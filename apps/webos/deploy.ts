@@ -2,6 +2,8 @@
 // VPS runner -> immutable release -> host activation, without cloud credentials.
 import { cp, mkdir, rename } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { stageIso } from "./vm";
+import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
 
 if (process.platform !== "linux")
   throw new Error("Deploy WebOS from the VPS factory");
@@ -43,6 +45,26 @@ for (const required of [
 ])
   if (!(await Bun.file(join(release, "dist", required)).exists()))
     throw new Error(`Missing ${required}`);
+if (!imported) {
+  const registry = (await Bun.file(
+    join(release, "dist/registry.json"),
+  ).json()) as { packages: { id: string }[] };
+  for (const capability of allAppCapabilities()) {
+    const id = capability.webosPackageId;
+    if (!id) continue;
+    if (!registry.packages.some((entry) => entry.id === id))
+      throw new Error(`Missing installable ${id}`);
+    const manifest = (await Bun.file(
+      join(release, "dist/apps", id, "app.json"),
+    ).json()) as { files: { path: string; bytes: number }[] };
+    if (
+      !manifest.files.some(
+        (file) => file.path.endsWith(".wasm") && file.bytes > 0,
+      )
+    )
+      throw new Error(`${id} has no executable WebAssembly artifact`);
+  }
+}
 const result = await Bun.build({
   entrypoints: [join(import.meta.dir, "serve.ts")],
   outdir: release,
@@ -52,6 +74,8 @@ const result = await Bun.build({
 });
 if (!result.success)
   throw new AggregateError(result.logs, "Native HTTP bundle failed");
+const iso = await stageIso();
+await Bun.write(join(release, "objects", iso.key), Bun.file(iso.path));
 await Bun.write(join(release, "release.env"), `SOURCE_COMMIT=${commit}\n`);
 const files: { path: string; bytes: number; sha256: string }[] = [];
 for await (const path of new Bun.Glob("**/*").scan({

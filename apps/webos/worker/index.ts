@@ -7,6 +7,7 @@ import { downloadsResponse } from "./downloads";
 import { APP_SERVER_PATHS, appServerResponse } from "./app-server";
 import { ROUTES } from "../src/config";
 import { ORIGIN, pathMeta } from "../paths";
+import vmLock from "../vm.lock.json";
 
 interface R2ObjectBodyLike {
   body: ReadableStream;
@@ -30,7 +31,7 @@ interface Env {
   };
 }
 
-const ISO_KEY = "webos/vm/alpine-virt-3.24.2-x86.iso";
+const ISO_KEY = `webos/vm/${vmLock.alpine.iso.name}`;
 
 /** Serve the Alpine ISO from R2 with Range support (v86 reads it in chunks). */
 async function iso(request: Request, env: Env): Promise<Response> {

@@ -34,7 +34,7 @@ const api = {
     );
   },
 };
-function objectFile(key: string) {
+async function objectFile(key: string) {
   if (
     !key ||
     key
@@ -45,11 +45,14 @@ function objectFile(key: string) {
       )
   )
     throw new Error("Invalid object key");
-  return Bun.file(join(objects, key));
+  const shared = Bun.file(join(objects, key));
+  return (await shared.exists())
+    ? shared
+    : Bun.file(join(import.meta.dir, "objects", key));
 }
 const vm = {
   async head(key: string) {
-    const file = objectFile(key);
+    const file = await objectFile(key);
     return (await file.exists())
       ? {
           size: file.size,
@@ -61,7 +64,7 @@ const vm = {
     key: string,
     options?: { range?: { offset: number; length?: number } },
   ) {
-    const file = objectFile(key);
+    const file = await objectFile(key);
     if (!(await file.exists())) return null;
     const r = options?.range;
     const slice = r

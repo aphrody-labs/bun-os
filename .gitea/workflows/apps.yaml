@@ -2,6 +2,16 @@ name: Aphrody / Bun
 on:
   push:
     branches: [main, os]
+    # Publishing the website does not change native application inputs.
+    paths-ignore:
+      - apps/webos/**
+      - infra/config/host/nginx/**
+      - infra/config/host/systemd/aphrody/aphrody-webos*
+      - infra/config/host/apps/vps/webos/**
+      - infra/config/host/apps/vps/compose.yaml
+      - .gitea/workflows/aphrody-sites.yaml
+      - .gitea/workflows/apps.yaml
+      - docs/**
   workflow_dispatch:
     inputs:
       build:
@@ -32,7 +42,7 @@ jobs:
       - uses: builtin:checkout
         with:
           submodules: true
-          fetch-depth: 0
+          fetch-depth: 1
           persist-credentials: false
       - name: Select runtime
         run: |

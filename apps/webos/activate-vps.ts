@@ -6,8 +6,12 @@ import { join, resolve } from "node:path";
 const home = "/home/ubuntu";
 const handoff = join(home, "build/cache/gitea-runner/webos-deploy");
 const app = join(home, "apps/webos");
-const ready = Bun.file(join(handoff, "ready"));
-if (!(await ready.exists())) process.exit(0);
+const readyPath = join(handoff, "ready");
+if (!(await Bun.file(readyPath).exists())) process.exit(0);
+// Claim this request before activation; a newly published ready pointer stays queued.
+const pending = join(handoff, `activating-${process.pid}`);
+await rename(readyPath, pending);
+const ready = Bun.file(pending);
 const name = (await ready.text()).trim();
 if (!/^[a-f0-9]{40}-[0-9]+$/.test(name))
   throw new Error("Invalid release name");
@@ -52,7 +56,7 @@ for (const path of [
 const current = join(app, "current");
 const previous = await readlink(current).catch(() => undefined);
 if (previous === release) {
-  await rename(join(handoff, "ready"), join(handoff, "activated"));
+  await rename(pending, join(handoff, "activated"));
   process.exit(0);
 }
 await mkdir(app, { recursive: true });
@@ -87,6 +91,23 @@ try {
     await Bun.sleep(1000);
   }
   if (!healthy) throw new Error("Activated source did not become healthy");
+  const publicHealth = await fetch("https://aphrody.com/api/health", {
+    cache: "no-store",
+    signal: AbortSignal.timeout(8000),
+  });
+  if (
+    !publicHealth.ok ||
+    ((await publicHealth.json()) as { sourceCommit?: string }).sourceCommit !==
+      receipt.sourceCommit
+  )
+    throw new Error("Public ingress did not confirm the activated source");
+  for (const path of ["/", "/workspace/", "/api/site/snapshot"]) {
+    const response = await fetch(`https://aphrody.com${path}`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    await response.body?.cancel();
+    if (!response.ok) throw new Error(`Public route failed: ${path}`);
+  }
   await Bun.write(
     join(app, "deployment.json"),
     JSON.stringify(
@@ -100,7 +121,7 @@ try {
       2,
     ),
   );
-  await rename(join(handoff, "ready"), join(handoff, "activated"));
+  await rename(pending, join(handoff, "activated"));
   console.log(`Activated WebOS ${receipt.sourceCommit}`);
 } catch (error) {
   if (previous) {
