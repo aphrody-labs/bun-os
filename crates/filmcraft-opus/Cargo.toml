@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-opus"
 description = "Clean-room pure-Rust Opus decoder (RFC 6716 / RFC 8251; OpusHead, multistream surround)"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -15,6 +15,7 @@ todo = "warn"
 too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
+
 
 [dependencies]
 

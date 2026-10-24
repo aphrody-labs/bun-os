@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-mpeg2v"
 description = "Clean-room MPEG-2 video (ITU-T H.262 | ISO/IEC 13818-2) and MPEG-1 video (ISO/IEC 11172-2) decoder"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,12 +16,13 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [features]
 default = ["threads"]
 threads = ["dep:rayon"]
 
 [dependencies]
-thiserror = "2"
+thiserror = { version = "2" }
 rayon = { version = "1", optional = true }
 
 [dev-dependencies]

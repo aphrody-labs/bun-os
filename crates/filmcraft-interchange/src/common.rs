@@ -68,7 +68,10 @@ pub fn file_url_to_path(url: &str) -> String {
         return url.to_string();
     }
     let rest = &url[7..];
-    let rest = if rest.len() >= 9 && rest[..9].eq_ignore_ascii_case("localhost") {
+    let rest = if rest
+        .get(..9)
+        .is_some_and(|s| s.eq_ignore_ascii_case("localhost"))
+    {
         &rest[9..]
     } else {
         rest

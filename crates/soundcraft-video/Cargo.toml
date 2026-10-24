@@ -17,10 +17,10 @@ threads = ["filmcraft-h264/threads", "filmcraft-prores/threads"]
 thiserror = "2"
 serde = { version = "1", features = ["derive", "rc"] }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
-filmcraft-bitstream = { path = "../filmcraft-bitstream", version = "0.7.2" }
-filmcraft-h264 = { path = "../filmcraft-h264", version = "0.7.2", default-features = false }
-filmcraft-isobmff = { path = "../filmcraft-isobmff", version = "0.7.2" }
-filmcraft-prores = { path = "../filmcraft-prores", version = "0.7.2", default-features = false }
+filmcraft-bitstream = { path = "../filmcraft-bitstream", version = "0.9.0" }
+filmcraft-h264 = { path = "../filmcraft-h264", version = "0.9.0", default-features = false }
+filmcraft-isobmff = { path = "../filmcraft-isobmff", version = "0.9.0" }
+filmcraft-prores = { path = "../filmcraft-prores", version = "0.9.0", default-features = false }
 
 [lints.rust]
 unsafe_code = "forbid"

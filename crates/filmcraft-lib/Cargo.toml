@@ -1,0 +1,57 @@
+[package]
+name = "filmcraft-lib"
+description = "FilmCraft as a library: probe, decode, remux, segment and encode media through one documented facade, without the editor"
+version = "0.9.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+repository = "https://github.com/storytold/filmcraft"
+keywords = ["video", "mp4", "matroska", "codec", "hls"]
+categories = ["multimedia::video", "multimedia::audio", "multimedia::encoding"]
+readme = "README.md"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+dbg_macro = "warn"
+todo = "warn"
+too_many_arguments = "allow"
+needless_range_loop = "allow"
+type_complexity = "allow"
+
+
+[features]
+# Everything a media toolkit needs. Drop `default-features` and pick: `container` alone is a
+# dependency-light MP4/MOV/MKV/WebM probe, remux and CMAF segmenter (no codecs, no pixels).
+default = ["decode", "container", "encode"]
+# Probe, seek and decode video frames and audio of every supported codec and container.
+decode = ["container", "dep:filmcraft-codecs", "dep:filmcraft-media", "dep:filmcraft-frame", "dep:filmcraft-color"]
+# Container-level work on packets: exact frame index, remux MP4/MOV <-> Matroska/WebM, CMAF segments, HLS playlists.
+container = ["dep:filmcraft-isobmff", "dep:filmcraft-matroska"]
+# Encode H.264, ProRes, DNxHR, APV, MJPEG video, AAC and PCM audio, GIF, PNG and WAV.
+encode = ["container", "dep:filmcraft-export", "dep:filmcraft-frame", "dep:filmcraft-color", "dep:image", "dep:filmcraft-h264enc"]
+
+[dependencies]
+filmcraft-time = { path = "../filmcraft-time", version = "0.9.0" }
+web-time = "1"
+filmcraft-isobmff = { path = "../filmcraft-isobmff", optional = true, version = "0.9.0" }
+filmcraft-matroska = { path = "../filmcraft-matroska", optional = true, version = "0.9.0" }
+filmcraft-codecs = { path = "../filmcraft-codecs", optional = true, version = "0.9.0" }
+filmcraft-media = { path = "../filmcraft-media", optional = true, version = "0.9.0" }
+filmcraft-frame = { path = "../filmcraft-frame", optional = true, version = "0.9.0" }
+filmcraft-color = { path = "../filmcraft-color", optional = true, version = "0.9.0" }
+filmcraft-export = { path = "../filmcraft-export", optional = true, version = "0.9.0" }
+filmcraft-h264enc = { path = "../filmcraft-h264enc", optional = true, version = "0.9.0" }
+image = { version = "0.25", default-features = false, features = ["gif", "png"], optional = true }
+
+[dev-dependencies]
+filmcraft-testkit = { path = "../filmcraft-testkit" }
+
+[[test]]
+name = "container"
+required-features = ["container"]
+
+[[test]]
+name = "codecs"
+required-features = ["decode", "encode"]

@@ -26,6 +26,7 @@
 //!
 //! The CPU plan executor (`filmcraft_render::plan::execute_cpu`) is the oracle; tests compare.
 
+#![recursion_limit = "256"]
 #![cfg_attr(
     not(test),
     deny(

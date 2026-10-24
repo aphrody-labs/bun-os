@@ -664,7 +664,7 @@ fn button(app: &mut FilmcraftApp, ui: &mut Ui, id: &str, label: &str, primary: b
         } else {
             Stroke::new(1.5, t.text_faint)
         });
-    let r = ui.add(b);
+    let r = ui.add(b).on_hover_cursor(egui::CursorIcon::PointingHand);
     app.auto.add(id, r.rect, label);
     r.clicked()
 }

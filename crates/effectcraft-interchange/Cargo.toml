@@ -21,12 +21,12 @@ effectcraft-time = { path = "../effectcraft-time", version = "0.9.2" }
 effectcraft-color = { path = "../effectcraft-color", version = "0.9.2" }
 effectcraft-keyframe = { path = "../effectcraft-keyframe", version = "0.9.2" }
 effectcraft-project = { path = "../effectcraft-project", version = "0.9.2" }
-filmcraft-interchange = { path = "../filmcraft-interchange", version = "0.7.2" }
-filmcraft-project = { path = "../filmcraft-project", version = "0.7.2" }
-filmcraft-media = { path = "../filmcraft-media", version = "0.7.2" }
-filmcraft-time = { path = "../filmcraft-time", version = "0.7.2" }
-filmcraft-geom = { path = "../filmcraft-geom", version = "0.7.2" }
-filmcraft-color = { path = "../filmcraft-color", version = "0.7.2" }
+filmcraft-interchange = { path = "../filmcraft-interchange", version = "0.9.0" }
+filmcraft-project = { path = "../filmcraft-project", version = "0.9.0" }
+filmcraft-media = { path = "../filmcraft-media", version = "0.9.0" }
+filmcraft-time = { path = "../filmcraft-time", version = "0.9.0" }
+filmcraft-geom = { path = "../filmcraft-geom", version = "0.9.0" }
+filmcraft-color = { path = "../filmcraft-color", version = "0.9.0" }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = { version = "1", features = ["float_roundtrip"] }
 thiserror = "2"

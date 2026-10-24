@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-ui-egui"
 description = "The FilmCraft egui frontend (swappable): panels, docking, timeline, monitors, control channel"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,42 +16,55 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [dependencies]
 craft-ui = { path = "../craft-ui", version = "1.4.7", features = ["serde"] }
-filmcraft-time = { path = "../filmcraft-time", version = "0.7.2" }
-filmcraft-geom = { path = "../filmcraft-geom", version = "0.7.2" }
-filmcraft-color = { path = "../filmcraft-color", version = "0.7.2" }
-filmcraft-frame = { path = "../filmcraft-frame", version = "0.7.2" }
-filmcraft-media = { path = "../filmcraft-media", version = "0.7.2" }
-filmcraft-project = { path = "../filmcraft-project", version = "0.7.2" }
-filmcraft-tts = { path = "../filmcraft-tts", version = "0.7.2" }
-filmcraft-edit = { path = "../filmcraft-edit", version = "0.7.2" }
-filmcraft-render = { path = "../filmcraft-render", version = "0.7.2" }
-filmcraft-text = { path = "../filmcraft-text", version = "0.7.2" }
-filmcraft-audio-dsp = { path = "../filmcraft-audio-dsp", version = "0.7.2" }
-filmcraft-engine = { path = "../filmcraft-engine", version = "0.7.2" }
-filmcraft-export = { path = "../filmcraft-export", version = "0.7.2" }
-filmcraft-gpu = { path = "../filmcraft-gpu", version = "0.7.2" }
-filmcraft-scopes = { path = "../filmcraft-scopes", version = "0.7.2" }
+filmcraft-time = { path = "../filmcraft-time", version = "0.9.0" }
+filmcraft-geom = { path = "../filmcraft-geom", version = "0.9.0" }
+filmcraft-color = { path = "../filmcraft-color", version = "0.9.0" }
+filmcraft-frame = { path = "../filmcraft-frame", version = "0.9.0" }
+filmcraft-media = { path = "../filmcraft-media", version = "0.9.0" }
+filmcraft-project = { path = "../filmcraft-project", version = "0.9.0" }
+filmcraft-tts = { path = "../filmcraft-tts", version = "0.9.0" }
+filmcraft-edit = { path = "../filmcraft-edit", version = "0.9.0" }
+filmcraft-render = { path = "../filmcraft-render", version = "0.9.0" }
+filmcraft-text = { path = "../filmcraft-text", version = "0.9.0" }
+filmcraft-audio-dsp = { path = "../filmcraft-audio-dsp", version = "0.9.0" }
+filmcraft-engine = { path = "../filmcraft-engine", version = "0.9.0" }
+filmcraft-export = { path = "../filmcraft-export", version = "0.9.0" }
+filmcraft-gpu = { path = "../filmcraft-gpu", version = "0.9.0" }
+filmcraft-scopes = { path = "../filmcraft-scopes", version = "0.9.0" }
 egui = "0.36"
 eframe = { version = "0.36", default-features = false, features = ["glow", "default_fonts", "wgpu", "accesskit"] }
 serde = { version = "1", features = ["derive", "rc"] }
-serde_json = "1"
-log = "0.4"
-rayon = "1"
+serde_json = { version = "1" }
+log = { version = "0.4" }
+rayon = { version = "1" }
 web-time = "1"
+# Unicode Bidirectional Algorithm for Arabic and Hebrew captions in reading order (MIT OR Apache-2.0).
 unicode-bidi = "0.3.18"
+# ArtCraft wordmark (PNG) for the About dialog and Home screen.
 image = { version = "0.25", default-features = false, features = ["png"] }
+
+# Thread/process CPU clocks for frame-job profiling (safe wrappers; see frames.rs).
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1", default-features = false, features = ["std", "time"] }
+# the same clocks on Windows (GetThreadTimes / GetProcessTimes behind a safe API; MIT OR Apache-2.0)
+[target.'cfg(windows)'.dependencies]
+cpu-time = "1"
 
 [dev-dependencies]
 pollster = "0.4"
-filmcraft-codecs = { path = "../filmcraft-codecs" }
-filmcraft-platform = { path = "../filmcraft-platform" }
-filmcraft-interchange = { path = "../filmcraft-interchange" }
+filmcraft-codecs = { path = "../filmcraft-codecs", version = "0.9.0" }
+# the bench registers OS hardware decoders as the desktop app does (dev-dependency only: ui-egui
+# itself stays OS-independent and web-portable)
+filmcraft-platform = { path = "../filmcraft-platform", version = "0.9.0" }
+filmcraft-interchange = { path = "../filmcraft-interchange", version = "0.9.0" }
 egui_kittest = { version = "0.36", features = ["eframe", "wgpu"] }
 
+# build.rs bakes contributors/contributors.json into the binary (About ▸ Contributors).
 [build-dependencies]
-serde_json = "1"
+serde_json = { version = "1" }
 toml = "1"
 
 # CPU clocks (frames.rs) exist on Unix only; the browser and Windows builds do not link rustix.

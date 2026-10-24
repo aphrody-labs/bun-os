@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-speech"
 description = "FilmCraft speech-to-text: the Transcriber trait, the Whisper model catalogue and downloader, pure-Rust Whisper inference (candle) with word timestamps, and speaker labelling"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,6 +16,7 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [features]
 default = []
 # Whisper inference on the CPU via candle (pure Rust). Off by default (and in wasm builds).
@@ -24,8 +25,8 @@ whisper = ["dep:candle-core", "dep:candle-nn"]
 download = ["dep:ureq", "dep:rustls", "dep:rustls-rustcrypto", "dep:sha2"]
 
 [dependencies]
-filmcraft-time = { path = "../filmcraft-time", version = "0.7.2" }
-filmcraft-project = { path = "../filmcraft-project", version = "0.7.2" }
+filmcraft-time = { path = "../filmcraft-time", version = "0.9.0" }
+filmcraft-project = { path = "../filmcraft-project", version = "0.9.0" }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"
 thiserror = "2"

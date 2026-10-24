@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-frame"
 description = "Video frames and audio buffers with explicit colour metadata"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,8 +16,9 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [dependencies]
-filmcraft-color = { path = "../filmcraft-color", version = "0.7.2" }
-filmcraft-time = { path = "../filmcraft-time", version = "0.7.2" }
-rayon = "1"
+filmcraft-color = { path = "../filmcraft-color", version = "0.9.0" }
+filmcraft-time = { path = "../filmcraft-time", version = "0.9.0" }
+rayon = { version = "1" }
 serde = { version = "1", features = ["derive", "rc"] }

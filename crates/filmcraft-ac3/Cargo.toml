@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-ac3"
 description = "Clean-room AC-3 and E-AC-3 (Dolby Digital / Dolby Digital Plus, ATSC A/52) audio decoder"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,8 +16,9 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [dependencies]
-thiserror = "2"
+thiserror = { version = "2" }
 
 [dev-dependencies]
 filmcraft-testkit = { path = "../filmcraft-testkit" }

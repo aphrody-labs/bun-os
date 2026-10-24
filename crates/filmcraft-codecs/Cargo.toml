@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-codecs"
 description = "Container + codec hub: MP4/MOV, Matroska, MXF, Ogg and MPEG TS/PS sources, image sequences, GOP-aware seeking, decoder registry, audio decoding"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,38 +16,41 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [dependencies]
-filmcraft-time = { path = "../filmcraft-time", version = "0.7.2" }
-filmcraft-color = { path = "../filmcraft-color", version = "0.7.2" }
-filmcraft-frame = { path = "../filmcraft-frame", version = "0.7.2" }
-filmcraft-media = { path = "../filmcraft-media", version = "0.7.2" }
-filmcraft-avi = { path = "../filmcraft-avi", version = "0.7.2" }
-filmcraft-isobmff = { path = "../filmcraft-isobmff", version = "0.7.2" }
-filmcraft-matroska = { path = "../filmcraft-matroska", version = "0.7.2" }
-filmcraft-mxf = { path = "../filmcraft-mxf", version = "0.7.2" }
-filmcraft-mpegts = { path = "../filmcraft-mpegts", version = "0.7.2" }
-filmcraft-mpeg2v = { path = "../filmcraft-mpeg2v", version = "0.7.2" }
-filmcraft-ac3 = { path = "../filmcraft-ac3", version = "0.7.2" }
-filmcraft-mpa = { path = "../filmcraft-mpa", version = "0.7.2" }
-filmcraft-ogg = { path = "../filmcraft-ogg", version = "0.7.2" }
-filmcraft-bitstream = { path = "../filmcraft-bitstream", version = "0.7.2" }
-filmcraft-h264 = { path = "../filmcraft-h264", version = "0.7.2" }
-filmcraft-hevc = { path = "../filmcraft-hevc", version = "0.7.2" }
-filmcraft-vp8 = { path = "../filmcraft-vp8", version = "0.7.2" }
-filmcraft-vp9 = { path = "../filmcraft-vp9", version = "0.7.2" }
-filmcraft-prores = { path = "../filmcraft-prores", version = "0.7.2" }
-filmcraft-dnx = { path = "../filmcraft-dnx", version = "0.7.2" }
-filmcraft-av1 = { path = "../filmcraft-av1", version = "0.7.2" }
-filmcraft-apv = { path = "../filmcraft-apv", version = "0.7.2" }
-filmcraft-aac = { path = "../filmcraft-aac", version = "0.7.2" }
-filmcraft-opus = { path = "../filmcraft-opus", version = "0.7.2" }
+filmcraft-time = { path = "../filmcraft-time", version = "0.9.0" }
+filmcraft-color = { path = "../filmcraft-color", version = "0.9.0" }
+filmcraft-frame = { path = "../filmcraft-frame", version = "0.9.0" }
+filmcraft-media = { path = "../filmcraft-media", version = "0.9.0" }
+filmcraft-avi = { path = "../filmcraft-avi", version = "0.9.0" }
+filmcraft-isobmff = { path = "../filmcraft-isobmff", version = "0.9.0" }
+filmcraft-matroska = { path = "../filmcraft-matroska", version = "0.9.0" }
+filmcraft-mxf = { path = "../filmcraft-mxf", version = "0.9.0" }
+filmcraft-mpegts = { path = "../filmcraft-mpegts", version = "0.9.0" }
+filmcraft-mpeg2v = { path = "../filmcraft-mpeg2v", version = "0.9.0" }
+filmcraft-ac3 = { path = "../filmcraft-ac3", version = "0.9.0" }
+filmcraft-mpa = { path = "../filmcraft-mpa", version = "0.9.0" }
+filmcraft-ogg = { path = "../filmcraft-ogg", version = "0.9.0" }
+filmcraft-bitstream = { path = "../filmcraft-bitstream", version = "0.9.0" }
+filmcraft-h264 = { path = "../filmcraft-h264", version = "0.9.0" }
+filmcraft-hevc = { path = "../filmcraft-hevc", version = "0.9.0" }
+filmcraft-vp8 = { path = "../filmcraft-vp8", version = "0.9.0" }
+filmcraft-vp9 = { path = "../filmcraft-vp9", version = "0.9.0" }
+filmcraft-prores = { path = "../filmcraft-prores", version = "0.9.0" }
+filmcraft-dnx = { path = "../filmcraft-dnx", version = "0.9.0" }
+filmcraft-av1 = { path = "../filmcraft-av1", version = "0.9.0" }
+filmcraft-apv = { path = "../filmcraft-apv", version = "0.9.0" }
+filmcraft-aac = { path = "../filmcraft-aac", version = "0.9.0" }
+filmcraft-opus = { path = "../filmcraft-opus", version = "0.9.0" }
 rayon = "1"
 thiserror = "2"
 log = "0.4"
+# Decode timing counters (`gop_stats`); std's Instant panics on wasm32.
 web-time = "1"
 image = { version = "0.25", default-features = false, features = ["jpeg"] }
+# Bootstrap audio decoding (MPL-2.0, used unmodified); replaced by own decoders over time.
 symphonia = { version = "0.5.5", default-features = false, features = ["aac", "mp1", "mp2", "mp3", "flac", "alac", "pcm", "wav", "aiff", "ogg", "vorbis", "isomp4"] }
 
 [dev-dependencies]
 filmcraft-testkit = { path = "../filmcraft-testkit" }
-serde_json = "1"
+serde_json = { version = "1" }

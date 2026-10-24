@@ -121,6 +121,7 @@ members = [
     "crates/craft-cms",
     "crates/craft-print",
     "crates/craft-quit",
+    "crates/craft-docpath",
     "crates/craft-ui",
     "crates/craft-fonts",
     "crates/craft-fonts-tests",
@@ -294,6 +295,7 @@ members = [
     "crates/filmcraft-hevc",
     "crates/filmcraft-interchange",
     "crates/filmcraft-isobmff",
+    "crates/filmcraft-lib",
     "crates/filmcraft-matroska",
     "crates/filmcraft-media",
     "crates/filmcraft-mpa",
@@ -755,15 +757,15 @@ pyo3 = { version = "0.29.3" }
 mimalloc = { version = "0.1", default-features = false, features = [] }
 aphrody-backend = { path = "crates/aphrody-backend", version = "1.4.7", features = [] }
 libm = { version = "0.2.16" }
-filmcraft-engine = { path = "crates/filmcraft-engine", version = "0.7.2" }
-filmcraft-ui-egui = { path = "crates/filmcraft-ui-egui", version = "0.7.2" }
-filmcraft-media = { path = "crates/filmcraft-media", version = "0.7.2" }
-filmcraft-codecs = { path = "crates/filmcraft-codecs", version = "0.7.2" }
-filmcraft-frame = { path = "crates/filmcraft-frame", version = "0.7.2" }
-filmcraft-color = { path = "crates/filmcraft-color", version = "0.7.2" }
-filmcraft-isobmff = { path = "crates/filmcraft-isobmff", version = "0.7.2" }
-filmcraft-format = { path = "crates/filmcraft-format", version = "0.7.2" }
-filmcraft-time = { path = "crates/filmcraft-time", version = "0.7.2" }
+filmcraft-engine = { path = "crates/filmcraft-engine", version = "0.9.0" }
+filmcraft-ui-egui = { path = "crates/filmcraft-ui-egui", version = "0.9.0" }
+filmcraft-media = { path = "crates/filmcraft-media", version = "0.9.0" }
+filmcraft-codecs = { path = "crates/filmcraft-codecs", version = "0.9.0" }
+filmcraft-frame = { path = "crates/filmcraft-frame", version = "0.9.0" }
+filmcraft-color = { path = "crates/filmcraft-color", version = "0.9.0" }
+filmcraft-isobmff = { path = "crates/filmcraft-isobmff", version = "0.9.0" }
+filmcraft-format = { path = "crates/filmcraft-format", version = "0.9.0" }
+filmcraft-time = { path = "crates/filmcraft-time", version = "0.9.0" }
 soundcraft-engine = { path = "crates/soundcraft-engine", version = "0.6.1" }
 soundcraft-ui-egui = { path = "crates/soundcraft-ui-egui", version = "0.6.1" }
 soundcraft-playback = { path = "crates/soundcraft-playback", version = "0.6.1" }

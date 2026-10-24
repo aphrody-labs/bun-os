@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-h264"
 description = "Clean-room pure-Rust H.264/AVC decoder (ITU-T H.264)"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,13 +16,14 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [features]
 default = ["threads"]
 threads = ["dep:rayon"]
 
 [dependencies]
-filmcraft-bitstream = { path = "../filmcraft-bitstream", version = "0.7.2" }
-thiserror = "2"
+filmcraft-bitstream = { path = "../filmcraft-bitstream", version = "0.9.0" }
+thiserror = { version = "2" }
 rayon = { version = "1", optional = true }
 
 [dev-dependencies]

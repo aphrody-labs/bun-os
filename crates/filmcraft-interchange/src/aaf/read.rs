@@ -775,7 +775,7 @@ impl R<'_> {
             file_channels,
             width: d.u32(pid::STORED_WIDTH).unwrap_or(0),
             height: if matches!(layout, 1 | 3) {
-                stored_h * 2
+                stored_h.saturating_mul(2)
             } else {
                 stored_h
             },

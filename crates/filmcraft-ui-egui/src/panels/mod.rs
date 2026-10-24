@@ -97,6 +97,9 @@ pub fn show(app: &mut FilmcraftApp, ui: &mut egui::Ui, p: PanelKind, rect: Rect)
         PanelKind::Properties if graphics::graphic_selected(app) => {
             graphics::properties(app, ui, rect)
         }
+        PanelKind::Properties if text::caption_selected(app) => {
+            text::caption_properties(app, ui, rect)
+        }
         PanelKind::Properties => effect_controls::properties_panel(app, ui, rect),
         PanelKind::EssentialGraphics => graphics_templates::essential_graphics(app, ui, rect),
         PanelKind::History => misc::history(app, ui, rect),

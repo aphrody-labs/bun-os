@@ -1,6 +1,7 @@
 [package]
 name = "filmcraft-geom"
-version = "0.7.2"
+description = "2D geometry for FilmCraft: vectors, rectangles and affine transforms."
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -15,8 +16,9 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [dependencies]
 serde = { version = "1", features = ["derive", "rc"] }
 
 [dev-dependencies]
-proptest = "1"
+proptest = { version = "1" }

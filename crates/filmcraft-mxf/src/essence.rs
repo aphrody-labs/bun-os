@@ -172,7 +172,7 @@ impl PictureInfo {
             self.stored_height
         };
         if matches!(self.frame_layout, 1 | 3) {
-            h * 2
+            h.saturating_mul(2)
         } else {
             h
         }
@@ -314,6 +314,23 @@ mod tests {
         ];
         b[8..8 + item.len()].copy_from_slice(item);
         Ul(b)
+    }
+
+    #[test]
+    fn interlaced_picture_height_does_not_overflow() {
+        let picture = PictureInfo {
+            stored_height: u32::MAX,
+            frame_layout: 1,
+            ..Default::default()
+        };
+        assert_eq!(picture.frame_height(), u32::MAX);
+        let picture = PictureInfo {
+            display_height: 240,
+            stored_height: u32::MAX,
+            frame_layout: 3,
+            ..Default::default()
+        };
+        assert_eq!(picture.frame_height(), 480);
     }
 
     #[test]

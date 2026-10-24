@@ -50,6 +50,10 @@ pub struct AutoSavePrefs {
     pub recovery_journal: bool,
     /// Longest time (s) unsaved changes may stay out of the journal while edits keep coming.
     pub recovery_interval_seconds: u32,
+    /// Folders chosen in Project Settings ▸ Scratch Disks on this computer. A project file may
+    /// name these, or folders inside its own folder; see
+    /// [`crate::project_tools::trusted_scratch`].
+    pub scratch_folders: Vec<String>,
 }
 
 impl Default for AutoSavePrefs {
@@ -61,6 +65,7 @@ impl Default for AutoSavePrefs {
             save_current_project: false,
             recovery_journal: true,
             recovery_interval_seconds: 5,
+            scratch_folders: Vec::new(),
         }
     }
 }
@@ -1158,25 +1163,23 @@ impl Worker {
         let Some(s) = &self.latest else {
             return Err("nothing to save".into());
         };
-        let scratch = s
-            .project
-            .settings
-            .scratch
-            .auto_save
-            .clone()
-            .filter(|d| !d.is_empty());
-        let (dir, name) = match &s.path {
+        let scratch = crate::project_tools::trusted_scratch(
+            s.project.settings.scratch.auto_save.as_deref(),
+            s.path.as_deref(),
+            &self.prefs.scratch_folders,
+        );
+        let (dir, name) = match (&s.path, scratch) {
             // Project Settings ▸ Scratch Disks ▸ Project Auto Save
-            Some(p) if scratch.is_some() => {
+            (Some(p), Some(scratch)) => {
                 let p = Path::new(p);
                 (
-                    PathBuf::from(scratch.clone().unwrap_or_default()),
+                    scratch,
                     p.file_stem()
                         .map(|n| n.to_string_lossy().into_owned())
                         .unwrap_or_else(|| s.project.name.clone()),
                 )
             }
-            Some(p) => {
+            (Some(p), None) => {
                 let p = Path::new(p);
                 (
                     names::auto_save_dir(p),
@@ -1185,7 +1188,7 @@ impl Worker {
                         .unwrap_or_else(|| s.project.name.clone()),
                 )
             }
-            None => (
+            (None, _) => (
                 self.data_dir.join(names::AUTO_SAVE_DIR),
                 s.project.name.clone(),
             ),

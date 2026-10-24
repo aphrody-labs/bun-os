@@ -511,13 +511,12 @@ pub fn create(s: &mut Session, p: &Value) -> Result<Value> {
     let items = items_param(s, p);
     // default: Project Settings ▸ Scratch Disks ▸ Captured and Generated, else next to the media
     let dest = str_p(p, "destination").map(str::to_string).or_else(|| {
-        s.project
-            .settings
-            .scratch
-            .captured
-            .clone()
-            .filter(|d| !d.is_empty())
-            .map(|d| format!("{d}/Proxies"))
+        crate::project_tools::trusted_scratch(
+            s.project.settings.scratch.captured.as_deref(),
+            s.path.as_deref(),
+            &s.prefs.auto_save.scratch_folders,
+        )
+        .map(|d| d.join("Proxies").to_string_lossy().into_owned())
     });
     let mut work = Vec::new();
     let mut taken = Vec::new();
@@ -531,6 +530,14 @@ pub fn create(s: &mut Session, p: &Value) -> Result<Value> {
             skipped.push(json!({"item": i.0, "reason": format!("{name} has no video to proxy")}));
             continue;
         }
+        let path = match s.media.follow(&path) {
+            Ok(file) => file,
+            Err(why) => {
+                skipped
+                    .push(json!({"item": i.0, "reason": format!("{path} is not opened: {why}")}));
+                continue;
+            }
+        };
         let stem = Path::new(&path)
             .file_stem()
             .map(|n| n.to_string_lossy().into_owned())

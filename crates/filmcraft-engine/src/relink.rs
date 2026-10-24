@@ -22,7 +22,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use crate::commands::{CommandSpec, always, bad, bool_p, str_p, u64_p};
-use crate::{EngineError, Result, Services, Session};
+use crate::{EngineError, MediaPool, Result, Services, Session};
 
 /// Bytes hashed at each end of the file.
 pub const FINGERPRINT_SPAN: usize = 1 << 20;
@@ -113,8 +113,13 @@ fn split_ext(name: &str) -> (&str, &str) {
     }
 }
 
-/// Every media item whose file is missing (or that was made offline), in project order.
-pub fn scan(p: &Project, services: &dyn Services) -> Vec<Missing> {
+/// Every media item whose file is missing (or that was made offline), in project order. A
+/// stored path the media pool does not follow ([`MediaPool::follow`]) counts as missing.
+pub fn scan(p: &Project, pool: &MediaPool, services: &dyn Services) -> Vec<Missing> {
+    let exists = |path: &str| {
+        pool.follow(path)
+            .is_ok_and(|file| services.file_size(&file).is_ok())
+    };
     let mut out = Vec::new();
     for it in p.items.values() {
         let ItemKind::Media(m) = &it.kind else {
@@ -125,10 +130,10 @@ pub fn scan(p: &Project, services: &dyn Services) -> Vec<Missing> {
         };
         let status = if m.offline {
             "offline"
-        } else if services.file_size(path).is_err() {
+        } else if !exists(path) {
             "missing"
         } else if let Some(MediaRef::File { path: pp }) = &m.proxy
-            && services.file_size(pp).is_err()
+            && !exists(pp)
         {
             "proxyMissing"
         } else {
@@ -149,7 +154,7 @@ pub fn scan(p: &Project, services: &dyn Services) -> Vec<Missing> {
 
 /// Rescan and remember the result. Returns the list.
 pub fn refresh(s: &mut Session) -> Vec<Missing> {
-    let list = scan(&s.project, &*s.services);
+    let list = scan(&s.project, &s.media, &*s.services);
     s.offline.missing = list
         .iter()
         .filter(|m| m.status != "proxyMissing")
@@ -440,6 +445,9 @@ fn apply(
         }
         Ok(())
     })?;
+    for p in &plans {
+        s.media.allow(&p.cand.path);
+    }
     for (item, path, src) in sources {
         s.media.insert_file(item, &path, src);
     }
@@ -456,7 +464,7 @@ fn others(s: &Session, skip: ItemId, old: &str, new: &str, o: &MatchOptions) -> 
     let remap = derive_remap(old, new);
     let new_dir = Path::new(new).parent().map(Path::to_path_buf);
     let mut out = Vec::new();
-    for m in scan(&s.project, &*s.services) {
+    for m in scan(&s.project, &s.media, &*s.services) {
         let id = ItemId(m.item);
         if id == skip || m.status != "missing" {
             continue;
@@ -540,7 +548,7 @@ pub fn relink(s: &mut Session, p: &Value) -> Result<Value> {
 /// `media.autoRelink`: `{from, to}` remaps a folder prefix; `{folder}` searches a folder tree.
 pub fn auto_relink(s: &mut Session, p: &Value) -> Result<Value> {
     let o = MatchOptions::from_params(p);
-    let missing: Vec<Missing> = scan(&s.project, &*s.services)
+    let missing: Vec<Missing> = scan(&s.project, &s.media, &*s.services)
         .into_iter()
         .filter(|m| m.status == "missing")
         .collect();
@@ -637,7 +645,7 @@ pub fn search(s: &Session, p: &Value) -> Result<Value> {
     let o = MatchOptions::from_params(p);
     let items: Vec<ItemId> = match u64_p(p, "item") {
         Some(i) => vec![ItemId(i)],
-        None => scan(&s.project, &*s.services)
+        None => scan(&s.project, &s.media, &*s.services)
             .into_iter()
             .filter(|m| m.status == "missing")
             .map(|m| ItemId(m.item))
@@ -907,6 +915,23 @@ pub fn commands() -> Vec<CommandSpec> {
 /// After a project opens: find missing files and ask for them.
 pub fn on_open(s: &mut Session) -> usize {
     let list = refresh(s);
+    let refused: Vec<String> = list
+        .iter()
+        .filter(|m| m.status == "missing")
+        .filter_map(|m| {
+            s.media
+                .follow(&m.path)
+                .err()
+                .map(|why| format!("{} ({why})", m.path))
+        })
+        .collect();
+    if !refused.is_empty() {
+        log::warn!(
+            "media paths stored in the project not opened: {}",
+            refused.join(", ")
+        );
+        s.toast(format!("Not opening {} media file(s) the project names on another computer or device; File ▸ Link Media… reconnects them", refused.len()));
+    }
     s.offline.prompt = !s.offline.missing.is_empty();
     if !s.offline.missing.is_empty() {
         s.toast(format!(

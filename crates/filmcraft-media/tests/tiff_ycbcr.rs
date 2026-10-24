@@ -168,9 +168,10 @@ fn ffmpeg_ycbcr_tiffs_match_ffmpeg_decode() {
     };
     let dir = filmcraft_testkit::fixtures::fixtures_dir("media/tiff_ycbcr");
     for pix_fmt in ["yuv420p", "yuv422p", "yuv444p"] {
-        let tiff = dir.join(format!("gradient_{pix_fmt}.tiff"));
+        let tiff = dir.join(format!("gradient_fixed_{pix_fmt}.tiff"));
         let made = filmcraft_testkit::fixtures::generate(&tiff, |tmp| {
             std::process::Command::new(&ff)
+                // Default gradient colors stay random even with a fixed seed.
                 .args([
                     "-y",
                     "-v",
@@ -178,7 +179,7 @@ fn ffmpeg_ycbcr_tiffs_match_ffmpeg_decode() {
                     "-f",
                     "lavfi",
                     "-i",
-                    "gradients=size=95x63:seed=7",
+                    "gradients=size=95x63:seed=7:c0=0x204060:c1=0xd0a080",
                     "-frames:v",
                     "1",
                     "-pix_fmt",

@@ -154,7 +154,7 @@ fn the_notice_follows_the_interface_language() {
     d.frames(3);
     assert_eq!(
         d.label("graphics.notice"),
-        "Modo gráfico seguro: renderizado por software"
+        "Modo gráfico seguro: procesamiento por software"
     );
     assert_eq!(
         d.label("graphics.notice.reset"),

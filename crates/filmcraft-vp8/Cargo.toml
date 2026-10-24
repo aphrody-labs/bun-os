@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-vp8"
 description = "Clean-room pure-Rust VP8 decoder (RFC 6386)"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,5 +16,6 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [dependencies]
-thiserror = "2"
+thiserror = { version = "2" }

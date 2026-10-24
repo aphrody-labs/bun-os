@@ -94,7 +94,16 @@ fn item_of(r: &Value) -> ItemId {
 
 #[test]
 fn import_as_image_sequence_with_missing_frames() {
-    let dir = tmp_dir("imgseq-import");
+    check_image_sequence_with_missing_frames("shot_");
+}
+
+#[test]
+fn import_unicode_image_sequence_with_missing_frames() {
+    check_image_sequence_with_missing_frames("é");
+}
+
+fn check_image_sequence_with_missing_frames(prefix: &str) {
+    let dir = tmp_dir(&format!("imgseq-import-{prefix}"));
     let mut s = demo();
     s.execute(
         "prefs.set",
@@ -102,7 +111,7 @@ fn import_as_image_sequence_with_missing_frames() {
     )
     .unwrap();
     // frames 1..=6 with 4 missing, plus an unrelated file
-    let paths = write_frames(&dir, "shot_", &[1, 2, 3, 5, 6], "png");
+    let paths = write_frames(&dir, prefix, &[1, 2, 3, 5, 6], "png");
     write_frames(&dir, "other_", &[1], "png");
     let r = s
         .execute(

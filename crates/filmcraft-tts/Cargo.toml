@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-tts"
 description = "FilmCraft text to speech: the Voice trait, the voice catalogue, script parsing (pause markers), the built-in formant voice and (feature kokoro) Kokoro-82M neural voices on candle"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,14 +16,15 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [features]
 default = []
 # Kokoro-82M neural voices on the CPU via candle (pure Rust). Off by default and in wasm builds.
 kokoro = ["dep:candle-core", "dep:candle-nn", "dep:zip", "dep:serde_json", "dep:filmcraft-tts-text", "dep:filmcraft-audio-dsp"]
 
 [dependencies]
-filmcraft-tts-text = { path = "../filmcraft-tts-text", version = "0.7.2", optional = true }
-filmcraft-audio-dsp = { path = "../filmcraft-audio-dsp", version = "0.7.2", optional = true }
+filmcraft-tts-text = { path = "../filmcraft-tts-text", version = "0.9.0", optional = true }
+filmcraft-audio-dsp = { path = "../filmcraft-audio-dsp", version = "0.9.0", optional = true }
 serde = { version = "1", features = ["derive", "rc"] }
 thiserror = "2"
 candle-core = { workspace = true, optional = true }

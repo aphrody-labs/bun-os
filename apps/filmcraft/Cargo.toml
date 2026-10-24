@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft"
 description = "FilmCraft desktop app"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 default-run = "filmcraft"
@@ -17,6 +17,7 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [features]
 default = []
 # Speech-to-text (Text panel ▸ Transcribe) with Whisper on the CPU, and model downloads.
@@ -25,14 +26,14 @@ whisper = ["filmcraft-engine/whisper", "filmcraft-engine/speech-download"]
 neural-voices = ["filmcraft-engine/neural-voices"]
 
 [dependencies]
-filmcraft-engine = { path = "../../crates/filmcraft-engine", version = "0.7.2" }
-filmcraft-export = { path = "../../crates/filmcraft-export", version = "0.7.2" }
-filmcraft-project = { path = "../../crates/filmcraft-project", version = "0.7.2" }
-filmcraft-render = { path = "../../crates/filmcraft-render", version = "0.7.2" }
-filmcraft-time = { path = "../../crates/filmcraft-time", version = "0.7.2" }
-filmcraft-gpu = { path = "../../crates/filmcraft-gpu", version = "0.7.2" }
-filmcraft-ui-egui = { path = "../../crates/filmcraft-ui-egui", version = "0.7.2" }
-filmcraft-platform = { path = "../../crates/filmcraft-platform", version = "0.7.2" }
+filmcraft-engine = { path = "../../crates/filmcraft-engine", version = "0.9.0" }
+filmcraft-export = { path = "../../crates/filmcraft-export", version = "0.9.0" }
+filmcraft-project = { path = "../../crates/filmcraft-project", version = "0.9.0" }
+filmcraft-render = { path = "../../crates/filmcraft-render", version = "0.9.0" }
+filmcraft-time = { path = "../../crates/filmcraft-time", version = "0.9.0" }
+filmcraft-gpu = { path = "../../crates/filmcraft-gpu", version = "0.9.0" }
+filmcraft-ui-egui = { path = "../../crates/filmcraft-ui-egui", version = "0.9.0" }
+filmcraft-platform = { path = "../../crates/filmcraft-platform", version = "0.9.0" }
 egui = "0.36"
 eframe = { version = "0.36", default-features = false, features = [
   "default_fonts",
@@ -45,14 +46,31 @@ serde_json = "1"
 log = "0.4"
 rfd = "0.17"
 cpal = "0.16"
+# Files and images on the system clipboard for Paste (#611); egui already uses it for text.
 arboard = "3"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
 sys-locale = "0.3"
+# Help menu / About / Discord links in the system browser (MIT; as PhotoCraft).
 open = "5"
 
 [dev-dependencies]
 glob = "0.3"
+# graphics.rs: enumerate the real adapters in a test.
 pollster = "0.4"
 
+[target.'cfg(target_os = "macos")'.dependencies]
+muda = "0.21"
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSProcessInfo", "NSString", "NSArray"] }
+objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "NSApplication", "NSResponder", "NSWindow"] }
+objc2 = "0.6"
+# Same winit as eframe: macOS event-loop options (no app activation when driven by an agent).
+winit = { version = "0.30", default-features = false }
+
 [target.'cfg(target_os = "linux")'.dependencies]
-zbus = "5"
+# Settings ▸ Appearance ▸ Sync with system: the XDG desktop portal's colour scheme. The zbus the
+# portal file dialogs (rfd) and accesskit already use.
+zbus = "5.19"
+
+# Icon + VERSIONINFO for filmcraft.exe (build.rs); only needed when building on Windows.
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1"

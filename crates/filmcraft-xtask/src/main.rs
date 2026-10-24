@@ -147,7 +147,11 @@ fn workspace_crates(md: &Value) -> Vec<(String, Vec<String>)> {
         .as_array()
         .into_iter()
         .flatten()
-        .filter(|p| p["name"] != "xtask")
+        .filter(|p| {
+            p["name"]
+                .as_str()
+                .is_some_and(|name| name == "filmcraft" || name.starts_with("filmcraft-"))
+        })
         .map(|p| {
             let deps = p["dependencies"]
                 .as_array()
@@ -345,7 +349,7 @@ fn web(args: &[String]) -> Result<(), String> {
             .and_then(|p| p.parse::<u16>().ok())
             .unwrap_or(8765)
     });
-    let profile = if dev { "dev" } else { "release" };
+    let profile = if dev { "filmcraft-dev" } else { "filmcraft" };
     let mut build = Command::new(env!("CARGO"));
     build.args([
         "build",
@@ -368,7 +372,7 @@ fn web(args: &[String]) -> Result<(), String> {
             v.trim()
         ));
     }
-    let dir = if dev { "debug" } else { "release" };
+    let dir = profile;
     let wasm = target_dir()
         .join("wasm32-unknown-unknown")
         .join(dir)
@@ -657,6 +661,10 @@ fn root() -> std::path::PathBuf {
 }
 
 fn main() -> ExitCode {
+    if let Err(error) = std::env::set_current_dir(root()) {
+        eprintln!("cannot open the FilmCraft source directory: {error}");
+        return ExitCode::FAILURE;
+    }
     let task = std::env::args().nth(1).unwrap_or_default();
     let r = match task.as_str() {
         "layers" => layers(),

@@ -18,14 +18,14 @@ large_enum_variant = "allow"
 result_large_err = "allow"
 
 [dependencies]
-filmcraft-isobmff = { path = "../filmcraft-isobmff", version = "0.7.2" }
-filmcraft-matroska = { path = "../filmcraft-matroska", version = "0.7.2" }
-filmcraft-ogg = { path = "../filmcraft-ogg", version = "0.7.2" }
-filmcraft-opus = { path = "../filmcraft-opus", version = "0.7.2" }
-filmcraft-h264 = { path = "../filmcraft-h264", version = "0.7.2" }
-filmcraft-hevc = { path = "../filmcraft-hevc", version = "0.7.2" }
-filmcraft-vp9 = { path = "../filmcraft-vp9", version = "0.7.2" }
-filmcraft-av1 = { path = "../filmcraft-av1", version = "0.7.2" }
+filmcraft-isobmff = { path = "../filmcraft-isobmff", version = "0.9.0" }
+filmcraft-matroska = { path = "../filmcraft-matroska", version = "0.9.0" }
+filmcraft-ogg = { path = "../filmcraft-ogg", version = "0.9.0" }
+filmcraft-opus = { path = "../filmcraft-opus", version = "0.9.0" }
+filmcraft-h264 = { path = "../filmcraft-h264", version = "0.9.0" }
+filmcraft-hevc = { path = "../filmcraft-hevc", version = "0.9.0" }
+filmcraft-vp9 = { path = "../filmcraft-vp9", version = "0.9.0" }
+filmcraft-av1 = { path = "../filmcraft-av1", version = "0.9.0" }
 thiserror = "2"
 log = "0.4"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif", "tiff", "bmp"] }

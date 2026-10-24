@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-media"
 description = "Media sources: probing, decoding traits, frame cache, generators, stills"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,17 +16,19 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [dependencies]
-filmcraft-time = { path = "../filmcraft-time", version = "0.7.2" }
-filmcraft-color = { path = "../filmcraft-color", version = "0.7.2" }
-filmcraft-frame = { path = "../filmcraft-frame", version = "0.7.2" }
-filmcraft-dng = { path = "../filmcraft-dng", version = "0.7.2" }
-rayon = "1"
+filmcraft-time = { path = "../filmcraft-time", version = "0.9.0" }
+filmcraft-color = { path = "../filmcraft-color", version = "0.9.0" }
+filmcraft-frame = { path = "../filmcraft-frame", version = "0.9.0" }
+filmcraft-dng = { path = "../filmcraft-dng", version = "0.9.0" }
+rayon = { version = "1" }
 serde = { version = "1", features = ["derive", "rc"] }
-thiserror = "2"
+thiserror = { version = "2" }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp", "tiff", "bmp"] }
 
 [dev-dependencies]
 filmcraft-testkit = { path = "../filmcraft-testkit" }
-filmcraft-dng = { path = "../filmcraft-dng", features = ["writer"] }
+filmcraft-dng = { path = "../filmcraft-dng", features = ["writer"], version = "0.9.0" }
+# APNG fixtures for the animated-image tests (the image crate does not encode APNG)
 png = "0.18"

@@ -1,7 +1,7 @@
 [package]
 name = "filmcraft-engine"
 description = "FilmCraft engine façade: session, command registry, history, media pool"
-version = "0.7.2"
+version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -16,6 +16,7 @@ too_many_arguments = "allow"
 needless_range_loop = "allow"
 type_complexity = "allow"
 
+
 [features]
 default = []
 # Speech-to-text with Whisper (candle, CPU). Off by default and in wasm builds.
@@ -26,33 +27,34 @@ speech-download = ["filmcraft-speech/download"]
 neural-voices = ["filmcraft-tts/kokoro", "speech-download"]
 
 [dependencies]
-filmcraft-time = { path = "../filmcraft-time", version = "0.7.2" }
-filmcraft-geom = { path = "../filmcraft-geom", version = "0.7.2" }
-filmcraft-color = { path = "../filmcraft-color", version = "0.7.2" }
-filmcraft-frame = { path = "../filmcraft-frame", version = "0.7.2" }
-filmcraft-media = { path = "../filmcraft-media", version = "0.7.2" }
-filmcraft-codecs = { path = "../filmcraft-codecs", version = "0.7.2" }
-filmcraft-project = { path = "../filmcraft-project", version = "0.7.2" }
-filmcraft-edit = { path = "../filmcraft-edit", version = "0.7.2" }
-filmcraft-render = { path = "../filmcraft-render", version = "0.7.2" }
-filmcraft-scopes = { path = "../filmcraft-scopes", version = "0.7.2" }
-filmcraft-text = { path = "../filmcraft-text", version = "0.7.2" }
-filmcraft-audio-dsp = { path = "../filmcraft-audio-dsp", version = "0.7.2" }
-filmcraft-export = { path = "../filmcraft-export", version = "0.7.2" }
-filmcraft-mxf = { path = "../filmcraft-mxf", version = "0.7.2" }
-filmcraft-format = { path = "../filmcraft-format", version = "0.7.2" }
-filmcraft-interchange = { path = "../filmcraft-interchange", version = "0.7.2" }
-filmcraft-captions = { path = "../filmcraft-captions", version = "0.7.2" }
-filmcraft-speech = { path = "../filmcraft-speech", version = "0.7.2" }
-filmcraft-tts = { path = "../filmcraft-tts", version = "0.7.2" }
+filmcraft-time = { path = "../filmcraft-time", version = "0.9.0" }
+filmcraft-geom = { path = "../filmcraft-geom", version = "0.9.0" }
+filmcraft-color = { path = "../filmcraft-color", version = "0.9.0" }
+filmcraft-frame = { path = "../filmcraft-frame", version = "0.9.0" }
+filmcraft-media = { path = "../filmcraft-media", version = "0.9.0" }
+filmcraft-codecs = { path = "../filmcraft-codecs", version = "0.9.0" }
+filmcraft-project = { path = "../filmcraft-project", version = "0.9.0" }
+filmcraft-edit = { path = "../filmcraft-edit", version = "0.9.0" }
+filmcraft-render = { path = "../filmcraft-render", version = "0.9.0" }
+filmcraft-scopes = { path = "../filmcraft-scopes", version = "0.9.0" }
+filmcraft-text = { path = "../filmcraft-text", version = "0.9.0" }
+filmcraft-audio-dsp = { path = "../filmcraft-audio-dsp", version = "0.9.0" }
+filmcraft-export = { path = "../filmcraft-export", version = "0.9.0" }
+filmcraft-mxf = { path = "../filmcraft-mxf", version = "0.9.0" }
+filmcraft-format = { path = "../filmcraft-format", version = "0.9.0" }
+filmcraft-interchange = { path = "../filmcraft-interchange", version = "0.9.0" }
+filmcraft-captions = { path = "../filmcraft-captions", version = "0.9.0" }
+filmcraft-speech = { path = "../filmcraft-speech", version = "0.9.0" }
+filmcraft-tts = { path = "../filmcraft-tts", version = "0.9.0" }
 serde = { version = "1", features = ["derive", "rc"] }
-serde_json = "1"
-thiserror = "2"
-log = "0.4"
+serde_json = { version = "1" }
+thiserror = { version = "2" }
+log = { version = "0.4" }
+craft-docpath = { package = "filmcraft-docpath", path = "../craft-docpath", version = "0.1.0" }
 web-time = "1"
 
 [dev-dependencies]
 filmcraft-testkit = { path = "../filmcraft-testkit" }
-filmcraft-dng = { path = "../filmcraft-dng", features = ["writer"] }
-filmcraft-isobmff = { path = "../filmcraft-isobmff" }
+filmcraft-dng = { path = "../filmcraft-dng", features = ["writer"], version = "0.9.0" }
+filmcraft-isobmff = { path = "../filmcraft-isobmff", version = "0.9.0" }
 image = { version = "0.25", default-features = false, features = ["png", "gif"] }

@@ -1,7 +1,7 @@
 //! Design tokens. Every widget reads colours/sizes from [`Tokens`] so themes apply everywhere.
 //!
-//! The default theme follows the look of Premiere Pro's current dark UI (values measured from
-//! black-box screenshots, see `plan/premiere/02-ui-ux.md`); fonts are Inter + JetBrains Mono (OFL).
+//! Aphrody's Material 3 roles adapt the existing editor tokens; media and meter colours remain
+//! functional. Fonts are Inter + JetBrains Mono (OFL).
 
 use std::sync::Arc;
 
@@ -557,8 +557,8 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
     v.extreme_bg_color = t.field_bg;
     v.faint_bg_color = t.row_alt;
     v.override_text_color = Some(t.text);
-    v.selection.bg_fill = t.accent;
-    v.selection.stroke = Stroke::new(1.0, Color32::WHITE);
+    v.selection.bg_fill = t.row_selected;
+    v.selection.stroke = Stroke::new(1.0, t.text);
     v.hyperlink_color = t.accent;
     v.window_stroke = Stroke::new(1.0, t.field_border);
     v.window_corner_radius = craft_ui::theme::shape::WINDOW;
