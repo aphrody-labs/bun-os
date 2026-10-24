@@ -1,4 +1,5 @@
 import { ArrowRightIcon } from "lucide-react";
+import { isTauri } from "@tauri-apps/api/core";
 import { DynamicIcon } from "@storyteller/icons";
 import { twMerge } from "tailwind-merge";
 import {
@@ -31,7 +32,9 @@ export const AppsIndexPage = () => {
           What will you <span className="text-ui-accent-ink">craft</span> today?
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-base-fg/70 sm:text-base">
-          Start with an idea. Choose a tool to bring it to life.
+          {isTauri()
+            ? "Start with an idea. Choose a tool to bring it to life."
+            : "Explore the desktop tools below. Open the desktop application to use them, or return to Craft for the browser editors."}
         </p>
 
         {categories.map((category, index) => (
@@ -57,7 +60,7 @@ export const AppsIndexPage = () => {
 
 function AppCard({ app }: { app: FullAppItem }) {
   const palette = getAppCardPalette(app.id);
-  const enabled = !!app.action;
+  const enabled = !!app.action && isTauri();
 
   return (
     <button

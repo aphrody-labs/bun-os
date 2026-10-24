@@ -11,6 +11,7 @@
 // dependency on the 3D engine being present.
 
 import { lazy, Suspense, useEffect } from "react";
+import { isTauri } from "@tauri-apps/api/core";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import { TopBar } from "~/components";
@@ -120,9 +121,7 @@ interface Props {
   sceneToken?: string;
 }
 
-export const MainApp = ({ sceneToken }: Props) => {
-  useSignals();
-
+const NativeServices = () => {
   // Background plumbing — should keep running regardless of which tab
   // is active.
   useActiveJobs();
@@ -169,6 +168,12 @@ export const MainApp = ({ sceneToken }: Props) => {
     });
   }, []);
 
+  return null;
+};
+
+export const MainApp = ({ sceneToken }: Props) => {
+  useSignals();
+
   const { triggerRecheck } = useLoginModalStore();
   const { isOpen: isCreditsOpen, closeModal: closeCreditsModal } =
     useCreditsModalStore();
@@ -179,28 +184,56 @@ export const MainApp = ({ sceneToken }: Props) => {
 
   return (
     <div className="w-screen">
-      <TopBar
-        loginSignUpPressed={() => {
-          console.log("PRESSED");
-          triggerRecheck();
-        }}
-        pageName="Edit Scene"
-      />
-      <LoginModal
-        videoSrc2D="/resources/videos/artcraft-canvas-demo.mp4"
-        videoSrc3D="/resources/videos/artcraft-3d-demo.mp4"
-        onOpenChange={(isOpen: boolean) => {
-          if (isOpen) {
-            disableHotkeyInput(DomLevels.DIALOGUE);
-          } else {
-            enableHotkeyInput(DomLevels.DIALOGUE);
-          }
-        }}
-        onArtCraftAuthSuccess={(userInfo: any) => {
-          authentication.status.value = AUTH_STATUS.LOGGED_IN;
-          authentication.userInfo.value = userInfo;
-        }}
-      />
+      {isTauri() && <NativeServices />}
+      {isTauri() ? (
+        <TopBar
+          loginSignUpPressed={() => {
+            triggerRecheck();
+          }}
+          pageName="Edit Scene"
+        />
+      ) : (
+        <header
+          style={{
+            position: "fixed",
+            inset: "0 0 auto",
+            height: 56,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingInline: 24,
+            zIndex: 1000,
+            background: "var(--md-sys-color-surface)",
+            color: "var(--md-sys-color-on-surface)",
+            borderBottom: "1px solid var(--md-sys-color-outline-variant)",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => void useTabStore.getState().setActiveTab("APPS")}
+          >
+            ArtCraft · All tools
+          </button>
+          <a href="/">Back to Craft ↗</a>
+        </header>
+      )}
+      {isTauri() && (
+        <LoginModal
+          videoSrc2D="/resources/videos/artcraft-canvas-demo.mp4"
+          videoSrc3D="/resources/videos/artcraft-3d-demo.mp4"
+          onOpenChange={(isOpen: boolean) => {
+            if (isOpen) {
+              disableHotkeyInput(DomLevels.DIALOGUE);
+            } else {
+              enableHotkeyInput(DomLevels.DIALOGUE);
+            }
+          }}
+          onArtCraftAuthSuccess={(userInfo: any) => {
+            authentication.status.value = AUTH_STATUS.LOGGED_IN;
+            authentication.userInfo.value = userInfo;
+          }}
+        />
+      )}
 
       <Suspense
         fallback={
@@ -215,8 +248,8 @@ export const MainApp = ({ sceneToken }: Props) => {
         <TabBody sceneToken={sceneToken} />
       </Suspense>
 
-      <GalleryDragComponent />
-      <ErrorDialog />
+      {isTauri() && <GalleryDragComponent />}
+      {isTauri() && <ErrorDialog />}
       <Toaster offsetTop={70} offsetRight={12} zIndex={9999} />
       {currentReminderModalProps && (
         <ActionReminderModal
@@ -237,8 +270,10 @@ export const MainApp = ({ sceneToken }: Props) => {
           }
         />
       )}
-      <PricingModal />
-      <CreditsModal isOpen={isCreditsOpen} onClose={closeCreditsModal} />
+      {isTauri() && <PricingModal />}
+      {isTauri() && (
+        <CreditsModal isOpen={isCreditsOpen} onClose={closeCreditsModal} />
+      )}
     </div>
   );
 };

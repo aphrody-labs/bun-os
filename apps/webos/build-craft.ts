@@ -347,6 +347,24 @@ for (const app of apps) {
   ]);
   if (app.web) {
     await cp(join(root, "apps", app.crate, "web"), dest, { recursive: true });
+    if (app.id === "effect") {
+      for (const size of [256, 512]) {
+        await cp(
+          join(
+            root,
+            `assets/effectcraft/app-icon/hicolor/${size}x${size}/apps/ai.storyteller.effectcraft.png`,
+          ),
+          join(dest, `icon-${size}.png`),
+        );
+        await cp(
+          join(
+            root,
+            `assets/effectcraft/app-icon/hicolor/${size}x${size}/apps/ai.storyteller.effectcraft.png.attribution`,
+          ),
+          join(dest, `icon-${size}.png.attribution`),
+        );
+      }
+    }
   } else if (
     !(await Bun.file(join(root, "apps", app.crate, "Trunk.toml")).exists()) &&
     (

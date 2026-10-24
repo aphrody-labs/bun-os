@@ -114,15 +114,38 @@ API owner: [Workers Custom Domains](https://developers.cloudflare.com/workers/co
 ## Craft browser frontends
 
 `https://craft.aphrody.app/<app>/` serves the static wasm32 builds of the Craft
-web apps (`/cad/`, `/deck/`, `/design/`, `/fig/`, `/grid/`, `/light/`, `/pdf/`,
-`/photo/`, `/sound/`, `/vector/`, `/word/`) behind a landing page at `/`. The
+web apps (`/cad/`, `/deck/`, `/design/`, `/effect/`, `/fig/`, `/film/`, `/grid/`,
+`/light/`, `/pdf/`, `/photo/`, `/sound/`, `/vector/`, `/word/`) and the ArtCraft
+frontend at `/art/`, behind a searchable, responsive studio directory at `/`. The
 Cloudflare record is a proxied `A craft` to the VPS, the TLS certificate is a
 Let's Encrypt ECDSA certificate issued like `play.aphrody.app`, and the vhost is
 `infra/config/host/nginx/craft/craft.aphrody.app.conf`.
-`scripts/aphrody/tools/infra/deploy-craft-frontends.ts` compiles on the VPS,
-content-addresses the bundles, replaces `~/apps/craft-web/current` in place and
-installs the vhost (`nginx -t` before reload). An app whose wasm build fails is
-left out of the landing page and reported by the script.
+`scripts/aphrody/tools/infra/deploy-craft-frontends.ts` runs on the VPS through
+the existing factory, with `run --slots 1 --max-slots 1 --`. It reuses
+`apps/webos/build-craft.ts` for all thirteen Rust dependency graphs, fonts,
+workers and WebAssembly assets, and ArtCraft's frontend owner for `/art/`.
+Use the runtime declared by `aphrody.config.json`, with the installed native
+Material 3 binding (or an explicit local development artifact).
+Set `APHRODY_BUILD_HOST=vps` for the deployment process; the script refuses
+workstation execution or an unlabelled host.
+
+All fourteen studios must assemble before deployment. A release is written to
+`~/apps/craft-web/releases/<timestamp>` with artifact SHA256 hashes, Cargo lock
+identity, runtime and source state in `release.json`. Nginx serves the release
+through an atomic `current` symlink; the previous release remains available for
+rollback. Configuration is checked with `nginx -t`, and all fourteen origin
+routes are checked over TLS after activation. A failed activation restores the
+previous release and Nginx configuration. `--skip-build` explicitly reuses a
+complete existing WASM assembly; ArtCraft is still built. There is no partial
+deployment mode. FilmCraft is served statically by Nginx, without a development
+server on port 8765. No Cloudflare Pages or Worker deployment is involved; the
+existing Cloudflare DNS/proxy layer is separate from VPS hosting.
+
+ArtCraft is a browser preview of its desktop frontend. The browser shell does
+not initialize desktop background services, account polling or native model
+discovery; generation and account operations still require the desktop host.
+This is separate from the thirteen standalone WebAssembly editor start-up
+checks and must not be reported as a qualified browser generation backend.
 
 ## Applied on Cloudflare (2026-10-22)
 

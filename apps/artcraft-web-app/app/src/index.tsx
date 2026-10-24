@@ -15,6 +15,7 @@ import { SyncStorytellerApiConfig } from "./api/SyncStorytellerApiConfig";
 import { posthog } from "posthog-js";
 import { SoundManager } from "@storyteller/soundboard";
 import { useModelsStore } from "@storyteller/tauri-api";
+import { isTauri } from "@tauri-apps/api/core";
 
 // TODO(bt,2025-04-19): Make these configurable
 const ENV = {
@@ -62,12 +63,12 @@ syncM3Mode();
 const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
   console.log("GlobalSettingsManager()");
 
-  SyncStorytellerApiConfig();
+  if (isTauri()) void SyncStorytellerApiConfig();
 
   useSignals();
 
   useSignalEffect(() => {
-    persistLogin();
+    if (isTauri()) persistLogin();
   });
 
   useEffect(() => {
@@ -113,14 +114,14 @@ const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
   }, []);
 
   useEffect(() => {
-    SoundManager.install();
+    if (isTauri()) SoundManager.install();
   }, []);
 
   // Reconcile the model dropdowns against the backend omni listing once on boot.
   // The store is already seeded with the static overlay, so a failure here is a
   // no-op (the UI keeps the overlay models).
   useEffect(() => {
-    void useModelsStore.getState().loadModelsFromBackend();
+    if (isTauri()) void useModelsStore.getState().loadModelsFromBackend();
   }, []);
 
   return null;
@@ -130,11 +131,34 @@ const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
 createRoot(document.getElementById("root")!).render(
   <>
     <StrictMode>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        {!isTauri() && (
+          <aside
+            aria-label="Browser preview availability"
+            style={{
+              position: "fixed",
+              bottom: 16,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 10000,
+              width: "min(600px, calc(100% - 32px))",
+              padding: "12px 18px",
+              borderRadius: 12,
+              background: "var(--md-sys-color-surface-container-high)",
+              color: "var(--md-sys-color-on-surface)",
+              border: "1px solid var(--md-sys-color-outline)",
+              fontSize: 13,
+              textAlign: "center",
+            }}
+          >
+            ArtCraft browser preview. Generation and account features require
+            the desktop application.
+          </aside>
+        )}
         <GlobalSettingsManager env={ENV} />
         <div className="topbar-spacer" data-tauri-drag-region={true} />
         <MainApp />
-        <GlobalFileDropHandler />
+        {isTauri() && <GlobalFileDropHandler />}
       </BrowserRouter>
     </StrictMode>
   </>,

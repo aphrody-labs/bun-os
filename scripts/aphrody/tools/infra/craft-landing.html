@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#151718">
+  <meta name="description" content="A considered workspace for your next idea. Explore Craft's creative and productivity studios, directly in your browser.">
+  <title>Craft — A space for your next idea.</title>
+  <link rel="icon" href="/aphrody-icon.png">
+  <link rel="stylesheet" href="/craft.css">
+  <script src="/craft.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#studios">Skip to studios</a>
+  <header class="topbar wrap">
+    <a class="brand" href="/" aria-label="Craft home"><img src="/aphrody-icon.png" alt="" width="32" height="32">craft<span class="brand-by">by Aphrody</span></a>
+    <nav aria-label="Main navigation"><a href="#studios">The studios <span aria-hidden="true">↗</span></a><a href="#about">Made for making</a></nav>
+    <span class="edition">THE CREATIVE WORKSPACE</span>
+  </header>
+  <main>
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy"><p class="eyebrow"><span class="spark" aria-hidden="true"></span> LESS FRICTION. MORE CREATION.</p>
+        <h1 id="hero-title">A space for<br>your <em>next idea.</em></h1>
+        <p class="intro">From the first sketch to the final frame.<br>A collection of focused studios for the things you make.</p>
+        <a class="primary" href="#studios">Find your studio <span aria-hidden="true">↗</span></a>
+        <p class="hero-note">Open a studio. Start creating. Right in your browser.</p>
+      </div>
+      <a class="feature" href="/photo/" aria-label="Open PhotoCraft, image editing studio">
+        <div class="feature-heading"><span>IN FOCUS / PHOTOCRAFT</span><span aria-hidden="true">↗</span></div>
+        <div class="feature-image"><img src="/previews/photo.jpg" width="1280" height="800" fetchpriority="high" alt="PhotoCraft image editing workspace"></div>
+        <div class="feature-caption"><span>Make room for a new perspective.</span><span class="feature-pill">Image editing</span></div>
+      </a>
+    </section>
+    <section class="studios wrap" id="studios" aria-labelledby="studio-title">
+      <div class="section-heading"><div><p class="eyebrow">YOUR TOOLKIT, REIMAGINED</p><h2 id="studio-title">One idea. Endless possibilities.</h2></div><p>Choose a craft.<br>Make it your own.</p></div>
+      <div class="tools">
+        <div class="filters" role="group" aria-label="Filter studios"><button type="button" data-filter="all" aria-pressed="true">All studios <span>14</span></button><button type="button" data-filter="visual" aria-pressed="false">Design &amp; image</button><button type="button" data-filter="motion" aria-pressed="false">Video &amp; audio</button><button type="button" data-filter="work" aria-pressed="false">Documents &amp; data</button></div>
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="sr-only">Search studios</span><input type="search" placeholder="Find a studio…" autocomplete="off" id="studio-search"></label>
+      </div>
+      <p class="sr-only" id="result-count" role="status" aria-live="polite" aria-atomic="true">14 studios available</p>
+      <div class="grid">{{CARDS}}</div>
+      <div class="empty" hidden><h3>No studios found</h3><p>Try another name or choose a different category.</p><button type="button" id="reset">Show all studios</button></div>
+    </section>
+    <section class="about wrap" id="about" aria-labelledby="about-title"><div><p class="eyebrow">MADE FOR MAKING</p><h2 id="about-title">Stay in your flow.</h2><p>Your tools should make space for your work.<br>Craft brings focused editors together, one studio at a time.</p></div><dl><div><dt>01 / A focused workspace</dt><dd>A dedicated studio for each kind of work. Nothing between you and your next step.</dd></div><div><dt>02 / Ready in your browser</dt><dd>Open the editor you need, without installing a desktop application.</dd></div><div><dt>03 / Room to explore</dt><dd>Move between image, motion, sound and documents as your ideas take shape.</dd></div></dl></section>
+  </main>
+  <footer class="wrap"><a class="brand" href="/">craft<span class="brand-by">by Aphrody</span></a><p>A little space. A lot of possibility.</p><a href="#hero-title">Back to top ↑</a></footer>
+</body>
+</html>

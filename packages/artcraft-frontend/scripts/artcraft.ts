@@ -8,11 +8,13 @@ import tailwindcss from "@tailwindcss/postcss";
 import tailwindConfig from "../../../apps/artcraft-web-app/tailwind.config";
 import { m3Plugin } from "@aphrody/m3/plugin";
 import { APHRODY_M3_SEED } from "@aphrody/identity/theme";
+import { assertRuntime, loadConfig } from "@aphrody/bun-workspace";
 
 export const frontendDir = resolve(import.meta.dir, "..");
 export const appDir = resolve(frontendDir, "../../apps/artcraft-web-app");
 export const appRoot = join(appDir, "app");
 export const defaultOutdir = join(appDir, "dist");
+const runtimeConfig = await loadConfig(resolve(appDir, "../.."));
 const sourceEntry = join(appRoot, "src/index.tsx");
 const publicDir = join(appRoot, "public");
 const tsconfig = join(appDir, "tsconfig.json");
@@ -22,6 +24,8 @@ const markdownGlob =
 
 export interface BuildOptions {
   outdir?: string;
+  /** Absolute browser mount, including the trailing slash. */
+  basePath?: string;
   development?: boolean;
   plugins?: BunPlugin[];
 }
@@ -31,11 +35,13 @@ export async function buildFrontend(options: BuildOptions = {}) {
   const outdir = resolve(options.outdir ?? defaultOutdir);
   requireOutputDirectory(outdir);
   const development = options.development ?? false;
+  const basePath = options.basePath ?? "/";
+  if (!/^\/(?:[a-z0-9-]+\/)*$/.test(basePath)) throw new Error("Invalid browser base path.");
   const environment = {
     DEV: development,
     PROD: !development,
     MODE: development ? "development" : "production",
-    BASE_URL: "/",
+    BASE_URL: basePath,
     VITE_ENVIRONMENT_TYPE: Bun.env.VITE_ENVIRONMENT_TYPE ?? "production",
     VITE_POSTHOG_API_KEY: Bun.env.VITE_POSTHOG_API_KEY,
   };
@@ -76,7 +82,7 @@ export async function buildFrontend(options: BuildOptions = {}) {
       chunk: "assets/[name]-[hash].[ext]",
       asset: "assets/[name]-[hash].[ext]",
     },
-    publicPath: "/",
+    publicPath: basePath,
     metafile: true,
     plugins: [
       m3Plugin({
@@ -85,7 +91,7 @@ export async function buildFrontend(options: BuildOptions = {}) {
         sass: false,
         urlImports: false,
       }),
-      frontendPlugin(outdir, inlineWorkers),
+      frontendPlugin(outdir, inlineWorkers, basePath),
       ...(options.plugins ?? []),
     ],
   });
@@ -93,12 +99,15 @@ export async function buildFrontend(options: BuildOptions = {}) {
   const entry = result.outputs.find(output => output.kind === "entry-point" && extname(output.path) === ".js");
   if (!entry) throw new Error("Bun did not emit the frontend entry point.");
   const css = result.outputs.filter(output => extname(output.path) === ".css");
-  const script = `<script type="module" src="/${relative(outdir, entry.path).replaceAll(sep, "/")}"></script>`;
+  const script = `<script type="module" src="${basePath}${relative(outdir, entry.path).replaceAll(sep, "/")}"></script>`;
   const links = css
-    .map(output => `<link rel="stylesheet" href="/${relative(outdir, output.path).replaceAll(sep, "/")}" />`)
+    .map(output => `<link rel="stylesheet" href="${basePath}${relative(outdir, output.path).replaceAll(sep, "/")}" />`)
     .join("\n");
   const html = (await Bun.file(join(appRoot, "index.html")).text())
     .replace('<script type="module" src="/src/index.tsx"></script>', script)
+    .replace('<base href="/"', `<base href="${basePath}"`)
+    .replaceAll('href="/artcraft-icon.svg"', `href="${basePath}artcraft-icon.svg"`)
+    .replaceAll('href="/favicon.ico"', `href="${basePath}favicon.ico"`)
     .replace("</head>", `${links}\n</head>`);
   await mkdir(outdir, { recursive: true });
   await cp(publicDir, outdir, { recursive: true });
@@ -167,7 +176,7 @@ export function serveFrontend(options: { outdir?: string; port?: number; develop
   return server;
 }
 
-function frontendPlugin(outdir: string, inlineWorkers: Map<string, string>): BunPlugin {
+function frontendPlugin(outdir: string, inlineWorkers: Map<string, string>, basePath: string): BunPlugin {
   return {
     name: "aphrody-frontend",
     setup(build) {
@@ -196,7 +205,7 @@ function frontendPlugin(outdir: string, inlineWorkers: Map<string, string>): Bun
           .join("\n");
         return {
           loader: "js",
-          contents: `${glue}\nconst response=await fetch(${JSON.stringify(`/${name}`)}); if(!response.ok) throw new Error("Failed to load OpenCut WASM"); const {instance}=await WebAssembly.instantiate(await response.arrayBuffer(),{${object}});\n${exports}`,
+          contents: `${glue}\nconst response=await fetch(${JSON.stringify(`${basePath}${name}`)}); if(!response.ok) throw new Error("Failed to load OpenCut WASM"); const {instance}=await WebAssembly.instantiate(await response.arrayBuffer(),{${object}});\n${exports}`,
         };
       });
       build.onResolve({ filter: /\?worker&inline$/ }, args => ({
@@ -230,7 +239,7 @@ function frontendPlugin(outdir: string, inlineWorkers: Map<string, string>): Bun
         await Bun.write(join(outdir, name), contents);
         return {
           loader: "js",
-          contents: `export default ${JSON.stringify(`/${name}`)}`,
+          contents: `export default ${JSON.stringify(`${basePath}${name}`)}`,
         };
       });
       build.onResolve(
@@ -314,12 +323,7 @@ async function compileCss(path: string) {
 }
 
 function requireRuntime() {
-  if (
-    Bun.version !== "1.4.4" ||
-    !process.release.sourceUrl?.startsWith("https://github.com/aphrody-labs/bun/releases/download/")
-  ) {
-    throw new Error("Use Bun 1.4.4 from aphrody-labs/bun.");
-  }
+  assertRuntime(runtimeConfig, true);
 }
 
 function requireOutputDirectory(outdir: string) {
