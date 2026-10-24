@@ -1,7 +1,8 @@
 # Runtime heavy-source migration
 
 Status, 2026-10-24: B0 and B1 executed; B2 dropped after inspection; B3 and B5
-re-scoped; B4 blocked on a filmcraft reconciliation; B6 found no source
+re-scoped; B4 blocked on a filmcraft reconciliation that needs hand ports
+and VPS gates; B6 found no source
 duplicates. Per-batch evidence is under [Batches](#batches).
 
 Moves the heavy sources that the `aphrody-labs/bun` runtime (`toolchains/bun`)
@@ -146,6 +147,20 @@ merge (see above).
    owner (2026-10-20); Bun OS and the standalone repository carry later
    cross-cutting edits. This is a three-way code merge of about 1,050 files and
    needs VPS build gates for every crate.
+
+   Bun OS carries seven FilmCraft commits that the runtime copy lacks:
+   `829cfaf20f` and `202cfe4afa` (wasm32 gating of native-only dependencies,
+   missing dependency declarations, the `cuvid.rs` API drift), `16b068c993`,
+   `e7ce8d4ea0` and `6d7addad37` (Aphrody / Bun app identity, wordmark and
+   about dialogs), and `b0f84eb3f4` and `6124069862` (the M3 chrome in
+   `ui-egui/src/theme.rs`). Checked on 2026-10-24 by remapping their paths
+   (`crates/filmcraft-<name>` to `src/media/filmcraft/crates/<name>`, xtask and
+   apps likewise): none of the seven applies to runtime `a861cfde057`, and the
+   touched files differ by 55 (`brand.rs`) to 1,352 (`ui-egui/src/lib.rs`)
+   lines. They must be ported by hand. Since FilmCraft leaves the runtime, port
+   them onto the runtime tree as it is imported into Bun OS, not into the
+   runtime. Each port needs a VPS `cargo check` of the touched crates for the
+   native and `wasm32` targets.
 2. Move `packages/bun-video` whole to Bun OS; keep the `@aphrody/bun-video` name
    and version line. The runtime keeps `src/runtime/video/Video.rs` and
    `src/js/eval/video.ts`, which already loads the adjacent `bun-video`
