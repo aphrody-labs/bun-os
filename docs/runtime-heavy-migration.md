@@ -206,14 +206,14 @@ merge (see above).
 Gate: runtime default build and `Bun.Video` tests; Bun OS factory build with
 `video_native`; `bun-video` release gate.
 
-### B5 — Rio: re-scoped
+### B5 — Rio: done, nothing to move
 
 Cargo resolve of `bun_runtime` (`cargo metadata --locked`, runtime `a861cfde057`)
 reaches `corcovado`, `rio-fonts`, `rio-grapheme-width`, `rio-graphics`,
 `rio-unicode`, `rio-vt`, `rio-window`, `sugarloaf` and `teletypewriter`. Only
 `librio`, `librio-wasm`, `libsugarloaf`, `rio-backend`, `rio-grid`,
 `rio-notifier` and `rioterm` are outside the runtime graph. Move those only
-together with a Bun OS consumer.
+together with a Bun OS consumer; Bun OS has none today, so this batch moves nothing.
 
 ### B6 — duplicate audit: done, no source duplicates
 
