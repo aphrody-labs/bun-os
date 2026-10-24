@@ -31,12 +31,12 @@ tauri = { version = "1.4.7", path = "../aphrody-tauri", package = "aphrody-tauri
 ] }
 tauri-macros = { version = "~1.4.7", path = "../aphrody-tauri-macros", package = "aphrody-tauri-macros" }
 base64 = "0.22"
-cef = { path = "../../../../toolchains/bun/src/browser/cef-rs/cef", version = "=154.5.0", features = [
+cef = { path = "../../../../vendor/cef-rs/cef", version = "=154.5.0", features = [
   "build-util",
   "linux-x11",
 ] }
 # Not actually used directly, just locking it.
-cef-dll-sys = { path = "../../../../toolchains/bun/src/browser/cef-rs/sys", version = "=154.5.0", default-features = false }
+cef-dll-sys = { path = "../../../../vendor/cef-rs/sys", version = "=154.5.0", default-features = false }
 dirs = "6"
 dioxus-debug-cell = "0.1"
 http = { workspace = true }
