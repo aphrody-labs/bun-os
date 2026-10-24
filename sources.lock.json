@@ -4,94 +4,8 @@
     {
       "id": "bun",
       "repository": "aphrody-labs/bun",
-      "revision": "340fb35a079f3e4a449455fe3283476e92e8b24a",
+      "revision": "a861cfde057fbb07d6a1c6142f5b020ff49c7ef7",
       "mount": "sources/bun",
-      "gitlinks": [
-        {
-          "path": "packages/aphrody-migrated/m3/aphrody-m3",
-          "repository": "aphrody-labs/aphrody-m3",
-          "revision": "393d397037dace7a13eb2bee29e43a3a67d176f8"
-        }
-      ]
-    },
-    {
-      "id": "bun/packages/aphrody-migrated/m3/aphrody-m3",
-      "repository": "aphrody-labs/aphrody-m3",
-      "revision": "393d397037dace7a13eb2bee29e43a3a67d176f8",
-      "mount": "sources/bun/packages/aphrody-migrated/m3/aphrody-m3",
-      "parent": "bun",
-      "submodulePath": "packages/aphrody-migrated/m3/aphrody-m3",
-      "gitlinks": [
-        {
-          "path": "forks/fonts",
-          "repository": "aphrody-labs/fonts",
-          "revision": "9710da1eacb3be272583c3224dcb70f9da6eadbb"
-        },
-        {
-          "path": "forks/material-color-utilities",
-          "repository": "aphrody-labs/material-color-utilities",
-          "revision": "51f0744f9cfbbef63f45c1058c2a883c5656b0fe"
-        },
-        {
-          "path": "forks/material-design-icons",
-          "repository": "aphrody-labs/material-design-icons",
-          "revision": "737e3324305806514d7909874fa1818ae1808232"
-        },
-        {
-          "path": "forks/material-web",
-          "repository": "aphrody-labs/material-web",
-          "revision": "a06811ee5dad1a670d99e5faf14cdf7082a70a10"
-        },
-        {
-          "path": "packages/m3-os-themes",
-          "repository": "aphrody-labs/aphrody-m3-os-themes",
-          "revision": "27b36bd34253da5010ec2855403852ba6e97d6e6"
-        }
-      ]
-    },
-    {
-      "id": "bun/packages/aphrody-migrated/m3/aphrody-m3/packages/m3-os-themes",
-      "repository": "aphrody-labs/aphrody-m3-os-themes",
-      "revision": "27b36bd34253da5010ec2855403852ba6e97d6e6",
-      "mount": "sources/bun/packages/aphrody-migrated/m3/aphrody-m3/packages/m3-os-themes",
-      "parent": "bun/packages/aphrody-migrated/m3/aphrody-m3",
-      "submodulePath": "packages/m3-os-themes",
-      "gitlinks": []
-    },
-    {
-      "id": "bun/packages/aphrody-migrated/m3/aphrody-m3/forks/fonts",
-      "repository": "aphrody-labs/fonts",
-      "revision": "9710da1eacb3be272583c3224dcb70f9da6eadbb",
-      "mount": "sources/bun/packages/aphrody-migrated/m3/aphrody-m3/forks/fonts",
-      "parent": "bun/packages/aphrody-migrated/m3/aphrody-m3",
-      "submodulePath": "forks/fonts",
-      "gitlinks": []
-    },
-    {
-      "id": "bun/packages/aphrody-migrated/m3/aphrody-m3/forks/material-color-utilities",
-      "repository": "aphrody-labs/material-color-utilities",
-      "revision": "51f0744f9cfbbef63f45c1058c2a883c5656b0fe",
-      "mount": "sources/bun/packages/aphrody-migrated/m3/aphrody-m3/forks/material-color-utilities",
-      "parent": "bun/packages/aphrody-migrated/m3/aphrody-m3",
-      "submodulePath": "forks/material-color-utilities",
-      "gitlinks": []
-    },
-    {
-      "id": "bun/packages/aphrody-migrated/m3/aphrody-m3/forks/material-design-icons",
-      "repository": "aphrody-labs/material-design-icons",
-      "revision": "737e3324305806514d7909874fa1818ae1808232",
-      "mount": "sources/bun/packages/aphrody-migrated/m3/aphrody-m3/forks/material-design-icons",
-      "parent": "bun/packages/aphrody-migrated/m3/aphrody-m3",
-      "submodulePath": "forks/material-design-icons",
-      "gitlinks": []
-    },
-    {
-      "id": "bun/packages/aphrody-migrated/m3/aphrody-m3/forks/material-web",
-      "repository": "aphrody-labs/material-web",
-      "revision": "a06811ee5dad1a670d99e5faf14cdf7082a70a10",
-      "mount": "sources/bun/packages/aphrody-migrated/m3/aphrody-m3/forks/material-web",
-      "parent": "bun/packages/aphrody-migrated/m3/aphrody-m3",
-      "submodulePath": "forks/material-web",
       "gitlinks": []
     },
     {
@@ -1172,6 +1086,14 @@
       "revision": "0c6fe8c0bc3f1a717349e207a407666e97d0bb98",
       "mount": "vendor/obscura",
       "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/cef-rs",
+      "repository": "aphrody-labs/cef-rs",
+      "revision": "b1bc46da11e9bc4aedec17d00e7d7a7b28f30f3d",
+      "mount": "vendor/cef-rs",
+      "branch": "dev",
       "gitlinks": []
     },
     {

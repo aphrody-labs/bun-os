@@ -135,7 +135,7 @@
     },
     {
       "id": "cef",
-      "path": "toolchains/bun/src/browser/cef-rs",
+      "path": "vendor/cef-rs",
       "size": "~250 MiB CEF distribution downloaded",
       "origin": "chromiumembedded/cef via download-cef",
       "kind": "native-sys",

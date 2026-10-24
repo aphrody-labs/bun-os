@@ -428,6 +428,11 @@
       "path": "walker",
       "origin": "https://github.com/aphrody-labs/walker.git",
       "localState": "not-initialized"
+    },
+    "cef-rs": {
+      "origin": "https://github.com/aphrody-labs/cef-rs.git",
+      "upstream": "https://github.com/tauri-apps/cef-rs.git",
+      "path": "cef-rs"
     }
   },
   "references": {

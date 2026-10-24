@@ -620,3 +620,7 @@
 	path = vendor/webx
 	url = https://github.com/Dankular/WebX.git
 	branch = main
+[submodule "vendor/cef-rs"]
+	path = vendor/cef-rs
+	url = https://github.com/aphrody-labs/cef-rs.git
+	branch = dev
