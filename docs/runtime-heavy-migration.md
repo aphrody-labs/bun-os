@@ -1,8 +1,8 @@
 # Runtime heavy-source migration
 
 Status, 2026-10-24: B0 and B1 executed; B2 dropped after inspection; B3 and B5
-re-scoped; B4 blocked on a filmcraft reconciliation that needs hand ports
-and VPS gates; B6 found no source
+re-scoped; B4 FilmCraft reconciled, `bun-video` move blocked on a new
+repository; B6 found no source
 duplicates. Per-batch evidence is under [Batches](#batches).
 
 Moves the heavy sources that the `aphrody-labs/bun` runtime (`toolchains/bun`)
@@ -141,27 +141,43 @@ Bun OS factory graph for the plugin first. Pruning `android`, `ios` and
 `desktop` also breaks Mullvad's own workspace members. There is no duplicate to
 merge (see above).
 
-### B4 — video domain (341 MB): blocked on filmcraft ownership
+### B4 — video domain (341 MB): FilmCraft reconciled; package move blocked on a new repository
 
-1. Reconcile filmcraft into one owner. The runtime copy is the newest declared
-   owner (2026-10-20); Bun OS and the standalone repository carry later
-   cross-cutting edits. This is a three-way code merge of about 1,050 files and
-   needs VPS build gates for every crate.
-
-   Bun OS carries seven FilmCraft commits that the runtime copy lacks:
-   `829cfaf20f` and `202cfe4afa` (wasm32 gating of native-only dependencies,
-   missing dependency declarations, the `cuvid.rs` API drift), `16b068c993`,
-   `e7ce8d4ea0` and `6d7addad37` (Aphrody / Bun app identity, wordmark and
-   about dialogs), and `b0f84eb3f4` and `6124069862` (the M3 chrome in
-   `ui-egui/src/theme.rs`). Checked on 2026-10-24 by remapping their paths
-   (`crates/filmcraft-<name>` to `src/media/filmcraft/crates/<name>`, xtask and
-   apps likewise): none of the seven applies to runtime `a861cfde057`, and the
-   touched files differ by 55 (`brand.rs`) to 1,352 (`ui-egui/src/lib.rs`)
-   lines. They must be ported by hand. Since FilmCraft leaves the runtime, port
-   them onto the runtime tree as it is imported into Bun OS, not into the
-   runtime. Each port needs a VPS `cargo check` of the touched crates for the
-   native and `wasm32` targets.
-2. Move `packages/bun-video` whole to Bun OS; keep the `@aphrody/bun-video` name
+1. Done: FilmCraft has one owner, the Bun OS `crates/filmcraft-*` and
+   `apps/filmcraft*` (commit `f7dcf26d0f`). The Aphrody / Bun identity and the
+   shared `craft-ui` depend on Bun OS crates, so a standalone owner cannot carry
+   them.
+   - The runtime copy at `1c9898a93d9` was exactly `aphrody-labs/filmcraft`
+     `main` (`9cfaa22b`). Its six later runtime commits were replayed there,
+     with the standalone workspace root restored. That tree is published as
+     `aphrody-labs/filmcraft` branch `bun-runtime-0.9.0` (`e1ebbf4c`).
+   - That tree was merged into Bun OS three-way against the Bun OS import
+     (`87b84513`, flattened in `fc2098cc31`). Both sides were first formatted
+     with the pinned rustfmt and the Bun OS configuration, so the 2026-10-17
+     formatting pass does not conflict, and flatten-time path adaptations were
+     re-applied.
+   - Bun OS keeps the Aphrody / Bun identity, the shared `craft-ui` and its M3
+     theme adapter (its seven FilmCraft commits). Upstream brings 0.9.0,
+     `filmcraft-lib`, the vendored `craft-docpath` and the in-crate fonts.
+     Every FilmCraft dependency moves from 0.7.2 to 0.9.0, including the
+     DeckCraft, EffectCraft and SoundCraft consumers.
+   - The ArtCraft wordmark artwork is dropped, as upstream did. The tracked
+     `h264enc/target` outputs are not imported.
+   - Gates, on a VPS clone with the root workspace's member, patch and path
+     submodules initialized: `cargo metadata` resolves the root workspace;
+     `cargo check --all-targets` passes for the 56 FilmCraft packages and their
+     8 consumers; `cargo check -p filmcraft-web --target wasm32-unknown-unknown`
+     passes. The serialized wrapper refused to run because it requires runtime
+     1.4.5 and the VPS has 1.4.6, so Cargo ran directly, one job at a time with
+     `-j 6`. That exceeds the four-compiler-job lane rule.
+   - The resolve also found B1 leftovers: the Tauri CEF runtime still pointed at
+     the removed runtime `src/browser/cef-rs`. It now uses `vendor/cef-rs`,
+     which the root workspace excludes (commit `7b70e97520`).
+2. Blocked: moving `packages/bun-video` needs a new repository. 271 MB of its
+   302 MB are vendored upstream projects (hyperframes 232, remotion 25,
+   mediabunny 15, yt-dlp 12). None of them, nor `bun-video` itself, has an
+   `aphrody-labs` fork. Under the batch protocol, the extracted history is
+   published on a new repository through the Infra owner. After that: move `packages/bun-video` whole to Bun OS; keep the `@aphrody/bun-video` name
    and version line. The runtime keeps `src/runtime/video/Video.rs` and
    `src/js/eval/video.ts`, which already loads the adjacent `bun-video`
    executable for its extensions.
