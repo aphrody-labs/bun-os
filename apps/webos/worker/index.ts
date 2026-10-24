@@ -16,6 +16,7 @@ interface R2ObjectBodyLike {
 }
 interface Env {
   SOURCE_COMMIT?: string;
+  BROWSE_FETCH?: (url: string, init: RequestInit) => Promise<Response>;
   ASSETS: { fetch(request: Request): Promise<Response> };
   /** The former aphrody-app Worker, kept as the private backend of the merged API routes (service binding). */
   LEGACY: { fetch(request: Request): Promise<Response> };
@@ -135,7 +136,10 @@ if(/^https?:/i.test(a.href)){e.preventDefault();p(a.href)}});
 addEventListener("submit",e=>{const f=e.target;if((f.method||"get").toLowerCase()!=="get")return;e.preventDefault();
 const u=new URL(f.action||${JSON.stringify(base)});for(const [k,v] of new FormData(f))if(typeof v==="string")u.searchParams.set(k,v);p(u.href)});})();`;
 
-async function browse(request: Request): Promise<Response> {
+async function browse(
+  request: Request,
+  fetchPage: (url: string, init: RequestInit) => Promise<Response> = fetch,
+): Promise<Response> {
   const target = new URL(request.url).searchParams.get("url") ?? "";
   let url: URL;
   try {
@@ -151,7 +155,7 @@ async function browse(request: Request): Promise<Response> {
   ) {
     return new Response("This address cannot be opened here.", { status: 403 });
   }
-  const upstream = await fetch(url, {
+  const upstream = await fetchPage(url.href, {
     method: "GET",
     redirect: "follow",
     headers: {
@@ -316,7 +320,7 @@ export default {
     }
     if (url.pathname === "/api/catalog") {
       return env.ASSETS.fetch(
-        new Request(new URL("/catalog.json", url), request),
+        new Request(new URL("/catalog.json", url).href, request),
       );
     }
     // Read-only Workspace catalogs (Documentation, Templates), assembled by build.ts from their owners.
@@ -327,7 +331,7 @@ export default {
           headers: { allow: "GET, HEAD" },
         });
       const res = await env.ASSETS.fetch(
-        new Request(new URL(`${url.pathname}.json`, url), request),
+        new Request(new URL(`${url.pathname}.json`, url).href, request),
       );
       const out = new Response(res.body, res);
       out.headers.set("cache-control", "no-cache");
@@ -354,7 +358,7 @@ export default {
     if (url.pathname === "/api/browse") {
       if (request.method !== "GET")
         return new Response("Method not allowed", { status: 405 });
-      return browse(request);
+      return browse(request, env.BROWSE_FETCH);
     }
     if (
       url.pathname === "/vm/alpine.iso" &&

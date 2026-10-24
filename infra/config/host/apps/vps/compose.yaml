@@ -9,3 +9,4 @@ include:
   - gitea/compose.yaml
   - komodo/compose.yaml
   - gitea-runner/compose.yaml
+  - webos/compose.yaml

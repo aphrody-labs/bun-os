@@ -48,7 +48,7 @@ export async function playResponse(
       headers: { allow: "GET, HEAD" },
     });
   const registry = await assets.fetch(
-    new Request(new URL("/registry.json", url)),
+    new Request(new URL("/registry.json", url).href),
   );
   if (!registry.ok)
     return new Response("Gaming registry unavailable", { status: 503 });
@@ -64,7 +64,8 @@ export async function playResponse(
         const core = entry.id.slice(5);
         const response = await assets.fetch(
           new Request(
-            new URL(`/apps/${entry.id}/payload/${core}/manifest.json`, url),
+            new URL(`/apps/${entry.id}/payload/${core}/manifest.json`, url)
+              .href,
           ),
         );
         if (!response.ok)
@@ -105,7 +106,7 @@ export async function playResponse(
   )
     return new Response("Not found", { status: 404 });
   const inventoryResponse = await assets.fetch(
-    new Request(new URL(`/apps/game-${core}/app.json`, url)),
+    new Request(new URL(`/apps/game-${core}/app.json`, url).href),
   );
   if (!inventoryResponse.ok)
     return new Response("Gaming package unavailable", { status: 503 });
@@ -116,7 +117,7 @@ export async function playResponse(
     return new Response("Not found", { status: 404 });
   return assets.fetch(
     new Request(
-      new URL(`/apps/game-${core}/payload/${core}/${path}`, url),
+      new URL(`/apps/game-${core}/payload/${core}/${path}`, url).href,
       request,
     ),
   );

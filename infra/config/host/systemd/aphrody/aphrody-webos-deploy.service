@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+[Unit]
+Description=Activate a complete source-pinned WebOS release
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/ubuntu/.local/bin/bun /usr/local/libexec/aphrody-webos-activate.ts
+TimeoutStartSec=120

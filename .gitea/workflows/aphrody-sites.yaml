@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 120
     env:
       GIT_SSH_COMMAND: ssh -F /run/aphrody/git-ssh/config
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      WEBOS_DEPLOY_ROOT: /cache/webos-deploy
       # The build runs in one persistent workspace on the runner cache volume (host:
       # ~/build/cache/gitea-runner/sites-ws): its 168 submodules, node_modules and Cargo target
       # survive between runs, so a push only fetches what changed. The concurrency group above
@@ -70,14 +70,12 @@ jobs:
           cd "$SITES_WORKSPACE"
           bun install --frozen-lockfile
           bun scripts/node-modules.ts
-      - name: Require production credential
-        run: test -n "$CLOUDFLARE_API_TOKEN"
       - name: Compile the complete installable Craft suite
         run: |
           cd "$SITES_WORKSPACE"
           rustup target add wasm32-unknown-unknown
           CARGO_BUILD_JOBS=4 APHRODY_CARGO_JOBS=4 bun apps/webos/build-craft.ts
-      - name: Build, deploy and verify all unified Worker hosts
+      - name: Build and hand off the native VPS release
         run: |
           cd "$SITES_WORKSPACE"
           bun apps/webos/deploy.ts

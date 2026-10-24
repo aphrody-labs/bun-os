@@ -11,7 +11,10 @@ export async function workspaceResponse(
       headers: { allow: "GET, HEAD" },
     });
   if (url.pathname === "/workspace")
-    return Response.redirect(new URL(`/workspace/${url.search}`, url), 308);
+    return Response.redirect(
+      new URL(`/workspace/${url.search}`, url).href,
+      308,
+    );
   const navigation =
     request.headers.get("accept")?.includes("text/html") ||
     !url.pathname.split("/").at(-1)?.includes(".");
@@ -22,7 +25,7 @@ export async function workspaceResponse(
   target.search = url.search;
   // Fetch HTML even for HEAD so its deployment prefix can be authenticated.
   const response = await assets.fetch(
-    new Request(target, { method: "GET", headers: request.headers }),
+    new Request(target.href, { method: "GET", headers: request.headers }),
   );
   if (!response.ok)
     return new Response(

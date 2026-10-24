@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+[Unit]
+Description=Aphrody WebOS native VPS HTTP service
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/apps/webos/current
+Environment=PORT=8790
+Environment=WEBOS_DIST=/home/ubuntu/apps/webos/current/dist
+Environment=WEBOS_OBJECTS=/home/ubuntu/apps/webos/objects
+Environment=WEBOS_DATABASE_URL_FILE=/home/ubuntu/apps/webos/secrets/database.url
+EnvironmentFile=/home/ubuntu/apps/webos/current/release.env
+ExecStart=/home/ubuntu/.local/bin/bun /home/ubuntu/apps/webos/current/server.js
+Restart=always
+RestartSec=3
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+MemoryMax=1G
+CPUQuota=200%
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target

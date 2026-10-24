@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+services:
+  webos-db:
+    image: postgres:18-alpine@sha256:898c60cb390d1085bc97bdd6a1ae968757421df394b071848b52b1c09c89d6a5
+    container_name: aphrody-webos-db
+    restart: unless-stopped
+    cpus: 1
+    mem_limit: 1g
+    pids_limit: 128
+    environment:
+      POSTGRES_USER: webos_owner
+      POSTGRES_DB: bun_site
+      POSTGRES_PASSWORD_FILE: /run/secrets/password
+    ports:
+      - "127.0.0.1:15434:5432"
+    volumes:
+      - ./postgres:/var/lib/postgresql
+      - ./secrets/postgres-password:/run/secrets/password:ro
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U webos_owner -d bun_site"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: "3" }
