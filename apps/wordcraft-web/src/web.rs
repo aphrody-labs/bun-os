@@ -4,6 +4,7 @@
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
+use crate::host::Bridge;
 use wasm_bindgen::JsCast as _;
 use wordcraft_engine::Session;
 use wordcraft_ui_egui::{Inbox, Services, WordApp};
@@ -33,8 +34,16 @@ pub fn start() {
             return;
         };
         let dirty = Rc::new(Cell::new(false));
+        let hosted = web_sys::UrlSearchParams::new_with_str(&query())
+            .ok()
+            .and_then(|p| p.get("host"))
+            .as_deref()
+            == Some("parent");
+        let bridge = hosted.then(Bridge::new).flatten();
         let saves = Rc::new(PickerSaves::default());
-        if let Err(e) = guard_unload(dirty.clone(), saves.clone()) {
+        if bridge.is_none()
+            && let Err(e) = guard_unload(dirty.clone(), saves.clone())
+        {
             log::error!("no unsaved-changes guard: {e}");
         }
         let mut options = eframe::WebOptions::default();
@@ -44,6 +53,7 @@ pub fn start() {
         {
             create.instance_descriptor.backends = eframe::wgpu::Backends::GL;
         }
+        let app_bridge = bridge.clone();
         let result = eframe::WebRunner::new()
             .start(
                 canvas,
@@ -72,19 +82,33 @@ pub fn start() {
                     };
                     let mut session = Session::new(doc);
                     session.system_region = region;
-                    let mut app = WordApp::new(
-                        session,
-                        services(inbox.clone(), cc.egui_ctx.clone(), dirty, saves.clone()),
-                    );
+                    let mut services =
+                        services(inbox.clone(), cc.egui_ctx.clone(), dirty, saves.clone());
+                    if let Some(b) = &app_bridge {
+                        if let Err(e) = b.connect(&mut services, inbox.clone(), cc.egui_ctx.clone())
+                        {
+                            b.failed(&e);
+                            return Err(e.into());
+                        }
+                    }
+                    let mut app = WordApp::new(session, services);
                     app.autosave = false;
                     // No document to show: start on File › Home, as the desktop app does (#766).
-                    if !sample {
+                    if !sample && app_bridge.is_none() {
                         app.start_screen();
+                    }
+                    if let Some(b) = &app_bridge {
+                        b.ready();
                     }
                     Ok(Box::new(WebShell { app, inbox, saves }))
                 }),
             )
             .await;
+        if let Err(e) = &result
+            && let Some(b) = bridge
+        {
+            b.failed(&format!("{e:?}"));
+        }
         if let Some(el) = document.get_element_by_id(LOADING_ID) {
             match result {
                 Ok(()) => el.remove(),
