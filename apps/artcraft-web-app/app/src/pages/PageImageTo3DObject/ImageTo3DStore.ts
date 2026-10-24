@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { listen } from "@tauri-apps/api/event";
+import { isTauri } from "@tauri-apps/api/core";
 import { MediaFilesApi, MediaUploadApi } from "@storyteller/api";
 import { captureModelThumbnail } from "./captureModelThumbnail";
 
@@ -245,27 +246,31 @@ interface ObjectGenerationEvent {
   };
 }
 
-listen<ObjectGenerationEvent>("object_generation_complete_event", (event) => {
-  const payload = event.payload?.data;
-  if (payload?.maybe_frontend_subscriber_id && payload?.generated_object) {
-    console.log(
-      "[ImageTo3DStore] Global event received for subscriber:",
-      payload.maybe_frontend_subscriber_id,
-    );
-    useImageTo3DStore
-      .getState()
-      .completeGeneration(
-        payload.generated_object.cdn_url,
-        payload.generated_object.media_token,
-        payload.maybe_frontend_subscriber_id,
-      );
+if (isTauri())
+  void listen<ObjectGenerationEvent>(
+    "object_generation_complete_event",
+    (event) => {
+      const payload = event.payload?.data;
+      if (payload?.maybe_frontend_subscriber_id && payload?.generated_object) {
+        console.log(
+          "[ImageTo3DStore] Global event received for subscriber:",
+          payload.maybe_frontend_subscriber_id,
+        );
+        useImageTo3DStore
+          .getState()
+          .completeGeneration(
+            payload.generated_object.cdn_url,
+            payload.generated_object.media_token,
+            payload.maybe_frontend_subscriber_id,
+          );
 
-    // Automatically capture and upload cover image in background
-    useImageTo3DStore
-      .getState()
-      .captureAndUploadCover(
-        payload.generated_object.cdn_url,
-        payload.generated_object.media_token,
-      );
-  }
-});
+        // Automatically capture and upload cover image in background
+        useImageTo3DStore
+          .getState()
+          .captureAndUploadCover(
+            payload.generated_object.cdn_url,
+            payload.generated_object.media_token,
+          );
+      }
+    },
+  );

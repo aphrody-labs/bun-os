@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { listen } from "@tauri-apps/api/event";
+import { isTauri } from "@tauri-apps/api/core";
 import { MediaFilesApi, MediaUploadApi } from "@storyteller/api";
 
 export type ImageTo3DWorldResult = {
@@ -223,26 +224,30 @@ interface GaussianGenerationEvent {
   };
 }
 
-listen<GaussianGenerationEvent>(
-  "gaussian_generation_complete_event",
-  (event) => {
-    const payload = event.payload?.data;
-    if (payload?.maybe_frontend_subscriber_id && payload?.generated_gaussian) {
-      console.log(
-        "[ImageTo3DWorldStore] Gaussian event received for subscriber:",
-        payload.maybe_frontend_subscriber_id,
-      );
-      useImageTo3DWorldStore
-        .getState()
-        .completeGeneration(
-          payload.generated_gaussian.cdn_url,
-          payload.generated_gaussian.media_token,
+if (isTauri())
+  void listen<GaussianGenerationEvent>(
+    "gaussian_generation_complete_event",
+    (event) => {
+      const payload = event.payload?.data;
+      if (
+        payload?.maybe_frontend_subscriber_id &&
+        payload?.generated_gaussian
+      ) {
+        console.log(
+          "[ImageTo3DWorldStore] Gaussian event received for subscriber:",
           payload.maybe_frontend_subscriber_id,
         );
+        useImageTo3DWorldStore
+          .getState()
+          .completeGeneration(
+            payload.generated_gaussian.cdn_url,
+            payload.generated_gaussian.media_token,
+            payload.maybe_frontend_subscriber_id,
+          );
 
-      useImageTo3DWorldStore
-        .getState()
-        .uploadCoverFromPreview(payload.generated_gaussian.media_token);
-    }
-  },
-);
+        useImageTo3DWorldStore
+          .getState()
+          .uploadCoverFromPreview(payload.generated_gaussian.media_token);
+      }
+    },
+  );
