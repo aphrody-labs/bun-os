@@ -1,8 +1,8 @@
 # Runtime heavy-source migration
 
 Status, 2026-10-24: B0 and B1 executed; B2 dropped after inspection; B3 and B5
-re-scoped; B4 FilmCraft reconciled, `bun-video` move blocked on a new
-repository; B6 found no source
+re-scoped; B4 FilmCraft reconciled, `bun-video` move re-scoped pending an
+owner decision on the media SDK release pipeline; B6 found no source
 duplicates. Per-batch evidence is under [Batches](#batches).
 
 Moves the heavy sources that the `aphrody-labs/bun` runtime (`toolchains/bun`)
@@ -141,7 +141,7 @@ Bun OS factory graph for the plugin first. Pruning `android`, `ios` and
 `desktop` also breaks Mullvad's own workspace members. There is no duplicate to
 merge (see above).
 
-### B4 — video domain (341 MB): FilmCraft reconciled; package move blocked on a new repository
+### B4 — video domain (341 MB): FilmCraft reconciled; package move re-scoped
 
 1. Done: FilmCraft has one owner, the Bun OS `crates/filmcraft-*` and
    `apps/filmcraft*` (commit `f7dcf26d0f`). The Aphrody / Bun identity and the
@@ -173,11 +173,26 @@ merge (see above).
    - The resolve also found B1 leftovers: the Tauri CEF runtime still pointed at
      the removed runtime `src/browser/cef-rs`. It now uses `vendor/cef-rs`,
      which the root workspace excludes (commit `7b70e97520`).
-2. Blocked: moving `packages/bun-video` needs a new repository. 271 MB of its
-   302 MB are vendored upstream projects (hyperframes 232, remotion 25,
-   mediabunny 15, yt-dlp 12). None of them, nor `bun-video` itself, has an
-   `aphrody-labs` fork. Under the batch protocol, the extracted history is
-   published on a new repository through the Infra owner. After that: move `packages/bun-video` whole to Bun OS; keep the `@aphrody/bun-video` name
+2. Re-scoped: `packages/bun-video` cannot move as one unit. 271 MB of its 302 MB
+   are vendored upstream projects (hyperframes 232, remotion 25, mediabunny 15,
+   yt-dlp 12). They feed the package's own build (`scripts/build.ts`,
+   `scripts/generate-hyperframes.ts`, `src/video-api.ts`,
+   `src/render-runtime.ts`).
+   - The runtime's own release pipeline imports the package source. 61 imports
+     in about 30 runtime files reach `packages/bun-video/src/sdk*` and
+     `src/apps/*`: `scripts/aphrody/media-sdk-*`, `media-release`, `media-stage`,
+     `release-*`, `runtime-sdk-build`, `native-sdk-*`, `ffmpeg`, `libmpv`, the
+     HLS, DASH and Crunchyroll labs, and the `linux-media-portable` receipts.
+   - The runtime feature `video_native` compiles `bun_video_native` into
+     `src/runtime/image/Image.rs`, and that crate needs FilmCraft.
+   - Moving the package therefore needs an owner decision first. Either the
+     media SDK release pipeline moves to Bun OS with it, or the package is split
+     into a runtime-owned media SDK and a Bun OS composition package (Remotion,
+     HyperFrames, studio, site). None of the four upstream projects, nor
+     `bun-video` itself, has an `aphrody-labs` fork; a new repository goes
+     through the Infra owner. `video_native` would then take FilmCraft from
+     `aphrody-labs/filmcraft` `bun-runtime-0.9.0`, which builds standalone.
+   - Once that is decided: move `packages/bun-video` whole to Bun OS; keep the `@aphrody/bun-video` name
    and version line. The runtime keeps `src/runtime/video/Video.rs` and
    `src/js/eval/video.ts`, which already loads the adjacent `bun-video`
    executable for its extensions.
