@@ -22,6 +22,29 @@ const receipt = (await Bun.file(join(release, "receipt.json")).json()) as {
 };
 if (!name.startsWith(receipt.sourceCommit + "-") || !receipt.files.length)
   throw new Error("Invalid receipt");
+// Read the existing local forge's published branch without network credentials.
+const sourceRepository =
+  Bun.env.WEBOS_SOURCE_REPOSITORY ??
+  join(home, "apps/gitea/data/git/repositories/aphrody-dev/bun-os.git");
+function publishedCommit() {
+  const result = Bun.spawnSync([
+    "git",
+    "-c",
+    `safe.directory=${sourceRepository}`,
+    "--git-dir",
+    sourceRepository,
+    "rev-parse",
+    "refs/heads/os",
+  ]);
+  if (result.exitCode !== 0)
+    throw new Error("Cannot verify the published production branch");
+  return result.stdout.toString().trim();
+}
+if (publishedCommit() !== receipt.sourceCommit) {
+  await rename(pending, join(handoff, `superseded-${name}`));
+  console.log(`Ignored superseded release ${receipt.sourceCommit}`);
+  process.exit(0);
+}
 for (const entry of receipt.files) {
   if (
     !entry.path ||
@@ -72,6 +95,8 @@ async function restart() {
   });
   if (await child.exited) throw new Error("Service restart failed");
 }
+if (publishedCommit() !== receipt.sourceCommit)
+  throw new Error("Production source advanced during activation");
 await point(release);
 try {
   await restart();

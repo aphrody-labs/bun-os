@@ -37,6 +37,9 @@ the handoff every 30 seconds. Its root-owned activator verifies artifact hashes,
 switches `~/apps/webos/current`, restarts `aphrody-webos.service` and checks the
 served source commit. A failed activation restores the previous release. The
 queue does not give build jobs host SSH credentials or the Docker socket.
+The activator reads the published `os` tip from the existing local forge and
+ignores a superseded queued release, preventing an older build from rolling
+back a newer deployment.
 
 `WEBOS_PREBUILT_DIST` explicitly imports an existing static artifact during a
 migration; the receipt records that import. Ordinary deployments build App UI
