@@ -582,7 +582,7 @@ function m3Components(size: MarkdownSize, link: LinkOptions = {}): Components {
         <a
           className={clsx(
             "text-primary underline underline-offset-2 hover:decoration-2",
-            "rounded-extra-small outline-none focus-visible:outline-3 focus-visible:outline-secondary focus-visible:outline-offset-2",
+            "rounded-extra-small outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-secondary focus-visible:outline-offset-2",
             className,
           )}
           href={href}

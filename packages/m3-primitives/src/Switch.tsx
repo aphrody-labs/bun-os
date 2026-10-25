@@ -29,7 +29,7 @@ const switchStyles = cva(
     "border-outline bg-surface-container-highest",
     // Selected: primary track.
     "data-checked:border-primary data-checked:bg-primary",
-    "outline-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary",
+    "outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary",
     "data-disabled:cursor-not-allowed data-disabled:opacity-38",
   ],
   {

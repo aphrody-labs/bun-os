@@ -220,7 +220,7 @@ export function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPa
             value={draft}
             onChange={e => setDraft(e.target.value)}
             placeholder="Rechercher ou exécuter une action..."
-            className="h-16 w-full rounded-2xl bg-surface-container-highest pr-20 pl-14 text-body-large text-on-surface outline-none placeholder:text-on-surface-variant focus-visible:outline-2 focus-visible:outline-primary"
+            className="h-16 w-full rounded-2xl bg-surface-container-highest pr-20 pl-14 text-body-large text-on-surface outline-none placeholder:text-on-surface-variant focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary"
           />
           <div className="absolute right-4 flex items-center gap-1.5">
             <Kbd>Esc</Kbd>

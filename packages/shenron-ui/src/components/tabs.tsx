@@ -38,7 +38,7 @@ function TabsPanel({ className, ...props }: React.ComponentProps<typeof TabsPrim
   return (
     <TabsPrimitive.Panel
       className={cn(
-        "mt-4 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dbz-orange/40",
+        "mt-4 outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dbz-orange/40",
         className,
       )}
       {...props}

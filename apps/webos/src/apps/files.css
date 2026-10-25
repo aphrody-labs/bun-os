@@ -9,6 +9,10 @@
   min-width: 0;
   outline: none;
 }
+.fx:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
+}
 .fx .dim {
   color: var(--md-sys-color-on-surface-variant);
 }
@@ -238,6 +242,10 @@
   padding: 8px;
   outline: none;
   position: relative;
+}
+.fx-pane:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
 }
 .fx-pane.drop {
   outline: 2px dashed var(--md-sys-color-primary);
@@ -546,6 +554,10 @@
 .fx-mi:focus-visible {
   background: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent);
   outline: none;
+}
+.fx-mi:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
 }
 .fx-mi.danger {
   color: var(--md-sys-color-error);

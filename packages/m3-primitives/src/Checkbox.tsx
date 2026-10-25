@@ -23,7 +23,7 @@ const stateLayer = [
   "hover:before:bg-on-surface/8 focus-visible:before:bg-on-surface/10 active:before:bg-primary/10",
 ];
 
-const focusRing = "outline-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+const focusRing = "outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 
 const styles = cva(
   [

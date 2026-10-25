@@ -71,7 +71,7 @@ export const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerPr
             "group/trigger flex min-h-14 w-full items-center justify-between gap-4 px-5 text-left",
             "text-title-medium font-medium text-on-surface",
             "transition-colors duration-200 ease-standard hover:bg-on-surface/8 active:bg-on-surface/12",
-            "outline-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary",
+            "outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary",
             "disabled:cursor-not-allowed disabled:opacity-38 data-disabled:cursor-not-allowed data-disabled:opacity-38",
           ),
           className,

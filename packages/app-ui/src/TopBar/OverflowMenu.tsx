@@ -32,7 +32,7 @@ export function OverflowButton({ items }: OverflowButtonProps) {
                 <DropdownMenu.Item
                   key={item.id}
                   onClick={() => item.onClick?.()}
-                  className="px-3 py-2 text-body-medium text-on-surface hover:bg-on-surface/4 transition-colors outline-none cursor-pointer"
+                  className="px-3 py-2 text-body-medium text-on-surface hover:bg-on-surface/4 transition-colors outline-none cursor-pointer data-[highlighted]:bg-on-surface/8 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
                 >
                   {item.label}
                 </DropdownMenu.Item>
@@ -41,7 +41,7 @@ export function OverflowButton({ items }: OverflowButtonProps) {
 
             return (
               <DropdownMenu.Sub key={item.id}>
-                <DropdownMenu.SubTrigger className="px-3 py-2 text-body-medium text-on-surface hover:bg-on-surface/4 transition-colors flex items-center justify-between outline-none cursor-pointer">
+                <DropdownMenu.SubTrigger className="px-3 py-2 text-body-medium text-on-surface hover:bg-on-surface/4 transition-colors flex items-center justify-between outline-none cursor-pointer data-[highlighted]:bg-on-surface/8 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2">
                   <span>{item.label}</span>
                   <span className="text-on-surface-variant text-body-small">▶</span>
                 </DropdownMenu.SubTrigger>

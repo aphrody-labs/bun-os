@@ -19,7 +19,7 @@ export type ContentProps = TabsPrimitive.Panel.Props;
 export const Content = ({ className, ...props }: ContentProps) => (
   <TabsPrimitive.Panel
     className={withClassName(
-      "outline-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary",
+      "outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary",
       className,
     )}
     data-m3-component="TabsContent"

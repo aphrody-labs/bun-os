@@ -75,7 +75,7 @@ export function KitDialog({ title, message, input, confirmLabel, onClose }: KitD
               value={value}
               onChange={event => setValue(event.target.value)}
               aria-invalid={!valid}
-              className="h-14 rounded-extra-small border border-outline bg-transparent px-4 text-body-large text-on-surface focus:border-primary focus:outline-none"
+              className="h-14 rounded-extra-small border border-outline bg-transparent px-4 text-body-large text-on-surface focus:border-primary focus:outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             />
           </label>
         )}
@@ -126,7 +126,7 @@ function FieldInput({
       </label>
     );
   const common =
-    "h-14 w-full rounded-extra-small border border-outline-variant bg-transparent px-4 text-body-large text-on-surface focus:border-primary focus:outline-none";
+    "h-14 w-full rounded-extra-small border border-outline-variant bg-transparent px-4 text-body-large text-on-surface focus:border-primary focus:outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2";
   return (
     <label htmlFor={id} className="flex flex-col gap-2 text-label-large">
       <span>

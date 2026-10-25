@@ -139,6 +139,10 @@
   color: var(--tm-fg);
   outline: none;
 }
+.tm-pane:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
+}
 .tm-split > .tm-pane.focus::after,
 .tm-split > .tm-split .tm-pane.focus::after {
   content: "";
@@ -246,6 +250,10 @@
   color: inherit;
   font: 14px var(--md-ref-typeface-plain, system-ui, sans-serif);
   border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+.tm-pick input:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
 }
 .tm-pick ul {
   list-style: none;

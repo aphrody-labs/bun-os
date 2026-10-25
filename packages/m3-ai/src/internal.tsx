@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 
 /** The M3 focus indicator (contract: docs/design/SPACEUI-M3-FUSION.md, "States"). */
 export const focusRing =
-  "outline-none focus-visible:outline-3 focus-visible:outline-secondary focus-visible:outline-offset-2";
+  "outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-secondary focus-visible:outline-offset-2";
 
 /** Expand / collapse: enter on emphasized decelerate, exit on emphasized accelerate. */
 export const expandMotion = {

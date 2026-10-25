@@ -418,7 +418,7 @@ export function QuickBar() {
           placeholder="Posez une question"
           aria-label="Posez une question"
           disabled={busy}
-          className="h-14 w-full rounded-full bg-surface-container-highest px-6 text-body-large text-on-surface outline-none placeholder:text-on-surface-variant focus-visible:outline-2 focus-visible:outline-primary"
+          className="h-14 w-full rounded-full bg-surface-container-highest px-6 text-body-large text-on-surface outline-none placeholder:text-on-surface-variant focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary"
         />
 
         {suggestions.length > 0 && (

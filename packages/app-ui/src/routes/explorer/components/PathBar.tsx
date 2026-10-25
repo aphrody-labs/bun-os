@@ -391,7 +391,7 @@ export function PathBar({ path, devices, onNavigate }: PathBarProps) {
               "min-w-0 flex-1 border-0 bg-transparent outline-none ring-0",
               "text-on-surface text-label-medium",
               "placeholder:text-on-surface-variant",
-              "focus:outline-none focus:ring-0",
+              "focus:outline-none focus:ring-0 rounded-extra-small focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2",
               editingAsUri && "font-mono",
             )}
             placeholder={editingAsUri ? "Enter SdPath JSON..." : "Enter path..."}
@@ -406,7 +406,7 @@ export function PathBar({ path, devices, onNavigate }: PathBarProps) {
               "text-on-surface text-label-medium",
               "placeholder:text-on-surface-variant",
               "cursor-text select-all",
-              "focus:outline-none focus:ring-0",
+              "focus:outline-none focus:ring-0 rounded-extra-small focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2",
             )}
             placeholder="No path selected"
           />
@@ -459,7 +459,7 @@ export function PathBar({ path, devices, onNavigate }: PathBarProps) {
               "text-on-surface text-label-medium",
               "placeholder:text-on-surface-variant",
               "cursor-text select-all",
-              "focus:outline-none focus:ring-0",
+              "focus:outline-none focus:ring-0 rounded-extra-small focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2",
             )}
             placeholder="No path selected"
           />

@@ -272,7 +272,8 @@ html[data-m3-nav="bar"] main {
 }
 
 main:focus-visible {
-  outline: none;
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }
 .preview {
   max-width: 100%;

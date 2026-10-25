@@ -22,7 +22,7 @@ export const ScrollAreaViewport = forwardRef<HTMLDivElement, ScrollAreaViewportP
     <ScrollAreaPrimitive.Viewport
       ref={ref}
       className={withClassName(
-        "size-full rounded-[inherit] outline-none focus-visible:outline-2 focus-visible:outline-primary",
+        "size-full rounded-[inherit] outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary",
         className,
       )}
       {...props}

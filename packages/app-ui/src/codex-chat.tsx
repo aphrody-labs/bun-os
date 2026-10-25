@@ -253,7 +253,7 @@ export function ThreadDrawer({
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Filtrer les sessions..."
-                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-surface-container text-body-medium text-on-surface placeholder:text-on-surface-variant/60 border border-outline-variant/40 focus:outline-none focus:border-primary"
+                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-surface-container text-body-medium text-on-surface placeholder:text-on-surface-variant/60 border border-outline-variant/40 focus:outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 focus:border-primary"
               />
             </div>
           </div>
@@ -296,7 +296,7 @@ export function ThreadDrawer({
                     <input
                       id={`thread-rename-${t.id}`}
                       type="text"
-                      className="w-full rounded-xl bg-surface-container px-3 py-1.5 text-body-medium text-on-surface border border-outline focus:outline-none focus:border-primary"
+                      className="w-full rounded-xl bg-surface-container px-3 py-1.5 text-body-medium text-on-surface border border-outline focus:outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 focus:border-primary"
                       value={editingName}
                       onChange={e => setEditingName(e.target.value)}
                       onKeyDown={e => {
@@ -885,7 +885,7 @@ export function CodexChat({
                   if (e.key === "Enter") handleCommitTitleRename();
                   if (e.key === "Escape") setIsEditingTitle(false);
                 }}
-                className="px-3 py-1 rounded-xl bg-surface-container-high border border-primary text-title-medium font-bold text-on-surface focus:outline-none max-w-sm"
+                className="px-3 py-1 rounded-xl bg-surface-container-high border border-primary text-title-medium font-bold text-on-surface focus:outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 max-w-sm"
 
                 placeholder="Nom du fil..."
               />
@@ -1154,7 +1154,7 @@ export function CodexChat({
               }}
               placeholder="Que voulez-vous faire ?"
               rows={2}
-              className="w-full bg-transparent resize-none border-0 text-body-large text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-0 leading-relaxed font-sans"
+              className="w-full bg-transparent resize-none border-0 text-body-large text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 focus:ring-0 leading-relaxed font-sans"
             />
 
             {/* Attached files chips under textarea */}

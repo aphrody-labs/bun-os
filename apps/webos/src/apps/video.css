@@ -5,7 +5,8 @@
 .vs-lib { max-width: 160px; }
 .vs-b { height: 34px; padding: 0 14px; border-radius: var(--md-sys-shape-corner-full); border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface-container-high); color: inherit; cursor: pointer; font: inherit; }
 .vs-b:hover { background: var(--md-sys-color-secondary-container); }
-.vs-b:focus-visible { outline: 2px solid var(--md-sys-color-primary); }
+.vs:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: -2px; }
+.vs-b:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
 .vs-b.prime { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: transparent; }
 .vs-b.vs-ic { width: 36px; padding: 0; font-size: 22px; font-family: "Material Symbols Rounded"; display: inline-grid; place-items: center; }
 .vs-main { display: flex; flex: 1; min-height: 0; }

@@ -47,4 +47,4 @@ export const m3StateLayer = [
 
 /** M3 focus indicator: 3 dp `secondary` outline, 2 dp offset, keyboard focus only. */
 export const m3FocusRing =
-  "outline-none focus-visible:outline-3 focus-visible:outline-secondary focus-visible:outline-offset-2";
+  "outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-secondary focus-visible:outline-offset-2";

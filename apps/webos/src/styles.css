@@ -187,6 +187,15 @@ kbd {
 .tbtn .mi {
   font-size: calc(19px * var(--fs));
 }
+/* Toolbar and dock buttons sit in clipping containers (window body, scrolling dock): keep an inset ring
+   alongside the outer outline so keyboard focus stays visible when the outline is cut. */
+.tbtn:focus-visible,
+.dbtn:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+  box-shadow: inset 0 0 0 2px var(--md-sys-color-primary);
+  background: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent);
+}
 .wsbar {
   display: flex;
   align-items: center;
@@ -546,7 +555,8 @@ kbd {
   box-shadow: var(--shadow-3);
 }
 .win:focus-visible {
-  outline: none;
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }
 .win[hidden] {
   display: none;
@@ -937,7 +947,8 @@ button.qtile:hover {
   }
 }
 .welcome:focus-visible {
-  outline: none;
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }
 .welcome.leaving {
   animation: welcome-out 160ms var(--ease) forwards;
@@ -1612,6 +1623,10 @@ button.qtile:hover {
   tab-size: 2;
   outline: none;
   min-height: 0;
+}
+.editor:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
 }
 .engine .editor {
   flex: 1.2;

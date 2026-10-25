@@ -61,7 +61,7 @@ export const Item = ({ children, className, ...props }: ItemProps) => {
           "before:transition-colors before:duration-200 before:ease-standard",
           "hover:before:bg-on-surface/8 focus-visible:before:bg-on-surface/10 active:before:bg-primary/10",
           "data-checked:hover:before:bg-primary/8 data-checked:focus-visible:before:bg-primary/10",
-          "outline-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary",
+          "outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary",
           "data-disabled:cursor-not-allowed",
           className,
         )}

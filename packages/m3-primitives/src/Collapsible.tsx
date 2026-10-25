@@ -40,7 +40,7 @@ const CollapsibleTrigger = forwardRef<HTMLButtonElement, CollapsibleTriggerProps
             "group flex min-h-12 w-full items-center justify-between gap-4 px-4 text-left",
             "rounded-medium text-title-small text-on-surface",
             "transition-colors duration-200 ease-standard hover:bg-on-surface/8 active:bg-on-surface/10",
-            "outline-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary",
+            "outline-none focus-visible:outline-solid focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-secondary",
             "disabled:cursor-not-allowed disabled:opacity-38 data-disabled:cursor-not-allowed data-disabled:opacity-38",
           ),
           className,
