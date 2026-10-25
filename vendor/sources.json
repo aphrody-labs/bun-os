@@ -480,6 +480,10 @@
     "bun-timeline": {
       "origin": "https://github.com/aphrody-labs/bun-timeline.git",
       "path": "bun-timeline"
+    },
+    "bun-ui": {
+      "origin": "https://github.com/aphrody-labs/bun-ui.git",
+      "path": "bun-ui"
     }
   },
   "references": {

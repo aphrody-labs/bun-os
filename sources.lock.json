@@ -1245,6 +1245,14 @@
       "gitlinks": []
     },
     {
+      "id": "vendor/bun-ui",
+      "repository": "aphrody-labs/bun-ui",
+      "revision": "844749f8399f04012396528be22fe780832ec0d6",
+      "mount": "vendor/bun-ui",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
       "id": "vendor/nushell",
       "repository": "aphrody-labs/nushell",
       "revision": "818d4ac0644a03e857062b024c136c5d27ba0ea5",

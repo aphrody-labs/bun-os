@@ -679,3 +679,8 @@
 	url = https://github.com/aphrody-labs/bun-timeline.git
 	branch = main
 	shallow = true
+[submodule "vendor/bun-ui"]
+	path = vendor/bun-ui
+	url = https://github.com/aphrody-labs/bun-ui.git
+	branch = main
+	shallow = true
