@@ -22,7 +22,10 @@ NetworkNamespacePath=/run/netns/mullvad
 BindReadOnlyPaths=/etc/netns/mullvad/resolv.conf:/etc/resolv.conf
 ExecStart=/home/ubuntu/.bun/bin/bun-1.4.4 /home/ubuntu/src/shenron/scripts/ops/manga-source-pool.ts --job /home/ubuntu/.aphrody/profiles/dbfr/jobs/manga-source-pool --pid-file /home/ubuntu/.aphrody/profiles/dbfr/jobs/manga-source-pool/pool.pid --workers 16 --interval-ms 60000 --reconcile-ms 3600000 --capabilities-file /home/ubuntu/.aphrody/profiles/dbfr/jobs/manga-source-pool/runtime-capabilities.json --public-progress-file /var/www/aphrody-status/manga-source-pool.json
 Restart=always
+# Back off up to 30 min so a long VPN outage (the Tokyo exit check fails) cannot exhaust StartLimitBurst.
 RestartSec=30s
+RestartSteps=8
+RestartMaxDelaySec=30min
 TimeoutStartSec=5min
 TimeoutStopSec=60s
 KillMode=control-group

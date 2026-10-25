@@ -6,7 +6,8 @@ After=network-online.target
 Type=oneshot
 WorkingDirectory=%h/src/aphrody
 Environment=PATH=%h/.bun/bin:%h/.cargo/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
-ExecStart=%h/.bun/bin/bun %h/src/aphrody/scripts/release/shenron-auto-deploy.ts sync
+# The script refuses any runtime other than its pinned Bun 1.4.4.
+ExecStart=%h/.bun/bin/bun-1.4.4 %h/src/aphrody/scripts/release/shenron-auto-deploy.ts sync
 SuccessExitStatus=75
 UMask=0077
 TimeoutStartSec=5min
