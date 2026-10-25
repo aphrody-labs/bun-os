@@ -9,7 +9,7 @@ repository-relative. Search the matching data with `--stack m3`, `--stack rg-ui`
 | Building                                           | Use                                                                                       | Why                                                                                                                 |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Rose Griffon, Azalée or Achilléa web surfaces      | `@rosegriffon/ui` (`packages/rg-ui`) + `@rosegriffon/app-shell` (`packages/rg-app-shell`) | Owns the five chrome themes, the shadcn bridge, Base UI components and the shared navigation chrome                 |
-| A new Aphrody/Bun app without a Rose Griffon brand | `@aphrody/m3*` (`packages/m3*`)                                                           | Material 3 tokens, Tailwind preset, Base UI wrappers, Next 16 integration, all generated from `crates/ui/m3-tokens` |
+| A new Aphrody/Bun app without a Rose Griffon brand | `@aphrody/m3*` (`packages/m3*`)                                                           | Material 3 tokens, Tailwind preset, Base UI wrappers, Next 16 integration, all generated from `crates/aphrody-m3-tokens` |
 | A web-component UI (Lit, `md-*`)                   | `@aphrody/material-web` fork (`vendor/material-web`) + `@aphrody/m3-react`                | 119 `md-*` elements with React wrappers                                                                             |
 | Any Tailwind v4 build on Bun                       | `@aphrody/bun-plugin-tailwind` (`toolchains/bun/packages/bun-plugin-tailwind`)            | `Bun.build`, `Bun.serve` HTML imports, dev server and a PostCSS entry for Next; `theme: "m3"` preset                |
 
@@ -23,7 +23,7 @@ rg-ui is itself built on the M3 tokens (`@aphrody/m3-tokens` dependency): its th
 - `m3-tokens`: `m3-tokens.css` (shape, typescale, motion, elevation, state layers), `expressive.css`,
   `breakpoints.css` (600/840/1200/1600 width classes, `@custom-media --md-*`), `dynamic-color`
   (`schemeFromSeed`, `cssFromSeed`, `applyDynamicColor`, `clearDynamicColor`), `platform-contract`
-  (`platformState(widthDp)`). Generated from `crates/ui/m3-tokens/src/sheets.rs`; never hand-edit.
+  (`platformState(widthDp)`). Generated from `crates/aphrody-m3-tokens/src/sheets.rs`; never hand-edit.
 - `m3-tailwind`: CSS-first `preset.css` (49 colour roles, `rounded-*`/`shape-*`, `text-<role>`,
   `shadow-elevation-0..5`, easings/durations/springs, `state-layer`, `compact:`..`extra-large:`,
   Base UI `m3-open:`/`m3-highlighted:`... variants). Import order: `tailwindcss`, `m3-tokens.css`,

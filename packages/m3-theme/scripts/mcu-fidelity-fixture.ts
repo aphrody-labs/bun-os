@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Reference fixture for the Content and Fidelity variants of crates/ui/m3-tokens (temperature
+// Reference fixture for the Content and Fidelity variants of crates/aphrody-m3-tokens (temperature
 // and dislike analyses), computed by @material/material-color-utilities: every role, both
 // modes, contrast -1, 0, 0.5 and 1. `cargo test -p aphrody-m3-tokens --test mcu_fidelity`
 // compares against it.
@@ -16,7 +16,7 @@ import {
 } from "@material/material-color-utilities";
 import { join } from "node:path";
 
-const OUT = join(import.meta.dir, "../../../../crates/ui/m3-tokens/tests/fixtures/mcu-fidelity.json");
+const OUT = join(import.meta.dir, "../../../../crates/aphrody-m3-tokens/tests/fixtures/mcu-fidelity.json");
 
 // Creator site, pet, plus seeds covering the dislike branch (dark yellow-green), warm, cool,
 // near-grey and very light colours.

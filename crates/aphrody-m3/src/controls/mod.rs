@@ -3,7 +3,7 @@
 //!
 //! Every size, colour role, opacity, shape and elevation comes from the Google-qualified
 //! `aphrody_m3_tokens::component` tables (checked against material-web v2.5.0 by
-//! `crates/ui/m3-tokens/tests/google_components.rs`). The few geometric constants that are not
+//! `crates/aphrody-m3-tokens/tests/google_components.rs`). The few geometric constants that are not
 //! tokens (radio ring, check glyph, label insets) are named and documented where they are used.
 
 mod buttons;

@@ -12,7 +12,7 @@ Decisions: [M3 plan](../../plans/design/M3-PLAN.md). Host qualification:
 ## Architecture and ownership
 
 ```text
-Aphrody crates/ui/m3-tokens          canonical Rust token contract
+Aphrody crates/aphrody-m3-tokens          canonical Rust token contract
         |
 Aphrody crates/ui/bun + interop/ffi  m3Css, Sass and icon exports
         |
@@ -111,7 +111,7 @@ CSS imports, so a Tailwind `@import` cannot address a virtual M3 module. Bun's s
 loads plugins from `bunfig.toml`; `m3 dev` reports a missing registration. Native scheme names
 are kebab-case (`tonalSpot` becomes `tonal-spot`).
 
-The Rust adaptive contract is in Aphrody `crates/ui/m3-tokens/src/adaptive.rs`. Web width
+The Rust adaptive contract is in Aphrody `crates/aphrody-m3-tokens/src/adaptive.rs`. Web width
 boundaries are exposed by `@aphrody/m3-tokens/breakpoints`: compact `< 600`, medium `< 840`,
 expanded `< 1200`, large `< 1600`, then extra-large. Height classes use `480` and `900`.
 `@aphrody/m3-react/adaptive` provides SSR-safe hooks; `M3App` defaults to `compact` until mounted.

@@ -124,7 +124,7 @@ function remember(key: string, result: M3CssResult): M3CssResult {
 
 /**
  * Render an M3 sheet on the server. Under Bun (`bun --bun next ...`) it calls the Rust renderer
- * of `@aphrody/bun` (`crates/ui/m3-tokens/src/sheets.rs`), which honours every option.
+ * of `@aphrody/bun` (`crates/aphrody-m3-tokens/src/sheets.rs`), which honours every option.
  * Under Node, where `bun:ffi` does not exist, `tokens` / `tailwind` / `spaceui` come from the
  * pre-generated files of `@aphrody/m3-theme` (baseline seed) and `scheme` is computed in JS with
  * material-color-utilities. Results are cached per request shape.

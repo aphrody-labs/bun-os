@@ -11,7 +11,7 @@ FSL-1.1-ALv2 provenance.
 
 | SpaceUI (`packages/aphrody-spaceui/` (not in repo), reference copy) | Aphrody |
 | --- | --- |
-| `packages/tokens` (not in repo) (7 HSL themes, `app/ink/sidebar/menu/accent/status`) | `crates/ui/m3-tokens/src/spaceui.rs`, `@aphrody/m3-theme` `spaceui.css` / `tailwind.css` |
+| `packages/tokens` (not in repo) (7 HSL themes, `app/ink/sidebar/menu/accent/status`) | `crates/aphrody-m3-tokens/src/spaceui.rs`, `@aphrody/m3-theme` `spaceui.css` / `tailwind.css` |
 | `@spacedrive/primitives` | `@aphrody/m3-primitives` (Base UI headless layer) |
 | `@spacedrive/forms` | `@aphrody/m3-forms` |
 | `@spacedrive/ai` | `@aphrody/m3-ai` |

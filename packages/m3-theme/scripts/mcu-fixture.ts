@@ -25,7 +25,7 @@ import {
 } from "@material/material-color-utilities";
 import { join } from "node:path";
 
-const OUT = join(import.meta.dir, "../../../../crates/ui/m3-tokens/tests/fixtures/mcu.json");
+const OUT = join(import.meta.dir, "../../../../crates/aphrody-m3-tokens/tests/fixtures/mcu.json");
 
 /** Deterministic colours: xorshift32 plus the usual suspects. */
 function sampleColors(count: number): number[] {
@@ -128,7 +128,7 @@ for (const seed of SEEDS) {
   }
 }
 
-// SpaceUI themes (crates/ui/m3-tokens/src/spaceui.rs): accent palette from the accent itself,
+// SpaceUI themes (crates/aphrody-m3-tokens/src/spaceui.rs): accent palette from the accent itself,
 // neutrals from the theme surface, tonal-spot relationships.
 const SPACEUI = [
   [0xff2499ff, 0xff1c1d26, true],

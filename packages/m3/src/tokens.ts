@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Token sheets and the self-contained token bundle (`m3 tokens`). Every sheet comes from
-// `crates/ui/m3-tokens` through `m3Css` (docs/design/M3-PLAN.md, decision D1); the bundle
+// `crates/aphrody-m3-tokens` through `m3Css` (docs/design/M3-PLAN.md, decision D1); the bundle
 // replaces the former static `assets/design-system/m3` tree.
 import { copyFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";

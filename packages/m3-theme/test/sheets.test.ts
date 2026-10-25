@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// The sheets come from Rust (crates/ui/m3-tokens/src/sheets.rs through @aphrody/bun's m3Css).
+// The sheets come from Rust (crates/aphrody-m3-tokens/src/sheets.rs through @aphrody/bun's m3Css).
 // These tests hold them to the reference implementation, @material/material-color-utilities, and
 // check the committed files are current.
 

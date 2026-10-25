@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /// <reference lib="es2023.array" />
-// Reference fixture for crates/ui/m3-tokens's image quantization port (quantize_wu,
+// Reference fixture for crates/aphrody-m3-tokens's image quantization port (quantize_wu,
 // quantize_wsmeans, quantize, score, image): computed by @material/material-color-utilities so
 // `cargo test -p aphrody-m3-tokens` can assert bit-exact results.
 //
@@ -8,7 +8,7 @@
 // startingClusters is short, extra L*a*b* clusters) from `Math.random()`, which has no fixed
 // seed and would make both this fixture and the Rust port it drives non-reproducible. This
 // script overrides `Math.random` with `mulberry32`, seeded, before calling into MCU; the Rust
-// port (crates/ui/m3-tokens/src/quantize_wsmeans.rs `Rng`) implements the exact same
+// port (crates/aphrody-m3-tokens/src/quantize_wsmeans.rs `Rng`) implements the exact same
 // generator so both sides draw an identical float sequence from an identical seed. See that
 // module's doc comment for the full rationale.
 //
@@ -17,8 +17,8 @@
 import { QuantizerCelebi, Score } from "@material/material-color-utilities";
 import { join } from "node:path";
 
-const OUT_JSON = join(import.meta.dir, "../../../../crates/ui/m3-tokens/tests/fixtures/mcu-image.json");
-const OUT_IMAGES_DIR = join(import.meta.dir, "../../../../crates/ui/m3-tokens/tests/fixtures/images");
+const OUT_JSON = join(import.meta.dir, "../../../../crates/aphrody-m3-tokens/tests/fixtures/mcu-image.json");
+const OUT_IMAGES_DIR = join(import.meta.dir, "../../../../crates/aphrody-m3-tokens/tests/fixtures/images");
 
 /** The default seed `quantize::DEFAULT_SEED` in the Rust port uses. */
 const DEFAULT_SEED = 0x6750a4b1;

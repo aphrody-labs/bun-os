@@ -3,15 +3,15 @@
 
 Who owns Material 3 typography in Aphrody. Spec values: the M3 type scale
 (<https://m3.material.io/styles/typography/type-scale-tokens>) as encoded in
-`crates/ui/m3-tokens/src/typography.rs`; do not copy the table elsewhere.
+`crates/aphrody-m3-tokens/src/typography.rs`; do not copy the table elsewhere.
 
 ## Owners
 
 | Concern | Owner | Consumers |
 | --- | --- | --- |
-| Type scale (15 baseline roles) | `crates/ui/m3-tokens/src/typography.rs` | `sheets.rs` (`--text-*` in `packages/m3-theme/tailwind.css`), `aphrody-render` via `aphrody_m3_tokens::facade::typography` |
+| Type scale (15 baseline roles) | `crates/aphrody-m3-tokens/src/typography.rs` | `sheets.rs` (`--text-*` in `packages/m3-theme/tailwind.css`), `aphrody-render` via `aphrody_m3_tokens::facade::typography` |
 | Runtime `--md-sys-typescale-*` CSS | `@aphrody/m3-tokens` (`../packages/m3-tokens`, `m3-tokens.css`) | `@aphrody/m3-theme`, `@aphrody/material-web` `md-typescale-styles` |
-| Google Sans Flex axes | `crates/ui/m3-tokens/src/google_sans_flex.rs` (mirrored in `packages/material-web/typography/internal/google-sans-flex-axes.ts`) | `<md-type>`, native renderer |
+| Google Sans Flex axes | `crates/aphrody-m3-tokens/src/google_sans_flex.rs` (mirrored in `packages/material-web/typography/internal/google-sans-flex-axes.ts`) | `<md-type>`, native renderer |
 | Expressive axes per role (`opsz`, `GRAD`, `ROND`) and emphasized roles | `packages/material-web/typography/internal/type-scale.ts` | `<md-type>`, `typeStyleCss`, `typeScaleVars` |
 | Font files, subsets, `@font-face`, stacks, fallbacks | `@aphrody/m3-fonts` ([`FONTS-AND-ICONS.md`](./FONTS-AND-ICONS.md)) | `@aphrody/app-ui`, the `@aphrody/m3` plugin |
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Regenerate tokens.css, tailwind.css and spaceui.css.
 //
-// The sheets are rendered in Rust (crates/ui/m3-tokens/src/sheets.rs) and reached through
+// The sheets are rendered in Rust (crates/aphrody-m3-tokens/src/sheets.rs) and reached through
 // @aphrody/bun's FFI, so this package holds no colour tables: the Rust crate is the single token
 // source, and its colours are bit-identical to @material/material-color-utilities
 // (test/sheets.test.ts checks both).

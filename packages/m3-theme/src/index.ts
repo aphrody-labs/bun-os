@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Runtime theme application. Colours always come from the Rust owner (`crates/ui/m3-tokens`):
+// Runtime theme application. Colours always come from the Rust owner (`crates/aphrody-m3-tokens`):
 // the page's compiled sheets (`m3:theme.css`, `tokens.css`, a brand sheet) carry the build-time
 // theme, and a different seed, variant or contrast is a Rust `scheme` sheet installed as a
 // stylesheet. Nothing here computes a colour or writes a colour role inline, so the Rust

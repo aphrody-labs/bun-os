@@ -231,7 +231,7 @@ export function clearDynamicColor(target?: HTMLElement | null): void {
 /**
  * Mapping from semantic UI-system token name to the M3 `--md-sys-color-*`
  * role it aliases. Shared by `exportShadcnAliases` and `exportTailwindTheme`.
- * In exact lockstep with Rust `crates/ui/m3-tokens/src/color.rs:FUSION_ALIAS_MAP`.
+ * In exact lockstep with Rust `crates/aphrody-m3-tokens/src/color.rs:FUSION_ALIAS_MAP`.
  */
 export const FUSION_ALIAS_MAP = [
   ["background", "surface"],

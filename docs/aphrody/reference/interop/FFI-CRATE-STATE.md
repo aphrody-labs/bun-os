@@ -205,7 +205,7 @@ Columns: Kind = lib/bin/cdylib targets; FFI = how the crate reaches the single `
 | `crates/ui/identity` | `aphrody-identity` | lib+bin*6 | linked transitively, no C symbols | - | 60 | 0/0 | 0/0 | member(glob) |
 | `crates/ui/local-ai` | `aphrody-local-ai` | lib | not linked | - | 12 | 0/0 | 0/0 | member(glob) |
 | `crates/ui/m3-reproduce` | `aphrody-m3-reproduce` | lib+bin*2 | linked transitively, no C symbols | - | 8 | 0/0 | 1/0 | member(glob) |
-| `crates/ui/m3-tokens` | `aphrody-m3-tokens` | lib | linked transitively, no C symbols | - | 132 | 0/0 | 0/0 | member(glob) |
+| `crates/aphrody-m3-tokens` | `aphrody-m3-tokens` | lib | linked transitively, no C symbols | - | 132 | 0/0 | 0/0 | member(glob) |
 | `crates/ui/render` | `aphrody-render` | lib+bin*2 | linked transitively, no C symbols | - | 69 | 0/0 | 3/0 | member(glob) |
 | `crates/ui/softraster` | `aphrody-softraster` | lib | aphrody_raster_fill_triangle via aphrody-ffi zerocopy.rs (new) | @aphrody/bun/zerocopy | 5 | 0/0 | 0/0 | member(glob) |
 | `crates/ui/sprite-sheet` | `aphrody-sprite-sheet` | lib | linked transitively, no C symbols | - | 7 | 0/0 | 0/0 | member(glob) |

@@ -33,7 +33,7 @@ system under the `--gem-sys-*` namespace, plus a canvas/code layer under
 | brand blue / green / red / yellow | `#3186ff` / `#0ebc5f` / `#ff4641` / `#ffcc00` |
 
 The corner-radius scale (`--gem-sys-shape--corner-*`) matches the M3 Expressive
-10-step scale now in [`m3-tokens` `shape.rs`](https://github.com/aphrody-labs/aphrody/blob/main/crates/ui/m3-tokens/src/shape.rs)
+10-step scale now in [`m3-tokens` `shape.rs`](https://github.com/aphrody-labs/aphrody/blob/main/crates/aphrody-m3-tokens/src/shape.rs)
 (none 0 → medium 12 → large 16 → large-increased 20 → extra-large 28 →
 extra-large-increased 32 → extra-extra-large 48 → full 9999), confirming our
 token update against a shipping Google product.

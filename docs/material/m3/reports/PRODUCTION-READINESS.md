@@ -178,7 +178,7 @@ Its owner was notified through native agent coordination. No ETA is established.
 
 The installed FFI artifact dated 2026-10-01 emits the older
 `crates/ui/aphrody-m3-tokens/src/sheets.rs` provenance. Current source
-correctly uses `crates/ui/m3-tokens/src/sheets.rs`. Three exact stylesheet
+correctly uses `crates/aphrody-m3-tokens/src/sheets.rs`. Three exact stylesheet
 parity tests still fail on that source-path comment. Observed numeric token
 parity does not close those failures. The current owner artifact must be
 built and installed, then parity rerun without erasing provenance or

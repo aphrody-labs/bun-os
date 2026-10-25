@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
  * Canonical Gemini AI & Google Design Brand Tokens.
- * Mirrored from Rust `crates/ui/m3-tokens/src/gemini_brand.rs`.
+ * Mirrored from Rust `crates/aphrody-m3-tokens/src/gemini_brand.rs`.
  */
 
 export const GEMINI_BRAND_COLORS = Object.freeze({

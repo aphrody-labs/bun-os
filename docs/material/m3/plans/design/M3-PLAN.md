@@ -22,7 +22,7 @@ exports are consumer APIs; they do not authorize public npm publication.
 
 | Owner | Contract |
 | --- | --- |
-| Aphrody `crates/ui/m3-tokens` (`aphrody-m3-tokens`) | Canonical Rust tokens, HCT, palettes, role sets and generated sheets. |
+| Aphrody `crates/aphrody-m3-tokens` (`aphrody-m3-tokens`) | Canonical Rust tokens, HCT, palettes, role sets and generated sheets. |
 | Aphrody `crates/ui/bun` (`aphrody-bun`), `@aphrody/bun` | Native bindings, including `m3Css`, rendering and the icons module. Native artifact qualification belongs to the parent workspace. |
 | `@aphrody/m3-tokens`, `@aphrody/m3-theme`, `@aphrody/m3-tailwind` | TypeScript/CSS projection, dynamic colour, theme providers and Tailwind v4 aliases. |
 | `@aphrody/material-web`, `@aphrody/m3-front`, `@aphrody/m3-react` | Lit components, custom-element registration and React wrappers. |

@@ -156,7 +156,7 @@ pub const EXTENDED: &[(&str, u32)] = spaceui::EXTENDED;
 fn header(what: &str, regenerate: &str) -> String {
     format!(
         "/* SPDX-License-Identifier: Apache-2.0 */\n/*\n * {what}\n * GENERATED - do not \
-         hand-edit. Source: crates/ui/m3-tokens/src/sheets.rs.\n * Regenerate with: \
+         hand-edit. Source: crates/aphrody-m3-tokens/src/sheets.rs.\n * Regenerate with: \
          {regenerate}\n */\n"
     )
 }

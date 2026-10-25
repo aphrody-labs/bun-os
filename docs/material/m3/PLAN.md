@@ -14,7 +14,7 @@ remain authoritative for native runtime and installed hosts.
 | Plugin, theme modules, Bun web build and `m3` CLI                     | `packages/m3`; OS theme implementation is the `aphrody-m3-os-themes` owner submodule         |
 | App API/file server, executable compiler and deployment configuration | `packages/m3-bun`                                                                            |
 | Shared `Bun.build` preset and workspace build cache                   | `packages/m3-config`, `scripts/build.ts`                                                     |
-| Tokens and theme renderers                                            | `packages/m3-tokens` owns the Rust export adapter; Aphrody `crates/ui/m3-tokens` owns colors |
+| Tokens and theme renderers                                            | `packages/m3-tokens` owns the Rust export adapter; Aphrody `crates/aphrody-m3-tokens` owns colors |
 | Package build/test orchestration                                      | `scripts/yolo.ts`, existing `$YOLO_ROOT/bin/yolo`                                            |
 | Minimal web example / adaptive UI and API consumer                    | `apps/web` / `apps/m3-showcase`                                                                 |
 | Native artifacts and installed desktop/mobile hosts                   | Aphrody integrator and declared build factory                                                |

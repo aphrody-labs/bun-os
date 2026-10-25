@@ -29,7 +29,7 @@ export const WINDOW_SIZE_CLASSES: readonly WindowSizeClass[] = [
 ];
 
 /** Recommended navigation affordance per M3 adaptive guidance. */
-/** Same names as `Navigation` in crates/ui/m3-tokens/src/adaptive.rs (Bar, RailCollapsed, RailExpanded). */
+/** Same names as `Navigation` in crates/aphrody-m3-tokens/src/adaptive.rs (Bar, RailCollapsed, RailExpanded). */
 export type NavigationKind = "bar" | "rail-collapsed" | "rail-expanded";
 
 /** M3 window height class, classifying a viewport **height** in dp/px. */

@@ -20,7 +20,7 @@ privileges stay under their application owners.
 
 | Layer | Current owner | Contract and boundary |
 | --- | --- | --- |
-| Rust design roles | Aphrody `crates/ui/m3-tokens` | Typed tokens, HCT, palettes and CSS-sheet generation. Native parity needs its own runtime receipt. |
+| Rust design roles | Aphrody `crates/aphrody-m3-tokens` | Typed tokens, HCT, palettes and CSS-sheet generation. Native parity needs its own runtime receipt. |
 | Web projection | `m3-tokens`, `m3-theme`, `m3-tailwind` | CSS roles, TypeScript inputs and Tailwind aliases; JavaScript dynamic colour uses Material Color Utilities. |
 | React DOM | `m3-primitives` family and `m3-motion` | Base UI behaviour, Tailwind styling and M3 motion. This also applies inside webviews. |
 | Custom elements | `material-web`, `m3-front`, `m3-react` | Lit components and React wrappers consuming shared roles. |

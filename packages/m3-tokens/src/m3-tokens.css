@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
  * Material 3 static tokens: shape, typescale, motion, elevation, state layers.
- * GENERATED - do not hand-edit. Source: crates/ui/m3-tokens/src/sheets.rs.
+ * GENERATED - do not hand-edit. Source: crates/aphrody-m3-tokens/src/sheets.rs.
  * Regenerate with: APHRODY_UPDATE_TOKENS=1 scripts/aphrody/build/rust/cargo-serial.sh test -p aphrody-m3-tokens --test sheets_golden
  */
 
