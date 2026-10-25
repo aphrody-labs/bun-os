@@ -4,7 +4,7 @@
     {
       "id": "bun",
       "repository": "aphrody-labs/bun",
-      "revision": "e6ee23eb7857e7893f8e85916b5bb89e715e9c01",
+      "revision": "b6f5b63112f2237aa69cb145e46c86d797f1bb6e",
       "mount": "sources/bun",
       "gitlinks": []
     },
@@ -1187,6 +1187,29 @@
       "revision": "8c1a9806a81cdae2f880f3213d7855e1b4416d36",
       "mount": "vendor/bun-winmd",
       "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-video",
+      "repository": "aphrody-labs/bun-video",
+      "revision": "c560e546ab239a0c5fe4c8b32849947567158c94",
+      "mount": "vendor/bun-video",
+      "branch": "main",
+      "gitlinks": [
+        {
+          "path": "vendor/filmcraft",
+          "repository": "aphrody-labs/filmcraft",
+          "revision": "e1ebbf4c1acbc267c2af65fb8b32842beecc50a5"
+        }
+      ]
+    },
+    {
+      "id": "vendor/bun-video/vendor/filmcraft",
+      "repository": "aphrody-labs/filmcraft",
+      "revision": "e1ebbf4c1acbc267c2af65fb8b32842beecc50a5",
+      "mount": "vendor/bun-video/vendor/filmcraft",
+      "parent": "vendor/bun-video",
+      "submodulePath": "vendor/filmcraft",
       "gitlinks": []
     },
     {

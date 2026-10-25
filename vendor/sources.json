@@ -460,6 +460,10 @@
     "bun-winmd": {
       "origin": "https://github.com/aphrody-labs/bun-winmd.git",
       "path": "bun-winmd"
+    },
+    "bun-video": {
+      "origin": "https://github.com/aphrody-labs/bun-video.git",
+      "path": "bun-video"
     }
   },
   "references": {

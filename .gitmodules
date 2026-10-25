@@ -654,3 +654,8 @@
 	url = https://github.com/aphrody-labs/bun-winmd.git
 	branch = main
 	shallow = true
+[submodule "vendor/bun-video"]
+	path = vendor/bun-video
+	url = https://github.com/aphrody-labs/bun-video.git
+	branch = main
+	shallow = true

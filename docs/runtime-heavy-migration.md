@@ -167,6 +167,11 @@ the WinFw link of `bun-vpn` stay in the runtime's native graph.
   Not run: native `bun bd --target=plugins`, Linux/macOS plugin builds, the
   release workflows.
 
+- Bun Video: `vendor/bun-video` mounts aphrody-labs/bun-video `c560e546ab2`, with
+  FilmCraft pinned as its child `vendor/bun-video/vendor/filmcraft` (aphrody-labs/filmcraft
+  `bun-runtime-0.9.0` `e1ebbf4c1ac`); runtime pin `b6f5b63112f` drops `packages/bun-video`
+  and `src/media/filmcraft` (B4 below). `readLock()` accepts 124 sources.
+
 ### B4 — video domain (341 MB): FilmCraft reconciled; package move re-scoped
 
 1. Done: FilmCraft has one owner, the Bun OS `crates/filmcraft-*` and
