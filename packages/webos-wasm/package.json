@@ -25,7 +25,7 @@
     "access": "public"
   },
   "scripts": {
-    "build:wasm": "wasm-pack build ../../crates/aphrody-webos-wasm --target web --out-dir ../../packages/webos-wasm/wasm --release -- --locked && bun stage-notices.ts",
+    "build:wasm": "bun ../../scripts/aphrody/build/rust/wasm-package.ts --crate aphrody-webos-wasm --out packages/webos-wasm/wasm && bun stage-notices.ts",
     "typecheck": "bun check --noEmit",
     "test": "bun test"
   },
