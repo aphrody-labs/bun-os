@@ -36,10 +36,15 @@ export async function buildDesktop() {
     define: { __APHRODY_CATALOG__: JSON.stringify(catalog) },
   });
   if (!web.success) throw new AggregateError(web.logs, "Bun frontend build failed");
-  await Promise.all([
-    Bun.write(join(desktopOutput, "web/index.html"), Bun.file(join(desktopRoot, "src/index.html"))),
-    Bun.write(join(desktopOutput, "web/style.css"), Bun.file(join(desktopRoot, "src/style.css"))),
-  ]);
+  // Bundle the stylesheet so its @aphrody/m3-tokens imports resolve into web/style.css.
+  const styles = await Bun.build({
+    entrypoints: [join(desktopRoot, "src/style.css")],
+    outdir: join(desktopOutput, "web"),
+    target: "browser",
+    minify: true,
+  });
+  if (!styles.success) throw new AggregateError(styles.logs, "Bun stylesheet build failed");
+  await Bun.write(join(desktopOutput, "web/index.html"), Bun.file(join(desktopRoot, "src/index.html")));
   const server = await Bun.build({
     entrypoints: [join(desktopRoot, "server.ts")],
     outdir: desktopOutput,

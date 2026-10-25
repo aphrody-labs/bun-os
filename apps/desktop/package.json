@@ -14,6 +14,7 @@
   "dependencies": {
     "@aphrody/bun-video-project": "workspace:*",
     "@aphrody/bun-workspace": "workspace:*",
+    "@aphrody/m3-tokens": "workspace:*",
     "@aphrody/tauri": "catalog:"
   },
   "engines": {

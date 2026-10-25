@@ -123,6 +123,7 @@ function inspectButton(library: Library): HTMLButtonElement {
   button.className = "launch-button";
   const running = latest(library.id)?.state === "running";
   button.textContent = running ? "Inspecting" : "Inspect CLI";
+  button.setAttribute("aria-label", (running ? "Inspecting " : "Inspect ") + library.title + " CLI");
   button.disabled = !connected || !library.inspectable || running;
   button.title = !connected
     ? "The local service is disconnected."
@@ -183,6 +184,8 @@ function render() {
       button.type = "button";
       button.className = item.id === selected ? "nav-item active" : "nav-item";
       button.setAttribute("aria-pressed", String(item.id === selected));
+      button.setAttribute("aria-label", item.title);
+      button.title = item.title;
       button.append(svg(item.path), document.createTextNode(item.title));
       button.addEventListener("click", () => {
         selected = item.id;
