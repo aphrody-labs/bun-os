@@ -4,7 +4,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 const HELP =
-  "Usage: bun scripts/aphrody/audit/verify-google-pipeline.ts [--static | --rust-only | --sdk-only] [--root <bun-distribution>]";
+  "Usage: bun scripts/aphrody/audit/verify-google-pipeline.ts [--static | --rust-only | --sdk-only] [--root <bun-os checkout>]";
 
 /** The flat crates of the OS Google domain, in qualification order. */
 export const GOOGLE_CRATES = [

@@ -3,9 +3,10 @@
  * Contrat et observabilité de la stack Aphrody/RG/Niers.
  *
  * Commands:
- *   status [--json] [--strict] [--deep]  live units, host resources and probes
- *   check                       manifest/source consistency
- *   plan                        check + live status, no mutations
+ *   status [--json] [--strict] [--deep] [--host=<alias>]  live units, host resources and probes (Linux host);
+ *     --host (or APHRODY_CATALOG_HOST) keeps only the catalog entries of that host
+ *
+ * Manifest/source consistency is checked by scripts/aphrody/tools/infra/check-infra.ts.
  *
  * This file intentionally never starts, stops, reloads or installs anything.
  * Deployment remains explicit through `aphrody-infra deploy`.
@@ -17,12 +18,15 @@
 import { homedir } from "node:os";
 import { readFile } from "node:fs/promises";
 
-const INFRA_ROOT = process.env.APHRODY_INFRA_ROOT ?? `${import.meta.dir}/../../..`;
+const INFRA_ROOT = process.env.APHRODY_INFRA_ROOT ?? `${import.meta.dir}/../../../..`;
 const CATALOG_PATH = process.env.APHRODY_SERVICE_CATALOG ?? `${INFRA_ROOT}/infra/config/service-catalog.json`;
 const catalog = JSON.parse(await readFile(CATALOG_PATH, "utf8")) as Catalog;
 const json = process.argv.includes("--json");
 const strict = process.argv.includes("--strict");
 const deep = process.argv.includes("--deep");
+// Catalog host alias (vps, dbfr, ...): limits the report to the entries that host runs.
+const hostFilter =
+  process.argv.find(arg => arg.startsWith("--host="))?.slice("--host=".length) ?? process.env.APHRODY_CATALOG_HOST;
 const command = process.argv[2] ?? "status";
 const DISK_WARNING_PERCENT = 85;
 const DISK_CRITICAL_PERCENT = 95;
@@ -30,7 +34,8 @@ const DISK_CRITICAL_PERCENT = 95;
 type CatalogService = {
   id: string;
   kind: string;
-  unit: string;
+  /** Absent for container, remote-host and proxy-only entries: they have no systemd unit. */
+  unit?: string;
   application?: string;
   sourceRepo?: string;
   health?: string;
@@ -39,6 +44,7 @@ type CatalogService = {
   required?: boolean;
   /** `retired` units are decommissioned: never required, never health-probed. */
   status?: string;
+  host?: string;
 };
 type Catalog = {
   schemaVersion: number;
@@ -69,28 +75,33 @@ const manifest = {
   name: "aphrody-production",
   schemaVersion: catalog.schemaVersion,
   components: [
-    ...catalog.services.map((service): Component => {
-      const timer = service.unit.endsWith(".timer") ? service.unit : undefined;
+    // Only systemd-managed entries are observable here; unit-less entries are checked by their owners.
+    ...catalog.services.flatMap((service): Component[] => {
+      const unit = service.unit;
+      if (!unit || (hostFilter && service.host && service.host !== hostFilter)) return [];
+      const timer = unit.endsWith(".timer") ? unit : undefined;
       const retired = service.status === "retired";
       const ports = [service.health, ...(service.additionalUpstreams ?? [])].flatMap(address => {
         const value = address ? port(address) : undefined;
         return value === undefined ? [] : [value];
       });
-      return {
-        id: service.id,
-        kind: retired ? "retired" : service.kind,
-        owner: retired
-          ? "retired"
-          : (service.application ?? service.sourceRepo ?? service.id.split("-", 1)[0] ?? service.id),
-        unit: timer ? timer.replace(/\.timer$/u, ".service") : service.unit,
-        required: !retired && (service.required ?? (service.staged ? false : true)),
-        oneshot: timer !== undefined,
-        timer,
-        // A retired unit is never health-probed: its listener is gone.
-        ports: retired ? [] : ports,
-        health: retired ? undefined : service.health,
-        retired,
-      };
+      return [
+        {
+          id: service.id,
+          kind: retired ? "retired" : service.kind,
+          owner: retired
+            ? "retired"
+            : (service.application ?? service.sourceRepo ?? service.id.split("-", 1)[0] ?? service.id),
+          unit: timer ? timer.replace(/\.timer$/u, ".service") : unit,
+          required: !retired && (service.required ?? (service.staged ? false : true)),
+          oneshot: timer !== undefined,
+          timer,
+          // A retired unit is never health-probed: its listener is gone.
+          ports: retired ? [] : ports,
+          health: retired ? undefined : service.health,
+          retired,
+        },
+      ];
     }),
     ...(catalog.policies?.retiredUnits ?? [])
       .filter(unit => !unit.includes("@"))
@@ -530,7 +541,7 @@ async function status() {
 let exitCode: number;
 if (command === "status") exitCode = await status();
 else {
-  console.error("usage: bun scripts/tools/infra/infra-status.ts [status] [--json] [--strict] [--deep]");
+  console.error("usage: bun scripts/aphrody/tools/infra/infra-status.ts [status] [--json] [--strict] [--deep] [--host=<alias>]");
   exitCode = 2;
 }
 process.exit(exitCode);

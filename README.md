@@ -10,7 +10,7 @@
 [Architecture](docs/architecture.md) ·
 [Plan](PLAN.md)
 
-[![CI](https://github.com/aphrody-labs/bun-distribution/actions/workflows/ci.yml/badge.svg?branch=os)](https://github.com/aphrody-labs/bun-distribution/actions/workflows/ci.yml)
+[![CI](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml/badge.svg?branch=os)](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml)
 [![Bun](https://img.shields.io/badge/bun-1.4.4-black?logo=bun)](toolchains/bun)
 [![Rust](https://img.shields.io/badge/rust-nightly-orange?logo=rust)](rust-toolchain.toml)
 [![License](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue)](LICENSE)
@@ -46,7 +46,7 @@ Requires Bun 1.4.4, Git, the nightly Rust toolchain from [`rust-toolchain.toml`]
 and the native toolchain of each target you build.
 
 ```bash
-git clone https://github.com/aphrody-labs/bun-distribution.git bun-os
+git clone https://github.com/aphrody-labs/bun-os.git bun-os
 ```
 
 ```bash

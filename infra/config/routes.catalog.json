@@ -223,7 +223,7 @@
       "keep": true
     }
   },
-  "source": "https://github.com/aphrody-labs/bun-distribution/tree/os",
+  "source": "https://github.com/aphrody-labs/bun-os/tree/os",
   "memberPath": "/source/",
   "apps": {
     "/art": "creative",

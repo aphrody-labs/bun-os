@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Bun OS monorepo
 
-Entry page for the canonical Bun OS workspace (`aphrody-labs/bun-distribution`, branch `os`; forge
+Entry page for the canonical Bun OS workspace (`aphrody-labs/bun-os` (renamed from `aphrody-labs/bun-distribution` on 2026-10-25), branch `os`; forge
 `bun-forge:aphrody-dev/bun-os`). It states the rules, the measured state and the open decisions, and links to
 the pages that own the details. Generated data is not copied here: see
 [`generated/component-inventory.json`](generated/component-inventory.json) (regenerate with
@@ -164,6 +164,8 @@ workflow environment (not checked), and non-current GitHub mirrors, on which `re
    protected token is configured is still pending, and GitHub `release.yml` does not deploy it.
 4. **GitHub mirror**: `aphrody-labs/bun-os` has no `os` branch (see Release state); decide whether it is a
    mirror of `os` or a separate repository, because the `github` remote of this checkout is
-   `aphrody-labs/bun-distribution`.
+   `aphrody-labs/bun-distribution`. Resolved 2026-10-25: `aphrody-labs/bun-distribution` was renamed
+   `aphrody-labs/bun-os` (default branch `os`) and the former `aphrody-labs/bun-os` became the archived
+   `aphrody-labs/bun-os-legacy`.
 5. **Migrate-class workspaces** (five) and the `Cargo.lock` stanza of the removed `aphrody-rg-server`
    package (see `PLAN.md`).

@@ -141,7 +141,7 @@
     {
       "id": "bun-distribution",
       "role": "Bun OS workspace: Bun Libraries history, shared workspace/process/artifact/assets packages, independent library app builds, OS distribution and Ubuntu factory, APT adapters and cross-ecosystem package conversion. Aphrody Infra owns host orchestration, services, routes, DNS desired state and activation.",
-      "source": "https://github.com/aphrody-labs/bun-distribution",
+      "source": "https://github.com/aphrody-labs/bun-os",
       "production": false,
       "note": "Canonical Bun OS checkout is branch os in the C:/src workspace. It owns distribution assembly and package conversion; APT implementation stays in apt. Infra owns hosts, DNS state and activation."
     }

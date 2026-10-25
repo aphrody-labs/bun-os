@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 // Installs the host compose project ~/apps/compose.yaml (infra/config/host/apps/<host>/) and the compose file of every
 // app it includes, from the one checkout of its repository (~/src/<repo>). Runs ON the host, from ~/src/aphrody:
-//   bun scripts/tools/infra/host-apps.ts --host vps|dbfr [--apply]
+//   bun scripts/aphrody/tools/infra/host-apps.ts --host vps|dbfr [--apply]
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { hostLayout, type HostLayout } from "@aphrody/yolo-core/src/host/layout.ts";
 
-const REPO = join(import.meta.dir, "..", "..", "..");
+const REPO = join(import.meta.dir, "..", "..", "..", "..");
 export const HOSTS = ["vps", "dbfr"] as const;
 
 /** Source (absolute, in ~/src/<repo>) -> destination on the host. */
@@ -16,7 +16,7 @@ export function hostAppFiles(host: (typeof HOSTS)[number], layout: HostLayout, r
   const files: [string, string][] = [
     [join(repo, "infra/config/host/apps", host, "compose.yaml"), layout.compose],
     [join(repo, "infra/config/host/apps", host, "env"), join(dirname(layout.compose), ".env")],
-    [join(repo, "tools/config/container/compose.yaml"), join(layout.apps, "aphrody", "compose.yaml")],
+    [join(repo, "tools/aphrody/config/container/compose.yaml"), join(layout.apps, "aphrody", "compose.yaml")],
   ];
   if (host === "vps") {
     for (const app of ["gitea", "komodo", "gitea-runner"]) {

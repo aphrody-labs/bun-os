@@ -14,11 +14,11 @@
     "mirror": "http://127.0.0.1:29020/aphrody-dev/bun-distribution.git",
     "checkout": "/home/ubuntu/src/bun-os",
     "recursiveSubmodules": false,
-    "bootstrapBackend": "https://github.com/aphrody-labs/bun-distribution.git",
+    "bootstrapBackend": "https://github.com/aphrody-labs/bun-os.git",
     "observedRevision": "1eedaa8ca51c06790eaae7c4bfee8e35cfce25a5",
     "currentBackend": "http://127.0.0.1:29020/aphrody-dev/bun-distribution.git",
     "mirrorAlignedRevision": "1e5c6435ffdb13d1aff8db1eb432033df00fd3af",
-    "effectiveRefreshBackend": "https://github.com/aphrody-labs/bun-distribution.git",
+    "effectiveRefreshBackend": "https://github.com/aphrody-labs/bun-os.git",
     "mirrorState": "private-during-resync"
   },
   "build": {
