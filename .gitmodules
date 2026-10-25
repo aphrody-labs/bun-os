@@ -659,3 +659,8 @@
 	url = https://github.com/aphrody-labs/bun-video.git
 	branch = main
 	shallow = true
+[submodule "vendor/bun-python"]
+	path = vendor/bun-python
+	url = https://github.com/aphrody-labs/bun-python.git
+	branch = main
+	shallow = true

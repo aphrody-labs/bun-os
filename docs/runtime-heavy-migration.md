@@ -172,6 +172,9 @@ the WinFw link of `bun-vpn` stay in the runtime's native graph.
   `bun-runtime-0.9.0` `e1ebbf4c1ac`); runtime pin `b6f5b63112f` drops `packages/bun-video`
   and `src/media/filmcraft` (B4 below). `readLock()` accepts 124 sources.
 
+- Bun Python: `vendor/bun-python` mounts aphrody-labs/bun-python `4d709fd3c16` (buv,
+  bun-python-native, -toolchain, -conformance); runtime pin `eeb831257d4` drops them.
+
 ### B4 — video domain (341 MB): FilmCraft reconciled; package move re-scoped
 
 1. Done: FilmCraft has one owner, the Bun OS `crates/filmcraft-*` and

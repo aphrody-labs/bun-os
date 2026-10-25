@@ -4,7 +4,7 @@
     {
       "id": "bun",
       "repository": "aphrody-labs/bun",
-      "revision": "b6f5b63112f2237aa69cb145e46c86d797f1bb6e",
+      "revision": "eeb831257d4bfcc92adc13ee13070ee07e51f950",
       "mount": "sources/bun",
       "gitlinks": []
     },
@@ -1210,6 +1210,14 @@
       "mount": "vendor/bun-video/vendor/filmcraft",
       "parent": "vendor/bun-video",
       "submodulePath": "vendor/filmcraft",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-python",
+      "repository": "aphrody-labs/bun-python",
+      "revision": "4d709fd3c166b83c1893686bafc5423070e99cd8",
+      "mount": "vendor/bun-python",
+      "branch": "main",
       "gitlinks": []
     },
     {

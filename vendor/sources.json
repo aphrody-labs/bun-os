@@ -464,6 +464,10 @@
     "bun-video": {
       "origin": "https://github.com/aphrody-labs/bun-video.git",
       "path": "bun-video"
+    },
+    "bun-python": {
+      "origin": "https://github.com/aphrody-labs/bun-python.git",
+      "path": "bun-python"
     }
   },
   "references": {
