@@ -23,7 +23,7 @@ bevy = ["std", "dep:bevy", "dep:accesskit"]
 m3-engine = { package = "aphrody-m3", path = "../aphrody-m3", version = "1.4.7", default-features = false, optional = true }
 m3-tokens = { package = "aphrody-m3-tokens", path = "../aphrody-m3-tokens", version = "1.4.7", default-features = false }
 bevy = { workspace = true, optional = true, features = ["ui"] }
-accesskit = { version = "0.24", default-features = false, optional = true }
+accesskit = { workspace = true, optional = true }
 cosmic = { package = "libcosmic", git = "https://github.com/aphrody-labs/libcosmic", rev = "7f715bc5d2d383a070fd8c760aa52c5627df96b6", default-features = false, features = ["winit", "tokio"], optional = true }
 
 [lints.rust]

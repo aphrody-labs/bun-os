@@ -34,13 +34,13 @@ network = ["crawl", "dep:reqwest"]
 cli     = ["image", "crawl", "network", "dep:clap"]
 
 [dependencies]
-aphrody-m3-tokens = { path = "../aphrody-m3-tokens", version = "1.4.7", features = [] }
-serde = { version = "1.0.228", features = ["derive", "std"], default-features = false }
-serde_json = "1.0.151"
-thiserror = "2.0.20"
+aphrody-m3-tokens = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true, features = ["std"] }
 regex = { version = "1.11", features = [], optional = true }
 reqwest = { version = "0.13.5", features = ["rustls-no-provider", "json", "stream", "form", "query", "charset", "http2", "system-proxy", "blocking", "cookies", "gzip", "brotli", "deflate", "socks", "multipart"], default-features = false, optional = true }
 clap = { version = "4.6.6", features = ["derive", "env", "color"], optional = true }
-image = { version = "0.25.10", optional = true }
+image = { workspace = true, optional = true }
 
 [dev-dependencies]

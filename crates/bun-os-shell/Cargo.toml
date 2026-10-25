@@ -18,10 +18,10 @@ workspace = true
 bevy = { workspace = true, features = ["ui", "audio", "wav", "png", "jpeg"] }
 bun-engine = { workspace = true, features = ["render", "audio", "gamepad", "nes", "gba", "psx", "nds"] }
 bun-steam = { workspace = true }
-aphrody-m3-tokens = { path = "../aphrody-m3-tokens", version = "1.4.7" }
+aphrody-m3-tokens = { workspace = true }
 bun-os-platform = { path = "../bun-os-platform", version = "1.4.7", features = ["bevy"] }
 aphrody-svg = { path = "../aphrody-svg", version = "1.4.7", default-features = false, features = ["symbols"] }
-accesskit = { version = "0.24", default-features = false }
+accesskit = { workspace = true }
 rusqlite = { version = "0.40", features = ["bundled"] }
 serde_json = { workspace = true }
 image = { workspace = true, features = ["png", "jpeg"] }

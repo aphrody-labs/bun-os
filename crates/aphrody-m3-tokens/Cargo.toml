@@ -28,8 +28,8 @@ image   = ["std", "dep:image"]
 serde   = ["dep:serde"]
 
 [dependencies]
-base64 = { version = "0.23.1", optional = true }
-image = { version = "0.25.10", optional = true, features = ["png", "jpeg"] }
+base64 = { workspace = true, optional = true, features = ["std"] }
+image = { workspace = true, optional = true, features = ["png", "jpeg"] }
 serde = { workspace = true, optional = true }
 
 [dev-dependencies]

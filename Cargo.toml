@@ -878,6 +878,7 @@ sys-locale = "0.3.2"
 skrifa = { version = "0.48.0", default-features = false, features = ["std"] }
 sha2 = { version = "0.11.1", default-features = false }
 similar = { version = "3.2.0", default-features = false }
+taffy = { version = "0.9.2" }
 tempfile = { version = "3.27.0", default-features = false, features = ["getrandom"] }
 thiserror = { version = "2.0.21", default-features = false }
 tiny-skia = { version = "0.11.4", default-features = false, features = ["std", "simd", "png-format"] }
@@ -919,6 +920,7 @@ objc2-ui-kit = { version = "0.3.2", default-features = false }
 wayland-cursor = { version = "0.31.14", default-features = false }
 smithay-clipboard = { version = "0.7.2" }
 webbrowser = { version = "1.2" }
+accesskit = { version = "0.24.1", default-features = false }
 accesskit_winit = { version = "0.32.0" }
 type-map = "0.5.1"
 epaint = { version = "0.36.2", default-features = false }

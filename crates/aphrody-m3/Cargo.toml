@@ -21,8 +21,8 @@ native-render = ["dep:aphrody-render", "aphrody-render/cpu"]
 wasm = []
 
 [dependencies]
-aphrody-m3-tokens = { path = "../aphrody-m3-tokens", version = "1.4.7", features = ["serde"] }
+aphrody-m3-tokens = { workspace = true, features = ["serde"] }
 aphrody-identity = { workspace = true, default-features = false }
-taffy = "0.9"
+taffy = { workspace = true }
 aphrody-render = { workspace = true, optional = true }
-serde = { version = "1.0.228", default-features = false, features = ["derive", "std"] }
+serde = { workspace = true }
