@@ -89,14 +89,14 @@ export function QuickPreviewOverlay({
                   {(hasPrevious || hasNext) && (
                     <>
                       <div className="flex items-center gap-1">
-                        <button
+                        <button aria-label="Previous"
                           onClick={onPrevious}
                           disabled={!hasPrevious}
                           className="rounded-small p-1.5 text-on-surface-variant transition-colors hover:bg-on-surface/8 hover:text-on-surface disabled:opacity-30"
                         >
                           <ArrowLeft size={16} weight="bold" />
                         </button>
-                        <button
+                        <button aria-label="Next"
                           onClick={onNext}
                           disabled={!hasNext}
                           className="rounded-small p-1.5 text-on-surface-variant transition-colors hover:bg-on-surface/8 hover:text-on-surface disabled:opacity-30"
@@ -110,7 +110,7 @@ export function QuickPreviewOverlay({
                   <div className="truncate text-label-large font-medium text-on-surface">{file.name}</div>
                 </div>
 
-                <button
+                <button aria-label="Close"
                   onClick={onClose}
                   className="rounded-small p-1.5 text-on-surface-variant transition-colors hover:bg-on-surface/8 hover:text-on-surface"
                 >

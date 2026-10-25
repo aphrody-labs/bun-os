@@ -103,14 +103,14 @@ export function QuickPreviewModal({
                   <div className="flex flex-1 items-center gap-3">
                     {/* Navigation Arrows */}
                     <div className="flex items-center gap-1">
-                      <button
+                      <button aria-label="Previous"
                         onClick={onPrevious}
                         disabled={!hasPrevious}
                         className="rounded-md p-1.5 text-ink-dull transition-colors hover:bg-app-hover hover:text-ink disabled:opacity-30"
                       >
                         <ArrowLeft size={16} weight="bold" />
                       </button>
-                      <button
+                      <button aria-label="Next"
                         onClick={onNext}
                         disabled={!hasNext}
                         className="rounded-md p-1.5 text-ink-dull transition-colors hover:bg-app-hover hover:text-ink disabled:opacity-30"
@@ -124,7 +124,7 @@ export function QuickPreviewModal({
                     <div className="truncate text-sm font-medium">{file.name}</div>
                   </div>
 
-                  <button
+                  <button aria-label="Close"
                     onClick={onClose}
                     className="rounded-md p-1 text-ink-dull transition-colors hover:bg-app-hover hover:text-ink"
                   >
