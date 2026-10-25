@@ -58,9 +58,16 @@ What breaks as a result: any single-row update waits up to `SQLITE_TIMEOUT` (60 
 - The 30 s target is **not met** while `sdb` stays saturated. Applying the restart and the
   config did not change the fsync latency.
 
-### Immediate fix (needs owner approval: second Gitea restart)
+### Applied fix: SQLite and queues on the root SSD (05:48 UTC)
 
-Move only the SQLite database (55 MB) to the ext4 SSD. Leave the repositories in place.
+Applied at 05:48:26–05:48:50 UTC by `~/apps/gitea/move-db-to-ssd.sh` (log next to it) while no job ran.
+`gitea.db`, its `-wal`/`-shm` and the LevelDB `queues` moved to `/var/lib/aphrody-gitea/db` (ext4 on
+`sda`), mounted at `/data/gitea-db` with `GITEA__database__PATH` and `GITEA__queue__DATADIR`. The
+originals stay in `~/apps/gitea/data/gitea/*.pre-ssd-2026-10-25` as the rollback. A dump taken
+during a hung push showed the writer held by the `Stop actions zombie tasks` cron, whose
+transaction waited on a LevelDB journal write behind a `btrfs_sync_log` fsync (thread in `D`).
+After the move, `git push origin os:refs/heads/claude/forge-push-probe` and its `--delete` each
+exit 0 in under 4 s from the workstation. The steps below record the procedure that was followed.
 
 1. `sudo install -d -o 1000 -g 1000 /var/lib/aphrody-gitea-db`
 2. Wait until no `GITEA-ACTIONS-TASK-*` container is running. Then run
@@ -192,8 +199,8 @@ VPS:
 - Docker reclaimable space: 24 GB of images, 23 GB of volumes, 5 GB of build cache.
 - Failed user units: `bun-release-{linux,windows}-x64`, `depot-tools-update`,
   `shenron-auto-deploy`, `shenron-sync`.
-- `sdc1` (305 GB) has no filesystem and is not mounted, yet it shows 100 % write utilization.
-  Identify what writes to it.
+- `sdc1` (305 GB) is device 2 of the `/home` btrfs (`btrfs filesystem show /home`), so its writes
+  are `/home` writes. `sdb` and `sdc` each saturate at 250 IOPS, which looks like a provider cap.
 
 ## Infra scripts
 

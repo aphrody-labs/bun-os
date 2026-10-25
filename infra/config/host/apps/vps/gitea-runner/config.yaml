@@ -9,8 +9,8 @@ runner:
   capacity: 3
   timeout: 720m
   shutdown_timeout: 30s
-  # SQLite contention fix (2026-10-25): the defaults poll every 2s and report every 5s, which kept the
-  # single SQLite writer of Gitea busy, so SSH key updates waited 60s and pushes failed.
+  # Fewer SQLite writes than the 2s poll / 5s report defaults. The push failures of 2026-10-25 came from fsync
+  # latency on /home, fixed by moving gitea.db to the root SSD (see ../gitea/compose.yaml).
   fetch_timeout: 30s
   fetch_interval: 10s
   fetch_interval_max: 60s

@@ -37,6 +37,10 @@ services:
       # SQLite write-contention mitigation (docs/aphrody/operations/infra/infra-repair-2026-10-25.md).
       GITEA__database__SQLITE_TIMEOUT: "60000"
       GITEA__database__SQLITE_JOURNAL_MODE: WAL
+      # SQLite and the LevelDB queues live on the root SSD: /home (btrfs on sdb+sdc) is capped at 250 IOPS per
+      # device and its fsyncs reach 30-80 s under build load, which held the writer lock past SQLITE_TIMEOUT.
+      GITEA__database__PATH: /data/gitea-db/gitea.db
+      GITEA__queue__DATADIR: /data/gitea-db/queues
       GITEA__cron_0X2E_update_mirrors__SCHEDULE: "@every 30m"
       GITEA__cron_0X2E_update_mirrors__PULL_LIMIT: "5"
       GITEA__mirror__DEFAULT_INTERVAL: 24h
@@ -50,6 +54,7 @@ services:
     command: ["/usr/bin/s6-svscan", "/etc/s6"]
     volumes:
       - ./data:/data
+      - /var/lib/aphrody-gitea/db:/data/gitea-db
       - ./native-storage-guard.sh:/usr/local/bin/gitea-native-storage-guard:ro
       - type: volume
         source: native_storage
