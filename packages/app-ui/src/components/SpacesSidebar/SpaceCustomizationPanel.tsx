@@ -5,9 +5,10 @@ import { clsx } from "clsx";
 import type { ItemType, SpaceItem as SpaceItemType, GroupType } from "@aphrody/drive-client";
 import { SpaceItem } from "./SpaceItem";
 import { createPortal } from "react-dom";
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useLibraryMutation } from "../../contexts/SpacedriveContext";
 import { Icon, Input } from "@aphrody/m3-primitives";
+import { useDialogFocus } from "../../hooks/useDialogFocus";
 
 interface PaletteItem {
   type: ItemType;
@@ -99,6 +100,9 @@ export function SpaceCustomizationPanel({ isOpen, onClose, spaceId }: SpaceCusto
   const [groupName, setGroupName] = useState("");
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const addGroup = useLibraryMutation("spaces.add_group");
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  useDialogFocus(dialogRef, { open: isOpen && !!spaceId, onEscape: onClose });
 
   if (!spaceId) return null;
 
@@ -154,6 +158,11 @@ export function SpaceCustomizationPanel({ isOpen, onClose, spaceId }: SpaceCusto
 
           {/* Panel */}
           <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -20, opacity: 0 }}
@@ -164,7 +173,9 @@ export function SpaceCustomizationPanel({ isOpen, onClose, spaceId }: SpaceCusto
               {/* Header */}
               <div className="flex items-center justify-between px-2 py-2 mb-2">
                 <div>
-                  <h2 className="text-label-large font-semibold text-on-surface">Customize</h2>
+                  <h2 id={titleId} className="text-label-large font-semibold text-on-surface">
+                    Customize
+                  </h2>
                   <p className="text-body-small text-sidebar-inkDull mt-0.5">Drag to sidebar</p>
                 </div>
                 <button aria-label="Close"
@@ -224,6 +235,8 @@ export function SpaceCustomizationPanel({ isOpen, onClose, spaceId }: SpaceCusto
                             if (e.key === "Enter") {
                               handleAddGroup();
                             } else if (e.key === "Escape") {
+                              // Cancel the new group only; a second Escape closes the panel.
+                              e.preventDefault();
                               setIsAddingGroup(false);
                               setGroupName("");
                             }

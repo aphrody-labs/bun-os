@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useId, useRef } from "react";
 import { QrCode, X, ArrowsClockwise, Check, Warning, DeviceMobile, Copy, CaretDown } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import { clsx } from "clsx";
@@ -6,6 +6,7 @@ import { drawQr } from "@aphrody/qr";
 import { useCoreMutation, useCoreQuery } from "../../contexts/SpacedriveContext";
 import { sounds } from "@aphrody/assets/sounds";
 import { Icon } from "@aphrody/m3-primitives";
+import { useDialogFocus } from "../../hooks/useDialogFocus";
 
 interface PairingModalProps {
   isOpen: boolean;
@@ -92,6 +93,11 @@ export function PairingModal({ isOpen, onClose, mode: initialMode = "generate" }
     }
   }, [isCompleted]);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
+  useDialogFocus(dialogRef, { open: isOpen, onEscape: handleClose });
+
   if (!isOpen) return null;
 
   return (
@@ -108,6 +114,12 @@ export function PairingModal({ isOpen, onClose, mode: initialMode = "generate" }
 
         {/* Modal */}
         <motion.div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          aria-describedby={descriptionId}
+          tabIndex={-1}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -119,8 +131,10 @@ export function PairingModal({ isOpen, onClose, mode: initialMode = "generate" }
             <div className="flex items-center gap-3">
               <DeviceMobile className="size-6 text-primary" weight="bold" />
               <div>
-                <h2 className="text-title-medium font-semibold text-on-surface">Device pairing</h2>
-                <p className="text-body-small text-on-surface-variant">Connect another device to share files</p>
+                <h2 id={titleId} className="text-title-medium font-semibold text-on-surface">
+                  Device pairing
+                </h2>
+                <p id={descriptionId} className="text-body-small text-on-surface-variant">Connect another device to share files</p>
               </div>
             </div>
             <button aria-label="Close" onClick={handleClose} className="p-1.5 hover:bg-on-surface/8 rounded-small transition-colors">

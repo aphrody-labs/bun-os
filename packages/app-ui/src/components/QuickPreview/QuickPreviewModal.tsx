@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from "motion/react";
 import { X, ArrowLeft, ArrowRight } from "@phosphor-icons/react";
-import { useEffect } from "react";
+import { useEffect, useId, useRef } from "react";
 import { useLibraryQuery } from "../../contexts/SpacedriveContext";
 import { Inspector } from "../Inspector/Inspector";
 import { ContentRenderer } from "./ContentRenderer";
+import { useDialogFocus } from "../../hooks/useDialogFocus";
 
 interface QuickPreviewModalProps {
   fileId: string;
@@ -38,10 +39,17 @@ export function QuickPreviewModal({
     },
   );
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  // Escape, Space and the arrows stay on the window listener below; the hook adds focus entry, trap and return.
+  useDialogFocus(dialogRef, { open: isOpen });
+
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // A nested dialog (subtitle settings) already consumed this key.
+      if (e.defaultPrevented) return;
       if (e.code === "Escape" || e.code === "Space") {
         e.preventDefault();
         onClose();
@@ -78,6 +86,11 @@ export function QuickPreviewModal({
           {/* Modal - key stays constant so it doesn't remount on file change */}
           <motion.div
             key="modal"
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            {...(file ? { "aria-labelledby": titleId } : { "aria-label": "Quick preview" })}
+            tabIndex={-1}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -121,7 +134,9 @@ export function QuickPreviewModal({
 
                     <div className="h-4 w-px bg-app-line" />
 
-                    <div className="truncate text-sm font-medium">{file.name}</div>
+                    <div id={titleId} className="truncate text-sm font-medium">
+                      {file.name}
+                    </div>
                   </div>
 
                   <button aria-label="Close"

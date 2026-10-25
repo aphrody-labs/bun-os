@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
+import { useId, useRef } from "react";
 import type { SubtitleSettings } from "./Subtitles";
+import { useDialogFocus } from "../../hooks/useDialogFocus";
 
 interface SubtitleSettingsMenuProps {
   isOpen: boolean;
@@ -9,6 +11,10 @@ interface SubtitleSettingsMenuProps {
 }
 
 export function SubtitleSettingsMenu({ isOpen, settings, onSettingsChange, onClose }: SubtitleSettingsMenuProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  useDialogFocus(dialogRef, { open: isOpen, onEscape: onClose });
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -18,6 +24,11 @@ export function SubtitleSettingsMenu({ isOpen, settings, onSettingsChange, onClo
 
           {/* Settings Menu */}
           <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
@@ -25,7 +36,9 @@ export function SubtitleSettingsMenu({ isOpen, settings, onSettingsChange, onClo
             className="absolute bottom-20 right-6 z-20 w-72 rounded-small border border-outline-variant bg-surface-container/95 p-4 backdrop-blur-xl shadow-md3-5"
             onClick={e => e.stopPropagation()}
           >
-            <h3 className="mb-4 text-label-large font-semibold text-on-surface">Subtitle settings</h3>
+            <h3 id={titleId} className="mb-4 text-label-large font-semibold text-on-surface">
+              Subtitle settings
+            </h3>
 
             <div className="space-y-4">
               {/* Font Size */}
