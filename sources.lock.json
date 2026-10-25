@@ -4,7 +4,7 @@
     {
       "id": "bun",
       "repository": "aphrody-labs/bun",
-      "revision": "eeb831257d4bfcc92adc13ee13070ee07e51f950",
+      "revision": "bfecf244d8617fdb1a9f1050e9dc6ffde0cf3dd8",
       "mount": "sources/bun",
       "gitlinks": []
     },
@@ -1217,6 +1217,30 @@
       "repository": "aphrody-labs/bun-python",
       "revision": "4d709fd3c166b83c1893686bafc5423070e99cd8",
       "mount": "vendor/bun-python",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-llama",
+      "repository": "aphrody-labs/bun-llama",
+      "revision": "d7e760c9ffb88b52e6421a473abd0263814177aa",
+      "mount": "vendor/bun-llama",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-qr",
+      "repository": "aphrody-labs/bun-qr",
+      "revision": "09ae9805b9ebe861306081b0eec32110a4a072ca",
+      "mount": "vendor/bun-qr",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-timeline",
+      "repository": "aphrody-labs/bun-timeline",
+      "revision": "c9d6b55deee3887b4d5cd8c136d8d0b52491f2b8",
+      "mount": "vendor/bun-timeline",
       "branch": "main",
       "gitlinks": []
     },

@@ -468,6 +468,18 @@
     "bun-python": {
       "origin": "https://github.com/aphrody-labs/bun-python.git",
       "path": "bun-python"
+    },
+    "bun-llama": {
+      "origin": "https://github.com/aphrody-labs/bun-llama.git",
+      "path": "bun-llama"
+    },
+    "bun-qr": {
+      "origin": "https://github.com/aphrody-labs/bun-qr.git",
+      "path": "bun-qr"
+    },
+    "bun-timeline": {
+      "origin": "https://github.com/aphrody-labs/bun-timeline.git",
+      "path": "bun-timeline"
     }
   },
   "references": {

@@ -175,6 +175,9 @@ the WinFw link of `bun-vpn` stay in the runtime's native graph.
 - Bun Python: `vendor/bun-python` mounts aphrody-labs/bun-python `4d709fd3c16` (buv,
   bun-python-native, -toolchain, -conformance); runtime pin `eeb831257d4` drops them.
 
+- Small packages: `vendor/bun-llama` `d7e760c9ffb`, `vendor/bun-qr` `09ae9805b9e`,
+  `vendor/bun-timeline` `c9d6b55deee`; runtime pin `bfecf244d86`.
+
 ### B4 — video domain (341 MB): FilmCraft reconciled; package move re-scoped
 
 1. Done: FilmCraft has one owner, the Bun OS `crates/filmcraft-*` and

@@ -664,3 +664,18 @@
 	url = https://github.com/aphrody-labs/bun-python.git
 	branch = main
 	shallow = true
+[submodule "vendor/bun-llama"]
+	path = vendor/bun-llama
+	url = https://github.com/aphrody-labs/bun-llama.git
+	branch = main
+	shallow = true
+[submodule "vendor/bun-qr"]
+	path = vendor/bun-qr
+	url = https://github.com/aphrody-labs/bun-qr.git
+	branch = main
+	shallow = true
+[submodule "vendor/bun-timeline"]
+	path = vendor/bun-timeline
+	url = https://github.com/aphrody-labs/bun-timeline.git
+	branch = main
+	shallow = true
