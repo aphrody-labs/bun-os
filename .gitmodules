@@ -624,3 +624,33 @@
 	path = vendor/cef-rs
 	url = https://github.com/aphrody-labs/cef-rs.git
 	branch = dev
+[submodule "vendor/bun-uv"]
+	path = vendor/bun-uv
+	url = https://github.com/aphrody-labs/bun-uv.git
+	branch = main
+	shallow = true
+[submodule "vendor/bun-vpn"]
+	path = vendor/bun-vpn
+	url = https://github.com/aphrody-labs/bun-vpn.git
+	branch = main
+	shallow = true
+[submodule "vendor/bun-ssh"]
+	path = vendor/bun-ssh
+	url = https://github.com/aphrody-labs/bun-ssh.git
+	branch = main
+	shallow = true
+[submodule "vendor/bun-docker"]
+	path = vendor/bun-docker
+	url = https://github.com/aphrody-labs/bun-docker.git
+	branch = main
+	shallow = true
+[submodule "vendor/bun-just"]
+	path = vendor/bun-just
+	url = https://github.com/aphrody-labs/bun-just.git
+	branch = main
+	shallow = true
+[submodule "vendor/bun-winmd"]
+	path = vendor/bun-winmd
+	url = https://github.com/aphrody-labs/bun-winmd.git
+	branch = main
+	shallow = true

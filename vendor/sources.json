@@ -433,6 +433,33 @@
       "origin": "https://github.com/aphrody-labs/cef-rs.git",
       "upstream": "https://github.com/tauri-apps/cef-rs.git",
       "path": "cef-rs"
+    },
+    "bun-uv": {
+      "origin": "https://github.com/aphrody-labs/bun-uv.git",
+      "upstream": "https://github.com/astral-sh/uv.git",
+      "path": "bun-uv"
+    },
+    "bun-vpn": {
+      "origin": "https://github.com/aphrody-labs/bun-vpn.git",
+      "upstream": "https://github.com/mullvad/mullvadvpn-app.git",
+      "path": "bun-vpn"
+    },
+    "bun-ssh": {
+      "origin": "https://github.com/aphrody-labs/bun-ssh.git",
+      "path": "bun-ssh"
+    },
+    "bun-docker": {
+      "origin": "https://github.com/aphrody-labs/bun-docker.git",
+      "path": "bun-docker"
+    },
+    "bun-just": {
+      "origin": "https://github.com/aphrody-labs/bun-just.git",
+      "upstream": "https://github.com/casey/just.git",
+      "path": "bun-just"
+    },
+    "bun-winmd": {
+      "origin": "https://github.com/aphrody-labs/bun-winmd.git",
+      "path": "bun-winmd"
     }
   },
   "references": {

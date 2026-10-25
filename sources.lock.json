@@ -4,7 +4,7 @@
     {
       "id": "bun",
       "repository": "aphrody-labs/bun",
-      "revision": "a861cfde057fbb07d6a1c6142f5b020ff49c7ef7",
+      "revision": "e6ee23eb7857e7893f8e85916b5bb89e715e9c01",
       "mount": "sources/bun",
       "gitlinks": []
     },
@@ -1094,6 +1094,99 @@
       "revision": "b1bc46da11e9bc4aedec17d00e7d7a7b28f30f3d",
       "mount": "vendor/cef-rs",
       "branch": "dev",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-uv",
+      "repository": "aphrody-labs/bun-uv",
+      "revision": "c1c32fce6c2593873617e870bd52faae564737f7",
+      "mount": "vendor/bun-uv",
+      "branch": "main",
+      "gitlinks": [
+        {
+          "path": "vendor/uv",
+          "repository": "aphrody-labs/uv",
+          "revision": "c3c36e2a7b3fca702043630f820aec862047e86c"
+        }
+      ]
+    },
+    {
+      "id": "vendor/bun-uv/vendor/uv",
+      "repository": "aphrody-labs/uv",
+      "revision": "c3c36e2a7b3fca702043630f820aec862047e86c",
+      "mount": "vendor/bun-uv/vendor/uv",
+      "parent": "vendor/bun-uv",
+      "submodulePath": "vendor/uv",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-vpn",
+      "repository": "aphrody-labs/bun-vpn",
+      "revision": "aff07e145237acd9126c8a532419da7eb0d4a9d4",
+      "mount": "vendor/bun-vpn",
+      "branch": "main",
+      "gitlinks": [
+        {
+          "path": "vendor/mullvad",
+          "repository": "aphrody-labs/mullvadvpn-app",
+          "revision": "9096ce027b87d97e00f7fce765ce8204737ff457"
+        }
+      ]
+    },
+    {
+      "id": "vendor/bun-vpn/vendor/mullvad",
+      "repository": "aphrody-labs/mullvadvpn-app",
+      "revision": "9096ce027b87d97e00f7fce765ce8204737ff457",
+      "mount": "vendor/bun-vpn/vendor/mullvad",
+      "parent": "vendor/bun-vpn",
+      "submodulePath": "vendor/mullvad",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-ssh",
+      "repository": "aphrody-labs/bun-ssh",
+      "revision": "964aaa1063223b4b6e167ad4cebb1d40a336e774",
+      "mount": "vendor/bun-ssh",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-docker",
+      "repository": "aphrody-labs/bun-docker",
+      "revision": "24ac698c6c2108df518f5efba28b845c8750ead5",
+      "mount": "vendor/bun-docker",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-just",
+      "repository": "aphrody-labs/bun-just",
+      "revision": "23ef9ebdaafa1ebf708affe7bb0b341da73cf4c3",
+      "mount": "vendor/bun-just",
+      "branch": "main",
+      "gitlinks": [
+        {
+          "path": "vendor/just",
+          "repository": "aphrody-labs/just",
+          "revision": "5827d90d9ecd99a6347fa53af2bd6d7f30f66c36"
+        }
+      ]
+    },
+    {
+      "id": "vendor/bun-just/vendor/just",
+      "repository": "aphrody-labs/just",
+      "revision": "5827d90d9ecd99a6347fa53af2bd6d7f30f66c36",
+      "mount": "vendor/bun-just/vendor/just",
+      "parent": "vendor/bun-just",
+      "submodulePath": "vendor/just",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/bun-winmd",
+      "repository": "aphrody-labs/bun-winmd",
+      "revision": "8c1a9806a81cdae2f880f3213d7855e1b4416d36",
+      "mount": "vendor/bun-winmd",
+      "branch": "main",
       "gitlinks": []
     },
     {

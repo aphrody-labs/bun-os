@@ -1,7 +1,7 @@
 # Runtime heavy-source migration
 
-Status, 2026-10-24: B0 and B1 executed; B2 dropped after inspection; B3 and B5
-re-scoped; B4 FilmCraft reconciled, `bun-video` move re-scoped pending an
+Status, 2026-10-24: B0 and B1 executed; B2 dropped after inspection; B3 done 2026-10-25
+(plugins); B5 re-scoped; B4 FilmCraft reconciled, `bun-video` move re-scoped pending an
 owner decision on the media SDK release pipeline; B6 found no source
 duplicates. Per-batch evidence is under [Batches](#batches).
 
@@ -131,15 +131,41 @@ These are the runtime's own qualification receipts (runtime-release, nginx SDK)
 and the default output directories of runtime scripts. They are not Bun OS
 content. Moving them to an artifact store is a runtime-side change.
 
-### B3 — VPN: deferred
+### B3 — plugins (uv, vpn, ssh, docker, just, winmd): done
 
-`bun-vpn` is built by the runtime's native graph: `scripts/build/plugins.ts`
-links `talpid-core` against the `winfw` library that the `bun` graph compiles as
-LTO bitcode (`scripts/build/deps/winfw.ts`). The GPL source offer of
-`scripts/aphrody/mullvad-sidecar.ts` names `vendor/mullvad`. Moving it needs a
-Bun OS factory graph for the plugin first. Pruning `android`, `ios` and
-`desktop` also breaks Mullvad's own workspace members. There is no duplicate to
-merge (see above).
+Owner directive (2026-10-25) supersedes the earlier deferral and the decision to
+keep `vendor/uv` in the runtime. Each plugin is its own repository; the runtime
+mounts it as the optional submodule `plugins/<name>` (`update = none`) and
+`scripts/build/plugins.ts` builds the mounted ones, so the release assets and
+the WinFw link of `bun-vpn` stay in the runtime's native graph.
+
+| Mount | Repository | Pin | Nested pin |
+| --- | --- | --- | --- |
+| `vendor/bun-uv` | aphrody-labs/bun-uv | `c1c32fce6c2` | `vendor/uv` aphrody-labs/uv `bun-0.12.24` `c3c36e2a7b3` |
+| `vendor/bun-vpn` | aphrody-labs/bun-vpn | `aff07e14523` | `vendor/mullvad` aphrody-labs/mullvadvpn-app `bun-embedded` `9096ce027b8` |
+| `vendor/bun-ssh` | aphrody-labs/bun-ssh | `964aaa10632` | patched russh-sftp in-tree |
+| `vendor/bun-docker` | aphrody-labs/bun-docker | `24ac698c6c2` | path-depends on bun-ssh |
+| `vendor/bun-just` | aphrody-labs/bun-just | `23ef9ebdaaf` | `vendor/just` aphrody-labs/just `bun` `5827d90d9ec` |
+| `vendor/bun-winmd` | aphrody-labs/bun-winmd | `8c1a9806a81` | uses the runtime's `vendor/find-msvc-tools` |
+
+- The fork branches carry the runtime trees verbatim (same Git tree object):
+  uv is upstream tag `0.12.24` plus the runtime edits, Mullvad is
+  `493198790be` plus the `embedded` daemon edits, just is `a6bc306` plus the
+  Bun runner edits.
+- Each plugin workspace path-depends on runtime crates (`src/system_tools`,
+  `src/no_window`, `src/zlib_rs`, `vendor/find-msvc-tools`), so it builds only
+  mounted in a runtime checkout; Bun OS builds it through `toolchains/bun`.
+- Runtime `e6ee23eb785` removes `src/plugins`, `src/bun_vpn`, `src/ssh`,
+  `src/docker`, `src/just`, `vendor/uv`, `vendor/mullvad`,
+  `vendor/russh-sftp` (129 MB tracked); `Cargo.lock` pruned, each plugin lock a
+  subset of it. `sources.lock.json` pins the runtime there and the six plugins, with their
+  nested forks, as `vendor/bun-*` (the runtime's own `plugins/*` gitlinks are
+  not assembled under `sources/bun`). Gate: `readLock()` accepts 122 sources.
+- Gates: runtime `cargo metadata --offline --locked`; `cargo check --locked` of
+  all six plugin workspaces on Windows x64 (MSVC); runtime script tests for the
+  native CI plan, release matrix, Mullvad sidecar and WinFw source (22 pass).
+  Not run: native `bun bd --target=plugins`, Linux/macOS plugin builds, the
+  release workflows.
 
 ### B4 — video domain (341 MB): FilmCraft reconciled; package move re-scoped
 
