@@ -123,6 +123,29 @@ def allowed_mount(name, volume, release, root, manifest, rollback=False):
     return False
 
 
+def validate_public_game(service, declared):
+    require(
+        service.get("network_mode") == "host"
+        and service.get("entrypoint") == ["/usr/local/bin/shenron-server"]
+        and service.get("command") == ["serve", "--host", "127.0.0.1", "--port", "5013"]
+        and not declared.get("env_file")
+        and not service.get("volumes")
+        and not service.get("ports"),
+        "game workload must remain a public isolated loopback surface",
+    )
+    environment = service.get("environment", {})
+    require(
+        environment.get("SHENRON_PROFILE") == "public"
+        and environment.get("SHENRON_SITE_SURFACE") == "game"
+        and environment.get("SHENRON_HOME") == "/var/lib/shenron-game"
+        and environment.get("SHENRON_SITE_URL") == "https://dragonballfr.com"
+        and environment.get("SHENRON_PUBLIC_SITE_URL") == "https://dragonballfr.com"
+        and environment.get("SHENRON_PUBLIC_GAME_URL") == "https://play.dragonballfr.com"
+        and set(environment).issubset({"SHENRON_HOME", "SHENRON_PROFILE", "SHENRON_SITE_SURFACE", "SHENRON_SITE_URL", "SHENRON_PUBLIC_SITE_URL", "SHENRON_PUBLIC_GAME_URL", "PORT", "HOSTNAME", "NEXT_TELEMETRY_DISABLED"}),
+        "game workload must not receive private application environment",
+    )
+
+
 def verify(release, root, rollback=False):
     require(
         release.parent == root / "releases",
@@ -200,14 +223,14 @@ def verify(release, root, rollback=False):
     require(
         {"site", "bot"}.issubset(services)
         and set(services).issubset(
-            {"site", "bot", "gateway", "postgres", "redis", "chat"}
+            {"site", "bot", "game", "gateway", "postgres", "redis", "chat"}
         )
         and (("postgres" in services) == ("redis" in services)),
         "Docker release must contain site and bot and optionally gateway",
     )
     images = manifest.get("images", {})
     expected_images = {name: image_id for name in services}
-    for role in set(services) - {"site", "bot"}:
+    for role in set(services) - {"site", "bot", "game"}:
         gateway = images.get(role, {})
         require(
             re.fullmatch(r"sha256:[a-f0-9]{64}", gateway.get("id", ""))
@@ -241,6 +264,8 @@ def verify(release, root, rollback=False):
             )
         )
     for name, service in services.items():
+        if name == "game":
+            validate_public_game(service, declared["services"][name])
         tagged = json.loads(command(["docker", "image", "inspect", service["image"]]))[
             0
         ]
@@ -252,7 +277,7 @@ def verify(release, root, rollback=False):
             tagged["Os"] == "linux" and tagged["Architecture"] == "amd64",
             "workload image platform differs",
         )
-        if name not in ("site", "bot"):
+        if name not in ("site", "bot", "game"):
             require(
                 tagged.get("Config", {})
                 .get("Labels", {})

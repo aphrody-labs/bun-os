@@ -522,5 +522,29 @@ class ContainerDeploymentTests(unittest.TestCase):
         self.assertEqual(self.calls, [])
 
 
+class PublicGamePolicyTests(unittest.TestCase):
+    def fixture(self):
+        return {
+            "network_mode": "host", "entrypoint": ["/usr/local/bin/shenron-server"],
+            "command": ["serve", "--host", "127.0.0.1", "--port", "5013"],
+            "environment": {"SHENRON_PROFILE": "public", "SHENRON_SITE_SURFACE": "game", "SHENRON_HOME": "/var/lib/shenron-game", "SHENRON_SITE_URL": "https://dragonballfr.com", "SHENRON_PUBLIC_SITE_URL": "https://dragonballfr.com", "SHENRON_PUBLIC_GAME_URL": "https://play.dragonballfr.com"},
+        }
+
+    def test_public_game_is_accepted_without_private_environment(self):
+        service = self.fixture()
+        adapter.validate_public_game(service, service)
+
+    def test_game_cannot_receive_secrets_or_private_mounts(self):
+        for change in ({"env_file": ["/etc/private.env"]}, {"volumes": [{"source": "/srv/shenron/shared"}]}, {"ports": ["5013:5013"]}, {"command": ["serve", "--host", "0.0.0.0"]}):
+            service = self.fixture()
+            service.update(change)
+            with self.assertRaises(adapter.DeploymentError):
+                adapter.validate_public_game(service, service)
+        service = self.fixture()
+        service["environment"]["DATABASE_URL"] = "private-fixture"
+        with self.assertRaises(adapter.DeploymentError):
+            adapter.validate_public_game(service, service)
+
+
 if __name__ == "__main__":
     unittest.main()
