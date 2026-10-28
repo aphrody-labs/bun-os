@@ -1,7 +1,7 @@
 {
   "extends": "../../packages/nie-ui/tsconfig.base.json",
   "compilerOptions": {
-    "types": ["@aphrody/bun-types", "@webgpu/types"]
+    "types": ["bun-types", "@webgpu/types"]
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"],
   "exclude": [

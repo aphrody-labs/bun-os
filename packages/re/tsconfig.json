@@ -8,7 +8,7 @@
     "noEmit": true,
     "skipLibCheck": true,
     "types": [
-      "@aphrody/bun-types"
+      "bun-types"
     ]
   },
   "include": [

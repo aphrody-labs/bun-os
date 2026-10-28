@@ -59,7 +59,7 @@
     "discordx": "catalog:"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "workspace:*",
+    "bun-types": "catalog:",
     "tsdown": "catalog:"
   },
   "engines": {

@@ -76,9 +76,9 @@
       "@storyteller/tauri-api": ["../storyteller-tauri-api/src/index.ts"],
       "@storyteller/tauri-events": ["../storyteller-tauri-events/src/index.ts"],
       "@storyteller/tauri-utils": ["../storyteller-tauri-utils/src/index.ts"],
-      "bun": ["../../node_modules/@aphrody/bun-types/index.d.ts"]
+      "bun": ["../../node_modules/bun-types/index.d.ts"]
     },
-    "types": ["@aphrody/bun-types", "@aphrody/bun-types/test-globals", "node"],
+    "types": ["bun-types", "bun-types/test-globals", "node"],
     "noEmit": true,
     "allowJs": true
   }

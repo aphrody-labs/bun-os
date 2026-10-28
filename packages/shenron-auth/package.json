@@ -35,7 +35,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@aphrody/bun-types": "catalog:",
+    "bun-types": "catalog:",
     "@aphrody/bun-workspace": "workspace:*",
     "@shenron/db": "workspace:*",
     "@types/react": "catalog:",

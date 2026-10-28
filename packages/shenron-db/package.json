@@ -44,7 +44,7 @@
     "postgres": "catalog:"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "catalog:",
+    "bun-types": "catalog:",
     "@aphrody/bun-workspace": "workspace:*"
   },
   "engines": {

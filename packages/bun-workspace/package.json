@@ -26,7 +26,7 @@
     "@aphrody/os": "workspace:*",
     "@aphrody/paths": "workspace:*",
     "@aphrody/runtime-sdk": "catalog:",
-    "@aphrody/timeline": "workspace:*",
+    "@aphrody/timeline": "1.4.7",
     "@aphrody/update": "workspace:*",
     "@aphrody/yolo-core": "workspace:*",
     "ts-morph": "catalog:"

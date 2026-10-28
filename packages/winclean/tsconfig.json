@@ -12,7 +12,7 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["@aphrody/bun-types"]
+    "types": ["bun-types"]
   },
   "include": ["src", "examples", "test"]
 }

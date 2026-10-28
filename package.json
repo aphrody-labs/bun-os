@@ -171,21 +171,8 @@
     "packages/winclean",
     "packages/yolo-cli",
     "packages/yolo-core",
-    "toolchains/bun/packages/bun-google",
     "packages/google",
-    "toolchains/bun/packages/bun-m3",
-    "toolchains/bun/packages/bun-plugin-tailwind",
-    "toolchains/bun/packages/bun-next",
     "packages/bun-tauri",
-    "toolchains/bun/packages/bun-types",
-    "toolchains/bun/packages/bun-webview-page",
-    "toolchains/bun/packages/web",
-    "toolchains/bun/packages/bun-web",
-    "toolchains/bun/packages/bun-fuzzy",
-    "toolchains/bun/packages/bun-qr",
-    "toolchains/bun/packages/bun-timeline",
-    "toolchains/bun/packages/bun-x",
-    "toolchains/bun/packages/bun-sql",
     "packages/bun-windows-aclui",
     "packages/bun-windows-activeds",
     "packages/bun-windows-advapi32",
@@ -652,15 +639,16 @@
     "@aphrody/webos": "workspace:*"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "catalog:",
-    "bun-types": "file:./toolchains/bun/packages/bun-types",
+    "bun": "1.4.4-canary.20261028.1",
+    "bun-types": "catalog:",
     "@types/node": "catalog:",
     "undici-types": "catalog:",
     "@typescript/typescript6": "catalog:",
     "turbo": "catalog:"
   },
   "overrides": {
-    "bun-types": "file:./toolchains/bun/packages/bun-types",
+    "bun-types": "1.4.4-canary.20261028T141247",
+    "@aphrody/bun-types": "npm:bun-types@1.4.4-canary.20261028T141247",
     "@preact/signals-react": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
     "@remix-run/node": "catalog:",
@@ -695,13 +683,12 @@
     "@next/env": "file:vendor/aphrody-third-party/next-fork/next-env-16.5.0-canary.5-dac376c6fe-f32e63fa.tgz",
     "@next/third-parties": "file:vendor/aphrody-third-party/next-fork/next-third-parties-16.5.0-canary.5-dac376c6fe-14a34de8.tgz",
     "next": "file:vendor/aphrody-third-party/next-fork/next-16.5.0-canary.5-dac376c6fe-80cae9ab.tgz",
-    "@aphrody/yolo-core": "file:packages/yolo-core",
-    "@aphrody/bun-webview-page": "file:toolchains/bun/packages/bun-webview-page"
+    "@aphrody/yolo-core": "file:packages/yolo-core"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   },
-  "packageManager": "bun@1.4.4",
+  "packageManager": "bun@1.4.4-canary.20261028.1",
   "catalog": {
     "@aphrody/tauri": "workspace:*",
     "@rosegriffon/assets": "1.4.4",
@@ -738,7 +725,7 @@
     "tailwind-merge": "3.7.0",
     "tailwindcss": "4.3.3",
     "terser": "5.51.2",
-    "@aphrody/bun-types": "1.4.7",
+    "bun-types": "1.4.4-canary.20261028T141247",
     "react-konva": "19.3.0",
     "@ag-ui/a2ui-toolkit": "0.0.4",
     "@ag-ui/client": "npm:@aphrody/ag-ui-client@1.0.1-aphrody.1",

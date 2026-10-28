@@ -7,7 +7,7 @@
     "module": "Preserve",
     "moduleResolution": "bundler",
     "forceConsistentCasingInFileNames": true,
-    "types": ["@aphrody/bun-types", "node"]
+    "types": ["bun-types", "node"]
   },
   "include": ["src/**/*.ts"],
   "exclude": [

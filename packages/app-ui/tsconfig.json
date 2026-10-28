@@ -13,7 +13,7 @@
     "paths": {
       "~/*": ["./src/*"]
     },
-    "types": ["@aphrody/bun-types", "@react-three/fiber"]
+    "types": ["bun-types", "@react-three/fiber"]
   },
   "include": [
     "src",

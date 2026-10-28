@@ -3,7 +3,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["@aphrody/bun-types", "react", "react-dom"],
+    "types": ["bun-types", "react", "react-dom"],
     "noEmit": true
   },
   "include": ["src/**/*", "test/**/*"]

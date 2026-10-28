@@ -54,7 +54,7 @@
     "react-hook-form": "catalog:"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "catalog:",
+    "bun-types": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "playwright-core": "catalog:"

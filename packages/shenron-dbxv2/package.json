@@ -19,6 +19,6 @@
     "lint": "bun lint src"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "catalog:"
+    "bun-types": "catalog:"
   }
 }

@@ -70,7 +70,7 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "catalog:",
+    "bun-types": "catalog:",
     "@playwright/test": "catalog:",
     "@remix-run/node": "catalog:",
     "@tailwindcss/postcss": "catalog:",

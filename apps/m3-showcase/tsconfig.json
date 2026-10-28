@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "ES2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "types": ["@aphrody/bun-types", "node"],
+    "types": ["bun-types", "node"],
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "noUnusedLocals": true,

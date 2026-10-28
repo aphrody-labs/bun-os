@@ -4,7 +4,7 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "forceConsistentCasingInFileNames": true,
-    "types": ["@aphrody/bun-types", "node"]
+    "types": ["bun-types", "node"]
   },
   "include": ["src/**/*.ts"],
   "exclude": [

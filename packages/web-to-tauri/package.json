@@ -38,7 +38,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@aphrody/bun-web": "workspace:*",
+    "@aphrody/bun-web": "1.4.7",
     "@aphrody/scaffold": "workspace:*"
   },
   "devDependencies": {

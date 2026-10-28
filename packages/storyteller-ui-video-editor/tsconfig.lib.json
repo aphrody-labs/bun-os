@@ -2,7 +2,7 @@
   "extends": "../artcraft-frontend/tsconfig.base.json",
   "compilerOptions": {
     "lib": ["dom", "esnext"],
-    "types": ["@aphrody/bun-types", "node"],
+    "types": ["bun-types", "node"],
     "jsx": "react-jsx",
     "allowJs": true,
     "checkJs": false,

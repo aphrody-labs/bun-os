@@ -31,7 +31,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/bun": "npm:@aphrody/bun-types@1.4.4"
+    "@types/bun": "catalog:"
   },
   "engines": {
     "bun": ">=1.4.4"
