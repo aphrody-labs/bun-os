@@ -3,6 +3,12 @@ exclude = ["vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/st
 resolver = "3"
 members = [
     "apps/webos-server",
+  "crates/bun-os-git",
+  "crates/bun-os-native",
+  "crates/bun-os-pkg-core",
+  "crates/bun-os-pkg-store",
+  "crates/bun-os-pkg-net",
+  "crates/bun-os-pkg-cli",
   "crates/apkeep",
   "crates/aphrody-google",
   "crates/aphrody-gemini-web",

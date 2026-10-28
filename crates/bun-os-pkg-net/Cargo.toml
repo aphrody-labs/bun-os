@@ -1,0 +1,23 @@
+[package]
+name = "bun_pkg_net"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "Apache-2.0"
+repository.workspace = true
+publish = false
+description = "Bounded resumable HTTP ingestion into the package store"
+
+[lints]
+workspace = true
+
+[dependencies]
+bun_pkg_store = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { version = "0.7", features = ["io", "rt"] }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+rustls = { workspace = true }
