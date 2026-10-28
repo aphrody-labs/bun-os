@@ -18,8 +18,8 @@ bun_pkg_core = { workspace = true }
 bun_pkg_net = { workspace = true }
 serde_json = { workspace = true }
 tempfile = { workspace = true }
-reqwest = { workspace = true }
-tokio = { workspace = true }
+reqwest = { workspace = true, features = ["rustls-no-provider"] }
+tokio = { workspace = true, features = ["fs", "io-util", "rt", "rt-multi-thread", "macros", "time"] }
 tokio-util = { version = "0.7", features = ["io", "rt"] }
-rustls = { workspace = true }
+rustls = { workspace = true, features = ["ring", "std"] }
 rustls-native-certs = "0.8"

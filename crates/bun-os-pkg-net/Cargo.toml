@@ -13,11 +13,11 @@ workspace = true
 
 [dependencies]
 bun_pkg_store = { workspace = true }
-reqwest = { workspace = true }
-tokio = { workspace = true }
+reqwest = { workspace = true, features = ["rustls-no-provider"] }
+tokio = { workspace = true, features = ["fs", "io-util", "rt", "rt-multi-thread", "macros", "time"] }
 tokio-util = { version = "0.7", features = ["io", "rt"] }
 tempfile = { workspace = true }
-thiserror = { workspace = true }
+thiserror = { workspace = true, features = ["std"] }
 
 [dev-dependencies]
-rustls = { workspace = true }
+rustls = { workspace = true, features = ["ring", "std"] }

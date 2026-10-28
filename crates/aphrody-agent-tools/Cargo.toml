@@ -43,7 +43,7 @@ aphrody-winclean = { package = "bun-windows-winclean", path = "../../packages/bu
 aphrody-google = { path = "../aphrody-google", version = "1.4.7", features = [] }
 aphrody-web-service = { path = "../../toolchains/bun/src/browser/crates/service", package = "bun_browser_service", features = ["render"] }
 aphrody-gemini-web = { path = "../aphrody-gemini-web", version = "1.4.7", features = [] }
-obscura-net = { path = "../../toolchains/bun/src/browser/crates/net", package = "bun_browser_net", features = [] }
+obscura-net = { package = "bun_browser_net", version = "1.4.7", features = [] }
 aphrody-remote-desktop = { path = "../aphrody-remote-desktop", version = "1.4.7", features = ["vnc-client"] }
 aphrody-term = { path = "../aphrody-term", version = "1.4.7", features = [] }
 anyhow = { version = "1.0.104" }

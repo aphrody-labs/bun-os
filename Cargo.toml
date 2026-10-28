@@ -9,6 +9,7 @@ members = [
   "crates/bun-os-pkg-store",
   "crates/bun-os-pkg-net",
   "crates/bun-os-pkg-cli",
+  "crates/bun-os-google",
   "crates/apkeep",
   "crates/aphrody-google",
   "crates/aphrody-gemini-web",
@@ -720,6 +721,15 @@ correctness = { level = "warn", priority = -1 }
 perf = { level = "warn", priority = -1 }
 
 [workspace.dependencies]
+bun_git = { path = "crates/bun-os-git", version = "1.4.7" }
+bun_native = { path = "crates/bun-os-native", version = "1.4.7" }
+bun_pkg_core = { path = "crates/bun-os-pkg-core", version = "1.4.7" }
+bun_pkg_store = { path = "crates/bun-os-pkg-store", version = "1.4.7" }
+bun_pkg_net = { path = "crates/bun-os-pkg-net", version = "1.4.7" }
+bun_pkg_cli = { path = "crates/bun-os-pkg-cli", version = "1.4.7" }
+gix = { version = "0.88", default-features = false, features = ["sha1", "basic", "extras", "comfort", "max-performance-safe", "revision", "index", "worktree-mutation"] }
+octocrab = { version = "0.54", default-features = false, features = ["default-client", "follow-redirect", "retry", "rustls", "rustls-ring", "timeout"] }
+serde_yaml = { package = "yaml_serde", version = "0.10" }
 slog = { version = "2.7" }
 arm-decoder = { git = "https://github.com/kelpsyberry/arm-decoder" }
 cocoa = { version = "0.25" }
@@ -757,8 +767,8 @@ aphrody-models = { path = "crates/aphrody-models", version = "1.4.7", features =
 aphrody-rag-core = { path = "crates/aphrody-rag-core", version = "1.4.7", features = [] }
 rookie-cookies = { version = "0.6.0" }
 yolo-runtime = { path = "crates/yolo-runtime", version = "1.4.7" }
-bun-python-host = { path = "toolchains/bun/packages/bun-python-native/crates/bun-python-host" }
-# PyO3 resolves to the fork pinned by toolchains/bun ([patch.crates-io] below).
+bun-python-host = { version = "0.1.0" }
+# PyO3 resolves to the aphrody-labs fork pinned in [patch.crates-io] below.
 pyo3 = { version = "0.29.3" }
 mimalloc = { version = "0.1", default-features = false, features = [] }
 aphrody-backend = { path = "crates/aphrody-backend", version = "1.4.7", features = [] }
@@ -776,8 +786,8 @@ soundcraft-engine = { path = "crates/soundcraft-engine", version = "0.6.1" }
 soundcraft-ui-egui = { path = "crates/soundcraft-ui-egui", version = "0.6.1" }
 soundcraft-playback = { path = "crates/soundcraft-playback", version = "0.6.1" }
 soundcraft-model = { path = "crates/soundcraft-model", version = "0.6.1" }
-aphrody-web-extract = { package = "bun_browser_extract", path = "toolchains/bun/src/browser/crates/extract" }
-aphrody-web-index = { package = "bun_browser_index", path = "toolchains/bun/src/browser/crates/index" }
+aphrody-web-extract = { package = "bun_browser_extract", version = "1.4.7" }
+aphrody-web-index = { package = "bun_browser_index", version = "1.4.7" }
 aphrody-gemini-web = { path = "crates/aphrody-gemini-web", version = "1.4.7" }
 aphrody-site = { path = "crates/aphrody-site", version = "1.4.7" }
 aphrody-webos-wasm = { path = "crates/aphrody-webos-wasm", version = "1.4.7" }
@@ -786,7 +796,7 @@ aphrody-shell-vfs = { path = "crates/aphrody-shell-vfs", version = "1.4.7" }
 aphrody-terminal-core = { path = "crates/aphrody-terminal-core", version = "1.4.7" }
 aphrody-shell-web = { path = "crates/aphrody-shell-web", version = "1.4.7" }
 aphrody-google = { path = "crates/aphrody-google", version = "1.4.7" }
-rio-vt = { path = "toolchains/bun/src/rio/rio-vt", default-features = false }
+rio-vt = { version = "0.5.28", default-features = false }
 tower = { version = "0.5.3", features = ["util"] }
 tower-http = { version = "0.7.1", features = ["cors"] }
 aphrody-gemini-runtime = { path = "crates/aphrody-gemini-runtime", version = "1.4.7" }
@@ -800,9 +810,9 @@ tonic-prost = { version = "0.14.6" }
 tonic-prost-build = { version = "0.14.6" }
 protoc-bin-vendored = { version = "3.2.0" }
 aphrody-mcp-client = { path = "crates/aphrody-mcp-client", version = "1.4.7" }
-aphrody-x = { package = "bun_x", path = "toolchains/bun/src/x" }
-obscura-dom = { package = "bun_browser_dom", path = "toolchains/bun/src/browser/crates/dom" }
-obscura-net = { package = "bun_browser_net", path = "toolchains/bun/src/browser/crates/net" }
+aphrody-x = { package = "bun_x", version = "1.4.7" }
+obscura-dom = { package = "bun_browser_dom", version = "1.4.7" }
+obscura-net = { package = "bun_browser_net", version = "1.4.7" }
 craft-fonts = { path = "crates/craft-fonts", version = "1.4.7" }
 craft-fonts-tests = { path = "crates/craft-fonts-tests", version = "1.4.7" }
 craft-atomic = { path = "crates/craft-atomic", version = "1.4.7" }
@@ -1385,7 +1395,7 @@ spirv-cross2 = "0.7"
 
 [patch.crates-io]
 cubeb-sys = { path = "vendor/cubeb-rs/cubeb-sys" }
-# PyO3: same fork and pin as the [patch.crates-io] of toolchains/bun/Cargo.toml.
+# PyO3: aphrody-labs fork, pinned.
 pyo3 = { git = "https://github.com/aphrody-labs/pyo3", rev = "451d99fdcdcddf159e8e0a1186960b332cdb5d7c" }
 pyo3-build-config = { git = "https://github.com/aphrody-labs/pyo3", rev = "451d99fdcdcddf159e8e0a1186960b332cdb5d7c" }
 pyo3-ffi = { git = "https://github.com/aphrody-labs/pyo3", rev = "451d99fdcdcddf159e8e0a1186960b332cdb5d7c" }
