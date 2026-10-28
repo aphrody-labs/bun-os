@@ -17,7 +17,7 @@ function bunCheckout(): string | undefined {
       throw new Error("APHRODY_BUN_CHECKOUT does not contain the Bun documentation catalog.");
     return checkout;
   }
-  const pinned = join(root, "toolchains/bun");
+  const pinned = join(root, "sources/bun");
   if (existsSync(join(pinned, "docs/docs.json"))) return pinned;
   let dir = dirname(process.execPath);
   for (let i = 0; i < 6; i++, dir = dirname(dir)) if (existsSync(join(dir, "docs/docs.json"))) return dir;

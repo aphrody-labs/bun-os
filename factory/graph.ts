@@ -314,7 +314,7 @@ export async function planFactoryGraph(options: FactoryGraphOptions): Promise<Fa
   const runtime = add({
     id: "toolchain:bun",
     kind: "toolchain",
-    owner: "aphrody-labs/bun scripts/build.ts",
+    owner: "oven-sh/bun scripts/build.ts",
     catalog: "sources.lock.json + aphrody.config.json",
     dependsOn: sourceIds.has("bun") ? ["source:bun"] : [],
     state: "blocked",

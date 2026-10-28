@@ -46,7 +46,7 @@ jobs:
           persist-credentials: false
       - name: Select runtime
         run: |
-          "$BUN_EXECUTABLE" --revision
+          "$BUN_EXECUTABLE" scripts/assert-runtime-pin.ts
           printf '%s\n' "${BUN_EXECUTABLE%/*}" >> "$GITHUB_PATH"
       - name: Install
         run: |

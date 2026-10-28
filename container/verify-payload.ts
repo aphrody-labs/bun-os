@@ -68,7 +68,7 @@ export async function verifyPayload(root = Bun.env.BUN_OS_ROOT ?? "/opt/bun-os",
       throw new Error(`Installed pacman inventory differs from the locked rootfs: ${errors.slice(-1000)}`);
   }
   if (
-    runtime?.repository !== "aphrody-labs/bun" ||
+    runtime?.repository !== "oven-sh/bun" ||
     runtime.abi !== "gnu" ||
     !/^[0-9a-f]{40}$/.test(runtime.revision) ||
     !/^[0-9a-f]{64}$/.test(runtime.sha256) ||

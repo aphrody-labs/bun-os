@@ -28,7 +28,7 @@ export function materialCheckout(config: Config = {}): string {
 export function runtimeCheckout(config: Config = {}): string {
   const explicitCheckout = config.checkouts?.bun;
   const configured = explicitCheckout ?? Bun.env.APHRODY_BUN_CHECKOUT;
-  const workspaceCheckout = join(packageRoot, "toolchains/bun");
+  const workspaceCheckout = join(packageRoot, "sources/bun");
   if (configured) {
     const root = resolve(configured);
     if (!existsSync(join(root, "scripts/build.ts")))
@@ -126,7 +126,7 @@ function cargoOwner(config: Config): string[] {
 }
 export interface RuntimeReceipt {
   schemaVersion: 1;
-  repository: "aphrody-labs/bun";
+  repository: "oven-sh/bun";
   revision: string;
   version: string;
   target: Exclude<Target, "wasm">;
@@ -290,7 +290,7 @@ export async function stageRuntime(
   const binaryABI = linux ? await inspectLinuxABI(binary, target === "linux-x64" ? "x64" : "arm64") : undefined;
   if (
     receipt.schemaVersion !== 1 ||
-    receipt.repository !== "aphrody-labs/bun" ||
+    receipt.repository !== "oven-sh/bun" ||
     receipt.revision !== source.revision ||
     receipt.target !== target ||
     receipt.version !== "1.4.4" ||

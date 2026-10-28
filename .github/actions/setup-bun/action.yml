@@ -1,42 +1,44 @@
 name: Setup Bun
-description: Installs the pinned Aphrody Bun runtime (published aphrody-labs/bun release).
+description: Installs the upstream oven-sh/bun build pinned by package.json (packageManager) from its npm platform package, checked against the registry integrity and gitHead.
 
 inputs:
   bun-version:
-    description: Published release tag of aphrody-labs/bun (bun-v<version>).
-    default: "1.4.5"
-    required: false
-  token:
-    description: Token able to read aphrody-labs/bun releases.
-    default: ${{ github.token }}
+    description: Exact npm version of bun (default is packageManager in package.json, bun@<version>).
+    default: ""
     required: false
 
 runs:
   using: composite
   steps:
+    - name: Resolve the pinned version
+      id: pin
+      shell: bash
+      env:
+        INPUT_VERSION: ${{ inputs.bun-version }}
+      run: |
+        set -euo pipefail
+        version="${INPUT_VERSION}"
+        if [ -z "$version" ]; then
+          version="$(sed -n 's/.*"packageManager": *"bun@\([^"]*\)".*/\1/p' package.json | head -n 1)"
+        fi
+        [ -n "$version" ] || { echo "::error::no Bun version: set packageManager to bun@<version> in package.json"; exit 1; }
+        echo "version=$version" >> "$GITHUB_OUTPUT"
     - name: Cache Bun
       uses: actions/cache@v4
       with:
         path: ~/.bun/bin
-        key: bun-${{ runner.os }}-${{ runner.arch }}-${{ inputs.bun-version }}
+        key: bun-${{ runner.os }}-${{ runner.arch }}-${{ steps.pin.outputs.version }}
     - name: Install Bun
       shell: bash
       env:
-        BUN_VERSION: ${{ inputs.bun-version }}
-        GH_TOKEN: ${{ inputs.token }}
+        BUN_VERSION: ${{ steps.pin.outputs.version }}
       run: |
         set -euo pipefail
-        case "${RUNNER_OS}-${RUNNER_ARCH}" in
-          Linux-X64) asset=bun-linux-x64.zip; exe=bun;;
-          Windows-X64) asset=bun-windows-x64.zip; exe=bun.exe;;
-          *) echo "::error::no published Bun ${BUN_VERSION} runtime for ${RUNNER_OS}-${RUNNER_ARCH}"; exit 1;;
-        esac
-        if ! "$HOME/.bun/bin/$exe" --version 2>/dev/null | grep -q "^${BUN_VERSION}"; then
-          tmp="$(mktemp -d)"
-          gh release download "bun-v${BUN_VERSION}" -R aphrody-labs/bun -p "$asset" -D "$tmp"
-          mkdir -p "$HOME/.bun/bin"
-          unzip -qjo "$tmp/$asset" "*/$exe" -d "$HOME/.bun/bin"
-          chmod +x "$HOME/.bun/bin/$exe"
+        case "${RUNNER_OS}" in Windows) exe=bun.exe;; *) exe=bun;; esac
+        # The cached binary is trusted only if it still reports the pinned revision.
+        expected="$(node -e 'fetch("https://registry.npmjs.org/bun/"+process.argv[1]).then(r=>r.json()).then(m=>console.log(m.gitHead))' "$BUN_VERSION")"
+        if ! [ "$("$HOME/.bun/bin/$exe" -p Bun.revision 2>/dev/null || true)" = "$expected" ]; then
+          node "$GITHUB_ACTION_PATH/install.mjs" "$BUN_VERSION" "$HOME/.bun/bin"
         fi
         # Native tools see Windows paths: a /c/Users/... entry is not one, and the workspace scripts that spawn a
         # separate Bun (resolveBunExecutable) did not find it on the Windows runner. Hand them the executable directly.
@@ -44,4 +46,4 @@ runs:
         if command -v cygpath >/dev/null; then bin="$(cygpath -w "$bin")" path="$(cygpath -w "$path")"; fi
         echo "$bin" >> "$GITHUB_PATH"
         echo "APHRODY_BUN_BINARY=$path" >> "$GITHUB_ENV"
-        "$HOME/.bun/bin/$exe" --version
+        "$HOME/.bun/bin/$exe" --revision

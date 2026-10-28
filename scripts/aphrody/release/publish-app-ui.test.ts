@@ -313,7 +313,7 @@ test("canonical Tauri exports typed sources directly without obsolete generation
 test("release source gates cover existing flat owners and canonical runtime overrides", () => {
   for (const path of [...uiSourcePaths, serverSource]) expect(existsSync(join(repository, path))).toBe(true);
   expect(downloadsConfig).toBe("tools/aphrody/config/downloads.json");
-  expect(releaseBunCheckout(repository, {})).toBe(join(repository, "toolchains/bun"));
+  expect(releaseBunCheckout(repository, {})).toBe(join(repository, "sources/bun"));
   expect(releaseBunCheckout(repository, { APHRODY_BUN_CHECKOUT: repository })).toBe(repository);
   expect(uiSourcePaths).toContain("packages");
   expect(uiSourcePaths).toContain("apps/aphrody-app");

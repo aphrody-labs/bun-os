@@ -11,14 +11,14 @@
 [Plan](PLAN.md)
 
 [![CI](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml/badge.svg?branch=os)](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml)
-[![Bun](https://img.shields.io/badge/bun-1.4.4-black?logo=bun)](toolchains/bun)
+[![Bun](https://img.shields.io/badge/bun-1.4.4--canary.20261028.1-black?logo=bun)](https://www.npmjs.com/package/bun/v/1.4.4-canary.20261028.1)
 [![Rust](https://img.shields.io/badge/rust-nightly-orange?logo=rust)](rust-toolchain.toml)
 [![License](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue)](LICENSE)
 
 </div>
 
 Bun OS is the distribution workspace for an Arch-based system using the
-[Aphrody Bun runtime](https://github.com/aphrody-labs/bun). This repository
+[upstream Bun runtime](https://github.com/oven-sh/bun), pinned to the canary `bun@1.4.4-canary.20261028.1`. This repository
 owns assembly and the root Bun workspace. Product sources live under `apps/`,
 `crates/` and `packages/`, while Cargo ownership is still split by nested
 workspace boundaries and excluded sources. The image factory uses
@@ -77,7 +77,7 @@ qualification will succeed.
 | `packages/`          | Bun packages; the root Bun manifest declares the workspace members         |
 | `apps/`              | Desktop, web, CLI and Android application sources                          |
 | `vendor/`            | Imported sources; inspect `sources.lock.json` and `.gitmodules` for declared pins |
-| `toolchains/bun`    | The Aphrody Bun runtime and Tauri SDK                                      |
+| `package.json`      | Pins the upstream Bun runtime (`bun@1.4.4-canary.20261028.1`, oven-sh/bun `11c367163a4b`) |
 | `infra/`            | Host, nginx, systemd and DNS desired state                                 |
 | `fonts/`, `assets/` | Shared fonts and app assets with their licenses                            |
 | `docs/`             | Documentation site ([`docs/docs.json`](docs/docs.json))                    |

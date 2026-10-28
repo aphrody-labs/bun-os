@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 import { expect, test } from "bun:test";
-import { bunEnv, bunExe } from "../../../toolchains/bun/test/harness";
 import { resolve } from "node:path";
 import { runDriveCli } from "../src/drive-cli";
+
+const bunExe = () => process.execPath;
+const bunEnv = { ...process.env } as Record<string, string>;
 
 test("Drive sync help returns before option validation or credential access", async () => {
   const lines: string[] = [];

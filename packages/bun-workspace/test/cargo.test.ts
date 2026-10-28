@@ -95,7 +95,7 @@ test("flat workspace sources share a root only with distinct contained manifests
   };
   const config = {
     schemaVersion: 1,
-    runtime: { version: "1.4.4", repository: "aphrody-labs/bun", revision: "1".repeat(40) },
+    runtime: { version: "1.4.4", repository: "oven-sh/bun", revision: "1".repeat(40) },
     desktop: {},
     modules: [
       source,

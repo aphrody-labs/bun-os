@@ -198,7 +198,7 @@ export async function loadConfig(root = repositoryRoot): Promise<Config> {
   if (
     typeof value.runtime.version !== "string" ||
     !runtimeVersionPattern.test(value.runtime.version) ||
-    value.runtime.repository !== "aphrody-labs/bun" ||
+    value.runtime.repository !== "oven-sh/bun" ||
     typeof value.runtime.revision !== "string" ||
     !revisionPattern.test(value.runtime.revision)
   ) {
@@ -221,7 +221,7 @@ export async function loadConfig(root = repositoryRoot): Promise<Config> {
         !object(pin) ||
         typeof pin.version !== "string" ||
         !runtimeVersionPattern.test(pin.version) ||
-        pin.repository !== "aphrody-labs/bun" ||
+        pin.repository !== "oven-sh/bun" ||
         typeof pin.revision !== "string" ||
         !revisionPattern.test(pin.revision)
       ) {
@@ -264,7 +264,7 @@ export async function loadConfig(root = repositoryRoot): Promise<Config> {
     if (
       !object(source) ||
       typeof source.path !== "string" ||
-      source.repository !== "aphrody-labs/bun" ||
+      source.repository !== "oven-sh/bun" ||
       typeof source.revision !== "string" ||
       !revisionPattern.test(source.revision)
     ) {

@@ -59,7 +59,7 @@ export function checkoutRoot(
     case "material":
       return root;
     case "bun":
-      return join(root, "toolchains/bun");
+      return join(root, "sources/bun");
   }
 }
 

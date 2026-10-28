@@ -98,9 +98,12 @@ if (shared) {
   for (const own of glob.scanSync(join(here, "pkgbuilds")))
     if (await Bun.file(join(root, shared, own)).exists()) errors.push(`${own.split(/[\\/]/)[0]}: duplicates ${shared}`);
 }
-if (!usrPackages.has("bun-aphrody")) missing.push("/usr basePackages do not select the fork runtime bun-aphrody");
-if (imagesManifest.pins?.bun?.url?.includes("oven-sh"))
-  missing.push("images pin bun from oven-sh releases (no aphrody-labs Linux assets yet)");
+if (!usrPackages.has("bun-canary")) missing.push("/usr basePackages do not select the upstream runtime bun-canary");
+if (
+  imagesManifest.pins?.bun?.repository !== "oven-sh/bun" ||
+  !/^[a-f0-9]{64}$/.test(imagesManifest.pins?.bun?.sha256 ?? "")
+)
+  missing.push("images do not pin the upstream oven-sh/bun runtime with a sha256");
 
 for (const line of missing) console.log(`missing: ${line}`);
 for (const line of errors) console.error(`error: ${line}`);

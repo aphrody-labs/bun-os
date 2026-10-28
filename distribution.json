@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "Bun OS",
   "version": "1.4.4-dev",
-  "runtimeKernel": "aphrody-labs/bun",
+  "runtimeKernel": "oven-sh/bun",
   "hostKernels": ["linux", "windows", "darwin"],
   "desktop": "aphrody-labs/cosmic-epoch",
   "toolkit": "aphrody-labs/libcosmic",
@@ -15,7 +15,7 @@
   },
   "profiles": {
     "full": {
-      "description": "Complete Bun fork and Material sources, COSMIC desktop and applications, GPU renderer",
+      "description": "Complete Bun and Material sources, COSMIC desktop and applications, GPU renderer",
       "renderer": "wgpu",
       "helperFeatures": ["gpu"],
       "materialFeatures": ["cosmic-wgpu"],

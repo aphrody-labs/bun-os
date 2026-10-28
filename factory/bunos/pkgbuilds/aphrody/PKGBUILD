@@ -20,7 +20,6 @@ sha256sums=('SKIP' 'SKIP' 'SKIP')
 
 build() {
   cd bun-os
-  git submodule update --init --depth 1 toolchains/bun
   bash scripts/aphrody/build/rust/cargo-serial.sh build --release --locked -p aphrody
 }
 

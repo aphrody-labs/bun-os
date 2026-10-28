@@ -689,6 +689,9 @@
     "bun": "1.4.4-canary.20261028.1"
   },
   "packageManager": "bun@1.4.4-canary.20261028.1",
+  "trustedDependencies": [
+    "bun"
+  ],
   "catalog": {
     "@aphrody/tauri": "workspace:*",
     "@rosegriffon/assets": "1.4.4",

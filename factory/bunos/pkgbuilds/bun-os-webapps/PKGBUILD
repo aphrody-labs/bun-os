@@ -7,7 +7,7 @@ pkgdesc='Bun OS web apps with desktop launchers (bunos-webapp)'
 arch=('any')
 url='https://github.com/aphrody-labs/bun-distribution'
 license=('Apache-2.0' 'MIT')
-depends=('bun-aphrody' 'xdg-utils')
+depends=('bun-canary' 'xdg-utils')
 optdepends=('chromium: open apps in their own window')
 makedepends=('git')
 options=('!strip' '!debug')
@@ -17,7 +17,6 @@ sha256sums=('SKIP' 'SKIP')
 
 build() {
   cd bun-os
-  git submodule update --init --depth 1 toolchains/bun
   bun install --frozen-lockfile
   bun -e 'for (const app of (await Bun.file("factory/bunos/webapps.json").json()).apps) {
     const run = Bun.spawnSync(["bun", "run", app.build], { cwd: app.path, stdio: ["ignore", "inherit", "inherit"] });

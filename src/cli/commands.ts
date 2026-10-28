@@ -54,7 +54,7 @@ define(
     run: args =>
       spawn([process.execPath, "mcp", ...args], {
         env: {
-          // A later root replaces an earlier skill of the same name (toolchains/bun src/mcp/tools/skills.rs).
+          // A later root replaces an earlier skill of the same name (the fork-era `bun mcp` skills tool).
           // vendor/rea/plugin/skills stays for the reverse-engineering skills only REA ships, but the REA
           // submodule also carries an older copy of the Replica skills: the canonical
           // packages/replica-skills/skills comes after it so its replica-* skills win.
@@ -150,8 +150,6 @@ define(
       "-c",
       ".oxlintrc.json",
       "--deny-warnings",
-      "--ignore-pattern",
-      "toolchains/**",
       "--ignore-pattern",
       "**/fixtures/**",
       "--ignore-pattern",

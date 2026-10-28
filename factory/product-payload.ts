@@ -38,6 +38,11 @@ export interface ProductPayloadOptions {
   signal?: AbortSignal;
 }
 
+/** The runtime is the upstream oven-sh/bun commit, locked beside bun-os rather than as one of its gitlinks. */
+function isRuntimeSource(source: { id: string; parent?: string; mount: string; repository: string }): boolean {
+  return source.id === "bun" && !source.parent && source.mount === "sources/bun" && source.repository === "oven-sh/bun";
+}
+
 function validateRuntime(
   runtime: RuntimeReceipt,
 ): asserts runtime is RuntimeReceipt & { target: LinuxTarget; abi: "gnu" } {
@@ -47,7 +52,7 @@ function validateRuntime(
     !target ||
     runtime.target !== target ||
     runtime.schemaVersion !== 1 ||
-    runtime.repository !== "aphrody-labs/bun" ||
+    runtime.repository !== "oven-sh/bun" ||
     runtime.abi !== "gnu" ||
     !/^[a-f0-9]{40}$/.test(runtime.revision) ||
     !/^[a-f0-9]{64}$/.test(runtime.sha256) ||
@@ -109,19 +114,14 @@ export async function prepareProductPayload(
     owner.repository !== "aphrody-labs/bun-distribution" ||
     owner.mount !== "sources/bun-os" ||
     lock.repositories.some(
-      source => source !== owner && (!source.parent || !source.mount.startsWith("sources/bun-os/")),
+      source =>
+        source !== owner && !isRuntimeSource(source) && (!source.parent || !source.mount.startsWith("sources/bun-os/")),
     )
   )
     throw new Error("Provide one pinned bun-os root and its complete child gitlink graph");
-  const runtimeSources = lock.repositories.filter(
-    source =>
-      source.parent === "bun-os" &&
-      source.submodulePath === "toolchains/bun" &&
-      source.mount === "sources/bun-os/toolchains/bun" &&
-      source.repository === "aphrody-labs/bun",
-  );
+  const runtimeSources = lock.repositories.filter(isRuntimeSource);
   if (runtimeSources.length !== 1 || runtimeSources[0]!.revision !== options.runtime.revision)
-    throw new Error("Product toolchains/bun pin must match the qualified runtime revision");
+    throw new Error("Product oven-sh/bun pin must match the qualified runtime revision");
   const executable = await realpath(options.executable);
   if (!sameProductIdentity(await productIdentity(executable), options.runtime))
     throw new Error("Product runtime bytes differ from their qualification receipt");

@@ -29,8 +29,8 @@
     },
     {
       "id": "bun",
-      "checkout": "toolchains/bun",
-      "repository": "aphrody-labs/bun",
+      "checkout": "sources/bun",
+      "repository": "oven-sh/bun",
       "owner": "runtime and native SDK",
       "integration": "pinned-source"
     }

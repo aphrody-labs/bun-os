@@ -70,7 +70,7 @@ export function currentRuntimeFacts(): RuntimeFacts {
 /** Inspect declared provenance separately from archive or executable digest verification. */
 export function runtimeFromFacts(expected: RuntimePin, facts: RuntimeFacts): Runtime {
   if (
-    expected.repository !== "aphrody-labs/bun" ||
+    expected.repository !== "oven-sh/bun" ||
     !runtimeVersionPattern.test(expected.version) ||
     !revisionPattern.test(expected.revision)
   ) {
@@ -92,7 +92,7 @@ export function runtimeFromFacts(expected: RuntimePin, facts: RuntimeFacts): Run
         source.port === "" &&
         source.username === "" &&
         source.password === "" &&
-        path[1] === "aphrody-labs" &&
+        path[1] === "oven-sh" &&
         path[2] === "bun" &&
         path[3] === "releases" &&
         path[4] === "download" &&

@@ -8,7 +8,7 @@ pkgdesc='Bun Engine emulator kernel, CLI and multi-console package manager'
 arch=('x86_64')
 url='https://github.com/aphrody-labs/bun-distribution'
 license=('GPL-3.0-or-later')
-depends=('glibc' 'gcc-libs' 'vulkan-icd-loader' 'libxkbcommon' 'wayland' 'bun-aphrody')
+depends=('glibc' 'gcc-libs' 'vulkan-icd-loader' 'libxkbcommon' 'wayland' 'bun-canary')
 optdepends=('gamescope: the bunos-gamescope-session full-screen session'
             'chromium: the frontend window (kiosk in the gamescope session)'
             'mesa: Vulkan/GL drivers for the window and for OpenGL libretro cores (headless EGL)'
@@ -23,7 +23,7 @@ sha256sums=('SKIP')
 
 build() {
   cd bun-os
-  git submodule update --init --depth 1 toolchains/bun vendor/chipi-spec vendor/retroarch
+  git submodule update --init --depth 1 vendor/chipi-spec vendor/retroarch
   bash scripts/aphrody/build/rust/cargo-serial.sh build --release --locked -p bun-engine --bin bun-engine
   # RetroArch as a library that bun-engine drives in process through bun:ffi (host drivers, headless EGL)
   (cd vendor/retroarch && ./configure --enable-libretroarch --enable-egl --disable-qt --disable-x11 \

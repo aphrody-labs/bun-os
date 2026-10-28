@@ -29,7 +29,7 @@ export function releaseBunCheckout(root = repository, env: NodeJS.ProcessEnv = p
   return checkoutRoot("bun", {
     ...env,
     APHRODY_WORKSPACE_ROOT: root,
-    APHRODY_BUN_CHECKOUT: env.APHRODY_BUN_CHECKOUT || join(root, "toolchains/bun"),
+    APHRODY_BUN_CHECKOUT: env.APHRODY_BUN_CHECKOUT || join(root, "sources/bun"),
   });
 }
 const sha = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");

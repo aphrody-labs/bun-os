@@ -17,7 +17,7 @@ test("showcase delegates to the existing desktop with its own source root", asyn
     productBuildContext({
       NODE_ENV: "test",
       APHRODY_WORKSPACE_ROOT: APHRODY_ROOT,
-      APHRODY_BUN_CHECKOUT: resolve(APHRODY_ROOT, "toolchains/bun"),
+      APHRODY_BUN_CHECKOUT: resolve(APHRODY_ROOT, "sources/bun"),
     }).uiDist,
   ).toBe(resolve(DESKTOP_ROOT, "ui-dist"));
   const plan = tauriHostPlan(["info"], "win32", () => null);

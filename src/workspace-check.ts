@@ -22,7 +22,11 @@ async function tracked(root: string, patterns: string[]) {
     stderr: "pipe",
     env: { ...process.env, GIT_OPTIONAL_LOCKS: "0" },
   });
-  const [out, err, code] = await Promise.all([proc.stdout.text(), proc.stderr.text(), proc.exited]);
+  const [out, err, code] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    proc.exited,
+  ]);
   if (code !== 0) throw new Error(`git ls-files failed: ${err}`);
   return out.split("\0").filter(Boolean).sort();
 }

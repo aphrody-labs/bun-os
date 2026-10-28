@@ -183,7 +183,7 @@ async function snapshot(configPath: string, config: AppInventory, target: AppTar
     );
     if (
       !/^[a-f0-9]{40}$/.test(metadata.revision) ||
-      !String(metadata.sourceUrl).startsWith("https://github.com/aphrody-labs/bun/releases/download/") ||
+      !String(metadata.sourceUrl).startsWith("https://github.com/oven-sh/bun/releases/download/") ||
       metadata.revision !== Bun.revision ||
       (selected && (selected.revision !== metadata.revision || selected.version !== metadata.version))
     )
@@ -206,7 +206,7 @@ async function snapshot(configPath: string, config: AppInventory, target: AppTar
   const receipt = (await Bun.file(receiptPath).json()) as RuntimeReceipt;
   if (
     receipt.schemaVersion !== 1 ||
-    receipt.repository !== "aphrody-labs/bun" ||
+    receipt.repository !== "oven-sh/bun" ||
     receipt.target !== target ||
     receipt.sha256 !== digest.sha256 ||
     receipt.bytes !== digest.bytes ||

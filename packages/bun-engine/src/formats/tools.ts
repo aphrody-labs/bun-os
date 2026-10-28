@@ -90,7 +90,11 @@ export async function runTool(command: string[], timeoutMs = 30_000): Promise<To
   });
   const timer = setTimeout(() => child.kill(), timeoutMs);
   try {
-    const [stdout, stderr, code] = await Promise.all([child.stdout.text(), child.stderr.text(), child.exited]);
+    const [stdout, stderr, code] = await Promise.all([
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+      child.exited,
+    ]);
     return { code, stdout, stderr };
   } finally {
     clearTimeout(timer);

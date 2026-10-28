@@ -25,113 +25,89 @@
   ],
   "compositionPackages": {
     "server": ["aphrody"],
-    "desktop": ["aphrody", "bun-video-native", "bun-os-fonts", "material-design-icons-bunos", "bun-os-webapps"],
-    "gaming": ["aphrody", "bun-video-native", "bun-os-fonts", "bun-engine"]
+    "desktop": ["aphrody", "bun-os-fonts", "material-design-icons-bunos", "bun-os-webapps"],
+    "gaming": ["aphrody", "bun-os-fonts", "bun-engine"]
   },
   "components": [
     {
       "id": "bun",
-      "path": "toolchains/bun",
-      "size": "4.0 GiB source, ~193 MiB release binary",
-      "origin": "aphrody-labs/bun @ 46709d69939f8f348d06967a371925ce0d8d4fa8",
+      "path": "sources/bun",
+      "size": "official release binary, ~70 MiB npm tarball",
+      "origin": "oven-sh/bun @ 11c367163a4baa77d3627d14764c376c856a630a (npm bun@1.4.4-canary.20261028.1)",
       "kind": "binary",
       "integration": {
         "mode": "pacman-bunos",
-        "package": "bun-aphrody",
+        "package": "bun-canary",
         "pkgbuilds": "factory/usr/pkgs",
         "owner": "factory/usr basePackages"
       },
-      "build": "aphrody-labs/bun release asset (native-candidate tag) repackaged; source build: bun scripts/build.ts --profile=release",
-      "license": "toolchains/bun/LICENSE.md"
+      "build": "official npm @oven/bun-linux-x64 tarball repackaged without changes (sha256 in factory/usr/pkgs/bun-canary/PKGBUILD); source build: bun scripts/build.ts --profile=release",
+      "license": "sources/bun/LICENSE.md"
     },
     {
       "id": "webkit-jsc",
-      "path": "toolchains/bun/scripts/build/deps/webkit.ts",
+      "path": "sources/bun/scripts/build/deps/webkit.ts",
       "size": "~80 MiB prebuilt archive",
-      "origin": "aphrody-labs/WebKit autobuild prebuilt (fallback oven-sh/WebKit)",
+      "origin": "oven-sh/WebKit prebuilt, version pinned by the oven-sh/bun build (scripts/build/deps/webkit.ts)",
       "kind": "vendored-static",
       "integration": {
         "mode": "static-in",
-        "package": "bun-aphrody"
+        "package": "bun-canary"
       },
       "build": "downloaded by the bun build; static",
       "system": "bundled: Bun patches JSC; webkit2gtk is not ABI compatible"
     },
     {
       "id": "icu",
-      "path": "toolchains/bun/scripts/build/deps/webkit.ts",
+      "path": "sources/bun/scripts/build/deps/webkit.ts",
       "size": "~35 MiB static",
       "origin": "unicode-org/icu via WebKit prebuilt",
       "kind": "vendored-static",
       "integration": {
         "mode": "static-in",
-        "package": "bun-aphrody"
+        "package": "bun-canary"
       },
       "build": "bundled in the Linux WebKit prebuilt",
       "system": "bundled: prebuilt mode links ICU statically; system icu applies only to local WebKit builds (-licu*)"
     },
     {
       "id": "lol-html",
-      "path": "toolchains/bun/vendor/lolhtml",
+      "path": "sources/bun/scripts/build/deps/lolhtml.ts",
       "size": "small Rust crate",
       "origin": "oven-sh/lol-html fork",
       "kind": "vendored-static",
       "integration": {
         "mode": "static-in",
-        "package": "bun-aphrody"
+        "package": "bun-canary"
       },
       "build": "cargo, linked into bun",
       "system": "bundled: not packaged by Arch"
     },
     {
       "id": "boringssl-mimalloc-libuv-tinycc-lsquic",
-      "path": "toolchains/bun/scripts/build/deps",
+      "path": "sources/bun/scripts/build/deps",
       "size": "~60 MiB sources fetched at build",
       "origin": "oven-sh forks, litespeedtech",
       "kind": "vendored-static",
       "integration": {
         "mode": "static-in",
-        "package": "bun-aphrody"
+        "package": "bun-canary"
       },
       "build": "DirectBuild/cmake in the bun build",
       "system": "bundled: patched forks (BoringSSL memory hooks, mimalloc fork); system openssl/mimalloc would change behaviour"
     },
     {
       "id": "zlib-zstd-brotli-libdeflate-cares-libarchive-sqlite-image-codecs",
-      "path": "toolchains/bun/scripts/build/deps",
+      "path": "sources/bun/scripts/build/deps",
       "size": "~40 MiB sources fetched at build",
       "origin": "zlib-ng, facebook/zstd, google/brotli, ebiggers/libdeflate, c-ares, libarchive, sqlite, libjpeg-turbo, libwebp, libspng, highway",
       "kind": "vendored-static",
       "integration": {
         "mode": "static-in",
-        "package": "bun-aphrody"
+        "package": "bun-canary"
       },
       "build": "bun build deps",
       "system": "bundled: Arch provides them, but bun pins versions and links statically; system linking needs build-system support first"
-    },
-    {
-      "id": "brave-mullvad-uv-vendor",
-      "path": "toolchains/bun/vendor",
-      "size": "134 MiB (mullvad 89 MiB)",
-      "origin": "brave/*, mullvad, astral-sh/uv forks",
-      "kind": "vendored-static",
-      "integration": {
-        "mode": "static-in",
-        "package": "bun-aphrody"
-      },
-      "build": "cargo path dependencies of bun",
-      "system": "bundled: Rust sources, no system equivalent"
-    },
-    {
-      "id": "windows-rs",
-      "path": "toolchains/bun/vendor/windows-rs",
-      "size": "Windows only",
-      "origin": "microsoft/windows-rs",
-      "kind": "vendored-static",
-      "integration": {
-        "mode": "excluded",
-        "reason": "Windows target only"
-      }
     },
     {
       "id": "cef",
@@ -143,19 +119,6 @@
         "mode": "remaining",
         "reason": "extra/cef is 152.0.6 while cef-rs pins CEF 154.5.0; CEF API is major-versioned, so keep download-cef until extra/cef reaches 154, then build with CEF_PATH=/usr/lib/cef"
       }
-    },
-    {
-      "id": "bun-video-native",
-      "path": "toolchains/bun/packages/bun-video/native",
-      "size": "324 MiB package tree",
-      "origin": "aphrody-labs/bun",
-      "kind": "native-sys",
-      "integration": {
-        "mode": "pacman-bunos",
-        "package": "bun-video-native"
-      },
-      "build": "cargo-serial build --features libav",
-      "system": "ffmpeg-sys-next without build feature: links system ffmpeg (extra/ffmpeg) via pkg-config"
     },
     {
       "id": "aphrody",
@@ -424,17 +387,6 @@
       }
     },
     {
-      "id": "npm-m3",
-      "path": "toolchains/bun/packages/aphrody-migrated/m3",
-      "size": "2.9 GiB (node_modules and build output)",
-      "origin": "aphrody-labs/m3",
-      "kind": "npm",
-      "integration": {
-        "mode": "excluded",
-        "reason": "Development workspace; built into apps, not installed in /usr"
-      }
-    },
-    {
       "id": "npm-apps",
       "path": "apps, packages",
       "size": "269 MiB apps, 267 MiB packages (artcraft-frontend node_modules 58 MiB)",
@@ -455,7 +407,10 @@
       "size": "crates/bun-engine-core and its in-tree cores (dust, rdynarmic)",
       "origin": "aphrody-labs/bun-distribution",
       "kind": "binary",
-      "integration": { "mode": "pacman-bunos", "package": "bun-engine" },
+      "integration": {
+        "mode": "pacman-bunos",
+        "package": "bun-engine"
+      },
       "build": "cargo-serial build --release -p bun-engine --bin bun-engine",
       "license": "crates/bun-engine-core/LICENSE"
     }

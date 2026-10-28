@@ -1,7 +1,3 @@
-[submodule "toolchains/bun"]
-	path = toolchains/bun
-	url = https://github.com/aphrody-labs/bun.git
-	shallow = true
 [submodule "vendor/cachyos-pkgbuilds"]
 	path = vendor/cachyos-pkgbuilds
 	url = https://github.com/aphrody-labs/cachyos-pkgbuilds.git

@@ -53,7 +53,7 @@ async function canonicalDirectory(path: string) {
     stderr: "inherit",
     timeout: 10_000,
   });
-  const [stdout, code] = await Promise.all([proc.stdout!.text(), proc.exited]);
+  const [stdout, code] = await Promise.all([new Response(proc.stdout!).text(), proc.exited]);
   if (code !== 0) throw new Error(`Cannot resolve build directory: ${path}`);
   const result = stdout.trim();
   const stat = await Bun.file(result).stat();
@@ -66,7 +66,7 @@ async function run(argv: string[], timeoutSeconds: number, capture = false) {
     stdout: capture ? "pipe" : "inherit",
     stderr: "inherit",
   });
-  const output = capture ? await proc.stdout!.text() : "";
+  const output = capture ? await new Response(proc.stdout!).text() : "";
   const code = await proc.exited;
   if (code !== 0) throw new Error(`${argv[0]} failed with exit code ${code}`);
   return output;

@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
   "runtime": {
-    "version": "1.4.5",
-    "repository": "aphrody-labs/bun",
-    "revision": "1d019cb1b558453c2f8901434d51d63ff1c5f014"
+    "version": "1.4.4",
+    "repository": "oven-sh/bun",
+    "revision": "11c367163a4baa77d3627d14764c376c856a630a"
   },
   "runtimeTargets": {
     "windows-x64": {
-      "version": "1.4.5",
-      "repository": "aphrody-labs/bun",
-      "revision": "1d019cb1b558453c2f8901434d51d63ff1c5f014"
+      "version": "1.4.4",
+      "repository": "oven-sh/bun",
+      "revision": "11c367163a4baa77d3627d14764c376c856a630a"
     },
     "linux-x64": {
-      "version": "1.4.5",
-      "repository": "aphrody-labs/bun",
-      "revision": "1d019cb1b558453c2f8901434d51d63ff1c5f014"
+      "version": "1.4.4",
+      "repository": "oven-sh/bun",
+      "revision": "11c367163a4baa77d3627d14764c376c856a630a"
     }
   },
   "desktop": {
@@ -22,9 +22,9 @@
     "version": "1.4.4",
     "runtime": "Tauri v3 / CEF",
     "source": {
-      "path": "toolchains/bun",
-      "repository": "aphrody-labs/bun",
-      "revision": "939c835adf6479bc1014da3843cda4ae29851dbd"
+      "path": "sources/bun",
+      "repository": "oven-sh/bun",
+      "revision": "11c367163a4baa77d3627d14764c376c856a630a"
     }
   },
   "modules": [

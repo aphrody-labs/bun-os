@@ -3,7 +3,7 @@
 Read AGENTS.md, GOAL.md, PLAN.md and MEMORY.md.
 
 This checkout owns distribution assembly. Runtime implementation changes
-belong to the Bun runtime source owner in `toolchains/bun`; the Material
+belong to upstream oven-sh/bun (pinned in `package.json`, `sources.lock.json`); the Material
 framework and other imported projects retain their own source and license
 boundaries. README.md documents repository entry points. PLAN.md distinguishes
 declared/prepared inputs from build and qualification evidence.
