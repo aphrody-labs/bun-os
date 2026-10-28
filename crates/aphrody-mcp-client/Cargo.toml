@@ -40,7 +40,7 @@ tokio = { version = "1.53.1", features = ["process", "rt-multi-thread", "macros"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 aphrody-proc = { path = "../aphrody-proc", version = "1.4.7", features = [] }
-aphrody-web-service = { path = "../../toolchains/bun/src/browser/crates/service", package = "bun_browser_service", features = ["render"] }
+aphrody-web-service = { package = "bun_browser_service", version = "1.4.7", features = ["render"] }
 tokio = { version = "1.53.1", features = ["process","rt-multi-thread","macros","time","signal","sync","fs","io-util","full"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

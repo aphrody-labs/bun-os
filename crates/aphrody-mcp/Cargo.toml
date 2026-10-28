@@ -142,7 +142,7 @@ aphrody-re = { package = "bun-re", version = "1.4.7", features = [] }
 dirs = { version = "7.0.0" }
 aphrody-gemini-web = { path = "../aphrody-gemini-web", version = "1.4.7", features = [] }
 aphrody-llama-server = { path = "../aphrody-llama-server", version = "1.4.7", features = [], optional = true }
-aphrody-web-service = { path = "../../toolchains/bun/src/browser/crates/service", package = "bun_browser_service", features = [] }
+aphrody-web-service = { package = "bun_browser_service", version = "1.4.7", features = [] }
 regex = { version = "1.11", features = [] }
 aphrody-session = { path = "../aphrody-session", version = "1.4.7", features = ["memory"] }
 aphrody-memory = { path = "../aphrody-memory", version = "1.4.7", features = [] }

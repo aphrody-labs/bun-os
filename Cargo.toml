@@ -1,5 +1,6 @@
 [workspace]
-exclude = ["vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "packages/bun-tauri", "apps/aphrody-model-view", "toolchains/bun", "apps/aphrody-drive", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "apps/artcraft", "crates/artcraft-tauri-plugin-http", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
+# Blocked on Bun fork runtime internals (bun_browser_{service,browser,engine,frames}, bun_core, bun_css, bun_ecma_*), not published or ported: re-add to members once they stop depending on them.
+exclude = ["apps/aphrody-app", "crates/aphrody", "crates/aphrody-agent-runtime", "crates/aphrody-agent-tools", "crates/aphrody-app-server", "crates/aphrody-command", "crates/aphrody-ffi", "crates/aphrody-gemini-runtime", "crates/aphrody-google", "crates/aphrody-mcp", "crates/aphrody-mcp-client", "crates/aphrody-site", "crates/aphrody-webos-wasm", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "packages/bun-tauri", "apps/aphrody-model-view", "apps/aphrody-drive", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "apps/artcraft", "crates/artcraft-tauri-plugin-http", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
 resolver = "3"
 members = [
     "apps/webos-server",
@@ -11,15 +12,11 @@ members = [
   "crates/bun-os-pkg-cli",
   "crates/bun-os-google",
   "crates/apkeep",
-  "crates/aphrody-google",
   "crates/aphrody-gemini-web",
-  "crates/aphrody-gemini-runtime",
   "crates/aphrody-antigravity",
   "crates/aphrody-model-antigravity",
   "crates/aphrody-boq",
   "packages/bun-windows-winclean",
-  "crates/aphrody-site",
-  "crates/aphrody-webos-wasm",
   "crates/aphrody-shell-session",
   "crates/aphrody-shell-vfs",
   "crates/aphrody-terminal-core",
@@ -44,7 +41,6 @@ members = [
   "crates/aphrody-identity",
   "crates/aphrody-drive",
   "crates/aphrody-bun",
-  "apps/aphrody-app",
   "crates/aphrody-yolo",
   "crates/aphrody-wireguard",
   "crates/aphrody-vpn",
@@ -57,8 +53,6 @@ members = [
   "crates/aphrody-certificates",
   "crates/aphrody-command-wasm",
   "crates/aphrody-command-pure",
-  "crates/aphrody-command",
-  "crates/aphrody",
   "crates/aphrody-secrets",
   "crates/aphrody-backend",
   "crates/aphrody-kernel",
@@ -104,8 +98,6 @@ members = [
   "crates/aphrody-models",
   "crates/aphrody-model-client",
   "crates/aphrody-memory",
-  "crates/aphrody-mcp-client",
-  "crates/aphrody-mcp",
   "crates/aphrody-llama-server",
   "crates/aphrody-infer",
   "crates/aphrody-gateway",
@@ -113,11 +105,7 @@ members = [
   "crates/aphrody-engine",
   "crates/aphrody-embed",
   "crates/aphrody-code-graph",
-  "crates/aphrody-app-server",
-  "crates/aphrody-agent-tools",
-  "crates/aphrody-agent-runtime",
   "crates/aphrody-agent-home",
-  "crates/aphrody-ffi",
   "crates/yolo-runtime",
   "crates/aphrody-m3",
   "crates/aphrody-m3-tokens",

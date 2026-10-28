@@ -41,7 +41,7 @@ aphrody-agent-proto = { path = "../aphrody-agent-proto", version = "1.4.7", feat
 aphrody-guard = { path = "../aphrody-guard", version = "1.4.7", features = [] }
 aphrody-winclean = { package = "bun-windows-winclean", path = "../../packages/bun-windows-winclean", version = "1.4.7", features = [] }
 aphrody-google = { path = "../aphrody-google", version = "1.4.7", features = [] }
-aphrody-web-service = { path = "../../toolchains/bun/src/browser/crates/service", package = "bun_browser_service", features = ["render"] }
+aphrody-web-service = { package = "bun_browser_service", version = "1.4.7", features = ["render"] }
 aphrody-gemini-web = { path = "../aphrody-gemini-web", version = "1.4.7", features = [] }
 obscura-net = { package = "bun_browser_net", version = "1.4.7", features = [] }
 aphrody-remote-desktop = { path = "../aphrody-remote-desktop", version = "1.4.7", features = ["vnc-client"] }

@@ -115,15 +115,15 @@ regex = { version = "1.11", features = [] }
 which = { version = "8", features = [] }
 colored = { version = "3", features = [] }
 mimalloc = { version = "0.1", default-features = false, features = [] }
-aphrody-web-service = { path = "../../toolchains/bun/src/browser/crates/service", package = "bun_browser_service", features = ["render"] }
+aphrody-web-service = { package = "bun_browser_service", version = "1.4.7", features = ["render"] }
 aphrody-web-crawl = { package = "bun_browser_crawl", version = "1.4.7", features = [] }
 aphrody-web-detect = { package = "bun_browser_detect", version = "1.4.7", features = ["fetch"] }
 aphrody-web-extract = { package = "bun_browser_extract", version = "1.4.7", features = [] }
-aphrody-web-frames = { path = "../../toolchains/bun/src/browser/crates/frames", package = "bun_browser_frames", features = [] }
+aphrody-web-frames = { package = "bun_browser_frames", version = "1.4.7", features = [] }
 aphrody-x = { package = "bun_x", version = "1.4.7", features = [] }
-obscura = { path = "../../toolchains/bun/src/browser/crates/api", package = "bun_browser" }
+obscura = { package = "bun_browser", version = "1.4.7" }
 obscura-dom = { package = "bun_browser_dom", version = "1.4.7", features = [] }
-obscura-browser = { path = "../../toolchains/bun/src/browser/crates/browser", package = "bun_browser_browser", features = [] }
+obscura-browser = { package = "bun_browser_browser", version = "1.4.7", features = [] }
 obscura-net = { package = "bun_browser_net", version = "1.4.7", features = [] }
 aphrody-n2b = { version = "0.7.0", features = [] }
 aphrody-translate = { path = "../aphrody-translate", version = "1.4.7", features = [] }
@@ -144,7 +144,7 @@ aphrody-kernel = { path = "../aphrody-kernel", version = "1.4.7", default-featur
 aphrody-infra = { path = "../aphrody-infra", version = "1.4.7" }
 aphrody-yolo = { path = "../aphrody-yolo", version = "1.4.7" }
 aphrody-mcp = { path = "../aphrody-mcp", version = "1.4.7" }
-aphrody-web-engine = { path = "../../toolchains/bun/src/browser/crates/engine", package = "bun_browser_engine", features = [] }
+aphrody-web-engine = { package = "bun_browser_engine", version = "1.4.7", features = [] }
 aphrody-m3-reproduce = { path = "../aphrody-m3-reproduce", version = "1.4.7", features = ["cli"] }
 aphrody-render = { path = "../aphrody-render", version = "1.4.7" }
 aphrody-bindgen = { path = "../aphrody-bindgen", version = "1.4.7" }

@@ -99,10 +99,10 @@ css-color = "0.2"
 resvg = "0.48"
 dunce = { workspace = true }
 glob = { workspace = true }
-oxc_parser = { path = "../../../../toolchains/bun/src/js_parser/ecma", package = "bun_ecma_parser", version = "0.153.0" }
-oxc_span = { path = "../../../../toolchains/bun/src/ast/span", package = "bun_ecma_span", version = "0.153.0" }
-oxc_allocator = { path = "../../../../toolchains/bun/src/collections/arena", package = "bun_arena", version = "0.153.0" }
-oxc_ast = { path = "../../../../toolchains/bun/src/ast/ecma", package = "bun_ecma_ast", version = "0.153.0" }
+oxc_parser = "0.153.0"
+oxc_span = "0.153.0"
+oxc_allocator = "0.153.0"
+oxc_ast = "0.153.0"
 magic_string = "0.3"
 phf = { version = "0.14", features = ["macros"] }
 walkdir = { workspace = true }
