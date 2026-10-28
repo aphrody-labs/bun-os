@@ -1,0 +1,23 @@
+[package]
+name = "bun_native"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "Apache-2.0"
+repository.workspace = true
+publish = false
+description = "Host hardware topology (CPU, RAM, CUDA) and monotonic clock probes."
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# The CUDA driver is loaded at run time so the crate builds and runs on hosts without CUDA.
+[target.'cfg(any(windows, target_os = "linux"))'.dependencies]
+libloading = "0.9.0"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_System_SystemInformation"] }
