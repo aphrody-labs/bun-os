@@ -1348,6 +1348,10 @@
       "name": "@aphrody/nie-web",
       "version": "1.4.7",
     },
+    "packages/ntcore": {
+      "name": "@aphrody/ntcore",
+      "version": "1.4.7",
+    },
     "packages/ovh": {
       "name": "@aphrody/ovh",
       "version": "1.4.7",
@@ -1799,6 +1803,9 @@
     "packages/wasm": {
       "name": "@aphrody/wasm",
       "version": "1.4.7",
+      "bin": {
+        "aphrody-wasm": "./src/cli.ts",
+      },
       "devDependencies": {
         "@types/bun": "catalog:",
       },
@@ -2580,6 +2587,8 @@
 
     "@aphrody/nie-web": ["@aphrody/nie-web@workspace:packages/nie-web"],
 
+    "@aphrody/ntcore": ["@aphrody/ntcore@workspace:packages/ntcore"],
+
     "@aphrody/os": ["@aphrody/os@workspace:packages/kernel-client"],
 
     "@aphrody/ovh": ["@aphrody/ovh@workspace:packages/ovh"],
@@ -2614,11 +2623,12 @@
 
     "@aphrody/update": ["@aphrody/update@workspace:packages/update"],
 
+    "@aphrody/wasm": ["@aphrody/wasm@workspace:packages/wasm"],
+
     "@aphrody/web": ["@aphrody/web@1.4.7", "", { "dependencies": { "@aphrody/bun-sql": "1.4.7", "@aphrody/typesafe-sdk": "0.6.2" } }, "sha512-uHPvmdvAAhwfMUs/CSYgGR+Pu+GIbJSsr4jNQb7JXO/8EZ0R/QqIcKDNZ/UTVTcVdMtnWnEGmEGIuGYflpIjeQ=="],
 
     "@aphrody/web-inspector-bun": ["@aphrody/web-inspector-bun@1.4.3-aphrody.1", "", {}, "sha512-xrtagKt6CSP5Y2cS1C7lj1utcSw15RjUnmF7iE2gnjMBBIv4U+vB0feH9EaZfoj/++SuHBavYu+FW0ZdsyKrWA=="],
 
-    "@aphrody/wasm": ["@aphrody/wasm@workspace:packages/wasm"],
     "@aphrody/web-to-tauri": ["@aphrody/web-to-tauri@workspace:packages/web-to-tauri"],
 
     "@aphrody/webos": ["@aphrody/webos@workspace:apps/webos"],
