@@ -55,6 +55,10 @@ export function closuresDir(root: string): string {
 
 async function runSteps(steps: Step[], log: (s: string) => void): Promise<number> {
   for (const s of steps) {
+    if (s.skipIfExists && existsSync(s.skipIfExists)) {
+      log(`skip: ${s.title} (${s.skipIfExists} exists)`);
+      continue;
+    }
     log(`$ ${s.cmd.join(" ")}   # ${s.title}`);
     const p = Bun.spawn(s.cmd, {
       cwd: s.cwd,

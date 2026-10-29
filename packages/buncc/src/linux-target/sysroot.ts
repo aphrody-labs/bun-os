@@ -9,6 +9,9 @@ import { ARCH_MIRROR, ArchIndex, archClosure, packageUrl, parseDb, type ArchPack
 import { untar, type TarEntry } from "./tar.ts";
 import type { LinuxArch } from "./crossfile.ts";
 
+/** Repository databases older than this are downloaded again (rolling repos drop old package files). */
+export const DB_MAX_AGE_MS = 6 * 3600 * 1000;
+
 export const ARCH_REPOS = ["core", "extra"] as const;
 /** Arch Linux ARM mirror for aarch64 (official Arch ships x86_64 only). */
 export const ALARM_MIRROR = "http://mirror.archlinuxarm.org";
@@ -86,7 +89,7 @@ export function sysrootManifest(
   exclude: string[] = [],
 ): SysrootManifest {
   const all = [...new Set([...TOOLCHAIN_ROOTS, ...roots])];
-  const { packages, unresolved } = archClosure(index, all, { exclude });
+  const { packages, unresolved } = archClosure(index, all, { exclude, rootMakedepends: true });
   const entries = packages.map(p => ({
     name: p.name,
     version: p.version,
@@ -117,7 +120,7 @@ export async function fetchIndex(arch: LinuxArch, cache: string, refresh = false
   const pkgs: ArchPackage[] = [];
   for (const repo of ARCH_REPOS) {
     const file = join(cache, `${arch}-${repo}.db`);
-    if (refresh || !existsSync(file)) {
+    if (refresh || !existsSync(file) || Date.now() - statSync(file).mtimeMs > DB_MAX_AGE_MS) {
       const res = await fetch(repoDbUrl(arch, repo));
       if (!res.ok) throw new Error(`${repoDbUrl(arch, repo)}: HTTP ${res.status}`);
       writeFileSync(file, new Uint8Array(await res.arrayBuffer()));

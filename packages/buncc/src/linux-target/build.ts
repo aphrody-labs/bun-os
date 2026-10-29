@@ -12,6 +12,8 @@ export interface Step {
   env?: Record<string, string>;
   /** Expected stdout, trimmed (used to verify that a checkout is the pinned commit). */
   expect?: string;
+  /** Skip the step when this path exists (an earlier clone; the following verify step still checks the pin). */
+  skipIfExists?: string;
 }
 
 export interface PlanFile {
@@ -51,6 +53,7 @@ export function checkoutSteps(s: SourcePin, dir: string): Step[] {
     {
       title: `clone ${s.id} ${s.tag}`,
       cmd: ["git", "clone", "--depth", "1", "--branch", s.tag, s.url, fwd(dir)],
+      skipIfExists: `${fwd(dir)}/.git`,
     },
     {
       title: `verify ${s.id} is ${s.sha.slice(0, 12)}`,
@@ -69,18 +72,7 @@ export function planBuild(o: PlanOptions): BuildPlan {
   const steps: Step[] = [...checkoutSteps(s, src)];
   const env = o.cross ? pkgConfigEnv(o.cross) : undefined;
   if (s.build === "meson") {
-    const args = [
-      "meson",
-      "setup",
-      build,
-      src,
-      "--prefix",
-      o.cross?.prefix ?? "/usr",
-      "--buildtype",
-      "release",
-      "--wrap-mode",
-      "nodownload",
-    ];
+    const args = ["meson", "setup", build, src, "--prefix", o.cross?.prefix ?? "/usr", "--buildtype", "release"];
     if (o.cross) {
       const f = `${fwd(o.fileDir)}/meson-${o.cross.triple.arch}.ini`;
       const n = `${fwd(o.fileDir)}/meson-native.ini`;
@@ -178,7 +170,7 @@ export function containerPlan(
     "set -euo pipefail",
     "pacman -Syu --noconfirm --needed base-devel git meson ninja cmake pkgconf python nodejs npm wayland-protocols dbus glib2-devel gobject-introspection sassc",
     `pacman -S --noconfirm --needed ${names.join(" ")}`,
-    `npm install -g bun@${CONTAINER_BUN}`,
+    `npm install -g --unsafe-perm bun@${CONTAINER_BUN}`,
     `bun /work/packages/buncc/src/cli.ts linux build ${target} --run${deep ? " --deep" : ""} --dir /work/.buncc/linux-desktop`,
   ].join("\n");
   return [
