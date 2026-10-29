@@ -8648,6 +8648,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "bun-waydroid"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "ureq 3.4.2",
+ "zip 8.6.0",
+]
+
+[[package]]
 name = "bun-windows-winclean"
 version = "1.4.7"
 dependencies = [

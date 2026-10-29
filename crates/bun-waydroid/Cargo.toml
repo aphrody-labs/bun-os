@@ -1,0 +1,25 @@
+[package]
+name = "bun-waydroid"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Bun OS control plane for Waydroid: OTA channel parsing and verification, binder node planning, waydroid.cfg and prop files, LXC config rendering, host doctor. Port of the management layer of waydroid/waydroid."
+publish = false
+
+[lib]
+name = "bun_waydroid"
+path = "src/lib.rs"
+
+[[bin]]
+name = "bun-waydroid"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+ureq = { version = "3", default-features = false, features = ["rustls"] }
+zip = { workspace = true }
+
+[lints]
+workspace = true
