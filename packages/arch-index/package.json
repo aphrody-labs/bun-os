@@ -1,0 +1,23 @@
+{
+  "name": "@aphrody/arch-index",
+  "version": "1.4.7",
+  "description": "Real-time Arch Linux and AUR package index in bun:sqlite: mirror .db files, AUR metadata archive, AUR RPC v5, .SRCINFO/PKGBUILD sources, Arch Linux Archive snapshots, change events (SSE, WebSocket, webhooks).",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "bunos-arch": "./src/cli.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./cli": "./src/cli.ts",
+    "./schema/*": "./schema/*"
+  },
+  "scripts": {
+    "test": "bun test test/unit",
+    "test:live": "ARCH_INDEX_LIVE=1 bun test test/live",
+    "typecheck": "bun check -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}
