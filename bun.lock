@@ -553,6 +553,10 @@
     "packages/bun-tauri": {
       "name": "@aphrody/tauri",
       "version": "1.4.7",
+      "devDependencies": {
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+      },
     },
     "packages/bun-video-project": {
       "name": "@aphrody/bun-video-project",
