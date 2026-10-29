@@ -104,7 +104,8 @@ export function bootstrapCommands(root: string, platform: Platform): string[][] 
 }
 
 export function cloneCommands(root: string): string[][] {
-  return [["git", "clone", "--depth", "1", "https://github.com/microsoft/vcpkg", root]];
+  // Full clone: manifest mode with a builtin-baseline needs the history that contains the baseline commit.
+  return [["git", "clone", "https://github.com/microsoft/vcpkg", root]];
 }
 
 export function vcpkgExe(root: string): string {

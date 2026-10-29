@@ -17,15 +17,27 @@ export const EXIT = {
   UPDATE_NOT_APPLICABLE: 0x8a15002b,
   NO_APPLICABLE_INSTALLER: 0x8a150010,
   PACKAGE_NOT_FOUND: 0x8a150014,
+  INSTALL_REBOOT_REQUIRED_TO_FINISH: 0x8a150109,
+  INSTALL_REBOOT_INITIATED: 0x8a15010a,
+  INSTALL_CANCELLED_BY_USER_REBOOT: 0x8a15010b,
 } as const;
 
 /** winget exits with a signed 32-bit code on Windows; compare as unsigned. */
-export function interpretExit(code: number): "installed" | "already-installed" | "reboot" | "not-found" | "failed" {
+export function interpretExit(
+  code: number,
+): "installed" | "already-installed" | "reboot" | "not-found" | "no-applicable-installer" | "failed" {
   const u = code >>> 0;
   if (code === 0) return "installed";
   if (u === EXIT.ALREADY_INSTALLED || u === EXIT.UPDATE_NOT_APPLICABLE) return "already-installed";
   if (u === EXIT.PACKAGE_NOT_FOUND) return "not-found";
+  if (u === EXIT.NO_APPLICABLE_INSTALLER) return "no-applicable-installer";
   if (code === 3010 || code === 1641) return "reboot";
+  if (
+    u === EXIT.INSTALL_REBOOT_REQUIRED_TO_FINISH ||
+    u === EXIT.INSTALL_REBOOT_INITIATED ||
+    u === EXIT.INSTALL_CANCELLED_BY_USER_REBOOT
+  )
+    return "reboot";
   return "failed";
 }
 

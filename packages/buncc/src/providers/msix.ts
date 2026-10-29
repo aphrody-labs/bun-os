@@ -173,7 +173,7 @@ const NAME_RE = /^[A-Za-z0-9][A-Za-z0-9.-]{2,49}$/;
 export function manifestProblems(o: Pick<AppIdentity, "name" | "publisher" | "version" | "executable">): string[] {
   const problems: string[] = [];
   if (!NAME_RE.test(o.name)) problems.push("name must be 3-50 characters: letters, digits, '.' and '-'");
-  if (!/^d+.d+.d+.d+$/.test(o.version)) problems.push("version must have four numeric parts, e.g. 1.4.7.0");
+  if (!/^\d+\.\d+\.\d+\.\d+$/.test(o.version)) problems.push("version must have four numeric parts, e.g. 1.4.7.0");
   else if (o.version.split(".").some(p => Number(p) > 65535)) problems.push("version parts must be at most 65535");
   if (!/^CN=/i.test(o.publisher)) problems.push("publisher must be a distinguished name starting with CN=");
   if (!o.executable) problems.push("executable is required");
