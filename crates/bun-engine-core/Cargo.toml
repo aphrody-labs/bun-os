@@ -167,6 +167,8 @@ windows = { workspace = true, features = [
 ], optional = true }
 
 [dev-dependencies]
+aphrody-dust-soft-2d = { path = "../aphrody-dust-soft-2d", version = "0.0.1" }
+aphrody-dust-soft-3d = { path = "../aphrody-dust-soft-3d", version = "0.0.1" }
 serde_json = { workspace = true }
 
 [[bin]]

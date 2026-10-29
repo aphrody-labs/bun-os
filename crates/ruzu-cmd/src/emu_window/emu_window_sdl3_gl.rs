@@ -54,6 +54,8 @@ impl SdlGlContext {
     /// Creates a new GL context for `window`.
     ///
     /// Maps to C++ `SDLGLContext::SDLGLContext`.
+    // Port of ruzu: the caller passes the live SDL window it owns.
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
     pub fn new(window: *mut sdl::SDL_Window) -> Self {
         // Maps to upstream SDLGLContext: make the main window context current
         // while creating shared contexts so strict drivers join the same GL

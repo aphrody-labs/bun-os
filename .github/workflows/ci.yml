@@ -128,6 +128,10 @@ jobs:
           vcpkg install openssl:x64-windows-static-md
           "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "VCPKGRS_TRIPLET=x64-windows-static-md" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+      # bun-os-shell embeds the pinned Material Symbols font (packages/m3-fonts/fonts/upstream is git-ignored and fetched here).
+      - name: Pinned font sources
+        if: ${{ steps.setup.outcome == 'success' }}
+        run: bun scripts/m3/fonts-sync.ts --quiet
       - name: Format
         run: bun scripts/cargo-fmt.ts
       - name: Check every workspace member
