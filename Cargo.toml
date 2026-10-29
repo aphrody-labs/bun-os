@@ -1,8 +1,20 @@
 [workspace]
-# Blocked on Bun fork runtime internals (bun_browser_{service,browser,engine,frames}, bun_core, bun_css, bun_ecma_*), not published or ported: re-add to members once they stop depending on them.
-exclude = ["apps/aphrody-app", "crates/aphrody", "crates/aphrody-agent-runtime", "crates/aphrody-agent-tools", "crates/aphrody-app-server", "crates/aphrody-command", "crates/aphrody-ffi", "crates/aphrody-gemini-runtime", "crates/aphrody-google", "crates/aphrody-mcp", "crates/aphrody-mcp-client", "crates/aphrody-site", "crates/aphrody-webos-wasm", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "packages/bun-tauri", "apps/aphrody-model-view", "apps/aphrody-drive", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "apps/artcraft", "crates/artcraft-tauri-plugin-http", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
+# apps/aphrody-app stays excluded: cef-dll-sys needs the native CEF CMake toolchain (CMake project() fails here), not available in the Rust-only gates.
+exclude = ["apps/aphrody-app", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "packages/bun-tauri", "apps/aphrody-model-view", "apps/aphrody-drive", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "apps/artcraft", "crates/artcraft-tauri-plugin-http", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
 resolver = "3"
 members = [
+  "crates/aphrody",
+  "crates/aphrody-agent-runtime",
+  "crates/aphrody-agent-tools",
+  "crates/aphrody-app-server",
+  "crates/aphrody-command",
+  "crates/aphrody-ffi",
+  "crates/aphrody-gemini-runtime",
+  "crates/aphrody-google",
+  "crates/aphrody-mcp",
+  "crates/aphrody-mcp-client",
+  "crates/aphrody-site",
+  "crates/aphrody-webos-wasm",
     "apps/webos-server",
   "crates/bun-os-git",
   "crates/bun-os-native",
@@ -1382,6 +1394,25 @@ vk-mem = "0.5"
 spirv-cross2 = "0.7"
 
 [patch.crates-io]
+# Obscura headless browser crates (aphrody-labs/bun-obscura, snapshot of the fork src/browser merged with h4ckf0r0day/obscura 3285fbc2357a); replaces the crates.io 1.4.7 releases.
+bun_browser = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_browser = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_cdp = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_crawl = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_detect = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_dom = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_engine = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_extract = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_frames = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_index = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_js = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_layout = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_mcp = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_net = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_process = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_render = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_service = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_ssrf = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
 cubeb-sys = { path = "vendor/cubeb-rs/cubeb-sys" }
 # PyO3: aphrody-labs fork, pinned.
 pyo3 = { git = "https://github.com/aphrody-labs/pyo3", rev = "451d99fdcdcddf159e8e0a1186960b332cdb5d7c" }
