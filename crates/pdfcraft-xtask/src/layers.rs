@@ -30,7 +30,6 @@ impl Class {
 /// Every workspace crate (package name without the `pdfcraft-` prefix) and its layer.
 pub const TABLE: &[(&str, Class)] = &[
     // L0 foundation (standalone, publishable)
-    ("geom", Class::Standalone(0)),
     ("filters", Class::Standalone(0)),
     ("crypt", Class::Standalone(0)),
     ("arlington", Class::Standalone(0)),
@@ -55,17 +54,13 @@ pub const TABLE: &[(&str, Class)] = &[
     ("organize", Class::Layer(4)),
     ("security", Class::Layer(4)),
     ("redact", Class::Layer(4)),
-    ("audit", Class::Layer(4)),
     ("xfdf", Class::Layer(4)),
     ("sign", Class::Layer(4)),
-    ("ocr", Class::Layer(4)),
     ("create", Class::Layer(4)),
     ("export", Class::Layer(4)),
     ("optimize", Class::Layer(4)),
-    ("preflight", Class::Layer(4)),
     ("prepress", Class::Layer(4)),
     ("a11y", Class::Layer(4)),
-    ("compare", Class::Layer(4)),
     ("measure", Class::Layer(4)),
     ("search", Class::Layer(4)),
     ("print", Class::Layer(4)),
@@ -91,16 +86,12 @@ pub const TABLE: &[(&str, Class)] = &[
     ("xtask", Class::Exempt),
 ];
 
-/// Workspace crates a standalone crate may use (architecture §3 rule 3: `cos → filters, crypt, geom`).
-pub const STANDALONE_DEPS: &[(&str, &[&str])] = &[("cos", &["filters", "crypt", "geom"])];
+/// Workspace crates a standalone crate may use (architecture §3 rule 3: `cos → filters, crypt`).
+pub const STANDALONE_DEPS: &[(&str, &[&str])] = &[("cos", &["filters", "crypt"])];
 
 /// Allowed same-layer edges (architecture §3 rule 1). `forms → js` is deliberately absent.
 pub const SIDEWAYS: &[(&str, &str)] = &[
     ("redact", "edit"),
-    ("audit", "edit"),
-    ("a11y", "preflight"),
-    ("prepress", "preflight"),
-    ("export", "ocr"),
     ("sign", "security"),
     ("ui-egui", "ui-common"),
     ("ui-egui", "platform"),
@@ -359,7 +350,6 @@ mod tests {
     #[test]
     fn current_graph_shape_passes() {
         let g = [
-            c("pdfcraft-geom", &[]),
             c(
                 "pdfcraft-render",
                 &[("hayro", Normal, false), ("lopdf", Normal, false)],
@@ -410,7 +400,7 @@ mod tests {
             v[..],
             [Violation::StandaloneHasWorkspaceDep { .. }]
         ));
-        let v = check(&[c("pdfcraft-filters", &[("pdfcraft-geom", Normal, true)])]);
+        let v = check(&[c("pdfcraft-filters", &[("pdfcraft-crypt", Normal, true)])]);
         assert!(matches!(
             v[..],
             [Violation::StandaloneHasWorkspaceDep { .. }]

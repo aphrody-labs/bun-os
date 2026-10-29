@@ -2009,7 +2009,7 @@ SHA256: 387bc959b6c332b955f03d30b13a5efd0e616a02881dc1942b14a9dc57d3d656
     # Font attribution
     
     Every font in `fonts/`, with its source and licence. The files are byte-identical to the pinned
-    upstream sources (checked by `craft-fonts-tests`, which verifies each SHA-256 in
+    upstream sources (checked by `craft-fonts` tests, which verifies each SHA-256 in
     `fonts/manifest.txt`).
     
     | File | Family / style | Author | Source (pinned) | Licence |

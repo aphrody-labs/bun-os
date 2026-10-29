@@ -6,7 +6,7 @@
 //! - **Remove** is Heal with an automatically chosen source: candidate offsets on rings around the
 //!   spot are scored by how well the source's surrounding annulus matches the target's.
 //! - **Fill** (content-aware) rebuilds the spot from patches of its surroundings instead of one
-//!   source: PatchMatch-based completion ([`lightcraft_inpaint::complete`]), coarse to fine, so the
+//!   source: PatchMatch-based completion ([`crate::inpaint::complete`]), coarse to fine, so the
 //!   structure is chosen at a scale set by the spot's size (the same at preview and export size).
 //!   Deterministic; the source offset is ignored.
 
@@ -300,15 +300,15 @@ pub fn window_for_reads_checked(
 fn fill_box(src: &mut [[f32; 3]], tgt: &[[f32; 3]], alpha: &[f32], bw: usize, bh: usize) {
     let hole: Vec<bool> = alpha.iter().map(|a| *a > 0.0).collect();
     let flat: Vec<f32> = tgt.iter().flatten().copied().collect();
-    let out = lightcraft_inpaint::complete(
+    let out = crate::inpaint::complete(
         bw,
         bh,
         3,
         &flat,
         &hole,
-        &lightcraft_inpaint::CompleteParams::default(),
+        &crate::inpaint::CompleteParams::default(),
     )
-    .unwrap_or_else(|| lightcraft_inpaint::membrane_fill(bw, bh, 3, &flat, &hole));
+    .unwrap_or_else(|| crate::inpaint::membrane_fill(bw, bh, 3, &flat, &hole));
     let (pixels, _) = out.as_chunks::<3>();
     for (d, v) in src.iter_mut().zip(pixels) {
         *d = *v;

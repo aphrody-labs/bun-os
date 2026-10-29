@@ -24,8 +24,6 @@ designcraft-doc = { path = "../designcraft-doc", version = "0.7.1" }
 designcraft-fonts = { path = "../designcraft-fonts", version = "0.7.1" }
 designcraft-compose = { path = "../designcraft-compose", version = "0.7.1" }
 designcraft-render = { path = "../designcraft-render", version = "0.7.1" }
-designcraft-format = { path = "../designcraft-format", version = "0.7.1" }
-designcraft-epub = { path = "../designcraft-epub", version = "0.7.1" }
 designcraft-textimport = { path = "../designcraft-textimport", version = "0.7.1" }
 designcraft-pdf = { path = "../designcraft-pdf", version = "0.7.1" }
 designcraft-tools = { path = "../designcraft-tools", version = "0.7.1" }
@@ -37,10 +35,10 @@ log = "0.4"
 regex = { version = "1", default-features = false, features = ["std", "unicode", "perf"] }
 quick-xml = "0.38"
 caseless = "0.2"
+zip = { workspace = true }
 
 [dev-dependencies]
 designcraft-fonts = { path = "../designcraft-fonts", features = ["testing"] }
-zip = { workspace = true }
 hayro-syntax = "0.7.2"
 hayro-interpret = { version = "0.7.0", default-features = false, features = ["embed-fonts"] }
 hayro-cmap = "0.1"

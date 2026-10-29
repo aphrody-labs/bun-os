@@ -9,7 +9,7 @@ use std::sync::{Arc, Mutex};
 
 use pdfcraft_render::{PageInfo, PageRenderer, RenderConfig, RenderRequest, RequestKind};
 
-pub use pdfcraft_ocr::{LANGUAGES, Models, Ocr, OcrError, PlacedWord};
+pub use crate::ocr_core::{LANGUAGES, Models, Ocr, OcrError, PlacedWord};
 
 use crate::{DocId, Edit, EditError, Session};
 

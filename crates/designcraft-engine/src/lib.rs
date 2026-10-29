@@ -15,6 +15,8 @@
 #![forbid(unsafe_code)]
 
 #[cfg(not(target_arch = "wasm32"))]
+pub mod format;
+pub mod epub;
 pub mod atomic;
 pub mod cmd;
 pub mod dtd;

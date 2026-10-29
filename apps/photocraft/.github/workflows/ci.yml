@@ -115,7 +115,7 @@ jobs:
         if: runner.os == 'Linux'
         run: cargo fmt --all -- --check
 
-      # `--features heif`: official builds open HEIC photos via the optional photocraft-heif crate.
+      # `--features heif`: official builds open HEIC photos via the optional heic-rs decoder.
       - name: Test
         run: cargo test --workspace --locked --features heif
 
@@ -123,7 +123,7 @@ jobs:
       # error for distributors who leave it out.
       - name: Test without heif
         if: runner.os == 'Linux'
-        run: cargo test -p photocraft-heif -p photocraft-codecs -p photocraft-io --locked
+        run: cargo test -p photocraft-codecs -p photocraft-io --locked
 
       # The same tests built with the optional craft-fonts input (crates/text/build.rs), so the
       # Japanese font tests that skip without it run here. Linux only. Keep the exact `--workspace

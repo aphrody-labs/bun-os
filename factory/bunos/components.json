@@ -9561,19 +9561,6 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/craft-fonts-tests",
-      "kind": "crate",
-      "path": "crates/craft-fonts-tests",
-      "source": {
-        "type": "path-crate",
-        "name": "craft-fonts-tests",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crate:crates/craft-fonts",
       "kind": "crate",
       "path": "crates/craft-fonts",
@@ -9912,38 +9899,12 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/designcraft-epub",
-      "kind": "crate",
-      "path": "crates/designcraft-epub",
-      "source": {
-        "type": "path-crate",
-        "name": "designcraft-epub",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crate:crates/designcraft-fonts",
       "kind": "crate",
       "path": "crates/designcraft-fonts",
       "source": {
         "type": "path-crate",
         "name": "designcraft-fonts",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/designcraft-format",
-      "kind": "crate",
-      "path": "crates/designcraft-format",
-      "source": {
-        "type": "path-crate",
-        "name": "designcraft-format",
         "version": "0.7.1"
       },
       "registration": ["none"],
@@ -11602,19 +11563,6 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/gridcraft-pdf",
-      "kind": "crate",
-      "path": "crates/gridcraft-pdf",
-      "source": {
-        "type": "path-crate",
-        "name": "gridcraft-pdf",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crate:crates/gridcraft-ui-egui",
       "kind": "crate",
       "path": "crates/gridcraft-ui-egui",
@@ -11836,19 +11784,6 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/lightcraft-geocode",
-      "kind": "crate",
-      "path": "crates/lightcraft-geocode",
-      "source": {
-        "type": "path-crate",
-        "name": "lightcraft-geocode",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crate:crates/lightcraft-geom",
       "kind": "crate",
       "path": "crates/lightcraft-geom",
@@ -11881,32 +11816,6 @@
       "source": {
         "type": "path-crate",
         "name": "lightcraft-heif",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/lightcraft-inpaint",
-      "kind": "crate",
-      "path": "crates/lightcraft-inpaint",
-      "source": {
-        "type": "path-crate",
-        "name": "lightcraft-inpaint",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/lightcraft-lensdb",
-      "kind": "crate",
-      "path": "crates/lightcraft-lensdb",
-      "source": {
-        "type": "path-crate",
-        "name": "lightcraft-lensdb",
         "version": "0.7.1"
       },
       "registration": ["none"],
@@ -12135,19 +12044,6 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/pdfcraft-audit",
-      "kind": "crate",
-      "path": "crates/pdfcraft-audit",
-      "source": {
-        "type": "path-crate",
-        "name": "pdfcraft-audit",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crate:crates/pdfcraft-automation",
       "kind": "crate",
       "path": "crates/pdfcraft-automation",
@@ -12155,19 +12051,6 @@
         "type": "path-crate",
         "name": "pdfcraft-automation",
         "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/pdfcraft-compare",
-      "kind": "crate",
-      "path": "crates/pdfcraft-compare",
-      "source": {
-        "type": "path-crate",
-        "name": "pdfcraft-compare",
-        "version": "1.4.7"
       },
       "registration": ["none"],
       "aot": true,
@@ -12304,19 +12187,6 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/pdfcraft-geom",
-      "kind": "crate",
-      "path": "crates/pdfcraft-geom",
-      "source": {
-        "type": "path-crate",
-        "name": "pdfcraft-geom",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crate:crates/pdfcraft-js",
       "kind": "crate",
       "path": "crates/pdfcraft-js",
@@ -12356,19 +12226,6 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/pdfcraft-ocr",
-      "kind": "crate",
-      "path": "crates/pdfcraft-ocr",
-      "source": {
-        "type": "path-crate",
-        "name": "pdfcraft-ocr",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crate:crates/pdfcraft-optimize",
       "kind": "crate",
       "path": "crates/pdfcraft-optimize",
@@ -12401,19 +12258,6 @@
       "source": {
         "type": "path-crate",
         "name": "pdfcraft-platform",
-        "version": "0.7.1"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/pdfcraft-preflight",
-      "kind": "crate",
-      "path": "crates/pdfcraft-preflight",
-      "source": {
-        "type": "path-crate",
-        "name": "pdfcraft-preflight",
         "version": "0.7.1"
       },
       "registration": ["none"],
@@ -12681,38 +12525,12 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/photocraft-heif",
-      "kind": "crate",
-      "path": "crates/photocraft-heif",
-      "source": {
-        "type": "path-crate",
-        "name": "photocraft-heif",
-        "version": "0.8.2"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crate:crates/photocraft-io",
       "kind": "crate",
       "path": "crates/photocraft-io",
       "source": {
         "type": "path-crate",
         "name": "photocraft-io",
-        "version": "0.8.2"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/photocraft-ops",
-      "kind": "crate",
-      "path": "crates/photocraft-ops",
-      "source": {
-        "type": "path-crate",
-        "name": "photocraft-ops",
         "version": "0.8.2"
       },
       "registration": ["none"],

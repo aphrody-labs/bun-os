@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 build = "build.rs"
 
 [features]
-# Open HEIC/HEIF photos (the optional photocraft-heif crate). Not default so distributors choose
+# Open HEIC/HEIF photos (the optional heic-rs decoder in photocraft-codecs). Not default so distributors choose
 # it; official builds (CI, packaging/, release) build with `--features heif`.
 heif = ["photocraft-codecs/heif"]
 
