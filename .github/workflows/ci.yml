@@ -59,7 +59,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libssl-dev libfontconfig1-dev libvulkan-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libssl-dev libfontconfig1-dev libvulkan-dev libgtk-3-dev libgtk-4-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
       - id: setup
         uses: ./.github/actions/setup-workspace
         with:
@@ -68,12 +68,16 @@ jobs:
       - name: Format
         run: bun scripts/cargo-fmt.ts
       - name: Check every workspace member
-        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && runner.os == 'Linux' }}
         run: bun scripts/cargo.ts check
+      # ruzu is a GTK 4 frontend: glib/gdk4 need pkg-config and the GTK 4 development files, which Windows runners lack.
+      - name: Check every workspace member except the GTK 4 frontend
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && runner.os == 'Windows' }}
+        run: bun scripts/cargo.ts exec -- check --locked --workspace --exclude ruzu
       # Deny-by-default lints only: the imported bevy forks do not pass -D warnings yet (non-ASCII test identifiers, unused deps).
       - name: Clippy
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
-        run: bun scripts/cargo.ts exec -- clippy --workspace --all-targets --locked
+        run: bun scripts/cargo.ts exec -- clippy --workspace --all-targets --locked ${{ runner.os == 'Windows' && '--exclude ruzu' || '' }}
 
   release-plan:
     name: Release plan
