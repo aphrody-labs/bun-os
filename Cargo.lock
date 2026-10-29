@@ -16040,6 +16040,7 @@ dependencies = [
  "document-features",
  "image",
  "num-traits",
+ "rayon",
  "thiserror 2.0.21",
 ]
 
@@ -25678,6 +25679,22 @@ name = "md5"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ebb8d8732c6a6df3d8f032a82911cfc747e00efb95cc46e8d0acd5b5b88570c"
+
+[[package]]
+name = "media-core"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "criterion 0.8.2",
+ "fast_image_resize",
+ "image",
+ "kamadak-exif",
+ "lightcraft-raster",
+ "rayon",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
 
 [[package]]
 name = "memchr"
