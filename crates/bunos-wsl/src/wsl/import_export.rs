@@ -3,8 +3,8 @@
 //! Functions for exporting distributions to tar files, importing from tar files,
 //! and cloning distributions.
 
-use super::executor::{resource_monitor, wsl_executor};
 use super::executor::wsl_command::{CommandOutput, WslCommandExecutor};
+use super::executor::{resource_monitor, wsl_executor};
 use super::types::WslError;
 use crate::metadata::{self, DistroMetadata};
 use crate::temp_file_guard::TempFileGuard;
@@ -57,7 +57,11 @@ pub fn export_distribution(name: &str, path: &str) -> Result<(), WslError> {
 }
 
 /// Import a distribution from a tar file
-pub fn import_distribution(name: &str, install_location: &str, tar_path: &str) -> Result<(), WslError> {
+pub fn import_distribution(
+    name: &str,
+    install_location: &str,
+    tar_path: &str,
+) -> Result<(), WslError> {
     ensure_install_location_exists(install_location)?;
     let output = wsl_executor().import(name, install_location, tar_path, None)?;
 
@@ -110,7 +114,10 @@ fn import_cloned_distribution(
 ) -> Result<CommandOutput, WslError> {
     let listed = executor.list_verbose()?;
     if !listed.success {
-        return Err(WslError::CommandFailed(extract_error_message(&listed, "Failed to determine source WSL version")));
+        return Err(WslError::CommandFailed(extract_error_message(
+            &listed,
+            "Failed to determine source WSL version",
+        )));
     }
     let version = bunos_wsl_core::parse_wsl_list_output(&listed.stdout)
         .into_iter()
@@ -124,7 +131,11 @@ fn import_cloned_distribution(
 ///
 /// If `install_location` is None, uses the default from settings.
 /// Creates metadata for the cloned distribution automatically.
-pub fn clone_distribution(source: &str, new_name: &str, install_location: Option<&str>) -> Result<(), WslError> {
+pub fn clone_distribution(
+    source: &str,
+    new_name: &str,
+    install_location: Option<&str>,
+) -> Result<(), WslError> {
     use crate::settings::get_default_distro_path;
     use crate::utils::is_mock_mode;
 
@@ -139,7 +150,13 @@ pub fn clone_distribution(source: &str, new_name: &str, install_location: Option
         }
 
         // Mock import (adds to mock state)
-        let import_output = import_cloned_distribution(wsl_executor(), source, new_name, "/tmp/mock-location", "/tmp/mock-clone.tar")?;
+        let import_output = import_cloned_distribution(
+            wsl_executor(),
+            source,
+            new_name,
+            "/tmp/mock-location",
+            "/tmp/mock-clone.tar",
+        )?;
         if !import_output.success {
             return Err(WslError::CommandFailed(import_output.stderr));
         }
@@ -167,14 +184,23 @@ pub fn clone_distribution(source: &str, new_name: &str, install_location: Option
     };
 
     ensure_install_location_exists(&final_location)?;
-    let result = import_cloned_distribution(wsl_executor(), source, new_name, &final_location, &temp_path)
-        .and_then(|output| {
-            if output.success {
-                Ok(())
-            } else {
-                Err(WslError::CommandFailed(extract_error_message(&output, "Import failed with no error message")))
-            }
-        });
+    let result = import_cloned_distribution(
+        wsl_executor(),
+        source,
+        new_name,
+        &final_location,
+        &temp_path,
+    )
+    .and_then(|output| {
+        if output.success {
+            Ok(())
+        } else {
+            Err(WslError::CommandFailed(extract_error_message(
+                &output,
+                "Import failed with no error message",
+            )))
+        }
+    });
 
     // Only create metadata if import succeeded
     if result.is_ok() {
@@ -192,7 +218,10 @@ pub fn clone_distribution(source: &str, new_name: &str, install_location: Option
                 info!("Created metadata for cloned distribution '{}'", new_name);
             }
         } else {
-            warn!("Could not find GUID for cloned distribution '{}' - metadata not created", new_name);
+            warn!(
+                "Could not find GUID for cloned distribution '{}' - metadata not created",
+                new_name
+            );
         }
     }
 
@@ -201,7 +230,10 @@ pub fn clone_distribution(source: &str, new_name: &str, install_location: Option
 
 /// Helper to extract error message from WSL command output
 /// WSL often writes errors to stdout instead of stderr
-fn extract_error_message(output: &super::executor::wsl_command::CommandOutput, default_msg: &str) -> String {
+fn extract_error_message(
+    output: &super::executor::wsl_command::CommandOutput,
+    default_msg: &str,
+) -> String {
     if !output.stderr.trim().is_empty() {
         output.stderr.clone()
     } else if !output.stdout.trim().is_empty() {
@@ -222,17 +254,39 @@ mod tests {
         for version in [1, 2] {
             let executor = MockWslExecutor::new();
             executor.set_version("Ubuntu", version).unwrap();
-            let output = import_cloned_distribution(&executor, "ubuntu", "Cloned", "/mock/location", "/mock/archive.tar").unwrap();
+            let output = import_cloned_distribution(
+                &executor,
+                "ubuntu",
+                "Cloned",
+                "/mock/location",
+                "/mock/archive.tar",
+            )
+            .unwrap();
             assert!(output.success);
-            let distributions = bunos_wsl_core::parse_wsl_list_output(&executor.list_verbose().unwrap().stdout);
-            assert_eq!(distributions.iter().find(|distro| distro.name == "Cloned").unwrap().version, version);
+            let distributions =
+                bunos_wsl_core::parse_wsl_list_output(&executor.list_verbose().unwrap().stdout);
+            assert_eq!(
+                distributions
+                    .iter()
+                    .find(|distro| distro.name == "Cloned")
+                    .unwrap()
+                    .version,
+                version
+            );
         }
     }
 
     #[test]
     fn test_clone_import_rejects_missing_source_before_creating_clone() {
         let executor = crate::wsl::executor::wsl_command::MockWslExecutor::new();
-        assert!(import_cloned_distribution(&executor, "Missing", "Cloned", "/mock/location", "/mock/archive.tar").is_err());
+        assert!(import_cloned_distribution(
+            &executor,
+            "Missing",
+            "Cloned",
+            "/mock/location",
+            "/mock/archive.tar"
+        )
+        .is_err());
         assert!(!executor.distro_exists("Cloned"));
     }
 
@@ -273,7 +327,10 @@ mod tests {
             stdout: "".to_string(),
             stderr: "".to_string(),
         };
-        assert_eq!(extract_error_message(&output, "default message"), "default message");
+        assert_eq!(
+            extract_error_message(&output, "default message"),
+            "default message"
+        );
     }
 
     #[test]
@@ -351,11 +408,21 @@ mod tests {
         let nested = root.join("wsl").join("arch-linux-current");
 
         assert!(!root.exists(), "precondition: root must not exist");
-        assert!(!nested.parent().unwrap().exists(), "precondition: parent must not exist");
+        assert!(
+            !nested.parent().unwrap().exists(),
+            "precondition: parent must not exist"
+        );
 
         let result = create_install_dir(nested.to_str().unwrap());
-        assert!(result.is_ok(), "create_install_dir returned error: {:?}", result);
-        assert!(nested.exists(), "nested install path should exist after call");
+        assert!(
+            result.is_ok(),
+            "create_install_dir returned error: {:?}",
+            result
+        );
+        assert!(
+            nested.exists(),
+            "nested install path should exist after call"
+        );
 
         let _ = std::fs::remove_dir_all(&root);
     }
@@ -368,7 +435,8 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_nanos())
             .unwrap_or(0);
-        let dir = std::env::temp_dir().join(format!("oct799-idem-{}-{}", std::process::id(), unique));
+        let dir =
+            std::env::temp_dir().join(format!("oct799-idem-{}-{}", std::process::id(), unique));
         std::fs::create_dir_all(&dir).unwrap();
 
         let result = create_install_dir(dir.to_str().unwrap());
@@ -386,8 +454,3 @@ mod tests {
         assert_ne!(temp_file1, temp_file2);
     }
 }
-
-
-
-
-

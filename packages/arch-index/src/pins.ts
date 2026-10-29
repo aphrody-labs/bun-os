@@ -29,7 +29,8 @@ export const DEFAULT_COLLECT: Required<CollectOptions> = {
 
 async function files(root: string, patterns: string[]): Promise<string[]> {
   const out: string[] = [];
-  for (const p of patterns) for await (const f of new Glob(p).scan({ cwd: root, onlyFiles: true })) out.push(f.replaceAll("\\", "/"));
+  for (const p of patterns)
+    for await (const f of new Glob(p).scan({ cwd: root, onlyFiles: true })) out.push(f.replaceAll("\\", "/"));
   return out.sort();
 }
 

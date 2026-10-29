@@ -18,7 +18,9 @@ function render() {
   const s = ctl.get();
   $("name").textContent = META[s.theme].name;
   $("themes").replaceChildren(...THEME_IDS.map(t => btn(META[t].name, t === s.theme, () => ctl.set({ theme: t }))));
-  $("schemes").replaceChildren(...(["auto", "light", "dark"] as const).map(m => btn(m, m === s.scheme, () => ctl.set({ scheme: m }))));
+  $("schemes").replaceChildren(
+    ...(["auto", "light", "dark"] as const).map(m => btn(m, m === s.scheme, () => ctl.set({ scheme: m }))),
+  );
   const scheme = document.documentElement.dataset.scheme as "light" | "dark";
   $("accents").replaceChildren(
     ...META[s.theme].accents.map(a => {
@@ -33,6 +35,8 @@ function render() {
   );
 }
 ctl.subscribe(render);
-$("glass").addEventListener("input", e => ctl.set({ transparency: Number((e.target as HTMLInputElement).value) / 100 }));
+$("glass").addEventListener("input", e =>
+  ctl.set({ transparency: Number((e.target as HTMLInputElement).value) / 100 }),
+);
 render();
 (globalThis as { __themes?: unknown }).__themes = ctl;

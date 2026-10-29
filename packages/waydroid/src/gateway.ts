@@ -65,7 +65,8 @@ export function inputToControl(m: InputMessage): Uint8Array | undefined {
   const finite = (...n: unknown[]) => n.every(v => typeof v === "number" && Number.isFinite(v));
   switch (m.t) {
     case "touch":
-      if (!finite(m.x, m.y, m.w, m.h) || !(m.action in ACTION) || m.w <= 0 || m.h <= 0 || m.w > 65535 || m.h > 65535) return undefined;
+      if (!finite(m.x, m.y, m.w, m.h) || !(m.action in ACTION) || m.w <= 0 || m.h <= 0 || m.w > 65535 || m.h > 65535)
+        return undefined;
       return encodeTouch({
         action: ACTION[m.action],
         x: m.x,
@@ -107,7 +108,8 @@ export function frameToWire(p: { config: boolean; key: boolean; pts: bigint; dat
 
 export function startGateway(options: GatewayOptions = {}) {
   const token = options.token ?? process.env.BUN_WAYDROID_TOKEN;
-  const authorize = options.authorize ?? (token ? tokenAuthorizer(token) : options.allowAnonymous ? () => true : undefined);
+  const authorize =
+    options.authorize ?? (token ? tokenAuthorizer(token) : options.allowAnonymous ? () => true : undefined);
   if (!authorize) throw new Error("gateway needs `authorize`, `token` (or BUN_WAYDROID_TOKEN) or allowAnonymous: true");
   const adbFor = options.adb ?? ((serial?: string) => new Adb(serial));
   const sessions = new Map<string, Promise<ScrcpySession>>();
@@ -132,24 +134,31 @@ export function startGateway(options: GatewayOptions = {}) {
     return p;
   };
 
-  const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "cache-control": "no-store" } });
+  const json = (body: unknown, status = 200) =>
+    Response.json(body, { status, headers: { "cache-control": "no-store" } });
 
   const server = Bun.serve<WsData>({
     port: options.port ?? 0,
     hostname: options.hostname ?? "127.0.0.1",
     async fetch(req, srv) {
-      if (!(await authorize(req))) return new Response("unauthorized", { status: 401, headers: { "www-authenticate": "Bearer" } });
+      if (!(await authorize(req)))
+        return new Response("unauthorized", { status: 401, headers: { "www-authenticate": "Bearer" } });
       const url = new URL(req.url);
       const serial = url.searchParams.get("serial") ?? undefined;
       try {
         if (url.pathname === "/stream") {
-          return srv.upgrade(req, { data: { serial, sent: 0 } }) ? undefined : new Response("websocket required", { status: 426 });
+          return srv.upgrade(req, { data: { serial, sent: 0 } })
+            ? undefined
+            : new Response("websocket required", { status: 426 });
         }
         if (url.pathname === "/api/health") return json({ ok: true, sessions: sessions.size });
         const adb = adbFor(serial);
-        if (url.pathname === "/api/devices" && req.method === "GET") return json((await adb.devices()) satisfies AdbDevice[]);
+        if (url.pathname === "/api/devices" && req.method === "GET")
+          return json((await adb.devices()) satisfies AdbDevice[]);
         if (url.pathname === "/api/screenshot" && req.method === "GET") {
-          return new Response((await adb.screenshot()).slice(), { headers: { "content-type": "image/png", "cache-control": "no-store" } });
+          return new Response((await adb.screenshot()).slice(), {
+            headers: { "content-type": "image/png", "cache-control": "no-store" },
+          });
         }
         if (url.pathname === "/api/install" && req.method === "POST") {
           const len = Number(req.headers.get("content-length") ?? 0);
@@ -184,7 +193,9 @@ export function startGateway(options: GatewayOptions = {}) {
           try {
             await adb.push(tmp, remote);
           } finally {
-            await Bun.file(tmp).delete().catch(() => {});
+            await Bun.file(tmp)
+              .delete()
+              .catch(() => {});
           }
           return json({ ok: true, bytes: body.byteLength });
         }
@@ -198,7 +209,10 @@ export function startGateway(options: GatewayOptions = {}) {
         try {
           const session = await sessionFor(ws.data.serial);
           const sink: Sink = {
-            meta: m => ws.send(JSON.stringify({ type: "meta", codec: m.codec, width: m.width, height: m.height, name: m.deviceName })),
+            meta: m =>
+              ws.send(
+                JSON.stringify({ type: "meta", codec: m.codec, width: m.width, height: m.height, name: m.deviceName }),
+              ),
             packet: p => {
               ws.data.sent++;
               ws.sendBinary(frameToWire(p));

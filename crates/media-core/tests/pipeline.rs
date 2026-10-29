@@ -18,7 +18,10 @@ fn sample(w: u32, h: u32) -> RgbaImage {
 fn encode(img: &RgbaImage, fmt: ImageFormat) -> Vec<u8> {
     let mut out = Cursor::new(Vec::new());
     if fmt == ImageFormat::Jpeg {
-        image::DynamicImage::ImageRgba8(img.clone()).to_rgb8().write_to(&mut out, fmt).unwrap();
+        image::DynamicImage::ImageRgba8(img.clone())
+            .to_rgb8()
+            .write_to(&mut out, fmt)
+            .unwrap();
     } else {
         img.write_to(&mut out, fmt).unwrap();
     }
@@ -50,7 +53,10 @@ fn asset_id_is_content_hash() {
     let a = encode(&sample(32, 32), ImageFormat::Png);
     let mut b = a.clone();
     assert_eq!(asset::probe(&a).unwrap().id, asset::probe(&b).unwrap().id);
-    assert_eq!(asset::probe(&a).unwrap().id.0, blake3::hash(&a).to_hex().to_string());
+    assert_eq!(
+        asset::probe(&a).unwrap().id.0,
+        blake3::hash(&a).to_hex().to_string()
+    );
     // The tail of a PNG is IEND+CRC; flipping a pixel byte in IDAT changes the id.
     let n = b.len() / 2;
     b[n] ^= 1;
@@ -61,8 +67,17 @@ fn asset_id_is_content_hash() {
 fn edit_stack_is_deterministic_and_matches_manual_ops() {
     let src = sample(200, 100);
     let stack = EditStack::new()
-        .push(Op::Crop { x: 10, y: 10, w: 160, h: 80 })
-        .push(Op::Resize { w: 80, h: 40, filter: Filter::Lanczos3 })
+        .push(Op::Crop {
+            x: 10,
+            y: 10,
+            w: 160,
+            h: 80,
+        })
+        .push(Op::Resize {
+            w: 80,
+            h: 40,
+            filter: Filter::Lanczos3,
+        })
         .push(Op::Grayscale)
         .push(Op::Invert);
     let a = engine::render(&src, &stack, &NoBackend).unwrap();
@@ -71,7 +86,10 @@ fn edit_stack_is_deterministic_and_matches_manual_ops() {
     assert_eq!(a.dimensions(), (80, 40));
     assert_eq!(stack.digest(), stack.clone().digest());
     // Grayscale then invert: all channels equal, alpha untouched.
-    assert!(a.pixels().all(|p| p[0] == p[1] && p[1] == p[2] && p[3] == 255));
+    assert!(
+        a.pixels()
+            .all(|p| p[0] == p[1] && p[1] == p[2] && p[3] == 255)
+    );
     // Inverting twice restores the pre-invert image.
     let twice = EditStack::new().push(Op::Invert).push(Op::Invert);
     assert_eq!(engine::render(&src, &twice, &NoBackend).unwrap(), src);
@@ -89,16 +107,29 @@ fn resize_down_then_compare_with_reference_filter() {
 #[test]
 fn invalid_ops_and_missing_ai_backend_fail_loudly() {
     let src = sample(10, 10);
-    let bad = EditStack::new().push(Op::Crop { x: 5, y: 5, w: 10, h: 10 });
+    let bad = EditStack::new().push(Op::Crop {
+        x: 5,
+        y: 5,
+        w: 10,
+        h: 10,
+    });
     assert!(engine::render(&src, &bad, &NoBackend).is_err());
-    let ai = EditStack::new().push(Op::Ai { kind: AiKind::Upscale, params: "{\"scale\":2}".into() });
+    let ai = EditStack::new().push(Op::Ai {
+        kind: AiKind::Upscale,
+        params: "{\"scale\":2}".into(),
+    });
     let err = engine::render(&src, &ai, &NoBackend).unwrap_err();
     assert!(err.to_string().contains("no backend"), "{err}");
 }
 
 struct Doubler;
 impl AiBackend for Doubler {
-    fn run(&self, k: AiKind, img: &RgbaImage, p: &serde_json::Value) -> media_core::Result<RgbaImage> {
+    fn run(
+        &self,
+        k: AiKind,
+        img: &RgbaImage,
+        p: &serde_json::Value,
+    ) -> media_core::Result<RgbaImage> {
         assert_eq!(k, AiKind::Upscale);
         let s = p["scale"].as_u64().unwrap() as u32;
         engine::resize(img, img.width() * s, img.height() * s, Filter::Mitchell)
@@ -109,7 +140,10 @@ impl AiBackend for Doubler {
 fn ai_hook_runs_through_backend_inside_the_stack() {
     let src = sample(40, 30);
     let stack = EditStack::new()
-        .push(Op::Ai { kind: AiKind::Upscale, params: "{\"scale\":2}".into() })
+        .push(Op::Ai {
+            kind: AiKind::Upscale,
+            params: "{\"scale\":2}".into(),
+        })
         .push(Op::Blur { sigma_milli: 1000 });
     let out = engine::render(&src, &stack, &Doubler).unwrap();
     assert_eq!(out.dimensions(), (80, 60));
@@ -146,8 +180,17 @@ fn handoff_between_two_apps_reproduces_identical_pixels() {
     let meta = asset::probe(&bytes).unwrap();
     let stack = EditStack::new()
         .push(Op::Brightness { delta: 20 })
-        .push(Op::Resize { w: 150, h: 100, filter: Filter::Bilinear });
-    let rendered_a = engine::render(&asset::decode(&bytes, meta.orientation).unwrap(), &stack, &NoBackend).unwrap();
+        .push(Op::Resize {
+            w: 150,
+            h: 100,
+            filter: Filter::Bilinear,
+        });
+    let rendered_a = engine::render(
+        &asset::decode(&bytes, meta.orientation).unwrap(),
+        &stack,
+        &NoBackend,
+    )
+    .unwrap();
     let inbox = root.join("inbox");
     Handoff {
         from: "photocraft".into(),
@@ -162,19 +205,30 @@ fn handoff_between_two_apps_reproduces_identical_pixels() {
     assert!(Handoff::receive(&inbox, "filmcraft").unwrap().is_none());
 
     // App B (effectcraft): receive, reload from the library path, verify the hash, render.
-    let h = Handoff::receive(&inbox, "effectcraft").unwrap().expect("pending handoff");
+    let h = Handoff::receive(&inbox, "effectcraft")
+        .unwrap()
+        .expect("pending handoff");
     assert_eq!(h.from, "photocraft");
     assert_eq!(h.frames, Some((120, 240)));
     let bytes_b = std::fs::read(&h.path).unwrap();
     assert_eq!(asset::probe(&bytes_b).unwrap().id, h.asset.id);
-    let rendered_b = engine::render(&asset::decode(&bytes_b, h.asset.orientation).unwrap(), &h.stack, &NoBackend).unwrap();
+    let rendered_b = engine::render(
+        &asset::decode(&bytes_b, h.asset.orientation).unwrap(),
+        &h.stack,
+        &NoBackend,
+    )
+    .unwrap();
     assert_eq!(rendered_a, rendered_b);
     assert!(Handoff::receive(&inbox, "effectcraft").unwrap().is_none());
 
     // Project roundtrip with the item.
     let mut proj = Project::new("demo");
     proj.add_asset(meta.clone(), file);
-    proj.items.push(Item { asset: meta.id, stack, frames: h.frames });
+    proj.items.push(Item {
+        asset: meta.id,
+        stack,
+        frames: h.frames,
+    });
     let pf = root.join("demo.mcproj");
     proj.save(&pf).unwrap();
     assert_eq!(Project::load(&pf).unwrap(), proj);

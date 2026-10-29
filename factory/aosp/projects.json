@@ -49,10 +49,7 @@
       "pinnedTree": "f76093c446c0be8f5effd9b97dc145b188e5f3f0",
       "pinnedDate": "Tue Mar 25 17:41:28 2025 -0700",
       "license": "Apache-2.0",
-      "licenseFiles": [
-        "MODULE_LICENSE_APACHE2",
-        "NOTICE"
-      ],
+      "licenseFiles": ["MODULE_LICENSE_APACHE2", "NOTICE"],
       "relevance": 10,
       "goal": "adb",
       "why": "adb client/daemon sources",
@@ -68,9 +65,7 @@
       "pinnedTree": "fb68e9245440ad7709490a9a10c5c2ebaa573f13",
       "pinnedDate": "Wed Mar 26 18:29:27 2025 -0700",
       "license": "Apache-2.0",
-      "licenseFiles": [
-        "MODULE_LICENSE_APACHE2"
-      ],
+      "licenseFiles": ["MODULE_LICENSE_APACHE2"],
       "relevance": 9,
       "goal": "adb",
       "why": "fastboot, libbase, libcutils, liblog, libsparse, init (adb/fastboot deps)",
@@ -102,10 +97,7 @@
       "pinnedTree": "688a2326403cce6ce83425b218e3553f2c0ca12e",
       "pinnedDate": "Wed Mar 26 17:56:59 2025 -0700",
       "license": "Apache-2.0",
-      "licenseFiles": [
-        "MODULE_LICENSE_APACHE2",
-        "NOTICE"
-      ],
+      "licenseFiles": ["MODULE_LICENSE_APACHE2", "NOTICE"],
       "relevance": 8,
       "goal": "runtime",
       "why": "ART runtime and dex2oat (APK execution)",
@@ -121,10 +113,7 @@
       "pinnedTree": "8e5bde5d91847dc2fe289cab162fcebd372f35dd",
       "pinnedDate": "Tue Mar 25 17:41:28 2025 -0700",
       "license": "Apache-2.0",
-      "licenseFiles": [
-        "MODULE_LICENSE_APACHE2",
-        "NOTICE"
-      ],
+      "licenseFiles": ["MODULE_LICENSE_APACHE2", "NOTICE"],
       "relevance": 8,
       "goal": "binder",
       "why": "libbinder, servicemanager, SurfaceFlinger, binder userspace",
@@ -140,10 +129,7 @@
       "pinnedTree": "ebea9f0f6c1c114a0aec72912da66509db7a2bfe",
       "pinnedDate": "Wed Mar 26 20:38:51 2025 -0700",
       "license": "Apache-2.0",
-      "licenseFiles": [
-        "MODULE_LICENSE_APACHE2",
-        "NOTICE"
-      ],
+      "licenseFiles": ["MODULE_LICENSE_APACHE2", "NOTICE"],
       "relevance": 9,
       "goal": "shell",
       "why": "Android framework; libs/WindowManager/Shell holds desktop windowing (read-only study)",
@@ -159,9 +145,7 @@
       "pinnedTree": "c7119685d5f376d09522888c9d6c2ebfe0f0483a",
       "pinnedDate": "Wed Mar 19 14:45:08 2025 -0700",
       "license": "BSD-3-Clause",
-      "licenseFiles": [
-        "LICENSE"
-      ],
+      "licenseFiles": ["LICENSE"],
       "relevance": 9,
       "goal": "vmm",
       "why": "AOSP copy of crosvm (Cuttlefish default VMM)",
@@ -177,11 +161,7 @@
       "pinnedTree": "5298d9daa1f1d6766ae0e51faf6622926ec57e8b",
       "pinnedDate": "Thu Feb 20 08:36:38 2025 -0800",
       "license": "BSD-3-Clause",
-      "licenseFiles": [
-        "LICENSE",
-        "MODULE_LICENSE_BSD",
-        "NOTICE"
-      ],
+      "licenseFiles": ["LICENSE", "MODULE_LICENSE_BSD", "NOTICE"],
       "relevance": 6,
       "goal": "sandbox",
       "why": "AOSP minijail",
@@ -197,10 +177,7 @@
       "pinnedTree": "ea483a9044bb9e6c6002fcc1d28277fc48f6e59b",
       "pinnedDate": "Wed Mar 26 10:37:56 2025 -0700",
       "license": "Apache-2.0",
-      "licenseFiles": [
-        "LICENSE",
-        "MODULE_LICENSE_APACHE2"
-      ],
+      "licenseFiles": ["LICENSE", "MODULE_LICENSE_APACHE2"],
       "relevance": 7,
       "goal": "gpu",
       "why": "gfxstream GPU virtualization for guests",
@@ -216,12 +193,7 @@
       "pinnedTree": "e8782cf8dd381118ab465f9faa112a7a34d662c9",
       "pinnedDate": "Fri Jan 24 11:06:13 2025 -0800",
       "license": "MIT",
-      "licenseFiles": [
-        "COPYING",
-        "LICENSE",
-        "MODULE_LICENSE_MIT",
-        "NOTICE"
-      ],
+      "licenseFiles": ["COPYING", "LICENSE", "MODULE_LICENSE_MIT", "NOTICE"],
       "relevance": 6,
       "goal": "gpu",
       "why": "virglrenderer in AOSP",
@@ -253,14 +225,7 @@
       "pinnedTree": "383ac97ff13c83421faa1500f465df5e337a6ec0",
       "pinnedDate": "Thu Mar 27 14:16:46 2025 -0700",
       "license": "GPL-2.0-only",
-      "licenseFiles": [
-        "COPYING",
-        "COPYING.LIB",
-        "COPYING.PYTHON",
-        "LICENSE",
-        "MODULE_LICENSE_GPL",
-        "NOTICE"
-      ],
+      "licenseFiles": ["COPYING", "COPYING.LIB", "COPYING.PYTHON", "LICENSE", "MODULE_LICENSE_GPL", "NOTICE"],
       "relevance": 5,
       "goal": "emulator",
       "why": "Android Emulator QEMU fork (listed only if present on this host)",
@@ -276,9 +241,7 @@
       "pinnedTree": "64d5db433bc1b76f719a5cd008fb17d8d9adaebc",
       "pinnedDate": "Tue Oct 27 17:30:46 2026 +0000",
       "license": "GPL-2.0-only",
-      "licenseFiles": [
-        "COPYING"
-      ],
+      "licenseFiles": ["COPYING"],
       "relevance": 5,
       "goal": "kernel",
       "why": "Android Common Kernel (binder, GKI)",

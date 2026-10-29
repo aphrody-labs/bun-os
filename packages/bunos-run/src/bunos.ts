@@ -49,7 +49,13 @@ export interface Plan {
 }
 
 const MACHINES: Record<number, string> = { 0x14c: "x86", 0x8664: "x86_64", 0xaa64: "aarch64", 0x1c4: "arm" };
-const ELF_MACHINES: Record<number, string> = { 0x3e: "x86_64", 0xb7: "aarch64", 0x03: "x86", 0x28: "arm", 0xf3: "riscv64" };
+const ELF_MACHINES: Record<number, string> = {
+  0x3e: "x86_64",
+  0xb7: "aarch64",
+  0x03: "x86",
+  0x28: "arm",
+  0xf3: "riscv64",
+};
 
 const hostArch = () => (process.arch === "x64" ? "x86_64" : process.arch === "arm64" ? "aarch64" : process.arch);
 
@@ -163,7 +169,8 @@ export function detect(file: string): Detection {
     if (listing.includes("AndroidManifest.xml")) return d("android-apk", { dex: /classes\d*\.dex/.test(listing) });
   }
   if (head[0] === 0xd0 && head[1] === 0xcf && head[2] === 0x11 && head[3] === 0xe0 && ext === ".msi") return d("msi");
-  if (head[0] === 0x23 && head[1] === 0x21) return d("script-shebang", { line: new TextDecoder().decode(head).split("\n")[0] });
+  if (head[0] === 0x23 && head[1] === 0x21)
+    return d("script-shebang", { line: new TextDecoder().decode(head).split("\n")[0] });
   if ([".js", ".mjs", ".cjs", ".ts", ".mts", ".tsx", ".jsx"].includes(ext)) return d("script-js");
   return d("unknown");
 }
@@ -183,7 +190,9 @@ export function plan(file: string, args: string[], opts: { engine?: string } = {
       if (detail.machine !== detail.host) {
         const q = `qemu-${detail.machine}`;
         if (which(q)) return p([[q, f, ...args]]);
-        return bad(`ELF ${detail.machine} on a ${detail.host} host and ${q} is not installed (apk add qemu-${detail.machine})`);
+        return bad(
+          `ELF ${detail.machine} on a ${detail.host} host and ${q} is not installed (apk add qemu-${detail.machine})`,
+        );
       }
       if (detail.libc === "glibc" && !existsSync("/lib/libc.so.6") && !existsSync("/usr/glibc-compat"))
         return bad("glibc ELF and gcompat is not installed (apk add gcompat)");
@@ -199,19 +208,27 @@ export function plan(file: string, args: string[], opts: { engine?: string } = {
       // redroid container or a device (docs/ALPINE.md). BUNOS_ADB_SERIAL / ANDROID_SERIAL picks the target.
       if (!which("adb")) return bad("Android APK: adb is not installed (apk add android-tools)");
       const serial = process.env.ANDROID_SERIAL ?? process.env.BUNOS_ADB_SERIAL;
-      if (!serial) return bad("Android APK: no Android target; set ANDROID_SERIAL to a redroid container or device (docker compose run android-apk)");
+      if (!serial)
+        return bad(
+          "Android APK: no Android target; set ANDROID_SERIAL to a redroid container or device (docker compose run android-apk)",
+        );
       return p([["adb", "-s", serial, "install", "-r", f]]);
     }
     case "deb": {
       const root = join(process.env.BUNOS_DEB_ROOT ?? "/opt/bunos/deb", basename(f, ".deb"));
-      return p([["mkdir", "-p", root], ["dpkg-deb", "-x", f, root], ["bunos-deb-exec", root, ...args]]);
+      return p([
+        ["mkdir", "-p", root],
+        ["dpkg-deb", "-x", f, root],
+        ["bunos-deb-exec", root, ...args],
+      ]);
     }
     case "pe-managed":
       return which("dotnet")
         ? p([["dotnet", f, ...args]])
         : bad("managed PE (CLR header) and dotnet is not installed (apk add dotnet10-runtime)");
     case "pe-native": {
-      if (detail.machine !== "x86_64" && detail.machine !== "x86") return bad(`PE ${detail.machine}: Wine here runs x86_64 PE only`);
+      if (detail.machine !== "x86_64" && detail.machine !== "x86")
+        return bad(`PE ${detail.machine}: Wine here runs x86_64 PE only`);
       // Measured: Alpine wine is a 64-bit build without the i386 (WoW64) DLL set; a 32-bit PE dies with c0000135.
       if (detail.machine === "x86" && !existsSync("/usr/lib/wine/i386-unix"))
         return bad("x86 PE (32-bit): this Wine has no i386 unix side (WoW64), only x86_64 PE run (see docs/ALPINE.md)");
@@ -230,7 +247,8 @@ export function plan(file: string, args: string[], opts: { engine?: string } = {
     case "wasm-component": {
       const engine = opts.engine ?? (which("wasmtime") ? "wasmtime" : "bun");
       if (engine === "wasmtime") return p([["wasmtime", "run", "--dir", ".", f, "--", ...args]]);
-      if (detection.kind === "wasm-component") return bad("wasm component: the Bun engine runs core modules (node:wasi); use wasmtime");
+      if (detection.kind === "wasm-component")
+        return bad("wasm component: the Bun engine runs core modules (node:wasi); use wasmtime");
       return p([["bun", "-e", WASI_RUNNER, f, ...args]]);
     }
     case "script-js":
@@ -263,7 +281,9 @@ async function execPlan(pl: Plan): Promise<number> {
         console.error(`bunos: no executable found under ${cmd[1]}/{usr/bin,bin,usr/games}`);
         return 4;
       }
-      env.LD_LIBRARY_PATH = ["lib", "usr/lib", "lib/x86_64-linux-gnu", "usr/lib/x86_64-linux-gnu"].map(d => join(cmd[1]!, d)).join(":");
+      env.LD_LIBRARY_PATH = ["lib", "usr/lib", "lib/x86_64-linux-gnu", "usr/lib/x86_64-linux-gnu"]
+        .map(d => join(cmd[1]!, d))
+        .join(":");
       cmd = [exe, ...cmd.slice(2)];
     }
     const proc = Bun.spawn(cmd, { env, stdin: "inherit", stdout: "inherit", stderr: "inherit" });
@@ -309,7 +329,9 @@ if (import.meta.main) {
   const pos = dash < 0 ? argv : argv.slice(0, dash);
   const file = pos[0];
   if ((cmd !== "run" && cmd !== "detect") || !file) {
-    console.error("usage: bunos detect [--json] <file> | bunos run [--dry-run] [--engine bun|wasmtime] <file> [-- args]");
+    console.error(
+      "usage: bunos detect [--json] <file> | bunos run [--dry-run] [--engine bun|wasmtime] <file> [-- args]",
+    );
     process.exit(2);
   }
   mkdirSync("/tmp", { recursive: true });

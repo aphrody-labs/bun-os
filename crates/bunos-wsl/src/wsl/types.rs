@@ -8,7 +8,11 @@ pub const WSL_REGISTRY_PATH: &str = r"Software\Microsoft\Windows\CurrentVersion\
 
 /// Result of WSL preflight check - determines if WSL is ready to use
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(tag = "status", rename_all = "camelCase", rename_all_fields = "camelCase")]
+#[serde(
+    tag = "status",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
 pub enum WslPreflightStatus {
     /// WSL is installed and ready
     Ready,
@@ -432,12 +436,19 @@ mod tests {
 
         for (status, expected_json) in test_cases {
             let json = serde_json::to_string(&status).unwrap();
-            assert_eq!(json, expected_json, "Serialization mismatch for {:?}", status);
+            assert_eq!(
+                json, expected_json,
+                "Serialization mismatch for {:?}",
+                status
+            );
 
             // Verify round-trip
             let deserialized: WslPreflightStatus = serde_json::from_str(&json).unwrap();
-            assert_eq!(deserialized, status, "Deserialization mismatch for {:?}", status);
+            assert_eq!(
+                deserialized, status,
+                "Deserialization mismatch for {:?}",
+                status
+            );
         }
     }
 }
-

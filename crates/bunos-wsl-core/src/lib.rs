@@ -128,8 +128,10 @@ mod tests {
             is_default: true,
         };
 
-        assert_eq!(distro.id, Some("{2aa80b0d-f814-48c6-872f-3a554e572505}".to_string()));
+        assert_eq!(
+            distro.id,
+            Some("{2aa80b0d-f814-48c6-872f-3a554e572505}".to_string())
+        );
         assert_eq!(distro.name, "DevBox");
     }
 }
-

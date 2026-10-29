@@ -2,8 +2,8 @@
 //!
 //! Functions for getting disk size, OS info, and WSL version from distributions.
 
-use serde::Serialize;
 use log::{debug, warn};
+use serde::Serialize;
 
 use super::executor::{resource_monitor, wsl_executor};
 use super::types::WslError;
@@ -69,7 +69,9 @@ pub fn parse_wsl_version_output(output: &str) -> WslVersionInfo {
         }
         let label = label.trim().to_lowercase();
         let has_component = |component: &str| {
-            label.split(|c: char| !c.is_alphanumeric()).any(|word| word == component)
+            label
+                .split(|c: char| !c.is_alphanumeric())
+                .any(|word| word == component)
         };
         let field = if has_component("wslg") {
             &mut info.wslg_version
@@ -81,13 +83,45 @@ pub fn parse_wsl_version_output(output: &str) -> WslVersionInfo {
             &mut info.dxcore_version
         } else if has_component("windows") {
             &mut info.windows_version
-        } else if ["kernel", "内核", "核心", "カーネル", "커널", "ядр", "noyau", "núcleo", "nucleo", "jądr", "çekirdek"]
-            .iter().any(|name| label.contains(name)) {
+        } else if [
+            "kernel",
+            "内核",
+            "核心",
+            "カーネル",
+            "커널",
+            "ядр",
+            "noyau",
+            "núcleo",
+            "nucleo",
+            "jądr",
+            "çekirdek",
+        ]
+        .iter()
+        .any(|name| label.contains(name))
+        {
             &mut info.kernel_version
-        } else if label.ends_with("wsl") || label.strip_prefix("wsl")
-            .map(|suffix| suffix.trim_start_matches(|c: char| !c.is_alphanumeric()))
-            .is_some_and(|suffix| ["version", "versión", "versão", "wersja", "sürüm", "версия", "版本", "バージョン", "버전", "verze", "verzió"]
-                .iter().any(|word| suffix.starts_with(word))) {
+        } else if label.ends_with("wsl")
+            || label
+                .strip_prefix("wsl")
+                .map(|suffix| suffix.trim_start_matches(|c: char| !c.is_alphanumeric()))
+                .is_some_and(|suffix| {
+                    [
+                        "version",
+                        "versión",
+                        "versão",
+                        "wersja",
+                        "sürüm",
+                        "версия",
+                        "版本",
+                        "バージョン",
+                        "버전",
+                        "verze",
+                        "verzió",
+                    ]
+                    .iter()
+                    .any(|word| suffix.starts_with(word))
+                })
+        {
             &mut info.wsl_version
         } else {
             continue;
@@ -116,8 +150,8 @@ pub fn get_distribution_vhd_size(name: &str) -> Result<VhdSizeInfo, WslError> {
     if is_mock_mode() {
         // Return mock values: ~8GB file size, 256GB virtual size
         return Ok(VhdSizeInfo {
-            file_size: 8_000_000_000,       // ~8 GB (realistic file size)
-            virtual_size: 274_877_906_944,  // 256 GB (default WSL2 virtual disk size)
+            file_size: 8_000_000_000,      // ~8 GB (realistic file size)
+            virtual_size: 274_877_906_944, // 256 GB (default WSL2 virtual disk size)
         });
     }
 
@@ -126,9 +160,7 @@ pub fn get_distribution_vhd_size(name: &str) -> Result<VhdSizeInfo, WslError> {
         .ok_or_else(|| WslError::CommandFailed(format!("Could not find VHDX for {}", name)))?;
 
     // Get file size
-    let file_size = std::fs::metadata(&vhdx_path)
-        .map(|m| m.len())
-        .unwrap_or(0);
+    let file_size = std::fs::metadata(&vhdx_path).map(|m| m.len()).unwrap_or(0);
 
     // Get virtual size using PowerShell Get-VHD
     let virtual_size = get_vhd_virtual_size(&vhdx_path).unwrap_or(file_size);
@@ -179,11 +211,16 @@ fn get_vhd_virtual_size(vhdx_path: &str) -> Option<u64> {
         }
     }
 
-    let entry_count = u32::from_le_bytes([region_table[8], region_table[9], region_table[10], region_table[11]]) as usize;
+    let entry_count = u32::from_le_bytes([
+        region_table[8],
+        region_table[9],
+        region_table[10],
+        region_table[11],
+    ]) as usize;
 
     let metadata_guid: [u8; 16] = [
-        0x06, 0xa2, 0x7c, 0x8b, 0x90, 0x47, 0x9a, 0x4b,
-        0xb8, 0xfe, 0x57, 0x5f, 0x05, 0x0f, 0x88, 0x6e
+        0x06, 0xa2, 0x7c, 0x8b, 0x90, 0x47, 0x9a, 0x4b, 0xb8, 0xfe, 0x57, 0x5f, 0x05, 0x0f, 0x88,
+        0x6e,
     ];
 
     // Each entry is 32 bytes, starting at offset 16
@@ -195,10 +232,14 @@ fn get_vhd_virtual_size(vhdx_path: &str) -> Option<u64> {
 
         if guid == metadata_guid {
             let file_offset = u64::from_le_bytes([
-                region_table[entry_offset + 16], region_table[entry_offset + 17],
-                region_table[entry_offset + 18], region_table[entry_offset + 19],
-                region_table[entry_offset + 20], region_table[entry_offset + 21],
-                region_table[entry_offset + 22], region_table[entry_offset + 23],
+                region_table[entry_offset + 16],
+                region_table[entry_offset + 17],
+                region_table[entry_offset + 18],
+                region_table[entry_offset + 19],
+                region_table[entry_offset + 20],
+                region_table[entry_offset + 21],
+                region_table[entry_offset + 22],
+                region_table[entry_offset + 23],
             ]);
 
             file.seek(SeekFrom::Start(file_offset)).ok()?;
@@ -209,15 +250,16 @@ fn get_vhd_virtual_size(vhdx_path: &str) -> Option<u64> {
                 return None;
             }
 
-            let md_entry_count = u16::from_le_bytes([metadata_header[10], metadata_header[11]]) as usize;
+            let md_entry_count =
+                u16::from_le_bytes([metadata_header[10], metadata_header[11]]) as usize;
 
             let mut metadata_entries = vec![0u8; md_entry_count * 32];
             file.seek(SeekFrom::Start(file_offset + 32)).ok()?;
             file.read_exact(&mut metadata_entries).ok()?;
 
             let vdisk_size_guid: [u8; 16] = [
-                0x24, 0x42, 0xa5, 0x2f, 0x1b, 0xcd, 0x76, 0x48,
-                0xb2, 0x11, 0x5d, 0xbe, 0xd8, 0x3b, 0xf4, 0xb8
+                0x24, 0x42, 0xa5, 0x2f, 0x1b, 0xcd, 0x76, 0x48, 0xb2, 0x11, 0x5d, 0xbe, 0xd8, 0x3b,
+                0xf4, 0xb8,
             ];
 
             for j in 0..md_entry_count {
@@ -226,8 +268,10 @@ fn get_vhd_virtual_size(vhdx_path: &str) -> Option<u64> {
 
                 if item_guid == vdisk_size_guid {
                     let item_offset = u32::from_le_bytes([
-                        metadata_entries[md_offset + 16], metadata_entries[md_offset + 17],
-                        metadata_entries[md_offset + 18], metadata_entries[md_offset + 19],
+                        metadata_entries[md_offset + 16],
+                        metadata_entries[md_offset + 17],
+                        metadata_entries[md_offset + 18],
+                        metadata_entries[md_offset + 19],
                     ]) as u64;
 
                     file.seek(SeekFrom::Start(file_offset + item_offset)).ok()?;
@@ -452,11 +496,20 @@ fn parse_system_distro_info(output: &str) -> SystemDistroInfo {
 
     for line in output.lines() {
         if line.starts_with("PRETTY_NAME=") {
-            info.name = line.trim_start_matches("PRETTY_NAME=").trim_matches('"').to_string();
+            info.name = line
+                .trim_start_matches("PRETTY_NAME=")
+                .trim_matches('"')
+                .to_string();
         } else if line.starts_with("VERSION=") {
-            info.version = line.trim_start_matches("VERSION=").trim_matches('"').to_string();
+            info.version = line
+                .trim_start_matches("VERSION=")
+                .trim_matches('"')
+                .to_string();
         } else if line.starts_with("VERSION_ID=") {
-            info.version_id = line.trim_start_matches("VERSION_ID=").trim_matches('"').to_string();
+            info.version_id = line
+                .trim_start_matches("VERSION_ID=")
+                .trim_matches('"')
+                .to_string();
         }
     }
 
@@ -464,7 +517,10 @@ fn parse_system_distro_info(output: &str) -> SystemDistroInfo {
     if info.name == "Unknown" {
         for line in output.lines() {
             if line.starts_with("NAME=") {
-                info.name = line.trim_start_matches("NAME=").trim_matches('"').to_string();
+                info.name = line
+                    .trim_start_matches("NAME=")
+                    .trim_matches('"')
+                    .to_string();
                 break;
             }
         }
@@ -528,7 +584,10 @@ mod tests {
     fn test_pick_running_distro_skips_wsl1() {
         let mut wsl1_default = distro("Legacy", DistroState::Running, true);
         wsl1_default.version = 1;
-        let distros = vec![wsl1_default.clone(), distro("Debian", DistroState::Running, false)];
+        let distros = vec![
+            wsl1_default.clone(),
+            distro("Debian", DistroState::Running, false),
+        ];
         assert_eq!(pick_running_distro(&distros), Some("Debian"));
         assert_eq!(pick_running_distro(&[wsl1_default]), None);
     }
@@ -561,7 +620,10 @@ mod tests {
         // UTF-16 LE decoded output may have a leading BOM character
         let output = "\u{FEFF}WSL version: 2.6.3.0\r\nKernel version: 6.6.87.2-1\r\nWSLg version: 1.0.71\r\nMSRDC version: 1.2.6353\r\nDirect3D version: 1.611.1-81528511\r\nDXCore version: 10.0.26100.1-240331-1435.ge-release\r\nWindows version: 10.0.26200.8037\r\n";
         let info = parse_wsl_version_output(output);
-        assert_eq!(info.wsl_version, "2.6.3.0", "BOM should be stripped before parsing");
+        assert_eq!(
+            info.wsl_version, "2.6.3.0",
+            "BOM should be stripped before parsing"
+        );
         assert_eq!(info.kernel_version, "6.6.87.2-1");
     }
 
@@ -580,8 +642,14 @@ mod tests {
         let info = parse_wsl_version_output(output);
         assert_eq!(info.wsl_version, "2.1.0.0");
         assert_eq!(info.kernel_version, "5.15.0");
-        assert_eq!(info.wslg_version, "Unknown", "Empty WSLg should remain Unknown");
-        assert_eq!(info.msrdc_version, "1.2.6000", "MSRDC must not shift into WSLg slot");
+        assert_eq!(
+            info.wslg_version, "Unknown",
+            "Empty WSLg should remain Unknown"
+        );
+        assert_eq!(
+            info.msrdc_version, "1.2.6000",
+            "MSRDC must not shift into WSLg slot"
+        );
         assert_eq!(info.windows_version, "10.0.22000.0");
     }
 
@@ -600,10 +668,22 @@ mod tests {
     #[test]
     fn test_parse_wsl_version_matches_localized_labels_without_positions() {
         for (output, kernel) in [
-            ("Version Windows : 10.0.1\nVersion du noyau : 6.6.1\nVersion WSL : 2.9.0\n", "6.6.1"),
-            ("Windows 版本：10.0.1\n内核版本：6.6.2\nWSL 版本：2.9.0\n", "6.6.2"),
-            ("Windows-Version: 10.0.1\nKernelversion: 6.6.3\nWSL-Version: 2.9.0\n", "6.6.3"),
-            ("Windows バージョン: 10.0.1\nカーネル バージョン: 6.6.4\nWSL バージョン: 2.9.0\n", "6.6.4"),
+            (
+                "Version Windows : 10.0.1\nVersion du noyau : 6.6.1\nVersion WSL : 2.9.0\n",
+                "6.6.1",
+            ),
+            (
+                "Windows 版本：10.0.1\n内核版本：6.6.2\nWSL 版本：2.9.0\n",
+                "6.6.2",
+            ),
+            (
+                "Windows-Version: 10.0.1\nKernelversion: 6.6.3\nWSL-Version: 2.9.0\n",
+                "6.6.3",
+            ),
+            (
+                "Windows バージョン: 10.0.1\nカーネル バージョン: 6.6.4\nWSL バージョン: 2.9.0\n",
+                "6.6.4",
+            ),
         ] {
             let info = parse_wsl_version_output(output);
             assert_eq!(info.wsl_version, "2.9.0");
@@ -630,5 +710,3 @@ mod tests {
         assert!(result.is_some()); // Mock returns a default path
     }
 }
-
-

@@ -29,7 +29,12 @@ pub struct Project {
 
 impl Project {
     pub fn new(name: impl Into<String>) -> Self {
-        Self { version: VERSION, name: name.into(), assets: BTreeMap::new(), items: Vec::new() }
+        Self {
+            version: VERSION,
+            name: name.into(),
+            assets: BTreeMap::new(),
+            items: Vec::new(),
+        }
     }
 
     pub fn add_asset(&mut self, meta: AssetMeta, path: PathBuf) {
@@ -82,13 +87,17 @@ impl Handoff {
 
     /// Take the oldest pending handoff for `app` (removes the file).
     pub fn receive(dir: &Path, app: &str) -> Result<Option<Self>> {
-        let Ok(rd) = std::fs::read_dir(dir.join(app)) else { return Ok(None) };
+        let Ok(rd) = std::fs::read_dir(dir.join(app)) else {
+            return Ok(None);
+        };
         let mut files: Vec<PathBuf> = rd
             .filter_map(|e| e.ok().map(|e| e.path()))
             .filter(|p| p.extension().is_some_and(|e| e == "json"))
             .collect();
         files.sort();
-        let Some(first) = files.first() else { return Ok(None) };
+        let Some(first) = files.first() else {
+            return Ok(None);
+        };
         let h: Self = serde_json::from_slice(&std::fs::read(first)?)?;
         std::fs::remove_file(first)?;
         Ok(Some(h))

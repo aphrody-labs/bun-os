@@ -23,7 +23,12 @@ pub fn open_system_terminal(terminal_command: &str) -> Result<(), WslError> {
 /// Open terminal and execute a command in a distribution
 /// The terminal stays open after the command completes so user can see output
 /// If `id` is provided, uses `--distribution-id` for more reliable identification
-pub fn open_terminal_with_command(name: &str, id: Option<&str>, command: &str, terminal_command: &str) -> Result<(), WslError> {
+pub fn open_terminal_with_command(
+    name: &str,
+    id: Option<&str>,
+    command: &str,
+    terminal_command: &str,
+) -> Result<(), WslError> {
     terminal_executor().open_terminal_with_command(name, id, command, terminal_command)
 }
 
@@ -36,5 +41,3 @@ pub fn open_file_explorer(name: &str) -> Result<(), WslError> {
 pub fn open_ide(name: &str, ide_command: &str) -> Result<(), WslError> {
     terminal_executor().open_ide(name, ide_command)
 }
-
-

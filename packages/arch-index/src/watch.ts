@@ -1,7 +1,16 @@
 // SPDX-License-Identifier: MIT
 // Real-time loop: conditional polling of every source, one task per source with its own interval and backoff.
 import { deliverWebhook, type Webhook, type WebhookOptions } from "./events.ts";
-import { syncAur, syncNews, syncOfficial, syncOfficialSources, syncAurSources, AUR_META_MIN_INTERVAL_MS, DEFAULT_REPOS, type Context } from "./sync.ts";
+import {
+  syncAur,
+  syncNews,
+  syncOfficial,
+  syncOfficialSources,
+  syncAurSources,
+  AUR_META_MIN_INTERVAL_MS,
+  DEFAULT_REPOS,
+  type Context,
+} from "./sync.ts";
 
 export interface WatchOptions {
   repos?: readonly string[];
@@ -55,7 +64,8 @@ export async function watch(ctx: Context, options: WatchOptions = {}): Promise<n
         const reports = await syncOfficial(ctx, { repos: options.repos ?? DEFAULT_REPOS, files: options.files });
         const bad = reports.find(r => r.status === "error");
         if (bad) throw new Error(`${bad.repo}: ${bad.error}`);
-        if (options.trackSources?.length) await syncOfficialSources(ctx, { names: options.trackSources, pkgbuild: true });
+        if (options.trackSources?.length)
+          await syncOfficialSources(ctx, { names: options.trackSources, pkgbuild: true });
         return reports;
       },
     },
@@ -104,7 +114,15 @@ export async function watch(ctx: Context, options: WatchOptions = {}): Promise<n
           task.failures++;
           // Exponential backoff with a ceiling of 30 minutes; the error is an event so subscribers see outages.
           task.due = ctx.now() + Math.min(1_800_000, task.every * 2 ** Math.min(task.failures, 6));
-          ctx.bus.emit(ctx.store.addEvent({ type: "sync-error", source: task.name, name: task.name, new: error instanceof Error ? error.message : String(error), ts: ctx.now() }));
+          ctx.bus.emit(
+            ctx.store.addEvent({
+              type: "sync-error",
+              source: task.name,
+              name: task.name,
+              new: error instanceof Error ? error.message : String(error),
+              ts: ctx.now(),
+            }),
+          );
           options.onTask?.(task.name, { error: error instanceof Error ? error.message : String(error) });
         }
         runs++;

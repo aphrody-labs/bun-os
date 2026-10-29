@@ -9,9 +9,9 @@
 //! sparklines. Headers and footers support `&L`/`&C`/`&R` sections and the `&P &N &D &T &A &F &Z`
 //! codes.
 
+use crate::pdf_export::{Font, Page, PdfDoc, Rgb};
 use gridcraft_core::{CellRef, MAX_COLS, MAX_ROWS, RangeRef, Value};
 use gridcraft_model::*;
-use crate::pdf_export::{Font, Page, PdfDoc, Rgb};
 use serde_json::{Value as Json, json};
 
 use super::*;
@@ -1000,7 +1000,9 @@ fn wrap_lines(text: &str, font: Font, size: f32, width: f32) -> Vec<String> {
                 line = word.to_string();
             }
             // Break a single over-long word by characters.
-            while crate::pdf_export::text_width(font, size, &line) > width && line.chars().count() > 1 {
+            while crate::pdf_export::text_width(font, size, &line) > width
+                && line.chars().count() > 1
+            {
                 let mut cut = String::new();
                 let mut rest = String::new();
                 for ch in line.chars() {

@@ -19,7 +19,10 @@ impl Loopback {
     /// `localhost` for Entra, which ignores the port of `http://localhost`).
     pub fn bind(advertised_host: &str) -> Result<Self> {
         let listener = TcpListener::bind(SocketAddr::from((Ipv4Addr::LOCALHOST, 0)))?;
-        Ok(Self { listener, host: advertised_host.to_owned() })
+        Ok(Self {
+            listener,
+            host: advertised_host.to_owned(),
+        })
     }
     /// Port actually bound.
     pub fn port(&self) -> u16 {
@@ -79,9 +82,17 @@ fn handle(mut stream: TcpStream, expected_state: &str) -> Result<Option<Result<S
 
     let outcome = if let Some(err) = get("error") {
         let desc = get("error_description").unwrap_or_default();
-        Some(Err(Error::Denied(if desc.is_empty() { err.to_owned() } else { format!("{err}: {desc}") })))
+        Some(Err(Error::Denied(if desc.is_empty() {
+            err.to_owned()
+        } else {
+            format!("{err}: {desc}")
+        })))
     } else if let Some(code) = get("code") {
-        if get("state") == Some(expected_state) { Some(Ok(code.to_owned())) } else { Some(Err(Error::StateMismatch)) }
+        if get("state") == Some(expected_state) {
+            Some(Ok(code.to_owned()))
+        } else {
+            Some(Err(Error::StateMismatch))
+        }
     } else {
         None
     };
@@ -144,6 +155,9 @@ mod tests {
     #[test]
     fn times_out() {
         let lb = Loopback::bind("127.0.0.1").unwrap();
-        assert!(matches!(lb.wait_for_code("s", Duration::from_millis(100)), Err(Error::Timeout)));
+        assert!(matches!(
+            lb.wait_for_code("s", Duration::from_millis(100)),
+            Err(Error::Timeout)
+        ));
     }
 }

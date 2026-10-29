@@ -1,11 +1,22 @@
 {
   "note": "Pinned inputs of the Bun OS Alpine line. Verified 2026-10-29 against dl-cdn.alpinelinux.org/alpine/v3.24 and npm.",
-  "alpine": { "image": "alpine:3.24.2", "branch": "v3.24", "canonicalAports": "https://gitlab.alpinelinux.org/alpine/aports", "githubMirror": "alpinelinux/aports (read-only [MIRROR], 608 MB)" },
+  "alpine": {
+    "image": "alpine:3.24.2",
+    "branch": "v3.24",
+    "canonicalAports": "https://gitlab.alpinelinux.org/alpine/aports",
+    "githubMirror": "alpinelinux/aports (read-only [MIRROR], 608 MB)"
+  },
   "bun": {
     "version": "1.4.4-canary.20261028.1",
     "gitHead": "11c367163a4baa77d3627d14764c376c856a630a",
-    "x86_64": { "npm": "@oven/bun-linux-x64-musl", "sha512": "0832b56d0cdbc7f14b79164456bd8f84ae6388e9c14db56ac143727728b3ffde475f4b8b3e3cee608dce4c139ef7e176510c9b54ccb66b1c7300333d10e3b480" },
-    "aarch64": { "npm": "@oven/bun-linux-aarch64-musl", "sha512": "a5968e8df5d7c49604c38733f38dcefb32d4086a475f3c9b96b7e3f6bb15dfed479ed29ccfb480d23ae0ce37126a83714c76b92db02b51f251c4d6b79b81401e" }
+    "x86_64": {
+      "npm": "@oven/bun-linux-x64-musl",
+      "sha512": "0832b56d0cdbc7f14b79164456bd8f84ae6388e9c14db56ac143727728b3ffde475f4b8b3e3cee608dce4c139ef7e176510c9b54ccb66b1c7300333d10e3b480"
+    },
+    "aarch64": {
+      "npm": "@oven/bun-linux-aarch64-musl",
+      "sha512": "a5968e8df5d7c49604c38733f38dcefb32d4086a475f3c9b96b7e3f6bb15dfed479ed29ccfb480d23ae0ce37126a83714c76b92db02b51f251c4d6b79b81401e"
+    }
   },
   "android": { "runtime": "redroid/redroid:16.0.0-250627", "needs": "binder_linux on the Docker host" },
   "fixtures": "factory/alpine/fixtures/pins.env"

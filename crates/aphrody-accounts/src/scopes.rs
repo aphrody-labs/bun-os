@@ -67,19 +67,32 @@ pub fn scopes(provider: Provider, service: Service, access: Access) -> &'static 
         (Provider::Google, Files, Write) => &["https://www.googleapis.com/auth/drive"],
         (Provider::Google, Docs, Read) => &["https://www.googleapis.com/auth/documents.readonly"],
         (Provider::Google, Docs, Write) => &["https://www.googleapis.com/auth/documents"],
-        (Provider::Google, Sheets, Read) => &["https://www.googleapis.com/auth/spreadsheets.readonly"],
+        (Provider::Google, Sheets, Read) => {
+            &["https://www.googleapis.com/auth/spreadsheets.readonly"]
+        }
         (Provider::Google, Sheets, Write) => &["https://www.googleapis.com/auth/spreadsheets"],
-        (Provider::Google, Slides, Read) => &["https://www.googleapis.com/auth/presentations.readonly"],
+        (Provider::Google, Slides, Read) => {
+            &["https://www.googleapis.com/auth/presentations.readonly"]
+        }
         (Provider::Google, Slides, Write) => &["https://www.googleapis.com/auth/presentations"],
-        (Provider::Google, Calendar, Read) => &["https://www.googleapis.com/auth/calendar.readonly"],
+        (Provider::Google, Calendar, Read) => {
+            &["https://www.googleapis.com/auth/calendar.readonly"]
+        }
         (Provider::Google, Calendar, Write) => &["https://www.googleapis.com/auth/calendar"],
         (Provider::Google, Mail, Read) => &["https://www.googleapis.com/auth/gmail.readonly"],
-        (Provider::Google, Mail, Write) => &["https://www.googleapis.com/auth/gmail.modify", "https://www.googleapis.com/auth/gmail.send"],
-        (Provider::Google, Contacts, Read) => &["https://www.googleapis.com/auth/contacts.readonly"],
+        (Provider::Google, Mail, Write) => &[
+            "https://www.googleapis.com/auth/gmail.modify",
+            "https://www.googleapis.com/auth/gmail.send",
+        ],
+        (Provider::Google, Contacts, Read) => {
+            &["https://www.googleapis.com/auth/contacts.readonly"]
+        }
         (Provider::Google, Contacts, Write) => &["https://www.googleapis.com/auth/contacts"],
         (Provider::Google, Tasks, Read) => &["https://www.googleapis.com/auth/tasks.readonly"],
         (Provider::Google, Tasks, Write) => &["https://www.googleapis.com/auth/tasks"],
-        (Provider::Google, Photos, Read) => &["https://www.googleapis.com/auth/photospicker.mediaitems.readonly"],
+        (Provider::Google, Photos, Read) => {
+            &["https://www.googleapis.com/auth/photospicker.mediaitems.readonly"]
+        }
         (Provider::Google, Photos, Write) => &[
             "https://www.googleapis.com/auth/photospicker.mediaitems.readonly",
             "https://www.googleapis.com/auth/photoslibrary.appendonly",
@@ -120,18 +133,40 @@ pub fn scopes_for(provider: Provider, services: &[Service], access: Access) -> V
 pub fn google_sensitivity(scope: &str) -> Sensitivity {
     let name = scope.strip_prefix(G).unwrap_or(scope);
     match name {
-        "openid" | "email" | "profile" | "userinfo.email" | "userinfo.profile" | "drive.file" | "drive.appdata" => {
-            Sensitivity::NonSensitive
-        }
-        "drive" | "drive.readonly" | "drive.metadata" | "drive.metadata.readonly" | "gmail.readonly" | "gmail.modify"
-        | "gmail.compose" | "gmail.insert" | "gmail.settings.basic" => Sensitivity::Restricted,
-        "documents" | "documents.readonly" | "spreadsheets" | "spreadsheets.readonly" | "presentations"
-        | "presentations.readonly" | "calendar" | "calendar.readonly" | "calendar.events" | "contacts"
-        | "contacts.readonly" | "tasks" | "tasks.readonly" | "gmail.send" | "youtube" | "youtube.readonly"
-        | "youtube.upload" | "androidpublisher" | "cloud-platform" | "photospicker.mediaitems.readonly"
-        | "photoslibrary.appendonly" | "photoslibrary.readonly.appcreateddata" | "photoslibrary.edit.appcreateddata" => {
-            Sensitivity::Sensitive
-        }
+        "openid" | "email" | "profile" | "userinfo.email" | "userinfo.profile" | "drive.file"
+        | "drive.appdata" => Sensitivity::NonSensitive,
+        "drive"
+        | "drive.readonly"
+        | "drive.metadata"
+        | "drive.metadata.readonly"
+        | "gmail.readonly"
+        | "gmail.modify"
+        | "gmail.compose"
+        | "gmail.insert"
+        | "gmail.settings.basic" => Sensitivity::Restricted,
+        "documents"
+        | "documents.readonly"
+        | "spreadsheets"
+        | "spreadsheets.readonly"
+        | "presentations"
+        | "presentations.readonly"
+        | "calendar"
+        | "calendar.readonly"
+        | "calendar.events"
+        | "contacts"
+        | "contacts.readonly"
+        | "tasks"
+        | "tasks.readonly"
+        | "gmail.send"
+        | "youtube"
+        | "youtube.readonly"
+        | "youtube.upload"
+        | "androidpublisher"
+        | "cloud-platform"
+        | "photospicker.mediaitems.readonly"
+        | "photoslibrary.appendonly"
+        | "photoslibrary.readonly.appcreateddata"
+        | "photoslibrary.edit.appcreateddata" => Sensitivity::Sensitive,
         _ => Sensitivity::Restricted,
     }
 }
@@ -142,7 +177,13 @@ pub fn google_device_flow_allows(scope: &str) -> bool {
     let name = scope.strip_prefix(G).unwrap_or(scope);
     matches!(
         name,
-        "openid" | "email" | "profile" | "drive.appdata" | "drive.file" | "youtube" | "youtube.readonly"
+        "openid"
+            | "email"
+            | "profile"
+            | "drive.appdata"
+            | "drive.file"
+            | "youtube"
+            | "youtube.readonly"
     )
 }
 
@@ -153,35 +194,70 @@ mod tests {
     #[test]
     fn every_google_service_has_scopes_and_microsoft_gaps_are_explicit() {
         use Service::*;
-        for s in [Files, Docs, Sheets, Slides, Calendar, Mail, Contacts, Tasks, Photos, YouTube, PlayConsole, CloudPlatform] {
+        for s in [
+            Files,
+            Docs,
+            Sheets,
+            Slides,
+            Calendar,
+            Mail,
+            Contacts,
+            Tasks,
+            Photos,
+            YouTube,
+            PlayConsole,
+            CloudPlatform,
+        ] {
             for a in [Access::Read, Access::Write] {
                 assert!(!scopes(Provider::Google, s, a).is_empty(), "{s:?}/{a:?}");
             }
         }
         assert!(scopes(Provider::Microsoft, Photos, Access::Read).is_empty());
-        assert_eq!(scopes_for(Provider::Microsoft, &[Files, Docs, Sheets], Access::Write), vec!["Files.ReadWrite"]);
+        assert_eq!(
+            scopes_for(Provider::Microsoft, &[Files, Docs, Sheets], Access::Write),
+            vec!["Files.ReadWrite"]
+        );
     }
 
     #[test]
     fn photos_never_asks_for_removed_scopes() {
         for a in [Access::Read, Access::Write] {
             for s in scopes(Provider::Google, Service::Photos, a) {
-                assert!(!s.ends_with("photoslibrary") && !s.ends_with("photoslibrary.readonly") && !s.ends_with("photoslibrary.sharing"));
+                assert!(
+                    !s.ends_with("photoslibrary")
+                        && !s.ends_with("photoslibrary.readonly")
+                        && !s.ends_with("photoslibrary.sharing")
+                );
             }
         }
     }
 
     #[test]
     fn device_flow_cannot_carry_full_drive() {
-        assert!(google_device_flow_allows("https://www.googleapis.com/auth/drive.file"));
-        assert!(!google_device_flow_allows("https://www.googleapis.com/auth/drive"));
-        assert!(!google_device_flow_allows("https://www.googleapis.com/auth/documents"));
+        assert!(google_device_flow_allows(
+            "https://www.googleapis.com/auth/drive.file"
+        ));
+        assert!(!google_device_flow_allows(
+            "https://www.googleapis.com/auth/drive"
+        ));
+        assert!(!google_device_flow_allows(
+            "https://www.googleapis.com/auth/documents"
+        ));
     }
 
     #[test]
     fn classification() {
-        assert_eq!(google_sensitivity("https://www.googleapis.com/auth/drive"), Sensitivity::Restricted);
-        assert_eq!(google_sensitivity("https://www.googleapis.com/auth/drive.file"), Sensitivity::NonSensitive);
-        assert_eq!(google_sensitivity("https://www.googleapis.com/auth/documents"), Sensitivity::Sensitive);
+        assert_eq!(
+            google_sensitivity("https://www.googleapis.com/auth/drive"),
+            Sensitivity::Restricted
+        );
+        assert_eq!(
+            google_sensitivity("https://www.googleapis.com/auth/drive.file"),
+            Sensitivity::NonSensitive
+        );
+        assert_eq!(
+            google_sensitivity("https://www.googleapis.com/auth/documents"),
+            Sensitivity::Sensitive
+        );
     }
 }

@@ -60,20 +60,66 @@ export const SITES = {
     out: join(here, "projects.json"),
     refs: ["android-latest-release", "main"],
     want: [
-      W("platform/manifest", "Apache-2.0", 10, "manifest", "Repo manifest: default.xml revision and project set per release"),
+      W(
+        "platform/manifest",
+        "Apache-2.0",
+        10,
+        "manifest",
+        "Repo manifest: default.xml revision and project set per release",
+      ),
       W("platform/packages/modules/adb", "Apache-2.0", 10, "adb", "adb client/daemon sources"),
-      W("platform/system/core", "Apache-2.0", 9, "adb", "fastboot, libbase, libcutils, liblog, libsparse, init (adb/fastboot deps)"),
-      W("platform/bionic", "BSD-3-Clause", 8, "runtime", "Android libc/libm/linker (read-only study for APK compatibility)"),
+      W(
+        "platform/system/core",
+        "Apache-2.0",
+        9,
+        "adb",
+        "fastboot, libbase, libcutils, liblog, libsparse, init (adb/fastboot deps)",
+      ),
+      W(
+        "platform/bionic",
+        "BSD-3-Clause",
+        8,
+        "runtime",
+        "Android libc/libm/linker (read-only study for APK compatibility)",
+      ),
       W("platform/art", "Apache-2.0", 8, "runtime", "ART runtime and dex2oat (APK execution)"),
-      W("platform/frameworks/native", "Apache-2.0", 8, "binder", "libbinder, servicemanager, SurfaceFlinger, binder userspace"),
-      W("platform/frameworks/base", "Apache-2.0", 9, "shell", "Android framework; libs/WindowManager/Shell holds desktop windowing (read-only study)"),
+      W(
+        "platform/frameworks/native",
+        "Apache-2.0",
+        8,
+        "binder",
+        "libbinder, servicemanager, SurfaceFlinger, binder userspace",
+      ),
+      W(
+        "platform/frameworks/base",
+        "Apache-2.0",
+        9,
+        "shell",
+        "Android framework; libs/WindowManager/Shell holds desktop windowing (read-only study)",
+      ),
       W("platform/external/crosvm", "BSD-3-Clause", 9, "vmm", "AOSP copy of crosvm (Cuttlefish default VMM)"),
       W("platform/external/minijail", "BSD-3-Clause", 6, "sandbox", "AOSP minijail"),
       W("platform/hardware/google/gfxstream", "Apache-2.0", 7, "gpu", "gfxstream GPU virtualization for guests"),
       W("platform/external/virglrenderer", "MIT", 6, "gpu", "virglrenderer in AOSP"),
-      W("device/google/cuttlefish", "Apache-2.0", 10, "cuttlefish", "Cuttlefish host tools (cvd, launch_cvd, WebRTC operator)"),
-      W("platform/external/qemu", "GPL-2.0-only", 5, "emulator", "Android Emulator QEMU fork (listed only if present on this host)", ["emu-master-dev", "main"]),
-      W("kernel/common", "GPL-2.0-only", 5, "kernel", "Android Common Kernel (binder, GKI)", ["android-mainline", "main"]),
+      W(
+        "device/google/cuttlefish",
+        "Apache-2.0",
+        10,
+        "cuttlefish",
+        "Cuttlefish host tools (cvd, launch_cvd, WebRTC operator)",
+      ),
+      W(
+        "platform/external/qemu",
+        "GPL-2.0-only",
+        5,
+        "emulator",
+        "Android Emulator QEMU fork (listed only if present on this host)",
+        ["emu-master-dev", "main"],
+      ),
+      W("kernel/common", "GPL-2.0-only", 5, "kernel", "Android Common Kernel (binder, GKI)", [
+        "android-mainline",
+        "main",
+      ]),
     ],
   },
   chromiumos: {
@@ -81,15 +127,51 @@ export const SITES = {
     out: join(dirname(here), "chromiumos", "projects.json"),
     refs: ["main"],
     want: [
-      W("chromiumos/manifest", "BSD-3-Clause", 10, "manifest", "Repo manifest (default.xml) for ChromiumOS; release-R* branches"),
-      W("crosvm/crosvm", "BSD-3-Clause", 10, "vmm", "Rust VMM (upstream, development moved here from chromiumos/platform/crosvm)"),
+      W(
+        "chromiumos/manifest",
+        "BSD-3-Clause",
+        10,
+        "manifest",
+        "Repo manifest (default.xml) for ChromiumOS; release-R* branches",
+      ),
+      W(
+        "crosvm/crosvm",
+        "BSD-3-Clause",
+        10,
+        "vmm",
+        "Rust VMM (upstream, development moved here from chromiumos/platform/crosvm)",
+      ),
       W("chromiumos/platform/crosvm", "BSD-3-Clause", 6, "vmm", "Legacy mirror marked MOVED; kept for history"),
-      W("chromiumos/platform/minijail", "BSD-3-Clause", 8, "sandbox", "Sandboxing (namespaces, seccomp) used by crosvm"),
-      W("chromiumos/platform2", "BSD-3-Clause", 9, "platform", "vm_tools, sommelier, permission_broker, system daemons"),
+      W(
+        "chromiumos/platform/minijail",
+        "BSD-3-Clause",
+        8,
+        "sandbox",
+        "Sandboxing (namespaces, seccomp) used by crosvm",
+      ),
+      W(
+        "chromiumos/platform2",
+        "BSD-3-Clause",
+        9,
+        "platform",
+        "vm_tools, sommelier, permission_broker, system daemons",
+      ),
       W("chromiumos/third_party/adhd", "BSD-3-Clause", 7, "audio", "CRAS audio server"),
       W("chromiumos/third_party/virglrenderer", "MIT", 7, "gpu", "virglrenderer with CrOS patches"),
-      W("chromiumos/overlays/chromiumos-overlay", "BSD-3-Clause", 6, "packaging", "Portage ebuilds, reference for PKGBUILD translation"),
-      W("chromiumos/overlays/portage-stable", "GPL-2.0-only", 3, "packaging", "Upstream Gentoo ebuilds (reference only)"),
+      W(
+        "chromiumos/overlays/chromiumos-overlay",
+        "BSD-3-Clause",
+        6,
+        "packaging",
+        "Portage ebuilds, reference for PKGBUILD translation",
+      ),
+      W(
+        "chromiumos/overlays/portage-stable",
+        "GPL-2.0-only",
+        3,
+        "packaging",
+        "Upstream Gentoo ebuilds (reference only)",
+      ),
       W("chromiumos/platform/tast-tests", "BSD-3-Clause", 3, "tests", "Tast integration tests, behaviour reference"),
     ],
   },
@@ -152,7 +234,9 @@ async function releaseInfo(key: SiteKey) {
       latestReleaseCommit: lr,
       latestReleaseTag: tags.at(-1),
       releaseDefaultRevision: def?.match(/<default[^>]*revision="([^"]+)"/)?.[1] ?? null,
-      branchesSeen: names.filter(n => /^(main|android-latest-release|android\d+-release|main-cuttlefish-vendor-dev)$/.test(n)),
+      branchesSeen: names.filter(n =>
+        /^(main|android-latest-release|android\d+-release|main-cuttlefish-vendor-dev)$/.test(n),
+      ),
     };
   }
   const rel = names.filter(n => /^release-R\d+-\d+\.B$/.test(n)).sort(numeric);
@@ -204,7 +288,9 @@ for (const key of keys) {
       }
       const head = await gs(`${s.host}/${p.name}/+/refs/heads/${p.defaultBranch}?format=JSON`);
       if (head && head.commit !== p.pinnedCommit) {
-        console.log(`${key}: ${p.name} ${p.defaultBranch} moved ${p.pinnedCommit.slice(0, 12)} -> ${head.commit.slice(0, 12)}${strict ? "" : " (informative)"}`);
+        console.log(
+          `${key}: ${p.name} ${p.defaultBranch} moved ${p.pinnedCommit.slice(0, 12)} -> ${head.commit.slice(0, 12)}${strict ? "" : " (informative)"}`,
+        );
         if (strict) bad++;
       } else console.log(`${key}: ${p.name} ok ${p.pinnedCommit.slice(0, 12)}`);
     }
@@ -212,10 +298,13 @@ for (const key of keys) {
     const snap = await build(key);
     try {
       const old = JSON.parse(await Bun.file(s.out).text());
-      for (const p of snap.projects as any[]) p.sizeBytes = old.projects.find((o: any) => o.name === p.name)?.sizeBytes ?? null;
+      for (const p of snap.projects as any[])
+        p.sizeBytes = old.projects.find((o: any) => o.name === p.name)?.sizeBytes ?? null;
     } catch {}
     await Bun.write(s.out, JSON.stringify(snap, null, 2) + "\n");
-    console.log(`${key}: wrote ${s.out} (${snap.projects.length} projects, ${(snap.projects as any[]).filter(p => p.missing).length} missing)`);
+    console.log(
+      `${key}: wrote ${s.out} (${snap.projects.length} projects, ${(snap.projects as any[]).filter(p => p.missing).length} missing)`,
+    );
   }
 }
 if (check) console.log(bad ? `FAIL: ${bad} problem(s)` : "OK");

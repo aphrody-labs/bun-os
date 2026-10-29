@@ -42,9 +42,7 @@
       "pinnedTree": "5a65a6bb683896a98db355d0e222884a7af9af92",
       "pinnedDate": "Thu Oct 29 16:15:14 2026",
       "license": "BSD-3-Clause",
-      "licenseFiles": [
-        "LICENSE"
-      ],
+      "licenseFiles": ["LICENSE"],
       "relevance": 10,
       "goal": "vmm",
       "why": "Rust VMM (upstream, development moved here from chromiumos/platform/crosvm)",
@@ -60,9 +58,7 @@
       "pinnedTree": "f10b9d2a6c7b70a79cd28918e02be72839f7328e",
       "pinnedDate": "Thu Jul 14 17:58:26 2022",
       "license": "BSD-3-Clause",
-      "licenseFiles": [
-        "LICENSE"
-      ],
+      "licenseFiles": ["LICENSE"],
       "relevance": 6,
       "goal": "vmm",
       "why": "Legacy mirror marked MOVED; kept for history",
@@ -78,11 +74,7 @@
       "pinnedTree": "8d045fd838134d7420833509f732588f988f02b0",
       "pinnedDate": "Fri Oct 16 21:47:25 2026",
       "license": "BSD-3-Clause",
-      "licenseFiles": [
-        "LICENSE",
-        "MODULE_LICENSE_BSD",
-        "NOTICE"
-      ],
+      "licenseFiles": ["LICENSE", "MODULE_LICENSE_BSD", "NOTICE"],
       "relevance": 8,
       "goal": "sandbox",
       "why": "Sandboxing (namespaces, seccomp) used by crosvm",
@@ -98,9 +90,7 @@
       "pinnedTree": "7a1292f6c2918e3dbb8157f012d21fd551e8fe5f",
       "pinnedDate": "Thu Oct 29 18:50:06 2026",
       "license": "BSD-3-Clause",
-      "licenseFiles": [
-        "LICENSE"
-      ],
+      "licenseFiles": ["LICENSE"],
       "relevance": 9,
       "goal": "platform",
       "why": "vm_tools, sommelier, permission_broker, system daemons",
@@ -116,10 +106,7 @@
       "pinnedTree": "8511a51b29f2f6848a0b09dc6dd15ce4588f24aa",
       "pinnedDate": "Tue Oct 20 03:35:20 2026",
       "license": "BSD-3-Clause",
-      "licenseFiles": [
-        "LICENSE",
-        "LICENSE.tpl"
-      ],
+      "licenseFiles": ["LICENSE", "LICENSE.tpl"],
       "relevance": 7,
       "goal": "audio",
       "why": "CRAS audio server",
@@ -135,9 +122,7 @@
       "pinnedTree": "f21865cc0d575f58f6835b53db0eb78350124636",
       "pinnedDate": "Thu Oct 22 04:11:08 2026",
       "license": "MIT",
-      "licenseFiles": [
-        "COPYING"
-      ],
+      "licenseFiles": ["COPYING"],
       "relevance": 7,
       "goal": "gpu",
       "why": "virglrenderer with CrOS patches",
@@ -185,9 +170,7 @@
       "pinnedTree": "62d2d90c617248b7df8853faf529c836941b2932",
       "pinnedDate": "Thu Oct 29 18:45:31 2026",
       "license": "BSD-3-Clause",
-      "licenseFiles": [
-        "LICENSE"
-      ],
+      "licenseFiles": ["LICENSE"],
       "relevance": 3,
       "goal": "tests",
       "why": "Tast integration tests, behaviour reference",

@@ -53,7 +53,8 @@ pub fn validate_distro_name(name: &str) -> Result<(), ValidationError> {
         .all(|c| c.is_alphanumeric() || c == '-' || c == '_' || c == '.' || c == ' ')
     {
         return Err(ValidationError::InvalidDistroName(
-            "name can only contain letters, numbers, hyphens, underscores, periods, and spaces".into(),
+            "name can only contain letters, numbers, hyphens, underscores, periods, and spaces"
+                .into(),
         ));
     }
 
@@ -78,7 +79,10 @@ pub fn validate_distro_name(name: &str) -> Result<(), ValidationError> {
 /// letters, digits, dots, underscores and hyphens (not spaces).
 pub fn validate_new_distro_name(name: &str) -> Result<(), ValidationError> {
     validate_distro_name(name)?;
-    if !name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.')) {
+    if !name
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
+    {
         return Err(ValidationError::InvalidDistroName(
             "new names can only contain ASCII letters, numbers, dots, underscores, and hyphens; spaces are not allowed".into(),
         ));
@@ -223,21 +227,23 @@ fn decode_single_level(input: &str) -> String {
 
 /// Check if path contains Unicode characters that look like dots
 fn contains_unicode_dots(path: &str) -> bool {
-    path.chars().any(|c| matches!(c,
-        '\u{FF0E}' |  // Fullwidth full stop
+    path.chars().any(|c| {
+        matches!(
+            c,
+            '\u{FF0E}' |  // Fullwidth full stop
         '\u{2024}' |  // One dot leader
         '\u{FE56}' |  // Small full stop
         '\u{FE52}' |  // Small full stop
-        '\u{FF61}'    // Halfwidth ideographic full stop
-    ))
+        '\u{FF61}' // Halfwidth ideographic full stop
+        )
+    })
 }
 
 /// Check if path contains Windows reserved device names
 fn contains_windows_device_name(path: &str) -> bool {
     let devices = [
-        "CON", "PRN", "AUX", "NUL",
-        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8",
+        "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
     ];
 
     // Split path into components and check each
@@ -454,7 +460,12 @@ mod tests {
 
     #[test]
     fn test_new_distro_names_follow_wsl_registration_rules() {
-        for name in ["Rocky Test", "Ubuntu 22.04 LTS", "NötVeryEnglish", "Release\tTest"] {
+        for name in [
+            "Rocky Test",
+            "Ubuntu 22.04 LTS",
+            "NötVeryEnglish",
+            "Release\tTest",
+        ] {
             assert!(validate_new_distro_name(name).is_err(), "accepted {name:?}");
         }
         for name in ["Rocky-Test", "Ubuntu-22.04", "my_distro"] {
@@ -464,7 +475,15 @@ mod tests {
 
     #[test]
     fn test_distro_name_rejects_edge_whitespace_and_control_characters() {
-        for name in [" ", " Ubuntu", "Ubuntu ", "Ubuntu\tDev", "Ubuntu\nDev", "Ubuntu\rDev", "Ubuntu\0Dev"] {
+        for name in [
+            " ",
+            " Ubuntu",
+            "Ubuntu ",
+            "Ubuntu\tDev",
+            "Ubuntu\nDev",
+            "Ubuntu\rDev",
+            "Ubuntu\0Dev",
+        ] {
             assert!(validate_distro_name(name).is_err(), "accepted {name:?}");
         }
     }
@@ -570,7 +589,8 @@ mod tests {
         assert!(validate_file_path("/home/\u{2024}\u{2024}/etc/passwd").is_err()); // one dot leader
 
         // Overlong UTF-8 encoding attempts
-        assert!(validate_file_path("/home/\u{FE56}\u{FE56}/etc/passwd").is_err()); // small full stop
+        assert!(validate_file_path("/home/\u{FE56}\u{FE56}/etc/passwd").is_err());
+        // small full stop
     }
 
     #[test]
@@ -718,7 +738,10 @@ mod tests {
             "/home/%2e%2e%5c..%2fetc",
             "/home/\u{FF0E}./etc/passwd",
             // Windows devices
-            "CON", "PRN", "AUX", "NUL",
+            "CON",
+            "PRN",
+            "AUX",
+            "NUL",
             "/path/CON/file",
             "/path/con",
             // Trailing dots/spaces
@@ -865,12 +888,20 @@ mod tests {
     fn test_valid_wsl_conf_values() {
         // Legitimate single-line values across the string fields.
         assert!(validate_wsl_conf_value("automount.root", "/mnt/").is_ok());
-        assert!(validate_wsl_conf_value("automount.options", "metadata,uid=1000,gid=1000,umask=22").is_ok());
+        assert!(validate_wsl_conf_value(
+            "automount.options",
+            "metadata,uid=1000,gid=1000,umask=22"
+        )
+        .is_ok());
         assert!(validate_wsl_conf_value("network.hostname", "my-host").is_ok());
         assert!(validate_wsl_conf_value("user.default", "ian").is_ok());
         // boot.command is a shell command line — spaces and shell metacharacters are fine,
         // as long as it stays on one line.
-        assert!(validate_wsl_conf_value("boot.command", "service docker start; echo ready | tee /tmp/x").is_ok());
+        assert!(validate_wsl_conf_value(
+            "boot.command",
+            "service docker start; echo ready | tee /tmp/x"
+        )
+        .is_ok());
         // Empty value is allowed.
         assert!(validate_wsl_conf_value("user.default", "").is_ok());
     }
@@ -899,10 +930,8 @@ mod tests {
         // A value carrying the heredoc delimiter on its own line would terminate the
         // heredoc early and run the trailing lines as root. The embedded newline is
         // what makes this possible, so it must be rejected.
-        let result = validate_wsl_conf_value(
-            "boot.command",
-            "echo hi\nWSLCONFEOF\ntouch /tmp/pwned",
-        );
+        let result =
+            validate_wsl_conf_value("boot.command", "echo hi\nWSLCONFEOF\ntouch /tmp/pwned");
         assert!(matches!(
             result,
             Err(ValidationError::InvalidConfigValue { .. })

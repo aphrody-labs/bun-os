@@ -59,11 +59,7 @@ export interface BudgetPlan {
 const WASM32_LIMIT = 4 * 1024 ** 3;
 
 /** Decide where the decoder runs and how much context fits, from what the browser reports. */
-export function planBudget(
-  d: DeviceInfo,
-  v: BrowserVariant = GEMMA4_E2B_QAT_MOBILE,
-  wantContext = 8192,
-): BudgetPlan {
+export function planBudget(d: DeviceInfo, v: BrowserVariant = GEMMA4_E2B_QAT_MOBILE, wantContext = 8192): BudgetPlan {
   const warnings: string[] = [];
   const decoderEp = d.webgpu ? "webgpu" : "wasm";
   if (!d.webgpu) warnings.push("WebGPU unavailable: decoder falls back to wasm CPU (slow).");
@@ -78,8 +74,10 @@ export function planBudget(
   const ceiling = d.deviceMemoryGiB !== undefined ? d.deviceMemoryGiB * 1024 ** 3 : 8 * 1024 ** 3;
   const fixed = v.gpuWeightBytes + wasmHeapBytes;
   let contextTokens = wantContext;
-  while (contextTokens > 512 && fixed + kvBytes(contextTokens) > ceiling * 0.8) contextTokens = Math.floor(contextTokens / 2);
-  if (fixed + kvBytes(contextTokens) > ceiling * 0.8) warnings.push("memory budget below the working set even at 512 tokens.");
+  while (contextTokens > 512 && fixed + kvBytes(contextTokens) > ceiling * 0.8)
+    contextTokens = Math.floor(contextTokens / 2);
+  if (fixed + kvBytes(contextTokens) > ceiling * 0.8)
+    warnings.push("memory budget below the working set even at 512 tokens.");
   return {
     decoderEp,
     downloadBytes: totalBytes(v),

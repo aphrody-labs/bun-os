@@ -16,21 +16,39 @@ pub enum Filter {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case")]
 pub enum Op {
-    Crop { x: u32, y: u32, w: u32, h: u32 },
-    Resize { w: u32, h: u32, filter: Filter },
+    Crop {
+        x: u32,
+        y: u32,
+        w: u32,
+        h: u32,
+    },
+    Resize {
+        w: u32,
+        h: u32,
+        filter: Filter,
+    },
     /// Gaussian blur, sigma in thousandths of a pixel.
-    Blur { sigma_milli: u32 },
+    Blur {
+        sigma_milli: u32,
+    },
     /// Brightness offset in -255..=255.
-    Brightness { delta: i32 },
+    Brightness {
+        delta: i32,
+    },
     /// Contrast factor in thousandths (1000 = unchanged).
-    Contrast { factor_milli: u32 },
+    Contrast {
+        factor_milli: u32,
+    },
     Grayscale,
     Invert,
     FlipH,
     FlipV,
     Rotate90,
     /// AI operation resolved by the configured backend; `params` is a JSON string.
-    Ai { kind: AiKind, params: String },
+    Ai {
+        kind: AiKind,
+        params: String,
+    },
 }
 
 /// Ordered list of operations applied to a source asset.

@@ -11,7 +11,10 @@ function pins(manifest: string, section: RegExp): Map<string, string> {
   const body = manifest.slice(start).split(/\n\[/)[0] ?? "";
   const out = new Map<string, string>();
   for (const line of body.split("\n")) {
-    const match = /^(tauri(?:-[a-z-]+)?|wry|tao|muda|tray-icon|webview2-com)\s*=\s*(?:"([^"]+)"|\{[^}]*version\s*=\s*"([^"]+)")/.exec(line);
+    const match =
+      /^(tauri(?:-[a-z-]+)?|wry|tao|muda|tray-icon|webview2-com)\s*=\s*(?:"([^"]+)"|\{[^}]*version\s*=\s*"([^"]+)")/.exec(
+        line,
+      );
     if (match) out.set(match[1]!, (match[2] ?? match[3])!);
   }
   return out;

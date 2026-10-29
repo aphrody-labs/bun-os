@@ -4,7 +4,8 @@ import { isTestingRepo, type PackageRow, type Store, type DepKind } from "./stor
 import { parseSrcinfo } from "./srcinfo.ts";
 import { parseDep, satisfies, vercmp, type DepSpec } from "./version.ts";
 
-export type SearchBy = "name" | "provides" | "depends" | "makedepends" | "optdepends" | "desc" | "file" | "maintainer" | "group" | "base";
+export type SearchBy =
+  "name" | "provides" | "depends" | "makedepends" | "optdepends" | "desc" | "file" | "maintainer" | "group" | "base";
 
 export interface SearchOptions {
   by?: SearchBy;
@@ -16,7 +17,10 @@ export interface SearchOptions {
 
 /** Shell glob to LIKE: * -> %, ? -> _, everything else literal. */
 export function globToLike(pattern: string): string {
-  return pattern.replace(/[\\%_]/g, c => `\\${c}`).replaceAll("*", "%").replaceAll("?", "_");
+  return pattern
+    .replace(/[\\%_]/g, c => `\\${c}`)
+    .replaceAll("*", "%")
+    .replaceAll("?", "_");
 }
 
 const PKG_SELECT = `SELECT p.id FROM packages p`;
@@ -77,7 +81,10 @@ export function search(store: Store, pattern: string, options: SearchOptions = {
 }
 
 export function rowById(store: Store, id: number): PackageRow | null {
-  const r = store.db.query("SELECT name, repo FROM packages WHERE id = ?").get(id) as { name: string; repo: string } | null;
+  const r = store.db.query("SELECT name, repo FROM packages WHERE id = ?").get(id) as {
+    name: string;
+    repo: string;
+  } | null;
   return r ? (store.getPackages(r.name).find(p => p.id === id) ?? null) : null;
 }
 
@@ -94,11 +101,18 @@ export interface PackageInfo extends PackageRow {
   srcinfoVersions: string[];
 }
 
-export function info(store: Store, name: string, options: { source?: "repo" | "aur"; repo?: string; testing?: boolean } = {}): PackageInfo | null {
+export function info(
+  store: Store,
+  name: string,
+  options: { source?: "repo" | "aur"; repo?: string; testing?: boolean } = {},
+): PackageInfo | null {
   const row = store.getPackage(name, options);
   if (!row) return null;
   const deps = store.depsOf(row.id);
-  const by = (k: DepKind): DepSpec[] => deps.filter(d => d.kind === k).map(d => ({ name: d.name, op: d.op as DepSpec["op"], version: d.ver, description: d.descr }));
+  const by = (k: DepKind): DepSpec[] =>
+    deps
+      .filter(d => d.kind === k)
+      .map(d => ({ name: d.name, op: d.op as DepSpec["op"], version: d.ver, description: d.descr }));
   const requiredBy = (
     store.db
       .query(
@@ -134,10 +148,18 @@ export type Resolution =
  * Resolve a name the way pacman would: exact package first, then a provider, then a package that replaces it.
  * Official repositories win over the AUR. `kind: "missing"` means the name is gone (fail fast in generators).
  */
-export function resolveName(store: Store, spec: string | DepSpec, options: { aur?: boolean; testing?: boolean } = {}): Resolution {
+export function resolveName(
+  store: Store,
+  spec: string | DepSpec,
+  options: { aur?: boolean; testing?: boolean } = {},
+): Resolution {
   const dep = typeof spec === "string" ? parseDep(spec) : spec;
-  const allowed = (p: PackageRow) => (options.testing || !isTestingRepo(p.repo)) && (options.aur ?? true ? true : p.source === "repo");
-  const exact = store.getPackages(dep.name).filter(allowed).sort((a, b) => Number(b.source === "repo") - Number(a.source === "repo"));
+  const allowed = (p: PackageRow) =>
+    (options.testing || !isTestingRepo(p.repo)) && ((options.aur ?? true) ? true : p.source === "repo");
+  const exact = store
+    .getPackages(dep.name)
+    .filter(allowed)
+    .sort((a, b) => Number(b.source === "repo") - Number(a.source === "repo"));
   const hit = exact.find(p => satisfies(p.version, dep.op, dep.version));
   if (hit) return { kind: "package", package: hit };
   const providers = store.db
@@ -148,17 +170,22 @@ export function resolveName(store: Store, spec: string | DepSpec, options: { aur
   for (const pr of providers) {
     const row = rowById(store, pr.id);
     if (!row || !allowed(row)) continue;
-    if (!dep.op || satisfies(pr.pv || row.version, dep.op, dep.version)) return { kind: "provided", package: row, via: dep.name };
+    if (!dep.op || satisfies(pr.pv || row.version, dep.op, dep.version))
+      return { kind: "provided", package: row, via: dep.name };
   }
   const replacers = store.db
-    .query(`SELECT p.id FROM deps d JOIN packages p ON p.id = d.pkg_id WHERE d.kind = 'replaces' AND d.name = ? ORDER BY (p.source = 'repo') DESC, p.name`)
+    .query(
+      `SELECT p.id FROM deps d JOIN packages p ON p.id = d.pkg_id WHERE d.kind = 'replaces' AND d.name = ? ORDER BY (p.source = 'repo') DESC, p.name`,
+    )
     .all(dep.name) as { id: number }[];
   for (const r of replacers) {
     const row = rowById(store, r.id);
     if (row && allowed(row)) return { kind: "replaced", package: row, replaces: dep.name };
   }
   const members = store.db
-    .query(`SELECT id FROM packages WHERE source = 'repo' AND groups LIKE ? AND repo NOT LIKE '%-testing' AND repo NOT LIKE '%-staging' ORDER BY name`)
+    .query(
+      `SELECT id FROM packages WHERE source = 'repo' AND groups LIKE ? AND repo NOT LIKE '%-testing' AND repo NOT LIKE '%-staging' ORDER BY name`,
+    )
     .all(`%"${dep.name}"%`) as { id: number }[];
   if (members.length) {
     const row = rowById(store, members[0]!.id);
@@ -183,15 +210,35 @@ export interface DepNode {
   children: DepNode[];
 }
 
-export function depTree(store: Store, name: string, options: { kinds?: DepKind[]; depth?: number; aur?: boolean; testing?: boolean } = {}): DepNode {
+export function depTree(
+  store: Store,
+  name: string,
+  options: { kinds?: DepKind[]; depth?: number; aur?: boolean; testing?: boolean } = {},
+): DepNode {
   const kinds = options.kinds ?? ["depends"];
   const maxDepth = options.depth ?? 8;
   const seen = new Set<string>();
   const walk = (spec: string, depth: number): DepNode => {
     const res = resolveName(store, spec, options);
-    if (res.kind === "missing") return { name: parseDep(spec).name, spec, resolved: null, version: null, repo: null, missing: true, children: [] };
+    if (res.kind === "missing")
+      return {
+        name: parseDep(spec).name,
+        spec,
+        resolved: null,
+        version: null,
+        repo: null,
+        missing: true,
+        children: [],
+      };
     const p = res.package;
-    const node: DepNode = { name: parseDep(spec).name, spec, resolved: p.name, version: p.version, repo: p.repo, children: [] };
+    const node: DepNode = {
+      name: parseDep(spec).name,
+      spec,
+      resolved: p.name,
+      version: p.version,
+      repo: p.repo,
+      children: [],
+    };
     if (res.kind === "provided") node.via = `provides ${res.via}`;
     else if (res.kind === "replaced") node.via = `replaces ${res.replaces}`;
     else if (res.kind === "group") node.via = `group ${res.group} (${res.members} packages)`;
@@ -219,7 +266,11 @@ export function renderTree(node: DepNode, prefix = "", last = true, root = true)
 }
 
 /** All distinct packages in the closure of a name (pacman -Si style resolution), cycle safe. */
-export function closure(store: Store, names: string[], options: { kinds?: DepKind[]; aur?: boolean } = {}): { packages: PackageRow[]; missing: string[] } {
+export function closure(
+  store: Store,
+  names: string[],
+  options: { kinds?: DepKind[]; aur?: boolean } = {},
+): { packages: PackageRow[]; missing: string[] } {
   const kinds = options.kinds ?? ["depends"];
   const out = new Map<string, PackageRow>();
   const missing = new Set<string>();
@@ -250,7 +301,8 @@ export interface Pin {
   origin?: string;
 }
 
-export type PinStatus = "group" | "current" | "outdated" | "newer" | "missing" | "replaced" | "provided" | "aur" | "flagged" | "orphaned";
+export type PinStatus =
+  "group" | "current" | "outdated" | "newer" | "missing" | "replaced" | "provided" | "aur" | "flagged" | "orphaned";
 
 export interface PinReport {
   pin: Pin;
@@ -264,19 +316,56 @@ export interface PinReport {
 export function checkPins(store: Store, pins: Pin[], options: { aur?: boolean; testing?: boolean } = {}): PinReport[] {
   return pins.map(pin => {
     const res = resolveName(store, pin.name, { aur: options.aur ?? true, testing: options.testing });
-    if (res.kind === "missing") return { pin, status: "missing" as const, note: "no package, provider or replacement in the index" };
-    if (res.kind === "replaced") return { pin, status: "replaced" as const, current: res.package.name, repo: res.package.repo, note: `replaced by ${res.package.name}` };
-    if (res.kind === "group") return { pin, status: "group" as const, current: res.package.name, repo: res.package.repo, note: `package group with ${res.members} members` };
-    if (res.kind === "provided") return { pin, status: "provided" as const, current: res.package.name, repo: res.package.repo, note: `provided by ${res.package.name}` };
+    if (res.kind === "missing")
+      return { pin, status: "missing" as const, note: "no package, provider or replacement in the index" };
+    if (res.kind === "replaced")
+      return {
+        pin,
+        status: "replaced" as const,
+        current: res.package.name,
+        repo: res.package.repo,
+        note: `replaced by ${res.package.name}`,
+      };
+    if (res.kind === "group")
+      return {
+        pin,
+        status: "group" as const,
+        current: res.package.name,
+        repo: res.package.repo,
+        note: `package group with ${res.members} members`,
+      };
+    if (res.kind === "provided")
+      return {
+        pin,
+        status: "provided" as const,
+        current: res.package.name,
+        repo: res.package.repo,
+        note: `provided by ${res.package.name}`,
+      };
     const p = res.package;
     if (p.source === "aur") {
       const status: PinStatus = p.outOfDate ? "flagged" : !p.maintainer ? "orphaned" : "aur";
       const cmp = pin.version ? vercmp(pin.version, p.version) : 0;
-      return { pin, status: cmp < 0 ? "outdated" : status, current: p.version, repo: "aur", note: p.outOfDate ? `flagged out of date ${new Date(p.outOfDate * 1000).toISOString().slice(0, 10)}` : !p.maintainer ? "orphaned" : undefined };
+      return {
+        pin,
+        status: cmp < 0 ? "outdated" : status,
+        current: p.version,
+        repo: "aur",
+        note: p.outOfDate
+          ? `flagged out of date ${new Date(p.outOfDate * 1000).toISOString().slice(0, 10)}`
+          : !p.maintainer
+            ? "orphaned"
+            : undefined,
+      };
     }
     if (!pin.version) return { pin, status: "current" as const, current: p.version, repo: p.repo };
     const c = vercmp(pin.version, p.version);
-    return { pin, status: c === 0 ? ("current" as const) : c < 0 ? ("outdated" as const) : ("newer" as const), current: p.version, repo: p.repo };
+    return {
+      pin,
+      status: c === 0 ? ("current" as const) : c < 0 ? ("outdated" as const) : ("newer" as const),
+      current: p.version,
+      repo: p.repo,
+    };
   });
 }
 
@@ -289,7 +378,9 @@ export function lineDiff(a: string, b: string): string[] {
   const n = x.length;
   const m = y.length;
   const lcs: Uint32Array[] = Array.from({ length: n + 1 }, () => new Uint32Array(m + 1));
-  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) lcs[i]![j] = x[i] === y[j] ? lcs[i + 1]![j + 1]! + 1 : Math.max(lcs[i + 1]![j]!, lcs[i]![j + 1]!);
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      lcs[i]![j] = x[i] === y[j] ? lcs[i + 1]![j + 1]! + 1 : Math.max(lcs[i + 1]![j]!, lcs[i]![j + 1]!);
   const out: string[] = [];
   let i = 0;
   let j = 0;
@@ -313,10 +404,19 @@ export interface SourceDiff {
 }
 
 /** Diff two stored versions of a pkgbase (defaults to the two most recent fetched). */
-export function diffSources(store: Store, source: "arch" | "aur", pkgbase: string, from?: string, to?: string): SourceDiff {
+export function diffSources(
+  store: Store,
+  source: "arch" | "aur",
+  pkgbase: string,
+  from?: string,
+  to?: string,
+): SourceDiff {
   const versions = store.listSrcinfoVersions(source, pkgbase);
   if (!from || !to) {
-    if (versions.length < 2) throw new Error(`Only ${versions.length} stored version(s) of ${pkgbase}; sync sources again after the package updates.`);
+    if (versions.length < 2)
+      throw new Error(
+        `Only ${versions.length} stored version(s) of ${pkgbase}; sync sources again after the package updates.`,
+      );
     from ??= versions[versions.length - 2]!.version;
     to ??= versions[versions.length - 1]!.version;
   }
@@ -340,7 +440,9 @@ export function diffSources(store: Store, source: "arch" | "aur", pkgbase: strin
     sources: {
       added: [...mb.keys()].filter(k => !ma.has(k)),
       removed: [...ma.keys()].filter(k => !mb.has(k)),
-      checksumChanged: [...mb.keys()].filter(k => ma.has(k) && JSON.stringify(ma.get(k)!.checksums) !== JSON.stringify(mb.get(k)!.checksums)),
+      checksumChanged: [...mb.keys()].filter(
+        k => ma.has(k) && JSON.stringify(ma.get(k)!.checksums) !== JSON.stringify(mb.get(k)!.checksums),
+      ),
     },
   };
 }

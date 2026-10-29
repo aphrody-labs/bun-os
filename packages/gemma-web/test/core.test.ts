@@ -34,7 +34,7 @@ describe("sampler", () => {
     const seen = new Set<number>();
     const r = mulberry32(3);
     for (let i = 0; i < 400; i++) seen.add(sampleToken(logits, { temperature: 1, topK: 3, topP: 0.95 }, r));
-    expect([...seen].every((x) => [7, 42, 9].includes(x))).toBe(true);
+    expect([...seen].every(x => [7, 42, 9].includes(x))).toBe(true);
     expect(seen.has(7)).toBe(true);
     expect(seen.has(42)).toBe(true);
   });
@@ -83,12 +83,12 @@ describe("ShardStore", () => {
     const { f, calls } = mk();
     const prog: number[] = [];
     const s = new ShardStore({
-      url: (p) => `http://x/${p}`,
+      url: p => `http://x/${p}`,
       storage: new MemoryStorage(),
       namespace: "n",
       partBytes: 300,
       fetch: f,
-      onProgress: (p) => prog.push(p.loaded),
+      onProgress: p => prog.push(p.loaded),
     });
     s.plan([{ path: "a", bytes: 1000 }]);
     expect([...(await s.get("a", 1000))]).toEqual([...body]);
@@ -98,22 +98,22 @@ describe("ShardStore", () => {
   test("resumes from stored parts and never refetches them", async () => {
     const storage = new MemoryStorage();
     const first = mk();
-    const s1 = new ShardStore({ url: (p) => p, storage, namespace: "n", partBytes: 400, fetch: first.f });
+    const s1 = new ShardStore({ url: p => p, storage, namespace: "n", partBytes: 400, fetch: first.f });
     await s1.get("a", 1000);
     storage.parts.delete("n/a.0001");
     const second = mk();
-    const s2 = new ShardStore({ url: (p) => p, storage, namespace: "n", partBytes: 400, fetch: second.f });
+    const s2 = new ShardStore({ url: p => p, storage, namespace: "n", partBytes: 400, fetch: second.f });
     expect([...(await s2.get("a", 1000))]).toEqual([...body]);
     expect(second.calls).toEqual(["bytes=400-799"]);
   });
   test("falls back when the server ignores Range", async () => {
     const { f } = mk(false);
-    const s = new ShardStore({ url: (p) => p, storage: new MemoryStorage(), namespace: "n", partBytes: 600, fetch: f });
+    const s = new ShardStore({ url: p => p, storage: new MemoryStorage(), namespace: "n", partBytes: 600, fetch: f });
     expect([...(await s.get("a", 1000))]).toEqual([...body]);
   });
   test("rejects a short part", async () => {
     const f = (async () => new Response(new Uint8Array(5), { status: 206 })) as unknown as typeof fetch;
-    const s = new ShardStore({ url: (p) => p, storage: new MemoryStorage(), namespace: "n", fetch: f });
+    const s = new ShardStore({ url: p => p, storage: new MemoryStorage(), namespace: "n", fetch: f });
     await expect(s.get("a", 100)).rejects.toThrow(/got 5, expected 100/);
   });
 });
@@ -171,7 +171,7 @@ describe("OpenAI surface", () => {
     for await (const c of api.chat.completions.create({ messages: [{ role: "user", content: "y" }], stream: true }))
       chunks.push(c);
     expect(chunks[0]!.choices[0]!.delta.role).toBe("assistant");
-    expect(chunks.map((c) => c.choices[0]!.delta.content ?? "").join("")).toBe("Hello y");
+    expect(chunks.map(c => c.choices[0]!.delta.content ?? "").join("")).toBe("Hello y");
     expect(chunks.at(-1)!.choices[0]!.finish_reason).toBe("stop");
     expect(chunks.at(-1)!.usage!.total_tokens).toBe(7);
   });
@@ -185,9 +185,9 @@ describe("OpenAI surface", () => {
     expect(text.endsWith("data: [DONE]\n\n")).toBe(true);
     const datas = text
       .split("\n\n")
-      .filter((l) => l.startsWith("data: {"))
-      .map((l) => JSON.parse(l.slice(6)));
-    expect(datas.map((d) => d.choices[0].delta.content ?? "").join("")).toBe("Hello z");
+      .filter(l => l.startsWith("data: {"))
+      .map(l => JSON.parse(l.slice(6)));
+    expect(datas.map(d => d.choices[0].delta.content ?? "").join("")).toBe("Hello z");
     const models = await (await api.fetch("http://local/v1/models")).json();
     expect(models.data[0].id).toBe("gemma-4-e2b-it-web");
     expect((await api.fetch("http://local/v1/other", { method: "POST" })).status).toBe(404);

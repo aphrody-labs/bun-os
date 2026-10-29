@@ -13,8 +13,8 @@
 
 use std::sync::Arc;
 
-use photocraft_doc::{Document, Layer, LayerContent};
 use crate::ops::LayerTarget;
+use photocraft_doc::{Document, Layer, LayerContent};
 use serde_json::{Value, json};
 
 use crate::commands::{CommandSpec, int};

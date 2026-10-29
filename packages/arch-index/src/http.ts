@@ -106,7 +106,10 @@ export class ArchClient {
     await turn;
   }
 
-  async get(url: string, options: { state?: ConditionalState; headers?: Record<string, string> } = {}): Promise<FetchOutcome> {
+  async get(
+    url: string,
+    options: { state?: ConditionalState; headers?: Record<string, string> } = {},
+  ): Promise<FetchOutcome> {
     const host = new URL(url).host;
     let attempt = 0;
     for (;;) {
@@ -123,7 +126,11 @@ export class ArchClient {
       try {
         this.stats.requests++;
         this.stats.byHost[host] = (this.stats.byHost[host] ?? 0) + 1;
-        response = await this.o.fetch(url, { headers, signal: AbortSignal.timeout(this.o.timeoutMs), redirect: "follow" });
+        response = await this.o.fetch(url, {
+          headers,
+          signal: AbortSignal.timeout(this.o.timeoutMs),
+          redirect: "follow",
+        });
       } catch (error) {
         failure = error;
       }
@@ -165,7 +172,11 @@ export class ArchClient {
         continue;
       }
       if (attempt >= this.o.maxRetries)
-        throw new HttpError(`GET ${url} failed: ${failure instanceof Error ? failure.message : String(failure)}`, 0, url);
+        throw new HttpError(
+          `GET ${url} failed: ${failure instanceof Error ? failure.message : String(failure)}`,
+          0,
+          url,
+        );
       attempt++;
       this.stats.retries++;
       await this.o.sleep(Math.min(30_000, 500 * 2 ** attempt));

@@ -3,10 +3,10 @@
 //! Returns realistic CLI output strings that match wsl.exe format,
 //! allowing parsing logic to be tested.
 
+use log::debug;
 use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::Duration;
-use log::debug;
 
 use super::{CommandOutput, WslCommandExecutor};
 use crate::wsl::types::{WslError, WslPreflightStatus};
@@ -48,7 +48,10 @@ pub enum MockErrorType {
 pub enum MockUpdateResult {
     #[default]
     AlreadyUpToDate,
-    Updated { old_version: String, new_version: String },
+    Updated {
+        old_version: String,
+        new_version: String,
+    },
 }
 
 /// Force kill simulation config
@@ -149,7 +152,10 @@ impl MockWslExecutor {
     /// Configure an error for an operation
     pub fn set_error(&self, operation: &str, error: MockErrorType) {
         let mut state = self.state.lock().unwrap();
-        state.error_config.operation_errors.insert(operation.to_string(), error);
+        state
+            .error_config
+            .operation_errors
+            .insert(operation.to_string(), error);
     }
 
     /// Set error delay
@@ -192,7 +198,9 @@ impl MockWslExecutor {
     /// Check if a distribution is running
     pub fn distro_is_running(&self, name: &str) -> bool {
         let state = self.state.lock().unwrap();
-        state.distributions.iter()
+        state
+            .distributions
+            .iter()
             .find(|d| d.name == name)
             .map(|d| d.state == MockDistroState::Running)
             .unwrap_or(false)
@@ -234,14 +242,14 @@ impl MockWslExecutor {
             Some(d) => {
                 if d.state == MockDistroState::Running {
                     return Err(WslError::CommandFailed(
-                        "Distribution must be stopped before renaming".to_string()
+                        "Distribution must be stopped before renaming".to_string(),
                     ));
                 }
                 let old_name = d.name.clone();
                 d.name = new_name.to_string();
                 Ok(old_name)
             }
-            None => Err(WslError::DistroNotFound(id.to_string()))
+            None => Err(WslError::DistroNotFound(id.to_string())),
         }
     }
 
@@ -251,10 +259,18 @@ impl MockWslExecutor {
         if let Some(error_type) = state.error_config.operation_errors.get(operation) {
             let delay = state.error_config.delay_ms;
             let error = match error_type {
-                MockErrorType::Timeout => WslError::Timeout(format!("{} timed out (simulated)", operation)),
-                MockErrorType::CommandFailed => WslError::CommandFailed(format!("{} failed (simulated)", operation)),
-                MockErrorType::DistroNotFound => WslError::DistroNotFound("SimulatedNotFound".to_string()),
-                MockErrorType::Cancelled => WslError::CommandFailed("Update cancelled - administrator approval was not granted".to_string()),
+                MockErrorType::Timeout => {
+                    WslError::Timeout(format!("{} timed out (simulated)", operation))
+                }
+                MockErrorType::CommandFailed => {
+                    WslError::CommandFailed(format!("{} failed (simulated)", operation))
+                }
+                MockErrorType::DistroNotFound => {
+                    WslError::DistroNotFound("SimulatedNotFound".to_string())
+                }
+                MockErrorType::Cancelled => WslError::CommandFailed(
+                    "Update cancelled - administrator approval was not granted".to_string(),
+                ),
             };
             drop(state);
             if delay > 0 {
@@ -512,7 +528,13 @@ openSUSE-Tumbleweed                    openSUSE Tumbleweed
         }
     }
 
-    fn install(&self, distro: &str, name: Option<&str>, _location: Option<&str>, _no_launch: bool) -> Result<CommandOutput, WslError> {
+    fn install(
+        &self,
+        distro: &str,
+        name: Option<&str>,
+        _location: Option<&str>,
+        _no_launch: bool,
+    ) -> Result<CommandOutput, WslError> {
         if let Some(err) = self.check_error("install") {
             return Err(err);
         }
@@ -535,7 +557,13 @@ openSUSE-Tumbleweed                    openSUSE Tumbleweed
         })
     }
 
-    fn import(&self, name: &str, _location: &str, _tarball: &str, version: Option<u8>) -> Result<CommandOutput, WslError> {
+    fn import(
+        &self,
+        name: &str,
+        _location: &str,
+        _tarball: &str,
+        version: Option<u8>,
+    ) -> Result<CommandOutput, WslError> {
         if let Some(err) = self.check_error("import") {
             return Err(err);
         }
@@ -557,7 +585,12 @@ openSUSE-Tumbleweed                    openSUSE Tumbleweed
         })
     }
 
-    fn export(&self, distro: &str, _file: &str, _format: Option<&str>) -> Result<CommandOutput, WslError> {
+    fn export(
+        &self,
+        distro: &str,
+        _file: &str,
+        _format: Option<&str>,
+    ) -> Result<CommandOutput, WslError> {
         if let Some(err) = self.check_error("export") {
             return Err(err);
         }
@@ -689,7 +722,10 @@ openSUSE-Tumbleweed                    openSUSE Tumbleweed
     }
 
     fn set_default_user(&self, distro: &str, username: &str) -> Result<CommandOutput, WslError> {
-        debug!("Mock: set_default_user distro='{}' user='{}'", distro, username);
+        debug!(
+            "Mock: set_default_user distro='{}' user='{}'",
+            distro, username
+        );
         self.simulate_delay(300);
 
         let state = self.state.lock().unwrap();
@@ -708,8 +744,16 @@ openSUSE-Tumbleweed                    openSUSE Tumbleweed
         }
     }
 
-    fn mount_disk(&self, disk: &str, _vhd: bool, _bare: bool, _name: Option<&str>,
-                  _fs_type: Option<&str>, _options: Option<&str>, _partition: Option<u32>) -> Result<CommandOutput, WslError> {
+    fn mount_disk(
+        &self,
+        disk: &str,
+        _vhd: bool,
+        _bare: bool,
+        _name: Option<&str>,
+        _fs_type: Option<&str>,
+        _options: Option<&str>,
+        _partition: Option<u32>,
+    ) -> Result<CommandOutput, WslError> {
         debug!("Mock: mount_disk disk='{}'", disk);
         self.simulate_delay(500);
         Ok(CommandOutput {
@@ -761,15 +805,26 @@ Default Version: 2
         })
     }
 
-    fn update(&self, pre_release: bool, current_version: Option<&str>) -> Result<CommandOutput, WslError> {
+    fn update(
+        &self,
+        pre_release: bool,
+        current_version: Option<&str>,
+    ) -> Result<CommandOutput, WslError> {
         if let Some(err) = self.check_error("update") {
             return Err(err);
         }
-        debug!("Mock: update pre_release={} current_version={:?}", pre_release, current_version);
+        debug!(
+            "Mock: update pre_release={} current_version={:?}",
+            pre_release, current_version
+        );
         self.simulate_delay(1000); // Reduced for faster tests
 
         let state = self.state.lock().unwrap();
-        let pre_release_suffix = if pre_release { " (pre-release channel)" } else { "" };
+        let pre_release_suffix = if pre_release {
+            " (pre-release channel)"
+        } else {
+            ""
+        };
         let message = match &state.update_result {
             MockUpdateResult::AlreadyUpToDate => {
                 match current_version {
@@ -788,11 +843,19 @@ Default Version: 2
         })
     }
 
-    fn exec(&self, distro: &str, id: Option<&str>, command: &str) -> Result<CommandOutput, WslError> {
+    fn exec(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+    ) -> Result<CommandOutput, WslError> {
         if let Some(err) = self.check_error("exec") {
             return Err(err);
         }
-        debug!("Mock: exec distro='{}' id={:?} command='{}'", distro, id, command);
+        debug!(
+            "Mock: exec distro='{}' id={:?} command='{}'",
+            distro, id, command
+        );
         self.simulate_delay(200);
 
         let state = self.state.lock().unwrap();
@@ -807,9 +870,16 @@ Default Version: 2
         // Simulate some common commands
         let stdout = if command.contains("cat /etc/os-release") {
             match distro {
-                d if d.contains("Ubuntu") => "PRETTY_NAME=\"Ubuntu 22.04.3 LTS\"\nNAME=\"Ubuntu\"\n".to_string(),
-                d if d.contains("Debian") => "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\nNAME=\"Debian GNU/Linux\"\n".to_string(),
-                d if d.contains("Alpine") => "PRETTY_NAME=\"Alpine Linux v3.18\"\nNAME=\"Alpine Linux\"\n".to_string(),
+                d if d.contains("Ubuntu") => {
+                    "PRETTY_NAME=\"Ubuntu 22.04.3 LTS\"\nNAME=\"Ubuntu\"\n".to_string()
+                }
+                d if d.contains("Debian") => {
+                    "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\nNAME=\"Debian GNU/Linux\"\n"
+                        .to_string()
+                }
+                d if d.contains("Alpine") => {
+                    "PRETTY_NAME=\"Alpine Linux v3.18\"\nNAME=\"Alpine Linux\"\n".to_string()
+                }
                 _ => "PRETTY_NAME=\"Linux\"\nNAME=\"Linux\"\n".to_string(),
             }
         } else if command.contains("df") || command.contains("stat") {
@@ -825,14 +895,28 @@ Default Version: 2
         })
     }
 
-    fn exec_with_timeout(&self, distro: &str, id: Option<&str>, command: &str, _timeout_secs: u64) -> Result<CommandOutput, WslError> {
+    fn exec_with_timeout(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+        _timeout_secs: u64,
+    ) -> Result<CommandOutput, WslError> {
         // Just delegate to exec for mock - timeout doesn't matter in tests
         self.exec(distro, id, command)
     }
 
-    fn exec_as_root(&self, distro: &str, id: Option<&str>, command: &str) -> Result<CommandOutput, WslError> {
+    fn exec_as_root(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+    ) -> Result<CommandOutput, WslError> {
         // Just delegate to exec for mock - user doesn't matter in tests
-        debug!("Mock: exec_as_root distro='{}' id={:?} command='{}'", distro, id, command);
+        debug!(
+            "Mock: exec_as_root distro='{}' id={:?} command='{}'",
+            distro, id, command
+        );
         self.exec(distro, id, command)
     }
 
@@ -852,7 +936,12 @@ Default Version: 2
         self.exec_system_with_timeout(distro, command, 30)
     }
 
-    fn exec_system_with_timeout(&self, _distro: &str, command: &str, _timeout_secs: u64) -> Result<CommandOutput, WslError> {
+    fn exec_system_with_timeout(
+        &self,
+        _distro: &str,
+        command: &str,
+        _timeout_secs: u64,
+    ) -> Result<CommandOutput, WslError> {
         if let Some(err) = self.check_error("exec_system") {
             return Err(err);
         }
@@ -872,7 +961,8 @@ ANSI_COLOR="1;34"
 HOME_URL="https://aka.ms/cbl-mariner"
 BUG_REPORT_URL="https://aka.ms/cbl-mariner"
 SUPPORT_URL="https://aka.ms/cbl-mariner"
-"#.to_string()
+"#
+            .to_string()
         } else if command.contains("ip") && command.contains("addr") {
             "10.5.0.2\n".to_string()
         } else if command.contains("free") {
@@ -913,7 +1003,11 @@ SUPPORT_URL="https://aka.ms/cbl-mariner"
                     }
                     return WslPreflightStatus::Unknown { message: msg };
                 }
-                _ => return WslPreflightStatus::Unknown { message: err.to_string() },
+                _ => {
+                    return WslPreflightStatus::Unknown {
+                        message: err.to_string(),
+                    }
+                }
             }
         }
         WslPreflightStatus::Ready
@@ -968,7 +1062,6 @@ mod tests {
         assert!(!output.stdout.contains("Running"));
     }
 
-
     #[test]
     fn test_check_preflight_returns_ready_by_default() {
         let executor = MockWslExecutor::new();
@@ -984,9 +1077,16 @@ mod tests {
         let status = executor.check_preflight();
         match status {
             WslPreflightStatus::Unknown { message } => {
-                assert!(message.contains("timed out"), "Expected timeout message, got: {}", message);
+                assert!(
+                    message.contains("timed out"),
+                    "Expected timeout message, got: {}",
+                    message
+                );
             }
-            _ => panic!("Expected Unknown status for timeout error, got: {:?}", status),
+            _ => panic!(
+                "Expected Unknown status for timeout error, got: {:?}",
+                status
+            ),
         }
     }
 

@@ -11,8 +11,8 @@ use std::time::SystemTime;
 
 use serde_json::{Value, json};
 
-use lightcraft_catalog::{Op, PhotoId};
 use crate::geocode::{GEONAMES_ATTRIBUTION, GEONAMES_FILES, GeoNames, LatLon};
+use lightcraft_catalog::{Op, PhotoId};
 
 use super::{CommandSpec, always, bad, bool_or, cmd, has_selection, str_param};
 use crate::activity::Cancel;

@@ -21,8 +21,8 @@ pub use wsl_command::{MockWslExecutor, WslCommandExecutor};
 pub use wsl_command::mock::MockErrorType;
 pub use wsl_command::MockUpdateResult;
 
-use std::sync::{Arc, OnceLock};
 use std::sync::atomic::{AtomicU8, Ordering};
+use std::sync::{Arc, OnceLock};
 
 use resource::{MockResourceMonitor, RealResourceMonitor};
 use terminal::{MockTerminalExecutor, RealTerminalExecutor};
@@ -49,7 +49,8 @@ fn init_executors() {
         WSL_EXECUTOR.get_or_init(|| wsl_mock.clone() as Arc<dyn WslCommandExecutor>);
 
         // Create terminal mock executor
-        TERMINAL_EXECUTOR.get_or_init(|| Arc::new(MockTerminalExecutor::new()) as Arc<dyn TerminalExecutor>);
+        TERMINAL_EXECUTOR
+            .get_or_init(|| Arc::new(MockTerminalExecutor::new()) as Arc<dyn TerminalExecutor>);
 
         // Create resource mock executor with reference to WSL mock for state consistency
         let resource_mock = MockResourceMonitor::with_wsl_mock(wsl_mock);
@@ -57,9 +58,12 @@ fn init_executors() {
     } else {
         log::info!("Initializing real executors");
 
-        WSL_EXECUTOR.get_or_init(|| Arc::new(RealWslExecutor::new()) as Arc<dyn WslCommandExecutor>);
-        TERMINAL_EXECUTOR.get_or_init(|| Arc::new(RealTerminalExecutor::new()) as Arc<dyn TerminalExecutor>);
-        RESOURCE_MONITOR.get_or_init(|| Arc::new(RealResourceMonitor::new()) as Arc<dyn ResourceMonitor>);
+        WSL_EXECUTOR
+            .get_or_init(|| Arc::new(RealWslExecutor::new()) as Arc<dyn WslCommandExecutor>);
+        TERMINAL_EXECUTOR
+            .get_or_init(|| Arc::new(RealTerminalExecutor::new()) as Arc<dyn TerminalExecutor>);
+        RESOURCE_MONITOR
+            .get_or_init(|| Arc::new(RealResourceMonitor::new()) as Arc<dyn ResourceMonitor>);
     }
 }
 
@@ -71,7 +75,10 @@ pub fn wsl_executor() -> &'static dyn WslCommandExecutor {
     if WSL_EXECUTOR.get().is_none() {
         init_executors();
     }
-    WSL_EXECUTOR.get().expect("WSL_EXECUTOR should be initialized by init_executors").as_ref()
+    WSL_EXECUTOR
+        .get()
+        .expect("WSL_EXECUTOR should be initialized by init_executors")
+        .as_ref()
 }
 
 /// Get the global terminal executor
@@ -79,7 +86,10 @@ pub fn terminal_executor() -> &'static dyn TerminalExecutor {
     if TERMINAL_EXECUTOR.get().is_none() {
         init_executors();
     }
-    TERMINAL_EXECUTOR.get().expect("TERMINAL_EXECUTOR should be initialized by init_executors").as_ref()
+    TERMINAL_EXECUTOR
+        .get()
+        .expect("TERMINAL_EXECUTOR should be initialized by init_executors")
+        .as_ref()
 }
 
 /// Get the global resource monitor
@@ -87,7 +97,10 @@ pub fn resource_monitor() -> &'static dyn ResourceMonitor {
     if RESOURCE_MONITOR.get().is_none() {
         init_executors();
     }
-    RESOURCE_MONITOR.get().expect("RESOURCE_MONITOR should be initialized by init_executors").as_ref()
+    RESOURCE_MONITOR
+        .get()
+        .expect("RESOURCE_MONITOR should be initialized by init_executors")
+        .as_ref()
 }
 
 /// Get the mock WSL executor for test configuration (only works in mock mode)
@@ -135,7 +148,9 @@ pub fn set_stubborn_shutdown(enabled: bool) {
 
 /// Check if force shutdown was used (for test verification)
 pub fn was_force_shutdown_used() -> bool {
-    mock_wsl_executor().map(|m| m.was_force_used()).unwrap_or(false)
+    mock_wsl_executor()
+        .map(|m| m.was_force_used())
+        .unwrap_or(false)
 }
 
 /// Reset mock state to default values (for E2E testing)
@@ -216,10 +231,7 @@ fn probe_distribution_id_support() -> bool {
 
 /// Check if a version string "major.minor.patch..." is >= the given threshold.
 fn is_version_gte(version: &str, req_major: u32, req_minor: u32, req_patch: u32) -> bool {
-    let parts: Vec<u32> = version
-        .split('.')
-        .filter_map(|p| p.parse().ok())
-        .collect();
+    let parts: Vec<u32> = version.split('.').filter_map(|p| p.parse().ok()).collect();
 
     let major = parts.first().copied().unwrap_or(0);
     let minor = parts.get(1).copied().unwrap_or(0);

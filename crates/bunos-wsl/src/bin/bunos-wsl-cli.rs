@@ -28,7 +28,10 @@ fn usage() -> ! {
 }
 
 fn flag<'a>(args: &'a [String], name: &str) -> Option<&'a str> {
-    args.iter().position(|a| a == name).and_then(|i| args.get(i + 1)).map(String::as_str)
+    args.iter()
+        .position(|a| a == name)
+        .and_then(|i| args.get(i + 1))
+        .map(String::as_str)
 }
 
 fn print<T: serde::Serialize>(v: &T) {
@@ -76,15 +79,22 @@ fn main() {
                 Some("get") => print(&detect::kernel_selection(&text)),
                 Some("set") => {
                     let kernel = args.get(2).unwrap_or_else(|| usage());
-                    let mut t = ini::set(&text, "wsl2", "kernel", &ini::escape_windows_path(kernel));
+                    let mut t =
+                        ini::set(&text, "wsl2", "kernel", &ini::escape_windows_path(kernel));
                     if let Some(m) = args.get(3) {
                         t = ini::set(&t, "wsl2", "kernelModules", &ini::escape_windows_path(m));
                     }
                     std::fs::write(&path, t).unwrap_or_else(|e| fail(e));
-                    print(&detect::kernel_selection(&std::fs::read_to_string(&path).unwrap_or_default()));
+                    print(&detect::kernel_selection(
+                        &std::fs::read_to_string(&path).unwrap_or_default(),
+                    ));
                 }
                 Some("unset") => {
-                    let t = ini::unset(&ini::unset(&text, "wsl2", "kernel"), "wsl2", "kernelModules");
+                    let t = ini::unset(
+                        &ini::unset(&text, "wsl2", "kernel"),
+                        "wsl2",
+                        "kernelModules",
+                    );
                     std::fs::write(&path, t).unwrap_or_else(|e| fail(e));
                     print(&detect::KernelSelection::default());
                 }
@@ -96,8 +106,12 @@ fn main() {
             let release = flag(&args, "--release").unwrap_or_else(|| usage());
             let base = flag(&args, "--base-url").unwrap_or_else(|| usage());
             let m = manifest::manifest_from_dir(Path::new(dir), release, base, &|k| match k {
-                ArtifactKind::Kernel | ArtifactKind::KernelModules => std::env::var("BUNOS_KERNEL_VERSION").unwrap_or_else(|_| "unknown".into()),
-                ArtifactKind::WslgSystem => std::env::var("BUNOS_WSLG_VERSION").unwrap_or_else(|_| "unknown".into()),
+                ArtifactKind::Kernel | ArtifactKind::KernelModules => {
+                    std::env::var("BUNOS_KERNEL_VERSION").unwrap_or_else(|_| "unknown".into())
+                }
+                ArtifactKind::WslgSystem => {
+                    std::env::var("BUNOS_WSLG_VERSION").unwrap_or_else(|_| "unknown".into())
+                }
                 ArtifactKind::Rootfs => release.to_string(),
             })
             .unwrap_or_else(|e| fail(e));
@@ -139,12 +153,14 @@ fn main() {
                 print(&plan);
                 return;
             }
-            install::execute(&plan, &m, &dir, exec, &mut |l| eprintln!("{l}")).unwrap_or_else(|e| fail(e));
+            install::execute(&plan, &m, &dir, exec, &mut |l| eprintln!("{l}"))
+                .unwrap_or_else(|e| fail(e));
             print(&plan);
         }
         Some("session") => {
             let distro = args.get(1).unwrap_or_else(|| usage());
-            let c = session::Compositor::parse(args.get(2).unwrap_or_else(|| usage())).unwrap_or_else(|| usage());
+            let c = session::Compositor::parse(args.get(2).unwrap_or_else(|| usage()))
+                .unwrap_or_else(|| usage());
             session::apply_session(exec, distro, c).unwrap_or_else(|e| fail(e));
             print(&c);
         }

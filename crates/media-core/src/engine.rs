@@ -26,7 +26,12 @@ fn to_f32(img: &RgbaImage) -> Image<[f32; 4]> {
             .pixels()
             .map(|p| {
                 let a = f32::from(p[3]) / 255.0;
-                [f32::from(p[0]) / 255.0 * a, f32::from(p[1]) / 255.0 * a, f32::from(p[2]) / 255.0 * a, a]
+                [
+                    f32::from(p[0]) / 255.0 * a,
+                    f32::from(p[1]) / 255.0 * a,
+                    f32::from(p[2]) / 255.0 * a,
+                    a,
+                ]
             })
             .collect(),
     }
@@ -52,7 +57,12 @@ pub fn resize(img: &RgbaImage, w: u32, h: u32, f: Filter) -> Result<RgbaImage> {
     if w == 0 || h == 0 {
         return Err(Error::Invalid("resize to zero size".into()));
     }
-    from_f32(&resample::resize(&to_f32(img), w as usize, h as usize, filter(f)))
+    from_f32(&resample::resize(
+        &to_f32(img),
+        w as usize,
+        h as usize,
+        filter(f),
+    ))
 }
 
 /// Gaussian blur with the canonical `lightcraft-raster` O(1)-per-pixel box-cascade blur.
@@ -98,7 +108,9 @@ pub fn apply(img: RgbaImage, op: &Op, ai: &dyn AiBackend) -> Result<RgbaImage> {
         Op::Contrast { factor_milli } => {
             let mut img = img;
             let f = *factor_milli as f32 / 1000.0;
-            map_rgb(&mut img, |v| ((v as f32 - 127.5) * f + 127.5).round().clamp(0.0, 255.0) as u8);
+            map_rgb(&mut img, |v| {
+                ((v as f32 - 127.5) * f + 127.5).round().clamp(0.0, 255.0) as u8
+            });
             Ok(img)
         }
         Op::Grayscale => {

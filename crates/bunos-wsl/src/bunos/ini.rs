@@ -3,7 +3,11 @@
 //! and the file's line ending are kept; only the requested key changes.
 
 fn eol_of(text: &str) -> &'static str {
-    if text.contains("\r\n") { "\r\n" } else { "\n" }
+    if text.contains("\r\n") {
+        "\r\n"
+    } else {
+        "\n"
+    }
 }
 
 fn section_name(line: &str) -> Option<String> {
@@ -136,7 +140,10 @@ mod tests {
     #[test]
     fn get_ignores_case_and_inline_comments() {
         assert_eq!(get(SAMPLE, "WSL2", "MEMORY").as_deref(), Some("8GB"));
-        assert_eq!(get(SAMPLE, "experimental", "sparsevhd").as_deref(), Some("true"));
+        assert_eq!(
+            get(SAMPLE, "experimental", "sparsevhd").as_deref(),
+            Some("true")
+        );
         assert_eq!(get(SAMPLE, "wsl2", "swap"), None);
     }
 

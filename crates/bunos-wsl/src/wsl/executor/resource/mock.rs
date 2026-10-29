@@ -2,12 +2,15 @@
 //!
 //! Returns realistic mock values for resource usage, disk information, and registry queries.
 
-use std::sync::Arc;
 use log::debug;
+use std::sync::Arc;
 
 use std::collections::HashMap;
 
-use super::{DistroRegistryInfo, DistroResourceUsage, RenameRegistryResult, ResourceMonitor, WslHealth, WslHealthStatus};
+use super::{
+    DistroRegistryInfo, DistroResourceUsage, RenameRegistryResult, ResourceMonitor, WslHealth,
+    WslHealthStatus,
+};
 use crate::wsl::executor::wsl_command::MockWslExecutor;
 use crate::wsl::types::{DiskPartition, PhysicalDisk, WslError};
 
@@ -24,7 +27,9 @@ impl MockResourceMonitor {
 
     /// Create with a reference to the WSL executor mock for state consistency
     pub fn with_wsl_mock(wsl_mock: Arc<MockWslExecutor>) -> Self {
-        Self { wsl_mock: Some(wsl_mock) }
+        Self {
+            wsl_mock: Some(wsl_mock),
+        }
     }
 }
 
@@ -75,12 +80,12 @@ impl ResourceMonitor for MockResourceMonitor {
 
         // Return mock values based on distro name
         let (mock_memory, mock_cpu) = match distro {
-            "Ubuntu" => (512_000_000, 2.5),        // ~512MB, 2.5% CPU
-            "Ubuntu-22.04" => (384_000_000, 1.8),  // ~384MB, 1.8% CPU
-            "Debian" => (256_000_000, 0.5),        // ~256MB, 0.5% CPU
-            "Alpine" => (64_000_000, 0.2),         // ~64MB, 0.2% CPU
-            "Fedora" => (320_000_000, 1.2),        // ~320MB, 1.2% CPU
-            _ => (128_000_000, 0.3),               // ~128MB, 0.3% CPU default
+            "Ubuntu" => (512_000_000, 2.5),       // ~512MB, 2.5% CPU
+            "Ubuntu-22.04" => (384_000_000, 1.8), // ~384MB, 1.8% CPU
+            "Debian" => (256_000_000, 0.5),       // ~256MB, 0.5% CPU
+            "Alpine" => (64_000_000, 0.2),        // ~64MB, 0.2% CPU
+            "Fedora" => (320_000_000, 1.2),       // ~320MB, 1.2% CPU
+            _ => (128_000_000, 0.3),              // ~128MB, 0.3% CPU default
         };
 
         Ok(DistroResourceUsage {
@@ -99,21 +104,33 @@ impl ResourceMonitor for MockResourceMonitor {
         if let Some(ref wsl_mock) = self.wsl_mock {
             for (i, name) in wsl_mock.get_distro_names().iter().enumerate() {
                 let guid = format!("{{mock-guid-{:04}-0000-0000-{:012}}}", i, i);
-                result.insert(name.clone(), DistroRegistryInfo {
-                    id: guid,
-                    
-                    base_path: Some(format!(r"C:\Users\MockUser\AppData\Local\Packages\{}", name)),
-                });
+                result.insert(
+                    name.clone(),
+                    DistroRegistryInfo {
+                        id: guid,
+
+                        base_path: Some(format!(
+                            r"C:\Users\MockUser\AppData\Local\Packages\{}",
+                            name
+                        )),
+                    },
+                );
             }
         } else {
             // Default mock distros
             for (i, name) in ["Ubuntu", "Debian", "Alpine"].iter().enumerate() {
                 let guid = format!("{{mock-guid-{:04}-0000-0000-{:012}}}", i, i);
-                result.insert(name.to_string(), DistroRegistryInfo {
-                    id: guid,
-                    
-                    base_path: Some(format!(r"C:\Users\MockUser\AppData\Local\Packages\{}", name)),
-                });
+                result.insert(
+                    name.to_string(),
+                    DistroRegistryInfo {
+                        id: guid,
+
+                        base_path: Some(format!(
+                            r"C:\Users\MockUser\AppData\Local\Packages\{}",
+                            name
+                        )),
+                    },
+                );
             }
         }
 
@@ -137,7 +154,10 @@ impl ResourceMonitor for MockResourceMonitor {
         }
 
         // Return a mock path
-        Some(format!(r"C:\Users\MockUser\AppData\Local\Packages\{}", name))
+        Some(format!(
+            r"C:\Users\MockUser\AppData\Local\Packages\{}",
+            name
+        ))
     }
 
     fn get_distro_vhdx_size(&self, name: &str) -> Option<u64> {
@@ -174,7 +194,10 @@ impl ResourceMonitor for MockResourceMonitor {
         }
 
         // Return mock VHDX path
-        Some(format!(r"C:\Users\MockUser\AppData\Local\Packages\{}\ext4.vhdx", name))
+        Some(format!(
+            r"C:\Users\MockUser\AppData\Local\Packages\{}\ext4.vhdx",
+            name
+        ))
     }
 
     fn compact_vhdx(&self, vhdx_path: &str) -> Result<(), WslError> {
@@ -230,13 +253,15 @@ impl ResourceMonitor for MockResourceMonitor {
         id: &str,
         new_name: &str,
     ) -> Result<RenameRegistryResult, WslError> {
-        debug!("Mock: rename_distribution_registry id='{}' new_name='{}'", id, new_name);
+        debug!(
+            "Mock: rename_distribution_registry id='{}' new_name='{}'",
+            id, new_name
+        );
 
         // Use the WSL mock to rename
         if let Some(ref wsl_mock) = self.wsl_mock {
             let _old_name = wsl_mock.rename_distro(id, new_name)?;
             Ok(RenameRegistryResult {
-                
                 terminal_profile_path: None,
                 shortcut_path: None,
             })
@@ -269,13 +294,25 @@ mod tests {
 
         for (name, registry_info) in &info {
             // GUID should start with { and end with }
-            assert!(registry_info.id.starts_with('{'), "GUID for {} should start with {{", name);
-            assert!(registry_info.id.ends_with('}'), "GUID for {} should end with }}", name);
+            assert!(
+                registry_info.id.starts_with('{'),
+                "GUID for {} should start with {{",
+                name
+            );
+            assert!(
+                registry_info.id.ends_with('}'),
+                "GUID for {} should end with }}",
+                name
+            );
 
             // Name in info should match the key
 
             // Base path should be present
-            assert!(registry_info.base_path.is_some(), "Base path for {} should be present", name);
+            assert!(
+                registry_info.base_path.is_some(),
+                "Base path for {} should be present",
+                name
+            );
         }
     }
 

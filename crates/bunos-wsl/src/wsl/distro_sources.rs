@@ -25,8 +25,7 @@ fn effective_mock_mode() -> bool {
 }
 
 /// Registry path under `HKEY_LOCAL_MACHINE` for the WSL distribution list values.
-pub const HKLM_LXSS_PATH: &str =
-    r"SOFTWARE\Microsoft\Windows\CurrentVersion\Lxss";
+pub const HKLM_LXSS_PATH: &str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Lxss";
 
 /// Registry value name for the override URL (replaces the default list).
 pub const VALUE_DISTRIBUTION_LIST_URL: &str = "DistributionListUrl";
@@ -267,13 +266,13 @@ fn read_current_source_windows() -> Result<Option<DistroSource>, WslError> {
     let append: Option<String> = key.get_value(VALUE_DISTRIBUTION_LIST_URL_APPEND).ok();
 
     match (replace, append) {
-        (Some(r), Some(a)) if !r.trim().is_empty() && !a.trim().is_empty() => Err(
-            WslError::ParseError(
+        (Some(r), Some(a)) if !r.trim().is_empty() && !a.trim().is_empty() => {
+            Err(WslError::ParseError(
                 "Both DistributionListUrl and DistributionListUrlAppend are set in the registry. \
                  Reset distribution sources to clear this conflict."
                     .to_string(),
-            ),
-        ),
+            ))
+        }
         (Some(r), _) if !r.trim().is_empty() => Ok(Some(DistroSource {
             url: r,
             mode: DistroSourceMode::Replace,
@@ -388,8 +387,7 @@ fn run_elevated_powershell(inner_script: &str, op_tag: &str) -> Result<(), WslEr
 
     let paths = get_executable_paths();
 
-    static NEXT_OUTPUT_ID: std::sync::atomic::AtomicU64 =
-        std::sync::atomic::AtomicU64::new(0);
+    static NEXT_OUTPUT_ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     let output_id = NEXT_OUTPUT_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     let temp_dir = std::env::temp_dir();
     let output_file = temp_dir.join(format!(
@@ -422,7 +420,13 @@ fn run_elevated_powershell(inner_script: &str, op_tag: &str) -> Result<(), WslEr
     );
 
     let output = hidden_command(&paths.powershell)
-        .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", &outer])
+        .args([
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            &outer,
+        ])
         .output()
         .map_err(|e| WslError::CommandFailed(format!("Failed to start PowerShell: {}", e)))?;
 
@@ -675,7 +679,9 @@ mod tests {
             mode: DistroSourceMode::Append,
         };
         apply_source(&src).unwrap();
-        let read = read_current_source().unwrap().expect("should have a source");
+        let read = read_current_source()
+            .unwrap()
+            .expect("should have a source");
         assert_eq!(read.url, src.url);
         assert_eq!(read.mode, DistroSourceMode::Append);
 
@@ -693,7 +699,9 @@ mod tests {
 
         apply_source(&src).unwrap();
 
-        let read = read_current_source().unwrap().expect("should have a source");
+        let read = read_current_source()
+            .unwrap()
+            .expect("should have a source");
         assert_eq!(read.url, "https://example.test/m.json");
     }
 

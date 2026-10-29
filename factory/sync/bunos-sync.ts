@@ -35,7 +35,11 @@ async function git(...args: string[]): Promise<{ code: number; out: string }> {
     stderr: "pipe",
     env: { ...process.env, GIT_TERMINAL_PROMPT: "0" },
   });
-  const [out, err, code] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text(), proc.exited]);
+  const [out, err, code] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    proc.exited,
+  ]);
   return { code, out: (out + err).trim() };
 }
 
@@ -87,7 +91,9 @@ async function pass(): Promise<Outcome> {
 async function main() {
   if (!loop) {
     const outcome = await pass();
-    process.exit(outcome === "diverged" || outcome === "dirty" || outcome === "wrong-branch" ? 2 : outcome === "error" ? 1 : 0);
+    process.exit(
+      outcome === "diverged" || outcome === "dirty" || outcome === "wrong-branch" ? 2 : outcome === "error" ? 1 : 0,
+    );
   }
   for (;;) {
     await pass();

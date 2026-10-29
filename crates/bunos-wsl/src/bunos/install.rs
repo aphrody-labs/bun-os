@@ -37,10 +37,22 @@ impl InstallRequest {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(tag = "step", rename_all = "kebab-case")]
 pub enum Step {
-    Verify { artifact: String, sha256: String },
-    Import { name: String, location: String, tarball: String },
-    WriteWslConfig { path: PathBuf, content: String },
-    SetDefault { name: String },
+    Verify {
+        artifact: String,
+        sha256: String,
+    },
+    Import {
+        name: String,
+        location: String,
+        tarball: String,
+    },
+    WriteWslConfig {
+        path: PathBuf,
+        content: String,
+    },
+    SetDefault {
+        name: String,
+    },
     Shutdown,
 }
 
@@ -66,7 +78,10 @@ pub enum InstallError {
 }
 
 fn valid_distro_name(n: &str) -> bool {
-    !n.is_empty() && n.len() <= 64 && n.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
+    !n.is_empty()
+        && n.len() <= 64
+        && n.chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
 }
 
 /// Build the plan. `wslconfig` is the current text of `%USERPROFILE%\.wslconfig` (empty if absent).
@@ -80,38 +95,80 @@ pub fn build_plan(
         return Err(InstallError::BadName(req.distro_name.clone()));
     }
     m.validate()?;
-    let rootfs = m.artifact(ArtifactKind::Rootfs).ok_or(InstallError::MissingArtifact(ArtifactKind::Rootfs))?;
-    let mut steps = vec![Step::Verify { artifact: rootfs.name.clone(), sha256: rootfs.sha256.clone() }];
+    let rootfs = m
+        .artifact(ArtifactKind::Rootfs)
+        .ok_or(InstallError::MissingArtifact(ArtifactKind::Rootfs))?;
+    let mut steps = vec![Step::Verify {
+        artifact: rootfs.name.clone(),
+        sha256: rootfs.sha256.clone(),
+    }];
     let mut config = wslconfig.to_string();
     let mut config_changed = false;
     if req.use_kernel {
-        let kernel = m.artifact(ArtifactKind::Kernel).ok_or(InstallError::MissingArtifact(ArtifactKind::Kernel))?;
-        steps.push(Step::Verify { artifact: kernel.name.clone(), sha256: kernel.sha256.clone() });
-        config = ini::set(&config, "wsl2", "kernel", &ini::escape_windows_path(&req.artifact_dir.join(&kernel.name).to_string_lossy()));
+        let kernel = m
+            .artifact(ArtifactKind::Kernel)
+            .ok_or(InstallError::MissingArtifact(ArtifactKind::Kernel))?;
+        steps.push(Step::Verify {
+            artifact: kernel.name.clone(),
+            sha256: kernel.sha256.clone(),
+        });
+        config = ini::set(
+            &config,
+            "wsl2",
+            "kernel",
+            &ini::escape_windows_path(&req.artifact_dir.join(&kernel.name).to_string_lossy()),
+        );
         if let Some(mods) = m.artifact(ArtifactKind::KernelModules) {
-            steps.push(Step::Verify { artifact: mods.name.clone(), sha256: mods.sha256.clone() });
-            config = ini::set(&config, "wsl2", "kernelModules", &ini::escape_windows_path(&req.artifact_dir.join(&mods.name).to_string_lossy()));
+            steps.push(Step::Verify {
+                artifact: mods.name.clone(),
+                sha256: mods.sha256.clone(),
+            });
+            config = ini::set(
+                &config,
+                "wsl2",
+                "kernelModules",
+                &ini::escape_windows_path(&req.artifact_dir.join(&mods.name).to_string_lossy()),
+            );
         }
         config_changed = config != wslconfig;
     }
     steps.push(Step::Import {
         name: req.distro_name.clone(),
         location: req.install_dir.clone(),
-        tarball: req.artifact_dir.join(&rootfs.name).to_string_lossy().into_owned(),
+        tarball: req
+            .artifact_dir
+            .join(&rootfs.name)
+            .to_string_lossy()
+            .into_owned(),
     });
     if req.make_default {
-        steps.push(Step::SetDefault { name: req.distro_name.clone() });
+        steps.push(Step::SetDefault {
+            name: req.distro_name.clone(),
+        });
     }
     if config_changed {
-        steps.push(Step::WriteWslConfig { path: wslconfig_path.to_path_buf(), content: config });
+        steps.push(Step::WriteWslConfig {
+            path: wslconfig_path.to_path_buf(),
+            content: config,
+        });
         // The kernel is read when the VM boots.
         steps.push(Step::Shutdown);
     }
     Ok(InstallPlan { steps })
 }
 
-fn command_ok(step: &'static str, out: crate::wsl::executor::CommandOutput) -> Result<(), InstallError> {
-    if out.success { Ok(()) } else { Err(InstallError::Command { step, detail: out.stderr }) }
+fn command_ok(
+    step: &'static str,
+    out: crate::wsl::executor::CommandOutput,
+) -> Result<(), InstallError> {
+    if out.success {
+        Ok(())
+    } else {
+        Err(InstallError::Command {
+            step,
+            detail: out.stderr,
+        })
+    }
 }
 
 /// Run a plan. All `Verify` steps come first in a plan, so nothing is imported or written when an
@@ -127,10 +184,18 @@ pub fn execute(
         match step {
             Step::Verify { artifact, .. } => {
                 progress(&format!("verify {artifact}"));
-                let a = m.artifacts.iter().find(|a| &a.name == artifact).ok_or_else(|| ManifestError::BadName(artifact.clone()))?;
+                let a = m
+                    .artifacts
+                    .iter()
+                    .find(|a| &a.name == artifact)
+                    .ok_or_else(|| ManifestError::BadName(artifact.clone()))?;
                 verify_artifact(&artifact_dir.join(&a.name), a)?;
             }
-            Step::Import { name, location, tarball } => {
+            Step::Import {
+                name,
+                location,
+                tarball,
+            } => {
                 progress(&format!("import {name}"));
                 std::fs::create_dir_all(location).map_err(|e| InstallError::Io(e.to_string()))?;
                 command_ok("import", exec.import(name, location, tarball, Some(2))?)?;
@@ -144,7 +209,8 @@ pub fn execute(
                 if path.exists() {
                     let backup = path.with_file_name(".wslconfig.bunos-backup");
                     if !backup.exists() {
-                        std::fs::copy(path, &backup).map_err(|e| InstallError::Io(e.to_string()))?;
+                        std::fs::copy(path, &backup)
+                            .map_err(|e| InstallError::Io(e.to_string()))?;
                     }
                 }
                 std::fs::write(path, content).map_err(|e| InstallError::Io(e.to_string()))?;
@@ -167,13 +233,38 @@ mod tests {
 
     fn manifest(with_modules: bool) -> Manifest {
         let mut artifacts = vec![
-            Artifact { kind: ArtifactKind::Rootfs, name: "bunos-wsl.tar.gz".into(), version: "1".into(), url: "https://x.test/r".into(), sha256: SHA_ABC.into(), size: Some(3) },
-            Artifact { kind: ArtifactKind::Kernel, name: "bzImage".into(), version: "7.3".into(), url: "https://x.test/k".into(), sha256: SHA_ABC.into(), size: Some(3) },
+            Artifact {
+                kind: ArtifactKind::Rootfs,
+                name: "bunos-wsl.tar.gz".into(),
+                version: "1".into(),
+                url: "https://x.test/r".into(),
+                sha256: SHA_ABC.into(),
+                size: Some(3),
+            },
+            Artifact {
+                kind: ArtifactKind::Kernel,
+                name: "bzImage".into(),
+                version: "7.3".into(),
+                url: "https://x.test/k".into(),
+                sha256: SHA_ABC.into(),
+                size: Some(3),
+            },
         ];
         if with_modules {
-            artifacts.push(Artifact { kind: ArtifactKind::KernelModules, name: "modules.vhdx".into(), version: "7.3".into(), url: "https://x.test/m".into(), sha256: SHA_ABC.into(), size: Some(3) });
+            artifacts.push(Artifact {
+                kind: ArtifactKind::KernelModules,
+                name: "modules.vhdx".into(),
+                version: "7.3".into(),
+                url: "https://x.test/m".into(),
+                sha256: SHA_ABC.into(),
+                size: Some(3),
+            });
         }
-        Manifest { schema: 1, release: "t".into(), artifacts }
+        Manifest {
+            schema: 1,
+            release: "t".into(),
+            artifacts,
+        }
     }
 
     fn dir_with_artifacts() -> tempfile::TempDir {
@@ -188,13 +279,31 @@ mod tests {
     fn plan_orders_verify_before_any_mutation_and_sets_the_kernel() {
         let d = dir_with_artifacts();
         let req = InstallRequest::new("C:\\wsl\\bunos", d.path());
-        let plan = build_plan(&manifest(true), &req, Path::new("C:\\u\\.wslconfig"), "[wsl2]\nmemory=8GB\n").unwrap();
-        let kinds: Vec<&str> = plan.steps.iter().map(|s| match s {
-            Step::Verify { .. } => "verify", Step::Import { .. } => "import", Step::WriteWslConfig { .. } => "write",
-            Step::SetDefault { .. } => "default", Step::Shutdown => "shutdown",
-        }).collect();
-        assert_eq!(kinds, ["verify", "verify", "verify", "import", "write", "shutdown"]);
-        let Step::WriteWslConfig { content, .. } = &plan.steps[4] else { panic!() };
+        let plan = build_plan(
+            &manifest(true),
+            &req,
+            Path::new("C:\\u\\.wslconfig"),
+            "[wsl2]\nmemory=8GB\n",
+        )
+        .unwrap();
+        let kinds: Vec<&str> = plan
+            .steps
+            .iter()
+            .map(|s| match s {
+                Step::Verify { .. } => "verify",
+                Step::Import { .. } => "import",
+                Step::WriteWslConfig { .. } => "write",
+                Step::SetDefault { .. } => "default",
+                Step::Shutdown => "shutdown",
+            })
+            .collect();
+        assert_eq!(
+            kinds,
+            ["verify", "verify", "verify", "import", "write", "shutdown"]
+        );
+        let Step::WriteWslConfig { content, .. } = &plan.steps[4] else {
+            panic!()
+        };
         assert!(content.contains("memory=8GB"));
         assert!(content.contains("kernel="));
         assert!(content.contains("kernelModules="));
@@ -216,11 +325,17 @@ mod tests {
         let d = dir_with_artifacts();
         let mut req = InstallRequest::new("C:\\wsl", d.path());
         req.distro_name = "bad name; rm".into();
-        assert!(matches!(build_plan(&manifest(false), &req, Path::new("x"), ""), Err(InstallError::BadName(_))));
+        assert!(matches!(
+            build_plan(&manifest(false), &req, Path::new("x"), ""),
+            Err(InstallError::BadName(_))
+        ));
         let mut m = manifest(false);
         m.artifacts.retain(|a| a.kind != ArtifactKind::Kernel);
         let req = InstallRequest::new("C:\\wsl", d.path());
-        assert!(matches!(build_plan(&m, &req, Path::new("x"), ""), Err(InstallError::MissingArtifact(ArtifactKind::Kernel))));
+        assert!(matches!(
+            build_plan(&m, &req, Path::new("x"), ""),
+            Err(InstallError::MissingArtifact(ArtifactKind::Kernel))
+        ));
     }
 
     #[test]
@@ -238,7 +353,10 @@ mod tests {
         execute(&plan, &m, d.path(), &exec, &mut |l| log.push(l.to_string())).unwrap();
         assert!(log.iter().any(|l| l.starts_with("import bunos")));
         assert!(std::fs::read_to_string(&cfg).unwrap().contains("kernel="));
-        assert_eq!(std::fs::read_to_string(work.path().join(".wslconfig.bunos-backup")).unwrap(), "[wsl2]\nmemory=8GB\n");
+        assert_eq!(
+            std::fs::read_to_string(work.path().join(".wslconfig.bunos-backup")).unwrap(),
+            "[wsl2]\nmemory=8GB\n"
+        );
         let listed = exec.list_verbose().unwrap().stdout;
         assert!(listed.contains("bunos"), "{listed}");
     }
@@ -254,7 +372,10 @@ mod tests {
         let plan = build_plan(&m, &req, &cfg, "").unwrap();
         let exec = MockWslExecutor::new();
         let err = execute(&plan, &m, d.path(), &exec, &mut |_| {}).unwrap_err();
-        assert!(matches!(err, InstallError::Manifest(ManifestError::Mismatch { .. })));
+        assert!(matches!(
+            err,
+            InstallError::Manifest(ManifestError::Mismatch { .. })
+        ));
         assert!(!cfg.exists());
         assert!(!exec.list_verbose().unwrap().stdout.contains("bunos"));
     }

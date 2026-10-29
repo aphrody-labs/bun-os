@@ -4,7 +4,17 @@
   "branch": "master",
   "license": "AGPL-3.0-only",
   "copy": [
-    { "from": "src", "to": "apps/lu/src", "skip": ["src/lib/__tests__/release-rules.test.ts", "src/lib/__tests__/signpath-stages.test.ts", "src/lib/__tests__/site-legal-pages.test.ts", "src/lib/__tests__/stage-three-keeps-the-other-platforms.test.ts", "src/lib/__tests__/windows-signpath.test.ts"] },
+    {
+      "from": "src",
+      "to": "apps/lu/src",
+      "skip": [
+        "src/lib/__tests__/release-rules.test.ts",
+        "src/lib/__tests__/signpath-stages.test.ts",
+        "src/lib/__tests__/site-legal-pages.test.ts",
+        "src/lib/__tests__/stage-three-keeps-the-other-platforms.test.ts",
+        "src/lib/__tests__/windows-signpath.test.ts"
+      ]
+    },
     { "from": "dev-server", "to": "apps/lu/dev-server" },
     { "from": "public", "to": "apps/lu/public" },
     { "from": "e2e", "to": "apps/lu/e2e" },
@@ -16,13 +26,27 @@
     { "from": "src-tauri", "to": "apps/lu/src-tauri", "skip": ["src-tauri/plugins/lu-native", "src-tauri/target"] },
     { "from": "mobile-docs", "to": "docs/ai/mobile" },
     { "from": "third-party", "to": "docs/ai/third-party" },
-    { "from": "scripts", "to": "apps/lu/scripts", "skip": [
-      "scripts/windows-signpath.mjs", "scripts/windows-signpath.d.mts", "scripts/signpath-stages.mjs",
-      "scripts/windows-signing-setup.ps1", "scripts/windows-signing-verify.ps1", "scripts/signing-config.sh",
-      "scripts/macos-release-signing.sh", "scripts/mark-old-releases.mjs", "scripts/release-dry-run.mjs",
-      "scripts/release-rules.mjs", "scripts/release-rules.d.mts", "scripts/enforce-prerelease.mjs",
-      "scripts/site-publish-date.mjs", "scripts/check-cloud-sales.mjs", "scripts/scorecard"
-    ] },
+    {
+      "from": "scripts",
+      "to": "apps/lu/scripts",
+      "skip": [
+        "scripts/windows-signpath.mjs",
+        "scripts/windows-signpath.d.mts",
+        "scripts/signpath-stages.mjs",
+        "scripts/windows-signing-setup.ps1",
+        "scripts/windows-signing-verify.ps1",
+        "scripts/signing-config.sh",
+        "scripts/macos-release-signing.sh",
+        "scripts/mark-old-releases.mjs",
+        "scripts/release-dry-run.mjs",
+        "scripts/release-rules.mjs",
+        "scripts/release-rules.d.mts",
+        "scripts/enforce-prerelease.mjs",
+        "scripts/site-publish-date.mjs",
+        "scripts/check-cloud-sales.mjs",
+        "scripts/scorecard"
+      ]
+    },
     { "from": "index.html", "to": "apps/lu/index.html" },
     { "from": "vite.config.ts", "to": "apps/lu/vite.config.ts" },
     { "from": "vitest.config.ts", "to": "apps/lu/vitest.config.ts" },

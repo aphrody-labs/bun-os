@@ -88,9 +88,8 @@ fn boot(
         #[cfg(feature = "wii")]
         "gc" => bun_engine::machine::wii::WiiMachine::gamecube_dol(rom).map(|m| Box::new(m) as _),
         #[cfg(any(feature = "nds", feature = "ctr"))]
-        "nds" | "3ds" => {
-            bun_engine::machine::handheld::HandheldMachine::from_path(path).map(|m| Box::new(m) as _)
-        }
+        "nds" | "3ds" => bun_engine::machine::handheld::HandheldMachine::from_path(path)
+            .map(|m| Box::new(m) as _),
         #[cfg(feature = "switch")]
         "switch" => bun_engine::machine::switch::Switch::from_path(&name).map(|m| Box::new(m) as _),
         #[cfg(feature = "arm")]
@@ -216,7 +215,11 @@ fn parse_mask(case: &Value) -> Mask {
         .map(|a| {
             a.iter()
                 .filter_map(|r| {
-                    let v: Vec<usize> = r.as_array()?.iter().filter_map(|n| n.as_u64().map(|n| n as usize)).collect();
+                    let v: Vec<usize> = r
+                        .as_array()?
+                        .iter()
+                        .filter_map(|n| n.as_u64().map(|n| n as usize))
+                        .collect();
                     <[usize; 5]>::try_from(v).ok()
                 })
                 .collect()
@@ -294,7 +297,17 @@ fn rom_suite() {
         let input = parse_input(case);
         let mask = parse_mask(case);
         let save = case["savestate"].as_bool().unwrap_or(true);
-        let first = match run(system, core, &path, &rom, bios.as_deref(), frames, &input, &mask, save) {
+        let first = match run(
+            system,
+            core,
+            &path,
+            &rom,
+            bios.as_deref(),
+            frames,
+            &input,
+            &mask,
+            save,
+        ) {
             Ok(f) => f,
             Err(e) if e.starts_with("core-missing") => {
                 r["status"] = "core-missing".into();
@@ -321,7 +334,18 @@ fn rom_suite() {
                 continue;
             }
         };
-        let second = run(system, core, &path, &rom, bios.as_deref(), frames, &input, &mask, false).unwrap();
+        let second = run(
+            system,
+            core,
+            &path,
+            &rom,
+            bios.as_deref(),
+            frames,
+            &input,
+            &mask,
+            false,
+        )
+        .unwrap();
         let deterministic = first.hash == second.hash && first.audio_hash == second.audio_hash;
         let expected = case["hash"].as_str().unwrap_or("");
         r["frame_hash"] = first.hash.clone().into();

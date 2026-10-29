@@ -10,7 +10,9 @@ function fakeWindow() {
   };
   return { win, calls };
 }
-const fakeDoc = () => ({ documentElement: { dataset: {} as Record<string, string>, style: {} as Record<string, string> } });
+const fakeDoc = () => ({
+  documentElement: { dataset: {} as Record<string, string>, style: {} as Record<string, string> },
+});
 
 test("Windows maps Fluent to Mica and Material 3 to Acrylic", () => {
   expect(effectsFor("fluent", "windows")?.effects as unknown).toEqual(["mica"]);
@@ -26,7 +28,12 @@ test("macOS maps Apple to Liquid Glass, Linux has no native effect", () => {
 test("applyNativeTheme sets effects, scheme and a transparent root", async () => {
   const { win, calls } = fakeWindow();
   const document = fakeDoc();
-  const applied = await applyNativeTheme("fluent", { window: win, platform: "windows", scheme: "dark", document: document as never });
+  const applied = await applyNativeTheme("fluent", {
+    window: win,
+    platform: "windows",
+    scheme: "dark",
+    document: document as never,
+  });
   expect(applied).toEqual({ theme: "fluent", platform: "windows", effects: ["mica"], native: true });
   expect(calls.map(c => c[0])).toEqual(["setTheme", "setEffects"]);
   expect(document.documentElement.dataset.theme).toBe("fluent");
@@ -36,7 +43,12 @@ test("applyNativeTheme sets effects, scheme and a transparent root", async () =>
 test("applyNativeTheme clears effects where none exist", async () => {
   const { win, calls } = fakeWindow();
   const document = fakeDoc();
-  const applied = await applyNativeTheme("apple", { window: win, platform: "linux", scheme: "light", document: document as never });
+  const applied = await applyNativeTheme("apple", {
+    window: win,
+    platform: "linux",
+    scheme: "light",
+    document: document as never,
+  });
   expect(applied.native).toBe(false);
   expect(calls.map(c => c[0])).toEqual(["setTheme", "clearEffects"]);
   expect(document.documentElement.style.background).toBe("");

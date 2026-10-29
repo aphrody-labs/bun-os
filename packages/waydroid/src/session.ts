@@ -147,7 +147,9 @@ export class ScrcpySession {
 export async function ensureServerJar(path: string): Promise<string> {
   const file = Bun.file(path);
   if (await file.exists()) {
-    const sum = createHash("sha256").update(new Uint8Array(await file.arrayBuffer())).digest("hex");
+    const sum = createHash("sha256")
+      .update(new Uint8Array(await file.arrayBuffer()))
+      .digest("hex");
     if (sum === SCRCPY_SERVER_SHA256) return path;
   }
   const res = await fetch(SCRCPY_SERVER_URL);
@@ -169,13 +171,25 @@ export interface StartOptions {
 
 /** Push the pinned server, start it through `adb shell` and connect video + control through an adb forward. */
 export async function startOnDevice(adb: Adb, opts: StartOptions = {}): Promise<ScrcpySession> {
-  const jar = await ensureServerJar(opts.jarPath ?? `${process.env.TMPDIR ?? process.env.TEMP ?? "/tmp"}/scrcpy-server-v${SCRCPY_VERSION}.jar`);
+  const jar = await ensureServerJar(
+    opts.jarPath ?? `${process.env.TMPDIR ?? process.env.TEMP ?? "/tmp"}/scrcpy-server-v${SCRCPY_VERSION}.jar`,
+  );
   const remoteJar = "/data/local/tmp/scrcpy-server.jar";
   await adb.push(jar, remoteJar);
   const scid = Math.floor(Math.random() * 0x7fff_ffff);
   const args = serverArgs({ scid, ...opts });
   const server = Bun.spawn(
-    [adb.bin, ...(adb.serial ? ["-s", adb.serial] : []), "shell", `CLASSPATH=${remoteJar}`, "app_process", "/", "com.genymobile.scrcpy.Server", SCRCPY_VERSION, ...args],
+    [
+      adb.bin,
+      ...(adb.serial ? ["-s", adb.serial] : []),
+      "shell",
+      `CLASSPATH=${remoteJar}`,
+      "app_process",
+      "/",
+      "com.genymobile.scrcpy.Server",
+      SCRCPY_VERSION,
+      ...args,
+    ],
     { stdout: "pipe", stderr: "pipe" },
   );
   const port = await adb.forward(`localabstract:${socketName(scid)}`);
@@ -188,7 +202,13 @@ export async function startOnDevice(adb: Adb, opts: StartOptions = {}): Promise<
       continue;
     }
     // adb forward accepts immediately; a dead remote shows up as a closed socket before any byte.
-    const ok = await Promise.race([c.queue.peek(1).then(() => true, () => false), Bun.sleep(1500).then(() => false)]);
+    const ok = await Promise.race([
+      c.queue.peek(1).then(
+        () => true,
+        () => false,
+      ),
+      Bun.sleep(1500).then(() => false),
+    ]);
     if (ok) {
       video = c;
     } else {

@@ -58,11 +58,17 @@ mod tests {
             assert!(temp_path.exists(), "File should exist after creation");
 
             let _guard = TempFileGuard::new(&temp_path);
-            assert!(temp_path.exists(), "File should exist while guard is in scope");
+            assert!(
+                temp_path.exists(),
+                "File should exist while guard is in scope"
+            );
         } // Guard dropped here
 
         // File should be removed after guard is dropped
-        assert!(!temp_path.exists(), "File should be removed after guard is dropped");
+        assert!(
+            !temp_path.exists(),
+            "File should be removed after guard is dropped"
+        );
     }
 
     #[test]
@@ -78,7 +84,10 @@ mod tests {
         } // Guard dropped here
 
         // File should still exist because we called keep()
-        assert!(temp_path.exists(), "File should exist after guard with keep() is dropped");
+        assert!(
+            temp_path.exists(),
+            "File should exist after guard with keep() is dropped"
+        );
 
         // Cleanup
         let _ = std::fs::remove_file(&temp_path);
@@ -115,7 +124,10 @@ mod tests {
         });
 
         assert!(result.is_err(), "Should have panicked");
-        assert!(!temp_path.exists(), "File should be cleaned up even after panic");
+        assert!(
+            !temp_path.exists(),
+            "File should be cleaned up even after panic"
+        );
     }
 
     #[test]
@@ -142,10 +154,16 @@ mod tests {
             std::fs::write(dir_path.join("nested").join("file.dat"), b"test data").unwrap();
 
             let _guard = TempFileGuard::new(&dir_path);
-            assert!(dir_path.exists(), "Directory should exist while guard is in scope");
+            assert!(
+                dir_path.exists(),
+                "Directory should exist while guard is in scope"
+            );
         } // Guard dropped here
 
-        assert!(!dir_path.exists(), "Directory tree should be removed after guard is dropped");
+        assert!(
+            !dir_path.exists(),
+            "Directory tree should be removed after guard is dropped"
+        );
     }
 
     #[test]
@@ -159,7 +177,10 @@ mod tests {
             guard.keep();
         }
 
-        assert!(dir_path.exists(), "Directory should exist after guard with keep() is dropped");
+        assert!(
+            dir_path.exists(),
+            "Directory should exist after guard with keep() is dropped"
+        );
 
         // Cleanup
         let _ = std::fs::remove_dir_all(&dir_path);

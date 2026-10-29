@@ -48,12 +48,20 @@ async function gcloud(...a: string[]): Promise<{ code: number; out: string; err:
 
 const listed = await gcloud("services", "list", "--enabled", "--project", project, "--format=value(config.name)");
 if (listed.code !== 0) {
-  console.error(`cannot list services of ${project}: ${listed.err.split("\n").filter(l => !l.startsWith("WARNING")).join(" ").trim()}`);
+  console.error(
+    `cannot list services of ${project}: ${listed.err
+      .split("\n")
+      .filter(l => !l.startsWith("WARNING"))
+      .join(" ")
+      .trim()}`,
+  );
   process.exit(1);
 }
 const enabled = new Set(listed.out.split(/\s+/).filter(Boolean));
 const missing = recipe.apis.filter(a => !enabled.has(a.name));
-console.log(`project ${project}: ${enabled.size} APIs enabled, ${recipe.apis.length - missing.length}/${recipe.apis.length} of the recipe present`);
+console.log(
+  `project ${project}: ${enabled.size} APIs enabled, ${recipe.apis.length - missing.length}/${recipe.apis.length} of the recipe present`,
+);
 for (const a of recipe.apis) console.log(`${enabled.has(a.name) ? "ok     " : "MISSING"} ${a.name}  ${a.use}`);
 
 if (missing.length === 0) {

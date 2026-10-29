@@ -122,8 +122,8 @@ impl Default for DownloadLimits {
     fn default() -> Self {
         Self {
             max_file_size: Some(10 * 1024 * 1024 * 1024), // 10GB
-            overall_timeout: Duration::from_secs(3600),     // 1 hour
-            progress_timeout: Duration::from_secs(300),      // 5 minutes
+            overall_timeout: Duration::from_secs(3600),   // 1 hour
+            progress_timeout: Duration::from_secs(300),   // 5 minutes
         }
     }
 }
@@ -136,7 +136,15 @@ pub async fn download_with_progress_and_checksum<E: ProgressEmitter>(
     distro_name: &str,
     expected_checksum: Option<String>,
 ) -> Result<(), String> {
-    download_with_progress_and_limits(app, url, dest_path, distro_name, DownloadLimits::default(), expected_checksum).await
+    download_with_progress_and_limits(
+        app,
+        url,
+        dest_path,
+        distro_name,
+        DownloadLimits::default(),
+        expected_checksum,
+    )
+    .await
 }
 
 /// Download a file with progress events, custom resource limits, and optional checksum verification
@@ -151,7 +159,14 @@ pub async fn download_with_progress_and_limits<E: ProgressEmitter>(
     // Wrap the entire download in an overall timeout
     match timeout(
         limits.overall_timeout,
-        download_with_limits_impl(app, url, dest_path, distro_name, limits.clone(), expected_checksum),
+        download_with_limits_impl(
+            app,
+            url,
+            dest_path,
+            distro_name,
+            limits.clone(),
+            expected_checksum,
+        ),
     )
     .await
     {
@@ -185,7 +200,10 @@ async fn download_with_limits_impl<E: ProgressEmitter>(
         .map_err(|e| format!("Failed to start download: {}", e))?;
 
     if !response.status().is_success() {
-        return Err(format!("Download failed with status: {}", response.status()));
+        return Err(format!(
+            "Download failed with status: {}",
+            response.status()
+        ));
     }
 
     let total_size = response.content_length();
@@ -526,7 +544,8 @@ mod tests {
             socket.read(&mut request).await.unwrap();
             socket.write_all(&response).await.unwrap();
         });
-        let dest_path = std::env::temp_dir().join(format!("test_download_progress_{}.dat", address.port()));
+        let dest_path =
+            std::env::temp_dir().join(format!("test_download_progress_{}.dat", address.port()));
         let app = RecordingApp::default();
         let result = download_with_progress_and_limits(
             &app,
@@ -552,7 +571,10 @@ mod tests {
             b"abcd",
         )
         .await;
-        let final_download = events.iter().rfind(|event| event.stage == "downloading").unwrap();
+        let final_download = events
+            .iter()
+            .rfind(|event| event.stage == "downloading")
+            .unwrap();
         assert_eq!(final_download.bytes_downloaded, 4);
         assert!(final_download.percent.is_none());
         assert!(final_download.total_bytes.is_none());
@@ -565,15 +587,29 @@ mod tests {
         let mut response = format!(
             "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n{:x}\r\n",
             body.len()
-        ).into_bytes();
+        )
+        .into_bytes();
         response.extend_from_slice(&body);
         response.extend_from_slice(b"\r\n0\r\n\r\n");
         let events = download_raw_response(response, &body).await;
-        let downloading: Vec<_> = events.iter().filter(|event| event.stage == "downloading").collect();
-        assert!(downloading.iter().any(|event| event.bytes_downloaded > 0 && event.bytes_downloaded < 3 * 1024 * 1024));
-        assert!(downloading.len() <= 10, "Must throttle updates instead of emitting every network chunk");
-        assert_eq!(downloading.last().unwrap().bytes_downloaded, 3 * 1024 * 1024);
-        assert!(downloading.iter().all(|event| event.percent.is_none() && event.total_bytes.is_none()));
+        let downloading: Vec<_> = events
+            .iter()
+            .filter(|event| event.stage == "downloading")
+            .collect();
+        assert!(downloading
+            .iter()
+            .any(|event| event.bytes_downloaded > 0 && event.bytes_downloaded < 3 * 1024 * 1024));
+        assert!(
+            downloading.len() <= 10,
+            "Must throttle updates instead of emitting every network chunk"
+        );
+        assert_eq!(
+            downloading.last().unwrap().bytes_downloaded,
+            3 * 1024 * 1024
+        );
+        assert!(downloading
+            .iter()
+            .all(|event| event.percent.is_none() && event.total_bytes.is_none()));
     }
 
     #[tokio::test]
@@ -582,17 +618,26 @@ mod tests {
         let mut response = format!(
             "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
             body.len()
-        ).into_bytes();
+        )
+        .into_bytes();
         response.extend_from_slice(&body);
         let events = download_raw_response(response, &body).await;
-        let downloading: Vec<_> = events.iter().filter(|event| event.stage == "downloading").collect();
+        let downloading: Vec<_> = events
+            .iter()
+            .filter(|event| event.stage == "downloading")
+            .collect();
         // The initial zero event is separate from the stream's percentage throttle.
         for pair in downloading[1..].windows(2) {
-            assert_ne!(pair[0].percent.unwrap() as i32, pair[1].percent.unwrap() as i32);
+            assert_ne!(
+                pair[0].percent.unwrap() as i32,
+                pair[1].percent.unwrap() as i32
+            );
         }
         assert!(downloading.len() <= 102);
         assert_eq!(downloading.last().unwrap().percent, Some(100.0));
-        assert!(downloading.iter().all(|event| event.total_bytes == Some(3 * 1024 * 1024)));
+        assert!(downloading
+            .iter()
+            .all(|event| event.total_bytes == Some(3 * 1024 * 1024)));
     }
 
     #[tokio::test]
@@ -602,8 +647,13 @@ mod tests {
             b"",
         )
         .await;
-        assert!(events.iter().all(|event| event.bytes_downloaded == 0 && event.total_bytes == Some(0)));
-        assert!(events.iter().filter_map(|event| event.percent).all(f32::is_finite));
+        assert!(events
+            .iter()
+            .all(|event| event.bytes_downloaded == 0 && event.total_bytes == Some(0)));
+        assert!(events
+            .iter()
+            .filter_map(|event| event.percent)
+            .all(f32::is_finite));
         assert_eq!(events.last().unwrap().stage, "importing");
     }
 
@@ -628,7 +678,8 @@ mod tests {
             socket.write_all(b"4\r\nijkl\r\n0\r\n\r\n").await.unwrap();
         });
 
-        let dest_path = std::env::temp_dir().join(format!("test_chunked_progress_{}.dat", address.port()));
+        let dest_path =
+            std::env::temp_dir().join(format!("test_chunked_progress_{}.dat", address.port()));
         let app = RecordingApp::default();
         let result = download_with_progress_and_limits(
             &app,
@@ -646,12 +697,19 @@ mod tests {
         assert_eq!(contents, b"abcdefghijkl");
 
         let events = app.0.lock().unwrap();
-        let downloading: Vec<_> = events.iter().filter(|event| event.stage == "downloading").collect();
+        let downloading: Vec<_> = events
+            .iter()
+            .filter(|event| event.stage == "downloading")
+            .collect();
         assert!(
-            downloading.iter().any(|event| event.bytes_downloaded > 0 && event.bytes_downloaded < 12),
+            downloading
+                .iter()
+                .any(|event| event.bytes_downloaded > 0 && event.bytes_downloaded < 12),
             "Unknown-length downloads must report bytes while the transfer is running"
         );
-        assert!(downloading.iter().all(|event| event.total_bytes.is_none() && event.percent.is_none()));
+        assert!(downloading
+            .iter()
+            .all(|event| event.total_bytes.is_none() && event.percent.is_none()));
         assert_eq!(downloading.last().unwrap().bytes_downloaded, 12);
         assert_eq!(events.last().unwrap().stage, "importing");
     }
@@ -666,10 +724,7 @@ mod tests {
         let body = vec![0u8; large_size];
         Mock::given(method("GET"))
             .and(path("/large-file"))
-            .respond_with(
-                ResponseTemplate::new(200)
-                    .set_body_bytes(body),
-            )
+            .respond_with(ResponseTemplate::new(200).set_body_bytes(body))
             .mount(&mock_server)
             .await;
 
@@ -980,10 +1035,7 @@ mod tests {
 
         // File should not exist or be cleaned up
         // Note: In this case the file isn't created because the request fails
-        assert!(
-            !dest_path.exists(),
-            "File should not exist after error"
-        );
+        assert!(!dest_path.exists(), "File should not exist after error");
 
         // Cleanup
         let _ = tokio::fs::remove_file(&dest_path).await;
@@ -1001,7 +1053,7 @@ mod tests {
     #[test]
     fn test_custom_limits() {
         let limits = DownloadLimits {
-            max_file_size: Some(100 * 1024 * 1024), // 100MB
+            max_file_size: Some(100 * 1024 * 1024),    // 100MB
             overall_timeout: Duration::from_secs(600), // 10 minutes
             progress_timeout: Duration::from_secs(60), // 1 minute
         };
@@ -1040,7 +1092,10 @@ mod tests {
         .await;
 
         // Should succeed with valid checksum
-        assert!(result.is_ok(), "Download should succeed with valid checksum");
+        assert!(
+            result.is_ok(),
+            "Download should succeed with valid checksum"
+        );
 
         // File should exist
         assert!(dest_path.exists(), "Downloaded file should exist");
@@ -1082,7 +1137,10 @@ mod tests {
         .await;
 
         // Should fail with invalid checksum
-        assert!(result.is_err(), "Download should fail with invalid checksum");
+        assert!(
+            result.is_err(),
+            "Download should fail with invalid checksum"
+        );
         let err = result.unwrap_err();
         assert!(
             err.contains("Checksum verification failed"),
@@ -1091,7 +1149,10 @@ mod tests {
         );
 
         // File should not exist (cleaned up after checksum failure)
-        assert!(!dest_path.exists(), "File should be deleted after checksum failure");
+        assert!(
+            !dest_path.exists(),
+            "File should be deleted after checksum failure"
+        );
     }
 
     #[tokio::test]
@@ -1161,13 +1222,12 @@ mod tests {
         .await;
 
         // Should succeed with uppercase checksum
-        assert!(result.is_ok(), "Download should succeed with uppercase checksum");
+        assert!(
+            result.is_ok(),
+            "Download should succeed with uppercase checksum"
+        );
 
         // Cleanup
         let _ = tokio::fs::remove_file(&dest_path).await;
     }
 }
-
-
-
-

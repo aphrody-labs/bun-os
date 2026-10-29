@@ -19,11 +19,8 @@
     clippy::unreachable
 )]
 
-pub mod audit;
-pub mod preflight;
-pub mod compare_core;
-pub mod ocr_core;
 pub mod actions;
+pub mod audit;
 pub mod autotag;
 pub mod build_info;
 pub mod camera;
@@ -32,14 +29,17 @@ pub mod camera_edges;
 pub mod catalog;
 pub mod commands;
 pub mod compare;
+pub mod compare_core;
 mod copy_image;
 pub mod dates;
 pub mod export;
 pub mod js;
 pub mod links;
 pub mod ocr;
+pub mod ocr_core;
 pub mod optimizer;
 pub mod perspective;
+pub mod preflight;
 pub mod printcheck;
 mod scan_colours;
 pub mod signature_image;
@@ -153,6 +153,7 @@ pub fn typed_signature_graphic(text: &str) -> Option<pdfcraft_sign::Graphic> {
         .then_some(pdfcraft_sign::Graphic::Outlines(o.contours))
 }
 
+pub use crate::preflight as pdfa;
 pub use links::{
     MAX_REMOTE_DOCUMENT_BYTES, RemoteDocumentPathError, read_remote_document,
     remote_document_path_is_absolute, resolve_remote_document_path,
@@ -167,7 +168,6 @@ pub use pdfcraft_annot::{
 };
 pub use pdfcraft_forms::detect;
 pub use pdfcraft_optimize as optimize;
-pub use crate::preflight as pdfa;
 pub use pdfcraft_print as print;
 pub use pdfcraft_redact::codes::{CODE_SETS as REDACTION_CODE_SETS, CodeSet as RedactionCodeSet};
 pub use pdfcraft_redact::patterns::{

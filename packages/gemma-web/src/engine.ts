@@ -84,7 +84,7 @@ export class GemmaWebEngine {
   async load(): Promise<LoadStats> {
     const v = this.variant;
     const ort = this.#ort;
-    const file = (p: string) => v.files.find((f) => f.path === p)!.bytes;
+    const file = (p: string) => v.files.find(f => f.path === p)!.bytes;
     const t0 = performance.now();
     this.#store.plan(v.files);
     const tokJson = JSON.parse(await this.#store.text("tokenizer.json", file("tokenizer.json")));
@@ -120,8 +120,8 @@ export class GemmaWebEngine {
     this.#dec = await session(v.decoder, this.#ep, this.#ep === "webgpu");
     const meta = (this.#dec as unknown as { inputMetadata?: readonly Record<string, unknown>[] }).inputMetadata ?? [];
     this.#kv = [];
-    for (const name of this.#dec.inputNames.filter((n) => n.startsWith("past_key_values"))) {
-      const m = meta.find((x) => x["name"] === name) as { type?: string; shape?: (number | string)[] } | undefined;
+    for (const name of this.#dec.inputNames.filter(n => n.startsWith("past_key_values"))) {
+      const m = meta.find(x => x["name"] === name) as { type?: string; shape?: (number | string)[] } | undefined;
       this.#kv.push({
         name,
         type: m?.type === "float32" ? "float32" : "float16",
@@ -235,7 +235,7 @@ export class GemmaWebEngine {
         if (delta.endsWith("�")) delta = ""; // incomplete UTF-8 sequence, wait for the next token
         if (delta) {
           emitted = text;
-          const stopAt = o.stop?.map((s) => text.indexOf(s)).filter((x) => x >= 0);
+          const stopAt = o.stop?.map(s => text.indexOf(s)).filter(x => x >= 0);
           if (stopAt?.length) {
             const cut = Math.min(...stopAt);
             const keep = text.slice(0, cut);

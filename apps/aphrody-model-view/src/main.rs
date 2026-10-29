@@ -40,22 +40,33 @@ fn parse_args() -> Result<Args, String> {
         match arg.as_str() {
             "--size" => {
                 let value = args.next().ok_or("--size needs a value")?;
-                size = Some(value.parse().map_err(|_| format!("invalid --size {value}"))?);
-            },
+                size = Some(
+                    value
+                        .parse()
+                        .map_err(|_| format!("invalid --size {value}"))?,
+                );
+            }
             "--dark" => dark = true,
             "--gdi" => gdi = true,
             "-h" | "--help" => {
-                return Err("usage: aphrody-model-view <model.glb|.gltf|.obj|scene.json> [--size \
+                return Err(
+                    "usage: aphrody-model-view <model.glb|.gltf|.obj|scene.json> [--size \
                             N] [--dark] [--gdi]"
-                    .into());
-            },
+                        .into(),
+                );
+            }
             other if path.is_none() => path = Some(PathBuf::from(other)),
             other => return Err(format!("unexpected argument {other}")),
         }
     }
     let path = path.ok_or("missing model path")?;
     let path = std::fs::canonicalize(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-    Ok(Args { path, size, dark, gdi })
+    Ok(Args {
+        path,
+        size,
+        dark,
+        gdi,
+    })
 }
 
 fn modified(path: &PathBuf) -> Option<SystemTime> {
@@ -70,7 +81,7 @@ fn main() -> std::process::ExitCode {
         Err(message) => {
             eprintln!("{message}");
             return std::process::ExitCode::from(2);
-        },
+        }
     };
     let result = tauri::Builder::default()
         .runtime(Wry::default())
@@ -94,7 +105,10 @@ fn main() -> std::process::ExitCode {
                     .build()?;
             let info = aphrody_tauri_3d::attach_window(&window.as_ref().window())?;
             log::info!("native 3D layer: {info:?}");
-            let options = ModelOptions { dark: Some(args.dark), ..ModelOptions::default() };
+            let options = ModelOptions {
+                dark: Some(args.dark),
+                ..ModelOptions::default()
+            };
             aphrody_tauri_3d::load_path(app.handle(), "main", &args.path, &options)?;
 
             // Live reload: agents and editors control the view by rewriting the file.
@@ -111,8 +125,10 @@ fn main() -> std::process::ExitCode {
                         std::thread::sleep(Duration::from_millis(60));
                         let (inner, file) = (handle.clone(), path.clone());
                         let _ = handle.run_on_main_thread(move || {
-                            let options =
-                                ModelOptions { dark: Some(args.dark), ..ModelOptions::default() };
+                            let options = ModelOptions {
+                                dark: Some(args.dark),
+                                ..ModelOptions::default()
+                            };
                             if let Err(error) =
                                 aphrody_tauri_3d::load_path(&inner, "main", &file, &options)
                             {

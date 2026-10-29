@@ -32,14 +32,25 @@ impl MemoryVault {
 
 impl TokenVault for MemoryVault {
     fn get(&self, key: &str) -> Result<Option<String>> {
-        Ok(self.map.lock().map_err(|_| Error::Vault("poisoned".into()))?.get(key).cloned())
+        Ok(self
+            .map
+            .lock()
+            .map_err(|_| Error::Vault("poisoned".into()))?
+            .get(key)
+            .cloned())
     }
     fn set(&self, key: &str, value: &str) -> Result<()> {
-        self.map.lock().map_err(|_| Error::Vault("poisoned".into()))?.insert(key.into(), value.into());
+        self.map
+            .lock()
+            .map_err(|_| Error::Vault("poisoned".into()))?
+            .insert(key.into(), value.into());
         Ok(())
     }
     fn delete(&self, key: &str) -> Result<()> {
-        self.map.lock().map_err(|_| Error::Vault("poisoned".into()))?.remove(key);
+        self.map
+            .lock()
+            .map_err(|_| Error::Vault("poisoned".into()))?
+            .remove(key);
         Ok(())
     }
     fn name(&self) -> &'static str {
@@ -64,7 +75,9 @@ const CHUNK: usize = 1200;
 impl KeyringVault {
     /// Vault under a keyring service name (default `aphrody-accounts`).
     pub fn new(service: impl Into<String>) -> Self {
-        Self { service: service.into() }
+        Self {
+            service: service.into(),
+        }
     }
     fn entry(&self, key: &str) -> Result<keyring::Entry> {
         keyring::Entry::new(&self.service, key).map_err(|e| Error::Vault(e.to_string()))
@@ -87,11 +100,19 @@ impl KeyringVault {
 #[cfg(feature = "os-keyring")]
 impl TokenVault for KeyringVault {
     fn get(&self, key: &str) -> Result<Option<String>> {
-        let Some(n) = self.read(&format!("{key}#n"))? else { return Ok(None) };
-        let n: usize = n.parse().map_err(|_| Error::Vault("corrupt chunk counter".into()))?;
+        let Some(n) = self.read(&format!("{key}#n"))? else {
+            return Ok(None);
+        };
+        let n: usize = n
+            .parse()
+            .map_err(|_| Error::Vault("corrupt chunk counter".into()))?;
         let mut out = String::new();
         for i in 0..n {
-            out.push_str(&self.read(&format!("{key}#{i}"))?.ok_or_else(|| Error::Vault("missing chunk".into()))?);
+            out.push_str(
+                &self
+                    .read(&format!("{key}#{i}"))?
+                    .ok_or_else(|| Error::Vault("missing chunk".into()))?,
+            );
         }
         Ok(Some(out))
     }
@@ -99,12 +120,19 @@ impl TokenVault for KeyringVault {
         self.delete(key)?;
         let chunks: Vec<&str> = split_utf8(value, CHUNK);
         for (i, c) in chunks.iter().enumerate() {
-            self.entry(&format!("{key}#{i}"))?.set_password(c).map_err(|e| Error::Vault(e.to_string()))?;
+            self.entry(&format!("{key}#{i}"))?
+                .set_password(c)
+                .map_err(|e| Error::Vault(e.to_string()))?;
         }
-        self.entry(&format!("{key}#n"))?.set_password(&chunks.len().to_string()).map_err(|e| Error::Vault(e.to_string()))
+        self.entry(&format!("{key}#n"))?
+            .set_password(&chunks.len().to_string())
+            .map_err(|e| Error::Vault(e.to_string()))
     }
     fn delete(&self, key: &str) -> Result<()> {
-        if let Some(n) = self.read(&format!("{key}#n"))?.and_then(|n| n.parse::<usize>().ok()) {
+        if let Some(n) = self
+            .read(&format!("{key}#n"))?
+            .and_then(|n| n.parse::<usize>().ok())
+        {
             for i in 0..n {
                 self.remove(&format!("{key}#{i}"))?;
             }
@@ -155,15 +183,22 @@ impl SecretStoreVault {
 #[cfg(feature = "secrets")]
 impl TokenVault for SecretStoreVault {
     fn get(&self, key: &str) -> Result<Option<String>> {
-        let v = self.rt.block_on(self.store.get(key)).map_err(|e| Error::Vault(e.to_string()))?;
+        let v = self
+            .rt
+            .block_on(self.store.get(key))
+            .map_err(|e| Error::Vault(e.to_string()))?;
         Ok(v.map(|s| s.expose_secret().to_owned()))
     }
     fn set(&self, key: &str, value: &str) -> Result<()> {
         let v = aphrody_secrets::SecretValue::from_string(value.to_owned());
-        self.rt.block_on(self.store.set(key, v)).map_err(|e| Error::Vault(e.to_string()))
+        self.rt
+            .block_on(self.store.set(key, v))
+            .map_err(|e| Error::Vault(e.to_string()))
     }
     fn delete(&self, key: &str) -> Result<()> {
-        self.rt.block_on(self.store.delete(key)).map_err(|e| Error::Vault(e.to_string()))
+        self.rt
+            .block_on(self.store.delete(key))
+            .map_err(|e| Error::Vault(e.to_string()))
     }
     fn name(&self) -> &'static str {
         "aphrody-secrets"

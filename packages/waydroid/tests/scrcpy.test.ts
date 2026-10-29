@@ -54,9 +54,19 @@ describe("scrcpy protocol", () => {
     const t = encodeTouch({ action: ACTION.down, x: 100, y: 200, width: 720, height: 1280, pointerId: 5n });
     expect(t.byteLength).toBe(32);
     const v = new DataView(t.buffer);
-    expect([t[0], t[1], Number(v.getBigUint64(2)), v.getInt32(10), v.getInt32(14), v.getUint16(18), v.getUint16(20)]).toEqual([2, 0, 5, 100, 200, 720, 1280]);
+    expect([
+      t[0],
+      t[1],
+      Number(v.getBigUint64(2)),
+      v.getInt32(10),
+      v.getInt32(14),
+      v.getUint16(18),
+      v.getUint16(20),
+    ]).toEqual([2, 0, 5, 100, 200, 720, 1280]);
     expect(v.getUint16(22)).toBe(0xffff); // full pressure
-    expect(new DataView(encodeTouch({ action: ACTION.up, x: 0, y: 0, width: 1, height: 1 }).buffer).getUint16(22)).toBe(0);
+    expect(new DataView(encodeTouch({ action: ACTION.up, x: 0, y: 0, width: 1, height: 1 }).buffer).getUint16(22)).toBe(
+      0,
+    );
 
     const k = encodeKeycode(0, 66);
     expect([k.byteLength, k[0], new DataView(k.buffer).getInt32(2)]).toEqual([14, 0, 66]);
@@ -64,7 +74,12 @@ describe("scrcpy protocol", () => {
     const txt = encodeText("héllo");
     expect(new DataView(txt.buffer).getUint32(1)).toBe(6);
     const clip = encodeSetClipboard("abc", true, 3n);
-    expect([clip[0], clip[9], new DataView(clip.buffer).getUint32(10), clip.byteLength]).toEqual([9, 1, 3, 1 + 8 + 1 + 4 + 3]);
+    expect([clip[0], clip[9], new DataView(clip.buffer).getUint32(10), clip.byteLength]).toEqual([
+      9,
+      1,
+      3,
+      1 + 8 + 1 + 4 + 3,
+    ]);
 
     const s = encodeScroll({ x: 1, y: 2, width: 3, height: 4, dx: 0, dy: -16 });
     expect(new DataView(s.buffer).getInt16(15)).toBe(-0x7fff);

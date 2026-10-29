@@ -14,7 +14,6 @@
 #[cfg(not(feature = "denoise"))]
 extern crate lightcraft_denoise_core as lightcraft_denoise;
 
-pub mod geocode;
 pub mod activity;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod apple_photos;
@@ -38,6 +37,7 @@ mod faces_index;
 mod faces_worker;
 pub mod files;
 pub mod fonts;
+pub mod geocode;
 pub mod guard;
 pub mod import;
 mod import_move;

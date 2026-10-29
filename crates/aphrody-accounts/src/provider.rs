@@ -97,7 +97,10 @@ impl Endpoints {
     }
     /// Microsoft identity platform v2.0 endpoints for a tenant.
     pub fn microsoft(tenant: &Tenant) -> Self {
-        let base = format!("https://login.microsoftonline.com/{}/oauth2/v2.0", tenant.segment());
+        let base = format!(
+            "https://login.microsoftonline.com/{}/oauth2/v2.0",
+            tenant.segment()
+        );
         Self {
             authorize: format!("{base}/authorize"),
             token: format!("{base}/token"),
@@ -131,7 +134,10 @@ impl std::fmt::Debug for ProviderConfig {
         f.debug_struct("ProviderConfig")
             .field("provider", &self.provider)
             .field("client_id", &self.client_id)
-            .field("client_secret", &self.client_secret.as_ref().map(|_| "<redacted>"))
+            .field(
+                "client_secret",
+                &self.client_secret.as_ref().map(|_| "<redacted>"),
+            )
             .field("tenant", &self.tenant)
             .finish_non_exhaustive()
     }
@@ -151,7 +157,13 @@ impl ProviderConfig {
     /// Microsoft public client (mobile and desktop application platform) for a tenant.
     pub fn microsoft(client_id: impl Into<String>, tenant: Tenant) -> Self {
         let endpoints = Endpoints::microsoft(&tenant);
-        Self { provider: Provider::Microsoft, client_id: client_id.into(), client_secret: None, tenant, endpoints }
+        Self {
+            provider: Provider::Microsoft,
+            client_id: client_id.into(),
+            client_secret: None,
+            tenant,
+            endpoints,
+        }
     }
     /// Scopes always requested on top of the caller's (identity claims, refresh token for Microsoft).
     pub fn base_scopes(&self) -> &'static [&'static str] {
@@ -177,8 +189,14 @@ mod tests {
     #[test]
     fn microsoft_endpoints_follow_the_tenant() {
         let e = Endpoints::microsoft(&Tenant::Consumers);
-        assert_eq!(e.authorize, "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize");
-        assert_eq!(e.device, "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode");
+        assert_eq!(
+            e.authorize,
+            "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize"
+        );
+        assert_eq!(
+            e.device,
+            "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode"
+        );
         assert_eq!(
             Endpoints::microsoft(&Tenant::Id("contoso.onmicrosoft.com".into())).token,
             "https://login.microsoftonline.com/contoso.onmicrosoft.com/oauth2/v2.0/token"
@@ -187,7 +205,10 @@ mod tests {
 
     #[test]
     fn debug_redacts_the_client_secret() {
-        let c = ProviderConfig::google("id.apps.googleusercontent.com", Some("GOCSPX-supersecret".into()));
+        let c = ProviderConfig::google(
+            "id.apps.googleusercontent.com",
+            Some("GOCSPX-supersecret".into()),
+        );
         let dbg = format!("{c:?}");
         assert!(!dbg.contains("supersecret"));
         assert!(dbg.contains("<redacted>"));
@@ -197,6 +218,9 @@ mod tests {
     fn parses_names() {
         assert_eq!(Provider::parse("Entra"), Some(Provider::Microsoft));
         assert_eq!(Tenant::parse("ORGANIZATIONS"), Tenant::Organizations);
-        assert_eq!(Tenant::parse("72f988bf-86f1-41af-91ab-2d7cd011db47").segment(), "72f988bf-86f1-41af-91ab-2d7cd011db47");
+        assert_eq!(
+            Tenant::parse("72f988bf-86f1-41af-91ab-2d7cd011db47").segment(),
+            "72f988bf-86f1-41af-91ab-2d7cd011db47"
+        );
     }
 }

@@ -13,8 +13,8 @@ mod real;
 pub use mock::MockTerminalExecutor;
 pub use real::RealTerminalExecutor;
 
-use std::collections::HashMap;
 use crate::wsl::types::WslError;
+use std::collections::HashMap;
 
 /// Available container runtime
 #[derive(Debug, Clone, PartialEq)]
@@ -50,12 +50,23 @@ pub trait TerminalExecutor: Send + Sync {
 
     /// Open a terminal connected to a WSL distribution
     /// If `id` is provided, uses `--distribution-id` for more reliable identification
-    fn open_terminal(&self, distro: &str, id: Option<&str>, terminal_command: &str) -> Result<(), WslError>;
+    fn open_terminal(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        terminal_command: &str,
+    ) -> Result<(), WslError>;
 
     /// Open a terminal and execute a command in a WSL distribution
     /// The terminal stays open after the command completes so user can see output
     /// If `id` is provided, uses `--distribution-id` for more reliable identification
-    fn open_terminal_with_command(&self, distro: &str, id: Option<&str>, command: &str, terminal_command: &str) -> Result<(), WslError>;
+    fn open_terminal_with_command(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+        terminal_command: &str,
+    ) -> Result<(), WslError>;
 
     /// Open a terminal connected to the WSL2 system distro (CBL-Mariner/Azure Linux)
     /// Uses `wsl --system` to access the hidden system distribution
@@ -79,7 +90,12 @@ pub trait TerminalExecutor: Send + Sync {
     fn container_create(&self, runtime: &str, image: &str) -> Result<String, WslError>;
 
     /// Export a container to a tar file
-    fn container_export(&self, runtime: &str, container_id: &str, dest: &str) -> Result<(), WslError>;
+    fn container_export(
+        &self,
+        runtime: &str,
+        container_id: &str,
+        dest: &str,
+    ) -> Result<(), WslError>;
 
     /// Remove a container
     fn container_rm(&self, runtime: &str, container_id: &str) -> Result<(), WslError>;

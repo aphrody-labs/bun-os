@@ -71,7 +71,13 @@ impl ImageReference {
         let (repo_part, tag) = if let Some(idx) = ref_part.rfind(':') {
             // Make sure this : is not part of a port number
             let before_colon = &ref_part[..idx];
-            if before_colon.contains('/') || !before_colon.chars().last().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+            if before_colon.contains('/')
+                || !before_colon
+                    .chars()
+                    .last()
+                    .map(|c| c.is_ascii_digit())
+                    .unwrap_or(false)
+            {
                 let (r, t) = ref_part.split_at(idx);
                 (r, t[1..].to_string())
             } else {
@@ -115,7 +121,8 @@ impl ImageReference {
     /// Get a suggested distribution name based on the image
     pub fn suggested_name(&self) -> String {
         // Extract the last part of the repository
-        let repo_name = self.repository
+        let repo_name = self
+            .repository
             .rsplit('/')
             .next()
             .unwrap_or(&self.repository);
@@ -123,14 +130,27 @@ impl ImageReference {
         // Clean up the name
         let clean_name: String = repo_name
             .chars()
-            .map(|c| if c.is_alphanumeric() || c == '-' || c == '_' { c } else { '-' })
+            .map(|c| {
+                if c.is_alphanumeric() || c == '-' || c == '_' {
+                    c
+                } else {
+                    '-'
+                }
+            })
             .collect();
 
         // Add tag if not "latest"
         if self.tag != "latest" {
-            let clean_tag: String = self.tag
+            let clean_tag: String = self
+                .tag
                 .chars()
-                .map(|c| if c.is_alphanumeric() || c == '-' || c == '_' { c } else { '-' })
+                .map(|c| {
+                    if c.is_alphanumeric() || c == '-' || c == '_' {
+                        c
+                    } else {
+                        '-'
+                    }
+                })
                 .collect();
             format!("{}-{}", clean_name, clean_tag)
         } else {

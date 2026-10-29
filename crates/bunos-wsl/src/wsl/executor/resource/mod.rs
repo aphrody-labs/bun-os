@@ -77,7 +77,8 @@ pub trait ResourceMonitor: Send + Sync {
 
     /// Get all distribution registry info (IDs, names, paths) in one query
     /// Returns a HashMap keyed by distribution name (case-insensitive lookup recommended)
-    fn get_all_distro_registry_info(&self) -> std::collections::HashMap<String, DistroRegistryInfo>;
+    fn get_all_distro_registry_info(&self)
+        -> std::collections::HashMap<String, DistroRegistryInfo>;
 
     /// Locale-independent check that the Lxss registry key positively confirms
     /// zero registered distributions (GH #101).

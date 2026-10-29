@@ -18,7 +18,6 @@
 pub mod broker;
 #[cfg(feature = "cef")]
 pub mod cef;
-pub mod webview;
 pub mod desktop;
 pub mod explorer;
 pub mod identity;
@@ -35,6 +34,7 @@ pub mod showcase;
 pub mod studio;
 #[path = "web_subsystem.rs"]
 pub mod web_subsystem;
+pub mod webview;
 pub mod window;
 
 use std::{
@@ -785,11 +785,9 @@ pub fn run() {
         .runtime(webview::runtime())
         // single-instance must be the first plugin: a second launch focuses this window.
         // Its callback forwards the second launch's files and `aphrody://` links to this window.
-        .plugin(tauri_plugin_single_instance::init(
-            |app, args, cwd| {
-                integration::on_second_instance(app, &args, &cwd);
-            },
-        ))
+        .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+            integration::on_second_instance(app, &args, &cwd);
+        }))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(
             tauri_plugin_window_state::Builder::default()

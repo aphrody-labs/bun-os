@@ -6,9 +6,9 @@
 //! profile. A screen profile such as sRGB is reported as a screen profile, not accepted as a
 //! press condition.
 
+use crate::preflight::{Issue, Level};
 use pdfcraft_cos::Document;
 use pdfcraft_edit::PageImage;
-use crate::preflight::{Issue, Level};
 
 use crate::Document as OpenDocument;
 

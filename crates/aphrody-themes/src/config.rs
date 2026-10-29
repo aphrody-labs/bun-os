@@ -50,7 +50,12 @@ pub struct Selection {
 
 impl Default for Selection {
     fn default() -> Self {
-        Self { theme: "m3".into(), scheme: SchemeChoice::Auto, accent: ThemeId::M3.meta().default_accent.into(), transparency: None }
+        Self {
+            theme: "m3".into(),
+            scheme: SchemeChoice::Auto,
+            accent: ThemeId::M3.meta().default_accent.into(),
+            transparency: None,
+        }
     }
 }
 
@@ -62,7 +67,11 @@ impl Selection {
     /// Lenient parse: anything invalid falls back field by field, like `normalize` in the TypeScript runtime.
     pub fn from_json(text: &str) -> Self {
         let v: serde_json::Value = serde_json::from_str(text).unwrap_or(serde_json::Value::Null);
-        let theme = v.get("theme").and_then(|t| t.as_str()).and_then(ThemeId::parse).unwrap_or(ThemeId::M3);
+        let theme = v
+            .get("theme")
+            .and_then(|t| t.as_str())
+            .and_then(ThemeId::parse)
+            .unwrap_or(ThemeId::M3);
         let scheme = match v.get("scheme").and_then(|s| s.as_str()) {
             Some("light") => SchemeChoice::Light,
             Some("dark") => SchemeChoice::Dark,
@@ -75,8 +84,16 @@ impl Selection {
             .filter(|a| meta.accents.contains(a))
             .unwrap_or(meta.default_accent)
             .to_string();
-        let transparency = v.get("transparency").and_then(|t| t.as_f64()).map(|t| t.clamp(0.0, 1.0) as f32);
-        Self { theme: theme.as_str().into(), scheme, accent, transparency }
+        let transparency = v
+            .get("transparency")
+            .and_then(|t| t.as_f64())
+            .map(|t| t.clamp(0.0, 1.0) as f32);
+        Self {
+            theme: theme.as_str().into(),
+            scheme,
+            accent,
+            transparency,
+        }
     }
 
     pub fn to_json(&self) -> String {
@@ -93,14 +110,20 @@ pub fn config_path() -> PathBuf {
     } else if cfg!(target_os = "macos") {
         std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support"))
     } else {
-        std::env::var_os("XDG_CONFIG_HOME").map(PathBuf::from).or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
+        std::env::var_os("XDG_CONFIG_HOME")
+            .map(PathBuf::from)
+            .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
     };
-    base.unwrap_or_else(|| PathBuf::from(".")).join("aphrody").join("theme.json")
+    base.unwrap_or_else(|| PathBuf::from("."))
+        .join("aphrody")
+        .join("theme.json")
 }
 
 /// Reads the selection; a missing or unreadable file yields the default.
 pub fn read(path: &Path) -> Selection {
-    fs::read_to_string(path).map(|t| Selection::from_json(&t)).unwrap_or_default()
+    fs::read_to_string(path)
+        .map(|t| Selection::from_json(&t))
+        .unwrap_or_default()
 }
 
 /// Writes atomically (temporary file in the same directory, then rename) so watchers never see a partial file.
@@ -125,12 +148,18 @@ impl Drop for WatchHandle {
 }
 
 fn stamp(path: &Path) -> Option<(SystemTime, u64)> {
-    fs::metadata(path).ok().and_then(|m| Some((m.modified().ok()?, m.len())))
+    fs::metadata(path)
+        .ok()
+        .and_then(|m| Some((m.modified().ok()?, m.len())))
 }
 
 /// Polls `path` every `interval` and calls `on_change` with the new selection whenever the file changes and the
 /// parsed selection differs from the previous one. Polling keeps this dependency-free and identical on every OS.
-pub fn watch(path: PathBuf, interval: Duration, mut on_change: impl FnMut(Selection) + Send + 'static) -> WatchHandle {
+pub fn watch(
+    path: PathBuf,
+    interval: Duration,
+    mut on_change: impl FnMut(Selection) + Send + 'static,
+) -> WatchHandle {
     let stop = Arc::new(AtomicBool::new(false));
     let flag = stop.clone();
     // initial state is taken before the thread starts so a write right after `watch` returns is never missed

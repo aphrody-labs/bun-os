@@ -1,4 +1,4 @@
-use super::types::{DistroState, Distribution};
+use super::types::{Distribution, DistroState};
 
 /// Parse the output of `wsl --list --verbose`
 ///
@@ -433,7 +433,10 @@ mod tests {
         // UTF-8 and produced mojibake.
         let sample = "适用于 Linux 的 Windows 子系统没有已安装的分发版本。\n\
                       Try running 'wsl --status' in PowerShell to diagnose.";
-        let utf16le: Vec<u8> = sample.encode_utf16().flat_map(|c| c.to_le_bytes()).collect();
+        let utf16le: Vec<u8> = sample
+            .encode_utf16()
+            .flat_map(|c| c.to_le_bytes())
+            .collect();
         let decoded = decode_wsl_output(&utf16le);
         assert_eq!(decoded, sample);
     }
@@ -443,7 +446,10 @@ mod tests {
         // Regression: the leading characters are CJK (non-NUL high bytes), which
         // the old "first 10 pairs must be NUL" heuristic misclassified as UTF-8.
         let sample = "适用于 Linux 子系统未安装任何分发版本";
-        let utf16le: Vec<u8> = sample.encode_utf16().flat_map(|c| c.to_le_bytes()).collect();
+        let utf16le: Vec<u8> = sample
+            .encode_utf16()
+            .flat_map(|c| c.to_le_bytes())
+            .collect();
         let decoded = decode_wsl_output(&utf16le);
         assert_eq!(decoded, sample);
     }
@@ -451,7 +457,10 @@ mod tests {
     #[test]
     fn test_looks_like_utf16le_localized() {
         let sample = "適用于 Linux 的子系統\nTry running 'wsl --status'.";
-        let utf16le: Vec<u8> = sample.encode_utf16().flat_map(|c| c.to_le_bytes()).collect();
+        let utf16le: Vec<u8> = sample
+            .encode_utf16()
+            .flat_map(|c| c.to_le_bytes())
+            .collect();
         assert!(looks_like_utf16le(&utf16le));
     }
 
@@ -473,4 +482,3 @@ mod tests {
         assert_eq!(decoded, sample);
     }
 }
-

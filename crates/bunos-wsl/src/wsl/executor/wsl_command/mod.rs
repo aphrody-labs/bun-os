@@ -7,8 +7,8 @@
 pub mod mock;
 mod real;
 
-pub use mock::MockWslExecutor;
 pub use mock::MockUpdateResult;
+pub use mock::MockWslExecutor;
 pub use real::RealWslExecutor;
 
 use crate::wsl::types::{WslError, WslPreflightStatus};
@@ -60,13 +60,30 @@ pub trait WslCommandExecutor: Send + Sync {
     // === Installation Operations ===
 
     /// Execute `wsl --install <distro>` with optional name, location, and no-launch flag
-    fn install(&self, distro: &str, name: Option<&str>, location: Option<&str>, no_launch: bool) -> Result<CommandOutput, WslError>;
+    fn install(
+        &self,
+        distro: &str,
+        name: Option<&str>,
+        location: Option<&str>,
+        no_launch: bool,
+    ) -> Result<CommandOutput, WslError>;
 
     /// Execute `wsl --import <name> <location> <tarball>` with optional version
-    fn import(&self, name: &str, location: &str, tarball: &str, version: Option<u8>) -> Result<CommandOutput, WslError>;
+    fn import(
+        &self,
+        name: &str,
+        location: &str,
+        tarball: &str,
+        version: Option<u8>,
+    ) -> Result<CommandOutput, WslError>;
 
     /// Execute `wsl --export <distro> <file>` with optional format
-    fn export(&self, distro: &str, file: &str, format: Option<&str>) -> Result<CommandOutput, WslError>;
+    fn export(
+        &self,
+        distro: &str,
+        file: &str,
+        format: Option<&str>,
+    ) -> Result<CommandOutput, WslError>;
 
     // === Configuration Operations ===
 
@@ -91,8 +108,16 @@ pub trait WslCommandExecutor: Send + Sync {
     // === Disk Operations ===
 
     /// Execute `wsl --mount` with various options
-    fn mount_disk(&self, disk: &str, vhd: bool, bare: bool, name: Option<&str>,
-                  fs_type: Option<&str>, options: Option<&str>, partition: Option<u32>) -> Result<CommandOutput, WslError>;
+    fn mount_disk(
+        &self,
+        disk: &str,
+        vhd: bool,
+        bare: bool,
+        name: Option<&str>,
+        fs_type: Option<&str>,
+        options: Option<&str>,
+        partition: Option<u32>,
+    ) -> Result<CommandOutput, WslError>;
 
     /// Execute `wsl --unmount [disk]`
     fn unmount_disk(&self, disk: Option<&str>) -> Result<CommandOutput, WslError>;
@@ -109,24 +134,44 @@ pub trait WslCommandExecutor: Send + Sync {
 
     /// Execute `wsl --update` with optional --pre-release
     /// current_version is used for before/after comparison message
-    fn update(&self, pre_release: bool, current_version: Option<&str>) -> Result<CommandOutput, WslError>;
+    fn update(
+        &self,
+        pre_release: bool,
+        current_version: Option<&str>,
+    ) -> Result<CommandOutput, WslError>;
 
     // === Command Execution in Distro ===
 
     /// Execute a command inside a distribution with default timeout.
     /// Command is wrapped in `sh -c` for proper shell interpretation.
     /// If `id` is provided, uses `wsl --distribution-id <id>`, otherwise `wsl -d <distro>`
-    fn exec(&self, distro: &str, id: Option<&str>, command: &str) -> Result<CommandOutput, WslError>;
+    fn exec(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+    ) -> Result<CommandOutput, WslError>;
 
     /// Execute a command with custom timeout.
     /// Command is wrapped in `sh -c` for proper shell interpretation.
     /// If `id` is provided, uses `wsl --distribution-id <id>`, otherwise `wsl -d <distro>`
-    fn exec_with_timeout(&self, distro: &str, id: Option<&str>, command: &str, timeout_secs: u64) -> Result<CommandOutput, WslError>;
+    fn exec_with_timeout(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+        timeout_secs: u64,
+    ) -> Result<CommandOutput, WslError>;
 
     /// Execute a command inside a distribution as root user.
     /// Uses `wsl -u root` to run commands with root privileges.
     /// Useful for writing to system files like /etc/wsl.conf
-    fn exec_as_root(&self, distro: &str, id: Option<&str>, command: &str) -> Result<CommandOutput, WslError>;
+    fn exec_as_root(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+    ) -> Result<CommandOutput, WslError>;
 
     /// Get WSL2 network IP address
     /// Uses the system distro of the given (already running) distribution with
@@ -143,7 +188,12 @@ pub trait WslCommandExecutor: Send + Sync {
     fn exec_system(&self, distro: &str, command: &str) -> Result<CommandOutput, WslError>;
 
     /// Execute a command in the system distro with custom timeout
-    fn exec_system_with_timeout(&self, distro: &str, command: &str, timeout_secs: u64) -> Result<CommandOutput, WslError>;
+    fn exec_system_with_timeout(
+        &self,
+        distro: &str,
+        command: &str,
+        timeout_secs: u64,
+    ) -> Result<CommandOutput, WslError>;
 
     // === Preflight Check ===
 

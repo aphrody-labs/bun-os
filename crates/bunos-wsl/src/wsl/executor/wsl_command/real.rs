@@ -1,9 +1,9 @@
 //! Real WSL command executor - calls actual wsl.exe
 
+use bunos_wsl_core::decode_wsl_output;
+use log::{debug, error};
 use std::process::Stdio;
 use std::time::Duration;
-use log::{debug, error};
-use bunos_wsl_core::decode_wsl_output;
 
 use super::{CommandOutput, WslCommandExecutor};
 use crate::settings::{get_executable_paths, get_timeout_config};
@@ -136,8 +136,13 @@ fn classify_preflight_command_failure(
 }
 
 fn mount_disk_args(
-    disk: &str, vhd: bool, bare: bool, name: Option<&str>,
-    fs_type: Option<&str>, options: Option<&str>, partition: Option<u32>,
+    disk: &str,
+    vhd: bool,
+    bare: bool,
+    name: Option<&str>,
+    fs_type: Option<&str>,
+    options: Option<&str>,
+    partition: Option<u32>,
 ) -> Vec<String> {
     let mut args = vec!["--mount", disk];
     if vhd {
@@ -146,7 +151,11 @@ fn mount_disk_args(
     if bare {
         args.push("--bare");
     }
-    for (flag, value) in [("--name", name), ("--type", fs_type), ("--options", options)] {
+    for (flag, value) in [
+        ("--name", name),
+        ("--type", fs_type),
+        ("--options", options),
+    ] {
         if let Some(value) = value {
             args.extend([flag, value]);
         }
@@ -166,8 +175,13 @@ pub struct RealWslExecutor;
 fn command_timeout(args: &[&str], requested: Duration) -> Option<Duration> {
     match args.first().copied() {
         Some("--install" | "--import" | "--import-in-place" | "--export" | "--set-version") => None,
-        Some("--manage") if args.get(2).is_some_and(|flag|
-            matches!(*flag, "--move" | "--resize" | "--set-sparse")) => None,
+        Some("--manage")
+            if args
+                .get(2)
+                .is_some_and(|flag| matches!(*flag, "--move" | "--resize" | "--set-sparse")) =>
+        {
+            None
+        }
         _ => Some(requested),
     }
 }
@@ -198,11 +212,17 @@ impl RealWslExecutor {
     }
 
     /// Execute a WSL command with custom timeout
-    fn execute_with_timeout(&self, args: &[&str], timeout: Duration) -> Result<CommandOutput, WslError> {
+    fn execute_with_timeout(
+        &self,
+        args: &[&str],
+        timeout: Duration,
+    ) -> Result<CommandOutput, WslError> {
         let deadline = command_timeout(args, timeout);
         debug!(
             "Executing WSL command: {:?}",
-            args.iter().map(|a| redact_secrets_for_log(a)).collect::<Vec<_>>()
+            args.iter()
+                .map(|a| redact_secrets_for_log(a))
+                .collect::<Vec<_>>()
         );
 
         let paths = get_executable_paths();
@@ -303,10 +323,7 @@ impl WslCommandExecutor for RealWslExecutor {
     }
 
     fn list_running(&self) -> Result<CommandOutput, WslError> {
-        self.execute_with_timeout(
-            &["--list", "--running", "--quiet"],
-            self.quick_timeout(),
-        )
+        self.execute_with_timeout(&["--list", "--running", "--quiet"], self.quick_timeout())
     }
 
     fn list_quiet(&self, include_all: bool) -> Result<CommandOutput, WslError> {
@@ -347,7 +364,13 @@ impl WslCommandExecutor for RealWslExecutor {
         self.execute(&["--unregister", distro])
     }
 
-    fn install(&self, distro: &str, name: Option<&str>, location: Option<&str>, no_launch: bool) -> Result<CommandOutput, WslError> {
+    fn install(
+        &self,
+        distro: &str,
+        name: Option<&str>,
+        location: Option<&str>,
+        no_launch: bool,
+    ) -> Result<CommandOutput, WslError> {
         let mut args = vec!["--install", distro];
 
         if let Some(n) = name {
@@ -365,7 +388,13 @@ impl WslCommandExecutor for RealWslExecutor {
         self.execute_long(&args)
     }
 
-    fn import(&self, name: &str, location: &str, tarball: &str, version: Option<u8>) -> Result<CommandOutput, WslError> {
+    fn import(
+        &self,
+        name: &str,
+        location: &str,
+        tarball: &str,
+        version: Option<u8>,
+    ) -> Result<CommandOutput, WslError> {
         let mut args = vec!["--import", name, location, tarball];
         let version_str;
         if let Some(v) = version {
@@ -376,7 +405,12 @@ impl WslCommandExecutor for RealWslExecutor {
         self.execute_long(&args)
     }
 
-    fn export(&self, distro: &str, file: &str, format: Option<&str>) -> Result<CommandOutput, WslError> {
+    fn export(
+        &self,
+        distro: &str,
+        file: &str,
+        format: Option<&str>,
+    ) -> Result<CommandOutput, WslError> {
         let mut args = vec!["--export", distro, file];
         if let Some(fmt) = format {
             args.push("--format");
@@ -414,8 +448,16 @@ impl WslCommandExecutor for RealWslExecutor {
         self.execute(&["--manage", distro, "--set-default-user", username])
     }
 
-    fn mount_disk(&self, disk: &str, vhd: bool, bare: bool, name: Option<&str>,
-                  fs_type: Option<&str>, options: Option<&str>, partition: Option<u32>) -> Result<CommandOutput, WslError> {
+    fn mount_disk(
+        &self,
+        disk: &str,
+        vhd: bool,
+        bare: bool,
+        name: Option<&str>,
+        fs_type: Option<&str>,
+        options: Option<&str>,
+        partition: Option<u32>,
+    ) -> Result<CommandOutput, WslError> {
         let args = mount_disk_args(disk, vhd, bare, name, fs_type, options, partition);
         self.execute(&args.iter().map(String::as_str).collect::<Vec<_>>())
     }
@@ -435,14 +477,20 @@ impl WslCommandExecutor for RealWslExecutor {
         self.execute_with_timeout(&["--status"], self.quick_timeout())
     }
 
-    fn update(&self, pre_release: bool, current_version: Option<&str>) -> Result<CommandOutput, WslError> {
+    fn update(
+        &self,
+        pre_release: bool,
+        current_version: Option<&str>,
+    ) -> Result<CommandOutput, WslError> {
         use log::info;
 
         let paths = get_executable_paths();
 
         // Use provided version or fall back to fetching it
         let version_before = current_version.map(|s| s.to_string()).or_else(|| {
-            self.version().ok().and_then(|v| extract_wsl_version(&v.stdout))
+            self.version()
+                .ok()
+                .and_then(|v| extract_wsl_version(&v.stdout))
         });
 
         debug!("WSL version before update: {:?}", version_before);
@@ -469,7 +517,13 @@ impl WslCommandExecutor for RealWslExecutor {
         info!("WSL update requires administrator privileges - UAC dialog will appear");
 
         let output = wsl_command(&paths.powershell)
-            .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", &ps_script])
+            .args([
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                &ps_script,
+            ])
             .output()
             .map_err(|e| {
                 error!("Failed to run PowerShell for WSL update: {}", e);
@@ -480,24 +534,26 @@ impl WslCommandExecutor for RealWslExecutor {
         let stderr = String::from_utf8_lossy(&output.stderr).to_string();
 
         if !success {
-            debug!("WSL update command failed with exit code: {:?}", output.status.code());
+            debug!(
+                "WSL update command failed with exit code: {:?}",
+                output.status.code()
+            );
             // Check if user cancelled UAC - exit code 1223 is ERROR_CANCELLED
             if output.status.code() == Some(1223) {
                 return Err(WslError::CommandFailed(
-                    "Update cancelled - administrator approval was not granted".to_string()
+                    "Update cancelled - administrator approval was not granted".to_string(),
                 ));
             }
-            return Err(WslError::CommandFailed(
-                if stderr.is_empty() {
-                    "WSL update failed".to_string()
-                } else {
-                    stderr
-                }
-            ));
+            return Err(WslError::CommandFailed(if stderr.is_empty() {
+                "WSL update failed".to_string()
+            } else {
+                stderr
+            }));
         }
 
         // Get version AFTER update for comparison
-        let version_after = self.version()
+        let version_after = self
+            .version()
             .ok()
             .and_then(|v| extract_wsl_version(&v.stdout));
 
@@ -529,7 +585,12 @@ impl WslCommandExecutor for RealWslExecutor {
         })
     }
 
-    fn exec(&self, distro: &str, id: Option<&str>, command: &str) -> Result<CommandOutput, WslError> {
+    fn exec(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+    ) -> Result<CommandOutput, WslError> {
         // Use --distribution-id if available and supported for more reliable identification
         match id.filter(|_| supports_distribution_id()) {
             Some(guid) => self.execute(&["--distribution-id", guid, "--", "sh", "-c", command]),
@@ -537,26 +598,43 @@ impl WslCommandExecutor for RealWslExecutor {
         }
     }
 
-    fn exec_as_root(&self, distro: &str, id: Option<&str>, command: &str) -> Result<CommandOutput, WslError> {
+    fn exec_as_root(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+    ) -> Result<CommandOutput, WslError> {
         // Use -u root to run as root user for privileged operations
         match id.filter(|_| supports_distribution_id()) {
-            Some(guid) => self.execute(&["--distribution-id", guid, "-u", "root", "--", "sh", "-c", command]),
+            Some(guid) => self.execute(&[
+                "--distribution-id",
+                guid,
+                "-u",
+                "root",
+                "--",
+                "sh",
+                "-c",
+                command,
+            ]),
             None => self.execute(&["-d", distro, "-u", "root", "--", "sh", "-c", command]),
         }
     }
 
-    fn exec_with_timeout(&self, distro: &str, id: Option<&str>, command: &str, timeout_secs: u64) -> Result<CommandOutput, WslError> {
+    fn exec_with_timeout(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+        timeout_secs: u64,
+    ) -> Result<CommandOutput, WslError> {
         let timeout = Duration::from_secs(timeout_secs);
         // Use --distribution-id if available and supported for more reliable identification
         match id.filter(|_| supports_distribution_id()) {
             Some(guid) => self.execute_with_timeout(
                 &["--distribution-id", guid, "--", "sh", "-c", command],
-                timeout
+                timeout,
             ),
-            None => self.execute_with_timeout(
-                &["-d", distro, "--", "sh", "-c", command],
-                timeout
-            ),
+            None => self.execute_with_timeout(&["-d", distro, "--", "sh", "-c", command], timeout),
         }
     }
 
@@ -566,17 +644,16 @@ impl WslCommandExecutor for RealWslExecutor {
         // traffic, which works with both NAT and mirrored networking modes.
         let command = "ip route get 1 2>/dev/null | head -1 | sed 's/.*src \\([0-9.]*\\).*/\\1/'";
         let timeout_secs = self.quick_timeout().as_secs();
-        let system_result = self.exec_system_with_timeout(
-            distro,
-            command,
-            timeout_secs,
-        );
+        let system_result = self.exec_system_with_timeout(distro, command, timeout_secs);
 
         // WSL's system distro is unavailable when GUI applications are disabled.
         // The caller only selects an already-running distro, so this fallback does
         // not boot a stopped/default distribution as a side effect.
         with_distro_ip_fallback(system_result, || {
-            debug!("System-distro IP probe unavailable for {}; using running distro", distro);
+            debug!(
+                "System-distro IP probe unavailable for {}; using running distro",
+                distro
+            );
             self.exec_with_timeout(distro, None, command, timeout_secs)
         })
     }
@@ -585,12 +662,20 @@ impl WslCommandExecutor for RealWslExecutor {
         self.exec_system_with_timeout(distro, command, self.default_timeout().as_secs())
     }
 
-    fn exec_system_with_timeout(&self, distro: &str, command: &str, timeout_secs: u64) -> Result<CommandOutput, WslError> {
+    fn exec_system_with_timeout(
+        &self,
+        distro: &str,
+        command: &str,
+        timeout_secs: u64,
+    ) -> Result<CommandOutput, WslError> {
         let timeout = std::time::Duration::from_secs(timeout_secs);
         // Run in the WSL2 system distro (CBL-Mariner/Azure Linux) scoped to the
         // given distribution. A bare `wsl --system` would target the default
         // distribution and boot it as a side effect (GH #157).
-        self.execute_with_timeout(&["--system", "-d", distro, "--", "sh", "-c", command], timeout)
+        self.execute_with_timeout(
+            &["--system", "-d", distro, "--", "sh", "-c", command],
+            timeout,
+        )
     }
 
     fn check_preflight(&self) -> WslPreflightStatus {
@@ -605,8 +690,16 @@ impl WslCommandExecutor for RealWslExecutor {
         match result {
             Ok(output) => {
                 // Log raw output for debugging
-                debug!("Preflight stdout ({} chars): {:?}", output.stdout.len(), &output.stdout[..output.stdout.len().min(200)]);
-                debug!("Preflight stderr ({} chars): {:?}", output.stderr.len(), &output.stderr[..output.stderr.len().min(200)]);
+                debug!(
+                    "Preflight stdout ({} chars): {:?}",
+                    output.stdout.len(),
+                    &output.stdout[..output.stdout.len().min(200)]
+                );
+                debug!(
+                    "Preflight stderr ({} chars): {:?}",
+                    output.stderr.len(),
+                    &output.stderr[..output.stderr.len().min(200)]
+                );
                 debug!("Preflight exit success: {}", output.success);
 
                 // WSL responded - check if there are any error indicators in the output
@@ -620,7 +713,8 @@ impl WslCommandExecutor for RealWslExecutor {
                     || (combined.contains("wsl2") && combined.contains("not supported"));
 
                 let has_feature_disabled_error = combined.contains("0x8007019e")
-                    || (combined.contains("windows subsystem for linux") && combined.contains("not enabled"));
+                    || (combined.contains("windows subsystem for linux")
+                        && combined.contains("not enabled"));
 
                 let has_kernel_update_error = combined.contains("0x1bc")
                     || (combined.contains("kernel") && combined.contains("update"));
@@ -660,7 +754,11 @@ impl WslCommandExecutor for RealWslExecutor {
 
                     // Return unknown error with the actual message
                     WslPreflightStatus::Unknown {
-                        message: if full_msg.is_empty() { "Command failed with no output".to_string() } else { full_msg }
+                        message: if full_msg.is_empty() {
+                            "Command failed with no output".to_string()
+                        } else {
+                            full_msg
+                        },
                     }
                 }
             }
@@ -694,37 +792,100 @@ mod tests {
     fn disk_writing_commands_have_no_kill_deadline() {
         let limit = std::time::Duration::from_secs(1);
         for args in [
-            vec!["--install", "Ubuntu"], vec!["--import", "clone", "D:\\WSL", "archive.tar"],
-            vec!["--import-in-place", "disk", "disk.vhdx"], vec!["--export", "Ubuntu", "archive.tar"],
-            vec!["--set-version", "Ubuntu", "2"], vec!["--manage", "Ubuntu", "--move", "D:\\WSL"],
-            vec!["--manage", "Ubuntu", "--resize", "100GB"], vec!["--manage", "Ubuntu", "--set-sparse", "true"],
+            vec!["--install", "Ubuntu"],
+            vec!["--import", "clone", "D:\\WSL", "archive.tar"],
+            vec!["--import-in-place", "disk", "disk.vhdx"],
+            vec!["--export", "Ubuntu", "archive.tar"],
+            vec!["--set-version", "Ubuntu", "2"],
+            vec!["--manage", "Ubuntu", "--move", "D:\\WSL"],
+            vec!["--manage", "Ubuntu", "--resize", "100GB"],
+            vec!["--manage", "Ubuntu", "--set-sparse", "true"],
         ] {
             assert_eq!(super::command_timeout(&args, limit), None, "{:?}", args);
         }
-        for args in [vec!["--list", "--verbose"], vec!["--shutdown"], vec!["-d", "Ubuntu", "--", "echo", "--export"]] {
+        for args in [
+            vec!["--list", "--verbose"],
+            vec!["--shutdown"],
+            vec!["-d", "Ubuntu", "--", "echo", "--export"],
+        ] {
             assert_eq!(super::command_timeout(&args, limit), Some(limit));
         }
     }
 
     #[test]
     fn test_mount_disk_without_partition_preserves_options() {
-        assert_eq!(super::mount_disk_args(
-            r"D:\data.vhdx", true, false, Some("data"), Some("ext4"), Some("ro"), None,
-        ), ["--mount", r"D:\data.vhdx", "--vhd", "--name", "data", "--type", "ext4", "--options", "ro"]);
+        assert_eq!(
+            super::mount_disk_args(
+                r"D:\data.vhdx",
+                true,
+                false,
+                Some("data"),
+                Some("ext4"),
+                Some("ro"),
+                None,
+            ),
+            [
+                "--mount",
+                r"D:\data.vhdx",
+                "--vhd",
+                "--name",
+                "data",
+                "--type",
+                "ext4",
+                "--options",
+                "ro"
+            ]
+        );
     }
 
     #[test]
     fn test_mount_disk_partition_preserves_all_options() {
-        assert_eq!(super::mount_disk_args(
-            r"\\.\PHYSICALDRIVE2", false, false, Some("my disk"), Some("ntfs"), Some("ro"), Some(3),
-        ), ["--mount", r"\\.\PHYSICALDRIVE2", "--name", "my disk", "--type", "ntfs", "--options", "ro", "--partition", "3"]);
+        assert_eq!(
+            super::mount_disk_args(
+                r"\\.\PHYSICALDRIVE2",
+                false,
+                false,
+                Some("my disk"),
+                Some("ntfs"),
+                Some("ro"),
+                Some(3),
+            ),
+            [
+                "--mount",
+                r"\\.\PHYSICALDRIVE2",
+                "--name",
+                "my disk",
+                "--type",
+                "ntfs",
+                "--options",
+                "ro",
+                "--partition",
+                "3"
+            ]
+        );
     }
 
     #[test]
     fn test_mount_disk_partition_preserves_vhd_and_bare_flags() {
-        assert_eq!(super::mount_disk_args(
-            r"D:\My Disks\data.vhdx", true, true, None, None, None, Some(2),
-        ), ["--mount", r"D:\My Disks\data.vhdx", "--vhd", "--bare", "--partition", "2"]);
+        assert_eq!(
+            super::mount_disk_args(
+                r"D:\My Disks\data.vhdx",
+                true,
+                true,
+                None,
+                None,
+                None,
+                Some(2),
+            ),
+            [
+                "--mount",
+                r"D:\My Disks\data.vhdx",
+                "--vhd",
+                "--bare",
+                "--partition",
+                "2"
+            ]
+        );
     }
 
     use super::{
@@ -746,10 +907,9 @@ mod tests {
             success: true,
         };
 
-        let result = with_distro_ip_fallback(system_result, || {
-            Ok::<_, WslError>(fallback_output.clone())
-        })
-        .expect("the running distro fallback should supply the IP");
+        let result =
+            with_distro_ip_fallback(system_result, || Ok::<_, WslError>(fallback_output.clone()))
+                .expect("the running distro fallback should supply the IP");
 
         assert_eq!(result.stdout.trim(), "192.168.0.31");
         assert!(result.success);
@@ -786,11 +946,8 @@ mod tests {
     // message; only the "(os error 2)" suffix Rust appends is stable.
     #[test]
     fn test_preflight_not_installed_zh_cn_os_error_2() {
-        let status = classify_preflight_command_failure(
-            "系统找不到指定的文件。 (os error 2)",
-            false,
-            "wsl",
-        );
+        let status =
+            classify_preflight_command_failure("系统找不到指定的文件。 (os error 2)", false, "wsl");
         assert!(matches!(status, WslPreflightStatus::NotInstalled { .. }));
     }
 
@@ -811,11 +968,7 @@ mod tests {
     // configured executable is absent from disk means WSL is not installed.
     #[test]
     fn test_preflight_not_installed_by_missing_executable() {
-        let status = classify_preflight_command_failure(
-            "アクセスが拒否されました。",
-            false,
-            "wsl",
-        );
+        let status = classify_preflight_command_failure("アクセスが拒否されました。", false, "wsl");
         assert!(matches!(status, WslPreflightStatus::NotInstalled { .. }));
     }
 
@@ -848,7 +1001,10 @@ mod tests {
             true,
             "wsl",
         );
-        assert!(matches!(status, WslPreflightStatus::VirtualizationDisabled { .. }));
+        assert!(matches!(
+            status,
+            WslPreflightStatus::VirtualizationDisabled { .. }
+        ));
     }
 
     // An unrelated localized failure with wsl.exe present on disk must stay

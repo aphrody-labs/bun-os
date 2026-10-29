@@ -23,8 +23,8 @@ const MEMBERS: &[&str] = &["aphrody"];
 fn manifests() -> BTreeMap<String, Manifest> {
     let mut acl = BTreeMap::new();
     for name in MEMBERS {
-        let list = PathBuf::from(env!("OUT_DIR"))
-            .join(format!("tauri-plugin-{name}-permission-files"));
+        let list =
+            PathBuf::from(env!("OUT_DIR")).join(format!("tauri-plugin-{name}-permission-files"));
         let paths: Vec<PathBuf> =
             serde_json::from_str(&std::fs::read_to_string(&list).unwrap()).unwrap();
         // entries inside the out dir are listed relative to the list file

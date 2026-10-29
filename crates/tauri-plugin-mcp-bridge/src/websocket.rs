@@ -4,9 +4,7 @@
 //! between the Tauri application and external MCP clients. It broadcasts events
 //! to all connected clients and can receive commands from them.
 
-use crate::commands::{
-    self, ScriptExecutor, WindowContext, resolve_window_with_context,
-};
+use crate::commands::{self, ScriptExecutor, WindowContext, resolve_window_with_context};
 use crate::logging::{mcp_log_error, mcp_log_info};
 use crate::script_registry::{ScriptEntry, ScriptType, SharedScriptRegistry};
 use futures_util::{SinkExt, StreamExt};

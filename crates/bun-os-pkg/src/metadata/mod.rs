@@ -2,7 +2,6 @@
 //! Pure package contracts. Ecosystem parsers are absorbed by SP/WG from Bun.
 //! No network, filesystem, process execution or implicit trust belongs here.
 
-
 mod contracts;
 pub mod ecosystem_versions;
 pub mod indexes;

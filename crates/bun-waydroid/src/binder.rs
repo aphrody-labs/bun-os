@@ -3,7 +3,12 @@
 //! Pure functions over a list of existing `/dev` names so they are testable on any host.
 
 pub const BINDER: &[&str] = &["anbox-binder", "puddlejumper", "bonder", "binder"];
-pub const VNDBINDER: &[&str] = &["anbox-vndbinder", "vndpuddlejumper", "vndbonder", "vndbinder"];
+pub const VNDBINDER: &[&str] = &[
+    "anbox-vndbinder",
+    "vndpuddlejumper",
+    "vndbonder",
+    "vndbinder",
+];
 pub const HWBINDER: &[&str] = &["anbox-hwbinder", "hwpuddlejumper", "hwbonder", "hwbinder"];
 
 /// `_IOWR('b', 1, struct binderfs_device)` where the struct is 256 + 4 + 4 bytes.
@@ -23,7 +28,11 @@ pub struct Nodes {
 
 fn pick(candidates: &[&str], existing: &[String]) -> Option<String> {
     // Upstream keeps the last match in list order.
-    candidates.iter().rev().find(|c| existing.iter().any(|e| e == **c)).map(|s| s.to_string())
+    candidates
+        .iter()
+        .rev()
+        .find(|c| existing.iter().any(|e| e == **c))
+        .map(|s| s.to_string())
 }
 
 /// Nodes present in `/dev`. For MAINLINE vendors all four names are accepted, for Halium the
@@ -60,7 +69,9 @@ pub fn ctl_payload(name: &str) -> Option<[u8; 264]> {
 }
 
 pub fn binderfs_loaded(proc_filesystems: &str) -> bool {
-    proc_filesystems.lines().any(|l| l.split_whitespace().nth(1) == Some("binder"))
+    proc_filesystems
+        .lines()
+        .any(|l| l.split_whitespace().nth(1) == Some("binder"))
 }
 
 #[cfg(test)]
@@ -79,8 +90,14 @@ mod tests {
 
     #[test]
     fn plan_creates_only_missing_families() {
-        assert_eq!(plan_alloc(&v(&[])), vec!["anbox-binder", "anbox-vndbinder", "anbox-hwbinder"]);
-        assert_eq!(plan_alloc(&v(&["anbox-binder", "hwbinder"])), vec!["anbox-vndbinder"]);
+        assert_eq!(
+            plan_alloc(&v(&[])),
+            vec!["anbox-binder", "anbox-vndbinder", "anbox-hwbinder"]
+        );
+        assert_eq!(
+            plan_alloc(&v(&["anbox-binder", "hwbinder"])),
+            vec!["anbox-vndbinder"]
+        );
         assert!(plan_alloc(&v(&["binder", "vndbinder", "hwbinder"])).is_empty());
     }
 
@@ -89,7 +106,10 @@ mod tests {
         let all = v(&["binder", "vndbinder", "hwbinder"]);
         assert_eq!(detect(&all, true).binder.as_deref(), Some("binder"));
         assert_eq!(detect(&all, false), Nodes::default());
-        assert_eq!(detect(&v(&["anbox-binder"]), false).binder.as_deref(), Some("anbox-binder"));
+        assert_eq!(
+            detect(&v(&["anbox-binder"]), false).binder.as_deref(),
+            Some("anbox-binder")
+        );
     }
 
     #[test]

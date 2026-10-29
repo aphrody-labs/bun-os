@@ -17,7 +17,10 @@ const USAGE: &str = "bun-waydroid <command>
   cfg get FILE KEY                         read waydroid.cfg with upstream defaults";
 
 fn flag(args: &[String], name: &str) -> Option<String> {
-    args.iter().position(|a| a == name).and_then(|i| args.get(i + 1)).cloned()
+    args.iter()
+        .position(|a| a == name)
+        .and_then(|i| args.get(i + 1))
+        .cloned()
 }
 
 fn die(msg: impl std::fmt::Display) -> ! {
@@ -68,7 +71,9 @@ fn main() {
         ["ota", "fetch"] => {
             let which = args.get(2).map(String::as_str).unwrap_or("");
             let dir = PathBuf::from(flag(&args, "--dir").unwrap_or_else(|| die("--dir required")));
-            let current: u64 = flag(&args, "--current-datetime").and_then(|v| v.parse().ok()).unwrap_or(0);
+            let current: u64 = flag(&args, "--current-datetime")
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(0);
             let (s, v) = urls(&args);
             let url = match which {
                 "system" => s,
@@ -82,7 +87,8 @@ fn main() {
             std::fs::create_dir_all(&dir).unwrap_or_else(|e| die(e));
             let zip = dir.join(&b.filename);
             let t = std::time::Instant::now();
-            let (bytes, sha) = ota::download_verified(&b.url, &zip, &b.id).unwrap_or_else(|e| die(e));
+            let (bytes, sha) =
+                ota::download_verified(&b.url, &zip, &b.id).unwrap_or_else(|e| die(e));
             let dl = t.elapsed().as_secs_f64();
             let files = ota::extract(&zip, &dir).unwrap_or_else(|e| die(e));
             let _ = std::fs::remove_file(&zip);
@@ -92,19 +98,29 @@ fn main() {
             }));
         }
         ["verify", ..] => {
-            let (Some(f), Some(h)) = (args.get(1), args.get(2)) else { die("verify FILE SHA256") };
+            let (Some(f), Some(h)) = (args.get(1), args.get(2)) else {
+                die("verify FILE SHA256")
+            };
             ota::verify_file(std::path::Path::new(f), h).unwrap_or_else(|e| die(e));
             print(serde_json::json!({ "ok": true }));
         }
         ["binder", "plan"] => {
             let existing: Vec<String> = match flag(&args, "--dev-list") {
-                Some(l) => l.split(',').filter(|s| !s.is_empty()).map(String::from).collect(),
+                Some(l) => l
+                    .split(',')
+                    .filter(|s| !s.is_empty())
+                    .map(String::from)
+                    .collect(),
                 None => doctor::collect().dev_names,
             };
-            print(serde_json::json!({ "alloc": binder::plan_alloc(&existing), "ioctl": binder::BINDER_CTL_ADD }));
+            print(
+                serde_json::json!({ "alloc": binder::plan_alloc(&existing), "ioctl": binder::BINDER_CTL_ADD }),
+            );
         }
         ["cfg", "get"] => {
-            let (Some(f), Some(k)) = (args.get(2), args.get(3)) else { die("cfg get FILE KEY") };
+            let (Some(f), Some(k)) = (args.get(2), args.get(3)) else {
+                die("cfg get FILE KEY")
+            };
             let text = std::fs::read_to_string(f).unwrap_or_default();
             let c = cfg::Config::parse(&text);
             print(serde_json::json!({ "key": k, "value": c.get_or_default(k) }));

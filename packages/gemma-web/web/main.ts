@@ -54,7 +54,7 @@ window.gemma = {
       ortBase: new URL("./ort/", location.href).href,
       decoderEp: o.decoderEp,
       partBytes: o.partBytes,
-      onProgress: (p) => {
+      onProgress: p => {
         progress.textContent = `${p.file} ${((100 * p.loaded) / p.total).toFixed(1)}%`;
       },
     });

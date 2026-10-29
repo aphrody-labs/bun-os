@@ -46,7 +46,10 @@ impl ScriptedTransport {
     }
     /// Number of requests whose URL contains `needle`.
     pub fn count(&self, needle: &str) -> usize {
-        self.requests().iter().filter(|r| r.url.contains(needle)).count()
+        self.requests()
+            .iter()
+            .filter(|r| r.url.contains(needle))
+            .count()
     }
 }
 
@@ -60,9 +63,15 @@ impl HttpTransport for ScriptedTransport {
         if let Ok(mut s) = self.seen.lock() {
             s.push(req.clone());
         }
-        let mut rules = self.rules.lock().map_err(|_| Error::Transport("poisoned".into()))?;
+        let mut rules = self
+            .rules
+            .lock()
+            .map_err(|_| Error::Transport("poisoned".into()))?;
         let Some(idx) = rules.iter().position(|(m, _, _)| m(req)) else {
-            return Err(Error::Transport(format!("no scripted response for {} {}", req.method, req.url)));
+            return Err(Error::Transport(format!(
+                "no scripted response for {} {}",
+                req.method, req.url
+            )));
         };
         let resp = if rules[idx].2 {
             rules[idx].1.clone()
@@ -77,5 +86,9 @@ impl HttpTransport for ScriptedTransport {
 pub fn fake_id_token(claims: &serde_json::Value) -> String {
     use base64::Engine as _;
     let enc = |v: &[u8]| base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(v);
-    format!("{}.{}.", enc(br#"{"alg":"none"}"#), enc(claims.to_string().as_bytes()))
+    format!(
+        "{}.{}.",
+        enc(br#"{"alg":"none"}"#),
+        enc(claims.to_string().as_bytes())
+    )
 }

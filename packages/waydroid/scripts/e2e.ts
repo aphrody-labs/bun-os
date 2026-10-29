@@ -20,7 +20,11 @@ const FDROID = {
 
 const { values } = parseArgs({
   args: Bun.argv.slice(2),
-  options: { out: { type: "string" }, seconds: { type: "string", default: "10" }, taps: { type: "string", default: "10" } },
+  options: {
+    out: { type: "string" },
+    seconds: { type: "string", default: "10" },
+    taps: { type: "string", default: "10" },
+  },
 });
 const serial = process.env.ANDROID_SERIAL;
 const adb = new Adb(serial);
@@ -72,7 +76,9 @@ r.screenshotSha256 = sha(png);
 const token = crypto.randomUUID();
 const gw = startGateway({ token, start: { maxSize: 1280, maxFps: 60 } });
 t = performance.now();
-const ws = new WebSocket(`${gw.url.replace("http", "ws")}/stream?token=${token}${serial ? `&serial=${encodeURIComponent(serial)}` : ""}`);
+const ws = new WebSocket(
+  `${gw.url.replace("http", "ws")}/stream?token=${token}${serial ? `&serial=${encodeURIComponent(serial)}` : ""}`,
+);
 ws.binaryType = "arraybuffer";
 type Pkt = { at: number; flags: number; size: number; hash: string; nal: number };
 const pkts: Pkt[] = [];
@@ -110,7 +116,11 @@ for (let i = 0; i < Number(values.taps); i++) {
   const y = (a: number) => Math.round(m.height * a);
   const x = Math.round(m.width / 2);
   const dir = i % 2 ? 0.3 : 0.7;
-  for (const [action, yy] of [["down", dir], ["move", 0.5], ["up", i % 2 ? 0.7 : 0.3]] as const) {
+  for (const [action, yy] of [
+    ["down", dir],
+    ["move", 0.5],
+    ["up", i % 2 ? 0.7 : 0.3],
+  ] as const) {
     ws.send(JSON.stringify({ t: "touch", action, x, y: y(yy), w: m.width, h: m.height, id: 1 }));
   }
   while (pkts.length === before && performance.now() - t0 < 2000) await Bun.sleep(1);
@@ -129,7 +139,17 @@ while (performance.now() - t1 < seconds * 1000) {
   const y0 = phase % 2 ? 0.75 : 0.25;
   const y1 = phase % 2 ? 0.25 : 0.75;
   for (let s = 0; s <= 8; s++) {
-    ws.send(JSON.stringify({ t: "touch", action: s === 0 ? "down" : s === 8 ? "up" : "move", x: Math.round(m.width / 2), y: Math.round(m.height * (y0 + ((y1 - y0) * s) / 8)), w: m.width, h: m.height, id: 1 }));
+    ws.send(
+      JSON.stringify({
+        t: "touch",
+        action: s === 0 ? "down" : s === 8 ? "up" : "move",
+        x: Math.round(m.width / 2),
+        y: Math.round(m.height * (y0 + ((y1 - y0) * s) / 8)),
+        w: m.width,
+        h: m.height,
+        id: 1,
+      }),
+    );
     await Bun.sleep(16);
   }
   await Bun.sleep(100);

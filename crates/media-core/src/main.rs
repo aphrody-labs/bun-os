@@ -29,9 +29,15 @@ fn run(args: &[String]) -> Result<serde_json::Value> {
         "render" => {
             let bytes = std::fs::read(a(1)?)?;
             let meta = asset::probe(&bytes)?;
-            let out = engine::render(&asset::decode(&bytes, meta.orientation)?, &stack(a(2)?)?, &NoBackend)?;
+            let out = engine::render(
+                &asset::decode(&bytes, meta.orientation)?,
+                &stack(a(2)?)?,
+                &NoBackend,
+            )?;
             if a(3)?.ends_with(".jpg") || a(3)?.ends_with(".jpeg") {
-                image::DynamicImage::ImageRgba8(out.clone()).to_rgb8().save(a(3)?)?;
+                image::DynamicImage::ImageRgba8(out.clone())
+                    .to_rgb8()
+                    .save(a(3)?)?;
             } else {
                 out.save(a(3)?)?;
             }
@@ -39,16 +45,21 @@ fn run(args: &[String]) -> Result<serde_json::Value> {
         }
         "proxy" => {
             let bytes = std::fs::read(a(1)?)?;
-            let edge: u32 = a(4)?.parse().map_err(|_| media_core::Error::Invalid("max-edge".into()))?;
-            let (p, hit) = ProxyCache::open(a(3)?)?.get_or_render(&bytes, &stack(a(2)?)?, edge, &NoBackend)?;
+            let edge: u32 = a(4)?
+                .parse()
+                .map_err(|_| media_core::Error::Invalid("max-edge".into()))?;
+            let (p, hit) =
+                ProxyCache::open(a(3)?)?.get_or_render(&bytes, &stack(a(2)?)?, edge, &NoBackend)?;
             Ok(serde_json::json!({ "path": p, "hit": hit }))
         }
         "send" => {
             let bytes = std::fs::read(a(4)?)?;
             let frames = match (args.get(6), args.get(7)) {
                 (Some(x), Some(y)) => Some((
-                    x.parse().map_err(|_| media_core::Error::Invalid("frame".into()))?,
-                    y.parse().map_err(|_| media_core::Error::Invalid("frame".into()))?,
+                    x.parse()
+                        .map_err(|_| media_core::Error::Invalid("frame".into()))?,
+                    y.parse()
+                        .map_err(|_| media_core::Error::Invalid("frame".into()))?,
                 )),
                 _ => None,
             };
@@ -62,8 +73,13 @@ fn run(args: &[String]) -> Result<serde_json::Value> {
             };
             Ok(serde_json::json!({ "file": h.send(std::path::Path::new(a(1)?))? }))
         }
-        "receive" => Ok(serde_json::to_value(Handoff::receive(std::path::Path::new(a(1)?), a(2)?)?)?),
-        other => Err(media_core::Error::Invalid(format!("unknown command {other}"))),
+        "receive" => Ok(serde_json::to_value(Handoff::receive(
+            std::path::Path::new(a(1)?),
+            a(2)?,
+        )?)?),
+        other => Err(media_core::Error::Invalid(format!(
+            "unknown command {other}"
+        ))),
     }
 }
 

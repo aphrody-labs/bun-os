@@ -38,18 +38,19 @@ thread_local! {
 fn pattern_matches(pattern: &str, text: &str) -> bool {
     REGEX_CACHE.with(|cache| {
         let mut cache = cache.borrow_mut();
-        let regex = cache.entry(pattern.to_string()).or_insert_with(|| {
-            match Regex::new(pattern) {
+        let regex = cache
+            .entry(pattern.to_string())
+            .or_insert_with(|| match Regex::new(pattern) {
                 Ok(r) => Some(r),
                 Err(e) => {
                     log::warn!(
                         "Invalid regex pattern '{}' in action configuration: {}",
-                        pattern, e
+                        pattern,
+                        e
                     );
                     None
                 }
-            }
-        });
+            });
         regex.as_ref().map(|r| r.is_match(text)).unwrap_or(false)
     })
 }
@@ -122,16 +123,20 @@ pub fn load_actions() -> Vec<CustomAction> {
 
     if path.exists() {
         match fs::read_to_string(&path) {
-            Ok(content) => {
-                match serde_json::from_str(&content) {
-                    Ok(actions) => return actions,
-                    Err(e) => {
-                        eprintln!("Warning: Failed to parse custom-actions.json: {}. Using defaults.", e);
-                    }
+            Ok(content) => match serde_json::from_str(&content) {
+                Ok(actions) => return actions,
+                Err(e) => {
+                    eprintln!(
+                        "Warning: Failed to parse custom-actions.json: {}. Using defaults.",
+                        e
+                    );
                 }
-            }
+            },
             Err(e) => {
-                eprintln!("Warning: Failed to read custom-actions.json: {}. Using defaults.", e);
+                eprintln!(
+                    "Warning: Failed to read custom-actions.json: {}. Using defaults.",
+                    e
+                );
             }
         }
     }
@@ -212,7 +217,11 @@ fn windows_home_in_wsl(userprofile: &str) -> String {
     let normalized = userprofile.replace('\\', "/");
     let bytes = normalized.as_bytes();
     if bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && &bytes[1..3] == b":/" {
-        format!("/mnt/{}{}", (bytes[0] as char).to_ascii_lowercase(), &normalized[2..])
+        format!(
+            "/mnt/{}{}",
+            (bytes[0] as char).to_ascii_lowercase(),
+            &normalized[2..]
+        )
     } else {
         normalized
     }
@@ -259,7 +268,8 @@ fn get_wsl_home(distro: &str, id: Option<&str>) -> Result<String, String> {
         return Ok("/home/user".to_string());
     }
 
-    let output = wsl_executor().exec(distro, id, "echo $HOME")
+    let output = wsl_executor()
+        .exec(distro, id, "echo $HOME")
         .map_err(|e| e.to_string())?;
 
     if output.success {
@@ -275,7 +285,8 @@ fn get_wsl_user(distro: &str, id: Option<&str>) -> Result<String, String> {
         return Ok("user".to_string());
     }
 
-    let output = wsl_executor().exec(distro, id, "whoami")
+    let output = wsl_executor()
+        .exec(distro, id, "whoami")
         .map_err(|e| e.to_string())?;
 
     if output.success {
@@ -297,7 +308,12 @@ pub fn action_applies_to_distro(action: &CustomAction, distro: &str) -> bool {
 /// Execute a custom action on a distro
 /// If the action requires sudo and a password is provided, it will be piped to sudo -S
 /// If `id` is provided, uses `--distribution-id` for more reliable identification
-pub fn execute_action(action_id: &str, distro: &str, id: Option<&str>, password: Option<&str>) -> Result<ActionResult, String> {
+pub fn execute_action(
+    action_id: &str,
+    distro: &str,
+    id: Option<&str>,
+    password: Option<&str>,
+) -> Result<ActionResult, String> {
     let actions = load_actions();
     let action = actions
         .iter()
@@ -327,7 +343,8 @@ pub fn execute_action(action_id: &str, distro: &str, id: Option<&str>, password:
         .map_err(|e| e.to_string())?;
 
     // Filter out the password prompt from stderr if present
-    let filtered_stderr = result.stderr
+    let filtered_stderr = result
+        .stderr
         .lines()
         .filter(|line| !line.contains("[sudo] password"))
         .collect::<Vec<_>>()
@@ -350,7 +367,11 @@ fn action_command(command: &str, requires_sudo: bool, password: Option<&str>) ->
             Some(pwd) if !pwd.is_empty() => {
                 // Use echo to pipe password to sudo -S
                 // The -S flag makes sudo read password from stdin
-                format!("echo {} | sudo -S bash -c {}", escape_for_shell(pwd), escape_for_shell(command))
+                format!(
+                    "echo {} | sudo -S bash -c {}",
+                    escape_for_shell(pwd),
+                    escape_for_shell(command)
+                )
             }
             _ => {
                 // Permit NOPASSWD policies and cached credentials, but never wait
@@ -367,7 +388,12 @@ fn action_command(command: &str, requires_sudo: bool, password: Option<&str>) ->
 /// The terminal will show real-time output and stay open after completion
 /// If the action requires sudo, the user will type their password in the terminal
 /// If `id` is provided, uses `--distribution-id` for more reliable identification
-pub fn run_action_in_terminal(action_id: &str, distro: &str, id: Option<&str>, terminal_command: &str) -> Result<(), String> {
+pub fn run_action_in_terminal(
+    action_id: &str,
+    distro: &str,
+    id: Option<&str>,
+    terminal_command: &str,
+) -> Result<(), String> {
     use crate::wsl::WslService;
 
     let actions = load_actions();
@@ -450,16 +476,25 @@ mod tests {
     #[test]
     fn test_unattended_sudo_uses_noninteractive_execution() {
         for password in [None, Some("")] {
-            assert_eq!(action_command("id -u", true, password), "sudo -n bash -c 'id -u'");
+            assert_eq!(
+                action_command("id -u", true, password),
+                "sudo -n bash -c 'id -u'"
+            );
         }
     }
 
     #[test]
     fn test_action_command_keeps_script_quoted_for_sudo() {
         let command = "printf '%s' \"$HOME\"; echo done";
-        assert_eq!(action_command(command, true, None), format!("sudo -n bash -c {}", escape_for_shell(command)));
+        assert_eq!(
+            action_command(command, true, None),
+            format!("sudo -n bash -c {}", escape_for_shell(command))
+        );
         assert_eq!(action_command(command, false, None), command);
-        assert_eq!(action_command("id -u", true, Some("test password")), "echo 'test password' | sudo -S bash -c 'id -u'");
+        assert_eq!(
+            action_command("id -u", true, Some("test password")),
+            "echo 'test password' | sudo -S bash -c 'id -u'"
+        );
     }
 
     #[test]
@@ -550,17 +585,14 @@ mod tests {
         // Should be properly escaped - semicolon should be quoted
         assert!(result.contains("test"));
         assert!(!result.contains("echo test;rm")); // Not literal injection
-        // Either quoted or semicolon is escaped
+                                                   // Either quoted or semicolon is escaped
         assert!(result.contains('\'') || !result.contains(';'));
     }
 
     #[test]
     fn test_substitute_multiple_variables() {
-        let result = substitute_variables(
-            "wsl -d ${DISTRO_NAME} echo ${DISTRO_NAME}",
-            "Ubuntu",
-            None,
-        );
+        let result =
+            substitute_variables("wsl -d ${DISTRO_NAME} echo ${DISTRO_NAME}", "Ubuntu", None);
         assert_eq!(result, "wsl -d Ubuntu echo Ubuntu");
     }
 
@@ -693,7 +725,11 @@ mod tests {
         let result = substitute_variables("echo ${DISTRO_NAME}", "test; rm -rf /", None);
         // shell-escape properly quotes the input, making it safe
         // The result should start with "echo '" (quoted) when containing special chars
-        assert!(result.starts_with("echo '"), "Expected quoted output, got: {}", result);
+        assert!(
+            result.starts_with("echo '"),
+            "Expected quoted output, got: {}",
+            result
+        );
     }
 
     #[test]
@@ -701,7 +737,11 @@ mod tests {
         // Attempt to inject commands with backticks
         let result = substitute_variables("echo ${DISTRO_NAME}", "test`whoami`", None);
         // shell-escape properly quotes the input
-        assert!(result.starts_with("echo '"), "Expected quoted output, got: {}", result);
+        assert!(
+            result.starts_with("echo '"),
+            "Expected quoted output, got: {}",
+            result
+        );
     }
 
     #[test]
@@ -709,7 +749,11 @@ mod tests {
         // Attempt to inject commands with $(...)
         let result = substitute_variables("echo ${DISTRO_NAME}", "test$(id)", None);
         // shell-escape properly quotes the input
-        assert!(result.starts_with("echo '"), "Expected quoted output, got: {}", result);
+        assert!(
+            result.starts_with("echo '"),
+            "Expected quoted output, got: {}",
+            result
+        );
     }
 
     #[test]
@@ -717,7 +761,11 @@ mod tests {
         // Attempt to inject commands with pipe
         let result = substitute_variables("echo ${DISTRO_NAME}", "test | cat /etc/passwd", None);
         // shell-escape properly quotes the input
-        assert!(result.starts_with("echo '"), "Expected quoted output, got: {}", result);
+        assert!(
+            result.starts_with("echo '"),
+            "Expected quoted output, got: {}",
+            result
+        );
     }
 
     #[test]
@@ -725,7 +773,11 @@ mod tests {
         // Attempt to inject commands with ampersand
         let result = substitute_variables("echo ${DISTRO_NAME}", "test & whoami", None);
         // shell-escape properly quotes the input
-        assert!(result.starts_with("echo '"), "Expected quoted output, got: {}", result);
+        assert!(
+            result.starts_with("echo '"),
+            "Expected quoted output, got: {}",
+            result
+        );
     }
 
     #[test]
@@ -733,8 +785,11 @@ mod tests {
         // Attempt to inject commands with newline
         let result = substitute_variables("echo ${DISTRO_NAME}", "test\nrm -rf /", None);
         // shell-escape properly quotes the input (may use $'...' syntax for newlines)
-        assert!(result.starts_with("echo '") || result.starts_with("echo $'"),
-            "Expected quoted output, got: {}", result);
+        assert!(
+            result.starts_with("echo '") || result.starts_with("echo $'"),
+            "Expected quoted output, got: {}",
+            result
+        );
     }
 
     #[test]
@@ -742,16 +797,25 @@ mod tests {
         // Attempt to inject file redirection
         let result = substitute_variables("echo ${DISTRO_NAME}", "test > /etc/passwd", None);
         // shell-escape properly quotes the input
-        assert!(result.starts_with("echo '"), "Expected quoted output, got: {}", result);
+        assert!(
+            result.starts_with("echo '"),
+            "Expected quoted output, got: {}",
+            result
+        );
     }
 
     #[test]
     fn test_substitute_variables_prevents_quotes_injection() {
         // Attempt to break out of quotes
-        let result = substitute_variables("echo '${DISTRO_NAME}'", "test' && whoami && 'test", None);
+        let result =
+            substitute_variables("echo '${DISTRO_NAME}'", "test' && whoami && 'test", None);
         // shell-escape properly escapes embedded single quotes
         // The outer quotes in the template remain, and the injected value is escaped
-        assert!(result.contains("echo '"), "Expected quoted output, got: {}", result);
+        assert!(
+            result.contains("echo '"),
+            "Expected quoted output, got: {}",
+            result
+        );
     }
 
     #[test]
@@ -759,7 +823,11 @@ mod tests {
         // Safe characters don't need quoting - shell-escape keeps them unquoted
         let result = substitute_variables("echo ${DISTRO_NAME}", "Ubuntu-22.04_test.1", None);
         // Simple alphanumeric with - _ . should not need quoting
-        assert!(result.contains("Ubuntu-22.04_test.1"), "Safe chars should be preserved, got: {}", result);
+        assert!(
+            result.contains("Ubuntu-22.04_test.1"),
+            "Safe chars should be preserved, got: {}",
+            result
+        );
     }
 
     #[test]
@@ -847,9 +915,7 @@ mod tests {
 
     #[test]
     fn test_distro_scope_specific_empty() {
-        let scope = DistroScope::Specific {
-            distros: vec![],
-        };
+        let scope = DistroScope::Specific { distros: vec![] };
         let json = serde_json::to_string(&scope).unwrap();
         assert_eq!(json, r#"{"type":"specific","distros":[]}"#);
     }
@@ -932,4 +998,3 @@ mod tests {
         assert!(!test_scope_applies(&scope, "Ubuntu"));
     }
 }
-

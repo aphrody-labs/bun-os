@@ -11,11 +11,11 @@
 
 use crate::utils::{get_config_file, is_mock_mode};
 use crate::wsl::executor::resource_monitor;
+use log::{info, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::sync::Mutex;
-use log::{info, warn};
 
 /// Metadata configuration file
 const METADATA_CONFIG_FILE: &str = "distro-metadata.json";
@@ -223,7 +223,10 @@ fn get_initial_mock_metadata() -> HashMap<String, DistroMetadata> {
             distro_name: "Debian".to_string(),
             install_source: InstallSource::Lxc,
             image_reference: None,
-            download_url: Some("https://images.linuxcontainers.org/images/debian/bookworm/amd64/default/".to_string()),
+            download_url: Some(
+                "https://images.linuxcontainers.org/images/debian/bookworm/amd64/default/"
+                    .to_string(),
+            ),
             installed_at: "2024-02-10T08:00:00Z".to_string(),
             catalog_entry: Some("debian/bookworm".to_string()),
             cloned_from: None,
@@ -330,7 +333,8 @@ fn load_and_migrate_metadata() -> MetadataStore {
         Err(_) => return MetadataStore::default(),
     };
 
-    let version = json.get("version")
+    let version = json
+        .get("version")
         .and_then(|v| v.as_str())
         .unwrap_or("1.0");
 
@@ -384,7 +388,10 @@ fn migrate_v1_to_v2(legacy: LegacyMetadataStore) -> MetadataStore {
             migrated_count += 1;
         } else {
             // Distro no longer exists, skip (orphaned metadata)
-            warn!("Skipping orphaned metadata for '{}' - distro not found in registry", name);
+            warn!(
+                "Skipping orphaned metadata for '{}' - distro not found in registry",
+                name
+            );
             orphaned_count += 1;
         }
     }
@@ -451,15 +458,29 @@ pub fn get_metadata(id: &str) -> Option<DistroMetadata> {
 /// Get metadata by distribution name (for backwards compatibility during transition)
 pub fn get_metadata_by_name(name: &str) -> Option<DistroMetadata> {
     if is_mock_mode() {
-        return get_mock_metadata().values().find(|m| m.distro_name == name).cloned();
+        return get_mock_metadata()
+            .values()
+            .find(|m| m.distro_name == name)
+            .cloned();
     }
 
     METADATA
         .lock()
-        .map(|guard| guard.distros.values().find(|m| m.distro_name == name).cloned())
+        .map(|guard| {
+            guard
+                .distros
+                .values()
+                .find(|m| m.distro_name == name)
+                .cloned()
+        })
         .unwrap_or_else(|poisoned| {
             warn!("Metadata mutex was poisoned, recovering");
-            poisoned.into_inner().distros.values().find(|m| m.distro_name == name).cloned()
+            poisoned
+                .into_inner()
+                .distros
+                .values()
+                .find(|m| m.distro_name == name)
+                .cloned()
         })
 }
 
@@ -590,7 +611,9 @@ pub fn delete_metadata_by_name(name: &str) -> Result<(), String> {
         let result = MOCK_METADATA.lock();
         return match result {
             Ok(mut guard) => {
-                let id_to_remove: Option<String> = guard.distros.iter()
+                let id_to_remove: Option<String> = guard
+                    .distros
+                    .iter()
                     .find(|(_, m)| m.distro_name == name)
                     .map(|(id, _)| id.clone());
                 if let Some(id) = id_to_remove {
@@ -601,7 +624,9 @@ pub fn delete_metadata_by_name(name: &str) -> Result<(), String> {
             Err(poisoned) => {
                 warn!("Mock metadata mutex was poisoned, recovering");
                 let mut store = poisoned.into_inner();
-                let id_to_remove: Option<String> = store.distros.iter()
+                let id_to_remove: Option<String> = store
+                    .distros
+                    .iter()
                     .find(|(_, m)| m.distro_name == name)
                     .map(|(id, _)| id.clone());
                 if let Some(id) = id_to_remove {
@@ -616,7 +641,9 @@ pub fn delete_metadata_by_name(name: &str) -> Result<(), String> {
     match result {
         Ok(mut guard) => {
             // Find and remove by name
-            let id_to_remove: Option<String> = guard.distros.iter()
+            let id_to_remove: Option<String> = guard
+                .distros
+                .iter()
                 .find(|(_, m)| m.distro_name == name)
                 .map(|(id, _)| id.clone());
 
@@ -629,7 +656,9 @@ pub fn delete_metadata_by_name(name: &str) -> Result<(), String> {
         Err(poisoned) => {
             warn!("Metadata mutex was poisoned, recovering");
             let mut store = poisoned.into_inner();
-            let id_to_remove: Option<String> = store.distros.iter()
+            let id_to_remove: Option<String> = store
+                .distros
+                .iter()
                 .find(|(_, m)| m.distro_name == name)
                 .map(|(id, _)| id.clone());
 
@@ -742,7 +771,10 @@ mod tests {
         );
 
         assert_eq!(metadata.install_source, InstallSource::Import);
-        assert_eq!(metadata.import_path, Some("C:\\backup\\distro.tar".to_string()));
+        assert_eq!(
+            metadata.import_path,
+            Some("C:\\backup\\distro.tar".to_string())
+        );
 
         let json = serde_json::to_string_pretty(&metadata).unwrap();
         assert!(json.contains("\"importPath\":"));
@@ -778,6 +810,9 @@ mod tests {
         let legacy: LegacyMetadataStore = serde_json::from_str(v1_json).unwrap();
         assert_eq!(legacy.version, "1.0");
         assert!(legacy.distros.contains_key("Ubuntu"));
-        assert_eq!(legacy.distros["Ubuntu"].install_source, InstallSource::Store);
+        assert_eq!(
+            legacy.distros["Ubuntu"].install_source,
+            InstallSource::Store
+        );
     }
 }

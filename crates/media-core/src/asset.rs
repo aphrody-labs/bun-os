@@ -38,7 +38,9 @@ pub fn probe(bytes: &[u8]) -> Result<AssetMeta> {
     Ok(AssetMeta {
         id,
         bytes: bytes.len() as u64,
-        format: format.map(|f| format!("{f:?}").to_lowercase()).unwrap_or_default(),
+        format: format
+            .map(|f| format!("{f:?}").to_lowercase())
+            .unwrap_or_default(),
         width,
         height,
         orientation,
@@ -74,7 +76,8 @@ impl ProxyCache {
     }
 
     pub fn path(&self, id: &AssetId, stack: &EditStack, max_edge: u32) -> PathBuf {
-        self.dir.join(format!("{}-{}-{max_edge}.png", id.0, &stack.digest()[..16]))
+        self.dir
+            .join(format!("{}-{}-{max_edge}.png", id.0, &stack.digest()[..16]))
     }
 
     /// Return the cached proxy or render it (decode, stack, fit to `max_edge`) and store it.

@@ -30,8 +30,6 @@
     clippy::unreachable
 )]
 
-pub mod lensdb;
-pub mod inpaint;
 pub mod auto;
 pub mod blemish;
 pub mod colorops;
@@ -39,6 +37,8 @@ pub mod cull;
 pub mod dust;
 pub mod finish;
 pub mod geometry;
+pub mod inpaint;
+pub mod lensdb;
 pub mod local;
 pub mod local_tone;
 pub mod lut;

@@ -14,7 +14,6 @@
     clippy::unreachable
 )]
 
-pub mod ops;
 pub mod actions_cmds;
 pub mod actions_edit_cmds;
 pub mod adjust_cmds;
@@ -83,6 +82,7 @@ pub mod mode_cmds;
 pub mod multichannel_cmds;
 pub mod new_layer;
 pub mod notes_cmds;
+pub mod ops;
 pub mod paint_cmds;
 mod param_check;
 mod path_edit_cmds;
@@ -136,8 +136,8 @@ mod wia_cmds;
 
 use std::sync::Arc;
 
-use photocraft_doc::{Document, LayerId};
 use crate::ops::{History, LayerTarget};
+use photocraft_doc::{Document, LayerId};
 use serde_json::Value;
 
 pub use commands::{CommandSpec, command_specs};

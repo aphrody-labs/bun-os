@@ -24,7 +24,10 @@ mod terminal;
 mod types;
 
 // Re-export types
-pub use types::{CompactResult, Distribution, DistroState, WslError, MountedDisk, MountDiskOptions, PhysicalDisk, WslPreflightStatus};
+pub use types::{
+    CompactResult, Distribution, DistroState, MountDiskOptions, MountedDisk, PhysicalDisk,
+    WslError, WslPreflightStatus,
+};
 
 // Re-export resource types
 pub use resources::{DistroResourceUsage, WslResourceUsage};
@@ -40,7 +43,6 @@ pub use service::WslService;
 
 // Re-export mock functions for E2E testing (from executor module)
 pub use executor::{
-    reset_mock_state, set_mock_error, clear_mock_errors, MockErrorType,
-    set_stubborn_shutdown, was_force_shutdown_used,
-    set_mock_update_result, MockUpdateResult
+    clear_mock_errors, reset_mock_state, set_mock_error, set_mock_update_result,
+    set_stubborn_shutdown, was_force_shutdown_used, MockErrorType, MockUpdateResult,
 };

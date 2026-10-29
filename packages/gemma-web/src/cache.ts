@@ -33,7 +33,7 @@ export class MemoryStorage implements PartStorage {
 export class OpfsStorage implements PartStorage {
   #root: Promise<FileSystemDirectoryHandle>;
   constructor(dir: string) {
-    this.#root = navigator.storage.getDirectory().then((r) => r.getDirectoryHandle(dir, { create: true }));
+    this.#root = navigator.storage.getDirectory().then(r => r.getDirectoryHandle(dir, { create: true }));
   }
   static #name(key: string) {
     return key.replace(/[^A-Za-z0-9._-]/g, "_");

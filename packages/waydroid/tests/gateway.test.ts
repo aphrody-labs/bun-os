@@ -94,7 +94,13 @@ describe("gateway", () => {
     };
     await done.promise;
 
-    expect(JSON.parse(texts[0]!)).toEqual({ type: "meta", codec: "h264", width: 720, height: 1280, name: "fake-android" });
+    expect(JSON.parse(texts[0]!)).toEqual({
+      type: "meta",
+      codec: "h264",
+      width: 720,
+      height: 1280,
+      name: "fake-android",
+    });
     expect(binary[0]![0]).toBe(1); // config flag
     expect([...binary[0]!.subarray(9)]).toEqual([...CONFIG]);
     expect(binary.slice(1).map(w => sha(w.subarray(9)))).toEqual(fake.sent);
@@ -132,12 +138,18 @@ describe("gateway", () => {
 
   test("apk upload requires the zip signature and passes bytes to adb", async () => {
     const installed: number[] = [];
-    const fakeAdb = { installBytes: async (b: Uint8Array) => (installed.push(b.byteLength), "Success") } as unknown as Adb;
+    const fakeAdb = {
+      installBytes: async (b: Uint8Array) => (installed.push(b.byteLength), "Success"),
+    } as unknown as Adb;
     const { gw } = await setup(1, { adb: () => fakeAdb });
     const h = { authorization: "Bearer secret" };
     const bad = await fetch(`${gw.url}/api/install`, { method: "POST", body: "hello", headers: h });
     expect(bad.status).toBe(400);
-    const ok = await fetch(`${gw.url}/api/install?name=a.apk`, { method: "POST", body: Uint8Array.of(0x50, 0x4b, 3, 4, 0), headers: h });
+    const ok = await fetch(`${gw.url}/api/install?name=a.apk`, {
+      method: "POST",
+      body: Uint8Array.of(0x50, 0x4b, 3, 4, 0),
+      headers: h,
+    });
     expect(await ok.json()).toEqual({ ok: true, output: "Success" });
     expect(installed).toEqual([5]);
   });

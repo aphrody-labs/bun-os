@@ -215,19 +215,23 @@ export class AndroidScreen extends HTMLElement {
       if (text) this.#send({ t: "clip", text, paste: true });
       e.preventDefault();
     });
-    this.addEventListener("wheel", e => {
-      const r = this.#canvas.getBoundingClientRect();
-      this.#send({
-        t: "scroll",
-        x: ((e.clientX - r.left) / r.width) * this.#width,
-        y: ((e.clientY - r.top) / r.height) * this.#height,
-        w: this.#width,
-        h: this.#height,
-        dx: -e.deltaX / 100,
-        dy: -e.deltaY / 100,
-      });
-      e.preventDefault();
-    }, { passive: false });
+    this.addEventListener(
+      "wheel",
+      e => {
+        const r = this.#canvas.getBoundingClientRect();
+        this.#send({
+          t: "scroll",
+          x: ((e.clientX - r.left) / r.width) * this.#width,
+          y: ((e.clientY - r.top) / r.height) * this.#height,
+          w: this.#width,
+          h: this.#height,
+          dx: -e.deltaX / 100,
+          dy: -e.deltaY / 100,
+        });
+        e.preventDefault();
+      },
+      { passive: false },
+    );
     this.addEventListener("dragover", e => {
       e.preventDefault();
       this.classList.add("drop");
@@ -256,7 +260,9 @@ export class AndroidScreen extends HTMLElement {
 
   /** POST the APK to the gateway; resolves with its `adb install` output. */
   async installApk(file: Blob & { name?: string }): Promise<{ ok: boolean; output: string }> {
-    const api = this.getAttribute("api") ?? new URL(this.getAttribute("src") ?? location.href, location.href).origin.replace(/^ws/, "http");
+    const api =
+      this.getAttribute("api") ??
+      new URL(this.getAttribute("src") ?? location.href, location.href).origin.replace(/^ws/, "http");
     const serial = this.getAttribute("serial");
     const token = this.getAttribute("token");
     const q = new URLSearchParams({ name: file.name ?? "upload.apk" });

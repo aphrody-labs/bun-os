@@ -8,8 +8,12 @@ pub fn parse_getprop(output: &str, prefix: &str) -> BTreeMap<String, String> {
     let mut m = BTreeMap::new();
     for line in output.lines() {
         let line = line.trim();
-        let Some((k, v)) = line.split_once("]: [") else { continue };
-        let Some(k) = k.strip_prefix('[') else { continue };
+        let Some((k, v)) = line.split_once("]: [") else {
+            continue;
+        };
+        let Some(k) = k.strip_prefix('[') else {
+            continue;
+        };
         if !k.starts_with(prefix) {
             continue;
         }
@@ -62,8 +66,17 @@ impl Default for Container {
 }
 
 /// Build the final `waydroid.prop` from `waydroid_base.prop` lines and the session.
-pub fn make_prop(base: &str, s: &Session, c: &Container, has_sensord: bool) -> Result<String, &'static str> {
-    let mut props: Vec<String> = base.lines().map(str::to_string).filter(|l| !l.is_empty()).collect();
+pub fn make_prop(
+    base: &str,
+    s: &Session,
+    c: &Container,
+    has_sensord: bool,
+) -> Result<String, &'static str> {
+    let mut props: Vec<String> = base
+        .lines()
+        .map(str::to_string)
+        .filter(|l| !l.is_empty())
+        .collect();
     if props.is_empty() {
         return Err("waydroid_base.prop is broken");
     }
@@ -80,7 +93,10 @@ pub fn make_prop(base: &str, s: &Session, c: &Container, has_sensord: bool) -> R
     add("waydroid.host_data_path", &s.waydroid_data);
     add("waydroid.background_start", &s.background_start);
     props.push(format!("waydroid.xdg_runtime_dir={}", c.xdg_runtime_dir));
-    props.push(format!("waydroid.pulse_runtime_path={}", c.pulse_runtime_path));
+    props.push(format!(
+        "waydroid.pulse_runtime_path={}",
+        c.pulse_runtime_path
+    ));
     props.push(format!("waydroid.wayland_display={}", c.wayland_display));
     if !has_sensord {
         props.push("waydroid.stub_sensors_hal=1".into());
@@ -114,7 +130,13 @@ mod tests {
         let m = parse_getprop("[ro.hardware]: [ranchu]\n[sys.x]: [1]\njunk\n", "ro.");
         assert_eq!(m.len(), 1);
         assert_eq!(m["ro.hardware"], "ranchu");
-        assert_eq!(file_get("# c\nwaydroid.tools_version=1.6.3\n", "waydroid.tools_version"), "1.6.3");
+        assert_eq!(
+            file_get(
+                "# c\nwaydroid.tools_version=1.6.3\n",
+                "waydroid.tools_version"
+            ),
+            "1.6.3"
+        );
         assert_eq!(file_get("a=b\n", "x"), "");
     }
 

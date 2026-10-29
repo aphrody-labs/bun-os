@@ -44,17 +44,28 @@ pub fn run(i: &Inputs) -> Report {
     let mut checks = Vec::new();
     let mut add = |id, ok, detail: String| checks.push(Check { id, ok, detail });
 
-    add("linux", i.is_linux, if i.is_linux { "linux".into() } else { "Waydroid needs a Linux host".into() });
+    add(
+        "linux",
+        i.is_linux,
+        if i.is_linux {
+            "linux".into()
+        } else {
+            "Waydroid needs a Linux host".into()
+        },
+    );
 
     let loaded = crate::binder::binderfs_loaded(&i.proc_filesystems);
     let nodes = crate::binder::detect(&i.dev_names, true);
-    let have_nodes = nodes.binder.is_some() && nodes.vndbinder.is_some() && nodes.hwbinder.is_some();
+    let have_nodes =
+        nodes.binder.is_some() && nodes.vndbinder.is_some() && nodes.hwbinder.is_some();
     add(
         "binder",
         loaded || have_nodes,
         match (loaded, have_nodes) {
             (_, true) => format!("nodes: {:?}", nodes),
-            (true, false) => "binderfs registered, nodes not allocated yet (waydroid init allocates them)".into(),
+            (true, false) => {
+                "binderfs registered, nodes not allocated yet (waydroid init allocates them)".into()
+            }
             _ => "binder not loaded and no /dev nodes".into(),
         },
     );
@@ -70,22 +81,41 @@ pub fn run(i: &Inputs) -> Report {
         // ashmem was removed from mainline; memfd is the fallback Waydroid enables itself.
         let a = config_state(cfg, "CONFIG_ANDROID_ASHMEM");
         let have_ashmem = i.dev_names.iter().any(|d| d == "ashmem");
-        add("ashmem-or-memfd", true, format!("ASHMEM={:?}, /dev/ashmem={}; sys.use_memfd used otherwise", a, have_ashmem));
+        add(
+            "ashmem-or-memfd",
+            true,
+            format!(
+                "ASHMEM={:?}, /dev/ashmem={}; sys.use_memfd used otherwise",
+                a, have_ashmem
+            ),
+        );
     }
 
     add(
         "lxc",
-        i.lxc_version.as_deref().map(crate::lxc::parse_version).unwrap_or(0) > 0,
-        i.lxc_version.clone().unwrap_or_else(|| "lxc-start not found".into()),
+        i.lxc_version
+            .as_deref()
+            .map(crate::lxc::parse_version)
+            .unwrap_or(0)
+            > 0,
+        i.lxc_version
+            .clone()
+            .unwrap_or_else(|| "lxc-start not found".into()),
     );
     add(
         "wayland",
         i.wayland_display.is_some(),
-        i.wayland_display.clone().unwrap_or_else(|| "WAYLAND_DISPLAY unset (headless needs a compositor such as weston)".into()),
+        i.wayland_display.clone().unwrap_or_else(|| {
+            "WAYLAND_DISPLAY unset (headless needs a compositor such as weston)".into()
+        }),
     );
 
     let ready = checks.iter().all(|c| c.ok);
-    Report { kernel: i.kernel.clone(), ready, checks }
+    Report {
+        kernel: i.kernel.clone(),
+        ready,
+        checks,
+    }
 }
 
 /// Collect inputs from the running host. Non-Linux hosts get an empty, honest report.
@@ -93,11 +123,21 @@ pub fn collect() -> Inputs {
     use std::fs;
     let is_linux = cfg!(target_os = "linux");
     if !is_linux {
-        return Inputs { kernel: std::env::consts::OS.into(), ..Default::default() };
+        return Inputs {
+            kernel: std::env::consts::OS.into(),
+            ..Default::default()
+        };
     }
-    let kernel = fs::read_to_string("/proc/sys/kernel/osrelease").unwrap_or_default().trim().to_string();
+    let kernel = fs::read_to_string("/proc/sys/kernel/osrelease")
+        .unwrap_or_default()
+        .trim()
+        .to_string();
     let dev_names = fs::read_dir("/dev")
-        .map(|d| d.flatten().map(|e| e.file_name().to_string_lossy().into_owned()).collect())
+        .map(|d| {
+            d.flatten()
+                .map(|e| e.file_name().to_string_lossy().into_owned())
+                .collect()
+        })
         .unwrap_or_default();
     let kernel_config = fs::read_to_string(format!("/boot/config-{kernel}")).ok();
     let lxc_version = std::process::Command::new("lxc-start")

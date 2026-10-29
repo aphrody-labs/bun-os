@@ -38,7 +38,10 @@ impl Rgba {
 
     /// This color with its alpha multiplied by `k` (0..=1).
     pub fn scale_alpha(self, k: f32) -> Self {
-        Self { a: (f32::from(self.a) * k.clamp(0.0, 1.0)).round() as u8, ..self }
+        Self {
+            a: (f32::from(self.a) * k.clamp(0.0, 1.0)).round() as u8,
+            ..self
+        }
     }
 }
 
@@ -65,7 +68,11 @@ impl ThemeId {
     }
 
     pub fn meta(self) -> &'static ThemeMeta {
-        METAS.iter().copied().find(|m| m.id == self).expect("generated metadata covers every theme")
+        METAS
+            .iter()
+            .copied()
+            .find(|m| m.id == self)
+            .expect("generated metadata covers every theme")
     }
 }
 
@@ -203,7 +210,10 @@ impl ThemeMeta {
 
 /// The resolved palette of one combination; `None` when the accent does not exist in the theme.
 pub fn palette(theme: ThemeId, scheme: Scheme, accent: &str) -> Option<&'static Palette> {
-    PALETTES.iter().find(|(t, s, a, _)| *t == theme && *s == scheme && *a == accent).map(|(_, _, _, p)| *p)
+    PALETTES
+        .iter()
+        .find(|(t, s, a, _)| *t == theme && *s == scheme && *a == accent)
+        .map(|(_, _, _, p)| *p)
 }
 
 /// Operating system families that differ in window effects.
@@ -302,7 +312,13 @@ impl Rgba {
         if out <= 0.0 {
             return Rgba::new(0, 0, 0, 0);
         }
-        let mix = |t: u8, u: u8| ((f32::from(t) * a + f32::from(u) * b * (1.0 - a)) / out).round() as u8;
-        Rgba::new(mix(self.r, below.r), mix(self.g, below.g), mix(self.b, below.b), (out * 255.0).round() as u8)
+        let mix =
+            |t: u8, u: u8| ((f32::from(t) * a + f32::from(u) * b * (1.0 - a)) / out).round() as u8;
+        Rgba::new(
+            mix(self.r, below.r),
+            mix(self.g, below.g),
+            mix(self.b, below.b),
+            (out * 255.0).round() as u8,
+        )
     }
 }

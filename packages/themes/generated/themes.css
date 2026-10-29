@@ -1427,9 +1427,12 @@
   --lineHeightHero800: 40px;
   --lineHeightHero900: 52px;
   --lineHeightHero1000: 92px;
-  --fontFamilyBase: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --fontFamilyBase:
+    'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
   --fontFamilyMonospace: Consolas, 'Courier New', Courier, monospace;
-  --fontFamilyNumeric: Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --fontFamilyNumeric:
+    Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto,
+    'Helvetica Neue', sans-serif;
   --fontWeightRegular: 400;
   --fontWeightMedium: 500;
   --fontWeightSemibold: 600;
@@ -2041,9 +2044,12 @@
   --lineHeightHero800: 40px;
   --lineHeightHero900: 52px;
   --lineHeightHero1000: 92px;
-  --fontFamilyBase: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --fontFamilyBase:
+    'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
   --fontFamilyMonospace: Consolas, 'Courier New', Courier, monospace;
-  --fontFamilyNumeric: Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --fontFamilyNumeric:
+    Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto,
+    'Helvetica Neue', sans-serif;
   --fontWeightRegular: 400;
   --fontWeightMedium: 500;
   --fontWeightSemibold: 600;
@@ -2710,7 +2716,7 @@
     --t-text-display-line: 32px;
     --t-text-display-weight: 400;
   }
-  }
+}
 [data-skin="apple"]:not([data-scheme="dark"]) {
   --t-bg: #FFFFFF;
   --t-bg-alt: #F2F2F7;

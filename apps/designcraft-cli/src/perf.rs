@@ -631,9 +631,11 @@ fn measure(doc: &Document, runs: usize) -> Result<Vec<Row>, String> {
     row(
         &mut rows,
         format!("save .designcraft ({} pages)", doc.page_count()),
-        median_ms(runs.min(3), || match designcraft_engine::format::save(doc) {
-            Ok(b) => bytes = b,
-            Err(e) => failed = Some(format!("save: {e}")),
+        median_ms(runs.min(3), || {
+            match designcraft_engine::format::save(doc) {
+                Ok(b) => bytes = b,
+                Err(e) => failed = Some(format!("save: {e}")),
+            }
         }),
         Some(300.0),
     );

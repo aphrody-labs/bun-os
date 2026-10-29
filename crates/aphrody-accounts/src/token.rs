@@ -24,7 +24,10 @@ impl std::fmt::Debug for TokenSet {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("TokenSet")
             .field("access_token", &"<redacted>")
-            .field("refresh_token", &self.refresh_token.as_ref().map(|_| "<redacted>"))
+            .field(
+                "refresh_token",
+                &self.refresh_token.as_ref().map(|_| "<redacted>"),
+            )
             .field("expires_at", &self.expires_at)
             .field("scopes", &self.scopes)
             .finish_non_exhaustive()
@@ -40,7 +43,11 @@ impl TokenSet {
     /// understands Google's full-URL vs short forms (`email` == `.../auth/userinfo.email`) and
     /// Microsoft's case-insensitive scope names; a broader scope implies its `.readonly` sibling.
     pub fn missing_scopes<'a>(&self, wanted: &[&'a str]) -> Vec<&'a str> {
-        wanted.iter().copied().filter(|w| !self.scopes.iter().any(|g| scope_covers(g, w))).collect()
+        wanted
+            .iter()
+            .copied()
+            .filter(|w| !self.scopes.iter().any(|g| scope_covers(g, w)))
+            .collect()
     }
 }
 
@@ -142,7 +149,10 @@ pub struct IdClaims {
 impl IdClaims {
     /// Decode the payload segment of a JWT without verifying it (see the type docs).
     pub fn decode(jwt: &str) -> Result<Self> {
-        let payload = jwt.split('.').nth(1).ok_or_else(|| Error::Invalid("id_token is not a JWT".into()))?;
+        let payload = jwt
+            .split('.')
+            .nth(1)
+            .ok_or_else(|| Error::Invalid("id_token is not a JWT".into()))?;
         let bytes = URL_SAFE_NO_PAD
             .decode(payload.trim_end_matches('='))
             .map_err(|e| Error::Invalid(format!("id_token payload: {e}")))?;
@@ -150,7 +160,10 @@ impl IdClaims {
     }
     /// Best human label: email, then UPN, then subject.
     pub fn label(&self) -> String {
-        self.email.clone().or_else(|| self.preferred_username.clone()).unwrap_or_else(|| self.sub.clone())
+        self.email
+            .clone()
+            .or_else(|| self.preferred_username.clone())
+            .unwrap_or_else(|| self.sub.clone())
     }
 }
 
@@ -177,26 +190,45 @@ mod tests {
 
     #[test]
     fn scope_matching_handles_google_and_microsoft_forms() {
-        let g = set(&["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/drive"]);
-        assert!(g.missing_scopes(&["email", "https://www.googleapis.com/auth/drive.readonly"]).is_empty());
+        let g = set(&[
+            "openid",
+            "https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/drive",
+        ]);
+        assert!(
+            g.missing_scopes(&["email", "https://www.googleapis.com/auth/drive.readonly"])
+                .is_empty()
+        );
         assert_eq!(
             g.missing_scopes(&["https://www.googleapis.com/auth/documents"]),
             vec!["https://www.googleapis.com/auth/documents"]
         );
         let m = set(&["Files.ReadWrite", "User.Read", "Sites.ReadWrite.All"]);
-        assert!(m.missing_scopes(&["files.read", "user.read", "sites.read.all"]).is_empty());
-        assert_eq!(m.missing_scopes(&["Calendars.Read"]), vec!["Calendars.Read"]);
+        assert!(
+            m.missing_scopes(&["files.read", "user.read", "sites.read.all"])
+                .is_empty()
+        );
+        assert_eq!(
+            m.missing_scopes(&["Calendars.Read"]),
+            vec!["Calendars.Read"]
+        );
     }
 
     #[test]
     fn readonly_does_not_imply_write() {
         let g = set(&["https://www.googleapis.com/auth/drive.readonly"]);
-        assert_eq!(g.missing_scopes(&["https://www.googleapis.com/auth/drive"]).len(), 1);
+        assert_eq!(
+            g.missing_scopes(&["https://www.googleapis.com/auth/drive"])
+                .len(),
+            1
+        );
     }
 
     #[test]
     fn decodes_id_token_claims() {
-        let jwt = crate::testing::fake_id_token(&serde_json::json!({"sub":"1","email":"a@b.c","name":"A B"}));
+        let jwt = crate::testing::fake_id_token(
+            &serde_json::json!({"sub":"1","email":"a@b.c","name":"A B"}),
+        );
         let c = IdClaims::decode(&jwt).unwrap();
         assert_eq!(c.label(), "a@b.c");
         assert_eq!(c.name.as_deref(), Some("A B"));

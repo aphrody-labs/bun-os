@@ -16,14 +16,19 @@ pub fn parse_os_release(text: &str) -> BTreeMap<String, String> {
                 return None;
             }
             let (k, v) = l.split_once('=')?;
-            Some((k.trim().to_string(), v.trim().trim_matches('"').trim_matches('\'').to_string()))
+            Some((
+                k.trim().to_string(),
+                v.trim().trim_matches('"').trim_matches('\'').to_string(),
+            ))
         })
         .collect()
 }
 
 /// The Bun OS WSL image sets `NAME="Bun OS (WSL)"` (factory/wsl/bunos-wsl.sh).
 pub fn is_bunos_os_release(text: &str) -> bool {
-    parse_os_release(text).get("NAME").is_some_and(|n| n.starts_with("Bun OS"))
+    parse_os_release(text)
+        .get("NAME")
+        .is_some_and(|n| n.starts_with("Bun OS"))
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -40,12 +45,24 @@ pub struct KernelRelease {
 /// Parse `uname -r`, e.g. `6.18.58.1-microsoft-standard-WSL2` or `7.3.0-microsoft-standard-WSL2+`.
 pub fn parse_kernel_release(raw: &str) -> Option<KernelRelease> {
     let raw = raw.trim();
-    let numeric: String = raw.chars().take_while(|c| c.is_ascii_digit() || *c == '.').collect();
-    let mut it = numeric.split('.').filter(|p| !p.is_empty()).map(|p| p.parse::<u32>().ok());
+    let numeric: String = raw
+        .chars()
+        .take_while(|c| c.is_ascii_digit() || *c == '.')
+        .collect();
+    let mut it = numeric
+        .split('.')
+        .filter(|p| !p.is_empty())
+        .map(|p| p.parse::<u32>().ok());
     let major = it.next()??;
     let minor = it.next().flatten().unwrap_or(0);
     let patch = it.next().flatten().unwrap_or(0);
-    Some(KernelRelease { raw: raw.to_string(), major, minor, patch, is_wsl: raw.to_ascii_lowercase().contains("microsoft") })
+    Some(KernelRelease {
+        raw: raw.to_string(),
+        major,
+        minor,
+        patch,
+        is_wsl: raw.to_ascii_lowercase().contains("microsoft"),
+    })
 }
 
 /// Kernel files selected in `.wslconfig` (`[wsl2] kernel=` / `kernelModules=`), unescaped.
@@ -59,7 +76,8 @@ pub struct KernelSelection {
 pub fn kernel_selection(wslconfig: &str) -> KernelSelection {
     KernelSelection {
         kernel: ini::get(wslconfig, "wsl2", "kernel").map(|v| ini::unescape_windows_path(&v)),
-        kernel_modules: ini::get(wslconfig, "wsl2", "kernelModules").map(|v| ini::unescape_windows_path(&v)),
+        kernel_modules: ini::get(wslconfig, "wsl2", "kernelModules")
+            .map(|v| ini::unescape_windows_path(&v)),
     }
 }
 
@@ -88,7 +106,9 @@ pub struct GuiStatus {
 pub fn parse_gui_probe(output: &str) -> GuiStatus {
     let mut s = GuiStatus::default();
     for line in output.lines() {
-        let Some((k, v)) = line.trim().split_once('=') else { continue };
+        let Some((k, v)) = line.trim().split_once('=') else {
+            continue;
+        };
         let on = v.trim() == "1";
         match k.trim() {
             "kernel" => s.kernel = Some(v.trim().to_string()),
@@ -119,20 +139,29 @@ pub fn inspect_distro(exec: &dyn WslCommandExecutor, name: &str) -> Result<Distr
     let probe = exec.exec(name, None, GUI_PROBE_COMMAND)?;
     let gui = parse_gui_probe(&probe.stdout);
     let kernel = gui.kernel.as_deref().and_then(parse_kernel_release);
-    Ok(DistroReport { name: name.to_string(), is_bunos: osr.success && is_bunos_os_release(&osr.stdout), gui, kernel })
+    Ok(DistroReport {
+        name: name.to_string(),
+        is_bunos: osr.success && is_bunos_os_release(&osr.stdout),
+        gui,
+        kernel,
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const OS_RELEASE: &str = "NAME=\"Bun OS (WSL)\"\nPRETTY_NAME=\"Arch Linux\"\nID=arch\nBUILD_ID=rolling\n";
+    const OS_RELEASE: &str =
+        "NAME=\"Bun OS (WSL)\"\nPRETTY_NAME=\"Arch Linux\"\nID=arch\nBUILD_ID=rolling\n";
 
     #[test]
     fn os_release_detection() {
         assert!(is_bunos_os_release(OS_RELEASE));
         assert!(!is_bunos_os_release("NAME=\"Ubuntu\"\nID=ubuntu\n"));
-        assert_eq!(parse_os_release(OS_RELEASE).get("ID").map(String::as_str), Some("arch"));
+        assert_eq!(
+            parse_os_release(OS_RELEASE).get("ID").map(String::as_str),
+            Some("arch")
+        );
     }
 
     #[test]
@@ -151,7 +180,10 @@ mod tests {
         let s = kernel_selection(cfg);
         assert_eq!(s.kernel.as_deref(), Some("C:\\bunos\\bzImage"));
         assert_eq!(s.kernel_modules.as_deref(), Some("C:\\bunos\\modules.vhdx"));
-        assert_eq!(kernel_selection("[wsl2]\nmemory=4GB\n"), KernelSelection::default());
+        assert_eq!(
+            kernel_selection("[wsl2]\nmemory=4GB\n"),
+            KernelSelection::default()
+        );
     }
 
     #[test]

@@ -470,8 +470,7 @@ mod shared_asset_tests {
             2
         );
         let back =
-            crate::format::load(&crate::format::save(&s.doc().unwrap().doc).unwrap())
-                .unwrap();
+            crate::format::load(&crate::format::save(&s.doc().unwrap().doc).unwrap()).unwrap();
         let mut names: Vec<&str> = back.assets.values().map(|a| a.name.as_str()).collect();
         names.sort();
         assert_eq!(names, ["a.png", "c.png"]);

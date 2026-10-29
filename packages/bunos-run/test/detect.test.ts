@@ -42,7 +42,8 @@ test("scripts and unknown", () => {
 test("PE import table", () => {
   const b = new Uint8Array(0x800);
   const dv = new DataView(b.buffer);
-  b[0] = 0x4d; b[1] = 0x5a;
+  b[0] = 0x4d;
+  b[1] = 0x5a;
   dv.setUint32(0x3c, 0x80, true);
   const nt = 0x80;
   dv.setUint32(nt, 0x4550, true);

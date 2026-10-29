@@ -41,7 +41,7 @@ interface Usage {
 
 function flatten(m: ChatCompletionRequest["messages"][number]): ChatMessage {
   const role = m.role === "assistant" || m.role === "system" ? m.role : "user";
-  const content = typeof m.content === "string" ? m.content : m.content.map((p) => p.text ?? "").join("");
+  const content = typeof m.content === "string" ? m.content : m.content.map(p => p.text ?? "").join("");
   return { role, content };
 }
 const finishOf = (s: GenerateStats) => (s.finishReason === "abort" ? "stop" : s.finishReason);

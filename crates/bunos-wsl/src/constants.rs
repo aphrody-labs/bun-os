@@ -26,7 +26,9 @@ mod tests {
     fn test_app_name_is_valid() {
         assert!(!APP_NAME.is_empty());
         assert!(!APP_NAME.contains(' '));
-        assert!(APP_NAME.chars().all(|c| c.is_ascii_alphanumeric() || c == '-'));
+        assert!(APP_NAME
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-'));
     }
 
     #[test]

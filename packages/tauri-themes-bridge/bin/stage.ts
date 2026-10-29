@@ -18,7 +18,10 @@ const index = Bun.file(join(dir, "index.html"));
 if (await index.exists()) {
   const html = await index.text();
   if (!html.includes("aphrody-theme.js")) {
-    await Bun.write(index, html.replace("</head>", '  <script type="module" src="aphrody-theme.js"></script>\n</head>'));
+    await Bun.write(
+      index,
+      html.replace("</head>", '  <script type="module" src="aphrody-theme.js"></script>\n</head>'),
+    );
   }
 }
 console.log(`theme bridge staged in ${dir}`);

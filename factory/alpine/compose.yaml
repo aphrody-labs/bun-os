@@ -10,13 +10,19 @@ x-test: &test
   working_dir: /fixtures
 services:
   repo:
-    build: { context: ., dockerfile: images/repo.Dockerfile, additional_contexts: [bunosrun=../../packages/bunos-run/src] }
+    build:
+      { context: ., dockerfile: images/repo.Dockerfile, additional_contexts: [bunosrun=../../packages/bunos-run/src] }
     image: bunos/repo:local
     command: ["sh", "-c", "cp -r /repo/. /repo-out/ && cp -r /keys /repo-out/keys"]
     volumes: [repo-out:/repo-out]
   repo-server:
     image: bunos/base:local
-    command: ["bun", "-e", "Bun.serve({port:80,async fetch(r){const f=Bun.file(\"/repo-out\"+new URL(r.url).pathname);return (await f.exists())?new Response(f):new Response(\"nf\",{status:404})}})"]
+    command:
+      [
+        "bun",
+        "-e",
+        'Bun.serve({port:80,async fetch(r){const f=Bun.file("/repo-out"+new URL(r.url).pathname);return (await f.exists())?new Response(f):new Response("nf",{status:404})}})',
+      ]
     volumes: [repo-out:/repo-out:ro]
     networks: { default: { aliases: [repo] } }
     depends_on: { repo: { condition: service_completed_successfully } }
@@ -25,27 +31,37 @@ services:
     image: bunos/base:local
     <<: *test
   rust:
-    build: { context: ., dockerfile: images/rust.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
+    build:
+      { context: ., dockerfile: images/rust.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
     image: bunos/rust:local
     <<: *test
   wasm:
-    build: { context: ., dockerfile: images/wasm.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
+    build:
+      { context: ., dockerfile: images/wasm.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
     image: bunos/wasm:local
     <<: *test
   wine:
-    build: { context: ., dockerfile: images/wine.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
+    build:
+      { context: ., dockerfile: images/wine.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
     image: bunos/wine:local
     <<: *test
   dotnet:
-    build: { context: ., dockerfile: images/dotnet.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
+    build:
+      { context: ., dockerfile: images/dotnet.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
     image: bunos/dotnet:local
     <<: *test
   android:
-    build: { context: ., dockerfile: images/android.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
+    build:
+      { context: ., dockerfile: images/android.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
     image: bunos/android:local
     <<: *test
   fixtures:
-    build: { context: ., dockerfile: images/fixtures.Dockerfile, additional_contexts: [base=service:base, repo=service:repo] }
+    build:
+      {
+        context: .,
+        dockerfile: images/fixtures.Dockerfile,
+        additional_contexts: [base=service:base, repo=service:repo],
+      }
     image: bunos/fixtures:local
     volumes: [fixtures:/fixtures]
   # Android runtime: needs the binder_linux kernel module on the Docker host (docs/ALPINE.md); profile keeps it out of the default run.

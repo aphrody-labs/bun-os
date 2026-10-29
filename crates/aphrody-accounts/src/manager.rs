@@ -74,7 +74,11 @@ pub struct AccountManager {
 
 impl AccountManager {
     /// Open (or create) the index at `index_path`; secrets go to `vault`.
-    pub fn open(index_path: impl Into<PathBuf>, vault: Arc<dyn TokenVault>, http: Arc<dyn HttpTransport>) -> Result<Self> {
+    pub fn open(
+        index_path: impl Into<PathBuf>,
+        vault: Arc<dyn TokenVault>,
+        http: Arc<dyn HttpTransport>,
+    ) -> Result<Self> {
         let index_path = index_path.into();
         let index = match std::fs::read(&index_path) {
             Ok(b) => serde_json::from_slice(&b)?,
@@ -121,7 +125,10 @@ impl AccountManager {
         Ok(())
     }
     fn with_index<R>(&self, f: impl FnOnce(&mut Index) -> R) -> Result<R> {
-        let mut g = self.index.lock().map_err(|_| Error::Vault("poisoned".into()))?;
+        let mut g = self
+            .index
+            .lock()
+            .map_err(|_| Error::Vault("poisoned".into()))?;
         Ok(f(&mut g))
     }
 
@@ -131,7 +138,13 @@ impl AccountManager {
     }
     /// The account used when a caller does not name one.
     pub fn active(&self) -> Option<Account> {
-        self.with_index(|i| i.active.as_ref().and_then(|id| i.accounts.iter().find(|a| &a.id == id).cloned())).ok().flatten()
+        self.with_index(|i| {
+            i.active
+                .as_ref()
+                .and_then(|id| i.accounts.iter().find(|a| &a.id == id).cloned())
+        })
+        .ok()
+        .flatten()
     }
     /// Look one up.
     pub fn get(&self, id: &str) -> Option<Account> {
@@ -139,7 +152,10 @@ impl AccountManager {
     }
     /// Make `id` the active account (the shell Settings switcher calls this).
     pub fn set_active(&self, id: &str) -> Result<()> {
-        let mut idx = self.index.lock().map_err(|_| Error::Vault("poisoned".into()))?;
+        let mut idx = self
+            .index
+            .lock()
+            .map_err(|_| Error::Vault("poisoned".into()))?;
         if !idx.accounts.iter().any(|a| a.id == id) {
             return Err(Error::UnknownAccount(id.into()));
         }
@@ -155,15 +171,30 @@ impl AccountManager {
     }
 
     /// Persist tokens obtained from a completed flow; creates or updates the account and makes it active.
-    pub fn add_with_tokens(&self, provider: Provider, tenant: &Tenant, tokens: TokenSet) -> Result<Account> {
-        let claims = tokens.id_token.as_deref().map(IdClaims::decode).transpose()?.ok_or_else(|| {
-            Error::Invalid("no id_token: the grant must include the `openid` scope".into())
-        })?;
+    pub fn add_with_tokens(
+        &self,
+        provider: Provider,
+        tenant: &Tenant,
+        tokens: TokenSet,
+    ) -> Result<Account> {
+        let claims = tokens
+            .id_token
+            .as_deref()
+            .map(IdClaims::decode)
+            .transpose()?
+            .ok_or_else(|| {
+                Error::Invalid("no id_token: the grant must include the `openid` scope".into())
+            })?;
         let id = Self::account_id(provider, &claims);
         let now = (self.now)();
-        let mut idx = self.index.lock().map_err(|_| Error::Vault("poisoned".into()))?;
+        let mut idx = self
+            .index
+            .lock()
+            .map_err(|_| Error::Vault("poisoned".into()))?;
         let existing = idx.accounts.iter().position(|a| a.id == id);
-        let mut scopes: Vec<String> = existing.map(|i| idx.accounts[i].scopes.clone()).unwrap_or_default();
+        let mut scopes: Vec<String> = existing
+            .map(|i| idx.accounts[i].scopes.clone())
+            .unwrap_or_default();
         for s in &tokens.scopes {
             if !scopes.iter().any(|x| x.eq_ignore_ascii_case(s)) {
                 scopes.push(s.clone());
@@ -172,7 +203,11 @@ impl AccountManager {
         let account = Account {
             id: id.clone(),
             provider,
-            tenant: if provider == Provider::Microsoft { tenant.segment().to_owned() } else { "common".into() },
+            tenant: if provider == Provider::Microsoft {
+                tenant.segment().to_owned()
+            } else {
+                "common".into()
+            },
             label: claims.label(),
             display_name: claims.name.clone(),
             picture: claims.picture.clone(),
@@ -197,7 +232,10 @@ impl AccountManager {
     }
 
     fn load(&self, id: &str) -> Result<Option<TokenSet>> {
-        self.vault.get(id)?.map(|s| serde_json::from_str(&s).map_err(Error::from)).transpose()
+        self.vault
+            .get(id)?
+            .map(|s| serde_json::from_str(&s).map_err(Error::from))
+            .transpose()
     }
 
     /// Browser sign-in: PKCE authorization code flow with a loopback redirect.
@@ -219,10 +257,26 @@ impl AccountManager {
         let pkce = Pkce::generate()?;
         let state = random_urlsafe(24)?;
         let wanted = flow::effective_scopes(&cfg, scopes);
-        let url = flow::authorization_url(&cfg, &wanted, &redirect, &state, &pkce, login_hint, force_consent)?;
+        let url = flow::authorization_url(
+            &cfg,
+            &wanted,
+            &redirect,
+            &state,
+            &pkce,
+            login_hint,
+            force_consent,
+        )?;
         open_url(&url);
         let code = lb.wait_for_code(&state, timeout)?;
-        let tokens = flow::exchange_code(self.http.as_ref(), &cfg, &code, &redirect, &pkce, &wanted, (self.now)())?;
+        let tokens = flow::exchange_code(
+            self.http.as_ref(),
+            &cfg,
+            &code,
+            &redirect,
+            &pkce,
+            &wanted,
+            (self.now)(),
+        )?;
         self.add_with_tokens(provider, &cfg.tenant, tokens)
     }
 
@@ -231,7 +285,10 @@ impl AccountManager {
         let cfg = self.client(provider)?;
         let wanted = flow::effective_scopes(&cfg, scopes);
         if provider == Provider::Google {
-            if let Some(bad) = wanted.iter().find(|s| !crate::scopes::google_device_flow_allows(s)) {
+            if let Some(bad) = wanted
+                .iter()
+                .find(|s| !crate::scopes::google_device_flow_allows(s))
+            {
                 return Err(Error::Invalid(format!(
                     "Google's device flow only allows openid/email/profile, drive.file, drive.appdata and youtube scopes; `{bad}` needs the loopback flow"
                 )));
@@ -241,7 +298,12 @@ impl AccountManager {
     }
 
     /// Poll the device grant until the user finishes, then store the account.
-    pub fn finish_device(&self, provider: Provider, dc: &DeviceCode, sleep: &dyn Fn(Duration)) -> Result<Account> {
+    pub fn finish_device(
+        &self,
+        provider: Provider,
+        dc: &DeviceCode,
+        sleep: &dyn Fn(Duration),
+    ) -> Result<Account> {
         let cfg = self.client(provider)?;
         let tokens = flow::wait_device(self.http.as_ref(), &cfg, dc, &|| (self.now)(), sleep)?;
         self.add_with_tokens(provider, &cfg.tenant, tokens)
@@ -249,7 +311,9 @@ impl AccountManager {
 
     /// Sign out. With `revoke`, Google tokens are revoked at the provider first (best effort).
     pub fn remove(&self, id: &str, revoke: bool) -> Result<()> {
-        let acct = self.get(id).ok_or_else(|| Error::UnknownAccount(id.into()))?;
+        let acct = self
+            .get(id)
+            .ok_or_else(|| Error::UnknownAccount(id.into()))?;
         if revoke {
             if let (Some(t), Ok(cfg)) = (self.load(id)?, self.client(acct.provider)) {
                 let token = t.refresh_token.as_deref().unwrap_or(&t.access_token);
@@ -257,7 +321,10 @@ impl AccountManager {
             }
         }
         self.vault.delete(id)?;
-        let mut idx = self.index.lock().map_err(|_| Error::Vault("poisoned".into()))?;
+        let mut idx = self
+            .index
+            .lock()
+            .map_err(|_| Error::Vault("poisoned".into()))?;
         idx.accounts.retain(|a| a.id != id);
         if idx.active.as_deref() == Some(id) {
             idx.active = idx.accounts.first().map(|a| a.id.clone());
@@ -268,7 +335,9 @@ impl AccountManager {
 
 impl TokenSource for AccountManager {
     fn bearer(&self, account: &str, scopes: &[&str]) -> Result<String> {
-        let acct = self.get(account).ok_or_else(|| Error::UnknownAccount(account.into()))?;
+        let acct = self
+            .get(account)
+            .ok_or_else(|| Error::UnknownAccount(account.into()))?;
         let missing: Vec<String> = {
             let probe = TokenSet {
                 access_token: String::new(),
@@ -277,13 +346,25 @@ impl TokenSource for AccountManager {
                 scopes: acct.scopes.clone(),
                 id_token: None,
             };
-            probe.missing_scopes(scopes).into_iter().map(str::to_owned).collect()
+            probe
+                .missing_scopes(scopes)
+                .into_iter()
+                .map(str::to_owned)
+                .collect()
         };
         if !missing.is_empty() {
-            return Err(Error::MissingScopes { account: account.into(), missing });
+            return Err(Error::MissingScopes {
+                account: account.into(),
+                missing,
+            });
         }
-        let _g = self.refresh_lock.lock().map_err(|_| Error::Vault("poisoned".into()))?;
-        let tokens = self.load(account)?.ok_or_else(|| Error::ReauthRequired(account.into()))?;
+        let _g = self
+            .refresh_lock
+            .lock()
+            .map_err(|_| Error::Vault("poisoned".into()))?;
+        let tokens = self
+            .load(account)?
+            .ok_or_else(|| Error::ReauthRequired(account.into()))?;
         let now = (self.now)();
         if tokens.is_fresh(now, EXPIRY_SKEW_SECS) {
             return Ok(tokens.access_token);
@@ -294,8 +375,13 @@ impl TokenSource for AccountManager {
                 self.vault.set(account, &serde_json::to_string(&new)?)?;
                 Ok(new.access_token)
             }
-            Err(Error::OAuth { code, .. }) if code == "invalid_grant" || code == "interaction_required" => {
-                let mut idx = self.index.lock().map_err(|_| Error::Vault("poisoned".into()))?;
+            Err(Error::OAuth { code, .. })
+                if code == "invalid_grant" || code == "interaction_required" =>
+            {
+                let mut idx = self
+                    .index
+                    .lock()
+                    .map_err(|_| Error::Vault("poisoned".into()))?;
                 if let Some(a) = idx.accounts.iter_mut().find(|a| a.id == account) {
                     a.needs_reauth = true;
                 }
@@ -316,10 +402,18 @@ mod tests {
     use serde_json::json;
     use std::sync::atomic::{AtomicU64, Ordering};
 
-    fn mgr(dir: &std::path::Path, http: Arc<ScriptedTransport>, clock: Arc<AtomicU64>) -> AccountManager {
-        let m = AccountManager::open(dir.join("accounts.json"), Arc::new(MemoryVault::new()), http)
-            .unwrap()
-            .with_clock(move || clock.load(Ordering::SeqCst));
+    fn mgr(
+        dir: &std::path::Path,
+        http: Arc<ScriptedTransport>,
+        clock: Arc<AtomicU64>,
+    ) -> AccountManager {
+        let m = AccountManager::open(
+            dir.join("accounts.json"),
+            Arc::new(MemoryVault::new()),
+            http,
+        )
+        .unwrap()
+        .with_clock(move || clock.load(Ordering::SeqCst));
         m.register_client(ProviderConfig::google("gid", Some("gsec".into())));
         m.register_client(ProviderConfig::microsoft("mid", Tenant::Common));
         m
@@ -331,7 +425,9 @@ mod tests {
             refresh_token: rt.map(str::to_owned),
             expires_at: exp,
             scopes: scopes.iter().map(|s| (*s).to_owned()).collect(),
-            id_token: Some(fake_id_token(&json!({"sub":sub,"email":email,"name":"Owner"}))),
+            id_token: Some(fake_id_token(
+                &json!({"sub":sub,"email":email,"name":"Owner"}),
+            )),
         }
     }
 
@@ -339,28 +435,63 @@ mod tests {
     fn multiple_accounts_switch_and_persist_without_secrets() {
         let dir = tempfile::tempdir().unwrap();
         let clock = Arc::new(AtomicU64::new(1000));
-        let m = mgr(dir.path(), Arc::new(ScriptedTransport::new()), clock.clone());
-        let a = m.add_with_tokens(Provider::Google, &Tenant::Common, tokens("1", "a@gmail.com", &["openid"], Some("RT-A"), 5000)).unwrap();
-        let b = m.add_with_tokens(Provider::Microsoft, &Tenant::Consumers, tokens("2", "b@outlook.com", &["User.Read"], Some("RT-B"), 5000)).unwrap();
+        let m = mgr(
+            dir.path(),
+            Arc::new(ScriptedTransport::new()),
+            clock.clone(),
+        );
+        let a = m
+            .add_with_tokens(
+                Provider::Google,
+                &Tenant::Common,
+                tokens("1", "a@gmail.com", &["openid"], Some("RT-A"), 5000),
+            )
+            .unwrap();
+        let b = m
+            .add_with_tokens(
+                Provider::Microsoft,
+                &Tenant::Consumers,
+                tokens("2", "b@outlook.com", &["User.Read"], Some("RT-B"), 5000),
+            )
+            .unwrap();
         assert_eq!(a.id, "google:1");
         assert_eq!(b.id, "microsoft:2");
         assert_eq!(m.active().unwrap().id, b.id);
         m.set_active(&a.id).unwrap();
         assert_eq!(m.list().len(), 2);
-        assert!(matches!(m.set_active("nope"), Err(Error::UnknownAccount(_))));
+        assert!(matches!(
+            m.set_active("nope"),
+            Err(Error::UnknownAccount(_))
+        ));
 
         let on_disk = std::fs::read_to_string(dir.path().join("accounts.json")).unwrap();
-        assert!(!on_disk.contains("RT-A") && !on_disk.contains("AT-1"), "index must hold no token material");
+        assert!(
+            !on_disk.contains("RT-A") && !on_disk.contains("AT-1"),
+            "index must hold no token material"
+        );
 
-        let reopened = AccountManager::open(dir.path().join("accounts.json"), Arc::new(MemoryVault::new()), Arc::new(ScriptedTransport::new())).unwrap();
+        let reopened = AccountManager::open(
+            dir.path().join("accounts.json"),
+            Arc::new(MemoryVault::new()),
+            Arc::new(ScriptedTransport::new()),
+        )
+        .unwrap();
         assert_eq!(reopened.active().unwrap().id, a.id);
         assert_eq!(reopened.get("microsoft:2").unwrap().tenant, "consumers");
     }
 
     #[test]
     fn entra_ids_use_tenant_and_object_id() {
-        let c = IdClaims { sub: "pairwise".into(), tid: Some("T".into()), oid: Some("O".into()), ..Default::default() };
-        assert_eq!(AccountManager::account_id(Provider::Microsoft, &c), "microsoft:T.O");
+        let c = IdClaims {
+            sub: "pairwise".into(),
+            tid: Some("T".into()),
+            oid: Some("O".into()),
+            ..Default::default()
+        };
+        assert_eq!(
+            AccountManager::account_id(Provider::Microsoft, &c),
+            "microsoft:T.O"
+        );
     }
 
     #[test]
@@ -372,13 +503,33 @@ mod tests {
             HttpResponse::json(200, &json!({"access_token":"AT-new","expires_in":3600})),
         ));
         let m = mgr(dir.path(), http.clone(), clock.clone());
-        let a = m.add_with_tokens(Provider::Google, &Tenant::Common, tokens("1", "a@gmail.com", &["openid", "https://www.googleapis.com/auth/drive"], Some("RT"), 1500)).unwrap();
-        assert_eq!(m.bearer(&a.id, &["https://www.googleapis.com/auth/drive.readonly"]).unwrap(), "AT-1");
+        let a = m
+            .add_with_tokens(
+                Provider::Google,
+                &Tenant::Common,
+                tokens(
+                    "1",
+                    "a@gmail.com",
+                    &["openid", "https://www.googleapis.com/auth/drive"],
+                    Some("RT"),
+                    1500,
+                ),
+            )
+            .unwrap();
+        assert_eq!(
+            m.bearer(&a.id, &["https://www.googleapis.com/auth/drive.readonly"])
+                .unwrap(),
+            "AT-1"
+        );
         assert_eq!(http.count("/token"), 0);
         clock.store(1450, Ordering::SeqCst);
         assert_eq!(m.bearer(&a.id, &[]).unwrap(), "AT-new");
         assert_eq!(m.bearer(&a.id, &[]).unwrap(), "AT-new");
-        assert_eq!(http.count("/token"), 1, "second call uses the refreshed token");
+        assert_eq!(
+            http.count("/token"),
+            1,
+            "second call uses the refreshed token"
+        );
     }
 
     #[test]
@@ -386,9 +537,17 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let http = Arc::new(ScriptedTransport::new());
         let m = mgr(dir.path(), http.clone(), Arc::new(AtomicU64::new(0)));
-        let a = m.add_with_tokens(Provider::Google, &Tenant::Common, tokens("1", "a@gmail.com", &["openid"], Some("RT"), 9999)).unwrap();
+        let a = m
+            .add_with_tokens(
+                Provider::Google,
+                &Tenant::Common,
+                tokens("1", "a@gmail.com", &["openid"], Some("RT"), 9999),
+            )
+            .unwrap();
         match m.bearer(&a.id, &["https://www.googleapis.com/auth/documents"]) {
-            Err(Error::MissingScopes { missing, .. }) => assert_eq!(missing, vec!["https://www.googleapis.com/auth/documents"]),
+            Err(Error::MissingScopes { missing, .. }) => {
+                assert_eq!(missing, vec!["https://www.googleapis.com/auth/documents"])
+            }
             other => panic!("{other:?}"),
         }
         assert!(http.requests().is_empty());
@@ -397,31 +556,88 @@ mod tests {
     #[test]
     fn revoked_refresh_token_flags_the_account() {
         let dir = tempfile::tempdir().unwrap();
-        let http = Arc::new(ScriptedTransport::new().on("/token", HttpResponse::json(400, &json!({"error":"invalid_grant"}))));
+        let http = Arc::new(ScriptedTransport::new().on(
+            "/token",
+            HttpResponse::json(400, &json!({"error":"invalid_grant"})),
+        ));
         let m = mgr(dir.path(), http, Arc::new(AtomicU64::new(100)));
-        let a = m.add_with_tokens(Provider::Google, &Tenant::Common, tokens("1", "a@gmail.com", &["openid"], Some("RT"), 100)).unwrap();
-        assert!(matches!(m.bearer(&a.id, &[]), Err(Error::ReauthRequired(_))));
+        let a = m
+            .add_with_tokens(
+                Provider::Google,
+                &Tenant::Common,
+                tokens("1", "a@gmail.com", &["openid"], Some("RT"), 100),
+            )
+            .unwrap();
+        assert!(matches!(
+            m.bearer(&a.id, &[]),
+            Err(Error::ReauthRequired(_))
+        ));
         assert!(m.get(&a.id).unwrap().needs_reauth);
     }
 
     #[test]
     fn incremental_consent_unions_scopes_and_keeps_the_refresh_token() {
         let dir = tempfile::tempdir().unwrap();
-        let m = mgr(dir.path(), Arc::new(ScriptedTransport::new()), Arc::new(AtomicU64::new(0)));
-        m.add_with_tokens(Provider::Google, &Tenant::Common, tokens("1", "a@gmail.com", &["openid"], Some("RT"), 9999)).unwrap();
-        let a = m.add_with_tokens(Provider::Google, &Tenant::Common, tokens("1", "a@gmail.com", &["https://www.googleapis.com/auth/documents"], None, 9999)).unwrap();
+        let m = mgr(
+            dir.path(),
+            Arc::new(ScriptedTransport::new()),
+            Arc::new(AtomicU64::new(0)),
+        );
+        m.add_with_tokens(
+            Provider::Google,
+            &Tenant::Common,
+            tokens("1", "a@gmail.com", &["openid"], Some("RT"), 9999),
+        )
+        .unwrap();
+        let a = m
+            .add_with_tokens(
+                Provider::Google,
+                &Tenant::Common,
+                tokens(
+                    "1",
+                    "a@gmail.com",
+                    &["https://www.googleapis.com/auth/documents"],
+                    None,
+                    9999,
+                ),
+            )
+            .unwrap();
         assert_eq!(m.list().len(), 1);
-        assert!(a.scopes.contains(&"openid".to_owned()) && a.scopes.iter().any(|s| s.ends_with("/documents")));
-        assert_eq!(m.load(&a.id).unwrap().unwrap().refresh_token.as_deref(), Some("RT"));
+        assert!(
+            a.scopes.contains(&"openid".to_owned())
+                && a.scopes.iter().any(|s| s.ends_with("/documents"))
+        );
+        assert_eq!(
+            m.load(&a.id).unwrap().unwrap().refresh_token.as_deref(),
+            Some("RT")
+        );
     }
 
     #[test]
     fn remove_revokes_google_and_promotes_another_account() {
         let dir = tempfile::tempdir().unwrap();
-        let http = Arc::new(ScriptedTransport::new().on("revoke", HttpResponse { status: 200, ..Default::default() }));
+        let http = Arc::new(ScriptedTransport::new().on(
+            "revoke",
+            HttpResponse {
+                status: 200,
+                ..Default::default()
+            },
+        ));
         let m = mgr(dir.path(), http.clone(), Arc::new(AtomicU64::new(0)));
-        let a = m.add_with_tokens(Provider::Google, &Tenant::Common, tokens("1", "a@gmail.com", &["openid"], Some("RT"), 9)).unwrap();
-        let b = m.add_with_tokens(Provider::Microsoft, &Tenant::Common, tokens("2", "b@x.y", &["User.Read"], Some("R2"), 9)).unwrap();
+        let a = m
+            .add_with_tokens(
+                Provider::Google,
+                &Tenant::Common,
+                tokens("1", "a@gmail.com", &["openid"], Some("RT"), 9),
+            )
+            .unwrap();
+        let b = m
+            .add_with_tokens(
+                Provider::Microsoft,
+                &Tenant::Common,
+                tokens("2", "b@x.y", &["User.Read"], Some("R2"), 9),
+            )
+            .unwrap();
         m.set_active(&a.id).unwrap();
         m.remove(&a.id, true).unwrap();
         assert!(http.requests()[0].body_text().contains("token=RT"));
@@ -432,8 +648,14 @@ mod tests {
     #[test]
     fn google_device_flow_refuses_full_drive_scope() {
         let dir = tempfile::tempdir().unwrap();
-        let m = mgr(dir.path(), Arc::new(ScriptedTransport::new()), Arc::new(AtomicU64::new(0)));
-        let err = m.begin_device(Provider::Google, &["https://www.googleapis.com/auth/drive"]).unwrap_err();
+        let m = mgr(
+            dir.path(),
+            Arc::new(ScriptedTransport::new()),
+            Arc::new(AtomicU64::new(0)),
+        );
+        let err = m
+            .begin_device(Provider::Google, &["https://www.googleapis.com/auth/drive"])
+            .unwrap_err();
         assert!(err.to_string().contains("loopback"));
     }
 
@@ -457,11 +679,19 @@ mod tests {
                     let u = url::Url::parse(url).unwrap();
                     let q: HashMap<_, _> = u.query_pairs().into_owned().collect();
                     let redirect = url::Url::parse(&q["redirect_uri"]).unwrap();
-                    let (host, port, state) = (redirect.host_str().unwrap().to_owned(), redirect.port().unwrap(), q["state"].clone());
+                    let (host, port, state) = (
+                        redirect.host_str().unwrap().to_owned(),
+                        redirect.port().unwrap(),
+                        q["state"].clone(),
+                    );
                     std::thread::spawn(move || {
                         use std::io::{Read, Write};
                         let mut s = std::net::TcpStream::connect((host.as_str(), port)).unwrap();
-                        write!(s, "GET /?code=THE_CODE&state={state} HTTP/1.1\r\nHost: x\r\n\r\n").unwrap();
+                        write!(
+                            s,
+                            "GET /?code=THE_CODE&state={state} HTTP/1.1\r\nHost: x\r\n\r\n"
+                        )
+                        .unwrap();
                         let mut sink = String::new();
                         let _ = s.read_to_string(&mut sink);
                     });
@@ -473,6 +703,10 @@ mod tests {
         assert_eq!(acct.label, "me@gmail.com");
         let body = http.requests()[0].body_text();
         assert!(body.contains("code=THE_CODE") && body.contains("code_verifier="));
-        assert_eq!(m.bearer(&acct.id, &["https://www.googleapis.com/auth/drive.file"]).unwrap(), "AT");
+        assert_eq!(
+            m.bearer(&acct.id, &["https://www.googleapis.com/auth/drive.file"])
+                .unwrap(),
+            "AT"
+        );
     }
 }

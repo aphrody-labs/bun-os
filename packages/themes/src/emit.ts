@@ -38,25 +38,17 @@ const ALIAS: Record<ThemeId, Record<string, string>> = {
   },
   fluent: {},
 };
-function rampVars(
-  s: ThemeStatic,
-  ramp: ThemeStatic["ramp"],
-): Record<string, string> {
+function rampVars(s: ThemeStatic, ramp: ThemeStatic["ramp"]): Record<string, string> {
   const o: Record<string, string> = {};
-  const put = (
-    name: string,
-    t: { size: number; line: number; weight: number },
-  ) => {
+  const put = (name: string, t: { size: number; line: number; weight: number }) => {
     o[`--t-text-${name}-size`] = `${t.size}px`;
     o[`--t-text-${name}-line`] = `${t.line}px`;
     o[`--t-text-${name}-weight`] = `${t.weight}`;
   };
   for (const [k, t] of Object.entries(ramp)) put(kebab(k), t);
   for (const [name, from] of Object.entries(ALIAS[s.id])) {
-    const src =
-      ramp[from] ?? ramp[from.replace(/-([a-z])/g, (_, c) => c.toUpperCase())];
-    if (!src)
-      throw new Error(`ramp alias ${name} -> ${from} missing in ${s.id}`);
+    const src = ramp[from] ?? ramp[from.replace(/-([a-z])/g, (_, c) => c.toUpperCase())];
+    if (!src) throw new Error(`ramp alias ${name} -> ${from} missing in ${s.id}`);
     put(name, src);
   }
   return o;
@@ -108,9 +100,7 @@ export function themesCss(m: Model, components: string): string {
       const base = rs.find(r => r.accent === s.defaultAccent)!;
       const baseVars = colorVars(base, s);
       const baseSel =
-        scheme === "dark"
-          ? `[data-skin="${id}"][data-scheme="dark"]`
-          : `[data-skin="${id}"]:not([data-scheme="dark"])`;
+        scheme === "dark" ? `[data-skin="${id}"][data-scheme="dark"]` : `[data-skin="${id}"]:not([data-scheme="dark"])`;
       out += block(baseSel, { ...baseVars, "color-scheme": scheme });
       for (const r of rs) {
         if (r === base) continue;

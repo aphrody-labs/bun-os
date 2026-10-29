@@ -11,8 +11,7 @@ fn repo_root() -> std::path::PathBuf {
 }
 
 fn bytes(f: &Font) -> Vec<u8> {
-    std::fs::read(repo_root().join(f.file))
-        .unwrap_or_else(|e| panic!("{}: {e}", f.file))
+    std::fs::read(repo_root().join(f.file)).unwrap_or_else(|e| panic!("{}: {e}", f.file))
 }
 
 #[test]

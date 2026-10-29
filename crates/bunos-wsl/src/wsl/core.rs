@@ -3,14 +3,17 @@
 //! Basic operations for listing, starting, stopping, and managing WSL distributions.
 //! All WSL CLI calls go through the executor abstraction layer.
 
-use std::path::Path;
+use bunos_wsl_core::parse_wsl_list_output;
 use log::{debug, error, info, warn};
+use std::path::Path;
 use winreg::enums::*;
 use winreg::RegKey;
-use bunos_wsl_core::parse_wsl_list_output;
 
 use super::executor::{resource_monitor, wsl_executor};
-use super::types::{CompactResult, Distribution, DistroState, WslError, MountedDisk, MountDiskOptions, PhysicalDisk, WSL_REGISTRY_PATH};
+use super::types::{
+    CompactResult, Distribution, DistroState, MountDiskOptions, MountedDisk, PhysicalDisk,
+    WslError, WSL_REGISTRY_PATH,
+};
 use crate::metadata;
 
 /// Parse bytes trimmed from fstrim output
@@ -217,7 +220,9 @@ pub fn list_distributions() -> Result<Vec<Distribution>, WslError> {
             Ok(running) => {
                 for distro in &mut distros {
                     if distro.state == DistroState::Unknown
-                        && running.iter().any(|name| name.eq_ignore_ascii_case(&distro.name))
+                        && running
+                            .iter()
+                            .any(|name| name.eq_ignore_ascii_case(&distro.name))
                     {
                         distro.state = DistroState::Running;
                     }
@@ -281,7 +286,10 @@ pub fn stop_distribution(name: &str) -> Result<(), WslError> {
 
 /// Force stop all WSL distributions (nuclear option)
 pub fn force_stop_distribution(name: &str) -> Result<(), WslError> {
-    info!("Force stopping distribution '{}' (will shutdown all WSL)", name);
+    info!(
+        "Force stopping distribution '{}' (will shutdown all WSL)",
+        name
+    );
 
     let output = wsl_executor().shutdown()?;
 
@@ -350,7 +358,10 @@ pub fn force_kill_wsl() -> Result<(), WslError> {
     let output = wsl_executor().shutdown_force()?;
 
     if !output.success {
-        warn!("wsl --shutdown --force returned non-zero exit code: {}", output.stderr);
+        warn!(
+            "wsl --shutdown --force returned non-zero exit code: {}",
+            output.stderr
+        );
     }
 
     // Give WSL time to fully terminate
@@ -358,7 +369,10 @@ pub fn force_kill_wsl() -> Result<(), WslError> {
 
     // Verify shutdown
     if let Ok(distros) = list_distributions() {
-        let still_running = distros.iter().filter(|d| d.state == DistroState::Running).count();
+        let still_running = distros
+            .iter()
+            .filter(|d| d.state == DistroState::Running)
+            .count();
         if still_running > 0 {
             warn!(
                 "WARNING: {} distributions may still be running. You may need to restart your computer.",
@@ -407,7 +421,10 @@ pub fn move_distribution(name: &str, location: &str) -> Result<(), WslError> {
     // Create destination directory if it doesn't exist
     if let Err(e) = std::fs::create_dir_all(location) {
         error!("Failed to create destination directory: {}", e);
-        return Err(WslError::CommandFailed(format!("Failed to create destination directory: {}", e)));
+        return Err(WslError::CommandFailed(format!(
+            "Failed to create destination directory: {}",
+            e
+        )));
     }
 
     let output = wsl_executor().move_distro(name, location)?;
@@ -469,14 +486,22 @@ pub fn set_default_user(name: &str, username: &str) -> Result<(), WslError> {
 
     // Validate username format (basic Linux username rules)
     if username.is_empty() {
-        return Err(WslError::CommandFailed("Username cannot be empty".to_string()));
+        return Err(WslError::CommandFailed(
+            "Username cannot be empty".to_string(),
+        ));
     }
     if !username.chars().next().unwrap().is_ascii_lowercase() {
-        return Err(WslError::CommandFailed("Username must start with a lowercase letter".to_string()));
-    }
-    if !username.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-') {
         return Err(WslError::CommandFailed(
-            "Username can only contain lowercase letters, digits, underscores, and hyphens".to_string()
+            "Username must start with a lowercase letter".to_string(),
+        ));
+    }
+    if !username
+        .chars()
+        .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-')
+    {
+        return Err(WslError::CommandFailed(
+            "Username can only contain lowercase letters, digits, underscores, and hyphens"
+                .to_string(),
         ));
     }
 
@@ -553,8 +578,8 @@ pub fn compact_distribution(name: &str) -> Result<CompactResult, WslError> {
         info!("Mock: Compacting distribution '{}'", name);
         // Simulate a successful compact with realistic size reduction
         return Ok(CompactResult {
-            size_before: 8_000_000_000,     // ~8 GB before
-            size_after: 6_500_000_000,      // ~6.5 GB after (1.5 GB saved)
+            size_before: 8_000_000_000, // ~8 GB before
+            size_after: 6_500_000_000,  // ~6.5 GB after (1.5 GB saved)
             fstrim_bytes: Some(1_200_000_000),
             fstrim_message: Some("Mock: 1.2 GB trimmed".to_string()),
         });
@@ -586,9 +611,7 @@ pub fn compact_distribution(name: &str) -> Result<CompactResult, WslError> {
     info!("Found VHDX at: {}", vhdx_path);
 
     // Get size before compact
-    let size_before = resource_monitor()
-        .get_distro_vhdx_size(name)
-        .unwrap_or(0);
+    let size_before = resource_monitor().get_distro_vhdx_size(name).unwrap_or(0);
 
     info!("Size before compact: {} bytes", size_before);
 
@@ -601,7 +624,7 @@ pub fn compact_distribution(name: &str) -> Result<CompactResult, WslError> {
     let fstrim_result = wsl_executor().exec_as_root(
         name,
         distro.id.as_deref(),
-        "fstrim -av 2>/dev/null || fstrim -v / 2>&1 || echo 'fstrim not available'"
+        "fstrim -av 2>/dev/null || fstrim -v / 2>&1 || echo 'fstrim not available'",
     );
 
     // Parse fstrim output to extract bytes trimmed
@@ -611,7 +634,10 @@ pub fn compact_distribution(name: &str) -> Result<CompactResult, WslError> {
             info!("fstrim output: {}", stdout);
 
             if stdout.contains("not available") {
-                (None, Some("fstrim not available on this distribution".to_string()))
+                (
+                    None,
+                    Some("fstrim not available on this distribution".to_string()),
+                )
             } else {
                 // Try to parse bytes from output like "1.2 TiB (1288557195264 bytes) trimmed"
                 // or BusyBox format "/: 123456789 bytes"
@@ -645,9 +671,7 @@ pub fn compact_distribution(name: &str) -> Result<CompactResult, WslError> {
     std::thread::sleep(std::time::Duration::from_millis(500));
 
     // Get size after compact
-    let size_after = resource_monitor()
-        .get_distro_vhdx_size(name)
-        .unwrap_or(0);
+    let size_after = resource_monitor().get_distro_vhdx_size(name).unwrap_or(0);
 
     let result = CompactResult {
         size_before,
@@ -677,7 +701,7 @@ pub fn set_distro_version(name: &str, version: u8) -> Result<(), WslError> {
     // Validate version
     if version != 1 && version != 2 {
         return Err(WslError::CommandFailed(
-            "Version must be 1 or 2".to_string()
+            "Version must be 1 or 2".to_string(),
         ));
     }
 
@@ -709,7 +733,10 @@ pub fn set_distro_version(name: &str, version: u8) -> Result<(), WslError> {
         return Err(WslError::CommandFailed(error_msg));
     }
 
-    info!("Distribution version changed to WSL {} successfully", version);
+    info!(
+        "Distribution version changed to WSL {} successfully",
+        version
+    );
     Ok(())
 }
 
@@ -748,7 +775,9 @@ pub fn rename_distribution(
 
     // Validate new name
     if new_name.is_empty() {
-        return Err(WslError::CommandFailed("New name cannot be empty".to_string()));
+        return Err(WslError::CommandFailed(
+            "New name cannot be empty".to_string(),
+        ));
     }
 
     // Check for invalid characters
@@ -762,7 +791,7 @@ pub fn rename_distribution(
     // Check name length
     if new_name.len() > 64 {
         return Err(WslError::CommandFailed(
-            "Name is too long (max 64 characters)".to_string()
+            "Name is too long (max 64 characters)".to_string(),
         ));
     }
 
@@ -777,9 +806,13 @@ pub fn rename_distribution(
     ensure_distribution_stopped(&old_name, "renaming")?;
 
     // Check new name doesn't conflict with existing distribution
-    if distros.iter().any(|d| d.name.eq_ignore_ascii_case(new_name) && d.id.as_deref() != Some(id)) {
+    if distros
+        .iter()
+        .any(|d| d.name.eq_ignore_ascii_case(new_name) && d.id.as_deref() != Some(id))
+    {
         return Err(WslError::CommandFailed(format!(
-            "A distribution named '{}' already exists", new_name
+            "A distribution named '{}' already exists",
+            new_name
         )));
     }
 
@@ -821,7 +854,10 @@ pub fn rename_distribution(
                     let lxss_path = format!(r"{}\{}", WSL_REGISTRY_PATH, id);
                     if let Ok(distro_key) = hkcu.open_subkey_with_flags(&lxss_path, KEY_WRITE) {
                         if let Err(e) = distro_key.set_value("ShortcutPath", &new_shortcut_path) {
-                            warn!("Failed to update shortcut path in registry (non-fatal): {}", e);
+                            warn!(
+                                "Failed to update shortcut path in registry (non-fatal): {}",
+                                e
+                            );
                         } else {
                             info!("Updated shortcut path in registry");
                         }
@@ -908,7 +944,10 @@ fn update_terminal_settings_json(profile_guid: &str, new_name: &str) {
     for settings_path in &settings_paths {
         if let Err(e) = update_single_terminal_settings(settings_path, profile_guid, new_name) {
             // Log but don't fail - this is best-effort
-            debug!("Could not update terminal settings at {}: {}", settings_path, e);
+            debug!(
+                "Could not update terminal settings at {}: {}",
+                settings_path, e
+            );
         } else {
             info!("Updated terminal settings.json at {}", settings_path);
         }
@@ -916,36 +955,54 @@ fn update_terminal_settings_json(profile_guid: &str, new_name: &str) {
 }
 
 /// Update a single Terminal settings.json file
-fn update_single_terminal_settings(path: &str, profile_guid: &str, new_name: &str) -> Result<(), String> {
+fn update_single_terminal_settings(
+    path: &str,
+    profile_guid: &str,
+    new_name: &str,
+) -> Result<(), String> {
     let path = Path::new(path);
     if !path.exists() {
         return Err("Settings file does not exist".to_string());
     }
 
-    let content = std::fs::read_to_string(path)
-        .map_err(|e| format!("Failed to read settings: {}", e))?;
+    let content =
+        std::fs::read_to_string(path).map_err(|e| format!("Failed to read settings: {}", e))?;
 
     use jsonc_parser::common::Ranged;
-    let parsed = jsonc_parser::parse_to_ast(&content, &Default::default(), &jsonc_parser::ParseOptions {
-        allow_comments: true,
-        allow_trailing_commas: true,
-        allow_loose_object_property_names: false,
-        allow_missing_commas: false,
-        allow_single_quoted_strings: false,
-        allow_hexadecimal_numbers: false,
-        allow_unary_plus_numbers: false,
-        allow_bare_decimal_point_numbers: false,
-        allow_extended_string_escapes: false,
-        allow_non_finite_numbers: false,
-    }).map_err(|error| format!("Failed to parse settings JSONC: {}", error))?;
+    let parsed = jsonc_parser::parse_to_ast(
+        &content,
+        &Default::default(),
+        &jsonc_parser::ParseOptions {
+            allow_comments: true,
+            allow_trailing_commas: true,
+            allow_loose_object_property_names: false,
+            allow_missing_commas: false,
+            allow_single_quoted_strings: false,
+            allow_hexadecimal_numbers: false,
+            allow_unary_plus_numbers: false,
+            allow_bare_decimal_point_numbers: false,
+            allow_extended_string_escapes: false,
+            allow_non_finite_numbers: false,
+        },
+    )
+    .map_err(|error| format!("Failed to parse settings JSONC: {}", error))?;
 
-    let profile = parsed.value.as_ref()
+    let profile = parsed
+        .value
+        .as_ref()
         .and_then(|value| value.as_object())
         .and_then(|root| root.get_object("profiles"))
         .and_then(|profiles| profiles.get_array("list"))
-        .and_then(|list| list.elements.iter().filter_map(|value| value.as_object()).find(|profile| {
-            profile.get_string("guid").is_some_and(|guid| guid.value.eq_ignore_ascii_case(profile_guid))
-        }))
+        .and_then(|list| {
+            list.elements
+                .iter()
+                .filter_map(|value| value.as_object())
+                .find(|profile| {
+                    profile
+                        .get_string("guid")
+                        .is_some_and(|guid| guid.value.eq_ignore_ascii_case(profile_guid))
+                })
+        })
         .ok_or_else(|| format!("Profile with GUID {} not found in settings", profile_guid))?;
     let encoded_name = serde_json::to_string(new_name)
         .map_err(|error| format!("Failed to serialize terminal profile name: {}", error))?;
@@ -961,8 +1018,7 @@ fn update_single_terminal_settings(path: &str, profile_guid: &str, new_name: &st
     let mut new_content = content.clone();
     new_content.replace_range(range, &replacement);
 
-    std::fs::write(path, new_content)
-        .map_err(|e| format!("Failed to write settings: {}", e))?;
+    std::fs::write(path, new_content).map_err(|e| format!("Failed to write settings: {}", e))?;
 
     Ok(())
 }
@@ -1089,11 +1145,8 @@ pub fn list_mounted_disks() -> Result<Vec<MountedDisk>, WslError> {
         None => return Ok(Vec::new()),
     };
 
-    let output = wsl_executor().exec(
-        &distro.name,
-        distro.id.as_deref(),
-        "cat /proc/self/mounts"
-    )?;
+    let output =
+        wsl_executor().exec(&distro.name, distro.id.as_deref(), "cat /proc/self/mounts")?;
 
     if !output.success {
         return Err(WslError::CommandFailed(output.stderr));
@@ -1103,7 +1156,13 @@ pub fn list_mounted_disks() -> Result<Vec<MountedDisk>, WslError> {
 
 fn parse_mounted_disks(output: &str) -> Vec<MountedDisk> {
     let mut mounted_disks = Vec::new();
-    let internal_mounts = ["docker-desktop", "docker-desktop-data", "docker-desktop-bind", "rancher-desktop", "rancher-desktop-data"];
+    let internal_mounts = [
+        "docker-desktop",
+        "docker-desktop-data",
+        "docker-desktop-bind",
+        "rancher-desktop",
+        "rancher-desktop-data",
+    ];
 
     for line in output.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();
@@ -1114,21 +1173,26 @@ fn parse_mounted_disks(output: &str) -> Vec<MountedDisk> {
         // Disk devices have several naming schemes. virtiofs uses a share tag
         // instead of a /dev path. Exclude unrelated pseudo filesystems.
         if filesystem != "virtiofs"
-            && (!source.starts_with("/dev/") || matches!(filesystem, "tmpfs" | "devtmpfs" | "devpts"))
+            && (!source.starts_with("/dev/")
+                || matches!(filesystem, "tmpfs" | "devtmpfs" | "devpts"))
         {
             continue;
         }
         // procfs escapes whitespace and backslashes. Decode backslashes last
         // so a literal \040 (encoded as \134040) is not decoded twice.
-        let mount_point = parts[1].replace(r"\040", " ")
+        let mount_point = parts[1]
+            .replace(r"\040", " ")
             .replace(r"\011", "\t")
             .replace(r"\012", "\n")
             .replace(r"\134", "\\");
         let Some(disk_name) = mount_point.strip_prefix("/mnt/wsl/") else {
             continue;
         };
-        if disk_name.is_empty() || disk_name.contains('/')
-            || internal_mounts.iter().any(|&name| disk_name.starts_with(name))
+        if disk_name.is_empty()
+            || disk_name.contains('/')
+            || internal_mounts
+                .iter()
+                .any(|&name| disk_name.starts_with(name))
         {
             continue;
         }
@@ -1159,7 +1223,10 @@ pub fn list_physical_disks() -> Result<Vec<PhysicalDisk>, WslError> {
 /// current_version is the version before update (for comparison)
 /// Returns the update result message on success
 pub fn update_wsl(pre_release: bool, current_version: Option<&str>) -> Result<String, WslError> {
-    info!("Updating WSL (pre_release: {}, current_version: {:?})", pre_release, current_version);
+    info!(
+        "Updating WSL (pre_release: {}, current_version: {:?})",
+        pre_release, current_version
+    );
 
     let output = wsl_executor().update(pre_release, current_version)?;
 
@@ -1173,12 +1240,13 @@ pub fn update_wsl(pre_release: bool, current_version: Option<&str>) -> Result<St
     Ok(message)
 }
 
-
-
 #[cfg(test)]
 mod tests {
     fn rename_terminal_fixture(content: &str, guid: &str, name: &str) -> Result<String, String> {
-        let path = std::env::temp_dir().join(format!("wslui_terminal_{}.json", super::super::unique_temp_tag()));
+        let path = std::env::temp_dir().join(format!(
+            "wslui_terminal_{}.json",
+            super::super::unique_temp_tag()
+        ));
         std::fs::write(&path, content).unwrap();
         let result = super::update_single_terminal_settings(&path.to_string_lossy(), guid, name);
         let saved = std::fs::read_to_string(&path).unwrap();
@@ -1190,21 +1258,30 @@ mod tests {
     fn test_terminal_settings_rename_preserves_jsonc_comments_and_trailing_commas() {
         let original = "{\r\n  // User preferences\r\n  \"profiles\": { \"list\": [\r\n    {\"guid\":\"{ABC}\", /* keep */ \"name\":\"Old\",},\r\n    {\"guid\":\"{OTHER}\", \"name\":\"Old\"},\r\n  ], },\r\n  \"theme\": \"dark\",\r\n}\r\n";
         let saved = rename_terminal_fixture(original, "{abc}", "New").unwrap();
-        assert_eq!(saved, original.replacen("\"name\":\"Old\"", "\"name\":\"New\"", 1));
+        assert_eq!(
+            saved,
+            original.replacen("\"name\":\"Old\"", "\"name\":\"New\"", 1)
+        );
     }
 
     #[test]
     fn test_terminal_settings_rename_preserves_json_formatting_and_escapes_new_name() {
         let original = r#"{ "profiles": { "list": [{"guid":"{ABC}","name":"Old","commandline":"wsl -d Old"}] }, "theme":"dark" }"#;
         let saved = rename_terminal_fixture(original, "{abc}", "New \"name\"").unwrap();
-        assert_eq!(saved, original.replacen("\"name\":\"Old\"", "\"name\":\"New \\\"name\\\"\"", 1));
+        assert_eq!(
+            saved,
+            original.replacen("\"name\":\"Old\"", "\"name\":\"New \\\"name\\\"\"", 1)
+        );
     }
 
     #[test]
     fn test_terminal_settings_rename_adds_missing_name_without_rewriting_profile() {
         let original = r#"{"profiles":{"list":[{/* profile */ "guid":"{ABC}","icon":"https://example.test/icon.png",}]}}"#;
         let saved = rename_terminal_fixture(original, "{abc}", "New").unwrap();
-        assert_eq!(saved, original.replacen("{/* profile */", "{\"name\":\"New\",/* profile */", 1));
+        assert_eq!(
+            saved,
+            original.replacen("{/* profile */", "{\"name\":\"New\",/* profile */", 1)
+        );
     }
 
     #[test]
@@ -1216,9 +1293,13 @@ mod tests {
             r#"{"profiles":{"list":[{"guid":"{ABC}","name":"Old","opacity":Infinity}]}}"#,
             r#"{"profiles":{"list":[{"guid":"{ABC}","name":"\x4f ld"}]}}"#,
         ] {
-            let path = std::env::temp_dir().join(format!("wslui_terminal_invalid_{}.json", super::super::unique_temp_tag()));
+            let path = std::env::temp_dir().join(format!(
+                "wslui_terminal_invalid_{}.json",
+                super::super::unique_temp_tag()
+            ));
             std::fs::write(&path, original).unwrap();
-            let result = super::update_single_terminal_settings(&path.to_string_lossy(), "{abc}", "New");
+            let result =
+                super::update_single_terminal_settings(&path.to_string_lossy(), "{abc}", "New");
             let saved = std::fs::read_to_string(&path).unwrap();
             std::fs::remove_file(path).unwrap();
             assert!(result.is_err());
@@ -1234,8 +1315,18 @@ mod tests {
             "/dev/vdb /mnt/wsl/virtio ext4 rw 0 0\n",
             "share-tag /mnt/wsl/shared virtiofs rw 0 0\n",
         ));
-        assert_eq!(disks.iter().map(|disk| disk.mount_point.as_str()).collect::<Vec<_>>(),
-            ["/mnt/wsl/scsi", "/mnt/wsl/nvme", "/mnt/wsl/virtio", "/mnt/wsl/shared"]);
+        assert_eq!(
+            disks
+                .iter()
+                .map(|disk| disk.mount_point.as_str())
+                .collect::<Vec<_>>(),
+            [
+                "/mnt/wsl/scsi",
+                "/mnt/wsl/nvme",
+                "/mnt/wsl/virtio",
+                "/mnt/wsl/shared"
+            ]
+        );
         assert_eq!(disks[1].filesystem.as_deref(), Some("xfs"));
         assert_eq!(disks[3].filesystem.as_deref(), Some("virtiofs"));
     }
@@ -1243,7 +1334,7 @@ mod tests {
     #[test]
     fn test_mounted_disks_decodes_mount_table_escapes_once() {
         let disks = super::parse_mounted_disks(
-            r"/dev/sdc /mnt/wsl/my\040disk\134040\011tab\012line ext4 rw 0 0"
+            r"/dev/sdc /mnt/wsl/my\040disk\134040\011tab\012line ext4 rw 0 0",
         );
         assert_eq!(disks.len(), 1);
         assert_eq!(disks[0].mount_point, "/mnt/wsl/my disk\\040\ttab\nline");
@@ -1284,7 +1375,10 @@ mod tests {
     fn test_find_transitioning_names_compares_all_with_registered() {
         let all = vec!["Ubuntu".to_string(), "Converting".to_string()];
         let registered = vec!["Ubuntu".to_string()];
-        assert_eq!(find_transitioning_names(&all, &registered), vec!["Converting"]);
+        assert_eq!(
+            find_transitioning_names(&all, &registered),
+            vec!["Converting"]
+        );
     }
 
     // GH #101: on localized Windows, wsl.exe emits the no-distro message in

@@ -38,7 +38,9 @@ pub fn parse_wsl_status(output: &str) -> WslStatus {
             }
         }
         let lower = line.to_lowercase();
-        if lower.contains("kernel") && (lower.contains("not found") || lower.contains("not installed")) {
+        if lower.contains("kernel")
+            && (lower.contains("not found") || lower.contains("not installed"))
+        {
             st.kernel_file_missing = true;
         }
         st.notices.push(line.to_string());

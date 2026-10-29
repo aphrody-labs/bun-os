@@ -1251,11 +1251,7 @@ mod tests {
         let checkpoint = files(root.path(), live_uid).0;
         let original = std::fs::read(&checkpoint).unwrap();
         let saved = root.path().join("saved-other.designcraft");
-        std::fs::write(
-            &saved,
-            crate::format::save(&session.docs[0].doc).unwrap(),
-        )
-        .unwrap();
+        std::fs::write(&saved, crate::format::save(&session.docs[0].doc).unwrap()).unwrap();
         session.docs[0].path = Some(saved.to_string_lossy().into_owned());
         session
             .execute("file.activate", &json!({"index": 0}))

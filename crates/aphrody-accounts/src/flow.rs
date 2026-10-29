@@ -15,7 +15,9 @@ use std::time::Duration;
 
 /// Seconds since the Unix epoch.
 pub fn unix_now() -> u64 {
-    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_secs())
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs())
 }
 
 /// Merge the provider's base scopes with the requested ones, de-duplicated, order preserved.
@@ -43,7 +45,8 @@ pub fn authorization_url(
     login_hint: Option<&str>,
     force_consent: bool,
 ) -> Result<String> {
-    let mut url = url::Url::parse(&cfg.endpoints.authorize).map_err(|e| Error::Invalid(e.to_string()))?;
+    let mut url =
+        url::Url::parse(&cfg.endpoints.authorize).map_err(|e| Error::Invalid(e.to_string()))?;
     {
         let mut q = url.query_pairs_mut();
         q.append_pair("client_id", &cfg.client_id)
@@ -55,7 +58,8 @@ pub fn authorization_url(
             .append_pair("code_challenge_method", "S256");
         match cfg.provider {
             Provider::Google => {
-                q.append_pair("access_type", "offline").append_pair("include_granted_scopes", "true");
+                q.append_pair("access_type", "offline")
+                    .append_pair("include_granted_scopes", "true");
                 if force_consent {
                     q.append_pair("prompt", "consent");
                 }
@@ -84,8 +88,18 @@ struct OAuthErrorBody {
 /// Parse an RFC 6749 error object out of a response, whatever its status.
 fn oauth_error(resp: &HttpResponse) -> Option<Error> {
     let b: OAuthErrorBody = serde_json::from_slice(&resp.body).ok()?;
-    let description = b.error_description.lines().next().unwrap_or_default().chars().take(300).collect();
-    Some(Error::OAuth { code: b.error, description })
+    let description = b
+        .error_description
+        .lines()
+        .next()
+        .unwrap_or_default()
+        .chars()
+        .take(300)
+        .collect();
+    Some(Error::OAuth {
+        code: b.error,
+        description,
+    })
 }
 
 fn token_request(cfg: &ProviderConfig, mut fields: Vec<(String, String)>) -> HttpRequest {
@@ -98,7 +112,10 @@ fn token_request(cfg: &ProviderConfig, mut fields: Vec<(String, String)>) -> Htt
 
 fn finish_token(resp: HttpResponse, now: u64, requested: &[String]) -> Result<TokenSet> {
     if !resp.is_success() {
-        return Err(oauth_error(&resp).unwrap_or(Error::Api { status: resp.status, message: crate::http::api_message(&resp.body) }));
+        return Err(oauth_error(&resp).unwrap_or(Error::Api {
+            status: resp.status,
+            message: crate::http::api_message(&resp.body),
+        }));
     }
     let t: TokenResponse = resp.parse()?;
     Ok(t.into_set(now, requested))
@@ -129,11 +146,19 @@ pub fn exchange_code(
 
 /// Use a refresh token. The result inherits the old refresh token and scopes when the server omits them
 /// (Google never returns a new refresh token; Microsoft rotates it).
-pub fn refresh(http: &dyn HttpTransport, cfg: &ProviderConfig, old: &TokenSet, now: u64) -> Result<TokenSet> {
+pub fn refresh(
+    http: &dyn HttpTransport,
+    cfg: &ProviderConfig,
+    old: &TokenSet,
+    now: u64,
+) -> Result<TokenSet> {
     let Some(rt) = &old.refresh_token else {
         return Err(Error::ReauthRequired("no refresh token".into()));
     };
-    let mut fields = vec![("grant_type".to_owned(), "refresh_token".to_owned()), ("refresh_token".to_owned(), rt.clone())];
+    let mut fields = vec![
+        ("grant_type".to_owned(), "refresh_token".to_owned()),
+        ("refresh_token".to_owned(), rt.clone()),
+    ];
     if cfg.provider == Provider::Microsoft {
         fields.push(("scope".into(), old.scopes.join(" ")));
     }
@@ -154,11 +179,17 @@ pub fn revoke(http: &dyn HttpTransport, cfg: &ProviderConfig, token: &str) -> Re
     let Some(url) = &cfg.endpoints.revoke else {
         return Ok(false);
     };
-    let resp = http.execute(&HttpRequest::post_form(url.clone(), vec![("token".into(), token.to_owned())]))?;
+    let resp = http.execute(&HttpRequest::post_form(
+        url.clone(),
+        vec![("token".into(), token.to_owned())],
+    ))?;
     if resp.is_success() {
         return Ok(true);
     }
-    Err(oauth_error(&resp).unwrap_or(Error::Api { status: resp.status, message: crate::http::api_message(&resp.body) }))
+    Err(oauth_error(&resp).unwrap_or(Error::Api {
+        status: resp.status,
+        message: crate::http::api_message(&resp.body),
+    }))
 }
 
 /// Device authorization response (RFC 8628). Google names the field `verification_url`,
@@ -193,11 +224,24 @@ fn default_interval() -> u64 {
 }
 
 /// Start the device grant.
-pub fn start_device(http: &dyn HttpTransport, cfg: &ProviderConfig, scopes: &[String]) -> Result<DeviceCode> {
-    let fields = vec![("client_id".to_owned(), cfg.client_id.clone()), ("scope".to_owned(), scopes.join(" "))];
-    let resp = http.execute(&HttpRequest::post_form(cfg.endpoints.device.clone(), fields))?;
+pub fn start_device(
+    http: &dyn HttpTransport,
+    cfg: &ProviderConfig,
+    scopes: &[String],
+) -> Result<DeviceCode> {
+    let fields = vec![
+        ("client_id".to_owned(), cfg.client_id.clone()),
+        ("scope".to_owned(), scopes.join(" ")),
+    ];
+    let resp = http.execute(&HttpRequest::post_form(
+        cfg.endpoints.device.clone(),
+        fields,
+    ))?;
     if !resp.is_success() {
-        return Err(oauth_error(&resp).unwrap_or(Error::Api { status: resp.status, message: crate::http::api_message(&resp.body) }));
+        return Err(oauth_error(&resp).unwrap_or(Error::Api {
+            status: resp.status,
+            message: crate::http::api_message(&resp.body),
+        }));
     }
     let mut d: DeviceCode = resp.parse()?;
     d.requested = scopes.to_vec();
@@ -216,9 +260,17 @@ pub enum DevicePoll {
 }
 
 /// Poll once.
-pub fn poll_device(http: &dyn HttpTransport, cfg: &ProviderConfig, dc: &DeviceCode, now: u64) -> Result<DevicePoll> {
+pub fn poll_device(
+    http: &dyn HttpTransport,
+    cfg: &ProviderConfig,
+    dc: &DeviceCode,
+    now: u64,
+) -> Result<DevicePoll> {
     let mut fields = vec![
-        ("grant_type".to_owned(), "urn:ietf:params:oauth:grant-type:device_code".to_owned()),
+        (
+            "grant_type".to_owned(),
+            "urn:ietf:params:oauth:grant-type:device_code".to_owned(),
+        ),
         ("device_code".to_owned(), dc.device_code.clone()),
     ];
     // Microsoft public clients send no secret; Google's device flow requires the client secret.
@@ -233,14 +285,29 @@ pub fn poll_device(http: &dyn HttpTransport, cfg: &ProviderConfig, dc: &DeviceCo
         return Ok(DevicePoll::Done(finish_token(resp, now, &dc.requested)?));
     }
     match oauth_error(&resp) {
-        Some(Error::OAuth { code, .. }) if code == "authorization_pending" => Ok(DevicePoll::Pending),
-        Some(Error::OAuth { code, .. }) if code == "slow_down" => Ok(DevicePoll::SlowDown),
-        Some(Error::OAuth { code, description }) if matches!(code.as_str(), "access_denied" | "authorization_declined") => {
-            Err(Error::Denied(if description.is_empty() { code } else { description }))
+        Some(Error::OAuth { code, .. }) if code == "authorization_pending" => {
+            Ok(DevicePoll::Pending)
         }
-        Some(Error::OAuth { code, .. }) if matches!(code.as_str(), "expired_token" | "code_expired") => Err(Error::Timeout),
+        Some(Error::OAuth { code, .. }) if code == "slow_down" => Ok(DevicePoll::SlowDown),
+        Some(Error::OAuth { code, description })
+            if matches!(code.as_str(), "access_denied" | "authorization_declined") =>
+        {
+            Err(Error::Denied(if description.is_empty() {
+                code
+            } else {
+                description
+            }))
+        }
+        Some(Error::OAuth { code, .. })
+            if matches!(code.as_str(), "expired_token" | "code_expired") =>
+        {
+            Err(Error::Timeout)
+        }
         Some(e) => Err(e),
-        None => Err(Error::Api { status: resp.status, message: crate::http::api_message(&resp.body) }),
+        None => Err(Error::Api {
+            status: resp.status,
+            message: crate::http::api_message(&resp.body),
+        }),
     }
 }
 
@@ -283,7 +350,16 @@ mod tests {
     fn google_url_has_pkce_offline_and_incremental() {
         let p = Pkce::from_verifier("v".repeat(43));
         let scopes = effective_scopes(&gcfg(), &["https://www.googleapis.com/auth/drive.file"]);
-        let u = authorization_url(&gcfg(), &scopes, "http://127.0.0.1:5555", "st", &p, Some("me@x.y"), true).unwrap();
+        let u = authorization_url(
+            &gcfg(),
+            &scopes,
+            "http://127.0.0.1:5555",
+            "st",
+            &p,
+            Some("me@x.y"),
+            true,
+        )
+        .unwrap();
         let url = url::Url::parse(&u).unwrap();
         let q: std::collections::HashMap<_, _> = url.query_pairs().into_owned().collect();
         assert_eq!(url.host_str(), Some("accounts.google.com"));
@@ -293,17 +369,40 @@ mod tests {
         assert_eq!(q["include_granted_scopes"], "true");
         assert_eq!(q["prompt"], "consent");
         assert_eq!(q["login_hint"], "me@x.y");
-        assert_eq!(q["scope"], "openid email profile https://www.googleapis.com/auth/drive.file");
-        assert!(!u.contains("sek"), "client secret must never be in the browser URL");
+        assert_eq!(
+            q["scope"],
+            "openid email profile https://www.googleapis.com/auth/drive.file"
+        );
+        assert!(
+            !u.contains("sek"),
+            "client secret must never be in the browser URL"
+        );
     }
 
     #[test]
     fn microsoft_url_uses_tenant_and_offline_access() {
         let c = ProviderConfig::microsoft("app-id", Tenant::Consumers);
         let scopes = effective_scopes(&c, &["Files.ReadWrite", "offline_access"]);
-        assert_eq!(scopes.iter().filter(|s| s.as_str() == "offline_access").count(), 1);
-        let u = authorization_url(&c, &scopes, "http://localhost:6000", "st", &Pkce::from_verifier("v".repeat(43)), None, false).unwrap();
-        assert!(u.starts_with("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?"));
+        assert_eq!(
+            scopes
+                .iter()
+                .filter(|s| s.as_str() == "offline_access")
+                .count(),
+            1
+        );
+        let u = authorization_url(
+            &c,
+            &scopes,
+            "http://localhost:6000",
+            "st",
+            &Pkce::from_verifier("v".repeat(43)),
+            None,
+            false,
+        )
+        .unwrap();
+        assert!(
+            u.starts_with("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?")
+        );
         assert!(u.contains("response_mode=query") && !u.contains("prompt="));
     }
 
@@ -318,20 +417,35 @@ mod tests {
             ),
         );
         let p = Pkce::from_verifier("v".repeat(43));
-        let t = exchange_code(&http, &gcfg(), "CODE", "http://127.0.0.1:1", &p, &["openid".into()], 1000).unwrap();
+        let t = exchange_code(
+            &http,
+            &gcfg(),
+            "CODE",
+            "http://127.0.0.1:1",
+            &p,
+            &["openid".into()],
+            1000,
+        )
+        .unwrap();
         assert_eq!(t.access_token, "AT");
         assert_eq!(t.refresh_token.as_deref(), Some("RT"));
         assert_eq!(t.expires_at, 4599);
         let body = http.requests()[0].body_text();
         assert!(body.contains("grant_type=authorization_code") && body.contains("code=CODE"));
-        assert!(body.contains(&format!("code_verifier={}", p.verifier)) && body.contains("client_secret=sek"));
+        assert!(
+            body.contains(&format!("code_verifier={}", p.verifier))
+                && body.contains("client_secret=sek")
+        );
     }
 
     #[test]
     fn refresh_keeps_google_refresh_token_and_scopes() {
         let http = ScriptedTransport::new().on(
             "token",
-            HttpResponse::json(200, &json!({"access_token":"AT2","expires_in":3600,"token_type":"Bearer"})),
+            HttpResponse::json(
+                200,
+                &json!({"access_token":"AT2","expires_in":3600,"token_type":"Bearer"}),
+            ),
         );
         let old = TokenSet {
             access_token: "AT".into(),
@@ -341,10 +455,17 @@ mod tests {
             id_token: Some("idt".into()),
         };
         let n = refresh(&http, &gcfg(), &old, 10).unwrap();
-        assert_eq!((n.access_token.as_str(), n.refresh_token.as_deref()), ("AT2", Some("RT")));
+        assert_eq!(
+            (n.access_token.as_str(), n.refresh_token.as_deref()),
+            ("AT2", Some("RT"))
+        );
         assert_eq!(n.scopes, old.scopes);
         assert_eq!(n.id_token.as_deref(), Some("idt"));
-        assert!(http.requests()[0].body_text().contains("grant_type=refresh_token"));
+        assert!(
+            http.requests()[0]
+                .body_text()
+                .contains("grant_type=refresh_token")
+        );
     }
 
     #[test]
@@ -354,7 +475,13 @@ mod tests {
             "/token",
             HttpResponse::json(200, &json!({"access_token":"B","refresh_token":"RT-new","expires_in":3600,"scope":"User.Read"})),
         );
-        let old = TokenSet { access_token: "A".into(), refresh_token: Some("RT-old".into()), expires_at: 0, scopes: vec!["User.Read".into()], id_token: None };
+        let old = TokenSet {
+            access_token: "A".into(),
+            refresh_token: Some("RT-old".into()),
+            expires_at: 0,
+            scopes: vec!["User.Read".into()],
+            id_token: None,
+        };
         let n = refresh(&http, &c, &old, 0).unwrap();
         assert_eq!(n.refresh_token.as_deref(), Some("RT-new"));
         assert!(!http.requests()[0].body_text().contains("client_secret"));
@@ -366,7 +493,13 @@ mod tests {
             "token",
             HttpResponse::json(400, &json!({"error":"invalid_grant","error_description":"Token has been expired or revoked."})),
         );
-        let old = TokenSet { access_token: "A".into(), refresh_token: Some("R".into()), expires_at: 0, scopes: vec![], id_token: None };
+        let old = TokenSet {
+            access_token: "A".into(),
+            refresh_token: Some("R".into()),
+            expires_at: 0,
+            scopes: vec![],
+            id_token: None,
+        };
         match refresh(&http, &gcfg(), &old, 0) {
             Err(Error::OAuth { code, .. }) => assert_eq!(code, "invalid_grant"),
             other => panic!("unexpected {other:?}"),
@@ -387,7 +520,12 @@ mod tests {
             .on("token", HttpResponse::json(403, &json!({"error":"slow_down"})))
             .on("token", HttpResponse::json(200, &json!({"access_token":"AT","expires_in":3600,"refresh_token":"RT","scope":"https://www.googleapis.com/auth/drive.file"})));
         let cfg = gcfg();
-        let dc = start_device(&http, &cfg, &["https://www.googleapis.com/auth/drive.file".into()]).unwrap();
+        let dc = start_device(
+            &http,
+            &cfg,
+            &["https://www.googleapis.com/auth/drive.file".into()],
+        )
+        .unwrap();
         assert_eq!(dc.verification_uri, "https://www.google.com/device");
         assert_eq!(dc.user_code, "ABCD-EFGH");
         let slept = Cell::new(Vec::<u64>::new());
@@ -398,7 +536,11 @@ mod tests {
         })
         .unwrap();
         assert_eq!(t.access_token, "AT");
-        assert_eq!(slept.take(), vec![5, 5, 10], "slow_down adds five seconds to the interval");
+        assert_eq!(
+            slept.take(),
+            vec![5, 5, 10],
+            "slow_down adds five seconds to the interval"
+        );
         let poll = http.requests()[1].body_text();
         assert!(poll.contains("device_code=DC") && poll.contains("client_secret=sek"));
     }
@@ -416,10 +558,22 @@ mod tests {
             message: None,
             requested: vec![],
         };
-        let http = ScriptedTransport::new().on("/token", HttpResponse::json(400, &json!({"error":"authorization_declined"})));
-        assert!(matches!(poll_device(&http, &c, &dc, 0), Err(Error::Denied(_))));
-        let http = ScriptedTransport::new().on("/token", HttpResponse::json(400, &json!({"error":"expired_token"})));
-        assert!(matches!(poll_device(&http, &c, &dc, 0), Err(Error::Timeout)));
+        let http = ScriptedTransport::new().on(
+            "/token",
+            HttpResponse::json(400, &json!({"error":"authorization_declined"})),
+        );
+        assert!(matches!(
+            poll_device(&http, &c, &dc, 0),
+            Err(Error::Denied(_))
+        ));
+        let http = ScriptedTransport::new().on(
+            "/token",
+            HttpResponse::json(400, &json!({"error":"expired_token"})),
+        );
+        assert!(matches!(
+            poll_device(&http, &c, &dc, 0),
+            Err(Error::Timeout)
+        ));
         assert!(!http.requests()[0].body_text().contains("client_secret"));
     }
 
@@ -427,7 +581,13 @@ mod tests {
     fn microsoft_has_no_revocation_endpoint() {
         let c = ProviderConfig::microsoft("app", Tenant::Common);
         assert!(!revoke(&ScriptedTransport::new(), &c, "t").unwrap());
-        let http = ScriptedTransport::new().on("revoke", HttpResponse { status: 200, ..Default::default() });
+        let http = ScriptedTransport::new().on(
+            "revoke",
+            HttpResponse {
+                status: 200,
+                ..Default::default()
+            },
+        );
         assert!(revoke(&http, &gcfg(), "t").unwrap());
     }
 }

@@ -381,7 +381,11 @@
       "title": "emulation (bun-engine cores, libretro host, headless ROM suite, console matrix)",
       "owner": "crates/bun-engine-core",
       "module": null,
-      "entry": ["cargo test -p bun-engine --release --test rom_suite", "bun scripts/emulation/fetch-roms.ts", "bun scripts/emulation/matrix.ts"],
+      "entry": [
+        "cargo test -p bun-engine --release --test rom_suite",
+        "bun scripts/emulation/fetch-roms.ts",
+        "bun scripts/emulation/matrix.ts"
+      ],
       "docs": ["docs/EMULATION.md"],
       "ci": ["emulation.yml#suite", "emulation.yml#openbios", "emulation.yml#nes-accuracy"],
       "pins": ["scripts/emulation/pins.json", "crates/bun-engine-core/tests/rom-suite.json"],

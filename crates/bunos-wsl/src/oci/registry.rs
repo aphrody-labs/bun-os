@@ -703,7 +703,10 @@ mod tests {
             "config": {"mediaType": "application/vnd.oci.image.config.v1+json", "digest": config_digest, "size": config.len()},
             "layers": []
         }).to_string();
-        let manifest_digest = format!("sha256:{}", hex::encode(Sha256::digest(manifest.as_bytes())));
+        let manifest_digest = format!(
+            "sha256:{}",
+            hex::encode(Sha256::digest(manifest.as_bytes()))
+        );
         let list = serde_json::json!({"schemaVersion": 2, "mediaType": OCI_INDEX, "manifests": [
             {"mediaType": OCI_MANIFEST, "digest": "unwanted-amd64", "size": 1, "platform": {"architecture": "amd64", "os": "linux"}},
             {"mediaType": OCI_MANIFEST, "digest": manifest_digest, "size": manifest.len(), "platform": {"architecture": "arm64", "os": "linux"}}

@@ -20,13 +20,21 @@ pub fn snippet_versions(lxc_major: u32, available: &[u32]) -> Vec<u32> {
     if lxc_major <= 2 {
         return vec![1];
     }
-    (3..5).filter(|v| lxc_major >= *v && available.contains(v)).collect()
+    (3..5)
+        .filter(|v| lxc_major >= *v && available.contains(v))
+        .collect()
 }
 
 /// Concatenate `base` and the chosen snippets, then substitute `LXCARCH` and `LXCPOSTSTOP`
 /// (first occurrence of each per line, like `sed s///`). With `apparmor`, `unconfined` profiles
 /// are replaced by `profile`.
-pub fn render(base: &str, snippets: &[&str], arch: &str, post_stop: &str, apparmor: Option<&str>) -> String {
+pub fn render(
+    base: &str,
+    snippets: &[&str],
+    arch: &str,
+    post_stop: &str,
+    apparmor: Option<&str>,
+) -> String {
     let mut text = String::from(base);
     for s in snippets {
         if !text.ends_with('\n') {
@@ -36,7 +44,9 @@ pub fn render(base: &str, snippets: &[&str], arch: &str, post_stop: &str, apparm
     }
     let mut out = String::new();
     for line in text.lines() {
-        let mut l = line.replacen("LXCARCH", arch, 1).replacen("LXCPOSTSTOP", post_stop, 1);
+        let mut l = line
+            .replacen("LXCARCH", arch, 1)
+            .replacen("LXCPOSTSTOP", post_stop, 1);
         if let Some(p) = apparmor
             && (l.contains("lxc.aa_profile") || l.contains("lxc.apparmor.profile"))
         {
@@ -65,7 +75,13 @@ mod tests {
     #[test]
     fn render_substitutes() {
         let base = "lxc.arch = LXCARCH\nlxc.hook.post-stop = LXCPOSTSTOP\nlxc.apparmor.profile = unconfined";
-        let out = render(base, &["lxc.pty.max = 10\n"], "x86_64", "/p/stop.sh", Some("lxc-waydroid"));
+        let out = render(
+            base,
+            &["lxc.pty.max = 10\n"],
+            "x86_64",
+            "/p/stop.sh",
+            Some("lxc-waydroid"),
+        );
         assert!(out.contains("lxc.arch = x86_64\n"));
         assert!(out.contains("post-stop = /p/stop.sh\n"));
         assert!(out.contains("lxc.apparmor.profile = lxc-waydroid\n"));

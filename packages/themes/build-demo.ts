@@ -1,6 +1,7 @@
 // Bundles demo/ into demo/out (served by `bun packages/themes/serve-demo.ts`).
 import { join } from "node:path";
-const d = join(import.meta.dir, "demo"), out = join(d, "out");
+const d = join(import.meta.dir, "demo"),
+  out = join(d, "out");
 const r = await Bun.build({ entrypoints: [join(d, "main.ts")], outdir: out, target: "browser", naming: "main.js" });
 if (!r.success) throw new Error(r.logs.join("\n"));
 const { bootScript } = await import("./src/runtime.ts");

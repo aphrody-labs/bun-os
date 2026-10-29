@@ -8,8 +8,7 @@ import { binary, media, type EditStack } from "./index";
 // Valid PNG built by hand so the test needs no binary fixture.
 function png(w: number, h: number, rgba: (x: number, y: number) => number[]): Uint8Array {
   const raw = new Uint8Array((w * 4 + 1) * h);
-  for (let y = 0; y < h; y++)
-    for (let x = 0; x < w; x++) raw.set(rgba(x, y), y * (w * 4 + 1) + 1 + x * 4);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) raw.set(rgba(x, y), y * (w * 4 + 1) + 1 + x * 4);
   const z = deflateSync(raw);
   const crcTable = Array.from({ length: 256 }, (_, n) => {
     let c = n;
@@ -54,7 +53,10 @@ test.skipIf(!available)("probe, render, proxy cache and handoff through the Rust
   const dir = mkdtempSync(join(tmpdir(), "aphrody-media-"));
   try {
     const file = join(dir, "in.png");
-    await Bun.write(file, png(64, 48, (x, y) => [x * 4, y * 5, 128, 255]));
+    await Bun.write(
+      file,
+      png(64, 48, (x, y) => [x * 4, y * 5, 128, 255]),
+    );
 
     const meta = await media.probe(file);
     expect([meta.width, meta.height, meta.format]).toEqual([64, 48, "png"]);

@@ -7,7 +7,10 @@ use std::time::{Duration, Instant};
 use winreg::enums::*;
 use winreg::RegKey;
 
-use super::{DistroRegistryInfo, DistroResourceUsage, RenameRegistryResult, ResourceMonitor, WslHealth, WslHealthStatus};
+use super::{
+    DistroRegistryInfo, DistroResourceUsage, RenameRegistryResult, ResourceMonitor, WslHealth,
+    WslHealthStatus,
+};
 use crate::settings::get_executable_paths;
 use crate::utils::hidden_command;
 use crate::wsl::types::{DiskPartition, PhysicalDisk, WslError, WSL_REGISTRY_PATH};
@@ -83,7 +86,13 @@ impl RealResourceMonitor {
 
         log::info!("Running Optimize-VHD with elevation - UAC dialog will appear");
         let output = hidden_command(&paths.powershell)
-            .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", &ps_script])
+            .args([
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                &ps_script,
+            ])
             .output()
             .map_err(|e| WslError::CommandFailed(format!("Failed to start PowerShell: {}", e)))?;
 
@@ -137,10 +146,7 @@ impl RealResourceMonitor {
         // Create diskpart script
         // Note: We don't need "detach vdisk" - WSL VHDXs aren't attached in diskpart's sense
         // and trying to detach causes "already detached" errors
-        let script = format!(
-            "select vdisk file=\"{}\"\ncompact vdisk\n",
-            vhdx_path
-        );
+        let script = format!("select vdisk file=\"{}\"\ncompact vdisk\n", vhdx_path);
 
         std::fs::write(&script_file, &script).map_err(|e| {
             WslError::CommandFailed(format!("Failed to create diskpart script: {}", e))
@@ -170,7 +176,13 @@ impl RealResourceMonitor {
 
         log::info!("Running diskpart with elevation - UAC dialog will appear");
         let output = hidden_command(&paths.powershell)
-            .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", &ps_script])
+            .args([
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                &ps_script,
+            ])
             .output()
             .map_err(|e| WslError::CommandFailed(format!("Failed to start PowerShell: {}", e)))?;
 
@@ -303,7 +315,11 @@ impl ResourceMonitor for RealResourceMonitor {
             .unwrap_or(0);
 
         let vm_running = wslhost_count > 0;
-        log::debug!("WSL VM running: {} (wslhost count: {})", vm_running, wslhost_count);
+        log::debug!(
+            "WSL VM running: {} (wslhost count: {})",
+            vm_running,
+            wslhost_count
+        );
 
         // Count wsl.exe processes for warning/unhealthy detection
         log::debug!("Counting wsl.exe processes via PowerShell Get-Process wsl");
@@ -331,17 +347,17 @@ impl ResourceMonitor for RealResourceMonitor {
             (WslHealthStatus::Stopped, "WSL stopped".to_string())
         } else {
             match process_count {
-                0..=49 => (
-                    WslHealthStatus::Healthy,
-                    "WSL running".to_string(),
-                ),
+                0..=49 => (WslHealthStatus::Healthy, "WSL running".to_string()),
                 50..=99 => (
                     WslHealthStatus::Warning,
                     format!("{} WSL processes - consider restarting WSL", process_count),
                 ),
                 _ => (
                     WslHealthStatus::Unhealthy,
-                    format!("{} WSL processes - WSL may be unstable, restart recommended", process_count),
+                    format!(
+                        "{} WSL processes - WSL may be unstable, restart recommended",
+                        process_count
+                    ),
                 ),
             }
         };
@@ -381,7 +397,9 @@ impl ResourceMonitor for RealResourceMonitor {
 
     fn get_system_total_memory(&self) -> Option<u64> {
         let paths = get_executable_paths();
-        log::debug!("Querying total system memory via PowerShell Get-CimInstance Win32_ComputerSystem");
+        log::debug!(
+            "Querying total system memory via PowerShell Get-CimInstance Win32_ComputerSystem"
+        );
         let output = hidden_command(&paths.powershell)
             .args([
                 "-NoProfile",
@@ -452,12 +470,20 @@ impl ResourceMonitor for RealResourceMonitor {
 
             let stdout = stdout_thread.join().unwrap_or_default();
             let stderr = stderr_thread.join().unwrap_or_default();
-            Some(std::process::Output { status, stdout, stderr })
+            Some(std::process::Output {
+                status,
+                stdout,
+                stderr,
+            })
         };
 
         // Get number of CPU cores for normalization (with timeout)
         // Try nproc first, fallback to getconf which is more POSIX-compliant
-        log::debug!("Querying CPU cores for '{}': wsl -d {} -- nproc", distro, distro);
+        log::debug!(
+            "Querying CPU cores for '{}': wsl -d {} -- nproc",
+            distro,
+            distro
+        );
         let num_cores: f64 = hidden_command(&paths.wsl)
             .args(["-d", distro, "--", "nproc"])
             .stdout(Stdio::piped())
@@ -474,7 +500,10 @@ impl ResourceMonitor for RealResourceMonitor {
             })
             .or_else(|| {
                 // Fallback to getconf for Alpine/BusyBox
-                log::debug!("Falling back to getconf for CPU cores: wsl -d {} -- getconf _NPROCESSORS_ONLN", distro);
+                log::debug!(
+                    "Falling back to getconf for CPU cores: wsl -d {} -- getconf _NPROCESSORS_ONLN",
+                    distro
+                );
                 hidden_command(&paths.wsl)
                     .args(["-d", distro, "--", "getconf", "_NPROCESSORS_ONLN"])
                     .stdout(Stdio::piped())
@@ -495,7 +524,11 @@ impl ResourceMonitor for RealResourceMonitor {
         // Try procps-style ps first (has pcpu), fallback to BusyBox (rss only)
         let (total_rss_kb, total_cpu) = {
             // First try: procps with pcpu and rss
-            log::debug!("Querying process stats for '{}': wsl -d {} -- ps -e -o pcpu=,rss=", distro, distro);
+            log::debug!(
+                "Querying process stats for '{}': wsl -d {} -- ps -e -o pcpu=,rss=",
+                distro,
+                distro
+            );
             let procps_result = hidden_command(&paths.wsl)
                 .args(["-d", distro, "--", "ps", "-e", "-o", "pcpu=,rss="])
                 .stdout(Stdio::piped())
@@ -524,7 +557,11 @@ impl ResourceMonitor for RealResourceMonitor {
                 (rss, Some(cpu))
             } else {
                 // Fallback: BusyBox-compatible ps (rss only, no CPU support)
-                log::debug!("Falling back to BusyBox ps for '{}': wsl -d {} -- ps -e -o rss=", distro, distro);
+                log::debug!(
+                    "Falling back to BusyBox ps for '{}': wsl -d {} -- ps -e -o rss=",
+                    distro,
+                    distro
+                );
                 let busybox_result = hidden_command(&paths.wsl)
                     .args(["-d", distro, "--", "ps", "-e", "-o", "rss="])
                     .stdout(Stdio::piped())
@@ -552,7 +589,10 @@ impl ResourceMonitor for RealResourceMonitor {
                         )));
                     }
                     None => {
-                        return Err(WslError::Timeout(format!("Resource stats for {} timed out", distro)));
+                        return Err(WslError::Timeout(format!(
+                            "Resource stats for {} timed out",
+                            distro
+                        )));
                     }
                 }
             }
@@ -572,7 +612,9 @@ impl ResourceMonitor for RealResourceMonitor {
         let mut result = HashMap::new();
 
         // Open the WSL registry key
-        log::debug!("Reading WSL registry: HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Lxss");
+        log::debug!(
+            "Reading WSL registry: HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Lxss"
+        );
         let hkcu = RegKey::predef(HKEY_CURRENT_USER);
         let lxss = match hkcu.open_subkey(WSL_REGISTRY_PATH) {
             Ok(key) => key,
@@ -746,9 +788,9 @@ impl ResourceMonitor for RealResourceMonitor {
             .open_subkey_with_flags(&lxss_path, KEY_READ | KEY_WRITE)
             .map_err(|e| WslError::CommandFailed(format!("Failed to open registry key: {}", e)))?;
 
-
         // Get paths before renaming (for optional updates)
-        let terminal_profile_path: Option<String> = distro_key.get_value("TerminalProfilePath").ok();
+        let terminal_profile_path: Option<String> =
+            distro_key.get_value("TerminalProfilePath").ok();
         let shortcut_path: Option<String> = distro_key.get_value("ShortcutPath").ok();
 
         // Update the DistributionName value
@@ -757,7 +799,6 @@ impl ResourceMonitor for RealResourceMonitor {
             .map_err(|e| WslError::CommandFailed(format!("Failed to update registry: {}", e)))?;
 
         Ok(RenameRegistryResult {
-            
             terminal_profile_path,
             shortcut_path,
         })
@@ -803,8 +844,7 @@ fn parse_physical_disks_json(json_str: &str) -> Result<Vec<PhysicalDisk>, WslErr
                 .map(|p| {
                     // Handle both array and single object
                     if p.is_array() {
-                        serde_json::from_value::<Vec<RawPartition>>(p)
-                            .unwrap_or_default()
+                        serde_json::from_value::<Vec<RawPartition>>(p).unwrap_or_default()
                     } else if p.is_object() {
                         serde_json::from_value::<RawPartition>(p)
                             .map(|p| vec![p])
@@ -867,7 +907,6 @@ mod tests {
                 name,
                 registry_info.id
             );
-
         }
     }
 
@@ -985,7 +1024,10 @@ mod tests {
             true
         )
         .is_ok());
-        assert!(diskpart_compact_outcome("DiskPart has encountered an error: access denied", true).is_err());
+        assert!(
+            diskpart_compact_outcome("DiskPart has encountered an error: access denied", true)
+                .is_err()
+        );
         assert!(diskpart_compact_outcome("", false).is_err());
         assert!(diskpart_compact_outcome("", true).is_ok());
     }

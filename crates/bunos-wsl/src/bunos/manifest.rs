@@ -63,14 +63,19 @@ pub enum ManifestError {
     #[error("artifact kind {0:?} appears more than once")]
     Duplicate(ArtifactKind),
     #[error("checksum mismatch for {name}: expected {expected}, got {actual}")]
-    Mismatch { name: String, expected: String, actual: String },
+    Mismatch {
+        name: String,
+        expected: String,
+        actual: String,
+    },
     #[error("io: {0}")]
     Io(String),
 }
 
 impl Manifest {
     pub fn parse(json: &str) -> Result<Self, ManifestError> {
-        let m: Manifest = serde_json::from_str(json).map_err(|e| ManifestError::Json(e.to_string()))?;
+        let m: Manifest =
+            serde_json::from_str(json).map_err(|e| ManifestError::Json(e.to_string()))?;
         m.validate()?;
         Ok(m)
     }
@@ -81,7 +86,8 @@ impl Manifest {
         }
         let mut seen = std::collections::HashSet::new();
         for a in &self.artifacts {
-            if a.name.is_empty() || a.name.contains(['/', '\\']) || a.name == "." || a.name == ".." {
+            if a.name.is_empty() || a.name.contains(['/', '\\']) || a.name == "." || a.name == ".."
+            {
                 return Err(ManifestError::BadName(a.name.clone()));
             }
             if !is_sha256_hex(&a.sha256) {
@@ -108,11 +114,14 @@ fn is_sha256_hex(s: &str) -> bool {
 
 /// Streaming sha256 of a file, lowercase hex.
 pub fn sha256_file(path: &Path) -> Result<String, ManifestError> {
-    let mut f = std::fs::File::open(path).map_err(|e| ManifestError::Io(format!("{}: {e}", path.display())))?;
+    let mut f = std::fs::File::open(path)
+        .map_err(|e| ManifestError::Io(format!("{}: {e}", path.display())))?;
     let mut hasher = Sha256::new();
     let mut buf = vec![0u8; 1 << 20];
     loop {
-        let n = f.read(&mut buf).map_err(|e| ManifestError::Io(e.to_string()))?;
+        let n = f
+            .read(&mut buf)
+            .map_err(|e| ManifestError::Io(e.to_string()))?;
         if n == 0 {
             break;
         }
@@ -124,7 +133,9 @@ pub fn sha256_file(path: &Path) -> Result<String, ManifestError> {
 /// Verify `path` against `artifact.sha256` (and `size` when the manifest records it).
 pub fn verify_artifact(path: &Path, artifact: &Artifact) -> Result<(), ManifestError> {
     if let Some(size) = artifact.size {
-        let actual = std::fs::metadata(path).map_err(|e| ManifestError::Io(e.to_string()))?.len();
+        let actual = std::fs::metadata(path)
+            .map_err(|e| ManifestError::Io(e.to_string()))?
+            .len();
         if actual != size {
             return Err(ManifestError::Mismatch {
                 name: artifact.name.clone(),
@@ -135,7 +146,11 @@ pub fn verify_artifact(path: &Path, artifact: &Artifact) -> Result<(), ManifestE
     }
     let actual = sha256_file(path)?;
     if actual != artifact.sha256 {
-        return Err(ManifestError::Mismatch { name: artifact.name.clone(), expected: artifact.sha256.clone(), actual });
+        return Err(ManifestError::Mismatch {
+            name: artifact.name.clone(),
+            expected: artifact.sha256.clone(),
+            actual,
+        });
     }
     Ok(())
 }
@@ -174,7 +189,9 @@ pub fn manifest_from_dir(
     entries.sort_by_key(|e| e.file_name());
     for e in entries {
         let name = e.file_name().to_string_lossy().into_owned();
-        let Some(kind) = kind_of_file(&name) else { continue };
+        let Some(kind) = kind_of_file(&name) else {
+            continue;
+        };
         // `bunos-wsl.wsl` and `.tar.gz` are the same bytes: keep the first (tar.gz sorts later, so skip dup).
         if artifacts.iter().any(|a: &Artifact| a.kind == kind) {
             continue;
@@ -190,7 +207,11 @@ pub fn manifest_from_dir(
             size,
         });
     }
-    let m = Manifest { schema: MANIFEST_SCHEMA, release: release.to_string(), artifacts };
+    let m = Manifest {
+        schema: MANIFEST_SCHEMA,
+        release: release.to_string(),
+        artifacts,
+    };
     m.validate()?;
     Ok(m)
 }
@@ -202,7 +223,14 @@ mod tests {
     const ABC_SHA: &str = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
 
     fn art(kind: ArtifactKind, name: &str) -> Artifact {
-        Artifact { kind, name: name.into(), version: "1".into(), url: format!("https://x.test/{name}"), sha256: ABC_SHA.into(), size: Some(3) }
+        Artifact {
+            kind,
+            name: name.into(),
+            version: "1".into(),
+            url: format!("https://x.test/{name}"),
+            sha256: ABC_SHA.into(),
+            size: Some(3),
+        }
     }
 
     #[test]
@@ -213,7 +241,10 @@ mod tests {
         assert_eq!(sha256_file(&p).unwrap(), ABC_SHA);
         verify_artifact(&p, &art(ArtifactKind::Kernel, "bzImage")).unwrap();
         std::fs::write(&p, b"abd").unwrap();
-        assert!(matches!(verify_artifact(&p, &art(ArtifactKind::Kernel, "bzImage")), Err(ManifestError::Mismatch { .. })));
+        assert!(matches!(
+            verify_artifact(&p, &art(ArtifactKind::Kernel, "bzImage")),
+            Err(ManifestError::Mismatch { .. })
+        ));
     }
 
     #[test]
@@ -227,7 +258,11 @@ mod tests {
 
     #[test]
     fn parse_validates_schema_digest_url_name_duplicates() {
-        let ok = Manifest { schema: 1, release: "r".into(), artifacts: vec![art(ArtifactKind::Rootfs, "bunos-wsl.tar.gz")] };
+        let ok = Manifest {
+            schema: 1,
+            release: "r".into(),
+            artifacts: vec![art(ArtifactKind::Rootfs, "bunos-wsl.tar.gz")],
+        };
         let json = serde_json::to_string(&ok).unwrap();
         assert_eq!(Manifest::parse(&json).unwrap(), ok);
 
@@ -244,14 +279,21 @@ mod tests {
         bad.artifacts[0].name = "../evil".into();
         assert!(matches!(bad.validate(), Err(ManifestError::BadName(_))));
         let mut bad = ok.clone();
-        bad.artifacts.push(art(ArtifactKind::Rootfs, "other.tar.gz"));
-        assert!(matches!(bad.validate(), Err(ManifestError::Duplicate(ArtifactKind::Rootfs))));
+        bad.artifacts
+            .push(art(ArtifactKind::Rootfs, "other.tar.gz"));
+        assert!(matches!(
+            bad.validate(),
+            Err(ManifestError::Duplicate(ArtifactKind::Rootfs))
+        ));
         assert!(matches!(Manifest::parse("{"), Err(ManifestError::Json(_))));
     }
 
     #[test]
     fn sha256_file_text_forms() {
-        assert_eq!(parse_sha256_file(&format!("{ABC_SHA}  bunos-wsl.tar.gz\n")).as_deref(), Some(ABC_SHA));
+        assert_eq!(
+            parse_sha256_file(&format!("{ABC_SHA}  bunos-wsl.tar.gz\n")).as_deref(),
+            Some(ABC_SHA)
+        );
         assert_eq!(parse_sha256_file("nothex  file"), None);
     }
 
@@ -262,11 +304,17 @@ mod tests {
         std::fs::write(dir.path().join("bunos-wsl.tar.gz"), b"abc").unwrap();
         std::fs::write(dir.path().join("bunos-wsl.wsl"), b"abc").unwrap();
         std::fs::write(dir.path().join("config"), b"ignored").unwrap();
-        let m = manifest_from_dir(dir.path(), "bunos-wsl-test", "https://x.test/dl/", &|k| format!("{k:?}")).unwrap();
+        let m = manifest_from_dir(dir.path(), "bunos-wsl-test", "https://x.test/dl/", &|k| {
+            format!("{k:?}")
+        })
+        .unwrap();
         assert_eq!(m.artifacts.len(), 2);
         let k = m.artifact(ArtifactKind::Kernel).unwrap();
         assert_eq!(k.url, "https://x.test/dl/bzImage");
         assert_eq!(k.sha256, ABC_SHA);
-        assert_eq!(m.artifact(ArtifactKind::Rootfs).unwrap().name, "bunos-wsl.tar.gz");
+        assert_eq!(
+            m.artifact(ArtifactKind::Rootfs).unwrap().name,
+            "bunos-wsl.tar.gz"
+        );
     }
 }

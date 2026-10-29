@@ -73,7 +73,9 @@ async function withStack<T>(stack: EditStack, f: (path: string) => Promise<T>): 
   try {
     return await f(path);
   } finally {
-    await Bun.file(path).delete().catch(() => {});
+    await Bun.file(path)
+      .delete()
+      .catch(() => {});
   }
 }
 
@@ -83,14 +85,7 @@ export const media = {
     withStack(stack, p => call<{ out: string; width: number; height: number }>(["render", file, p, out])),
   proxy: (file: string, stack: EditStack, cacheDir: string, maxEdge: number) =>
     withStack(stack, p => call<{ path: string; hit: boolean }>(["proxy", file, p, cacheDir, String(maxEdge)])),
-  send: (
-    inbox: string,
-    from: string,
-    to: string,
-    file: string,
-    stack: EditStack,
-    frames?: [number, number],
-  ) =>
+  send: (inbox: string, from: string, to: string, file: string, stack: EditStack, frames?: [number, number]) =>
     withStack(stack, p =>
       call<{ file: string }>(["send", inbox, from, to, file, p, ...(frames ? frames.map(String) : [])]),
     ),

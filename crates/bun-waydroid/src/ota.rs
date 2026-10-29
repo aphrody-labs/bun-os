@@ -73,12 +73,23 @@ impl From<serde_json::Error> for Error {
 
 /// `<base>/<rom_type>/waydroid_<arch>/<system_type>.json` (initializer.py).
 pub fn system_channel_url(base: &str, rom_type: &str, arch: &str, system_type: &str) -> String {
-    format!("{}/{}/waydroid_{}/{}.json", base.trim_end_matches('/'), rom_type, arch, system_type)
+    format!(
+        "{}/{}/waydroid_{}/{}.json",
+        base.trim_end_matches('/'),
+        rom_type,
+        arch,
+        system_type
+    )
 }
 
 /// `<base>/waydroid_<arch>/<vendor>.json`, spaces in the vendor name become `_`.
 pub fn vendor_channel_url(base: &str, arch: &str, vendor: &str) -> String {
-    format!("{}/waydroid_{}/{}.json", base.trim_end_matches('/'), arch, vendor.replace(' ', "_"))
+    format!(
+        "{}/waydroid_{}/{}.json",
+        base.trim_end_matches('/'),
+        arch,
+        vendor.replace(' ', "_")
+    )
 }
 
 pub fn parse_channel(json: &str) -> Result<Vec<Build>, Error> {
@@ -132,7 +143,10 @@ pub fn verify_file(path: &Path, expected: &str) -> Result<(), Error> {
     if actual.eq_ignore_ascii_case(expected) {
         Ok(())
     } else {
-        Err(Error::HashMismatch { expected: expected.to_string(), actual })
+        Err(Error::HashMismatch {
+            expected: expected.to_string(),
+            actual,
+        })
     }
 }
 
@@ -143,15 +157,22 @@ pub fn validate_against_channel(path: &Path, builds: &[Build]) -> Result<bool, E
 }
 
 pub fn fetch_channel(url: &str) -> Result<Vec<Build>, Error> {
-    let mut resp = ureq::get(url).call().map_err(|e| Error::Http(e.to_string()))?;
-    let body = resp.body_mut().read_to_string().map_err(|e| Error::Http(e.to_string()))?;
+    let mut resp = ureq::get(url)
+        .call()
+        .map_err(|e| Error::Http(e.to_string()))?;
+    let body = resp
+        .body_mut()
+        .read_to_string()
+        .map_err(|e| Error::Http(e.to_string()))?;
     parse_channel(&body)
 }
 
 /// Stream `url` to `dest` while hashing; the file is removed again on mismatch.
 /// Returns `(bytes, sha256)`.
 pub fn download_verified(url: &str, dest: &Path, expected: &str) -> Result<(u64, String), Error> {
-    let resp = ureq::get(url).call().map_err(|e| Error::Http(e.to_string()))?;
+    let resp = ureq::get(url)
+        .call()
+        .map_err(|e| Error::Http(e.to_string()))?;
     let mut reader = resp.into_body().into_reader();
     let mut out = File::create(dest)?;
     let mut h = Sha256::new();
@@ -171,7 +192,10 @@ pub fn download_verified(url: &str, dest: &Path, expected: &str) -> Result<(u64,
     if !actual.eq_ignore_ascii_case(expected) {
         drop(out);
         let _ = std::fs::remove_file(dest);
-        return Err(Error::HashMismatch { expected: expected.to_string(), actual });
+        return Err(Error::HashMismatch {
+            expected: expected.to_string(),
+            actual,
+        });
     }
     Ok((total, actual))
 }
@@ -194,7 +218,8 @@ pub fn safe_join(root: &Path, entry: &str) -> Result<PathBuf, Error> {
 
 /// Extract a verified image zip into `dir`. Returns the file entries written.
 pub fn extract(zip_path: &Path, dir: &Path) -> Result<Vec<String>, Error> {
-    let mut ar = zip::ZipArchive::new(File::open(zip_path)?).map_err(|e| Error::Zip(e.to_string()))?;
+    let mut ar =
+        zip::ZipArchive::new(File::open(zip_path)?).map_err(|e| Error::Zip(e.to_string()))?;
     let mut written = Vec::new();
     for i in 0..ar.len() {
         let mut f = ar.by_index(i).map_err(|e| Error::Zip(e.to_string()))?;
@@ -243,7 +268,10 @@ mod tests {
         assert_eq!(first_newer(&b, 0).unwrap().datetime, 1790539062);
         assert!(first_newer(&b, 1790539062).is_none());
         assert_eq!(latest(&b).unwrap().size, 847449341);
-        assert!(matches!(parse_channel(r#"{"response":[]}"#), Err(Error::EmptyChannel)));
+        assert!(matches!(
+            parse_channel(r#"{"response":[]}"#),
+            Err(Error::EmptyChannel)
+        ));
     }
 
     #[test]
@@ -269,7 +297,10 @@ mod tests {
         let good = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
         verify_file(&f, good).unwrap();
         verify_file(&f, &good.to_uppercase()).unwrap();
-        assert!(matches!(verify_file(&f, "00"), Err(Error::HashMismatch { .. })));
+        assert!(matches!(
+            verify_file(&f, "00"),
+            Err(Error::HashMismatch { .. })
+        ));
         let b = vec![Build {
             datetime: 1,
             filename: "a".into(),
@@ -289,7 +320,10 @@ mod tests {
         assert!(safe_join(root, "/etc/passwd").is_err());
         assert!(safe_join(root, "a\\b").is_err());
         assert!(safe_join(root, "C:x").is_err());
-        assert_eq!(safe_join(root, "system.img").unwrap(), root.join("system.img"));
+        assert_eq!(
+            safe_join(root, "system.img").unwrap(),
+            root.join("system.img")
+        );
 
         let d = tmp("zip");
         let z = d.join("i.zip");

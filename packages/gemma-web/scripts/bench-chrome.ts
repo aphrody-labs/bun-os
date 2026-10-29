@@ -16,7 +16,8 @@ const flag = (k: string) => args.includes(k);
 
 const dist = join(import.meta.dir, "..", "dist", "web");
 const modelDir = opt("--model-dir", process.env["GEMMA_MODEL_DIR"]);
-if (!modelDir || !existsSync(modelDir)) throw new Error("--model-dir (or GEMMA_MODEL_DIR) must point at the ONNX repo snapshot");
+if (!modelDir || !existsSync(modelDir))
+  throw new Error("--model-dir (or GEMMA_MODEL_DIR) must point at the ONNX repo snapshot");
 const ep = (opt("--ep", "webgpu") as "webgpu" | "wasm") ?? "webgpu";
 const maxTokens = Number(opt("--max-tokens", "64"));
 const prompt = opt("--prompt", "Explain in two sentences why the sky is blue.")!;
@@ -29,7 +30,7 @@ function findChrome(): string {
     "/usr/bin/google-chrome",
     "/usr/bin/chromium",
   ].filter(Boolean) as string[];
-  const f = c.find((p) => existsSync(p));
+  const f = c.find(p => existsSync(p));
   if (!f) throw new Error("no Chrome/Chromium found; pass --chrome");
   return f;
 }
@@ -47,7 +48,11 @@ async function treeRssMiB(root: number): Promise<number> {
     const ps = `$ids=@(${root});$all=Get-CimInstance Win32_Process;$i=0;while($i -lt $ids.Count){$ids+=@($all|?{$_.ParentProcessId -eq $ids[$i]}|%{$_.ProcessId});$i++};[int]((Get-Process -Id $ids -ErrorAction SilentlyContinue|Measure-Object WorkingSet64 -Sum).Sum/1MB)`;
     return Number((await sh(["powershell", "-NoProfile", "-Command", ps])).trim()) || 0;
   }
-  const out = await sh(["sh", "-c", `ps -eo pid,ppid,rss | awk -v r=${root} '{p[$1]=$2;m[$1]=$3} END{for(i in p){x=i;while(x&&x!=r)x=p[x];if(x==r)s+=m[i]};print s/1024}'`]);
+  const out = await sh([
+    "sh",
+    "-c",
+    `ps -eo pid,ppid,rss | awk -v r=${root} '{p[$1]=$2;m[$1]=$3} END{for(i in p){x=i;while(x&&x!=r)x=p[x];if(x==r)s+=m[i]};print s/1024}'`,
+  ]);
   return Number(out.trim()) || 0;
 }
 
@@ -64,7 +69,9 @@ async function gpuUsedMiB(): Promise<number | undefined> {
 const server = serve({ dist, modelDir, port: Number(opt("--port", "0")) });
 // --profile DIR keeps the Chrome profile (and so the OPFS shard cache) between runs: cold vs warm load.
 const userData = opt("--profile") ?? mkdtempSync(join(tmpdir(), "gemma-chrome-"));
-try { unlinkSync(join(userData, "DevToolsActivePort")); } catch {}
+try {
+  unlinkSync(join(userData, "DevToolsActivePort"));
+} catch {}
 const flags = [
   "--headless=new",
   `--user-data-dir=${userData}`,
@@ -94,18 +101,20 @@ async function devtoolsUrl(): Promise<string> {
 }
 
 const ws = new WebSocket(await devtoolsUrl());
-await new Promise((r) => (ws.onopen = r));
+await new Promise(r => (ws.onopen = r));
 let nextId = 0;
 const pending = new Map<number, (v: any) => void>();
 const logs: string[] = [];
-ws.onmessage = (e) => {
+ws.onmessage = e => {
   const m = JSON.parse(String(e.data));
   if (m.id && pending.has(m.id)) pending.get(m.id)!(m);
-  else if (m.method === "Runtime.consoleAPICalled") logs.push(m.params.args.map((a: any) => a.value ?? a.description).join(" "));
-  else if (m.method === "Runtime.exceptionThrown") logs.push("EXC " + (m.params.exceptionDetails.exception?.description ?? m.params.exceptionDetails.text));
+  else if (m.method === "Runtime.consoleAPICalled")
+    logs.push(m.params.args.map((a: any) => a.value ?? a.description).join(" "));
+  else if (m.method === "Runtime.exceptionThrown")
+    logs.push("EXC " + (m.params.exceptionDetails.exception?.description ?? m.params.exceptionDetails.text));
 };
 const send = (method: string, params: object = {}) =>
-  new Promise<any>((res) => {
+  new Promise<any>(res => {
     const id = ++nextId;
     pending.set(id, res);
     ws.send(JSON.stringify({ id, method, params }));

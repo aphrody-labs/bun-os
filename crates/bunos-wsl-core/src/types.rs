@@ -70,4 +70,3 @@ impl From<WslError> for String {
         error.to_string()
     }
 }
-

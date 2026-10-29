@@ -220,7 +220,14 @@ export function encodeSetClipboard(text: string, paste = false, sequence = 0n): 
   return withString(CTRL.setClipboard, prefix, text);
 }
 
-export function encodeScroll(a: { x: number; y: number; width: number; height: number; dx: number; dy: number }): Uint8Array {
+export function encodeScroll(a: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  dx: number;
+  dy: number;
+}): Uint8Array {
   // position(12) + hscroll i16 + vscroll i16 + buttons i32; the i16 is fixed point over [-1,1] and the
   // server multiplies it by 16, so dx/dy are scroll ticks in [-16,16].
   const out = new Uint8Array(1 + 12 + 2 + 2 + 4);

@@ -41,7 +41,10 @@ impl Compositor {
 
 /// Content of `/etc/bunos/session.conf` (sourced by sh).
 pub fn session_conf(c: Compositor) -> String {
-    format!("# written by the Bun OS WSL manager\nWSL2_COMPOSITOR={}\n", c.as_env_value())
+    format!(
+        "# written by the Bun OS WSL manager\nWSL2_COMPOSITOR={}\n",
+        c.as_env_value()
+    )
 }
 
 fn write_file_command(path: &str, content: &str) -> String {
@@ -52,9 +55,21 @@ fn write_file_command(path: &str, content: &str) -> String {
     )
 }
 
-pub fn apply_session(exec: &dyn WslCommandExecutor, distro: &str, c: Compositor) -> Result<(), WslError> {
-    let out = exec.exec_as_root(distro, None, &write_file_command("/etc/bunos/session.conf", &session_conf(c)))?;
-    if out.success { Ok(()) } else { Err(WslError::CommandFailed(out.stderr)) }
+pub fn apply_session(
+    exec: &dyn WslCommandExecutor,
+    distro: &str,
+    c: Compositor,
+) -> Result<(), WslError> {
+    let out = exec.exec_as_root(
+        distro,
+        None,
+        &write_file_command("/etc/bunos/session.conf", &session_conf(c)),
+    )?;
+    if out.success {
+        Ok(())
+    } else {
+        Err(WslError::CommandFailed(out.stderr))
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -76,7 +91,10 @@ pub enum LimitError {
 
 impl DistroLimits {
     pub fn validate(&self) -> Result<(), LimitError> {
-        if self.memory_mib.is_some_and(|m| !(256..=4_194_304).contains(&m)) {
+        if self
+            .memory_mib
+            .is_some_and(|m| !(256..=4_194_304).contains(&m))
+        {
             return Err(LimitError::Memory);
         }
         if self.cpu_percent.is_some_and(|c| !(10..=6400).contains(&c)) {
@@ -102,15 +120,28 @@ pub const LIMITS_DROPIN_PATH: &str = "/etc/systemd/system/user.slice.d/50-bunos-
 
 /// Write (or, with empty limits, remove) the drop-in and reload systemd. Needs `[boot] systemd=true`,
 /// which the Bun OS image sets.
-pub fn apply_limits(exec: &dyn WslCommandExecutor, distro: &str, limits: DistroLimits) -> Result<(), LimitApplyError> {
+pub fn apply_limits(
+    exec: &dyn WslCommandExecutor,
+    distro: &str,
+    limits: DistroLimits,
+) -> Result<(), LimitApplyError> {
     limits.validate().map_err(LimitApplyError::Invalid)?;
     let cmd = if limits.memory_mib.is_none() && limits.cpu_percent.is_none() {
         format!("rm -f {LIMITS_DROPIN_PATH} && systemctl daemon-reload")
     } else {
-        format!("{} && systemctl daemon-reload", write_file_command(LIMITS_DROPIN_PATH, &limits.dropin()))
+        format!(
+            "{} && systemctl daemon-reload",
+            write_file_command(LIMITS_DROPIN_PATH, &limits.dropin())
+        )
     };
-    let out = exec.exec_as_root(distro, None, &cmd).map_err(LimitApplyError::Wsl)?;
-    if out.success { Ok(()) } else { Err(LimitApplyError::Wsl(WslError::CommandFailed(out.stderr))) }
+    let out = exec
+        .exec_as_root(distro, None, &cmd)
+        .map_err(LimitApplyError::Wsl)?;
+    if out.success {
+        Ok(())
+    } else {
+        Err(LimitApplyError::Wsl(WslError::CommandFailed(out.stderr)))
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -127,25 +158,57 @@ mod tests {
 
     #[test]
     fn compositor_names_match_the_wslgd_switch() {
-        for c in [Compositor::Weston, Compositor::HyprlandNested, Compositor::HyprlandHeadless] {
+        for c in [
+            Compositor::Weston,
+            Compositor::HyprlandNested,
+            Compositor::HyprlandHeadless,
+        ] {
             assert_eq!(Compositor::parse(c.as_env_value()), Some(c));
         }
         assert_eq!(Compositor::parse("sway"), None);
-        assert_eq!(serde_json::to_string(&Compositor::HyprlandNested).unwrap(), "\"hyprland-nested\"");
+        assert_eq!(
+            serde_json::to_string(&Compositor::HyprlandNested).unwrap(),
+            "\"hyprland-nested\""
+        );
     }
 
     #[test]
     fn session_conf_is_sourceable() {
-        assert_eq!(session_conf(Compositor::Weston), "# written by the Bun OS WSL manager\nWSL2_COMPOSITOR=weston\n");
+        assert_eq!(
+            session_conf(Compositor::Weston),
+            "# written by the Bun OS WSL manager\nWSL2_COMPOSITOR=weston\n"
+        );
     }
 
     #[test]
     fn limits_dropin_and_validation() {
-        let l = DistroLimits { memory_mib: Some(4096), cpu_percent: Some(200) };
+        let l = DistroLimits {
+            memory_mib: Some(4096),
+            cpu_percent: Some(200),
+        };
         assert_eq!(l.dropin(), "[Slice]\nMemoryMax=4096M\nCPUQuota=200%\n");
-        assert_eq!(DistroLimits { memory_mib: Some(1), cpu_percent: None }.validate(), Err(LimitError::Memory));
-        assert_eq!(DistroLimits { memory_mib: None, cpu_percent: Some(5) }.validate(), Err(LimitError::Cpu));
-        assert!(DistroLimits { memory_mib: None, cpu_percent: None }.validate().is_ok());
+        assert_eq!(
+            DistroLimits {
+                memory_mib: Some(1),
+                cpu_percent: None
+            }
+            .validate(),
+            Err(LimitError::Memory)
+        );
+        assert_eq!(
+            DistroLimits {
+                memory_mib: None,
+                cpu_percent: Some(5)
+            }
+            .validate(),
+            Err(LimitError::Cpu)
+        );
+        assert!(DistroLimits {
+            memory_mib: None,
+            cpu_percent: None
+        }
+        .validate()
+        .is_ok());
     }
 
     #[test]

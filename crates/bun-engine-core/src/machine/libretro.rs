@@ -212,7 +212,12 @@ unsafe extern "C" fn environment(cmd: c_uint, data: *mut c_void) -> bool {
     }
 }
 
-unsafe extern "C" fn video_refresh(data: *const c_void, width: c_uint, height: c_uint, pitch: usize) {
+unsafe extern "C" fn video_refresh(
+    data: *const c_void,
+    width: c_uint,
+    height: c_uint,
+    pitch: usize,
+) {
     // SAFETY: see `shared`; `data` holds `height` rows of `pitch` bytes in the negotiated format.
     let Some(host) = (unsafe { shared() }) else {
         return;
@@ -245,7 +250,11 @@ unsafe extern "C" fn video_refresh(data: *const c_void, width: c_uint, height: c
             PixelFormat::Xrgb1555 => {
                 for px in row[..w * 2].chunks_exact(2) {
                     let v = u16::from_le_bytes([px[0], px[1]]);
-                    let (r, g, b) = (((v >> 10) & 31) as u8, ((v >> 5) & 31) as u8, (v & 31) as u8);
+                    let (r, g, b) = (
+                        ((v >> 10) & 31) as u8,
+                        ((v >> 5) & 31) as u8,
+                        (v & 31) as u8,
+                    );
                     rgb.extend_from_slice(&[r << 3 | r >> 2, g << 3 | g >> 2, b << 3 | b >> 2]);
                 }
             }
@@ -339,9 +348,8 @@ impl Libretro {
         if !HOST.load(Ordering::Acquire).is_null() {
             return Err("a libretro core is already running in this process".into());
         }
-        let cstr = |p: &Path| {
-            CString::new(p.to_string_lossy().into_owned()).map_err(|e| e.to_string())
-        };
+        let cstr =
+            |p: &Path| CString::new(p.to_string_lossy().into_owned()).map_err(|e| e.to_string());
         let save_dir: PathBuf = system_dir.join("saves");
         std::fs::create_dir_all(&save_dir).map_err(|e| e.to_string())?;
         let mut shared = Box::new(Shared {
@@ -382,20 +390,32 @@ impl Libretro {
             if info.library_name.is_null() {
                 "libretro".to_string()
             } else {
-                CStr::from_ptr(info.library_name).to_string_lossy().into_owned()
+                CStr::from_ptr(info.library_name)
+                    .to_string_lossy()
+                    .into_owned()
             }
         };
         HOST.store(&mut *shared, Ordering::Release);
         let boot = || -> Result<(f64, f64), String> {
             // SAFETY: callback registration then init, in the order libretro.h requires.
             unsafe {
-                sym::<unsafe extern "C" fn(EnvironmentFn)>(&lib, "retro_set_environment")?(environment);
+                sym::<unsafe extern "C" fn(EnvironmentFn)>(&lib, "retro_set_environment")?(
+                    environment,
+                );
                 sym::<unsafe extern "C" fn()>(&lib, "retro_init")?();
-                sym::<unsafe extern "C" fn(VideoRefreshFn)>(&lib, "retro_set_video_refresh")?(video_refresh);
-                sym::<unsafe extern "C" fn(AudioSampleFn)>(&lib, "retro_set_audio_sample")?(audio_sample);
-                sym::<unsafe extern "C" fn(AudioBatchFn)>(&lib, "retro_set_audio_sample_batch")?(audio_batch);
+                sym::<unsafe extern "C" fn(VideoRefreshFn)>(&lib, "retro_set_video_refresh")?(
+                    video_refresh,
+                );
+                sym::<unsafe extern "C" fn(AudioSampleFn)>(&lib, "retro_set_audio_sample")?(
+                    audio_sample,
+                );
+                sym::<unsafe extern "C" fn(AudioBatchFn)>(&lib, "retro_set_audio_sample_batch")?(
+                    audio_batch,
+                );
                 sym::<unsafe extern "C" fn(InputPollFn)>(&lib, "retro_set_input_poll")?(input_poll);
-                sym::<unsafe extern "C" fn(InputStateFn)>(&lib, "retro_set_input_state")?(input_state);
+                sym::<unsafe extern "C" fn(InputStateFn)>(&lib, "retro_set_input_state")?(
+                    input_state,
+                );
             }
             let path = cstr(content)?;
             let data = if info.need_fullpath {
@@ -405,13 +425,19 @@ impl Libretro {
             };
             let game = GameInfo {
                 path: path.as_ptr(),
-                data: if info.need_fullpath { ptr::null() } else { data.as_ptr().cast() },
+                data: if info.need_fullpath {
+                    ptr::null()
+                } else {
+                    data.as_ptr().cast()
+                },
                 size: data.len(),
                 meta: ptr::null(),
             };
             // SAFETY: `game` outlives the call; the core copies what it keeps.
             let loaded = unsafe {
-                sym::<unsafe extern "C" fn(*const GameInfo) -> bool>(&lib, "retro_load_game")?(&game)
+                sym::<unsafe extern "C" fn(*const GameInfo) -> bool>(&lib, "retro_load_game")?(
+                    &game,
+                )
             };
             if !loaded {
                 return Err(format!("{name} refused {}", content.display()));
@@ -419,8 +445,13 @@ impl Libretro {
             let mut av = SystemAvInfo::default();
             // SAFETY: valid out-parameter.
             unsafe {
-                sym::<unsafe extern "C" fn(*mut SystemAvInfo)>(&lib, "retro_get_system_av_info")?(&mut av);
-                sym::<unsafe extern "C" fn(c_uint, c_uint)>(&lib, "retro_set_controller_port_device")?(0, DEVICE_JOYPAD);
+                sym::<unsafe extern "C" fn(*mut SystemAvInfo)>(&lib, "retro_get_system_av_info")?(
+                    &mut av,
+                );
+                sym::<unsafe extern "C" fn(c_uint, c_uint)>(
+                    &lib,
+                    "retro_set_controller_port_device",
+                )?(0, DEVICE_JOYPAD);
             }
             Ok((av.timing.fps, av.timing.sample_rate))
         };
@@ -481,8 +512,11 @@ impl Machine for Libretro {
     }
 
     fn save_state(&mut self) -> Option<Vec<u8>> {
-        let size = sym::<unsafe extern "C" fn() -> usize>(&self.lib, "retro_serialize_size").ok()?;
-        let ser = sym::<unsafe extern "C" fn(*mut c_void, usize) -> bool>(&self.lib, "retro_serialize").ok()?;
+        let size =
+            sym::<unsafe extern "C" fn() -> usize>(&self.lib, "retro_serialize_size").ok()?;
+        let ser =
+            sym::<unsafe extern "C" fn(*mut c_void, usize) -> bool>(&self.lib, "retro_serialize")
+                .ok()?;
         // SAFETY: the buffer is `size()` bytes as the core asked.
         unsafe {
             let n = size();
@@ -495,7 +529,10 @@ impl Machine for Libretro {
     }
 
     fn load_state(&mut self, state: &[u8]) -> Result<(), String> {
-        let de = sym::<unsafe extern "C" fn(*const c_void, usize) -> bool>(&self.lib, "retro_unserialize")?;
+        let de = sym::<unsafe extern "C" fn(*const c_void, usize) -> bool>(
+            &self.lib,
+            "retro_unserialize",
+        )?;
         // SAFETY: `state` is a buffer produced by `retro_serialize` of the same core and content.
         if unsafe { de(state.as_ptr().cast(), state.len()) } {
             Ok(())

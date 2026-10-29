@@ -16,7 +16,10 @@ pub struct Pkce {
 
 impl std::fmt::Debug for Pkce {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Pkce").field("verifier", &"<redacted>").field("challenge", &self.challenge).finish()
+        f.debug_struct("Pkce")
+            .field("verifier", &"<redacted>")
+            .field("challenge", &self.challenge)
+            .finish()
     }
 }
 
@@ -35,7 +38,10 @@ impl Pkce {
     /// Derive the challenge for a given verifier.
     pub fn from_verifier(verifier: String) -> Self {
         let challenge = URL_SAFE_NO_PAD.encode(Sha256::digest(verifier.as_bytes()));
-        Self { verifier, challenge }
+        Self {
+            verifier,
+            challenge,
+        }
     }
 }
 
@@ -55,8 +61,15 @@ mod tests {
         let b = Pkce::generate().unwrap();
         assert_ne!(a.verifier, b.verifier);
         assert_eq!(a.verifier.len(), 43);
-        assert!(a.verifier.bytes().all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_'));
-        assert_eq!(Pkce::from_verifier(a.verifier.clone()).challenge, a.challenge);
+        assert!(
+            a.verifier
+                .bytes()
+                .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_')
+        );
+        assert_eq!(
+            Pkce::from_verifier(a.verifier.clone()).challenge,
+            a.challenge
+        );
     }
 
     #[test]

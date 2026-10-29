@@ -407,9 +407,10 @@ fn parse_online_distros_output(output: &str) -> Vec<String> {
 
 /// Compare parsed names exactly so similarly named installations cannot mask a failure.
 fn installed_list_contains(output: &CommandOutput, name: &str) -> bool {
-    output.success && bunos_wsl_core::parse_wsl_list_output(&output.stdout)
-        .iter()
-        .any(|distro| distro.name.eq_ignore_ascii_case(name))
+    output.success
+        && bunos_wsl_core::parse_wsl_list_output(&output.stdout)
+            .iter()
+            .any(|distro| distro.name.eq_ignore_ascii_case(name))
 }
 
 #[cfg(test)]
@@ -423,7 +424,9 @@ mod tests {
             stderr: "Network timeout".to_string(),
             success: false,
         };
-        let error = parse_online_catalog_result(&output).unwrap_err().to_string();
+        let error = parse_online_catalog_result(&output)
+            .unwrap_err()
+            .to_string();
         assert!(error.contains("无法连接服务器"));
         assert!(error.contains("Network timeout"));
     }
@@ -435,7 +438,10 @@ mod tests {
             stderr: String::new(),
             success: true,
         };
-        assert_eq!(parse_online_catalog_result(&output).unwrap(), vec!["Ubuntu-26.04", "Debian"]);
+        assert_eq!(
+            parse_online_catalog_result(&output).unwrap(),
+            vec!["Ubuntu-26.04", "Debian"]
+        );
     }
 
     #[test]

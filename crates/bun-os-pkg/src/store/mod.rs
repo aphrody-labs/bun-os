@@ -3,7 +3,6 @@
 //! Cache formats remain ecosystem-owned. Writable extraction must use copies:
 //! hardlinking a mutable package tree would corrupt the shared content address.
 
-
 mod maintenance;
 pub use maintenance::GcReport;
 

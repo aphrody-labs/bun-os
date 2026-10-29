@@ -10,7 +10,15 @@ import { parseDep } from "./version.ts";
 export const SCHEMA_VERSION = 1;
 
 export type DepKind = "depends" | "makedepends" | "checkdepends" | "optdepends" | "provides" | "conflicts" | "replaces";
-export const DEP_KINDS: DepKind[] = ["depends", "makedepends", "checkdepends", "optdepends", "provides", "conflicts", "replaces"];
+export const DEP_KINDS: DepKind[] = [
+  "depends",
+  "makedepends",
+  "checkdepends",
+  "optdepends",
+  "provides",
+  "conflicts",
+  "replaces",
+];
 
 /** Normalised package row, shared by official repositories and the AUR. */
 export interface PackageRow {
@@ -155,7 +163,12 @@ const PKG_COLS = `id, source, repo, name, base, version, description, url, arch,
   first_submitted AS firstSubmitted, last_modified AS lastModified, comaintainers, keywords`;
 
 function hydrate(row: Record<string, unknown>): PackageRow {
-  const r = row as unknown as PackageRow & { licenses: string; groups: string; comaintainers: string; keywords: string };
+  const r = row as unknown as PackageRow & {
+    licenses: string;
+    groups: string;
+    comaintainers: string;
+    keywords: string;
+  };
   return {
     ...r,
     licenses: JSON.parse(r.licenses),
@@ -179,7 +192,9 @@ export class Store {
     const version = this.getMeta("schema_version");
     if (version === null) this.setMeta("schema_version", String(SCHEMA_VERSION));
     else if (Number(version) !== SCHEMA_VERSION)
-      throw new Error(`Index schema ${version} at ${path} is not supported (expected ${SCHEMA_VERSION}); delete the file and sync again.`);
+      throw new Error(
+        `Index schema ${version} at ${path} is not supported (expected ${SCHEMA_VERSION}); delete the file and sync again.`,
+      );
   }
 
   close(): void {
@@ -201,7 +216,10 @@ export class Store {
   }
 
   setMeta(key: string, value: string): void {
-    this.stmt("INSERT INTO meta(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(key, value);
+    this.stmt("INSERT INTO meta(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(
+      key,
+      value,
+    );
   }
 
   getFetchState(url: string): FetchState | null {
@@ -212,7 +230,12 @@ export class Store {
   }
 
   /** Record a conditional-request outcome; `changed` is false for a 304. */
-  setFetchState(url: string, s: { etag?: string | null; lastModified?: string | null; bytes?: number; sha256?: string | null }, changed: boolean, now = Date.now()): void {
+  setFetchState(
+    url: string,
+    s: { etag?: string | null; lastModified?: string | null; bytes?: number; sha256?: string | null },
+    changed: boolean,
+    now = Date.now(),
+  ): void {
     const prev = this.getFetchState(url);
     this.stmt(
       `INSERT INTO fetch_state(url, etag, last_modified, checked_at, changed_at, bytes, sha256) VALUES(?,?,?,?,?,?,?)
@@ -229,9 +252,20 @@ export class Store {
     );
   }
 
-  addEvent(e: { type: string; source: string; repo?: string; name?: string; old?: string | null; new?: string | null; data?: unknown; ts?: number }): IndexEvent {
+  addEvent(e: {
+    type: string;
+    source: string;
+    repo?: string;
+    name?: string;
+    old?: string | null;
+    new?: string | null;
+    data?: unknown;
+    ts?: number;
+  }): IndexEvent {
     const ts = e.ts ?? Date.now();
-    const res = this.stmt("INSERT INTO events(ts, type, source, repo, name, old, new, data) VALUES(?,?,?,?,?,?,?,?)").run(
+    const res = this.stmt(
+      "INSERT INTO events(ts, type, source, repo, name, old, new, data) VALUES(?,?,?,?,?,?,?,?)",
+    ).run(
       ts,
       e.type,
       e.source,
@@ -241,10 +275,22 @@ export class Store {
       e.new ?? null,
       e.data === undefined ? null : JSON.stringify(e.data),
     );
-    return { id: Number(res.lastInsertRowid), ts, type: e.type, source: e.source, repo: e.repo ?? "", name: e.name ?? "", old: e.old ?? null, new: e.new ?? null, data: e.data ?? null };
+    return {
+      id: Number(res.lastInsertRowid),
+      ts,
+      type: e.type,
+      source: e.source,
+      repo: e.repo ?? "",
+      name: e.name ?? "",
+      old: e.old ?? null,
+      new: e.new ?? null,
+      data: e.data ?? null,
+    };
   }
 
-  listEvents(options: { sinceId?: number; sinceTs?: number; type?: string; name?: string; limit?: number } = {}): IndexEvent[] {
+  listEvents(
+    options: { sinceId?: number; sinceTs?: number; type?: string; name?: string; limit?: number } = {},
+  ): IndexEvent[] {
     const where: string[] = [];
     const args: (string | number)[] = [];
     if (options.sinceId !== undefined) (where.push("id > ?"), args.push(options.sinceId));
@@ -252,7 +298,9 @@ export class Store {
     if (options.type) (where.push("type = ?"), args.push(options.type));
     if (options.name) (where.push("name = ?"), args.push(options.name));
     const sql = `SELECT id, ts, type, source, repo, name, old, new, data FROM events ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY id ${options.sinceId !== undefined ? "ASC" : "DESC"} LIMIT ?`;
-    const rows = this.db.query(sql).all(...args, options.limit ?? 200) as (Omit<IndexEvent, "data"> & { data: string | null })[];
+    const rows = this.db.query(sql).all(...args, options.limit ?? 200) as (Omit<IndexEvent, "data"> & {
+      data: string | null;
+    })[];
     return rows.map(r => ({ ...r, data: r.data === null ? null : JSON.parse(r.data) }));
   }
 
@@ -261,7 +309,13 @@ export class Store {
     const bytes = typeof content === "string" ? new TextEncoder().encode(content) : content;
     const sha256 = new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
     const exists = this.stmt("SELECT 1 FROM blobs WHERE sha256 = ?").get(sha256);
-    if (!exists) this.stmt("INSERT INTO blobs(sha256, kind, size, z) VALUES(?,?,?,?)").run(sha256, kind, bytes.length, Bun.zstdCompressSync(bytes, { level: 6 }));
+    if (!exists)
+      this.stmt("INSERT INTO blobs(sha256, kind, size, z) VALUES(?,?,?,?)").run(
+        sha256,
+        kind,
+        bytes.length,
+        Bun.zstdCompressSync(bytes, { level: 6 }),
+      );
     return sha256;
   }
 
@@ -273,39 +327,65 @@ export class Store {
   // ---- packages -------------------------------------------------------------------------------------------------
 
   getPackages(name: string): PackageRow[] {
-    return (this.stmt(`SELECT ${PKG_COLS} FROM packages WHERE name = ? ORDER BY source, repo`).all(name) as Record<string, unknown>[]).map(hydrate);
+    return (
+      this.stmt(`SELECT ${PKG_COLS} FROM packages WHERE name = ? ORDER BY source, repo`).all(name) as Record<
+        string,
+        unknown
+      >[]
+    ).map(hydrate);
   }
 
-  getPackage(name: string, options: { source?: "repo" | "aur"; repo?: string; testing?: boolean } = {}): PackageRow | null {
+  getPackage(
+    name: string,
+    options: { source?: "repo" | "aur"; repo?: string; testing?: boolean } = {},
+  ): PackageRow | null {
     const rows = this.getPackages(name).filter(
-      p => (!options.source || p.source === options.source) && (!options.repo || p.repo === options.repo) && (options.testing || options.repo || !isTestingRepo(p.repo)),
+      p =>
+        (!options.source || p.source === options.source) &&
+        (!options.repo || p.repo === options.repo) &&
+        (options.testing || options.repo || !isTestingRepo(p.repo)),
     );
     return rows[0] ?? null;
   }
 
   packagesByBase(base: string): PackageRow[] {
-    return (this.stmt(`SELECT ${PKG_COLS} FROM packages WHERE base = ? ORDER BY source, repo, name`).all(base) as Record<string, unknown>[]).map(hydrate);
+    return (
+      this.stmt(`SELECT ${PKG_COLS} FROM packages WHERE base = ? ORDER BY source, repo, name`).all(base) as Record<
+        string,
+        unknown
+      >[]
+    ).map(hydrate);
   }
 
   depsOf(pkgId: number, kind?: DepKind): { kind: DepKind; name: string; op: string; ver: string; descr: string }[] {
     const rows = kind
-      ? this.stmt("SELECT kind, name, op, ver, descr FROM deps WHERE pkg_id = ? AND kind = ? ORDER BY rowid").all(pkgId, kind)
+      ? this.stmt("SELECT kind, name, op, ver, descr FROM deps WHERE pkg_id = ? AND kind = ? ORDER BY rowid").all(
+          pkgId,
+          kind,
+        )
       : this.stmt("SELECT kind, name, op, ver, descr FROM deps WHERE pkg_id = ? ORDER BY rowid").all(pkgId);
     return rows as { kind: DepKind; name: string; op: string; ver: string; descr: string }[];
   }
 
   filesOf(pkgId: number): string[] {
-    return (this.stmt("SELECT path FROM files WHERE pkg_id = ? ORDER BY path").all(pkgId) as { path: string }[]).map(r => r.path);
+    return (this.stmt("SELECT path FROM files WHERE pkg_id = ? ORDER BY path").all(pkgId) as { path: string }[]).map(
+      r => r.path,
+    );
   }
 
   count(source?: "repo" | "aur", repo?: string): number {
     if (repo) return (this.stmt("SELECT COUNT(*) AS n FROM packages WHERE repo = ?").get(repo) as { n: number }).n;
-    if (source) return (this.stmt("SELECT COUNT(*) AS n FROM packages WHERE source = ?").get(source) as { n: number }).n;
+    if (source)
+      return (this.stmt("SELECT COUNT(*) AS n FROM packages WHERE source = ?").get(source) as { n: number }).n;
     return (this.stmt("SELECT COUNT(*) AS n FROM packages").get() as { n: number }).n;
   }
 
   repoCounts(): { source: string; repo: string; n: number; latestBuild: number }[] {
-    return this.db.query("SELECT source, repo, COUNT(*) AS n, MAX(builddate) AS latestBuild FROM packages GROUP BY source, repo ORDER BY source, repo").all() as {
+    return this.db
+      .query(
+        "SELECT source, repo, COUNT(*) AS n, MAX(builddate) AS latestBuild FROM packages GROUP BY source, repo ORDER BY source, repo",
+      )
+      .all() as {
       source: string;
       repo: string;
       n: number;
@@ -326,13 +406,30 @@ export class Store {
    * Replace one official repository with the parsed database content. Only changed packages are rewritten and
    * every change becomes an event. An empty repository yields one `initial` event instead of one per package.
    */
-  replaceRepo(repo: string, packages: DbPackage[], options: { files?: boolean; now?: number; emit?: (e: IndexEvent) => void } = {}): ReplaceResult {
+  replaceRepo(
+    repo: string,
+    packages: DbPackage[],
+    options: { files?: boolean; now?: number; emit?: (e: IndexEvent) => void } = {},
+  ): ReplaceResult {
     const now = options.now ?? Date.now();
-    const result: ReplaceResult = { added: 0, updated: 0, removed: 0, unchanged: 0, total: packages.length, initial: false };
+    const result: ReplaceResult = {
+      added: 0,
+      updated: 0,
+      removed: 0,
+      unchanged: 0,
+      total: packages.length,
+      initial: false,
+    };
     const events: IndexEvent[] = [];
     const tx = this.db.transaction(() => {
       const existing = new Map<string, { id: number; version: string; builddate: number }>();
-      for (const r of this.stmt("SELECT id, name, arch, version, builddate FROM packages WHERE repo = ?").all(repo) as { id: number; name: string; arch: string; version: string; builddate: number }[])
+      for (const r of this.stmt("SELECT id, name, arch, version, builddate FROM packages WHERE repo = ?").all(repo) as {
+        id: number;
+        name: string;
+        arch: string;
+        version: string;
+        builddate: number;
+      }[])
         existing.set(`${r.name}\0${r.arch}`, r);
       result.initial = existing.size === 0;
       const seen = new Set<string>();
@@ -352,17 +449,59 @@ export class Store {
           this.stmt("DELETE FROM files WHERE pkg_id = ?").run(id);
           this.stmt(
             `UPDATE packages SET base=?, version=?, description=?, url=?, filename=?, csize=?, isize=?, sha256=?, builddate=?, packager=?, licenses=?, groups=? WHERE id=?`,
-          ).run(p.base, p.version, p.description, p.url, p.filename, p.csize, p.isize, p.sha256, p.builddate, p.packager, JSON.stringify(p.licenses), JSON.stringify(p.groups), id);
+          ).run(
+            p.base,
+            p.version,
+            p.description,
+            p.url,
+            p.filename,
+            p.csize,
+            p.isize,
+            p.sha256,
+            p.builddate,
+            p.packager,
+            JSON.stringify(p.licenses),
+            JSON.stringify(p.groups),
+            id,
+          );
           result.updated++;
-          if (!result.initial) events.push(this.addEvent({ type: "updated", source: "repo", repo, name: p.name, old: old.version, new: p.version, ts: now }));
+          if (!result.initial)
+            events.push(
+              this.addEvent({
+                type: "updated",
+                source: "repo",
+                repo,
+                name: p.name,
+                old: old.version,
+                new: p.version,
+                ts: now,
+              }),
+            );
         } else {
           const res = this.stmt(
             `INSERT INTO packages(source, repo, name, base, version, description, url, arch, filename, csize, isize, sha256, builddate, packager, licenses, groups)
              VALUES('repo',?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-          ).run(repo, p.name, p.base, p.version, p.description, p.url, p.arch, p.filename, p.csize, p.isize, p.sha256, p.builddate, p.packager, JSON.stringify(p.licenses), JSON.stringify(p.groups));
+          ).run(
+            repo,
+            p.name,
+            p.base,
+            p.version,
+            p.description,
+            p.url,
+            p.arch,
+            p.filename,
+            p.csize,
+            p.isize,
+            p.sha256,
+            p.builddate,
+            p.packager,
+            JSON.stringify(p.licenses),
+            JSON.stringify(p.groups),
+          );
           id = Number(res.lastInsertRowid);
           result.added++;
-          if (!result.initial) events.push(this.addEvent({ type: "added", source: "repo", repo, name: p.name, new: p.version, ts: now }));
+          if (!result.initial)
+            events.push(this.addEvent({ type: "added", source: "repo", repo, name: p.name, new: p.version, ts: now }));
         }
         for (const kind of DEP_KINDS) this.insertDeps(id, kind, p[kind]);
         if (options.files && p.files.length) this.replaceFiles(id, p.files);
@@ -376,7 +515,8 @@ export class Store {
         result.removed++;
         events.push(this.addEvent({ type: "removed", source: "repo", repo, name, old: old.version, ts: now }));
       }
-      if (result.initial) events.push(this.addEvent({ type: "initial", source: "repo", repo, new: String(packages.length), ts: now }));
+      if (result.initial)
+        events.push(this.addEvent({ type: "initial", source: "repo", repo, new: String(packages.length), ts: now }));
     });
     tx();
     for (const e of events) options.emit?.(e);
@@ -390,13 +530,28 @@ export class Store {
   }
 
   /** Replace the whole AUR table content from the metadata archive (or a partial RPC answer with `partial`). */
-  replaceAur(records: AurRecord[], options: { partial?: boolean; now?: number; emit?: (e: IndexEvent) => void } = {}): ReplaceResult {
+  replaceAur(
+    records: AurRecord[],
+    options: { partial?: boolean; now?: number; emit?: (e: IndexEvent) => void } = {},
+  ): ReplaceResult {
     const now = options.now ?? Date.now();
-    const result: ReplaceResult = { added: 0, updated: 0, removed: 0, unchanged: 0, total: records.length, initial: false };
+    const result: ReplaceResult = {
+      added: 0,
+      updated: 0,
+      removed: 0,
+      unchanged: 0,
+      total: records.length,
+      initial: false,
+    };
     const events: IndexEvent[] = [];
     const tx = this.db.transaction(() => {
-      const existing = new Map<string, { id: number; version: string; lastModified: number; outOfDate: number | null; maintainer: string | null }>();
-      for (const r of this.stmt("SELECT id, name, version, last_modified AS lastModified, out_of_date AS outOfDate, maintainer FROM packages WHERE repo = 'aur'").all() as {
+      const existing = new Map<
+        string,
+        { id: number; version: string; lastModified: number; outOfDate: number | null; maintainer: string | null }
+      >();
+      for (const r of this.stmt(
+        "SELECT id, name, version, last_modified AS lastModified, out_of_date AS outOfDate, maintainer FROM packages WHERE repo = 'aur'",
+      ).all() as {
         id: number;
         name: string;
         version: string;
@@ -410,7 +565,12 @@ export class Store {
       for (const a of records) {
         seen.add(a.Name);
         const old = existing.get(a.Name);
-        const meta = [JSON.stringify(a.License ?? []), JSON.stringify(a.Groups ?? []), JSON.stringify(a.CoMaintainers ?? []), JSON.stringify(a.Keywords ?? [])] as const;
+        const meta = [
+          JSON.stringify(a.License ?? []),
+          JSON.stringify(a.Groups ?? []),
+          JSON.stringify(a.CoMaintainers ?? []),
+          JSON.stringify(a.Keywords ?? []),
+        ] as const;
         let id: number;
         if (old) {
           id = old.id;
@@ -418,7 +578,26 @@ export class Store {
           this.stmt(
             `UPDATE packages SET base=?, version=?, description=?, url=?, aur_id=?, votes=?, popularity=?, out_of_date=?, maintainer=?, submitter=?,
                first_submitted=?, last_modified=?, licenses=?, groups=?, comaintainers=?, keywords=?, filename=? WHERE id=?`,
-          ).run(a.PackageBase, a.Version, a.Description ?? "", a.URL ?? "", a.ID, a.NumVotes, a.Popularity, a.OutOfDate, a.Maintainer, a.Submitter ?? null, a.FirstSubmitted, a.LastModified, meta[0], meta[1], meta[2], meta[3], a.URLPath ?? "", id);
+          ).run(
+            a.PackageBase,
+            a.Version,
+            a.Description ?? "",
+            a.URL ?? "",
+            a.ID,
+            a.NumVotes,
+            a.Popularity,
+            a.OutOfDate,
+            a.Maintainer,
+            a.Submitter ?? null,
+            a.FirstSubmitted,
+            a.LastModified,
+            meta[0],
+            meta[1],
+            meta[2],
+            meta[3],
+            a.URLPath ?? "",
+            id,
+          );
           if (!depsChanged && old.outOfDate === a.OutOfDate && old.maintainer === a.Maintainer) {
             result.unchanged++;
             continue;
@@ -428,12 +607,78 @@ export class Store {
           }
           result.updated++;
           if (!result.initial) {
-            if (old.version !== a.Version) events.push(this.addEvent({ type: "updated", source: "aur", repo: "aur", name: a.Name, old: old.version, new: a.Version, ts: now }));
-            if (old.outOfDate === null && a.OutOfDate !== null) events.push(this.addEvent({ type: "flagged-out-of-date", source: "aur", repo: "aur", name: a.Name, old: null, new: String(a.OutOfDate), ts: now }));
-            if (old.outOfDate !== null && a.OutOfDate === null) events.push(this.addEvent({ type: "unflagged", source: "aur", repo: "aur", name: a.Name, old: String(old.outOfDate), new: null, ts: now }));
-            if (old.maintainer !== null && a.Maintainer === null) events.push(this.addEvent({ type: "orphaned", source: "aur", repo: "aur", name: a.Name, old: old.maintainer, new: null, ts: now }));
-            else if (old.maintainer === null && a.Maintainer !== null) events.push(this.addEvent({ type: "adopted", source: "aur", repo: "aur", name: a.Name, old: null, new: a.Maintainer, ts: now }));
-            else if (old.maintainer !== a.Maintainer) events.push(this.addEvent({ type: "maintainer-changed", source: "aur", repo: "aur", name: a.Name, old: old.maintainer, new: a.Maintainer, ts: now }));
+            if (old.version !== a.Version)
+              events.push(
+                this.addEvent({
+                  type: "updated",
+                  source: "aur",
+                  repo: "aur",
+                  name: a.Name,
+                  old: old.version,
+                  new: a.Version,
+                  ts: now,
+                }),
+              );
+            if (old.outOfDate === null && a.OutOfDate !== null)
+              events.push(
+                this.addEvent({
+                  type: "flagged-out-of-date",
+                  source: "aur",
+                  repo: "aur",
+                  name: a.Name,
+                  old: null,
+                  new: String(a.OutOfDate),
+                  ts: now,
+                }),
+              );
+            if (old.outOfDate !== null && a.OutOfDate === null)
+              events.push(
+                this.addEvent({
+                  type: "unflagged",
+                  source: "aur",
+                  repo: "aur",
+                  name: a.Name,
+                  old: String(old.outOfDate),
+                  new: null,
+                  ts: now,
+                }),
+              );
+            if (old.maintainer !== null && a.Maintainer === null)
+              events.push(
+                this.addEvent({
+                  type: "orphaned",
+                  source: "aur",
+                  repo: "aur",
+                  name: a.Name,
+                  old: old.maintainer,
+                  new: null,
+                  ts: now,
+                }),
+              );
+            else if (old.maintainer === null && a.Maintainer !== null)
+              events.push(
+                this.addEvent({
+                  type: "adopted",
+                  source: "aur",
+                  repo: "aur",
+                  name: a.Name,
+                  old: null,
+                  new: a.Maintainer,
+                  ts: now,
+                }),
+              );
+            else if (old.maintainer !== a.Maintainer)
+              events.push(
+                this.addEvent({
+                  type: "maintainer-changed",
+                  source: "aur",
+                  repo: "aur",
+                  name: a.Name,
+                  old: old.maintainer,
+                  new: a.Maintainer,
+                  ts: now,
+                }),
+              );
           }
           if (!depsChanged) continue;
         } else {
@@ -441,10 +686,32 @@ export class Store {
             `INSERT INTO packages(source, repo, name, base, version, description, url, arch, filename, aur_id, votes, popularity, out_of_date, maintainer, submitter,
                first_submitted, last_modified, licenses, groups, comaintainers, keywords)
              VALUES('aur','aur',?,?,?,?,?,'',?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-          ).run(a.Name, a.PackageBase, a.Version, a.Description ?? "", a.URL ?? "", a.URLPath ?? "", a.ID, a.NumVotes, a.Popularity, a.OutOfDate, a.Maintainer, a.Submitter ?? null, a.FirstSubmitted, a.LastModified, meta[0], meta[1], meta[2], meta[3]);
+          ).run(
+            a.Name,
+            a.PackageBase,
+            a.Version,
+            a.Description ?? "",
+            a.URL ?? "",
+            a.URLPath ?? "",
+            a.ID,
+            a.NumVotes,
+            a.Popularity,
+            a.OutOfDate,
+            a.Maintainer,
+            a.Submitter ?? null,
+            a.FirstSubmitted,
+            a.LastModified,
+            meta[0],
+            meta[1],
+            meta[2],
+            meta[3],
+          );
           id = Number(res.lastInsertRowid);
           result.added++;
-          if (!result.initial) events.push(this.addEvent({ type: "added", source: "aur", repo: "aur", name: a.Name, new: a.Version, ts: now }));
+          if (!result.initial)
+            events.push(
+              this.addEvent({ type: "added", source: "aur", repo: "aur", name: a.Name, new: a.Version, ts: now }),
+            );
         }
         this.insertDeps(id, "depends", a.Depends);
         this.insertDeps(id, "makedepends", a.MakeDepends);
@@ -463,7 +730,10 @@ export class Store {
           events.push(this.addEvent({ type: "removed", source: "aur", repo: "aur", name, old: old.version, ts: now }));
         }
       }
-      if (result.initial && !options.partial) events.push(this.addEvent({ type: "initial", source: "aur", repo: "aur", new: String(records.length), ts: now }));
+      if (result.initial && !options.partial)
+        events.push(
+          this.addEvent({ type: "initial", source: "aur", repo: "aur", new: String(records.length), ts: now }),
+        );
     });
     tx();
     for (const e of events) options.emit?.(e);
@@ -473,18 +743,45 @@ export class Store {
   // ---- sources --------------------------------------------------------------------------------------------------
 
   hasSrcinfo(source: string, pkgbase: string, version: string): boolean {
-    return !!this.stmt("SELECT 1 FROM srcinfo WHERE source = ? AND pkgbase = ? AND version = ?").get(source, pkgbase, version);
+    return !!this.stmt("SELECT 1 FROM srcinfo WHERE source = ? AND pkgbase = ? AND version = ?").get(
+      source,
+      pkgbase,
+      version,
+    );
   }
 
-  getSrcinfoRow(source: string, pkgbase: string, version?: string): { source: string; pkgbase: string; version: string; ref: string; srcinfo_sha256: string | null; pkgbuild_sha256: string | null; fetched_at: number } | null {
+  getSrcinfoRow(
+    source: string,
+    pkgbase: string,
+    version?: string,
+  ): {
+    source: string;
+    pkgbase: string;
+    version: string;
+    ref: string;
+    srcinfo_sha256: string | null;
+    pkgbuild_sha256: string | null;
+    fetched_at: number;
+  } | null {
     const sql = version
       ? "SELECT * FROM srcinfo WHERE source = ? AND pkgbase = ? AND version = ?"
       : "SELECT * FROM srcinfo WHERE source = ? AND pkgbase = ? ORDER BY fetched_at DESC LIMIT 1";
     return (version ? this.stmt(sql).get(source, pkgbase, version) : this.stmt(sql).get(source, pkgbase)) as never;
   }
 
-  listSrcinfoVersions(source: string, pkgbase: string): { version: string; ref: string; srcinfo_sha256: string | null; pkgbuild_sha256: string | null; fetched_at: number }[] {
-    return this.stmt("SELECT version, ref, srcinfo_sha256, pkgbuild_sha256, fetched_at FROM srcinfo WHERE source = ? AND pkgbase = ? ORDER BY fetched_at").all(source, pkgbase) as never;
+  listSrcinfoVersions(
+    source: string,
+    pkgbase: string,
+  ): {
+    version: string;
+    ref: string;
+    srcinfo_sha256: string | null;
+    pkgbuild_sha256: string | null;
+    fetched_at: number;
+  }[] {
+    return this.stmt(
+      "SELECT version, ref, srcinfo_sha256, pkgbuild_sha256, fetched_at FROM srcinfo WHERE source = ? AND pkgbase = ? ORDER BY fetched_at",
+    ).all(source, pkgbase) as never;
   }
 
   putSources(
@@ -492,7 +789,11 @@ export class Store {
     pkgbase: string,
     version: string,
     ref: string,
-    parts: { srcinfo?: string; pkgbuild?: string; entries?: { source: string; arch: string; checksums: Record<string, string> }[] },
+    parts: {
+      srcinfo?: string;
+      pkgbuild?: string;
+      entries?: { source: string; arch: string; checksums: Record<string, string> }[];
+    },
     now = Date.now(),
   ): void {
     this.db.transaction(() => {
@@ -504,8 +805,14 @@ export class Store {
            pkgbuild_sha256=COALESCE(excluded.pkgbuild_sha256, pkgbuild_sha256), fetched_at=excluded.fetched_at`,
       ).run(source, pkgbase, version, ref, si, pb, now);
       if (parts.entries) {
-        this.stmt("DELETE FROM source_entries WHERE source = ? AND pkgbase = ? AND version = ?").run(source, pkgbase, version);
-        const ins = this.stmt("INSERT INTO source_entries(source, pkgbase, version, idx, entry, arch, algo, checksum) VALUES(?,?,?,?,?,?,?,?)");
+        this.stmt("DELETE FROM source_entries WHERE source = ? AND pkgbase = ? AND version = ?").run(
+          source,
+          pkgbase,
+          version,
+        );
+        const ins = this.stmt(
+          "INSERT INTO source_entries(source, pkgbase, version, idx, entry, arch, algo, checksum) VALUES(?,?,?,?,?,?,?,?)",
+        );
         parts.entries.forEach((e, i) => {
           const algos = Object.keys(e.checksums);
           if (algos.length === 0) ins.run(source, pkgbase, version, i, e.source, e.arch, "", "");
@@ -515,8 +822,14 @@ export class Store {
     })();
   }
 
-  sourceEntries(source: string, pkgbase: string, version: string): { idx: number; entry: string; arch: string; algo: string; checksum: string }[] {
-    return this.stmt("SELECT idx, entry, arch, algo, checksum FROM source_entries WHERE source = ? AND pkgbase = ? AND version = ? ORDER BY idx, algo").all(source, pkgbase, version) as never;
+  sourceEntries(
+    source: string,
+    pkgbase: string,
+    version: string,
+  ): { idx: number; entry: string; arch: string; algo: string; checksum: string }[] {
+    return this.stmt(
+      "SELECT idx, entry, arch, algo, checksum FROM source_entries WHERE source = ? AND pkgbase = ? AND version = ? ORDER BY idx, algo",
+    ).all(source, pkgbase, version) as never;
   }
 
   // ---- news, budget ---------------------------------------------------------------------------------------------
@@ -528,7 +841,13 @@ export class Store {
         const had = this.stmt("SELECT 1 FROM news WHERE guid = ?").get(n.guid);
         if (!had) {
           fresh.push(n);
-          this.stmt("INSERT INTO news(guid, title, link, published, summary) VALUES(?,?,?,?,?)").run(n.guid, n.title, n.link, n.published, n.summary);
+          this.stmt("INSERT INTO news(guid, title, link, published, summary) VALUES(?,?,?,?,?)").run(
+            n.guid,
+            n.title,
+            n.link,
+            n.published,
+            n.summary,
+          );
         }
       }
     })();
@@ -537,11 +856,16 @@ export class Store {
 
   /** AUR RPC budget bookkeeping: 4000 requests per day per IP. */
   rpcUsed(day = new Date().toISOString().slice(0, 10)): number {
-    return (this.stmt("SELECT requests FROM rpc_budget WHERE day = ?").get(day) as { requests: number } | null)?.requests ?? 0;
+    return (
+      (this.stmt("SELECT requests FROM rpc_budget WHERE day = ?").get(day) as { requests: number } | null)?.requests ??
+      0
+    );
   }
 
   rpcCount(n = 1, day = new Date().toISOString().slice(0, 10)): void {
-    this.stmt("INSERT INTO rpc_budget(day, requests) VALUES(?,?) ON CONFLICT(day) DO UPDATE SET requests = requests + excluded.requests").run(day, n);
+    this.stmt(
+      "INSERT INTO rpc_budget(day, requests) VALUES(?,?) ON CONFLICT(day) DO UPDATE SET requests = requests + excluded.requests",
+    ).run(day, n);
   }
 }
 

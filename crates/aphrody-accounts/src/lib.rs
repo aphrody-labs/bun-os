@@ -29,8 +29,8 @@ pub use http::{Body, HttpRequest, HttpResponse, HttpTransport, UreqTransport};
 pub use manager::{Account, AccountManager, StaticToken, TokenSource};
 pub use provider::{Endpoints, Provider, ProviderConfig, Tenant};
 pub use token::{IdClaims, TokenSet};
-pub use vault::{MemoryVault, TokenVault};
 #[cfg(feature = "os-keyring")]
 pub use vault::KeyringVault;
 #[cfg(feature = "secrets")]
 pub use vault::SecretStoreVault;
+pub use vault::{MemoryVault, TokenVault};

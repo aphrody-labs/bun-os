@@ -17,7 +17,8 @@ pub enum AiKind {
 /// Executes an AI operation on an RGBA8 image. `params` is backend-specific JSON (scale, prompt,
 /// mask asset id, ...).
 pub trait AiBackend: Sync {
-    fn run(&self, kind: AiKind, image: &RgbaImage, params: &serde_json::Value) -> Result<RgbaImage>;
+    fn run(&self, kind: AiKind, image: &RgbaImage, params: &serde_json::Value)
+    -> Result<RgbaImage>;
 }
 
 /// Backend used when none is configured.
@@ -25,6 +26,8 @@ pub struct NoBackend;
 
 impl AiBackend for NoBackend {
     fn run(&self, kind: AiKind, _: &RgbaImage, _: &serde_json::Value) -> Result<RgbaImage> {
-        Err(Error::AiUnavailable(format!("{kind:?}: no backend configured")))
+        Err(Error::AiUnavailable(format!(
+            "{kind:?}: no backend configured"
+        )))
     }
 }

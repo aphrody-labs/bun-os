@@ -144,9 +144,7 @@
       "health": "http://127.0.0.1:8081/health",
       "port": 8081,
       "modelId": "omar-qwen3",
-      "capabilities": [
-        "chat"
-      ],
+      "capabilities": ["chat"],
       "sourceRepo": "aphrody",
       "public": false,
       "note": "Omar GPU gateway alias over the existing boot-managed Omar Llama CUDA service. The process remains owned by OmarServer and authenticates through its protected api-key file. Replace DBFR gateway only after an authenticated remote health and chat probe through the declared tunnel."
@@ -160,9 +158,7 @@
       "host": "dbfr",
       "health": "http://127.0.0.1:8786/health",
       "port": 8786,
-      "capabilities": [
-        "chat"
-      ],
+      "capabilities": ["chat"],
       "sourceRepo": "aphrody",
       "public": false,
       "note": "Persistent authenticated Aphrody OpenAI-compatible gateway on DBFR, bound to loopback only. Forwards to the local llama server at 127.0.0.1:8799/v1; no Nginx route or public inference endpoint."
@@ -223,9 +219,7 @@
       "unit": "aphrody-ai-http.service",
       "health": "http://127.0.0.1:8789/healthz",
       "port": 8789,
-      "capabilities": [
-        "ai-http"
-      ],
+      "capabilities": ["ai-http"],
       "sourceRepo": "aphrody-ai",
       "workingDirectory": "/home/ubuntu/apps/aphrody/current",
       "publicProxy": "nginx",
@@ -258,9 +252,7 @@
       "unit": "aphrody-a2a.service",
       "health": "http://127.0.0.1:8788/ping",
       "port": 8788,
-      "capabilities": [
-        "a2a"
-      ],
+      "capabilities": ["a2a"],
       "sourceRepo": "aphrody",
       "workingDirectory": "/home/ubuntu/apps/aphrody/shared/agent-workspaces/aphrody",
       "a2a": {
@@ -360,12 +352,8 @@
       "container": "aphrody-gitea",
       "public": true,
       "publicProxy": "nginx",
-      "additionalUpstreams": [
-        "127.0.0.1:29022"
-      ],
-      "capabilities": [
-        "git-forge"
-      ],
+      "additionalUpstreams": ["127.0.0.1:29022"],
+      "capabilities": ["git-forge"],
       "note": "Gitea28.1.0; private installation, signup disabled, protected admin credential. GitHub histories/origins remain unchanged."
     },
     {
@@ -379,9 +367,7 @@
       "container": "aphrody-komodo-core",
       "public": true,
       "publicProxy": "nginx",
-      "capabilities": [
-        "deploy-control"
-      ],
+      "capabilities": ["deploy-control"],
       "note": "Komodo2.3.3; authenticated Core, private Mongo and PKI Periphery. Canonical Infra catalogs remain the desired-state owner."
     },
     {
@@ -392,9 +378,7 @@
       "host": "vps",
       "container": "aphrody-gitea-runner",
       "public": false,
-      "capabilities": [
-        "ci-runner"
-      ],
+      "capabilities": ["ci-runner"],
       "note": "GiteaRunner5.0.0; one trusted Bun/Rust job, builtin checkout, no Node actions. Native Linux Bun fork revision differs from Windows."
     },
     {
@@ -429,15 +413,8 @@
       "aphrody-ai": "/home/ubuntu/apps/aphrody/current"
     },
     "secrets": "operator-managed-environment-files",
-    "retiredUnits": [
-      "filebrowser.service"
-    ],
-    "sharedRuntimes": [
-      "bun",
-      "postgresql",
-      "redis",
-      "nginx"
-    ],
+    "retiredUnits": ["filebrowser.service"],
+    "sharedRuntimes": ["bun", "postgresql", "redis", "nginx"],
     "databasePolicy": "postgresql-primary-with-sqlite-local-cache",
     "authPolicy": "one-better-auth-contract-per-public-origin"
   },
@@ -468,28 +445,21 @@
         "host": "local",
         "kind": "scheduledTask",
         "name": "Aphrody WG aphro-pc",
-        "triggers": [
-          "atStartup"
-        ],
+        "triggers": ["atStartup"],
         "principal": "system"
       },
       {
         "host": "local",
         "kind": "scheduledTask",
         "name": "Aphrody MCP HTTP",
-        "triggers": [
-          "atStartup",
-          "atLogon"
-        ],
+        "triggers": ["atStartup", "atLogon"],
         "principal": "user"
       },
       {
         "host": "local",
         "kind": "scheduledTask",
         "name": "Aphrody Remote Desktop",
-        "triggers": [
-          "atLogon"
-        ],
+        "triggers": ["atLogon"],
         "principal": "user",
         "desktop": true
       },
@@ -498,9 +468,7 @@
         "kind": "scheduledTask",
         "name": "hub-tunnel",
         "path": "\\Aphrody\\Native\\",
-        "triggers": [
-          "atLogon"
-        ],
+        "triggers": ["atLogon"],
         "principal": "user"
       },
       {
@@ -508,9 +476,7 @@
         "kind": "scheduledTask",
         "name": "site",
         "path": "\\Aphrody\\Native\\",
-        "triggers": [
-          "atStartup"
-        ],
+        "triggers": ["atStartup"],
         "principal": "system",
         "execute": "%USERPROFILE%\\.bun\\bin\\bun.exe",
         "arguments": "--no-env-file scripts/aphrody/tools/infra/native-startup.ts run site --config %USERPROFILE%\\.aphrody\\host\\aphrody-startup.json",
@@ -555,9 +521,7 @@
         "host": "local",
         "kind": "scheduledTask",
         "name": "Container",
-        "triggers": [
-          "atLogon"
-        ],
+        "triggers": ["atLogon"],
         "principal": "user",
         "desktop": true,
         "periodic": true,
@@ -580,10 +544,7 @@
         "kind": "scheduledTask",
         "name": "Aphrody self update",
         "path": "\\",
-        "triggers": [
-          "every:30m",
-          "atLogon"
-        ],
+        "triggers": ["every:30m", "atLogon"],
         "principal": "user",
         "runLevel": "limited",
         "periodic": true,
@@ -597,9 +558,7 @@
         "kind": "scheduledTask",
         "name": "AphrodyBunHygiene",
         "path": "\\",
-        "triggers": [
-          "daily@05:30"
-        ],
+        "triggers": ["daily@05:30"],
         "principal": "user",
         "runLevel": "limited",
         "periodic": true,
@@ -614,9 +573,7 @@
         "kind": "scheduledTask",
         "name": "Omar Nginx",
         "principal": "system",
-        "triggers": [
-          "atStartup"
-        ],
+        "triggers": ["atStartup"],
         "execute": "C:/Users/omara/AppData/Local/Microsoft/WinGet/Packages/nginxinc.nginx_Microsoft.Winget.Source_8wekyb3d8bbwe/nginx-1.31.6/nginx.exe",
         "arguments": "-p C:/SSH/omar-server/nginx/ -c nginx.conf -g \"daemon off;\"",
         "workingDirectory": "C:/SSH/omar-server/nginx",
@@ -634,9 +591,7 @@
         "kind": "scheduledTask",
         "name": "Omar Llama CUDA",
         "principal": "system",
-        "triggers": [
-          "atStartup"
-        ],
+        "triggers": ["atStartup"],
         "execute": "C:/Users/omara/.aphrody/runtimes/llama-b11552-cuda/llama-server.exe",
         "arguments": "--model C:/Users/omara/.aphrody/models/omar-server/Qwen3-0.6B-Q8_0.gguf --host 127.0.0.1 --port 8081 --n-gpu-layers 99 --ctx-size 2048 --parallel 1 --alias omar-qwen3 --api-key-file C:/Users/omara/.aphrody/private/omar-server/llama-api-key.txt",
         "workingDirectory": "C:/Users/omara/.aphrody/runtimes/llama-b11552-cuda",
@@ -659,10 +614,7 @@
         "kind": "scheduledTask",
         "name": "Aphrody omar reverse",
         "path": "\\Aphrody\\",
-        "triggers": [
-          "atStartup",
-          "atLogon"
-        ],
+        "triggers": ["atStartup", "atLogon"],
         "principal": "user",
         "execute": "C:\\Windows\\System32\\bun.exe",
         "arguments": "--no-env-file C:\\aphrody\\scripts\\tools\\infra\\ssh-reverse-task.ts C:\\Users\\omara\\.aphrody\\private\\state\\reverse-tunnel.json",
@@ -695,10 +647,7 @@
         "kind": "scheduledTask",
         "name": "Aphrody Omar Browser",
         "path": "\\Aphrody\\",
-        "triggers": [
-          "atStartup",
-          "atLogon"
-        ],
+        "triggers": ["atStartup", "atLogon"],
         "execute": "C:/Program Files/OpenSSH/ssh.exe",
         "arguments": "-N -T -o BatchMode=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 127.0.0.1:9223:127.0.0.1:9233 omar-pc",
         "workingDirectory": "C:/Users/aphro",

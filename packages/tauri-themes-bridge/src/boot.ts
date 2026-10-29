@@ -5,7 +5,10 @@ const ids: readonly ThemeId[] = ["material3", "fluent", "apple"];
 const isThemeId = (value: unknown): value is ThemeId => ids.includes(value as ThemeId);
 
 /** `?theme=` > localStorage `aphrody-theme` > the platform's own design language. */
-export function pickTheme(search = globalThis.location?.search ?? "", stored = globalThis.localStorage?.getItem("aphrody-theme")): ThemeId {
+export function pickTheme(
+  search = globalThis.location?.search ?? "",
+  stored = globalThis.localStorage?.getItem("aphrody-theme"),
+): ThemeId {
   const fromUrl = new URLSearchParams(search).get("theme");
   if (isThemeId(fromUrl)) return fromUrl;
   if (isThemeId(stored)) return stored;

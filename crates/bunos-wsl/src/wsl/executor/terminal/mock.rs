@@ -2,9 +2,9 @@
 //!
 //! Simulates terminal/IDE/explorer/download/container operations with configurable delays.
 
+use log::debug;
 use std::collections::HashMap;
 use std::time::Duration;
-use log::debug;
 
 use super::{ContainerRuntime, InstalledTerminal, TerminalExecutor};
 use crate::wsl::types::WslError;
@@ -33,29 +33,52 @@ impl TerminalExecutor for MockTerminalExecutor {
         debug!("Mock: detect_store_terminals");
         // Return mock data simulating both terminals installed
         let mut terminals = HashMap::new();
-        terminals.insert("wt".to_string(), InstalledTerminal {
-            id: "wt".to_string(),
-            name: "Windows Terminal".to_string(),
-            package_family_name: "Microsoft.WindowsTerminal_8wekyb3d8bbwe".to_string(),
-            installed: true,
-        });
-        terminals.insert("wt-preview".to_string(), InstalledTerminal {
-            id: "wt-preview".to_string(),
-            name: "Windows Terminal Preview".to_string(),
-            package_family_name: "Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe".to_string(),
-            installed: true,
-        });
+        terminals.insert(
+            "wt".to_string(),
+            InstalledTerminal {
+                id: "wt".to_string(),
+                name: "Windows Terminal".to_string(),
+                package_family_name: "Microsoft.WindowsTerminal_8wekyb3d8bbwe".to_string(),
+                installed: true,
+            },
+        );
+        terminals.insert(
+            "wt-preview".to_string(),
+            InstalledTerminal {
+                id: "wt-preview".to_string(),
+                name: "Windows Terminal Preview".to_string(),
+                package_family_name: "Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe".to_string(),
+                installed: true,
+            },
+        );
         terminals
     }
 
-    fn open_terminal(&self, distro: &str, id: Option<&str>, terminal_command: &str) -> Result<(), WslError> {
-        debug!("Mock: open_terminal distro='{}' id={:?} command='{}'", distro, id, terminal_command);
+    fn open_terminal(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        terminal_command: &str,
+    ) -> Result<(), WslError> {
+        debug!(
+            "Mock: open_terminal distro='{}' id={:?} command='{}'",
+            distro, id, terminal_command
+        );
         self.simulate_delay(100);
         Ok(())
     }
 
-    fn open_terminal_with_command(&self, distro: &str, id: Option<&str>, command: &str, terminal_command: &str) -> Result<(), WslError> {
-        debug!("Mock: open_terminal_with_command distro='{}' id={:?} command='{}' terminal='{}'", distro, id, command, terminal_command);
+    fn open_terminal_with_command(
+        &self,
+        distro: &str,
+        id: Option<&str>,
+        command: &str,
+        terminal_command: &str,
+    ) -> Result<(), WslError> {
+        debug!(
+            "Mock: open_terminal_with_command distro='{}' id={:?} command='{}' terminal='{}'",
+            distro, id, command, terminal_command
+        );
         self.simulate_delay(100);
         Ok(())
     }
@@ -85,26 +108,43 @@ impl TerminalExecutor for MockTerminalExecutor {
     }
 
     fn container_pull(&self, runtime: &str, image: &str) -> Result<(), WslError> {
-        debug!("Mock: container_pull runtime='{}' image='{}'", runtime, image);
+        debug!(
+            "Mock: container_pull runtime='{}' image='{}'",
+            runtime, image
+        );
         self.simulate_delay(500);
         Ok(())
     }
 
     fn container_create(&self, runtime: &str, image: &str) -> Result<String, WslError> {
-        debug!("Mock: container_create runtime='{}' image='{}'", runtime, image);
+        debug!(
+            "Mock: container_create runtime='{}' image='{}'",
+            runtime, image
+        );
         self.simulate_delay(200);
         // Return a mock container ID
         Ok("mock-container-12345".to_string())
     }
 
-    fn container_export(&self, runtime: &str, container_id: &str, dest: &str) -> Result<(), WslError> {
-        debug!("Mock: container_export runtime='{}' container='{}' dest='{}'", runtime, container_id, dest);
+    fn container_export(
+        &self,
+        runtime: &str,
+        container_id: &str,
+        dest: &str,
+    ) -> Result<(), WslError> {
+        debug!(
+            "Mock: container_export runtime='{}' container='{}' dest='{}'",
+            runtime, container_id, dest
+        );
         self.simulate_delay(500);
         Ok(())
     }
 
     fn container_rm(&self, runtime: &str, container_id: &str) -> Result<(), WslError> {
-        debug!("Mock: container_rm runtime='{}' container='{}'", runtime, container_id);
+        debug!(
+            "Mock: container_rm runtime='{}' container='{}'",
+            runtime, container_id
+        );
         self.simulate_delay(100);
         Ok(())
     }

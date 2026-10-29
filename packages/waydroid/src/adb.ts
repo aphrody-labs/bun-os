@@ -23,7 +23,10 @@ export class Adb {
   async run(args: string[], opts: { stdin?: Uint8Array | string; timeoutMs?: number } = {}): Promise<AdbResult> {
     const cmd = [this.bin, ...(this.serial ? ["-s", this.serial] : []), ...args];
     const proc = Bun.spawn(cmd, {
-      stdin: opts.stdin === undefined ? "ignore" : new Response(typeof opts.stdin === "string" ? opts.stdin : opts.stdin.slice()),
+      stdin:
+        opts.stdin === undefined
+          ? "ignore"
+          : new Response(typeof opts.stdin === "string" ? opts.stdin : opts.stdin.slice()),
       stdout: "pipe",
       stderr: "pipe",
       timeout: opts.timeoutMs ?? 120_000,
@@ -76,7 +79,9 @@ export class Adb {
 
   async installBytes(bytes: Uint8Array, name = "upload.apk"): Promise<string> {
     const tmp = `/data/local/tmp/${name.replace(/[^\w.-]/g, "_")}`;
-    const dir = await import("node:fs/promises").then(fs => fs.mkdtemp(`${(process.env.TMPDIR ?? process.env.TEMP ?? "/tmp").replace(/\\/g, "/")}/wd-apk-`));
+    const dir = await import("node:fs/promises").then(fs =>
+      fs.mkdtemp(`${(process.env.TMPDIR ?? process.env.TEMP ?? "/tmp").replace(/\\/g, "/")}/wd-apk-`),
+    );
     const local = `${dir}/${name.replace(/[^\w.-]/g, "_")}`;
     await Bun.write(local, bytes);
     try {

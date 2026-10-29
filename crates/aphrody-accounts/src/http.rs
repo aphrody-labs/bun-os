@@ -41,7 +41,12 @@ impl HttpRequest {
     }
     /// Request with no body.
     pub fn new(method: &str, url: impl Into<String>) -> Self {
-        Self { method: method.into(), url: url.into(), headers: Vec::new(), body: Body::Empty }
+        Self {
+            method: method.into(),
+            url: url.into(),
+            headers: Vec::new(),
+            body: Body::Empty,
+        }
     }
     /// `POST` form.
     pub fn post_form(url: impl Into<String>, fields: Vec<(String, String)>) -> Self {
@@ -61,7 +66,10 @@ impl HttpRequest {
     /// Raw body.
     pub fn bytes(method: &str, url: impl Into<String>, content_type: &str, data: Vec<u8>) -> Self {
         let mut r = Self::new(method, url);
-        r.body = Body::Bytes { content_type: content_type.into(), data };
+        r.body = Body::Bytes {
+            content_type: content_type.into(),
+            data,
+        };
         r
     }
     /// Add a header.
@@ -77,7 +85,10 @@ impl HttpRequest {
     }
     /// Value of a header, case-insensitive.
     pub fn header_value(&self, name: &str) -> Option<&str> {
-        self.headers.iter().find(|(k, _)| k.eq_ignore_ascii_case(name)).map(|(_, v)| v.as_str())
+        self.headers
+            .iter()
+            .find(|(k, _)| k.eq_ignore_ascii_case(name))
+            .map(|(_, v)| v.as_str())
     }
     /// Body as UTF-8 text (form bodies are re-encoded), for assertions and logs.
     pub fn body_text(&self) -> String {
@@ -115,7 +126,10 @@ impl HttpResponse {
     }
     /// Header value, case-insensitive.
     pub fn header(&self, name: &str) -> Option<&str> {
-        self.headers.iter().find(|(k, _)| k.eq_ignore_ascii_case(name)).map(|(_, v)| v.as_str())
+        self.headers
+            .iter()
+            .find(|(k, _)| k.eq_ignore_ascii_case(name))
+            .map(|(_, v)| v.as_str())
     }
     /// Body as lossy UTF-8.
     pub fn text(&self) -> String {
@@ -130,13 +144,21 @@ impl HttpResponse {
         if self.is_success() {
             return Ok(self);
         }
-        Err(Error::Api { status: self.status, message: api_message(&self.body) })
+        Err(Error::Api {
+            status: self.status,
+            message: api_message(&self.body),
+        })
     }
 }
 
 /// Extract `error.message` (Google, Graph) or `error` (OAuth) from an error body, truncated.
 pub fn api_message(body: &[u8]) -> String {
-    let fallback = || String::from_utf8_lossy(body).chars().take(300).collect::<String>();
+    let fallback = || {
+        String::from_utf8_lossy(body)
+            .chars()
+            .take(300)
+            .collect::<String>()
+    };
     let Ok(v) = serde_json::from_slice::<serde_json::Value>(body) else {
         return fallback();
     };
@@ -181,7 +203,9 @@ impl UreqTransport {
             .timeout_global(Some(timeout))
             .user_agent("aphrody-accounts/1.4")
             .build();
-        Self { agent: config.into() }
+        Self {
+            agent: config.into(),
+        }
     }
 }
 
@@ -193,31 +217,49 @@ impl Default for UreqTransport {
 
 impl HttpTransport for UreqTransport {
     fn execute(&self, req: &HttpRequest) -> Result<HttpResponse> {
-        let mut builder = ureq::http::Request::builder().method(req.method.as_str()).uri(req.url.as_str());
+        let mut builder = ureq::http::Request::builder()
+            .method(req.method.as_str())
+            .uri(req.url.as_str());
         for (k, v) in &req.headers {
             builder = builder.header(k.as_str(), v.as_str());
         }
         let (content_type, data): (Option<String>, Vec<u8>) = match &req.body {
             Body::Empty => (None, Vec::new()),
-            Body::Form(f) => (Some("application/x-www-form-urlencoded".into()), encode_form(f).into_bytes()),
+            Body::Form(f) => (
+                Some("application/x-www-form-urlencoded".into()),
+                encode_form(f).into_bytes(),
+            ),
             Body::Bytes { content_type, data } => (Some(content_type.clone()), data.clone()),
         };
         if let Some(ct) = content_type {
             builder = builder.header("Content-Type", ct);
         }
         let transport = |e: ureq::Error| Error::Transport(e.to_string());
-        let mut resp = if data.is_empty() && req.method != "POST" && req.method != "PUT" && req.method != "PATCH" {
-            let r = builder.body(()).map_err(|e| Error::Transport(e.to_string()))?;
+        let mut resp = if data.is_empty()
+            && req.method != "POST"
+            && req.method != "PUT"
+            && req.method != "PATCH"
+        {
+            let r = builder
+                .body(())
+                .map_err(|e| Error::Transport(e.to_string()))?;
             self.agent.run(r).map_err(transport)?
         } else {
-            let r = builder.body(data).map_err(|e| Error::Transport(e.to_string()))?;
+            let r = builder
+                .body(data)
+                .map_err(|e| Error::Transport(e.to_string()))?;
             self.agent.run(r).map_err(transport)?
         };
         let status = resp.status().as_u16();
         let headers = resp
             .headers()
             .iter()
-            .map(|(k, v)| (k.as_str().to_owned(), v.to_str().unwrap_or_default().to_owned()))
+            .map(|(k, v)| {
+                (
+                    k.as_str().to_owned(),
+                    v.to_str().unwrap_or_default().to_owned(),
+                )
+            })
             .collect();
         let body = resp
             .body_mut()
@@ -225,6 +267,10 @@ impl HttpTransport for UreqTransport {
             .limit(2 * 1024 * 1024 * 1024)
             .read_to_vec()
             .map_err(transport)?;
-        Ok(HttpResponse { status, headers, body })
+        Ok(HttpResponse {
+            status,
+            headers,
+            body,
+        })
     }
 }
