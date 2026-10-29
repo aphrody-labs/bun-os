@@ -35,7 +35,9 @@ test.skipIf(!ready)(
     expect(ls.exitCode).toBe(0);
     screen = term.screen();
     // Real Alpine root: these directories exist in every image; the lines are not staircased.
-    for (const dir of ["bin", "etc", "usr"]) expect(screen).toMatch(new RegExp(`^${dir}\\s*$`, "m"));
+    // busybox lays the names out in columns (the guest console is a tty), so match words, not lines.
+    for (const dir of ["bin", "etc", "usr", "home"]) expect(screen).toMatch(new RegExp(`(^|\\s)${dir}(\\s|$)`, "m"));
+    expect(screen).not.toMatch(/\n\s{20,}\S/); // no staircase: every row starts at column 0
     console.log(
       screen
         .split("\n")
