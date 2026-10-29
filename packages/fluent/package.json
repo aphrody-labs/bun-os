@@ -10,5 +10,7 @@
     "web": "bun src/build-web.ts",
     "test": "bun test"
   },
-  "engines": { "bun": ">=1.4.4" }
+  "engines": {
+    "bun": ">=1.4.4"
+  }
 }

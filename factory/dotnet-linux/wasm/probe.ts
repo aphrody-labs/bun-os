@@ -14,7 +14,14 @@ const probes = args.slice(dash + 1);
 
 const sizes = Bun.file(wasm).size;
 const base = await boot({ wasm, args: ["sh", "-c", "true"], timeoutMs });
-console.log(JSON.stringify({ name: "wasm guest baseline (boot + true)", bytes: sizes, wallMs: { median: base.ms }, note: `exit ${base.exitCode}` }));
+console.log(
+  JSON.stringify({
+    name: "wasm guest baseline (boot + true)",
+    bytes: sizes,
+    wallMs: { median: base.ms },
+    note: `exit ${base.exitCode}`,
+  }),
+);
 for (const p of probes) {
   const eq = p.indexOf("=");
   const name = p.slice(0, eq);

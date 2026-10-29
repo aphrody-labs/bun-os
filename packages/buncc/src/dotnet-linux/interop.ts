@@ -36,15 +36,16 @@ export async function pwshFile(file: string, args: string[] = [], options: PwshO
   });
 }
 
+import { dlopen, FFIType } from "bun:ffi";
+
 /** Symbols exported by factory/dotnet-linux/sample/native (NativeAOT shared library). */
 export const SAMPLE_SYMBOLS = {
-  bunos_add: { args: ["i32", "i32"], returns: "i32" },
-  bunos_utf16_length: { args: ["cstring"], returns: "i32" },
-  bunos_runtime_description: { args: ["ptr", "i32"], returns: "i32" },
+  bunos_add: { args: [FFIType.i32, FFIType.i32], returns: FFIType.i32 },
+  bunos_utf16_length: { args: [FFIType.cstring], returns: FFIType.i32 },
+  bunos_runtime_description: { args: [FFIType.ptr, FFIType.i32], returns: FFIType.i32 },
 } as const;
 
 /** Load the sample NativeAOT library with bun:ffi. */
-export async function loadSampleNative(path: string) {
-  const { dlopen } = await import("bun:ffi");
-  return dlopen(path, SAMPLE_SYMBOLS as never);
+export function loadSampleNative(path: string) {
+  return dlopen(path, SAMPLE_SYMBOLS);
 }

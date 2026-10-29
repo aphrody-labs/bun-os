@@ -20,7 +20,10 @@ function dotnet(name: string, channel: "10.0" | "11.0", stable: boolean) {
   const root = stable ? "/usr/share/dotnet" : "/usr/share/dotnet-preview";
   const bin = stable ? "dotnet" : "dotnet-preview";
   const src = Object.entries(ARCHES)
-    .map(([a, rid]) => `source_${a}=("dotnet-sdk-\${_sdk}-linux-${rid}.tar.gz::${p.assets[`linux-${rid}`].url.replaceAll(p.sdk, "${_sdk}")}")`)
+    .map(
+      ([a, rid]) =>
+        `source_${a}=("dotnet-sdk-\${_sdk}-linux-${rid}.tar.gz::${p.assets[`linux-${rid}`].url.replaceAll(p.sdk, "${_sdk}")}")`,
+    )
     .join("\n");
   const sums = Object.entries(ARCHES)
     .map(([a, rid]) => `sha512sums_${a}=('${p.assets[`linux-${rid}`].sha512}')`)
@@ -69,7 +72,9 @@ package() {
   install -Dm644 "$pkgdir${root}/ThirdPartyNotices.txt" "$pkgdir/usr/share/licenses/$pkgname/ThirdPartyNotices.txt"
   rm "$pkgdir${root}/LICENSE.txt" "$pkgdir${root}/ThirdPartyNotices.txt"${profile}
 }
-`.replace("${CARCH/x86_64/x64}", "${CARCH/x86_64/x64}").replace(/\$\{CARCH\/x86_64\/x64\}/g, "${_rid}"),
+`
+      .replace("${CARCH/x86_64/x64}", "${CARCH/x86_64/x64}")
+      .replace(/\$\{CARCH\/x86_64\/x64\}/g, "${_rid}"),
   );
 }
 
@@ -130,7 +135,10 @@ pre_remove() {
 }
 
 // the profile has one source of truth (pwsh/); the package directory gets a copy so makepkg can use it as a source
-files.set("pkg/bunos-powershell-default/Microsoft.PowerShell_profile.ps1", readFileSync(join(dir, "pwsh", "Microsoft.PowerShell_profile.ps1"), "utf8"));
+files.set(
+  "pkg/bunos-powershell-default/Microsoft.PowerShell_profile.ps1",
+  readFileSync(join(dir, "pwsh", "Microsoft.PowerShell_profile.ps1"), "utf8"),
+);
 
 dotnet("bunos-dotnet-sdk-bin", "10.0", true);
 dotnet("bunos-dotnet-sdk-preview-bin", "11.0", false);

@@ -10,7 +10,12 @@ import { parseArgs } from "node:util";
 const pins = await Bun.file(join(import.meta.dir, "pins.json")).json();
 // --image / --artifact build another image (a local Docker image works) with the same pinned c2w: factory/dotnet-linux/wasm.
 const { values } = parseArgs({
-  options: { out: { type: "string" }, loglevel: { type: "string" }, image: { type: "string" }, artifact: { type: "string" } },
+  options: {
+    out: { type: "string" },
+    loglevel: { type: "string" },
+    image: { type: "string" },
+    artifact: { type: "string" },
+  },
 });
 const image: string = values.image ?? pins.image;
 const artifact: string = values.artifact ?? pins.artifact;

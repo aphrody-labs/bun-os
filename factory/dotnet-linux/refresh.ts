@@ -84,7 +84,8 @@ export async function powershellRelease(kind: "stable" | "preview") {
   const hashAsset = best.assets.find((a: any) => a.name === "hashes.sha256");
   // upstream publishes hashes.sha256 as UTF-16LE with a BOM
   const raw = new Uint8Array(await (await fetch(hashAsset.browser_download_url)).arrayBuffer());
-  const text = raw[0] === 0xff && raw[1] === 0xfe ? new TextDecoder("utf-16le").decode(raw) : new TextDecoder().decode(raw);
+  const text =
+    raw[0] === 0xff && raw[1] === 0xfe ? new TextDecoder("utf-16le").decode(raw) : new TextDecoder().decode(raw);
   for (const line of text.split(/\r?\n/)) {
     const m = /^([0-9A-Fa-f]{64})\s+\*?(.+)$/.exec(line.trim());
     if (m) hashes.set(m[2]!, m[1]!.toLowerCase());
@@ -175,9 +176,23 @@ if (import.meta.main) {
           problems.push(`${label} ${rid}: ${hash} differs from upstream for the same version`);
     };
     for (const ch of ["10.0", "11.0"] as const)
-      compare(`dotnet ${ch}`, pinned.dotnet[ch], fresh.dotnet[ch], "sha512", pinned.dotnet[ch].sdk, fresh.dotnet[ch].sdk);
+      compare(
+        `dotnet ${ch}`,
+        pinned.dotnet[ch],
+        fresh.dotnet[ch],
+        "sha512",
+        pinned.dotnet[ch].sdk,
+        fresh.dotnet[ch].sdk,
+      );
     for (const k of ["stable", "preview"] as const)
-      compare(`pwsh ${k}`, pinned.powershell[k], fresh.powershell[k], "sha256", pinned.powershell[k].version, fresh.powershell[k].version);
+      compare(
+        `pwsh ${k}`,
+        pinned.powershell[k],
+        fresh.powershell[k],
+        "sha256",
+        pinned.powershell[k].version,
+        fresh.powershell[k].version,
+      );
     for (const l of newer) console.log(`newer upstream: ${l}`);
     for (const l of problems) console.error(`MISMATCH ${l}`);
     console.log(`pins.json checked: ${problems.length} mismatch(es), ${newer.length} newer upstream release(s)`);

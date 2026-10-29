@@ -9,7 +9,11 @@ export async function installFluent(dir = join(tmpdir(), "bunos-fluent-deps")): 
   mkdirSync(dir, { recursive: true });
   if (!existsSync(join(dir, "node_modules", "@fluentui", "web-components"))) {
     await Bun.write(join(dir, "package.json"), "{}");
-    const p = Bun.spawn([process.execPath, "add", ...Object.entries(PINS).map(([n, v]) => `${n}@${v}`)], { cwd: dir, stdout: "inherit", stderr: "inherit" });
+    const p = Bun.spawn([process.execPath, "add", ...Object.entries(PINS).map(([n, v]) => `${n}@${v}`)], {
+      cwd: dir,
+      stdout: "inherit",
+      stderr: "inherit",
+    });
     if ((await p.exited) !== 0) throw new Error("bun add failed");
   }
   return dir;

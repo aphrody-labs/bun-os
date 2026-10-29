@@ -7,7 +7,7 @@ import { loadSampleNative } from "../../packages/buncc/src/dotnet-linux/interop.
 const lib = Bun.env.BUNOS_NATIVE_LIB;
 
 test.skipIf(!lib)("NativeAOT shared library answers through bun:ffi", async () => {
-  const { symbols, close } = await loadSampleNative(lib!);
+  const { symbols, close } = loadSampleNative(lib!);
   try {
     expect(symbols.bunos_add(40, 2)).toBe(42);
     expect(symbols.bunos_add(-5, 3)).toBe(-2);

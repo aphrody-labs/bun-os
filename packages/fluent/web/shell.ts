@@ -10,4 +10,6 @@ const dark = matchMedia("(prefers-color-scheme: dark)");
 const apply = () => setTheme(dark.matches ? webDarkTheme : webLightTheme);
 apply();
 dark.addEventListener("change", apply);
-document.querySelector("#open")?.addEventListener("click", () => (document.querySelector("#dlg") as { show(): void }).show());
+document
+  .querySelector("#open")
+  ?.addEventListener("click", () => (document.querySelector("#dlg") as { show(): void }).show());

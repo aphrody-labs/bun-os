@@ -382,7 +382,15 @@
       "module": "factory:dotnet-linux",
       "entry": ["bun factory/dotnet-linux/refresh.ts --check", "bun packages/buncc/src/cli.ts dotnet pins"],
       "docs": ["docs/DOTNET-LINUX.md"],
-      "ci": ["dotnet-linux.yml#pins", "dotnet-linux.yml#ubuntu", "dotnet-linux.yml#alpine", "dotnet-linux.yml#cross-arm64", "dotnet-linux.yml#arch", "dotnet-linux.yml#wsl-layer", "dotnet-linux.yml#wasm-guest"],
+      "ci": [
+        "dotnet-linux.yml#pins",
+        "dotnet-linux.yml#ubuntu",
+        "dotnet-linux.yml#alpine",
+        "dotnet-linux.yml#cross-arm64",
+        "dotnet-linux.yml#arch",
+        "dotnet-linux.yml#wsl-layer",
+        "dotnet-linux.yml#wasm-guest"
+      ],
       "pins": ["factory/dotnet-linux/pins.json"],
       "status": "unverified",
       "note": "provider code: packages/buncc/src/dotnet-linux (buncc dotnet, buncc pwsh); the existing Windows-centric dotnet provider stays in packages/buncc/src/providers/dotnet.ts",

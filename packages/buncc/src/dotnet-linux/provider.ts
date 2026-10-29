@@ -46,7 +46,7 @@ export const pwshProvider: Provider = {
       commands: [[process.execPath, join(import.meta.dir, "..", "cli.ts"), "dotnet", "install", "pwsh", "--run"]],
     };
   },
-  async env(ctx) {
+  async env(ctx): Promise<Record<string, string>> {
     const bin = join(defaultPrefix(ctx.env), "bin");
     return existsSync(bin)
       ? { POWERSHELL_TELEMETRY_OPTOUT: "1", POWERSHELL_UPDATECHECK: "Off", PATH: prependPath(pathVar(ctx), [bin]) }

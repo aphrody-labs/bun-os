@@ -23,7 +23,10 @@ test.skipIf(process.platform !== "win32" || !existsSync(exe))(
   async () => {
     const png = join(root, "test", "capture.png");
     const json = join(root, "test", "uia.json");
-    const p = Bun.spawn(["pwsh", "-NoProfile", "-File", join(root, "capture.ps1"), "-Exe", exe, "-Png", png, "-Json", json], { stdout: "pipe", stderr: "pipe" });
+    const p = Bun.spawn(
+      ["pwsh", "-NoProfile", "-File", join(root, "capture.ps1"), "-Exe", exe, "-Png", png, "-Json", json],
+      { stdout: "pipe", stderr: "pipe" },
+    );
     expect(await p.exited).toBe(0);
     const r = JSON.parse(readFileSync(json, "utf8"));
     expect(r.printWindow).toBe(true);
