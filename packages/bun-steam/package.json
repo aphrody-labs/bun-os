@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@aphrody/paths": "workspace:*",
-    "@aphrody/winreg": "workspace:*"
+    "@aphrody/windows": "workspace:*"
   },
   "engines": {
     "bun": "=1.4.4"

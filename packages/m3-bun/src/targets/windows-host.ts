@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-// The few Windows facts the windows target reads, on upstream Bun: @aphrody/winreg, bun:ffi (shell32) and sc.exe.
-import * as registry from "@aphrody/winreg";
+// The few Windows facts the windows target reads, on upstream Bun: @aphrody/windows/registry, bun:ffi (shell32) and sc.exe.
+import * as registry from "@aphrody/windows/registry";
 import { dlopen, FFIType } from "bun:ffi";
 import { release } from "node:os";
 

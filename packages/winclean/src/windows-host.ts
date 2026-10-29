@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 // The Windows host behind the WinClean compatibility tools, on upstream Bun: reg.exe, PowerShell and sc.exe through
 // Bun.spawnSync, and bun:ffi (kernel32) for drives and memory. Synchronous on purpose, like the BunWindowsApi it fills.
-import { dlopen, FFIType, ptr } from "bun:ffi";
-import { homedir, hostname, userInfo } from "node:os";
-import { join } from "node:path";
+import { hostname, userInfo } from "node:os";
 import type { BunWindowsApi } from "./bun-windows";
-import * as nativeRegistry from "@aphrody/winreg";
+import * as nativeRegistry from "@aphrody/windows/registry";
+import * as win32 from "@aphrody/windows/win32";
+import * as shell from "@aphrody/windows/shell";
 
 function run(command: string, args: string[], input?: string): string {
   const result = Bun.spawnSync([command, ...args], {
@@ -72,53 +72,26 @@ function services(): Array<{ name: string; displayName: string; state: string; s
   }));
 }
 
-function kernel32() {
-  return dlopen("kernel32.dll", {
-    GetLogicalDrives: { args: [], returns: FFIType.u32 },
-    GetDriveTypeW: { args: [FFIType.ptr], returns: FFIType.u32 },
-    GetDiskFreeSpaceExW: { args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.ptr], returns: FFIType.bool },
-    GlobalMemoryStatusEx: { args: [FFIType.ptr], returns: FFIType.bool },
-  }).symbols;
-}
-
-const DRIVE_TYPES: Record<number, string> = { 2: "removable", 3: "fixed", 4: "remote", 5: "cdrom", 6: "ramdisk" };
-
 function drives() {
-  const k = kernel32();
-  const mask = k.GetLogicalDrives();
-  const found = [];
-  for (let i = 0; i < 26; i++) {
-    if (!(mask & (1 << i))) continue;
-    const root = `${String.fromCharCode(65 + i)}:\\`;
-    const name = Buffer.from(`${root}\0`, "utf16le");
-    const available = new BigUint64Array(1);
-    const total = new BigUint64Array(1);
-    const free = new BigUint64Array(1);
-    const ok = k.GetDiskFreeSpaceExW(ptr(name), ptr(available), ptr(total), ptr(free));
-    found.push({
-      root,
-      type: DRIVE_TYPES[k.GetDriveTypeW(ptr(name))] ?? "unknown",
-      totalBytes: ok ? Number(total[0]) : 0,
-      freeBytes: ok ? Number(free[0]) : 0,
-      availableBytes: ok ? Number(available[0]) : 0,
-    });
-  }
-  return found;
+  return win32.volumes().map(v => ({
+    root: v.root,
+    type: v.type,
+    totalBytes: Number(v.totalBytes),
+    freeBytes: Number(v.freeBytes),
+    availableBytes: Number(v.availableBytes),
+  }));
 }
 
 function memoryStatus(): Record<string, number> {
-  const buffer = new Uint8Array(64);
-  const view = new DataView(buffer.buffer);
-  view.setUint32(0, 64, true);
-  if (!kernel32().GlobalMemoryStatusEx(ptr(buffer))) throw new Error("GlobalMemoryStatusEx failed");
+  const m = win32.memory();
   return {
-    memoryLoad: view.getUint32(4, true),
-    totalPhysical: Number(view.getBigUint64(8, true)),
-    availablePhysical: Number(view.getBigUint64(16, true)),
-    totalPageFile: Number(view.getBigUint64(24, true)),
-    availablePageFile: Number(view.getBigUint64(32, true)),
-    totalVirtual: Number(view.getBigUint64(40, true)),
-    availableVirtual: Number(view.getBigUint64(48, true)),
+    memoryLoad: m.loadPercent,
+    totalPhysical: Number(m.totalPhys),
+    availablePhysical: Number(m.availPhys),
+    totalPageFile: Number(m.totalPageFile),
+    availablePageFile: Number(m.availPageFile),
+    totalVirtual: Number(m.totalVirtual),
+    availableVirtual: Number(m.availVirtual),
   };
 }
 
@@ -137,24 +110,14 @@ function versionInfo(): Record<string, unknown> {
   };
 }
 
-export function isElevated(): boolean {
-  return dlopen("shell32.dll", { IsUserAnAdmin: { args: [], returns: FFIType.bool } }).symbols.IsUserAnAdmin();
-}
+export const isElevated = (): boolean => win32.isElevated();
 
 /** The current user's profile and local application data folders. */
-export function knownFolder(name: "Profile" | "LocalAppData"): string {
-  return name === "Profile" ? homedir() : (process.env.LOCALAPPDATA ?? join(homedir(), "AppData", "Local"));
-}
+export const knownFolder = (name: "Profile" | "LocalAppData"): string => shell.knownFolder(name);
 
 /** Running processes (image name and pid), from tasklist. */
-export function processes(): Array<{ pid: number; name: string }> {
-  return run("tasklist", ["/fo", "csv", "/nh"])
-    .split(/\r?\n/)
-    .flatMap(line => {
-      const match = /^"([^"]*)","(\d+)"/.exec(line);
-      return match ? [{ name: match[1]!, pid: Number(match[2]) }] : [];
-    });
-}
+export const processes = (): Array<{ pid: number; name: string }> =>
+  win32.processes().map(({ pid, name }) => ({ pid, name }));
 
 /** The BunWindowsApi on this machine; only valid on Windows. */
 export function windowsHost(): BunWindowsApi {

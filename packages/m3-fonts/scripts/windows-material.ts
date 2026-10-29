@@ -9,7 +9,7 @@
 //   bun scripts/windows-material.ts shell apply [--force]
 //   bun scripts/windows-material.ts shell rollback
 import { dlopen, FFIType } from "bun:ffi";
-import * as registry from "@aphrody/winreg";
+import * as registry from "@aphrody/windows/registry";
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 

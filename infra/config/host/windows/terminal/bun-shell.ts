@@ -5,7 +5,7 @@
 // History lives in $APHRODY_HOME/bun-shell-history (default ~/.aphrody); arrows browse it on a TTY.
 //
 // Runs on the unmodified upstream Bun canary. The fork-only modules map as follows:
-//   windows     -> windowsHost() of @aphrody/winclean/windows-host (bun:ffi + @aphrody/winreg + Bun.spawnSync), win32 only;
+//   windows     -> windowsHost() of @aphrody/winclean/windows-host (bun:ffi + @aphrody/windows/registry + Bun.spawnSync), win32 only;
 //   linux       -> a small node:os / /proc / Bun.spawn host (`linux`), linux only;
 //   wasm        -> the standard WebAssembly global (`wasm`: compile, instantiate, validate, Module, Instance).
 // No upstream equivalent, removed: wasm.build / wasm.optimize (wasm toolchain); the linux namespace, cgroup, seccomp and

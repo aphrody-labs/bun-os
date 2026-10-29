@@ -572,7 +572,7 @@
       },
       "dependencies": {
         "@aphrody/paths": "workspace:*",
-        "@aphrody/winreg": "workspace:*",
+        "@aphrody/windows": "workspace:*",
       },
     },
     "packages/bun-tauri": {
@@ -942,7 +942,7 @@
         "@aphrody/material-design-icons": "workspace:*",
         "@aphrody/scaffold": "workspace:*",
         "@aphrody/web-to-tauri": "workspace:*",
-        "@aphrody/winreg": "workspace:*",
+        "@aphrody/windows": "workspace:*",
       },
       "devDependencies": {
         "@aphrody/bun-debug-adapter-protocol": "0.0.1-aphrody.1",
@@ -1046,7 +1046,7 @@
       "version": "1.4.7",
       "devDependencies": {
         "@aphrody/m3-config": "workspace:*",
-        "@aphrody/winreg": "workspace:*",
+        "@aphrody/windows": "workspace:*",
       },
     },
     "packages/m3-forms": {
@@ -1829,12 +1829,19 @@
       "version": "1.4.7",
       "dependencies": {
         "@aphrody/os": "workspace:*",
-        "@aphrody/winreg": "workspace:*",
+        "@aphrody/windows": "workspace:*",
       },
+    },
+    "packages/windows": {
+      "name": "@aphrody/windows",
+      "version": "1.4.7",
     },
     "packages/winreg": {
       "name": "@aphrody/winreg",
       "version": "1.4.7",
+      "dependencies": {
+        "@aphrody/windows": "workspace:*",
+      },
     },
     "packages/yolo-cli": {
       "name": "@aphrody/yolo-cli",
@@ -2615,6 +2622,8 @@
     "@aphrody/webos-wasm": ["@aphrody/webos-wasm@workspace:packages/webos-wasm"],
 
     "@aphrody/winclean": ["@aphrody/winclean@workspace:packages/winclean"],
+
+    "@aphrody/windows": ["@aphrody/windows@workspace:packages/windows"],
 
     "@aphrody/winreg": ["@aphrody/winreg@workspace:packages/winreg"],
 

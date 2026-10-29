@@ -463,6 +463,7 @@
         "apps/m3-published-consumer": "proves resolution of the published crate from the registry, so it must stay outside the path workspace; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
         "apps/pdfcraft/vendor": "vendored crates resolved only through [patch.crates-io] paths in the root Cargo.toml (patch notes in apps/pdfcraft/vendor/README.md)",
         "apps/photocraft/examples/plugins": "plugin example; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "packages/windows/native/napi": "N-API addon of @aphrody/windows on windows-rs; own [workspace] root (separate lockfile and resolver), built by bun run build:napi, never by the root workspace",
         "apps/vectorcraft/vendor/windows-link": "Windows 7 import patch of windows-link 0.2.1 applied only by apps/vectorcraft/packaging/windows/windows7.ps1 (see VECTORCRAFT-PATCH.md)",
         "crates/aphrody-code-graph/tests/fixtures": "test fixture crate parsed by the code-graph tests, not built",
         "crates/aphrody-nds-sdk/devkit/templates": "project templates copied by the NDS/3DS devkit; each is an own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
@@ -5991,6 +5992,27 @@
       ],
       "aot": true,
       "status": "present"
+    },
+    {
+      "id": "npm:@aphrody/windows",
+      "kind": "npm-package",
+      "path": "packages/windows",
+      "source": {
+        "type": "workspace",
+        "name": "@aphrody/windows",
+        "version": "1.4.7"
+      },
+      "registration": ["bun-ffi", "napi", "bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": [
+        "npm:@aphrody/winclean",
+        "npm:@aphrody/winreg",
+        "npm:@aphrody/bun-steam",
+        "npm:@aphrody/m3-bun",
+        "npm:@aphrody/m3-fonts",
+        "file:infra/config/host/windows/terminal/bun-shell.ts"
+      ]
     },
     {
       "id": "npm:@aphrody/winreg",
