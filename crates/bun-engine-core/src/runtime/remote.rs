@@ -74,9 +74,9 @@ fn status(In(_): In<Option<Value>>, world: &mut World) -> BrpResult {
     let state = world
         .get_resource::<State<ShellState>>()
         .map(|s| format!("{:?}", **s));
-    let machine = world.get_resource::<MachineStatus>().map(|m| {
-        json!({ "name": m.name, "frames": m.frames, "paused": m.paused })
-    });
+    let machine = world
+        .get_resource::<MachineStatus>()
+        .map(|m| json!({ "name": m.name, "frames": m.frames, "paused": m.paused }));
     let filter = world.get_resource::<DisplayFilter>().map(|f| {
         json!({ "kind": f.kind.name(), "strength": f.strength, "integer_scale": f.integer_scale })
     });
@@ -101,12 +101,17 @@ fn status(In(_): In<Option<Value>>, world: &mut World) -> BrpResult {
         use super::home::{HomeAction, HomeData, HomeLoad, HomeUi};
         use crate::bevy::input_focus::InputFocus;
         let focus = world.get_resource::<InputFocus>().and_then(InputFocus::get);
-        let focused = focus.and_then(|e| world.get::<HomeAction>(e)).map(|a| match a {
-            HomeAction::Play(i) => format!("play:{i}"),
-            HomeAction::Filter(s) => format!("filter:{}", s.as_deref().unwrap_or("all")),
-            HomeAction::Retry => "retry".to_owned(),
-        });
-        if let (Some(data), Some(ui)) = (world.get_resource::<HomeData>(), world.get_resource::<HomeUi>()) {
+        let focused = focus
+            .and_then(|e| world.get::<HomeAction>(e))
+            .map(|a| match a {
+                HomeAction::Play(i) => format!("play:{i}"),
+                HomeAction::Filter(s) => format!("filter:{}", s.as_deref().unwrap_or("all")),
+                HomeAction::Retry => "retry".to_owned(),
+            });
+        if let (Some(data), Some(ui)) = (
+            world.get_resource::<HomeData>(),
+            world.get_resource::<HomeUi>(),
+        ) {
             out["home"] = json!({
                 "load": match &data.load {
                     HomeLoad::Loading => "loading".to_owned(),
@@ -127,7 +132,9 @@ fn status(In(_): In<Option<Value>>, world: &mut World) -> BrpResult {
 fn filter(In(params): In<Option<Value>>, mut filter: ResMut<DisplayFilter>) -> BrpResult {
     let params = params.unwrap_or(Value::Null);
     if let Some(kind) = params.get("kind") {
-        let name = kind.as_str().ok_or_else(|| invalid("`kind` must be a string"))?;
+        let name = kind
+            .as_str()
+            .ok_or_else(|| invalid("`kind` must be a string"))?;
         filter.kind = FilterKind::parse(name).ok_or_else(|| {
             invalid(format!(
                 "unknown filter `{name}` (off, plain, scanlines, crt, lcd, sharp)"
@@ -135,7 +142,9 @@ fn filter(In(params): In<Option<Value>>, mut filter: ResMut<DisplayFilter>) -> B
         })?;
     }
     if let Some(strength) = params.get("strength") {
-        let v = strength.as_f64().ok_or_else(|| invalid("`strength` must be a number"))?;
+        let v = strength
+            .as_f64()
+            .ok_or_else(|| invalid("`strength` must be a number"))?;
         filter.strength = (v as f32).clamp(0.0, 1.0);
     }
     if let Some(integer) = params.get("integer_scale") {
@@ -164,7 +173,9 @@ fn pause(
     // restores when it closes.
     let current = if in_menu { was.0 } else { status.paused };
     let want = match params.as_ref().and_then(|p| p.get("paused")) {
-        Some(v) => v.as_bool().ok_or_else(|| invalid("`paused` must be a boolean"))?,
+        Some(v) => v
+            .as_bool()
+            .ok_or_else(|| invalid("`paused` must be a boolean"))?,
         None => !current,
     };
     if in_menu {
@@ -188,7 +199,11 @@ fn menu(
     match (**state, open) {
         (ShellState::Playing, true) => next.set(ShellState::QuickMenu),
         (ShellState::QuickMenu, false) => next.set(ShellState::Playing),
-        (ShellState::Home, true) => return Err(BrpError::internal("no machine: the quick menu needs a running game")),
+        (ShellState::Home, true) => {
+            return Err(BrpError::internal(
+                "no machine: the quick menu needs a running game",
+            ));
+        }
         _ => {}
     }
     Ok(json!({ "requested": if open { "QuickMenu" } else { "Playing" } }))
@@ -200,14 +215,21 @@ fn capture(
     mut captures: ResMut<PendingCaptures>,
 ) -> BrpResult {
     let params = params.unwrap_or(Value::Null);
-    let delay = params.get("delay").and_then(Value::as_u64).unwrap_or(1).min(600) as u32;
+    let delay = params
+        .get("delay")
+        .and_then(Value::as_u64)
+        .unwrap_or(1)
+        .min(600) as u32;
     let path = match params.get("path").and_then(Value::as_str) {
         Some(p) => std::path::PathBuf::from(p),
         None => {
             let stamp = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .map_or(0, |d| d.as_millis());
-            config.state_dir.join("screenshots").join(format!("window-{stamp}.png"))
+            config
+                .state_dir
+                .join("screenshots")
+                .join(format!("window-{stamp}.png"))
         }
     };
     if path.extension().and_then(|e| e.to_str()) != Some("png") {

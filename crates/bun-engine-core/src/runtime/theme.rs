@@ -69,7 +69,8 @@ fn parse_hex(hex: &str) -> Option<Color> {
 fn table() -> &'static HashMap<String, Color> {
     static TABLE: OnceLock<HashMap<String, Color>> = OnceLock::new();
     TABLE.get_or_init(|| {
-        let json: serde_json::Value = serde_json::from_str(TOKENS).expect("tokens.json is valid JSON");
+        let json: serde_json::Value =
+            serde_json::from_str(TOKENS).expect("tokens.json is valid JSON");
         json["color"]
             .as_object()
             .expect("tokens.json has a `color` table")

@@ -524,7 +524,11 @@ pub mod view {
             );
     }
 
-    pub(super) fn install(world: &mut World, machine: &mut dyn crate::machine::Machine, spawn_view: bool) {
+    pub(super) fn install(
+        world: &mut World,
+        machine: &mut dyn crate::machine::Machine,
+        spawn_view: bool,
+    ) {
         #[cfg(feature = "nds-gpu")]
         if machine.gpu_rendering() {
             super::gpu::install(world, machine, spawn_view);

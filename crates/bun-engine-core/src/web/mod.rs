@@ -217,10 +217,8 @@ fn render_error(
     _render_world: &mut World,
 ) -> crate::bevy::render::error_handler::RenderErrorPolicy {
     if let Some(page) = world.get_resource::<Page>() {
-        page.0.lock().unwrap().stopped = Some(format!(
-            "WebGPU {:?}: {}",
-            error.ty, error.description,
-        ));
+        page.0.lock().unwrap().stopped =
+            Some(format!("WebGPU {:?}: {}", error.ty, error.description,));
     }
     world.write_message(AppExit::error());
     crate::bevy::render::error_handler::RenderErrorPolicy::StopRendering
@@ -298,7 +296,8 @@ fn page_status(
     }
     // CPU reference images are authoritative only in software mode. GPU qualification uses
     // canvas pixels and the independent submission counter instead of stale CPU images.
-    if !shared.gpu_rendering && status.frames != shared.hashed_at
+    if !shared.gpu_rendering
+        && status.frames != shared.hashed_at
         && (shared.hashed_at == 0 || status.frames - shared.hashed_at >= 15)
     {
         let screens = slot.0.screens();
@@ -346,8 +345,8 @@ pub fn start(
     options: JsValue,
 ) -> Result<Emulator, JsError> {
     let started_at = js_sys::Date::now();
-    let navigator = Reflect::get(&js_sys::global(), &"navigator".into())
-        .unwrap_or(JsValue::UNDEFINED);
+    let navigator =
+        Reflect::get(&js_sys::global(), &"navigator".into()).unwrap_or(JsValue::UNDEFINED);
     let gpu = Reflect::get(&navigator, &"gpu".into()).unwrap_or(JsValue::UNDEFINED);
     if gpu.is_null() || gpu.is_undefined() {
         return Err(JsError::new(
@@ -363,20 +362,27 @@ pub fn start(
         ));
     }
     let renderer = option::<js_sys::JsString>(&options, "renderer")
-        .map(String::from).unwrap_or_else(|| "auto".into());
+        .map(String::from)
+        .unwrap_or_else(|| "auto".into());
     if !matches!(renderer.as_str(), "auto" | "gpu" | "software") {
         STARTED.store(false, Ordering::SeqCst);
-        return Err(JsError::new("options.renderer must be auto, gpu or software"));
+        return Err(JsError::new(
+            "options.renderer must be auto, gpu or software",
+        ));
     }
     let gpu_ds = cfg!(feature = "nds-gpu")
         && matches!(system.as_str(), "nds" | "nintendo-ds")
         && renderer != "software";
     if renderer == "gpu" && !gpu_ds {
         STARTED.store(false, Ordering::SeqCst);
-        return Err(JsError::new("GPU emulation requires a Dust module compiled with nds-gpu"));
+        return Err(JsError::new(
+            "GPU emulation requires a Dust module compiled with nds-gpu",
+        ));
     }
     let bytes = rom.to_vec();
-    let machine = if gpu_ds { None } else {
+    let machine = if gpu_ds {
+        None
+    } else {
         match build_machine(&system, &bytes, &options) {
             Ok(machine) => Some(machine),
             Err(e) => {
@@ -393,7 +399,9 @@ pub fn start(
     }
     let shared = Arc::new(Mutex::new(Shared {
         started_at,
-        system: machine.as_ref().map_or("nintendo-ds", |machine| machine.name()),
+        system: machine
+            .as_ref()
+            .map_or("nintendo-ds", |machine| machine.name()),
         ..Shared::default()
     }));
 
@@ -419,7 +427,9 @@ pub fn start(
         ..BunEnginePlugin::windowed("Bun Engine")
     })
     .insert_resource(Page(shared.clone()))
-    .insert_resource(crate::bevy::render::error_handler::RenderErrorHandler(render_error))
+    .insert_resource(crate::bevy::render::error_handler::RenderErrorHandler(
+        render_error,
+    ))
     .add_systems(PreUpdate, page_keys.before(EngineSystems::Input))
     .add_systems(
         RunFixedMainLoop,
@@ -484,7 +494,12 @@ impl Emulator {
 
     #[wasm_bindgen(getter)]
     pub fn renderer(&self) -> String {
-        if self.shared.lock().unwrap().gpu_rendering { "wgpu30-dust" } else { "software" }.into()
+        if self.shared.lock().unwrap().gpu_rendering {
+            "wgpu30-dust"
+        } else {
+            "software"
+        }
+        .into()
     }
 
     /// Browser presentation is separate from the machine's emulation renderer.

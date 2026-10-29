@@ -11,6 +11,27 @@ const vendorPaths = (source: string) =>
     m[1] === "uutils" ? `vendor/uutils/${m[2] ?? ""}` : `vendor/${m[1]}`,
   );
 
+/** `../vendor/<name>` references in tracked first-party files (git grep over the tracked tree only). */
+async function relativeVendorReferences(): Promise<string> {
+  const proc = Bun.spawn(
+    [
+      "git",
+      "grep",
+      "-hoE",
+      "(\.\./)+vendor/[A-Za-z0-9_.-]+",
+      "--no-recurse-submodules",
+      "--",
+      "crates",
+      "apps",
+      ":!vendor",
+    ],
+    { cwd: root, stdout: "pipe", stderr: "pipe" },
+  );
+  const out = await new Response(proc.stdout).text();
+  await proc.exited;
+  return out;
+}
+
 test("the ci profile mounts every vendor tree that `bun run setup` and the CI jobs read", async () => {
   const file = (await Bun.file(resolve(root, "packages/bun-workspace/config/git-profiles.json")).json()) as ProfileFile;
   const profile = file.profiles.ci!;
@@ -28,6 +49,8 @@ test("the ci profile mounts every vendor tree that `bun run setup` and the CI jo
     ...workspaces.flatMap(w => vendorPaths(w)),
     // Cargo workspace members and path dependencies under vendor/.
     ...vendorPaths(await text("Cargo.toml")),
+    // Relative includes and path dependencies that climb out of a first-party tree into vendor/ (build scripts, specs).
+    ...vendorPaths(await relativeVendorReferences()),
   ]);
   required.delete("vendor/uutils/");
   // Only gitlinks and tracked cone directories can be mounted; a path the repository does not contain is not required.
