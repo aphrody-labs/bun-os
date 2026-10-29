@@ -504,6 +504,7 @@ impl ruzu_core::core::AudioCoreInterface for AudioCore {
         count as u32
     }
 
+    #[allow(clippy::not_unsafe_ptr_arg_deref)] // port of ruzu: the guest process pointer is checked for null and owned by the caller
     fn open_audio_input(
         &self,
         name: &[u8; 0x100],
@@ -618,6 +619,7 @@ impl ruzu_core::core::AudioCoreInterface for AudioCore {
         })
     }
 
+    #[allow(clippy::not_unsafe_ptr_arg_deref)] // port of ruzu: the guest process pointer is checked for null and owned by the caller
     fn open_audio_output(
         &self,
         name: &[u8; 0x100],
