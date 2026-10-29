@@ -880,17 +880,6 @@
     "bin": []
   },
   {
-    "name": "@aphrody/winreg",
-    "version": "1.4.7",
-    "description": "Windows registry (list, get, set, delete) and shell-folder facts through bun:ffi on upstream Bun.",
-    "dir": "packages/winreg",
-    "kind": "package",
-    "workspace": true,
-    "private": false,
-    "exports": 1,
-    "bin": []
-  },
-  {
     "name": "@aphrody/yolo-cli",
     "version": "1.4.7",
     "description": "Yolo command line on Bun: workspace operations, documentation generation, code scan/rename/parse, plugin and forge commands",

@@ -1847,13 +1847,6 @@
       "name": "@aphrody/windows-samples-tests",
       "version": "1.4.7",
     },
-    "packages/winreg": {
-      "name": "@aphrody/winreg",
-      "version": "1.4.7",
-      "dependencies": {
-        "@aphrody/windows": "workspace:*",
-      },
-    },
     "packages/yolo-cli": {
       "name": "@aphrody/yolo-cli",
       "version": "1.4.7",
@@ -2640,8 +2633,6 @@
     "@aphrody/windows": ["@aphrody/windows@workspace:packages/windows"],
 
     "@aphrody/windows-samples-tests": ["@aphrody/windows-samples-tests@workspace:packages/windows-samples-tests"],
-
-    "@aphrody/winreg": ["@aphrody/winreg@workspace:packages/winreg"],
 
     "@aphrody/yolo-cli": ["@aphrody/yolo-cli@workspace:packages/yolo-cli"],
 

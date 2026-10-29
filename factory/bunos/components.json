@@ -5181,25 +5181,11 @@
       "status": "present",
       "consumedBy": [
         "npm:@aphrody/winclean",
-        "npm:@aphrody/winreg",
         "npm:@aphrody/bun-steam",
         "npm:@aphrody/m3-bun",
         "npm:@aphrody/m3-fonts",
         "file:infra/config/host/windows/terminal/bun-shell.ts"
       ]
-    },
-    {
-      "id": "npm:@aphrody/winreg",
-      "kind": "npm-package",
-      "path": "packages/winreg",
-      "source": {
-        "type": "workspace",
-        "name": "@aphrody/winreg",
-        "version": "1.4.7"
-      },
-      "registration": ["bun-ffi"],
-      "aot": true,
-      "status": "present"
     },
     {
       "id": "npm:@aphrody/yolo-cli",

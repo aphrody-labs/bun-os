@@ -15,7 +15,6 @@ Windows-specific modules, so everything is `bun:ffi`, Node-API or a spawned proc
 | `winrt` (Uri, StorageFolder, device family) | Node-API addon on windows-rs 0.62.2 + napi 3.15 (`native/napi`) | `cargo` | yes (embed the `.node`) |
 | `winui` (WinUI 3 window, XAML, get/set/click) | .NET 10 host on Windows App SDK 2.6.4 (`native/winui-host`), JSON lines | `dotnet publish` | host is a separate exe |
 | `@aphrody/winclean` | tool catalog, its Windows host consumes the modules above | none | yes |
-| `@aphrody/winreg` | re-export of `registry` (compatibility) | none | yes |
 
 ```ts
 import { registry, services, shell, win32, winrt } from "@aphrody/windows";
