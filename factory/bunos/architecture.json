@@ -21,7 +21,7 @@
     {
       "id": "facade",
       "title": "Platform facades",
-      "text": "@aphrody/windows, windows/posix, @aphrody/wasm"
+      "text": "@aphrody/windows, @aphrody/wasm"
     },
     {
       "id": "workspace",
@@ -128,19 +128,6 @@
       "pins": [],
       "status": "built",
       "note": "the one Windows API facade; toolchain discovery stays in buncc, not here"
-    },
-    {
-      "id": "windows-posix",
-      "layer": "facade",
-      "title": "windows/posix (path translation, env and spawn across windows, msys, cygwin, wsl)",
-      "owner": "packages/windows/src/posix",
-      "module": "npm:@aphrody/windows",
-      "entry": ["bun test packages/windows/src/posix"],
-      "docs": ["docs/POSIX-ON-WINDOWS.md"],
-      "ci": [],
-      "pins": [],
-      "status": "built",
-      "note": "the one path-translation implementation"
     },
     {
       "id": "wasm",
@@ -451,11 +438,6 @@
       "capability": "Windows API facade",
       "owner": "packages/windows",
       "entry": "@aphrody/windows"
-    },
-    {
-      "capability": "Path translation (windows, msys, cygwin, wsl)",
-      "owner": "packages/windows/src/posix/path.ts",
-      "entry": "@aphrody/windows/posix"
     },
     {
       "capability": "Task entry",

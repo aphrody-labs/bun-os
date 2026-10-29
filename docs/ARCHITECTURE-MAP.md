@@ -13,7 +13,7 @@ buncc               | buncc, buncc-sh
                     v
 buncc providers     | buncc-providers, buncc-posix
                     v
-Platform facades    | windows, windows-posix, wasm, ntcore
+Platform facades    | windows, wasm, ntcore
                     v
 Workspace tooling   | bun-workspace, components, windows-samples
                     v
@@ -33,7 +33,6 @@ Images              | images, release, sites
 | Shell | `packages/buncc/src/sh.ts` | `buncc sh` |
 | MSVC discovery (vswhere, vcvarsall) | `packages/buncc/src/providers/msvc.ts` | `@aphrody/buncc/msvc` |
 | Windows API facade | `packages/windows` | `@aphrody/windows` |
-| Path translation (windows, msys, cygwin, wsl) | `packages/windows/src/posix/path.ts` | `@aphrody/windows/posix` |
 | Task entry | `justfile` | `just --list (delegates to buncc and turbo)` |
 | Component and edge registry | `factory/bunos/components.json` | `just components` |
 | Architecture map | `factory/bunos/architecture.json` | `just map` |
@@ -48,7 +47,6 @@ Images              | images, release, sites
 | providers | **buncc-providers**: Toolchain providers (msvc, clang, cmake, dotnet, vcpkg, winget, rust, uv, wasm, xwin, ...) (msvc is the one vswhere/vcvarsall implementation; import it as @aphrody/buncc/msvc) | `packages/buncc/src/providers` | `buncc install`<br>`buncc env`<br>`buncc which`<br>`buncc pin` | `docs/BUNCC.md` | `ci.yml#quality` | `buncc.toolchain.json` | built |
 | providers | **buncc-posix**: POSIX on Windows and Wine/Proton providers (posix, mingw, msys2, wine, proton) | `packages/buncc/src/providers/posix.ts` | `buncc posix doctor`<br>`buncc posix smoke`<br>`buncc posix uninstall`<br>`buncc wine doctor` | `docs/POSIX-ON-WINDOWS.md` | - | `buncc.toolchain.json` | built |
 | facade | **windows**: @aphrody/windows (Win32, registry, services, shell, WinRT, WinUI) (the one Windows API facade; toolchain discovery stays in buncc, not here) | `packages/windows` | `bun test packages/windows` | `docs/WINDOWS.md` | - | - | built |
-| facade | **windows-posix**: windows/posix (path translation, env and spawn across windows, msys, cygwin, wsl) (the one path-translation implementation) | `packages/windows/src/posix` | `bun test packages/windows/src/posix` | `docs/POSIX-ON-WINDOWS.md` | - | - | built |
 | facade | **wasm**: @aphrody/wasm (build, inspect, run, optimize) | `packages/wasm` | `buncc wasm`<br>`aphrody-wasm` | `packages/wasm/README.md` | - | - | built |
 | facade | **ntcore**: ntcore (ReactOS registry hives, handle table, PE helpers compiled to wasm32) (no CI job yet) | `packages/ntcore` | `bun factory/ntcore/build.ts`<br>`bun test packages/ntcore` | `docs/NTCORE.md` | - | `factory/ntcore/sweep.json` | unverified |
 | workspace | **bun-workspace**: @aphrody/bun-workspace (cargo module runner, git at scale, source coverage) | `packages/bun-workspace` | `aphrody-bun doctor`<br>`aphrody-bun git doctor`<br>`aphrody-bun status` | `docs/MONOREPO-SCALE.md`<br>`docs/MONOREPO.md` | `ci.yml#quality` | `packages/bun-workspace/config/git-profiles.json` | built |

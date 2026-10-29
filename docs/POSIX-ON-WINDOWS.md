@@ -40,11 +40,9 @@ Counts (15 rows): REPLACE 2, UNIFY 8, DROP 1, KEEP 2, DEFER 1, not used 1.
 (measured on 1.4.4), so buncc rewrites the plain braced form and reports operator forms (`${X:-d}`) it cannot. Scripts using
 those constructs stay `.sh` for a real bash or become TypeScript.
 
-## @aphrody/windows posix module
+## Path translation
 
-`packages/windows/src/posix/` (path, env, spawn): `C:\ <-> /c/ <-> /cygdrive/c/ <-> /mnt/c/`, UNC, `\\?\`, `\\wsl.localhost\` (written by default; it can start the distro on Windows 11) and `\\wsl$\` (still read);
-PATH-list and variable translation; spawn helpers that put the shim directory first. WSL's mount root is configurable
-(`[automount] root`, default `/mnt/`, Microsoft Learn "Advanced settings configuration in WSL"), hence the `wslMount` option.
+`cygpath` (MSYS2, Cygwin) and `wslpath` (WSL) already translate paths and are the owners; the unused TypeScript copy under `packages/windows/src/posix` (no importer, not exported by the package) was deleted.
 
 ## Migration proof
 
