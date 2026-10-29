@@ -61,7 +61,11 @@ test("SDK staging resolves transitive source dependencies without copying runtim
   }
 });
 
-async function run(args: string[], env = process.env) {
+// A workstation that exports the root of another checkout must not decide which aphrody.config.json the builder reads.
+const hostRoots = ["BUN_OS_ROOT", "APHRODY_ROOT", "APHRODY_WORKSPACE_ROOT", "APHRODY_MONOREPO_ROOT", "APHRODY_BUN_CHECKOUT"];
+const cleanEnv = () => Object.fromEntries(Object.entries(process.env).filter(([key]) => !hostRoots.includes(key)));
+
+async function run(args: string[], env: Record<string, string | undefined> = cleanEnv()) {
   const child = Bun.spawn([process.execPath, builder, ...args], {
     windowsHide: true,
     env,
@@ -161,7 +165,7 @@ test("native builder fails before build when the serialization wrapper is absent
       ),
     );
     const result = await run([`--root=${root}`, "--debug", "--offline", "--unlocked"], {
-      ...process.env,
+      ...cleanEnv(),
       CARGO_TARGET_DIR: join(root, "target"),
     });
     expect(result.code).toBe(1);
@@ -339,7 +343,7 @@ test("native builder refuses an ABI-incomplete artifact and leaves no success ma
   const { root, consumer } = await fixture();
   try {
     const result = await run([`--root=${root}`, "--debug", "--offline", "--unlocked"], {
-      ...process.env,
+      ...cleanEnv(),
       CARGO_TARGET_DIR: join(root, "target"),
     });
     expect(result.stderr).toContain("staged native consumer failed");
