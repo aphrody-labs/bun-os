@@ -105,7 +105,7 @@ export const msys2Provider: Provider = {
     };
   },
   install: () => ({ commands: [["buncc", "env", "msys2", "--ensure"]] }),
-  async env(ctx) {
+  async env(ctx): Promise<Record<string, string>> {
     const root = isMsys2Root(managedRoot()) ? managedRoot() : undefined;
     // An existing install is deliberately NOT put on PATH: that is what made builds depend on it.
     return root ? { PATH: prependPath(pathVar(ctx), [join(root, "usr", "bin")]), MSYS2_ROOT: root } : {};

@@ -1,4 +1,4 @@
-import { currentPlatform, type Context, type Detection, type InstallPlan, type Provider } from "./types.ts";
+import { currentPlatform, type Context, type Detection, type Provider } from "./types.ts";
 import { msvc } from "./msvc.ts";
 import { rust } from "./rust.ts";
 import { toolProviders } from "./tools.ts";

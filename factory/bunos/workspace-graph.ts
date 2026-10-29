@@ -36,7 +36,7 @@ const matchGlob = (glob: string, dirs: Iterable<string>) => {
         .replace(/[.+^${}()|[\]\\]/g, "\\$&")
         .replace(/\*\*/g, "\u0000")
         .replace(/\*/g, "[^/]*")
-        .replace(/\u0000/g, ".*") +
+        .replaceAll(String.fromCharCode(0), ".*") +
       "$",
   );
   return [...dirs].filter(d => re.test(d));

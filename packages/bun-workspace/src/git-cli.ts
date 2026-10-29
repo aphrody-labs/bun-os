@@ -148,8 +148,14 @@ export async function gitCommand(args: string[]): Promise<number> {
     }
     case "generate": {
       const what = rest[0] ?? "all";
-      if (["attributes", "all"].includes(what)) (await writeAttributes(root), console.log("wrote .gitattributes"));
-      if (["codeowners", "all"].includes(what)) (await writeCodeowners(root), console.log("wrote .github/CODEOWNERS"));
+      if (["attributes", "all"].includes(what)) {
+        await writeAttributes(root);
+        console.log("wrote .gitattributes");
+      }
+      if (["codeowners", "all"].includes(what)) {
+        await writeCodeowners(root);
+        console.log("wrote .github/CODEOWNERS");
+      }
       if (["ignore-revs", "all"].includes(what))
         console.log(`wrote .git-blame-ignore-revs (${(await writeIgnoreRevs(root)).length} commits)`);
       if (["gitmodules", "all"].includes(what))

@@ -122,7 +122,7 @@ export const wineProvider: Provider = {
     return { found: true, path: bin, version: await probeVersion(bin, ["--version"], ctx) };
   },
   install: () => ({ commands: [["buncc", "install", "wine", "--run"]] }),
-  async env(ctx) {
+  async env(ctx): Promise<Record<string, string>> {
     const local = findInstalled(wineBuilds);
     return local ? { PATH: prependPath(pathVar(ctx), [join(local.dir, "bin")]) } : {};
   },

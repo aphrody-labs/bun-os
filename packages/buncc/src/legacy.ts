@@ -86,7 +86,7 @@ export async function protectedRoots(host: LegacyHost): Promise<string[]> {
   for (const p of pf) roots.add(join(p, "Git"));
   const local = host.env.LOCALAPPDATA;
   if (local) roots.add(join(local, "Programs", "Git"));
-  for (const root of [...roots]) if (!host.exists(root)) roots.delete(root);
+  for (const root of roots) if (!host.exists(root)) roots.delete(root);
   return [...roots];
 }
 
@@ -365,7 +365,7 @@ export function needsElevation(kind: StepKind, target: string | undefined): bool
   if (!target) return false;
   const t = lower(target);
   if (kind === "path") return false;
-  if (/^hklm\\/.test(t) || /^hkey_local_machine\\/.test(t)) return true;
+  if (t.startsWith("hklm\\") || t.startsWith("hkey_local_machine\\")) return true;
   return /^[a-z]:\\(program files|program files \(x86\)|windows)(\\|$)/.test(t);
 }
 

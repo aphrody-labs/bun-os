@@ -326,7 +326,7 @@ export const posixProvider: Provider = {
   install(): InstallPlan {
     return { commands: [["buncc", "env", "posix", "--ensure"]] };
   },
-  async env(ctx: Context) {
+  async env(ctx: Context): Promise<Record<string, string>> {
     const dir = findShimDir();
     return dir ? { PATH: prependPath(pathVar(ctx), [dir]), BUNCC_POSIX_DIR: dir } : {};
   },

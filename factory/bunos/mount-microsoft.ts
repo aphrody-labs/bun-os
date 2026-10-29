@@ -84,13 +84,13 @@ const SPECS: Spec[] = [
 
 const gh = async (path: string, jq: string) => {
   const p = Bun.spawn(["gh", "api", path, "--jq", jq], { stdout: "pipe", stderr: "pipe" });
-  const [o, code] = await Promise.all([p.stdout.text(), p.exited]);
+  const [o, code] = await Promise.all([new Response(p.stdout).text(), p.exited]);
   if (code) throw new Error(`gh api ${path} failed`);
   return o.trim();
 };
 const git = async (...a: string[]) => {
   const p = Bun.spawn(["git", ...a], { cwd: root, stdout: "pipe", stderr: "pipe" });
-  const [o, e, code] = await Promise.all([p.stdout.text(), p.stderr.text(), p.exited]);
+  const [o, e, code] = await Promise.all([new Response(p.stdout).text(), new Response(p.stderr).text(), p.exited]);
   if (code) throw new Error(`git ${a.join(" ")}: ${e}`);
   return o.trim();
 };

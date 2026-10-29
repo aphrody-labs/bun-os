@@ -18,7 +18,7 @@ async function relativeVendorReferences(): Promise<string> {
       "git",
       "grep",
       "-hoE",
-      "(\.\./)+vendor/[A-Za-z0-9_.-]+",
+      "(\\.\\./)+vendor/[A-Za-z0-9_.-]+",
       "--no-recurse-submodules",
       "--",
       "crates",

@@ -39,7 +39,7 @@ const split = (s: string) => s.split(/[\\/]+/).filter(Boolean);
 /** Guess the style of a path string. A bare `/x/...` with a one-letter first segment is msys. */
 export function detectStyle(p: string, o: PathOptions = {}): PathStyle {
   const mount = (o.wslMount ?? "/mnt").replace(/\/+$/, "");
-  if (DRIVE.test(p) || /^\\\\/.test(p)) return "windows";
+  if (DRIVE.test(p) || p.startsWith("\\\\")) return "windows";
   if (/^\/cygdrive\/[A-Za-z](\/|$)/.test(p)) return "cygwin";
   if (new RegExp(`^${mount.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/[A-Za-z](/|$)`).test(p)) return "wsl";
   if (/^\/[A-Za-z](\/|$)/.test(p)) return "msys";
@@ -55,7 +55,7 @@ export function parsePath(p: string, o: PathOptions = {}): ParsedPath {
     const s = verbatim ? verbatim[1]! : p;
     const wsl = /^\\\\(?:wsl\$|wsl\.localhost)\\([^\\]+)(.*)$/i.exec(s);
     if (wsl) return { wslDistro: wsl[1], absolute: true, parts: split(wsl[2]!), style: "windows" };
-    if (/^\\\\/.test(s)) return parseUnc(s.slice(2));
+    if (s.startsWith("\\\\")) return parseUnc(s.slice(2));
     const d = DRIVE.exec(s);
     if (d) return { drive: d[1]!.toLowerCase(), absolute: /^[A-Za-z]:[\\/]/.test(s), parts: split(s.slice(2)), style };
     return { absolute: s.startsWith("\\"), parts: split(s), style };

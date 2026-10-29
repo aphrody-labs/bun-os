@@ -5,7 +5,7 @@
  * (buildArgs / aotPublishArgs) and writes examples/windows/<channel>/results.json.
  *   bun packages/windows-samples-tests/scripts/generate-dotnet-templates.ts [10|11] [--no-build] [--only name,...]
  */
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { dotnetAot, dotnetBuild, repoRoot, resolveDotnet, runDotnet } from "../src/dotnet.ts";
 

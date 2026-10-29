@@ -116,6 +116,8 @@ define(
       "--ignore-pattern",
       "**/fixtures/**",
       "--ignore-pattern",
+      "packages/wasm/test/programs/**",
+      "--ignore-pattern",
       "**/node_modules/**",
       ...LINT_PATHS,
     ),

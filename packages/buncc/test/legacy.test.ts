@@ -63,7 +63,7 @@ function fakeHost(opts: {
     list: p => {
       const prefix = norm(p) + "\\";
       const names = new Set<string>();
-      for (const f of [...files]) if (f.startsWith(prefix)) names.add(f.slice(prefix.length).split("\\")[0]!);
+      for (const f of files) if (f.startsWith(prefix)) names.add(f.slice(prefix.length).split("\\")[0]!);
       return [...names];
     },
     readText: p => opts.configs?.[p],
@@ -85,7 +85,7 @@ function fakeHost(opts: {
         if (!opts.silent?.includes("scoop")) {
           const marker = "\\apps\\" + argv[2]!.toLowerCase();
           for (const set of [files, dirs])
-            for (const x of [...set]) if (x.includes(marker + "\\") || x.endsWith(marker)) set.delete(x);
+            for (const x of set) if (x.includes(marker + "\\") || x.endsWith(marker)) set.delete(x);
         }
       } else if (cmd === "reg" && argv[1] === "delete") {
         if (!opts.silent?.includes("reg-delete")) keys.delete(argv[2]!.toLowerCase());
@@ -119,7 +119,7 @@ function fakeHost(opts: {
       if (opts.eperm?.some(x => norm(x) === norm(p))) throw new Error(`EPERM: operation not permitted, rmdir '${p}'`);
       log.removed.push(p);
       for (const set of [files, dirs])
-        for (const x of [...set]) if (x === norm(p) || x.startsWith(norm(p) + "\\")) set.delete(x);
+        for (const x of set) if (x === norm(p) || x.startsWith(norm(p) + "\\")) set.delete(x);
     },
     writeFile: (p, t) => {
       log.written[p] = t;
