@@ -21,6 +21,10 @@ env:
   CARGO_HOME: /var/cache/cargo
   CARGO_TERM_COLOR: never
 
+concurrency:
+  group: rustbase-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
