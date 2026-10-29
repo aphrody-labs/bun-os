@@ -3,7 +3,9 @@
 import { build, type BuildOptions } from "./build.ts";
 import { inspect, type WasmInfo } from "./inspect.ts";
 import { optimize, type OptimizeLevel } from "./optimize.ts";
-import { canBuildFor, PINS, TRIPLES, versionOf, wasmOptCommand } from "./tools.ts";
+import { TRIPLES } from "./tools.ts";
+import { toolchain } from "./toolchain.ts";
+import { runCli } from "./commands.ts";
 import { readFileSync } from "node:fs";
 
 export type BunccWasmMode = "web" | "bundler" | "nodejs" | "wasi-p1" | "wasi-p2" | "raw";
@@ -98,28 +100,6 @@ export async function optimizeWasm(
   return optimize(input, options);
 }
 
-export interface BunccWasmToolchain {
-  cargo: boolean;
-  targets: Record<string, boolean>;
-  wasmBindgen: string | undefined;
-  wasmOpt: string[];
-  pins: typeof PINS;
-}
-
-/** What `buncc wasm` can do on this machine, for `buncc doctor`-style reports. */
-export async function toolchain(): Promise<BunccWasmToolchain> {
-  const targets: Record<string, boolean> = {};
-  for (const triple of Object.values(TRIPLES)) targets[triple] = await canBuildFor(triple);
-  const bindgen = Bun.which("wasm-bindgen");
-  return {
-    cargo: !!Bun.which("cargo"),
-    targets,
-    wasmBindgen: bindgen ? await versionOf(bindgen) : undefined,
-    wasmOpt: wasmOptCommand(),
-    pins: PINS,
-  };
-}
-
 /** The backend object buncc registers under `wasm`. */
 export const bunccWasm = {
   id: "wasm",
@@ -130,4 +110,12 @@ export const bunccWasm = {
   toolchain,
 } as const;
 
-export default bunccWasm;
+export default main;
+
+export { toolchain };
+export type { BunccWasmToolchain } from "./toolchain.ts";
+
+/** Entry point of `buncc wasm <args>`: build, opt, inspect, validate, run, init, tools. Returns the exit code. */
+export async function main(args: string[]): Promise<number> {
+  return runCli(args);
+}

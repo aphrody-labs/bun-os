@@ -46,9 +46,10 @@ Overrides: `APHRODY_WASM_BINDGEN`, `APHRODY_WASM_OPT`, `APHRODY_JCO`.
 
 ## buncc
 
-`@aphrody/wasm/buncc` exports the hooks of the `wasm` backend: `buildWasm()`,
-`optimizeWasm()`, `toolchain()` and the `bunccWasm` object. Requests and results
-are plain JSON.
+`buncc wasm <command>` runs this package (`packages/wasm/src/buncc.ts`, default
+export `main(args)`): `build`, `opt`, `inspect`, `validate`, `run`, `init`,
+`tools`. `@aphrody/wasm/buncc` also exports `buildWasm()`, `optimizeWasm()`,
+`toolchain()` and the `bunccWasm` object; requests and results are plain JSON.
 
 ## Tests
 

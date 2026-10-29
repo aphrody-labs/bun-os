@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { inspect, instantiate, validate } from "../src/index.ts";
+import { init, inspect, instantiate, PINS, validate } from "../src/index.ts";
 import { tempDir, tinyModule } from "./helpers.ts";
 
 describe("inspect", () => {
@@ -77,5 +77,23 @@ console.log((instance.exports as any).add(20, 22));
       proc.exited,
     ]);
     expect({ stdout: stdout.trim(), stderr, code }).toEqual({ stdout: "42", stderr: "", code: 0 });
+  });
+});
+
+describe("init", () => {
+  test("scaffolds a wasm-bindgen crate pinned to the newest wasm-bindgen and refuses to overwrite", () => {
+    const dir = join(tempDir(), "hello-wasm");
+    const files = init(dir);
+    expect(files.map(f => f.slice(dir.length + 1).replaceAll("\\", "/"))).toEqual([
+      "Cargo.toml",
+      "src/lib.rs",
+      "index.ts",
+      ".gitignore",
+    ]);
+    const manifest = readFileSync(join(dir, "Cargo.toml"), "utf8");
+    expect(manifest).toContain('name = "hello-wasm"');
+    expect(manifest).toContain(`wasm-bindgen = "${PINS.wasmBindgen}"`);
+    expect(() => init(dir)).toThrow("exists");
+    expect(() => init(join(dir, "Bad Name"))).toThrow("Invalid crate name");
   });
 });

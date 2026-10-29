@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import bunccWasm, { buildWasm, optimizeWasm, toolchain } from "../src/buncc.ts";
+import main, { buildWasm, bunccWasm, optimizeWasm, toolchain } from "../src/buncc.ts";
 import { canBuildFor, PINS, TRIPLES, wasmPlugin } from "../src/index.ts";
-import { cargoEnv, standaloneCrate, tempDir, tinyModule } from "./helpers.ts";
+import { cargoEnv, repoRoot, standaloneCrate, tempDir, tinyModule } from "./helpers.ts";
 
 cargoEnv();
 const raw = await canBuildFor(TRIPLES.unknown);
@@ -22,6 +22,29 @@ describe("buncc wasm backend hooks", () => {
     expect(JSON.parse(JSON.stringify(report))).toEqual(report);
     expect(Object.keys(report.targets)).toEqual(Object.values(TRIPLES));
     expect(report.pins.wasmBindgen).toBe(PINS.wasmBindgen);
+  });
+
+  test("default export is main(args), the entry `buncc wasm` calls", async () => {
+    expect(typeof main).toBe("function");
+    const file = join(tempDir(), "tiny.wasm");
+    writeFileSync(file, tinyModule());
+    expect(await main(["validate", file])).toBe(0);
+    writeFileSync(file, new Uint8Array([0, 0x61, 0x73, 0x6d, 1, 0, 0, 0, 1]));
+    expect(await main(["validate", file])).toBe(1);
+    expect(await main(["inspect", join(tempDir(), "missing.wasm")])).toBe(1);
+    expect(await main(["bogus"])).toBe(2);
+  });
+
+  test("buncc wasm runs this module through the buncc CLI", async () => {
+    const file = join(tempDir(), "tiny.wasm");
+    writeFileSync(file, tinyModule());
+    const proc = Bun.spawn([process.execPath, join(repoRoot, "packages/buncc/src/cli.ts"), "wasm", "inspect", file], {
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const [stdout, code] = await Promise.all([new Response(proc.stdout).text(), proc.exited]);
+    expect(code).toBe(0);
+    expect(JSON.parse(stdout).exports.map((e: { name: string }) => e.name)).toEqual(["add", "twice", "memory"]);
   });
 
   test("inspect reads a file", () => {
