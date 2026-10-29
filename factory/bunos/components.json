@@ -3108,7 +3108,7 @@
       "note": "Fluent 2 for the Windows track and the craft apps (docs/MICROSOFT.md): tokens (JSON, TOML, CSS, XAML) generated from @fluentui/react-theme, a WinUI 3 app on Windows App SDK 2.6.4 launched from Bun, a @fluentui/web-components shell. The Bun OS desktop design system stays Material 3."
     },
     {
-      "id": "factory:themes",
+      "id": "npm:@aphrody/themes",
       "kind": "factory-module",
       "path": "packages/themes",
       "source": {

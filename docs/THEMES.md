@@ -17,7 +17,7 @@ One token source, three themes, every app. Facts below are measured or cited; an
 
 | Output                                   | Consumer                                                                                   |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `generated/themes.css`                   | CSS variables `--t-*` per `data-theme`/`data-scheme`/`data-accent`, plus `.t-*` components |
+| `generated/themes.css`                   | CSS variables `--t-*` per `data-skin`/`data-scheme`/`data-accent`, plus `.t-*` components |
 | `generated/tailwind.css`                 | Tailwind v4 `@theme inline` mapping `--color-*`, `--radius-*`, fonts                       |
 | `src/generated.ts`                       | TypeScript types and all palettes (`COLORS[theme][scheme][accent][slot]`)                  |
 | `crates/aphrody-themes/src/generated.rs` | Rust palettes, shapes, type ramps, glass, window effects                                   |
@@ -104,7 +104,7 @@ macOS 15 and older fall back to the latter.
 
 ## Delivery
 
-- **Web**: `@import "@aphrody/themes/themes.css"`; `<html data-theme data-scheme data-accent>`; `bootScript()` in `<head>`
+- **Web**: `@import "@aphrody/themes/themes.css"`; `<html data-skin data-scheme data-accent>`; `bootScript()` in `<head>`
   prevents a flash; `createThemeController()` persists (localStorage) and follows the system scheme live.
 - **Live sync**: `BroadcastChannel("aphrody-theme")` between same-origin apps, the Tauri event `aphrody://theme` between
   webview windows, and the selection file `theme.json` (see `aphrody_themes::config`) for native apps. The controller's

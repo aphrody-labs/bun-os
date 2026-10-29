@@ -52,7 +52,7 @@ const glassOpacity = (t: number) => Math.round((0.04 + 0.96 * t) * 1000) / 1000;
 export function applyTheme(sel: Selection, systemDark: boolean, root: HTMLElement = document.documentElement): Scheme {
   const scheme = resolveScheme(sel, systemDark);
   const meta = META[sel.theme];
-  root.dataset.theme = sel.theme;
+  root.dataset.skin = sel.theme;
   root.dataset.scheme = scheme;
   if (sel.accent === meta.defaultAccent) delete root.dataset.accent;
   else root.dataset.accent = sel.accent;
@@ -141,7 +141,12 @@ export function createThemeController(opts: ControllerOptions = {}): ThemeContro
   return {
     get: () => sel,
     set(patch) {
-      sel = normalize({ ...sel, ...patch }, sel);
+      // a new theme starts on its own default accent unless the patch names one
+      const next =
+        patch.theme && patch.theme !== sel.theme && patch.accent === undefined
+          ? { ...sel, ...patch, accent: "" }
+          : { ...sel, ...patch };
+      sel = normalize(next, sel);
       storage?.setItem(STORAGE_KEY, JSON.stringify(sel));
       apply();
       bc?.postMessage(sel);
@@ -181,5 +186,5 @@ export function bootScript(): string {
   const defaults = JSON.stringify(
     Object.fromEntries(THEME_IDS.map(t => [t, [META[t].defaultAccent, META[t].controls]])),
   );
-  return `(function(){try{var d=${defaults},s=JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})||"{}"),t=d[s.theme]?s.theme:${JSON.stringify(DEFAULT_SELECTION.theme)},sc=s.scheme==="light"||s.scheme==="dark"?s.scheme:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),r=document.documentElement;r.dataset.theme=t;r.dataset.scheme=sc;r.dataset.controls=d[t][1];if(s.accent&&s.accent!==d[t][0])r.dataset.accent=s.accent;r.style.colorScheme=sc}catch(e){}})();`;
+  return `(function(){try{var d=${defaults},s=JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})||"{}"),t=d[s.theme]?s.theme:${JSON.stringify(DEFAULT_SELECTION.theme)},sc=s.scheme==="light"||s.scheme==="dark"?s.scheme:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),r=document.documentElement;r.dataset.skin=t;r.dataset.scheme=sc;r.dataset.controls=d[t][1];if(s.accent&&s.accent!==d[t][0])r.dataset.accent=s.accent;r.style.colorScheme=sc}catch(e){}})();`;
 }

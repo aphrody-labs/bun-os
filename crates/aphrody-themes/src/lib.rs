@@ -134,7 +134,7 @@ pub struct Radii {
     pub container: f32,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct TextStyle {
     pub size: f32,
     pub line: f32,

@@ -3902,6 +3902,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "aphrody-themes"
+version = "1.4.7"
+dependencies = [
+ "egui",
+ "egui_kittest",
+ "image",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "aphrody-toolcall"
 version = "1.4.7"
 dependencies = [

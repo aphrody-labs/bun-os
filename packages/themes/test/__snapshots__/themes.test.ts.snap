@@ -1,7 +1,7 @@
 // Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`generated outputs css snapshot: apple dark default block and accent override 1`] = `
-"[data-theme="apple"][data-scheme="dark"] {
+"[data-skin="apple"][data-scheme="dark"] {
   --t-bg: #000000;
   --t-bg-alt: #1C1C1E;
   --t-surface: #2C2C2E;
@@ -41,7 +41,7 @@ exports[`generated outputs css snapshot: apple dark default block and accent ove
 `;
 
 exports[`generated outputs css snapshot: apple dark default block and accent override 2`] = `
-"[data-theme="fluent"]:not([data-scheme="dark"])[data-accent="orange"] {
+"[data-skin="fluent"]:not([data-scheme="dark"])[data-accent="orange"] {
   --t-accent: #B24300;
   --t-accent-hover: #B24300E6;
   --t-accent-pressed: #B24300CC;
@@ -62,7 +62,7 @@ exports[`generated outputs css snapshot: apple dark default block and accent ove
 `;
 
 exports[`generated outputs css snapshot: apple dark default block and accent override 3`] = `
-"[data-theme="m3"] {
+"[data-skin="m3"] {
   --t-radius-none: 0px;
   --t-radius-sm: 8px;
   --t-radius-md: 12px;
@@ -164,6 +164,24 @@ exports[`generated outputs css snapshot: apple dark default block and accent ove
   --t-text-label-small-emphasized-size: 11px;
   --t-text-label-small-emphasized-line: 16px;
   --t-text-label-small-emphasized-weight: 700;
+  --t-text-caption-size: 12px;
+  --t-text-caption-line: 16px;
+  --t-text-caption-weight: 400;
+  --t-text-body-size: 14px;
+  --t-text-body-line: 20px;
+  --t-text-body-weight: 400;
+  --t-text-body-strong-size: 14px;
+  --t-text-body-strong-line: 20px;
+  --t-text-body-strong-weight: 500;
+  --t-text-subtitle-size: 16px;
+  --t-text-subtitle-line: 24px;
+  --t-text-subtitle-weight: 500;
+  --t-text-title-size: 24px;
+  --t-text-title-line: 32px;
+  --t-text-title-weight: 400;
+  --t-text-display-size: 36px;
+  --t-text-display-line: 44px;
+  --t-text-display-weight: 400;
   --t-motion-fast: 150ms;
   --t-motion-normal: 300ms;
   --t-motion-slow: 500ms;

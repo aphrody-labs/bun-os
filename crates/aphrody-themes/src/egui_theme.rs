@@ -55,7 +55,7 @@ pub fn visuals(theme: ThemeId, scheme: Scheme, p: &Palette) -> Visuals {
     let hairline = theme != ThemeId::M3;
     let ctl_fill = |c: Rgba| c.over(surface);
     let stroke = |c: Rgba| if hairline { Some((1.0, c.over(surface))) } else { None };
-    v.widgets.noninteractive = widget(surface, Some((1.0, p.divider.over(surface))), p.fg_muted.over(surface), ctl, 0.0);
+    v.widgets.noninteractive = widget(surface, Some((1.0, p.divider.over(surface))), p.fg.over(surface), ctl, 0.0);
     v.widgets.inactive = widget(ctl_fill(p.control), stroke(p.border), p.fg.over(surface), ctl, 0.0);
     v.widgets.hovered = widget(ctl_fill(p.control_hover), stroke(p.border_strong), p.fg.over(surface), ctl, 0.0);
     v.widgets.active = widget(p.control_pressed.over(surface), Some((1.0, p.accent)), p.fg.over(surface), ctl, 0.0);
