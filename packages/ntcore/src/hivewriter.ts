@@ -48,7 +48,7 @@ const KEY_HIVE_ENTRY = 0x04;
 const KEY_NO_DELETE = 0x08;
 const KEY_COMP_NAME = 0x20;
 const VALUE_COMP_NAME = 0x01;
-const isAscii = (s: string) => /^[\x01-\x7f]*$/.test(s);
+const isAscii = (s: string) => [...s].every(ch => ch.charCodeAt(0) >= 0x01 && ch.charCodeAt(0) <= 0x7f);
 const upper = (c: number) => (c >= 0x61 && c <= 0x7a ? c - 32 : c);
 const cmpCi = (a: string, b: string) => {
   const n = Math.min(a.length, b.length);
