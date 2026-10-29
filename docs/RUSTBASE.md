@@ -199,12 +199,16 @@ ship the upstream license files under `/usr/share/licenses/<pkgname>/`.
 Only numbers produced by a run are reported; results of the latest run are recorded below.
 
 <!-- rustbase:ci:start -->
-No run recorded yet.
+Run 40828567909 (commit c8f4a2f88c, all five jobs green):
+
+- `packages`: the four packages built with makepkg; namcap errors=0, warnings=51; installed over GNU coreutils/findutils/diffutils/sudo; `smoke.sh` pass=41 fail=0 total=41.
+- `gnu-coreutils` (uutils 0.12.0, dc1efd8, GNU coreutils 9.11 suite, `release-small` build, as user): total 692, PASS 602, FAIL 22, SKIP 68, ERROR 0 (96.47% of the 624 tests run). Earlier runs on the same SHA gave PASS 604/FAIL 20 and PASS 597/FAIL 26, so the count varies by a few tests between runs. The root-only and tty test groups were not run.
+- `util-linux-tests` (fork 09959d4, `cargo test`): 237 passed, 0 failed, 2 ignored (239).
 <!-- rustbase:ci:end -->
 
 ## Unverified
 
-- The PKGBUILDs have not been built on a workstation (builds run in CI only); see the CI section for the run result.
+- The PKGBUILDs are built only in CI (never on a workstation); the install ran in a throwaway container, not on a booted system.
 - The packages have not been booted in a WSL rootfs or a bare-metal image; `wsl-rootfs.yml` does not install them yet.
 - The upstream GNU util-linux test suite is not run (the uutils fork has no harness for it; only its own cargo tests).
 - Arch/AUR/CachyOS membership is the observation of the `observedAt` date; CachyOS membership is derived from the
