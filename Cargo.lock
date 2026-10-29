@@ -1164,18 +1164,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aphrody-bun-desktop"
-version = "1.4.4"
-dependencies = [
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-aphrody",
- "tauri-runtime-cef",
- "tauri-runtime-wry",
-]
-
-[[package]]
 name = "aphrody-bun-docs"
 version = "1.4.7"
 dependencies = [
@@ -4513,8 +4501,6 @@ version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2f3f79755c74fd155000314eb349864caa787c6592eace6c6882dad873d9c39"
 dependencies = [
- "async-fs",
- "async-net",
  "enumflags2",
  "futures-channel",
  "futures-util",
@@ -4524,9 +4510,6 @@ dependencies = [
  "serde_repr",
  "tokio",
  "url",
- "wayland-backend",
- "wayland-client",
- "wayland-protocols",
  "zbus",
 ]
 
@@ -4587,16 +4570,6 @@ dependencies = [
  "proc-macro2",
  "quote 1.0.47",
  "syn 2.0.119",
-]
-
-[[package]]
-name = "assert-json-diff"
-version = "2.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47e4f2b81832e72834d7518d8487a0396a28cc408186a2e8854c0f98011faf12"
-dependencies = [
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -4723,17 +4696,6 @@ dependencies = [
  "event-listener",
  "event-listener-strategy",
  "pin-project-lite",
-]
-
-[[package]]
-name = "async-net"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b948000fad4873c1c9339d60f2623323a0cfd3816e5181033c6a5cb68b2accf7"
-dependencies = [
- "async-io",
- "blocking",
- "futures-lite",
 ]
 
 [[package]]
@@ -8557,34 +8519,6 @@ dependencies = [
  "uucore 0.12.0",
  "uucore 0.13.0",
  "uucore 0.2.2",
-]
-
-[[package]]
-name = "bunos-wsl"
-version = "1.4.7"
-dependencies = [
- "bunos-wsl-core",
- "chrono",
- "configparser",
- "flate2",
- "futures-util",
- "hex",
- "jsonc-parser",
- "lazy_static",
- "log",
- "regex",
- "reqwest 0.13.5",
- "ruzstd 0.9.1",
- "serde",
- "serde_json",
- "sha2 0.11.1",
- "shell-escape",
- "tar",
- "tempfile",
- "thiserror 2.0.21",
- "tokio",
- "winreg 0.56.0",
- "wiremock",
 ]
 
 [[package]]
@@ -22259,12 +22193,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "jsonc-parser"
-version = "0.34.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ecded084f9b9a718d39668a42657c32253663d1f6afb3fbb9134f0305f73f48"
-
-[[package]]
 name = "jsonptr"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -34320,12 +34248,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "de1c6cdf07f3a4b1900680728ac1a12f72aa6424f37138f9253116461576e00f"
 
 [[package]]
-name = "shell-escape"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45bb67a18fa91266cc7807181f62f9178a6873bfad7dc788c42e6430db40184f"
-
-[[package]]
 name = "shell-words"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -45101,16 +45023,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "winreg"
-version = "0.56.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d6f32a0ff4a9f6f01231eb2059cc85479330739333e0e58cadf03b6af2cca10"
-dependencies = [
- "cfg-if 1.0.5",
- "windows-sys 0.61.2",
-]
-
-[[package]]
 name = "winresource"
 version = "0.1.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -45165,29 +45077,6 @@ dependencies = [
  "thiserror 1.0.69",
  "widestring 0.4.3",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "wiremock"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08db1edfb05d9b3c1542e521aea074442088292f00b5f28e435c714a98f85031"
-dependencies = [
- "assert-json-diff",
- "base64 0.22.1",
- "deadpool",
- "futures",
- "http",
- "http-body-util",
- "hyper",
- "hyper-util",
- "log",
- "once_cell",
- "regex",
- "serde",
- "serde_json",
- "tokio",
- "url",
 ]
 
 [[package]]

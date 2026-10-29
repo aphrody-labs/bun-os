@@ -154,7 +154,6 @@ export interface OpenOptions {
   flushDelayMs?: number;
 }
 
-
 /** Load the module, restore the file system from the store and start autosaving. */
 export async function openWebOs(options: OpenOptions = {}): Promise<WebOs> {
   await init(options.wasm === undefined ? undefined : { module_or_path: options.wasm });

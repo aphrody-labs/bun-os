@@ -24,7 +24,15 @@
     },
     "rust-workspace": {
       "description": "Cargo workspace members and the path dependencies they reference (crates, pdfcraft, bun-tauri, cubeb-rs).",
-      "paths": ["cloud", "crates", "tools", "apps", "packages/bun-tauri", "packages/bun-windows-winclean", "vendor/uutils"],
+      "paths": [
+        "cloud",
+        "crates",
+        "tools",
+        "apps",
+        "packages/bun-tauri",
+        "packages/bun-windows-winclean",
+        "vendor/uutils"
+      ],
       "submodules": [
         "crates/*",
         "vendor/cubeb-rs",

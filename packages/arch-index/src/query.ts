@@ -391,8 +391,7 @@ export function lineDiff(a: string, b: string): string[] {
     if (x[i] === y[j]) {
       i++;
       j++;
-    }
-    else if (lcs[i + 1]![j]! >= lcs[i]![j + 1]!) out.push(`-${x[i++]}`);
+    } else if (lcs[i + 1]![j]! >= lcs[i]![j + 1]!) out.push(`-${x[i++]}`);
     else out.push(`+${y[j++]}`);
   }
   while (i < n) out.push(`-${x[i++]}`);
