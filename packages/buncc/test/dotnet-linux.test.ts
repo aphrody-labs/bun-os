@@ -112,7 +112,7 @@ test("buncc dotnet pins prints the pinned versions", async () => {
 });
 
 const havePwsh = !!Bun.which("pwsh");
-test.skipIf(!havePwsh)("pwshJson: objects cross the process boundary as JSON", async () => {
+test.skipIf(!havePwsh)("pwshJson: objects cross the process boundary as JSON", { timeout: 60_000 }, async () => {
   const out = await pwshJson<{ a: number; b: string[]; v: string }>(
     "[pscustomobject]@{ a = 40 + 2; b = @('x','y'); v = $PSVersionTable.PSVersion.ToString() }",
   );

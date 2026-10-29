@@ -21,15 +21,15 @@ try {
   await page.goto(`http://localhost:${server.port}/`);
   await page.waitForFunction(() => customElements.get("fluent-button") && customElements.get("fluent-dialog"));
   const r = await page.evaluate(async () => {
-    const dlg = document.querySelector("#dlg") as unknown as { open?: boolean; show(): void };
+    const dlg = document.querySelector("#dlg") as unknown as { dialog: HTMLDialogElement };
     document.querySelector<HTMLElement>("#open")!.click();
-    await new Promise(r => setTimeout(r, 300));
+    for (let i = 0; i < 40 && !dlg.dialog.open; i++) await new Promise(r => setTimeout(r, 50));
     return {
       button: !!customElements.get("fluent-button"),
       text: !!customElements.get("fluent-text"),
       brand: getComputedStyle(document.documentElement).getPropertyValue("--colorBrandBackground").trim(),
       buttonFont: getComputedStyle(document.querySelector("fluent-button")!).fontFamily,
-      dialogOpen: !!dlg.open,
+      dialogOpen: dlg.dialog.open,
     };
   });
   console.log(JSON.stringify(r));

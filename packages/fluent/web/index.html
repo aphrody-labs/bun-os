@@ -12,7 +12,7 @@
   <nav aria-label="Bun OS"><fluent-text weight="semibold">Bun OS</fluent-text><fluent-button appearance="subtle" id="open">Open dialog</fluent-button></nav>
   <fluent-divider></fluent-divider>
   <main><fluent-text size="600" weight="semibold" id="title">Fluent 2 on the wasm desktop</fluent-text></main>
-  <fluent-dialog id="dlg" modal><fluent-dialog-body><span slot="title">Bun OS</span>@fluentui/web-components dialog<fluent-button slot="action" appearance="primary" onclick="this.closest('fluent-dialog').hide()">Close</fluent-button></fluent-dialog-body></fluent-dialog>
+  <fluent-dialog id="dlg" type="modal"><fluent-dialog-body><span slot="title">Bun OS</span>@fluentui/web-components dialog<fluent-button slot="action" appearance="primary" onclick="this.closest('fluent-dialog').hide()">Close</fluent-button></fluent-dialog-body></fluent-dialog>
   <script type="module" src="./shell.js"></script>
 </body>
 </html>
