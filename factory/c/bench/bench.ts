@@ -42,7 +42,7 @@ type Cfg = {
   link: (objs: string[], exe: string) => string[];
 };
 const cfgs: Cfg[] = [];
-const vs = vsEnv("x86_64");
+const vs = await vsEnv("x86_64");
 if (vs) {
   cfgs.push({
     name: "msvc cl 19.51",
@@ -97,7 +97,9 @@ if (process.platform === "linux") {
 }
 
 async function exec(cmd: string[], env: Record<string, string> | undefined, cwd: string) {
-  const p = Bun.spawn(cmd, {
+  const searchPath = env ? (env.Path ?? env.PATH) : undefined;
+  const exe = searchPath ? (Bun.which(cmd[0]!, { PATH: searchPath }) ?? cmd[0]!) : cmd[0]!;
+  const p = Bun.spawn([exe, ...cmd.slice(1)], {
     cwd,
     env: env ?? (process.env as Record<string, string>),
     stdout: "pipe",
