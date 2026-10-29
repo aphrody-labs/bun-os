@@ -5,7 +5,7 @@
 The public fork is [aphrody-labs/cef-rs](https://github.com/aphrody-labs/cef-rs),
 based on [tauri-apps/cef-rs](https://github.com/tauri-apps/cef-rs).
 `vendor/cef-rs` mounts the fork as a pinned submodule (`sources.lock.json`, `dev` branch)
-with both licenses. It moved from the abandoned `aphrody-labs/bun` fork's `src/browser/cef-rs` (runtime-heavy-migration B1, legacy). The fork pin is
+with both licenses. It moved from the abandoned `aphrody-labs/bun` fork's `src/browser/cef-rs`. The fork pin is
 `b1bc46da11e9bc4aedec17d00e7d7a7b28f30f3d`; its upstream base is
 `163744c8286d5f593d89202c7807751a7898db28`. Git verifies the submodule content.
 
