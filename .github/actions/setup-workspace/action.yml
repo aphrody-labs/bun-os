@@ -24,9 +24,6 @@ runs:
       shell: bash
       run: |
         git config --global core.longpaths true
-        # rea-agents `prepare` runs `bun` through node_modules/.bin/bun, a Windows shim whose npm postinstall has not run yet
-        # ("could not create process"). The Windows job only checks Rust, so skip lifecycle scripts there.
-        echo "NPM_CONFIG_IGNORE_SCRIPTS=true" >> "$GITHUB_ENV"
         git config submodule.packages/re/third_party/unblob.update none
         # Kernel, LLVM and Wine forks are Linux-only distribution sources: their checkout alone outlasts the setup deadline on NTFS.
         for path in vendor/cachyos-linux vendor/ogc-linux vendor/linux-cachyos vendor/kernel-patches vendor/ogc-kernel-packages vendor/nvidia-kernels vendor/open-gpu-kernel-modules vendor/llvm vendor/proton vendor/proton-cachyos vendor/wine-cachyos; do
@@ -40,7 +37,15 @@ runs:
         restore-keys: bun-install-${{ runner.os }}-
     - name: Setup
       shell: bash
+      env:
+        # rea-agents runs its `prepare` script (`bun scripts/prepare.mjs`) through node_modules/.bin/bun, the npm `bun` shim,
+        # before that package's own postinstall has linked the real binary ("Bun's postinstall script was not run").
+        # The prepare script only installs git hooks, so skip lifecycle scripts and finish the bun package by hand below.
+        NPM_CONFIG_IGNORE_SCRIPTS: "true"
       run: bun run setup
+    - name: Finish the npm bun package
+      shell: bash
+      run: cd node_modules/bun && node install.js
     - name: Rust toolchain
       if: inputs.rust == 'true'
       shell: bash
