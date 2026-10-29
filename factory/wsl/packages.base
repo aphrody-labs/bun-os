@@ -21,7 +21,6 @@ inetutils
 mesa
 vulkan-dzn
 vulkan-icd-loader
-libva-mesa-driver
 mesa-utils
 wayland
 xorg-xwayland
