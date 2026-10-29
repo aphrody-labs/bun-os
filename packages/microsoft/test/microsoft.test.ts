@@ -1,4 +1,7 @@
-import { expect, test } from "bun:test";
+import { expect, setDefaultTimeout, test } from "bun:test";
+
+// every COM or PowerShell test starts pwsh, which can take several seconds on a loaded machine
+setDefaultTimeout(60_000);
 import { existsSync } from "node:fs";
 import { isPackagedAumid, listStartApps } from "../src/apps.ts";
 import { isRegistered, officeProgIds, withCom } from "../src/com.ts";
@@ -111,3 +114,52 @@ test.skipIf(!win)("Start menu apps are listed with AUMIDs", async () => {
   expect(apps.length).toBeGreaterThan(5);
   expect(apps.some(a => a.packaged)).toBe(true);
 });
+
+import { classify, parseManifest, parseWingetList, readMsixManifest } from "../src/msix.ts";
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
+
+test("AppxManifest: packaged Win32 app versus Windows App SDK app", () => {
+  const win32 =
+    parseManifest(`<Package xmlns:rescap="r"><Identity Name="A.B" Publisher="CN=X" Version="1.0.0.0" ProcessorArchitecture="x64"/>
+    <Dependencies><TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0"/></Dependencies>
+    <Applications><Application Id="App" Executable="a.exe" EntryPoint="Windows.FullTrustApplication"/></Applications>
+    <Capabilities><rescap:Capability Name="runFullTrust"/><Capability Name="internetClient"/></Capabilities></Package>`);
+  expect(win32).toMatchObject({
+    name: "A.B",
+    architecture: "x64",
+    minVersion: "10.0.19041.0",
+    restrictedCapabilities: ["runFullTrust"],
+    capabilities: ["internetClient"],
+  });
+  expect(classify(win32).kind).toBe("win32-packaged");
+  const sdk = { ...win32, dependencies: ["Microsoft.WindowsAppRuntime.1.8"] };
+  expect(classify(sdk)).toMatchObject({ kind: "winui-or-appsdk-dependent", wineCoverageApplies: false });
+});
+
+test("winget list table is parsed by header column offsets", () => {
+  const rows = parseWingetList(`Name                    Id                       Version
+-------------------------------------------------------
+Windows Terminal        Microsoft.WindowsTerminal 1.24.12741.0
+Git                     Git.Git                  2.51.0`);
+  expect(rows.map(r => r.id)).toEqual(["Microsoft.WindowsTerminal", "Git.Git"]);
+  expect(rows[0]!.name).toBe("Windows Terminal");
+});
+
+const msixDir = join(import.meta.dir, "..", "..", "fluent", "out", "msix");
+const builtMsix = (() => {
+  try {
+    return readdirSync(msixDir).find(f => f.endsWith(".msix"));
+  } catch {
+    return undefined;
+  }
+})();
+test.skipIf(!win || !builtMsix)(
+  "the MSIX built by buncc package msix is a packaged Win32 WinUI app (read back from the zip)",
+  async () => {
+    const m = await readMsixManifest(join(msixDir, builtMsix!));
+    expect(m).toMatchObject({ name: "BunOs.Fluent", architecture: "x64", publisher: "CN=BunOsLocalTest" });
+    expect(m.apps[0]).toMatchObject({ executable: "FluentApp.exe", entryPoint: "Windows.FullTrustApplication" });
+    expect(classify(m).kind).toBe("win32-packaged");
+  },
+);

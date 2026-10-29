@@ -102,3 +102,16 @@ This is an upper bound on API availability, not a statement that a program runs:
 
 The owner stated in chat that all licences are accepted. Used in this change: Windows App SDK, Microsoft.Windows.SDK.BuildTools and the .NET
 ILCompiler through NuGet (nuget.org terms, packages restored by `dotnet build`), `@fluentui/*` (MIT). Nothing needed an interactive acceptance.
+
+## MSIX, winget and manifest analysis (measured 2026-10-29)
+
+- `bun packages/fluent/src/package-msix.ts` stages the app, generates the tile assets, runs `buncc package msix` (`makeappx` from
+  Microsoft.Windows.SDK.BuildTools 10.0.26100.4654) and signs the package with a throw-away local certificate (`CN=BunOsLocalTest`, created in
+  `CurrentUser\My`, exported to a temp PFX, both deleted afterwards; nothing committed, nothing added to a trust store).
+  Result: `BunOs.Fluent-1.4.7.0.msix`, 96 533 186 bytes, "Package creation succeeded", signature present with subject `CN=BunOsLocalTest`,
+  `Get-AuthenticodeSignature` status `UnknownError` (untrusted root, as expected). The package was **not installed**: that would need the test
+  certificate in a trust store. Store submission and production signing are not done.
+- `packages/microsoft/src/msix.ts` parses `AppxManifest.xml` (from an installed package or read back out of the `.msix` zip) and classifies it:
+  `win32-packaged` (Wine import coverage applies), `winui-or-appsdk-dependent` and `uwp` (not covered by it). Test: the MSIX built above reads
+  back as `win32-packaged`, x64, `FluentApp.exe`, `Windows.FullTrustApplication`. `parseWingetList` parses the `winget list` table by header columns (fixture test).
+- UI Automation capture is now deterministic: `capture.ps1` polls with bounded deadlines (window, all controls in the UIA tree, a non-uniform rendered frame, the dialog text) instead of fixed sleeps; three consecutive local runs passed.

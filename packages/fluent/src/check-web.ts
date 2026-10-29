@@ -6,9 +6,10 @@ import { join } from "node:path";
 const dist = join(import.meta.dir, "..", "web", "dist");
 const server = Bun.serve({
   port: 0,
-  fetch(r) {
+  async fetch(r) {
     const p = new URL(r.url).pathname;
-    return new Response(Bun.file(join(dist, p === "/" ? "index.html" : p)));
+    const file = Bun.file(join(dist, p === "/" ? "index.html" : p));
+    return (await file.exists()) ? new Response(file) : new Response("not found", { status: 404 });
   },
 });
 const { chromium } = await import(Bun.env.PLAYWRIGHT_CORE ?? "playwright-core");
