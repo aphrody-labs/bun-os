@@ -96,6 +96,12 @@ async function smokeCheck(id: string, stage: string, log: (s: string) => void): 
   log(`smoke: ${spec.files.length} files present`);
   if (!spec.run || process.platform !== "linux") return 0;
   const lib = ["usr/lib", "usr/lib64", "usr/lib/x86_64-linux-gnu"].map(d => join(stage, d)).join(":");
+  // kwin_wayland is installed with file capabilities (cap_sys_nice); a container without them in its bounding set refuses to exec it (EPERM).
+  try {
+    Bun.spawnSync(["setcap", "-r", join(stage, spec.run[0]!)], { stdout: "ignore", stderr: "ignore" });
+  } catch {
+    // setcap is not installed: the binary has no file capabilities to drop.
+  }
   const p = Bun.spawn([join(stage, spec.run[0]!), ...spec.run.slice(1)], {
     env: { ...process.env, LD_LIBRARY_PATH: lib },
     stdout: "pipe",

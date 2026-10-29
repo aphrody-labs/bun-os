@@ -144,7 +144,7 @@ export const SMOKE: Record<string, { files: string[]; run?: string[] }> = {
   mutter: { files: ["usr/bin/mutter", "usr/lib/libmutter-51.so.0"], run: ["usr/bin/mutter", "--version"] },
   "gnome-shell": { files: ["usr/bin/gnome-shell"], run: ["usr/bin/gnome-shell", "--version"] },
   "gnome-session": { files: ["usr/bin/gnome-session"], run: ["usr/bin/gnome-session", "--version"] },
-  "gnome-settings-daemon": { files: ["usr/lib/gnome-settings-daemon/gsd-power"] },
+  "gnome-settings-daemon": { files: ["usr/libexec/gsd-power"] },
   "gnome-control-center": { files: ["usr/bin/gnome-control-center"] },
   kwin: { files: ["usr/bin/kwin_wayland"], run: ["usr/bin/kwin_wayland", "--version"] },
   "plasma-workspace": { files: ["usr/bin/plasmashell"], run: ["usr/bin/plasmashell", "--version"] },
