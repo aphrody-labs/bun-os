@@ -2083,7 +2083,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/rea.git",
-        "pin": "987fcf07191c818ca0b62c2b75568c2355751ca6"
+        "pin": "8a3caee4f33cc448af65cac56c6c690b26d66ecf"
       },
       "registration": ["none"],
       "aot": true,
