@@ -32,5 +32,8 @@
   "devDependencies": {
     "@types/bun": "catalog:"
   },
-  "homepage": "https://github.com/aphrody-labs/bun-os/tree/os/packages/wasm"
+  "homepage": "https://github.com/aphrody-labs/bun-os/tree/os/packages/wasm",
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
 }

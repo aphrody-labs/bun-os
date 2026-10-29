@@ -27,7 +27,7 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "engines": {
-    "bun": ">=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   },
   "bin": {
     "bun-tauri-sidecar": "./bin/sidecar.ts"

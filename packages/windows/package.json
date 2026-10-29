@@ -29,10 +29,11 @@
   "scripts": {
     "build:napi": "bun src/provider.ts build",
     "build:winui": "bun -e \"import {buildHost} from './src/winui'; await buildHost()\"",
-    "test": "bun test"
+    "test": "bun test",
+    "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "engines": {
-    "bun": ">=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   },
   "repository": {
     "type": "git",

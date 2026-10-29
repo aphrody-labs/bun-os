@@ -23,6 +23,6 @@
     "three-stdlib": "catalog:"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

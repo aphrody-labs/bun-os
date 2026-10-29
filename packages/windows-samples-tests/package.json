@@ -11,5 +11,8 @@
     "templates": "bun scripts/generate-dotnet-templates.ts",
     "matrix": "bun scripts/run-matrix.ts",
     "coverage": "bun scripts/compute-coverage.ts"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

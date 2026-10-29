@@ -47,6 +47,6 @@
     "@aphrody/bun-runtime-sdk": "npm:@aphrody/bun-runtime-sdk@1.4.4"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

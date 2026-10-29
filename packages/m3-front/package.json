@@ -46,7 +46,7 @@
     "@aphrody/material-web": "catalog:"
   },
   "engines": {
-    "bun": ">=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   },
   "peerDependencies": {
     "@aphrody/material-web": "^3.3.3"
