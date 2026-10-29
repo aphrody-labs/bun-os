@@ -1,0 +1,11 @@
+{
+  "source": "https://github.com/aphrody-labs/bun (fork of https://github.com/oven-sh/bun)",
+  "repository": "https://github.com/aphrody-labs/bun.git",
+  "path": "docs/",
+  "commit": "1a3f3dc4d332bee7b1fae6dc1cc46e995c9f46bc",
+  "date": "2026-10-09",
+  "command": "bun packages/infra/workspace/src/bun-upstream-docs.ts --root .",
+  "files": {
+    "LICENSE.md": "0974fabb9ed623713466d3ca8621c44715b277d5137be9b8940fe1b9f38ef743"
+  }
+}

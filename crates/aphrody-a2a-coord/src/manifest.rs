@@ -197,7 +197,7 @@ mod tests {
     #[test]
     fn repo_manifest_parses_without_unqualified_public_endpoint() {
         let manifest: AiManifest =
-            serde_json::from_str(include_str!("../../../docs/aphrody/ai.json"))
+            serde_json::from_str(include_str!("../data/ai.json"))
                 .expect("ai.json parses");
         assert!(manifest.supported_interfaces.is_empty());
         assert!(

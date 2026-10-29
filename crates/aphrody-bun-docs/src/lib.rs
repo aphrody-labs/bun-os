@@ -11,7 +11,7 @@
 //! Root resolution ([`resolve_root`]): `APHRODY_BUN_DOCS`, the upstream checkout
 //! (`APHRODY_BUN_CHECKOUT`, else a sibling of the configured workspace), installed corpora, then a previous
 //! versioned download. When none exists, [`BunDocsSubsystem::index`] downloads `docs/` of upstream Bun
-//! at the commit pinned in `docs/reference/upstream-bun/SOURCE.json` ([`download_root`], a partial
+//! at the commit pinned in `data/SOURCE.json` ([`download_root`], a partial
 //! `git` clone, reported in `bun_docs_list`); `APHRODY_BUN_DOCS_FETCH=0` turns that into an error.
 
 use aphrody_proc::NoWindow as _;
@@ -48,8 +48,8 @@ const SPARSE_PATTERNS: [&str; 5] = [
     "!/docs/logo/",
     "/LICENSE.md",
 ];
-/// `docs/reference/upstream-bun/SOURCE.json`: the upstream commit Aphrody is pinned to.
-const PIN: &str = include_str!("../../../docs/aphrody/reference/upstream-bun/SOURCE.json");
+/// `data/SOURCE.json`: the upstream commit Aphrody is pinned to.
+const PIN: &str = include_str!("../data/SOURCE.json");
 
 /// Upstream commit pinned by `bun run docs:bun:update`.
 #[must_use]

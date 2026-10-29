@@ -1,0 +1,104 @@
+{
+  "version": "1.0.0",
+  "spec": "a2a/v1.0",
+  "id": "aphrody@aphrody-code/aphrody",
+  "schema_version": "1.0.0",
+  "kind": "agent",
+  "name": "aphrody",
+  "description": "Aphrody monorepo agent coordination; shared session and memory owners, local A2A peers.",
+  "a2a_protocol_version": "1.0",
+  "documentation_url": "https://github.com/aphrody-labs/aphrody",
+  "peer_registry": {
+    "owner": "@aphrody/workspace",
+    "path": "tools/config/a2a-peers.json",
+    "note": "Canonical monorepo peer registry; APHRODY_A2A_PEERS_FILE is an explicit override."
+  },
+  "provider": {
+    "organization": "aphrody-code",
+    "url": "https://github.com/aphrody-labs/aphrody"
+  },
+  "supported_interfaces": [],
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "extendedAgentCard": false,
+    "virtualFileSystem": true,
+    "telemetrySsh": true
+  },
+  "default_input_modes": [
+    "text/plain"
+  ],
+  "default_output_modes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "niers.vfs",
+      "name": "Niers Virtual File System",
+      "description": "Zero-copy G4 container unpacking, RAM mount, offset search, and 3D asset extraction.",
+      "tags": [
+        "niers",
+        "vfs",
+        "g4",
+        "level5"
+      ]
+    },
+    {
+      "id": "telemetry.ssh",
+      "name": "SSH Fleet Telemetry & Tuning",
+      "description": "Real-time CPU/RAM/Swap/IO monitoring, host audit, and kernel sysctl BBR tuning.",
+      "tags": [
+        "ssh",
+        "telemetry",
+        "sysctl",
+        "bbr"
+      ]
+    },
+    {
+      "id": "grok.code",
+      "name": "Grok code task",
+      "description": "Headless Grok Build for codegen, refactor, verification.",
+      "tags": [
+        "codegen",
+        "grok",
+        "json"
+      ]
+    },
+    {
+      "id": "agy.reason",
+      "name": "agy reasoning",
+      "description": "Antigravity/Gemini broad reasoning and generation.",
+      "tags": [
+        "gemini",
+        "reasoning"
+      ]
+    },
+    {
+      "id": "a2a.coord",
+      "name": "File A2A coordination",
+      "description": "JSONL mailboxes + HTTP /msg bridge compatible with a2a-protocol.org v1.0 data model.",
+      "tags": [
+        "a2a",
+        "coord",
+        "jsonl"
+      ]
+    }
+  ],
+  "coord": {
+    "mailbox_dir": ".coord",
+    "inbox_pattern": "inbox-from-<peer-short-id>.jsonl",
+    "http_bind": "127.0.0.1:8788",
+    "envelope": {
+      "v": 1,
+      "kinds": [
+        "ping",
+        "ask",
+        "fact",
+        "ack",
+        "error"
+      ]
+    }
+  },
+  "deployment_status": "local-coordination; public A2A interface remains unqualified"
+}
