@@ -19,7 +19,9 @@ name = "artcraft_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.6.2", features = [] }
+# Outside the root workspace (sqlx 0.7 <-> libsqlite3-sys clash, see root Cargo.toml): these pins repeat
+# [workspace.dependencies] exactly; bump them together (test/internal/source-lints checks it).
+tauri-build = "=3.0.0-alpha.4"
 
 [dependencies]
 toml = "1.0.7+spec-1.1.0"
@@ -75,31 +77,18 @@ reqwest = { version = "0.12.23", default-features = false, features = [
 serde = { version = "1.0.228", features = ["derive"] }
 serde_derive = "1.0.228"
 serde_json = "1.0.149"
-tauri-plugin-dialog = "2.7.1"
-tauri-plugin-log = "2.8.0"
-tauri-plugin-upload = "2.4.0"
-tauri = { version = "2.11.2", features = [
-  "unstable",
-  "devtools",
-  "protocol-asset",
-] }
+tauri-plugin-dialog = "=3.0.0-alpha.4"
+tauri-plugin-log = "=3.0.0-alpha.3"
+tauri-plugin-upload = "=3.0.0-alpha.2"
+tauri = { version = "=3.0.0-alpha.5", default-features = false, features = ["compression", "dynamic-acl", "unstable", "devtools", "protocol-asset"] }
+tauri-runtime-wry = { version = "=3.0.0-alpha.5", features = ["devtools"] }
 tempdir = "0.3.7"
 tempfile = "3.27.0"
 tokio = { version = "1.42", features = ["rt", "rt-multi-thread", "fs"] }
 tokio-util = "0.7.12"
 url = { version = "2.5.8", features = ["serde"] }
 tauri-plugin-http = { path = "../../crates/artcraft-tauri-plugin-http", package = "artcraft-tauri-plugin-http" }
-tauri-plugin-opener = "2"
+tauri-plugin-opener = "=3.0.0-alpha.3"
 
 [dev-dependencies]
 serial_test = "3.2.0"
-
-[profile.dev]
-incremental = true # Compile your binary in smaller steps.
-
-[profile.release]
-codegen-units = 1 # Allows LLVM to perform better optimization.
-lto = true # Enables link-time-optimizations.
-opt-level = 3 # `s` prioritizes small binary size. Use `3` if you prefer speed.
-panic = "abort" # Higher performance by disabling panic handlers.
-strip = true # Ensures debug symbols are removed.

@@ -30,7 +30,7 @@ All fetch operations are enabled.
 <tr>
 <td>
 
-`http:allow-fetch`
+`artcraft-tauri-plugin-http:allow-fetch`
 
 </td>
 <td>
@@ -43,7 +43,7 @@ Enables the fetch command without any pre-configured scope.
 <tr>
 <td>
 
-`http:deny-fetch`
+`artcraft-tauri-plugin-http:deny-fetch`
 
 </td>
 <td>
@@ -56,7 +56,7 @@ Denies the fetch command without any pre-configured scope.
 <tr>
 <td>
 
-`http:allow-fetch-cancel`
+`artcraft-tauri-plugin-http:allow-fetch-cancel`
 
 </td>
 <td>
@@ -69,7 +69,7 @@ Enables the fetch_cancel command without any pre-configured scope.
 <tr>
 <td>
 
-`http:deny-fetch-cancel`
+`artcraft-tauri-plugin-http:deny-fetch-cancel`
 
 </td>
 <td>
@@ -82,7 +82,7 @@ Denies the fetch_cancel command without any pre-configured scope.
 <tr>
 <td>
 
-`http:allow-fetch-read-body`
+`artcraft-tauri-plugin-http:allow-fetch-read-body`
 
 </td>
 <td>
@@ -95,7 +95,7 @@ Enables the fetch_read_body command without any pre-configured scope.
 <tr>
 <td>
 
-`http:deny-fetch-read-body`
+`artcraft-tauri-plugin-http:deny-fetch-read-body`
 
 </td>
 <td>
@@ -108,7 +108,7 @@ Denies the fetch_read_body command without any pre-configured scope.
 <tr>
 <td>
 
-`http:allow-fetch-send`
+`artcraft-tauri-plugin-http:allow-fetch-send`
 
 </td>
 <td>
@@ -121,7 +121,7 @@ Enables the fetch_send command without any pre-configured scope.
 <tr>
 <td>
 
-`http:deny-fetch-send`
+`artcraft-tauri-plugin-http:deny-fetch-send`
 
 </td>
 <td>

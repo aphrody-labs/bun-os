@@ -23,7 +23,6 @@
     "undeclared-deps.ts",
     "m3.config.ts",
     "../assets/types.d.ts",
-    "../bun-tauri/js/api/global.d.ts",
     "../drive-client/src/tiny-invariant.d.ts"
   ],
   "exclude": ["src/**/*.test.ts"]

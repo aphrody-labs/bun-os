@@ -9,15 +9,21 @@
     "native:dev": "bun native.ts dev",
     "native:build": "bun native.ts build",
     "desktop:dev": "bun native.ts dev",
-    "desktop:build": "bun native.ts build"
+    "desktop:build": "bun native.ts build",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@aphrody/bun-video-project": "workspace:*",
     "@aphrody/bun-workspace": "workspace:*",
     "@aphrody/m3-tokens": "workspace:*",
-    "@aphrody/tauri": "workspace:*"
+    "@aphrody/tauri": "workspace:*",
+    "@tauri-apps/api": "catalog:",
+    "@aphrody/tauri-theme": "workspace:*"
   },
   "engines": {
     "bun": "1.4.4"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "catalog:"
   }
 }

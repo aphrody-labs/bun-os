@@ -74,7 +74,7 @@ tokio = { version = "1.50.0", features = [
 url = { version = "2.5.8", features = ["serde"] }
 uuid = { version = "1.22.0", features = ["v4"] }
 arboard = { version = "3", default-features = false, features = ["image-data"] }
-wry = "0.55"
+wry = { workspace = true }
 
 [dev-dependencies]
 egui_kittest = "0.36"

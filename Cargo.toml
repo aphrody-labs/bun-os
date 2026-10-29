@@ -1,6 +1,7 @@
 [workspace]
-# apps/aphrody-app stays excluded: cef-dll-sys needs the native CEF CMake toolchain (CMake project() fails here), not available in the Rust-only gates.
-exclude = ["apps/aphrody-app", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "packages/bun-tauri", "apps/aphrody-model-view", "apps/aphrody-drive", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "apps/artcraft", "crates/artcraft-tauri-plugin-http", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
+# apps/artcraft + crates/sqlite_tasks: sqlx 0.7 (libsqlite3-sys 0.27; sqlx 0.9 caps <0.38) cannot share a lock with rookie-cookies (=libsqlite3-sys 0.38.2); artcraft repeats the exact Tauri pins of [workspace.dependencies].
+# apps/aphrody-drive is the nested FSL Spacedrive workspace. Tauri apps are members: the CEF runtime (cef-dll-sys, needs CMake) is an opt-in `cef` feature, wry is the default runtime.
+exclude = ["apps/aphrody-drive", "apps/artcraft", "crates/sqlite_tasks", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
 resolver = "3"
 members = [
   "crates/aphrody",
@@ -80,6 +81,12 @@ members = [
   "crates/aphrody-capture",
   "crates/aphrody-terminal-backend",
   "crates/aphrody-shell-tauri",
+  "crates/tauri-plugin-aphrody",
+  "crates/tauri-plugin-mcp-bridge",
+  "crates/artcraft-tauri-plugin-http",
+  "apps/desktop/src-tauri",
+  "apps/aphrody-app",
+  "apps/aphrody-model-view",
   "crates/aphrody-nu",
   "crates/aphrody-term",
   "crates/aphrody-toolchains",
@@ -893,6 +900,8 @@ sha2 = { version = "0.11.1", default-features = false }
 similar = { version = "3.2.0", default-features = false }
 taffy = { version = "0.9.2" }
 tempfile = { version = "3.27.0", default-features = false, features = ["getrandom"] }
+open = { version = "5.4.3" }
+dunce = "1.0.5"
 thiserror = { version = "2.0.21", default-features = false }
 tiny-skia = { version = "0.11.4", default-features = false, features = ["std", "simd", "png-format"] }
 toml = { version = "1.1.8+spec-1.1.0", default-features = false }
@@ -1371,9 +1380,41 @@ input_common = { path = "crates/ruzu-input-common", version = "1.4.7" }
 video_core = { path = "crates/ruzu-video-core", version = "1.4.7" }
 frontend_common = { path = "crates/ruzu-frontend-common", version = "1.4.7" }
 shader_recompiler = { path = "crates/ruzu-shader-recompiler", version = "1.4.7" }
-tauri = { package = "aphrody-tauri", path = "packages/bun-tauri/crates/aphrody-tauri", version = "1.4.7", default-features = false }
-tauri-build = { package = "aphrody-tauri-build", path = "packages/bun-tauri/crates/aphrody-tauri-build", version = "1.4.7" }
-tauri-plugin = { package = "aphrody-tauri-plugin", path = "packages/bun-tauri/crates/aphrody-tauri-plugin", version = "1.4.7" }
+# One Tauri line for the whole monorepo: upstream tauri-apps/tauri v3 alpha from crates.io (the aphrody-labs/tauri fork carries no patch).
+# Members consume these with `workspace = true` and only add features; bump here and nowhere else.
+tauri = { version = "=3.0.0-alpha.5", default-features = false }
+tauri-build = { version = "=3.0.0-alpha.4" }
+tauri-plugin = { version = "=3.0.0-alpha.4" }
+tauri-utils = { version = "=3.0.0-alpha.4" }
+tauri-runtime = { version = "=3.0.0-alpha.4" }
+tauri-runtime-wry = { version = "=3.0.0-alpha.5" }
+tauri-runtime-cef = { version = "=3.0.0-alpha.6" }
+tauri-cli = { version = "=3.0.0-alpha.5" }
+create-tauri-app = { version = "=4.8.0" }
+wry = { version = "0.57.1" }
+tao = { version = "0.37.2" }
+tray-icon = { version = "0.26.1" }
+webview2-com = { version = "0.39.1" }
+tauri-plugin-autostart = { version = "=3.0.0-alpha.3" }
+tauri-plugin-clipboard-manager = { version = "=3.0.0-alpha.3" }
+tauri-plugin-deep-link = { version = "=3.0.0-alpha.3" }
+tauri-plugin-dialog = { version = "=3.0.0-alpha.4" }
+tauri-plugin-fs = { version = "=3.0.0-alpha.3" }
+tauri-plugin-global-shortcut = { version = "=3.0.0-alpha.3" }
+tauri-plugin-http = { version = "=3.0.0-alpha.3" }
+tauri-plugin-log = { version = "=3.0.0-alpha.3" }
+tauri-plugin-notification = { version = "=3.0.0-alpha.3" }
+tauri-plugin-opener = { version = "=3.0.0-alpha.3" }
+tauri-plugin-os = { version = "=3.0.0-alpha.3" }
+tauri-plugin-process = { version = "=3.0.0-alpha.3" }
+tauri-plugin-shell = { version = "=3.0.0-alpha.3" }
+tauri-plugin-single-instance = { version = "=3.0.0-alpha.3" }
+tauri-plugin-store = { version = "=3.0.0-alpha.3" }
+tauri-plugin-updater = { version = "=3.0.0-alpha.3" }
+tauri-plugin-upload = { version = "=3.0.0-alpha.2" }
+tauri-plugin-window-state = { version = "=3.0.0-alpha.2" }
+tauri-plugin-mcp-bridge = { path = "crates/tauri-plugin-mcp-bridge", version = "1.4.7" }
+tauri-plugin-aphrody = { path = "crates/tauri-plugin-aphrody", version = "1.4.7", default-features = false }
 aphrody-render = { path = "crates/aphrody-render", version = "1.4.7" }
 aphrody-m3-tokens = { path = "crates/aphrody-m3-tokens", version = "1.4.7" }
 cubeb = "0.34"

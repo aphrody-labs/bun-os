@@ -15,8 +15,8 @@ use tauri::{
     AppHandle, Manager, PhysicalPosition, PhysicalSize, Position, Size, WebviewUrl,
     WebviewWindowBuilder, image::Image,
 };
-use tauri_plugin_aphrody::clipboard_manager::ClipboardExt;
-use tauri_plugin_aphrody::notification::NotificationExt;
+use tauri_plugin_clipboard_manager::ClipboardExt;
+use tauri_plugin_notification::NotificationExt;
 
 fn adaptive_title(url: &tauri::Url, label: &str) -> String {
     let host = url.host_str().unwrap_or(label);

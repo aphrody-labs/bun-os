@@ -1,4 +1,4 @@
-import { invoke } from "../api/core";
+import { invoke } from "@tauri-apps/api/core";
 
 export interface WindowInfo {
   width: number;

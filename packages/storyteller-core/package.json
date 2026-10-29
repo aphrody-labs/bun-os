@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "howler": "^2.2.4",
-    "@tauri-apps/plugin-http": "catalog:"
+    "@artcraft/plugin-http": "workspace:*"
   },
   "scripts": {
     "typecheck": "bun check -p tsconfig.json --threads=2 --no-pretty",

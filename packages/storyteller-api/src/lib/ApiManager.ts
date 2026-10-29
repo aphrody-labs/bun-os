@@ -1,7 +1,7 @@
 // import { bool } from "@techstark/opencv-js";
 import { StorytellerApiHostStore } from "./config/StorytellerApiHostStore.js";
 import { API_TARGETS } from "./enums/Api.js";
-//import { fetch } from '@tauri-apps/plugin-http'
+//import { fetch } from '@artcraft/plugin-http'
 import { FetchProxy as fetch } from "@storyteller/tauri-utils";
 
 const SESSION_STORAGE_KEY = "artcraft_signed_session";

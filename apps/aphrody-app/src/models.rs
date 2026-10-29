@@ -45,7 +45,7 @@ const PREFERENCES_STORE: &str = "preferences.json";
 /// Nothing exports it through the process environment.
 #[must_use]
 pub fn stored_models_dir(app: &AppHandle) -> Option<String> {
-    use tauri_plugin_aphrody::store::StoreExt as _;
+    use tauri_plugin_store::StoreExt as _;
     let preferences = app.store(PREFERENCES_STORE).ok()?.get("preferences")?;
     let dir = preferences.get("modelsDir")?.as_str()?.trim();
     (!dir.is_empty()).then(|| dir.to_owned())

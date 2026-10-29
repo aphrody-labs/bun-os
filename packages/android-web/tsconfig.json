@@ -7,5 +7,5 @@
     "types": ["bun"],
     "noEmit": true
   },
-  "include": ["src", "scripts", "tests", "../../node_modules/@aphrody/tauri/js/api/global.d.ts"]
+  "include": ["src", "scripts", "tests"]
 }

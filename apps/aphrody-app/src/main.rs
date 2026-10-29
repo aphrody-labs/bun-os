@@ -8,8 +8,9 @@
 //! SDK contract (`aphrody_app_lib::runtime_host`), also answered before any window exists;
 //! `--showcase` opens the M3 showcase window next to the desktop.
 //!
-//! The one desktop runtime is CEF: this executable is also its own renderer, GPU, network and utility
-//! process, so `#[cef_entry_point]` hands every `--type=` child to Chromium before anything else runs.
+//! The default runtime is the system webview (wry). With the `cef` feature this executable is also its own
+//! CEF renderer, GPU, network and utility process, so `#[cef_entry_point]` hands every `--type=` child to
+//! Chromium before anything else runs.
 
 // Hide the console window on Windows release builds (kept in debug so log output shows).
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
@@ -21,7 +22,7 @@ use aphrody_app_lib::runtime_host;
 #[global_allocator]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
-#[tauri_runtime_cef::cef_entry_point]
+#[cfg_attr(feature = "cef", tauri_runtime_cef::cef_entry_point)]
 fn main() -> ExitCode {
     if let Some(code) = aphrody_app_lib::llama_daemon::run_if_requested(std::env::args_os()) {
         return code;

@@ -1,0 +1,25 @@
+{
+  "name": "@aphrody/tauri-theme",
+  "version": "1.4.7",
+  "description": "Native window effects (Mica, Acrylic, vibrancy, transparency) for the three Aphrody themes in every Tauri app",
+  "license": "Apache-2.0 OR MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./boot": "./src/boot.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@tauri-apps/api": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  },
+  "bin": {
+    "aphrody-theme-stage": "./bin/stage.ts"
+  }
+}

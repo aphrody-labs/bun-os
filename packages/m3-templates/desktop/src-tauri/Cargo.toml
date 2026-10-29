@@ -9,13 +9,14 @@ publish = false
 name = "__IDENT___desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
-# Tauri comes from the Aphrody forks of the yolo checkout (package aphrody-*, upstream dependency keys).
+# Upstream Tauri 3 from crates.io (the same pins as the bun-os workspace.dependencies).
 [build-dependencies]
-tauri-build = { package = "aphrody-tauri-build", path = "__YOLO__/crates/aphrody-tauri-build", version = "3.0.0-alpha" }
+tauri-build = "=3.0.0-alpha.4"
 
 [dependencies]
-tauri = { package = "aphrody-tauri", path = "__YOLO__/crates/aphrody-tauri", version = "3.0.0-alpha" }
-tauri-plugin-opener = { package = "aphrody-tauri-plugin-opener", path = "__YOLO__/crates/aphrody-tauri-plugin-opener", version = "3.0.0-alpha" }
+tauri = { version = "=3.0.0-alpha.5", default-features = false, features = ["compression", "dynamic-acl"] }
+tauri-runtime-wry = "=3.0.0-alpha.5"
+tauri-plugin-opener = "=3.0.0-alpha.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

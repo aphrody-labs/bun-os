@@ -1,0 +1,68 @@
+[package]
+name = "tauri-plugin-aphrody"
+version = "1.4.7"
+description = "Upstream Bun as a first-class backend runtime for Tauri 3 apps (sidecar, IPC bridge), plus the wrap and MCP debug bridge modules. Official plugins come from tauri-plugin-* crates."
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license = "Apache-2.0 OR MIT"
+authors.workspace = true
+links = "tauri-plugin-aphrody"
+build = "build.rs"
+include = ["build.rs", "build/**", "src/**", "permissions/**", "iife/**", "LICENSE*", "SECURITY.md"]
+
+[lib]
+name = "tauri_plugin_aphrody"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = []
+wrap = ["dep:open"]
+wrap-bundle = ["wrap", "dep:axum", "dep:http", "dep:reqwest", "reqwest/rustls-no-provider", "dep:rustls", "dep:tokio"]
+wrap-debug-bridge = ["wrap", "dep:tauri-plugin-mcp-bridge", "dep:uuid"]
+# Mock runtime of `tauri::test`, used by the e2e suite (tests/).
+test = ["tauri/test"]
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+schemars = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+
+[dependencies]
+tauri = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true, features = ["kv"] }
+url = { workspace = true }
+open = { workspace = true, optional = true, features = ["shellexecute-on-windows"] }
+tokio = { workspace = true, optional = true, features = ["net", "rt", "macros", "time"] }
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "stream"], optional = true }
+rustls = { workspace = true, optional = true, features = ["ring", "std"] }
+http = { workspace = true, optional = true }
+axum = { workspace = true, optional = true, features = ["tokio", "http1", "http2"] }
+tauri-plugin-mcp-bridge = { workspace = true, optional = true }
+uuid = { workspace = true, optional = true, features = ["v4"] }
+
+[dev-dependencies]
+tauri = { workspace = true, features = ["test", "dynamic-acl"] }
+tauri-utils = { workspace = true, features = ["build"] }
+tempfile = { workspace = true }
+toml = { workspace = true }
+dunce = { workspace = true }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"
+non_ascii_idents = "deny"
+
+[lints.clippy]
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+correctness = { level = "warn", priority = -1 }
+perf = { level = "warn", priority = -1 }
