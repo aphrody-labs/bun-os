@@ -632,8 +632,7 @@ fn open_file(path: &str) -> Result<(), String> {
 /// `packaging/linux/ai.storyteller.vectorcraft.desktop` so Wayland docks find the launcher icon.
 fn app_icon() -> egui::IconData {
     #[cfg(target_os = "macos")]
-    let png: &[u8] =
-        vectorcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
+    let png: &[u8] = vectorcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
     #[cfg(not(target_os = "macos"))]
     let png: &[u8] = vectorcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
     eframe::icon_data::from_png_bytes(png).unwrap_or_default()

@@ -1,9 +1,9 @@
 //! Shared widgets in Illustrator's panel style. Colours come from theme tokens.
 
+use craft_ui::buttons::{ButtonVisuals, IconButton, IconButtonStyle};
 use egui::{
     Color32, CornerRadius, Pos2, Rect, Response, Sense, Stroke, StrokeKind, Ui, Vec2, pos2, vec2,
 };
-use craft_ui::buttons::{ButtonVisuals, IconButton, IconButtonStyle};
 use vectorcraft_color::{BlendMode, Color, Paint};
 use vectorcraft_doc::Unit;
 
