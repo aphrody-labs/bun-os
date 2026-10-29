@@ -28,7 +28,11 @@ export async function editorApp(root: HTMLElement, path: string, text: string) {
       extensions: [
         basicSetup,
         languageFor(path),
-        keymap.of([{ key: "Mod-s", preventDefault: true, run: () => (void save(), true) }]),
+        keymap.of([{ key: "Mod-s", preventDefault: true, run: () => {
+              void save();
+              return true;
+            },
+          }]),
         EditorView.updateListener.of(update => {
           if (update.docChanged) status.textContent = `${path} · modified`;
         }),

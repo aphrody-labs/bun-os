@@ -35,10 +35,10 @@ class MemFs {
     this.nodes.set(path, null);
   }
   remove(path: string) {
-    for (const p of [...this.nodes.keys()]) if (p === path || p.startsWith(`${path}/`)) this.nodes.delete(p);
+    for (const p of this.nodes.keys()) if (p === path || p.startsWith(`${path}/`)) this.nodes.delete(p);
   }
   rename(from: string, to: string) {
-    for (const [p, n] of [...this.nodes]) {
+    for (const [p, n] of this.nodes) {
       if (p === from || p.startsWith(`${from}/`)) {
         this.nodes.delete(p);
         this.nodes.set(to + p.slice(from.length), n);
