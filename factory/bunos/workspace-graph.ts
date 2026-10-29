@@ -308,3 +308,83 @@ export async function buildGraph(root: string, manifest: any, integration: Integ
     nodes: nodeModules.length,
   };
 }
+
+/** External crates that cannot target wasm32-unknown-unknown (OS services, native TLS, C builds, thread runtimes). Merged from the former scripts/workspace-explore.ts. */
+export const NATIVE_ONLY_CRATES = new Set([
+  "tokio-uring",
+  "mio",
+  "libc",
+  "nix",
+  "windows",
+  "windows-sys",
+  "winapi",
+  "zbus",
+  "dbus",
+  "aws-lc-sys",
+  "aws-lc-rs",
+  "openssl",
+  "openssl-sys",
+  "ring-native",
+  "cpal",
+  "alsa",
+  "libpulse-binding",
+  "rusb",
+  "hidapi",
+  "portable-pty",
+  "notify",
+  "rusqlite-bundled",
+  "libloading",
+  "core-foundation",
+  "objc2",
+  "cocoa",
+  "gtk",
+  "gtk4",
+  "wayland-client",
+  "x11rb",
+  "xcb",
+  "smithay",
+  "ash",
+  "vulkano",
+  "cuda",
+  "cudarc",
+  "wgpu-hal-native",
+  "rdkafka",
+  "libgit2-sys",
+  "git2",
+  "tauri",
+  "tao",
+  "wry",
+  "pyo3",
+  "napi",
+  "mlua",
+  "v8",
+  "rquickjs",
+  "reqwest-native",
+  "ffmpeg-next",
+  "ffmpeg-sys-next",
+  "bindgen",
+  "cc-native",
+  "rustix-native",
+  "async-process",
+  "async-io-native",
+  "tun",
+  "pcap",
+]);
+
+/**
+ * Native-only external crates reachable below `start` (manifest heuristic, unqualified): an empty result means the crate
+ * can plausibly build for wasm32. `internal` maps a workspace crate to its workspace dependencies, `external` to the
+ * names of its external dependencies.
+ */
+export function nativeBelow(start: string, internal: Map<string, string[]>, external: Map<string, string[]>): string[] {
+  const seen = new Set<string>();
+  const found = new Set<string>();
+  const visit = (name: string) => {
+    if (seen.has(name)) return;
+    seen.add(name);
+    for (const dep of external.get(name) ?? []) if (NATIVE_ONLY_CRATES.has(dep)) found.add(dep);
+    for (const dep of internal.get(name) ?? []) visit(dep);
+  };
+  visit(start);
+  return [...found].sort();
+}
