@@ -3,7 +3,7 @@
 // with excerpts from the content index placed in the prompt.
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test";
 import { openAiCompatible } from "./backend";
-import { installAssistant, type AssistantHandle } from "./overlay";
+import { installAssistant, openOnShake, type AssistantHandle } from "./overlay";
 
 let server: ReturnType<typeof Bun.serve>;
 let base: string;
@@ -120,5 +120,21 @@ describe("assistant overlay", () => {
     const answer = document.querySelector<HTMLElement>(".assist-out")!;
     await until(() => answer.dataset.state === "error");
     expect(answer.textContent).toContain("API key");
+  });
+});
+
+describe("compositor shake source", () => {
+  test("a shake recognised by the wasmos compositor opens the assistant at the pointer", async () => {
+    const { Compositor } = await import("../../../../packages/wasmos/src/compositor.ts");
+    const { ShakeDetector } = await import("./shake");
+    const compositor = new Compositor({ init() {} } as never, 1280, 720);
+    compositor.useShakeGesture(new ShakeDetector());
+    make();
+    const off = openOnShake(handle!, compositor);
+    for (let ms = 0; ms <= 700; ms += 16)
+      compositor.pointerMove(400 + 70 * Math.sin((2 * Math.PI * 7 * ms) / 1000), 300, 1000 + ms);
+    expect(handle!.isOpen).toBe(true);
+    expect(document.querySelector(".assist")).not.toBeNull();
+    off();
   });
 });

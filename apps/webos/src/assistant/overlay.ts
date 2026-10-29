@@ -121,3 +121,13 @@ export function installAssistant(deps: AssistantDeps): AssistantHandle {
     },
   };
 }
+
+/** Anything that reports shakes of the pointer, such as the wasmos compositor's `onShake` (packages/wasmos). */
+export interface ShakeSource {
+  onShake(listener: (at: { x: number; y: number }) => void): () => void;
+}
+
+/** Open the assistant where a compositor-recognised shake happened (pointer over a client surface). */
+export function openOnShake(handle: AssistantHandle, source: ShakeSource): () => void {
+  return source.onShake(at => handle.open(at));
+}
