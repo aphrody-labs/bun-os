@@ -47,7 +47,9 @@
   "noBunSetup": {
     "wsl-kernel.yml": "builds the WSL kernel on an ubuntu runner with the distribution toolchain; no Bun step",
     "wsl-rootfs.yml": "builds the rootfs inside an archlinux:base-devel container; Bun is bootstrapped inside the chroot by build-rootfs.sh",
-    "rustbase.yml": "jobs run in Arch and Ubuntu containers; the Bun step uses oven-sh/setup-bun directly (owner: rustbase, to move to the setup action)"
+    "rustbase.yml": "jobs run in Arch and Ubuntu containers; the Bun step uses oven-sh/setup-bun directly (owner: rustbase, to move to the setup action)",
+    "wasmos.yml": "jobs install the pinned Bun with npm install -g bun@BUN_VERSION (same version source as setup-bun, no integrity check) and drive Chromium; owner: wasmos, to move to the setup action",
+    "buncc-linux-desktop.yml": "jobs install the pinned Bun with npm install -g bun@BUN_VERSION on ubuntu and windows runners and build in an Arch container; owner: linux-desktop, to move to the setup action"
   },
   "entries": [
     {
@@ -242,16 +244,16 @@
     {
       "id": "wslg",
       "layer": "factory",
-      "title": "WSLg (bunos-wslg)",
+      "title": "WSLg fork (vendor/wslg: Weston, Xwayland and Hyprland stack)",
       "owner": "factory/wsl",
-      "module": null,
+      "module": "submodule:vendor/wslg",
       "entry": [],
       "docs": ["docs/WSLG.md"],
       "ci": [],
       "pins": [],
       "status": "unverified",
-      "pending": true,
-      "note": "announced by the WSLg owner (workflow bunos-wslg on the fork); not on os yet"
+      "note": "fork aphrody-labs/wslg, shallow update=none submodule; its CI (bunos-wslg.yml) lives in the fork and is not visible to this map",
+      "covers": ["vendor/wslg"]
     },
     {
       "id": "wayland",
@@ -374,31 +376,30 @@
     {
       "id": "wasmos",
       "layer": "factory",
-      "title": "wasmos (factory/wasmos, packages/wasmos)",
+      "title": "wasmos (compositor and Alpine x86_64 wasm boot under Bun)",
       "owner": "packages/wasmos",
-      "module": null,
-      "entry": [],
-      "docs": [],
-      "ci": [],
-      "pins": [],
+      "module": "factory:wasmos",
+      "entry": ["bun packages/wasmos/src/cli.ts", "bun factory/wasmos/build-alpine.ts"],
+      "docs": ["docs/WASMOS.md"],
+      "ci": ["wasmos.yml#compositor", "wasmos.yml#alpine"],
+      "pins": ["factory/wasmos/pins.json"],
       "status": "unverified",
-      "pending": true,
-      "note": "announced by the wasmos owner; nothing on os yet",
+      "note": "recipes in factory/wasmos/wasmos.just (imported by the justfile); CI result not checked by the map",
       "covers": ["factory/wasmos"]
     },
     {
       "id": "ntcore",
       "layer": "facade",
-      "title": "ntcore (packages/ntcore)",
+      "title": "ntcore (ReactOS registry hives, handle table, PE helpers compiled to wasm32)",
       "owner": "packages/ntcore",
-      "module": null,
-      "entry": [],
-      "docs": [],
+      "module": "npm:@aphrody/ntcore",
+      "entry": ["bun factory/ntcore/build.ts", "bun test packages/ntcore"],
+      "docs": ["docs/NTCORE.md"],
       "ci": [],
-      "pins": [],
+      "pins": ["factory/ntcore/sweep.json"],
       "status": "unverified",
-      "pending": true,
-      "note": "announced by the ntcore owner; nothing on os yet"
+      "note": "no CI job yet",
+      "covers": ["factory/ntcore"]
     }
   ],
   "pinExemptions": {

@@ -22256,6 +22256,20 @@
       "status": "present",
       "dependsOn": ["factory:kernel", "factory:distro/repos"],
       "note": "Arch rootfs and WSL2 kernel for WSL; docs/WSL.md; workflows wsl-rootfs.yml and wsl-kernel.yml."
+    },
+    {
+      "id": "factory:ntcore",
+      "kind": "factory-module",
+      "path": "factory/ntcore",
+      "source": {
+        "type": "factory",
+        "files": ["factory/ntcore/build.ts", "factory/ntcore/sweep.json"]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/ntcore"],
+      "note": "Build and sweep of the ReactOS-derived NT building blocks compiled to wasm32; docs/NTCORE.md."
     }
   ]
 }

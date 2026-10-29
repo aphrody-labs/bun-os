@@ -96,6 +96,7 @@
         "tools",
         "vendor/cargo",
         "vendor/microsoft",
+        "vendor/tailwindcss",
         "vendor/uutils"
       ],
       "submodules": [

@@ -135,6 +135,7 @@ for (const mod of f.components.modules)
   if (
     mod.kind === "factory-module" &&
     !entryModules.has(mod.id) &&
+    !covered(mod.path) &&
     !(mod.id.startsWith("factory:distro/") && [...entryModules].some(m => m!.startsWith("factory:distro/")))
   )
     soft(`${mod.id}: factory module without an architecture entry`);

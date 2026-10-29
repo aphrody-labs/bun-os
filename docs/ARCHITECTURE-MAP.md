@@ -13,11 +13,11 @@ buncc               | buncc, buncc-sh
                     v
 buncc providers     | buncc-providers, buncc-posix
                     v
-Platform facades    | windows, windows-posix, wasm, ntcore*
+Platform facades    | windows, windows-posix, wasm, ntcore
                     v
 Workspace tooling   | bun-workspace, components, windows-samples
                     v
-factory             | distro, kernel, wsl, wsl-kernel, wslg*, wayland, buncc-desktop, linux-desktop, c, rustbase, wasmos*
+factory             | distro, kernel, wsl, wsl-kernel, wslg, wayland, buncc-desktop, linux-desktop, c, rustbase, wasmos
                     v
 Images              | images, release, sites
 ```
@@ -50,7 +50,7 @@ Images              | images, release, sites
 | facade | **windows**: @aphrody/windows (Win32, registry, services, shell, WinRT, WinUI) (the one Windows API facade; toolchain discovery stays in buncc, not here) | `packages/windows` | `bun test packages/windows` | `docs/WINDOWS.md` | - | - | built |
 | facade | **windows-posix**: windows/posix (path translation, env and spawn across windows, msys, cygwin, wsl) (the one path-translation implementation) | `packages/windows/src/posix` | `bun test packages/windows/src/posix` | `docs/POSIX-ON-WINDOWS.md` | - | - | built |
 | facade | **wasm**: @aphrody/wasm (build, inspect, run, optimize) | `packages/wasm` | `buncc wasm`<br>`aphrody-wasm` | `packages/wasm/README.md` | - | - | built |
-| facade | **ntcore**: ntcore (packages/ntcore) (announced by the ntcore owner; nothing on os yet) | `packages/ntcore` | - | - | - | - | unverified (pending) |
+| facade | **ntcore**: ntcore (ReactOS registry hives, handle table, PE helpers compiled to wasm32) (no CI job yet) | `packages/ntcore` | `bun factory/ntcore/build.ts`<br>`bun test packages/ntcore` | `docs/NTCORE.md` | - | `factory/ntcore/sweep.json` | unverified |
 | workspace | **bun-workspace**: @aphrody/bun-workspace (cargo module runner, git at scale, source coverage) | `packages/bun-workspace` | `aphrody-bun doctor`<br>`aphrody-bun git doctor`<br>`aphrody-bun status` | `docs/MONOREPO-SCALE.md`<br>`docs/MONOREPO.md` | `ci.yml#quality` | `packages/bun-workspace/config/git-profiles.json` | built |
 | workspace | **components**: Component manifest and architecture map (check, generate, graph, consistency) | `factory/bunos` | `just components`<br>`just map`<br>`buncc doctor --repo` | `docs/ARCHITECTURE-MAP.md`<br>`docs/MONOREPO.md` | `ci.yml#quality` | `factory/bunos/components.json` | built |
 | workspace | **windows-samples**: windows-samples-tests (vendor/microsoft references across C++, C#, Rust, Bun) | `packages/windows-samples-tests` | `bun run --cwd packages/windows-samples-tests coverage` | `docs/WINDOWS-SAMPLES.md` | - | `vendor/microsoft/PINS.json` | built |
@@ -58,13 +58,13 @@ Images              | images, release, sites
 | factory | **kernel**: factory/kernel (linux-bun package, variants) (makepkg needs an Arch host; never run in CI so far) | `factory/kernel` | `just kernel`<br>`just kernel-list`<br>`just kernel-build` | `docs/KERNEL-ROADMAP.md`<br>`factory/kernel/ROADMAP.md` | - | - | unverified |
 | factory | **wsl**: factory/wsl (Arch rootfs for WSL) (Linux host only; wsl-rootfs.yml proves the rootfs checks (no kernel in the archive, no shadow hashes) when green) | `factory/wsl` | `bash factory/wsl/build-rootfs.sh` | `docs/WSL.md` | `wsl-rootfs.yml#rootfs` | - | unverified |
 | factory | **wsl-kernel**: factory/wsl/kernel (WSL2 kernel 7.3 with Rust, patch series) (Linux host only; bzImage and modules.vhdx exist only when the workflow uploads them) | `factory/wsl/kernel` | `bash factory/wsl/kernel/build-wsl-kernel.sh` | `docs/WSL.md`<br>`docs/KERNEL-ROADMAP.md` | `wsl-kernel.yml#kernel`<br>`wsl-kernel.yml#nvidia-open-build-check` | - | unverified |
-| factory | **wslg**: WSLg (bunos-wslg) (announced by the WSLg owner (workflow bunos-wslg on the fork); not on os yet) | `factory/wsl` | - | `docs/WSLG.md` | - | - | unverified (pending) |
+| factory | **wslg**: WSLg fork (vendor/wslg: Weston, Xwayland and Hyprland stack) (fork aphrody-labs/wslg, shallow update=none submodule; its CI (bunos-wslg.yml) lives in the fork and is not visible to this map) | `factory/wsl` | - | `docs/WSLG.md` | - | - | unverified |
 | factory | **wayland**: factory/wayland (Wayland, Weston, Xwayland and Hyprland closure, WSLg subset) (78 shallow update=none submodules under vendor/wayland and vendor/hyprland; closure counts are generated into docs/WAYLAND-CLOSURE.md; nothing is built from them yet) | `factory/wayland` | `bun factory/wayland/compute-closure.ts`<br>`bun factory/wayland/verify-closure.ts`<br>`bun factory/wayland/integrate.ts` | `docs/WAYLAND-CLOSURE.md` | - | `factory/wayland/closure.json` | built |
 | factory | **buncc-desktop**: buncc desktop (GNOME/GTK4, Qt6 and KDE builds on Windows) (driver in packages/buncc/src/desktop; recipes in factory/desktop) | `factory/desktop` | `buncc desktop doctor`<br>`buncc desktop plan` | `docs/BUNCC-DESKTOP.md` | `buncc-desktop.yml#plan`<br>`buncc-desktop.yml#build` | `factory/desktop/recipes.json` | unverified |
 | factory | **linux-desktop**: factory/linux-desktop (GNOME, Plasma, Qt 6 closures; buncc linux) (workflow installs Bun with npm instead of the setup action) | `factory/linux-desktop` | `buncc linux pins` | `docs/BUNCC-LINUX-DESKTOP.md` | `buncc-linux-desktop.yml#unit`<br>`buncc-linux-desktop.yml#windows-cross`<br>`buncc-linux-desktop.yml#arch-build` | `factory/linux-desktop/closure-gnome.json` | unverified |
 | factory | **c**: factory/c (Bun OS C environment: targets, sysroots, runners) (driver in packages/buncc/src/c; CI result not checked by the map) | `factory/c` | `buncc c doctor`<br>`buncc c env`<br>`buncc c targets` | `docs/BUNOS-C.md` | `bunos-c.yml#linux`<br>`bunos-c.yml#musl`<br>`bunos-c.yml#windows` | `factory/c/c-env.json` | unverified |
 | factory | **rustbase**: factory/rustbase (Rust userland: uutils, sudo-rs, nushell packages) (workflow uses oven-sh/setup-bun directly) | `factory/rustbase` | `bun factory/rustbase/check.ts` | `docs/RUSTBASE.md` | `rustbase.yml#check`<br>`rustbase.yml#packages`<br>`rustbase.yml#gnu-coreutils`<br>`rustbase.yml#util-linux-tests` | `factory/rustbase/pins.json` | unverified |
-| factory | **wasmos**: wasmos (factory/wasmos, packages/wasmos) (announced by the wasmos owner; nothing on os yet) | `packages/wasmos` | - | - | - | - | unverified (pending) |
+| factory | **wasmos**: wasmos (compositor and Alpine x86_64 wasm boot under Bun) (recipes in factory/wasmos/wasmos.just (imported by the justfile); CI result not checked by the map) | `packages/wasmos` | `bun packages/wasmos/src/cli.ts`<br>`bun factory/wasmos/build-alpine.ts` | `docs/WASMOS.md` | `wasmos.yml#compositor`<br>`wasmos.yml#alpine` | `factory/wasmos/pins.json` | unverified |
 | images | **images**: Images (factory/images, factory/arch, factory/usr) (images build on a Linux host; no image has been produced by CI) | `factory/images` | `just iso` | `docs/UNIFIED-INSTALL.md` | - | `factory/arch/sources.json` | unverified |
 | images | **release**: Release (npm, crates, binaries) | `scripts/release.ts` | `just release` | - | `release.yml#verify`<br>`ci.yml#release-plan` | - | unverified |
 | images | **sites**: Web sites (webos) | `apps/webos` | `just build-js` | - | `aphrody-sites.yml#webos` | - | ci-verified |
@@ -91,11 +91,12 @@ Microsoft references (`vendor/microsoft/PINS.json`, 14 pins): microsoft-ui-xaml 
 | --- | --- | --- | --- | --- |
 | `aphrody-sites.yml` (Aphrody Sites) | push (os; paths 6: apps/webos/**, apps/craft*/**, ...), workflow_dispatch | `webos` | sites | setup-workspace |
 | `buncc-desktop.yml` (buncc-desktop) | workflow_dispatch, pull_request (paths 3: packages/buncc/src/desktop/**, factory/desktop/**, ...), schedule | `plan`, `build` | buncc-desktop | setup-workspace |
-| `buncc-linux-desktop.yml` (buncc linux desktop (GNOME, Plasma, Qt 6)) | workflow_dispatch, push (os; paths 4: packages/buncc/src/linux-target/**, packages/buncc/test/linux-target.test.ts, ...) | `unit`, `windows-cross`, `arch-build` | linux-desktop | none |
+| `buncc-linux-desktop.yml` (buncc linux desktop (GNOME, Plasma, Qt 6)) | workflow_dispatch, push (os; paths 4: packages/buncc/src/linux-target/**, packages/buncc/test/linux-target.test.ts, ...) | `unit`, `windows-cross`, `arch-build` | linux-desktop | jobs install the pinned Bun with npm install -g bun@BUN_VERSION on ubuntu and windows runners and build in an Arch container; owner: linux-desktop, to move to the setup action |
 | `bunos-c.yml` (Bun OS C) | push (os; paths 3: factory/c/**, packages/buncc/src/c/**, ...), workflow_dispatch | `linux`, `musl`, `windows` | c | setup-workspace |
 | `ci.yml` (CI) | push (os), pull_request, workflow_dispatch | `plan`, `quality`, `rust`, `release-plan` | runtime, buncc, buncc-sh, buncc-providers, bun-workspace, components, release | setup-workspace |
 | `release.yml` (Release) | push, workflow_dispatch | `verify`, `binaries`, `npm`, `crates`, `github-release` | release | setup-workspace |
 | `rustbase.yml` (Rust userland (rustbase)) | workflow_dispatch, push (os; paths 3: factory/rustbase/**, docs/RUSTBASE.md, ...) | `check`, `packages`, `gnu-coreutils`, `util-linux-tests` | rustbase | jobs run in Arch and Ubuntu containers; the Bun step uses oven-sh/setup-bun directly (owner: rustbase, to move to the setup action) |
+| `wasmos.yml` (WASM OS) | workflow_dispatch, push (os; paths 4: packages/wasmos/**, factory/wasmos/**, ...) | `compositor`, `alpine` | wasmos | jobs install the pinned Bun with npm install -g bun@BUN_VERSION (same version source as setup-bun, no integrity check) and drive Chromium; owner: wasmos, to move to the setup action |
 | `wsl-kernel.yml` (WSL kernel (7.3 + Rust)) | workflow_dispatch, push (os; paths 2: factory/wsl/kernel/**, .github/workflows/wsl-kernel.yml) | `kernel`, `nvidia-open-build-check` | wsl-kernel | builds the WSL kernel on an ubuntu runner with the distribution toolchain; no Bun step |
 | `wsl-rootfs.yml` (WSL rootfs (Bun OS on Arch)) | workflow_dispatch, push (os; paths 2: factory/wsl/**, .github/workflows/wsl-rootfs.yml) | `rootfs` | wsl | builds the rootfs inside an archlinux:base-devel container; Bun is bootstrapped inside the chroot by build-rootfs.sh |
 

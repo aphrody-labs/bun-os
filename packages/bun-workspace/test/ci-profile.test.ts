@@ -126,3 +126,13 @@ test("the ci profile cone holds the tracked files `buncc doctor --repo` reads", 
   for (const path of ["vendor/microsoft/PINS.json", "examples/windows/d3d12-headless/rust/Cargo.toml"])
     expect({ path, covered: inCone(cone, path) }).toEqual({ path, covered: true });
 });
+
+test("every tracked Cargo.toml that factory/bunos/check-components.ts reads is inside the ci cone", async () => {
+  const file = (await Bun.file(resolve(root, "packages/bun-workspace/config/git-profiles.json")).json()) as ProfileFile;
+  const cone = conePaths(file, file.profiles.ci!, await gitlinks(root));
+  const proc = Bun.spawn(["git", "ls-files", "--", "*Cargo.toml"], { cwd: root, stdout: "pipe", stderr: "pipe" });
+  const tracked = (await new Response(proc.stdout).text()).split(/\r?\n/).filter(Boolean);
+  await proc.exited;
+  const outside = tracked.filter(f => f.includes("/") && !cone.some(c => f.startsWith(`${c}/`)));
+  expect(outside.sort()).toEqual([]);
+});
