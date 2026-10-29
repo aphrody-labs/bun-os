@@ -144,7 +144,7 @@ the WinFw link of `bun-vpn` stay in the runtime's native graph.
 | Mount | Repository | Pin | Nested pin |
 | --- | --- | --- | --- |
 | `vendor/bun-uv` | aphrody-labs/bun-uv | `c1c32fce6c2` | `vendor/uv` aphrody-labs/uv `bun-0.12.24` `c3c36e2a7b3` |
-| `vendor/bun-vpn` | aphrody-labs/bun-vpn | `aff07e14523` | `vendor/mullvad` aphrody-labs/mullvadvpn-app `bun-embedded` `9096ce027b8` |
+| `vendor/bun-vpn` | aphrody-labs/bun-vpn | `60401c1` | `vendor/mullvad` aphrody-labs/mullvadvpn-app `bun-embedded` `594657c3793` (mullvad/mullvadvpn-app main `011860c6728`, 2026-10-28; standalone, npm wrapper in `npm/`) |
 | `vendor/bun-ssh` | aphrody-labs/bun-ssh | `964aaa10632` | patched russh-sftp in-tree |
 | `vendor/bun-docker` | aphrody-labs/bun-docker | `24ac698c6c2` | path-depends on bun-ssh |
 | `vendor/bun-just` | aphrody-labs/bun-just | `23ef9ebdaaf` | `vendor/just` aphrody-labs/just `bun` `5827d90d9ec` |
