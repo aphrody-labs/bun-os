@@ -28,8 +28,9 @@
 - [`7b7c7c62`](https://github.com/tauri-apps/plugins-workspace/commit/7b7c7c62516ad263053adeb37f555e5fee2cfd98) ([#3691](https://github.com/tauri-apps/plugins-workspace/pull/3691) by [@lucasfernog](https://github.com/tauri-apps/plugins-workspace/../../lucasfernog)) Calling `Update.download()` again now releases the bytes of the previous download instead of keeping them in memory until the webview is destroyed.
 - [`4b1ba079`](https://github.com/tauri-apps/plugins-workspace/commit/4b1ba07943bda841f5f9be135ac9f1e5f504eafa) ([#3695](https://github.com/tauri-apps/plugins-workspace/pull/3695) by [@lucasfernog](https://github.com/tauri-apps/plugins-workspace/../../lucasfernog)) On Android and iOS, `Update::install` now returns `Error::UnsupportedOs` instead of reporting success without installing anything.
 - [`fce235c3`](https://github.com/tauri-apps/plugins-workspace/commit/fce235c3fbebaf4442362470d91c7b7be190caee) ([#3640](https://github.com/tauri-apps/plugins-workspace/pull/3640) by [@t8y2](https://github.com/tauri-apps/plugins-workspace/../../t8y2)) Add `Updater::restore_update` to restore an update from cached release metadata, and `Update::verify` to verify package bytes using the configured signing key and signed-version policy. Restored updates always require the signature to bind the announced version.
-    
-    `Update::install` now verifies the package bytes before installing them, and `Updater::check` resolves to `None` instead of a target error when the release is not an update and has no entry for the current target.
+
+  `Update::install` now verifies the package bytes before installing them, and `Updater::check` resolves to `None` instead of a target error when the release is not an update and has no entry for the current target.
+
 - [`d057ec47`](https://github.com/tauri-apps/plugins-workspace/commit/d057ec4736739281624e33c43758ae565737e955) ([#3694](https://github.com/tauri-apps/plugins-workspace/pull/3694) by [@lucasfernog](https://github.com/tauri-apps/plugins-workspace/../../lucasfernog)) Log a warning when the download URL of an update does not use `https` and `dangerousInsecureTransportProtocol` is not enabled.
 - [`21ebe1f5`](https://github.com/tauri-apps/plugins-workspace/commit/21ebe1f5314f4ff5a5e5d06a9bac6609728b6d25) ([#3692](https://github.com/tauri-apps/plugins-workspace/pull/3692) by [@lucasfernog](https://github.com/tauri-apps/plugins-workspace/../../lucasfernog)) On Windows, report why launching the installer failed from the `ShellExecuteW` return value (for example "Access is denied" when the user declines the UAC prompt) instead of an unrelated `GetLastError` message.
 
@@ -44,11 +45,12 @@
 ## [2.13.1]
 
 - [`ecd3273e`](https://github.com/tauri-apps/plugins-workspace/commit/ecd3273e8e4c6e9b123bf9861bf7b925cad1c679) ([#3480](https://github.com/tauri-apps/plugins-workspace/pull/3480) by [@renovate](https://github.com/tauri-apps/plugins-workspace/../../renovate)) Updated `windows-rs` dependencies:
-    
-    - deep-link: updated `windows-registry` to 0.6 and `windows-result` to 0.4. The public `Error::Windows` variant wraps `windows_result::Error`; applications using this type directly should update their `windows-result` dependency.
-    - opener: updated `windows` to 0.62. The public `Error::Win32Error` variant wraps `windows::core::Error`; applications using this type directly should update their `windows` dependency.
-    - single-instance: updated `windows-sys` to 0.61
-    - updater: updated `windows-sys` to 0.61
+
+  - deep-link: updated `windows-registry` to 0.6 and `windows-result` to 0.4. The public `Error::Windows` variant wraps `windows_result::Error`; applications using this type directly should update their `windows-result` dependency.
+  - opener: updated `windows` to 0.62. The public `Error::Win32Error` variant wraps `windows::core::Error`; applications using this type directly should update their `windows` dependency.
+  - single-instance: updated `windows-sys` to 0.61
+  - updater: updated `windows-sys` to 0.61
+
 - [`90b9869e`](https://github.com/tauri-apps/plugins-workspace/commit/90b9869e610e7453772fa0f84f3e641ff2b36f23) ([#3573](https://github.com/tauri-apps/plugins-workspace/pull/3573) by [@renovate](https://github.com/tauri-apps/plugins-workspace/../../renovate)) Updated `dirs` to v7
 - [`22e286f3`](https://github.com/tauri-apps/plugins-workspace/commit/22e286f3121f9d79f170b7092de884ee19fb2d14) ([#3501](https://github.com/tauri-apps/plugins-workspace/pull/3501) by [@renovate](https://github.com/tauri-apps/plugins-workspace/../../renovate)) Updated dependency `infer` to 0.22
 

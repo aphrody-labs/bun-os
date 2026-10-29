@@ -6,10 +6,7 @@
   "properties": {
     "version": {
       "description": "The version of the permission.",
-      "type": [
-        "integer",
-        "null"
-      ],
+      "type": ["integer", "null"],
       "format": "uint64",
       "minimum": 1
     },
@@ -19,10 +16,7 @@
     },
     "description": {
       "description": "Human-readable description of what the permission does.\nTauri internal convention is to use `<h4>` headings in markdown content\nfor Tauri documentation generation purposes.",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "commands": {
       "description": "Allowed or denied commands when using this permission.",
@@ -46,18 +40,13 @@
     },
     "platforms": {
       "description": "Target platforms this permission applies. By default all platforms are affected by this permission.",
-      "type": [
-        "array",
-        "null"
-      ],
+      "type": ["array", "null"],
       "items": {
         "$ref": "#/definitions/Target"
       }
     }
   },
-  "required": [
-    "identifier"
-  ],
+  "required": ["identifier"],
   "definitions": {
     "Commands": {
       "description": "Allowed and denied commands inside a permission.\n\nIf two commands clash inside of `allow` and `deny`, it should be denied by default.",
@@ -87,20 +76,14 @@
       "properties": {
         "allow": {
           "description": "Data that defines what is allowed by the scope.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/Value"
           }
         },
         "deny": {
           "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/Value"
           }

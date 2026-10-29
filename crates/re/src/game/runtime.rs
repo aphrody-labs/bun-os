@@ -14,7 +14,9 @@ use serde_json::{Value, json};
 use super::assets::AssetResult;
 use super::formats::ema::EmaFile;
 use super::formats::emo::EmoFile;
-use super::formats::{BacFile, BdmFile, CmsFile, CusFile, EmbFile, EmdFile, EmmFile, MsgFile, PupFile};
+use super::formats::{
+    BacFile, BdmFile, CmsFile, CusFile, EmbFile, EmdFile, EmmFile, MsgFile, PupFile,
+};
 use super::unified_vfs::UnifiedVfs;
 
 /// A streamed, format-decoding view over the merged games.
@@ -98,7 +100,9 @@ fn decode(ext: &str, bytes: &[u8]) -> Option<Result<Value, String>> {
             Some(
                 <$ty>::parse(bytes)
                     .map_err(|error| error.to_string())
-                    .and_then(|parsed| serde_json::to_value(parsed).map_err(|error| error.to_string())),
+                    .and_then(|parsed| {
+                        serde_json::to_value(parsed).map_err(|error| error.to_string())
+                    }),
             )
         }};
     }

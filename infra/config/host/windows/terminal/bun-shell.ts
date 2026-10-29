@@ -490,7 +490,11 @@ export function linuxHost() {
     cpus: availableParallelism,
     exec: async (cmd: string, ...args: string[]) => {
       await using proc = Bun.spawn({ cmd: [cmd, ...args], stdin: "ignore", stdout: "pipe", stderr: "pipe" });
-      const [stdout, stderr, code] = await Promise.all([Bun.readableStreamToText(proc.stdout), Bun.readableStreamToText(proc.stderr), proc.exited]);
+      const [stdout, stderr, code] = await Promise.all([
+        Bun.readableStreamToText(proc.stdout),
+        Bun.readableStreamToText(proc.stderr),
+        proc.exited,
+      ]);
       return { stdout, stderr, code };
     },
   };

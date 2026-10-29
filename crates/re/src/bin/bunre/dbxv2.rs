@@ -568,8 +568,11 @@ mod media {
         use bun_re::game::assets::vfs::MountOptions;
         use bun_re::game::unified_vfs::UnifiedVfs;
 
-        let roots: Vec<std::path::PathBuf> =
-            args.positional.iter().map(std::path::PathBuf::from).collect();
+        let roots: Vec<std::path::PathBuf> = args
+            .positional
+            .iter()
+            .map(std::path::PathBuf::from)
+            .collect();
         let options = MountOptions {
             keys: Keys::default(),
             profile: None,
@@ -632,10 +635,11 @@ mod media {
                 .flatten()
                 .map(|entry| entry.path())
                 .filter(|path| {
-                    let name = path.file_name().and_then(|n| n.to_str()).unwrap_or_default();
-                    name.starts_with(prefix)
-                        && name.ends_with(".emd")
-                        && !name.contains("_LOD")
+                    let name = path
+                        .file_name()
+                        .and_then(|n| n.to_str())
+                        .unwrap_or_default();
+                    name.starts_with(prefix) && name.ends_with(".emd") && !name.contains("_LOD")
                 })
                 .collect(),
             Err(error) => return fail(format!("could not list {}: {error}", chara_dir.display())),
@@ -649,18 +653,27 @@ mod media {
         let mut owned: Vec<(bun_re::game::EmdFile, Option<Vec<u8>>)> = Vec::new();
         let mut names = Vec::new();
         for path in &entries {
-            let Ok(bytes) = std::fs::read(path) else { continue };
+            let Ok(bytes) = std::fs::read(path) else {
+                continue;
+            };
             let Ok(emd) = bun_re::game::EmdFile::parse(&bytes) else {
                 continue;
             };
             owned.push((emd, texture_png_for_emd(path)));
-            names.push(path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_string());
+            names.push(
+                path.file_stem()
+                    .and_then(|s| s.to_str())
+                    .unwrap_or("")
+                    .to_string(),
+            );
         }
         if owned.is_empty() {
             return fail("no part parsed");
         }
-        let refs: Vec<(&bun_re::game::EmdFile, Option<&[u8]>)> =
-            owned.iter().map(|(emd, tex)| (emd, tex.as_deref())).collect();
+        let refs: Vec<(&bun_re::game::EmdFile, Option<&[u8]>)> = owned
+            .iter()
+            .map(|(emd, tex)| (emd, tex.as_deref()))
+            .collect();
         let glb = bun_re::game::emd_gltf::assemble_glb(&refs);
         let textured = owned.iter().filter(|(_, tex)| tex.is_some()).count();
         match std::fs::write(out, &glb) {
@@ -719,7 +732,9 @@ mod media {
                 let input = Path::new(&args.positional[0]);
                 let bytes = match std::fs::read(input) {
                     Ok(bytes) => bytes,
-                    Err(error) => return fail(format!("could not read {}: {error}", input.display())),
+                    Err(error) => {
+                        return fail(format!("could not read {}: {error}", input.display()));
+                    }
                 };
                 let emd = match bun_re::game::EmdFile::parse(&bytes) {
                     Ok(emd) => emd,
@@ -751,7 +766,10 @@ mod media {
                 let Some(out) = args.get("--out") else {
                     return usage();
                 };
-                report_result(merge_extracted(Path::new(&args.positional[0]), Path::new(out)))
+                report_result(merge_extracted(
+                    Path::new(&args.positional[0]),
+                    Path::new(out),
+                ))
             }
             "unified"
                 if !args.positional.is_empty()

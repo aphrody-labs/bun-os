@@ -7,32 +7,20 @@
   "properties": {
     "$schema": {
       "description": "The JSON schema for the Tauri config.",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "productName": {
       "description": "App name.\n\nThis is the name your app is known by on the user's system, so it must be changed from the\ndefault before publishing. Besides naming the generated bundles, it is written into platform\nmetadata and install paths that are expected to be unique to your application.\n\n## Platform-specific\n\n- **macOS**: Names the `.app` bundle and the `.dmg`, and sets the bundle's\n   `CFBundleDisplayName` and `CFBundleName` properties. `CFBundleName` can be overridden with\n   [`bundle > macOS > bundleName`](MacConfig::bundle_name).\n- **Linux**: Kebab-cased for the Debian and RPM package names, used as the `Name` entry of\n   the desktop file and as the resource directory name under `/usr/lib`.\n- **Windows**: Names the installers, the installation directory, the Start Menu folder and\n   the `HKCU\\Software\\<publisher>\\<product name>` registry key. It also derives the default\n   WiX upgrade code, which must be unique across applications and can be set explicitly with\n   [`bundle > windows > wix > upgradeCode`](WixConfig::upgrade_code).",
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": ["string", "null"],
       "pattern": "^[^/\\:*?\"<>|]+$"
     },
     "mainBinaryName": {
       "description": "Overrides app's main binary filename.\n\nBy default, Tauri uses the output binary from `cargo`, by setting this, we will rename that binary in `tauri-cli`'s\n`tauri build` command, and target `tauri bundle` to it\n\nIf possible, change the [`package name`] or set the [`name field`] instead,\nand if that's not enough and you're using nightly, consider using the [`different-binary-name`] feature instead\n\nNote: this config should not include the binary extension (e.g. `.exe`), we'll add that for you\n\n[`package name`]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-name-field\n[`name field`]: https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-name-field\n[`different-binary-name`]: https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#different-binary-name",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "version": {
       "description": "App version. It is a semver version number or a path to a `package.json` file containing the `version` field.\n\nIf removed the version number from `Cargo.toml` is used.\nIt's recommended to manage the app versioning in the Tauri config.\n\n## Platform-specific\n\n- **macOS**: Translates to the bundle's CFBundleShortVersionString property and is used as the default CFBundleVersion.\n   You can set an specific bundle version using [`bundle > macOS > bundleVersion`](MacConfig::bundle_version).\n- **iOS**: Translates to the bundle's CFBundleShortVersionString property and is used as the default CFBundleVersion.\n   You can set an specific bundle version using [`bundle > iOS > bundleVersion`](IosConfig::bundle_version).\n   The `tauri ios build` CLI command has a `--build-number <number>` option that lets you append a build number to the app version.\n- **Android**: By default version 1.0 is used. You can set a version code using [`bundle > android > versionCode`](AndroidConfig::version_code).\n\nBy default version 1.0 is used on Android.",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "identifier": {
       "description": "The application identifier in reverse domain name notation (e.g. `com.tauri.example`).\nThis string must be unique across applications since it is used in system configurations like\nthe bundle ID and path to the webview data directory.\nThis string must contain only alphanumeric characters (A-Z, a-z, and 0-9), hyphens (-),\nand periods (.).\nThe default value `com.tauri.dev` is rejected by `tauri build` and must be changed before\nbuilding your application.",
@@ -163,9 +151,7 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "identifier"
-  ],
+  "required": ["identifier"],
   "definitions": {
     "AppConfig": {
       "description": "The App configuration object.\n\nSee more: <https://v2.tauri.app/reference/config/#appconfig>",
@@ -259,10 +245,7 @@
         },
         "userAgent": {
           "description": "The user agent for the webview",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "dragDropEnabled": {
           "description": "Whether the drag and drop handlers used internally to generate [`DragDropEvent`]s are enabled on the webview. By default it is enabled.\n\nDisabling it is required to use HTML5 drag and drop on the frontend on Windows since we replace the drag drop handler of WebView2.\n\nNote: this setting maps to [`WebviewBuilder::disable_drag_drop_handler`], not [`WindowBuilder::drag_and_drop`].\n\n[`DragDropEvent`]: https://docs.rs/tauri/latest/tauri/enum.DragDropEvent.html\n[`WebviewBuilder::disable_drag_drop_handler`]: https://docs.rs/tauri/latest/tauri/webview/struct.WebviewBuilder.html#method.disable_drag_drop_handler\n[`WindowBuilder::drag_and_drop`]: https://docs.rs/tauri/latest/x86_64-pc-windows-msvc/tauri/window/struct.WindowBuilder.html#method.drag_and_drop",
@@ -276,18 +259,12 @@
         },
         "x": {
           "description": "The horizontal position of the window's top left corner in logical pixels",
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "format": "double"
         },
         "y": {
           "description": "The vertical position of the window's top left corner in logical pixels",
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "format": "double"
         },
         "width": {
@@ -304,34 +281,22 @@
         },
         "minWidth": {
           "description": "The min window width in logical pixels.",
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "format": "double"
         },
         "minHeight": {
           "description": "The min window height in logical pixels.",
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "format": "double"
         },
         "maxWidth": {
           "description": "The max window width in logical pixels.",
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "format": "double"
         },
         "maxHeight": {
           "description": "The max window height in logical pixels.",
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "format": "double"
         },
         "preventOverflow": {
@@ -432,10 +397,7 @@
         },
         "windowClassname": {
           "description": "The name of the window class created on Windows to create the window. **Windows only**.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "noRedirectionBitmap": {
           "description": "This sets `WS_EX_NOREDIRECTIONBITMAP`.\n\nThis can avoid the white flash that may appear before the webview content is rendered\nwhen using a transparent window. **Windows only**.",
@@ -485,17 +447,11 @@
         },
         "tabbingIdentifier": {
           "description": "Defines the window [tabbing identifier] for macOS.\n\nWindows with matching tabbing identifiers will be grouped together.\nIf the tabbing identifier is not set, automatic tabbing will be disabled.\n\n[tabbing identifier]: <https://developer.apple.com/documentation/appkit/nswindow/1644704-tabbingidentifier>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "additionalBrowserArgs": {
           "description": "Defines additional browser arguments on Windows.\n\n## Platform-specific\n\n- **CEF runtime**: Unsupported. Chromium's command line is per process, not per webview;\n  pass switches through `Cef::command_line_arg` in Rust instead.\n\n## Warning\n\nWebview instances with different browser arguments must also have different [data directories](Self::data_directory).\n\nBy default wry passes `--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection`\nso if you set this, you also need to disable these components by yourself if you want.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "shadow": {
           "description": "Whether or not the window has shadow.\n\n## Platform-specific\n\n- **Windows:**\n  - `false` has no effect on decorated window, shadow are always ON.\n  - `true` will make undecorated window have a 1px white border,\nand on Windows 11, it will have a rounded corners.\n- **Linux:** Unsupported.",
@@ -520,17 +476,11 @@
         },
         "parent": {
           "description": "Sets the window associated with this label to be the parent of the window to be created.\n\n## Platform-specific\n\n- **Windows**: This sets the passed parent as an owner window to the window to be created.\n  From [MSDN owned windows docs](https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#owned-windows):\n    - An owned window is always above its owner in the z-order.\n    - The system automatically destroys an owned window when its owner is destroyed.\n    - An owned window is hidden when its owner is minimized.\n- **Linux**: This makes the new window transient for parent, see <https://docs.gtk.org/gtk3/method.Window.set_transient_for.html>\n- **macOS**: This adds the window as a child of parent, see <https://developer.apple.com/documentation/appkit/nswindow/1419152-addchildwindow?language=objc>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "proxyUrl": {
           "description": "The proxy URL for the WebView for all network requests.\n\nMust be either a `http://` or a `socks5://` URL.\n\n## Platform-specific\n\n- **macOS**: Requires the `macos-proxy` feature flag and only compiles for macOS 14+.",
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "uri"
         },
         "zoomHotkeysEnabled": {
@@ -550,10 +500,7 @@
         },
         "devtools": {
           "description": "Enable web inspector which is usually called browser devtools. Enabled by default.\n\nThis API works in **debug** builds, but requires `devtools` feature flag to enable it in **release** builds.\n\n## Platform-specific\n\n- macOS: This will call private functions on **macOS**.\n- Android: Open `chrome://inspect/#devices` in Chrome to get the devtools window. Wry's `WebView` devtools API isn't supported on Android.\n- iOS: Open Safari > Develop > [Your Device Name] > [Your WebView] to get the devtools window.",
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": ["boolean", "null"]
         },
         "backgroundColor": {
           "description": "Set the window and webview background color.\n\n## Platform-specific:\n\n- **Windows**: alpha channel is ignored for the window layer.\n- **Windows**: On Windows 7, alpha channel is ignored for the webview layer.\n- **Windows**: On Windows 8 and newer, if alpha channel is not `0`, it will be ignored for the webview layer.",
@@ -594,17 +541,11 @@
         },
         "dataDirectory": {
           "description": "Set a custom path for the webview's data directory (localStorage, cache, etc.),\n**relative to the local data directory (`localDataDir()`), followed by the window label**.\n\nTo set absolute paths, use [`WebviewWindowBuilder::data_directory`](https://docs.rs/tauri/2/tauri/webview/struct.WebviewWindowBuilder.html#method.data_directory)\n\nThis path is not affected by the `app > appDirectoriesOverride` config.\nTo keep the webview data in an overridden directory, leave this unset (the webview then uses the app local data directory)\nor resolve a path from `app.path().app_local_data_dir()` and set it with `WebviewWindowBuilder::data_directory`.\n\n#### Platform-specific:\n\n- **Windows**: WebViews with different values for settings like `additionalBrowserArgs`, `browserExtensionsEnabled` or `scrollBarStyle` must have different data directories.\n- **macOS / iOS**: Unsupported, use `dataStoreIdentifier` instead.\n- **Android**: Unsupported.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "dataStoreIdentifier": {
           "description": "Initialize the WebView with a custom data store identifier. This can be seen as a replacement for `dataDirectory` which is unavailable in WKWebView.\n\nSee <https://developer.apple.com/documentation/webkit/wkwebsitedatastore/init(foridentifier:)?language=objc>\n\nThe array must contain 16 u8 numbers.\n\n#### Platform-specific:\n\n- **iOS**: Supported since version 17.0+.\n- **macOS**: Supported since version 14.0+.\n- **Windows / Linux / Android**: Unsupported.\n- **CEF runtime**: Supported. The identifier names a profile directory under the runtime's cache path, the same isolation `dataDirectory` gives; `dataDirectory` wins when both are set.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "integer",
             "format": "uint8",
@@ -630,24 +571,15 @@
         },
         "activityName": {
           "description": "The name of the Android activity to create for this window.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "createdByActivityName": {
           "description": "The name of the Android activity that is creating this webview window.\n\nThis is important to determine which stack the activity will belong to.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "requestedBySceneIdentifier": {
           "description": "Sets the identifier of the scene that is requesting the new scene,\nestablishing a relationship between the two scenes.\n\nBy default the system uses the foreground scene.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "generalAutofillEnabled": {
           "description": "Controls the WebView's browser-level general autofill behavior.\n\n**This option does not disable password or credit card autofill.**\n\nWhen set to `false`, the WebView will not automatically populate\ngeneral form fields using previously stored data such as addresses\nor contact information.\n\nIf not specified, this is `true` by default.\n\n## Platform-specific\n\n- **Windows**: Supported. WebView2's autofill feature (called\n  \"Suggestions\") may not honor `autocomplete=\"off\"` on input\n  elements in some cases.\n- **Linux / Android / iOS / macOS**: Unsupported and performs no\n  operation.\n- **CEF runtime**: Autofill is already off on this runtime (it disables `autofill.profile_enabled` on every profile), so `false` is the state you get; turn it on with `Cef::profile_preference(\"autofill.profile_enabled\", true)`.",
@@ -711,10 +643,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "width",
-        "height"
-      ]
+      "required": ["width", "height"]
     },
     "Theme": {
       "description": "System theme.",
@@ -767,10 +696,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "x",
-        "y"
-      ]
+      "required": ["x", "y"]
     },
     "WindowEffectsConfig": {
       "description": "The window effects configuration object",
@@ -796,10 +722,7 @@
         },
         "radius": {
           "description": "Window effect corner radius **macOS Only**",
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "format": "double"
         },
         "color": {
@@ -820,9 +743,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "effects"
-      ]
+      "required": ["effects"]
     },
     "WindowEffect": {
       "description": "Platform-specific window effects",
@@ -1095,11 +1016,7 @@
               "default": 255
             }
           },
-          "required": [
-            "red",
-            "green",
-            "blue"
-          ]
+          "required": ["red", "green", "blue"]
         }
       ]
     },
@@ -1324,10 +1241,7 @@
             },
             "requireLiteralLeadingDot": {
               "description": "Whether or not paths that contain components that start with a `.`\nwill require that `.` appears literally in the pattern; `*`, `?`, `**`,\nor `[...]` will not match. This is useful because such files are\nconventionally considered hidden on Unix systems and it might be\ndesirable to skip them when listing files.\n\nDefaults to `true` on Unix systems and `false` on Windows",
-              "type": [
-                "boolean",
-                "null"
-              ]
+              "type": ["boolean", "null"]
             }
           }
         }
@@ -1345,9 +1259,7 @@
               "const": "brownfield"
             }
           },
-          "required": [
-            "use"
-          ]
+          "required": ["use"]
         },
         {
           "description": "Isolation pattern. Recommended for security purposes.",
@@ -1365,15 +1277,10 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "dir"
-              ]
+              "required": ["dir"]
             }
           },
-          "required": [
-            "use",
-            "options"
-          ]
+          "required": ["use", "options"]
         }
       ]
     },
@@ -1447,19 +1354,13 @@
         },
         "platforms": {
           "description": "Limit which target platforms this capability applies to.\n\nBy default all platforms are targeted.\n\n## Example\n\n`[\"macOS\",\"windows\"]`",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/Target"
           }
         }
       },
-      "required": [
-        "identifier",
-        "permissions"
-      ]
+      "required": ["identifier", "permissions"]
     },
     "CapabilityRemote": {
       "description": "Configuration for remote URLs that are associated with the capability.",
@@ -1473,9 +1374,7 @@
           }
         }
       },
-      "required": [
-        "urls"
-      ]
+      "required": ["urls"]
     },
     "PermissionEntry": {
       "description": "An entry for a permission value in a [`Capability`] can be either a raw permission [`Identifier`]\nor an object that references a permission and extends its scope.",
@@ -1502,28 +1401,20 @@
             },
             "allow": {
               "description": "Data that defines what is allowed by the scope.",
-              "type": [
-                "array",
-                "null"
-              ],
+              "type": ["array", "null"],
               "items": {
                 "$ref": "#/definitions/Value"
               }
             },
             "deny": {
               "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
-              "type": [
-                "array",
-                "null"
-              ],
+              "type": ["array", "null"],
               "items": {
                 "$ref": "#/definitions/Value"
               }
             }
           },
-          "required": [
-            "identifier"
-          ]
+          "required": ["identifier"]
         }
       ]
     },
@@ -1793,10 +1684,7 @@
       "properties": {
         "id": {
           "description": "Set an id for this tray icon so you can reference it later, defaults to `main`.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "iconPath": {
           "description": "Path to the default icon to use for the tray icon.\n\nNote: this stores the image in raw pixels to the final binary,\nso keep the icon size (width and height) small\nor else it's going to bloat your final executable",
@@ -1820,23 +1708,15 @@
         },
         "title": {
           "description": "Title for MacOS tray",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "tooltip": {
           "description": "Tray icon tooltip on Windows and macOS",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false,
-      "required": [
-        "iconPath"
-      ]
+      "required": ["iconPath"]
     },
     "AppDirectoriesOverride": {
       "description": "Overrides the directories returned by the `app_*_dir` path APIs.\n\nSee the `app > appDirectoriesOverride` config for how each path is resolved.",
@@ -1861,38 +1741,23 @@
       "properties": {
         "config": {
           "description": "Overrides the app config directory (`app_config_dir`, `$APPCONFIG`).",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "data": {
           "description": "Overrides the app data directory (`app_data_dir`, `$APPDATA`).",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "localData": {
           "description": "Overrides the app local data directory (`app_local_data_dir`, `$APPLOCALDATA`).\n\nOn Windows and Linux this is also the default data directory of the webviews.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "cache": {
           "description": "Overrides the app cache directory (`app_cache_dir`, `$APPCACHE`).",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "log": {
           "description": "Overrides the app log directory (`app_log_dir`, `$APPLOG`).",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false
@@ -1914,10 +1779,7 @@
         },
         "devUrl": {
           "description": "The URL to load in development.\n\nThis is usually an URL to a dev server, which serves your application assets with hot-reload and HMR.\nMost modern JavaScript bundlers like [Vite](https://vite.dev/guide/) provides a way to start a dev server by default.\n\nIf you don't have a dev server or don't want to use one, ignore this option and use [`frontendDist`](BuildConfig::frontend_dist)\nand point to a web assets directory, and Tauri CLI will run its built-in dev server and provide a simple hot-reload experience.",
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "uri"
         },
         "frontendDist": {
@@ -1966,10 +1828,7 @@
         },
         "features": {
           "description": "Features passed to `cargo` commands.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
@@ -2018,25 +1877,17 @@
             },
             "cwd": {
               "description": "The current working directory to run the command from.",
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             },
             "args": {
               "description": "Arguments to pass to the command.",
-              "type": [
-                "array",
-                "null"
-              ],
+              "type": ["array", "null"],
               "items": {
                 "type": "string"
               }
             }
           },
-          "required": [
-            "cmd"
-          ]
+          "required": ["cmd"]
         }
       ]
     },
@@ -2078,10 +1929,7 @@
             },
             "cwd": {
               "description": "The current working directory.",
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             },
             "wait": {
               "description": "Whether `tauri dev` should wait for the command to finish or not. Defaults to `false`.",
@@ -2089,9 +1937,7 @@
               "default": false
             }
           },
-          "required": [
-            "script"
-          ]
+          "required": ["script"]
         }
       ]
     },
@@ -2112,15 +1958,10 @@
             },
             "cwd": {
               "description": "The current working directory.",
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             }
           },
-          "required": [
-            "script"
-          ]
+          "required": ["script"]
         }
       ]
     },
@@ -2165,17 +2006,11 @@
         },
         "publisher": {
           "description": "The application's publisher. Defaults to the second element in the identifier string.\n\nCurrently maps to the Manufacturer property of the Windows Installer\nand the Maintainer field of debian packages if the Cargo.toml does not have the authors field.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "homepage": {
           "description": "A url to the home page of your application. If unset, will\nfallback to `homepage` defined in `Cargo.toml`.\n\nSupported bundle targets: `deb`, `rpm`, `nsis` and `msi`.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "icon": {
           "description": "The app's icons",
@@ -2198,55 +2033,34 @@
         },
         "copyright": {
           "description": "A copyright string associated with your application.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "license": {
           "description": "The package's license identifier to be included in the appropriate bundles.\nIf not set, defaults to the license from the Cargo.toml file.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "licenseFile": {
           "description": "The path to the license file to be included in the appropriate bundles.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "category": {
           "description": "The application kind.\n\nShould be one of the following:\nBusiness, DeveloperTool, Education, Entertainment, Finance, Game, ActionGame, AdventureGame, ArcadeGame, BoardGame, CardGame, CasinoGame, DiceGame, EducationalGame, FamilyGame, KidsGame, MusicGame, PuzzleGame, RacingGame, RolePlayingGame, SimulationGame, SportsGame, StrategyGame, TriviaGame, WordGame, GraphicsAndDesign, HealthcareAndFitness, Lifestyle, Medical, Music, News, Photography, Productivity, Reference, SocialNetworking, Sports, Travel, Utility, Video, Weather.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "fileAssociations": {
           "description": "File types to associate with the application.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/FileAssociation"
           }
         },
         "shortDescription": {
           "description": "A short description of your application.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "longDescription": {
           "description": "A longer, multi-line description of the application.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "useLocalToolsDir": {
           "description": "Whether to use the project's `target` directory, for caching build tools (e.g., Wix and NSIS) when building this application. Defaults to `false`.\n\nIf true, tools will be cached in `target/.tauri/`.\nIf false, tools will be cached in the current user's platform-specific cache directory.\n\nAn example where it can be appropriate to set this to `true` is when building this application as a Windows System user (e.g., AWS EC2 workloads),\nbecause the Window system's app data directory is restricted.",
@@ -2255,10 +2069,7 @@
         },
         "externalBin": {
           "description": "A list of—either absolute or relative—paths to binaries to embed with your application.\n\nNote that Tauri will look for system-specific binaries following the pattern \"binary-name{-target-triple}{.system-extension}\".\n\nE.g. for the external binary \"my-binary\", Tauri looks for:\n\n- \"my-binary-x86_64-pc-windows-msvc.exe\" for Windows\n- \"my-binary-x86_64-apple-darwin\" for macOS\n- \"my-binary-x86_64-unknown-linux-gnu\" for Linux\n\nso don't forget to provide binaries for all targeted platforms.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
@@ -2497,27 +2308,18 @@
         },
         "contentTypes": {
           "description": "Declare support to a file with the given content type. Maps to `LSItemContentTypes` on macOS.\n\nThis allows supporting any file format declared by another application that conforms to this type.\nDeclaration of new types can be done with [`Self::exported_type`] and linking to certain content types are done via [`ExportedFileAssociation::conforms_to`].",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "name": {
           "description": "The name. Maps to `CFBundleTypeName` on macOS. Default to `ext[0]`",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "description": {
           "description": "The association description. Windows-only. It is displayed on the `Type` column on Windows Explorer.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "role": {
           "description": "The app's role with respect to the type. Maps to `CFBundleTypeRole` on macOS.",
@@ -2530,10 +2332,7 @@
         },
         "mimeType": {
           "description": "The mime-type of the association, e.g. `'image/png'` or `'text/plain'`.\n\n- **Linux**: written as `MimeType=` in the `.desktop` file.\n- **macOS / iOS**: added as `public.mime-type` in the `UTTypeTagSpecification` dictionary of\n  the `UTExportedTypeDeclarations` entry in `Info.plist`.\n- **Android**: used as `android:mimeType` in the `<data>` element of an `<intent-filter>`\n  in `AndroidManifest.xml`.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "rank": {
           "description": "The ranking of this app among apps that declare themselves as editors or viewers of the given file type.  Maps to `LSHandlerRank` on macOS.",
@@ -2557,19 +2356,14 @@
         },
         "androidIntentActionFilters": {
           "description": "Intent action filters for this file association.\n\nBy default all filters are used.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/AndroidIntentAction"
           }
         }
       },
       "additionalProperties": false,
-      "required": [
-        "ext"
-      ]
+      "required": ["ext"]
     },
     "AssociationExt": {
       "description": "An extension for a [`FileAssociation`].\n\nA leading `.` is automatically stripped.",
@@ -2640,19 +2434,14 @@
         },
         "conformsTo": {
           "description": "The types that this type conforms to. Maps to `UTTypeConformsTo`.\n\nExamples are `public.data`, `public.image`, `public.json` and `public.database`.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         }
       },
       "additionalProperties": false,
-      "required": [
-        "identifier"
-      ]
+      "required": ["identifier"]
     },
     "AndroidIntentAction": {
       "description": "Android intent action.",
@@ -2680,24 +2469,15 @@
       "properties": {
         "digestAlgorithm": {
           "description": "Specifies the file digest algorithm to use for creating file signatures.\nRequired for code signing. SHA-256 is recommended.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "certificateThumbprint": {
           "description": "Specifies the SHA1 hash of the signing certificate.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "timestampUrl": {
           "description": "Server to use during timestamping.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "tsp": {
           "description": "Whether to use Time-Stamp Protocol (TSP, a.k.a. RFC 3161) for the timestamp server. Your code signing provider may\nuse a TSP timestamp server, like e.g. SSL.com does. If so, enable TSP by setting to true.",
@@ -2723,10 +2503,7 @@
         },
         "minimumWebview2Version": {
           "description": "Try to ensure that the WebView2 version is equal to or newer than this version,\nif the user's WebView2 is older than this version,\nthe installer will try to trigger a WebView2 update.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "wix": {
           "description": "Configuration for the MSI generated with WiX.",
@@ -2781,9 +2558,7 @@
               "const": "skip"
             }
           },
-          "required": [
-            "type"
-          ],
+          "required": ["type"],
           "additionalProperties": false
         },
         {
@@ -2801,9 +2576,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         {
           "description": "Embed the bootstrapper and run it.\nRequires an internet connection.\nIncreases the installer size by around 1.8MB, but offers better support on Windows 7.",
@@ -2820,9 +2593,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         {
           "description": "Embed the offline installer and run it.\nDoes not require an internet connection.\nIncreases the installer size by around 127MB.",
@@ -2839,9 +2610,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type"
-          ]
+          "required": ["type"]
         },
         {
           "description": "Embed a fixed webview2 version and use it at runtime.\nIncreases the installer size by around 180MB.",
@@ -2857,10 +2626,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "path"
-          ]
+          "required": ["type", "path"]
         }
       ]
     },
@@ -2870,17 +2636,11 @@
       "properties": {
         "version": {
           "description": "MSI installer version in the format `major.minor.patch.build` (build is optional).\n\nBecause a valid version is required for MSI installer, it will be derived from [`Config::version`] if this field is not set.\n\nThe first field is the major version and has a maximum value of 255. The second field is the minor version and has a maximum value of 255.\nThe third and fourth fields have a maximum value of 65,535.\n\nSee <https://learn.microsoft.com/en-us/windows/win32/msi/productversion> for more info.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "upgradeCode": {
           "description": "A GUID upgrade code for MSI installer. This code **_must stay the same across all of your updates_**,\notherwise, Windows will treat your update as a different app and your users will have duplicate versions of your app.\n\nBy default, tauri generates this code by generating a Uuid v5 using the string `<productName>.exe.app.x64` in the DNS namespace.\nYou can use Tauri's CLI to generate and print this code for you, run `tauri inspect wix-upgrade-code`.\n\nIt is recommended that you set this value in your tauri config file to avoid accidental changes in your upgrade code\nwhenever you want to change your product name.",
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "uuid"
         },
         "language": {
@@ -2894,10 +2654,7 @@
         },
         "template": {
           "description": "A custom .wxs template to use.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "fragmentPaths": {
           "description": "A list of paths to .wxs files with WiX fragments to use.",
@@ -2954,17 +2711,11 @@
         },
         "bannerPath": {
           "description": "Path to a bitmap file to use as the installation user interface banner.\nThis bitmap will appear at the top of all but the first page of the installer.\n\nThe required dimensions are 493px × 58px.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "dialogImagePath": {
           "description": "Path to a bitmap file to use on the installation user interface dialogs.\nIt is used on the welcome and completion dialogs.\n\nThe required dimensions are 493px × 312px.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "fipsCompliant": {
           "description": "Enables FIPS compliant algorithms.\nCan also be enabled via the `TAURI_BUNDLER_WIX_FIPS_COMPLIANT` env var.",
@@ -3003,10 +2754,7 @@
       "properties": {
         "localePath": {
           "description": "The path to a locale (`.wxl`) file. See <https://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/build_a_localized_version.html>.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false
@@ -3017,45 +2765,27 @@
       "properties": {
         "template": {
           "description": "A custom .nsi template to use.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "headerImage": {
           "description": "The path to a bitmap file to display on the header of installers pages.\n\nThe recommended dimensions are 150px x 57px.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "sidebarImage": {
           "description": "The path to a bitmap file for the Welcome page and the Finish page.\n\nThe recommended dimensions are 164px x 314px.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "installerIcon": {
           "description": "The path to an icon file used as the installer icon.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "uninstallerIcon": {
           "description": "The path to an icon file used as the uninstaller icon.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "uninstallerHeaderImage": {
           "description": "The path to a bitmap file to display on the header of uninstallers pages.\nDefaults to [`Self::header_image`]. If this is set but [`Self::header_image`] is not, a default image from NSIS will be applied to `header_image`\n\nThe recommended dimensions are 150px x 57px.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "installMode": {
           "description": "Whether the installation will be for all users or just the current user.",
@@ -3068,20 +2798,14 @@
         },
         "languages": {
           "description": "A list of installer languages. Default to `[\"English\"]` if not set.\n\nBy default the OS language is used. If the OS language is not in the list of languages, the first language will be used.\nTo allow the user to select the language, set `display_language_selector` to `true`.\n\nSee <https://github.com/kichik/nsis/tree/9465c08046f00ccb6eda985abbdbf52c275c6c4d/Contrib/Language%20files> for the complete list of languages.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "customLanguageFiles": {
           "description": "A key-value pair where the key is the language and the\nvalue is the path to a custom `.nsh` file that holds the translated text for tauri's custom messages.\n\nSee <https://github.com/tauri-apps/tauri/blob/dev/crates/tauri-bundler/src/bundle/windows/nsis/languages/English.nsh> for an example `.nsh` file.\n\n**Note**: the key must be a valid NSIS language and it must be added to the [`Self::languages`] array,",
-          "type": [
-            "object",
-            "null"
-          ],
+          "type": ["object", "null"],
           "additionalProperties": {
             "type": "string"
           }
@@ -3102,24 +2826,15 @@
         },
         "startMenuFolder": {
           "description": "Set the folder name for the start menu shortcut.\n\nUse this option if you have multiple apps and wish to group their shortcuts under one folder\nor if you generally prefer to set your shortcut inside a folder.\n\nExamples:\n- `AwesomePublisher`, shortcut will be placed in `%AppData%\\Microsoft\\Windows\\Start Menu\\Programs\\AwesomePublisher\\<your-app>.lnk`\n- If unset, shortcut will be placed in `%AppData%\\Microsoft\\Windows\\Start Menu\\Programs\\<your-app>.lnk`",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "installerHooks": {
           "description": "A path to a `.nsh` file that contains special NSIS macros to be hooked into the\nmain installer.nsi script.\n\nSupported hooks are:\n\n- `NSIS_HOOK_PREINSTALL`: This hook runs before copying files, setting registry key values and creating shortcuts.\n- `NSIS_HOOK_POSTINSTALL`: This hook runs after the installer has finished copying all files, setting the registry keys and created shortcuts.\n- `NSIS_HOOK_PREUNINSTALL`: This hook runs before removing any files, registry keys and shortcuts.\n- `NSIS_HOOK_POSTUNINSTALL`: This hook runs after files, registry keys and shortcuts have been removed.\n\n### Example\n\n```nsh\n!macro NSIS_HOOK_PREINSTALL\n  MessageBox MB_OK \"PreInstall\"\n!macroend\n\n!macro NSIS_HOOK_POSTINSTALL\n  MessageBox MB_OK \"PostInstall\"\n!macroend\n\n!macro NSIS_HOOK_PREUNINSTALL\n  MessageBox MB_OK \"PreUnInstall\"\n!macroend\n\n!macro NSIS_HOOK_POSTUNINSTALL\n  MessageBox MB_OK \"PostUninstall\"\n!macroend\n```",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "minimumWebview2Version": {
           "description": "Deprecated: use [`WindowsConfig::minimum_webview2_version`] (`bundle >  windows > minimumWebview2Version`) instead.\n\nTry to ensure that the WebView2 version is equal to or newer than this version,\nif the user's WebView2 is older than this version,\nthe installer will try to trigger a WebView2 update.",
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "deprecated": true
         }
       },
@@ -3194,10 +2909,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "cmd",
-            "args"
-          ]
+          "required": ["cmd", "args"]
         }
       ]
     },
@@ -3270,50 +2982,35 @@
       "properties": {
         "depends": {
           "description": "The list of deb dependencies your application relies on.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "recommends": {
           "description": "The list of deb dependencies your application recommends.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "provides": {
           "description": "The list of dependencies the package provides.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "conflicts": {
           "description": "The list of package conflicts.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "replaces": {
           "description": "The list of package replaces.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
@@ -3328,59 +3025,35 @@
         },
         "section": {
           "description": "Define the section in Debian Control file. See : https://www.debian.org/doc/debian-policy/ch-archive.html#s-subsections",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "priority": {
           "description": "Change the priority of the Debian Package. By default, it is set to `optional`.\nRecognized Priorities as of now are :  `required`, `important`, `standard`, `optional`, `extra`",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "changelog": {
           "description": "Path of the uncompressed Changelog file, to be stored at /usr/share/doc/package-name/changelog.gz. See\n<https://www.debian.org/doc/debian-policy/ch-docs.html#changelog-files-and-release-notes>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "desktopTemplate": {
           "description": "Path to a custom desktop file Handlebars template.\n\nAvailable variables: `categories`, `comment` (optional), `exec`, `icon` and `name`.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "preInstallScript": {
           "description": "Path to script that will be executed before the package is unpacked. See\n<https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "postInstallScript": {
           "description": "Path to script that will be executed after the package is unpacked. See\n<https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "preRemoveScript": {
           "description": "Path to script that will be executed before the package is removed. See\n<https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "postRemoveScript": {
           "description": "Path to script that will be executed after the package is removed. See\n<https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "compression": {
           "description": "Compression algorithm and level. Defaults to `Gzip` with level 6.",
@@ -3415,10 +3088,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "level"
-          ]
+          "required": ["type", "level"]
         },
         {
           "description": "Zstd compression",
@@ -3435,10 +3105,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "level"
-          ]
+          "required": ["type", "level"]
         },
         {
           "description": "Xz compression",
@@ -3456,10 +3123,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "level"
-          ]
+          "required": ["type", "level"]
         },
         {
           "description": "Bzip2 compression",
@@ -3477,10 +3141,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "level"
-          ]
+          "required": ["type", "level"]
         },
         {
           "description": "Disable compression",
@@ -3491,9 +3152,7 @@
               "const": "none"
             }
           },
-          "required": [
-            "type"
-          ],
+          "required": ["type"],
           "additionalProperties": false
         }
       ]
@@ -3504,50 +3163,35 @@
       "properties": {
         "depends": {
           "description": "The list of RPM dependencies your application relies on.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "recommends": {
           "description": "The list of RPM dependencies your application recommends.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "provides": {
           "description": "The list of RPM dependencies your application provides.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "conflicts": {
           "description": "The list of RPM dependencies your application conflicts with. They must not be present\nin order for the package to be installed.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "obsoletes": {
           "description": "The list of RPM dependencies your application supersedes - if this package is installed,\npackages listed as \"obsoletes\" will be automatically removed (if they are present).",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
@@ -3574,38 +3218,23 @@
         },
         "desktopTemplate": {
           "description": "Path to a custom desktop file Handlebars template.\n\nAvailable variables: `categories`, `comment` (optional), `exec`, `icon` and `name`.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "preInstallScript": {
           "description": "Path to script that will be executed before the package is unpacked. See\n<http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "postInstallScript": {
           "description": "Path to script that will be executed after the package is unpacked. See\n<http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "preRemoveScript": {
           "description": "Path to script that will be executed before the package is removed. See\n<http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "postRemoveScript": {
           "description": "Path to script that will be executed after the package is removed. See\n<http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "compression": {
           "description": "Compression algorithm and level. Defaults to `Gzip` with level 6.",
@@ -3640,10 +3269,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "level"
-          ]
+          "required": ["type", "level"]
         },
         {
           "description": "Zstd compression",
@@ -3660,10 +3286,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "level"
-          ]
+          "required": ["type", "level"]
         },
         {
           "description": "Xz compression",
@@ -3681,10 +3304,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "level"
-          ]
+          "required": ["type", "level"]
         },
         {
           "description": "Bzip2 compression",
@@ -3702,10 +3322,7 @@
             }
           },
           "additionalProperties": false,
-          "required": [
-            "type",
-            "level"
-          ]
+          "required": ["type", "level"]
         },
         {
           "description": "Disable compression",
@@ -3716,9 +3333,7 @@
               "const": "none"
             }
           },
-          "required": [
-            "type"
-          ],
+          "required": ["type"],
           "additionalProperties": false
         }
       ]
@@ -3729,10 +3344,7 @@
       "properties": {
         "frameworks": {
           "description": "A list of strings indicating any macOS X frameworks that need to be bundled with the application.\n\nIf a name is used, \".framework\" must be omitted and it will look for standard install locations. You may also use a path to a specific framework.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
@@ -3747,39 +3359,24 @@
         },
         "bundleVersion": {
           "description": "The version of the build that identifies an iteration of the bundle.\n\nTranslates to the bundle's CFBundleVersion property.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "bundleName": {
           "description": "The name of the builder that built the bundle.\n\nTranslates to the bundle's CFBundleName property.\n\nIf not set, defaults to the package's product name.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "minimumSystemVersion": {
           "description": "A version string indicating the minimum macOS X version that the bundled application supports. Defaults to `10.13`.\n\nSetting it to `null` completely removes the `LSMinimumSystemVersion` field on the bundle's `Info.plist`\nand the `MACOSX_DEPLOYMENT_TARGET` environment variable.\n\nIgnored in `tauri dev`.\n\nAn empty string is considered an invalid value so the default value is used.",
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "default": "10.13"
         },
         "exceptionDomain": {
           "description": "Allows your application to communicate with the outside world.\nIt should be a lowercase, without port and protocol domain name.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "signingIdentity": {
           "description": "Identity to use for code signing.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "hardenedRuntime": {
           "description": "Whether the codesign should enable [hardened runtime](https://developer.apple.com/documentation/security/hardened_runtime) (for executables) or not.",
@@ -3788,24 +3385,15 @@
         },
         "providerShortName": {
           "description": "Provider short name for notarization.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "entitlements": {
           "description": "Path to the entitlements file.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "infoPlist": {
           "description": "Path to a Info.plist file to merge with the default Info.plist.\n\nNote that Tauri also looks for a `Info.plist` file in the same directory as the Tauri configuration file.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "dmg": {
           "description": "DMG-specific settings.",
@@ -3838,10 +3426,7 @@
       "properties": {
         "background": {
           "description": "Image to use as the background in dmg file. Accepted formats: `png`/`jpg`/`gif`.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "windowPosition": {
           "description": "Position of volume window on screen.",
@@ -3911,10 +3496,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "x",
-        "y"
-      ]
+      "required": ["x", "y"]
     },
     "Size": {
       "description": "Size of the window.",
@@ -3934,10 +3516,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "width",
-        "height"
-      ]
+      "required": ["width", "height"]
     },
     "IosConfig": {
       "description": "General configuration for the iOS target.",
@@ -3945,34 +3524,22 @@
       "properties": {
         "template": {
           "description": "A custom [XcodeGen] project.yml template to use.\n\n[XcodeGen]: <https://github.com/yonaskolb/XcodeGen>",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "frameworks": {
           "description": "A list of strings indicating any iOS frameworks that need to be bundled with the application.\n\nNote that you need to recreate the iOS project for the changes to be applied.",
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
             "type": "string"
           }
         },
         "developmentTeam": {
           "description": "The development team. This value is required for iOS development because code signing is enforced.\nThe `APPLE_DEVELOPMENT_TEAM` environment variable can be set to overwrite it.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "bundleVersion": {
           "description": "The version of the build that identifies an iteration of the bundle.\n\nTranslates to the bundle's CFBundleVersion property.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "minimumSystemVersion": {
           "description": "A version string indicating the minimum iOS version that the bundled application supports. Defaults to `15.0`.\n\nMaps to the IPHONEOS_DEPLOYMENT_TARGET value.",
@@ -3981,10 +3548,7 @@
         },
         "infoPlist": {
           "description": "Path to a Info.plist file to merge with the default Info.plist.\n\nNote that Tauri also looks for a `Info.plist` and `Info.ios.plist` file in the same directory as the Tauri configuration file.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false
@@ -4002,10 +3566,7 @@
         },
         "versionCode": {
           "description": "The version code of the application.\nIt is limited to 2,100,000,000 as per Google Play Store requirements.\n\nBy default we use your configured version and perform the following math:\nversionCode = version.major * 1000000 + version.minor * 1000 + version.patch",
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "format": "uint32",
           "minimum": 1,
           "maximum": 2100000000
@@ -4017,10 +3578,7 @@
         },
         "debugApplicationIdSuffix": {
           "description": "Application ID suffix to append for debug builds.\nThis allows installing debug and release versions side-by-side on the same device.\nExample: \".debug\" will make debug builds use \"com.example.app.debug\" as the application ID.",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false

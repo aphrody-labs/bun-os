@@ -23,7 +23,6 @@ disable the automatic start on boot.
 <th>Description</th>
 </tr>
 
-
 <tr>
 <td>
 

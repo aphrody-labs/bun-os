@@ -907,10 +907,10 @@ async function serializedCargo(
   const cargo = Bun.which("cargo");
   if (!cargo) throw new Error("Native Cargo missing on this host.");
   let argv = [cargo, ...args];
+  // Upstream Bun has no `bun msvc`: run the host MSVC Cargo directly unless a fork checkout provides the wrapper.
   if (process.platform === "win32") {
-    const bun = await resolveBunExecutable(config, { root, runtimePolicy });
-    argv = [bun, "msvc", "exec", "--", cargo, ...args];
     if (Bun.env.APHRODY_BUN_CHECKOUT) {
+      const bun = await resolveBunExecutable(config, { root, runtimePolicy });
       const owner = join(resolve(Bun.env.APHRODY_BUN_CHECKOUT), "scripts", "build", "rust", "cargo-serial.ts");
       if (!(await Bun.file(owner).exists()))
         throw new Error("Cargo owner wrapper missing from the configured APHRODY_BUN_CHECKOUT.");

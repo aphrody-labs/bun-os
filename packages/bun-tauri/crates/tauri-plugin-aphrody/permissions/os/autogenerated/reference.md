@@ -26,7 +26,6 @@ All information except the host name are available.
 <th>Description</th>
 </tr>
 
-
 <tr>
 <td>
 

@@ -6,20 +6,14 @@
   "properties": {
     "allow": {
       "description": "Data that defines what is allowed by the scope.",
-      "type": [
-        "array",
-        "null"
-      ],
+      "type": ["array", "null"],
       "items": {
         "$ref": "#/definitions/Value"
       }
     },
     "deny": {
       "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
-      "type": [
-        "array",
-        "null"
-      ],
+      "type": ["array", "null"],
       "items": {
         "$ref": "#/definitions/Value"
       }

@@ -11,6 +11,9 @@ pub mod api;
 pub mod assets;
 pub mod catalog;
 pub mod convert;
+/// Export a DBXV2 `.emd` object to GLB so it renders through the nie 3D pipeline.
+#[cfg(feature = "dbxv2")]
+pub mod emd_gltf;
 pub mod error;
 pub mod formats;
 pub mod fs;
@@ -20,18 +23,15 @@ pub mod index;
 pub mod inventory;
 pub mod live;
 pub mod reverse;
-pub mod steam;
-pub mod text;
-pub mod unified;
-/// Export a DBXV2 `.emd` object to GLB so it renders through the nie 3D pipeline.
-#[cfg(feature = "dbxv2")]
-pub mod emd_gltf;
-/// Streamed mount of several game installs under one `<game>/<path>` namespace.
-#[cfg(feature = "assets")]
-pub mod unified_vfs;
 /// Engine-facing asset runtime: streams and format-decodes assets from the merged games.
 #[cfg(feature = "assets")]
 pub mod runtime;
+pub mod steam;
+pub mod text;
+pub mod unified;
+/// Streamed mount of several game installs under one `<game>/<path>` namespace.
+#[cfg(feature = "assets")]
+pub mod unified_vfs;
 pub mod world;
 
 #[cfg(feature = "wasm")]

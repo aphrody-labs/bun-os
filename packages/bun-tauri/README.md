@@ -11,13 +11,13 @@ from the repository workspace) and are not built into any Bun executable.
 
 Pins and dates are in [`upstream.json`](./upstream.json) (machine readable).
 
-| Upstream                                  | Version / ref                                        | Date       |
-| ----------------------------------------- | ---------------------------------------------------- | ---------- |
-| `tauri-apps/tauri` branch `v3`            | `78f49ba3993f` (`tauri` 3.0.0-alpha.5)               | 2026-10-21 |
-| `tauri-apps/tauri` stable (`dev`, 2.x)    | `tauri` 2.12.5 (`993038c49185`), CLI 2.12.4          | 2026-10-21 |
+| Upstream                                   | Version / ref                                          | Date       |
+| ------------------------------------------ | ------------------------------------------------------ | ---------- |
+| `tauri-apps/tauri` branch `v3`             | `78f49ba3993f` (`tauri` 3.0.0-alpha.5)                 | 2026-10-21 |
+| `tauri-apps/tauri` stable (`dev`, 2.x)     | `tauri` 2.12.5 (`993038c49185`), CLI 2.12.4            | 2026-10-21 |
 | `tauri-apps/plugins-workspace` branch `v3` | `3d836244bcb9` (plugins 3.0.0-alpha.3, dialog alpha.4) | 2026-10-14 |
-| `tao` / `wry`                             | 0.37.2 / 0.57.1 (used by `tauri-runtime-wry`)        | 2026-10-23 |
-| `@tauri-apps/cli` / `@tauri-apps/api`     | `next` 3.0.0-alpha.5 / 3.0.0-alpha.3 (`latest` 2.12.4) | 2026-10    |
+| `tao` / `wry`                              | 0.37.2 / 0.57.1 (used by `tauri-runtime-wry`)          | 2026-10-23 |
+| `@tauri-apps/cli` / `@tauri-apps/api`      | `next` 3.0.0-alpha.5 / 3.0.0-alpha.3 (`latest` 2.12.4) | 2026-10    |
 
 The `crates/aphrody-tauri*` directories are the upstream `crates/tauri*` of the
 `v3` branch with the package renamed (`aphrody-tauri`, version `1.4.7`),

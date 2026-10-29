@@ -35,7 +35,6 @@ It allows all notification related features.
 <th>Description</th>
 </tr>
 
-
 <tr>
 <td>
 

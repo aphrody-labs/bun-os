@@ -53,19 +53,13 @@
     },
     "platforms": {
       "description": "Limit which target platforms this capability applies to.\n\nBy default all platforms are targeted.\n\n## Example\n\n`[\"macOS\",\"windows\"]`",
-      "type": [
-        "array",
-        "null"
-      ],
+      "type": ["array", "null"],
       "items": {
         "$ref": "#/definitions/Target"
       }
     }
   },
-  "required": [
-    "identifier",
-    "permissions"
-  ],
+  "required": ["identifier", "permissions"],
   "definitions": {
     "CapabilityRemote": {
       "description": "Configuration for remote URLs that are associated with the capability.",
@@ -79,9 +73,7 @@
           }
         }
       },
-      "required": [
-        "urls"
-      ]
+      "required": ["urls"]
     },
     "PermissionEntry": {
       "description": "An entry for a permission value in a [`Capability`] can be either a raw permission [`Identifier`]\nor an object that references a permission and extends its scope.",
@@ -108,28 +100,20 @@
             },
             "allow": {
               "description": "Data that defines what is allowed by the scope.",
-              "type": [
-                "array",
-                "null"
-              ],
+              "type": ["array", "null"],
               "items": {
                 "$ref": "#/definitions/Value"
               }
             },
             "deny": {
               "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
-              "type": [
-                "array",
-                "null"
-              ],
+              "type": ["array", "null"],
               "items": {
                 "$ref": "#/definitions/Value"
               }
             }
           },
-          "required": [
-            "identifier"
-          ]
+          "required": ["identifier"]
         }
       ]
     },

@@ -14,7 +14,6 @@ Allows reading the opened deep link via the get_current command
 <th>Description</th>
 </tr>
 
-
 <tr>
 <td>
 

@@ -92,7 +92,10 @@ impl UnifiedVfs {
     /// Total entry count across every game.
     #[must_use]
     pub fn len(&self) -> usize {
-        self.mounts.iter().map(|mount| mount.vfs.entries().len()).sum()
+        self.mounts
+            .iter()
+            .map(|mount| mount.vfs.entries().len())
+            .sum()
     }
 
     /// Whether no game contributes any entry.
@@ -103,15 +106,22 @@ impl UnifiedVfs {
 
     /// Iterate `(game, entry)` across every mount, in mount order.
     pub fn entries(&self) -> impl Iterator<Item = (&str, &VfsEntry)> {
-        self.mounts
-            .iter()
-            .flat_map(|mount| mount.vfs.entries().iter().map(move |entry| (mount.game.as_str(), entry)))
+        self.mounts.iter().flat_map(|mount| {
+            mount
+                .vfs
+                .entries()
+                .iter()
+                .map(move |entry| (mount.game.as_str(), entry))
+        })
     }
 
     /// Split a unified path `"<game>/<rest>"` into its owning mount and the per-game path.
     fn split<'a>(&self, path: &'a str) -> Option<(&UnifiedMount, &'a str)> {
         let (game, rest) = path.split_once('/')?;
-        let mount = self.mounts.iter().find(|mount| mount.game.eq_ignore_ascii_case(game))?;
+        let mount = self
+            .mounts
+            .iter()
+            .find(|mount| mount.game.eq_ignore_ascii_case(game))?;
         Some((mount, rest))
     }
 
@@ -119,7 +129,10 @@ impl UnifiedVfs {
     #[must_use]
     pub fn find(&self, path: &str) -> Option<(&str, &VfsEntry)> {
         let (mount, rest) = self.split(path)?;
-        mount.vfs.find(rest).map(|entry| (mount.game.as_str(), entry))
+        mount
+            .vfs
+            .find(rest)
+            .map(|entry| (mount.game.as_str(), entry))
     }
 
     /// Read an entry by unified path `"<game>/<path>"`, streamed from its container.
@@ -214,8 +227,16 @@ impl UnifiedVfs {
         for (game, entry) in self.entries() {
             let kind = format!("{:?}", entry.kind);
             index.total.add(entry.size);
-            index.by_game.entry(game.to_string()).or_default().add(entry.size);
-            index.by_kind.entry(kind.clone()).or_default().add(entry.size);
+            index
+                .by_game
+                .entry(game.to_string())
+                .or_default()
+                .add(entry.size);
+            index
+                .by_kind
+                .entry(kind.clone())
+                .or_default()
+                .add(entry.size);
             index
                 .by_game_kind
                 .entry(game.to_string())

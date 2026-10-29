@@ -85,9 +85,7 @@
     "workspace": true,
     "private": false,
     "exports": 3,
-    "bin": [
-      "bun-android"
-    ]
+    "bin": ["bun-android"]
   },
   {
     "name": "@aphrody/bun-app-host",
@@ -98,9 +96,7 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": [
-      "aphrody-server"
-    ]
+    "bin": ["aphrody-server"]
   },
   {
     "name": "@aphrody/bun-arch-mcp",
@@ -111,10 +107,7 @@
     "workspace": true,
     "private": false,
     "exports": 2,
-    "bin": [
-      "bun-arch-docs",
-      "bun-arch-mcp"
-    ]
+    "bin": ["bun-arch-docs", "bun-arch-mcp"]
   },
   {
     "name": "@aphrody/bun-artifacts",
@@ -125,9 +118,7 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": [
-      "aphrody-artifacts"
-    ]
+    "bin": ["aphrody-artifacts"]
   },
   {
     "name": "@aphrody/bun-blender",
@@ -138,10 +129,7 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": [
-      "bun-blender",
-      "bun-blender-mcp"
-    ]
+    "bin": ["bun-blender", "bun-blender-mcp"]
   },
   {
     "name": "@aphrody/bun-desktop",
@@ -163,9 +151,7 @@
     "workspace": true,
     "private": false,
     "exports": 1,
-    "bin": [
-      "bun-emu-host"
-    ]
+    "bin": ["bun-emu-host"]
   },
   {
     "name": "@aphrody/bun-engine",
@@ -176,11 +162,7 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": [
-      "bep",
-      "bun-engine",
-      "bun-engine-formats"
-    ]
+    "bin": ["bep", "bun-engine", "bun-engine-formats"]
   },
   {
     "name": "@aphrody/bun-engine-android",
@@ -224,9 +206,7 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": [
-      "bun-steam"
-    ]
+    "bin": ["bun-steam"]
   },
   {
     "name": "@aphrody/bun-video-project",
@@ -237,9 +217,7 @@
     "workspace": true,
     "private": false,
     "exports": 3,
-    "bin": [
-      "aphrody-video"
-    ]
+    "bin": ["aphrody-video"]
   },
   {
     "name": "@aphrody/bun-workspace",
@@ -250,9 +228,7 @@
     "workspace": true,
     "private": false,
     "exports": 14,
-    "bin": [
-      "aphrody-bun"
-    ]
+    "bin": ["aphrody-bun"]
   },
   {
     "name": "@aphrody/canvas",
@@ -395,9 +371,7 @@
     "workspace": true,
     "private": false,
     "exports": 10,
-    "bin": [
-      "m3"
-    ]
+    "bin": ["m3"]
   },
   {
     "name": "@aphrody/m3-ai",
@@ -430,9 +404,7 @@
     "workspace": true,
     "private": false,
     "exports": 26,
-    "bin": [
-      "m3-bun"
-    ]
+    "bin": ["m3-bun"]
   },
   {
     "name": "@aphrody/m3-codemods",
@@ -465,9 +437,7 @@
     "workspace": true,
     "private": false,
     "exports": 0,
-    "bin": [
-      "m3-design"
-    ]
+    "bin": ["m3-design"]
   },
   {
     "name": "@aphrody/m3-explorer",
@@ -555,9 +525,7 @@
     "workspace": true,
     "private": false,
     "exports": 7,
-    "bin": [
-      "m3-next"
-    ]
+    "bin": ["m3-next"]
   },
   {
     "name": "@aphrody/m3-next-example",
@@ -579,10 +547,7 @@
     "workspace": true,
     "private": false,
     "exports": 17,
-    "bin": [
-      "m3-next-migrate",
-      "next-migrate"
-    ]
+    "bin": ["m3-next-migrate", "next-migrate"]
   },
   {
     "name": "@aphrody/m3-next-tauri-example",
@@ -604,9 +569,7 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": [
-      "m3-os-themes"
-    ]
+    "bin": ["m3-os-themes"]
   },
   {
     "name": "@aphrody/m3-primitives",
@@ -705,9 +668,7 @@
     "workspace": true,
     "private": false,
     "exports": 1,
-    "bin": [
-      "m3-svg-to-ico"
-    ]
+    "bin": ["m3-svg-to-ico"]
   },
   {
     "name": "@aphrody/nie-ui",
@@ -784,12 +745,7 @@
     "workspace": true,
     "private": false,
     "exports": 17,
-    "bin": [
-      "aphrody-omar",
-      "aphrody-product",
-      "aphrody-setup",
-      "creator-kit"
-    ]
+    "bin": ["aphrody-omar", "aphrody-product", "aphrody-setup", "creator-kit"]
   },
   {
     "name": "@aphrody/rag-core",
@@ -833,9 +789,7 @@
     "workspace": true,
     "private": false,
     "exports": 7,
-    "bin": [
-      "aphrody-scaffold"
-    ]
+    "bin": ["aphrody-scaffold"]
   },
   {
     "name": "@aphrody/shell-web",
@@ -868,9 +822,7 @@
     "workspace": true,
     "private": false,
     "exports": 8,
-    "bin": [
-      "bun-tauri-sidecar"
-    ]
+    "bin": ["bun-tauri-sidecar"]
   },
   {
     "name": "@aphrody/update",
@@ -892,9 +844,7 @@
     "workspace": true,
     "private": false,
     "exports": 8,
-    "bin": [
-      "web-to-tauri"
-    ]
+    "bin": ["web-to-tauri"]
   },
   {
     "name": "@aphrody/webos",
@@ -949,9 +899,7 @@
     "workspace": true,
     "private": false,
     "exports": 8,
-    "bin": [
-      "yolo"
-    ]
+    "bin": ["yolo"]
   },
   {
     "name": "@aphrody/yolo-core",
@@ -973,9 +921,7 @@
     "workspace": true,
     "private": true,
     "exports": 3,
-    "bin": [
-      "ds-dotnet"
-    ]
+    "bin": ["ds-dotnet"]
   },
   {
     "name": "@bun-os/package-converter",
@@ -986,10 +932,7 @@
     "workspace": true,
     "private": true,
     "exports": 3,
-    "bin": [
-      "package-converter",
-      "pacman2apt"
-    ]
+    "bin": ["package-converter", "pacman2apt"]
   },
   {
     "name": "@bun-os/platform",
@@ -1000,9 +943,7 @@
     "workspace": true,
     "private": true,
     "exports": 12,
-    "bin": [
-      "bun-os-platform"
-    ]
+    "bin": ["bun-os-platform"]
   },
   {
     "name": "@bun-os/re",
@@ -1013,9 +954,7 @@
     "workspace": true,
     "private": true,
     "exports": 1,
-    "bin": [
-      "re"
-    ]
+    "bin": ["re"]
   },
   {
     "name": "@frontend/source",
@@ -1037,9 +976,7 @@
     "workspace": true,
     "private": false,
     "exports": 27,
-    "bin": [
-      "inagle"
-    ]
+    "bin": ["inagle"]
   },
   {
     "name": "@rosegriffon/inagle-cross",
@@ -1798,9 +1735,7 @@
     "workspace": true,
     "private": false,
     "exports": 0,
-    "bin": [
-      "iecode-homebrew"
-    ]
+    "bin": ["iecode-homebrew"]
   },
   {
     "name": "ieverse",

@@ -14,7 +14,6 @@ Default permissions for the plugin, which enables all commands.
 <th>Description</th>
 </tr>
 
-
 <tr>
 <td>
 

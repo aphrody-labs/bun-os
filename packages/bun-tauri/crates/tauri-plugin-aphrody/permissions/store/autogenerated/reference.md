@@ -32,7 +32,6 @@ All operations are enabled by default.
 <th>Description</th>
 </tr>
 
-
 <tr>
 <td>
 
