@@ -24,15 +24,3 @@ export const justProvider = toolProvider({
   github: justRelease,
 });
 
-export function justArgs(o: {
-  justfile?: string;
-  dir?: string;
-  recipe?: string[];
-  set?: Record<string, string>;
-}): string[] {
-  const args: string[] = [];
-  if (o.justfile) args.push("--justfile", o.justfile);
-  if (o.dir) args.push("--working-directory", o.dir);
-  for (const [k, v] of Object.entries(o.set ?? {})) args.push("--set", k, v);
-  return [...args, ...(o.recipe ?? [])];
-}

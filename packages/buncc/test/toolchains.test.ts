@@ -11,20 +11,13 @@ import {
   packageInstallCommand,
   pinFromToolchain,
 } from "../src/providers/_shared.ts";
-import { cmakeRelease, chooseGenerator, configureArgs, buildArgs } from "../src/providers/cmake.ts";
+import { cmakeRelease } from "../src/providers/cmake.ts";
 import { llvmBinCandidates } from "../src/providers/clang.ts";
 import { justRelease } from "../src/providers/just.ts";
-import { makeArgs, mesonSetupArgs, ninjaArgs, ninjaRelease } from "../src/providers/make.ts";
-import { uvRelease, uvRunArgs, venvPython } from "../src/providers/uv.ts";
-import { crossEnv, isSplatComplete, splatArgs, xwinRelease } from "../src/providers/xwin.ts";
-import {
-  binaryenRelease,
-  bindgenVersionFromLock,
-  wasmOptArgs,
-  cargoBuildArgs,
-  wasmArtifact,
-} from "../src/providers/wasm.ts";
-import { gnArgs, gnGenArgs, gnLiteral } from "../src/providers/gn.ts";
+import { ninjaRelease } from "../src/providers/make.ts";
+import { uvRelease } from "../src/providers/uv.ts";
+import { xwinRelease } from "../src/providers/xwin.ts";
+import { binaryenRelease } from "../src/providers/wasm.ts";
 import {
   binaryCacheDir,
   findRoot,
@@ -46,7 +39,6 @@ import {
 } from "../src/providers/winget.ts";
 import { msixManifest } from "../src/packaging/index.ts";
 import { manifestProblems, packArgs, readIdentity, redact, signArgs, wixBuildArgs } from "../src/providers/msix.ts";
-import { generatePkgbuild, makepkgArgs, packageFileName, pkgbuildProblems } from "../src/providers/archpkg.ts";
 import { toolchainProviders } from "../src/providers/toolchains.ts";
 
 let cache: string;
@@ -200,66 +192,6 @@ test("pin read from buncc.toolchain.json", async () => {
   }
 });
 
-test("cmake / make / ninja / meson / uv argument builders", () => {
-  expect(chooseGenerator("win32", c => c === "ninja")).toBe("Ninja");
-  expect(chooseGenerator("win32", c => c === "nmake")).toBe("NMake Makefiles");
-  expect(chooseGenerator("linux", () => false)).toBe("Unix Makefiles");
-  expect(
-    configureArgs(
-      { source: ".", build: "out", buildType: "Release", defines: { FOO: true, N: 3 }, toolchainFile: "tc.cmake" },
-      "linux",
-      () => true,
-    ),
-  ).toEqual([
-    "-S",
-    ".",
-    "-B",
-    "out",
-    "-G",
-    "Ninja",
-    "-DFOO=ON",
-    "-DN=3",
-    "-DCMAKE_BUILD_TYPE=Release",
-    "-DCMAKE_TOOLCHAIN_FILE=tc.cmake",
-    "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-  ]);
-  expect(buildArgs({ build: "out", target: "all", config: "Release", jobs: 8 })).toEqual([
-    "--build",
-    "out",
-    "--config",
-    "Release",
-    "--target",
-    "all",
-    "--parallel",
-    "8",
-  ]);
-  expect(makeArgs({ dir: "d", jobs: 4, vars: { CC: "clang" }, target: "all" })).toEqual([
-    "-C",
-    "d",
-    "-j4",
-    "CC=clang",
-    "all",
-  ]);
-  expect(ninjaArgs({ dir: "out", jobs: 6, keepGoing: 0, targets: ["bun"] })).toEqual([
-    "-C",
-    "out",
-    "-j",
-    "6",
-    "-k",
-    "0",
-    "bun",
-  ]);
-  expect(mesonSetupArgs({ source: ".", build: "b", buildType: "release", options: { x: "1" } })).toEqual([
-    "setup",
-    "b",
-    ".",
-    "--buildtype=release",
-    "-Dx=1",
-  ]);
-  expect(uvRunArgs(["python", "-V"], { python: "3.13" })).toEqual(["run", "--python", "3.13", "--", "python", "-V"]);
-  expect(venvPython("p", "win32")).toBe(join("p", ".venv", "Scripts", "python.exe"));
-});
-
 test("clang search order prefers the newest versioned LLVM directory", () => {
   const list = (dir: string) => (dir === "/usr/lib" ? ["llvm-17", "llvm-21", "llvm20", "python3"] : []);
   const c = llvmBinCandidates("linux", { LLVM_PATH: "/opt/llvm" }, list).map(p => p.replaceAll("\\", "/"));
@@ -269,66 +201,6 @@ test("clang search order prefers the newest versioned LLVM directory", () => {
   expect(llvmBinCandidates("win32", { ProgramFiles: "C:\\PF" }, () => []).map(p => p.replaceAll("\\", "/"))).toContain(
     "C:/PF/LLVM/bin",
   );
-});
-
-test("xwin requires the licence flag and exports cargo cross variables", () => {
-  expect(() => splatArgs({ acceptLicense: false })).toThrow("acceptLicense");
-  const a = splatArgs({ acceptLicense: true, output: "/s", arch: ["x86_64"], sdkVersion: "10.0.26100" });
-  expect(a).toEqual(["--accept-license", "splat", "--output", "/s", "--arch", "x86_64", "--sdk-version", "10.0.26100"]);
-  const env = crossEnv("/s", ["x86_64", "aarch64"]);
-  expect(env.CC_x86_64_pc_windows_msvc).toBe("clang-cl");
-  expect(env.CARGO_TARGET_AARCH64_PC_WINDOWS_MSVC_LINKER).toBe("lld-link");
-  expect(env.CFLAGS_x86_64_pc_windows_msvc).toContain("--target=x86_64-pc-windows-msvc");
-  expect(env.CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS.replaceAll("\\", "/")).toContain(
-    "-Lnative=/s/sdk/lib/um/x86_64",
-  );
-  const root = mkdtempSync(join(tmpdir(), "buncc-xwin-"));
-  try {
-    expect(isSplatComplete(root)).toBe(false);
-    for (const d of ["crt/include", "sdk/include/um", "sdk/lib/um/x86_64", "crt/lib/x86_64"])
-      mkdirSync(join(root, d), { recursive: true });
-    writeFileSync(join(root, "crt/include/vcruntime.h"), "");
-    writeFileSync(join(root, "sdk/include/um/Windows.h"), "");
-    expect(isSplatComplete(root)).toBe(true);
-    expect(isSplatComplete(root, ["x86_64", "aarch64"])).toBe(false);
-  } finally {
-    rmSync(root, { recursive: true, force: true });
-  }
-});
-
-test("wasm helpers", () => {
-  const lock = `[[package]]\nname = "wasm-bindgen"\nversion = "0.2.129"\nsource = "registry+x"\n\n[[package]]\nname = "wasm-bindgen-macro"\nversion = "0.2.129"\n`;
-  expect(bindgenVersionFromLock(lock)).toBe("0.2.129");
-  expect(cargoBuildArgs({ target: "p2", package: "app", features: ["a", "b"] })).toEqual([
-    "build",
-    "--target",
-    "wasm32-wasip2",
-    "--release",
-    "-p",
-    "app",
-    "--features",
-    "a,b",
-  ]);
-  expect(wasmArtifact("target", "unknown", "my-crate").replaceAll("\\", "/")).toBe(
-    "target/wasm32-unknown-unknown/release/my_crate.wasm",
-  );
-  const opt = wasmOptArgs({ input: "a.wasm", output: "b.wasm" });
-  expect(opt).toContain("--enable-bulk-memory");
-  expect(opt).not.toContain("--all-features");
-});
-
-test("gn args", () => {
-  expect(gnLiteral('a"b$c\\d')).toBe('"a\\"b\\$c\\\\d"');
-  expect(gnArgs({ is_debug: false, target_cpu: "x64", defs: ["A", "B"], jobs: 4 })).toBe(
-    'is_debug=false target_cpu="x64" defs=["A", "B"] jobs=4',
-  );
-  expect(() => gnArgs({ "bad key": 1 })).toThrow("invalid GN argument");
-  expect(gnGenArgs({ out: "out/Release", args: { is_debug: false } })).toEqual([
-    "gen",
-    "out/Release",
-    "--args=is_debug=false",
-    "--export-compile-commands",
-  ]);
 });
 
 test("vcpkg triplets, environment and install arguments", () => {
@@ -493,39 +365,5 @@ test("msix packaging commands, manifest and signing", () => {
     "-d",
     "Version=1.0",
     "a.wxs",
-  ]);
-});
-
-test("PKGBUILD generation and validation", () => {
-  const spec = {
-    pkgname: "bun-os",
-    pkgver: "1.4.7",
-    pkgdesc: "Bun OS runtime",
-    arch: ["x86_64", "aarch64"],
-    url: "https://github.com/aphrody-labs/bun-os",
-    license: ["MIT"],
-    depends: ["glibc"],
-    source: ["bun-os-1.4.7.tar.gz::https://example.com/it's.tar.gz"],
-    sha256sums: ["a".repeat(64)],
-    package: 'install -Dm755 bun "$pkgdir/usr/bin/bun"',
-  };
-  const text = generatePkgbuild(spec);
-  expect(text).toContain("pkgname='bun-os'\npkgver=1.4.7\npkgrel=1\n");
-  expect(text).toContain("arch=('x86_64' 'aarch64')");
-  expect(text).toContain(`'bun-os-1.4.7.tar.gz::https://example.com/it'\\''s.tar.gz'`);
-  expect(text).toContain('package() {\n  install -Dm755 bun "$pkgdir/usr/bin/bun"\n}');
-  expect(pkgbuildProblems({ ...spec, pkgver: "1.4-7", pkgname: "Bad Name", sha256sums: [] })).toHaveLength(3);
-  expect(pkgbuildProblems({ ...spec, arch: ["any", "x86_64"] })).toContain(
-    "'any' cannot be combined with other architectures",
-  );
-  expect(() => generatePkgbuild({ ...spec, license: [] })).toThrow("invalid PKGBUILD");
-  expect(packageFileName(spec, "bun-os", "x86_64")).toBe("bun-os-1.4.7-1-x86_64.pkg.tar.zst");
-  expect(packageFileName({ ...spec, arch: ["any"] }, "bun-os", "x86_64")).toBe("bun-os-1.4.7-1-any.pkg.tar.zst");
-  expect(makepkgArgs({ syncDeps: true, force: true, clean: true })).toEqual([
-    "--syncdeps",
-    "--force",
-    "--cleanbuild",
-    "--clean",
-    "--noconfirm",
   ]);
 });

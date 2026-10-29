@@ -1,5 +1,4 @@
 /** uv: Python package/project manager (the fork shipped it as the `bun uv` plugin). */
-import { join } from "node:path";
 import type { GithubToolSpec } from "./_github.ts";
 import { toolProvider } from "./_tool.ts";
 
@@ -27,23 +26,3 @@ export const uvProvider = toolProvider({
     "download uv with `ensure()` (checksum-verified release) or see https://docs.astral.sh/uv/getting-started/installation/",
 });
 
-export function uvSyncArgs(o: { frozen?: boolean; python?: string; groups?: string[] } = {}): string[] {
-  const args = ["sync"];
-  if (o.frozen) args.push("--frozen");
-  if (o.python) args.push("--python", o.python);
-  for (const g of o.groups ?? []) args.push("--group", g);
-  return args;
-}
-
-export function uvRunArgs(command: string[], o: { python?: string; withPackages?: string[] } = {}): string[] {
-  const args = ["run"];
-  if (o.python) args.push("--python", o.python);
-  for (const w of o.withPackages ?? []) args.push("--with", w);
-  return [...args, "--", ...command];
-}
-
-export function venvPython(project: string, platform: string = process.platform): string {
-  return platform === "win32"
-    ? join(project, ".venv", "Scripts", "python.exe")
-    : join(project, ".venv", "bin", "python");
-}

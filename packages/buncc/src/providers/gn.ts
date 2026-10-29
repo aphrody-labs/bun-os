@@ -20,46 +20,6 @@ export function findDepotTools(
   return undefined;
 }
 
-export type GnValue = string | number | boolean | GnValue[];
-
-/** GN literal: strings are double-quoted with `\`, `"` and `$` escaped; lists are `[a, b]`. */
-export function gnLiteral(v: GnValue): string {
-  if (typeof v === "boolean") return v ? "true" : "false";
-  if (typeof v === "number") return String(v);
-  if (Array.isArray(v)) return `[${v.map(gnLiteral).join(", ")}]`;
-  return `"${v.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\$/g, "\\$")}"`;
-}
-
-/** The text for `gn gen --args=`: `is_debug=false target_cpu="x64"`. Keys are validated as GN identifiers. */
-export function gnArgs(args: Record<string, GnValue>): string {
-  return Object.entries(args)
-    .map(([k, v]) => {
-      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(k)) throw new Error(`invalid GN argument name ${JSON.stringify(k)}`);
-      return `${k}=${gnLiteral(v)}`;
-    })
-    .join(" ");
-}
-
-export function gnGenArgs(o: {
-  out: string;
-  args?: Record<string, GnValue>;
-  root?: string;
-  exportCompileCommands?: boolean;
-}): string[] {
-  const a = ["gen", o.out];
-  if (o.root) a.push(`--root=${o.root}`);
-  if (o.args && Object.keys(o.args).length) a.push(`--args=${gnArgs(o.args)}`);
-  if (o.exportCompileCommands ?? true) a.push("--export-compile-commands");
-  return a;
-}
-
-export function autoninjaArgs(o: { out: string; targets: string[]; jobs?: number; keepGoing?: number }): string[] {
-  const a = ["-C", o.out];
-  if (o.jobs) a.push("-j", String(o.jobs));
-  if (o.keepGoing !== undefined) a.push("-k", String(o.keepGoing));
-  return [...a, ...o.targets];
-}
-
 export function cloneCommands(dest: string): string[][] {
   return [["git", "clone", "--depth", "1", DEPOT_TOOLS_URL, dest]];
 }

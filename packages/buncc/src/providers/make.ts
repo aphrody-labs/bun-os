@@ -60,33 +60,3 @@ export const pkgconfProvider = toolProvider({
   },
 });
 
-export function makeArgs(o: { dir?: string; target?: string; jobs?: number; vars?: Record<string, string> }): string[] {
-  const args: string[] = [];
-  if (o.dir) args.push("-C", o.dir);
-  if (o.jobs) args.push(`-j${o.jobs}`);
-  for (const [k, v] of Object.entries(o.vars ?? {})) args.push(`${k}=${v}`);
-  if (o.target) args.push(o.target);
-  return args;
-}
-
-export function ninjaArgs(o: { dir?: string; targets?: string[]; jobs?: number; keepGoing?: number }): string[] {
-  const args: string[] = [];
-  if (o.dir) args.push("-C", o.dir);
-  if (o.jobs) args.push("-j", String(o.jobs));
-  if (o.keepGoing !== undefined) args.push("-k", String(o.keepGoing));
-  return [...args, ...(o.targets ?? [])];
-}
-
-export function mesonSetupArgs(o: {
-  source: string;
-  build: string;
-  buildType?: string;
-  prefix?: string;
-  options?: Record<string, string>;
-}): string[] {
-  const args = ["setup", o.build, o.source];
-  if (o.buildType) args.push(`--buildtype=${o.buildType}`);
-  if (o.prefix) args.push(`--prefix=${o.prefix}`);
-  for (const [k, v] of Object.entries(o.options ?? {})) args.push(`-D${k}=${v}`);
-  return args;
-}
