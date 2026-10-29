@@ -17,8 +17,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: bunos-c-${{ github.sha }}
-  cancel-in-progress: false
+  group: bunos-c-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   linux:
