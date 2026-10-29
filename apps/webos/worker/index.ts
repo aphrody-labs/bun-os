@@ -2,6 +2,7 @@
 // aphrody.com edge: static Bun OS shell + /api/health + /api/browse (script-free reader proxy for the Bun Browser).
 import { workspaceResponse } from "./workspace";
 import { gameContentResponse } from "./game-content";
+import { ISOLATION, isolated } from "./isolation";
 import { playResponse } from "./play";
 import { downloadsResponse } from "./downloads";
 import { APP_SERVER_PATHS, appServerResponse } from "./app-server";
@@ -98,11 +99,6 @@ const APP_CSP = PAGE_CSP.replace(
 )
   .replace("connect-src 'self'", "connect-src 'self' blob: data:")
   .replace("img-src", "media-src 'self' blob: data:; img-src");
-// Cross-origin isolation enables the threaded emulators; credentialless keeps third-party images working.
-const ISOLATION = {
-  "cross-origin-opener-policy": "same-origin",
-  "cross-origin-embedder-policy": "credentialless",
-};
 
 const MAX_BYTES = 4_000_000;
 const PRIVATE_HOST =
@@ -357,7 +353,7 @@ export default {
     if (url.pathname === "/api/browse") {
       if (request.method !== "GET")
         return new Response("Method not allowed", { status: 405 });
-      return browse(request, env.BROWSE_FETCH);
+      return isolated(await browse(request, env.BROWSE_FETCH));
     }
     if (
       url.pathname === "/vm/alpine.iso" &&

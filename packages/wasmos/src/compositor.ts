@@ -34,7 +34,10 @@ export class Compositor {
     if (typeof source === "string") bytes = await (await fetch(source)).arrayBuffer();
     else if (source instanceof Response) bytes = await source.arrayBuffer();
     else bytes = source;
-    const { instance } = await WebAssembly.instantiate(bytes, {});
+    const { instance } = (await WebAssembly.instantiate(
+      bytes,
+      {},
+    )) as unknown as WebAssembly.WebAssemblyInstantiatedSource;
     return new Compositor(instance.exports as unknown as CompositorExports, width, height);
   }
 
