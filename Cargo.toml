@@ -28,6 +28,7 @@ members = [
   "crates/aphrody-antigravity",
   "crates/aphrody-model-antigravity",
   "crates/aphrody-boq",
+  "crates/aphrody-accounts",
   "packages/bun-windows-winclean",
   "crates/aphrody-shell-session",
   "crates/aphrody-shell-vfs",
