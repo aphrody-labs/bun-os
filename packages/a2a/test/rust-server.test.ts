@@ -10,7 +10,7 @@
  * aphrody-a2a-server, `Unreleased` changelog entries); tighten them once the binary is rebuilt.
  */
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { copyFileSync, mkdtempSync, rmSync } from "node:fs";
+import { copyFileSync, existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -24,7 +24,7 @@ import {
 } from "../src/index.ts";
 import { LegacyBridge } from "../src/legacy.ts";
 
-const repoRoot = join(import.meta.dir, "..", "..", "..", "..");
+const repoRoot = join(import.meta.dir, "..", "..", "..");
 const binary = Bun.which("aphrody");
 
 async function freePort(): Promise<number> {
@@ -52,7 +52,7 @@ async function waitReady(url: string, process: { exitCode: number | null }): Pro
   throw new Error("aphrody a2a serve did not become ready");
 }
 
-describe.skipIf(!binary)("Rust A2A server (aphrody a2a serve, dry run)", () => {
+describe.skipIf(!binary || !existsSync(join(repoRoot, "ai.json")))("Rust A2A server (aphrody a2a serve, dry run)", () => {
   let dir: string;
   let server: ReturnType<typeof Bun.spawn>;
   let url: string;

@@ -1,6 +1,6 @@
 /** Native-free Aphrody Site entrypoint. */
 export const aphrodyCanvasRuntime = "aphrody-canvas/skia" as const;
-export const aphrodyCanvasVersion = "1.4.4" as const;
+export const aphrodyCanvasVersion = "1.4.7" as const;
 export type CanvasBackend = "browser" | "native-skia";
 export interface CanvasSize {
   width: number;

@@ -11,7 +11,9 @@ describe("generated pet data", () => {
   test("matches the crate animations.json (run `bun run gen` after a re-export)", async () => {
     const raw = (await Bun.file(crateJson).json()) as RawAnimations;
     const generated = await Bun.file(join(import.meta.dir, "animations.generated.ts")).text();
-    expect(generated).toBe(renderModule(compactPet(raw)));
+    // The committed module is run through the repo formatter, so compare without layout.
+    const squash = (s: string) => s.replace(/\s+/g, "").replace(/,([)\]}])/g, "$1");
+    expect(squash(generated)).toBe(squash(renderModule(compactPet(raw))));
   });
 
   test("atlas is the 8x11 grid of 192x208 cells", () => {

@@ -2,7 +2,7 @@
 /**
  * Minimal proto3 reader and ProtoJSON TypeScript emitter for `a2a.proto`.
  *
- * `crates/os/kernel/comps/a2a-pb/proto/a2a.proto` is the single source of the A2A 1.0 data model: the Rust
+ * `crates/aphrody-a2a-pb/proto/a2a.proto` is the single source of the A2A 1.0 data model: the Rust
  * crates compile it with prost, this module projects it to TypeScript. Only the proto3 subset
  * used by the A2A schema is understood (messages, enums, oneof, map, optional, repeated,
  * services); anything else throws so a schema change cannot be silently mis-projected.

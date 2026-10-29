@@ -20,7 +20,7 @@ import canvasModule, {
 import { createBrowserCanvas, createM3CanvasSurface, type M3CanvasSurface } from "@aphrody/canvas/site";
 
 export async function consumerView(scene: M3Scene): Promise<void> {
-  const version: "1.4.4" = aphrodyCanvasVersion;
+  const version: "1.4.7" = aphrodyCanvasVersion;
   const canvas: Canvas = createCanvas(64, 32);
   const ctx: SKRSContext2D = canvas.getContext("2d");
   ctx.fillRect(0, 0, 64, 32);

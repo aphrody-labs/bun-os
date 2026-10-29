@@ -4,7 +4,7 @@ import type { JsonValue } from "./generated/a2a.ts";
 
 /**
  * Error codes of the A2A 1.0 specification (section 5.4) and of JSON-RPC 2.0. Kept in step with
- * `crates/contracts/a2a/src/errors.rs`; the test suite compares both tables.
+ * `crates/aphrody-a2a/src/errors.rs`; the test suite compares both tables.
  */
 export const A2A_ERROR_CODES = {
   TASK_NOT_FOUND: -32001,

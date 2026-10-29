@@ -10,7 +10,7 @@ test("help works without Cargo or the native binary", async () => {
   expect(await child.exited).toBe(0);
 });
 
-test("configured native binary receives arguments without invoking Cargo", async () => {
+test.skipIf(process.platform === "win32")("configured native binary receives arguments without invoking Cargo", async () => {
   const child = Bun.spawn([process.execPath, `${import.meta.dir}/cli.ts`, "targets"], {
     env: { ...process.env, IECODE_HOMEBREW_BINARY: "/bin/echo", PATH: "" },
     stdout: "pipe",
