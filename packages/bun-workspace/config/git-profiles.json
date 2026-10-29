@@ -119,6 +119,19 @@
         "vendor/ctru-rs",
         "vendor/chipi-spec"
       ]
+    },
+    "microsoft": {
+      "description": "Microsoft/Windows track: Fluent tokens and WinUI app, Microsoft app probes, the Windows facade, buncc and the Microsoft SDK sources.",
+      "paths": [
+        "docs",
+        "packages/fluent",
+        "packages/microsoft",
+        "packages/windows",
+        "packages/buncc",
+        "packages/ntcore",
+        "vendor/microsoft"
+      ],
+      "submodules": []
     }
   }
 }

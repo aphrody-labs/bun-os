@@ -397,6 +397,20 @@
       "covers": ["factory/dotnet-linux", "packages/buncc/src/dotnet-linux"]
     },
     {
+      "id": "microsoft",
+      "layer": "facade",
+      "title": "packages/fluent and packages/microsoft (Fluent 2 tokens, WinUI 3 app, Microsoft app probes, Wine coverage matrix)",
+      "owner": "packages/microsoft",
+      "module": "factory:microsoft",
+      "entry": ["bun test packages/microsoft", "bun test packages/fluent", "bun packages/microsoft/src/cli.ts probe"],
+      "docs": ["docs/MICROSOFT.md"],
+      "ci": ["microsoft.yml#windows", "microsoft.yml#ubuntu"],
+      "pins": [],
+      "status": "unverified",
+      "note": "packages/fluent (module factory:fluent) is covered by the same entry",
+      "covers": ["packages/microsoft", "packages/fluent"]
+    },
+    {
       "id": "ntcore",
       "layer": "facade",
       "title": "ntcore (ReactOS registry hives, handle table, PE helpers compiled to wasm32)",
@@ -465,6 +479,7 @@
   ],
   "duplicatesAllowed": {
     "vswhere": {
+      "packages/buncc/src/dotnet-linux/cli.ts": "puts the Visual Studio Installer directory (vswhere.exe) on PATH for ILCompiler, which the msvc provider env does not do; fold into the msvc provider when packages/buncc is next audited",
       "scripts/aphrody/build/rust/cargo-serial.ts": "VsDevCmd-based environment of the serial cargo runner; migrate to @aphrody/buncc/msvc when scripts/aphrody is folded into buncc (owner: scripts/aphrody)",
       "scripts/aphrody/build/shell/terminal-build.ts": "VsDevCmd with MSBuild requirement for the terminal build; same migration (owner: scripts/aphrody)"
     }

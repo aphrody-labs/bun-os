@@ -13,7 +13,7 @@ buncc               | buncc, buncc-sh
                     v
 buncc providers     | buncc-providers, buncc-posix
                     v
-Platform facades    | windows, wasm, ntcore
+Platform facades    | windows, wasm, microsoft, ntcore
                     v
 Workspace tooling   | bun-workspace, components, windows-samples
                     v
@@ -48,6 +48,7 @@ Images              | images, release, sites
 | providers | **buncc-posix**: POSIX on Windows and Wine/Proton providers (posix, mingw, msys2, wine, proton) | `packages/buncc/src/providers/posix.ts` | `buncc posix doctor`<br>`buncc posix smoke`<br>`buncc posix uninstall`<br>`buncc wine doctor` | `docs/POSIX-ON-WINDOWS.md` | - | `buncc.toolchain.json` | built |
 | facade | **windows**: @aphrody/windows (Win32, registry, services, shell, WinRT, WinUI) (the one Windows API facade; toolchain discovery stays in buncc, not here) | `packages/windows` | `bun test packages/windows` | `docs/WINDOWS.md` | - | - | built |
 | facade | **wasm**: @aphrody/wasm (build, inspect, run, optimize) | `packages/wasm` | `buncc wasm`<br>`aphrody-wasm` | `packages/wasm/README.md` | - | - | built |
+| facade | **microsoft**: packages/fluent and packages/microsoft (Fluent 2 tokens, WinUI 3 app, Microsoft app probes, Wine coverage matrix) (packages/fluent (module factory:fluent) is covered by the same entry) | `packages/microsoft` | `bun test packages/microsoft`<br>`bun test packages/fluent`<br>`bun packages/microsoft/src/cli.ts probe` | `docs/MICROSOFT.md` | `microsoft.yml#windows`<br>`microsoft.yml#ubuntu` | - | unverified |
 | facade | **ntcore**: ntcore (ReactOS registry hives, handle table, PE helpers compiled to wasm32) (no CI job yet) | `packages/ntcore` | `bun factory/ntcore/build.ts`<br>`bun test packages/ntcore` | `docs/NTCORE.md` | - | `factory/ntcore/sweep.json` | unverified |
 | workspace | **bun-workspace**: @aphrody/bun-workspace (cargo module runner, git at scale, source coverage) | `packages/bun-workspace` | `aphrody-bun doctor`<br>`aphrody-bun git doctor`<br>`aphrody-bun status` | `docs/MONOREPO-SCALE.md`<br>`docs/MONOREPO.md` | `ci.yml#quality` | `packages/bun-workspace/config/git-profiles.json` | built |
 | workspace | **components**: Component manifest and architecture map (check, generate, graph, consistency) | `factory/bunos` | `just components`<br>`just map`<br>`buncc doctor --repo` | `docs/ARCHITECTURE-MAP.md`<br>`docs/MONOREPO.md` | `ci.yml#quality` | `factory/bunos/components.json` | built |
@@ -94,6 +95,7 @@ Microsoft references (`vendor/microsoft/PINS.json`, 14 pins): microsoft-ui-xaml 
 | `bunos-c.yml` (Bun OS C) | push (os; paths 3: factory/c/**, packages/buncc/src/c/**, ...), workflow_dispatch | `linux`, `musl`, `windows` | c | setup-workspace |
 | `ci.yml` (CI) | push (os), pull_request, workflow_dispatch | `plan`, `quality`, `rust`, `release-plan` | runtime, buncc, buncc-sh, buncc-providers, bun-workspace, components, release | setup-workspace |
 | `dotnet-linux.yml` (dotnet-linux) | workflow_dispatch, push (os; paths 5: factory/dotnet-linux/**, packages/buncc/src/dotnet-linux/**, ...) | `pins`, `ubuntu`, `alpine`, `cross-arm64`, `arch`, `wsl-layer`, `wasm-guest` | dotnet-linux | setup-workspace |
+| `microsoft.yml` (microsoft) | workflow_dispatch, push (os; paths 4: packages/fluent/**, packages/microsoft/**, ...) | `windows`, `ubuntu` | microsoft | setup-workspace |
 | `release.yml` (Release) | push, workflow_dispatch | `verify`, `binaries`, `npm`, `crates`, `github-release` | release | setup-workspace |
 | `rustbase.yml` (Rust userland (rustbase)) | workflow_dispatch, push (os; paths 3: factory/rustbase/**, docs/RUSTBASE.md, ...) | `check`, `packages`, `gnu-coreutils`, `util-linux-tests` | rustbase | jobs run in Arch and Ubuntu containers; the Bun step uses oven-sh/setup-bun directly (owner: rustbase, to move to the setup action) |
 | `wasmos.yml` (WASM OS) | workflow_dispatch, push (os; paths 4: packages/wasmos/**, factory/wasmos/**, ...) | `compositor`, `alpine`, `apps` | wasmos | jobs install the pinned Bun with npm install -g bun@BUN_VERSION (same version source as setup-bun, no integrity check) and drive Chromium; owner: wasmos, to move to the setup action |

@@ -1,5 +1,5 @@
 {
-  "name": "@aphrody/fluent",
+  "//": "Unnamed on purpose: not a root workspace member (factory/bunos/components.json workspaceIntegration), so the root bun.lock stays untouched.",
   "version": "0.1.0",
   "private": true,
   "description": "Fluent 2 for Bun OS: tokens generated from @fluentui/react-theme, a WinUI 3 app (Windows App SDK) and a @fluentui/web-components shell",
