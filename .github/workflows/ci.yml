@@ -111,6 +111,18 @@ jobs:
           token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
           profile: ci
           rust: "true"
+      # The libcubeb C sources are a nested submodule that `bun run setup` does not recurse into; cubeb-sys builds them with CMake.
+      - name: Nested libcubeb submodule
+        if: ${{ steps.setup.outcome == 'success' }}
+        run: git -C vendor/cubeb-rs submodule update --init --depth 1 --recursive
+      # openssl-sys finds OpenSSL through vcpkg on MSVC; Windows runners ship vcpkg without OpenSSL.
+      - name: OpenSSL for the native crates
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          vcpkg install openssl:x64-windows-static-md
+          "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "VCPKGRS_TRIPLET=x64-windows-static-md" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
       - name: Format
         run: bun scripts/cargo-fmt.ts
       - name: Check every workspace member

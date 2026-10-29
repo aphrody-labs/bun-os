@@ -17,7 +17,7 @@ export interface Integration {
 
 const sh = async (root: string, ...args: string[]) => {
   const proc = Bun.spawn(args, { cwd: root, stdout: "pipe", stderr: "pipe" });
-  const [out] = await Promise.all([proc.stdout.text(), proc.exited]);
+  const [out] = await Promise.all([new Response(proc.stdout).text(), proc.exited]);
   return out.replace(/\r/g, "").split("\n").filter(Boolean);
 };
 
@@ -30,7 +30,15 @@ const underAny = (dir: string, roots: Iterable<string>) => {
 /** Expand `a/*`-style workspace globs against a directory set. */
 const matchGlob = (glob: string, dirs: Iterable<string>) => {
   if (!/[*?]/.test(glob)) return [...dirs].filter(d => d === glob);
-  const re = new RegExp("^" + glob.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*/g, "\u0000").replace(/\*/g, "[^/]*").replace(/\u0000/g, ".*") + "$");
+  const re = new RegExp(
+    "^" +
+      glob
+        .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+        .replace(/\*\*/g, "\u0000")
+        .replace(/\*/g, "[^/]*")
+        .replace(/\u0000/g, ".*") +
+      "$",
+  );
   return [...dirs].filter(d => re.test(d));
 };
 
@@ -54,9 +62,14 @@ export interface Graph {
 
 export async function buildGraph(root: string, manifest: any, integration: Integration): Promise<Graph> {
   const files = await sh(root, "git", "ls-files");
-  const gitlinks = new Set((await sh(root, "git", "ls-files", "-s")).filter(l => l.startsWith("160000")).map(l => l.split("\t")[1]));
+  const gitlinks = new Set(
+    (await sh(root, "git", "ls-files", "-s")).filter(l => l.startsWith("160000")).map(l => l.split("\t")[1]),
+  );
   const fileSet = new Set(files);
-  const readJson = async (f: string) => Bun.file(`${root}/${f}`).json().catch(() => undefined);
+  const readJson = async (f: string) =>
+    Bun.file(`${root}/${f}`)
+      .json()
+      .catch(() => undefined);
   const readToml = async (f: string) => {
     try {
       return Bun.TOML.parse(await Bun.file(`${root}/${f}`).text()) as any;
@@ -139,13 +152,17 @@ export async function buildGraph(root: string, manifest: any, integration: Integ
 
   // ---- npm ---------------------------------------------------------------------------------------------------
   const rootPkg = (await readJson("package.json")) ?? {};
-  const pkgFiles = files.filter(f => (f.endsWith("/package.json") || f === "package.json") && !f.includes("node_modules/"));
+  const pkgFiles = files.filter(
+    f => (f.endsWith("/package.json") || f === "package.json") && !f.includes("node_modules/"),
+  );
   const npmPkgs = new Map<string, any>();
   for (const f of pkgFiles) {
     const j = await readJson(f);
     if (j) npmPkgs.set(posix.dirname(f), j);
   }
-  const wsGlobs: string[] = Array.isArray(rootPkg.workspaces) ? rootPkg.workspaces : (rootPkg.workspaces?.packages ?? []);
+  const wsGlobs: string[] = Array.isArray(rootPkg.workspaces)
+    ? rootPkg.workspaces
+    : (rootPkg.workspaces?.packages ?? []);
   const npmMembers = new Set<string>();
   for (const g of wsGlobs) {
     if (g.startsWith("!")) continue;

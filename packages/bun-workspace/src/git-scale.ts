@@ -35,16 +35,52 @@ export const RECOMMENDED: Setting[] = [
     platforms: ["win32", "darwin"],
     why: "git-config core.fsmonitor: built-in fsmonitor daemon, available on Windows and macOS only",
   },
-  { key: "core.untrackedCache", value: "true", why: "git-config feature.manyFiles: untracked cache (needs working mtime)" },
-  { key: "feature.manyFiles", value: "true", why: "git-config feature.manyFiles: index.version=4, index.skipHash, untracked cache" },
-  { key: "core.preloadIndex", value: "true", why: "git-config core.preloadIndex: parallel lstat while refreshing the index" },
+  {
+    key: "core.untrackedCache",
+    value: "true",
+    why: "git-config feature.manyFiles: untracked cache (needs working mtime)",
+  },
+  {
+    key: "feature.manyFiles",
+    value: "true",
+    why: "git-config feature.manyFiles: index.version=4, index.skipHash, untracked cache",
+  },
+  {
+    key: "core.preloadIndex",
+    value: "true",
+    why: "git-config core.preloadIndex: parallel lstat while refreshing the index",
+  },
   { key: "core.longpaths", value: "true", platforms: ["win32"], why: "git-for-windows: paths over MAX_PATH" },
-  { key: "core.multiPackIndex", value: "true", why: "git-config core.multiPackIndex: read the multi-pack-index (incremental-repack needs it)" },
-  { key: "fetch.writeCommitGraph", value: "true", why: "git-config fetch.writeCommitGraph: commit-graph refreshed after each fetch" },
-  { key: "protocol.version", value: "2", why: "git-config protocol.version: wire protocol v2 (ref filtering, partial clone)" },
-  { key: "submodule.fetchJobs", value: "8", why: "git-config submodule.fetchJobs: parallel submodule fetch/clone (default 1)" },
-  { key: "submodule.recurse", value: "false", why: "git-config submodule.recurse: do not recurse into 180+ submodules by default" },
-  { key: "maintenance.strategy", value: "incremental", why: "git-maintenance: prefetch+commit-graph hourly, loose-objects+incremental-repack daily" },
+  {
+    key: "core.multiPackIndex",
+    value: "true",
+    why: "git-config core.multiPackIndex: read the multi-pack-index (incremental-repack needs it)",
+  },
+  {
+    key: "fetch.writeCommitGraph",
+    value: "true",
+    why: "git-config fetch.writeCommitGraph: commit-graph refreshed after each fetch",
+  },
+  {
+    key: "protocol.version",
+    value: "2",
+    why: "git-config protocol.version: wire protocol v2 (ref filtering, partial clone)",
+  },
+  {
+    key: "submodule.fetchJobs",
+    value: "8",
+    why: "git-config submodule.fetchJobs: parallel submodule fetch/clone (default 1)",
+  },
+  {
+    key: "submodule.recurse",
+    value: "false",
+    why: "git-config submodule.recurse: do not recurse into 180+ submodules by default",
+  },
+  {
+    key: "maintenance.strategy",
+    value: "incremental",
+    why: "git-maintenance: prefetch+commit-graph hourly, loose-objects+incremental-repack daily",
+  },
 ];
 
 export function applicable(platform: NodeJS.Platform = process.platform) {
@@ -109,7 +145,8 @@ export function selectSubmodules(file: ProfileFile, profile: Profile, links: str
           ? links.filter(l => l.startsWith(pat.slice(0, -1)))
           : links.filter(l => l === pat);
     if (!hits.length) unmatched.push(pat);
-    for (const h of hits) if (profile.includeOptional || !optional.has(h) || profile.submodules.includes(h)) chosen.add(h);
+    for (const h of hits)
+      if (profile.includeOptional || !optional.has(h) || profile.submodules.includes(h)) chosen.add(h);
   }
   return { submodules: [...chosen].sort(), unmatched };
 }
@@ -185,7 +222,9 @@ export async function doctor(root: string): Promise<DoctorReport> {
     .map(p => p.trim().replace(/\\/g, "/").toLowerCase())
     .includes(root.replace(/\\/g, "/").toLowerCase());
   const fsm =
-    process.platform === "linux" ? undefined : (await git(root, ["fsmonitor--daemon", "status"])).out.includes("is watching");
+    process.platform === "linux"
+      ? undefined
+      : (await git(root, ["fsmonitor--daemon", "status"])).out.includes("is watching");
   const exists = (p: string) => Bun.file(resolve(gitDir, p)).exists();
   const graph =
     (await exists("objects/info/commit-graph")) || (await exists("objects/info/commit-graphs/commit-graph-chain"));
@@ -242,9 +281,21 @@ async function timeGit(root: string, args: string[]) {
 
 /** Median-of-3 wall clock of the read paths that dominate developer time, without and with the recommended settings. */
 export async function measure(root: string) {
-  const off = ["-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false", "-c", "feature.manyFiles=false", "-c", "core.preloadIndex=false"];
+  const off = [
+    "-c",
+    "core.fsmonitor=false",
+    "-c",
+    "core.untrackedCache=false",
+    "-c",
+    "feature.manyFiles=false",
+    "-c",
+    "core.preloadIndex=false",
+  ];
   const rows: { mode: string; label: string; ms: number }[] = [];
-  for (const [mode, flags] of [["baseline", off], ["tuned", [] as string[]]] as const) {
+  for (const [mode, flags] of [
+    ["baseline", off],
+    ["tuned", [] as string[]],
+  ] as const) {
     await git(root, [...flags, "status", "--porcelain"]); // warm-up: builds the untracked cache / starts the daemon
     for (const [label, args] of [
       ["status", ["status", "--porcelain"]],

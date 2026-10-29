@@ -17,7 +17,10 @@ const file: ProfileFile = {
 const links = ["vendor/llvm", "vendor/x", "apps/y"];
 
 test("submodule selection is explicit, reports unmatched patterns and holds optional ones back", () => {
-  expect(selectSubmodules(file, file.profiles.a!, links)).toEqual({ submodules: ["vendor/x"], unmatched: ["vendor/missing"] });
+  expect(selectSubmodules(file, file.profiles.a!, links)).toEqual({
+    submodules: ["vendor/x"],
+    unmatched: ["vendor/missing"],
+  });
   expect(selectSubmodules(file, file.profiles.k!, links).submodules).toEqual(["vendor/llvm", "vendor/x"]);
   expect(selectSubmodules(file, file.profiles.d!, links).submodules).toEqual(["vendor/x"]);
   expect(conePaths(file, file.profiles.a!)).toEqual(["crates", "scripts"]);
@@ -25,7 +28,14 @@ test("submodule selection is explicit, reports unmatched patterns and holds opti
 
 test("format commits need a formatting subject and enough files", () => {
   const sha = (c: string) => c.repeat(40);
-  const log = [`${sha("a")}\tstyle: rustfmt crates`, " 900 files changed, 1 insertion(+)", `${sha("b")}\tfeat: add thing`, " 900 files changed", `${sha("c")}\tformat tiny`, " 3 files changed"].join("\n");
+  const log = [
+    `${sha("a")}\tstyle: rustfmt crates`,
+    " 900 files changed, 1 insertion(+)",
+    `${sha("b")}\tfeat: add thing`,
+    " 900 files changed",
+    `${sha("c")}\tformat tiny`,
+    " 3 files changed",
+  ].join("\n");
   expect(pickFormatCommits(log, 200).map(c => c.sha)).toEqual([sha("a")]);
 });
 
@@ -37,7 +47,12 @@ test("managed block is replaced in place and idempotent", () => {
 });
 
 test("codeowners skips submodule paths and templated paths", () => {
-  const text = renderCodeowners({ components: [{ id: "a", path: "crates/a, vendor/sub/inner, $X/y" }] }, ["crates"], ["vendor/sub"], "@o");
+  const text = renderCodeowners(
+    { components: [{ id: "a", path: "crates/a, vendor/sub/inner, $X/y" }] },
+    ["crates"],
+    ["vendor/sub"],
+    "@o",
+  );
   expect(text).toContain("/crates/a/");
   expect(text).not.toContain("vendor/sub");
   expect(text).not.toContain("$X");

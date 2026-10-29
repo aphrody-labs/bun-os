@@ -26,7 +26,16 @@
     "infra/**/*.ts",
     "scripts/**/*.ts",
     "apps/desktop/**/*.ts",
-    "packages/*/src/**/*.ts"
+    "packages/bun-app-host/src/**/*.ts",
+    "packages/bun-artifacts/src/**/*.ts",
+    "packages/bun-engine/src/**/*.ts",
+    "packages/docs-sync/src/**/*.ts",
+    "packages/bun-video-project/src/**/*.ts",
+    "packages/bun-workspace/src/**/*.ts",
+    "packages/kernel-client/src/**/*.ts",
+    "packages/ovh/src/**/*.ts",
+    "packages/package-converter/src/**/*.ts",
+    "packages/paths/src/**/*.ts"
   ],
   "exclude": [
     "node_modules",

@@ -34,8 +34,5 @@ product.scripts["format:check"] =
 product.scripts["workspace:manifests"] = "bun scripts/workspace-manifests.ts";
 for (const entry of [{ path: "package.json", manifest: product }, ...entries])
   await Bun.write(entry.path, JSON.stringify(entry.manifest, null, 2) + "\n");
-const types = await Bun.file("tsconfig.json").json();
-types.include = types.include.filter((path: string) => !path.startsWith("packages/"));
-types.include.push("packages/*/src/**/*.ts");
-await Bun.write("tsconfig.json", JSON.stringify(types, null, 2) + "\n");
+// tsconfig.json keeps its curated include list: the Next.js and Vite packages augment ProcessEnv/ImportMeta globally.
 console.log(`Bun workspace: ${entries.length} packages at ${product.version}`);

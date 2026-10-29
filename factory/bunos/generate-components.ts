@@ -16,7 +16,11 @@ const checkOnly = process.argv.includes("--check");
 
 const run = async (cmd: string[]) => {
   const proc = Bun.spawn(cmd, { cwd: root, stdout: "pipe", stderr: "pipe" });
-  const [out, err, code] = await Promise.all([proc.stdout.text(), proc.stderr.text(), proc.exited]);
+  const [out, err, code] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    proc.exited,
+  ]);
   if (code) throw new Error(`${cmd.join(" ")}: ${err.trim()}`);
   return out.replace(/\r/g, "");
 };

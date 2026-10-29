@@ -7,11 +7,44 @@ export interface Areas {
   distro: boolean;
 }
 
-const GLOBAL = [/^\.github\//, /^turbo\.json$/, /^bunfig\.toml$/, /^tsconfig[^/]*\.json$/, /^rust-toolchain\.toml$/, /^\.gitmodules$/];
-const RUST = [/^crates\//, /^Cargo\.(toml|lock)$/, /^\.cargo\//, /^vendor\/cargo\//, /^tools\//, /^apps\//, /^packages\/bun-tauri\//, /^scripts\/cargo/];
-const JS = [/^packages\//, /^apps\//, /^src\//, /^scripts\//, /^factory\//, /^design-system\//, /^fonts\//, /^bun\.lock$/, /^package\.json$/, /^infra\//];
+const GLOBAL = [
+  /^\.github\//,
+  /^turbo\.json$/,
+  /^bunfig\.toml$/,
+  /^tsconfig[^/]*\.json$/,
+  /^rust-toolchain\.toml$/,
+  /^\.gitmodules$/,
+];
+const RUST = [
+  /^crates\//,
+  /^Cargo\.(toml|lock)$/,
+  /^\.cargo\//,
+  /^vendor\/cargo\//,
+  /^tools\//,
+  /^apps\//,
+  /^packages\/bun-tauri\//,
+  /^scripts\/cargo/,
+];
+const JS = [
+  /^packages\//,
+  /^apps\//,
+  /^src\//,
+  /^scripts\//,
+  /^factory\//,
+  /^design-system\//,
+  /^fonts\//,
+  /^bun\.lock$/,
+  /^package\.json$/,
+  /^infra\//,
+];
 const DOCS = [/^docs\//, /\.mdx?$/];
-const DISTRO = [/^factory\//, /^container\//, /^infra\//, /^patches\//, /^vendor\/(cachyos|linux|ogc|kernel|nvidia|open-gpu|llvm|proton|wine)/];
+const DISTRO = [
+  /^factory\//,
+  /^container\//,
+  /^infra\//,
+  /^patches\//,
+  /^vendor\/(cachyos|linux|ogc|kernel|nvidia|open-gpu|llvm|proton|wine)/,
+];
 
 export function classify(files: string[]): Areas {
   const hit = (res: RegExp[]) => files.some(f => res.some(r => r.test(f)));

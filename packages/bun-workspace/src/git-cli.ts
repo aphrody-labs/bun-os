@@ -45,7 +45,8 @@ export async function gitCommand(args: string[]): Promise<number> {
       if (flag("--json")) console.log(JSON.stringify(r, null, 2));
       else {
         console.log(`${r.git}; scalar ${r.scalar ? "yes" : "no"}; backfill ${r.backfill ? "yes" : "no"}`);
-        for (const s of r.settings) console.log(`${s.ok ? "ok  " : "FAIL"} ${s.key} = ${s.have ?? "(unset)"} (want ${s.want})`);
+        for (const s of r.settings)
+          console.log(`${s.ok ? "ok  " : "FAIL"} ${s.key} = ${s.have ?? "(unset)"} (want ${s.want})`);
         console.log(
           `sparse ${r.sparse}; partial clone ${r.partialClone ?? "no"}; fsmonitor ${r.fsmonitorRunning ?? "n/a"}; commit-graph ${r.commitGraph}; midx ${r.multiPackIndex}; maintenance ${r.maintenanceRegistered}; submodules ${r.initializedSubmodules}/${r.gitlinks} initialised`,
         );
@@ -69,7 +70,13 @@ export async function gitCommand(args: string[]): Promise<number> {
         for (const [n, p] of Object.entries(f.profiles)) console.log(`${n.padEnd(16)} ${p.description}`);
         return 0;
       }
-      console.log(JSON.stringify(await applyProfile(root, name, { submodules: !flag("--no-submodules"), dryRun: flag("--dry-run") }), null, 2));
+      console.log(
+        JSON.stringify(
+          await applyProfile(root, name, { submodules: !flag("--no-submodules"), dryRun: flag("--dry-run") }),
+          null,
+          2,
+        ),
+      );
       return 0;
     }
     case "clone": {
@@ -94,7 +101,9 @@ export async function gitCommand(args: string[]): Promise<number> {
       const ms = Math.round(performance.now() - t);
       const sparse = (await git(root, ["sparse-checkout", "list"])).out.split("\n").filter(Boolean);
       const subs = (await git(root, ["submodule", "status"])).out.split("\n").filter(Boolean);
-      console.log(`status ${ms} ms, ${s.out.split("\n").filter(Boolean).length} changes; cone dirs: ${sparse.length ? sparse.join(" ") : "(full)"}; submodules initialised ${subs.filter(l => !l.startsWith("-")).length}/${subs.length}`);
+      console.log(
+        `status ${ms} ms, ${s.out.split("\n").filter(Boolean).length} changes; cone dirs: ${sparse.length ? sparse.join(" ") : "(full)"}; submodules initialised ${subs.filter(l => !l.startsWith("-")).length}/${subs.length}`,
+      );
       return 0;
     }
     case "prune":
@@ -113,11 +122,13 @@ export async function gitCommand(args: string[]): Promise<number> {
       const wanted = new Set(plan.submodules);
       const skipped: string[] = [];
       for (const link of await gitlinks(root)) {
-        if (wanted.has(link) || plan.sparse === false && name === "all") continue;
+        if (wanted.has(link) || (plan.sparse === false && name === "all")) continue;
         await git(root, ["config", "--local", `submodule.${link}.update`, "none"]);
         skipped.push(link);
       }
-      console.log(`profile ${name}: ${plan.cone.length} cone dirs, ${wanted.size} submodules kept, ${skipped.length} skipped`);
+      console.log(
+        `profile ${name}: ${plan.cone.length} cone dirs, ${wanted.size} submodules kept, ${skipped.length} skipped`,
+      );
       return 0;
     }
     case "affected": {
@@ -127,15 +138,22 @@ export async function gitCommand(args: string[]): Promise<number> {
       const areas = classify(diff.out.split("\n").filter(Boolean));
       console.log(JSON.stringify(areas));
       if (flag("--github-output") && Bun.env.GITHUB_OUTPUT)
-        appendFileSync(Bun.env.GITHUB_OUTPUT, Object.entries(areas).map(([k, v]) => `${k}=${v}\n`).join(""));
+        appendFileSync(
+          Bun.env.GITHUB_OUTPUT,
+          Object.entries(areas)
+            .map(([k, v]) => `${k}=${v}\n`)
+            .join(""),
+        );
       return 0;
     }
     case "generate": {
       const what = rest[0] ?? "all";
       if (["attributes", "all"].includes(what)) (await writeAttributes(root), console.log("wrote .gitattributes"));
       if (["codeowners", "all"].includes(what)) (await writeCodeowners(root), console.log("wrote .github/CODEOWNERS"));
-      if (["ignore-revs", "all"].includes(what)) console.log(`wrote .git-blame-ignore-revs (${(await writeIgnoreRevs(root)).length} commits)`);
-      if (["gitmodules", "all"].includes(what)) console.log(`.gitmodules: ${(await writeGitmodulesKeys(root)).length} keys changed`);
+      if (["ignore-revs", "all"].includes(what))
+        console.log(`wrote .git-blame-ignore-revs (${(await writeIgnoreRevs(root)).length} commits)`);
+      if (["gitmodules", "all"].includes(what))
+        console.log(`.gitmodules: ${(await writeGitmodulesKeys(root)).length} keys changed`);
       return 0;
     }
     default:

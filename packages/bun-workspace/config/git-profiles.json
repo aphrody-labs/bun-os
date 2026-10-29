@@ -1,15 +1,7 @@
 {
   "$comment": "Sparse-checkout (cone mode) profiles for `aphrody-bun git profile <name>`. paths are directories (cone mode accepts directories only; top-level files are always checked out). submodules are gitlink paths initialised shallow (--depth 1) after the cone is set; entries ending in /* match every gitlink below that directory. optionalSubmodules get `update = none` in .gitmodules and are only fetched by a profile that lists them.",
   "schemaVersion": 1,
-  "alwaysPaths": [
-    ".cargo",
-    ".github",
-    ".claude",
-    ".gitea",
-    "factory",
-    "scripts",
-    "src"
-  ],
+  "alwaysPaths": [".cargo", ".github", ".claude", ".gitea", "factory", "scripts", "src"],
   "optionalSubmodules": [
     "packages/re/third_party/unblob",
     "vendor/cachyos-linux",
@@ -27,14 +19,7 @@
   "profiles": {
     "core": {
       "description": "Tooling, factory, docs, infra: enough to run the quality gates that read tracked files only.",
-      "paths": [
-        "docs",
-        "infra",
-        "container",
-        "patches",
-        "tools",
-        "assets"
-      ],
+      "paths": ["docs", "infra", "container", "patches", "tools", "assets"],
       "submodules": []
     },
     "rust-workspace": {
@@ -57,14 +42,7 @@
         "vendor/uutils/*",
         "vendor/zakuro"
       ],
-      "verify": [
-        "cargo",
-        "metadata",
-        "--offline",
-        "--no-deps",
-        "--format-version",
-        "1"
-      ]
+      "verify": ["cargo", "metadata", "--offline", "--no-deps", "--format-version", "1"]
     },
     "web": {
       "description": "Bun workspaces (apps and packages), design system, fonts and the web vendor trees.",
@@ -80,38 +58,23 @@
         "vendor/fonts",
         "vendor/material-design-icons"
       ],
-      "submodules": [
-        "vendor/fonts",
-        "vendor/material-design-icons"
-      ]
+      "submodules": ["vendor/fonts", "vendor/material-design-icons"]
     },
     "kernel-distro": {
       "description": "Distribution and kernel sources (Linux only): pkgbuilds, kernels, Wine/Proton, LLVM.",
-      "paths": [
-        "vendor",
-        "container",
-        "infra",
-        "patches"
-      ],
-      "submodules": [
-        "vendor/*"
-      ],
+      "paths": ["vendor", "container", "infra", "patches"],
+      "submodules": ["vendor/*"],
       "includeOptional": true
     },
     "vendor-minimal": {
       "description": "Only the vendored cargo crates and the shallow sources the runtime build links.",
-      "paths": [
-        "vendor/cargo",
-        "crates"
-      ],
+      "paths": ["vendor/cargo", "crates"],
       "submodules": []
     },
     "all": {
       "description": "Full checkout: disables sparse-checkout and initialises every non-optional submodule shallow.",
       "paths": [],
-      "submodules": [
-        "*"
-      ],
+      "submodules": ["*"],
       "full": true
     },
     "ci": {
@@ -144,7 +107,13 @@
         "vendor/starpsx",
         "vendor/tetanes",
         "vendor/uutils/*",
-        "vendor/zakuro"
+        "vendor/zakuro",
+        "vendor/material-web",
+        "vendor/magika",
+        "vendor/cargo-3ds",
+        "vendor/cef-rs",
+        "vendor/citro3d-rs",
+        "vendor/ctru-rs"
       ]
     }
   }

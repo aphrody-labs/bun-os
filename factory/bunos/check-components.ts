@@ -21,7 +21,7 @@ const fail = (message: string) => errors.push(message);
 
 const git = async (...args: string[]) => {
   const proc = Bun.spawn(["git", ...args], { cwd: root, stdout: "pipe", stderr: "pipe" });
-  const [out, code] = await Promise.all([proc.stdout.text(), proc.exited]);
+  const [out, code] = await Promise.all([new Response(proc.stdout).text(), proc.exited]);
   return { out: out.replace(/\r/g, ""), code };
 };
 const read = (path: string) => Bun.file(join(root, path)).text();
