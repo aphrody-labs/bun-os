@@ -29,10 +29,16 @@ if (values.apps) {
   const pkgs = Object.entries(spec.packages as Record<string, string>).map(([n, v]) => `${n}=${v}`);
   const appsDir = resolve(values.out ?? join(import.meta.dir, "../../build/wasmos"));
   mkdirSync(appsDir, { recursive: true });
-  await Bun.write(join(appsDir, `Dockerfile.${values.apps}`), `FROM ${pins.apps.base}
+  await Bun.write(
+    join(appsDir, `Dockerfile.${values.apps}`),
+    `FROM ${pins.apps.base}
 RUN apk add --no-cache ${pkgs.join(" ")}
-`);
-  const b = Bun.spawn(["docker", "build", "-t", image, "-f", join(appsDir, `Dockerfile.${values.apps}`), appsDir], { stdout: "inherit", stderr: "inherit" });
+`,
+  );
+  const b = Bun.spawn(["docker", "build", "-t", image, "-f", join(appsDir, `Dockerfile.${values.apps}`), appsDir], {
+    stdout: "inherit",
+    stderr: "inherit",
+  });
   if ((await b.exited) !== 0) throw new Error("docker build of the apps image failed");
 }
 const out = resolve(values.out ?? join(import.meta.dir, "../../build/wasmos"));
