@@ -1,6 +1,6 @@
 {
   "//": "Unnamed on purpose: not a root workspace member (factory/bunos/components.json workspaceIntegration), so the root bun.lock stays untouched.",
-  "version": "0.1.0",
+  "version": "1.4.7",
   "private": true,
   "description": "Microsoft app support probes for Bun OS: PE import analysis, Wine spec coverage, COM automation (Office), packaged apps, Windows 11 feature probes. Every claim is a test.",
   "license": "Apache-2.0",

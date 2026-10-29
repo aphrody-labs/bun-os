@@ -20,7 +20,7 @@ env:
   DOTNET_NOLOGO: "1"
 
 concurrency:
-  group: microsoft-${{ github.ref }}
+  group: microsoft-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.ref }}
   cancel-in-progress: true
 
 jobs:

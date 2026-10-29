@@ -30,7 +30,7 @@ env:
   PESTER_VERSION: 5.7.1
 
 concurrency:
-  group: dotnet-linux-${{ github.ref }}
+  group: dotnet-linux-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.ref }}
   cancel-in-progress: true
 
 jobs:
