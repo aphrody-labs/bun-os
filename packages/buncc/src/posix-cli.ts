@@ -66,7 +66,7 @@ export async function posixCommand(args: string[], root: string): Promise<number
       const installs: LegacyInstall[] = [];
       for (const id of ids) installs.push(...(await detectLegacy(id, host)));
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const plan = planUninstall(installs, await protectedRoots(host), join(cacheDir(), "uninstall-backup", stamp));
+      const plan = planUninstall(installs, await protectedRoots(host), join(cacheDir(), "uninstall-backup", stamp), await host.isElevated());
       const yes = rest.includes("--yes");
       console.log(renderPlan(plan, yes));
       if (!installs.length) return 0;

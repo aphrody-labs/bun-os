@@ -36,7 +36,11 @@ export interface LegacyHost {
   /** Persistent (registry) PATH, not the process one. */
   persistentPath(): Promise<{ user: string; machine: string }>;
   /** Run a command (backup and uninstall steps). */
-  exec(argv: string[], opts?: { cwd?: string }): Promise<{ code: number; stdout: string; stderr: string }>;
+  exec(argv: string[], opts?: { cwd?: string; timeoutMs?: number }): Promise<{ code: number; stdout: string; stderr: string }>;
+  /** Does this registry key exist? (`reg query`; false also when it cannot be read.) */
+  regKeyExists(key: string): Promise<boolean>;
+  /** Is the process elevated (high integrity token)? buncc never tries to elevate itself. */
+  isElevated(): Promise<boolean>;
   removeDir(path: string): void;
   writeFile(path: string, text: string): void;
   /** Absolute paths of the files that may reference an install (editor and terminal settings, cargo config). */
@@ -51,6 +55,8 @@ export interface LegacyInstall {
   uninstaller?: string[];
   /** One per registered product (GnuWin32 registers one uninstaller per package). */
   uninstallers: string[][];
+  /** Registry key of the product each uninstaller belongs to (same index); used to verify removal. */
+  uninstallerKeys: (string | undefined)[];
   registryKeys: string[];
   pathEntries: { scope: "user" | "machine" | "process"; value: string }[];
   shortcuts: string[];
@@ -186,8 +192,19 @@ export async function detectLegacy(id: LegacyId, host: LegacyHost): Promise<Lega
   for (const { root, entries: found } of roots.values()) {
     const entry = found.find(e => e.UninstallString) ?? found[0];
     const m = modeOf(root, entry, host);
-    const uninstallers = [...new Map(found.filter(e => e.UninstallString).map(e => { const u = modeOf(root, e, host).uninstaller; return [u?.join(" ") ?? "", u] as const; })).values()].filter((u): u is string[] => !!u);
-    if (!uninstallers.length && m.uninstaller) uninstallers.push(m.uninstaller);
+    const uninstallers: string[][] = [];
+    const uninstallerKeys: (string | undefined)[] = [];
+    for (const e of found) {
+      const u = e.UninstallString ? modeOf(root, e, host).uninstaller : undefined;
+      if (u && !uninstallers.some(x => x.join(" ") === u.join(" "))) {
+        uninstallers.push(u);
+        uninstallerKeys.push(e.key);
+      }
+    }
+    if (!uninstallers.length && m.uninstaller) {
+      uninstallers.push(m.uninstaller);
+      uninstallerKeys.push(undefined);
+    }
     const notes: string[] = [];
     if (touchesProtected(root, protectedList)) {
       notes.push(`PROTECTED: overlaps Git for Windows (${touchesProtected(root, protectedList)}); excluded from removal`);
@@ -216,7 +233,7 @@ export async function detectLegacy(id: LegacyId, host: LegacyHost): Promise<Lega
     const registryKeys = [...found.map(e => e.key), ...(id === "cygwin" ? ["HKLM\\SOFTWARE\\Cygwin", "HKCU\\Software\\Cygwin"] : [])]
       .filter((k): k is string => !!k);
     out.push({
-      id, mode: m.mode, root, version: entry?.DisplayVersion, uninstaller: uninstallers[0], uninstallers,
+      id, mode: m.mode, root, version: entry?.DisplayVersion, uninstaller: uninstallers[0], uninstallers, uninstallerKeys,
       registryKeys, pathEntries, shortcuts, dependents, notes,
     });
   }
@@ -235,6 +252,23 @@ function shortcutsFor(id: LegacyId, host: LegacyHost): string[] {
   return out;
 }
 
+/** Inno Setup writes its uninstall key as <AppId>_is1 and its uninstaller as unins000.exe, unins001.exe, ... */
+export function isInnoUninstaller(exe: string, key?: string): boolean {
+  return /unins\d{3}\.exe$/i.test(exe) || /_is1$/i.test(key ?? "");
+}
+/** Documented Inno Setup uninstaller switches (jrsoftware.org/ishelp, "Uninstaller Command Line Parameters"). */
+export const INNO_SILENT = ["/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"];
+const UNINSTALL_TIMEOUT_MS = 300_000;
+
+/** Paths and keys a non-elevated process cannot change: HKLM, Program Files, Windows, machine PATH. */
+export function needsElevation(kind: StepKind, target: string | undefined): boolean {
+  if (!target) return false;
+  const t = lower(target);
+  if (kind === "path") return false;
+  if (/^hklm\\/.test(t) || /^hkey_local_machine\\/.test(t)) return true;
+  return /^[a-z]:\\(program files|program files \(x86\)|windows)(\\|$)/.test(t);
+}
+
 export type StepKind = "backup" | "gate" | "uninstaller" | "scoop" | "winget" | "chocolatey" | "path" | "registry" | "shortcut" | "delete-dir";
 export interface PlanStep {
   kind: StepKind;
@@ -243,12 +277,19 @@ export interface PlanStep {
   /** Path the step deletes or writes. */
   path?: string;
   install?: LegacyId;
+  /** The step changes something only an elevated process can change. */
+  needsElevation?: boolean;
+  /** How the effect is checked after the step. A step is "done" only when this holds. */
+  verify?: { kind: "reg-gone" | "path-gone" | "path-exists" | "path-entry-gone"; target: string; scope?: "user" | "machine" };
+  timeoutMs?: number;
 }
 export interface UninstallPlan {
   installs: LegacyInstall[];
   protected: string[];
   steps: PlanStep[];
   backupDir: string;
+  /** Was the planning process elevated? */
+  elevated: boolean;
   rollback: string[];
   warnings: string[];
 }
@@ -273,7 +314,7 @@ function backupSteps(installs: LegacyInstall[], backupDir: string): PlanStep[] {
   return steps;
 }
 
-export function planUninstall(installs: LegacyInstall[], protectedList: string[], backupDir: string): UninstallPlan {
+export function planUninstall(installs: LegacyInstall[], protectedList: string[], backupDir: string, elevated = false): UninstallPlan {
   const warnings: string[] = [];
   const removable = installs.filter(i => {
     const hit = touchesProtected(i.root, protectedList);
@@ -287,12 +328,26 @@ export function planUninstall(installs: LegacyInstall[], protectedList: string[]
     if (i.mode === "scoop") steps.push({ kind: "scoop", title: `scoop uninstall ${i.id}`, command: ["scoop", "uninstall", i.id === "mingw" ? basename(dirname(i.root)) : i.id], install: i.id });
     else if (i.mode === "winget") steps.push({ kind: "winget", title: `winget uninstall ${i.id}`, command: ["winget", "uninstall", "--name", i.id === "msys2" ? "MSYS2" : i.id, "--silent", "--disable-interactivity"], install: i.id });
     else if (i.mode === "chocolatey") steps.push({ kind: "chocolatey", title: `choco uninstall ${i.id}`, command: ["choco", "uninstall", i.id, "-y"], install: i.id });
-    else if (i.mode === "installer") for (const uninstaller of i.uninstallers) steps.push({ kind: "uninstaller", title: i.id === "msys2" ? "run the MSYS2 installer uninstaller (Qt IFW command line, unattended)" : "run the registered uninstaller exactly as Windows records it (interactive; no silent flag is assumed)", command: i.id === "msys2" ? [...uninstaller, "pr", "--confirm-command"] : uninstaller, install: i.id });
+    else if (i.mode === "installer")
+      i.uninstallers.forEach((uninstaller, n) => {
+        const exe = uninstaller[0]!;
+        const key = i.uninstallerKeys?.[n];
+        const inno = i.id !== "msys2" && isInnoUninstaller(exe, key);
+        const command = i.id === "msys2" ? [...uninstaller, "pr", "--confirm-command"] : inno ? [exe, ...INNO_SILENT] : uninstaller;
+        const title = i.id === "msys2" ? "run the MSYS2 installer uninstaller (Qt IFW command line, unattended)"
+          : inno ? `run the Inno Setup uninstaller silently (${INNO_SILENT.join(" ")}, waits up to ${UNINSTALL_TIMEOUT_MS / 1000}s for the effect)`
+          : "run the registered uninstaller exactly as Windows records it (interactive; no silent flag is assumed)";
+        steps.push({
+          kind: "uninstaller", title, command, install: i.id, path: exe, timeoutMs: UNINSTALL_TIMEOUT_MS,
+          needsElevation: needsElevation("uninstaller", exe) || needsElevation("registry", key),
+          verify: key ? { kind: "reg-gone", target: key } : { kind: "path-gone", target: exe },
+        });
+      });
     for (const e of i.pathEntries.filter(e => e.scope !== "process"))
-      steps.push({ kind: "path", title: `remove ${e.scope} PATH entry ${e.value}${e.scope === "machine" ? " (needs an elevated shell)" : ""}`, path: e.value, command: ["powershell", "-NoProfile", "-Command", `$s='${e.scope === "user" ? "User" : "Machine"}';$p=[Environment]::GetEnvironmentVariable('Path',$s) -split ';' | Where-Object { $_ -and ($_ -ne '${e.value}') };[Environment]::SetEnvironmentVariable('Path',($p -join ';'),$s)`], install: i.id });
-    for (const key of i.registryKeys) steps.push({ kind: "registry", title: `delete registry key ${key}`, path: key, command: ["reg", "delete", key, "/f"], install: i.id });
-    for (const s of i.shortcuts) steps.push({ kind: "shortcut", title: `delete shortcut ${s}`, path: s, install: i.id });
-    steps.push({ kind: "delete-dir", title: `delete the folder ${i.root} (what the uninstaller leaves behind; only this detected path)`, path: i.root, install: i.id });
+      steps.push({ kind: "path", title: `remove ${e.scope} PATH entry ${e.value}`, path: e.value, needsElevation: e.scope === "machine", verify: { kind: "path-entry-gone", target: e.value, scope: e.scope as "user" | "machine" }, command: ["powershell", "-NoProfile", "-Command", `$s='${e.scope === "user" ? "User" : "Machine"}';$p=[Environment]::GetEnvironmentVariable('Path',$s) -split ';' | Where-Object { $_ -and ($_ -ne '${e.value}') };[Environment]::SetEnvironmentVariable('Path',($p -join ';'),$s)`], install: i.id });
+    for (const key of i.registryKeys) steps.push({ kind: "registry", title: `delete registry key ${key}`, path: key, command: ["reg", "delete", key, "/f"], install: i.id, needsElevation: needsElevation("registry", key), verify: { kind: "reg-gone", target: key } });
+    for (const s of i.shortcuts) steps.push({ kind: "shortcut", title: `delete shortcut ${s}`, path: s, install: i.id, needsElevation: needsElevation("shortcut", s), verify: { kind: "path-gone", target: s } });
+    steps.push({ kind: "delete-dir", title: `delete the folder ${i.root} (what the uninstaller leaves behind; only this detected path)`, path: i.root, install: i.id, needsElevation: needsElevation("delete-dir", i.root), verify: { kind: "path-gone", target: i.root } });
   }
   const rollback = [
     `PATH: read ${join(backupDir, "path.json")} and set it back: [Environment]::SetEnvironmentVariable('Path', <user>, 'User') (machine: elevated)`,
@@ -303,13 +358,17 @@ export function planUninstall(installs: LegacyInstall[], protectedList: string[]
     "Registry: `reg import <file>.reg` for each reg-*.reg in the backup directory",
     "Replacements stay installed under the buncc cache; they never conflict with the old stacks",
   ];
-  return { installs: removable, protected: protectedList, steps, backupDir, rollback, warnings };
+  return { installs: removable, protected: protectedList, steps, backupDir, elevated, rollback, warnings };
 }
 
 export function renderPlan(plan: UninstallPlan, yes: boolean): string {
   const l: string[] = [];
   l.push(yes ? "UNINSTALL (executing)" : "UNINSTALL DRY RUN: nothing is changed. Re-run with --yes after reviewing.");
   l.push(`backup directory: ${plan.backupDir}`);
+  const elevSteps = plan.steps.filter(s => s.needsElevation);
+  l.push(`elevated: ${plan.elevated ? "yes" : "no"}`);
+  if (!plan.elevated && elevSteps.length)
+    l.push(`needs elevation: ${elevSteps.length} step(s) below change HKLM or Program Files. buncc never elevates itself: it stops at the first one without marking it done. Re-run from an elevated shell.`);
   l.push(`protected (never touched): ${plan.protected.join("; ") || "none found"}`);
   for (const w of plan.warnings) l.push(`warning: ${w}`);
   for (const i of plan.installs) {
@@ -321,7 +380,7 @@ export function renderPlan(plan: UninstallPlan, yes: boolean): string {
     for (const n of i.notes) l.push(`  note: ${n}`);
   }
   l.push("", "steps:");
-  plan.steps.forEach((s, n) => l.push(`  ${String(n + 1).padStart(2)}. [${s.kind}] ${s.title}${s.command ? `\n        ${s.command.join(" ")}` : ""}`));
+  plan.steps.forEach((s, n) => l.push(`  ${String(n + 1).padStart(2)}. [${s.kind}] ${s.title}${s.needsElevation && !plan.elevated ? "  [needs elevation]" : ""}${s.command ? `\n        ${s.command.join(" ")}` : ""}`));
   l.push("", "rollback:", ...plan.rollback.map(r => `  - ${r}`));
   return l.join("\n");
 }
@@ -374,16 +433,48 @@ export interface ExecuteResult {
   smoke?: SmokeResult[];
 }
 
-/** Execute a plan. `smoke` must pass before the first removal step; any failure stops the run. */
+export interface ExecuteOptions {
+  /** How long to poll for a step's effect (the Inno uninstaller re-launches itself and returns early). Default 60 s for uninstallers, 3 s otherwise. */
+  verifyMs?: number;
+  pollMs?: number;
+}
+
+/** Check the effect of a step. Returns undefined when it holds, else the reason it does not. */
+async function verifyStep(step: PlanStep, host: LegacyHost): Promise<string | undefined> {
+  const v = step.verify;
+  if (!v) return undefined;
+  switch (v.kind) {
+    case "reg-gone":
+      return (await host.regKeyExists(v.target)) ? `registry key still exists: ${v.target}` : undefined;
+    case "path-gone":
+      return host.exists(v.target) ? `still exists: ${v.target}` : undefined;
+    case "path-exists":
+      return host.exists(v.target) ? undefined : `not created: ${v.target}`;
+    case "path-entry-gone": {
+      const p = await host.persistentPath();
+      const list = (v.scope === "machine" ? p.machine : p.user).split(delimiter).map(x => lower(x).replace(/\\+$/, ""));
+      return list.includes(lower(v.target).replace(/\\+$/, "")) ? `${v.scope} PATH still has ${v.target}` : undefined;
+    }
+  }
+}
+
+/**
+ * Execute a plan. Every step is checked AFTER it ran (registry query, file system): a step is "done" only when its effect
+ * is observed, otherwise it fails with the reason and the run stops. A step that needs elevation is not attempted without it.
+ * `smoke` must pass before the first removal step.
+ */
 export async function executePlan(
   plan: UninstallPlan,
   host: LegacyHost,
   smoke: (need: { posix: boolean; mingw: boolean }) => Promise<SmokeResult[]>,
+  options: ExecuteOptions = {},
 ): Promise<ExecuteResult> {
   const result: ExecuteResult = { executed: [] };
   const allowed = new Set(plan.installs.map(i => lower(i.root)));
   const allowedShortcuts = new Set(plan.installs.flatMap(i => i.shortcuts.map(lower)));
   const protectedList = plan.protected;
+  const elevated = plan.elevated || (await host.isElevated());
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
   for (const [n, step] of plan.steps.entries()) {
     const stop = (detail: string) => { result.executed.push({ step, ok: false, detail }); result.stoppedAt = n; return result; };
     if (step.kind === "gate") {
@@ -393,6 +484,7 @@ export async function executePlan(
       result.executed.push({ step, ok: true });
       continue;
     }
+    if (step.needsElevation && !elevated) return stop("needs elevation: run this from an elevated shell (buncc does not elevate itself); nothing was attempted");
     try {
       if (step.kind === "backup") {
         mkdirSync(plan.backupDir, { recursive: true });
@@ -405,7 +497,12 @@ export async function executePlan(
           if (!okCode) return stop(`backup command failed (${r.code}): ${r.stderr.slice(0, 200)}`);
           if (step.command[0] !== "robocopy" && step.command[0] !== "reg") host.writeFile(step.path!, r.stdout);
         }
-      } else if (step.kind === "delete-dir") {
+        if (step.path && !host.exists(step.path)) return stop(`backup was not written: ${step.path}`);
+        result.executed.push({ step, ok: true });
+        continue;
+      }
+      let exitNote = "";
+      if (step.kind === "delete-dir") {
         const target = step.path!;
         if (!allowed.has(lower(target))) return stop(`refusing to delete ${target}: not a detected install root`);
         if (touchesProtected(target, protectedList)) return stop(`refusing to delete ${target}: protected`);
@@ -414,11 +511,19 @@ export async function executePlan(
         if (!allowedShortcuts.has(lower(step.path!))) return stop(`refusing to delete ${step.path}: not a detected shortcut`);
         if (host.exists(step.path!)) host.removeDir(step.path!);
       } else if (step.command) {
-        const r = await host.exec(step.command);
-        const tolerant = step.kind === "registry" || step.kind === "uninstaller";
-        if (r.code !== 0 && !tolerant) return stop(`${step.command[0]} exited ${r.code}: ${r.stderr.slice(0, 200)}`);
+        const r = await host.exec(step.command, { timeoutMs: step.timeoutMs });
+        if (r.code !== 0) exitNote = `${step.command[0]} exited ${r.code}: ${(r.stderr || r.stdout).trim().slice(0, 200)}`;
       }
-      result.executed.push({ step, ok: true });
+      const budget = options.verifyMs ?? (step.kind === "uninstaller" ? 60_000 : 3_000);
+      const deadline = Date.now() + budget;
+      let problem = await verifyStep(step, host);
+      while (problem && Date.now() < deadline) {
+        await sleep(options.pollMs ?? 500);
+        problem = await verifyStep(step, host);
+      }
+      if (problem) return stop(`${problem}${exitNote ? `; ${exitNote}` : ""}`);
+      if (!step.verify && exitNote) return stop(exitNote);
+      result.executed.push({ step, ok: true, detail: step.verify ? "effect verified" : undefined });
     } catch (error) {
       return stop((error as Error).message);
     }
@@ -476,7 +581,18 @@ export function realHost(): LegacyHost {
       const machine = parseValues(await reg(["query", "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment", "/v", "Path"])).Path ?? "";
       return { user, machine };
     },
-    exec: argv => run(argv, { output: "capture", timeoutMs: 600_000 }),
+    exec: (argv, opts) => run(argv, { output: "capture", timeoutMs: opts?.timeoutMs ?? 600_000 }),
+    async regKeyExists(key) {
+      if (process.platform !== "win32") return false;
+      const r = await run(["reg", "query", key], { output: "capture", timeoutMs: 20_000 });
+      return r.code === 0;
+    },
+    async isElevated() {
+      if (process.platform !== "win32") return typeof process.getuid === "function" && process.getuid() === 0;
+      // The High mandatory level SID S-1-16-12288 is in the token groups only for an elevated process.
+      const r = await run(["whoami", "/groups"], { output: "capture", timeoutMs: 20_000 });
+      return r.stdout.includes("S-1-16-12288");
+    },
     removeDir: p => rmSync(p, { recursive: true, force: true }),
     writeFile: (p, t) => { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, t); },
     configFiles() {

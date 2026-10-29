@@ -71,7 +71,7 @@ PATH entries (user, machine, process), registry keys, shortcuts, dependents (VS 
 mention the root; `*-pc-windows-gnu` Rust toolchains) and the steps. With `--yes` it first writes a backup (PATH, `pacman -Qqe`
 and `-Qqm`, MSYS2 home dotfiles and `pacman.d`, `reg export` of each key, `cygcheck -c`), then runs the smoke test of the
 replacements (uutils, busybox, ripgrep, and a mingw compiler when MSYS2 or MinGW is being removed; an MSYS2 mingw tree does not
-count), and only then removes. A failing smoke test stops before any removal. Deletion is limited to the detected roots and
+count), and only then removes. A failing smoke test stops before any removal. Every step is checked after it ran (registry query, file system, PATH re-read, polling up to 60 s for uninstallers) and is printed "done" only when its effect is observed, else "FAIL <reason>" and the run stops. Without an elevated token, steps on HKLM, Program Files or the machine PATH are marked "needs elevation" in the plan and are never attempted; buncc does not elevate itself. Inno Setup uninstallers (`unins000.exe`, `_is1` keys) get `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART` (jrsoftware.org/ishelp, "Uninstaller Command Line Parameters"; the page does not say whether the process returns before the work is done, hence the polling). Deletion is limited to the detected roots and
 shortcuts; Git for Windows is never touched. Rollback: restore PATH from `path.json`, `reg import` the `.reg` files,
 reinstall MSYS2 and `pacman -S --needed - < msys2-pacman-Qe.txt`, restore `msys2-home`, rerun Cygwin setup with the saved package list.
 
