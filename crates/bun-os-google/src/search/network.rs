@@ -885,7 +885,9 @@ mod tests {
         };
         match search_rich("rust language", &options).await {
             Ok(result) => assert!(!result.content.organic.is_empty()),
-            Err(error) => crate::search::output::print_errorln(format_args!("Google Search unavailable: {error}")),
+            Err(error) => crate::search::output::print_errorln(format_args!(
+                "Google Search unavailable: {error}"
+            )),
         }
     }
 }

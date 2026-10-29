@@ -72,7 +72,8 @@ fn first(tree: &DomTree, root: NodeId, selector: &str) -> Option<NodeId> {
 }
 
 fn attr(tree: &DomTree, node: NodeId, name: &str) -> Option<String> {
-    tree.with_node(node, |node| node.get_attribute(name).map(str::to_owned)).flatten()
+    tree.with_node(node, |node| node.get_attribute(name).map(str::to_owned))
+        .flatten()
 }
 
 fn clean_text(text: &str) -> String {
@@ -133,7 +134,13 @@ fn search_time_ms(html: &str) -> Option<u64> {
         Regex::new(r"(?i)\(([\d.,]+)\s*(?:seconds|secondes|Sekunden|segundos)\)")
             .expect("static regex")
     });
-    let seconds = TIME.captures(html)?.get(1)?.as_str().replace(',', ".").parse::<f64>().ok()?;
+    let seconds = TIME
+        .captures(html)?
+        .get(1)?
+        .as_str()
+        .replace(',', ".")
+        .parse::<f64>()
+        .ok()?;
     if seconds.is_finite() && seconds >= 0.0 {
         Some((seconds * 1000.0).round() as u64)
     } else {
@@ -148,7 +155,9 @@ pub fn parse_serp(html: &str, query: &str) -> SerpContent {
     let mut seen = HashSet::new();
     for selector in ["div.MjjYud", "div.g"] {
         for block in select(&tree, selector) {
-            let Some(title_node) = first(&tree, block, "h3") else { continue };
+            let Some(title_node) = first(&tree, block, "h3") else {
+                continue;
+            };
             let title = tree.text_content(title_node);
             if title.trim().is_empty() {
                 continue;
@@ -162,8 +171,12 @@ pub fn parse_serp(html: &str, query: &str) -> SerpContent {
             else {
                 continue;
             };
-            let dedupe =
-                url.split(['?', '#']).next().unwrap_or(&url).trim_end_matches('/').to_owned();
+            let dedupe = url
+                .split(['?', '#'])
+                .next()
+                .unwrap_or(&url)
+                .trim_end_matches('/')
+                .to_owned();
             if !seen.insert(dedupe) {
                 continue;
             }
@@ -173,7 +186,8 @@ pub fn parse_serp(html: &str, query: &str) -> SerpContent {
             let displayed_url = Url::parse(&url)
                 .ok()
                 .and_then(|url| {
-                    url.host_str().map(|host| host.trim_start_matches("www.").to_owned())
+                    url.host_str()
+                        .map(|host| host.trim_start_matches("www.").to_owned())
                 })
                 .unwrap_or_else(|| url.clone());
             organic.push(OrganicResult {
@@ -187,33 +201,36 @@ pub fn parse_serp(html: &str, query: &str) -> SerpContent {
         }
     }
 
-    let people_also_ask =
-        select(&tree, "div.related-question-pair, .iDP60e, .CS59e, div[jsname='Cpkphb']")
-            .into_iter()
-            .map(|node| tree.text_content(node).trim().to_owned())
-            .filter(|text| !text.is_empty() && text.chars().count() < 250)
-            .collect();
+    let people_also_ask = select(
+        &tree,
+        "div.related-question-pair, .iDP60e, .CS59e, div[jsname='Cpkphb']",
+    )
+    .into_iter()
+    .map(|node| tree.text_content(node).trim().to_owned())
+    .filter(|text| !text.is_empty() && text.chars().count() < 250)
+    .collect();
     let related_searches = select(&tree, "div.nv67Ub, .y676u, .RES9nd, a.k8XOCe")
         .into_iter()
         .map(|node| tree.text_content(node).trim().to_owned())
         .filter(|text| !text.is_empty() && text.chars().count() < 120)
         .collect();
 
-    let featured_snippet =
-        tree.query_selector("div.kp-blk, .LGOjbe, .c29vbe, div.xpdopen").ok().flatten().and_then(
-            |block| {
-                let title = first(&tree, block, "h3")?;
-                let link = first(&tree, block, "a[href]")?;
-                Some(FeaturedSnippet {
-                    title: tree.text_content(title).trim().to_owned(),
-                    url: attr(&tree, link, "href").unwrap_or_default(),
-                    content: first(&tree, block, ".LGOjbe, .hgKElc, .V3FYCf, .Z0LcW")
-                        .map(|node| tree.text_content(node).trim().to_owned())
-                        .unwrap_or_default(),
-                    source: nonempty(tree.text_content(link)),
-                })
-            },
-        );
+    let featured_snippet = tree
+        .query_selector("div.kp-blk, .LGOjbe, .c29vbe, div.xpdopen")
+        .ok()
+        .flatten()
+        .and_then(|block| {
+            let title = first(&tree, block, "h3")?;
+            let link = first(&tree, block, "a[href]")?;
+            Some(FeaturedSnippet {
+                title: tree.text_content(title).trim().to_owned(),
+                url: attr(&tree, link, "href").unwrap_or_default(),
+                content: first(&tree, block, ".LGOjbe, .hgKElc, .V3FYCf, .Z0LcW")
+                    .map(|node| tree.text_content(node).trim().to_owned())
+                    .unwrap_or_default(),
+                source: nonempty(tree.text_content(link)),
+            })
+        });
 
     let knowledge_panel = tree
         .query_selector(
@@ -250,7 +267,14 @@ pub fn parse_serp(html: &str, query: &str) -> SerpContent {
             let url = first(&tree, block, "a.ab_button, a.LV6jFe")
                 .and_then(|node| attr(&tree, node, "href"))
                 .and_then(nonempty);
-            KnowledgePanel { title, r#type, description, metadata, image_url, url }
+            KnowledgePanel {
+                title,
+                r#type,
+                description,
+                metadata,
+                image_url,
+                url,
+            }
         });
 
     let mut json_ld = Vec::new();
@@ -304,10 +328,17 @@ mod tests {
         assert_eq!(result.organic.len(), 3);
         assert_eq!(result.organic[0].title, "Bun & the fast runtime");
         assert_eq!(result.organic[0].displayed_url, "bun.com");
-        assert_eq!(result.organic[0].snippet, "A drop-in replacement for Node.js using JSC <3.");
+        assert_eq!(
+            result.organic[0].snippet,
+            "A drop-in replacement for Node.js using JSC <3."
+        );
         assert_eq!(result.organic[2].url, "https://example.org/page");
         assert_eq!(
-            result.organic.iter().map(|hit| hit.position).collect::<Vec<_>>(),
+            result
+                .organic
+                .iter()
+                .map(|hit| hit.position)
+                .collect::<Vec<_>>(),
             vec![1, 2, 3]
         );
     }
@@ -323,7 +354,10 @@ mod tests {
         assert_eq!(result.total_results, Some(1234));
         assert_eq!(result.search_time_ms, Some(420));
         assert_eq!(result.featured_snippet.as_ref().unwrap().content, "42");
-        assert_eq!(result.knowledge_panel.as_ref().unwrap().metadata["Created"], "2010");
+        assert_eq!(
+            result.knowledge_panel.as_ref().unwrap().metadata["Created"],
+            "2010"
+        );
         assert_eq!(result.people_also_ask, ["What is Rust?"]);
         assert_eq!(result.related_searches, ["Rust tutorial"]);
         assert_eq!(result.json_ld, vec![serde_json::json!({"@type": "Thing"})]);

@@ -46,7 +46,10 @@ fn url(value: &str) -> io::Result<Url> {
 /// segments, preventing names or queries from replacing an authority/path.
 fn info_url(source: &str, package: &str) -> io::Result<Url> {
     if package.is_empty() || package.chars().any(char::is_control) {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid package name"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "invalid package name",
+        ));
     }
     match source {
         "npm" => {
@@ -57,7 +60,7 @@ fn info_url(source: &str, package: &str) -> io::Result<Url> {
                 .pop_if_empty()
                 .push(package);
             Ok(result)
-        },
+        }
         "nuget" => {
             if !package
                 .bytes()
@@ -76,9 +79,12 @@ fn info_url(source: &str, package: &str) -> io::Result<Url> {
                 .push(&package.to_ascii_lowercase())
                 .push("index.json");
             Ok(result)
-        },
+        }
         "cargo" => {
-            if !package.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_')) {
+            if !package
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_'))
+            {
                 return Err(io::Error::new(
                     io::ErrorKind::InvalidInput,
                     "invalid Cargo package name",
@@ -91,8 +97,10 @@ fn info_url(source: &str, package: &str) -> io::Result<Url> {
                 3 => format!("3/{}/{name}", &name[..1]),
                 _ => format!("{}/{}/{name}", &name[..2], &name[2..4]),
             };
-            url("https://index.crates.io/")?.join(&path).map_err(io::Error::other)
-        },
+            url("https://index.crates.io/")?
+                .join(&path)
+                .map_err(io::Error::other)
+        }
         source => Err(io::Error::new(
             io::ErrorKind::Unsupported,
             format!("remote info unavailable for {source}"),
@@ -116,7 +124,7 @@ fn search_url(source: &str, query: &str, limit: u16) -> io::Result<Url> {
                 io::ErrorKind::Unsupported,
                 format!("remote search unavailable for {source}"),
             ));
-        },
+        }
     };
     let mut result = url(base)?;
     result
@@ -133,7 +141,12 @@ async fn fetch(client: Client, address: Url) -> io::Result<Vec<u8>> {
         .map_err(io::Error::other)?;
     let mut resume = Resume::new(temporary.path(), address).map_err(io::Error::other)?;
     let id = downloader
-        .download(&mut resume, Arc::clone(&store), None, &CancellationToken::new())
+        .download(
+            &mut resume,
+            Arc::clone(&store),
+            None,
+            &CancellationToken::new(),
+        )
         .await
         .map_err(io::Error::other)?;
     // Store publication verified the content-address. This is metadata, not an
@@ -145,17 +158,28 @@ async fn fetch(client: Client, address: Url) -> io::Result<Vec<u8>> {
 /// These public registry queries never alter the selected domain's store.
 pub async fn execute_remote(command: &Command, client: Client) -> io::Result<Value> {
     match command {
-        Command::RemoteInfo { source, package, version } => {
+        Command::RemoteInfo {
+            source,
+            package,
+            version,
+        } => {
             let bytes = fetch(client, info_url(source, package)?).await?;
             inspect_bytes(source, package, &bytes, version.as_deref())
-        },
-        Command::Search { source, query, limit } => {
+        }
+        Command::Search {
+            source,
+            query,
+            limit,
+        } => {
             let bytes = fetch(client, search_url(source, query, *limit)?).await?;
             let response: Value = serde_json::from_slice(&bytes)
                 .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
             Ok(json!({"source":source,"query":query,"response":response}))
-        },
-        _ => Err(io::Error::new(io::ErrorKind::InvalidInput, "expected a remote command")),
+        }
+        _ => Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "expected a remote command",
+        )),
     }
 }
 
@@ -179,15 +203,24 @@ mod tests {
 
     #[test]
     fn cargo_sparse_sharding_and_search_queries_are_source_specific() {
-        for (name, suffix) in
-            [("a", "1/a"), ("ab", "2/ab"), ("abc", "3/a/abc"), ("serde", "se/rd/serde")]
-        {
-            assert_eq!(info_url("cargo", name).unwrap().path(), format!("/{suffix}"));
+        for (name, suffix) in [
+            ("a", "1/a"),
+            ("ab", "2/ab"),
+            ("abc", "3/a/abc"),
+            ("serde", "se/rd/serde"),
+        ] {
+            assert_eq!(
+                info_url("cargo", name).unwrap().path(),
+                format!("/{suffix}")
+            );
         }
         let endpoint = search_url("npm", "x&size=999", 20).unwrap();
         assert_eq!(
             endpoint.query_pairs().collect::<Vec<_>>(),
-            vec![("text".into(), "x&size=999".into()), ("size".into(), "20".into())]
+            vec![
+                ("text".into(), "x&size=999".into()),
+                ("size".into(), "20".into())
+            ]
         );
         assert!(search_url("npm", "x", 101).is_err());
     }

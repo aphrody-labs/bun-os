@@ -27,11 +27,14 @@ fn first(dom: &DomTree, root: NodeId, selector: &str) -> Option<NodeId> {
     dom.query_selector_from(root, selector).ok().flatten()
 }
 fn text(dom: &DomTree, root: NodeId, selector: &str) -> String {
-    first(dom, root, selector).map(|id| dom.text_content(id).trim().to_owned()).unwrap_or_default()
+    first(dom, root, selector)
+        .map(|id| dom.text_content(id).trim().to_owned())
+        .unwrap_or_default()
 }
 fn attribute(dom: &DomTree, root: NodeId, selector: &str, name: &str) -> Option<String> {
     first(dom, root, selector).and_then(|id| {
-        dom.with_node(id, |node| node.get_attribute(name).map(str::to_owned)).flatten()
+        dom.with_node(id, |node| node.get_attribute(name).map(str::to_owned))
+            .flatten()
     })
 }
 fn clean_url(raw: &str) -> Option<String> {
@@ -65,10 +68,12 @@ pub fn parse_vertical(html: &str, query: &str, vertical: GoogleVertical, limit: 
     let mut seen = HashSet::new();
     if matches!(vertical, GoogleVertical::Images) {
         for id in nodes(&dom, "img") {
-            let src =
-                dom.with_node(id, |node| node.get_attribute("src").map(str::to_owned)).flatten();
-            let title =
-                dom.with_node(id, |node| node.get_attribute("alt").map(str::to_owned)).flatten();
+            let src = dom
+                .with_node(id, |node| node.get_attribute("src").map(str::to_owned))
+                .flatten();
+            let title = dom
+                .with_node(id, |node| node.get_attribute("alt").map(str::to_owned))
+                .flatten();
             if let (Some(src), Some(title)) = (src, title)
                 && !src.starts_with("data:")
                 && !title.trim().is_empty()
@@ -127,24 +132,29 @@ pub fn parse_vertical(html: &str, query: &str, vertical: GoogleVertical, limit: 
                     text(&dom, root, "h3, .DKV0Md"),
                     attribute(&dom, root, "a[href*='books.google']", "href"),
                 ),
-                _ => (text(&dom, root, "h3"), attribute(&dom, root, "a[href]", "href")),
+                _ => (
+                    text(&dom, root, "h3"),
+                    attribute(&dom, root, "a[href]", "href"),
+                ),
             };
-            let Some(url) = raw.as_deref().and_then(clean_url) else { continue };
+            let Some(url) = raw.as_deref().and_then(clean_url) else {
+                continue;
+            };
             if title.is_empty() || !seen.insert(url.clone()) {
                 continue;
             }
             let record = match vertical {
                 GoogleVertical::News => {
                     json!({"title":title,"url":url,"source":text(&dom,root,"div.NUnG9d span, div.MgUUmf span"),"snippet":text(&dom,root,"div.GI74Re, div.Y3v8qd"),"publishedAt": nonempty(text(&dom,root,"div.OSrXXb span, span.WG9SHc"))})
-                },
+                }
                 GoogleVertical::Videos => {
                     json!({"title":title,"url":url,"source":text(&dom,root,"cite"),"duration":nonempty(text(&dom,root,"div.J1mWY, span.fGsHV")),"thumbnail":attribute(&dom,root,"img","src")})
-                },
+                }
                 GoogleVertical::Books => {
                     let meta = text(&dom, root, "div.fl, .qLRx3b");
                     let year = YEAR.find(&meta);
                     json!({"title":title,"url":url,"author":year.as_ref().map_or(meta.as_str(), |year| &meta[..year.start()]).trim(),"year":year.and_then(|year| year.as_str().parse::<u32>().ok()),"snippet":text(&dom,root,"div.VwiC3b, .cmlJmd")})
-                },
+                }
                 GoogleVertical::Scholar => {
                     let meta = text(&dom, root, "div.gs_a");
                     let parts: Vec<_> = meta.split('-').map(str::trim).collect();
@@ -168,7 +178,7 @@ pub fn parse_vertical(html: &str, query: &str, vertical: GoogleVertical, limit: 
                         }
                     }
                     json!({"title":title,"url":url,"authors":parts.first().copied().unwrap_or_default(),"venue":parts.get(1).copied().unwrap_or_default(),"snippet":text(&dom,root,"div.gs_rs"),"citedBy":cited,"year":YEAR.find(&meta).and_then(|year|year.as_str().parse::<u32>().ok()),"pdfUrl":pdf})
-                },
+                }
                 GoogleVertical::Images => unreachable!(),
             };
             records.push(record);
@@ -193,9 +203,12 @@ fn vertical_url(
     if matches!(vertical, GoogleVertical::Scholar) {
         url =
             Url::parse("https://scholar.google.com/scholar").map_err(|error| error.to_string())?;
-        url.query_pairs_mut().append_pair("q", query).append_pair("hl", &options.hl);
+        url.query_pairs_mut()
+            .append_pair("q", query)
+            .append_pair("hl", &options.hl);
         if let Some(start) = options.start {
-            url.query_pairs_mut().append_pair("start", &start.to_string());
+            url.query_pairs_mut()
+                .append_pair("start", &start.to_string());
         }
     } else {
         let code = match vertical {
@@ -217,10 +230,15 @@ pub async fn search_vertical(
 ) -> Result<Value, String> {
     let url = vertical_url(query, vertical, options)?;
     let html = network::discovery_html(&url, options).await?;
-    let records = parse_vertical(&html, query, vertical, usize::from(options.num.unwrap_or(50)));
+    let records = parse_vertical(
+        &html,
+        query,
+        vertical,
+        usize::from(options.num.unwrap_or(50)),
+    );
     if records.as_array().is_none_or(Vec::is_empty) {
         return Err(
-            "Google vertical returned no parseable results; no empty success inferred".into()
+            "Google vertical returned no parseable results; no empty success inferred".into(),
         );
     }
     Ok(records)
@@ -245,7 +263,9 @@ pub async fn search_books(
     match network::public_json(url).await {
         Ok(value) if value.get("totalItems").is_some_and(Value::is_u64) => Ok(value),
         result => {
-            let error = result.err().unwrap_or_else(|| "invalid Books API payload".into());
+            let error = result
+                .err()
+                .unwrap_or_else(|| "invalid Books API payload".into());
             let mut options = options.clone();
             options.num = Some(max_results);
             let records = search_vertical(query, GoogleVertical::Books, &options)
@@ -255,7 +275,7 @@ pub async fn search_books(
             Ok(
                 json!({"totalItems":items.len(),"items":items,"nativeFallback":true,"apiError":error}),
             )
-        },
+        }
     }
 }
 
@@ -267,14 +287,22 @@ pub async fn autocomplete(query: &str, hl: &str) -> Result<Vec<String>, String> 
         .append_pair("q", query)
         .append_pair("hl", hl);
     let result = network::public_json(url).await?;
-    let items =
-        result.get(1).and_then(Value::as_array).ok_or("invalid Google autocomplete response")?;
-    Ok(items.iter().filter_map(Value::as_str).map(str::to_owned).collect())
+    let items = result
+        .get(1)
+        .and_then(Value::as_array)
+        .ok_or("invalid Google autocomplete response")?;
+    Ok(items
+        .iter()
+        .filter_map(Value::as_str)
+        .map(str::to_owned)
+        .collect())
 }
 
 pub async fn resolve_dns(domain: &str) -> Result<Value, String> {
     let mut url = Url::parse("https://dns.google/resolve").map_err(|error| error.to_string())?;
-    url.query_pairs_mut().append_pair("name", domain).append_pair("type", "A");
+    url.query_pairs_mut()
+        .append_pair("name", domain)
+        .append_pair("type", "A");
     let result = network::public_json(url).await?;
     if result.get("Status").and_then(Value::as_u64) != Some(0) {
         return Err("Google DNS resolution failed or malformed response".into());
@@ -302,15 +330,25 @@ mod tests {
     fn image_payload_retains_original_media_urls_and_excludes_branding() {
         let html = r#"<html><img src="https://encrypted-tbn0.gstatic.com/thumbnail.jpg" alt="Cover"><script>https:\/\/source.example\/cover.png?x\u003d1\u0026y\u003d2 https://www.gstatic.com/images/branding/logo.png</script></html>"#;
         let result = parse_vertical(html, "Dragon Ball", GoogleVertical::Images, 50);
-        assert_eq!(result[0]["imageUrl"], "https://source.example/cover.png?x=1&y=2");
+        assert_eq!(
+            result[0]["imageUrl"],
+            "https://source.example/cover.png?x=1&y=2"
+        );
         assert_eq!(result.as_array().unwrap().len(), 1);
     }
     #[test]
     fn vertical_endpoints_preserve_legacy_query_and_language_contract() {
-        let options =
-            SearchOptions { hl: "ja".into(), num: Some(50), anonymous: true, ..Default::default() };
+        let options = SearchOptions {
+            hl: "ja".into(),
+            num: Some(50),
+            anonymous: true,
+            ..Default::default()
+        };
         let news = vertical_url("ドラゴンボール", GoogleVertical::News, &options).unwrap();
-        assert!(news.query_pairs().any(|(key, value)| key == "tbm" && value == "nws"));
+        assert!(
+            news.query_pairs()
+                .any(|(key, value)| key == "tbm" && value == "nws")
+        );
         assert!(!news.query_pairs().any(|(key, _)| key == "udm"));
         let scholar = vertical_url("Dragon Ball", GoogleVertical::Scholar, &options).unwrap();
         assert_eq!(scholar.host_str(), Some("scholar.google.com"));

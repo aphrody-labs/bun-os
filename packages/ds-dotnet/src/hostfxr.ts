@@ -59,7 +59,13 @@ function dotnetRoots(): string[] {
   } else if (process.platform === "darwin") {
     roots.push("/usr/local/share/dotnet", join(homedir(), ".dotnet"));
   } else {
-    roots.push("/usr/share/dotnet", "/usr/lib/dotnet", "/usr/lib64/dotnet", "/usr/local/share/dotnet", join(homedir(), ".dotnet"));
+    roots.push(
+      "/usr/share/dotnet",
+      "/usr/lib/dotnet",
+      "/usr/lib64/dotnet",
+      "/usr/local/share/dotnet",
+      join(homedir(), ".dotnet"),
+    );
   }
   return roots;
 }
@@ -119,7 +125,10 @@ function startRuntime(runtimeConfig: string): void {
   const host = loadHostfxr();
   if (!existsSync(runtimeConfig)) throw new Error(`runtime configuration not found: ${runtimeConfig}`);
   const handle = new BigUint64Array(1);
-  check(host.initialize(nativeString(runtimeConfig), null, new Uint8Array(handle.buffer)), "hostfxr_initialize_for_runtime_config");
+  check(
+    host.initialize(nativeString(runtimeConfig), null, new Uint8Array(handle.buffer)),
+    "hostfxr_initialize_for_runtime_config",
+  );
   const context = handle[0];
   const out = new BigUint64Array(1);
   check(

@@ -112,4 +112,3 @@ export function createClient(options: GoogleClientOptions): GoogleClient {
 
   return { request };
 }
-

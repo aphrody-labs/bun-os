@@ -8,7 +8,8 @@ export type { RegistryListing, RegistryValue } from "@aphrody/winreg";
 function run(command: string, args: string[]): string {
   if (process.platform !== "win32") throw new Error("Windows only");
   const result = Bun.spawnSync([command, ...args], { stdout: "pipe", stderr: "pipe", windowsHide: true });
-  if (result.exitCode !== 0) throw new Error(`${command} exited with ${result.exitCode}: ${result.stderr.toString().trim()}`);
+  if (result.exitCode !== 0)
+    throw new Error(`${command} exited with ${result.exitCode}: ${result.stderr.toString().trim()}`);
   return result.stdout.toString();
 }
 

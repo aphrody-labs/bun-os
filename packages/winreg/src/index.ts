@@ -209,7 +209,16 @@ export function list(path: string): RegistryListing | null {
         const type = new Uint32Array(1);
         const data = new Uint8Array(capacity);
         const dataLength = new Uint32Array([capacity]);
-        const result = api!.RegEnumValueW(handle, i, ptr(name), ptr(nameLength), null, ptr(type), ptr(data), ptr(dataLength));
+        const result = api!.RegEnumValueW(
+          handle,
+          i,
+          ptr(name),
+          ptr(nameLength),
+          null,
+          ptr(type),
+          ptr(data),
+          ptr(dataLength),
+        );
         if (result === ERROR_MORE_DATA) {
           capacity = dataLength[0]! + 2;
           continue;

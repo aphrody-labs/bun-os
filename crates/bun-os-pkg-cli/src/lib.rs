@@ -4,7 +4,6 @@
     clippy::disallowed_types,
     clippy::disallowed_macros
 )]
-
 // SPDX-License-Identifier: Apache-2.0
 //! Native store commands. Package resolution/install is a separate capability;
 //! ingesting a blob never claims to have installed an ecosystem package.
@@ -106,7 +105,10 @@ impl Cli {
     /// Native async adapter shared by standalone and the Aphrody multicall.
     /// Local commands need neither an HTTP client nor TLS initialization.
     pub async fn execute_native(&self, configured_home: Option<PathBuf>) -> io::Result<Value> {
-        if matches!(self.command, Command::RemoteInfo { .. } | Command::Search { .. }) {
+        if matches!(
+            self.command,
+            Command::RemoteInfo { .. } | Command::Search { .. }
+        ) {
             execute_remote(&self.command, metadata_client()?).await
         } else {
             self.execute(configured_home)
@@ -116,13 +118,22 @@ impl Cli {
     /// The caller can supply a domain-specific resolved home. Ambient provider
     /// stores are never guessed, scanned, or imported.
     pub fn execute(&self, configured_home: Option<PathBuf>) -> io::Result<Value> {
-        if matches!(self.command, Command::RemoteInfo { .. } | Command::Search { .. }) {
+        if matches!(
+            self.command,
+            Command::RemoteInfo { .. } | Command::Search { .. }
+        ) {
             return Err(io::Error::new(
                 io::ErrorKind::Unsupported,
                 "remote commands require execute_remote with an injected HTTP client",
             ));
         }
-        if let Command::Info { source, package, index, version } = &self.command {
+        if let Command::Info {
+            source,
+            package,
+            index,
+            version,
+        } = &self.command
+        {
             return inspect_index(source, package, index, version.as_deref());
         }
         let root = self
@@ -136,16 +147,25 @@ impl Cli {
                 )
             })?;
         if root.as_os_str().is_empty() {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "empty store root"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "empty store root",
+            ));
         }
         let store = Store::new(&root);
-        let Command::Store { command } = &self.command else { unreachable!("info handled above") };
+        let Command::Store { command } = &self.command else {
+            unreachable!("info handled above")
+        };
         match command {
             StoreCommand::Stats => {
                 let stats = store.stats()?;
                 Ok(json!({"store":root,"blobs":stats.blobs,"bytes":stats.bytes}))
-            },
-            StoreCommand::Put { file, expected, owner } => {
+            }
+            StoreCommand::Put {
+                file,
+                expected,
+                owner,
+            } => {
                 let expected = expected.as_deref().map(BlobId::parse).transpose()?;
                 let file = File::open(file)?;
                 let id = match owner {
@@ -153,34 +173,37 @@ impl Cli {
                     None => store.put(file, expected.as_ref())?,
                 };
                 Ok(json!({"digest":id.as_str(),"pinned":owner.is_some()}))
-            },
+            }
             StoreCommand::Verify { digest } => {
                 let id = BlobId::parse(digest)?;
                 store.verify(&id)?;
                 Ok(json!({"digest":id.as_str(),"verified":true}))
-            },
-            StoreCommand::Materialize { digest, destination } => {
+            }
+            StoreCommand::Materialize {
+                digest,
+                destination,
+            } => {
                 let id = BlobId::parse(digest)?;
                 let method = store.materialize_with_method(&id, destination)?;
                 Ok(json!({"digest":id.as_str(),"destination":destination,
                     "method":format!("{method:?}").to_ascii_lowercase()}))
-            },
+            }
             StoreCommand::Pin { owner, digest } => {
                 let id = BlobId::parse(digest)?;
                 store.pin(owner, &id)?;
                 Ok(json!({"digest":id.as_str(),"owner":owner,"pinned":true}))
-            },
+            }
             StoreCommand::Unpin { owner, digest } => {
                 let id = BlobId::parse(digest)?;
                 let removed = store.unpin(owner, &id)?;
                 Ok(json!({"digest":id.as_str(),"owner":owner,"removed":removed}))
-            },
+            }
             StoreCommand::Gc { apply, min_age } => {
                 let report = store.gc(Duration::from_secs(*min_age), *apply)?;
                 Ok(json!({"apply":apply,"minimumAgeSeconds":min_age,
                     "eligibleBlobs":report.eligible_blobs,"eligibleBytes":report.eligible_bytes,
                     "removedBlobs":report.removed_blobs,"removedBytes":report.removed_bytes}))
-            },
+            }
         }
     }
 }
@@ -200,7 +223,10 @@ fn inspect_index(
         &mut bytes,
     )?;
     if bytes.len() > 64 * 1024 * 1024 {
-        return Err(io::Error::new(io::ErrorKind::InvalidData, "index exceeds 64 MiB"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "index exceeds 64 MiB",
+        ));
     }
     inspect_bytes(source, package, &bytes, version)
 }
@@ -222,7 +248,7 @@ fn inspect_bytes(
                 io::ErrorKind::Unsupported,
                 format!("index decoder unavailable for {other}"),
             ));
-        },
+        }
     }
     .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
     let packages: Vec<Value> = decoded.packages.iter()
@@ -249,11 +275,15 @@ pub fn cli_main(args: impl IntoIterator<Item = OsString>) -> i32 {
             let code = error.exit_code();
             let _ = error.print();
             return code;
-        },
+        }
     };
-    let home = std::env::var_os("APHRODY_HOME").filter(|s| !s.is_empty()).map(PathBuf::from);
+    let home = std::env::var_os("APHRODY_HOME")
+        .filter(|s| !s.is_empty())
+        .map(PathBuf::from);
     let result = (|| {
-        let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build()?;
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()?;
         runtime.block_on(cli.execute_native(home))
     })();
     match result {
@@ -262,12 +292,12 @@ pub fn cli_main(args: impl IntoIterator<Item = OsString>) -> i32 {
             Err(error) => {
                 eprintln!("package output: {error}");
                 1
-            },
+            }
         },
         Err(error) => {
             eprintln!("package store: {error}");
             1
-        },
+        }
     }
 }
 
@@ -290,7 +320,10 @@ mod tests {
             },
         };
         let value = cli.execute(None)?;
-        assert_eq!(value["packages"][0]["record"]["peerDependencies"]["react"], "19");
+        assert_eq!(
+            value["packages"][0]["record"]["peerDependencies"]["react"],
+            "19"
+        );
         Ok(())
     }
 
@@ -299,7 +332,12 @@ mod tests {
         let cli = Cli::try_parse_from(["pkg", "store", "gc"]).unwrap();
         assert!(matches!(
             cli.command,
-            Command::Store { command: StoreCommand::Gc { apply: false, min_age: 86400 } }
+            Command::Store {
+                command: StoreCommand::Gc {
+                    apply: false,
+                    min_age: 86400
+                }
+            }
         ));
         assert!(Cli::try_parse_from(["pkg", "store", "gc", "--min-age", "-1"]).is_err());
     }
@@ -311,19 +349,52 @@ mod tests {
         let input = temporary.path().join("input");
         std::fs::write(&input, b"package")?;
         let run = |command| {
-            Cli { store: Some(root.clone()), command: Command::Store { command } }.execute(None)
+            Cli {
+                store: Some(root.clone()),
+                command: Command::Store { command },
+            }
+            .execute(None)
         };
-        let value =
-            run(StoreCommand::Put { file: input, expected: None, owner: Some("test".into()) })?;
+        let value = run(StoreCommand::Put {
+            file: input,
+            expected: None,
+            owner: Some("test".into()),
+        })?;
         let digest = value["digest"].as_str().unwrap().to_owned();
-        assert_eq!(run(StoreCommand::Gc { apply: true, min_age: 0 })?["removedBlobs"], 0);
-        run(StoreCommand::Unpin { owner: "test".into(), digest: digest.clone() })?;
-        assert_eq!(run(StoreCommand::Gc { apply: false, min_age: 0 })?["eligibleBlobs"], 1);
-        run(StoreCommand::Verify { digest: digest.clone() })?;
+        assert_eq!(
+            run(StoreCommand::Gc {
+                apply: true,
+                min_age: 0
+            })?["removedBlobs"],
+            0
+        );
+        run(StoreCommand::Unpin {
+            owner: "test".into(),
+            digest: digest.clone(),
+        })?;
+        assert_eq!(
+            run(StoreCommand::Gc {
+                apply: false,
+                min_age: 0
+            })?["eligibleBlobs"],
+            1
+        );
+        run(StoreCommand::Verify {
+            digest: digest.clone(),
+        })?;
         let output = temporary.path().join("output");
-        run(StoreCommand::Materialize { digest: digest.clone(), destination: output.clone() })?;
+        run(StoreCommand::Materialize {
+            digest: digest.clone(),
+            destination: output.clone(),
+        })?;
         assert_eq!(std::fs::read(output)?, b"package");
-        assert_eq!(run(StoreCommand::Gc { apply: true, min_age: 0 })?["removedBlobs"], 1);
+        assert_eq!(
+            run(StoreCommand::Gc {
+                apply: true,
+                min_age: 0
+            })?["removedBlobs"],
+            1
+        );
         assert!(run(StoreCommand::Verify { digest }).is_err());
         Ok(())
     }

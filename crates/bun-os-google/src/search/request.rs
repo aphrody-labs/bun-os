@@ -6,7 +6,10 @@ use serde_json::{Value, json};
 fn optional_text(args: &Value, name: &str) -> Result<Option<String>, String> {
     args.get(name)
         .map(|value| {
-            value.as_str().map(str::to_owned).ok_or_else(|| format!("{name} must be a string"))
+            value
+                .as_str()
+                .map(str::to_owned)
+                .ok_or_else(|| format!("{name} must be a string"))
         })
         .transpose()
 }
@@ -31,8 +34,11 @@ pub fn parse_search_request(args: &Value) -> Result<(String, SearchOptions, bool
     }) {
         return Err("unknown search argument".to_owned());
     }
-    let query =
-        args.get("query").and_then(Value::as_str).ok_or("query must be a string")?.to_owned();
+    let query = args
+        .get("query")
+        .and_then(Value::as_str)
+        .ok_or("query must be a string")?
+        .to_owned();
     if query.trim().is_empty() || query.len() > 4096 {
         return Err("query must contain 1 to 4096 bytes of non-empty text".to_owned());
     }
@@ -54,12 +60,12 @@ pub fn parse_search_request(args: &Value) -> Result<(String, SearchOptions, bool
         options.domain = domain;
     }
     let vertical = optional_text(args, "vertical")?.unwrap_or_else(|| "web".to_owned());
-    let rich = args
-        .get("rich")
-        .map_or(Ok(false), |value| value.as_bool().ok_or("rich must be a boolean"))?;
-    options.anonymous = args
-        .get("anonymous")
-        .map_or(Ok(false), |value| value.as_bool().ok_or("anonymous must be a boolean"))?;
+    let rich = args.get("rich").map_or(Ok(false), |value| {
+        value.as_bool().ok_or("rich must be a boolean")
+    })?;
+    options.anonymous = args.get("anonymous").map_or(Ok(false), |value| {
+        value.as_bool().ok_or("anonymous must be a boolean")
+    })?;
     if let Some(safe) = optional_text(args, "safe")? {
         if !matches!(safe.as_str(), "active" | "off") {
             return Err("safe must be active or off".to_owned());
@@ -87,7 +93,12 @@ pub fn parse_search_request(args: &Value) -> Result<(String, SearchOptions, bool
             _ => return Err("vertical must be web, images, news, videos or books".to_owned()),
         })
     };
-    if rich && !matches!(vertical.as_str(), "web" | "images" | "news" | "videos" | "books") {
+    if rich
+        && !matches!(
+            vertical.as_str(),
+            "web" | "images" | "news" | "videos" | "books"
+        )
+    {
         return Err("vertical must be web, images, news, videos or books".to_owned());
     }
     Ok((query, options, rich))
@@ -99,7 +110,10 @@ pub fn project_search_result(result: &RichSearchResult, rich: bool) -> Value {
     value.insert("query".to_owned(), json!(result.content.query));
     value.insert("authenticated".to_owned(), json!(result.authenticated));
     value.insert("transport".to_owned(), json!(result.profile_used));
-    value.insert("servedFromCache".to_owned(), json!(result.served_from_cache));
+    value.insert(
+        "servedFromCache".to_owned(),
+        json!(result.served_from_cache),
+    );
     if let Some(total) = result.content.total_results {
         value.insert("totalResults".to_owned(), json!(total));
     }
@@ -116,8 +130,14 @@ pub fn project_search_result(result: &RichSearchResult, rich: bool) -> Value {
         if let Some(panel) = &result.content.knowledge_panel {
             value.insert("knowledgePanel".to_owned(), json!(panel));
         }
-        value.insert("peopleAlsoAsk".to_owned(), json!(result.content.people_also_ask));
-        value.insert("relatedSearches".to_owned(), json!(result.content.related_searches));
+        value.insert(
+            "peopleAlsoAsk".to_owned(),
+            json!(result.content.people_also_ask),
+        );
+        value.insert(
+            "relatedSearches".to_owned(),
+            json!(result.content.related_searches),
+        );
     }
     Value::Object(value)
 }
@@ -125,7 +145,11 @@ pub fn project_search_result(result: &RichSearchResult, rich: bool) -> Value {
 /// Execute a validated native search while preserving the requested vertical.
 pub async fn execute_search_request(args: &Value) -> Result<Value, String> {
     let (query, options, rich) = parse_search_request(args)?;
-    let vertical = match args.get("vertical").and_then(Value::as_str).unwrap_or("web") {
+    let vertical = match args
+        .get("vertical")
+        .and_then(Value::as_str)
+        .unwrap_or("web")
+    {
         "images" => Some(GoogleVertical::Images),
         "news" => Some(GoogleVertical::News),
         "videos" => Some(GoogleVertical::Videos),
@@ -142,7 +166,9 @@ pub async fn execute_search_request(args: &Value) -> Result<Value, String> {
 
 /// Project native discovery records into common organic result entries.
 pub fn project_vertical_result(query: &str, records: Value) -> Result<Value, String> {
-    let records = records.as_array().ok_or("invalid native vertical records")?;
+    let records = records
+        .as_array()
+        .ok_or("invalid native vertical records")?;
     let organic: Vec<_> = records
         .iter()
         .enumerate()

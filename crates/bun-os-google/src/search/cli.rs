@@ -138,7 +138,9 @@ pub fn main(args: Vec<OsString>) -> i32 {
     {
         Ok(runtime) => runtime,
         Err(_) => {
-            crate::search::output::print_errorln(format_args!("bun search: native executor unavailable"));
+            crate::search::output::print_errorln(format_args!(
+                "bun search: native executor unavailable"
+            ));
             return 2;
         }
     };

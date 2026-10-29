@@ -106,7 +106,11 @@ export class GraphRegistry implements Disposable {
   }
 
   /** Stores a module graph as the snapshot `<repository>:graph:<hash>`; importing the same hash again is a no-op. */
-  async importGraph(repositoryId: string, graph: GraphDocument, hash: string): Promise<{ nodes: number; edges: number }> {
+  async importGraph(
+    repositoryId: string,
+    graph: GraphDocument,
+    hash: string,
+  ): Promise<{ nodes: number; edges: number }> {
     const snapshotId = `${repositoryId}:graph:${hash}`;
     const insertNodes = this.db.transaction(() => {
       this.db.query("DELETE FROM nodes WHERE snapshot_id = ?").run(snapshotId);
@@ -114,17 +118,36 @@ export class GraphRegistry implements Disposable {
       this.db.query("DELETE FROM snapshots WHERE id = ?").run(snapshotId);
       this.db
         .query("INSERT INTO snapshots(id, repository_id, hash, created_at, producer) VALUES (?, ?, ?, ?, ?)")
-        .run(snapshotId, repositoryId, hash, new Date().toISOString(), (graph as { producer?: string }).producer ?? null);
+        .run(
+          snapshotId,
+          repositoryId,
+          hash,
+          new Date().toISOString(),
+          (graph as { producer?: string }).producer ?? null,
+        );
       const node = this.db.query(
         "INSERT INTO nodes(id, snapshot_id, label, kind, source_file, bytes) VALUES (?, ?, ?, ?, ?, ?)",
       );
       for (const entry of graph.nodes)
-        node.run(`${snapshotId}:${entry.id}`, snapshotId, entry.label, entry.file_type, entry.source_file ?? null, entry.bytes ?? null);
+        node.run(
+          `${snapshotId}:${entry.id}`,
+          snapshotId,
+          entry.label,
+          entry.file_type,
+          entry.source_file ?? null,
+          entry.bytes ?? null,
+        );
       const edge = this.db.query(
         "INSERT INTO edges(snapshot_id, source, target, relation, bytes) VALUES (?, ?, ?, ?, ?)",
       );
       for (const link of graph.links)
-        edge.run(snapshotId, `${snapshotId}:${link.source}`, `${snapshotId}:${link.target}`, link.relation, link.bytes ?? null);
+        edge.run(
+          snapshotId,
+          `${snapshotId}:${link.source}`,
+          `${snapshotId}:${link.target}`,
+          link.relation,
+          link.bytes ?? null,
+        );
     });
     insertNodes();
     return { nodes: graph.nodes.length, edges: graph.links.length };
@@ -175,7 +198,9 @@ export class GraphRegistry implements Disposable {
     const snapshot = this.getSnapshot(filter.repositoryId);
     if (!snapshot) return [];
     return this.db
-      .query<RegistryNode, [string, number]>("SELECT id, label, kind FROM nodes WHERE snapshot_id = ? ORDER BY label LIMIT ?")
+      .query<RegistryNode, [string, number]>(
+        "SELECT id, label, kind FROM nodes WHERE snapshot_id = ? ORDER BY label LIMIT ?",
+      )
       .all(snapshot.id, filter.limit ?? 500);
   }
 
@@ -204,7 +229,12 @@ export class GraphRegistry implements Disposable {
     const lines = [`# Build graph of ${repositoryId}`, ""];
     const coverage = this.coverage({ repositoryId });
     if (!coverage.snapshot) return [...lines, "No build recorded.", ""].join("\n");
-    lines.push(`Snapshot \`${coverage.snapshot.id}\`: ${coverage.nodes} nodes, ${coverage.edges} links.`, "", "## Runs", "");
+    lines.push(
+      `Snapshot \`${coverage.snapshot.id}\`: ${coverage.nodes} nodes, ${coverage.edges} links.`,
+      "",
+      "## Runs",
+      "",
+    );
     for (const run of this.queryRuns({ kind: "m3-bun.build" }))
       lines.push(`- ${run.status}: ${run.summary ?? ""}`.trimEnd());
     lines.push("", "## Largest outputs", "");

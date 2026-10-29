@@ -47,12 +47,19 @@ pub fn supported_languages(target: Option<&str>) -> SupportedLanguagesResponse {
     } else {
         &LANGUAGES.raw
     };
-    SupportedLanguagesResponse { data: SupportedLanguagesData { languages: list.clone() } }
+    SupportedLanguagesResponse {
+        data: SupportedLanguagesData {
+            languages: list.clone(),
+        },
+    }
 }
 
 /// Check a code against the raw source registry, ignoring ASCII case.
 pub fn is_valid_language_code(code: &str) -> bool {
-    LANGUAGES.raw.iter().any(|item| item.language.eq_ignore_ascii_case(code))
+    LANGUAGES
+        .raw
+        .iter()
+        .any(|item| item.language.eq_ignore_ascii_case(code))
 }
 
 #[cfg(test)]

@@ -55,17 +55,7 @@ describe("runCli", () => {
     expect((await capture(() => runCli(["help"]))).text).toContain("Compile targets: linux-x64");
     expect((await capture(() => runCli(["version"]))).text).toMatch(/^\d+\.\d+\.\d+/);
     const targets = await capture(() => runCli(["targets"]));
-    for (const id of [
-      "docker",
-      "systemd",
-      "nginx",
-      "vercel",
-      "fly",
-      "cloudflare",
-      "coolify",
-      "vscode",
-      "windows",
-    ])
+    for (const id of ["docker", "systemd", "nginx", "vercel", "fly", "cloudflare", "coolify", "vscode", "windows"])
       expect(targets.text).toContain(id);
   });
 

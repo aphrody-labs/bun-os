@@ -19,7 +19,10 @@ import {
 
 const infra = resolve(dirname(fileURLToPath(import.meta.url)), "../../../");
 const config = JSON.parse(
-  readFileSync(process.env.SHENRON_AUTO_DEPLOY_CONFIG ?? join(infra, "tools/aphrody/config/shenron-auto-deploy.json"), "utf8"),
+  readFileSync(
+    process.env.SHENRON_AUTO_DEPLOY_CONFIG ?? join(infra, "tools/aphrody/config/shenron-auto-deploy.json"),
+    "utf8",
+  ),
 );
 const factoryPath = join(infra, "tools/aphrody/config/build-factory.json");
 const factory = JSON.parse(readFileSync(factoryPath, "utf8")) as BuildFactoryConfig;

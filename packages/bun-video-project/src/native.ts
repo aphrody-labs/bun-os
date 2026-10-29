@@ -32,7 +32,11 @@ export async function probeVideo(path: string): Promise<Record<string, unknown>>
     stderr: "pipe",
     windowsHide: true,
   });
-  const [out, err, code] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]);
+  const [out, err, code] = await Promise.all([
+    new Response(child.stdout).text(),
+    new Response(child.stderr).text(),
+    child.exited,
+  ]);
   if (code !== 0) throw new Error(`ffprobe failed: ${err.trim()}`);
   return JSON.parse(out) as Record<string, unknown>;
 }

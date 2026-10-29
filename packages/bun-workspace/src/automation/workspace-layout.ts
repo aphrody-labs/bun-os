@@ -71,9 +71,7 @@ export async function runWorkspaceLayout(args: string[]): Promise<number> {
     const gitMetadata = join(absolutePath, ".git");
 
     if (!allowedWorkspace(root, workspacePath)) {
-      errors.push(
-        `workspace must live below ${INTERNAL_ROOTS.join(", ")}: ${workspacePath}`,
-      );
+      errors.push(`workspace must live below ${INTERNAL_ROOTS.join(", ")}: ${workspacePath}`);
     }
     if (!existsSync(packageManifest)) {
       errors.push(`workspace has no package.json: ${workspacePath}`);

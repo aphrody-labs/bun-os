@@ -4,7 +4,6 @@
     clippy::disallowed_types,
     clippy::disallowed_macros
 )]
-
 // SPDX-License-Identifier: Apache-2.0
 //! Shared SHA-256 blob store. Hosts supply streams; this crate never fetches.
 //! Cache formats remain ecosystem-owned. Writable extraction must use copies:
@@ -29,7 +28,10 @@ impl BlobId {
     pub fn parse(value: &str) -> io::Result<Self> {
         let value = value.strip_prefix("sha256:").unwrap_or(value);
         if value.len() != 64 || !value.bytes().all(|b| b.is_ascii_hexdigit()) {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid SHA-256 address"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "invalid SHA-256 address",
+            ));
         }
         Ok(Self(value.to_ascii_lowercase()))
     }
@@ -63,7 +65,11 @@ impl Store {
     }
 
     pub fn blob_path(&self, id: &BlobId) -> PathBuf {
-        self.root.join("blobs").join("sha256").join(&id.0[..2]).join(&id.0)
+        self.root
+            .join("blobs")
+            .join("sha256")
+            .join(&id.0[..2])
+            .join(&id.0)
     }
 
     /// Count recognized regular blob files; never follows directory/file symlinks.
@@ -80,7 +86,10 @@ impl Store {
         for shard in shards {
             let shard = shard?;
             if !shard.file_type()?.is_dir() {
-                return Err(io::Error::new(io::ErrorKind::InvalidData, "invalid blob shard"));
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "invalid blob shard",
+                ));
             }
             for entry in fs::read_dir(shard.path())? {
                 let entry = entry?;
@@ -89,7 +98,10 @@ impl Store {
                     io::Error::new(io::ErrorKind::InvalidData, "non-UTF8 blob name")
                 })?)?;
                 if entry.path() != self.blob_path(&id) || !entry.file_type()?.is_file() {
-                    return Err(io::Error::new(io::ErrorKind::InvalidData, "invalid blob object"));
+                    return Err(io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "invalid blob object",
+                    ));
                 }
                 result.blobs = result
                     .blobs
@@ -127,17 +139,22 @@ impl Store {
         }
         let id = BlobId(hex::encode(hasher.finalize()));
         if expected.is_some_and(|expected| expected != &id) {
-            return Err(io::Error::new(io::ErrorKind::InvalidData, "package digest mismatch"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "package digest mismatch",
+            ));
         }
         temporary.as_file().sync_all()?;
         let destination = self.blob_path(&id);
-        let parent = destination.parent().ok_or_else(|| io::Error::other("missing blob parent"))?;
+        let parent = destination
+            .parent()
+            .ok_or_else(|| io::Error::other("missing blob parent"))?;
         fs::create_dir_all(parent)?;
         match temporary.persist_noclobber(&destination) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(error) if error.error.kind() == io::ErrorKind::AlreadyExists => {
                 self.verify_unlocked(&id)?;
-            },
+            }
             Err(error) => return Err(error.error),
         }
         Ok(id)
@@ -161,7 +178,10 @@ impl Store {
             hasher.update(&buffer[..count]);
         }
         if hex::encode(hasher.finalize()) != id.0 {
-            return Err(io::Error::new(io::ErrorKind::InvalidData, "corrupt package blob"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "corrupt package blob",
+            ));
         }
         Ok(())
     }
@@ -179,8 +199,10 @@ impl Store {
         destination: &Path,
     ) -> io::Result<Materialization> {
         let _guard = self.lock(false)?;
-        let parent =
-            destination.parent().filter(|p| !p.as_os_str().is_empty()).unwrap_or(Path::new("."));
+        let parent = destination
+            .parent()
+            .filter(|p| !p.as_os_str().is_empty())
+            .unwrap_or(Path::new("."));
         fs::create_dir_all(parent)?;
         let staging = tempfile::tempdir_in(parent)?;
         let cloned_path = staging.path().join("blob");
@@ -196,7 +218,10 @@ impl Store {
                 hasher.update(&buffer[..count]);
             }
             if hex::encode(hasher.finalize()) != id.0 {
-                return Err(io::Error::new(io::ErrorKind::InvalidData, "corrupt cloned blob"));
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "corrupt cloned blob",
+                ));
             }
             drop(cloned);
             File::options().write(true).open(&cloned_path)?.sync_all()?;
@@ -217,10 +242,15 @@ impl Store {
             temporary.write_all(&buffer[..count])?;
         }
         if hex::encode(hasher.finalize()) != id.0 {
-            return Err(io::Error::new(io::ErrorKind::InvalidData, "corrupt package blob"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "corrupt package blob",
+            ));
         }
         temporary.as_file().sync_all()?;
-        temporary.persist_noclobber(destination).map_err(|error| error.error)?;
+        temporary
+            .persist_noclobber(destination)
+            .map_err(|error| error.error)?;
         Ok(Materialization::Copy)
     }
 }
@@ -236,7 +266,13 @@ mod tests {
         let first = store.put(&b"package bytes"[..], None)?;
         let second = store.put(&b"package bytes"[..], Some(&first))?;
         assert_eq!(first, second);
-        assert_eq!(store.stats()?, StoreStats { blobs: 1, bytes: 13 });
+        assert_eq!(
+            store.stats()?,
+            StoreStats {
+                blobs: 1,
+                bytes: 13
+            }
+        );
         let destination = root.path().join("consumer/package");
         let method = store.materialize_with_method(&first, &destination)?;
         eprintln!("materialization method: {method:?}");
@@ -260,7 +296,10 @@ mod tests {
             io::ErrorKind::InvalidData
         );
         fs::write(store.blob_path(&id), b"corrupt")?;
-        assert_eq!(store.verify(&id).unwrap_err().kind(), io::ErrorKind::InvalidData);
+        assert_eq!(
+            store.verify(&id).unwrap_err().kind(),
+            io::ErrorKind::InvalidData
+        );
         let destination = root.path().join("consumer");
         assert_eq!(
             store.materialize(&id, &destination).unwrap_err().kind(),
@@ -274,7 +313,10 @@ mod tests {
     fn address_rejects_path_traversal_and_normalizes_hashes() -> io::Result<()> {
         assert!(BlobId::parse("../other").is_err());
         let uppercase = "A".repeat(64);
-        assert_eq!(BlobId::parse(&format!("sha256:{uppercase}"))?.as_str(), "a".repeat(64));
+        assert_eq!(
+            BlobId::parse(&format!("sha256:{uppercase}"))?.as_str(),
+            "a".repeat(64)
+        );
         Ok(())
     }
 
@@ -291,11 +333,19 @@ mod tests {
         let ids: Vec<_> = handles
             .into_iter()
             .map(|handle| {
-                handle.join().map_err(|_| io::Error::other("ingestion worker panicked"))?
+                handle
+                    .join()
+                    .map_err(|_| io::Error::other("ingestion worker panicked"))?
             })
             .collect::<io::Result<_>>()?;
         assert!(ids.iter().all(|id| id == &ids[0]));
-        assert_eq!(store.stats()?, StoreStats { blobs: 1, bytes: 12 });
+        assert_eq!(
+            store.stats()?,
+            StoreStats {
+                blobs: 1,
+                bytes: 12
+            }
+        );
         assert_eq!(fs::read_dir(root.path().join("staging"))?.count(), 0);
         Ok(())
     }

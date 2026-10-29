@@ -210,7 +210,7 @@ export function parsePe(bytes: Uint8Array): PeInfo | null {
     if (!security.rva || !security.size) return null;
     // The security directory holds a file offset, not an RVA: a list of 8-byte-aligned WIN_CERTIFICATE records.
     let certificates = 0;
-    for (let at = security.rva; at + 8 <= bytes.length && at < security.rva + security.size; ) {
+    for (let at = security.rva; at + 8 <= bytes.length && at < security.rva + security.size;) {
       const length = view.getUint32(at, true);
       if (length < 8) break;
       certificates++;

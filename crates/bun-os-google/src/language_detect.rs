@@ -137,10 +137,18 @@ fn lexical_language(text: &str) -> Option<(&'static str, f64)> {
 pub fn detect_single_local(text: &str) -> DetectionV2Item {
     let trimmed = text.trim();
     if trimmed.is_empty() {
-        return DetectionV2Item { language: "und".to_owned(), confidence: 0.0, is_reliable: false };
+        return DetectionV2Item {
+            language: "und".to_owned(),
+            confidence: 0.0,
+            is_reliable: false,
+        };
     }
     if let Some((language, confidence)) = script_language(trimmed) {
-        return DetectionV2Item { language: language.to_owned(), confidence, is_reliable: true };
+        return DetectionV2Item {
+            language: language.to_owned(),
+            confidence,
+            is_reliable: true,
+        };
     }
     if let Some((language, confidence)) = lexical_language(trimmed) {
         if confidence >= 0.7 {
@@ -156,7 +164,11 @@ pub fn detect_single_local(text: &str) -> DetectionV2Item {
             is_reliable: false,
         };
     }
-    DetectionV2Item { language: "en".to_owned(), confidence: 0.6, is_reliable: false }
+    DetectionV2Item {
+        language: "en".to_owned(),
+        confidence: 0.6,
+        is_reliable: false,
+    }
 }
 
 /// Resolve an uncertain snippet through the caller's existing Gemini client.
@@ -177,7 +189,11 @@ where
     if let Ok(answer) = ask(prompt).await {
         let code = answer.trim().to_ascii_lowercase();
         if valid_language_answer(&code) {
-            return DetectionV2Item { language: code, confidence: 0.95, is_reliable: true };
+            return DetectionV2Item {
+                language: code,
+                confidence: 0.95,
+                is_reliable: true,
+            };
         }
     }
     local
@@ -198,7 +214,10 @@ pub fn detect_languages_local<'a>(
 ) -> DetectLanguageV2Response {
     DetectLanguageV2Response {
         data: DetectLanguageV2Data {
-            detections: input.into_iter().map(|text| vec![detect_single_local(text)]).collect(),
+            detections: input
+                .into_iter()
+                .map(|text| vec![detect_single_local(text)])
+                .collect(),
         },
     }
 }

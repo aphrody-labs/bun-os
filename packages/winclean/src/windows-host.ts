@@ -28,7 +28,6 @@ function powershell(script: string): string {
   ]);
 }
 
-
 /** PowerShell-style type names (`MultiString` becomes `REG_MULTI_STRING`) mapped to registry types. */
 const REG_TYPE_ALIASES: Record<string, string> = {
   REG_STRING: "REG_SZ",
@@ -58,7 +57,12 @@ function services(): Array<{ name: string; displayName: string; state: string; s
   const text = powershell(
     "Get-CimInstance Win32_Service | Select-Object Name,DisplayName,State,StartMode | ConvertTo-Json -Compress",
   ).trim();
-  const rows = (text ? JSON.parse(text) : []) as Array<{ Name: string; DisplayName: string; State: string; StartMode: string }>;
+  const rows = (text ? JSON.parse(text) : []) as Array<{
+    Name: string;
+    DisplayName: string;
+    State: string;
+    StartMode: string;
+  }>;
   return (Array.isArray(rows) ? rows : [rows]).map(row => ({
     name: row.Name,
     displayName: row.DisplayName,
@@ -145,7 +149,8 @@ export function windowsHost(): BunWindowsApi {
     registry: {
       get: (path, name = "") => nativeRegistry.get(path, name),
       list: nativeRegistry.list,
-      set: (path, name, value, type = "REG_SZ") => nativeRegistry.set(path, name, value, REG_TYPE_ALIASES[type] ?? type),
+      set: (path, name, value, type = "REG_SZ") =>
+        nativeRegistry.set(path, name, value, REG_TYPE_ALIASES[type] ?? type),
       deleteValue: nativeRegistry.deleteValue,
       deleteKey: nativeRegistry.deleteKey,
     },

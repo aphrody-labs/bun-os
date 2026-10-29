@@ -126,7 +126,11 @@ async function probeVideo(path: string, ffprobe: string): Promise<Record<string,
     stdout: "pipe",
     stderr: "pipe",
   });
-  const [out, err, code] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]);
+  const [out, err, code] = await Promise.all([
+    new Response(child.stdout).text(),
+    new Response(child.stderr).text(),
+    child.exited,
+  ]);
   if (code !== 0) throw new Error(`ffprobe failed for ${path}: ${err.trim()}`);
   return { kind: "video", path, metadata: JSON.parse(out), decoder: "ffprobe" };
 }

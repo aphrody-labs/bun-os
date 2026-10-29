@@ -92,22 +92,22 @@ if it is upstream; otherwise only Bun OS).
 
 ### Timeline (VERIFIED unless marked)
 
-| Date | Event |
-|---|---|
-| 2021-03 | Rust tree in linux-next (LWN 849849; merge commit message of `8aebac82933f` links it) |
-| 2021-04-14 | first RFC `[PATCH 00/13] [RFC] Rust support`, Miguel Ojeda |
-| 2021-07-03/04 | v1, 17 patches, 141 files, +33,003/-45, "still to be considered experimental" |
-| 2021-12-06 | v2; stable rustc 1.57.0, edition 2021 |
-| 2022-01-17 | v3 (UNVERIFIED, one source) |
-| 2022-02 | v4 (date per LWN only) |
-| 2022-08-02 | v8, 31 patches, 198 files, +43,688/-75; rustc 1.62.0 |
-| 2022-09-15 | Maintainers Summit, Dublin: Linus will take Rust for 6.1 unless strong objections, wants a minimal infrastructure merge routed through Kees Cook |
-| 2022-10-03 | merge `8aebac82933f` "Pull Rust introductory support from Kees Cook", "the absolute minimum to get Rust code building in the kernel", 173 credited people |
-| 2022-12-11 | Linux 6.1, first release with Rust |
-| 2023-10-18 | "The Rust experiment" section added to `Documentation/rust/index.rst` (`3857af38e57a`) |
-| 2024-03-10 | 6.8: first Rust driver (Asix AX88796B PHY, `cbe0e4150896`) |
-| 2025-02-20 | Linus on the DMA dispute: maintainers may stay out of Rust but then have no say over Rust users of their C API |
-| 2025-12-13 | experiment concluded (`9fa7153c31a3`), in v7.0; 2026-02-10 merge `a9aabb3b839a` |
+| Date          | Event                                                                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2021-03       | Rust tree in linux-next (LWN 849849; merge commit message of `8aebac82933f` links it)                                                                     |
+| 2021-04-14    | first RFC `[PATCH 00/13] [RFC] Rust support`, Miguel Ojeda                                                                                                |
+| 2021-07-03/04 | v1, 17 patches, 141 files, +33,003/-45, "still to be considered experimental"                                                                             |
+| 2021-12-06    | v2; stable rustc 1.57.0, edition 2021                                                                                                                     |
+| 2022-01-17    | v3 (UNVERIFIED, one source)                                                                                                                               |
+| 2022-02       | v4 (date per LWN only)                                                                                                                                    |
+| 2022-08-02    | v8, 31 patches, 198 files, +43,688/-75; rustc 1.62.0                                                                                                      |
+| 2022-09-15    | Maintainers Summit, Dublin: Linus will take Rust for 6.1 unless strong objections, wants a minimal infrastructure merge routed through Kees Cook          |
+| 2022-10-03    | merge `8aebac82933f` "Pull Rust introductory support from Kees Cook", "the absolute minimum to get Rust code building in the kernel", 173 credited people |
+| 2022-12-11    | Linux 6.1, first release with Rust                                                                                                                        |
+| 2023-10-18    | "The Rust experiment" section added to `Documentation/rust/index.rst` (`3857af38e57a`)                                                                    |
+| 2024-03-10    | 6.8: first Rust driver (Asix AX88796B PHY, `cbe0e4150896`)                                                                                                |
+| 2025-02-20    | Linus on the DMA dispute: maintainers may stay out of Rust but then have no say over Rust users of their C API                                            |
+| 2025-12-13    | experiment concluded (`9fa7153c31a3`), in v7.0; 2026-02-10 merge `a9aabb3b839a`                                                                           |
 
 Elapsed: first RFC to merge about 17.5 months with 8+ revisions; merge to first in-tree driver 15 months;
 merge to "experiment concluded" about 38 months; RFC to concluded about 4 years 8 months.

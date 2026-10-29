@@ -61,7 +61,15 @@ async function capture(argv: string[]): Promise<string> {
   return out;
 }
 
-const SERVICE_STATES: Record<number, string> = { 1: "stopped", 2: "start_pending", 3: "stop_pending", 4: "running", 5: "continue_pending", 6: "pause_pending", 7: "paused" };
+const SERVICE_STATES: Record<number, string> = {
+  1: "stopped",
+  2: "start_pending",
+  3: "stop_pending",
+  4: "running",
+  5: "continue_pending",
+  6: "pause_pending",
+  7: "paused",
+};
 
 /** Services whose name matches `pattern`, with their status. */
 export async function services(pattern: RegExp): Promise<{ name: string; status: string }[]> {
@@ -75,7 +83,13 @@ export async function services(pattern: RegExp): Promise<{ name: string; status:
   const rows = JSON.parse(text.trim() || "[]") as { Name: string; Status: number | string }[];
   return (Array.isArray(rows) ? rows : [rows])
     .filter(row => pattern.test(row.Name))
-    .map(row => ({ name: row.Name, status: typeof row.Status === "number" ? (SERVICE_STATES[row.Status] ?? String(row.Status)) : String(row.Status).toLowerCase() }));
+    .map(row => ({
+      name: row.Name,
+      status:
+        typeof row.Status === "number"
+          ? (SERVICE_STATES[row.Status] ?? String(row.Status))
+          : String(row.Status).toLowerCase(),
+    }));
 }
 
 /** WSL registrations from the registry only; this does not start WSL. */

@@ -4,7 +4,6 @@
     clippy::disallowed_types,
     clippy::disallowed_macros
 )]
-
 // SPDX-License-Identifier: Apache-2.0
 //! Host-configured HTTP client; no TLS provider, credentials or global runtime mutation.
 //! Each resume owns one temporary file. Dropping it removes unpublished bytes.
@@ -52,9 +51,16 @@ impl Resume {
             || !url.username().is_empty()
             || url.password().is_some()
         {
-            return Err(Error::Protocol("HTTP URL without embedded credentials required"));
+            return Err(Error::Protocol(
+                "HTTP URL without embedded credentials required",
+            ));
         }
-        Ok(Self { file: NamedTempFile::new_in(directory)?, url, bytes: 0, etag: None })
+        Ok(Self {
+            file: NamedTempFile::new_in(directory)?,
+            url,
+            bytes: 0,
+            etag: None,
+        })
     }
 
     pub fn downloaded_bytes(&self) -> u64 {
@@ -77,9 +83,16 @@ impl Downloader {
         idle_timeout: Duration,
     ) -> Result<Self, Error> {
         if concurrency == 0 || max_bytes == 0 || idle_timeout.is_zero() {
-            return Err(Error::Protocol("nonzero concurrency, size and timeout required"));
+            return Err(Error::Protocol(
+                "nonzero concurrency, size and timeout required",
+            ));
         }
-        Ok(Self { client, slots: Semaphore::new(concurrency), max_bytes, idle_timeout })
+        Ok(Self {
+            client,
+            slots: Semaphore::new(concurrency),
+            max_bytes,
+            idle_timeout,
+        })
     }
 
     /// Streams at most max_bytes, preserving partial bytes on transport failure.
@@ -100,21 +113,37 @@ impl Downloader {
             permit = self.slots.acquire() => permit.map_err(|_| Error::Cancelled)?,
         };
         // Strong ETag is mandatory for safe resumptions; otherwise restart.
-        let offset = if resume.etag.is_some() { resume.bytes } else { 0 };
-        let mut request =
-            self.client.get(resume.url.clone()).header(header::ACCEPT_ENCODING, "identity");
+        let offset = if resume.etag.is_some() {
+            resume.bytes
+        } else {
+            0
+        };
+        let mut request = self
+            .client
+            .get(resume.url.clone())
+            .header(header::ACCEPT_ENCODING, "identity");
         if offset > 0 {
-            request = request.header(header::RANGE, format!("bytes={offset}-")).header(
-                header::IF_RANGE,
-                resume.etag.as_ref().ok_or(Error::Protocol("missing validator"))?.clone(),
-            );
+            request = request
+                .header(header::RANGE, format!("bytes={offset}-"))
+                .header(
+                    header::IF_RANGE,
+                    resume
+                        .etag
+                        .as_ref()
+                        .ok_or(Error::Protocol("missing validator"))?
+                        .clone(),
+                );
         }
         let mut response = tokio::select! {
             biased;
             _ = cancel.cancelled() => return Err(Error::Cancelled),
             result = tokio::time::timeout(self.idle_timeout, request.send()) => result.map_err(|_| Error::Timeout)?.map_err(Error::Http)?,
         };
-        if response.headers().get(header::CONTENT_ENCODING).is_some_and(|v| v != "identity") {
+        if response
+            .headers()
+            .get(header::CONTENT_ENCODING)
+            .is_some_and(|v| v != "identity")
+        {
             return Err(Error::Protocol("encoded response cannot be resumed"));
         }
         let status = response.status();
@@ -151,7 +180,10 @@ impl Downloader {
         let validator = response
             .headers()
             .get(header::ETAG)
-            .filter(|v| v.to_str().is_ok_and(|s| s.starts_with('"') && s.ends_with('"')))
+            .filter(|v| {
+                v.to_str()
+                    .is_ok_and(|s| s.starts_with('"') && s.ends_with('"'))
+            })
             .cloned();
         let mut file = tokio::fs::File::from_std(resume.file.reopen()?);
         // A failed write may have produced unacknowledged trailing bytes.
@@ -168,7 +200,10 @@ impl Downloader {
                 result = tokio::time::timeout(self.idle_timeout, response.chunk()) => result.map_err(|_| Error::Timeout)?.map_err(Error::Http)?,
             };
             let Some(chunk) = chunk else { break };
-            let next = resume.bytes.checked_add(chunk.len() as u64).ok_or(Error::TooLarge)?;
+            let next = resume
+                .bytes
+                .checked_add(chunk.len() as u64)
+                .ok_or(Error::TooLarge)?;
             if next > self.max_bytes {
                 return Err(Error::TooLarge);
             }
@@ -197,8 +232,11 @@ impl Downloader {
 
 fn parse_range(value: &str) -> Result<(u64, u64, u64), Error> {
     let invalid = || Error::Protocol("invalid Content-Range");
-    let (range, total) =
-        value.strip_prefix("bytes ").ok_or_else(invalid)?.split_once('/').ok_or_else(invalid)?;
+    let (range, total) = value
+        .strip_prefix("bytes ")
+        .ok_or_else(invalid)?
+        .split_once('/')
+        .ok_or_else(invalid)?;
     let (start, end) = range.split_once('-').ok_or_else(invalid)?;
     let start: u64 = start.parse().map_err(|_| invalid())?;
     let end: u64 = end.parse().map_err(|_| invalid())?;
@@ -216,11 +254,16 @@ mod tests {
 
     fn fixture(response: &'static [u8]) -> (Url, std::thread::JoinHandle<String>) {
         let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
-        let url =
-            Url::parse(&format!("http://{}/package", listener.local_addr().unwrap())).unwrap();
+        let url = Url::parse(&format!(
+            "http://{}/package",
+            listener.local_addr().unwrap()
+        ))
+        .unwrap();
         let handle = std::thread::spawn(move || {
             let (mut stream, _) = listener.accept().unwrap();
-            stream.set_read_timeout(Some(Duration::from_secs(5))).unwrap();
+            stream
+                .set_read_timeout(Some(Duration::from_secs(5)))
+                .unwrap();
             let mut request = Vec::new();
             loop {
                 let mut byte = [0];
@@ -288,7 +331,12 @@ mod tests {
         resume.bytes = 3;
         resume.etag = Some(header::HeaderValue::from_static("\"v1\""));
         let id = downloader(100)
-            .download(&mut resume, store.clone(), Some(expected.clone()), &CancellationToken::new())
+            .download(
+                &mut resume,
+                store.clone(),
+                Some(expected.clone()),
+                &CancellationToken::new(),
+            )
             .await
             .unwrap();
         assert_eq!(id, expected);
@@ -300,13 +348,21 @@ mod tests {
     async fn oversized_and_wrong_digest_never_publish() {
         let dir = tempfile::tempdir().unwrap();
         let store = Arc::new(Store::new(dir.path().join("store")));
-        for (limit, digest) in [(2, None), (100, Some(BlobId::parse(&"0".repeat(64)).unwrap()))] {
+        for (limit, digest) in [
+            (2, None),
+            (100, Some(BlobId::parse(&"0".repeat(64)).unwrap())),
+        ] {
             let (url, server) =
                 fixture(b"HTTP/1.1 200 OK\r\nContent-Length: 4\r\nConnection: close\r\n\r\ndata");
             let mut resume = Resume::new(dir.path(), url).unwrap();
             assert!(
                 downloader(limit)
-                    .download(&mut resume, store.clone(), digest, &CancellationToken::new())
+                    .download(
+                        &mut resume,
+                        store.clone(),
+                        digest,
+                        &CancellationToken::new()
+                    )
                     .await
                     .is_err()
             );
@@ -318,8 +374,11 @@ mod tests {
     #[tokio::test]
     async fn precancelled_requests_do_not_contact_network() {
         let dir = tempfile::tempdir().unwrap();
-        let mut resume =
-            Resume::new(dir.path(), Url::parse("http://127.0.0.1:1/package").unwrap()).unwrap();
+        let mut resume = Resume::new(
+            dir.path(),
+            Url::parse("http://127.0.0.1:1/package").unwrap(),
+        )
+        .unwrap();
         let cancel = CancellationToken::new();
         cancel.cancel();
         assert!(matches!(
@@ -357,7 +416,13 @@ mod tests {
     #[test]
     fn range_validation() {
         assert_eq!(parse_range("bytes 3-7/8").unwrap(), (3, 7, 8));
-        for value in ["bytes 3-2/8", "bytes 0-8/8", "bytes 0-1/*", "items 0-1/2", "bytes */8"] {
+        for value in [
+            "bytes 3-2/8",
+            "bytes 0-8/8",
+            "bytes 0-1/*",
+            "items 0-1/2",
+            "bytes */8",
+        ] {
             assert!(parse_range(value).is_err());
         }
     }

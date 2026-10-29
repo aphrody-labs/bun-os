@@ -510,7 +510,8 @@ async function probeMedia(path: string): Promise<Metadata | null> {
 async function videoPreview(path: string, width: number): Promise<Preview> {
   const probe = await probeMedia(path);
   if (!probe) return { kind: "video", metadata: { size: Bun.file(path).size, probe: "ffprobe unavailable" } };
-  const streams = (probe.streams as { codec_type?: string; width?: number; height?: number; codec_name?: string }[]) ?? [];
+  const streams =
+    (probe.streams as { codec_type?: string; width?: number; height?: number; codec_name?: string }[]) ?? [];
   const stream = streams.find(s => s.codec_type === "video");
   const duration = Number((probe.format as { duration?: string } | undefined)?.duration ?? 0);
   const metadata = {
@@ -525,8 +526,22 @@ async function videoPreview(path: string, width: number): Promise<Preview> {
   const at = Math.min(Math.max(0, duration * 0.1), 10);
   try {
     const png = await capture([
-      ffmpeg, "-v", "error", "-ss", String(at), "-i", path, "-frames:v", "1",
-      "-vf", `scale=${width}:-2`, "-f", "image2pipe", "-c:v", "png", "pipe:1",
+      ffmpeg,
+      "-v",
+      "error",
+      "-ss",
+      String(at),
+      "-i",
+      path,
+      "-frames:v",
+      "1",
+      "-vf",
+      `scale=${width}:-2`,
+      "-f",
+      "image2pipe",
+      "-c:v",
+      "png",
+      "pipe:1",
     ]);
     const thumbnail = await new Bun.Image(png).webp({ quality: 80 }).bytes();
     return { kind: "video", thumbnail, metadata };

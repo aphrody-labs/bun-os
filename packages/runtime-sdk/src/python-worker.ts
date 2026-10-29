@@ -21,7 +21,10 @@ self.onmessage = ({ data: { id, operation, args } }: MessageEvent<{ id: number; 
   } catch (error) {
     self.postMessage({
       id,
-      error: { status: error instanceof PythonError ? error.status : -3, message: String((error as Error).message ?? error) },
+      error: {
+        status: error instanceof PythonError ? error.status : -3,
+        message: String((error as Error).message ?? error),
+      },
     });
   }
 };

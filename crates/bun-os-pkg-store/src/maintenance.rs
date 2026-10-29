@@ -20,9 +20,14 @@ fn valid_owner(owner: &str) -> io::Result<()> {
     if owner.is_empty()
         || owner.len() > 128
         || matches!(owner, "." | "..")
-        || !owner.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_' | b'.'))
+        || !owner
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_' | b'.'))
     {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid store reference owner"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "invalid store reference owner",
+        ));
     }
     Ok(())
 }
@@ -78,9 +83,12 @@ impl Store {
                 if metadata.is_file() && metadata.len() == 0 {
                     Ok(())
                 } else {
-                    Err(io::Error::new(io::ErrorKind::InvalidData, "invalid store reference"))
+                    Err(io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "invalid store reference",
+                    ))
                 }
-            },
+            }
             Err(error) => Err(error),
         }
     }
@@ -107,7 +115,8 @@ impl Store {
             let owner = owner?;
             let name = owner.file_name();
             valid_owner(
-                name.to_str().ok_or_else(|| io::Error::other("non-UTF8 reference owner"))?,
+                name.to_str()
+                    .ok_or_else(|| io::Error::other("non-UTF8 reference owner"))?,
             )?;
             if !owner.file_type()?.is_dir() {
                 return Err(io::Error::new(
@@ -125,7 +134,9 @@ impl Store {
                     ));
                 }
                 let name = reference.file_name();
-                let name = name.to_str().ok_or_else(|| io::Error::other("non-UTF8 reference"))?;
+                let name = name
+                    .to_str()
+                    .ok_or_else(|| io::Error::other("non-UTF8 reference"))?;
                 let id = BlobId::parse(name)?;
                 if id.as_str() != name {
                     return Err(io::Error::new(
@@ -156,18 +167,28 @@ impl Store {
         for shard in shards {
             let shard = shard?;
             if !shard.file_type()?.is_dir() {
-                return Err(io::Error::new(io::ErrorKind::InvalidData, "invalid blob shard"));
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "invalid blob shard",
+                ));
             }
             for entry in fs::read_dir(shard.path())? {
                 let entry = entry?;
                 let name = entry.file_name();
-                let id =
-                    BlobId::parse(name.to_str().ok_or_else(|| io::Error::other("non-UTF8 blob"))?)?;
+                let id = BlobId::parse(
+                    name.to_str()
+                        .ok_or_else(|| io::Error::other("non-UTF8 blob"))?,
+                )?;
                 if entry.path() != self.blob_path(&id) || !entry.file_type()?.is_file() {
-                    return Err(io::Error::new(io::ErrorKind::InvalidData, "invalid blob object"));
+                    return Err(io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "invalid blob object",
+                    ));
                 }
                 let metadata = entry.metadata()?;
-                let age = now.duration_since(metadata.modified()?).unwrap_or(Duration::ZERO);
+                let age = now
+                    .duration_since(metadata.modified()?)
+                    .unwrap_or(Duration::ZERO);
                 if !live.contains(&id) && age >= minimum_age {
                     candidates.push((entry.path(), metadata.len()));
                 }

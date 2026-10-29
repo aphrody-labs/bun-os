@@ -6,7 +6,7 @@
 #![allow(
     clippy::disallowed_methods,
     clippy::disallowed_types,
-    clippy::disallowed_macros,
+    clippy::disallowed_macros
 )]
 
 pub mod atlas;
