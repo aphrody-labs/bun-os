@@ -76,9 +76,9 @@ reproduce an image (for example, point lists traced from someone else's icon).
    `crates/engine/src/demo.rs`, generators in `crates/effects`) are original work under the project licence
    and are listed in `ATTRIBUTION.md`.
 7. **When in doubt, leave it out** and draw or generate it yourself.
-8. **The one exception: first-party ArtCraft brand marks.** The ArtCraft name and logos in `docs/brand/`
+8. **The one exception: first-party ArtCraft brand marks.** The ArtCraft name and logos in `../brand/`
    are trademarks of the ArtCraft Team, not open source, usable only unmodified and only in the context of
-   EffectCraft under `docs/brand/LICENSE-brand.txt` (forks and modified versions must remove them). They still
+   EffectCraft under `brand/LICENSE-brand.txt` (forks and modified versions must remove them). They still
    need a sidecar and an `ATTRIBUTION.md` row (licence `LicenseRef-ArtCraft-Trademark`). No other
    non-open asset is allowed, and this exception never covers third-party marks (Adobe, Discord, GitHub
    and other logos stay out; draw a generic icon instead).

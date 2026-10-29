@@ -50,8 +50,8 @@ Ubuntu-Font-1.0, Bitstream-Vera); Creative Commons (CC0-1.0, CC-BY-4.0, CC-BY-SA
 domain; or contributor-original (created by a contributor who licenses it under
 `MIT OR Apache-2.0`).
 
-One narrow exception: the ArtCraft name, wordmark and logos in `docs/brand/` are trademarks of the
-ArtCraft Team (not open source, terms in `docs/brand/LICENSE-brand.txt`), used only unmodified to
+One narrow exception: the ArtCraft name, wordmark and logos in `../brand/` are trademarks of the
+ArtCraft Team (not open source, terms in `brand/LICENSE-brand.txt`), used only unmodified to
 identify the project.
 
 Forbidden: system fonts that are not openly licensed, vendor emoji artwork, stock photos, "free
@@ -66,7 +66,7 @@ allowed: our UI, our/Lucide icons, OFL fonts, and decks built only from allowed 
 - **`ATTRIBUTION.md`** (repo root) lists every asset file — committed, fetched at build time
   (craft-fonts) or bundled through a Cargo dependency — with author, source (URL + version or
   commit), licence and use. `cargo xtask assets` fails if a file under `assets/`, `docs/images/`
-  or `docs/brand/` has no row.
+  or `../brand/` has no row.
 - **`NOTICE`** keeps the notices the licences require.
 - Fonts live in [storytold/craft-fonts](https://github.com/storytold/craft-fonts), never in this
   repo (craftrules `standards/fonts.md`). DeckCraft embeds its `fonts/latin-manifest.txt` and
