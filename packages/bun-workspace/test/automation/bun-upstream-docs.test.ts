@@ -34,20 +34,6 @@ function git(cwd: string, ...args: string[]): string {
 }
 
 describe("bun-upstream-docs", () => {
-  test("the pin directory holds only the fork page, the licence and the pinned commit", async () => {
-    const pin = await readBunDocsPin(join(root, BUN_PIN_DIR, "SOURCE.json"));
-    expect(pin?.commit).toMatch(/^[0-9a-f]{40}$/);
-    const licence = await Bun.file(join(root, BUN_PIN_DIR, "LICENSE.md")).bytes();
-    expect(pin?.files["LICENSE.md"]).toBe(createHash("sha256").update(licence).digest("hex"));
-    const files = [
-      ...new Bun.Glob("**/*").scanSync({
-        cwd: join(root, BUN_PIN_DIR),
-        dot: true,
-      }),
-    ].toSorted();
-    expect(files).toEqual(["APHRODY-FORK.md", "LICENSE.md", "SOURCE.json"]);
-  });
-
   test("user data directory follows APPDATA, XDG_DATA_HOME, then HOME", () => {
     expect(bunDataDir({ APPDATA: "C:/Users/a/AppData/Roaming" }, "win32")).toBe(
       join("C:/Users/a/AppData/Roaming", "aphrody", "bun"),

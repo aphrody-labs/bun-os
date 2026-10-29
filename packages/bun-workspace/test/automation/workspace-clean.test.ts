@@ -43,7 +43,7 @@ test("tracked target sources survive cleanup, ignored nested artifacts are remov
 test("unignored source build directory and symlink targets survive", async () => {
   const root = await fixture();
   await writeFile(join(root, ".gitignore"), "target/\n");
-  await mkdir(join(root, "scripts/build"), { recursive: true });
+  await mkdir(join(root, "scripts/aphrody/build"), { recursive: true });
   await writeFile(join(root, "scripts/aphrody/build/source.ts"), "source");
   const outside = await mkdtemp(join(tmpdir(), "aphrody-clean-outside-"));
   roots.push(outside);

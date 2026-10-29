@@ -26,7 +26,7 @@ import { homedir } from "node:os";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 
 /** Pin directory: APHRODY-FORK.md, LICENSE.md and SOURCE.json only. */
-export const BUN_PIN_DIR = "docs/reference/upstream-bun";
+export const BUN_PIN_DIR = "crates/aphrody-bun-docs/data";
 export const FORK_URL = "https://github.com/oven-sh/bun.git";
 const FORK_SOURCE = "https://github.com/oven-sh/bun";
 const KEEP = new Set(["APHRODY-FORK.md", "LICENSE.md", "SOURCE.json"]);
