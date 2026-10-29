@@ -13076,26 +13076,6 @@
       "buildOwner": ".",
       "bunOwner": ".",
       "cargoOwner": null,
-      "component": "aphrody",
-      "migrationState": "outside-declared-members",
-      "ownerEvidence": "nearest-ancestor-workspace-manifest",
-      "path": "docs/aphrody",
-      "qualificationState": "source-inventory-only",
-      "releaseOwner": ".",
-      "revision": null,
-      "sourceRepository": "aphrody-labs/bun-distribution",
-      "submodule": null,
-      "targets": {
-        "cpu": null,
-        "os": null
-      },
-      "type": "package",
-      "upstream": null
-    },
-    {
-      "buildOwner": ".",
-      "bunOwner": ".",
-      "cargoOwner": null,
       "component": "@sd/interface",
       "migrationState": "outside-declared-members",
       "ownerEvidence": "nearest-ancestor-workspace-manifest",

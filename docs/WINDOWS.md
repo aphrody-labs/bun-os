@@ -112,7 +112,7 @@ Migrated callers: `@aphrody/winclean` (`windows-host.ts`), `@aphrody/bun-steam`,
 outside `packages/windows`): `scripts/aphrody/tools/infra/win32-{user,net}.ts`, `scripts/aphrody/tools/os/windex/win32.ts`,
 `packages/bun-workspace/src/windows-job.ts`, `packages/google/src/credentials.ts`,
 `packages/product/src/admin/lib/fleet/windows.ts`, `packages/bun-os-platform/src/i18n/index.ts`,
-`scripts/aphrody/install/mesh-supervisor.ts`, `packages/bun-engine/src/owned/store.ts`, `docs/aphrody/win-window.ts`.
+`scripts/aphrody/install/mesh-supervisor.ts`, `packages/bun-engine/src/owned/store.ts`.
 
 Backlog of fork `bun:windows` areas not yet in the layer: eventlog, clipboard, conpty, dll search path, job objects
 (`windows-job.ts` is the seed), NTFS, storage, toast, wintrust, WSL, GPU; dynamic WinRT projection from `.winmd`
