@@ -22,7 +22,6 @@ path = "src/main.rs"
 
 [dependencies]
 designcraft-engine = { path = "../../crates/designcraft-engine" }
-designcraft-format = { path = "../../crates/designcraft-format" }
 form_urlencoded = "1.2"
 designcraft-ui-egui = { path = "../../crates/designcraft-ui-egui" }
 egui = "0.36"

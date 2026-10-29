@@ -13,6 +13,7 @@
 )]
 #![forbid(unsafe_code)]
 
+pub mod pdf_export;
 pub mod catalog;
 pub mod cf;
 mod clip_html;

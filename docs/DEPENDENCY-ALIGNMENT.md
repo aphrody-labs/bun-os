@@ -17,7 +17,7 @@ declarations** inherit an existing root workspace dependency. No dependency
 name resolves to different versions between direct workspace consumers.
 
 The font owners are now centralized too: `craft-fonts` at source revision
-`8855577a452c6d2536674e7e0a705bb933110ef5` and `craft-fonts-tests` at
+`8855577a452c6d2536674e7e0a705bb933110ef5` and `craft-fonts` tests at
 `29111fb27a8338ff220ad87395f70ca0cbbf80dc`. The latter inherits `craft-fonts`
 and `skrifa =0.48.0`, requesting the published `default` feature for skrifa.
 
@@ -38,8 +38,8 @@ Four versions have only workspace members as their immediate parents:
 | --- | --- | --- |
 | `moxcms 0.9.1`, craft-cms | `0.8.1` | image 0.25.10 requires `^0.8.0` |
 | `roxmltree 0.21.1`, craft-print | `0.20.0` | usvg 0.45.1 requires `^0.20` |
-| `sha2 0.11.1`, craft-fonts-tests | `0.10.9` | sigstore-crypto 0.6.6 requires `^0.10` |
-| `skrifa 0.48.0`, craft-fonts-tests | `0.44.0` | epaint 0.36.2 and glifo 0.2.0 require `^0.44.0` |
+| `sha2 0.11.1`, craft-fonts | `0.10.9` | sigstore-crypto 0.6.6 requires `^0.10` |
+| `skrifa 0.48.0`, craft-fonts | `0.44.0` | epaint 0.36.2 and glifo 0.2.0 require `^0.44.0` |
 
 For these pre-1.0 packages, the indicated minor ranges are incompatible.
 Changing the common root pin cannot make the upstream declarations accept the

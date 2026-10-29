@@ -538,7 +538,7 @@ pub(crate) fn save_tracked(s: &mut Session, dir: &Path) -> Result<usize> {
             continue;
         };
         let (doc, meta) = files(dir, document.uid);
-        let bytes = designcraft_format::save(
+        let bytes = crate::format::save(
             document
                 .preview_stash
                 .as_deref()
@@ -562,7 +562,7 @@ pub(crate) fn save_tracked(s: &mut Session, dir: &Path) -> Result<usize> {
 /// Publish a document's recovery entry before its optional metadata.
 fn write_entry(dir: &Path, d: &DocState) -> Result<()> {
     let (doc, meta) = files(dir, d.uid);
-    let bytes = designcraft_format::save(d.preview_stash.as_deref().unwrap_or(d.doc.as_ref()))
+    let bytes = crate::format::save(d.preview_stash.as_deref().unwrap_or(d.doc.as_ref()))
         .map_err(|e| EngineError::Other(e.to_string()))?;
     write_recovery_file(&doc, &bytes)?;
     let metadata =
@@ -886,7 +886,7 @@ fn open_with_publisher(
         // clean up every snapshot this document actually owns rather than an unrelated same uid.
         if let Some(state) = s.docs.get_mut(index) {
             let (document, metadata) = files(&destination, state.uid);
-            let published = designcraft_format::save(state.doc.as_ref())
+            let published = crate::format::save(state.doc.as_ref())
                 .map_err(|e| EngineError::Other(e.to_string()))
                 .and_then(|bytes| publish(&document, &bytes));
             match published {
@@ -1253,7 +1253,7 @@ mod tests {
         let saved = root.path().join("saved-other.designcraft");
         std::fs::write(
             &saved,
-            designcraft_format::save(&session.docs[0].doc).unwrap(),
+            crate::format::save(&session.docs[0].doc).unwrap(),
         )
         .unwrap();
         session.docs[0].path = Some(saved.to_string_lossy().into_owned());

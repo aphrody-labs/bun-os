@@ -12,7 +12,7 @@ use std::time::SystemTime;
 use serde_json::{Value, json};
 
 use lightcraft_catalog::{Op, PhotoId};
-use lightcraft_geocode::{GEONAMES_ATTRIBUTION, GEONAMES_FILES, GeoNames, LatLon};
+use crate::geocode::{GEONAMES_ATTRIBUTION, GEONAMES_FILES, GeoNames, LatLon};
 
 use super::{CommandSpec, always, bad, bool_or, cmd, has_selection, str_param};
 use crate::activity::Cancel;
@@ -69,7 +69,7 @@ impl PlaceNames {
     fn load(
         &mut self,
         dir: &Path,
-    ) -> std::result::Result<Arc<GeoNames>, lightcraft_geocode::GeocodeError> {
+    ) -> std::result::Result<Arc<GeoNames>, crate::geocode::GeocodeError> {
         let file = dir.join(GEONAMES_FILES[0]);
         let meta = std::fs::metadata(&file).ok();
         let (len, mtime) = (
@@ -105,12 +105,12 @@ fn status(s: &mut Session, p: &Value) -> Result<Value> {
     };
     Ok(json!({
         "downloaded": size.is_some(), "bytes": size, "path": dir, "downloading": sh.running, "lastDownload": last, "lastError": error,
-        "attribution": GEONAMES_ATTRIBUTION, "source": lightcraft_geocode::GEONAMES_BASE,
+        "attribution": GEONAMES_ATTRIBUTION, "source": crate::geocode::GEONAMES_BASE,
     }))
 }
 
 /// Which place fields to write: a field is filled when it is empty, or always with `overwrite`.
-fn fill(meta: &mut lightcraft_catalog::Meta, place: &lightcraft_geocode::Place, overwrite: bool) {
+fn fill(meta: &mut lightcraft_catalog::Meta, place: &crate::geocode::Place, overwrite: bool) {
     for (field, value) in [
         (&mut meta.location, &place.sublocation),
         (&mut meta.city, &place.city),
@@ -193,7 +193,7 @@ mod download {
     use std::sync::Arc;
     use std::sync::atomic::AtomicBool;
 
-    use lightcraft_geocode::{GEONAMES_BASE, GEONAMES_ZIP};
+    use crate::geocode::{GEONAMES_BASE, GEONAMES_ZIP};
 
     use super::*;
     use crate::activity::Unit;
@@ -238,7 +238,7 @@ mod download {
             .map_err(|e| format!("could not create {}: {e}", staging.display()))?;
         get(GEONAMES_ZIP, base, &staging, cancel, task)?;
         let zip = std::fs::read(staging.join(GEONAMES_ZIP)).map_err(|e| e.to_string())?;
-        let cities = lightcraft_geocode::unzip::extract(&zip, GEONAMES_FILES[0], MAX_TEXT)
+        let cities = crate::geocode::unzip::extract(&zip, GEONAMES_FILES[0], MAX_TEXT)
             .map_err(|e| e.to_string())?;
         let places = GeoNames::parse(&String::from_utf8_lossy(&cities), None, None).len();
         if places == 0 {
@@ -511,7 +511,7 @@ mod tests {
         use std::io::{BufRead, BufReader, Write};
         let l = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
         let port = l.local_addr().unwrap().port();
-        let zip = lightcraft_geocode::unzip::make(GEONAMES_FILES[0], CITIES.as_bytes());
+        let zip = crate::geocode::unzip::make(GEONAMES_FILES[0], CITIES.as_bytes());
         std::thread::spawn(move || {
             for conn in l.incoming() {
                 let Ok(mut c) = conn else { continue };

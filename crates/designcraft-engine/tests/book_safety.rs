@@ -24,7 +24,7 @@ fn document(start: u32, custom: bool) -> designcraft_doc::Document {
 fn native(p: &Path, start: u32, custom: bool) {
     std::fs::write(
         p,
-        designcraft_format::save(&document(start, custom)).unwrap(),
+        designcraft_engine::format::save(&document(start, custom)).unwrap(),
     )
     .unwrap();
 }
@@ -61,7 +61,7 @@ fn late_missing_chapter_does_not_partially_paginate_earlier_chapters() {
     assert!(
         before == after,
         "book.paginate changed the first chapter before error: {result:?}; new first number {:?}",
-        designcraft_format::load(&after)
+        designcraft_engine::format::load(&after)
             .unwrap()
             .sections
             .first()
@@ -87,7 +87,7 @@ fn late_corrupt_chapter_does_not_partially_sync_earlier_chapters() {
     assert!(
         before == after,
         "book.syncStyles changed the first target before error: {result:?}; copied custom style {}",
-        designcraft_format::load(&after)
+        designcraft_engine::format::load(&after)
             .unwrap()
             .styles
             .paragraph
@@ -108,7 +108,7 @@ fn paginate_does_not_replace_imported_idml_with_native_format() {
         before == after,
         "book.paginate rewrote imported IDML: {result:?}; IDML readable after {}, native readable after {}",
         designcraft_idml::import_idml(&after).is_ok(),
-        designcraft_format::load(&after).is_ok()
+        designcraft_engine::format::load(&after).is_ok()
     );
 }
 #[test]
@@ -126,7 +126,7 @@ fn style_sync_does_not_replace_imported_idml_with_native_format() {
         before == after,
         "book.syncStyles rewrote imported IDML: {result:?}; IDML readable after {}, native readable after {}",
         designcraft_idml::import_idml(&after).is_ok(),
-        designcraft_format::load(&after).is_ok()
+        designcraft_engine::format::load(&after).is_ok()
     );
 }
 
@@ -213,7 +213,7 @@ fn imported_idml_remains_a_read_only_style_source() {
     assert_eq!(result["synced"], 1);
     assert_eq!(std::fs::read(&source).unwrap(), before);
     assert!(designcraft_idml::import_idml(&before).is_ok());
-    let target = designcraft_format::load(&std::fs::read(target).unwrap()).unwrap();
+    let target = designcraft_engine::format::load(&std::fs::read(target).unwrap()).unwrap();
     assert!(
         target
             .styles

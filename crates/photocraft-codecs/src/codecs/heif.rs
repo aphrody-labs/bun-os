@@ -1,6 +1,6 @@
 //! HEIF / HEIC (the iPhone and Mac photo format), read-only: see [`crate::ASYMMETRIC_EXCEPTIONS`].
 //!
-//! Decoding lives in the optional `photocraft-heif` crate (heic-rs, a pure-Rust HEVC
+//! Decoding lives in `heif_backend` (heic-rs, a pure-Rust HEVC
 //! still-picture decoder), enabled by this crate's `heif` feature. Without it, HEIF files are
 //! still detected and opening one is an [`CodecError::Unsupported`] error, never a panic.
 //!
@@ -31,11 +31,11 @@ pub(crate) fn decode(
 }
 
 #[cfg(feature = "heif")]
-fn err(e: photocraft_heif::Error) -> CodecError {
+fn err(e: super::heif_backend::Error) -> CodecError {
     match e {
-        photocraft_heif::Error::Unsupported(what) => CodecError::unsupported(F, what),
-        photocraft_heif::Error::Limit(what) => CodecError::LimitExceeded(what),
-        photocraft_heif::Error::Malformed(what) => CodecError::malformed(F, what),
+        super::heif_backend::Error::Unsupported(what) => CodecError::unsupported(F, what),
+        super::heif_backend::Error::Limit(what) => CodecError::LimitExceeded(what),
+        super::heif_backend::Error::Malformed(what) => CodecError::malformed(F, what),
     }
 }
 
@@ -48,7 +48,7 @@ pub(crate) fn decode(
     use crate::image::{ChannelLayout, Metadata, SampleType};
 
     // The container alone: the declared size is checked before any pixel is decoded.
-    let info = photocraft_heif::probe(bytes).map_err(err)?;
+    let info = super::heif_backend::probe(bytes).map_err(err)?;
     let layout = if info.has_alpha {
         ChannelLayout::Rgba
     } else {
@@ -65,11 +65,11 @@ pub(crate) fn decode(
         (info.width, info.height)
     };
     limits.check(w, h, layout, sample)?;
-    let options = photocraft_heif::Options {
+    let options = super::heif_backend::Options {
         max_pixels: limits.max_pixels,
         apply_transforms: !keep_orientation,
     };
-    let decoded = photocraft_heif::decode(bytes, &options).map_err(err)?;
+    let decoded = super::heif_backend::decode(bytes, &options).map_err(err)?;
     // The decoder re-reads the container; trust its output's shape, not the probe's.
     let layout = if decoded.has_alpha {
         ChannelLayout::Rgba
