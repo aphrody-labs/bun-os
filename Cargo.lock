@@ -1268,7 +1268,7 @@ dependencies = [
  "bun_browser_service",
  "bun_git",
  "bun_native",
- "bun_pkg_cli",
+ "bun_pkg",
  "bun_x",
  "bytes",
  "chrono",
@@ -9031,53 +9031,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "bun_pkg_cli"
+name = "bun_pkg"
 version = "1.4.7"
 dependencies = [
- "bun_pkg_core",
- "bun_pkg_net",
- "bun_pkg_store",
  "clap",
+ "hex",
+ "node-semver",
+ "pep440_rs",
+ "reflink-copy",
  "reqwest 0.13.5",
  "rustls",
  "rustls-native-certs 0.8.5",
- "serde_json",
- "tempfile",
- "tokio",
- "tokio-util",
-]
-
-[[package]]
-name = "bun_pkg_core"
-version = "1.4.7"
-dependencies = [
- "node-semver",
- "pep440_rs",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "bun_pkg_net"
-version = "1.4.7"
-dependencies = [
- "bun_pkg_store",
- "reqwest 0.13.5",
- "rustls",
+ "sha2 0.11.1",
  "tempfile",
  "thiserror 2.0.21",
  "tokio",
  "tokio-util",
-]
-
-[[package]]
-name = "bun_pkg_store"
-version = "1.4.7"
-dependencies = [
- "hex",
- "reflink-copy",
- "sha2 0.11.1",
- "tempfile",
 ]
 
 [[package]]
