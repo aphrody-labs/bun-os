@@ -222,8 +222,7 @@
         "-Dinstalled_tests=false",
         "-Dgobject_types=true",
         "-Dintrospection=disabled",
-        "-Dgtk_doc=false",
-        "-Dbenchmarks=false"
+        "-Dgtk_doc=false"
       ]
     },
     {
