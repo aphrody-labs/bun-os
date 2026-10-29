@@ -3438,6 +3438,19 @@
       "status": "present"
     },
     {
+      "id": "npm:@aphrody/buncc",
+      "kind": "npm-package",
+      "path": "packages/buncc",
+      "source": {
+        "type": "workspace",
+        "name": "@aphrody/buncc",
+        "version": "1.4.7"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "npm:@aphrody/canvas",
       "kind": "npm-package",
       "path": "packages/canvas",

@@ -48,6 +48,7 @@
     "packages/bun-tauri",
     "packages/bun-video-project",
     "packages/bun-workspace",
+    "packages/buncc",
     "packages/canvas",
     "packages/cli-wasm",
     "packages/discord-kit",
@@ -183,6 +184,7 @@
     ".": "./src/distribution.ts"
   },
   "scripts": {
+    "buncc": "bun packages/buncc/src/cli.ts",
     "android": "bun src/cli.ts tool bun-android",
     "setup": "bun src/cli.ts setup",
     "cargo:metadata": "bun src/cli.ts cargo metadata",

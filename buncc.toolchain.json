@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-29",
+  "note": "min is the oldest version this repository was built with (observed on the dev machine); latest was read from the official release feed on observedAt. buncc doctor warns when an installed tool is older than min.",
+  "tools": {
+    "cmake": { "min": "4.4.4", "latest": "4.4.5", "source": "gh api repos/Kitware/CMake/releases/latest" },
+    "clang": { "min": "23.1.4", "latest": "23.1.4", "source": "gh api repos/llvm/llvm-project/releases/latest (llvmorg-23.1.4)" },
+    "sccache": { "min": "0.18.0", "latest": "0.19.0", "source": "gh api repos/mozilla/sccache/releases/latest" },
+    "protoc": { "min": "36.0", "source": "libprotoc 36.0 on the dev machine" },
+    "dotnet": { "min": "10.0.401", "latest10": "10.0.13 runtime", "latest11": "11.0.0-rc.3.26522.148", "source": "gh api repos/dotnet/runtime tags" },
+    "ninja": { "min": "1.13.0", "source": "ninja 1.13.2 on the dev machine" }
+  },
+  "msvc": { "toolset": "14.51", "source": "Visual Studio Build Tools 2026 (18.x) found by vswhere" }
+}
