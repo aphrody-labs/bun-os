@@ -437,6 +437,71 @@
       "license": "crates/bun-engine-core/LICENSE"
     }
   ],
+  "workspaceIntegration": {
+    "note": "Every Cargo package and every named package.json must be a member of the root workspace or covered here by a path prefix with a reason; checked by factory/bunos/check-components.ts. Members: root Cargo.toml [workspace].members (plus their path dependencies) and root package.json workspaces.",
+    "cargo": {
+      "excluded": {
+        "apps/aphrody-app": "cef-dll-sys needs the native CEF CMake toolchain (CMake project() fails in the Rust-only gates); re-add once the CEF toolchain is part of the gate image",
+        "apps/aphrody-drive": "own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace (Spacedrive layout, virtual workspace with its own Cargo.lock)",
+        "apps/aphrody-examples/runtime-rust-extension": "standalone example of a Rust extension; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "apps/aphrody-model-view": "needs aphrody-tauri-wrap, which is neither in [workspace.dependencies] nor in the repository",
+        "apps/artcraft": "crates.io tauri 2.x conflicts with the workspace tauri (aphrody-tauri, links = tauri); the native part is the member apps/artcraft_native",
+        "apps/desktop/src-tauri": "Tauri shell of the apps/desktop npm workspace member; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "apps/effectcraft/examples/plugins": "plugin example; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "apps/figcraft/plugins": "plugin SDK and examples; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "apps/m3-published-consumer": "proves resolution of the published crate from the registry, so it must stay outside the path workspace; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "apps/pdfcraft/vendor": "vendored crates resolved only through [patch.crates-io] paths in the root Cargo.toml (patch notes in apps/pdfcraft/vendor/README.md)",
+        "apps/photocraft/examples/plugins": "plugin example; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "apps/vectorcraft/vendor/windows-link": "Windows 7 import patch of windows-link 0.2.1 applied only by apps/vectorcraft/packaging/windows/windows7.ps1 (see VECTORCRAFT-PATCH.md)",
+        "crates/aphrody-code-graph/tests/fixtures": "test fixture crate parsed by the code-graph tests, not built",
+        "crates/aphrody-nds-sdk/devkit/templates": "project templates copied by the NDS/3DS devkit; each is an own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "crates/artcraft-tauri-plugin-http": "crates.io tauri 2.x conflicts with the workspace tauri (links = tauri-plugin-http)",
+        "crates/bevy/examples/mobile/android_basic": "cargo-apk example without a lib.path; cannot be loaded as a workspace member",
+        "crates/bevy/tests-integration": "upstream Bevy integration test crates, built by Bevy CI only",
+        "crates/bevy_color/crates/gen_tests": "code generator for bevy_color tests; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "crates/ghidra-decompiler/fuzz": "cargo-fuzz target with its own [workspace]",
+        "crates/pdfcraft-filters/fuzz": "cargo-fuzz target with its own [workspace]",
+        "crates/photocraft-affinity/fuzz": "cargo-fuzz target with its own [workspace]",
+        "crates/photocraft-codecs/fuzz": "cargo-fuzz target with its own [workspace]",
+        "crates/photocraft-format/fuzz": "cargo-fuzz target with its own [workspace]",
+        "crates/photocraft-psd/fuzz": "cargo-fuzz target with its own [workspace]",
+        "crates/photocraft-raw/fuzz": "cargo-fuzz target with its own [workspace]",
+        "crates/soundcraft-clap-host/tests/fixture": "CLAP plugin fixture loaded by the host tests; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "crates/soundcraft-vst3-host/tests/fixture": "VST3 plugin fixture loaded by the host tests; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "crates/sqlite_tasks": "pins sqlx 0.7.4 whose libsqlite3-sys (links = sqlite3) cannot unify with the workspace sqlx",
+        "crates/vectorcraft-affinity/fuzz": "cargo-fuzz target with its own [workspace]",
+        "crates/vectorcraft-plugins/example": "plugin example; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
+        "packages/bun-tauri": "Tauri fork; virtual [workspace] of its own, consumed by path through the aphrody-tauri* entries of [workspace.dependencies]",
+        "packages/m3-templates/desktop/src-tauri": "scaffold template (name placeholder __NAME__), copied by the M3 templates CLI",
+        "vendor/cargo": "cargo vendor output (crates.io sources), selected by source replacement, not workspace members",
+        "vendor/cargo-3ds": "upstream submodule with its own workspace; build tool, not a dependency",
+        "vendor/cef-rs": "upstream submodule with its own workspace; waits on the CEF CMake toolchain like apps/aphrody-app",
+        "vendor/citro3d-rs": "upstream submodule with its own workspace; consumed by path from the 3DS crates",
+        "vendor/ctru-rs": "upstream submodule; virtual [workspace] of its own, consumed by path",
+        "vendor/magika": "upstream submodule with its own workspace; consumed by path",
+        "vendor/rustboyadvance-ng": "upstream submodule; virtual [workspace] of its own, consumed by path",
+        "vendor/starpsx": "upstream submodule; virtual [workspace] of its own, consumed by path",
+        "vendor/tailwindcss": "vendored upstream Tailwind CSS workspace (crates/oxide, crates/node); built by its own pnpm and cargo flow",
+        "vendor/tetanes": "upstream submodule; virtual [workspace] of its own, consumed by path",
+        "vendor/uutils": "upstream uutils submodules, each a workspace of its own, consumed by path from crates/bunos-utils",
+        "vendor/zakuro": "upstream submodule; virtual [workspace] of its own, consumed by path"
+      }
+    },
+    "npm": {
+      "excluded": {
+        "crates/artcraft-tauri-plugin-http": "guest bindings of the excluded crate of the same name",
+        "docs/aphrody": "separate monorepo copy with its own workspaces, kept as documentation",
+        "docs/material": "reference copy of upstream material sources used by the docs",
+        "packages/bun-tauri": "Tauri fork JS tooling and CLI templates, built by the Tauri fork flow",
+        "packages/bun-workspace/test/fixtures": "test fixtures for the portability checks",
+        "packages/m3-bun/test/fixtures": "test fixture app",
+        "packages/m3-templates": "scaffold templates copied by the M3 templates CLI",
+        "packages/product/resources/creator/extensions": "WebExtension resources packaged into the creator product, dependency-free",
+        "vendor/base-ui": "vendored upstream Base UI workspace (pnpm)",
+        "vendor/tailwindcss": "vendored upstream Tailwind CSS workspace (pnpm)"
+      }
+    }
+  },
   "modules": [
     {
       "id": "submodule:apps/iecode-dotnet",
@@ -449,7 +514,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["file:src/cli/commands.ts"]
     },
     {
       "id": "submodule:crates/apkeep",
@@ -488,7 +554,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-emu-host", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:packages/iecode-docs",
@@ -501,7 +568,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:packages/iecode-scripts",
@@ -514,7 +582,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["file:src/cli/commands.ts"]
     },
     {
       "id": "submodule:packages/nie-blender",
@@ -527,7 +596,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["file:src/cli/commands.ts"]
     },
     {
       "id": "submodule:packages/niepy",
@@ -540,7 +610,11 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": [
+        "file:src/cli/commands.ts",
+        "file:py/docs/migration/source-map.json"
+      ]
     },
     {
       "id": "submodule:vendor/3ds-hbmenu",
@@ -553,7 +627,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/ares",
@@ -566,7 +641,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/azahar",
@@ -579,7 +655,12 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": [
+        "crate:crates/re",
+        "npm:@aphrody/bun-emu-host",
+        "npm:@aphrody/bun-engine"
+      ]
     },
     {
       "id": "submodule:vendor/bash",
@@ -592,7 +673,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bash"]
     },
     {
       "id": "submodule:vendor/bevy",
@@ -605,7 +687,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine", "bevy"]
     },
     {
       "id": "submodule:vendor/brave-core",
@@ -631,7 +714,9 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "dependsOn": ["submodule:vendor/bun-ssh"],
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-just",
@@ -644,7 +729,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-llama",
@@ -657,7 +743,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-python",
@@ -670,7 +757,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-qr",
@@ -683,7 +771,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-ssh",
@@ -696,7 +785,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-timeline",
@@ -709,7 +799,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-ui",
@@ -722,7 +813,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-uv",
@@ -735,7 +827,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-video",
@@ -748,7 +841,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun", "npm:@aphrody/bun-video-project"]
     },
     {
       "id": "submodule:vendor/bun-vpn",
@@ -761,7 +855,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/bun-winmd",
@@ -774,7 +869,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["bun"]
     },
     {
       "id": "submodule:vendor/buzz",
@@ -865,7 +961,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/cargo-3ds",
@@ -904,7 +1001,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/chimeraos",
@@ -1021,7 +1119,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/citro2d",
@@ -1034,7 +1133,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/citro3d",
@@ -1073,7 +1173,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/cosmic-epoch",
@@ -1125,7 +1226,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/bun-engine-core", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/cuda-samples",
@@ -1138,7 +1240,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/dbxv2",
@@ -1151,7 +1254,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["file:src/cli/commands.ts"]
     },
     {
       "id": "submodule:vendor/directx-compiler",
@@ -1164,7 +1268,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/directx-headers",
@@ -1177,7 +1282,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/bun-engine-core", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/directx-samples",
@@ -1190,7 +1296,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/dolphin",
@@ -1203,7 +1310,12 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": [
+        "crate:crates/re",
+        "npm:@aphrody/bun-emu-host",
+        "npm:@aphrody/bun-engine"
+      ]
     },
     {
       "id": "submodule:vendor/dust",
@@ -1216,7 +1328,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/dxvk",
@@ -1229,7 +1342,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["dxvk"]
     },
     {
       "id": "submodule:vendor/eza",
@@ -1255,7 +1369,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/flea",
@@ -1320,7 +1435,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/ghidra",
@@ -1333,7 +1449,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/gliff",
@@ -1359,7 +1476,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/herdr",
@@ -1411,7 +1529,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/kernel-patches",
@@ -1437,7 +1556,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@bun-os/ds-dotnet"]
     },
     {
       "id": "submodule:vendor/kytyps5",
@@ -1450,7 +1570,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-emu-host"]
     },
     {
       "id": "submodule:vendor/libctru",
@@ -1463,7 +1584,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/libnds",
@@ -1476,7 +1598,12 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": [
+        "crate:crates/aphrody-nds-sys",
+        "crate:crates/re",
+        "npm:@aphrody/bun-engine"
+      ]
     },
     {
       "id": "submodule:vendor/libogc",
@@ -1489,7 +1616,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/libretro-core-info",
@@ -1502,7 +1630,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/libretro-database",
@@ -1515,7 +1644,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/linux-cachyos",
@@ -1593,7 +1723,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/mame",
@@ -1606,7 +1737,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/material-design-icons",
@@ -1645,7 +1777,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-emu-host", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/mingw-packages",
@@ -1658,7 +1791,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["msys2-mingw-cygwin"]
     },
     {
       "id": "submodule:vendor/msys2-installer",
@@ -1671,7 +1805,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["msys2-mingw-cygwin"]
     },
     {
       "id": "submodule:vendor/msys2-packages",
@@ -1684,7 +1819,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["msys2-mingw-cygwin"]
     },
     {
       "id": "submodule:vendor/msys2-runtime",
@@ -1697,7 +1833,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["msys2-mingw-cygwin"]
     },
     {
       "id": "submodule:vendor/newlib-cygwin",
@@ -1710,7 +1847,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["msys2-mingw-cygwin"]
     },
     {
       "id": "submodule:vendor/nexium",
@@ -1723,7 +1861,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/ntr-ghidra",
@@ -1736,7 +1875,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/nushell",
@@ -1775,7 +1915,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/obscura",
@@ -1879,7 +2020,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/omatrack",
@@ -1905,7 +2047,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/open-gpu-kernel-modules",
@@ -1957,7 +2100,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/pk3ds",
@@ -1970,7 +2114,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@bun-os/ds-dotnet"]
     },
     {
       "id": "submodule:vendor/pkg-manage-util",
@@ -1996,7 +2141,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["powershell"]
     },
     {
       "id": "submodule:vendor/powerstation",
@@ -2048,7 +2194,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/qmk-hid",
@@ -2074,7 +2221,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@bun-os/re"]
     },
     {
       "id": "submodule:vendor/rea",
@@ -2101,6 +2249,7 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
+      "consumedBy": ["npm:@frontend/source"],
       "edges": {
         "consumers": ["shenron"],
         "npm": "mediabunny@1.63.0 (latest on npm, 2026-10-29)"
@@ -2119,6 +2268,10 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
+      "consumedBy": [
+        "npm:@aphrody/m3-design",
+        "file:packages/m3-design/intelligence/ui-ux-pro-max/SKILL.md"
+      ],
       "edges": {
         "consumers": ["skill:ui-ux-pro-max"]
       },
@@ -2154,7 +2307,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/retroarch",
@@ -2180,7 +2334,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/rustboyadvance-ng",
@@ -2219,7 +2374,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@bun-os/ds-dotnet"]
     },
     {
       "id": "submodule:vendor/starpsx",
@@ -2245,7 +2401,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/archisteamfarm",
@@ -2258,7 +2415,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/depotdownloader",
@@ -2271,7 +2429,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/facepunch-steamworks",
@@ -2284,7 +2443,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/internalsteamwebapi",
@@ -2297,7 +2457,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/node-steam-user",
@@ -2310,7 +2471,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/protobufs",
@@ -2323,7 +2485,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/python-steam",
@@ -2336,7 +2499,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steam-claude-skills",
@@ -2349,7 +2513,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamachievementmanager",
@@ -2362,7 +2527,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamappinfo",
@@ -2375,7 +2541,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamctl",
@@ -2388,7 +2555,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamkit",
@@ -2401,7 +2569,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamlocate-rs",
@@ -2414,7 +2583,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamos-claude-skill",
@@ -2427,7 +2597,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamtools",
@@ -2440,7 +2611,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamwebapidocumentation",
@@ -2453,7 +2625,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamworks-js",
@@ -2466,7 +2639,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/steamworks-net",
@@ -2479,7 +2653,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steam/valvekeyvalue",
@@ -2492,7 +2667,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-steam"]
     },
     {
       "id": "submodule:vendor/steamcmd",
@@ -2505,7 +2681,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/steamcmd-api",
@@ -2518,7 +2695,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/steamos-nvidia-installer",
@@ -2531,7 +2709,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/strata",
@@ -2609,7 +2788,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@bun-os/ds-dotnet"]
     },
     {
       "id": "submodule:vendor/ttfx",
@@ -2713,7 +2893,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/vkd3d-proton",
@@ -2726,7 +2907,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["vkd3d-proton"]
     },
     {
       "id": "submodule:vendor/vkwebgpu-icd",
@@ -2739,7 +2921,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/walker",
@@ -2765,7 +2948,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/wgpu",
@@ -2778,7 +2962,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine", "wgpu"]
     },
     {
       "id": "submodule:vendor/wiki",
@@ -2791,7 +2976,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/wine-cachyos",
@@ -14247,7 +14433,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:apps/pdfcraft/vendor/egui-wgpu"]
     },
     {
       "id": "crate:vendor/cargo/winit-0.30.13",
@@ -14260,7 +14447,8 @@
       },
       "registration": ["none"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "consumedBy": ["crate:apps/pdfcraft/vendor/winit"]
     },
     {
       "id": "crates.io:gix",

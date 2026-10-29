@@ -7,8 +7,13 @@
  * manifest lists every such component, that no entry is pending or missing, and that nothing references the removed
  * `toolchains/bun` fork path or imports a fork-only `bun:*` module (upstream: bun:test, bun:sqlite, bun:ffi, bun:jsc,
  * bun:bundle).
+ * It also checks the workspace integration (factory/bunos/workspace-graph.ts): every Cargo package and named
+ * package.json is a member of the root workspace or covered by an explicit reasoned entry of `workspaceIntegration`,
+ * every root `exclude` has a reason, the module graph has no isolated node and every `dependsOn`/`consumedBy` edge
+ * resolves. `--report` lists the members, exclusions and edge counts.
  */
 import { dirname, join, resolve } from "node:path";
+import { buildGraph, type Integration } from "./workspace-graph.ts";
 
 const root = resolve(import.meta.dir, "../..");
 const errors: string[] = [];
@@ -137,6 +142,37 @@ for (const file of tracked) {
 }
 void workspaceVersion;
 
+// ---- workspace integration -----------------------------------------------------------------------------------------
+const integration: Integration | undefined = manifest.workspaceIntegration;
+let graphSummary = "";
+if (!integration?.cargo?.excluded || !integration?.npm?.excluded) fail("workspaceIntegration: cargo.excluded and npm.excluded maps are required");
+else {
+  for (const [eco, map] of [["cargo", integration.cargo.excluded], ["npm", integration.npm.excluded]] as const)
+    for (const [path, reason] of Object.entries(map))
+      if (typeof reason !== "string" || reason.trim().length < 12) fail(`workspaceIntegration.${eco}.excluded[${path}]: a reason is required`);
+  const graph = await buildGraph(root, manifest, integration);
+  for (const dir of graph.cargoOrphans) fail(`crate ${dir}: not a member of the root Cargo workspace and not in workspaceIntegration.cargo.excluded`);
+  for (const dir of graph.npmOrphans) fail(`package ${dir}: not in the root package.json workspaces and not in workspaceIntegration.npm.excluded`);
+  for (const path of graph.rootExcludeMissingReason) fail(`Cargo.toml exclude ${path}: no reason in workspaceIntegration.cargo.excluded`);
+  for (const path of graph.cargoStaleExcludes) fail(`workspaceIntegration.cargo.excluded[${path}]: path does not exist`);
+  for (const path of graph.npmStaleExcludes) fail(`workspaceIntegration.npm.excluded[${path}]: path does not exist`);
+  for (const mod of manifest.modules ?? [])
+    if (mod.kind === "crate" && !graph.cargoMembers.has(mod.path) && ![...graph.cargoExcluded.keys()].some(d => d === mod.path || mod.path.startsWith(d + "/")) && !Object.keys(integration.cargo.excluded).some(p => mod.path === p || mod.path.startsWith(p + "/")))
+      fail(`${mod.id}: listed in the manifest but neither a workspace member nor an explicit exclusion`);
+  for (const mod of manifest.modules ?? [])
+    if ((mod.kind === "npm-package" || mod.kind === "app") && !graph.npmMembers.has(mod.path)) fail(`${mod.id}: not in the root package.json workspaces`);
+  for (const ref of graph.unresolved) fail(`edge does not resolve: ${ref}`);
+  for (const id of graph.isolated) fail(`${id}: isolated (no dependency edge in or out; add dependsOn/consumedBy)`);
+  graphSummary =
+    `; workspace: ${graph.cargoMembers.size - 1} Cargo members, ${graph.cargoExcluded.size} excluded packages, ` +
+    `${graph.npmMembers.size} npm members, ${graph.npmExcluded.size} excluded packages, ` +
+    `${graph.derivedEdgeCount} derived + ${graph.manifestEdgeCount} declared edges over ${graph.nodes} nodes, ${graph.isolated.length} isolated`;
+  if (process.argv.includes("--report")) {
+    for (const [dir, reason] of [...graph.cargoExcluded].sort()) console.log(`cargo excluded ${dir}: ${reason}`);
+    for (const [dir, reason] of [...graph.npmExcluded].sort()) console.log(`npm excluded ${dir}: ${reason}`);
+  }
+}
+
 // ---- no fork path, no fork-only bun:* ----------------------------------------------------------------------------
 const fork = await git(
   "grep",
@@ -178,6 +214,6 @@ const count = (kind: string) => (manifest.modules ?? []).filter((m: any) => m.ki
 console.log(
   `runtime bun@${runtime?.source?.version}; ${manifest.modules?.length ?? 0} modules ` +
     `(${[...kinds].map(k => `${count(k)} ${k}`).join(", ")}); ` +
-    `${(manifest.modules ?? []).filter((m: any) => !m.aot).length} not AOT-safe; ${errors.length} errors`,
+    `${(manifest.modules ?? []).filter((m: any) => !m.aot).length} not AOT-safe${graphSummary}; ${errors.length} errors`,
 );
 process.exit(errors.length ? 1 : 0);
