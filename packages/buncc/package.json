@@ -14,7 +14,8 @@
     "./flags": "./src/flags.ts",
     "./driver": "./src/driver.ts",
     "./plan": "./src/plan.ts",
-    "./providers": "./src/providers/index.ts"
+    "./providers": "./src/providers/index.ts",
+    "./msvc": "./src/providers/msvc.ts"
   },
   "scripts": {
     "test": "bun test"

@@ -1,31 +1,15 @@
-/** Native build helpers: MSVC environment (vcvars64, found with vswhere) and cargo, both run without touching global state. */
-import { existsSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+/** Native build helpers: MSVC environment (entered through buncc) and cargo, both run without touching global state. */
+import { captureVcvars, findVisualStudio } from "@aphrody/buncc/msvc";
 
 let cached: Record<string, string> | undefined;
 
+/** The x64 developer environment, entered by buncc (the one vswhere/vcvarsall implementation) and merged over the process environment. */
 export async function msvcEnv(): Promise<Record<string, string>> {
   if (cached) return cached;
-  const vswhere = "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe";
-  const p = Bun.spawn([vswhere, "-latest", "-products", "*", "-property", "installationPath"], { stdout: "pipe" });
-  const install = (await p.stdout.text()).trim();
-  const vcvars = join(install, "VC", "Auxiliary", "Build", "vcvars64.bat");
-  if (!install || !existsSync(vcvars)) throw new Error("MSVC (VS Build Tools) not found");
-  const bat = join(tmpdir(), "bunos-vcvars.bat");
-  writeFileSync(
-    bat,
-    `@call "${vcvars}" >nul
-@set
-`,
-  );
-  const d = Bun.spawn(["cmd", "/c", bat], { stdout: "pipe" });
-  const env: Record<string, string> = {};
-  for (const line of (await d.stdout.text()).split(/\r?\n/)) {
-    const k = line.indexOf("=");
-    if (k > 0) env[line.slice(0, k)] = line.slice(k + 1);
-  }
-  return (cached = env);
+  const studio = await findVisualStudio();
+  if (!studio) throw new Error("MSVC (VS Build Tools) not found");
+  const { env } = await captureVcvars(studio, { arch: "x64" });
+  return (cached = { ...(process.env as Record<string, string>), ...env });
 }
 
 export interface Exec {

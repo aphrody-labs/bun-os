@@ -6,6 +6,7 @@
 // build/emu-host/bin. Native builds are bounded to 4 jobs by default.
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { captureVcvars, findVisualStudio } from "@aphrody/buncc/msvc";
 
 const root = resolve(import.meta.dir, "../../..");
 const pkg = resolve(import.meta.dir, "..");
@@ -110,38 +111,17 @@ async function run(cmd: string[], env: Record<string, string> = {}) {
   if (code !== 0) throw new Error(`${cmd[0]} exited with ${code}`);
 }
 
-// The MSVC developer environment of a toolset (vcvarsall.bat of the newest Visual Studio, found with vswhere; upstream
-// Bun has no MSVC command). When that toolset was installed without its C++ standard library and CRT (an unfinished
-// Visual Studio install), the headers and import libraries of the default toolset are used with its compiler, so
-// objects still link against msvcp140/vcruntime140.
+// The MSVC developer environment of a toolset, entered by buncc (one vswhere/vcvarsall implementation, cached). When that
+// toolset was installed without its C++ standard library and CRT (an unfinished Visual Studio install), the headers and
+// import libraries of the default toolset are used with its compiler, so objects still link against msvcp140/vcruntime140.
 async function msvcEnv(toolset: string): Promise<Record<string, string>> {
-  const vswhere = join(
-    process.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)",
-    "Microsoft Visual Studio",
-    "Installer",
-    "vswhere.exe",
-  );
-  const install = (
-    await new Response(
-      Bun.spawn([vswhere, "-latest", "-products", "*", "-property", "installationPath"], { stdout: "pipe" }).stdout,
-    ).text()
-  ).trim();
-  if (!install) throw new Error("Visual Studio with the C++ toolset was not found (vswhere)");
-  const read = async (t: string) => {
-    const vcvars = join(install, "VC", "Auxiliary", "Build", "vcvarsall.bat");
-    const out = await new Response(
-      Bun.spawn(["cmd.exe", "/d", "/c", `"${vcvars}" x64 -vcvars_ver=${t} >nul && set`], {
-        stdout: "pipe",
-        windowsVerbatimArguments: true,
-      }).stdout,
-    ).text();
-    const env: Record<string, string> = {};
-    for (const line of out.split(/\r?\n/)) {
-      const at = line.indexOf("=");
-      if (at > 0) env[line.slice(0, at)] = line.slice(at + 1);
-    }
-    return env;
-  };
+  const studio = await findVisualStudio();
+  if (!studio) throw new Error("Visual Studio with the C++ toolset was not found (buncc msvc provider)");
+  const read = async (t: string) =>
+    ({
+      ...(process.env as Record<string, string>),
+      ...(await captureVcvars(studio, { arch: "x64", toolset: t })).env,
+    }) as Record<string, string>;
   const env = await read(toolset);
   const first = (list: string) => list.split(";")[0]!;
   if (toolset !== "14.44" && !existsSync(join(first(env.INCLUDE!), "vector"))) {
