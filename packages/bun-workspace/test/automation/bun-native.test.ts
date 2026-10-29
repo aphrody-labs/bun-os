@@ -89,6 +89,7 @@ async function fixture() {
   const serialScript = join(root, wrapper);
   await mkdir(dirname(serialScript), { recursive: true });
   await cp(join(import.meta.dir, "../../../..", wrapper), serialScript);
+  await cp(join(import.meta.dir, "../../../..", "aphrody.config.json"), join(root, "aphrody.config.json"));
   await writeFile(join(root, "Cargo.toml"), '[workspace]\nresolver="3"\nmembers=["crates/aphrody-ffi"]\n');
   await writeFile(
     join(ffi, "Cargo.toml"),

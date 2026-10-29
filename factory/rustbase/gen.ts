@@ -7,17 +7,15 @@
  * Nothing in pkg/ is hand-edited for pins: tags, commits and versions come from pins.json, which comes from catalog.json.
  */
 import { join } from "node:path";
+import { getJson, ghToken } from "./http.ts";
+import { getJson, ghToken } from "./http.ts";
 
 const dir = import.meta.dir;
 const checkOnly = process.argv.includes("--check");
 const refresh = process.argv.includes("--refresh");
 const read = (p: string) => Bun.file(join(dir, p)).json();
 
-async function api(url: string, headers: Record<string, string> = {}) {
-  const res = await fetch(url, { headers: { "user-agent": "bunos-rustbase", ...headers } });
-  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  return res.json();
-}
+const api = getJson;
 
 if (refresh) {
   const catalog = await read("catalog.json");
@@ -37,7 +35,7 @@ if (refresh) {
         : null,
     };
   };
-  const token = (await new Response(Bun.spawn(["gh", "auth", "token"], { stdout: "pipe" }).stdout).text()).trim();
+  const token = await ghToken();
   const fork = "aphrody-labs/uutils-util-linux";
   const head = await api(`https://api.github.com/repos/${fork}/commits/main`, {
     authorization: `Bearer ${token}`,

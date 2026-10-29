@@ -8,6 +8,7 @@
  * Auth: token from `gh auth token`, kept in memory, never printed or written.
  */
 import { join, resolve } from "node:path";
+import { ghToken } from "./http.ts";
 
 const root = process.env.RUSTBASE_ROOT ?? resolve(import.meta.dir, "../..");
 const args = process.argv.slice(2);
@@ -36,15 +37,7 @@ export const SCORING = {
     "not archived, primary language Rust (unless allowNonRust), stars >= 300, pushed within 400 days, score >= 45; otherwise the domain is a gap",
 };
 
-const token = (
-  await (async () => {
-    const p = Bun.spawn(["gh", "auth", "token"], { stdout: "pipe", stderr: "pipe" });
-    const t = (await new Response(p.stdout).text()).trim();
-    await p.exited;
-    return t;
-  })()
-).trim();
-if (!token) throw new Error("gh auth token returned nothing");
+const token = await ghToken();
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 async function gh(path: string, tries = 4): Promise<any | undefined> {
