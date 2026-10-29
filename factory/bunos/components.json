@@ -461,6 +461,19 @@
       },
       "build": "cargo-serial build --release -p bun-engine --bin bun-engine",
       "license": "crates/bun-engine-core/LICENSE"
+    },
+    {
+      "id": "linux-desktop",
+      "path": "factory/linux-desktop",
+      "size": "closure files only; sysroots are assembled on demand (GNOME 3.0 GiB, Plasma 3.6 GiB, Qt 2.2 GiB installed)",
+      "origin": "gitlab.gnome.org/GNOME (GNOME 51.1), invent.kde.org/plasma (Plasma 6.8.2), code.qt.io/qt (Qt 6.12.0), Arch core/extra for sysroot packages; pins in factory/linux-desktop/closure-*.json",
+      "kind": "vendor",
+      "integration": {
+        "mode": "pacman-system",
+        "package": "gnome-shell,mutter,plasma-workspace,kwin,qt6-base"
+      },
+      "build": "buncc linux closure|sysroot|cross|build|container <gnome-shell|mutter|gtk4|libadwaita|kwin|plasma-workspace|qtbase|...>; CI: .github/workflows/buncc-linux-desktop.yml",
+      "docs": "docs/BUNCC-LINUX-DESKTOP.md"
     }
   ],
   "workspaceIntegration": {
