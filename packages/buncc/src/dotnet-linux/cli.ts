@@ -160,7 +160,7 @@ export async function dotnetLinuxMain(args: string[], root: string, command = "d
       const env = { ...Bun.env, ...prefixEnv(prefix) } as Record<string, string>;
       // ILCompiler locates the MSVC linker through vswhere.exe, which is not on PATH in a plain shell
       const installer = join(
-        Bun.env["ProgramFiles(x86)"] ?? "C:\Program Files (x86)",
+        Bun.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)",
         "Microsoft Visual Studio",
         "Installer",
       );

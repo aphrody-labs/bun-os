@@ -36,7 +36,7 @@ const langWasm = process.env.WASMOS_LANG_WASM ?? "";
 async function run(wasm: string, script: string) {
   const r = await boot({ wasm, args: ["sh", "-c", script], timeoutMs: 900_000 });
   console.log(
-    JSON.stringify({ wasm: wasm.split(/[\/]/).pop(), bytes: Bun.file(wasm).size, ms: r.ms, exit: r.exitCode }),
+    JSON.stringify({ wasm: wasm.split(/[\\/]/).pop(), bytes: Bun.file(wasm).size, ms: r.ms, exit: r.exitCode }),
   );
   expect(r.timedOut).toBe(false);
   expect(r.exitCode).toBe(0);
