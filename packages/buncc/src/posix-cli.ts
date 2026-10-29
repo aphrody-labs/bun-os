@@ -13,7 +13,7 @@ import {
   smokeReplacements,
   type LegacyId,
   type LegacyInstall,
-} from "./legacy.ts";
+} from "./uninstall-legacy/index.ts";
 import { getProvider, makeContext } from "./providers/index.ts";
 import { locateMingw } from "./providers/mingw.ts";
 import { findShimDir } from "./providers/posix.ts";

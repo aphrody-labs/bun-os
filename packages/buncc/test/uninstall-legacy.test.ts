@@ -12,7 +12,7 @@ import {
   touchesProtected,
   type LegacyHost,
   type UninstallEntry,
-} from "../src/legacy.ts";
+} from "../src/uninstall-legacy/index.ts";
 
 /**
  * A simulated machine: directories and files, a registry (the keys of the Add/Remove Programs entries plus extras), a PATH,

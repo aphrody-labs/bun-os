@@ -1,4 +1,5 @@
 /**
+ * Isolated module: the only code that removes software from the machine. Imported by posix-cli.ts alone.
  * `buncc posix uninstall <msys2|mingw|gnuwin32|cygwin|all>`: remove the old POSIX-on-Windows stacks once the pinned
  * replacements work. DRY RUN by default. Detection is read-only. Execution needs `--yes`, a passing smoke test of the
  * replacements, and a backup written first. Only paths found by detection are ever touched; Git for Windows is protected.
@@ -10,7 +11,7 @@ import { win32 } from "node:path";
 
 // The detected stacks live on Windows: path logic stays win32 on every host (the simulated-host tests run on Linux CI too).
 const { basename, delimiter, dirname, join } = win32;
-import { run } from "./process.ts";
+import { run } from "../process.ts";
 
 export type LegacyId = "msys2" | "mingw" | "gnuwin32" | "cygwin";
 export const LEGACY_IDS: LegacyId[] = ["msys2", "mingw", "gnuwin32", "cygwin"];
