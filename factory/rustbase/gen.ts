@@ -96,7 +96,7 @@ pkgdesc="uutils coreutils (multicall), findutils and diffutils replacing GNU; uu
 arch=(x86_64 aarch64)
 url="https://github.com/uutils/coreutils"
 license=(MIT Apache-2.0)
-depends=(glibc gcc-libs)
+depends=(glibc gcc-libs util-linux-libs)
 makedepends=(cargo git make clang)
 # GNU versions are the Arch core versions observed on ${pins.observedAt}; uutils targets the matching GNU behaviour.
 provides=(coreutils=${gnuVer("coreutils")} findutils=${gnuVer("findutils")} diffutils=${gnuVer("diffutils")} uutils-coreutils=${C.coreutils.version})
@@ -133,6 +133,11 @@ package() {
   # coreutils: /usr/bin/coreutils + one symlink per applet (LN override: symlinks, not hard links)
   (cd "$srcdir/coreutils" && make install PROFILE=release MULTICALL=y CARGOFLAGS=--locked \\
     PREFIX=/usr DESTDIR="$pkgdir" LN='ln -sf')
+  # applets whose /usr/bin names are owned by util-linux (kill, more) or procps-ng (uptime) stay with those packages
+  local dropped
+  for dropped in kill more uptime; do
+    rm -f "$pkgdir/usr/bin/$dropped" "$pkgdir/usr/share/man/man1/$dropped.1"       "$pkgdir/usr/share/bash-completion/completions/$dropped.bash" "$pkgdir/usr/share/zsh/site-functions/_$dropped"       "$pkgdir/usr/share/fish/vendor_completions.d/$dropped.fish"
+  done
   install -Dm644 "$srcdir/coreutils/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE-coreutils"
 
   # findutils: find xargs locate updatedb
@@ -287,13 +292,14 @@ url="https://github.com/nushell/nushell"
 license=(MIT)
 depends=(nushell)
 backup=(etc/skel/.config/nushell/env.nu etc/skel/.config/nushell/config.nu)
-source=(env.nu config.nu)
-sha256sums=(SKIP SKIP)
+source=(env.nu config.nu LICENSE)
+sha256sums=(SKIP SKIP SKIP)
 install=bunos-nushell-default.install
 
 package() {
   install -Dm644 "$srcdir/env.nu" "$pkgdir/etc/skel/.config/nushell/env.nu"
   install -Dm644 "$srcdir/config.nu" "$pkgdir/etc/skel/.config/nushell/config.nu"
+  install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
 `,
 );
@@ -409,15 +415,35 @@ ${optdepends
   .map(o => "  '" + o + "'")
   .join("\n")}
 )
-source=(picks.json)
-sha256sums=(SKIP)
+source=(picks.json LICENSE)
+sha256sums=(SKIP SKIP)
 
 package() {
   install -Dm644 "$srcdir/picks.json" "$pkgdir/usr/share/bunos/rustbase/picks.json"
+  install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
 `,
 );
 files.set("pkg/bunos-rust-base/picks.json", JSON.stringify({ observedAt: catalog.observedAt, picks }, null, 2) + "\n");
+
+const mit = `MIT License
+
+Copyright (c) 2026 Bun OS contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+`;
+files.set("pkg/bunos-nushell-default/LICENSE", mit);
+files.set("pkg/bunos-rust-base/LICENSE", mit);
 
 let stale = 0;
 for (const [rel, text] of files) {

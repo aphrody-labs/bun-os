@@ -10,11 +10,12 @@ url="https://github.com/nushell/nushell"
 license=(MIT)
 depends=(nushell)
 backup=(etc/skel/.config/nushell/env.nu etc/skel/.config/nushell/config.nu)
-source=(env.nu config.nu)
-sha256sums=(SKIP SKIP)
+source=(env.nu config.nu LICENSE)
+sha256sums=(SKIP SKIP SKIP)
 install=bunos-nushell-default.install
 
 package() {
   install -Dm644 "$srcdir/env.nu" "$pkgdir/etc/skel/.config/nushell/env.nu"
   install -Dm644 "$srcdir/config.nu" "$pkgdir/etc/skel/.config/nushell/config.nu"
+  install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

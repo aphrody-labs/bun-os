@@ -129,7 +129,8 @@ scored), tar/gzip/xz utilities.
 
 - **uutils coreutils** (`bunos-uutils-multicall`): one `/usr/bin/coreutils` binary built with `make MULTICALL=y`,
   with a symlink per applet (`LN='ln -sf'`) in `/usr/bin`. The package `provides=(coreutils=<Arch core version>)` and
-  `conflicts=(coreutils)` so `base` stays installable. Locales and man pages come from the uutils Makefile.
+  `conflicts=(coreutils)` so `base` stays installable. The applets `kill`, `more` (owned by util-linux) and `uptime`
+  (procps-ng) are removed from the package because pacman reported file conflicts with those packages in CI. Locales and man pages come from the uutils Makefile.
 - **uutils findutils**: `/usr/bin/{find,xargs,locate,updatedb}`, `provides=(findutils)`.
 - **uutils diffutils**: one `diffutils` binary dispatching on the argv[0] suffix; `diff` and `cmp` are symlinks.
   `diff3` and `sdiff` do not exist upstream, so `provides=(diffutils)` is a known partial replacement.

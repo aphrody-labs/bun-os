@@ -10,7 +10,7 @@ pkgdesc="uutils coreutils (multicall), findutils and diffutils replacing GNU; uu
 arch=(x86_64 aarch64)
 url="https://github.com/uutils/coreutils"
 license=(MIT Apache-2.0)
-depends=(glibc gcc-libs)
+depends=(glibc gcc-libs util-linux-libs)
 makedepends=(cargo git make clang)
 # GNU versions are the Arch core versions observed on 2026-10-29; uutils targets the matching GNU behaviour.
 provides=(coreutils=9.12 findutils=4.11.0 diffutils=3.12 uutils-coreutils=0.12.0)
@@ -47,6 +47,11 @@ package() {
   # coreutils: /usr/bin/coreutils + one symlink per applet (LN override: symlinks, not hard links)
   (cd "$srcdir/coreutils" && make install PROFILE=release MULTICALL=y CARGOFLAGS=--locked \
     PREFIX=/usr DESTDIR="$pkgdir" LN='ln -sf')
+  # applets whose /usr/bin names are owned by util-linux (kill, more) or procps-ng (uptime) stay with those packages
+  local dropped
+  for dropped in kill more uptime; do
+    rm -f "$pkgdir/usr/bin/$dropped" "$pkgdir/usr/share/man/man1/$dropped.1"       "$pkgdir/usr/share/bash-completion/completions/$dropped.bash" "$pkgdir/usr/share/zsh/site-functions/_$dropped"       "$pkgdir/usr/share/fish/vendor_completions.d/$dropped.fish"
+  done
   install -Dm644 "$srcdir/coreutils/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE-coreutils"
 
   # findutils: find xargs locate updatedb

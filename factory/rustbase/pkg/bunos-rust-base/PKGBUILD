@@ -30,9 +30,10 @@ optdepends=(
   'rustic: Backup'
   'wasmer: WebAssembly runtime'
 )
-source=(picks.json)
-sha256sums=(SKIP)
+source=(picks.json LICENSE)
+sha256sums=(SKIP SKIP)
 
 package() {
   install -Dm644 "$srcdir/picks.json" "$pkgdir/usr/share/bunos/rustbase/picks.json"
+  install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
