@@ -38,7 +38,9 @@ export function resolveDotnet(cwd: string): Dotnet | undefined {
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1",
       DOTNET_MULTILEVEL_LOOKUP: "0",
       DOTNET_CLI_HOME: join(portableRoot, ".cli-home"),
-      PATH: [choice.root, "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer", process.env.PATH ?? ""].join(";"),
+      PATH: [choice.root, "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer", process.env.PATH ?? ""].join(
+        ";",
+      ),
     },
   };
 }

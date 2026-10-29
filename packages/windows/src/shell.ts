@@ -40,7 +40,11 @@ export function knownFolder(folder: KnownFolder | (string & {})): string {
   const hr = api.SHGetKnownFolderPath(ptr(id), 0, 0n, ptr(out));
   try {
     if (hr < 0) {
-      throw new WindowsError("ERR_WINDOWS_HRESULT", `SHGetKnownFolderPath(${folder}) = 0x${(hr >>> 0).toString(16)}`, hr);
+      throw new WindowsError(
+        "ERR_WINDOWS_HRESULT",
+        `SHGetKnownFolderPath(${folder}) = 0x${(hr >>> 0).toString(16)}`,
+        hr,
+      );
     }
     return readWide(out[0]!);
   } finally {

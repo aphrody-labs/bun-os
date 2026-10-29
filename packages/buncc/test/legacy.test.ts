@@ -73,7 +73,10 @@ function fakeHost(opts: {
         const m = /\$s='(User|Machine)'.*?-ne '([^']+)'/.exec(argv[3]!);
         if (m) {
           const slot = m[1] === "User" ? "user" : "machine";
-          state[slot] = state[slot].split(";").filter(x => x && x !== m[2]).join(";");
+          state[slot] = state[slot]
+            .split(";")
+            .filter(x => x && x !== m[2])
+            .join(";");
         }
       } else if (/\.exe$/i.test(cmd!) && (opts.uninstall ?? []).some(e => e.UninstallString === cmd)) {
         const entry = opts.uninstall!.find(e => e.UninstallString === cmd)!;
@@ -91,7 +94,8 @@ function fakeHost(opts: {
     removeDir: p => {
       if (opts.eperm?.some(x => norm(x) === norm(p))) throw new Error(`EPERM: operation not permitted, rmdir '${p}'`);
       log.removed.push(p);
-      for (const set of [files, dirs]) for (const x of [...set]) if (x === norm(p) || x.startsWith(norm(p) + "\\")) set.delete(x);
+      for (const set of [files, dirs])
+        for (const x of [...set]) if (x === norm(p) || x.startsWith(norm(p) + "\\")) set.delete(x);
     },
     writeFile: (p, t) => {
       log.written[p] = t;
@@ -102,16 +106,32 @@ function fakeHost(opts: {
   return { host, log, keys, state };
 }
 
-const MSYS = ["C:\\msys64\\usr\\bin\\msys-2.0.dll", "C:\\msys64\\usr\\bin\\pacman.exe", "C:\\msys64\\home\\me\\.bashrc", "C:\\msys64\\uninstall.exe"];
+const MSYS = [
+  "C:\\msys64\\usr\\bin\\msys-2.0.dll",
+  "C:\\msys64\\usr\\bin\\pacman.exe",
+  "C:\\msys64\\home\\me\\.bashrc",
+  "C:\\msys64\\uninstall.exe",
+];
 const GIT = ["C:\\Program Files\\Git\\cmd\\git.exe", "C:\\Program Files\\Git\\usr\\bin\\bash.exe"];
 
 describe("detection (read-only)", () => {
   test("msys2: mode installer, PATH entry, registry key, dependents", async () => {
     const { host } = fakeHost({
       files: [...MSYS, ...GIT],
-      uninstall: [{ key: "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MSYS2 64bit", DisplayName: "MSYS2 64bit", DisplayVersion: "20260927", InstallLocation: "C:\\msys64", UninstallString: "C:\\msys64\\uninstall.exe" }],
+      uninstall: [
+        {
+          key: "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MSYS2 64bit",
+          DisplayName: "MSYS2 64bit",
+          DisplayVersion: "20260927",
+          InstallLocation: "C:\\msys64",
+          UninstallString: "C:\\msys64\\uninstall.exe",
+        },
+      ],
       userPath: "C:\\msys64\\ucrt64\\bin;C:\\Tools",
-      configs: { "C:\\Users\\me\\AppData\\Roaming\\Code\\User\\settings.json": '{"terminal":"C:\\\\msys64\\\\usr\\\\bin\\\\bash.exe"}' },
+      configs: {
+        "C:\\Users\\me\\AppData\\Roaming\\Code\\User\\settings.json":
+          '{"terminal":"C:\\\\msys64\\\\usr\\\\bin\\\\bash.exe"}',
+      },
     });
     const [m] = await detectLegacy("msys2", host);
     expect(m!.mode).toBe("installer");
@@ -130,7 +150,10 @@ describe("detection (read-only)", () => {
   });
 
   test("Git for Windows is found as protected and is never a detection result", async () => {
-    const { host } = fakeHost({ files: [...GIT, ...MSYS], reg: { "HKLM\\SOFTWARE\\GitForWindows": { InstallPath: "C:\\Program Files\\Git" } } });
+    const { host } = fakeHost({
+      files: [...GIT, ...MSYS],
+      reg: { "HKLM\\SOFTWARE\\GitForWindows": { InstallPath: "C:\\Program Files\\Git" } },
+    });
     expect(await protectedRoots(host)).toContain("C:\\Program Files\\Git");
     for (const id of ["msys2", "mingw", "gnuwin32", "cygwin"] as const)
       for (const i of await detectLegacy(id, host)) expect(i.root.toLowerCase()).not.toContain("\\git");
@@ -139,7 +162,10 @@ describe("detection (read-only)", () => {
   });
 
   test("cygwin root from the registry; gnuwin32 under Program Files (x86)", async () => {
-    const cyg = fakeHost({ files: ["D:\\cyg\\bin\\cygwin1.dll"], reg: { "HKLM\\SOFTWARE\\Cygwin\\setup": { rootdir: "D:\\cyg" } } });
+    const cyg = fakeHost({
+      files: ["D:\\cyg\\bin\\cygwin1.dll"],
+      reg: { "HKLM\\SOFTWARE\\Cygwin\\setup": { rootdir: "D:\\cyg" } },
+    });
     const [c] = await detectLegacy("cygwin", cyg.host);
     expect(c!.root).toBe("D:\\cyg");
     expect(c!.registryKeys).toContain("HKLM\\SOFTWARE\\Cygwin");
@@ -155,8 +181,18 @@ describe("root normalisation", () => {
     const { host } = fakeHost({
       files: [`${base}\\bin\\sed.exe`, `${base}\\uninstall\\a.exe`],
       uninstall: [
-        { key: "HKLM\\U\\A", DisplayName: "GnuWin32: A", InstallLocation: `${base}\\`, UninstallString: `${base}\\uninstall\\a.exe` },
-        { key: "HKLM\\U\\B", DisplayName: "GnuWin32: B", InstallLocation: base, UninstallString: `${base}\\uninstall\\b.exe` },
+        {
+          key: "HKLM\\U\\A",
+          DisplayName: "GnuWin32: A",
+          InstallLocation: `${base}\\`,
+          UninstallString: `${base}\\uninstall\\a.exe`,
+        },
+        {
+          key: "HKLM\\U\\B",
+          DisplayName: "GnuWin32: B",
+          InstallLocation: base,
+          UninstallString: `${base}\\uninstall\\b.exe`,
+        },
       ],
     });
     host.env["ProgramFiles(x86)"] = "C:\\Program Files (x86)";
@@ -172,10 +208,20 @@ const OK = async () => [{ name: "ls", ok: true, detail: "ok" }];
 const fast = { verifyMs: 0 };
 
 describe("plan and execution", () => {
-  async function msysPlan(extra: Parameters<typeof fakeHost>[0] extends infer T ? Partial<T> : never = {}, elevated = true) {
+  async function msysPlan(
+    extra: Parameters<typeof fakeHost>[0] extends infer T ? Partial<T> : never = {},
+    elevated = true,
+  ) {
     const fake = fakeHost({
       files: [...MSYS, ...GIT],
-      uninstall: [{ key: KEY, DisplayName: "MSYS2 64bit", InstallLocation: "C:\\msys64", UninstallString: "C:\\msys64\\uninstall.exe" }],
+      uninstall: [
+        {
+          key: KEY,
+          DisplayName: "MSYS2 64bit",
+          InstallLocation: "C:\\msys64",
+          UninstallString: "C:\\msys64\\uninstall.exe",
+        },
+      ],
       userPath: "C:\\msys64\\usr\\bin",
       elevated,
       ...extra,
@@ -194,8 +240,12 @@ describe("plan and execution", () => {
     expect(text).toContain("registry: HKLM");
     expect(text).toContain("pacman.exe -Qqe");
     expect(text).toContain("rollback:");
-    expect(plan.steps.findIndex(s => s.kind === "gate")).toBeGreaterThan(plan.steps.findIndex(s => s.kind === "backup"));
-    expect(plan.steps.findIndex(s => s.kind === "gate")).toBeLessThan(plan.steps.findIndex(s => s.kind === "uninstaller"));
+    expect(plan.steps.findIndex(s => s.kind === "gate")).toBeGreaterThan(
+      plan.steps.findIndex(s => s.kind === "backup"),
+    );
+    expect(plan.steps.findIndex(s => s.kind === "gate")).toBeLessThan(
+      plan.steps.findIndex(s => s.kind === "uninstaller"),
+    );
     expect(log.exec).toEqual([]);
     expect(log.removed).toEqual([]);
   });
@@ -219,7 +269,9 @@ describe("plan and execution", () => {
     expect(state.user).toBe("");
     expect(log.written["C:\\backup\\1\\msys2-pacman-Qe.txt"]).toBe("pkg-a\npkg-b\n");
     const order = log.exec.map(c => c.argv[0]!);
-    expect(order.findIndex(c => c.endsWith("pacman.exe"))).toBeLessThan(order.findIndex(c => c.endsWith("uninstall.exe")));
+    expect(order.findIndex(c => c.endsWith("pacman.exe"))).toBeLessThan(
+      order.findIndex(c => c.endsWith("uninstall.exe")),
+    );
     expect(log.removed).toEqual(["C:\\msys64"]);
   });
 
@@ -280,13 +332,25 @@ describe("plan and execution", () => {
     const base = "C:\\Program Files (x86)\\GnuWin32";
     const inno = fakeHost({
       files: [`${base}\\bin\\sed.exe`, `${base}\\uninstall\\unins000.exe`],
-      uninstall: [{ key: "HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\UnZip-5.51_is1", DisplayName: "GnuWin32: UnZip 5.51", InstallLocation: base, UninstallString: `${base}\\uninstall\\unins000.exe` }],
+      uninstall: [
+        {
+          key: "HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\UnZip-5.51_is1",
+          DisplayName: "GnuWin32: UnZip 5.51",
+          InstallLocation: base,
+          UninstallString: `${base}\\uninstall\\unins000.exe`,
+        },
+      ],
     });
     inno.host.env["ProgramFiles(x86)"] = "C:\\Program Files (x86)";
     const [gnu] = await detectLegacy("gnuwin32", inno.host);
     const plan = planUninstall([gnu!], [], "C:\\b", true);
     const step = plan.steps.find(s => s.kind === "uninstaller")!;
-    expect(step.command).toEqual([`${base}\\uninstall\\unins000.exe`, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"]);
+    expect(step.command).toEqual([
+      `${base}\\uninstall\\unins000.exe`,
+      "/VERYSILENT",
+      "/SUPPRESSMSGBOXES",
+      "/NORESTART",
+    ]);
     expect(step.timeoutMs).toBeGreaterThan(0);
     expect(step.needsElevation).toBe(true);
     const r = await executePlan(plan, inno.host, OK, fast);
@@ -311,7 +375,16 @@ describe("plan and execution", () => {
   test("an install overlapping Git for Windows is dropped from the plan with a warning", async () => {
     const { host } = fakeHost({ files: GIT });
     const fakeInstall = {
-      id: "msys2" as const, mode: "portable" as const, root: "C:\\Program Files\\Git", uninstallers: [], uninstallerKeys: [], registryKeys: [], pathEntries: [], shortcuts: [], dependents: [], notes: [],
+      id: "msys2" as const,
+      mode: "portable" as const,
+      root: "C:\\Program Files\\Git",
+      uninstallers: [],
+      uninstallerKeys: [],
+      registryKeys: [],
+      pathEntries: [],
+      shortcuts: [],
+      dependents: [],
+      notes: [],
     };
     const plan = planUninstall([fakeInstall], await protectedRoots(host), "C:\\b");
     expect(plan.installs).toEqual([]);

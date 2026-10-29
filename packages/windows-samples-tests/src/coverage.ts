@@ -7,7 +7,10 @@ export type Lang = (typeof LANGS)[number];
 export type Status = "not-started" | "builds" | "runs-headless" | "runs-interactive-only-CI-or-manual";
 export const STATUSES: Status[] = ["not-started", "builds", "runs-headless", "runs-interactive-only-CI-or-manual"];
 
-export interface Cell { impl?: string; dotnet?: string }
+export interface Cell {
+  impl?: string;
+  dotnet?: string;
+}
 export interface Row {
   id: string;
   category: string;
@@ -16,10 +19,31 @@ export interface Row {
   interactive: boolean;
   cells: Record<Lang, Cell>;
 }
-export interface Manifest { schemaVersion: number; pins: Record<string, { repo: string; ref: string; sha: string }>; rows: Row[] }
-export interface ImplResult { lang: string; dir: string; scope: string; build: boolean; run?: boolean }
-export interface DotnetResults { sdk: string; tfm: string; templates: Record<string, { generated: boolean; build?: boolean; run?: boolean; aot?: boolean; interactive?: boolean }> }
-export interface Inputs { manifest: Manifest; impls: Record<string, ImplResult>; dotnet: Record<string, DotnetResults> }
+export interface Manifest {
+  schemaVersion: number;
+  pins: Record<string, { repo: string; ref: string; sha: string }>;
+  rows: Row[];
+}
+export interface ImplResult {
+  lang: string;
+  dir: string;
+  scope: string;
+  build: boolean;
+  run?: boolean;
+}
+export interface DotnetResults {
+  sdk: string;
+  tfm: string;
+  templates: Record<
+    string,
+    { generated: boolean; build?: boolean; run?: boolean; aot?: boolean; interactive?: boolean }
+  >;
+}
+export interface Inputs {
+  manifest: Manifest;
+  impls: Record<string, ImplResult>;
+  dotnet: Record<string, DotnetResults>;
+}
 
 export async function load(): Promise<Inputs> {
   const dir = join(root, "packages/windows-samples-tests/manifest");
@@ -53,7 +77,17 @@ export function cellStatus(cell: Cell, row: Row, inp: Inputs): Status {
 
 export interface Computed {
   statuses: Record<string, Record<Lang, Status>>;
-  perLang: Record<Lang, { total: number; counts: Record<Status, number>; implementedPct: number; runsHeadlessPct: number; functionalImplementedPct: number; functionalRunsPct: number }>;
+  perLang: Record<
+    Lang,
+    {
+      total: number;
+      counts: Record<Status, number>;
+      implementedPct: number;
+      runsHeadlessPct: number;
+      functionalImplementedPct: number;
+      functionalRunsPct: number;
+    }
+  >;
   perCategory: Record<string, Record<Lang, Record<Status, number>> & { rows?: number }>;
   categoryRows: Record<string, number>;
 }
@@ -67,8 +101,19 @@ export function compute(inp: Inputs): Computed {
   const perCategory: Computed["perCategory"] = {};
   const categoryRows: Record<string, number> = {};
   const fresh = () => Object.fromEntries(STATUSES.map(s => [s, 0])) as Record<Status, number>;
-  for (const l of LANGS) perLang[l] = { total: 0, counts: fresh(), implementedPct: 0, runsHeadlessPct: 0, functionalImplementedPct: 0, functionalRunsPct: 0 };
-  const fn = Object.fromEntries(LANGS.map(l => [l, { total: 0, impl: 0, run: 0 }])) as Record<Lang, { total: number; impl: number; run: number }>;
+  for (const l of LANGS)
+    perLang[l] = {
+      total: 0,
+      counts: fresh(),
+      implementedPct: 0,
+      runsHeadlessPct: 0,
+      functionalImplementedPct: 0,
+      functionalRunsPct: 0,
+    };
+  const fn = Object.fromEntries(LANGS.map(l => [l, { total: 0, impl: 0, run: 0 }])) as Record<
+    Lang,
+    { total: number; impl: number; run: number }
+  >;
   for (const row of inp.manifest.rows) {
     categoryRows[row.category] = (categoryRows[row.category] ?? 0) + 1;
     statuses[row.id] = {} as Record<Lang, Status>;

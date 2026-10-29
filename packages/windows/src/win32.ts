@@ -175,7 +175,13 @@ export function uptimeMs(): bigint {
   return k32().GetTickCount64();
 }
 
-const DRIVE_TYPES: Record<number, Volume["type"]> = { 2: "removable", 3: "fixed", 4: "remote", 5: "cdrom", 6: "ramdisk" };
+const DRIVE_TYPES: Record<number, Volume["type"]> = {
+  2: "removable",
+  3: "fixed",
+  4: "remote",
+  5: "cdrom",
+  6: "ramdisk",
+};
 
 /** Logical drives with type and capacity. */
 export function volumes(): Volume[] {

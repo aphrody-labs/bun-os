@@ -25,9 +25,18 @@ export const llvmMingwRelease: GithubToolSpec = {
   repo: "mstorsjo/llvm-mingw",
   binary: "x86_64-w64-mingw32-clang",
   asset(tag, platform, arch) {
-    if (platform === "win32") return arch === "arm64" ? `llvm-mingw-${tag}-ucrt-aarch64.zip` : arch === "x86" ? `llvm-mingw-${tag}-ucrt-i686.zip` : `llvm-mingw-${tag}-ucrt-x86_64.zip`;
+    if (platform === "win32")
+      return arch === "arm64"
+        ? `llvm-mingw-${tag}-ucrt-aarch64.zip`
+        : arch === "x86"
+          ? `llvm-mingw-${tag}-ucrt-i686.zip`
+          : `llvm-mingw-${tag}-ucrt-x86_64.zip`;
     if (platform === "darwin") return `llvm-mingw-${tag}-ucrt-macos-universal.tar.xz`;
-    return arch === "arm64" ? `llvm-mingw-${tag}-ucrt-ubuntu-22.04-aarch64.tar.xz` : arch === "x64" ? `llvm-mingw-${tag}-ucrt-ubuntu-22.04-x86_64.tar.xz` : undefined;
+    return arch === "arm64"
+      ? `llvm-mingw-${tag}-ucrt-ubuntu-22.04-aarch64.tar.xz`
+      : arch === "x64"
+        ? `llvm-mingw-${tag}-ucrt-ubuntu-22.04-x86_64.tar.xz`
+        : undefined;
   },
 };
 
@@ -63,17 +72,35 @@ const hasTriple = (dir: string, triple: string, tool: string) =>
 /** Where a mingw toolchain is, in order of preference. Reads the disk and PATH only. */
 export function locateMingw(ctx: Context): MingwFound | undefined {
   const local = findInstalled(llvmMingwRelease);
-  if (local) return { flavor: "llvm", kind: "managed", binDir: dirname(local.bin), triples: MINGW_TRIPLES.filter(t => hasTriple(dirname(local.bin), t, "clang")) };
+  if (local)
+    return {
+      flavor: "llvm",
+      kind: "managed",
+      binDir: dirname(local.bin),
+      triples: MINGW_TRIPLES.filter(t => hasTriple(dirname(local.bin), t, "clang")),
+    };
   for (const t of MINGW_TRIPLES) {
     const clang = which(`${t}-clang`, ctx);
-    if (clang) return { flavor: "llvm", kind: "path", binDir: dirname(clang), triples: MINGW_TRIPLES.filter(x => hasTriple(dirname(clang), x, "clang")) };
+    if (clang)
+      return {
+        flavor: "llvm",
+        kind: "path",
+        binDir: dirname(clang),
+        triples: MINGW_TRIPLES.filter(x => hasTriple(dirname(clang), x, "clang")),
+      };
     const gcc = which(`${t}-gcc`, ctx);
     if (gcc) return { flavor: "gcc", kind: "path", binDir: dirname(gcc), triples: [t] };
   }
   const roots = [ctx.env.W64DEVKIT_HOME, ctx.env.WINLIBS_HOME].filter(Boolean) as string[];
   for (const root of roots) {
     const bin = join(root, "bin");
-    if (hasTriple(bin, "x86_64-w64-mingw32", "gcc")) return { flavor: "gcc", kind: root === ctx.env.W64DEVKIT_HOME ? "w64devkit" : "winlibs", binDir: bin, triples: ["x86_64-w64-mingw32"] };
+    if (hasTriple(bin, "x86_64-w64-mingw32", "gcc"))
+      return {
+        flavor: "gcc",
+        kind: root === ctx.env.W64DEVKIT_HOME ? "w64devkit" : "winlibs",
+        binDir: bin,
+        triples: ["x86_64-w64-mingw32"],
+      };
   }
   if (ctx.platform === "win32") {
     for (const sub of ["clang64", "ucrt64", "mingw64"]) {
@@ -92,7 +119,10 @@ export const mingwProvider: Provider = {
   async detect(ctx): Promise<Detection> {
     const found = locateMingw(ctx);
     if (!found) return missing("buncc install mingw --run  (downloads llvm-mingw, checksum verified)");
-    const probe = join(found.binDir, `${found.triples[0] ?? "x86_64-w64-mingw32"}-${found.flavor === "llvm" ? "clang" : "gcc"}`);
+    const probe = join(
+      found.binDir,
+      `${found.triples[0] ?? "x86_64-w64-mingw32"}-${found.flavor === "llvm" ? "clang" : "gcc"}`,
+    );
     const version = await probeVersion(probe, ["--version"], ctx);
     const notes = [`${found.kind}: ${found.triples.join(", ") || "no mingw triple prefixed binaries"}`];
     if (found.kind === "msys2-readonly") notes.push("existing MSYS2 tree, used read-only; not modified");

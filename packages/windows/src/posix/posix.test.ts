@@ -52,7 +52,11 @@ describe("path translation", () => {
 
 describe("env translation", () => {
   test("PATH list both ways, case-insensitive key kept", () => {
-    const posix = translateEnv({ Path: "C:\\Windows;C:\\Program Files\\Git\\cmd", FOO: "bar", TEMP: "C:\\Temp" }, "msys", "windows");
+    const posix = translateEnv(
+      { Path: "C:\\Windows;C:\\Program Files\\Git\\cmd", FOO: "bar", TEMP: "C:\\Temp" },
+      "msys",
+      "windows",
+    );
     expect(posix.Path).toBe("/c/Windows:/c/Program Files/Git/cmd");
     expect(posix.TEMP).toBe("/c/Temp");
     expect(posix.FOO).toBe("bar");
@@ -72,7 +76,12 @@ describe("env translation", () => {
 
 describe("spawn", () => {
   test("prepare: native child keeps windows paths, pathPrepend goes first, args translate on request", () => {
-    const a = preparePosixSpawn(["ls", "/c/x"], { env: { PATH: "C:\\a" }, pathPrepend: ["C:\\shims"], childStyle: "windows", translateArgs: true });
+    const a = preparePosixSpawn(["ls", "/c/x"], {
+      env: { PATH: "C:\\a" },
+      pathPrepend: ["C:\\shims"],
+      childStyle: "windows",
+      translateArgs: true,
+    });
     expect(a.env.PATH).toBe("C:\\shims;C:\\a");
     expect(a.argv).toEqual(["ls", "C:\\x"]);
     const b = preparePosixSpawn(["x", "C:\\y"], { env: { PATH: "C:\\a" }, childStyle: "msys", translateArgs: true });
@@ -85,7 +94,10 @@ describe("spawn", () => {
     expect(existsSync(join(dir, "f.txt"))).toBe(true);
     const r = await posixShell("cat f.txt", { cwd: dir });
     expect(r).toMatchObject({ code: 0, stdout: "data\n" });
-    const s = await posixSpawn([process.execPath, "-e", "console.log(process.env.PATH.split(require('path').delimiter)[0])"], { pathPrepend: [dir] });
+    const s = await posixSpawn(
+      [process.execPath, "-e", "console.log(process.env.PATH.split(require('path').delimiter)[0])"],
+      { pathPrepend: [dir] },
+    );
     expect(s.stdout.trim().toLowerCase()).toBe(dir.toLowerCase());
   });
 });

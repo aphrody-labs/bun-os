@@ -7,13 +7,7 @@ import { readWide, wide } from "./ffi";
 import { lastError } from "./win32";
 
 export type ServiceState =
-  | "stopped"
-  | "start-pending"
-  | "stop-pending"
-  | "running"
-  | "continue-pending"
-  | "pause-pending"
-  | "paused";
+  "stopped" | "start-pending" | "stop-pending" | "running" | "continue-pending" | "pause-pending" | "paused";
 
 export interface ServiceInfo {
   name: string;

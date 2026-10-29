@@ -25,7 +25,8 @@ export interface NapiAddon {
 }
 
 const crateDir = resolve(import.meta.dir, "../native/napi");
-export const defaultAddonDir = (): string => process.env.APHRODY_WINDOWS_NAPI_DIR ?? join(tmpdir(), "aphrody-windows-napi");
+export const defaultAddonDir = (): string =>
+  process.env.APHRODY_WINDOWS_NAPI_DIR ?? join(tmpdir(), "aphrody-windows-napi");
 export const addonPath = (dir: string = defaultAddonDir()): string => join(dir, "aphrody_windows_napi.node");
 
 export const isAddonBuilt = (dir?: string): boolean => existsSync(addonPath(dir));
@@ -39,7 +40,8 @@ export async function buildAddon(outDir: string = defaultAddonDir()): Promise<st
     stdout: "inherit",
     stderr: "inherit",
   });
-  if ((await proc.exited) !== 0) throw new WindowsError("ERR_WINDOWS_PROVIDER_MISSING", "cargo build of aphrody-windows-napi failed");
+  if ((await proc.exited) !== 0)
+    throw new WindowsError("ERR_WINDOWS_PROVIDER_MISSING", "cargo build of aphrody-windows-napi failed");
   mkdirSync(outDir, { recursive: true });
   copyFileSync(join(target, "release", "aphrody_windows_napi.dll"), addonPath(outDir));
   return addonPath(outDir);

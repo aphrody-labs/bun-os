@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 export type WindowsErrorCode =
-  | "ERR_WINDOWS_UNSUPPORTED"
-  | "ERR_WINDOWS_WIN32"
-  | "ERR_WINDOWS_PROVIDER_MISSING"
-  | "ERR_WINDOWS_HRESULT";
+  "ERR_WINDOWS_UNSUPPORTED" | "ERR_WINDOWS_WIN32" | "ERR_WINDOWS_PROVIDER_MISSING" | "ERR_WINDOWS_HRESULT";
 
 export class WindowsError extends Error {
   readonly code: WindowsErrorCode;

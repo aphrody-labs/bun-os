@@ -74,7 +74,10 @@ describe("recorded results", () => {
   });
 
   test("docs/WINDOWS-SAMPLES.md is up to date", async () => {
-    const proc = Bun.spawn([process.execPath, join(import.meta.dir, "../scripts/compute-coverage.ts"), "--check"], { stdout: "pipe", stderr: "pipe" });
+    const proc = Bun.spawn([process.execPath, join(import.meta.dir, "../scripts/compute-coverage.ts"), "--check"], {
+      stdout: "pipe",
+      stderr: "pipe",
+    });
     expect(await proc.exited).toBe(0);
   });
 });

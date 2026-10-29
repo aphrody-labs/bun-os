@@ -44,7 +44,8 @@ export async function runScript(script: string, options: ShOptions = {}): Promis
   let shell = $.env(shEnv(options)).nothrow();
   if (options.cwd) shell = shell.cwd(options.cwd);
   const expanded = expandBraces(script);
-  for (const form of expanded.unsupported) console.error(`buncc sh: ${form} is not supported by Bun Shell and was left as written`);
+  for (const form of expanded.unsupported)
+    console.error(`buncc sh: ${form} is not supported by Bun Shell and was left as written`);
   const run = shell`${{ raw: expanded.script }}`;
   const result = await (options.quiet ? run.quiet() : run);
   return { code: result.exitCode, stdout: result.stdout.toString(), stderr: result.stderr.toString() };

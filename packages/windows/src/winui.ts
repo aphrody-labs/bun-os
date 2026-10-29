@@ -36,8 +36,7 @@ function versionAtLeast(v: string, min: number[]): boolean {
 // Installed Microsoft.WindowsAppRuntime packages ("Name Version"); needs no host build.
 export async function probe(): Promise<{ ok: boolean; reason?: string; packages: string[] }> {
   if (process.platform !== "win32") return { ok: false, reason: "not Windows", packages: [] };
-  const script =
-    "Get-AppxPackage -Name 'Microsoft.WindowsAppRuntime*' | ForEach-Object { $_.Name + ' ' + $_.Version }";
+  const script = "Get-AppxPackage -Name 'Microsoft.WindowsAppRuntime*' | ForEach-Object { $_.Name + ' ' + $_.Version }";
   let out = "";
   try {
     const p = Bun.spawn(["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script], {
@@ -49,7 +48,14 @@ export async function probe(): Promise<{ ok: boolean; reason?: string; packages:
   } catch (e) {
     return { ok: false, reason: `Get-AppxPackage failed: ${(e as Error).message}`, packages: [] };
   }
-  const packages = [...new Set(out.split(/\r?\n/).map(s => s.trim()).filter(Boolean))].sort();
+  const packages = [
+    ...new Set(
+      out
+        .split(/\r?\n/)
+        .map(s => s.trim())
+        .filter(Boolean),
+    ),
+  ].sort();
   const [major, minor] = WINDOWS_APP_SDK_VERSION.split(".").map(Number);
   const ok = packages.some(line => {
     const [name, ver] = line.split(" ");
@@ -67,8 +73,20 @@ export async function buildHost(outDir: string = defaultHostDir()): Promise<{ ex
   const arch = process.arch === "arm64" ? "arm64" : "x64";
   const p = Bun.spawn(
     [
-      "dotnet", "publish", hostProject, "-c", "Release", "-r", `win-${arch}`, "--self-contained", "false",
-      "-o", out, `-p:BaseIntermediateOutputPath=${obj}\\`, `-p:Platform=${arch}`, "-nologo",
+      "dotnet",
+      "publish",
+      hostProject,
+      "-c",
+      "Release",
+      "-r",
+      `win-${arch}`,
+      "--self-contained",
+      "false",
+      "-o",
+      out,
+      `-p:BaseIntermediateOutputPath=${obj}\\`,
+      `-p:Platform=${arch}`,
+      "-nologo",
     ],
     { stdout: "pipe", stderr: "pipe" },
   );

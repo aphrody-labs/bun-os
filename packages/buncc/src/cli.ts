@@ -177,7 +177,8 @@ async function main(): Promise<number> {
     }
     case "env": {
       const ctx = makeContext(root);
-      if (has("ensure") && isManaged(rest[0] ?? "")) for (const line of await ensureManaged(rest[0] as never, false)) console.error(line);
+      if (has("ensure") && isManaged(rest[0] ?? ""))
+        for (const line of await ensureManaged(rest[0] as never, false)) console.error(line);
       const selected = rest[0] === "all" || !rest[0] ? applicable(ctx) : [getProvider(rest[0])];
       const merged: Record<string, string> = {};
       for (const provider of selected) Object.assign(merged, await provider.env(ctx));

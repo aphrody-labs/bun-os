@@ -13,9 +13,12 @@ export async function msvcEnv(): Promise<Record<string, string>> {
   const vcvars = join(install, "VC", "Auxiliary", "Build", "vcvars64.bat");
   if (!install || !existsSync(vcvars)) throw new Error("MSVC (VS Build Tools) not found");
   const bat = join(tmpdir(), "bunos-vcvars.bat");
-  writeFileSync(bat, `@call "${vcvars}" >nul
+  writeFileSync(
+    bat,
+    `@call "${vcvars}" >nul
 @set
-`);
+`,
+  );
   const d = Bun.spawn(["cmd", "/c", bat], { stdout: "pipe" });
   const env: Record<string, string> = {};
   for (const line of (await d.stdout.text()).split(/\r?\n/)) {
@@ -25,10 +28,23 @@ export async function msvcEnv(): Promise<Record<string, string>> {
   return (cached = env);
 }
 
-export interface Exec { code: number; out: string }
+export interface Exec {
+  code: number;
+  out: string;
+}
 
-export async function exec(argv: string[], cwd: string, env?: Record<string, string>, timeoutMs = 600_000): Promise<Exec> {
-  const proc = Bun.spawn(argv, { cwd, env: env ?? (process.env as Record<string, string>), stdout: "pipe", stderr: "pipe" });
+export async function exec(
+  argv: string[],
+  cwd: string,
+  env?: Record<string, string>,
+  timeoutMs = 600_000,
+): Promise<Exec> {
+  const proc = Bun.spawn(argv, {
+    cwd,
+    env: env ?? (process.env as Record<string, string>),
+    stdout: "pipe",
+    stderr: "pipe",
+  });
   const timer = setTimeout(() => proc.kill(), timeoutMs);
   const [o, e, code] = await Promise.all([proc.stdout.text(), proc.stderr.text(), proc.exited]);
   clearTimeout(timer);
@@ -41,4 +57,5 @@ export async function cl(cwd: string, args: string[]) {
 }
 
 export const NIGHTLY = Bun.env.BUNOS_RUST_TOOLCHAIN ?? "nightly-2026-09-15";
-export const cargo = (cwd: string, args: string[]) => exec(["cargo", `+${NIGHTLY}`, ...args], cwd, undefined, 1_200_000);
+export const cargo = (cwd: string, args: string[]) =>
+  exec(["cargo", `+${NIGHTLY}`, ...args], cwd, undefined, 1_200_000);

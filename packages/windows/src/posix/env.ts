@@ -16,7 +16,21 @@ export const PATH_LIST_VARS = [
 ] as const;
 
 /** Variables holding one path. */
-export const PATH_VARS = ["HOME", "PWD", "OLDPWD", "TMP", "TEMP", "TMPDIR", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "ProgramData", "ProgramFiles", "SystemRoot", "windir"] as const;
+export const PATH_VARS = [
+  "HOME",
+  "PWD",
+  "OLDPWD",
+  "TMP",
+  "TEMP",
+  "TMPDIR",
+  "USERPROFILE",
+  "APPDATA",
+  "LOCALAPPDATA",
+  "ProgramData",
+  "ProgramFiles",
+  "SystemRoot",
+  "windir",
+] as const;
 
 type Env = Record<string, string | undefined>;
 
@@ -49,7 +63,12 @@ export function convertList(value: string, to: PathStyle, from: PathStyle, o?: P
  * Translate the path-valued variables of `env` to `to`. Keys are matched case-insensitively (Windows spells `Path`);
  * the key's original spelling is kept. Other variables are copied unchanged.
  */
-export function translateEnv(env: Env, to: PathStyle, from: PathStyle = to === "windows" ? "msys" : "windows", o?: PathOptions): Record<string, string> {
+export function translateEnv(
+  env: Env,
+  to: PathStyle,
+  from: PathStyle = to === "windows" ? "msys" : "windows",
+  o?: PathOptions,
+): Record<string, string> {
   const lists = new Set(PATH_LIST_VARS.map(s => s.toLowerCase()));
   const singles = new Set(PATH_VARS.map(s => s.toLowerCase()));
   const out: Record<string, string> = {};
@@ -57,7 +76,8 @@ export function translateEnv(env: Env, to: PathStyle, from: PathStyle = to === "
     if (value === undefined) continue;
     const k = key.toLowerCase();
     if (lists.has(k)) out[key] = convertList(value, to, from, o);
-    else if (singles.has(k)) out[key] = looksLikePath(value, o) || value.startsWith("/") ? convertPath(value, to, o) : value;
+    else if (singles.has(k))
+      out[key] = looksLikePath(value, o) || value.startsWith("/") ? convertPath(value, to, o) : value;
     else out[key] = value;
   }
   return out;

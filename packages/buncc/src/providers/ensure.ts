@@ -12,13 +12,24 @@ export const isManaged = (id: string): id is ManagedId => (MANAGED_IDS as readon
 export async function ensureManaged(id: ManagedId, dryRun: boolean): Promise<string[]> {
   switch (id) {
     case "posix": {
-      if (dryRun) return ["posix: would download uutils coreutils/findutils/diffutils, ripgrep, fd, sd (+ busybox-w32 on Windows)"];
+      if (dryRun)
+        return [
+          "posix: would download uutils coreutils/findutils/diffutils, ripgrep, fd, sd (+ busybox-w32 on Windows)",
+        ];
       const done = await ensurePosix();
-      return [`shim directory: ${done.dir}`, `tools: ${Object.keys(done.tools).join(", ")}`, `shims: ${done.shims.length}`, ...done.skipped.map(s => `skipped ${s}`)];
+      return [
+        `shim directory: ${done.dir}`,
+        `tools: ${Object.keys(done.tools).join(", ")}`,
+        `shims: ${done.shims.length}`,
+        ...done.skipped.map(s => `skipped ${s}`),
+      ];
     }
     case "mingw": {
       const done = await ensureMingw({ dryRun });
-      return [`llvm-mingw ${done.tag} (${done.asset.name}, sha256 ${done.asset.sha256.slice(0, 12)}): ${done.status}`, `bin: ${done.bin ?? done.dir}`];
+      return [
+        `llvm-mingw ${done.tag} (${done.asset.name}, sha256 ${done.asset.sha256.slice(0, 12)}): ${done.status}`,
+        `bin: ${done.bin ?? done.dir}`,
+      ];
     }
     case "msys2": {
       if (process.platform !== "win32") return ["msys2: not applicable on this host"];

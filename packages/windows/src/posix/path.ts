@@ -92,7 +92,8 @@ export function convertPath(p: string, target: PathStyle, o: PathOptions = {}): 
   const tail = parsed.parts;
   switch (target) {
     case "windows": {
-      if (parsed.drive) return `${parsed.drive.toUpperCase()}:${tail.length || parsed.absolute ? sep : ""}${tail.join(sep)}`;
+      if (parsed.drive)
+        return `${parsed.drive.toUpperCase()}:${tail.length || parsed.absolute ? sep : ""}${tail.join(sep)}`;
       if (parsed.unc) return `${sep}${sep}${[parsed.unc.server, parsed.unc.share, ...tail].join(sep)}`;
       if (parsed.wslDistro) return `\\\\wsl$\\${parsed.wslDistro}\\${tail.join("\\")}`;
       // A plain POSIX absolute path has no Windows spelling without a distro; separators change only.

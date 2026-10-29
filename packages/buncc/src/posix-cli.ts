@@ -17,7 +17,16 @@ import {
 import { getProvider, makeContext } from "./providers/index.ts";
 import { locateMingw } from "./providers/mingw.ts";
 import { findShimDir } from "./providers/posix.ts";
-import { prefixPath, prefixPlan, protonRun, wineRun, wineBuilds, dxvkRelease, vkd3dProtonRelease, protonCachyos } from "./providers/wine.ts";
+import {
+  prefixPath,
+  prefixPlan,
+  protonRun,
+  wineRun,
+  wineBuilds,
+  dxvkRelease,
+  vkd3dProtonRelease,
+  protonCachyos,
+} from "./providers/wine.ts";
 import { findInstalled } from "./providers/_github.ts";
 import { run } from "./process.ts";
 
@@ -29,7 +38,9 @@ export async function posixCommand(args: string[], root: string): Promise<number
     // A mingw tree inside MSYS2 is what is being replaced: it does not count as a replacement.
     const found = locateMingw(ctx);
     const mingw = found && found.kind !== "msys2-readonly" ? found : undefined;
-    const bin = mingw ? join(mingw.binDir, `${mingw.triples[0] ?? "x86_64-w64-mingw32"}-${mingw.flavor === "llvm" ? "clang" : "gcc"}`) : undefined;
+    const bin = mingw
+      ? join(mingw.binDir, `${mingw.triples[0] ?? "x86_64-w64-mingw32"}-${mingw.flavor === "llvm" ? "clang" : "gcc"}`)
+      : undefined;
     return smokeReplacements(need, host.exec, findShimDir(), bin);
   };
   switch (sub) {
@@ -54,7 +65,8 @@ export async function posixCommand(args: string[], root: string): Promise<number
     }
     case "uninstall": {
       const target = rest.find(a => !a.startsWith("-")) ?? "";
-      const ids: LegacyId[] = target === "all" ? LEGACY_IDS : (LEGACY_IDS as string[]).includes(target) ? [target as LegacyId] : [];
+      const ids: LegacyId[] =
+        target === "all" ? LEGACY_IDS : (LEGACY_IDS as string[]).includes(target) ? [target as LegacyId] : [];
       if (!ids.length) {
         console.error(`usage: buncc posix uninstall <${LEGACY_IDS.join("|")}|all> [--yes]`);
         return 2;
@@ -66,14 +78,20 @@ export async function posixCommand(args: string[], root: string): Promise<number
       const installs: LegacyInstall[] = [];
       for (const id of ids) installs.push(...(await detectLegacy(id, host)));
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const plan = planUninstall(installs, await protectedRoots(host), join(cacheDir(), "uninstall-backup", stamp), await host.isElevated());
+      const plan = planUninstall(
+        installs,
+        await protectedRoots(host),
+        join(cacheDir(), "uninstall-backup", stamp),
+        await host.isElevated(),
+      );
       const yes = rest.includes("--yes");
       console.log(renderPlan(plan, yes));
       if (!installs.length) return 0;
       if (!yes) return 0;
       mkdirSync(plan.backupDir, { recursive: true });
       const result = await executePlan(plan, host, smoke);
-      for (const e of result.executed) console.log(`${e.ok ? "done" : "FAIL"} ${e.step.title}${e.detail ? `: ${e.detail}` : ""}`);
+      for (const e of result.executed)
+        console.log(`${e.ok ? "done" : "FAIL"} ${e.step.title}${e.detail ? `: ${e.detail}` : ""}`);
       if (result.stoppedAt !== undefined) {
         console.error(`stopped at step ${result.stoppedAt + 1}; nothing after it ran. Backup: ${plan.backupDir}`);
         return 1;
@@ -93,7 +111,7 @@ export async function wineCommand(args: string[], root: string): Promise<number>
     console.log("wine/proton: not applicable on Windows (they run Windows programs on Linux and macOS)");
     return 0;
   }
-  const prefix = (rest.find(a => a.startsWith("--prefix="))?.slice(9)) ?? "default";
+  const prefix = rest.find(a => a.startsWith("--prefix="))?.slice(9) ?? "default";
   switch (sub) {
     case "doctor": {
       for (const id of ["wine", "proton"]) {
@@ -107,7 +125,10 @@ export async function wineCommand(args: string[], root: string): Promise<number>
     case "prefix": {
       const name = rest.find(a => !a.startsWith("-")) ?? "default";
       const wine = findInstalled(wineBuilds)?.bin ?? Bun.which("wine64") ?? Bun.which("wine");
-      if (!wine) { console.error("wine not found: buncc install wine --run"); return 1; }
+      if (!wine) {
+        console.error("wine not found: buncc install wine --run");
+        return 1;
+      }
       const plan = prefixPlan(wine, name, {
         dxvkDir: rest.includes("--dxvk") ? findInstalled(dxvkRelease)?.dir : undefined,
         vkd3dDir: rest.includes("--vkd3d") ? findInstalled(vkd3dProtonRelease)?.dir : undefined,
@@ -122,14 +143,20 @@ export async function wineCommand(args: string[], root: string): Promise<number>
     }
     case "run": {
       const [program, ...pargs] = rest.filter(a => !a.startsWith("--prefix="));
-      if (!program) { console.error("usage: buncc wine run [--prefix=name] <program.exe> [args]"); return 2; }
+      if (!program) {
+        console.error("usage: buncc wine run [--prefix=name] <program.exe> [args]");
+        return 2;
+      }
       const proton = findInstalled(protonCachyos);
       if (rest.includes("--proton") && proton) {
         const p = protonRun(proton.dir, prefix, program, pargs);
         return (await run(p.command, { env: { ...ctx.env, ...p.env }, output: "inherit", stdin: "inherit" })).code;
       }
       const wine = findInstalled(wineBuilds)?.bin ?? Bun.which("wine64") ?? Bun.which("wine");
-      if (!wine) { console.error("wine not found: buncc install wine --run"); return 1; }
+      if (!wine) {
+        console.error("wine not found: buncc install wine --run");
+        return 1;
+      }
       const w = wineRun(wine, prefix, program, pargs);
       return (await run(w.command, { env: { ...ctx.env, ...w.env }, output: "inherit", stdin: "inherit" })).code;
     }
@@ -138,4 +165,3 @@ export async function wineCommand(args: string[], root: string): Promise<number>
       return 2;
   }
 }
-

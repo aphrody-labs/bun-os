@@ -23,17 +23,29 @@ export function preparePosixSpawn(argv: string[], o: PosixSpawnOptions = {}) {
   const style = o.childStyle ?? "windows";
   const base = o.env ?? (process.env as Record<string, string | undefined>);
   const hostStyle: PathStyle = process.platform === "win32" ? "windows" : "posix";
-  let env = style === hostStyle ? Object.fromEntries(Object.entries(base).filter(([, v]) => v !== undefined)) as Record<string, string> : translateEnv(base, style, hostStyle, o.path);
+  let env =
+    style === hostStyle
+      ? (Object.fromEntries(Object.entries(base).filter(([, v]) => v !== undefined)) as Record<string, string>)
+      : translateEnv(base, style, hostStyle, o.path);
   if (o.pathPrepend?.length) env = prependToPath(env, o.pathPrepend, style);
-  const args = o.translateArgs ? argv.map((a, i) => (i > 0 && looksLikePath(a, o.path) ? convertPath(a, style, o.path) : a)) : argv;
-  const cwd = o.cwd && style !== hostStyle ? convertPath(o.cwd, hostStyle === "windows" ? "windows" : "posix", o.path) : o.cwd;
+  const args = o.translateArgs
+    ? argv.map((a, i) => (i > 0 && looksLikePath(a, o.path) ? convertPath(a, style, o.path) : a))
+    : argv;
+  const cwd =
+    o.cwd && style !== hostStyle ? convertPath(o.cwd, hostStyle === "windows" ? "windows" : "posix", o.path) : o.cwd;
   return { argv: args, env, cwd };
 }
 
 /** Run a program and collect its output. */
 export async function posixSpawn(argv: string[], o: PosixSpawnOptions = {}) {
   const prepared = preparePosixSpawn(argv, o);
-  const proc = Bun.spawn(prepared.argv, { cwd: prepared.cwd, env: prepared.env, stdout: "pipe", stderr: "pipe", stdin: "ignore" });
+  const proc = Bun.spawn(prepared.argv, {
+    cwd: prepared.cwd,
+    env: prepared.env,
+    stdout: "pipe",
+    stderr: "pipe",
+    stdin: "ignore",
+  });
   const [stdout, stderr, code] = await Promise.all([proc.stdout.text(), proc.stderr.text(), proc.exited]);
   return { code, stdout, stderr };
 }

@@ -36,7 +36,10 @@ export interface LegacyHost {
   /** Persistent (registry) PATH, not the process one. */
   persistentPath(): Promise<{ user: string; machine: string }>;
   /** Run a command (backup and uninstall steps). */
-  exec(argv: string[], opts?: { cwd?: string; timeoutMs?: number }): Promise<{ code: number; stdout: string; stderr: string }>;
+  exec(
+    argv: string[],
+    opts?: { cwd?: string; timeoutMs?: number },
+  ): Promise<{ code: number; stdout: string; stderr: string }>;
   /** Does this registry key exist? (`reg query`; false also when it cannot be read.) */
   regKeyExists(key: string): Promise<boolean>;
   /** Is the process elevated (high integrity token)? buncc never tries to elevate itself. */
@@ -137,16 +140,29 @@ const finders: Record<LegacyId, Finder> = {
       "C:\\GnuWin32",
       join(env.USERPROFILE ?? "", "scoop", "apps", "gnuwin32", "current"),
     ],
-    marker: (r, h) => h.isDir(join(r, "bin")) && (h.exists(join(r, "bin", "grep.exe")) || h.exists(join(r, "bin", "sed.exe")) || h.exists(join(r, "bin", "ls.exe")) || h.list(join(r, "bin")).length > 0),
+    marker: (r, h) =>
+      h.isDir(join(r, "bin")) &&
+      (h.exists(join(r, "bin", "grep.exe")) ||
+        h.exists(join(r, "bin", "sed.exe")) ||
+        h.exists(join(r, "bin", "ls.exe")) ||
+        h.list(join(r, "bin")).length > 0),
   },
   cygwin: {
     names: /^cygwin\b/i,
-    roots: env => ["C:\\cygwin64", "C:\\cygwin", join(env.USERPROFILE ?? "", "scoop", "apps", "cygwin", "current", "root")],
+    roots: env => [
+      "C:\\cygwin64",
+      "C:\\cygwin",
+      join(env.USERPROFILE ?? "", "scoop", "apps", "cygwin", "current", "root"),
+    ],
     marker: (r, h) => h.exists(join(r, "bin", "cygwin1.dll")) || h.exists(join(r, "bin", "bash.exe")),
   },
 };
 
-function modeOf(root: string, entry: UninstallEntry | undefined, host: LegacyHost): { mode: InstallMode; uninstaller?: string[]; note?: string } {
+function modeOf(
+  root: string,
+  entry: UninstallEntry | undefined,
+  host: LegacyHost,
+): { mode: InstallMode; uninstaller?: string[]; note?: string } {
   const r = lower(root);
   if (r.includes("\\scoop\\apps\\")) return { mode: "scoop" };
   if (r.includes("\\chocolatey\\") || r.startsWith("c:\\tools\\")) return { mode: "chocolatey" };
@@ -154,9 +170,17 @@ function modeOf(root: string, entry: UninstallEntry | undefined, host: LegacyHos
     const cmd = entry.UninstallString;
     if (/winget/i.test(cmd) || /Winget/.test(entry.key)) return { mode: "winget" };
     const exe = /^"([^"]+)"/.exec(cmd)?.[1] ?? cmd.split(/\s+(?=\/|-)/)[0]!;
-    return { mode: "installer", uninstaller: [exe, ...(/\/|-/.test(cmd.slice(exe.length)) ? cmd.slice(exe.length).trim().split(/\s+/).filter(Boolean) : [])] };
+    return {
+      mode: "installer",
+      uninstaller: [
+        exe,
+        ...(/\/|-/.test(cmd.slice(exe.length)) ? cmd.slice(exe.length).trim().split(/\s+/).filter(Boolean) : []),
+      ],
+    };
   }
-  const uninstallExe = ["uninstall.exe", "unins000.exe", "uninst.exe"].map(n => join(root, n)).find(p => host.exists(p));
+  const uninstallExe = ["uninstall.exe", "unins000.exe", "uninst.exe"]
+    .map(n => join(root, n))
+    .find(p => host.exists(p));
   if (uninstallExe) return { mode: "installer", uninstaller: [uninstallExe] };
   return { mode: "portable" };
 }
@@ -176,11 +200,13 @@ export async function detectLegacy(id: LegacyId, host: LegacyHost): Promise<Lega
   };
   for (const e of entries) {
     if (e.DisplayName && finder.names.test(e.DisplayName) && !(id === "mingw" && /msys2/i.test(e.DisplayName))) {
-      const loc = e.InstallLocation || (e.UninstallString ? dirname(/^"?([^"]+?\.exe)/i.exec(e.UninstallString)?.[1] ?? "") : "");
+      const loc =
+        e.InstallLocation || (e.UninstallString ? dirname(/^"?([^"]+?\.exe)/i.exec(e.UninstallString)?.[1] ?? "") : "");
       if (loc && host.exists(loc)) addRoot(loc, e);
     }
   }
-  for (const candidate of finder.roots(host.env)) if (candidate && host.exists(candidate) && finder.marker(candidate, host)) addRoot(candidate);
+  for (const candidate of finder.roots(host.env))
+    if (candidate && host.exists(candidate) && finder.marker(candidate, host)) addRoot(candidate);
   if (id === "cygwin") {
     const reg = await host.regValues("HKLM\\SOFTWARE\\Cygwin\\setup");
     if (reg?.rootdir && host.exists(reg.rootdir)) addRoot(reg.rootdir);
@@ -207,11 +233,14 @@ export async function detectLegacy(id: LegacyId, host: LegacyHost): Promise<Lega
     }
     const notes: string[] = [];
     if (touchesProtected(root, protectedList)) {
-      notes.push(`PROTECTED: overlaps Git for Windows (${touchesProtected(root, protectedList)}); excluded from removal`);
+      notes.push(
+        `PROTECTED: overlaps Git for Windows (${touchesProtected(root, protectedList)}); excluded from removal`,
+      );
     }
     const pathEntries: LegacyInstall["pathEntries"] = [];
     const scan = (scope: "user" | "machine" | "process", value: string | undefined) => {
-      for (const part of (value ?? "").split(delimiter).filter(Boolean)) if (within(root, part)) pathEntries.push({ scope, value: part });
+      for (const part of (value ?? "").split(delimiter).filter(Boolean))
+        if (within(root, part)) pathEntries.push({ scope, value: part });
     };
     scan("user", persistent.user);
     scan("machine", persistent.machine);
@@ -220,29 +249,59 @@ export async function detectLegacy(id: LegacyId, host: LegacyHost): Promise<Lega
     const dependents: string[] = [];
     for (const file of configs) {
       const text = host.readText(file);
-      if (text && lower(text).replace(/\\\\/g, "\\").includes(lower(root))) dependents.push(`${file} references ${root}`);
+      if (text && lower(text).replace(/\\\\/g, "\\").includes(lower(root)))
+        dependents.push(`${file} references ${root}`);
     }
     if (id === "msys2") {
       const home = join(root, "home");
-      if (host.isDir(home)) notes.push(`user data: ${host.list(home).map(h => join(home, h)).join(", ") || home} (dotfiles are backed up; the rest is deleted with the root)`);
-      if (host.exists(join(root, "var", "lib", "pacman", "local"))) notes.push("pacman state: var/lib/pacman (package list is exported before removal)");
-      dependents.push("Rust toolchains named *-pc-windows-gnu use <root>\\ucrt64|mingw64 gcc: check `rustup toolchain list` (use gnullvm via buncc mingw)");
+      if (host.isDir(home))
+        notes.push(
+          `user data: ${
+            host
+              .list(home)
+              .map(h => join(home, h))
+              .join(", ") || home
+          } (dotfiles are backed up; the rest is deleted with the root)`,
+        );
+      if (host.exists(join(root, "var", "lib", "pacman", "local")))
+        notes.push("pacman state: var/lib/pacman (package list is exported before removal)");
+      dependents.push(
+        "Rust toolchains named *-pc-windows-gnu use <root>\\ucrt64|mingw64 gcc: check `rustup toolchain list` (use gnullvm via buncc mingw)",
+      );
     }
-    if (id === "cygwin") notes.push("Cygwin ships no uninstaller: removal is the folder, the HKLM\\SOFTWARE\\Cygwin key, shortcuts and PATH");
+    if (id === "cygwin")
+      notes.push(
+        "Cygwin ships no uninstaller: removal is the folder, the HKLM\\SOFTWARE\\Cygwin key, shortcuts and PATH",
+      );
     const shortcuts = shortcutsFor(id, host);
-    const registryKeys = [...found.map(e => e.key), ...(id === "cygwin" ? ["HKLM\\SOFTWARE\\Cygwin", "HKCU\\Software\\Cygwin"] : [])]
-      .filter((k): k is string => !!k);
+    const registryKeys = [
+      ...found.map(e => e.key),
+      ...(id === "cygwin" ? ["HKLM\\SOFTWARE\\Cygwin", "HKCU\\Software\\Cygwin"] : []),
+    ].filter((k): k is string => !!k);
     out.push({
-      id, mode: m.mode, root, version: entry?.DisplayVersion, uninstaller: uninstallers[0], uninstallers, uninstallerKeys,
-      registryKeys, pathEntries, shortcuts, dependents, notes,
+      id,
+      mode: m.mode,
+      root,
+      version: entry?.DisplayVersion,
+      uninstaller: uninstallers[0],
+      uninstallers,
+      uninstallerKeys,
+      registryKeys,
+      pathEntries,
+      shortcuts,
+      dependents,
+      notes,
     });
   }
   return out;
 }
 
 function shortcutsFor(id: LegacyId, host: LegacyHost): string[] {
-  const bases = [join(host.env.ProgramData ?? "C:\\ProgramData", "Microsoft", "Windows", "Start Menu", "Programs"), join(host.env.APPDATA ?? "", "Microsoft", "Windows", "Start Menu", "Programs"), host.env.USERPROFILE ? join(host.env.USERPROFILE, "Desktop") : ""]
-    .filter(Boolean);
+  const bases = [
+    join(host.env.ProgramData ?? "C:\\ProgramData", "Microsoft", "Windows", "Start Menu", "Programs"),
+    join(host.env.APPDATA ?? "", "Microsoft", "Windows", "Start Menu", "Programs"),
+    host.env.USERPROFILE ? join(host.env.USERPROFILE, "Desktop") : "",
+  ].filter(Boolean);
   const re = { msys2: /^msys2/i, mingw: /^(mingw|w64devkit|winlibs)/i, gnuwin32: /gnuwin32/i, cygwin: /^cygwin/i }[id];
   const out: string[] = [];
   for (const base of bases) {
@@ -269,7 +328,17 @@ export function needsElevation(kind: StepKind, target: string | undefined): bool
   return /^[a-z]:\\(program files|program files \(x86\)|windows)(\\|$)/.test(t);
 }
 
-export type StepKind = "backup" | "gate" | "uninstaller" | "scoop" | "winget" | "chocolatey" | "path" | "registry" | "shortcut" | "delete-dir";
+export type StepKind =
+  | "backup"
+  | "gate"
+  | "uninstaller"
+  | "scoop"
+  | "winget"
+  | "chocolatey"
+  | "path"
+  | "registry"
+  | "shortcut"
+  | "delete-dir";
 export interface PlanStep {
   kind: StepKind;
   title: string;
@@ -280,7 +349,11 @@ export interface PlanStep {
   /** The step changes something only an elevated process can change. */
   needsElevation?: boolean;
   /** How the effect is checked after the step. A step is "done" only when this holds. */
-  verify?: { kind: "reg-gone" | "path-gone" | "path-exists" | "path-entry-gone"; target: string; scope?: "user" | "machine" };
+  verify?: {
+    kind: "reg-gone" | "path-gone" | "path-exists" | "path-entry-gone";
+    target: string;
+    scope?: "user" | "machine";
+  };
   timeoutMs?: number;
 }
 export interface UninstallPlan {
@@ -302,19 +375,65 @@ function backupSteps(installs: LegacyInstall[], backupDir: string): PlanStep[] {
   for (const i of installs) {
     if (i.id === "msys2") {
       steps.push(
-        { kind: "backup", title: "export installed MSYS2 packages (explicit)", path: join(backupDir, "msys2-pacman-Qe.txt"), command: [join(i.root, "usr", "bin", "pacman.exe"), "-Qqe"] },
-        { kind: "backup", title: "export installed MSYS2 packages (foreign/AUR-style)", path: join(backupDir, "msys2-pacman-Qm.txt"), command: [join(i.root, "usr", "bin", "pacman.exe"), "-Qqm"] },
-        { kind: "backup", title: "copy dotfiles of MSYS2 homes (no caches)", path: join(backupDir, "msys2-home"), command: ["robocopy", join(i.root, "home"), join(backupDir, "msys2-home"), "/E", "/XD", ".cache", "/XF", "*.tmp"] },
-        { kind: "backup", title: "save pacman.conf and mirrorlists", path: join(backupDir, "msys2-etc"), command: ["robocopy", join(i.root, "etc", "pacman.d"), join(backupDir, "msys2-etc", "pacman.d"), "/E"] },
+        {
+          kind: "backup",
+          title: "export installed MSYS2 packages (explicit)",
+          path: join(backupDir, "msys2-pacman-Qe.txt"),
+          command: [join(i.root, "usr", "bin", "pacman.exe"), "-Qqe"],
+        },
+        {
+          kind: "backup",
+          title: "export installed MSYS2 packages (foreign/AUR-style)",
+          path: join(backupDir, "msys2-pacman-Qm.txt"),
+          command: [join(i.root, "usr", "bin", "pacman.exe"), "-Qqm"],
+        },
+        {
+          kind: "backup",
+          title: "copy dotfiles of MSYS2 homes (no caches)",
+          path: join(backupDir, "msys2-home"),
+          command: [
+            "robocopy",
+            join(i.root, "home"),
+            join(backupDir, "msys2-home"),
+            "/E",
+            "/XD",
+            ".cache",
+            "/XF",
+            "*.tmp",
+          ],
+        },
+        {
+          kind: "backup",
+          title: "save pacman.conf and mirrorlists",
+          path: join(backupDir, "msys2-etc"),
+          command: ["robocopy", join(i.root, "etc", "pacman.d"), join(backupDir, "msys2-etc", "pacman.d"), "/E"],
+        },
       );
     }
-    if (i.id === "cygwin") steps.push({ kind: "backup", title: "export Cygwin package list", path: join(backupDir, "cygwin-packages.txt"), command: [join(i.root, "bin", "cygcheck.exe"), "-c"] });
-    for (const key of i.registryKeys) steps.push({ kind: "backup", title: `export registry key ${key}`, path: join(backupDir, `reg-${i.id}-${basename(key).replace(/\W+/g, "_")}.reg`), command: ["reg", "export", key, join(backupDir, `reg-${i.id}-${basename(key).replace(/\W+/g, "_")}.reg`), "/y"] });
+    if (i.id === "cygwin")
+      steps.push({
+        kind: "backup",
+        title: "export Cygwin package list",
+        path: join(backupDir, "cygwin-packages.txt"),
+        command: [join(i.root, "bin", "cygcheck.exe"), "-c"],
+      });
+    for (const key of i.registryKeys)
+      steps.push({
+        kind: "backup",
+        title: `export registry key ${key}`,
+        path: join(backupDir, `reg-${i.id}-${basename(key).replace(/\W+/g, "_")}.reg`),
+        command: ["reg", "export", key, join(backupDir, `reg-${i.id}-${basename(key).replace(/\W+/g, "_")}.reg`), "/y"],
+      });
   }
   return steps;
 }
 
-export function planUninstall(installs: LegacyInstall[], protectedList: string[], backupDir: string, elevated = false): UninstallPlan {
+export function planUninstall(
+  installs: LegacyInstall[],
+  protectedList: string[],
+  backupDir: string,
+  elevated = false,
+): UninstallPlan {
   const warnings: string[] = [];
   const removable = installs.filter(i => {
     const hit = touchesProtected(i.root, protectedList);
@@ -323,38 +442,117 @@ export function planUninstall(installs: LegacyInstall[], protectedList: string[]
   });
   const steps: PlanStep[] = [...backupSteps(removable, backupDir)];
   const gates = new Set(removable.map(i => i.id));
-  steps.push({ kind: "gate", title: `smoke-test the replacements (posix shims${gates.has("msys2") || gates.has("mingw") ? ", mingw compile+link" : ""}, buncc sh) before any removal`, command: ["buncc", "posix", "smoke", ...(gates.has("msys2") || gates.has("mingw") ? ["--mingw"] : [])] });
+  steps.push({
+    kind: "gate",
+    title: `smoke-test the replacements (posix shims${gates.has("msys2") || gates.has("mingw") ? ", mingw compile+link" : ""}, buncc sh) before any removal`,
+    command: ["buncc", "posix", "smoke", ...(gates.has("msys2") || gates.has("mingw") ? ["--mingw"] : [])],
+  });
   for (const i of removable) {
-    if (i.mode === "scoop") steps.push({ kind: "scoop", title: `scoop uninstall ${i.id}`, command: ["scoop", "uninstall", i.id === "mingw" ? basename(dirname(i.root)) : i.id], install: i.id });
-    else if (i.mode === "winget") steps.push({ kind: "winget", title: `winget uninstall ${i.id}`, command: ["winget", "uninstall", "--name", i.id === "msys2" ? "MSYS2" : i.id, "--silent", "--disable-interactivity"], install: i.id });
-    else if (i.mode === "chocolatey") steps.push({ kind: "chocolatey", title: `choco uninstall ${i.id}`, command: ["choco", "uninstall", i.id, "-y"], install: i.id });
+    if (i.mode === "scoop")
+      steps.push({
+        kind: "scoop",
+        title: `scoop uninstall ${i.id}`,
+        command: ["scoop", "uninstall", i.id === "mingw" ? basename(dirname(i.root)) : i.id],
+        install: i.id,
+      });
+    else if (i.mode === "winget")
+      steps.push({
+        kind: "winget",
+        title: `winget uninstall ${i.id}`,
+        command: [
+          "winget",
+          "uninstall",
+          "--name",
+          i.id === "msys2" ? "MSYS2" : i.id,
+          "--silent",
+          "--disable-interactivity",
+        ],
+        install: i.id,
+      });
+    else if (i.mode === "chocolatey")
+      steps.push({
+        kind: "chocolatey",
+        title: `choco uninstall ${i.id}`,
+        command: ["choco", "uninstall", i.id, "-y"],
+        install: i.id,
+      });
     else if (i.mode === "installer")
       i.uninstallers.forEach((uninstaller, n) => {
         const exe = uninstaller[0]!;
         const key = i.uninstallerKeys?.[n];
         const inno = i.id !== "msys2" && isInnoUninstaller(exe, key);
-        const command = i.id === "msys2" ? [...uninstaller, "pr", "--confirm-command"] : inno ? [exe, ...INNO_SILENT] : uninstaller;
-        const title = i.id === "msys2" ? "run the MSYS2 installer uninstaller (Qt IFW command line, unattended)"
-          : inno ? `run the Inno Setup uninstaller silently (${INNO_SILENT.join(" ")}, waits up to ${UNINSTALL_TIMEOUT_MS / 1000}s for the effect)`
-          : "run the registered uninstaller exactly as Windows records it (interactive; no silent flag is assumed)";
+        const command =
+          i.id === "msys2" ? [...uninstaller, "pr", "--confirm-command"] : inno ? [exe, ...INNO_SILENT] : uninstaller;
+        const title =
+          i.id === "msys2"
+            ? "run the MSYS2 installer uninstaller (Qt IFW command line, unattended)"
+            : inno
+              ? `run the Inno Setup uninstaller silently (${INNO_SILENT.join(" ")}, waits up to ${UNINSTALL_TIMEOUT_MS / 1000}s for the effect)`
+              : "run the registered uninstaller exactly as Windows records it (interactive; no silent flag is assumed)";
         steps.push({
-          kind: "uninstaller", title, command, install: i.id, path: exe, timeoutMs: UNINSTALL_TIMEOUT_MS,
+          kind: "uninstaller",
+          title,
+          command,
+          install: i.id,
+          path: exe,
+          timeoutMs: UNINSTALL_TIMEOUT_MS,
           needsElevation: needsElevation("uninstaller", exe) || needsElevation("registry", key),
           verify: key ? { kind: "reg-gone", target: key } : { kind: "path-gone", target: exe },
         });
       });
     for (const e of i.pathEntries.filter(e => e.scope !== "process"))
-      steps.push({ kind: "path", title: `remove ${e.scope} PATH entry ${e.value}`, path: e.value, needsElevation: e.scope === "machine", verify: { kind: "path-entry-gone", target: e.value, scope: e.scope as "user" | "machine" }, command: ["powershell", "-NoProfile", "-Command", `$s='${e.scope === "user" ? "User" : "Machine"}';$p=[Environment]::GetEnvironmentVariable('Path',$s) -split ';' | Where-Object { $_ -and ($_ -ne '${e.value}') };[Environment]::SetEnvironmentVariable('Path',($p -join ';'),$s)`], install: i.id });
-    for (const key of i.registryKeys) steps.push({ kind: "registry", title: `delete registry key ${key}`, path: key, command: ["reg", "delete", key, "/f"], install: i.id, needsElevation: needsElevation("registry", key), verify: { kind: "reg-gone", target: key } });
-    for (const s of i.shortcuts) steps.push({ kind: "shortcut", title: `delete shortcut ${s}`, path: s, install: i.id, needsElevation: needsElevation("shortcut", s), verify: { kind: "path-gone", target: s } });
-    steps.push({ kind: "delete-dir", title: `delete the folder ${i.root} (what the uninstaller leaves behind; only this detected path)`, path: i.root, install: i.id, needsElevation: needsElevation("delete-dir", i.root), verify: { kind: "path-gone", target: i.root } });
+      steps.push({
+        kind: "path",
+        title: `remove ${e.scope} PATH entry ${e.value}`,
+        path: e.value,
+        needsElevation: e.scope === "machine",
+        verify: { kind: "path-entry-gone", target: e.value, scope: e.scope as "user" | "machine" },
+        command: [
+          "powershell",
+          "-NoProfile",
+          "-Command",
+          `$s='${e.scope === "user" ? "User" : "Machine"}';$p=[Environment]::GetEnvironmentVariable('Path',$s) -split ';' | Where-Object { $_ -and ($_ -ne '${e.value}') };[Environment]::SetEnvironmentVariable('Path',($p -join ';'),$s)`,
+        ],
+        install: i.id,
+      });
+    for (const key of i.registryKeys)
+      steps.push({
+        kind: "registry",
+        title: `delete registry key ${key}`,
+        path: key,
+        command: ["reg", "delete", key, "/f"],
+        install: i.id,
+        needsElevation: needsElevation("registry", key),
+        verify: { kind: "reg-gone", target: key },
+      });
+    for (const s of i.shortcuts)
+      steps.push({
+        kind: "shortcut",
+        title: `delete shortcut ${s}`,
+        path: s,
+        install: i.id,
+        needsElevation: needsElevation("shortcut", s),
+        verify: { kind: "path-gone", target: s },
+      });
+    steps.push({
+      kind: "delete-dir",
+      title: `delete the folder ${i.root} (what the uninstaller leaves behind; only this detected path)`,
+      path: i.root,
+      install: i.id,
+      needsElevation: needsElevation("delete-dir", i.root),
+      verify: { kind: "path-gone", target: i.root },
+    });
   }
   const rollback = [
     `PATH: read ${join(backupDir, "path.json")} and set it back: [Environment]::SetEnvironmentVariable('Path', <user>, 'User') (machine: elevated)`,
-    ...(removable.some(i => i.id === "msys2") ? [
-      "MSYS2: reinstall with `winget install MSYS2.MSYS2` or buncc env msys2 --ensure, then `pacman -S --needed - < msys2-pacman-Qe.txt`, copy msys2-home back to <root>\\home, restore msys2-etc\\pacman.d",
-    ] : []),
-    ...(removable.some(i => i.id === "cygwin") ? ["Cygwin: run setup-x86_64.exe and select the packages listed in cygwin-packages.txt"] : []),
+    ...(removable.some(i => i.id === "msys2")
+      ? [
+          "MSYS2: reinstall with `winget install MSYS2.MSYS2` or buncc env msys2 --ensure, then `pacman -S --needed - < msys2-pacman-Qe.txt`, copy msys2-home back to <root>\\home, restore msys2-etc\\pacman.d",
+        ]
+      : []),
+    ...(removable.some(i => i.id === "cygwin")
+      ? ["Cygwin: run setup-x86_64.exe and select the packages listed in cygwin-packages.txt"]
+      : []),
     "Registry: `reg import <file>.reg` for each reg-*.reg in the backup directory",
     "Replacements stay installed under the buncc cache; they never conflict with the old stacks",
   ];
@@ -368,7 +566,9 @@ export function renderPlan(plan: UninstallPlan, yes: boolean): string {
   const elevSteps = plan.steps.filter(s => s.needsElevation);
   l.push(`elevated: ${plan.elevated ? "yes" : "no"}`);
   if (!plan.elevated && elevSteps.length)
-    l.push(`needs elevation: ${elevSteps.length} step(s) below change HKLM or Program Files. buncc never elevates itself: it stops at the first one without marking it done. Re-run from an elevated shell.`);
+    l.push(
+      `needs elevation: ${elevSteps.length} step(s) below change HKLM or Program Files. buncc never elevates itself: it stops at the first one without marking it done. Re-run from an elevated shell.`,
+    );
   l.push(`protected (never touched): ${plan.protected.join("; ") || "none found"}`);
   for (const w of plan.warnings) l.push(`warning: ${w}`);
   for (const i of plan.installs) {
@@ -380,7 +580,11 @@ export function renderPlan(plan: UninstallPlan, yes: boolean): string {
     for (const n of i.notes) l.push(`  note: ${n}`);
   }
   l.push("", "steps:");
-  plan.steps.forEach((s, n) => l.push(`  ${String(n + 1).padStart(2)}. [${s.kind}] ${s.title}${s.needsElevation && !plan.elevated ? "  [needs elevation]" : ""}${s.command ? `\n        ${s.command.join(" ")}` : ""}`));
+  plan.steps.forEach((s, n) =>
+    l.push(
+      `  ${String(n + 1).padStart(2)}. [${s.kind}] ${s.title}${s.needsElevation && !plan.elevated ? "  [needs elevation]" : ""}${s.command ? `\n        ${s.command.join(" ")}` : ""}`,
+    ),
+  );
   l.push("", "rollback:", ...plan.rollback.map(r => `  - ${r}`));
   return l.join("\n");
 }
@@ -411,14 +615,22 @@ export async function smokeReplacements(
     ];
     for (const [tool, args, re] of probes) {
       const bin = join(shimDir, tool + ext);
-      if (!existsSync(bin)) { out.push({ name: tool, ok: false, detail: "shim missing" }); continue; }
+      if (!existsSync(bin)) {
+        out.push({ name: tool, ok: false, detail: "shim missing" });
+        continue;
+      }
       const r = await exec([bin, ...args]);
       const text = r.stdout + r.stderr;
-      out.push({ name: tool, ok: (r.code === 0 || tool === "sed") && re.test(text), detail: text.split("\n")[0]!.slice(0, 80) });
+      out.push({
+        name: tool,
+        ok: (r.code === 0 || tool === "sed") && re.test(text),
+        detail: text.split("\n")[0]!.slice(0, 80),
+      });
     }
   }
   if (need.mingw) {
-    if (!mingwBin) out.push({ name: "mingw", ok: false, detail: "no mingw toolchain found: run `buncc install mingw --run`" });
+    if (!mingwBin)
+      out.push({ name: "mingw", ok: false, detail: "no mingw toolchain found: run `buncc install mingw --run`" });
     else {
       const r = await exec([mingwBin, "--version"]);
       out.push({ name: "mingw", ok: r.code === 0, detail: (r.stdout || r.stderr).split("\n")[0]!.slice(0, 80) });
@@ -476,15 +688,23 @@ export async function executePlan(
   const elevated = plan.elevated || (await host.isElevated());
   const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
   for (const [n, step] of plan.steps.entries()) {
-    const stop = (detail: string) => { result.executed.push({ step, ok: false, detail }); result.stoppedAt = n; return result; };
+    const stop = (detail: string) => {
+      result.executed.push({ step, ok: false, detail });
+      result.stoppedAt = n;
+      return result;
+    };
     if (step.kind === "gate") {
       result.smoke = await smoke({ posix: true, mingw: plan.installs.some(i => i.id === "msys2" || i.id === "mingw") });
       const bad = result.smoke.filter(s => !s.ok);
-      if (!result.smoke.length || bad.length) return stop(`smoke test failed: ${bad.map(b => `${b.name}: ${b.detail}`).join("; ") || "no probes"}`);
+      if (!result.smoke.length || bad.length)
+        return stop(`smoke test failed: ${bad.map(b => `${b.name}: ${b.detail}`).join("; ") || "no probes"}`);
       result.executed.push({ step, ok: true });
       continue;
     }
-    if (step.needsElevation && !elevated) return stop("needs elevation: run this from an elevated shell (buncc does not elevate itself); nothing was attempted");
+    if (step.needsElevation && !elevated)
+      return stop(
+        "needs elevation: run this from an elevated shell (buncc does not elevate itself); nothing was attempted",
+      );
     try {
       if (step.kind === "backup") {
         mkdirSync(plan.backupDir, { recursive: true });
@@ -508,11 +728,13 @@ export async function executePlan(
         if (touchesProtected(target, protectedList)) return stop(`refusing to delete ${target}: protected`);
         if (host.exists(target)) host.removeDir(target);
       } else if (step.kind === "shortcut") {
-        if (!allowedShortcuts.has(lower(step.path!))) return stop(`refusing to delete ${step.path}: not a detected shortcut`);
+        if (!allowedShortcuts.has(lower(step.path!)))
+          return stop(`refusing to delete ${step.path}: not a detected shortcut`);
         if (host.exists(step.path!)) host.removeDir(step.path!);
       } else if (step.command) {
         const r = await host.exec(step.command, { timeoutMs: step.timeoutMs });
-        if (r.code !== 0) exitNote = `${step.command[0]} exited ${r.code}: ${(r.stderr || r.stdout).trim().slice(0, 200)}`;
+        if (r.code !== 0)
+          exitNote = `${step.command[0]} exited ${r.code}: ${(r.stderr || r.stdout).trim().slice(0, 200)}`;
       }
       const budget = options.verifyMs ?? (step.kind === "uninstaller" ? 60_000 : 3_000);
       const deadline = Date.now() + budget;
@@ -549,9 +771,27 @@ export function realHost(): LegacyHost {
   return {
     env,
     exists: p => existsSync(p),
-    isDir: p => { try { return statSync(p).isDirectory(); } catch { return false; } },
-    list: p => { try { return readdirSync(p); } catch { return []; } },
-    readText: p => { try { return readFileSync(p, "utf8"); } catch { return undefined; } },
+    isDir: p => {
+      try {
+        return statSync(p).isDirectory();
+      } catch {
+        return false;
+      }
+    },
+    list: p => {
+      try {
+        return readdirSync(p);
+      } catch {
+        return [];
+      }
+    },
+    readText: p => {
+      try {
+        return readFileSync(p, "utf8");
+      } catch {
+        return undefined;
+      }
+    },
     async uninstallEntries() {
       if (process.platform !== "win32") return [];
       const roots = [
@@ -563,9 +803,21 @@ export function realHost(): LegacyHost {
       for (const root of roots) {
         const text = await reg(["query", root, "/s"]);
         for (const block of text.split(/\r?\n(?=HKEY_)/)) {
-          const key = block.split(/\r?\n/, 1)[0]!.trim().replace(/^HKEY_LOCAL_MACHINE/, "HKLM").replace(/^HKEY_CURRENT_USER/, "HKCU");
+          const key = block
+            .split(/\r?\n/, 1)[0]!
+            .trim()
+            .replace(/^HKEY_LOCAL_MACHINE/, "HKLM")
+            .replace(/^HKEY_CURRENT_USER/, "HKCU");
           const v = parseValues(block);
-          if (v.DisplayName) out.push({ key, DisplayName: v.DisplayName, DisplayVersion: v.DisplayVersion, InstallLocation: v.InstallLocation, UninstallString: v.UninstallString, Publisher: v.Publisher });
+          if (v.DisplayName)
+            out.push({
+              key,
+              DisplayName: v.DisplayName,
+              DisplayVersion: v.DisplayVersion,
+              InstallLocation: v.InstallLocation,
+              UninstallString: v.UninstallString,
+              Publisher: v.Publisher,
+            });
         }
       }
       return out;
@@ -578,7 +830,10 @@ export function realHost(): LegacyHost {
     async persistentPath() {
       if (process.platform !== "win32") return { user: "", machine: "" };
       const user = parseValues(await reg(["query", "HKCU\\Environment", "/v", "Path"])).Path ?? "";
-      const machine = parseValues(await reg(["query", "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment", "/v", "Path"])).Path ?? "";
+      const machine =
+        parseValues(
+          await reg(["query", "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment", "/v", "Path"]),
+        ).Path ?? "";
       return { user, machine };
     },
     exec: (argv, opts) => run(argv, { output: "capture", timeoutMs: opts?.timeoutMs ?? 600_000 }),
@@ -594,18 +849,26 @@ export function realHost(): LegacyHost {
       return r.stdout.includes("S-1-16-12288");
     },
     removeDir: p => rmSync(p, { recursive: true, force: true }),
-    writeFile: (p, t) => { mkdirSync(dirname(p), { recursive: true }); writeFileSync(p, t); },
+    writeFile: (p, t) => {
+      mkdirSync(dirname(p), { recursive: true });
+      writeFileSync(p, t);
+    },
     configFiles() {
       const appdata = env.APPDATA ?? "";
       const local = env.LOCALAPPDATA ?? "";
       const home = env.USERPROFILE ?? "";
-      const files = [join(appdata, "Code", "User", "settings.json"), join(appdata, "Cursor", "User", "settings.json"), join(home, ".cargo", "config.toml"), join(home, ".gitconfig")];
+      const files = [
+        join(appdata, "Code", "User", "settings.json"),
+        join(appdata, "Cursor", "User", "settings.json"),
+        join(home, ".cargo", "config.toml"),
+        join(home, ".gitconfig"),
+      ];
       try {
         const pk = join(local, "Packages");
-        for (const d of readdirSync(pk)) if (d.startsWith("Microsoft.WindowsTerminal")) files.push(join(pk, d, "LocalState", "settings.json"));
+        for (const d of readdirSync(pk))
+          if (d.startsWith("Microsoft.WindowsTerminal")) files.push(join(pk, d, "LocalState", "settings.json"));
       } catch {}
       return files.filter(f => existsSync(f));
     },
   };
 }
-

@@ -31,7 +31,9 @@ export const protonCachyos: GithubToolSpec = {
   repo: "CachyOS/proton-cachyos",
   binary: "proton",
   asset: (_tag, platform, arch) =>
-    platform === "linux" ? new RegExp(`^proton-cachyos-.*-${arch === "arm64" ? "arm64" : "x86_64"}\\.tar\\.xz$`) : undefined,
+    platform === "linux"
+      ? new RegExp(`^proton-cachyos-.*-${arch === "arm64" ? "arm64" : "x86_64"}\\.tar\\.xz$`)
+      : undefined,
 };
 export const dxvkRelease: GithubToolSpec = {
   id: "dxvk",
@@ -100,7 +102,10 @@ export function protonRun(protonDir: string, name: string, program: string, args
   };
 }
 
-const notApplicable: Detection = { found: false, notes: ["not applicable on Windows (Wine/Proton run Windows programs on Linux and macOS)"] };
+const notApplicable: Detection = {
+  found: false,
+  notes: ["not applicable on Windows (Wine/Proton run Windows programs on Linux and macOS)"],
+};
 
 export const wineProvider: Provider = {
   id: "wine",
@@ -110,7 +115,10 @@ export const wineProvider: Provider = {
     if (ctx.platform === "win32") return notApplicable;
     const local = findInstalled(wineBuilds);
     const bin = local?.bin ?? which("wine64", ctx) ?? which("wine", ctx);
-    if (!bin) return missing("buncc install wine --run (pinned Kron4ek build, Linux x64) or your distribution's wine/wine-staging");
+    if (!bin)
+      return missing(
+        "buncc install wine --run (pinned Kron4ek build, Linux x64) or your distribution's wine/wine-staging",
+      );
     return { found: true, path: bin, version: await probeVersion(bin, ["--version"], ctx) };
   },
   install: () => ({ commands: [["buncc", "install", "wine", "--run"]] }),
@@ -134,8 +142,10 @@ export const protonProvider: Provider = {
   env: async () => ({}),
 };
 
-export async function ensureWine(kind: "wine" | "proton" | "dxvk" | "vkd3d-proton", options: { tag?: string; fetcher?: typeof fetch; dryRun?: boolean } = {}) {
+export async function ensureWine(
+  kind: "wine" | "proton" | "dxvk" | "vkd3d-proton",
+  options: { tag?: string; fetcher?: typeof fetch; dryRun?: boolean } = {},
+) {
   const spec = { wine: wineBuilds, proton: protonCachyos, dxvk: dxvkRelease, "vkd3d-proton": vkd3dProtonRelease }[kind];
   return installGithubTool(spec, options);
 }
-

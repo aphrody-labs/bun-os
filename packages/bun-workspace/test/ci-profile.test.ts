@@ -38,3 +38,61 @@ test("the ci profile mounts every vendor tree that `bun run setup` and the CI jo
   expect(covered("vendor/material-web")).toBe(true);
   expect(selectSubmodules(file, profile, links).unmatched).toEqual([]);
 });
+
+const repoPath = /(?:packages|factory|scripts|src|infra)\/[\w./-]+\.(?:ts|js|mjs)/g;
+const inCone = (cone: string[], path: string) => cone.some(c => path === c || path.startsWith(`${c}/`));
+
+/** Local files a TypeScript entry imports, transitively (relative specifiers only). */
+async function importClosure(entry: string): Promise<string[]> {
+  const seen = new Set<string>();
+  const queue = [entry];
+  while (queue.length) {
+    const file = queue.pop()!;
+    if (seen.has(file)) continue;
+    seen.add(file);
+    const source = await text(file);
+    for (const m of source.matchAll(/(?:from|import\()\s*"(\.{1,2}\/[^"]+)"/g)) {
+      const base = resolve(root, file, "..", m[1]!).replaceAll("\\", "/");
+      const rel = base.slice(root.replaceAll("\\", "/").length + 1);
+      for (const candidate of [rel, `${rel}.ts`, `${rel}/index.ts`])
+        if (await Bun.file(resolve(root, candidate)).exists()) {
+          queue.push(candidate);
+          break;
+        }
+    }
+  }
+  return [...seen];
+}
+
+test("the bootstrap cone holds every repository file the setup-workspace steps run before the profile is applied", async () => {
+  const workflow = Bun.YAML.parse(await text(".github/workflows/ci.yml")) as {
+    jobs: Record<string, { steps: { with?: Record<string, string>; uses?: string }[] }>;
+  };
+  const action = Bun.YAML.parse(await text(".github/actions/setup-workspace/action.yml")) as {
+    runs: { steps: { name?: string; run?: string; shell?: string }[] };
+  };
+  // Steps up to and including the one that applies the profile run inside the bootstrap cone only.
+  const steps = action.runs.steps;
+  const last = steps.findIndex(s => s.name?.startsWith("Sparse checkout and submodule profile"));
+  expect(last).toBeGreaterThan(-1);
+  const referenced = new Set<string>();
+  for (const step of steps.slice(0, last + 1))
+    for (const m of `${step.shell ?? ""}\n${step.run ?? ""}`.matchAll(repoPath)) referenced.add(m[0]);
+  expect(referenced.size).toBeGreaterThan(0);
+  const files = new Set(referenced);
+  for (const entry of referenced) for (const f of await importClosure(entry)) files.add(f);
+
+  const jobs = Object.entries(workflow.jobs).filter(([, job]) =>
+    job.steps.some(s => s.uses === "./.github/actions/setup-workspace" && s.with?.profile && s.with.profile !== "all"),
+  );
+  expect(jobs.length).toBeGreaterThan(0);
+  for (const [name, job] of jobs) {
+    const checkout = job.steps.find(s => s.uses?.startsWith("actions/checkout"));
+    const cone = String(checkout?.with?.["sparse-checkout"] ?? "")
+      .split("\n")
+      .map(l => l.trim())
+      .filter(Boolean);
+    const missing = [...files].filter(f => !inCone(cone, f));
+    expect({ job: name, missing }).toEqual({ job: name, missing: [] });
+  }
+});

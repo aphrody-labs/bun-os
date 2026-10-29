@@ -29,6 +29,7 @@ jobs:
           sparse-checkout: |
             .github
             packages/bun-workspace
+            packages/buncc
       - uses: ./.github/actions/setup-bun
       - id: areas
         env:
@@ -52,6 +53,7 @@ jobs:
           sparse-checkout: |
             .github
             packages/bun-workspace
+            packages/buncc
       - id: setup
         uses: ./.github/actions/setup-workspace
         with:
@@ -100,6 +102,7 @@ jobs:
           sparse-checkout: |
             .github
             packages/bun-workspace
+            packages/buncc
       - name: System libraries for the native crates (alsa-sys, bevy, tauri)
         if: runner.os == 'Linux'
         run: |
@@ -150,6 +153,7 @@ jobs:
           sparse-checkout: |
             .github
             packages/bun-workspace
+            packages/buncc
       - id: setup
         uses: ./.github/actions/setup-workspace
         with:

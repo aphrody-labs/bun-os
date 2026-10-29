@@ -94,7 +94,10 @@ export const msys2Provider: Provider = {
     const managed = isMsys2Root(managedRoot()) ? managedRoot() : undefined;
     const existing = findMsys2(ctx.env);
     const root = managed ?? existing;
-    if (!root) return missing("not required: use `buncc env posix` and `buncc env mingw`; `buncc env msys2 --ensure` for a managed copy");
+    if (!root)
+      return missing(
+        "not required: use `buncc env posix` and `buncc env mingw`; `buncc env msys2 --ensure` for a managed copy",
+      );
     return {
       found: true,
       path: root,

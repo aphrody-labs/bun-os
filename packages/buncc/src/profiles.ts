@@ -1,7 +1,8 @@
 import { compileArgs } from "./build/bun.ts";
 import { aotPublishArgs } from "./providers/dotnet.ts";
 
-export type ProfileId = "aot-bun" | "aot-dotnet10" | "aot-dotnet11" | "win32-msvc" | "win32-clang" | "win32-mingw" | "glibc-gnu";
+export type ProfileId =
+  "aot-bun" | "aot-dotnet10" | "aot-dotnet11" | "win32-msvc" | "win32-clang" | "win32-mingw" | "glibc-gnu";
 
 export interface ProfileStep {
   title: string;
@@ -194,7 +195,10 @@ export const profiles: Record<ProfileId, Profile> = {
       "gh api mstorsjo/llvm-mingw: 20261020 (x86_64, aarch64, i686, armv7 hosts and targets, UCRT)",
       "Rust platform support: *-pc-windows-gnullvm uses llvm-mingw, *-pc-windows-gnu uses a GCC mingw",
     ],
-    unmeasured: ["size and speed delta against win32-msvc and win32-clang", "aarch64 output was not executed here (no ARM64 Windows host)"],
+    unmeasured: [
+      "size and speed delta against win32-msvc and win32-clang",
+      "aarch64 output was not executed here (no ARM64 Windows host)",
+    ],
     steps: o => {
       const triple = o.target?.includes("aarch64") ? "aarch64-w64-mingw32" : "x86_64-w64-mingw32";
       return [

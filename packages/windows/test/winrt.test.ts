@@ -12,7 +12,14 @@ describe.skipIf(!enabled)("winrt (windows-rs N-API addon)", () => {
 
   test("Uri parses through Windows.Foundation", () => {
     const uri = winrt.parseUri("https://example.com:8443/a/b?x=1#frag");
-    expect(uri).toMatchObject({ scheme: "https", host: "example.com", port: 8443, path: "/a/b", query: "?x=1", fragment: "#frag" });
+    expect(uri).toMatchObject({
+      scheme: "https",
+      host: "example.com",
+      port: 8443,
+      path: "/a/b",
+      query: "?x=1",
+      fragment: "#frag",
+    });
   });
 
   test("an invalid Uri surfaces the HRESULT", () => {
