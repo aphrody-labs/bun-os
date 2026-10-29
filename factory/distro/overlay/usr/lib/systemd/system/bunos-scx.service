@@ -1,0 +1,18 @@
+# sched_ext scheduler loader: the hook point for Bun as control plane (docs/KERNEL-ROADMAP.md, Phase 3).
+# Same shape as sched-ext/scx services/scx.service (v1.1.4, e7b3a219617472cf78880ac424714e52c932db61): started
+# only when the running kernel has sched_ext (CONFIG_SCHED_CLASS_EXT=y, pinned in aphrody-bun.config), the
+# scheduler binary and flags come from /etc/default/bunos-scx. Needs the scx-scheds package; not enabled by default.
+[Unit]
+Description=Bun OS sched_ext scheduler
+ConditionPathIsDirectory=/sys/kernel/sched_ext
+Documentation=https://github.com/sched-ext/scx
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/default/bunos-scx
+ExecStart=/bin/bash -c 'exec ${SCX_SCHEDULER_OVERRIDE:-$SCX_SCHEDULER} ${SCX_FLAGS_OVERRIDE:-$SCX_FLAGS}'
+Restart=on-failure
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

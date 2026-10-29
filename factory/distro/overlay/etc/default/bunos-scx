@@ -1,0 +1,4 @@
+# Read by bunos-scx.service. SCX_SCHEDULER is a binary from scx-scheds (scx_cosmos is the CachyOS default,
+# CachyOS/CachyOS-PKGBUILDS scx-scheds 1.1.4); empty flags use the scheduler's defaults.
+SCX_SCHEDULER=scx_cosmos
+SCX_FLAGS=

@@ -611,10 +611,7 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "consumedBy": [
-        "file:src/cli/commands.ts",
-        "file:py/docs/migration/source-map.json"
-      ]
+      "consumedBy": ["file:src/cli/commands.ts", "file:py/docs/migration/source-map.json"]
     },
     {
       "id": "submodule:vendor/3ds-hbmenu",
@@ -656,11 +653,7 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "consumedBy": [
-        "crate:crates/re",
-        "npm:@aphrody/bun-emu-host",
-        "npm:@aphrody/bun-engine"
-      ]
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-emu-host", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/bash",
@@ -1311,11 +1304,7 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "consumedBy": [
-        "crate:crates/re",
-        "npm:@aphrody/bun-emu-host",
-        "npm:@aphrody/bun-engine"
-      ]
+      "consumedBy": ["crate:crates/re", "npm:@aphrody/bun-emu-host", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/dust",
@@ -1599,11 +1588,7 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "consumedBy": [
-        "crate:crates/aphrody-nds-sys",
-        "crate:crates/re",
-        "npm:@aphrody/bun-engine"
-      ]
+      "consumedBy": ["crate:crates/aphrody-nds-sys", "crate:crates/re", "npm:@aphrody/bun-engine"]
     },
     {
       "id": "submodule:vendor/libogc",
@@ -2268,10 +2253,7 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "consumedBy": [
-        "npm:@aphrody/m3-design",
-        "file:packages/m3-design/intelligence/ui-ux-pro-max/SKILL.md"
-      ],
+      "consumedBy": ["npm:@aphrody/m3-design", "file:packages/m3-design/intelligence/ui-ux-pro-max/SKILL.md"],
       "edges": {
         "consumers": ["skill:ui-ux-pro-max"]
       },
@@ -19764,6 +19746,127 @@
       "registration": ["none"],
       "aot": true,
       "status": "present"
+    },
+    {
+      "id": "factory:distro/migrate",
+      "kind": "factory-module",
+      "path": "factory/distro",
+      "source": {
+        "type": "factory",
+        "files": ["factory/distro/migrate.ts", "factory/distro/migrations/.gitkeep"]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/omarchy"],
+      "note": "Omarchy-style timestamped migrations with per-user markers (omacom/omarchy bin/omarchy-migrate)."
+    },
+    {
+      "id": "factory:distro/hw",
+      "kind": "factory-module",
+      "path": "factory/distro",
+      "source": {
+        "type": "factory",
+        "files": ["factory/distro/hw.ts", "factory/distro/hw/profiles.toml"]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/chwd"],
+      "note": "chwd-style hardware profile planner; read-only, installs nothing."
+    },
+    {
+      "id": "factory:distro/repos",
+      "kind": "factory-module",
+      "path": "factory/distro",
+      "source": {
+        "type": "factory",
+        "files": ["factory/distro/repos.ts"]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/cachyos-pkgbuilds", "submodule:vendor/cachyos-repo-manage-util"],
+      "note": "x86-64 / v3 / v4 / znver4 repository layers for pacman.conf (CachyOS cachyos-repo-add-script model)."
+    },
+    {
+      "id": "factory:distro/kernel-variants",
+      "kind": "factory-module",
+      "path": "factory/distro",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/distro/kernel-variant.ts",
+          "factory/kernel/linux-bun/variants/desktop.config",
+          "factory/kernel/linux-bun/variants/server.config"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/linux-cachyos"],
+      "note": "linux-bun config fragments (HZ, NO_HZ, preempt, THP); BORE/ISA-level/O3 rejected without the CachyOS patch set. Not wired into the PKGBUILD, not built."
+    },
+    {
+      "id": "factory:distro/cosmic",
+      "kind": "factory-module",
+      "path": "factory/distro",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/distro/cosmic.ts",
+          "factory/distro/cosmic/defaults/com.system76.CosmicAppList/v1/favorites",
+          "factory/distro/cosmic/defaults/com.system76.CosmicTheme.Mode/v1/is_dark"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/cosmic-epoch"],
+      "note": "cosmic-config system defaults and the user/previous/system resolver."
+    },
+    {
+      "id": "factory:distro/theme",
+      "kind": "factory-module",
+      "path": "factory/distro",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/distro/theme.ts",
+          "factory/distro/layers.ts",
+          "factory/distro/themes/bunos/colors.toml",
+          "factory/distro/themed/cosmic-accent.ron.tpl",
+          "factory/distro/themed/colors.env.tpl"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/omarchy"],
+      "note": "colors.toml templating, package-vs-user config refresh and hooks (Omarchy model)."
+    },
+    {
+      "id": "factory:distro/overlay",
+      "kind": "factory-module",
+      "path": "factory/distro",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/distro/overlay/usr/lib/sysctl.d/70-bunos-settings.conf",
+          "factory/distro/overlay/usr/lib/udev/rules.d/60-ioschedulers.rules",
+          "factory/distro/overlay/usr/lib/systemd/zram-generator.conf",
+          "factory/distro/overlay/usr/lib/tmpfiles.d/thp.conf",
+          "factory/distro/overlay/usr/lib/systemd/journald.conf.d/00-journal-size.conf",
+          "factory/distro/overlay/usr/lib/systemd/system.conf.d/10-limits.conf",
+          "factory/distro/overlay/usr/lib/systemd/system/bunos-scx.service",
+          "factory/distro/overlay/etc/default/bunos-scx"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/linux-cachyos"],
+      "note": "CachyOS-Settings derived system files plus the sched_ext loader unit (kernel control-plane hook)."
     }
   ]
 }

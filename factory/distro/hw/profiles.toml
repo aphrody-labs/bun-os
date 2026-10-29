@@ -1,0 +1,69 @@
+# Bun OS hardware profiles. Format after CachyOS/chwd (profiles/pci/graphic_drivers, chwd 1.25.0 / 4c61525942aa);
+# package sets are Arch repository names, not copies of chwd's CachyOS-specific ones (no cachyos-drm-awaiter,
+# no CachyOS kernel packages). `bun factory/distro/cli.ts hw plan` prints the selection; nothing is installed here.
+# Lists are whitespace-separated. Missing class_ids/vendor_ids/device_ids match everything.
+
+[intel]
+desc = "Intel integrated graphics (Mesa)"
+priority = 4
+class_ids = "0300 0302 0380"
+vendor_ids = "8086"
+driver_conflict_group = "gpu-intel"
+packages = "mesa vulkan-intel intel-media-driver"
+
+[amd]
+desc = "AMD Radeon (Mesa RADV)"
+priority = 4
+class_ids = "0300 0302 0380"
+vendor_ids = "1002"
+driver_conflict_group = "gpu-amd"
+packages = "mesa vulkan-radeon"
+
+# NVIDIA open kernel modules cover Turing and newer only. The device list is an ids file that is NOT shipped:
+# without factory/distro/hw/ids/nvidia-open.ids no NVIDIA device matches this profile and `fallback` applies.
+[nvidia-open-dkms]
+desc = "NVIDIA open kernel modules (needs ids/nvidia-open.ids)"
+priority = 10
+class_ids = "0300 0302 0380"
+vendor_ids = "10de"
+device_ids = ">ids/nvidia-open.ids"
+driver_conflict_group = "gpu-nvidia"
+packages = "nvidia-open-dkms nvidia-utils egl-wayland nvidia-settings libva-nvidia-driver"
+
+[nvidia-open-dkms.prime]
+desc = "NVIDIA hybrid laptop (PRIME offload)"
+priority = 11
+chassis_types = "8 9 10 11 31"
+packages = "nvidia-open-dkms nvidia-utils egl-wayland nvidia-settings libva-nvidia-driver nvidia-prime switcheroo-control"
+
+[fallback]
+desc = "Any display adapter: software Vulkan and generic Mesa"
+priority = 3
+class_ids = "0300 0302 0380"
+vendor_ids = "1002 8086 10de"
+driver_conflict_group = "gpu-fallback"
+packages = "mesa vulkan-swrast"
+
+[qemu]
+desc = "QEMU/KVM guest"
+priority = 5
+class_ids = "0300 0302 0380"
+environment_types = "kvm qemu"
+driver_conflict_group = "gpu-vm"
+packages = "qemu-guest-agent spice-vdagent vulkan-virtio mesa"
+
+[vmware]
+desc = "VMware guest"
+priority = 5
+class_ids = "0300 0302 0380"
+environment_types = "vmware"
+driver_conflict_group = "gpu-vm"
+packages = "open-vm-tools mesa"
+
+[virtualbox]
+desc = "VirtualBox guest"
+priority = 5
+class_ids = "0300 0302 0380"
+environment_types = "oracle"
+driver_conflict_group = "gpu-vm"
+packages = "virtualbox-guest-utils mesa"

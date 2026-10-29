@@ -28,7 +28,7 @@ const read = (path: string) => Bun.file(join(root, path)).text();
 
 const manifest = await Bun.file(join(root, "factory/bunos/components.json")).json();
 const modes = new Set(Object.keys(manifest.registrationModes ?? {}));
-const kinds = new Set(["submodule", "npm-package", "app", "crate", "crate-dependency"]);
+const kinds = new Set(["submodule", "npm-package", "app", "crate", "crate-dependency", "factory-module"]);
 const AOT_BLOCKERS = ["bunfig-preload", "bun-plugin"];
 const UPSTREAM_BUN_MODULES = new Set(["test", "sqlite", "ffi", "jsc", "bundle"]);
 
@@ -111,6 +111,10 @@ for (const mod of manifest.modules ?? []) {
     const name = text.match(/^\[package\][\s\S]*?^name\s*=\s*"([^"]+)"/m)?.[1];
     if (name !== source.name) fail(`${id}: Cargo.toml package ${name} != ${source.name}`);
     if (!pathCrates.has(source.name)) fail(`${id}: ${source.name} is not in Cargo.lock`);
+  } else if (source.type === "factory") {
+    // Source files of the factory (no package manifest): every listed file must be tracked.
+    if (!Array.isArray(source.files) || !source.files.length) fail(`${id}: factory source needs a files list`);
+    for (const file of source.files ?? []) if (!tracked.has(file)) fail(`${id}: ${file} is not a tracked file`);
   } else if (source.type === "crates.io") {
     const versions = locked.get(source.name);
     if (!versions) fail(`${id}: ${source.name} not locked in Cargo.lock`);
@@ -145,22 +149,37 @@ void workspaceVersion;
 // ---- workspace integration -----------------------------------------------------------------------------------------
 const integration: Integration | undefined = manifest.workspaceIntegration;
 let graphSummary = "";
-if (!integration?.cargo?.excluded || !integration?.npm?.excluded) fail("workspaceIntegration: cargo.excluded and npm.excluded maps are required");
+if (!integration?.cargo?.excluded || !integration?.npm?.excluded)
+  fail("workspaceIntegration: cargo.excluded and npm.excluded maps are required");
 else {
-  for (const [eco, map] of [["cargo", integration.cargo.excluded], ["npm", integration.npm.excluded]] as const)
+  for (const [eco, map] of [
+    ["cargo", integration.cargo.excluded],
+    ["npm", integration.npm.excluded],
+  ] as const)
     for (const [path, reason] of Object.entries(map))
-      if (typeof reason !== "string" || reason.trim().length < 12) fail(`workspaceIntegration.${eco}.excluded[${path}]: a reason is required`);
+      if (typeof reason !== "string" || reason.trim().length < 12)
+        fail(`workspaceIntegration.${eco}.excluded[${path}]: a reason is required`);
   const graph = await buildGraph(root, manifest, integration);
-  for (const dir of graph.cargoOrphans) fail(`crate ${dir}: not a member of the root Cargo workspace and not in workspaceIntegration.cargo.excluded`);
-  for (const dir of graph.npmOrphans) fail(`package ${dir}: not in the root package.json workspaces and not in workspaceIntegration.npm.excluded`);
-  for (const path of graph.rootExcludeMissingReason) fail(`Cargo.toml exclude ${path}: no reason in workspaceIntegration.cargo.excluded`);
-  for (const path of graph.cargoStaleExcludes) fail(`workspaceIntegration.cargo.excluded[${path}]: path does not exist`);
+  for (const dir of graph.cargoOrphans)
+    fail(`crate ${dir}: not a member of the root Cargo workspace and not in workspaceIntegration.cargo.excluded`);
+  for (const dir of graph.npmOrphans)
+    fail(`package ${dir}: not in the root package.json workspaces and not in workspaceIntegration.npm.excluded`);
+  for (const path of graph.rootExcludeMissingReason)
+    fail(`Cargo.toml exclude ${path}: no reason in workspaceIntegration.cargo.excluded`);
+  for (const path of graph.cargoStaleExcludes)
+    fail(`workspaceIntegration.cargo.excluded[${path}]: path does not exist`);
   for (const path of graph.npmStaleExcludes) fail(`workspaceIntegration.npm.excluded[${path}]: path does not exist`);
   for (const mod of manifest.modules ?? [])
-    if (mod.kind === "crate" && !graph.cargoMembers.has(mod.path) && ![...graph.cargoExcluded.keys()].some(d => d === mod.path || mod.path.startsWith(d + "/")) && !Object.keys(integration.cargo.excluded).some(p => mod.path === p || mod.path.startsWith(p + "/")))
+    if (
+      mod.kind === "crate" &&
+      !graph.cargoMembers.has(mod.path) &&
+      ![...graph.cargoExcluded.keys()].some(d => d === mod.path || mod.path.startsWith(d + "/")) &&
+      !Object.keys(integration.cargo.excluded).some(p => mod.path === p || mod.path.startsWith(p + "/"))
+    )
       fail(`${mod.id}: listed in the manifest but neither a workspace member nor an explicit exclusion`);
   for (const mod of manifest.modules ?? [])
-    if ((mod.kind === "npm-package" || mod.kind === "app") && !graph.npmMembers.has(mod.path)) fail(`${mod.id}: not in the root package.json workspaces`);
+    if ((mod.kind === "npm-package" || mod.kind === "app") && !graph.npmMembers.has(mod.path))
+      fail(`${mod.id}: not in the root package.json workspaces`);
   for (const ref of graph.unresolved) fail(`edge does not resolve: ${ref}`);
   for (const id of graph.isolated) fail(`${id}: isolated (no dependency edge in or out; add dependsOn/consumedBy)`);
   graphSummary =

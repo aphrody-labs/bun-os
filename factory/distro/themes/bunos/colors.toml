@@ -1,0 +1,10 @@
+# Bun OS base theme. Keys follow Omarchy's colors.toml (omacom/omarchy themes/*/colors.toml, 84782475aeb8).
+mode = "dark"
+accent = "#fbf0df"
+background = "#14151a"
+foreground = "#fbf0df"
+selection = "#2a2c36"
+muted = "#8a8c99"
+red = "#e5484d"
+green = "#46a758"
+blue = "#3e63dd"
