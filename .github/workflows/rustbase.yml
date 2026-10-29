@@ -78,7 +78,7 @@ jobs:
           chown -R builder:builder /var/cache/cargo /out /home/builder/build
           for p in bunos-uutils-multicall bunos-sudo-rs bunos-nushell-default bunos-rust-base; do
             echo "::group::makepkg $p"
-            su builder -c "cd /home/builder/build/$p && CARGO_HOME=/var/cache/cargo PKGDEST=/out makepkg -f --noconfirm --skippgpcheck"
+            su builder -c "cd /home/builder/build/$p && CARGO_HOME=/var/cache/cargo PKGDEST=/out makepkg -f -d --noconfirm --skippgpcheck"
             echo "::endgroup::"
           done
           ls -l /out
@@ -144,6 +144,7 @@ jobs:
         if: always()
         run: |
           python3 uutils/util/gnu-json-result.py gnu/tests > gnu-result.json
+          set -o pipefail
           python3 - <<'PY' | tee gnu-summary.json
           import json
           from collections import Counter
@@ -176,7 +177,7 @@ jobs:
           repository: aphrody-labs/uutils-util-linux
           ref: ${{ needs.check.outputs.util_linux_sha }}
       - name: libsmartcols and libclang for smartcols-sys
-        run: sudo apt-get update && sudo apt-get install -y libsmartcols-dev libclang-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libsmartcols-dev libmount-dev libblkid-dev uuid-dev libclang-dev pkg-config
       - uses: Swatinem/rust-cache@v2
       - name: cargo test (uutils util-linux fork at the pinned commit)
         continue-on-error: true
@@ -184,6 +185,7 @@ jobs:
       - name: Totals
         if: always()
         run: |
+          set -o pipefail
           python3 - <<'PY' | tee util-linux-summary.json
           import re, json
           p = f = i = 0
