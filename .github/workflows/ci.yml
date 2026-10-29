@@ -55,8 +55,10 @@ jobs:
       - name: Format
         run: bun scripts/cargo-fmt.ts
       - name: Check every workspace member
+        if: ${{ !cancelled() }}
         run: bun scripts/cargo.ts check
       - name: Clippy
+        if: ${{ !cancelled() }}
         run: bun scripts/cargo.ts exec -- clippy --workspace --all-targets --locked -- -D warnings
 
   release-plan:
