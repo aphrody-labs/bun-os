@@ -39,7 +39,7 @@ rustls = { version = "0.23", default-features = false, features = ["ring", "std"
 tokio = { version = "1.53.1", features = ["process", "rt-multi-thread", "macros", "time", "signal", "sync", "fs", "io-util", "full"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-aphrody-proc = { path = "../aphrody-proc", version = "1.4.7", features = [] }
+aphrody-proc = { path = "../aphrody-proc", version = "1.4.7", features = ["tokio"] }
 aphrody-web-service = { package = "bun_browser_service", version = "1.4.7", features = ["render"] }
 tokio = { version = "1.53.1", features = ["process","rt-multi-thread","macros","time","signal","sync","fs","io-util","full"] }
 
