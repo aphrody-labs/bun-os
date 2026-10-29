@@ -41,4 +41,4 @@ receipt is evidence only for the exact revisions, target and gates it records.
 The root `distribution.json` currently labels qualification as `development`.
 
 See [the root README](../README.md), [repository architecture](../docs/architecture.md)
-and [qualification guide](../docs/qualification.md).
+and [qualification guide](../docs/NATIVE-QUALIFICATION.md).

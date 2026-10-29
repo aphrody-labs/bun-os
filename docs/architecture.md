@@ -46,5 +46,5 @@ assembly does not transfer upstream source ownership.
 Keep source inventory, package resolution, compilation, tests, runtime checks,
 image assembly, boot/hardware validation and release qualification distinct.
 Report a stage only when its current receipt or command output establishes it.
-`PLAN.md` tracks migration work; `factory/` and `docs/qualification.md` describe
+`PLAN.md` tracks migration work; `factory/` and `docs/NATIVE-QUALIFICATION.md` describe
 factory and qualification interfaces.

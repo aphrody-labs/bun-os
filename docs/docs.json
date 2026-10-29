@@ -69,10 +69,8 @@
             "pages": [
               "/NATIVE-TARGETS",
               "/SOURCE-EXPORT",
-              "/builds",
               "/APP-BUILDS",
               "/artifacts",
-              "/qualification",
               "/NATIVE-QUALIFICATION"
             ]
           },
@@ -81,7 +79,6 @@
             "icon": "server",
             "pages": [
               "/control-plane",
-              "/DEPLOYMENT-CONTROL",
               "/PRODUCT-SERVER",
               "/APP-DOMAINS",
               "/source-private-network",

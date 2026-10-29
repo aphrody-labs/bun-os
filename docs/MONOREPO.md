@@ -21,7 +21,7 @@ the pages that own the details. Generated data is not copied here: see
 | `toolchains/` | Legacy: held the abandoned Bun runtime fork (`toolchains/bun`, removed). The runtime is now unmodified upstream Bun, pinned by `packageManager` in `package.json` (`bun@1.4.4-canary.20261028.1`) |
 | `factory/` | OS composition: Arch package profile, `/usr` composition, container images (`factory/images/*`), qualification |
 | `infra/` | Routes, hosts, runtime pins, shared assets and deployment control |
-| `docs/` | Documentation; this page, [architecture](architecture.md), [builds](builds.md), [qualification](qualification.md) |
+| `docs/` | Documentation; this page, [architecture](architecture.md), [builds](APP-BUILDS.md), [qualification](NATIVE-QUALIFICATION.md) |
 | `replica/` | Recon, screens and feature matrices for reference products (study only) |
 | `scripts/`, `src/` | Root CLI (`bun src/cli.ts`), release and workspace tooling |
 

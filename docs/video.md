@@ -51,7 +51,7 @@ The parallel Bun session owns native codec internalization. The installed
 `1.4.4` runtime at `2ae8fc65fba1d05c423a2433b1195835109942b6` currently has no
 Bun.Video API. The adapter reports this and does not substitute an unqualified
 provider. Native availability alone does not qualify codecs, video encoding or
-frame accuracy. See [qualification](qualification.md).
+frame accuracy. See [qualification](NATIVE-QUALIFICATION.md).
 
 ## Bun Video package
 

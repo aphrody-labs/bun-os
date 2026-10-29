@@ -25,7 +25,7 @@ declared/prepared inputs from build and qualification evidence.
 - Package/source conversion: src/apt.ts and packages/package-converter/.
 - Standalone compiler and assets: [app builds](docs/APP-BUILDS.md).
 - Public routing: [app domains](docs/APP-DOMAINS.md).
-- Control plane and workflows: [deployment control](docs/DEPLOYMENT-CONTROL.md).
+- Control plane and workflows: [deployment control](docs/control-plane.md).
 
 Start with the native help and read-only plan:
 
