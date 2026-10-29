@@ -29,7 +29,7 @@ jobs:
       - name: Toolchain (rustc >= 1.85, bindgen >= 0.71.1, LLVM)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends clang lld llvm libclang-dev flex bison bc libssl-dev libelf-dev dwarves zstd gnupg xz-utils cpio e2fsprogs qemu-utils
+          sudo apt-get install -y --no-install-recommends clang lld llvm libclang-dev flex bison bc libssl-dev libelf-dev dwarves zstd gnupg xz-utils cpio
           rustup toolchain install stable --profile minimal --component rust-src
           rustup default stable
           cargo install bindgen-cli --version 0.71.1 --locked
@@ -56,9 +56,8 @@ jobs:
         with:
           name: wsl-kernel-${{ inputs.kver || '7.3' }}
           path: |
-            out/perf-build.log
             out/bzImage
-            out/modules.vhdx
+            out/modules.tar.zst
             out/config
             out/report.json
             out/rustavailable.txt
@@ -75,11 +74,9 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Build kernel-open against v7.3 headers
-        env:
-          IGNORE_MISSING_MODULE_SYMVERS: "1"  # modules_prepare does not produce Module.symvers; this is a compile check only
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential flex bison bc libssl-dev libelf-dev xz-utils curl clang lld llvm dwarves
+          sudo apt-get install -y --no-install-recommends build-essential flex bison bc libssl-dev libelf-dev xz-utils curl clang lld llvm
           curl -fsSLO https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-${{ matrix.kver }}.tar.xz
           tar xf linux-${{ matrix.kver }}.tar.xz
           git clone --depth 1 --branch 615.78.08 https://github.com/aphrody-labs/open-gpu-kernel-modules.git nv

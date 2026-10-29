@@ -47,21 +47,7 @@ passwd -l bun
 # The Windows user already owns this VM; passwordless wheel keeps `wsl -d` + sudo usable without an OOBE.
 echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' >/etc/sudoers.d/10-bunos-wheel && chmod 440 /etc/sudoers.d/10-bunos-wheel
 sed -i 's/^NAME=.*/NAME="Bun OS (WSL)"/;s/^ID=.*/ID=arch/' /etc/os-release
-# Microsoft's list of units that break WSL (Learn build-custom-distro "Systemd recommendations" and
-# distributions/validate-modern.py DISCOURAGED_SYSTEM_UNITS): mask them for system and user managers.
-# WSL generates /etc/resolv.conf itself ([network] generateResolvConf=true), so systemd-resolved stays masked.
-units=(systemd-resolved.service systemd-networkd.service systemd-networkd-wait-online.service
-  NetworkManager.service NetworkManager-wait-online.service networking.service
-  systemd-tmpfiles-setup.service systemd-tmpfiles-clean.service systemd-tmpfiles-clean.timer
-  systemd-tmpfiles-setup-dev-early.service systemd-tmpfiles-setup-dev.service
-  systemd-vconsole-setup.service tmp.mount console-getty.service hypervkvpd.service)
-systemctl mask "${units[@]}"
-systemctl --global mask "${units[@]}"
-# WSL files: configuration, icon, no resolv.conf, locked passwords (no hashes in /etc/shadow).
-install -Dm644 /opt/bunos/factory/wsl/wsl.conf /etc/wsl.conf
-install -Dm644 /opt/bunos/factory/wsl/wsl-distribution.conf /etc/wsl-distribution.conf
-install -Dm644 /opt/bunos/factory/wsl/bunos.ico /usr/lib/wsl/bunos.ico
-usermod -p '!' root
-usermod -p '!' bun
-rm -f /etc/resolv.conf
+systemctl enable systemd-resolved.service systemd-timesyncd.service || true
+# WSL generates /etc/resolv.conf and mounts its own units; keep these masked as Microsoft's guidance does.
+systemctl mask systemd-networkd-wait-online.service systemd-networkd.service || true
 rm -rf /var/cache/pacman/pkg/* /etc/pacman.d/gnupg/S.* 2>/dev/null || true

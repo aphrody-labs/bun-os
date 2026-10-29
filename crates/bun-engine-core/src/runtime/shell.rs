@@ -473,10 +473,10 @@ fn navigate(
                 });
                 feedback.captures.request(
                     4,
-                    config
-                        .state_dir
-                        .join("screenshots")
-                        .join(format!("{}-{}-window.png", status.name, status.frames)),
+                    config.state_dir.join("screenshots").join(format!(
+                        "{}-{}-window.png",
+                        status.name, status.frames
+                    )),
                 );
             }
             next.set(ShellState::Playing);
@@ -497,11 +497,7 @@ fn highlight(
 ) {
     for (item, mut outline, mut background) in &mut items {
         let focused = item.0 == cursor.0;
-        outline.color = if focused {
-            theme::color(Role::Accent)
-        } else {
-            Color::NONE
-        };
+        outline.color = if focused { theme::color(Role::Accent) } else { Color::NONE };
         background.0 = if focused {
             theme::color(Role::Border)
         } else {
@@ -510,11 +506,7 @@ fn highlight(
     }
 }
 
-fn collect_results(
-    mut results: MessageReader<MachineStateResult>,
-    mut toast: ResMut<Toast>,
-    time: Res<Time>,
-) {
+fn collect_results(mut results: MessageReader<MachineStateResult>, mut toast: ResMut<Toast>, time: Res<Time>) {
     for result in results.read() {
         toast.text = match result {
             MachineStateResult::Saved(Ok(p)) => format!("Saved: {}", p.display()),

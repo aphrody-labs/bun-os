@@ -113,8 +113,7 @@
         "vendor/cargo-3ds",
         "vendor/cef-rs",
         "vendor/citro3d-rs",
-        "vendor/ctru-rs",
-        "vendor/chipi-spec"
+        "vendor/ctru-rs"
       ]
     }
   }

@@ -35,8 +35,7 @@ use crate::bevy::{
         keyboard::KeyCode,
     },
     input_focus::{
-        FocusCause, InputFocus, InputFocusVisible,
-        directional_navigation::DirectionalNavigationPlugin,
+        FocusCause, InputFocus, InputFocusVisible, directional_navigation::DirectionalNavigationPlugin,
     },
     math::{CompassOctant, Vec2},
     state::prelude::*,
@@ -52,7 +51,7 @@ use crate::bevy::{
 };
 
 use super::{
-    shell::{RING, ShellConfig, ShellState, Toast, rumble_confirm},
+    shell::{RING, ShellState, Toast, rumble_confirm, ShellConfig},
     theme::{self, Role},
 };
 
@@ -98,26 +97,10 @@ impl MockLibrary {
     pub fn sample() -> Self {
         let systems = ["nes", "gba", "nds", "psx"];
         let titles = [
-            "Alter Ego",
-            "Lan Master",
-            "Hello GBA",
-            "Micro Mages",
-            "Star Harbor",
-            "Pocket Rally",
-            "Blue Orchard",
-            "Night Courier",
-            "Paper Moon",
-            "Iron Garden",
-            "Loop Runner",
-            "Glass Maze",
-            "Tiny Orbit",
-            "Copper Trail",
-            "Salt Flats",
-            "Echo Valley",
-            "Brass Keys",
-            "Lantern Run",
-            "Pixel Harvest",
-            "Quiet Reactor",
+            "Alter Ego", "Lan Master", "Hello GBA", "Micro Mages", "Star Harbor", "Pocket Rally",
+            "Blue Orchard", "Night Courier", "Paper Moon", "Iron Garden", "Loop Runner",
+            "Glass Maze", "Tiny Orbit", "Copper Trail", "Salt Flats", "Echo Valley", "Brass Keys",
+            "Lantern Run", "Pixel Harvest", "Quiet Reactor",
         ];
         let games = titles
             .iter()
@@ -132,35 +115,20 @@ impl MockLibrary {
                 last_played: (i < 6).then(|| format!("2026-10-{:02} 20:00:00", 22 - i)),
             })
             .collect();
-        Self {
-            games,
-            error: None,
-            delay: Duration::ZERO,
-        }
+        Self { games, error: None, delay: Duration::ZERO }
     }
 
     pub fn empty() -> Self {
-        Self {
-            games: Vec::new(),
-            error: None,
-            delay: Duration::ZERO,
-        }
+        Self { games: Vec::new(), error: None, delay: Duration::ZERO }
     }
 
     pub fn failing(message: impl Into<String>) -> Self {
-        Self {
-            games: Vec::new(),
-            error: Some(message.into()),
-            delay: Duration::ZERO,
-        }
+        Self { games: Vec::new(), error: Some(message.into()), delay: Duration::ZERO }
     }
 
     /// A library that never answers within a session (for the `Loading` state).
     pub fn slow() -> Self {
-        Self {
-            delay: Duration::from_secs(3600),
-            ..Self::sample()
-        }
+        Self { delay: Duration::from_secs(3600), ..Self::sample() }
     }
 }
 
@@ -207,10 +175,7 @@ impl LibrarySource for SqliteLibrary {
     fn load(&self) -> Result<Vec<Game>, String> {
         use rusqlite::{Connection, OpenFlags};
         if !self.path.is_file() {
-            return Err(format!(
-                "no library at {} (scan sources with the frontend first)",
-                self.path.display()
-            ));
+            return Err(format!("no library at {} (scan sources with the frontend first)", self.path.display()));
         }
         let db = Connection::open_with_flags(
             &self.path,
@@ -246,8 +211,7 @@ impl LibrarySource for SqliteLibrary {
                 })
             })
             .map_err(|e| e.to_string())?;
-        rows.collect::<Result<Vec<_>, _>>()
-            .map_err(|e| e.to_string())
+        rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
     }
 }
 
@@ -285,10 +249,7 @@ pub struct HomeData {
 
 impl Default for HomeData {
     fn default() -> Self {
-        Self {
-            load: HomeLoad::Loading,
-            games: Vec::new(),
-        }
+        Self { load: HomeLoad::Loading, games: Vec::new() }
     }
 }
 
@@ -376,11 +337,7 @@ fn enter_home(mut ui: ResMut<HomeUi>, mut visible: ResMut<InputFocusVisible>) {
     visible.0 = true;
 }
 
-fn leave_home(
-    mut commands: Commands,
-    roots: Query<Entity, With<HomeRoot>>,
-    mut focus: ResMut<InputFocus>,
-) {
+fn leave_home(mut commands: Commands, roots: Query<Entity, With<HomeRoot>>, mut focus: ResMut<InputFocus>) {
     for root in &roots {
         commands.entity(root).despawn();
     }
@@ -450,32 +407,13 @@ fn gather_input(
     mut commands: MessageWriter<HomeCommand>,
     mut stick_was: Local<Option<CompassOctant>>,
 ) {
-    let key = |codes: &[KeyCode]| {
-        keys.as_ref()
-            .is_some_and(|k| codes.iter().any(|c| k.just_pressed(*c)))
-    };
+    let key = |codes: &[KeyCode]| keys.as_ref().is_some_and(|k| codes.iter().any(|c| k.just_pressed(*c)));
     let pad = |button: GamepadButton| pads.iter().any(|p| p.just_pressed(button));
     for (octant, codes, button) in [
-        (
-            CompassOctant::North,
-            [KeyCode::ArrowUp, KeyCode::KeyW],
-            GamepadButton::DPadUp,
-        ),
-        (
-            CompassOctant::South,
-            [KeyCode::ArrowDown, KeyCode::KeyS],
-            GamepadButton::DPadDown,
-        ),
-        (
-            CompassOctant::West,
-            [KeyCode::ArrowLeft, KeyCode::KeyA],
-            GamepadButton::DPadLeft,
-        ),
-        (
-            CompassOctant::East,
-            [KeyCode::ArrowRight, KeyCode::KeyD],
-            GamepadButton::DPadRight,
-        ),
+        (CompassOctant::North, [KeyCode::ArrowUp, KeyCode::KeyW], GamepadButton::DPadUp),
+        (CompassOctant::South, [KeyCode::ArrowDown, KeyCode::KeyS], GamepadButton::DPadDown),
+        (CompassOctant::West, [KeyCode::ArrowLeft, KeyCode::KeyA], GamepadButton::DPadLeft),
+        (CompassOctant::East, [KeyCode::ArrowRight, KeyCode::KeyD], GamepadButton::DPadRight),
     ] {
         if key(&codes) || pad(button) {
             commands.write(HomeCommand::Move(octant));
@@ -488,11 +426,7 @@ fn gather_input(
         .find(|v| v.length() > 0.6)
         .map(|v: Vec2| {
             if v.x.abs() > v.y.abs() {
-                if v.x > 0.0 {
-                    CompassOctant::East
-                } else {
-                    CompassOctant::West
-                }
+                if v.x > 0.0 { CompassOctant::East } else { CompassOctant::West }
             } else if v.y > 0.0 {
                 CompassOctant::North
             } else {
@@ -539,9 +473,7 @@ fn apply_commands(
             }
             HomeCommand::Reload => ui.reload = true,
             HomeCommand::Activate => {
-                let Some(action) = navigator.input_focus().and_then(|e| actions.get(e).ok()) else {
-                    continue;
-                };
+                let Some(action) = navigator.input_focus().and_then(|e| actions.get(e).ok()) else { continue };
                 rumble_confirm(config.rumble, &gamepads, &mut rumble);
                 match action {
                     HomeAction::Play(index) => {
@@ -574,11 +506,7 @@ fn focus_ring(
 ) {
     for (entity, mut outline, mut background, base) in &mut items {
         let focused = visible.0 && focus.get() == Some(entity);
-        let ring = if focused {
-            theme::color(Role::Accent)
-        } else {
-            Color::NONE
-        };
+        let ring = if focused { theme::color(Role::Accent) } else { Color::NONE };
         if outline.color != ring {
             outline.color = ring;
         }
@@ -613,20 +541,13 @@ fn metrics(width: f32, height: f32) -> Metrics {
     let cols = (((inner + GAP) / (TILE_W + GAP)).floor() as usize).max(1);
     // Header, hero, shelf, labels, footer, paddings and gaps.
     let rows = (((height - 440.0 + GAP) / (TILE_H + GAP)).floor() as isize).max(1) as usize;
-    Metrics {
-        tile_w: TILE_W,
-        gap: GAP,
-        cap: cols * rows,
-    }
+    Metrics { tile_w: TILE_W, gap: GAP, cap: cols * rows }
 }
 
 fn label(text: impl Into<String>, size: f32, role: Role) -> impl Bundle {
     (
         Text::new(text),
-        TextFont {
-            font_size: FontSize::Px(size),
-            ..Default::default()
-        },
+        TextFont { font_size: FontSize::Px(size), ..Default::default() },
         TextColor(theme::color(role)),
     )
 }
@@ -643,11 +564,7 @@ fn focusable(action: HomeAction, base: Color) -> impl Bundle {
 }
 
 /// Games shown as tiles: the current filter, in library order, as many as fit.
-fn visible_games<'a>(
-    data: &'a HomeData,
-    filter: &Option<String>,
-    cap: usize,
-) -> Vec<(usize, &'a Game)> {
+fn visible_games<'a>(data: &'a HomeData, filter: &Option<String>, cap: usize) -> Vec<(usize, &'a Game)> {
     data.games
         .iter()
         .enumerate()
@@ -996,12 +913,9 @@ fn centered(root: &mut ChildSpawnerCommands, build: impl FnOnce(&mut ChildSpawne
 
 /// One-line description of the focused element (for BRP and logs).
 pub fn describe_focus(focus: &InputFocus, actions: &Query<&HomeAction>) -> Option<String> {
-    focus
-        .get()
-        .and_then(|e| actions.get(e).ok())
-        .map(|a| match a {
-            HomeAction::Play(i) => format!("play:{i}"),
-            HomeAction::Filter(s) => format!("filter:{}", s.as_deref().unwrap_or("all")),
-            HomeAction::Retry => "retry".to_owned(),
-        })
+    focus.get().and_then(|e| actions.get(e).ok()).map(|a| match a {
+        HomeAction::Play(i) => format!("play:{i}"),
+        HomeAction::Filter(s) => format!("filter:{}", s.as_deref().unwrap_or("all")),
+        HomeAction::Retry => "retry".to_owned(),
+    })
 }
