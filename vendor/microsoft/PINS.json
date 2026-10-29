@@ -8,7 +8,7 @@
       "commitDate": "2026-09-24T16:24:05Z",
       "defaultBranch": "main",
       "defaultBranchTip": "a2b44831fda8147f53b92921fc23d79b9cf948e8",
-      "sizeKB": 494796,
+      "sizeKB": 494811,
       "prerelease": {
         "tag": "winui3/release/2.5.4-experimental",
         "sha": "7b12709347527238494ca28cb9fed326d513e779"
