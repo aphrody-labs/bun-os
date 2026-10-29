@@ -97,3 +97,34 @@ jobs:
             build-receipt.txt
             build/wasmos/alpine-3.24.2-x86_64.wasm
           if-no-files-found: ignore
+
+  apps:
+    name: "Alpine apps wasm (${{ matrix.image }}) - real pinned packages booted under Bun"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [tools, lang]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            packages/wasmos
+            factory/wasmos
+          sparse-checkout-cone-mode: true
+      - run: npm install -g bun@${BUN_VERSION} && bun -e 'console.log(Bun.version, Bun.revision, process.release.sourceUrl)'
+      - uses: actions/cache@v4
+        id: cache
+        with:
+          path: build/wasmos/alpine-${{ matrix.image }}-3.24.2-x86_64.wasm
+          key: wasmos-apps-${{ matrix.image }}-${{ hashFiles('factory/wasmos/pins.json', 'factory/wasmos/build-alpine.ts') }}
+      - name: Build the apps image and convert it (container2wasm)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bun factory/wasmos/build-alpine.ts --apps ${{ matrix.image }} | tee build-receipt.txt
+      - name: Boot and run the apps (size and boot time are printed)
+        working-directory: packages/wasmos
+        env:
+          WASMOS_TOOLS_WASM: ${{ github.workspace }}/build/wasmos/alpine-tools-3.24.2-x86_64.wasm
+          WASMOS_LANG_WASM: ${{ github.workspace }}/build/wasmos/alpine-lang-3.24.2-x86_64.wasm
+        run: bun test test/boot.test.ts

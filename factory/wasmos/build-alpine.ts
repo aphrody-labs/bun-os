@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Builds the Alpine x86_64 wasm (Bochs + Linux 6.1 + Alpine rootfs in one WASI module) with container2wasm.
 // Linux only (needs docker buildx). Every input is pinned in pins.json and verified.
-//   bun factory/wasmos/build-alpine.ts [--out dir] [--loglevel 0..7]
+//   bun factory/wasmos/build-alpine.ts [--out dir] [--loglevel 0..7] [--apps tools|lang]
+// --apps builds a local Docker image of pins.json "apps" (real pinned apk packages) and converts that.
 import { existsSync, mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -15,10 +16,25 @@ const { values } = parseArgs({
     loglevel: { type: "string" },
     image: { type: "string" },
     artifact: { type: "string" },
+    apps: { type: "string" },
   },
 });
-const image: string = values.image ?? pins.image;
-const artifact: string = values.artifact ?? pins.artifact;
+let image: string = values.image ?? pins.image;
+let artifact: string = values.artifact ?? pins.artifact;
+if (values.apps) {
+  const spec = pins.apps.images[values.apps];
+  if (!spec) throw new Error(`--apps must be one of ${Object.keys(pins.apps.images).join(", ")}`);
+  image = `wasmos-apps-${values.apps}:local`;
+  artifact = spec.artifact;
+  const pkgs = Object.entries(spec.packages as Record<string, string>).map(([n, v]) => `${n}=${v}`);
+  const appsDir = resolve(values.out ?? join(import.meta.dir, "../../build/wasmos"));
+  mkdirSync(appsDir, { recursive: true });
+  await Bun.write(join(appsDir, `Dockerfile.${values.apps}`), `FROM ${pins.apps.base}
+RUN apk add --no-cache ${pkgs.join(" ")}
+`);
+  const b = Bun.spawn(["docker", "build", "-t", image, "-f", join(appsDir, `Dockerfile.${values.apps}`), appsDir], { stdout: "inherit", stderr: "inherit" });
+  if ((await b.exited) !== 0) throw new Error("docker build of the apps image failed");
+}
 const out = resolve(values.out ?? join(import.meta.dir, "../../build/wasmos"));
 mkdirSync(out, { recursive: true });
 
