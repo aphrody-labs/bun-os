@@ -1,17 +1,10 @@
-// Leaf crate on std, outside the event loop (like `bun_host`): std I/O and strings are intended.
-#![allow(
-    clippy::disallowed_methods,
-    clippy::disallowed_types,
-    clippy::disallowed_macros
-)]
 // SPDX-License-Identifier: Apache-2.0
 //! Native store commands. Package resolution/install is a separate capability;
 //! ingesting a blob never claims to have installed an ecosystem package.
-#![forbid(unsafe_code)]
 mod remote;
 pub use remote::{execute_remote, metadata_client};
 
-use bun_pkg_store::{BlobId, Store};
+use crate::store::{BlobId, Store};
 use clap::{Parser, Subcommand};
 use serde_json::{Value, json};
 use std::ffi::OsString;
@@ -237,7 +230,7 @@ fn inspect_bytes(
     bytes: &[u8],
     version: Option<&str>,
 ) -> io::Result<Value> {
-    use bun_pkg_core::indexes;
+    use crate::metadata::indexes;
     let decoded = match source {
         "npm" => indexes::npm_packument(package, bytes),
         "cargo" => indexes::cargo_sparse(package, bytes),

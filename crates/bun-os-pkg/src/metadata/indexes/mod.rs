@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Pure index decoders. The raw record remains available so adapters do not
 //! discard peer dependencies, features, framework groups or platform markers.
-use crate::ecosystem_versions::{NpmVersions, NugetVersions};
-use crate::{Dependency, Index, PackageVersion, Source, VersionScheme};
+use crate::metadata::ecosystem_versions::{NpmVersions, NugetVersions};
+use crate::metadata::{Dependency, Index, PackageVersion, Source, VersionScheme};
 use serde_json::Value;
 use std::{collections::BTreeMap, fmt};
 
@@ -359,7 +359,7 @@ impl Source for NugetSource {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Version, ecosystem_versions::Pep440Versions};
+    use crate::metadata::{Version, ecosystem_versions::Pep440Versions};
 
     #[test]
     fn npm_optional_overrides_regular_and_peers_survive() {

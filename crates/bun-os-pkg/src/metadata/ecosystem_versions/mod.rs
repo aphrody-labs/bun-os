@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Maintained source-native version engines. PEP 440 prerelease environment
 //! policy is resolved by the caller, separately from specifier membership.
-use crate::{Version, VersionScheme};
+use crate::metadata::{Version, VersionScheme};
 use std::{cmp::Ordering, fmt, str::FromStr};
 
 pub mod nuget;

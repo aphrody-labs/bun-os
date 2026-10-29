@@ -1,0 +1,29 @@
+[package]
+name = "bun_pkg"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "Apache-2.0"
+repository.workspace = true
+publish = false
+description = "Package contracts and metadata parsers (npm, Cargo sparse, NuGet, vcpkg, PyPI), verified blob store, bounded HTTP ingestion and the store command line"
+
+[lints]
+workspace = true
+
+[dependencies]
+clap = { workspace = true }
+hex = "0.4"
+node-semver = "2.2.0"
+pep440_rs = "0.7.3"
+reflink-copy = "0.1.30"
+reqwest = { workspace = true, features = ["rustls-no-provider"] }
+rustls = { workspace = true, features = ["ring", "std"] }
+rustls-native-certs = "0.8"
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true, features = ["std"] }
+tokio = { workspace = true, features = ["fs", "io-util", "rt", "rt-multi-thread", "macros", "time"] }
+tokio-util = { version = "0.7", features = ["io", "rt"] }
