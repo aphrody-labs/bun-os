@@ -238,6 +238,8 @@ jobs:
             out/results-alpine.jsonl
             out/pester-alpine.xml
             out/receipts.jsonl
+            out/hello-aot-musl
+            out/hello-jit-musl
           if-no-files-found: warn
 
   cross-arm64:
@@ -370,6 +372,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
+            /.github/actions
             /factory/wsl
             /factory/dotnet-linux
             /packages/buncc
@@ -378,7 +381,7 @@ jobs:
           sparse-checkout-cone-mode: false
       - name: Same layout as the rootfs (/opt/bunos/factory, /opt/bunos/buncc), pinned Bun
         run: |
-          npm install -g "bun@$BUN_VERSION" && bun --revision
+          node .github/actions/setup-bun/install.mjs "$BUN_VERSION" /usr/local/bin && bun --revision
           mkdir -p /opt/bunos/buncc
           cp -r factory /opt/bunos/factory
           cp -r packages/buncc/. /opt/bunos/buncc/
@@ -395,3 +398,74 @@ jobs:
           su probe -c 'pwsh -NoLogo -Command "bunos-info | ConvertTo-Json -Compress"'
           su probe -c 'source /etc/profile.d/dotnet.sh; mkdir -p /tmp/h && cp -r /opt/bunos/factory/dotnet-linux/sample/hello /tmp/h/ && cd /tmp/h/hello && dotnet publish -c Release -f net10.0 -o out --nologo && ./out/hello'
           { echo '### WSL layer'; echo "installed under /opt/bunos/dotnet-linux: $(cut -f1 /tmp/layer-size.txt) MiB"; } >> "$GITHUB_STEP_SUMMARY"
+
+  wasm-guest:
+    name: .NET and pwsh in the container2wasm Alpine guest (measured)
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.wasm }}
+    needs: alpine
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      OUT: ${{ github.workspace }}/out
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/actions
+            /package.json
+            /Cargo.toml
+            /factory/dotnet-linux
+            /factory/wasmos
+            /packages/wasmos
+            /packages/buncc
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - uses: actions/download-artifact@v4
+        with:
+          name: dotnet-linux-alpine
+          path: ${{ github.workspace }}/out
+      - name: Payloads from the musl artifacts (A is the runtime, B adds PowerShell)
+        run: |
+          PREFIX="$RUNNER_TEMP/bunos-musl"; echo "BUNOS_DOTNET_LINUX_PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          for what in sdk10 pwsh; do bun packages/buncc/src/cli.ts dotnet install "$what" --rid linux-musl-x64 --run --prefix "$PREFIX"; done
+          pwsh_dir=$(ls -d "$PREFIX"/pwsh/*/ | head -1)
+          for c in a b; do mkdir -p "ctx-$c/payload" && cp factory/dotnet-linux/wasm/Dockerfile "ctx-$c/"; done
+          cp -r out/hello-aot-musl ctx-a/payload/hello-aot; cp -r out/hello-jit-musl ctx-a/payload/hello-jit
+          mkdir -p ctx-a/payload/dotnet/shared
+          cp "$PREFIX/dotnet/dotnet" ctx-a/payload/dotnet/; cp -r "$PREFIX/dotnet/host" ctx-a/payload/dotnet/
+          cp -r "$PREFIX/dotnet/shared/Microsoft.NETCore.App" ctx-a/payload/dotnet/shared/
+          cp -r ctx-a/payload/dotnet ctx-b/payload/dotnet; cp -r "$pwsh_dir" ctx-b/payload/pwsh
+          du -sm ctx-a/payload/* ctx-b/payload/pwsh
+      - name: Images
+        run: |
+          docker build -t bunos-dotnet-probe:a ctx-a
+          docker build -t bunos-dotnet-probe:b ctx-b
+          docker image ls bunos-dotnet-probe
+      - name: container2wasm build (A), then probe
+        run: |
+          bun factory/wasmos/build-alpine.ts --image bunos-dotnet-probe:a --artifact dotnet-a.wasm --out build/dotnet-wasm | tee build-a.json
+          mkdir -p "$OUT"
+          bun factory/dotnet-linux/wasm/probe.ts build/dotnet-wasm/dotnet-a.wasm --timeout-s 1500 -- \
+            "NativeAOT hello=/opt/hello-aot/hello" \
+            "dotnet hello.dll (JIT)=/opt/dotnet/dotnet /opt/hello-jit/hello.dll" | tee "$OUT/results-wasm-a.jsonl"
+      - name: container2wasm build (B, with PowerShell), then probe
+        continue-on-error: true
+        run: |
+          bun factory/wasmos/build-alpine.ts --image bunos-dotnet-probe:b --artifact dotnet-b.wasm --out build/dotnet-wasm | tee build-b.json
+          bun factory/dotnet-linux/wasm/probe.ts build/dotnet-wasm/dotnet-b.wasm --timeout-s 3000 -- \
+            "pwsh -NoProfile -c 1=/opt/pwsh/pwsh -NoProfile -NonInteractive -Command 1" | tee "$OUT/results-wasm-b.jsonl"
+      - name: Receipt
+        if: always()
+        run: |
+          cat "$OUT"/results-wasm-*.jsonl > "$OUT/results-wasm.jsonl" 2>/dev/null || true
+          { echo '### container2wasm guest'; cat build-a.json build-b.json 2>/dev/null; } >> "$GITHUB_STEP_SUMMARY"
+          [ -s "$OUT/results-wasm.jsonl" ] && bun factory/dotnet-linux/summary.ts "$OUT/results-wasm.jsonl" "wasm guest" >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dotnet-linux-wasm
+          path: |
+            out/results-wasm*.jsonl
+            build-a.json
+            build-b.json
+          if-no-files-found: warn

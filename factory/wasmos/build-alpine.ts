@@ -8,7 +8,12 @@ import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 
 const pins = await Bun.file(join(import.meta.dir, "pins.json")).json();
-const { values } = parseArgs({ options: { out: { type: "string" }, loglevel: { type: "string" } } });
+// --image / --artifact build another image (a local Docker image works) with the same pinned c2w: factory/dotnet-linux/wasm.
+const { values } = parseArgs({
+  options: { out: { type: "string" }, loglevel: { type: "string" }, image: { type: "string" }, artifact: { type: "string" } },
+});
+const image: string = values.image ?? pins.image;
+const artifact: string = values.artifact ?? pins.artifact;
 const out = resolve(values.out ?? join(import.meta.dir, "../../build/wasmos"));
 mkdirSync(out, { recursive: true });
 
@@ -34,14 +39,14 @@ await Bun.write(join(out, "Dockerfile.patched"), dockerfile);
 
 const args = [join(out, "c2w"), "--dockerfile", join(out, "Dockerfile.patched")];
 if (values.loglevel) args.push("--build-arg", `LINUX_LOGLEVEL=${values.loglevel}`);
-args.push(pins.image, join(out, pins.artifact));
+args.push(image, join(out, artifact));
 const t0 = performance.now();
 await sh(args);
-const bytes = Bun.file(join(out, pins.artifact)).size;
-const digest = new Bun.CryptoHasher("sha256").update(await Bun.file(join(out, pins.artifact)).bytes()).digest("hex");
+const bytes = Bun.file(join(out, artifact)).size;
+const digest = new Bun.CryptoHasher("sha256").update(await Bun.file(join(out, artifact)).bytes()).digest("hex");
 console.log(
   JSON.stringify({
-    artifact: pins.artifact,
+    artifact,
     bytes,
     sha256: digest,
     buildSeconds: Math.round((performance.now() - t0) / 1000),

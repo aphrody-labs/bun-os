@@ -19924,6 +19924,8 @@
           "factory/dotnet-linux/pins.json",
           "factory/dotnet-linux/refresh.ts",
           "factory/dotnet-linux/gen-pkgbuild.ts",
+          "factory/dotnet-linux/wasm/Dockerfile",
+          "factory/dotnet-linux/wasm/probe.ts",
           "factory/wsl/dotnet-layer.sh",
           "factory/wsl/packages.dotnet",
           "factory/dotnet-linux/bench.ts",
