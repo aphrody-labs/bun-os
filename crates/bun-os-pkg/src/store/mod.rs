@@ -1,15 +1,8 @@
-// Leaf crate on std, outside the event loop (like `bun_host`): std I/O and strings are intended.
-#![allow(
-    clippy::disallowed_methods,
-    clippy::disallowed_types,
-    clippy::disallowed_macros
-)]
 // SPDX-License-Identifier: Apache-2.0
 //! Shared SHA-256 blob store. Hosts supply streams; this crate never fetches.
 //! Cache formats remain ecosystem-owned. Writable extraction must use copies:
 //! hardlinking a mutable package tree would corrupt the shared content address.
 
-#![forbid(unsafe_code)]
 
 mod maintenance;
 pub use maintenance::GcReport;

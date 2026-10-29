@@ -56,7 +56,7 @@ the one human entry point and holds no logic of its own: each recipe forwards to
 | `release`, `pkg`                  | `bun run release`, `bun run packages` (package converter)           |
 | `migrate`, `hw`, `repos`, `theme`, `overlay` | `factory/distro/cli.ts`                                  |
 
-`bun-os-pkg-*` crates (`crates/bun-os-pkg-cli`) are libraries without a binary target in this tree, so no recipe
+The `bun_pkg` crate (`crates/bun-os-pkg`) is a library without a binary target in this tree, so no recipe
 wraps them yet (UNVERIFIED that a binary is planned).
 
 ## B. Comparison and decisions

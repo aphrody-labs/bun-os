@@ -9712,51 +9712,12 @@
       "status": "present"
     },
     {
-      "id": "crate:crates/bun-os-pkg-cli",
+      "id": "crate:crates/bun-os-pkg",
       "kind": "crate",
-      "path": "crates/bun-os-pkg-cli",
+      "path": "crates/bun-os-pkg",
       "source": {
         "type": "path-crate",
-        "name": "bun_pkg_cli",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/bun-os-pkg-core",
-      "kind": "crate",
-      "path": "crates/bun-os-pkg-core",
-      "source": {
-        "type": "path-crate",
-        "name": "bun_pkg_core",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/bun-os-pkg-net",
-      "kind": "crate",
-      "path": "crates/bun-os-pkg-net",
-      "source": {
-        "type": "path-crate",
-        "name": "bun_pkg_net",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/bun-os-pkg-store",
-      "kind": "crate",
-      "path": "crates/bun-os-pkg-store",
-      "source": {
-        "type": "path-crate",
-        "name": "bun_pkg_store",
+        "name": "bun_pkg",
         "version": "1.4.7"
       },
       "registration": ["none"],

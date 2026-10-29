@@ -6,7 +6,7 @@
 //! NuGet's four-part versions and case-insensitive release ordering. Floating
 //! ranges are explicitly unsupported; NuGet interval/exact/minimum ranges work.
 use super::VersionError;
-use crate::{Version, VersionScheme};
+use crate::metadata::{Version, VersionScheme};
 use std::cmp::Ordering;
 
 #[derive(Debug)]

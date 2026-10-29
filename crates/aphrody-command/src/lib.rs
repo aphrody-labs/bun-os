@@ -213,7 +213,7 @@ impl AgentOptions {
 enum Commands {
     /// Unified native package indexes and verified content-addressed store.
     #[cfg(not(target_arch = "wasm32"))]
-    Pkg(aphrody_pkg_cli::Cli),
+    Pkg(aphrody_pkg::cli::Cli),
     /// Native product site, sharing its catalog and renderer with HTTP and MCP.
     #[cfg(not(target_arch = "wasm32"))]
     Site(site_cmd::SiteCli),

@@ -103,7 +103,7 @@ bytes = "1.12.1"
 ignored = ["ort"]
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-aphrody-pkg-cli = { package = "bun_pkg_cli", path = "../bun-os-pkg-cli" }
+aphrody-pkg = { package = "bun_pkg", path = "../bun-os-pkg" }
 aphrody-site = { path = "../aphrody-site", version = "1.4.7" }
 toml_edit = { version = "0.25.15", features = [] }
 tempfile = { version = "3.27.0" }

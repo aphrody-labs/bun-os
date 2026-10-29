@@ -1,15 +1,8 @@
-// Leaf crate on std, outside the event loop (like `bun_host`): std I/O and strings are intended.
-#![allow(
-    clippy::disallowed_methods,
-    clippy::disallowed_types,
-    clippy::disallowed_macros
-)]
 // SPDX-License-Identifier: Apache-2.0
 //! Host-configured HTTP client; no TLS provider, credentials or global runtime mutation.
 //! Each resume owns one temporary file. Dropping it removes unpublished bytes.
-#![forbid(unsafe_code)]
 
-use bun_pkg_store::{BlobId, Store};
+use crate::store::{BlobId, Store};
 use reqwest::{Client, StatusCode, Url, header};
 use std::{path::Path, sync::Arc, time::Duration};
 use tempfile::NamedTempFile;

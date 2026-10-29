@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Explicit public-registry queries using the shared bounded downloader.
 use super::{Command, inspect_bytes};
-use bun_pkg_net::{Downloader, Resume};
-use bun_pkg_store::Store;
+use crate::net::{Downloader, Resume};
+use crate::store::Store;
 use reqwest::{Client, Url};
 use serde_json::{Value, json};
 use std::{io, sync::Arc, time::Duration};
