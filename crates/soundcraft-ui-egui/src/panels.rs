@@ -767,7 +767,9 @@ fn about(app: &mut SoundApp, ctx: &egui::Context) {
                 1 => crate::credits::contributors_ui(ui),
                 2 => crate::credits::models_ui(ui),
                 _ => {
-                    ui.label(egui::RichText::new(craft_ui::brand::app_title("Audio")).font(bold(22.0)));
+                    ui.label(
+                        egui::RichText::new(craft_ui::brand::app_title("Audio")).font(bold(22.0)),
+                    );
                     ui.label(format!("Version {}", env!("CARGO_PKG_VERSION")));
                     ui.label("An open-source digital audio workstation from Aphrody / Bun.");
                     ui.label("Dual-licensed MIT OR Apache-2.0. Made with Rust and egui.");

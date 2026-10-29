@@ -281,8 +281,7 @@ const APP_ID: &str = "ai.storyteller.designcraft";
 /// elsewhere the full tile. Regenerate with `packaging/icons.sh`.
 fn app_icon() -> Option<egui::IconData> {
     #[cfg(target_os = "macos")]
-    let png: &[u8] =
-        designcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
+    let png: &[u8] = designcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
     #[cfg(not(target_os = "macos"))]
     let png: &[u8] = designcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
     eframe::icon_data::from_png_bytes(png)

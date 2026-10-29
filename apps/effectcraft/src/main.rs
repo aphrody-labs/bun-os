@@ -47,8 +47,7 @@ const ICON_PNG: &[u8] = effectcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
 
 fn app_icon() -> egui::IconData {
     #[cfg(target_os = "macos")]
-    let png: &[u8] =
-        effectcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
+    let png: &[u8] = effectcraft_ui_egui::aphrody_brand::WINDOW_ICON_PNG;
     #[cfg(not(target_os = "macos"))]
     let png: &[u8] = ICON_PNG;
     eframe::icon_data::from_png_bytes(png).unwrap_or_default()

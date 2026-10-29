@@ -14,10 +14,7 @@ fn main() {
     let mut res = winresource::WindowsResource::new();
     res.set_icon("../../assets/effectcraft/app-icon/effectcraft.ico")
         .set("ProductName", "Aphrody / Bun · Compositing")
-        .set(
-            "FileDescription",
-            "Aphrody / Bun compositing workspace",
-        )
+        .set("FileDescription", "Aphrody / Bun compositing workspace")
         .set(
             "LegalCopyright",
             "Copyright (c) 2026 The EffectCraft contributors. MIT OR Apache-2.0.",

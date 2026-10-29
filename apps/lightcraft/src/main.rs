@@ -994,7 +994,9 @@ fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
         renderer,
         viewport: egui::ViewportBuilder::default()
-            .with_title(lightcraft_ui_egui::aphrody_brand::app_title("Photo Processing"))
+            .with_title(lightcraft_ui_egui::aphrody_brand::app_title(
+                "Photo Processing",
+            ))
             .with_inner_size([1600.0, 1000.0])
             .with_min_inner_size([900.0, 560.0])
             .with_drag_and_drop(true)

@@ -840,7 +840,9 @@ pub fn start(chinese_font: Vec<u8>) {
             }
             Err(e) => {
                 log::error!("Photo Processing workspace failed to start: {e:?}");
-                set_status(&format!("Photo Processing workspace failed to start: {e:?}"));
+                set_status(&format!(
+                    "Photo Processing workspace failed to start: {e:?}"
+                ));
             }
         }
     });
