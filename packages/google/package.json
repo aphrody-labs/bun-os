@@ -30,12 +30,12 @@
     "verify": "bun run test && bun run build"
   },
   "dependencies": {
-    "@ai-sdk/google-vertex": "5.0.101",
+    "@ai-sdk/google-vertex": "catalog:",
     "@aphrody/bun-google": "1.4.7",
-    "@googleapis/docs": "14.1.0",
-    "@googleapis/drive": "26.0.2",
-    "ai": "7.0.127",
-    "google-auth-library": "11.1.0"
+    "@googleapis/docs": "catalog:",
+    "@googleapis/drive": "catalog:",
+    "ai": "catalog:",
+    "google-auth-library": "catalog:"
   },
   "engines": {
     "bun": ">=1.4.4"

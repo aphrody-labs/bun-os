@@ -66449,7 +66449,7 @@
       "path": "vendor/rea",
       "qualificationState": "source-inventory-only",
       "releaseOwner": ".",
-      "revision": "8a3caee4f33cc448af65cac56c6c690b26d66ecf",
+      "revision": "32748ddfe5b0a0a5ff7d4994343d2444de15afec",
       "sourceRepository": "https://github.com/aphrody-labs/rea.git",
       "submodule": "vendor/rea",
       "targets": {
@@ -66469,7 +66469,7 @@
       "path": "vendor/rea",
       "qualificationState": "source-available-unqualified",
       "releaseOwner": "vendor/rea",
-      "revision": "8a3caee4f33cc448af65cac56c6c690b26d66ecf",
+      "revision": "32748ddfe5b0a0a5ff7d4994343d2444de15afec",
       "sourceRepository": "https://github.com/aphrody-labs/rea.git",
       "submodule": "vendor/rea",
       "targets": null,
@@ -66486,7 +66486,7 @@
       "path": "vendor/rea",
       "qualificationState": "consumer-review-only",
       "releaseOwner": "vendor/rea",
-      "revision": "8a3caee4f33cc448af65cac56c6c690b26d66ecf",
+      "revision": "32748ddfe5b0a0a5ff7d4994343d2444de15afec",
       "sourceRepository": "https://github.com/aphrody-labs/rea.git",
       "submodule": "vendor/rea",
       "targets": null,
@@ -66503,7 +66503,7 @@
       "path": "vendor/rea/tests/conformance/readiness/electron",
       "qualificationState": "source-inventory-only",
       "releaseOwner": "vendor/rea",
-      "revision": "8a3caee4f33cc448af65cac56c6c690b26d66ecf",
+      "revision": "32748ddfe5b0a0a5ff7d4994343d2444de15afec",
       "sourceRepository": "https://github.com/aphrody-labs/rea.git",
       "submodule": "vendor/rea",
       "targets": {
@@ -66523,7 +66523,7 @@
       "path": "vendor/rea/tests/conformance/readiness/javascript-cli",
       "qualificationState": "source-inventory-only",
       "releaseOwner": "vendor/rea",
-      "revision": "8a3caee4f33cc448af65cac56c6c690b26d66ecf",
+      "revision": "32748ddfe5b0a0a5ff7d4994343d2444de15afec",
       "sourceRepository": "https://github.com/aphrody-labs/rea.git",
       "submodule": "vendor/rea",
       "targets": {
@@ -67281,7 +67281,7 @@
       "path": "vendor/rea/website/public/examples/notes-electron",
       "qualificationState": "source-inventory-only",
       "releaseOwner": "vendor/rea",
-      "revision": "8a3caee4f33cc448af65cac56c6c690b26d66ecf",
+      "revision": "32748ddfe5b0a0a5ff7d4994343d2444de15afec",
       "sourceRepository": "https://github.com/aphrody-labs/rea.git",
       "submodule": "vendor/rea",
       "targets": {

@@ -58,7 +58,7 @@
     "prepack": "bun run build"
   },
   "dependencies": {
-    "@aphrody/bun": "^1.4.4"
+    "@aphrody/bun": "workspace:*"
   },
   "devDependencies": {
     "@aphrody/m3-config": "workspace:*",

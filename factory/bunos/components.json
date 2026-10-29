@@ -2083,7 +2083,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/rea.git",
-        "pin": "8a3caee4f33cc448af65cac56c6c690b26d66ecf"
+        "pin": "32748ddfe5b0a0a5ff7d4994343d2444de15afec"
       },
       "registration": ["none"],
       "aot": true,
@@ -5499,6 +5499,19 @@
       "status": "present"
     },
     {
+      "id": "crate:crates/aphrody",
+      "kind": "crate",
+      "path": "crates/aphrody",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "crate:crates/aphrody-a2a-client",
       "kind": "crate",
       "path": "crates/aphrody-a2a-client",
@@ -5603,6 +5616,32 @@
       "status": "present"
     },
     {
+      "id": "crate:crates/aphrody-agent-runtime",
+      "kind": "crate",
+      "path": "crates/aphrody-agent-runtime",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-agent-runtime",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-agent-tools",
+      "kind": "crate",
+      "path": "crates/aphrody-agent-tools",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-agent-tools",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "crate:crates/aphrody-antigravity",
       "kind": "crate",
       "path": "crates/aphrody-antigravity",
@@ -5622,6 +5661,19 @@
       "source": {
         "type": "path-crate",
         "name": "aphrody-app-protocol",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-app-server",
+      "kind": "crate",
+      "path": "crates/aphrody-app-server",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-app-server",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -5726,6 +5778,19 @@
       "source": {
         "type": "path-crate",
         "name": "aphrody-code-graph",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-command",
+      "kind": "crate",
+      "path": "crates/aphrody-command",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-command",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -5980,6 +6045,19 @@
       "status": "present"
     },
     {
+      "id": "crate:crates/aphrody-ffi",
+      "kind": "crate",
+      "path": "crates/aphrody-ffi",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-ffi",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "crate:crates/aphrody-firefly",
       "kind": "crate",
       "path": "crates/aphrody-firefly",
@@ -6019,12 +6097,38 @@
       "status": "present"
     },
     {
+      "id": "crate:crates/aphrody-gemini-runtime",
+      "kind": "crate",
+      "path": "crates/aphrody-gemini-runtime",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-gemini-runtime",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "crate:crates/aphrody-gemini-web",
       "kind": "crate",
       "path": "crates/aphrody-gemini-web",
       "source": {
         "type": "path-crate",
         "name": "aphrody-gemini-web",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-google",
+      "kind": "crate",
+      "path": "crates/aphrody-google",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-google",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -6246,6 +6350,32 @@
       "source": {
         "type": "path-crate",
         "name": "aphrody-m3",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-mcp",
+      "kind": "crate",
+      "path": "crates/aphrody-mcp",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-mcp",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-mcp-client",
+      "kind": "crate",
+      "path": "crates/aphrody-mcp-client",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-mcp-client",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -7228,6 +7358,19 @@
       "status": "present"
     },
     {
+      "id": "crate:crates/aphrody-site",
+      "kind": "crate",
+      "path": "crates/aphrody-site",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-site",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "crate:crates/aphrody-softraster",
       "kind": "crate",
       "path": "crates/aphrody-softraster",
@@ -7494,6 +7637,19 @@
       "source": {
         "type": "path-crate",
         "name": "aphrody-vpn",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-webos-wasm",
+      "kind": "crate",
+      "path": "crates/aphrody-webos-wasm",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-webos-wasm",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -13858,6 +14014,19 @@
       "status": "present"
     },
     {
+      "id": "crate:packages/bun-tauri/crates/aphrody-create-tauri-app",
+      "kind": "crate",
+      "path": "packages/bun-tauri/crates/aphrody-create-tauri-app",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-create-tauri-app",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "crate:packages/bun-tauri/crates/aphrody-tauri-build",
       "kind": "crate",
       "path": "packages/bun-tauri/crates/aphrody-tauri-build",
@@ -13871,12 +14040,51 @@
       "status": "present"
     },
     {
+      "id": "crate:packages/bun-tauri/crates/aphrody-tauri-bundler",
+      "kind": "crate",
+      "path": "packages/bun-tauri/crates/aphrody-tauri-bundler",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-tauri-bundler",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:packages/bun-tauri/crates/aphrody-tauri-cli",
+      "kind": "crate",
+      "path": "packages/bun-tauri/crates/aphrody-tauri-cli",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-tauri-cli",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "crate:packages/bun-tauri/crates/aphrody-tauri-codegen",
       "kind": "crate",
       "path": "packages/bun-tauri/crates/aphrody-tauri-codegen",
       "source": {
         "type": "path-crate",
         "name": "aphrody-tauri-codegen",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:packages/bun-tauri/crates/aphrody-tauri-macos-sign",
+      "kind": "crate",
+      "path": "packages/bun-tauri/crates/aphrody-tauri-macos-sign",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-tauri-macos-sign",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -14406,36 +14614,6 @@
       "status": "present"
     },
     {
-      "id": "crates.io:bun_browser_extract",
-      "kind": "crate-dependency",
-      "path": "Cargo.toml",
-      "source": {
-        "type": "crates.io",
-        "name": "bun_browser_extract",
-        "key": "aphrody-web-extract",
-        "requirement": "1.4.7",
-        "locked": ["1.4.7"]
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crates.io:bun_browser_index",
-      "kind": "crate-dependency",
-      "path": "Cargo.toml",
-      "source": {
-        "type": "crates.io",
-        "name": "bun_browser_index",
-        "key": "aphrody-web-index",
-        "requirement": "1.4.7",
-        "locked": ["1.4.7"]
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crates.io:rio-vt",
       "kind": "crate-dependency",
       "path": "Cargo.toml",
@@ -14571,21 +14749,6 @@
       "status": "present"
     },
     {
-      "id": "crates.io:bun_browser_dom",
-      "kind": "crate-dependency",
-      "path": "Cargo.toml",
-      "source": {
-        "type": "crates.io",
-        "name": "bun_browser_dom",
-        "key": "obscura-dom",
-        "requirement": "1.4.7",
-        "locked": ["1.4.7"]
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "crates.io:acadrust",
       "kind": "crate-dependency",
       "path": "Cargo.toml",
@@ -14684,7 +14847,7 @@
         "name": "dirs",
         "key": "dirs",
         "requirement": "7.0.0",
-        "locked": ["6.0.0", "7.0.0"]
+        "locked": ["5.0.1", "6.0.0", "7.0.0"]
       },
       "registration": ["none"],
       "aot": true,
@@ -15029,7 +15192,7 @@
         "name": "quick-xml",
         "key": "quick-xml",
         "requirement": "0.41.0",
-        "locked": ["0.38.4", "0.41.0"]
+        "locked": ["0.38.4", "0.41.0", "0.42.0"]
       },
       "registration": ["none"],
       "aot": true,
@@ -15419,7 +15582,7 @@
         "name": "windows",
         "key": "windows",
         "requirement": "0.62.2",
-        "locked": ["0.54.0", "0.61.3", "0.62.2"]
+        "locked": ["0.51.1", "0.54.0", "0.61.3", "0.62.2"]
       },
       "registration": ["none"],
       "aot": true,
@@ -15434,7 +15597,7 @@
         "name": "winsafe",
         "key": "winsafe",
         "requirement": "0.0.29",
-        "locked": ["0.0.29"]
+        "locked": ["0.0.19", "0.0.29"]
       },
       "registration": ["none"],
       "aot": true,
@@ -15764,7 +15927,7 @@
         "name": "twox-hash",
         "key": "twox-hash",
         "requirement": "2.1.2",
-        "locked": ["2.1.5"]
+        "locked": ["1.6.3", "2.1.5"]
       },
       "registration": ["none"],
       "aot": true,
@@ -16094,7 +16257,7 @@
         "name": "strum_macros",
         "key": "strum_macros",
         "requirement": "0.28",
-        "locked": ["0.27.2", "0.28.0"]
+        "locked": ["0.24.3", "0.27.2", "0.28.0"]
       },
       "registration": ["none"],
       "aot": true,
@@ -16784,7 +16947,7 @@
         "name": "goblin",
         "key": "goblin",
         "requirement": "0.10",
-        "locked": ["0.10.7"]
+        "locked": ["0.9.3", "0.10.7"]
       },
       "registration": ["none"],
       "aot": true,
@@ -18044,7 +18207,7 @@
         "name": "strum",
         "key": "strum",
         "requirement": "0.28",
-        "locked": ["0.28.0"]
+        "locked": ["0.27.2", "0.28.0"]
       },
       "registration": ["none"],
       "aot": true,
@@ -18449,7 +18612,7 @@
         "name": "which",
         "key": "which",
         "requirement": "8",
-        "locked": ["4.4.2", "8.0.6"]
+        "locked": ["4.4.2", "6.0.3", "8.0.6"]
       },
       "registration": ["none"],
       "aot": true,
@@ -18464,7 +18627,7 @@
         "name": "windows-core",
         "key": "windows-core",
         "requirement": "0.62",
-        "locked": ["0.54.0", "0.61.2", "0.62.2"]
+        "locked": ["0.51.1", "0.54.0", "0.61.2", "0.62.2"]
       },
       "registration": ["none"],
       "aot": true,

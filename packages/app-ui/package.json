@@ -77,7 +77,7 @@
     "@aphrody/material-design-icons": "workspace:*",
     "@aphrody/qr": "1.4.7",
     "@aphrody/scaffold": "workspace:*",
-    "@aphrody/tauri": "catalog:",
+    "@aphrody/tauri": "workspace:*",
     "@aphrody/webos-wasm": "workspace:*",
     "@dnd-kit/core": "catalog:",
     "@dnd-kit/sortable": "catalog:",

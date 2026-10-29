@@ -15,7 +15,7 @@
     "@aphrody/bun-video-project": "workspace:*",
     "@aphrody/bun-workspace": "workspace:*",
     "@aphrody/m3-tokens": "workspace:*",
-    "@aphrody/tauri": "catalog:"
+    "@aphrody/tauri": "workspace:*"
   },
   "engines": {
     "bun": "1.4.4"

@@ -199,7 +199,7 @@
     "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aphrody/runtime-sdk": "catalog:",
+    "@aphrody/runtime-sdk": "workspace:*",
     "@leeoniya/ufuzzy": "catalog:",
     "@rosegriffon/assets": "catalog:",
     "@rosegriffon/db": "catalog:",

@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@aphrody/bun-workspace": "workspace:*",
-    "@aphrody/runtime-sdk": "catalog:",
+    "@aphrody/runtime-sdk": "workspace:*",
     "@aphrody/yolo-core": "workspace:*"
   },
   "engines": {

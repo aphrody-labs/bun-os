@@ -35,7 +35,9 @@ else {
   if (!/^\d+\.\d+\.\d+(-canary\.\d{8}\.\d+)?$/.test(version ?? "")) fail(`runtime: version ${version} is not exact`);
   if (!/^[a-f0-9]{40}$/.test(gitHead ?? "")) fail("runtime: gitHead must be a 40-hex commit");
   const pkg = await Bun.file(join(root, "package.json")).json();
-  const pinned = [pkg.dependencies?.bun, pkg.devDependencies?.bun, pkg.catalog?.bun, pkg.overrides?.bun].filter(Boolean);
+  const pinned = [pkg.dependencies?.bun, pkg.devDependencies?.bun, pkg.catalog?.bun, pkg.overrides?.bun].filter(
+    Boolean,
+  );
   if (!pinned.length) fail("runtime: package.json does not pin bun");
   for (const spec of pinned) if (spec !== version) fail(`runtime: package.json pins bun@${spec}, manifest ${version}`);
   const sources = await Bun.file(join(root, "sources.lock.json")).json();
@@ -87,11 +89,14 @@ for (const mod of manifest.modules ?? []) {
   const source = mod.source ?? {};
   if (source.type === "submodule") {
     seen.submodule.add(mod.path);
-    if (gitmodules.get(mod.path) !== source.url) fail(`${id}: .gitmodules url ${gitmodules.get(mod.path)} != ${source.url}`);
+    if (gitmodules.get(mod.path) !== source.url)
+      fail(`${id}: .gitmodules url ${gitmodules.get(mod.path)} != ${source.url}`);
     if (gitlinks.get(mod.path) !== source.pin) fail(`${id}: gitlink ${gitlinks.get(mod.path)} != pin ${source.pin}`);
   } else if (source.type === "workspace") {
     seen.workspace.add(mod.path);
-    const pkg = await Bun.file(join(root, mod.path, "package.json")).json().catch(() => undefined);
+    const pkg = await Bun.file(join(root, mod.path, "package.json"))
+      .json()
+      .catch(() => undefined);
     if (!pkg) fail(`${id}: ${mod.path}/package.json missing`);
     else if (pkg.name !== source.name || pkg.version !== source.version)
       fail(`${id}: package.json is ${pkg.name}@${pkg.version}, manifest ${source.name}@${source.version}`);
@@ -105,7 +110,11 @@ for (const mod of manifest.modules ?? []) {
     const versions = locked.get(source.name);
     if (!versions) fail(`${id}: ${source.name} not locked in Cargo.lock`);
     else if (versions.join() !== (source.locked ?? []).join()) fail(`${id}: locked ${versions} != ${source.locked}`);
-    if (!new RegExp(`^${(source.key ?? source.name).replace(/[.+]/g, "\\$&")}\\s*=`, "m").test(rootCargo.split("[workspace.dependencies]")[1] ?? ""))
+    if (
+      !new RegExp(`^${(source.key ?? source.name).replace(/[.+]/g, "\\$&")}\\s*=`, "m").test(
+        rootCargo.split("[workspace.dependencies]")[1] ?? "",
+      )
+    )
       fail(`${id}: not in [workspace.dependencies] of Cargo.toml`);
   } else fail(`${id}: unknown source type ${source.type}`);
 }
@@ -116,7 +125,8 @@ for (const file of tracked) {
   if (/^(packages|apps)\/[^/]+\/package\.json$/.test(file)) {
     const dir = dirname(file).replace(/\\/g, "/");
     const pkg = await Bun.file(join(root, file)).json();
-    if (pkg.name && !seen.workspace.has(dir) && !ids.has(`npm:${pkg.name}`)) fail(`workspace ${dir}: not in the manifest`);
+    if (pkg.name && !seen.workspace.has(dir) && !ids.has(`npm:${pkg.name}`))
+      fail(`workspace ${dir}: not in the manifest`);
   }
   if (file.endsWith("/Cargo.toml")) {
     const text = await read(file);
@@ -128,13 +138,35 @@ for (const file of tracked) {
 void workspaceVersion;
 
 // ---- no fork path, no fork-only bun:* ----------------------------------------------------------------------------
-const fork = await git("grep", "-l", "toolchains/bun", "--", ".gitmodules", "Cargo.toml", "*/Cargo.toml", "package.json",
-  "*/package.json", "factory/bunos/components.json", "sources.lock.json");
+const fork = await git(
+  "grep",
+  "-l",
+  "toolchains/bun",
+  "--",
+  ".gitmodules",
+  "Cargo.toml",
+  "*/Cargo.toml",
+  "package.json",
+  "*/package.json",
+  "factory/bunos/components.json",
+  "sources.lock.json",
+);
 for (const file of fork.out.split("\n").filter(Boolean)) fail(`${file}: references the removed toolchains/bun path`);
-for (const mod of manifest.modules ?? []) if (JSON.stringify(mod).includes("toolchains/bun")) fail(`${mod.id}: toolchains/bun`);
+for (const mod of manifest.modules ?? [])
+  if (JSON.stringify(mod).includes("toolchains/bun")) fail(`${mod.id}: toolchains/bun`);
 
-const imports = await git("grep", "-nIE", String.raw`(from|import\(|require\()\s*["']bun:[a-z_-]+["']`, "--",
-  "*.ts", "*.tsx", "*.js", "*.mjs", "*.cts", "*.mts");
+const imports = await git(
+  "grep",
+  "-nIE",
+  String.raw`(from|import\(|require\()\s*["']bun:[a-z_-]+["']`,
+  "--",
+  "*.ts",
+  "*.tsx",
+  "*.js",
+  "*.mjs",
+  "*.cts",
+  "*.mts",
+);
 for (const line of imports.out.split("\n").filter(Boolean)) {
   for (const m of line.matchAll(/["']bun:([a-z_-]+)["']/g))
     if (!UPSTREAM_BUN_MODULES.has(m[1])) fail(`${line.split(":").slice(0, 2).join(":")}: fork-only module bun:${m[1]}`);

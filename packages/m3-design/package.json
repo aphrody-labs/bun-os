@@ -35,7 +35,7 @@
     "typecheck:fast": "bun check --noEmit"
   },
   "dependencies": {
-    "@aphrody/bun": "^3.3.0",
+    "@aphrody/bun": "workspace:*",
     "@material/material-color-utilities": "catalog:"
   },
   "devDependencies": {

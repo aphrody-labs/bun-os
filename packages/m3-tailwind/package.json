@@ -38,7 +38,7 @@
     "@aphrody/m3-tokens": "workspace:*"
   },
   "devDependencies": {
-    "@aphrody/bun": "^3.3.0",
+    "@aphrody/bun": "workspace:*",
     "@aphrody/m3-config": "workspace:*",
     "@tailwindcss/node": "catalog:",
     "tailwindcss": "catalog:"
