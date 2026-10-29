@@ -52,7 +52,12 @@ function fakeHost(opts: {
   };
   const norm = (p: string) => p.toLowerCase().replace(/\\+$/, "");
   const host: LegacyHost = {
-    env: { ProgramFiles: "C:\\Program Files", USERPROFILE: "C:\\Users\\me", PATH: "C:\\msys64\\usr\\bin;C:\\Windows", ...opts.env },
+    env: {
+      ProgramFiles: "C:\\Program Files",
+      USERPROFILE: "C:\\Users\\me",
+      PATH: "C:\\msys64\\usr\\bin;C:\\Windows",
+      ...opts.env,
+    },
     exists: p => files.has(norm(p)) || dirs.has(norm(p)),
     isDir: p => dirs.has(norm(p)),
     list: p => {
@@ -79,7 +84,8 @@ function fakeHost(opts: {
       } else if (cmd === "scoop" && argv[1] === "uninstall") {
         if (!opts.silent?.includes("scoop")) {
           const marker = "\\apps\\" + argv[2]!.toLowerCase();
-          for (const set of [files, dirs]) for (const x of [...set]) if (x.includes(marker + "\\") || x.endsWith(marker)) set.delete(x);
+          for (const set of [files, dirs])
+            for (const x of [...set]) if (x.includes(marker + "\\") || x.endsWith(marker)) set.delete(x);
         }
       } else if (cmd === "reg" && argv[1] === "delete") {
         if (!opts.silent?.includes("reg-delete")) keys.delete(argv[2]!.toLowerCase());
@@ -412,14 +418,35 @@ describe("plan and execution", () => {
 });
 
 const bare = (over: Partial<LegacyInstall>): LegacyInstall => ({
-  id: "msys2", mode: "portable", root: "C:\\msys64", uninstallers: [], uninstallerKeys: [], registryKeys: [], pathEntries: [], shortcuts: [], dependents: [], notes: [], ...over,
+  id: "msys2",
+  mode: "portable",
+  root: "C:\\msys64",
+  uninstallers: [],
+  uninstallerKeys: [],
+  registryKeys: [],
+  pathEntries: [],
+  shortcuts: [],
+  dependents: [],
+  notes: [],
+  ...over,
 });
 
 describe("winget uninstall (exact id, checked first)", () => {
   test("plan: --id --exact --source winget, never --name; winget list --id runs first", () => {
     const plan = planUninstall([bare({ mode: "winget" })], [], "C:\\b", true);
     const step = plan.steps.find(s => s.kind === "winget")!;
-    expect(step.command).toEqual(["winget", "uninstall", "--id", "MSYS2.MSYS2", "--exact", "--source", "winget", "--silent", "--disable-interactivity", "--accept-source-agreements"]);
+    expect(step.command).toEqual([
+      "winget",
+      "uninstall",
+      "--id",
+      "MSYS2.MSYS2",
+      "--exact",
+      "--source",
+      "winget",
+      "--silent",
+      "--disable-interactivity",
+      "--accept-source-agreements",
+    ]);
     expect(step.command).not.toContain("--name");
     expect(step.precheck!.slice(0, 5)).toEqual(["winget", "list", "--id", "MSYS2.MSYS2", "--exact"]);
     expect(renderPlan(plan, false)).toContain("only if");
@@ -456,13 +483,24 @@ describe("winget uninstall (exact id, checked first)", () => {
 });
 
 describe("scoop: per user, global, SCOOP and SCOOP_GLOBAL, --purge", () => {
-  const env = { USERPROFILE: "C:\\Users\\me", ProgramData: "C:\\ProgramData", SCOOP: "D:\\sc", SCOOP_GLOBAL: "E:\\scg" };
+  const env = {
+    USERPROFILE: "C:\\Users\\me",
+    ProgramData: "C:\\ProgramData",
+    SCOOP: "D:\\sc",
+    SCOOP_GLOBAL: "E:\\scg",
+  };
 
   test("scoopInfo tells user from global and finds the app", () => {
     expect(scoopInfo("C:\\Users\\me\\scoop\\apps\\msys2\\current", env)).toMatchObject({ app: "msys2", global: false });
     expect(scoopInfo("D:\\sc\\apps\\gnuwin32\\current", env)).toMatchObject({ app: "gnuwin32", global: false });
-    expect(scoopInfo("E:\\scg\\apps\\mingw\\current", env)).toMatchObject({ app: "mingw", global: true, appDir: "E:\\scg\\apps\\mingw" });
-    expect(scoopInfo("C:\\ProgramData\\scoop\\apps\\w64devkit\\current", { ...env, SCOOP_GLOBAL: undefined })).toMatchObject({ app: "w64devkit", global: true });
+    expect(scoopInfo("E:\\scg\\apps\\mingw\\current", env)).toMatchObject({
+      app: "mingw",
+      global: true,
+      appDir: "E:\\scg\\apps\\mingw",
+    });
+    expect(
+      scoopInfo("C:\\ProgramData\\scoop\\apps\\w64devkit\\current", { ...env, SCOOP_GLOBAL: undefined }),
+    ).toMatchObject({ app: "w64devkit", global: true });
     expect(scoopInfo("C:\\msys64", env)).toBeUndefined();
   });
 
@@ -494,7 +532,8 @@ describe("scoop: per user, global, SCOOP and SCOOP_GLOBAL, --purge", () => {
 
   test("scoop step is verified on the app directory; a silent failure is a FAIL", async () => {
     const root = "E:\\scg\\apps\\msys2\\current";
-    const mk = (silent: boolean) => fakeHost({ files: [`${root}\\usr\\bin\\msys-2.0.dll`], env, silent: silent ? ["scoop"] : [] });
+    const mk = (silent: boolean) =>
+      fakeHost({ files: [`${root}\\usr\\bin\\msys-2.0.dll`], env, silent: silent ? ["scoop"] : [] });
     for (const silent of [false, true]) {
       const { host } = mk(silent);
       const [found] = await detectLegacy("msys2", host);

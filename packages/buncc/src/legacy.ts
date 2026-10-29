@@ -132,7 +132,10 @@ export function scoopInfo(
   for (const b of scoopBases(env)) {
     const apps = join(b.dir, "apps");
     if (within(apps, root) && lower(root) !== lower(apps)) {
-      const app = root.replace(/[\\/]+$/, "").slice(apps.replace(/[\\/]+$/, "").length + 1).split(/[\\/]/)[0]!;
+      const app = root
+        .replace(/[\\/]+$/, "")
+        .slice(apps.replace(/[\\/]+$/, "").length + 1)
+        .split(/[\\/]/)[0]!;
       return { app, global: b.global, appDir: join(apps, app) };
     }
   }
@@ -190,11 +193,7 @@ const finders: Record<LegacyId, Finder> = {
   },
   cygwin: {
     names: /^cygwin\b/i,
-    roots: env => [
-      "C:\\cygwin64",
-      "C:\\cygwin",
-      ...scoopAppRoots(env, "cygwin", "root"),
-    ],
+    roots: env => ["C:\\cygwin64", "C:\\cygwin", ...scoopAppRoots(env, "cygwin", "root")],
     marker: (r, h) => h.exists(join(r, "bin", "cygwin1.dll")) || h.exists(join(r, "bin", "bash.exe")),
   },
 };
@@ -505,19 +504,40 @@ export function planUninstall(
       });
     } else if (i.mode === "winget") {
       const ids = WINGET_IDS[i.id];
-      if (!ids.length) warnings.push(`${i.id}: no winget package id is known; the winget uninstall step was not planned`);
+      if (!ids.length)
+        warnings.push(`${i.id}: no winget package id is known; the winget uninstall step was not planned`);
       for (const id of ids)
         steps.push({
           kind: "winget",
           title: `winget uninstall ${id} (only if \`winget list --id ${id}\` finds it)`,
-          precheck: ["winget", "list", "--id", id, "--exact", "--source", "winget", "--disable-interactivity", "--accept-source-agreements"],
-          command: ["winget", "uninstall", "--id", id, "--exact", "--source", "winget", "--silent", "--disable-interactivity", "--accept-source-agreements"],
+          precheck: [
+            "winget",
+            "list",
+            "--id",
+            id,
+            "--exact",
+            "--source",
+            "winget",
+            "--disable-interactivity",
+            "--accept-source-agreements",
+          ],
+          command: [
+            "winget",
+            "uninstall",
+            "--id",
+            id,
+            "--exact",
+            "--source",
+            "winget",
+            "--silent",
+            "--disable-interactivity",
+            "--accept-source-agreements",
+          ],
           install: i.id,
           needsElevation: needsElevation("winget", i.root),
           verify: { kind: "winget-gone", target: id },
         });
-    }
-    else if (i.mode === "chocolatey")
+    } else if (i.mode === "chocolatey")
       steps.push({
         kind: "chocolatey",
         title: `choco uninstall ${i.id}`,
@@ -707,7 +727,20 @@ async function verifyStep(step: PlanStep, host: LegacyHost): Promise<string | un
     case "reg-gone":
       return (await host.regKeyExists(v.target)) ? `registry key still exists: ${v.target}` : undefined;
     case "winget-gone": {
-      const r = await host.exec(["winget", "list", "--id", v.target, "--exact", "--source", "winget", "--disable-interactivity", "--accept-source-agreements"], { timeoutMs: 120_000 });
+      const r = await host.exec(
+        [
+          "winget",
+          "list",
+          "--id",
+          v.target,
+          "--exact",
+          "--source",
+          "winget",
+          "--disable-interactivity",
+          "--accept-source-agreements",
+        ],
+        { timeoutMs: 120_000 },
+      );
       return r.code === 0 ? `winget still lists ${v.target}` : undefined;
     }
     case "path-gone":
@@ -761,7 +794,11 @@ export async function executePlan(
       if (step.precheck) {
         const found = await host.exec(step.precheck, { timeoutMs: 120_000 });
         if (found.code !== 0) {
-          result.executed.push({ step, ok: true, detail: `skipped: not installed (${step.precheck.slice(0, 4).join(" ")} exited ${found.code})` });
+          result.executed.push({
+            step,
+            ok: true,
+            detail: `skipped: not installed (${step.precheck.slice(0, 4).join(" ")} exited ${found.code})`,
+          });
           continue;
         }
       }

@@ -100,7 +100,9 @@ export async function posixCommand(args: string[], root: string): Promise<number
       return 0;
     }
     default:
-      console.error("usage: buncc posix doctor | smoke | uninstall <msys2|mingw|gnuwin32|cygwin|all> [--yes] [--purge]");
+      console.error(
+        "usage: buncc posix doctor | smoke | uninstall <msys2|mingw|gnuwin32|cygwin|all> [--yes] [--purge]",
+      );
       return 2;
   }
 }
