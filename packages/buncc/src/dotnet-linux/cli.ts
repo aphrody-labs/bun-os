@@ -32,7 +32,8 @@ function parse(args: string[]) {
       const [k, v] = a.slice(2).split("=", 2);
       const next = args[i + 1];
       if (v !== undefined) flags.set(k!, v);
-      else if (["rid", "prefix", "shell", "channel"].includes(k!) && next && !next.startsWith("-")) flags.set(k!, args[++i]!);
+      else if (["rid", "prefix", "shell", "channel"].includes(k!) && next && !next.startsWith("-"))
+        flags.set(k!, args[++i]!);
       else flags.set(k!, "true");
     } else positional.push(a);
   }
@@ -49,7 +50,9 @@ export async function dotnetLinuxMain(args: string[], root: string, command = "d
     const prefix = defaultPrefix();
     const pwsh = join(prefix, "bin", "pwsh");
     const exe = existsSync(pwsh) ? pwsh : (Bun.which("pwsh") ?? "pwsh");
-    return (await run([exe, ...args], { output: "inherit", stdin: "inherit", env: { ...Bun.env, ...prefixEnv(prefix) } })).code;
+    return (
+      await run([exe, ...args], { output: "inherit", stdin: "inherit", env: { ...Bun.env, ...prefixEnv(prefix) } })
+    ).code;
   }
   const [sub = "help", ...all] = args;
   const dash = all.indexOf("--");
@@ -71,16 +74,21 @@ export async function dotnetLinuxMain(args: string[], root: string, command = "d
         return 0;
       }
       for (const k of ["10.0", "11.0"] as const)
-        console.log(`.NET ${k.padEnd(5)} SDK ${p.dotnet[k].sdk}  runtime ${p.dotnet[k].runtime}  (${p.dotnet[k].supportPhase}, ${p.dotnet[k].release})`);
-      for (const k of ["stable", "preview"] as const) console.log(`PowerShell ${k.padEnd(8)} ${p.powershell[k].version}  (${p.powershell[k].tag})`);
+        console.log(
+          `.NET ${k.padEnd(5)} SDK ${p.dotnet[k].sdk}  runtime ${p.dotnet[k].runtime}  (${p.dotnet[k].supportPhase}, ${p.dotnet[k].release})`,
+        );
+      for (const k of ["stable", "preview"] as const)
+        console.log(`PowerShell ${k.padEnd(8)} ${p.powershell[k].version}  (${p.powershell[k].tag})`);
       console.log(`observed ${p.observedAt}; refresh: bun factory/dotnet-linux/refresh.ts`);
       return 0;
     }
     case "install": {
       const what = positional[0] ?? "all";
       const list: WhatKey[] = what === "all" ? ["sdk10", "pwsh"] : [what as WhatKey];
-      for (const w of list) if (!WHAT.includes(w)) throw new Error(`unknown component ${w}; use ${WHAT.join(", ")} or all`);
-      if (what === "all") console.error("buncc dotnet: 'all' installs sdk10 and pwsh; add sdk11 / pwsh-preview explicitly");
+      for (const w of list)
+        if (!WHAT.includes(w)) throw new Error(`unknown component ${w}; use ${WHAT.join(", ")} or all`);
+      if (what === "all")
+        console.error("buncc dotnet: 'all' installs sdk10 and pwsh; add sdk11 / pwsh-preview explicitly");
       for (const w of list) {
         const receipt = await installPinned({ root, what: w, rid, prefix, dryRun: !flags.has("run") });
         console.log(JSON.stringify(receipt));
@@ -94,7 +102,11 @@ export async function dotnetLinuxMain(args: string[], root: string, command = "d
       if (shell === "json") console.log(JSON.stringify(env, null, 2));
       else
         for (const [k, v] of Object.entries(env))
-          console.log(shell === "pwsh" ? `$env:${k} = '${v.replaceAll("'", "''")}'` : `export ${k}='${v.replaceAll("'", "'\\''")}'`);
+          console.log(
+            shell === "pwsh"
+              ? `$env:${k} = '${v.replaceAll("'", "''")}'`
+              : `export ${k}='${v.replaceAll("'", "'\\''")}'`,
+          );
       return 0;
     }
     case "check": {
@@ -103,17 +115,27 @@ export async function dotnetLinuxMain(args: string[], root: string, command = "d
       let bad = 0;
       const dotnet = join(prefix, "dotnet", "dotnet");
       const sdks = existsSync(dotnet) ? ((await version([dotnet, "--list-sdks"], env)) ?? "") : "";
-      for (const [w, want] of [["sdk10", p.dotnet["10.0"].sdk], ["sdk11", p.dotnet["11.0"].sdk]] as const) {
+      for (const [w, want] of [
+        ["sdk10", p.dotnet["10.0"].sdk],
+        ["sdk11", p.dotnet["11.0"].sdk],
+      ] as const) {
         const ok = sdks.includes(want);
         if (!ok && w === "sdk10") bad++;
         console.log(`${ok ? "ok " : w === "sdk10" ? "ERR" : "-- "} ${w.padEnd(13)} want ${want}`);
       }
-      for (const [w, want] of [["pwsh", p.powershell.stable.version], ["pwsh-preview", p.powershell.preview.version]] as const) {
+      for (const [w, want] of [
+        ["pwsh", p.powershell.stable.version],
+        ["pwsh-preview", p.powershell.preview.version],
+      ] as const) {
         const exe = layout(prefix, w, want).marker;
-        const got = existsSync(exe) ? await version([exe, "-NoProfile", "-NoLogo", "-Command", "$PSVersionTable.PSVersion.ToString()"], env) : undefined;
+        const got = existsSync(exe)
+          ? await version([exe, "-NoProfile", "-NoLogo", "-Command", "$PSVersionTable.PSVersion.ToString()"], env)
+          : undefined;
         const ok = got === want;
         if (!ok && w === "pwsh") bad++;
-        console.log(`${ok ? "ok " : w === "pwsh" ? "ERR" : "-- "} ${w.padEnd(13)} want ${want}${got ? `  got ${got}` : "  missing"}`);
+        console.log(
+          `${ok ? "ok " : w === "pwsh" ? "ERR" : "-- "} ${w.padEnd(13)} want ${want}${got ? `  got ${got}` : "  missing"}`,
+        );
       }
       for (const q of await aotPrerequisites(makeContext(root)))
         console.log(`${q.ok ? "ok " : "-- "} NativeAOT: ${q.name}  ${q.detail}${q.ok ? "" : `  fix: ${q.fix}`}`);

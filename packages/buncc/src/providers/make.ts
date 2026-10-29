@@ -59,4 +59,3 @@ export const pkgconfProvider = toolProvider({
     brew: "pkgconf",
   },
 });
-

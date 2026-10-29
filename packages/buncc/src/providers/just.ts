@@ -23,4 +23,3 @@ export const justProvider = toolProvider({
   packages: { winget: "Casey.Just", pacman: "just", apt: "just", dnf: "just", apk: "just", brew: "just" },
   github: justRelease,
 });
-

@@ -161,7 +161,6 @@
       "name": "@aphrody/m3-showcase",
       "version": "1.4.7",
       "dependencies": {
-        "@aphrody/ag-ui": "workspace:*",
         "@aphrody/app-ui": "workspace:*",
         "@aphrody/assets": "workspace:*",
         "@aphrody/canvas": "workspace:*",
@@ -276,17 +275,6 @@
       },
       "peerDependencies": {
         "react-dom": "catalog:",
-      },
-    },
-    "packages/ag-ui": {
-      "name": "@aphrody/ag-ui",
-      "version": "1.4.7",
-      "dependencies": {
-        "@ag-ui/a2ui-toolkit": "catalog:",
-        "@ag-ui/client": "catalog:",
-        "@ag-ui/core": "catalog:",
-        "@ag-ui/encoder": "catalog:",
-        "@ag-ui/proto": "catalog:",
       },
     },
     "packages/android-pipeline": {
@@ -2198,8 +2186,6 @@
     "@aphrody/a2a": ["@aphrody/a2a@workspace:packages/a2a"],
 
     "@aphrody/admin-ui": ["@aphrody/admin-ui@workspace:packages/admin-ui"],
-
-    "@aphrody/ag-ui": ["@aphrody/ag-ui@workspace:packages/ag-ui"],
 
     "@aphrody/android-web": ["@aphrody/android-web@workspace:packages/android-web"],
 

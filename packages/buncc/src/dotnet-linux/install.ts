@@ -18,7 +18,11 @@ export function defaultPrefix(env: Record<string, string | undefined> = Bun.env)
 export function layout(prefix: string, what: WhatKey, version: string) {
   const root = join(prefix, "dotnet");
   return what === "pwsh" || what === "pwsh-preview"
-    ? { dir: join(prefix, "pwsh", version), marker: join(prefix, "pwsh", version, "pwsh"), link: join(prefix, "bin", what) }
+    ? {
+        dir: join(prefix, "pwsh", version),
+        marker: join(prefix, "pwsh", version, "pwsh"),
+        link: join(prefix, "bin", what),
+      }
     : { dir: root, marker: join(root, "sdk", version), link: join(prefix, "bin", "dotnet") };
 }
 
@@ -59,7 +63,15 @@ export async function installPinned(options: {
   const a = resolvePinned(pins, options.what, options.rid);
   const prefix = resolve(options.prefix ?? defaultPrefix());
   const where = layout(prefix, options.what, a.version);
-  const base = { what: a.what, version: a.version, rid: a.rid, url: a.url, hash: a.hash, algorithm: a.algorithm, dir: where.dir };
+  const base = {
+    what: a.what,
+    version: a.version,
+    rid: a.rid,
+    url: a.url,
+    hash: a.hash,
+    algorithm: a.algorithm,
+    dir: where.dir,
+  };
   if (existsSync(where.marker)) return { ...base, status: "already-installed" };
   if (options.dryRun) return { ...base, status: "dry-run" };
 
@@ -94,7 +106,7 @@ export async function installPinned(options: {
     status: "installed",
     archiveBytes: bytes.length,
     installedBytes: treeSize(where.dir),
-    downloadSeconds: Math.round((t1 - t0)) / 1000,
+    downloadSeconds: Math.round(t1 - t0) / 1000,
     extractSeconds: Math.round(t2 - t1) / 1000,
   };
 }

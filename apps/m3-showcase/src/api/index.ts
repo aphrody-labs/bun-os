@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Local showcase computations. Providers, credentials and OS writes stay with their native owners.
 import { defineM3Api } from "@aphrody/m3-bun/api";
-import { EventEncoder, EventType, type BaseEvent } from "@aphrody/ag-ui";
+import { EventEncoder, EventType, type BaseEvent } from "@aphrody/m3-ai/ag-ui";
 import { DesignCompiler } from "@aphrody/m3-design";
 import { generate, TARGETS, type Target, type ThemeInput } from "@aphrody/m3-os-themes";
 import {

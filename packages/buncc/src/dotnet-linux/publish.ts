@@ -4,7 +4,14 @@
  * only with a target-capable linker (clang), C runtime and zlib objects of the target. Arguments come from the existing
  * dotnet provider (publishArgs / aotPublishArgs); this file only decides whether the combination is allowed.
  */
-import { aotPublishArgs, CHANNELS, publishArgs, runtimeIdentifier, type AotProfile, type MsbuildProps } from "../providers/dotnet.ts";
+import {
+  aotPublishArgs,
+  CHANNELS,
+  publishArgs,
+  runtimeIdentifier,
+  type AotProfile,
+  type MsbuildProps,
+} from "../providers/dotnet.ts";
 
 export interface PublishRequest {
   project?: string;
@@ -49,9 +56,13 @@ export function publishPlan(req: PublishRequest): PublishPlan {
       );
     else {
       if (target.arch !== host.arch)
-        needs.push(`cross toolchain for ${target.arch}: clang/lld, target C runtime and zlib objects (e.g. gcc-aarch64-linux-gnu zlib1g-dev:arm64)`);
+        needs.push(
+          `cross toolchain for ${target.arch}: clang/lld, target C runtime and zlib objects (e.g. gcc-aarch64-linux-gnu zlib1g-dev:arm64)`,
+        );
       if (target.musl !== host.musl)
-        needs.push(`${target.musl ? "musl" : "glibc"} C runtime for the target: use the matching SDK (${target.musl ? "linux-musl" : "linux"} tarball) in an ${target.musl ? "Alpine" : "glibc"} container instead of crossing libc`);
+        needs.push(
+          `${target.musl ? "musl" : "glibc"} C runtime for the target: use the matching SDK (${target.musl ? "linux-musl" : "linux"} tarball) in an ${target.musl ? "Alpine" : "glibc"} container instead of crossing libc`,
+        );
       if (target.os === "linux") needs.push("clang", "zlib development headers (zlib1g-dev / zlib-dev)");
     }
     return {

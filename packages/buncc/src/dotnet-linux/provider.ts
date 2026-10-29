@@ -21,25 +21,36 @@ export const pwshProvider: Provider = {
   platforms: ["win32", "linux", "darwin"],
   async detect(ctx): Promise<Detection> {
     const prefixed = join(defaultPrefix(ctx.env), "bin", "pwsh");
-    const exe = existsSync(prefixed) ? prefixed : (Bun.which("pwsh", { PATH: pathVar(ctx) ?? "" } as never) ?? Bun.which("pwsh"));
+    const exe = existsSync(prefixed)
+      ? prefixed
+      : (Bun.which("pwsh", { PATH: pathVar(ctx) ?? "" } as never) ?? Bun.which("pwsh"));
     if (!exe) return { found: false, fixHint: "buncc dotnet install pwsh --run" };
-    const r = await run([exe, "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", "$PSVersionTable.PSVersion.ToString()"], { output: "capture", timeoutMs: 60_000 });
+    const r = await run(
+      [exe, "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", "$PSVersionTable.PSVersion.ToString()"],
+      { output: "capture", timeoutMs: 60_000 },
+    );
     const version = r.code === 0 ? r.stdout.trim() : undefined;
     const want = pinned(ctx);
     return {
       found: !!version,
       path: exe,
       version,
-      notes: want && version && version !== want ? [`pin is ${want}; \`buncc dotnet install pwsh --run\` installs it`] : [],
+      notes:
+        want && version && version !== want ? [`pin is ${want}; \`buncc dotnet install pwsh --run\` installs it`] : [],
     };
   },
   install(ctx) {
-    if (ctx.platform === "win32") return { commands: [["winget", "install", "--id", "Microsoft.PowerShell", "-e", "--silent"]] };
-    return { commands: [[process.execPath, join(import.meta.dir, "..", "cli.ts"), "dotnet", "install", "pwsh", "--run"]] };
+    if (ctx.platform === "win32")
+      return { commands: [["winget", "install", "--id", "Microsoft.PowerShell", "-e", "--silent"]] };
+    return {
+      commands: [[process.execPath, join(import.meta.dir, "..", "cli.ts"), "dotnet", "install", "pwsh", "--run"]],
+    };
   },
   async env(ctx) {
     const bin = join(defaultPrefix(ctx.env), "bin");
-    return existsSync(bin) ? { POWERSHELL_TELEMETRY_OPTOUT: "1", POWERSHELL_UPDATECHECK: "Off", PATH: prependPath(pathVar(ctx), [bin]) } : { POWERSHELL_TELEMETRY_OPTOUT: "1" };
+    return existsSync(bin)
+      ? { POWERSHELL_TELEMETRY_OPTOUT: "1", POWERSHELL_UPDATECHECK: "Off", PATH: prependPath(pathVar(ctx), [bin]) }
+      : { POWERSHELL_TELEMETRY_OPTOUT: "1" };
   },
   async pin(ctx) {
     return pinned(ctx);

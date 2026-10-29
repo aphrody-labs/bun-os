@@ -357,14 +357,6 @@
       "steps": [
         {
           "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/ag-ui", "typecheck"]
-        },
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/ag-ui", "test"]
-        },
-        {
-          "repo": "aphrody",
           "command": ["run", "--filter", "@aphrody/app-ui", "typecheck"]
         },
         {

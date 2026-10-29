@@ -18,14 +18,18 @@ test("pins carry a complete, well-formed hash for every supported RID", () => {
     for (const rid of ["linux-x64", "linux-arm64", "linux-musl-x64", "linux-musl-arm64"]) {
       const a = pins.dotnet[ch].assets[rid]!;
       expect(a.sha512).toMatch(/^[0-9a-f]{128}$/);
-      expect(a.url).toBe(`https://builds.dotnet.microsoft.com/dotnet/Sdk/${pins.dotnet[ch].sdk}/dotnet-sdk-${pins.dotnet[ch].sdk}-${rid}.tar.gz`);
+      expect(a.url).toBe(
+        `https://builds.dotnet.microsoft.com/dotnet/Sdk/${pins.dotnet[ch].sdk}/dotnet-sdk-${pins.dotnet[ch].sdk}-${rid}.tar.gz`,
+      );
     }
   }
   for (const k of ["stable", "preview"] as const) {
     for (const rid of ["linux-x64", "linux-arm64", "linux-musl-x64"]) {
       const a = pins.powershell[k].assets[rid]!;
       expect(a.sha256).toMatch(/^[0-9a-f]{64}$/);
-      expect(a.url).toBe(`https://github.com/PowerShell/PowerShell/releases/download/${pins.powershell[k].tag}/powershell-${pins.powershell[k].version}-${rid}.tar.gz`);
+      expect(a.url).toBe(
+        `https://github.com/PowerShell/PowerShell/releases/download/${pins.powershell[k].tag}/powershell-${pins.powershell[k].version}-${rid}.tar.gz`,
+      );
     }
     expect(pins.powershell[k].assets["linux-musl-arm64"]).toBeUndefined(); // upstream ships none: must fail loudly, not guess
   }
@@ -44,7 +48,9 @@ test("a tampered archive never reaches the prefix", async () => {
   const prefix = mkdtempSync(join(tmpdir(), "bunos-dl-"));
   try {
     const fetcher = (async () => new Response(new Uint8Array([1, 2, 3]))) as unknown as typeof fetch;
-    await expect(installPinned({ root, what: "pwsh", rid: "linux-x64", prefix, pins, fetcher })).rejects.toBeInstanceOf(ChecksumError);
+    await expect(installPinned({ root, what: "pwsh", rid: "linux-x64", prefix, pins, fetcher })).rejects.toBeInstanceOf(
+      ChecksumError,
+    );
     expect(await Bun.file(join(prefix, "pwsh")).exists()).toBe(false);
     const dry = await installPinned({ root, what: "sdk10", rid: "linux-x64", prefix, pins, dryRun: true });
     expect(dry.status).toBe("dry-run");
@@ -75,7 +81,13 @@ test("publish plan: NativeAOT cross-OS is refused as Microsoft documents, cross-
   const musl = publishPlan({ rid: "linux-musl-x64", aot: true, hostRid: "linux-x64" });
   expect(musl.needs.join(" ")).toContain("Alpine");
 
-  const native = publishPlan({ rid: "linux-x64", aot: true, nativeLib: "Shared", hostRid: "linux-x64", channel: "11.0" });
+  const native = publishPlan({
+    rid: "linux-x64",
+    aot: true,
+    nativeLib: "Shared",
+    hostRid: "linux-x64",
+    channel: "11.0",
+  });
   expect(native.ok).toBe(true);
   expect(native.needs).toEqual(["clang", "zlib development headers (zlib1g-dev / zlib-dev)"]);
   expect(native.args).toEqual(expect.arrayContaining(["-f", "net11.0", "-p:NativeLib=Shared"]));

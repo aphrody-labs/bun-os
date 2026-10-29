@@ -70,10 +70,29 @@ export function resolvePinned(pins: Pins, what: WhatKey, rid: string): Resolved 
     const pin = pins.dotnet[what === "sdk10" ? "10.0" : "11.0"];
     const asset = pin.assets[rid];
     if (!asset?.sha512) throw new Error(`no pinned .NET SDK ${pin.sdk} archive for ${rid}`);
-    return { what, version: pin.sdk, rid, name: `dotnet-sdk-${rid}.tar.gz`, url: asset.url, algorithm: "sha512", hash: asset.sha512 };
+    return {
+      what,
+      version: pin.sdk,
+      rid,
+      name: `dotnet-sdk-${rid}.tar.gz`,
+      url: asset.url,
+      algorithm: "sha512",
+      hash: asset.sha512,
+    };
   }
   const pin = pins.powershell[what === "pwsh" ? "stable" : "preview"];
   const asset = pin.assets[rid];
-  if (!asset?.sha256) throw new Error(`no pinned PowerShell ${pin.version} archive for ${rid} (upstream ships ${Object.keys(pin.assets).join(", ")})`);
-  return { what, version: pin.version, rid, name: `powershell-${pin.version}-${rid}.tar.gz`, url: asset.url, algorithm: "sha256", hash: asset.sha256 };
+  if (!asset?.sha256)
+    throw new Error(
+      `no pinned PowerShell ${pin.version} archive for ${rid} (upstream ships ${Object.keys(pin.assets).join(", ")})`,
+    );
+  return {
+    what,
+    version: pin.version,
+    rid,
+    name: `powershell-${pin.version}-${rid}.tar.gz`,
+    url: asset.url,
+    algorithm: "sha256",
+    hash: asset.sha256,
+  };
 }

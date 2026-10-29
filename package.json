@@ -27,7 +27,6 @@
     "apps/webos",
     "packages/a2a",
     "packages/admin-ui",
-    "packages/ag-ui",
     "packages/android-pipeline",
     "packages/android-web",
     "packages/aphrody-bun",

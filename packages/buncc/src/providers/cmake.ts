@@ -25,4 +25,3 @@ export const cmakeProvider = toolProvider({
   packages: { winget: "Kitware.CMake", pacman: "cmake", apt: "cmake", dnf: "cmake", apk: "cmake", brew: "cmake" },
   github: cmakeRelease,
 });
-

@@ -25,4 +25,3 @@ export const uvProvider = toolProvider({
   manual:
     "download uv with `ensure()` (checksum-verified release) or see https://docs.astral.sh/uv/getting-started/installation/",
 });
-

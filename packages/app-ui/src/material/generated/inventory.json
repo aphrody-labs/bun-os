@@ -22,17 +22,6 @@
     "bin": []
   },
   {
-    "name": "@aphrody/ag-ui",
-    "version": "1.4.7",
-    "description": "Aphrody AG-UI Protocol — Pure Bun & TypeScript 7 suite connecting Agentic UI events, streaming lifecycle, Protobuf codec, A2UI surfaces, and Agent-to-User bridges.",
-    "dir": "packages/ag-ui",
-    "kind": "package",
-    "workspace": true,
-    "private": false,
-    "exports": 2,
-    "bin": []
-  },
-  {
     "name": "@aphrody/android-web",
     "version": "1.4.7",
     "description": "",

@@ -20,7 +20,6 @@
     "test:dom": "bun test --preload @aphrody/m3-config/test/dom ./test-dom"
   },
   "dependencies": {
-    "@aphrody/ag-ui": "workspace:*",
     "@aphrody/app-ui": "workspace:*",
     "@aphrody/assets": "workspace:*",
     "@aphrody/canvas": "workspace:*",

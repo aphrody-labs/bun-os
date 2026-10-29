@@ -3239,19 +3239,6 @@
       "status": "present"
     },
     {
-      "id": "npm:@aphrody/ag-ui",
-      "kind": "npm-package",
-      "path": "packages/ag-ui",
-      "source": {
-        "type": "workspace",
-        "name": "@aphrody/ag-ui",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "npm:@aphrody/bun-engine-android",
       "kind": "npm-package",
       "path": "packages/android-pipeline",
