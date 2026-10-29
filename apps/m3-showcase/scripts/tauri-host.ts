@@ -8,16 +8,16 @@
  */
 import { mkdir } from "node:fs/promises";
 import { relative, resolve } from "node:path";
-import { runProcess } from "../../../bun-workspace/src/process";
+import { runProcess } from "../../../packages/bun-workspace/src/process";
 import {
   heavyBuildStatus,
   readFactoryConfig,
   routeHeavyBuild,
   type BuildFactoryStatus,
-} from "../../../bun-workspace/src/automation/build-factory";
+} from "../../../packages/bun-workspace/src/automation/build-factory";
 
 export const SHOWCASE_ROOT = resolve(import.meta.dir, "..");
-export const APHRODY_ROOT = resolve(SHOWCASE_ROOT, "../../..");
+export const APHRODY_ROOT = resolve(SHOWCASE_ROOT, "../..");
 /** The only desktop application; it hosts the showcase window. */
 export const DESKTOP_ROOT = resolve(APHRODY_ROOT, "apps/aphrody-app");
 export const CARGO_RUNNER = resolve(APHRODY_ROOT, "scripts/cargo.ts");
@@ -27,7 +27,10 @@ export const SIDECAR_STAGING = resolve(APHRODY_ROOT, "target/m3-showcase");
 const M3_CLI = resolve(APHRODY_ROOT, "packages/m3-bun/bin/m3-bun.ts");
 
 /** The canonical compiler embeds both UI and API in one executable. */
-export function sidecarCommand(triple: string, root = SIDECAR_STAGING): string[] {
+export function sidecarCommand(
+  triple: string,
+  root = SIDECAR_STAGING,
+): string[] {
   const targets: Record<string, string> = {
     "x86_64-unknown-linux-gnu": "linux-x64",
     "aarch64-unknown-linux-gnu": "linux-arm64",
@@ -55,7 +58,12 @@ export function sidecarCommand(triple: string, root = SIDECAR_STAGING): string[]
 }
 
 export function assertFactoryHost(status: BuildFactoryStatus): void {
-  if (!status.configured || !status.enabled || status.route !== "local" || status.host !== status.target)
+  if (
+    !status.configured ||
+    !status.enabled ||
+    status.route !== "local" ||
+    status.host !== status.target
+  )
     throw new Error(
       "Native host compilation must execute through the configured Workspace build factory. Local Cargo flags do not authorize host builds.",
     );
@@ -81,7 +89,8 @@ export function showcaseHostPlan(
 ): ShowcaseHostPlan {
   const missing: string[] = [];
   const sidecar = args[0] === "sidecar";
-  if (sidecar && !which("cargo")) missing.push("The Rust Cargo toolchain is missing");
+  if (sidecar && !which("cargo"))
+    missing.push("The Rust Cargo toolchain is missing");
   if (sidecar && !which("rustc")) missing.push("The Rust compiler is missing");
   return {
     platform,
@@ -95,14 +104,16 @@ export function showcaseHostPlan(
 }
 
 async function runSidecar(showcaseRoot: string): Promise<void> {
-  let triple = process.env.BUN_OS_M3_TARGET ?? process.env.APHRODY_M3_TAURI_TARGET;
+  let triple =
+    process.env.BUN_OS_M3_TARGET ?? process.env.APHRODY_M3_TAURI_TARGET;
   if (!triple) {
     const rust = await runProcess(["rustc", "-vV"], APHRODY_ROOT, {
       timeoutMs: 30_000,
       maxOutputBytes: 1024 * 1024,
     });
     const output = rust.stdout;
-    if (rust.code !== 0) throw new Error("Cannot qualify the installed Rust host triple");
+    if (rust.code !== 0)
+      throw new Error("Cannot qualify the installed Rust host triple");
     triple = output.match(/^host: (.+)$/m)?.[1];
   }
   if (!triple) throw new Error("Missing native target triple");
@@ -115,7 +126,8 @@ async function runSidecar(showcaseRoot: string): Promise<void> {
     stderr: "inherit",
   });
   const code = child.code;
-  if (code !== 0) throw new Error(`Native API sidecar compilation failed with exit ${code}`);
+  if (code !== 0)
+    throw new Error(`Native API sidecar compilation failed with exit ${code}`);
   // The desktop resolves its sidecar beside its own executable. Metadata runs through the same
   // native Cargo owner, after factory admission.
   const metadata = await runProcess(
@@ -137,40 +149,64 @@ async function runSidecar(showcaseRoot: string): Promise<void> {
     { timeoutMs: 120_000, maxOutputBytes: 16 * 1024 * 1024, stderr: "inherit" },
   );
   const output = metadata.stdout;
-  if (metadata.code !== 0) throw new Error("Cannot qualify the native desktop artifact directory");
-  const targetDir = (JSON.parse(output) as { target_directory: string }).target_directory;
-  const profile = process.env.BUN_OS_M3_PROFILE ?? process.env.APHRODY_M3_TAURI_PROFILE ?? "release";
-  if (!["debug", "release"].includes(profile)) throw new Error("Unsupported native desktop artifact profile");
+  if (metadata.code !== 0)
+    throw new Error("Cannot qualify the native desktop artifact directory");
+  const targetDir = (JSON.parse(output) as { target_directory: string })
+    .target_directory;
+  const profile =
+    process.env.BUN_OS_M3_PROFILE ??
+    process.env.APHRODY_M3_TAURI_PROFILE ??
+    "release";
+  if (!["debug", "release"].includes(profile))
+    throw new Error("Unsupported native desktop artifact profile");
   const suffix = triple.includes("windows") ? ".exe" : "";
   const beside = resolve(
     targetDir,
-    ...((process.env.BUN_OS_M3_TARGET ?? process.env.APHRODY_M3_TAURI_TARGET) ? [triple] : []),
+    ...((process.env.BUN_OS_M3_TARGET ?? process.env.APHRODY_M3_TAURI_TARGET)
+      ? [triple]
+      : []),
     profile,
     `m3-showcase${suffix}`,
   );
   await Bun.write(beside, Bun.file(command.at(-1)!));
 }
 
-export async function runTauri(input: string[] = [], showcaseRoot = SHOWCASE_ROOT): Promise<void> {
+export async function runTauri(
+  input: string[] = [],
+  showcaseRoot = SHOWCASE_ROOT,
+): Promise<void> {
   const planOnly = input.includes("--plan");
-  const args = input.filter(arg => arg !== "--plan");
+  const args = input.filter((arg) => arg !== "--plan");
   if (args.length === 0) args.push("info");
   if (args[0] !== "info" && args[0] !== "sidecar")
     throw new Error(
       "Use an explicit owner command: info or sidecar. The existing desktop aphrody-app opens the showcase with --showcase; no separate Rust shell is generated",
     );
-  const plan = showcaseHostPlan(args, process.platform, Bun.which, showcaseRoot);
+  const plan = showcaseHostPlan(
+    args,
+    process.platform,
+    Bun.which,
+    showcaseRoot,
+  );
   if (planOnly || args[0] === "info") {
     console.log(JSON.stringify(plan, null, 2));
     return;
   }
   if (plan.missing.length) throw new Error(plan.missing.join("\n"));
   const dispatched = await routeHeavyBuild(
-    ["bun", relative(APHRODY_ROOT, resolve(showcaseRoot, "scripts/tauri.ts")).replaceAll("\\", "/"), ...args],
+    [
+      "bun",
+      relative(
+        APHRODY_ROOT,
+        resolve(showcaseRoot, "scripts/tauri.ts"),
+      ).replaceAll("\\", "/"),
+      ...args,
+    ],
     APHRODY_ROOT,
   );
   if (dispatched !== undefined) {
-    if (dispatched !== 0) throw new Error(`Native build factory failed with exit ${dispatched}`);
+    if (dispatched !== 0)
+      throw new Error(`Native build factory failed with exit ${dispatched}`);
     return;
   }
   const factory = await readFactoryConfig(APHRODY_ROOT);

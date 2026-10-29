@@ -2,11 +2,11 @@
 //! The Aphrody M3 showcase as a window of the desktop, not a separate application.
 //!
 //! `aphrody-app --showcase` (or the main window's `aphrody_showcase_open` command, or a second
-//! launch carrying the flag) starts the compiled Bun sidecar `m3-showcase` of `m3/packages/app-ui/showcase`
+//! launch carrying the flag) starts the compiled Bun sidecar `m3-showcase` of `apps/m3-showcase`
 //! on a free loopback port and opens a `showcase` window on its origin. The sidecar serves the UI
 //! and its API from one origin and is stopped when the desktop exits. The window has no Tauri
 //! capability: the page gets no IPC, navigation stays on the sidecar origin and external links
-//! leave for the system browser. `bun m3/packages/app-ui/showcase/scripts/tauri.ts sidecar` compiles the
+//! leave for the system browser. `bun apps/m3-showcase/scripts/tauri.ts sidecar` compiles the
 //! sidecar next to the desktop executable (found there first, then on `PATH`).
 
 use std::collections::HashMap;
@@ -20,7 +20,7 @@ use tauri_plugin_aphrody::wrap::{Sidecar, sidecar};
 pub const FLAG: &str = "--showcase";
 /// Label of the showcase window; no capability targets it.
 pub const LABEL: &str = "showcase";
-/// Compiled Bun sidecar (UI and API) staged by `m3/packages/app-ui/showcase/scripts/tauri.ts`.
+/// Compiled Bun sidecar (UI and API) staged by `apps/m3-showcase/scripts/tauri.ts`.
 const PROGRAM: &str = "m3-showcase";
 
 /// Origin of the running sidecar. Set once: the sidecar guard lives in the app state until exit.

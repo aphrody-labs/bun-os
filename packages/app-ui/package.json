@@ -9,9 +9,7 @@
     "m3.config.ts",
     "scripts",
     "src",
-    "undeclared-deps.ts",
-    "showcase",
-    "!showcase/scripts"
+    "undeclared-deps.ts"
   ],
   "type": "module",
   "main": "./src/index.ts",
@@ -20,8 +18,7 @@
     ".": "./src/index.ts",
     "./backend": "./backend.ts",
     "./webos": "./webos.ts",
-    "./styles.css": "./src/styles.css",
-    "./showcase": "./showcase/src/App.tsx"
+    "./styles.css": "./src/styles.css"
   },
   "publishConfig": {
     "access": "public"
@@ -31,19 +28,7 @@
     "build": "bun run build.ts",
     "typecheck": "bun check -p tsconfig.json --noEmit",
     "test": "bun test src",
-    "brand": "bun run scripts/brand-theme.ts",
-    "showcase:inventory": "cd showcase && bun scripts/inventory.ts",
-    "showcase:dev": "cd showcase && bun scripts/inventory.ts && bun ../../m3-bun/bin/m3-bun.ts dev",
-    "showcase:build": "cd showcase && bun scripts/inventory.ts && bun ../../m3-bun/bin/m3-bun.ts build",
-    "showcase:serve": "cd showcase && bun ../../m3-bun/bin/m3-bun.ts serve",
-    "showcase:compile": "cd showcase && bun scripts/inventory.ts && bun ../../m3-bun/bin/m3-bun.ts compile",
-    "showcase:package": "cd showcase && bun ../../m3-bun/bin/m3-bun.ts package",
-    "showcase:deploy": "cd showcase && bun ../../m3-bun/bin/m3-bun.ts deploy all",
-    "showcase:smoke": "cd showcase && bun ../../m3-bun/bin/m3-bun.ts smoke",
-    "showcase:typecheck": "cd showcase && bun check -p tsconfig.json --noEmit",
-    "showcase:test": "cd showcase && bun test ./test && bun test --preload @aphrody/m3-config/test/dom ./test-dom",
-    "showcase:tauri": "cd showcase && bun scripts/tauri.ts",
-    "showcase:test:dom": "cd showcase && bun test --preload @aphrody/m3-config/test/dom ./test-dom"
+    "brand": "bun run scripts/brand-theme.ts"
   },
   "dependencies": {
     "@aphrody/assets": "workspace:*",

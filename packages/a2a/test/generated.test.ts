@@ -14,7 +14,11 @@ describe("generated types", () => {
   test("src/generated/a2a.ts is the projection of the current proto", async () => {
     const committed = await Bun.file(join(import.meta.dir, "..", "src", "generated", "a2a.ts")).text();
     // The committed file is run through the repo formatter (wrapping, leading `|`, trailing commas).
-    const squash = (s: string) => s.replace(/\s+/g, "").replace(/=\|/g, "=").replace(/,([)\]}])/g, "$1");
+    const squash = (s: string) =>
+      s
+        .replace(/\s+/g, "")
+        .replace(/=\|/g, "=")
+        .replace(/,([)\]}])/g, "$1");
     expect(squash(await renderGenerated())).toBe(squash(committed));
   });
 });
