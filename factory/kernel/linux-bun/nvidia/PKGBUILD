@@ -18,6 +18,11 @@ conflicts=(nvidia-open-dkms nvidia-dkms)
 source=("git+https://github.com/aphrody-labs/open-gpu-kernel-modules.git#commit=1a82fbfda8f321b056eb3568850f9316c5e465c5")
 b2sums=(SKIP)
 
+prepare() {
+  # 615.78.08 still calls del_timer_sync(); the CI compile check (run 40819800811) failed on it for 7.2.11 and 7.3.
+  sed -i 's/del_timer_sync/timer_delete_sync/g' open-gpu-kernel-modules/kernel-open/common/inc/nv-timer.h
+}
+
 build() {
   local _kernver
   _kernver=$(basename "$(ls -d /usr/lib/modules/*-bun | sort -V | tail -n 1)")
