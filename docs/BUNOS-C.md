@@ -108,10 +108,29 @@ llvm-mingw was much slower and very noisy (min 46.7 s vs median 66.0 s) while ot
 compiler speed ranking. Smoke runs on the workstation: x86_64-pc-windows-msvc, x86_64-w64-mingw32 and i686-reactos binaries built and executed
 (`bunos-c hello` printed), aarch64-w64-mingw32 built and header-checked only.
 
+## Measured in CI (run 40826191891, GitHub-hosted runners, same project, 3 runs, median)
+
+| Runner | Compiler | Median | Executable |
+| --- | --- | --- | --- |
+| windows-latest | MSVC `cl` 19.51 | 37.15 s | 258,048 B |
+| windows-latest | clang-cl 23.1.4 (runner Visual Studio SDK) | 33.49 s | 166,912 B |
+| windows-latest | llvm-mingw clang 23.1.4 | 24.19 s | 1,965,056 B |
+| windows-latest | mingw-w64 gcc | 56.56 s | 1,968,115 B |
+| ubuntu-latest | llvm-mingw clang 23.1.4 | 21.48 s | not recorded |
+| ubuntu-latest | mingw-w64 gcc | 45.37 s | not recorded |
+| ubuntu-latest | clang (glibc) | 35.29 s | 1,978,048 B |
+| ubuntu-latest | gcc (glibc) | 40.14 s | 1,937,088 B |
+
+Sizes of the mingw rows on ubuntu are 0 in the log because the benchmark looked for `bench` while the linker wrote `bench.exe`. The sizes of PE files are unstripped
+for mingw. The workstation ranking of llvm-mingw above (slowest) was therefore load noise: on clean runners it is the fastest of the Windows rows.
+
+CI smoke matrix (same run): ubuntu built and ran x86_64 and aarch64 glibc (qemu), built and ran the mingw and ReactOS-flavoured PE through Wine (i686 and x86_64), musl built and ran on
+alpine; windows built and ran the msvc-ABI, mingw and ReactOS-flavoured binaries. Skipped on purpose: msvc targets on Linux (no Microsoft opt-in), bunos (no sysroot), musl via `buncc` (covered by the alpine job).
+
 ## Verified and not verified
 
 Verified here: catalog loads; `buncc c test` builds x86_64-pc-windows-msvc (local VS), x86_64/aarch64-w64-mingw32, i686/x86_64-reactos (imports `msvcrt.dll`),
 parses PE headers and runs the x64/i686 ones natively; `components.json` checks pass; llvm-mingw archive sha256 matched GitHub's digest.
 
-Not verified: Linux, musl and bunos targets (need the Linux runner or sysroots; the workflow covers them); Wine execution; qemu aarch64; xwin sysroot
-build (no Microsoft opt-in given); gcc numbers; ReactOS runtime execution; a diff of wine-cachyos against wine-mirror; ReactOS built through RosBE.
+Not verified: the bunos target (needs the Bun OS sysroot); aarch64 musl; aarch64 MSVC and mingw execution; xwin sysroot
+build (no Microsoft opt-in given); ReactOS runtime execution; a diff of wine-cachyos against wine-mirror; ReactOS built through RosBE.
