@@ -63,6 +63,28 @@ export class Compositor {
     return out;
   }
 
+  private gesture?: PointerGesture;
+  private shakeListeners = new Set<(at: { x: number; y: number }) => void>();
+
+  /**
+   * Pointer gestures are recognised in the compositor, where every pointer event of the session passes, so they work over
+   * any client surface ("wiggle the pointer to ask"). The recogniser is injected (the shell owns its tuning).
+   */
+  useShakeGesture(gesture: PointerGesture) {
+    this.gesture = gesture;
+  }
+
+  /** Called with the pointer position when a shake completes. Returns the unsubscribe function. */
+  onShake(listener: (at: { x: number; y: number }) => void): () => void {
+    this.shakeListeners.add(listener);
+    return () => this.shakeListeners.delete(listener);
+  }
+
+  /** Feed a pointer sample in framebuffer pixels (`t` in ms, monotonic). */
+  pointerMove(x: number, y: number, t: number = performance.now()) {
+    if (this.gesture?.push(x, y, t)) for (const listener of this.shakeListeners) listener({ x, y });
+  }
+
   /** Compose one frame and return a view of the RGBA framebuffer (valid until the next wasm call that grows memory). */
   frame(): Uint8ClampedArray {
     this.x.render();
@@ -79,6 +101,11 @@ export class Compositor {
     if (!p) throw new Error(`no shm pool ${id}`);
     return new Uint8Array(this.x.memory.buffer, p, size);
   }
+}
+
+/** A pointer gesture recogniser: true when the sample completes the gesture. */
+export interface PointerGesture {
+  push(x: number, y: number, t: number): boolean;
 }
 
 export interface WireEvent {
