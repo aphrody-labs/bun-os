@@ -1,4 +1,5 @@
 import { compileArgs } from "./build/bun.ts";
+import { aotPublishArgs } from "./providers/dotnet.ts";
 
 export type ProfileId = "aot-bun" | "aot-dotnet10" | "aot-dotnet11" | "win32-msvc" | "win32-clang" | "glibc-gnu";
 
@@ -32,45 +33,23 @@ export interface ProfileOptions {
 
 const bun = () => process.execPath;
 
-function dotnet(frameworkMajor: 10 | 11): Profile["steps"] {
-  return o => {
-    const project = o.project ?? ".";
-    const rid = o.rid ?? (process.platform === "win32" ? "win-x64" : "linux-x64");
-    return [
-      {
-        title: `pin the SDK (global.json, .NET ${frameworkMajor})`,
-        command: [
-          "dotnet",
-          "new",
-          "globaljson",
-          "--sdk-version",
-          frameworkMajor === 10 ? "10.0.401" : "11.0.100",
-          "--roll-forward",
-          frameworkMajor === 11 ? "latestMajor" : "latestFeature",
-          "--force",
-        ],
-      },
-      {
-        title: "publish NativeAOT",
-        command: [
-          "dotnet",
-          "publish",
-          project,
-          "-c",
-          "Release",
-          "-r",
-          rid,
-          `-f`,
-          `net${frameworkMajor}.0`,
-          "-p:PublishAot=true",
-          "-p:IlcOptimizationPreference=Size",
-          "-p:StripSymbols=true",
-          "-p:InvariantGlobalization=true",
-          "-p:Deterministic=true",
-        ],
-      },
-    ];
-  };
+function dotnet(profile: "aot-dotnet10" | "aot-dotnet11"): Profile["steps"] {
+  return o => [
+    {
+      title: "publish NativeAOT (providers/dotnet.ts aotPublishArgs; pin the SDK with writeGlobalJson if wanted)",
+      command: [
+        "dotnet",
+        ...aotPublishArgs({
+          profile,
+          project: o.project,
+          rid: o.rid,
+          size: true,
+          stripSymbols: true,
+          invariantGlobalization: true,
+        }),
+      ],
+    },
+  ];
 }
 
 export const profiles: Record<ProfileId, Profile> = {
@@ -110,7 +89,7 @@ export const profiles: Record<ProfileId, Profile> = {
       "dotnet/runtime releases: v10.0.13 (2026-10-13)",
     ],
     unmeasured: ["size, build time and start-up"],
-    steps: dotnet(10),
+    steps: dotnet("aot-dotnet10"),
   },
   "aot-dotnet11": {
     id: "aot-dotnet11",
@@ -122,7 +101,7 @@ export const profiles: Record<ProfileId, Profile> = {
       "whether the installed SDK is 11.x: `buncc doctor` shows `dotnet --version`",
       "size, build time and start-up",
     ],
-    steps: dotnet(11),
+    steps: dotnet("aot-dotnet11"),
   },
   "win32-msvc": {
     id: "win32-msvc",

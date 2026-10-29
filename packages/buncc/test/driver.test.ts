@@ -252,7 +252,7 @@ test("every profile renders its steps without running anything", () => {
     for (const step of steps) expect(step.command.length).toBeGreaterThan(0);
   }
   expect(profiles["aot-bun"].steps({ entry: "a.ts", outfile: "o" })[0]!.command).toContain("--aot");
-  expect(profiles["aot-dotnet11"].steps({})[1]!.command).toContain("net11.0");
+  expect(profiles["aot-dotnet11"].steps({})[0]!.command).toContain("net11.0");
   expect(
     profiles["glibc-gnu"].steps({ target: "x86_64-linux-gnu.2.28", source: "m.c" })[0]!.command.slice(0, 3),
   ).toEqual(["zig", "cc", "-target"]);

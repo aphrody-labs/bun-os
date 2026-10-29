@@ -26,6 +26,19 @@ need for one has appeared).
 | `buncc package <msix\|appx\|msi\|exe\|zip>`, `sign`, `store` | Windows packaging plans (dry run unless `--run`) |
 | `buncc profile list\|show\|apply <id>`, `buncc bench aot-bun <entry>` | named build profiles and the measured Bun AOT benchmark |
 
+## Adopt, extend or write
+
+| Need | Decision | Why |
+| --- | --- | --- |
+| Cargo run, deadline, process-tree kill | **migrated** from `packages/bun-workspace` `serializedCargo` (`bun-workspace` now calls `buncc/cargo`) | one owner; the PowerShell mutex wrapper is replaced by lock files |
+| Rust workspace graph for `plan` | **write** (small): `cargo metadata --no-deps` | it is the only source that knows build/dev dependency kinds; `factory/bunos/workspace-graph.ts` reads tracked files for component integration checks and stays the owner of that job |
+| Cross-compile to windows-msvc | **adopt** `cargo-xwin` / `xwin` (provider by the toolchains agent) | not recoded |
+| Compiler cache | **adopt** sccache; buncc only probes its health and bypasses it | not recoded |
+| C dependencies | **adopt** vcpkg (provider), CMake presets are left to CMake | not recoded |
+| .NET NativeAOT, winget, CMake, clang, make, ninja, gn, wix, MSIX | **adopt** the providers in `providers/toolchains.ts` (they replace the detect-only core ones of the same id) | verified downloads and argument builders |
+| JS task cache / affected | **not done**: turborepo is not wired; `--affected` only covers Cargo crates | no measurement yet |
+| `crates/bun-os-git`, `crates/aphrody-infra`, `infra/` | **not reviewed or reused yet**: buncc shells out to `git diff --name-only` for affected selection | listed so it is not mistaken for done |
+
 ## Environment (MSVC, sccache, stale paths)
 
 - MSVC: `vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -format json -utf8`
