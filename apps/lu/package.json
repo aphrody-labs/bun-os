@@ -1,6 +1,6 @@
 {
   "name": "@aphrody/lu",
-  "version": "3.0.8",
+  "version": "1.4.7",
   "private": true,
   "description": "The all-in-one local AI studio for your desktop: chat, images, video and a coding agent in one app.",
   "license": "AGPL-3.0-only",
