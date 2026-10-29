@@ -1796,6 +1796,13 @@
         "@aphrody/paths": "workspace:*",
       },
     },
+    "packages/wasm": {
+      "name": "@aphrody/wasm",
+      "version": "1.4.7",
+      "devDependencies": {
+        "@types/bun": "catalog:",
+      },
+    },
     "packages/web-to-tauri": {
       "name": "@aphrody/web-to-tauri",
       "version": "1.4.7",
@@ -2600,6 +2607,7 @@
 
     "@aphrody/web-inspector-bun": ["@aphrody/web-inspector-bun@1.4.3-aphrody.1", "", {}, "sha512-xrtagKt6CSP5Y2cS1C7lj1utcSw15RjUnmF7iE2gnjMBBIv4U+vB0feH9EaZfoj/++SuHBavYu+FW0ZdsyKrWA=="],
 
+    "@aphrody/wasm": ["@aphrody/wasm@workspace:packages/wasm"],
     "@aphrody/web-to-tauri": ["@aphrody/web-to-tauri@workspace:packages/web-to-tauri"],
 
     "@aphrody/webos": ["@aphrody/webos@workspace:apps/webos"],

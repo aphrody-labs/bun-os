@@ -5024,6 +5024,19 @@
       "status": "present"
     },
     {
+      "id": "npm:@aphrody/wasm",
+      "kind": "npm-package",
+      "path": "packages/wasm",
+      "source": {
+        "type": "workspace",
+        "name": "@aphrody/wasm",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "npm:@aphrody/web-to-tauri",
       "kind": "npm-package",
       "path": "packages/web-to-tauri",
@@ -7890,6 +7903,45 @@
       "source": {
         "type": "path-crate",
         "name": "aphrody-vpn",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-wasm-bindgen-hello",
+      "kind": "crate",
+      "path": "crates/aphrody-wasm-bindgen-hello",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-wasm-bindgen-hello",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-wasm-raw",
+      "kind": "crate",
+      "path": "crates/aphrody-wasm-raw",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-wasm-raw",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-wasm-wasi-hello",
+      "kind": "crate",
+      "path": "crates/aphrody-wasm-wasi-hello",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-wasm-wasi-hello",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -17471,7 +17523,7 @@
         "type": "crates.io",
         "name": "js-sys",
         "key": "js-sys",
-        "requirement": "0.3.104",
+        "requirement": "0.3.106",
         "locked": ["0.3.106"]
       },
       "registration": ["none"],
@@ -18701,7 +18753,7 @@
         "type": "crates.io",
         "name": "wasm-bindgen",
         "key": "wasm-bindgen",
-        "requirement": "0.2.127",
+        "requirement": "0.2.129",
         "locked": ["0.2.129"]
       },
       "registration": ["none"],

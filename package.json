@@ -170,6 +170,7 @@
     "packages/storyteller-ui-video-editor",
     "packages/storyteller-ui-viewer-3d",
     "packages/update",
+    "packages/wasm",
     "packages/web-to-tauri",
     "packages/webos-wasm",
     "packages/winclean",
