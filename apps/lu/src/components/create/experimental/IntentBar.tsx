@@ -1,0 +1,167 @@
+import { Cloud } from 'lucide-react'
+import { useCreateStore } from '../../../stores/createStore'
+import { useUIStore, type CloudTeaserTarget } from '../../../stores/uiStore'
+import { useSettingsStore } from '../../../stores/settingsStore'
+import { isIntentLocked, visibleIntents } from './intents'
+import { isMlxImageHost } from '../../../api/mlx-image'
+import { mlxFollowsMotion, mlxTakesStartImage, mlxTalking } from '../../../api/mlx-video'
+import { mlxMakesMusic } from '../../../lib/mac-music'
+import { mlxTakesEditImage } from '../../../lib/image-engines'
+import { cn } from '../ui/cn'
+import { ICON_SM } from '../../ui/icon-size'
+
+// Jede Pille traegt ihre Beschriftung, immer. Bis 2.6.7 stand hier ein
+// `max-width`-Aufklappen: nur die AKTIVE Pille zeigte ihren Namen, die
+// uebrigen elf standen auf einer Maximalbreite von null, Deckkraft null und
+// ohne waagerechtes Polster, die Hauptnavigation des ganzen Create-Bereichs
+// war eine Reihe unbeschrifteter Icons, deren Namen nur der Hover-Tooltip
+// verriet. Die kurzen Namen lagen dabei fertig im Datenmodell (`short` in
+// intents.ts) und wurden von niemandem gelesen.
+//
+// (Die drei Utilities stehen hier bewusst ausgeschrieben statt als
+// Klassennamen: Tailwind scannt diese Datei als Text und haette aus der
+// Erklaerung wieder Regeln im ausgelieferten Bundle gemacht, siehe
+// keine-klasse-aus-prosa.test.ts, der genau das gefangen hat.)
+//
+// Gemessen am 01.09.2026 im laufenden Fenster (Chromium 149, 1280x800,
+// --ui-scale 1.15, also gerenderte Pixel), alle zwoelf Pillen der
+// Cloud-/Windows-Leiste beschriftet:
+//
+//   nur Icons (Ist bis 2.6.7)     476 px
+//   `short`  (Image … Motion)    1068 px   <- passt, 184 px Luft
+//   `label`  (Edit / Image to Image, Remove Background, …)  1704 px
+//   verfuegbar bei 1280px Fenster 1252 px
+//
+// Deshalb `short` und nicht `label`: die vollen Namen sprengen schon das
+// Standardfenster um 452 px. `short` traegt bis hinunter zu ~1096 px
+// Fensterbreite in einer Zeile.
+//
+// Darunter reicht der Platz nicht mehr. Nachgemessen bei 700 px Fenster:
+// die Leiste laeuft 50 px ueber ihren Container hinaus, die Pillen stauchen
+// NICHT, weil ein Flex-Item mit `whitespace-nowrap`-Inhalt und ohne `min-w-0`
+// seine Mindestbreite behaelt. Der Ausgang waere die abgeschnittene letzte
+// Pille am rechten Rand.
+//
+// Deshalb `flex-wrap`: dieselbe Leiste bricht in eine zweite Zeile um
+// (gemessen 35,6 -> 71,3 px Hoehe; die Buehne darunter ist `flex-1` und gibt
+// die 35,7 px her). Kein Ueberlauf, kein abgeschnittener Text, nichts
+// verschwindet.
+//
+// 2.6.8 hatte hier ein Scrollrad an dieser Stelle: eine Zeile, die den
+// aktiven Eintrag in die Mitte fuhr und die Nachbarn nach aussen ausblendete.
+// Rueckbau am 07.09.2026 nach dem Discord-Befund „when the tools move I have
+// to look for them" (Rollback auf den Stand von 2.6.7). Ein Werkzeug, das
+// seinen Platz wechselt, ist teurer als eine zweite Zeile.
+//
+// Der volle Name bleibt in `title` und `aria-label`. „Edit" auf der Pille,
+// „Edit / Image to Image" fuer Hover und Screenreader.
+//
+// Die aktive Pille hebt sich weiter ueber Flaeche, Rand und Schriftfarbe ab
+// (kein Framer-Layout, nichts kann auf dem Weg springen).
+const EASE = 'ease-[cubic-bezier(0.22,1,0.36,1)]'
+
+type TeaserIntent = Extract<CloudTeaserTarget, { surface: 'intent' }>['intent']
+
+export function IntentBar() {
+  const intent = useCreateStore((s) => s.intent())
+  const setIntent = useCreateStore((s) => s.setIntent)
+  const backend = useCreateStore((s) => s.backend)
+  const setCloudTeaser = useUIStore((s) => s.setCloudTeaser)
+  // Every tool that can run or be previewed is in the bar. With "Show Cloud
+  // features in Local mode" off, the hosted-only tools are left out of the
+  // local bar (visibleIntents). The 2.5.8 lanes with hasLocalLane
+  // (lipsync / music / extend / motion) are REAL local tabs, plain selectable
+  // pills with NO cloud glyph (2026-07-19: the top row only carries a
+  // cloud badge for the genuinely hosted-only tools). Enhance Image runs on
+  // local ComfyUI since 3.0.7. Only eraser (cloudOnly, no local backend)
+  // renders as a locked, cloud-tagged pill in local mode; a tap opens the
+  // teaser sheet / plans gate.
+  //
+  // On an MLX Mac (no ComfyUI at all) those lanes have no local implementation
+  // either, so they lock there too. Both rules live in intents.ts so they stay
+  // pure + unit tested; this component only renders the verdict.
+  const mlxHost = isMlxImageHost()
+  const cloudFeatures = useSettingsStore((s) => s.settings.cloudTeasersEnabled)
+  // Animate Image is a local tab on the Mac while an installed video model
+  // starts from an image (the catalogue's word, carried on the list entry).
+  const mlxAnimate = useCreateStore((s) => mlxTakesStartImage(s.videoModelList))
+  // And Edit while an installed image model takes an image (Qwen-Image 2.1).
+  const mlxEdit = useCreateStore((s) => mlxTakesEditImage(s.imageModelList))
+  // And Enhance Image while an upscaler is installed (SeedVR2), and Music
+  // while the music engine (ACE-Step 1.5) is installed.
+  const mlxUpscale = useCreateStore((s) => s.mlxUpscale)
+  const mlxMusic = useCreateStore((s) => mlxMakesMusic(s.audioModelList))
+  // And Motion Control while an installed LTX-2.3 pack follows a motion video.
+  const mlxMotion = useCreateStore((s) => mlxFollowsMotion(s.videoModelList))
+  // And Talking Character while a video model that talks is installed.
+  const mlxTalk = useCreateStore((s) => mlxTalking(s.videoModelList).tab)
+  const intents = visibleIntents(backend, mlxHost, cloudFeatures, mlxAnimate, mlxEdit, mlxUpscale, mlxMusic, mlxMotion, mlxTalk)
+
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Create mode"
+      // Bis 2.6.7 stand hier `transform: scale(0.763)`, eine dritte
+      // Skalierungsschicht neben dem 18,4px-Wurzelmass und dem `zoom: 1.25`
+      // der Sidebar. `transform` skaliert nur das BILD: die Leiste belegte
+      // weiter ihre ungeschrumpfte Layoutbreite (gemessen 1084,7px fuer eine
+      // sichtbar 827px breite Zeile) und jede Haarlinie darin wurde auf
+      // 0,763px gemalt. Die 0,763 stehen jetzt in den Groessen selbst:
+      // jede rem-Laenge dieser Leiste ist ihr altes Mass mal 0,763, in
+      // ganzen Pixeln des 16px-Rasters (36px Pille -> 28px, 16px Icon ->
+      // 12px = ICON_SM, 12px Label -> 9px).
+      // 05.09.2026: die Leiste klebte an der Hauptnavigation. Gemessen
+      // am Windows-Bau (1296x808): 9,2 gerenderte px zwischen Kopfzeilenkante
+      // und Leiste, 10,9 bis zur ersten Pille. `pt-1.5` legt 4,5
+      // Entwurfspixel dazu, gerendert gut 5. Das ist die „minimale
+      // Luftschicht, wenige Pixel, nicht mehr", die er verlangt hat. Unten bleibt es bei
+      // den 1,5px: darunter steht die Buehne, und die stand nie zu eng.
+      className="flex flex-wrap items-center justify-center gap-x-[3px] gap-y-[3px] px-3 pt-1.5 pb-[1.5px] [--text-control:9px]"
+    >
+      {intents.map((meta) => {
+        const locked = isIntentLocked(meta, backend, mlxHost, mlxAnimate, mlxEdit, mlxUpscale, mlxMusic, mlxMotion, mlxTalk)
+        const selected = !locked && intent === meta.id
+        const Icon = meta.icon
+        return (
+          <button
+            key={meta.id}
+            role="radio"
+            aria-checked={selected}
+            aria-label={locked ? `${meta.label}, runs on LU Cloud` : meta.label}
+            title={locked ? `${meta.label}, runs on LU Cloud` : meta.label}
+            onClick={() =>
+              locked
+                ? setCloudTeaser({ surface: 'intent', intent: meta.id as TeaserIntent })
+                : setIntent(meta.id)
+            }
+            className={cn(
+              'relative flex items-center h-7 rounded-full border transition-[background-color,border-color,box-shadow,color] duration-200',
+              EASE,
+              selected
+                ? 'bg-white/[0.11] border-white/20 shadow-sm text-white'
+                : locked
+                  ? 'border-transparent text-gray-600 hover:text-gray-400 hover:bg-white/[0.03]'
+                  : 'border-transparent text-gray-500 hover:text-gray-200 hover:bg-white/[0.05]',
+            )}
+          >
+            <span className="grid place-items-center w-7 h-7 shrink-0">
+              <Icon size={ICON_SM} />
+            </span>
+            {locked && (
+              // Brighter, theme-aware cloud tag: violet-300/80 was near
+              // invisible on light backgrounds and easy to miss on dark.
+              <Cloud
+                size={8}
+                className="absolute top-[1.5px] right-[1.5px] text-violet-500 dark:text-violet-200"
+                aria-hidden
+              />
+            )}
+            <span className="whitespace-nowrap t-control pl-[3px] pr-[10.5px]">
+              {meta.short}
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}

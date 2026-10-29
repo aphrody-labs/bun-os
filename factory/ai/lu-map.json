@@ -1,0 +1,53 @@
+{
+  "upstream": "https://github.com/PurpleDoubleD/locally-uncensored",
+  "fork": "https://github.com/aphrody-labs/locally-uncensored",
+  "branch": "master",
+  "license": "AGPL-3.0-only",
+  "copy": [
+    { "from": "src", "to": "apps/lu/src", "skip": ["src/lib/__tests__/release-rules.test.ts", "src/lib/__tests__/signpath-stages.test.ts", "src/lib/__tests__/site-legal-pages.test.ts", "src/lib/__tests__/stage-three-keeps-the-other-platforms.test.ts", "src/lib/__tests__/windows-signpath.test.ts"] },
+    { "from": "dev-server", "to": "apps/lu/dev-server" },
+    { "from": "public", "to": "apps/lu/public" },
+    { "from": "e2e", "to": "apps/lu/e2e" },
+    { "from": "e2e-stack", "to": "apps/lu/e2e-stack" },
+    { "from": "logos", "to": "apps/lu/logos" },
+    { "from": "mobile-client", "to": "apps/lu/mobile-client" },
+    { "from": "mobile-tests", "to": "apps/lu/mobile-tests" },
+    { "from": "src-tauri/plugins/lu-native", "to": "crates/lu-native" },
+    { "from": "src-tauri", "to": "apps/lu/src-tauri", "skip": ["src-tauri/plugins/lu-native", "src-tauri/target"] },
+    { "from": "mobile-docs", "to": "docs/ai/mobile" },
+    { "from": "third-party", "to": "docs/ai/third-party" },
+    { "from": "scripts", "to": "apps/lu/scripts", "skip": [
+      "scripts/windows-signpath.mjs", "scripts/windows-signpath.d.mts", "scripts/signpath-stages.mjs",
+      "scripts/windows-signing-setup.ps1", "scripts/windows-signing-verify.ps1", "scripts/signing-config.sh",
+      "scripts/macos-release-signing.sh", "scripts/mark-old-releases.mjs", "scripts/release-dry-run.mjs",
+      "scripts/release-rules.mjs", "scripts/release-rules.d.mts", "scripts/enforce-prerelease.mjs",
+      "scripts/site-publish-date.mjs", "scripts/check-cloud-sales.mjs", "scripts/scorecard"
+    ] },
+    { "from": "index.html", "to": "apps/lu/index.html" },
+    { "from": "vite.config.ts", "to": "apps/lu/vite.config.ts" },
+    { "from": "vitest.config.ts", "to": "apps/lu/vitest.config.ts" },
+    { "from": "eslint.config.js", "to": "apps/lu/eslint.config.js" },
+    { "from": "playwright.config.ts", "to": "apps/lu/playwright.config.ts" },
+    { "from": "playwright.stack.config.ts", "to": "apps/lu/playwright.stack.config.ts" },
+    { "from": "tsconfig.json", "to": "apps/lu/tsconfig.json" },
+    { "from": "tsconfig.app.json", "to": "apps/lu/tsconfig.app.json" },
+    { "from": "tsconfig.node.json", "to": "apps/lu/tsconfig.node.json" },
+    { "from": "tsconfig.e2e.json", "to": "apps/lu/tsconfig.e2e.json" },
+    { "from": "LICENSE", "to": "apps/lu/LICENSE" },
+    { "from": "LICENSE", "to": "crates/lu-native/LICENSE" },
+    { "from": "COMPUTER-CONTROL.md", "to": "docs/ai/COMPUTER-CONTROL.md" },
+    { "from": "VOICE.md", "to": "docs/ai/VOICE.md" },
+    { "from": "SECURITY.md", "to": "docs/ai/SECURITY.md" },
+    { "from": "CONTRIBUTING.md", "to": "docs/ai/CONTRIBUTING.md" },
+    { "from": "CODE_OF_CONDUCT.md", "to": "docs/ai/CODE_OF_CONDUCT.md" },
+    { "from": "CHANGELOG.md", "to": "docs/ai/CHANGELOG.upstream.md" },
+    { "from": "README.md", "to": "docs/ai/README.upstream.md" }
+  ],
+  "dropped": [
+    "docs (marketing site of lu-labs.ai: pricing, cloud, SEO pages)",
+    ".github (upstream CI, release, SignPath, Discord announce; replaced by .github/workflows/ai.yml)",
+    ".signpath, signing and release scripts",
+    "setup.bat, setup.ps1, setup.sh, start.bat, update.bat (replaced by factory/ai/setup.ts)",
+    "package-lock.json (Bun lockfile at the repository root)"
+  ]
+}

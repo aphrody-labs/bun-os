@@ -1,0 +1,36 @@
+# MLX-Stable-Diffusion stack — what we pip-install into the dedicated
+# venv at ~/Library/Application Support/lu-labs/mlx/venv. PyTorch is
+# pinned to a version with stable MPS (Metal) support; older 2.x
+# releases had race conditions in MPS-flash-attention paths.
+#
+# Apple's diffusers + torch-mps story keeps shifting — re-check this
+# file when MLX-native SD pipelines become available; we'd swap
+# `torch` + `diffusers` for `mlx-stable-diffusion` at that point.
+
+# Exact versions, not lower bounds: these are the ones the catalogue was run
+# on (owner's M5 Pro, 08.10.2026). An open bound hands a new customer whatever
+# was released that morning, and torch on MPS has shipped releases that
+# compute silently wrong. Move a pin only together with a real run.
+#
+# torch 2.4+ has stable MPS bfloat16 (Z-Image/Qwen-Image run in bf16);
+# diffusers 0.38+ ships every pipeline the catalogue names: ZImage, QwenImage,
+# Flux2Klein and Chroma. An engine set up from an older copy of
+# this file is updated before the next model install (commands/mlx.rs,
+# `bring_engine_up_to_date`).
+torch==2.12.1
+diffusers==0.38.0
+transformers==5.12.1
+accelerate==1.14.0
+safetensors==0.8.0
+huggingface_hub==1.21.0
+sentencepiece==0.2.1
+tokenizers==0.22.2
+numpy==2.4.6
+
+# HTTP server hosting /generate. uvicorn is the production-quality
+# choice; fastapi gives us a typed request schema for free.
+fastapi==0.139.0
+uvicorn[standard]==0.49.0
+
+# Image post-processing + return-as-PNG path.
+pillow==12.3.0

@@ -1,0 +1,1306 @@
+{
+  "open-video": {
+    "label": "OpenVideo",
+    "endpoint": "base/open-video/image-to-video",
+    "kind": "video",
+    "adult": true,
+    "tier": "standard",
+    "weights": "closed",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.02,
+        "720p": 0.04,
+        "1080p": 0.06
+      }
+    },
+    "inputs": {
+      "image": "source_path"
+    },
+    "defaults": {},
+    "baselineUsd": 0.1
+  },
+  "open-video-lora": {
+    "label": "OpenVideo + Style LoRA",
+    "endpoint": "base/open-video/image-to-video-lora",
+    "kind": "video",
+    "adult": true,
+    "tier": "standard",
+    "weights": "closed",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.03,
+        "720p": 0.05,
+        "1080p": 0.07
+      }
+    },
+    "inputs": {
+      "image": "source_path"
+    },
+    "defaults": {},
+    "baselineUsd": 0.15
+  },
+  "mmaudio-v2": {
+    "label": "MMAudio v2",
+    "endpoint": "base/mmaudio-v2",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "default": 0.001
+      }
+    },
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {
+      "duration": 5
+    },
+    "baselineUsd": 0.001
+  },
+  "hunyuan-video-foley": {
+    "label": "Hunyuan Video Foley",
+    "endpoint": "base/hunyuan-video-foley",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.05
+      }
+    },
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "baselineUsd": 0.05
+  },
+  "infinitetalk": {
+    "label": "InfiniteTalk HQ",
+    "endpoint": "base/infinitetalk",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "price": {
+      "mode": "input",
+      "rates": {
+        "480p": 0.03,
+        "720p": 0.06
+      },
+      "maxSeconds": 600
+    },
+    "inputs": {
+      "image": "source_path",
+      "audio": "audio_path",
+      "mask_image": "mask_path"
+    },
+    "defaults": {},
+    "baselineUsd": 0.15
+  },
+  "infinitetalk-multi": {
+    "label": "InfiniteTalk Duo",
+    "endpoint": "base/infinitetalk/multi",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "price": {
+      "mode": "input",
+      "rates": {
+        "480p": 0.03,
+        "720p": 0.06
+      },
+      "maxSeconds": 600
+    },
+    "inputs": {
+      "image": "source_path",
+      "left_audio": "audio_path",
+      "right_audio": "audio2_path"
+    },
+    "defaults": {},
+    "baselineUsd": 0.15
+  },
+  "qwen-image-angles": {
+    "label": "Qwen Image \u2022 Multiple Angles",
+    "endpoint": "base/qwen-image/edit-multiple-angles",
+    "kind": "image",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.025
+      }
+    },
+    "inputs": {
+      "images": "image_paths"
+    },
+    "defaults": {},
+    "baselineUsd": 0.025
+  },
+  "minimax-h3-edit": {
+    "label": "MiniMax H3 \u2022 Image Edit",
+    "endpoint": "base/minimax-h3/image-edit",
+    "kind": "image",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "1k": 0.03,
+        "2k": 0.09
+      },
+      "extraImage": 0.005
+    },
+    "inputs": {
+      "images": "image_paths"
+    },
+    "defaults": {},
+    "baselineUsd": 0.03
+  },
+  "scail-2": {
+    "label": "SCAIL 2 \u2022 Character Motion",
+    "endpoint": "base/scail-2",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open-family",
+    "price": {
+      "mode": "input",
+      "rates": {
+        "480p": 0.04,
+        "720p": 0.08
+      },
+      "maxSeconds": 120
+    },
+    "inputs": {
+      "image": "source_path",
+      "video": "video_path"
+    },
+    "defaults": {
+      "mode": "animate"
+    },
+    "baselineUsd": 0.2
+  },
+  "wan-ditto": {
+    "label": "Wan DITTO \u2022 Video Restyle",
+    "endpoint": "base/wan-2.1/ditto",
+    "kind": "video",
+    "adult": false,
+    "tier": "older",
+    "weights": "open-family",
+    "price": {
+      "mode": "input",
+      "rates": {
+        "480p": 0.04,
+        "720p": 0.08
+      },
+      "maxSeconds": 120
+    },
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "baselineUsd": 0.2
+  },
+  "seedance-2.5": {
+    "label": "Seedance 2.5",
+    "endpoint": "bytedance/seedance-2.5/image-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "closed",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.18,
+        "720p": 0.36,
+        "1080p": 0.9,
+        "4k": 1.8
+      }
+    },
+    "inputs": {
+      "image": "source_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "baselineUsd": 0.9
+  },
+  "minimax-h3": {
+    "label": "MiniMax H3",
+    "endpoint": "base/minimax-h3/image-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.04,
+        "540p": 0.06,
+        "768p": 0.08,
+        "1080p": 0.16
+      }
+    },
+    "inputs": {
+      "image": "source_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "baselineUsd": 0.2
+  },
+  "wan-3.0": {
+    "label": "Wan 3.0",
+    "endpoint": "alibaba/wan-3.0/image-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open-family",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.05,
+        "720p": 0.1,
+        "1080p": 0.2
+      }
+    },
+    "inputs": {
+      "image": "source_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "baselineUsd": 0.5
+  },
+  "wan-3.0-spicy": {
+    "label": "Wan 3.0 Uncensored",
+    "endpoint": "alibaba/wan-3.0/image-to-video-spicy",
+    "kind": "video",
+    "adult": true,
+    "tier": "best",
+    "weights": "open-family",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.05,
+        "720p": 0.1,
+        "1080p": 0.2
+      }
+    },
+    "inputs": {
+      "image": "source_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "baselineUsd": 0.5
+  },
+  "preset-chroma": {
+    "label": "Chroma",
+    "endpoint": "base/chroma",
+    "kind": "image",
+    "adult": true,
+    "tier": "standard",
+    "weights": "open",
+    "inputs": {},
+    "defaults": {},
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.015
+      }
+    },
+    "sourceModel": "chroma",
+    "baselineUsd": 0.015
+  },
+  "preset-prefect-pony": {
+    "label": "Prefect Pony",
+    "endpoint": "base/prefect-pony-xl",
+    "kind": "image",
+    "adult": true,
+    "tier": "standard",
+    "weights": "open",
+    "inputs": {},
+    "defaults": {},
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.015
+      }
+    },
+    "sourceModel": "prefect-pony",
+    "baselineUsd": 0.015
+  },
+  "preset-neta-lumina": {
+    "label": "Neta Lumina",
+    "endpoint": "base/neta-lumina",
+    "kind": "image",
+    "adult": true,
+    "tier": "standard",
+    "weights": "open",
+    "inputs": {},
+    "defaults": {},
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.01
+      }
+    },
+    "sourceModel": "neta-lumina",
+    "baselineUsd": 0.01
+  },
+  "preset-wan-2.2-spicy": {
+    "label": "Wan 2.2 Uncensored",
+    "endpoint": "base/wan-2.2-spicy/image-to-video",
+    "kind": "video",
+    "adult": true,
+    "tier": "older",
+    "weights": "open",
+    "inputs": {
+      "image": "source_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.03,
+        "720p": 0.06
+      }
+    },
+    "sourceModel": "wan-2.2-spicy",
+    "baselineUsd": 0.15
+  },
+  "preset-wan-2.7-spicy": {
+    "label": "Wan 2.7 Uncensored",
+    "endpoint": "alibaba/wan-2.7/image-to-video-spicy",
+    "kind": "video",
+    "adult": true,
+    "tier": "standard",
+    "weights": "open-family",
+    "inputs": {
+      "image": "source_path",
+      "audio": "audio_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "output",
+      "rates": {
+        "720p": 0.1,
+        "1080p": 0.15
+      }
+    },
+    "sourceModel": "wan-2.7-spicy",
+    "baselineUsd": 0.5
+  },
+  "preset-wan-2.2-spicy-extend": {
+    "label": "Wan 2.2 Uncensored Extend",
+    "endpoint": "base/wan-2.2-spicy/video-extend",
+    "kind": "video",
+    "adult": true,
+    "tier": "older",
+    "weights": "open",
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.03,
+        "720p": 0.06
+      }
+    },
+    "sourceModel": "wan-2.2-spicy-extend",
+    "baselineUsd": 0.15
+  },
+  "preset-qwen3-tts": {
+    "label": "Qwen3 TTS",
+    "endpoint": "base/qwen3-tts/text-to-speech",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "inputs": {},
+    "defaults": {},
+    "price": {
+      "mode": "characters",
+      "rates": {
+        "default": 0.005
+      }
+    },
+    "sourceModel": "qwen3-tts",
+    "promptField": "text",
+    "baselineUsd": 0.005
+  },
+  "seedance-2.5-avatar": {
+    "label": "Seedance 2.5 Avatar",
+    "endpoint": "bytedance/seedance-2.5/talking-avatar",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "image": "source_path",
+      "audio": "audio_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "price": {
+      "mode": "input",
+      "rates": {
+        "480p": 0.22,
+        "720p": 0.44
+      },
+      "minSeconds": 4,
+      "maxSeconds": 120
+    },
+    "baselineUsd": 1.1
+  },
+  "longcat-avatar": {
+    "label": "LongCat Avatar",
+    "endpoint": "base/longcat-avatar-1.5",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open-family",
+    "inputs": {
+      "image": "source_path",
+      "audio": "audio_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "480p": 0.04,
+        "720p": 0.08
+      },
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.2
+  },
+  "longcat-avatar-multi": {
+    "label": "LongCat Avatar Duo",
+    "endpoint": "base/longcat-avatar-1.5/multi",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open-family",
+    "inputs": {
+      "image": "source_path",
+      "left_audio": "audio_path",
+      "right_audio": "audio2_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "480p": 0.04,
+        "720p": 0.08
+      },
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.2
+  },
+  "lipsync-3-avatar": {
+    "label": "Lipsync 3 Avatar",
+    "endpoint": "sync/lipsync-3/avatar",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "image": "source_path",
+      "audio": "audio_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "default": 0.135
+      },
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.135
+  },
+  "heygen-twin": {
+    "label": "HeyGen Presenter",
+    "endpoint": "heygen/avatar-v/digital-twin",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "audio": "audio_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "720p": 0.12,
+        "1080p": 0.12,
+        "4k": 0.12
+      },
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.12
+  },
+  "seed-speech-tts": {
+    "label": "Seed Speech 2.0",
+    "endpoint": "bytedance/seed-speech-tts-2.0",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {},
+    "defaults": {},
+    "promptField": "text",
+    "price": {
+      "mode": "characters",
+      "rates": {
+        "default": 0.006
+      }
+    },
+    "baselineUsd": 0.06
+  },
+  "chatterbox-tts": {
+    "label": "Chatterbox",
+    "endpoint": "chatterbox/text-to-speech",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "inputs": {
+      "reference_audio": "audio_path"
+    },
+    "defaults": {},
+    "promptField": "text",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.03
+      }
+    },
+    "baselineUsd": 0.03
+  },
+  "minimax-speech-hd": {
+    "label": "MiniMax Speech HD",
+    "endpoint": "minimax/speech-2.8-hd",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {},
+    "defaults": {
+      "voice_id": "Wise_Woman"
+    },
+    "promptField": "text",
+    "price": {
+      "mode": "characters",
+      "rates": {
+        "default": 0.01
+      }
+    },
+    "baselineUsd": 0.1
+  },
+  "minimax-speech-turbo": {
+    "label": "MiniMax Speech Turbo",
+    "endpoint": "minimax/speech-2.8-turbo",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {},
+    "defaults": {
+      "voice_id": "Wise_Woman"
+    },
+    "promptField": "text",
+    "price": {
+      "mode": "characters",
+      "rates": {
+        "default": 0.006
+      }
+    },
+    "baselineUsd": 0.06
+  },
+  "eleven-v3": {
+    "label": "ElevenLabs v3",
+    "endpoint": "elevenlabs/eleven-v3",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {},
+    "defaults": {},
+    "promptField": "text",
+    "price": {
+      "mode": "characters",
+      "rates": {
+        "default": 0.02
+      }
+    },
+    "baselineUsd": 0.2
+  },
+  "inworld-tts": {
+    "label": "Inworld TTS",
+    "endpoint": "inworld/realtime-tts-2",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {},
+    "defaults": {},
+    "promptField": "text",
+    "price": {
+      "mode": "characters",
+      "rates": {
+        "default": 0.005
+      }
+    },
+    "baselineUsd": 0.05
+  },
+  "minimax-music": {
+    "label": "MiniMax Music",
+    "endpoint": "minimax/music-3.0",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {},
+    "defaults": {},
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.15
+      }
+    },
+    "baselineUsd": 0.15
+  },
+  "mureka-song": {
+    "label": "Mureka Song",
+    "endpoint": "mureka-ai/mureka-v9.5/generate-song",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {},
+    "defaults": {},
+    "promptField": "lyrics",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.225
+      }
+    },
+    "baselineUsd": 0.225
+  },
+  "eleven-music": {
+    "label": "ElevenLabs Music",
+    "endpoint": "elevenlabs/music-v2.5",
+    "kind": "audio",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {},
+    "defaults": {},
+    "price": {
+      "mode": "output",
+      "rates": {
+        "default": 0.0125
+      },
+      "durationField": "music_length_ms",
+      "unitDivisor": 1000,
+      "blockSeconds": 60
+    },
+    "baselineUsd": 0.75
+  },
+  "wan-3.0-prime": {
+    "label": "Wan 3.0 Prime",
+    "endpoint": "alibaba/wan-3.0-prime/image-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open-family",
+    "inputs": {
+      "image": "source_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.075,
+        "720p": 0.15,
+        "1080p": 0.3
+      }
+    },
+    "baselineUsd": 0.75
+  },
+  "wan-3.0-prime-spicy": {
+    "label": "Wan 3.0 Prime Uncensored",
+    "endpoint": "alibaba/wan-3.0-prime/image-to-video-spicy",
+    "kind": "video",
+    "adult": true,
+    "tier": "standard",
+    "weights": "open-family",
+    "inputs": {
+      "image": "source_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.075,
+        "720p": 0.15,
+        "1080p": 0.3
+      }
+    },
+    "baselineUsd": 0.75
+  },
+  "seedance-2.5-turbo": {
+    "label": "Seedance 2.5 Turbo",
+    "endpoint": "bytedance/seedance-2.5/image-to-video-turbo",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "image": "source_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {
+      "resolution": "720p"
+    },
+    "price": {
+      "mode": "output",
+      "rates": {
+        "720p": 0.2,
+        "1080p": 0.22
+      }
+    },
+    "baselineUsd": 1.0
+  },
+  "wan-2.2-animate-2": {
+    "label": "Wan 2.2 Animate 2",
+    "endpoint": "base/wan-2.2/animate-2",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open-family",
+    "inputs": {
+      "image": "source_path",
+      "video": "video_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "480p": 0.04,
+        "720p": 0.08
+      },
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.2
+  },
+  "seedance-2.5-extend": {
+    "label": "Seedance 2.5 Extend",
+    "endpoint": "bytedance/seedance-2.5/video-extend",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "price": {
+      "mode": "both",
+      "rates": {
+        "480p": 0.11,
+        "720p": 0.22,
+        "1080p": 0.55,
+        "4k": 1.1
+      },
+      "maxSeconds": 120
+    },
+    "baselineUsd": 1.1
+  },
+  "wan-3.0-extend": {
+    "label": "Wan 3.0 Extend",
+    "endpoint": "alibaba/wan-3.0/video-extend",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open-family",
+    "inputs": {
+      "video": "video_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.05,
+        "720p": 0.1,
+        "1080p": 0.2
+      }
+    },
+    "baselineUsd": 0.5
+  },
+  "seedream-5-edit": {
+    "label": "Seedream 5 Pro",
+    "endpoint": "bytedance/seedream-v5.0-pro/edit",
+    "kind": "image",
+    "adult": false,
+    "tier": "best",
+    "weights": "closed",
+    "inputs": {
+      "images": "image_paths"
+    },
+    "defaults": {
+      "resolution": "1k"
+    },
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "1k": 0.045,
+        "1.5k": 0.045,
+        "2k": 0.09
+      },
+      "extraImage": 0.003
+    },
+    "baselineUsd": 0.045
+  },
+  "qwen-image-3-edit": {
+    "label": "Qwen Image 3.0",
+    "endpoint": "alibaba/qwen-image-3.0/edit",
+    "kind": "image",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open-family",
+    "inputs": {
+      "images": "image_paths"
+    },
+    "defaults": {
+      "resolution": "1k"
+    },
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "1k": 0.033,
+        "2k": 0.033
+      },
+      "extraImage": 0.003
+    },
+    "baselineUsd": 0.03
+  },
+  "flashvsr": {
+    "label": "FlashVSR",
+    "endpoint": "base/flashvsr",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "720p": 0.012,
+        "1080p": 0.018,
+        "2k": 0.024,
+        "4k": 0.032
+      },
+      "resolutionField": "target_resolution",
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.05
+  },
+  "video-upscaler-pro": {
+    "label": "Upscaler Pro",
+    "endpoint": "base/video-upscaler-pro",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "720p": 0.02,
+        "1080p": 0.04,
+        "2k": 0.05,
+        "4k": 0.07
+      },
+      "resolutionField": "target_resolution",
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.2
+  },
+  "ultimate-video-upscaler": {
+    "label": "Ultimate Upscaler",
+    "endpoint": "base/ultimate-video-upscaler",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "720p": 0.02,
+        "1080p": 0.03,
+        "2k": 0.05,
+        "4k": 0.08
+      },
+      "resolutionField": "target_resolution",
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.15
+  },
+  "crystal-upscaler": {
+    "label": "Crystal 8K",
+    "endpoint": "clarity-ai/crystal-video-upscaler",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "default": 0.1
+      },
+      "perUnitField": "target_megapixels",
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.1
+  },
+  "flux-3-upscale": {
+    "label": "FLUX 3 Upscale",
+    "endpoint": "black-forest-labs/flux-3/video-upscale",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open-family",
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "default": 0.79
+      },
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.79
+  },
+  "video-upscaler": {
+    "label": "Video Upscaler",
+    "endpoint": "base/video-upscaler",
+    "kind": "video",
+    "adult": false,
+    "tier": "standard",
+    "weights": "closed",
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {},
+    "price": {
+      "mode": "input",
+      "rates": {
+        "720p": 0.005,
+        "1080p": 0.005,
+        "2k": 0.01,
+        "4k": 0.02
+      },
+      "resolutionField": "target_resolution",
+      "maxSeconds": 120
+    },
+    "baselineUsd": 0.025
+  },
+  "z-image": {
+    "label": "Z-Image Base",
+    "endpoint": "base/z-image/base",
+    "kind": "image",
+    "adult": true,
+    "tier": "best",
+    "weights": "open",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.01
+      }
+    },
+    "inputs": {},
+    "defaults": {},
+    "baselineUsd": 0.01
+  },
+  "nucleus-image": {
+    "label": "Nucleus",
+    "endpoint": "base/nucleus-image/text-to-image",
+    "kind": "image",
+    "adult": true,
+    "tier": "standard",
+    "weights": "open-family",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.01
+      },
+      "perUnitField": "num_images"
+    },
+    "inputs": {},
+    "defaults": {},
+    "baselineUsd": 0.01
+  },
+  "jib-mix-qwen": {
+    "label": "JibMix Qwen",
+    "endpoint": "base/jib-mix-qwen-image/text-to-image",
+    "kind": "image",
+    "adult": true,
+    "tier": "standard",
+    "weights": "open-family",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.02
+      }
+    },
+    "inputs": {},
+    "defaults": {},
+    "baselineUsd": 0.02
+  },
+  "wan-2.2-realism": {
+    "label": "Wan 2.2 Realism",
+    "endpoint": "base/wan-2.2/text-to-image-realism",
+    "kind": "image",
+    "adult": true,
+    "tier": "older",
+    "weights": "open-family",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "default": 0.025
+      }
+    },
+    "inputs": {},
+    "defaults": {},
+    "baselineUsd": 0.025
+  },
+  "qwen-image-2.1": {
+    "label": "Qwen Image 2.1",
+    "endpoint": "base/qwen-image-2.1/text-to-image",
+    "kind": "image",
+    "adult": false,
+    "tier": "standard",
+    "weights": "open",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "1k": 0.02,
+        "1.5k": 0.04,
+        "2k": 0.08
+      }
+    },
+    "inputs": {},
+    "defaults": {},
+    "baselineUsd": 0.02
+  },
+  "qwen-image-2.1-edit": {
+    "label": "Qwen Image 2.1",
+    "endpoint": "base/qwen-image-2.1/edit",
+    "kind": "image",
+    "adult": false,
+    "tier": "best",
+    "weights": "open",
+    "price": {
+      "mode": "flat",
+      "rates": {
+        "1k": 0.03,
+        "1.5k": 0.06,
+        "2k": 0.12
+      },
+      "extraImage": 0.02
+    },
+    "inputs": {
+      "images": "image_paths"
+    },
+    "defaults": {},
+    "baselineUsd": 0.03
+  },
+  "ltx-2.5-t2v": {
+    "label": "LTX 2.5",
+    "endpoint": "base/ltx-2.5/text-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "720p": 0.1,
+        "1080p": 0.14,
+        "2k": 0.21,
+        "4k": 0.33
+      }
+    },
+    "inputs": {},
+    "defaults": {},
+    "baselineUsd": 0.5
+  },
+  "ltx-2.5-i2v": {
+    "label": "LTX 2.5",
+    "endpoint": "base/ltx-2.5/image-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "720p": 0.1,
+        "1080p": 0.14,
+        "2k": 0.21,
+        "4k": 0.33
+      }
+    },
+    "inputs": {
+      "image": "source_path",
+      "last_image": "last_image_path"
+    },
+    "defaults": {},
+    "baselineUsd": 0.5
+  },
+  "minimax-h3-t2v": {
+    "label": "MiniMax H3",
+    "endpoint": "base/minimax-h3/text-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.04,
+        "540p": 0.06,
+        "768p": 0.08,
+        "1080p": 0.16
+      }
+    },
+    "inputs": {},
+    "defaults": {
+      "resolution": "480p"
+    },
+    "baselineUsd": 0.2
+  },
+  "minimax-h3-ref": {
+    "label": "MiniMax H3 \u2022 Reference",
+    "endpoint": "base/minimax-h3/reference-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.057,
+        "540p": 0.082,
+        "768p": 0.107,
+        "1080p": 0.207
+      },
+      "extraImage": 0.02
+    },
+    "inputs": {
+      "reference_images": "image_paths"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "baselineUsd": 0.25
+  },
+  "minimax-h3-video-edit": {
+    "label": "MiniMax H3 \u2022 Video Edit",
+    "endpoint": "base/minimax-h3/video-edit",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open",
+    "price": {
+      "mode": "inout",
+      "rates": {
+        "480p": 0.1,
+        "540p": 0.15,
+        "768p": 0.2,
+        "1080p": 0.4
+      },
+      "maxSeconds": 15
+    },
+    "inputs": {
+      "video": "video_path"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "baselineUsd": 0.25
+  },
+  "wan-3.0-ref": {
+    "label": "Wan 3.0 \u2022 Reference",
+    "endpoint": "alibaba/wan-3.0/reference-to-video",
+    "kind": "video",
+    "adult": false,
+    "tier": "best",
+    "weights": "open-family",
+    "price": {
+      "mode": "output",
+      "rates": {
+        "480p": 0.05,
+        "720p": 0.1,
+        "1080p": 0.2
+      }
+    },
+    "inputs": {
+      "reference_images": "image_paths"
+    },
+    "defaults": {
+      "resolution": "480p"
+    },
+    "baselineUsd": 0.5
+  }
+}
