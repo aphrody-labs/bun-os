@@ -1,0 +1,22 @@
+# Mass-format commits (subject mentions formatting, >= 200 files changed), oldest first.
+# Used by `git blame --ignore-revs-file .git-blame-ignore-revs`; `aphrody-bun git setup` sets blame.ignoreRevsFile.
+# Simpler lint fixes: makes `ci lints` work but disables a lint for now (#15376) (373 files)
+94aaa0da73d30a3695d2d6bff7ca3db1ee761128
+# refactor: finish lint cleanup (515 files)
+2bea40571d47f8b3454cdb9b467839521d3174b4
+# Format: adopt the craft-family rustfmt.toml and format the workspace (345 files)
+f7eb6ea9e724dbcf97af2d8162785c8063089edc
+# fix(lint): resolve oxlint warnings across packages and m3 (416 files)
+a2f4bd3412d80ef45c2526571811146eb83250a0
+# style: native bun fmt over imported packages, apps and scripts (3426 files)
+01b5395ba89cbb2ece598bf511d4dcec106acaf0
+# refactor(iecode): apply n2b native Bun rewrites, fix azalee-web types, lint and format the absorbed  (2415 files)
+8c4f6be58fab878addd70bc37bb26e5dd48e52d4
+# style(crates): format with the pinned rustfmt and the repository Bun format configuration (12041 files)
+58eda8926bbb4439ac8a559b6fbd3027bc4ef875
+# style(apps): format with the pinned rustfmt and the repository Bun format configuration (376 files)
+4f9d5392cc9ffa065e1cbbbd6825d4c6813d2109
+# style(packages): format with the pinned rustfmt and the repository Bun format configuration (4770 files)
+4045fd33873e4e6ab569bafab93ba190e0087487
+# style: format the remaining sources (305 files)
+07c23339cf46c1c09af72294fbf9003b17454a13

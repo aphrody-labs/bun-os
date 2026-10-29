@@ -2,3 +2,30 @@
 *.ps1 text eol=crlf
 vendor/cargo/** -text
 factory/usr/overlay/usr/share/licenses/bun-os/LICENSE whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab,-conflict-marker
+
+# >>> bunrepo managed (aphrody-bun git generate attributes) >>>
+# Lockfiles and generated manifests: no textual diff in `git diff`, collapsed in GitHub reviews.
+bun.lock text eol=lf -diff linguist-generated
+Cargo.lock text eol=lf -diff linguist-generated
+sources.lock.json text eol=lf linguist-generated
+factory/bunos/components.json text eol=lf linguist-generated
+*.lockb binary linguist-generated
+# Third-party trees are not repository code.
+vendor/** linguist-vendored
+docs/** linguist-documentation
+# Binary assets: never normalise line endings or diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.tgz binary
+*.zip binary
+*.wasm binary
+*.node binary
+# <<< bunrepo managed <<<
