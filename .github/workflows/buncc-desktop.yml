@@ -90,11 +90,11 @@ jobs:
         continue-on-error: true
       - name: Pack runtime
         shell: pwsh
-        run: bun packages/buncc/src/cli.ts desktop pack ${{ matrix.name }} --runtime --out C:\bd\${{ matrix.name }}-runtime.zip
+        run: bun packages/buncc/src/cli.ts desktop pack ${{ matrix.name }} --runtime --out ${{ github.workspace }}\${{ matrix.name }}-runtime.zip
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-${{ matrix.name }}
           path: |
-            C:\bd\${{ matrix.name }}-runtime.zip
+            ${{ matrix.name }}-runtime.zip
             bench.json
           if-no-files-found: warn
