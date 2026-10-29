@@ -1,6 +1,6 @@
 {
   "name": "@aphrody/windows-samples-tests",
-  "version": "0.1.0",
+  "version": "1.4.7",
   "private": true,
   "description": "Test matrix of the official Microsoft Windows samples (WinUI, Windows App SDK, Direct3D 12, .NET 10/11 templates) across C++, C#, Rust and Bun",
   "license": "MIT",
