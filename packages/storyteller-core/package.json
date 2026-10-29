@@ -1,0 +1,35 @@
+{
+  "name": "@storyteller/core",
+  "version": "1.4.7",
+  "description": "ArtCraft shared non-UI modules (common, api-enums, credits, analytics, icons, keybinds, soundboard, subscription, tauri events and utils), one subpath export per former package.",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    "./common": "./src/common/index.ts",
+    "./api-enums": "./src/api-enums/index.ts",
+    "./credits": "./src/credits/index.ts",
+    "./google-analytics": "./src/google-analytics/index.ts",
+    "./icons": "./src/icons/index.ts",
+    "./keybinds": "./src/keybinds/index.ts",
+    "./markdown-content": "./src/markdown-content/index.ts",
+    "./soundboard": "./src/soundboard/index.ts",
+    "./subscription": "./src/subscription/index.ts",
+    "./tauri-events": "./src/tauri-events/index.ts",
+    "./tauri-utils": "./src/tauri-utils/index.ts"
+  },
+  "dependencies": {
+    "howler": "^2.2.4",
+    "@tauri-apps/plugin-http": "catalog:"
+  },
+  "scripts": {
+    "typecheck": "bun check -p tsconfig.json --threads=2 --no-pretty",
+    "lint": "bun lint src",
+    "format": "bun fmt --write -c ../../bun-format.json src"
+  },
+  "engines": {
+    "bun": "=1.4.4"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.12"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "../artcraft-frontend/tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["bun-types", "node"]
+  },
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "../artcraft-frontend/types/*.d.ts"],
+  "exclude": ["dist", "out-tsc"]
+}

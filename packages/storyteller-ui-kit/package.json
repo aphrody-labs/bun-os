@@ -1,0 +1,41 @@
+{
+  "name": "@storyteller/ui-kit",
+  "version": "1.4.7",
+  "description": "ArtCraft UI primitives (button, input, select, tooltip, toaster, ...), one subpath export per former package.",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    "./ui-badge": "./src/ui-badge/index.ts",
+    "./ui-button": "./src/ui-button/index.ts",
+    "./ui-button-dropdown": "./src/ui-button-dropdown/index.ts",
+    "./ui-button-icon": "./src/ui-button-icon/index.ts",
+    "./ui-button-icon-select": "./src/ui-button-icon-select/index.ts",
+    "./ui-checkbox": "./src/ui-checkbox/index.ts",
+    "./ui-close-button": "./src/ui-close-button/index.ts",
+    "./ui-input": "./src/ui-input/index.ts",
+    "./ui-label": "./src/ui-label/index.ts",
+    "./ui-list-dropdown": "./src/ui-list-dropdown/index.ts",
+    "./ui-loading": "./src/ui-loading/index.ts",
+    "./ui-loading-spinner": "./src/ui-loading-spinner/index.ts",
+    "./ui-select": "./src/ui-select/index.ts",
+    "./ui-sliderv2": "./src/ui-sliderv2/index.ts",
+    "./ui-switch": "./src/ui-switch/index.ts",
+    "./ui-tab-selector": "./src/ui-tab-selector/index.ts",
+    "./ui-toaster": "./src/ui-toaster/index.ts",
+    "./ui-tooltip": "./src/ui-tooltip/index.ts",
+    "./ui-popover": "./src/ui-popover/index.ts",
+    "./ui-modal": "./src/ui-modal/index.ts",
+    "./ui-gravatar": "./src/ui-gravatar/index.ts",
+    "./ui-file-uploader": "./src/ui-file-uploader/index.ts",
+    "./ui-menu-icon-selector": "./src/ui-menu-icon-selector/index.ts",
+    "./ui-pricing-table": "./src/ui-pricing-table/index.ts"
+  },
+  "scripts": {
+    "typecheck": "bun check -p tsconfig.json --threads=2 --no-pretty",
+    "lint": "bun lint src",
+    "format": "bun fmt --write -c ../../bun-format.json src"
+  },
+  "engines": {
+    "bun": "=1.4.4"
+  }
+}

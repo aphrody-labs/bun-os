@@ -1,0 +1,32 @@
+{
+  "name": "@storyteller/ui-dialogs",
+  "version": "1.4.7",
+  "description": "ArtCraft dialogs and modals (login, pricing, settings, upload, gallery, lightbox, help, provider setup), one subpath export per former package.",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    "./ui-action-reminder-modal": "./src/ui-action-reminder-modal/index.ts",
+    "./ui-camera-settings-modal": "./src/ui-camera-settings-modal/index.ts",
+    "./ui-help-menu": "./src/ui-help-menu/index.ts",
+    "./ui-lightbox-modal": "./src/ui-lightbox-modal/index.ts",
+    "./ui-gallery-modal": "./src/ui-gallery-modal/index.ts",
+    "./ui-login-modal": "./src/ui-login-modal/index.ts",
+    "./ui-pricing-modal": "./src/ui-pricing-modal/index.ts",
+    "./ui-settings-modal": "./src/ui-settings-modal/index.ts",
+    "./ui-upload-modal": "./src/ui-upload-modal/index.ts",
+    "./provider-billing-modal": "./src/provider-billing-modal/index.ts",
+    "./provider-setup-modal": "./src/provider-setup-modal/index.ts"
+  },
+  "dependencies": {
+    "@tauri-apps/plugin-dialog": "catalog:"
+  },
+  "scripts": {
+    "typecheck": "bun check -p tsconfig.json --threads=2 --no-pretty",
+    "lint": "bun lint src",
+    "format": "bun fmt --write -c ../../bun-format.json src",
+    "test": "bun test src/ui-login-modal && bun test src/ui-pricing-modal && bun test src/ui-settings-modal && bun test src/ui-upload-modal && bun test src/provider-setup-modal"
+  },
+  "engines": {
+    "bun": "=1.4.4"
+  }
+}

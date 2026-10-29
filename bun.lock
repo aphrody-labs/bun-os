@@ -1535,33 +1535,16 @@
       "name": "@storyteller/api",
       "version": "1.4.7",
     },
-    "packages/storyteller-api-enums": {
-      "name": "@storyteller/api-enums",
+    "packages/storyteller-core": {
+      "name": "@storyteller/core",
       "version": "1.4.7",
-    },
-    "packages/storyteller-common": {
-      "name": "@storyteller/common",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-credits": {
-      "name": "@storyteller/credits",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-google-analytics": {
-      "name": "@storyteller/google-analytics",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-icons": {
-      "name": "@storyteller/icons",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-keybinds": {
-      "name": "@storyteller/keybinds",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-markdown-content": {
-      "name": "@storyteller/markdown-content",
-      "version": "1.4.7",
+      "dependencies": {
+        "@tauri-apps/plugin-http": "catalog:",
+        "howler": "^2.2.4",
+      },
+      "devDependencies": {
+        "@types/howler": "^2.2.12",
+      },
     },
     "packages/storyteller-model-list": {
       "name": "@storyteller/model-list",
@@ -1569,28 +1552,6 @@
     },
     "packages/storyteller-omni-gen": {
       "name": "@storyteller/omni-gen",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-provider-billing-modal": {
-      "name": "@storyteller/provider-billing-modal",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-provider-setup-modal": {
-      "name": "@storyteller/provider-setup-modal",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-soundboard": {
-      "name": "@storyteller/soundboard",
-      "version": "1.4.7",
-      "dependencies": {
-        "howler": "^2.2.4",
-      },
-      "devDependencies": {
-        "@types/howler": "^2.2.12",
-      },
-    },
-    "packages/storyteller-subscription": {
-      "name": "@storyteller/subscription",
       "version": "1.4.7",
     },
     "packages/storyteller-tauri-api": {
@@ -1602,21 +1563,6 @@
         "@tauri-apps/plugin-upload": "2.4.0",
       },
     },
-    "packages/storyteller-tauri-events": {
-      "name": "@storyteller/tauri-events",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-tauri-utils": {
-      "name": "@storyteller/tauri-utils",
-      "version": "1.4.7",
-      "dependencies": {
-        "@tauri-apps/plugin-http": "catalog:",
-      },
-    },
-    "packages/storyteller-ui-action-reminder-modal": {
-      "name": "@storyteller/ui-action-reminder-modal",
-      "version": "1.4.7",
-    },
     "packages/storyteller-ui-audio-player": {
       "name": "@storyteller/ui-audio-player",
       "version": "1.4.7",
@@ -1624,92 +1570,19 @@
         "wavesurfer.js": "^7.7.11",
       },
     },
-    "packages/storyteller-ui-badge": {
-      "name": "@storyteller/ui-badge",
+    "packages/storyteller-ui-dialogs": {
+      "name": "@storyteller/ui-dialogs",
       "version": "1.4.7",
-    },
-    "packages/storyteller-ui-button": {
-      "name": "@storyteller/ui-button",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-button-dropdown": {
-      "name": "@storyteller/ui-button-dropdown",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-button-icon": {
-      "name": "@storyteller/ui-button-icon",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-button-icon-select": {
-      "name": "@storyteller/ui-button-icon-select",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-camera-settings-modal": {
-      "name": "@storyteller/ui-camera-settings-modal",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-checkbox": {
-      "name": "@storyteller/ui-checkbox",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-close-button": {
-      "name": "@storyteller/ui-close-button",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-file-uploader": {
-      "name": "@storyteller/ui-file-uploader",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-gallery-modal": {
-      "name": "@storyteller/ui-gallery-modal",
-      "version": "1.4.7",
+      "dependencies": {
+        "@tauri-apps/plugin-dialog": "catalog:",
+      },
     },
     "packages/storyteller-ui-generation-list": {
       "name": "@storyteller/ui-generation-list",
       "version": "1.4.7",
     },
-    "packages/storyteller-ui-gravatar": {
-      "name": "@storyteller/ui-gravatar",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-help-menu": {
-      "name": "@storyteller/ui-help-menu",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-input": {
-      "name": "@storyteller/ui-input",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-label": {
-      "name": "@storyteller/ui-label",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-lightbox-modal": {
-      "name": "@storyteller/ui-lightbox-modal",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-list-dropdown": {
-      "name": "@storyteller/ui-list-dropdown",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-loading": {
-      "name": "@storyteller/ui-loading",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-loading-spinner": {
-      "name": "@storyteller/ui-loading-spinner",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-login-modal": {
-      "name": "@storyteller/ui-login-modal",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-menu-icon-selector": {
-      "name": "@storyteller/ui-menu-icon-selector",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-modal": {
-      "name": "@storyteller/ui-modal",
+    "packages/storyteller-ui-kit": {
+      "name": "@storyteller/ui-kit",
       "version": "1.4.7",
     },
     "packages/storyteller-ui-model-selector": {
@@ -1731,55 +1604,8 @@
         "three-stdlib": "catalog:",
       },
     },
-    "packages/storyteller-ui-popover": {
-      "name": "@storyteller/ui-popover",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-pricing-modal": {
-      "name": "@storyteller/ui-pricing-modal",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-pricing-table": {
-      "name": "@storyteller/ui-pricing-table",
-      "version": "1.4.7",
-    },
     "packages/storyteller-ui-promptbox": {
       "name": "@storyteller/ui-promptbox",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-select": {
-      "name": "@storyteller/ui-select",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-settings-modal": {
-      "name": "@storyteller/ui-settings-modal",
-      "version": "1.4.7",
-      "dependencies": {
-        "@tauri-apps/plugin-dialog": "catalog:",
-      },
-    },
-    "packages/storyteller-ui-sliderv2": {
-      "name": "@storyteller/ui-sliderv2",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-switch": {
-      "name": "@storyteller/ui-switch",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-tab-selector": {
-      "name": "@storyteller/ui-tab-selector",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-toaster": {
-      "name": "@storyteller/ui-toaster",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-tooltip": {
-      "name": "@storyteller/ui-tooltip",
-      "version": "1.4.7",
-    },
-    "packages/storyteller-ui-upload-modal": {
-      "name": "@storyteller/ui-upload-modal",
       "version": "1.4.7",
     },
     "packages/storyteller-ui-vfx": {
@@ -3785,85 +3611,21 @@
 
     "@storyteller/api": ["@storyteller/api@workspace:packages/storyteller-api"],
 
-    "@storyteller/api-enums": ["@storyteller/api-enums@workspace:packages/storyteller-api-enums"],
-
-    "@storyteller/common": ["@storyteller/common@workspace:packages/storyteller-common"],
-
-    "@storyteller/credits": ["@storyteller/credits@workspace:packages/storyteller-credits"],
-
-    "@storyteller/google-analytics": ["@storyteller/google-analytics@workspace:packages/storyteller-google-analytics"],
-
-    "@storyteller/icons": ["@storyteller/icons@workspace:packages/storyteller-icons"],
-
-    "@storyteller/keybinds": ["@storyteller/keybinds@workspace:packages/storyteller-keybinds"],
-
-    "@storyteller/markdown-content": ["@storyteller/markdown-content@workspace:packages/storyteller-markdown-content"],
+    "@storyteller/core": ["@storyteller/core@workspace:packages/storyteller-core"],
 
     "@storyteller/model-list": ["@storyteller/model-list@workspace:packages/storyteller-model-list"],
 
     "@storyteller/omni-gen": ["@storyteller/omni-gen@workspace:packages/storyteller-omni-gen"],
 
-    "@storyteller/provider-billing-modal": ["@storyteller/provider-billing-modal@workspace:packages/storyteller-provider-billing-modal"],
-
-    "@storyteller/provider-setup-modal": ["@storyteller/provider-setup-modal@workspace:packages/storyteller-provider-setup-modal"],
-
-    "@storyteller/soundboard": ["@storyteller/soundboard@workspace:packages/storyteller-soundboard"],
-
-    "@storyteller/subscription": ["@storyteller/subscription@workspace:packages/storyteller-subscription"],
-
     "@storyteller/tauri-api": ["@storyteller/tauri-api@workspace:packages/storyteller-tauri-api"],
-
-    "@storyteller/tauri-events": ["@storyteller/tauri-events@workspace:packages/storyteller-tauri-events"],
-
-    "@storyteller/tauri-utils": ["@storyteller/tauri-utils@workspace:packages/storyteller-tauri-utils"],
-
-    "@storyteller/ui-action-reminder-modal": ["@storyteller/ui-action-reminder-modal@workspace:packages/storyteller-ui-action-reminder-modal"],
 
     "@storyteller/ui-audio-player": ["@storyteller/ui-audio-player@workspace:packages/storyteller-ui-audio-player"],
 
-    "@storyteller/ui-badge": ["@storyteller/ui-badge@workspace:packages/storyteller-ui-badge"],
-
-    "@storyteller/ui-button": ["@storyteller/ui-button@workspace:packages/storyteller-ui-button"],
-
-    "@storyteller/ui-button-dropdown": ["@storyteller/ui-button-dropdown@workspace:packages/storyteller-ui-button-dropdown"],
-
-    "@storyteller/ui-button-icon": ["@storyteller/ui-button-icon@workspace:packages/storyteller-ui-button-icon"],
-
-    "@storyteller/ui-button-icon-select": ["@storyteller/ui-button-icon-select@workspace:packages/storyteller-ui-button-icon-select"],
-
-    "@storyteller/ui-camera-settings-modal": ["@storyteller/ui-camera-settings-modal@workspace:packages/storyteller-ui-camera-settings-modal"],
-
-    "@storyteller/ui-checkbox": ["@storyteller/ui-checkbox@workspace:packages/storyteller-ui-checkbox"],
-
-    "@storyteller/ui-close-button": ["@storyteller/ui-close-button@workspace:packages/storyteller-ui-close-button"],
-
-    "@storyteller/ui-file-uploader": ["@storyteller/ui-file-uploader@workspace:packages/storyteller-ui-file-uploader"],
-
-    "@storyteller/ui-gallery-modal": ["@storyteller/ui-gallery-modal@workspace:packages/storyteller-ui-gallery-modal"],
+    "@storyteller/ui-dialogs": ["@storyteller/ui-dialogs@workspace:packages/storyteller-ui-dialogs"],
 
     "@storyteller/ui-generation-list": ["@storyteller/ui-generation-list@workspace:packages/storyteller-ui-generation-list"],
 
-    "@storyteller/ui-gravatar": ["@storyteller/ui-gravatar@workspace:packages/storyteller-ui-gravatar"],
-
-    "@storyteller/ui-help-menu": ["@storyteller/ui-help-menu@workspace:packages/storyteller-ui-help-menu"],
-
-    "@storyteller/ui-input": ["@storyteller/ui-input@workspace:packages/storyteller-ui-input"],
-
-    "@storyteller/ui-label": ["@storyteller/ui-label@workspace:packages/storyteller-ui-label"],
-
-    "@storyteller/ui-lightbox-modal": ["@storyteller/ui-lightbox-modal@workspace:packages/storyteller-ui-lightbox-modal"],
-
-    "@storyteller/ui-list-dropdown": ["@storyteller/ui-list-dropdown@workspace:packages/storyteller-ui-list-dropdown"],
-
-    "@storyteller/ui-loading": ["@storyteller/ui-loading@workspace:packages/storyteller-ui-loading"],
-
-    "@storyteller/ui-loading-spinner": ["@storyteller/ui-loading-spinner@workspace:packages/storyteller-ui-loading-spinner"],
-
-    "@storyteller/ui-login-modal": ["@storyteller/ui-login-modal@workspace:packages/storyteller-ui-login-modal"],
-
-    "@storyteller/ui-menu-icon-selector": ["@storyteller/ui-menu-icon-selector@workspace:packages/storyteller-ui-menu-icon-selector"],
-
-    "@storyteller/ui-modal": ["@storyteller/ui-modal@workspace:packages/storyteller-ui-modal"],
+    "@storyteller/ui-kit": ["@storyteller/ui-kit@workspace:packages/storyteller-ui-kit"],
 
     "@storyteller/ui-model-selector": ["@storyteller/ui-model-selector@workspace:packages/storyteller-ui-model-selector"],
 
@@ -3873,29 +3635,7 @@
 
     "@storyteller/ui-pagescene": ["@storyteller/ui-pagescene@workspace:packages/storyteller-ui-pagescene"],
 
-    "@storyteller/ui-popover": ["@storyteller/ui-popover@workspace:packages/storyteller-ui-popover"],
-
-    "@storyteller/ui-pricing-modal": ["@storyteller/ui-pricing-modal@workspace:packages/storyteller-ui-pricing-modal"],
-
-    "@storyteller/ui-pricing-table": ["@storyteller/ui-pricing-table@workspace:packages/storyteller-ui-pricing-table"],
-
     "@storyteller/ui-promptbox": ["@storyteller/ui-promptbox@workspace:packages/storyteller-ui-promptbox"],
-
-    "@storyteller/ui-select": ["@storyteller/ui-select@workspace:packages/storyteller-ui-select"],
-
-    "@storyteller/ui-settings-modal": ["@storyteller/ui-settings-modal@workspace:packages/storyteller-ui-settings-modal"],
-
-    "@storyteller/ui-sliderv2": ["@storyteller/ui-sliderv2@workspace:packages/storyteller-ui-sliderv2"],
-
-    "@storyteller/ui-switch": ["@storyteller/ui-switch@workspace:packages/storyteller-ui-switch"],
-
-    "@storyteller/ui-tab-selector": ["@storyteller/ui-tab-selector@workspace:packages/storyteller-ui-tab-selector"],
-
-    "@storyteller/ui-toaster": ["@storyteller/ui-toaster@workspace:packages/storyteller-ui-toaster"],
-
-    "@storyteller/ui-tooltip": ["@storyteller/ui-tooltip@workspace:packages/storyteller-ui-tooltip"],
-
-    "@storyteller/ui-upload-modal": ["@storyteller/ui-upload-modal@workspace:packages/storyteller-ui-upload-modal"],
 
     "@storyteller/ui-vfx": ["@storyteller/ui-vfx@workspace:packages/storyteller-ui-vfx"],
 

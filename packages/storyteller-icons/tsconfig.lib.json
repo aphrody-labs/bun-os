@@ -1,9 +1,0 @@
-{
-  "extends": "../artcraft-frontend/tsconfig.base.json",
-  "compilerOptions": {
-    "types": ["bun-types", "node"],
-    "jsx": "react-jsx"
-  },
-  "exclude": ["out-tsc", "dist", "vite.config.ts"],
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
-}

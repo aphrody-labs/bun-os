@@ -1,8 +1,0 @@
-{
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "../artcraft-frontend/types/*.d.ts"],
-  "extends": "../artcraft-frontend/tsconfig.base.json",
-  "compilerOptions": {
-    "jsx": "react-jsx"
-  },
-  "exclude": ["dist", "out-tsc"]
-}

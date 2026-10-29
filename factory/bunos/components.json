@@ -4322,103 +4322,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@storyteller/api-enums",
-      "kind": "npm-package",
-      "path": "packages/storyteller-api-enums",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/api-enums",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "npm:@storyteller/api",
       "kind": "npm-package",
       "path": "packages/storyteller-api",
       "source": {
         "type": "workspace",
         "name": "@storyteller/api",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/common",
-      "kind": "npm-package",
-      "path": "packages/storyteller-common",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/common",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/credits",
-      "kind": "npm-package",
-      "path": "packages/storyteller-credits",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/credits",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/google-analytics",
-      "kind": "npm-package",
-      "path": "packages/storyteller-google-analytics",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/google-analytics",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/icons",
-      "kind": "npm-package",
-      "path": "packages/storyteller-icons",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/icons",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/keybinds",
-      "kind": "npm-package",
-      "path": "packages/storyteller-keybinds",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/keybinds",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/markdown-content",
-      "kind": "npm-package",
-      "path": "packages/storyteller-markdown-content",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/markdown-content",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -4452,12 +4361,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@storyteller/provider-billing-modal",
+      "id": "npm:@storyteller/core",
       "kind": "npm-package",
-      "path": "packages/storyteller-provider-billing-modal",
+      "path": "packages/storyteller-core",
       "source": {
         "type": "workspace",
-        "name": "@storyteller/provider-billing-modal",
+        "name": "@storyteller/core",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -4465,12 +4374,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@storyteller/provider-setup-modal",
+      "id": "npm:@storyteller/ui-dialogs",
       "kind": "npm-package",
-      "path": "packages/storyteller-provider-setup-modal",
+      "path": "packages/storyteller-ui-dialogs",
       "source": {
         "type": "workspace",
-        "name": "@storyteller/provider-setup-modal",
+        "name": "@storyteller/ui-dialogs",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -4478,25 +4387,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@storyteller/soundboard",
+      "id": "npm:@storyteller/ui-kit",
       "kind": "npm-package",
-      "path": "packages/storyteller-soundboard",
+      "path": "packages/storyteller-ui-kit",
       "source": {
         "type": "workspace",
-        "name": "@storyteller/soundboard",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/subscription",
-      "kind": "npm-package",
-      "path": "packages/storyteller-subscription",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/subscription",
+        "name": "@storyteller/ui-kit",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -4517,45 +4413,6 @@
       "status": "present"
     },
     {
-      "id": "npm:@storyteller/tauri-events",
-      "kind": "npm-package",
-      "path": "packages/storyteller-tauri-events",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/tauri-events",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/tauri-utils",
-      "kind": "npm-package",
-      "path": "packages/storyteller-tauri-utils",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/tauri-utils",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-action-reminder-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-action-reminder-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-action-reminder-modal",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "npm:@storyteller/ui-audio-player",
       "kind": "npm-package",
       "path": "packages/storyteller-ui-audio-player",
@@ -4569,285 +4426,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@storyteller/ui-badge",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-badge",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-badge",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-button-dropdown",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-button-dropdown",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-button-dropdown",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-button-icon-select",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-button-icon-select",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-button-icon-select",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-button-icon",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-button-icon",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-button-icon",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-button",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-button",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-button",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-camera-settings-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-camera-settings-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-camera-settings-modal",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-checkbox",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-checkbox",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-checkbox",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-close-button",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-close-button",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-close-button",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-file-uploader",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-file-uploader",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-file-uploader",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-gallery-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-gallery-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-gallery-modal",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "npm:@storyteller/ui-generation-list",
       "kind": "npm-package",
       "path": "packages/storyteller-ui-generation-list",
       "source": {
         "type": "workspace",
         "name": "@storyteller/ui-generation-list",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-gravatar",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-gravatar",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-gravatar",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-help-menu",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-help-menu",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-help-menu",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-input",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-input",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-input",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-label",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-label",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-label",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-lightbox-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-lightbox-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-lightbox-modal",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-list-dropdown",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-list-dropdown",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-list-dropdown",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-loading-spinner",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-loading-spinner",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-loading-spinner",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-loading",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-loading",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-loading",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-login-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-login-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-login-modal",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-menu-icon-selector",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-menu-icon-selector",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-menu-icon-selector",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-modal",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -4907,155 +4491,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@storyteller/ui-popover",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-popover",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-popover",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-pricing-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-pricing-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-pricing-modal",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-pricing-table",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-pricing-table",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-pricing-table",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "npm:@storyteller/ui-promptbox",
       "kind": "npm-package",
       "path": "packages/storyteller-ui-promptbox",
       "source": {
         "type": "workspace",
         "name": "@storyteller/ui-promptbox",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-select",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-select",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-select",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-settings-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-settings-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-settings-modal",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-sliderv2",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-sliderv2",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-sliderv2",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-switch",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-switch",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-switch",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-tab-selector",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-tab-selector",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-tab-selector",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-toaster",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-toaster",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-toaster",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-tooltip",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-tooltip",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-tooltip",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@storyteller/ui-upload-modal",
-      "kind": "npm-package",
-      "path": "packages/storyteller-ui-upload-modal",
-      "source": {
-        "type": "workspace",
-        "name": "@storyteller/ui-upload-modal",
         "version": "1.4.7"
       },
       "registration": ["none"],
