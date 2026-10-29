@@ -182,11 +182,11 @@
       "build": "meson",
       "repo": "https://github.com/GNOME/gdk-pixbuf",
       "track": {
-        "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
+        "pattern": "^(2)\\.(44)\\.(\\d+)$"
       },
       "pin": {
-        "tag": "2.90.3",
-        "sha": "aab1a96d46a5b96dfe316cd897880637db98791c"
+        "tag": "2.44.8",
+        "sha": "0bd66153abb6bd548febb82337db79cbefe694b0"
       },
       "deps": ["glib"],
       "options": [

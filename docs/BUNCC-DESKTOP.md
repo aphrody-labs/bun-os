@@ -48,7 +48,7 @@ buncc desktop bench <hello-gtk4|hello-qt|hello-qml|hello-kcoreaddons>
 
 Tag rules: GTK/GLib/Cairo use even minor numbers only (stable series); Qt uses the highest `v6.x.y` and records the
 newest 6.8 LTS next to it (`--lts`); KDE Frameworks, Plasma and Gear use the highest release tag.
-Pins on 2026-10-29: glib 2.90.1, gtk 4.24.1, pango 1.58.2, cairo 1.18.6, harfbuzz 15.0.0, gdk-pixbuf 2.90.3,
+Pins on 2026-10-29: glib 2.90.1, gtk 4.24.1, pango 1.58.2, cairo 1.18.6, harfbuzz 15.0.0, gdk-pixbuf 2.44.8,
 graphene 1.10.8, libepoxy 1.5.10, libadwaita 1.10.0, Qt 6.12.0 (LTS 6.8.3), KDE Frameworks 6.31.0,
 Plasma 6.8.2, Gear/Kate 26.08.2.
 
