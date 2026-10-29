@@ -11,7 +11,7 @@ const server = Bun.serve({
     return new Response(Bun.file(join(dist, p === "/" ? "index.html" : p)));
   },
 });
-const { chromium } = await import("playwright-core");
+const { chromium } = await import(Bun.env.PLAYWRIGHT_CORE ?? "playwright-core");
 const browser = await chromium.launch({
   executablePath: Bun.env.WASMOS_CHROME ?? "/usr/bin/google-chrome",
   args: ["--no-sandbox"],

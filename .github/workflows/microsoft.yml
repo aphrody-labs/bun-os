@@ -111,7 +111,7 @@ jobs:
         run: bun packages/fluent/src/build-web.ts
       - name: Headless Chrome check
         run: |
-          (cd packages/fluent && npm install --no-save --no-package-lock playwright-core@1.63.0)
-          WASMOS_CHROME=/usr/bin/google-chrome bun packages/fluent/src/check-web.ts
+          mkdir -p "$RUNNER_TEMP/pw" && (cd "$RUNNER_TEMP/pw" && npm init -y >/dev/null && npm install --no-package-lock playwright-core@1.63.0)
+          PLAYWRIGHT_CORE="$RUNNER_TEMP/pw/node_modules/playwright-core/index.mjs" WASMOS_CHROME=/usr/bin/google-chrome bun packages/fluent/src/check-web.ts
       - name: Pure-logic tests of packages/microsoft (PE, Wine spec, coverage)
         run: bun test packages/microsoft
