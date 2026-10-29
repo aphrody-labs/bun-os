@@ -1,28 +1,20 @@
 // Generates and qualifies the cef-rs bindings of the vendor/cef-rs fork from owner-built CEF headers.
 // Moved from aphrody-labs/bun scripts/aphrody/cef-rs-bindings.ts with the cef-rs source (runtime-heavy-migration B1).
 import { isAbsolute, join, resolve } from "node:path";
-import {
-  CHROMIUM_BASE_REVISION,
-  CHROMIUM_REVISION,
-} from "../../../toolchains/bun/scripts/aphrody/cef.ts";
+import { CHROMIUM_BASE_REVISION, CHROMIUM_REVISION } from "../../../toolchains/bun/scripts/aphrody/cef.ts";
 
 const root = resolve(import.meta.dir, "../../..");
 const source = join(root, "vendor/cef-rs");
-const lock: { repositories: { id: string; revision: string }[] } =
-  await Bun.file(join(root, "sources.lock.json")).json();
-export const CEF_RS_REVISION = lock.repositories.find(
-  (entry) => entry.id === "vendor/cef-rs",
-)!.revision;
+const lock: { repositories: { id: string; revision: string }[] } = await Bun.file(
+  join(root, "sources.lock.json"),
+).json();
+export const CEF_RS_REVISION = lock.repositories.find(entry => entry.id === "vendor/cef-rs")!.revision;
 const cefRevision = "7e28cb05af72af8c0cdfafe7facfca97eed139c8";
 const chromiumRevision = CHROMIUM_REVISION;
 const chromiumVersion = "157.0.8099.0";
-const hash = (bytes: Uint8Array) =>
-  new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
+const hash = (bytes: Uint8Array) => new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
 
-export function cefTargetEnvironment(
-  target: string,
-  headers: string,
-): Record<string, string> {
+export function cefTargetEnvironment(target: string, headers: string): Record<string, string> {
   const targets: Record<string, string> = {
     "x86_64-pc-windows-msvc": "CEF_PATH_windows_x86_64",
     "aarch64-pc-windows-msvc": "CEF_PATH_windows_aarch64",
@@ -33,27 +25,17 @@ export function cefTargetEnvironment(
   };
   const key = targets[target];
   if (!key) throw new Error(`Unsupported owner CEF target: ${target}`);
-  if (!isAbsolute(headers))
-    throw new Error("CEF header directory must be absolute");
+  if (!isAbsolute(headers)) throw new Error("CEF header directory must be absolute");
   return { [key]: headers };
 }
 
 export function generatedBindingPaths(target: string) {
   cefTargetEnvironment(target, source);
   const filename = target.replaceAll("-", "_") + ".rs";
-  return [
-    `sys/src/bindings/${filename}`,
-    `cef/src/bindings/${filename}`,
-    `cef/src/resources/${filename}`,
-  ];
+  return [`sys/src/bindings/${filename}`, `cef/src/bindings/${filename}`, `cef/src/resources/${filename}`];
 }
 
-export function bindingPlan(
-  target: string,
-  headers: string,
-  platform = process.platform,
-  bun = process.execPath,
-) {
+export function bindingPlan(target: string, headers: string, platform = process.platform, bun = process.execPath) {
   return {
     cefRsRevision: CEF_RS_REVISION,
     cefRevision,
@@ -84,9 +66,7 @@ export function bindingPlan(
 
 export async function generateBindings(target: string, headers: string) {
   const plan = bindingPlan(target, headers);
-  const headerReceipt = await Bun.file(
-    join(headers, ".bun-cef-headers.json"),
-  ).json();
+  const headerReceipt = await Bun.file(join(headers, ".bun-cef-headers.json")).json();
   if (
     headerReceipt.schema !== 1 ||
     headerReceipt.target !== target ||
@@ -95,9 +75,7 @@ export async function generateBindings(target: string, headers: string) {
     headerReceipt.chromiumVersion !== chromiumVersion ||
     !Number.isInteger(headerReceipt.apiVersion)
   ) {
-    throw new Error(
-      "CEF binding generation requires the matching owner source header receipt",
-    );
+    throw new Error("CEF binding generation requires the matching owner source header receipt");
   }
   const headerInputs: { path: string; sha256: string }[] = [];
   for (const path of new Bun.Glob("include/**/*.h").scanSync({
@@ -118,8 +96,7 @@ export async function generateBindings(target: string, headers: string) {
     windowsHide: true,
   });
   const code = await process.exited;
-  if (code !== 0)
-    throw new Error(`Owner CEF binding generation failed (${code})`);
+  if (code !== 0) throw new Error(`Owner CEF binding generation failed (${code})`);
   const files: { path: string; sha256: string }[] = [];
   for (const path of plan.outputs)
     files.push({
@@ -127,24 +104,12 @@ export async function generateBindings(target: string, headers: string) {
       sha256: hash(await Bun.file(join(source, path)).bytes()),
     });
   const raw = await Bun.file(join(source, plan.outputs[0]!)).text();
-  const constant = (name: string) =>
-    Number(
-      new RegExp(`^pub const ${name}: i32 = (\\d+);$`, "m").exec(raw)?.[1],
-    );
-  const version = ["MAJOR", "MINOR", "BUILD", "PATCH"]
-    .map((part) => constant(`CHROME_VERSION_${part}`))
-    .join(".");
-  if (
-    version !== chromiumVersion ||
-    constant("CEF_API_VERSION_LAST") !== headerReceipt.apiVersion
-  )
-    throw new Error(
-      "Generated CEF bindings do not match owner Chromium and header API version",
-    );
+  const constant = (name: string) => Number(new RegExp(`^pub const ${name}: i32 = (\\d+);$`, "m").exec(raw)?.[1]);
+  const version = ["MAJOR", "MINOR", "BUILD", "PATCH"].map(part => constant(`CHROME_VERSION_${part}`)).join(".");
+  if (version !== chromiumVersion || constant("CEF_API_VERSION_LAST") !== headerReceipt.apiVersion)
+    throw new Error("Generated CEF bindings do not match owner Chromium and header API version");
   for (const header of headerInputs) {
-    if (
-      hash(await Bun.file(join(headers, header.path)).bytes()) !== header.sha256
-    )
+    if (hash(await Bun.file(join(headers, header.path)).bytes()) !== header.sha256)
       throw new Error(`CEF header changed during generation: ${header.path}`);
   }
   const receipt = {
@@ -166,32 +131,13 @@ export async function generateBindings(target: string, headers: string) {
   return receipt;
 }
 
-export async function qualifyBindings(
-  target: string,
-  distribution: string,
-  generatedSource = source,
-) {
+export async function qualifyBindings(target: string, distribution: string, generatedSource = source) {
   const generated = generatedBindingPaths(target);
-  const receiptPath = join(
-    generatedSource,
-    generated[0]!.replace(/\.rs$/, ".bun-cef.json"),
-  );
+  const receiptPath = join(generatedSource, generated[0]!.replace(/\.rs$/, ".bun-cef.json"));
   const receipt = await Bun.file(receiptPath).json();
-  const native = await Bun.file(
-    join(distribution, ".bun-cef-build.json"),
-  ).json();
-  for (const key of [
-    "schema",
-    "target",
-    "cefRevision",
-    "chromiumRevision",
-    "chromiumVersion",
-    "apiVersion",
-  ]) {
-    if (receipt[key] !== native[key])
-      throw new Error(
-        `Native CEF and generated bindings do not match (${key})`,
-      );
+  const native = await Bun.file(join(distribution, ".bun-cef-build.json")).json();
+  for (const key of ["schema", "target", "cefRevision", "chromiumRevision", "chromiumVersion", "apiVersion"]) {
+    if (receipt[key] !== native[key]) throw new Error(`Native CEF and generated bindings do not match (${key})`);
   }
   if (
     native.cefRevision !== cefRevision ||
@@ -208,34 +154,24 @@ export async function qualifyBindings(
     typeof binary.path !== "string" ||
     isAbsolute(binary.path) ||
     binary.path.includes("\\") ||
-    binary.path
-      .split("/")
-      .some((part: string) => !part || part === "." || part === "..")
+    binary.path.split("/").some((part: string) => !part || part === "." || part === "..")
   )
     throw new Error("Invalid CEF binary receipt path");
-  if (
-    hash(await Bun.file(join(distribution, binary.path)).bytes()) !==
-    binary.sha256
-  )
+  if (hash(await Bun.file(join(distribution, binary.path)).bytes()) !== binary.sha256)
     throw new Error("Owner CEF binary hash mismatch");
   if (
     !Array.isArray(receipt.files) ||
     receipt.files.length !== generated.length ||
-    !generated.every((path) =>
-      receipt.files.some((file: { path: string }) => file.path === path),
-    )
+    !generated.every(path => receipt.files.some((file: { path: string }) => file.path === path))
   ) {
-    throw new Error(
-      "CEF generation must cover raw, safe and resource bindings",
-    );
+    throw new Error("CEF generation must cover raw, safe and resource bindings");
   }
   if (!Array.isArray(receipt.headers) || !receipt.headers.length)
     throw new Error("Generated CEF header inputs are missing");
   for (const file of receipt.files) {
     if (
       !generated.includes(file.path) ||
-      hash(await Bun.file(join(generatedSource, file.path)).bytes()) !==
-        file.sha256
+      hash(await Bun.file(join(generatedSource, file.path)).bytes()) !== file.sha256
     )
       throw new Error("Generated CEF binding hash mismatch");
   }
@@ -244,12 +180,9 @@ export async function qualifyBindings(
       !header.path.startsWith("include/") ||
       header.path.includes("..") ||
       header.path.includes("\\") ||
-      hash(await Bun.file(join(distribution, header.path)).bytes()) !==
-        header.sha256
+      hash(await Bun.file(join(distribution, header.path)).bytes()) !== header.sha256
     )
-      throw new Error(
-        "Generated CEF header inputs do not match the native distribution",
-      );
+      throw new Error("Generated CEF header inputs do not match the native distribution");
   }
   receipt.apiHash = native.apiHash;
   receipt.qualification = "native-api-qualified";
@@ -259,11 +192,7 @@ export async function qualifyBindings(
 
 if (import.meta.main) {
   const [command, target, headers] = Bun.argv.slice(2);
-  if (
-    !target ||
-    !headers ||
-    !["plan", "generate", "qualify"].includes(command!)
-  )
+  if (!target || !headers || !["plan", "generate", "qualify"].includes(command!))
     throw new Error(
       "Usage: bun scripts/aphrody/build/cef-rs-bindings.ts <plan|generate|qualify> <rust-target> <absolute-owner-headers-or-distribution>",
     );

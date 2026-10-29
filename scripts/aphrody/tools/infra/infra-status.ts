@@ -541,7 +541,9 @@ async function status() {
 let exitCode: number;
 if (command === "status") exitCode = await status();
 else {
-  console.error("usage: bun scripts/aphrody/tools/infra/infra-status.ts [status] [--json] [--strict] [--deep] [--host=<alias>]");
+  console.error(
+    "usage: bun scripts/aphrody/tools/infra/infra-status.ts [status] [--json] [--strict] [--deep] [--host=<alias>]",
+  );
   exitCode = 2;
 }
 process.exit(exitCode);

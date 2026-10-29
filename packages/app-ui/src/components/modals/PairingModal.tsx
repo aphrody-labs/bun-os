@@ -134,10 +134,16 @@ export function PairingModal({ isOpen, onClose, mode: initialMode = "generate" }
                 <h2 id={titleId} className="text-title-medium font-semibold text-on-surface">
                   Device pairing
                 </h2>
-                <p id={descriptionId} className="text-body-small text-on-surface-variant">Connect another device to share files</p>
+                <p id={descriptionId} className="text-body-small text-on-surface-variant">
+                  Connect another device to share files
+                </p>
               </div>
             </div>
-            <button aria-label="Close" onClick={handleClose} className="p-1.5 hover:bg-on-surface/8 rounded-small transition-colors">
+            <button
+              aria-label="Close"
+              onClick={handleClose}
+              className="p-1.5 hover:bg-on-surface/8 rounded-small transition-colors"
+            >
               <X className="size-5 text-on-surface-variant" weight="bold" />
             </button>
           </div>
@@ -369,7 +375,8 @@ function GenerateMode({ generatePairing, currentSession, onGenerate, onCancel, o
                       <div className="p-3 bg-surface-container/40 rounded-small border border-outline-variant">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-body-small text-on-surface-variant">QR JSON</span>
-                          <button aria-label="Copy"
+                          <button
+                            aria-label="Copy"
                             onClick={copyQRJson}
                             className="p-1 hover:bg-on-surface/8 rounded-extra-small transition-colors"
                           >

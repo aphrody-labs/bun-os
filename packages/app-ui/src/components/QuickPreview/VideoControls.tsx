@@ -150,7 +150,8 @@ export function VideoControls({
           {/* Controls Bar */}
           <div className="flex items-center gap-3">
             {/* Play/Pause */}
-            <button aria-label={state.playing ? "Pause" : "Play"}
+            <button
+              aria-label={state.playing ? "Pause" : "Play"}
               onClick={callbacks.onTogglePlay}
               className="rounded-small p-2 text-white transition-colors hover:bg-white/10"
             >

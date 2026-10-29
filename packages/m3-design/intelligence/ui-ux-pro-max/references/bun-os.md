@@ -6,12 +6,12 @@ repository-relative. Search the matching data with `--stack m3`, `--stack rg-ui`
 
 ## Which layer to use
 
-| Building                                           | Use                                                                                       | Why                                                                                                                 |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Rose Griffon, Azalée or Achilléa web surfaces      | `@rosegriffon/ui` (`packages/rg-ui`) + `@rosegriffon/app-shell` (`packages/rg-app-shell`) | Owns the five chrome themes, the shadcn bridge, Base UI components and the shared navigation chrome                 |
+| Building                                           | Use                                                                                       | Why                                                                                                                      |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Rose Griffon, Azalée or Achilléa web surfaces      | `@rosegriffon/ui` (`packages/rg-ui`) + `@rosegriffon/app-shell` (`packages/rg-app-shell`) | Owns the five chrome themes, the shadcn bridge, Base UI components and the shared navigation chrome                      |
 | A new Aphrody/Bun app without a Rose Griffon brand | `@aphrody/m3*` (`packages/m3*`)                                                           | Material 3 tokens, Tailwind preset, Base UI wrappers, Next 16 integration, all generated from `crates/aphrody-m3-tokens` |
-| A web-component UI (Lit, `md-*`)                   | `@aphrody/material-web` fork (`vendor/material-web`) + `@aphrody/m3-react`                | 119 `md-*` elements with React wrappers                                                                             |
-| Any Tailwind v4 build on Bun                       | `@aphrody/bun-plugin-tailwind` (`toolchains/bun/packages/bun-plugin-tailwind`)            | `Bun.build`, `Bun.serve` HTML imports, dev server and a PostCSS entry for Next; `theme: "m3"` preset                |
+| A web-component UI (Lit, `md-*`)                   | `@aphrody/material-web` fork (`vendor/material-web`) + `@aphrody/m3-react`                | 119 `md-*` elements with React wrappers                                                                                  |
+| Any Tailwind v4 build on Bun                       | `@aphrody/bun-plugin-tailwind` (`toolchains/bun/packages/bun-plugin-tailwind`)            | `Bun.build`, `Bun.serve` HTML imports, dev server and a PostCSS entry for Next; `theme: "m3"` preset                     |
 
 rg-ui is itself built on the M3 tokens (`@aphrody/m3-tokens` dependency): its themes declare
 `--md-sys-color-*` roles and map shadcn variables onto them, so both vocabularies work inside it.

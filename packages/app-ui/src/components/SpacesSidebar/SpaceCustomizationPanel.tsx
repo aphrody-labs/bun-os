@@ -178,7 +178,8 @@ export function SpaceCustomizationPanel({ isOpen, onClose, spaceId }: SpaceCusto
                   </h2>
                   <p className="text-body-small text-sidebar-inkDull mt-0.5">Drag to sidebar</p>
                 </div>
-                <button aria-label="Close"
+                <button
+                  aria-label="Close"
                   onClick={onClose}
                   className="p-1 rounded-small hover:bg-secondary-container/30 transition-colors"
                 >
