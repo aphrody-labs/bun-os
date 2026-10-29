@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
-// Cloud and release targets: lambda (the bun-lambda runtime of the Bun fork), release (GitHub workflow on the
-// fork's install.sh), next (@aphrody/m3-next inside @aphrody/next-bun).
+// Cloud and release targets: lambda (the bun-lambda runtime of upstream Bun), release (GitHub workflow on
+// oven-sh/setup-bun), next (@aphrody/m3-next inside @aphrody/next-bun).
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { loadApp } from "../src/config.ts";
 import { contextFor, generateTargets, type TargetContext } from "../src/targets/index.ts";
-import { forkTag, RELEASE_MATRIX } from "../src/targets/release.ts";
+import { RELEASE_MATRIX } from "../src/targets/release.ts";
 import { COMPILE_TARGETS } from "../src/config.ts";
 import { cleanup, fixtureCopy } from "./helpers.ts";
 
@@ -80,10 +80,7 @@ describe("lambda", () => {
     expect(() => new Bun.Transpiler({ loader: "ts" }).transformSync(build)).not.toThrow();
     const layer = await read("lambda", "build-layer.sh");
     expect(layer).toContain('/packages/bun-lambda/scripts/build-layer.ts" --arch aarch64 \\\n');
-    const tag = forkTag(ctx.bunVersion);
-    expect(layer).toContain(
-      tag ? `/releases/download/${tag}/bun-linux-aarch64.zip` : `--release "bun-v${ctx.bunVersion}"`,
-    );
+    expect(layer).toContain(`--release "bun-v${ctx.bunVersion}"`);
     const sam = Bun.YAML.parse(await read("lambda", "template.yaml")) as any;
     expect(sam.Resources.App.Properties).toMatchObject({
       Handler: "handler.fetch",
@@ -93,7 +90,7 @@ describe("lambda", () => {
     });
   });
 
-  // The bun-lambda runtime of the fork against a local Lambda Runtime API: one function URL event in, one response out.
+  // The bun-lambda runtime of upstream Bun against a local Lambda Runtime API: one function URL event in, one response out.
   const runtime = join(process.env.APHRODY_BUN_CHECKOUT ?? "C:/bun", "packages/bun-lambda/runtime.ts");
   const runnable =
     existsSync(runtime) &&
@@ -179,7 +176,7 @@ describe("lambda", () => {
 });
 
 describe("release", () => {
-  test("a tag builds every target with the fork Bun and attaches archives and checksums to the release", async () => {
+  test("a tag builds every target with upstream Bun and attaches archives and checksums to the release", async () => {
     const workflow = Bun.YAML.parse(await read("release", ".github/workflows/release.yml")) as any;
     expect(workflow.on.push.tags).toEqual(["v*"]);
     expect(workflow.permissions).toEqual({ contents: "write" });
@@ -189,16 +186,11 @@ describe("release", () => {
     expect(include.map(m => m.target)).toEqual(RELEASE_MATRIX.map(m => m.target));
     for (const { target } of include) expect(COMPILE_TARGETS as readonly string[]).toContain(target);
     const steps = workflow.jobs.package.steps.map((s: any) => s.run ?? s.uses).join("\n");
-    expect(steps).toContain("aphrody-labs/bun/main/scripts/aphrody/install.sh | bash -s ");
+    expect(steps).toContain("oven-sh/setup-bun@v2");
     expect(steps).toContain("bunx --bun m3-bun package --target ${{ matrix.target }} --out release");
     const publish = workflow.jobs.publish.steps.map((s: any) => s.run ?? s.uses).join("\n");
     expect(publish).toContain('gh release create "$GITHUB_REF_NAME" release/*');
     expect(publish).toContain("grep -v '\\.sha256$'");
-  });
-
-  test("forkTag names the fork release of a version", () => {
-    expect(forkTag("1.4.3-aphrody.2")).toBe("aphrody-v1.4.3-aphrody.2");
-    expect(forkTag("0.0.1")).toBeUndefined();
   });
 });
 

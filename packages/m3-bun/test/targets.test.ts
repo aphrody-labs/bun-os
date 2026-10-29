@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { loadApp } from "../src/config.ts";
 import { generateTargets, getTarget, TARGETS, contextFor, type TargetContext } from "../src/targets/index.ts";
 import { RUNTIME_IMAGE } from "../src/targets/docker.ts";

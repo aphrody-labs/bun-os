@@ -2,7 +2,7 @@
 // System tests: the generated images really build and run. Opt in with M3_BUN_SYSTEM=1 (they need docker,
 // and for the boot test QEMU and a kernel in M3_BUN_KERNEL; they take about a minute and write ~300 MB).
 import { afterAll, describe, expect, test } from "bun:test";
-import { existsSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { compileApp } from "../src/compile.ts";
 import { packageApp } from "../src/package.ts";

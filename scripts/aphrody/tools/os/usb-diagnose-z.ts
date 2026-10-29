@@ -14,7 +14,8 @@ function queryEventLog(channel: string, options: { xpath: string; limit: number 
     ["wevtutil", "qe", channel, `/q:${options.xpath}`, `/c:${options.limit}`, "/rd:true", "/f:xml"],
     { stdout: "pipe", stderr: "pipe", windowsHide: true },
   );
-  if (result.exitCode !== 0) throw new Error(result.stderr.toString().trim() || `wevtutil exited with ${result.exitCode}`);
+  if (result.exitCode !== 0)
+    throw new Error(result.stderr.toString().trim() || `wevtutil exited with ${result.exitCode}`);
   return result.stdout.toString().match(/<Event[ >][\s\S]*?<\/Event>/g) ?? [];
 }
 

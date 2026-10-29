@@ -73,8 +73,8 @@ RUN curl -fsSL "https://github.com/cargo-bins/cargo-binstall/releases/download/v
  && rm -rf /tmp/cargo-binstall /tmp/cargo-binstall.tgz /opt/rust/cargo/registry /opt/rust/cargo/.crates* \
  && sccache --version && cargo-xwin --version && wasm-bindgen --version
 
-# Bun: the exact aphrody-labs/bun fork release pinned by package.json.
-RUN curl -fsSL https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.sh \
+# Bun: the exact upstream oven-sh/bun release pinned by package.json.
+RUN curl -fsSL https://bun.com/install \
       | env BUN_INSTALL=/opt/bun bash -s "${BUN_RELEASE_VERSION}" \
  && ln -sf /opt/bun/bin/bun /usr/local/bin/bun && ln -sf /opt/bun/bin/bun /usr/local/bin/bunx \
  && case "$(bun --version)" in "${BUN_VERSION}"*) ;; *) echo "bun $(bun --version) is not ${BUN_VERSION}" >&2; exit 1 ;; esac \

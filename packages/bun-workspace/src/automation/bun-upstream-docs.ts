@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * Bun documentation of Aphrody: `docs/` of the aphrody-labs/bun fork (upstream oven-sh/bun), read in place.
+ * Bun documentation of Aphrody: `docs/` of upstream oven-sh/bun, read in place.
  * Aphrody keeps no copy of it; `docs/reference/upstream-bun` holds only `APHRODY-FORK.md`, the Bun
  * `LICENSE.md` (shipped by scripts/release/release.ts) and `SOURCE.json`, the pinned fork commit.
  *
@@ -27,8 +27,8 @@ import { dirname, isAbsolute, join, resolve } from "node:path";
 
 /** Pin directory: APHRODY-FORK.md, LICENSE.md and SOURCE.json only. */
 export const BUN_PIN_DIR = "docs/reference/upstream-bun";
-export const FORK_URL = "https://github.com/aphrody-labs/bun.git";
-const FORK_SOURCE = "https://github.com/aphrody-labs/bun (fork of https://github.com/oven-sh/bun)";
+export const FORK_URL = "https://github.com/oven-sh/bun.git";
+const FORK_SOURCE = "https://github.com/oven-sh/bun";
 const KEEP = new Set(["APHRODY-FORK.md", "LICENSE.md", "SOURCE.json"]);
 /** Repository-root files copied next to the pin (Bun licence, shipped by scripts/release/release.ts). */
 const ROOT_FILES = ["LICENSE.md"];
@@ -168,11 +168,11 @@ export async function resolveBunDocs(options: ResolveBunDocsOptions = {}): Promi
   const download = options.download ?? env.APHRODY_BUN_DOCS_FETCH !== "0";
   if (!download)
     throw new Error(
-      `Bun docs not found (tried ${tried.join(", ")}): set APHRODY_BUN_CHECKOUT to the aphrody-labs/bun checkout, ` +
+      `Bun docs not found (tried ${tried.join(", ")}): set APHRODY_BUN_CHECKOUT to the oven-sh/bun checkout, ` +
         `APHRODY_BUN_DOCS to a docs directory, or allow the download (unset APHRODY_BUN_DOCS_FETCH=0)`,
     );
   (options.log ?? ((message: string) => console.error(message)))(
-    `Bun docs: no fork checkout; downloading docs/ of ${FORK_URL} @ ${ref} into ${cache}`,
+    `Bun docs: no oven-sh/bun checkout; downloading docs/ of ${FORK_URL} @ ${ref} into ${cache}`,
   );
   await fetchForkDocs(ref, cache);
   return { dir: cached, source: "download" };

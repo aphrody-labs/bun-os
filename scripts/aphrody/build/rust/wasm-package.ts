@@ -91,7 +91,8 @@ async function tool(command: string[]): Promise<void> {
 
 const bindgenPack: Packer = async options => {
   const bindgen = Bun.which("wasm-bindgen");
-  if (!bindgen) throw new Error("wasm-bindgen CLI not found: cargo install wasm-bindgen-cli --locked --version <Cargo.lock pin>");
+  if (!bindgen)
+    throw new Error("wasm-bindgen CLI not found: cargo install wasm-bindgen-cli --locked --version <Cargo.lock pin>");
   const pinned = pinnedBindgenVersion(options.crate, repositoryRoot);
   const version = (await $`${bindgen} --version`.quiet().text()).trim().split(/\s+/).at(-1);
   if (pinned && version !== pinned)
@@ -99,7 +100,16 @@ const bindgenPack: Packer = async options => {
   // Build beside the output and swap in only a validated package, so a failure keeps the last usable one.
   const staging = `${options.outdir}.partial-${crypto.randomUUID()}`;
   try {
-    await tool([bindgen, "--target", options.target, "--out-dir", staging, "--out-name", options.name, options.artifact]);
+    await tool([
+      bindgen,
+      "--target",
+      options.target,
+      "--out-dir",
+      staging,
+      "--out-name",
+      options.name,
+      options.artifact,
+    ]);
     const wasm = join(staging, `${options.name}_bg.wasm`);
     const rawBytes = Bun.file(wasm).size;
     if (options.optimize) {

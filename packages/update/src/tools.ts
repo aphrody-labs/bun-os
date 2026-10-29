@@ -15,8 +15,8 @@ export type ToolRow = {
 };
 
 const VERSION = /\d+\.\d+\.\d+/;
-/** Installers of the aphrody-labs/bun runtime releases (append `.sh` or `.ps1`). */
-export const BUN_INSTALLER = "https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install";
+/** Upstream installer of stable Bun releases: `install` (POSIX shell) or `install.ps1` (Windows). */
+export const BUN_INSTALLER = "https://bun.com/install";
 
 export function installed(c: Ctx, tool: string): string | undefined {
   const cmds: Record<string, [string, string[]]> = {
@@ -88,7 +88,7 @@ export function install(c: Ctx, tool: string, version: string): boolean {
             "-Command",
             `& ([scriptblock]::Create((irm ${BUN_INSTALLER}.ps1))) -Version ${version}`,
           ])
-        : run("bash", ["-c", `curl -fsSL ${BUN_INSTALLER}.sh | bash -s ${version}`]);
+        : run("bash", ["-c", `curl -fsSL ${BUN_INSTALLER} | bash -s bun-v${version}`]);
     case "rust":
       return run("rustup", ["toolchain", "install", version, "--profile", "minimal"]);
     case "nushell":

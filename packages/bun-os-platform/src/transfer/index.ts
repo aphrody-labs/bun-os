@@ -28,8 +28,9 @@ import {
   writeSync,
 } from "node:fs";
 import { lookup } from "node:dns/promises";
+import { homedir } from "node:os";
 import { basename, dirname, join } from "node:path";
-import { ensureDir, platformPaths, readSettings, repoRoot } from "../paths";
+import { ensureDir, platformPaths, readSettings } from "../paths";
 import { slices, Throttle } from "./throttle";
 
 export type TransferState = "queued" | "running" | "paused" | "done" | "failed";
@@ -433,9 +434,34 @@ interface R2Owner {
   createR2Client(o: { bucket: string; env: Record<string, string | undefined> }): Bun.S3Client;
 }
 
-/** The R2 owner of the Bun checkout (toolchains/bun/packages/bun-cloudflare), as infra/assets.ts. */
+/** Parses a `KEY=VALUE` env file (comments, optional quotes); a missing file is an empty environment. */
+async function readEnvFile(path: string): Promise<Record<string, string>> {
+  const file = Bun.file(path);
+  if (!(await file.exists())) return {};
+  const env: Record<string, string> = {};
+  for (const line of (await file.text()).split(/\r?\n/)) {
+    const match = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/.exec(line);
+    if (!match || line.trimStart().startsWith("#")) continue;
+    env[match[1]!] = match[2]!.replace(/^(['"])(.*)\1$/, "$2");
+  }
+  return env;
+}
+
+/** The R2 owner: the protected store (`~/.aphrody/config/cloudflare.env`) under the injected environment, over Bun.S3Client. */
 function r2Owner(): Promise<R2Owner> {
-  return import(join(repoRoot, "toolchains", "bun", "packages", "bun-cloudflare", "src", "api.ts")) as Promise<R2Owner>;
+  return Promise.resolve({
+    async loadCloudflareEnvironment(file = join(homedir(), ".aphrody", "config", "cloudflare.env")) {
+      return { ...(await readEnvFile(file)), ...process.env };
+    },
+    createR2Client({ bucket, env }) {
+      const endpoint = env.R2_ENDPOINT ?? env.AWS_ENDPOINT_URL_S3;
+      const accessKeyId = env.R2_ACCESS_KEY_ID ?? env.AWS_ACCESS_KEY_ID;
+      const secretAccessKey = env.R2_SECRET_ACCESS_KEY ?? env.AWS_SECRET_ACCESS_KEY;
+      if (!endpoint || !accessKeyId || !secretAccessKey)
+        throw new Error("R2 credentials are not in the protected store");
+      return new Bun.S3Client({ bucket, endpoint, accessKeyId, secretAccessKey, region: "auto" });
+    },
+  });
 }
 
 async function credentials(): Promise<Record<string, string | undefined>> {

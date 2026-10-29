@@ -34,9 +34,9 @@ const cacheRoot = () => join(usrRoot(), "var", "cache", "bep", "thumbnails");
 /** libretro-thumbnails file name of a title: &, *, /, :, backtick, <, >, ?, backslash, | and " become `_`. */
 export const thumbnailName = (title: string) => title.replace(/[&*/:`<>?\\|"]/g, "_");
 
-/** Bun's logo from the pinned runtime checkout (toolchains/bun/assets). */
+/** The Bun Engine press-kit art of this repository (assets/presskit). */
 export function bunEngineArt(): Artwork {
-  const assets = join(repoRoot, "toolchains", "bun", "assets");
+  const assets = join(repoRoot, "assets", "presskit");
   const pick = (name: string) => {
     const path = join(assets, name);
     return existsSync(path) ? path : undefined;

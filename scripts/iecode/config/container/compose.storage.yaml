@@ -21,7 +21,7 @@ services:
       timeout: 3s
       retries: 12
   bun:
-    image: ghcr.io/aphrody-labs/bun@sha256:8b12917085a44f30c1dbee201c62a206be2b2e38b11c2ed2cffbfafa2b091489
+    image: docker.io/oven/bun@sha256:1d22548f177f4ff38e0c15baa3c2c46c6c2060ba2d1bc573bb4720b407548f1d
     profiles: [runtime]
     labels:
       io.aphrody.profile: ie

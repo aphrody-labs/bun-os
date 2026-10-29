@@ -185,7 +185,7 @@ rustup target add x86_64-unknown-linux-gnu wasm32-unknown-unknown wasm32-wasip1
 
 echo "==> 4. Installing Bun (JavaScript runtime)"
 if ! command -v bun &>/dev/null; then
-  curl -fsSL https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.sh | bash
+  curl -fsSL https://bun.com/install | bash
 else
   echo "Bun already installed."
 fi

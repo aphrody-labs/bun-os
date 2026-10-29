@@ -1,8 +1,6 @@
 [build-system]
-requires = [
-  "bun-native-build @ git+https://github.com/aphrody-labs/bun.git@fcfc2a6dca114193a1d7120ad9cd7c2855a022b0#subdirectory=packages/bun-python-native/python/build-backend",
-]
-build-backend = "bun_native_build"
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
 
 [project]
 name = "yolo"
@@ -22,7 +20,3 @@ python-source = "python"
 features = ["pyo3/extension-module"]
 locked = true
 
-[tool.aphrody.bun-native]
-revision = "6181424bc2fca4349560832161c07ba85c33e8ef"
-workspace = "packages/bun-runtime-sdk"
-manifest = "crates/yolo-pyo3/Cargo.toml"

@@ -92,7 +92,7 @@
     { "id": "deploy", "hostname": "deploy.aphrody.app", "owner": "aphrody-infra" }
   ],
   "worker": {
-    "owner": "aphrody-labs/bun",
+    "owner": "aphrody-labs/bun-os",
     "name": "aphrody-app",
     "routes": [
       "app-audio.aphrody.app/*",

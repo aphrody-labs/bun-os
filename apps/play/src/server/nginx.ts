@@ -93,7 +93,8 @@ const isAlive = (pid: number) => {
 function recoverPrefix(prefix: string): void {
   const pidFile = join(prefix, "bun-nginx.pid");
   const masterPid = existsSync(pidFile) ? Number(readFileSync(pidFile, "utf8").trim()) : 0;
-  if (masterPid && isAlive(masterPid)) throw new Error(`NGINX master ${masterPid} from a previous owner is still alive`);
+  if (masterPid && isAlive(masterPid))
+    throw new Error(`NGINX master ${masterPid} from a previous owner is still alive`);
   rmSync(pidFile, { force: true });
 }
 
@@ -110,23 +111,16 @@ function render(): string {
     PUBLIC_ORIGIN: config.publicOrigin,
   };
   const source = readFileSync(nginx.template, "utf8");
-  const template = moduleLocation
-    ? source
-    : source.replace(/\n\s*location = \/_bun\/info \{[^}]*\}/, "");
-  return template.replace(
-    /\$\{([A-Z_]+)\}/g,
-    (match, name: string) => {
-      const value = values[name];
-      if (value === undefined)
-        throw new Error(`engine.conf: unknown placeholder ${match}`);
-      return value;
-    },
-  );
+  const template = moduleLocation ? source : source.replace(/\n\s*location = \/_bun\/info \{[^}]*\}/, "");
+  return template.replace(/\$\{([A-Z_]+)\}/g, (match, name: string) => {
+    const value = values[name];
+    if (value === undefined) throw new Error(`engine.conf: unknown placeholder ${match}`);
+    return value;
+  });
 }
 
 async function writeConfig(): Promise<void> {
-  for (const dir of ["conf", "logs", "temp"])
-    mkdirSync(join(config.nginx.prefix, dir), { recursive: true });
+  for (const dir of ["conf", "logs", "temp"]) mkdirSync(join(config.nginx.prefix, dir), { recursive: true });
   await Bun.write(join(config.nginx.prefix, "conf", "nginx.conf"), render());
 }
 
@@ -149,7 +143,14 @@ async function refreshModule(): Promise<void> {
     : null;
 }
 
-const args = (prefix: string, pidFile: string) => ["-p", prefix, "-c", "conf/nginx.conf", "-g", `daemon off; pid ${pidFile};`];
+const args = (prefix: string, pidFile: string) => [
+  "-p",
+  prefix,
+  "-c",
+  "conf/nginx.conf",
+  "-g",
+  `daemon off; pid ${pidFile};`,
+];
 
 async function validate(binary: string, prefix: string, pidFile: string): Promise<void> {
   const result = await run(binary, [...args(prefix, pidFile), "-t"]);
@@ -205,9 +206,7 @@ export async function startEngine(log: (line: string) => void): Promise<void> {
     controller?.child.kill();
     controller = null;
     state.error =
-      error instanceof Error
-        ? `${(error as { code?: string }).code ?? "Error"}: ${error.message}`
-        : String(error);
+      error instanceof Error ? `${(error as { code?: string }).code ?? "Error"}: ${error.message}` : String(error);
     log(`[play] nginx engine failed: ${state.error}`);
     throw error;
   }

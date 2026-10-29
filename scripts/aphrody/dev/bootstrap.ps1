@@ -34,9 +34,9 @@ $packagePins = Get-Content (Join-Path $root 'infra/config/system-packages.json')
 $bunPin = $packagePins.toolchains.bun.version
 $haveBun = if (Get-Command bun -ErrorAction SilentlyContinue) { (bun --version).Trim() } else { '' }
 if ($haveBun -ne $bunPin) {
-  # Bun of Aphrody = the aphrody-labs/bun fork releases.
-  & ([scriptblock]::Create((Invoke-RestMethod 'https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.ps1'))) -Version $bunPin
-  $env:PATH = "$env:USERPROFILE\.bun\bin;$env:PATH"
+  # Unmodified upstream Bun, installed from its npm package at the exact pin (see infra/config/system-packages.json).
+  npm install -g "bun@$bunPin"
+  $env:PATH = "$(npm prefix -g);$env:USERPROFILE\.bun\bin;$env:PATH"
   if ((bun --version).Trim() -ne $bunPin) { throw "Pinned Bun $bunPin installation failed" }
 }
 $uvPin = $packagePins.toolchains.uv.version

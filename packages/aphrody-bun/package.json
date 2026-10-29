@@ -1,7 +1,7 @@
 {
   "name": "@aphrody/bun",
   "version": "1.4.7",
-  "description": "bun:ffi bindings for the Aphrody native library (aphrody-ffi: M3 tokens, icons, SVG, render, web, X, inference) and the aphrody app-server client. Not the Bun runtime: the aphrody-labs/bun fork binary ships as @aphrody/bun-runtime.",
+  "description": "bun:ffi bindings for the Aphrody native library (aphrody-ffi: M3 tokens, icons, SVG, render, web, X, inference) and the aphrody app-server client. Not the Bun runtime: that is the unmodified npm package `bun`.",
   "license": "Apache-2.0",
   "author": "aphrody-code",
   "files": [

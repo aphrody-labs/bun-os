@@ -32,7 +32,7 @@ foreach ($id in $ids) {
 winget upgrade --id astral-sh.uv --exact --silent --accept-package-agreements --accept-source-agreements 2>&1 | Select-Object -Last 1
 $bunPin = $m.versions.bun
 if ((Get-Command bun -ErrorAction SilentlyContinue) -and (bun --version).Trim() -eq $bunPin) { "bun $bunPin" } else {
-  & ([scriptblock]::Create((Invoke-RestMethod 'https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.ps1'))) -Version $bunPin 2>&1 | Select-Object -Last 1
+  npm install -g "bun@$bunPin" 2>&1 | Select-Object -Last 1
 }
 
 Log windows-extras

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-// GitHub release workflow: on a `v*` tag, every runner installs the Bun of the aphrody-labs fork with its
-// install.sh (the runtime m3-bun is developed with), packages the app for each target with `m3-bun package`
-// and attaches the archives and their SHA-256 to the GitHub release. The release scripts of the Bun repository
-// (packages/bun-release) publish Bun itself and are not reused here.
+// GitHub release workflow: on a `v*` tag, every runner installs upstream Bun with oven-sh/setup-bun at the version
+// of the app, packages the app for each target with `m3-bun package` and attaches the archives and their
+// SHA-256 to the GitHub release. The release scripts of the Bun repository (packages/bun-release) publish Bun
+// itself and are not reused here.
 import { GENERATED_NOTE } from "../util.ts";
 import type { Target, TargetContext, TargetFile } from "./types.ts";
 
@@ -13,18 +13,6 @@ export const RELEASE_MATRIX = [
   { target: "windows-x64", os: "ubuntu-latest" },
   { target: "darwin-arm64", os: "macos-latest" },
 ] as const;
-
-/** The release tag of the aphrody-labs Bun fork for `version` (`aphrody-v1.4.3-aphrody.2`), when it is known. */
-export function forkTag(version: string): string | undefined {
-  if (version.includes("-aphrody.")) return `aphrody-v${version.replace(/^v/, "")}`;
-  const running = /^v?(\d+\.\d+\.\d+-aphrody\.\d+)/.exec(
-    (Bun as { version_with_sha?: string }).version_with_sha ?? "",
-  )?.[1];
-  return running?.startsWith(`${version}-`) ? `aphrody-v${running}` : undefined;
-}
-
-/** The fork install.sh takes a fork tag, or `X.Y.Z` for the newest fork build of it. */
-export const forkBunVersion = (version: string): string => forkTag(version) ?? version;
 
 export const releaseWorkflow = (c: TargetContext): string => `# ${GENERATED_NOTE}
 # Release ${c.name}: \`git tag v${c.version} && git push --tags\`. Copy to .github/workflows/release.yml.
@@ -48,12 +36,9 @@ ${RELEASE_MATRIX.map(m => `          - { target: ${m.target}, os: ${m.os} }`).jo
     runs-on: \${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Bun (aphrody-labs fork)
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.sh | bash -s ${forkBunVersion(c.bunVersion)}
-          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
-        env:
-          GITHUB_TOKEN: \${{ github.token }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${c.bunVersion}
       - run: bun --revision
       - run: bun install --frozen-lockfile
       - run: bun test

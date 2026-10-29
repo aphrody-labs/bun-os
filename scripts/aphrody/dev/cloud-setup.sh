@@ -64,7 +64,7 @@ fi
 
 step "bun"
 if ! have bun; then
-  run bash -c "curl -fsSL https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.sh | bash -s ${bun_pin:-latest}"
+  run npm install -g "bun@${bun_pin:-latest}"
 fi
 
 step "uv and Graphify"

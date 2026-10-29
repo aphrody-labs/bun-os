@@ -178,9 +178,9 @@ async function main() {
       throw new Error("Apply requires one selected private source repository; mirror orchestration remains separate.");
     if (
       Bun.version !== "1.4.4" ||
-      !process.release.sourceUrl?.startsWith("https://github.com/aphrody-labs/bun/releases/download/")
+      !process.release.sourceUrl?.startsWith("https://github.com/oven-sh/bun/releases/download/")
     )
-      throw new Error("Use the owner-qualified Aphrody Bun runtime.");
+      throw new Error("Use the pinned upstream Bun runtime.");
     for (const source of [catalogPath, clientPath, remotePath, rustPath]) {
       await safeSourceFile(root, source);
       const current = await bounded(["git", "hash-object", `--path=${source}`, source], {

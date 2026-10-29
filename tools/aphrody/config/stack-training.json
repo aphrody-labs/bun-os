@@ -12,8 +12,8 @@
     },
     {
       "id": "bun",
-      "role": "Bun runtime and SDK: JavaScriptCore/WebKit, built-ins, package manager, system APIs, native integrations and Bun Cloudflare capabilities. Runtime source changes belong to the aphrody-labs/bun fork; product configuration and release orchestration stay with Aphrody Infra.",
-      "source": "https://github.com/aphrody-labs/bun",
+      "role": "Bun runtime and SDK: JavaScriptCore/WebKit, built-ins, package manager, system APIs, native integrations and Bun Cloudflare capabilities. Runtime source changes belong to upstream oven-sh/bun; product configuration and release orchestration stay with Aphrody Infra.",
+      "source": "https://github.com/oven-sh/bun",
       "production": true,
       "note": "Canonical runtime and system SDK owner; produces SDK artifacts consumed by Bun OS and served from bun-lib.aphrody.app. Infra owns DNS and R2 state. Resolve the checkout from workspace configuration."
     },

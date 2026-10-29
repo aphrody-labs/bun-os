@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Bun-first dependency ratchet over `tools/config/bun-absorb.json`.
 //!
-//!   bun scripts/audit/workspace/bun-absorb.ts [--json] [--write-baseline] [--no-fork-active]
+//!   bun scripts/audit/workspace/bun-absorb.ts [--json] [--write-baseline] [--fork-active]
 //!
 //! Fails when a `builtin` package is declared by a workspace package, when a root catalog entry
 //! is used by no workspace package, or when a `native` package is imported by more files than
-//! `tools/config/bun-absorb.baseline.json` records. Declared `fork` packages are refused: the
-//! aphrody-labs/bun runtime resolves them natively (active since 2026-10-06; `--no-fork-active`
-//! downgrades them to warnings). `--write-baseline` records the
+//! `tools/config/bun-absorb.baseline.json` records. Declared `fork` packages were absorbed by the
+//! abandoned aphrody-labs/bun fork; upstream Bun does not resolve them, so they only warn (`--fork-active`
+//! refuses them, for a runtime that does). `--write-baseline` records the
 //! current import counts, which may only go down.
 
 import { resolve } from "node:path";
@@ -202,7 +202,7 @@ if (import.meta.main) {
     rootManifest.workspaces.catalog ?? {},
     imports,
     baseline,
-    !args.has("--no-fork-active"),
+    args.has("--fork-active"),
   );
   if (args.has("--json")) {
     console.log(JSON.stringify(report, null, 2));

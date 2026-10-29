@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
-// AWS Lambda through the Bun runtime layer of the Bun fork (packages/bun-lambda): its `bootstrap` runs
+// AWS Lambda through the Bun runtime layer of upstream Bun (packages/bun-lambda of oven-sh/bun): its `bootstrap` runs
 // `runtime.ts`, which imports `$LAMBDA_TASK_ROOT/<file>` named by `_HANDLER` (`handler.fetch`) and turns every
 // API Gateway or function URL event into a `Request` for the module's `fetch`. The generated handler is the same
 // `createM3App` the compiled executable serves (UI files, API, /healthz), bundled into one file.
 import { relative } from "node:path";
 import { GENERATED_NOTE } from "../util.ts";
-import { forkTag } from "./release.ts";
 import type { Target, TargetContext, TargetFile } from "./types.ts";
 
 /** The app directory seen from the target directory (`../..` for the default `deploy/lambda`). */
@@ -51,16 +50,14 @@ console.log(\`function.zip written by \${archiver}\`);
 `;
 
 export const layerScript = (c: TargetContext): string => {
-  const tag = forkTag(c.bunVersion);
-  const url = tag ? `https://github.com/aphrody-labs/bun/releases/download/${tag}/bun-linux-aarch64.zip` : undefined;
-  const source = url ? `--url "\${BUN_LAYER_URL:-${url}}"` : `--release "bun-v${c.bunVersion}"`;
+  const source = `--release "bun-v${c.bunVersion}"`;
   return `#!/bin/sh
 # ${GENERATED_NOTE}
-# Build the Bun runtime layer with the build-layer command of packages/bun-lambda in a Bun fork checkout
+# Build the Bun runtime layer with the build-layer command of packages/bun-lambda in an oven-sh/bun checkout
 # (APHRODY_BUN_CHECKOUT, run \`bun install\` in packages/bun-lambda once). Publishing stays manual:
 #   aws lambda publish-layer-version --layer-name bun --zip-file fileb://bun-lambda-layer.zip --compatible-architectures arm64
 set -eu
-checkout="\${APHRODY_BUN_CHECKOUT:?set APHRODY_BUN_CHECKOUT to a checkout of aphrody-labs/bun}"
+checkout="\${APHRODY_BUN_CHECKOUT:?set APHRODY_BUN_CHECKOUT to a checkout of oven-sh/bun}"
 bun "$checkout/packages/bun-lambda/scripts/build-layer.ts" --arch aarch64 \\
   ${source} \\
   --output "$(dirname "$0")/bun-lambda-layer.zip"
