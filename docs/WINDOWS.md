@@ -40,8 +40,22 @@ loading the other modules. Every `dlopen` is lazy, so importing on another platf
 - WinRT needs COM vtables, HSTRING and async operations, which windows-rs projects safely. Bun implements Node-API
   from scratch and loads `.node` files; the addon is plain `napi` + `napi-derive`, with no Node.js dependency.
   Add a call in `native/napi/src/lib.rs`, a typed wrapper in `src/winrt.ts`, a test.
-- windows-rs: the repository release `74` (2026-09-03) is not published as a `windows` crate; the newest crate is
-  `0.62.2`, which the layer pins (same as `bun-windows-winclean`).
+- windows-rs versions (crates.io, 2026-10-29): the pre-generated `windows` crate is still `0.62.2` (2025-10-06) and is what
+  the layer pins (same as `bun-windows-winclean`). The small crates (`windows-core`, `windows-link`, `windows-future`,
+  `windows-bindgen`) moved to `0.100.0` (2026-09-03, MSRV 1.95) with the repository release `74`; the windows-rs README
+  presents `windows-bindgen` (project-specific generated bindings) as the way forward and keeps the pre-generated `windows` /
+  `windows-sys` crates as the convenience option for binaries. The two lines do not mix: `windows 0.62.2` resolves
+  `windows-core 0.62.2`. Compile proof: `cargo build --release --locked` of `native/napi` succeeds on the pinned
+  `rust-toolchain.toml` channel (`nightly-2026-09-15`, cargo 1.100, above the 1.95 MSRV). Migrate to generated bindings
+  when a call needs an API the pre-generated crate lacks.
+- Upstream warnings on `bun:ffi` (`docs/runtime/ffi.mdx`, `docs/runtime/c-compiler.mdx`, `docs/compiler/*.mdx`): `bun:ffi` is
+  "experimental, with known bugs and limitations", "do not rely on it in production", and the most stable way to reach native
+  code is a Node-API module. Hence the layer keeps `bun:ffi` to flat read-only Win32 calls with tests and puts WinRT in the
+  N-API addon. `JSCallback` thread-safe mode is experimental and `close()` must be called to free the callback. In a
+  `bun compile` executable on Linux 6.7 or later, `cc()` fails with `PR_SET_MDWE` (compile the C at build time and load it
+  with `dlopen()`); this is Linux-only and does not touch the Windows modules, which never use `cc()`. A limit of 256
+  `JSCallback` objects was reported to us but is not stated anywhere in the upstream docs or sources checked, so it is not
+  documented here as a fact.
 
 ## Build the providers
 
@@ -104,7 +118,7 @@ Backlog of fork `bun:windows` areas not yet in the layer: eventlog, clipboard, c
 
 ## Qualification
 
-| Layer | Local (Windows 11 28120, Bun 1.4.4-canary, rustc nightly 2026-10-27, dotnet 10.0.401) | CI |
+| Layer | Local (Windows 11 28120, Bun 1.4.4-canary, Rust channel from `rust-toolchain.toml` (nightly-2026-09-15), dotnet 10.0.401) | CI |
 | --- | --- | --- |
 | win32, shell, services, registry | `bun test` in `packages/windows` | not wired |
 | winrt addon | built with cargo and loaded by Bun, tests pass | not wired |
