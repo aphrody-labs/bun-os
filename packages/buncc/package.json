@@ -23,5 +23,19 @@
   },
   "engines": {
     "bun": ">=1.4.4"
+  },
+  "files": [
+    "src",
+    "LICENSE-MIT",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/buncc"
+  },
+  "homepage": "https://github.com/aphrody-labs/bun-os/tree/os/packages/buncc",
+  "publishConfig": {
+    "access": "public"
   }
 }

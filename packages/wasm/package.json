@@ -18,7 +18,9 @@
     "aphrody-wasm": "./src/cli.ts"
   },
   "files": [
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "test": "bun test",
@@ -29,5 +31,6 @@
   },
   "devDependencies": {
     "@types/bun": "catalog:"
-  }
+  },
+  "homepage": "https://github.com/aphrody-labs/bun-os/tree/os/packages/wasm"
 }
