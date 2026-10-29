@@ -820,3 +820,66 @@
 	url = https://github.com/aphrody-labs/shenron-config.git
 	branch = main
 	shallow = true
+[submodule "vendor/microsoft/microsoft-ui-xaml"]
+	path = vendor/microsoft/microsoft-ui-xaml
+	url = https://github.com/microsoft/microsoft-ui-xaml.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/WindowsAppSDK"]
+	path = vendor/microsoft/WindowsAppSDK
+	url = https://github.com/microsoft/WindowsAppSDK.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/WindowsAppSDK-Samples"]
+	path = vendor/microsoft/WindowsAppSDK-Samples
+	url = https://github.com/microsoft/WindowsAppSDK-Samples.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/WinUI-Gallery"]
+	path = vendor/microsoft/WinUI-Gallery
+	url = https://github.com/microsoft/WinUI-Gallery.git
+	shallow = true
+[submodule "vendor/microsoft/DirectX-Graphics-Samples"]
+	path = vendor/microsoft/DirectX-Graphics-Samples
+	url = https://github.com/microsoft/DirectX-Graphics-Samples.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/DirectXTK12"]
+	path = vendor/microsoft/DirectXTK12
+	url = https://github.com/microsoft/DirectXTK12.git
+	shallow = true
+[submodule "vendor/microsoft/DirectX-Specs"]
+	path = vendor/microsoft/DirectX-Specs
+	url = https://github.com/microsoft/DirectX-Specs.git
+	shallow = true
+[submodule "vendor/microsoft/DirectXShaderCompiler"]
+	path = vendor/microsoft/DirectXShaderCompiler
+	url = https://github.com/microsoft/DirectXShaderCompiler.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/Windows-universal-samples"]
+	path = vendor/microsoft/Windows-universal-samples
+	url = https://github.com/microsoft/Windows-universal-samples.git
+	shallow = true
+[submodule "vendor/microsoft/Windows-classic-samples"]
+	path = vendor/microsoft/Windows-classic-samples
+	url = https://github.com/microsoft/Windows-classic-samples.git
+	shallow = true
+[submodule "vendor/microsoft/dotnet-samples"]
+	path = vendor/microsoft/dotnet-samples
+	url = https://github.com/dotnet/samples.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/windows-rs"]
+	path = vendor/microsoft/windows-rs
+	url = https://github.com/microsoft/windows-rs.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/cppwinrt"]
+	path = vendor/microsoft/cppwinrt
+	url = https://github.com/microsoft/cppwinrt.git
+	shallow = true
+[submodule "vendor/microsoft/CsWinRT"]
+	path = vendor/microsoft/CsWinRT
+	url = https://github.com/microsoft/CsWinRT.git
+	shallow = true

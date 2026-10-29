@@ -1,0 +1,147 @@
+{
+ "observedAt": "2026-10-29T04:11:21.019Z",
+ "host": "win32",
+ "bun": "1.4.4",
+ "impls": {
+  "xaml-static-bun": {
+   "lang": "bun",
+   "dir": "examples/windows/xaml-static/bun",
+   "scope": "static XAML scan in Bun (reference output)",
+   "at": "2026-10-29T04:11:20.732Z",
+   "build": true,
+   "pages": 126,
+   "run": true
+  },
+  "xaml-static-cpp": {
+   "lang": "cpp",
+   "dir": "examples/windows/xaml-static/cpp",
+   "scope": "static XAML scan (root element, element count)",
+   "at": "2026-10-29T04:11:20.799Z",
+   "build": true,
+   "pages": 126,
+   "run": true
+  },
+  "xaml-static-cs": {
+   "lang": "cs",
+   "dir": "examples/windows/xaml-static/cs",
+   "scope": "static XAML scan with XmlReader (also proves well-formedness)",
+   "at": "2026-10-29T04:11:20.832Z",
+   "build": true,
+   "pages": 126,
+   "run": true
+  },
+  "xaml-static-rust": {
+   "lang": "rust",
+   "dir": "examples/windows/xaml-static/rust",
+   "scope": "static XAML scan (std only)",
+   "at": "2026-10-29T04:11:20.992Z",
+   "build": true,
+   "pages": 126,
+   "run": true
+  },
+  "d3d12-headless-cpp": {
+   "lang": "cpp",
+   "dir": "examples/windows/d3d12-headless/cpp",
+   "scope": "WARP device, queue, list, fence, RT clear, readback (no window, no swapchain)",
+   "at": "2026-10-29T04:08:59.077Z",
+   "build": true,
+   "run": true
+  },
+  "d3d12-headless-cs": {
+   "lang": "cs",
+   "dir": "examples/windows/d3d12-headless/cs",
+   "scope": "same, C# with CsWin32 (unsafe COM structs)",
+   "at": "2026-10-29T04:09:01.835Z",
+   "build": true,
+   "run": true
+  },
+  "d3d12-headless-rust": {
+   "lang": "rust",
+   "dir": "examples/windows/d3d12-headless/rust",
+   "scope": "same, Rust with windows 0.62.2",
+   "at": "2026-10-29T04:09:10.959Z",
+   "build": true,
+   "run": true
+  },
+  "d3d12-headless-bun": {
+   "lang": "bun",
+   "dir": "examples/windows/d3d12-headless/bun",
+   "scope": "same, raw COM vtable calls through bun:ffi",
+   "at": "2026-10-29T04:09:11.231Z",
+   "build": true,
+   "run": true
+  },
+  "hello-cpp": {
+   "lang": "cpp",
+   "dir": "examples/windows/hello/cpp",
+   "scope": "console hello, dynamic CRT",
+   "at": "2026-10-29T04:09:11.313Z",
+   "build": true,
+   "run": true
+  },
+  "hello-rust": {
+   "lang": "rust",
+   "dir": "examples/windows/hello/rust",
+   "scope": "console hello, dev profile",
+   "at": "2026-10-29T04:09:11.529Z",
+   "build": true,
+   "run": true
+  },
+  "hello-bun": {
+   "lang": "bun",
+   "dir": "examples/windows/hello/bun",
+   "scope": "console hello, bun run",
+   "at": "2026-10-29T04:09:12.705Z",
+   "build": true,
+   "run": true
+  },
+  "hello-aot-cpp": {
+   "lang": "cpp",
+   "dir": "examples/windows/hello/cpp",
+   "scope": "native release exe, static CRT (NativeAOT analog)",
+   "at": "2026-10-29T04:09:12.734Z",
+   "build": true,
+   "run": true
+  },
+  "hello-aot-rust": {
+   "lang": "rust",
+   "dir": "examples/windows/hello/rust",
+   "scope": "release exe, LTO, size-optimised, stripped",
+   "at": "2026-10-29T04:09:13.072Z",
+   "build": true,
+   "run": true
+  },
+  "hello-aot-bun": {
+   "lang": "bun",
+   "dir": "examples/windows/hello/bun",
+   "scope": "bun build --compile standalone executable",
+   "at": "2026-10-29T04:09:15.761Z",
+   "build": true,
+   "run": true
+  },
+  "libadd-cpp": {
+   "lang": "cpp",
+   "dir": "examples/windows/libadd/cpp",
+   "scope": "DLL exporting add(), called through bun:ffi",
+   "at": "2026-10-29T04:09:16.470Z",
+   "build": true,
+   "run": true
+  },
+  "libadd-rust": {
+   "lang": "rust",
+   "dir": "examples/windows/libadd/rust",
+   "scope": "cdylib exporting add(), called through bun:ffi",
+   "at": "2026-10-29T04:09:16.653Z",
+   "build": true,
+   "run": true
+  },
+  "libadd-bun": {
+   "lang": "bun",
+   "dir": "examples/windows/libadd/bun",
+   "scope": "TypeScript module exporting add()",
+   "at": "2026-10-29T04:09:18.064Z",
+   "build": true,
+   "run": true
+  }
+ }
+}

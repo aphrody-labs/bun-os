@@ -1,0 +1,15 @@
+{
+  "name": "@aphrody/windows-samples-tests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Test matrix of the official Microsoft Windows samples (WinUI, Windows App SDK, Direct3D 12, .NET 10/11 templates) across C++, C#, Rust and Bun",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "manifest": "bun scripts/build-manifest.ts",
+    "templates": "bun scripts/generate-dotnet-templates.ts",
+    "matrix": "bun scripts/run-matrix.ts",
+    "coverage": "bun scripts/compute-coverage.ts"
+  }
+}

@@ -1,0 +1,11 @@
+CreateDXGIFactory1
+D3D12CreateDevice
+IDXGIFactory4
+ID3D12Device
+ID3D12CommandQueue
+ID3D12CommandAllocator
+ID3D12GraphicsCommandList
+ID3D12Resource
+ID3D12DescriptorHeap
+ID3D12Fence
+IUnknown
