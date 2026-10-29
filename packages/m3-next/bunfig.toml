@@ -1,0 +1,2 @@
+[test]
+preload = ["@aphrody/m3-config/test/dom"]
