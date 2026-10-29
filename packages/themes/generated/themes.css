@@ -2911,8 +2911,7 @@
 }
 .t-glass {
   background: var(--t-glass-bg);
-  -webkit-backdrop-filter: blur(var(--t-glass-blur))
-    saturate(var(--t-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--t-glass-blur)) saturate(var(--t-glass-saturate));
   backdrop-filter: blur(var(--t-glass-blur)) saturate(var(--t-glass-saturate));
   border: 1px solid var(--t-glass-border);
   box-shadow:
@@ -3061,8 +3060,7 @@
 /* Shape language per theme. */
 [data-skin="apple"] .t-card {
   background: var(--t-glass-bg);
-  -webkit-backdrop-filter: blur(var(--t-glass-blur))
-    saturate(var(--t-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--t-glass-blur)) saturate(var(--t-glass-saturate));
   backdrop-filter: blur(var(--t-glass-blur)) saturate(var(--t-glass-saturate));
   border-color: var(--t-glass-border);
   box-shadow: inset 0 1px 0 var(--t-glass-highlight);
