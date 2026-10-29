@@ -85,7 +85,6 @@ export async function buildGraph(root: string, manifest: any, integration: Integ
   const pkgs = new Map<string, any>(); // dir -> parsed toml (packages only)
   const wsRoots = new Set<string>(); // nested workspace roots (own [workspace]), excluding the repo root
   for (const f of cargoFiles) {
-    if (f.startsWith("vendor/cargo/")) continue; // vendored crates.io sources (cargo vendor), not components
     const t = await readToml(f);
     if (!t) continue;
     const dir = posix.dirname(f) === "." ? "." : posix.dirname(f);
@@ -236,7 +235,6 @@ export async function buildGraph(root: string, manifest: any, integration: Integ
   // Wiring-file references: a component path mentioned by a build/CI/factory file other than the manifest itself.
   const wiring = files.filter(
     f =>
-      !f.startsWith("vendor/cargo/") &&
       !f.startsWith("docs/generated/") &&
       f !== "factory/bunos/components.json" &&
       f !== ".gitmodules" &&

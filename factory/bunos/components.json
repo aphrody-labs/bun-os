@@ -402,17 +402,6 @@
       "system": "base provides core/bash; fork stays source of patches"
     },
     {
-      "id": "vendor-cargo",
-      "path": "vendor/cargo",
-      "size": "651 MiB (aws-lc-sys 63 MiB, windows 109 MiB)",
-      "origin": "crates.io vendored registry",
-      "kind": "build-input",
-      "integration": {
-        "mode": "excluded",
-        "reason": "Build-time offline registry, not installed"
-      }
-    },
-    {
       "id": "msys2-mingw-cygwin",
       "path": "vendor/msys2-packages, vendor/msys2-runtime, vendor/newlib-cygwin, vendor/mingw-packages, vendor/msys2-source-metadata",
       "size": "1.0 GiB",
@@ -514,7 +503,6 @@
         "crates/vectorcraft-plugins/example": "plugin example; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
         "packages/bun-tauri": "Tauri fork; virtual [workspace] of its own, consumed by path through the aphrody-tauri* entries of [workspace.dependencies]",
         "packages/m3-templates/desktop/src-tauri": "scaffold template (name placeholder __NAME__), copied by the M3 templates CLI",
-        "vendor/cargo": "cargo vendor output (crates.io sources), selected by source replacement, not workspace members",
         "vendor/cargo-3ds": "upstream submodule with its own workspace; build tool, not a dependency",
         "vendor/cef-rs": "upstream submodule with its own workspace; waits on the CEF CMake toolchain like apps/aphrody-app",
         "vendor/citro3d-rs": "upstream submodule with its own workspace; consumed by path from the 3DS crates",
@@ -14599,34 +14587,6 @@
       "registration": ["none"],
       "aot": true,
       "status": "present"
-    },
-    {
-      "id": "crate:vendor/cargo/egui-wgpu-0.36.2",
-      "kind": "crate",
-      "path": "vendor/cargo/egui-wgpu-0.36.2",
-      "source": {
-        "type": "path-crate",
-        "name": "egui-wgpu",
-        "version": "0.36.2"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present",
-      "consumedBy": ["crate:apps/pdfcraft/vendor/egui-wgpu"]
-    },
-    {
-      "id": "crate:vendor/cargo/winit-0.30.13",
-      "kind": "crate",
-      "path": "vendor/cargo/winit-0.30.13",
-      "source": {
-        "type": "path-crate",
-        "name": "winit",
-        "version": "0.30.13"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present",
-      "consumedBy": ["crate:apps/pdfcraft/vendor/winit"]
     },
     {
       "id": "crates.io:gix",

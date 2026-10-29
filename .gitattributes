@@ -1,6 +1,5 @@
 * text=auto eol=lf
 *.ps1 text eol=crlf
-vendor/cargo/** -text
 factory/usr/overlay/usr/share/licenses/bun-os/LICENSE whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab,-conflict-marker
 
 # >>> bunrepo managed (aphrody-bun git generate attributes) >>>
