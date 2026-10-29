@@ -333,7 +333,7 @@ test("container plan installs packages inside the container only", () => {
   expect(step!.cmd.slice(0, 3)).toEqual(["podman", "run", "--rm"]);
   expect(step!.cmd.at(-1)).toContain("pacman -S --noconfirm --needed gnome-pkg");
   expect(step!.cmd.at(-1)).toContain("linux build a --run");
-  expect(step!.cmd.at(-1)).toContain("npm install -g bun@1.4.4-canary.20261028.1");
+  expect(step!.cmd.at(-1)).toContain("npm install -g --allow-scripts=bun bun@1.4.4-canary.20261028.1");
   expect(step!.cmd).toContain("/abs:/work".replace("/abs", "."));
 });
 

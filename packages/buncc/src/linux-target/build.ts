@@ -170,7 +170,7 @@ export function containerPlan(
     "set -euo pipefail",
     "pacman -Syu --noconfirm --needed base-devel git meson ninja cmake pkgconf python nodejs npm wayland-protocols dbus glib2-devel gobject-introspection sassc",
     `pacman -S --noconfirm --needed ${names.join(" ")}`,
-    `npm install -g bun@${CONTAINER_BUN}`,
+    `npm install -g --allow-scripts=bun bun@${CONTAINER_BUN}`,
     `bun /work/packages/buncc/src/cli.ts linux build ${target} --run${deep ? " --deep" : ""} --dir /work/.buncc/linux-desktop`,
   ].join("\n");
   return [
