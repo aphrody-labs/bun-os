@@ -18,7 +18,6 @@ permissions:
   contents: read
 
 env:
-  CARGO_HOME: /var/cache/cargo
   CARGO_TERM_COLOR: never
 
 concurrency:
@@ -56,6 +55,8 @@ jobs:
     timeout-minutes: 120
     container:
       image: archlinux:base-devel
+    env:
+      CARGO_HOME: /var/cache/cargo
     steps:
       - name: Toolchain
         run: |
@@ -71,11 +72,13 @@ jobs:
       - name: Build packages with makepkg
         run: |
           useradd -m builder
-          mkdir -p /var/cache/cargo /out
-          chown -R builder:builder /var/cache/cargo /out "$GITHUB_WORKSPACE"
+          mkdir -p /var/cache/cargo /out /home/builder/build
+          # build outside the checkout: cargo would otherwise pick up the repository root workspace
+          cp -r factory/rustbase/pkg/. /home/builder/build/
+          chown -R builder:builder /var/cache/cargo /out /home/builder/build
           for p in bunos-uutils-multicall bunos-sudo-rs bunos-nushell-default bunos-rust-base; do
             echo "::group::makepkg $p"
-            su builder -c "cd '$GITHUB_WORKSPACE/factory/rustbase/pkg/$p' && CARGO_HOME=/var/cache/cargo PKGDEST=/out makepkg -f --noconfirm --skippgpcheck"
+            su builder -c "cd /home/builder/build/$p && CARGO_HOME=/var/cache/cargo PKGDEST=/out makepkg -f --noconfirm --skippgpcheck"
             echo "::endgroup::"
           done
           ls -l /out
@@ -151,6 +154,7 @@ jobs:
           c = Counter(); walk(json.load(open("gnu-result.json")), c)
           total = sum(c.values()); run = total - c["SKIP"]
           print(json.dumps({"total": total, **{k: c[k] for k in ("PASS","FAIL","SKIP","ERROR")}, "pass_rate_of_run_percent": round(100 * c["PASS"] / run, 2) if run else None}))
+          if total == 0: raise SystemExit("no GNU test results parsed")
           PY
           { echo '### GNU coreutils conformance (uutils '"${{ needs.check.outputs.coreutils_sha }}"')'; echo '```'; cat gnu-summary.json; echo '```'; } >>"$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
@@ -184,6 +188,7 @@ jobs:
           for m in re.finditer(r"test result: \w+\. (\d+) passed; (\d+) failed; (\d+) ignored", open("test.log").read()):
               p += int(m[1]); f += int(m[2]); i += int(m[3])
           print(json.dumps({"passed": p, "failed": f, "ignored": i, "total": p + f + i}))
+          if p + f + i == 0: raise SystemExit("no test results parsed")
           PY
           { echo '### uutils util-linux cargo test'; echo '```'; cat util-linux-summary.json; echo '```'; } >>"$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
