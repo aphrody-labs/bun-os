@@ -107,7 +107,6 @@ first launch.
 | `vendor/bash`                  | 326 MiB         | `pacman-system` `bash` (via `base`)                                    |
 | `vendor/fonts`                 | not initialized | `pacman-bunos` `bun-os-fonts` → `/usr/share/fonts/bun-os`              |
 | `vendor/material-design-icons` | not initialized | `pacman-bunos` `material-design-icons-bunos`                           |
-| `vendor/cargo`                 | 651 MiB         | `excluded`: offline crate registry                                     |
 | MSYS2, mingw, Cygwin trees     | 1.0 GiB         | `excluded`: Windows factory                                            |
 | `vendor/powershell`            | 102 MiB         | `remaining`: no repo package, no consumer                              |
 

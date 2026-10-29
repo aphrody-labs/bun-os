@@ -30,6 +30,5 @@
 /crates/aphrody/                                 @aphrody-dev
 /crates/bun-engine-core/                         @aphrody-dev
 /crates/bunos-utils/                             @aphrody-dev
-/vendor/cargo/                                   @aphrody-dev
 /vendor/msys2-source-metadata/                   @aphrody-dev
 /vendor/wgpu + 25 crates/                        @aphrody-dev

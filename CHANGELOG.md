@@ -10,8 +10,8 @@ Nothing listed here has been published to npm or crates.io yet (see
 
 ### Workspace
 
-- Six `tools/bevy/*` build tools are flat Cargo members under `crates/` (`c93236a800`); `tools/bevy/ci` and
-  twelve nested Bevy members remain, pending an owner decision.
+- Bevy comes from crates.io (0.20.1): the in-tree copies (`crates/bevy*`, `vendor/bevy`, `docs/bevy`, `tools/bevy`, their six build tools), the
+  uncompiled `vendor/cargo` snapshot and the `ghidra-decompiler` copy are removed; `simdutf`, `rfb-encodings` and the PdfCraft vendor crates stay as patched copies.
 - Standalone fuzz, fixture and example workspaces are excluded from the root Cargo graph (`9250e43294`).
 - `bun src/cli.ts workspace check` enforces one root `bun.lock`, the nested Cargo workspace/lock ledger and the
   persisted component inventory (`867501bc0e`). Ledger: [cargo-exceptions](docs/cargo-exceptions.md).
