@@ -1,8 +1,0 @@
-{
-  "extends": "@aphrody/m3-config/tsconfig.json",
-  "compilerOptions": {
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["bun-types", "node"]
-  },
-  "include": ["src/**/*", "scripts/**/*", "m3.config.ts"]
-}

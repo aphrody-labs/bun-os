@@ -19,14 +19,6 @@
       "build": "build",
       "dist": "dist",
       "categories": "Development;"
-    },
-    {
-      "id": "m3-web",
-      "name": "M3 Web",
-      "path": "apps/m3-web",
-      "build": "build",
-      "dist": "dist",
-      "categories": "Development;"
     }
   ]
 }

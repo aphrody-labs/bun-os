@@ -1196,26 +1196,6 @@
     },
     {
       "buildOwner": ".",
-      "bunOwner": ".",
-      "cargoOwner": null,
-      "component": "@aphrody/m3-web",
-      "migrationState": "declared-member",
-      "ownerEvidence": "root-workspace-members",
-      "path": "apps/m3-web",
-      "qualificationState": "source-inventory-only",
-      "releaseOwner": ".",
-      "revision": null,
-      "sourceRepository": "aphrody-labs/bun-distribution",
-      "submodule": null,
-      "targets": {
-        "cpu": null,
-        "os": null
-      },
-      "type": "bun-app",
-      "upstream": null
-    },
-    {
-      "buildOwner": ".",
       "bunOwner": null,
       "cargoOwner": ".",
       "component": "pdfcraft",
@@ -1450,26 +1430,6 @@
       "submodule": null,
       "targets": null,
       "type": "crate",
-      "upstream": null
-    },
-    {
-      "buildOwner": ".",
-      "bunOwner": ".",
-      "cargoOwner": null,
-      "component": "@aphrody/play",
-      "migrationState": "declared-member",
-      "ownerEvidence": "root-workspace-members",
-      "path": "apps/play",
-      "qualificationState": "source-inventory-only",
-      "releaseOwner": ".",
-      "revision": null,
-      "sourceRepository": "aphrody-labs/bun-distribution",
-      "submodule": null,
-      "targets": {
-        "cpu": null,
-        "os": null
-      },
-      "type": "bun-app",
       "upstream": null
     },
     {
@@ -47303,13 +47263,13 @@
   "counts": {
     "crates": 1599,
     "fixtureManifests": 165,
-    "manifests": 2221,
+    "manifests": 2219,
     "missingMembers": 0,
     "omittedManifests": 1,
     "ownershipConflicts": 12,
-    "packages": 602,
+    "packages": 600,
     "parseFailures": 6,
-    "rootBunMembers": 489,
+    "rootBunMembers": 487,
     "rootCargoMembers": 682,
     "rootSubmodules": 168,
     "submodules": 309,

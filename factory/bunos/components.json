@@ -3229,32 +3229,6 @@
       "status": "present"
     },
     {
-      "id": "npm:@aphrody/m3-web",
-      "kind": "app",
-      "path": "apps/m3-web",
-      "source": {
-        "type": "workspace",
-        "name": "@aphrody/m3-web",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@aphrody/play",
-      "kind": "app",
-      "path": "apps/play",
-      "source": {
-        "type": "workspace",
-        "name": "@aphrody/play",
-        "version": "1.4.7"
-      },
-      "registration": ["bun-build-plugin"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "npm:@aphrody/webos",
       "kind": "app",
       "path": "apps/webos",

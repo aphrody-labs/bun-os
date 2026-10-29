@@ -201,36 +201,6 @@
         "playwright-core": "catalog:",
       },
     },
-    "apps/m3-web": {
-      "name": "@aphrody/m3-web",
-      "version": "1.4.7",
-      "dependencies": {
-        "@aphrody/m3": "workspace:*",
-        "@aphrody/m3-front": "workspace:*",
-        "@aphrody/m3-tailwind": "workspace:*",
-        "@aphrody/m3-tokens": "workspace:*",
-        "tailwindcss": "catalog:",
-      },
-      "devDependencies": {
-        "@aphrody/m3-config": "workspace:*",
-      },
-    },
-    "apps/play": {
-      "name": "@aphrody/play",
-      "version": "1.4.7",
-      "dependencies": {
-        "@aphrody/bun-steam": "workspace:*",
-        "@aphrody/m3": "workspace:*",
-        "@aphrody/m3-fonts": "workspace:*",
-        "@aphrody/m3-front": "workspace:*",
-        "@aphrody/m3-tailwind": "workspace:*",
-        "@aphrody/m3-tokens": "workspace:*",
-        "tailwindcss": "catalog:",
-      },
-      "devDependencies": {
-        "@aphrody/m3-config": "workspace:*",
-      },
-    },
     "apps/webos": {
       "name": "@aphrody/webos",
       "version": "1.4.7",
@@ -2390,8 +2360,6 @@
 
     "@aphrody/m3-tokens": ["@aphrody/m3-tokens@workspace:packages/m3-tokens"],
 
-    "@aphrody/m3-web": ["@aphrody/m3-web@workspace:apps/m3-web"],
-
     "@aphrody/material-design-icons": ["@aphrody/material-design-icons@workspace:packages/material-design-icons"],
 
     "@aphrody/material-web": ["@aphrody/material-web@build/packages/material-web.tgz", { "dependencies": { "@aphrody/bun": "3.3.0", "@aphrody/canvas": "1.0.9-aphrody.2", "@lit/context": "^1.1.6", "lit": "^3.3.3", "three": "^0.186.1", "tslib": "^2.8.1" }, "hasInstallScript": true }, "sha512-fyPqF7dzM2O9C43WVu8cpNft1zZLuvTMbXIWBcTOLTKKmv7jPhSq52juMoMldordeSPfBRzAhtDCkn5bYa+uGw=="],
@@ -2411,8 +2379,6 @@
     "@aphrody/ovh": ["@aphrody/ovh@workspace:packages/ovh"],
 
     "@aphrody/paths": ["@aphrody/paths@workspace:packages/paths"],
-
-    "@aphrody/play": ["@aphrody/play@workspace:apps/play"],
 
     "@aphrody/product": ["@aphrody/product@workspace:packages/product"],
 

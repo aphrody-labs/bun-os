@@ -103,7 +103,6 @@ export function checkCatalogs(): Finding[] {
       [/\bbun_os_platform::tf?\(\s*"([a-z0-9.-]+)"/g],
       ["common", "engine"],
     ],
-    ["apps/play/src/client", "play", [/\bth?\(\s*"([a-z0-9-]+)"/g, /data-i18n="([a-z0-9-]+)"/g], ["common", "play"]],
   ];
   for (const [dir, , patterns, domainsOf] of uses) {
     const known = new Set(domainsOf.flatMap(d => [...enIds(d)]));
@@ -151,27 +150,6 @@ export function checkStrings(): Finding[] {
       if (/^\s*(\/\/|#\[|eprintln!|println!|log::|debug!|info!|warn!|error!|trace!)/.test(text)) return;
       for (const m of text.matchAll(rustSinks)) if (WORDS.test(m[1] as string)) add("hardcoded-string", file, i, m[0]);
     });
-  // Play client: text nodes and user-facing attributes in templates and HTML.
-  for (const file of walk(
-    join(repoRoot, "apps/play/src/client"),
-    f => /\.(ts|html)$/.test(f) && !f.endsWith("messages.ts"),
-  )) {
-    lines(file).forEach((text, i) => {
-      if (/^\s*(\/\/|\*|\/\*|import )/.test(text)) return;
-      // Text nodes between markup tags (not TypeScript generics such as `Promise<T>`).
-      for (const m of text.matchAll(
-        /(?:<[a-zA-Z][^<>]*>|<\/[a-zA-Z0-9]+>)([^<>${}`]*[A-Za-z]{2,}[^<>${}`]*)<(?:\/|[a-zA-Z])/g,
-      ))
-        if (WORDS.test((m[1] as string).trim()) && !/[();=]/.test(m[1] as string))
-          add("hardcoded-string", file, i, m[1] as string);
-      for (const m of text.matchAll(/\b(aria-label|title|placeholder|alt)="([^"$]*[A-Za-z]{2,}[^"$]*)"/g))
-        add("hardcoded-attribute", file, i, m[0]);
-      for (const m of text.matchAll(
-        /\.(textContent|innerText|title|ariaLabel)\s*=\s*["'`]([^"'`$]*[A-Za-z]{2,}[^"'`]*)["'`]/g,
-      ))
-        add("hardcoded-string", file, i, m[0]);
-    });
-  }
   return out;
 }
 
@@ -186,25 +164,6 @@ export function checkTokens(): Finding[] {
       line: i + 1,
       text: text.trim().slice(0, 120),
     });
-  for (const file of walk(join(repoRoot, "apps/play/src/client"), f => /\.(css|ts|html)$/.test(f))) {
-    const css = file.endsWith(".css");
-    let inMedia = false;
-    lines(file).forEach((text, i) => {
-      if (/^\s*(\/\/|\*|\/\*)/.test(text)) return;
-      if (/@media|@container/.test(text)) inMedia = true;
-      const code = text.replace(/var\(--[^)]*\)/g, "var()");
-      for (const m of code.matchAll(/#[0-9a-fA-F]{3,8}\b(?![\w-])/g))
-        if (css || /["'`]#/.test(text)) add("raw-color", file, i, m[0]);
-      for (const m of code.matchAll(/\b(rgba?|hsla?|oklch|lab|lch)\(\s*\d/g)) add("raw-color", file, i, m[0]);
-      if (css && !inMedia)
-        for (const m of code.matchAll(/(?<![\w.-])(\d*\.?\d+)(px|rem|em)\b/g))
-          if (!["0", "1"].includes(m[1] as string) || m[2] !== "px") add("raw-size", file, i, m[0]);
-      for (const m of code.matchAll(/(?<![\w.-])(\d*\.?\d+)(ms|s)\b/g))
-        if (css || /["'`]/.test(text)) add("raw-duration", file, i, m[0]);
-      if (inMedia && /\{\s*$/.test(text) && !/@media|@container/.test(text)) inMedia = true;
-      if (text.startsWith("}")) inMedia = false;
-    });
-  }
   // UI modules only: timers of system pollers (nvidia.rs, runtime.rs) are not motion tokens.
   const rustUi = walk(join(repoRoot, "crates/bun-os-shell/src"), f =>
     /[\\/](screens|ui|overlay|app|text)\.rs$/.test(f),

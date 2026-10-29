@@ -84,7 +84,6 @@
       "artifact": "iecode-dotnet"
     },
     "m3-showcase": { "kind": "server", "related": "showcase" },
-    "m3-web": { "kind": "example", "related": "showcase" },
     "m3-next-example": { "kind": "example", "related": "showcase" },
     "m3-next-tauri-example": { "kind": "example", "related": "showcase" },
     "m3-published-consumer": { "kind": "example", "related": "showcase" },

@@ -141,7 +141,7 @@ Android app installs on a device; a library has no window; an example is read an
 | iecode-web-wasm                                                                         | Web                                                      | Nintendo DS (Dust)            | itself                 |
 | iecode-web-wii-wasm                                                                     | Library                                                  | `/source/iecode-web-wii-wasm` | IECODE Web member      |
 | java-ffi                                                                                | Library                                                  | `/source/java-ffi`            | bun-android member     |
-| m3-next-example, m3-next-tauri-example, m3-published-consumer, m3-web | Example                                                  | `/source/<member>`            | Material 3 components  |
+| m3-next-example, m3-next-tauri-example, m3-published-consumer | Example                                                  | `/source/<member>`            | Material 3 components  |
 | m3-showcase                                                                             | Server                                                   | `/source/m3-showcase`         | Material 3 components  |
 | play                                                                                    | Server (Bun.serve + NGINX: Steam, LAN cache, gamestream) | `/source/play`                | Play                   |
 | rg-website                                                                              | Server (Next.js)                                         | `/source/rg-website`          |                        |
