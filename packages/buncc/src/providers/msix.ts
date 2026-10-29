@@ -65,7 +65,7 @@ export const msixProvider: Provider = {
       ],
     ],
   }),
-  async env(ctx): Promise<Record<string, string>> {
+  async env(ctx) {
     const m = findSdkTool("makeappx", ctx.env);
     return m ? { WINDOWS_SDK_BIN: m.replace(/[\\/][^\\/]+$/, "") } : {};
   },

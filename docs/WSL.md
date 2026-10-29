@@ -43,17 +43,14 @@ no current tag. Refs `615.78.08` (branch and tag, commit `1a82fbfda8f321b056eb35
 
 | File | Role |
 | --- | --- |
-| `build-rootfs.sh` | `pacstrap` base into a directory, install the pinned Bun, chroot-run `bunos-wsl.sh`, run the Learn checks (below), write `bunos-wsl.tar.gz`, the same bytes as `bunos-wsl.wsl`, and sha256. Runs only as root in `archlinux:base-devel --privileged` (workflow `wsl-rootfs.yml`). |
+| `build-rootfs.sh` | `pacstrap` base into a directory, install the pinned Bun, chroot-run `bunos-wsl.sh`, write `bunos-wsl.tar.gz` + sha256. Runs only as root in `archlinux:base-devel --privileged` (workflow `wsl-rootfs.yml`). |
 | `bunos-wsl.sh` | CachyOS key + keyring + mirrorlists + CachyOS `pacman` fork (same steps and URLs as `cachyos-repo-add-script` `cachyos-repo.sh` e2c90c6), then `factory/distro/cli.ts repo --tier <tier> --conf /etc/pacman.conf` for the v3/v4/znver4 layers (reuses `factory/distro/repos.ts`, nothing duplicated), package lists, Bun, buncc, user, sudo, locale. |
-| `wsl-distribution.conf`, `bunos.ico` | `[oobe] defaultUid=1000 defaultName=bunos`, start-menu shortcut with `/usr/lib/wsl/bunos.ico`, Windows Terminal profile (no `oobe.command`: user `bun` already exists). |
 | `wsl.conf` | `systemd=true`, `[user] default=bun`, interop on, `appendWindowsPath=false`, automount metadata options. |
 | `packages.base`, `packages.cosmic`, `packages.hyprland` | base set (Mesa with the d3d12 gallium driver, `vulkan-dzn`, Wayland, XWayland, Rust, clang); COSMIC group; Hyprland subset of `factory/images/bunos-omarchy/candidate.packages`. |
 
 Decisions:
 
-- **Install paths** (all from Microsoft Learn, fetched 2026-10-29): `wsl --install --no-distribution` installs WSL itself without a distro (first on a machine without WSL); then either `wsl --install --from-file bunos-wsl.wsl [--name N]` or double-click the `.wsl` file (WSL >= 2.4.4; needs `oobe.defaultName`, present), or `wsl --import <name> <dir> bunos-wsl.tar.gz`; or `wsl --import-in-place <name> <ext4.vhdx>` for a ready ext4 VHDX (not produced yet, only the tarball is). gzip tar, because Learn says other compressions risk breaking compatibility with older WSL; `.tar.zst` is not used.
-- **Learn "Configuration file recommendations", enforced in `build-rootfs.sh` before archiving:** no `/etc/resolv.conf` (also checked in the archive listing), no password hash in `/etc/shadow` (`root` and `bun` are `!`), root uid 0 in `/etc/passwd`, `bun` uid 1000 = `oobe.defaultUid`, `wsl.conf` and `wsl-distribution.conf` `0644 root:root`, empty `/boot`, no `/usr/lib/modules`, no `vmlinuz`/`initramfs`/`initrd` file.
-- **Systemd units masked** (system and `--global` user): the Learn list (`systemd-resolved`, `systemd-networkd`, `NetworkManager`, `systemd-tmpfiles-setup/clean(.timer)/setup-dev(-early)`, `tmp.mount`) plus the rest of `DISCOURAGED_SYSTEM_UNITS` in `microsoft/WSL` `distributions/validate-modern.py` (`*-wait-online`, `networking`, `systemd-vconsole-setup`, `console-getty`, `hypervkvpd`). The earlier revision enabled `systemd-resolved`; that was wrong. `systemd-timesyncd` is no longer enabled either.
+- **Import with `wsl --import <name> <dir> bunos-wsl.tar.gz`.** gzip tar, because `.tar.zst` support in `wsl --import` was not confirmed.
 - **No kernel, firmware or NVIDIA package in the guest.** WSL supplies the kernel (`.wslconfig` `kernel=` selects ours) and the GPU path.
 - **Bun** is the unmodified official npm canary `1.4.4-canary.20261028.1` (`@oven/bun-linux-x64`), sha256 `a9b0e5d2...f6796c` as pinned in `factory/usr/pkgs/bun-canary/PKGBUILD`.
 - **buncc** is not published to npm (docs/BUNCC.md), so the workspace sources ship in `/opt/bunos/buncc` with `/usr/local/bin/buncc`.
@@ -111,11 +108,6 @@ Totals: 4 files conflicted textually (all four resolved above), 17 merged, 27 ad
 compiles against v7.3 internal APIs (6.18 -> 7.3) is unknown** and is exactly what the `wsl-kernel.yml` build checks. No Microsoft commit history was
 replayed (a depth-1500 blobless fetch of the history stalled on GitHub), so this is a squashed per-area series, not Microsoft's individual commits.
 
-### Kernel modules for WSL: a VHD, not a tarball
-
-`modules.tar.zst` cannot be used by WSL. `.wslconfig` `[wsl2]` takes `kernel=` (absolute Windows path to `bzImage`) and `kernelModules=` (absolute Windows path to a modules VHD), paths with escaped backslashes, e.g.
-`kernel=C:\wsl\bzImage-7.3` and `kernelModules=C:\wsl\modules-7.3.vhdx` (Learn wsl-config). The VHD layout `<kernelrelease>/{modules,linux-headers,perf}` is produced by Microsoft's `Microsoft/scripts/gen_artifacts_vhdx.sh <modules dir> <headers dir> <perf dir> <kernelrelease> <out>` (read at `a989171`; needs `mke2fs` and `qemu-img`). `build-wsl-kernel.sh` now runs `modules_install`, `headers_install`, a best-effort `tools/perf` build and that script, and emits `modules.vhdx`; `report.json` has `perf_built`. If perf fails to build, `perf/` is empty. Not run yet.
-
 ### Config fragment (`factory/wsl/kernel/wsl-rust.config`)
 
 Merged over Microsoft's `config-wsl` (6.18.52.3) after `olddefconfig`. Verified in the real files: `config-wsl` has `CONFIG_MODVERSIONS=y`, which
@@ -134,11 +126,6 @@ and a prebuilt-module `PKGBUILD` pinned to commit `1a82fbfda8f3` of our fork. `l
 - Any workflow run: `wsl-kernel.yml` (kernel build, `make rustavailable`, size/time report in the job summary and `report.json`, nvidia-open compile on 7.2.11 and 7.3) and `wsl-rootfs.yml` (rootfs build). Both are unbuilt.
 - That `dxgkrnl` and the Hyper-V patches compile and work on 7.3; that the kernel boots under WSL; that Rust objects build with rustc 1.99.1 + bindgen 0.71.1 on the runner.
 - Whether CachyOS v3/v4 repos install cleanly in the chroot (mirror still serving the pinned `cachyos-keyring-20240331-1`, `cachyos-mirrorlist-27-1`, `pacman-7.1.0.r9.g54d9411-5` files; they may have been superseded).
-- `wsl --install --from-file`, `wsl --import` or `--import-in-place` of the image, `systemd=true` boot, that the masked units leave a working boot, that WSL accepts the generated `modules.vhdx` as `kernelModules=`, WSLg sockets inside this distro, nested Hyprland/COSMIC.
+- `wsl --import` of the tarball, `systemd=true` boot, `.tar.zst` import support, WSLg sockets inside this distro, nested Hyprland/COSMIC.
 - Any "optimized" claim for 7.3, Rust or NVIDIA. nova-core status is read from Kconfig text only.
 - CachyOS `7.3.0-4` was read from `.SRCINFO`; no CachyOS kernel tag or patchset was fetched or compared.
-
-## 6. Corrections of 2026-10-29 (Microsoft Learn audit)
-
-Verified again on Learn pages build-custom-distro, wsl-config and basic-commands before applying: systemd unit list, configuration file recommendations, `kernelModules`, `--no-distribution`, `--from-file`, `--import-in-place`. CI failures on `0a52c6398`: the kernel job stopped on `# CONFIG_... is not set` lines that `olddefconfig` drops for invisible symbols (the check now fails only when such a symbol is `y`/`m`); the nvidia-open jobs lacked `pahole` and `Module.symvers` (`dwarves` installed, `IGNORE_MISSING_MODULE_SYMVERS=1`, compile check only); the rootfs job failed in `arch-chroot` with `/etc/pacman.conf not found` (cause not understood, a fallback copy of the host file plus a listing was added; unverified).
-Not adopted: `[boot] command`, `[gpu]`, `[time] useWindowsTimezone`, `[automount] mountFsTab`, `.wslconfig` `systemDistro`; `wsl.conf` is unchanged.

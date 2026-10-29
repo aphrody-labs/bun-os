@@ -17,7 +17,7 @@ import { renderTheme } from "./theme.ts";
 
 const here = import.meta.dir;
 const [cmd = "help", sub, ...rest] = Bun.argv.slice(2);
-const opt = <const O extends Record<string, { type: "string" | "boolean" }>>(args: string[], options: O) =>
+const opt = (args: string[], options: Record<string, { type: "string" | "boolean" }>) =>
   parseArgs({ args, options, allowPositionals: true, strict: true });
 
 const USAGE = `bunos distro tools (factory/distro)
@@ -55,10 +55,7 @@ async function main(): Promise<number> {
         for (const f of p) console.log(f);
         return p.length ? 0 : 1; // omarchy-migrate --pending: 0 = some pending
       }
-      if (values.seed) {
-        console.log(`seeded ${(await seedMigrations(dir, state)).length}`);
-        return 0;
-      }
+      if (values.seed) return void console.log(`seeded ${(await seedMigrations(dir, state)).length}`) ?? 0;
       const r = await migrate({ dir, stateDir: state, pacmanLock: "/var/lib/pacman/db.lck" });
       if (r.locked) console.error("pacman database locked; retry later");
       if (r.failed) console.error(`migration ${r.failed.file} failed (exit ${r.failed.code})`);
@@ -96,10 +93,7 @@ async function main(): Promise<number> {
         });
       const tier = (values.tier as IsaTier | undefined) ?? (await detected());
       if (!isaTiers.includes(tier)) throw new Error(`unknown tier ${tier}; known: ${isaTiers.join(", ")}`);
-      if (sub === "detect") {
-        console.log(tier);
-        return 0;
-      }
+      if (sub === "detect") return void console.log(tier) ?? 0;
       const layers = [
         ...(values["bunos-server"] ? bunosLayers(tier, values["bunos-server"]) : []),
         ...cachyosLayers(tier),
@@ -161,10 +155,7 @@ async function main(): Promise<number> {
     case "overlay": {
       const root = join(here, "overlay");
       const files = (await walk(root)).map(f => relative(root, f).replaceAll("\\", "/")).sort();
-      if (sub === "list") {
-        console.log(files.join("\n"));
-        return 0;
-      }
+      if (sub === "list") return void console.log(files.join("\n")) ?? 0;
       const { values } = opt(rest, { root: { type: "string" } });
       if (!values.root) throw new Error("overlay install --root DIR");
       await cp(root, values.root, { recursive: true });

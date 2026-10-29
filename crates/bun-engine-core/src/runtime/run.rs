@@ -89,9 +89,7 @@ pub fn machine_app(
     }
     #[cfg(feature = "display-filter")]
     if !options.headless {
-        let mut filter = app
-            .world_mut()
-            .resource_mut::<super::display_filter::DisplayFilter>();
+        let mut filter = app.world_mut().resource_mut::<super::display_filter::DisplayFilter>();
         if let Some(kind) = options
             .filter
             .as_deref()
@@ -115,15 +113,11 @@ fn configure_shell(app: &mut App, options: &RunOptions) {
     }
     #[cfg(feature = "shell")]
     if let Some(dir) = &options.state_dir {
-        app.world_mut()
-            .resource_mut::<super::shell::ShellConfig>()
-            .state_dir = dir.clone();
+        app.world_mut().resource_mut::<super::shell::ShellConfig>().state_dir = dir.clone();
     }
     #[cfg(feature = "home")]
     if let Some(spec) = &options.library {
-        app.insert_resource(super::home::HomeLibrary(super::home::source_from_spec(
-            spec,
-        )));
+        app.insert_resource(super::home::HomeLibrary(super::home::source_from_spec(spec)));
     }
     #[cfg(all(feature = "remote", not(target_arch = "wasm32")))]
     if let Some(port) = options.remote {
