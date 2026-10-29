@@ -3,7 +3,17 @@
  * `sysrootManifest` is pure; `fetchIndex`, `downloadPackages` and `extractPackage` do the I/O.
  */
 import { createHash } from "node:crypto";
-import { existsSync, lstatSync, unlinkSync, mkdirSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  lstatSync,
+  unlinkSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join, posix } from "node:path";
 import { ARCH_MIRROR, ArchIndex, archClosure, packageUrl, parseDb, type ArchPackage } from "./pacmandb.ts";
 import { untar, type TarEntry } from "./tar.ts";

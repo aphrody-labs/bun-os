@@ -14,7 +14,13 @@ const checkOnly = process.argv.includes("--check");
 const num = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
 const chosen = (d: any) => d.candidates.find((c: any) => c.repo === d.pick);
 const archCell = (c: any) =>
-  c.arch.official ? `${c.arch.official.repo}/${c.arch.official.pkgname} ${c.arch.official.version}` : c.arch.cachyosRecipe ? `cachyos:${c.arch.cachyosRecipe}` : c.arch.aur ? `aur/${c.arch.aur.pkgname} ${c.arch.aur.version}` : "none";
+  c.arch.official
+    ? `${c.arch.official.repo}/${c.arch.official.pkgname} ${c.arch.official.version}`
+    : c.arch.cachyosRecipe
+      ? `cachyos:${c.arch.cachyosRecipe}`
+      : c.arch.aur
+        ? `aur/${c.arch.aur.pkgname} ${c.arch.aur.version}`
+        : "none";
 
 const rows: string[] = [
   "| Domain | Replaces | Pick | Status | Stars | Release (date) | License | Arch | Score | Runners-up (score) |",
@@ -23,10 +29,17 @@ const rows: string[] = [
 for (const d of catalog.domains) {
   const c = chosen(d);
   if (!c) continue;
-  const ru = d.candidates.filter((x: any) => x.repo !== d.pick).slice(0, 3).map((x: any) => `${x.repo.split("/")[1]} (${x.score.total})`).join(", ") || "-";
+  const ru =
+    d.candidates
+      .filter((x: any) => x.repo !== d.pick)
+      .slice(0, 3)
+      .map((x: any) => `${x.repo.split("/")[1]} (${x.score.total})`)
+      .join(", ") || "-";
   const rel = c.release ? `${c.release.tag} (${c.release.date ?? "?"})` : "none";
   const note = d.status === "directive" && d.dataRank1 !== d.pick ? ` (data rank 1: ${d.dataRank1})` : "";
-  rows.push(`| ${d.id} | ${d.replaces} | ${c.repo} | ${d.status}${note} | ${num(c.stars)} | ${rel} | ${c.license ?? "?"} | ${archCell(c)} | ${c.score.total} | ${ru} |`);
+  rows.push(
+    `| ${d.id} | ${d.replaces} | ${c.repo} | ${d.status}${note} | ${num(c.stars)} | ${rel} | ${c.license ?? "?"} | ${archCell(c)} | ${c.score.total} | ${ru} |`,
+  );
 }
 const table = rows.join("\n");
 

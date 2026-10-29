@@ -32,14 +32,16 @@ if (refresh) {
       date: c.release.date,
       version: String(c.release.tag).replace(/^v/, ""),
       license: c.license,
-      archOfficial: c.arch.official ? `${c.arch.official.repo}/${c.arch.official.pkgname} ${c.arch.official.version}` : null,
+      archOfficial: c.arch.official
+        ? `${c.arch.official.repo}/${c.arch.official.pkgname} ${c.arch.official.version}`
+        : null,
     };
   };
   const token = (await new Response(Bun.spawn(["gh", "auth", "token"], { stdout: "pipe" }).stdout).text()).trim();
   const fork = "aphrody-labs/uutils-util-linux";
-  const head = await api(`https://api.github.com/repos/${fork}/commits/main`, { authorization: `Bearer ${token}` }).catch(() =>
-    api(`https://api.github.com/repos/${fork}/commits/HEAD`, { authorization: `Bearer ${token}` }),
-  );
+  const head = await api(`https://api.github.com/repos/${fork}/commits/main`, {
+    authorization: `Bearer ${token}`,
+  }).catch(() => api(`https://api.github.com/repos/${fork}/commits/HEAD`, { authorization: `Bearer ${token}` }));
   const upstreamUL = catalog.domains.find((x: any) => x.id === "util-linux").candidates[0];
   const gnu: Record<string, string> = {};
   for (const n of ["coreutils", "findutils", "diffutils", "util-linux", "sudo"]) {
@@ -335,9 +337,35 @@ $env.config = {
 
 // ---- meta package ---------------------------------------------------------------------------------------------
 const CORE = [
-  "shell", "ls", "find", "grep", "cat", "cd", "prompt", "editor", "multiplexer", "file-manager", "disk-usage",
-  "process-viewer", "diff", "benchmark", "archiver", "http-client", "fields", "json", "vcs", "git-tui", "task-runner",
-  "fuzzy-finder", "help", "watcher", "code-stats", "hexdump", "substitute", "python-tooling", "python-lint",
+  "shell",
+  "ls",
+  "find",
+  "grep",
+  "cat",
+  "cd",
+  "prompt",
+  "editor",
+  "multiplexer",
+  "file-manager",
+  "disk-usage",
+  "process-viewer",
+  "diff",
+  "benchmark",
+  "archiver",
+  "http-client",
+  "fields",
+  "json",
+  "vcs",
+  "git-tui",
+  "task-runner",
+  "fuzzy-finder",
+  "help",
+  "watcher",
+  "code-stats",
+  "hexdump",
+  "substitute",
+  "python-tooling",
+  "python-lint",
 ];
 const own = new Set(["coreutils", "findutils", "diffutils", "util-linux", "privilege"]);
 const depends = new Set<string>(["bunos-uutils-multicall", "bunos-sudo-rs", "bunos-nushell-default"]);
@@ -348,8 +376,14 @@ for (const d of catalog.domains) {
   if (!c) continue;
   const off = c.arch.official;
   picks.push({
-    domain: d.id, status: d.status, repo: c.repo, tag: c.release?.tag ?? null, sha: c.release?.sha ?? null,
-    date: c.release?.date ?? null, license: c.license, arch: off ? { repo: off.repo, name: off.pkgname, version: off.version } : null,
+    domain: d.id,
+    status: d.status,
+    repo: c.repo,
+    tag: c.release?.tag ?? null,
+    sha: c.release?.sha ?? null,
+    date: c.release?.date ?? null,
+    license: c.license,
+    arch: off ? { repo: off.repo, name: off.pkgname, version: off.version } : null,
   });
   if (own.has(d.id) || !off) continue;
   if (CORE.includes(d.id)) depends.add(off.pkgname);
@@ -370,7 +404,10 @@ url="https://github.com/aphrody-labs/bun-os"
 license=(MIT)
 depends=(${[...depends].sort().join(" ")})
 optdepends=(
-${optdepends.sort().map(o => "  '" + o + "'").join("\n")}
+${optdepends
+  .sort()
+  .map(o => "  '" + o + "'")
+  .join("\n")}
 )
 source=(picks.json)
 sha256sums=(SKIP)

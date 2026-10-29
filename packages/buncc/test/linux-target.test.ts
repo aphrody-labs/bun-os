@@ -365,7 +365,12 @@ test("host tools are linked into the sysroot bin dir, replacing target binaries"
     ["glib-mkenums", "/host/glib-mkenums"],
     ["wayland-scanner", "/host/wayland-scanner"],
   ]);
-  const r = shimHostTools(root, n => found.get(n) ?? null, ["glib-mkenums", "wayland-scanner", "gresource"], (t, p) => links.push([t, p]));
+  const r = shimHostTools(
+    root,
+    n => found.get(n) ?? null,
+    ["glib-mkenums", "wayland-scanner", "gresource"],
+    (t, p) => links.push([t, p]),
+  );
   expect(r).toEqual({ linked: ["glib-mkenums", "wayland-scanner"], present: [], missing: ["gresource"] });
   expect(links.map(l => l[0])).toEqual(["/host/glib-mkenums", "/host/wayland-scanner"]);
   expect(links[0]![1].replaceAll("\\", "/")).toContain("/usr/bin/glib-mkenums");

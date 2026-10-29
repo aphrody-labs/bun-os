@@ -9,29 +9,19 @@
       "candidates": [
         {
           "repo": "nushell/nushell",
-          "arch": [
-            "nushell"
-          ]
+          "arch": ["nushell"]
         },
         {
           "repo": "fish-shell/fish-shell",
-          "arch": [
-            "fish"
-          ]
+          "arch": ["fish"]
         },
         {
           "repo": "reubeno/brush",
-          "arch": [
-            "brush-shell",
-            "brush"
-          ]
+          "arch": ["brush-shell", "brush"]
         },
         {
           "repo": "redox-os/ion",
-          "arch": [
-            "ion-shell",
-            "ion"
-          ]
+          "arch": ["ion-shell", "ion"]
         }
       ]
     },
@@ -42,9 +32,7 @@
       "candidates": [
         {
           "repo": "uutils/coreutils",
-          "arch": [
-            "uutils-coreutils"
-          ]
+          "arch": ["uutils-coreutils"]
         }
       ]
     },
@@ -55,9 +43,7 @@
       "candidates": [
         {
           "repo": "uutils/util-linux",
-          "arch": [
-            "uutils-util-linux"
-          ],
+          "arch": ["uutils-util-linux"],
           "fork": "aphrody-labs/uutils-util-linux"
         }
       ],
@@ -71,9 +57,7 @@
       "candidates": [
         {
           "repo": "uutils/findutils",
-          "arch": [
-            "uutils-findutils"
-          ]
+          "arch": ["uutils-findutils"]
         }
       ]
     },
@@ -84,9 +68,7 @@
       "candidates": [
         {
           "repo": "uutils/diffutils",
-          "arch": [
-            "uutils-diffutils"
-          ]
+          "arch": ["uutils-diffutils"]
         }
       ],
       "ownerPick": "uutils/diffutils",
@@ -99,9 +81,7 @@
       "candidates": [
         {
           "repo": "uutils/procps",
-          "arch": [
-            "uutils-procps"
-          ]
+          "arch": ["uutils-procps"]
         }
       ]
     },
@@ -112,9 +92,7 @@
       "candidates": [
         {
           "repo": "uutils/sed",
-          "arch": [
-            "uutils-sed"
-          ]
+          "arch": ["uutils-sed"]
         }
       ]
     },
@@ -125,15 +103,11 @@
       "candidates": [
         {
           "repo": "trifectatechfoundation/sudo-rs",
-          "arch": [
-            "sudo-rs"
-          ]
+          "arch": ["sudo-rs"]
         },
         {
           "repo": "edneville/please",
-          "arch": [
-            "please"
-          ]
+          "arch": ["please"]
         }
       ]
     },
@@ -144,15 +118,11 @@
       "candidates": [
         {
           "repo": "eza-community/eza",
-          "arch": [
-            "eza"
-          ]
+          "arch": ["eza"]
         },
         {
           "repo": "lsd-rs/lsd",
-          "arch": [
-            "lsd"
-          ]
+          "arch": ["lsd"]
         }
       ]
     },
@@ -163,15 +133,11 @@
       "candidates": [
         {
           "repo": "sharkdp/fd",
-          "arch": [
-            "fd"
-          ]
+          "arch": ["fd"]
         },
         {
           "repo": "uutils/findutils",
-          "arch": [
-            "uutils-findutils"
-          ]
+          "arch": ["uutils-findutils"]
         }
       ]
     },
@@ -182,9 +148,7 @@
       "candidates": [
         {
           "repo": "BurntSushi/ripgrep",
-          "arch": [
-            "ripgrep"
-          ]
+          "arch": ["ripgrep"]
         }
       ]
     },
@@ -195,9 +159,7 @@
       "candidates": [
         {
           "repo": "sharkdp/bat",
-          "arch": [
-            "bat"
-          ]
+          "arch": ["bat"]
         }
       ]
     },
@@ -208,9 +170,7 @@
       "candidates": [
         {
           "repo": "ajeetdsouza/zoxide",
-          "arch": [
-            "zoxide"
-          ]
+          "arch": ["zoxide"]
         }
       ]
     },
@@ -221,9 +181,7 @@
       "candidates": [
         {
           "repo": "starship/starship",
-          "arch": [
-            "starship"
-          ]
+          "arch": ["starship"]
         }
       ]
     },
@@ -234,34 +192,23 @@
       "candidates": [
         {
           "repo": "helix-editor/helix",
-          "arch": [
-            "helix"
-          ]
+          "arch": ["helix"]
         },
         {
           "repo": "microsoft/edit",
-          "arch": [
-            "edit",
-            "msedit"
-          ]
+          "arch": ["edit", "msedit"]
         },
         {
           "repo": "zed-industries/zed",
-          "arch": [
-            "zed"
-          ]
+          "arch": ["zed"]
         },
         {
           "repo": "lapce/lapce",
-          "arch": [
-            "lapce"
-          ]
+          "arch": ["lapce"]
         },
         {
           "repo": "curlpipe/ox",
-          "arch": [
-            "ox"
-          ]
+          "arch": ["ox"]
         }
       ]
     },
@@ -272,9 +219,7 @@
       "candidates": [
         {
           "repo": "zellij-org/zellij",
-          "arch": [
-            "zellij"
-          ]
+          "arch": ["zellij"]
         }
       ]
     },
@@ -285,27 +230,19 @@
       "candidates": [
         {
           "repo": "sxyazi/yazi",
-          "arch": [
-            "yazi"
-          ]
+          "arch": ["yazi"]
         },
         {
           "repo": "Canop/broot",
-          "arch": [
-            "broot"
-          ]
+          "arch": ["broot"]
         },
         {
           "repo": "sayanarijit/xplr",
-          "arch": [
-            "xplr"
-          ]
+          "arch": ["xplr"]
         },
         {
           "repo": "kamiyaa/joshuto",
-          "arch": [
-            "joshuto"
-          ]
+          "arch": ["joshuto"]
         }
       ]
     },
@@ -316,21 +253,15 @@
       "candidates": [
         {
           "repo": "bootandy/dust",
-          "arch": [
-            "dust"
-          ]
+          "arch": ["dust"]
         },
         {
           "repo": "Byron/dua-cli",
-          "arch": [
-            "dua-cli"
-          ]
+          "arch": ["dua-cli"]
         },
         {
           "repo": "sharkdp/diskus",
-          "arch": [
-            "diskus"
-          ]
+          "arch": ["diskus"]
         }
       ]
     },
@@ -341,21 +272,15 @@
       "candidates": [
         {
           "repo": "ClementTsang/bottom",
-          "arch": [
-            "bottom"
-          ]
+          "arch": ["bottom"]
         },
         {
           "repo": "dalance/procs",
-          "arch": [
-            "procs"
-          ]
+          "arch": ["procs"]
         },
         {
           "repo": "bvaisvil/zenith",
-          "arch": [
-            "zenith"
-          ]
+          "arch": ["zenith"]
         }
       ]
     },
@@ -366,15 +291,11 @@
       "candidates": [
         {
           "repo": "dandavison/delta",
-          "arch": [
-            "git-delta"
-          ]
+          "arch": ["git-delta"]
         },
         {
           "repo": "Wilfred/difftastic",
-          "arch": [
-            "difftastic"
-          ]
+          "arch": ["difftastic"]
         }
       ]
     },
@@ -385,9 +306,7 @@
       "candidates": [
         {
           "repo": "sharkdp/hyperfine",
-          "arch": [
-            "hyperfine"
-          ]
+          "arch": ["hyperfine"]
         }
       ]
     },
@@ -398,15 +317,11 @@
       "candidates": [
         {
           "repo": "ouch-org/ouch",
-          "arch": [
-            "ouch"
-          ]
+          "arch": ["ouch"]
         },
         {
           "repo": "google/ripunzip",
-          "arch": [
-            "ripunzip"
-          ]
+          "arch": ["ripunzip"]
         }
       ]
     },
@@ -417,9 +332,7 @@
       "candidates": [
         {
           "repo": "ducaale/xh",
-          "arch": [
-            "xh"
-          ]
+          "arch": ["xh"]
         }
       ]
     },
@@ -430,9 +343,7 @@
       "candidates": [
         {
           "repo": "chmln/sd",
-          "arch": [
-            "sd"
-          ]
+          "arch": ["sd"]
         }
       ]
     },
@@ -443,9 +354,7 @@
       "candidates": [
         {
           "repo": "theryangeary/choose",
-          "arch": [
-            "choose"
-          ]
+          "arch": ["choose"]
         }
       ]
     },
@@ -456,15 +365,11 @@
       "candidates": [
         {
           "repo": "01mf02/jaq",
-          "arch": [
-            "jaq"
-          ]
+          "arch": ["jaq"]
         },
         {
           "repo": "yamafaktory/jql",
-          "arch": [
-            "jql"
-          ]
+          "arch": ["jql"]
         }
       ]
     },
@@ -475,10 +380,7 @@
       "candidates": [
         {
           "repo": "GitoxideLabs/gitoxide",
-          "arch": [
-            "gitoxide",
-            "gix"
-          ],
+          "arch": ["gitoxide", "gix"],
           "tagPrefix": "gitoxide-v"
         }
       ]
@@ -490,9 +392,7 @@
       "candidates": [
         {
           "repo": "jj-vcs/jj",
-          "arch": [
-            "jujutsu"
-          ]
+          "arch": ["jujutsu"]
         }
       ]
     },
@@ -503,9 +403,7 @@
       "candidates": [
         {
           "repo": "gitui-org/gitui",
-          "arch": [
-            "gitui"
-          ]
+          "arch": ["gitui"]
         }
       ]
     },
@@ -516,21 +414,15 @@
       "candidates": [
         {
           "repo": "Morganamilo/paru",
-          "arch": [
-            "paru"
-          ]
+          "arch": ["paru"]
         },
         {
           "repo": "fosskers/aura",
-          "arch": [
-            "aura"
-          ]
+          "arch": ["aura"]
         },
         {
           "repo": "vn971/rua",
-          "arch": [
-            "rua"
-          ]
+          "arch": ["rua"]
         }
       ]
     },
@@ -541,15 +433,11 @@
       "candidates": [
         {
           "repo": "KillingSpark/rustysd",
-          "arch": [
-            "rustysd"
-          ]
+          "arch": ["rustysd"]
         },
         {
           "repo": "threefoldtech/zinit",
-          "arch": [
-            "zinit"
-          ]
+          "arch": ["zinit"]
         }
       ]
     },
@@ -560,9 +448,7 @@
       "candidates": [
         {
           "repo": "pendulum-project/ntpd-rs",
-          "arch": [
-            "ntpd-rs"
-          ]
+          "arch": ["ntpd-rs"]
         }
       ]
     },
@@ -573,9 +459,7 @@
       "candidates": [
         {
           "repo": "imsnif/bandwhich",
-          "arch": [
-            "bandwhich"
-          ]
+          "arch": ["bandwhich"]
         }
       ]
     },
@@ -586,15 +470,11 @@
       "candidates": [
         {
           "repo": "fujiapple852/trippy",
-          "arch": [
-            "trippy"
-          ]
+          "arch": ["trippy"]
         },
         {
           "repo": "orf/gping",
-          "arch": [
-            "gping"
-          ]
+          "arch": ["gping"]
         }
       ]
     },
@@ -605,10 +485,7 @@
       "candidates": [
         {
           "repo": "rustls/rustls",
-          "arch": [
-            "rustls",
-            "rustls-ffi"
-          ]
+          "arch": ["rustls", "rustls-ffi"]
         }
       ]
     },
@@ -619,15 +496,11 @@
       "candidates": [
         {
           "repo": "hickory-dns/hickory-dns",
-          "arch": [
-            "hickory-dns"
-          ]
+          "arch": ["hickory-dns"]
         },
         {
           "repo": "ogham/dog",
-          "arch": [
-            "dog"
-          ]
+          "arch": ["dog"]
         }
       ]
     },
@@ -638,15 +511,11 @@
       "candidates": [
         {
           "repo": "Eugeny/russh",
-          "arch": [
-            "russh"
-          ]
+          "arch": ["russh"]
         },
         {
           "repo": "alexcrichton/ssh2-rs",
-          "arch": [
-            "ssh2-rs"
-          ]
+          "arch": ["ssh2-rs"]
         }
       ]
     },
@@ -657,27 +526,19 @@
       "candidates": [
         {
           "repo": "pop-os/cosmic-comp",
-          "arch": [
-            "cosmic-comp"
-          ]
+          "arch": ["cosmic-comp"]
         },
         {
           "repo": "YaLTeR/niri",
-          "arch": [
-            "niri"
-          ]
+          "arch": ["niri"]
         },
         {
           "repo": "pinnacle-comp/pinnacle",
-          "arch": [
-            "pinnacle"
-          ]
+          "arch": ["pinnacle"]
         },
         {
           "repo": "Smithay/smithay",
-          "arch": [
-            "smithay"
-          ]
+          "arch": ["smithay"]
         }
       ]
     },
@@ -688,27 +549,19 @@
       "candidates": [
         {
           "repo": "alacritty/alacritty",
-          "arch": [
-            "alacritty"
-          ]
+          "arch": ["alacritty"]
         },
         {
           "repo": "wezterm/wezterm",
-          "arch": [
-            "wezterm"
-          ]
+          "arch": ["wezterm"]
         },
         {
           "repo": "raphamorim/rio",
-          "arch": [
-            "rio"
-          ]
+          "arch": ["rio"]
         },
         {
           "repo": "pop-os/cosmic-term",
-          "arch": [
-            "cosmic-term"
-          ]
+          "arch": ["cosmic-term"]
         }
       ]
     },
@@ -719,21 +572,15 @@
       "candidates": [
         {
           "repo": "greshake/i3status-rust",
-          "arch": [
-            "i3status-rust"
-          ]
+          "arch": ["i3status-rust"]
         },
         {
           "repo": "JakeStanger/ironbar",
-          "arch": [
-            "ironbar"
-          ]
+          "arch": ["ironbar"]
         },
         {
           "repo": "elkowar/eww",
-          "arch": [
-            "eww"
-          ]
+          "arch": ["eww"]
         }
       ]
     },
@@ -744,15 +591,11 @@
       "candidates": [
         {
           "repo": "anyrun-org/anyrun",
-          "arch": [
-            "anyrun"
-          ]
+          "arch": ["anyrun"]
         },
         {
           "repo": "abenz1267/walker",
-          "arch": [
-            "walker"
-          ]
+          "arch": ["walker"]
         }
       ]
     },
@@ -763,9 +606,7 @@
       "candidates": [
         {
           "repo": "YaLTeR/wl-clipboard-rs",
-          "arch": [
-            "wl-clipboard-rs"
-          ]
+          "arch": ["wl-clipboard-rs"]
         }
       ]
     },
@@ -776,15 +617,11 @@
       "candidates": [
         {
           "repo": "kennylevinsen/greetd",
-          "arch": [
-            "greetd"
-          ]
+          "arch": ["greetd"]
         },
         {
           "repo": "pop-os/cosmic-greeter",
-          "arch": [
-            "cosmic-greeter"
-          ]
+          "arch": ["cosmic-greeter"]
         }
       ]
     },
@@ -795,21 +632,15 @@
       "candidates": [
         {
           "repo": "woelper/oculante",
-          "arch": [
-            "oculante"
-          ]
+          "arch": ["oculante"]
         },
         {
           "repo": "ArturKovacs/emulsion",
-          "arch": [
-            "emulsion"
-          ]
+          "arch": ["emulsion"]
         },
         {
           "repo": "atanunq/viu",
-          "arch": [
-            "viu"
-          ]
+          "arch": ["viu"]
         }
       ]
     },
@@ -820,9 +651,7 @@
       "candidates": [
         {
           "repo": "youki-dev/youki",
-          "arch": [
-            "youki"
-          ]
+          "arch": ["youki"]
         }
       ]
     },
@@ -833,15 +662,11 @@
       "candidates": [
         {
           "repo": "firecracker-microvm/firecracker",
-          "arch": [
-            "firecracker"
-          ]
+          "arch": ["firecracker"]
         },
         {
           "repo": "cloud-hypervisor/cloud-hypervisor",
-          "arch": [
-            "cloud-hypervisor"
-          ]
+          "arch": ["cloud-hypervisor"]
         }
       ]
     },
@@ -852,21 +677,15 @@
       "candidates": [
         {
           "repo": "bytecodealliance/wasmtime",
-          "arch": [
-            "wasmtime"
-          ]
+          "arch": ["wasmtime"]
         },
         {
           "repo": "wasmerio/wasmer",
-          "arch": [
-            "wasmer"
-          ]
+          "arch": ["wasmer"]
         },
         {
           "repo": "wasmi-labs/wasmi",
-          "arch": [
-            "wasmi"
-          ]
+          "arch": ["wasmi"]
         }
       ]
     },
@@ -882,9 +701,7 @@
         },
         {
           "repo": "AsahiLinux/linux",
-          "arch": [
-            "linux-asahi"
-          ]
+          "arch": ["linux-asahi"]
         }
       ]
     },
@@ -897,16 +714,11 @@
       "candidates": [
         {
           "repo": "oven-sh/bun",
-          "arch": [
-            "bun",
-            "bun-bin"
-          ]
+          "arch": ["bun", "bun-bin"]
         },
         {
           "repo": "denoland/deno",
-          "arch": [
-            "deno"
-          ]
+          "arch": ["deno"]
         }
       ],
       "ownerPick": "oven-sh/bun"
@@ -918,9 +730,7 @@
       "candidates": [
         {
           "repo": "astral-sh/uv",
-          "arch": [
-            "uv"
-          ]
+          "arch": ["uv"]
         }
       ]
     },
@@ -931,9 +741,7 @@
       "candidates": [
         {
           "repo": "astral-sh/ruff",
-          "arch": [
-            "ruff"
-          ]
+          "arch": ["ruff"]
         }
       ]
     },
@@ -944,15 +752,11 @@
       "candidates": [
         {
           "repo": "skim-rs/skim",
-          "arch": [
-            "skim"
-          ]
+          "arch": ["skim"]
         },
         {
           "repo": "alexpasmantier/television",
-          "arch": [
-            "television"
-          ]
+          "arch": ["television"]
         }
       ]
     },
@@ -963,9 +767,7 @@
       "candidates": [
         {
           "repo": "casey/just",
-          "arch": [
-            "just"
-          ]
+          "arch": ["just"]
         }
       ]
     },
@@ -976,9 +778,7 @@
       "candidates": [
         {
           "repo": "watchexec/watchexec",
-          "arch": [
-            "watchexec"
-          ]
+          "arch": ["watchexec"]
         }
       ]
     },
@@ -989,9 +789,7 @@
       "candidates": [
         {
           "repo": "XAMPPRocky/tokei",
-          "arch": [
-            "tokei"
-          ]
+          "arch": ["tokei"]
         }
       ]
     },
@@ -1002,9 +800,7 @@
       "candidates": [
         {
           "repo": "sharkdp/hexyl",
-          "arch": [
-            "hexyl"
-          ]
+          "arch": ["hexyl"]
         }
       ]
     },
@@ -1015,9 +811,7 @@
       "candidates": [
         {
           "repo": "tealdeer-rs/tealdeer",
-          "arch": [
-            "tealdeer"
-          ]
+          "arch": ["tealdeer"]
         }
       ]
     },
@@ -1028,9 +822,7 @@
       "candidates": [
         {
           "repo": "Macchina-CLI/macchina",
-          "arch": [
-            "macchina"
-          ]
+          "arch": ["macchina"]
         }
       ]
     },
@@ -1041,9 +833,7 @@
       "candidates": [
         {
           "repo": "rustic-rs/rustic",
-          "arch": [
-            "rustic"
-          ]
+          "arch": ["rustic"]
         }
       ]
     },
@@ -1054,10 +844,7 @@
       "candidates": [
         {
           "repo": "str4d/rage",
-          "arch": [
-            "rage-encryption",
-            "rage"
-          ]
+          "arch": ["rage-encryption", "rage"]
         }
       ]
     },
@@ -1068,27 +855,19 @@
       "candidates": [
         {
           "repo": "cloudflare/pingora",
-          "arch": [
-            "pingora"
-          ]
+          "arch": ["pingora"]
         },
         {
           "repo": "sozu-proxy/sozu",
-          "arch": [
-            "sozu"
-          ]
+          "arch": ["sozu"]
         },
         {
           "repo": "memorysafety/river",
-          "arch": [
-            "river"
-          ]
+          "arch": ["river"]
         },
         {
           "repo": "static-web-server/static-web-server",
-          "arch": [
-            "static-web-server"
-          ]
+          "arch": ["static-web-server"]
         }
       ]
     },
@@ -1099,9 +878,7 @@
       "candidates": [
         {
           "repo": "tursodatabase/turso",
-          "arch": [
-            "turso"
-          ]
+          "arch": ["turso"]
         }
       ]
     },
@@ -1112,9 +889,7 @@
       "candidates": [
         {
           "repo": "AMythicDev/minus",
-          "arch": [
-            "minus"
-          ]
+          "arch": ["minus"]
         }
       ]
     },
@@ -1125,9 +900,7 @@
       "candidates": [
         {
           "repo": "edera-dev/sprout",
-          "arch": [
-            "sprout"
-          ]
+          "arch": ["sprout"]
         },
         {
           "repo": "rust-osdev/bootloader",
@@ -1142,9 +915,7 @@
       "candidates": [
         {
           "repo": "archlinux/alpm.rs",
-          "arch": [
-            "alpm.rs"
-          ]
+          "arch": ["alpm.rs"]
         }
       ]
     },
@@ -1166,9 +937,7 @@
       "candidates": [
         {
           "repo": "nmstate/nmstate",
-          "arch": [
-            "nmstate"
-          ]
+          "arch": ["nmstate"]
         }
       ]
     },
@@ -1179,9 +948,7 @@
       "candidates": [
         {
           "repo": "ast-grep/ast-grep",
-          "arch": [
-            "ast-grep"
-          ]
+          "arch": ["ast-grep"]
         }
       ]
     },
@@ -1192,9 +959,7 @@
       "candidates": [
         {
           "repo": "Julien-cpsn/ATAC",
-          "arch": [
-            "atac"
-          ]
+          "arch": ["atac"]
         }
       ]
     },
@@ -1205,9 +970,7 @@
       "candidates": [
         {
           "repo": "o2sh/onefetch",
-          "arch": [
-            "onefetch"
-          ]
+          "arch": ["onefetch"]
         }
       ]
     },
@@ -1218,9 +981,7 @@
       "candidates": [
         {
           "repo": "rpgp/rpgp",
-          "arch": [
-            "rpgp"
-          ]
+          "arch": ["rpgp"]
         }
       ]
     }

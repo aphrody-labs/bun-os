@@ -32,7 +32,8 @@ export const SCORING = {
   arch: "15 official Arch repo (core/extra), 10 CachyOS-PKGBUILDS recipe, 5 AUR, 0 none",
   omarchy: "3 if the package is in an Omarchy default package list",
   tests: "5 if the repo root has a tests/test dir or CI workflows exist",
-  credible: "not archived, primary language Rust (unless allowNonRust), stars >= 300, pushed within 400 days, score >= 45; otherwise the domain is a gap",
+  credible:
+    "not archived, primary language Rust (unless allowNonRust), stars >= 300, pushed within 400 days, score >= 45; otherwise the domain is a gap",
 };
 
 const token = (
@@ -49,7 +50,11 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 async function gh(path: string, tries = 4): Promise<any | undefined> {
   for (let i = 0; i < tries; i++) {
     const res = await fetch(`https://api.github.com${path}`, {
-      headers: { authorization: `Bearer ${token}`, accept: "application/vnd.github+json", "user-agent": "bunos-rustbase" },
+      headers: {
+        authorization: `Bearer ${token}`,
+        accept: "application/vnd.github+json",
+        "user-agent": "bunos-rustbase",
+      },
     });
     if (res.status === 404 || res.status === 409) return undefined;
     if (res.status === 202 || res.status >= 500) {
@@ -80,8 +85,7 @@ async function web(url: string): Promise<any | undefined> {
 // ---- distro signals --------------------------------------------------------------------------------------------
 const cachy = await Bun.file(join(root, "factory/arch/cachyos/catalog.json")).json();
 const cachyNames = new Set<string>();
-for (const c of cachy.catalogs ?? [])
-  for (const r of c.recipes ?? []) cachyNames.add(String(r.recipe).split("/")[0]);
+for (const c of cachy.catalogs ?? []) for (const r of c.recipes ?? []) cachyNames.add(String(r.recipe).split("/")[0]);
 const omarchyPk = await Bun.file(join(root, "factory/arch/omarchy/packages.json")).json();
 const omarchyNames = new Set<string>();
 for (const l of omarchyPk.lists ?? []) for (const p of l.packages ?? []) omarchyNames.add(String(p));
@@ -93,7 +97,14 @@ async function archOfficial(name: string) {
     const hit = (j?.results ?? []).find((r: any) => r.arch === "x86_64" || r.arch === "any");
     archCache.set(
       name,
-      hit && { pkgname: hit.pkgname, repo: hit.repo, version: `${hit.pkgver}-${hit.pkgrel}`, upstreamVersion: hit.pkgver, url: hit.url, licenses: hit.licenses },
+      hit && {
+        pkgname: hit.pkgname,
+        repo: hit.repo,
+        version: `${hit.pkgver}-${hit.pkgrel}`,
+        upstreamVersion: hit.pkgver,
+        url: hit.url,
+        licenses: hit.licenses,
+      },
     );
   }
   return archCache.get(name);
@@ -103,7 +114,14 @@ async function aur(names: string[]) {
   const q = names.map(n => `arg[]=${encodeURIComponent(n)}`).join("&");
   const j = await web(`https://aur.archlinux.org/rpc/v5/info?${q}`);
   const out: Record<string, any> = {};
-  for (const r of j?.results ?? []) out[r.Name] = { pkgname: r.Name, version: r.Version, votes: r.NumVotes, popularity: r.Popularity, outOfDate: r.OutOfDate };
+  for (const r of j?.results ?? [])
+    out[r.Name] = {
+      pkgname: r.Name,
+      version: r.Version,
+      votes: r.NumVotes,
+      popularity: r.Popularity,
+      outOfDate: r.OutOfDate,
+    };
   return out;
 }
 
@@ -124,17 +142,32 @@ async function resolveTag(repo: string, tag: string) {
 
 async function latestRelease(repo: string, prefix?: string) {
   const rels: any[] = (await gh(`/repos/${repo}/releases?per_page=20`)) ?? [];
-  const rel = rels.find(r => !r.draft && !r.prerelease && isStable(r.tag_name) && (!prefix || r.tag_name.startsWith(prefix)));
+  const rel = rels.find(
+    r => !r.draft && !r.prerelease && isStable(r.tag_name) && (!prefix || r.tag_name.startsWith(prefix)),
+  );
   if (rel) {
     const sha = await resolveTag(repo, rel.tag_name);
-    if (sha) return { tag: rel.tag_name, sha, date: String(rel.published_at).slice(0, 10), source: "github-release", url: rel.html_url };
+    if (sha)
+      return {
+        tag: rel.tag_name,
+        sha,
+        date: String(rel.published_at).slice(0, 10),
+        source: "github-release",
+        url: rel.html_url,
+      };
   }
   const tags: any[] = (await gh(`/repos/${repo}/tags?per_page=40`)) ?? [];
   const tag = tags.find(t => isStable(t.name) && /\d/.test(t.name) && (!prefix || t.name.startsWith(prefix)));
   if (!tag) return undefined;
   const sha = await resolveTag(repo, tag.name);
   const c = sha ? await gh(`/repos/${repo}/commits/${sha}`) : undefined;
-  return { tag: tag.name, sha: sha ?? tag.commit.sha, date: String(c?.commit?.committer?.date ?? "").slice(0, 10) || undefined, source: "git-tag", url: `https://github.com/${repo}/releases/tag/${tag.name}` };
+  return {
+    tag: tag.name,
+    sha: sha ?? tag.commit.sha,
+    date: String(c?.commit?.committer?.date ?? "").slice(0, 10) || undefined,
+    source: "git-tag",
+    url: `https://github.com/${repo}/releases/tag/${tag.name}`,
+  };
 }
 
 async function analyse(domain: any, cand: any) {
@@ -172,7 +205,9 @@ async function analyse(domain: any, cand: any) {
     omarchy: omarchyHit ? 3 : 0,
     tests: testDirs.length || workflows ? 5 : 0,
   };
-  const total = +Object.values(parts).reduce((a, b) => a + b, 0).toFixed(2);
+  const total = +Object.values(parts)
+    .reduce((a, b) => a + b, 0)
+    .toFixed(2);
   const daysSincePush = (now.getTime() - Date.parse(r.pushed_at)) / 86400_000;
   const reasons: string[] = [];
   if (r.archived) reasons.push("archived");
@@ -247,7 +282,9 @@ const outDomains = domains.map((d: any) => {
     .map((c: any, i: number) => ({ rank: i + 1, ...c }));
   const credible = ranked.filter((c: any) => c.credible);
   const dataPick = credible[0];
-  const ownerPick = d.ownerPick ? ranked.find((c: any) => c.repo.toLowerCase() === d.ownerPick.toLowerCase() || c.requestedRepo === d.ownerPick) : undefined;
+  const ownerPick = d.ownerPick
+    ? ranked.find((c: any) => c.repo.toLowerCase() === d.ownerPick.toLowerCase() || c.requestedRepo === d.ownerPick)
+    : undefined;
   if (d.ownerPick && !ownerPick) throw new Error(`${d.id}: ownerPick ${d.ownerPick} not among candidates`);
   const status = ownerPick ? "directive" : dataPick ? "pick" : "gap";
   const chosen = ownerPick ?? dataPick;
@@ -259,7 +296,7 @@ const outDomains = domains.map((d: any) => {
     ownerDirective: d.ownerDirective,
     dataRank1: ranked[0]?.repo,
     pick: chosen ? chosen.repo : null,
-    bestAvailable: chosen ? undefined : ranked[0]?.repo ?? null,
+    bestAvailable: chosen ? undefined : (ranked[0]?.repo ?? null),
     runnersUp: ranked.filter((c: any) => c.repo !== chosen?.repo).map((c: any) => c.repo),
     candidates: ranked,
     errors: errors.map((e: any) => ({ repo: e.repo, error: e.error })),
@@ -274,6 +311,14 @@ const counts = {
   gaps: outDomains.filter((d: any) => d.status === "gap").length,
   unresolvedCandidates: outDomains.reduce((a: number, d: any) => a + d.errors.length, 0),
 };
-const catalog = { schemaVersion: 1, kind: "bunos-rustbase-catalog", observedAt, generator: "factory/rustbase/rank.ts", scoring: SCORING, counts, domains: outDomains };
+const catalog = {
+  schemaVersion: 1,
+  kind: "bunos-rustbase-catalog",
+  observedAt,
+  generator: "factory/rustbase/rank.ts",
+  scoring: SCORING,
+  counts,
+  domains: outDomains,
+};
 await Bun.write(outFile, JSON.stringify(catalog, null, 2) + "\n");
 console.log(JSON.stringify(counts));

@@ -30,11 +30,7 @@
       "status": "pick",
       "dataRank1": "nushell/nushell",
       "pick": "nushell/nushell",
-      "runnersUp": [
-        "fish-shell/fish-shell",
-        "reubeno/brush",
-        "redox-os/ion"
-      ],
+      "runnersUp": ["fish-shell/fish-shell", "reubeno/brush", "redox-os/ion"],
       "candidates": [
         {
           "rank": 1,
@@ -64,18 +60,14 @@
               "version": "0.116.1-1",
               "upstreamVersion": "0.116.1",
               "url": "https://www.nushell.sh",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 15
           },
           "score": {
@@ -121,18 +113,14 @@
               "version": "4.9.3-1",
               "upstreamVersion": "4.9.3",
               "url": "https://fishshell.com/",
-              "licenses": [
-                "GPL-2.0-only AND BSD-3-Clause AND ISC AND MIT AND PSF-2.0"
-              ]
+              "licenses": ["GPL-2.0-only AND BSD-3-Clause AND ISC AND MIT AND PSF-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 8
           },
           "score": {
@@ -178,18 +166,14 @@
               "version": "0.4.0-1",
               "upstreamVersion": "0.4.0",
               "url": "https://github.com/reubeno/brush",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "e2e"
-            ],
+            "rootDirs": ["e2e"],
             "workflowFiles": 10
           },
           "score": {
@@ -235,10 +219,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "testing",
-              "tests"
-            ],
+            "rootDirs": ["testing", "tests"],
             "workflowFiles": 0
           },
           "score": {
@@ -254,9 +235,7 @@
             "total": 26.4
           },
           "credible": false,
-          "notCredibleReasons": [
-            "score 26.4 < 45"
-          ]
+          "notCredibleReasons": ["score 26.4 < 45"]
         }
       ],
       "errors": []
@@ -298,18 +277,14 @@
               "version": "0.12.0-1",
               "upstreamVersion": "0.12.0",
               "url": "https://uutils.github.io/",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 24
           },
           "score": {
@@ -375,9 +350,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 2
           },
           "score": {
@@ -393,9 +366,7 @@
             "total": 45.78
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 226 < 300"
-          ]
+          "notCredibleReasons": ["stars 226 < 300"]
         }
       ],
       "errors": []
@@ -443,9 +414,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 7
           },
           "score": {
@@ -510,9 +479,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 8
           },
           "score": {
@@ -528,9 +495,7 @@
             "total": 58.94
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 280 < 300"
-          ]
+          "notCredibleReasons": ["stars 280 < 300"]
         }
       ],
       "errors": []
@@ -543,9 +508,7 @@
       "dataRank1": "uutils/procps",
       "pick": null,
       "bestAvailable": "uutils/procps",
-      "runnersUp": [
-        "uutils/procps"
-      ],
+      "runnersUp": ["uutils/procps"],
       "candidates": [
         {
           "rank": 1,
@@ -575,9 +538,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 3
           },
           "score": {
@@ -593,10 +554,7 @@
             "total": 39.36
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 117 < 300",
-            "score 39.36 < 45"
-          ]
+          "notCredibleReasons": ["stars 117 < 300", "score 39.36 < 45"]
         }
       ],
       "errors": []
@@ -609,9 +567,7 @@
       "dataRank1": "uutils/sed",
       "pick": null,
       "bestAvailable": "uutils/sed",
-      "runnersUp": [
-        "uutils/sed"
-      ],
+      "runnersUp": ["uutils/sed"],
       "candidates": [
         {
           "rank": 1,
@@ -647,9 +603,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 11
           },
           "score": {
@@ -665,9 +619,7 @@
             "total": 60.23
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 110 < 300"
-          ]
+          "notCredibleReasons": ["stars 110 < 300"]
         }
       ],
       "errors": []
@@ -679,9 +631,7 @@
       "status": "pick",
       "dataRank1": "trifectatechfoundation/sudo-rs",
       "pick": "trifectatechfoundation/sudo-rs",
-      "runnersUp": [
-        "edneville/please"
-      ],
+      "runnersUp": ["edneville/please"],
       "candidates": [
         {
           "rank": 1,
@@ -711,9 +661,7 @@
               "version": "0.2.15-1",
               "upstreamVersion": "0.2.15",
               "url": "https://github.com/trifectatechfoundation/sudo-rs",
-              "licenses": [
-                "Apache-2.0 AND MIT"
-              ]
+              "licenses": ["Apache-2.0 AND MIT"]
             },
             "cachyosRecipe": "sudo-rs",
             "aur": null,
@@ -772,9 +720,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 0
           },
           "score": {
@@ -790,10 +736,7 @@
             "total": 28.6
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 82 < 300",
-            "score 28.6 < 45"
-          ]
+          "notCredibleReasons": ["stars 82 < 300", "score 28.6 < 45"]
         }
       ],
       "errors": []
@@ -805,9 +748,7 @@
       "status": "pick",
       "dataRank1": "eza-community/eza",
       "pick": "eza-community/eza",
-      "runnersUp": [
-        "lsd-rs/lsd"
-      ],
+      "runnersUp": ["lsd-rs/lsd"],
       "candidates": [
         {
           "rank": 1,
@@ -837,18 +778,14 @@
               "version": "0.23.5-2",
               "upstreamVersion": "0.23.5",
               "url": "https://github.com/eza-community/eza",
-              "licenses": [
-                "EUPL-1.2"
-              ]
+              "licenses": ["EUPL-1.2"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": "eza"
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 5
           },
           "score": {
@@ -894,18 +831,14 @@
               "version": "1.2.0-2",
               "upstreamVersion": "1.2.0",
               "url": "https://github.com/lsd-rs/lsd",
-              "licenses": [
-                "Apache-2.0"
-              ]
+              "licenses": ["Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 1
           },
           "score": {
@@ -933,9 +866,7 @@
       "status": "pick",
       "dataRank1": "sharkdp/fd",
       "pick": "sharkdp/fd",
-      "runnersUp": [
-        "uutils/findutils"
-      ],
+      "runnersUp": ["uutils/findutils"],
       "candidates": [
         {
           "rank": 1,
@@ -965,18 +896,14 @@
               "version": "10.5.0-3",
               "upstreamVersion": "10.5.0",
               "url": "https://github.com/sharkdp/fd",
-              "licenses": [
-                "MIT OR Apache-2.0"
-              ]
+              "licenses": ["MIT OR Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": "fd"
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 1
           },
           "score": {
@@ -1028,9 +955,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 7
           },
           "score": {
@@ -1088,18 +1013,14 @@
               "version": "15.2.0-1",
               "upstreamVersion": "15.2.0",
               "url": "https://github.com/BurntSushi/ripgrep",
-              "licenses": [
-                "MIT OR Unlicense"
-              ]
+              "licenses": ["MIT OR Unlicense"]
             },
             "cachyosRecipe": "ripgrep",
             "aur": null,
             "omarchyDefault": "ripgrep"
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 2
           },
           "score": {
@@ -1157,18 +1078,14 @@
               "version": "0.26.1-3",
               "upstreamVersion": "0.26.1",
               "url": "https://github.com/sharkdp/bat",
-              "licenses": [
-                "Apache-2.0 OR MIT"
-              ]
+              "licenses": ["Apache-2.0 OR MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": "bat"
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 2
           },
           "score": {
@@ -1226,18 +1143,14 @@
               "version": "0.10.0-1",
               "upstreamVersion": "0.10.0",
               "url": "https://github.com/ajeetdsouza/zoxide",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": "zoxide"
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 5
           },
           "score": {
@@ -1295,9 +1208,7 @@
               "version": "1.27.0-1",
               "upstreamVersion": "1.27.0",
               "url": "https://starship.rs/",
-              "licenses": [
-                "ISC"
-              ]
+              "licenses": ["ISC"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -1332,12 +1243,7 @@
       "status": "pick",
       "dataRank1": "microsoft/edit",
       "pick": "microsoft/edit",
-      "runnersUp": [
-        "zed-industries/zed",
-        "lapce/lapce",
-        "helix-editor/helix",
-        "curlpipe/ox"
-      ],
+      "runnersUp": ["zed-industries/zed", "lapce/lapce", "helix-editor/helix", "curlpipe/ox"],
       "candidates": [
         {
           "rank": 1,
@@ -1367,9 +1273,7 @@
               "version": "2.0.0-1",
               "upstreamVersion": "2.0.0",
               "url": "https://github.com/microsoft/edit",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -1422,11 +1326,7 @@
               "version": "1.26.2-1",
               "upstreamVersion": "1.26.2",
               "url": "https://zed.dev",
-              "licenses": [
-                "AGPL-3.0-or-later",
-                "Apache-2.0",
-                "GPL-3.0-or-later"
-              ]
+              "licenses": ["AGPL-3.0-or-later", "Apache-2.0", "GPL-3.0-or-later"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -1479,9 +1379,7 @@
               "version": "0.4.6-4",
               "upstreamVersion": "0.4.6",
               "url": "https://lapce.dev",
-              "licenses": [
-                "Apache-2.0"
-              ]
+              "licenses": ["Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -1534,18 +1432,14 @@
               "version": "25.07.1-2",
               "upstreamVersion": "25.07.1",
               "url": "https://helix-editor.com",
-              "licenses": [
-                "MPL-2.0"
-              ]
+              "licenses": ["MPL-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 4
           },
           "score": {
@@ -1607,9 +1501,7 @@
             "total": 37.87
           },
           "credible": false,
-          "notCredibleReasons": [
-            "score 37.87 < 45"
-          ]
+          "notCredibleReasons": ["score 37.87 < 45"]
         }
       ],
       "errors": []
@@ -1651,9 +1543,7 @@
               "version": "0.45.1-1",
               "upstreamVersion": "0.45.1",
               "url": "https://zellij.dev",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -1688,11 +1578,7 @@
       "status": "pick",
       "dataRank1": "sxyazi/yazi",
       "pick": "sxyazi/yazi",
-      "runnersUp": [
-        "Canop/broot",
-        "sayanarijit/xplr",
-        "kamiyaa/joshuto"
-      ],
+      "runnersUp": ["Canop/broot", "sayanarijit/xplr", "kamiyaa/joshuto"],
       "candidates": [
         {
           "rank": 1,
@@ -1722,9 +1608,7 @@
               "version": "26.9.1-2",
               "upstreamVersion": "26.9.1",
               "url": "https://github.com/sxyazi/yazi",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -1777,18 +1661,14 @@
               "version": "1.61.0-2",
               "upstreamVersion": "1.61.0",
               "url": "https://github.com/Canop/broot",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 1
           },
           "score": {
@@ -1834,18 +1714,14 @@
               "version": "1.0.1-1",
               "upstreamVersion": "1.0.1",
               "url": "https://github.com/sayanarijit/xplr",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 4
           },
           "score": {
@@ -1925,10 +1801,7 @@
       "status": "pick",
       "dataRank1": "bootandy/dust",
       "pick": "bootandy/dust",
-      "runnersUp": [
-        "Byron/dua-cli",
-        "sharkdp/diskus"
-      ],
+      "runnersUp": ["Byron/dua-cli", "sharkdp/diskus"],
       "candidates": [
         {
           "rank": 1,
@@ -1958,18 +1831,14 @@
               "version": "1.2.6-1",
               "upstreamVersion": "1.2.6",
               "url": "https://github.com/bootandy/dust",
-              "licenses": [
-                "Apache-2.0"
-              ]
+              "licenses": ["Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 1
           },
           "score": {
@@ -2015,18 +1884,14 @@
               "version": "2.46.0-1",
               "upstreamVersion": "2.46.0",
               "url": "https://github.com/Byron/dua-cli",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 2
           },
           "score": {
@@ -2072,18 +1937,14 @@
               "version": "0.9.0-2",
               "upstreamVersion": "0.9.0",
               "url": "https://github.com/sharkdp/diskus",
-              "licenses": [
-                "Apache-2.0 OR MIT"
-              ]
+              "licenses": ["Apache-2.0 OR MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 1
           },
           "score": {
@@ -2111,10 +1972,7 @@
       "status": "pick",
       "dataRank1": "ClementTsang/bottom",
       "pick": "ClementTsang/bottom",
-      "runnersUp": [
-        "dalance/procs",
-        "bvaisvil/zenith"
-      ],
+      "runnersUp": ["dalance/procs", "bvaisvil/zenith"],
       "candidates": [
         {
           "rank": 1,
@@ -2144,18 +2002,14 @@
               "version": "0.14.9-1",
               "upstreamVersion": "0.14.9",
               "url": "https://github.com/ClementTsang/bottom",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 11
           },
           "score": {
@@ -2201,9 +2055,7 @@
               "version": "0.14.12-1",
               "upstreamVersion": "0.14.12",
               "url": "https://github.com/dalance/procs",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -2256,9 +2108,7 @@
               "version": "0.15.1-1",
               "upstreamVersion": "0.15.1",
               "url": "https://github.com/bvaisvil/zenith",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -2293,9 +2143,7 @@
       "status": "pick",
       "dataRank1": "Wilfred/difftastic",
       "pick": "Wilfred/difftastic",
-      "runnersUp": [
-        "dandavison/delta"
-      ],
+      "runnersUp": ["dandavison/delta"],
       "candidates": [
         {
           "rank": 1,
@@ -2325,18 +2173,14 @@
               "version": "0.71.0-1",
               "upstreamVersion": "0.71.0",
               "url": "https://difftastic.wilfred.me.uk",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 4
           },
           "score": {
@@ -2382,18 +2226,14 @@
               "version": "0.20.1-1",
               "upstreamVersion": "0.20.1",
               "url": "https://dandavison.github.io/delta/",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 6
           },
           "score": {
@@ -2451,18 +2291,14 @@
               "version": "2.0.0-1",
               "upstreamVersion": "2.0.0",
               "url": "https://github.com/sharkdp/hyperfine",
-              "licenses": [
-                "Apache-2.0 OR MIT"
-              ]
+              "licenses": ["Apache-2.0 OR MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 1
           },
           "score": {
@@ -2490,9 +2326,7 @@
       "status": "pick",
       "dataRank1": "ouch-org/ouch",
       "pick": "ouch-org/ouch",
-      "runnersUp": [
-        "GoogleChrome/ripunzip"
-      ],
+      "runnersUp": ["GoogleChrome/ripunzip"],
       "candidates": [
         {
           "rank": 1,
@@ -2522,18 +2356,14 @@
               "version": "0.8.3-1",
               "upstreamVersion": "0.8.3",
               "url": "https://github.com/ouch-org/ouch",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 4
           },
           "score": {
@@ -2602,10 +2432,7 @@
             "total": 32.35
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 294 < 300",
-            "score 32.35 < 45"
-          ]
+          "notCredibleReasons": ["stars 294 < 300", "score 32.35 < 45"]
         }
       ],
       "errors": []
@@ -2647,18 +2474,14 @@
               "version": "0.26.3-1",
               "upstreamVersion": "0.26.3",
               "url": "https://github.com/ducaale/xh",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 2
           },
           "score": {
@@ -2716,9 +2539,7 @@
               "version": "1.1.0-1",
               "upstreamVersion": "1.1.0",
               "url": "https://github.com/chmln/sd",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -2783,18 +2604,14 @@
               "version": "1.3.7-2",
               "upstreamVersion": "1.3.7",
               "url": "https://github.com/theryangeary/choose",
-              "licenses": [
-                "GPL-3.0-only"
-              ]
+              "licenses": ["GPL-3.0-only"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "test"
-            ],
+            "rootDirs": ["test"],
             "workflowFiles": 2
           },
           "score": {
@@ -2822,9 +2639,7 @@
       "status": "pick",
       "dataRank1": "01mf02/jaq",
       "pick": "01mf02/jaq",
-      "runnersUp": [
-        "yamafaktory/jql"
-      ],
+      "runnersUp": ["yamafaktory/jql"],
       "candidates": [
         {
           "rank": 1,
@@ -2854,9 +2669,7 @@
               "version": "3.1.2-1",
               "upstreamVersion": "3.1.2",
               "url": "https://github.com/01mf02/jaq",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -2967,19 +2780,14 @@
               "version": "0.56.0-1",
               "upstreamVersion": "0.56.0",
               "url": "https://github.com/Byron/gitoxide",
-              "licenses": [
-                "Apache-2.0",
-                "MIT"
-              ]
+              "licenses": ["Apache-2.0", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 6
           },
           "score": {
@@ -3037,9 +2845,7 @@
               "version": "0.46.0-1",
               "upstreamVersion": "0.46.0",
               "url": "https://github.com/jj-vcs/jj",
-              "licenses": [
-                "Apache-2.0"
-              ]
+              "licenses": ["Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -3104,9 +2910,7 @@
               "version": "0.28.1-2",
               "upstreamVersion": "0.28.1",
               "url": "https://github.com/extrawurst/gitui",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -3141,10 +2945,7 @@
       "status": "pick",
       "dataRank1": "Morganamilo/paru",
       "pick": "Morganamilo/paru",
-      "runnersUp": [
-        "fosskers/aura",
-        "vn971/rua"
-      ],
+      "runnersUp": ["fosskers/aura", "vn971/rua"],
       "candidates": [
         {
           "rank": 1,
@@ -3180,9 +2981,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 3
           },
           "score": {
@@ -3250,9 +3049,7 @@
             "total": 56.42
           },
           "credible": false,
-          "notCredibleReasons": [
-            "primary language Haskell"
-          ]
+          "notCredibleReasons": ["primary language Haskell"]
         },
         {
           "rank": 3,
@@ -3304,9 +3101,7 @@
             "total": 32.3
           },
           "credible": false,
-          "notCredibleReasons": [
-            "score 32.3 < 45"
-          ]
+          "notCredibleReasons": ["score 32.3 < 45"]
         }
       ],
       "errors": []
@@ -3319,10 +3114,7 @@
       "dataRank1": "threefoldtech/zinit",
       "pick": null,
       "bestAvailable": "threefoldtech/zinit",
-      "runnersUp": [
-        "threefoldtech/zinit",
-        "KillingSpark/rustysd"
-      ],
+      "runnersUp": ["threefoldtech/zinit", "KillingSpark/rustysd"],
       "candidates": [
         {
           "rank": 1,
@@ -3374,10 +3166,7 @@
             "total": 26.28
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 17 < 300",
-            "score 26.28 < 45"
-          ]
+          "notCredibleReasons": ["stars 17 < 300", "score 26.28 < 45"]
         },
         {
           "rank": 2,
@@ -3423,10 +3212,7 @@
             "total": 23.84
           },
           "credible": false,
-          "notCredibleReasons": [
-            "last push 489 days ago",
-            "score 23.84 < 45"
-          ]
+          "notCredibleReasons": ["last push 489 days ago", "score 23.84 < 45"]
         }
       ],
       "errors": []
@@ -3468,9 +3254,7 @@
               "version": "1.9.0-1",
               "upstreamVersion": "1.9.0",
               "url": "https://docs.ntpd-rs.pendulum-project.org",
-              "licenses": [
-                "Apache-2.0 OR MIT"
-              ]
+              "licenses": ["Apache-2.0 OR MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -3535,9 +3319,7 @@
               "version": "0.23.1-3",
               "upstreamVersion": "0.23.1",
               "url": "https://github.com/imsnif/bandwhich",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -3572,9 +3354,7 @@
       "status": "pick",
       "dataRank1": "orf/gping",
       "pick": "orf/gping",
-      "runnersUp": [
-        "fujiapple852/trippy"
-      ],
+      "runnersUp": ["fujiapple852/trippy"],
       "candidates": [
         {
           "rank": 1,
@@ -3604,9 +3384,7 @@
               "version": "1.21.0-1",
               "upstreamVersion": "1.21.0",
               "url": "https://github.com/orf/gping",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -3659,9 +3437,7 @@
               "version": "0.13.0-2",
               "upstreamVersion": "0.13.0",
               "url": "https://trippy.cli.rs",
-              "licenses": [
-                "Apache-2.0"
-              ]
+              "licenses": ["Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -3754,9 +3530,7 @@
       "status": "pick",
       "dataRank1": "hickory-dns/hickory-dns",
       "pick": "hickory-dns/hickory-dns",
-      "runnersUp": [
-        "ogham/dog"
-      ],
+      "runnersUp": ["ogham/dog"],
       "candidates": [
         {
           "rank": 1,
@@ -3792,9 +3566,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 3
           },
           "score": {
@@ -3840,9 +3612,7 @@
               "version": "0.1.0-8",
               "upstreamVersion": "0.1.0",
               "url": "https://github.com/ogham/dog",
-              "licenses": [
-                "EUPL-1.2"
-              ]
+              "licenses": ["EUPL-1.2"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -3865,10 +3635,7 @@
             "total": 39.13
           },
           "credible": false,
-          "notCredibleReasons": [
-            "last push 882 days ago",
-            "score 39.13 < 45"
-          ]
+          "notCredibleReasons": ["last push 882 days ago", "score 39.13 < 45"]
         }
       ],
       "errors": []
@@ -3880,9 +3647,7 @@
       "status": "pick",
       "dataRank1": "Eugeny/russh",
       "pick": "Eugeny/russh",
-      "runnersUp": [
-        "rust-lang/ssh2-rs"
-      ],
+      "runnersUp": ["rust-lang/ssh2-rs"],
       "candidates": [
         {
           "rank": 1,
@@ -3959,9 +3724,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 3
           },
           "score": {
@@ -3989,11 +3752,7 @@
       "status": "pick",
       "dataRank1": "niri-wm/niri",
       "pick": "niri-wm/niri",
-      "runnersUp": [
-        "pop-os/cosmic-comp",
-        "Smithay/smithay",
-        "pinnacle-comp/pinnacle"
-      ],
+      "runnersUp": ["pop-os/cosmic-comp", "Smithay/smithay", "pinnacle-comp/pinnacle"],
       "candidates": [
         {
           "rank": 1,
@@ -4024,9 +3783,7 @@
               "version": "26.04-1",
               "upstreamVersion": "26.04",
               "url": "https://github.com/YaLTeR/niri",
-              "licenses": [
-                "GPL-3.0-or-later"
-              ]
+              "licenses": ["GPL-3.0-or-later"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -4079,9 +3836,7 @@
               "version": "1.10.0-1",
               "upstreamVersion": "1.10.0",
               "url": "https://github.com/pop-os/cosmic-comp",
-              "licenses": [
-                "GPL-3.0-only"
-              ]
+              "licenses": ["GPL-3.0-only"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -4186,9 +3941,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 5
           },
           "score": {
@@ -4216,11 +3969,7 @@
       "status": "pick",
       "dataRank1": "raphamorim/rio",
       "pick": "raphamorim/rio",
-      "runnersUp": [
-        "alacritty/alacritty",
-        "wezterm/wezterm",
-        "pop-os/cosmic-term"
-      ],
+      "runnersUp": ["alacritty/alacritty", "wezterm/wezterm", "pop-os/cosmic-term"],
       "candidates": [
         {
           "rank": 1,
@@ -4250,18 +3999,14 @@
               "version": "0.5.28-1",
               "upstreamVersion": "0.5.28",
               "url": "https://github.com/raphamorim/rio",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "specs"
-            ],
+            "rootDirs": ["specs"],
             "workflowFiles": 5
           },
           "score": {
@@ -4307,10 +4052,7 @@
               "version": "0.17.0-1",
               "upstreamVersion": "0.17.0",
               "url": "https://github.com/alacritty/alacritty",
-              "licenses": [
-                "Apache-2.0",
-                "MIT"
-              ]
+              "licenses": ["Apache-2.0", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -4363,9 +4105,7 @@
               "version": "20240203.110809.5046fc22.r869.g76b606ec5-3",
               "upstreamVersion": "20240203.110809.5046fc22.r869.g76b606ec5",
               "url": "https://github.com/wezterm/wezterm",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -4446,10 +4186,7 @@
       "status": "pick",
       "dataRank1": "JakeStanger/ironbar",
       "pick": "JakeStanger/ironbar",
-      "runnersUp": [
-        "greshake/i3status-rust",
-        "elkowar/eww"
-      ],
+      "runnersUp": ["greshake/i3status-rust", "elkowar/eww"],
       "candidates": [
         {
           "rank": 1,
@@ -4479,9 +4216,7 @@
               "version": "0.19.1-1",
               "upstreamVersion": "0.19.1",
               "url": "https://github.com/JakeStanger/ironbar",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -4534,18 +4269,14 @@
               "version": "0.36.2-1",
               "upstreamVersion": "0.36.2",
               "url": "https://github.com/greshake/i3status-rust",
-              "licenses": [
-                "GPL-3.0-only"
-              ]
+              "licenses": ["GPL-3.0-only"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 3
           },
           "score": {
@@ -4613,9 +4344,7 @@
             "total": 39.52
           },
           "credible": false,
-          "notCredibleReasons": [
-            "score 39.52 < 45"
-          ]
+          "notCredibleReasons": ["score 39.52 < 45"]
         }
       ],
       "errors": []
@@ -4627,9 +4356,7 @@
       "status": "pick",
       "dataRank1": "abenz1267/walker",
       "pick": "abenz1267/walker",
-      "runnersUp": [
-        "anyrun-org/anyrun"
-      ],
+      "runnersUp": ["anyrun-org/anyrun"],
       "candidates": [
         {
           "rank": 1,
@@ -4810,10 +4537,7 @@
       "dataRank1": "pop-os/cosmic-greeter",
       "pick": null,
       "bestAvailable": "pop-os/cosmic-greeter",
-      "runnersUp": [
-        "pop-os/cosmic-greeter",
-        "kennylevinsen/greetd"
-      ],
+      "runnersUp": ["pop-os/cosmic-greeter", "kennylevinsen/greetd"],
       "candidates": [
         {
           "rank": 1,
@@ -4843,9 +4567,7 @@
               "version": "1.10.0-1",
               "upstreamVersion": "1.10.0",
               "url": "https://github.com/pop-os/cosmic-greeter",
-              "licenses": [
-                "GPL-3.0-only"
-              ]
+              "licenses": ["GPL-3.0-only"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -4868,9 +4590,7 @@
             "total": 66.86
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 141 < 300"
-          ]
+          "notCredibleReasons": ["stars 141 < 300"]
         },
         {
           "rank": 2,
@@ -4900,9 +4620,7 @@
               "version": "0.10.3-2",
               "upstreamVersion": "0.10.3",
               "url": "https://git.sr.ht/~kennylevinsen/greetd",
-              "licenses": [
-                "GPL-3.0-only"
-              ]
+              "licenses": ["GPL-3.0-only"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -4925,10 +4643,7 @@
             "total": 37.33
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 266 < 300",
-            "score 37.33 < 45"
-          ]
+          "notCredibleReasons": ["stars 266 < 300", "score 37.33 < 45"]
         }
       ],
       "errors": []
@@ -4940,10 +4655,7 @@
       "status": "pick",
       "dataRank1": "woelper/oculante",
       "pick": "woelper/oculante",
-      "runnersUp": [
-        "atanunq/viu",
-        "ArturKovacs/emulsion"
-      ],
+      "runnersUp": ["atanunq/viu", "ArturKovacs/emulsion"],
       "candidates": [
         {
           "rank": 1,
@@ -4973,18 +4685,14 @@
               "version": "0.9.6-1",
               "upstreamVersion": "0.9.6",
               "url": "https://github.com/woelper/oculante",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 11
           },
           "score": {
@@ -5030,9 +4738,7 @@
               "version": "1.6.1-2",
               "upstreamVersion": "1.6.1",
               "url": "https://github.com/atanunq/viu",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -5155,9 +4861,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 13
           },
           "score": {
@@ -5185,9 +4889,7 @@
       "status": "pick",
       "dataRank1": "firecracker-microvm/firecracker",
       "pick": "firecracker-microvm/firecracker",
-      "runnersUp": [
-        "cloud-hypervisor/cloud-hypervisor"
-      ],
+      "runnersUp": ["cloud-hypervisor/cloud-hypervisor"],
       "candidates": [
         {
           "rank": 1,
@@ -5217,19 +4919,14 @@
               "version": "1.17.0-1",
               "upstreamVersion": "1.17.0",
               "url": "https://firecracker-microvm.github.io",
-              "licenses": [
-                "Apache-2.0",
-                "BSD-3-Clause"
-              ]
+              "licenses": ["Apache-2.0", "BSD-3-Clause"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 9
           },
           "score": {
@@ -5281,9 +4978,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 4
           },
           "score": {
@@ -5311,10 +5006,7 @@
       "status": "pick",
       "dataRank1": "wasmerio/wasmer",
       "pick": "wasmerio/wasmer",
-      "runnersUp": [
-        "bytecodealliance/wasmtime",
-        "wasmi-labs/wasmi"
-      ],
+      "runnersUp": ["bytecodealliance/wasmtime", "wasmi-labs/wasmi"],
       "candidates": [
         {
           "rank": 1,
@@ -5344,18 +5036,14 @@
               "version": "7.5.0-1",
               "upstreamVersion": "7.5.0",
               "url": "https://github.com/wasmerio/wasmer",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 10
           },
           "score": {
@@ -5401,18 +5089,14 @@
               "version": "50.0.0-1",
               "upstreamVersion": "50.0.0",
               "url": "https://github.com/bytecodealliance/wasmtime",
-              "licenses": [
-                "Apache-2.0"
-              ]
+              "licenses": ["Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 7
           },
           "score": {
@@ -5486,9 +5170,7 @@
       "status": "pick",
       "dataRank1": "Rust-for-Linux/linux",
       "pick": "Rust-for-Linux/linux",
-      "runnersUp": [
-        "AsahiLinux/linux"
-      ],
+      "runnersUp": ["AsahiLinux/linux"],
       "candidates": [
         {
           "rank": 1,
@@ -5593,9 +5275,7 @@
       "ownerDirective": "Bun is the OS runtime by owner decision (2026-10-29); the data rank is recorded next to it.",
       "dataRank1": "denoland/deno",
       "pick": "oven-sh/bun",
-      "runnersUp": [
-        "denoland/deno"
-      ],
+      "runnersUp": ["denoland/deno"],
       "candidates": [
         {
           "rank": 1,
@@ -5625,18 +5305,14 @@
               "version": "2.9.8-1",
               "upstreamVersion": "2.9.8",
               "url": "https://deno.com",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 22
           },
           "score": {
@@ -5682,18 +5358,14 @@
               "version": "1.4.4-1",
               "upstreamVersion": "1.4.4",
               "url": "https://github.com/oven-sh/bun",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "test"
-            ],
+            "rootDirs": ["test"],
             "workflowFiles": 30
           },
           "score": {
@@ -5751,19 +5423,14 @@
               "version": "0.13.6-1",
               "upstreamVersion": "0.13.6",
               "url": "https://github.com/astral-sh/uv",
-              "licenses": [
-                "Apache-2.0",
-                "MIT"
-              ]
+              "licenses": ["Apache-2.0", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "test"
-            ],
+            "rootDirs": ["test"],
             "workflowFiles": 48
           },
           "score": {
@@ -5821,9 +5488,7 @@
               "version": "0.17.3-1",
               "upstreamVersion": "0.17.3",
               "url": "https://github.com/astral-sh/ruff",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -5858,9 +5523,7 @@
       "status": "pick",
       "dataRank1": "skim-rs/skim",
       "pick": "skim-rs/skim",
-      "runnersUp": [
-        "alexpasmantier/television"
-      ],
+      "runnersUp": ["alexpasmantier/television"],
       "candidates": [
         {
           "rank": 1,
@@ -5890,18 +5553,14 @@
               "version": "5.9.0-1",
               "upstreamVersion": "5.9.0",
               "url": "https://github.com/skim-rs/skim",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 9
           },
           "score": {
@@ -5947,18 +5606,14 @@
               "version": "0.15.9-1",
               "upstreamVersion": "0.15.9",
               "url": "https://github.com/alexpasmantier/television",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 10
           },
           "score": {
@@ -6016,18 +5671,14 @@
               "version": "1.59.0-1",
               "upstreamVersion": "1.59.0",
               "url": "https://github.com/casey/just",
-              "licenses": [
-                "CC0-1.0"
-              ]
+              "licenses": ["CC0-1.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 3
           },
           "score": {
@@ -6085,9 +5736,7 @@
               "version": "2.8.0-1",
               "upstreamVersion": "2.8.0",
               "url": "https://github.com/watchexec/watchexec",
-              "licenses": [
-                "Apache-2.0"
-              ]
+              "licenses": ["Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -6152,19 +5801,14 @@
               "version": "15.0.0-1",
               "upstreamVersion": "15.0.0",
               "url": "https://github.com/XAMPPRocky/tokei",
-              "licenses": [
-                "Apache",
-                "MIT"
-              ]
+              "licenses": ["Apache", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 4
           },
           "score": {
@@ -6222,19 +5866,14 @@
               "version": "0.17.0-2",
               "upstreamVersion": "0.17.0",
               "url": "https://github.com/sharkdp/hexyl",
-              "licenses": [
-                "Apache-2.0",
-                "MIT"
-              ]
+              "licenses": ["Apache-2.0", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 1
           },
           "score": {
@@ -6292,19 +5931,14 @@
               "version": "1.9.1-1",
               "upstreamVersion": "1.9.1",
               "url": "https://github.com/tealdeer-rs/tealdeer",
-              "licenses": [
-                "Apache-2.0",
-                "MIT"
-              ]
+              "licenses": ["Apache-2.0", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 2
           },
           "score": {
@@ -6333,9 +5967,7 @@
       "dataRank1": "Macchina-CLI/macchina",
       "pick": null,
       "bestAvailable": "Macchina-CLI/macchina",
-      "runnersUp": [
-        "Macchina-CLI/macchina"
-      ],
+      "runnersUp": ["Macchina-CLI/macchina"],
       "candidates": [
         {
           "rank": 1,
@@ -6365,9 +5997,7 @@
               "version": "6.4.0-3",
               "upstreamVersion": "6.4.0",
               "url": "https://github.com/Macchina-CLI/macchina",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -6390,9 +6020,7 @@
             "total": 45.5
           },
           "credible": false,
-          "notCredibleReasons": [
-            "last push 600 days ago"
-          ]
+          "notCredibleReasons": ["last push 600 days ago"]
         }
       ],
       "errors": []
@@ -6434,20 +6062,14 @@
               "version": "0.11.4-1",
               "upstreamVersion": "0.11.4",
               "url": "https://github.com/rustic-rs/rustic",
-              "licenses": [
-                "Apache-2.0",
-                "MIT"
-              ]
+              "licenses": ["Apache-2.0", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "test",
-              "tests"
-            ],
+            "rootDirs": ["test", "tests"],
             "workflowFiles": 12
           },
           "score": {
@@ -6505,10 +6127,7 @@
               "version": "0.12.1-1",
               "upstreamVersion": "0.12.1",
               "url": "https://github.com/str4d/rage",
-              "licenses": [
-                "Apache-2.0",
-                "MIT"
-              ]
+              "licenses": ["Apache-2.0", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -6543,11 +6162,7 @@
       "status": "pick",
       "dataRank1": "sozu-proxy/sozu",
       "pick": "sozu-proxy/sozu",
-      "runnersUp": [
-        "cloudflare/pingora",
-        "static-web-server/static-web-server",
-        "memorysafety/river"
-      ],
+      "runnersUp": ["cloudflare/pingora", "static-web-server/static-web-server", "memorysafety/river"],
       "candidates": [
         {
           "rank": 1,
@@ -6583,9 +6198,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "e2e"
-            ],
+            "rootDirs": ["e2e"],
             "workflowFiles": 11
           },
           "score": {
@@ -6683,9 +6296,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 16
           },
           "score": {
@@ -6731,12 +6342,7 @@
               "version": "0.5.0-1",
               "upstreamVersion": "0.5.0",
               "url": "https://isaacfreund.com/software/river/",
-              "licenses": [
-                "0BSD",
-                "CC-BY-SA-4.0",
-                "GPL-3.0-only",
-                "MIT"
-              ]
+              "licenses": ["0BSD", "CC-BY-SA-4.0", "GPL-3.0-only", "MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -6759,9 +6365,7 @@
             "total": 45.86
           },
           "credible": false,
-          "notCredibleReasons": [
-            "last push 782 days ago"
-          ]
+          "notCredibleReasons": ["last push 782 days ago"]
         }
       ],
       "errors": []
@@ -6809,10 +6413,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "testing",
-              "tests"
-            ],
+            "rootDirs": ["testing", "tests"],
             "workflowFiles": 35
           },
           "score": {
@@ -6841,9 +6442,7 @@
       "dataRank1": "AMythicDev/minus",
       "pick": null,
       "bestAvailable": "AMythicDev/minus",
-      "runnersUp": [
-        "AMythicDev/minus"
-      ],
+      "runnersUp": ["AMythicDev/minus"],
       "candidates": [
         {
           "rank": 1,
@@ -6889,9 +6488,7 @@
             "total": 44.68
           },
           "credible": false,
-          "notCredibleReasons": [
-            "score 44.68 < 45"
-          ]
+          "notCredibleReasons": ["score 44.68 < 45"]
         }
       ],
       "errors": []
@@ -6903,9 +6500,7 @@
       "status": "pick",
       "dataRank1": "edera-dev/sprout",
       "pick": "rust-osdev/bootloader",
-      "runnersUp": [
-        "edera-dev/sprout"
-      ],
+      "runnersUp": ["edera-dev/sprout"],
       "candidates": [
         {
           "rank": 1,
@@ -6951,9 +6546,7 @@
             "total": 57.39
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 299 < 300"
-          ]
+          "notCredibleReasons": ["stars 299 < 300"]
         },
         {
           "rank": 2,
@@ -6983,9 +6576,7 @@
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 4
           },
           "score": {
@@ -7014,9 +6605,7 @@
       "dataRank1": "archlinux/alpm.rs",
       "pick": null,
       "bestAvailable": "archlinux/alpm.rs",
-      "runnersUp": [
-        "archlinux/alpm.rs"
-      ],
+      "runnersUp": ["archlinux/alpm.rs"],
       "candidates": [
         {
           "rank": 1,
@@ -7062,10 +6651,7 @@
             "total": 25.23
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 175 < 300",
-            "score 25.23 < 45"
-          ]
+          "notCredibleReasons": ["stars 175 < 300", "score 25.23 < 45"]
         }
       ],
       "errors": []
@@ -7078,9 +6664,7 @@
       "dataRank1": "mullvad/nftnl-rs",
       "pick": null,
       "bestAvailable": "mullvad/nftnl-rs",
-      "runnersUp": [
-        "mullvad/nftnl-rs"
-      ],
+      "runnersUp": ["mullvad/nftnl-rs"],
       "candidates": [
         {
           "rank": 1,
@@ -7126,10 +6710,7 @@
             "total": 43.85
           },
           "credible": false,
-          "notCredibleReasons": [
-            "stars 111 < 300",
-            "score 43.85 < 45"
-          ]
+          "notCredibleReasons": ["stars 111 < 300", "score 43.85 < 45"]
         }
       ],
       "errors": []
@@ -7171,18 +6752,14 @@
               "version": "2.2.62-1",
               "upstreamVersion": "2.2.62",
               "url": "https://nmstate.io",
-              "licenses": [
-                "Apache-2.0"
-              ]
+              "licenses": ["Apache-2.0"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 7
           },
           "score": {
@@ -7240,9 +6817,7 @@
               "version": "0.44.1-1",
               "upstreamVersion": "0.44.1",
               "url": "https://ast-grep.github.io/",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
@@ -7307,18 +6882,14 @@
               "version": "0.24.0-1",
               "upstreamVersion": "0.24.0",
               "url": "https://github.com/Julien-cpsn/ATAC",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 4
           },
           "score": {
@@ -7376,18 +6947,14 @@
               "version": "3.1.0-1",
               "upstreamVersion": "3.1.0",
               "url": "https://github.com/o2sh/onefetch",
-              "licenses": [
-                "MIT"
-              ]
+              "licenses": ["MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 6
           },
           "score": {
@@ -7445,18 +7012,14 @@
               "version": "0.12.1-1",
               "upstreamVersion": "0.12.1",
               "url": "https://codeberg.org/heiko/rpgpie",
-              "licenses": [
-                "Apache-2.0 OR MIT"
-              ]
+              "licenses": ["Apache-2.0 OR MIT"]
             },
             "cachyosRecipe": null,
             "aur": null,
             "omarchyDefault": null
           },
           "tests": {
-            "rootDirs": [
-              "tests"
-            ],
+            "rootDirs": ["tests"],
             "workflowFiles": 1
           },
           "score": {

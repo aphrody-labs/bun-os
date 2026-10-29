@@ -271,7 +271,9 @@ export async function linuxMain(args: string[], root: string, log: (s: string) =
         : undefined;
     if (cross && existsSync(sysroot)) {
       const shim = shimHostTools(sysroot);
-      log(`host tools in ${sysroot}/usr/bin: ${shim.linked.length} linked, ${shim.present.length} present, missing: ${shim.missing.join(" ") || "none"}`);
+      log(
+        `host tools in ${sysroot}/usr/bin: ${shim.linked.length} linked, ${shim.present.length} present, missing: ${shim.missing.join(" ") || "none"}`,
+      );
     }
     const chain = rest.includes("--deep")
       ? resolved.order

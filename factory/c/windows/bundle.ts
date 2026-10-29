@@ -41,7 +41,14 @@ for (const a of recipe.assets) {
   mkdirSync(dest, { recursive: true });
   const archive = join(dest, a.asset.replace(/[+]/g, "_"));
   writeFileSync(archive, buf);
-  const t = Bun.spawnSync([process.platform === "win32" ? join(process.env.SystemRoot ?? "C:\Windows", "System32", "tar.exe") : "tar", "-xf", archive.slice(dest.length + 1)], { cwd: dest, stdout: "inherit", stderr: "inherit" });
+  const t = Bun.spawnSync(
+    [
+      process.platform === "win32" ? join(process.env.SystemRoot ?? "C:\Windows", "System32", "tar.exe") : "tar",
+      "-xf",
+      archive.slice(dest.length + 1),
+    ],
+    { cwd: dest, stdout: "inherit", stderr: "inherit" },
+  );
   if (t.exitCode) failed++;
   else writeFileSync(join(dest, ".bunos-c-ok"), digest);
 }
