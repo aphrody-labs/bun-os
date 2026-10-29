@@ -73,8 +73,8 @@ test("the explorer wire protocol lists, renames and deletes through the Rust VFS
     return reply.json;
   };
   const os = await (await import("./webos-backend")).getWebOs();
-  const terminal = os.terminal(80, 24);
-  terminal.type("mkdir photos\recho hi > photos/note.txt\r");
+  os.fs.mkdir("/home/user/photos");
+  os.fs.write("/home/user/photos/note.txt", new TextEncoder().encode("hi\n"));
   const listing = (await call("Query", "query:files.directory_listing", {
     path: sd("/home/user"),
     limit: null,

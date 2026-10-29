@@ -223,6 +223,8 @@ const result = await Bun.build({
     join(import.meta.dir, "src/main.ts"),
     join(import.meta.dir, "src/sw.ts"),
     join(import.meta.dir, "src/boot.ts"),
+    // Worker of the Terminal's Alpine guest (/guest-worker.js), see packages/webos-wasm/src/guest.ts
+    join(root, "packages/webos-wasm/src/guest-worker.ts"),
   ],
   outdir: dist,
   target: "browser",

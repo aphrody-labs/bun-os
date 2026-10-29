@@ -12,13 +12,14 @@ use std::{
 };
 
 use aphrody_patch::{PatchFileSystem, apply_patch, parse_patch};
-use aphrody_shell_session::SpawnSpec;
 use aphrody_shell_vfs::{FileKind, Vfs, VfsError, path as vpath};
-use aphrody_shell_web::{WebTerminal, local::LocalShell, opfs::SharedOpfsVfs};
+use aphrody_shell_web::opfs::SharedOpfsVfs;
+
+/// The Rio VT terminal state, exported so the WebOS Terminal app can feed it the bytes of a real shell (the Alpine guest).
+pub use aphrody_shell_web::WebTerminal;
 use serde_json::json;
 use wasm_bindgen::prelude::*;
 
-mod commands;
 mod rag;
 mod rpc;
 
@@ -160,27 +161,6 @@ impl WebOsFs {
         rag::stats(&mut self.fs, rpc::HOME).to_string()
     }
 
-    /// Start a terminal whose shell works on this very filesystem, so files written by
-    /// the explorer and by shell commands are the same files and share one OPFS image.
-    ///
-    /// # Errors
-    /// Throws when the dimensions are zero.
-    pub fn shell(&mut self, cols: u16, rows: u16) -> Result<WebOsShell, String> {
-        let spec = SpawnSpec {
-            columns: cols,
-            rows,
-            cwd: Some(rpc::HOME.to_owned()),
-            ..SpawnSpec::default()
-        };
-        let (shell, greeting) = LocalShell::with_spec_and_vfs(&spec, Box::new(self.fs.clone()))
-            .map_err(|e| e.to_string())?;
-        let mut shell = shell;
-        commands::register(&mut shell, &self.fs);
-        let mut terminal = WebTerminal::new(cols, rows);
-        terminal.ingest(&greeting);
-        Ok(WebOsShell { shell, terminal })
-    }
-
     /// `aphrody re triage` report (format, sections, hashes, strings) as JSON.
     ///
     /// # Errors
@@ -239,41 +219,6 @@ pub(crate) fn triage_json(bytes: &[u8]) -> Result<String, String> {
     let report =
         aphrody_re::triage_bounded(bytes, TRIAGE_STRINGS_LIMIT).map_err(|e| e.to_string())?;
     serde_json::to_string(&report).map_err(|e| e.to_string())
-}
-
-/// Local shell and VT screen over the shared WebOS filesystem.
-#[wasm_bindgen]
-pub struct WebOsShell {
-    shell: LocalShell,
-    terminal: WebTerminal,
-}
-
-#[wasm_bindgen]
-impl WebOsShell {
-    /// Feed typed bytes; returns the shell output bytes (already applied to the screen).
-    pub fn input(&mut self, bytes: &[u8]) -> Vec<u8> {
-        let out = self.shell.input(bytes);
-        self.terminal.ingest(&out);
-        out
-    }
-
-    /// Resize the screen.
-    pub fn resize(&mut self, cols: u16, rows: u16) {
-        self.terminal.resize(cols, rows);
-    }
-
-    /// Whether `exit` was run.
-    #[must_use]
-    pub fn exited(&self) -> bool {
-        self.shell.exited()
-    }
-
-    /// `{columns, rows, lines, cursor:{row,col,visible}}` for the renderer.
-    #[must_use]
-    #[wasm_bindgen(js_name = snapshotJson)]
-    pub fn snapshot_json(&self) -> String {
-        self.terminal.snapshot_json()
-    }
 }
 
 /// Unified diff of two texts, for the Files app's compare view.
@@ -405,59 +350,24 @@ mod tests {
 }
 
 #[cfg(test)]
-mod shell_tests {
+mod api_tests {
     use super::WebOsFs;
 
     #[test]
-    fn shell_and_explorer_share_one_filesystem() {
-        let mut fs = WebOsFs::new(&[]).expect("empty image");
-        let mut shell = fs.shell(80, 24).expect("shell");
-        let _ = shell.input(b"echo from-shell > made.txt\r");
-        assert_eq!(
-            fs.read("/home/user/made.txt").expect("read"),
-            b"from-shell\n"
-        );
-        let reply = fs.rpc(
-            r#"{"Query":{"method":"query:files.directory_listing","library_id":null,"payload":{"path":{"Physical":{"device_slug":"webos","path":"/home/user"}},"sort_by":"name","limit":null,"include_hidden":null,"folders_first":null}}}"#,
-            "2026-10-10T00:00:00Z",
-        );
-        assert!(reply.contains("made.txt"), "{reply}");
-        assert!(shell.snapshot_json().contains("lines"));
-        assert!(!fs.image_if_dirty().expect("image").is_empty());
-    }
-}
-
-#[cfg(test)]
-mod command_tests {
-    use super::WebOsFs;
-
-    #[test]
-    fn terminal_reaches_triage_search_and_patch() {
+    fn search_patch_and_triage_work_on_the_shared_filesystem() {
         let mut fs = WebOsFs::new(&[]).expect("empty image");
         fs.write("/home/user/notes.md", b"# Notes\n\nthe walrus sings\n")
             .expect("write");
-        let mut shell = fs.shell(100, 40).expect("shell");
-        let out = String::from_utf8(shell.input(b"search walrus\r")).expect("utf8");
-        assert!(out.contains("/home/user/notes.md:"), "{out}");
-        let out = String::from_utf8(shell.input(b"triage notes.md\r")).expect("utf8");
-        assert!(!out.contains("command not found"), "{out}");
+        let hits = fs.rag_search("walrus", 5);
+        assert!(hits.contains("/home/user/notes.md"), "{hits}");
         let patch = "*** Begin Patch\n*** Add File: made.txt\n+patched\n*** End Patch";
         fs.apply_patch(patch, "/home/user").expect("patch");
-        let out = String::from_utf8(shell.input(b"cat made.txt\r")).expect("utf8");
-        assert!(out.contains("patched"), "{out}");
+        assert_eq!(fs.read("/home/user/made.txt").expect("read"), b"patched\n");
+        assert!(fs.triage("/home/user/notes.md").is_ok());
     }
 
     #[test]
-    fn terminal_and_module_detect_languages() {
-        let mut fs = WebOsFs::new(&[]).expect("empty image");
-        fs.write(
-            "/home/user/fr.txt",
-            "bonjour et merci pour le café\n".as_bytes(),
-        )
-        .expect("write");
-        let mut shell = fs.shell(100, 40).expect("shell");
-        let out = String::from_utf8(shell.input(b"detect-lang fr.txt\r")).expect("utf8");
-        assert!(out.contains(r#""language":"fr""#), "{out}");
+    fn detects_languages() {
         let json = super::detect_language("こんにちは").expect("json");
         assert!(
             json.contains(r#""language":"ja""#) && json.contains(r#""isReliable":true"#),

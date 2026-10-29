@@ -33,15 +33,22 @@ interface Env {
 }
 
 const ISO_KEY = `webos/vm/${vmLock.alpine.iso.name}`;
+const GUEST_KEY = `webos/vm/${vmLock.alpine.guest64.name}`;
 
-/** Serve the Alpine ISO from R2 with Range support (v86 reads it in chunks). */
-async function iso(request: Request, env: Env): Promise<Response> {
-  const head = await env.VM.head(ISO_KEY);
+/** Serve an object of the VM bucket with Range support (v86 reads the ISO in chunks; the guest image is cached in OPFS). */
+async function vmObject(
+  request: Request,
+  env: Env,
+  key: string,
+  type = "application/octet-stream",
+  cache = "no-store",
+): Promise<Response> {
+  const head = await env.VM.head(key);
   if (!head) return new Response("Disk image not published.", { status: 404 });
   const headers = new Headers({
     "accept-ranges": "bytes",
-    "content-type": "application/octet-stream",
-    "cache-control": "no-store",
+    "content-type": type,
+    "cache-control": cache,
     etag: head.httpEtag,
     "cross-origin-resource-policy": "same-origin",
   });
@@ -53,7 +60,7 @@ async function iso(request: Request, env: Env): Promise<Response> {
     return new Response(null, { headers });
   }
   if (!m) {
-    const full = await env.VM.get(ISO_KEY);
+    const full = await env.VM.get(key);
     headers.set("content-length", String(head.size));
     return new Response(full?.body ?? null, { headers });
   }
@@ -69,7 +76,7 @@ async function iso(request: Request, env: Env): Promise<Response> {
       headers: { "content-range": `bytes */${head.size}` },
     });
   start = Math.max(0, start);
-  const part = await env.VM.get(ISO_KEY, {
+  const part = await env.VM.get(key, {
     range: { offset: start, length: end - start + 1 },
   });
   headers.set("content-range", `bytes ${start}-${end}/${head.size}`);
@@ -359,7 +366,12 @@ export default {
       url.pathname === "/vm/alpine.iso" &&
       (request.method === "GET" || request.method === "HEAD")
     )
-      return iso(request, env);
+      return vmObject(request, env, ISO_KEY);
+    if (
+      url.pathname === `/vm/${vmLock.alpine.guest64.name}` &&
+      (request.method === "GET" || request.method === "HEAD")
+    )
+      return isolated(await vmObject(request, env, GUEST_KEY, "application/wasm", "no-cache"));
     if (url.pathname.startsWith("/api/"))
       return new Response("Not found", { status: 404 });
     const workspace =

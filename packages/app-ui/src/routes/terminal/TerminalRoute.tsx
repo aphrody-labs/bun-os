@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // The public terminal stays inside the browser: Rust/WASM owns the shell and VT grid,
 // while its OPFS VFS is shared with the WebOS file manager.
-import type { Snapshot, Terminal } from "@aphrody/webos-wasm";
+import { openGuestTerminal, type GuestSession, type Snapshot } from "@aphrody/webos-wasm";
 import { Button, Icon } from "@aphrody/m3-primitives";
 import {
   useCallback,
@@ -41,7 +41,7 @@ function clamp(value: number, min: number, max: number) {
 
 export function TerminalRoute() {
   const { t } = useI18n();
-  const terminal = useRef<Terminal | null>(null);
+  const terminal = useRef<GuestSession | null>(null);
   const terminalPanel = useRef<HTMLDivElement>(null);
   const [screen, setScreen] = useState<Snapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +62,9 @@ export function TerminalRoute() {
     getWebOs()
       .then(os => {
         if (cancelled) return;
-        const instance = os.terminal(96, 28);
+        // A real Alpine shell: the guest's output is rendered by Rio VT and pushed to React on every change.
+        const instance = openGuestTerminal({ cols: 96, rows: 28 });
+        instance.onChange(() => setScreen(instance.snapshot()));
         terminal.current = instance;
         setPersistent(os.persistent);
         setScreen(instance.snapshot());
@@ -73,6 +75,7 @@ export function TerminalRoute() {
       });
     return () => {
       cancelled = true;
+      terminal.current?.dispose();
       terminal.current = null;
     };
   }, []);
