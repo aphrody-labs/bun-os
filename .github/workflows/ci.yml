@@ -90,6 +90,9 @@ jobs:
     if: ${{ needs.plan.outputs.rust == 'true' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
+    env:
+      # buncc's cargo runs stop after 30 minutes by default; whole-workspace check and clippy on the runners take longer.
+      BUNCC_CARGO_DEADLINE_MS: "7200000"
     # Windows stays advisory until a green run on windows-latest is recorded (the fork-only MSVC wrapper calls are removed).
     continue-on-error: ${{ matrix.os == 'windows-latest' }}
     strategy:
@@ -126,9 +129,15 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
         run: |
-          $root = 'C:\Program Files\OpenSSL-Win64'
-          $lib = "$root\lib\VC\x64\MD"
-          if (-not (Test-Path "$lib\libssl.lib")) { choco install openssl --no-progress -y }
+          choco install openssl --no-progress -y
+          # The Shining Light installer's directory varies by version: locate the MD import libraries instead of assuming it.
+          $ssl = Get-ChildItem -Path 'C:\Program Files','C:\Program Files (x86)','C:\OpenSSL-Win64','C:\OpenSSL' -Filter libssl.lib -Recurse -Depth 8 -ErrorAction SilentlyContinue |
+            Where-Object { $_.DirectoryName -match '\\MD$' } | Select-Object -First 1
+          if (-not $ssl) { throw 'libssl.lib (MD) not found after installing OpenSSL' }
+          $lib = $ssl.DirectoryName
+          $root = $lib
+          while ($root -and -not (Test-Path (Join-Path $root 'include\openssl\ssl.h'))) { $root = Split-Path $root -Parent }
+          if (-not $root) { throw "OpenSSL headers not found above $lib" }
           "OPENSSL_DIR=$root" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "OPENSSL_LIB_DIR=$lib" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "OPENSSL_INCLUDE_DIR=$root\include" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV

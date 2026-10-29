@@ -29216,10 +29216,13 @@ dependencies = [
  "pollster 1.0.1",
  "rustls-native-certs 0.8.5",
  "serde_json",
+ "uds_windows",
  "ureq 3.4.2",
  "wayland-client",
  "wayland-protocols",
+ "windows 0.62.2",
  "winresource",
+ "winsafe 0.0.29",
 ]
 
 [[package]]

@@ -1055,7 +1055,7 @@ mod tests {
             // `mode con` prints the line count, then the column count; the labels are localized,
             // so match on the numbers that follow the command echo.
             client
-                .send(Message::Binary(b"mode con\r".to_vec()))
+                .send(Message::Binary(b"mode con\r".to_vec().into()))
                 .await
                 .expect("send command");
             read_until(&mut client, |out| {
