@@ -2,10 +2,10 @@
 
 # Offline Bun documentation
 
-`aphrody-bun-docs` indexes the Markdown and MDX pages of `docs/` in the Bun fork
-`aphrody-labs/bun` on the first tool call. It provides `bun_docs_search`, `bun_docs_read`,
+`aphrody-bun-docs` indexes the Markdown and MDX pages of `docs/` in upstream Bun (oven-sh/bun)
+`oven-sh/bun` on the first tool call. It provides `bun_docs_search`, `bun_docs_read`,
 `bun_docs_list` and the N2B registry's `bun_node_equivalent`. Aphrody keeps no copy of the docs:
-`docs/reference/upstream-bun` only holds `SOURCE.json` (the pinned fork commit), the Bun
+`docs/reference/upstream-bun` only holds `SOURCE.json` (the pinned upstream commit), the Bun
 `LICENSE.md` and `APHRODY-FORK.md`.
 
 Corpus resolution, in order:

@@ -95,24 +95,6 @@ async function calls(log: string): Promise<string[][]> {
     .map(line => JSON.parse(line) as string[]);
 }
 
-async function bunFixture(setup: Awaited<ReturnType<typeof fixture>>) {
-  await Bun.write(
-    join(setup.dir, "packages/engine/yolo/yolo.just"),
-    Bun.file(join(root, "packages/engine/yolo/yolo.just")),
-  );
-  const log = join(setup.dir, "bun.jsonl");
-  const bun = join(setup.bin, "bun");
-  await Bun.write(
-    bun,
-    `#!${process.execPath}
-import { appendFileSync } from "node:fs";
-appendFileSync(${JSON.stringify(log)}, JSON.stringify({args: process.argv.slice(2), cwd: process.cwd()}) + "\\n");
-`,
-  );
-  await chmod(bun, 0o700);
-  return { log };
-}
-
 /** Package names of the manifests under crates/, skipping dependency and build trees (slow on bind mounts). */
 async function workspacePackageNames(): Promise<string[]> {
   const manifests: string[] = [];
@@ -142,65 +124,6 @@ async function workspacePackageNames(): Promise<string[]> {
 function packages(args: string[]): string[] {
   return args.flatMap((value, index) => (value === "-p" ? [args[index + 1]!] : []));
 }
-
-profileTest("the Bun recipe dispatches to yolo forge, which owns toolchain and pins", async () => {
-  const setup = await fixture();
-  const bun = await bunFixture(setup);
-  const result = await runRecipes(setup, ["qualify-bun", "--dry-run"], setup.dir, {
-    APHRODY_BUN_CHECKOUT: "",
-  });
-  expect(result.exitCode, result.stderr).toBe(0);
-  const probes = (await Bun.file(bun.log).text())
-    .trim()
-    .split("\n")
-    .map(line => JSON.parse(line));
-  expect(probes).toEqual([
-    {
-      args: ["packages/engine/yolo/src/index.ts", "forge", "build", "--branch", "main", "--dry-run"],
-      cwd: setup.dir,
-    },
-  ]);
-  expect(await Bun.file(setup.log).exists()).toBe(false);
-});
-
-profileTest("the Bun recipe qualifies the local fork checkout before forge builds it", async () => {
-  const setup = await fixture();
-  const bun = await bunFixture(setup);
-  const fork = join(setup.dir, "fork");
-  await Bun.write(join(fork, "scripts/aphrody/scope.ts"), "");
-  const result = await runRecipes(setup, ["qualify-bun", "--dry-run"], setup.dir, {
-    APHRODY_BUN_CHECKOUT: fork,
-  });
-  expect(result.exitCode, result.stderr).toBe(0);
-  const probes = (await Bun.file(bun.log).text())
-    .trim()
-    .split("\n")
-    .map(line => JSON.parse(line));
-  expect(probes).toEqual([
-    {
-      args: [join(fork, "scripts/aphrody/scope.ts"), "--check"],
-      cwd: setup.dir,
-    },
-    {
-      args: [
-        "packages/engine/yolo/src/index.ts",
-        "forge",
-        "build",
-        "--branch",
-        "main",
-        "--repository",
-        fork,
-        "--dry-run",
-      ],
-      cwd: setup.dir,
-    },
-  ]);
-
-  const missing = await runRecipes(setup, ["qualify-bun"], setup.dir, {
-    APHRODY_BUN_CHECKOUT: join(setup.dir, "absent"),
-  });
-  expect(missing.exitCode).toBe(64);
-});
 
 profileTest("historical full ship refuses a missing factory contract before bootstrap", async () => {
   const setup = await fixture();
@@ -327,7 +250,7 @@ profileTest("factory recipes dispatch a pinned profile through the native owner 
     revision,
     "--",
     "just",
-    "qualify-bun",
+    "qualify-upstream",
   ]);
   for (const args of [
     ["invalid", revision],

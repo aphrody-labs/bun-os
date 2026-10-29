@@ -5,10 +5,6 @@ import { dirname, relative, resolve } from "node:path";
 const root = resolve(import.meta.dir, "../../../docs/aphrody");
 const copies = [
   [
-    resolve(root, "tools/config/bun-forge.json"),
-    resolve(dirname(Bun.resolveSync("@aphrody/yolo-cli/forge", import.meta.dir)), "defaults.json"),
-  ],
-  [
     resolve(root, "crates/ai/agent-home/sync-contract.json"),
     resolve(dirname(Bun.resolveSync("@aphrody/google/api", import.meta.dir)), "sync-contract.json"),
   ],

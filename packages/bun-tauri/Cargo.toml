@@ -7,7 +7,7 @@ members = ["crates/*"]
 [workspace.package]
 edition = "2024"
 rust-version = "1.97"
-repository = "https://github.com/aphrody-labs/bun"
+repository = "https://github.com/aphrody-labs/bun-os"
 authors = ["aphrody-code"]
 
 [workspace.dependencies]

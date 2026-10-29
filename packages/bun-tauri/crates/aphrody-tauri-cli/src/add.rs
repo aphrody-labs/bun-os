@@ -116,7 +116,7 @@ pub fn run(options: Options, dirs: &Dirs) -> Result<()> {
         target: if is_known { None } else { target_str },
         features: &features,
         no_default_features: is_known && !has_consolidated_dependency(dirs.tauri)?,
-        git_url: is_known.then_some("https://github.com/aphrody-labs/bun"),
+        git_url: is_known.then_some("https://github.com/aphrody-labs/bun-os"),
     })?;
 
     if !metadata.rust_only {

@@ -6,7 +6,7 @@ edition = "2024"
 rust-version = "1.97"
 authors = ["aphrody-dev <contact@aphrody.com>"]
 homepage = "https://aphrody.app"
-repository = "https://github.com/aphrody-labs/bun"
+repository = "https://github.com/aphrody-labs/bun-os"
 license = "Apache-2.0"
 description = "Canonical Bun Windows SDK for WinClean-compatible automation and diagnostics."
 

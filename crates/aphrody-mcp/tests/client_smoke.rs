@@ -231,7 +231,7 @@ async fn stateless_mcp_discovers_and_lists_the_full_shenron_catalog() {
         "params": {
             "_meta": request_meta,
             "name": "bun_docs_search",
-            "arguments": {"query": "bun:windows", "limit": 1, "include_content": false}
+            "arguments": {"query": "bun:sqlite", "limit": 1, "include_content": false}
         }
     });
     stdin

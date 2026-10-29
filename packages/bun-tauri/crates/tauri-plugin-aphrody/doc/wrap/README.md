@@ -2,13 +2,13 @@
 
 # aphrody-tauri-wrap
 
-Runtime plugin of [`@aphrody/web-to-tauri`](https://github.com/aphrody-labs/bun/blob/main/packages/web/rust/integrations/m3/packages/web-to-tauri): reads
+Runtime plugin of [`@aphrody/web-to-tauri`](https://github.com/aphrody-labs/bun-os/blob/os/packages/web/rust/integrations/m3/packages/web-to-tauri): reads
 `src-tauri/wrap.json` and creates the window with the navigation policy, downloads, loopback
 server (bundle mode, with the backend proxy) and sidecar. Contract:
 [`src/wrap/config.rs`](../../src/wrap/config.rs) in this crate.
 
 The crate also hosts the debug bridge of Tauri 3 apps (`aphrody_tauri_wrap::debug::init()`, the
-former `aphrody-tauri-debug` crate; guide: [`docs/guides/web/TAURI-DEBUG.md`](https://github.com/aphrody-labs/bun/blob/main/docs/aphrody-source/guides/web/TAURI-DEBUG.md)).
+former `aphrody-tauri-debug` crate; guide: [`docs/guides/web/TAURI-DEBUG.md`](https://github.com/aphrody-labs/bun-os/blob/os/docs/aphrody-source/guides/web/TAURI-DEBUG.md)).
 
 | Feature        | Default | Pulls in                                         | Without it                                           |
 | -------------- | ------- | ------------------------------------------------ | ---------------------------------------------------- |

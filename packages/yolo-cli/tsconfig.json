@@ -1,6 +1,6 @@
 {
   "extends": "../../docs/aphrody/tsconfig.base.json",
-  "include": ["src/**/*", "test/forge/**/*", "test/plugins.test.ts"],
+  "include": ["src/**/*", "test/plugins.test.ts"],
   "compilerOptions": {
     "resolveJsonModule": true
   }

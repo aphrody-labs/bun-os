@@ -3,7 +3,13 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { probe, verifyNextCatalog, qualifyRuntime, qualifyCompiledRuntimes, runtimeEvidence } from "./shenron-auto-deploy";
+import {
+  probe,
+  verifyNextCatalog,
+  qualifyRuntime,
+  qualifyCompiledRuntimes,
+  runtimeEvidence,
+} from "./shenron-auto-deploy";
 import { activeDeployment, deploymentIsCurrent, deploymentSelection } from "./shenron-deployment-identity";
 
 test("a runtime-only change builds a distinct deployment without changing the Shenron Git commit", () => {
@@ -141,7 +147,11 @@ test("the Next catalog must be exact registry versions that agree and are locked
   const root = mkdtempSync(join(tmpdir(), "shenron-next-"));
   temporary.push(root);
   const write = (catalog: Record<string, string>) => Bun.write(join(root, "package.json"), JSON.stringify({ catalog }));
-  const exact = { next: "16.5.0-canary.30", "@next/env": "16.5.0-canary.30", "@next/third-parties": "16.5.0-canary.30" };
+  const exact = {
+    next: "16.5.0-canary.30",
+    "@next/env": "16.5.0-canary.30",
+    "@next/third-parties": "16.5.0-canary.30",
+  };
   await write(exact);
   await expect(verifyNextCatalog(root)).rejects.toThrow("bun.lock is missing");
   await Bun.write(join(root, "bun.lock"), "{}");

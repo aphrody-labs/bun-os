@@ -103,7 +103,7 @@ if [ -n "$crates_asset" ]; then
 fi
 [ -f "$TMP/main/bin/yolo" ] || die "release is missing bin/yolo"
 chmod +x "$TMP/main/bin/yolo"
-# A release built from the bun-forge artifact carries the aliases `bun` (engine) and `vu` as links to the same file.
+# A release built from the Bun release artifact carries the aliases `bun` (engine) and `vu` as links to the same file.
 if [ -L "$TMP/main/bin/bun" ]; then
   "$TMP/main/bin/bun" --revision >/dev/null || die "the bun alias of this release does not run"
 fi

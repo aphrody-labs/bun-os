@@ -319,7 +319,7 @@ pub(crate) fn handle_shell(action: ShellAction) -> miette::Result<()> {
                 "backend": "aphrody-terminal-backend",
                 "tui": "not_wired",
                 "engine": "nushell",
-                "bun_shell": "bun exec (aphrody-labs/bun)",
+                "bun_shell": "Bun.$ (upstream Bun)",
                 "status": "capabilities_declared_not_probed"
             });
             if json {
