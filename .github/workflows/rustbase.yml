@@ -60,7 +60,7 @@ jobs:
     steps:
       - name: Toolchain
         run: |
-          pacman -Syu --noconfirm --needed git rust namcap pam jq
+          pacman -Syu --noconfirm --needed git rust clang namcap pam jq
       - uses: actions/checkout@v4
         with:
           sparse-checkout: factory/rustbase
@@ -175,6 +175,8 @@ jobs:
         with:
           repository: aphrody-labs/uutils-util-linux
           ref: ${{ needs.check.outputs.util_linux_sha }}
+      - name: libsmartcols and libclang for smartcols-sys
+        run: sudo apt-get update && sudo apt-get install -y libsmartcols-dev libclang-dev pkg-config
       - uses: Swatinem/rust-cache@v2
       - name: cargo test (uutils util-linux fork at the pinned commit)
         continue-on-error: true

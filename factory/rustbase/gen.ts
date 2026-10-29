@@ -97,7 +97,7 @@ arch=(x86_64 aarch64)
 url="https://github.com/uutils/coreutils"
 license=(MIT Apache-2.0)
 depends=(glibc gcc-libs)
-makedepends=(cargo git make)
+makedepends=(cargo git make clang)
 # GNU versions are the Arch core versions observed on ${pins.observedAt}; uutils targets the matching GNU behaviour.
 provides=(coreutils=${gnuVer("coreutils")} findutils=${gnuVer("findutils")} diffutils=${gnuVer("diffutils")} uutils-coreutils=${C.coreutils.version})
 conflicts=(coreutils findutils diffutils uutils-coreutils uutils-findutils uutils-diffutils)
