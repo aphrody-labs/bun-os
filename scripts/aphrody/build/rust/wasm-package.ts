@@ -14,8 +14,9 @@
  * artifact still lands in the repository target directory.
  */
 import { $ } from "bun";
+import { build } from "../../../../packages/wasm/src/build.ts";
 import { existsSync, readFileSync } from "node:fs";
-import { mkdtemp, rename, rm } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
@@ -75,65 +76,25 @@ export function pinnedBindgenVersion(manifest: string, root: string): string | u
   return undefined;
 }
 
-/** Features wasm-opt may use: the set JavaScriptCore runs. Never --all-features. */
-const WASM_OPT_FEATURES = [
-  "--enable-bulk-memory",
-  "--enable-sign-ext",
-  "--enable-mutable-globals",
-  "--enable-nontrapping-float-to-int",
-];
-
-async function tool(command: string[]): Promise<void> {
-  const result = await $`${command}`.nothrow().quiet();
-  if (result.exitCode !== 0)
-    throw new Error(`${command[0]} failed (${result.exitCode}): ${result.stderr.toString() || result.text()}`);
-}
-
+/**
+ * Packs a cargo artifact with `@aphrody/wasm` (wasm-bindgen pinned by Cargo.lock and installed on
+ * demand, wasm-opt with the JavaScriptCore-safe features, validation, size ratchet, atomic swap).
+ */
 const bindgenPack: Packer = async options => {
-  const bindgen = Bun.which("wasm-bindgen");
-  if (!bindgen)
-    throw new Error("wasm-bindgen CLI not found: cargo install wasm-bindgen-cli --locked --version <Cargo.lock pin>");
-  const pinned = pinnedBindgenVersion(options.crate, repositoryRoot);
-  const version = (await $`${bindgen} --version`.quiet().text()).trim().split(/\s+/).at(-1);
-  if (pinned && version !== pinned)
-    throw new Error(`wasm-bindgen CLI ${version} differs from the Cargo.lock pin ${pinned}`);
-  // Build beside the output and swap in only a validated package, so a failure keeps the last usable one.
-  const staging = `${options.outdir}.partial-${crypto.randomUUID()}`;
-  try {
-    await tool([
-      bindgen,
-      "--target",
-      options.target,
-      "--out-dir",
-      staging,
-      "--out-name",
-      options.name,
-      options.artifact,
-    ]);
-    const wasm = join(staging, `${options.name}_bg.wasm`);
-    const rawBytes = Bun.file(wasm).size;
-    if (options.optimize) {
-      const wasmOpt = Bun.which("wasm-opt");
-      if (wasmOpt) await tool([wasmOpt, `-${options.optimize}`, ...WASM_OPT_FEATURES, "-o", wasm, wasm]);
-    }
-    const bytes = new Uint8Array(await Bun.file(wasm).arrayBuffer());
-    if (!WebAssembly.validate(bytes)) throw new Error(`${options.name}_bg.wasm is not a valid WebAssembly module`);
-    if (options.maxBytes !== undefined && bytes.length > options.maxBytes)
-      throw new Error(`${options.name}_bg.wasm is ${bytes.length} bytes, over the ${options.maxBytes} byte limit`);
-    const retired = `${options.outdir}.previous-${crypto.randomUUID()}`;
-    const hadPrevious = existsSync(options.outdir);
-    if (hadPrevious) await rename(options.outdir, retired);
-    try {
-      await rename(staging, options.outdir);
-    } catch (error) {
-      if (hadPrevious) await rename(retired, options.outdir);
-      throw error;
-    }
-    if (hadPrevious) await rm(retired, { recursive: true, force: true });
-    return { wasm: join(options.outdir, `${options.name}_bg.wasm`), bytes: bytes.length, rawBytes };
-  } finally {
-    await rm(staging, { recursive: true, force: true });
-  }
+  const built = await build({
+    crate: options.crate,
+    package: options.package,
+    artifact: options.artifact,
+    cargo: false,
+    outdir: options.outdir,
+    name: options.name,
+    target: options.target,
+    optimize: options.optimize,
+    maxBytes: options.maxBytes,
+    packageJson: false,
+    quiet: true,
+  });
+  return { wasm: built.wasm, bytes: built.bytes, rawBytes: built.rawBytes };
 };
 
 /**
