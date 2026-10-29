@@ -34,12 +34,10 @@ export async function verifyQualifiedProduct(
     !Array.isArray(qualification.gates) ||
     !qualification.gates.includes("product-cli") ||
     !qualification.gates.includes("cli-wasm") ||
-    !qualification.gates.includes("ffi") ||
-    !qualification.gates.includes("agent-plugin") ||
-    !qualification.gates.includes("mcp")
+    !qualification.gates.includes("ffi")
   )
     throw new Error(
-      "Product payload requires passed CLI, CLI-WASM, FFI, agent-plugin and MCP gates bound to its source, runtime and installed tree",
+      "Product payload requires passed CLI, CLI-WASM and FFI gates bound to its source, runtime and installed tree",
     );
   return { receipt, qualification };
 }

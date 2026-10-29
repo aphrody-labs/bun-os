@@ -201,7 +201,6 @@
     "format": "bun src/cli.ts format",
     "format:check": "bun src/cli.ts format --check",
     "check": "bun src/cli.ts check",
-    "n2b": "bun src/cli.ts n2b",
     "doctor": "bun src/cli.ts doctor",
     "catalog": "bun src/cli.ts workspace list",
     "status": "bun src/cli.ts status",

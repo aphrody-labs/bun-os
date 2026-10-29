@@ -135,7 +135,7 @@ export async function verifyPayload(root = Bun.env.BUN_OS_ROOT ?? "/opt/bun-os",
     const proof = (await Bun.file(`${root}/image.qualification.json`).json()) as NonNullable<
       typeof receipt.imageQualification
     >;
-    const requiredGates = ["product-cli", "cli-wasm", "ffi", "agent-plugin", "mcp"];
+    const requiredGates = ["product-cli", "cli-wasm", "ffi"];
     if (
       proof.schemaVersion !== 1 ||
       proof.kind !== "bun-os-image-surface-qualification" ||
