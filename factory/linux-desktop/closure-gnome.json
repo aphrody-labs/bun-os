@@ -1,0 +1,4996 @@
+{
+  "schemaVersion": 1,
+  "kind": "linux-desktop-closure",
+  "id": "gnome",
+  "resolvedAt": "2026-10-29",
+  "release": {
+    "name": "GNOME",
+    "note": "stable branch; Arch core/extra carries the same tags"
+  },
+  "sources": [
+    {
+      "id": "glib",
+      "url": "https://gitlab.gnome.org/GNOME/glib.git",
+      "tag": "2.90.1",
+      "sha": "e05063ccc6c8f222465a1080927f4c14349f3de6",
+      "date": "2026-10-06T16:22:44.000+01:00",
+      "build": "meson",
+      "needs": [],
+      "options": [
+        "-Dtests=false",
+        "-Dman-pages=disabled",
+        "-Ddocumentation=false",
+        "-Dintrospection=disabled"
+      ],
+      "declared": [
+        "bash-completion >=2.0",
+        "gobject-introspection-1.0",
+        "gvdb",
+        "iconv",
+        "intl",
+        "libffi",
+        "libpcre2-8",
+        "libselinux >=2.2",
+        "mount",
+        "threads",
+        "zlib"
+      ]
+    },
+    {
+      "id": "gsettings-desktop-schemas",
+      "url": "https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas.git",
+      "tag": "51.0",
+      "sha": "1db238b6a349ea7fae6f1c0713afe04d1bb7ea5c",
+      "date": "2026-09-13T22:44:58.000+02:00",
+      "build": "meson",
+      "needs": [
+        "glib"
+      ],
+      "options": [
+        "-Dintrospection=false"
+      ],
+      "declared": [
+        "gsettings-desktop-schemas"
+      ],
+      "hostRun": [
+        "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)"
+      ]
+    },
+    {
+      "id": "gnome-desktop",
+      "url": "https://gitlab.gnome.org/GNOME/gnome-desktop.git",
+      "tag": "51.0",
+      "sha": "fd610b86a526a504a217c5532c47865273c95b10",
+      "date": "2026-09-14T15:55:46.000-04:00",
+      "build": "meson",
+      "needs": [
+        "glib",
+        "gsettings-desktop-schemas",
+        "gtk4"
+      ],
+      "options": [
+        "-Dgtk_doc=false",
+        "-Ddebug_tools=false",
+        "-Dintrospection=false"
+      ],
+      "declared": [
+        "fontconfig",
+        "gdk-pixbuf-2.0",
+        "gio-2.0",
+        "gio-unix-2.0",
+        "glib-2.0",
+        "gsettings-desktop-schemas",
+        "gtk+-3.0",
+        "gtk4",
+        "iso-codes",
+        "libseccomp",
+        "libsystemd",
+        "libudev",
+        "xkbregistry",
+        "xkeyboard-config"
+      ]
+    },
+    {
+      "id": "gtk4",
+      "url": "https://gitlab.gnome.org/GNOME/gtk.git",
+      "tag": "4.24.1",
+      "sha": "2ea935e3ec680fb122f245b28e18c3495df8c344",
+      "date": "2026-10-01T11:47:40.000-04:00",
+      "build": "meson",
+      "needs": [
+        "glib"
+      ],
+      "options": [
+        "-Dintrospection=disabled",
+        "-Dbuild-demos=false",
+        "-Dbuild-tests=false",
+        "-Dbuild-testsuite=false",
+        "-Dbuild-examples=false",
+        "-Dmedia-gstreamer=disabled",
+        "-Dvulkan=disabled",
+        "-Dman-pages=false",
+        "-Ddocumentation=false"
+      ],
+      "declared": [
+        "accesskit-c-0.18",
+        "bash-completion >=2.0",
+        "cairo",
+        "cairo-gobject",
+        "cairo-script-interpreter",
+        "cloudproviders",
+        "colord >= 0.1.9",
+        "cpdb-frontend",
+        "cups",
+        "cups3",
+        "epoxy",
+        "fontconfig",
+        "fribidi",
+        "gdk-pixbuf-2.0",
+        "gio-2.0",
+        "gio-unix-2.0",
+        "gio-windows-2.0",
+        "glib-2.0",
+        "gmodule-2.0",
+        "gobject-2.0",
+        "gobject-introspection-1.0",
+        "graphene-gobject-1.0",
+        "gstreamer-allocators-1.0",
+        "gstreamer-d3d12-1.0",
+        "gstreamer-gl-1.0",
+        "gstreamer-play-1.0",
+        "gtk4",
+        "gtk4-unix-print",
+        "harfbuzz",
+        "harfbuzz-subset",
+        "iso-codes",
+        "libdrm",
+        "libjpeg",
+        "libpng",
+        "libtiff-4",
+        "pango",
+        "pangocairo",
+        "pangoft2",
+        "pangowin32",
+        "sysprof-capture-4",
+        "tracker-sparql-3.0",
+        "vulkan",
+        "wayland-client",
+        "wayland-egl",
+        "wayland-protocols",
+        "x11",
+        "xcursor",
+        "xdamage",
+        "xext",
+        "xfixes",
+        "xi",
+        "xinerama",
+        "xkbcommon",
+        "xrandr >= 1.2.99",
+        "xrandr >= 1.5",
+        "xrender"
+      ],
+      "hostRun": [
+        "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)"
+      ]
+    },
+    {
+      "id": "libadwaita",
+      "url": "https://gitlab.gnome.org/GNOME/libadwaita.git",
+      "tag": "1.10.0",
+      "sha": "c9ab118612eee92324143783c4641c98eaded3f0",
+      "date": "2026-09-14T15:34:42.000+04:00",
+      "build": "meson",
+      "needs": [
+        "glib",
+        "gtk4"
+      ],
+      "options": [
+        "-Dtests=false",
+        "-Dexamples=false",
+        "-Dintrospection=disabled",
+        "-Dvapi=false",
+        "-Ddocumentation=false"
+      ],
+      "declared": [
+        "appleframeworks",
+        "fribidi",
+        "gio-2.0",
+        "glib-2.0",
+        "gtk4",
+        "gtk4-win32",
+        "ministream"
+      ],
+      "hostRun": [
+        "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)"
+      ]
+    },
+    {
+      "id": "gjs",
+      "url": "https://gitlab.gnome.org/GNOME/gjs.git",
+      "tag": "1.90.1",
+      "sha": "b755c24b9b0580623d4ed82013dbbfcb0ae37499",
+      "date": "2026-10-11T17:01:17.000-07:00",
+      "build": "meson",
+      "needs": [
+        "glib",
+        "gtk4"
+      ],
+      "options": [
+        "-Dskip_dbus_tests=true",
+        "-Dskip_gtk_tests=true",
+        "-Dinstalled_tests=false"
+      ],
+      "declared": [
+        "cairo",
+        "cairo-gobject",
+        "cairo-xlib",
+        "gio-2.0",
+        "gio-unix-2.0",
+        "girepository-2.0",
+        "glib-2.0",
+        "gobject-2.0",
+        "gthread-2.0",
+        "gtk+-3.0",
+        "gtk4",
+        "libffi",
+        "mozjs-140",
+        "sysprof-capture-4"
+      ],
+      "hostRun": [
+        "g-ir-scanner links and runs target binaries: needs an exe_wrapper (qemu-user) or a native Linux host",
+        "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)",
+        "mozjs-140 (SpiderMonkey) comes from the sysroot (Arch mozjs140); building it from source needs a host JS shell and Rust"
+      ]
+    },
+    {
+      "id": "mutter",
+      "url": "https://gitlab.gnome.org/GNOME/mutter.git",
+      "tag": "51.1",
+      "sha": "9134e3a5869ce232bf95b77519005865747ba603",
+      "date": "2026-10-12T20:12:35.000+02:00",
+      "build": "meson",
+      "needs": [
+        "glib",
+        "gtk4",
+        "libadwaita",
+        "gnome-desktop",
+        "gsettings-desktop-schemas",
+        "gnome-settings-daemon"
+      ],
+      "options": [
+        "-Dtests=disabled",
+        "-Dintrospection=false",
+        "-Ddocs=false",
+        "-Dprofiler=false",
+        "-Dinstalled_tests=false"
+      ],
+      "declared": [
+        "atk",
+        "cairo",
+        "colord",
+        "egl",
+        "fribidi",
+        "gbm",
+        "gio-unix-2.0",
+        "gl",
+        "glesv2",
+        "glib-2.0",
+        "gmodule-no-export-2.0",
+        "gnome-desktop-4",
+        "gnome-settings-daemon",
+        "gobject-2.0",
+        "gobject-introspection-1.0",
+        "graphene-gobject-1.0",
+        "gsettings-desktop-schemas",
+        "gtk+-3.0",
+        "gtk4",
+        "gudev-1.0",
+        "gvdb",
+        "harfbuzz",
+        "lcms2",
+        "libadwaita-1",
+        "libcanberra",
+        "libdisplay-info",
+        "libdrm",
+        "libei-1.0",
+        "libeis-1.0",
+        "libelogind",
+        "libevdev",
+        "libinput",
+        "libpipewire-0.3",
+        "libstartup-notification-1.0",
+        "libsystemd",
+        "libudev",
+        "libwacom",
+        "pango",
+        "pangocairo",
+        "pixman-1",
+        "sysprof-6",
+        "sysprof-capture-4",
+        "udev",
+        "umockdev-1.0",
+        "wayland-client",
+        "wayland-cursor",
+        "wayland-egl",
+        "wayland-protocols",
+        "wayland-server",
+        "x11",
+        "x11-xcb",
+        "xau",
+        "xcb-res",
+        "xcomposite",
+        "xcursor",
+        "xdamage",
+        "xext",
+        "xfixes",
+        "xi",
+        "xinerama",
+        "xkbcommon",
+        "xkbregistry",
+        "xkeyboard-config-2",
+        "xrandr",
+        "xwayland"
+      ],
+      "hostRun": [
+        "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)",
+        "wayland-scanner (host tool) generates protocol glue; without introspection no target code runs"
+      ]
+    },
+    {
+      "id": "gnome-settings-daemon",
+      "url": "https://gitlab.gnome.org/GNOME/gnome-settings-daemon.git",
+      "tag": "51.1",
+      "sha": "4a75955f7481e2bb19fa73fa67456e83d67e8563",
+      "date": "2026-10-14T13:24:39.000+02:00",
+      "build": "meson",
+      "needs": [
+        "glib",
+        "gtk4",
+        "gnome-desktop",
+        "gsettings-desktop-schemas"
+      ],
+      "options": [],
+      "declared": [
+        "colord >= 1.4.5",
+        "cups",
+        "gck-1 >= 3.36",
+        "gck-2",
+        "gcr-4 >= 3.90.0",
+        "gcr-base-3 >= 3.7.5",
+        "geocode-glib-1.0 >= 3.10.0",
+        "geocode-glib-2.0 >= 3.26.3",
+        "gio-2.0 >= 2.53.0",
+        "gio-unix-2.0",
+        "glib-2.0 >=",
+        "gnome-desktop-4",
+        "gsettings-desktop-schemas >= 46.beta",
+        "gudev-1.0",
+        "gweather4",
+        "libcanberra",
+        "libelogind >= 209",
+        "libgeoclue-2.0 >= 2.3.1",
+        "libnm >= 1.0",
+        "libnotify >= 0.8.7",
+        "libpulse-mainloop-glib >= 2.0",
+        "libsystemd >= 243",
+        "mm-glib >= 1.18",
+        "polkit-gobject-1 >= 0.114",
+        "systemd >= 243",
+        "udev",
+        "upower-glib >= 0.99.12",
+        "x11",
+        "xfixes >= 6.0"
+      ],
+      "hostRun": [
+        "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)"
+      ]
+    },
+    {
+      "id": "gnome-shell",
+      "url": "https://gitlab.gnome.org/GNOME/gnome-shell.git",
+      "tag": "51.1",
+      "sha": "33da06854e229c256afd5872fedd83c28cbfa176",
+      "date": "2026-10-14T13:10:58.000+02:00",
+      "build": "meson",
+      "needs": [
+        "glib",
+        "gtk4",
+        "gjs",
+        "mutter",
+        "gnome-desktop",
+        "gsettings-desktop-schemas"
+      ],
+      "options": [
+        "-Dtests=false",
+        "-Dgtk_doc=false",
+        "-Dman=false"
+      ],
+      "declared": [
+        "atk-bridge-2.0",
+        "cairo",
+        "gcr-4",
+        "gdk-pixbuf-2.0",
+        "gio-2.0",
+        "gio-unix-2.0",
+        "girepository-2.0",
+        "gjs-1.0",
+        "glycin-2",
+        "gnome-desktop-4",
+        "gnome-keybindings",
+        "gsettings-desktop-schemas",
+        "gtk4",
+        "json-glib-1.0",
+        "libecal-2.0",
+        "libedataserver-1.2",
+        "libelogind",
+        "libnm",
+        "libpipewire-0.3",
+        "librsvg-2.0",
+        "libsecret-1",
+        "libshew",
+        "libsystemd",
+        "libxml-2.0",
+        "pango",
+        "polkit-agent-1",
+        "systemd",
+        "x11",
+        "xext",
+        "xfixes"
+      ],
+      "hostRun": [
+        "g-ir-scanner links and runs target binaries: needs an exe_wrapper (qemu-user) or a native Linux host",
+        "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)",
+        "gnome-shell-extension-tool and the bundled gvc/st build run no target code after introspection is generated"
+      ]
+    },
+    {
+      "id": "gnome-session",
+      "url": "https://gitlab.gnome.org/GNOME/gnome-session.git",
+      "tag": "51.0",
+      "sha": "aed00cf18229a98231c23e14f5798ddb918c4956",
+      "date": "2026-09-14T19:52:26.000-04:00",
+      "build": "meson",
+      "needs": [
+        "glib",
+        "gtk4"
+      ],
+      "options": [
+        "-Ddocbook=false",
+        "-Dman=false"
+      ],
+      "declared": [
+        "gio-2.0",
+        "gio-unix-2.0",
+        "glib-2.0",
+        "gnome-desktop-4",
+        "libsystemd >= 209",
+        "systemd >= 242"
+      ]
+    },
+    {
+      "id": "gnome-control-center",
+      "url": "https://gitlab.gnome.org/GNOME/gnome-control-center.git",
+      "tag": "51.1",
+      "sha": "348dd99d9f3a51a39fe9c60c967a6aabaeb34813",
+      "date": "2026-10-12T12:00:43.000+02:00",
+      "build": "meson",
+      "needs": [
+        "glib",
+        "gtk4",
+        "libadwaita",
+        "gnome-desktop",
+        "gsettings-desktop-schemas",
+        "gnome-settings-daemon"
+      ],
+      "options": [
+        "-Ddocumentation=false",
+        "-Dtests=false"
+      ],
+      "declared": [
+        "accountsservice >= 26.27.3",
+        "colord >= 0.1.34",
+        "cups",
+        "epoxy",
+        "gcr-4 >= 4.1.0",
+        "gdk-pixbuf-2.0 >= 2.23.0",
+        "gio-2.0",
+        "gio-unix-2.0",
+        "glib-2.0 >= 2.76.6",
+        "gmobile >= 0.6.0",
+        "gnome-bg-4",
+        "gnome-bluetooth-ui-3.0",
+        "gnome-desktop-4 >= 51.alpha",
+        "gnome-qr-gtk-4",
+        "gnome-settings-daemon >= 48.rc",
+        "goa-1.0",
+        "gsettings-desktop-schemas >= 51.beta",
+        "gthread-2.0",
+        "gtk4",
+        "gtk4-wayland",
+        "gudev-1.0 >= 232",
+        "ibus-1.0 >= 1.5.2",
+        "json-glib-1.0",
+        "libadwaita-1",
+        "libnm >= 1.52.0",
+        "libnma-gtk4 >= 1.10.2",
+        "libpulse",
+        "libpulse-mainloop-glib",
+        "libsoup-3.0",
+        "libwacom >= 1.4",
+        "libxml-2.0",
+        "malcontent-0",
+        "mm-glib >= 0.7",
+        "polkit-gobject-1 >= 0.103",
+        "pwquality >= 1.2.2",
+        "tecla >=47.0",
+        "upower-glib >= 1.90.6"
+      ],
+      "hostRun": [
+        "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)"
+      ]
+    }
+  ],
+  "sysrootRoots": [
+    "gnome-shell",
+    "mutter",
+    "gtk4",
+    "libadwaita",
+    "gjs",
+    "gnome-session",
+    "gnome-settings-daemon",
+    "gnome-control-center",
+    "gnome-desktop-4",
+    "gsettings-desktop-schemas",
+    "glib2"
+  ],
+  "sysrootExclude": [
+    "meson",
+    "ninja",
+    "cmake",
+    "git",
+    "pkgconf",
+    "pkg-config",
+    "python",
+    "python-docutils",
+    "python-sphinx",
+    "python-gobject",
+    "python-cairo",
+    "asciidoc",
+    "gi-docgen",
+    "sassc",
+    "gtk-doc",
+    "doxygen",
+    "docbook-xsl",
+    "docbook-xml",
+    "xorg-server-xvfb",
+    "xorg-server",
+    "weston",
+    "gdb",
+    "valgrind",
+    "clang",
+    "llvm",
+    "gcc-fortran",
+    "nodejs",
+    "npm",
+    "rust",
+    "cargo",
+    "bash-completion",
+    "shellcheck",
+    "yelp-tools",
+    "itstool",
+    "intltool",
+    "kdoctools",
+    "graphviz",
+    "qt6-doc",
+    "umockdev",
+    "python-dbusmock",
+    "libxslt"
+  ],
+  "sysroot": {
+    "packages": [
+      {
+        "name": "aalib",
+        "version": "1.4rc5-19",
+        "repo": "extra",
+        "sha256": "d1000be98fdbb30d96a1d77fd6cb2b666c2c6cca780c600cf12dfd42caf5f71d",
+        "csize": 138109,
+        "isize": 291082
+      },
+      {
+        "name": "abseil-cpp",
+        "version": "20260817.0-2",
+        "repo": "extra",
+        "sha256": "4ecd2e4e2cf7096edfad8522df68d0d9adbe41ce7a6689c1915905342ae6a016",
+        "csize": 1414389,
+        "isize": 7497607
+      },
+      {
+        "name": "accountsservice",
+        "version": "26.27.3-1",
+        "repo": "extra",
+        "sha256": "d3af0478419f59cf771f516cd6265e1e9f7a4e8d3e9cede1d0e6f7173835dab1",
+        "csize": 173172,
+        "isize": 991953
+      },
+      {
+        "name": "acl",
+        "version": "2.4.0-1",
+        "repo": "core",
+        "sha256": "dca9ec50cf51243b86a67367a55e78b1851d31240b1edaf9c011f8511765d999",
+        "csize": 150821,
+        "isize": 353496
+      },
+      {
+        "name": "adwaita-cursors",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "7eba104ea1a7a04e3058bf5fc8108ec37bbd38b4966bc36722b23bfaff2e5af4",
+        "csize": 368330,
+        "isize": 11963936
+      },
+      {
+        "name": "adwaita-fonts",
+        "version": "51.0-2",
+        "repo": "extra",
+        "sha256": "f27dd3b4700ef61bed117a6106013b7181ee9348ba038784ccfe5091ef172e4d",
+        "csize": 2276345,
+        "isize": 7627210
+      },
+      {
+        "name": "adwaita-icon-theme",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "e64aba66149a0aced7a44f08e15c1e74ceeb18a6c7f86fbede88edccab57e685",
+        "csize": 202148,
+        "isize": 964678
+      },
+      {
+        "name": "adwaita-icon-theme-legacy",
+        "version": "46.2-3",
+        "repo": "extra",
+        "sha256": "c14690d14e1d8a67e6b5570a2b28a2da6de4ebeb592a629b2a70e41411bafc5a",
+        "csize": 2275676,
+        "isize": 2339026
+      },
+      {
+        "name": "alsa-card-profiles",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "043678ed42f435844f6669c8dcd8ff71bdfeb16526af6b748746ce8825671741",
+        "csize": 28965,
+        "isize": 203568
+      },
+      {
+        "name": "alsa-lib",
+        "version": "1.2.16.1-1",
+        "repo": "extra",
+        "sha256": "2d2f2b3966cebd6ec75abbbdb4709a1093849207ada6624cdfe36f38d0f5c811",
+        "csize": 540042,
+        "isize": 1839539
+      },
+      {
+        "name": "alsa-topology-conf",
+        "version": "1.2.5.1-4",
+        "repo": "extra",
+        "sha256": "a76b237e24973099b3cee9d3c89f4f8b46d9133411f0992bd46a5131e4427a0c",
+        "csize": 13830,
+        "isize": 343788
+      },
+      {
+        "name": "alsa-ucm-conf",
+        "version": "1.2.16.1-1",
+        "repo": "extra",
+        "sha256": "73e3a6cf819dfcedf884616c18d2206dea77e98311717dca8135256fabe55fbc",
+        "csize": 134369,
+        "isize": 709032
+      },
+      {
+        "name": "aom",
+        "version": "3.15.2-1",
+        "repo": "extra",
+        "sha256": "3d3b023c981de96332a44eda677c8bf4ccb3b6cc27e9486b3c5bbf98f4522307",
+        "csize": 3112240,
+        "isize": 9957850
+      },
+      {
+        "name": "at-spi2-core",
+        "version": "2.62.1-1",
+        "repo": "extra",
+        "sha256": "2e77ea55a7c18cfeaf0092a48f3b873d67f84f208e593e4976a34e45f6b717e6",
+        "csize": 606627,
+        "isize": 4239153
+      },
+      {
+        "name": "attr",
+        "version": "2.6.0-1",
+        "repo": "core",
+        "sha256": "0db32b421f67000950f7b55b531291ce8c13985c5444425b22dce94d485daed1",
+        "csize": 74207,
+        "isize": 240294
+      },
+      {
+        "name": "audit",
+        "version": "4.2.1-1",
+        "repo": "core",
+        "sha256": "6b2f7e400336d05bf9a4b1b65015e4a7ac3a3842fbc67790913f9748513b964e",
+        "csize": 414714,
+        "isize": 1098162
+      },
+      {
+        "name": "avahi",
+        "version": "1:0.9rc5-2",
+        "repo": "extra",
+        "sha256": "be55af7cf20701e6e9786d15cc20b36e6764b5d062261cad7954db34e9dd9408",
+        "csize": 435520,
+        "isize": 1975366
+      },
+      {
+        "name": "bash",
+        "version": "5.3.20-1",
+        "repo": "core",
+        "sha256": "73a67dc509ed4a6dd64e4c7eca2895643f48083940f49431782ce78c4d4619e1",
+        "csize": 2001850,
+        "isize": 10055840
+      },
+      {
+        "name": "binutils",
+        "version": "2.47-4",
+        "repo": "core",
+        "sha256": "d9508ad848fd6c31473ac0925cf8c3ec0d2a71bbbb5c7e39274186338a285660",
+        "csize": 8594742,
+        "isize": 45888135
+      },
+      {
+        "name": "blueprint-compiler",
+        "version": "0.22.2-1",
+        "repo": "extra",
+        "sha256": "b833a28c82e1f3c8c8fee973e1427c348fcf5c501ddb56393cb6e7bcc86e6ba5",
+        "csize": 409799,
+        "isize": 2816249
+      },
+      {
+        "name": "bluez",
+        "version": "5.87-2",
+        "repo": "extra",
+        "sha256": "3125034ace76d4d6096b507b6a22888eafaf0e5019abc41a80a8207fbe9f7666",
+        "csize": 696024,
+        "isize": 1812713
+      },
+      {
+        "name": "bluez-libs",
+        "version": "5.87-2",
+        "repo": "extra",
+        "sha256": "8d7605dfc7383a5e662199c7f9e36ded67b3a361797d284f5935ca259ea22563",
+        "csize": 95069,
+        "isize": 324595
+      },
+      {
+        "name": "bluez-obex",
+        "version": "5.87-2",
+        "repo": "extra",
+        "sha256": "60af47718ac449d508a2adc78c25c61a0f0cd8eb7f2f8437b9c8ab1f994f8956",
+        "csize": 213749,
+        "isize": 609780
+      },
+      {
+        "name": "bolt",
+        "version": "0.9.11-3",
+        "repo": "extra",
+        "sha256": "39fa256a5ccb093d40bf41af68f037d43785af76df8601dbc85d1ef24222b726",
+        "csize": 160077,
+        "isize": 449256
+      },
+      {
+        "name": "brotli",
+        "version": "1.2.1-1",
+        "repo": "core",
+        "sha256": "dff80818057da76e93c90045f7d9eef0469c35caa03b153cae02ba47bd3c4db2",
+        "csize": 414192,
+        "isize": 1107045
+      },
+      {
+        "name": "bubblewrap",
+        "version": "0.13.1-1",
+        "repo": "extra",
+        "sha256": "f0efc4e02138b1b1f0719f37008da58b03213122d4881cfe949681fcbd72b36e",
+        "csize": 41315,
+        "isize": 99750
+      },
+      {
+        "name": "bzip2",
+        "version": "1.0.8-6",
+        "repo": "core",
+        "sha256": "8779003d659c441b952095c19907603a738c1366f25cc51be3fd139fa4e95748",
+        "csize": 59786,
+        "isize": 148479
+      },
+      {
+        "name": "ca-certificates",
+        "version": "20240618-1",
+        "repo": "core",
+        "sha256": "982005bd5ecc998c05f561b57bb58b4457407779727e3c3d59e926d34a8b0712",
+        "csize": 2135,
+        "isize": 0
+      },
+      {
+        "name": "ca-certificates-mozilla",
+        "version": "3.132-1",
+        "repo": "core",
+        "sha256": "d2305ed8c1426e018ad611cb6e7fa387c3cac0f2e7040401dae2f1f78e0867ab",
+        "csize": 388399,
+        "isize": 1059359
+      },
+      {
+        "name": "ca-certificates-utils",
+        "version": "20240618-1",
+        "repo": "core",
+        "sha256": "aabd5b2b7030716ccdd465d607e734e851fe4a01adf8293a3968fe22eb89ce9b",
+        "csize": 11071,
+        "isize": 13960
+      },
+      {
+        "name": "cairo",
+        "version": "1.18.6-1",
+        "repo": "extra",
+        "sha256": "0df806e0edf067d62b417c77d978a7577c4d6e11a724db3c12adea1a425666a1",
+        "csize": 712052,
+        "isize": 1858947
+      },
+      {
+        "name": "cifs-utils",
+        "version": "7.9-1",
+        "repo": "extra",
+        "sha256": "086befab80425b7d08a7029ae3b4dcb1c97d98d4f27d3e090ab403a9e999c26e",
+        "csize": 106842,
+        "isize": 309581
+      },
+      {
+        "name": "colord",
+        "version": "1.4.8-2",
+        "repo": "extra",
+        "sha256": "383373868edc94b47c59386577e39be1ea156156047471ddfdc7b6725700183e",
+        "csize": 1771600,
+        "isize": 5361254
+      },
+      {
+        "name": "colord-gtk-common",
+        "version": "0.3.1-1",
+        "repo": "extra",
+        "sha256": "6faa5c34c7c3fee8fd749840b7348caf4f8bb6b32a16a86c828419f05346296f",
+        "csize": 27230,
+        "isize": 121962
+      },
+      {
+        "name": "colord-gtk4",
+        "version": "0.3.1-1",
+        "repo": "extra",
+        "sha256": "77d7ceb295654e44bd7410146c13c310cd55cf18be6d1014f20597115bc464da",
+        "csize": 11700,
+        "isize": 30915
+      },
+      {
+        "name": "coreutils",
+        "version": "9.12-2",
+        "repo": "core",
+        "sha256": "9196947f860144b5bf4dbe5079e8a1d38ea3080fdb83cae96294d1e83681c6eb",
+        "csize": 3075958,
+        "isize": 18513954
+      },
+      {
+        "name": "cracklib",
+        "version": "2.10.3-1",
+        "repo": "core",
+        "sha256": "443746c71feea1357ffb3cae3b1d7dc76ca214d7f0ea45064c280da1002bb35f",
+        "csize": 283854,
+        "isize": 955225
+      },
+      {
+        "name": "cryptsetup",
+        "version": "2.8.8-1",
+        "repo": "core",
+        "sha256": "322f0e79a7d659d5e645e96cad3d30966f7dd5476f984f96b50a4f4cea274640",
+        "csize": 886302,
+        "isize": 3793370
+      },
+      {
+        "name": "cups-pk-helper",
+        "version": "0.2.7-2",
+        "repo": "extra",
+        "sha256": "a9a0c5d1eece5acb14160e73463cc4c7b89d47f811b5b585f941fb51eb4735d7",
+        "csize": 62026,
+        "isize": 353485
+      },
+      {
+        "name": "curl",
+        "version": "8.23.0-1",
+        "repo": "core",
+        "sha256": "ed3e4e252073137ee6b1267f3476a13680ff6b3dbdc7ddc6a8d1497fa60cd6d0",
+        "csize": 1372375,
+        "isize": 2377050
+      },
+      {
+        "name": "dav1d",
+        "version": "1.5.4-1",
+        "repo": "extra",
+        "sha256": "cf991c63dc289cbe61f7f5d0fd395be2dd75ebda2bd2a4e886b2cd11b8f2795d",
+        "csize": 688949,
+        "isize": 1938500
+      },
+      {
+        "name": "db5.3",
+        "version": "5.3.28-7",
+        "repo": "core",
+        "sha256": "abac3474e766fa8a36fcae945f5e8c8e818665fc41a56daff92db81cd176d389",
+        "csize": 1320537,
+        "isize": 6792639
+      },
+      {
+        "name": "dbus",
+        "version": "1.16.2-2",
+        "repo": "core",
+        "sha256": "773bfb7020491b5f44e4cba11d096ac570b9b1e81c6cb1e437a5e7a68b68f974",
+        "csize": 368744,
+        "isize": 1059306
+      },
+      {
+        "name": "dbus-broker",
+        "version": "37-3",
+        "repo": "core",
+        "sha256": "c3a915bb57188e6a43b9df25c0bf11f87528bc20ac50718b1772ce917c6d6117",
+        "csize": 150097,
+        "isize": 366227
+      },
+      {
+        "name": "dbus-broker-units",
+        "version": "37-3",
+        "repo": "core",
+        "sha256": "f3f73e7c8169f54e3e5447d266917ae7454bd984fc0ede0f85e2ca60e21d97df",
+        "csize": 2542,
+        "isize": 0
+      },
+      {
+        "name": "dbus-units",
+        "version": "37-3",
+        "repo": "core",
+        "sha256": "b3c4dee19391724893993ed993522846368bb38257daae4182de980255a995cc",
+        "csize": 2296,
+        "isize": 0
+      },
+      {
+        "name": "dconf",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "ec49323f17349376e57b9b51dc0fe817fb5a61ee217480780f406b7fa573b667",
+        "csize": 114086,
+        "isize": 481506
+      },
+      {
+        "name": "default-cursors",
+        "version": "3-1",
+        "repo": "extra",
+        "sha256": "ae52028372c3b2f66547baab41f1614b25472489d927b1a50b596bb8df7c056e",
+        "csize": 2372,
+        "isize": 30
+      },
+      {
+        "name": "desktop-file-utils",
+        "version": "0.28-1",
+        "repo": "extra",
+        "sha256": "cc525a69b6901318f360fae249986e62f233c0320c61274f2bad44449e0c8e44",
+        "csize": 43566,
+        "isize": 184991
+      },
+      {
+        "name": "device-mapper",
+        "version": "2.03.43-2",
+        "repo": "core",
+        "sha256": "86442d403ae86d358aa070ee3243908bbb91bf5a4c3838a80b10b13ddeb0c14c",
+        "csize": 322472,
+        "isize": 863178
+      },
+      {
+        "name": "duktape",
+        "version": "2.7.0-7",
+        "repo": "extra",
+        "sha256": "92452979e8cc6f34558ee4d9c3f34f8b7e0d7a8ebff94296b68c7926f00895cd",
+        "csize": 180479,
+        "isize": 822248
+      },
+      {
+        "name": "e2fsprogs",
+        "version": "1.47.4-1",
+        "repo": "core",
+        "sha256": "a78971bbbe0ae89d15a0cbbc952e64462edc5a6f991c1bb9cefd0539ca548bd4",
+        "csize": 1296838,
+        "isize": 5541430
+      },
+      {
+        "name": "egl-wayland",
+        "version": "4:1.1.24-1",
+        "repo": "extra",
+        "sha256": "9d5b5afd7d6563c15903ea69f42dba989c46d2c16343c7990f022b3be9d6b046",
+        "csize": 40309,
+        "isize": 103983
+      },
+      {
+        "name": "eglexternalplatform",
+        "version": "1.2.1-1",
+        "repo": "extra",
+        "sha256": "70dc6d52f6941b37b859eda84bbf3664dde531803a97a5c84c739283aeb64b8f",
+        "csize": 7665,
+        "isize": 18303
+      },
+      {
+        "name": "enchant",
+        "version": "2.8.21-1",
+        "repo": "extra",
+        "sha256": "019efd404da395c3d0c4e8a1aa15ced72d340b1b9f18900a538e13d8f917c75e",
+        "csize": 89450,
+        "isize": 333155
+      },
+      {
+        "name": "evolution-data-server",
+        "version": "3.62.1-1",
+        "repo": "extra",
+        "sha256": "d0fa84fd5d358a30c543e34e503fd4c145050d5c60138f512f2cc3ae7e43e919",
+        "csize": 4532555,
+        "isize": 29567212
+      },
+      {
+        "name": "exempi",
+        "version": "2.6.6-3",
+        "repo": "extra",
+        "sha256": "934db44cb710c52b2784e510c5f0b8432ff8cff401b411831194c690967d9f89",
+        "csize": 562881,
+        "isize": 1473394
+      },
+      {
+        "name": "exiv2",
+        "version": "0.28.9-1",
+        "repo": "extra",
+        "sha256": "1c6886993b68be782d472d0a5859a9a77a645f59ad932c8f9ba79579d17049d1",
+        "csize": 3033635,
+        "isize": 16392410
+      },
+      {
+        "name": "expat",
+        "version": "2.9.0-1",
+        "repo": "core",
+        "sha256": "20f81870a8d28c7bbdf10639dc0cac28ebe0425cc6526882c2cd97f972c38143",
+        "csize": 136637,
+        "isize": 551447
+      },
+      {
+        "name": "ffmpeg",
+        "version": "2:9.0.2-2",
+        "repo": "extra",
+        "sha256": "91b8d558885d655999c5b2430e8b70a1f55a04d50fb3729ed03b4fcb6478ebe2",
+        "csize": 15894388,
+        "isize": 50800266
+      },
+      {
+        "name": "fftw",
+        "version": "3.3.11-1",
+        "repo": "extra",
+        "sha256": "4548ce6c2b143c2118adc2a24d37782eadf3215df7f499b57289fae536957a44",
+        "csize": 2799340,
+        "isize": 9253687
+      },
+      {
+        "name": "file",
+        "version": "5.48-1",
+        "repo": "core",
+        "sha256": "b77fe84e1dda2f32fcd11a004347c0a0c6bb9806376533c78abd78b4ea779af2",
+        "csize": 463924,
+        "isize": 11041442
+      },
+      {
+        "name": "filesystem",
+        "version": "2025.10.12-1",
+        "repo": "core",
+        "sha256": "6b6c3fee7432204840d3b6afc9bc1a68c28f591a47fb220071715c40cca956df",
+        "csize": 15479,
+        "isize": 24551
+      },
+      {
+        "name": "findutils",
+        "version": "4.11.0-1",
+        "repo": "core",
+        "sha256": "76ac56a7f03039d163306701e5c02777b9b7170ad5388e66e46c363dd2792edf",
+        "csize": 539114,
+        "isize": 1965172
+      },
+      {
+        "name": "flac",
+        "version": "1.5.0-1",
+        "repo": "extra",
+        "sha256": "7c8dce6bde402b9d243fd240847722a57b94df1dbf53e0cabc9119219dd04735",
+        "csize": 343225,
+        "isize": 1195836
+      },
+      {
+        "name": "fontconfig",
+        "version": "2:2.18.3-2",
+        "repo": "extra",
+        "sha256": "c3d961568e10d0bc035b52554333535d31853310b9b7936eedf5d026425d3adf",
+        "csize": 419159,
+        "isize": 1399269
+      },
+      {
+        "name": "freeglut",
+        "version": "3.8.0-1",
+        "repo": "extra",
+        "sha256": "654537d5b3652fb115b018fcb971074929cf9e5101279c3e16bfd296052334ee",
+        "csize": 189103,
+        "isize": 433721
+      },
+      {
+        "name": "freetype2",
+        "version": "2.15.0-1",
+        "repo": "extra",
+        "sha256": "51ac42a702634f0fd8eb78a6c6110e1abb33c4f6045b432f46a915afdd370cc5",
+        "csize": 593190,
+        "isize": 1825748
+      },
+      {
+        "name": "fribidi",
+        "version": "1.0.17-1",
+        "repo": "extra",
+        "sha256": "7e033aa73bb62ee3782d4d4943cafbf455f077c0ab60442c2b36add53c3588d5",
+        "csize": 76358,
+        "isize": 269691
+      },
+      {
+        "name": "fuse-common",
+        "version": "3.18.3-1",
+        "repo": "extra",
+        "sha256": "6948976906ea830ab210401402ab849e8b5211dd34952e82a92e28a9db3a7389",
+        "csize": 2837,
+        "isize": 725
+      },
+      {
+        "name": "fuse3",
+        "version": "3.18.3-1",
+        "repo": "extra",
+        "sha256": "7171289bad5b88b01b2a2737ecc2a4b0a334a2fc045b6d74c9af57aa863c9547",
+        "csize": 146742,
+        "isize": 585136
+      },
+      {
+        "name": "gcc",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "1d79371ccf3138e3c172dd83b51560687b65ab824c1ad7e9cb41b7857ed9c55f",
+        "csize": 60743018,
+        "isize": 231619683
+      },
+      {
+        "name": "gcc-ada",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "8ccd8dcd0c6bc77b1092b3f0ad506f6b9cb86c103cbd3d997b1a6b539c117e9e",
+        "csize": 33788611,
+        "isize": 172810662
+      },
+      {
+        "name": "gcc-d",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "3a26a83a117193a99daad73e009cbba08ad5b6b6b59454a1166245d3f19832f6",
+        "csize": 23470448,
+        "isize": 131930942
+      },
+      {
+        "name": "gcc-libs",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "dbeca7c4844e3112de98ba95f7c2b2618f4dd2b9c693c34076b7ba51ddf4611e",
+        "csize": 2730,
+        "isize": 0
+      },
+      {
+        "name": "gcr-4",
+        "version": "4.4.1-1",
+        "repo": "extra",
+        "sha256": "95097d48773a225fc4f5b14972df0e49a266c977c62ffa6e478fe2a7251dd5e9",
+        "csize": 575069,
+        "isize": 3202422
+      },
+      {
+        "name": "gd",
+        "version": "2.3.3-9",
+        "repo": "extra",
+        "sha256": "8f3677fbb4c6986f2a8fa3c7b9082d8cac194787ecb0b3b9429e67165324fb21",
+        "csize": 154777,
+        "isize": 669598
+      },
+      {
+        "name": "gdbm",
+        "version": "1.26-2",
+        "repo": "core",
+        "sha256": "7bb8768fc7f617c580ae4c7902aed5413984a8374915da42beeecbb085c2a29e",
+        "csize": 260430,
+        "isize": 752748
+      },
+      {
+        "name": "gdk-pixbuf2",
+        "version": "2.44.8-1",
+        "repo": "extra",
+        "sha256": "48de0aa8c384d6cc4092851c462bbf17cb3275967f112f7b31e19443ff86b78f",
+        "csize": 509116,
+        "isize": 3153954
+      },
+      {
+        "name": "geoclue",
+        "version": "2.8.2-2",
+        "repo": "extra",
+        "sha256": "740436587c28c8deaccd116e3e07319a62931b63fd2c9d23d03709bba94d30e5",
+        "csize": 222556,
+        "isize": 1498281
+      },
+      {
+        "name": "geocode-glib",
+        "version": "3.26.4-6",
+        "repo": "extra",
+        "sha256": "999ee47327f610ea80776af492ea589eb75b1ca444f8c806b818ef2c7163f44f",
+        "csize": 70420,
+        "isize": 457245
+      },
+      {
+        "name": "gettext",
+        "version": "1.0-2",
+        "repo": "core",
+        "sha256": "bf1bd9d2f096f1446a645a89a26663371ab6ef78a8ed4b1c3f006b60569a2e28",
+        "csize": 3355456,
+        "isize": 21804039
+      },
+      {
+        "name": "gexiv2",
+        "version": "0.16.2-2",
+        "repo": "extra",
+        "sha256": "4cbb5a08bca8cc3b436da947d7a97eebf0f5ad8781f81c7a772ccf21475201b6",
+        "csize": 101474,
+        "isize": 551296
+      },
+      {
+        "name": "gexiv2-common",
+        "version": "0.16.2-2",
+        "repo": "extra",
+        "sha256": "8824611dad8479fad7c3f64b348bd22da550b7a4db10f0e0d7b093d1af2b78e0",
+        "csize": 7050,
+        "isize": 14126
+      },
+      {
+        "name": "giflib",
+        "version": "6.1.3-2",
+        "repo": "extra",
+        "sha256": "88c0509823519642af0a3418db529dc3e8130d1d204dc64c071c506fdc7e6ed7",
+        "csize": 103824,
+        "isize": 353525
+      },
+      {
+        "name": "gjs",
+        "version": "2:1.90.1-1",
+        "repo": "extra",
+        "sha256": "2b73150035a46ab337904b2486d66fe5ba18a8c6bcb1ce06a5f1192ee26d1854",
+        "csize": 721384,
+        "isize": 2550840
+      },
+      {
+        "name": "glib-networking",
+        "version": "1:2.90.1-1",
+        "repo": "extra",
+        "sha256": "6b9452217bb4bdff19929b3fc9deb7aea3383cfe74cddd6d0a77becc2803caab",
+        "csize": 156027,
+        "isize": 747615
+      },
+      {
+        "name": "glib2",
+        "version": "2.90.1-1",
+        "repo": "core",
+        "sha256": "b7d930dae1b926dd8dfa9375183182ebc7a26689428fd109feaeace3aecf99a0",
+        "csize": 5369371,
+        "isize": 40259808
+      },
+      {
+        "name": "glib2-devel",
+        "version": "2.90.1-1",
+        "repo": "core",
+        "sha256": "229d4f834e57cbe94b33bc838f6aed209ec873d5e7d9f3c0a9cc9594f96f79c8",
+        "csize": 167692,
+        "isize": 1288559
+      },
+      {
+        "name": "glibc",
+        "version": "2.44+r50+g1848099f063e-1",
+        "repo": "core",
+        "sha256": "e8e4d50d45cb2bd21c9f7eabacc6a01bd5eb93dbd476f3f44d44038fc1eba417",
+        "csize": 10879104,
+        "isize": 53124323
+      },
+      {
+        "name": "glslang",
+        "version": "1:1.4.363.0-1",
+        "repo": "extra",
+        "sha256": "df5cf8841b77c60aece3468fef856db8dcb7515ae3f3654343acdca55a0ae5cf",
+        "csize": 2727204,
+        "isize": 14659069
+      },
+      {
+        "name": "glu",
+        "version": "9.0.3-3",
+        "repo": "extra",
+        "sha256": "a981608b5a1c7d6cdee0e71385035dc45ada61dc1221429adde16909e17222e6",
+        "csize": 160043,
+        "isize": 384036
+      },
+      {
+        "name": "glycin",
+        "version": "2.2.5-1",
+        "repo": "extra",
+        "sha256": "8cab3204e446fb75621e80f333e0f8d80b6fb462e2f7f739ff317abe7e6a524e",
+        "csize": 4261913,
+        "isize": 20035222
+      },
+      {
+        "name": "glycin-gtk4",
+        "version": "2.2.5-1",
+        "repo": "extra",
+        "sha256": "31f3002b2358960c2370bea05cb033021993fbb40aa94c4867ac278aba1d0967",
+        "csize": 132778,
+        "isize": 278087
+      },
+      {
+        "name": "gmp",
+        "version": "6.3.0-3",
+        "repo": "core",
+        "sha256": "2969061e117d2a8c19d89427b0b88e1c956a6269bc0602087d41aecd15097064",
+        "csize": 453294,
+        "isize": 1061616
+      },
+      {
+        "name": "gnome-autoar",
+        "version": "0.5.2-1",
+        "repo": "extra",
+        "sha256": "07d9a46600ef9adb00206971c1c5a778cf4fe6173288e6ed0fd0b2eea4376d35",
+        "csize": 45236,
+        "isize": 223302
+      },
+      {
+        "name": "gnome-bluetooth-3.0",
+        "version": "47.2-1",
+        "repo": "extra",
+        "sha256": "be2664e29a0e0c97d58fe4bc0dfcf1a44da008c84cf691246897fe48b85eef2a",
+        "csize": 269560,
+        "isize": 1204140
+      },
+      {
+        "name": "gnome-color-manager",
+        "version": "3.36.2-2",
+        "repo": "extra",
+        "sha256": "b608e049c0bcad0423097496d353490616003d8f0333220a003e8d2ca46a5a22",
+        "csize": 1077496,
+        "isize": 3216539
+      },
+      {
+        "name": "gnome-control-center",
+        "version": "51.1-1",
+        "repo": "extra",
+        "sha256": "c5b919a0c02d601617e970c9095ef5f7239bb49d7fe8a9448d1521a1ea005f61",
+        "csize": 5956677,
+        "isize": 24945748
+      },
+      {
+        "name": "gnome-desktop-4",
+        "version": "1:51.0-1",
+        "repo": "extra",
+        "sha256": "43feb36157d574f94a71a77d4909a9d4d4dbc5d5f2281ddde2916259f9461db4",
+        "csize": 110063,
+        "isize": 487422
+      },
+      {
+        "name": "gnome-desktop-common",
+        "version": "1:51.0-1",
+        "repo": "extra",
+        "sha256": "414c07bd65ae19d86094f34e04f7e7b499e645d3938863c524ed77e9b915902b",
+        "csize": 471497,
+        "isize": 2680556
+      },
+      {
+        "name": "gnome-keybindings",
+        "version": "51.1-1",
+        "repo": "extra",
+        "sha256": "ab0770b8c7f8d256b4ef84419b41ca609bbddfeae08e826e2c257436935bae68",
+        "csize": 8036,
+        "isize": 4428
+      },
+      {
+        "name": "gnome-online-accounts",
+        "version": "3.58.1-1",
+        "repo": "extra",
+        "sha256": "751a57ff797a5109d32c7c04f53a0dcfe54429c72fd2d3a410c979437c87bbfd",
+        "csize": 414594,
+        "isize": 1876270
+      },
+      {
+        "name": "gnome-session",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "487b5397d8de38d48440cca19c86fb36f0617480f6988d03677c5671d0ae6cf4",
+        "csize": 290051,
+        "isize": 1257238
+      },
+      {
+        "name": "gnome-settings-daemon",
+        "version": "51.1-1",
+        "repo": "extra",
+        "sha256": "de17308f06588b45270dc6dbd03238f915de80e80ec9d749939c5bb97d45433c",
+        "csize": 976735,
+        "isize": 6345398
+      },
+      {
+        "name": "gnome-shell",
+        "version": "1:51.1-1",
+        "repo": "extra",
+        "sha256": "c0e8e344a1543dd576a44ec00b47762921bb30bb510f05d481e667d0e93cc4df",
+        "csize": 2048349,
+        "isize": 16022658
+      },
+      {
+        "name": "gnu-free-fonts",
+        "version": "20120503-9",
+        "repo": "extra",
+        "sha256": "d35b949c4e036647b72e2b3cf337959b7fa85d9e3fcd83daee0e00dba0842014",
+        "csize": 3340350,
+        "isize": 6969712
+      },
+      {
+        "name": "gnulib-l10n",
+        "version": "20241231-1",
+        "repo": "core",
+        "sha256": "86e6ea818cb331171018bef6e4486c1176064655e0d459bcecc9cc9c2bb74a2c",
+        "csize": 126997,
+        "isize": 644166
+      },
+      {
+        "name": "gnupg",
+        "version": "2.4.9-3",
+        "repo": "core",
+        "sha256": "c758ccf2d09d85b033b30828800844609f47016ee93cd790315dea3818a95cc5",
+        "csize": 3028475,
+        "isize": 10912940
+      },
+      {
+        "name": "gnutls",
+        "version": "3.8.13-3",
+        "repo": "core",
+        "sha256": "a61d5d908aa83ad2ed6ddffda70ae2ddb5a81852dddcbf68ec42c1744e8a8ee9",
+        "csize": 1924864,
+        "isize": 8618870
+      },
+      {
+        "name": "gobject-introspection",
+        "version": "1.86.0-2",
+        "repo": "extra",
+        "sha256": "03b932edc9e8bfaced0fc2a0970ccf2879c5d03961109664f96deb9ac8d9440b",
+        "csize": 534831,
+        "isize": 3256357
+      },
+      {
+        "name": "gobject-introspection-runtime",
+        "version": "1.86.0-2",
+        "repo": "extra",
+        "sha256": "68495be23fc8b012e67f6107b415e73b383a99d715d38ab192620a2e380af307",
+        "csize": 34678,
+        "isize": 154460
+      },
+      {
+        "name": "gperftools",
+        "version": "2.19.1-1",
+        "repo": "extra",
+        "sha256": "e4e665c1b02ed957d305ef7b975a0b9de88834091f7195df46ccc63976393ba8",
+        "csize": 589416,
+        "isize": 2433223
+      },
+      {
+        "name": "gpgme",
+        "version": "2.2.0-1",
+        "repo": "core",
+        "sha256": "d720cb9773612a993581e0478724ac0249087236b3e899d7dadc50ee143b279b",
+        "csize": 339789,
+        "isize": 809476
+      },
+      {
+        "name": "gpgmepp",
+        "version": "2.2.0-1",
+        "repo": "extra",
+        "sha256": "d0e2be1c05328d397b3d4b7a4e89b4eefdaf3caf23c364bb08ae4037f7aefb28",
+        "csize": 165786,
+        "isize": 614707
+      },
+      {
+        "name": "gpm",
+        "version": "1.20.7.r38.ge82d1a6-7",
+        "repo": "core",
+        "sha256": "c13146ba90f58ad4b561ffb15ae7d667718acca7865eb752b83d1530f3e67689",
+        "csize": 142211,
+        "isize": 403594
+      },
+      {
+        "name": "graphene",
+        "version": "1.10.8-2",
+        "repo": "extra",
+        "sha256": "6965123514a90c62c2ff20077c80000075b4f42f69759a2d84fcf0981b540a21",
+        "csize": 108568,
+        "isize": 1025528
+      },
+      {
+        "name": "graphite",
+        "version": "1:1.3.15-1",
+        "repo": "extra",
+        "sha256": "b3bd9b30b0715c36b5cfd997ca35ada9c559b1f89f3c386cae7847714c7a5ea2",
+        "csize": 86864,
+        "isize": 206818
+      },
+      {
+        "name": "gsettings-desktop-schemas",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "a643fb0af16f7795e8d8c8ea09625997749f2cc498473b1a3c37cc9e15c5495a",
+        "csize": 907739,
+        "isize": 6975440
+      },
+      {
+        "name": "gsettings-system-schemas",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "a8aec16f9124e6b3fd38b5f50305ab8a7ac793f29eadbddf666e92cf01f833fa",
+        "csize": 6242,
+        "isize": 16204
+      },
+      {
+        "name": "gsm",
+        "version": "1.0.24-1",
+        "repo": "extra",
+        "sha256": "779c60b87e5b463ad2ea97e64832d5f184e84e33693ca1059948c1f43e3eba2f",
+        "csize": 40695,
+        "isize": 108986
+      },
+      {
+        "name": "gsound",
+        "version": "1.0.3-4",
+        "repo": "extra",
+        "sha256": "50d26aed781218070f671f70c36c556ff5e0cf5b1bb1d21461aabc7a20fd2e5c",
+        "csize": 40987,
+        "isize": 278794
+      },
+      {
+        "name": "gssdp",
+        "version": "1.6.6-1",
+        "repo": "extra",
+        "sha256": "1b03fff2f98f39e973f91c06773e2bf0c9ad22316b68bf13fa1e9cd8041f39d4",
+        "csize": 62037,
+        "isize": 255791
+      },
+      {
+        "name": "gst-plugins-bad-libs",
+        "version": "1.28.8-1",
+        "repo": "extra",
+        "sha256": "83ca293d766ab7484b040bbc673cedb3b3aecdfb52d150e12457168bf850eb53",
+        "csize": 3340233,
+        "isize": 15447898
+      },
+      {
+        "name": "gst-plugins-base-libs",
+        "version": "1.28.8-1",
+        "repo": "extra",
+        "sha256": "34f2bcd85eb3caf997fc239b3fa150d7dd6b146a053a64e5cac1f03430b98658",
+        "csize": 2575578,
+        "isize": 13478603
+      },
+      {
+        "name": "gst-plugins-good",
+        "version": "1.28.8-1",
+        "repo": "extra",
+        "sha256": "fbd6e5b7e8869764bb71cc74a0f701305c558407b7d756b6afa723f89bdfcc73",
+        "csize": 2432601,
+        "isize": 7787504
+      },
+      {
+        "name": "gstreamer",
+        "version": "1.28.8-1",
+        "repo": "extra",
+        "sha256": "ee0db3bac8e0b0d885cf7128feed4c482d75ea4a1ed001a0c8c72546b1e89dc2",
+        "csize": 2213366,
+        "isize": 12488286
+      },
+      {
+        "name": "gtest",
+        "version": "1.18.0-1",
+        "repo": "extra",
+        "sha256": "a056289240aebf743810c69a9dc3a8503edf9ae98b5be167fddd66598236ebe5",
+        "csize": 408829,
+        "isize": 1748074
+      },
+      {
+        "name": "gtk-update-icon-cache",
+        "version": "1:4.24.1-1",
+        "repo": "extra",
+        "sha256": "daa2b4c82e8c94e05b201ad393294f549fda6e3717dfb2aca759ee70557dddfa",
+        "csize": 18140,
+        "isize": 41088
+      },
+      {
+        "name": "gtk3",
+        "version": "1:3.24.52-2",
+        "repo": "extra",
+        "sha256": "898965abbebb37f6ef155e08c68292f1cb75eff12dc25af736c5565a765361a1",
+        "csize": 9365862,
+        "isize": 55806938
+      },
+      {
+        "name": "gtk4",
+        "version": "1:4.24.1-1",
+        "repo": "extra",
+        "sha256": "5e87795451f883bc76720d2c7eb08ca306308095590872709967eb383f400f33",
+        "csize": 9951829,
+        "isize": 56661976
+      },
+      {
+        "name": "gupnp",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "37e57db6d5731c62e9305b0b5af4f32c51e03c854db90e884b8603ada68dd812",
+        "csize": 132129,
+        "isize": 737514
+      },
+      {
+        "name": "gupnp-dlna",
+        "version": "0.12.0-5",
+        "repo": "extra",
+        "sha256": "f5a0c4460d36a8393f7599d785a827022b87f6310b590e8b89bd12d6648caf73",
+        "csize": 103394,
+        "isize": 986041
+      },
+      {
+        "name": "gupnp-igd",
+        "version": "1.6.0-2",
+        "repo": "extra",
+        "sha256": "60efc49d5995fdb13d6ce373e6c394f2f87fc2a9568b40ebaec1496616aa2afd",
+        "csize": 29058,
+        "isize": 117569
+      },
+      {
+        "name": "gvfs",
+        "version": "1.62.0-3",
+        "repo": "extra",
+        "sha256": "8854c22b48e2d4bfc6b56ac5de1cec47a45cc7798476bee719557cce45159fb9",
+        "csize": 945062,
+        "isize": 5298854
+      },
+      {
+        "name": "gweather-locations",
+        "version": "2026.2-1",
+        "repo": "extra",
+        "sha256": "0ac95d70e92dee0cb35b710cd0fe1dc2f571a0e8a3a369835e5bf666baa7014f",
+        "csize": 2909921,
+        "isize": 22992549
+      },
+      {
+        "name": "gzip",
+        "version": "1.15-1",
+        "repo": "core",
+        "sha256": "4a2d1fd90458bf9751b9aca418f8e8ae6d570cb4a406bd7dc646ad7162a720fa",
+        "csize": 95787,
+        "isize": 174659
+      },
+      {
+        "name": "harfbuzz",
+        "version": "15.0.0-1",
+        "repo": "extra",
+        "sha256": "c2593af12b2d888f6edd91cb95fbea324c189ae9390342bcd86a20807ed5ba57",
+        "csize": 1561895,
+        "isize": 5811311
+      },
+      {
+        "name": "harfbuzz-icu",
+        "version": "15.0.0-1",
+        "repo": "extra",
+        "sha256": "be5e0ccc535a28f0bba99972d7304a8ba880ae94ba2d4df90e9302fe964cf244",
+        "csize": 8531,
+        "isize": 18093
+      },
+      {
+        "name": "hicolor-icon-theme",
+        "version": "0.18-1",
+        "repo": "extra",
+        "sha256": "22ec69012b9a55e276b5891f916366f692541dce3793bff3e85a28a10b91990a",
+        "csize": 13337,
+        "isize": 55627
+      },
+      {
+        "name": "hidapi",
+        "version": "0.15.0-1",
+        "repo": "extra",
+        "sha256": "58eee8119ef8ca47a6f10c073ee3a89d9d3958b77b94aa7d05c331e73f50f5b8",
+        "csize": 43174,
+        "isize": 135875
+      },
+      {
+        "name": "highway",
+        "version": "1.4.0-1",
+        "repo": "extra",
+        "sha256": "1695affe5d6174380504a42b0808b1ca638e95b265fa15bc80e6d6e9875ba993",
+        "csize": 1245399,
+        "isize": 10525816
+      },
+      {
+        "name": "hwdata",
+        "version": "0.412-1",
+        "repo": "core",
+        "sha256": "cce4809b7fa0146464f41f5d6bd643e11624311007f79e8927818b438d7a6092",
+        "csize": 1783601,
+        "isize": 10565629
+      },
+      {
+        "name": "hyphen",
+        "version": "2.8.9-1",
+        "repo": "extra",
+        "sha256": "06d5afbaf7021b92c3a54ced6177ae516bebd33845824ce33767970e482668d7",
+        "csize": 18237,
+        "isize": 39033
+      },
+      {
+        "name": "iana-etc",
+        "version": "20260617-1",
+        "repo": "core",
+        "sha256": "f451da19de46e77177d959239e03b6ee837c93966ac72ca0b80a1e9a32abeb67",
+        "csize": 411435,
+        "isize": 4213221
+      },
+      {
+        "name": "ibus",
+        "version": "1.5.34-2",
+        "repo": "extra",
+        "sha256": "64c688e0615430b8367080571990d95cf53b5cd8debe0cbfd82a6907854e61e6",
+        "csize": 16244444,
+        "isize": 159756943
+      },
+      {
+        "name": "icu",
+        "version": "78.3-1",
+        "repo": "core",
+        "sha256": "118fe41efa6c550f3fe67893946dcea2c6cbb5272299a6ddf4160fb17f3e4bb0",
+        "csize": 12272670,
+        "isize": 45330098
+      },
+      {
+        "name": "iio-sensor-proxy",
+        "version": "3.9-1",
+        "repo": "extra",
+        "sha256": "02d90729e6990f3a8208577a5d2fe65acbd3b6563d6ab4cc08019dbe07c7de6f",
+        "csize": 40923,
+        "isize": 120705
+      },
+      {
+        "name": "imlib2",
+        "version": "1.12.7-3",
+        "repo": "extra",
+        "sha256": "2596007da59aa913d3f347417003b7702938e1cb60434d7d504c4cb2cffeabb9",
+        "csize": 596237,
+        "isize": 1556845
+      },
+      {
+        "name": "iso-codes",
+        "version": "4.20.1-1",
+        "repo": "extra",
+        "sha256": "c2dbcb21176ff2a15cea0072ea13f2998bcd435fd494c99d0a8f06e9eb029192",
+        "csize": 3777898,
+        "isize": 23380644
+      },
+      {
+        "name": "jack2",
+        "version": "1.9.22-2",
+        "repo": "extra",
+        "sha256": "e400bbd5f48b5f657d7835ef607822d14be1fc66c1807718b13086c53b95c8a7",
+        "csize": 483134,
+        "isize": 1930572
+      },
+      {
+        "name": "jansson",
+        "version": "2.15.1-1",
+        "repo": "core",
+        "sha256": "ff1ff9da9ec0520b30cc4add6160ba5a171d9a478408863a2d99b61f5bb9866b",
+        "csize": 94532,
+        "isize": 287251
+      },
+      {
+        "name": "jbigkit",
+        "version": "2.2-1",
+        "repo": "extra",
+        "sha256": "22025fe7212ce8f1492c0834e7e0f7f9ce99d97f62b1e56f77b8db2275d4d9a0",
+        "csize": 56852,
+        "isize": 175730
+      },
+      {
+        "name": "js140",
+        "version": "140.17.0-1",
+        "repo": "extra",
+        "sha256": "2cd66002cb1c98f398e66818c220ddac9a5cd4afcc97468e66271f97d2c15467",
+        "csize": 15181129,
+        "isize": 81945927
+      },
+      {
+        "name": "json-c",
+        "version": "0.19-1",
+        "repo": "core",
+        "sha256": "a2ebb9395bfc18a29abd21b6dd756519114e4e6241d6321588ada285ded4d63f",
+        "csize": 64992,
+        "isize": 203194
+      },
+      {
+        "name": "json-glib",
+        "version": "1.10.8-1",
+        "repo": "extra",
+        "sha256": "3c2ec1b51d45f7c2d0cee7d28520b0772cc6d01fa09b808536e08dca7dd638eb",
+        "csize": 177781,
+        "isize": 1063459
+      },
+      {
+        "name": "kbd",
+        "version": "2.10.0-1",
+        "repo": "core",
+        "sha256": "9322a5fb74f43341835d22d3ea0cf1d88d91eb4c98ab9fcb816955e2159b4b41",
+        "csize": 1341125,
+        "isize": 3449841
+      },
+      {
+        "name": "keyutils",
+        "version": "1.6.3-4",
+        "repo": "core",
+        "sha256": "e3e5d4226bb7d213a6baddb997bf679a2b1106d95b5c2845b79bf8df1c3ef5fe",
+        "csize": 104718,
+        "isize": 211289
+      },
+      {
+        "name": "kmod",
+        "version": "34.2-1",
+        "repo": "core",
+        "sha256": "8cce1b4dfd2a1f354a253bb60a36c83024042eef5d47cb0214ec5d4f47f2007e",
+        "csize": 133390,
+        "isize": 350816
+      },
+      {
+        "name": "krb5",
+        "version": "1.22.2-1",
+        "repo": "core",
+        "sha256": "38dcaf86512559c47e9b084ce78f417b5e8b0634feb8cb80b5edeab2c40b704f",
+        "csize": 1407071,
+        "isize": 4948474
+      },
+      {
+        "name": "l-smash",
+        "version": "2.14.5-4",
+        "repo": "extra",
+        "sha256": "43ba7aa48088b132082c144d38c0cd2647d613df43d8b447b972629f8e0014f6",
+        "csize": 326377,
+        "isize": 1068386
+      },
+      {
+        "name": "lame",
+        "version": "4.0-1",
+        "repo": "extra",
+        "sha256": "2c7bf7150e41a12b7b2ef62fec6ab5a071e20b537ac734490922fa64c204af77",
+        "csize": 319710,
+        "isize": 1155547
+      },
+      {
+        "name": "lcms2",
+        "version": "2.19.1-1",
+        "repo": "extra",
+        "sha256": "8cdbd1ec200fcf41a583d0fd6fbc6f117f9642a3968c73263c5b0ca35a4c4663",
+        "csize": 237258,
+        "isize": 724964
+      },
+      {
+        "name": "ldb",
+        "version": "2:4.25.1-1",
+        "repo": "extra",
+        "sha256": "04910fbd71aa3b77a6ea80030c03f0398ec4a95e68729102cd233bde20ad86a7",
+        "csize": 501663,
+        "isize": 2282716
+      },
+      {
+        "name": "leancrypto",
+        "version": "1.9.1-1",
+        "repo": "core",
+        "sha256": "0494b72775287ab8a9f87dbb9a579cdde1e39fbb855e9040cf7bae793f04339f",
+        "csize": 1607376,
+        "isize": 7348859
+      },
+      {
+        "name": "lib32-gcc-libs",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "21fde8d5c5fda174b0277515fb6e49a450763a9c8a05f1956f719779e459465a",
+        "csize": 11341393,
+        "isize": 47168904
+      },
+      {
+        "name": "lib32-glibc",
+        "version": "2.44+r50+g1848099f063e-1",
+        "repo": "core",
+        "sha256": "a977f9a6a405ab85e594aa9f1230a0b7dddfc33e3de5f2cb66931c92a48931d8",
+        "csize": 3794395,
+        "isize": 19928234
+      },
+      {
+        "name": "libadwaita",
+        "version": "1:1.10.0-1",
+        "repo": "extra",
+        "sha256": "9db0082481173f109dbe4af6a52fc3ca1d983b240ea67a5ab71a894f4db164cf",
+        "csize": 841979,
+        "isize": 5543195
+      },
+      {
+        "name": "libarchive",
+        "version": "3.8.10-1",
+        "repo": "core",
+        "sha256": "9142262bb26509f8c1eae3854c3f151074c8e4be5d07778e2abcae6101caa854",
+        "csize": 602031,
+        "isize": 1342404
+      },
+      {
+        "name": "libasan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "7f6c602ea97c01b67cf8261b87afa1a47c1eb383ded769aaef71475e781defdc",
+        "csize": 533471,
+        "isize": 1974116
+      },
+      {
+        "name": "libass",
+        "version": "0.17.5-1",
+        "repo": "extra",
+        "sha256": "d157ce85501267f92bddb29e5d1ca534120c69fb55ad8f8447082fecb1fae4bb",
+        "csize": 127321,
+        "isize": 311427
+      },
+      {
+        "name": "libassuan",
+        "version": "3.0.0-1",
+        "repo": "core",
+        "sha256": "1843d675b324c9d549f3413dcbe653ec86876ac2898fc94423926ed30eab25a1",
+        "csize": 114921,
+        "isize": 245206
+      },
+      {
+        "name": "libasyncns",
+        "version": "1:0.8+r3+g68cd5af-3",
+        "repo": "extra",
+        "sha256": "de65e601391ace5c126e863ad67245b03cfe87f46c12b509668f3da2419bbf15",
+        "csize": 17309,
+        "isize": 49043
+      },
+      {
+        "name": "libatasmart",
+        "version": "0.19-8",
+        "repo": "extra",
+        "sha256": "31e8b419d2ffe2ebb306533af3923b8f1bf75dfd6afa0df2dc861371ec9c50d6",
+        "csize": 31102,
+        "isize": 106008
+      },
+      {
+        "name": "libatomic",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "920cfea3dcac82e3d7c8ebbf64dfe341821c1118277d55b6c1e96035cd943656",
+        "csize": 14372,
+        "isize": 38092
+      },
+      {
+        "name": "libavc1394",
+        "version": "0.5.4-7",
+        "repo": "extra",
+        "sha256": "fc51adf3f9af30d7d58abd8962e39ae85bd6c8c36ede30e24ea3400d195a5b0a",
+        "csize": 32942,
+        "isize": 125511
+      },
+      {
+        "name": "libavif",
+        "version": "1.4.2-1",
+        "repo": "extra",
+        "sha256": "296986d8795009e86279608a311c580154d84b82d53365495d76cf28ef375441",
+        "csize": 322252,
+        "isize": 910442
+      },
+      {
+        "name": "libblockdev",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "2fd763118bda5eae9d15645aac0ae3482d506d66f471fb59fc6d5c84b4267a91",
+        "csize": 267805,
+        "isize": 3810920
+      },
+      {
+        "name": "libblockdev-crypto",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "3f1637ecc3a63ac4509decc5f4c6e64242fdac852948c4d2d0b147daefadf74a",
+        "csize": 29125,
+        "isize": 84023
+      },
+      {
+        "name": "libblockdev-fs",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "345165f70971455bcb2a0904ebabda70b3c2d633c7b80a8271fadf5f292b2a38",
+        "csize": 44214,
+        "isize": 142118
+      },
+      {
+        "name": "libblockdev-loop",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "fb375443a923d4fdb8f63c87f6259add1753aab9c753885225d96aa453dc20b8",
+        "csize": 9418,
+        "isize": 24746
+      },
+      {
+        "name": "libblockdev-mdraid",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "7de7b6608763647e00e81b991b69a485823f10ee250b7202d9a77d58d8ca3f18",
+        "csize": 15087,
+        "isize": 38686
+      },
+      {
+        "name": "libblockdev-nvme",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "12871d559d976b7654a090db663fb71510de1786768bae72877bc73adef3d2d0",
+        "csize": 26143,
+        "isize": 80297
+      },
+      {
+        "name": "libblockdev-part",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "59185b56349bef3fe2b15ec6ece646bfbe6c0d8c1f400c48c2eeee62cb3617ba",
+        "csize": 17249,
+        "isize": 46992
+      },
+      {
+        "name": "libblockdev-smart",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "e992d31f806169815af390a55a20bfa5fa8ef4ddc76ed0f327dc02e75125853c",
+        "csize": 25245,
+        "isize": 130888
+      },
+      {
+        "name": "libblockdev-swap",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "77cb9b5a3a16ed84e998b1a3e3633cf7a5fda34110891090cfcee4b930b571be",
+        "csize": 9316,
+        "isize": 24459
+      },
+      {
+        "name": "libbluray",
+        "version": "1.5.1-1",
+        "repo": "extra",
+        "sha256": "69f006d2a282f28fee68b01f617528f04bec475ac67c03e334f03c606b7cb104",
+        "csize": 922101,
+        "isize": 1325320
+      },
+      {
+        "name": "libbpf",
+        "version": "1.7.0-1",
+        "repo": "core",
+        "sha256": "07ca39704fd534fcb4f520550cdddad5c113521f87035fb66f66a50a6d843257",
+        "csize": 273925,
+        "isize": 864822
+      },
+      {
+        "name": "libbs2b",
+        "version": "3.1.0-11",
+        "repo": "extra",
+        "sha256": "b50871a0b53667c22b72ecbc01efccfe8554d9c907b39529796c2050d46fc8c4",
+        "csize": 18636,
+        "isize": 77580
+      },
+      {
+        "name": "libbsd",
+        "version": "0.12.2-2",
+        "repo": "extra",
+        "sha256": "e26194849786b0202828a348be3f4b90d410604cd7d48f113a4301584a49895a",
+        "csize": 167385,
+        "isize": 343936
+      },
+      {
+        "name": "libbytesize",
+        "version": "2.12-3",
+        "repo": "extra",
+        "sha256": "9d83943d26d0574b22398201610431a761a419394a9724fb7ac32bf2b7720a04",
+        "csize": 25594,
+        "isize": 94738
+      },
+      {
+        "name": "libcaca",
+        "version": "0.99.beta20-7",
+        "repo": "extra",
+        "sha256": "072b0d54e3630542f808d912ea57960affc3ca6b23ae6c8bff9e1717ef2ea816",
+        "csize": 431556,
+        "isize": 2702147
+      },
+      {
+        "name": "libcanberra",
+        "version": "1:0.30+r2+gc0620e4-6",
+        "repo": "extra",
+        "sha256": "1aca6220b76c4009dbfcad432fcef529fa8fcb2cb187b03a506a2270d50110b1",
+        "csize": 84505,
+        "isize": 392581
+      },
+      {
+        "name": "libcap",
+        "version": "2.78-1",
+        "repo": "core",
+        "sha256": "3e984fe1d323b1c5a5fc60fef005776a4882fbca913d6fe3c41ad11128929ed1",
+        "csize": 854184,
+        "isize": 2177888
+      },
+      {
+        "name": "libcap-ng",
+        "version": "0.9.6-1",
+        "repo": "core",
+        "sha256": "05b0a8356f898e251845b2e5ffa5966be21ca85f3eaaf5aeb8a9e8df4148ba5c",
+        "csize": 72214,
+        "isize": 173852
+      },
+      {
+        "name": "libcdio",
+        "version": "2.4.0-1",
+        "repo": "extra",
+        "sha256": "be3bf364e24ba2fc8662e85f884e9985c0324ecc46b0787cf82577bec7cb48b0",
+        "csize": 268585,
+        "isize": 930362
+      },
+      {
+        "name": "libcdio-paranoia",
+        "version": "10.2+2.0.2-3",
+        "repo": "extra",
+        "sha256": "9b85bf9d7abb252f3af15c4a759cb7b9013143eb6399207d11e636d13fcd857c",
+        "csize": 69410,
+        "isize": 168235
+      },
+      {
+        "name": "libcloudproviders",
+        "version": "0.4.1-1",
+        "repo": "extra",
+        "sha256": "4118ca6e1b14202e5d08d8e6013cb47152d7b8433a94a1d67a0c025a9f2f6896",
+        "csize": 48535,
+        "isize": 335892
+      },
+      {
+        "name": "libcolord",
+        "version": "1.4.8-2",
+        "repo": "extra",
+        "sha256": "6e703e71970d735779a4dbecff603abf75b4289ed34bdbf5645146dba28ae6ad",
+        "csize": 190198,
+        "isize": 1299722
+      },
+      {
+        "name": "libcue",
+        "version": "2.3.0-2",
+        "repo": "extra",
+        "sha256": "a96988a4c4ee650fb4fa77ae6a405bd6c26932d290b909d9dc217ca78f00a143",
+        "csize": 18703,
+        "isize": 51710
+      },
+      {
+        "name": "libcups",
+        "version": "2:2.4.20-1",
+        "repo": "extra",
+        "sha256": "a83b00e3578c33b11e1d0713599689e6c601c8b569a55fbbe656164985799be2",
+        "csize": 290140,
+        "isize": 828340
+      },
+      {
+        "name": "libdaemon",
+        "version": "0.14-6",
+        "repo": "extra",
+        "sha256": "ece83006a468d5205ea45d1de8e9cdb3a864700f9d904fc4b7d52d69dce1b0b6",
+        "csize": 19660,
+        "isize": 59932
+      },
+      {
+        "name": "libdatrie",
+        "version": "0.2.14-1",
+        "repo": "extra",
+        "sha256": "f5ad651ed99afa29d44c662da4f2c6e93764e8a1d47487f41837be1c94ddd38e",
+        "csize": 112102,
+        "isize": 509877
+      },
+      {
+        "name": "libdbusmenu-glib",
+        "version": "18.10.20180917-2",
+        "repo": "extra",
+        "sha256": "cd95a3dd2ab7de4a1f0295bcdbe4db1ae7b35771e195faf2696bc94659c6bd60",
+        "csize": 92583,
+        "isize": 702189
+      },
+      {
+        "name": "libdbusmenu-gtk3",
+        "version": "18.10.20180917-2",
+        "repo": "extra",
+        "sha256": "4b5ce5d42a2357ddc6924259df2579f4f231813fdf6fe42f00059bfe75d8b10d",
+        "csize": 50164,
+        "isize": 234852
+      },
+      {
+        "name": "libde265",
+        "version": "1.1.3-1",
+        "repo": "extra",
+        "sha256": "c39e04757d24257c153513104a807c1c5d1418dca1589d98134093398cba8dd0",
+        "csize": 364938,
+        "isize": 1004724
+      },
+      {
+        "name": "libdecor",
+        "version": "0.2.5-1",
+        "repo": "extra",
+        "sha256": "79fb92af5bf5358da4dc418fc784554284c09cdf4e8aa2cdc95197752d1df115",
+        "csize": 46413,
+        "isize": 169749
+      },
+      {
+        "name": "libdeflate",
+        "version": "1.26-1",
+        "repo": "extra",
+        "sha256": "3bd3b1ca9a333ab97ebb55f760963f64817b6c4c0d54747b37187f36ab60deab",
+        "csize": 65298,
+        "isize": 146456
+      },
+      {
+        "name": "libdex",
+        "version": "1.2.0-1",
+        "repo": "extra",
+        "sha256": "e1d7b7877960c6336225fcaefb1f1a85a4bff89fcfd55d8db7cd5e2ca83a2f2f",
+        "csize": 165594,
+        "isize": 1019939
+      },
+      {
+        "name": "libdisplay-info",
+        "version": "0.3.0-1",
+        "repo": "extra",
+        "sha256": "07ab1479ec5e70aea174e2d0e340bd9364b507ed74f2df3bfd51b3c6f40e5787",
+        "csize": 124625,
+        "isize": 409003
+      },
+      {
+        "name": "libdovi",
+        "version": "3.4.0-1",
+        "repo": "extra",
+        "sha256": "5832cbddc94e3eb134fc14420d8b4503cb9683041b724a64fdedd080155fa106",
+        "csize": 289809,
+        "isize": 690123
+      },
+      {
+        "name": "libdrm",
+        "version": "2.4.134-1",
+        "repo": "extra",
+        "sha256": "29d101f13d219d01ee4aae25e8f84026e0740d747d56c37ea5573c4618e7df04",
+        "csize": 367774,
+        "isize": 1341788
+      },
+      {
+        "name": "libdv",
+        "version": "1.0.0-12",
+        "repo": "extra",
+        "sha256": "7815939869bf655f5d36557e4fb1a60db93b6d3d3ad047951bd0bb88cd0cb376",
+        "csize": 80423,
+        "isize": 210774
+      },
+      {
+        "name": "libdvdnav",
+        "version": "7.0.0-1",
+        "repo": "extra",
+        "sha256": "442122c2f7eefdcdd6a3042b531c5cf9aec10105fc32f39912170ae7c6410a6b",
+        "csize": 60535,
+        "isize": 168562
+      },
+      {
+        "name": "libdvdread",
+        "version": "7.1.1-1",
+        "repo": "extra",
+        "sha256": "41d9fce076d8dc28d85cbad6327ef5997dc52c13494871e3c1a2bb0c01a4112a",
+        "csize": 144471,
+        "isize": 445961
+      },
+      {
+        "name": "libebur128",
+        "version": "1.2.6-2",
+        "repo": "extra",
+        "sha256": "95ea3382b10f3891f8d4527035eca3c3bca95c602bb3d2a7e26ce260e40cf7ee",
+        "csize": 17895,
+        "isize": 47464
+      },
+      {
+        "name": "libedit",
+        "version": "20260512_3.1-1",
+        "repo": "core",
+        "sha256": "70cb736e4fdee330cd0dfab45875f6ea378ae819958dd15748c300b8d7285b42",
+        "csize": 120327,
+        "isize": 280288
+      },
+      {
+        "name": "libei",
+        "version": "1.6.0-2",
+        "repo": "extra",
+        "sha256": "36e0482d629b846baaefc0363212b5afb291e6f9417b43ab4230c1a1d5f8b50b",
+        "csize": 117619,
+        "isize": 444970
+      },
+      {
+        "name": "libelf",
+        "version": "0.197-1",
+        "repo": "core",
+        "sha256": "f8341a1e281ffd294d81891c95dfcd7cbcf9b5527b160d4b54848ec79a19abc1",
+        "csize": 734261,
+        "isize": 3494644
+      },
+      {
+        "name": "libepoxy",
+        "version": "1.5.10-3",
+        "repo": "extra",
+        "sha256": "6e3f4e026b94d45b044f8c15ef0cc04772eafa892dd8b0bf037b1f865f0aaa33",
+        "csize": 312656,
+        "isize": 2766939
+      },
+      {
+        "name": "libevdev",
+        "version": "1.14.0-1",
+        "repo": "extra",
+        "sha256": "3a27bf7676ab002b1dd6b0b8b731d2b6f239acbe414911c1447af9573a255dc3",
+        "csize": 61733,
+        "isize": 230305
+      },
+      {
+        "name": "libevent",
+        "version": "2.1.13-2",
+        "repo": "core",
+        "sha256": "9fd8563e3aa1c64d80257b7b4f60d37cf8589260ba3eb015f8257e2cfd118b04",
+        "csize": 298430,
+        "isize": 1272722
+      },
+      {
+        "name": "libexif",
+        "version": "0.6.26-1",
+        "repo": "extra",
+        "sha256": "92890eb0eece217dff5df78403d32682693b0b1557f20ca9264ca798646caea5",
+        "csize": 540159,
+        "isize": 3272459
+      },
+      {
+        "name": "libfdk-aac",
+        "version": "3.0.0-1",
+        "repo": "extra",
+        "sha256": "fad493b38fdfa190e0fea9c0521d273bddaf2e9fe70c5e3bb859b42e62071da3",
+        "csize": 1360737,
+        "isize": 2947565
+      },
+      {
+        "name": "libffi",
+        "version": "3.8.0-1",
+        "repo": "core",
+        "sha256": "5d21227f2a1d10db60d0cf5bb02b36a1801ae61dc7dae8c3bc1afa548afd8601",
+        "csize": 56862,
+        "isize": 117789
+      },
+      {
+        "name": "libfontenc",
+        "version": "1.1.9-1",
+        "repo": "extra",
+        "sha256": "d81a0725b82dd5e89cfd5e65b6502a281cac62c413e1170dc7c571a5f44c42f6",
+        "csize": 15752,
+        "isize": 36682
+      },
+      {
+        "name": "libfreeaptx",
+        "version": "0.2.2-1",
+        "repo": "extra",
+        "sha256": "bd6c02fce728512a27e6ef3a06cc42ecdd12ec3915d29b80a41ea14f247c13ff",
+        "csize": 19485,
+        "isize": 57863
+      },
+      {
+        "name": "libgcc",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "7367dad49fc3229bde804816d412ab77306d433b1f92e4126b8b3ba3502c67d6",
+        "csize": 81949,
+        "isize": 185836
+      },
+      {
+        "name": "libgcrypt",
+        "version": "1.12.4-1",
+        "repo": "core",
+        "sha256": "25ca27f53e0862e706b325d05893e43585be2bb0a0a4a750b8faa6e0e253e136",
+        "csize": 770063,
+        "isize": 2053115
+      },
+      {
+        "name": "libgdm",
+        "version": "51.1.1-1",
+        "repo": "extra",
+        "sha256": "8178c50e7c67ec67a435b75318872c50ac7ef3eec8bc49355bddc83534dea73e",
+        "csize": 89075,
+        "isize": 918069
+      },
+      {
+        "name": "libgfortran",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "0b40387c87793ed7b72fc3138c6877630ed66d8b5f841e436f4372a6405663e6",
+        "csize": 948773,
+        "isize": 3684588
+      },
+      {
+        "name": "libgirepository",
+        "version": "1.86.0-2",
+        "repo": "extra",
+        "sha256": "edf68340a4aab5c4e5a7a2886512367c7ed6ad2be5e1f07ffc6aff07ebb0a1bf",
+        "csize": 151458,
+        "isize": 1592296
+      },
+      {
+        "name": "libglvnd",
+        "version": "1.7.0-3",
+        "repo": "extra",
+        "sha256": "633c2e95d7798d0ce7ee1b7fe970a22325f7f6d35b9f923bb61b223a80934437",
+        "csize": 333994,
+        "isize": 3506849
+      },
+      {
+        "name": "libgoa",
+        "version": "3.58.1-1",
+        "repo": "extra",
+        "sha256": "70cc98374c1bf4c54e384895b5dc62696af2735b25440f2adfcc3156e757204f",
+        "csize": 133572,
+        "isize": 1785599
+      },
+      {
+        "name": "libgomp",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "ffad807ed2ea36a29fe6da70dd77a6c476f1a1d5357cbec0b2481dbc84f303f4",
+        "csize": 236404,
+        "isize": 447361
+      },
+      {
+        "name": "libgpg-error",
+        "version": "1.61-1",
+        "repo": "core",
+        "sha256": "7d5a5b39f588b275558f5e13bd792bff84cf89abb6d48e3e494d6c30e8ea9ca4",
+        "csize": 282578,
+        "isize": 1199323
+      },
+      {
+        "name": "libgphobos",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "832ba49ee28d96389ff4290174611f04430b595e4755718233ba26049ef24698",
+        "csize": 1804411,
+        "isize": 11954724
+      },
+      {
+        "name": "libgsf",
+        "version": "1.14.60-1",
+        "repo": "extra",
+        "sha256": "64abd3d509e148bf349db32ffbbda35f3f4d3b02fdd48fb218513a213c275091",
+        "csize": 295112,
+        "isize": 1562775
+      },
+      {
+        "name": "libgtop",
+        "version": "2.41.3-2",
+        "repo": "extra",
+        "sha256": "310e3f88213dcff7bb071cc422e155fb6fa8a34409f43ea8a62599cce48ab1af",
+        "csize": 198793,
+        "isize": 1322175
+      },
+      {
+        "name": "libgudev",
+        "version": "238-4",
+        "repo": "extra",
+        "sha256": "9a78afc58dbf41dd2af33e9c8a6cfb7dc89d0b5150593c7e8ca6beda28d11259",
+        "csize": 29422,
+        "isize": 182148
+      },
+      {
+        "name": "libgusb",
+        "version": "0.4.9-2",
+        "repo": "extra",
+        "sha256": "433495cbfe5d8b7b0b6f8b7ee09cc308461a2fdfd66edee0227d1a4b02d31a3b",
+        "csize": 69631,
+        "isize": 368997
+      },
+      {
+        "name": "libgweather-4",
+        "version": "4.6.0-1",
+        "repo": "extra",
+        "sha256": "6cf6c7e5de4e2a7b69740299a56047506e8f27ac85b98111b719f45ec98af169",
+        "csize": 311481,
+        "isize": 1961497
+      },
+      {
+        "name": "libgxps",
+        "version": "0.3.2-5",
+        "repo": "extra",
+        "sha256": "faf01b7294b2d7f7168872f547ff65ec10ea302bb3fb4b823aad7b331e80ce9a",
+        "csize": 108182,
+        "isize": 607489
+      },
+      {
+        "name": "libheif",
+        "version": "1.23.7-1",
+        "repo": "extra",
+        "sha256": "416cbbca351a9537d58667bb3e3d55fb128a6aa716b7e46cf2494bc1bd416af4",
+        "csize": 918022,
+        "isize": 2911614
+      },
+      {
+        "name": "libhwasan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "299ad02f954643c8b0fb919b0d545ebba34816f0facc673399f79252b33ec018",
+        "csize": 281695,
+        "isize": 757548
+      },
+      {
+        "name": "libibus",
+        "version": "1.5.34-2",
+        "repo": "extra",
+        "sha256": "d4c5d9193dea4c7e334d1d544ad3ba6fb0bb461507fd7c44eb5b39d8e1533bc5",
+        "csize": 445220,
+        "isize": 3750976
+      },
+      {
+        "name": "libical",
+        "version": "4.0.7-1",
+        "repo": "extra",
+        "sha256": "2a12f2cd48271158532ae98c02273127611eedc1d70f97e2f14e8bde34f52a14",
+        "csize": 776758,
+        "isize": 6868893
+      },
+      {
+        "name": "libice",
+        "version": "1.1.2-1",
+        "repo": "extra",
+        "sha256": "bb613be39e5bc1707a39f895c178674bbda52f022da51612e7a10a386608e107",
+        "csize": 80999,
+        "isize": 374521
+      },
+      {
+        "name": "libidn2",
+        "version": "2.3.8-1",
+        "repo": "core",
+        "sha256": "1749bdd4c395913df18c57fdd42820d3de88738b7163b7aa254d13e3da7b1d9d",
+        "csize": 135360,
+        "isize": 384496
+      },
+      {
+        "name": "libiec61883",
+        "version": "1.2.0-9",
+        "repo": "extra",
+        "sha256": "ce0718c4be56ebe9570c6571412191bc1bc57461ac646397b4e52b0f2b5032cd",
+        "csize": 34277,
+        "isize": 129853
+      },
+      {
+        "name": "libimobiledevice",
+        "version": "1.4.0-2",
+        "repo": "extra",
+        "sha256": "52577eb2e9dae9385e19bc0b5ce7b3fc4df127565edcae9b1867926f79e58b22",
+        "csize": 689875,
+        "isize": 6489400
+      },
+      {
+        "name": "libimobiledevice-glue",
+        "version": "1.3.2-1",
+        "repo": "extra",
+        "sha256": "f20da2280b05f04e9209ebf2ee88cb3a02868ae21b27679e077daa97251189b6",
+        "csize": 37483,
+        "isize": 105493
+      },
+      {
+        "name": "libinih",
+        "version": "62-2",
+        "repo": "core",
+        "sha256": "a31257bca509c845a77374a8696596ac39d3456a33788ce9af2dc555d8a19a9a",
+        "csize": 22129,
+        "isize": 66457
+      },
+      {
+        "name": "libinput",
+        "version": "1.32.0-1",
+        "repo": "extra",
+        "sha256": "f2c600dda468e3c3614ca728584dfc99ff1968e6354a235cdab5792a90c51dfb",
+        "csize": 236501,
+        "isize": 831515
+      },
+      {
+        "name": "libiptcdata",
+        "version": "1.0.5-5",
+        "repo": "extra",
+        "sha256": "1686c691938c8c986a94b2eb221e644e7e35735ba10390a78cff43df3717a248",
+        "csize": 78416,
+        "isize": 450859
+      },
+      {
+        "name": "libisl",
+        "version": "0.28-1",
+        "repo": "core",
+        "sha256": "e72fd1165d674f440ff9882b514c999423098a5852ea41fa692db65f391c98c1",
+        "csize": 980886,
+        "isize": 6191080
+      },
+      {
+        "name": "libjpeg-turbo",
+        "version": "3.2.0-2",
+        "repo": "extra",
+        "sha256": "14e743e58bbab35665d3e59ea71bd411f81a01d995e0101442f5f4c82c9de0ab",
+        "csize": 615715,
+        "isize": 2778875
+      },
+      {
+        "name": "libjxl",
+        "version": "0.12.0-1",
+        "repo": "extra",
+        "sha256": "a4e0f65e8ba3a2da1cc348aad4f7f8aee1b504b824a64838fb3d9b2f75cc9449",
+        "csize": 1947638,
+        "isize": 7111117
+      },
+      {
+        "name": "libksba",
+        "version": "1.8.1-1",
+        "repo": "core",
+        "sha256": "6aa88da7314b620af39ae619625b6ffac55f347c1a977cec3c4a0e4bc6f6a79d",
+        "csize": 154959,
+        "isize": 351565
+      },
+      {
+        "name": "liblc3",
+        "version": "1.1.3-2",
+        "repo": "extra",
+        "sha256": "8c5039ae39f823830941ed4d52a781758041c0289b918bce5cba67eb9ee89579",
+        "csize": 122066,
+        "isize": 297164
+      },
+      {
+        "name": "libldac",
+        "version": "2.0.2.6-1",
+        "repo": "extra",
+        "sha256": "aa163544d10dd2e8ebfb3011894660aa9334566aad731899b274de8c0171c1ba",
+        "csize": 37955,
+        "isize": 100262
+      },
+      {
+        "name": "libldap",
+        "version": "2.7.2-2",
+        "repo": "core",
+        "sha256": "a11255b067d9b6b85f5d8d4ca8a145eefcc496e4f9ac04e4d6c378042815266b",
+        "csize": 294932,
+        "isize": 673250
+      },
+      {
+        "name": "liblsan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "11b69f544a6f3d1c58d5612ebc336837e76567f2413b96900a6eb33d5de06e21",
+        "csize": 233817,
+        "isize": 573212
+      },
+      {
+        "name": "libmalcontent",
+        "version": "0.14.0-4",
+        "repo": "extra",
+        "sha256": "9c35fcdcade68ff32a0af35f5e80b3c72eb69926069ae0450a2006241109f23c",
+        "csize": 70373,
+        "isize": 432482
+      },
+      {
+        "name": "libmanette",
+        "version": "0.2.13-2",
+        "repo": "extra",
+        "sha256": "37ff8274c77c8092ee5b30e34e53533157e18ead998670a21fa3ae7d67355932",
+        "csize": 57386,
+        "isize": 419020
+      },
+      {
+        "name": "libmbim",
+        "version": "1.34.0-2",
+        "repo": "extra",
+        "sha256": "3a5f102da9350760424cb179d07c03e4b48883ff4297c9dc883f3a8910fea7e0",
+        "csize": 487315,
+        "isize": 3792022
+      },
+      {
+        "name": "libmd",
+        "version": "1.3.0-1",
+        "repo": "extra",
+        "sha256": "54147206639feaec7559f284e1094dd12523eb9bbec0ec877f99af87eedf123c",
+        "csize": 61753,
+        "isize": 133221
+      },
+      {
+        "name": "libmediainfo",
+        "version": "26.10-1",
+        "repo": "extra",
+        "sha256": "cde60ea5a0342786516bfaa199662b83e0f58900bacd1adc58023a00feb1210c",
+        "csize": 3741814,
+        "isize": 11798110
+      },
+      {
+        "name": "libmm-glib",
+        "version": "1.24.2-2",
+        "repo": "extra",
+        "sha256": "c0cf1baea2fbfa0b0dc858b32140b3560943b09cc27f814f349b47fd7b2a924b",
+        "csize": 584598,
+        "isize": 7786792
+      },
+      {
+        "name": "libmms",
+        "version": "0.6.4-6",
+        "repo": "extra",
+        "sha256": "2e85a8e2e28772a0680460188a42ce4dcd377b96c529820e462e84b72c5e0932",
+        "csize": 30121,
+        "isize": 75270
+      },
+      {
+        "name": "libmodplug",
+        "version": "0.8.9.0-7",
+        "repo": "extra",
+        "sha256": "41a834ee39468b5ec96238cfae5e3be8f2b4d6ea26edfa4c838f2620fe30fa80",
+        "csize": 174485,
+        "isize": 383148
+      },
+      {
+        "name": "libmpc",
+        "version": "1.4.1-1",
+        "repo": "core",
+        "sha256": "880bdba957ebe5136449c7b61821e92628d7bdd43f370e5a0818d229372d3851",
+        "csize": 94077,
+        "isize": 196392
+      },
+      {
+        "name": "libmysofa",
+        "version": "1.3.5-1",
+        "repo": "extra",
+        "sha256": "4ebe0c6f3da8a11193a8dc6ad1a1905edcb13ffae99c4ada945f9794846674c4",
+        "csize": 1166594,
+        "isize": 1329362
+      },
+      {
+        "name": "libnautilus-extension",
+        "version": "51.1-1",
+        "repo": "extra",
+        "sha256": "671d17197e2dc88543f6cbc9883747f4d3d10d4c5cfadd0f384f338f3b5cce95",
+        "csize": 33651,
+        "isize": 221662
+      },
+      {
+        "name": "libnghttp2",
+        "version": "1.70.0-1",
+        "repo": "core",
+        "sha256": "332e2cb2d953dab326f97a3257594f8031ec0fce6305e2bcd5d64d9832c84778",
+        "csize": 101532,
+        "isize": 412427
+      },
+      {
+        "name": "libnghttp3",
+        "version": "1.18.0-1",
+        "repo": "core",
+        "sha256": "4a474a6c8c2970bead13cbdf4ab47662039d43dcc48aa811ee58becd778cf890",
+        "csize": 85025,
+        "isize": 286206
+      },
+      {
+        "name": "libngtcp2",
+        "version": "1.25.0-1",
+        "repo": "core",
+        "sha256": "e4a728d9f647f3c52a3aedd67c589be5f43e7dd31ebde6867ad535ba29ec9511",
+        "csize": 227814,
+        "isize": 785425
+      },
+      {
+        "name": "libnice",
+        "version": "0.1.24-1",
+        "repo": "extra",
+        "sha256": "78883aacdc4e1a0e4eff42cb1bfc9d3746bd3e49d644b0183ac4a1896b8efe2a",
+        "csize": 329988,
+        "isize": 1951526
+      },
+      {
+        "name": "libnl",
+        "version": "3.12.0-1",
+        "repo": "core",
+        "sha256": "531827dac4f6d3de9a7e4c8c31f3243bf484b39c41648178c18dc027566b1bb4",
+        "csize": 434678,
+        "isize": 2222797
+      },
+      {
+        "name": "libnm",
+        "version": "1.58.1-2",
+        "repo": "extra",
+        "sha256": "21b2f67ed6fbd9cd0904cddd661b071145ae85425ceedcba9b39afa5188af8ac",
+        "csize": 953387,
+        "isize": 6717612
+      },
+      {
+        "name": "libnma-common",
+        "version": "1.10.6-3",
+        "repo": "extra",
+        "sha256": "001bd6e84ba17e2b470dfee6c624eecf5086778f776e41d463dcf9532390c4b3",
+        "csize": 193619,
+        "isize": 1118524
+      },
+      {
+        "name": "libnma-gtk4",
+        "version": "1.10.6-3",
+        "repo": "extra",
+        "sha256": "60ec211bcb72ed3b341e7242e5e680bac92f8f8478b198a1155f3793f47f8c61",
+        "csize": 110736,
+        "isize": 480816
+      },
+      {
+        "name": "libnotify",
+        "version": "0.8.9-1",
+        "repo": "extra",
+        "sha256": "712849867684044e655951aa27f5b1894c6d2b134f2cba1d90b8c57243c344b7",
+        "csize": 42255,
+        "isize": 176654
+      },
+      {
+        "name": "libnsl",
+        "version": "2.0.1-2",
+        "repo": "core",
+        "sha256": "4ba7b85b42fbda5a1f07e15b8f91c60faa4c5f9168cc27d49fcd20e3a3be8bd8",
+        "csize": 22606,
+        "isize": 71818
+      },
+      {
+        "name": "libnvme",
+        "version": "1.16.2-2",
+        "repo": "extra",
+        "sha256": "eeac4e875668745c9d1cc41f995cc32d69bb23900af2ebbcb0d5d0d609f27fd1",
+        "csize": 318622,
+        "isize": 1816817
+      },
+      {
+        "name": "libobjc",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "b56770fbd0167ed14159744e3f18e220684f5acf65241b5110808ec49bdbffd6",
+        "csize": 38476,
+        "isize": 94212
+      },
+      {
+        "name": "libogg",
+        "version": "1.3.6-1",
+        "repo": "extra",
+        "sha256": "b6d4724c1ed16b4806fa596cd823a2930efeeddeb95f7d8a869644b665a9ba37",
+        "csize": 202092,
+        "isize": 460025
+      },
+      {
+        "name": "libopenmpt",
+        "version": "0.8.9-1",
+        "repo": "extra",
+        "sha256": "8ffbeb4cc21dce411ea9d59280550a2e8d28dbb6d59c18bbc56a439d85bac9bb",
+        "csize": 942251,
+        "isize": 2648597
+      },
+      {
+        "name": "libosinfo",
+        "version": "1.12.0-3",
+        "repo": "extra",
+        "sha256": "e295d4829f8478f8e19f0d85637477558397ba8978e29688e3eb42cb6c6e391e",
+        "csize": 276425,
+        "isize": 2862449
+      },
+      {
+        "name": "libp11-kit",
+        "version": "0.26.5-1",
+        "repo": "core",
+        "sha256": "8ddc055b304a98c2434fa5d25550c94c0bbcdb22388f752e05e619b2ee98027c",
+        "csize": 533456,
+        "isize": 3472860
+      },
+      {
+        "name": "libpanel",
+        "version": "1.10.4-1",
+        "repo": "extra",
+        "sha256": "f82ac58c524fe826431e9ac1870b65126954f995d1ee2d09544e93072da04ddd",
+        "csize": 218432,
+        "isize": 1263979
+      },
+      {
+        "name": "libpcap",
+        "version": "1.11.0-1",
+        "repo": "core",
+        "sha256": "ed40e51f84882865d254571015a8ad403bf9c0ec743cf454e8223199de34580d",
+        "csize": 318914,
+        "isize": 718629
+      },
+      {
+        "name": "libpciaccess",
+        "version": "0.19-1",
+        "repo": "extra",
+        "sha256": "ef533895e7688da61749bee185103435dbe635d9773d092fb0516e132817e39f",
+        "csize": 22129,
+        "isize": 59560
+      },
+      {
+        "name": "libpgm",
+        "version": "5.3.128-4",
+        "repo": "extra",
+        "sha256": "cca617d50f88c96d93fbedb75ec5e948e4a3471680e708e88f7d4e391923be4d",
+        "csize": 181875,
+        "isize": 370108
+      },
+      {
+        "name": "libphonenumber",
+        "version": "1:9.0.42-1",
+        "repo": "extra",
+        "sha256": "f857fedd2d4dd5d3b1c340357d4d876f31b50ce377b874db5a60fc638a0b8160",
+        "csize": 1165741,
+        "isize": 7196943
+      },
+      {
+        "name": "libpipewire",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "08180fc76743ab9fbf873062aa158af9914991f6e397744e9a4525c2a9399447",
+        "csize": 1558769,
+        "isize": 6057396
+      },
+      {
+        "name": "libplacebo",
+        "version": "7.360.1-7",
+        "repo": "extra",
+        "sha256": "757a01497ccf07023fce7843d99b035cef298b92fea1a20b3f365a1f2b551da3",
+        "csize": 540607,
+        "isize": 1692413
+      },
+      {
+        "name": "libplist",
+        "version": "2.7.0-3",
+        "repo": "extra",
+        "sha256": "3bfa58c10996d9ba38e03a61b6cc9c1e5c5cd02ab12e26bce96649cb35431e3c",
+        "csize": 169160,
+        "isize": 543701
+      },
+      {
+        "name": "libpng",
+        "version": "1.6.59-1",
+        "repo": "extra",
+        "sha256": "c25e3f039aa598e65d01ee4404cb4a83b383b53b483a7b8627e391cc2c036de1",
+        "csize": 265171,
+        "isize": 611925
+      },
+      {
+        "name": "libportal",
+        "version": "0.11.0-1",
+        "repo": "extra",
+        "sha256": "b25f331290f34bf10532eb55a8f25409ed53ac0ada45d6e0737edbc2455297bf",
+        "csize": 119729,
+        "isize": 723530
+      },
+      {
+        "name": "libportal-gtk4",
+        "version": "0.11.0-1",
+        "repo": "extra",
+        "sha256": "d4f4af259afc5a1f155f95be06cd36a708c275f1dd5d7adcecaceec9fa913d9b",
+        "csize": 13496,
+        "isize": 34542
+      },
+      {
+        "name": "libproxy",
+        "version": "0.5.12-1",
+        "repo": "extra",
+        "sha256": "d8c945f0acc851077b4dc68a653478100a6e50133dc927ec9a86796c6916abea",
+        "csize": 30478,
+        "isize": 103264
+      },
+      {
+        "name": "libpsl",
+        "version": "0.21.5-2",
+        "repo": "core",
+        "sha256": "e07925c2487bd7deffdd57808b19561e80a4cb25a33e51dbd94efb673bc81944",
+        "csize": 88860,
+        "isize": 228063
+      },
+      {
+        "name": "libpulse",
+        "version": "17.0+r134+g77d25a1e6-1",
+        "repo": "extra",
+        "sha256": "c24a3b5ebacdae424c885c81770236f7f7d26a017cf7dfca84040e7354bea242",
+        "csize": 424269,
+        "isize": 1560058
+      },
+      {
+        "name": "libpwquality",
+        "version": "1.4.5-7",
+        "repo": "extra",
+        "sha256": "1c7110f166d74ff3671b62e4242e6e21a59c483eb26bcd7b3e72d723b9d8bb2b",
+        "csize": 96963,
+        "isize": 446742
+      },
+      {
+        "name": "libqb",
+        "version": "2.0.10-1",
+        "repo": "extra",
+        "sha256": "8c07d6115661f70e2ce0c317d6769190f9821e5d558bde8d3283212a74dbdbd9",
+        "csize": 256563,
+        "isize": 491999
+      },
+      {
+        "name": "libqmi",
+        "version": "1.38.0-2",
+        "repo": "extra",
+        "sha256": "2049b218b75da32e8be0ce4a8792fadef1abfab8149ace778bc09e9936100404",
+        "csize": 1970072,
+        "isize": 22426203
+      },
+      {
+        "name": "libqrtr-glib",
+        "version": "1.4.0-2",
+        "repo": "extra",
+        "sha256": "9a447513a5d23e8ebd8729b663cb47d989c54567fee57f12e25295d4c15e2b6c",
+        "csize": 27520,
+        "isize": 138045
+      },
+      {
+        "name": "libquadmath",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "c6db8f6c787601f17fa812f2270f4e53fad1426fa9e372ab2e1a881c1368cee3",
+        "csize": 170466,
+        "isize": 316008
+      },
+      {
+        "name": "libraw1394",
+        "version": "2.1.2-4",
+        "repo": "extra",
+        "sha256": "c4e68646b84e8657d77d50dfc8c9849df911729a4ed8daf54c042b21ae6bc4d4",
+        "csize": 48310,
+        "isize": 170084
+      },
+      {
+        "name": "librest",
+        "version": "0.10.2-2",
+        "repo": "extra",
+        "sha256": "635651df943391e9d7b12598174daa53eee26b9b19020d1ce5e6a52796df9b33",
+        "csize": 75832,
+        "isize": 445057
+      },
+      {
+        "name": "librsvg",
+        "version": "2:2.63.4-1",
+        "repo": "extra",
+        "sha256": "062352b0a55e34e610f2d1770993970fec3ea0ae5e77f805f064daec2f34da4c",
+        "csize": 2463949,
+        "isize": 10777271
+      },
+      {
+        "name": "libsamplerate",
+        "version": "0.2.2-3",
+        "repo": "extra",
+        "sha256": "6641b016f15c73f90ee0741f0d14db1ea7ec988a2b8c74c5fce0182239bbbf00",
+        "csize": 1396674,
+        "isize": 1621031
+      },
+      {
+        "name": "libsasl",
+        "version": "2.1.28-5",
+        "repo": "core",
+        "sha256": "113e1676371544e5142a46ee046a6179ace201c4f0a0d56b618a984b5c764463",
+        "csize": 150083,
+        "isize": 528563
+      },
+      {
+        "name": "libseccomp",
+        "version": "2.6.0-1",
+        "repo": "core",
+        "sha256": "3d3effb23898177d0faece196ac664859d29027b64cdeee3a09a2c3967b8401d",
+        "csize": 97566,
+        "isize": 321068
+      },
+      {
+        "name": "libsecret",
+        "version": "0.21.8.2-1",
+        "repo": "core",
+        "sha256": "311a982a109a3814ebc8f467215f9c92660b85833e1c65b6da16ba21d6f406ad",
+        "csize": 180540,
+        "isize": 1140809
+      },
+      {
+        "name": "libshout",
+        "version": "1:2.4.6-5",
+        "repo": "extra",
+        "sha256": "ff83687714596eb98bf599db8bdfeb107c6f3fa321027b99d70eee38786e2807",
+        "csize": 71410,
+        "isize": 206621
+      },
+      {
+        "name": "libsm",
+        "version": "1.2.6-1",
+        "repo": "extra",
+        "sha256": "ce334b07a9701ba6ef4d610257500f7b035dc1cdc0a658e056d293547cde0976",
+        "csize": 46693,
+        "isize": 271759
+      },
+      {
+        "name": "libsndfile",
+        "version": "1.2.2-4",
+        "repo": "extra",
+        "sha256": "9b580a25a4d38f688c3561bacdd1d8c2d3451eee657f317220a38cffe41fa512",
+        "csize": 321153,
+        "isize": 977515
+      },
+      {
+        "name": "libsodium",
+        "version": "1.0.22-1",
+        "repo": "extra",
+        "sha256": "fc0440c108fff0341f3cb7b4ee38f5a9406b45d9315205ce999e1b147b52f972",
+        "csize": 222253,
+        "isize": 673274
+      },
+      {
+        "name": "libsoup3",
+        "version": "3.8.1-1",
+        "repo": "extra",
+        "sha256": "a8c637736c948e01b9096b7e9251dc59404d51497fea7b68349546ef1aeb9b93",
+        "csize": 436460,
+        "isize": 2155252
+      },
+      {
+        "name": "libsoxr",
+        "version": "0.1.3-5",
+        "repo": "extra",
+        "sha256": "5d23ef0082854b031a4ac5867018969d3008f1d3ccb841872b8cdc12073ef55e",
+        "csize": 84244,
+        "isize": 216113
+      },
+      {
+        "name": "libssc",
+        "version": "0.4.4-1",
+        "repo": "extra",
+        "sha256": "6fa2bfa80ee5f35e06eafcead32fab20fd5d108ef96f4d503a23c5971d5ebd4c",
+        "csize": 58857,
+        "isize": 270976
+      },
+      {
+        "name": "libssh",
+        "version": "0.12.2-1",
+        "repo": "extra",
+        "sha256": "f7d543fa557482e52c0eac1d5cb348b0385fbf44bb1244d5b656d87010056a2b",
+        "csize": 267066,
+        "isize": 785547
+      },
+      {
+        "name": "libssh2",
+        "version": "1.11.1-7",
+        "repo": "core",
+        "sha256": "462cca91bff394c2719b7e8d1951f0c0a2db979d71521ac93dba6b6b6974f6b9",
+        "csize": 265862,
+        "isize": 514626
+      },
+      {
+        "name": "libstdc++",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "15dc6bd2f3a2ee17fcd79a14325e9e0037722a592b2bdc55e1665d92112eaa51",
+        "csize": 883125,
+        "isize": 2944139
+      },
+      {
+        "name": "libstemmer",
+        "version": "3.1.1-1",
+        "repo": "extra",
+        "sha256": "d5f9947642735e4f026cf0e382fbec7bb45f3eed3b00b8ba29562cd455746ee8",
+        "csize": 152084,
+        "isize": 670681
+      },
+      {
+        "name": "libsysprof-capture",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "4076158a6db4137615c241a7019309f8be3ceab9e5f91291385c4fb41a7c2921",
+        "csize": 54925,
+        "isize": 288998
+      },
+      {
+        "name": "libtasn1",
+        "version": "4.21.0-1",
+        "repo": "core",
+        "sha256": "00e50489d3c00951380d578cf89ebd7d7a38d97269e7ca9ccc9cde146f1e21da",
+        "csize": 136141,
+        "isize": 284533
+      },
+      {
+        "name": "libtatsu",
+        "version": "1.0.5-1",
+        "repo": "extra",
+        "sha256": "3151e7443850fd811e88d7cd7e6606b234f69f95f06ef79fa9f601cee3f85714",
+        "csize": 18090,
+        "isize": 48281
+      },
+      {
+        "name": "libthai",
+        "version": "0.1.30-1",
+        "repo": "extra",
+        "sha256": "890798f30ac72d0ca3b59dc5fe8eebe8f923bf09bdb1bc2ec75bc200d7aa70a2",
+        "csize": 276504,
+        "isize": 1304396
+      },
+      {
+        "name": "libtheora",
+        "version": "1.2.0-1",
+        "repo": "extra",
+        "sha256": "398931e8cdbcb359194af12564e301e1db57746a49e061d56ea8d41c9b54c9bc",
+        "csize": 442284,
+        "isize": 2450754
+      },
+      {
+        "name": "libtiff",
+        "version": "4.7.2-2",
+        "repo": "extra",
+        "sha256": "d08440599d808813057851b32dbffd6991d841f5d4efb4c1b75822e2b07c7ea9",
+        "csize": 422932,
+        "isize": 1387341
+      },
+      {
+        "name": "libtirpc",
+        "version": "1.3.8-1",
+        "repo": "core",
+        "sha256": "4861eac60e6daffdf02366a09fc559ffe456e987410362793cd7faf91be22b30",
+        "csize": 181209,
+        "isize": 449916
+      },
+      {
+        "name": "libtool",
+        "version": "2.6.2-5",
+        "repo": "core",
+        "sha256": "75da3b1ff54182ba18061714996943cb04d59b5206adfc76241ebb33934984cc",
+        "csize": 439406,
+        "isize": 2452271
+      },
+      {
+        "name": "libtsan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "8dd48336bb11dd0d15b9f5d0560166838802b21e3d279db25d6da96df19e0437",
+        "csize": 472183,
+        "isize": 1527644
+      },
+      {
+        "name": "libubsan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "eba85316fdf63265285624baa22724fbb93e15901696f99d2c2cbde2162ad71d",
+        "csize": 211475,
+        "isize": 520076
+      },
+      {
+        "name": "libunibreak",
+        "version": "7.0-1",
+        "repo": "extra",
+        "sha256": "0bb013ef4b8c9ba0ee0fe009201726600a0021330bb4dea690450e33faa45279",
+        "csize": 28481,
+        "isize": 160739
+      },
+      {
+        "name": "libunistring",
+        "version": "1.4.2-1",
+        "repo": "core",
+        "sha256": "582625bc02e710b587f4ed319e5c7ad29fd5d4d424b6384f125fc094f07ce590",
+        "csize": 746290,
+        "isize": 2866464
+      },
+      {
+        "name": "libunwind",
+        "version": "1.8.3-1",
+        "repo": "extra",
+        "sha256": "7a3106a1ec551d3047bfad524b3a7078058234047292a8fdf8cb5cb481bda5af",
+        "csize": 134569,
+        "isize": 309837
+      },
+      {
+        "name": "liburing",
+        "version": "2.15-1",
+        "repo": "extra",
+        "sha256": "ceaf9e41bcd5cb06efcffbc90a39628b7a5cae5490c5e6db810a792450070ad2",
+        "csize": 272523,
+        "isize": 489708
+      },
+      {
+        "name": "libusb",
+        "version": "1.0.30-1",
+        "repo": "core",
+        "sha256": "8b75816afbb316dc92110d9ac542df3e20d9550fe949a1a1402b25366c0a2c6d",
+        "csize": 82411,
+        "isize": 238616
+      },
+      {
+        "name": "libusbmuxd",
+        "version": "2.1.1-2",
+        "repo": "extra",
+        "sha256": "dcb2b0842a3f924142550704f4b968311c427dfe75b46da9c77b5906049a5a3f",
+        "csize": 28669,
+        "isize": 84529
+      },
+      {
+        "name": "libva",
+        "version": "2.24.1-1",
+        "repo": "extra",
+        "sha256": "59b0a85c6edb8953b7cbb077a3078c0e589e4e4b06cbf871417e40d0c0357747",
+        "csize": 210646,
+        "isize": 1043980
+      },
+      {
+        "name": "libvdpau",
+        "version": "1.5-4",
+        "repo": "extra",
+        "sha256": "fcdb6731dbc33afddd899de00a113d26d7dd4c69ae6a2dcb25754085b55d90b5",
+        "csize": 64313,
+        "isize": 291237
+      },
+      {
+        "name": "libverto",
+        "version": "0.3.2-6",
+        "repo": "core",
+        "sha256": "d0965b1b256e330e300c2bc3c699afa24f2d800dc476541039d452b606309496",
+        "csize": 19195,
+        "isize": 70030
+      },
+      {
+        "name": "libvorbis",
+        "version": "1.3.7-4",
+        "repo": "extra",
+        "sha256": "3aea2a31212fe7aa9f3d8922e8f71c2608d6260e8af0b7c1b5da790786763089",
+        "csize": 186353,
+        "isize": 874147
+      },
+      {
+        "name": "libvpl",
+        "version": "2.17.0-1",
+        "repo": "extra",
+        "sha256": "2c9f8d6dd899e8efbadf98976a62dae5fea704058f453048ac14e8ec246888e1",
+        "csize": 241679,
+        "isize": 1037634
+      },
+      {
+        "name": "libvpx",
+        "version": "1.17.0-1",
+        "repo": "extra",
+        "sha256": "023fa4af099e82ba9b2c3cb0c92bcac1b65975f3648e56f2131ede121d340115",
+        "csize": 1380722,
+        "isize": 3896948
+      },
+      {
+        "name": "libwacom",
+        "version": "2.20.0-1",
+        "repo": "extra",
+        "sha256": "6c646b6af034fc6b3975437cffbd0582f9f935173435b18357a2f1285b11b86c",
+        "csize": 190475,
+        "isize": 1688846
+      },
+      {
+        "name": "libwbclient",
+        "version": "2:4.25.1-1",
+        "repo": "extra",
+        "sha256": "e95b14014c087d85e95c559d01fab035e8317a401c0241f3421902ff6ded7ee8",
+        "csize": 38762,
+        "isize": 130413
+      },
+      {
+        "name": "libwebp",
+        "version": "1.6.0-2",
+        "repo": "extra",
+        "sha256": "a80e7edd3ddd27c6fd8cd83d0bd98d46b3f0279b7ee01f5baeded0d6f26f8975",
+        "csize": 339664,
+        "isize": 1085357
+      },
+      {
+        "name": "libwireplumber",
+        "version": "0.5.18-1",
+        "repo": "extra",
+        "sha256": "0475d9fb44a8b7fd34e38ef7c6ff46334163c2739ddb147e48d53f5cabc08b60",
+        "csize": 318388,
+        "isize": 1804796
+      },
+      {
+        "name": "libx11",
+        "version": "1.8.14-1",
+        "repo": "extra",
+        "sha256": "47fff5bbeadabe30b5fb1ad3f3609c20e6064ef002ba0377dfd8564ec813da7b",
+        "csize": 2120220,
+        "isize": 10322928
+      },
+      {
+        "name": "libxau",
+        "version": "1.0.12-1",
+        "repo": "extra",
+        "sha256": "605c8b059c36792f4e0cc235acadf39d0762df6c7878825a1be01a00ae7ea21e",
+        "csize": 11633,
+        "isize": 23152
+      },
+      {
+        "name": "libxcb",
+        "version": "1.17.0-1",
+        "repo": "extra",
+        "sha256": "2b2e7ac64b1d56c08a227c10bcab179605f2773f31db0a8c89f49f4e5b2f1292",
+        "csize": 1019918,
+        "isize": 4055289
+      },
+      {
+        "name": "libxcomposite",
+        "version": "0.4.7-1",
+        "repo": "extra",
+        "sha256": "5d11e648ccccbd7cf19884a677441528d8546eb89a4fda57febb08446e619917",
+        "csize": 11961,
+        "isize": 24653
+      },
+      {
+        "name": "libxcrypt",
+        "version": "4.5.2-1",
+        "repo": "core",
+        "sha256": "7d324b88963786491391468203701efd2c812798a9c3fbcc4ff8a4ddb2d9f276",
+        "csize": 94258,
+        "isize": 199801
+      },
+      {
+        "name": "libxcursor",
+        "version": "1.2.3-1",
+        "repo": "extra",
+        "sha256": "2a90267877c2f5ffe6c41a8ef91e6def3b7720de7b4b2628b329373ce20c1b99",
+        "csize": 33749,
+        "isize": 71422
+      },
+      {
+        "name": "libxcvt",
+        "version": "0.1.3-1",
+        "repo": "extra",
+        "sha256": "0e402123056ca36d3462ea830d8b18275f8c3d30167b5cda9b8e690f58e53003",
+        "csize": 11031,
+        "isize": 36757
+      },
+      {
+        "name": "libxdamage",
+        "version": "1.1.7-1",
+        "repo": "extra",
+        "sha256": "36be52372da7f2f49f949fc8a0f3c6e4eaee6fb03761d67e17355bd15ea6cee6",
+        "csize": 7465,
+        "isize": 17973
+      },
+      {
+        "name": "libxdmcp",
+        "version": "1.1.5-2",
+        "repo": "extra",
+        "sha256": "623c957c2fd4b427a0f5a531da44931f9f66521391ee0bd0e635479947036b65",
+        "csize": 27949,
+        "isize": 135580
+      },
+      {
+        "name": "libxext",
+        "version": "1.3.7-1",
+        "repo": "extra",
+        "sha256": "ac56905dc51bb652eca5f706fd7e7bb7ea81d4e057a236139fc769ce5ea10cf1",
+        "csize": 107586,
+        "isize": 315129
+      },
+      {
+        "name": "libxfixes",
+        "version": "6.0.2-1",
+        "repo": "extra",
+        "sha256": "d58ab2dbf326e36cf84792fe0dc12c34239ea04ac34159006a566103203db272",
+        "csize": 14237,
+        "isize": 38139
+      },
+      {
+        "name": "libxfont2",
+        "version": "2.0.9-1",
+        "repo": "extra",
+        "sha256": "1e6e54047bb0c069671d20c6eb9582310d842e88ba8943833facc5861109640c",
+        "csize": 99822,
+        "isize": 208199
+      },
+      {
+        "name": "libxft",
+        "version": "2.3.9-1",
+        "repo": "extra",
+        "sha256": "a7841ed8e67dc3f94eca4672c8961329dfdd6b67836f8ac720a246d3aab02ecb",
+        "csize": 61873,
+        "isize": 134018
+      },
+      {
+        "name": "libxi",
+        "version": "1.8.4-1",
+        "repo": "extra",
+        "sha256": "264bcc5732f144774922654c2975504583451504044168798fe2f11cb2b0a5bc",
+        "csize": 75634,
+        "isize": 432364
+      },
+      {
+        "name": "libxinerama",
+        "version": "1.1.6-1",
+        "repo": "extra",
+        "sha256": "7a91e2e649d9b24946b2b8088c3d7f70fa0673a96d3bae80497f403e57fb7654",
+        "csize": 10229,
+        "isize": 25196
+      },
+      {
+        "name": "libxkbcommon",
+        "version": "1.13.2-1",
+        "repo": "extra",
+        "sha256": "18d8dc90958eda2edaab9b671ee96c2c1f2b1a322618eca97c7c04605d738581",
+        "csize": 288147,
+        "isize": 1103127
+      },
+      {
+        "name": "libxkbcommon-x11",
+        "version": "1.13.2-1",
+        "repo": "extra",
+        "sha256": "350c1f367caed92abdb1c5d230b57cf46dd75b77d27c13ea7b152947fda62508",
+        "csize": 33374,
+        "isize": 107470
+      },
+      {
+        "name": "libxkbfile",
+        "version": "1.2.0-1",
+        "repo": "extra",
+        "sha256": "78f14e9854c70527975cf2204a6dcbb55473ccda8f4da953b8f15618f167a0f3",
+        "csize": 77719,
+        "isize": 202625
+      },
+      {
+        "name": "libxml2",
+        "version": "2.15.4-1",
+        "repo": "core",
+        "sha256": "a6b5c30f51a7ca7c85348de8e83280e6825a8f3e193cc6916ecd8e695d4a24bb",
+        "csize": 822191,
+        "isize": 3216638
+      },
+      {
+        "name": "libxpm",
+        "version": "3.5.20-1",
+        "repo": "extra",
+        "sha256": "cf538c4400abd6bdba8942bfdddb0c01716528e75bd95279b4b0a842fa035052",
+        "csize": 73958,
+        "isize": 171552
+      },
+      {
+        "name": "libxrandr",
+        "version": "1.5.5-1",
+        "repo": "extra",
+        "sha256": "49d3a3596311477f8ad2e1735dae612013118802822f21ce22886f65103dd899",
+        "csize": 28139,
+        "isize": 73087
+      },
+      {
+        "name": "libxrender",
+        "version": "0.9.13-1",
+        "repo": "extra",
+        "sha256": "893571a9e101faf7a8d3fbdb13a76513236e6ceffd7c2229721bcc53e957b9a4",
+        "csize": 30862,
+        "isize": 100754
+      },
+      {
+        "name": "libxshmfence",
+        "version": "1.3.3-1",
+        "repo": "extra",
+        "sha256": "39d0f128e4efc393fcd3b42f20046ec0e854341b601f14b457d67add86036d13",
+        "csize": 6113,
+        "isize": 17293
+      },
+      {
+        "name": "libxt",
+        "version": "1.3.1-1",
+        "repo": "extra",
+        "sha256": "5d4ee1f73c946cdd9b908b127157d6d826d198be982c91e199daf6bdd7f6b9ec",
+        "csize": 540271,
+        "isize": 2118982
+      },
+      {
+        "name": "libxtst",
+        "version": "1.2.6-1",
+        "repo": "extra",
+        "sha256": "c2a5db58aa5b4af3de2f985644b6573b4c34692a74478f0bdf913a5865966265",
+        "csize": 27132,
+        "isize": 111656
+      },
+      {
+        "name": "libxv",
+        "version": "1.0.13-1",
+        "repo": "extra",
+        "sha256": "9cae2311e50945fd5144575aa010da6009ca85d68a492f253920ac16c936e290",
+        "csize": 35784,
+        "isize": 61659
+      },
+      {
+        "name": "libxxf86vm",
+        "version": "1.1.7-1",
+        "repo": "extra",
+        "sha256": "b9215b44734a0149f6e9b3c9bfcbb5abef2b6f32b2767ed628bafc3f0cc38934",
+        "csize": 16030,
+        "isize": 36266
+      },
+      {
+        "name": "libyuv",
+        "version": "r2921+644251f25-1",
+        "repo": "extra",
+        "sha256": "953c7ee536b35be829a3cc8c614f9a0b553830f5d4d030f35fc452d0199612ce",
+        "csize": 269130,
+        "isize": 1577117
+      },
+      {
+        "name": "libzen",
+        "version": "0.4.41-3",
+        "repo": "extra",
+        "sha256": "aea7c2467b2580ee707b30ac6d6f3759be5c566c17699692149c950f566c8d18",
+        "csize": 133077,
+        "isize": 481969
+      },
+      {
+        "name": "libzip",
+        "version": "1.11.4-1",
+        "repo": "extra",
+        "sha256": "e6bc733cdc738d317d94f1906eb86229be174aa8362ad7dbb03ae68d9eb3dbf6",
+        "csize": 263160,
+        "isize": 492257
+      },
+      {
+        "name": "lilv",
+        "version": "0.28.0-1",
+        "repo": "extra",
+        "sha256": "d8b6e7aea382261114d383eb0ea93249a1172e28a1bc25613c5cd2a737511c7c",
+        "csize": 66412,
+        "isize": 210525
+      },
+      {
+        "name": "linux-api-headers",
+        "version": "7.3-1",
+        "repo": "core",
+        "sha256": "a5a6f5fc8922ef454c54e65e321906183e6606acaadaf416896dcbc44f2194ed",
+        "csize": 1599600,
+        "isize": 7410915
+      },
+      {
+        "name": "llvm-libs",
+        "version": "23.1.4-1",
+        "repo": "extra",
+        "sha256": "033a4c9b70686f2dca142087961add7db81ae816d85eb060bee91d05461ec5bd",
+        "csize": 43457482,
+        "isize": 172887701
+      },
+      {
+        "name": "lm_sensors",
+        "version": "1:3.6.2-1",
+        "repo": "extra",
+        "sha256": "5363304255a506cf71e1ed4f0464166e5f2aad6f0ae444fe08cafd8c83bf11ff",
+        "csize": 136777,
+        "isize": 498326
+      },
+      {
+        "name": "lmdb",
+        "version": "0.9.35-1",
+        "repo": "extra",
+        "sha256": "50ae8083860e1ffadf4fab3c173a043fd97be41f5ceda7d2e77c528cd84d2386",
+        "csize": 115659,
+        "isize": 422913
+      },
+      {
+        "name": "localsearch",
+        "version": "3.12.0-1",
+        "repo": "extra",
+        "sha256": "a0ca07c76e43143f128d1318935f5bd46817970a2b0f29278475d7809a8c87c9",
+        "csize": 653839,
+        "isize": 3019130
+      },
+      {
+        "name": "lua",
+        "version": "5.5.1-1",
+        "repo": "extra",
+        "sha256": "2cd360ab4590950b40adae136dd45a22a50b0621c67db5691e066751f6f2416f",
+        "csize": 400516,
+        "isize": 1670806
+      },
+      {
+        "name": "lua54",
+        "version": "5.4.9-1",
+        "repo": "extra",
+        "sha256": "ceda43657ee1d54eef282f636772baf4a7bacc86b5cd461d1891d26c23141ff1",
+        "csize": 376407,
+        "isize": 1591575
+      },
+      {
+        "name": "lv2",
+        "version": "1.18.10-2",
+        "repo": "extra",
+        "sha256": "82ad14877273ea4b06289e9bdb9a8241646c511eb9b1747e79413b6b24a9a3c5",
+        "csize": 158049,
+        "isize": 1025520
+      },
+      {
+        "name": "lz4",
+        "version": "1:1.10.0-2",
+        "repo": "core",
+        "sha256": "c6200c776440678fe8c26adae6c104194b425d9393a9e3fc09f934363f0c39a6",
+        "csize": 160028,
+        "isize": 460964
+      },
+      {
+        "name": "lzo",
+        "version": "2.10-5",
+        "repo": "core",
+        "sha256": "dd5ec871aea5ddfd38d4a25539e966dc05e75d6969ebc31917c8d25b97ccd69e",
+        "csize": 89912,
+        "isize": 395669
+      },
+      {
+        "name": "mdadm",
+        "version": "4.6-2",
+        "repo": "core",
+        "sha256": "17b2091ae3c0644e452783ec889d90e0814fd19d17989e184fcad1c73ae1aa76",
+        "csize": 430261,
+        "isize": 1072690
+      },
+      {
+        "name": "mesa",
+        "version": "1:26.2.5-1",
+        "repo": "extra",
+        "sha256": "8362f54565d3b71557e6a4ebcf208f51af32e205f271f8d13991962030139bd1",
+        "csize": 14156046,
+        "isize": 56480798
+      },
+      {
+        "name": "ministream",
+        "version": "0.99.1-1",
+        "repo": "extra",
+        "sha256": "22b5025fe5f619b1c878aa547e3ce1ce41f0026962f14bf84fa991f94aaad261",
+        "csize": 18583,
+        "isize": 55679
+      },
+      {
+        "name": "mobile-broadband-provider-info",
+        "version": "20251101-1",
+        "repo": "extra",
+        "sha256": "1b0146d8b72f6ffc3edcccd5709d8de42798c4827a5fccd994c389584d60c56c",
+        "csize": 64716,
+        "isize": 521558
+      },
+      {
+        "name": "modemmanager",
+        "version": "1.24.2-2",
+        "repo": "extra",
+        "sha256": "a8b3df2e44b0edc625e3fd33ce496f0e81c8a2982a6edaf741a5c3d3af283e13",
+        "csize": 1225683,
+        "isize": 4941887
+      },
+      {
+        "name": "mpfr",
+        "version": "4.2.2-1",
+        "repo": "core",
+        "sha256": "e765082b2c3260550887ccf34f6f0d24289fc5ca8c0949eb5c2e9937272ea80f",
+        "csize": 447319,
+        "isize": 1060163
+      },
+      {
+        "name": "mpg123",
+        "version": "1.33.7-1",
+        "repo": "extra",
+        "sha256": "af9bbea4f7c003f2c4b604430582d58b7b232c5adcda673d15401c3faf1943f2",
+        "csize": 470959,
+        "isize": 1259452
+      },
+      {
+        "name": "mtdev",
+        "version": "1.1.7-1",
+        "repo": "extra",
+        "sha256": "f04b23715273930002a0133ebd0f48ad4374b9e3ec9484a500a33b6aee478443",
+        "csize": 17246,
+        "isize": 52737
+      },
+      {
+        "name": "mutter",
+        "version": "51.1-1",
+        "repo": "extra",
+        "sha256": "aeed82eb1346b2422613b29b10b1599e3e055528cd47a48170c85ee12cfa739e",
+        "csize": 3040458,
+        "isize": 15608768
+      },
+      {
+        "name": "nautilus",
+        "version": "51.1-1",
+        "repo": "extra",
+        "sha256": "fd53302287620a95abb30e305843be3df1eef1365f68c4f9dac1285743037ec9",
+        "csize": 2493575,
+        "isize": 14448612
+      },
+      {
+        "name": "ncurses",
+        "version": "6.6-2",
+        "repo": "core",
+        "sha256": "9b80390fd681121443a45a51b74e2e2ade245ce22af8769915d63165b727e27c",
+        "csize": 1226662,
+        "isize": 4289967
+      },
+      {
+        "name": "nettle",
+        "version": "4.0-1",
+        "repo": "core",
+        "sha256": "679138a8405ca383aba7836d54fdc282db9394b7dc23c097b8965f70119adf13",
+        "csize": 468859,
+        "isize": 1083098
+      },
+      {
+        "name": "npth",
+        "version": "1.8-1",
+        "repo": "core",
+        "sha256": "2f045edab9f7fd2c04667c5ba7f70c47da7b6fcfe87a99a857ab7ef5a12f39b4",
+        "csize": 28897,
+        "isize": 88201
+      },
+      {
+        "name": "nspr",
+        "version": "4.40-1",
+        "repo": "core",
+        "sha256": "00c276c71d748e5220757f26776f4ad340b1cb477eb835de0d088f9b36277ad7",
+        "csize": 206580,
+        "isize": 752825
+      },
+      {
+        "name": "nss",
+        "version": "3.132-1",
+        "repo": "core",
+        "sha256": "22fb9a759a58b68331caf532c748dea49dd903781717faae017b3ca9ef7d602a",
+        "csize": 1808091,
+        "isize": 5704893
+      },
+      {
+        "name": "numactl",
+        "version": "2.0.19-1",
+        "repo": "extra",
+        "sha256": "699bce74daee11fa49de93999ba4e023f132bc51a7768dec845b2979d54f367d",
+        "csize": 84828,
+        "isize": 246970
+      },
+      {
+        "name": "ocl-icd",
+        "version": "2.3.5-1",
+        "repo": "extra",
+        "sha256": "dd5a8adc1b0f9489c2dd182bb645cdaa4b7786811b34aa4acc26cf882d1428b8",
+        "csize": 109553,
+        "isize": 521166
+      },
+      {
+        "name": "opencore-amr",
+        "version": "0.1.6-2",
+        "repo": "extra",
+        "sha256": "d7072809d9754200244280d1b8ffd945a3d87ca7562d82d0bf2bf13ce77261a9",
+        "csize": 146385,
+        "isize": 299588
+      },
+      {
+        "name": "openh264",
+        "version": "2.7.0-1",
+        "repo": "extra",
+        "sha256": "c0635a401aada4bc8d2811241c649ed114b834193fe51759c43af12a9c9cebac",
+        "csize": 697090,
+        "isize": 2397408
+      },
+      {
+        "name": "openjpeg2",
+        "version": "2.5.4-1",
+        "repo": "extra",
+        "sha256": "f09d64baeda07bc9bc0bb6a08b5f316db372bedd100b9a56f44ffaeace26c1e6",
+        "csize": 917105,
+        "isize": 14020246
+      },
+      {
+        "name": "openssh",
+        "version": "10.6p1-2",
+        "repo": "core",
+        "sha256": "f260869a1e9a27b1efa44216df6213187dccce6019cabcd0b260f2d35358d721",
+        "csize": 1504248,
+        "isize": 7096251
+      },
+      {
+        "name": "openssl",
+        "version": "3.6.5-1",
+        "repo": "core",
+        "sha256": "be0a07ef3d8ffa878732b138e98dee26559527212cb941fc5f6c282545c787cc",
+        "csize": 5783344,
+        "isize": 12858874
+      },
+      {
+        "name": "opus",
+        "version": "1.6.1-1",
+        "repo": "extra",
+        "sha256": "191b1f303950e184bdbe12105d8cb06e69e727e8f9160cfdcf33105f70d05b46",
+        "csize": 3451036,
+        "isize": 4357129
+      },
+      {
+        "name": "orc",
+        "version": "0.4.44-1",
+        "repo": "extra",
+        "sha256": "87bf68a92af1281feacdccd04f9e3a8494e1da19adc76f2fd3b7080c316f8db5",
+        "csize": 357190,
+        "isize": 1518117
+      },
+      {
+        "name": "osinfo-db",
+        "version": "20260812-1",
+        "repo": "extra",
+        "sha256": "f39665d3b2f1e8ebe3a003bc0a9ce97827f04c2c14e155df7846c6e742a30e40",
+        "csize": 230108,
+        "isize": 4768411
+      },
+      {
+        "name": "p11-kit",
+        "version": "0.26.5-1",
+        "repo": "core",
+        "sha256": "94ad53e76eaeacac1584ace5da7751d8e7fb7aefbfd3bd99d9c34d3461d630ad",
+        "csize": 261660,
+        "isize": 1195446
+      },
+      {
+        "name": "pam",
+        "version": "1.7.3-1",
+        "repo": "core",
+        "sha256": "78edd987656671b1995412b60ac1a1ae92f7110a14ea3722c2ef3a81e928d7fb",
+        "csize": 621467,
+        "isize": 3081792
+      },
+      {
+        "name": "pambase",
+        "version": "20260616-1",
+        "repo": "core",
+        "sha256": "306265b486e3f7d2854d583202409cdd90f131368c92aa56f845822a5d2bbf65",
+        "csize": 3386,
+        "isize": 2794
+      },
+      {
+        "name": "pango",
+        "version": "1:1.58.2-1",
+        "repo": "extra",
+        "sha256": "9b74c73056ce6b2aca83bf1647f79f0a6bf53f204c5273b03530e034472db13c",
+        "csize": 452759,
+        "isize": 2497225
+      },
+      {
+        "name": "parted",
+        "version": "3.8-1",
+        "repo": "extra",
+        "sha256": "082e294123c4b993fa367c32fd5807e0ec9366b2420d17286d64654326a880f3",
+        "csize": 577909,
+        "isize": 2794888
+      },
+      {
+        "name": "pcre",
+        "version": "8.45-5",
+        "repo": "core",
+        "sha256": "386dc0f4c46f359e9bdd033f07d37b43df1f63a2649566685dc0c86e19623274",
+        "csize": 1044986,
+        "isize": 3712789
+      },
+      {
+        "name": "pcre2",
+        "version": "10.49-1",
+        "repo": "core",
+        "sha256": "e37f4152ff869a6ba050ad08307d7b6b474f4d48cbe0c6ccc01ce9118a774dbf",
+        "csize": 1781740,
+        "isize": 7457904
+      },
+      {
+        "name": "perl",
+        "version": "5.44.0-1",
+        "repo": "core",
+        "sha256": "f7170b9ac09dfc4d46decd5e953888a379215af0207e361bbd426efa53968c70",
+        "csize": 22001771,
+        "isize": 75815345
+      },
+      {
+        "name": "pinentry",
+        "version": "1.3.3-1",
+        "repo": "core",
+        "sha256": "16dfcc18fc60f8c654687970a9b7253ce17a987c44119fe2ee37c760460fc557",
+        "csize": 172284,
+        "isize": 692067
+      },
+      {
+        "name": "pipewire",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "4a28a0f18fa2d6b73563782988c3572bca7ffc8c56f104eeaa5339667cbcac30",
+        "csize": 286540,
+        "isize": 1361015
+      },
+      {
+        "name": "pipewire-audio",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "df34e8b39a82e1838ffb11a7c431acd2bf1faf4d72358b63310cd142ebc3204d",
+        "csize": 1365996,
+        "isize": 4655422
+      },
+      {
+        "name": "pipewire-pulse",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "271dd90d4b8f3b95fd41472c96e45d75174fffef49bbd4c4f882e6a99baf1ebd",
+        "csize": 223553,
+        "isize": 575564
+      },
+      {
+        "name": "pipewire-session-manager",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "d3925e414ce3cab200b9cff06b4c43bcb1980d51fbd2a7a00e16e24827bdb494",
+        "csize": 4131,
+        "isize": 0
+      },
+      {
+        "name": "pixman",
+        "version": "0.46.4-1",
+        "repo": "extra",
+        "sha256": "e87e665d25a2230a178d8490202e1d677fde5908f68ebedf7d987308fc26fcb6",
+        "csize": 291455,
+        "isize": 774270
+      },
+      {
+        "name": "polkit",
+        "version": "128-1",
+        "repo": "extra",
+        "sha256": "27a25617077c39f430ab5fe7aa8c9dd913711bd0f39745af123da0bf3fb1de07",
+        "csize": 437644,
+        "isize": 2096911
+      },
+      {
+        "name": "poppler",
+        "version": "26.10.0-1",
+        "repo": "extra",
+        "sha256": "3c90aa3d2b0f90e25fc63e8250971197e8826ce4904d3a950eb41b5bd9f8ea2f",
+        "csize": 1921134,
+        "isize": 7141242
+      },
+      {
+        "name": "poppler-glib",
+        "version": "26.10.0-1",
+        "repo": "extra",
+        "sha256": "e080c5e066335d0f7dd4a06cd9b2f42a0db0822ae820353f8bdcdc3cf4d86b8f",
+        "csize": 375682,
+        "isize": 3409452
+      },
+      {
+        "name": "popt",
+        "version": "1.19-2",
+        "repo": "core",
+        "sha256": "877635962b604efa79409c3d423f4fdffc4868776af3e0e804cc94a0b57ca151",
+        "csize": 78173,
+        "isize": 241164
+      },
+      {
+        "name": "portaudio",
+        "version": "1:19.7.0-4",
+        "repo": "extra",
+        "sha256": "ca2e6423a25820b8a2808ce933365680f38cb4af7875533af2902ade761379c2",
+        "csize": 102521,
+        "isize": 344975
+      },
+      {
+        "name": "ppp",
+        "version": "2.5.4-1",
+        "repo": "core",
+        "sha256": "a06030803b631121331295eaa7e7dc8e9be276a233f8318dcaf8070a1296f13f",
+        "csize": 343030,
+        "isize": 966000
+      },
+      {
+        "name": "procps-ng",
+        "version": "4.0.7-1",
+        "repo": "core",
+        "sha256": "7a0b17ee89ad1a04f7c6c86be69c9c816ac2c14da9648dfdefb7ccf4b22c14d3",
+        "csize": 1023957,
+        "isize": 2674579
+      },
+      {
+        "name": "protobuf",
+        "version": "36.1-1",
+        "repo": "extra",
+        "sha256": "3d63417c8fbe2354bea29b23c338baf3f03c9438e0127c5519d6dddc4825185c",
+        "csize": 4106999,
+        "isize": 19802545
+      },
+      {
+        "name": "protobuf-c",
+        "version": "1.5.2-15",
+        "repo": "extra",
+        "sha256": "5f6d5bf77d267ab0b77dd09e488a3480c7e4e8c92a2d9e9a43200c386886a1c7",
+        "csize": 144037,
+        "isize": 433123
+      },
+      {
+        "name": "pulse-native-provider",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "1b2a578a355c788c8a9b814170f86ae2645d9a5991e7677b4e7353a465878707",
+        "csize": 4124,
+        "isize": 0
+      },
+      {
+        "name": "python-argcomplete",
+        "version": "3.7.2-1",
+        "repo": "extra",
+        "sha256": "202817bb7d46d719388cb3ce1a962e50e5d535a78578676b46ecbc11bcd5fce9",
+        "csize": 77103,
+        "isize": 347980
+      },
+      {
+        "name": "python-autocommand",
+        "version": "2.2.2-9",
+        "repo": "extra",
+        "sha256": "17b5712b2fd15f1202c72861998da29c4d25696f22cb4d1a704373fcf7926043",
+        "csize": 25059,
+        "isize": 87897
+      },
+      {
+        "name": "python-dbus",
+        "version": "1.5.1-1",
+        "repo": "extra",
+        "sha256": "f1760d9c4494efb278e53cc16dcfcbff43c98422f23752b12ced16465a83dad3",
+        "csize": 126971,
+        "isize": 651103
+      },
+      {
+        "name": "python-jaraco.collections",
+        "version": "5.1.0-3",
+        "repo": "extra",
+        "sha256": "6458833d521549d9db4e7157eba5cb5d0258f2f9c46baadb794c925d3dcbbbff",
+        "csize": 24868,
+        "isize": 112764
+      },
+      {
+        "name": "python-jaraco.context",
+        "version": "6.1.2-1",
+        "repo": "extra",
+        "sha256": "97b5709a7f0c1b8192756b3f9a414100b9438f9eff0d85df4b37fd0fb293f25a",
+        "csize": 17091,
+        "isize": 60520
+      },
+      {
+        "name": "python-jaraco.functools",
+        "version": "4.1.0-3",
+        "repo": "extra",
+        "sha256": "b6fde8d3fef8e1338d92aa59c85b3179e4d35a67029b123a74ee23f62bd86344",
+        "csize": 18845,
+        "isize": 74624
+      },
+      {
+        "name": "python-jaraco.text",
+        "version": "4.0.0-4",
+        "repo": "extra",
+        "sha256": "df57d9e62cb16d23c45f10ae4658150db3e6a4059e41f9fbc4d5e5db05388e25",
+        "csize": 22187,
+        "isize": 87306
+      },
+      {
+        "name": "python-mako",
+        "version": "1.4.3-1",
+        "repo": "extra",
+        "sha256": "3e3fbef071bf47aa4945037b600e31e7bcc7f993dfa8ab384546ab56e86e7954",
+        "csize": 180068,
+        "isize": 1031823
+      },
+      {
+        "name": "python-markdown",
+        "version": "3.11.2-1",
+        "repo": "extra",
+        "sha256": "857d07e7052a2b8c9a124fb8de5bce3e196056bf07466cff4c8cb248718ad16d",
+        "csize": 210618,
+        "isize": 1271508
+      },
+      {
+        "name": "python-markupsafe",
+        "version": "3.0.4-1",
+        "repo": "extra",
+        "sha256": "fc242b277ed7824ee8b927fe2f7dee0f9c58da09f2016218cf2f5a0b01eea9be",
+        "csize": 22381,
+        "isize": 97742
+      },
+      {
+        "name": "python-more-itertools",
+        "version": "11.2.1-1",
+        "repo": "extra",
+        "sha256": "f16b566f45419a43acbc078cf6ff32b56df75dba67d9fe6c9dd48bfa43b5745d",
+        "csize": 135765,
+        "isize": 821009
+      },
+      {
+        "name": "python-packaging",
+        "version": "26.3-1",
+        "repo": "extra",
+        "sha256": "b6020d9f99a21fe3b209c7e4253c33ba36e644e8d75a9cac6af5ca0fe4fb1e6c",
+        "csize": 263904,
+        "isize": 1655057
+      },
+      {
+        "name": "python-platformdirs",
+        "version": "4.13.5-1",
+        "repo": "extra",
+        "sha256": "18559275382f891117817c6a5cc317cc87890d6b7aca5bfedc912fe87ebc4637",
+        "csize": 69815,
+        "isize": 602319
+      },
+      {
+        "name": "python-setuptools",
+        "version": "1:84.2.1-1",
+        "repo": "extra",
+        "sha256": "14704478fd82e03078497f5be3235607d0937650dd5cdcca86bda347271ba9dc",
+        "csize": 817498,
+        "isize": 5184413
+      },
+      {
+        "name": "python-wheel",
+        "version": "0.48.0-1",
+        "repo": "extra",
+        "sha256": "e2ff0c0129c86523b95a8d2adf0feb58309d556eb2360cae11a040fe15b80c12",
+        "csize": 77451,
+        "isize": 354987
+      },
+      {
+        "name": "rav1e",
+        "version": "0.8.1-3",
+        "repo": "extra",
+        "sha256": "17812c6c332ad56fbbce4b758ce8cf9b8d311b2474a574619643aedd681119c3",
+        "csize": 1658941,
+        "isize": 7852713
+      },
+      {
+        "name": "readline",
+        "version": "8.3.6-1",
+        "repo": "core",
+        "sha256": "016b2aeebfbe9dfb89283c52bb49487d95ea23a875d477da42d000a793613020",
+        "csize": 424891,
+        "isize": 1573521
+      },
+      {
+        "name": "rsync",
+        "version": "3.5.1-3",
+        "repo": "extra",
+        "sha256": "450464513cef80cf7da6a7b89ad8f976b40336b189233cdeeba0b462b75f4e75",
+        "csize": 435763,
+        "isize": 879520
+      },
+      {
+        "name": "rubberband",
+        "version": "4.0.0-2",
+        "repo": "extra",
+        "sha256": "ed5e3a9856db7a99f4aa7bfe4f0cb4903faab720020d0b07aef61376f86ef9e1",
+        "csize": 307768,
+        "isize": 1593065
+      },
+      {
+        "name": "sbc",
+        "version": "2.2-1",
+        "repo": "extra",
+        "sha256": "a6545bbb75db51b4bc3e3022dabeb3cf5637c503a7efb45f739e758d6d88f6b2",
+        "csize": 51117,
+        "isize": 216562
+      },
+      {
+        "name": "sdl2-compat",
+        "version": "2.32.74-1",
+        "repo": "extra",
+        "sha256": "caea4b91d83bb585542e86047a800b7500376c4ce2c6d74b51465123d74439f6",
+        "csize": 478999,
+        "isize": 3238825
+      },
+      {
+        "name": "sdl3",
+        "version": "3.4.18-1",
+        "repo": "extra",
+        "sha256": "fbcd4dbe7d9609ab60ccfb0a9ad559df242823caba18ed1e6fc7c15abe7bc04e",
+        "csize": 1798313,
+        "isize": 7324203
+      },
+      {
+        "name": "sed",
+        "version": "4.10-2",
+        "repo": "core",
+        "sha256": "90733f34fe5791b554b935998df858350bcea53061257dba06829ce3533f8e01",
+        "csize": 220815,
+        "isize": 745601
+      },
+      {
+        "name": "serd",
+        "version": "0.32.10-1",
+        "repo": "extra",
+        "sha256": "7a86b0bca67dd3391016f0ca08382f102a64a860a75af883c6503a62b88f6815",
+        "csize": 66547,
+        "isize": 176257
+      },
+      {
+        "name": "shaderc",
+        "version": "2026.4-1",
+        "repo": "extra",
+        "sha256": "4d3f5e14b23f596959135a657a024278a3cdd403eeaa60d2e7bc61093a2ffd6b",
+        "csize": 168365,
+        "isize": 709124
+      },
+      {
+        "name": "shadow",
+        "version": "4.20.0.arch1-1",
+        "repo": "core",
+        "sha256": "615c819eb2d3e22158289f3cc2447f81ae981a6d11b3418da30b6085306b3e77",
+        "csize": 1232280,
+        "isize": 3769582
+      },
+      {
+        "name": "shared-mime-info",
+        "version": "2.5.1-2",
+        "repo": "extra",
+        "sha256": "e71f0788fbb52679b9a75f3558ef8a2b5c3c9f691f136b7574caefc0240461c1",
+        "csize": 783722,
+        "isize": 6111615
+      },
+      {
+        "name": "slang",
+        "version": "2.3.3-4",
+        "repo": "extra",
+        "sha256": "272e4afe2bff678a590d28abbeba8eda95b2041c5d0063e01a8a0f457b13a177",
+        "csize": 846235,
+        "isize": 3527887
+      },
+      {
+        "name": "smbclient",
+        "version": "2:4.25.1-1",
+        "repo": "extra",
+        "sha256": "60edd2a387e8219353c42f2c936d7011e3492a329d5e085a3599aab05aa68de6",
+        "csize": 7697766,
+        "isize": 30419112
+      },
+      {
+        "name": "snappy",
+        "version": "1.3.1-1",
+        "repo": "extra",
+        "sha256": "f9660c6253000eeb98e0fbe960f1b1784a5a26966450c5ece013e8c977cd9e5b",
+        "csize": 40127,
+        "isize": 113174
+      },
+      {
+        "name": "sndio",
+        "version": "1.10.0-1",
+        "repo": "extra",
+        "sha256": "82b16de5ef6054418db941e01f6aca2b5afb605a579eabd847155daa2fb56ea2",
+        "csize": 129936,
+        "isize": 293392
+      },
+      {
+        "name": "sord",
+        "version": "0.16.22-1",
+        "repo": "extra",
+        "sha256": "2d6a5986fb8904a4ab9a8270e8325003a86480decce6ba10e88971562a0166a8",
+        "csize": 37647,
+        "isize": 123244
+      },
+      {
+        "name": "sound-theme-freedesktop",
+        "version": "0.8-6",
+        "repo": "extra",
+        "sha256": "266d5198ed35ed265f7e64cb014b48bd1e5a9eda1defcce817cce200ffaa6c19",
+        "csize": 377411,
+        "isize": 472275
+      },
+      {
+        "name": "spandsp",
+        "version": "0.0.6-7",
+        "repo": "extra",
+        "sha256": "08ee8756f182ad22f5651818c459c868cd992985f724ee4af30c0b5564c09c55",
+        "csize": 433470,
+        "isize": 1664712
+      },
+      {
+        "name": "speex",
+        "version": "1.2.1-3",
+        "repo": "extra",
+        "sha256": "f9488fe7910d09222314dcf361064a50904f709cac06bb7d73451e4db9f27a85",
+        "csize": 496950,
+        "isize": 668435
+      },
+      {
+        "name": "speexdsp",
+        "version": "1.2.1-3",
+        "repo": "extra",
+        "sha256": "56cdf8b95fca61e610fa3c08a428c516b85df4a7e9d497096232cbaafc0e8c2b",
+        "csize": 462423,
+        "isize": 566310
+      },
+      {
+        "name": "spirv-tools",
+        "version": "1:1.4.363.0-1",
+        "repo": "extra",
+        "sha256": "04b83f2e9fbf38cd349031b105a49d6baf451f7116e84428fc0bfe55a3968010",
+        "csize": 2221392,
+        "isize": 8559942
+      },
+      {
+        "name": "sqlite",
+        "version": "3.54.0-1",
+        "repo": "core",
+        "sha256": "c5e40a46c5ddec7e44f8cad475e39344fedc7f01fc2b2bb87c0c7862f4b942f3",
+        "csize": 2505466,
+        "isize": 17806821
+      },
+      {
+        "name": "sratom",
+        "version": "0.6.22-1",
+        "repo": "extra",
+        "sha256": "d1e9488f3c1b8a05d3061bf6d798eea6edba8ad8918b44e4289df2aa09be1a5a",
+        "csize": 20953,
+        "isize": 54504
+      },
+      {
+        "name": "srt",
+        "version": "1.5.7-2",
+        "repo": "extra",
+        "sha256": "936cea8439721c70b0492385a8e04deedfca08dfabc2dd0bd135740b54d2cf81",
+        "csize": 565094,
+        "isize": 1677477
+      },
+      {
+        "name": "startup-notification",
+        "version": "0.12-9",
+        "repo": "extra",
+        "sha256": "ead2ea9178863a2477d69db564013eb5123f6381b388ddcd62d73b03018c7b63",
+        "csize": 19347,
+        "isize": 58631
+      },
+      {
+        "name": "svt-av1",
+        "version": "4.2.0-1",
+        "repo": "extra",
+        "sha256": "3d807071e467a022eeab287ff117c73ec4abb085a0374b54d9ff33b4479f515a",
+        "csize": 2071166,
+        "isize": 5619211
+      },
+      {
+        "name": "sysprof",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "36cac0c413d15aba1b9761a79110a09e969d1bc88253694b8a75198f7f9ec701",
+        "csize": 1060846,
+        "isize": 5231157
+      },
+      {
+        "name": "systemd",
+        "version": "262.1-1",
+        "repo": "core",
+        "sha256": "fd6d2e14fa2b42c793ae5c52054414a5b74932b152023453facd287f268b3622",
+        "csize": 11203908,
+        "isize": 42545279
+      },
+      {
+        "name": "systemd-libs",
+        "version": "262.1-1",
+        "repo": "core",
+        "sha256": "fbf6d77053bb210c8fd3f473f86159870ece009506828e3d4a7b8c425a50995e",
+        "csize": 1507473,
+        "isize": 3965002
+      },
+      {
+        "name": "taglib",
+        "version": "2.3.2-1",
+        "repo": "extra",
+        "sha256": "3dc1d3fabf9a8c12a5a48994e9a4b543f23596b10e0f8ad9d73db771ef854908",
+        "csize": 589280,
+        "isize": 2492534
+      },
+      {
+        "name": "talloc",
+        "version": "2.5.0-2",
+        "repo": "extra",
+        "sha256": "8209c935210ab9ce983afa271acd3504a8df2f272f11f66cbdc72b1d339f8529",
+        "csize": 51850,
+        "isize": 182711
+      },
+      {
+        "name": "tar",
+        "version": "1.35-5",
+        "repo": "core",
+        "sha256": "e8a3baa1b4bd754442f92c1c25794b9225700f931e1d2c175bb2e7d9a28725e7",
+        "csize": 783624,
+        "isize": 2936350
+      },
+      {
+        "name": "tdb",
+        "version": "1.4.15-2",
+        "repo": "extra",
+        "sha256": "f8edbb862dc0eebbe8f5ff448c1530db65874599cfaaea4c34e6247fe732e239",
+        "csize": 76990,
+        "isize": 247497
+      },
+      {
+        "name": "tecla",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "9e6a638390734e45d240024b57fe25402c4aea9ccf7820e1ca0881a679809d52",
+        "csize": 39344,
+        "isize": 133758
+      },
+      {
+        "name": "tevent",
+        "version": "1:0.17.2-2",
+        "repo": "extra",
+        "sha256": "aa30a016ec4d8b8aba0d2930392e3fc841afd8b59fc6955aedd343876dcee5f5",
+        "csize": 61634,
+        "isize": 222965
+      },
+      {
+        "name": "tinysparql",
+        "version": "3.12.0-1",
+        "repo": "extra",
+        "sha256": "f2f75be63d3d9d76a68275f4d3749cc429c924ccd90203e1ae60c8900d518498",
+        "csize": 1113070,
+        "isize": 4115278
+      },
+      {
+        "name": "tinyxml2",
+        "version": "11.0.0-2",
+        "repo": "extra",
+        "sha256": "75ebed93d1496529b97068b17f4aad8c8932a4126f3f5e7ea31c46b0e43e218d",
+        "csize": 48647,
+        "isize": 178117
+      },
+      {
+        "name": "totem-pl-parser",
+        "version": "3.26.7-1",
+        "repo": "extra",
+        "sha256": "a9e530a036c3a337d5ccea670cd148ef5b8d318052fc158ba2780dfa2e6dde96",
+        "csize": 124245,
+        "isize": 596145
+      },
+      {
+        "name": "tpm2-tss",
+        "version": "4.2.0-2",
+        "repo": "core",
+        "sha256": "7aa2a963f99bcd51e4f3b2587fa8f374a7cfa09ec65749cc9a72fa6f3ad34fdc",
+        "csize": 1042609,
+        "isize": 3823415
+      },
+      {
+        "name": "twolame",
+        "version": "0.4.0-4",
+        "repo": "extra",
+        "sha256": "16cd8a6134a928ab9453b11518258aca74559bf6782d93a5c484f693ad8384e0",
+        "csize": 86287,
+        "isize": 248623
+      },
+      {
+        "name": "tzdata",
+        "version": "2026e-1",
+        "repo": "core",
+        "sha256": "921d75b3bdb810be4a917013fd2569912d0cc23dc718c591764f64ed83de26ea",
+        "csize": 312965,
+        "isize": 1742570
+      },
+      {
+        "name": "uchardet",
+        "version": "0.0.8-4",
+        "repo": "extra",
+        "sha256": "afe60fcdc490303349b23d0aaf3fa19205fb4a029ba1382dd8bd2a18d5db292c",
+        "csize": 79618,
+        "isize": 209324
+      },
+      {
+        "name": "udisks2",
+        "version": "2.11.2-1",
+        "repo": "extra",
+        "sha256": "4b6fa221f14a248cc86d0ea8e0380d09965305a38d3cb19aba318508fe61efdb",
+        "csize": 811523,
+        "isize": 8267894
+      },
+      {
+        "name": "unzip",
+        "version": "6.0-23",
+        "repo": "extra",
+        "sha256": "12afd31b30f4335ed56cda717fc2ea0e817ee8d13e0562177ddbb20bd2dc937a",
+        "csize": 144673,
+        "isize": 315463
+      },
+      {
+        "name": "upower",
+        "version": "1.91.5-1",
+        "repo": "extra",
+        "sha256": "2de652124aaeec80cfec37411d4b0a9a8c16cc895a1d0e395cbe98d7186591a6",
+        "csize": 176808,
+        "isize": 891922
+      },
+      {
+        "name": "usbguard",
+        "version": "1.1.4-11",
+        "repo": "extra",
+        "sha256": "48f5a1b7bad9c16648c52bdeb09a31fce922ea7cf21a1eb35105724d68fe11cb",
+        "csize": 508831,
+        "isize": 1733087
+      },
+      {
+        "name": "util-linux",
+        "version": "2.42.4-1",
+        "repo": "core",
+        "sha256": "95b7096bf4b45274645f6bb96f5b5508af6ea80e5fccba29244abaa53a341962",
+        "csize": 6684541,
+        "isize": 20929372
+      },
+      {
+        "name": "util-linux-libs",
+        "version": "2.42.4-1",
+        "repo": "core",
+        "sha256": "56075bc7da9be4470da36a040195f98aac0afbc1edcc7e4f27e6d267dcaf9f37",
+        "csize": 542399,
+        "isize": 1459403
+      },
+      {
+        "name": "v4l-utils",
+        "version": "1.32.0-2",
+        "repo": "extra",
+        "sha256": "0a316d96bb8c73f0f047458d2d652971137d27de826e10f386ea933860ae885d",
+        "csize": 2085295,
+        "isize": 11863568
+      },
+      {
+        "name": "vala",
+        "version": "0.56.19-2",
+        "repo": "extra",
+        "sha256": "b9c8a82c6ea2c2a61d0f85e0de23ed1cd2b01aa0e52e459ab9fe879ca39921e4",
+        "csize": 2423616,
+        "isize": 15303591
+      },
+      {
+        "name": "vapoursynth",
+        "version": "81-1",
+        "repo": "extra",
+        "sha256": "148deb4215b006a13abf81e1c445c5e85aeba1e92e6e935083cc3193306744ef",
+        "csize": 3404261,
+        "isize": 12490277
+      },
+      {
+        "name": "vid.stab",
+        "version": "1.1.2-1",
+        "repo": "extra",
+        "sha256": "e50577203f408e76dad3e7325c98577180fd32c4a0e0440cd85874d03b907676",
+        "csize": 97907,
+        "isize": 550488
+      },
+      {
+        "name": "vmaf",
+        "version": "3.2.1-1",
+        "repo": "extra",
+        "sha256": "c99983f741cf5679bd44eeecf6ca53931077f7d07563480376fc2b0256548910",
+        "csize": 507549,
+        "isize": 7458877
+      },
+      {
+        "name": "volume_key",
+        "version": "0.3.12-12",
+        "repo": "extra",
+        "sha256": "8f6528250a09cf4781e2de814a2a4056d05ff5e3df17184aee5a0b59da12a04c",
+        "csize": 133210,
+        "isize": 715589
+      },
+      {
+        "name": "vulkan-headers",
+        "version": "1:1.4.363.0-1",
+        "repo": "extra",
+        "sha256": "574e320444b0eac2479f2c3441c6d030176db572bca8a783bf2a67b808a11ebd",
+        "csize": 1901792,
+        "isize": 43064162
+      },
+      {
+        "name": "vulkan-icd-loader",
+        "version": "1.4.363.0-1",
+        "repo": "extra",
+        "sha256": "c84e1c9752eeebcc7d9aa5e755c8fd5291c12e8d4e3a17ab83435ee51715dcdc",
+        "csize": 191476,
+        "isize": 702478
+      },
+      {
+        "name": "wavpack",
+        "version": "5.9.0-1",
+        "repo": "extra",
+        "sha256": "d5aed609ce3bf3d21d6939f1022ff89baac1784f905a5abb9967bd5a047d0f41",
+        "csize": 531028,
+        "isize": 940220
+      },
+      {
+        "name": "wayland",
+        "version": "1.26.0-1",
+        "repo": "extra",
+        "sha256": "0bf83ec9dd5b9e4037e7fd7d5ded70838bb50f82aa43e8280c8c0025c92804a9",
+        "csize": 153145,
+        "isize": 897135
+      },
+      {
+        "name": "wayland-protocols",
+        "version": "1.49-1",
+        "repo": "extra",
+        "sha256": "79efa08167c423c6bdbba0efeb05ccc0ef9172c930be96a5b93f8208bdab04a4",
+        "csize": 141908,
+        "isize": 1032392
+      },
+      {
+        "name": "webkit2gtk-4.1",
+        "version": "2.54.2-1",
+        "repo": "extra",
+        "sha256": "afabc402ad1a9861871fb84c207de0a524a9059f1cf54becc3d1cd59bda823f1",
+        "csize": 40256443,
+        "isize": 148085093
+      },
+      {
+        "name": "webkitgtk-6.0",
+        "version": "2.54.2-1",
+        "repo": "extra",
+        "sha256": "38806dbdad248fb6f4bc6e609b3b5bac49f2ac250c2b0514b0595fba2fee0e80",
+        "csize": 40365099,
+        "isize": 145375258
+      },
+      {
+        "name": "webrtc-audio-processing-1",
+        "version": "1.3-6",
+        "repo": "extra",
+        "sha256": "6a3096ee762546c6ee0435ccb5471aa98324b4d72448b2a746a53e0f3a8e3761",
+        "csize": 560285,
+        "isize": 1548999
+      },
+      {
+        "name": "wireplumber",
+        "version": "0.5.18-1",
+        "repo": "extra",
+        "sha256": "821be7b062cbab5455dd9b315d4823cceba27ba76120e2991e68e6583a09041b",
+        "csize": 314986,
+        "isize": 1351017
+      },
+      {
+        "name": "woff2",
+        "version": "1.0.2-7",
+        "repo": "extra",
+        "sha256": "49679d0375b2cd13677b5757073e167e54a82e4e01e4b588f55f13a0c1bfbe57",
+        "csize": 63734,
+        "isize": 204175
+      },
+      {
+        "name": "x264",
+        "version": "3:0.165.r3222.b35605a-2",
+        "repo": "extra",
+        "sha256": "c448740d7be83a63d52f1573984d3f878afec7eab21c4424727c72c639922bb7",
+        "csize": 785803,
+        "isize": 3978017
+      },
+      {
+        "name": "x265",
+        "version": "4.3-1",
+        "repo": "extra",
+        "sha256": "d798aef9f851c07693b08dee578a1906d2af418f64e611cb96aa433ed4489c27",
+        "csize": 2208215,
+        "isize": 22504200
+      },
+      {
+        "name": "xcb-proto",
+        "version": "1.17.0-4",
+        "repo": "extra",
+        "sha256": "98f661ef7c7e05eb7a687e859cf123a92806ceed8f55c0d70ddbac799988239a",
+        "csize": 133206,
+        "isize": 1076752
+      },
+      {
+        "name": "xcb-util",
+        "version": "0.4.1-2",
+        "repo": "extra",
+        "sha256": "34ffaa2c68ac7985178a0cc379004fd40d0d0b1f02e48e8c0f4dc35b1e4946ea",
+        "csize": 11912,
+        "isize": 35257
+      },
+      {
+        "name": "xdg-dbus-proxy",
+        "version": "0.1.9-1",
+        "repo": "extra",
+        "sha256": "b8e196bf980b870e53e1b91a4937f9c8294d9596f92d45041b54542a1b96e714",
+        "csize": 27654,
+        "isize": 62477
+      },
+      {
+        "name": "xdg-desktop-portal",
+        "version": "1.22.1-2",
+        "repo": "extra",
+        "sha256": "7df21ee565cd6f5b42dc374b77cd8a19ab31fb4bc5f76481f06713b5bd40d889",
+        "csize": 459195,
+        "isize": 1923399
+      },
+      {
+        "name": "xdg-desktop-portal-gnome",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "127bfa665c00c9f6cc52cb668bf48f43a7bf7d042f2983d5b2f7eb286bb58787",
+        "csize": 237682,
+        "isize": 984502
+      },
+      {
+        "name": "xdg-desktop-portal-gtk",
+        "version": "1.15.3-2",
+        "repo": "extra",
+        "sha256": "9d42f58def4b36629f18268627f23eaf561facd2dbc114379c782d6a9f96ab49",
+        "csize": 109595,
+        "isize": 438182
+      },
+      {
+        "name": "xdg-user-dirs",
+        "version": "0.20-1",
+        "repo": "extra",
+        "sha256": "d2d8d9cf22fca76652320c905056dfcf55201665d025ae2c3de60702a36bfa65",
+        "csize": 47603,
+        "isize": 181677
+      },
+      {
+        "name": "xdg-user-dirs-gtk",
+        "version": "0.16-1",
+        "repo": "extra",
+        "sha256": "5579674821b9fc97756e2c0f47e17a5ed032fd1fca5735a74c2170e23464a3c2",
+        "csize": 51975,
+        "isize": 202650
+      },
+      {
+        "name": "xkeyboard-config",
+        "version": "2.48-1",
+        "repo": "extra",
+        "sha256": "7f7f8656dbd0b37e36d3a97f6e188fc5c6cbccc4c1e5d34ff35f1d7a79b1cc73",
+        "csize": 910202,
+        "isize": 10741197
+      },
+      {
+        "name": "xmlto",
+        "version": "0.0.29-1",
+        "repo": "extra",
+        "sha256": "5c7caf1070c6571d98cc788436ba4721748cdbe7933919162cc1b340caacaed0",
+        "csize": 25895,
+        "isize": 76838
+      },
+      {
+        "name": "xorg-fonts-encodings",
+        "version": "1.1.0-2",
+        "repo": "extra",
+        "sha256": "656df66ba73b7c9d84faf25465d64a4a81f5b67a7e16b8d8fe04599a311e6f8a",
+        "csize": 582430,
+        "isize": 644558
+      },
+      {
+        "name": "xorg-server-common",
+        "version": "21.1.25-2",
+        "repo": "extra",
+        "sha256": "851b8e7ad135d99ce263334f64512a10c69d6b19231a6de48953fe44227c0dcc",
+        "csize": 28329,
+        "isize": 130326
+      },
+      {
+        "name": "xorg-setxkbmap",
+        "version": "1.3.5-1",
+        "repo": "extra",
+        "sha256": "dc1dce9a0aa737d39344d15232a62ab6b1963bb5763360bf166c11699c37e3f5",
+        "csize": 14149,
+        "isize": 34192
+      },
+      {
+        "name": "xorg-xkbcomp",
+        "version": "1.5.0-1",
+        "repo": "extra",
+        "sha256": "662f4ad50763b9d4192bb4f2bbd81ba3c50630a0ec2a83a13deb8770f785734d",
+        "csize": 93470,
+        "isize": 223360
+      },
+      {
+        "name": "xorg-xprop",
+        "version": "1.2.8-1",
+        "repo": "extra",
+        "sha256": "05dcc5b1d6616fd7566f6616bc0868b72c1028c011b95732f445db76217f8510",
+        "csize": 26380,
+        "isize": 53454
+      },
+      {
+        "name": "xorg-xwayland",
+        "version": "24.1.14-1",
+        "repo": "extra",
+        "sha256": "ff0147866b9196feca370239854abb2a7c6d99f8c9de09330ec4cbe4542d0441",
+        "csize": 1031411,
+        "isize": 2459481
+      },
+      {
+        "name": "xorgproto",
+        "version": "2026.1-1",
+        "repo": "extra",
+        "sha256": "1fca2c5a52c8cacf9825fc76531a4286de441099d8d6eb912725b136be70eae7",
+        "csize": 249666,
+        "isize": 1541082
+      },
+      {
+        "name": "xvidcore",
+        "version": "1.3.7-4",
+        "repo": "extra",
+        "sha256": "02f16d9aefb29f12ec3c5e3386475e1417a4331c5ee32dfc0d6075325e5cb889",
+        "csize": 226447,
+        "isize": 696193
+      },
+      {
+        "name": "xxhash",
+        "version": "0.8.4-1",
+        "repo": "extra",
+        "sha256": "ef60bad0552de3eb8a0e1e2a07eb1bcaceaa771a5f36401a2cf0de135ffcc72b",
+        "csize": 108215,
+        "isize": 443052
+      },
+      {
+        "name": "xz",
+        "version": "5.8.4-1",
+        "repo": "core",
+        "sha256": "89b8e777c8f7a39413e1b223d4c212caec6ddd9470b3d1ea1d5161bcc6215c04",
+        "csize": 856380,
+        "isize": 2998393
+      },
+      {
+        "name": "zeromq",
+        "version": "4.3.5-3",
+        "repo": "extra",
+        "sha256": "e3ec5be13978db5ba53c86a2416fac800bc14da8d6c6c3325afd928ebf79d27b",
+        "csize": 576741,
+        "isize": 3174264
+      },
+      {
+        "name": "zimg",
+        "version": "3.0.6-2",
+        "repo": "extra",
+        "sha256": "cfd009bc43571c04a189dff125c57552f826840e82cfb146eb94990339adf9a6",
+        "csize": 247961,
+        "isize": 736924
+      },
+      {
+        "name": "zix",
+        "version": "0.8.2-1",
+        "repo": "extra",
+        "sha256": "563534f9bf8ac7b17f9936d0a00f2853b7ed8a0154d2d2e8147bf34fa4983dcf",
+        "csize": 45532,
+        "isize": 137996
+      },
+      {
+        "name": "zlib",
+        "version": "1:1.3.2-4",
+        "repo": "core",
+        "sha256": "81e183eb4c676c86eb1709d1878f7aec1df10d59ce0980b5ab0724560328d015",
+        "csize": 86278,
+        "isize": 232676
+      },
+      {
+        "name": "zstd",
+        "version": "1.5.7-3",
+        "repo": "core",
+        "sha256": "d4cf0049137124c8a025eedfad267a3e8a02310c9efb9d1ae4a61aa1d02789fc",
+        "csize": 527400,
+        "isize": 1610357
+      }
+    ],
+    "unresolved": [],
+    "csize": 697047616,
+    "isize": 3185045907
+  }
+}

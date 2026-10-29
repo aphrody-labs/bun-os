@@ -1,0 +1,5769 @@
+{
+  "schemaVersion": 1,
+  "kind": "linux-desktop-closure",
+  "id": "plasma",
+  "resolvedAt": "2026-10-29",
+  "release": {
+    "name": "KDE Plasma 6",
+    "note": "KF6 comes from the sysroot packages (kf6 individual Arch packages)"
+  },
+  "sources": [
+    {
+      "id": "plasma-wayland-protocols",
+      "url": "https://invent.kde.org/libraries/plasma-wayland-protocols.git",
+      "tag": "v1.23.0",
+      "sha": "c5ac4db818f4a575a6ccfe0065b73ecfaba6e93e",
+      "date": "2026-09-24T11:27:52.000+03:00",
+      "build": "cmake",
+      "needs": [],
+      "options": [
+        "-DBUILD_TESTING=OFF"
+      ],
+      "declared": [
+        "ECM",
+        "WaylandScanner",
+        "Wayland[Client,REQUIRED]"
+      ]
+    },
+    {
+      "id": "kdecoration",
+      "url": "https://invent.kde.org/plasma/kdecoration.git",
+      "tag": "v6.8.2",
+      "sha": "3cd4373b90578e95685dcbda13a34fcfd445fa4c",
+      "date": "2026-10-27T15:49:51.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "KF6I18n",
+        "Qt6[Core,Gui,Test]"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "breeze",
+      "url": "https://invent.kde.org/plasma/breeze.git",
+      "tag": "v6.8.2",
+      "sha": "c97883a8fe41bce774835c25d7f7e321c71fa618",
+      "date": "2026-10-27T15:47:28.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "kdecoration"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "KDecoration3",
+        "KF5FrameworkIntegration",
+        "KF5[CoreAddons,Config,ConfigWidgets,GuiAddons,IconThemes,WindowSystem]",
+        "KF6FrameworkIntegration",
+        "KF6KCMUtils",
+        "KF6[CoreAddons,ColorScheme,Config,GuiAddons,I18n,IconThemes,WindowSystem]",
+        "Qt5",
+        "Qt5[Quick]",
+        "Qt5[Widgets]",
+        "Qt5[X11Extras]",
+        "Qt6",
+        "Qt6[Quick]",
+        "Qt6[Widgets,Core,Svg]"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "kwayland",
+      "url": "https://invent.kde.org/plasma/kwayland.git",
+      "tag": "v6.8.2",
+      "sha": "1bbc4071d50e7e41d68322fc369adedf71b21607",
+      "date": "2026-10-27T15:53:27.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtwayland",
+        "plasma-wayland-protocols"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "EGL",
+        "PlasmaWaylandProtocols",
+        "Qt6",
+        "Qt6GuiPrivate",
+        "Qt6Gui[Private]",
+        "Qt6WaylandClientPrivate",
+        "Qt6WaylandClient[Private]",
+        "WaylandProtocols",
+        "WaylandScanner",
+        "Wayland[Client]"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "plasma-activities",
+      "url": "https://invent.kde.org/plasma/plasma-activities.git",
+      "tag": "v6.8.2",
+      "sha": "f17cdb507d5c949aa99abcea1a520856981c13c9",
+      "date": "2026-10-27T15:56:56.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtdeclarative"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "plasma-activities-stats",
+      "url": "https://invent.kde.org/plasma/plasma-activities-stats.git",
+      "tag": "v6.8.2",
+      "sha": "f70c548d8eab4df47a60454cbbc6220ad345c345",
+      "date": "2026-10-27T15:57:10.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "plasma-activities"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "Boost",
+        "ECM",
+        "KF6Config",
+        "KF6CoreAddons",
+        "PlasmaActivities",
+        "Qt6[Core,DBus,Sql]",
+        "Threads"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "kglobalacceld",
+      "url": "https://invent.kde.org/plasma/kglobalacceld.git",
+      "tag": "v6.8.2",
+      "sha": "2c0cc38bc800c43fd5bceff304fa1ce9ebbad3e0",
+      "date": "2026-10-27T15:50:24.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "KF6Config",
+        "KF6CoreAddons",
+        "KF6GlobalAccel",
+        "KF6JobWidgets",
+        "KF6KIO",
+        "KF6Service",
+        "Qt6"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "layer-shell-qt",
+      "url": "https://invent.kde.org/plasma/layer-shell-qt.git",
+      "tag": "v6.8.2",
+      "sha": "842f397180f349380e9f7d466c9e746e4dd7faaa",
+      "date": "2026-10-27T15:54:55.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtwayland"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "PkgConfig",
+        "Qt6WaylandClientPrivate",
+        "Qt6[WaylandClient,Qml]",
+        "WaylandProtocols",
+        "WaylandScanner",
+        "Wayland[Client,Server]"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "libplasma",
+      "url": "https://invent.kde.org/plasma/libplasma.git",
+      "tag": "v6.8.2",
+      "sha": "6f6566e4ec44a432abdcdd4854cbed3582bcddd1",
+      "date": "2026-10-27T15:55:39.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtdeclarative",
+        "qtsvg",
+        "kwayland",
+        "plasma-activities"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "KF6DBusAddons",
+        "KF6[Config,CoreAddons,GlobalAccel,GuiAddons,I18n,IconThemes,KIO,WindowSystem,Notifications,Package,KirigamiPlatform,Svg,ColorScheme]",
+        "PlasmaActivities",
+        "PlasmaWaylandProtocols",
+        "Qt6GuiPrivate",
+        "Qt6WaylandClient",
+        "Qt6[Quick,Gui,Qml,Svg,QuickControls2,DBus]",
+        "Wayland",
+        "WaylandProtocols"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "libkscreen",
+      "url": "https://invent.kde.org/plasma/libkscreen.git",
+      "tag": "v6.8.2",
+      "sha": "f9ca271de44ebb0e36e15e50f5ca1386d7d26b5c",
+      "date": "2026-10-27T15:55:07.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtwayland",
+        "plasma-wayland-protocols"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "PlasmaWaylandProtocols",
+        "Qt6",
+        "Qt6GuiPrivate",
+        "WaylandScanner",
+        "Wayland[Client]"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "kscreenlocker",
+      "url": "https://invent.kde.org/plasma/kscreenlocker.git",
+      "tag": "v6.8.2",
+      "sha": "972baf4a25e08991c7c0451d983497eaf30cb0a8",
+      "date": "2026-10-27T15:52:13.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtdeclarative",
+        "libplasma",
+        "kwayland",
+        "layer-shell-qt"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ConsoleKit",
+        "ECM",
+        "KF6Screen",
+        "KF6[Crash,KCMUtils,KIO,GlobalAccel,I18n,IdleTime,Notifications,Solid,WindowSystem,XmlGui,Svg]",
+        "LayerShellQt",
+        "PAM",
+        "PlasmaQuick",
+        "Qt6[DBus,Widgets,Quick,Test]",
+        "loginctl"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "knighttime",
+      "url": "https://invent.kde.org/plasma/knighttime.git",
+      "tag": "v6.8.2",
+      "sha": "7f7795b8bca0b64212b8c0578082b9d6b325342d",
+      "date": "2026-10-27T15:51:05.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "KF6[Config,CoreAddons,DBusAddons,Holidays,I18n]",
+        "Qt6[Core,Gui,DBus,Positioning]"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "union",
+      "url": "https://invent.kde.org/plasma/union.git",
+      "tag": "v6.8.2",
+      "sha": "fe5feb687ec21d0f39b57b311e0823fc2e5e55cc",
+      "date": "2026-10-27T16:11:41.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtdeclarative"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "KF6Kirigami",
+        "KF6KirigamiPlatform",
+        "KF6[Archive,ColorScheme,Config,REQUIRED]",
+        "KF6[CoreAddons,GuiAddons,Config,IconThemes,ColorScheme]",
+        "Plasma",
+        "Qt6",
+        "Qt6DBus",
+        "Qt6Quick",
+        "Qt6QuickControls2",
+        "Qt6QuickTest",
+        "Qt6ShaderTools",
+        "Qt6Svg",
+        "Qt6Test",
+        "Qt6Widgets",
+        "ZLIB",
+        "cxx",
+        "ryml"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "kpipewire",
+      "url": "https://invent.kde.org/plasma/kpipewire.git",
+      "tag": "v6.8.2",
+      "sha": "5f687fba7d8a9e847282f712539d44d8850a6ddb",
+      "date": "2026-10-27T15:51:18.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtdeclarative"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "ECM",
+        "EGL",
+        "KF6[I18n,CoreAddons]",
+        "Libdrm",
+        "PlasmaWaylandProtocols",
+        "Qt6GuiPrivate",
+        "Qt6[DBus,OpenGL,Quick]",
+        "Qt6[Test,QuickTest]",
+        "epoxy"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "kwin",
+      "url": "https://invent.kde.org/plasma/kwin.git",
+      "tag": "v6.8.2",
+      "sha": "f130ab33c8e6f3b9d728aade87836086ae9a8ed4",
+      "date": "2026-10-27T15:54:21.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtdeclarative",
+        "qtwayland",
+        "kdecoration",
+        "libplasma",
+        "kwayland",
+        "plasma-activities",
+        "kglobalacceld",
+        "kscreenlocker",
+        "knighttime",
+        "kpipewire",
+        "plasma-wayland-protocols",
+        "breeze"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DKWIN_BUILD_X11=ON",
+        "-DKWIN_BUILD_NOTIFICATIONS=ON"
+      ],
+      "declared": [
+        "Aurorae",
+        "Breeze",
+        "Canberra",
+        "ECM",
+        "EGL",
+        "KDecoration3",
+        "KF6DocTools",
+        "KF6Kirigami",
+        "KF6[Auth,ColorScheme,Config,CoreAddons,Crash,DBusAddons,GlobalAccel,GuiAddons,I18n,IdleTime,Package,Service,Svg,WidgetsAddons,WindowSystem]",
+        "KF6[Declarative,KCMUtils,NewStuff,Service,XmlGui]",
+        "KF6[Notifications]",
+        "KF6[Runner]",
+        "KF6[WidgetsAddons]",
+        "KGlobalAccelD",
+        "KNightTime",
+        "KPipeWire",
+        "KScreenLocker",
+        "KWayland",
+        "Libcap",
+        "Libdrm",
+        "Libeis",
+        "Libinput",
+        "Plasma",
+        "PlasmaActivities",
+        "PlasmaWaylandProtocols",
+        "QAccessibilityClient6",
+        "Qt6GuiPrivate",
+        "Qt6Test",
+        "Qt6WaylandClientPrivate",
+        "Qt6[Concurrent,Core,Core5Compat,DBus,Quick,UiTools,WaylandClient,Widgets,Svg]",
+        "Threads",
+        "UDev",
+        "Vulkan",
+        "Wayland",
+        "WaylandProtocols",
+        "X11",
+        "X11_XCB",
+        "XCB[COMPOSITE,CURSOR,DRI3,ICCCM,KEYSYMS,PRESENT,RANDR,RENDER,RES,SHAPE,SHM,SYNC,XCB,XFIXES,XINERAMA,XINPUT]",
+        "XKB",
+        "Xwayland",
+        "epoxy",
+        "gbm",
+        "hwdata",
+        "lcms2"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "plasma-workspace",
+      "url": "https://invent.kde.org/plasma/plasma-workspace.git",
+      "tag": "v6.8.2",
+      "sha": "30beb0095873364c6b34ebcfd292ecafd4db7f61",
+      "date": "2026-10-27T16:07:16.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtdeclarative",
+        "qtsvg",
+        "qtwayland",
+        "libplasma",
+        "kwayland",
+        "plasma-activities",
+        "plasma-activities-stats",
+        "libkscreen",
+        "layer-shell-qt",
+        "kscreenlocker",
+        "knighttime",
+        "union",
+        "kwin",
+        "plasma-wayland-protocols"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "AccountsService",
+        "AppStreamQt",
+        "Canberra",
+        "ECM",
+        "Fontconfig",
+        "Freetype",
+        "ICU[i18n,uc]",
+        "KExiv2Qt6",
+        "KF6Baloo",
+        "KF6Kirigami",
+        "KF6KirigamiAddons",
+        "KF6NetworkManagerQt",
+        "KF6QuickCharts",
+        "KF6Screen",
+        "KF6UserFeedback",
+        "KF6[Archive,Auth,CoreAddons,Crash,DBusAddons,Declarative,GlobalAccel,GuiAddons,Holidays,I18n,IconThemes,IdleTime,ItemModels,KCMUtils,KDED,KIO,NewStuff,Notifications,Package,Parts,Prison,Runner,StatusNotifierItem,Svg,TextEditor,TextWidgets,Wallet,ColorScheme]",
+        "KIOExtras",
+        "KIOFuse",
+        "KNightTime",
+        "KSysGuard",
+        "KWayland",
+        "KWinDBusInterface",
+        "LayerShellQt",
+        "PackageKitQt6",
+        "PkgConfig",
+        "Plasma",
+        "PlasmaActivities",
+        "PlasmaActivitiesStats",
+        "PlasmaQuick",
+        "PlasmaWaylandProtocols",
+        "PolkitQt6",
+        "QCoro6[Core]",
+        "Qt6GuiPrivate",
+        "Qt6WaylandClientPrivate",
+        "Qt6WaylandClient[Private]",
+        "Qt6[Concurrent,DBus,Location,Network,Positioning,Quick,QuickWidgets,ShaderTools,Sql,Svg,Widgets]",
+        "Qt6[PrintSupport]",
+        "Qt6[Test,QuickTest]",
+        "Qt6[WaylandCompositor]",
+        "ScreenSaverDBusInterface",
+        "UDev",
+        "Union",
+        "Wayland[Client,Server]",
+        "X11",
+        "XCB[AUX,XCB,CURSOR,RANDR,IMAGE]",
+        "ZLIB"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    },
+    {
+      "id": "plasma-desktop",
+      "url": "https://invent.kde.org/plasma/plasma-desktop.git",
+      "tag": "v6.8.2",
+      "sha": "3a67a04b656bda45b2c175b5f12bb7e4222d5026",
+      "date": "2026-10-27T16:29:10.000+05:30",
+      "build": "cmake",
+      "needs": [
+        "qtbase",
+        "qtdeclarative",
+        "libplasma",
+        "plasma-workspace",
+        "kwin",
+        "plasma-activities",
+        "plasma-activities-stats",
+        "libkscreen",
+        "kwayland"
+      ],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "declared": [
+        "AccountsQt6",
+        "Canberra",
+        "ECM",
+        "FontNotoColorEmoji",
+        "GLIB2",
+        "KAccounts6",
+        "KF6Baloo",
+        "KF6DocTools",
+        "KF6ItemModels",
+        "KF6KDED",
+        "KF6Kirigami",
+        "KF6KirigamiAddons",
+        "KF6QQC2DesktopStyle",
+        "KF6[Auth,Crash,Config,I18n,KCMUtils,NewStuff,KIO,Notifications,NotifyConfig,Attica,Runner,GlobalAccel,CoreAddons,KSharedDataCache,required,by,KStringHandler,required,by,FolderModel,GuiAddons,KImageCache,DBusAddons,Config,WidgetsAddons,Codecs,Sonnet,Package,IconThemes,XmlGui,Svg]",
+        "KRunnerAppDBusInterface",
+        "KSysGuard",
+        "KWinDBusInterface",
+        "LibKLookAndFeel",
+        "LibKWorkspace",
+        "LibNotificationManager",
+        "LibTaskManager",
+        "PackageKitQt6",
+        "PkgConfig",
+        "Plasma",
+        "Plasma5Support",
+        "PlasmaActivities",
+        "PlasmaActivitiesStats",
+        "PlasmaQuick",
+        "PolkitQt6",
+        "Qt6GuiPrivate",
+        "Qt6Test",
+        "Qt6WaylandClient",
+        "Qt6[Quick,QuickWidgets,DBus,Widgets,Svg,Concurrent,Core5Compat,ShaderTools,Sql]",
+        "SDL2",
+        "ScreenSaverDBusInterface",
+        "UDev",
+        "Wayland",
+        "WaylandProtocols",
+        "X11",
+        "XCB[XCB]",
+        "XdgUserDir"
+      ],
+      "hostRun": [
+        "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
+        "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
+      ]
+    }
+  ],
+  "sysrootRoots": [
+    "plasma-workspace",
+    "kwin",
+    "plasma-desktop",
+    "libplasma",
+    "kscreenlocker",
+    "layer-shell-qt",
+    "libkscreen",
+    "breeze",
+    "kdecoration",
+    "plasma-activities"
+  ],
+  "sysrootExclude": [
+    "meson",
+    "ninja",
+    "cmake",
+    "git",
+    "pkgconf",
+    "pkg-config",
+    "python",
+    "python-docutils",
+    "python-sphinx",
+    "python-gobject",
+    "python-cairo",
+    "asciidoc",
+    "gi-docgen",
+    "sassc",
+    "gtk-doc",
+    "doxygen",
+    "docbook-xsl",
+    "docbook-xml",
+    "xorg-server-xvfb",
+    "xorg-server",
+    "weston",
+    "gdb",
+    "valgrind",
+    "clang",
+    "llvm",
+    "gcc-fortran",
+    "nodejs",
+    "npm",
+    "rust",
+    "cargo",
+    "bash-completion",
+    "shellcheck",
+    "yelp-tools",
+    "itstool",
+    "intltool",
+    "kdoctools",
+    "graphviz",
+    "qt6-doc",
+    "umockdev",
+    "python-dbusmock",
+    "libxslt"
+  ],
+  "sysroot": {
+    "packages": [
+      {
+        "name": "abseil-cpp",
+        "version": "20260817.0-2",
+        "repo": "extra",
+        "sha256": "4ecd2e4e2cf7096edfad8522df68d0d9adbe41ce7a6689c1915905342ae6a016",
+        "csize": 1414389,
+        "isize": 7497607
+      },
+      {
+        "name": "accountsservice",
+        "version": "26.27.3-1",
+        "repo": "extra",
+        "sha256": "d3af0478419f59cf771f516cd6265e1e9f7a4e8d3e9cede1d0e6f7173835dab1",
+        "csize": 173172,
+        "isize": 991953
+      },
+      {
+        "name": "acl",
+        "version": "2.4.0-1",
+        "repo": "core",
+        "sha256": "dca9ec50cf51243b86a67367a55e78b1851d31240b1edaf9c011f8511765d999",
+        "csize": 150821,
+        "isize": 353496
+      },
+      {
+        "name": "adwaita-cursors",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "7eba104ea1a7a04e3058bf5fc8108ec37bbd38b4966bc36722b23bfaff2e5af4",
+        "csize": 368330,
+        "isize": 11963936
+      },
+      {
+        "name": "adwaita-fonts",
+        "version": "51.0-2",
+        "repo": "extra",
+        "sha256": "f27dd3b4700ef61bed117a6106013b7181ee9348ba038784ccfe5091ef172e4d",
+        "csize": 2276345,
+        "isize": 7627210
+      },
+      {
+        "name": "adwaita-icon-theme",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "e64aba66149a0aced7a44f08e15c1e74ceeb18a6c7f86fbede88edccab57e685",
+        "csize": 202148,
+        "isize": 964678
+      },
+      {
+        "name": "adwaita-icon-theme-legacy",
+        "version": "46.2-3",
+        "repo": "extra",
+        "sha256": "c14690d14e1d8a67e6b5570a2b28a2da6de4ebeb592a629b2a70e41411bafc5a",
+        "csize": 2275676,
+        "isize": 2339026
+      },
+      {
+        "name": "alsa-lib",
+        "version": "1.2.16.1-1",
+        "repo": "extra",
+        "sha256": "2d2f2b3966cebd6ec75abbbdb4709a1093849207ada6624cdfe36f38d0f5c811",
+        "csize": 540042,
+        "isize": 1839539
+      },
+      {
+        "name": "alsa-topology-conf",
+        "version": "1.2.5.1-4",
+        "repo": "extra",
+        "sha256": "a76b237e24973099b3cee9d3c89f4f8b46d9133411f0992bd46a5131e4427a0c",
+        "csize": 13830,
+        "isize": 343788
+      },
+      {
+        "name": "alsa-ucm-conf",
+        "version": "1.2.16.1-1",
+        "repo": "extra",
+        "sha256": "73e3a6cf819dfcedf884616c18d2206dea77e98311717dca8135256fabe55fbc",
+        "csize": 134369,
+        "isize": 709032
+      },
+      {
+        "name": "aom",
+        "version": "3.15.2-1",
+        "repo": "extra",
+        "sha256": "3d3b023c981de96332a44eda677c8bf4ccb3b6cc27e9486b3c5bbf98f4522307",
+        "csize": 3112240,
+        "isize": 9957850
+      },
+      {
+        "name": "appstream",
+        "version": "1.2.2-1",
+        "repo": "extra",
+        "sha256": "806aec144a0c02820b69da890f89df8738db693b6a2faff48c422546ff98d5e9",
+        "csize": 2553446,
+        "isize": 19222779
+      },
+      {
+        "name": "appstream-qt",
+        "version": "1.2.2-1",
+        "repo": "extra",
+        "sha256": "6f759208979afb0fec0fe8f4b9a969b09e5d5aa63939ac950bf0601514dc3598",
+        "csize": 155212,
+        "isize": 779312
+      },
+      {
+        "name": "at-spi2-core",
+        "version": "2.62.1-1",
+        "repo": "extra",
+        "sha256": "2e77ea55a7c18cfeaf0092a48f3b873d67f84f208e593e4976a34e45f6b717e6",
+        "csize": 606627,
+        "isize": 4239153
+      },
+      {
+        "name": "attica",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "b51f4de3fd6ec5811d8f4740b4b6b0454c15149a82158e6b54dd147ccaf25eb5",
+        "csize": 204249,
+        "isize": 880100
+      },
+      {
+        "name": "attr",
+        "version": "2.6.0-1",
+        "repo": "core",
+        "sha256": "0db32b421f67000950f7b55b531291ce8c13985c5444425b22dce94d485daed1",
+        "csize": 74207,
+        "isize": 240294
+      },
+      {
+        "name": "audit",
+        "version": "4.2.1-1",
+        "repo": "core",
+        "sha256": "6b2f7e400336d05bf9a4b1b65015e4a7ac3a3842fbc67790913f9748513b964e",
+        "csize": 414714,
+        "isize": 1098162
+      },
+      {
+        "name": "aurorae",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "f427ce13ddb6efbfbdabb583710e754eec45a2ed23f89e03ad174fe6f2f5a20e",
+        "csize": 173489,
+        "isize": 687074
+      },
+      {
+        "name": "avahi",
+        "version": "1:0.9rc5-2",
+        "repo": "extra",
+        "sha256": "be55af7cf20701e6e9786d15cc20b36e6764b5d062261cad7954db34e9dd9408",
+        "csize": 435520,
+        "isize": 1975366
+      },
+      {
+        "name": "baloo",
+        "version": "6.31.0-2",
+        "repo": "extra",
+        "sha256": "a05c29995566afc7f8ba24d49d33e7d1c619b26a38218e346ed575ae000fdc7e",
+        "csize": 597455,
+        "isize": 2643333
+      },
+      {
+        "name": "bash",
+        "version": "5.3.20-1",
+        "repo": "core",
+        "sha256": "73a67dc509ed4a6dd64e4c7eca2895643f48083940f49431782ce78c4d4619e1",
+        "csize": 2001850,
+        "isize": 10055840
+      },
+      {
+        "name": "binutils",
+        "version": "2.47-4",
+        "repo": "core",
+        "sha256": "d9508ad848fd6c31473ac0925cf8c3ec0d2a71bbbb5c7e39274186338a285660",
+        "csize": 8594742,
+        "isize": 45888135
+      },
+      {
+        "name": "breeze",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "f0ffc54e1fc26b99326149c8284714c10600bcb9115bd0d2e2181e93fdde8ed8",
+        "csize": 39555187,
+        "isize": 40669758
+      },
+      {
+        "name": "breeze-cursors",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "38ecd4666df61d11a52d2224d88955b2ab9a4f1452e894be79ff459e87928449",
+        "csize": 1300820,
+        "isize": 30674848
+      },
+      {
+        "name": "breeze-icons",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "e9ab48135e849327523a3fb1f0a1d0994aa8561a747c7dec24ecca2c569b8bb8",
+        "csize": 7558579,
+        "isize": 60115377
+      },
+      {
+        "name": "brotli",
+        "version": "1.2.1-1",
+        "repo": "core",
+        "sha256": "dff80818057da76e93c90045f7d9eef0469c35caa03b153cae02ba47bd3c4db2",
+        "csize": 414192,
+        "isize": 1107045
+      },
+      {
+        "name": "bubblewrap",
+        "version": "0.13.1-1",
+        "repo": "extra",
+        "sha256": "f0efc4e02138b1b1f0719f37008da58b03213122d4881cfe949681fcbd72b36e",
+        "csize": 41315,
+        "isize": 99750
+      },
+      {
+        "name": "bzip2",
+        "version": "1.0.8-6",
+        "repo": "core",
+        "sha256": "8779003d659c441b952095c19907603a738c1366f25cc51be3fd139fa4e95748",
+        "csize": 59786,
+        "isize": 148479
+      },
+      {
+        "name": "ca-certificates",
+        "version": "20240618-1",
+        "repo": "core",
+        "sha256": "982005bd5ecc998c05f561b57bb58b4457407779727e3c3d59e926d34a8b0712",
+        "csize": 2135,
+        "isize": 0
+      },
+      {
+        "name": "ca-certificates-mozilla",
+        "version": "3.132-1",
+        "repo": "core",
+        "sha256": "d2305ed8c1426e018ad611cb6e7fa387c3cac0f2e7040401dae2f1f78e0867ab",
+        "csize": 388399,
+        "isize": 1059359
+      },
+      {
+        "name": "ca-certificates-utils",
+        "version": "20240618-1",
+        "repo": "core",
+        "sha256": "aabd5b2b7030716ccdd465d607e734e851fe4a01adf8293a3968fe22eb89ce9b",
+        "csize": 11071,
+        "isize": 13960
+      },
+      {
+        "name": "cairo",
+        "version": "1.18.6-1",
+        "repo": "extra",
+        "sha256": "0df806e0edf067d62b417c77d978a7577c4d6e11a724db3c12adea1a425666a1",
+        "csize": 712052,
+        "isize": 1858947
+      },
+      {
+        "name": "cdparanoia",
+        "version": "10.2-10",
+        "repo": "extra",
+        "sha256": "03cafb8d7d0cdd713aec4e9e6cf8137562ddbbb07ac10c5a24ae16bba14bc52f",
+        "csize": 77119,
+        "isize": 194843
+      },
+      {
+        "name": "cfitsio",
+        "version": "1:4.7.0-1",
+        "repo": "extra",
+        "sha256": "4894fa781a56026d612970fbfabffc668b3f3b91b1eb20dba60bd5b7a4b42f87",
+        "csize": 661371,
+        "isize": 2214510
+      },
+      {
+        "name": "cifs-utils",
+        "version": "7.9-1",
+        "repo": "extra",
+        "sha256": "086befab80425b7d08a7029ae3b4dcb1c97d98d4f27d3e090ab403a9e999c26e",
+        "csize": 106842,
+        "isize": 309581
+      },
+      {
+        "name": "convertlit",
+        "version": "1.8-13",
+        "repo": "extra",
+        "sha256": "6d67ee485bf6113ef5162591c01cfe7c74e329937449c76d174d0d1c8f0dd237",
+        "csize": 45520,
+        "isize": 110816
+      },
+      {
+        "name": "coreutils",
+        "version": "9.12-2",
+        "repo": "core",
+        "sha256": "9196947f860144b5bf4dbe5079e8a1d38ea3080fdb83cae96294d1e83681c6eb",
+        "csize": 3075958,
+        "isize": 18513954
+      },
+      {
+        "name": "cryptsetup",
+        "version": "2.8.8-1",
+        "repo": "core",
+        "sha256": "322f0e79a7d659d5e645e96cad3d30966f7dd5476f984f96b50a4f4cea274640",
+        "csize": 886302,
+        "isize": 3793370
+      },
+      {
+        "name": "curl",
+        "version": "8.23.0-1",
+        "repo": "core",
+        "sha256": "ed3e4e252073137ee6b1267f3476a13680ff6b3dbdc7ddc6a8d1497fa60cd6d0",
+        "csize": 1372375,
+        "isize": 2377050
+      },
+      {
+        "name": "cxx-rust-cssparser",
+        "version": "1.1.0-1",
+        "repo": "extra",
+        "sha256": "44565026ebe5e35670298bd56456d9b500a9c2c6b44f25b2d497148931ae3d20",
+        "csize": 1047628,
+        "isize": 4220114
+      },
+      {
+        "name": "dav1d",
+        "version": "1.5.4-1",
+        "repo": "extra",
+        "sha256": "cf991c63dc289cbe61f7f5d0fd395be2dd75ebda2bd2a4e886b2cd11b8f2795d",
+        "csize": 688949,
+        "isize": 1938500
+      },
+      {
+        "name": "db5.3",
+        "version": "5.3.28-7",
+        "repo": "core",
+        "sha256": "abac3474e766fa8a36fcae945f5e8c8e818665fc41a56daff92db81cd176d389",
+        "csize": 1320537,
+        "isize": 6792639
+      },
+      {
+        "name": "dbus",
+        "version": "1.16.2-2",
+        "repo": "core",
+        "sha256": "773bfb7020491b5f44e4cba11d096ac570b9b1e81c6cb1e437a5e7a68b68f974",
+        "csize": 368744,
+        "isize": 1059306
+      },
+      {
+        "name": "dbus-broker",
+        "version": "37-3",
+        "repo": "core",
+        "sha256": "c3a915bb57188e6a43b9df25c0bf11f87528bc20ac50718b1772ce917c6d6117",
+        "csize": 150097,
+        "isize": 366227
+      },
+      {
+        "name": "dbus-broker-units",
+        "version": "37-3",
+        "repo": "core",
+        "sha256": "f3f73e7c8169f54e3e5447d266917ae7454bd984fc0ede0f85e2ca60e21d97df",
+        "csize": 2542,
+        "isize": 0
+      },
+      {
+        "name": "dbus-units",
+        "version": "37-3",
+        "repo": "core",
+        "sha256": "b3c4dee19391724893993ed993522846368bb38257daae4182de980255a995cc",
+        "csize": 2296,
+        "isize": 0
+      },
+      {
+        "name": "dconf",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "ec49323f17349376e57b9b51dc0fe817fb5a61ee217480780f406b7fa573b667",
+        "csize": 114086,
+        "isize": 481506
+      },
+      {
+        "name": "ddcutil",
+        "version": "3.0.2-1",
+        "repo": "extra",
+        "sha256": "409eb5cc5d15d9b15d4ac2abeb6a0ed1f41cdece08ccc1b9334051e076ed9ce0",
+        "csize": 927436,
+        "isize": 2776001
+      },
+      {
+        "name": "default-cursors",
+        "version": "3-1",
+        "repo": "extra",
+        "sha256": "ae52028372c3b2f66547baab41f1614b25472489d927b1a50b596bb8df7c056e",
+        "csize": 2372,
+        "isize": 30
+      },
+      {
+        "name": "desktop-file-utils",
+        "version": "0.28-1",
+        "repo": "extra",
+        "sha256": "cc525a69b6901318f360fae249986e62f233c0320c61274f2bad44449e0c8e44",
+        "csize": 43566,
+        "isize": 184991
+      },
+      {
+        "name": "device-mapper",
+        "version": "2.03.43-2",
+        "repo": "core",
+        "sha256": "86442d403ae86d358aa070ee3243908bbb91bf5a4c3838a80b10b13ddeb0c14c",
+        "csize": 322472,
+        "isize": 863178
+      },
+      {
+        "name": "double-conversion",
+        "version": "3.4.0-1",
+        "repo": "extra",
+        "sha256": "37a22e79d8725fff6a2ca36342bec4c5b64027944cfaba8bfea448c426fe98e8",
+        "csize": 59483,
+        "isize": 199847
+      },
+      {
+        "name": "duktape",
+        "version": "2.7.0-7",
+        "repo": "extra",
+        "sha256": "92452979e8cc6f34558ee4d9c3f34f8b7e0d7a8ebff94296b68c7926f00895cd",
+        "csize": 180479,
+        "isize": 822248
+      },
+      {
+        "name": "e2fsprogs",
+        "version": "1.47.4-1",
+        "repo": "core",
+        "sha256": "a78971bbbe0ae89d15a0cbbc952e64462edc5a6f991c1bb9cefd0539ca548bd4",
+        "csize": 1296838,
+        "isize": 5541430
+      },
+      {
+        "name": "ebook-tools",
+        "version": "0.2.2-9",
+        "repo": "extra",
+        "sha256": "0822c646005b5bf15dd1eaf246ba89f1c241657d5601bc68d2e5483f77c79018",
+        "csize": 26246,
+        "isize": 79796
+      },
+      {
+        "name": "editorconfig-core-c",
+        "version": "0.12.11-1",
+        "repo": "extra",
+        "sha256": "1009686965d587e2168ced4be31796e0d367556fad607e6c13f3e02e72468768",
+        "csize": 34712,
+        "isize": 113468
+      },
+      {
+        "name": "exiv2",
+        "version": "0.28.9-1",
+        "repo": "extra",
+        "sha256": "1c6886993b68be782d472d0a5859a9a77a645f59ad932c8f9ba79579d17049d1",
+        "csize": 3033635,
+        "isize": 16392410
+      },
+      {
+        "name": "expat",
+        "version": "2.9.0-1",
+        "repo": "core",
+        "sha256": "20f81870a8d28c7bbdf10639dc0cac28ebe0425cc6526882c2cd97f972c38143",
+        "csize": 136637,
+        "isize": 551447
+      },
+      {
+        "name": "extra-cmake-modules",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "d008a0d1fc0ac02a83f4c162e1d9ebd6077827fe71c1cc7284fa59265d939437",
+        "csize": 498236,
+        "isize": 2310681
+      },
+      {
+        "name": "ffmpeg",
+        "version": "2:9.0.2-2",
+        "repo": "extra",
+        "sha256": "91b8d558885d655999c5b2430e8b70a1f55a04d50fb3729ed03b4fcb6478ebe2",
+        "csize": 15894388,
+        "isize": 50800266
+      },
+      {
+        "name": "fftw",
+        "version": "3.3.11-1",
+        "repo": "extra",
+        "sha256": "4548ce6c2b143c2118adc2a24d37782eadf3215df7f499b57289fae536957a44",
+        "csize": 2799340,
+        "isize": 9253687
+      },
+      {
+        "name": "file",
+        "version": "5.48-1",
+        "repo": "core",
+        "sha256": "b77fe84e1dda2f32fcd11a004347c0a0c6bb9806376533c78abd78b4ea779af2",
+        "csize": 463924,
+        "isize": 11041442
+      },
+      {
+        "name": "filesystem",
+        "version": "2025.10.12-1",
+        "repo": "core",
+        "sha256": "6b6c3fee7432204840d3b6afc9bc1a68c28f591a47fb220071715c40cca956df",
+        "csize": 15479,
+        "isize": 24551
+      },
+      {
+        "name": "findutils",
+        "version": "4.11.0-1",
+        "repo": "core",
+        "sha256": "76ac56a7f03039d163306701e5c02777b9b7170ad5388e66e46c363dd2792edf",
+        "csize": 539114,
+        "isize": 1965172
+      },
+      {
+        "name": "flac",
+        "version": "1.5.0-1",
+        "repo": "extra",
+        "sha256": "7c8dce6bde402b9d243fd240847722a57b94df1dbf53e0cabc9119219dd04735",
+        "csize": 343225,
+        "isize": 1195836
+      },
+      {
+        "name": "fontconfig",
+        "version": "2:2.18.3-2",
+        "repo": "extra",
+        "sha256": "c3d961568e10d0bc035b52554333535d31853310b9b7936eedf5d026425d3adf",
+        "csize": 419159,
+        "isize": 1399269
+      },
+      {
+        "name": "frameworkintegration",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "63a191eda3c88a7874e1993b31fc88effef7a5520085e4db3067ba890efcfe69",
+        "csize": 79609,
+        "isize": 266080
+      },
+      {
+        "name": "frameworkintegration5",
+        "version": "5.116.0-3",
+        "repo": "extra",
+        "sha256": "9c02f5a3ae3af99a30f09d8d6598e32b2be8de7625584e734ba64c68f5d20492",
+        "csize": 1614615,
+        "isize": 1743400
+      },
+      {
+        "name": "freetype2",
+        "version": "2.15.0-1",
+        "repo": "extra",
+        "sha256": "51ac42a702634f0fd8eb78a6c6110e1abb33c4f6045b432f46a915afdd370cc5",
+        "csize": 593190,
+        "isize": 1825748
+      },
+      {
+        "name": "fribidi",
+        "version": "1.0.17-1",
+        "repo": "extra",
+        "sha256": "7e033aa73bb62ee3782d4d4943cafbf455f077c0ab60442c2b36add53c3588d5",
+        "csize": 76358,
+        "isize": 269691
+      },
+      {
+        "name": "fuse-common",
+        "version": "3.18.3-1",
+        "repo": "extra",
+        "sha256": "6948976906ea830ab210401402ab849e8b5211dd34952e82a92e28a9db3a7389",
+        "csize": 2837,
+        "isize": 725
+      },
+      {
+        "name": "fuse3",
+        "version": "3.18.3-1",
+        "repo": "extra",
+        "sha256": "7171289bad5b88b01b2a2737ecc2a4b0a334a2fc045b6d74c9af57aa863c9547",
+        "csize": 146742,
+        "isize": 585136
+      },
+      {
+        "name": "gawk",
+        "version": "5.4.1-1",
+        "repo": "core",
+        "sha256": "875761229b80b29078cd1fafc35a07add9ac4c2dbb9a429bd0b72ddcc14a31bd",
+        "csize": 1553071,
+        "isize": 4285308
+      },
+      {
+        "name": "gcc",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "1d79371ccf3138e3c172dd83b51560687b65ab824c1ad7e9cb41b7857ed9c55f",
+        "csize": 60743018,
+        "isize": 231619683
+      },
+      {
+        "name": "gcc-ada",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "8ccd8dcd0c6bc77b1092b3f0ad506f6b9cb86c103cbd3d997b1a6b539c117e9e",
+        "csize": 33788611,
+        "isize": 172810662
+      },
+      {
+        "name": "gcc-d",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "3a26a83a117193a99daad73e009cbba08ad5b6b6b59454a1166245d3f19832f6",
+        "csize": 23470448,
+        "isize": 131930942
+      },
+      {
+        "name": "gcc-libs",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "dbeca7c4844e3112de98ba95f7c2b2618f4dd2b9c693c34076b7ba51ddf4611e",
+        "csize": 2730,
+        "isize": 0
+      },
+      {
+        "name": "gd",
+        "version": "2.3.3-9",
+        "repo": "extra",
+        "sha256": "8f3677fbb4c6986f2a8fa3c7b9082d8cac194787ecb0b3b9429e67165324fb21",
+        "csize": 154777,
+        "isize": 669598
+      },
+      {
+        "name": "gdbm",
+        "version": "1.26-2",
+        "repo": "core",
+        "sha256": "7bb8768fc7f617c580ae4c7902aed5413984a8374915da42beeecbb085c2a29e",
+        "csize": 260430,
+        "isize": 752748
+      },
+      {
+        "name": "gdk-pixbuf2",
+        "version": "2.44.8-1",
+        "repo": "extra",
+        "sha256": "48de0aa8c384d6cc4092851c462bbf17cb3275967f112f7b31e19443ff86b78f",
+        "csize": 509116,
+        "isize": 3153954
+      },
+      {
+        "name": "gettext",
+        "version": "1.0-2",
+        "repo": "core",
+        "sha256": "bf1bd9d2f096f1446a645a89a26663371ab6ef78a8ed4b1c3f006b60569a2e28",
+        "csize": 3355456,
+        "isize": 21804039
+      },
+      {
+        "name": "giflib",
+        "version": "6.1.3-2",
+        "repo": "extra",
+        "sha256": "88c0509823519642af0a3418db529dc3e8130d1d204dc64c071c506fdc7e6ed7",
+        "csize": 103824,
+        "isize": 353525
+      },
+      {
+        "name": "glib-networking",
+        "version": "1:2.90.1-1",
+        "repo": "extra",
+        "sha256": "6b9452217bb4bdff19929b3fc9deb7aea3383cfe74cddd6d0a77becc2803caab",
+        "csize": 156027,
+        "isize": 747615
+      },
+      {
+        "name": "glib2",
+        "version": "2.90.1-1",
+        "repo": "core",
+        "sha256": "b7d930dae1b926dd8dfa9375183182ebc7a26689428fd109feaeace3aecf99a0",
+        "csize": 5369371,
+        "isize": 40259808
+      },
+      {
+        "name": "glibc",
+        "version": "2.44+r50+g1848099f063e-1",
+        "repo": "core",
+        "sha256": "e8e4d50d45cb2bd21c9f7eabacc6a01bd5eb93dbd476f3f44d44038fc1eba417",
+        "csize": 10879104,
+        "isize": 53124323
+      },
+      {
+        "name": "glslang",
+        "version": "1:1.4.363.0-1",
+        "repo": "extra",
+        "sha256": "df5cf8841b77c60aece3468fef856db8dcb7515ae3f3654343acdca55a0ae5cf",
+        "csize": 2727204,
+        "isize": 14659069
+      },
+      {
+        "name": "glycin",
+        "version": "2.2.5-1",
+        "repo": "extra",
+        "sha256": "8cab3204e446fb75621e80f333e0f8d80b6fb462e2f7f739ff317abe7e6a524e",
+        "csize": 4261913,
+        "isize": 20035222
+      },
+      {
+        "name": "gmp",
+        "version": "6.3.0-3",
+        "repo": "core",
+        "sha256": "2969061e117d2a8c19d89427b0b88e1c956a6269bc0602087d41aecd15097064",
+        "csize": 453294,
+        "isize": 1061616
+      },
+      {
+        "name": "gnulib-l10n",
+        "version": "20241231-1",
+        "repo": "core",
+        "sha256": "86e6ea818cb331171018bef6e4486c1176064655e0d459bcecc9cc9c2bb74a2c",
+        "csize": 126997,
+        "isize": 644166
+      },
+      {
+        "name": "gnupg",
+        "version": "2.4.9-3",
+        "repo": "core",
+        "sha256": "c758ccf2d09d85b033b30828800844609f47016ee93cd790315dea3818a95cc5",
+        "csize": 3028475,
+        "isize": 10912940
+      },
+      {
+        "name": "gnutls",
+        "version": "3.8.13-3",
+        "repo": "core",
+        "sha256": "a61d5d908aa83ad2ed6ddffda70ae2ddb5a81852dddcbf68ec42c1744e8a8ee9",
+        "csize": 1924864,
+        "isize": 8618870
+      },
+      {
+        "name": "gperftools",
+        "version": "2.19.1-1",
+        "repo": "extra",
+        "sha256": "e4e665c1b02ed957d305ef7b975a0b9de88834091f7195df46ccc63976393ba8",
+        "csize": 589416,
+        "isize": 2433223
+      },
+      {
+        "name": "gpgme",
+        "version": "2.2.0-1",
+        "repo": "core",
+        "sha256": "d720cb9773612a993581e0478724ac0249087236b3e899d7dadc50ee143b279b",
+        "csize": 339789,
+        "isize": 809476
+      },
+      {
+        "name": "gpgmepp",
+        "version": "2.2.0-1",
+        "repo": "extra",
+        "sha256": "d0e2be1c05328d397b3d4b7a4e89b4eefdaf3caf23c364bb08ae4037f7aefb28",
+        "csize": 165786,
+        "isize": 614707
+      },
+      {
+        "name": "gpm",
+        "version": "1.20.7.r38.ge82d1a6-7",
+        "repo": "core",
+        "sha256": "c13146ba90f58ad4b561ffb15ae7d667718acca7865eb752b83d1530f3e67689",
+        "csize": 142211,
+        "isize": 403594
+      },
+      {
+        "name": "graphene",
+        "version": "1.10.8-2",
+        "repo": "extra",
+        "sha256": "6965123514a90c62c2ff20077c80000075b4f42f69759a2d84fcf0981b540a21",
+        "csize": 108568,
+        "isize": 1025528
+      },
+      {
+        "name": "graphite",
+        "version": "1:1.3.15-1",
+        "repo": "extra",
+        "sha256": "b3bd9b30b0715c36b5cfd997ca35ada9c559b1f89f3c386cae7847714c7a5ea2",
+        "csize": 86864,
+        "isize": 206818
+      },
+      {
+        "name": "grep",
+        "version": "3.12-2",
+        "repo": "core",
+        "sha256": "9dd8a5dad99e8d388b1fb1406919de218d30c7e49924f615a12d3f2deaaecfe2",
+        "csize": 241270,
+        "isize": 920241
+      },
+      {
+        "name": "gsettings-desktop-schemas",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "a643fb0af16f7795e8d8c8ea09625997749f2cc498473b1a3c37cc9e15c5495a",
+        "csize": 907739,
+        "isize": 6975440
+      },
+      {
+        "name": "gsettings-system-schemas",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "a8aec16f9124e6b3fd38b5f50305ab8a7ac793f29eadbddf666e92cf01f833fa",
+        "csize": 6242,
+        "isize": 16204
+      },
+      {
+        "name": "gsm",
+        "version": "1.0.24-1",
+        "repo": "extra",
+        "sha256": "779c60b87e5b463ad2ea97e64832d5f184e84e33693ca1059948c1f43e3eba2f",
+        "csize": 40695,
+        "isize": 108986
+      },
+      {
+        "name": "gst-plugins-base",
+        "version": "1.28.8-1",
+        "repo": "extra",
+        "sha256": "be3374db7788bc4a8b6ad482910f24b3c5b3eb965a4472ca69e31a917b5ca102",
+        "csize": 222833,
+        "isize": 659712
+      },
+      {
+        "name": "gst-plugins-base-libs",
+        "version": "1.28.8-1",
+        "repo": "extra",
+        "sha256": "34f2bcd85eb3caf997fc239b3fa150d7dd6b146a053a64e5cac1f03430b98658",
+        "csize": 2575578,
+        "isize": 13478603
+      },
+      {
+        "name": "gstreamer",
+        "version": "1.28.8-1",
+        "repo": "extra",
+        "sha256": "ee0db3bac8e0b0d885cf7128feed4c482d75ea4a1ed001a0c8c72546b1e89dc2",
+        "csize": 2213366,
+        "isize": 12488286
+      },
+      {
+        "name": "gtest",
+        "version": "1.18.0-1",
+        "repo": "extra",
+        "sha256": "a056289240aebf743810c69a9dc3a8503edf9ae98b5be167fddd66598236ebe5",
+        "csize": 408829,
+        "isize": 1748074
+      },
+      {
+        "name": "gtk-update-icon-cache",
+        "version": "1:4.24.1-1",
+        "repo": "extra",
+        "sha256": "daa2b4c82e8c94e05b201ad393294f549fda6e3717dfb2aca759ee70557dddfa",
+        "csize": 18140,
+        "isize": 41088
+      },
+      {
+        "name": "gtk3",
+        "version": "1:3.24.52-2",
+        "repo": "extra",
+        "sha256": "898965abbebb37f6ef155e08c68292f1cb75eff12dc25af736c5565a765361a1",
+        "csize": 9365862,
+        "isize": 55806938
+      },
+      {
+        "name": "gumbo-parser",
+        "version": "0.14.1-1",
+        "repo": "extra",
+        "sha256": "c2b88b4027f4c7fd42d0c0fb096117ce01ee6d2210876f388552fc9ae3c7b9cc",
+        "csize": 88622,
+        "isize": 362098
+      },
+      {
+        "name": "gzip",
+        "version": "1.15-1",
+        "repo": "core",
+        "sha256": "4a2d1fd90458bf9751b9aca418f8e8ae6d570cb4a406bd7dc646ad7162a720fa",
+        "csize": 95787,
+        "isize": 174659
+      },
+      {
+        "name": "harfbuzz",
+        "version": "15.0.0-1",
+        "repo": "extra",
+        "sha256": "c2593af12b2d888f6edd91cb95fbea324c189ae9390342bcd86a20807ed5ba57",
+        "csize": 1561895,
+        "isize": 5811311
+      },
+      {
+        "name": "hdf5",
+        "version": "2.2.0-1",
+        "repo": "extra",
+        "sha256": "c87b81f8139357c7d6a12d0b02edf60215ffcb99ae4d961c1f23b4780c9f838d",
+        "csize": 4644534,
+        "isize": 14980328
+      },
+      {
+        "name": "hicolor-icon-theme",
+        "version": "0.18-1",
+        "repo": "extra",
+        "sha256": "22ec69012b9a55e276b5891f916366f692541dce3793bff3e85a28a10b91990a",
+        "csize": 13337,
+        "isize": 55627
+      },
+      {
+        "name": "hidapi",
+        "version": "0.15.0-1",
+        "repo": "extra",
+        "sha256": "58eee8119ef8ca47a6f10c073ee3a89d9d3958b77b94aa7d05c331e73f50f5b8",
+        "csize": 43174,
+        "isize": 135875
+      },
+      {
+        "name": "highway",
+        "version": "1.4.0-1",
+        "repo": "extra",
+        "sha256": "1695affe5d6174380504a42b0808b1ca638e95b265fa15bc80e6d6e9875ba993",
+        "csize": 1245399,
+        "isize": 10525816
+      },
+      {
+        "name": "hunspell",
+        "version": "1.7.5-1",
+        "repo": "extra",
+        "sha256": "1596e91b95f8e4315782304d00d2bc9c686b7e6eaa93bf6b421a6d53b74bebe9",
+        "csize": 438504,
+        "isize": 1480634
+      },
+      {
+        "name": "hwdata",
+        "version": "0.412-1",
+        "repo": "core",
+        "sha256": "cce4809b7fa0146464f41f5d6bd643e11624311007f79e8927818b438d7a6092",
+        "csize": 1783601,
+        "isize": 10565629
+      },
+      {
+        "name": "hwloc",
+        "version": "2.15.0-1",
+        "repo": "extra",
+        "sha256": "70557154447db225e7be8b16a6b5797bac7c3ff0cd290dd58ad1e0b011c1d730",
+        "csize": 600020,
+        "isize": 1794508
+      },
+      {
+        "name": "i2c-tools",
+        "version": "4.4-4",
+        "repo": "extra",
+        "sha256": "0bf5b396a1fe87b7b10c82887f2dde427b8f4bf33f04b4f3d10d81c803540d7f",
+        "csize": 93097,
+        "isize": 340507
+      },
+      {
+        "name": "iana-etc",
+        "version": "20260617-1",
+        "repo": "core",
+        "sha256": "f451da19de46e77177d959239e03b6ee837c93966ac72ca0b80a1e9a32abeb67",
+        "csize": 411435,
+        "isize": 4213221
+      },
+      {
+        "name": "icu",
+        "version": "78.3-1",
+        "repo": "core",
+        "sha256": "118fe41efa6c550f3fe67893946dcea2c6cbb5272299a6ddf4160fb17f3e4bb0",
+        "csize": 12272670,
+        "isize": 45330098
+      },
+      {
+        "name": "iio-sensor-proxy",
+        "version": "3.9-1",
+        "repo": "extra",
+        "sha256": "02d90729e6990f3a8208577a5d2fe65acbd3b6563d6ab4cc08019dbe07c7de6f",
+        "csize": 40923,
+        "isize": 120705
+      },
+      {
+        "name": "imath",
+        "version": "3.2.3-1",
+        "repo": "extra",
+        "sha256": "f034fcd6b6df873e8dd248b4ad7a5b9dab86b30f9fd249be92d4299741ac07c2",
+        "csize": 4115769,
+        "isize": 27834003
+      },
+      {
+        "name": "iproute2",
+        "version": "7.3.0-1",
+        "repo": "core",
+        "sha256": "e7afcf7bee5976e3c01053e46ebd396091a5341e5f267210eff251902aca65e9",
+        "csize": 1247634,
+        "isize": 3262545
+      },
+      {
+        "name": "iptables",
+        "version": "1:1.8.13-1",
+        "repo": "core",
+        "sha256": "c827ed573b29dd488317da6b61be22c5d12154378b6bceda35ced834e8bbbc94",
+        "csize": 431248,
+        "isize": 2465703
+      },
+      {
+        "name": "iso-codes",
+        "version": "4.20.1-1",
+        "repo": "extra",
+        "sha256": "c2dbcb21176ff2a15cea0072ea13f2998bcd435fd494c99d0a8f06e9eb029192",
+        "csize": 3777898,
+        "isize": 23380644
+      },
+      {
+        "name": "jack2",
+        "version": "1.9.22-2",
+        "repo": "extra",
+        "sha256": "e400bbd5f48b5f657d7835ef607822d14be1fc66c1807718b13086c53b95c8a7",
+        "csize": 483134,
+        "isize": 1930572
+      },
+      {
+        "name": "jansson",
+        "version": "2.15.1-1",
+        "repo": "core",
+        "sha256": "ff1ff9da9ec0520b30cc4add6160ba5a171d9a478408863a2d99b61f5bb9866b",
+        "csize": 94532,
+        "isize": 287251
+      },
+      {
+        "name": "jbigkit",
+        "version": "2.2-1",
+        "repo": "extra",
+        "sha256": "22025fe7212ce8f1492c0834e7e0f7f9ce99d97f62b1e56f77b8db2275d4d9a0",
+        "csize": 56852,
+        "isize": 175730
+      },
+      {
+        "name": "json-c",
+        "version": "0.19-1",
+        "repo": "core",
+        "sha256": "a2ebb9395bfc18a29abd21b6dd756519114e4e6241d6321588ada285ded4d63f",
+        "csize": 64992,
+        "isize": 203194
+      },
+      {
+        "name": "json-glib",
+        "version": "1.10.8-1",
+        "repo": "extra",
+        "sha256": "3c2ec1b51d45f7c2d0cee7d28520b0772cc6d01fa09b808536e08dca7dd638eb",
+        "csize": 177781,
+        "isize": 1063459
+      },
+      {
+        "name": "kaccounts-integration",
+        "version": "26.08.2-1",
+        "repo": "extra",
+        "sha256": "620d3fff035c57e6a5746d7b275614abe1f016b227a311fd9ee8027a3f1b4985",
+        "csize": 157657,
+        "isize": 635480
+      },
+      {
+        "name": "kactivitymanagerd",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "b558f155ee6623d75fc95fc776c5852b2dd482eba6bca4e6e37644e196c6b733",
+        "csize": 205063,
+        "isize": 772580
+      },
+      {
+        "name": "karchive",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "31ced523be42d264d29073ec7859f0208abab1ffe01f2f99e9679603add99140",
+        "csize": 205413,
+        "isize": 892270
+      },
+      {
+        "name": "karchive5",
+        "version": "5.116.0-3",
+        "repo": "extra",
+        "sha256": "2e737b992c54332e8d69e957e0d8981583cf31f860f9bfedd9df0cf931996a16",
+        "csize": 155122,
+        "isize": 640792
+      },
+      {
+        "name": "kauth",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "5edc057749947c29027fd8a91f039b16c30c9c898656a16821c601806c3b14f4",
+        "csize": 124544,
+        "isize": 447941
+      },
+      {
+        "name": "kauth5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "0a7ad22392cf297451dd136cd095b9a0ad6b21e2e3cec37553a59a5ef6bfe82a",
+        "csize": 111723,
+        "isize": 431313
+      },
+      {
+        "name": "kbd",
+        "version": "2.10.0-1",
+        "repo": "core",
+        "sha256": "9322a5fb74f43341835d22d3ea0cf1d88d91eb4c98ab9fcb816955e2159b4b41",
+        "csize": 1341125,
+        "isize": 3449841
+      },
+      {
+        "name": "kbookmarks",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "459c6d70dfe4eeddb953e3c1ba11723f2ec349b3f41f73a5645178e503f10975",
+        "csize": 132029,
+        "isize": 549184
+      },
+      {
+        "name": "kcmutils",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "6a74ba8decae8899b88641b38540e9050ae38ab3e6f902ccc1969648691020eb",
+        "csize": 351029,
+        "isize": 1415330
+      },
+      {
+        "name": "kcodecs",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "74a6e61ba60790a5222cd12f00bf901a235e71caf4e3b48e945a557da75bde58",
+        "csize": 176800,
+        "isize": 734659
+      },
+      {
+        "name": "kcodecs5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "f7eb6a8dcf38027b0904ab7b87728613aee96aeed3ccec94626a9c7ec37fe236",
+        "csize": 159952,
+        "isize": 673763
+      },
+      {
+        "name": "kcolorscheme",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "0cea2a31b00587846191561ec2464517d71d8c4bad74e4547b33e7f2797a4db5",
+        "csize": 55993,
+        "isize": 166403
+      },
+      {
+        "name": "kcompletion",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "71d373ba143745cd0062f9ea86f43959a005375814e3ad581fdc3e1b965829d7",
+        "csize": 134302,
+        "isize": 422450
+      },
+      {
+        "name": "kconfig",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "d885b6d00a5d9a9a692992147722923f8435bc337ea95667db497e9c3e36be29",
+        "csize": 556891,
+        "isize": 2519215
+      },
+      {
+        "name": "kconfig5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "c6d4843745f3d8f701b5bf51cde87ec7f06f41cdeac1e1ba383dc56fe58f480d",
+        "csize": 381508,
+        "isize": 1588308
+      },
+      {
+        "name": "kconfigwidgets",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "9c5730034fa8099d6d1473830d47b7d2368989a5eec8b61b080de09e04fc27df",
+        "csize": 369784,
+        "isize": 1433099
+      },
+      {
+        "name": "kconfigwidgets5",
+        "version": "5.116.0-3",
+        "repo": "extra",
+        "sha256": "ef5f4748a0a354766edd9ba80c059cef2f65c19800e88a0d1679abd5b9f2ee87",
+        "csize": 416857,
+        "isize": 1612586
+      },
+      {
+        "name": "kcoreaddons",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "864a0f9c189f2a690cbeac368db0d2df3541224f4c284599dd25e4f4fa3cbcc1",
+        "csize": 796076,
+        "isize": 3357687
+      },
+      {
+        "name": "kcoreaddons5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "0532d5221919f2a92b90d1ed91f602d1cdded80ebe9de8e8be4d3b20860b251b",
+        "csize": 517797,
+        "isize": 2055780
+      },
+      {
+        "name": "kcrash",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "b86be4410c61fd633cf0c4cb56940b2d795161e173043f6372b3b040922a8fd4",
+        "csize": 30793,
+        "isize": 76596
+      },
+      {
+        "name": "kdbusaddons",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "4b9cab817345b99f9c20d6a7d5cd0f7a551f1b70c58210270598058f6537822b",
+        "csize": 77706,
+        "isize": 250228
+      },
+      {
+        "name": "kde-cli-tools",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "1237d5a72f9c7d857e7ff8e1acdcd860cf3af3414fc1fdecc5ef9f7a9087b1a9",
+        "csize": 905830,
+        "isize": 3823340
+      },
+      {
+        "name": "kdeclarative",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "31f46f7a5bd10b1babff0d130617861ad04a998de5636cd089ef2645fb268a04",
+        "csize": 208940,
+        "isize": 877907
+      },
+      {
+        "name": "kdecoration",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "6a530286de1b24f40c9839685b76d88e702c4c9aa5fff8179e712bf892d487f7",
+        "csize": 104106,
+        "isize": 415655
+      },
+      {
+        "name": "kded",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "aa210d11df5457f23854befcc8f760da746a4c088cef5c1a3359561c7c65b9e3",
+        "csize": 70690,
+        "isize": 134441
+      },
+      {
+        "name": "kdesu",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "c7da60559e911cd62cc516dea88ae30fc233ed829cf01f6a256385dd4088439a",
+        "csize": 79019,
+        "isize": 252026
+      },
+      {
+        "name": "kdnssd",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "a8da895907d1166a1b0b1dcaa2044e85e87dc05babc911c2d6c0bf43d7feafd1",
+        "csize": 95738,
+        "isize": 291354
+      },
+      {
+        "name": "kdsoap",
+        "version": "2.3.0-1",
+        "repo": "extra",
+        "sha256": "444b80f2e59881e4be25f417ee443d0ee649cfd66b058d2d3aca2027cd31ab1b",
+        "csize": 485372,
+        "isize": 1400558
+      },
+      {
+        "name": "kdsoap-ws-discovery-client",
+        "version": "0.4.0-3",
+        "repo": "extra",
+        "sha256": "e38cf0b087924bbaca5376d706c22923883c41b57e690f94249c853bd6d491fc",
+        "csize": 176556,
+        "isize": 770575
+      },
+      {
+        "name": "keyutils",
+        "version": "1.6.3-4",
+        "repo": "core",
+        "sha256": "e3e5d4226bb7d213a6baddb997bf679a2b1106d95b5c2845b79bf8df1c3ef5fe",
+        "csize": 104718,
+        "isize": 211289
+      },
+      {
+        "name": "kfilemetadata",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "110ade86c361d30130fe60bbd62c3e3dd9b07364c1ac238322f2a441231fb29b",
+        "csize": 288819,
+        "isize": 1458782
+      },
+      {
+        "name": "kglobalaccel",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "ebb62d0ded42e39faf8175d7e532e88af075ba1a50b8764b53a7edd2feed8651",
+        "csize": 103117,
+        "isize": 312137
+      },
+      {
+        "name": "kglobalacceld",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "ef15bbc8db672621f441a9426dbdea7ae312a5f5d37d4041b8083fba7e03a281",
+        "csize": 120561,
+        "isize": 345537
+      },
+      {
+        "name": "kguiaddons",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "7caa8edfba7180ab815525fc8d5e7d207e2acd77c9a120a86a2d66c4d88514e3",
+        "csize": 226420,
+        "isize": 821832
+      },
+      {
+        "name": "kguiaddons5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "52eafc7300f9e7a5c7fbf1fdd4b250b8cb7c15ddb1d6f032e524cb32b3ffbf0c",
+        "csize": 94230,
+        "isize": 296990
+      },
+      {
+        "name": "kholidays",
+        "version": "1:6.31.0-1",
+        "repo": "extra",
+        "sha256": "84a6034f3ceedf529bbb1c8fe3aba5f29a22871b6ea6fadc8fbfdabb9cba901d",
+        "csize": 331894,
+        "isize": 1175911
+      },
+      {
+        "name": "ki18n",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "7f5e6d3ae1a67c97962334a2d9280854de8cf38d0862c1e0d4cf986b9763a1af",
+        "csize": 1762409,
+        "isize": 18688509
+      },
+      {
+        "name": "ki18n5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "1b7221eb7e978c452e85902a730f4c0e3aa1740ccf5f7511678ed7a18faca77f",
+        "csize": 1652654,
+        "isize": 17876301
+      },
+      {
+        "name": "kiconthemes",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "367495463a7c17066b58629a6e229fbea88d55a66aaebe71f879c76e60577266",
+        "csize": 178851,
+        "isize": 625100
+      },
+      {
+        "name": "kiconthemes5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "77c7d0d107cd71ed21c66ce29b908843f6a0260a579824af0525d2134a416df1",
+        "csize": 148518,
+        "isize": 512533
+      },
+      {
+        "name": "kidletime",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "ffea2dd679d6818843220deae92f4ba08748468d1ee3e45068ef22172cc288c7",
+        "csize": 64037,
+        "isize": 225023
+      },
+      {
+        "name": "kio",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "060107d41da0f1ecc9e228b1f7a2c8ac2810ccb41cd8c510ee5ca299e48ac1a9",
+        "csize": 4012990,
+        "isize": 20808406
+      },
+      {
+        "name": "kio-extras",
+        "version": "26.08.2-1",
+        "repo": "extra",
+        "sha256": "6fbe925bdc2389f83b3c1cad86d93978d3cc5f1c5393b51fe93e8e171ab3bc16",
+        "csize": 1995038,
+        "isize": 7743920
+      },
+      {
+        "name": "kio-fuse",
+        "version": "5.1.1-2",
+        "repo": "extra",
+        "sha256": "11cf3a84e8e7816ffb612d492e84c0628ed5e49c9a7a6211d312b2205f9564b9",
+        "csize": 75219,
+        "isize": 192430
+      },
+      {
+        "name": "kirigami",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "a6bfd8fbdcafc3ea33e6b08d7270d5fb18e86070a1cc7e6db3b0290705141f23",
+        "csize": 1489742,
+        "isize": 7423876
+      },
+      {
+        "name": "kirigami-addons",
+        "version": "1.15.0-1",
+        "repo": "extra",
+        "sha256": "4156f0051b644e9b5be114b666b6f0b191622974976ba3e7d90a08f208442159",
+        "csize": 2436061,
+        "isize": 8097792
+      },
+      {
+        "name": "kitemmodels",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "c1b5b13958e6c1a26b50b16529366bc5d775fc84afd020c13db7d66a0546363b",
+        "csize": 164522,
+        "isize": 554682
+      },
+      {
+        "name": "kitemviews",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "da6fff4ba8d50f5a6d3987a65141579acb9768baaeb248921c3214dfd5637c92",
+        "csize": 133324,
+        "isize": 409623
+      },
+      {
+        "name": "kjobwidgets",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "c9c904bfa289f85a22466d4abf20782f4fc229f5ede466812431d2bdb6f9290c",
+        "csize": 196756,
+        "isize": 767173
+      },
+      {
+        "name": "kmenuedit",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "0bfd410c033532317ffa04e7845bb1a84dd07f813b43e2703b84fee2900f2df7",
+        "csize": 1071520,
+        "isize": 2045227
+      },
+      {
+        "name": "kmod",
+        "version": "34.2-1",
+        "repo": "core",
+        "sha256": "8cce1b4dfd2a1f354a253bb60a36c83024042eef5d47cb0214ec5d4f47f2007e",
+        "csize": 133390,
+        "isize": 350816
+      },
+      {
+        "name": "knewstuff",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "6a657bbf1c3812b5062aadc35d2930894f8a289b3ef789307af85a15d0ebb590",
+        "csize": 753344,
+        "isize": 3276233
+      },
+      {
+        "name": "knighttime",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "4d14cf8f51f17b238539d92601322441138bb495a62c294273d69980ca75c8c4",
+        "csize": 68392,
+        "isize": 199033
+      },
+      {
+        "name": "knotifications",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "9b295b3754a3d07ec24424d79e2f828941fd2096bf6d13c48c0d7ea34bc2ce75",
+        "csize": 156515,
+        "isize": 507403
+      },
+      {
+        "name": "knotifications5",
+        "version": "5.116.0-3",
+        "repo": "extra",
+        "sha256": "eab663d7323efb5e7be2b76e9b7ae33319cc31134dfa2bcc609a1770c39558b1",
+        "csize": 150096,
+        "isize": 496940
+      },
+      {
+        "name": "knotifyconfig",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "179b91add3661dd26aaee212a1ca9644fc38baf72c52489872993b6eecf6de30",
+        "csize": 66662,
+        "isize": 209125
+      },
+      {
+        "name": "kpackage",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "bdc8271ee9a62014b07bc79e2ff98568b5b0e28f7da5bdbfc468390ef71e90d3",
+        "csize": 198304,
+        "isize": 720000
+      },
+      {
+        "name": "kparts",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "e4f5dff9ed255b364f48610c2a07fcd378233e10aae47d7a2679f34d36fa6ada",
+        "csize": 179170,
+        "isize": 515301
+      },
+      {
+        "name": "kpipewire",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "f9407b46f00707538a7818b1d7e76cd73b3568a714515cf5f7f798144ad6a010",
+        "csize": 176133,
+        "isize": 633281
+      },
+      {
+        "name": "kpty",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "272a1dcf58d025ee976fad2ac54808fac5fdeb33e90db1e03298249a5d248aa1",
+        "csize": 55263,
+        "isize": 162055
+      },
+      {
+        "name": "kquickcharts",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "1d8222bc46829161270ecd82123ac24f0291c90e1be06227210265c721dfd69f",
+        "csize": 206063,
+        "isize": 770902
+      },
+      {
+        "name": "krb5",
+        "version": "1.22.2-1",
+        "repo": "core",
+        "sha256": "38dcaf86512559c47e9b084ce78f417b5e8b0634feb8cb80b5edeab2c40b704f",
+        "csize": 1407071,
+        "isize": 4948474
+      },
+      {
+        "name": "krunner",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "7a1256695e874a62321cb713b349bc04701e7e5da325a95f0177fa43591d60ed",
+        "csize": 220981,
+        "isize": 513740
+      },
+      {
+        "name": "kscreenlocker",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "003f0993b74572fa060a42c06bea2b996cb0cf970388a56c7ecf5f59e66a0eba",
+        "csize": 290359,
+        "isize": 1215989
+      },
+      {
+        "name": "kservice",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "3c65559aa783351cfcf4aab0a3dfb356a0189946a3fbbf9d8109ddb51a0890f2",
+        "csize": 257852,
+        "isize": 708690
+      },
+      {
+        "name": "kstatusnotifieritem",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "cff9066e90c11719960528e4c2a23be00da4fd40f054f647975c02f2e77f2c4b",
+        "csize": 155004,
+        "isize": 479826
+      },
+      {
+        "name": "ksvg",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "6b6c8aedffd3d4a5f598ed9b09c05afbe7c417744a00425ee5769b5594689b3f",
+        "csize": 166120,
+        "isize": 549320
+      },
+      {
+        "name": "ksystemstats",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "ca754e10acf0242b527b712e533d0c7f82085b469b54e6b15d5bd8fad167c934",
+        "csize": 365471,
+        "isize": 1955406
+      },
+      {
+        "name": "ktexteditor",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "b64a4fb946ec6dc74adc1bc4107de1fb8a96e257acf9205056991a16d19586c0",
+        "csize": 3054110,
+        "isize": 14844369
+      },
+      {
+        "name": "ktextwidgets",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "bc4f841ccb3f043dc4b4f06780d4e5c48363abfb8f4bbc9b92fbdb210d12dad9",
+        "csize": 316469,
+        "isize": 1481903
+      },
+      {
+        "name": "kunitconversion",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "6e2d5f3ec8595218e357d35226b63b240bfee8160f214f4c6dafca7aa8649451",
+        "csize": 1139545,
+        "isize": 12422516
+      },
+      {
+        "name": "kuserfeedback",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "c85b509f30d13f3077533e81e59997f4e2cb98df54e0543eef29e516615b34fa",
+        "csize": 346821,
+        "isize": 2127389
+      },
+      {
+        "name": "kwallet",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "ad8993c1321d1dde2ca19dbf3696a9baccdc7657a19556ab53744a216fcb6ec3",
+        "csize": 585946,
+        "isize": 2564691
+      },
+      {
+        "name": "kwayland",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "65520d4070eed0a2fa155aef66c2e394681308bcfd8f0ca4fb9818ac35a53097",
+        "csize": 252967,
+        "isize": 1284377
+      },
+      {
+        "name": "kwidgetsaddons",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "e9e57a0c27709fca51e771467afa61ac2db0199effa180926e0b7b5b16a50123",
+        "csize": 2289647,
+        "isize": 7877487
+      },
+      {
+        "name": "kwidgetsaddons5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "c88c033b5883dc9b716be7c17c91fbda2b619dd190a06d3cb48df3dccf086b68",
+        "csize": 1686757,
+        "isize": 7341288
+      },
+      {
+        "name": "kwin",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "348f1e6be9d95fa7e52a52738f1b2a70e3c3e9c83ae6a1c35339ce6974f797d0",
+        "csize": 11117246,
+        "isize": 33205863
+      },
+      {
+        "name": "kwindowsystem",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "cc4f26260e4b833c3d5c4bd01852cd2507366f0b9a480b792533300c65dff961",
+        "csize": 254981,
+        "isize": 877086
+      },
+      {
+        "name": "kwindowsystem5",
+        "version": "5.116.0-2",
+        "repo": "extra",
+        "sha256": "91f6aeb80a57637740b79a1988024fc90e9d0f490fc4af48f385c5bef6548af9",
+        "csize": 196588,
+        "isize": 729294
+      },
+      {
+        "name": "kxmlgui",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "8c75ac0741d3597a044465b54da5b93d6a5b3e2cde536028fced83472821327d",
+        "csize": 875011,
+        "isize": 4036374
+      },
+      {
+        "name": "l-smash",
+        "version": "2.14.5-4",
+        "repo": "extra",
+        "sha256": "43ba7aa48088b132082c144d38c0cd2647d613df43d8b447b972629f8e0014f6",
+        "csize": 326377,
+        "isize": 1068386
+      },
+      {
+        "name": "lame",
+        "version": "4.0-1",
+        "repo": "extra",
+        "sha256": "2c7bf7150e41a12b7b2ef62fec6ab5a071e20b537ac734490922fa64c204af77",
+        "csize": 319710,
+        "isize": 1155547
+      },
+      {
+        "name": "layer-shell-qt",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "b92e56a1277342840a34f97886a55d0d2bd5db4285a7cd006f60c5a99ff92510",
+        "csize": 38912,
+        "isize": 153467
+      },
+      {
+        "name": "lcms2",
+        "version": "2.19.1-1",
+        "repo": "extra",
+        "sha256": "8cdbd1ec200fcf41a583d0fd6fbc6f117f9642a3968c73263c5b0ca35a4c4663",
+        "csize": 237258,
+        "isize": 724964
+      },
+      {
+        "name": "ldb",
+        "version": "2:4.25.1-1",
+        "repo": "extra",
+        "sha256": "04910fbd71aa3b77a6ea80030c03f0398ec4a95e68729102cd233bde20ad86a7",
+        "csize": 501663,
+        "isize": 2282716
+      },
+      {
+        "name": "leancrypto",
+        "version": "1.9.1-1",
+        "repo": "core",
+        "sha256": "0494b72775287ab8a9f87dbb9a579cdde1e39fbb855e9040cf7bae793f04339f",
+        "csize": 1607376,
+        "isize": 7348859
+      },
+      {
+        "name": "lib32-gcc-libs",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "21fde8d5c5fda174b0277515fb6e49a450763a9c8a05f1956f719779e459465a",
+        "csize": 11341393,
+        "isize": 47168904
+      },
+      {
+        "name": "lib32-glibc",
+        "version": "2.44+r50+g1848099f063e-1",
+        "repo": "core",
+        "sha256": "a977f9a6a405ab85e594aa9f1230a0b7dddfc33e3de5f2cb66931c92a48931d8",
+        "csize": 3794395,
+        "isize": 19928234
+      },
+      {
+        "name": "libaccounts-glib",
+        "version": "1.27-3",
+        "repo": "extra",
+        "sha256": "1d91b0c5374088685c617bb610646f234050ba9ae8f93c9bc8c0ed0cb1bfedf0",
+        "csize": 119052,
+        "isize": 1006111
+      },
+      {
+        "name": "libaccounts-qt",
+        "version": "1.17-2",
+        "repo": "extra",
+        "sha256": "54ad59f5462f1efc7391031a0081c47b6fafb4bc87904a1d79cc5be0d9c55943",
+        "csize": 59708,
+        "isize": 194421
+      },
+      {
+        "name": "libaec",
+        "version": "1.1.7-1",
+        "repo": "extra",
+        "sha256": "894da633b21eb2f5920fbb6bd48458546487a4da078e7291f8f2532cecc99c8c",
+        "csize": 26013,
+        "isize": 101975
+      },
+      {
+        "name": "libarchive",
+        "version": "3.8.10-1",
+        "repo": "core",
+        "sha256": "9142262bb26509f8c1eae3854c3f151074c8e4be5d07778e2abcae6101caa854",
+        "csize": 602031,
+        "isize": 1342404
+      },
+      {
+        "name": "libasan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "7f6c602ea97c01b67cf8261b87afa1a47c1eb383ded769aaef71475e781defdc",
+        "csize": 533471,
+        "isize": 1974116
+      },
+      {
+        "name": "libass",
+        "version": "0.17.5-1",
+        "repo": "extra",
+        "sha256": "d157ce85501267f92bddb29e5d1ca534120c69fb55ad8f8447082fecb1fae4bb",
+        "csize": 127321,
+        "isize": 311427
+      },
+      {
+        "name": "libassuan",
+        "version": "3.0.0-1",
+        "repo": "core",
+        "sha256": "1843d675b324c9d549f3413dcbe653ec86876ac2898fc94423926ed30eab25a1",
+        "csize": 114921,
+        "isize": 245206
+      },
+      {
+        "name": "libasyncns",
+        "version": "1:0.8+r3+g68cd5af-3",
+        "repo": "extra",
+        "sha256": "de65e601391ace5c126e863ad67245b03cfe87f46c12b509668f3da2419bbf15",
+        "csize": 17309,
+        "isize": 49043
+      },
+      {
+        "name": "libatasmart",
+        "version": "0.19-8",
+        "repo": "extra",
+        "sha256": "31e8b419d2ffe2ebb306533af3923b8f1bf75dfd6afa0df2dc861371ec9c50d6",
+        "csize": 31102,
+        "isize": 106008
+      },
+      {
+        "name": "libatomic",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "920cfea3dcac82e3d7c8ebbf64dfe341821c1118277d55b6c1e96035cd943656",
+        "csize": 14372,
+        "isize": 38092
+      },
+      {
+        "name": "libavc1394",
+        "version": "0.5.4-7",
+        "repo": "extra",
+        "sha256": "fc51adf3f9af30d7d58abd8962e39ae85bd6c8c36ede30e24ea3400d195a5b0a",
+        "csize": 32942,
+        "isize": 125511
+      },
+      {
+        "name": "libavif",
+        "version": "1.4.2-1",
+        "repo": "extra",
+        "sha256": "296986d8795009e86279608a311c580154d84b82d53365495d76cf28ef375441",
+        "csize": 322252,
+        "isize": 910442
+      },
+      {
+        "name": "libb2",
+        "version": "0.98.1-3",
+        "repo": "extra",
+        "sha256": "c556a0b37611e9a09f4ff18bb29e8a56f7c4cf59ef70d771d1c031dd2c2fc849",
+        "csize": 45804,
+        "isize": 133780
+      },
+      {
+        "name": "libblake3",
+        "version": "1.8.7-1",
+        "repo": "extra",
+        "sha256": "1092d411d22cdd2f2c6b611f73086e29732cb441abbe1a0235ebff422ab37a3b",
+        "csize": 30005,
+        "isize": 117317
+      },
+      {
+        "name": "libblockdev",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "2fd763118bda5eae9d15645aac0ae3482d506d66f471fb59fc6d5c84b4267a91",
+        "csize": 267805,
+        "isize": 3810920
+      },
+      {
+        "name": "libblockdev-crypto",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "3f1637ecc3a63ac4509decc5f4c6e64242fdac852948c4d2d0b147daefadf74a",
+        "csize": 29125,
+        "isize": 84023
+      },
+      {
+        "name": "libblockdev-fs",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "345165f70971455bcb2a0904ebabda70b3c2d633c7b80a8271fadf5f292b2a38",
+        "csize": 44214,
+        "isize": 142118
+      },
+      {
+        "name": "libblockdev-loop",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "fb375443a923d4fdb8f63c87f6259add1753aab9c753885225d96aa453dc20b8",
+        "csize": 9418,
+        "isize": 24746
+      },
+      {
+        "name": "libblockdev-mdraid",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "7de7b6608763647e00e81b991b69a485823f10ee250b7202d9a77d58d8ca3f18",
+        "csize": 15087,
+        "isize": 38686
+      },
+      {
+        "name": "libblockdev-nvme",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "12871d559d976b7654a090db663fb71510de1786768bae72877bc73adef3d2d0",
+        "csize": 26143,
+        "isize": 80297
+      },
+      {
+        "name": "libblockdev-part",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "59185b56349bef3fe2b15ec6ece646bfbe6c0d8c1f400c48c2eeee62cb3617ba",
+        "csize": 17249,
+        "isize": 46992
+      },
+      {
+        "name": "libblockdev-smart",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "e992d31f806169815af390a55a20bfa5fa8ef4ddc76ed0f327dc02e75125853c",
+        "csize": 25245,
+        "isize": 130888
+      },
+      {
+        "name": "libblockdev-swap",
+        "version": "3.5.0-2",
+        "repo": "extra",
+        "sha256": "77cb9b5a3a16ed84e998b1a3e3633cf7a5fda34110891090cfcee4b930b571be",
+        "csize": 9316,
+        "isize": 24459
+      },
+      {
+        "name": "libbluray",
+        "version": "1.5.1-1",
+        "repo": "extra",
+        "sha256": "69f006d2a282f28fee68b01f617528f04bec475ac67c03e334f03c606b7cb104",
+        "csize": 922101,
+        "isize": 1325320
+      },
+      {
+        "name": "libbpf",
+        "version": "1.7.0-1",
+        "repo": "core",
+        "sha256": "07ca39704fd534fcb4f520550cdddad5c113521f87035fb66f66a50a6d843257",
+        "csize": 273925,
+        "isize": 864822
+      },
+      {
+        "name": "libbs2b",
+        "version": "3.1.0-11",
+        "repo": "extra",
+        "sha256": "b50871a0b53667c22b72ecbc01efccfe8554d9c907b39529796c2050d46fc8c4",
+        "csize": 18636,
+        "isize": 77580
+      },
+      {
+        "name": "libbsd",
+        "version": "0.12.2-2",
+        "repo": "extra",
+        "sha256": "e26194849786b0202828a348be3f4b90d410604cd7d48f113a4301584a49895a",
+        "csize": 167385,
+        "isize": 343936
+      },
+      {
+        "name": "libbytesize",
+        "version": "2.12-3",
+        "repo": "extra",
+        "sha256": "9d83943d26d0574b22398201610431a761a419394a9724fb7ac32bf2b7720a04",
+        "csize": 25594,
+        "isize": 94738
+      },
+      {
+        "name": "libcanberra",
+        "version": "1:0.30+r2+gc0620e4-6",
+        "repo": "extra",
+        "sha256": "1aca6220b76c4009dbfcad432fcef529fa8fcb2cb187b03a506a2270d50110b1",
+        "csize": 84505,
+        "isize": 392581
+      },
+      {
+        "name": "libcap",
+        "version": "2.78-1",
+        "repo": "core",
+        "sha256": "3e984fe1d323b1c5a5fc60fef005776a4882fbca913d6fe3c41ad11128929ed1",
+        "csize": 854184,
+        "isize": 2177888
+      },
+      {
+        "name": "libcap-ng",
+        "version": "0.9.6-1",
+        "repo": "core",
+        "sha256": "05b0a8356f898e251845b2e5ffa5966be21ca85f3eaaf5aeb8a9e8df4148ba5c",
+        "csize": 72214,
+        "isize": 173852
+      },
+      {
+        "name": "libcgif",
+        "version": "0.5.4-1",
+        "repo": "extra",
+        "sha256": "dc2782ebc369456e09c9c6ad9957b55169843b83f22fa6d1daf12d03ec99d6a5",
+        "csize": 14036,
+        "isize": 28719
+      },
+      {
+        "name": "libcloudproviders",
+        "version": "0.4.1-1",
+        "repo": "extra",
+        "sha256": "4118ca6e1b14202e5d08d8e6013cb47152d7b8433a94a1d67a0c025a9f2f6896",
+        "csize": 48535,
+        "isize": 335892
+      },
+      {
+        "name": "libcolord",
+        "version": "1.4.8-2",
+        "repo": "extra",
+        "sha256": "6e703e71970d735779a4dbecff603abf75b4289ed34bdbf5645146dba28ae6ad",
+        "csize": 190198,
+        "isize": 1299722
+      },
+      {
+        "name": "libcups",
+        "version": "2:2.4.20-1",
+        "repo": "extra",
+        "sha256": "a83b00e3578c33b11e1d0713599689e6c601c8b569a55fbbe656164985799be2",
+        "csize": 290140,
+        "isize": 828340
+      },
+      {
+        "name": "libdaemon",
+        "version": "0.14-6",
+        "repo": "extra",
+        "sha256": "ece83006a468d5205ea45d1de8e9cdb3a864700f9d904fc4b7d52d69dce1b0b6",
+        "csize": 19660,
+        "isize": 59932
+      },
+      {
+        "name": "libdatrie",
+        "version": "0.2.14-1",
+        "repo": "extra",
+        "sha256": "f5ad651ed99afa29d44c662da4f2c6e93764e8a1d47487f41837be1c94ddd38e",
+        "csize": 112102,
+        "isize": 509877
+      },
+      {
+        "name": "libdbusmenu-qt5",
+        "version": "0.9.3+16.04.20160218-8",
+        "repo": "extra",
+        "sha256": "6da3c304f278cdf1f43df40c96c7d86484262425a844ec31480d23cdbf2acf16",
+        "csize": 64594,
+        "isize": 181981
+      },
+      {
+        "name": "libde265",
+        "version": "1.1.3-1",
+        "repo": "extra",
+        "sha256": "c39e04757d24257c153513104a807c1c5d1418dca1589d98134093398cba8dd0",
+        "csize": 364938,
+        "isize": 1004724
+      },
+      {
+        "name": "libdecor",
+        "version": "0.2.5-1",
+        "repo": "extra",
+        "sha256": "79fb92af5bf5358da4dc418fc784554284c09cdf4e8aa2cdc95197752d1df115",
+        "csize": 46413,
+        "isize": 169749
+      },
+      {
+        "name": "libdeflate",
+        "version": "1.26-1",
+        "repo": "extra",
+        "sha256": "3bd3b1ca9a333ab97ebb55f760963f64817b6c4c0d54747b37187f36ab60deab",
+        "csize": 65298,
+        "isize": 146456
+      },
+      {
+        "name": "libdisplay-info",
+        "version": "0.3.0-1",
+        "repo": "extra",
+        "sha256": "07ab1479ec5e70aea174e2d0e340bd9364b507ed74f2df3bfd51b3c6f40e5787",
+        "csize": 124625,
+        "isize": 409003
+      },
+      {
+        "name": "libdmtx",
+        "version": "0.7.8-1",
+        "repo": "extra",
+        "sha256": "e54afff867ea06c282883f84c6a4de7f1774a97e2992e1fa17a008ae9c0379dc",
+        "csize": 54474,
+        "isize": 124867
+      },
+      {
+        "name": "libdovi",
+        "version": "3.4.0-1",
+        "repo": "extra",
+        "sha256": "5832cbddc94e3eb134fc14420d8b4503cb9683041b724a64fdedd080155fa106",
+        "csize": 289809,
+        "isize": 690123
+      },
+      {
+        "name": "libdrm",
+        "version": "2.4.134-1",
+        "repo": "extra",
+        "sha256": "29d101f13d219d01ee4aae25e8f84026e0740d747d56c37ea5573c4618e7df04",
+        "csize": 367774,
+        "isize": 1341788
+      },
+      {
+        "name": "libdvdnav",
+        "version": "7.0.0-1",
+        "repo": "extra",
+        "sha256": "442122c2f7eefdcdd6a3042b531c5cf9aec10105fc32f39912170ae7c6410a6b",
+        "csize": 60535,
+        "isize": 168562
+      },
+      {
+        "name": "libdvdread",
+        "version": "7.1.1-1",
+        "repo": "extra",
+        "sha256": "41d9fce076d8dc28d85cbad6327ef5997dc52c13494871e3c1a2bb0c01a4112a",
+        "csize": 144471,
+        "isize": 445961
+      },
+      {
+        "name": "libedit",
+        "version": "20260512_3.1-1",
+        "repo": "core",
+        "sha256": "70cb736e4fdee330cd0dfab45875f6ea378ae819958dd15748c300b8d7285b42",
+        "csize": 120327,
+        "isize": 280288
+      },
+      {
+        "name": "libei",
+        "version": "1.6.0-2",
+        "repo": "extra",
+        "sha256": "36e0482d629b846baaefc0363212b5afb291e6f9417b43ab4230c1a1d5f8b50b",
+        "csize": 117619,
+        "isize": 444970
+      },
+      {
+        "name": "libelf",
+        "version": "0.197-1",
+        "repo": "core",
+        "sha256": "f8341a1e281ffd294d81891c95dfcd7cbcf9b5527b160d4b54848ec79a19abc1",
+        "csize": 734261,
+        "isize": 3494644
+      },
+      {
+        "name": "libepoxy",
+        "version": "1.5.10-3",
+        "repo": "extra",
+        "sha256": "6e3f4e026b94d45b044f8c15ef0cc04772eafa892dd8b0bf037b1f865f0aaa33",
+        "csize": 312656,
+        "isize": 2766939
+      },
+      {
+        "name": "libevdev",
+        "version": "1.14.0-1",
+        "repo": "extra",
+        "sha256": "3a27bf7676ab002b1dd6b0b8b731d2b6f239acbe414911c1447af9573a255dc3",
+        "csize": 61733,
+        "isize": 230305
+      },
+      {
+        "name": "libevent",
+        "version": "2.1.13-2",
+        "repo": "core",
+        "sha256": "9fd8563e3aa1c64d80257b7b4f60d37cf8589260ba3eb015f8257e2cfd118b04",
+        "csize": 298430,
+        "isize": 1272722
+      },
+      {
+        "name": "libexif",
+        "version": "0.6.26-1",
+        "repo": "extra",
+        "sha256": "92890eb0eece217dff5df78403d32682693b0b1557f20ca9264ca798646caea5",
+        "csize": 540159,
+        "isize": 3272459
+      },
+      {
+        "name": "libffi",
+        "version": "3.8.0-1",
+        "repo": "core",
+        "sha256": "5d21227f2a1d10db60d0cf5bb02b36a1801ae61dc7dae8c3bc1afa548afd8601",
+        "csize": 56862,
+        "isize": 117789
+      },
+      {
+        "name": "libfontenc",
+        "version": "1.1.9-1",
+        "repo": "extra",
+        "sha256": "d81a0725b82dd5e89cfd5e65b6502a281cac62c413e1170dc7c571a5f44c42f6",
+        "csize": 15752,
+        "isize": 36682
+      },
+      {
+        "name": "libfyaml",
+        "version": "0.9.6-3",
+        "repo": "extra",
+        "sha256": "0638641908b9474cd343045e36569efe52ac668331f973c8c07b76ef3a934be9",
+        "csize": 411393,
+        "isize": 1302983
+      },
+      {
+        "name": "libgcc",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "7367dad49fc3229bde804816d412ab77306d433b1f92e4126b8b3ba3502c67d6",
+        "csize": 81949,
+        "isize": 185836
+      },
+      {
+        "name": "libgcrypt",
+        "version": "1.12.4-1",
+        "repo": "core",
+        "sha256": "25ca27f53e0862e706b325d05893e43585be2bb0a0a4a750b8faa6e0e253e136",
+        "csize": 770063,
+        "isize": 2053115
+      },
+      {
+        "name": "libgfortran",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "0b40387c87793ed7b72fc3138c6877630ed66d8b5f841e436f4372a6405663e6",
+        "csize": 948773,
+        "isize": 3684588
+      },
+      {
+        "name": "libglvnd",
+        "version": "1.7.0-3",
+        "repo": "extra",
+        "sha256": "633c2e95d7798d0ce7ee1b7fe970a22325f7f6d35b9f923bb61b223a80934437",
+        "csize": 333994,
+        "isize": 3506849
+      },
+      {
+        "name": "libgomp",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "ffad807ed2ea36a29fe6da70dd77a6c476f1a1d5357cbec0b2481dbc84f303f4",
+        "csize": 236404,
+        "isize": 447361
+      },
+      {
+        "name": "libgpg-error",
+        "version": "1.61-1",
+        "repo": "core",
+        "sha256": "7d5a5b39f588b275558f5e13bd792bff84cf89abb6d48e3e494d6c30e8ea9ca4",
+        "csize": 282578,
+        "isize": 1199323
+      },
+      {
+        "name": "libgphobos",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "832ba49ee28d96389ff4290174611f04430b595e4755718233ba26049ef24698",
+        "csize": 1804411,
+        "isize": 11954724
+      },
+      {
+        "name": "libgudev",
+        "version": "238-4",
+        "repo": "extra",
+        "sha256": "9a78afc58dbf41dd2af33e9c8a6cfb7dc89d0b5150593c7e8ca6beda28d11259",
+        "csize": 29422,
+        "isize": 182148
+      },
+      {
+        "name": "libheif",
+        "version": "1.23.7-1",
+        "repo": "extra",
+        "sha256": "416cbbca351a9537d58667bb3e3d55fb128a6aa716b7e46cf2494bc1bd416af4",
+        "csize": 918022,
+        "isize": 2911614
+      },
+      {
+        "name": "libhwasan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "299ad02f954643c8b0fb919b0d545ebba34816f0facc673399f79252b33ec018",
+        "csize": 281695,
+        "isize": 757548
+      },
+      {
+        "name": "libibus",
+        "version": "1.5.34-2",
+        "repo": "extra",
+        "sha256": "d4c5d9193dea4c7e334d1d544ad3ba6fb0bb461507fd7c44eb5b39d8e1533bc5",
+        "csize": 445220,
+        "isize": 3750976
+      },
+      {
+        "name": "libice",
+        "version": "1.1.2-1",
+        "repo": "extra",
+        "sha256": "bb613be39e5bc1707a39f895c178674bbda52f022da51612e7a10a386608e107",
+        "csize": 80999,
+        "isize": 374521
+      },
+      {
+        "name": "libidn2",
+        "version": "2.3.8-1",
+        "repo": "core",
+        "sha256": "1749bdd4c395913df18c57fdd42820d3de88738b7163b7aa254d13e3da7b1d9d",
+        "csize": 135360,
+        "isize": 384496
+      },
+      {
+        "name": "libiec61883",
+        "version": "1.2.0-9",
+        "repo": "extra",
+        "sha256": "ce0718c4be56ebe9570c6571412191bc1bc57461ac646397b4e52b0f2b5032cd",
+        "csize": 34277,
+        "isize": 129853
+      },
+      {
+        "name": "libimagequant",
+        "version": "4.4.1-2",
+        "repo": "extra",
+        "sha256": "c26846108d4cf718c844bcdf2323293d5cc5c9f847e891bd95239efbcf34e24b",
+        "csize": 271926,
+        "isize": 623963
+      },
+      {
+        "name": "libimobiledevice",
+        "version": "1.4.0-2",
+        "repo": "extra",
+        "sha256": "52577eb2e9dae9385e19bc0b5ce7b3fc4df127565edcae9b1867926f79e58b22",
+        "csize": 689875,
+        "isize": 6489400
+      },
+      {
+        "name": "libimobiledevice-glue",
+        "version": "1.3.2-1",
+        "repo": "extra",
+        "sha256": "f20da2280b05f04e9209ebf2ee88cb3a02868ae21b27679e077daa97251189b6",
+        "csize": 37483,
+        "isize": 105493
+      },
+      {
+        "name": "libinih",
+        "version": "62-2",
+        "repo": "core",
+        "sha256": "a31257bca509c845a77374a8696596ac39d3456a33788ce9af2dc555d8a19a9a",
+        "csize": 22129,
+        "isize": 66457
+      },
+      {
+        "name": "libinput",
+        "version": "1.32.0-1",
+        "repo": "extra",
+        "sha256": "f2c600dda468e3c3614ca728584dfc99ff1968e6354a235cdab5792a90c51dfb",
+        "csize": 236501,
+        "isize": 831515
+      },
+      {
+        "name": "libisl",
+        "version": "0.28-1",
+        "repo": "core",
+        "sha256": "e72fd1165d674f440ff9882b514c999423098a5852ea41fa692db65f391c98c1",
+        "csize": 980886,
+        "isize": 6191080
+      },
+      {
+        "name": "libjpeg-turbo",
+        "version": "3.2.0-2",
+        "repo": "extra",
+        "sha256": "14e743e58bbab35665d3e59ea71bd411f81a01d995e0101442f5f4c82c9de0ab",
+        "csize": 615715,
+        "isize": 2778875
+      },
+      {
+        "name": "libjxl",
+        "version": "0.12.0-1",
+        "repo": "extra",
+        "sha256": "a4e0f65e8ba3a2da1cc348aad4f7f8aee1b504b824a64838fb3d9b2f75cc9449",
+        "csize": 1947638,
+        "isize": 7111117
+      },
+      {
+        "name": "libkexiv2",
+        "version": "26.08.2-1",
+        "repo": "extra",
+        "sha256": "5b58b61c9eb6bfc5152255ad8f65b375cc3a64f983b2c588de84adde98545685",
+        "csize": 161219,
+        "isize": 482267
+      },
+      {
+        "name": "libksba",
+        "version": "1.8.1-1",
+        "repo": "core",
+        "sha256": "6aa88da7314b620af39ae619625b6ffac55f347c1a977cec3c4a0e4bc6f6a79d",
+        "csize": 154959,
+        "isize": 351565
+      },
+      {
+        "name": "libkscreen",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "d5fa74c5ef69b253e0206bef5539d6fb8f01d59b8b62b4b2dfdd3c9e2cae6171",
+        "csize": 256283,
+        "isize": 784591
+      },
+      {
+        "name": "libksysguard",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "cdcec0ca3ee58b3d72df83d6028151a4522823151098122b91d908729c498d2d",
+        "csize": 767356,
+        "isize": 3926462
+      },
+      {
+        "name": "libldap",
+        "version": "2.7.2-2",
+        "repo": "core",
+        "sha256": "a11255b067d9b6b85f5d8d4ca8a145eefcc496e4f9ac04e4d6c378042815266b",
+        "csize": 294932,
+        "isize": 673250
+      },
+      {
+        "name": "liblsan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "11b69f544a6f3d1c58d5612ebc336837e76567f2413b96900a6eb33d5de06e21",
+        "csize": 233817,
+        "isize": 573212
+      },
+      {
+        "name": "libmakepkg-dropins",
+        "version": "20-2",
+        "repo": "core",
+        "sha256": "78c4e32d3140d11d2fd7d1bac6bcfdbdd34d3b59b56620f987fd28fd4334648e",
+        "csize": 6365,
+        "isize": 11493
+      },
+      {
+        "name": "libmatio",
+        "version": "1.5.30-1",
+        "repo": "extra",
+        "sha256": "793ea554a35f2413206172f1d91e968a764bf871c3220c1a8c0caf8d1b819c2e",
+        "csize": 177920,
+        "isize": 666558
+      },
+      {
+        "name": "libmbim",
+        "version": "1.34.0-2",
+        "repo": "extra",
+        "sha256": "3a5f102da9350760424cb179d07c03e4b48883ff4297c9dc883f3a8910fea7e0",
+        "csize": 487315,
+        "isize": 3792022
+      },
+      {
+        "name": "libmd",
+        "version": "1.3.0-1",
+        "repo": "extra",
+        "sha256": "54147206639feaec7559f284e1094dd12523eb9bbec0ec877f99af87eedf123c",
+        "csize": 61753,
+        "isize": 133221
+      },
+      {
+        "name": "libmm-glib",
+        "version": "1.24.2-2",
+        "repo": "extra",
+        "sha256": "c0cf1baea2fbfa0b0dc858b32140b3560943b09cc27f814f349b47fd7b2a924b",
+        "csize": 584598,
+        "isize": 7786792
+      },
+      {
+        "name": "libmnl",
+        "version": "1.0.5-2",
+        "repo": "core",
+        "sha256": "1ee554fe2637bbee1da61f0bdbd3f9d1dd89ddbb9809cd5ef012540a748ff4a0",
+        "csize": 11477,
+        "isize": 35012
+      },
+      {
+        "name": "libmodplug",
+        "version": "0.8.9.0-7",
+        "repo": "extra",
+        "sha256": "41a834ee39468b5ec96238cfae5e3be8f2b4d6ea26edfa4c838f2620fe30fa80",
+        "csize": 174485,
+        "isize": 383148
+      },
+      {
+        "name": "libmpc",
+        "version": "1.4.1-1",
+        "repo": "core",
+        "sha256": "880bdba957ebe5136449c7b61821e92628d7bdd43f370e5a0818d229372d3851",
+        "csize": 94077,
+        "isize": 196392
+      },
+      {
+        "name": "libmtp",
+        "version": "1.1.23-1",
+        "repo": "extra",
+        "sha256": "5a4c1eabb75c870b39fbb96a22e9e8a51616f834265fee2516333605a5d07d1c",
+        "csize": 621709,
+        "isize": 5616858
+      },
+      {
+        "name": "libndp",
+        "version": "1.9-1",
+        "repo": "extra",
+        "sha256": "4285f52d6399cdd9edd740488f0efdb3c7bcc7f2559c6f0ff7c2233719f619d2",
+        "csize": 19958,
+        "isize": 58664
+      },
+      {
+        "name": "libnetfilter_conntrack",
+        "version": "1.1.1-1",
+        "repo": "core",
+        "sha256": "9315ab4571be5d9764367f2e3d56004a127a7dfe6fbbfb1850c05efb674a8bdb",
+        "csize": 52011,
+        "isize": 164057
+      },
+      {
+        "name": "libnewt",
+        "version": "0.52.25-2",
+        "repo": "extra",
+        "sha256": "a6f7192698b7b0a978317135f9218e1d6da550b1d50c5d823564b801df08362c",
+        "csize": 95918,
+        "isize": 289825
+      },
+      {
+        "name": "libnfnetlink",
+        "version": "1.0.2-2",
+        "repo": "core",
+        "sha256": "b06f0d8f2723ac33155bf4f584d88906c5be68d3c3c8b4f3f0694a5874672727",
+        "csize": 17437,
+        "isize": 47204
+      },
+      {
+        "name": "libnftnl",
+        "version": "1.3.2-1",
+        "repo": "core",
+        "sha256": "99114ae2579be7e4cdd553209394572c75751e3af9a3581d742f59a558f08620",
+        "csize": 79235,
+        "isize": 271507
+      },
+      {
+        "name": "libnghttp2",
+        "version": "1.70.0-1",
+        "repo": "core",
+        "sha256": "332e2cb2d953dab326f97a3257594f8031ec0fce6305e2bcd5d64d9832c84778",
+        "csize": 101532,
+        "isize": 412427
+      },
+      {
+        "name": "libnghttp3",
+        "version": "1.18.0-1",
+        "repo": "core",
+        "sha256": "4a474a6c8c2970bead13cbdf4ab47662039d43dcc48aa811ee58becd778cf890",
+        "csize": 85025,
+        "isize": 286206
+      },
+      {
+        "name": "libngtcp2",
+        "version": "1.25.0-1",
+        "repo": "core",
+        "sha256": "e4a728d9f647f3c52a3aedd67c589be5f43e7dd31ebde6867ad535ba29ec9511",
+        "csize": 227814,
+        "isize": 785425
+      },
+      {
+        "name": "libnl",
+        "version": "3.12.0-1",
+        "repo": "core",
+        "sha256": "531827dac4f6d3de9a7e4c8c31f3243bf484b39c41648178c18dc027566b1bb4",
+        "csize": 434678,
+        "isize": 2222797
+      },
+      {
+        "name": "libnm",
+        "version": "1.58.1-2",
+        "repo": "extra",
+        "sha256": "21b2f67ed6fbd9cd0904cddd661b071145ae85425ceedcba9b39afa5188af8ac",
+        "csize": 953387,
+        "isize": 6717612
+      },
+      {
+        "name": "libnotify",
+        "version": "0.8.9-1",
+        "repo": "extra",
+        "sha256": "712849867684044e655951aa27f5b1894c6d2b134f2cba1d90b8c57243c344b7",
+        "csize": 42255,
+        "isize": 176654
+      },
+      {
+        "name": "libnsl",
+        "version": "2.0.1-2",
+        "repo": "core",
+        "sha256": "4ba7b85b42fbda5a1f07e15b8f91c60faa4c5f9168cc27d49fcd20e3a3be8bd8",
+        "csize": 22606,
+        "isize": 71818
+      },
+      {
+        "name": "libnvme",
+        "version": "1.16.2-2",
+        "repo": "extra",
+        "sha256": "eeac4e875668745c9d1cc41f995cc32d69bb23900af2ebbcb0d5d0d609f27fd1",
+        "csize": 318622,
+        "isize": 1816817
+      },
+      {
+        "name": "libobjc",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "b56770fbd0167ed14159744e3f18e220684f5acf65241b5110808ec49bdbffd6",
+        "csize": 38476,
+        "isize": 94212
+      },
+      {
+        "name": "libogg",
+        "version": "1.3.6-1",
+        "repo": "extra",
+        "sha256": "b6d4724c1ed16b4806fa596cd823a2930efeeddeb95f7d8a869644b665a9ba37",
+        "csize": 202092,
+        "isize": 460025
+      },
+      {
+        "name": "libopenmpt",
+        "version": "0.8.9-1",
+        "repo": "extra",
+        "sha256": "8ffbeb4cc21dce411ea9d59280550a2e8d28dbb6d59c18bbc56a439d85bac9bb",
+        "csize": 942251,
+        "isize": 2648597
+      },
+      {
+        "name": "libp11-kit",
+        "version": "0.26.5-1",
+        "repo": "core",
+        "sha256": "8ddc055b304a98c2434fa5d25550c94c0bbcdb22388f752e05e619b2ee98027c",
+        "csize": 533456,
+        "isize": 3472860
+      },
+      {
+        "name": "libpackagekit-glib",
+        "version": "1.4.0-1",
+        "repo": "extra",
+        "sha256": "5858716ac40c19b1b70647dea728b015a4c1e0c6c275ca74462956f2141e1e3b",
+        "csize": 231353,
+        "isize": 1932226
+      },
+      {
+        "name": "libpcap",
+        "version": "1.11.0-1",
+        "repo": "core",
+        "sha256": "ed40e51f84882865d254571015a8ad403bf9c0ec743cf454e8223199de34580d",
+        "csize": 318914,
+        "isize": 718629
+      },
+      {
+        "name": "libpciaccess",
+        "version": "0.19-1",
+        "repo": "extra",
+        "sha256": "ef533895e7688da61749bee185103435dbe635d9773d092fb0516e132817e39f",
+        "csize": 22129,
+        "isize": 59560
+      },
+      {
+        "name": "libpgm",
+        "version": "5.3.128-4",
+        "repo": "extra",
+        "sha256": "cca617d50f88c96d93fbedb75ec5e948e4a3471680e708e88f7d4e391923be4d",
+        "csize": 181875,
+        "isize": 370108
+      },
+      {
+        "name": "libpipewire",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "08180fc76743ab9fbf873062aa158af9914991f6e397744e9a4525c2a9399447",
+        "csize": 1558769,
+        "isize": 6057396
+      },
+      {
+        "name": "libplacebo",
+        "version": "7.360.1-7",
+        "repo": "extra",
+        "sha256": "757a01497ccf07023fce7843d99b035cef298b92fea1a20b3f365a1f2b551da3",
+        "csize": 540607,
+        "isize": 1692413
+      },
+      {
+        "name": "libplasma",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "fe18c46ade42ff2be3a7d25eba10539c651b32d8d5477c36c8fc03c61cd470a3",
+        "csize": 2903163,
+        "isize": 8673011
+      },
+      {
+        "name": "libplist",
+        "version": "2.7.0-3",
+        "repo": "extra",
+        "sha256": "3bfa58c10996d9ba38e03a61b6cc9c1e5c5cd02ab12e26bce96649cb35431e3c",
+        "csize": 169160,
+        "isize": 543701
+      },
+      {
+        "name": "libpng",
+        "version": "1.6.59-1",
+        "repo": "extra",
+        "sha256": "c25e3f039aa598e65d01ee4404cb4a83b383b53b483a7b8627e391cc2c036de1",
+        "csize": 265171,
+        "isize": 611925
+      },
+      {
+        "name": "libproxy",
+        "version": "0.5.12-1",
+        "repo": "extra",
+        "sha256": "d8c945f0acc851077b4dc68a653478100a6e50133dc927ec9a86796c6916abea",
+        "csize": 30478,
+        "isize": 103264
+      },
+      {
+        "name": "libpsl",
+        "version": "0.21.5-2",
+        "repo": "core",
+        "sha256": "e07925c2487bd7deffdd57808b19561e80a4cb25a33e51dbd94efb673bc81944",
+        "csize": 88860,
+        "isize": 228063
+      },
+      {
+        "name": "libpulse",
+        "version": "17.0+r134+g77d25a1e6-1",
+        "repo": "extra",
+        "sha256": "c24a3b5ebacdae424c885c81770236f7f7d26a017cf7dfca84040e7354bea242",
+        "csize": 424269,
+        "isize": 1560058
+      },
+      {
+        "name": "libqaccessibilityclient-qt6",
+        "version": "0.6.0-4",
+        "repo": "extra",
+        "sha256": "e478d9abacfcc7381bb21a2d06659524072904119edba89607165d74fb8dd801",
+        "csize": 104287,
+        "isize": 339255
+      },
+      {
+        "name": "libqalculate",
+        "version": "5.13.2-1",
+        "repo": "extra",
+        "sha256": "ac95d08aa2e829aea1cd022d9062ce0cb4b0ef156a49ed18ca8605fdc9b73c1f",
+        "csize": 3317988,
+        "isize": 16852832
+      },
+      {
+        "name": "libqmi",
+        "version": "1.38.0-2",
+        "repo": "extra",
+        "sha256": "2049b218b75da32e8be0ce4a8792fadef1abfab8149ace778bc09e9936100404",
+        "csize": 1970072,
+        "isize": 22426203
+      },
+      {
+        "name": "libqrtr-glib",
+        "version": "1.4.0-2",
+        "repo": "extra",
+        "sha256": "9a447513a5d23e8ebd8729b663cb47d989c54567fee57f12e25295d4c15e2b6c",
+        "csize": 27520,
+        "isize": 138045
+      },
+      {
+        "name": "libquadmath",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "c6db8f6c787601f17fa812f2270f4e53fad1426fa9e372ab2e1a881c1368cee3",
+        "csize": 170466,
+        "isize": 316008
+      },
+      {
+        "name": "libraw",
+        "version": "0.22.3-1",
+        "repo": "extra",
+        "sha256": "4bcb6fba76dae5a9eb20af1d92ad8023078469ce82213e1627ef5c8f2baaafda",
+        "csize": 534620,
+        "isize": 3031005
+      },
+      {
+        "name": "libraw1394",
+        "version": "2.1.2-4",
+        "repo": "extra",
+        "sha256": "c4e68646b84e8657d77d50dfc8c9849df911729a4ed8daf54c042b21ae6bc4d4",
+        "csize": 48310,
+        "isize": 170084
+      },
+      {
+        "name": "librsvg",
+        "version": "2:2.63.4-1",
+        "repo": "extra",
+        "sha256": "062352b0a55e34e610f2d1770993970fec3ea0ae5e77f805f064daec2f34da4c",
+        "csize": 2463949,
+        "isize": 10777271
+      },
+      {
+        "name": "libsamplerate",
+        "version": "0.2.2-3",
+        "repo": "extra",
+        "sha256": "6641b016f15c73f90ee0741f0d14db1ea7ec988a2b8c74c5fce0182239bbbf00",
+        "csize": 1396674,
+        "isize": 1621031
+      },
+      {
+        "name": "libsasl",
+        "version": "2.1.28-5",
+        "repo": "core",
+        "sha256": "113e1676371544e5142a46ee046a6179ace201c4f0a0d56b618a984b5c764463",
+        "csize": 150083,
+        "isize": 528563
+      },
+      {
+        "name": "libseccomp",
+        "version": "2.6.0-1",
+        "repo": "core",
+        "sha256": "3d3effb23898177d0faece196ac664859d29027b64cdeee3a09a2c3967b8401d",
+        "csize": 97566,
+        "isize": 321068
+      },
+      {
+        "name": "libsecret",
+        "version": "0.21.8.2-1",
+        "repo": "core",
+        "sha256": "311a982a109a3814ebc8f467215f9c92660b85833e1c65b6da16ba21d6f406ad",
+        "csize": 180540,
+        "isize": 1140809
+      },
+      {
+        "name": "libsm",
+        "version": "1.2.6-1",
+        "repo": "extra",
+        "sha256": "ce334b07a9701ba6ef4d610257500f7b035dc1cdc0a658e056d293547cde0976",
+        "csize": 46693,
+        "isize": 271759
+      },
+      {
+        "name": "libsndfile",
+        "version": "1.2.2-4",
+        "repo": "extra",
+        "sha256": "9b580a25a4d38f688c3561bacdd1d8c2d3451eee657f317220a38cffe41fa512",
+        "csize": 321153,
+        "isize": 977515
+      },
+      {
+        "name": "libsodium",
+        "version": "1.0.22-1",
+        "repo": "extra",
+        "sha256": "fc0440c108fff0341f3cb7b4ee38f5a9406b45d9315205ce999e1b147b52f972",
+        "csize": 222253,
+        "isize": 673274
+      },
+      {
+        "name": "libsoup3",
+        "version": "3.8.1-1",
+        "repo": "extra",
+        "sha256": "a8c637736c948e01b9096b7e9251dc59404d51497fea7b68349546ef1aeb9b93",
+        "csize": 436460,
+        "isize": 2155252
+      },
+      {
+        "name": "libsoxr",
+        "version": "0.1.3-5",
+        "repo": "extra",
+        "sha256": "5d23ef0082854b031a4ac5867018969d3008f1d3ccb841872b8cdc12073ef55e",
+        "csize": 84244,
+        "isize": 216113
+      },
+      {
+        "name": "libssc",
+        "version": "0.4.4-1",
+        "repo": "extra",
+        "sha256": "6fa2bfa80ee5f35e06eafcead32fab20fd5d108ef96f4d503a23c5971d5ebd4c",
+        "csize": 58857,
+        "isize": 270976
+      },
+      {
+        "name": "libssh",
+        "version": "0.12.2-1",
+        "repo": "extra",
+        "sha256": "f7d543fa557482e52c0eac1d5cb348b0385fbf44bb1244d5b656d87010056a2b",
+        "csize": 267066,
+        "isize": 785547
+      },
+      {
+        "name": "libssh2",
+        "version": "1.11.1-7",
+        "repo": "core",
+        "sha256": "462cca91bff394c2719b7e8d1951f0c0a2db979d71521ac93dba6b6b6974f6b9",
+        "csize": 265862,
+        "isize": 514626
+      },
+      {
+        "name": "libstdc++",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "15dc6bd2f3a2ee17fcd79a14325e9e0037722a592b2bdc55e1665d92112eaa51",
+        "csize": 883125,
+        "isize": 2944139
+      },
+      {
+        "name": "libstemmer",
+        "version": "3.1.1-1",
+        "repo": "extra",
+        "sha256": "d5f9947642735e4f026cf0e382fbec7bb45f3eed3b00b8ba29562cd455746ee8",
+        "csize": 152084,
+        "isize": 670681
+      },
+      {
+        "name": "libsysprof-capture",
+        "version": "51.0-1",
+        "repo": "extra",
+        "sha256": "4076158a6db4137615c241a7019309f8be3ceab9e5f91291385c4fb41a7c2921",
+        "csize": 54925,
+        "isize": 288998
+      },
+      {
+        "name": "libtasn1",
+        "version": "4.21.0-1",
+        "repo": "core",
+        "sha256": "00e50489d3c00951380d578cf89ebd7d7a38d97269e7ca9ccc9cde146f1e21da",
+        "csize": 136141,
+        "isize": 284533
+      },
+      {
+        "name": "libtatsu",
+        "version": "1.0.5-1",
+        "repo": "extra",
+        "sha256": "3151e7443850fd811e88d7cd7e6606b234f69f95f06ef79fa9f601cee3f85714",
+        "csize": 18090,
+        "isize": 48281
+      },
+      {
+        "name": "libteam",
+        "version": "1.32-3",
+        "repo": "extra",
+        "sha256": "179c1120809f0a9ff4515ff75a700c1b57f57ac7327f6dab0570ce5504789018",
+        "csize": 112482,
+        "isize": 342085
+      },
+      {
+        "name": "libthai",
+        "version": "0.1.30-1",
+        "repo": "extra",
+        "sha256": "890798f30ac72d0ca3b59dc5fe8eebe8f923bf09bdb1bc2ec75bc200d7aa70a2",
+        "csize": 276504,
+        "isize": 1304396
+      },
+      {
+        "name": "libtheora",
+        "version": "1.2.0-1",
+        "repo": "extra",
+        "sha256": "398931e8cdbcb359194af12564e301e1db57746a49e061d56ea8d41c9b54c9bc",
+        "csize": 442284,
+        "isize": 2450754
+      },
+      {
+        "name": "libtiff",
+        "version": "4.7.2-2",
+        "repo": "extra",
+        "sha256": "d08440599d808813057851b32dbffd6991d841f5d4efb4c1b75822e2b07c7ea9",
+        "csize": 422932,
+        "isize": 1387341
+      },
+      {
+        "name": "libtirpc",
+        "version": "1.3.8-1",
+        "repo": "core",
+        "sha256": "4861eac60e6daffdf02366a09fc559ffe456e987410362793cd7faf91be22b30",
+        "csize": 181209,
+        "isize": 449916
+      },
+      {
+        "name": "libtommath",
+        "version": "1.3.0-2",
+        "repo": "extra",
+        "sha256": "e66d577798bb066d1e80fa573699bebb5ee923d9427796389514a592b1276924",
+        "csize": 48179,
+        "isize": 126809
+      },
+      {
+        "name": "libtool",
+        "version": "2.6.2-5",
+        "repo": "core",
+        "sha256": "75da3b1ff54182ba18061714996943cb04d59b5206adfc76241ebb33934984cc",
+        "csize": 439406,
+        "isize": 2452271
+      },
+      {
+        "name": "libtsan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "8dd48336bb11dd0d15b9f5d0560166838802b21e3d279db25d6da96df19e0437",
+        "csize": 472183,
+        "isize": 1527644
+      },
+      {
+        "name": "libubsan",
+        "version": "16.2.1+r23+gd564253eb6c8-1",
+        "repo": "core",
+        "sha256": "eba85316fdf63265285624baa22724fbb93e15901696f99d2c2cbde2162ad71d",
+        "csize": 211475,
+        "isize": 520076
+      },
+      {
+        "name": "libunibreak",
+        "version": "7.0-1",
+        "repo": "extra",
+        "sha256": "0bb013ef4b8c9ba0ee0fe009201726600a0021330bb4dea690450e33faa45279",
+        "csize": 28481,
+        "isize": 160739
+      },
+      {
+        "name": "libunistring",
+        "version": "1.4.2-1",
+        "repo": "core",
+        "sha256": "582625bc02e710b587f4ed319e5c7ad29fd5d4d424b6384f125fc094f07ce590",
+        "csize": 746290,
+        "isize": 2866464
+      },
+      {
+        "name": "libunwind",
+        "version": "1.8.3-1",
+        "repo": "extra",
+        "sha256": "7a3106a1ec551d3047bfad524b3a7078058234047292a8fdf8cb5cb481bda5af",
+        "csize": 134569,
+        "isize": 309837
+      },
+      {
+        "name": "liburing",
+        "version": "2.15-1",
+        "repo": "extra",
+        "sha256": "ceaf9e41bcd5cb06efcffbc90a39628b7a5cae5490c5e6db810a792450070ad2",
+        "csize": 272523,
+        "isize": 489708
+      },
+      {
+        "name": "libusb",
+        "version": "1.0.30-1",
+        "repo": "core",
+        "sha256": "8b75816afbb316dc92110d9ac542df3e20d9550fe949a1a1402b25366c0a2c6d",
+        "csize": 82411,
+        "isize": 238616
+      },
+      {
+        "name": "libusbmuxd",
+        "version": "2.1.1-2",
+        "repo": "extra",
+        "sha256": "dcb2b0842a3f924142550704f4b968311c427dfe75b46da9c77b5906049a5a3f",
+        "csize": 28669,
+        "isize": 84529
+      },
+      {
+        "name": "libutempter",
+        "version": "1.2.3-1",
+        "repo": "extra",
+        "sha256": "e1dd15aed4cd76b42729d5dc58d4db3dd49d6c5fe08b33abee0df3bcfc98fd13",
+        "csize": 9620,
+        "isize": 32053
+      },
+      {
+        "name": "libva",
+        "version": "2.24.1-1",
+        "repo": "extra",
+        "sha256": "59b0a85c6edb8953b7cbb077a3078c0e589e4e4b06cbf871417e40d0c0357747",
+        "csize": 210646,
+        "isize": 1043980
+      },
+      {
+        "name": "libvdpau",
+        "version": "1.5-4",
+        "repo": "extra",
+        "sha256": "fcdb6731dbc33afddd899de00a113d26d7dd4c69ae6a2dcb25754085b55d90b5",
+        "csize": 64313,
+        "isize": 291237
+      },
+      {
+        "name": "libverto",
+        "version": "0.3.2-6",
+        "repo": "core",
+        "sha256": "d0965b1b256e330e300c2bc3c699afa24f2d800dc476541039d452b606309496",
+        "csize": 19195,
+        "isize": 70030
+      },
+      {
+        "name": "libvips",
+        "version": "8.18.7-1",
+        "repo": "extra",
+        "sha256": "b73f0ccdc7857a325767725ae302c29a3436b0bde49ce7aedcfcc45a6b21dd0b",
+        "csize": 1590468,
+        "isize": 6324546
+      },
+      {
+        "name": "libvorbis",
+        "version": "1.3.7-4",
+        "repo": "extra",
+        "sha256": "3aea2a31212fe7aa9f3d8922e8f71c2608d6260e8af0b7c1b5da790786763089",
+        "csize": 186353,
+        "isize": 874147
+      },
+      {
+        "name": "libvpl",
+        "version": "2.17.0-1",
+        "repo": "extra",
+        "sha256": "2c9f8d6dd899e8efbadf98976a62dae5fea704058f453048ac14e8ec246888e1",
+        "csize": 241679,
+        "isize": 1037634
+      },
+      {
+        "name": "libvpx",
+        "version": "1.17.0-1",
+        "repo": "extra",
+        "sha256": "023fa4af099e82ba9b2c3cb0c92bcac1b65975f3648e56f2131ede121d340115",
+        "csize": 1380722,
+        "isize": 3896948
+      },
+      {
+        "name": "libwacom",
+        "version": "2.20.0-1",
+        "repo": "extra",
+        "sha256": "6c646b6af034fc6b3975437cffbd0582f9f935173435b18357a2f1285b11b86c",
+        "csize": 190475,
+        "isize": 1688846
+      },
+      {
+        "name": "libwbclient",
+        "version": "2:4.25.1-1",
+        "repo": "extra",
+        "sha256": "e95b14014c087d85e95c559d01fab035e8317a401c0241f3421902ff6ded7ee8",
+        "csize": 38762,
+        "isize": 130413
+      },
+      {
+        "name": "libwebp",
+        "version": "1.6.0-2",
+        "repo": "extra",
+        "sha256": "a80e7edd3ddd27c6fd8cd83d0bd98d46b3f0279b7ee01f5baeded0d6f26f8975",
+        "csize": 339664,
+        "isize": 1085357
+      },
+      {
+        "name": "libwireplumber",
+        "version": "0.5.18-1",
+        "repo": "extra",
+        "sha256": "0475d9fb44a8b7fd34e38ef7c6ff46334163c2739ddb147e48d53f5cabc08b60",
+        "csize": 318388,
+        "isize": 1804796
+      },
+      {
+        "name": "libx11",
+        "version": "1.8.14-1",
+        "repo": "extra",
+        "sha256": "47fff5bbeadabe30b5fb1ad3f3609c20e6064ef002ba0377dfd8564ec813da7b",
+        "csize": 2120220,
+        "isize": 10322928
+      },
+      {
+        "name": "libxau",
+        "version": "1.0.12-1",
+        "repo": "extra",
+        "sha256": "605c8b059c36792f4e0cc235acadf39d0762df6c7878825a1be01a00ae7ea21e",
+        "csize": 11633,
+        "isize": 23152
+      },
+      {
+        "name": "libxaw",
+        "version": "1.0.16-2",
+        "repo": "extra",
+        "sha256": "79966ba7df3cf46bbcac4292384247b0070bfd036f3a55dbcd9121cb4ccf8a38",
+        "csize": 361987,
+        "isize": 1733884
+      },
+      {
+        "name": "libxcb",
+        "version": "1.17.0-1",
+        "repo": "extra",
+        "sha256": "2b2e7ac64b1d56c08a227c10bcab179605f2773f31db0a8c89f49f4e5b2f1292",
+        "csize": 1019918,
+        "isize": 4055289
+      },
+      {
+        "name": "libxcomposite",
+        "version": "0.4.7-1",
+        "repo": "extra",
+        "sha256": "5d11e648ccccbd7cf19884a677441528d8546eb89a4fda57febb08446e619917",
+        "csize": 11961,
+        "isize": 24653
+      },
+      {
+        "name": "libxcrypt",
+        "version": "4.5.2-1",
+        "repo": "core",
+        "sha256": "7d324b88963786491391468203701efd2c812798a9c3fbcc4ff8a4ddb2d9f276",
+        "csize": 94258,
+        "isize": 199801
+      },
+      {
+        "name": "libxcursor",
+        "version": "1.2.3-1",
+        "repo": "extra",
+        "sha256": "2a90267877c2f5ffe6c41a8ef91e6def3b7720de7b4b2628b329373ce20c1b99",
+        "csize": 33749,
+        "isize": 71422
+      },
+      {
+        "name": "libxcvt",
+        "version": "0.1.3-1",
+        "repo": "extra",
+        "sha256": "0e402123056ca36d3462ea830d8b18275f8c3d30167b5cda9b8e690f58e53003",
+        "csize": 11031,
+        "isize": 36757
+      },
+      {
+        "name": "libxdamage",
+        "version": "1.1.7-1",
+        "repo": "extra",
+        "sha256": "36be52372da7f2f49f949fc8a0f3c6e4eaee6fb03761d67e17355bd15ea6cee6",
+        "csize": 7465,
+        "isize": 17973
+      },
+      {
+        "name": "libxdmcp",
+        "version": "1.1.5-2",
+        "repo": "extra",
+        "sha256": "623c957c2fd4b427a0f5a531da44931f9f66521391ee0bd0e635479947036b65",
+        "csize": 27949,
+        "isize": 135580
+      },
+      {
+        "name": "libxext",
+        "version": "1.3.7-1",
+        "repo": "extra",
+        "sha256": "ac56905dc51bb652eca5f706fd7e7bb7ea81d4e057a236139fc769ce5ea10cf1",
+        "csize": 107586,
+        "isize": 315129
+      },
+      {
+        "name": "libxfixes",
+        "version": "6.0.2-1",
+        "repo": "extra",
+        "sha256": "d58ab2dbf326e36cf84792fe0dc12c34239ea04ac34159006a566103203db272",
+        "csize": 14237,
+        "isize": 38139
+      },
+      {
+        "name": "libxfont2",
+        "version": "2.0.9-1",
+        "repo": "extra",
+        "sha256": "1e6e54047bb0c069671d20c6eb9582310d842e88ba8943833facc5861109640c",
+        "csize": 99822,
+        "isize": 208199
+      },
+      {
+        "name": "libxft",
+        "version": "2.3.9-1",
+        "repo": "extra",
+        "sha256": "a7841ed8e67dc3f94eca4672c8961329dfdd6b67836f8ac720a246d3aab02ecb",
+        "csize": 61873,
+        "isize": 134018
+      },
+      {
+        "name": "libxi",
+        "version": "1.8.4-1",
+        "repo": "extra",
+        "sha256": "264bcc5732f144774922654c2975504583451504044168798fe2f11cb2b0a5bc",
+        "csize": 75634,
+        "isize": 432364
+      },
+      {
+        "name": "libxinerama",
+        "version": "1.1.6-1",
+        "repo": "extra",
+        "sha256": "7a91e2e649d9b24946b2b8088c3d7f70fa0673a96d3bae80497f403e57fb7654",
+        "csize": 10229,
+        "isize": 25196
+      },
+      {
+        "name": "libxkbcommon",
+        "version": "1.13.2-1",
+        "repo": "extra",
+        "sha256": "18d8dc90958eda2edaab9b671ee96c2c1f2b1a322618eca97c7c04605d738581",
+        "csize": 288147,
+        "isize": 1103127
+      },
+      {
+        "name": "libxkbcommon-x11",
+        "version": "1.13.2-1",
+        "repo": "extra",
+        "sha256": "350c1f367caed92abdb1c5d230b57cf46dd75b77d27c13ea7b152947fda62508",
+        "csize": 33374,
+        "isize": 107470
+      },
+      {
+        "name": "libxkbfile",
+        "version": "1.2.0-1",
+        "repo": "extra",
+        "sha256": "78f14e9854c70527975cf2204a6dcbb55473ccda8f4da953b8f15618f167a0f3",
+        "csize": 77719,
+        "isize": 202625
+      },
+      {
+        "name": "libxml2",
+        "version": "2.15.4-1",
+        "repo": "core",
+        "sha256": "a6b5c30f51a7ca7c85348de8e83280e6825a8f3e193cc6916ecd8e695d4a24bb",
+        "csize": 822191,
+        "isize": 3216638
+      },
+      {
+        "name": "libxmlb",
+        "version": "0.3.29-1",
+        "repo": "extra",
+        "sha256": "f1e20abcdd8c72c67c3dc731c108395542b8744300b466008b266f0a90b1be2c",
+        "csize": 158783,
+        "isize": 1270034
+      },
+      {
+        "name": "libxmu",
+        "version": "1.3.1-1",
+        "repo": "extra",
+        "sha256": "31870eb5ad1911880cd7b2f3a59292b644d84b873ed62a1a7c36b9ac26bc08a5",
+        "csize": 78356,
+        "isize": 356077
+      },
+      {
+        "name": "libxpm",
+        "version": "3.5.20-1",
+        "repo": "extra",
+        "sha256": "cf538c4400abd6bdba8942bfdddb0c01716528e75bd95279b4b0a842fa035052",
+        "csize": 73958,
+        "isize": 171552
+      },
+      {
+        "name": "libxrandr",
+        "version": "1.5.5-1",
+        "repo": "extra",
+        "sha256": "49d3a3596311477f8ad2e1735dae612013118802822f21ce22886f65103dd899",
+        "csize": 28139,
+        "isize": 73087
+      },
+      {
+        "name": "libxrender",
+        "version": "0.9.13-1",
+        "repo": "extra",
+        "sha256": "893571a9e101faf7a8d3fbdb13a76513236e6ceffd7c2229721bcc53e957b9a4",
+        "csize": 30862,
+        "isize": 100754
+      },
+      {
+        "name": "libxshmfence",
+        "version": "1.3.3-1",
+        "repo": "extra",
+        "sha256": "39d0f128e4efc393fcd3b42f20046ec0e854341b601f14b457d67add86036d13",
+        "csize": 6113,
+        "isize": 17293
+      },
+      {
+        "name": "libxt",
+        "version": "1.3.1-1",
+        "repo": "extra",
+        "sha256": "5d4ee1f73c946cdd9b908b127157d6d826d198be982c91e199daf6bdd7f6b9ec",
+        "csize": 540271,
+        "isize": 2118982
+      },
+      {
+        "name": "libxtst",
+        "version": "1.2.6-1",
+        "repo": "extra",
+        "sha256": "c2a5db58aa5b4af3de2f985644b6573b4c34692a74478f0bdf913a5865966265",
+        "csize": 27132,
+        "isize": 111656
+      },
+      {
+        "name": "libxv",
+        "version": "1.0.13-1",
+        "repo": "extra",
+        "sha256": "9cae2311e50945fd5144575aa010da6009ca85d68a492f253920ac16c936e290",
+        "csize": 35784,
+        "isize": 61659
+      },
+      {
+        "name": "libxxf86vm",
+        "version": "1.1.7-1",
+        "repo": "extra",
+        "sha256": "b9215b44734a0149f6e9b3c9bfcbb5abef2b6f32b2767ed628bafc3f0cc38934",
+        "csize": 16030,
+        "isize": 36266
+      },
+      {
+        "name": "libyuv",
+        "version": "r2921+644251f25-1",
+        "repo": "extra",
+        "sha256": "953c7ee536b35be829a3cc8c614f9a0b553830f5d4d030f35fc452d0199612ce",
+        "csize": 269130,
+        "isize": 1577117
+      },
+      {
+        "name": "libzip",
+        "version": "1.11.4-1",
+        "repo": "extra",
+        "sha256": "e6bc733cdc738d317d94f1906eb86229be174aa8362ad7dbb03ae68d9eb3dbf6",
+        "csize": 263160,
+        "isize": 492257
+      },
+      {
+        "name": "linux-api-headers",
+        "version": "7.3-1",
+        "repo": "core",
+        "sha256": "a5a6f5fc8922ef454c54e65e321906183e6606acaadaf416896dcbc44f2194ed",
+        "csize": 1599600,
+        "isize": 7410915
+      },
+      {
+        "name": "litehtml",
+        "version": "0.10-2",
+        "repo": "extra",
+        "sha256": "7c08afe384af6459e00faaf6cd92535149f3a083d96862dfe9e8650d471001b2",
+        "csize": 511130,
+        "isize": 1601066
+      },
+      {
+        "name": "llvm-libs",
+        "version": "23.1.4-1",
+        "repo": "extra",
+        "sha256": "033a4c9b70686f2dca142087961add7db81ae816d85eb060bee91d05461ec5bd",
+        "csize": 43457482,
+        "isize": 172887701
+      },
+      {
+        "name": "lm_sensors",
+        "version": "1:3.6.2-1",
+        "repo": "extra",
+        "sha256": "5363304255a506cf71e1ed4f0464166e5f2aad6f0ae444fe08cafd8c83bf11ff",
+        "csize": 136777,
+        "isize": 498326
+      },
+      {
+        "name": "lmdb",
+        "version": "0.9.35-1",
+        "repo": "extra",
+        "sha256": "50ae8083860e1ffadf4fab3c173a043fd97be41f5ceda7d2e77c528cd84d2386",
+        "csize": 115659,
+        "isize": 422913
+      },
+      {
+        "name": "lua",
+        "version": "5.5.1-1",
+        "repo": "extra",
+        "sha256": "2cd360ab4590950b40adae136dd45a22a50b0621c67db5691e066751f6f2416f",
+        "csize": 400516,
+        "isize": 1670806
+      },
+      {
+        "name": "lua54",
+        "version": "5.4.9-1",
+        "repo": "extra",
+        "sha256": "ceda43657ee1d54eef282f636772baf4a7bacc86b5cd461d1891d26c23141ff1",
+        "csize": 376407,
+        "isize": 1591575
+      },
+      {
+        "name": "lz4",
+        "version": "1:1.10.0-2",
+        "repo": "core",
+        "sha256": "c6200c776440678fe8c26adae6c104194b425d9393a9e3fc09f934363f0c39a6",
+        "csize": 160028,
+        "isize": 460964
+      },
+      {
+        "name": "lzo",
+        "version": "2.10-5",
+        "repo": "core",
+        "sha256": "dd5ec871aea5ddfd38d4a25539e966dc05e75d6969ebc31917c8d25b97ccd69e",
+        "csize": 89912,
+        "isize": 395669
+      },
+      {
+        "name": "md4c",
+        "version": "0.6.0-2",
+        "repo": "extra",
+        "sha256": "f18aebcc90018c774fc5bb2ef9823950546f1667889f1a303b156224f3fc5edc",
+        "csize": 83535,
+        "isize": 229363
+      },
+      {
+        "name": "mdadm",
+        "version": "4.6-2",
+        "repo": "core",
+        "sha256": "17b2091ae3c0644e452783ec889d90e0814fd19d17989e184fcad1c73ae1aa76",
+        "csize": 430261,
+        "isize": 1072690
+      },
+      {
+        "name": "media-player-info",
+        "version": "26-1",
+        "repo": "extra",
+        "sha256": "6493bd3752fa01a9a360f0e213b4414c20d6f38c4e9039e047961bf677477549",
+        "csize": 34259,
+        "isize": 183512
+      },
+      {
+        "name": "mesa",
+        "version": "1:26.2.5-1",
+        "repo": "extra",
+        "sha256": "8362f54565d3b71557e6a4ebcf208f51af32e205f271f8d13991962030139bd1",
+        "csize": 14156046,
+        "isize": 56480798
+      },
+      {
+        "name": "milou",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "6d9df607c32031eaef5c23efa40a1e5b3c314510232c7b6d42bda25a369474c1",
+        "csize": 126489,
+        "isize": 530470
+      },
+      {
+        "name": "minizip",
+        "version": "1:1.3.2-4",
+        "repo": "core",
+        "sha256": "569bfea23ef60f1cd1ce7b5ee9b74e5cbb49445d9ea8485b08279ee06c78d297",
+        "csize": 33187,
+        "isize": 102046
+      },
+      {
+        "name": "mobile-broadband-provider-info",
+        "version": "20251101-1",
+        "repo": "extra",
+        "sha256": "1b0146d8b72f6ffc3edcccd5709d8de42798c4827a5fccd994c389584d60c56c",
+        "csize": 64716,
+        "isize": 521558
+      },
+      {
+        "name": "mpfr",
+        "version": "4.2.2-1",
+        "repo": "core",
+        "sha256": "e765082b2c3260550887ccf34f6f0d24289fc5ca8c0949eb5c2e9937272ea80f",
+        "csize": 447319,
+        "isize": 1060163
+      },
+      {
+        "name": "mpg123",
+        "version": "1.33.7-1",
+        "repo": "extra",
+        "sha256": "af9bbea4f7c003f2c4b604430582d58b7b232c5adcda673d15401c3faf1943f2",
+        "csize": 470959,
+        "isize": 1259452
+      },
+      {
+        "name": "mtdev",
+        "version": "1.1.7-1",
+        "repo": "extra",
+        "sha256": "f04b23715273930002a0133ebd0f48ad4374b9e3ec9484a500a33b6aee478443",
+        "csize": 17246,
+        "isize": 52737
+      },
+      {
+        "name": "ncurses",
+        "version": "6.6-2",
+        "repo": "core",
+        "sha256": "9b80390fd681121443a45a51b74e2e2ade245ce22af8769915d63165b727e27c",
+        "csize": 1226662,
+        "isize": 4289967
+      },
+      {
+        "name": "nettle",
+        "version": "4.0-1",
+        "repo": "core",
+        "sha256": "679138a8405ca383aba7836d54fdc282db9394b7dc23c097b8965f70119adf13",
+        "csize": 468859,
+        "isize": 1083098
+      },
+      {
+        "name": "networkmanager",
+        "version": "1.58.1-2",
+        "repo": "extra",
+        "sha256": "691287ef230bdb50d72e42e6b0cf54ffc79cdb816b5c16a8c120ce39756d4cd1",
+        "csize": 4229139,
+        "isize": 18977670
+      },
+      {
+        "name": "networkmanager-qt",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "226f7b61a5feb77ac1709e4be65fcbf9aed53de4acde3150204ab7b91f0d95ec",
+        "csize": 439256,
+        "isize": 1831420
+      },
+      {
+        "name": "nftables",
+        "version": "1:1.1.7-3",
+        "repo": "extra",
+        "sha256": "5a25cfdb19c370d01cfe81ce8c1e2e1fa9a2e05d51d1417578e8c425893a5b29",
+        "csize": 464449,
+        "isize": 1210499
+      },
+      {
+        "name": "noto-fonts",
+        "version": "1:2026.10.01-1",
+        "repo": "extra",
+        "sha256": "3cf6de13b1f3600ed782ff5e22eb6b3827fcc0ab5ee407bc0b121239fe19d949",
+        "csize": 29214572,
+        "isize": 111994197
+      },
+      {
+        "name": "noto-fonts-emoji",
+        "version": "1:2.057-1",
+        "repo": "extra",
+        "sha256": "d030b017c729065e1f6349a71ed573e8eeedf9f47a6f945e0d3178236e4418e8",
+        "csize": 9676324,
+        "isize": 10734425
+      },
+      {
+        "name": "npth",
+        "version": "1.8-1",
+        "repo": "core",
+        "sha256": "2f045edab9f7fd2c04667c5ba7f70c47da7b6fcfe87a99a857ab7ef5a12f39b4",
+        "csize": 28897,
+        "isize": 88201
+      },
+      {
+        "name": "nspr",
+        "version": "4.40-1",
+        "repo": "core",
+        "sha256": "00c276c71d748e5220757f26776f4ad340b1cb477eb835de0d088f9b36277ad7",
+        "csize": 206580,
+        "isize": 752825
+      },
+      {
+        "name": "nss",
+        "version": "3.132-1",
+        "repo": "core",
+        "sha256": "22fb9a759a58b68331caf532c748dea49dd903781717faae017b3ca9ef7d602a",
+        "csize": 1808091,
+        "isize": 5704893
+      },
+      {
+        "name": "numactl",
+        "version": "2.0.19-1",
+        "repo": "extra",
+        "sha256": "699bce74daee11fa49de93999ba4e023f132bc51a7768dec845b2979d54f367d",
+        "csize": 84828,
+        "isize": 246970
+      },
+      {
+        "name": "ocean-sound-theme",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "5c652c8de3654c75c8671cd609c3695c0192b48f91e66db2a3c1f8947c2a45b6",
+        "csize": 2026130,
+        "isize": 2176022
+      },
+      {
+        "name": "ocl-icd",
+        "version": "2.3.5-1",
+        "repo": "extra",
+        "sha256": "dd5a8adc1b0f9489c2dd182bb645cdaa4b7786811b34aa4acc26cf882d1428b8",
+        "csize": 109553,
+        "isize": 521166
+      },
+      {
+        "name": "onetbb",
+        "version": "2023.1.0-1",
+        "repo": "extra",
+        "sha256": "fd2318a3988bc73935c63fe8678f4afa0813271549bd99d431414bea25b4f0ed",
+        "csize": 410054,
+        "isize": 2108343
+      },
+      {
+        "name": "openal",
+        "version": "1.25.2-2",
+        "repo": "extra",
+        "sha256": "f836d5ee3aa0fc4b46800ac41840e8aa35d076de93114fd07d0de43546c1bd07",
+        "csize": 995050,
+        "isize": 2829370
+      },
+      {
+        "name": "opencore-amr",
+        "version": "0.1.6-2",
+        "repo": "extra",
+        "sha256": "d7072809d9754200244280d1b8ffd945a3d87ca7562d82d0bf2bf13ce77261a9",
+        "csize": 146385,
+        "isize": 299588
+      },
+      {
+        "name": "openexr",
+        "version": "3.5.2-1",
+        "repo": "extra",
+        "sha256": "3cec88be56af81254d5fc4b0f40c0b9f4a8a897da01f0dcf18d20501d5afd593",
+        "csize": 1340415,
+        "isize": 5131647
+      },
+      {
+        "name": "openh264",
+        "version": "2.7.0-1",
+        "repo": "extra",
+        "sha256": "c0635a401aada4bc8d2811241c649ed114b834193fe51759c43af12a9c9cebac",
+        "csize": 697090,
+        "isize": 2397408
+      },
+      {
+        "name": "openjpeg2",
+        "version": "2.5.4-1",
+        "repo": "extra",
+        "sha256": "f09d64baeda07bc9bc0bb6a08b5f316db372bedd100b9a56f44ffaeace26c1e6",
+        "csize": 917105,
+        "isize": 14020246
+      },
+      {
+        "name": "openjph",
+        "version": "0.32.0-1",
+        "repo": "extra",
+        "sha256": "46ae741a0369a74b549072a2c95a3cea5e6ab4ef63314f3b7a83efa318ca8cce",
+        "csize": 247824,
+        "isize": 825267
+      },
+      {
+        "name": "openssl",
+        "version": "3.6.5-1",
+        "repo": "core",
+        "sha256": "be0a07ef3d8ffa878732b138e98dee26559527212cb941fc5f6c282545c787cc",
+        "csize": 5783344,
+        "isize": 12858874
+      },
+      {
+        "name": "opus",
+        "version": "1.6.1-1",
+        "repo": "extra",
+        "sha256": "191b1f303950e184bdbe12105d8cb06e69e727e8f9160cfdcf33105f70d05b46",
+        "csize": 3451036,
+        "isize": 4357129
+      },
+      {
+        "name": "orc",
+        "version": "0.4.44-1",
+        "repo": "extra",
+        "sha256": "87bf68a92af1281feacdccd04f9e3a8494e1da19adc76f2fd3b7080c316f8db5",
+        "csize": 357190,
+        "isize": 1518117
+      },
+      {
+        "name": "p11-kit",
+        "version": "0.26.5-1",
+        "repo": "core",
+        "sha256": "94ad53e76eaeacac1584ace5da7751d8e7fb7aefbfd3bd99d9c34d3461d630ad",
+        "csize": 261660,
+        "isize": 1195446
+      },
+      {
+        "name": "packagekit",
+        "version": "1.4.0-1",
+        "repo": "extra",
+        "sha256": "b2f25a466a4c5203166672699c2ec931d043a4e2f6170e8cd72696b9b303431a",
+        "csize": 630382,
+        "isize": 3372925
+      },
+      {
+        "name": "packagekit-qt6",
+        "version": "1.1.4-2",
+        "repo": "extra",
+        "sha256": "0aa7056dc228057d16423b38c43c231710c0a4d72541b8e90747f33f2ef6b4e0",
+        "csize": 123256,
+        "isize": 450705
+      },
+      {
+        "name": "pacman",
+        "version": "7.1.0.r9.g54d9411-3",
+        "repo": "core",
+        "sha256": "bad000f7b482c7f5e6c8e6951d918ce8a9207c0f9c0786ab2b49fe75e935de28",
+        "csize": 993348,
+        "isize": 5284710
+      },
+      {
+        "name": "pacman-mirrorlist",
+        "version": "20260610-1",
+        "repo": "core",
+        "sha256": "f6008b33d950a4e4eb5930fe3852cceb0fe1fa5fdaff36125583201531fe4ae9",
+        "csize": 6631,
+        "isize": 27292
+      },
+      {
+        "name": "pam",
+        "version": "1.7.3-1",
+        "repo": "core",
+        "sha256": "78edd987656671b1995412b60ac1a1ae92f7110a14ea3722c2ef3a81e928d7fb",
+        "csize": 621467,
+        "isize": 3081792
+      },
+      {
+        "name": "pambase",
+        "version": "20260616-1",
+        "repo": "core",
+        "sha256": "306265b486e3f7d2854d583202409cdd90f131368c92aa56f845822a5d2bbf65",
+        "csize": 3386,
+        "isize": 2794
+      },
+      {
+        "name": "pango",
+        "version": "1:1.58.2-1",
+        "repo": "extra",
+        "sha256": "9b74c73056ce6b2aca83bf1647f79f0a6bf53f204c5273b03530e034472db13c",
+        "csize": 452759,
+        "isize": 2497225
+      },
+      {
+        "name": "parted",
+        "version": "3.8-1",
+        "repo": "extra",
+        "sha256": "082e294123c4b993fa367c32fd5807e0ec9366b2420d17286d64654326a880f3",
+        "csize": 577909,
+        "isize": 2794888
+      },
+      {
+        "name": "pcre",
+        "version": "8.45-5",
+        "repo": "core",
+        "sha256": "386dc0f4c46f359e9bdd033f07d37b43df1f63a2649566685dc0c86e19623274",
+        "csize": 1044986,
+        "isize": 3712789
+      },
+      {
+        "name": "pcre2",
+        "version": "10.49-1",
+        "repo": "core",
+        "sha256": "e37f4152ff869a6ba050ad08307d7b6b474f4d48cbe0c6ccc01ce9118a774dbf",
+        "csize": 1781740,
+        "isize": 7457904
+      },
+      {
+        "name": "pcsclite",
+        "version": "2.5.3-1",
+        "repo": "extra",
+        "sha256": "bd80ba7f5d249a00f1cf4da0c77eba0635e230b1035c0bf219b3e2cad3bd02a2",
+        "csize": 107289,
+        "isize": 327372
+      },
+      {
+        "name": "perl",
+        "version": "5.44.0-1",
+        "repo": "core",
+        "sha256": "f7170b9ac09dfc4d46decd5e953888a379215af0207e361bbd426efa53968c70",
+        "csize": 22001771,
+        "isize": 75815345
+      },
+      {
+        "name": "pinentry",
+        "version": "1.3.3-1",
+        "repo": "core",
+        "sha256": "16dfcc18fc60f8c654687970a9b7253ce17a987c44119fe2ee37c760460fc557",
+        "csize": 172284,
+        "isize": 692067
+      },
+      {
+        "name": "pipewire",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "4a28a0f18fa2d6b73563782988c3572bca7ffc8c56f104eeaa5339667cbcac30",
+        "csize": 286540,
+        "isize": 1361015
+      },
+      {
+        "name": "pipewire-session-manager",
+        "version": "1:1.6.10-1",
+        "repo": "extra",
+        "sha256": "d3925e414ce3cab200b9cff06b4c43bcb1980d51fbd2a7a00e16e24827bdb494",
+        "csize": 4131,
+        "isize": 0
+      },
+      {
+        "name": "pixman",
+        "version": "0.46.4-1",
+        "repo": "extra",
+        "sha256": "e87e665d25a2230a178d8490202e1d677fde5908f68ebedf7d987308fc26fcb6",
+        "csize": 291455,
+        "isize": 774270
+      },
+      {
+        "name": "plasma-activities",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "a463a563e8df1783ad23216ec897d9588ed71e152fa064363e6f1d7838945349",
+        "csize": 128547,
+        "isize": 454988
+      },
+      {
+        "name": "plasma-activities-stats",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "258e78dc0cc09d80aca58909dcec852bb9bb06cd8b5529fd16d10a50aab4304c",
+        "csize": 94460,
+        "isize": 296223
+      },
+      {
+        "name": "plasma-desktop",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "9721270e3f1ad045643429ed5a050215f5768355fa84ea082b10cff590c2cb67",
+        "csize": 20132704,
+        "isize": 43890280
+      },
+      {
+        "name": "plasma-integration",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "08683a5fd710cd805796e5179420e405c42a3985e509bea9b1b8f93856b50b82",
+        "csize": 137790,
+        "isize": 428597
+      },
+      {
+        "name": "plasma-wayland-protocols",
+        "version": "1.23.0-1",
+        "repo": "extra",
+        "sha256": "3f89f37dbb8c7a70eba54567764cb35e9e4fd253c803ef14bfb8425588b05ea7",
+        "csize": 41024,
+        "isize": 234114
+      },
+      {
+        "name": "plasma-workspace",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "2a3972ed3e931b5462ed556680014af7a8d8e97c330d5add0eb9dc3ca032b4d7",
+        "csize": 22495068,
+        "isize": 60425146
+      },
+      {
+        "name": "plasma5support",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "de6a50706842eef897e1ea4409c3c3427a991119f404e154ee84faf0c15e23d5",
+        "csize": 1257004,
+        "isize": 9633963
+      },
+      {
+        "name": "polkit",
+        "version": "128-1",
+        "repo": "extra",
+        "sha256": "27a25617077c39f430ab5fe7aa8c9dd913711bd0f39745af123da0bf3fb1de07",
+        "csize": 437644,
+        "isize": 2096911
+      },
+      {
+        "name": "polkit-kde-agent",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "d4d7b1ed7dcbac7fd8365bd2d1443e371e53b6d88eb2be84d6daaf3ad9f64142",
+        "csize": 78499,
+        "isize": 260822
+      },
+      {
+        "name": "polkit-qt5",
+        "version": "0.201.1-1",
+        "repo": "extra",
+        "sha256": "085e3853a040422d847a80e4f8b0a457df5c1d4a73d8ee2b71e502aa8ae8ae8c",
+        "csize": 87010,
+        "isize": 341504
+      },
+      {
+        "name": "polkit-qt6",
+        "version": "0.201.1-1",
+        "repo": "extra",
+        "sha256": "b9944cfed4aa4d3103c942c0210c984766c2defb6c1033a5df4479a2a53ba029",
+        "csize": 95685,
+        "isize": 368456
+      },
+      {
+        "name": "poppler",
+        "version": "26.10.0-1",
+        "repo": "extra",
+        "sha256": "3c90aa3d2b0f90e25fc63e8250971197e8826ce4904d3a950eb41b5bd9f8ea2f",
+        "csize": 1921134,
+        "isize": 7141242
+      },
+      {
+        "name": "poppler-qt6",
+        "version": "26.10.0-1",
+        "repo": "extra",
+        "sha256": "87c4cf0eb9ee04d17ef976e2a2ba5021979b5d3fc7605e5f5cf01b20583a2fea",
+        "csize": 280551,
+        "isize": 926017
+      },
+      {
+        "name": "popt",
+        "version": "1.19-2",
+        "repo": "core",
+        "sha256": "877635962b604efa79409c3d423f4fdffc4868776af3e0e804cc94a0b57ca151",
+        "csize": 78173,
+        "isize": 241164
+      },
+      {
+        "name": "portaudio",
+        "version": "1:19.7.0-4",
+        "repo": "extra",
+        "sha256": "ca2e6423a25820b8a2808ce933365680f38cb4af7875533af2902ade761379c2",
+        "csize": 102521,
+        "isize": 344975
+      },
+      {
+        "name": "powerdevil",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "19821f9754aaaf7c4b61dc429e87947bd3b7062365d8eba61988dabf18dd57fe",
+        "csize": 1775553,
+        "isize": 7056468
+      },
+      {
+        "name": "prison",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "0e14929eccbc6c9154c33598d9dcc8a347446c0f67fa655000294ed2ed1e220e",
+        "csize": 87085,
+        "isize": 299622
+      },
+      {
+        "name": "procps-ng",
+        "version": "4.0.7-1",
+        "repo": "core",
+        "sha256": "7a0b17ee89ad1a04f7c6c86be69c9c816ac2c14da9648dfdefb7ccf4b22c14d3",
+        "csize": 1023957,
+        "isize": 2674579
+      },
+      {
+        "name": "protobuf",
+        "version": "36.1-1",
+        "repo": "extra",
+        "sha256": "3d63417c8fbe2354bea29b23c338baf3f03c9438e0127c5519d6dddc4825185c",
+        "csize": 4106999,
+        "isize": 19802545
+      },
+      {
+        "name": "protobuf-c",
+        "version": "1.5.2-15",
+        "repo": "extra",
+        "sha256": "5f6d5bf77d267ab0b77dd09e488a3480c7e4e8c92a2d9e9a43200c386886a1c7",
+        "csize": 144037,
+        "isize": 433123
+      },
+      {
+        "name": "qca-qt6",
+        "version": "2.3.12-1",
+        "repo": "extra",
+        "sha256": "1a510783f421fcb4678ddef350c2420a86e7395448e0f23d5f1567163ef6353b",
+        "csize": 926620,
+        "isize": 3585723
+      },
+      {
+        "name": "qcoro",
+        "version": "0.13.0-2",
+        "repo": "extra",
+        "sha256": "9d4f604b3353c8153b9d59e43c55f8bef8e8d0efb432b91512d3df049ce54c05",
+        "csize": 147733,
+        "isize": 756750
+      },
+      {
+        "name": "qqc2-breeze-style",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "da3a1b3dd738cbf1f3ecfd0027869ac75b4c8c60aab76ac0f58733812768d476",
+        "csize": 685157,
+        "isize": 3885184
+      },
+      {
+        "name": "qqc2-desktop-style",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "49378e805e0dc613e84230cdd525fb167a4bd73b938f062b54f0056d80930d2e",
+        "csize": 811115,
+        "isize": 4267297
+      },
+      {
+        "name": "qrencode",
+        "version": "4.1.1-4",
+        "repo": "extra",
+        "sha256": "8ce056bd7e3b77713483f642aa1b82da044e3a7781296c217513c2902e1354a2",
+        "csize": 41834,
+        "isize": 113218
+      },
+      {
+        "name": "qt5-base",
+        "version": "5.15.19+kde+r96-1",
+        "repo": "extra",
+        "sha256": "c772c6d18c29b58443cee96d9a6012baf8cb9622a14553e4759fdc418b93cf3c",
+        "csize": 14087128,
+        "isize": 66804102
+      },
+      {
+        "name": "qt5-declarative",
+        "version": "5.15.19+kde+r23-1",
+        "repo": "extra",
+        "sha256": "8b207369843d9603a87420279ddacf025718dcdb47a7ea4ad703e4c70357ea78",
+        "csize": 5204716,
+        "isize": 24801937
+      },
+      {
+        "name": "qt5-multimedia",
+        "version": "5.15.19+kde+r2-1",
+        "repo": "extra",
+        "sha256": "a791eb720836c86ae9328a4d775ec9095637007a121f7c6b75dd9ead52373018",
+        "csize": 789832,
+        "isize": 3607207
+      },
+      {
+        "name": "qt5-speech",
+        "version": "5.15.19+kde+r1-1",
+        "repo": "extra",
+        "sha256": "ea6990a6713c9838822dae2c1b5dea47741e6d801c2fbbcd78b7bc0cfc7eb98a",
+        "csize": 50301,
+        "isize": 177831
+      },
+      {
+        "name": "qt5-svg",
+        "version": "5.15.19+kde+r5-1",
+        "repo": "extra",
+        "sha256": "874d631c937bbca955257cd47af9199864479a07772e99cc480775b1efb6ea1f",
+        "csize": 154217,
+        "isize": 515350
+      },
+      {
+        "name": "qt5-translations",
+        "version": "5.15.19-1",
+        "repo": "extra",
+        "sha256": "5031b69a16673fa44d5d9285276960e8b6f93df38211a60977a288b661008c88",
+        "csize": 1952692,
+        "isize": 15421930
+      },
+      {
+        "name": "qt5-wayland",
+        "version": "5.15.19+kde+r55-1",
+        "repo": "extra",
+        "sha256": "af063b187c1370cfdac6a19bc72a98069fe5efb76b7e2dd7ab4ef8ae75ca3fab",
+        "csize": 1156714,
+        "isize": 6382446
+      },
+      {
+        "name": "qt5-x11extras",
+        "version": "5.15.19-1",
+        "repo": "extra",
+        "sha256": "6f8b11edee65e9646be560956dab2b371e9be43c414b47414b885a6b5d3163d9",
+        "csize": 14748,
+        "isize": 41892
+      },
+      {
+        "name": "qt6-5compat",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "32812e7ad218035ea61d80438153ce52011eaec887669328150719ebb6958000",
+        "csize": 586002,
+        "isize": 2477682
+      },
+      {
+        "name": "qt6-base",
+        "version": "6.12.0-3",
+        "repo": "extra",
+        "sha256": "dea8a8c45a7929af115a2ba96c60dff927425f8c65432cf5d1027c79c8aa98f0",
+        "csize": 16709006,
+        "isize": 70841637
+      },
+      {
+        "name": "qt6-declarative",
+        "version": "6.12.0-3",
+        "repo": "extra",
+        "sha256": "cd4abff40be0352905933a6475912ac695fdf8e0a3c88e7e8b986316852da6bf",
+        "csize": 20951112,
+        "isize": 141724351
+      },
+      {
+        "name": "qt6-location",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "411b314cdc249d92fa7b95287163a99c1ce8aaaeb1cd9a64aeee67cd31c4cb28",
+        "csize": 762332,
+        "isize": 3470685
+      },
+      {
+        "name": "qt6-multimedia",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "a4c1106a5dd60f559851199e234a4eeaa830be2fe77067dca28ff30faa62fee0",
+        "csize": 1469648,
+        "isize": 7279313
+      },
+      {
+        "name": "qt6-multimedia-ffmpeg",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "9378f91c96344ff187b95c3347d45e2be0e1fe16c6dc6696e708531c0a3ccf5d",
+        "csize": 662694,
+        "isize": 3387118
+      },
+      {
+        "name": "qt6-positioning",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "7c2599cd4ec2655d7a3eb00d7a4b81363da1a7e72b9d3858d8e6909bc289bc36",
+        "csize": 411260,
+        "isize": 1896531
+      },
+      {
+        "name": "qt6-shadertools",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "6e7863301b3111a6a9acd8b042b9e5a874c0c289287b3ecdd6209d6d67f6554a",
+        "csize": 1899369,
+        "isize": 6111968
+      },
+      {
+        "name": "qt6-speech",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "38d4f9bb3491570e9e4db2bbf0a39bda57efd0dd5baec7181694bcab17c016c8",
+        "csize": 153314,
+        "isize": 649284
+      },
+      {
+        "name": "qt6-svg",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "922e48a36b2c8e1ac16c2b5f222f0e33e52fb2ec5384e69715eb427512af7ebf",
+        "csize": 314150,
+        "isize": 1085075
+      },
+      {
+        "name": "qt6-tools",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "bc45c9721e2fed7c7e85afc85e8653584bb7c90219af64b23769bd3e6fa46408",
+        "csize": 6965073,
+        "isize": 23456218
+      },
+      {
+        "name": "qt6-translations",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "125c56e90bd77aac7bd03e2bbfeabd42025e1e110b8b58829336fe6758e0a7c5",
+        "csize": 2125054,
+        "isize": 16686418
+      },
+      {
+        "name": "qt6-virtualkeyboard",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "d239e49c255fc3721e34463134149623fa4826129e4f846ab76d641d060d315e",
+        "csize": 2637076,
+        "isize": 6685507
+      },
+      {
+        "name": "qt6-webchannel",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "8246bb014ef7b1d2194efcd355b3aa8308c0b1be7aea6cdfb7b73ad7cd63cfd1",
+        "csize": 147052,
+        "isize": 547782
+      },
+      {
+        "name": "qt6-webengine",
+        "version": "6.11.3-2",
+        "repo": "extra",
+        "sha256": "22af5a4ea0c4f583aeeb497df4d168c67e042c011d4e120006cbaefb8a481a8b",
+        "csize": 99316898,
+        "isize": 297121925
+      },
+      {
+        "name": "qt6-websockets",
+        "version": "6.12.0-1",
+        "repo": "extra",
+        "sha256": "24cf7b0b2b09596985275ffa2e9296e2439887d33371ffc91d05e5b8df77e2ae",
+        "csize": 115795,
+        "isize": 450069
+      },
+      {
+        "name": "rav1e",
+        "version": "0.8.1-3",
+        "repo": "extra",
+        "sha256": "17812c6c332ad56fbbce4b758ce8cf9b8d311b2474a574619643aedd681119c3",
+        "csize": 1658941,
+        "isize": 7852713
+      },
+      {
+        "name": "re2",
+        "version": "2:2025.11.05-6",
+        "repo": "extra",
+        "sha256": "f055975eadd1916f1952c5caefcaaf32ef60f1e4461b2f4ac079b0e3c42d61d4",
+        "csize": 238303,
+        "isize": 637441
+      },
+      {
+        "name": "readline",
+        "version": "8.3.6-1",
+        "repo": "core",
+        "sha256": "016b2aeebfbe9dfb89283c52bb49487d95ea23a875d477da42d000a793613020",
+        "csize": 424891,
+        "isize": 1573521
+      },
+      {
+        "name": "ripgrep",
+        "version": "15.2.0-1",
+        "repo": "extra",
+        "sha256": "4ab540861ee43dfe6974403dd3f03830615fd4b53971736f5c4fc7aa82133a21",
+        "csize": 1458382,
+        "isize": 4494285
+      },
+      {
+        "name": "ripgrep-all",
+        "version": "0.10.10-3",
+        "repo": "extra",
+        "sha256": "935288f1b839e2ead1717a3229289eb5c7bf7e20ca5826f79e1b73b209798620",
+        "csize": 2320836,
+        "isize": 14185656
+      },
+      {
+        "name": "rsync",
+        "version": "3.5.1-3",
+        "repo": "extra",
+        "sha256": "450464513cef80cf7da6a7b89ad8f976b40336b189233cdeeba0b462b75f4e75",
+        "csize": 435763,
+        "isize": 879520
+      },
+      {
+        "name": "rubberband",
+        "version": "4.0.0-2",
+        "repo": "extra",
+        "sha256": "ed5e3a9856db7a99f4aa7bfe4f0cb4903faab720020d0b07aef61376f86ef9e1",
+        "csize": 307768,
+        "isize": 1593065
+      },
+      {
+        "name": "scim",
+        "version": "1.4.18-5",
+        "repo": "extra",
+        "sha256": "d5ee62b148ab01fac89e7640e62a003ebd45eb3fc5eed91887e1474a22f16b69",
+        "csize": 826486,
+        "isize": 3575151
+      },
+      {
+        "name": "sdl2-compat",
+        "version": "2.32.74-1",
+        "repo": "extra",
+        "sha256": "caea4b91d83bb585542e86047a800b7500376c4ce2c6d74b51465123d74439f6",
+        "csize": 478999,
+        "isize": 3238825
+      },
+      {
+        "name": "sdl3",
+        "version": "3.4.18-1",
+        "repo": "extra",
+        "sha256": "fbcd4dbe7d9609ab60ccfb0a9ad559df242823caba18ed1e6fc7c15abe7bc04e",
+        "csize": 1798313,
+        "isize": 7324203
+      },
+      {
+        "name": "sed",
+        "version": "4.10-2",
+        "repo": "core",
+        "sha256": "90733f34fe5791b554b935998df858350bcea53061257dba06829ce3533f8e01",
+        "csize": 220815,
+        "isize": 745601
+      },
+      {
+        "name": "shaderc",
+        "version": "2026.4-1",
+        "repo": "extra",
+        "sha256": "4d3f5e14b23f596959135a657a024278a3cdd403eeaa60d2e7bc61093a2ffd6b",
+        "csize": 168365,
+        "isize": 709124
+      },
+      {
+        "name": "shadow",
+        "version": "4.20.0.arch1-1",
+        "repo": "core",
+        "sha256": "615c819eb2d3e22158289f3cc2447f81ae981a6d11b3418da30b6085306b3e77",
+        "csize": 1232280,
+        "isize": 3769582
+      },
+      {
+        "name": "shared-mime-info",
+        "version": "2.5.1-2",
+        "repo": "extra",
+        "sha256": "e71f0788fbb52679b9a75f3558ef8a2b5c3c9f691f136b7574caefc0240461c1",
+        "csize": 783722,
+        "isize": 6111615
+      },
+      {
+        "name": "signon-kwallet-extension",
+        "version": "26.08.2-1",
+        "repo": "extra",
+        "sha256": "4757121f70bd849fdbaf0291d98d988526a132689015d3f46ef256bf7044bd9d",
+        "csize": 15688,
+        "isize": 35296
+      },
+      {
+        "name": "signon-plugin-oauth2",
+        "version": "0.25-4",
+        "repo": "extra",
+        "sha256": "e7a898575c7e51a37d5384aa74f731af451612106d47cca80a09343bcd19541e",
+        "csize": 83785,
+        "isize": 241424
+      },
+      {
+        "name": "signon-ui",
+        "version": "0.17+20231016-4",
+        "repo": "extra",
+        "sha256": "4fd71149b383066534f9d2591166f924c69e3997a662aeca13118510e4b4e5a0",
+        "csize": 99531,
+        "isize": 264684
+      },
+      {
+        "name": "signond",
+        "version": "8.61-4",
+        "repo": "extra",
+        "sha256": "8825ac7ee8a4c207308fdb86e1920b6ac49428c7cb4a2f6b88bd9ebcb9b925af",
+        "csize": 380626,
+        "isize": 1423422
+      },
+      {
+        "name": "slang",
+        "version": "2.3.3-4",
+        "repo": "extra",
+        "sha256": "272e4afe2bff678a590d28abbeba8eda95b2041c5d0063e01a8a0f457b13a177",
+        "csize": 846235,
+        "isize": 3527887
+      },
+      {
+        "name": "smbclient",
+        "version": "2:4.25.1-1",
+        "repo": "extra",
+        "sha256": "60edd2a387e8219353c42f2c936d7011e3492a329d5e085a3599aab05aa68de6",
+        "csize": 7697766,
+        "isize": 30419112
+      },
+      {
+        "name": "snappy",
+        "version": "1.3.1-1",
+        "repo": "extra",
+        "sha256": "f9660c6253000eeb98e0fbe960f1b1784a5a26966450c5ece013e8c977cd9e5b",
+        "csize": 40127,
+        "isize": 113174
+      },
+      {
+        "name": "sndio",
+        "version": "1.10.0-1",
+        "repo": "extra",
+        "sha256": "82b16de5ef6054418db941e01f6aca2b5afb605a579eabd847155daa2fb56ea2",
+        "csize": 129936,
+        "isize": 293392
+      },
+      {
+        "name": "solid",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "465cfc34d7069c62bf0bf9bccf954fe76179ccdfea569879b888a4a2149a3ca3",
+        "csize": 483295,
+        "isize": 2213744
+      },
+      {
+        "name": "sonnet",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "972a56b426ec6b05219dd0755436e8ecdbe2249e0e123c8467a941e962c4f46d",
+        "csize": 408241,
+        "isize": 1762347
+      },
+      {
+        "name": "sound-theme-freedesktop",
+        "version": "0.8-6",
+        "repo": "extra",
+        "sha256": "266d5198ed35ed265f7e64cb014b48bd1e5a9eda1defcce817cce200ffaa6c19",
+        "csize": 377411,
+        "isize": 472275
+      },
+      {
+        "name": "speex",
+        "version": "1.2.1-3",
+        "repo": "extra",
+        "sha256": "f9488fe7910d09222314dcf361064a50904f709cac06bb7d73451e4db9f27a85",
+        "csize": 496950,
+        "isize": 668435
+      },
+      {
+        "name": "speexdsp",
+        "version": "1.2.1-3",
+        "repo": "extra",
+        "sha256": "56cdf8b95fca61e610fa3c08a428c516b85df4a7e9d497096232cbaafc0e8c2b",
+        "csize": 462423,
+        "isize": 566310
+      },
+      {
+        "name": "spirv-tools",
+        "version": "1:1.4.363.0-1",
+        "repo": "extra",
+        "sha256": "04b83f2e9fbf38cd349031b105a49d6baf451f7116e84428fc0bfe55a3968010",
+        "csize": 2221392,
+        "isize": 8559942
+      },
+      {
+        "name": "sqlite",
+        "version": "3.54.0-1",
+        "repo": "core",
+        "sha256": "c5e40a46c5ddec7e44f8cad475e39344fedc7f01fc2b2bb87c0c7862f4b942f3",
+        "csize": 2505466,
+        "isize": 17806821
+      },
+      {
+        "name": "srt",
+        "version": "1.5.7-2",
+        "repo": "extra",
+        "sha256": "936cea8439721c70b0492385a8e04deedfca08dfabc2dd0bd135740b54d2cf81",
+        "csize": 565094,
+        "isize": 1677477
+      },
+      {
+        "name": "svt-av1",
+        "version": "4.2.0-1",
+        "repo": "extra",
+        "sha256": "3d807071e467a022eeab287ff117c73ec4abb085a0374b54d9ff33b4479f515a",
+        "csize": 2071166,
+        "isize": 5619211
+      },
+      {
+        "name": "syndication",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "7c21516f48eae1b4a4bd96c3f3ad916fffbe92b94d09e79c7bde4a2bcf089155",
+        "csize": 229937,
+        "isize": 755625
+      },
+      {
+        "name": "syntax-highlighting",
+        "version": "6.31.0-1",
+        "repo": "extra",
+        "sha256": "1851b4cab589ed13d9169350fb019eaf62b0abe6271406d832e63e8ecf65f041",
+        "csize": 1272601,
+        "isize": 10694949
+      },
+      {
+        "name": "systemd",
+        "version": "262.1-1",
+        "repo": "core",
+        "sha256": "fd6d2e14fa2b42c793ae5c52054414a5b74932b152023453facd287f268b3622",
+        "csize": 11203908,
+        "isize": 42545279
+      },
+      {
+        "name": "systemd-libs",
+        "version": "262.1-1",
+        "repo": "core",
+        "sha256": "fbf6d77053bb210c8fd3f473f86159870ece009506828e3d4a7b8c425a50995e",
+        "csize": 1507473,
+        "isize": 3965002
+      },
+      {
+        "name": "systemsettings",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "31663ec863b03365c161d69e83770aa054265d1a1cfc14bedb654fd271eaaf05",
+        "csize": 399627,
+        "isize": 1278900
+      },
+      {
+        "name": "taglib",
+        "version": "2.3.2-1",
+        "repo": "extra",
+        "sha256": "3dc1d3fabf9a8c12a5a48994e9a4b543f23596b10e0f8ad9d73db771ef854908",
+        "csize": 589280,
+        "isize": 2492534
+      },
+      {
+        "name": "talloc",
+        "version": "2.5.0-2",
+        "repo": "extra",
+        "sha256": "8209c935210ab9ce983afa271acd3504a8df2f272f11f66cbdc72b1d339f8529",
+        "csize": 51850,
+        "isize": 182711
+      },
+      {
+        "name": "tar",
+        "version": "1.35-5",
+        "repo": "core",
+        "sha256": "e8a3baa1b4bd754442f92c1c25794b9225700f931e1d2c175bb2e7d9a28725e7",
+        "csize": 783624,
+        "isize": 2936350
+      },
+      {
+        "name": "tdb",
+        "version": "1.4.15-2",
+        "repo": "extra",
+        "sha256": "f8edbb862dc0eebbe8f5ff448c1530db65874599cfaaea4c34e6247fe732e239",
+        "csize": 76990,
+        "isize": 247497
+      },
+      {
+        "name": "tevent",
+        "version": "1:0.17.2-2",
+        "repo": "extra",
+        "sha256": "aa30a016ec4d8b8aba0d2930392e3fc841afd8b59fc6955aedd343876dcee5f5",
+        "csize": 61634,
+        "isize": 222965
+      },
+      {
+        "name": "tinysparql",
+        "version": "3.12.0-1",
+        "repo": "extra",
+        "sha256": "f2f75be63d3d9d76a68275f4d3749cc429c924ccd90203e1ae60c8900d518498",
+        "csize": 1113070,
+        "isize": 4115278
+      },
+      {
+        "name": "tpm2-tss",
+        "version": "4.2.0-2",
+        "repo": "core",
+        "sha256": "7aa2a963f99bcd51e4f3b2587fa8f374a7cfa09ec65749cc9a72fa6f3ad34fdc",
+        "csize": 1042609,
+        "isize": 3823415
+      },
+      {
+        "name": "tslib",
+        "version": "1.24-1",
+        "repo": "extra",
+        "sha256": "8b32452dc81f79e48c1dfbf1bd594a3ba37cd8d06bb05a47817b2c22aed2ff3d",
+        "csize": 103146,
+        "isize": 490472
+      },
+      {
+        "name": "ttf-hack",
+        "version": "3.003-7",
+        "repo": "extra",
+        "sha256": "1759282d1f019812c70b5ce6929efa05f0654b99a7244a1518d84d6b6dd09a39",
+        "csize": 395130,
+        "isize": 1269761
+      },
+      {
+        "name": "tzdata",
+        "version": "2026e-1",
+        "repo": "core",
+        "sha256": "921d75b3bdb810be4a917013fd2569912d0cc23dc718c591764f64ed83de26ea",
+        "csize": 312965,
+        "isize": 1742570
+      },
+      {
+        "name": "udisks2",
+        "version": "2.11.2-1",
+        "repo": "extra",
+        "sha256": "4b6fa221f14a248cc86d0ea8e0380d09965305a38d3cb19aba318508fe61efdb",
+        "csize": 811523,
+        "isize": 8267894
+      },
+      {
+        "name": "union",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "5903a6155e93bf10457f073569a8e176c68316a43bad64ce36e97ff54e9d40f0",
+        "csize": 1113282,
+        "isize": 5360243
+      },
+      {
+        "name": "upower",
+        "version": "1.91.5-1",
+        "repo": "extra",
+        "sha256": "2de652124aaeec80cfec37411d4b0a9a8c16cc895a1d0e395cbe98d7186591a6",
+        "csize": 176808,
+        "isize": 891922
+      },
+      {
+        "name": "util-linux",
+        "version": "2.42.4-1",
+        "repo": "core",
+        "sha256": "95b7096bf4b45274645f6bb96f5b5508af6ea80e5fccba29244abaa53a341962",
+        "csize": 6684541,
+        "isize": 20929372
+      },
+      {
+        "name": "util-linux-libs",
+        "version": "2.42.4-1",
+        "repo": "core",
+        "sha256": "56075bc7da9be4470da36a040195f98aac0afbc1edcc7e4f27e6d267dcaf9f37",
+        "csize": 542399,
+        "isize": 1459403
+      },
+      {
+        "name": "v4l-utils",
+        "version": "1.32.0-2",
+        "repo": "extra",
+        "sha256": "0a316d96bb8c73f0f047458d2d652971137d27de826e10f386ea933860ae885d",
+        "csize": 2085295,
+        "isize": 11863568
+      },
+      {
+        "name": "vapoursynth",
+        "version": "81-1",
+        "repo": "extra",
+        "sha256": "148deb4215b006a13abf81e1c445c5e85aeba1e92e6e935083cc3193306744ef",
+        "csize": 3404261,
+        "isize": 12490277
+      },
+      {
+        "name": "vid.stab",
+        "version": "1.1.2-1",
+        "repo": "extra",
+        "sha256": "e50577203f408e76dad3e7325c98577180fd32c4a0e0440cd85874d03b907676",
+        "csize": 97907,
+        "isize": 550488
+      },
+      {
+        "name": "vmaf",
+        "version": "3.2.1-1",
+        "repo": "extra",
+        "sha256": "c99983f741cf5679bd44eeecf6ca53931077f7d07563480376fc2b0256548910",
+        "csize": 507549,
+        "isize": 7458877
+      },
+      {
+        "name": "volume_key",
+        "version": "0.3.12-12",
+        "repo": "extra",
+        "sha256": "8f6528250a09cf4781e2de814a2a4056d05ff5e3df17184aee5a0b59da12a04c",
+        "csize": 133210,
+        "isize": 715589
+      },
+      {
+        "name": "vulkan-headers",
+        "version": "1:1.4.363.0-1",
+        "repo": "extra",
+        "sha256": "574e320444b0eac2479f2c3441c6d030176db572bca8a783bf2a67b808a11ebd",
+        "csize": 1901792,
+        "isize": 43064162
+      },
+      {
+        "name": "vulkan-icd-loader",
+        "version": "1.4.363.0-1",
+        "repo": "extra",
+        "sha256": "c84e1c9752eeebcc7d9aa5e755c8fd5291c12e8d4e3a17ab83435ee51715dcdc",
+        "csize": 191476,
+        "isize": 702478
+      },
+      {
+        "name": "wayland",
+        "version": "1.26.0-1",
+        "repo": "extra",
+        "sha256": "0bf83ec9dd5b9e4037e7fd7d5ded70838bb50f82aa43e8280c8c0025c92804a9",
+        "csize": 153145,
+        "isize": 897135
+      },
+      {
+        "name": "wayland-protocols",
+        "version": "1.49-1",
+        "repo": "extra",
+        "sha256": "79efa08167c423c6bdbba0efeb05ccc0ef9172c930be96a5b93f8208bdab04a4",
+        "csize": 141908,
+        "isize": 1032392
+      },
+      {
+        "name": "wireplumber",
+        "version": "0.5.18-1",
+        "repo": "extra",
+        "sha256": "821be7b062cbab5455dd9b315d4823cceba27ba76120e2991e68e6583a09041b",
+        "csize": 314986,
+        "isize": 1351017
+      },
+      {
+        "name": "wpa_supplicant",
+        "version": "2:2.12-1",
+        "repo": "core",
+        "sha256": "fe87452ac26eaab3ce37a6a682e1b3992f4b7d6a19b3117b84bfe1a2a1ea51e6",
+        "csize": 2309363,
+        "isize": 8678033
+      },
+      {
+        "name": "x264",
+        "version": "3:0.165.r3222.b35605a-2",
+        "repo": "extra",
+        "sha256": "c448740d7be83a63d52f1573984d3f878afec7eab21c4424727c72c639922bb7",
+        "csize": 785803,
+        "isize": 3978017
+      },
+      {
+        "name": "x265",
+        "version": "4.3-1",
+        "repo": "extra",
+        "sha256": "d798aef9f851c07693b08dee578a1906d2af418f64e611cb96aa433ed4489c27",
+        "csize": 2208215,
+        "isize": 22504200
+      },
+      {
+        "name": "xcb-proto",
+        "version": "1.17.0-4",
+        "repo": "extra",
+        "sha256": "98f661ef7c7e05eb7a687e859cf123a92806ceed8f55c0d70ddbac799988239a",
+        "csize": 133206,
+        "isize": 1076752
+      },
+      {
+        "name": "xcb-util",
+        "version": "0.4.1-2",
+        "repo": "extra",
+        "sha256": "34ffaa2c68ac7985178a0cc379004fd40d0d0b1f02e48e8c0f4dc35b1e4946ea",
+        "csize": 11912,
+        "isize": 35257
+      },
+      {
+        "name": "xcb-util-cursor",
+        "version": "0.1.6-1",
+        "repo": "extra",
+        "sha256": "8e13b77368a8fa7771e35398e79e5f737def0687d96f08a346bac06f248df162",
+        "csize": 11592,
+        "isize": 29586
+      },
+      {
+        "name": "xcb-util-image",
+        "version": "0.4.1-3",
+        "repo": "extra",
+        "sha256": "c77aec71c7fc172a8b6cf8af98ff9886fc290f7fc5715ec4cc9591842491e075",
+        "csize": 17724,
+        "isize": 54318
+      },
+      {
+        "name": "xcb-util-keysyms",
+        "version": "0.4.1-5",
+        "repo": "extra",
+        "sha256": "312213911881c0742e2a825432feac761e863945b74bb3a6daca97a99778d35e",
+        "csize": 7729,
+        "isize": 17973
+      },
+      {
+        "name": "xcb-util-renderutil",
+        "version": "0.3.10-2",
+        "repo": "extra",
+        "sha256": "4855eaf033ec72f27cce311ebf4b7c9bd8518c73ee3a372bd9b1cf7baaafa4dd",
+        "csize": 9522,
+        "isize": 26982
+      },
+      {
+        "name": "xcb-util-wm",
+        "version": "0.4.2-2",
+        "repo": "extra",
+        "sha256": "aa4becb215290dc33fcf2938b4e5604fceaf1189e4d2d5688861001413fc888c",
+        "csize": 33792,
+        "isize": 222132
+      },
+      {
+        "name": "xdg-desktop-portal",
+        "version": "1.22.1-2",
+        "repo": "extra",
+        "sha256": "7df21ee565cd6f5b42dc374b77cd8a19ab31fb4bc5f76481f06713b5bd40d889",
+        "csize": 459195,
+        "isize": 1923399
+      },
+      {
+        "name": "xdg-desktop-portal-kde",
+        "version": "6.8.2-1",
+        "repo": "extra",
+        "sha256": "101055626a2005d853bfba6992335655ceb384dd41a192f317fad27a3297f25b",
+        "csize": 788418,
+        "isize": 3260514
+      },
+      {
+        "name": "xdg-user-dirs",
+        "version": "0.20-1",
+        "repo": "extra",
+        "sha256": "d2d8d9cf22fca76652320c905056dfcf55201665d025ae2c3de60702a36bfa65",
+        "csize": 47603,
+        "isize": 181677
+      },
+      {
+        "name": "xdg-utils",
+        "version": "1.2.1-2",
+        "repo": "extra",
+        "sha256": "35de6314be9c3c95e1e6bb6ecde5ceb2d9efb8412c0f154cd309eb9dcb16ebd7",
+        "csize": 61249,
+        "isize": 318148
+      },
+      {
+        "name": "xkeyboard-config",
+        "version": "2.48-1",
+        "repo": "extra",
+        "sha256": "7f7f8656dbd0b37e36d3a97f6e188fc5c6cbccc4c1e5d34ff35f1d7a79b1cc73",
+        "csize": 910202,
+        "isize": 10741197
+      },
+      {
+        "name": "xorg-fonts-encodings",
+        "version": "1.1.0-2",
+        "repo": "extra",
+        "sha256": "656df66ba73b7c9d84faf25465d64a4a81f5b67a7e16b8d8fe04599a311e6f8a",
+        "csize": 582430,
+        "isize": 644558
+      },
+      {
+        "name": "xorg-server-common",
+        "version": "21.1.25-2",
+        "repo": "extra",
+        "sha256": "851b8e7ad135d99ce263334f64512a10c69d6b19231a6de48953fe44227c0dcc",
+        "csize": 28329,
+        "isize": 130326
+      },
+      {
+        "name": "xorg-setxkbmap",
+        "version": "1.3.5-1",
+        "repo": "extra",
+        "sha256": "dc1dce9a0aa737d39344d15232a62ab6b1963bb5763360bf166c11699c37e3f5",
+        "csize": 14149,
+        "isize": 34192
+      },
+      {
+        "name": "xorg-xkbcomp",
+        "version": "1.5.0-1",
+        "repo": "extra",
+        "sha256": "662f4ad50763b9d4192bb4f2bbd81ba3c50630a0ec2a83a13deb8770f785734d",
+        "csize": 93470,
+        "isize": 223360
+      },
+      {
+        "name": "xorg-xmessage",
+        "version": "1.0.7-2",
+        "repo": "extra",
+        "sha256": "f78544debbd0306c11074d82483bbce16bee57215dfdc8d72b61e5b234807712",
+        "csize": 13843,
+        "isize": 33610
+      },
+      {
+        "name": "xorg-xprop",
+        "version": "1.2.8-1",
+        "repo": "extra",
+        "sha256": "05dcc5b1d6616fd7566f6616bc0868b72c1028c011b95732f445db76217f8510",
+        "csize": 26380,
+        "isize": 53454
+      },
+      {
+        "name": "xorg-xrdb",
+        "version": "1.2.3-1",
+        "repo": "extra",
+        "sha256": "12b984dc4b3bbf7539ed040ddfbfaba4937daf064180b09ec29292aaa6912678",
+        "csize": 21227,
+        "isize": 41949
+      },
+      {
+        "name": "xorg-xwayland",
+        "version": "24.1.14-1",
+        "repo": "extra",
+        "sha256": "ff0147866b9196feca370239854abb2a7c6d99f8c9de09330ec4cbe4542d0441",
+        "csize": 1031411,
+        "isize": 2459481
+      },
+      {
+        "name": "xorgproto",
+        "version": "2026.1-1",
+        "repo": "extra",
+        "sha256": "1fca2c5a52c8cacf9825fc76531a4286de441099d8d6eb912725b136be70eae7",
+        "csize": 249666,
+        "isize": 1541082
+      },
+      {
+        "name": "xvidcore",
+        "version": "1.3.7-4",
+        "repo": "extra",
+        "sha256": "02f16d9aefb29f12ec3c5e3386475e1417a4331c5ee32dfc0d6075325e5cb889",
+        "csize": 226447,
+        "isize": 696193
+      },
+      {
+        "name": "xxhash",
+        "version": "0.8.4-1",
+        "repo": "extra",
+        "sha256": "ef60bad0552de3eb8a0e1e2a07eb1bcaceaa771a5f36401a2cf0de135ffcc72b",
+        "csize": 108215,
+        "isize": 443052
+      },
+      {
+        "name": "xz",
+        "version": "5.8.4-1",
+        "repo": "core",
+        "sha256": "89b8e777c8f7a39413e1b223d4c212caec6ddd9470b3d1ea1d5161bcc6215c04",
+        "csize": 856380,
+        "isize": 2998393
+      },
+      {
+        "name": "zeromq",
+        "version": "4.3.5-3",
+        "repo": "extra",
+        "sha256": "e3ec5be13978db5ba53c86a2416fac800bc14da8d6c6c3325afd928ebf79d27b",
+        "csize": 576741,
+        "isize": 3174264
+      },
+      {
+        "name": "zimg",
+        "version": "3.0.6-2",
+        "repo": "extra",
+        "sha256": "cfd009bc43571c04a189dff125c57552f826840e82cfb146eb94990339adf9a6",
+        "csize": 247961,
+        "isize": 736924
+      },
+      {
+        "name": "zint",
+        "version": "2.16.0-2",
+        "repo": "extra",
+        "sha256": "260a4368f18841cad979606102e77f64423aa06bbd4abbf4709b727a40e695e7",
+        "csize": 519951,
+        "isize": 987829
+      },
+      {
+        "name": "zlib",
+        "version": "1:1.3.2-4",
+        "repo": "core",
+        "sha256": "81e183eb4c676c86eb1709d1878f7aec1df10d59ce0980b5ab0724560328d015",
+        "csize": 86278,
+        "isize": 232676
+      },
+      {
+        "name": "zstd",
+        "version": "1.5.7-3",
+        "repo": "core",
+        "sha256": "d4cf0049137124c8a025eedfad267a3e8a02310c9efb9d1ae4a61aa1d02789fc",
+        "csize": 527400,
+        "isize": 1610357
+      },
+      {
+        "name": "zxing-cpp",
+        "version": "3.1.1-1",
+        "repo": "extra",
+        "sha256": "4d8c25e0234e264fa0a34687c674fa2ae0d257734783a6982c4985163621141c",
+        "csize": 867461,
+        "isize": 1940466
+      }
+    ],
+    "unresolved": [],
+    "csize": 930026368,
+    "isize": 3824507492
+  },
+  "extends": [
+    "qt6"
+  ]
+}
