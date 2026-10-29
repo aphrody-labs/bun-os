@@ -96,7 +96,7 @@ Microsoft references (`vendor/microsoft/PINS.json`, 14 pins): microsoft-ui-xaml 
 | `dotnet-linux.yml` (dotnet-linux) | workflow_dispatch, push (os; paths 5: factory/dotnet-linux/**, packages/buncc/src/dotnet-linux/**, ...) | `pins`, `ubuntu`, `alpine`, `cross-arm64`, `arch`, `wsl-layer`, `wasm-guest` | dotnet-linux | setup-workspace |
 | `release.yml` (Release) | push, workflow_dispatch | `verify`, `binaries`, `npm`, `crates`, `github-release` | release | setup-workspace |
 | `rustbase.yml` (Rust userland (rustbase)) | workflow_dispatch, push (os; paths 3: factory/rustbase/**, docs/RUSTBASE.md, ...) | `check`, `packages`, `gnu-coreutils`, `util-linux-tests` | rustbase | jobs run in Arch and Ubuntu containers; the Bun step uses oven-sh/setup-bun directly (owner: rustbase, to move to the setup action) |
-| `wasmos.yml` (WASM OS) | workflow_dispatch, push (os; paths 4: packages/wasmos/**, factory/wasmos/**, ...) | `compositor`, `alpine` | wasmos | jobs install the pinned Bun with npm install -g bun@BUN_VERSION (same version source as setup-bun, no integrity check) and drive Chromium; owner: wasmos, to move to the setup action |
+| `wasmos.yml` (WASM OS) | workflow_dispatch, push (os; paths 4: packages/wasmos/**, factory/wasmos/**, ...) | `compositor`, `alpine`, `apps` | wasmos | jobs install the pinned Bun with npm install -g bun@BUN_VERSION (same version source as setup-bun, no integrity check) and drive Chromium; owner: wasmos, to move to the setup action |
 | `wsl-kernel.yml` (WSL kernel (7.3 + Rust)) | workflow_dispatch, push (os; paths 2: factory/wsl/kernel/**, .github/workflows/wsl-kernel.yml) | `kernel`, `nvidia-open-build-check` | wsl-kernel | builds the WSL kernel on an ubuntu runner with the distribution toolchain; no Bun step |
 | `wsl-rootfs.yml` (WSL rootfs (Bun OS on Arch)) | workflow_dispatch, push (os; paths 2: factory/wsl/**, .github/workflows/wsl-rootfs.yml) | `rootfs` | wsl | builds the rootfs inside an archlinux:base-devel container; Bun is bootstrapped inside the chroot by build-rootfs.sh |
 
@@ -156,3 +156,4 @@ Required status checks for `os`: `ci.yml#plan`, `ci.yml#quality`, `ci.yml#rust`,
 | `just c-targets` | Bun OS C: target catalog (factory/c/c-env.json) |
 | `just c-test` | Bun OS C: smoke matrix, hello.c for every target, header check, run where a runner exists |
 | `just c-bench` | Bun OS C: compile-time and size benchmark across the installed compilers |
+| `just m3-bench` | m3 benchmark harness: bun scripts/m3/bench/run.ts (--check enforces docs/material/m3/reports/perf-budget.json) |
