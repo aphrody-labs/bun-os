@@ -45,7 +45,7 @@
     "WinUI-Gallery": {
       "repo": "microsoft/WinUI-Gallery",
       "ref": "v3.0.4",
-      "sha": "71b5f04d3f7e3d02f91dc0d86d4d92d6d31c719b",
+      "sha": "7360ac322414e118eadfb0c7c2f4ecc31a218f59",
       "commitDate": "2026-10-12T15:58:41Z",
       "defaultBranch": "main",
       "defaultBranchTip": "7360ac322414e118eadfb0c7c2f4ecc31a218f59",
@@ -67,7 +67,7 @@
     "DirectXTK12": {
       "repo": "microsoft/DirectXTK12",
       "ref": "may2026",
-      "sha": "b1403303f3540879a01b5679df955ffd611e4b2d",
+      "sha": "f5b928460d91984b27029d064ee5a7dd4301513c",
       "commitDate": "2026-05-08T17:29:14Z",
       "defaultBranch": "main",
       "defaultBranchTip": "f5b928460d91984b27029d064ee5a7dd4301513c",
@@ -104,7 +104,7 @@
     "Windows-universal-samples": {
       "repo": "microsoft/Windows-universal-samples",
       "ref": "v19.0.2",
-      "sha": "99baab22e9b264c4d63a2fef4e0aa5724c4b55b5",
+      "sha": "4eb2fcb499c5bc549e918920cfd2b64396a650d9",
       "commitDate": "2026-05-14T00:00:19Z",
       "defaultBranch": "main",
       "defaultBranchTip": "4eb2fcb499c5bc549e918920cfd2b64396a650d9",
@@ -148,7 +148,7 @@
     "cppwinrt": {
       "repo": "microsoft/cppwinrt",
       "ref": "3.0.260818.1",
-      "sha": "d6cff316a991152071038668fb586a8b5ab1d51f",
+      "sha": "30ac599beedc03d0f38f5fc84c390ee2f8551204",
       "commitDate": "2026-07-28T01:15:40Z",
       "defaultBranch": "master",
       "defaultBranchTip": "30ac599beedc03d0f38f5fc84c390ee2f8551204",
@@ -159,7 +159,7 @@
     "CsWinRT": {
       "repo": "microsoft/CsWinRT",
       "ref": "2.3.1.260716.1",
-      "sha": "ff5227a4ffca06dfa6de8ca0a5c127c04f294291",
+      "sha": "c28d756c4f042cf573d269c6ac39de05087e86c8",
       "commitDate": "2026-07-15T18:37:44Z",
       "defaultBranch": "master",
       "defaultBranchTip": "c28d756c4f042cf573d269c6ac39de05087e86c8",

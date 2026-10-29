@@ -67,11 +67,17 @@ jobs:
         run: |
           bun factory/bunos/generate-components.ts
           bun factory/bunos/generate-map.ts
+      # Merged branches arrive with the formatting of their own tree: apply the repository formatters so Format steps of CI start clean.
+      - name: Format (bun run format, cargo fmt)
+        run: |
+          bun run format
+          cargo fmt --all
       - name: Commit the regenerated files to main
         run: |
           git config user.name aphrody-dev
           git config user.email contact@aphrody.com
           git checkout -- scripts/setup.ts
+          git add -u
           git add Cargo.lock bun.lock factory/bunos/components.json docs/ARCHITECTURE-MAP.md docs/BUNCC.md
           if git diff --cached --quiet; then
             echo "Lockfiles and generated docs are up to date."
