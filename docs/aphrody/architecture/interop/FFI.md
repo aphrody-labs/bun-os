@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document describes the abandoned `aphrody-labs/bun` fork. The Bun OS runtime is now the unmodified upstream `bun` npm package pinned at `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`, `bun --revision` prints `1.4.4-canary.1+11c367163`). Fork-only commands, APIs and modules named here (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`, `bun:nginx`, ...) are not available on upstream Bun. Read it as history, not as current instructions.
+
 # Rust to Bun FFI layer
 
 > Path reconciliation (2026-10-07): `packages/engine/n2b-plugin/src/index.ts` (not in repo) → `packages/engine/n2b-client/src/plugin.ts` (not in repo). Original dated observations below retain their historical scope.

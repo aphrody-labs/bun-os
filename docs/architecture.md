@@ -11,7 +11,7 @@ have been built, deployed or qualified.
 | Distribution CLI | `src/cli.ts`, `src/cli/` | Command routing and CLI implementation are present. |
 | Bun workspace | Root `package.json`, `bun.lock`, `bunfig.toml` | A root Bun workspace and dependency lock are declared. |
 | Cargo workspace | Root `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml` | A root Cargo workspace and toolchain are declared; exclusions and nested workspaces mean it is not the sole Rust workspace. |
-| Runtime source | `toolchains/bun`, `.gitmodules`, `sources.lock.json` | The runtime is consumed as a pinned source owner; runtime implementation ownership remains external to this distribution. |
+| Runtime | `package.json` `packageManager`, `sources.lock.json`, `distribution.json` | The runtime is unmodified upstream oven-sh/bun, pinned to npm `bun@1.4.4-canary.20261028.1` (gitHead `11c367163a4b`); runtime implementation ownership stays with upstream. The former `toolchains/bun` fork submodule was removed. |
 | Factory | `factory/`, `src/distribution.ts`, `distribution.json` | Factory code and configuration are present. A manifest entry alone does not prove an image was produced. |
 | Product sources | `apps/`, `crates/`, `packages/` | Source directories exist. Membership and ownership must be checked from manifests and source inventory. |
 | Imported sources | `vendor/`, `sources.lock.json`, `.gitmodules` | Some external sources and pins are declared. Inspect each source's provenance and status independently. |

@@ -30,14 +30,14 @@ The AI plugin orchestrates these engines; it does not duplicate them. The submod
 are shallow transport boundaries. Product ownership stays in the root Cargo/Bun
 workspaces and `src/pipeline/reverse.ts` defines the canonical engine sequence:
 
-1. inspect PE32/PE32+ metadata with `bun:windows.pe`;
+1. inspect PE32/PE32+ metadata with `bun:windows.pe` (fork-only API, not available on upstream Bun);
 2. decompile PE, ELF or Mach-O through the Rust owner;
 3. route full multi-architecture analysis to Ghidra;
 4. activate NTRGhidra for Nintendo DS/DSi images.
 
 ## Windows 11 integration
 
-`packages/re/src/ghidra/windows.ts` uses the fork's `bun:windows` API directly. It discovers the
+`packages/re/src/ghidra/windows.ts` uses the abandoned fork's `bun:windows` API directly (not available on upstream Bun). It discovers the
 Windows version, MSVC and Windows SDK without `vswhere`, parses PE metadata without
 loading the image, and contains Gradle/Java descendants in a Windows Job Object.
 Closing the owner terminates its entire process tree.

@@ -55,10 +55,9 @@ bun run list
 bun check
 bun lint
 bun fmt
-bun n2b
 ```
 
-These four quality and migration commands use Bun's native implementations
+These quality commands (`bun n2b` was fork-only and is gone) use Bun's built-in implementations
 directly. Do not add subprocess-backed linters or formatters, `bunx`, standalone
 Oxc tools, TypeScript compiler binaries, ESLint, Prettier, or an external n2b
 backend to workspace scripts or CI.

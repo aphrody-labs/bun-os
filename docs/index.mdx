@@ -41,7 +41,7 @@ or qualified.
 - `package.json` declares the root Bun workspace.
 - `Cargo.toml` declares a root Cargo workspace, but also excludes source trees;
   nested Cargo workspace boundaries remain. Cargo consolidation is incomplete.
-- `toolchains/bun` is a Git submodule for the Aphrody Bun runtime source owner.
+- The runtime is unmodified upstream Bun, pinned to npm `bun@1.4.4-canary.20261028.1` (gitHead `11c367163a4b`). The former `toolchains/bun` fork submodule was removed.
 - `factory/`, `src/`, `crates/`, `packages/`, `apps/` and `vendor/` contain
   product, tooling and imported source. Directory presence alone does not prove
   ownership, workspace membership or qualification.

@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document describes a matrix whose `bun:windows` references target the abandoned fork's API. The Bun OS runtime is now the unmodified upstream `bun` npm package pinned at `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`, `bun --revision` prints `1.4.4-canary.1+11c367163`). Fork-only commands, APIs and modules named here (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`, `bun:nginx`, ...) are not available on upstream Bun. Read it as history, not as current instructions.
+
 # rea capability matrix
 
 Every reverse-engineering need of Bun OS mapped to one `re` (rea) command, its MCP tool, its canonical owner and a real run on this workstation. Machine-readable copy: [`rea-matrix.json`](rea-matrix.json). Proof outputs live under `var/rea-matrix/proof/` (local, not versioned).

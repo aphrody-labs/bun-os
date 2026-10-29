@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document describes the abandoned `aphrody-labs/bun` fork. The Bun OS runtime is now the unmodified upstream `bun` npm package pinned at `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`, `bun --revision` prints `1.4.4-canary.1+11c367163`). Fork-only commands, APIs and modules named here (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`, `bun:nginx`, ...) are not available on upstream Bun. Read it as history, not as current instructions.
+
 # Public M3 site and Google search publication
 
 The product UI is owned by `m3/packages/app-ui` in Aphrody. The public search adapter is owned by `packages/bun-google/src/search.ts` in the Bun checkout; the anonymous SERP transport and parser remain the existing Rust Google owner. The adapter uses standard Bun process APIs and does not import `bun:google`, so the deployed Bun 1.4.3 server can load the pinned single-file module.

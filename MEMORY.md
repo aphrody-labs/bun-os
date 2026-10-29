@@ -9,9 +9,9 @@ rolling status narrative.
 - `bun-distribution`, branch `os`, is the canonical Bun OS distribution
   workspace. It owns product assembly, workspace configuration, factory,
   packaging and release coordination.
-- The Bun runtime implementation belongs to the canonical Bun runtime
-  repository. This workspace consumes the runtime through its declared source
-  and artifact contracts.
+- The runtime is unmodified upstream Bun, npm `bun@1.4.4-canary.20261028.1` (gitHead
+  `11c367163a4b`). The `aphrody-labs/bun` fork is abandoned. This workspace
+  consumes the runtime through the pin in `package.json`.
 - Product members belong under the root `apps/`, `crates/` and `packages/`
   directories. Imported projects retain their upstream history, licenses and
   ownership until a deliberate migration is completed.
@@ -20,7 +20,8 @@ rolling status narrative.
   `docs/ROSEGRIFFON.md`.
 - The distribution direction is Arch Linux with pacman/libalpm. Server, COSMIC
   Desktop and Gamescope Gaming are separate compositions. Alpine and Ubuntu
-  remain compatibility targets.
+  remain compatibility targets. The final goal is Bun integrated into the Linux
+  kernel the way Rust was; the phased plan is `docs/KERNEL-ROADMAP.md`.
 
 ## Current structural caveats
 

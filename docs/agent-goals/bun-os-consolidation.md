@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document describes a plan written while the runtime was the `aphrody-labs/bun` fork. The Bun OS runtime is now the unmodified upstream `bun` npm package pinned at `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`, `bun --revision` prints `1.4.4-canary.1+11c367163`). Fork-only commands, APIs and modules named here (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`, `bun:nginx`, ...) are not available on upstream Bun. Read it as history, not as current instructions.
+
 # Bun OS canonical workspace consolidation
 
 Status: active owner execution goal, 2026-10-14.
@@ -8,7 +10,7 @@ until its implementation and relevant qualification are complete.
 
 Canonical execution repository: `aphrody-labs/bun-distribution`, branch `os`.
 
-This is the canonical copy and is intentionally mirrored into `aphrody-labs/bun` and
+This is the canonical copy and was mirrored into the now abandoned `aphrody-labs/bun` fork and
 `aphrody-labs/aphrody` so repository-local Codex sessions discover the same
 cross-repository direction. The canonical implementation owner is
 `bun-distribution`; the mirrors do not transfer runtime or product ownership
@@ -75,10 +77,9 @@ Use the inventory to drive changes.
 
 ## Repository roles
 
-### aphrody-labs/bun
+### aphrody-labs/bun (abandoned)
 
-Treat the Bun fork as the canonical runtime and system-capability source unless
-newer repository instructions explicitly move an owner.
+Superseded 2026-10-29: the fork is abandoned. The runtime is unmodified upstream oven-sh/bun, npm `bun@1.4.4-canary.20261028.1` (gitHead `11c367163a4b`). The paragraphs below are history.
 
 Inspect its current implementation and instructions, including Rust/JSC/WebKit,
 OXC/native check-lint-fmt, FFI, Windows/Linux system APIs, Python/.NET/native

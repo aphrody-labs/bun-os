@@ -34,7 +34,7 @@ explicitly excluded source trees remain. The root manifest is therefore not
 the sole Cargo workspace yet. CMake and vcpkg ownership is source-specific;
 consult their manifests and the pinned source inventory before treating either
 as a repository-wide owner. The Bun runtime implementation remains with its
-canonical runtime repository and is consumed through `toolchains/bun`; this
+canonical runtime repository (upstream oven-sh/bun, pinned npm `bun@1.4.4-canary.20261028.1`; the former `toolchains/bun` fork is removed); this
 distribution does not own a `crates/bun-runtime` source tree. Linux gaming,
 NVIDIA, CUDA and DirectX sources retain their own pinned source locations.
 Package-management and repository-management integrations should be described

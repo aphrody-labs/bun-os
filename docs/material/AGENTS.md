@@ -17,9 +17,9 @@ web/source consumers explicitly run `git submodule update --init --recursive
 Material Git URL and exact revision as their other Material dependencies.
 
 Use native Windows on the owner workstation; never start WSL. Resolve checkout
-paths from configuration or the selected workspace. Type checks, lint, format,
-and Node-to-Bun migration must run through the Bun runtime's native commands:
-`bun check`, `bun lint`, `bun fmt`, and `bun n2b`, invoked directly. Do not route
+paths from configuration or the selected workspace. Type checks, lint and format
+must run through the Bun runtime's built-in commands:
+`bun check`, `bun lint` and `bun fmt`, invoked directly (`bun n2b` was fork-only and no longer exists). Do not route
 these gates through subprocess backends, `bunx`, standalone Oxc binaries,
 `tsc`/`tsgo`, ESLint, Prettier, or external n2b. Package scripts and CI must
 preserve this contract. Run heavy Cargo commands through the configured

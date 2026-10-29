@@ -2,7 +2,7 @@
 
 # Bun OS
 
-**An Arch-based Linux distribution and product workspace built on the Aphrody Bun runtime.**
+**An Arch-based Linux distribution and product workspace built on the unmodified upstream Bun runtime.**
 
 [Docs](docs/index.mdx) ·
 [Quickstart](docs/quickstart.mdx) ·
@@ -42,7 +42,7 @@ separate compatibility path. See [`distribution.json`](distribution.json),
 
 ## Quickstart
 
-Requires Bun 1.4.4, Git, the nightly Rust toolchain from [`rust-toolchain.toml`](rust-toolchain.toml),
+Requires the upstream Bun canary `1.4.4-canary.20261028.1` (`npm install -g bun@1.4.4-canary.20261028.1`; `bun --revision` prints `1.4.4-canary.1+11c367163`), Git, the nightly Rust toolchain from [`rust-toolchain.toml`](rust-toolchain.toml),
 and the native toolchain of each target you build.
 
 ```bash
@@ -112,8 +112,8 @@ bun fmt --check
 bun scripts/cargo.ts check
 ```
 
-Type checking, lint, format and Node-to-Bun migration use the native `bun check`, `bun lint`,
-`bun fmt` and `bun n2b`. Cargo runs through the serialized wrapper `scripts/cargo.ts`. Build
+Type checking, lint and format use the upstream `bun check`, `bun lint` and
+`bun fmt` (`bun n2b` was fork-only and no longer exists). Cargo runs through the serialized wrapper `scripts/cargo.ts`. Build
 outputs go to `build/` and `target/`, and installed binaries to `install/`.
 The [contributor guide](AGENTS.md) and [CI](.github/workflows) define the gates.
 

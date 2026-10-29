@@ -42,10 +42,13 @@ manager. Keep Server, COSMIC Desktop and Gamescope Gaming compositions separate;
 preserve upstream kernel/Rust histories and licenses. Imported source projects
 remain external pinned owners until deliberate Cargo/member migration.
 
-Use Bun 1.4.4 and native Bun APIs for JavaScript and TypeScript. Use the native
-quality commands directly: `bun check`, `bun lint`, `bun fmt` and `bun n2b`.
-Do not route these commands through subprocess backends, `bunx`, standalone
-OXC tools, `tsgo`/`tsc`, ESLint, Prettier or external n2b. Fix native Bun
+Use the upstream Bun canary `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`; `bun --revision`
+prints `1.4.4-canary.1+11c367163`) and Bun APIs for JavaScript and TypeScript. The
+`aphrody-labs/bun` fork is abandoned: do not call fork-only commands or APIs
+(`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`,
+`bun:nginx`, `Bun.Video`). Use the quality commands directly: `bun check`,
+`bun lint` and `bun fmt`. Do not route these commands through subprocess backends,
+`bunx`, standalone OXC tools, `tsgo`/`tsc`, ESLint or Prettier. Fix native Bun
 failures in place instead of adding a fallback. Use Rust's serialized wrapper
 for Cargo.
 Do not start WSL on the workstation. Resolve paths from this checkout or

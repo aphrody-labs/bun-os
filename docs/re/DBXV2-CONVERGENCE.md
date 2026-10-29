@@ -12,7 +12,7 @@ readers and the browser execution targets. It does not declare a completed game 
 | `packages/bun-gamestream` | Signalling, client and input protocol | Existing WebRTC sender reused |
 | `infra/config/host/apps/vps/gaming/stream` | Headless or authorized existing X11 capture | X11 mode preserves the host Steam store; audio initially disabled |
 | Shenron | Product pages, editorial records and data explorer | Links to the same Play target; no session or game bytes copied |
-| `bun:nginx` and host NGINX | Play frontend and private assets origin | Keep established authentication, range and private-origin boundaries |
+| `bun:nginx` (fork-only, not available on upstream Bun) and host NGINX | Play frontend and private assets origin | Keep established authentication, range and private-origin boundaries |
 
 ## Real-data gate
 

@@ -24,7 +24,7 @@ and each pinned source repository govern subsequent changes.
 | Content digests and shared asset identity                                                          | Bun OS `packages/bun-workspace/src/hash.ts` / `assets.ts`                                          | App payloads and shared R2 assets                                                     |
 | Child lifetime, cancellation, signals and captured output                                          | Bun OS `packages/bun-workspace/src/process.ts`                                                     | Cargo tools, native video transport, factories and standalone launchers               |
 | Video project, timeline and commands                                                               | Bun OS pinned FilmCraft Rust source                                                                | Typed Bun Video adapter; media codecs remain Bun runtime capabilities                 |
-| JavaScript runtime, native APIs and Bun.Video                                                      | Bun fork `aphrody-labs/bun`                                                                        | Bun OS factories and Aphrody product consumers                                        |
+| JavaScript runtime and native APIs (`Bun.Video` was fork-only)                                     | Upstream oven-sh/bun (fork abandoned)                                                              | Bun OS factories and Aphrody product consumers                                        |
 | Shared Rust primitives and native libraries                                                        | Their pinned Craft source owners                                                                   | Bun OS library engines                                                                |
 | Licensed font sources                                                                              | Pinned Craft font owner                                                                            | Bun OS shared asset manifest and native engines                                       |
 | App payload extraction and manifest verification                                                   | Bun OS `packages/bun-artifacts`                                                                    | Standalone Bun apps                                                                   |
@@ -82,10 +82,7 @@ pin M3 to `393d397037dace7a13eb2bee29e43a3a67d176f8`. The source lock includes
 the M3 themes gitlink in both complete source graphs. Native M3 builds remain
 routed through the Material checkout.
 
-The bundled `toolchains/bun` submodule remains at Bun revision
-`939c835adf6479bc1014da3843cda4ae29851dbd`, whose nested M3 pointer is older.
-That submodule has concurrent local M3 changes; keep its checkout intact until
-the Bun source owner can advance the submodule gitlink in a clean owner batch.
+The `toolchains/bun` fork submodule (Bun revision `939c835adf6479bc1014da3843cda4ae29851dbd`, with an older nested M3 pointer) was removed with the abandoned fork; the runtime is now upstream Bun.
 
 Bun OS Infra declares and actuates desired DNS, host, route and app lifecycle
 state. Cloudflare's live records/R2 and application health require direct

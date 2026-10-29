@@ -2,8 +2,12 @@
 
 Read AGENTS.md, GOAL.md, PLAN.md and MEMORY.md.
 
-This checkout owns distribution assembly. Runtime implementation changes
-belong to upstream oven-sh/bun (pinned in `package.json`, `sources.lock.json`); the Material
+This checkout owns distribution assembly. The runtime is the unmodified upstream Bun canary
+(npm `bun@1.4.4-canary.20261028.1`, gitHead `11c367163a4b`, pinned in `package.json` and
+`sources.lock.json`; `bun --revision` prints `1.4.4-canary.1+11c367163`); runtime
+changes belong to upstream oven-sh/bun. Bun OS is an Arch-inspired Linux
+distribution whose final goal is Bun integrated into the Linux kernel the way
+Rust was ([roadmap](docs/KERNEL-ROADMAP.md)). The Material
 framework and other imported projects retain their own source and license
 boundaries. README.md documents repository entry points. PLAN.md distinguishes
 declared/prepared inputs from build and qualification evidence.
@@ -17,6 +21,7 @@ declared/prepared inputs from build and qualification evidence.
   [distribution architecture](docs/architecture/arch-distribution.md).
 - Ubuntu compatibility factory: factory/ubuntu.ts and factory/ubuntu-profile.json.
 - Kernel/WSL/APT recipes: [native targets](docs/NATIVE-TARGETS.md).
+- Bun-in-kernel roadmap: [docs/KERNEL-ROADMAP.md](docs/KERNEL-ROADMAP.md).
 - Package/source conversion: src/apt.ts and packages/package-converter/.
 - Standalone compiler and assets: [app builds](docs/APP-BUILDS.md).
 - Public routing: [app domains](docs/APP-DOMAINS.md).
@@ -45,5 +50,6 @@ the VPS with the local MCP context, or delete protected .local/provider stores.
 ---
 
 Install the repository's declared Bun runtime, then run `bun run setup`.
-Invoke `bun check`, `bun lint`, `bun fmt` and `bun n2b` directly as documented
-in README.md. Native binaries require separate host qualification.
+Invoke the upstream `bun check`, `bun lint` and `bun fmt` as documented in
+README.md. Fork-only commands (`bun mcp`, `bun n2b`, `bun agent-plugin`,
+`bun wasm`) do not exist on upstream Bun. Native binaries require separate host qualification.

@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document describes moving heavy sources out of the abandoned `aphrody-labs/bun` fork (`toolchains/bun`). The Bun OS runtime is now the unmodified upstream `bun` npm package pinned at `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`, `bun --revision` prints `1.4.4-canary.1+11c367163`). Fork-only commands, APIs and modules named here (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`, `bun:nginx`, ...) are not available on upstream Bun. Read it as history, not as current instructions.
+
 # Runtime heavy-source migration
 
 Status, 2026-10-24: B0 and B1 executed; B2 dropped after inspection; B3 done 2026-10-25

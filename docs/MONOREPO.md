@@ -18,7 +18,7 @@ the pages that own the details. Generated data is not copied here: see
 | `packages/` | Bun and TypeScript packages, one direct child per member (Bun Engine in `packages/bun-engine`) |
 | `crates/` | Rust crates, one direct child per member, most of them flat Git submodules |
 | `vendor/` | External pinned owners and third-party sources (Bazzite, Omarchy, CachyOS, ChimeraOS, RetroArch, emulators); not Cargo members |
-| `toolchains/` | The pinned Bun runtime fork (`toolchains/bun`), excluded from the root Cargo workspace |
+| `toolchains/` | Legacy: held the abandoned Bun runtime fork (`toolchains/bun`, removed). The runtime is now unmodified upstream Bun, pinned by `packageManager` in `package.json` (`bun@1.4.4-canary.20261028.1`) |
 | `factory/` | OS composition: Arch package profile, `/usr` composition, container images (`factory/images/*`), qualification |
 | `infra/` | Routes, hosts, runtime pins, shared assets and deployment control |
 | `docs/` | Documentation; this page, [architecture](architecture.md), [builds](builds.md), [qualification](qualification.md) |
@@ -47,7 +47,6 @@ Native Bun commands only; never `bunx`, `tsc`, ESLint or Prettier:
 bun check          # type check (native)
 bun lint           # native lint
 bun fmt            # native format (use `bun run format:check` to only check)
-bun n2b            # Node-to-Bun rewrite
 bun src/cli.ts workspace check       # root invariants and the exceptions ledger
 bun scripts/cargo.ts metadata        # members-contract workspace report
 bun scripts/cargo.ts check           # serialized `cargo check --locked --workspace`
