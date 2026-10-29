@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "kind": "bunos-c-env",
   "observedAt": "2026-10-29",
-  "note": "Data for `buncc c`. Pins were read from the GitHub release API on observedAt (digests are the sha256 GitHub reports for each asset). Microsoft-licensed content is never fetched without --accept-ms-license or BUNOS_C_ACCEPT_MS_LICENSE=1.",
+  "note": "Data for `buncc c`. Pins were read from the GitHub release API on observedAt (digests are the sha256 GitHub reports for each asset). Microsoft-licensed content is fetched under the licence the owner accepted on 2026-10-29 (opt out: --decline-ms-license or BUNOS_C_ACCEPT_MS_LICENSE=0).",
   "llvm": { "version": "23.1.4", "tag": "llvmorg-23.1.4", "pin": "23.1.x" },
   "headerSources": {
     "ms-sdk": {

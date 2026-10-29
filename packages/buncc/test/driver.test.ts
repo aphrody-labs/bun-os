@@ -224,7 +224,7 @@ test("packaging: manifest, plan and guid", () => {
     "/o",
   ]);
   const msi = packagePlan("msi", app, "d", "o");
-  expect(msi.steps[0]).toMatchObject({ command: ["wix", "eula", "accept", "wix7"], needsApproval: true });
+  expect(msi.steps[0]).toMatchObject({ command: ["wix", "eula", "accept", "wix7"] });
   expect(stableGuid("a")).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   expect(stableGuid("a")).toBe(stableGuid("a"));
   expect(
@@ -306,10 +306,11 @@ test("--aot refuses a foreign --target before calling Bun, plain cross-compiles 
   expect(compileArgs({ entry: "a.ts", outfile: "x", target: "bun-linux-x64" }, "win32", "x64")).not.toContain("--aot");
 });
 
-test("xwin: no macOS asset, and no code path that accepts the Microsoft licence", async () => {
-  const { xwinRelease } = await import("../src/providers/xwin.ts");
+test("xwin: no macOS asset, 32-bit ARM is spelled aarch, triples follow", async () => {
+  const { xwinRelease, splatArgs, crossEnv } = await import("../src/providers/xwin.ts");
   expect(xwinRelease.asset("0.10.0", "darwin", "arm64")).toBeUndefined();
   expect(xwinRelease.asset("0.10.0", "darwin", "x64")).toBeUndefined();
   expect(xwinRelease.asset("0.10.0", "linux", "arm64")).toBe("xwin-0.10.0-aarch64-unknown-linux-musl.tar.gz");
-  expect(await import("../src/providers/xwin.ts")).not.toHaveProperty("splatArgs");
+  expect(splatArgs({ acceptLicense: true, arch: ["x86_64", "aarch"] }).join(" ")).toContain("--arch x86_64,aarch");
+  expect(Object.keys(crossEnv("/s", ["aarch"])).some(key => key.includes("THUMBV7A_PC_WINDOWS_MSVC"))).toBe(true);
 });

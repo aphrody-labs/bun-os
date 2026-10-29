@@ -211,7 +211,11 @@ export function packagePlan(format: PackageFormat, app: AppIdentity, directory: 
       format,
       requires: ["dotnet", "wix"],
       steps: [
-        { title: "WiX needs the OSMF EULA accepted by the owner", command: WIX_EULA_COMMAND, needsApproval: true },
+        {
+          title:
+            "accept the WiX OSMF EULA (owner accepted all licences in chat on 2026-10-29; https://github.com/wixtoolset/FireGiant/blob/main/OSMF-EULA.txt)",
+          command: WIX_EULA_COMMAND,
+        },
         { title: "build the msi with WixToolset.Sdk", command: ["dotnet", "build", "-c", "Release", "-o", outDir] },
       ],
     };

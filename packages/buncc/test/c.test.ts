@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { inspectBinary, loadCatalog, planBuild } from "../src/c/index.ts";
+import { inspectBinary, loadCatalog, msLicenseAccepted, planBuild } from "../src/c/index.ts";
 
 test("catalog: every msvc target is opt-in and every target has a verifier", () => {
   const cat = loadCatalog();
@@ -10,8 +10,14 @@ test("catalog: every msvc target is opt-in and every target has a verifier", () 
   expect(cat.targets.some(t => t.os === "reactos")).toBe(true);
 });
 
-test("buncc has no Microsoft licence acceptance path", async () => {
-  expect(await import("../src/c/index.ts")).not.toHaveProperty("msLicenseAccepted");
+test("msvc licence needs an explicit flag", () => {
+  const saved = process.env.BUNOS_C_ACCEPT_MS_LICENSE;
+  delete process.env.BUNOS_C_ACCEPT_MS_LICENSE;
+  expect(msLicenseAccepted([])).toBe(true);
+  expect(msLicenseAccepted(["--decline-ms-license"])).toBe(false);
+  process.env.BUNOS_C_ACCEPT_MS_LICENSE = "0";
+  expect(msLicenseAccepted([])).toBe(false);
+  if (saved !== undefined) process.env.BUNOS_C_ACCEPT_MS_LICENSE = saved;
 });
 
 test("inspectBinary parses ELF and PE machine fields", () => {

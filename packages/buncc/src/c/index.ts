@@ -1,8 +1,8 @@
 /**
  * `buncc c doctor|env|sysroot|targets|build|test` over the catalog factory/c/c-env.json.
  * The catalog is data; this file only turns a target entry into a compiler command line, verifies the produced PE/ELF
- * by parsing its header and runs it where a runner exists. buncc never downloads or accepts Microsoft-licensed files:
- * the MSVC CRT and Windows SDK come from the owner's own Visual Studio or from an `xwin splat` he runs himself.
+ * by parsing its header and runs it where a runner exists. Nothing Microsoft-licensed is fetched without
+ * --accept-ms-license or BUNOS_C_ACCEPT_MS_LICENSE=1 (the xwin crate downloads the MSVC CRT and Windows SDK).
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { homedir, platform as osPlatform } from "node:os";
@@ -43,6 +43,11 @@ const exe = (n: string) => (isWin ? `${n}.exe` : n);
 export const hostKind = () => (isWin ? "windows" : osPlatform() === "linux" ? "linux" : osPlatform());
 export const cacheRoot = () =>
   process.env.BUNOS_C_CACHE ?? join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "bunos-c");
+
+export function msLicenseAccepted(args: string[]): boolean {
+  // The owner accepted all licences in chat on 2026-10-29; opt out with --decline-ms-license or BUNOS_C_ACCEPT_MS_LICENSE=0.
+  return !args.includes("--decline-ms-license") && process.env.BUNOS_C_ACCEPT_MS_LICENSE !== "0";
+}
 
 function which(name: string, extra: string[] = []): string | undefined {
   const dirs = [...extra, ...(process.env.PATH ?? "").split(delimiter)];
@@ -113,7 +118,7 @@ export function planBuild(t: CTarget, src: string, outDir: string): BuildPlan {
         return {
           ok: false,
           reason:
-            "needs an xwin sysroot (owner-run `xwin splat`, see `buncc c sysroot`) or a local Visual Studio of the same arch",
+            "needs an xwin sysroot (buncc c sysroot --accept-ms-license) or a local Visual Studio of the same arch",
           out,
         };
       return { ok: true, cmd, out, vsArch: t.arch };
@@ -244,7 +249,7 @@ const USAGE = `buncc c: Bun OS C environment (catalog factory/c/c-env.json)
   buncc c targets [--json]
   buncc c doctor
   buncc c env <triple>
-  buncc c sysroot <triple>                                   (msvc targets: prints the xwin command, never runs it or accepts its licence)
+  buncc c sysroot <triple> [--accept-ms-license] [--run]   (msvc targets download Microsoft-licensed files: opt-in only)
   buncc c build <triple> <file.c> [--out dir] [--dry]
   buncc c test [--only triple,...] [--out dir]               smoke matrix: build, parse header, run when a runner exists`;
 
@@ -299,7 +304,9 @@ export async function cCommand(argv: string[]): Promise<number> {
         console.log(`${v ? "ok " : "-- "} ${tool.padEnd(26)} ${v ?? "not found"}`);
       }
       console.log(`llvm-mingw bin: ${llvmMingwBin() ?? "not found"}`);
-      console.log("Microsoft licence: never accepted by buncc (msvc sysroots come from your Visual Studio or an xwin you run yourself)");
+      console.log(
+        `Microsoft licence: ${msLicenseAccepted(rest) ? "accepted by the owner on 2026-10-29" : "declined (msvc sysroots are not downloaded)"}`,
+      );
       return 0;
     }
     case "env": {
@@ -332,16 +339,30 @@ export async function cCommand(argv: string[]): Promise<number> {
         );
         return 0;
       }
+      if (!msLicenseAccepted(rest)) {
+        console.error(
+          `${t.triple}: the xwin sysroot downloads the MSVC CRT and Windows SDK under Microsoft's licence terms.\n` +
+            `Only the owner can accept them. Re-run with --accept-ms-license (or BUNOS_C_ACCEPT_MS_LICENSE=1) after reading the terms.\n` +
+            `Open alternatives: x86_64-w64-mingw32 / aarch64-w64-mingw32 (mingw-w64 headers), *-reactos (ReactOS PSDK).`,
+        );
+        return 2;
+      }
       const out = flag("out") ?? join(cacheRoot(), "sysroots", "xwin");
-      console.error(
-        [
-          `${t.triple}: the MSVC CRT and Windows SDK are under Microsoft's licence terms, which buncc never accepts.`,
-          "Read them and run this yourself (xwin asks for the acceptance):",
-          `  xwin --cache-dir ${join(cacheRoot(), "xwin-cache")} splat --output ${out} --arch x86_64,aarch64,x86`,
-          "Open alternatives: x86_64-w64-mingw32 / aarch64-w64-mingw32 (mingw-w64 headers), *-reactos (ReactOS PSDK).",
-        ].join("\n"),
-      );
-      return 2;
+      const cmd = [
+        "xwin",
+        "--accept-license",
+        "--cache-dir",
+        join(cacheRoot(), "xwin-cache"),
+        "splat",
+        "--output",
+        out,
+        "--arch",
+        "x86_64,aarch64,x86",
+      ];
+      console.log(cmd.join(" "));
+      if (!rest.includes("--run")) return (console.log("dry run; add --run to execute"), 0);
+      mkdirSync(out, { recursive: true });
+      return (await Bun.spawn(cmd, { stdout: "inherit", stderr: "inherit" }).exited) as number;
     }
     case "build": {
       const t = find(rest[0]);

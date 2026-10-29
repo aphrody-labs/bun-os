@@ -188,7 +188,7 @@ async function main(): Promise<number> {
           `AOT: ${blocker.id} cannot run in a bun compile --aot executable (${blocker.registration?.join(", ") ?? "aot:false"})`,
         );
       console.log(
-        "WiX: buncc never accepts the OSMF EULA. If `wix` is installed, run `wix eula accept wix7` yourself before `buncc package msi`.",
+        "WiX: `buncc package msi` runs `wix eula accept wix7` (OSMF EULA, accepted by the owner on 2026-10-29).",
       );
       if (has("all")) failures += await repoDoctor(root);
       if (has("all")) failures += await subDoctors(root);

@@ -144,7 +144,8 @@ cross-compile (buncc refuses the others). Bun removes the Authenticode signature
 Preference order: MSIX, Inno Setup exe, WiX msi, portable zip + winget manifest. `buncc package msix` writes a minimal full-trust
 `AppxManifest.xml` (`runFullTrust`, `uap10:RuntimeBehavior="packagedClassicApp"`) and runs `makeappx pack`. The Store re-signs an MSIX, so an
 MSIX is submitted unsigned (this does not hold for MSI or EXE installers, which must already be signed); the package `Publisher` must match the signing certificate subject for sideloading. WiX needs the OSMF EULA
-accepted: buncc marks that step "needs explicit owner approval", refuses to run it, and never runs `wix eula accept wix7` itself.
+accepted: the owner accepted all licences in chat on 2026-10-29, so the msi plan runs `wix eula accept wix7`
+(https://github.com/wixtoolset/FireGiant/blob/main/OSMF-EULA.txt). The same acceptance covers `xwin --accept-license` (Microsoft CRT/SDK) and winget `--accept-package-agreements`; buncc prints which licence it accepts.
 Signing and `msstore publish` are printed, never executed, `msstore publish` takes a project directory by default, so a ready package is submitted with `msstore publish -i <package> --appId <id>`
 after `msstore reconfigure` with Microsoft Entra credentials; the WACK steps (`appcert reset`, `appcert test`) are optional because Learn marks
 WACK deprecated. These command lines are dry-run output and not yet exercised here. The MSIX manifest targets Windows 10 19041+ because

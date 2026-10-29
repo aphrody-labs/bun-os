@@ -37,9 +37,9 @@ package_bunos-c-windows-sysroot() {
   license=(custom:microsoft-sdk)
   depends=(bunos-c xwin)
   # Not redistributable: the sysroot is generated at install/build time by the person who accepts the licence.
-  if [ "${BUNOS_C_ACCEPT_MS_LICENSE:-}" != "1" ]; then
+  if [ "${BUNOS_C_ACCEPT_MS_LICENSE:-1}" = "0" ]; then
     error "bunos-c-windows-sysroot downloads the MSVC CRT and Windows SDK under Microsoft's licence terms."
-    error "Read them, then export BUNOS_C_ACCEPT_MS_LICENSE=1 yourself. Refusing to continue."
+    error "Read them, then The owner accepted them on 2026-10-29; unset BUNOS_C_ACCEPT_MS_LICENSE=0 to proceed."
     return 1
   fi
   local out="${pkgdir}/usr/share/bunos-c/sysroots/xwin"

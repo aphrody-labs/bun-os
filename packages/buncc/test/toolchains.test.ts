@@ -16,7 +16,7 @@ import { llvmBinCandidates } from "../src/providers/clang.ts";
 import { justRelease } from "../src/providers/just.ts";
 import { ninjaRelease } from "../src/providers/make.ts";
 import { uvRelease } from "../src/providers/uv.ts";
-import { xwinRelease } from "../src/providers/xwin.ts";
+import { crossEnv, isSplatComplete, splatArgs, xwinRelease } from "../src/providers/xwin.ts";
 import { binaryenRelease } from "../src/providers/wasm.ts";
 import {
   binaryCacheDir,
@@ -201,6 +201,31 @@ test("clang search order prefers the newest versioned LLVM directory", () => {
   expect(llvmBinCandidates("win32", { ProgramFiles: "C:\\PF" }, () => []).map(p => p.replaceAll("\\", "/"))).toContain(
     "C:/PF/LLVM/bin",
   );
+});
+
+test("xwin requires the licence flag and exports cargo cross variables", () => {
+  expect(() => splatArgs({ acceptLicense: false })).toThrow("acceptLicense");
+  const a = splatArgs({ acceptLicense: true, output: "/s", arch: ["x86_64"], sdkVersion: "10.0.26100" });
+  expect(a).toEqual(["--accept-license", "splat", "--output", "/s", "--arch", "x86_64", "--sdk-version", "10.0.26100"]);
+  const env = crossEnv("/s", ["x86_64", "aarch64"]);
+  expect(env.CC_x86_64_pc_windows_msvc).toBe("clang-cl");
+  expect(env.CARGO_TARGET_AARCH64_PC_WINDOWS_MSVC_LINKER).toBe("lld-link");
+  expect(env.CFLAGS_x86_64_pc_windows_msvc).toContain("--target=x86_64-pc-windows-msvc");
+  expect(env.CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS.replaceAll("\\", "/")).toContain(
+    "-Lnative=/s/sdk/lib/um/x86_64",
+  );
+  const root = mkdtempSync(join(tmpdir(), "buncc-xwin-"));
+  try {
+    expect(isSplatComplete(root)).toBe(false);
+    for (const d of ["crt/include", "sdk/include/um", "sdk/lib/um/x86_64", "crt/lib/x86_64"])
+      mkdirSync(join(root, d), { recursive: true });
+    writeFileSync(join(root, "crt/include/vcruntime.h"), "");
+    writeFileSync(join(root, "sdk/include/um/Windows.h"), "");
+    expect(isSplatComplete(root)).toBe(true);
+    expect(isSplatComplete(root, ["x86_64", "aarch64"])).toBe(false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test("vcpkg triplets, environment and install arguments", () => {

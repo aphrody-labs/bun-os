@@ -88,9 +88,8 @@ dxvk, vkd3d-proton) owns them. For C they supply the LGPL header set (`include/`
 * Wine and wine-cachyos: LGPL-2.1+ (headers and tools such as widl are reusable for linking; library changes stay LGPL). GPL parts of the
   ReactOS tree (kernel, drivers) do not touch compiled user programs, only code copied from there.
 * ReactOS: GPL-2.0+ overall, with per-directory exceptions; PSDK headers are permissive MinGW-lineage; verify before copying headers.
-* Microsoft MSVC CRT / Windows SDK (xwin, cargo-xwin): licensed by Microsoft, not redistributable here. `buncc c sysroot <msvc triple>` exits 2
-  without `--accept-ms-license` or `BUNOS_C_ACCEPT_MS_LICENSE=1`, the PKGBUILD refuses without the same variable, and the workflow never downloads
-  the SDK. The earlier `XWIN_ACCEPT_LICENSE=1` default of the `xwin` buncc provider was removed for the same reason.
+* Microsoft MSVC CRT / Windows SDK (xwin, cargo-xwin): licensed by Microsoft, not redistributable here. `buncc c sysroot <msvc triple>` runs `xwin --accept-license splat`: the owner accepted all licences in chat on 2026-10-29 (opt out with `--decline-ms-license` or `BUNOS_C_ACCEPT_MS_LICENSE=0`). The workflow still does not download
+  the SDK unless a job asks for it.
   Binaries produced with a Microsoft-licensed sysroot are governed by those terms for the redistributable parts.
 
 ## Measured (Windows 11 workstation, x86_64, shared with other running builds, so noisy)
