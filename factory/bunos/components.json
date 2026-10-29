@@ -42,11 +42,12 @@
     "/usr/lib/tmpfiles.d",
     "/usr/lib/environment.d",
     "/usr/lib/systemd/user",
+    "/usr/lib/systemd/system",
     "/usr/share/icons",
     "/usr/share/applications"
   ],
   "compositionPackages": {
-    "server": ["aphrody"],
+    "server": ["aphrody", "bun-os-server"],
     "desktop": ["aphrody", "bun-os-fonts", "material-design-icons-bunos", "bun-os-webapps"],
     "gaming": ["aphrody", "bun-os-fonts", "bun-engine"]
   },
@@ -448,6 +449,19 @@
       },
       "build": "bun run build per app; static dist served on 127.0.0.1 by bunos-webapp, one .desktop per app",
       "remainingApps": "IECODE web apps need a server or WASM launcher contract. Rose Griffon is maintained in aphrody-labs/rosegriffon and publishes its self-hosted binaries there."
+    },
+    {
+      "id": "bun-os-server",
+      "path": "packages/bun-app-host",
+      "size": "one compiled Bun binary (~150 MiB), no Cargo build",
+      "origin": "aphrody-labs/bun-distribution",
+      "kind": "binary",
+      "integration": {
+        "mode": "pacman-bunos",
+        "package": "bun-os-server",
+        "units": ["/usr/lib/systemd/system/bun-os-server.service"]
+      },
+      "build": "bun packages/bun-app-host/src/build.ts build (filtered frozen install of bun-app-host, bun-artifacts, bun-workspace)"
     },
     {
       "id": "bun-engine",
