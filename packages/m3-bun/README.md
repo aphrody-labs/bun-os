@@ -78,7 +78,7 @@ sample and one artifact (path, SHA-256, bytes) per output file, and the `Bun.bui
 are the inputs (virtual `m3:` modules included), the outputs and the external imports; its edges the imports, keyed by
 import kind, and `bundled-into` from an input to each output it contributed to. `m3-bun graph` prints the
 markdown report; `m3-bun graph src/main.ts` lists the modules that import the file, transitively, and the outputs it went
-into. Runtimes without `bun:graph` fail with an explicit error.
+into. 
 
 ## One process, UI and API
 

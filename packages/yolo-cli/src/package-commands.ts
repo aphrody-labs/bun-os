@@ -1,5 +1,5 @@
 /**
- * `yolo ops|workspace|optimize|update|google|doc-ai|browser|forge|m3`: the command lines of the Bun owner packages,
+ * `yolo ops|workspace|optimize|update|google|doc-ai|forge|m3`: the command lines of the Bun owner packages,
  * folded into yolo. Each command imports its owner's CLI module in-process and returns the runner's exit status;
  * the owners keep their code. Internal packages no longer publish a binary of their own; the npm-published m3
  * packages keep theirs for external consumers, and the repository calls them through `yolo m3 <tool>`.
@@ -109,11 +109,6 @@ export const PACKAGE_COMMANDS = {
     module: "packages/doc-ai/src/cli.ts",
     run: "main",
     summary: "Translate Markdown, generate Lit API guides, sync docs/",
-  },
-  browser: {
-    module: "toolchains/bun/packages/bun-web/src/cli.ts",
-    run: "runAgentBrowser",
-    summary: "One CDP browser command on the Bun browser endpoint, as a JSON line",
   },
   forge: {
     module: "packages/yolo-cli/src/cli/forge/main.ts",

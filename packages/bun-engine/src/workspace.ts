@@ -4,7 +4,7 @@ import { frontendRoutes } from "./frontend/api";
 import { consolePlugins, formatPlugins } from "./plugins";
 
 const root = join(import.meta.dir, "..", "..", "..");
-const cargo = join(root, "toolchains", "bun", "scripts", "build", "rust", "cargo-serial.ts");
+const cargo = join(root, "scripts", "aphrody", "build", "rust", "cargo-serial.ts");
 
 export const compileTargets = [
   "bun-linux-x64",

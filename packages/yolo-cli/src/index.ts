@@ -135,7 +135,6 @@ ${header}
   \x1b[32mupdate check|pins|tools|cargo|deps|systemd|sources|rust|bun|uv|upstream|run\x1b[0m Pins, dependencies, upstream sources
   \x1b[32mgoogle drive|fonts ...\x1b[0m Google Drive projection and Fonts proxy (Gemini runtime: aphrody google)
   \x1b[32mdoc-ai translate|generate|sync\x1b[0m Markdown translation and Lit component API guides
-  \x1b[32mbrowser open|snapshot|click|fill|eval|screenshot|... [--cdp URL]\x1b[0m One CDP browser command (Obscura)
   \x1b[32mforge doctor|bootstrap|build|watch|status|unit\x1b[0m Build the aphrody-labs/bun fork (toolchain, per-commit scratch, receipts)
   \x1b[32mm3 [dev|build|compile|desktop|tokens|check|new]\x1b[0m M3 framework CLI; \x1b[32mm3 next|bun|os-themes|next-migrate|svg-to-ico|web-to-tauri|scaffold ...\x1b[0m its package tools
   \x1b[32mverify [--only a,b] [--changed] [--parallel N] [--json|--md] [--list|--last]\x1b[0m Run the repository gates as a parallel graph; JSON or Markdown evidence in var/verify
@@ -466,7 +465,6 @@ async function main(): Promise<void> {
     case "update":
     case "google":
     case "doc-ai":
-    case "browser":
     case "forge":
     case "m3": {
       const { resolvePackageCommand, runPackageCommand } = await import("./package-commands");
