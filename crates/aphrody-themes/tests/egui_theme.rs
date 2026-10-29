@@ -54,5 +54,5 @@ fn apply_sets_the_context_theme() {
     let sel = Selection { theme: "fluent".into(), scheme: SchemeChoice::Dark, accent: "blue".into(), transparency: None };
     apply(&ctx, &sel, false, false);
     assert_eq!(ctx.theme(), egui::Theme::Dark);
-    assert_eq!(ctx.style().visuals.panel_fill, color(palette(ThemeId::Fluent, Scheme::Dark, "blue").unwrap().bg));
+    assert_eq!(ctx.style_of(egui::Theme::Dark).visuals.panel_fill, color(palette(ThemeId::Fluent, Scheme::Dark, "blue").unwrap().bg));
 }

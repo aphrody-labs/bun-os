@@ -102,6 +102,24 @@
   --t-text-label-small-emphasized-size: 11px;
   --t-text-label-small-emphasized-line: 16px;
   --t-text-label-small-emphasized-weight: 700;
+  --t-text-caption-size: 12px;
+  --t-text-caption-line: 16px;
+  --t-text-caption-weight: 400;
+  --t-text-body-size: 14px;
+  --t-text-body-line: 20px;
+  --t-text-body-weight: 400;
+  --t-text-body-strong-size: 14px;
+  --t-text-body-strong-line: 20px;
+  --t-text-body-strong-weight: 500;
+  --t-text-subtitle-size: 16px;
+  --t-text-subtitle-line: 24px;
+  --t-text-subtitle-weight: 500;
+  --t-text-title-size: 24px;
+  --t-text-title-line: 32px;
+  --t-text-title-weight: 400;
+  --t-text-display-size: 36px;
+  --t-text-display-line: 44px;
+  --t-text-display-weight: 400;
   --t-motion-fast: 150ms;
   --t-motion-normal: 300ms;
   --t-motion-slow: 500ms;
@@ -2617,6 +2635,21 @@
   --t-text-caption2-size: 11px;
   --t-text-caption2-line: 13px;
   --t-text-caption2-weight: 400;
+  --t-text-caption-size: 12px;
+  --t-text-caption-line: 16px;
+  --t-text-caption-weight: 400;
+  --t-text-body-strong-size: 17px;
+  --t-text-body-strong-line: 22px;
+  --t-text-body-strong-weight: 600;
+  --t-text-subtitle-size: 20px;
+  --t-text-subtitle-line: 25px;
+  --t-text-subtitle-weight: 400;
+  --t-text-title-size: 28px;
+  --t-text-title-line: 34px;
+  --t-text-title-weight: 400;
+  --t-text-display-size: 34px;
+  --t-text-display-line: 41px;
+  --t-text-display-weight: 400;
   --t-motion-fast: 150ms;
   --t-motion-normal: 250ms;
   --t-motion-slow: 400ms;
@@ -2661,6 +2694,21 @@
     --t-text-caption2-size: 10px;
     --t-text-caption2-line: 13px;
     --t-text-caption2-weight: 500;
+    --t-text-caption-size: 10px;
+    --t-text-caption-line: 13px;
+    --t-text-caption-weight: 400;
+    --t-text-body-strong-size: 13px;
+    --t-text-body-strong-line: 16px;
+    --t-text-body-strong-weight: 700;
+    --t-text-subtitle-size: 15px;
+    --t-text-subtitle-line: 20px;
+    --t-text-subtitle-weight: 400;
+    --t-text-title-size: 22px;
+    --t-text-title-line: 26px;
+    --t-text-title-weight: 400;
+    --t-text-display-size: 26px;
+    --t-text-display-line: 32px;
+    --t-text-display-weight: 400;
   }
   }
 [data-theme="apple"]:not([data-scheme="dark"]) {
@@ -2963,6 +3011,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
+  font-size: 0;
 }
 [data-theme="apple"] .t-window-controls > [data-role="close"] {
   background: #ff5f57;

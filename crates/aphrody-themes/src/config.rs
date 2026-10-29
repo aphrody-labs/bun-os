@@ -133,9 +133,10 @@ fn stamp(path: &Path) -> Option<(SystemTime, u64)> {
 pub fn watch(path: PathBuf, interval: Duration, mut on_change: impl FnMut(Selection) + Send + 'static) -> WatchHandle {
     let stop = Arc::new(AtomicBool::new(false));
     let flag = stop.clone();
+    // initial state is taken before the thread starts so a write right after `watch` returns is never missed
+    let mut last_stamp = stamp(&path);
+    let mut last = read(&path);
     thread::spawn(move || {
-        let mut last_stamp = stamp(&path);
-        let mut last = read(&path);
         while !flag.load(Ordering::Relaxed) {
             thread::sleep(interval);
             let now = stamp(&path);
