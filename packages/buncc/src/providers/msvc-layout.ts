@@ -33,13 +33,35 @@ export function programFilesX86(env: Record<string, string | undefined> = Bun.en
   return env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)";
 }
 
+/** vswhere ships with Visual Studio 2017+ at this fixed location (Microsoft Learn: tools-for-managing-visual-studio-instances). */
 export function vswherePath(env: Record<string, string | undefined> = Bun.env): string | undefined {
   const path = join(programFilesX86(env), "Microsoft Visual Studio", "Installer", "vswhere.exe");
-  return existsSync(path) ? path : undefined;
+  return existsSync(path) ? path : (Bun.which("vswhere") ?? undefined);
+}
+
+export const VC_TOOLS_COMPONENT = "Microsoft.VisualStudio.Component.VC.Tools.x86.x64";
+
+/** vswhere arguments that find the newest instance with the C++ x64 toolset, including prereleases on request. */
+export function vswhereArgs(prerelease = false): string[] {
+  const args = ["-latest", "-products", "*", "-requires", VC_TOOLS_COMPONENT, "-format", "json", "-utf8"];
+  if (prerelease) args.push("-prerelease");
+  return args;
+}
+
+/** The newest instance that has the C++ x64 toolset; the one vswhere query behind vcvarsall, cargo and the driver. */
+export async function findVisualStudio(
+  env: Record<string, string | undefined> = Bun.env,
+  prerelease = false,
+): Promise<VsInstance | null> {
+  const vswhere = vswherePath(env);
+  if (!vswhere) return null;
+  const result = await run([vswhere, ...vswhereArgs(prerelease)], { output: "capture", timeoutMs: 30_000 });
+  if (result.code !== 0) return null;
+  return parseVswhere(result.stdout)[0] ?? null;
 }
 
 export function parseVswhere(json: string): VsInstance[] {
-  const rows = JSON.parse(json) as {
+  let rows: {
     instanceId?: string;
     installationPath: string;
     installationVersion: string;
@@ -47,6 +69,13 @@ export function parseVswhere(json: string): VsInstance[] {
     productId?: string;
     isPrerelease?: boolean;
   }[];
+  try {
+    const value = JSON.parse(json) as unknown;
+    if (!Array.isArray(value)) return [];
+    rows = value.filter(r => typeof r?.installationPath === "string");
+  } catch {
+    return [];
+  }
   return rows.map(r => ({
     id: r.instanceId,
     path: r.installationPath,

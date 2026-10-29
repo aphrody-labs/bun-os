@@ -4,50 +4,10 @@ import { join } from "node:path";
 import { diffEnv, parseEnvDump, type Env } from "../env.ts";
 import { cacheDir } from "../lock.ts";
 import { run } from "../process.ts";
+import { findVisualStudio, VC_TOOLS_COMPONENT, type VsInstance } from "./msvc-layout.ts";
 import type { Context, Detection, InstallPlan, Provider } from "./types.ts";
 
-/** vswhere ships with Visual Studio 2017+ at this fixed location (Microsoft Learn: tools-for-managing-visual-studio-instances). */
-export function vswherePath(env: Env = Bun.env): string | null {
-  const root = env["ProgramFiles(x86)"] ?? env.ProgramFiles ?? "C:\\Program Files (x86)";
-  const fixed = join(root, "Microsoft Visual Studio", "Installer", "vswhere.exe");
-  if (existsSync(fixed)) return fixed;
-  return Bun.which("vswhere");
-}
-
-export const VC_TOOLS_COMPONENT = "Microsoft.VisualStudio.Component.VC.Tools.x86.x64";
-
-export interface VsInstance {
-  installationPath: string;
-  installationVersion: string;
-  displayName?: string;
-  productId?: string;
-  isPrerelease?: boolean;
-}
-
-/** vswhere arguments that find the newest instance with the C++ x64 toolset, including Build Tools and prereleases on request. */
-export function vswhereArgs(prerelease = false): string[] {
-  const args = ["-latest", "-products", "*", "-requires", VC_TOOLS_COMPONENT, "-format", "json", "-utf8"];
-  if (prerelease) args.push("-prerelease");
-  return args;
-}
-
-export function parseVswhere(json: string): VsInstance[] {
-  try {
-    const value = JSON.parse(json) as unknown;
-    if (!Array.isArray(value)) return [];
-    return value.filter((entry): entry is VsInstance => typeof entry?.installationPath === "string");
-  } catch {
-    return [];
-  }
-}
-
-export async function findVisualStudio(env: Env = Bun.env, prerelease = false): Promise<VsInstance | null> {
-  const vswhere = vswherePath(env);
-  if (!vswhere) return null;
-  const result = await run([vswhere, ...vswhereArgs(prerelease)], { output: "capture", timeoutMs: 30_000 });
-  if (result.code !== 0) return null;
-  return parseVswhere(result.stdout)[0] ?? null;
-}
+export { findVisualStudio };
 
 export type Arch = "x64" | "x86" | "arm64";
 
@@ -102,7 +62,7 @@ export async function captureVcvars(
   request: VcvarsRequest,
   base: Env = Bun.env,
 ): Promise<{ env: Record<string, string>; cached: boolean }> {
-  const vcvarsall = join(instance.installationPath, "VC", "Auxiliary", "Build", "vcvarsall.bat");
+  const vcvarsall = join(instance.path, "VC", "Auxiliary", "Build", "vcvarsall.bat");
   if (!existsSync(vcvarsall)) throw new Error(`vcvarsall.bat missing: ${vcvarsall}`);
   const key = vcvarsCacheKey(vcvarsall, statSync(vcvarsall).mtimeMs, request);
   const dir = join(cacheDir(), "vcvars");
@@ -124,7 +84,7 @@ export async function captureVcvars(
 }
 
 async function version(instance: VsInstance): Promise<string | undefined> {
-  const file = join(instance.installationPath, "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt");
+  const file = join(instance.path, "VC", "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt");
   try {
     return (await Bun.file(file).text()).trim();
   } catch {
@@ -147,9 +107,9 @@ export const msvc: Provider = {
       };
     return {
       found: true,
-      path: instance.installationPath,
+      path: instance.path,
       version: await version(instance),
-      notes: [instance.displayName ?? instance.productId ?? "Visual Studio"],
+      notes: [instance.displayName],
     };
   },
   install(): InstallPlan {

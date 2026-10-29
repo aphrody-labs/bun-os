@@ -8,7 +8,8 @@ import { decideWrapper } from "../src/sccache.ts";
 import { bundleArgs, canonicalTarget, compileArgs, parseTarget } from "../src/build/bun.ts";
 import { fourPartVersion, innoScript, msixManifest, packagePlan, stableGuid } from "../src/packaging/index.ts";
 import { glibcAtMost, maxGlibc, profiles } from "../src/profiles.ts";
-import { vcvarsArch, vcvarsArguments, vcvarsCacheKey, vswhereArgs, parseVswhere } from "../src/providers/msvc.ts";
+import { vcvarsArch, vcvarsArguments, vcvarsCacheKey } from "../src/providers/msvc.ts";
+import { vswhereArgs, parseVswhere } from "../src/providers/msvc-layout.ts";
 import { installPlanFor, WINGET_FLAGS } from "../src/providers/tools.ts";
 import { compareVersions } from "../src/providers/types.ts";
 import { parseToolchain } from "../src/providers/rust.ts";
@@ -164,7 +165,7 @@ test("vswhere and vcvars helpers", () => {
     "-utf8",
   ]);
   expect(vswhereArgs(true).at(-1)).toBe("-prerelease");
-  expect(parseVswhere('[{"installationPath":"C:\\\\VS","installationVersion":"18.1"}]')[0]?.installationPath).toBe(
+  expect(parseVswhere('[{"installationPath":"C:\\\\VS","installationVersion":"18.1"}]')[0]?.path).toBe(
     "C:\\VS",
   );
   expect(parseVswhere("garbage")).toEqual([]);

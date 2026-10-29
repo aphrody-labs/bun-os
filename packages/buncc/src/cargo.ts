@@ -60,7 +60,7 @@ export async function prepareEnv(
       const captured = await captureVcvars(instance, { arch: "x64" }, env);
       env = overlayEnv(env, captured.env);
       notes.push(
-        `MSVC from ${instance.displayName ?? instance.installationPath} (${captured.cached ? "cached" : "captured"})`,
+        `MSVC from ${instance.displayName || instance.path} (${captured.cached ? "cached" : "captured"})`,
       );
     } else notes.push("no Visual Studio C++ toolset found; using whatever link.exe is on PATH");
   }
