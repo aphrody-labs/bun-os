@@ -18,6 +18,7 @@
   "workspaces": [
     "apps/artcraft-web-app",
     "apps/desktop",
+    "apps/lu",
     "apps/iecode-web",
     "apps/m3-next-example",
     "apps/m3-next-tauri-example",

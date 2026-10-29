@@ -1,0 +1,1756 @@
+[
+  {
+    "model": "open-video",
+    "options": {
+      "duration": 5,
+      "preset": "tuned",
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.2
+  },
+  {
+    "model": "open-video",
+    "options": {
+      "duration": 5,
+      "preset": "tuned",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.1
+  },
+  {
+    "model": "open-video",
+    "options": {
+      "duration": 5,
+      "preset": "tuned",
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.3
+  },
+  {
+    "model": "open-video",
+    "options": {
+      "duration": 20,
+      "preset": "tuned",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.4
+  },
+  {
+    "model": "open-video",
+    "options": {
+      "duration": 3,
+      "preset": "tuned",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.06
+  },
+  {
+    "model": "open-video",
+    "options": {
+      "duration": 5,
+      "preset": "original",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.1
+  },
+  {
+    "model": "open-video-lora",
+    "options": {
+      "duration": 5,
+      "preset": "tuned",
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.25
+  },
+  {
+    "model": "open-video-lora",
+    "options": {
+      "duration": 5,
+      "preset": "tuned",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.15
+  },
+  {
+    "model": "open-video-lora",
+    "options": {
+      "duration": 5,
+      "preset": "tuned",
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.35
+  },
+  {
+    "model": "open-video-lora",
+    "options": {
+      "duration": 20,
+      "preset": "tuned",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.6
+  },
+  {
+    "model": "open-video-lora",
+    "options": {
+      "duration": 5,
+      "preset": "original",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.15
+  },
+  {
+    "model": "open-video-lora",
+    "options": {
+      "duration": 3,
+      "preset": "tuned",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.09
+  },
+  {
+    "model": "mmaudio-v2",
+    "options": {
+      "duration": 5,
+      "guidance_scale": 4.5,
+      "mask_away_clip": false,
+      "num_inference_steps": 25
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.005
+  },
+  {
+    "model": "mmaudio-v2",
+    "options": {
+      "duration": 30,
+      "guidance_scale": 4.5,
+      "mask_away_clip": false,
+      "num_inference_steps": 25
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.03
+  },
+  {
+    "model": "mmaudio-v2",
+    "options": {
+      "duration": 1,
+      "guidance_scale": 4.5,
+      "mask_away_clip": false,
+      "num_inference_steps": 25
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.001
+  },
+  {
+    "model": "mmaudio-v2",
+    "options": {
+      "duration": 5,
+      "guidance_scale": 4.5,
+      "mask_away_clip": false,
+      "num_inference_steps": 50
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.005
+  },
+  {
+    "model": "mmaudio-v2",
+    "options": {
+      "duration": 5,
+      "guidance_scale": 0,
+      "mask_away_clip": false,
+      "num_inference_steps": 25
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.005
+  },
+  {
+    "model": "mmaudio-v2",
+    "options": {
+      "duration": 5,
+      "guidance_scale": 4.5,
+      "mask_away_clip": false,
+      "num_inference_steps": 4
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.005
+  },
+  {
+    "model": "mmaudio-v2",
+    "options": {
+      "duration": 5,
+      "guidance_scale": 20,
+      "mask_away_clip": false,
+      "num_inference_steps": 25
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.005
+  },
+  {
+    "model": "hunyuan-video-foley",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.05
+  },
+  {
+    "model": "mmaudio-v2",
+    "options": {
+      "duration": 5,
+      "guidance_scale": 4.5,
+      "mask_away_clip": true,
+      "num_inference_steps": 25
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.005
+  },
+  {
+    "model": "infinitetalk",
+    "options": {
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.09
+  },
+  {
+    "model": "infinitetalk-multi",
+    "options": {
+      "order": "meanwhile",
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.09
+  },
+  {
+    "model": "infinitetalk",
+    "options": {
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.18
+  },
+  {
+    "model": "infinitetalk-multi",
+    "options": {
+      "order": "right_left",
+      "resolution": "480p"
+    },
+    "seconds": 6,
+    "promptLength": 100,
+    "usd": 0.18
+  },
+  {
+    "model": "infinitetalk-multi",
+    "options": {
+      "order": "meanwhile",
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.18
+  },
+  {
+    "model": "infinitetalk-multi",
+    "options": {
+      "order": "left_right",
+      "resolution": "480p"
+    },
+    "seconds": 6,
+    "promptLength": 100,
+    "usd": 0.18
+  },
+  {
+    "model": "minimax-h3-edit",
+    "options": {
+      "output_format": "jpeg",
+      "resolution": "2k"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.09
+  },
+  {
+    "model": "minimax-h3-edit",
+    "options": {
+      "output_format": "jpeg",
+      "resolution": "1k"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.03
+  },
+  {
+    "model": "qwen-image-angles",
+    "options": {
+      "distance": 1,
+      "horizontal_angle": 0,
+      "output_format": "jpeg",
+      "vertical_angle": 0
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.025
+  },
+  {
+    "model": "scail-2",
+    "options": {
+      "mode": "animate",
+      "resolution": "480p"
+    },
+    "seconds": 6,
+    "promptLength": 100,
+    "usd": 0.24
+  },
+  {
+    "model": "scail-2",
+    "options": {
+      "mode": "replace",
+      "resolution": "480p"
+    },
+    "seconds": 6,
+    "promptLength": 100,
+    "usd": 0.24
+  },
+  {
+    "model": "scail-2",
+    "options": {
+      "mode": "animate",
+      "resolution": "720p"
+    },
+    "seconds": 6,
+    "promptLength": 100,
+    "usd": 0.48
+  },
+  {
+    "model": "wan-ditto",
+    "options": {
+      "resolution": "720p"
+    },
+    "seconds": 6,
+    "promptLength": 100,
+    "usd": 0.48
+  },
+  {
+    "model": "seedance-2.5",
+    "options": {
+      "duration": 5,
+      "generate_audio": true,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.9
+  },
+  {
+    "model": "wan-ditto",
+    "options": {
+      "resolution": "480p"
+    },
+    "seconds": 6,
+    "promptLength": 100,
+    "usd": 0.24
+  },
+  {
+    "model": "seedance-2.5",
+    "options": {
+      "duration": 5,
+      "generate_audio": true,
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1.8
+  },
+  {
+    "model": "seedance-2.5",
+    "options": {
+      "duration": 5,
+      "generate_audio": true,
+      "resolution": "4k"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 9
+  },
+  {
+    "model": "seedance-2.5",
+    "options": {
+      "duration": 5,
+      "generate_audio": true,
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 4.5
+  },
+  {
+    "model": "seedance-2.5",
+    "options": {
+      "duration": 30,
+      "generate_audio": true,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 5.4
+  },
+  {
+    "model": "seedance-2.5",
+    "options": {
+      "duration": 5,
+      "generate_audio": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.9
+  },
+  {
+    "model": "seedance-2.5",
+    "options": {
+      "duration": 4,
+      "generate_audio": true,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.72
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 5,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.2
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 5,
+      "resolution": "768p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.4
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 5,
+      "resolution": "540p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.3
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 3,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.12
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 5,
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.8
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 4,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.16
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 7,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.28
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 6,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.24
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 8,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.32
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 10,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.4
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 11,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.44
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 9,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.36
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 12,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.48
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 14,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.56
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 13,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.52
+  },
+  {
+    "model": "wan-3.0",
+    "options": {
+      "duration": 5,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.25
+  },
+  {
+    "model": "wan-3.0",
+    "options": {
+      "duration": 5,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.5
+  },
+  {
+    "model": "minimax-h3",
+    "options": {
+      "duration": 15,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.6
+  },
+  {
+    "model": "wan-3.0",
+    "options": {
+      "duration": 5,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1
+  },
+  {
+    "model": "wan-3.0",
+    "options": {
+      "duration": 30,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1.5
+  },
+  {
+    "model": "wan-3.0",
+    "options": {
+      "duration": 2,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.1
+  },
+  {
+    "model": "wan-3.0-spicy",
+    "options": {
+      "duration": 5,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.25
+  },
+  {
+    "model": "wan-3.0-spicy",
+    "options": {
+      "duration": 5,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.5
+  },
+  {
+    "model": "wan-3.0",
+    "options": {
+      "duration": 5,
+      "enable_audio": false,
+      "enable_prompt_expansion": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.25
+  },
+  {
+    "model": "wan-3.0-spicy",
+    "options": {
+      "duration": 5,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1
+  },
+  {
+    "model": "wan-3.0-spicy",
+    "options": {
+      "duration": 30,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1.5
+  },
+  {
+    "model": "wan-3.0-spicy",
+    "options": {
+      "duration": 2,
+      "enable_audio": true,
+      "enable_prompt_expansion": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.1
+  },
+  {
+    "model": "wan-3.0-spicy",
+    "options": {
+      "duration": 5,
+      "enable_audio": false,
+      "enable_prompt_expansion": false,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.25
+  },
+  {
+    "model": "preset-wan-2.2-spicy",
+    "options": {
+      "resolution": "480p",
+      "duration": 5
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.15
+  },
+  {
+    "model": "preset-wan-2.2-spicy",
+    "options": {
+      "resolution": "480p",
+      "duration": 8
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.24
+  },
+  {
+    "model": "preset-wan-2.2-spicy",
+    "options": {
+      "resolution": "720p",
+      "duration": 5
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.3
+  },
+  {
+    "model": "preset-wan-2.2-spicy",
+    "options": {
+      "resolution": "720p",
+      "duration": 8
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.48
+  },
+  {
+    "model": "preset-wan-2.2-spicy-extend",
+    "options": {
+      "resolution": "480p",
+      "duration": 5
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.15
+  },
+  {
+    "model": "preset-wan-2.2-spicy-extend",
+    "options": {
+      "resolution": "480p",
+      "duration": 8
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.24
+  },
+  {
+    "model": "preset-wan-2.2-spicy-extend",
+    "options": {
+      "resolution": "720p",
+      "duration": 5
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.3
+  },
+  {
+    "model": "preset-wan-2.2-spicy-extend",
+    "options": {
+      "resolution": "720p",
+      "duration": 8
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.48
+  },
+  {
+    "model": "preset-wan-2.7-spicy",
+    "options": {
+      "resolution": "720p",
+      "duration": 5
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.5
+  },
+  {
+    "model": "preset-wan-2.7-spicy",
+    "options": {
+      "resolution": "720p",
+      "duration": 10
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1
+  },
+  {
+    "model": "preset-wan-2.7-spicy",
+    "options": {
+      "resolution": "720p",
+      "duration": 15
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1.5
+  },
+  {
+    "model": "preset-wan-2.7-spicy",
+    "options": {
+      "resolution": "1080p",
+      "duration": 5
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.75
+  },
+  {
+    "model": "preset-wan-2.7-spicy",
+    "options": {
+      "resolution": "1080p",
+      "duration": 10
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1.5
+  },
+  {
+    "model": "preset-wan-2.7-spicy",
+    "options": {
+      "resolution": "1080p",
+      "duration": 15
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 2.25
+  },
+  {
+    "model": "preset-chroma",
+    "options": {
+      "size": "512*512"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.015
+  },
+  {
+    "model": "preset-prefect-pony",
+    "options": {
+      "size": "512*512"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.015
+  },
+  {
+    "model": "preset-neta-lumina",
+    "options": {
+      "size": "512*512"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "preset-chroma",
+    "options": {
+      "size": "1024*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.015
+  },
+  {
+    "model": "preset-prefect-pony",
+    "options": {
+      "size": "1024*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.015
+  },
+  {
+    "model": "preset-neta-lumina",
+    "options": {
+      "size": "1024*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "preset-chroma",
+    "options": {
+      "size": "1536*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.015
+  },
+  {
+    "model": "preset-prefect-pony",
+    "options": {
+      "size": "1536*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.015
+  },
+  {
+    "model": "preset-neta-lumina",
+    "options": {
+      "size": "1536*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "preset-chroma",
+    "options": {
+      "size": "2048*2048"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.015
+  },
+  {
+    "model": "preset-prefect-pony",
+    "options": {
+      "size": "2048*2048"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.015
+  },
+  {
+    "model": "preset-neta-lumina",
+    "options": {
+      "size": "2048*2048"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 10,
+    "usd": 0.005
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.005
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 1000,
+    "usd": 0.05
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 4000,
+    "usd": 0.2
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 1,
+    "usd": 0.005
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 99,
+    "usd": 0.005
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 101,
+    "usd": 0.00505
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 150,
+    "usd": 0.0075
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 199,
+    "usd": 0.00995
+  },
+  {
+    "model": "preset-qwen3-tts",
+    "options": {
+      "voice": "Serena",
+      "language": "auto"
+    },
+    "seconds": 3,
+    "promptLength": 201,
+    "usd": 0.01005
+  },
+  {
+    "model": "seed-speech-tts",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 1000,
+    "usd": 0.06
+  },
+  {
+    "model": "minimax-speech-hd",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 1000,
+    "usd": 0.1
+  },
+  {
+    "model": "minimax-speech-turbo",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 1000,
+    "usd": 0.06
+  },
+  {
+    "model": "eleven-v3",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 1000,
+    "usd": 0.2
+  },
+  {
+    "model": "inworld-tts",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 1000,
+    "usd": 0.05
+  },
+  {
+    "model": "chatterbox-tts",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 1000,
+    "usd": 0.03
+  },
+  {
+    "model": "minimax-music",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.15
+  },
+  {
+    "model": "mureka-song",
+    "options": {},
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.225
+  },
+  {
+    "model": "eleven-music",
+    "options": {
+      "music_length_ms": 59000
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.75
+  },
+  {
+    "model": "eleven-music",
+    "options": {
+      "music_length_ms": 60000
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.75
+  },
+  {
+    "model": "eleven-music",
+    "options": {
+      "music_length_ms": 61000
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1.5
+  },
+  {
+    "model": "eleven-music",
+    "options": {
+      "music_length_ms": 180000
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 2.25
+  },
+  {
+    "model": "eleven-music",
+    "options": {
+      "music_length_ms": 600000
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 7.5
+  },
+  {
+    "model": "wan-3.0-prime",
+    "options": {
+      "duration": 5,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.375
+  },
+  {
+    "model": "wan-3.0-prime",
+    "options": {
+      "duration": 5,
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.75
+  },
+  {
+    "model": "wan-3.0-prime",
+    "options": {
+      "duration": 10,
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 3.0
+  },
+  {
+    "model": "wan-3.0-prime-spicy",
+    "options": {
+      "duration": 5,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.375
+  },
+  {
+    "model": "wan-3.0-prime-spicy",
+    "options": {
+      "duration": 5,
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.75
+  },
+  {
+    "model": "wan-3.0-prime-spicy",
+    "options": {
+      "duration": 10,
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 3.0
+  },
+  {
+    "model": "seedance-2.5-turbo",
+    "options": {
+      "duration": 5,
+      "resolution": "720p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 1.0
+  },
+  {
+    "model": "seedance-2.5-turbo",
+    "options": {
+      "duration": 10,
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 2.2
+  },
+  {
+    "model": "seedance-2.5-avatar",
+    "options": {
+      "resolution": "480p"
+    },
+    "seconds": 2.936875,
+    "promptLength": 100,
+    "usd": 0.88
+  },
+  {
+    "model": "seedance-2.5-avatar",
+    "options": {
+      "resolution": "720p"
+    },
+    "seconds": 11.096875,
+    "promptLength": 100,
+    "usd": 5.28
+  },
+  {
+    "model": "longcat-avatar",
+    "options": {
+      "resolution": "480p"
+    },
+    "seconds": 2.936875,
+    "promptLength": 100,
+    "usd": 0.12
+  },
+  {
+    "model": "longcat-avatar",
+    "options": {
+      "resolution": "720p"
+    },
+    "seconds": 11.096875,
+    "promptLength": 100,
+    "usd": 0.96
+  },
+  {
+    "model": "longcat-avatar-multi",
+    "options": {
+      "resolution": "480p"
+    },
+    "seconds": 2.936875,
+    "promptLength": 100,
+    "usd": 0.12
+  },
+  {
+    "model": "lipsync-3-avatar",
+    "options": {},
+    "seconds": 11.096875,
+    "promptLength": 100,
+    "usd": 1.62
+  },
+  {
+    "model": "heygen-twin",
+    "options": {
+      "resolution": "4k"
+    },
+    "seconds": 11.096875,
+    "promptLength": 100,
+    "usd": 1.44
+  },
+  {
+    "model": "wan-2.2-animate-2",
+    "options": {
+      "resolution": "480p"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.16
+  },
+  {
+    "model": "wan-2.2-animate-2",
+    "options": {
+      "resolution": "720p"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.32
+  },
+  {
+    "model": "wan-3.0-extend",
+    "options": {
+      "duration": 5,
+      "resolution": "480p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.25
+  },
+  {
+    "model": "wan-3.0-extend",
+    "options": {
+      "duration": 10,
+      "resolution": "1080p"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 2.0
+  },
+  {
+    "model": "seedance-2.5-extend",
+    "options": {
+      "duration": 5,
+      "resolution": "480p"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.99
+  },
+  {
+    "model": "seedance-2.5-extend",
+    "options": {
+      "duration": 10,
+      "resolution": "4k"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 15.4
+  },
+  {
+    "model": "seedream-5-edit",
+    "options": {
+      "resolution": "1k"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.045
+  },
+  {
+    "model": "seedream-5-edit",
+    "options": {
+      "resolution": "2k"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.09
+  },
+  {
+    "model": "qwen-image-3-edit",
+    "options": {
+      "resolution": "1k"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.033
+  },
+  {
+    "model": "flashvsr",
+    "options": {
+      "target_resolution": "720p"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.048
+  },
+  {
+    "model": "flashvsr",
+    "options": {
+      "target_resolution": "1080p"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.072
+  },
+  {
+    "model": "flashvsr",
+    "options": {
+      "target_resolution": "4k"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.128
+  },
+  {
+    "model": "video-upscaler-pro",
+    "options": {
+      "target_resolution": "1080p"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.16
+  },
+  {
+    "model": "video-upscaler-pro",
+    "options": {
+      "target_resolution": "4k"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.28
+  },
+  {
+    "model": "ultimate-video-upscaler",
+    "options": {
+      "target_resolution": "1080p"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.12
+  },
+  {
+    "model": "ultimate-video-upscaler",
+    "options": {
+      "target_resolution": "4k"
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.32
+  },
+  {
+    "model": "crystal-upscaler",
+    "options": {
+      "target_megapixels": 2
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 0.8
+  },
+  {
+    "model": "crystal-upscaler",
+    "options": {
+      "target_megapixels": 33
+    },
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 13.2
+  },
+  {
+    "model": "flux-3-upscale",
+    "options": {},
+    "seconds": 3.041667,
+    "promptLength": 100,
+    "usd": 3.16
+  },
+  {
+    "model": "z-image",
+    "options": {
+      "size": "1024*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "z-image",
+    "options": {
+      "size": "1024*576"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "z-image",
+    "options": {
+      "size": "1920*1080"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "z-image",
+    "options": {
+      "size": "2048*2048"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "z-image",
+    "options": {
+      "size": "832*1216"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "jib-mix-qwen",
+    "options": {
+      "size": "1024*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.02
+  },
+  {
+    "model": "jib-mix-qwen",
+    "options": {
+      "size": "1024*576"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.02
+  },
+  {
+    "model": "jib-mix-qwen",
+    "options": {
+      "size": "1920*1080"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.02
+  },
+  {
+    "model": "jib-mix-qwen",
+    "options": {
+      "size": "2048*2048"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.02
+  },
+  {
+    "model": "jib-mix-qwen",
+    "options": {
+      "size": "832*1216"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.02
+  },
+  {
+    "model": "wan-2.2-realism",
+    "options": {
+      "size": "1024*1024"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.025
+  },
+  {
+    "model": "wan-2.2-realism",
+    "options": {
+      "size": "1024*576"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.025
+  },
+  {
+    "model": "wan-2.2-realism",
+    "options": {
+      "size": "1920*1080"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.025
+  },
+  {
+    "model": "wan-2.2-realism",
+    "options": {
+      "size": "2048*2048"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.025
+  },
+  {
+    "model": "wan-2.2-realism",
+    "options": {
+      "size": "832*1216"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.025
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "1:1"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "16:9"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "9:16"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "4:3"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "3:4"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "3:2"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "2:3"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "16:9"
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "16:9",
+      "num_inference_steps": 10
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "16:9",
+      "num_inference_steps": 50
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  },
+  {
+    "model": "nucleus-image",
+    "options": {
+      "aspect_ratio": "16:9",
+      "num_inference_steps": 100
+    },
+    "seconds": 3,
+    "promptLength": 100,
+    "usd": 0.01
+  }
+]
