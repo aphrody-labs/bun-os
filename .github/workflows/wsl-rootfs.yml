@@ -18,6 +18,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: wsl-rootfs-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   rootfs:
     runs-on: ubuntu-latest
