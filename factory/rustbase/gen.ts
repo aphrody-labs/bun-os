@@ -8,7 +8,6 @@
  */
 import { join } from "node:path";
 import { getJson, ghToken } from "./http.ts";
-import { getJson, ghToken } from "./http.ts";
 
 const dir = import.meta.dir;
 const checkOnly = process.argv.includes("--check");
