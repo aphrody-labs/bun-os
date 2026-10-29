@@ -2328,3 +2328,9 @@ md-linear-progress[hidden] {
   gap: 3px;
   align-items: center;
 }
+
+.calc-in {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}

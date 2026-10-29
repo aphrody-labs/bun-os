@@ -246,6 +246,8 @@ await cp(
   join(wasmDir, "aphrody_webos_wasm_bg.wasm"),
   join(dist, "wasm/aphrody_webos_wasm_bg.wasm"),
 );
+// fend (MIT): the Calculator engine, instantiated by apps/calculator via apps/fend.ts.
+await cp(join(root, "node_modules/fend-wasm/fend_wasm_bg.wasm"), join(dist, "wasm/fend_wasm_bg.wasm"));
 await cp(join(root, "LICENSE-APACHE"), join(dist, "wasm/LICENSE-APACHE"));
 // @aphrody/m3-fonts: Google Sans Flex / Code, Roboto Flex / Mono (Settings > Font) and the full Material Symbols
 // Rounded font (catalog apps name any icon, so not the default subset of fonts-symbols.css).
