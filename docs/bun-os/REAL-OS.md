@@ -15,7 +15,7 @@ built and booted on the VPS, and what is missing. Evidence is a repository path 
   rejected); `factory/images/build.ts` is the working entry.
 - VPS (`ssh vps`): no `bunos-gaming` image, no rootfs tar, nothing under `bun-os-usr` except a package cache.
   The only Arch rootfs is `bunos-omarchy:imported-rootfs` (official Try-Omarchy 4.0.4 guest rootfs: 678 packages,
-  Hyprland 0.56.2, uwsm, NetworkManager, quickshell, Arch kernel 7.2.9, no initramfs, no gamescope, no Bun).
+  Hyprland 0.56.2 (upstream current: v0.57.0, 2026-10-28), uwsm, NetworkManager, quickshell, Arch kernel 7.2.9, no initramfs, no gamescope, no Bun).
 - Host tools: qemu 11.0.3, mkfs.btrfs/ext4/vfat, sfdisk, docker. Missing: OVMF (taken from the `edk2-ovmf` pacman
   package inside a container), guestfish, genimage, systemd-repart, mtools and bootctl (both used from the
   container image). `/dev/kvm` is `root:kvm 0660` and the `ubuntu` user is not in `kvm`, so QEMU runs with TCG.
@@ -32,7 +32,7 @@ only the plumbing exists; `missing` = no implementation (an upstream catalog ent
 | 3 | Optimised kernel `linux-cachyos` | CachyOS, Bazzite (own kernel) | partial | `bootable.packages` is now the kernel list the disk image installs: `linux-cachyos` 7.3.0-3 (v3 build) replaces Arch `linux`; see "Absorbed image". The verity `/usr` factory keeps `kernelSelection` `blocked` (no qualified receipt) |
 | 4 | sched-ext (scx), BORE | CachyOS | partial | `scx-scheds` + `scx-tools` installed, `scx_loader.service` enabled, `/etc/scx_loader/config.toml` selects `scx_lavd`; see "Absorbed image" for whether it ran |
 | 5 | x86-64-v3/v4 package builds | CachyOS | partial | v3 repositories enabled in the disk image (kernel, inputplumber, mangohud, snapper, ... come from `cachyos-*-v3`); v4/znver4 not selected; the image needs an AVX2 CPU |
-| 6 | Hyprland desktop | Omarchy | have | Hyprland 0.56.2, uwsm, quickshell in the image; session file `bunos-desktop.desktop` |
+| 6 | Hyprland desktop | Omarchy | have | Hyprland 0.56.2 in the image (upstream current v0.57.0, 2026-10-28; Arch extra 0.57.0-1), uwsm, quickshell in the image; session file `bunos-desktop.desktop` |
 | 7 | Omarchy defaults, menus, themes | Omarchy | partial | `/usr/share/omarchy` (444 `bin` scripts incl. `omarchy-menu*`, 21 themes) present; per-user config seeded by first boot; Omarchy installer migrations and `limine-snapper` not wired |
 | 8 | gamescope session without a display manager, return to desktop | Bazzite, ChimeraOS | partial | `factory/bunos/pkgbuilds/bun-engine/bunos-gamescope-session`; `bunos-session.service` + `bunos-session switch desktop|gaming` in `factory/images/bunos-disk/` (this change) |
 | 9 | Bun Engine library as the session client | Steam Big Picture equivalent | partial | `packages/bun-engine/src/frontend/cli.ts`; bundled with Bun in the image, served on loopback; needs a Chromium kiosk window under gamescope |
