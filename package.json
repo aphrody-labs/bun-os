@@ -89,6 +89,7 @@
     "packages/m3-tokens",
     "packages/m3",
     "packages/material-design-icons",
+    "packages/media",
     "packages/menu-render-webgpu",
     "packages/menu-render",
     "packages/nie-ui",

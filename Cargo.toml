@@ -367,6 +367,7 @@ members = [
     "crates/lightcraft-tiff",
     "crates/lightcraft-ui-egui",
     "crates/lightcraft-xtask",
+    "crates/media-core",
     "crates/midjourney_client",
     "crates/openai_sora_client",
     "crates/pdfcraft-a11y",

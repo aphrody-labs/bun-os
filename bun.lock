@@ -1286,6 +1286,10 @@
         "react-dom": "catalog:",
       },
     },
+    "packages/media": {
+      "name": "@aphrody/media",
+      "version": "1.4.7",
+    },
     "packages/menu-render-webgpu": {
       "name": "@rosegriffon/menu-render-webgpu",
       "version": "1.4.7",
@@ -2400,6 +2404,7 @@
 
     "@aphrody/next-bun": ["@aphrody/next-bun@0.2.0-aphrody.2", "", { "peerDependencies": { "next": ">=16.0.0" }, "optionalPeers": ["next"], "bin": { "next-bun": "bin/next-bun.js" } }, "sha512-tHToclWyXzjJFlhyhHcruu20SOy/J5fuDhN+IZvFWFy1OEICPGb0iZHr3/1nBW0eId/mdaTdGXxF867g2MmYxg=="],
 
+    "@aphrody/media": ["@aphrody/media@workspace:packages/media"],
     "@aphrody/nie-ui": ["@aphrody/nie-ui@workspace:packages/nie-ui"],
 
     "@aphrody/nie-web": ["@aphrody/nie-web@workspace:packages/nie-web"],

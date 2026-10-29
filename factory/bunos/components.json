@@ -4777,6 +4777,19 @@
       "status": "present"
     },
     {
+      "id": "npm:@aphrody/media",
+      "kind": "npm-package",
+      "path": "packages/media",
+      "source": {
+        "type": "workspace",
+        "name": "@aphrody/media",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "npm:@aphrody/m3",
       "kind": "npm-package",
       "path": "packages/m3",
@@ -12357,6 +12370,19 @@
       "registration": [
         "none"
       ],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/media-core",
+      "kind": "crate",
+      "path": "crates/media-core",
+      "source": {
+        "type": "path-crate",
+        "name": "media-core",
+        "version": "0.1.0"
+      },
+      "registration": ["none"],
       "aot": true,
       "status": "present"
     },
