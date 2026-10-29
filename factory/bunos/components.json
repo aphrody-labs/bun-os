@@ -19788,6 +19788,25 @@
       "status": "present"
     },
     {
+      "id": "factory:desktop/recipes",
+      "kind": "factory-module",
+      "path": "factory/desktop",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/desktop/recipes.json",
+          "packages/buncc/src/desktop/index.ts",
+          "packages/buncc/src/desktop/build.ts",
+          "packages/buncc/src/desktop/recipes.ts"
+        ]
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["npm:@aphrody/buncc"],
+      "note": "buncc desktop: pinned recipes and ordered graph for GTK4/libadwaita, Qt6, KDE Frameworks on Windows (MSVC/clang-cl, Meson/CMake, shared prefix); docs/BUNCC-DESKTOP.md"
+    },
+    {
       "id": "factory:distro/migrate",
       "kind": "factory-module",
       "path": "factory/distro",

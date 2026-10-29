@@ -21,6 +21,7 @@ import { getProfile, profiles } from "./profiles.ts";
 import { applicable, getProvider, makeContext } from "./providers/index.ts";
 import { run } from "./process.ts";
 import { cargoArgs, type CargoAction } from "./tasks.ts";
+import { desktopCommand } from "./desktop/index.ts";
 import { posixCommand, wineCommand } from "./posix-cli.ts";
 import { ensureManaged, isManaged } from "./providers/ensure.ts";
 import { shMain } from "./sh.ts";
@@ -35,6 +36,7 @@ Build:        bundle <entry...> [--minify] [--splitting] | compile <entry> --out
 Package:      package <msix|appx|msi|exe|zip> --dir d --out o --name N --publisher P ... | sign ... | store <package>
 Profiles:     profile list|show|apply <id> [--run] | bench aot-bun <entry>
 Linux desktop: linux closure|pins|sysroot|cross|build|container|hello <gnome-shell|mutter|gtk4|libadwaita|kwin|plasma-workspace|qtbase|...>   (buncc linux help)
+Desktop:      desktop doctor|plan|fetch|build|env|pack|bench   GTK4/libadwaita, Qt6, KDE Frameworks on Windows (docs/BUNCC-DESKTOP.md)
 POSIX:        sh [-c script | file]       Bun Shell (cross-platform); env posix --ensure adds pinned uutils/busybox/ripgrep shims
               install posix|mingw|msys2|wine|proton [--run] | posix doctor|smoke|uninstall <msys2|mingw|gnuwin32|cygwin|all> [--yes]
 Wine:         wine run <exe> [args] | wine prefix <name> [--dxvk --vkd3d] | wine doctor   (Linux and macOS hosts)
@@ -192,6 +194,8 @@ async function main(): Promise<number> {
     }
     case "sh":
       return shMain(rest);
+    case "desktop":
+      return desktopCommand(rest, root);
     case "posix":
       return posixCommand(rest, root);
     case "wine":
