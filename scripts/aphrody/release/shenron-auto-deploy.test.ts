@@ -12,9 +12,9 @@ test("a runtime-only change builds a distinct deployment without changing the Sh
     deploymentIdentity: "source-runtime-v1",
     runtimeSha256: "b".repeat(64),
     runtimeExpected: {
-      version: "1.4.5",
+      version: "1.4.4",
       revision: "c".repeat(40),
-      sourceUrl: "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64.zip",
+      sourceUrl: "https://github.com/oven-sh/bun/releases/download/canary/bun-linux-x64.zip",
     },
   };
   const expected = deploymentSelection(commit, config);

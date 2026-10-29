@@ -236,7 +236,7 @@ class CdnStageTests(unittest.TestCase):
             "deploymentIdentity": "source-runtime-v1",
             "runtimeSha256": "b" * 64,
             "runtimeExpected": {
-                "version": "1.4.5",
+                "version": "1.4.4",
                 "revision": "c" * 40,
                 "sourceUrl": "https://github.com/oven-sh/bun/releases/download/fixture/bun.zip",
             },

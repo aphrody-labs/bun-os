@@ -100,8 +100,8 @@ class ContainerDeploymentTests(unittest.TestCase):
     def test_runtime_release_suffix_preserves_the_real_source_revision(self):
         release = self.release("a")
         manifest = self.releases[-1][1]
-        runtime = {"sha256": "b" * 64, "version": "1.4.5", "revision": "c" * 40,
-                   "sourceUrl": "https://github.com/oven-sh/bun/releases/download/bun-v1.4.5/bun-linux-x64-full.zip"}
+        runtime = {"sha256": "b" * 64, "version": "1.4.4", "revision": "c" * 40,
+                   "sourceUrl": "https://github.com/oven-sh/bun/releases/download/canary/bun-linux-x64.zip"}
         fields = ["shenron-source-runtime/v1", manifest["commit"], *runtime.values()]
         identity = hashlib.sha256("\n".join(fields).encode()).hexdigest()
         manifest["deployment"] = {"schema": fields[0], "id": identity, "commit": manifest["commit"], "runtime": runtime}

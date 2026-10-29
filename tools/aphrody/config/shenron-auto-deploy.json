@@ -17,10 +17,10 @@
     "ffiSha256": "707c3d8b0ff76878e802a3c10c6b109bdbc084cfffb0211e837c6f9150309b79",
     "reSha256": "ea93a17103ae641203a7f8ddd3a0560d71ae64dff0080db1831d9272e326244f"
   },
-  "runtimeSha256": "890af6a675e1dc58b15a15777c53de3b2e82668690c9be5f6e87ec690246ac0e",
+  "runtimeSha256": "64f4147bf08b36daecd198f7610f04faf230a747d646bcc6f4e098f86c39e6a5",
   "runtimeExpected": {
     "version": "1.4.4",
     "revision": "11c367163a4baa77d3627d14764c376c856a630a",
-    "sourceUrl": "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64.zip"
+    "sourceUrl": "https://github.com/oven-sh/bun/releases/download/canary/bun-linux-x64.zip"
   }
 }
