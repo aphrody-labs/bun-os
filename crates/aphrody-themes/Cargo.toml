@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aphrody-themes"
+version = "1.4.7"
+edition = "2024"
+rust-version = "1.97"
+authors = ["aphrody-code"]
+repository = "https://github.com/aphrody-labs/bun-os"
+license = "Apache-2.0"
+description = "Bun OS themes (Material 3 Google Book OS, Windows 11 Fluent, Apple Liquid Glass) generated from packages/themes: palettes, shapes, type, egui Visuals, Tauri window effects and the shared theme selection file"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = "warn"
+
+[features]
+default = []
+# egui Visuals and Style per theme (replaces the per-app themes of the craft apps).
+egui = ["dep:egui"]
+
+[dependencies]
+egui = { workspace = true, optional = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+egui = { workspace = true, features = ["default_fonts"] }
+egui_kittest = { workspace = true, features = ["wgpu", "snapshot"] }
+image = { workspace = true, features = ["png"] }
+
+[[example]]
+name = "gallery"
+required-features = ["egui"]
+
+[[test]]
+name = "egui_theme"
+required-features = ["egui"]

@@ -1,0 +1,215 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`generated outputs css snapshot: apple dark default block and accent override 1`] = `
+"[data-theme="apple"][data-scheme="dark"] {
+  --t-bg: #000000;
+  --t-bg-alt: #1C1C1E;
+  --t-surface: #2C2C2E;
+  --t-surface-raised: #3A3A3C;
+  --t-layer: #1C1C1E;
+  --t-fg: #FFFFFF;
+  --t-fg-muted: #EBEBF599;
+  --t-fg-subtle: #EBEBF54D;
+  --t-fg-disabled: #EBEBF529;
+  --t-border: #54545899;
+  --t-border-strong: #38383A;
+  --t-divider: #54545899;
+  --t-control: #7878805C;
+  --t-control-hover: #78788052;
+  --t-control-pressed: #78788070;
+  --t-accent: #0091FF;
+  --t-accent-hover: #1A9CFF;
+  --t-accent-pressed: #33A7FF;
+  --t-on-accent: #FFFFFF;
+  --t-accent-container: #001729;
+  --t-on-accent-container: #FFFFFF;
+  --t-danger: #FF4245;
+  --t-on-danger: #FFFFFF;
+  --t-warning: #FF9230;
+  --t-success: #30D158;
+  --t-focus: #0091FF99;
+  --t-selection: #0091FF4D;
+  --t-scrim: #00000066;
+  --t-shadow: #00000066;
+  --t-glass-tint: #1C1C1E;
+  --t-glass-border: #FFFFFF2E;
+  --t-glass-highlight: #FFFFFF47;
+  --t-glass-opacity: 0.5;
+  color-scheme: dark;
+}
+"
+`;
+
+exports[`generated outputs css snapshot: apple dark default block and accent override 2`] = `
+"[data-theme="fluent"]:not([data-scheme="dark"])[data-accent="orange"] {
+  --t-accent: #B24300;
+  --t-accent-hover: #B24300E6;
+  --t-accent-pressed: #B24300CC;
+  --t-accent-container: #E6D0C2;
+  --t-selection: #F7630C66;
+  --colorBrandForegroundLink: #762A00;
+  --colorBrandForeground1: #762A00;
+  --colorBrandForeground2: #762A00;
+  --colorBrandBackground: #B24300;
+  --colorBrandBackgroundHover: #B24300E6;
+  --colorBrandBackgroundPressed: #B24300CC;
+  --colorBrandBackgroundSelected: #B24300CC;
+  --colorCompoundBrandBackground: #B24300;
+  --colorBrandStroke1: #B24300;
+  --colorCompoundBrandStroke: #B24300;
+}
+"
+`;
+
+exports[`generated outputs css snapshot: apple dark default block and accent override 3`] = `
+"[data-theme="m3"] {
+  --t-radius-none: 0px;
+  --t-radius-sm: 8px;
+  --t-radius-md: 12px;
+  --t-radius-lg: 16px;
+  --t-radius-xl: 28px;
+  --t-radius-full: 9999px;
+  --t-radius-control: 9999px;
+  --t-radius-container: 28px;
+  --t-font-ui: "Google Sans Flex", "Google Sans", "Roboto Flex", Roboto, system-ui, sans-serif;
+  --t-font-display: "Google Sans Flex", "Google Sans", "Roboto Flex", Roboto, system-ui, sans-serif;
+  --t-font-mono: "Google Sans Code", "Roboto Mono", ui-monospace, monospace;
+  --t-text-display-large-size: 57px;
+  --t-text-display-large-line: 64px;
+  --t-text-display-large-weight: 400;
+  --t-text-display-medium-size: 45px;
+  --t-text-display-medium-line: 52px;
+  --t-text-display-medium-weight: 400;
+  --t-text-display-small-size: 36px;
+  --t-text-display-small-line: 44px;
+  --t-text-display-small-weight: 400;
+  --t-text-headline-large-size: 32px;
+  --t-text-headline-large-line: 40px;
+  --t-text-headline-large-weight: 400;
+  --t-text-headline-medium-size: 28px;
+  --t-text-headline-medium-line: 36px;
+  --t-text-headline-medium-weight: 400;
+  --t-text-headline-small-size: 24px;
+  --t-text-headline-small-line: 32px;
+  --t-text-headline-small-weight: 400;
+  --t-text-title-large-size: 22px;
+  --t-text-title-large-line: 28px;
+  --t-text-title-large-weight: 400;
+  --t-text-title-medium-size: 16px;
+  --t-text-title-medium-line: 24px;
+  --t-text-title-medium-weight: 500;
+  --t-text-title-small-size: 14px;
+  --t-text-title-small-line: 20px;
+  --t-text-title-small-weight: 500;
+  --t-text-body-large-size: 16px;
+  --t-text-body-large-line: 24px;
+  --t-text-body-large-weight: 400;
+  --t-text-body-medium-size: 14px;
+  --t-text-body-medium-line: 20px;
+  --t-text-body-medium-weight: 400;
+  --t-text-body-small-size: 12px;
+  --t-text-body-small-line: 16px;
+  --t-text-body-small-weight: 400;
+  --t-text-label-large-size: 14px;
+  --t-text-label-large-line: 20px;
+  --t-text-label-large-weight: 500;
+  --t-text-label-medium-size: 12px;
+  --t-text-label-medium-line: 16px;
+  --t-text-label-medium-weight: 500;
+  --t-text-label-small-size: 11px;
+  --t-text-label-small-line: 16px;
+  --t-text-label-small-weight: 500;
+  --t-text-display-large-emphasized-size: 57px;
+  --t-text-display-large-emphasized-line: 64px;
+  --t-text-display-large-emphasized-weight: 500;
+  --t-text-display-medium-emphasized-size: 45px;
+  --t-text-display-medium-emphasized-line: 52px;
+  --t-text-display-medium-emphasized-weight: 500;
+  --t-text-display-small-emphasized-size: 36px;
+  --t-text-display-small-emphasized-line: 44px;
+  --t-text-display-small-emphasized-weight: 500;
+  --t-text-headline-large-emphasized-size: 32px;
+  --t-text-headline-large-emphasized-line: 40px;
+  --t-text-headline-large-emphasized-weight: 500;
+  --t-text-headline-medium-emphasized-size: 28px;
+  --t-text-headline-medium-emphasized-line: 36px;
+  --t-text-headline-medium-emphasized-weight: 500;
+  --t-text-headline-small-emphasized-size: 24px;
+  --t-text-headline-small-emphasized-line: 32px;
+  --t-text-headline-small-emphasized-weight: 500;
+  --t-text-title-large-emphasized-size: 22px;
+  --t-text-title-large-emphasized-line: 28px;
+  --t-text-title-large-emphasized-weight: 500;
+  --t-text-title-medium-emphasized-size: 16px;
+  --t-text-title-medium-emphasized-line: 24px;
+  --t-text-title-medium-emphasized-weight: 700;
+  --t-text-title-small-emphasized-size: 14px;
+  --t-text-title-small-emphasized-line: 20px;
+  --t-text-title-small-emphasized-weight: 700;
+  --t-text-body-large-emphasized-size: 16px;
+  --t-text-body-large-emphasized-line: 24px;
+  --t-text-body-large-emphasized-weight: 500;
+  --t-text-body-medium-emphasized-size: 14px;
+  --t-text-body-medium-emphasized-line: 20px;
+  --t-text-body-medium-emphasized-weight: 500;
+  --t-text-body-small-emphasized-size: 12px;
+  --t-text-body-small-emphasized-line: 16px;
+  --t-text-body-small-emphasized-weight: 500;
+  --t-text-label-large-emphasized-size: 14px;
+  --t-text-label-large-emphasized-line: 20px;
+  --t-text-label-large-emphasized-weight: 700;
+  --t-text-label-medium-emphasized-size: 12px;
+  --t-text-label-medium-emphasized-line: 16px;
+  --t-text-label-medium-emphasized-weight: 700;
+  --t-text-label-small-emphasized-size: 11px;
+  --t-text-label-small-emphasized-line: 16px;
+  --t-text-label-small-emphasized-weight: 700;
+  --t-motion-fast: 150ms;
+  --t-motion-normal: 300ms;
+  --t-motion-slow: 500ms;
+  --t-motion-easing: cubic-bezier(0.2, 0, 0, 1);
+  --t-glass-blur: 0px;
+  --t-glass-saturate: 100%;
+  --t-glass-bg: color-mix(in srgb, var(--t-glass-tint) calc(var(--t-glass-opacity) * 100%), transparent);
+  color-scheme: light dark;
+}
+"
+`;
+
+exports[`generated outputs rust snapshot: one palette 1`] = `
+"static FLUENT_DARK_BLUE: Palette = Palette {
+    bg: Rgba::new(32, 32, 32, 255),
+    bg_alt: Rgba::new(28, 28, 28, 255),
+    surface: Rgba::new(40, 40, 40, 255),
+    surface_raised: Rgba::new(44, 44, 44, 255),
+    layer: Rgba::new(58, 58, 58, 76),
+    fg: Rgba::new(255, 255, 255, 255),
+    fg_muted: Rgba::new(255, 255, 255, 197),
+    fg_subtle: Rgba::new(255, 255, 255, 135),
+    fg_disabled: Rgba::new(255, 255, 255, 93),
+    border: Rgba::new(255, 255, 255, 18),
+    border_strong: Rgba::new(255, 255, 255, 139),
+    divider: Rgba::new(255, 255, 255, 21),
+    control: Rgba::new(255, 255, 255, 15),
+    control_hover: Rgba::new(255, 255, 255, 21),
+    control_pressed: Rgba::new(255, 255, 255, 8),
+    accent: Rgba::new(76, 194, 255, 255),
+    accent_hover: Rgba::new(76, 194, 255, 230),
+    accent_pressed: Rgba::new(76, 194, 255, 204),
+    on_accent: Rgba::new(0, 0, 0, 255),
+    accent_container: Rgba::new(41, 64, 77, 255),
+    on_accent_container: Rgba::new(255, 255, 255, 255),
+    danger: Rgba::new(255, 153, 164, 255),
+    on_danger: Rgba::new(0, 0, 0, 255),
+    warning: Rgba::new(252, 225, 0, 255),
+    success: Rgba::new(108, 203, 95, 255),
+    focus: Rgba::new(255, 255, 255, 255),
+    selection: Rgba::new(0, 120, 212, 102),
+    scrim: Rgba::new(0, 0, 0, 102),
+    shadow: Rgba::new(0, 0, 0, 71),
+    glass_tint: Rgba::new(28, 28, 28, 255),
+    glass: Rgba::new(28, 28, 28, 179),
+    glass_border: Rgba::new(255, 255, 255, 18),
+    glass_highlight: Rgba::new(255, 255, 255, 0),
+};"
+`;

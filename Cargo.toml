@@ -121,6 +121,7 @@ members = [
   "crates/yolo-runtime",
   "crates/aphrody-m3",
   "crates/aphrody-m3-tokens",
+  "crates/aphrody-themes",
   "crates/libm3",
   "crates/libm3-wasm",
     "crates/craft-atomic",
@@ -818,6 +819,7 @@ craft-cms = { path = "crates/craft-cms", version = "1.4.7" }
 craft-print = { path = "crates/craft-print", version = "1.4.7" }
 craft-quit = { path = "crates/craft-quit", version = "1.4.7" }
 craft-ui = { path = "crates/craft-ui", version = "1.4.7" }
+aphrody-themes = { path = "crates/aphrody-themes", version = "1.4.7" }
 pdfcraft-compare = { path = "crates/pdfcraft-compare", version = "1.4.7" }
 cadcraft-color = { path = "crates/cadcraft-color", version = "1.4.7" }
 cadcraft-geom = { path = "crates/cadcraft-geom", version = "1.4.7" }

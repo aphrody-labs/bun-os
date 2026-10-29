@@ -537,6 +537,7 @@
         "crates/artcraft-tauri-plugin-http": "guest bindings of the excluded crate of the same name",
         "docs/material": "reference copy of upstream material sources used by the docs",
         "packages/fluent": "own scratch dependencies (@fluentui/*) installed by src/deps.ts outside the repository; not in the root bun.lock",
+        "packages/themes": "own dev dependencies (@material/material-color-utilities, happy-dom) installed in the package; not in the root bun.lock so concurrent lockfile changes cannot conflict",
         "packages/microsoft": "no dependencies; kept out of the root bun.lock so concurrent lockfile changes cannot conflict",
         "packages/wasmos": "own dev dependencies (playwright-core, browser_wasi_shim) installed by its flow; not in the root bun.lock so concurrent lockfile changes cannot conflict",
         "packages/bun-tauri": "Tauri fork JS tooling and CLI templates, built by the Tauri fork flow",
@@ -3077,6 +3078,32 @@
       "status": "present",
       "dependsOn": ["npm:@aphrody/windows"],
       "note": "Fluent 2 for the Windows track and the craft apps (docs/MICROSOFT.md): tokens (JSON, TOML, CSS, XAML) generated from @fluentui/react-theme, a WinUI 3 app on Windows App SDK 2.6.4 launched from Bun, a @fluentui/web-components shell. The Bun OS desktop design system stays Material 3."
+    },
+    {
+      "id": "factory:themes",
+      "kind": "factory-module",
+      "path": "packages/themes",
+      "source": {
+        "type": "factory",
+        "files": [
+          "packages/themes/package.json",
+          "packages/themes/src/build.ts",
+          "packages/themes/src/resolve.ts",
+          "packages/themes/src/emit.ts",
+          "packages/themes/src/runtime.ts",
+          "packages/themes/src/verify-sources.ts",
+          "packages/themes/tokens/m3-googlebook.tokens.json",
+          "packages/themes/tokens/fluent-win11.tokens.json",
+          "packages/themes/tokens/apple-glass.tokens.json",
+          "packages/themes/test/themes.test.ts",
+          "docs/THEMES.md"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["factory:fluent", "npm:@aphrody/m3-tokens", "crate:crates/aphrody-themes"],
+      "note": "@aphrody/themes: single source of truth for the Material 3 (Google Book OS), Windows 11 Fluent and Apple Liquid Glass themes (docs/THEMES.md). W3C design tokens in, CSS variables, Tailwind v4 theme, TS data, Rust consts, Tauri window effects out. Own scratch dependencies, not in the root bun.lock."
     },
     {
       "id": "factory:microsoft",
@@ -6158,6 +6185,19 @@
       "source": {
         "type": "path-crate",
         "name": "aphrody-m3-tokens",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
+      "id": "crate:crates/aphrody-themes",
+      "kind": "crate",
+      "path": "crates/aphrody-themes",
+      "source": {
+        "type": "path-crate",
+        "name": "aphrody-themes",
         "version": "1.4.7"
       },
       "registration": ["none"],

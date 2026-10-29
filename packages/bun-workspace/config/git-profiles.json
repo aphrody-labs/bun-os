@@ -132,6 +132,22 @@
         "vendor/microsoft"
       ],
       "submodules": []
+    },
+    "themes": {
+      "description": "Themes track: @aphrody/themes and aphrody-themes (Material 3, Windows 11 Fluent, Apple Liquid Glass), the M3 token owners, Fluent tokens, craft-ui and the webos shell.",
+      "paths": [
+        "docs",
+        "packages/themes",
+        "packages/fluent",
+        "packages/m3-tokens",
+        "packages/m3-fonts",
+        "packages/m3-tailwind",
+        "crates/aphrody-themes",
+        "crates/aphrody-m3-tokens",
+        "crates/craft-ui",
+        "apps/webos"
+      ],
+      "submodules": []
     }
   }
 }
