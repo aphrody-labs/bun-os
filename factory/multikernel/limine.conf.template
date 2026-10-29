@@ -1,0 +1,15 @@
+# Secondary route: UEFI, single FAT32 ESP partition. Limine config syntax (CONFIG.md).
+timeout: 3
+serial: yes
+verbose: yes
+
+/Bun OS (linux-bun 7.3)
+    protocol: linux
+    path: boot():/vmlinuz-linux-bun
+    cmdline: @CMDLINE@
+    module_path: boot():/initramfs-linux-bun.img
+
+# ReactOS under UEFI: FreeLoader UEFI port, experimental (unverified). Present only when freeldr.efi exists.
+/ReactOS (FreeLoader UEFI, experimental)
+    protocol: efi
+    path: boot():/reactos-boot/freeldr.efi

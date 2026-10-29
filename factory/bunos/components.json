@@ -829,6 +829,24 @@
       "consumedBy": ["bun"]
     },
     {
+      "id": "submodule:vendor/reactos",
+      "kind": "submodule",
+      "path": "vendor/reactos",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/reactos.git",
+        "pin": "e46f4bb1a1ea7c722f941231565144fe0c286d3e"
+      },
+      "registration": [
+        "bun-spawn"
+      ],
+      "aot": true,
+      "status": "present",
+      "consumedBy": [
+        "bun"
+      ]
+    },
+    {
       "id": "submodule:vendor/bun-video",
       "kind": "submodule",
       "path": "vendor/bun-video",

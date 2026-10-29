@@ -883,3 +883,9 @@
 	path = vendor/microsoft/CsWinRT
 	url = https://github.com/microsoft/CsWinRT.git
 	shallow = true
+[submodule "vendor/reactos"]
+	path = vendor/reactos
+	url = https://github.com/aphrody-labs/reactos.git
+	branch = master
+	shallow = true
+	update = none
