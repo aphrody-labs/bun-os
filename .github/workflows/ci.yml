@@ -124,10 +124,12 @@ jobs:
       - name: OpenSSL for the native crates
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
+        # Run outside the checkout: vcpkg switches to manifest mode when it finds a vcpkg.json in the working directory.
+        working-directory: ${{ runner.temp }}
         run: |
           vcpkg install openssl:x64-windows-static-md
-          "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
-          "VCPKGRS_TRIPLET=x64-windows-static-md" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "OPENSSL_DIR=$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows-static-md" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "OPENSSL_STATIC=1" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
       # bun-os-shell embeds the pinned Material Symbols font (packages/m3-fonts/fonts/upstream is git-ignored and fetched here).
       - name: Pinned font sources
         if: ${{ steps.setup.outcome == 'success' }}
