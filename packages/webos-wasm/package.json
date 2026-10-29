@@ -29,7 +29,9 @@
     "typecheck": "bun check --noEmit",
     "test": "bun test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@bjorn3/browser_wasi_shim": "0.4.2"
+  },
   "devDependencies": {
     "@types/bun": "catalog:"
   },

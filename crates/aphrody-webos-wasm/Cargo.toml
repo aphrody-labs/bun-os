@@ -19,7 +19,6 @@ aphrody-google    = { workspace = true }
 aphrody-patch     = { workspace = true }
 aphrody-rag-core  = { workspace = true }
 aphrody-re        = { workspace = true }
-aphrody-shell-session = { workspace = true }
 aphrody-shell-vfs = { workspace = true }
 aphrody-shell-web = { workspace = true }
 serde_json        = { workspace = true }

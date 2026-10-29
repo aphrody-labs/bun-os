@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
-// Typed facade over crates/aphrody-webos-wasm: the Rust file system, explorer backend and terminal of the
-// browser OS, persisted in OPFS. No logic of the OS lives here; this module loads the module, restores
+// Typed facade over crates/aphrody-webos-wasm: the Rust file system and explorer backend of the browser OS, persisted
+// in OPFS (the terminal is a real Alpine guest, see guest.ts). No logic of the OS lives here; this module loads the module, restores
 // and saves the APFS1 image atomically, and exposes the wire transport the explorer client expects.
-import init, { WebOsFs, detectLanguage, version, type InitInput } from "#webos-wasm-glue";
+import init, { WebOsFs, WebTerminal, detectLanguage, version, type InitInput } from "#webos-wasm-glue";
+import { GuestSession, type GuestOptions } from "./guest.ts";
 
 export type { WebOsFs } from "#webos-wasm-glue";
+export { GuestSession, type GuestOptions, type GuestState, type RioVt, type Snapshot } from "./guest.ts";
 export type WasmInput = InitInput;
 
 /** Where the file system image lives between page loads. */
@@ -113,22 +115,6 @@ export async function defaultImageStore(): Promise<ImageStore> {
   return slotImageStore(await storage.getDirectory());
 }
 
-export interface Snapshot {
-  columns: number;
-  rows: number;
-  lines: string[];
-  cursor: { row: number; col: number; visible: boolean };
-}
-
-/** A shell and its screen, working on the same files as the explorer. */
-export interface Terminal {
-  /** Type text or bytes; returns the new screen. */
-  type(data: string | Uint8Array): Snapshot;
-  snapshot(): Snapshot;
-  resize(cols: number, rows: number): void;
-  readonly exited: boolean;
-}
-
 /** Request envelope of the explorer wire protocol (`Query`/`Action`) or the string "Ping". */
 export type WireRequest = unknown;
 
@@ -154,7 +140,6 @@ export interface WebOs {
   /** Answer one explorer wire request from the Rust backend. */
   rpc(request: WireRequest): Promise<unknown>;
   transport(): ExplorerTransport;
-  terminal(cols?: number, rows?: number): Terminal;
   detectLanguage(text: string): LanguageDetection;
   /** Wait until every change reached the store. */
   flush(): Promise<void>;
@@ -231,23 +216,18 @@ export async function openWebOs(options: OpenOptions = {}): Promise<WebOs> {
     version: version(),
     rpc,
     transport: () => ({ sendRequest: rpc, subscribe: async () => () => {} }),
-    terminal(cols = 80, rows = 24) {
-      const shell = files.shell(cols, rows);
-      const snapshot = (): Snapshot => JSON.parse(shell.snapshotJson()) as Snapshot;
-      return {
-        type(data) {
-          shell.input(typeof data === "string" ? encoder.encode(data) : data);
-          schedule();
-          return snapshot();
-        },
-        snapshot,
-        resize: (c, r) => shell.resize(c, r),
-        get exited() {
-          return shell.exited();
-        },
-      };
-    },
     detectLanguage: text => JSON.parse(detectLanguage(text)) as LanguageDetection,
     flush,
   };
+}
+
+/**
+ * A terminal on a real shell: the Alpine guest rendered by Rio VT. Call after `openWebOs` (it initialises the module that
+ * carries `WebTerminal`).
+ */
+export function openGuestTerminal(
+  options: Omit<GuestOptions, "vt"> & { cols?: number; rows?: number } = {},
+): GuestSession {
+  const { cols = 100, rows = 30, ...rest } = options;
+  return new GuestSession({ ...rest, vt: new WebTerminal(cols, rows) });
 }
