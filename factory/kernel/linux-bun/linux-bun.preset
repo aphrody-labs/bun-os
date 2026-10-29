@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: 0BSD
+# mkinitcpio preset for the 'linux-bun' package (pkgbase file: /usr/lib/modules/<kver>/pkgbase).
+# Same layout as mkinitcpio's own template (hook.preset, %PKGBASE% = linux-bun). The mkinitcpio
+# pacman hook creates /etc/mkinitcpio.d/linux-bun.preset from that template when none exists; this
+# file is installed as /usr/share/linux-bun/linux-bun.preset and may be copied to
+# /etc/mkinitcpio.d/ to get a fallback image as well.
+# Bun OS images keep the kernel and initramfs at the ESP root = /boot (see limine-linux-bun.conf.template).
+
+#ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-bun"
+
+PRESETS=('default' 'fallback')
+
+#default_config="/etc/mkinitcpio.conf"
+default_image="/boot/initramfs-linux-bun.img"
+
+#fallback_config="/etc/mkinitcpio.conf"
+fallback_image="/boot/initramfs-linux-bun-fallback.img"
+fallback_options="-S autodetect"

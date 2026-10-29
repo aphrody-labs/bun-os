@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: 0BSD
+# Limine entries for linux-bun (Limine config syntax: protocol/path/cmdline/module_path, see
+# https://github.com/limine-bootloader/limine/blob/trunk/CONFIG.md). Installed as
+# /usr/share/linux-bun/limine-linux-bun.conf.template. On Bun OS images limine-entry-tool
+# (limine-mkinitcpio-hook) owns /boot/limine.conf and generates the equivalent of entry 1 from the
+# pkgbase file; this template is for static setups and for the bare Bun /init entry.
+# Substitute: @KVER@ = kernel release (e.g. 7.2.11-arch1-1-bun), @ROOT@ = root= value
+# (e.g. LABEL=bunos-root). Both initramfs and kernel paths follow linux-bun.preset.
+
+/Bun OS (linux-bun)
+    protocol: linux
+    path: boot():/vmlinuz-linux-bun
+    cmdline: root=@ROOT@ rw console=tty0 console=ttyS0,115200 loglevel=4
+    module_path: boot():/initramfs-linux-bun.img
+
+/Bun OS (linux-bun, fallback initramfs)
+    protocol: linux
+    path: boot():/vmlinuz-linux-bun
+    cmdline: root=@ROOT@ rw console=tty0 console=ttyS0,115200 loglevel=7
+    module_path: boot():/initramfs-linux-bun-fallback.img
+
+# Appliance entry (Phase 0 step 3, NOT QUALIFIED): an initramfs whose /init is a Bun executable.
+# `rdinit=` selects the initramfs program (Documentation/admin-guide/kernel-parameters.txt); no root= is needed
+# because the initramfs is the root. The initramfs file below is produced by the image factory and
+# is not shipped by this package.
+/Bun OS (linux-bun, Bun as /init)
+    protocol: linux
+    path: boot():/vmlinuz-linux-bun
+    cmdline: rdinit=/init console=tty0 console=ttyS0,115200 loglevel=7
+    module_path: boot():/initramfs-bun-init.img
