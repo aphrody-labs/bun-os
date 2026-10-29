@@ -175,6 +175,7 @@
     "packages/webos-wasm",
     "packages/winclean",
     "packages/windows",
+    "packages/windows-samples-tests",
     "packages/winreg",
     "packages/yolo-cli",
     "packages/yolo-core",

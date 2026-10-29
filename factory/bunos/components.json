@@ -496,7 +496,11 @@
         "vendor/tailwindcss": "vendored upstream Tailwind CSS workspace (crates/oxide, crates/node); built by its own pnpm and cargo flow",
         "vendor/tetanes": "upstream submodule; virtual [workspace] of its own, consumed by path",
         "vendor/uutils": "upstream uutils submodules, each a workspace of its own, consumed by path from crates/bunos-utils",
-        "vendor/zakuro": "upstream submodule; virtual [workspace] of its own, consumed by path"
+        "vendor/zakuro": "upstream submodule; virtual [workspace] of its own, consumed by path",
+        "examples/windows/d3d12-headless/rust": "standalone sample crate with its own [workspace] and Cargo.lock; built by packages/windows-samples-tests (cargo +nightly-2026-09-15), pins windows 0.62.2 independently of the root lockfile",
+        "examples/windows/hello/rust": "standalone sample crate with its own [workspace] and Cargo.lock; built by packages/windows-samples-tests (cargo +nightly-2026-09-15), pins windows 0.62.2 independently of the root lockfile",
+        "examples/windows/libadd/rust": "standalone sample crate with its own [workspace] and Cargo.lock; built by packages/windows-samples-tests (cargo +nightly-2026-09-15), pins windows 0.62.2 independently of the root lockfile",
+        "examples/windows/xaml-static/rust": "standalone sample crate with its own [workspace] and Cargo.lock; built by packages/windows-samples-tests (cargo +nightly-2026-09-15), pins windows 0.62.2 independently of the root lockfile"
       }
     },
     "npm": {
@@ -6002,7 +6006,11 @@
         "name": "@aphrody/windows",
         "version": "1.4.7"
       },
-      "registration": ["bun-ffi", "napi", "bun-spawn"],
+      "registration": [
+        "bun-ffi",
+        "napi",
+        "bun-spawn"
+      ],
       "aot": true,
       "status": "present",
       "consumedBy": [
@@ -23891,7 +23899,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -23914,7 +23923,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -23937,7 +23947,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -23960,7 +23971,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -23983,7 +23995,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24006,7 +24019,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24029,7 +24043,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24052,7 +24067,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24075,7 +24091,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24098,7 +24115,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24121,7 +24139,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24144,7 +24163,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24167,7 +24187,8 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
@@ -24190,12 +24211,34 @@
       "status": "present",
       "dependsOn": [
         "npm:@aphrody/buncc",
-        "crates.io:windows"
+        "crates.io:windows",
+        "npm:@aphrody/windows"
       ],
       "consumedBy": [
         "bun"
       ],
       "note": "Official Microsoft reference (C#/WinRT); test matrix in packages/windows-samples-tests, docs/WINDOWS-SAMPLES.md."
+    },
+    {
+      "id": "npm:@aphrody/windows-samples-tests",
+      "kind": "npm-package",
+      "path": "packages/windows-samples-tests",
+      "source": {
+        "type": "workspace",
+        "name": "@aphrody/windows-samples-tests",
+        "version": "0.1.0"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "npm:@aphrody/buncc",
+        "crates.io:windows",
+        "npm:@aphrody/windows"
+      ],
+      "note": "Test matrix of the vendor/microsoft references across C++, C#, Rust and Bun; docs/WINDOWS-SAMPLES.md."
     }
   ]
 }

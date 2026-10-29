@@ -1836,6 +1836,10 @@
       "name": "@aphrody/windows",
       "version": "1.4.7",
     },
+    "packages/windows-samples-tests": {
+      "name": "@aphrody/windows-samples-tests",
+      "version": "0.1.0",
+    },
     "packages/winreg": {
       "name": "@aphrody/winreg",
       "version": "1.4.7",
@@ -2624,6 +2628,8 @@
     "@aphrody/winclean": ["@aphrody/winclean@workspace:packages/winclean"],
 
     "@aphrody/windows": ["@aphrody/windows@workspace:packages/windows"],
+
+    "@aphrody/windows-samples-tests": ["@aphrody/windows-samples-tests@workspace:packages/windows-samples-tests"],
 
     "@aphrody/winreg": ["@aphrody/winreg@workspace:packages/winreg"],
 
