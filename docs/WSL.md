@@ -36,7 +36,7 @@ Related forks (not modified, listed for the owner; `ahead` = upstream commits we
 | `cachyos-linux`, `kernel-packages`, `ogc-kernel-packages`, `ogc-linux`, `ogc-arch-packaging`, `nvidia-kernels`, `open-gpu-kernel-modules`, `omarchy-task-manager`, `steamos-nvidia-installer` | various | 0 | 0 |
 
 `open-gpu-kernel-modules` forks `CachyOS/open-gpu-kernel-modules` (default `560-cachyos`), not NVIDIA's repository, so it had
-no current tag. Refs `615.78.08` (branch and tag, commit `1a82fbfda8f321b056eb3568850f9316c5e465c5`, the newest NVIDIA tag,
+no current tag. Refs `615.78.08` (branch and tag, commit `1a82fbfda8f321b056eb3568850f9316c5e465c5`, the highest 6xx tag, not verified newest by date,
 2026-10-07) were created in the fork through the Git refs API (objects already in the shared network); its default branch is unchanged.
 
 ## 2. Bun OS Arch WSL image (`factory/wsl/`)
@@ -83,9 +83,9 @@ the `try-omarchy-windows` QEMU guest path in `factory/images/bunos-omarchy`, or 
 | Longterm | 6.18.59 (2026-10-26), 6.12.114, 6.6.160, 6.1.190, 5.15.223, 5.10.272 | same |
 | Microsoft WSL2 | 6.18.y only: tag `linux-msft-wsl-6.18.58.1` = `v6.18.58` + WSL patches | GitHub API; diff `v6.18.58..a989171` |
 | CachyOS | `linux-cachyos` PKGBUILD `pkgver = 7.3.0`, `pkgrel = 4` (default branch commit 2026-10-23); `cachyos-linux` fork (`7.0/cachy`) is stale | `.SRCINFO` raw |
-| Rust minimums for 7.3 | rustc >= 1.85.0, bindgen >= 0.71.1, Clang/LLVM >= 17.0.1 (for `LLVM=1` and libclang), GCC >= 8.1 | `scripts/min-tool-versions.sh` @ v7.3 |
+| Rust minimums for 7.3 | rustc >= 1.85.0, bindgen >= 0.71.1, Clang/LLVM >= 17.0.1 (for `LLVM=1` and libclang), GCC >= 8.1 | `scripts/min-tool-version.sh` @ v7.3 |
 | Rust stable now | 1.99.1 (2026-10-13); bindgen-cli 0.73.2 on crates.io, the workflow pins 0.71.1 (the minimum) | static.rust-lang.org, crates.io |
-| NVIDIA open modules | newest tag `615.78.08` (2026-10-07); Arch `nvidia-open`/`nvidia-utils` = 615.78.08 | `git ls-remote`, archlinux.org |
+| NVIDIA open modules | highest 6xx tag `615.78.08` (2026-10-07), not the newest by date (see section 6); Arch `nvidia-open`/`nvidia-utils` = 615.78.08 | `git ls-remote`, archlinux.org |
 | In-tree Rust NVIDIA | `nova-core` exists in v7.3, "work in progress and may not be functional" | `drivers/gpu/nova-core/Kconfig` |
 
 "7.3 optimized for Rust and NVIDIA" is **not claimed**: nothing is built, so nothing is measured.
@@ -144,3 +144,6 @@ Verified again on Learn pages build-custom-distro, wsl-config and basic-commands
 Not adopted: `[boot] command`, `[gpu]`, `[time] useWindowsTimezone`, `[automount] mountFsTab`, `.wslconfig` `systemDistro`; `wsl.conf` is unchanged.
 
 nvidia-open result (CI run 40819800811, the one run that finished that job): **`615.78.08` does not compile unmodified on 7.2.11 or 7.3**: `kernel-open/common/inc/nv-timer.h:58` calls `del_timer_sync()`, which no longer exists (implicit declaration, `-Werror`). The workflow and the `linux-bun` PKGBUILD now rewrite it to `timer_delete_sync()`; whether anything else breaks after that is unknown until the next run. This also means the "nvidia-open for 7.3" claim is currently false without that patch.
+
+Follow-up (Context7/GitHub audit, 2026-10-29). CachyOS keeps four 7.3 patches for NVIDIA in `CachyOS/kernel-patches` `7.3/misc/nvidia` (commit `89bb22dec944`, 2026-10-22). Tested with `git apply --check` on a checkout of `615.78.08` (`1a82fbfda8f3`): `0001` (DSC RC tables), `0002` (Bigscreen Beyond DP workaround) and `0004` (open sysfs config from the userspace root on 7.3+) apply and are vendored unchanged in `factory/kernel/linux-bun/nvidia/patches/`; `0003` (`dmem_cgroup_register_region` takes a struct) **does not apply because `615.78.08` already has that change** (`os-interface.c` line 3055 uses `&init`), so it is skipped. None of the four touches `nv-timer.h`, so the `del_timer_sync` rewrite stays. **Compatibility of nvidia-open with 7.2.11 and 7.3 is NOT VERIFIED** until CI compiles it with these patches.
+Tag choice: GitHub release dates are not ordered by version: `595.112.07` 2026-10-22, `615.71.10` 2026-10-21, `615.78.08` 2026-10-07 (the highest 6xx version number, and what Arch `nvidia-open`/`nvidia-utils` ship). `615.78.08` is kept for userspace parity; it is **not verified to be the newest release by date**, and whether `615.71.10` is a later build of a different branch was not determined.
