@@ -67,11 +67,11 @@ fn print_booklet(s: &mut Session, p: &Value) -> Result<Value> {
 
 fn export_html(s: &mut Session, p: &Value) -> Result<Value> {
     let st = s.doc()?;
-    let opts = designcraft_epub::HtmlOptions {
+    let opts = crate::epub::HtmlOptions {
         title: str_param(p, "title").map(str::to_string),
         language: str_param(p, "language").map(str::to_string),
     };
-    let text = designcraft_epub::export_html(&st.doc, &opts);
+    let text = crate::epub::export_html(&st.doc, &opts);
     match str_param(p, "path") {
         Some(path) => {
             #[cfg(not(target_arch = "wasm32"))]
@@ -173,7 +173,7 @@ fn export_epub(s: &mut Session, p: &Value) -> Result<Value> {
                 .map(|img| img.to_png())
         })
         .flatten();
-    let opts = designcraft_epub::EpubOptions {
+    let opts = crate::epub::EpubOptions {
         title: p.get("title").and_then(Value::as_str).map(str::to_string),
         author: p.get("author").and_then(Value::as_str).map(str::to_string),
         language: p
@@ -195,14 +195,14 @@ fn export_epub(s: &mut Session, p: &Value) -> Result<Value> {
             let Some(img) = rr.render_page(d, &s.cache, i, 2.0, false, &ropts) else {
                 continue;
             };
-            pages.push(designcraft_epub::FixedPage {
+            pages.push(crate::epub::FixedPage {
                 png: img.to_png(),
                 width: b.width(),
                 height: b.height(),
                 text: page_text(d, &s.cache, i),
             });
         }
-        let bytes = designcraft_epub::export_fixed_epub(d, &pages, &opts)
+        let bytes = crate::epub::export_fixed_epub(d, &pages, &opts)
             .map_err(|e| crate::EngineError::Other(e.to_string()))?;
         return match p.get("path").and_then(Value::as_str) {
             Some(path) => {
@@ -214,7 +214,7 @@ fn export_epub(s: &mut Session, p: &Value) -> Result<Value> {
             ),
         };
     }
-    let bytes = designcraft_epub::export_epub(epub_doc, &opts)
+    let bytes = crate::epub::export_epub(epub_doc, &opts)
         .map_err(|e| crate::EngineError::Other(e.to_string()))?;
     match p.get("path").and_then(Value::as_str) {
         Some(path) => {

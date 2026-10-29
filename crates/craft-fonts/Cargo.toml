@@ -13,5 +13,9 @@ publish = false
 # Compile every font in the manifest into the binary (about 24 MB).
 embed = []
 
+[dev-dependencies]
+skrifa = { workspace = true }
+sha2 = { workspace = true, default-features = true }
+
 [lints.rust]
 unsafe_code = "forbid"

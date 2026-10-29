@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use std::sync::OnceLock;
 
 use lightcraft_develop::EmbeddedLens;
-use lightcraft_lensdb::{LensDb, Shot};
+use lightcraft_pipeline::lensdb::{LensDb, Shot};
 
 /// The environment variable naming the lens database directory.
 pub const ENV: &str = "LIGHTCRAFT_LENSFUN_DIR";

@@ -8,7 +8,7 @@
 
 use pdfcraft_cos::Document;
 use pdfcraft_edit::PageImage;
-use pdfcraft_preflight::{Issue, Level};
+use crate::preflight::{Issue, Level};
 
 use crate::Document as OpenDocument;
 
@@ -175,8 +175,8 @@ impl OpenDocument {
 }
 
 fn inspect(doc: &Document) -> PrintReadiness {
-    let declared = pdfcraft_preflight::declared(doc);
-    let pdfa_issues = pdfcraft_preflight::verify(doc, Level::A2b);
+    let declared = crate::preflight::declared(doc);
+    let pdfa_issues = crate::preflight::verify(doc, Level::A2b);
     let fonts_not_embedded = pdfa_issues
         .iter()
         .filter(|issue| {

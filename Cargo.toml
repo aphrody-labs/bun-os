@@ -131,8 +131,6 @@ members = [
     "crates/craft-docpath",
     "crates/craft-ui",
     "crates/craft-fonts",
-    "crates/craft-fonts-tests",
-    "crates/pdfcraft-compare",
     "crates/cadcraft-cli",
     "crates/cadcraft",
     "crates/cadcraft-color",
@@ -147,7 +145,6 @@ members = [
     "crates/cadcraft-mcp",
     "crates/cadcraft-render",
     "crates/cadcraft-ui-egui",
-    "crates/gridcraft-pdf",
     "crates/aphrody-a2a",
     "crates/aphrody-agent-proto",
     "crates/aphrody-app-protocol",
@@ -209,9 +206,7 @@ members = [
     "crates/designcraft-compose",
     "crates/designcraft-doc",
     "crates/designcraft-engine",
-    "crates/designcraft-epub",
     "crates/designcraft-fonts",
-    "crates/designcraft-format",
     "crates/designcraft-geom",
     "crates/designcraft-idml",
     "crates/designcraft-images",
@@ -351,12 +346,9 @@ members = [
     "crates/lightcraft-engine",
     "crates/lightcraft-faces",
     "crates/lightcraft-fetch",
-    "crates/lightcraft-geocode",
     "crates/lightcraft-geom",
     "crates/lightcraft-gpu",
     "crates/lightcraft-heif",
-    "crates/lightcraft-inpaint",
-    "crates/lightcraft-lensdb",
     "crates/lightcraft-mcp",
     "crates/lightcraft-merge",
     "crates/lightcraft-meta",
@@ -374,7 +366,6 @@ members = [
     "crates/openai_sora_client",
     "crates/pdfcraft-a11y",
     "crates/pdfcraft-annot",
-    "crates/pdfcraft-audit",
     "crates/pdfcraft-automation",
     "crates/pdfcraft-content",
     "crates/pdfcraft-cos",
@@ -386,15 +377,12 @@ members = [
     "crates/pdfcraft-filters",
     "crates/pdfcraft-fonts",
     "crates/pdfcraft-forms",
-    "crates/pdfcraft-geom",
     "crates/pdfcraft-js",
     "crates/pdfcraft-measure",
     "crates/pdfcraft-model",
-    "crates/pdfcraft-ocr",
     "crates/pdfcraft-optimize",
     "crates/pdfcraft-organize",
     "crates/pdfcraft-platform",
-    "crates/pdfcraft-preflight",
     "crates/pdfcraft-print",
     "crates/pdfcraft-redact",
     "crates/pdfcraft-render",
@@ -415,9 +403,7 @@ members = [
     "crates/photocraft-format",
     "crates/photocraft-geom",
     "crates/photocraft-gpu",
-    "crates/photocraft-heif",
     "crates/photocraft-io",
-    "crates/photocraft-ops",
     "crates/photocraft-paint",
     "crates/photocraft-plugins",
     "crates/photocraft-psd",
@@ -811,7 +797,6 @@ aphrody-x = { package = "bun_x", version = "1.4.7" }
 obscura-dom = { package = "bun_browser_dom", version = "1.4.7" }
 obscura-net = { package = "bun_browser_net", version = "1.4.7" }
 craft-fonts = { path = "crates/craft-fonts", version = "1.4.7" }
-craft-fonts-tests = { path = "crates/craft-fonts-tests", version = "1.4.7" }
 craft-atomic = { path = "crates/craft-atomic", version = "1.4.7" }
 craft-settings = { path = "crates/craft-settings", version = "1.4.7" }
 craft-cms = { path = "crates/craft-cms", version = "1.4.7" }
@@ -819,7 +804,6 @@ craft-print = { path = "crates/craft-print", version = "1.4.7" }
 craft-quit = { path = "crates/craft-quit", version = "1.4.7" }
 craft-ui = { path = "crates/craft-ui", version = "1.4.7" }
 aphrody-themes = { path = "crates/aphrody-themes", version = "1.4.7" }
-pdfcraft-compare = { path = "crates/pdfcraft-compare", version = "1.4.7" }
 cadcraft-color = { path = "crates/cadcraft-color", version = "1.4.7" }
 cadcraft-geom = { path = "crates/cadcraft-geom", version = "1.4.7" }
 cadcraft-doc = { path = "crates/cadcraft-doc", version = "1.4.7" }
@@ -833,7 +817,6 @@ cadcraft-mcp = { path = "crates/cadcraft-mcp", version = "1.4.7" }
 cadcraft-render = { path = "crates/cadcraft-render", version = "1.4.7" }
 cadcraft-ui-egui = { path = "crates/cadcraft-ui-egui", version = "1.4.7" }
 cadcraft = { path = "crates/cadcraft", version = "1.4.7" }
-gridcraft-pdf = { path = "crates/gridcraft-pdf", version = "1.4.7" }
 aphrody-a2a = { path = "crates/aphrody-a2a", version = "1.4.7" }
 aphrody-agent-proto = { path = "crates/aphrody-agent-proto", version = "1.4.7" }
 aphrody-app-protocol = { path = "crates/aphrody-app-protocol", version = "1.4.7" }

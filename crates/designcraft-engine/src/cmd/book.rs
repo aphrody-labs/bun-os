@@ -93,7 +93,7 @@ impl ChapterBatch {
         use std::io::Write;
 
         // Propagate serialization errors; an empty fallback must never replace a chapter.
-        let bytes = designcraft_format::save(doc)
+        let bytes = crate::format::save(doc)
             .map_err(|e| EngineError::Other(format!("{path}: {e}")))?;
         let mut file = tempfile::Builder::new()
             .prefix("chapter-")

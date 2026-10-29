@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use pdfcraft_geom::perspective::{Homography, Point, order_quad};
+use crate::perspective::{Homography, Point, order_quad};
 use pdfcraft_render::{RenderConfig, RenderRequest};
 
 use crate::{DocId, Edit, EditError, ImageResolution, Session};
