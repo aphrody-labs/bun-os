@@ -2,7 +2,7 @@
 
 bun-os is one git repository of about 71,300 tracked files, 183 submodules (153 under `vendor/`), 635+ Cargo packages and 150+ Bun
 workspaces, with a 1.4 GB `.git`. This page records which tools already existed, what was adopted, what was extended, the git
-settings and why, and the numbers measured on the maintainer workstation (Windows 11, NTFS, git 2.55.0.windows.5, Scalar included).
+settings and why, and the numbers measured on the maintainer workstation (Windows 11, NTFS, git 2.55.0.windows.5, Scalar included). Git 2.56.0 and Git for Windows 2.56.0.windows.4 (2026-10-26) are out (checked with `gh api`); the numbers below were measured on 2.55.0.windows.5 and not re-measured on 2.56.
 No new package was created: every addition lives in `packages/bun-workspace` (`aphrody-bun git ...`).
 
 ## 1. What already existed
@@ -45,11 +45,10 @@ from git's manual (Context7 `/git/git`, `git-config`, `git-maintenance`):
 | Key | Value | Source and reason |
 | --- | --- | --- |
 | `core.fsmonitor` | true (Windows, macOS) | built-in daemon; only on those platforms |
-| `core.untrackedCache` | true | `feature.manyFiles` doc; needs working mtime |
-| `feature.manyFiles` | true | `index.version=4`, `index.skipHash`, untracked cache |
+| `core.untrackedCache` | true; **false on Windows** | git v2.56.0 `scalar.c`: Scalar sets it to false on Windows ("unreliable": fresh files do not update the directory mtime) and true elsewhere; `feature.manyFiles` would enable it, so `setup` overrides it explicitly on Windows |
+| `feature.manyFiles` | true | `index.version=4` and `index.skipHash` everywhere; its untracked-cache part is overridden on Windows as above |
 | `core.preloadIndex` | true | parallel index refresh |
 | `core.longpaths` | true (Windows) | paths over MAX_PATH |
-| `core.multiPackIndex` | true | the `incremental-repack` task skips itself with a warning when it is off (builtin/gc.c) |
 | `fetch.writeCommitGraph` | true | commit-graph refreshed after fetch (default false) |
 | `protocol.version` | 2 | partial clone and ref filtering |
 | `submodule.fetchJobs` | 8 | parallel submodule clone/fetch (default 1) |
@@ -57,7 +56,7 @@ from git's manual (Context7 `/git/git`, `git-config`, `git-maintenance`):
 | `maintenance.strategy` | incremental | prefetch + commit-graph hourly, loose-objects + incremental-repack daily, no `gc` |
 | `blame.ignoreRevsFile` | `.git-blame-ignore-revs` | mass-format commits |
 
-`setup` also writes the commit-graph (`--changed-paths --split`) and runs `git maintenance register`; `--scheduler` runs
+`core.multiPackIndex` is not set: git v2.56.0 `core.adoc` says it defaults to true. `setup --untracked-cache` re-enables the untracked cache on Windows (measured below; accepts the risk of stale untracked-file reports). `setup` also writes the commit-graph (`--changed-paths --split`) and runs `git maintenance register`; `--scheduler` runs
 `git maintenance start` (installs the OS scheduler job). `--fast-status` sets `diff.ignoreSubmodules=dirty`: `status` stops scanning
 initialised submodule work trees (measured below); it hides uncommitted edits inside submodules, so it is opt-in.
 
@@ -95,7 +94,7 @@ cone because git rejects them. Commands: `doctor`, `setup`, `profile <name|list>
 * New `plan` job: `git diff <base>...HEAD` classified by path (`git-affected.ts`: js, rust, docs, distro, all). The `rust` job runs only
   when Rust paths or global files (`.github`, `turbo.json`, `.gitmodules`, toolchain) change; an unknown base runs everything.
 * Caches: `.git/modules` (key from `.gitmodules` + `sources.lock.json`), plus the existing Bun and Cargo caches.
-* Package-level selection: `bun run affected` = `turbo run typecheck lint --affected` (base from `TURBO_SCM_BASE`). Remote cache needs
+* Package-level selection: `bun run affected` = `turbo run typecheck lint --affected` (the script sets `TURBO_SCM_BASE=origin/os`: turbo's default base is `main`, which does not exist on origin; CI should `git fetch origin os` first). Remote cache needs
   `TURBO_TOKEN` and `TURBO_TEAM` in the environment (not set; local cache only until the owner provides them).
 
 ## 6. Measurements (this workstation, before and after)
@@ -108,7 +107,8 @@ Source repository: local file clone of this repository (no network), median of 3
 | Then `profile core` (5,044 files) | | +11.0 s, `.git` 173 MB |
 | Then `profile all` without submodules | | +102 s, `.git` 546 MB |
 | `profile rust-workspace` incl. 12 shallow submodules | | 51 s first time (network), 10.6 s re-apply; `cargo metadata` OK |
-| `git status`, full tree, settings off (`-c` overrides) | 3,618 ms | 224 ms (fsmonitor + untracked cache + manyFiles + preload) |
+| `git status`, full tree, settings off (`-c` overrides) | 3,618 ms | 224 ms measured with the untracked cache on (before this correction); with it off, fsmonitor + manyFiles + preload alone gave 4.3-6.5 s on a loaded machine, see the next row |
+| `git status`, full tree, untracked cache off vs on (fsmonitor + manyFiles, loaded machine, 3 runs each) | 3,966-6,482 ms off | 386-482 ms on after the first run; kept off on Windows by default (Scalar), opt-in with `--untracked-cache` |
 | `git status`, `core` profile | | 272 ms first, 82 ms warm |
 | `git status`, 12 submodules initialised | 6,901 ms | 948 ms with `diff.ignoreSubmodules=dirty` (opt-in) |
 | `git log -n 1000 -- crates` | 260 ms | 125 ms (commit-graph) |

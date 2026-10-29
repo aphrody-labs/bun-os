@@ -24,6 +24,8 @@ export interface Setting {
   value: string;
   /** Platforms the setting applies to (default: all). */
   platforms?: NodeJS.Platform[];
+  /** Value on Windows when it differs (Scalar turns the untracked cache off there). */
+  windowsValue?: string;
   why: string;
 }
 
@@ -38,7 +40,8 @@ export const RECOMMENDED: Setting[] = [
   {
     key: "core.untrackedCache",
     value: "true",
-    why: "git-config feature.manyFiles: untracked cache (needs working mtime)",
+    windowsValue: "false",
+    why: "git scalar.c: Scalar enables it except on Windows, where fresh files do not update the directory mtime (unreliable)",
   },
   {
     key: "feature.manyFiles",
@@ -51,11 +54,6 @@ export const RECOMMENDED: Setting[] = [
     why: "git-config core.preloadIndex: parallel lstat while refreshing the index",
   },
   { key: "core.longpaths", value: "true", platforms: ["win32"], why: "git-for-windows: paths over MAX_PATH" },
-  {
-    key: "core.multiPackIndex",
-    value: "true",
-    why: "git-config core.multiPackIndex: read the multi-pack-index (incremental-repack needs it)",
-  },
   {
     key: "fetch.writeCommitGraph",
     value: "true",
@@ -84,7 +82,9 @@ export const RECOMMENDED: Setting[] = [
 ];
 
 export function applicable(platform: NodeJS.Platform = process.platform) {
-  return RECOMMENDED.filter(s => !s.platforms || s.platforms.includes(platform));
+  return RECOMMENDED.filter(s => !s.platforms || s.platforms.includes(platform)).map(s =>
+    platform === "win32" && s.windowsValue !== undefined ? { ...s, value: s.windowsValue } : s,
+  );
 }
 
 const norm = (v: string) => v.trim().toLowerCase();
@@ -294,7 +294,7 @@ export async function measure(root: string) {
   const rows: { mode: string; label: string; ms: number }[] = [];
   for (const [mode, flags] of [
     ["baseline", off],
-    ["tuned", [] as string[]],
+    ["tuned", process.platform === "win32" ? ["-c", "core.untrackedCache=false"] : ([] as string[])],
   ] as const) {
     await git(root, [...flags, "status", "--porcelain"]); // warm-up: builds the untracked cache / starts the daemon
     for (const [label, args] of [

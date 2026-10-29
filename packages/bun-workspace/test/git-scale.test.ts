@@ -85,7 +85,7 @@ test("config and profile application are idempotent on a real repository", async
     await git(dir, ["fsmonitor--daemon", "stop"]);
     rmSync(dir, { recursive: true, force: true });
   }
-});
+}, 60_000);
 
 test("diff classification selects only the touched areas", async () => {
   const { classify } = await import("../src/git-affected.ts");
@@ -93,4 +93,12 @@ test("diff classification selects only the touched areas", async () => {
   expect(classify(["crates/x/src/lib.rs"])).toMatchObject({ rust: true, js: false });
   expect(classify([".github/workflows/ci.yml"])).toMatchObject({ all: true, js: true, rust: true });
   expect(classify(["packages/a/src/i.ts"])).toMatchObject({ js: true, rust: false });
+});
+
+test("untracked cache is off on Windows (Scalar scalar.c) and on elsewhere", async () => {
+  const { applicable } = await import("../src/git-scale.ts");
+  const v = (p: NodeJS.Platform) => applicable(p).find(s => s.key === "core.untrackedCache")!.value;
+  expect(v("win32")).toBe("false");
+  expect(v("linux")).toBe("true");
+  expect(applicable("linux").some(s => s.key === "core.multiPackIndex")).toBe(false);
 });

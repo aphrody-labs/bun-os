@@ -16,7 +16,7 @@ import {
 
 const usage = `aphrody-bun git <command>
   doctor [--json]                          check the clone against the recommended settings (exit 1 if not ok)
-  setup [--dry-run] [--no-maintenance] [--scheduler] [--fast-status]   apply per-clone config idempotently, register maintenance
+  setup [--dry-run] [--no-maintenance] [--scheduler] [--fast-status] [--untracked-cache]   apply per-clone config idempotently, register maintenance
   profile <name|list> [--dry-run] [--no-submodules]    sparse-checkout cone + shallow submodules for a profile
   clone <url> <dir> [--profile <name>]     scalar clone (blobless, sparse) or git clone --filter=blob:none --sparse
   status                                   profile, sparse state, submodule count, timed git status
@@ -58,6 +58,7 @@ export async function gitCommand(args: string[]): Promise<number> {
       console.log(changed.length ? `config: ${changed.join(", ")}` : "config: already applied");
       if (flag("--dry-run")) return 0;
       if (flag("--fast-status")) await git(root, ["config", "--local", "diff.ignoreSubmodules", "dirty"]);
+      if (flag("--untracked-cache")) await git(root, ["config", "--local", "core.untrackedCache", "true"]);
       await git(root, ["config", "--local", "blame.ignoreRevsFile", ".git-blame-ignore-revs"]);
       await git(root, ["commit-graph", "write", "--reachable", "--changed-paths", "--split"]);
       if (!flag("--no-maintenance")) console.log(`maintenance: ${await setupMaintenance(root, flag("--scheduler"))}`);
