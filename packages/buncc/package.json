@@ -15,7 +15,8 @@
     "./driver": "./src/driver.ts",
     "./plan": "./src/plan.ts",
     "./providers": "./src/providers/index.ts",
-    "./msvc": "./src/providers/msvc.ts"
+    "./msvc": "./src/providers/msvc.ts",
+    "./rust": "./src/providers/rust.ts"
   },
   "scripts": {
     "test": "bun test"

@@ -1,5 +1,7 @@
 /** Native build helpers: MSVC environment (entered through buncc) and cargo, both run without touching global state. */
 import { captureVcvars, findVisualStudio } from "@aphrody/buncc/msvc";
+import { readToolchain } from "@aphrody/buncc/rust";
+import { resolve } from "node:path";
 
 let cached: Record<string, string> | undefined;
 
@@ -40,6 +42,8 @@ export async function cl(cwd: string, args: string[]) {
   return exec(["cl.exe", "/nologo", "/EHsc", "/std:c++20", "/O2", "/utf-8", ...args], cwd, await msvcEnv());
 }
 
-export const NIGHTLY = Bun.env.BUNOS_RUST_TOOLCHAIN ?? "nightly-2026-09-15";
+/** The channel of rust-toolchain.toml (the one Rust pin); BUNOS_RUST_TOOLCHAIN overrides it for an experiment. */
+export const NIGHTLY =
+  Bun.env.BUNOS_RUST_TOOLCHAIN ?? (await readToolchain(resolve(import.meta.dir, "../../..")))?.channel ?? "nightly";
 export const cargo = (cwd: string, args: string[]) =>
   exec(["cargo", `+${NIGHTLY}`, ...args], cwd, undefined, 1_200_000);

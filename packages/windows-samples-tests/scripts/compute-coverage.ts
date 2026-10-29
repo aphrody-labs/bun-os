@@ -5,10 +5,12 @@
  * --check fails when the committed document differs from what the recorded results produce.
  */
 import { join } from "node:path";
+import { readToolchain } from "@aphrody/buncc/rust";
 import { compute, load, LANGS, root, STATUSES, type Status } from "../src/coverage.ts";
 
 const inp = await load();
 const c = compute(inp);
+const rustChannel = (await readToolchain(root))?.channel ?? "nightly";
 const pinsFile = await Bun.file(join(root, "vendor/microsoft/PINS.json")).json();
 const sym: Record<Status, string> = {
   "not-started": "-",
@@ -25,7 +27,7 @@ L.push(
   "",
 );
 L.push(
-  `Results observed ${inp.impls ? "on this Windows 11 host (VS Build Tools 14.51, SDK 10.0.26100, .NET 10.0.403 and 11.0.100-rc.3, Rust nightly-2026-09-15, Bun canary)" : ""}.`,
+  `Results observed ${inp.impls ? `on this Windows 11 host (VS Build Tools 14.51, SDK 10.0.26100, .NET 10.0.403 and 11.0.100-rc.3, Rust ${rustChannel}, Bun canary)` : ""}.`,
   "",
 );
 L.push(

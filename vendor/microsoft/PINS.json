@@ -3,9 +3,9 @@
   "pins": {
     "microsoft-ui-xaml": {
       "repo": "microsoft/microsoft-ui-xaml",
-      "ref": "winui3/release/1.8.12",
-      "sha": "91da8f5303651791acbb96e63a8ac4c38851e678",
-      "commitDate": "2026-09-24T16:24:05Z",
+      "ref": "winui3/release/2.5.1",
+      "sha": "ba3a8d59e6de4e2b86ca4f61c78bc26ccf129afd",
+      "commitDate": "2026-09-19T00:04:27Z",
       "defaultBranch": "main",
       "defaultBranchTip": "a2b44831fda8147f53b92921fc23d79b9cf948e8",
       "sizeKB": 494811,
