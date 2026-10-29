@@ -15,7 +15,6 @@
     { "pattern": "craft.aphrody.app/", "zone_name": "aphrody.app" },
     { "pattern": "aphrody.com/*", "zone_name": "aphrody.com" },
     { "pattern": "www.aphrody.com/*", "zone_name": "aphrody.com" },
-    { "pattern": "play.aphrody.app/", "zone_name": "aphrody.app" },
     { "pattern": "app-video.aphrody.app/*", "zone_name": "aphrody.app" },
     { "pattern": "app-generation.aphrody.app/*", "zone_name": "aphrody.app" },
     { "pattern": "app-images.aphrody.app/*", "zone_name": "aphrody.app" },

@@ -1,32 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-/** Only the Play homepage enters WebOS; the Play origin owns streaming and APIs. */
-import { ROUTES, WORKSPACE_ROUTES } from "../src/config";
-
-const PUBLIC_ORIGIN = ROUTES.origin;
-/** The old Play host is the catalogued host whose path is the Play app. */
-const PLAY_PATH = Object.entries(ROUTES.apps).find(
-  ([, id]) => id === "play",
-)?.[0];
-const PLAY_HOST = Object.entries(ROUTES.hosts).find(
-  ([, entry]) => PLAY_PATH && entry.path === PLAY_PATH,
-)?.[0];
-const PLAY_ROUTE = WORKSPACE_ROUTES.find((entry) => entry.id === "play")?.route;
-
-export function playRedirect(url: URL): string | undefined {
-  if (
-    !PLAY_HOST ||
-    !PLAY_ROUTE ||
-    url.hostname !== PLAY_HOST ||
-    url.pathname !== "/"
-  )
-    return undefined;
-  const target = new URL(`/workspace/${PLAY_ROUTE}`, PUBLIC_ORIGIN);
-  target.search = url.search;
-  target.searchParams.delete("app");
-  target.searchParams.delete("category");
-  return target.href;
-}
-
+/** Read-only emulator URLs backed by the qualified product registry. */
 interface Assets {
   fetch(request: Request): Promise<Response>;
 }

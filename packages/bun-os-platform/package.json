@@ -2,7 +2,7 @@
   "name": "@bun-os/platform",
   "version": "1.4.7",
   "private": true,
-  "description": "Bun OS platform layer shared by the console shell, play.aphrody.app and the Bun Engine: Fluent catalogs and locale negotiation, M3 theme files, Bun.plugin-style plugins, the file-type registry and the transfer service (downloads, mirrors, LAN cache, R2 uploads).",
+  "description": "Bun OS platform layer shared by the console shell, web hosts and the Bun Engine: Fluent catalogs and locale negotiation, M3 theme files, Bun.plugin-style plugins, the file-type registry and the transfer service (downloads, mirrors, LAN cache, R2 uploads).",
   "license": "Apache-2.0",
   "author": "aphrody-dev <contact@aphrody.com>",
   "bin": {

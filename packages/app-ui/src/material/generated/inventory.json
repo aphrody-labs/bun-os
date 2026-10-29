@@ -649,17 +649,6 @@
     "bin": []
   },
   {
-    "name": "@aphrody/m3-web",
-    "version": "1.4.7",
-    "description": "Showcase app of the M3 framework. Built, served and compiled through the yolo CLI (`yolo web build|dev`, `yolo tauri build`), which runs these scripts.",
-    "dir": "apps/m3-web",
-    "kind": "app",
-    "workspace": true,
-    "private": false,
-    "exports": 0,
-    "bin": []
-  },
-  {
     "name": "@aphrody/material-design-icons",
     "version": "1.4.7",
     "description": "Material Symbols SVG catalogue (vendor/material-design-icons) with SVG to ICO/ICNS sync for Tauri desktop icons.",
@@ -734,17 +723,6 @@
     "workspace": true,
     "private": false,
     "exports": 1,
-    "bin": []
-  },
-  {
-    "name": "@aphrody/play",
-    "version": "1.4.7",
-    "description": "play.aphrody.app: the Bun OS gaming web app. Bun Engine library, Steam, LAN cache, the WebRTC gamestream and web emulation behind one Bun.serve server fronted by an nginx engine that the service owns.",
-    "dir": "apps/play",
-    "kind": "app",
-    "workspace": true,
-    "private": false,
-    "exports": 0,
     "bin": []
   },
   {
@@ -970,7 +948,7 @@
   {
     "name": "@bun-os/platform",
     "version": "1.4.7",
-    "description": "Bun OS platform layer shared by the console shell, play.aphrody.app and the Bun Engine: Fluent catalogs and locale negotiation, M3 theme files, Bun.plugin-style plugins, the file-type registry and the transfer service (d",
+    "description": "Bun OS platform layer shared by the console shell, web hosts and the Bun Engine: Fluent catalogs and locale negotiation, M3 theme files, Bun.plugin-style plugins, the file-type registry and the transfer service (download",
     "dir": "packages/bun-os-platform",
     "kind": "package",
     "workspace": true,

@@ -2,7 +2,7 @@
 // aphrody.com edge: static Bun OS shell + /api/health + /api/browse (script-free reader proxy for the Bun Browser).
 import { workspaceResponse } from "./workspace";
 import { gameContentResponse } from "./game-content";
-import { playRedirect, playResponse } from "./play";
+import { playResponse } from "./play";
 import { downloadsResponse } from "./downloads";
 import { APP_SERVER_PATHS, appServerResponse } from "./app-server";
 import { ROUTES } from "../src/config";
@@ -269,8 +269,6 @@ const PATH_BY_PACKAGE = new Map(
 
 /** Old product hosts redirect to a path of the canonical origin (infra/config/routes.catalog.json). */
 function redirectFor(url: URL): string | undefined {
-  const play = playRedirect(url);
-  if (play) return play;
   const route = ROUTES.hosts[url.hostname];
   if (route && !route.keep && route.path) {
     const rest = url.pathname === "/" ? "" : url.pathname;
