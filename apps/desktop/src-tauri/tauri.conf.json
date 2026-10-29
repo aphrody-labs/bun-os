@@ -2,7 +2,11 @@
   "productName": "Aphrody",
   "version": "1.4.4",
   "identifier": "com.aphrody.bun",
-  "build": { "frontendDist": "../../../build/apps/desktop/web" },
+  "build": {
+    "frontendDist": "../../../build/apps/desktop/web",
+    "beforeBuildCommand": "bun run build",
+    "beforeDevCommand": "bun run dev"
+  },
   "app": {
     "windows": [
       {
@@ -11,7 +15,9 @@
         "width": 1240,
         "height": 860,
         "minWidth": 720,
-        "minHeight": 560
+        "minHeight": 560,
+        "decorations": true,
+        "transparent": true
       }
     ],
     "security": {

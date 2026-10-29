@@ -3,7 +3,7 @@
 
 [package]
 name = "artcraft-tauri-plugin-http"
-version = "2.4.3"
+version = "3.0.0-alpha.3"
 description = "Access an HTTP client written in Rust."
 #edition = { workspace = true }
 edition = "2021"
@@ -28,8 +28,8 @@ android = { level = "full", notes = "" }
 ios = { level = "full", notes = "" }
 
 [build-dependencies]
-tauri-plugin = { version = "2.6.2", features = ["build"] }
-schemars = "0.8"
+tauri-plugin = { workspace = true, features = ["build"] }
+schemars = { workspace = true }
 serde = { version = "1.0.228", features = ["derive"] }
 url = { version = "2.5.8", features = ["serde"] }
 urlpattern = "0.3"
@@ -39,10 +39,10 @@ regex = "1"
 artcraft_client_identity = { path = "../artcraft_client_identity" }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
-tauri = { version = "2.11.2", features = ["unstable", "devtools", "protocol-asset"] }
+tauri = { workspace = true, features = ["unstable", "devtools", "protocol-asset"] }
 thiserror = "2.0.18"
 tokio = { version = "1", features = ["sync", "macros"] }
-tauri-plugin-fs = "2.5.1"
+tauri-plugin-fs = { workspace = true }
 urlpattern = "0.3"
 regex = "1"
 http = "1"

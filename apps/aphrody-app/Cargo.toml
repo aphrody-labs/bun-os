@@ -43,6 +43,8 @@ perf = { level = "warn", priority = -1 }
 # it never re-executes its own exe as `__llama-daemon`. Without the feature (no libclang at build
 # time) the supervisor falls back to the detached daemon, which `src/llama_daemon.rs` still serves.
 default = ["in-process"]
+# Chromium Embedded Framework runtime instead of the system webview (WebView2/WKWebView/WebKitGTK); cef-dll-sys needs CMake.
+cef = ["dep:tauri-runtime-cef"]
 in-process = [
   "aphrody-app-server/in-process",
   "aphrody-llama-server/in-process",
@@ -52,7 +54,7 @@ in-process = [
 custom-protocol = ["tauri/custom-protocol"]
 
 [build-dependencies]
-tauri-build = { package = "aphrody-tauri-build", path = "../../packages/bun-tauri/crates/aphrody-tauri-build" }
+tauri-build = { workspace = true }
 
 [dependencies]
 aphrody-proc = { path = "../../crates/aphrody-proc", version = "1.4.7", features = [] }
@@ -80,8 +82,9 @@ rustls = { version = "0.23", default-features = false, features = [
   "std",
   "tls12",
 ] }
-tauri = { package = "aphrody-tauri", path = "../../packages/bun-tauri/crates/aphrody-tauri", default-features = false, features = ["compression", "dynamic-acl", "image-ico", "tray-icon"] }
-tauri-runtime-cef = { package = "aphrody-tauri-runtime-cef", path = "../../packages/bun-tauri/crates/aphrody-tauri-runtime-cef" }
+tauri = { workspace = true, features = ["compression", "dynamic-acl", "image-ico", "tray-icon"] }
+tauri-runtime-wry = { workspace = true }
+tauri-runtime-cef = { workspace = true, optional = true }
 tokio = { version = "1.53.1", features = [
   "process",
   "rt-multi-thread",
@@ -98,7 +101,22 @@ serde_json = "1.0.151"
 log = "0.4.34"
 mimalloc = { version = "0.1", default-features = false, features = [] }
 url = { version = "2.5.8", features = ["serde"] }
-tauri-plugin-aphrody = { path = "../../packages/bun-tauri/crates/tauri-plugin-aphrody", default-features = false, features = ["autostart", "clipboard-manager", "deep-link", "dialog", "fs", "global-shortcut", "log", "notification", "opener", "os", "process", "single-instance-deep-link", "store", "updater", "updater-rustls-tls", "window-state", "wrap"] }
+tauri-plugin-aphrody = { workspace = true, features = ["wrap"] }
+tauri-plugin-autostart = { workspace = true }
+tauri-plugin-clipboard-manager = { workspace = true }
+tauri-plugin-deep-link = { workspace = true }
+tauri-plugin-dialog = { workspace = true }
+tauri-plugin-fs = { workspace = true }
+tauri-plugin-global-shortcut = { workspace = true }
+tauri-plugin-log = { workspace = true }
+tauri-plugin-notification = { workspace = true }
+tauri-plugin-opener = { workspace = true }
+tauri-plugin-os = { workspace = true }
+tauri-plugin-process = { workspace = true }
+tauri-plugin-single-instance = { workspace = true }
+tauri-plugin-store = { workspace = true }
+tauri-plugin-updater = { workspace = true }
+tauri-plugin-window-state = { workspace = true }
 
 [dev-dependencies]
 tempfile = "3.27.0"
