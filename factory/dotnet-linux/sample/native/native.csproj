@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- NativeAOT shared library loaded by Bun through bun:ffi: publish with -p:PublishAot=true -p:NativeLib=Shared (buncc dotnet publish --aot --native-lib). -->
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <AssemblyName>bunos_native</AssemblyName>
+  </PropertyGroup>
+</Project>

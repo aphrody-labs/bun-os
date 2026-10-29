@@ -19955,6 +19955,40 @@
       "note": "Data-driven Rust userland: catalog.json ranks the top Rust tool per domain from GitHub/Arch data; PKGBUILDs bunos-rust-base, bunos-uutils-multicall, bunos-sudo-rs, bunos-nushell-default pin upstream tags by commit."
     },
     {
+      "id": "factory:dotnet-linux",
+      "kind": "factory-module",
+      "path": "factory/dotnet-linux",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/dotnet-linux/pins.json",
+          "factory/dotnet-linux/refresh.ts",
+          "factory/dotnet-linux/gen-pkgbuild.ts",
+          "factory/dotnet-linux/bench.ts",
+          "factory/dotnet-linux/summary.ts",
+          "factory/dotnet-linux/fetch-bun-musl.mjs",
+          "factory/dotnet-linux/ffi-interop.test.ts",
+          "factory/dotnet-linux/tests/BunOS.Tests.ps1",
+          "factory/dotnet-linux/pwsh/Microsoft.PowerShell_profile.ps1",
+          "factory/dotnet-linux/sample/hello/hello.csproj",
+          "factory/dotnet-linux/sample/native/native.csproj",
+          "factory/dotnet-linux/pkg/bunos-dotnet-sdk-bin/PKGBUILD",
+          "factory/dotnet-linux/pkg/bunos-dotnet-sdk-preview-bin/PKGBUILD",
+          "factory/dotnet-linux/pkg/bunos-powershell-bin/PKGBUILD",
+          "factory/dotnet-linux/pkg/bunos-powershell-preview-bin/PKGBUILD",
+          "factory/dotnet-linux/pkg/bunos-powershell-default/PKGBUILD",
+          "packages/buncc/src/dotnet-linux/cli.ts",
+          "docs/DOTNET-LINUX.md",
+          ".github/workflows/dotnet-linux.yml"
+        ]
+      },
+      "registration": ["bun-spawn", "bun-ffi"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["npm:@aphrody/buncc"],
+      "note": "Upstream .NET SDK (10 LTS, 11 RC) and PowerShell (stable, preview) on Linux: pins from the official release metadata, checksum-verified buncc dotnet install, Arch repackaging PKGBUILDs, Bun to NativeAOT through bun:ffi, Pester v5 tests."
+    },
+    {
       "id": "factory:distro/hw",
       "kind": "factory-module",
       "path": "factory/distro",

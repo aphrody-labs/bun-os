@@ -1,0 +1,356 @@
+name: dotnet-linux
+
+# Upstream .NET SDK and PowerShell on Linux (factory/dotnet-linux, docs/DOTNET-LINUX.md): pinned tarballs installed by
+# `buncc dotnet install`, a hello and a NativeAOT hello built and timed, a NativeAOT shared library loaded from Bun
+# through bun:ffi, Pester v5 tests, the Alpine (musl) toolchain, and the Arch packages built with makepkg + namcap.
+on:
+  workflow_dispatch:
+    inputs:
+      wasm:
+        description: Also probe .NET and pwsh inside the container2wasm Alpine guest (long)
+        type: boolean
+        default: false
+  push:
+    branches: [os]
+    paths:
+      - factory/dotnet-linux/**
+      - packages/buncc/src/dotnet-linux/**
+      - packages/buncc/test/dotnet-linux.test.ts
+      - docs/DOTNET-LINUX.md
+      - .github/workflows/dotnet-linux.yml
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  POWERSHELL_TELEMETRY_OPTOUT: "1"
+  POWERSHELL_UPDATECHECK: "Off"
+  PESTER_VERSION: 5.7.1
+
+concurrency:
+  group: dotnet-linux-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pins:
+    name: pins, PKGBUILDs, unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/actions
+            /package.json
+            /Cargo.toml
+            /factory/dotnet-linux
+            /packages/buncc
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - name: Pinned hashes still equal the upstream metadata (a newer release is reported, not an error)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bun factory/dotnet-linux/refresh.ts --check
+      - name: PKGBUILDs are generated from the pins
+        run: bun factory/dotnet-linux/gen-pkgbuild.ts --check
+      - name: Unit tests (pins, checksum refusal, NativeAOT rules, pwsh JSON interop)
+        run: bun test packages/buncc/test/dotnet-linux.test.ts packages/buncc/test/dotnet.test.ts
+
+  ubuntu:
+    name: ${{ matrix.name }}
+    needs: pins
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "x64 .NET 10 + pwsh stable", runner: ubuntu-latest, sdk: sdk10, pwsh: pwsh, channel: "10.0", tfm: net10.0, tag: x64-net10 }
+          - { name: "x64 .NET 11 + pwsh preview", runner: ubuntu-latest, sdk: sdk11, pwsh: pwsh-preview, channel: "11.0", tfm: net11.0, tag: x64-net11 }
+          - { name: "arm64 .NET 10 + pwsh stable", runner: ubuntu-24.04-arm, sdk: sdk10, pwsh: pwsh, channel: "10.0", tfm: net10.0, tag: arm64-net10 }
+    env:
+      OUT: ${{ github.workspace }}/out
+      RES: ${{ github.workspace }}/out/results.jsonl
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/actions
+            /package.json
+            /Cargo.toml
+            /factory/dotnet-linux
+            /packages/buncc
+            **/*.ps1
+            **/*.psm1
+            **/*.psd1
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - name: Install the pinned SDK and PowerShell (SHA-512 / SHA-256 verified before extraction)
+        run: |
+          PREFIX="$RUNNER_TEMP/bunos-prefix"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          mkdir -p "$OUT"; : > "$RES"
+          for what in ${{ matrix.sdk }} ${{ matrix.pwsh }}; do
+            bun packages/buncc/src/cli.ts dotnet install "$what" --run --prefix "$PREFIX" | tee -a "$OUT/receipts.jsonl"
+          done
+          # receipts -> measurements (archive and installed bytes, download and extract seconds)
+          jq -c 'select(.status=="installed") | {name:("install "+.what+" "+.version), bytes:.installedBytes, note:("archive "+((.archiveBytes/1048576)|floor|tostring)+" MiB, download "+(.downloadSeconds|tostring)+" s, extract "+(.extractSeconds|tostring)+" s")}' "$OUT/receipts.jsonl" >> "$RES"
+          bun packages/buncc/src/cli.ts dotnet env --prefix "$PREFIX" --shell json | jq -r 'to_entries[] | select(.key!="PATH") | "\(.key)=\(.value)"' >> "$GITHUB_ENV"
+          echo "$PREFIX/bin" >> "$GITHUB_PATH"; echo "$PREFIX/dotnet" >> "$GITHUB_PATH"
+      - name: The installed versions are the pinned ones
+        run: |
+          want_sdk=$(bun packages/buncc/src/cli.ts dotnet pins --json | jq -r '.dotnet["${{ matrix.channel }}"].sdk')
+          want_pwsh=$(bun packages/buncc/src/cli.ts dotnet pins --json | jq -r '.powershell.${{ matrix.pwsh == 'pwsh' && 'stable' || 'preview' }}.version')
+          got_sdk=$("$PREFIX/dotnet/dotnet" --list-sdks | grep -F "$want_sdk" || true)
+          [ -n "$got_sdk" ] || { echo "::error::SDK $want_sdk not installed"; "$PREFIX/dotnet/dotnet" --list-sdks; exit 1; }
+          got_pwsh=$("$PREFIX/bin/${{ matrix.pwsh }}" -NoProfile -Command '$PSVersionTable.PSVersion.ToString()')
+          [ "$got_pwsh" = "$want_pwsh" ] || { echo "::error::pwsh $got_pwsh != $want_pwsh"; exit 1; }
+          echo "BUNOS_PWSH_PIN=$want_pwsh" >> "$GITHUB_ENV"
+          echo "SDK_PIN=$want_sdk" >> "$GITHUB_ENV"
+          # the pinned dotnet must win over the runner's preinstalled one
+          cd "$RUNNER_TEMP" && [ "$(dotnet --version)" = "$want_sdk" ]
+          buncc_doctor=$(bun "$GITHUB_WORKSPACE/packages/buncc/src/cli.ts" dotnet doctor --prefix "$PREFIX" || true); echo "$buncc_doctor"
+          dotnet --info | head -30
+      - name: hello (framework-dependent), measured
+        run: |
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} -o "$OUT/hello-jit" --exec
+          bun factory/dotnet-linux/bench.ts --name "hello JIT framework-dependent ${{ matrix.tfm }}" --size "$OUT/hello-jit" --runs 10 -- "$OUT/hello-jit/hello" | tee -a "$RES"
+      - name: hello (self-contained), measured
+        run: |
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --self-contained -o "$OUT/hello-sc" --exec
+          bun factory/dotnet-linux/bench.ts --name "hello JIT self-contained ${{ matrix.tfm }}" --size "$OUT/hello-sc" --runs 10 -- "$OUT/hello-sc/hello" | tee -a "$RES"
+      - name: hello (NativeAOT), measured
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq clang zlib1g-dev
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --aot -o "$OUT/hello-aot" --exec
+          "$OUT/hello-aot/hello" | tee "$OUT/hello-aot.json"; jq -e '.aot==true' "$OUT/hello-aot.json"
+          bun factory/dotnet-linux/bench.ts --name "hello NativeAOT ${{ matrix.tfm }}" --size "$OUT/hello-aot/hello" --runs 10 -- "$OUT/hello-aot/hello" | tee -a "$RES"
+      - name: Bun loads a NativeAOT shared library with bun:ffi
+        run: |
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/native -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --aot --native-lib -o "$OUT/native" --exec
+          ls -l "$OUT/native"
+          BUNOS_NATIVE_LIB="$OUT/native/bunos_native.so" bun test factory/dotnet-linux/ffi-interop.test.ts 2>&1 | tee "$OUT/ffi.txt"
+          grep -q ' 1 pass' "$OUT/ffi.txt"
+          echo "{\"name\":\"bun:ffi -> NativeAOT .so ${{ matrix.tfm }}\",\"bytes\":$(stat -c %s "$OUT/native/bunos_native.so"),\"note\":\"$(grep -o 'runtime description from NativeAOT: .*' "$OUT/ffi.txt" | head -1)\"}" >> "$RES"
+      - name: pwsh startup (measured)
+        run: bun factory/dotnet-linux/bench.ts --name "${{ matrix.pwsh }} -NoProfile -c 1" --size "$PREFIX/pwsh" --runs 5 -- "$PREFIX/bin/${{ matrix.pwsh }}" -NoProfile -NonInteractive -Command 1 | tee -a "$RES"
+      - name: Pester v5 (profile, pins, every PowerShell script parses, buncc sh and pwsh interop)
+        shell: bash
+        run: |
+          "$PREFIX/bin/${{ matrix.pwsh }}" -NoProfile -NonInteractive -Command '
+            Install-PSResource Pester -Version $env:PESTER_VERSION -TrustRepository -Scope CurrentUser -Quiet
+            Import-Module Pester -RequiredVersion $env:PESTER_VERSION
+            $c = New-PesterConfiguration
+            $c.Run.Path = "factory/dotnet-linux/tests"; $c.Run.Exit = $true
+            $c.Output.Verbosity = "Normal"
+            $c.TestResult.Enabled = $true; $c.TestResult.OutputPath = "out/pester-${{ matrix.tag }}.xml"
+            Invoke-Pester -Configuration $c'
+        env:
+          BUNOS_REPO: ${{ github.workspace }}
+      - name: Receipt
+        if: always()
+        run: |
+          [ -s "$RES" ] && bun factory/dotnet-linux/summary.ts "$RES" "${{ matrix.name }}" >> "$GITHUB_STEP_SUMMARY" || true
+          cp "$RES" "$OUT/results-${{ matrix.tag }}.jsonl" 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dotnet-linux-${{ matrix.tag }}
+          path: |
+            out/results*.jsonl
+            out/pester-*.xml
+            out/receipts.jsonl
+            out/hello-aot.json
+          if-no-files-found: warn
+
+  alpine:
+    name: Alpine 3.24 (musl) .NET 10 + pwsh
+    needs: pins
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OUT: ${{ github.workspace }}/out
+      BUN_VERSION: 1.4.4-canary.20261028.1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/actions
+            /package.json
+            /Cargo.toml
+            /factory/dotnet-linux
+            /packages/buncc
+            **/*.ps1
+            **/*.psm1
+            **/*.psd1
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - name: Install the pinned musl SDK and PowerShell on the host (checksums verified), musl Bun from npm
+        run: |
+          PREFIX="$RUNNER_TEMP/bunos-musl"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          mkdir -p "$OUT"
+          for what in sdk10 pwsh; do
+            bun packages/buncc/src/cli.ts dotnet install "$what" --rid linux-musl-x64 --run --prefix "$PREFIX" | tee -a "$OUT/receipts.jsonl"
+          done
+          node factory/dotnet-linux/fetch-bun-musl.mjs "$BUN_VERSION" "$PREFIX/musl-bun"
+      - name: Build, run and test inside alpine:3.24.2
+        run: |
+          cat > "$OUT/alpine.sh" <<'EOS'
+          set -eu
+          apk add --no-cache ca-certificates less ncurses-terminfo-base krb5-libs libgcc libintl libssl3 libstdc++ tzdata userspace-rcu zlib icu-libs curl git jq clang build-base zlib-dev >/dev/null
+          apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache lttng-ust openssh-client >/dev/null
+          cat /etc/alpine-release
+          export DOTNET_ROOT="$PREFIX/dotnet" PATH="$PREFIX/musl-bun:$PREFIX/bin:$PREFIX/dotnet:$PATH" DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 POWERSHELL_TELEMETRY_OPTOUT=1 POWERSHELL_UPDATECHECK=Off
+          bun --revision
+          dotnet --list-sdks
+          RES="$OUT/results-alpine.jsonl"; : > "$RES"
+          jq -c 'select(.status=="installed") | {name:("install "+.what+" "+.version+" "+.rid), bytes:.installedBytes, note:("archive "+((.archiveBytes/1048576)|floor|tostring)+" MiB")}' "$OUT/receipts.jsonl" >> "$RES"
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r linux-musl-x64 --channel 10.0 -o "$OUT/hello-jit-musl" --exec
+          bun factory/dotnet-linux/bench.ts --name "hello JIT framework-dependent net10.0 musl" --size "$OUT/hello-jit-musl" --runs 10 -- "$OUT/hello-jit-musl/hello" | tee -a "$RES"
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r linux-musl-x64 --channel 10.0 --aot -o "$OUT/hello-aot-musl" --exec
+          "$OUT/hello-aot-musl/hello" | tee "$OUT/hello-aot-musl.json"; jq -e '.aot==true and (.rid|test("musl"))' "$OUT/hello-aot-musl.json"
+          bun factory/dotnet-linux/bench.ts --name "hello NativeAOT net10.0 musl" --size "$OUT/hello-aot-musl/hello" --runs 10 -- "$OUT/hello-aot-musl/hello" | tee -a "$RES"
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/native -r linux-musl-x64 --channel 10.0 --aot --native-lib -o "$OUT/native-musl" --exec
+          BUNOS_NATIVE_LIB="$OUT/native-musl/bunos_native.so" bun test factory/dotnet-linux/ffi-interop.test.ts 2>&1 | tee "$OUT/ffi-musl.txt"
+          grep -q ' 1 pass' "$OUT/ffi-musl.txt"
+          echo "{\"name\":\"bun:ffi (musl Bun) -> NativeAOT musl .so\",\"bytes\":$(stat -c %s "$OUT/native-musl/bunos_native.so"),\"note\":\"$(grep -o 'runtime description from NativeAOT: .*' "$OUT/ffi-musl.txt" | head -1)\"}" >> "$RES"
+          bun factory/dotnet-linux/bench.ts --name "pwsh -NoProfile -c 1 musl" --size "$PREFIX/pwsh" --runs 5 -- pwsh -NoProfile -NonInteractive -Command 1 | tee -a "$RES"
+          export BUNOS_REPO="$PWD" BUNOS_PWSH_PIN="$(bun packages/buncc/src/cli.ts dotnet pins --json | jq -r .powershell.stable.version)"
+          pwsh -NoProfile -NonInteractive -Command '
+            Install-PSResource Pester -Version $env:PESTER_VERSION -TrustRepository -Scope CurrentUser -Quiet
+            Import-Module Pester -RequiredVersion $env:PESTER_VERSION
+            $c = New-PesterConfiguration
+            $c.Run.Path = "factory/dotnet-linux/tests"; $c.Run.Exit = $true
+            $c.TestResult.Enabled = $true; $c.TestResult.OutputPath = "out/pester-alpine.xml"
+            Invoke-Pester -Configuration $c'
+          EOS
+          docker run --rm -e PREFIX -e OUT -e PESTER_VERSION -v "$PWD:$PWD" -v "$PREFIX:$PREFIX" -w "$PWD" alpine:3.24.2 sh "$OUT/alpine.sh"
+      - name: Receipt
+        if: always()
+        run: |
+          [ -s "$OUT/results-alpine.jsonl" ] && bun factory/dotnet-linux/summary.ts "$OUT/results-alpine.jsonl" "Alpine 3.24.2 musl" >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dotnet-linux-alpine
+          path: |
+            out/results-alpine.jsonl
+            out/pester-alpine.xml
+            out/receipts.jsonl
+          if-no-files-found: warn
+
+  cross-arm64:
+    name: NativeAOT cross x64 -> linux-arm64 (Microsoft cross-compile recipe)
+    needs: pins
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 30
+    env:
+      OUT: ${{ github.workspace }}/out
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/actions
+            /package.json
+            /Cargo.toml
+            /factory/dotnet-linux
+            /packages/buncc
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - name: Install the pinned x64 SDK
+        run: |
+          PREFIX="$RUNNER_TEMP/bunos-prefix"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          mkdir -p "$OUT"
+          bun packages/buncc/src/cli.ts dotnet install sdk10 --run --prefix "$PREFIX"
+          bun packages/buncc/src/cli.ts dotnet env --prefix "$PREFIX" --shell json | jq -r 'to_entries[] | select(.key!="PATH") | "\(.key)=\(.value)"' >> "$GITHUB_ENV"
+          echo "$PREFIX/dotnet" >> "$GITHUB_PATH"
+      - name: "arm64 cross toolchain (noble deb822 sources, arm64 from ports.ubuntu.com)"
+        run: |
+          sudo dpkg --add-architecture arm64
+          sudo sed -i 's/^Types: deb$/Types: deb\nArchitectures: amd64/' /etc/apt/sources.list.d/ubuntu.sources
+          printf 'Types: deb\nURIs: http://ports.ubuntu.com/ubuntu-ports\nSuites: noble noble-updates noble-backports\nComponents: main universe restricted multiverse\nArchitectures: arm64\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n' | sudo tee /etc/apt/sources.list.d/arm64-ports.sources
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang llvm binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu zlib1g-dev:arm64 qemu-user
+      - name: Publish for linux-arm64 and run under qemu-user
+        run: |
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r linux-arm64 --aot -o "$OUT/hello-arm64" --exec -- -p:ObjCopyName=aarch64-linux-gnu-objcopy 2>&1 | tail -30 || true
+          file "$OUT/hello-arm64/hello"
+          qemu-aarch64 -L /usr/aarch64-linux-gnu "$OUT/hello-arm64/hello" | tee "$OUT/hello-arm64.json"
+          jq -e '.aot==true and .arch=="Arm64"' "$OUT/hello-arm64.json"
+          { echo "### NativeAOT cross x64 -> linux-arm64"; echo; ls -l "$OUT/hello-arm64/hello"; cat "$OUT/hello-arm64.json"; } >> "$GITHUB_STEP_SUMMARY"
+
+  arch:
+    name: Arch packages (makepkg, namcap, install, run)
+    needs: pins
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      image: archlinux:base-devel
+    env:
+      PESTER_VERSION: 5.7.1
+    steps:
+      - name: Toolchain
+        run: pacman -Syu --noconfirm --needed git namcap jq clang zlib npm libarchive
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /factory/dotnet-linux
+            /packages/buncc
+            /package.json
+            **/*.ps1
+          sparse-checkout-cone-mode: false
+      - name: Build the packages with makepkg
+        run: |
+          useradd -m builder
+          mkdir -p /out /home/builder/build
+          cp -r factory/dotnet-linux/pkg/. /home/builder/build/
+          chown -R builder:builder /out /home/builder/build
+          for p in bunos-dotnet-sdk-bin bunos-dotnet-sdk-preview-bin bunos-powershell-bin bunos-powershell-preview-bin bunos-powershell-default; do
+            echo "::group::makepkg $p"
+            s=$SECONDS
+            su builder -c "cd /home/builder/build/$p && PKGDEST=/out makepkg -f --noconfirm --nodeps" 2>&1 | tail -15
+            echo "$p: $((SECONDS - s)) s" | tee -a /out/makepkg-times.txt
+            echo "::endgroup::"
+          done
+          ls -l /out
+      - name: namcap (PKGBUILDs and packages)
+        run: |
+          { for p in factory/dotnet-linux/pkg/*/PKGBUILD; do namcap "$p"; done; namcap /out/*.pkg.tar.zst; } 2>&1 | tee /out/namcap.txt || true
+          e=$(grep -c ' E: ' /out/namcap.txt || true); w=$(grep -c ' W: ' /out/namcap.txt || true)
+          echo "namcap: errors=$e warnings=$w" | tee -a "$GITHUB_STEP_SUMMARY"
+          grep ' E: ' /out/namcap.txt || true
+      - name: Install them and run the real tools
+        run: |
+          pacman -U --noconfirm --ask 4 /out/bunos-dotnet-sdk-bin-*.pkg.tar.zst /out/bunos-powershell-bin-*.pkg.tar.zst /out/bunos-powershell-default-*.pkg.tar.zst
+          pacman -U --noconfirm --ask 4 /out/bunos-dotnet-sdk-preview-bin-*.pkg.tar.zst /out/bunos-powershell-preview-bin-*.pkg.tar.zst
+          source /etc/profile.d/dotnet.sh
+          dotnet --list-sdks; dotnet-preview --list-sdks
+          pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'; pwsh-preview -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'
+          grep -x '/usr/bin/pwsh' /etc/shells
+          # a new user gets pwsh as login shell and the Bun OS profile
+          grep '^SHELL=' /etc/default/useradd
+          useradd -m probe && getent passwd probe | cut -d: -f7
+          test -f /home/probe/.config/powershell/Microsoft.PowerShell_profile.ps1
+          su probe -c 'pwsh -NoLogo -Command "bunos-info | ConvertTo-Json -Compress"'
+          { echo '### Arch packages'; ls -l /out/*.pkg.tar.zst | awk '{print "- " $9 " " $5 " bytes"}'; pacman -Qi bunos-dotnet-sdk-bin bunos-powershell-bin | grep -E '^(Name|Version|Installed Size)'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Pester on the installed packages
+        run: |
+          export BUNOS_REPO="$PWD" BUNOS_PWSH_PIN=$(jq -r .powershell.stable.version factory/dotnet-linux/pins.json)
+          pwsh -NoProfile -NonInteractive -Command '
+            Install-PSResource Pester -Version $env:PESTER_VERSION -TrustRepository -Scope CurrentUser -Quiet
+            Import-Module Pester -RequiredVersion $env:PESTER_VERSION
+            $c = New-PesterConfiguration
+            $c.Run.Path = "factory/dotnet-linux/tests"; $c.Run.Exit = $true
+            $c.TestResult.Enabled = $true; $c.TestResult.OutputPath = "/out/pester-arch.xml"
+            Invoke-Pester -Configuration $c'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dotnet-linux-arch-packages
+          path: |
+            /out/*.pkg.tar.zst
+            /out/namcap.txt
+            /out/pester-arch.xml
+          if-no-files-found: warn

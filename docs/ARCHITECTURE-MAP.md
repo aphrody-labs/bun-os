@@ -17,7 +17,7 @@ Platform facades    | windows, windows-posix, wasm, ntcore
                     v
 Workspace tooling   | bun-workspace, components, windows-samples
                     v
-factory             | distro, kernel, wsl, wsl-kernel, wslg, wayland, buncc-desktop, linux-desktop, c, rustbase, wasmos
+factory             | distro, kernel, wsl, wsl-kernel, wslg, wayland, buncc-desktop, linux-desktop, c, rustbase, wasmos, dotnet-linux
                     v
 Images              | images, release, sites
 ```
@@ -65,6 +65,7 @@ Images              | images, release, sites
 | factory | **c**: factory/c (Bun OS C environment: targets, sysroots, runners) (driver in packages/buncc/src/c; CI result not checked by the map) | `factory/c` | `buncc c doctor`<br>`buncc c env`<br>`buncc c targets` | `docs/BUNOS-C.md` | `bunos-c.yml#linux`<br>`bunos-c.yml#musl`<br>`bunos-c.yml#windows` | `factory/c/c-env.json` | unverified |
 | factory | **rustbase**: factory/rustbase (Rust userland: uutils, sudo-rs, nushell packages) (workflow uses oven-sh/setup-bun directly) | `factory/rustbase` | `bun factory/rustbase/check.ts` | `docs/RUSTBASE.md` | `rustbase.yml#check`<br>`rustbase.yml#packages`<br>`rustbase.yml#gnu-coreutils`<br>`rustbase.yml#util-linux-tests` | `factory/rustbase/pins.json` | unverified |
 | factory | **wasmos**: wasmos (compositor and Alpine x86_64 wasm boot under Bun) (recipes in factory/wasmos/wasmos.just (imported by the justfile); CI result not checked by the map) | `packages/wasmos` | `bun packages/wasmos/src/cli.ts`<br>`bun factory/wasmos/build-alpine.ts` | `docs/WASMOS.md` | `wasmos.yml#compositor`<br>`wasmos.yml#alpine` | `factory/wasmos/pins.json` | unverified |
+| factory | **dotnet-linux**: factory/dotnet-linux (upstream .NET SDK and PowerShell on Linux: pinned tarballs, Arch packages, buncc dotnet) (provider code: packages/buncc/src/dotnet-linux (buncc dotnet, buncc pwsh); the existing Windows-centric dotnet provider stays in packages/buncc/src/providers/dotnet.ts) | `factory/dotnet-linux` | `bun factory/dotnet-linux/refresh.ts --check`<br>`bun packages/buncc/src/cli.ts dotnet pins` | `docs/DOTNET-LINUX.md` | `dotnet-linux.yml#pins`<br>`dotnet-linux.yml#ubuntu`<br>`dotnet-linux.yml#alpine`<br>`dotnet-linux.yml#cross-arm64`<br>`dotnet-linux.yml#arch` | `factory/dotnet-linux/pins.json` | unverified |
 | images | **images**: Images (factory/images, factory/arch, factory/usr) (images build on a Linux host; no image has been produced by CI) | `factory/images` | `just iso` | `docs/UNIFIED-INSTALL.md` | - | `factory/arch/sources.json` | unverified |
 | images | **release**: Release (npm, crates, binaries) | `scripts/release.ts` | `just release` | - | `release.yml#verify`<br>`ci.yml#release-plan` | - | unverified |
 | images | **sites**: Web sites (webos) | `apps/webos` | `just build-js` | - | `aphrody-sites.yml#webos` | - | ci-verified |
@@ -94,6 +95,7 @@ Microsoft references (`vendor/microsoft/PINS.json`, 14 pins): microsoft-ui-xaml 
 | `buncc-linux-desktop.yml` (buncc linux desktop (GNOME, Plasma, Qt 6)) | workflow_dispatch, push (os; paths 4: packages/buncc/src/linux-target/**, packages/buncc/test/linux-target.test.ts, ...) | `unit`, `windows-cross`, `arch-build` | linux-desktop | jobs install the pinned Bun with npm install -g bun@BUN_VERSION on ubuntu and windows runners and build in an Arch container; owner: linux-desktop, to move to the setup action |
 | `bunos-c.yml` (Bun OS C) | push (os; paths 3: factory/c/**, packages/buncc/src/c/**, ...), workflow_dispatch | `linux`, `musl`, `windows` | c | setup-workspace |
 | `ci.yml` (CI) | push (os), pull_request, workflow_dispatch | `plan`, `quality`, `rust`, `release-plan` | runtime, buncc, buncc-sh, buncc-providers, bun-workspace, components, release | setup-workspace |
+| `dotnet-linux.yml` (dotnet-linux) | workflow_dispatch, push (os; paths 5: factory/dotnet-linux/**, packages/buncc/src/dotnet-linux/**, ...) | `pins`, `ubuntu`, `alpine`, `cross-arm64`, `arch` | dotnet-linux | setup-workspace |
 | `release.yml` (Release) | push, workflow_dispatch | `verify`, `binaries`, `npm`, `crates`, `github-release` | release | setup-workspace |
 | `rustbase.yml` (Rust userland (rustbase)) | workflow_dispatch, push (os; paths 3: factory/rustbase/**, docs/RUSTBASE.md, ...) | `check`, `packages`, `gnu-coreutils`, `util-linux-tests` | rustbase | jobs run in Arch and Ubuntu containers; the Bun step uses oven-sh/setup-bun directly (owner: rustbase, to move to the setup action) |
 | `wasmos.yml` (WASM OS) | workflow_dispatch, push (os; paths 4: packages/wasmos/**, factory/wasmos/**, ...) | `compositor`, `alpine` | wasmos | jobs install the pinned Bun with npm install -g bun@BUN_VERSION (same version source as setup-bun, no integrity check) and drive Chromium; owner: wasmos, to move to the setup action |

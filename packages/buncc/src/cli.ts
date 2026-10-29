@@ -36,6 +36,7 @@ Build:        bundle <entry...> [--minify] [--splitting] | compile <entry> --out
 Package:      package <msix|appx|msi|exe|zip> --dir d --out o --name N --publisher P ... | sign ... | store <package>
 Profiles:     profile list|show|apply <id> [--run] | bench aot-bun <entry>
 Linux desktop: linux closure|pins|sysroot|cross|build|container|hello <gnome-shell|mutter|gtk4|libadwaita|kwin|plasma-workspace|qtbase|...>   (buncc linux help)
+Dotnet:       dotnet pins|install|env|doctor|publish -r <rid> [--aot] | pwsh   upstream .NET SDK + PowerShell on Linux, pinned (docs/DOTNET-LINUX.md)
 Desktop:      desktop doctor|plan|fetch|build|env|pack|bench   GTK4/libadwaita, Qt6, KDE Frameworks on Windows (docs/BUNCC-DESKTOP.md)
 POSIX:        sh [-c script | file]       Bun Shell (cross-platform); env posix --ensure adds pinned uutils/busybox/ripgrep shims
               install posix|mingw|msys2|wine|proton [--run] | posix doctor|smoke|uninstall <msys2|mingw|gnuwin32|cygwin|all> [--yes]
@@ -203,6 +204,9 @@ async function main(): Promise<number> {
       return wineCommand(rest, root);
     case "linux":
       return (await import("./linux-target/cli.ts")).linuxMain(rest, root);
+    case "dotnet":
+    case "pwsh":
+      return (await import("./dotnet-linux/cli.ts")).dotnetLinuxMain(rest, root, command);
     case "c":
       return (await import("./c/index.ts")).cCommand(rest);
     case "install": {

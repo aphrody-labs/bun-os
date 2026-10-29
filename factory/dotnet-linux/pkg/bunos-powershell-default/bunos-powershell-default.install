@@ -1,0 +1,13 @@
+post_install() {
+  grep -qx /usr/bin/pwsh /etc/shells || echo /usr/bin/pwsh >>/etc/shells
+  # new users only: existing accounts and root are not changed
+  if [ -f /etc/default/useradd ] && grep -q '^SHELL=/bin/bash\|^SHELL=/usr/bin/bash' /etc/default/useradd; then
+    sed -i 's#^SHELL=.*#SHELL=/usr/bin/pwsh#' /etc/default/useradd
+  fi
+}
+post_upgrade() { post_install; }
+post_remove() {
+  if grep -q '^SHELL=/usr/bin/pwsh' /etc/default/useradd 2>/dev/null; then
+    sed -i 's#^SHELL=.*#SHELL=/usr/bin/bash#' /etc/default/useradd
+  fi
+}
