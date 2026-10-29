@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-pub use pdfcraft_compare::{Change, Comparison, Kind, Side};
+pub use crate::compare_core::{Change, Comparison, Kind, Side};
 
 use crate::{DocId, Edit, EditError, Markup, NewAnnotation, NoteIcon, Session, Shape};
 
@@ -18,23 +18,23 @@ pub fn colour(kind: Kind) -> crate::Rgb {
 
 impl crate::Document {
     /// Standards ▸ Verify PDF/A: the rules the document breaks for `level`.
-    pub fn pdfa_verify(&self, level: pdfcraft_preflight::Level) -> Vec<pdfcraft_preflight::Issue> {
+    pub fn pdfa_verify(&self, level: crate::preflight::Level) -> Vec<crate::preflight::Issue> {
         self.editor
             .as_ref()
-            .map(|e| pdfcraft_preflight::verify(&e.cos, level))
+            .map(|e| crate::preflight::verify(&e.cos, level))
             .unwrap_or_default()
     }
 
     /// The standards the document declares (Standards panel).
-    pub fn standards(&self) -> pdfcraft_preflight::Declared {
+    pub fn standards(&self) -> crate::preflight::Declared {
         self.editor
             .as_ref()
-            .map(|e| pdfcraft_preflight::declared(&e.cos))
+            .map(|e| crate::preflight::declared(&e.cos))
             .unwrap_or_default()
     }
 
     /// Every word of the document in reading order, with page and box.
-    pub fn words(&self) -> Vec<pdfcraft_compare::Word> {
+    pub fn words(&self) -> Vec<crate::compare_core::Word> {
         let config = pdfcraft_render::RenderConfig {
             password: self.password.as_deref().map(Arc::from),
             ..Default::default()
@@ -52,7 +52,7 @@ impl crate::Document {
                 out.extend(
                     crate::js::page_words(&t, info)
                         .into_iter()
-                        .map(|(text, rect)| pdfcraft_compare::Word { text, page, rect }),
+                        .map(|(text, rect)| crate::compare_core::Word { text, page, rect }),
                 );
             }
         }
@@ -65,7 +65,7 @@ impl Session {
     pub fn compare(&self, old: DocId, new: DocId) -> Result<Comparison, EditError> {
         let a = self.get(old).ok_or(EditError::NoDocument)?;
         let b = self.get(new).ok_or(EditError::NoDocument)?;
-        Ok(pdfcraft_compare::compare(&a.words(), &b.words()))
+        Ok(crate::compare_core::compare(&a.words(), &b.words()))
     }
 
     /// Visual compare: regions where page n of `new` looks different from page n of `old`
@@ -101,7 +101,7 @@ impl Session {
                 continue;
             }
             let s = y.width as f32 / info.width.max(1e-3);
-            for r in pdfcraft_compare::visual_regions(
+            for r in crate::compare_core::visual_regions(
                 (&y.rgba, y.width, y.height),
                 (&x.rgba, x.width, x.height),
                 24,
@@ -128,7 +128,7 @@ impl Session {
         let name = |id| self.get(id).map(|d| d.name.clone()).unwrap_or_default();
         self.create_report(
             "Compare Report",
-            &pdfcraft_compare::report(&c, &name(old), &name(new)),
+            &crate::compare_core::report(&c, &name(old), &name(new)),
         )
     }
 

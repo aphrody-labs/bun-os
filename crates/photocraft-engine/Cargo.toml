@@ -21,7 +21,6 @@ photocraft-color = { path = "../photocraft-color", version = "0.8.2" }
 photocraft-cms = { path = "../photocraft-cms", version = "0.8.2" }
 photocraft-raster = { path = "../photocraft-raster", version = "0.8.2" }
 photocraft-doc = { path = "../photocraft-doc", version = "0.8.2" }
-photocraft-ops = { path = "../photocraft-ops", version = "0.8.2" }
 photocraft-compose = { path = "../photocraft-compose", version = "0.8.2" }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"

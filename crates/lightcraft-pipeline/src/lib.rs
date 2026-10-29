@@ -30,6 +30,8 @@
     clippy::unreachable
 )]
 
+pub mod lensdb;
+pub mod inpaint;
 pub mod auto;
 pub mod blemish;
 pub mod colorops;

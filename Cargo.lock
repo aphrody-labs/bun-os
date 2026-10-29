@@ -11416,12 +11416,7 @@ dependencies = [
 [[package]]
 name = "craft-fonts"
 version = "1.4.7"
-
-[[package]]
-name = "craft-fonts-tests"
-version = "1.4.7"
 dependencies = [
- "craft-fonts",
  "sha2 0.11.1",
  "skrifa 0.48.0",
 ]
@@ -13513,7 +13508,6 @@ dependencies = [
  "designcraft-compose",
  "designcraft-doc",
  "designcraft-engine",
- "designcraft-format",
  "designcraft-geom",
  "designcraft-mcp",
  "designcraft-pdf",
@@ -13571,9 +13565,7 @@ dependencies = [
  "designcraft-color",
  "designcraft-compose",
  "designcraft-doc",
- "designcraft-epub",
  "designcraft-fonts",
- "designcraft-format",
  "designcraft-geom",
  "designcraft-idml",
  "designcraft-images",
@@ -13597,15 +13589,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "designcraft-epub"
-version = "0.7.1"
-dependencies = [
- "designcraft-color",
- "designcraft-doc",
- "zip 8.6.0",
-]
-
-[[package]]
 name = "designcraft-fonts"
 version = "0.7.1"
 dependencies = [
@@ -13615,17 +13598,6 @@ dependencies = [
  "skrifa 0.47.0",
  "unicode-bidi",
  "unicode-script",
-]
-
-[[package]]
-name = "designcraft-format"
-version = "0.7.1"
-dependencies = [
- "designcraft-doc",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "zip 8.6.0",
 ]
 
 [[package]]
@@ -13772,7 +13744,6 @@ name = "designcraft-web"
 version = "0.7.1"
 dependencies = [
  "designcraft-engine",
- "designcraft-format",
  "designcraft-ui-egui",
  "eframe",
  "egui",
@@ -20550,7 +20521,6 @@ dependencies = [
  "gridcraft-functions",
  "gridcraft-model",
  "gridcraft-numfmt",
- "gridcraft-pdf",
  "gridcraft-xlsx",
  "image",
  "log",
@@ -20604,10 +20574,6 @@ version = "0.6.1"
 dependencies = [
  "gridcraft-core",
 ]
-
-[[package]]
-name = "gridcraft-pdf"
-version = "1.4.7"
 
 [[package]]
 name = "gridcraft-ui-egui"
@@ -24699,11 +24665,9 @@ dependencies = [
  "lightcraft-develop",
  "lightcraft-faces",
  "lightcraft-fetch",
- "lightcraft-geocode",
  "lightcraft-geom",
  "lightcraft-gpu",
  "lightcraft-heif",
- "lightcraft-lensdb",
  "lightcraft-merge",
  "lightcraft-meta",
  "lightcraft-pipeline",
@@ -24749,14 +24713,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lightcraft-geocode"
-version = "0.7.1"
-dependencies = [
- "miniz_oxide 0.8.9",
- "serde",
-]
-
-[[package]]
 name = "lightcraft-geom"
 version = "0.7.1"
 dependencies = [
@@ -24788,22 +24744,6 @@ version = "0.7.1"
 dependencies = [
  "heic-rs",
  "rayon",
-]
-
-[[package]]
-name = "lightcraft-inpaint"
-version = "0.7.1"
-dependencies = [
- "rayon",
-]
-
-[[package]]
-name = "lightcraft-lensdb"
-version = "0.7.1"
-dependencies = [
- "lightcraft-develop",
- "lightcraft-geom",
- "quick-xml 0.38.4",
 ]
 
 [[package]]
@@ -24853,11 +24793,11 @@ dependencies = [
  "lightcraft-color",
  "lightcraft-develop",
  "lightcraft-geom",
- "lightcraft-inpaint",
  "lightcraft-raster",
  "lightcraft-raw",
  "lightcraft-scenes",
  "proptest",
+ "quick-xml 0.38.4",
  "rayon",
  "serde",
  "serde_json",
@@ -29249,17 +29189,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-audit"
-version = "0.7.1"
-dependencies = [
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-edit",
- "pdfcraft-model",
- "thiserror 2.0.21",
-]
-
-[[package]]
 name = "pdfcraft-automation"
 version = "0.7.1"
 dependencies = [
@@ -29285,7 +29214,6 @@ name = "pdfcraft-cli"
 version = "0.7.1"
 dependencies = [
  "base64 0.22.1",
- "pdfcraft-audit",
  "pdfcraft-automation",
  "pdfcraft-cos",
  "pdfcraft-engine",
@@ -29294,10 +29222,6 @@ dependencies = [
  "serde_json",
  "winresource",
 ]
-
-[[package]]
-name = "pdfcraft-compare"
-version = "1.4.7"
 
 [[package]]
 name = "pdfcraft-content"
@@ -29369,24 +29293,21 @@ dependencies = [
  "icu_properties",
  "idna",
  "image",
+ "ocrs",
  "pdfcraft-a11y",
  "pdfcraft-annot",
- "pdfcraft-audit",
- "pdfcraft-compare",
+ "pdfcraft-content",
  "pdfcraft-cos",
  "pdfcraft-create",
  "pdfcraft-edit",
  "pdfcraft-export",
  "pdfcraft-fonts",
  "pdfcraft-forms",
- "pdfcraft-geom",
  "pdfcraft-js",
  "pdfcraft-measure",
  "pdfcraft-model",
- "pdfcraft-ocr",
  "pdfcraft-optimize",
  "pdfcraft-organize",
- "pdfcraft-preflight",
  "pdfcraft-print",
  "pdfcraft-redact",
  "pdfcraft-render",
@@ -29394,6 +29315,7 @@ dependencies = [
  "pdfcraft-xfa",
  "pdfcraft-xfdf",
  "png 0.18.1",
+ "rten",
  "thiserror 2.0.21",
  "url",
 ]
@@ -29438,10 +29360,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-geom"
-version = "0.7.1"
-
-[[package]]
 name = "pdfcraft-js"
 version = "0.7.1"
 dependencies = [
@@ -29465,16 +29383,6 @@ name = "pdfcraft-model"
 version = "0.7.1"
 dependencies = [
  "pdfcraft-cos",
-]
-
-[[package]]
-name = "pdfcraft-ocr"
-version = "0.7.1"
-dependencies = [
- "ocrs",
- "pdfcraft-fonts",
- "rten",
- "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -29507,14 +29415,6 @@ dependencies = [
  "async-channel",
  "futures-lite",
  "zbus",
-]
-
-[[package]]
-name = "pdfcraft-preflight"
-version = "0.7.1"
-dependencies = [
- "pdfcraft-cos",
- "pdfcraft-model",
 ]
 
 [[package]]
@@ -30141,10 +30041,10 @@ dependencies = [
  "exr",
  "flate2",
  "half",
+ "heic-rs",
  "image",
  "image-webp",
  "jpeg-encoder 0.6.1",
- "photocraft-heif",
  "png 0.18.1",
  "proptest",
  "rayon",
@@ -30207,7 +30107,6 @@ dependencies = [
  "photocraft-format",
  "photocraft-geom",
  "photocraft-io",
- "photocraft-ops",
  "photocraft-paint",
  "photocraft-plugins",
  "photocraft-psd",
@@ -30269,13 +30168,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "photocraft-heif"
-version = "0.8.2"
-dependencies = [
- "heic-rs",
-]
-
-[[package]]
 name = "photocraft-io"
 version = "0.8.2"
 dependencies = [
@@ -30302,13 +30194,6 @@ dependencies = [
  "roxmltree 0.20.0",
  "serde_json",
  "thiserror 2.0.21",
-]
-
-[[package]]
-name = "photocraft-ops"
-version = "0.8.2"
-dependencies = [
- "photocraft-doc",
 ]
 
 [[package]]

@@ -17,7 +17,7 @@ pub(crate) fn mime_for(name: &str) -> &'static str {
         Some("png") => "image/png",
         Some("jpg" | "jpeg") => "image/jpeg",
         Some("pdf") => "application/pdf",
-        Some("designcraft") => designcraft_format::MIME,
+        Some("designcraft") => designcraft_engine::format::MIME,
         Some("idml") => "application/vnd.adobe.indesign-idml-package",
         _ => "application/octet-stream",
     }
@@ -62,8 +62,8 @@ mod tests {
     #[test]
     fn download_mime_matches_native_package_and_existing_exports() {
         for (name, expected) in [
-            ("Quarterly.designcraft", designcraft_format::MIME),
-            ("日本語.multi.DEsignCraft", designcraft_format::MIME),
+            ("Quarterly.designcraft", designcraft_engine::format::MIME),
+            ("日本語.multi.DEsignCraft", designcraft_engine::format::MIME),
             ("page.pdf", "application/pdf"),
             ("page.png", "image/png"),
             ("page.jpg", "image/jpeg"),
