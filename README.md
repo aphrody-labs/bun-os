@@ -121,6 +121,7 @@ The [contributor guide](AGENTS.md) and [CI](.github/workflows) define the gates.
 
 - [Introduction](docs/index.mdx), [installation](docs/installation.mdx), [quickstart](docs/quickstart.mdx)
 - [Architecture](docs/architecture.md) and [Arch distribution](docs/architecture/arch-distribution.md)
+- [Architecture map](docs/ARCHITECTURE-MAP.md): every component with its owner, entry command, docs, CI job, pins and status (generated)
 - [Factory](factory/README.md), [native targets](docs/NATIVE-TARGETS.md), [builds](docs/builds.md)
 - [Reverse-engineering pipeline](docs/re-pipeline.md) and [fonts](docs/fonts.md)
 - [Deployment control](docs/control-plane.md) and [qualification](docs/qualification.md)

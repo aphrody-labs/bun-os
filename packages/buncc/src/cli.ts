@@ -28,7 +28,7 @@ import { shMain } from "./sh.ts";
 const USAGE = `buncc: Bun C Compiler, toolchain manager and workspace builder
 
 Driver (use as CC / CXX / AR):  buncc cc|c++|ar|link <compiler arguments>
-Toolchains:   doctor | install <provider> [--run] | env <provider|all> [--shims] | which <tool> | pin
+Toolchains:   doctor [--repo] [--all] | install <provider> [--run] | env <provider|all> [--shims] | which <tool> | pin
 Workspace:    plan [--affected[=base]] [-p crate] | check|build|test|clippy|fmt [-p crate ...] [--affected[=base]] [--jobs N] [--release] [-- extra]
 C LSP:        lsp [--out dir]          merge the driver's compile log into compile_commands.json and write .clangd
 Build:        bundle <entry...> [--minify] [--splitting] | compile <entry> --outfile f [--aot] [--target bun-linux-x64] | aot <entry> --outfile f | wasm ...
@@ -107,6 +107,40 @@ async function selectCrates(root: string): Promise<{ packages: string[]; note: s
   return { packages: result.crates, note: `affected vs ${base}: ${result.reason}` };
 }
 
+/** Repository checks (pins, generated documents, component manifest, one owner per capability); each prints its own summary. */
+async function repoDoctor(root: string): Promise<number> {
+  let failures = 0;
+  console.log("--- repository consistency");
+  for (const script of [
+    "generate-components.ts --check",
+    "check-components.ts",
+    "generate-map.ts --check",
+    "consistency.ts",
+  ]) {
+    const [file, ...args] = script.split(" ");
+    const result = await run([process.execPath, join(root, "factory", "bunos", file!), ...args], {
+      cwd: root,
+      output: "inherit",
+    });
+    if (result.code !== 0) failures++;
+  }
+  return failures;
+}
+
+/** The other doctors of the repository, run as sub-commands of the one doctor (list: factory/bunos/architecture.json "doctors"). */
+async function subDoctors(root: string): Promise<number> {
+  let failures = 0;
+  const file = join(root, "factory", "bunos", "architecture.json");
+  const doctors: Record<string, string> = existsSync(file) ? ((await Bun.file(file).json()).doctors ?? {}) : {};
+  for (const command of Object.values(doctors)) {
+    console.log(`--- ${command}`);
+    const [, ...argv] = command.split(" ");
+    const result = await run([process.execPath, ...argv], { cwd: root, output: "inherit", timeoutMs: 300_000 });
+    if (result.code !== 0) failures++;
+  }
+  return failures;
+}
+
 async function main(): Promise<number> {
   const root = findRoot();
   const cli = import.meta.path;
@@ -150,6 +184,8 @@ async function main(): Promise<number> {
       console.log(
         "WiX: buncc never accepts the OSMF EULA. If `wix` is installed, run `wix eula accept wix7` yourself before `buncc package msi`.",
       );
+      if (has("repo") || has("all")) failures += await repoDoctor(root);
+      if (has("all")) failures += await subDoctors(root);
       return failures ? 1 : 0;
     }
     case "sh":

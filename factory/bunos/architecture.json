@@ -1,0 +1,407 @@
+{
+  "schemaVersion": 1,
+  "kind": "bun-os-architecture",
+  "note": "Hand-curated input of docs/ARCHITECTURE-MAP.md. Everything derivable (pins, workflows, triggers, justfile recipes, buncc commands) is read from the repository by factory/bunos/generate-map.ts; factory/bunos/consistency.ts fails when an entry points at something that does not exist. status: built = code present and unit-tested locally; ci-verified = the listed CI job passed on origin/os; unverified = not run, or CI red. pending = the owner announced it but it has not landed: the map lists it, and the check fails once the file exists while pending is still set.",
+  "layers": [
+    {
+      "id": "runtime",
+      "title": "Bun canary runtime",
+      "text": "npm bun, pinned exactly, unmodified upstream"
+    },
+    {
+      "id": "orchestrator",
+      "title": "buncc",
+      "text": "toolchains, cc driver, Bun Shell, build and package orchestration, the one task entry"
+    },
+    {
+      "id": "providers",
+      "title": "buncc providers",
+      "text": "detect / install / env / pin per toolchain"
+    },
+    {
+      "id": "facade",
+      "title": "Platform facades",
+      "text": "@aphrody/windows, windows/posix, @aphrody/wasm"
+    },
+    {
+      "id": "workspace",
+      "title": "Workspace tooling",
+      "text": "bun-workspace, component manifest, samples matrix"
+    },
+    {
+      "id": "factory",
+      "title": "factory",
+      "text": "distro, wsl, wayland, kernel, linux-desktop, desktop"
+    },
+    {
+      "id": "images",
+      "title": "Images",
+      "text": "factory/images, factory/arch, factory/usr"
+    }
+  ],
+  "ci": {
+    "required": ["ci.yml#plan", "ci.yml#quality", "ci.yml#rust", "ci.yml#release-plan"],
+    "setupAction": ".github/actions/setup-workspace",
+    "note": "required = the status checks a merge into os waits for. Workflows that run Bun use the one setup action (setup-workspace -> setup-bun); workflows that build in a Linux container (container, arch-chroot) do not install Bun on the runner and are listed in noBunSetup."
+  },
+  "noBunSetup": {
+    "wsl-kernel.yml": "builds the WSL kernel on an ubuntu runner with the distribution toolchain; no Bun step",
+    "wsl-rootfs.yml": "builds the rootfs inside an archlinux:base-devel container; Bun is bootstrapped inside the chroot by build-rootfs.sh"
+  },
+  "entries": [
+    {
+      "id": "runtime",
+      "layer": "runtime",
+      "title": "Bun canary",
+      "owner": "package.json",
+      "module": null,
+      "entry": ["bun --version", "buncc doctor"],
+      "docs": ["README.md"],
+      "ci": ["ci.yml#quality"],
+      "pins": ["package.json#packageManager", "factory/bunos/components.json#runtime"],
+      "status": "built",
+      "note": ".github/actions/setup-bun installs the version of packageManager from npm and checks integrity and gitHead"
+    },
+    {
+      "id": "buncc",
+      "layer": "orchestrator",
+      "title": "buncc core (driver, env, cargo, tasks, profiles)",
+      "owner": "packages/buncc",
+      "module": "npm:@aphrody/buncc",
+      "entry": ["just doctor", "just build", "buncc doctor", "buncc plan", "buncc pin", "buncc cc"],
+      "docs": ["docs/BUNCC.md"],
+      "ci": ["ci.yml#quality"],
+      "pins": ["buncc.toolchain.json", "rust-toolchain.toml"],
+      "status": "built"
+    },
+    {
+      "id": "buncc-sh",
+      "layer": "orchestrator",
+      "title": "Shell (Bun Shell through buncc sh)",
+      "owner": "packages/buncc/src/sh.ts",
+      "module": "npm:@aphrody/buncc",
+      "entry": ["buncc sh"],
+      "docs": ["docs/POSIX-ON-WINDOWS.md"],
+      "ci": ["ci.yml#quality"],
+      "pins": [],
+      "status": "built",
+      "note": "the one shell story: .github/actions/setup-workspace runs its steps with shell: bun packages/buncc/src/cli.ts sh {0}"
+    },
+    {
+      "id": "buncc-providers",
+      "layer": "providers",
+      "title": "Toolchain providers (msvc, clang, cmake, dotnet, vcpkg, winget, rust, uv, wasm, xwin, ...)",
+      "owner": "packages/buncc/src/providers",
+      "module": "npm:@aphrody/buncc",
+      "entry": ["buncc install", "buncc env", "buncc which", "buncc pin"],
+      "docs": ["docs/BUNCC.md"],
+      "ci": ["ci.yml#quality"],
+      "pins": ["buncc.toolchain.json"],
+      "status": "built",
+      "note": "msvc is the one vswhere/vcvarsall implementation; import it as @aphrody/buncc/msvc"
+    },
+    {
+      "id": "buncc-posix",
+      "layer": "providers",
+      "title": "POSIX on Windows and Wine/Proton providers (posix, mingw, msys2, wine, proton)",
+      "owner": "packages/buncc/src/providers/posix.ts",
+      "module": "npm:@aphrody/buncc",
+      "entry": ["buncc posix doctor", "buncc posix smoke", "buncc posix uninstall", "buncc wine doctor"],
+      "docs": ["docs/POSIX-ON-WINDOWS.md"],
+      "ci": [],
+      "pins": ["buncc.toolchain.json"],
+      "status": "built",
+      "covers": ["factory/msys2"]
+    },
+    {
+      "id": "windows",
+      "layer": "facade",
+      "title": "@aphrody/windows (Win32, registry, services, shell, WinRT, WinUI)",
+      "owner": "packages/windows",
+      "module": "npm:@aphrody/windows",
+      "entry": ["bun test packages/windows"],
+      "docs": ["docs/WINDOWS.md"],
+      "ci": [],
+      "pins": [],
+      "status": "built",
+      "note": "the one Windows API facade; toolchain discovery stays in buncc, not here"
+    },
+    {
+      "id": "windows-posix",
+      "layer": "facade",
+      "title": "windows/posix (path translation, env and spawn across windows, msys, cygwin, wsl)",
+      "owner": "packages/windows/src/posix",
+      "module": "npm:@aphrody/windows",
+      "entry": ["bun test packages/windows/src/posix"],
+      "docs": ["docs/POSIX-ON-WINDOWS.md"],
+      "ci": [],
+      "pins": [],
+      "status": "built",
+      "note": "the one path-translation implementation"
+    },
+    {
+      "id": "wasm",
+      "layer": "facade",
+      "title": "@aphrody/wasm (build, inspect, run, optimize)",
+      "owner": "packages/wasm",
+      "module": "npm:@aphrody/wasm",
+      "entry": ["buncc wasm", "aphrody-wasm"],
+      "docs": ["packages/wasm/README.md"],
+      "ci": [],
+      "pins": [],
+      "status": "built"
+    },
+    {
+      "id": "bun-workspace",
+      "layer": "workspace",
+      "title": "@aphrody/bun-workspace (cargo module runner, git at scale, source coverage)",
+      "owner": "packages/bun-workspace",
+      "module": "npm:@aphrody/bun-workspace",
+      "entry": ["aphrody-bun doctor", "aphrody-bun git doctor", "aphrody-bun status"],
+      "docs": ["docs/MONOREPO-SCALE.md", "docs/MONOREPO.md"],
+      "ci": ["ci.yml#quality"],
+      "pins": ["packages/bun-workspace/config/git-profiles.json"],
+      "status": "built"
+    },
+    {
+      "id": "components",
+      "layer": "workspace",
+      "title": "Component manifest and architecture map (check, generate, graph, consistency)",
+      "owner": "factory/bunos",
+      "module": "factory:bunos",
+      "entry": ["just components", "just map", "buncc doctor --repo"],
+      "docs": ["docs/ARCHITECTURE-MAP.md", "docs/MONOREPO.md"],
+      "ci": ["ci.yml#quality"],
+      "pins": ["factory/bunos/components.json"],
+      "status": "built"
+    },
+    {
+      "id": "windows-samples",
+      "layer": "workspace",
+      "title": "windows-samples-tests (vendor/microsoft references across C++, C#, Rust, Bun)",
+      "owner": "packages/windows-samples-tests",
+      "module": "npm:@aphrody/windows-samples-tests",
+      "entry": ["bun run --cwd packages/windows-samples-tests coverage"],
+      "docs": ["docs/WINDOWS-SAMPLES.md"],
+      "ci": [],
+      "pins": ["vendor/microsoft/PINS.json"],
+      "status": "built"
+    },
+    {
+      "id": "distro",
+      "layer": "factory",
+      "title": "factory/distro (migrations, hardware profiles, repo layers, COSMIC defaults, theme, overlay)",
+      "owner": "factory/distro",
+      "module": "factory:distro/migrate",
+      "entry": ["just test-distro", "just migrate", "just hw", "just repos", "just overlay"],
+      "docs": ["docs/DISTRO-INSPIRATION.md"],
+      "ci": [],
+      "pins": [],
+      "status": "built"
+    },
+    {
+      "id": "kernel",
+      "layer": "factory",
+      "title": "factory/kernel (linux-bun package, variants)",
+      "owner": "factory/kernel",
+      "module": "factory:kernel",
+      "entry": ["just kernel", "just kernel-list", "just kernel-build"],
+      "docs": ["docs/KERNEL-ROADMAP.md", "factory/kernel/ROADMAP.md"],
+      "ci": [],
+      "pins": [],
+      "status": "unverified",
+      "note": "makepkg needs an Arch host; never run in CI so far"
+    },
+    {
+      "id": "wsl",
+      "layer": "factory",
+      "title": "factory/wsl (Arch rootfs for WSL)",
+      "owner": "factory/wsl",
+      "module": "factory:wsl",
+      "entry": ["bash factory/wsl/build-rootfs.sh"],
+      "docs": ["docs/WSL.md"],
+      "ci": ["wsl-rootfs.yml#rootfs"],
+      "pins": [],
+      "status": "unverified",
+      "note": "Linux host only; wsl-rootfs.yml proves the rootfs checks (no kernel in the archive, no shadow hashes) when green"
+    },
+    {
+      "id": "wsl-kernel",
+      "layer": "factory",
+      "title": "factory/wsl/kernel (WSL2 kernel 7.3 with Rust, patch series)",
+      "owner": "factory/wsl/kernel",
+      "module": "factory:wsl",
+      "entry": ["bash factory/wsl/kernel/build-wsl-kernel.sh"],
+      "docs": ["docs/WSL.md", "docs/KERNEL-ROADMAP.md"],
+      "ci": ["wsl-kernel.yml#kernel", "wsl-kernel.yml#nvidia-open-build-check"],
+      "pins": [],
+      "status": "unverified",
+      "note": "Linux host only; bzImage and modules.vhdx exist only when the workflow uploads them"
+    },
+    {
+      "id": "wslg",
+      "layer": "factory",
+      "title": "WSLg (bunos-wslg)",
+      "owner": "factory/wsl",
+      "module": null,
+      "entry": [],
+      "docs": ["docs/WSLG.md"],
+      "ci": [],
+      "pins": [],
+      "status": "unverified",
+      "pending": true,
+      "note": "announced by the WSLg owner (workflow bunos-wslg on the fork); not on os yet"
+    },
+    {
+      "id": "wayland",
+      "layer": "factory",
+      "title": "factory/wayland (Wayland closure)",
+      "owner": "factory/wayland",
+      "module": null,
+      "entry": [],
+      "docs": ["docs/WAYLAND-CLOSURE.md"],
+      "ci": [],
+      "pins": [],
+      "status": "unverified",
+      "pending": true,
+      "note": "announced by the Wayland owner; not on os yet"
+    },
+    {
+      "id": "buncc-desktop",
+      "layer": "factory",
+      "title": "buncc desktop entries",
+      "owner": "packages/buncc",
+      "module": "npm:@aphrody/buncc",
+      "entry": [],
+      "docs": ["docs/BUNCC-DESKTOP.md"],
+      "ci": ["buncc-desktop.yml#desktop"],
+      "pins": [],
+      "status": "unverified",
+      "pending": true,
+      "note": "announced by the buncc desktop owner; workflow and doc not on os yet"
+    },
+    {
+      "id": "linux-desktop",
+      "layer": "factory",
+      "title": "factory/linux-desktop",
+      "owner": "factory/linux-desktop",
+      "module": null,
+      "entry": [],
+      "docs": [],
+      "ci": ["buncc-linux-desktop.yml#desktop"],
+      "pins": [],
+      "status": "unverified",
+      "pending": true,
+      "note": "announced by the Linux-desktop owner; not on os yet"
+    },
+    {
+      "id": "images",
+      "layer": "images",
+      "title": "Images (factory/images, factory/arch, factory/usr)",
+      "owner": "factory/images",
+      "module": null,
+      "entry": ["just iso"],
+      "docs": ["docs/UNIFIED-INSTALL.md"],
+      "ci": [],
+      "pins": ["factory/arch/sources.json"],
+      "status": "unverified",
+      "note": "images build on a Linux host; no image has been produced by CI",
+      "covers": ["factory/arch", "factory/usr", "factory/upstream"]
+    },
+    {
+      "id": "release",
+      "layer": "images",
+      "title": "Release (npm, crates, binaries)",
+      "owner": "scripts/release.ts",
+      "module": null,
+      "entry": ["just release"],
+      "docs": [],
+      "ci": ["release.yml#verify", "ci.yml#release-plan"],
+      "pins": [],
+      "status": "unverified"
+    },
+    {
+      "id": "sites",
+      "layer": "images",
+      "title": "Web sites (webos)",
+      "owner": "apps/webos",
+      "module": null,
+      "entry": ["just build-js"],
+      "docs": [],
+      "ci": ["aphrody-sites.yml#webos"],
+      "pins": [],
+      "status": "ci-verified"
+    }
+  ],
+  "pinExemptions": {
+    "nightly": {
+      "apps/vectorcraft/": "own application with its own Windows 7 toolchain",
+      "crates/ghidra-decompiler/fuzz/": "fuzz crate with its own channel",
+      "crates/aphrody-infra/src/devenv.rs": "workstation profile of the infra crate, unrelated to the repository channel",
+      "infra/config/host/toolchain.json": "workstation inventory, not a build input",
+      "infra/config/disk-reclaim.json": "prose about the workstation inventory",
+      "packages/bun-tauri/": "vendored Tauri changelogs quote historical channels"
+    }
+  },
+  "canonical": [
+    {
+      "capability": "Doctor (toolchains, workspace, distro, repository consistency)",
+      "owner": "packages/buncc",
+      "entry": "buncc doctor --all (just doctor)"
+    },
+    {
+      "capability": "Pins (tools, Rust, Bun runtime)",
+      "owner": "buncc.toolchain.json, rust-toolchain.toml, package.json packageManager",
+      "entry": "buncc pin; tables in docs are generated (just map)"
+    },
+    {
+      "capability": "Shell",
+      "owner": "packages/buncc/src/sh.ts",
+      "entry": "buncc sh"
+    },
+    {
+      "capability": "MSVC discovery (vswhere, vcvarsall)",
+      "owner": "packages/buncc/src/providers/msvc.ts",
+      "entry": "@aphrody/buncc/msvc"
+    },
+    {
+      "capability": "Windows API facade",
+      "owner": "packages/windows",
+      "entry": "@aphrody/windows"
+    },
+    {
+      "capability": "Path translation (windows, msys, cygwin, wsl)",
+      "owner": "packages/windows/src/posix/path.ts",
+      "entry": "@aphrody/windows/posix"
+    },
+    {
+      "capability": "Task entry",
+      "owner": "justfile",
+      "entry": "just --list (delegates to buncc and turbo)"
+    },
+    {
+      "capability": "Component and edge registry",
+      "owner": "factory/bunos/components.json",
+      "entry": "just components"
+    },
+    {
+      "capability": "Architecture map",
+      "owner": "factory/bunos/architecture.json",
+      "entry": "just map"
+    }
+  ],
+  "duplicatesAllowed": {
+    "vswhere": {
+      "scripts/aphrody/build/rust/cargo-serial.ts": "VsDevCmd-based environment of the serial cargo runner; migrate to @aphrody/buncc/msvc when scripts/aphrody is folded into buncc (owner: scripts/aphrody)",
+      "scripts/aphrody/build/shell/terminal-build.ts": "VsDevCmd with MSBuild requirement for the terminal build; same migration (owner: scripts/aphrody)"
+    }
+  },
+  "doctors": {
+    "packages/bun-workspace/src/cli.ts": "bun packages/bun-workspace/src/cli.ts doctor",
+    "packages/bun-workspace/src/git-cli.ts": "bun packages/bun-workspace/src/cli.ts git doctor",
+    "factory/distro/cli.ts": "bun factory/distro/cli.ts doctor",
+    "packages/buncc/src/posix-cli.ts": "bun packages/buncc/src/cli.ts posix doctor",
+    "src/cli.ts": "bun src/cli.ts doctor"
+  },
+  "doctorsNote": "buncc doctor --all runs buncc's own toolchain report, then each command above, then the repository consistency check. These stay as sub-commands for their owners; nobody adds a new top-level doctor."
+}

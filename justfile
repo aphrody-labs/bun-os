@@ -58,11 +58,9 @@ lint:
     bun run lint
 
 [group('everyday')]
-[doc('Diagnose toolchains (buncc), the workspace, the component manifest and the distro files')]
-doctor: components
-    bun run doctor
-    bun run buncc doctor
-    {{ distro }} doctor
+[doc('The one doctor: buncc toolchains, repository consistency, workspace, product CLI and distro files')]
+doctor:
+    bun run buncc doctor --all
 
 # ---- images, kernel, desktop, release -------------------------------------------------------------------------------
 
@@ -142,9 +140,14 @@ test-distro:
     bun test factory/distro
 
 [group('distro')]
-[doc('Component manifest consistency (factory/bunos/components.json)')]
+[doc('Repository consistency: component manifest, generated pins and map, one owner per capability (buncc doctor --repo)')]
 components:
-    bun factory/bunos/check-components.ts
+    bun run buncc doctor --repo
+
+[group('distro')]
+[doc('Regenerate docs/ARCHITECTURE-MAP.md and the pin table of docs/BUNCC.md from the repository')]
+map:
+    bun factory/bunos/generate-map.ts
 
 # ---- inventory and plans -----------------------------------------------------------------------------------------
 

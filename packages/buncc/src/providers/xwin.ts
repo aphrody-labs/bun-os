@@ -1,7 +1,7 @@
 /**
  * xwin: download the MSVC CRT and Windows SDK from Microsoft's CDN and lay them out for cross-compiling to Windows with
  * clang-cl / lld-link from Linux and macOS (https://github.com/Jake-Shadle/xwin). The fork wrapped this in
- * scripts/build/winsysroot.ts and its own `bun msvc` cross mode; xwin is the maintained tool for the same job.
+ * scripts/build/winsysroot.ts and a cross mode of its own (removed with the fork); xwin is the maintained tool for the same job.
  */
 import { existsSync } from "node:fs";
 import { join } from "node:path";

@@ -3317,7 +3317,8 @@
       },
       "registration": ["bun-ffi"],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "dependsOn": ["npm:@aphrody/buncc"]
     },
     {
       "id": "npm:@aphrody/bun-engine",
@@ -3443,7 +3444,12 @@
         "wine": "Linux and macOS hosts only: pinned Wine build, buncc-owned prefixes, dxvk, vkd3d-proton",
         "proton": "Linux hosts only: pinned proton-cachyos"
       },
-      "note": "docs/POSIX-ON-WINDOWS.md; buncc posix uninstall <msys2|mingw|gnuwin32|cygwin|all> is a dry run unless --yes"
+      "note": "docs/POSIX-ON-WINDOWS.md; buncc posix uninstall <msys2|mingw|gnuwin32|cygwin|all> is a dry run unless --yes",
+      "consumedBy": [
+        "file:factory/native-targets.ts",
+        "npm:@aphrody/bun-emu-host",
+        "npm:@aphrody/windows-samples-tests"
+      ]
     },
     {
       "id": "npm:@aphrody/canvas",
@@ -19909,7 +19915,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/microsoft/microsoft-ui-xaml.git",
-        "pin": "91da8f5303651791acbb96e63a8ac4c38851e678"
+        "pin": "ba3a8d59e6de4e2b86ca4f61c78bc26ccf129afd"
       },
       "registration": ["none"],
       "aot": true,
@@ -20133,7 +20139,7 @@
       "source": {
         "type": "workspace",
         "name": "@aphrody/windows-samples-tests",
-        "version": "0.1.0"
+        "version": "1.4.7"
       },
       "registration": ["none"],
       "aot": true,
@@ -20150,9 +20156,7 @@
         "url": "https://github.com/hyprwm/aquamarine.git",
         "pin": "f31c47a1b9d300847d8fc3108ad959448103dfc1"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20184,9 +20188,7 @@
         "url": "https://gitlab.freedesktop.org/cairo/cairo.git",
         "pin": "018b3424a10ecd37450360f21454ecf0f3007e17"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20212,9 +20214,7 @@
         "url": "https://github.com/microsoft/DirectX-Headers.git",
         "pin": "6064ae312901a77e8700e84a2341470d050fcbca"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -20234,9 +20234,7 @@
         "url": "https://github.com/FreeRDP/FreeRDP.git",
         "pin": "97eff6ddfbbfaa8e42a126d362686bd001ff8bdc"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20271,9 +20269,7 @@
         "url": "https://github.com/stephenberry/glaze.git",
         "pin": "43b175e7446862b84ed07b2e5f5138433777680e"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -20293,9 +20289,7 @@
         "url": "https://github.com/hyprwm/hyprcursor.git",
         "pin": "44e91d467bdad8dcf8bbd2ac7cf49972540980a5"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20319,9 +20313,7 @@
         "url": "https://github.com/hyprwm/hyprgraphics.git",
         "pin": "482d4b7ec36ffdaf3573086aa586b178fd5404be"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20348,9 +20340,7 @@
         "url": "https://github.com/hyprwm/Hyprland.git",
         "pin": "0aa6745f705f2c4b0a5004eb019ef76e5bbdb426"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20412,9 +20402,7 @@
         "url": "https://github.com/hyprwm/hyprland-guiutils.git",
         "pin": "a16ad89ed5fb4192c966018a80c652de8d96f748"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20441,19 +20429,14 @@
         "url": "https://github.com/aphrody-labs/hyprland-preview-share-picker.git",
         "pin": "211b7890ed3332f4d1bb1f1a96999e18874a9c3c"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
         "submodule:vendor/hyprland/hyprland-protocols",
         "submodule:vendor/hyprland/xdg-desktop-portal-hyprland"
       ],
-      "consumedBy": [
-        "file:factory/wayland/closure.json",
-        "file:factory/images/bunos-hyprland/hyprland.packages"
-      ],
+      "consumedBy": ["file:factory/wayland/closure.json", "file:factory/images/bunos-hyprland/hyprland.packages"],
       "note": "hyprland-preview-share-picker v0.2.1 (2025-04-29) cargo; consumers bun-os; factory/wayland/closure.json"
     },
     {
@@ -20465,9 +20448,7 @@
         "url": "https://github.com/hyprwm/hyprland-protocols.git",
         "pin": "044a434ec371f985655389bcef09286b1af3d77c"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -20487,18 +20468,11 @@
         "url": "https://github.com/hyprwm/hyprland-qtutils.git",
         "pin": "119bcb9aa742658107b326c50dcd24ab59b309b7"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/hyprland/hyprutils"
-      ],
-      "consumedBy": [
-        "file:factory/wayland/closure.json",
-        "file:factory/images/bunos-hyprland/hyprland.packages"
-      ],
+      "dependsOn": ["submodule:vendor/hyprland/hyprutils"],
+      "consumedBy": ["file:factory/wayland/closure.json", "file:factory/images/bunos-hyprland/hyprland.packages"],
       "note": "hyprland-qtutils v0.1.5 (2025-09-10) cmake; consumers bun-os; factory/wayland/closure.json"
     },
     {
@@ -20510,14 +20484,10 @@
         "url": "https://github.com/hyprwm/hyprlang.git",
         "pin": "3a1c1b25b059dae2c6bbc46991562ba1158d125c"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/hyprland/hyprutils"
-      ],
+      "dependsOn": ["submodule:vendor/hyprland/hyprutils"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20534,9 +20504,7 @@
         "url": "https://github.com/hyprwm/hyprtoolkit.git",
         "pin": "f8cbaf42e1f7fdc9c7565d7be3e935f6d56c7a39"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20570,14 +20538,10 @@
         "url": "https://github.com/hyprwm/hyprutils.git",
         "pin": "0d13d5a624eb093b600d1b2cbe448fb613c86424"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/pixman"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/pixman"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20594,9 +20558,7 @@
         "url": "https://github.com/hyprwm/hyprwayland-scanner.git",
         "pin": "b8632713a6beaf28b56f2a7b0ab2fb7088dbb404"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -20616,14 +20578,10 @@
         "url": "https://github.com/hyprwm/hyprwire.git",
         "pin": "3e6865ce5fd9237b58f5b2ce5de18814df3baff5"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/hyprland/hyprutils"
-      ],
+      "dependsOn": ["submodule:vendor/hyprland/hyprutils"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20640,9 +20598,7 @@
         "url": "https://github.com/mm2/Little-CMS.git",
         "pin": "21c582a594fe5279f90c0b93437c398f93bf62b0"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -20662,9 +20618,7 @@
         "url": "https://gitlab.freedesktop.org/libdecor/libdecor.git",
         "pin": "149c6f0b05663aaa69fdf7f94be2483776d1a311"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20691,9 +20645,7 @@
         "url": "https://gitlab.freedesktop.org/emersion/libdisplay-info.git",
         "pin": "c67a3e9bedb05ab61c7443704a1a107e76254595"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -20713,14 +20665,10 @@
         "url": "https://gitlab.freedesktop.org/mesa/drm.git",
         "pin": "e984d448b8b17aab853369e6c203e53719f46de1"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/libpciaccess"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/libpciaccess"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20737,15 +20685,10 @@
         "url": "https://gitlab.freedesktop.org/libinput/libei.git",
         "pin": "8a46bf3d4b6af7f25a61be53386cf618218114ef"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/libevdev",
-        "submodule:vendor/wayland/libxkbcommon"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/libevdev", "submodule:vendor/wayland/libxkbcommon"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20762,9 +20705,7 @@
         "url": "https://github.com/anholt/libepoxy.git",
         "pin": "c84bc9459357a40e46e2fec0408d04fbdde2c973"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20788,9 +20729,7 @@
         "url": "https://gitlab.freedesktop.org/libevdev/libevdev.git",
         "pin": "d9af2e4580297e9c14715fef06621dd39d9d8a3a"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -20810,15 +20749,10 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libfontenc.git",
         "pin": "780d1f6f192a331de7b298a96e23ebc44d2a884b"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/xorg-util-macros",
-        "submodule:vendor/wayland/xorgproto"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/xorg-util-macros", "submodule:vendor/wayland/xorgproto"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20835,9 +20769,7 @@
         "url": "https://gitlab.freedesktop.org/glvnd/libglvnd.git",
         "pin": "faa23f21fc677af5792825dc30cb1ccef4bf33a6"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20861,9 +20793,7 @@
         "url": "https://gitlab.freedesktop.org/libinput/libinput.git",
         "pin": "5cf833b572f5a33663888da321dce0ba1abd82a2"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20890,14 +20820,10 @@
         "url": "https://gitlab.freedesktop.org/emersion/libliftoff.git",
         "pin": "8b08dc1c14fd019cc90ddabe34ad16596b0691f4"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/libdrm"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/libdrm"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20914,14 +20840,10 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git",
         "pin": "38e6f15f839fba2c49982e7ad61cde681fd5d4d6"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/xorg-util-macros"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/xorg-util-macros"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20938,9 +20860,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libx11.git",
         "pin": "b8d5a7046a98a244ee8ca3c9c07fd617c800dde2"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -20964,14 +20884,10 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxau.git",
         "pin": "a9c65683e68b3a4349afee5d7673b393fb924d2e"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/xorgproto"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/xorgproto"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -20988,9 +20904,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb.git",
         "pin": "622152ee42a310876f10602601206954b8d0613e"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21016,9 +20930,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcomposite.git",
         "pin": "a6d5d773e2a4e5a11b58f3a894f2085686baa6f4"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21043,9 +20955,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcursor.git",
         "pin": "8ae6cf61b18ecddf26f72a07bbfbd1ea9f022c36"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21071,9 +20981,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcvt.git",
         "pin": "dd8631c61465cc0de5e476c7a98e56528d62b163"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21093,9 +21001,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxdamage.git",
         "pin": "4ff0f0e76c974faf920e476abccc65a4990a637c"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21119,15 +21025,10 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxdmcp.git",
         "pin": "1192d3bc407348ff316bd3bffc791b3ac73f591b"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/xorg-util-macros",
-        "submodule:vendor/wayland/xorgproto"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/xorg-util-macros", "submodule:vendor/wayland/xorgproto"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -21144,9 +21045,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxext.git",
         "pin": "2a694ba264ccdb205909909abfe8b136f9156ebe"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21170,9 +21069,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxfixes.git",
         "pin": "70d5b0e37f8a759f3dbc218f22954347ceed094a"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21196,9 +21093,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxfont.git",
         "pin": "975cc6526e892c6fad8fa49d0fef58565fbaa003"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21222,9 +21117,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxi.git",
         "pin": "9ea632ab9dce9ad6630ef7db9d1850ea3d0a2419"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21250,9 +21143,7 @@
         "url": "https://github.com/xkbcommon/libxkbcommon.git",
         "pin": "d1442aaa6b635551182e83c3b55037f4c118c962"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21278,9 +21169,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxkbfile.git",
         "pin": "42e5dedd7fd3c7c73f3870a8751893c03c1afc69"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21304,9 +21193,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxrandr.git",
         "pin": "540c3ceef2be3e513b18002a858c7a9591dd749a"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21332,9 +21219,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxrender.git",
         "pin": "f30d654658ebf17d41141ed3ec2abf607d8a512e"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21358,15 +21243,10 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxshmfence.git",
         "pin": "89f064748554e11832a3ec783945e1f4c7fe846e"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/xorg-util-macros",
-        "submodule:vendor/wayland/xorgproto"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/xorg-util-macros", "submodule:vendor/wayland/xorgproto"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -21383,9 +21263,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxtst.git",
         "pin": "b95aac652cd77f66c4b472aa840b30c337b77715"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21411,9 +21289,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxxf86vm.git",
         "pin": "7f200bf00e3e288e47265c01decc401616c57f10"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21437,9 +21313,7 @@
         "url": "https://gitlab.freedesktop.org/mesa/mesa.git",
         "pin": "8e87a503ebd91408c88596d1b9eeb5f4c0b2088d"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21474,9 +21348,7 @@
         "url": "https://bitmath.org/git/mtdev.git",
         "pin": "9035c2225494b80b02e985fc7ee77880e0bd6993"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21496,9 +21368,7 @@
         "url": "https://github.com/beltoforion/muparser.git",
         "pin": "fbafd7f8774af2b53f4d2de07c57353fcfc09216"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21518,9 +21388,7 @@
         "url": "https://gitlab.gnome.org/GNOME/pango.git",
         "pin": "45522cd5c68ef9ef6e67a902a45a4e39dfcddaf7"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21544,9 +21412,7 @@
         "url": "https://gitlab.freedesktop.org/pipewire/pipewire.git",
         "pin": "f9d6cbc99c354b9b0ad1d37245dc3ab0fb9f9171"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21570,9 +21436,7 @@
         "url": "https://gitlab.freedesktop.org/pixman/pixman.git",
         "pin": "9cc163c9da0fb4da430641715313d95a6ec466d9"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21592,9 +21456,7 @@
         "url": "https://github.com/polkit-org/polkit.git",
         "pin": "e6373dc19975d8583568c6cd7025d03e682ca956"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21614,9 +21476,7 @@
         "url": "https://github.com/google/re2.git",
         "pin": "927f5d53caf8111721e734cf24724686bb745f55"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21636,9 +21496,7 @@
         "url": "https://github.com/Kistler-Group/sdbus-cpp.git",
         "pin": "ca073434d2c03c2b619f7e23f285cebbf32c7e46"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21658,9 +21516,7 @@
         "url": "https://git.sr.ht/~kennylevinsen/seatd",
         "pin": "daa8196e10b180b8b0caeafa8e5f860eb1bd6706"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21680,9 +21536,7 @@
         "url": "https://github.com/marzer/tomlplusplus.git",
         "pin": "30172438cee64926dc41fdd9c11fb3ba5b2ba9de"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21702,9 +21556,7 @@
         "url": "https://gitlab.freedesktop.org/wayland/wayland.git",
         "pin": "87cc8a8728a923fc57938faa81ba0e74f34ecdc7"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21724,14 +21576,10 @@
         "url": "https://gitlab.freedesktop.org/wayland/wayland-protocols.git",
         "pin": "ee78491a237eaff9389a0ccf8680521d074407d3"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/wayland"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/wayland"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -21748,9 +21596,7 @@
         "url": "https://gitlab.freedesktop.org/wayland/weston.git",
         "pin": "530ae6c769d2fd55ea5157542654810be81a3193"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21793,9 +21639,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/proto/xcbproto.git",
         "pin": "77d7fc04da729ddc5ed4aacf30253726fac24dca"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -21815,9 +21659,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-util.git",
         "pin": "3a157762578a2e4253a7cb40d2854a3444d5a9df"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21841,9 +21683,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-cursor.git",
         "pin": "7b0fa99aa13084a9bf7be4180066f6a74b0adef1"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21868,15 +21708,10 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-errors.git",
         "pin": "517dd82c079de762a7426f20166a44f11e8d38c5"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/libxcb",
-        "submodule:vendor/wayland/xorgproto"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/libxcb", "submodule:vendor/wayland/xorgproto"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -21893,9 +21728,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-image.git",
         "pin": "525ce59fe2329d4b23fc0c52ed9dd92daac8ac2a"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21920,9 +21753,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-keysyms.git",
         "pin": "85e093f14b0ade2956e0a5d1c37cfde06d8b1ba6"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21946,9 +21777,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-render-util.git",
         "pin": "5293d8b6165f23b9f7a8bcc903da0e4d7a75984c"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21972,9 +21801,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-wm.git",
         "pin": "0c6681e465c9cc7b1fbb60778ba1eaa61ab01a14"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -21998,14 +21825,10 @@
         "url": "https://github.com/flatpak/xdg-desktop-portal.git",
         "pin": "1d20fadc304f6601452b5db65ed91197dba77041"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/pipewire"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/pipewire"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -22022,14 +21845,10 @@
         "url": "https://github.com/flatpak/xdg-desktop-portal-gtk.git",
         "pin": "337202d4e7179857bc37b03c1a6d8c9d92e47c44"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/xdg-desktop-portal"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/xdg-desktop-portal"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -22046,9 +21865,7 @@
         "url": "https://github.com/hyprwm/xdg-desktop-portal-hyprland.git",
         "pin": "d1467fea8d1895cb7835829c2fbb271a0d37760a"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -22065,10 +21882,7 @@
         "submodule:vendor/wayland/wayland-protocols",
         "submodule:vendor/wayland/xdg-desktop-portal"
       ],
-      "consumedBy": [
-        "file:factory/wayland/closure.json",
-        "file:factory/images/bunos-hyprland/hyprland.packages"
-      ],
+      "consumedBy": ["file:factory/wayland/closure.json", "file:factory/images/bunos-hyprland/hyprland.packages"],
       "note": "xdg-desktop-portal-hyprland v1.5.0 (2026-10-28) meson; consumers bun-os; factory/wayland/closure.json"
     },
     {
@@ -22080,9 +21894,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/app/xkbcomp.git",
         "pin": "2c7789785981ad1fce3858c726615b49293f7de0"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -22107,14 +21919,10 @@
         "url": "https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git",
         "pin": "2ec770a0085bf776de749e185ca40e50213fb21f"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/xkbcomp"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/xkbcomp"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -22131,9 +21939,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/util/macros.git",
         "pin": "a9d71e3fd8e6758b70be31c586921bbbcd2a8449"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [],
@@ -22153,14 +21959,10 @@
         "url": "https://gitlab.freedesktop.org/xorg/proto/xorgproto.git",
         "pin": "6d3907b6d5dc4aa7d7ee6ee5d7d8714e7466630b"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": [
-        "submodule:vendor/wayland/xorg-util-macros"
-      ],
+      "dependsOn": ["submodule:vendor/wayland/xorg-util-macros"],
       "consumedBy": [
         "file:factory/wayland/closure.json",
         "file:factory/wayland/wslg-deps.json",
@@ -22177,9 +21979,7 @@
         "url": "https://gitlab.freedesktop.org/xorg/xserver.git",
         "pin": "d958b4e84c903e8d5851b5ea587b998e4834ce62"
       },
-      "registration": [
-        "none"
-      ],
+      "registration": ["none"],
       "aot": true,
       "status": "present",
       "dependsOn": [
@@ -22206,6 +22006,67 @@
         "file:factory/images/bunos-hyprland/hyprland.packages"
       ],
       "note": "xwayland xwayland-24.1.14 (2026-10-07) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "factory:bunos",
+      "kind": "factory-module",
+      "path": "factory/bunos",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/bunos/check-components.ts",
+          "factory/bunos/generate-components.ts",
+          "factory/bunos/generate-map.ts",
+          "factory/bunos/consistency.ts",
+          "factory/bunos/workspace-graph.ts",
+          "factory/bunos/components.json",
+          "factory/bunos/architecture.json"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/buncc"],
+      "note": "Component manifest, workspace graph and the architecture map (docs/ARCHITECTURE-MAP.md); buncc doctor --repo runs consistency.ts."
+    },
+    {
+      "id": "factory:kernel",
+      "kind": "factory-module",
+      "path": "factory/kernel",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/kernel/README.md",
+          "factory/kernel/ROADMAP.md",
+          "factory/kernel/linux-bun/PKGBUILD",
+          "factory/kernel/linux-bun/check-config.sh"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["factory:distro/kernel-variants", "factory:wsl"],
+      "note": "linux-bun Arch package; docs/KERNEL-ROADMAP.md."
+    },
+    {
+      "id": "factory:wsl",
+      "kind": "factory-module",
+      "path": "factory/wsl",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/wsl/build-rootfs.sh",
+          "factory/wsl/bunos-wsl.sh",
+          "factory/wsl/packages.base",
+          "factory/wsl/wsl.conf",
+          "factory/wsl/kernel/build-wsl-kernel.sh"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["factory:kernel", "factory:distro/repos"],
+      "note": "Arch rootfs and WSL2 kernel for WSL; docs/WSL.md; workflows wsl-rootfs.yml and wsl-kernel.yml."
     }
   ]
 }
