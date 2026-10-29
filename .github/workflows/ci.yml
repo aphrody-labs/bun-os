@@ -42,6 +42,9 @@ jobs:
     name: Rust ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
+    # Windows is advisory until packages/bun-workspace/src/index.ts stops calling the fork-only `bun msvc exec`
+    # (upstream Bun has no msvc command, setup fails with: Script not found "msvc").
+    continue-on-error: ${{ matrix.os == 'windows-latest' }}
     strategy:
       fail-fast: false
       matrix:
