@@ -72,28 +72,60 @@ impl GitHubClient {
         );
 
         let resp = self.request(ApiMethod::Get, &route, None).await?;
-        let items =
-            resp.body.get("items").and_then(Value::as_array).ok_or_else(|| {
-                Error::Git("missing items array in GitHub search response".into())
-            })?;
+        let items = resp
+            .body
+            .get("items")
+            .and_then(Value::as_array)
+            .ok_or_else(|| Error::Git("missing items array in GitHub search response".into()))?;
 
         let mut results = Vec::new();
         for item in items {
-            let name = item.get("name").and_then(Value::as_str).unwrap_or("").to_string();
-            let full_name = item.get("full_name").and_then(Value::as_str).unwrap_or("").to_string();
-            let owner =
-                item.pointer("/owner/login").and_then(Value::as_str).unwrap_or("").to_string();
-            let html_url = item.get("html_url").and_then(Value::as_str).unwrap_or("").to_string();
-            let description = item.get("description").and_then(Value::as_str).map(str::to_string);
-            let stars = item.get("stargazers_count").and_then(Value::as_u64).unwrap_or(0);
-            let language = item.get("language").and_then(Value::as_str).map(str::to_string);
+            let name = item
+                .get("name")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string();
+            let full_name = item
+                .get("full_name")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string();
+            let owner = item
+                .pointer("/owner/login")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string();
+            let html_url = item
+                .get("html_url")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string();
+            let description = item
+                .get("description")
+                .and_then(Value::as_str)
+                .map(str::to_string);
+            let stars = item
+                .get("stargazers_count")
+                .and_then(Value::as_u64)
+                .unwrap_or(0);
+            let language = item
+                .get("language")
+                .and_then(Value::as_str)
+                .map(str::to_string);
             let topics: Vec<String> = item
                 .get("topics")
                 .and_then(Value::as_array)
-                .map(|arr| arr.iter().filter_map(|v| v.as_str().map(str::to_string)).collect())
+                .map(|arr| {
+                    arr.iter()
+                        .filter_map(|v| v.as_str().map(str::to_string))
+                        .collect()
+                })
                 .unwrap_or_default();
-            let default_branch =
-                item.get("default_branch").and_then(Value::as_str).unwrap_or("main").to_string();
+            let default_branch = item
+                .get("default_branch")
+                .and_then(Value::as_str)
+                .unwrap_or("main")
+                .to_string();
 
             if !name.is_empty() && !full_name.is_empty() {
                 results.push(RepoSearchResult {
@@ -125,13 +157,18 @@ impl GitHubClient {
         let resp = self.request(ApiMethod::Get, &route, None).await?;
         if let Some(content_b64) = resp.body.get("content").and_then(Value::as_str) {
             let clean = content_b64.replace(['\n', '\r'], "");
-            let decoded =
-                base64::engine::general_purpose::STANDARD.decode(clean.as_bytes()).map_err(
-                    |e| Error::Git(format!("base64 decode failed for {owner}/{repo}/{path}: {e}")),
-                )?;
+            let decoded = base64::engine::general_purpose::STANDARD
+                .decode(clean.as_bytes())
+                .map_err(|e| {
+                    Error::Git(format!(
+                        "base64 decode failed for {owner}/{repo}/{path}: {e}"
+                    ))
+                })?;
             return Ok(String::from_utf8_lossy(&decoded).to_string());
         }
-        Err(Error::Git(format!("no content field found for {owner}/{repo}/{path}")))
+        Err(Error::Git(format!(
+            "no content field found for {owner}/{repo}/{path}"
+        )))
     }
 
     /// Search GitHub repositories, probe for `llms.txt` and documentation, and generate a prompt-ready markdown report.
@@ -160,13 +197,19 @@ impl GitHubClient {
             let mut readme_excerpt = None;
 
             // Probe for llms.txt at root or .github/llms.txt
-            if let Ok(content) =
-                self.fetch_raw_file(&repo.owner, &repo.name, &repo.default_branch, "llms.txt").await
+            if let Ok(content) = self
+                .fetch_raw_file(&repo.owner, &repo.name, &repo.default_branch, "llms.txt")
+                .await
             {
                 has_llms_txt = true;
                 llms_txt = Some(content);
             } else if let Ok(content) = self
-                .fetch_raw_file(&repo.owner, &repo.name, &repo.default_branch, ".github/llms.txt")
+                .fetch_raw_file(
+                    &repo.owner,
+                    &repo.name,
+                    &repo.default_branch,
+                    ".github/llms.txt",
+                )
                 .await
             {
                 has_llms_txt = true;
@@ -276,7 +319,9 @@ pub async fn search_github_docs(
     include_digest: bool,
 ) -> Result<GitHubDocsReport, Error> {
     let client = GitHubClient::from_env()?;
-    client.search_github_docs(query, limit.min(10) as u8, include_digest).await
+    client
+        .search_github_docs(query, limit.min(10) as u8, include_digest)
+        .await
 }
 
 /// Convenience function to search GitHub repositories using default or environment credentials.

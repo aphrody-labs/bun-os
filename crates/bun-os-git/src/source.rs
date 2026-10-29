@@ -139,7 +139,11 @@ pub fn source_report(
             None => repository.join(&manifest.root),
         },
     };
-    let mut rows: Vec<_> = manifest.sources.iter().map(|source| inspect(&root, source)).collect();
+    let mut rows: Vec<_> = manifest
+        .sources
+        .iter()
+        .map(|source| inspect(&root, source))
+        .collect();
     for integrated in &manifest.integrated {
         if !integrated.path.starts_with("crates")
             || integrated
@@ -152,7 +156,10 @@ pub fn source_report(
                 integrated.source.id
             )));
         }
-        rows.push(inspect_at(&repository.join(&integrated.path), &integrated.source));
+        rows.push(inspect_at(
+            &repository.join(&integrated.path),
+            &integrated.source,
+        ));
     }
     let mut unmanaged = Vec::new();
     if let Ok(entries) = std::fs::read_dir(&root) {
@@ -165,7 +172,11 @@ pub fn source_report(
         }
         unmanaged.sort();
     }
-    Ok(SourceReport { root, rows, unmanaged })
+    Ok(SourceReport {
+        root,
+        rows,
+        unmanaged,
+    })
 }
 
 fn inspect(root: &Path, source: &Source) -> SourceRow {
@@ -173,7 +184,11 @@ fn inspect(root: &Path, source: &Source) -> SourceRow {
 }
 
 fn inspect_at(dir: &Path, source: &Source) -> SourceRow {
-    let row = |state, detail: String| SourceRow { id: source.id.clone(), state, detail };
+    let row = |state, detail: String| SourceRow {
+        id: source.id.clone(),
+        state,
+        detail,
+    };
     if !dir.is_dir() {
         return row(SourceState::Missing, dir.display().to_string());
     }
@@ -216,7 +231,14 @@ fn inspect_at(dir: &Path, source: &Source) -> SourceRow {
         .map(|sha| sha.chars().take(8).collect())
         .or_else(|| source.version.clone())
         .unwrap_or_default();
-    row(if source.pinned { SourceState::Ok } else { SourceState::Tracked }, detail)
+    row(
+        if source.pinned {
+            SourceState::Ok
+        } else {
+            SourceState::Tracked
+        },
+        detail,
+    )
 }
 
 #[cfg(test)]
@@ -256,9 +278,16 @@ mod tests {
         std::fs::create_dir_all(repo.join("crates/native/example")).unwrap();
         let manifest = r#"{"schemaVersion":1,"root":"absent","sources":[],"integrated":[{"id":"example","kind":"crate","version":"1.0.0","pinned":true,"integratedPath":"crates/native/example","patches":[{"id":"p","marker":{"file":"f.rs","contains":"patched"}}]}]}"#;
         std::fs::write(repo.join(MANIFEST_PATH), manifest).unwrap();
-        assert_eq!(source_report(repo, None).unwrap().rows[0].state, SourceState::PatchMissing);
+        assert_eq!(
+            source_report(repo, None).unwrap().rows[0].state,
+            SourceState::PatchMissing
+        );
         std::fs::write(repo.join("crates/native/example/f.rs"), "patched").unwrap();
-        assert!(source_report(repo, Some(Path::new("also-absent"))).unwrap().is_healthy());
+        assert!(
+            source_report(repo, Some(Path::new("also-absent")))
+                .unwrap()
+                .is_healthy()
+        );
         std::fs::write(
             repo.join(MANIFEST_PATH),
             manifest.replace("crates/native/example", "crates/../../outside"),

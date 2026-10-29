@@ -19,7 +19,9 @@ fn invalid(value: &str) -> VersionError {
 }
 fn valid_label(label: &str, leading_zero: bool) -> bool {
     !label.is_empty()
-        && label.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
+        && label
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'-')
         && (leading_zero
             || label.len() == 1
             || !label.starts_with('0')
@@ -28,11 +30,15 @@ fn valid_label(label: &str, leading_zero: bool) -> bool {
 impl NugetVersion {
     fn parse(value: &str) -> Result<Self, VersionError> {
         let text = value.trim();
-        let (base, metadata) = text.split_once('+').map_or((text, None), |(a, b)| (a, Some(b)));
+        let (base, metadata) = text
+            .split_once('+')
+            .map_or((text, None), |(a, b)| (a, Some(b)));
         if metadata.is_some_and(|m| !m.split('.').all(|s| valid_label(s, true))) {
             return Err(invalid(value));
         }
-        let (core, release) = base.split_once('-').map_or((base, None), |(a, b)| (a, Some(b)));
+        let (core, release) = base
+            .split_once('-')
+            .map_or((base, None), |(a, b)| (a, Some(b)));
         let segments: Vec<_> = core.split('.').collect();
         if segments.is_empty() || segments.len() > 4 {
             return Err(invalid(value));
@@ -66,7 +72,7 @@ impl NugetVersion {
         match (self.release.is_empty(), other.release.is_empty()) {
             (true, false) => return Ordering::Greater,
             (false, true) => return Ordering::Less,
-            _ => {},
+            _ => {}
         }
         for (left, right) in self.release.iter().zip(&other.release) {
             // NuGet compares numeric identifiers only when they fit Int32.
@@ -109,7 +115,10 @@ impl Version for NugetVersions {
         if first != b'[' && first != b'(' {
             return Ok(version.compare(&NugetVersion::parse(requirement)?) != Ordering::Less);
         }
-        let last = *requirement.as_bytes().last().ok_or_else(|| invalid(requirement))?;
+        let last = *requirement
+            .as_bytes()
+            .last()
+            .ok_or_else(|| invalid(requirement))?;
         if last != b']' && last != b')' {
             return Err(invalid(requirement));
         }
@@ -128,8 +137,12 @@ impl Version for NugetVersions {
         if (lower.is_empty() && first != b'(') || (upper.is_empty() && last != b')') {
             return Err(invalid(requirement));
         }
-        let lower = (!lower.is_empty()).then(|| NugetVersion::parse(lower)).transpose()?;
-        let upper = (!upper.is_empty()).then(|| NugetVersion::parse(upper)).transpose()?;
+        let lower = (!lower.is_empty())
+            .then(|| NugetVersion::parse(lower))
+            .transpose()?;
+        let upper = (!upper.is_empty())
+            .then(|| NugetVersion::parse(upper))
+            .transpose()?;
         if let (Some(lower), Some(upper)) = (&lower, &upper) {
             let order = lower.compare(upper);
             if order == Ordering::Greater
@@ -138,15 +151,20 @@ impl Version for NugetVersions {
                 return Err(invalid(requirement));
             }
         }
-        Ok(lower.as_ref().is_none_or(|lower| match version.compare(lower) {
-            Ordering::Less => false,
-            Ordering::Equal => first == b'[',
-            Ordering::Greater => true,
-        }) && upper.as_ref().is_none_or(|upper| match version.compare(upper) {
-            Ordering::Greater => false,
-            Ordering::Equal => last == b']',
-            Ordering::Less => true,
-        }))
+        Ok(lower
+            .as_ref()
+            .is_none_or(|lower| match version.compare(lower) {
+                Ordering::Less => false,
+                Ordering::Equal => first == b'[',
+                Ordering::Greater => true,
+            })
+            && upper
+                .as_ref()
+                .is_none_or(|upper| match version.compare(upper) {
+                    Ordering::Greater => false,
+                    Ordering::Equal => last == b']',
+                    Ordering::Less => true,
+                }))
     }
 }
 
@@ -155,13 +173,24 @@ mod tests {
     use super::*;
     #[test]
     fn padded_four_part_case_and_metadata() {
-        assert_eq!(NugetVersions.compare("1", "1.0.0.0").unwrap(), Ordering::Equal);
-        assert_eq!(NugetVersions.compare("1.0.0.1", "1.0.0").unwrap(), Ordering::Greater);
         assert_eq!(
-            NugetVersions.compare("1.0-PREVIEW+Build", "1.0-preview+different").unwrap(),
+            NugetVersions.compare("1", "1.0.0.0").unwrap(),
             Ordering::Equal
         );
-        assert_eq!(NugetVersions.compare("1-rc.2", "1-rc.10").unwrap(), Ordering::Less);
+        assert_eq!(
+            NugetVersions.compare("1.0.0.1", "1.0.0").unwrap(),
+            Ordering::Greater
+        );
+        assert_eq!(
+            NugetVersions
+                .compare("1.0-PREVIEW+Build", "1.0-preview+different")
+                .unwrap(),
+            Ordering::Equal
+        );
+        assert_eq!(
+            NugetVersions.compare("1-rc.2", "1-rc.10").unwrap(),
+            Ordering::Less
+        );
         assert_eq!(NugetVersions.compare("1-rc", "1").unwrap(), Ordering::Less);
     }
     #[test]

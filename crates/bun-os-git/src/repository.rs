@@ -74,7 +74,9 @@ fn valid_owner(owner: &str) -> bool {
         && owner.len() <= 39
         && !owner.starts_with('-')
         && !owner.ends_with('-')
-        && owner.chars().all(|character| character.is_ascii_alphanumeric() || character == '-')
+        && owner
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric() || character == '-')
 }
 
 fn valid_repository_name(name: &str) -> bool {
@@ -149,8 +151,11 @@ pub struct LocalRepository {
 /// Discover and inspect the repository containing `path` without shelling out.
 pub fn inspect_repository(path: impl AsRef<Path>) -> Result<LocalRepository, Error> {
     let requested = path.as_ref();
-    let discovery_path =
-        if requested.is_file() { requested.parent().unwrap_or(requested) } else { requested };
+    let discovery_path = if requested.is_file() {
+        requested.parent().unwrap_or(requested)
+    } else {
+        requested
+    };
     let repository = gix::discover(discovery_path).map_err(git_error)?;
     let unresolved_root = repository.workdir().unwrap_or_else(|| repository.path());
     let root = std::fs::canonicalize(unresolved_root)
@@ -160,11 +165,20 @@ pub fn inspect_repository(path: impl AsRef<Path>) -> Result<LocalRepository, Err
         crate::io_error("canonicalize Git directory", unresolved_git_dir, error)
     })?;
     let head_ref = repository.head().map_err(git_error)?;
-    let branch = head_ref.referent_name().map(|name| short_ref_name(&name.to_string()));
+    let branch = head_ref
+        .referent_name()
+        .map(|name| short_ref_name(&name.to_string()));
     let head = if head_ref.is_unborn() {
         None
     } else {
-        Some(repository.head_commit().map_err(git_error)?.id.to_hex().to_string())
+        Some(
+            repository
+                .head_commit()
+                .map_err(git_error)?
+                .id
+                .to_hex()
+                .to_string(),
+        )
     };
 
     let mut changes = Vec::new();
@@ -188,19 +202,26 @@ pub fn inspect_repository(path: impl AsRef<Path>) -> Result<LocalRepository, Err
                 let bytes: &[u8] = location.as_ref();
                 base64::engine::general_purpose::STANDARD.encode(bytes)
             };
-            changes.push(Change { path: location.to_string(), path_bytes_base64, layer });
+            changes.push(Change {
+                path: location.to_string(),
+                path_bytes_base64,
+                layer,
+            });
         }
     }
 
     let mut remotes = Vec::new();
     let github_host = configured_github_host();
     for name in repository.remote_names() {
-        let remote =
-            repository.find_remote(AsRef::<gix::bstr::BStr>::as_ref(&name)).map_err(git_error)?;
-        let fetch_url =
-            remote.url(gix::remote::Direction::Fetch).map(|url| url.to_bstring().to_string());
-        let push_url =
-            remote.url(gix::remote::Direction::Push).map(|url| url.to_bstring().to_string());
+        let remote = repository
+            .find_remote(AsRef::<gix::bstr::BStr>::as_ref(&name))
+            .map_err(git_error)?;
+        let fetch_url = remote
+            .url(gix::remote::Direction::Fetch)
+            .map(|url| url.to_bstring().to_string());
+        let push_url = remote
+            .url(gix::remote::Direction::Push)
+            .map(|url| url.to_bstring().to_string());
         let github = fetch_url
             .as_deref()
             .and_then(|url| GitHubRepository::parse_with_host(url, &github_host).ok())
@@ -209,12 +230,19 @@ pub fn inspect_repository(path: impl AsRef<Path>) -> Result<LocalRepository, Err
                     .as_deref()
                     .and_then(|url| GitHubRepository::parse_with_host(url, &github_host).ok())
             });
-        remotes.push(Remote { name: name.to_string(), fetch_url, push_url, github });
+        remotes.push(Remote {
+            name: name.to_string(),
+            fetch_url,
+            push_url,
+            github,
+        });
     }
     remotes.sort_by(|left, right| {
         let left_origin = left.name != "origin";
         let right_origin = right.name != "origin";
-        left_origin.cmp(&right_origin).then_with(|| left.name.cmp(&right.name))
+        left_origin
+            .cmp(&right_origin)
+            .then_with(|| left.name.cmp(&right.name))
     });
     let github = remotes.iter().find_map(|remote| remote.github.clone());
 

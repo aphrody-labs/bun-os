@@ -57,7 +57,10 @@ fn repository_references_support_documented_forms_and_reject_impostors() {
         "https://github.com.evil.invalid/aphrody-code/aphrody-infra",
     ] {
         assert!(
-            matches!(GitHubRepository::parse(reference), Err(Error::InvalidRepository(_))),
+            matches!(
+                GitHubRepository::parse(reference),
+                Err(Error::InvalidRepository(_))
+            ),
             "invalid repository reference was accepted: {reference:?}"
         );
     }
@@ -97,7 +100,10 @@ fn api_methods_have_stable_parse_display_mutability_and_json_contracts() {
 
 #[test]
 fn exported_snapshot_types_keep_their_serialized_field_contract() {
-    let repository = GitHubRepository { owner: "aphrody-code".into(), name: "aphrody".into() };
+    let repository = GitHubRepository {
+        owner: "aphrody-code".into(),
+        name: "aphrody".into(),
+    };
     let remote = Remote {
         name: "origin".into(),
         fetch_url: Some("https://github.com/aphrody-code/aphrody-infra.git".into()),
@@ -118,7 +124,10 @@ fn exported_snapshot_types_keep_their_serialized_field_contract() {
         error: None,
     };
 
-    assert_eq!(serde_json::to_value(remote).expect("serialize remote")["name"], "origin");
+    assert_eq!(
+        serde_json::to_value(remote).expect("serialize remote")["name"],
+        "origin"
+    );
     assert_eq!(
         serde_json::to_value(change).expect("serialize change"),
         json!({

@@ -67,10 +67,16 @@ fn invalid_git_refs_are_rejected_without_creating_a_workflow() {
 
 #[test]
 fn valid_refs_render_as_one_inert_uses_value() {
-    for source_ref in ["main", "release/v1.2.3", "0123456789abcdef0123456789abcdef01234567"] {
+    for source_ref in [
+        "main",
+        "release/v1.2.3",
+        "0123456789abcdef0123456789abcdef01234567",
+    ] {
         let rendered = render_consumer_workflow(source_ref).expect("render valid ref");
-        let uses_lines: Vec<_> =
-            rendered.lines().filter(|line| line.trim().starts_with("uses:")).collect();
+        let uses_lines: Vec<_> = rendered
+            .lines()
+            .filter(|line| line.trim().starts_with("uses:"))
+            .collect();
         assert_eq!(uses_lines.len(), 1);
         assert_eq!(
             uses_lines[0].trim(),
@@ -96,7 +102,10 @@ fn unmanaged_workflow_is_rejected_and_preserved_in_plan_and_apply_modes() {
             Error::UnmanagedWorkflow(path) => assert_eq!(path, workflow),
             other => panic!("unexpected error: {other}"),
         }
-        assert_eq!(fs::read(&workflow).expect("read preserved workflow"), user_content);
+        assert_eq!(
+            fs::read(&workflow).expect("read preserved workflow"),
+            user_content
+        );
     }
 }
 
@@ -140,7 +149,13 @@ fn apply_refuses_a_symlinked_workflow_directory_and_does_not_escape() {
     let error = install_consumer_workflow(repository.path(), "main", InstallMode::Apply)
         .expect_err("symlink traversal must be rejected");
     assert!(matches!(error, Error::UnsafeWorkflowPath(path) if path == github));
-    assert!(!outside.path().join("workflows").join("aphrody-ci.yml").exists());
+    assert!(
+        !outside
+            .path()
+            .join("workflows")
+            .join("aphrody-ci.yml")
+            .exists()
+    );
 }
 
 #[cfg(unix)]
@@ -164,7 +179,7 @@ fn handle_symlink_result(result: io::Result<()>) -> bool {
             ) =>
         {
             false
-        },
+        }
         Err(error) => panic!("create symlink fixture: {error}"),
     }
 }

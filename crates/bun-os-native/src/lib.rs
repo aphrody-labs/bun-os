@@ -24,7 +24,6 @@ pub use topology::SystemTopology;
 #[derive(Debug, Clone, Copy, Default)]
 pub struct NativePlatform;
 
-
 impl NativePlatform {
     /// Nanoseconds elapsed on the monotonic clock since a process-wide anchor.
     ///

@@ -76,8 +76,11 @@ pub fn repository_history(
     options: &HistoryOptions,
 ) -> Result<History, Error> {
     let requested = path.as_ref();
-    let discovery =
-        if requested.is_file() { requested.parent().unwrap_or(requested) } else { requested };
+    let discovery = if requested.is_file() {
+        requested.parent().unwrap_or(requested)
+    } else {
+        requested
+    };
     let repository = gix::discover(discovery).map_err(git_error)?;
     let head = match repository.head_id() {
         Ok(id) => id.detach(),
@@ -86,7 +89,12 @@ pub fn repository_history(
     let mut history = History::default();
     for (label, id) in compared_revisions(&repository, &options.against)? {
         let count = |tip: gix::ObjectId, hidden: gix::ObjectId| -> Result<usize, Error> {
-            Ok(repository.rev_walk([tip]).with_hidden([hidden]).all().map_err(git_error)?.count())
+            Ok(repository
+                .rev_walk([tip])
+                .with_hidden([hidden])
+                .all()
+                .map_err(git_error)?
+                .count())
         };
         history.divergence.push(Divergence {
             against: label,
@@ -100,7 +108,11 @@ pub fn repository_history(
     if wanted == 0 {
         return Ok(history);
     }
-    let walk = repository.rev_walk([head]).first_parent_only().all().map_err(git_error)?;
+    let walk = repository
+        .rev_walk([head])
+        .first_parent_only()
+        .all()
+        .map_err(git_error)?;
     let mut counts: HashMap<String, usize> = HashMap::new();
     let mut scanned = 0;
     for info in walk.take(wanted) {
@@ -120,7 +132,12 @@ pub fn repository_history(
             let tree = commit.tree().map_err(git_error)?;
             let parent = match commit.parent_ids().next() {
                 Some(parent) => Some(
-                    parent.object().map_err(git_error)?.into_commit().tree().map_err(git_error)?,
+                    parent
+                        .object()
+                        .map_err(git_error)?
+                        .into_commit()
+                        .tree()
+                        .map_err(git_error)?,
                 ),
                 None => None,
             };
@@ -135,8 +152,10 @@ pub fn repository_history(
         }
     }
     history.hotspot_window = scanned;
-    let mut hotspots: Vec<Hotspot> =
-        counts.into_iter().map(|(path, commits)| Hotspot { path, commits }).collect();
+    let mut hotspots: Vec<Hotspot> = counts
+        .into_iter()
+        .map(|(path, commits)| Hotspot { path, commits })
+        .collect();
     hotspots.sort_by(|a, b| b.commits.cmp(&a.commits).then_with(|| a.path.cmp(&b.path)));
     hotspots.truncate(options.hotspots);
     history.hotspots = hotspots;
@@ -163,7 +182,9 @@ fn compared_revisions(
         }
         return Ok(out);
     }
-    let Ok(Some(head_ref)) = repository.head_ref() else { return Ok(out) };
+    let Ok(Some(head_ref)) = repository.head_ref() else {
+        return Ok(out);
+    };
     let branch = head_ref.name().shorten().to_string();
     let mut names = Vec::new();
     if let Some(Ok(tracking)) =
@@ -178,7 +199,10 @@ fn compared_revisions(
         if let Ok(mut reference) = repository.find_reference(name.as_str())
             && let Ok(id) = reference.peel_to_id()
         {
-            let label = name.strip_prefix("refs/remotes/").unwrap_or(&name).to_owned();
+            let label = name
+                .strip_prefix("refs/remotes/")
+                .unwrap_or(&name)
+                .to_owned();
             push(label, id.detach());
         }
     }
@@ -194,7 +218,12 @@ mod tests {
     fn git(dir: &Path, args: &[&str]) -> bool {
         Command::new("git")
             .args(["-c", "user.name=Test", "-c", "user.email=test@example.com"])
-            .args(["-c", "commit.gpgsign=false", "-c", "init.defaultBranch=main"])
+            .args([
+                "-c",
+                "commit.gpgsign=false",
+                "-c",
+                "init.defaultBranch=main",
+            ])
             .args(args)
             .current_dir(dir)
             .output()
@@ -225,7 +254,12 @@ mod tests {
         commit(&work, "a.rs", "2", "local one");
         commit(&work, "a.rs", "3", "local two");
 
-        let options = HistoryOptions { log: 2, hotspots: 2, window: 10, against: Vec::new() };
+        let options = HistoryOptions {
+            log: 2,
+            hotspots: 2,
+            window: 10,
+            against: Vec::new(),
+        };
         let history = repository_history(&work, &options).unwrap();
         assert_eq!(
             history
@@ -236,7 +270,11 @@ mod tests {
             [("origin/main", 2, 1)]
         );
         assert_eq!(
-            history.log.iter().map(|e| e.summary.as_str()).collect::<Vec<_>>(),
+            history
+                .log
+                .iter()
+                .map(|e| e.summary.as_str())
+                .collect::<Vec<_>>(),
             ["local two", "local one"]
         );
         assert_eq!(history.log[0].author, "Test");
@@ -244,18 +282,31 @@ mod tests {
         assert_eq!(
             history.hotspots,
             [
-                Hotspot { path: "a.rs".into(), commits: 3 },
-                Hotspot { path: "b.rs".into(), commits: 1 }
+                Hotspot {
+                    path: "a.rs".into(),
+                    commits: 3
+                },
+                Hotspot {
+                    path: "b.rs".into(),
+                    commits: 1
+                }
             ]
         );
 
-        let explicit =
-            HistoryOptions { against: vec!["HEAD~2".into()], ..HistoryOptions::default() };
+        let explicit = HistoryOptions {
+            against: vec!["HEAD~2".into()],
+            ..HistoryOptions::default()
+        };
         let history = repository_history(&work, &explicit).unwrap();
-        assert_eq!((history.divergence[0].ahead, history.divergence[0].behind), (2, 0));
+        assert_eq!(
+            (history.divergence[0].ahead, history.divergence[0].behind),
+            (2, 0)
+        );
         assert!(history.log.is_empty() && history.hotspots.is_empty());
-        let missing =
-            HistoryOptions { against: vec!["nope/main".into()], ..HistoryOptions::default() };
+        let missing = HistoryOptions {
+            against: vec!["nope/main".into()],
+            ..HistoryOptions::default()
+        };
         assert!(repository_history(&work, &missing).is_err());
     }
 }

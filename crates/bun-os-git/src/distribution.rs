@@ -113,14 +113,18 @@ fn validate_source_ref(source_ref: &str) -> Result<(), Error> {
         || source_ref.contains("..")
         || source_ref.contains("//")
         || source_ref.contains("@{")
-        || source_ref.split('/').any(|component| component.ends_with(".lock"))
+        || source_ref
+            .split('/')
+            .any(|component| component.ends_with(".lock"))
         || source_ref.chars().any(|character| {
             character.is_control()
                 || character.is_whitespace()
                 || matches!(character, '~' | '^' | ':' | '?' | '*' | '[' | '\\')
         });
     if invalid {
-        return Err(Error::Git(format!("invalid workflow source ref `{source_ref}`")));
+        return Err(Error::Git(format!(
+            "invalid workflow source ref `{source_ref}`"
+        )));
     }
     Ok(())
 }
@@ -169,7 +173,12 @@ pub fn install_consumer_workflow(
         ensure_safe_local_path(repository_root, &path)?;
         std::fs::write(&path, rendered).map_err(|error| io_error("write", &path, error))?;
     }
-    Ok(InstallOutcome { path, unchanged: false, written, source_ref: source_ref.to_owned() })
+    Ok(InstallOutcome {
+        path,
+        unchanged: false,
+        written,
+        source_ref: source_ref.to_owned(),
+    })
 }
 
 fn ensure_safe_local_path(repository_root: &Path, target: &Path) -> Result<(), Error> {
@@ -181,7 +190,7 @@ fn ensure_safe_local_path(repository_root: &Path, target: &Path) -> Result<(), E
         match std::fs::symlink_metadata(&current) {
             Ok(metadata) if metadata.file_type().is_symlink() => {
                 return Err(Error::UnsafeWorkflowPath(current));
-            },
+            }
             Ok(_) => {
                 if current.is_dir() {
                     let canonical = std::fs::canonicalize(&current)
@@ -190,7 +199,7 @@ fn ensure_safe_local_path(repository_root: &Path, target: &Path) -> Result<(), E
                         return Err(Error::UnsafeWorkflowPath(current));
                     }
                 }
-            },
+            }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => break,
             Err(error) => return Err(io_error("inspect workflow path", &current, error)),
         }
@@ -208,8 +217,15 @@ pub async fn audit_ecosystem_workflows(
     source_ref: &str,
     include_forks: bool,
 ) -> Result<Vec<EcosystemOutcome>, Error> {
-    rollout_ecosystem_workflows(client, owner, source_ref, include_forks, &[], InstallMode::Plan)
-        .await
+    rollout_ecosystem_workflows(
+        client,
+        owner,
+        source_ref,
+        include_forks,
+        &[],
+        InstallMode::Plan,
+    )
+    .await
 }
 
 /// Install or update the managed caller across GitHub repositories.
@@ -237,7 +253,9 @@ pub async fn rollout_ecosystem_workflows(
     for repository in repositories {
         GitHubRepository::parse(&format!("{owner}/{repository}"))?;
     }
-    let owner_kind = client.request(ApiMethod::Get, &format!("/users/{owner}"), None).await?;
+    let owner_kind = client
+        .request(ApiMethod::Get, &format!("/users/{owner}"), None)
+        .await?;
     let is_organization = owner_kind
         .body
         .get("type")
@@ -251,7 +269,10 @@ pub async fn rollout_ecosystem_workflows(
             && (repositories.is_empty() || repositories.contains(&repository.name))
     });
     for requested in repositories {
-        if !targets.iter().any(|repository| &repository.name == requested) {
+        if !targets
+            .iter()
+            .any(|repository| &repository.name == requested)
+        {
             return Err(Error::Git(format!(
                 "requested repository `{owner}/{requested}` is unavailable or ineligible"
             )));
@@ -268,15 +289,19 @@ pub async fn rollout_ecosystem_workflows(
 }
 
 async fn verify_published_source(client: &GitHubClient, source_ref: &str) -> Result<(), Error> {
-    for path in
-        [".github/workflows/aphrody-reusable-ci.yml", ".github/actions/aphrody-toolkit/action.yml"]
-    {
+    for path in [
+        ".github/workflows/aphrody-reusable-ci.yml",
+        ".github/actions/aphrody-toolkit/action.yml",
+    ] {
         let route = format!("/repos/aphrody-code/aphrody-infra/contents/{path}?ref={source_ref}");
-        client.request(ApiMethod::Get, &route, None).await.map_err(|error| {
-            Error::Git(format!(
-                "source artifact `{path}` is not available at `{source_ref}`: {error}"
-            ))
-        })?;
+        client
+            .request(ApiMethod::Get, &route, None)
+            .await
+            .map_err(|error| {
+                Error::Git(format!(
+                    "source artifact `{path}` is not available at `{source_ref}`: {error}"
+                ))
+            })?;
     }
     Ok(())
 }
@@ -321,7 +346,10 @@ async fn inspect_or_rollout_repository(
     mode: InstallMode,
 ) -> EcosystemOutcome {
     let full_name = format!("{owner}/{}", repository.name);
-    let Some(default_branch) = repository.default_branch.filter(|branch| !branch.is_empty()) else {
+    let Some(default_branch) = repository
+        .default_branch
+        .filter(|branch| !branch.is_empty())
+    else {
         return EcosystemOutcome {
             repository: full_name,
             default_branch: None,
@@ -331,20 +359,27 @@ async fn inspect_or_rollout_repository(
             error: None,
         };
     };
-    let route = format!("/repos/{owner}/{}/contents/{}", repository.name, CONSUMER_WORKFLOW_PATH);
+    let route = format!(
+        "/repos/{owner}/{}/contents/{}",
+        repository.name, CONSUMER_WORKFLOW_PATH
+    );
     let content = match client.request(ApiMethod::Get, &route, None).await {
         Ok(response) => match serde_json::from_value::<ContentResource>(response.body) {
             Ok(content) => Some(content),
             Err(error) => {
                 return failed_outcome(full_name, default_branch, error.to_string());
-            },
+            }
         },
         Err(Error::GitHubStatus { status: 404, .. }) => {
-            let branch_route =
-                format!("/repos/{owner}/{}/commits/{default_branch}", repository.name);
+            let branch_route = format!(
+                "/repos/{owner}/{}/commits/{default_branch}",
+                repository.name
+            );
             match client.request(ApiMethod::Get, &branch_route, None).await {
                 Ok(_) => None,
-                Err(Error::GitHubStatus { status: 404 | 409, .. }) => {
+                Err(Error::GitHubStatus {
+                    status: 404 | 409, ..
+                }) => {
                     return EcosystemOutcome {
                         repository: full_name,
                         default_branch: Some(default_branch),
@@ -353,12 +388,12 @@ async fn inspect_or_rollout_repository(
                         commit: None,
                         error: None,
                     };
-                },
+                }
                 Err(error) => {
                     return failed_outcome(full_name, default_branch, error.to_string());
-                },
+                }
             }
-        },
+        }
         Err(error) => return failed_outcome(full_name, default_branch, error.to_string()),
     };
 
@@ -372,12 +407,16 @@ async fn inspect_or_rollout_repository(
                     format!("unsupported GitHub content encoding `{}`", content.encoding),
                 );
             }
-            let compact: String = content.content.chars().filter(|c| !c.is_whitespace()).collect();
+            let compact: String = content
+                .content
+                .chars()
+                .filter(|c| !c.is_whitespace())
+                .collect();
             let decoded = match BASE64.decode(compact) {
                 Ok(decoded) => decoded,
                 Err(error) => {
                     return failed_outcome(full_name, default_branch, error.to_string());
-                },
+                }
             };
             if decoded == rendered.as_bytes() {
                 (WorkflowState::Current, Some(content.sha))
@@ -389,7 +428,7 @@ async fn inspect_or_rollout_repository(
             } else {
                 (WorkflowState::Unmanaged, Some(content.sha))
             }
-        },
+        }
     };
 
     if mode == InstallMode::Plan
@@ -419,7 +458,11 @@ async fn inspect_or_rollout_repository(
             default_branch: Some(default_branch),
             state: WorkflowState::Current,
             written: true,
-            commit: response.body.pointer("/commit/sha").and_then(Value::as_str).map(str::to_owned),
+            commit: response
+                .body
+                .pointer("/commit/sha")
+                .and_then(Value::as_str)
+                .map(str::to_owned),
             error: None,
         },
         Err(error) => failed_outcome(full_name, default_branch, error.to_string()),
@@ -475,13 +518,24 @@ mod tests {
             install_consumer_workflow(directory.path(), "main", InstallMode::Apply),
             Err(Error::UnmanagedWorkflow(_))
         ));
-        assert_eq!(std::fs::read_to_string(target).unwrap(), "name: user owned\n");
+        assert_eq!(
+            std::fs::read_to_string(target).unwrap(),
+            "name: user owned\n"
+        );
     }
 
     #[test]
     fn rejects_source_ref_injection() {
-        for source_ref in ["", "main\npermissions: write-all", "../main", "refs//heads/main"] {
-            assert!(render_consumer_workflow(source_ref).is_err(), "{source_ref:?}");
+        for source_ref in [
+            "",
+            "main\npermissions: write-all",
+            "../main",
+            "refs//heads/main",
+        ] {
+            assert!(
+                render_consumer_workflow(source_ref).is_err(),
+                "{source_ref:?}"
+            );
         }
         assert!(render_consumer_workflow("release/v1.2.3").is_ok());
         assert!(render_consumer_workflow("0123456789abcdef").is_ok());
@@ -489,9 +543,13 @@ mod tests {
 
     #[test]
     fn recognizes_only_full_commit_sha_as_immutable() {
-        assert!(is_full_commit_sha("0123456789abcdef0123456789abcdef01234567"));
+        assert!(is_full_commit_sha(
+            "0123456789abcdef0123456789abcdef01234567"
+        ));
         assert!(!is_full_commit_sha("main"));
         assert!(!is_full_commit_sha("0123456789abcdef"));
-        assert!(!is_full_commit_sha("g123456789abcdef0123456789abcdef01234567"));
+        assert!(!is_full_commit_sha(
+            "g123456789abcdef0123456789abcdef01234567"
+        ));
     }
 }

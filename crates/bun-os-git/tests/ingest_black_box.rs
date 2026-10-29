@@ -8,9 +8,7 @@
 
 // SPDX-License-Identifier: Apache-2.0
 
-use bun_git::ingest::{
-    DEFAULT_IGNORE_PATTERNS, estimate_tokens, format_token_count,
-};
+use bun_git::ingest::{DEFAULT_IGNORE_PATTERNS, estimate_tokens, format_token_count};
 
 #[test]
 fn test_token_estimation_and_formatting() {

@@ -4,7 +4,6 @@
     clippy::disallowed_types,
     clippy::disallowed_macros
 )]
-
 // SPDX-License-Identifier: Apache-2.0
 //! Pure package contracts. Ecosystem parsers are absorbed by SP/WG from Bun.
 //! No network, filesystem, process execution or implicit trust belongs here.

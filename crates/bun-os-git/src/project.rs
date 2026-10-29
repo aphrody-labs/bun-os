@@ -137,15 +137,20 @@ pub fn commit_log(path: impl AsRef<Path>, limit: usize) -> Result<Vec<GitCommitN
 
         let message = commit_ref.message();
         let summary = message.title.to_string();
-        let full_message =
-            message.body.map(|b| format!("{summary}\n\n{b}")).unwrap_or_else(|| summary.clone());
+        let full_message = message
+            .body
+            .map(|b| format!("{summary}\n\n{b}"))
+            .unwrap_or_else(|| summary.clone());
 
         let author = commit_ref.author().map_err(git_error)?;
         let author_name = author.name.to_string();
         let author_email = author.email.to_string();
         let timestamp_secs = commit_ref.time().map(|t| t.seconds).unwrap_or(0);
 
-        let parents = commit_ref.parents().map(|p| p.to_hex().to_string()).collect();
+        let parents = commit_ref
+            .parents()
+            .map(|p| p.to_hex().to_string())
+            .collect();
 
         commit_nodes.push(GitCommitNode {
             id,
@@ -175,7 +180,11 @@ pub fn commit_graph(path: impl AsRef<Path>, limit: usize) -> Result<GitCommitGra
     let commits = commit_log(&path, limit)?;
     let branches = list_branches(&path)?;
 
-    Ok(GitCommitGraph { head: head_commit, commits, branches })
+    Ok(GitCommitGraph {
+        head: head_commit,
+        commits,
+        branches,
+    })
 }
 
 /// Browse a remote or local project tree directly from the Git object database at a given revision.
@@ -186,7 +195,11 @@ pub fn list_tree_at(
 ) -> Result<Vec<GitTreeNode>, Error> {
     let repo = gix::discover(path.as_ref()).map_err(git_error)?;
     let commit = if let Some(spec) = rev {
-        repo.rev_parse_single(spec).map_err(git_error)?.object().map_err(git_error)?.into_commit()
+        repo.rev_parse_single(spec)
+            .map_err(git_error)?
+            .object()
+            .map_err(git_error)?
+            .into_commit()
     } else {
         repo.head_commit().map_err(git_error)?
     };
@@ -196,7 +209,9 @@ pub fn list_tree_at(
         let trimmed = sub.trim_matches('/');
         let entry = root_tree.lookup_entry_by_path(trimmed).map_err(git_error)?;
         if let Some(entry) = entry {
-            repo.find_object(entry.object_id()).map_err(git_error)?.into_tree()
+            repo.find_object(entry.object_id())
+                .map_err(git_error)?
+                .into_tree()
         } else {
             return Ok(Vec::new());
         }
@@ -244,7 +259,11 @@ pub fn list_worktrees(path: impl AsRef<Path>) -> Result<Vec<GitWorktreeInfo>, Er
     for wt in repo.worktrees().map_err(git_error)? {
         let name = wt.id().to_string();
         let base = wt.base().map_err(git_error)?;
-        worktrees.push(GitWorktreeInfo { name, path: base, is_main: false });
+        worktrees.push(GitWorktreeInfo {
+            name,
+            path: base,
+            is_main: false,
+        });
     }
 
     Ok(worktrees)
@@ -276,7 +295,11 @@ mod tests {
                 .args(args)
                 .output()
                 .expect("fixture git command");
-            assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+            assert!(
+                output.status.success(),
+                "{}",
+                String::from_utf8_lossy(&output.stderr)
+            );
         }
         dir
     }
@@ -293,7 +316,10 @@ mod tests {
     #[test]
     fn test_list_branches_accepts_detached_snapshot_without_branch_refs() {
         let dir = branch_fixture();
-        for args in [vec!["checkout", "--detach"], vec!["update-ref", "-d", "refs/heads/main"]] {
+        for args in [
+            vec!["checkout", "--detach"],
+            vec!["update-ref", "-d", "refs/heads/main"],
+        ] {
             assert!(
                 std::process::Command::new("git")
                     .current_dir(dir.path())
@@ -303,7 +329,11 @@ mod tests {
                     .success()
             );
         }
-        assert!(list_branches(dir.path()).expect("detached branches").is_empty());
+        assert!(
+            list_branches(dir.path())
+                .expect("detached branches")
+                .is_empty()
+        );
     }
 
     #[test]

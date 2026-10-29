@@ -109,14 +109,18 @@ pub fn parse_catalogue(text: &str) -> Result<Vec<Upstream>, Error> {
     let mut entries =
         Vec::with_capacity(raw.sources.len() + raw.integrated.len() + raw.reference.len());
     for source in raw.sources.into_iter().chain(raw.integrated) {
-        let Some(url) = source.url.or(source.upstream_url) else { continue };
+        let Some(url) = source.url.or(source.upstream_url) else {
+            continue;
+        };
         entries.push(Upstream {
             id: source.id,
             tier: UpstreamTier::Vital,
             url,
             git_ref: source.git_ref.or(source.upstream_tag),
             observed_commit: source.commit,
-            purpose: source.note.unwrap_or_else(|| "Cargo path dependency".to_owned()),
+            purpose: source
+                .note
+                .unwrap_or_else(|| "Cargo path dependency".to_owned()),
             consumers: "Cargo.toml path dependency".to_owned(),
             license: source.license,
             checkout: None,
@@ -126,7 +130,12 @@ pub fn parse_catalogue(text: &str) -> Result<Vec<Upstream>, Error> {
         let tier = match reference.tier.as_str() {
             "build" => UpstreamTier::Build,
             "reference" => UpstreamTier::Reference,
-            other => return Err(git_error(format!("{}: unknown tier `{other}`", reference.id))),
+            other => {
+                return Err(git_error(format!(
+                    "{}: unknown tier `{other}`",
+                    reference.id
+                )));
+            }
         };
         entries.push(Upstream {
             id: reference.id,
@@ -172,7 +181,11 @@ fn strip_verbatim(path: PathBuf) -> PathBuf {
 /// Finds one entry by id.
 pub fn find<'a>(entries: &'a [Upstream], id: &str) -> Result<&'a Upstream, Error> {
     entries.iter().find(|entry| entry.id == id).ok_or_else(|| {
-        let ids = entries.iter().map(|entry| entry.id.as_str()).collect::<Vec<_>>().join(", ");
+        let ids = entries
+            .iter()
+            .map(|entry| entry.id.as_str())
+            .collect::<Vec<_>>()
+            .join(", ");
         git_error(format!("unknown upstream `{id}`; known: {ids}"))
     })
 }
@@ -236,7 +249,11 @@ pub async fn info(client: &GitHubClient, entry: &Upstream) -> Result<Value, Erro
         .clone()
         .or_else(|| repo["default_branch"].as_str().map(str::to_owned))
         .unwrap_or_else(|| "HEAD".to_owned());
-    let head = get(client, &format!("/repos/{slug}/commits/{}", encode_path(&branch))).await;
+    let head = get(
+        client,
+        &format!("/repos/{slug}/commits/{}", encode_path(&branch)),
+    )
+    .await;
     let release = match get(client, &format!("/repos/{slug}/releases/latest")).await {
         Ok(body) => json!({
             "tag": body["tag_name"],
@@ -303,7 +320,10 @@ pub async fn read(client: &GitHubClient, entry: &Upstream, path: &str) -> Result
     if body.is_array() {
         return Err(git_error(format!("`{path}` is a directory; use `tree`")));
     }
-    let Some(encoded) = body["content"].as_str().filter(|content| !content.is_empty()) else {
+    let Some(encoded) = body["content"]
+        .as_str()
+        .filter(|content| !content.is_empty())
+    else {
         return Err(git_error(format!(
             "`{path}` has no inline content (over 1 MB or a submodule); use `aphrody-update upstream fetch {}`",
             entry.id
@@ -314,7 +334,11 @@ pub async fn read(client: &GitHubClient, entry: &Upstream, path: &str) -> Result
         .decode(compact.as_bytes())
         .map_err(|error| git_error(format!("decode `{path}`: {error}")))?;
     let truncated = bytes.len() > MAX_READ_BYTES;
-    let shown = if truncated { &bytes[..MAX_READ_BYTES] } else { &bytes[..] };
+    let shown = if truncated {
+        &bytes[..MAX_READ_BYTES]
+    } else {
+        &bytes[..]
+    };
     Ok(json!({
         "id": entry.id,
         "path": path,
@@ -338,9 +362,12 @@ pub async fn search(client: &GitHubClient, entry: &Upstream, query: &str) -> Res
     }
     let refused = if client.is_authenticated() {
         match github_search(client, entry, query).await {
-            Err(Error::GitHubStatus { status: status @ (401 | 403), .. }) => {
+            Err(Error::GitHubStatus {
+                status: status @ (401 | 403),
+                ..
+            }) => {
                 format!("GitHub code search refused the token (HTTP {status})")
-            },
+            }
             other => return other,
         }
     } else {
@@ -352,7 +379,7 @@ pub async fn search(client: &GitHubClient, entry: &Upstream, query: &str) -> Res
             found["id"] = json!(entry.id);
             found["degraded"] = json!(refused);
             Ok(found)
-        },
+        }
         None => Ok(json!({
             "id": entry.id,
             "query": query,
@@ -379,11 +406,15 @@ pub fn local_search(checkout: &Path, query: &str) -> Result<Value, Error> {
     let mut truncated = false;
     for entry in walker.flatten() {
         if !entry.file_type().is_some_and(|kind| kind.is_file())
-            || entry.metadata().map_or(true, |meta| meta.len() > LOCAL_SEARCH_MAX_FILE)
+            || entry
+                .metadata()
+                .map_or(true, |meta| meta.len() > LOCAL_SEARCH_MAX_FILE)
         {
             continue;
         }
-        let Ok(bytes) = std::fs::read(entry.path()) else { continue };
+        let Ok(bytes) = std::fs::read(entry.path()) else {
+            continue;
+        };
         if bytes.contains(&0) {
             continue;
         }
@@ -401,7 +432,10 @@ pub fn local_search(checkout: &Path, query: &str) -> Result<Value, Error> {
             .enumerate()
             .find(|(_, line)| line.to_lowercase().contains(first.as_str()))
             .map(|(index, line)| (index + 1, line.trim().chars().take(200).collect::<String>()));
-        let relative = entry.path().strip_prefix(checkout).unwrap_or_else(|_| entry.path());
+        let relative = entry
+            .path()
+            .strip_prefix(checkout)
+            .unwrap_or_else(|_| entry.path());
         items.push(json!({
             "path": relative.to_string_lossy().replace('\\', "/"),
             "line": line.as_ref().map(|(number, _)| *number),
@@ -425,8 +459,11 @@ async fn github_search(
 ) -> Result<Value, Error> {
     let slug = slug(&entry.url)?;
     let q: String = url::form_urlencoded::byte_serialize(query.trim().as_bytes()).collect();
-    let body =
-        get(client, &format!("/search/code?q={q}+repo:{slug}&per_page={SEARCH_HITS}")).await?;
+    let body = get(
+        client,
+        &format!("/search/code?q={q}+repo:{slug}&per_page={SEARCH_HITS}"),
+    )
+    .await?;
     let items: Vec<Value> = body["items"]
         .as_array()
         .map(|items| {
@@ -495,7 +532,11 @@ mod tests {
         .unwrap();
         let entries = catalogue(&repository).unwrap();
         let bun = find(&entries, "bun").unwrap();
-        assert!(bun.checkout.as_ref().is_some_and(|path| path.ends_with("bun")));
+        assert!(
+            bun.checkout
+                .as_ref()
+                .is_some_and(|path| path.ends_with("bun"))
+        );
         let codex = find(&entries, "codex").unwrap();
         assert_eq!(codex.checkout, None);
 
@@ -525,8 +566,14 @@ mod tests {
 
     #[test]
     fn slug_accepts_github_urls_only() {
-        assert_eq!(slug("https://github.com/openai/codex.git").unwrap(), "openai/codex");
-        assert_eq!(slug("https://github.com/openai/codex/").unwrap(), "openai/codex");
+        assert_eq!(
+            slug("https://github.com/openai/codex.git").unwrap(),
+            "openai/codex"
+        );
+        assert_eq!(
+            slug("https://github.com/openai/codex/").unwrap(),
+            "openai/codex"
+        );
         assert!(slug("https://gitlab.com/a/b").is_err());
         assert!(slug("https://github.com/a").is_err());
         assert!(slug("https://github.com/a/b/c").is_err());
@@ -537,14 +584,19 @@ mod tests {
         let entries = parse_catalogue(MANIFEST).unwrap();
         let codex = find(&entries, "codex").unwrap();
         assert_eq!(
-            contents_route(codex, "codex-rs/some dir/a#b.rs").unwrap_err().to_string(),
+            contents_route(codex, "codex-rs/some dir/a#b.rs")
+                .unwrap_err()
+                .to_string(),
             "git operation failed: invalid repository path `codex-rs/some dir/a#b.rs`"
         );
         assert_eq!(
             contents_route(codex, "/codex-rs/some dir/").unwrap(),
             "/repos/openai/codex/contents/codex-rs/some%20dir?ref=main"
         );
-        assert_eq!(contents_route(codex, "").unwrap(), "/repos/openai/codex/contents?ref=main");
+        assert_eq!(
+            contents_route(codex, "").unwrap(),
+            "/repos/openai/codex/contents?ref=main"
+        );
         assert!(contents_route(codex, "a/../b").is_err());
     }
 }

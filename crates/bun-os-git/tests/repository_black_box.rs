@@ -22,9 +22,15 @@ fn inspection_discovers_an_unborn_repository_from_nested_file_and_directory_path
     let source = nested.join("lib.rs");
     fs::write(&source, "pub fn fixture() {}\n").expect("write untracked fixture");
 
-    let expected_root = repository.path().canonicalize().expect("canonical repository root");
-    let expected_git_dir =
-        repository.path().join(".git").canonicalize().expect("canonical Git directory");
+    let expected_root = repository
+        .path()
+        .canonicalize()
+        .expect("canonical repository root");
+    let expected_git_dir = repository
+        .path()
+        .join(".git")
+        .canonicalize()
+        .expect("canonical Git directory");
 
     for entrypoint in [&source, &nested] {
         let snapshot = inspect_repository(entrypoint).expect("inspect repository");
@@ -32,7 +38,10 @@ fn inspection_discovers_an_unborn_repository_from_nested_file_and_directory_path
         assert_eq!(snapshot.git_dir, expected_git_dir);
         assert!(snapshot.root.is_absolute());
         assert!(snapshot.git_dir.is_absolute());
-        assert_eq!(snapshot.head, None, "new repository must have an unborn HEAD");
+        assert_eq!(
+            snapshot.head, None,
+            "new repository must have an unborn HEAD"
+        );
         assert!(snapshot.dirty);
         assert!(
             snapshot.changes.iter().any(|change| {
@@ -62,10 +71,20 @@ fn inspection_uses_a_github_push_url_when_fetch_points_elsewhere() {
     let origin = snapshot.remotes.first().expect("origin remote");
 
     assert_eq!(origin.name, "origin");
-    assert_eq!(origin.fetch_url.as_deref(), Some("https://example.invalid/mirror/project.git"));
-    assert_eq!(origin.push_url.as_deref(), Some("git@github.com:aphrody-code/push-project.git"));
     assert_eq!(
-        origin.github.as_ref().map(GitHubRepository::full_name).as_deref(),
+        origin.fetch_url.as_deref(),
+        Some("https://example.invalid/mirror/project.git")
+    );
+    assert_eq!(
+        origin.push_url.as_deref(),
+        Some("git@github.com:aphrody-code/push-project.git")
+    );
+    assert_eq!(
+        origin
+            .github
+            .as_ref()
+            .map(GitHubRepository::full_name)
+            .as_deref(),
         Some("aphrody-code/push-project")
     );
     assert_eq!(snapshot.github, origin.github);

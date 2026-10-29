@@ -77,12 +77,21 @@ mod driver {
         let (cu_init, cu_device_get_count, cu_device_get, cu_device_total_mem) = unsafe {
             (
                 library.get::<CuInit>(b"cuInit\0").ok()?,
-                library.get::<CuDeviceGetCount>(b"cuDeviceGetCount\0").ok()?,
+                library
+                    .get::<CuDeviceGetCount>(b"cuDeviceGetCount\0")
+                    .ok()?,
                 library.get::<CuDeviceGet>(b"cuDeviceGet\0").ok()?,
-                library.get::<CuDeviceTotalMem>(b"cuDeviceTotalMem_v2\0").ok()?,
+                library
+                    .get::<CuDeviceTotalMem>(b"cuDeviceTotalMem_v2\0")
+                    .ok()?,
             )
         };
-        device_info(*cu_init, *cu_device_get_count, *cu_device_get, *cu_device_total_mem)
+        device_info(
+            *cu_init,
+            *cu_device_get_count,
+            *cu_device_get,
+            *cu_device_total_mem,
+        )
     }
 
     fn device_info(
@@ -120,7 +129,11 @@ mod driver {
         }
         Some(CudaInfo {
             device_count: u32::try_from(count).ok()?,
-            vram_total_mb: if vram_available { bytes_to_mib(vram_bytes) } else { 0 },
+            vram_total_mb: if vram_available {
+                bytes_to_mib(vram_bytes)
+            } else {
+                0
+            },
         })
     }
 
@@ -158,11 +171,17 @@ mod driver {
         fn device_info_keeps_gpu_count_when_vram_query_fails() {
             assert_eq!(
                 device_info(init_ok, count_one, device_zero, total_mem_ok),
-                Some(CudaInfo { device_count: 1, vram_total_mb: 2 })
+                Some(CudaInfo {
+                    device_count: 1,
+                    vram_total_mb: 2
+                })
             );
             assert_eq!(
                 device_info(init_ok, count_one, device_zero, total_mem_error),
-                Some(CudaInfo { device_count: 1, vram_total_mb: 0 })
+                Some(CudaInfo {
+                    device_count: 1,
+                    vram_total_mb: 0
+                })
             );
         }
     }

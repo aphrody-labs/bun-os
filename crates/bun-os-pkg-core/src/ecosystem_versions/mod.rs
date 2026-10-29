@@ -70,9 +70,15 @@ impl Version for UnsupportedVersions {
         self.0
     }
     fn compare(&self, _left: &str, _right: &str) -> Result<Ordering, Self::Error> {
-        Err(VersionError(format!("comparison not implemented for {:?}", self.0)))
+        Err(VersionError(format!(
+            "comparison not implemented for {:?}",
+            self.0
+        )))
     }
     fn satisfies(&self, _version: &str, _requirement: &str) -> Result<bool, Self::Error> {
-        Err(VersionError(format!("constraint evaluation not implemented for {:?}", self.0)))
+        Err(VersionError(format!(
+            "constraint evaluation not implemented for {:?}",
+            self.0
+        )))
     }
 }

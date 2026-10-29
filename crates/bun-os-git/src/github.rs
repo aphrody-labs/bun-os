@@ -54,7 +54,9 @@ impl FromStr for ApiMethod {
             "PATCH" => Ok(Self::Patch),
             "PUT" => Ok(Self::Put),
             "DELETE" => Ok(Self::Delete),
-            _ => Err(Error::Git(format!("unsupported GitHub API method `{value}`"))),
+            _ => Err(Error::Git(format!(
+                "unsupported GitHub API method `{value}`"
+            ))),
         }
     }
 }
@@ -101,8 +103,9 @@ impl GitHubClient {
         let token = env_value("GH_TOKEN")
             .or_else(|| env_value("GITHUB_TOKEN"))
             .or_else(|| gh_cli_token(&api_base, env_value("APHRODY_GITHUB_USER").as_deref()));
-        let graphql_url =
-            std::env::var("GITHUB_GRAPHQL_URL").ok().filter(|value| !value.trim().is_empty());
+        let graphql_url = std::env::var("GITHUB_GRAPHQL_URL")
+            .ok()
+            .filter(|value| !value.trim().is_empty());
         Self::new_with_graphql_url(token, api_base, graphql_url.as_deref())
     }
 
@@ -126,7 +129,9 @@ impl GitHubClient {
         let graphql_base = graphql_url
             .strip_suffix("/graphql")
             .ok_or_else(|| {
-                Error::Git(format!("GitHub GraphQL URL must end with `/graphql`: `{graphql_url}`"))
+                Error::Git(format!(
+                    "GitHub GraphQL URL must end with `/graphql`: `{graphql_url}`"
+                ))
             })?
             .to_owned();
         let authenticated = token.is_some();
@@ -223,7 +228,9 @@ impl GitHubClient {
             return Ok(route.to_owned());
         }
         if !route.starts_with('/') {
-            return Err(Error::Git(format!("GitHub API route must start with `/`: `{route}`")));
+            return Err(Error::Git(format!(
+                "GitHub API route must start with `/`: `{route}`"
+            )));
         }
         if route.starts_with("//") {
             return Err(Error::Git(format!(
@@ -261,22 +268,27 @@ fn ensure_same_origin(api_base: &str, graphql_url: &str) -> Result<(), Error> {
 }
 
 fn env_value(name: &str) -> Option<String> {
-    std::env::var(name).ok().filter(|value| !value.trim().is_empty())
+    std::env::var(name)
+        .ok()
+        .filter(|value| !value.trim().is_empty())
 }
 
 /// Token of a GitHub CLI login: read from `hosts.yml` when `gh` stored it there, otherwise asked
 /// to `gh auth token` (keyring storage, the default on Windows and macOS).
 fn gh_cli_token(api_base: &str, user: Option<&str>) -> Option<String> {
-    let dir = env_value("GH_CONFIG_DIR").map(std::path::PathBuf::from).or_else(|| {
-        env_value("XDG_CONFIG_HOME")
-            .map(|base| std::path::PathBuf::from(base).join("gh"))
-            .or_else(|| {
-                env_value("APPDATA").map(|base| std::path::PathBuf::from(base).join("GitHub CLI"))
-            })
-            .or_else(|| {
-                env_value("HOME").map(|home| std::path::PathBuf::from(home).join(".config/gh"))
-            })
-    });
+    let dir = env_value("GH_CONFIG_DIR")
+        .map(std::path::PathBuf::from)
+        .or_else(|| {
+            env_value("XDG_CONFIG_HOME")
+                .map(|base| std::path::PathBuf::from(base).join("gh"))
+                .or_else(|| {
+                    env_value("APPDATA")
+                        .map(|base| std::path::PathBuf::from(base).join("GitHub CLI"))
+                })
+                .or_else(|| {
+                    env_value("HOME").map(|home| std::path::PathBuf::from(home).join(".config/gh"))
+                })
+        });
     dir.and_then(|dir| std::fs::read_to_string(dir.join("hosts.yml")).ok())
         .and_then(|text| hosts_token(&text, api_base, user))
         .or_else(|| gh_keyring_token(api_base, user))
@@ -284,21 +296,32 @@ fn gh_cli_token(api_base: &str, user: Option<&str>) -> Option<String> {
 
 fn gh_keyring_token(api_base: &str, user: Option<&str>) -> Option<String> {
     let host = url::Url::parse(api_base).ok()?.host_str()?.to_owned();
-    let host = if host == "api.github.com" { "github.com".to_owned() } else { host };
+    let host = if host == "api.github.com" {
+        "github.com".to_owned()
+    } else {
+        host
+    };
     let mut cmd = std::process::Command::new("gh");
     cmd.args(["auth", "token", "--hostname", &host]);
     if let Some(user) = user {
         cmd.args(["--user", user]);
     }
-    let out =
-        cmd.stdin(std::process::Stdio::null()).stderr(std::process::Stdio::null()).output().ok()?;
+    let out = cmd
+        .stdin(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .output()
+        .ok()?;
     let token = String::from_utf8(out.stdout).ok()?.trim().to_owned();
     (out.status.success() && !token.is_empty()).then_some(token)
 }
 
 fn hosts_token(hosts_yml: &str, api_base: &str, user: Option<&str>) -> Option<String> {
     let host = url::Url::parse(api_base).ok()?.host_str()?.to_owned();
-    let host = if host == "api.github.com" { "github.com".to_owned() } else { host };
+    let host = if host == "api.github.com" {
+        "github.com".to_owned()
+    } else {
+        host
+    };
     let hosts: serde_yaml::Value = serde_yaml::from_str(hosts_yml).ok()?;
     let entry = hosts.get(host.as_str())?;
     let account = user.or_else(|| entry.get("user").and_then(serde_yaml::Value::as_str))?;
@@ -323,12 +346,18 @@ mod tests {
 
     #[test]
     fn gh_cli_token_follows_selected_or_active_account() {
-        assert_eq!(hosts_token(HOSTS, "https://api.github.com", None).as_deref(), Some("tok_bob"));
+        assert_eq!(
+            hosts_token(HOSTS, "https://api.github.com", None).as_deref(),
+            Some("tok_bob")
+        );
         assert_eq!(
             hosts_token(HOSTS, "https://api.github.com", Some("alice")).as_deref(),
             Some("tok_alice")
         );
-        assert_eq!(hosts_token(HOSTS, "https://api.github.com", Some("carol")), None);
+        assert_eq!(
+            hosts_token(HOSTS, "https://api.github.com", Some("carol")),
+            None
+        );
         assert_eq!(hosts_token(HOSTS, "https://ghe.example/api/v3", None), None);
     }
 
@@ -370,28 +399,48 @@ mod tests {
     async fn rejects_routes_outside_configured_api() {
         install_rustls_provider();
         let client = GitHubClient::new(None, "https://api.github.com").unwrap();
-        assert!(client.absolute_url("https://example.com/repos/a/b").is_err());
-        assert!(client.absolute_url("https://api.github.com.evil.test/repos/a/b").is_err());
+        assert!(
+            client
+                .absolute_url("https://example.com/repos/a/b")
+                .is_err()
+        );
+        assert!(
+            client
+                .absolute_url("https://api.github.com.evil.test/repos/a/b")
+                .is_err()
+        );
         assert!(client.absolute_url("//evil.example/repos/a/b").is_err());
 
         let enterprise = GitHubClient::new(None, "https://github.example/api/v3").unwrap();
-        assert!(enterprise.absolute_url("https://github.example/api/v30/repos/a/b").is_err());
+        assert!(
+            enterprise
+                .absolute_url("https://github.example/api/v30/repos/a/b")
+                .is_err()
+        );
         assert_eq!(
-            enterprise.absolute_url("https://github.example/api/v3/repos/a/b").unwrap(),
+            enterprise
+                .absolute_url("https://github.example/api/v3/repos/a/b")
+                .unwrap(),
             "https://github.example/api/v3/repos/a/b"
         );
     }
 
     #[test]
     fn derives_saas_and_enterprise_graphql_urls() {
-        assert_eq!(default_graphql_url("https://api.github.com"), "https://api.github.com/graphql");
+        assert_eq!(
+            default_graphql_url("https://api.github.com"),
+            "https://api.github.com/graphql"
+        );
         assert_eq!(
             default_graphql_url("https://github.example/api/v3"),
             "https://github.example/api/graphql"
         );
         assert!(
-            ensure_same_origin("https://github.example/api/v3", "https://evil.example/api/graphql")
-                .is_err()
+            ensure_same_origin(
+                "https://github.example/api/v3",
+                "https://evil.example/api/graphql"
+            )
+            .is_err()
         );
     }
 }

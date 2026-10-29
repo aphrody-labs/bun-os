@@ -54,7 +54,11 @@ fn insert(
     package: PackageVersion,
     record: Value,
 ) -> Result<(), ParseError> {
-    if out.records.insert(package.version.clone(), record).is_some() {
+    if out
+        .records
+        .insert(package.version.clone(), record)
+        .is_some()
+    {
         return Err(ParseError(format!("duplicate version {}", package.version)));
     }
     out.packages.push(package);
@@ -71,16 +75,23 @@ pub fn npm_packument(package: &str, bytes: &[u8]) -> Result<RegistryIndex, Parse
         .ok_or_else(|| ParseError("missing versions object".into()))?;
     let mut out = index("npm", document.clone());
     for (version, record) in versions {
-        if record.get("name").and_then(Value::as_str).is_some_and(|name| name != package)
-            || record.get("version").and_then(Value::as_str).is_some_and(|value| value != version)
+        if record
+            .get("name")
+            .and_then(Value::as_str)
+            .is_some_and(|name| name != package)
+            || record
+                .get("version")
+                .and_then(Value::as_str)
+                .is_some_and(|value| value != version)
         {
             return Err(ParseError("npm package identity mismatch".into()));
         }
         let mut deps = BTreeMap::new();
         for (field, optional) in [("dependencies", false), ("optionalDependencies", true)] {
             if let Some(values) = record.get(field) {
-                let values =
-                    values.as_object().ok_or_else(|| ParseError(format!("invalid {field}")))?;
+                let values = values
+                    .as_object()
+                    .ok_or_else(|| ParseError(format!("invalid {field}")))?;
                 for (name, requirement) in values {
                     let requirement = requirement
                         .as_str()
@@ -145,7 +156,11 @@ pub fn cargo_sparse(package: &str, bytes: &[u8]) -> Result<RegistryIndex, ParseE
             .iter()
             .map(|dep| {
                 Ok(Dependency {
-                    source: dep.get("registry").and_then(Value::as_str).unwrap_or("cargo").into(),
+                    source: dep
+                        .get("registry")
+                        .and_then(Value::as_str)
+                        .unwrap_or("cargo")
+                        .into(),
                     name: dep
                         .get("package")
                         .and_then(Value::as_str)
@@ -195,8 +210,9 @@ pub fn nuget_flatcontainer(package: &str, bytes: &[u8]) -> Result<RegistryIndex,
         .ok_or_else(|| ParseError("missing versions array".into()))?;
     let mut out = index("nuget", record.clone());
     for value in versions {
-        let version =
-            value.as_str().ok_or_else(|| ParseError("non-string NuGet version".into()))?;
+        let version = value
+            .as_str()
+            .ok_or_else(|| ParseError("non-string NuGet version".into()))?;
         insert(
             &mut out,
             PackageVersion {
@@ -224,17 +240,27 @@ pub fn vcpkg_versions(package: &str, bytes: &[u8]) -> Result<RegistryIndex, Pars
         .ok_or_else(|| ParseError("missing versions array".into()))?;
     let mut out = index("vcpkg", document.clone());
     for record in records {
-        let schemes = ["version", "version-semver", "version-date", "version-string"];
-        let present: Vec<_> = schemes.into_iter().filter(|key| record.get(key).is_some()).collect();
+        let schemes = [
+            "version",
+            "version-semver",
+            "version-date",
+            "version-string",
+        ];
+        let present: Vec<_> = schemes
+            .into_iter()
+            .filter(|key| record.get(key).is_some())
+            .collect();
         if present.len() != 1 {
-            return Err(ParseError("vcpkg record needs exactly one version scheme".into()));
+            return Err(ParseError(
+                "vcpkg record needs exactly one version scheme".into(),
+            ));
         }
         let version = required(record, present[0])?;
         let port = match record.get("port-version") {
             None => 0,
-            Some(value) => {
-                value.as_u64().ok_or_else(|| ParseError("invalid port-version".into()))?
-            },
+            Some(value) => value
+                .as_u64()
+                .ok_or_else(|| ParseError("invalid port-version".into()))?,
         };
         insert(
             &mut out,
@@ -348,7 +374,10 @@ mod tests {
     fn cargo_retains_renames_features_and_target() {
         let index = cargo_sparse("demo", br#"{"name":"demo","vers":"1.0.0","deps":[{"name":"alias","package":"real","req":"^2","optional":true,"target":"cfg(windows)","kind":"build","features":["f"],"default_features":false}],"cksum":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","yanked":true,"features":{"x":["alias/f"]}}"#).unwrap();
         assert_eq!(index.packages[0].dependencies[0].name, "real");
-        assert_eq!(index.packages[0].dependencies[0].target.as_deref(), Some("cfg(windows)"));
+        assert_eq!(
+            index.packages[0].dependencies[0].target.as_deref(),
+            Some("cfg(windows)")
+        );
         assert!(index.packages[0].withdrawn);
         assert_eq!(index.records["1.0.0"]["deps"][0]["kind"], "build");
         assert!(cargo_sparse("other", br#"{"name":"demo"}"#).is_err());
@@ -361,8 +390,18 @@ mod tests {
         assert_eq!(index.packages[0].version, "1.2.3.4");
         assert!(index.packages[0].integrity.is_none());
         assert!(nuget_flatcontainer("demo", br#"{"versions":["1","1"]}"#).is_err());
-        assert!(NugetSource::default().versions().satisfies("1", "*").is_err());
-        assert!(NugetSource::default().versions().satisfies("1.2.3.4", "[1.2,2)").unwrap());
+        assert!(
+            NugetSource::default()
+                .versions()
+                .satisfies("1", "*")
+                .is_err()
+        );
+        assert!(
+            NugetSource::default()
+                .versions()
+                .satisfies("1.2.3.4", "[1.2,2)")
+                .unwrap()
+        );
     }
 
     #[test]
@@ -394,7 +433,10 @@ mod tests {
     fn npm_and_python_use_distinct_native_engines() {
         assert!(NpmVersions.satisfies("1.4.0", "^1.2.0 || ^2.0.0").unwrap());
         assert!(!NpmVersions.satisfies("1.4.0-beta.1", "^1.2.0").unwrap());
-        assert_eq!(Pep440Versions.compare("1!1.0", "2.0").unwrap(), std::cmp::Ordering::Greater);
+        assert_eq!(
+            Pep440Versions.compare("1!1.0", "2.0").unwrap(),
+            std::cmp::Ordering::Greater
+        );
         assert!(Pep440Versions.satisfies("1.0+local", "==1.0").unwrap());
         assert!(Pep440Versions.satisfies("1.0", "^1").is_err());
     }

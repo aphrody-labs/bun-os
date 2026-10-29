@@ -114,7 +114,9 @@ fn parse_meminfo(text: &str) -> Option<MemoryInfo> {
         })
     };
     let total_kib = field("MemTotal")?;
-    let available_kib = field("MemAvailable").or_else(|| field("MemFree")).unwrap_or(0);
+    let available_kib = field("MemAvailable")
+        .or_else(|| field("MemFree"))
+        .unwrap_or(0);
     Some(MemoryInfo {
         total_mb: bytes_to_mib(total_kib.saturating_mul(1024)),
         available_mb: bytes_to_mib(available_kib.saturating_mul(1024)),
@@ -138,14 +140,26 @@ mod tests {
         let text = "MemTotal:       32768000 kB\nMemFree:         1024000 kB\n\
                     MemAvailable:   16384000 kB\nBuffers:          204800 kB\n";
         let info = parse_meminfo(text).expect("MemTotal is present");
-        assert_eq!(info, MemoryInfo { total_mb: 32_000, available_mb: 16_000 });
+        assert_eq!(
+            info,
+            MemoryInfo {
+                total_mb: 32_000,
+                available_mb: 16_000
+            }
+        );
     }
 
     #[test]
     fn parse_meminfo_falls_back_to_mem_free() {
         let info = parse_meminfo("MemTotal: 2048000 kB\nMemFree: 1024000 kB\n")
             .expect("MemTotal is present");
-        assert_eq!(info, MemoryInfo { total_mb: 2_000, available_mb: 1_000 });
+        assert_eq!(
+            info,
+            MemoryInfo {
+                total_mb: 2_000,
+                available_mb: 1_000
+            }
+        );
     }
 
     #[test]
@@ -160,7 +174,10 @@ mod tests {
         assert!(topology.cpu_count >= 1);
         assert!(topology.memory_available_mb <= topology.memory_total_mb);
         if cfg!(any(windows, target_os = "linux")) {
-            assert!(topology.memory_total_mb > 0, "memory is probed on this platform");
+            assert!(
+                topology.memory_total_mb > 0,
+                "memory is probed on this platform"
+            );
         }
         assert_eq!(topology.has_cuda, topology.cuda_device_count > 0);
         if !topology.has_cuda {

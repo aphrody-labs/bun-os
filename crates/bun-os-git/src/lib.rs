@@ -5,7 +5,6 @@
     clippy::disallowed_types,
     clippy::disallowed_macros
 )]
-
 // SPDX-License-Identifier: Apache-2.0
 //! Native Git and GitHub primitives shared by every Aphrody repository.
 //!
@@ -104,5 +103,9 @@ pub(crate) fn io_error(
     path: impl Into<std::path::PathBuf>,
     source: std::io::Error,
 ) -> Error {
-    Error::Io { operation, path: path.into(), source }
+    Error::Io {
+        operation,
+        path: path.into(),
+        source,
+    }
 }

@@ -40,8 +40,11 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 #[test]
 fn test_parse_awesome_markdown() {
-    let index =
-        parse_awesome_markdown("awesome-bun", "oven-sh/awesome-bun", SAMPLE_AWESOME_MARKDOWN);
+    let index = parse_awesome_markdown(
+        "awesome-bun",
+        "oven-sh/awesome-bun",
+        SAMPLE_AWESOME_MARKDOWN,
+    );
 
     assert_eq!(index.name, "awesome-bun");
     assert_eq!(index.repository, "oven-sh/awesome-bun");
@@ -82,8 +85,11 @@ fn test_parse_awesome_markdown() {
 
 #[test]
 fn test_search_awesome_index() {
-    let index =
-        parse_awesome_markdown("awesome-bun", "oven-sh/awesome-bun", SAMPLE_AWESOME_MARKDOWN);
+    let index = parse_awesome_markdown(
+        "awesome-bun",
+        "oven-sh/awesome-bun",
+        SAMPLE_AWESOME_MARKDOWN,
+    );
 
     // Search by title
     let res1 = index.search("elysia");

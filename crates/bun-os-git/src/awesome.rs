@@ -18,8 +18,18 @@ pub const PRESETS: &[(&str, &str, &str, &str)] = &[
         "main",
         "Curated list of awesome lists (the canonical meta-index)",
     ),
-    ("bun", "oven-sh/awesome-bun", "main", "Curated list of awesome things related to Bun runtime"),
-    ("rust", "rust-unofficial/awesome-rust", "main", "Curated list of Rust code and resources"),
+    (
+        "bun",
+        "oven-sh/awesome-bun",
+        "main",
+        "Curated list of awesome things related to Bun runtime",
+    ),
+    (
+        "rust",
+        "rust-unofficial/awesome-rust",
+        "main",
+        "Curated list of Rust code and resources",
+    ),
     (
         "tauri",
         "tauri-apps/awesome-tauri",
@@ -126,7 +136,10 @@ impl AwesomeIndex {
     pub fn to_markdown(&self) -> String {
         let mut md = format!("# Awesome List: {}\n\n", self.name);
         md.push_str(&format!("**Repository**: `{}`\n", self.repository));
-        md.push_str(&format!("**Total categories**: {}\n", self.categories.len()));
+        md.push_str(&format!(
+            "**Total categories**: {}\n",
+            self.categories.len()
+        ));
         md.push_str(&format!("**Total items**: {}\n\n", self.total_items));
 
         for cat in &self.categories {
@@ -193,8 +206,11 @@ fn parse_list_item(line: &str) -> Option<(String, String, String)> {
     let url = rest[close_bracket + 2..paren_close].trim().to_string();
 
     let raw_desc = rest[paren_close + 1..].trim();
-    let desc =
-        raw_desc.trim_start_matches(['-', '—', ':', ' ']).trim().trim_end_matches('.').to_string();
+    let desc = raw_desc
+        .trim_start_matches(['-', '—', ':', ' '])
+        .trim()
+        .trim_end_matches('.')
+        .to_string();
 
     Some((title, url, desc))
 }
@@ -269,7 +285,10 @@ pub fn parse_awesome_markdown(name: &str, repository: &str, markdown: &str) -> A
     }
 
     if !current_items.is_empty() {
-        categories.push(AwesomeCategory { name: current_category, items: current_items });
+        categories.push(AwesomeCategory {
+            name: current_category,
+            items: current_items,
+        });
     }
 
     let total_items = categories.iter().map(|c| c.items.len()).sum();
@@ -289,14 +308,22 @@ pub fn resolve_preset(preset_or_repo: &str) -> (String, String, String) {
     for (name, repo, branch, _) in PRESETS {
         if *name == lower || *repo == lower {
             let parts: Vec<&str> = repo.split('/').collect();
-            return (parts[0].to_string(), parts[1].to_string(), (*branch).to_string());
+            return (
+                parts[0].to_string(),
+                parts[1].to_string(),
+                (*branch).to_string(),
+            );
         }
     }
 
     if let Some((owner, repo)) = preset_or_repo.split_once('/') {
         (owner.to_string(), repo.to_string(), "main".to_string())
     } else {
-        (preset_or_repo.to_string(), format!("awesome-{preset_or_repo}"), "main".to_string())
+        (
+            preset_or_repo.to_string(),
+            format!("awesome-{preset_or_repo}"),
+            "main".to_string(),
+        )
     }
 }
 

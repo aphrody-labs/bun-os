@@ -200,8 +200,13 @@ impl IngestResult {
 /// Node representing a file or directory in the ingested tree.
 #[derive(Debug, Clone)]
 enum TreeNode {
-    File { name: String },
-    Directory { name: String, children: BTreeMap<String, TreeNode> },
+    File {
+        name: String,
+    },
+    Directory {
+        name: String,
+        children: BTreeMap<String, TreeNode>,
+    },
 }
 
 impl TreeNode {
@@ -223,14 +228,14 @@ impl TreeNode {
                 } else {
                     (2, name_lower)
                 }
-            },
+            }
             Self::Directory { .. } => {
                 if !name_lower.starts_with('.') {
                     (3, name_lower)
                 } else {
                     (4, name_lower)
                 }
-            },
+            }
         }
     }
 }
@@ -246,7 +251,9 @@ fn build_globset(patterns: &[String]) -> Result<Option<GlobSet>, Error> {
             Glob::new(p).map_err(|e| Error::Git(format!("invalid glob pattern '{p}': {e}")))?;
         builder.add(glob);
     }
-    let set = builder.build().map_err(|e| Error::Git(format!("failed to compile globs: {e}")))?;
+    let set = builder
+        .build()
+        .map_err(|e| Error::Git(format!("failed to compile globs: {e}")))?;
     Ok(Some(set))
 }
 
@@ -283,10 +290,16 @@ fn extract_notebook_content(raw_json: &str) -> Option<String> {
     let mut out = String::new();
 
     for cell in cells {
-        let cell_type = cell.get("cell_type").and_then(|s| s.as_str()).unwrap_or("code");
+        let cell_type = cell
+            .get("cell_type")
+            .and_then(|s| s.as_str())
+            .unwrap_or("code");
         let source_val = cell.get("source")?;
         let source_text = if let Some(arr) = source_val.as_array() {
-            arr.iter().filter_map(|line| line.as_str()).collect::<Vec<_>>().join("")
+            arr.iter()
+                .filter_map(|line| line.as_str())
+                .collect::<Vec<_>>()
+                .join("")
         } else if let Some(s) = source_val.as_str() {
             s.to_string()
         } else {
@@ -307,17 +320,25 @@ pub fn parse_repo_source(source: &str) -> (String, Option<String>, Option<String
 
     // Handle URLs like https://github.com/owner/repo/tree/branch/subpath
     if let Ok(parsed_url) = url::Url::parse(trimmed) {
-        let path_segments: Vec<&str> =
-            parsed_url.path_segments().map(|c| c.collect()).unwrap_or_default();
+        let path_segments: Vec<&str> = parsed_url
+            .path_segments()
+            .map(|c| c.collect())
+            .unwrap_or_default();
         if path_segments.len() >= 4 && (path_segments[2] == "tree" || path_segments[2] == "blob") {
             let branch = path_segments[3].to_string();
-            let subpath =
-                if path_segments.len() > 4 { Some(path_segments[4..].join("/")) } else { None };
+            let subpath = if path_segments.len() > 4 {
+                Some(path_segments[4..].join("/"))
+            } else {
+                None
+            };
             let base_url = format!(
                 "{}://{}{}/{}/{}",
                 parsed_url.scheme(),
                 parsed_url.host_str().unwrap_or("github.com"),
-                parsed_url.port().map(|p| format!(":{p}")).unwrap_or_default(),
+                parsed_url
+                    .port()
+                    .map(|p| format!(":{p}"))
+                    .unwrap_or_default(),
                 path_segments[0],
                 path_segments[1]
             );
@@ -330,9 +351,14 @@ pub fn parse_repo_source(source: &str) -> (String, Option<String>, Option<String
 
 /// Ingest a local filesystem directory into a prompt-ready digest.
 fn ingest_path(root_path: &Path, options: &IngestOptions) -> Result<IngestResult, Error> {
-    let root = root_path.canonicalize().unwrap_or_else(|_| root_path.to_path_buf());
+    let root = root_path
+        .canonicalize()
+        .unwrap_or_else(|_| root_path.to_path_buf());
     if !root.exists() {
-        return Err(Error::Git(format!("directory does not exist: {}", root.display())));
+        return Err(Error::Git(format!(
+            "directory does not exist: {}",
+            root.display()
+        )));
     }
 
     let include_set = build_globset(&options.include_patterns)?;
@@ -346,7 +372,11 @@ fn ingest_path(root_path: &Path, options: &IngestOptions) -> Result<IngestResult
     }
     let default_ignore_set = default_ignore_builder.build().ok();
 
-    let target_dir = if let Some(sub) = &options.subpath { root.join(sub) } else { root.clone() };
+    let target_dir = if let Some(sub) = &options.subpath {
+        root.join(sub)
+    } else {
+        root.clone()
+    };
 
     let mut walker = ignore::WalkBuilder::new(&target_dir);
     walker.hidden(false); // We want hidden files/dirs checked through our own filter
@@ -435,7 +465,11 @@ fn ingest_path(root_path: &Path, options: &IngestOptions) -> Result<IngestResult
     let file_count = file_entries.len();
 
     // Build directory tree
-    let slug = root.file_name().and_then(|n| n.to_str()).unwrap_or("project").to_string();
+    let slug = root
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("project")
+        .to_string();
 
     let mut root_children: BTreeMap<String, TreeNode> = BTreeMap::new();
 
@@ -496,7 +530,10 @@ fn insert_tree_node(current: &mut BTreeMap<String, TreeNode>, parts: &[&str], in
         // Directory
         let entry = current
             .entry(part.clone())
-            .or_insert_with(|| TreeNode::Directory { name: part, children: BTreeMap::new() });
+            .or_insert_with(|| TreeNode::Directory {
+                name: part,
+                children: BTreeMap::new(),
+            });
         if let TreeNode::Directory { children, .. } = entry {
             insert_tree_node(children, parts, index + 1);
         }
@@ -515,13 +552,16 @@ fn render_ascii_tree(children: &BTreeMap<String, TreeNode>, out: &mut String, pr
         match node {
             TreeNode::File { name, .. } => {
                 out.push_str(&format!("{prefix}{connector}{name}\n"));
-            },
+            }
             TreeNode::Directory { name, children, .. } => {
                 out.push_str(&format!("{prefix}{connector}{name}/\n"));
-                let next_prefix =
-                    if is_last { format!("{prefix}    ") } else { format!("{prefix}│   ") };
+                let next_prefix = if is_last {
+                    format!("{prefix}    ")
+                } else {
+                    format!("{prefix}│   ")
+                };
                 render_ascii_tree(children, out, &next_prefix);
-            },
+            }
         }
     }
 }
@@ -569,8 +609,9 @@ pub fn ingest_remote(repo_url: &str, options: &IngestOptions) -> Result<IngestRe
 
     git_cmd.arg(&clone_url).arg(temp_dir.path());
 
-    let output =
-        git_cmd.output().map_err(|e| Error::Git(format!("failed to run git clone: {e}")))?;
+    let output = git_cmd
+        .output()
+        .map_err(|e| Error::Git(format!("failed to run git clone: {e}")))?;
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         return Err(Error::Git(format!("git clone failed: {stderr}")));
@@ -610,7 +651,10 @@ pub fn ingest_remote(repo_url: &str, options: &IngestOptions) -> Result<IngestRe
 /// True when `source` designates a remote Git repository rather than a local path.
 pub fn is_remote_source(source: &str) -> bool {
     let t = source.trim();
-    t.starts_with("http://") || t.starts_with("https://") || t.starts_with("git@") || t.ends_with(".git")
+    t.starts_with("http://")
+        || t.starts_with("https://")
+        || t.starts_with("git@")
+        || t.ends_with(".git")
 }
 
 #[cfg(test)]
@@ -622,18 +666,28 @@ mod local_tests {
     fn ingest_local_path() {
         let dir = tempfile::tempdir().expect("create tempdir");
         let root = dir.path();
-        fs::write(root.join("README.md"), "# Project Test
+        fs::write(
+            root.join("README.md"),
+            "# Project Test
 Description here
-").expect("readme");
+",
+        )
+        .expect("readme");
         fs::create_dir_all(root.join("src")).expect("src");
-        fs::write(root.join("src/main.rs"), "fn main() {
+        fs::write(
+            root.join("src/main.rs"),
+            "fn main() {
     println!(\"hello\");
 }
-")
-            .expect("main.rs");
-        fs::write(root.join("src/lib.rs"), "pub fn add(a: i32, b: i32) -> i32 { a + b }
-")
-            .expect("lib.rs");
+",
+        )
+        .expect("main.rs");
+        fs::write(
+            root.join("src/lib.rs"),
+            "pub fn add(a: i32, b: i32) -> i32 { a + b }
+",
+        )
+        .expect("lib.rs");
         fs::create_dir_all(root.join("target")).expect("target");
         fs::write(root.join("target/dummy.o"), [0u8, 1, 2, 3]).expect("dummy");
         fs::write(root.join("test.png"), [0u8, 1, 2, 3]).expect("binary");
@@ -655,14 +709,28 @@ Description here
     fn ingest_include_filter() {
         let dir = tempfile::tempdir().expect("create tempdir");
         let root = dir.path();
-        fs::write(root.join("README.md"), "# Title
-").unwrap();
-        fs::write(root.join("script.py"), "print('py')
-").unwrap();
-        fs::write(root.join("main.rs"), "fn main() {}
-").unwrap();
-        let options =
-            IngestOptions { include_patterns: vec!["*.rs".to_string()], ..IngestOptions::default() };
+        fs::write(
+            root.join("README.md"),
+            "# Title
+",
+        )
+        .unwrap();
+        fs::write(
+            root.join("script.py"),
+            "print('py')
+",
+        )
+        .unwrap();
+        fs::write(
+            root.join("main.rs"),
+            "fn main() {}
+",
+        )
+        .unwrap();
+        let options = IngestOptions {
+            include_patterns: vec!["*.rs".to_string()],
+            ..IngestOptions::default()
+        };
         let result = ingest_path(root, &options).expect("ingest filter");
         assert_eq!(result.file_count, 1);
         assert!(result.content.contains("FILE: main.rs"));
