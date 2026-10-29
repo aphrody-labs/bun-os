@@ -1,0 +1,26 @@
+[package]
+name    = "sd-supervisor"
+version = "0.1.0"
+
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+
+[dependencies]
+chrono     = { version = "0.4.39" }
+serde      = { version = "1.0.216", features = ["derive"] }
+serde_json = { version = "1.0.133" }
+specta     = { git = "https://github.com/jamiepine/specta", branch = "main", features = ["chrono", "derive", "serde", "serde_json"] }
+thiserror  = { version = "2.0.8" }
+tokio      = { version = "1.42.0", features = ["fs", "io-util", "macros", "net", "process", "rt", "sync", "time"] }
+tracing    = { version = "0.1.41" }
+
+[target.'cfg(unix)'.dependencies]
+libc = { version = "0.2.169" }
+
+[dev-dependencies]
+tempfile = { version = "3.14.0" }
+tokio    = { version = "1.42.0", features = ["rt-multi-thread"] }
+
+[lib]
+path = "src/lib.rs"

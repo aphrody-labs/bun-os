@@ -1,0 +1,192 @@
+---
+title: React Hooks
+description: Type-safe queries and actions generated from Rust operations
+sidebarTitle: Hooks
+---
+
+The TypeScript client exposes React Query hooks over Spacedrive's registered
+operations. Inputs and outputs come from generated Rust types.
+
+Import hooks and types from **@sd/ts-client**. Do not redefine backend types or
+cast results to an unrelated shape.
+
+## Provider
+
+Place one provider above components that use the daemon client:
+
+~~~tsx
+import { SpacedriveProvider } from '@sd/ts-client';
+
+export function App({ client }: { client: SpacedriveClient }) {
+  return (
+    <SpacedriveProvider client={client}>
+      <Routes />
+    </SpacedriveProvider>
+  );
+}
+~~~
+
+The client holds the selected library and transport. Components should not open
+their own socket.
+
+## Core queries
+
+Core queries do not require a selected library:
+
+~~~tsx
+import { useCoreQuery } from '@sd/ts-client';
+
+export function LibraryList() {
+  const libraries = useCoreQuery({
+    type: 'libraries.list',
+    input: { include_stats: false },
+  });
+
+  if (libraries.isPending) return <Spinner />;
+  if (libraries.error) return <ErrorState error={libraries.error} />;
+
+  return libraries.data.map((library) => (
+    <LibraryRow key={library.id} library={library} />
+  ));
+}
+~~~
+
+The operation name constrains the input and inferred result.
+
+## Library queries
+
+Library queries use the client's current library:
+
+~~~tsx
+import { useLibraryQuery } from '@sd/ts-client';
+
+export function SourceList() {
+  const sources = useLibraryQuery({
+    type: 'sources.list',
+    input: { data_type: null },
+  });
+
+  if (sources.isPending) return <Spinner />;
+  if (sources.error) return <ErrorState error={sources.error} />;
+
+  return sources.data.map((source) => (
+    <SourceRow
+      key={source.id}
+      name={source.name}
+      available={source.attached}
+      records={source.item_count}
+    />
+  ));
+}
+~~~
+
+The hook stays disabled until a library is selected and refetches when library
+identity changes.
+
+## Mutations
+
+Core and library actions use separate hooks:
+
+~~~tsx
+import { useLibraryMutation } from '@sd/ts-client';
+
+export function TrackSourceButton({ path }: { path: string }) {
+  const track = useLibraryMutation('sources.track');
+
+  return (
+    <button
+      disabled={track.isPending}
+      onClick={() => track.mutate({
+        path,
+        name: null,
+        unfiltered: false,
+      })}
+    >
+      Track source
+    </button>
+  );
+}
+~~~
+
+The mutation result includes the stable source ID and optional job ID. Follow
+the job instead of keeping a component-local progress loop.
+
+## Normalized queries
+
+Use the shared normalized-query hook when resource events can update visible
+rows without refetching the whole result. The resource key must use the stable
+ID returned by the backend.
+
+Normalization is a client projection. Source availability, permission, sort
+order, and partial-result truth still come from canonical queries.
+
+## Jobs
+
+The job hook combines the initial list query with progress events:
+
+~~~tsx
+import { useJobs } from '@sd/ts-client';
+
+export function JobPanel() {
+  const { jobs, isLoading } = useJobs();
+  if (isLoading) return <Spinner />;
+
+  return jobs.map((job) => (
+    <JobRow key={job.id} job={job} />
+  ));
+}
+~~~
+
+Completion and failure remain durable daemon state. Events make the interface
+faster but are not the source of truth after reconnect.
+
+## Search
+
+Use **useSearchFiles** for debounced source search and cancellation. Preserve
+the source ID on every result so the interface can report availability and
+route later operations correctly.
+
+Search can be partial when a remote source is offline. Do not flatten that into
+an empty result.
+
+## Error handling
+
+Render typed states separately:
+
+- unauthenticated or no library;
+- permission denied;
+- source offline;
+- stale generation;
+- request cancelled;
+- operation failed.
+
+Do not catch every failure and return an empty array. Empty and unavailable are
+different product states.
+
+## Cache keys
+
+Query keys include operation type, current library ID, and input. Inputs should
+contain stable IDs and serializable values.
+
+After a mutation, prefer resource events and targeted invalidation. Clearing the
+entire query cache creates unnecessary source and network work.
+
+## Type regeneration
+
+After changing a public Rust type:
+
+~~~bash
+cargo run --bin generate_typescript_types
+~~~
+
+Commit generated types with the backend change. Type-check every frontend
+consumer before landing it.
+
+## Rules
+
+- Import generated types from **@sd/ts-client**.
+- Never use **as any** to cross the API boundary.
+- Keep one client and subscription manager per application.
+- Use stable IDs, not labels or array positions.
+- Preserve offline, stale, denied, and partial states.
+- Let the daemon own durable work.

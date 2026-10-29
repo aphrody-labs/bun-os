@@ -1,0 +1,104 @@
+---
+title: Security and Sync
+description: Capability isolation, provenance, and extension data movement
+sidebarTitle: Security and Sync
+---
+
+Extensions run in a WASM sandbox and call a narrow host API. Installation grants
+capabilities to one signed package identity. The extension does not inherit the
+daemon's full filesystem or network authority.
+
+## Capability model
+
+Grants can restrict:
+
+- library;
+- source and source-relative subtree;
+- metadata versus original-byte reads;
+- write operations;
+- model and sidecar kinds;
+- named network destinations;
+- jobs, actions, and interface surfaces.
+
+A location pin is not a security boundary. Grants resolve to stable source
+scope.
+
+## Host boundary
+
+The host validates every request before:
+
+- resolving a record;
+- opening a byte stream;
+- writing a source;
+- creating an assertion;
+- dispatching a job;
+- making an external network request.
+
+Extensions do not receive raw SQLite connections, secret keys, provider tokens,
+or arbitrary local paths.
+
+## Provenance
+
+Every generated model and sidecar records the extension ID, version, input
+identity, and generation. A user can see which code produced a result and
+invalidate it after an update.
+
+User assertions also record the actor and grant used to create them.
+
+## Sync by storage class
+
+Extensions do not implement private sync protocols. The host routes data by
+ownership:
+
+| Data | Sync rule |
+| --- | --- |
+| Source-derived model | Follows source generation authority |
+| User or extension assertion | Merges between authorized library peers |
+| Original file | Moves through a file operation or file sync |
+| Rebuildable sidecar | Regenerates near the consumer or uses cache |
+| Persistent sidecar | Replicates under source policy |
+| Standalone model | Uses its declared assertion and conflict rule |
+
+An extension declares conflict semantics for fields that several peers can
+edit. Filesystem timestamps do not order model changes.
+
+## Network access
+
+Network capability names allowed hosts, protocols, and purpose. The user sees
+when data will leave their infrastructure and which service receives it.
+
+Responses remain untrusted input. The host applies size, time, redirect, and
+rate limits.
+
+## Updates
+
+An update keeps the same signed extension identity and presents any new
+capabilities before activation. Model migrations can change only the
+extension-owned schema and run transactionally.
+
+If migration fails, the old package and data remain available for rollback.
+
+## Uninstall
+
+The uninstall preview separates:
+
+- code and active grants;
+- scheduled jobs;
+- reclaimable caches;
+- durable models and assertions;
+- persistent sidecars;
+- original files in user sources.
+
+Removing executable code is immediate. Deleting durable data is a separate
+explicit action.
+
+## Security rules
+
+- Deny undeclared host calls.
+- Scope grants by stable source identity.
+- Keep secrets outside extension memory unless a call requires a short-lived
+  credential.
+- Record provenance for every durable output.
+- Require confirmed content before content-scoped irreversible merges.
+- Treat external processors as named data recipients.
+- Apply the same operation authorization to extensions, humans, and agents.

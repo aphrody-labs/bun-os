@@ -1,0 +1,116 @@
+---
+title: Data Storage
+description: Store extension data without creating a second filesystem model
+sidebarTitle: Data Storage
+---
+
+Extensions can persist typed models, original files, and derived sidecars. The
+correct storage class depends on who owns the data and whether it can be
+recreated.
+
+## Storage classes
+
+| Class | Example | Lifetime |
+| --- | --- | --- |
+| Source record or facet | Provider metadata observed during ingest | Part of the source generation |
+| Record overlay | A review state attached to one observed object | Survives reindexing |
+| Content model | Faces or transcript attached to verified bytes | Shared by records with that content |
+| Standalone model | Album, project, or person | Owned by the extension |
+| Original file | Imported email or exported report | Stored in a user-chosen source |
+| Sidecar | Thumbnail, proxy, embedding, or OCR output | Rebuildable or retained by declared policy |
+
+Do not copy core file metadata into an extension table. Query source records and
+attach only the facts your extension owns.
+
+## Generation or assertion
+
+Ask one question before storing a field: can the ingest reproduce it from the
+origin?
+
+- If yes, it belongs to the source generation or a derived sidecar.
+- If no, it belongs to the assertion layer with provenance.
+
+A source reindex can replace generation data. It must preserve assertions.
+Removing a provider or losing an origin may make even generated data impossible
+to recreate, so source stores are still treated as durable evidence.
+
+## Model scopes
+
+### Record-scoped
+
+Use record scope for facts about one observed instance, such as an import
+decision, manual crop, or provider-specific review state.
+
+### Content-scoped
+
+Use content scope when the fact follows confirmed bytes across copies, such as a
+video transcript or image embedding. Candidate content identity is not strong
+enough for irreversible merges.
+
+### Standalone
+
+Use a standalone model for objects with their own identity, such as an album,
+customer, project, or saved workflow. Relate it to records or content through
+typed edges.
+
+## Original files
+
+When an extension creates or imports original data, the user chooses a
+destination source. The normal file operation writes the bytes, the source
+ingest records them, and the extension attaches its own metadata.
+
+This keeps files visible to every Spacedrive client and to other permitted
+extensions. An extension-private blob store is appropriate only for internal
+state that has no meaning as a user file.
+
+## Sidecars
+
+Sidecars are files derived from records or content:
+
+- thumbnails and preview tiles;
+- media proxies and thumbstrips;
+- OCR text and transcripts;
+- embeddings and feature vectors;
+- extracted structured metadata.
+
+A sidecar declaration identifies its owner, input identity, variant, format,
+generation version, and retention class. Deterministic addressing lets
+Spacedrive reuse existing output and invalidate it when the generator changes.
+
+Rebuildable sidecars can be evicted. Persistent sidecars travel with source or
+content policy.
+
+## Queries and search
+
+Extensions query the common record API and their declared models. Search fields
+join the library projection through stable source, record, or content identity.
+
+An extension must report partial answers when relevant sources are offline or
+its model has not finished processing the current generation.
+
+## Sync
+
+Storage class determines sync behavior:
+
+- Source generation data follows the source ingest authority.
+- Assertions merge between authorized library peers.
+- Original files move through file sync or an explicit operation.
+- Rebuildable sidecars can be regenerated near the consumer.
+- Persistent sidecars replicate according to source policy.
+
+An extension does not implement a private sync protocol for each model.
+
+## Removal
+
+Uninstalling an extension removes its executable capabilities. The uninstall
+preview separately lists:
+
+- rebuildable caches that can be reclaimed;
+- durable models that will be retained;
+- original files that remain in user sources;
+- grants and scheduled jobs that will be revoked.
+
+Durable data is deleted only through an explicit follow-up action.
+
+See [Security and Sync](/extensions/security-and-sync) for capability rules and
+[Virtual Sidecars](/core/virtual-sidecars) for derivative storage.

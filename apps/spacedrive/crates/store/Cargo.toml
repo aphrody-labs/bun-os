@@ -1,0 +1,22 @@
+[package]
+name    = "sd-store"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sqlx        = { workspace = true, features = ["sqlite", "runtime-tokio", "derive", "uuid"] }
+serde       = { version = "1.0.216" }
+serde_json  = { version = "1.0.133" }
+uuid        = { version = "1.10", features = ["v4", "v5", "v7"] }
+blake3      = { workspace = true }
+chrono      = { version = "0.4.39" }
+tokio       = { version = "1.42.0", features = ["fs"] }
+toml        = { version = "0.8" }
+thiserror   = { version = "2.0.8" }
+tracing     = { version = "0.1.41" }
+indexmap    = { version = "2.7", features = ["serde"] }
+unicode-normalization = { workspace = true }
+
+[dev-dependencies]
+tempfile = { version = "3.14.0" }
+tokio    = { version = "1.42.0", features = ["macros", "rt-multi-thread"] }

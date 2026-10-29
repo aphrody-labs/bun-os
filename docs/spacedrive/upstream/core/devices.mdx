@@ -1,0 +1,121 @@
+---
+title: Devices
+description: Runtime identity, pairing, availability, and grants
+sidebarTitle: Devices
+---
+
+A device is one Spacedrive runtime identity. It represents a daemon that can
+open libraries, observe volumes, serve sources, execute jobs, and connect to
+peers.
+
+A device does not own file identity merely because a drive is currently mounted
+there. Sources and volumes retain their own identity when they move.
+
+## Device identity
+
+Each instance creates a cryptographic identity on first run. The public identity
+names the peer on the network. Private key material remains in the local key
+store.
+
+Renaming a device changes its display label, not its identity. Reinstalling
+without restoring keys creates a new device that must be paired again.
+
+## Device state
+
+The library distinguishes membership from current network state:
+
+| State | Meaning |
+| --- | --- |
+| Discovered | Visible on the local network but not trusted |
+| Pairing | Completing a user-approved trust exchange |
+| Paired | Known and eligible for granted library access |
+| Connected | Reachable through an authenticated session |
+| Offline | Still paired but not currently reachable |
+| Revoked | No longer authorized for future sessions |
+
+An offline device remains in the library so source provenance and job history
+do not disappear.
+
+## Pairing
+
+Pairing proves that two instances were approved by a person with the short code
+shown on one of them. The devices exchange identities and record the
+relationship as soon as the code is verified; neither side prompts again.
+
+Pairing does not grant blanket filesystem access and does not add the device to
+any library. Library membership is a second step.
+
+~~~bash
+sd-cli network pair generate
+sd-cli network pair join "<PAIRING_CODE>"
+sd-cli network devices
+sd-cli library sync-setup discover <REMOTE_DEVICE_ID>
+sd-cli library sync-setup setup --local-library <LOCAL_LIBRARY_ID> \
+  --remote-device <REMOTE_DEVICE_ID> --remote-library <LIBRARY_ID> \
+  --action join-remote --name "<LIBRARY_NAME>"
+sd-cli devices list
+~~~
+
+`network devices` shows pairing state. `devices list` shows the current
+library's members and is empty of the peer until the join completes. See
+[Device Pairing](/core/pairing) for the protocol and
+[Library Sync](/core/library-sync#joining-an-existing-library) for the join.
+
+## What a device can serve
+
+An authorized device can expose:
+
+- its hardware and mounted volumes;
+- source queries and search;
+- snapshots and catalog projections;
+- byte ranges and previews;
+- durable operation status;
+- job and daemon logs;
+- mounts and scoped shares.
+
+Every request is checked against the authenticated device and current grant.
+The same checks apply when the caller is another UI, a script, or an agent.
+
+## Volumes and source authority
+
+A device observes mounted volumes and hosts the volume arena. A filesystem
+source uses whichever authorized device currently has valid access to its
+origin.
+
+Source generation authority is explicit. Moving a drive to another device does
+not require rewriting every record. The new attachment is recorded, the source
+root resolves against it, and authority transfers through a visible handoff.
+
+## Revocation
+
+Revoking a device prevents new authenticated sessions and removes its active
+grants. Other devices retain:
+
+- the device identity and audit history;
+- references needed for provenance;
+- source stores or caches already copied under prior permission;
+- conflicts and unacknowledged operations.
+
+Revocation cannot recall bytes that were previously shared. Use narrow scopes
+and retention policy when data should not persist on a client.
+
+## Lost devices
+
+Marking a device lost records the event without erasing it. The library can
+then:
+
+- revoke network access;
+- identify sources last served by that device;
+- report protection gaps;
+- rotate relevant share secrets;
+- guide recovery from another source store or file copy.
+
+Device loss and source loss are related but separate. A portable drive may
+survive its old host. A source store replicated elsewhere may preserve evidence
+even when both are gone.
+
+## Related systems
+
+- [Networking](/core/networking) describes peer transport.
+- [Library Sync](/core/library-sync) describes state exchanged by devices.
+- [Volumes](/core/volumes) describes storage identity and attachment.

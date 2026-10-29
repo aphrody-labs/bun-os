@@ -1,0 +1,102 @@
+---
+title: Examples
+description: A small durable job and a file-kind integration
+sidebarTitle: Examples
+---
+
+## Durable counter
+
+This extension registers one resumable job. Its serializable state is the
+checkpoint.
+
+~~~rust
+use spacedrive_sdk::prelude::*;
+
+#[extension(
+    id = "com.example.counter",
+    name = "Counter",
+    version = "0.1.0",
+    jobs = [count],
+)]
+struct CounterExtension;
+
+#[derive(Serialize, Deserialize, Default)]
+pub struct CounterState {
+    pub current: u32,
+    pub target: u32,
+}
+
+#[job(name = "count")]
+fn count(ctx: &JobContext, state: &mut CounterState) -> Result<()> {
+    while state.current < state.target {
+        if ctx.check_interrupt_sync() {
+            ctx.checkpoint(state)?;
+            return Err(Error::OperationFailed("Interrupted".into()));
+        }
+
+        state.current += 1;
+        ctx.report_progress(
+            state.current as f32 / state.target as f32,
+            &format!("Counted {}/{}", state.current, state.target),
+        );
+
+        if state.current % 10 == 0 {
+            ctx.checkpoint(state)?;
+        }
+    }
+
+    Ok(())
+}
+~~~
+
+The host persists progress, associates logs with the job ID, and resumes only
+from committed state.
+
+## Camera RAW support
+
+A file-kind extension for a camera format contributes a small set of connected
+capabilities:
+
+1. Recognize the format from extension, MIME type, and magic bytes.
+2. Extract camera, lens, exposure, dimensions, and embedded-preview metadata.
+3. Register a fast preview using the embedded image.
+4. Register a full renderer when the required codec is available.
+5. Generate deterministic thumbnails and an optional editing proxy.
+6. Add inspector rows and an “Open in registered editor” command.
+
+The source keeps the original file record. Extracted facts record the extension
+and input generation. Thumbnails remain reclaimable while the original and
+generator are available. An explicitly retained proxy follows source policy.
+
+If the extension is removed, Spacedrive still shows the file, path, content
+identity, source, and generic metadata. It explains that the specialized preview
+handler is missing.
+
+## Photos library adapter
+
+A Photos adapter reads an existing library as an origin:
+
+- assets become standard source records;
+- albums, edits, faces, and places become typed facets, models, and edges;
+- original bytes stay where the photo library manages them;
+- the user can choose a normal source as an export or backup destination.
+
+Import clearly states that it will not move original files. The adapter uses
+provider versions and identifiers to update the same records on later ingests.
+
+The extension contributes People, Places, and Albums views over the common
+operation API. An external agent can query those views through CLI or MCP
+without receiving access to the extension database.
+
+## Review checklist
+
+Before shipping an extension:
+
+- Build the WASM module reproducibly.
+- Verify the package signature and stable ID.
+- Review every requested capability.
+- Test interruption and migration rollback.
+- Confirm durable data survives reindex and uninstall.
+- Confirm partial results when a source is offline.
+- Confirm file mutation uses registered operations.
+- Confirm the interface has a safe missing-extension fallback.

@@ -1,8 +1,41 @@
 [workspace]
 # apps/aphrody-app stays excluded: cef-dll-sys needs the native CEF CMake toolchain (CMake project() fails here), not available in the Rust-only gates.
-exclude = ["apps/aphrody-app", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "packages/bun-tauri", "apps/aphrody-model-view", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "apps/artcraft", "crates/artcraft-tauri-plugin-http", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
+exclude = ["apps/spacedrive/apps/native", "apps/spacedrive/crates/json-sample-derive", "apps/spacedrive/extensions/photos", "apps/spacedrive/extensions/test-extension", "apps/aphrody-app", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "packages/bun-tauri", "apps/aphrody-model-view", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "apps/artcraft", "crates/artcraft-tauri-plugin-http", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
 resolver = "3"
 members = [
+  "apps/spacedrive/core",
+  "apps/spacedrive/core/benchmarks",
+  "apps/spacedrive/apps/server",
+  "apps/spacedrive/apps/cli",
+  "apps/spacedrive/apps/tauri/sd-tauri-core",
+  "apps/spacedrive/apps/tauri/src-tauri",
+  "apps/spacedrive/apps/mobile/modules/sd-mobile-core/core",
+  "apps/spacedrive/xtask",
+  "apps/spacedrive/crates/actors",
+  "apps/spacedrive/crates/archive",
+  "apps/spacedrive/crates/bake",
+  "apps/spacedrive/crates/crypto",
+  "apps/spacedrive/crates/extension-ui",
+  "apps/spacedrive/crates/fda",
+  "apps/spacedrive/crates/ffmpeg",
+  "apps/spacedrive/crates/fs-watcher",
+  "apps/spacedrive/crates/imageio",
+  "apps/spacedrive/crates/images",
+  "apps/spacedrive/crates/job-derive",
+  "apps/spacedrive/crates/log-analyzer",
+  "apps/spacedrive/crates/media-metadata",
+  "apps/spacedrive/crates/photos",
+  "apps/spacedrive/crates/pvcache",
+  "apps/spacedrive/crates/rc4-shim",
+  "apps/spacedrive/crates/sd-client",
+  "apps/spacedrive/crates/sdk",
+  "apps/spacedrive/crates/sdk-macros",
+  "apps/spacedrive/crates/sidecar-path",
+  "apps/spacedrive/crates/store",
+  "apps/spacedrive/crates/supervisor",
+  "apps/spacedrive/crates/task-system",
+  "apps/spacedrive/crates/task-validator",
+  "apps/spacedrive/crates/utils",
   "crates/aphrody",
   "crates/aphrody-agent-runtime",
   "crates/aphrody-agent-tools",
@@ -721,6 +754,33 @@ correctness = { level = "warn", priority = -1 }
 perf = { level = "warn", priority = -1 }
 
 [workspace.dependencies]
+# Spacedrive (apps/spacedrive) dependencies the Bun OS workspace did not pin yet; same requirements as upstream.
+async-channel = "2.3"
+async-stream = "0.3.6"
+axum-extra = "0.9.6"
+blake3 = "1.5.5"
+ed25519-dalek = "2.1"
+futures-concurrency = "7.6.2"
+iroh = "0.95.1"
+lending-stream = "1.0"
+normpath = "1.3"
+quic-rpc = "0.17.3"
+rmp = "0.8.14"
+rmp-serde = "1.3"
+rmpv = { version = "1.3", features = ["with-serde"] }
+tokio-stream = "0.1.17"
+tracing-test = "0.2.5"
+uhlc = "0.8.0"
+webp = "0.3.0"
+zeroize = "1.8"
+sqlx = { version = "0.8", default-features = false, features = ["sqlite", "runtime-tokio"] }
+lancedb = "0.15"
+fastembed = "4"
+arrow-array = "53.3"
+arrow-schema = "53.3"
+unicode-normalization = "0.1"
+dashmap = "6.1"
+ort = { version = "2.0.0-rc.9", default-features = false, features = ["download-binaries", "tls-native"] }
 bun_git = { path = "crates/bun-os-git", version = "1.4.7" }
 bun_native = { path = "crates/bun-os-native", version = "1.4.7" }
 bun_pkg = { path = "crates/bun-os-pkg", version = "1.4.7" }

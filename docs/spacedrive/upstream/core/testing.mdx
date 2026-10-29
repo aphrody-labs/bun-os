@@ -1,0 +1,209 @@
+---
+title: Testing
+description: Prove filesystem safety across restarts, platforms, and real data
+sidebarTitle: Testing
+---
+
+Spacedrive tests behavior at four scales: pure logic, one daemon, several
+processes, and real filesystems. A test suite that never touches real storage
+cannot support the release claim.
+
+## Commands
+
+~~~bash
+cargo test
+cargo test <TEST_NAME>
+cargo test --lib
+cargo test -- --nocapture
+cargo clippy
+cargo fmt --check
+~~~
+
+Frontend changes also run the relevant package type checks and production
+build. Public Rust type changes regenerate TypeScript before those checks.
+
+## Test layers
+
+### Unit tests
+
+Keep pure rules beside their implementation:
+
+- identity evidence ordering;
+- capture-policy matching;
+- content evidence promotion;
+- sync conflict rules;
+- path and URI parsing;
+- permission decisions.
+
+Unit tests should be deterministic and avoid global daemon state.
+
+### Single-daemon integration tests
+
+Use an isolated temporary data directory and real SQLite stores. Cover complete
+operation paths, transaction behavior, jobs, events, and restart reconciliation.
+
+Tests inspect public operations and durable state. They do not rely only on log
+messages.
+
+### Multi-process tests
+
+Use independent daemon processes for pairing, peer transport, remote operations,
+relay behavior, disconnects, and protocol compatibility. Separate processes
+catch assumptions hidden by an in-memory harness.
+
+Use a deterministic transport harness for merge algorithms and precise packet
+ordering, then keep at least one real-network test for the protocol.
+
+### Filesystem matrix
+
+Run destructive and metadata-sensitive tests on every claimed platform and
+filesystem. Include:
+
+- macOS APFS;
+- Windows NTFS;
+- Linux ext4 and supported network filesystems;
+- removable drives;
+- case-sensitive and case-insensitive names;
+- symlinks and permission denial;
+- names that are not valid UTF-8;
+- sparse, large, and changing files.
+
+An emulated filesystem is useful for injection but cannot replace native
+metadata verification.
+
+## Source ingest regression suite
+
+Every source ingest must prove:
+
+- the daemon data directory is excluded;
+- a failed batch salvages valid records and identifies the bad record;
+- capture policy matches between the initial walk and watcher;
+- final writes commit before job completion;
+- interrupted walks restart from zero;
+- incomplete evidence cannot sweep unseen records;
+- a surprising mass sweep trips the safety fuse;
+- volume-relative roots survive remount;
+- unreadable content remains represented with a reason;
+- reindex preserves assertions.
+
+Compare final record counts with an independent filesystem walk. Sample stored
+metadata against platform APIs.
+
+## Content verification suite
+
+Test:
+
+- deterministic candidate identity;
+- candidate collisions;
+- full-byte confirmation;
+- files changing during a read;
+- final batch flush;
+- permission and I/O failures;
+- duplicate grouping across records;
+- failure-domain counts across physical storage.
+
+No test may treat a sampled candidate as authorization to delete bytes.
+
+## Job recovery suite
+
+Interrupt each job kind:
+
+- before its first checkpoint;
+- during an external write;
+- after data commit but before progress update;
+- during final output;
+- during cancellation.
+
+Restart the daemon and assert that every queued or running row becomes resumed,
+failed with a reason, cancelled, or completed. No zombie state is acceptable.
+
+## File operation suite
+
+Copy, move, sync, archive, and delete tests inject:
+
+- destination collision;
+- source change after preview;
+- short read and short write;
+- disk full;
+- network loss;
+- provider throttling;
+- process exit;
+- checksum mismatch;
+- permission revocation;
+- cross-device rename fallback.
+
+Assert both bytes and durable operation evidence. For destructive work, assert
+that failed verification leaves the source copy intact.
+
+## Sync and networking suite
+
+Test local and relayed pairing, device revocation, scoped source grants, remote
+query completeness, range reads, reconnect watermarks, source authority, and
+multi-writer assertions.
+
+Library sync, source sync, and file sync have separate assertions. A passing
+metadata sync test does not prove that bytes were copied.
+
+## Extension suite
+
+Run a real WASM extension that:
+
+- requests and is denied a capability;
+- registers a file kind and preview;
+- checkpoints a job;
+- writes each supported model scope;
+- migrates and rolls back;
+- survives reindex;
+- degrades safely after uninstall.
+
+The host must reject database, filesystem, and network access outside the grant.
+
+## Real-data qualification
+
+Release candidates run against datasets large enough to expose queue races,
+filesystem churn, and query-plan failures. Keep the origins backed up and
+perform independent acceptance checks.
+
+Record:
+
+- source and independent counts;
+- pending content work;
+- unreadable objects and reasons;
+- verification results;
+- frozen store checks;
+- restart and recovery observations.
+
+Fixtures prove known cases. Real data discovers cases the suite does not yet
+know to model.
+
+## Test hygiene
+
+- Use unique temporary directories.
+- Never point destructive tests at a home directory or workspace root.
+- Keep timeouts bounded.
+- Assert structured output before logs.
+- Preserve failed test artifacts when they contain useful evidence.
+- Avoid sleeps when an event or state query can prove readiness.
+- Add every production data-loss bug as a regression test.
+
+## Acceptance matrices
+
+A plan that ends in an acceptance table gets a matrix file under
+`docs/core/acceptance/`, one row per scenario, each naming the test that
+proves it and its status on the CI runner. A row no Linux test can prove says
+why. A row whose test fails at the current commit keeps the test, marked
+`#[ignore = "R8: <row> fails: <reason>"]`, and the matrix records the observed
+behavior so the fix has a target.
+
+- [Source runtime](https://github.com/spacedriveapp/spacedrive/blob/main/docs/core/acceptance/source-runtime.md):
+  the R8 table of the source runtime reliability plan.
+- [Entries drop and file operations](https://github.com/spacedriveapp/spacedrive/blob/main/docs/core/acceptance/entries-drop-and-file-operations.md):
+  the FDA acceptance section of the entries final drop plan and the
+  acceptance cases of the action previews and file operations plans.
+- [Volumes](https://github.com/spacedriveapp/spacedrive/blob/main/docs/core/acceptance/volumes.md):
+  the Linux rows of the locked volumes plan.
+- [Add to Library](https://github.com/spacedriveapp/spacedrive/blob/main/docs/core/acceptance/add-to-library.md):
+  the acceptance cases of the Add to Library plan that the core half proves.
+
+See [Jobs](/core/jobs), [Indexing](/core/indexing), and [Releases](/core/releases)
+for the contracts these tests enforce.

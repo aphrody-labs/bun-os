@@ -1,0 +1,109 @@
+---
+title: Welcome to Spacedrive
+description: Open personal data infrastructure for your files
+sidebarTitle: Introduction
+---
+
+<Callout>
+  **Spacedrive 2.0 arrives October 1, 2026.**
+
+  The new release brings portable source indexes, private remote access,
+  filesystem mounts, history, extensions, and one API for people and software.
+  [Download Spacedrive 2.0](https://github.com/spacedriveapp/spacedrive/releases).
+</Callout>
+
+# Your data should not have to live on somebody else's computer to be useful
+
+Spacedrive is open personal data infrastructure. It gives you one fast,
+cross-platform interface over files on your computers, private servers,
+removable drives, and optional cloud accounts.
+
+Your files stay with the storage providers you choose. Spacedrive adds durable
+identity, search, history, protection, remote access, and automation without
+requiring a hosted account or central control plane.
+
+<img src="/SDGridView.webp" alt="Files from several sources in Spacedrive's grid view" />
+
+## Why this matters now
+
+The last decade made cloud custody the price of convenience. Personal files and
+their metadata became concentrated on infrastructure controlled by a few
+companies. A breach, account loss, policy change, or service shutdown can affect
+years of a person's life at once.
+
+AI increases the cost of that concentration. Automated attacks can find and
+exploit weaknesses faster, while large collections of personal data can train
+or inform systems that infer more about a person than any single file reveals.
+Privacy is now part of operational safety.
+
+Moving files onto a hard drive is not enough. Owned storage must also be easy to
+search, protect, share, inspect, and reach from anywhere. Spacedrive supplies
+that missing layer.
+
+## The model
+
+Spacedrive treats every retained collection of data as a **source**. A source
+has three parts:
+
+- An **origin**, where the data comes from
+- An **ingest**, which reads that origin
+- A **store**, which preserves records, content identity, history, and your
+  assertions about the data
+
+A source may be a folder, an entire drive, a NAS dataset, another Spacedrive
+node, or a cloud provider. Every source produces the same record shape, so
+search and file operations do not have to understand each provider separately.
+
+Source stores are portable. They can live next to a drive, remain available
+when that drive is offline, and be frozen into dated snapshots. Spacedrive can
+therefore answer both “where is this file?” and “what did this source look like
+ten days ago?”
+
+## What Spacedrive gives you
+
+### One view across storage
+
+Browse live files, offline indexes, remote nodes, and snapshots through the same
+library. Places such as Documents or Photos, and folders you pin, are shortcuts
+into sources. They do not create duplicate file trees.
+
+### Evidence before destructive action
+
+Spacedrive separates fast candidate identity from full-byte verification.
+Duplicate cleanup, archive moves, and other destructive operations can require
+confirmed content before removing a copy. Jobs report progress, survive
+interruptions when safe, and preserve failure reasons.
+
+### Private access from anywhere
+
+Pair devices directly. Browse and stream data from a device that is online,
+cache selected data locally, mount remote content into the operating system, or
+share a scoped subtree. Encrypted peer-to-peer connections use relays only when
+a direct path is unavailable.
+
+### One API for people and software
+
+The desktop app, web interface, CLI, generated clients, and MCP server call the
+same typed operations. An agent receives no special authority. It can only use
+the libraries, sources, and actions that you expose to it.
+
+### An extensible filesystem
+
+Sandboxed extensions add file-kind detection, metadata extraction, previews,
+jobs, actions, and views. Provider adapters can add new origins without
+creating a second data model.
+
+## No required cloud
+
+Spacedrive has no required account, hosted database, or telemetry service. You
+can run it entirely on hardware you own. Optional cloud services remain useful
+as sources and destinations, but they do not become the authority over your
+library.
+
+## Continue
+
+- [Get started](/overview/get-started) with your first library and source.
+- Read the [product direction](/core/product-direction) for the boundary behind
+  product decisions.
+- Read the [architecture overview](/core/architecture) for the runtime and data
+  model.

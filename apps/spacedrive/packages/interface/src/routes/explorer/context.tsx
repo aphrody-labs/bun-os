@@ -1,0 +1,1124 @@
+import type {
+	SearchFilters as ApiSearchFilters,
+	Device,
+	DirectorySortBy,
+	File,
+	ListLibraryDevicesInput,
+	MediaSortBy,
+	SdPath
+} from '@sd/ts-client';
+import {useSortPreferencesStore, useViewPreferencesStore} from '@sd/ts-client';
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useReducer,
+	type ReactNode
+} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
+import type {
+	SortBy as TabSortBy,
+	ViewMode as TabViewMode
+} from '../../components/TabManager/TabManagerContext';
+import {useTabManager} from '../../components/TabManager/useTabManager';
+import {coerceSortBy, type ExplorerViewMode} from './sortOptions';
+import {useNormalizedQuery} from '../../contexts/SpacedriveContext';
+
+export type SortBy = DirectorySortBy | MediaSortBy;
+export type ViewMode =
+	| 'grid'
+	| 'list'
+	| 'media'
+	| 'column'
+	| 'size'
+	| 'knowledge';
+
+export interface ViewSettings {
+	gridSize: number;
+	gapSize: number;
+	showFileSize: boolean;
+	columnWidth: number;
+	foldersFirst: boolean;
+	sizeViewItemLimit: number;
+}
+
+export type SearchScope = 'folder' | 'source' | 'library';
+
+/** The filter bar: hidden, showing since the search was focused, or pinned
+ * by a click on it, after which a click elsewhere no longer closes it. */
+export type SearchBarState = 'closed' | 'open' | 'pinned';
+
+/** The one place the minimum query length lives; the input handler reads
+ * it, and a shorter query is not sent. */
+export const MIN_SEARCH_QUERY_LENGTH = 2;
+
+/** Search filters are stored in wire shape: one type from the generated
+ * client, no parallel UI shape to map or drift. */
+export const EMPTY_SEARCH_FILTERS: ApiSearchFilters = {
+	file_types: null,
+	tags: null,
+	date_range: null,
+	size_range: null,
+	content_types: null,
+	include_hidden: null,
+	include_archived: null,
+	at_risk: null,
+	on_volumes: null,
+	not_on_volumes: null,
+	min_volume_count: null,
+	max_volume_count: null
+};
+
+/** Whether the filters narrow the scope by themselves, so a search runs
+ * without a query. Hidden and archived only widen what a search shows. The
+ * daemon accepts an empty query on the same rule. */
+export function searchFiltersNarrow(filters: ApiSearchFilters): boolean {
+	return (
+		filters.file_types !== null ||
+		filters.content_types !== null ||
+		filters.size_range !== null ||
+		filters.date_range !== null ||
+		(filters.tags !== null &&
+			(filters.tags.include.length > 0 ||
+				filters.tags.exclude.length > 0))
+	);
+}
+
+export type ExplorerMode =
+	| {type: 'browse'}
+	| {type: 'search'; query: string}
+	| {type: 'recents'}
+	| {type: 'tag'; tagId: string}
+	| {type: 'collection'; slug: string}
+	| {type: 'source'; sourceId: string}
+	| {type: 'filtered'; filters: ApiSearchFilters; label: string};
+
+export type NavigationTarget =
+	| {type: 'path'; path: SdPath}
+	| {
+			type: 'view';
+			view: string;
+			id?: string;
+			params?: Record<string, string>;
+	  };
+
+function targetToKey(target: NavigationTarget): string {
+	if (target.type === 'path') {
+		const p = target.path;
+		if ('Physical' in p && p.Physical) {
+			return `path:${p.Physical.device_slug}:${p.Physical.path}`;
+		}
+		if ('Virtual' in p && p.Virtual) {
+			return `path:virtual:${p.Virtual}`;
+		}
+		return `path:${JSON.stringify(p)}`;
+	}
+	return `view:${target.view}:${target.id || ''}`;
+}
+
+function targetsEqual(
+	a: NavigationTarget | null,
+	b: NavigationTarget | null
+): boolean {
+	if (a === null || b === null) return a === b;
+	return targetToKey(a) === targetToKey(b);
+}
+
+const MAX_HISTORY_SIZE = 100;
+
+interface NavigationState {
+	history: NavigationTarget[];
+	index: number;
+}
+
+type NavigationAction =
+	| {type: 'NAVIGATE'; target: NavigationTarget}
+	| {type: 'GO_BACK'}
+	| {type: 'GO_FORWARD'}
+	| {type: 'SYNC'; target: NavigationTarget};
+
+function navigationReducer(
+	state: NavigationState,
+	action: NavigationAction
+): NavigationState {
+	switch (action.type) {
+		case 'NAVIGATE': {
+			const current = state.history[state.index];
+			if (current && targetsEqual(current, action.target)) {
+				return state;
+			}
+
+			const newHistory = state.history.slice(0, state.index + 1);
+			newHistory.push(action.target);
+
+			const trimmedHistory = newHistory.slice(-MAX_HISTORY_SIZE);
+			const indexAdjustment = newHistory.length - trimmedHistory.length;
+
+			return {
+				history: trimmedHistory,
+				index: state.index + 1 - indexAdjustment
+			};
+		}
+
+		case 'GO_BACK': {
+			if (state.index <= 0) return state;
+			return {...state, index: state.index - 1};
+		}
+
+		case 'GO_FORWARD': {
+			if (state.index >= state.history.length - 1) return state;
+			return {...state, index: state.index + 1};
+		}
+
+		case 'SYNC': {
+			const current = state.history[state.index];
+			if (current && targetsEqual(current, action.target)) {
+				return state;
+			}
+
+			const newHistory = [
+				...state.history.slice(0, state.index + 1),
+				action.target
+			];
+			const trimmedHistory = newHistory.slice(-MAX_HISTORY_SIZE);
+			const indexAdjustment = newHistory.length - trimmedHistory.length;
+
+			return {
+				history: trimmedHistory,
+				index: state.index + 1 - indexAdjustment
+			};
+		}
+
+		default:
+			return state;
+	}
+}
+
+const initialNavigationState: NavigationState = {
+	history: [],
+	index: -1
+};
+
+interface UIState {
+	sortBy: SortBy;
+	viewSettings: ViewSettings;
+	sidebarVisible: boolean;
+	inspectorVisible: boolean;
+	quickPreviewFileId: string | null;
+	tagModeActive: boolean;
+	mode: ExplorerMode;
+	searchBar: SearchBarState;
+	searchScope: SearchScope;
+	searchFilters: ApiSearchFilters;
+}
+
+type UIAction =
+	| {type: 'SET_SORT_BY'; sort: SortBy}
+	| {type: 'SET_VIEW_SETTINGS'; settings: Partial<ViewSettings>}
+	| {type: 'SET_SIDEBAR_VISIBLE'; visible: boolean}
+	| {type: 'SET_INSPECTOR_VISIBLE'; visible: boolean}
+	| {type: 'SET_QUICK_PREVIEW'; fileId: string | null}
+	| {type: 'SET_TAG_MODE'; active: boolean}
+	| {type: 'OPEN_SEARCH'}
+	| {type: 'PIN_SEARCH'}
+	| {type: 'SET_SEARCH_QUERY'; query: string}
+	| {type: 'SET_SEARCH_SCOPE'; scope: SearchScope}
+	| {type: 'EXIT_SEARCH_MODE'}
+	| {type: 'ENTER_RECENTS_MODE'}
+	| {type: 'EXIT_RECENTS_MODE'}
+	| {type: 'ENTER_FILTERED_MODE'; filters: ApiSearchFilters; label: string}
+	| {type: 'EXIT_FILTERED_MODE'}
+	| {type: 'ENTER_TAG_MODE'; tagId: string}
+	| {type: 'ENTER_COLLECTION_MODE'; slug: string}
+	| {type: 'EXIT_COLLECTION_MODE'}
+	| {type: 'ENTER_SOURCE_MODE'; sourceId: string}
+	| {type: 'EXIT_SOURCE_MODE'}
+	| {type: 'EXIT_TAG_MODE'}
+	| {type: 'SET_SEARCH_FILTERS'; filters: ApiSearchFilters}
+	| {
+			type: 'LOAD_PREFERENCES';
+			viewSettings?: Partial<ViewSettings>;
+	  };
+
+const defaultViewSettings: ViewSettings = {
+	gridSize: 120,
+	gapSize: 16,
+	showFileSize: true,
+	columnWidth: 256,
+	foldersFirst: false,
+	sizeViewItemLimit: 500
+};
+
+/** What a closed search leaves behind. Leaving for another view closes the
+ * search the same way Escape does. */
+const CLOSED_SEARCH: Pick<
+	UIState,
+	'searchBar' | 'searchScope' | 'searchFilters'
+> = {
+	searchBar: 'closed',
+	searchScope: 'folder',
+	searchFilters: EMPTY_SEARCH_FILTERS
+};
+
+/**
+ * Search mode follows the search's criteria: a query long enough to send,
+ * or a filter that narrows the scope by itself. Losing both returns the
+ * explorer to browsing while the bar stays as it is, open and waiting.
+ * A closed search starts nothing, so a query that settles after its search
+ * closed arrives too late to reopen it.
+ */
+function settleSearch(state: UIState, query: string): UIState {
+	if (state.searchBar === 'closed') return state;
+	if (query !== '' || searchFiltersNarrow(state.searchFilters)) {
+		return state.mode.type === 'search' && state.mode.query === query
+			? state
+			: {...state, mode: {type: 'search', query}};
+	}
+	return state.mode.type === 'search'
+		? {...state, mode: {type: 'browse'}}
+		: state;
+}
+
+function uiReducer(state: UIState, action: UIAction): UIState {
+	switch (action.type) {
+		case 'SET_SORT_BY':
+			return {...state, sortBy: action.sort};
+
+		case 'SET_VIEW_SETTINGS':
+			return {
+				...state,
+				viewSettings: {...state.viewSettings, ...action.settings}
+			};
+
+		case 'SET_SIDEBAR_VISIBLE':
+			return {...state, sidebarVisible: action.visible};
+
+		case 'SET_INSPECTOR_VISIBLE':
+			return {...state, inspectorVisible: action.visible};
+
+		case 'SET_QUICK_PREVIEW':
+			return {...state, quickPreviewFileId: action.fileId};
+
+		case 'SET_TAG_MODE':
+			return {...state, tagModeActive: action.active};
+
+		case 'OPEN_SEARCH':
+			return state.searchBar === 'closed'
+				? {...state, searchBar: 'open'}
+				: state;
+
+		case 'PIN_SEARCH':
+			return state.searchBar === 'open'
+				? {...state, searchBar: 'pinned'}
+				: state;
+
+		case 'SET_SEARCH_QUERY':
+			return settleSearch(state, action.query);
+
+		case 'SET_SEARCH_SCOPE':
+			return {...state, searchScope: action.scope};
+
+		case 'SET_SEARCH_FILTERS':
+			return settleSearch(
+				{...state, searchFilters: action.filters},
+				state.mode.type === 'search' ? state.mode.query : ''
+			);
+
+		case 'EXIT_SEARCH_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode:
+					state.mode.type === 'search' ? {type: 'browse'} : state.mode
+			};
+
+		case 'ENTER_RECENTS_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'recents'}
+			};
+
+		case 'EXIT_RECENTS_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'browse'}
+			};
+
+		case 'ENTER_FILTERED_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {
+					type: 'filtered',
+					filters: action.filters,
+					label: action.label
+				}
+			};
+
+		case 'EXIT_FILTERED_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'browse'}
+			};
+
+		case 'ENTER_SOURCE_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'source', sourceId: action.sourceId}
+			};
+
+		case 'EXIT_SOURCE_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'browse'}
+			};
+
+		case 'ENTER_COLLECTION_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'collection', slug: action.slug}
+			};
+
+		case 'EXIT_COLLECTION_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'browse'}
+			};
+
+		case 'ENTER_TAG_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'tag', tagId: action.tagId}
+			};
+
+		case 'EXIT_TAG_MODE':
+			return {
+				...state,
+				...CLOSED_SEARCH,
+				mode: {type: 'browse'}
+			};
+
+		case 'LOAD_PREFERENCES':
+			return {
+				...state,
+				viewSettings: action.viewSettings
+					? {...state.viewSettings, ...action.viewSettings}
+					: state.viewSettings
+			};
+
+		default:
+			return state;
+	}
+}
+
+const initialUIState: UIState = {
+	sortBy: 'name',
+	viewSettings: defaultViewSettings,
+	sidebarVisible: true,
+	inspectorVisible: true,
+	quickPreviewFileId: null,
+	tagModeActive: false,
+	mode: {type: 'browse'},
+	...CLOSED_SEARCH
+};
+
+export function targetToUrl(target: NavigationTarget): string {
+	if (target.type === 'path') {
+		const encoded = encodeURIComponent(JSON.stringify(target.path));
+		return `/explorer?path=${encoded}`;
+	}
+
+	const params = new URLSearchParams({view: target.view});
+	if (target.id) params.set('id', target.id);
+	if (target.params) {
+		Object.entries(target.params).forEach(([k, v]) => params.set(k, v));
+	}
+	return `/explorer?${params.toString()}`;
+}
+
+function urlToTarget(search: string): NavigationTarget | null {
+	const params = new URLSearchParams(search);
+
+	const pathParam = params.get('path');
+	if (pathParam) {
+		try {
+			const path = JSON.parse(decodeURIComponent(pathParam)) as SdPath;
+			return {type: 'path', path};
+		} catch {
+			return null;
+		}
+	}
+
+	const view = params.get('view');
+	if (view) {
+		const id = params.get('id') || undefined;
+		const extraParams: Record<string, string> = {};
+		params.forEach((v, k) => {
+			if (k !== 'view' && k !== 'id') extraParams[k] = v;
+		});
+		return {
+			type: 'view',
+			view,
+			id,
+			params:
+				Object.keys(extraParams).length > 0 ? extraParams : undefined
+		};
+	}
+
+	return null;
+}
+
+function getSpaceItemKey(pathname: string, search: string): string {
+	if (pathname === '/') return 'overview';
+	if (pathname === '/recents') return 'recents';
+	if (pathname === '/favorites') return 'favorites';
+	if (pathname === '/file-kinds') return 'file-kinds';
+	if (pathname.startsWith('/tag/')) return `tag:${pathname.slice(5)}`;
+	if (pathname === '/explorer' && search) return `explorer:${search}`;
+	return pathname;
+}
+
+function getPathKey(target: NavigationTarget | null): string {
+	if (!target) return 'null';
+	return targetToKey(target);
+}
+
+interface ExplorerContextValue {
+	currentTarget: NavigationTarget | null;
+	currentPath: SdPath | null;
+	currentView: {
+		view: string;
+		id?: string;
+		params?: Record<string, string>;
+	} | null;
+
+	navigateToPath: (path: SdPath) => void;
+	navigateToView: (
+		view: string,
+		id?: string,
+		params?: Record<string, string>
+	) => void;
+	goBack: () => void;
+	goForward: () => void;
+	canGoBack: boolean;
+	canGoForward: boolean;
+
+	viewMode: ViewMode;
+	setViewMode: (mode: ViewMode) => void;
+	sortBy: SortBy;
+	setSortBy: (sort: SortBy) => void;
+	viewSettings: ViewSettings;
+	setViewSettings: (settings: Partial<ViewSettings>) => void;
+
+	// Column view state (per-tab, stored in TabManager)
+	columnStack: SdPath[];
+	setColumnStack: (columns: SdPath[]) => void;
+
+	// Scroll position (per-tab, stored in TabManager)
+	scrollPosition: {top: number; left: number};
+	setScrollPosition: (pos: {top: number; left: number}) => void;
+
+	// Size view transform (per-tab, stored in TabManager)
+	sizeViewTransform: {k: number; x: number; y: number};
+	setSizeViewTransform: (transform: {
+		k: number;
+		x: number;
+		y: number;
+	}) => void;
+
+	sidebarVisible: boolean;
+	setSidebarVisible: (visible: boolean) => void;
+	inspectorVisible: boolean;
+	setInspectorVisible: (visible: boolean) => void;
+
+	quickPreviewFileId: string | null;
+	openQuickPreview: (fileId: string) => void;
+	closeQuickPreview: () => void;
+
+	currentFiles: File[];
+	setCurrentFiles: (files: File[]) => void;
+
+	tagModeActive: boolean;
+	setTagModeActive: (active: boolean) => void;
+
+	mode: ExplorerMode;
+	searchBar: SearchBarState;
+	openSearch: () => void;
+	pinSearch: () => void;
+	setSearchQuery: (query: string) => void;
+	exitSearchMode: () => void;
+	searchScope: SearchScope;
+	setSearchScope: (scope: SearchScope) => void;
+	enterRecentsMode: () => void;
+	exitRecentsMode: () => void;
+	enterFilteredMode: (filters: ApiSearchFilters, label: string) => void;
+	exitFilteredMode: () => void;
+	enterTagMode: (tagId: string) => void;
+	enterCollectionMode: (slug: string) => void;
+	exitCollectionMode: () => void;
+	enterSourceMode: (sourceId: string) => void;
+	exitSourceMode: () => void;
+	exitTagMode: () => void;
+	searchFilters: ApiSearchFilters;
+	setSearchFilters: (filters: ApiSearchFilters) => void;
+
+	devices: Map<string, Device>;
+
+	loadPreferencesForSpaceItem: (
+		id: string,
+		defaultViewMode?: ViewMode
+	) => void;
+
+	// Tab info
+	activeTabId: string;
+}
+
+const ExplorerContext = createContext<ExplorerContextValue | null>(null);
+
+interface ExplorerProviderProps {
+	children: ReactNode;
+	/** Reserved for Phase 2: Will control whether this tab's context should process events/updates */
+	isActiveTab?: boolean;
+}
+
+export function ExplorerProvider({
+	children,
+	isActiveTab: _isActiveTab = true
+}: ExplorerProviderProps) {
+	const routerNavigate = useNavigate();
+	const location = useLocation();
+	const viewPrefs = useViewPreferencesStore();
+	const sortPrefs = useSortPreferencesStore();
+
+	// Get per-tab state from TabManager
+	const {activeTabId, getExplorerState, updateExplorerState} =
+		useTabManager();
+
+	// Memoize tabState to ensure it updates when activeTabId or explorerStates change
+	const tabState = useMemo(
+		() => getExplorerState(activeTabId),
+		[activeTabId, getExplorerState]
+	);
+
+	const [navState, navDispatch] = useReducer(
+		navigationReducer,
+		initialNavigationState
+	);
+	const [uiState, uiDispatch] = useReducer(uiReducer, initialUIState);
+	const [currentFiles, setCurrentFiles] = useReducer(
+		(_: File[], files: File[]) => files,
+		[] as File[]
+	);
+
+	// Parse columnStack from TabManager (stored as JSON strings)
+	// Must depend on activeTabId to recalculate when switching tabs
+	const columnStack = useMemo((): SdPath[] => {
+		if (!tabState.columnStack || tabState.columnStack.length === 0) {
+			return [];
+		}
+		try {
+			return tabState.columnStack.map((s) => JSON.parse(s) as SdPath);
+		} catch {
+			return [];
+		}
+	}, [activeTabId, tabState.columnStack]);
+
+	const setColumnStack = useCallback(
+		(columns: SdPath[]) => {
+			updateExplorerState(activeTabId, {
+				columnStack: columns.map((c) => JSON.stringify(c))
+			});
+		},
+		[activeTabId, updateExplorerState]
+	);
+
+	const scrollPosition = useMemo(
+		() => ({
+			top: tabState.scrollTop,
+			left: tabState.scrollLeft
+		}),
+		[activeTabId, tabState.scrollTop, tabState.scrollLeft]
+	);
+
+	const setScrollPosition = useCallback(
+		(pos: {top: number; left: number}) => {
+			updateExplorerState(activeTabId, {
+				scrollTop: pos.top,
+				scrollLeft: pos.left
+			});
+		},
+		[activeTabId, updateExplorerState]
+	);
+
+	const sizeViewTransform = useMemo(
+		() => tabState.sizeViewTransform ?? {k: 1, x: 0, y: 0},
+		[activeTabId, tabState.sizeViewTransform]
+	);
+
+	const setSizeViewTransform = useCallback(
+		(transform: {k: number; x: number; y: number}) => {
+			updateExplorerState(activeTabId, {
+				sizeViewTransform: transform
+			});
+		},
+		[activeTabId, updateExplorerState]
+	);
+
+	const currentTarget = navState.history[navState.index] ?? null;
+	const canGoBack = navState.index > 0;
+	const canGoForward = navState.index < navState.history.length - 1;
+
+	const currentPath = useMemo(() => {
+		if (currentTarget?.type === 'path') return currentTarget.path;
+		return null;
+	}, [currentTarget]);
+
+	const currentView = useMemo(() => {
+		if (currentTarget?.type === 'view') {
+			return {
+				view: currentTarget.view,
+				id: currentTarget.id,
+				params: currentTarget.params
+			};
+		}
+		return null;
+	}, [currentTarget]);
+
+	const devicesQuery = useNormalizedQuery<ListLibraryDevicesInput, Device[]>({
+		query: 'devices.list',
+		input: {include_offline: true, include_details: false},
+		resourceType: 'device'
+	});
+
+	const devices = useMemo(() => {
+		const list = devicesQuery.data ?? [];
+		return new Map(list.map((d) => [d.id, d]));
+	}, [devicesQuery.data]);
+
+	// Exclude currentTarget from deps to prevent infinite sync loops.
+	useEffect(() => {
+		const target = urlToTarget(location.search);
+		if (target && !targetsEqual(target, currentTarget)) {
+			navDispatch({type: 'SYNC', target});
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [location.search]);
+
+	const pathKey = getPathKey(currentTarget);
+	const viewMode = tabState.viewMode as ViewMode;
+
+	useEffect(() => {
+		const savedSort = sortPrefs.getPreferences(pathKey);
+		if (savedSort) {
+			uiDispatch({type: 'SET_SORT_BY', sort: savedSort as SortBy});
+		}
+	}, [pathKey, sortPrefs]);
+
+	// An order the new view does not offer falls back to that view's first.
+	useEffect(() => {
+		const kept = coerceSortBy(viewMode as ExplorerViewMode, uiState.sortBy);
+		if (kept !== uiState.sortBy) {
+			uiDispatch({type: 'SET_SORT_BY', sort: kept});
+			sortPrefs.setPreferences(pathKey, kept);
+		}
+	}, [viewMode, uiState.sortBy, pathKey, sortPrefs]);
+
+	const navigateToPath = useCallback(
+		(path: SdPath) => {
+			const target: NavigationTarget = {type: 'path', path};
+			navDispatch({type: 'NAVIGATE', target});
+			routerNavigate(targetToUrl(target));
+			// Exit special modes when navigating to a path
+			uiDispatch({type: 'EXIT_SEARCH_MODE'});
+			uiDispatch({type: 'EXIT_TAG_MODE'});
+		},
+		[routerNavigate]
+	);
+
+	const navigateToView = useCallback(
+		(view: string, id?: string, params?: Record<string, string>) => {
+			const target: NavigationTarget = {type: 'view', view, id, params};
+			navDispatch({type: 'NAVIGATE', target});
+			routerNavigate(targetToUrl(target));
+			// Exit special modes when navigating
+			uiDispatch({type: 'EXIT_SEARCH_MODE'});
+			uiDispatch({type: 'EXIT_TAG_MODE'});
+		},
+		[routerNavigate]
+	);
+
+	const goBack = useCallback(() => {
+		navDispatch({type: 'GO_BACK'});
+		const targetIndex = navState.index - 1;
+		if (targetIndex >= 0) {
+			const target = navState.history[targetIndex];
+			routerNavigate(targetToUrl(target), {replace: true});
+			// Exit special modes when navigating
+			uiDispatch({type: 'EXIT_SEARCH_MODE'});
+			uiDispatch({type: 'EXIT_TAG_MODE'});
+		}
+	}, [navState.index, navState.history, routerNavigate]);
+
+	const goForward = useCallback(() => {
+		navDispatch({type: 'GO_FORWARD'});
+		const targetIndex = navState.index + 1;
+		if (targetIndex < navState.history.length) {
+			const target = navState.history[targetIndex];
+			routerNavigate(targetToUrl(target), {replace: true});
+			// Exit special modes when navigating
+			uiDispatch({type: 'EXIT_SEARCH_MODE'});
+			uiDispatch({type: 'EXIT_TAG_MODE'});
+		}
+	}, [navState.index, navState.history, routerNavigate]);
+
+	const spaceKey = getSpaceItemKey(location.pathname, location.search);
+
+	// View settings from TabManager (per-tab)
+	const sortByValue = tabState.sortBy as SortBy;
+	const viewSettings: ViewSettings = useMemo(
+		() => ({
+			gridSize: tabState.gridSize,
+			gapSize: tabState.gapSize,
+			foldersFirst: tabState.foldersFirst,
+			showFileSize: uiState.viewSettings.showFileSize,
+			columnWidth: uiState.viewSettings.columnWidth,
+			sizeViewItemLimit: uiState.viewSettings.sizeViewItemLimit
+		}),
+		[
+			activeTabId,
+			tabState.gridSize,
+			tabState.gapSize,
+			tabState.foldersFirst,
+			uiState.viewSettings.showFileSize,
+			uiState.viewSettings.columnWidth,
+			uiState.viewSettings.sizeViewItemLimit
+		]
+	);
+
+	const setViewMode = useCallback(
+		(mode: ViewMode) => {
+			updateExplorerState(activeTabId, {
+				viewMode: mode as TabViewMode
+			});
+			viewPrefs.setPreferences(spaceKey, {viewMode: mode});
+		},
+		[activeTabId, updateExplorerState, spaceKey, viewPrefs]
+	);
+
+	const setSortBy = useCallback(
+		(sort: SortBy) => {
+			updateExplorerState(activeTabId, {
+				sortBy: sort as TabSortBy
+			});
+			sortPrefs.setPreferences(pathKey, sort);
+		},
+		[activeTabId, updateExplorerState, pathKey, sortPrefs]
+	);
+
+	const setViewSettings = useCallback(
+		(settings: Partial<ViewSettings>) => {
+			// Update tab state for tab-specific settings
+			updateExplorerState(activeTabId, {
+				gridSize: settings.gridSize ?? tabState.gridSize,
+				gapSize: settings.gapSize ?? tabState.gapSize,
+				foldersFirst: settings.foldersFirst ?? tabState.foldersFirst
+			});
+
+			// Update UI state for global settings (showFileSize, sizeViewItemLimit)
+			if (
+				settings.showFileSize !== undefined ||
+				settings.sizeViewItemLimit !== undefined
+			) {
+				uiDispatch({
+					type: 'SET_VIEW_SETTINGS',
+					settings
+				});
+			}
+
+			// Save to preferences
+			viewPrefs.setPreferences(spaceKey, {
+				viewSettings: {...viewSettings, ...settings}
+			});
+		},
+		[
+			activeTabId,
+			updateExplorerState,
+			tabState,
+			spaceKey,
+			viewSettings,
+			viewPrefs
+		]
+	);
+
+	const setSidebarVisible = useCallback((visible: boolean) => {
+		uiDispatch({type: 'SET_SIDEBAR_VISIBLE', visible});
+	}, []);
+
+	const setInspectorVisible = useCallback((visible: boolean) => {
+		uiDispatch({type: 'SET_INSPECTOR_VISIBLE', visible});
+	}, []);
+
+	const openQuickPreview = useCallback((fileId: string) => {
+		uiDispatch({type: 'SET_QUICK_PREVIEW', fileId});
+	}, []);
+
+	const closeQuickPreview = useCallback(() => {
+		uiDispatch({type: 'SET_QUICK_PREVIEW', fileId: null});
+	}, []);
+
+	const setTagModeActive = useCallback((active: boolean) => {
+		uiDispatch({type: 'SET_TAG_MODE', active});
+	}, []);
+
+	const openSearch = useCallback(() => {
+		uiDispatch({type: 'OPEN_SEARCH'});
+	}, []);
+
+	const pinSearch = useCallback(() => {
+		uiDispatch({type: 'PIN_SEARCH'});
+	}, []);
+
+	const setSearchQuery = useCallback((query: string) => {
+		uiDispatch({type: 'SET_SEARCH_QUERY', query});
+	}, []);
+
+	const exitSearchMode = useCallback(() => {
+		uiDispatch({type: 'EXIT_SEARCH_MODE'});
+	}, []);
+
+	const setSearchScope = useCallback((scope: SearchScope) => {
+		uiDispatch({type: 'SET_SEARCH_SCOPE', scope});
+	}, []);
+
+	const enterRecentsMode = useCallback(() => {
+		uiDispatch({type: 'ENTER_RECENTS_MODE'});
+	}, []);
+
+	const exitRecentsMode = useCallback(() => {
+		uiDispatch({type: 'EXIT_RECENTS_MODE'});
+	}, []);
+
+	const enterFilteredMode = useCallback(
+		(filters: ApiSearchFilters, label: string) => {
+			uiDispatch({type: 'ENTER_FILTERED_MODE', filters, label});
+		},
+		[]
+	);
+
+	const exitFilteredMode = useCallback(() => {
+		uiDispatch({type: 'EXIT_FILTERED_MODE'});
+	}, []);
+
+	const enterSourceMode = useCallback((sourceId: string) => {
+		uiDispatch({type: 'ENTER_SOURCE_MODE', sourceId});
+	}, []);
+
+	const exitSourceMode = useCallback(() => {
+		uiDispatch({type: 'EXIT_SOURCE_MODE'});
+	}, []);
+
+	const enterCollectionMode = useCallback((slug: string) => {
+		uiDispatch({type: 'ENTER_COLLECTION_MODE', slug});
+	}, []);
+
+	const exitCollectionMode = useCallback(() => {
+		uiDispatch({type: 'EXIT_COLLECTION_MODE'});
+	}, []);
+
+	const enterTagMode = useCallback((tagId: string) => {
+		uiDispatch({type: 'ENTER_TAG_MODE', tagId});
+	}, []);
+
+	const exitTagMode = useCallback(() => {
+		uiDispatch({type: 'EXIT_TAG_MODE'});
+	}, []);
+
+	const setSearchFilters = useCallback((filters: ApiSearchFilters) => {
+		uiDispatch({type: 'SET_SEARCH_FILTERS', filters});
+	}, []);
+
+	const loadPreferencesForSpaceItem = useCallback(
+		(id: string, defaultViewMode: ViewMode = 'grid') => {
+			const prefs = viewPrefs.getPreferences(id);
+			updateExplorerState(activeTabId, {
+				viewMode: (prefs?.viewMode ?? defaultViewMode) as TabViewMode,
+				...(prefs
+					? {
+							gridSize: prefs.viewSettings.gridSize,
+							gapSize: prefs.viewSettings.gapSize
+						}
+					: {})
+			});
+
+			if (prefs?.viewSettings) {
+				uiDispatch({
+					type: 'LOAD_PREFERENCES',
+					viewSettings: prefs.viewSettings
+				});
+			}
+		},
+		[activeTabId, updateExplorerState, viewPrefs]
+	);
+
+	const value = useMemo<ExplorerContextValue>(
+		() => ({
+			currentTarget,
+			currentPath,
+			currentView,
+			navigateToPath,
+			navigateToView,
+			goBack,
+			goForward,
+			canGoBack,
+			canGoForward,
+			viewMode,
+			setViewMode,
+			sortBy: sortByValue,
+			setSortBy,
+			viewSettings,
+			setViewSettings,
+			columnStack,
+			setColumnStack,
+			scrollPosition,
+			setScrollPosition,
+			sizeViewTransform,
+			setSizeViewTransform,
+			sidebarVisible: uiState.sidebarVisible,
+			setSidebarVisible,
+			inspectorVisible: uiState.inspectorVisible,
+			setInspectorVisible,
+			quickPreviewFileId: uiState.quickPreviewFileId,
+			openQuickPreview,
+			closeQuickPreview,
+			currentFiles,
+			setCurrentFiles,
+			tagModeActive: uiState.tagModeActive,
+			setTagModeActive,
+			mode: uiState.mode,
+			searchBar: uiState.searchBar,
+			openSearch,
+			pinSearch,
+			setSearchQuery,
+			exitSearchMode,
+			searchScope: uiState.searchScope,
+			setSearchScope,
+			enterRecentsMode,
+			exitRecentsMode,
+			enterFilteredMode,
+			exitFilteredMode,
+			enterTagMode,
+			enterCollectionMode,
+			exitCollectionMode,
+			enterSourceMode,
+			exitSourceMode,
+			exitTagMode,
+			searchFilters: uiState.searchFilters,
+			setSearchFilters,
+			devices,
+			loadPreferencesForSpaceItem,
+			activeTabId
+		}),
+		[
+			currentTarget,
+			currentPath,
+			currentView,
+			navigateToPath,
+			navigateToView,
+			goBack,
+			goForward,
+			canGoBack,
+			canGoForward,
+			viewMode,
+			setViewMode,
+			sortByValue,
+			setSortBy,
+			viewSettings,
+			setViewSettings,
+			columnStack,
+			setColumnStack,
+			scrollPosition,
+			setScrollPosition,
+			sizeViewTransform,
+			setSizeViewTransform,
+			uiState.sidebarVisible,
+			setSidebarVisible,
+			uiState.inspectorVisible,
+			setInspectorVisible,
+			uiState.quickPreviewFileId,
+			openQuickPreview,
+			closeQuickPreview,
+			currentFiles,
+			uiState.tagModeActive,
+			setTagModeActive,
+			uiState.mode,
+			uiState.searchBar,
+			openSearch,
+			pinSearch,
+			setSearchQuery,
+			exitSearchMode,
+			uiState.searchScope,
+			setSearchScope,
+			enterRecentsMode,
+			exitRecentsMode,
+			enterFilteredMode,
+			exitFilteredMode,
+			enterTagMode,
+			enterCollectionMode,
+			exitCollectionMode,
+			enterSourceMode,
+			exitSourceMode,
+			exitTagMode,
+			uiState.searchFilters,
+			setSearchFilters,
+			devices,
+			loadPreferencesForSpaceItem,
+			activeTabId
+		]
+	);
+
+	return (
+		<ExplorerContext.Provider value={value}>
+			{children}
+		</ExplorerContext.Provider>
+	);
+}
+
+export function useExplorer(): ExplorerContextValue {
+	const context = useContext(ExplorerContext);
+	if (!context) {
+		throw new Error('useExplorer must be used within an ExplorerProvider');
+	}
+	return context;
+}
+
+/**
+ * Null-safe variant for components that also render outside the explorer
+ * (e.g. the pop-out inspector window), where explorer-bound actions should
+ * disappear instead of crashing.
+ */
+export function useOptionalExplorer(): ExplorerContextValue | null {
+	return useContext(ExplorerContext);
+}
+
+export {
+	getSpaceItemKey,
+	getSpaceItemKey as getSpaceItemKeyFromRoute,
+	targetToKey,
+	targetsEqual
+};
+
+export type VirtualView = {
+	view: string;
+	id?: string;
+	params?: Record<string, string>;
+};

@@ -1,0 +1,27 @@
+[package]
+name = "sd-mobile-core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "sd_mobile_core"
+crate-type = ["staticlib", "cdylib"]
+
+[dependencies]
+# Import the real Spacedrive core (FFmpeg and HEIF disabled for iOS build issues)
+sd-core = { path = "../../../../../core", default-features = false }
+
+# Minimal dependencies for mobile
+anyhow = { version = "1.0.94" }
+once_cell = "1.0"
+serde = { version = "1.0.216", features = ["derive"] }
+serde_json = { version = "1.0.133" }
+tokio = { version = "1.42.0", features = ["macros", "rt", "rt-multi-thread", "sync", "time"] }
+tracing = { version = "0.1.41" }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+uuid = { version = "1.10", features = ["serde", "v4"] }
+libc = { version = "0.2.169" }
+openssl-sys = { version = "0.9", features = ["vendored"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "0.21"

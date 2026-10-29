@@ -1,0 +1,147 @@
+---
+title: Device Pairing
+description: Establish trust between two Spacedrive instances
+sidebarTitle: Device Pairing
+---
+
+Pairing creates an authenticated relationship between two Spacedrive nodes. A
+person starts the exchange on one device, enters the short-lived secret on the
+other, and the two daemons record trust as soon as the secret is verified.
+Pairing records network trust only. Adding the new device to a library is a
+separate step, described in [Library Sync](/core/library-sync#joining-an-existing-library).
+
+Pairing is not account sign-in. No central Spacedrive service becomes the owner
+of the relationship.
+
+## Pair from the CLI
+
+On the first device:
+
+~~~bash
+sd-cli network pair generate
+~~~
+
+Spacedrive displays a 12-word code and QR payload. On the second device:
+
+~~~bash
+sd-cli network pair join "<PAIRING_CODE>"
+~~~
+
+The joiner reports the peer's name once trust is recorded. There is no
+confirmation prompt on either side: possession of the code is the approval, so
+only read the code to a device you intend to trust. The session expires after
+five minutes.
+
+When the devices are not on the same local network, pass the initiator's node
+ID as well. `sd-cli --format json network pair generate` prints it as
+`node_id`:
+
+~~~bash
+sd-cli network pair join "<PAIRING_CODE>" --node-id <NODE_ID>
+~~~
+
+## Code formats
+
+The text code contains a short-lived pairing secret and works when discovery
+can find the initiator.
+
+The QR payload also includes the initiator's network node ID. That lets a device
+connect across different networks through direct discovery or relay fallback.
+
+Pairing material expires and cannot be reused after completion. Treat it like a
+temporary password while it is visible.
+
+## Handshake
+
+The pairing protocol:
+
+1. Creates a short-lived session on the initiator.
+2. Uses the entered secret to bind the join request to that session.
+3. Establishes an encrypted channel between node identities.
+4. Exchanges device descriptions and supported protocol versions.
+5. Records the paired device on both sides.
+6. Invalidates the pairing secret.
+
+A failed or cancelled session creates no lasting trust.
+
+## Grants after pairing
+
+Pairing grants device identity, not blanket filesystem access. Choose:
+
+- which libraries are visible;
+- which sources or source-relative subtrees can be queried;
+- whether metadata and original bytes are available;
+- which actions may mutate data;
+- whether mounts, shares, jobs, and logs are exposed;
+- how long the grant remains valid.
+
+Read grants do not imply write grants. An agent running on a paired device has
+only the authority of that device's current session.
+
+## Local and internet paths
+
+Nearby devices discover each other on the local network. For remote pairing,
+the node ID supplies a stable destination. The network then attempts direct
+QUIC connectivity and uses a relay if required.
+
+The trust result is the same on either path. The relay cannot approve a device
+or browse a library.
+
+## Pairing status
+
+~~~bash
+sd-cli network pair status
+sd-cli network devices
+sd-cli network status
+~~~
+
+`pair status` lists active pairing sessions. `network devices` lists paired
+devices and whether each is connected. A paired device can be offline without
+losing its identity.
+
+`sd-cli devices list` reads the current library's device table, not the pairing
+registry. A freshly paired device appears there only after it joins the library
+with `sd-cli library sync-setup`.
+
+## Cancel or revoke
+
+Cancel an unfinished session:
+
+~~~bash
+sd-cli network pair cancel <SESSION_ID>
+~~~
+
+Revoke a device when it is lost, replaced, or no longer trusted. Revocation
+blocks future authenticated sessions and removes active grants.
+
+Revocation cannot recall bytes or metadata the device was previously allowed to
+retain. Use narrow scopes and explicit cache retention for sensitive data.
+
+## Recovery
+
+If a device loses its identity keys, treat its replacement as a new device:
+
+1. Revoke the old identity from an authorized peer.
+2. Pair the replacement.
+3. Regrant only the required scopes.
+4. Restore local libraries and source stores from trusted backups.
+5. Review sources and shares that depended on the lost device.
+
+Do not copy one device's private identity into several live installations.
+
+## Security guidance
+
+- Generate a fresh code for each device.
+- Check the peer name the joiner prints against the device you expected.
+- Do not send pairing codes through an untrusted public channel.
+- Cancel sessions you did not complete.
+- Review grants after pairing.
+- Revoke lost devices promptly.
+- Protect the local data directory and key store with operating-system access
+  controls.
+
+## Related systems
+
+- [Networking](/core/networking) describes transport and relays.
+- [Devices](/core/devices) describes membership and revocation.
+- [Library Sync](/core/library-sync) describes data exchanged after pairing.

@@ -1,0 +1,90 @@
+---
+title: Tags and Assertions
+description: Durable organization that lives in each source store and travels with it
+sidebarTitle: Tagging
+---
+
+Tags are user assertions. They cannot be recreated by scanning an origin, so
+they live in the assertion half of each source store, beside the records they
+describe. A drive or a delivered replica arrives carrying named, colored,
+hierarchical tags rather than foreign keys into a database that stayed home.
+
+## Definitions and applications
+
+Two different things wear the word tag.
+
+A definition is the tag itself: a stable UUID, a full path such as
+`Work/Clients/Acme`, a color, an icon. Hierarchy is derived from the path, so
+a definition travels whole. Renaming changes the label without rewriting any
+attachment.
+
+An application is the claim that a definition applies to something. It is an
+append-only `tag_assertion` row carrying the record UUID, the source-relative
+path as rebind evidence, the convergent content UUID once hashing has reached
+the file, an apply or remove flag, an HLC, and the device that wrote it.
+
+A definition is copied into every store that applies it, reconciled by
+last-writer-wins on its stamp. A definition applied nowhere waits in the
+library's staging table until a source adopts it on first use.
+
+## Identity and convergence
+
+The definition's UUID is assigned and stable. Its slug, a v5 UUID over the
+case-folded, NFC-composed path, is a merge key only: a store arriving at a
+foreign library finds that library's existing `Work` instead of silently
+creating a second one. Same slug under different UUIDs stays parked as two
+tags; merging concepts is a user decision, never automatic.
+
+Content UUIDs are convergent, so the same bytes tagged independently on two
+machines produce the same claim twice. Those rows collapse at read time
+rather than needing reconciliation.
+
+## State is ordered, never edited
+
+The state of a tag on a record is the latest assertion by HLC, device UUID
+breaking ties. Removal appends an `asserted = 0` row, so a drive that spent a
+month in a drawer cannot resurrect a tag that was removed while it was away.
+The assertion primary key doubles as the merge dedupe key: replaying a
+delivery batch inserts nothing.
+
+A tag applied before hashing reaches the file is record-keyed; the content
+key binds as soon as the hash lands, and from then on the claim reaches every
+copy of the bytes the store holds.
+
+## Remote-owned sources
+
+Tagging a file on a source another device owns writes the finished rows into
+the library's assertion outbox, attempts delivery now, and retires them on
+the owner's ack. `sources.assertions.merge` commits before replying, so the
+reply is the ack, and redelivery is harmless. Reads union pending rows, so
+the claim shows immediately; reachability changes latency, never behavior.
+
+## Reindexing and rebuilds
+
+Assertion tables belong to the half of a store no ingest can rebuild. Walks,
+sweeps, and eviction leave them alone. When a rebuild mints fresh record
+UUIDs, orphaned assertions rebind through their evidence: content first,
+since it is derived from the bytes, then the source-relative path.
+
+## Operations
+
+`tags.create` stages a definition by path. `tags.apply` and `tags.unapply`
+take Content or File targets; a File target still reaches every copy once the
+content key is known. `tags.delete` removes the definition from stores it can
+write now and asserts removals for live applications there. `tags.search`,
+`tags.by_id`, `tags.ancestors`, `tags.children`, and `files.by_tag` read
+across staging and every open store, replicas included, with no loaded arena
+required. The CLI mirrors these under `sd tag`.
+
+## Core rules
+
+- A source carries everything needed to read its own tags.
+- Stable IDs outlive names and paths; the slug is never a foreign key.
+- Record and content keys ride one row; neither substitutes for the other.
+- Removal is an assertion, never a delete.
+- Reindexing preserves assertions; rebind is evidence-driven.
+- Delivery is an idempotent merge; the ack is the owner's commit.
+- Tag deletion never implies file deletion.
+
+See [Data Model](/core/data-model) for generation and assertion ownership,
+and `docs/core/design/tags-and-assertions.md` for the design rationale.

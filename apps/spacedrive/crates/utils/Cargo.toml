@@ -1,0 +1,11 @@
+[package]
+name = "sd-utils"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+thiserror = { version = "2.0.8" }
+tracing = { version = "0.1.41" }
+
+[features]
+default = []

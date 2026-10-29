@@ -1,0 +1,222 @@
+---
+title: Indexing
+description: How Spacedrive captures a source without making the index disposable
+sidebarTitle: Indexing
+---
+
+Spacedrive uses two related indexes for different lifetimes:
+
+- The **volume arena** is a fast machine-level read map for filesystems that are
+  mounted now.
+- A **source store** is the retained, portable record of one selected origin.
+
+Browsing can begin from the arena immediately. Tracking a source preserves a
+scope in its own store, keeps it current, and makes it available after the
+origin disconnects.
+
+## Why the split exists
+
+A file manager needs low-latency access to what is online now. A data system
+also needs memory after a drive, peer, or provider stops answering. Treating one
+cache as both things either slows ordinary browsing or makes valuable history
+disposable.
+
+The arena may be rebuilt. A source store may be the last remaining evidence of
+an unavailable origin, so it is never treated as a disposable cache.
+
+## Tracking a filesystem source
+
+When you track a local path, Spacedrive:
+
+1. Resolves the mounted volume and records a stable anchor.
+2. Registers the source and its capture policy in the library.
+3. Opens or creates the source store.
+4. Walks the selected subtree through the volume arena.
+5. Persists records, facets, edges, and content evidence in bounded batches.
+6. Starts watching the same scope for live changes.
+
+The registry stores a volume-relative anchor rather than relying on one absolute
+path. A volume can mount somewhere else after a restart and still resolve to
+the same source.
+
+~~~bash
+sd-cli sources track /path/to/folder
+sd-cli sources track /mnt/archive --unfiltered
+sd-cli sources list
+~~~
+
+Tracking records data in place. It does not move or rewrite the source files.
+
+## One capture policy
+
+The initial walk and live watcher use the same persisted capture policy.
+
+The default policy removes common operating-system noise, development build
+trees, and other paths that rarely belong in a personal index. An unfiltered
+source records every readable object and is suited to archives or evidence
+capture.
+
+Widening a source from default to unfiltered schedules a new walk for the
+previously skipped paths. Narrowing the policy hides nothing retroactively.
+Presentation filters belong in a lens, not in destructive ingest behavior.
+
+## Generation writes
+
+The indexer writes generation data in batches so large sources do not require a
+single long transaction. A committed batch advances its durable progress. A job
+cannot report completion while its final writes are still queued.
+
+If a batch contains a bad record, Spacedrive retries the rows individually. It
+preserves valid records and reports the exact path that failed. One malformed
+name or SQLite collision cannot create a permanent hole for the rest of the
+batch.
+
+Unreadable files remain in the generation with a content error. Metadata is
+still useful, and the reason is evidence that can be reviewed later.
+
+## Identity during a walk
+
+Filesystem identity comes from the volume arena. Sources adopt that identity
+instead of assigning unrelated IDs to overlapping roots. This lets nested
+sources and ordinary browsing refer to the same mounted object while retaining
+different source scopes.
+
+Names and parent relationships produce paths for display and access. They do
+not replace stable record identity.
+
+## Content identification
+
+Content work is separate from metadata capture. Normal identification reads
+small samples to create a candidate content hash without reading every byte of
+every large file.
+
+When two or more records share candidate content, verification reads every byte
+and records a full integrity hash:
+
+~~~bash
+sd-cli sources verify <SOURCE_ID>
+~~~
+
+The distinction is part of the safety model:
+
+- Candidate identity supports grouping and verification scheduling.
+- Confirmed identity supports destructive duplicate decisions.
+- A read error leaves the record intact with a reason.
+
+Hashing and verification flush each claimed batch before asking the store for
+more work. This prevents the claim query from racing queued writes and hashing
+the same files indefinitely.
+
+## Photo metadata
+
+Identification says which records are images. A metadata pass follows every
+identification pass and reads EXIF for those records, so capture time, GPS,
+camera, lens, exposure, orientation and pixel geometry live in the store's
+`facet_image` row and nothing has to open the file to answer them. The
+extension host's `records.exif`, the rename resolver's capture time, and any
+inspector read the row first.
+
+Listings and search read it too. A store-served row carries its facet from
+the join in `sd_store::read`, which takes the row only while its content
+hash is the record's current one, so an edited photo reads as unread until
+the pass rewrites it. An arena holds none of it: a listing or search served
+from an arena reads the facet from the store ahead of its sort and filter
+(`core/src/ops/search/capture.rs`), the way a tag filter resolves its paths
+from the stores first. Both backends then hand the same `File` to one
+predicate and one order. `search.files` sorts by `CapturedAt` and filters by
+a `CapturedAt` date range and by `has_location`; `files.directory_listing`
+sorts by `datetaken`. A file without a facet has no capture time and no
+place: it fails those filters and trails every dated file in a capture
+order. A replica of another device's source has no store here and reads
+the same way.
+
+The pass claims its work from the store. A row carries the hash of the bytes
+it was read from, so a record is pending when it has no row or its row names
+other bytes. A changed file loses its content identity in the walk, gains a
+new hash in identification, and reads as pending again without the two
+phases coordinating. A photo without EXIF gets an empty row under its hash
+and is never read twice. One row is written per content hash, to every
+record holding those bytes, so a source with three copies of a photo reads
+one header.
+
+The pass runs at low priority behind identification, reads four files at a
+time on the blocking pool (a raw or TIFF container is read whole, so the
+bound is memory rather than seeks), sweeps once more from the start before
+it exits so a photo re-identified behind its cursor is not left for the next
+pass, and is silent on the event bus when the
+identification it follows was a background one. A source added with content
+identification off is never enriched, since nothing names its images. The
+launch sweep backfills stores indexed before the pass existed.
+
+## Watchers
+
+After the initial walk, filesystem watchers translate creates, modifications,
+moves, and deletions into the same source-store model. A changed file also
+schedules content identification.
+
+Events are coalesced before expensive content work. Bursty applications can
+write the same path many times, so the watcher records that a source is dirty
+and lets the job system process stable batches.
+
+Watchers improve freshness. They do not replace a complete walk. Overflow,
+disconnects, permission changes, and platform behavior can all require a new
+scan.
+
+## Safe sweeping
+
+A complete walk produces evidence about which prior generation rows no longer
+exist. Only then may the indexer sweep stale rows.
+
+Walk state is process-local, so an interrupted walk is not resumed from an old
+checkpoint. A restart begins a fresh walk. This avoids treating an incomplete
+visitor set as proof that unseen files were deleted.
+
+Spacedrive also refuses a sweep that would remove more than half of a source.
+That fuse turns a surprising mount or root-resolution failure into a visible
+error instead of a mass deletion from the store.
+
+## Self-exclusion
+
+The daemon data directory is excluded from every filesystem source, even under
+an unfiltered policy. This includes live SQLite journals, source stores, and
+frozen copies.
+
+Without this rule, Spacedrive can index its own writes, create collisions, and
+feed a changing database back into the hashing pipeline.
+
+## Reindexing
+
+A reindex may replace source generation data only after a complete new ingest
+can be committed. It must preserve the assertion layer, including tags, notes,
+policy, review decisions, and provenance.
+
+If the origin is unavailable, the retained generation remains authoritative as
+the last observation. “Rebuild” is not a valid recovery plan for a lost source.
+
+## Freezing a source
+
+A freeze writes a dated, self-contained copy of the source store:
+
+~~~bash
+sd-cli sources freeze <SOURCE_ID>
+~~~
+
+Use freezes before removing storage, before a large cleanup, and after
+verification gates. A freeze preserves the index and assertions. It does not
+copy file bytes, so pair it with a backup policy when the origin itself needs
+protection.
+
+## Operational checks
+
+Use the CLI to inspect progress and failures:
+
+~~~bash
+sd-cli job list
+sd-cli job logs <JOB_ID>
+sd-cli sources list
+~~~
+
+For a final archival capture, compare source record counts with an independent
+filesystem walk, review every content error, verify shared content, then freeze
+the source and copy both the store and file bytes into separate failure
+domains.

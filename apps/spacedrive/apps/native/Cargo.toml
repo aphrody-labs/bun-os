@@ -1,0 +1,38 @@
+[package]
+name    = "sd-native"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "spacedrive-native"
+path = "src/main.rs"
+
+[dependencies]
+anyhow         = { version = "1.0.94" }
+chrono         = { version = "0.4.39" }
+gpui           = { workspace = true }
+gpui-component = { workspace = true }
+gpui_platform  = { workspace = true }
+# Match gpui's own versions: RenderImage is built from image::Frame, via smallvec.
+image          = { version = "0.25.5" }
+sd-bake        = { path = "../../crates/bake" }
+sd-client      = { path = "../../crates/sd-client" }
+# Op input/output types (the same structs the daemon registers on the wire).
+sd-core        = { path = "../../core" }
+sd-pvcache     = { path = "../../crates/pvcache" }
+serde_json     = { version = "1.0.133" }
+smallvec       = "1"
+tokio          = { version = "1.42.0", features = ["rt", "rt-multi-thread", "sync", "time", "macros", "net"] }
+# v5: demo record uuids are derived deterministically from file paths.
+uuid           = { version = "1.10", features = ["v5"] }
+
+# Quick Look: the system preview panel, and the AppKit around it.
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2               = "0.6"
+objc2-app-kit       = { version = "0.3", default-features = false, features = ["std", "NSEvent", "NSResponder", "NSView", "NSWindow"] }
+objc2-foundation    = { version = "0.3", default-features = false, features = ["std", "NSObject", "NSString", "NSURL"] }
+objc2-quick-look-ui = { version = "0.3", default-features = false, features = ["std", "objc2-app-kit", "QLPreviewItem", "QLPreviewPanel"] }
+raw-window-handle   = "0.6"
+
+[dev-dependencies]
+tempfile = { version = "3.14.0" }

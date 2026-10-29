@@ -1,0 +1,107 @@
+---
+title: Sync Event Log
+description: Durable diagnostics for library and source synchronization
+sidebarTitle: Sync Event Log
+---
+
+The sync event log records high-level synchronization facts that must survive a
+restart. It explains what moved, which peer participated, how far a watermark
+advanced, and why a session stopped.
+
+It is an observability log, not the replicated data itself.
+
+## What it records
+
+| Event | Evidence |
+| --- | --- |
+| Session started | Peer, protocol, source or library scope, starting watermark |
+| Batch committed | Range, count, bytes, duration, resulting watermark |
+| Assertion merge | Type, count, conflict count, provenance summary |
+| Availability changed | Device or source state and reason |
+| Session completed | Final watermark and totals |
+| Session failed | Error category, retry state, and last committed watermark |
+| Authorization rejected | Peer and denied scope without secret data |
+
+Large batches produce aggregate events. The log does not add one row for every
+source record.
+
+## Correlation
+
+Each session has a correlation ID shared by events and logs. Source generation,
+library assertions, and byte transfer use distinct protocol scopes even when
+one user action started them together.
+
+A support report can therefore answer:
+
+- Did library state synchronize?
+- Which source generation is current?
+- Were original bytes transferred?
+- Which step failed?
+
+## Commit ordering
+
+A batch-committed event is written only after the receiving transaction commits.
+The recorded watermark must refer to durable state.
+
+If the process exits before commit, the next session resumes from the prior
+watermark and no success event exists for the lost batch.
+
+## Queries
+
+Clients filter by:
+
+- time range;
+- device or peer;
+- library;
+- source;
+- correlation ID;
+- event kind;
+- severity;
+- outcome.
+
+The web interface and CLI use the same query. Agents receive structured events,
+not scraped text logs.
+
+## Retention
+
+Retention is configurable by library policy. Summary events can outlive verbose
+diagnostics. Security and destructive-operation evidence may require a longer
+retention class than ordinary presence changes.
+
+Pruning is a durable job and reports the exact time range removed.
+
+## Privacy
+
+Sync events avoid:
+
+- pairing secrets;
+- private keys or bearer tokens;
+- raw file content;
+- signed provider URLs;
+- full paths when stable record identity is enough.
+
+Access to the event log follows library and source grants because names,
+topology, and activity timing can still be sensitive.
+
+## Metrics and logs
+
+Metrics answer how the system is behaving now. Diagnostic logs explain code
+paths. The sync event log answers what durable sync work happened.
+
+Use all three during an incident, but do not infer a committed watermark from a
+transient metric.
+
+## Recovery use
+
+After a failed session:
+
+1. Find the last committed batch for the correlation ID.
+2. Inspect the typed failure and source availability.
+3. Confirm the local database watermark matches the event.
+4. Resume or restart through the registered sync operation.
+5. Verify the next committed range begins at the expected point.
+
+Never edit sync watermarks by hand to silence an error.
+
+See [Library Sync](/core/library-sync), [Networking](/core/networking), and
+[Events](/core/events).

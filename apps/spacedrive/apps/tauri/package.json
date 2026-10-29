@@ -1,0 +1,54 @@
+{
+	"name": "@sd/tauri",
+	"private": true,
+	"version": "2.0.0-alpha.2",
+	"type": "module",
+	"engines": {
+		"bun": ">=1.3.0"
+	},
+	"scripts": {
+		"dev": "vite dev",
+		"dev:with-daemon": "bun ./scripts/dev-with-daemon.ts",
+		"build": "vite build",
+		"build:daemon": "bash -c 'cargo build --bin sd-daemon --manifest-path ../../Cargo.toml ${CARGO_BUILD_TARGET:+--target $CARGO_BUILD_TARGET}'",
+		"build:daemon:release": "bash -c 'cargo build --release --bin sd-daemon --manifest-path ../../Cargo.toml ${CARGO_BUILD_TARGET:+--target $CARGO_BUILD_TARGET}'",
+		"preview": "vite preview",
+		"typecheck": "tsc -b",
+		"tauri": "tauri",
+		"daemon:sidecar": "./scripts/ensure-daemon-sidecar.sh",
+		"tauri:dev": "bun run daemon:sidecar && tauri dev",
+		"tauri:dev:no-watch": "bun run daemon:sidecar && tauri dev --no-watch",
+		"tauri:build": "bun run daemon:sidecar && tauri build && ./scripts/fix-daemon-entitlements.sh ../../target/release/bundle/macos/Spacedrive.app || true"
+	},
+	"dependencies": {
+		"@phosphor-icons/react": "catalog:",
+		"@sd/assets": "workspace:*",
+		"@sd/interface": "workspace:*",
+		"@sd/ts-client": "workspace:*",
+		"@spacedrive/primitives": "catalog:",
+		"@tauri-apps/api": "catalog:",
+		"@tauri-apps/plugin-dialog": "catalog:",
+		"@tauri-apps/plugin-fs": "^2.0.1",
+		"@tauri-apps/plugin-shell": "^2.0.1",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"react-router-dom": "catalog:",
+		"react-scan": "^0.4.3"
+	},
+	"devDependencies": {
+		"@headlessui/tailwindcss": "^0.2.0",
+		"@spacedrive/tokens": "catalog:",
+		"@vitejs/plugin-react-swc": "^4.0.0",
+		"@tailwindcss/forms": "^0.5.7",
+		"@tailwindcss/typography": "catalog:",
+		"@tailwindcss/vite": "^4.1.0",
+		"@tauri-apps/cli": "^2.1.0",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"tailwindcss": "catalog:",
+		"tailwindcss-animate": "catalog:",
+		"tailwindcss-radix": "^2.8.0",
+		"typescript": "catalog:",
+		"vite": "^5.4.9"
+	}
+}

@@ -1,0 +1,113 @@
+---
+title: Manage Your Libraries
+description: Organize sources, devices, and policy without duplicating file trees
+sidebarTitle: Manage Libraries
+---
+
+A library connects sources, devices, organization, and policy. It is a control
+plane for your data, not a container that moves every file into one database.
+
+Most people need one personal library. Create another when you need a true
+security or administrative boundary, such as separating personal data from an
+employer-managed environment.
+
+## What a library owns
+
+A library stores:
+
+- source registrations and attachment hints;
+- paired devices and grants;
+- pins, spaces, and saved views;
+- tags, notes, permissions, and policies;
+- durable job and sync state.
+
+Each source keeps its large indexed generation in a portable source store.
+Separating the two keeps libraries responsive at large scale.
+
+## Create and switch libraries
+
+Use the library switcher in the app, or use the CLI:
+
+~~~bash
+sd-cli library create Personal
+sd-cli library list
+sd-cli library switch --library-id <LIBRARY_ID>
+sd-cli library info
+~~~
+
+Clients show common user folders as computed Places when they exist on the
+current device. Creating a library does not store an item for each one.
+
+## Add storage
+
+Open **Sources** to attach a local folder, full drive, NAS dataset, remote node,
+or provider account. The source remains distinct inside the library, so custody
+and availability stay visible.
+
+One source can appear in more than one library only through an explicit grant.
+The source store remains authoritative for its generation. Each library keeps
+its own policy and presentation.
+
+## Connect devices
+
+Pair devices from **Settings > Devices** or through the CLI:
+
+~~~bash
+sd-cli network pair generate
+sd-cli network pair join "<PAIRING_CODE>"
+~~~
+
+After pairing, choose which library and source scopes the other device may use.
+Pairing grants an identity. It does not expose every local path.
+
+Library sync carries small shared state and assertions. Source generations are
+served or replicated separately, and file bytes move only under an explicit
+operation or policy.
+
+## Export and preserve
+
+Your library and source stores are ordinary durable data owned by you. Before a
+machine migration:
+
+1. Stop mutations or let active jobs finish.
+2. Freeze important sources.
+3. Back up the Spacedrive data directory.
+4. Copy the file origins according to their own backup policy.
+5. Verify the destination before retiring the old machine.
+
+A source freeze protects index knowledge. It does not contain the original file
+bytes.
+
+## Delete a library
+
+Deleting a library removes its registry, presentation, assertions, and job
+state from that instance. It does not delete source file bytes.
+
+<Callout type="warn">
+  Library deletion can remove knowledge that a filesystem scan cannot recover.
+  Export or back up the library and its source stores before deletion.
+</Callout>
+
+The CLI requires explicit confirmation:
+
+~~~bash
+sd-cli library delete <LIBRARY_ID>
+~~~
+
+## Library boundaries
+
+Use separate libraries when:
+
+- different administrators own the policy;
+- a device or agent must never discover the other source registry;
+- work and personal assertions require independent encryption or retention;
+- you need a clean exportable environment for a client or project.
+
+Use sources, pins, tags, and views inside one library when the distinction
+is only organizational.
+
+## Related guides
+
+- [Add Sources and Pins](/overview/add-sources-and-pins)
+- [Library Sync](/core/library-sync)
+- [Self-Hosting](/overview/self-hosting)

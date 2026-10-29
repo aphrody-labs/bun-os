@@ -1,0 +1,7 @@
+# WASM build configuration
+[build]
+target = "wasm32-unknown-unknown"
+
+# The guest has no entropy of its own; the SDK routes getrandom to the host.
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "link-arg=--export-table", "--cfg", "getrandom_backend=\"custom\""]

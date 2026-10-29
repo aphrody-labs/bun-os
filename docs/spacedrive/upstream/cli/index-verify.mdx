@@ -1,0 +1,105 @@
+---
+title: Verify and Freeze a Source
+description: Confirm duplicate content and preserve a dated source-store copy
+sidebarTitle: Verify a Source
+---
+
+Source verification reads every byte of files that share a candidate content
+identity. It upgrades matching candidates to confirmed integrity hashes and
+records read failures.
+
+This is different from comparing every path with a fresh filesystem walk.
+Retracking a source performs that reconciliation.
+
+## Find the source
+
+~~~bash
+sd-cli sources list
+~~~
+
+Wait for the current index and hashing jobs to finish before taking a final
+archival snapshot:
+
+~~~bash
+sd-cli job list
+~~~
+
+## Verify shared content
+
+~~~bash
+sd-cli sources verify <SOURCE_ID>
+~~~
+
+The action dispatches a durable verification job. Monitor it with:
+
+~~~bash
+sd-cli job monitor --job-id <JOB_ID>
+sd-cli logs show --job-id <JOB_ID>
+~~~
+
+Verification:
+
+- claims records whose sampled content is shared and unconfirmed;
+- reads each file completely from its current origin;
+- computes an integrity hash;
+- promotes matching content to confirmed identity;
+- preserves metadata and an error reason when bytes cannot be read;
+- commits each batch before claiming more work.
+
+## Interpret the result
+
+A completed job means every record claimed by that run committed a result. It
+does not mean every file in the source is readable or that the source has
+enough backup copies.
+
+Review:
+
+- remaining unconfirmed duplicate candidates;
+- content errors and permissions;
+- source availability;
+- failure-domain placement;
+- job retries and warnings.
+
+## Reconcile filesystem state
+
+To compare the retained generation with the current origin, track the same root
+again:
+
+~~~bash
+sd-cli sources track /path/to/source
+~~~
+
+The new walk records current metadata and safely sweeps stale generation rows
+only after complete traversal evidence. A restarted walk begins from zero.
+
+For archival acceptance, compare the resulting record count with an independent
+operating-system walk and sample stored metadata against the source.
+
+## Freeze the store
+
+After verification and reconciliation gates pass:
+
+~~~bash
+sd-cli sources freeze <SOURCE_ID>
+~~~
+
+The freeze is a dated, self-contained source-store copy. It preserves indexed
+records, content evidence, and assertions as they existed at that point.
+
+<Callout type="warn">
+  A freeze contains index knowledge, not the original file bytes. Copy and
+  verify the origin separately.
+</Callout>
+
+## Suggested archival gate
+
+1. The source root resolves to the expected volume.
+2. The latest walk completed from zero.
+3. Record counts match an independent walk.
+4. Metadata samples match the operating system.
+5. Every unreadable item has a reviewed reason.
+6. Shared content has confirmed integrity evidence.
+7. Protection policy shows independent copies where required.
+8. The source store is frozen and backed up off the origin.
+
+See [Indexing](/core/indexing) for the safety model.

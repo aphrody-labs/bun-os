@@ -1,0 +1,111 @@
+---
+title: Project Tracking
+description: How active work, design plans, and long-term issues stay distinct
+sidebarTitle: Project Tracking
+---
+
+Spacedrive uses three records for three different lifetimes:
+
+| Record | Owns |
+| --- | --- |
+| PROJECT_STATUS.md | Current truth, active owners, and the next proof |
+| docs/plans | Design rationale, phases, dependencies, and acceptance criteria |
+| GitHub issues | Durable backlog and work that outlives the current push |
+
+The old **.tasks** tree is frozen. It describes the entry-centric architecture
+that Spacedrive 2.0 replaced. Do not add new work there or run its validator
+against current changes.
+
+## Start a session
+
+Read, in order:
+
+1. **AGENTS.md** for repository rules.
+2. **PROJECT_STATUS.md** for current operating context.
+3. **docs/core/product-direction.mdx** for the product boundary.
+4. The plan associated with the subsystem you will change.
+
+Then inspect the worktree. Existing uncommitted changes may belong to another
+person or session.
+
+## Start broad work
+
+Add or update one row in the Immediate register in **PROJECT_STATUS.md**. Record:
+
+- a short work name;
+- status;
+- owner;
+- the next observable proof or action.
+
+Update the row in the same commit as the work. The status file should say what
+is true now, not repeat a long implementation plan.
+
+## Write a design plan
+
+Create a dated plan under **docs/plans** when work changes architecture,
+introduces a subsystem, or needs phased acceptance. A useful plan contains:
+
+- the problem and product boundary;
+- current evidence from code and real data;
+- invariants;
+- ownership and data lifetime;
+- phases with measurable exit criteria;
+- failure and rollback behavior;
+- deferred work.
+
+Keep phase status at the top so a later session can resume without reading the
+whole history first.
+
+## Entries teardown exception
+
+Work that still touches the retired entry substrate also updates the status
+table at the top of
+**docs/plans/2026-08-20-entries-teardown-execution.md**. Do not deepen that
+model. New durable filesystem state belongs in source stores.
+
+## During implementation
+
+Update tracking when work:
+
+- starts;
+- lands;
+- becomes blocked;
+- changes owner;
+- reveals a new safety invariant;
+- changes the next proof.
+
+Put detailed design reasoning in the plan. Put stable architectural truth in
+the relevant core documentation. Put short-lived operating facts in
+**PROJECT_STATUS.md**.
+
+## When work lands
+
+In the same commit:
+
+1. Mark or remove the Immediate row.
+2. Add a concise item to Recent landed when future sessions need the context.
+3. Update the plan phase and acceptance evidence.
+4. Update public docs if user-visible behavior or the product contract changed.
+5. Record new regression boundaries under safety invariants.
+
+A commit hash is useful evidence only after the commit exists. Before that,
+label the work as uncommitted.
+
+## What not to track in code
+
+Do not leave future work as placeholder comments. Comments explain why current
+code behaves as it does. GitHub issues and plans own future changes.
+
+Do not use status prose to hide a missing acceptance test. State the missing
+proof directly.
+
+## Good status language
+
+Prefer observations:
+
+- “Full-byte verification is zero-pending across nine stores.”
+- “Blocked on an exact private backup of the current UI.”
+- “Next proof: pair the Mac with titan and query one NAS source.”
+
+Avoid percentages without a measurable denominator and labels such as “almost
+done” that do not tell the next session what remains.

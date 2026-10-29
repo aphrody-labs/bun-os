@@ -1,0 +1,86 @@
+---
+title: Event System
+description: Typed change notifications for clients and services
+sidebarTitle: Events
+---
+
+The event system tells connected clients what changed after durable state
+commits. Events keep interfaces responsive without making them another source
+of truth.
+
+## Event classes
+
+| Class | Examples |
+| --- | --- |
+| Resource | A file, space, tag, device, or volume projection changed |
+| Job | Queued, progress, paused, completed, failed |
+| Availability | Device, volume, source, or provider state changed |
+| Sync | Peer connected, watermark advanced, conflict recorded |
+| Filesystem | Watched source became dirty or needs reconciliation |
+
+Events carry stable IDs and enough scope for a client to invalidate or update
+the correct query.
+
+## Commit ordering
+
+A durable event is published only after its database transaction commits. A
+client that receives the event can immediately query the new state.
+
+Progress events may be transient and coalesced. Completion and failure are
+durable job state, so losing an event does not lose the outcome.
+
+## Subscriptions
+
+Clients subscribe by event class and optional scope:
+
+- library;
+- source;
+- source-relative subtree;
+- job;
+- resource type.
+
+Authorization is evaluated when the subscription starts and when each event is
+delivered. Revoking a grant closes or narrows existing subscriptions.
+
+## Batching
+
+Large ingests do not publish one event for every record. They emit bounded batch
+or invalidation events after commits. Clients requery the affected window or
+source generation.
+
+This prevents the notification channel from duplicating the source store and
+keeps UI work proportional to what is visible.
+
+## Reconnect
+
+The event stream is not a permanent sync log. After reconnecting, a client
+compares query versions or watermarks and refreshes missed state.
+
+Library and source sync use their own durable protocols. Events tell an online
+client to react; they do not replace replication.
+
+## Frontend use
+
+The generated client maps events to typed cache invalidation. Components should
+subscribe through shared hooks instead of opening duplicate transports.
+
+An event payload identifies the changed resource. The canonical query remains
+responsible for sorting, permissions, availability, and partial-result state.
+
+## Backpressure
+
+Each subscriber has bounded buffering. Coalescible events collapse by resource
+or scope. If a client falls too far behind, the server closes the stream with a
+refresh-required reason.
+
+Dropping UI progress updates is acceptable. Dropping a durable state change
+without forcing refresh is not.
+
+## Observability
+
+Metrics expose subscriber count, queue depth, coalesced events, slow consumers,
+and forced refreshes. Logs carry event class and resource scope without
+including private file content.
+
+See [API](/core/api) for operation semantics and [Sync Event Log](/core/sync-event-log)
+for durable sync diagnostics.

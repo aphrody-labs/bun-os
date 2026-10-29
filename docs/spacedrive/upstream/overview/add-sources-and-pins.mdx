@@ -1,0 +1,114 @@
+---
+title: Add Sources and Pins
+description: Track storage once, then pin the paths you use most
+sidebarTitle: Sources and Pins
+---
+
+Spacedrive separates the data you retain from the shortcuts you use to reach
+it:
+
+- A **source** captures an origin into a portable store.
+- A **pin** keeps a folder in the sidebar so you can return to it.
+
+Track a folder, drive, NAS dataset, or provider as a source. Add pins afterward
+without creating another index.
+
+## Track a source
+
+<Steps>
+<Step>
+### Open Sources
+
+Choose **Sources** in the sidebar and select **Track source**.
+</Step>
+<Step>
+### Choose the origin
+
+Select a folder, mounted drive, network share, paired node, or connected
+provider. Spacedrive shows where the source store will live and what access it
+requires.
+</Step>
+<Step>
+### Choose capture policy
+
+Use the default policy for ordinary folders. It skips common system noise and
+development artifacts. Choose unfiltered capture for archival storage where
+every readable object must be recorded.
+</Step>
+<Step>
+### Review the first walk
+
+The source appears immediately while its job records names, metadata, content
+evidence, and errors. You can close the window without stopping the daemon.
+</Step>
+</Steps>
+
+The CLI provides the same flow:
+
+~~~bash
+sd-cli sources track ~/Documents
+sd-cli sources track /Volumes/Archive --unfiltered
+sd-cli sources list
+~~~
+
+Tracking does not move or modify the origin.
+
+## Understand source state
+
+The source view reports two separate facts:
+
+- **Availability** tells you whether records and bytes can be reached now.
+- **Protection** tells you whether the data has enough verified copies across
+  independent failure domains.
+
+An offline drive can remain searchable because its source store is retained.
+Opening or changing a file still requires a live origin or cached copy.
+
+## Add a pin
+
+Open a folder and choose **Pin this folder** in the path bar. The pin is an
+item in the current space, listed under **Pinned** in the sidebar.
+
+A pin does not change what Spacedrive indexes or watches. The containing source
+already owns capture and freshness.
+
+## Known Places
+
+Clients show Home, Desktop, Documents, Downloads, Pictures, Movies, and Music
+when those folders exist on the current device. These are computed Places, not
+stored items. They require no setup and do not start overlapping scans.
+
+## Verify and freeze
+
+For important or archival sources, verify shared content and freeze the store
+after the first walk completes:
+
+~~~bash
+sd-cli sources verify <SOURCE_ID>
+sd-cli sources freeze <SOURCE_ID>
+~~~
+
+Verification reads every byte of duplicate candidates. A freeze creates a
+dated, self-contained copy of the source store. Neither command creates a
+backup copy of the original files.
+
+## Remove a pin or source
+
+Removing a pin deletes only the shortcut. It does not stop source indexing or
+watching.
+
+Detaching a source removes it from the active library view but preserves its
+store unless you explicitly delete that evidence. Deleting file bytes is always
+a separate operation with its own preview and verification.
+
+## Choose the right object
+
+| Goal | Use |
+| --- | --- |
+| Retain a drive or folder in the library | Source |
+| Keep a folder in the sidebar | Pin |
+| Show all screenshots or duplicates | Lens or extension view |
+| Copy bytes to another storage system | File operation or file sync |
+| Preserve the index before a cleanup | Source freeze |
+
+Read [Indexing](/core/indexing) for capture behavior.

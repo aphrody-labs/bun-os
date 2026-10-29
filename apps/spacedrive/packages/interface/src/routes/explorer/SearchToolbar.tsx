@@ -1,0 +1,459 @@
+import {X} from '@phosphor-icons/react';
+import type {ContentKind, SearchFacets, SearchFilters} from '@sd/ts-client';
+import {useLibraryQuery} from '@sd/ts-client';
+import {
+	Button,
+	Input,
+	OptionList,
+	OptionListItem,
+	Popover,
+	SelectPill,
+	Switch,
+	ToggleGroup,
+	usePopover
+} from '@spacedrive/primitives';
+import clsx from 'clsx';
+import {useState, type Ref} from 'react';
+import {useExplorer} from './context';
+import type {SearchScope} from './context';
+import {useExplorerFiles} from './hooks/useExplorerFiles';
+
+import {tagColor} from '../../components/Tags';
+const SIZE_PRESETS: Array<{
+	label: string;
+	min: number | null;
+	max: number | null;
+}> = [
+	{label: 'Any size', min: null, max: null},
+	{label: '< 1 MB', min: null, max: 1_000_000},
+	{label: '1–100 MB', min: 1_000_000, max: 100_000_000},
+	{label: '> 100 MB', min: 100_000_000, max: null}
+];
+
+const DATE_PRESETS: Array<{label: string; days: number | null}> = [
+	{label: 'Any time', days: null},
+	{label: 'Today', days: 1},
+	{label: 'Last 7 days', days: 7},
+	{label: 'Last 30 days', days: 30},
+	{label: 'This year', days: 365}
+];
+
+/** Kinds the pill always offers, so a search can start from a kind before
+ * there are results to count. */
+const COMMON_KINDS: ContentKind[] = [
+	'image',
+	'video',
+	'audio',
+	'document',
+	'text',
+	'code',
+	'archive',
+	'book'
+];
+
+/** How many kinds beyond the common ones the pill offers, most common first. */
+const KIND_OPTION_LIMIT = 10;
+
+/**
+ * The search refinement bar: scope, filter pills, hidden toggle, and the
+ * true result count, in one row of primitives. A pill carries its own state
+ * in its label, so an active filter is legible without opening anything.
+ * It shows while the search is open, before there is anything to search,
+ * so filters alone can start one.
+ */
+export function SearchToolbar({ref}: {ref: Ref<HTMLDivElement>}) {
+	const explorer = useExplorer();
+	const {totalFound, isLoading, facets} = useExplorerFiles();
+
+	// The containing source, resolved the same way the path bar resolves it.
+	// Pins do not define search domains; a source does, and paths.context
+	// reports it alias-normalized.
+	const {data: pathContext} = useLibraryQuery(
+		{
+			type: 'paths.context',
+			input: {path: explorer.currentPath!}
+		},
+		{enabled: !!explorer.currentPath}
+	);
+
+	const scope = explorer.searchScope;
+	const source = pathContext?.source ?? null;
+	const filters = explorer.searchFilters;
+
+	const scopeOptions = [
+		{value: 'folder', label: 'This Folder'},
+		...(source ? [{value: 'source', label: source.name}] : []),
+		{value: 'library', label: 'Library'}
+	];
+
+	return (
+		<div
+			ref={ref}
+			onKeyDown={(event) => {
+				// An open popover takes its own Escape.
+				if (event.key === 'Escape' && !event.defaultPrevented) {
+					explorer.exitSearchMode();
+				}
+			}}
+			className="flex flex-wrap items-center gap-2 px-3 py-1.5 border-b border-app-line/50"
+		>
+			<ToggleGroup
+				options={scopeOptions}
+				value={scope === 'source' && !source ? 'folder' : scope}
+				onChange={(value) =>
+					explorer.setSearchScope(value as SearchScope)
+				}
+			/>
+
+			<div className="mx-1 h-4 w-px bg-app-line/60" />
+
+			<KindPill
+				filters={filters}
+				facets={facets}
+				onChange={explorer.setSearchFilters}
+			/>
+			<SizePill filters={filters} onChange={explorer.setSearchFilters} />
+			<DatePill filters={filters} onChange={explorer.setSearchFilters} />
+			<ExtensionPill
+				filters={filters}
+				onChange={explorer.setSearchFilters}
+			/>
+			<TagsPill filters={filters} onChange={explorer.setSearchFilters} />
+
+			<label className="ml-1 flex items-center gap-1.5 text-xs text-ink-dull cursor-pointer">
+				<Switch
+					size="sm"
+					checked={filters.include_hidden === true}
+					onCheckedChange={(checked) =>
+						explorer.setSearchFilters({
+							...filters,
+							include_hidden: checked ? true : null
+						})
+					}
+				/>
+				Hidden
+			</label>
+
+			<div className="flex-1" />
+
+			{totalFound != null && !isLoading && (
+				<span className="text-xs text-ink-faint tabular-nums">
+					{totalFound.toLocaleString()} result
+					{totalFound === 1 ? '' : 's'}
+				</span>
+			)}
+
+			<Button
+				variant="subtle"
+				size="xs"
+				onClick={explorer.exitSearchMode}
+			>
+				<X className="size-3" weight="bold" />
+				Close
+			</Button>
+		</div>
+	);
+}
+
+interface PillProps {
+	filters: SearchFilters;
+	onChange: (filters: SearchFilters) => void;
+}
+
+/** Shared pill styling: quiet at rest, accent-tinted while filtering. */
+function pillClass(active: boolean): string {
+	return clsx(active && 'text-accent [&_svg]:text-accent');
+}
+
+function KindPill({
+	filters,
+	facets,
+	onChange
+}: PillProps & {facets?: SearchFacets}) {
+	const popover = usePopover();
+	const selected = filters.content_types ?? [];
+	const counts = facets?.kinds ?? {};
+
+	// The common kinds hold their places; kinds the results hold beyond them
+	// follow, most common first, and a selected kind always stays listed.
+	const found = Object.entries(counts)
+		.filter(([kind]) => !COMMON_KINDS.includes(kind as ContentKind))
+		.sort((a, b) => b[1] - a[1])
+		.slice(0, KIND_OPTION_LIMIT)
+		.map(([kind]) => kind as ContentKind);
+	const options = Array.from(
+		new Set([...COMMON_KINDS, ...found, ...selected])
+	);
+
+	const label =
+		selected.length === 0
+			? 'Kind'
+			: selected.length === 1
+				? selected[0]
+				: `${selected[0]} +${selected.length - 1}`;
+
+	const toggle = (kind: ContentKind) => {
+		const next = selected.includes(kind)
+			? selected.filter((k) => k !== kind)
+			: [...selected, kind];
+		onChange({...filters, content_types: next.length > 0 ? next : null});
+	};
+
+	return (
+		<Popover.Root open={popover.open} onOpenChange={popover.setOpen}>
+			<Popover.Trigger asChild>
+				<SelectPill size="sm" className={pillClass(selected.length > 0)}>
+					{label}
+				</SelectPill>
+			</Popover.Trigger>
+			<Popover.Content align="start" sideOffset={8}>
+				<OptionList>
+					<OptionListItem
+						selected={selected.length === 0}
+						onClick={() => {
+							onChange({...filters, content_types: null});
+							popover.setOpen(false);
+						}}
+					>
+						Any kind
+					</OptionListItem>
+					{options.map((kind) => {
+						const count: number | undefined = counts[kind];
+						return (
+							<OptionListItem
+								key={kind}
+								selected={selected.includes(kind)}
+								onClick={() => toggle(kind)}
+							>
+								<span className="flex w-full items-center justify-between gap-4">
+									{kind}
+									{count !== undefined && (
+										<span className="text-ink-faint tabular-nums">
+											{count.toLocaleString()}
+										</span>
+									)}
+								</span>
+							</OptionListItem>
+						);
+					})}
+				</OptionList>
+			</Popover.Content>
+		</Popover.Root>
+	);
+}
+
+function TagsPill({filters, onChange}: PillProps) {
+	const popover = usePopover();
+	const selected = filters.tags?.include ?? [];
+
+	const {data: tagsData} = useLibraryQuery(
+		{type: 'tags.search', input: {query: '', limit: null}},
+		{enabled: popover.open || selected.length > 0}
+	);
+	const tags = tagsData?.tags ?? [];
+
+	const first = tags.find((tag) => tag.id === selected[0])?.name ?? 'Tag';
+	const label =
+		selected.length === 0
+			? 'Tags'
+			: selected.length === 1
+				? first
+				: `${first} +${selected.length - 1}`;
+
+	const toggle = (id: string) => {
+		const next = selected.includes(id)
+			? selected.filter((tag) => tag !== id)
+			: [...selected, id];
+		onChange({
+			...filters,
+			tags: next.length > 0 ? {include: next, exclude: []} : null
+		});
+	};
+
+	return (
+		<Popover.Root open={popover.open} onOpenChange={popover.setOpen}>
+			<Popover.Trigger asChild>
+				<SelectPill size="sm" className={pillClass(selected.length > 0)}>
+					{label}
+				</SelectPill>
+			</Popover.Trigger>
+			<Popover.Content align="start" sideOffset={8}>
+				<OptionList>
+					<OptionListItem
+						selected={selected.length === 0}
+						onClick={() => {
+							onChange({...filters, tags: null});
+							popover.setOpen(false);
+						}}
+					>
+						Any tag
+					</OptionListItem>
+					{tags.map((tag) => (
+						<OptionListItem
+							key={tag.id}
+							selected={selected.includes(tag.id)}
+							onClick={() => toggle(tag.id)}
+						>
+							<span className="flex w-full items-center gap-2">
+								<span
+									className="size-2 rounded-full"
+									style={{
+										backgroundColor: tagColor(tag)
+									}}
+								/>
+								{tag.path}
+							</span>
+						</OptionListItem>
+					))}
+				</OptionList>
+			</Popover.Content>
+		</Popover.Root>
+	);
+}
+
+function SizePill({filters, onChange}: PillProps) {
+	const popover = usePopover();
+	const activeIndex = filters.size_range
+		? SIZE_PRESETS.findIndex(
+				(preset) =>
+					(filters.size_range?.min ?? null) === preset.min &&
+					(filters.size_range?.max ?? null) === preset.max
+			)
+		: 0;
+
+	return (
+		<Popover.Root open={popover.open} onOpenChange={popover.setOpen}>
+			<Popover.Trigger asChild>
+				<SelectPill size="sm" className={pillClass(activeIndex > 0)}>
+					{activeIndex > 0 ? SIZE_PRESETS[activeIndex].label : 'Size'}
+				</SelectPill>
+			</Popover.Trigger>
+			<Popover.Content align="start" sideOffset={8}>
+				<OptionList>
+					{SIZE_PRESETS.map((preset, index) => (
+						<OptionListItem
+							key={preset.label}
+							selected={index === activeIndex}
+							onClick={() => {
+								onChange({
+									...filters,
+									size_range:
+										index === 0
+											? null
+											: {min: preset.min, max: preset.max}
+								});
+								popover.setOpen(false);
+							}}
+						>
+							{preset.label}
+						</OptionListItem>
+					))}
+				</OptionList>
+			</Popover.Content>
+		</Popover.Root>
+	);
+}
+
+function DatePill({filters, onChange}: PillProps) {
+	const popover = usePopover();
+
+	const activeDays = (() => {
+		if (!filters.date_range?.start) return null;
+		const elapsed =
+			Date.now() - new Date(filters.date_range.start).getTime();
+		return Math.round(elapsed / 86_400_000);
+	})();
+	const activePreset = DATE_PRESETS.find((p) => p.days === activeDays);
+
+	return (
+		<Popover.Root open={popover.open} onOpenChange={popover.setOpen}>
+			<Popover.Trigger asChild>
+				<SelectPill
+					size="sm"
+					className={pillClass(filters.date_range !== null)}
+				>
+					{filters.date_range
+						? (activePreset?.label ?? 'Custom')
+						: 'Modified'}
+				</SelectPill>
+			</Popover.Trigger>
+			<Popover.Content align="start" sideOffset={8}>
+				<OptionList>
+					{DATE_PRESETS.map((preset) => (
+						<OptionListItem
+							key={preset.label}
+							selected={
+								preset.days === null
+									? filters.date_range === null
+									: activeDays === preset.days
+							}
+							onClick={() => {
+								onChange({
+									...filters,
+									date_range:
+										preset.days === null
+											? null
+											: {
+													field: 'ModifiedAt',
+													start: new Date(
+														Date.now() -
+															preset.days *
+																86_400_000
+													).toISOString(),
+													end: null
+												}
+								});
+								popover.setOpen(false);
+							}}
+						>
+							{preset.label}
+						</OptionListItem>
+					))}
+				</OptionList>
+			</Popover.Content>
+		</Popover.Root>
+	);
+}
+
+function ExtensionPill({filters, onChange}: PillProps) {
+	const popover = usePopover();
+	const [draft, setDraft] = useState(filters.file_types?.join(', ') ?? '');
+	const active = (filters.file_types?.length ?? 0) > 0;
+
+	const apply = () => {
+		const extensions = draft
+			.split(',')
+			.map((ext) => ext.trim().replace(/^\./, '').toLowerCase())
+			.filter(Boolean);
+		onChange({
+			...filters,
+			file_types: extensions.length > 0 ? extensions : null
+		});
+		popover.setOpen(false);
+	};
+
+	return (
+		<Popover.Root open={popover.open} onOpenChange={popover.setOpen}>
+			<Popover.Trigger asChild>
+				<SelectPill size="sm" className={pillClass(active)}>
+					{active
+						? filters.file_types!.map((ext) => `.${ext}`).join(' ')
+						: 'Extension'}
+				</SelectPill>
+			</Popover.Trigger>
+			<Popover.Content align="start" sideOffset={8} className="p-2">
+				<Input
+					autoFocus
+					value={draft}
+					onChange={(e) => setDraft(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') apply();
+					}}
+					onBlur={apply}
+					placeholder="jpg, pdf, mp4"
+					className="w-40"
+				/>
+			</Popover.Content>
+		</Popover.Root>
+	);
+}

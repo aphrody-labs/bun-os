@@ -1,0 +1,31 @@
+[package]
+name    = "sd-ffmpeg"
+version = "0.1.0"
+
+authors                = ["Ericson Soares <ericson@spacedrive.com>", "Vítor Vasconcellos <vitor@spacedrive.com>"]
+description            = "A simple library to generate video thumbnails using ffmpeg with the webp format"
+edition.workspace      = true
+license.workspace      = true
+readme                 = "README.md"
+repository.workspace   = true
+rust-version.workspace = true
+
+[dependencies]
+# Spacedrive Sub-crates
+sd-utils = { path = "../utils" }
+
+# Workspace dependencies
+chrono    = { version = "0.4.39", features = ["serde"] }
+image     = { version = "0.25.5" }
+libc      = { version = "0.2.169" }
+thiserror = { version = "2.0.8" }
+tokio     = { version = "1.42.0", features = ["fs", "rt", "io-util"] }
+tracing   = { version = "0.1.41" }
+webp      = { workspace = true }
+
+# Specific FFmpeg dependencies
+ffmpeg-sys-next = "7.0"
+
+[dev-dependencies]
+tempfile = { version = "3.14.0" }
+tokio    = { version = "1.42.0", features = ["fs", "macros", "rt"] }

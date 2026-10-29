@@ -1,0 +1,474 @@
+//! Events domain for monitoring event bus in real-time
+
+mod args;
+
+pub use args::*;
+
+use crate::context::Context;
+use anyhow::Result;
+use chrono::{DateTime, Utc};
+use sd_core::infra::daemon::types::EventFilter;
+use sd_core::infra::event::Event;
+use sd_core::volume::VolumeState;
+use std::collections::HashSet;
+
+/// Run events command
+pub async fn run(ctx: &Context, cmd: EventsCmd) -> Result<()> {
+	match cmd {
+		EventsCmd::Monitor(args) => run_events_monitor(ctx, args).await,
+	}
+}
+
+/// Monitor events in real-time
+async fn run_events_monitor(ctx: &Context, args: EventsMonitorArgs) -> Result<()> {
+	println!("Monitoring events - Press Ctrl+C to exit");
+
+	// Parse event types filter
+	let event_types_filter: Option<HashSet<String>> = args
+		.event_type
+		.as_ref()
+		.map(|types| types.split(',').map(|s| s.trim().to_string()).collect());
+
+	if let Some(ref types) = event_types_filter {
+		println!(
+			"Filtering by event types: {}",
+			types.iter().cloned().collect::<Vec<_>>().join(", ")
+		);
+	}
+	if let Some(ref lib_id) = args.library_id {
+		println!("Filtering by library: {}", lib_id);
+	}
+	if let Some(ref job_id) = args.job_id {
+		println!("Filtering by job: {}", job_id);
+	}
+	if let Some(ref device_id) = args.device_id {
+		println!("Filtering by device: {}", device_id);
+	}
+	println!("═══════════════════════════════════════════════════════");
+
+	// Create event filter for daemon
+	let filter = EventFilter {
+		library_id: args.library_id,
+		job_id: args.job_id.clone(),
+		device_id: args.device_id,
+		resource_type: None,
+		path_scope: None,
+		include_descendants: None,
+	};
+
+	// Subscribe to all events (we'll filter by type client-side)
+	let event_types = vec![];
+
+	match ctx.core.subscribe_events(event_types, Some(filter)).await {
+		Ok(mut event_stream) => {
+			println!("Connected to event stream");
+			println!();
+
+			// Listen for events
+			while let Some(event) = event_stream.recv().await {
+				// Apply client-side event type filter
+				if let Some(ref types_filter) = event_types_filter {
+					let event_variant = event.variant_name();
+					if !types_filter.contains(event_variant) {
+						continue;
+					}
+				}
+
+				// Display the event
+				display_event(&event, &args);
+			}
+		}
+
+		Err(e) => {
+			println!("Failed to connect to event stream: {}", e);
+			println!("Make sure the daemon is running");
+		}
+	}
+
+	Ok(())
+}
+
+/// Display an event based on formatting preferences
+fn display_event(event: &Event, args: &EventsMonitorArgs) {
+	let timestamp = if args.timestamps {
+		format!("[{}] ", Utc::now().format("%H:%M:%S%.3f"))
+	} else {
+		String::new()
+	};
+
+	let event_variant = event.variant_name();
+
+	// Determine output format (new format flag takes precedence over legacy flags)
+	let use_json_pretty = matches!(args.format, OutputFormat::JsonPretty) || args.pretty;
+	let use_json = matches!(args.format, OutputFormat::Json) || use_json_pretty || args.verbose;
+
+	if use_json {
+		// JSON mode: show full JSON
+		let json_str = if use_json_pretty {
+			serde_json::to_string_pretty(&event).unwrap_or_else(|_| format!("{:?}", event))
+		} else {
+			serde_json::to_string(&event).unwrap_or_else(|_| format!("{:?}", event))
+		};
+		println!("{}{}: {}", timestamp, event_variant, json_str);
+	} else {
+		// Human-readable mode: show event type and key fields
+		let summary = summarize_event(event);
+		println!("{}{}: {}", timestamp, event_variant, summary);
+	}
+}
+
+/// Create a human-readable summary of an event
+fn summarize_event(event: &Event) -> String {
+	match event {
+		// Core lifecycle
+		Event::CoreStarted => "Core started".to_string(),
+		Event::CoreShutdown => "Core shutting down".to_string(),
+
+		// Cache invalidation
+		Event::Refresh => "Cache refresh triggered".to_string(),
+
+		// Library events
+		Event::LibraryCreated { name, id, .. } => {
+			format!("Library '{}' created ({})", name, id)
+		}
+		Event::LibraryOpened { name, id, .. } => {
+			format!("Library '{}' opened ({})", name, id)
+		}
+		Event::LibraryClosed { name, id } => {
+			format!("Library '{}' closed ({})", name, id)
+		}
+		Event::LibraryDeleted {
+			name,
+			id,
+			deleted_data,
+		} => {
+			format!(
+				"Library '{}' deleted ({}, data: {})",
+				name, id, deleted_data
+			)
+		}
+		Event::LibraryLoadFailed {
+			id,
+			path,
+			error,
+			error_type,
+		} => {
+			if let Some(lib_id) = id {
+				format!(
+					"Failed to load library {} at {:?}: {} ({})",
+					lib_id, path, error, error_type
+				)
+			} else {
+				format!(
+					"Failed to load library at {:?}: {} ({})",
+					path, error, error_type
+				)
+			}
+		}
+		Event::LibraryStatisticsUpdated { library_id, .. } => {
+			format!("Statistics updated for library {}", library_id)
+		}
+
+		// Volume events
+		Event::VolumeAdded(vol) => {
+			format!("Volume added: {} ({})", vol.name, vol.fingerprint.0)
+		}
+		Event::VolumeRemoved { fingerprint } => {
+			format!("Volume removed: {}", fingerprint.0)
+		}
+		Event::VolumeUpdated {
+			fingerprint,
+			old_info,
+			new_info,
+		} => {
+			let before = VolumeState::from_flags(old_info.is_mounted, old_info.locked);
+			let after = VolumeState::from_flags(new_info.is_mounted, new_info.locked);
+			if before == after {
+				format!("Volume updated: {}", fingerprint.0)
+			} else {
+				format!(
+					"Volume updated: {} ({} -> {})",
+					fingerprint.0,
+					before.as_str(),
+					after.as_str()
+				)
+			}
+		}
+		Event::VolumeSpeedTested {
+			fingerprint,
+			read_speed_mbps,
+			write_speed_mbps,
+		} => {
+			format!(
+				"Volume {} speed: read {}MB/s, write {}MB/s",
+				fingerprint.0, read_speed_mbps, write_speed_mbps
+			)
+		}
+		Event::VolumeMountChanged {
+			fingerprint,
+			is_mounted,
+			state,
+		} => match state.unwrap_or(VolumeState::from_flags(*is_mounted, false)) {
+			VolumeState::Locked => format!("Volume {} locked: key not loaded", fingerprint.0),
+			VolumeState::Unmounted => format!("Volume {} unmounted", fingerprint.0),
+			VolumeState::Mounted => format!("Volume {} mounted", fingerprint.0),
+		},
+		Event::VolumeError { fingerprint, error } => {
+			format!("Volume {} error: {}", fingerprint.0, error)
+		}
+
+		// Job events
+		Event::JobQueued {
+			job_id, job_type, ..
+		} => {
+			format!("Job queued: {} ({})", job_type, &job_id[..8])
+		}
+		Event::JobStarted {
+			job_id, job_type, ..
+		} => {
+			format!("Job started: {} ({})", job_type, &job_id[..8])
+		}
+		Event::JobProgress {
+			job_id,
+			job_type,
+			progress,
+			message,
+			..
+		} => {
+			let msg = message
+				.as_ref()
+				.map(|m| format!(" - {}", m))
+				.unwrap_or_default();
+			format!(
+				"Job progress: {} ({}) - {:.1}%{}",
+				job_type,
+				&job_id[..8],
+				progress,
+				msg
+			)
+		}
+		Event::JobCompleted {
+			job_id,
+			job_type,
+			output,
+			..
+		} => {
+			format!(
+				"Job completed: {} ({}) - {:?}",
+				job_type,
+				&job_id[..8],
+				output
+			)
+		}
+		Event::JobFailed {
+			job_id,
+			job_type,
+			error,
+			..
+		} => {
+			format!("Job failed: {} ({}) - {}", job_type, &job_id[..8], error)
+		}
+		Event::JobCancelled {
+			job_id, job_type, ..
+		} => {
+			format!("Job cancelled: {} ({})", job_type, &job_id[..8])
+		}
+		Event::JobPaused { job_id, .. } => {
+			format!("Job paused: {}", &job_id[..8])
+		}
+		Event::JobResumed { job_id, .. } => {
+			format!("Job resumed: {}", &job_id[..8])
+		}
+
+		// Device events
+		Event::DeviceConnected {
+			device_id,
+			device_name,
+		} => {
+			format!("Device connected: {} ({})", device_name, device_id)
+		}
+		Event::DeviceDisconnected { device_id } => {
+			format!("Device disconnected: {}", device_id)
+		}
+
+		// Resource events
+		Event::ResourceChanged {
+			resource_type,
+			resource,
+			..
+		} => {
+			if let Some(id) = resource.get("id") {
+				format!("Resource changed: {} ({})", resource_type, id)
+			} else {
+				format!("Resource changed: {}", resource_type)
+			}
+		}
+		Event::ResourceChangedBatch {
+			resource_type,
+			resources,
+			..
+		} => {
+			if let Some(arr) = resources.as_array() {
+				format!("Resources changed: {} ({} items)", resource_type, arr.len())
+			} else {
+				format!("Resources changed: {} (batch)", resource_type)
+			}
+		}
+		Event::ResourceDeleted {
+			resource_type,
+			resource_id,
+		} => {
+			format!("Resource deleted: {} ({})", resource_type, resource_id)
+		}
+
+		// Sync events
+		Event::SyncStateChanged {
+			previous_state,
+			new_state,
+			..
+		} => {
+			format!("Sync state changed: {} → {}", previous_state, new_state)
+		}
+		Event::SyncActivity {
+			peer_device_id,
+			count,
+			..
+		} => {
+			format!(
+				"Sync activity: {} changes from peer {}",
+				count, peer_device_id
+			)
+		}
+		Event::SyncConnectionChanged {
+			peer_name,
+			connected,
+			..
+		} => {
+			format!(
+				"Peer {} {}",
+				peer_name,
+				if *connected {
+					"connected"
+				} else {
+					"disconnected"
+				}
+			)
+		}
+		Event::SyncError { message, .. } => {
+			format!("Sync error: {}", message)
+		}
+
+		// Proxy pairing events
+		Event::ProxyPairingConfirmationRequired {
+			vouchee_device_name,
+			voucher_device_name,
+			..
+		} => {
+			format!(
+				"Proxy pairing confirmation required: {} vouched by {}",
+				vouchee_device_name, voucher_device_name
+			)
+		}
+		Event::ProxyPairingVouchingReady {
+			vouchee_device_id, ..
+		} => {
+			format!(
+				"Proxy pairing vouching ready for device {}",
+				vouchee_device_id
+			)
+		}
+
+		// Config events
+		Event::ConfigChanged { .. } => "Configuration changed".to_string(),
+
+		Event::ReplicationProgress { transfer } => format!(
+			"Replica {} from {}: {}{}",
+			transfer.root.display(),
+			transfer.device_label,
+			crate::util::output::format_transfer(
+				transfer.bytes,
+				transfer.total,
+				transfer.bytes_per_sec
+			),
+			if transfer.finished {
+				if transfer.bytes == transfer.total {
+					" (complete)"
+				} else {
+					" (stopped)"
+				}
+			} else {
+				""
+			}
+		),
+
+		// Custom events
+		Event::Custom { event_type, data } => {
+			format!("Custom event: {} - {:?}", event_type, data)
+		}
+
+		// Config events
+		Event::ConfigChanged { field } => {
+			format!("Configuration changed: {}", field)
+		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::summarize_event;
+	use sd_core::infra::event::Event;
+	use sd_core::volume::{VolumeFingerprint, VolumeInfo, VolumeState};
+
+	fn info(is_mounted: bool, locked: bool) -> VolumeInfo {
+		VolumeInfo {
+			is_mounted,
+			locked,
+			total_bytes_available: 0,
+			read_speed_mbps: None,
+			write_speed_mbps: None,
+			error_status: None,
+		}
+	}
+
+	#[test]
+	fn a_lock_and_an_unlock_are_named_as_such() {
+		let fingerprint = VolumeFingerprint("vault".to_string());
+		let locked = Event::VolumeMountChanged {
+			fingerprint: fingerprint.clone(),
+			is_mounted: false,
+			state: Some(VolumeState::Locked),
+		};
+		assert_eq!(
+			summarize_event(&locked),
+			"Volume vault locked: key not loaded"
+		);
+
+		let mounted = Event::VolumeMountChanged {
+			fingerprint: fingerprint.clone(),
+			is_mounted: true,
+			state: Some(VolumeState::Mounted),
+		};
+		assert_eq!(summarize_event(&mounted), "Volume vault mounted");
+
+		let from_an_older_daemon = Event::VolumeMountChanged {
+			fingerprint: fingerprint.clone(),
+			is_mounted: true,
+			state: None,
+		};
+		assert_eq!(
+			summarize_event(&from_an_older_daemon),
+			"Volume vault mounted",
+			"without a state the flag decides"
+		);
+
+		let updated = Event::VolumeUpdated {
+			fingerprint,
+			old_info: info(false, false),
+			new_info: info(false, true),
+		};
+		assert_eq!(
+			summarize_event(&updated),
+			"Volume updated: vault (unmounted -> locked)"
+		);
+	}
+}

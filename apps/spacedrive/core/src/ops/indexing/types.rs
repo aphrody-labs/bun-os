@@ -1,0 +1,615 @@
+//! Core types for efficient arena storage
+//!
+//! This module provides compact data structures for storing file system entries
+//! with minimal memory overhead. Key optimizations:
+//! - 32-bit node IDs (4 bytes vs 8 bytes for u64)
+//! - Bit-packed metadata (16 bytes for state, type, size, mtime, ctime)
+//! - String interning via NameRef pointers
+//!
+//! Memory per node: ~48 bytes vs ~200 bytes with HashMap<PathBuf, EntryMetadata>
+
+use serde::{Deserialize, Serialize};
+use smallvec::SmallVec;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+/// Identifies a node in the arena. Uses u32 to halve memory vs u64
+/// while supporting up to 4.3 billion nodes.
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct EntryId(u32);
+
+impl EntryId {
+	/// Create an EntryId from a usize index
+	///
+	/// # Panics
+	/// Panics if index >= u32::MAX - 1 (reserved for NONE sentinel)
+	pub fn from_usize(index: usize) -> Self {
+		assert!(
+			index < u32::MAX as usize - 1,
+			"EntryId overflow: index {} exceeds maximum",
+			index
+		);
+		Self(index as u32)
+	}
+
+	/// Get the underlying index as usize
+	pub fn as_usize(self) -> usize {
+		self.0 as usize
+	}
+
+	/// Get the raw u32 value
+	pub fn as_u32(self) -> u32 {
+		self.0
+	}
+}
+
+/// Optional EntryId using u32::MAX as None sentinel
+/// This saves 8 bytes per optional reference vs Option<EntryId>
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MaybeEntryId(u32);
+
+impl MaybeEntryId {
+	/// The sentinel value representing None
+	pub const NONE: Self = Self(u32::MAX);
+
+	/// Create a Some variant
+	pub fn some(id: EntryId) -> Self {
+		debug_assert!(id.0 != u32::MAX, "EntryId cannot use reserved NONE value");
+		Self(id.0)
+	}
+
+	/// Convert to Option<EntryId>
+	pub fn as_option(self) -> Option<EntryId> {
+		if self.0 == u32::MAX {
+			None
+		} else {
+			Some(EntryId(self.0))
+		}
+	}
+
+	/// Check if this is None
+	pub fn is_none(self) -> bool {
+		self.0 == u32::MAX
+	}
+
+	/// Check if this is Some
+	pub fn is_some(self) -> bool {
+		self.0 != u32::MAX
+	}
+}
+
+impl Default for MaybeEntryId {
+	fn default() -> Self {
+		Self::NONE
+	}
+}
+
+impl From<Option<EntryId>> for MaybeEntryId {
+	fn from(opt: Option<EntryId>) -> Self {
+		match opt {
+			Some(id) => Self::some(id),
+			None => Self::NONE,
+		}
+	}
+}
+
+/// Node state indicating accessibility
+#[repr(u8)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum NodeState {
+	#[default]
+	Unknown = 0,
+	Accessible = 1,
+	Inaccessible = 2,
+}
+
+impl NodeState {
+	pub fn from_u8(value: u8) -> Self {
+		match value {
+			0 => Self::Unknown,
+			1 => Self::Accessible,
+			2 => Self::Inaccessible,
+			_ => Self::Unknown,
+		}
+	}
+}
+
+/// File type classification
+#[repr(u8)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum FileType {
+	#[default]
+	Unknown = 0,
+	File = 1,
+	Directory = 2,
+	Symlink = 3,
+}
+
+impl FileType {
+	pub fn from_u8(value: u8) -> Self {
+		match value {
+			0 => Self::Unknown,
+			1 => Self::File,
+			2 => Self::Directory,
+			3 => Self::Symlink,
+			_ => Self::Unknown,
+		}
+	}
+}
+
+/// Convert from state::EntryKind to FileType
+impl From<super::state::EntryKind> for FileType {
+	fn from(kind: super::state::EntryKind) -> Self {
+		match kind {
+			super::state::EntryKind::File => FileType::File,
+			super::state::EntryKind::Directory => FileType::Directory,
+			super::state::EntryKind::Symlink => FileType::Symlink,
+		}
+	}
+}
+
+/// Convert from FileType to state::EntryKind
+impl From<FileType> for super::state::EntryKind {
+	fn from(ft: FileType) -> Self {
+		match ft {
+			FileType::File => super::state::EntryKind::File,
+			FileType::Directory => super::state::EntryKind::Directory,
+			FileType::Symlink => super::state::EntryKind::Symlink,
+			FileType::Unknown => super::state::EntryKind::File, // Default to file
+		}
+	}
+}
+
+/// Compact metadata packed into 16 bytes
+///
+/// Layout:
+/// - Bits 62-63: state (2 bits)
+/// - Bits 60-61: type (2 bits)
+/// - Bit 59: hidden
+/// - Bits 0-58: size (59 bits, max ~576 petabytes)
+/// - mtime: seconds since epoch (32 bits)
+/// - ctime: seconds since epoch (32 bits)
+///
+/// Hidden lives here because it is read from the entry's own stat on Windows
+/// (the hidden attribute) and only from its name elsewhere, so the arena has
+/// to keep what the walk saw rather than ask the filesystem again on every
+/// read. Snapshots written before the bit existed carry sizes under 2^59, so
+/// the bit reads as clear and the restore recomputes it where a name decides.
+#[repr(C)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+pub struct PackedMetadata {
+	/// Bits 62-63: state, 60-61: type, 59: hidden, 0-58: size
+	state_type_size: u64,
+	/// Modified time (seconds since epoch, 0 = None)
+	mtime: u32,
+	/// Created time (seconds since epoch, 0 = None)
+	ctime: u32,
+}
+
+impl PackedMetadata {
+	const SIZE_MASK: u64 = (1u64 << 59) - 1;
+	const HIDDEN_BIT: u64 = 1u64 << 59;
+	const TYPE_SHIFT: u32 = 60;
+	const STATE_SHIFT: u32 = 62;
+
+	/// Create new packed metadata
+	pub fn new(state: NodeState, file_type: FileType, size: u64) -> Self {
+		let size = size.min(Self::SIZE_MASK);
+		let packed =
+			size | ((file_type as u64) << Self::TYPE_SHIFT) | ((state as u64) << Self::STATE_SHIFT);
+
+		Self {
+			state_type_size: packed,
+			mtime: 0,
+			ctime: 0,
+		}
+	}
+
+	/// Get the file size
+	pub fn size(&self) -> u64 {
+		self.state_type_size & Self::SIZE_MASK
+	}
+
+	/// Get the file type
+	pub fn file_type(&self) -> FileType {
+		FileType::from_u8(((self.state_type_size >> Self::TYPE_SHIFT) & 0b11) as u8)
+	}
+
+	/// Get the node state
+	pub fn state(&self) -> NodeState {
+		NodeState::from_u8(((self.state_type_size >> Self::STATE_SHIFT) & 0b11) as u8)
+	}
+
+	/// Record whether the walk saw the entry as hidden.
+	pub fn with_hidden(mut self, hidden: bool) -> Self {
+		if hidden {
+			self.state_type_size |= Self::HIDDEN_BIT;
+		} else {
+			self.state_type_size &= !Self::HIDDEN_BIT;
+		}
+		self
+	}
+
+	/// Whether the walk saw the entry as hidden.
+	pub fn is_hidden(&self) -> bool {
+		self.state_type_size & Self::HIDDEN_BIT != 0
+	}
+
+	/// Set timestamps
+	pub fn with_times(mut self, mtime: Option<SystemTime>, ctime: Option<SystemTime>) -> Self {
+		self.mtime = mtime
+			.and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+			.map(|d| d.as_secs() as u32)
+			.unwrap_or(0);
+		self.ctime = ctime
+			.and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+			.map(|d| d.as_secs() as u32)
+			.unwrap_or(0);
+		self
+	}
+
+	/// Get modified time as SystemTime
+	pub fn mtime_as_system_time(&self) -> Option<SystemTime> {
+		if self.mtime == 0 {
+			None
+		} else {
+			Some(UNIX_EPOCH + std::time::Duration::from_secs(self.mtime as u64))
+		}
+	}
+
+	/// Get created time as SystemTime
+	pub fn ctime_as_system_time(&self) -> Option<SystemTime> {
+		if self.ctime == 0 {
+			None
+		} else {
+			Some(UNIX_EPOCH + std::time::Duration::from_secs(self.ctime as u64))
+		}
+	}
+
+	/// Get raw mtime value
+	pub fn mtime_secs(&self) -> u32 {
+		self.mtime
+	}
+
+	/// Get raw ctime value
+	pub fn ctime_secs(&self) -> u32 {
+		self.ctime
+	}
+}
+
+impl Default for PackedMetadata {
+	fn default() -> Self {
+		Self::new(NodeState::Unknown, FileType::Unknown, 0)
+	}
+}
+
+/// Reference to an interned string with parent link
+///
+/// Memory layout: 16 bytes total
+/// - ptr: 8 bytes (pointer to string in NameCache)
+/// - len: 4 bytes (string length)
+/// - parent: 4 bytes (parent EntryId or NONE)
+#[repr(C)]
+#[derive(Serialize, Deserialize)]
+pub struct NameRef {
+	/// Pointer to string in NameCache (stable reference)
+	/// Serialized as 0, reconstructed during snapshot load
+	#[serde(skip)]
+	#[serde(default)]
+	ptr: *const u8,
+	/// String length
+	len: u32,
+	/// Parent node ID (u32::MAX if root)
+	parent: MaybeEntryId,
+}
+
+// SAFETY: NameRef contains a raw pointer to an interned string that lives
+// as long as the NameCache. The NameCache is owned by Arena and
+// never deallocates strings. This makes NameRef safe to send between threads.
+unsafe impl Send for NameRef {}
+unsafe impl Sync for NameRef {}
+
+impl NameRef {
+	/// Create a new NameRef from an interned string
+	///
+	/// # Safety
+	/// The interned string must live as long as any NameRef referencing it.
+	/// This is guaranteed when used with NameCache.
+	pub fn new(interned: &str, parent: MaybeEntryId) -> Self {
+		Self {
+			ptr: interned.as_ptr(),
+			len: interned.len() as u32,
+			parent,
+		}
+	}
+
+	/// Get the filename
+	///
+	/// # Safety
+	/// Assumes the interned string is still valid. This is guaranteed
+	/// when NameCache is not dropped before NameRef.
+	pub fn name(&self) -> &str {
+		unsafe {
+			std::str::from_utf8_unchecked(std::slice::from_raw_parts(self.ptr, self.len as usize))
+		}
+	}
+
+	/// Get the parent entry ID
+	pub fn parent(&self) -> Option<EntryId> {
+		self.parent.as_option()
+	}
+}
+
+impl std::fmt::Debug for NameRef {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		f.debug_struct("NameRef")
+			.field("name", &self.name())
+			.field("parent", &self.parent.as_option())
+			.finish()
+	}
+}
+
+/// What a node contributes to the rollups of everything above it.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Rollup {
+	pub bytes: u64,
+	pub files: u32,
+}
+
+impl Rollup {
+	/// A file's own contribution: its size, and itself.
+	pub fn file(size: u64) -> Self {
+		Self {
+			bytes: size,
+			files: 1,
+		}
+	}
+
+	pub fn of(node: &FileNode) -> Self {
+		Self {
+			bytes: node.subtree_bytes,
+			files: node.file_count,
+		}
+	}
+
+	pub fn added(self) -> RollupDelta {
+		RollupDelta {
+			bytes: self.bytes as i64,
+			files: i64::from(self.files),
+		}
+	}
+
+	pub fn removed(self) -> RollupDelta {
+		RollupDelta {
+			bytes: -(self.bytes as i64),
+			files: -i64::from(self.files),
+		}
+	}
+}
+
+impl std::ops::AddAssign for Rollup {
+	fn add_assign(&mut self, other: Self) {
+		self.bytes = self.bytes.saturating_add(other.bytes);
+		self.files = self.files.saturating_add(other.files);
+	}
+}
+
+/// A change to apply along an ancestor chain.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct RollupDelta {
+	pub bytes: i64,
+	pub files: i64,
+}
+
+impl RollupDelta {
+	/// What it takes to turn `before` into `after`.
+	pub fn between(before: Rollup, after: Rollup) -> Self {
+		Self {
+			bytes: after.bytes as i64 - before.bytes as i64,
+			files: i64::from(after.files) - i64::from(before.files),
+		}
+	}
+
+	pub fn is_zero(&self) -> bool {
+		self.bytes == 0 && self.files == 0
+	}
+
+	pub fn apply_bytes(&self, current: u64) -> u64 {
+		if self.bytes >= 0 {
+			current.saturating_add(self.bytes as u64)
+		} else {
+			current.saturating_sub(self.bytes.unsigned_abs())
+		}
+	}
+
+	pub fn apply_files(&self, current: u32) -> u32 {
+		let applied = i64::from(current).saturating_add(self.files);
+		applied.clamp(0, i64::from(u32::MAX)) as u32
+	}
+}
+
+/// Single node in the file tree
+///
+/// Memory: ~48 bytes total
+/// - name_ref: 16 bytes
+/// - children: 8-24 bytes (SmallVec with inline storage)
+/// - meta: 16 bytes
+#[derive(Serialize, Deserialize)]
+pub struct FileNode {
+	/// Interned filename + parent reference
+	pub name_ref: NameRef,
+	/// Child node IDs (directories only)
+	/// SmallVec stores 0 elements inline (8 bytes), grows on heap when needed
+	pub children: SmallVec<[EntryId; 0]>,
+	/// Packed metadata
+	pub meta: PackedMetadata,
+	/// Sum of file sizes in this subtree (a file's own size for file nodes).
+	/// Maintained incrementally along the ancestor chain on add/remove, so
+	/// directory sizes are answerable without a walk.
+	pub subtree_bytes: u64,
+	/// Number of files in this subtree (1 for a file node). Maintained the same
+	/// way as `subtree_bytes`, and the second half of what a directory has to
+	/// report without being walked.
+	pub file_count: u32,
+}
+
+impl FileNode {
+	/// Create a new file node
+	pub fn new(name_ref: NameRef, meta: PackedMetadata) -> Self {
+		Self {
+			name_ref,
+			children: SmallVec::new(),
+			meta,
+			subtree_bytes: 0,
+			file_count: 0,
+		}
+	}
+
+	/// An empty node for a slot whose entry has been removed.
+	///
+	/// Marked `Inaccessible` so anything still holding the id reads it as a node
+	/// with nothing behind it rather than as an empty file. The name is a
+	/// `'static` empty string, which satisfies `NameRef`'s lifetime requirement
+	/// without touching the interner.
+	pub fn vacant() -> Self {
+		Self {
+			name_ref: NameRef::new("", MaybeEntryId::NONE),
+			children: SmallVec::new(),
+			meta: PackedMetadata::new(NodeState::Inaccessible, FileType::File, 0),
+			subtree_bytes: 0,
+			file_count: 0,
+		}
+	}
+
+	/// Get the filename
+	pub fn name(&self) -> &str {
+		self.name_ref.name()
+	}
+
+	/// Get the parent entry ID
+	pub fn parent(&self) -> Option<EntryId> {
+		self.name_ref.parent()
+	}
+
+	/// Check if this is a directory
+	pub fn is_directory(&self) -> bool {
+		self.meta.file_type() == FileType::Directory
+	}
+
+	/// Add a child (for directories) - checks for duplicates
+	pub fn add_child(&mut self, child_id: EntryId) {
+		// Prevent duplicate children
+		if !self.children.contains(&child_id) {
+			self.children.push(child_id);
+		}
+	}
+}
+
+impl std::fmt::Debug for FileNode {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		f.debug_struct("FileNode")
+			.field("name", &self.name())
+			.field("type", &self.meta.file_type())
+			.field("size", &self.meta.size())
+			.field("children", &self.children.len())
+			.finish()
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_entry_id_roundtrip() {
+		let id = EntryId::from_usize(42);
+		assert_eq!(id.as_usize(), 42);
+		assert_eq!(id.as_u32(), 42);
+	}
+
+	#[test]
+	fn test_maybe_entry_id() {
+		let none = MaybeEntryId::NONE;
+		assert!(none.is_none());
+		assert!(!none.is_some());
+		assert_eq!(none.as_option(), None);
+
+		let some = MaybeEntryId::some(EntryId::from_usize(42));
+		assert!(!some.is_none());
+		assert!(some.is_some());
+		assert_eq!(some.as_option(), Some(EntryId::from_usize(42)));
+	}
+
+	#[test]
+	fn test_packed_metadata_size() {
+		// Verify struct size is 16 bytes
+		assert_eq!(std::mem::size_of::<PackedMetadata>(), 16);
+	}
+
+	#[test]
+	fn test_packed_metadata_roundtrip() {
+		let meta = PackedMetadata::new(NodeState::Accessible, FileType::File, 12345);
+
+		assert_eq!(meta.state(), NodeState::Accessible);
+		assert_eq!(meta.file_type(), FileType::File);
+		assert_eq!(meta.size(), 12345);
+	}
+
+	#[test]
+	fn test_packed_metadata_max_size() {
+		// Test that large sizes are clamped
+		let meta = PackedMetadata::new(NodeState::Accessible, FileType::File, u64::MAX);
+
+		// Size should be clamped to 59-bit max
+		assert_eq!(meta.size(), (1u64 << 59) - 1);
+		assert_eq!(meta.file_type(), FileType::File);
+		assert!(!meta.is_hidden());
+	}
+
+	#[test]
+	fn test_packed_metadata_hidden_bit_leaves_the_rest_alone() {
+		let meta = PackedMetadata::new(NodeState::Accessible, FileType::Directory, 12_345)
+			.with_hidden(true);
+		assert!(meta.is_hidden());
+		assert_eq!(meta.size(), 12_345);
+		assert_eq!(meta.file_type(), FileType::Directory);
+		assert_eq!(meta.state(), NodeState::Accessible);
+		assert!(!meta.with_hidden(false).is_hidden());
+	}
+
+	#[test]
+	fn test_packed_metadata_times() {
+		use std::time::Duration;
+
+		let mtime = UNIX_EPOCH + Duration::from_secs(1700000000);
+		let ctime = UNIX_EPOCH + Duration::from_secs(1600000000);
+
+		let meta = PackedMetadata::new(NodeState::Accessible, FileType::File, 1000)
+			.with_times(Some(mtime), Some(ctime));
+
+		assert_eq!(meta.mtime_secs(), 1700000000);
+		assert_eq!(meta.ctime_secs(), 1600000000);
+		assert!(meta.mtime_as_system_time().is_some());
+		assert!(meta.ctime_as_system_time().is_some());
+	}
+
+	#[test]
+	fn test_name_ref_size() {
+		// Verify NameRef is 16 bytes
+		assert_eq!(std::mem::size_of::<NameRef>(), 16);
+	}
+
+	#[test]
+	fn test_file_type_conversion() {
+		use crate::ops::indexing::state::EntryKind;
+
+		assert_eq!(FileType::from(EntryKind::File), FileType::File);
+		assert_eq!(FileType::from(EntryKind::Directory), FileType::Directory);
+		assert_eq!(FileType::from(EntryKind::Symlink), FileType::Symlink);
+
+		assert_eq!(EntryKind::from(FileType::File), EntryKind::File);
+		assert_eq!(EntryKind::from(FileType::Directory), EntryKind::Directory);
+		assert_eq!(EntryKind::from(FileType::Symlink), EntryKind::Symlink);
+	}
+}

@@ -1,0 +1,1386 @@
+//! Library management system
+//!
+//! This module provides the core library functionality for Spacedrive.
+//! Each library is a self-contained directory with its own database,
+//! thumbnails, and other data.
+
+pub(crate) mod config;
+mod error;
+mod lock;
+mod manager;
+mod sync_helpers;
+
+pub use config::{AddDefaults, AddOverrides, LibraryConfig, LibrarySettings, LibraryStatistics};
+pub use error::{LibraryError, Result};
+pub use lock::LibraryLock;
+pub(crate) use manager::{sanitize_filename, CreationGuard};
+pub use manager::{DiscoveredLibrary, LibraryManager};
+
+/// Filename for the library database
+pub(crate) const LIBRARY_DB_FILENAME: &str = "library.db";
+
+use crate::infra::{
+	db::Database,
+	event::EventBus,
+	job::manager::JobManager,
+	sync::{SyncEventBus, TransactionManager},
+};
+use once_cell::sync::OnceCell;
+use sea_orm::ConnectionTrait;
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, RwLock as StdRwLock};
+use tokio::sync::{Mutex, RwLock};
+use tracing::{debug, info, warn};
+use uuid::Uuid;
+
+/// Represents an open Spacedrive library
+pub struct Library {
+	/// Root directory of the library (the .sdlibrary folder)
+	path: PathBuf,
+
+	/// Library configuration
+	config: Arc<RwLock<LibraryConfig>>,
+
+	/// Core context for accessing system services
+	core_context: Arc<crate::context::CoreContext>,
+
+	/// Database connection
+	db: Arc<Database>,
+
+	/// Job manager for this library
+	jobs: Arc<JobManager>,
+
+	/// General event bus for UI, jobs, volume events, etc
+	event_bus: Arc<EventBus>,
+
+	/// Dedicated sync event bus (prevents starvation from high-volume events)
+	sync_events: Arc<SyncEventBus>,
+
+	/// Transaction manager for atomic writes + sync logging
+	transaction_manager: Arc<TransactionManager>,
+
+	/// Sync service for real-time synchronization (initialized after library creation)
+	sync_service: OnceCell<Arc<crate::service::sync::SyncService>>,
+
+	/// Source manager for archive data (emails, notes, etc.) - initialized lazily
+	source_manager: OnceCell<Arc<crate::data::manager::SourceManager>>,
+
+	/// Library-specific device cache (slug → UUID)
+	/// Loaded from this library's devices table for per-library device resolution
+	device_cache: Arc<StdRwLock<HashMap<String, Uuid>>>,
+
+	/// Lock preventing concurrent access (wrapped in Mutex to allow explicit release during shutdown)
+	_lock: std::sync::Mutex<Option<LibraryLock>>,
+}
+
+impl Library {
+	/// Get the library ID
+	pub fn id(&self) -> Uuid {
+		// Config is immutable for ID, so we can use try_read
+		self.config.try_read().map(|c| c.id).unwrap_or_else(|_| {
+			// This should never happen in practice
+			panic!("Failed to read library config for ID")
+		})
+	}
+
+	/// Get the library name
+	pub async fn name(&self) -> String {
+		self.config.read().await.name.clone()
+	}
+
+	/// Get the library path
+	pub fn path(&self) -> &Path {
+		&self.path
+	}
+
+	/// Get the database
+	pub fn db(&self) -> &Arc<Database> {
+		&self.db
+	}
+
+	/// Get the general event bus (for UI, jobs, volumes, etc)
+	pub fn event_bus(&self) -> &Arc<EventBus> {
+		&self.event_bus
+	}
+
+	/// Get the dedicated sync event bus
+	pub fn sync_events(&self) -> &Arc<SyncEventBus> {
+		&self.sync_events
+	}
+
+	/// Get the job manager
+	pub fn jobs(&self) -> &Arc<JobManager> {
+		&self.jobs
+	}
+
+	/// Get the transaction manager
+	pub fn transaction_manager(&self) -> &Arc<TransactionManager> {
+		&self.transaction_manager
+	}
+
+	/// Get the sync service
+	pub fn sync_service(&self) -> Option<&Arc<crate::service::sync::SyncService>> {
+		self.sync_service.get()
+	}
+
+	/// Get the source manager (for archive data)
+	pub fn source_manager(&self) -> Option<&Arc<crate::data::manager::SourceManager>> {
+		self.source_manager.get()
+	}
+
+	/// Initialize the source manager (called during library setup)
+	pub async fn init_source_manager(self: &Arc<Self>) -> Result<()> {
+		if self.source_manager.get().is_some() {
+			warn!(
+				"Source manager already initialized for library {}",
+				self.id()
+			);
+			return Ok(());
+		}
+
+		// Stores and adapters are machine artifacts, not library ones: a store
+		// is rebuilt wherever it is needed and an adapter is installed once for
+		// every library on the machine. The registration is what belongs to the
+		// library, and that is a row in `sources`.
+		let dirs = crate::infra::source_dirs::SourceDirs::from_default_data_dir()
+			.map_err(|e| LibraryError::Other(format!("Failed to resolve source layout: {e}")))?;
+		let adapters_dir = crate::config::default_data_dir()
+			.map_err(|e| LibraryError::Other(format!("Failed to resolve data directory: {e}")))?
+			.join("adapters");
+
+		let source_manager =
+			crate::data::manager::SourceManager::new(dirs.root().to_path_buf(), adapters_dir)
+				.await
+				.map_err(|e| {
+					LibraryError::Other(format!("Failed to create source manager: {e}"))
+				})?;
+
+		self.source_manager
+			.set(Arc::new(source_manager))
+			.map_err(|_| LibraryError::Other("Source manager already initialized".to_string()))?;
+
+		debug!("Source manager initialized for library {}", self.id());
+
+		Ok(())
+	}
+
+	/// Get core context
+	pub fn core_context(&self) -> &Arc<crate::context::CoreContext> {
+		&self.core_context
+	}
+
+	/// Initialize the sync service (called during library setup)
+	#[cfg_attr(test, allow(dead_code))] // Exposed for integration tests
+	pub async fn init_sync_service(
+		&self,
+		device_id: Uuid,
+		network: Arc<dyn crate::infra::sync::NetworkTransport>,
+	) -> Result<()> {
+		if self.sync_service.get().is_some() {
+			warn!(
+				"Sync service already initialized for library {}, cannot replace transport. Transport: {}",
+				self.id(),
+				self.sync_service.get().unwrap().peer_sync().transport_name()
+			);
+			return Ok(());
+		}
+
+		let sync_service =
+			crate::service::sync::SyncService::new_from_library(self, device_id, network)
+				.await
+				.map_err(|e| {
+					LibraryError::Other(format!("Failed to create sync service: {}", e))
+				})?;
+
+		self.sync_service
+			.set(Arc::new(sync_service))
+			.map_err(|_| LibraryError::Other("Sync service already initialized".to_string()))?;
+
+		// Start the sync service
+		if let Some(service) = self.sync_service.get() {
+			use crate::service::Service;
+			service
+				.start()
+				.await
+				.map_err(|e| LibraryError::Other(format!("Failed to start sync service: {}", e)))?;
+		}
+
+		// Ensure current device is synced as shared resource (one-time migration)
+		// This handles the transition from device-owned to shared sync for existing devices
+		self.ensure_device_synced_as_shared(device_id).await?;
+
+		Ok(())
+	}
+
+	/// Ensure the current device is synced as a shared resource
+	/// This is called once during sync initialization to handle migration from device-owned to shared sync
+	async fn ensure_device_synced_as_shared(&self, device_id: Uuid) -> Result<()> {
+		use crate::infra::db::entities;
+		use crate::infra::sync::ChangeType;
+		use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
+
+		// Find the current device in the database
+		let device = entities::device::Entity::find()
+			.filter(entities::device::Column::Uuid.eq(device_id))
+			.one(self.db().conn())
+			.await
+			.map_err(|e| LibraryError::Other(format!("Failed to query device: {}", e)))?;
+
+		if let Some(device_model) = device {
+			// Sync the device record as a shared resource
+			// This ensures it will propagate to all other devices in the library
+			self.sync_model(&device_model, ChangeType::Insert)
+				.await
+				.map_err(|e| {
+					LibraryError::Other(format!("Failed to sync device as shared resource: {}", e))
+				})?;
+
+			info!(
+				"Synced device {} as shared resource for library {}",
+				device_id,
+				self.id()
+			);
+		}
+
+		Ok(())
+	}
+
+	/// Get a copy of the current configuration
+	pub async fn config(&self) -> LibraryConfig {
+		self.config.read().await.clone()
+	}
+
+	/// Update library configuration
+	pub async fn update_config<F>(&self, f: F) -> Result<()>
+	where
+		F: FnOnce(&mut LibraryConfig),
+	{
+		let mut config = self.config.write().await;
+		f(&mut config);
+		config.updated_at = chrono::Utc::now();
+		config.save(&self.path.join("library.json")).await?;
+
+		Ok(())
+	}
+
+	/// Reload library configuration from disk
+	pub async fn reload_config(&self) -> Result<()> {
+		let config_path = self.path.join("library.json");
+		let json = tokio::fs::read_to_string(config_path).await?;
+		let config: LibraryConfig = serde_json::from_str(&json)?;
+
+		let mut current_config = self.config.write().await;
+		*current_config = config;
+
+		// Note: Cannot call self.id() here as we still hold the write lock
+		// The caller should log this if needed
+
+		Ok(())
+	}
+
+	/// Save library configuration to disk
+	pub async fn save_config(&self, config: &LibraryConfig) -> Result<()> {
+		config.save(&self.path.join("library.json")).await
+	}
+
+	/// Load device cache from library database
+	/// Returns HashMap of device_slug → device_uuid for all devices in this library
+	pub(crate) async fn load_device_cache_from_db(
+		db: &crate::infra::db::Database,
+	) -> Result<HashMap<String, Uuid>> {
+		use crate::infra::db::entities;
+		use sea_orm::EntityTrait;
+
+		let devices = entities::device::Entity::find()
+			.all(db.conn())
+			.await
+			.map_err(|e| LibraryError::Other(format!("Failed to load devices: {}", e)))?;
+
+		let cache: HashMap<String, Uuid> = devices.into_iter().map(|d| (d.slug, d.uuid)).collect();
+
+		debug!("Loaded {} devices into library cache", cache.len());
+
+		Ok(cache)
+	}
+
+	/// Resolve device slug to UUID within this library
+	/// Checks current device first, then library's device cache
+	pub fn resolve_device_slug(&self, slug: &str) -> Option<Uuid> {
+		// Priority 1: Check if it's the current device
+		let current_device_id = crate::device::get_current_device_id();
+		let current_device_slug = crate::device::get_current_device_slug();
+
+		if slug == current_device_slug {
+			return Some(current_device_id);
+		}
+
+		// Priority 2: Check library's device cache
+		if let Ok(cache) = self.device_cache.read() {
+			if let Some(device_id) = cache.get(slug).copied() {
+				return Some(device_id);
+			}
+		}
+
+		// Priority 3: Fall back to paired devices from networking layer
+		// This allows file transfers between paired devices even if they're not in the library DB
+		if let Ok(networking_guard) = self.core_context.networking.try_read() {
+			if let Some(networking) = networking_guard.as_ref() {
+				if let Ok(registry) = networking.device_registry().try_read() {
+					// Check all devices in the registry for a matching slug
+					for (device_id, state) in registry.get_all_devices() {
+						let device_info = match state {
+							crate::service::network::device::DeviceState::Paired {
+								info, ..
+							}
+							| crate::service::network::device::DeviceState::Connected {
+								info,
+								..
+							}
+							| crate::service::network::device::DeviceState::Disconnected {
+								info,
+								..
+							} => Some(info),
+							_ => None,
+						};
+
+						if let Some(info) = device_info {
+							if info.device_slug == slug {
+								return Some(device_id);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		None
+	}
+
+	/// Reload device cache from database
+	/// Called after device changes (e.g., sync updates, device registration)
+	pub async fn reload_device_cache(&self) -> Result<()> {
+		let new_cache = Self::load_device_cache_from_db(&self.db).await?;
+
+		let mut cache = self
+			.device_cache
+			.write()
+			.map_err(|_| LibraryError::Other("Device cache lock poisoned".to_string()))?;
+
+		debug!(
+			"Reloading device cache for library {}: {} devices",
+			self.id(),
+			new_cache.len()
+		);
+		*cache = new_cache;
+
+		Ok(())
+	}
+
+	/// Add or update device in cache
+	/// Called when device joins/updates via sync
+	pub fn cache_device(&self, slug: String, device_id: Uuid) -> Result<()> {
+		let mut cache = self
+			.device_cache
+			.write()
+			.map_err(|_| LibraryError::Other("Device cache lock poisoned".to_string()))?;
+		cache.insert(slug.clone(), device_id);
+		debug!(
+			"Cached device in library {}: {} -> {}",
+			self.id(),
+			slug,
+			device_id
+		);
+		Ok(())
+	}
+
+	/// Ensure slug is unique within existing slugs
+	/// Appends -2, -3, etc. if collision detected (like VolumeManager does)
+	pub fn ensure_unique_slug(base_slug: &str, existing_slugs: &[String]) -> String {
+		let mut candidate = base_slug.to_string();
+		let mut counter = 2;
+
+		while existing_slugs.contains(&candidate) {
+			candidate = format!("{}-{}", base_slug, counter);
+			counter += 1;
+
+			if counter > 1000 {
+				// Fallback: use UUID suffix if too many collisions
+				let uuid_suffix = Uuid::new_v4()
+					.to_string()
+					.split('-')
+					.next()
+					.unwrap()
+					.to_string();
+				return format!("{}-{}", base_slug, uuid_suffix);
+			}
+		}
+
+		candidate
+	}
+
+	/// Get the job logs directory for this library
+	pub fn job_logs_dir(&self) -> PathBuf {
+		self.path.join("logs")
+	}
+
+	/// Shutdown the library, gracefully stopping all jobs
+	///
+	/// The lock file goes whatever happens on the way: a job manager that
+	/// could not pause a running job in time used to return early here and
+	/// leave the lock behind, so the next process in the same hour refused
+	/// the library as in use by a process that had already finished with it.
+	pub async fn shutdown(&self) -> Result<()> {
+		let result = self.shutdown_inner().await;
+		if let Ok(mut lock_guard) = self._lock.lock() {
+			if let Some(mut lock) = lock_guard.take() {
+				lock.release();
+				debug!("Library lock explicitly released during shutdown");
+			}
+		}
+		result
+	}
+
+	async fn shutdown_inner(&self) -> Result<()> {
+		debug!("Shutting down library {}", self.id());
+
+		// Stop sync service
+		if let Some(sync_service) = self.sync_service() {
+			use crate::service::Service;
+			if let Err(e) = sync_service.stop().await {
+				warn!("Error stopping sync service: {}", e);
+			}
+		}
+
+		// Shutdown the job manager, which will pause all running jobs
+		self.jobs.shutdown().await?;
+
+		// Save config to ensure any updates are persisted
+		let config = self.config.read().await;
+		self.save_config(&*config).await?;
+
+		// Close library database connection properly
+		debug!("Closing library database connection");
+
+		// First, checkpoint the WAL file to merge it back into the main database
+		use sea_orm::{ConnectionTrait, Statement};
+		if let Err(e) = self
+			.db
+			.as_ref()
+			.conn()
+			.execute(Statement::from_string(
+				sea_orm::DatabaseBackend::Sqlite,
+				"PRAGMA wal_checkpoint(TRUNCATE)",
+			))
+			.await
+		{
+			warn!("Failed to checkpoint WAL file: {}", e);
+		} else {
+			debug!("WAL file checkpointed successfully");
+		}
+
+		if let Err(e) = self.db.as_ref().conn().clone().close().await {
+			warn!("Failed to close library database connection: {}", e);
+		} else {
+			debug!("Library database connection closed successfully");
+		}
+
+		// Clear device cache from DeviceManager
+		if let Err(e) = self.core_context.device_manager.clear_paired_device_cache() {
+			warn!("Failed to clear paired device cache: {}", e);
+		}
+
+		Ok(())
+	}
+
+	/// Delete the library, including all data
+	pub async fn delete(&self) -> Result<bool> {
+		// Shutdown the library
+		self.shutdown().await?;
+
+		// Delete the library directory if it exists
+		if tokio::fs::metadata(self.path()).await.is_err() {
+			return Ok(false);
+		}
+
+		tokio::fs::remove_dir_all(self.path()).await?;
+		Ok(true)
+	}
+
+	/// Update library statistics
+	pub async fn update_statistics<F>(&self, f: F) -> Result<()>
+	where
+		F: FnOnce(&mut LibraryStatistics),
+	{
+		self.update_config(|config| {
+			f(&mut config.statistics);
+			config.statistics.updated_at = chrono::Utc::now();
+		})
+		.await
+	}
+
+	/// Get cached statistics immediately (non-blocking)
+	pub async fn get_statistics(&self) -> LibraryStatistics {
+		// Get library info before any potential locking
+		let library_id = self.id();
+		let library_name = self.name().await;
+
+		// Try to reload config from disk to get latest statistics
+		if let Err(e) = self.reload_config().await {
+			debug!(
+				library_id = %library_id,
+				library_name = %library_name,
+				error = %e,
+				"Failed to reload config from disk, using cached statistics"
+			);
+		} else {
+			debug!(
+				library_id = %library_id,
+				"Reloaded library configuration from disk"
+			);
+		}
+
+		let stats = self.config.read().await.statistics.clone();
+
+		// Trigger non-blocking recalculation
+		if let Err(e) = self.recalculate_statistics().await {
+			debug!(
+				library_id = %library_id,
+				library_name = %library_name,
+				error = %e,
+				"Failed to trigger statistics recalculation"
+			);
+		}
+
+		debug!(
+			library_id = %library_id,
+			library_name = %library_name,
+			total_files = stats.total_files,
+			total_size = stats.total_size,
+			database_size = stats.database_size,
+			updated_at = %stats.updated_at,
+			"Retrieved library statistics"
+		);
+
+		stats
+	}
+
+	/// Calculate statistics directly from database (for queries)
+	/// This is synchronous and queries the database directly for accurate real-time stats
+	pub async fn calculate_statistics_for_query(&self) -> Result<LibraryStatistics> {
+		let library_id = self.id();
+		let library_name = self.name().await;
+
+		debug!(
+			library_id = %library_id,
+			library_name = %library_name,
+			"Calculating statistics from database for query"
+		);
+
+		// Calculate all statistics from database
+		let stats = self.calculate_all_statistics().await?;
+
+		debug!(
+			library_id = %library_id,
+			library_name = %library_name,
+			total_files = stats.total_files,
+			total_size = stats.total_size,
+			source_count = stats.source_count,
+			tag_count = stats.tag_count,
+			device_count = stats.device_count,
+			total_capacity = stats.total_capacity,
+			available_capacity = stats.available_capacity,
+			"Completed database statistics calculation for query"
+		);
+
+		Ok(stats)
+	}
+
+	/// Trigger async statistics recalculation
+	/// Current capacity readings by fingerprint, from live detection.
+	/// Volume rows persist at track time and age, and only live detection
+	/// applies filesystem-specific corrections such as the ZFS pool-root
+	/// capacity fix.
+	pub(crate) async fn live_capacity_by_fingerprint(
+		volume_manager: &crate::volume::VolumeManager,
+	) -> std::collections::HashMap<String, (u64, u64)> {
+		volume_manager
+			.get_all_volumes()
+			.await
+			.into_iter()
+			.map(|volume| {
+				(
+					volume.fingerprint.0.clone(),
+					(volume.total_capacity, volume.available_space),
+				)
+			})
+			.collect()
+	}
+
+	pub async fn recalculate_statistics(&self) -> Result<()> {
+		let library_id = self.id();
+		let library_name = self.name().await;
+		let event_bus = self.event_bus.clone();
+		let path = self.path().to_path_buf();
+		let db = self.db().clone();
+		let config = self.config.read().await.clone();
+		let config_lock = Arc::clone(&self.config);
+		let live_capacity =
+			Self::live_capacity_by_fingerprint(&self.core_context.volume_manager).await;
+
+		debug!(
+			library_id = %library_id,
+			library_name = %library_name,
+			"Starting async statistics recalculation for library"
+		);
+
+		// Spawn background task to calculate statistics
+		tokio::spawn(async move {
+			debug!(
+				library_id = %library_id,
+				library_name = %library_name,
+				"Background statistics calculation task started"
+			);
+
+			if let Err(e) = Self::calculate_statistics_async_static(
+				library_id,
+				event_bus.clone(),
+				path,
+				db,
+				config,
+				config_lock,
+				live_capacity,
+			)
+			.await
+			{
+				tracing::error!(
+					library_id = %library_id,
+					library_name = %library_name,
+					error = %e,
+					"Failed to calculate library statistics"
+				);
+			} else {
+				// debug!(
+				// 	library_id = %library_id,
+				// 	library_name = %library_name,
+				// 	"Background statistics calculation completed successfully"
+				// );
+			}
+		});
+		Ok(())
+	}
+
+	/// Calculate all statistics asynchronously (static version for background task)
+	async fn calculate_statistics_async_static(
+		library_id: Uuid,
+		event_bus: Arc<EventBus>,
+		path: PathBuf,
+		db: Arc<Database>,
+		mut config: LibraryConfig,
+		config_lock: Arc<RwLock<LibraryConfig>>,
+		live_capacity: std::collections::HashMap<String, (u64, u64)>,
+	) -> Result<()> {
+		debug!(
+			library_id = %library_id,
+			library_name = %config.name,
+			"Starting statistics calculation from database"
+		);
+
+		let mut stats = Self::calculate_all_statistics_static(&db, &path, &live_capacity).await?;
+		stats.updated_at = chrono::Utc::now();
+
+		debug!(
+			library_id = %library_id,
+			library_name = %config.name,
+			total_files = stats.total_files,
+			total_size = stats.total_size,
+			source_count = stats.source_count,
+			tag_count = stats.tag_count,
+			device_count = stats.device_count,
+			total_capacity = stats.total_capacity,
+			available_capacity = stats.available_capacity,
+			database_size = stats.database_size,
+			sidecar_count = stats.sidecar_count,
+			sidecar_size = stats.sidecar_size,
+			"Calculated library statistics"
+		);
+
+		// Write the live config, not the snapshot this task started from: a
+		// config update made meanwhile would otherwise be lost. The lock is
+		// not held across the write because `Library::id` only tries it.
+		{
+			let mut cached_config = config_lock.write().await;
+			cached_config.statistics = stats;
+			config = cached_config.clone();
+		}
+		let config_path = path.join("library.json");
+		config.save(&config_path).await?;
+
+		debug!(
+			library_id = %library_id,
+			library_name = %config.name,
+			config_path = %config_path.display(),
+			"Saved updated statistics to library.json"
+		);
+
+		// Emit ResourceChanged event for normalizedCache using EventEmitter trait.
+		// Clients receive fleet totals: the persisted config keeps local-only
+		// figures, but an event carrying those would overwrite the summed
+		// statistics `libraries.info` served into the normalized cache.
+		let mut library = crate::domain::Library::from_config(&config, path.clone());
+		crate::service::mounts::peer::add_device_summaries(&mut library.statistics, db.conn())
+			.await;
+		use crate::domain::resource::EventEmitter;
+		if let Err(e) = library.emit_changed(&event_bus) {
+			warn!(
+				library_id = %library_id,
+				error = %e,
+				"Failed to emit library ResourceChanged event"
+			);
+		}
+
+		// Also emit the legacy event for backwards compatibility
+		event_bus.emit(crate::infra::event::Event::LibraryStatisticsUpdated {
+			library_id,
+			statistics: library.statistics.clone(),
+		});
+
+		debug!(
+			library_id = %library_id,
+			library_name = %config.name,
+			"Statistics calculation and save completed successfully, events emitted"
+		);
+
+		Ok(())
+	}
+
+	/// Calculate all statistics asynchronously
+	async fn calculate_statistics_async(&self) -> Result<()> {
+		let library_id = self.id();
+		let library_name = self.name().await;
+
+		debug!(
+			library_id = %library_id,
+			library_name = %library_name,
+			"Starting instance-based statistics calculation"
+		);
+
+		let mut stats = self.calculate_all_statistics().await?;
+		stats.updated_at = chrono::Utc::now();
+
+		debug!(
+			library_id = %library_id,
+			library_name = %library_name,
+			total_files = stats.total_files,
+			total_size = stats.total_size,
+			source_count = stats.source_count,
+			tag_count = stats.tag_count,
+			device_count = stats.device_count,
+			total_capacity = stats.total_capacity,
+			available_capacity = stats.available_capacity,
+			database_size = stats.database_size,
+			sidecar_count = stats.sidecar_count,
+			sidecar_size = stats.sidecar_size,
+			"Calculated library statistics (instance method)"
+		);
+
+		// Update config with new statistics
+		self.update_statistics(|existing_stats| {
+			*existing_stats = stats.clone();
+		})
+		.await?;
+
+		debug!(
+			library_id = %library_id,
+			library_name = %library_name,
+			"Updated and saved statistics via update_statistics method"
+		);
+
+		// Emit ResourceChanged event for normalizedCache using EventEmitter trait.
+		// Clients receive fleet totals: the persisted config keeps local-only
+		// figures, but an event carrying those would overwrite the summed
+		// statistics `libraries.info` served into the normalized cache.
+		let config = self.config.read().await;
+		let mut library = crate::domain::Library::from_config(&config, self.path().to_path_buf());
+		drop(config);
+		crate::service::mounts::peer::add_device_summaries(
+			&mut library.statistics,
+			self.db().conn(),
+		)
+		.await;
+
+		use crate::domain::resource::EventEmitter;
+		if let Err(e) = library.emit_changed(&self.event_bus) {
+			warn!(
+				library_id = %library_id,
+				error = %e,
+				"Failed to emit library ResourceChanged event"
+			);
+		}
+
+		// Also emit the legacy event for backwards compatibility
+		self.event_bus
+			.emit(crate::infra::event::Event::LibraryStatisticsUpdated {
+				library_id: self.id(),
+				statistics: library.statistics.clone(),
+			});
+
+		debug!(
+			library_id = %library_id,
+			library_name = %library_name,
+			"Instance-based statistics calculation completed successfully, events emitted"
+		);
+
+		Ok(())
+	}
+
+	/// Calculate all statistics from database (static version)
+	async fn calculate_all_statistics_static(
+		db: &Arc<Database>,
+		path: &PathBuf,
+		live_capacity: &std::collections::HashMap<String, (u64, u64)>,
+	) -> Result<LibraryStatistics> {
+		let db_conn = db.conn();
+
+		debug!("Starting file statistics calculation");
+		// Calculate file count and total size
+		let (total_files, total_size) = Self::calculate_file_statistics_static(&db_conn).await?;
+		debug!(
+			total_files = total_files,
+			total_size = total_size,
+			"Completed file statistics calculation"
+		);
+
+		debug!("Starting source count calculation");
+		let source_count = Self::calculate_source_count_static(&db_conn).await?;
+		debug!(
+			source_count = source_count,
+			"Completed source count calculation"
+		);
+
+		debug!("Starting tag count calculation");
+		// Calculate tag count
+		let tag_count = Self::calculate_tag_count_static(&db_conn).await?;
+		debug!(tag_count = tag_count, "Completed tag count calculation");
+
+		debug!("Starting device count calculation");
+		// Calculate device count
+		let device_count = Self::calculate_device_count_static(&db_conn).await?;
+		debug!(
+			device_count = device_count,
+			"Completed device count calculation"
+		);
+
+		debug!("Starting unique content count calculation");
+		// Calculate unique content count
+		let unique_content_count = Self::calculate_unique_content_count_static(&db_conn).await?;
+		debug!(
+			unique_content_count = unique_content_count,
+			"Completed unique content count calculation"
+		);
+
+		debug!("Starting volume capacity calculation");
+		// Calculate volume capacity
+		let (total_capacity, available_capacity) =
+			Self::calculate_volume_capacity_static(&db_conn, live_capacity).await?;
+		debug!(
+			total_capacity = total_capacity,
+			available_capacity = available_capacity,
+			"Completed volume capacity calculation"
+		);
+
+		debug!("Starting database size calculation");
+		// Calculate database size
+		let database_size = Self::calculate_database_size_static(path).await?;
+		debug!(
+			database_size = database_size,
+			"Completed database size calculation"
+		);
+
+		debug!("Starting sidecar statistics calculation");
+		// Calculate sidecar statistics
+		let (sidecar_count, sidecar_size) = Self::calculate_sidecar_statistics_static(path).await?;
+		debug!(
+			sidecar_count = sidecar_count,
+			sidecar_size = sidecar_size,
+			"Completed sidecar statistics calculation"
+		);
+
+		Ok(LibraryStatistics {
+			total_files,
+			total_size,
+			source_count,
+			tag_count,
+			device_count,
+			unique_content_count,
+			total_capacity,
+			available_capacity,
+			database_size,
+			sidecar_count,
+			sidecar_size,
+			last_indexed: None, // Will be preserved from existing config
+			updated_at: chrono::Utc::now(),
+		})
+	}
+
+	/// Calculate all statistics from database
+	async fn calculate_all_statistics(&self) -> Result<LibraryStatistics> {
+		let db = self.db().conn();
+
+		// Calculate file count and total size
+		let (total_files, total_size) = self.calculate_file_statistics(db).await?;
+
+		// Calculate source count
+		let source_count = self.calculate_source_count(db).await?;
+
+		// Calculate tag count
+		let tag_count = self.calculate_tag_count(db).await?;
+
+		// Calculate device count
+		let device_count = self.calculate_device_count(db).await?;
+
+		// Calculate unique content count
+		let unique_content_count = self.calculate_unique_content_count(db).await?;
+
+		// Calculate volume capacity
+		let (total_capacity, available_capacity) = self.calculate_volume_capacity(db).await?;
+
+		// Calculate database size
+		let database_size = self.calculate_database_size().await?;
+
+		// Calculate sidecar statistics
+		let (sidecar_count, sidecar_size) = self.calculate_sidecar_statistics().await?;
+
+		Ok(LibraryStatistics {
+			total_files,
+			total_size,
+			source_count,
+			tag_count,
+			device_count,
+			unique_content_count,
+			total_capacity,
+			available_capacity,
+			database_size,
+			sidecar_count,
+			sidecar_size,
+			last_indexed: self.config.read().await.statistics.last_indexed,
+			updated_at: chrono::Utc::now(),
+		})
+	}
+
+	/// Calculate file statistics from database
+	/// How many files this library keeps, and how many bytes they occupy.
+	///
+	/// Read off the source rows rather than counted, because each source
+	/// already maintains the totals for its own store as it is written.
+	/// Directories are records too, so they come off the count: someone asking
+	/// how many files they have does not mean folders.
+	async fn calculate_file_statistics(
+		&self,
+		db: &sea_orm::DatabaseConnection,
+	) -> Result<(u64, u64)> {
+		Self::calculate_file_statistics_static(db).await
+	}
+
+	/// Count the sources registered in this library.
+	async fn calculate_source_count(&self, db: &sea_orm::DatabaseConnection) -> Result<u32> {
+		Self::calculate_source_count_static(db).await
+	}
+
+	/// Calculate tag count: every definition this machine can name, staged
+	/// ones included, deduplicated across the stores that carry them.
+	async fn calculate_tag_count(&self, _db: &sea_orm::DatabaseConnection) -> Result<u32> {
+		let cache = self.core_context.volume_index();
+		let count = crate::ops::tags::definitions::all(self, cache).await.len() as u32;
+		debug!(tag_count = count, "Completed tag count calculation");
+		Ok(count)
+	}
+
+	/// Calculate device count
+	async fn calculate_device_count(&self, db: &sea_orm::DatabaseConnection) -> Result<u32> {
+		use crate::infra::db::entities::device;
+		use sea_orm::{EntityTrait, QueryTrait};
+
+		debug!("Starting device count calculation");
+		let devices = device::Entity::find().all(db).await?;
+		let count = devices.len() as u32;
+
+		debug!(device_count = count, "Completed device count calculation");
+
+		Ok(count)
+	}
+
+	/// Calculate unique content count
+	/// Distinct sets of bytes this library knows about.
+	///
+	/// Each store counts its own `content` rows, which are one per identity, so
+	/// a file held twice inside a source counts once. Two *sources* holding the
+	/// same file still count twice, because each store counts on its own.
+	async fn calculate_unique_content_count(
+		&self,
+		db: &sea_orm::DatabaseConnection,
+	) -> Result<u64> {
+		Self::calculate_unique_content_count_static(db).await
+	}
+
+	/// Calculate volume capacity (total and available) across all volumes
+	/// Only counts user-relevant volumes (Primary, UserData, External, Secondary)
+	/// Excludes system volumes (VM, Recovery, Preboot, etc.)
+	/// Excludes volumes that are subpaths of other volumes (e.g., /System/Volumes/Data/home inside /System/Volumes/Data)
+	async fn calculate_volume_capacity(
+		&self,
+		db: &sea_orm::DatabaseConnection,
+	) -> Result<(u64, u64)> {
+		let live = Self::live_capacity_by_fingerprint(&self.core_context.volume_manager).await;
+		Self::calculate_volume_capacity_static(db, &live).await
+	}
+
+	/// Calculate database file size
+	async fn calculate_database_size(&self) -> Result<u64> {
+		let db_path = self.path().join(LIBRARY_DB_FILENAME);
+
+		debug!(
+			db_path = %db_path.display(),
+			"Starting database size calculation"
+		);
+
+		if db_path.exists() {
+			let metadata = tokio::fs::metadata(&db_path).await?;
+			let size = metadata.len();
+
+			debug!(
+				database_size = size,
+				db_path = %db_path.display(),
+				"Completed database size calculation"
+			);
+
+			Ok(size)
+		} else {
+			debug!(
+				db_path = %db_path.display(),
+				"Database file does not exist, returning zero size"
+			);
+			Ok(0)
+		}
+	}
+
+	/// Calculate sidecar statistics (count and total size) by scanning sidecars directory
+	async fn calculate_sidecar_statistics(&self) -> Result<(u64, u64)> {
+		let sidecars_dir = self.path().join("sidecars");
+
+		debug!(
+			sidecars_dir = %sidecars_dir.display(),
+			"Starting sidecar statistics calculation"
+		);
+
+		let mut total_count = 0u64;
+		let mut total_size = 0u64;
+
+		if sidecars_dir.exists() {
+			let (count, size) = self.count_and_size_recursive(sidecars_dir.clone()).await?;
+			total_count += count;
+			total_size += size;
+		}
+
+		debug!(
+			sidecar_count = total_count,
+			sidecar_size = total_size,
+			"Completed sidecar statistics calculation"
+		);
+
+		Ok((total_count, total_size))
+	}
+
+	/// Count files and sum their sizes recursively in a directory
+	async fn count_and_size_recursive(&self, path: PathBuf) -> Result<(u64, u64)> {
+		Box::pin(self.count_and_size_recursive_impl(path)).await
+	}
+
+	async fn count_and_size_recursive_impl(&self, path: PathBuf) -> Result<(u64, u64)> {
+		let mut count = 0u64;
+		let mut size = 0u64;
+		let mut entries = tokio::fs::read_dir(&path).await?;
+
+		while let Some(entry) = entries.next_entry().await? {
+			let file_type = entry.file_type().await?;
+			if file_type.is_dir() {
+				let (sub_count, sub_size) =
+					Box::pin(self.count_and_size_recursive_impl(entry.path())).await?;
+				count += sub_count;
+				size += sub_size;
+			} else if file_type.is_file() {
+				count += 1;
+				if let Ok(metadata) = entry.metadata().await {
+					size += metadata.len();
+				}
+			}
+		}
+
+		Ok((count, size))
+	}
+
+	// Static versions of calculation methods for background tasks
+
+	pub(crate) async fn calculate_file_statistics_static(
+		db: &sea_orm::DatabaseConnection,
+	) -> Result<(u64, u64)> {
+		use crate::infra::db::entities::source;
+		use sea_orm::EntityTrait;
+
+		let sources = source::Entity::find().all(db).await?;
+
+		let mut file_count = 0u64;
+		let mut total_size = 0u64;
+		for source in sources {
+			let records = source.record_count.unwrap_or(0).max(0) as u64;
+			let directories = source.directory_count.unwrap_or(0).max(0) as u64;
+			file_count += records.saturating_sub(directories);
+			total_size += source.total_bytes.unwrap_or(0).max(0) as u64;
+		}
+
+		debug!(file_count, total_size, "Counted files across sources");
+		Ok((file_count, total_size))
+	}
+
+	/// Count the sources registered in this library (static version).
+	pub async fn calculate_source_count_static(db: &sea_orm::DatabaseConnection) -> Result<u32> {
+		use crate::infra::db::entities::source;
+		use sea_orm::{EntityTrait, PaginatorTrait};
+
+		let count = source::Entity::find().count(db).await?;
+		debug!(
+			source_count = count,
+			"Source count query completed successfully"
+		);
+		Ok(count as u32)
+	}
+
+	/// Calculate tag count (static version). Definitions live in source
+	/// stores, which need the cache the instance path has; before a library
+	/// is constructed only the staging table is reachable, and the instance
+	/// recount replaces this number once the library is open.
+	async fn calculate_tag_count_static(db: &sea_orm::DatabaseConnection) -> Result<u32> {
+		use crate::infra::db::entities::tag_staging;
+		use sea_orm::{EntityTrait, PaginatorTrait};
+
+		let count = tag_staging::Entity::find().count(db).await?;
+		debug!(tag_count = count, "Tag count query completed successfully");
+		Ok(count as u32)
+	}
+
+	/// Calculate device count (static version)
+	async fn calculate_device_count_static(db: &sea_orm::DatabaseConnection) -> Result<u32> {
+		use crate::infra::db::entities::device;
+		use sea_orm::{EntityTrait, PaginatorTrait, QuerySelect, QueryTrait, Select};
+
+		debug!("Executing device count query");
+		let count = device::Entity::find().count(db).await?;
+		debug!(
+			device_count = count,
+			"Device count query completed successfully"
+		);
+		Ok(count as u32)
+	}
+
+	pub(crate) async fn calculate_unique_content_count_static(
+		db: &sea_orm::DatabaseConnection,
+	) -> Result<u64> {
+		use crate::infra::db::entities::source;
+		use sea_orm::EntityTrait;
+
+		let count = source::Entity::find()
+			.all(db)
+			.await?
+			.into_iter()
+			.map(|source| source.content_count.unwrap_or(0).max(0) as u64)
+			.sum();
+
+		debug!(unique_content_count = count, "Counted unique content");
+		Ok(count)
+	}
+
+	/// Calculate volume capacity (total and available) across all volumes (static version)
+	/// Only counts user-relevant volumes (Primary, UserData, External, Secondary)
+	/// Excludes system volumes (VM, Recovery, Preboot, etc.)
+	/// Excludes volumes that are subpaths of other volumes (e.g., /System/Volumes/Data/home inside /System/Volumes/Data)
+	pub(crate) async fn calculate_volume_capacity_static(
+		db: &sea_orm::DatabaseConnection,
+		live_capacity: &std::collections::HashMap<String, (u64, u64)>,
+	) -> Result<(u64, u64)> {
+		use crate::infra::db::entities::volume;
+		use sea_orm::{EntityTrait, QueryTrait};
+
+		debug!("Executing volume capacity query");
+		let volumes = volume::Entity::find().all(db).await?;
+
+		// First pass: filter to user-visible volumes
+		let mut user_volumes: Vec<_> = volumes
+			.into_iter()
+			.filter(|vol| {
+				let volume_type = vol.volume_type.as_deref().unwrap_or("Unknown");
+				matches!(
+					volume_type,
+					"Primary" | "UserData" | "External" | "Secondary"
+				)
+			})
+			// Drop volumes the user can't see. Honor the persisted flag *and*
+			// re-check the current platform visibility rules so stale DB rows
+			// (created before the filter logic existed) don't inflate the
+			// library's reported capacity. Without this, every ZFS dataset on
+			// a TrueNAS pool gets counted even though they share storage.
+			.filter(|vol| {
+				vol.is_user_visible.unwrap_or(true)
+					&& !vol
+						.mount_point
+						.as_deref()
+						.map(std::path::Path::new)
+						.map(crate::volume::utils::should_hide_by_mount_path)
+						.unwrap_or(false)
+			})
+			.collect();
+
+		// Deduplicate by fingerprint first (same physical volume tracked multiple times)
+		let mut seen_fingerprints = std::collections::HashSet::new();
+		user_volumes.retain(|v| seen_fingerprints.insert(v.fingerprint.clone()));
+
+		// Prefer live readings where detection has one; see
+		// `live_capacity_by_fingerprint`.
+		for row in user_volumes.iter_mut() {
+			if let Some((total, available)) = live_capacity.get(&row.fingerprint) {
+				row.total_capacity = Some(*total as i64);
+				row.available_capacity = Some(*available as i64);
+			}
+		}
+
+		// Sort by mount point length (shorter first) to detect parent volumes first
+		user_volumes.sort_by_key(|v| v.mount_point.as_ref().map(|m| m.len()).unwrap_or(0));
+
+		let mut total_capacity = 0u64;
+		let mut available_capacity = 0u64;
+		let mut counted_volumes = 0;
+		let mut excluded_by_subpath = 0;
+
+		let mut counted_mount_points: Vec<(Uuid, String)> = Vec::new();
+
+		for vol in user_volumes {
+			let mount_point = match &vol.mount_point {
+				Some(mp) => mp,
+				None => continue,
+			};
+
+			// Check if this volume's mount point is a subpath of any already-counted volume on the SAME device
+			// Use path-aware comparison to avoid false positives like "/Volumes/Seagate" matching "/Volumes/Seagate 20TB"
+			let mount_path = std::path::Path::new(mount_point);
+			let is_subpath = counted_mount_points
+				.iter()
+				.any(|(parent_device, parent_mount)| {
+					vol.device_id == *parent_device
+						&& mount_path.starts_with(std::path::Path::new(parent_mount))
+						&& mount_point != parent_mount
+				});
+
+			if is_subpath {
+				debug!(
+					volume_type = vol.volume_type.as_deref().unwrap_or("Unknown"),
+					mount_point = ?mount_point,
+					device_id = ?vol.device_id,
+					"Excluding volume: subpath of already-counted volume on same device"
+				);
+				excluded_by_subpath += 1;
+				continue;
+			}
+
+			// Count this volume
+			if let Some(capacity) = vol.total_capacity {
+				total_capacity = total_capacity.saturating_add(capacity as u64);
+				counted_volumes += 1;
+				counted_mount_points.push((vol.device_id, mount_point.clone()));
+				debug!(
+					volume_type = vol.volume_type.as_deref().unwrap_or("Unknown"),
+					mount_point = ?mount_point,
+					capacity = capacity,
+					fingerprint = vol.fingerprint,
+					device_id = ?vol.device_id,
+					"Counted volume"
+				);
+			}
+			if let Some(available) = vol.available_capacity {
+				available_capacity = available_capacity.saturating_add(available as u64);
+			}
+		}
+
+		debug!(
+			total_capacity = total_capacity,
+			available_capacity = available_capacity,
+			counted_volumes = counted_volumes,
+			excluded_by_subpath = excluded_by_subpath,
+			"Volume capacity query completed successfully"
+		);
+
+		Ok((total_capacity, available_capacity))
+	}
+
+	/// Calculate database file size (static version)
+	async fn calculate_database_size_static(path: &PathBuf) -> Result<u64> {
+		let db_path = path.join(LIBRARY_DB_FILENAME);
+		if db_path.exists() {
+			let metadata = tokio::fs::metadata(&db_path).await?;
+			Ok(metadata.len())
+		} else {
+			Ok(0)
+		}
+	}
+
+	/// Calculate sidecar statistics (static version)
+	async fn calculate_sidecar_statistics_static(path: &PathBuf) -> Result<(u64, u64)> {
+		let sidecars_dir = path.join("sidecars");
+
+		let mut total_count = 0u64;
+		let mut total_size = 0u64;
+
+		if sidecars_dir.exists() {
+			let (count, size) = Self::count_and_size_recursive_static(sidecars_dir).await?;
+			total_count += count;
+			total_size += size;
+		}
+
+		Ok((total_count, total_size))
+	}
+
+	/// Count files and sum their sizes recursively (static version)
+	async fn count_and_size_recursive_static(path: PathBuf) -> Result<(u64, u64)> {
+		Box::pin(Self::count_and_size_recursive_static_impl(path)).await
+	}
+
+	async fn count_and_size_recursive_static_impl(path: PathBuf) -> Result<(u64, u64)> {
+		let mut count = 0u64;
+		let mut size = 0u64;
+		let mut entries = tokio::fs::read_dir(&path).await?;
+
+		while let Some(entry) = entries.next_entry().await? {
+			let file_type = entry.file_type().await?;
+			if file_type.is_dir() {
+				let (sub_count, sub_size) =
+					Box::pin(Self::count_and_size_recursive_static_impl(entry.path())).await?;
+				count += sub_count;
+				size += sub_size;
+			} else if file_type.is_file() {
+				count += 1;
+				if let Ok(metadata) = entry.metadata().await {
+					size += metadata.len();
+				}
+			}
+		}
+
+		Ok((count, size))
+	}
+}
+
+// Note: Library does not implement Clone due to the exclusive lock
+// Use Arc<Library> when you need shared access
+
+/// Current library configuration version
+pub const LIBRARY_CONFIG_VERSION: u32 = 2;
+
+/// Library directory extension
+pub const LIBRARY_EXTENSION: &str = "sdlibrary";
