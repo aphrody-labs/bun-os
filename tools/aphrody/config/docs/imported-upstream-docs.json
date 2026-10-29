@@ -15,12 +15,6 @@
       "except": ["docs/*/discord/packages/aphrody-messaging/**"]
     },
     {
-      "id": "spacedrive",
-      "upstream": "https://github.com/spacedriveapp/spacedrive",
-      "include": ["docs/*/ui/drive/**"],
-      "except": []
-    },
-    {
       "id": "material-web",
       "upstream": "https://github.com/material-components/material-web",
       "include": ["docs/*/ui/packages/material-web/**"],

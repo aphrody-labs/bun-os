@@ -522,7 +522,7 @@
           ],
           [
             "2026-10-08",
-            "Resolved app-ui module state leakage and stock Bun test dependencies: inlined typed invariant assertion helper in @aphrody/drive-client, isolated kit-bridge catalog cache and tauri-bridge initialization promises across test suites. Full app-ui test suite passes with 216 tests, 990 assertions; app-ui build packages 640 files into ui-dist; aphrody-terminal-backend checks and passes all 33 unit and integration tests.",
+            "Resolved app-ui module state leakage and stock Bun test dependencies: isolated kit-bridge catalog cache and tauri-bridge initialization promises across test suites. Full app-ui test suite passes with 216 tests, 990 assertions; app-ui build packages 640 files into ui-dist; aphrody-terminal-backend checks and passes all 33 unit and integration tests.",
             "Linux host tests; physical Windows and CEF graphics rendering qualified separately."
           ]
         ]

@@ -59,7 +59,7 @@ not copy or delete them during startup.
 | Agent sessions | `aphrody app-server` | broker-managed stdio JSON-RPC |
 | Web tools | Aphrody kernel | `aphrody_web` Obscura/provider subsystem |
 | Web retrieval and crawl | Aphrody kernel / Obscura | backend capability; no embedded browser or crawler-management view in the public webview |
-| File libraries | `aphrody-drive` + `sd-daemon` | local socket; daemon stays outside this Cargo graph |
+| File libraries | Spacedrive `sd-daemon` | local socket; daemon stays outside this Cargo graph |
 
 ## Capability surface (default-deny)
 
@@ -90,13 +90,7 @@ ui_dist_assets` checks that every listed file is staged byte-for-byte and that e
 `app.css` loads is present. The shipped configuration (`--features custom-protocol`) fails the
 build if a source is missing; a plain `cargo check` only warns.
 
-The daemon source lives in `apps/aphrody-drive/core/Cargo.toml`, outside the root Cargo graph.
-`crates/aphrody-drive` locates it from `APHRODY_DRIVE_DAEMON`, beside the app executable, or on
-`PATH`. The checked-in `tauri.drive.conf.json` declares a sidecar, but no current unified build
-command has been verified to compile and stage it for each target. Treat sidecar packaging and
-installed startup as open gates. The Files surface already composes `packages/app-ui`,
-`packages/m3-explorer`, `packages/drive-client`, and the native bridge. Android Files workflows
-still need to be brought into the unified Android product and qualified.
+The file service daemon is Spacedrive (`vendor/spacedrive`). The checked-in `tauri.drive.conf.json` declares no daemon sidecar until it is staged; treat sidecar packaging and installed startup as open gates.
 
 The supported serialized Cargo entry point is
 `bun scripts/aphrody/build/rust/cargo-serial.ts`; qualification must run through the VPS factory.

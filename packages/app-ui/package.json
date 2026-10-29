@@ -35,7 +35,6 @@
     "@aphrody/assets": "workspace:*",
     "@aphrody/bun-webview-page": "0.1.1-aphrody.2",
     "@aphrody/canvas": "workspace:*",
-    "@aphrody/drive-client": "workspace:*",
     "@aphrody/eslint-plugin-m3": "workspace:*",
     "@aphrody/fuzzy": "1.4.7",
     "@aphrody/identity": "workspace:*",

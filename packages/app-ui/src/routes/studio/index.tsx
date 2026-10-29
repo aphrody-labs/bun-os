@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
-// Studio of the desktop app: agent tools and Drive.
+// Studio of the desktop app: agent tools, Aphrody search and engine.
 // Each section calls an existing native owner through typed Studio commands.
 import { useState, type ComponentType } from "react";
 import { useSearchParams } from "react-router-dom";
 import { studioLabel, studioSection, studioSections, type StudioSection } from "./navigation";
 import { useI18n } from "../../i18n";
 export { studioSections, type StudioSection } from "./navigation";
-import { DriveStudio } from "./DriveStudio";
 import { A2AStudio } from "./A2AStudio";
 import { RuntimeStudio } from "./RuntimeStudio";
 import { GoogleStudio } from "./GoogleStudio";
 
 const panels: Record<StudioSection, ComponentType> = {
   a2a: A2AStudio,
-  drive: DriveStudio,
   runtime: RuntimeStudio,
   google: GoogleStudio,
 };

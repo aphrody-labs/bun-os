@@ -49,7 +49,6 @@ aphrody/
 │   ├── os/kernel/                # Noyau IPC et sous-systèmes OS
 │   └── ui/                       # Composants et applications graphiques natifs
 │       ├── app/                  # Application Desktop principale aphrody-app (Tauri 3)
-│       ├── drive/                # Plugin Tauri aphrody-drive
 │       ├── m3/                   # Implémentation Rust du design system Material 3
 │       └── tauri-wrap/           # Abstraction d'exécution webview Wry / CEF
 ├── packages/                     # Packages TypeScript / Bun de premier ordre
@@ -118,7 +117,6 @@ flowchart TD
     subgraph Rust_Crates["Crates Rust Backend & Native UI"]
         CR_M3["crates/ui/m3<br/>(aphrody-m3)"]
         CR_APP["crates/ui/app<br/>(aphrody-app Tauri v3)"]
-        CR_DRIVE["crates/ui/drive<br/>(aphrody-drive)"]
         CR_KERN["crates/os/kernel<br/>(Kernel IPC)"]
     end
 

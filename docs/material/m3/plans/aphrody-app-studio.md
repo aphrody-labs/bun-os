@@ -9,7 +9,7 @@ fine-tuning, d'agent home dbfr et du Drive dbfr. Cet accord lève la réserve de
 mise en production du site et du bot reste une opération distincte.
 
 Règles : aucun moteur recréé (Koharu, `aphrody-ocr*`, `aphrody-train`,
-`aphrody-drive`, `@shenron/ui`, `@koharu/ui`, M3 restent propriétaires) ; pas de
+`@shenron/ui`, `@koharu/ui`, M3 restent propriétaires) ; pas de
 régression des surfaces existantes (chat, fichiers, modèles, réglages) ; Cargo
 uniquement via `scripts/build/rust/cargo-serial.sh`, une commande à la fois.
 
@@ -33,7 +33,7 @@ uniquement via `scripts/build/rust/cargo-serial.sh`, une commande à la fois.
    `paddle_ocr_vl`), LLM local (`aphrody-llama-server` vs `koharu-llama`) ;
    adaptateurs côté Koharu, parité par fixtures, aucune régression des tests.
 5. **Drive dbfr.** Volume cloud Google Drive (OpenDAL `services-gdrive`,
-   `ops/volumes/add_cloud`) monté par `aphrody-drive` sur le dossier dbfr ;
+   `ops/volumes/add_cloud`) monté par le service de fichiers Spacedrive sur le dossier dbfr ;
    synchronisation vers `~/.aphrody/workspaces/dbfr`.
 6. **Modèles et stubs.** Chargement des modèles Koharu, OCR et chat depuis le hub
    Modèles (`aphrody-models`), complétion des stubs restants, puis refonte UI

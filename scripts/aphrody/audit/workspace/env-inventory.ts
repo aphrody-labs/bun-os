@@ -169,7 +169,7 @@ const sections: [string, (key: string) => boolean][] = [
   [
     "Browser, system and rendering",
     key =>
-      /^(OBSCURA_|APHRODY_WEB_|APHRODY_BROWSER_|CHROME_|AGENT_BROWSER_|FFMPEG_|CUDA_|HIP_|VULKAN_|AMD|BLAS_|OPENBLAS_|WINE|WINCLEAN_|SD_|SPACEDRIVE_)/.test(
+      /^(OBSCURA_|APHRODY_WEB_|APHRODY_BROWSER_|CHROME_|AGENT_BROWSER_|FFMPEG_|CUDA_|HIP_|VULKAN_|AMD|BLAS_|OPENBLAS_|WINE|WINCLEAN_|SD_)/.test(
         key,
       ),
   ],

@@ -71,7 +71,7 @@ Measured on `origin/os` at `15d3c89088` (`bun src/cli.ts workspace check`: 0 vio
 | Git submodules | pinned, initialised on demand | 168 declared at the root; 155 initialised on the VPS checkout, 65 on the workstation |
 | Flat members | every member `crates/<name>`, `apps/<name>`, `packages/<name>` | 19 formerly non-flat: 6 `tools/bevy/*` are flat now; `tools/bevy/ci` and 12 `crates/bevy*` members remain |
 
-Still open: the five `migrate` workspaces (`apps/aphrody-drive`, `apps/desktop/src-tauri`,
+Still open: the four `migrate` workspaces (`apps/desktop/src-tauri`,
 `apps/figcraft/plugins`, `apps/m3-published-consumer`, `packages/bun-tauri`), `crates/sqlite_tasks`,
 unflattened Bevy members, active Cargo vendor source replacement, native qualification of the whole
 graph ([NATIVE-QUALIFICATION](NATIVE-QUALIFICATION.md)), and the Aphrody/Bun unification as a whole.

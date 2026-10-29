@@ -29,8 +29,8 @@ Component index (owners, entry commands, CI jobs, pins, status, announced-but-pe
   Bun OS no longer contains its application/package copies; the integration
   state is documented in `docs/ROSEGRIFFON.md`.
 - The root Cargo workspace is not yet the sole Rust workspace. For example,
-  `apps/aphrody-drive` and `packages/bun-tauri` declare nested workspaces, and
-  the root manifest excludes them. Do not report Cargo consolidation complete.
+  `packages/bun-tauri` declares a nested workspace, and
+  the root manifest excludes it. Do not report Cargo consolidation complete.
 - The product direction is Arch Linux with pacman/libalpm. Server, COSMIC
   Desktop and Gamescope Gaming remain distinct compositions; Alpine and Ubuntu
   are compatibility targets in the checked-in product configuration. The

@@ -1,4 +1,4 @@
-/* Player-free stand-in for packages/assets/lottie/loading-pulse.json (Spacedrive set, FSL-1.1-ALv2): two pulsing rings. */
+/* Player-free stand-in for packages/assets/lottie/loading-pulse.json (Apache-2.0 upstream set): two pulsing rings. */
 .aph-pulse{position:relative;width:48px;height:48px;margin:auto}
 .aph-pulse::before,.aph-pulse::after{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid var(--md-sys-color-primary,#6750a4);opacity:0;animation:aph-pulse 1.6s ease-out infinite}
 .aph-pulse::after{animation-delay:.8s}

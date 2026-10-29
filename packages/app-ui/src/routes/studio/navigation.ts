@@ -3,7 +3,6 @@ import type { SupportedLanguage } from "../../i18n";
 import { nativeGoogleMessages } from "../product/product-search-messages";
 export const studioSections = [
   { id: "a2a", label: "Outils des agents", icon: "hub" },
-  { id: "drive", label: "Drive", icon: "cloud_sync" },
   { id: "google", label: "Recherche Aphrody", icon: "search" },
   { id: "runtime", label: "Moteur", icon: "memory" },
 ] as const;

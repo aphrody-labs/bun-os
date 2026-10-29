@@ -285,7 +285,7 @@ await Bun.write(
     .replaceAll("../fonts/web/", "/fonts/")
     .replaceAll("../fonts/upstream/material-symbols/", "/fonts/"),
 );
-// Brand: the Aphrody logo of apps/aphrody-app; file and device icons: packages/assets (SpaceUI/Spacedrive set).
+// Brand: the Aphrody logo of apps/aphrody-app; file and device icons: packages/assets (SpaceUI set).
 await mkdir(join(dist, "brand"), { recursive: true });
 await mkdir(join(dist, "icons"), { recursive: true });
 for (const [from, to] of [

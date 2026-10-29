@@ -286,17 +286,6 @@
     "bin": []
   },
   {
-    "name": "@aphrody/drive-client",
-    "version": "1.4.7",
-    "description": "Type-safe TypeScript client for Spacedrive daemon",
-    "dir": "packages/drive-client",
-    "kind": "package",
-    "workspace": true,
-    "private": false,
-    "exports": 9,
-    "bin": []
-  },
-  {
     "name": "@aphrody/eslint-plugin-m3",
     "version": "1.4.7",
     "description": "Lint rules for sites consuming material-web (@aphrody/m3-react + Material Symbols) — runs under the native bun lint (jsPlugins).",

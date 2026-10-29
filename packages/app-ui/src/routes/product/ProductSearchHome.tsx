@@ -175,11 +175,6 @@ export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; asse
           <Link className="min-h-12 content-center underline" to="/os">
             {text.files}
           </Link>
-          {isTauri() && (
-            <Link className="min-h-12 content-center underline" to="/studio?section=drive">
-              {text.drive}
-            </Link>
-          )}
           <a className="min-h-12 content-center underline" href="https://downloads.aphrody.com/">
             {text.downloads}
           </a>
