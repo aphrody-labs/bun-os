@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Browser backend for the Aphrody file explorer wire protocol.
 //!
-//! The explorer (`@aphrody/drive-client`) sends `{"Query"|"Action": {method, library_id, payload}}`
+//! The webos explorer sends `{"Query"|"Action": {method, library_id, payload}}`
 //! envelopes and expects `{"json": ...}` or `{"error": ...}`. In the native app a daemon answers; in
 //! the browser this module answers from the OPFS-persisted VFS, so the same UI runs unchanged.
 //! Only the methods the explorer needs are served; any other method returns an explicit error.

@@ -18,7 +18,7 @@ One site for the whole product: a desktop that runs in the browser. Owner: `apps
 | Craft apps | egui/eframe wasm builds of `apps/*-web` via `build-craft.ts` | PdfCraft opens in the browser |
 | Alpine Linux | v86 (x86 JIT to wasm) booting Alpine 3.24.2 x86; ISO in R2, served with Range by the Worker | booted to login, `uname -a` |
 | Calculator, Media, Disk Usage, Activity, Web Apps | `src/apps/*` | typecheck |
-| Materials | `@aphrody/m3-tokens`, `@aphrody/m3-fonts`, `@aphrody/material-web` elements, Spacedrive file icons from `packages/assets` | local browser |
+| Materials | `@aphrody/m3-tokens`, `@aphrody/m3-fonts`, `@aphrody/material-web` elements, file icons from `packages/assets` | local browser |
 
 ## Honest limits
 

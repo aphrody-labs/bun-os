@@ -1414,30 +1414,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aphrody-drive"
-version = "1.4.7"
-dependencies = [
- "aphrody-kernel",
- "aphrody-proc",
- "aphrody-subsystem",
- "aphrody-tauri",
- "aphrody-tauri-plugin",
- "axum",
- "dirs 7.0.0",
- "log",
- "open",
- "parking_lot",
- "serde",
- "serde_json",
- "swift-rs",
- "tempfile",
- "tokio",
- "tokio-util",
- "uuid",
- "windows 0.62.2",
-]
-
-[[package]]
 name = "aphrody-dust-cli"
 version = "0.1.1"
 dependencies = [

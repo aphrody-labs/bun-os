@@ -20,7 +20,6 @@ First-party guides:
 - [`WEB-TO-TAURI.md`](./WEB-TO-TAURI.md): converting a website or web app to a native Tauri 3 app
   (`@aphrody/web-to-tauri`, contract in [`docs/apis/ui/WRAP-CONFIG.md`](../apis/WRAP-CONFIG.md)).
 
-The Spacedrive contributor and setup guides are imported and live under `drive/`
-(for example [`drive/CONTRIBUTING.md`](./drive/CONTRIBUTING.md)). The Tauri project-setup guide of
+The Tauri project-setup guide of
 the Material Web package is owned by
 `packages/material-web/docs/tauri/02-project-setup.md`.

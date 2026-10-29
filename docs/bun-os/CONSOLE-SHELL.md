@@ -84,8 +84,7 @@ regenerated from it. Everything else stays quiet.
 - **Accessibility.** Every control carries an AccessKit button node named by its action (icon-only
   controls included); focus targets are at least 48 px (56 px icon buttons, 64 px buttons); focus
   feedback is a transform and a ring, so it never shifts layout.
-- **Sounds.** None: the repository has no free-licensed UI sound set (the Spacedrive sounds in
-  `packages/assets` are FSL-1.1). Machine audio plays through the engine's `bevy_audio` sink.
+- **Sounds.** None: the repository has no free-licensed UI sound set. Machine audio plays through the engine's `bevy_audio` sink.
 
 ## Input
 

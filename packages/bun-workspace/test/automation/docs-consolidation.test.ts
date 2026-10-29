@@ -135,7 +135,7 @@ test("shingle similarity separates translations from copies", () => {
 });
 
 test("topic classification follows the path before the content", () => {
-  expect(classifyTopic("docs/reference/ui/drive/docs/core/api.mdx")).toBe("spacedrive-spaceui");
+  expect(classifyTopic("docs/reference/ui/drive/docs/core/api.mdx")).toBe("spaceui");
   expect(classifyTopic("docs/reference/ui/tauri/plugins.md")).toBe("tauri");
   expect(classifyTopic("docs/reference/ui/WASM/wgpu-webgpu.md")).toBe("gpu-render");
   expect(classifyTopic("docs/architecture/ui/design/M3-RENDER.md")).toBe("gpu-render");

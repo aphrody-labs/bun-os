@@ -289,7 +289,6 @@
         "@aphrody/assets": "workspace:*",
         "@aphrody/bun-webview-page": "0.1.1-aphrody.2",
         "@aphrody/canvas": "workspace:*",
-        "@aphrody/drive-client": "workspace:*",
         "@aphrody/eslint-plugin-m3": "workspace:*",
         "@aphrody/fuzzy": "1.4.7",
         "@aphrody/identity": "workspace:*",
@@ -662,31 +661,6 @@
     "packages/docs-sync": {
       "name": "@aphrody/docs-sync",
       "version": "1.4.7",
-    },
-    "packages/drive-client": {
-      "name": "@aphrody/drive-client",
-      "version": "1.4.7",
-      "dependencies": {
-        "@aphrody/assets": "workspace:*",
-        "type-fest": "catalog:",
-        "valibot": "catalog:",
-        "zustand": "catalog:",
-      },
-      "devDependencies": {
-        "@happy-dom/global-registrator": "catalog:",
-        "@tanstack/react-query": "catalog:",
-        "@testing-library/react": "catalog:",
-        "@types/react": "catalog:",
-        "react": "catalog:",
-      },
-      "peerDependencies": {
-        "@tanstack/react-query": "^5.0.0",
-        "react": "^18.0.0 || ^19.0.0",
-      },
-      "optionalPeers": [
-        "@tanstack/react-query",
-        "react",
-      ],
     },
     "packages/ds-dotnet": {
       "name": "@bun-os/ds-dotnet",
@@ -2292,7 +2266,6 @@
 
     "@aphrody/docs-sync": ["@aphrody/docs-sync@workspace:packages/docs-sync"],
 
-    "@aphrody/drive-client": ["@aphrody/drive-client@workspace:packages/drive-client"],
 
     "@aphrody/eslint-plugin-m3": ["@aphrody/eslint-plugin-m3@workspace:packages/eslint-plugin-m3"],
 

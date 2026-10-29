@@ -1,1 +1,0 @@
-export { RecentsView } from './RecentsView';

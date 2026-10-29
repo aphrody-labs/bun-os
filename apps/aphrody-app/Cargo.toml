@@ -60,7 +60,6 @@ reqwest = { version = "0.13.5", features = ["rustls-no-provider", "json", "strea
 aphrody-app-server = { path = "../../crates/aphrody-app-server", version = "1.4.7", features = [] }
 aphrody-capture = { path = "../../crates/aphrody-capture", version = "1.4.7", features = [] }
 aphrody-diagnostics = { path = "../../crates/aphrody-diagnostics", version = "1.4.7" }
-aphrody-drive = { path = "../../crates/aphrody-drive", version = "1.4.7" }
 aphrody-fsindex = { path = "../../crates/aphrody-fsindex", version = "1.4.7", features = [] }
 aphrody-shell-tauri = { path = "../../crates/aphrody-shell-tauri", version = "1.4.7", features = [] }
 aphrody-identity = { path = "../../crates/aphrody-identity", version = "1.4.7" }

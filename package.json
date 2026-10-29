@@ -51,7 +51,6 @@
     "packages/discord-kit",
     "packages/doc-ai",
     "packages/docs-sync",
-    "packages/drive-client",
     "packages/ds-dotnet",
     "packages/eslint-plugin-m3",
     "packages/fluent",

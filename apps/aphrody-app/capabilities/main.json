@@ -92,7 +92,6 @@
       ]
     },
 
-    "aphrody-drive:default",
     "aphrody-shell-tauri:default"
   ]
 }

@@ -129,10 +129,10 @@ export interface Terminal {
   readonly exited: boolean;
 }
 
-/** Request envelope of `@aphrody/drive-client` (`Query`/`Action`) or the string "Ping". */
+/** Request envelope of the explorer wire protocol (`Query`/`Action`) or the string "Ping". */
 export type WireRequest = unknown;
 
-/** Structural match of `Transport` in `@aphrody/drive-client`. */
+/** Transport of the explorer wire protocol. */
 export interface ExplorerTransport {
   sendRequest(request: WireRequest): Promise<unknown>;
   subscribe(): Promise<() => void>;

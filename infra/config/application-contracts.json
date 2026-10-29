@@ -115,7 +115,7 @@
         "sidecars": ["sd-daemon", "aphrody"],
         "modules": [
           "agent (aphrody app-server over stdio)",
-          "drive (aphrody-drive plugin + sd-daemon; the Spacedrive drive/apps/tauri host was removed 2026-09-26)",
+          "drive (Spacedrive sd-daemon sidecar)",
           "models",
           "identity (pet and pixel pipeline, ex-Inacord)",
           "browser",

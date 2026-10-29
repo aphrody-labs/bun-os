@@ -252,12 +252,6 @@ export async function runOps(argv: readonly string[]): Promise<number> {
     return await (await import("./stack-dedup.ts")).runStackDedup(rest);
   }
   // The UI scaffolding CLIs (web-to-tauri, scaffold) are `yolo m3 web-to-tauri|scaffold`.
-  if (operation === "drive-daemon") {
-    return await (await import("./drive-daemon.ts")).runDriveDaemon(rest);
-  }
-  if (operation === "drive-upstream-audit") {
-    return await (await import("./drive-upstream-audit.ts")).runDriveUpstreamAudit(rest);
-  }
   if (operation === "bun-workspace") {
     return await (await import("./bun-workspace.ts")).runBunWorkspace(rest);
   }

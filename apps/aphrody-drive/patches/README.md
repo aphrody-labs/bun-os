@@ -1,5 +1,0 @@
-# Local crate patches (Aphrody Drive)
-
-| Crate                   | Why                                                                                                                                                                                                                                                                                                                                |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ffmpeg-sys-next` 7.1.3 | Its build script uses bindgen 0.70, which generates empty structs (`_address: u8`) against libclang 21+ while still emitting the real layout assertions, so the bindings fail to compile. This copy only raises the build-dependency to bindgen 0.72. Drop it once `ffmpeg-sys-next` ships a bindgen 0.72+ release for FFmpeg 7.1. |

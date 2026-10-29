@@ -1,9 +1,7 @@
 # @aphrody/assets
 
 File-kind icons, extension badges, brand logos, images, sounds, videos and Lottie animations for the
-M3 explorer surfaces, with icon resolution helpers. The set merges the Spacedrive `@sd/assets`
-(FSL-1.1-ALv2, `LICENSE.spacedrive`, upstream notes in `UPSTREAM-README.md`) with SpaceUI's
-`@spacedrive/icons` (MIT, `LICENSE.spaceui`, `UPSTREAM-CHANGELOG.spaceui.md`).
+M3 explorer surfaces, with icon resolution helpers. The icon set is derived from Spacedrive `@sd/assets` (Apache-2.0 upstream since 2026-03-24; see `ATTRIBUTION.md` and `docs/spacedrive/PROVENANCE.md`) merged with SpaceUI `@spacedrive/icons` (MIT, `LICENSE.spaceui`, `UPSTREAM-CHANGELOG.spaceui.md`).
 
 | Import                                           | Contents                                                                                  |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------- |

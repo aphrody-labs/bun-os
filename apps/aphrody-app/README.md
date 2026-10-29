@@ -41,7 +41,7 @@ not copy or delete them during startup.
 | Agent sessions          | `aphrody-app-server`          | in-process broker; loopback HTTP/SSE for web clients                                     |
 | Web tools               | Aphrody kernel                | `aphrody_web` Obscura/provider subsystem                                                 |
 | Web retrieval and crawl | Aphrody kernel / Obscura      | backend capability; no embedded browser or crawler-management view in the public webview |
-| File libraries          | `aphrody-drive` + `sd-daemon` | local socket; daemon stays outside this Cargo graph                                      |
+| File libraries          | Spacedrive `sd-daemon`          | local socket; daemon stays outside this Cargo graph                                      |
 
 ## Capability surface (default-deny)
 
@@ -72,14 +72,7 @@ ui_dist_assets` checks that every listed file is staged byte-for-byte and that e
 `app.css` loads is present. The shipped configuration (`--features custom-protocol`) fails the
 build if a source is missing; a plain `cargo check` only warns.
 
-The daemon source is owned by the nested FSL workspace at
-`apps/aphrody-drive/core/Cargo.toml`. `crates/aphrody-drive` locates it through
-`APHRODY_DRIVE_DAEMON`, beside the desktop executable, or on `PATH`. Although
-`tauri.drive.conf.json` declares an `externalBin`, the current unified build path has not yet
-been shown to build and stage that binary for each target. Keep bundled daemon startup and
-installed Files behavior as open release gates. The active Drive UI uses the shared explorer,
-search, sidebar, tabs, and file operations through `packages/app-ui`, `packages/m3-explorer`,
-and `packages/drive-client`; Android Files workflows still need integration and qualification.
+The file service daemon is Spacedrive (`vendor/spacedrive`, Apache-2.0, see `docs/spacedrive/PROVENANCE.md`). `tauri.drive.conf.json` declares its `externalBin`; staging and packaged startup are open release gates.
 
 ```pwsh
 bun install --frozen-lockfile

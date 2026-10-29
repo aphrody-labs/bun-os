@@ -125,7 +125,6 @@ Android app installs on a device; a library has no window; an example is read an
 | Member                                                                                  | Kind                                                     | Opens                         | In-browser counterpart |
 | --------------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------- | ---------------------- |
 | aphrody-app                                                                             | Desktop (Tauri 3)                                        | `/source/aphrody-app`         | Aphrody Workspace      |
-| aphrody-drive                                                                           | Server (Drive backend)                                   | `/source/aphrody-drive`       | Aphrody Drive          |
 | aphrody-examples                                                                        | Example                                                  | `/source/aphrody-examples`    |                        |
 | aphrody-model-view                                                                      | Desktop                                                  | `/source/aphrody-model-view`  | Files                  |
 | artcraft, artcraft_native                                                               | Desktop                                                  | `/source/<member>`            | Aphrody Creative       |
@@ -155,7 +154,7 @@ Android app installs on a device; a library has no window; an example is read an
   operating system's windowing, GPU and disk access. Their browser counterparts are the Craft packages
   and the Workspace.
 - Command-line tools (the Craft `-cli` members): terminal programs and MCP servers.
-- Servers (`play`, `webos-server`, `aphrody-drive`, `figcraft-server`, `m3-showcase`, `iecode-web`,
+- Servers (`play`, `webos-server`, `figcraft-server`, `m3-showcase`, `iecode-web`,
   `artcraft-web-app`, `rg-website`): each needs its own backend process; `play` streams games over
   WebRTC from its own host.
 - `bun-android`, `java-ffi`: Android only.

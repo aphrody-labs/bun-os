@@ -41,11 +41,6 @@
       "related": "aphrody-workspace",
       "artifact": "aphrody-desktop"
     },
-    "aphrody-drive": {
-      "kind": "server",
-      "desc": "Drive backend (Spacedrive-derived core, adapters and xtask), FSL-1.1-ALv2",
-      "related": "drive"
-    },
     "aphrody-model-view": {
       "kind": "native",
       "related": "files"

@@ -189,8 +189,8 @@ async function sounds(dist: string) {
         join(dir, `${f}.${ext}`),
       );
   await cp(
-    join(root, "packages/assets/LICENSE.spacedrive"),
-    join(dir, "LICENSE.spacedrive"),
+    join(root, "LICENSE-APACHE"),
+    join(dir, "LICENSE.apache"),
   );
   await Bun.write(
     join(dir, "NOTICE.txt"),

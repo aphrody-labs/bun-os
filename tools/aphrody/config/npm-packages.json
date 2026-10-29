@@ -197,7 +197,6 @@
         "@aphrody/m3-codemods",
         "@aphrody/m3-explorer",
         "@aphrody/m3-tailwind",
-        "@aphrody/drive-client",
         "@aphrody/m3-os-themes",
         "@phosphor-icons/react",
         "@tanstack/react-query",
@@ -697,15 +696,6 @@
       "sha256": "fdf9898847cdb0f2651d1f07dfde93ae4ee32742cbca087ac8bd7e22f9148688",
       "integrity": "sha512-IqcWJ2FknplSiOWcBy7BAQmM8qGCGQAJn+hr5r7PK3xMvaL1O9y+Fy6z0Gyg84XkgzOBiFxiYMj6p2pgytGveQ==",
       "dependencies": []
-    },
-    {
-      "name": "@aphrody/drive-client",
-      "version": "0.1.2",
-      "path": "packages/os/drive-client/package.json",
-      "status": "published",
-      "sha256": "47096319b2ceed1398add5af856a9853f862bf3ddc87dbf9cc05e0a61a1abc45",
-      "integrity": "sha512-Ns2EbHnXoKV0+5hXEOLrgiPOZZIaL/msbfRUYLuCVU7S1zBtTbDRYObMfmUhsWcoG9/i7jS7t0tqICHdQbcezQ==",
-      "dependencies": ["valibot", "zustand", "type-fest", "@aphrody/assets"]
     },
     {
       "name": "@aphrody/os",

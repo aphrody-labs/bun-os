@@ -1,4 +1,0 @@
-# Unit tests live under src/. tests/integration needs a live daemon started by the
-# Rust bridge harness (core/tests/typescript_bridge_test.rs): `bun run test:integration`.
-[test]
-root = "src"

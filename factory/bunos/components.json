@@ -482,7 +482,6 @@
       "excluded": {
         "apps/aphrody-app": "cef-dll-sys needs the native CEF CMake toolchain (CMake project() fails in the Rust-only gates); re-add once the CEF toolchain is part of the gate image",
         "packages/wasmos/compositor": "own [workspace] root (separate lockfile and resolver); wasm32-unknown-unknown cdylib built by packages/wasmos (bun src/cli.ts build-compositor), never by the root workspace",
-        "apps/aphrody-drive": "own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace (Spacedrive layout, virtual workspace with its own Cargo.lock)",
         "apps/aphrody-examples/runtime-rust-extension": "standalone example of a Rust extension; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
         "apps/aphrody-model-view": "needs aphrody-tauri-wrap, which is neither in [workspace.dependencies] nor in the repository",
         "apps/artcraft": "crates.io tauri 2.x conflicts with the workspace tauri (aphrody-tauri, links = tauri); the native part is the member apps/artcraft_native",
@@ -3650,19 +3649,6 @@
       "status": "present"
     },
     {
-      "id": "npm:@aphrody/drive-client",
-      "kind": "npm-package",
-      "path": "packages/drive-client",
-      "source": {
-        "type": "workspace",
-        "name": "@aphrody/drive-client",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
       "id": "npm:@bun-os/ds-dotnet",
       "kind": "npm-package",
       "path": "packages/ds-dotnet",
@@ -5743,19 +5729,6 @@
       "source": {
         "type": "path-crate",
         "name": "aphrody-discord",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/aphrody-drive",
-      "kind": "crate",
-      "path": "crates/aphrody-drive",
-      "source": {
-        "type": "path-crate",
-        "name": "aphrody-drive",
         "version": "1.4.7"
       },
       "registration": ["none"],

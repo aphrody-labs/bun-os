@@ -71,6 +71,6 @@ To eliminate ambiguity between the two form offerings:
 
 2. **`@aphrody/app-ui`** owns **Drive domain logic and host integration**:
    - Selection context, range selection, multi-selection.
-   - Spacedrive daemon (`sd-daemon`) RPC commands (rename, delete, move, tags).
+   - File-service daemon RPC commands (rename, delete, move, tags).
    - Sidecar URL resolution (`ServerContext`) and video thumbstrip scrubber (`ThumbstripScrubber`).
    - Context menus with system integration and AI contextual actions (OCR, transcription, RAG).
