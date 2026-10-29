@@ -1,0 +1,6 @@
+<!doctype html><meta charset="utf-8"><title>wasmos boot</title>
+<script type="module">
+  const w = new Worker("/boot-worker.js", { type: "module" });
+  w.onmessage = e => { window.__boot = e.data; };
+  w.postMessage({ wasm: "/alpine.wasm", args: JSON.parse(new URLSearchParams(location.search).get("args") ?? "[]") });
+</script>

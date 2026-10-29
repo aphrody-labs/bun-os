@@ -481,6 +481,7 @@
     "cargo": {
       "excluded": {
         "apps/aphrody-app": "cef-dll-sys needs the native CEF CMake toolchain (CMake project() fails in the Rust-only gates); re-add once the CEF toolchain is part of the gate image",
+        "packages/wasmos/compositor": "own [workspace] root (separate lockfile and resolver); wasm32-unknown-unknown cdylib built by packages/wasmos (bun src/cli.ts build-compositor), never by the root workspace",
         "apps/aphrody-drive": "own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace (Spacedrive layout, virtual workspace with its own Cargo.lock)",
         "apps/aphrody-examples/runtime-rust-extension": "standalone example of a Rust extension; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
         "apps/aphrody-model-view": "needs aphrody-tauri-wrap, which is neither in [workspace.dependencies] nor in the repository",
@@ -536,6 +537,7 @@
         "crates/artcraft-tauri-plugin-http": "guest bindings of the excluded crate of the same name",
         "docs/aphrody": "separate monorepo copy with its own workspaces, kept as documentation",
         "docs/material": "reference copy of upstream material sources used by the docs",
+        "packages/wasmos": "own dev dependencies (playwright-core, browser_wasi_shim) installed by its flow; not in the root bun.lock so concurrent lockfile changes cannot conflict",
         "packages/bun-tauri": "Tauri fork JS tooling and CLI templates, built by the Tauri fork flow",
         "packages/bun-workspace/test/fixtures": "test fixtures for the portability checks",
         "packages/m3-bun/test/fixtures": "test fixture app",
@@ -19908,6 +19910,27 @@
       "status": "present",
       "dependsOn": ["submodule:vendor/omarchy"],
       "note": "Omarchy-style timestamped migrations with per-user markers (omacom/omarchy bin/omarchy-migrate)."
+    },
+    {
+      "id": "factory:wasmos",
+      "kind": "factory-module",
+      "path": "factory/wasmos",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/wasmos/pins.json",
+          "factory/wasmos/build-alpine.ts",
+          "packages/wasmos/package.json",
+          "packages/wasmos/src/boot.ts",
+          "packages/wasmos/src/compositor.ts",
+          "packages/wasmos/compositor/Cargo.toml"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["npm:@aphrody/wasm", "npm:@aphrody/webos-wasm"],
+      "note": "WASM OS (docs/WASMOS.md): pins and build script of the Alpine x86_64 wasm artifact (container2wasm v0.8.4, Bochs, Linux 6.1), the Bun/Chromium boot runner and the wasm32 Wayland-subset compositor of packages/wasmos; .github/workflows/wasmos.yml."
     },
     {
       "id": "factory:rustbase",

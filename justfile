@@ -260,3 +260,5 @@ c-test *args:
 [doc('Bun OS C: compile-time and size benchmark across the installed compilers')]
 c-bench *args:
     bun factory/c/bench/bench.ts {{ args }}
+
+import 'factory/wasmos/wasmos.just'

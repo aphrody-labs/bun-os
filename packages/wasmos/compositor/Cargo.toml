@@ -1,0 +1,17 @@
+[package]
+name = "wasmos-compositor"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Minimal software Wayland-subset compositor for wasm32: wire protocol in, RGBA framebuffer out."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = "s"
+lto = true
+panic = "abort"
+
+# Own workspace root: built by packages/wasmos, never by the root workspace.
+[workspace]

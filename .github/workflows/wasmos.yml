@@ -1,0 +1,99 @@
+name: WASM OS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [os]
+    paths:
+      - packages/wasmos/**
+      - factory/wasmos/**
+      - docs/WASMOS.md
+      - .github/workflows/wasmos.yml
+
+permissions:
+  contents: read
+
+env:
+  # Pinned in factory/bunos/components.json (runtime) and rust-toolchain.toml.
+  BUN_VERSION: 1.4.4-canary.20261028.1
+  RUST_TOOLCHAIN: nightly-2026-09-15
+
+jobs:
+  compositor:
+    name: wasm32 compositor (Bun + headless Chrome pixel tests)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            packages/wasmos
+            factory/wasmos
+          sparse-checkout-cone-mode: true
+      - run: npm install -g bun@${BUN_VERSION} && bun -e 'console.log(Bun.version, Bun.revision)'
+      - run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --target wasm32-unknown-unknown
+          rustup default "$RUST_TOOLCHAIN"
+      - name: Install dev dependencies of packages/wasmos
+        working-directory: packages/wasmos
+        run: |
+          npm install --no-save --no-package-lock playwright-core@1.63.0 @bjorn3/browser_wasi_shim@0.4.2
+      - name: Build and test
+        working-directory: packages/wasmos
+        env:
+          WASMOS_CHROME: /usr/bin/google-chrome
+        run: |
+          bun src/cli.ts build-compositor
+          bun test test/compositor.test.ts test/browser.test.ts
+
+  alpine:
+    name: Alpine x86_64 wasm (container2wasm) boot under Bun and Chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            packages/wasmos
+            factory/wasmos
+          sparse-checkout-cone-mode: true
+      - run: npm install -g bun@${BUN_VERSION} && bun -e 'console.log(Bun.version, Bun.revision, process.release.sourceUrl)'
+      - uses: actions/cache@v4
+        id: cache
+        with:
+          path: build/wasmos/alpine-3.24.2-x86_64.wasm
+          key: wasmos-alpine-${{ hashFiles('factory/wasmos/pins.json', 'factory/wasmos/build-alpine.ts') }}
+      - name: Build the Alpine wasm (about 11 minutes on 12 cores)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bun factory/wasmos/build-alpine.ts | tee build-receipt.txt
+      - name: Install dev dependencies of packages/wasmos
+        working-directory: packages/wasmos
+        run: npm install --no-save --no-package-lock playwright-core@1.63.0 @bjorn3/browser_wasi_shim@0.4.2
+      - name: Boot under Bun (serial log is the evidence)
+        working-directory: packages/wasmos
+        env:
+          WASMOS_ALPINE_WASM: ${{ github.workspace }}/build/wasmos/alpine-3.24.2-x86_64.wasm
+          WASMOS_BOOT_LOG: ${{ github.workspace }}/serial-bun.log
+        run: bun test test/boot.test.ts
+      - name: Boot in headless Chromium
+        working-directory: packages/wasmos
+        env:
+          WASMOS_ALPINE_WASM: ${{ github.workspace }}/build/wasmos/alpine-3.24.2-x86_64.wasm
+          WASMOS_CHROME: /usr/bin/google-chrome
+          WASMOS_BROWSER_BOOT_LOG: ${{ github.workspace }}/serial-browser.log
+        run: bun test test/browser-boot.test.ts
+      - name: Receipt
+        if: always()
+        run: |
+          ls -l build/wasmos/*.wasm || true
+          sha256sum build/wasmos/*.wasm || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wasmos-alpine
+          path: |
+            serial-bun.log
+            serial-browser.log
+            build-receipt.txt
+            build/wasmos/alpine-3.24.2-x86_64.wasm
+          if-no-files-found: ignore
