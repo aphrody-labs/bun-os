@@ -52,7 +52,8 @@ export function AppSidebar({ isPreviewActive = false }: AppSidebarProps) {
   // Active Area Detection
   const isChatActive =
     location.pathname === "/chat" || location.pathname === "/codex" || location.pathname.startsWith("/chat/");
-  const isFilesActive = location.pathname === "/os" || location.pathname.startsWith("/explorer") || location.pathname.startsWith("/files");
+  const isFilesActive =
+    location.pathname === "/os" || location.pathname.startsWith("/explorer") || location.pathname.startsWith("/files");
   const isModelsActive = location.pathname.startsWith("/models");
   const isStudioActive = location.pathname.startsWith("/studio");
   const isTerminalActive = location.pathname.startsWith(browserOnlyRoutes.terminal);

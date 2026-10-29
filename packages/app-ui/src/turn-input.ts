@@ -99,4 +99,3 @@ export function buildTurnInputItems(text: string, attachments: string[] = []): T
 
   return items;
 }
-

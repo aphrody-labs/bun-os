@@ -23,7 +23,7 @@
     "undeclared-deps.ts",
     "m3.config.ts",
     "../assets/types.d.ts",
-    "../bun-tauri/js/api/global.d.ts",
+    "../bun-tauri/js/api/global.d.ts"
   ],
   "exclude": ["src/**/*.test.ts"]
 }

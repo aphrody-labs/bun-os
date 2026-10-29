@@ -5,7 +5,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { searchGoogle, type GoogleSearchPage } from "../../google-search";
 import { useI18n } from "../../i18n";
-import { isTauri, usesBrowserBackend } from "../../tauri-bridge";
+import { usesBrowserBackend } from "../../tauri-bridge";
 import { productSearchMessages } from "./product-search-messages";
 
 export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; assetBase?: string }) {
