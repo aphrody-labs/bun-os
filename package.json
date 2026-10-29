@@ -251,8 +251,7 @@
     "iecode:storage:status": "bun src/cli.ts iecode storage-status",
     "iecode:inagle": "bun src/cli.ts iecode inagle",
     "iecode:web:build": "bun src/cli.ts iecode web-build",
-    "bunos": "bun src/cli.ts",
-    "n2b": "bun n2b"
+    "bunos": "bun src/cli.ts"
   },
   "dependencies": {
     "@aphrody/bun-app-host": "workspace:*",
@@ -309,9 +308,9 @@
     "tailwindcss": "catalog:",
     "terser": "catalog:",
     "undici-types": "catalog:",
-    "@next/env": "file:vendor/aphrody-third-party/next-fork/next-env-16.5.0-canary.5-dac376c6fe-f32e63fa.tgz",
-    "@next/third-parties": "file:vendor/aphrody-third-party/next-fork/next-third-parties-16.5.0-canary.5-dac376c6fe-14a34de8.tgz",
-    "next": "file:vendor/aphrody-third-party/next-fork/next-16.5.0-canary.5-dac376c6fe-80cae9ab.tgz",
+    "@next/env": "catalog:",
+    "@next/third-parties": "catalog:",
+    "next": "catalog:",
     "@aphrody/yolo-core": "file:packages/yolo-core"
   },
   "engines": {
@@ -423,7 +422,7 @@
     "lit": "^3.3.3",
     "lucide-react": "^1.48.0",
     "motion": "^13.4.4",
-    "next": "16.3.8",
+    "next": "16.5.0-canary.30",
     "next-themes": "^0.4.6",
     "playwright-core": "1.63.0",
     "react-day-picker": "^10.0.1",
@@ -532,7 +531,8 @@
     "@lexical/table": "^0.52.0",
     "@lexical/utils": "^0.52.0",
     "@markdoc/markdoc": "^0.5.10",
-    "@next/third-parties": "^16.3.0",
+    "@next/env": "16.5.0-canary.30",
+    "@next/third-parties": "16.5.0-canary.30",
     "@sentry/nextjs": "^11.1.0",
     "@spacedrive/primitives": "^0.2.4",
     "@spacedrive/tokens": "^0.2.3",

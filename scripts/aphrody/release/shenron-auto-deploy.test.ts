@@ -3,7 +3,7 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { probe, verifyVendor, qualifyRuntime, qualifyCompiledRuntimes, runtimeEvidence } from "./shenron-auto-deploy";
+import { probe, verifyNextCatalog, qualifyRuntime, qualifyCompiledRuntimes, runtimeEvidence } from "./shenron-auto-deploy";
 import { activeDeployment, deploymentIsCurrent, deploymentSelection } from "./shenron-deployment-identity";
 
 test("a runtime-only change builds a distinct deployment without changing the Shenron Git commit", () => {
@@ -137,35 +137,19 @@ test("both compiled product runtimes must pass the same isolated fixtures before
 });
 
 const temporary: string[] = [];
-test("tracked Next fork archives are verified without a removed bootstrap script", async () => {
-  const root = mkdtempSync(join(tmpdir(), "shenron-vendor-"));
+test("the Next catalog must be exact registry versions that agree and are locked", async () => {
+  const root = mkdtempSync(join(tmpdir(), "shenron-next-"));
   temporary.push(root);
-  const archive = join(root, "vendor/next-fork/next.tgz");
-  await Bun.write(archive, "qualified fixture");
-  const manifest = join(root, "vendor/next-fork/manifest.json");
-  await Bun.write(
-    manifest,
-    JSON.stringify({
-      schemaVersion: 1,
-      packages: [
-        {
-          archive: "next.tgz",
-          sha256: new Bun.CryptoHasher("sha256").update("qualified fixture").digest("hex"),
-        },
-      ],
-    }),
-  );
-  await verifyVendor(root);
-  await Bun.write(archive, "altered");
-  await expect(verifyVendor(root)).rejects.toThrow("digest differs");
-  await Bun.write(
-    manifest,
-    JSON.stringify({
-      schemaVersion: 1,
-      packages: [{ archive: "../escape.tgz", sha256: "a".repeat(64) }],
-    }),
-  );
-  await expect(verifyVendor(root)).rejects.toThrow("Invalid Next fork archive identity");
+  const write = (catalog: Record<string, string>) => Bun.write(join(root, "package.json"), JSON.stringify({ catalog }));
+  const exact = { next: "16.5.0-canary.30", "@next/env": "16.5.0-canary.30", "@next/third-parties": "16.5.0-canary.30" };
+  await write(exact);
+  await expect(verifyNextCatalog(root)).rejects.toThrow("bun.lock is missing");
+  await Bun.write(join(root, "bun.lock"), "{}");
+  await verifyNextCatalog(root);
+  await write({ ...exact, next: "16.5.0-canary.31" });
+  await expect(verifyNextCatalog(root)).rejects.toThrow("versions differ");
+  await write({ ...exact, next: "file:vendor/next.tgz" });
+  await expect(verifyNextCatalog(root)).rejects.toThrow("not an exact registry version");
 });
 afterEach(() => {
   for (const path of temporary.splice(0)) rmSync(path, { recursive: true, force: true });

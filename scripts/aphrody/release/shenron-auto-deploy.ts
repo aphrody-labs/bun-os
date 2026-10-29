@@ -208,22 +208,17 @@ export function syncDecision(branch: string, status: string, fastForward: boolea
   return "fast-forward";
 }
 
-/** Current Shenron tracks its fork archives; no historical vendor bootstrap is needed. */
-export async function verifyVendor(work: string): Promise<void> {
-  const directory = join(work, "vendor/next-fork");
-  const manifest = await Bun.file(join(directory, "manifest.json")).json();
-  if (manifest.schemaVersion !== 1 || !Array.isArray(manifest.packages) || !manifest.packages.length)
-    throw new Error("Invalid Next fork archive manifest");
-  for (const entry of manifest.packages) {
-    if (
-      typeof entry.archive !== "string" ||
-      !/^[\w.-]+\.tgz$/.test(entry.archive) ||
-      !/^[a-f0-9]{64}$/.test(entry.sha256)
-    )
-      throw new Error("Invalid Next fork archive identity");
-    if (!matches(join(directory, entry.archive), entry.sha256))
-      throw new Error(`Next fork archive digest differs: ${entry.archive}`);
-  }
+/** Shenron takes Next.js from the npm registry: the catalog must pin next, @next/env and @next/third-parties to one exact version. */
+export async function verifyNextCatalog(work: string): Promise<void> {
+  const pkg = await Bun.file(join(work, "package.json")).json();
+  const catalog = pkg.catalog ?? pkg.workspaces?.catalog ?? {};
+  const names = ["next", "@next/env", "@next/third-parties"];
+  const versions = names.map(name => catalog[name]);
+  for (const [i, version] of versions.entries())
+    if (typeof version !== "string" || !/^d+.d+.d+(-canary.d+)?$/.test(version))
+      throw new Error(`Next catalog entry ${names[i]} is not an exact registry version: ${version}`);
+  if (new Set(versions).size !== 1) throw new Error(`Next catalog versions differ: ${versions.join(", ")}`);
+  if (!existsSync(join(work, "bun.lock"))) throw new Error("bun.lock is missing: the Next catalog is not locked");
 }
 
 function command(args: string[], cwd = config.source, inherited = false): string {
@@ -404,7 +399,7 @@ async function buildDeploy() {
       throw new Error("Build worktree contains changes; preserved");
     git(["checkout", "--detach", sha], work);
   }
-  await verifyVendor(work);
+  await verifyNextCatalog(work);
   git(["submodule", "update", "--init", "--", "packages/config"], work);
   command([config.bun, "install", "--frozen-lockfile"], work, true);
   native(sha, work);
