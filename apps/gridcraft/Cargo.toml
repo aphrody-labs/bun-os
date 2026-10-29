@@ -44,3 +44,6 @@ winresource = "0.1"
 [[test]]
 name = "mac_menu_appkit"
 harness = false
+
+[target.'cfg(windows)'.dependencies]
+pollster = "1"

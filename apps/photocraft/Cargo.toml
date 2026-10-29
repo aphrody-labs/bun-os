@@ -63,3 +63,7 @@ winresource = "0.1"
 x11rb = { version = "=0.13.2", default-features = false, features = ["image", "randr", "xkb"] }
 zbus = "5"
 wl-clipboard-rs = "0.9"
+
+[target.'cfg(windows)'.dependencies]
+winsafe = { workspace = true, features = ["gdi", "user"] }
+xcap = "0.7"

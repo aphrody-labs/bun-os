@@ -64,3 +64,6 @@ wat = "1.261"
 
 [build-dependencies]
 winresource = "0.1"
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = ["Gaming_Input", "System_UserProfile", "UI_ViewManagement", "Foundation_Collections"] }

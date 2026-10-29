@@ -120,16 +120,18 @@ jobs:
       - name: Nested libcubeb submodule
         if: ${{ steps.setup.outcome == 'success' }}
         run: git -C vendor/cubeb-rs submodule update --init --depth 1 --recursive
-      # openssl-sys finds OpenSSL through vcpkg on MSVC; Windows runners ship vcpkg without OpenSSL.
+      # openssl-sys needs a prebuilt OpenSSL on MSVC. The Shining Light build from Chocolatey avoids vcpkg, which compiles OpenSSL
+      # and downloads NASM from nasm.us (unreachable from the runners at times).
       - name: OpenSSL for the native crates
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
-        # Run outside the checkout: vcpkg switches to manifest mode when it finds a vcpkg.json in the working directory.
-        working-directory: ${{ runner.temp }}
         run: |
-          vcpkg install openssl:x64-windows-static-md
-          "OPENSSL_DIR=$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows-static-md" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
-          "OPENSSL_STATIC=1" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          $root = 'C:\Program Files\OpenSSL-Win64'
+          $lib = "$root\lib\VC\x64\MD"
+          if (-not (Test-Path "$lib\libssl.lib")) { choco install openssl --no-progress -y }
+          "OPENSSL_DIR=$root" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "OPENSSL_LIB_DIR=$lib" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "OPENSSL_INCLUDE_DIR=$root\include" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
       # bun-os-shell embeds the pinned Material Symbols font (packages/m3-fonts/fonts/upstream is git-ignored and fetched here).
       - name: Pinned font sources
         if: ${{ steps.setup.outcome == 'success' }}
@@ -139,16 +141,16 @@ jobs:
       - name: Check every workspace member
         if: ${{ !cancelled() && steps.setup.outcome == 'success' && runner.os == 'Linux' }}
         run: bun packages/buncc/src/cli.ts check
-      # ruzu is a GTK 4 frontend: glib/gdk4 need pkg-config and the GTK 4 development files, which Windows runners lack.
+      # ruzu is a GTK 4 frontend (glib/gdk4 need pkg-config and GTK 4 development files); its ruzu_cmd, video_core and audio_core ports probe pkg-config for FFmpeg and libopus.
       - name: Check every workspace member except the GTK 4 frontend
         if: ${{ !cancelled() && steps.setup.outcome == 'success' && runner.os == 'Windows' }}
-        run: bun packages/buncc/src/cli.ts exec -- check --locked --workspace --exclude ruzu
+        run: bun packages/buncc/src/cli.ts exec -- check --locked --workspace --keep-going --exclude ruzu --exclude ruzu_cmd --exclude video_core --exclude audio_core
       # Deny-by-default lints only: the imported bevy forks do not pass -D warnings yet (non-ASCII test identifiers, unused deps).
       - name: Clippy
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         env:
           BUNCC_CARGO_DEADLINE_MS: "7200000"
-        run: bun packages/buncc/src/cli.ts exec -- clippy --workspace --all-targets --locked --keep-going ${{ runner.os == 'Windows' && '--exclude ruzu' || '' }}
+        run: bun packages/buncc/src/cli.ts exec -- clippy --workspace --all-targets --locked --keep-going ${{ runner.os == 'Windows' && '--exclude ruzu --exclude ruzu_cmd --exclude video_core --exclude audio_core' || '' }}
 
   release-plan:
     name: Release plan

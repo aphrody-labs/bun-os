@@ -52,6 +52,9 @@ winresource = "0.1"
 
 [target.'cfg(windows)'.dependencies]
 winsafe = { workspace = true, features = ["gui"], optional = true }
+windows = { workspace = true, features = ["Win32_Graphics_DirectWrite"] }
+clipboard-win = "5"
+pollster = "1"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 wayland-client = "0.31"

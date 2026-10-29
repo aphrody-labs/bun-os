@@ -48,3 +48,8 @@ winresource = "0.1"
 [target.'cfg(target_os = "linux")'.dependencies]
 zbus = "5"
 wl-clipboard-rs = "0.9"
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = ["System_UserProfile", "UI_ViewManagement"] }
+clipboard-win = "5"
+open = "5"
