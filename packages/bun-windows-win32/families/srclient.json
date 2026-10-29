@@ -1,7 +1,0 @@
-{
-  "family": "srclient",
-  "dll": "srclient.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["System.Restore"],
-  "functions": { "SRRemoveRestorePoint": ["u32", ["u32"], ["dwRPNum"], 0] }
-}

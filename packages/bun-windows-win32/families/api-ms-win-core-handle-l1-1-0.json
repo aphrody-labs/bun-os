@@ -1,7 +1,0 @@
-{
-  "family": "api-ms-win-core-handle-l1-1-0",
-  "dll": "api-ms-win-core-handle-l1-1-0.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Foundation"],
-  "functions": { "CompareObjectHandles": ["i32", ["p", "p"], ["hFirstObjectHandle", "hSecondObjectHandle"], 0] }
-}

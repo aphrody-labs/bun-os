@@ -1,7 +1,0 @@
-{
-  "family": "windows-networking",
-  "dll": "windows.networking.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Networking.WinSock"],
-  "functions": { "SetSocketMediaStreamingMode": ["hr", ["i32"], ["value"], 0] }
-}

@@ -1,7 +1,0 @@
-{
-  "family": "api-ms-win-core-sysinfo-l1-2-0",
-  "dll": "api-ms-win-core-sysinfo-l1-2-0.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["System.SystemInformation"],
-  "functions": { "GetOsSafeBootMode": ["i32", ["*u32"], ["Flags"], 0] }
-}

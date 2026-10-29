@@ -1,7 +1,0 @@
-{
-  "family": "sas",
-  "dll": "sas.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Security.Authentication.Identity"],
-  "functions": { "SendSAS": ["void", ["i32"], ["AsUser"], 0] }
-}

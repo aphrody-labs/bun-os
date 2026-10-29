@@ -1,7 +1,0 @@
-{
-  "family": "ntdllk",
-  "dll": "ntdllk.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["System.SystemInformation"],
-  "functions": { "RtlGetSystemGlobalData": ["u32", ["i32", "p", "u32"], ["DataId", "Buffer", "Size"], 0] }
-}

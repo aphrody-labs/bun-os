@@ -1,7 +1,0 @@
-{
-  "family": "dxcore",
-  "dll": "dxcore.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Graphics.DXCore"],
-  "functions": { "DXCoreCreateAdapterFactory": ["hr", ["*s16:Foundation.GUID", "p"], ["riid", "ppvFactory"], 0] }
-}

@@ -1,9 +1,0 @@
-{
-  "family": "api-ms-win-core-winrt-registration-l1-1-0",
-  "dll": "api-ms-win-core-winrt-registration-l1-1-0.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["System.WinRT"],
-  "functions": {
-    "RoGetServerActivatableClasses": ["hr", ["p", "p", "*u32"], ["serverName", "activatableClassIds", "count"], 0]
-  }
-}

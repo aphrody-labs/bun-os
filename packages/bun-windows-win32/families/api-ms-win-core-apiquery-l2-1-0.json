@@ -1,7 +1,0 @@
-{
-  "family": "api-ms-win-core-apiquery-l2-1-0",
-  "dll": "api-ms-win-core-apiquery-l2-1-0.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["System.WindowsProgramming"],
-  "functions": { "IsApiSetImplemented": ["i32", ["a"], ["Contract"], 0] }
-}

@@ -1,9 +1,0 @@
-{
-  "family": "api-ms-win-gaming-deviceinformation-l1-1-0",
-  "dll": "api-ms-win-gaming-deviceinformation-l1-1-0.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Gaming"],
-  "functions": {
-    "GetGamingDeviceModelInformation": ["hr", ["*s8:Gaming.GAMING_DEVICE_MODEL_INFORMATION"], ["information"], 0]
-  }
-}

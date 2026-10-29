@@ -1,7 +1,0 @@
-{
-  "family": "api-ms-win-shcore-scaling-l1-1-2",
-  "dll": "api-ms-win-shcore-scaling-l1-1-2.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["UI.Shell"],
-  "functions": { "GetDpiForShellUIComponent": ["u32", ["i32"], ["param0"], 0] }
-}

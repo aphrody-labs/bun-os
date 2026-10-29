@@ -1,7 +1,0 @@
-{
-  "family": "api-ms-win-appmodel-runtime-l1-1-6",
-  "dll": "api-ms-win-appmodel-runtime-l1-1-6.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Storage.Packaging.Appx"],
-  "functions": { "GetPackageGraphRevisionId": ["u32", [], [], 0] }
-}

@@ -1,9 +1,0 @@
-{
-  "interfaces": {
-    "IIsolatedEnvironmentInterop": {
-      "g": "85713c2e-8e62-46c5-8de2-c647e1d54636",
-      "b": "System.Com.IUnknown",
-      "m": [["GetHostHwndInterop", "hr", "p", "@p"]]
-    }
-  }
-}

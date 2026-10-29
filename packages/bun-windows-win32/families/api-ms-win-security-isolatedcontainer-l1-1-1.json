@@ -1,7 +1,0 @@
-{
-  "family": "api-ms-win-security-isolatedcontainer-l1-1-1",
-  "dll": "api-ms-win-security-isolatedcontainer-l1-1-1.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Security.Isolation"],
-  "functions": { "IsProcessInWDAGContainer": ["hr", ["p", "*i32"], ["Reserved", "isProcessInWDAGContainer"], 0] }
-}
