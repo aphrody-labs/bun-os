@@ -82,7 +82,10 @@ export class NtCore {
     if (source instanceof ArrayBuffer || ArrayBuffer.isView(source)) bytes = source as BufferSource;
     else {
       const url = source ?? new URL("../wasm/ntcore.wasm", import.meta.url);
-      bytes = source instanceof Response ? await source.arrayBuffer() : await Bun.file(url instanceof URL ? url : String(url)).arrayBuffer();
+      bytes =
+        source instanceof Response
+          ? await source.arrayBuffer()
+          : await Bun.file(url instanceof URL ? url : String(url)).arrayBuffer();
     }
     const { instance } = await WebAssembly.instantiate(bytes, {});
     return new NtCore(instance.exports as unknown as Exports);
@@ -108,7 +111,7 @@ export class NtCore {
     const buf = new Uint8Array(s.length * 2);
     const v = new DataView(buf.buffer);
     for (let i = 0; i < s.length; i++) v.setUint16(i * 2, s.charCodeAt(i), true);
-    return this.withBytes(buf, (p) => fn(p, s.length));
+    return this.withBytes(buf, p => fn(p, s.length));
   }
   /** @internal */ scratch<T>(words: number, fn: (ptr: number, read: () => Uint32Array) => T): T {
     const p = this.x.nt_malloc(words * 4);
@@ -137,7 +140,7 @@ export class NtCore {
   }
 
   openHive(image: Uint8Array): Hive {
-    const id = this.withBytes(image, (p) => this.x.nt_hive_open(p, image.length));
+    const id = this.withBytes(image, p => this.x.nt_hive_open(p, image.length));
     if (id <= 0) throw new NtError("hive load failed", id);
     return new Hive(this, id);
   }
@@ -147,7 +150,7 @@ export class NtCore {
   }
 
   inspectPe(image: Uint8Array): PeInfo {
-    return this.withBytes(image, (p) =>
+    return this.withBytes(image, p =>
       this.scratch(9, (out, read) => {
         const st = this.x.nt_pe_inspect(p, image.length, out);
         if (st !== 0) throw new NtError("not a PE image", st);
@@ -169,11 +172,11 @@ export class NtCore {
   }
   /** File offset of an RVA through the section table, or undefined when it is not backed by the file. */
   rvaToOffset(image: Uint8Array, rva: number): number | undefined {
-    const r = this.withBytes(image, (p) => this.x.nt_pe_rva_to_offset(p, image.length, rva));
+    const r = this.withBytes(image, p => this.x.nt_pe_rva_to_offset(p, image.length, rva));
     return r < 0 ? undefined : r;
   }
   peDirectory(image: Uint8Array, index: number): { rva: number; size: number } | undefined {
-    return this.withBytes(image, (p) =>
+    return this.withBytes(image, p =>
       this.scratch(2, (out, read) => {
         if (this.x.nt_pe_directory(p, image.length, index, out) !== 0) return undefined;
         const r = read();

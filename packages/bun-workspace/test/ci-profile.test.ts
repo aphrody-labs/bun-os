@@ -119,3 +119,10 @@ test("the bootstrap cone holds every repository file the setup-workspace steps r
     expect({ job: name, missing }).toEqual({ job: name, missing: [] });
   }
 });
+
+test("the ci profile cone holds the tracked files `buncc doctor --repo` reads", async () => {
+  const file = (await Bun.file(resolve(root, "packages/bun-workspace/config/git-profiles.json")).json()) as ProfileFile;
+  const cone = conePaths(file, file.profiles.ci!, await gitlinks(root));
+  for (const path of ["vendor/microsoft/PINS.json", "examples/windows/d3d12-headless/rust/Cargo.toml"])
+    expect({ path, covered: inCone(cone, path) }).toEqual({ path, covered: true });
+});

@@ -86,6 +86,7 @@
         "crates",
         "design-system",
         "docs",
+        "examples",
         "fonts",
         "infra",
         "packages",
@@ -94,6 +95,7 @@
         "replica",
         "tools",
         "vendor/cargo",
+        "vendor/microsoft",
         "vendor/uutils"
       ],
       "submodules": [

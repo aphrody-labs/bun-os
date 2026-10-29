@@ -46,12 +46,22 @@ async function generateHeaders() {
     let ok = false;
     for (const cc of candidates) {
       const r = await run([cc, "-O1", "-w", join(R, "sdk/tools/hpp/hpp.c"), "-o", hpp]).catch(() => ({ code: 1 }));
-      if (r.code === 0) { ok = true; break; }
+      if (r.code === 0) {
+        ok = true;
+        break;
+      }
     }
     if (!ok) throw new Error("no host C compiler could build sdk/tools/hpp (set NTCORE_HOST_CC)");
   }
   const xdk = join(R, "sdk/include/xdk");
-  for (const [name, dir] of [["wdm", "ddk"], ["ntddk", "ddk"], ["ntifs", "ddk"], ["devioctl", "psdk"], ["ntdef", "psdk"], ["winnt", "psdk"]] as const) {
+  for (const [name, dir] of [
+    ["wdm", "ddk"],
+    ["ntddk", "ddk"],
+    ["ntifs", "ddk"],
+    ["devioctl", "psdk"],
+    ["ntdef", "psdk"],
+    ["winnt", "psdk"],
+  ] as const) {
     const r = await run([hpp, `${name}.template.h`, join(gen, dir, `${name}.h`)], xdk);
     if (r.code !== 0) throw new Error(`hpp ${name}: ${r.err}`);
   }
@@ -61,42 +71,128 @@ async function generateHeaders() {
     wdm,
     readFileSync(wdm, "utf8")
       .replaceAll("0xffdff000", "0x00000400")
-      .replace('__asm__ __volatile__ ("xchg %%eax, %0" : : "m" (Barrier) : "%eax", "memory");', "__sync_synchronize();"),
+      .replace(
+        '__asm__ __volatile__ ("xchg %%eax, %0" : : "m" (Barrier) : "%eax", "memory");',
+        "__sync_synchronize();",
+      ),
   );
   // bugcodes.h from the .mc message file (what wmc does for the real build)
   const sev: Record<string, number> = { Success: 0, Informational: 1, Warning: 2, Error: 3 };
   const fac: Record<string, number> = { System: 0, Runtime: 2, Stubs: 3, Io: 4 };
-  let id = 0, s = 0, f = 0;
+  let id = 0,
+    s = 0,
+    f = 0;
   const lines = ["#pragma once"];
   for (const l of readFileSync(join(R, "sdk/include/reactos/mc/bugcodes.mc"), "utf8").split(/\r?\n/)) {
     let m;
     if ((m = /^MessageId=0x([0-9A-Fa-f]+)/.exec(l))) id = parseInt(m[1]!, 16);
     else if ((m = /^Severity=(\w+)/.exec(l))) s = sev[m[1]!] ?? 0;
     else if ((m = /^Facility=(\w+)/.exec(l))) f = fac[m[1]!] ?? 0;
-    else if ((m = /^SymbolicName=(\w+)/.exec(l))) lines.push(`#define ${m[1]} ((ULONG)0x${(((s << 30) | (f << 16) | id) >>> 0).toString(16).toUpperCase().padStart(8, "0")}L)`);
+    else if ((m = /^SymbolicName=(\w+)/.exec(l)))
+      lines.push(
+        `#define ${m[1]} ((ULONG)0x${(((s << 30) | (f << 16) | id) >>> 0).toString(16).toUpperCase().padStart(8, "0")}L)`,
+      );
   }
   writeFileSync(join(gen, "bugcodes.h"), lines.join("\n") + "\n");
 }
 function findMingw(): string | undefined {
   const base = join(root, "..", "ref", "llvm-mingw-dl");
   if (!existsSync(base)) return undefined;
-  const d = readdirSync(base).find((n) => n.startsWith("llvm-mingw-") && !n.endsWith(".zip"));
+  const d = readdirSync(base).find(n => n.startsWith("llvm-mingw-") && !n.endsWith(".zip"));
   return d ? join(base, d, "bin", "x86_64-w64-mingw32-clang" + exe) : undefined;
 }
 
 // ---- 2. compile profiles ---------------------------------------------------------------------------------------------
-const base = ["--target=wasm32-unknown-unknown", "-ffreestanding", "-fshort-wchar", "-O2", "-mbulk-memory", "-msign-ext", "-fno-builtin", "-Wno-everything"];
-const ntInc = ["factory/ntcore/shim-nt", `${gen}/ddk`, `${gen}/psdk`, gen].map((p) => (p.startsWith("factory") ? join(root, p) : p)).concat(
-  ["ntoskrnl/include", "sdk/include/vcruntime", "sdk/include/ucrt", "sdk/include/crt", "sdk/include/ddk", "sdk/include/ndk", "sdk/include/psdk", "sdk/include/reactos", "sdk/include/reactos/libs", "sdk/include", "sdk/include/reactos/wine", "sdk/lib/cmlib", "sdk/include/reactos/drivers", "sdk/lib/drivers/arbiter", "ntoskrnl", "sdk/lib/rtl"].map((p) => join(R, p)),
-);
-const ntDefs = ["-D__REACTOS__", "-D_NTOSKRNL_", "-D_NTSYSTEM_", "-DNTDDI_VERSION=0x05020400", "-D_WIN32_WINNT=0x502", "-DTARGET_i386", "-D_M_IX86", "-D__i386__", "-DNDEBUG", "-D_X86_", "-D_DLL", "-DWIN32", "-D_WIN32", "-DWINVER=0x502", "-DCONFIG=1", "-D__NO_INTRINSICS__", "-fms-extensions", "-include", join(root, "factory/ntcore/shim-nt/preinc.h")];
-const ntArgs = (extra: string[] = []) => [...base, ...ntInc.map((i) => `-I${i}`), ...ntDefs, ...extra];
-const cmArgs = [...base, `-I${join(here, "shim")}`, `-I${join(R, "sdk/include/host")}`, `-I${join(R, "sdk/lib/cmlib")}`, "-DCMLIB_HOST", "-D__NO_CTYPE_INLINES", "-DNASSERT", "-D_NTSYSTEM_", "-DTARGET_i386", "-Wno-multichar"];
+const base = [
+  "--target=wasm32-unknown-unknown",
+  "-ffreestanding",
+  "-fshort-wchar",
+  "-O2",
+  "-mbulk-memory",
+  "-msign-ext",
+  "-fno-builtin",
+  "-Wno-everything",
+];
+const ntInc = ["factory/ntcore/shim-nt", `${gen}/ddk`, `${gen}/psdk`, gen]
+  .map(p => (p.startsWith("factory") ? join(root, p) : p))
+  .concat(
+    [
+      "ntoskrnl/include",
+      "sdk/include/vcruntime",
+      "sdk/include/ucrt",
+      "sdk/include/crt",
+      "sdk/include/ddk",
+      "sdk/include/ndk",
+      "sdk/include/psdk",
+      "sdk/include/reactos",
+      "sdk/include/reactos/libs",
+      "sdk/include",
+      "sdk/include/reactos/wine",
+      "sdk/lib/cmlib",
+      "sdk/include/reactos/drivers",
+      "sdk/lib/drivers/arbiter",
+      "ntoskrnl",
+      "sdk/lib/rtl",
+    ].map(p => join(R, p)),
+  );
+const ntDefs = [
+  "-D__REACTOS__",
+  "-D_NTOSKRNL_",
+  "-D_NTSYSTEM_",
+  "-DNTDDI_VERSION=0x05020400",
+  "-D_WIN32_WINNT=0x502",
+  "-DTARGET_i386",
+  "-D_M_IX86",
+  "-D__i386__",
+  "-DNDEBUG",
+  "-D_X86_",
+  "-D_DLL",
+  "-DWIN32",
+  "-D_WIN32",
+  "-DWINVER=0x502",
+  "-DCONFIG=1",
+  "-D__NO_INTRINSICS__",
+  "-fms-extensions",
+  "-include",
+  join(root, "factory/ntcore/shim-nt/preinc.h"),
+];
+const ntArgs = (extra: string[] = []) => [...base, ...ntInc.map(i => `-I${i}`), ...ntDefs, ...extra];
+const cmArgs = [
+  ...base,
+  `-I${join(here, "shim")}`,
+  `-I${join(R, "sdk/include/host")}`,
+  `-I${join(R, "sdk/lib/cmlib")}`,
+  "-DCMLIB_HOST",
+  "-D__NO_CTYPE_INLINES",
+  "-DNASSERT",
+  "-D_NTSYSTEM_",
+  "-DTARGET_i386",
+  "-Wno-multichar",
+];
 const plain = [...base];
 
-interface Job { name: string; src: string; args: string[]; origin: "reactos" | "glue" }
+interface Job {
+  name: string;
+  src: string;
+  args: string[];
+  origin: "reactos" | "glue";
+}
 const jobs: Job[] = [
-  ...["cmcheck", "cminit", "cmheal", "cmindex", "cmkeydel", "cmname", "cmse", "cmvalue", "hivebin", "hivecell", "hiveinit", "hivesum", "hivewrt"].map((n): Job => ({ name: `cm_${n}`, src: join(R, `sdk/lib/cmlib/${n}.c`), args: cmArgs, origin: "reactos" })),
+  ...[
+    "cmcheck",
+    "cminit",
+    "cmheal",
+    "cmindex",
+    "cmkeydel",
+    "cmname",
+    "cmse",
+    "cmvalue",
+    "hivebin",
+    "hivecell",
+    "hiveinit",
+    "hivesum",
+    "hivewrt",
+  ].map((n): Job => ({ name: `cm_${n}`, src: join(R, `sdk/lib/cmlib/${n}.c`), args: cmArgs, origin: "reactos" })),
   { name: "ex_handle", src: join(R, "ntoskrnl/ex/handle.c"), args: ntArgs(), origin: "reactos" },
   { name: "rtl_image", src: join(R, "sdk/lib/rtl/image.c"), args: ntArgs(["-D_BLDR_"]), origin: "reactos" },
   { name: "cm_glue", src: join(here, "glue/cm_glue.c"), args: [...cmArgs, `-I${join(here, "glue")}`], origin: "glue" },
@@ -111,10 +207,17 @@ async function build() {
   const tHdr = performance.now() - t0;
   const t1 = performance.now();
   const results = await Promise.all(
-    jobs.map(async (j) => {
+    jobs.map(async j => {
       const o = join(objDir, `${j.name}.o`);
       const r = await run([clang, ...j.args, "-c", j.src, "-o", o], R);
-      if (r.code !== 0) throw new Error(`${j.name}: ${r.err.split("\n").filter((l) => /error/.test(l)).slice(0, 5).join("\n")}`);
+      if (r.code !== 0)
+        throw new Error(
+          `${j.name}: ${r.err
+            .split("\n")
+            .filter(l => /error/.test(l))
+            .slice(0, 5)
+            .join("\n")}`,
+        );
       return { name: j.name, origin: j.origin, bytes: statSync(o).size };
     }),
   );
@@ -122,10 +225,25 @@ async function build() {
   const t2 = performance.now();
   const wasm = join(root, "packages/ntcore/wasm/ntcore.wasm");
   mkdirSync(dirname(wasm), { recursive: true });
-  const link = await run([wasmLd, "--no-entry", "--gc-sections", "--no-stack-first", "--global-base=16384", "-z", "stack-size=262144", "--initial-memory=4194304", "--max-memory=268435456", "--export-memory", "-o", wasm, ...jobs.map((j) => join(objDir, `${j.name}.o`))]);
+  const link = await run([
+    wasmLd,
+    "--no-entry",
+    "--gc-sections",
+    "--no-stack-first",
+    "--global-base=16384",
+    "-z",
+    "stack-size=262144",
+    "--initial-memory=4194304",
+    "--max-memory=268435456",
+    "--export-memory",
+    "-o",
+    wasm,
+    ...jobs.map(j => join(objDir, `${j.name}.o`)),
+  ]);
   if (link.code !== 0) throw new Error(`wasm-ld: ${link.err}`);
   const tLd = performance.now() - t2;
-  const git = async (dir: string, ...a: string[]) => (await run(["git", "-C", dir, ...a]).catch(() => ({ out: "" }))).out.trim();
+  const git = async (dir: string, ...a: string[]) =>
+    (await run(["git", "-C", dir, ...a]).catch(() => ({ out: "" }))).out.trim();
   const manifest = {
     wasm: "ntcore.wasm",
     bytes: statSync(wasm).size,
@@ -136,34 +254,74 @@ async function build() {
     timingMs: { headers: Math.round(tHdr), compile: Math.round(tCc), link: Math.round(tLd) },
   };
   writeFileSync(join(root, "packages/ntcore/wasm/ntcore.build.json"), JSON.stringify(manifest, null, 2) + "\n");
-  console.log(`ntcore.wasm ${manifest.bytes} bytes; headers ${manifest.timingMs.headers} ms, compile ${manifest.timingMs.compile} ms, link ${manifest.timingMs.link} ms`);
+  console.log(
+    `ntcore.wasm ${manifest.bytes} bytes; headers ${manifest.timingMs.headers} ms, compile ${manifest.timingMs.compile} ms, link ${manifest.timingMs.link} ms`,
+  );
 }
 
 // ---- 3. sweep: how much of ReactOS/Wine compiles for wasm32 -----------------------------------------------------------
 function* walk(dir: string): Generator<string> {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
     const p = join(dir, e.name);
-    if (e.isDirectory()) { if (!/^(amd64|arm|arm64|powerpc|unix)$/.test(e.name)) yield* walk(p); }
-    else if (e.name.endsWith(".c")) yield p;
+    if (e.isDirectory()) {
+      if (!/^(amd64|arm|arm64|powerpc|unix)$/.test(e.name)) yield* walk(p);
+    } else if (e.name.endsWith(".c")) yield p;
   }
 }
 async function pool<T, U>(items: T[], n: number, fn: (x: T) => Promise<U>): Promise<U[]> {
   const res: U[] = [];
   let i = 0;
-  await Promise.all(Array.from({ length: n }, async () => { while (i < items.length) { const k = i++; res[k] = await fn(items[k]!); } }));
+  await Promise.all(
+    Array.from({ length: n }, async () => {
+      while (i < items.length) {
+        const k = i++;
+        res[k] = await fn(items[k]!);
+      }
+    }),
+  );
   return res;
 }
 async function sweep() {
   // wine PE-side headers need two patched copies (x86 inline asm in winnt.h and wine/asm.h)
   const gw = join(out, "gen-wine");
   mkdirSync(join(gw, "wine"), { recursive: true });
-  writeFileSync(join(gw, "winnt.h"), readFileSync(join(W, "include/winnt.h"), "utf8")
-    .replace('__asm__ __volatile__( "int $0x29" :: "c" ((ULONG_PTR)code) : "memory" );', "__builtin_trap();")
-    .replace('__asm__(".byte 0x64\\n\\tmovl (0x18),%0" : "=r" (teb));', "{ extern struct _TEB *__ntcore_teb; teb = __ntcore_teb; }"));
-  writeFileSync(join(gw, "wine/asm.h"), readFileSync(join(W, "include/wine/asm.h"), "utf8") + "\n#undef __ASM_DEFINE_FUNC\n#define __ASM_DEFINE_FUNC(name,code)\n#undef __ASM_SYSCALL_FUNC\n#define __ASM_SYSCALL_FUNC(...)\n");
-  const wineArgs = [...base, `-I${gw}`, `-I${join(W, "include")}`, `-I${join(W, "include/msvcrt")}`, `-I${join(W, "dlls/ntdll")}`, "-fms-extensions", "-D__WINESRC__", "-D_NTSYSTEM_", "-DWINE_NOWINSOCK", "-D__i386__", "-D_X86_"];
+  writeFileSync(
+    join(gw, "winnt.h"),
+    readFileSync(join(W, "include/winnt.h"), "utf8")
+      .replace('__asm__ __volatile__( "int $0x29" :: "c" ((ULONG_PTR)code) : "memory" );', "__builtin_trap();")
+      .replace(
+        '__asm__(".byte 0x64\\n\\tmovl (0x18),%0" : "=r" (teb));',
+        "{ extern struct _TEB *__ntcore_teb; teb = __ntcore_teb; }",
+      ),
+  );
+  writeFileSync(
+    join(gw, "wine/asm.h"),
+    readFileSync(join(W, "include/wine/asm.h"), "utf8") +
+      "\n#undef __ASM_DEFINE_FUNC\n#define __ASM_DEFINE_FUNC(name,code)\n#undef __ASM_SYSCALL_FUNC\n#define __ASM_SYSCALL_FUNC(...)\n",
+  );
+  const wineArgs = [
+    ...base,
+    `-I${gw}`,
+    `-I${join(W, "include")}`,
+    `-I${join(W, "include/msvcrt")}`,
+    `-I${join(W, "dlls/ntdll")}`,
+    "-fms-extensions",
+    "-D__WINESRC__",
+    "-D_NTSYSTEM_",
+    "-DWINE_NOWINSOCK",
+    "-D__i386__",
+    "-D_X86_",
+  ];
   const groups: { name: string; dir: string; root: string; args: string[] }[] = [
-    ...["ntoskrnl/ob", "ntoskrnl/ex", "ntoskrnl/ps", "ntoskrnl/io", "ntoskrnl/mm", "ntoskrnl/se", "ntoskrnl/config"].map((d) => ({ name: d, dir: d, root: R, args: ntArgs() })),
+    ...[
+      "ntoskrnl/ob",
+      "ntoskrnl/ex",
+      "ntoskrnl/ps",
+      "ntoskrnl/io",
+      "ntoskrnl/mm",
+      "ntoskrnl/se",
+      "ntoskrnl/config",
+    ].map(d => ({ name: d, dir: d, root: R, args: ntArgs() })),
     { name: "sdk/lib/rtl (_BLDR_)", dir: "sdk/lib/rtl", root: R, args: ntArgs(["-D_BLDR_"]) },
     { name: "sdk/lib/cmlib", dir: "sdk/lib/cmlib", root: R, args: cmArgs },
     { name: "wine dlls/ntdll (PE side)", dir: "dlls/ntdll", root: W, args: wineArgs },
@@ -172,16 +330,43 @@ async function sweep() {
   for (const g of groups) {
     const base0 = join(g.root, g.dir);
     if (!existsSync(base0)) continue;
-    const files = g.dir === "dlls/ntdll" ? readdirSync(base0).filter((f) => f.endsWith(".c")).map((f) => join(base0, f)) : [...walk(base0)];
-    const rs = await pool(files, 8, async (f) => {
-      const r = await run([clang, ...g.args, "-c", f, "-o", process.platform === "win32" ? "NUL" : "/dev/null"], g.root);
-      const first = r.err.split("\n").find((l) => /error/.test(l))?.replace(/^.*error: /, "") ?? "";
+    const files =
+      g.dir === "dlls/ntdll"
+        ? readdirSync(base0)
+            .filter(f => f.endsWith(".c"))
+            .map(f => join(base0, f))
+        : [...walk(base0)];
+    const rs = await pool(files, 8, async f => {
+      const r = await run(
+        [clang, ...g.args, "-c", f, "-o", process.platform === "win32" ? "NUL" : "/dev/null"],
+        g.root,
+      );
+      const first =
+        r.err
+          .split("\n")
+          .find(l => /error/.test(l))
+          ?.replace(/^.*error: /, "") ?? "";
       return { f: relative(g.root, f).replaceAll("\\", "/"), ok: r.code === 0, first };
     });
-    report[g.name] = { ok: rs.filter((x) => x.ok).length, total: rs.length, failed: Object.fromEntries(rs.filter((x) => !x.ok).map((x) => [x.f, x.first])) };
+    report[g.name] = {
+      ok: rs.filter(x => x.ok).length,
+      total: rs.length,
+      failed: Object.fromEntries(rs.filter(x => !x.ok).map(x => [x.f, x.first])),
+    };
     console.log(`${g.name.padEnd(28)} ${report[g.name]!.ok}/${rs.length}`);
   }
-  writeFileSync(join(here, "sweep.json"), JSON.stringify({ clang: (await run([clang, "--version"])).out.split("\n")[0], reactos: (await run(["git", "-C", R, "rev-parse", "HEAD"])).out.trim(), report }, null, 2) + "\n");
+  writeFileSync(
+    join(here, "sweep.json"),
+    JSON.stringify(
+      {
+        clang: (await run([clang, "--version"])).out.split("\n")[0],
+        reactos: (await run(["git", "-C", R, "rev-parse", "HEAD"])).out.trim(),
+        report,
+      },
+      null,
+      2,
+    ) + "\n",
+  );
 }
 
 await build();

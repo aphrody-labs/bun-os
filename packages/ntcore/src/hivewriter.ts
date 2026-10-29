@@ -75,7 +75,12 @@ export function buildHive(root: RegKeyDef, hiveName = "NTCORE"): Uint8Array {
     const cell = { idx: cursor, bytes };
     cursor += size;
     cells.push(cell);
-    return { idx: cell.idx, v: new DataView(bytes.buffer), bytes, put: (off: number, src: Uint8Array) => bytes.set(src, 4 + off) };
+    return {
+      idx: cell.idx,
+      v: new DataView(bytes.buffer),
+      bytes,
+      put: (off: number, src: Uint8Array) => bytes.set(src, 4 + off),
+    };
   };
 
   // security cell: self-relative SD with an empty DACL, shared by every key
@@ -96,15 +101,15 @@ export function buildHive(root: RegKeyDef, hiveName = "NTCORE"): Uint8Array {
   const writeKey = (def: RegKeyDef, parent: number, isRoot: boolean): number => {
     keyCount++;
     const comp = isAscii(def.name);
-    const nameBytes = comp ? Uint8Array.from(def.name, (c) => c.charCodeAt(0)) : utf16(def.name);
+    const nameBytes = comp ? Uint8Array.from(def.name, c => c.charCodeAt(0)) : utf16(def.name);
     const nk = alloc(0x4c + nameBytes.length);
     const subs = [...(def.subkeys ?? [])].sort((a, b) => cmpCi(a.name, b.name));
-    const subCells = subs.map((s) => ({ def: s, idx: writeKey(s, nk.idx, false) }));
+    const subCells = subs.map(s => ({ def: s, idx: writeKey(s, nk.idx, false) }));
 
     const vals = def.values ?? [];
-    const valCells = vals.map((val) => {
+    const valCells = vals.map(val => {
       const vcomp = isAscii(val.name);
-      const vname = vcomp ? Uint8Array.from(val.name, (c) => c.charCodeAt(0)) : utf16(val.name);
+      const vname = vcomp ? Uint8Array.from(val.name, c => c.charCodeAt(0)) : utf16(val.name);
       const vk = alloc(0x14 + vname.length);
       vk.v.setUint16(4, 0x6b76, true); // "vk"
       vk.v.setUint16(6, vname.length, true);
@@ -156,10 +161,10 @@ export function buildHive(root: RegKeyDef, hiveName = "NTCORE"): Uint8Array {
     v.setUint32(44, valueList, true);
     v.setUint32(48, sk.idx, true);
     v.setUint32(52, NIL, true); // class
-    v.setUint32(56, Math.max(0, ...subs.map((s) => s.name.length * 2)), true);
+    v.setUint32(56, Math.max(0, ...subs.map(s => s.name.length * 2)), true);
     v.setUint32(60, 0, true);
-    v.setUint32(64, Math.max(0, ...vals.map((x) => x.name.length * 2)), true);
-    v.setUint32(68, Math.max(0, ...vals.map((x) => x.data.length)), true);
+    v.setUint32(64, Math.max(0, ...vals.map(x => x.name.length * 2)), true);
+    v.setUint32(68, Math.max(0, ...vals.map(x => x.data.length)), true);
     v.setUint32(72, 0, true);
     v.setUint16(76, nameBytes.length, true);
     v.setUint16(78, 0, true);

@@ -97,7 +97,7 @@ describe("registry hive (ReactOS cmlib in wasm)", () => {
     expect([...h.value(k, "Tiny")!.data]).toEqual([9]);
     expect(h.value(k, "Empty")!.data.length).toBe(0);
     expect(h.value(k, "Missing")).toBeUndefined();
-    expect(h.values(k).map((v) => v.name)).toEqual(["Version", "Build", "Epoch", "Blob", "Path", "Tiny", "Empty"]);
+    expect(h.values(k).map(v => v.name)).toEqual(["Version", "Build", "Epoch", "Blob", "Path", "Tiny", "Empty"]);
     expect(text(h.value(h.root, "")!.data)).toBe("default\0");
     expect(text(h.value(h.open("Ünïcode ключ")!, "ЗНАЧЕНИЕ")!.data)).toBe("ok\0");
     h.close();
@@ -269,7 +269,16 @@ function buildPe(plus: boolean, opts: { machine?: number; entry?: number; base?:
 describe("PE images (ReactOS rtl/image.c in wasm)", () => {
   test("PE32 (x86) headers", () => {
     const p = nt.inspectPe(buildPe(false));
-    expect(p).toMatchObject({ machine: 0x14c, sections: 2, entryPointRva: 0x1010, sizeOfImage: 0x4000, subsystem: 3, magic: 0x10b, imageBase: 0x400000n, ntHeadersOffset: 0x80 });
+    expect(p).toMatchObject({
+      machine: 0x14c,
+      sections: 2,
+      entryPointRva: 0x1010,
+      sizeOfImage: 0x4000,
+      subsystem: 3,
+      magic: 0x10b,
+      imageBase: 0x400000n,
+      ntHeadersOffset: 0x80,
+    });
     expect(p.characteristics).toBe(0x102);
     expect(p.dllCharacteristics).toBe(0x8160);
   });
