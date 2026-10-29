@@ -101,6 +101,8 @@ jobs:
           sed -i 's/^#if NV_IS_EXPORT_SYMBOL_PRESENT_hrtimer_setup/#if 1/' nv/kernel-open/nvidia/nv-nano-timer.c
           # sys_close() is gone from kernels 6.x+; close_fd() is the in-kernel replacement.
           sed -i 's/sys_close(fd)/close_fd(fd)/' nv/kernel-open/nvidia/nv-caps.c
+          # iowrite64() needs the 64-bit MMIO helpers include since linux/io.h stopped pulling them in.
+          sed -i '0,/^#include/s//#include <linux\/io-64-nonatomic-lo-hi.h>\n#include/' nv/kernel-open/nvidia-uvm/uvm_ats_sva.c
           make -C linux-${{ matrix.kver }} defconfig modules_prepare -j"$(nproc)"
           make -C nv modules -j"$(nproc)" SYSSRC="$PWD/linux-${{ matrix.kver }}" SYSOUT="$PWD/linux-${{ matrix.kver }}" 2>&1 | tee nv-build.log | tail -n 60
           ls -l nv/kernel-open/*.ko
