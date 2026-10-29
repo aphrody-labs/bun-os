@@ -9,6 +9,14 @@ place in the OS. The machine-readable source is
 [`factory/bunos/components.json`](../factory/bunos/components.json); check it
 with `bun factory/bunos/validate.ts` (no build).
 
+The same file also holds the `runtime` pin (npm `bun`), the `registrationModes`
+vocabulary and a `modules` list of every submodule, workspace package, crate and
+crates.io workspace dependency with its registration mode and `aot` flag (AOT
+executables ignore bunfig `preload` and reject `--preload` unless built with
+`--aot-allow-code-from-disk`). `bun factory/bunos/check-components.ts` verifies
+it against `.gitmodules`, `package.json`, `Cargo.toml` and `Cargo.lock`, and runs
+in the CI Bun quality job.
+
 Measured 2026-10-16 with `dust -b`. Submodules shown as "not initialized" are
 declared in `.gitmodules` but not checked out on the workstation.
 

@@ -38,6 +38,9 @@ jobs:
       - name: Workspace manifests
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun scripts/workspace-manifests.ts
+      - name: Component manifest
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: bun factory/bunos/check-components.ts
 
   rust:
     name: Rust ${{ matrix.os }}
