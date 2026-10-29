@@ -1,0 +1,1228 @@
+{
+  "schemaVersion": 1,
+  "note": "Input of rank.ts. Candidates are hand-listed (the only non-data step); every rank, number and pick is computed by rank.ts from GitHub and the Arch/AUR APIs. arch = candidate Arch package names to probe. allowNonRust marks domains where the candidate need not be a Rust-primary repository.",
+  "domains": [
+    {
+      "id": "shell",
+      "title": "Interactive shell / login shell",
+      "replaces": "bash",
+      "candidates": [
+        {
+          "repo": "nushell/nushell",
+          "arch": [
+            "nushell"
+          ]
+        },
+        {
+          "repo": "fish-shell/fish-shell",
+          "arch": [
+            "fish"
+          ]
+        },
+        {
+          "repo": "reubeno/brush",
+          "arch": [
+            "brush-shell",
+            "brush"
+          ]
+        },
+        {
+          "repo": "redox-os/ion",
+          "arch": [
+            "ion-shell",
+            "ion"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "coreutils",
+      "title": "Core utilities",
+      "replaces": "GNU coreutils",
+      "candidates": [
+        {
+          "repo": "uutils/coreutils",
+          "arch": [
+            "uutils-coreutils"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "util-linux",
+      "title": "util-linux",
+      "replaces": "util-linux",
+      "candidates": [
+        {
+          "repo": "uutils/util-linux",
+          "arch": [
+            "uutils-util-linux"
+          ],
+          "fork": "aphrody-labs/uutils-util-linux"
+        }
+      ],
+      "ownerPick": "uutils/util-linux",
+      "ownerDirective": "Owner directive 2026-10-29: util-linux is replaced by uutils-util-linux (our fork aphrody-labs/uutils-util-linux); data rank recorded."
+    },
+    {
+      "id": "findutils",
+      "title": "find/xargs",
+      "replaces": "GNU findutils",
+      "candidates": [
+        {
+          "repo": "uutils/findutils",
+          "arch": [
+            "uutils-findutils"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "diffutils",
+      "title": "cmp/diff/diff3/sdiff",
+      "replaces": "GNU diffutils",
+      "candidates": [
+        {
+          "repo": "uutils/diffutils",
+          "arch": [
+            "uutils-diffutils"
+          ]
+        }
+      ],
+      "ownerPick": "uutils/diffutils",
+      "ownerDirective": "Owner directive 2026-10-29: GNU diffutils is replaced by uutils diffutils."
+    },
+    {
+      "id": "procps",
+      "title": "ps/top/free/uptime",
+      "replaces": "procps-ng",
+      "candidates": [
+        {
+          "repo": "uutils/procps",
+          "arch": [
+            "uutils-procps"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sed",
+      "title": "Stream editor",
+      "replaces": "GNU sed",
+      "candidates": [
+        {
+          "repo": "uutils/sed",
+          "arch": [
+            "uutils-sed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "privilege",
+      "title": "Privilege escalation",
+      "replaces": "sudo",
+      "candidates": [
+        {
+          "repo": "trifectatechfoundation/sudo-rs",
+          "arch": [
+            "sudo-rs"
+          ]
+        },
+        {
+          "repo": "edneville/please",
+          "arch": [
+            "please"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ls",
+      "title": "File listing",
+      "replaces": "ls",
+      "candidates": [
+        {
+          "repo": "eza-community/eza",
+          "arch": [
+            "eza"
+          ]
+        },
+        {
+          "repo": "lsd-rs/lsd",
+          "arch": [
+            "lsd"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "find",
+      "title": "File search",
+      "replaces": "find",
+      "candidates": [
+        {
+          "repo": "sharkdp/fd",
+          "arch": [
+            "fd"
+          ]
+        },
+        {
+          "repo": "uutils/findutils",
+          "arch": [
+            "uutils-findutils"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grep",
+      "title": "Text search",
+      "replaces": "grep",
+      "candidates": [
+        {
+          "repo": "BurntSushi/ripgrep",
+          "arch": [
+            "ripgrep"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cat",
+      "title": "File viewer",
+      "replaces": "cat",
+      "candidates": [
+        {
+          "repo": "sharkdp/bat",
+          "arch": [
+            "bat"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cd",
+      "title": "Directory jumper",
+      "replaces": "cd",
+      "candidates": [
+        {
+          "repo": "ajeetdsouza/zoxide",
+          "arch": [
+            "zoxide"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prompt",
+      "title": "Shell prompt",
+      "replaces": "PS1",
+      "candidates": [
+        {
+          "repo": "starship/starship",
+          "arch": [
+            "starship"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "editor",
+      "title": "Terminal editor",
+      "replaces": "vi/nano",
+      "candidates": [
+        {
+          "repo": "helix-editor/helix",
+          "arch": [
+            "helix"
+          ]
+        },
+        {
+          "repo": "microsoft/edit",
+          "arch": [
+            "edit",
+            "msedit"
+          ]
+        },
+        {
+          "repo": "zed-industries/zed",
+          "arch": [
+            "zed"
+          ]
+        },
+        {
+          "repo": "lapce/lapce",
+          "arch": [
+            "lapce"
+          ]
+        },
+        {
+          "repo": "curlpipe/ox",
+          "arch": [
+            "ox"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "multiplexer",
+      "title": "Terminal multiplexer",
+      "replaces": "tmux/screen",
+      "candidates": [
+        {
+          "repo": "zellij-org/zellij",
+          "arch": [
+            "zellij"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "file-manager",
+      "title": "Terminal file manager",
+      "replaces": "ranger/mc",
+      "candidates": [
+        {
+          "repo": "sxyazi/yazi",
+          "arch": [
+            "yazi"
+          ]
+        },
+        {
+          "repo": "Canop/broot",
+          "arch": [
+            "broot"
+          ]
+        },
+        {
+          "repo": "sayanarijit/xplr",
+          "arch": [
+            "xplr"
+          ]
+        },
+        {
+          "repo": "kamiyaa/joshuto",
+          "arch": [
+            "joshuto"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "disk-usage",
+      "title": "Disk usage",
+      "replaces": "du/ncdu",
+      "candidates": [
+        {
+          "repo": "bootandy/dust",
+          "arch": [
+            "dust"
+          ]
+        },
+        {
+          "repo": "Byron/dua-cli",
+          "arch": [
+            "dua-cli"
+          ]
+        },
+        {
+          "repo": "sharkdp/diskus",
+          "arch": [
+            "diskus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "process-viewer",
+      "title": "Process / system monitor",
+      "replaces": "top/htop",
+      "candidates": [
+        {
+          "repo": "ClementTsang/bottom",
+          "arch": [
+            "bottom"
+          ]
+        },
+        {
+          "repo": "dalance/procs",
+          "arch": [
+            "procs"
+          ]
+        },
+        {
+          "repo": "bvaisvil/zenith",
+          "arch": [
+            "zenith"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "diff",
+      "title": "Diff viewer",
+      "replaces": "diff pager",
+      "candidates": [
+        {
+          "repo": "dandavison/delta",
+          "arch": [
+            "git-delta"
+          ]
+        },
+        {
+          "repo": "Wilfred/difftastic",
+          "arch": [
+            "difftastic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "benchmark",
+      "title": "Command benchmarking",
+      "replaces": "time loops",
+      "candidates": [
+        {
+          "repo": "sharkdp/hyperfine",
+          "arch": [
+            "hyperfine"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "archiver",
+      "title": "Archive tool",
+      "replaces": "tar/unzip",
+      "candidates": [
+        {
+          "repo": "ouch-org/ouch",
+          "arch": [
+            "ouch"
+          ]
+        },
+        {
+          "repo": "google/ripunzip",
+          "arch": [
+            "ripunzip"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "http-client",
+      "title": "HTTP client",
+      "replaces": "curl/httpie",
+      "candidates": [
+        {
+          "repo": "ducaale/xh",
+          "arch": [
+            "xh"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "substitute",
+      "title": "Find and replace",
+      "replaces": "sed s///",
+      "candidates": [
+        {
+          "repo": "chmln/sd",
+          "arch": [
+            "sd"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fields",
+      "title": "Field selection",
+      "replaces": "cut/awk print",
+      "candidates": [
+        {
+          "repo": "theryangeary/choose",
+          "arch": [
+            "choose"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "json",
+      "title": "JSON processor",
+      "replaces": "jq",
+      "candidates": [
+        {
+          "repo": "01mf02/jaq",
+          "arch": [
+            "jaq"
+          ]
+        },
+        {
+          "repo": "yamafaktory/jql",
+          "arch": [
+            "jql"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "git-impl",
+      "title": "Git implementation",
+      "replaces": "git",
+      "candidates": [
+        {
+          "repo": "GitoxideLabs/gitoxide",
+          "arch": [
+            "gitoxide",
+            "gix"
+          ],
+          "tagPrefix": "gitoxide-v"
+        }
+      ]
+    },
+    {
+      "id": "vcs",
+      "title": "Version control system",
+      "replaces": "git workflow",
+      "candidates": [
+        {
+          "repo": "jj-vcs/jj",
+          "arch": [
+            "jujutsu"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "git-tui",
+      "title": "Git terminal UI",
+      "replaces": "tig",
+      "candidates": [
+        {
+          "repo": "gitui-org/gitui",
+          "arch": [
+            "gitui"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aur-helper",
+      "title": "AUR helper / package builder front-end",
+      "replaces": "yay/makepkg wrapper",
+      "candidates": [
+        {
+          "repo": "Morganamilo/paru",
+          "arch": [
+            "paru"
+          ]
+        },
+        {
+          "repo": "fosskers/aura",
+          "arch": [
+            "aura"
+          ]
+        },
+        {
+          "repo": "vn971/rua",
+          "arch": [
+            "rua"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "init",
+      "title": "Init / service manager",
+      "replaces": "systemd",
+      "candidates": [
+        {
+          "repo": "KillingSpark/rustysd",
+          "arch": [
+            "rustysd"
+          ]
+        },
+        {
+          "repo": "threefoldtech/zinit",
+          "arch": [
+            "zinit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ntp",
+      "title": "Time synchronisation",
+      "replaces": "chrony/ntpd",
+      "candidates": [
+        {
+          "repo": "pendulum-project/ntpd-rs",
+          "arch": [
+            "ntpd-rs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bandwidth",
+      "title": "Per-process bandwidth",
+      "replaces": "nethogs",
+      "candidates": [
+        {
+          "repo": "imsnif/bandwhich",
+          "arch": [
+            "bandwhich"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "traceroute",
+      "title": "Network path diagnostics",
+      "replaces": "traceroute/mtr",
+      "candidates": [
+        {
+          "repo": "fujiapple852/trippy",
+          "arch": [
+            "trippy"
+          ]
+        },
+        {
+          "repo": "orf/gping",
+          "arch": [
+            "gping"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tls",
+      "title": "TLS library",
+      "replaces": "OpenSSL TLS",
+      "candidates": [
+        {
+          "repo": "rustls/rustls",
+          "arch": [
+            "rustls",
+            "rustls-ffi"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dns",
+      "title": "DNS client / server",
+      "replaces": "bind/dig",
+      "candidates": [
+        {
+          "repo": "hickory-dns/hickory-dns",
+          "arch": [
+            "hickory-dns"
+          ]
+        },
+        {
+          "repo": "ogham/dog",
+          "arch": [
+            "dog"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ssh",
+      "title": "SSH implementation",
+      "replaces": "OpenSSH",
+      "candidates": [
+        {
+          "repo": "Eugeny/russh",
+          "arch": [
+            "russh"
+          ]
+        },
+        {
+          "repo": "alexcrichton/ssh2-rs",
+          "arch": [
+            "ssh2-rs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compositor",
+      "title": "Wayland compositor",
+      "replaces": "Mutter/Sway/Hyprland",
+      "candidates": [
+        {
+          "repo": "pop-os/cosmic-comp",
+          "arch": [
+            "cosmic-comp"
+          ]
+        },
+        {
+          "repo": "YaLTeR/niri",
+          "arch": [
+            "niri"
+          ]
+        },
+        {
+          "repo": "pinnacle-comp/pinnacle",
+          "arch": [
+            "pinnacle"
+          ]
+        },
+        {
+          "repo": "Smithay/smithay",
+          "arch": [
+            "smithay"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "terminal",
+      "title": "Terminal emulator",
+      "replaces": "xterm/kitty",
+      "candidates": [
+        {
+          "repo": "alacritty/alacritty",
+          "arch": [
+            "alacritty"
+          ]
+        },
+        {
+          "repo": "wezterm/wezterm",
+          "arch": [
+            "wezterm"
+          ]
+        },
+        {
+          "repo": "raphamorim/rio",
+          "arch": [
+            "rio"
+          ]
+        },
+        {
+          "repo": "pop-os/cosmic-term",
+          "arch": [
+            "cosmic-term"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "status-bar",
+      "title": "Status bar",
+      "replaces": "waybar",
+      "candidates": [
+        {
+          "repo": "greshake/i3status-rust",
+          "arch": [
+            "i3status-rust"
+          ]
+        },
+        {
+          "repo": "JakeStanger/ironbar",
+          "arch": [
+            "ironbar"
+          ]
+        },
+        {
+          "repo": "elkowar/eww",
+          "arch": [
+            "eww"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "launcher",
+      "title": "Application launcher",
+      "replaces": "rofi/wofi",
+      "candidates": [
+        {
+          "repo": "anyrun-org/anyrun",
+          "arch": [
+            "anyrun"
+          ]
+        },
+        {
+          "repo": "abenz1267/walker",
+          "arch": [
+            "walker"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clipboard",
+      "title": "Wayland clipboard tools",
+      "replaces": "wl-clipboard",
+      "candidates": [
+        {
+          "repo": "YaLTeR/wl-clipboard-rs",
+          "arch": [
+            "wl-clipboard-rs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "greeter",
+      "title": "Login greeter",
+      "replaces": "GDM/SDDM",
+      "candidates": [
+        {
+          "repo": "kennylevinsen/greetd",
+          "arch": [
+            "greetd"
+          ]
+        },
+        {
+          "repo": "pop-os/cosmic-greeter",
+          "arch": [
+            "cosmic-greeter"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "image-viewer",
+      "title": "Image viewer",
+      "replaces": "feh/eog",
+      "candidates": [
+        {
+          "repo": "woelper/oculante",
+          "arch": [
+            "oculante"
+          ]
+        },
+        {
+          "repo": "ArturKovacs/emulsion",
+          "arch": [
+            "emulsion"
+          ]
+        },
+        {
+          "repo": "atanunq/viu",
+          "arch": [
+            "viu"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oci-runtime",
+      "title": "OCI container runtime",
+      "replaces": "runc/crun",
+      "candidates": [
+        {
+          "repo": "youki-dev/youki",
+          "arch": [
+            "youki"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "microvm",
+      "title": "MicroVM monitor",
+      "replaces": "QEMU (microvm)",
+      "candidates": [
+        {
+          "repo": "firecracker-microvm/firecracker",
+          "arch": [
+            "firecracker"
+          ]
+        },
+        {
+          "repo": "cloud-hypervisor/cloud-hypervisor",
+          "arch": [
+            "cloud-hypervisor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wasm-runtime",
+      "title": "WebAssembly runtime",
+      "replaces": "WAMR/wasm3",
+      "candidates": [
+        {
+          "repo": "bytecodealliance/wasmtime",
+          "arch": [
+            "wasmtime"
+          ]
+        },
+        {
+          "repo": "wasmerio/wasmer",
+          "arch": [
+            "wasmer"
+          ]
+        },
+        {
+          "repo": "wasmi-labs/wasmi",
+          "arch": [
+            "wasmi"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kernel-rust",
+      "title": "Rust-in-kernel",
+      "replaces": "C drivers",
+      "allowNonRust": true,
+      "candidates": [
+        {
+          "repo": "Rust-for-Linux/linux",
+          "arch": []
+        },
+        {
+          "repo": "AsahiLinux/linux",
+          "arch": [
+            "linux-asahi"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "js-runtime",
+      "title": "JavaScript runtime",
+      "replaces": "node",
+      "allowNonRust": true,
+      "ownerDirective": "Bun is the OS runtime by owner decision (2026-10-29); the data rank is recorded next to it.",
+      "candidates": [
+        {
+          "repo": "oven-sh/bun",
+          "arch": [
+            "bun",
+            "bun-bin"
+          ]
+        },
+        {
+          "repo": "denoland/deno",
+          "arch": [
+            "deno"
+          ]
+        }
+      ],
+      "ownerPick": "oven-sh/bun"
+    },
+    {
+      "id": "python-tooling",
+      "title": "Python package/project manager",
+      "replaces": "pip/venv",
+      "candidates": [
+        {
+          "repo": "astral-sh/uv",
+          "arch": [
+            "uv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "python-lint",
+      "title": "Python linter/formatter",
+      "replaces": "flake8/black",
+      "candidates": [
+        {
+          "repo": "astral-sh/ruff",
+          "arch": [
+            "ruff"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fuzzy-finder",
+      "title": "Fuzzy finder",
+      "replaces": "fzf",
+      "candidates": [
+        {
+          "repo": "skim-rs/skim",
+          "arch": [
+            "skim"
+          ]
+        },
+        {
+          "repo": "alexpasmantier/television",
+          "arch": [
+            "television"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task-runner",
+      "title": "Task runner",
+      "replaces": "make (tasks)",
+      "candidates": [
+        {
+          "repo": "casey/just",
+          "arch": [
+            "just"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "watcher",
+      "title": "File watcher runner",
+      "replaces": "entr",
+      "candidates": [
+        {
+          "repo": "watchexec/watchexec",
+          "arch": [
+            "watchexec"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "code-stats",
+      "title": "Code statistics",
+      "replaces": "cloc",
+      "candidates": [
+        {
+          "repo": "XAMPPRocky/tokei",
+          "arch": [
+            "tokei"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hexdump",
+      "title": "Hex viewer",
+      "replaces": "xxd/hexdump",
+      "candidates": [
+        {
+          "repo": "sharkdp/hexyl",
+          "arch": [
+            "hexyl"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "help",
+      "title": "Command cheat sheets",
+      "replaces": "man (examples)",
+      "candidates": [
+        {
+          "repo": "tealdeer-rs/tealdeer",
+          "arch": [
+            "tealdeer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sysinfo",
+      "title": "System information",
+      "replaces": "neofetch",
+      "candidates": [
+        {
+          "repo": "Macchina-CLI/macchina",
+          "arch": [
+            "macchina"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backup",
+      "title": "Backup",
+      "replaces": "restic/borg",
+      "candidates": [
+        {
+          "repo": "rustic-rs/rustic",
+          "arch": [
+            "rustic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "encryption",
+      "title": "File encryption",
+      "replaces": "gpg (files)",
+      "candidates": [
+        {
+          "repo": "str4d/rage",
+          "arch": [
+            "rage-encryption",
+            "rage"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reverse-proxy",
+      "title": "Reverse proxy",
+      "replaces": "nginx",
+      "candidates": [
+        {
+          "repo": "cloudflare/pingora",
+          "arch": [
+            "pingora"
+          ]
+        },
+        {
+          "repo": "sozu-proxy/sozu",
+          "arch": [
+            "sozu"
+          ]
+        },
+        {
+          "repo": "memorysafety/river",
+          "arch": [
+            "river"
+          ]
+        },
+        {
+          "repo": "static-web-server/static-web-server",
+          "arch": [
+            "static-web-server"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sql-database",
+      "title": "Embedded SQL database",
+      "replaces": "SQLite",
+      "candidates": [
+        {
+          "repo": "tursodatabase/turso",
+          "arch": [
+            "turso"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pager",
+      "title": "Pager",
+      "replaces": "less",
+      "candidates": [
+        {
+          "repo": "AMythicDev/minus",
+          "arch": [
+            "minus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bootloader",
+      "title": "Boot manager",
+      "replaces": "systemd-boot/GRUB",
+      "candidates": [
+        {
+          "repo": "edera-dev/sprout",
+          "arch": [
+            "sprout"
+          ]
+        },
+        {
+          "repo": "rust-osdev/bootloader",
+          "arch": []
+        }
+      ]
+    },
+    {
+      "id": "package-manager",
+      "title": "System package manager",
+      "replaces": "pacman",
+      "candidates": [
+        {
+          "repo": "archlinux/alpm.rs",
+          "arch": [
+            "alpm.rs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "firewall",
+      "title": "Packet filter front-end",
+      "replaces": "nftables",
+      "candidates": [
+        {
+          "repo": "mullvad/nftnl-rs",
+          "arch": []
+        }
+      ]
+    },
+    {
+      "id": "network-manager",
+      "title": "Network configuration",
+      "replaces": "NetworkManager",
+      "candidates": [
+        {
+          "repo": "nmstate/nmstate",
+          "arch": [
+            "nmstate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "structural-search",
+      "title": "Structural code search",
+      "replaces": "grep (code)",
+      "candidates": [
+        {
+          "repo": "ast-grep/ast-grep",
+          "arch": [
+            "ast-grep"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api-client",
+      "title": "Terminal API client",
+      "replaces": "Postman",
+      "candidates": [
+        {
+          "repo": "Julien-cpsn/ATAC",
+          "arch": [
+            "atac"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "git-summary",
+      "title": "Repository summary",
+      "replaces": "git-summary",
+      "candidates": [
+        {
+          "repo": "o2sh/onefetch",
+          "arch": [
+            "onefetch"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "openpgp",
+      "title": "OpenPGP library",
+      "replaces": "GnuPG (library)",
+      "candidates": [
+        {
+          "repo": "rpgp/rpgp",
+          "arch": [
+            "rpgp"
+          ]
+        }
+      ]
+    }
+  ]
+}

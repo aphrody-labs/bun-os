@@ -1,0 +1,831 @@
+{
+  "observedAt": "2026-10-29",
+  "picks": [
+    {
+      "domain": "shell",
+      "status": "pick",
+      "repo": "nushell/nushell",
+      "tag": "0.116.1",
+      "sha": "b632ef0994e07b5176ec45171e8cee2c127c5563",
+      "date": "2026-10-04",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "nushell",
+        "version": "0.116.1-1"
+      }
+    },
+    {
+      "domain": "coreutils",
+      "status": "pick",
+      "repo": "uutils/coreutils",
+      "tag": "0.12.0",
+      "sha": "dc1efd89948a9ca4c78c3a4b9a6ac891019a8c69",
+      "date": "2026-09-17",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "uutils-coreutils",
+        "version": "0.12.0-1"
+      }
+    },
+    {
+      "domain": "util-linux",
+      "status": "directive",
+      "repo": "uutils/util-linux",
+      "tag": "0.0.1",
+      "sha": "2b6494475a7ab0bcaae8af4b6f640a0de3b0891e",
+      "date": "2024-02-17",
+      "license": "MIT",
+      "arch": null
+    },
+    {
+      "domain": "findutils",
+      "status": "pick",
+      "repo": "uutils/findutils",
+      "tag": "0.10.0",
+      "sha": "41e7a599f59198617e2e152da5bc3eaa2f87ac0b",
+      "date": "2026-08-03",
+      "license": "MIT",
+      "arch": null
+    },
+    {
+      "domain": "diffutils",
+      "status": "directive",
+      "repo": "uutils/diffutils",
+      "tag": "v0.6.0",
+      "sha": "815ed7d8de89a236e5f636749f80a5b061017521",
+      "date": "2026-10-23",
+      "license": "Apache-2.0",
+      "arch": null
+    },
+    {
+      "domain": "privilege",
+      "status": "pick",
+      "repo": "trifectatechfoundation/sudo-rs",
+      "tag": "v0.2.15",
+      "sha": "e4cfa9cf7b71e287dd5046633c0f5276072d147d",
+      "date": "2026-08-31",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "sudo-rs",
+        "version": "0.2.15-1"
+      }
+    },
+    {
+      "domain": "ls",
+      "status": "pick",
+      "repo": "eza-community/eza",
+      "tag": "v0.23.5",
+      "sha": "98442ab17c2c3738701b62a7e060b1431ae2d6ea",
+      "date": "2026-07-09",
+      "license": "EUPL-1.2",
+      "arch": {
+        "repo": "extra",
+        "name": "eza",
+        "version": "0.23.5-2"
+      }
+    },
+    {
+      "domain": "find",
+      "status": "pick",
+      "repo": "sharkdp/fd",
+      "tag": "v10.5.0",
+      "sha": "4f81778774463bf414a184cbe6d5219ad2229646",
+      "date": "2026-08-26",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "fd",
+        "version": "10.5.0-3"
+      }
+    },
+    {
+      "domain": "grep",
+      "status": "pick",
+      "repo": "BurntSushi/ripgrep",
+      "tag": "15.2.0",
+      "sha": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+      "date": "2026-07-15",
+      "license": "Unlicense",
+      "arch": {
+        "repo": "extra",
+        "name": "ripgrep",
+        "version": "15.2.0-1"
+      }
+    },
+    {
+      "domain": "cat",
+      "status": "pick",
+      "repo": "sharkdp/bat",
+      "tag": "v0.26.1",
+      "sha": "979ba22628bc9d8171f2cffca2bd5c90c9fc0a9e",
+      "date": "2025-12-02",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "bat",
+        "version": "0.26.1-3"
+      }
+    },
+    {
+      "domain": "cd",
+      "status": "pick",
+      "repo": "ajeetdsouza/zoxide",
+      "tag": "v0.10.0",
+      "sha": "f84f9a3e1d16fabf3e34b199ec7d552993b41f29",
+      "date": "2026-07-04",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "zoxide",
+        "version": "0.10.0-1"
+      }
+    },
+    {
+      "domain": "prompt",
+      "status": "pick",
+      "repo": "starship/starship",
+      "tag": "v1.27.0",
+      "sha": "f8e4e2155542cc84f49b342122d371f74e0ad253",
+      "date": "2026-10-17",
+      "license": "ISC",
+      "arch": {
+        "repo": "extra",
+        "name": "starship",
+        "version": "1.27.0-1"
+      }
+    },
+    {
+      "domain": "editor",
+      "status": "pick",
+      "repo": "microsoft/edit",
+      "tag": "v2.0.0",
+      "sha": "d3f86975dc3c1298bf7300dbdf409a1df8d8b2b7",
+      "date": "2026-04-28",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "msedit",
+        "version": "2.0.0-1"
+      }
+    },
+    {
+      "domain": "multiplexer",
+      "status": "pick",
+      "repo": "zellij-org/zellij",
+      "tag": "v0.45.1",
+      "sha": "efd8fd5a89a20c07a111d248ad7fce53848d2c18",
+      "date": "2026-08-28",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "zellij",
+        "version": "0.45.1-1"
+      }
+    },
+    {
+      "domain": "file-manager",
+      "status": "pick",
+      "repo": "sxyazi/yazi",
+      "tag": "v26.9.1",
+      "sha": "8dd895c695a5950330c2623eb43debf323b60654",
+      "date": "2026-09-01",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "yazi",
+        "version": "26.9.1-2"
+      }
+    },
+    {
+      "domain": "disk-usage",
+      "status": "pick",
+      "repo": "bootandy/dust",
+      "tag": "v1.2.6",
+      "sha": "5cc5828d3b6b1c70c8ed6b952fda127639da4d7b",
+      "date": "2026-09-16",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "dust",
+        "version": "1.2.6-1"
+      }
+    },
+    {
+      "domain": "process-viewer",
+      "status": "pick",
+      "repo": "ClementTsang/bottom",
+      "tag": "0.14.9",
+      "sha": "e22236a928eeb876b2ccaad2f3d1ce5f6450281a",
+      "date": "2026-08-27",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "bottom",
+        "version": "0.14.9-1"
+      }
+    },
+    {
+      "domain": "diff",
+      "status": "pick",
+      "repo": "Wilfred/difftastic",
+      "tag": "0.71.0",
+      "sha": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "date": "2026-09-18",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "difftastic",
+        "version": "0.71.0-1"
+      }
+    },
+    {
+      "domain": "benchmark",
+      "status": "pick",
+      "repo": "sharkdp/hyperfine",
+      "tag": "v2.0.0",
+      "sha": "b33755fe1fca8bcc1f182c773ca3ab040bfe517d",
+      "date": "2026-10-07",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "hyperfine",
+        "version": "2.0.0-1"
+      }
+    },
+    {
+      "domain": "archiver",
+      "status": "pick",
+      "repo": "ouch-org/ouch",
+      "tag": "0.8.3",
+      "sha": "433c05d21ffd3a59a213930e256ce4b4ad863d79",
+      "date": "2026-09-13",
+      "license": null,
+      "arch": {
+        "repo": "extra",
+        "name": "ouch",
+        "version": "0.8.3-1"
+      }
+    },
+    {
+      "domain": "http-client",
+      "status": "pick",
+      "repo": "ducaale/xh",
+      "tag": "v0.26.3",
+      "sha": "319d39c2561d2a8697acb3eb9800abcc33bbad98",
+      "date": "2026-10-21",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "xh",
+        "version": "0.26.3-1"
+      }
+    },
+    {
+      "domain": "substitute",
+      "status": "pick",
+      "repo": "chmln/sd",
+      "tag": "v1.1.0",
+      "sha": "4a7b216552d64134c0fa17a59b9d557d89019f0f",
+      "date": "2026-02-25",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "sd",
+        "version": "1.1.0-1"
+      }
+    },
+    {
+      "domain": "fields",
+      "status": "pick",
+      "repo": "theryangeary/choose",
+      "tag": "v1.3.7",
+      "sha": "c0e9622436dfbeb5ae21438466b60c25692f808a",
+      "date": "2025-08-26",
+      "license": "GPL-3.0",
+      "arch": {
+        "repo": "extra",
+        "name": "choose",
+        "version": "1.3.7-2"
+      }
+    },
+    {
+      "domain": "json",
+      "status": "pick",
+      "repo": "01mf02/jaq",
+      "tag": "v3.1.2",
+      "sha": "f7fea9219d8d5364c91c6a0278765eaa0e6fa95e",
+      "date": "2026-10-21",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "jaq",
+        "version": "3.1.2-1"
+      }
+    },
+    {
+      "domain": "git-impl",
+      "status": "pick",
+      "repo": "GitoxideLabs/gitoxide",
+      "tag": null,
+      "sha": null,
+      "date": null,
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "gitoxide",
+        "version": "0.56.0-1"
+      }
+    },
+    {
+      "domain": "vcs",
+      "status": "pick",
+      "repo": "jj-vcs/jj",
+      "tag": "v0.46.0",
+      "sha": "7d382314f9420b4b8d932245b49c99492c812b9f",
+      "date": "2026-10-07",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "jujutsu",
+        "version": "0.46.0-1"
+      }
+    },
+    {
+      "domain": "git-tui",
+      "status": "pick",
+      "repo": "gitui-org/gitui",
+      "tag": "v0.28.1",
+      "sha": "e24fb45df1584ee8d8ebdc4258531b4a91ca975d",
+      "date": "2026-03-24",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "gitui",
+        "version": "0.28.1-2"
+      }
+    },
+    {
+      "domain": "aur-helper",
+      "status": "pick",
+      "repo": "Morganamilo/paru",
+      "tag": "v2.2.0",
+      "sha": "ddd54339054ac6638acaf7a5387a360aabef3bc3",
+      "date": "2026-10-29",
+      "license": "GPL-3.0",
+      "arch": null
+    },
+    {
+      "domain": "ntp",
+      "status": "pick",
+      "repo": "pendulum-project/ntpd-rs",
+      "tag": "v1.9.0",
+      "sha": "46ec9bb4d5b6cb24f814f5543d85b9138afb4cba",
+      "date": "2026-06-12",
+      "license": null,
+      "arch": {
+        "repo": "extra",
+        "name": "ntpd-rs",
+        "version": "1.9.0-1"
+      }
+    },
+    {
+      "domain": "bandwidth",
+      "status": "pick",
+      "repo": "imsnif/bandwhich",
+      "tag": "v0.23.1",
+      "sha": "4faccd1f43968e9be16bae9f26f9c13d2e5c2b10",
+      "date": "2024-10-08",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "bandwhich",
+        "version": "0.23.1-3"
+      }
+    },
+    {
+      "domain": "traceroute",
+      "status": "pick",
+      "repo": "orf/gping",
+      "tag": "gping-v1.21.0",
+      "sha": "ee5163fc6dcba93e63dd84ccb2dd5ca26c4b461b",
+      "date": "2026-08-31",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "gping",
+        "version": "1.21.0-1"
+      }
+    },
+    {
+      "domain": "tls",
+      "status": "pick",
+      "repo": "rustls/rustls",
+      "tag": "v/0.23.46",
+      "sha": "f04804fa13341a9b1dc02b5d1dd8a746f2c4b7fb",
+      "date": "2026-10-14",
+      "license": null,
+      "arch": null
+    },
+    {
+      "domain": "dns",
+      "status": "pick",
+      "repo": "hickory-dns/hickory-dns",
+      "tag": "v0.26.3",
+      "sha": "bd37cafbdd86112a6da32878f8c9bab22e14377e",
+      "date": "2026-09-10",
+      "license": null,
+      "arch": null
+    },
+    {
+      "domain": "ssh",
+      "status": "pick",
+      "repo": "Eugeny/russh",
+      "tag": "v0.65.0",
+      "sha": "183a22e8f8f490fa09b6eb7bd044ef99d8c4414f",
+      "date": "2026-10-25",
+      "license": "Apache-2.0",
+      "arch": null
+    },
+    {
+      "domain": "compositor",
+      "status": "pick",
+      "repo": "niri-wm/niri",
+      "tag": "v26.04",
+      "sha": "8ed0da44d974c32c6877d2f4630c314da0717ecb",
+      "date": "2026-04-25",
+      "license": "GPL-3.0",
+      "arch": {
+        "repo": "extra",
+        "name": "niri",
+        "version": "26.04-1"
+      }
+    },
+    {
+      "domain": "terminal",
+      "status": "pick",
+      "repo": "raphamorim/rio",
+      "tag": "v0.5.28",
+      "sha": "37624389e8dde79ba25a8147a5e809c01d16d1c9",
+      "date": "2026-09-17",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "rio",
+        "version": "0.5.28-1"
+      }
+    },
+    {
+      "domain": "status-bar",
+      "status": "pick",
+      "repo": "JakeStanger/ironbar",
+      "tag": "v0.19.1",
+      "sha": "cac7d684ddc7e26315b4e269b93143ab92c71757",
+      "date": "2026-09-20",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "ironbar",
+        "version": "0.19.1-1"
+      }
+    },
+    {
+      "domain": "launcher",
+      "status": "pick",
+      "repo": "abenz1267/walker",
+      "tag": "v2.17.2",
+      "sha": "a515085fd39fae80acc086c8fbfd9b7771a9a11d",
+      "date": "2026-10-08",
+      "license": "GPL-3.0",
+      "arch": null
+    },
+    {
+      "domain": "clipboard",
+      "status": "pick",
+      "repo": "YaLTeR/wl-clipboard-rs",
+      "tag": "v0.9.5",
+      "sha": "16b63adcbd2191a8c29c2a467342fc24b4ea82dc",
+      "date": "2026-10-26",
+      "license": "Apache-2.0",
+      "arch": null
+    },
+    {
+      "domain": "image-viewer",
+      "status": "pick",
+      "repo": "woelper/oculante",
+      "tag": "0.9.6",
+      "sha": "38dfbe837bb3744c96061c9e237602449f933396",
+      "date": "2026-10-05",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "oculante",
+        "version": "0.9.6-1"
+      }
+    },
+    {
+      "domain": "oci-runtime",
+      "status": "pick",
+      "repo": "youki-dev/youki",
+      "tag": "v0.7.0",
+      "sha": "94ba653efbb180ce04650f6ae01a8e6bc8f96d92",
+      "date": "2026-07-25",
+      "license": "Apache-2.0",
+      "arch": null
+    },
+    {
+      "domain": "microvm",
+      "status": "pick",
+      "repo": "firecracker-microvm/firecracker",
+      "tag": "v1.17.0",
+      "sha": "95f868c8e345b1cc8faccd1a3c910b4989dc3f58",
+      "date": "2026-09-10",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "firecracker",
+        "version": "1.17.0-1"
+      }
+    },
+    {
+      "domain": "wasm-runtime",
+      "status": "pick",
+      "repo": "wasmerio/wasmer",
+      "tag": "v7.5.0",
+      "sha": "82ff099e082da586b38af79986abbb8b677f8baf",
+      "date": "2026-10-01",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "wasmer",
+        "version": "7.5.0-1"
+      }
+    },
+    {
+      "domain": "kernel-rust",
+      "status": "pick",
+      "repo": "Rust-for-Linux/linux",
+      "tag": "v7.3",
+      "sha": "c03c1a14507dfaf8b856c2608f9ac216021fc222",
+      "date": "2026-10-18",
+      "license": null,
+      "arch": null
+    },
+    {
+      "domain": "js-runtime",
+      "status": "directive",
+      "repo": "oven-sh/bun",
+      "tag": "bun-v1.4.4",
+      "sha": "38afee6c84fcf48c0edb2466aa4b27d287a59c30",
+      "date": "2026-10-22",
+      "license": null,
+      "arch": {
+        "repo": "extra",
+        "name": "bun",
+        "version": "1.4.4-1"
+      }
+    },
+    {
+      "domain": "python-tooling",
+      "status": "pick",
+      "repo": "astral-sh/uv",
+      "tag": "0.13.6",
+      "sha": "329bf9448afd9f9088d14a4d57fbc61eb454f117",
+      "date": "2026-10-27",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "uv",
+        "version": "0.13.6-1"
+      }
+    },
+    {
+      "domain": "python-lint",
+      "status": "pick",
+      "repo": "astral-sh/ruff",
+      "tag": "0.17.3",
+      "sha": "ba65abf8ba7bfbcc059f7fb9712be5ba9cab6abc",
+      "date": "2026-10-27",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "ruff",
+        "version": "0.17.3-1"
+      }
+    },
+    {
+      "domain": "fuzzy-finder",
+      "status": "pick",
+      "repo": "skim-rs/skim",
+      "tag": "v5.9.0",
+      "sha": "fe2bfbed9f85712e31d4fd5fedb6f15a81bb1a57",
+      "date": "2026-10-27",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "skim",
+        "version": "5.9.0-1"
+      }
+    },
+    {
+      "domain": "task-runner",
+      "status": "pick",
+      "repo": "casey/just",
+      "tag": "1.59.0",
+      "sha": "2638e9c0941edb1f409da7426fa7842887656973",
+      "date": "2026-10-15",
+      "license": "CC0-1.0",
+      "arch": {
+        "repo": "extra",
+        "name": "just",
+        "version": "1.59.0-1"
+      }
+    },
+    {
+      "domain": "watcher",
+      "status": "pick",
+      "repo": "watchexec/watchexec",
+      "tag": "v2.8.0",
+      "sha": "07e2b99e833da655571fc4001ae47b03f44742c7",
+      "date": "2026-10-06",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "watchexec",
+        "version": "2.8.0-1"
+      }
+    },
+    {
+      "domain": "code-stats",
+      "status": "pick",
+      "repo": "XAMPPRocky/tokei",
+      "tag": "v15.0.0",
+      "sha": "c14f744716272fadeb27a74443cdffa0af35f82f",
+      "date": "2026-09-06",
+      "license": null,
+      "arch": {
+        "repo": "extra",
+        "name": "tokei",
+        "version": "15.0.0-1"
+      }
+    },
+    {
+      "domain": "hexdump",
+      "status": "pick",
+      "repo": "sharkdp/hexyl",
+      "tag": "v0.17.0",
+      "sha": "8eb6d4771ce1ec7af65d06bd335457783b77d557",
+      "date": "2026-02-14",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "hexyl",
+        "version": "0.17.0-2"
+      }
+    },
+    {
+      "domain": "help",
+      "status": "pick",
+      "repo": "tealdeer-rs/tealdeer",
+      "tag": "v1.9.1",
+      "sha": "993a8e0232ef42c4d9935ff5598796b6e98bf213",
+      "date": "2026-10-24",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "tealdeer",
+        "version": "1.9.1-1"
+      }
+    },
+    {
+      "domain": "backup",
+      "status": "pick",
+      "repo": "rustic-rs/rustic",
+      "tag": "v0.11.4",
+      "sha": "6b96f976ff437a0528a4742358b172b32c3e3932",
+      "date": "2026-08-18",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "rustic",
+        "version": "0.11.4-1"
+      }
+    },
+    {
+      "domain": "encryption",
+      "status": "pick",
+      "repo": "str4d/rage",
+      "tag": "v0.12.1",
+      "sha": "7a854c9c8c02dab2ebea19e02e6693a5730a8b2a",
+      "date": "2026-07-14",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "rage-encryption",
+        "version": "0.12.1-1"
+      }
+    },
+    {
+      "domain": "reverse-proxy",
+      "status": "pick",
+      "repo": "sozu-proxy/sozu",
+      "tag": "2.3.3",
+      "sha": "6c983b68d3e230d758643a9639d294cb340baadd",
+      "date": "2026-10-19",
+      "license": "AGPL-3.0",
+      "arch": null
+    },
+    {
+      "domain": "sql-database",
+      "status": "pick",
+      "repo": "tursodatabase/turso",
+      "tag": "v0.8.3",
+      "sha": "607bff9fd0e547a25a97b3bf06e83bcc5d99d53c",
+      "date": "2026-10-12",
+      "license": "MIT",
+      "arch": null
+    },
+    {
+      "domain": "bootloader",
+      "status": "pick",
+      "repo": "rust-osdev/bootloader",
+      "tag": "v0.11.17",
+      "sha": "ec8a8b4b59bd94f3c0280adc1bcdae530251b003",
+      "date": "2026-07-27",
+      "license": "Apache-2.0",
+      "arch": null
+    },
+    {
+      "domain": "network-manager",
+      "status": "pick",
+      "repo": "nmstate/nmstate",
+      "tag": "v2.2.62",
+      "sha": "5b0944fea5cb5bd456abaeec64e01febbeb398f1",
+      "date": "2026-08-25",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "nmstate",
+        "version": "2.2.62-1"
+      }
+    },
+    {
+      "domain": "structural-search",
+      "status": "pick",
+      "repo": "ast-grep/ast-grep",
+      "tag": "0.51.0",
+      "sha": "48b54b3120b70fa9e8cbb40a03bf3bfebe6bf50a",
+      "date": "2026-10-15",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "ast-grep",
+        "version": "0.44.1-1"
+      }
+    },
+    {
+      "domain": "api-client",
+      "status": "pick",
+      "repo": "Julien-cpsn/ATAC",
+      "tag": "v0.24.0",
+      "sha": "f6f939bfc1566c178b554754ffe7ea14b7d3eb42",
+      "date": "2026-10-11",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "atac",
+        "version": "0.24.0-1"
+      }
+    },
+    {
+      "domain": "git-summary",
+      "status": "pick",
+      "repo": "o2sh/onefetch",
+      "tag": "3.1.0",
+      "sha": "a84d62403c5e530eead293804afd43c527d9d433",
+      "date": "2026-10-18",
+      "license": "MIT",
+      "arch": {
+        "repo": "extra",
+        "name": "onefetch",
+        "version": "3.1.0-1"
+      }
+    },
+    {
+      "domain": "openpgp",
+      "status": "pick",
+      "repo": "rpgp/rpgp",
+      "tag": "v0.21.0",
+      "sha": "c2b192e52b2e7f99777196539ea79b37f1f9ff30",
+      "date": "2026-10-03",
+      "license": "Apache-2.0",
+      "arch": {
+        "repo": "extra",
+        "name": "rpgp",
+        "version": "0.12.1-1"
+      }
+    }
+  ]
+}

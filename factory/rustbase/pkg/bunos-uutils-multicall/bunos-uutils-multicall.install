@@ -1,0 +1,8 @@
+post_install() {
+  echo ":: uutils coreutils/findutils/diffutils are active (they replace the GNU packages)."
+  echo ":: util-linux applets stay GNU until: bunos-rust-alternatives enable util-linux"
+}
+post_upgrade() { post_install; }
+pre_remove() {
+  bunos-rust-alternatives disable util-linux >/dev/null 2>&1 || true
+}

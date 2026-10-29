@@ -1,0 +1,14 @@
+post_install() {
+  grep -qx /usr/bin/nu /etc/shells || echo /usr/bin/nu >>/etc/shells
+  # new users only: existing accounts and root are not changed
+  if [ -f /etc/default/useradd ] && grep -q '^SHELL=/bin/bash\|^SHELL=/usr/bin/bash' /etc/default/useradd; then
+    sed -i 's#^SHELL=.*#SHELL=/usr/bin/nu#' /etc/default/useradd
+  fi
+}
+post_upgrade() { post_install; }
+post_remove() {
+  if grep -q '^SHELL=/usr/bin/nu' /etc/default/useradd 2>/dev/null; then
+    sed -i 's#^SHELL=.*#SHELL=/usr/bin/bash#' /etc/default/useradd
+  fi
+  sed -i '\#^/usr/bin/nu$#d' /etc/shells
+}

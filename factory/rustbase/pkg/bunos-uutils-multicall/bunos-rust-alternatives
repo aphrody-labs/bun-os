@@ -1,0 +1,28 @@
+#!/bin/sh
+# Opt-in activation of the uutils util-linux applets. Arch util-linux owns the /usr/bin paths, so the Rust applets are
+# linked into /usr/local/bin (first in the default PATH) and nothing owned by another package is touched.
+set -eu
+SRC=/usr/lib/bunos/rust/bin
+DST=${BUNOS_ALT_DST:-/usr/local/bin}
+cmd=${1:-status}; group=${2:-util-linux}
+[ "$group" = util-linux ] || { echo "unknown group: $group" >&2; exit 2; }
+case "$cmd" in
+  enable)
+    mkdir -p "$DST"
+    for f in "$SRC"/*; do
+      a=$(basename "$f")
+      if [ -e "$DST/$a" ] && [ ! -L "$DST/$a" ]; then echo "skip $a (exists, not ours)"; continue; fi
+      ln -sf "$f" "$DST/$a"
+    done ;;
+  disable)
+    for f in "$SRC"/*; do
+      a=$(basename "$f")
+      [ "$(readlink "$DST/$a" 2>/dev/null || true)" = "$f" ] && rm -f "$DST/$a"
+    done ;;
+  status)
+    for f in "$SRC"/*; do
+      a=$(basename "$f")
+      if [ "$(readlink "$DST/$a" 2>/dev/null || true)" = "$f" ]; then echo "$a rust"; else echo "$a gnu"; fi
+    done ;;
+  *) echo "usage: bunos-rust-alternatives enable|disable|status [util-linux]" >&2; exit 2 ;;
+esac

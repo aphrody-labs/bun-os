@@ -19847,6 +19847,20 @@
       "note": "Omarchy-style timestamped migrations with per-user markers (omacom/omarchy bin/omarchy-migrate)."
     },
     {
+      "id": "factory:rustbase",
+      "kind": "factory-module",
+      "path": "factory/rustbase",
+      "source": {
+        "type": "factory",
+        "files": ["factory/rustbase/domains.json", "factory/rustbase/rank.ts", "factory/rustbase/catalog.json", "factory/rustbase/gen.ts", "factory/rustbase/pins.json", "factory/rustbase/check.ts", "factory/rustbase/render-docs.ts", "factory/rustbase/smoke.sh", "factory/rustbase/pkg/bunos-rust-base/PKGBUILD", "factory/rustbase/pkg/bunos-uutils-multicall/PKGBUILD", "factory/rustbase/pkg/bunos-sudo-rs/PKGBUILD", "factory/rustbase/pkg/bunos-nushell-default/PKGBUILD", "docs/RUSTBASE.md", ".github/workflows/rustbase.yml"]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/nushell", "submodule:vendor/sudo-rs", "submodule:vendor/uutils/coreutils", "submodule:vendor/uutils/findutils", "submodule:vendor/uutils/diffutils", "submodule:vendor/uutils/util-linux"],
+      "note": "Data-driven Rust userland: catalog.json ranks the top Rust tool per domain from GitHub/Arch data; PKGBUILDs bunos-rust-base, bunos-uutils-multicall, bunos-sudo-rs, bunos-nushell-default pin upstream tags by commit."
+    },
+    {
       "id": "factory:distro/hw",
       "kind": "factory-module",
       "path": "factory/distro",
