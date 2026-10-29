@@ -26,6 +26,10 @@ permissions:
 env:
   BUN_VERSION: 1.4.4-canary.20261028.1
 
+concurrency:
+  group: buncc-linux-desktop-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   unit:
     runs-on: ubuntu-latest
