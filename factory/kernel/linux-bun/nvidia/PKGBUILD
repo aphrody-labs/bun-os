@@ -16,9 +16,21 @@ makedepends=(linux-bun-headers git)
 conflicts=(nvidia-open-dkms nvidia-dkms)
 # Commit 1a82fbfda8f321b056eb3568850f9316c5e465c5 is the peeled tag 615.78.08 of NVIDIA/open-gpu-kernel-modules.
 source=("git+https://github.com/aphrody-labs/open-gpu-kernel-modules.git#commit=1a82fbfda8f321b056eb3568850f9316c5e465c5")
-b2sums=(SKIP)
+# Patches: CachyOS/kernel-patches 7.3/misc/nvidia (commit 89bb22dec944, 2026-10-22), vendored unchanged. 0003 (dmem_cgroup_register_region
+# signature) is NOT taken: 615.78.08 already contains that change (os-interface.c, `#if` around &init) and the patch does not apply.
+# Compatibility with 7.2.11 and 7.3 is NOT VERIFIED: the first CI compile failed on del_timer_sync before reaching other errors.
+source+=("patches/0001-fix-dsc-correct-RC-parameter-tables-to-match-VESA-DS.patch")
+source+=("patches/0002-fix-dp-add-Bigscreen-Beyond-VR-headset-to-WAR-databa.patch")
+source+=("patches/0004-Open-sysfs-config-from-the-userspace-root-on-7.3.patch")
+sha256sums=(SKIP
+            'dcbce21a16a008a7371014220cff1153ad9893b8d095b2024066275d4c953bee'
+            '70dc137a9bd6e95ae4b9e296acc24d3e13a138786c6f5dd549dcbcd3a3305906'
+            'a6bbae1da91bead7030ed78a161dedd2dc8d38d495ef87af24673642ef1d7ca9')
 
 prepare() {
+  cd open-gpu-kernel-modules
+  for p in "${srcdir}"/*.patch; do patch -Np1 -i "$p"; done
+  cd ..
   # 615.78.08 still calls del_timer_sync(); the CI compile check (run 40819800811) failed on it for 7.2.11 and 7.3.
   sed -i 's/del_timer_sync/timer_delete_sync/g' open-gpu-kernel-modules/kernel-open/common/inc/nv-timer.h
 }

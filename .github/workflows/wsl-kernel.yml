@@ -74,6 +74,10 @@ jobs:
         kver: ["7.2.11", "7.3"]
     timeout-minutes: 120
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: factory/kernel/linux-bun/nvidia
+          sparse-checkout-cone-mode: true
       - name: Build kernel-open against v7.3 headers
         env:
           IGNORE_MISSING_MODULE_SYMVERS: "1"  # modules_prepare does not produce Module.symvers; this is a compile check only
@@ -84,7 +88,9 @@ jobs:
           tar xf linux-${{ matrix.kver }}.tar.xz
           git clone --depth 1 --branch 615.78.08 https://github.com/aphrody-labs/open-gpu-kernel-modules.git nv
           test "$(git -C nv rev-parse HEAD)" = 1a82fbfda8f321b056eb3568850f9316c5e465c5
+          # CachyOS 7.3 patches (0001, 0002, 0004; 0003 is already in 615.78.08), then:
           # 615.78.08 uses del_timer_sync(), gone from the kernel; timer_delete_sync() is the replacement (first CI run: implicit declaration error on 7.2.11 and 7.3)
+          for p in factory/kernel/linux-bun/nvidia/patches/*.patch; do git -C nv apply "$GITHUB_WORKSPACE/$p"; done
           sed -i 's/del_timer_sync/timer_delete_sync/g' nv/kernel-open/common/inc/nv-timer.h
           make -C linux-${{ matrix.kver }} defconfig modules_prepare -j"$(nproc)"
           make -C nv modules -j"$(nproc)" SYSSRC="$PWD/linux-${{ matrix.kver }}" SYSOUT="$PWD/linux-${{ matrix.kver }}" 2>&1 | tee nv-build.log | tail -n 60
