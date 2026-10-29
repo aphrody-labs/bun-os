@@ -1,0 +1,15 @@
+# Maintainer: aphrody-dev <contact@aphrody.com>
+pkgname=bunos-android
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Android tooling: adb and fastboot (APK execution needs the redroid image, see docs/ALPINE.md)"
+url="https://github.com/aphrody-labs/bun-os"
+arch="noarch"
+license="Apache-2.0"
+depends="android-tools"
+options="!check"
+
+builddir="$srcdir"
+package() {
+	mkdir -p "$pkgdir"
+}

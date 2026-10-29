@@ -1,0 +1,15 @@
+# Maintainer: aphrody-dev <contact@aphrody.com>
+pkgname=bunos-hello
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Tiny package used by the test suite to exercise apk install routes"
+url="https://github.com/aphrody-labs/bun-os"
+arch="noarch"
+license="Apache-2.0"
+options="!check"
+builddir="$srcdir"
+package() {
+	mkdir -p "$pkgdir/usr/bin"
+	printf '#!/bin/sh\necho "hello from the bunos-hello apk"\n' > "$pkgdir/usr/bin/bunos-hello"
+	chmod 755 "$pkgdir/usr/bin/bunos-hello"
+}

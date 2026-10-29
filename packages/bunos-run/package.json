@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "//": "Unnamed on purpose: not a root workspace member, like packages/wasmos.",
+  "description": "bunos run <file>: detect and run ELF, Alpine apk, Windows exe, wasm, deb and scripts on the Bun OS Alpine line.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "bin": { "bunos": "./src/bunos.ts" },
+  "scripts": { "test": "bun test" }
+}

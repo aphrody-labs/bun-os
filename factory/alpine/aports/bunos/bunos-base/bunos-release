@@ -1,0 +1,4 @@
+NAME="Bun OS (Alpine line)"
+ID=bunos-alpine
+VERSION_ID=1.0.0
+HOME_URL="https://github.com/aphrody-labs/bun-os"
