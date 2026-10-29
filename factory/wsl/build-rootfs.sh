@@ -26,7 +26,8 @@ rm -f "$root/etc/resolv.conf"
 fail() { echo "rootfs check failed: $*" >&2; exit 1; }
 [[ -z $(find "$root/boot" -mindepth 1 2>/dev/null) ]] || fail "/boot is not empty"
 [[ ! -e $root/usr/lib/modules ]] || fail "kernel modules in the archive"
-[[ -z $(find "$root" -xdev \( -name 'vmlinuz*' -o -name 'initramfs*' -o -name 'initrd*' \) -print -quit) ]] || fail "kernel or initramfs in the archive"
+kern=$(find "$root" -xdev -type f \( -name 'vmlinuz*' -o -name 'initramfs*.img' -o -name 'initrd.img*' -o -name 'bzImage*' \) -print)
+[[ -z $kern ]] || fail "kernel or initramfs in the archive: $kern"
 [[ -z $(awk -F: '$2 !~ /^[!*]/' "$root/etc/shadow") ]] || fail "password hash in /etc/shadow"
 awk -F: '$1=="root" && $3==0 {ok=1} END{exit !ok}' "$root/etc/passwd" || fail "no root with uid 0 in /etc/passwd"
 awk -F: '$1=="bun" && $3==1000 {ok=1} END{exit !ok}' "$root/etc/passwd" || fail "bun is not uid 1000"
