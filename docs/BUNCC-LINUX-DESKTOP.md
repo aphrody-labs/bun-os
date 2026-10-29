@@ -79,5 +79,14 @@ Windows 11 workstation, LLVM clang 23.1.4 / lld, Meson 1.12.1, Ninja 1.13.2, CMa
   program to `elf64-x86-64` with clang + lld from Windows.
 - No MSYS2 or native distro baseline was measured; no comparative claim is made.
 
+- VPS (`ssh vps`, Ubuntu 26.10 x86_64, 12 cores, load average about 15 to 20, run under `nice -n 19`, everything in
+  `~/build/bun-os-linuxdesktop`, no sudo, no system packages; docutils for `rst2man` in a venv inside that dir):
+  GNOME sysroot (504 packages at that time, 20 671 files) downloaded and extracted in 1 m 49 s; mutter 51.1 (pinned
+  SHA 9134e3a5869c) cross-built with `buncc linux cross mutter` (clang 22.1.8 + lld, Meson, introspection off) in
+  2 m 22 s. Result: ELF64 x86-64 `usr/bin/mutter` and `libmutter-51.so.0` (12 MiB stage). Not executed: the
+  extracted sysroot loses the exec bit, so `mutter --version` was not run there.
+- Needed for that build, now automated: host-tool shims in `<sysroot>/usr/bin` (`glib-mkenums`, `wayland-scanner`, ...),
+  makedepends of the roots in the sysroot, Meson wrap downloads, `-Dbash_completion=false`.
+
 CI and VPS results are recorded in the workflow summaries of `.github/workflows/buncc-linux-desktop.yml` and below
 once they ran.

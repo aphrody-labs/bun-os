@@ -141,7 +141,7 @@ export const SMOKE: Record<string, { files: string[]; run?: string[] }> = {
   gtk4: { files: ["usr/lib/libgtk-4.so.1"] },
   libadwaita: { files: ["usr/lib/libadwaita-1.so.0"] },
   gjs: { files: ["usr/bin/gjs"], run: ["usr/bin/gjs", "--version"] },
-  mutter: { files: ["usr/bin/mutter", "usr/lib/libmutter-18.so.0"], run: ["usr/bin/mutter", "--version"] },
+  mutter: { files: ["usr/bin/mutter", "usr/lib/libmutter-51.so.0"], run: ["usr/bin/mutter", "--version"] },
   "gnome-shell": { files: ["usr/bin/gnome-shell"], run: ["usr/bin/gnome-shell", "--version"] },
   "gnome-session": { files: ["usr/bin/gnome-session"], run: ["usr/bin/gnome-session", "--version"] },
   "gnome-settings-daemon": { files: ["usr/lib/gnome-settings-daemon/gsd-power"] },
