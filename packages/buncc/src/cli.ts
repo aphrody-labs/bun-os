@@ -39,6 +39,7 @@ Linux desktop: linux closure|pins|sysroot|cross|build|container|hello <gnome-she
 Desktop:      desktop doctor|plan|fetch|build|env|pack|bench   GTK4/libadwaita, Qt6, KDE Frameworks on Windows (docs/BUNCC-DESKTOP.md)
 POSIX:        sh [-c script | file]       Bun Shell (cross-platform); env posix --ensure adds pinned uutils/busybox/ripgrep shims
               install posix|mingw|msys2|wine|proton [--run] | posix doctor|smoke|uninstall <msys2|mingw|gnuwin32|cygwin|all> [--yes]
+C env:        c doctor|env|sysroot|targets|build|test   (catalog factory/c/c-env.json, docs/BUNOS-C.md)
 Wine:         wine run <exe> [args] | wine prefix <name> [--dxvk --vkd3d] | wine doctor   (Linux and macOS hosts)
 
 Nothing is signed, published or licence-accepted unless you pass --run and the command says so. Default is a dry run for install/package/profile apply.`;
@@ -202,6 +203,8 @@ async function main(): Promise<number> {
       return wineCommand(rest, root);
     case "linux":
       return (await import("./linux-target/cli.ts")).linuxMain(rest, root);
+    case "c":
+      return (await import("./c/index.ts")).cCommand(rest);
     case "install": {
       if (isManaged(rest[0] ?? "")) {
         for (const line of await ensureManaged(rest[0] as never, !has("run"))) console.log(line);

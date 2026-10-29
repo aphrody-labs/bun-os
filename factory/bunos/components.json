@@ -329,6 +329,32 @@
       "system": "CachyOS repo binary; image currently ships wine-staging"
     },
     {
+      "id": "cargo-xwin",
+      "path": "vendor/cargo-xwin",
+      "size": "not initialized (reference clone, 0.23.1 at 6aa7da9)",
+      "origin": "aphrody-labs/cargo-xwin (fork of rust-cross/cargo-xwin)",
+      "kind": "vendor",
+      "integration": {
+        "mode": "reference",
+        "package": "bunos-c-windows-sysroot",
+        "note": "MSVC CRT and Windows SDK via xwin; Microsoft licence opt-in only"
+      },
+      "system": "read as reference; buncc c sysroot drives xwin directly"
+    },
+    {
+      "id": "reactos",
+      "path": "vendor/reactos",
+      "size": "not initialized",
+      "origin": "aphrody-labs/reactos (fork owned by the multikernel work; read from reactos/reactos)",
+      "kind": "vendor",
+      "integration": {
+        "mode": "reference",
+        "package": "reactos",
+        "note": "PSDK/DDK headers and the ReactOS CRT are the open Windows header source of the reactos targets of buncc c"
+      },
+      "system": "compilation target of buncc c (i686-reactos, x86_64-reactos)"
+    },
+    {
       "id": "omarchy",
       "path": "vendor/omarchy",
       "size": "378 MiB",
@@ -19903,6 +19929,28 @@
       "status": "present",
       "dependsOn": ["submodule:vendor/omarchy"],
       "note": "colors.toml templating, package-vs-user config refresh and hooks (Omarchy model)."
+    },
+    {
+      "id": "factory:c/env",
+      "kind": "factory-module",
+      "path": "factory/c",
+      "source": {
+        "type": "factory",
+        "files": [
+          "factory/c/c-env.json",
+          "factory/c/PKGBUILD",
+          "factory/c/smoke/hello.c",
+          "factory/c/bench/bench.ts",
+          "factory/c/windows/bundle.json",
+          "factory/c/windows/bundle.ts",
+          "packages/buncc/src/c/index.ts"
+        ]
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["npm:@aphrody/buncc", "submodule:vendor/wine-cachyos", "submodule:vendor/proton-cachyos"],
+      "note": "Bun OS C: catalog of C/C++ targets (windows-msvc, windows-gnu, linux gnu/musl, bun-os, reactos); buncc c doctor|env|sysroot|targets|build|test; PKGBUILD bunos-c; docs/BUNOS-C.md. Microsoft SDK only with explicit opt-in."
     },
     {
       "id": "factory:distro/overlay",

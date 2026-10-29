@@ -34,7 +34,6 @@ export const xwinProvider = toolProvider({
   packages: { pacman: "xwin" },
   github: xwinRelease,
   manual: "cargo install xwin --locked   (or call xwinProvider.ensure() for the checksum-verified release)",
-  extraEnv: () => ({ XWIN_ACCEPT_LICENSE: "1" }),
 });
 
 /** Values of `xwin --arch`: x86, x86_64, aarch (32-bit ARM), aarch64. */

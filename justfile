@@ -238,3 +238,25 @@ cargo-build-status:
 [group('plans')]
 cargo-build:
     bun scripts/cargo-build-proof.ts build
+
+# ---- Bun OS C (docs/BUNOS-C.md) -----------------------------------------------------------------------------------
+
+[group('c')]
+[doc('Bun OS C: tools found on this host and the Microsoft licence state')]
+c-doctor:
+    bun packages/buncc/src/cli.ts c doctor
+
+[group('c')]
+[doc('Bun OS C: target catalog (factory/c/c-env.json)')]
+c-targets:
+    bun packages/buncc/src/cli.ts c targets
+
+[group('c')]
+[doc('Bun OS C: smoke matrix, hello.c for every target, header check, run where a runner exists')]
+c-test *args:
+    bun packages/buncc/src/cli.ts c test {{ args }}
+
+[group('c')]
+[doc('Bun OS C: compile-time and size benchmark across the installed compilers')]
+c-bench *args:
+    bun factory/c/bench/bench.ts {{ args }}
