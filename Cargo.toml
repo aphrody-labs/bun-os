@@ -1,10 +1,10 @@
 [workspace]
 # apps/artcraft + crates/sqlite_tasks: sqlx 0.7 (libsqlite3-sys 0.27; sqlx 0.9 caps <0.38) cannot share a lock with rookie-cookies (=libsqlite3-sys 0.38.2); artcraft repeats the exact Tauri pins of [workspace.dependencies].
 # apps/aphrody-drive is the nested FSL Spacedrive workspace. Tauri apps are members: the CEF runtime (cef-dll-sys, needs CMake) is an opt-in `cef` feature, wry is the default runtime.
-exclude = ["cloud", "apps/bunos-wsl/src-tauri", "apps/lu/src-tauri", "crates/lu-native", "apps/artcraft", "crates/sqlite_tasks", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
+# apps/desktop/src-tauri needs the compiled aphrody-server sidecar (build/apps/desktop/native); crates/bunos-wsl is the Windows-only WSL manager (winreg, WSL executor): both build from their own CI jobs, not the Linux workspace gate.
+exclude = ["apps/desktop/src-tauri", "crates/bunos-wsl", "cloud", "apps/bunos-wsl/src-tauri", "apps/lu/src-tauri", "crates/lu-native", "apps/artcraft", "crates/sqlite_tasks", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
 resolver = "3"
 members = [
-  "crates/bunos-wsl",
   "crates/bunos-wsl-core",
   "crates/aphrody",
   "crates/aphrody-agent-runtime",
@@ -86,7 +86,6 @@ members = [
   "crates/tauri-plugin-aphrody",
   "crates/tauri-plugin-mcp-bridge",
   "crates/artcraft-tauri-plugin-http",
-  "apps/desktop/src-tauri",
   "apps/aphrody-app",
   "apps/aphrody-model-view",
   "crates/aphrody-nu",

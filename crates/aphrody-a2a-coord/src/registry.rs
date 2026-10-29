@@ -16,6 +16,7 @@ use std::path::{Path, PathBuf};
 use serde::{Deserialize, Serialize};
 
 /// Canonical peers of the aphrody federation.
+pub const KNOWN_PEERS: &[&str] = &["codex", "agycli", "claude", "ocr", "rag"];
 
 /// Channel a peer is reached through.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

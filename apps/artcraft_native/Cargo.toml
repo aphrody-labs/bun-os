@@ -57,7 +57,7 @@ reqwest = { version = "0.12.23", default-features = false, features = [
   "multipart",
 ] }
 resvg = "0.45"
-rfd = "0.16"
+rfd = { version = "0.16", default-features = false, features = ["gtk3"] }
 rodio = { version = "0.20", default-features = false, features = [
   "symphonia-all",
 ] }

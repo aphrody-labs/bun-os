@@ -425,10 +425,10 @@ fn query_value(query: &str, key: &str) -> Option<String> {
 #[cfg(feature = "serde")]
 /// Host of the NIE wiki whose `chara/<id>` links are accepted: host of `NIE_WIKI_BASE`, else the public default.
 fn wiki_host() -> String {
-    std::env::var("NIE_WIKI_BASE")
-        .ok()
-        .and_then(|base| url_host(base.trim()).map(str::to_owned))
-        .unwrap_or_else(|| "azalee.rosegriffon.fr".to_owned())
+    // The crate is no_std: the override is read at build time, not from the process environment.
+    option_env!("NIE_WIKI_BASE")
+        .and_then(|base| url_host(base.trim()).map(String::from))
+        .unwrap_or_else(|| String::from("azalee.rosegriffon.fr"))
 }
 
 #[cfg(feature = "serde")]

@@ -102,6 +102,7 @@
         "py",
         "replica",
         "tools",
+        "vendor/chipi-spec",
         "vendor/microsoft",
         "vendor/tailwindcss",
         "vendor/uutils"
