@@ -1,0 +1,35 @@
+{
+  "name": "@aphrody/gemma-web",
+  "version": "0.1.0",
+  "description": "Gemma 4 E2B in the browser: ONNX Runtime Web (WebGPU decoder, wasm per-layer embeddings), OPFS shard cache, OpenAI-style streaming client.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/gemma-web"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./worker": "./src/worker.ts",
+    "./catalog": "./src/catalog.ts"
+  },
+  "files": [
+    "src",
+    "web",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "build:web": "bun scripts/build-web.ts",
+    "bench:webgpu": "bun scripts/bench-chrome.ts"
+  },
+  "dependencies": {
+    "@huggingface/jinja": "0.5.11",
+    "@huggingface/tokenizers": "0.2.0",
+    "onnxruntime-web": "1.31.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

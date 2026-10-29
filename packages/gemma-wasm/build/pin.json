@@ -1,0 +1,9 @@
+{
+  "llama.cpp": {
+    "repo": "https://github.com/ggml-org/llama.cpp",
+    "tag": "b11985",
+    "commit": "6d194531e1e5876d5d1a0641ce3ca7dae23f94ad",
+    "date": "2026-10-29"
+  },
+  "emscripten": "6.0.5"
+}
