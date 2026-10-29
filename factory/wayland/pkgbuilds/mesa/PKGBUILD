@@ -1,0 +1,25 @@
+# STUB, UNVERIFIED (never built): mesa mesa-26.2.6 pinned to the exact commit of factory/wayland/closure.json.
+# Replaces Arch 26.2.5 for the opt-in Hyprland composition; same package name, so the local repository must precede core/extra.
+pkgname=mesa
+pkgver=26.2.6
+pkgrel=1
+_commit=8e87a503ebd91408c88596d1b9eeb5f4c0b2088d
+pkgdesc='mesa pinned by the Bun OS Wayland closure'
+arch=(x86_64)
+url='https://gitlab.freedesktop.org/mesa/mesa'
+license=(custom)
+depends=('expat' 'glibc' 'libdrm' 'libelf' 'libgcc' 'libglvnd' 'libstdc++' 'libx11' 'libxcb' 'libxext' 'libxshmfence' 'libxxf86vm' 'llvm-libs' 'lm_sensors' 'sdl3' 'spirv-tools' 'wayland' 'zlib' 'zstd')
+makedepends=('cbindgen' 'clang' 'cmake' 'directx-headers' 'elfutils' 'glslang' 'libclc' 'libdisplay-info' 'libpng' 'libva' 'libxml2' 'libxrandr' 'llvm' 'meson' 'python-mako' 'python-packaging' 'python-ply' 'python-pycparser' 'python-sphinx' 'python-sphinx-hawkmoth' 'python-yaml' 'rust' 'rust-bindgen' 'spirv-llvm-translator' 'systemd-libs' 'valgrind' 'vulkan-icd-loader' 'wayland-protocols' 'xcb-util-keysyms' 'xorgproto' 'ninja' 'git')
+source=("$pkgname::git+https://gitlab.freedesktop.org/mesa/mesa.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  _src="$srcdir/$pkgname"
+  arch-meson build "$_src"
+  meson compile -C build
+}
+
+package() {
+  _src="$srcdir/$pkgname"
+  meson install -C build --destdir "$pkgdir"
+}

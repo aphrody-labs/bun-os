@@ -1,0 +1,25 @@
+# STUB, UNVERIFIED (never built): xkeyboard-config xkeyboard-config-2.49 pinned to the exact commit of factory/wayland/closure.json.
+# Replaces Arch 2.48 for the opt-in Hyprland composition; same package name, so the local repository must precede core/extra.
+pkgname=xkeyboard-config
+pkgver=2.49
+pkgrel=1
+_commit=2ec770a0085bf776de749e185ca40e50213fb21f
+pkgdesc='xkeyboard-config pinned by the Bun OS Wayland closure'
+arch=(x86_64)
+url='https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config'
+license=(custom)
+depends=()
+makedepends=('libxslt' 'meson' 'python' 'xorg-xkbcomp' 'ninja' 'git')
+source=("$pkgname::git+https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  _src="$srcdir/$pkgname"
+  arch-meson build "$_src"
+  meson compile -C build
+}
+
+package() {
+  _src="$srcdir/$pkgname"
+  meson install -C build --destdir "$pkgdir"
+}

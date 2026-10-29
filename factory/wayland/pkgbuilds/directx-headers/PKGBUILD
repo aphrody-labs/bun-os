@@ -1,0 +1,25 @@
+# STUB, UNVERIFIED (never built): directx-headers v1.721.2 pinned to the exact commit of factory/wayland/closure.json.
+# Replaces Arch 1.619.5 for the opt-in Hyprland composition; same package name, so the local repository must precede core/extra.
+pkgname=directx-headers
+pkgver=1.721.2
+pkgrel=1
+_commit=6064ae312901a77e8700e84a2341470d050fcbca
+pkgdesc='directx-headers pinned by the Bun OS Wayland closure'
+arch=(x86_64)
+url='https://github.com/microsoft/DirectX-Headers'
+license=(custom)
+depends=()
+makedepends=('git' 'meson' 'ninja')
+source=("$pkgname::git+https://github.com/microsoft/DirectX-Headers.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  _src="$srcdir/$pkgname"
+  arch-meson build "$_src"
+  meson compile -C build
+}
+
+package() {
+  _src="$srcdir/$pkgname"
+  meson install -C build --destdir "$pkgdir"
+}

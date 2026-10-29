@@ -1,0 +1,25 @@
+# STUB, UNVERIFIED (never built): glaze v9.1.0 pinned to the exact commit of factory/wayland/closure.json.
+# Replaces Arch 9.0.0 for the opt-in Hyprland composition; same package name, so the local repository must precede core/extra.
+pkgname=glaze
+pkgver=9.1.0
+pkgrel=1
+_commit=43b175e7446862b84ed07b2e5f5138433777680e
+pkgdesc='glaze pinned by the Bun OS Wayland closure'
+arch=(x86_64)
+url='https://github.com/stephenberry/glaze'
+license=(custom)
+depends=('asio' 'erlang' 'openssl')
+makedepends=('cmake' 'ninja' 'git')
+source=("$pkgname::git+https://github.com/stephenberry/glaze.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  _src="$srcdir/$pkgname"
+  cmake -S "$_src" -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+  cmake --build build
+}
+
+package() {
+  _src="$srcdir/$pkgname"
+  DESTDIR="$pkgdir" cmake --install build
+}

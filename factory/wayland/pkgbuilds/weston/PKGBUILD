@@ -1,0 +1,25 @@
+# STUB, UNVERIFIED (never built): weston 16.0.2 pinned to the exact commit of factory/wayland/closure.json.
+# Replaces Arch 15.0.1 for the opt-in Hyprland composition; same package name, so the local repository must precede core/extra.
+pkgname=weston
+pkgver=16.0.2
+pkgrel=1
+_commit=530ae6c769d2fd55ea5157542654810be81a3193
+pkgdesc='weston pinned by the Bun OS Wayland closure'
+arch=(x86_64)
+url='https://gitlab.freedesktop.org/wayland/weston'
+license=(custom)
+depends=('cairo' 'colord' 'dbus' 'fontconfig' 'glib2' 'glibc' 'gst-plugins-base-libs' 'gstreamer' 'lcms2' 'libdisplay-info' 'libdrm' 'libevdev' 'libglvnd' 'libinput' 'libjpeg-turbo' 'libpng' 'libunwind' 'libva' 'libwebp' 'libx11' 'libxcb' 'libxcursor' 'libxkbcommon' 'mesa' 'mtdev' 'pam' 'pango' 'pixman' 'seatd' 'systemd-libs' 'wayland')
+makedepends=('freerdp' 'lua' 'meson' 'neatvnc' 'ninja' 'pipewire' 'vulkan-headers' 'vulkan-icd-loader' 'wayland-protocols' 'xcb-util-cursor' 'xorg-xwayland' 'git')
+source=("$pkgname::git+https://gitlab.freedesktop.org/wayland/weston.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  _src="$srcdir/$pkgname"
+  arch-meson build "$_src"
+  meson compile -C build
+}
+
+package() {
+  _src="$srcdir/$pkgname"
+  meson install -C build --destdir "$pkgdir"
+}
