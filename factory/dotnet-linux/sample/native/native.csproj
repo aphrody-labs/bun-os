@@ -2,7 +2,8 @@
   <!-- NativeAOT shared library loaded by Bun through bun:ffi: publish with PublishAot=true and NativeLib=Shared (buncc dotnet publish, flags aot and native-lib). -->
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <BunosTfm Condition="'$(BunosTfm)'==''">net10.0</BunosTfm>
+    <TargetFramework>$(BunosTfm)</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>

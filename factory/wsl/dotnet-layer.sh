@@ -5,7 +5,7 @@
 set -euo pipefail
 root=${BUNOS_ROOT:-/opt/bunos}
 prefix=${BUNOS_DOTNET_PREFIX:-$root/dotnet-linux}
-grep -vE '^\s*(#|$)' "$root/factory/wsl/packages.dotnet" | pacman -S --needed --noconfirm -
+pacman -S --needed --noconfirm $(grep -vE '^\s*(#|$)' "$root/factory/wsl/packages.dotnet")
 (cd "$root" && for what in sdk10 pwsh; do bun "$root/buncc/src/cli.ts" dotnet install "$what" --run --prefix "$prefix"; done)
 ln -sf "$prefix/bin/dotnet" /usr/local/bin/dotnet
 ln -sf "$prefix/bin/pwsh" /usr/local/bin/pwsh

@@ -114,21 +114,21 @@ jobs:
           dotnet --info | head -30
       - name: hello (framework-dependent), measured
         run: |
-          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} -o "$OUT/hello-jit" --exec
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} -o "$OUT/hello-jit" --exec -- -p:BunosTfm=${{ matrix.tfm }}
           bun factory/dotnet-linux/bench.ts --name "hello JIT framework-dependent ${{ matrix.tfm }}" --size "$OUT/hello-jit" --runs 10 -- "$OUT/hello-jit/hello" | tee -a "$RES"
       - name: hello (self-contained), measured
         run: |
-          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --self-contained -o "$OUT/hello-sc" --exec
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --self-contained -o "$OUT/hello-sc" --exec -- -p:BunosTfm=${{ matrix.tfm }}
           bun factory/dotnet-linux/bench.ts --name "hello JIT self-contained ${{ matrix.tfm }}" --size "$OUT/hello-sc" --runs 10 -- "$OUT/hello-sc/hello" | tee -a "$RES"
       - name: hello (NativeAOT), measured
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq clang zlib1g-dev
-          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --aot -o "$OUT/hello-aot" --exec
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --aot -o "$OUT/hello-aot" --exec -- -p:BunosTfm=${{ matrix.tfm }}
           "$OUT/hello-aot/hello" | tee "$OUT/hello-aot.json"; jq -e '.aot==true' "$OUT/hello-aot.json"
           bun factory/dotnet-linux/bench.ts --name "hello NativeAOT ${{ matrix.tfm }}" --size "$OUT/hello-aot/hello" --runs 10 -- "$OUT/hello-aot/hello" | tee -a "$RES"
       - name: Bun loads a NativeAOT shared library with bun:ffi
         run: |
-          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/native -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --aot --native-lib -o "$OUT/native" --exec
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/native -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --aot --native-lib -o "$OUT/native" --exec -- -p:BunosTfm=${{ matrix.tfm }}
           ls -l "$OUT/native"
           BUNOS_NATIVE_LIB="$OUT/native/bunos_native.so" bun test factory/dotnet-linux/ffi-interop.test.ts 2>&1 | tee "$OUT/ffi.txt"
           grep -q ' 1 pass' "$OUT/ffi.txt"
@@ -396,7 +396,7 @@ jobs:
           useradd -m -s /usr/local/bin/pwsh probe
           test -f /home/probe/.config/powershell/Microsoft.PowerShell_profile.ps1
           su probe -c 'pwsh -NoLogo -Command "bunos-info | ConvertTo-Json -Compress"'
-          su probe -c 'source /etc/profile.d/dotnet.sh; mkdir -p /tmp/h && cp -r /opt/bunos/factory/dotnet-linux/sample/hello /tmp/h/ && cd /tmp/h/hello && dotnet publish -c Release -f net10.0 -o out --nologo && ./out/hello'
+          su -s /bin/bash probe -c 'source /etc/profile.d/dotnet.sh; mkdir -p /tmp/h && cp -r /opt/bunos/factory/dotnet-linux/sample/hello /tmp/h/ && cd /tmp/h/hello && dotnet publish -c Release -f net10.0 -o out --nologo && ./out/hello'
           { echo '### WSL layer'; echo "installed under /opt/bunos/dotnet-linux: $(cut -f1 /tmp/layer-size.txt) MiB"; } >> "$GITHUB_STEP_SUMMARY"
 
   wasm-guest:
