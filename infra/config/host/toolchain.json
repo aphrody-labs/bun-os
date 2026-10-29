@@ -147,7 +147,7 @@
     "vps": "~/src/aphrody",
     "dbfr": "~/src/aphrody",
     "remote": "workspace (git@github.com:aphrody-labs/aphrody.git, blobless clone via forwarded agent)",
-    "links": ["~/.local/bin/bun (release aphrody-labs/bun, also linked as ~/.bun/bin/bun)"]
+    "links": ["~/.local/bin/bun (upstream oven-sh/bun canary 1.4.4-canary.20261028.1, also linked as ~/.bun/bin/bun)"]
   },
   "uvTools": [],
   "codeIntel": {

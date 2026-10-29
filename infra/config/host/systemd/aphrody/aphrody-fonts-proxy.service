@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Google Fonts edge proxy behind nginx on cdn.aphrody.com (nginx/aphrody/cdn.aphrody.com.conf).
-# Runs one self-contained bundle of packages/google/src/fonts-serve.ts (with @aphrody/bun-google from toolchains/bun),
+# Runs one self-contained bundle of packages/google/src/fonts-serve.ts (with @aphrody/bun-google from the abandoned fork, legacy),
 # /home/ubuntu/apps/cdn/src/fonts-serve.js, no dependency to install; the source revision is in
 # /home/ubuntu/apps/cdn/src/REVISION. Upgrade from the vps checkout with:
 #   bun build packages/google/src/fonts-serve.ts --target bun --outfile /home/ubuntu/apps/cdn/src/fonts-serve.js

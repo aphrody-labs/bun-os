@@ -58,7 +58,7 @@
       "publicProxy": "nginx",
       "public": true,
       "host": "vps",
-      "note": "Browser-local public WebOS demonstration and three public checksummed Bun package archives at /labs/webos/. Exact Nginx allowlist only; no host/model/application upstream. Omar remains private at10.200.77.10; the VPS omar.aphrody.com vhost refuses public requests with403 and preserves its dedicated certificate. Source packages/bun-webos/public-site in aphrody-labs/bun; docs/operations/infra/public-webos-2026-10-11.md. Existing private Omar services and DBFR apex origin remain separate."
+      "note": "Browser-local public WebOS demonstration and three public checksummed Bun package archives at /labs/webos/. Exact Nginx allowlist only; no host/model/application upstream. Omar remains private at10.200.77.10; the VPS omar.aphrody.com vhost refuses public requests with403 and preserves its dedicated certificate. Source packages/bun-webos/public-site in the abandoned aphrody-labs/bun fork (legacy); docs/operations/infra/public-webos-2026-10-11.md. Existing private Omar services and DBFR apex origin remain separate."
     },
     {
       "id": "aphrody-fonts-proxy",
@@ -109,7 +109,7 @@
       "runtime": "none",
       "sourceRepo": "aphrody",
       "publicProxy": "nginx",
-      "note": "bun.aphrody.com is a permanent redirect to https://aphrody.app, where the site of the Bun runtime fork aphrody-labs/bun (home, /runtime, docs, downloads, installers) and its API run on Cloudflare (Worker aphrody-app, packages/bun-cloudflare/app of the fork, published by scripts/aphrody/site/publish.ts from the user timer aphrody-site-publish on the vps); vhost nginx/aphrody/bun.aphrody.com.conf (docs/reference/upstream-bun/APHRODY-FORK.md)",
+      "note": "bun.aphrody.com is a permanent redirect to https://aphrody.app, where the site of the abandoned Bun runtime fork aphrody-labs/bun (legacy; home, /runtime, docs, downloads, installers) and its API run on Cloudflare (Worker aphrody-app, packages/bun-cloudflare/app of the fork, published by scripts/aphrody/site/publish.ts from the user timer aphrody-site-publish on the vps); vhost nginx/aphrody/bun.aphrody.com.conf (docs/reference/upstream-bun/APHRODY-FORK.md)",
       "public": true,
       "host": "vps"
     },
