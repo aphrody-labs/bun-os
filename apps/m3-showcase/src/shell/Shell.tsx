@@ -15,10 +15,10 @@ import closeIcon from "m3:icons/close";
 import contrastIcon from "m3:icons/contrast";
 import darkIcon from "m3:icons/dark_mode";
 import lightIcon from "m3:icons/light_mode";
-import { attachDpad } from "../adaptive/dpad.ts";
-import { useAdaptive, type AdaptiveState } from "../adaptive/window.ts";
-import { Svg } from "../components/ui.tsx";
-import { PAGES } from "../pages/index.ts";
+import { attachDpad } from "@aphrody/app-ui/material/adaptive/dpad.ts";
+import { useAdaptive, type AdaptiveState } from "@aphrody/app-ui/material/adaptive/window.ts";
+import { Svg } from "@aphrody/app-ui/material/ui.tsx";
+import { PAGES } from "@aphrody/app-ui/material/pages/index.ts";
 import { useRoute } from "../router.ts";
 import {
   DESTINATIONS,
@@ -27,7 +27,7 @@ import {
   PRIMARY_IDS,
   findDestination,
   type Destination,
-} from "./nav.ts";
+} from "@aphrody/app-ui/material/nav.ts";
 
 const MODE_LABEL = { light: "Light", dark: "Dark", system: "System" } as const;
 

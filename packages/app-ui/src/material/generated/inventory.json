@@ -12,11 +12,11 @@
   },
   {
     "name": "@aphrody/admin-ui",
-    "version": "1.4.4",
+    "version": "1.4.7",
     "description": "Canonical Aphrody M3 administration, served by the existing authenticated Shenron web host",
     "dir": "packages/admin-ui",
     "kind": "package",
-    "workspace": false,
+    "workspace": true,
     "private": false,
     "exports": 150,
     "bin": []
@@ -229,6 +229,17 @@
     "private": false,
     "exports": 14,
     "bin": ["aphrody-bun"]
+  },
+  {
+    "name": "@aphrody/buncc",
+    "version": "1.4.7",
+    "description": "Bun C Compiler: cc/c++/ar/link driver, toolchain providers and workspace build orchestrator for Bun OS",
+    "dir": "packages/buncc",
+    "kind": "package",
+    "workspace": true,
+    "private": false,
+    "exports": 9,
+    "bin": ["buncc"]
   },
   {
     "name": "@aphrody/canvas",
@@ -693,6 +704,17 @@
     "bin": []
   },
   {
+    "name": "@aphrody/ntcore",
+    "version": "1.4.7",
+    "description": "NT personality building blocks for Bun OS: ReactOS cmlib registry hives, the ReactOS Executive handle table and PE helpers, compiled to wasm32 (see docs/NTCORE.md).",
+    "dir": "packages/ntcore",
+    "kind": "package",
+    "workspace": true,
+    "private": false,
+    "exports": 2,
+    "bin": []
+  },
+  {
     "name": "@aphrody/os",
     "version": "1.4.7",
     "description": "Bun client for the Aphrody OS kernel: join the OS as a subsystem, call any OS tool or skill.",
@@ -836,6 +858,17 @@
     "bin": []
   },
   {
+    "name": "@aphrody/wasm",
+    "version": "1.4.7",
+    "description": "Rust to WebAssembly on upstream Bun: cargo, wasm-bindgen, wasm-opt, validate, inspect, run. Replaces the fork-only bun:wasm.",
+    "dir": "packages/wasm",
+    "kind": "package",
+    "workspace": true,
+    "private": false,
+    "exports": 3,
+    "bin": ["aphrody-wasm"]
+  },
+  {
     "name": "@aphrody/web-to-tauri",
     "version": "1.4.7",
     "description": "Converts a website, web app or built web bundle into a native Tauri 3 app: probes the target, plans a regression-free mode (remote, bundle, sidecar), generates the project and checks parity against the original.",
@@ -880,14 +913,36 @@
     "bin": []
   },
   {
-    "name": "@aphrody/yolo-cli",
+    "name": "@aphrody/windows",
     "version": "1.4.7",
-    "description": "Yolo command line on Bun: workspace operations, documentation generation, code scan/rename/parse, plugin and forge commands",
-    "dir": "packages/yolo-cli",
+    "description": "One Windows layer for upstream Bun: Win32 (bun:ffi), registry, services, shell folders, WinRT (windows-rs N-API addon), WinUI 3 (.NET host) and WinClean.",
+    "dir": "packages/windows",
     "kind": "package",
     "workspace": true,
     "private": false,
     "exports": 8,
+    "bin": []
+  },
+  {
+    "name": "@aphrody/windows-samples-tests",
+    "version": "1.4.7",
+    "description": "Test matrix of the official Microsoft Windows samples (WinUI, Windows App SDK, Direct3D 12, .NET 10/11 templates) across C++, C#, Rust and Bun",
+    "dir": "packages/windows-samples-tests",
+    "kind": "package",
+    "workspace": true,
+    "private": true,
+    "exports": 0,
+    "bin": []
+  },
+  {
+    "name": "@aphrody/yolo-cli",
+    "version": "1.4.7",
+    "description": "Yolo command line on Bun: workspace operations, documentation generation, code scan/rename/parse, plugin commands",
+    "dir": "packages/yolo-cli",
+    "kind": "package",
+    "workspace": true,
+    "private": false,
+    "exports": 4,
     "bin": ["yolo"]
   },
   {

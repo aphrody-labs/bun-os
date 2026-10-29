@@ -162,6 +162,7 @@
       "version": "1.4.7",
       "dependencies": {
         "@aphrody/ag-ui": "workspace:*",
+        "@aphrody/app-ui": "workspace:*",
         "@aphrody/assets": "workspace:*",
         "@aphrody/canvas": "workspace:*",
         "@aphrody/eslint-plugin-m3": "workspace:*",

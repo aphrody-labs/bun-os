@@ -19,7 +19,7 @@ import { transformSource, type MigrationKind } from "@aphrody/m3-codemods";
 import lintPlugin from "@aphrody/eslint-plugin-m3";
 import googleSansCode from "@aphrody/m3-fonts/fonts/web/GoogleSansCode-latin.woff2" with { type: "file" };
 import robotoMono from "@aphrody/m3-fonts/fonts/web/RobotoMono-latin.woff2" with { type: "file" };
-import { PACKAGES } from "../inventory.ts";
+import { PACKAGES } from "@aphrody/app-ui/material/inventory.ts";
 
 class InputError extends Error {}
 const json = (data: unknown, status = 200) =>

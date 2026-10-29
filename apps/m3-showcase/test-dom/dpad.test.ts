@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { afterEach, expect, test } from "bun:test";
-import { activeModal, attachDpad, focusables } from "../src/adaptive/dpad.ts";
+import { activeModal, attachDpad, focusables } from "@aphrody/app-ui/material/adaptive/dpad.ts";
 afterEach(() => {
   document.body.innerHTML = "";
 });

@@ -18,7 +18,8 @@
     ".": "./src/index.ts",
     "./backend": "./backend.ts",
     "./webos": "./webos.ts",
-    "./styles.css": "./src/styles.css"
+    "./styles.css": "./src/styles.css",
+    "./material/*": "./src/material/*"
   },
   "publishConfig": {
     "access": "public"
