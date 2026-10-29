@@ -43,7 +43,7 @@ Pinned Alpine 3.24 packages (`factory/wasmos/pins.json` "apps") converted with t
 | `lang` | python3 3.14.10, helix 25.07.1, nano 9.3 | 160,767,739 | 953 s | 6.3 s |
 | `tools` | uutils 0.11.0, bash 5.3.9, nushell 0.104.1, curl 8.23.0, git 2.54.0, jq 1.8.2, ripgrep 15.1.0, fd 10.2.0, eza 0.23.4, htop 3.5.3, vim 9.2.1202 | 200,525,740 | 623 s | 9.3 s |
 
-`lang` passed its assertions (python3 3.14 + hashlib, helix and nano versions). `tools` ran every program with the expected output (sha256 via uutils, bash 5, nushell sum, jq, ripgrep, fd, eza, git, curl, htop, vim); the first CI run failed only because jq and ripgrep printed ANSI colour codes on the guest tty, fixed with `jq -M` and `rg --color never`. Bun is not in the guest: Alpine has no musl package for it. Sizes and times are one run each, not averaged.
+Second run (40923915360, all four jobs green, including the `tools` assertions on uutils, bash, nushell, jq, ripgrep, fd, eza, git, curl, htop and vim): `tools` 200,521,524 bytes, c2w build 763 s, boot + commands 9.4 s; `lang` 162,129,429 bytes, 6.5 s (python3 3.14 + hashlib, helix, nano). The first run (40920519749) failed only because jq and ripgrep printed ANSI colour codes on the guest tty, fixed with `jq -M` and `rg --color never`. The artifact bytes differ by a few KB between runs (the kernel embeds its build date). Bun is not in the guest: Alpine has no musl package for it. Two runs each, not averaged.
 
 ## Facts from source (clones under `C:\Users\aphro\src\ref`)
 
