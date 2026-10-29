@@ -54,7 +54,7 @@ bun run setup
 ```
 
 ```bash
-bun src/cli.ts plan --profile full --target linux-x64
+bun src/cli.ts build plan --profile full --target linux-x64
 ```
 
 ```bash

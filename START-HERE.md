@@ -31,9 +31,9 @@ Start with the native help and read-only plan:
 
 ```sh
 bun src/cli.ts --help
-bun src/cli.ts factory --action plan --composition server --snapshot <YYYY-MM-DD>
-bun src/cli.ts graph --composition server
-bun src/cli.ts plan --profile full --target linux-x64
+bun src/cli.ts factory arch --action plan --composition server --snapshot <YYYY-MM-DD>
+bun src/cli.ts workspace graph --profile full --target linux-x64
+bun src/cli.ts build plan --profile full --target linux-x64
 bun infra/app-build.ts plan apt --config infra/apps.json --target windows-x64
 ```
 

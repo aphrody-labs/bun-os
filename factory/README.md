@@ -18,8 +18,8 @@ recipe is not evidence of a built package, root filesystem, image or release.
 ## Read-only planning
 
 ```sh
-bun src/cli.ts factory --action plan --composition server --snapshot YYYY-MM-DD
-bun src/cli.ts graph --composition server
+bun src/cli.ts factory arch --action plan --composition server --snapshot YYYY-MM-DD
+bun src/cli.ts workspace graph --profile full --target linux-x64
 ```
 
 Planning reports inputs for the selected composition and snapshot. It does not
