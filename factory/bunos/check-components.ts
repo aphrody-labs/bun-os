@@ -192,6 +192,39 @@ else {
   }
 }
 
+// ---- Wayland / Hyprland closure (factory/wayland/closure.json) -----------------------------------------------------
+// Every closure item resolves, the source graph is acyclic, every pin is a 40-hex commit, and every item that must be
+// built from source is mounted as a shallow `update = none` submodule whose gitlink equals the closure SHA (SHA-exact).
+// Remote existence of the pins: bun factory/wayland/verify-closure.ts (network).
+let closureSummary = "";
+{
+  const closure = await Bun.file(join(root, "factory/wayland/closure.json"))
+    .json()
+    .catch(() => undefined);
+  if (!closure) fail("factory/wayland/closure.json missing");
+  else {
+    const verify = Bun.spawn(["bun", join(root, "factory/wayland/verify-closure.ts"), "--offline"], { stdout: "pipe", stderr: "pipe" });
+    const [vout, verr, vcode] = await Promise.all([new Response(verify.stdout).text(), new Response(verify.stderr).text(), verify.exited]);
+    if (vcode) fail(`wayland closure: ${verr.trim().split(String.fromCharCode(10)).slice(0, 5).join("; ")}`);
+    const gmBlocks = new Map<string, string>();
+    for (const b of (await read(".gitmodules")).split(/\[submodule /).slice(1)) gmBlocks.set(b.match(/path\s*=\s*(.*)/)?.[1].trim() ?? "", b);
+    let mounted = 0;
+    for (const it of closure.items) {
+      if (!it.mount) continue;
+      mounted++;
+      if (gitmodules.get(it.mount) !== it.url) fail(`closure ${it.id}: .gitmodules url ${gitmodules.get(it.mount)} != ${it.url}`);
+      if (gitlinks.get(it.mount) !== it.sha) fail(`closure ${it.id}: gitlink ${gitlinks.get(it.mount)} != pin ${it.sha}`);
+      const block = gmBlocks.get(it.mount) ?? "";
+      if (!/update\s*=\s*none/.test(block) || !/shallow\s*=\s*true/.test(block))
+        fail(`closure ${it.id}: submodule must be shallow with update = none`);
+      if (!ids.has(`submodule:${it.mount}`)) fail(`closure ${it.id}: no components.json entry`);
+    }
+    for (const rel of ["factory/wayland/wslg-deps.json", "factory/images/bunos-hyprland/hyprland.packages", "docs/WAYLAND-CLOSURE.md"])
+      if (!tracked.has(rel)) fail(`${rel}: not a tracked file`);
+    closureSummary = `; wayland closure ${closure.counts.items} items (${closure.counts.sources} source, ${closure.counts.distroPackages} distro), ${mounted} mounted; ${vout.trim()}`;
+  }
+}
+
 // ---- no fork path, no fork-only bun:* ----------------------------------------------------------------------------
 const fork = await git(
   "grep",
@@ -233,6 +266,6 @@ const count = (kind: string) => (manifest.modules ?? []).filter((m: any) => m.ki
 console.log(
   `runtime bun@${runtime?.source?.version}; ${manifest.modules?.length ?? 0} modules ` +
     `(${[...kinds].map(k => `${count(k)} ${k}`).join(", ")}); ` +
-    `${(manifest.modules ?? []).filter((m: any) => !m.aot).length} not AOT-safe${graphSummary}; ${errors.length} errors`,
+    `${(manifest.modules ?? []).filter((m: any) => !m.aot).length} not AOT-safe${graphSummary}${closureSummary}; ${errors.length} errors`,
 );
 process.exit(errors.length ? 1 : 0);

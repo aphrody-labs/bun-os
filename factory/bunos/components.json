@@ -20140,6 +20140,2072 @@
       "status": "present",
       "dependsOn": ["npm:@aphrody/buncc", "crates.io:windows", "npm:@aphrody/windows"],
       "note": "Test matrix of the vendor/microsoft references across C++, C#, Rust and Bun; docs/WINDOWS-SAMPLES.md."
+    },
+    {
+      "id": "submodule:vendor/hyprland/aquamarine",
+      "kind": "submodule",
+      "path": "vendor/hyprland/aquamarine",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/aquamarine.git",
+        "pin": "f31c47a1b9d300847d8fc3108ad959448103dfc1"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprutils",
+        "submodule:vendor/hyprland/hyprwayland-scanner",
+        "submodule:vendor/wayland/libdisplay-info",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/libinput",
+        "submodule:vendor/wayland/mesa",
+        "submodule:vendor/wayland/pixman",
+        "submodule:vendor/wayland/seatd",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "aquamarine v0.15.1 (2026-09-17) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/cairo",
+      "kind": "submodule",
+      "path": "vendor/wayland/cairo",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/cairo/cairo.git",
+        "pin": "018b3424a10ecd37450360f21454ecf0f3007e17"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/libxext",
+        "submodule:vendor/wayland/libxrender",
+        "submodule:vendor/wayland/pixman"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "cairo 1.18.6 (2026-09-20) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/directx-headers",
+      "kind": "submodule",
+      "path": "vendor/wayland/directx-headers",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/microsoft/DirectX-Headers.git",
+        "pin": "6064ae312901a77e8700e84a2341470d050fcbca"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "directx-headers v1.721.2 (2026-07-01) meson; consumers wslg+bun-os; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/freerdp",
+      "kind": "submodule",
+      "path": "vendor/wayland/freerdp",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/FreeRDP/FreeRDP.git",
+        "pin": "97eff6ddfbbfaa8e42a126d362686bd001ff8bdc"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxcursor",
+        "submodule:vendor/wayland/libxdamage",
+        "submodule:vendor/wayland/libxext",
+        "submodule:vendor/wayland/libxfixes",
+        "submodule:vendor/wayland/libxi",
+        "submodule:vendor/wayland/libxkbcommon",
+        "submodule:vendor/wayland/libxkbfile",
+        "submodule:vendor/wayland/libxrandr",
+        "submodule:vendor/wayland/libxrender",
+        "submodule:vendor/wayland/libxtst",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "freerdp 3.32.2 (2026-10-12) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/glaze",
+      "kind": "submodule",
+      "path": "vendor/wayland/glaze",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/stephenberry/glaze.git",
+        "pin": "43b175e7446862b84ed07b2e5f5138433777680e"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "glaze v9.1.0 (2026-10-28) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprcursor",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprcursor",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprcursor.git",
+        "pin": "44e91d467bdad8dcf8bbd2ac7cf49972540980a5"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprlang",
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/tomlplusplus"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprcursor v0.1.13 (2025-07-31) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprgraphics",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprgraphics",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprgraphics.git",
+        "pin": "482d4b7ec36ffdaf3573086aa586b178fd5404be"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprutils",
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/pango",
+        "submodule:vendor/wayland/pixman"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprgraphics v0.5.1 (2026-04-06) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprland",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprland",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/Hyprland.git",
+        "pin": "0aa6745f705f2c4b0a5004eb019ef76e5bbdb426"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/aquamarine",
+        "submodule:vendor/hyprland/hyprcursor",
+        "submodule:vendor/hyprland/hyprgraphics",
+        "submodule:vendor/hyprland/hyprland-guiutils",
+        "submodule:vendor/hyprland/hyprland-protocols",
+        "submodule:vendor/hyprland/hyprlang",
+        "submodule:vendor/hyprland/hyprutils",
+        "submodule:vendor/hyprland/hyprwayland-scanner",
+        "submodule:vendor/hyprland/hyprwire",
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/glaze",
+        "submodule:vendor/wayland/lcms2",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libei",
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/libinput",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/libxcomposite",
+        "submodule:vendor/wayland/libxcursor",
+        "submodule:vendor/wayland/libxfixes",
+        "submodule:vendor/wayland/libxkbcommon",
+        "submodule:vendor/wayland/libxrender",
+        "submodule:vendor/wayland/mesa",
+        "submodule:vendor/wayland/muparser",
+        "submodule:vendor/wayland/pango",
+        "submodule:vendor/wayland/pixman",
+        "submodule:vendor/wayland/re2",
+        "submodule:vendor/wayland/sdbus-cpp",
+        "submodule:vendor/wayland/tomlplusplus",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols",
+        "submodule:vendor/wayland/xcb-proto",
+        "submodule:vendor/wayland/xcb-util",
+        "submodule:vendor/wayland/xcb-util-errors",
+        "submodule:vendor/wayland/xcb-util-image",
+        "submodule:vendor/wayland/xcb-util-keysyms",
+        "submodule:vendor/wayland/xcb-util-renderutil",
+        "submodule:vendor/wayland/xcb-util-wm",
+        "submodule:vendor/wayland/xorgproto",
+        "submodule:vendor/wayland/xwayland"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprland v0.57.0 (2026-10-28) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprland-guiutils",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprland-guiutils",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprland-guiutils.git",
+        "pin": "a16ad89ed5fb4192c966018a80c652de8d96f748"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprlang",
+        "submodule:vendor/hyprland/hyprtoolkit",
+        "submodule:vendor/hyprland/hyprutils",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libxkbcommon",
+        "submodule:vendor/wayland/pixman"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprland-guiutils v0.2.2 (2026-07-20) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprland-preview-share-picker",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprland-preview-share-picker",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/hyprland-preview-share-picker.git",
+        "pin": "211b7890ed3332f4d1bb1f1a96999e18874a9c3c"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprland-protocols",
+        "submodule:vendor/hyprland/xdg-desktop-portal-hyprland"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprland-preview-share-picker v0.2.1 (2025-04-29) cargo; consumers bun-os; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprland-protocols",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprland-protocols",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprland-protocols.git",
+        "pin": "044a434ec371f985655389bcef09286b1af3d77c"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprland-protocols v0.8.0 (2026-10-16) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprland-qtutils",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprland-qtutils",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprland-qtutils.git",
+        "pin": "119bcb9aa742658107b326c50dcd24ab59b309b7"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprutils"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprland-qtutils v0.1.5 (2025-09-10) cmake; consumers bun-os; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprlang",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprlang",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprlang.git",
+        "pin": "3a1c1b25b059dae2c6bbc46991562ba1158d125c"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprutils"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprlang v0.6.8 (2026-01-05) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprtoolkit",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprtoolkit",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprtoolkit.git",
+        "pin": "f8cbaf42e1f7fdc9c7565d7be3e935f6d56c7a39"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/aquamarine",
+        "submodule:vendor/hyprland/hyprgraphics",
+        "submodule:vendor/hyprland/hyprlang",
+        "submodule:vendor/hyprland/hyprutils",
+        "submodule:vendor/hyprland/hyprwayland-scanner",
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/libxkbcommon",
+        "submodule:vendor/wayland/mesa",
+        "submodule:vendor/wayland/pango",
+        "submodule:vendor/wayland/pixman",
+        "submodule:vendor/wayland/wayland"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprtoolkit v0.6.0 (2026-09-09) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprutils",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprutils",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprutils.git",
+        "pin": "0d13d5a624eb093b600d1b2cbe448fb613c86424"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/pixman"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprutils v0.14.3 (2026-10-22) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprwayland-scanner",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprwayland-scanner",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprwayland-scanner.git",
+        "pin": "b8632713a6beaf28b56f2a7b0ab2fb7088dbb404"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprwayland-scanner v0.4.6 (2026-04-26) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/hyprwire",
+      "kind": "submodule",
+      "path": "vendor/hyprland/hyprwire",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/hyprwire.git",
+        "pin": "3e6865ce5fd9237b58f5b2ce5de18814df3baff5"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprutils"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "hyprwire v0.3.1 (2026-04-26) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/lcms2",
+      "kind": "submodule",
+      "path": "vendor/wayland/lcms2",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/mm2/Little-CMS.git",
+        "pin": "21c582a594fe5279f90c0b93437c398f93bf62b0"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "lcms2 lcms2.19.1 (2026-05-06) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libdecor",
+      "kind": "submodule",
+      "path": "vendor/wayland/libdecor",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/libdecor/libdecor.git",
+        "pin": "149c6f0b05663aaa69fdf7f94be2483776d1a311"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/libxkbcommon",
+        "submodule:vendor/wayland/pango",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libdecor 0.2.5 (2025-12-16) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libdisplay-info",
+      "kind": "submodule",
+      "path": "vendor/wayland/libdisplay-info",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/emersion/libdisplay-info.git",
+        "pin": "c67a3e9bedb05ab61c7443704a1a107e76254595"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libdisplay-info 0.4.0 (2026-07-23) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libdrm",
+      "kind": "submodule",
+      "path": "vendor/wayland/libdrm",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/mesa/drm.git",
+        "pin": "e984d448b8b17aab853369e6c203e53719f46de1"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libpciaccess"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libdrm libdrm-2.4.134 (2026-05-29) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libei",
+      "kind": "submodule",
+      "path": "vendor/wayland/libei",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/libinput/libei.git",
+        "pin": "8a46bf3d4b6af7f25a61be53386cf618218114ef"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libevdev",
+        "submodule:vendor/wayland/libxkbcommon"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libei 1.6.0 (2026-05-15) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libepoxy",
+      "kind": "submodule",
+      "path": "vendor/wayland/libepoxy",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/anholt/libepoxy.git",
+        "pin": "c84bc9459357a40e46e2fec0408d04fbdde2c973"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/mesa"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libepoxy 1.5.10 (2022-02-17) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libevdev",
+      "kind": "submodule",
+      "path": "vendor/wayland/libevdev",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/libevdev/libevdev.git",
+        "pin": "d9af2e4580297e9c14715fef06621dd39d9d8a3a"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libevdev libevdev-1.14.0 (2026-10-07) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libfontenc",
+      "kind": "submodule",
+      "path": "vendor/wayland/libfontenc",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libfontenc.git",
+        "pin": "780d1f6f192a331de7b298a96e23ebc44d2a884b"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libfontenc libfontenc-1.1.9 (2026-02-07) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libglvnd",
+      "kind": "submodule",
+      "path": "vendor/wayland/libglvnd",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/glvnd/libglvnd.git",
+        "pin": "faa23f21fc677af5792825dc30cb1ccef4bf33a6"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxext",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libglvnd v1.7.0 (2023-09-12) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libinput",
+      "kind": "submodule",
+      "path": "vendor/wayland/libinput",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/libinput/libinput.git",
+        "pin": "5cf833b572f5a33663888da321dce0ba1abd82a2"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/libevdev",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/mtdev",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libinput 1.32.0 (2026-09-17) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libliftoff",
+      "kind": "submodule",
+      "path": "vendor/wayland/libliftoff",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/emersion/libliftoff.git",
+        "pin": "8b08dc1c14fd019cc90ddabe34ad16596b0691f4"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libdrm"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libliftoff v0.5.0 (2024-05-28) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libpciaccess",
+      "kind": "submodule",
+      "path": "vendor/wayland/libpciaccess",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git",
+        "pin": "38e6f15f839fba2c49982e7ad61cde681fd5d4d6"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/xorg-util-macros"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libpciaccess libpciaccess-0.19 (2026-03-14) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libx11",
+      "kind": "submodule",
+      "path": "vendor/wayland/libx11",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libx11.git",
+        "pin": "b8d5a7046a98a244ee8ca3c9c07fd617c800dde2"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libx11 libX11-1.8.14 (2026-10-16) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxau",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxau",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxau.git",
+        "pin": "a9c65683e68b3a4349afee5d7673b393fb924d2e"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxau libXau-1.0.12 (2024-12-13) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxcb",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxcb",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb.git",
+        "pin": "622152ee42a310876f10602601206954b8d0613e"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxau",
+        "submodule:vendor/wayland/libxdmcp",
+        "submodule:vendor/wayland/xcb-proto",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxcb libxcb-1.17.0 (2024-04-15) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxcomposite",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxcomposite",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcomposite.git",
+        "pin": "a6d5d773e2a4e5a11b58f3a894f2085686baa6f4"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxfixes",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxcomposite libXcomposite-0.4.7 (2026-01-25) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxcursor",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxcursor",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcursor.git",
+        "pin": "8ae6cf61b18ecddf26f72a07bbfbd1ea9f022c36"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxfixes",
+        "submodule:vendor/wayland/libxrender",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxcursor libXcursor-1.2.3 (2024-11-04) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxcvt",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxcvt",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcvt.git",
+        "pin": "dd8631c61465cc0de5e476c7a98e56528d62b163"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxcvt libxcvt-0.1.3 (2024-12-13) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxdamage",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxdamage",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxdamage.git",
+        "pin": "4ff0f0e76c974faf920e476abccc65a4990a637c"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxfixes",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxdamage libXdamage-1.1.7 (2026-01-25) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxdmcp",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxdmcp",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxdmcp.git",
+        "pin": "1192d3bc407348ff316bd3bffc791b3ac73f591b"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxdmcp libXdmcp-1.1.5 (2024-03-02) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxext",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxext",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxext.git",
+        "pin": "2a694ba264ccdb205909909abfe8b136f9156ebe"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxext libXext-1.3.7 (2026-01-25) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxfixes",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxfixes",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxfixes.git",
+        "pin": "70d5b0e37f8a759f3dbc218f22954347ceed094a"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxfixes libXfixes-6.0.2 (2025-09-01) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxfont2",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxfont2",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxfont.git",
+        "pin": "975cc6526e892c6fad8fa49d0fef58565fbaa003"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libfontenc",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxfont2 libXfont2-2.0.9 (2026-08-05) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxi",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxi",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxi.git",
+        "pin": "9ea632ab9dce9ad6630ef7db9d1850ea3d0a2419"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxext",
+        "submodule:vendor/wayland/libxfixes",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxi libXi-1.8.4 (2026-10-16) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxkbcommon",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxkbcommon",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/xkbcommon/libxkbcommon.git",
+        "pin": "d1442aaa6b635551182e83c3b55037f4c118c962"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols",
+        "submodule:vendor/wayland/xkeyboard-config",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxkbcommon xkbcommon-1.13.2 (2026-05-30) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxkbfile",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxkbfile",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxkbfile.git",
+        "pin": "42e5dedd7fd3c7c73f3870a8751893c03c1afc69"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxkbfile libxkbfile-1.2.0 (2026-01-25) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxrandr",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxrandr",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxrandr.git",
+        "pin": "540c3ceef2be3e513b18002a858c7a9591dd749a"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxext",
+        "submodule:vendor/wayland/libxrender",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxrandr libXrandr-1.5.5 (2026-01-25) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxrender",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxrender",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxrender.git",
+        "pin": "f30d654658ebf17d41141ed3ec2abf607d8a512e"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxrender libXrender-0.9.13 (2026-10-16) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxshmfence",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxshmfence",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxshmfence.git",
+        "pin": "89f064748554e11832a3ec783945e1f4c7fe846e"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxshmfence libxshmfence-1.3.3 (2024-12-13) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxtst",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxtst",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxtst.git",
+        "pin": "b95aac652cd77f66c4b472aa840b30c337b77715"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxext",
+        "submodule:vendor/wayland/libxi",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxtst libXtst-1.2.6 (2026-10-16) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/libxxf86vm",
+      "kind": "submodule",
+      "path": "vendor/wayland/libxxf86vm",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxxf86vm.git",
+        "pin": "7f200bf00e3e288e47265c01decc401616c57f10"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxext",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "libxxf86vm libXxf86vm-1.1.7 (2026-01-25) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/mesa",
+      "kind": "submodule",
+      "path": "vendor/wayland/mesa",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/mesa/mesa.git",
+        "pin": "8e87a503ebd91408c88596d1b9eeb5f4c0b2088d"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/directx-headers",
+        "submodule:vendor/wayland/libdisplay-info",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/libxext",
+        "submodule:vendor/wayland/libxrandr",
+        "submodule:vendor/wayland/libxshmfence",
+        "submodule:vendor/wayland/libxxf86vm",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols",
+        "submodule:vendor/wayland/xcb-util-keysyms",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "mesa mesa-26.2.6 (2026-10-28) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/mtdev",
+      "kind": "submodule",
+      "path": "vendor/wayland/mtdev",
+      "source": {
+        "type": "submodule",
+        "url": "https://bitmath.org/git/mtdev.git",
+        "pin": "9035c2225494b80b02e985fc7ee77880e0bd6993"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "mtdev v1.1.7 (2024-04-04) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/muparser",
+      "kind": "submodule",
+      "path": "vendor/wayland/muparser",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/beltoforion/muparser.git",
+        "pin": "fbafd7f8774af2b53f4d2de07c57353fcfc09216"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "muparser v2.3.5 (2024-12-13) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/pango",
+      "kind": "submodule",
+      "path": "vendor/wayland/pango",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.gnome.org/GNOME/pango.git",
+        "pin": "45522cd5c68ef9ef6e67a902a45a4e39dfcddaf7"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxrender"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "pango 1.90 (2022-06-22) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/pipewire",
+      "kind": "submodule",
+      "path": "vendor/wayland/pipewire",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/pipewire/pipewire.git",
+        "pin": "f9d6cbc99c354b9b0ad1d37245dc3ab0fb9f9171"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxfixes"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "pipewire 1.6.10 (2026-10-22) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/pixman",
+      "kind": "submodule",
+      "path": "vendor/wayland/pixman",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/pixman/pixman.git",
+        "pin": "9cc163c9da0fb4da430641715313d95a6ec466d9"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "pixman pixman-0.46.4 (2025-07-20) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/polkit",
+      "kind": "submodule",
+      "path": "vendor/wayland/polkit",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/polkit-org/polkit.git",
+        "pin": "e6373dc19975d8583568c6cd7025d03e682ca956"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "polkit 128 (2026-10-15) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/re2",
+      "kind": "submodule",
+      "path": "vendor/wayland/re2",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/google/re2.git",
+        "pin": "927f5d53caf8111721e734cf24724686bb745f55"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "re2 2025-11-05 (2025-11-05) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/sdbus-cpp",
+      "kind": "submodule",
+      "path": "vendor/wayland/sdbus-cpp",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/Kistler-Group/sdbus-cpp.git",
+        "pin": "ca073434d2c03c2b619f7e23f285cebbf32c7e46"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "sdbus-cpp v2.3.1 (2026-05-20) cmake; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/seatd",
+      "kind": "submodule",
+      "path": "vendor/wayland/seatd",
+      "source": {
+        "type": "submodule",
+        "url": "https://git.sr.ht/~kennylevinsen/seatd",
+        "pin": "daa8196e10b180b8b0caeafa8e5f860eb1bd6706"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "seatd 0.9.3 (2026-02-28) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/tomlplusplus",
+      "kind": "submodule",
+      "path": "vendor/wayland/tomlplusplus",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/marzer/tomlplusplus.git",
+        "pin": "30172438cee64926dc41fdd9c11fb3ba5b2ba9de"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "tomlplusplus v3.4.0 (2023-10-13) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/wayland",
+      "kind": "submodule",
+      "path": "vendor/wayland/wayland",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/wayland/wayland.git",
+        "pin": "87cc8a8728a923fc57938faa81ba0e74f34ecdc7"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "wayland 1.26.0 (2026-07-16) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/wayland-protocols",
+      "kind": "submodule",
+      "path": "vendor/wayland/wayland-protocols",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/wayland/wayland-protocols.git",
+        "pin": "ee78491a237eaff9389a0ccf8680521d074407d3"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/wayland"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "wayland-protocols 1.49 (2026-06-07) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/weston",
+      "kind": "submodule",
+      "path": "vendor/wayland/weston",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/wayland/weston.git",
+        "pin": "530ae6c769d2fd55ea5157542654810be81a3193"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/cairo",
+        "submodule:vendor/wayland/freerdp",
+        "submodule:vendor/wayland/lcms2",
+        "submodule:vendor/wayland/libdisplay-info",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libevdev",
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/libinput",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/libxcursor",
+        "submodule:vendor/wayland/libxkbcommon",
+        "submodule:vendor/wayland/mesa",
+        "submodule:vendor/wayland/mtdev",
+        "submodule:vendor/wayland/pango",
+        "submodule:vendor/wayland/pipewire",
+        "submodule:vendor/wayland/pixman",
+        "submodule:vendor/wayland/seatd",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols",
+        "submodule:vendor/wayland/xcb-util-cursor",
+        "submodule:vendor/wayland/xwayland"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "weston 16.0.2 (2026-10-26) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xcb-proto",
+      "kind": "submodule",
+      "path": "vendor/wayland/xcb-proto",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/proto/xcbproto.git",
+        "pin": "77d7fc04da729ddc5ed4aacf30253726fac24dca"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xcb-proto xcb-proto-1.17.0 (2024-04-12) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xcb-util",
+      "kind": "submodule",
+      "path": "vendor/wayland/xcb-util",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-util.git",
+        "pin": "3a157762578a2e4253a7cb40d2854a3444d5a9df"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xcb-util xcb-util-0.4.1 (2022-12-19) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xcb-util-cursor",
+      "kind": "submodule",
+      "path": "vendor/wayland/xcb-util-cursor",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-cursor.git",
+        "pin": "7b0fa99aa13084a9bf7be4180066f6a74b0adef1"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/xcb-util-image",
+        "submodule:vendor/wayland/xcb-util-renderutil",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xcb-util-cursor xcb-util-cursor-0.1.6 (2025-09-01) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xcb-util-errors",
+      "kind": "submodule",
+      "path": "vendor/wayland/xcb-util-errors",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-errors.git",
+        "pin": "517dd82c079de762a7426f20166a44f11e8d38c5"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xcb-util-errors xcb-util-errors-1.0.1 (2022-10-18) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xcb-util-image",
+      "kind": "submodule",
+      "path": "vendor/wayland/xcb-util-image",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-image.git",
+        "pin": "525ce59fe2329d4b23fc0c52ed9dd92daac8ac2a"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/xcb-util",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xcb-util-image xcb-util-image-0.4.1 (2022-10-18) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xcb-util-keysyms",
+      "kind": "submodule",
+      "path": "vendor/wayland/xcb-util-keysyms",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-keysyms.git",
+        "pin": "85e093f14b0ade2956e0a5d1c37cfde06d8b1ba6"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xcb-util-keysyms xcb-util-keysyms-0.4.1 (2022-10-18) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xcb-util-renderutil",
+      "kind": "submodule",
+      "path": "vendor/wayland/xcb-util-renderutil",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-render-util.git",
+        "pin": "5293d8b6165f23b9f7a8bcc903da0e4d7a75984c"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xcb-util-renderutil xcb-util-renderutil-0.3.10 (2022-10-18) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xcb-util-wm",
+      "kind": "submodule",
+      "path": "vendor/wayland/xcb-util-wm",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/lib/libxcb-wm.git",
+        "pin": "0c6681e465c9cc7b1fbb60778ba1eaa61ab01a14"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libxcb",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xcb-util-wm xcb-util-wm-0.4.2 (2022-10-18) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xdg-desktop-portal",
+      "kind": "submodule",
+      "path": "vendor/wayland/xdg-desktop-portal",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/flatpak/xdg-desktop-portal.git",
+        "pin": "1d20fadc304f6601452b5db65ed91197dba77041"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/pipewire"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xdg-desktop-portal 1.22.1 (2026-06-17) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xdg-desktop-portal-gtk",
+      "kind": "submodule",
+      "path": "vendor/wayland/xdg-desktop-portal-gtk",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/flatpak/xdg-desktop-portal-gtk.git",
+        "pin": "337202d4e7179857bc37b03c1a6d8c9d92e47c44"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/xdg-desktop-portal"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xdg-desktop-portal-gtk 1.15.3 (2025-03-21) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/hyprland/xdg-desktop-portal-hyprland",
+      "kind": "submodule",
+      "path": "vendor/hyprland/xdg-desktop-portal-hyprland",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/hyprwm/xdg-desktop-portal-hyprland.git",
+        "pin": "d1467fea8d1895cb7835829c2fbb271a0d37760a"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/hyprland/hyprland-protocols",
+        "submodule:vendor/hyprland/hyprlang",
+        "submodule:vendor/hyprland/hyprtoolkit",
+        "submodule:vendor/hyprland/hyprutils",
+        "submodule:vendor/hyprland/hyprwayland-scanner",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/mesa",
+        "submodule:vendor/wayland/pipewire",
+        "submodule:vendor/wayland/sdbus-cpp",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols",
+        "submodule:vendor/wayland/xdg-desktop-portal"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xdg-desktop-portal-hyprland v1.5.0 (2026-10-28) meson; consumers bun-os; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xkbcomp",
+      "kind": "submodule",
+      "path": "vendor/wayland/xkbcomp",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/app/xkbcomp.git",
+        "pin": "2c7789785981ad1fce3858c726615b49293f7de0"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxkbfile",
+        "submodule:vendor/wayland/xorg-util-macros",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xkbcomp xkbcomp-1.5.0 (2025-12-03) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xkeyboard-config",
+      "kind": "submodule",
+      "path": "vendor/wayland/xkeyboard-config",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git",
+        "pin": "2ec770a0085bf776de749e185ca40e50213fb21f"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/xkbcomp"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xkeyboard-config xkeyboard-config-2.49 (2026-10-21) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xorg-util-macros",
+      "kind": "submodule",
+      "path": "vendor/wayland/xorg-util-macros",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/util/macros.git",
+        "pin": "a9d71e3fd8e6758b70be31c586921bbbcd2a8449"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xorg-util-macros util-macros-1.20.2 (2024-11-13) autotools; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xorgproto",
+      "kind": "submodule",
+      "path": "vendor/wayland/xorgproto",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/proto/xorgproto.git",
+        "pin": "6d3907b6d5dc4aa7d7ee6ee5d7d8714e7466630b"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/xorg-util-macros"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xorgproto xorgproto-2026.1 (2026-10-03) meson; consumers bun-os+wslg; factory/wayland/closure.json"
+    },
+    {
+      "id": "submodule:vendor/wayland/xwayland",
+      "kind": "submodule",
+      "path": "vendor/wayland/xwayland",
+      "source": {
+        "type": "submodule",
+        "url": "https://gitlab.freedesktop.org/xorg/xserver.git",
+        "pin": "d958b4e84c903e8d5851b5ea587b998e4834ce62"
+      },
+      "registration": [
+        "none"
+      ],
+      "aot": true,
+      "status": "present",
+      "dependsOn": [
+        "submodule:vendor/wayland/libdecor",
+        "submodule:vendor/wayland/libdrm",
+        "submodule:vendor/wayland/libei",
+        "submodule:vendor/wayland/libepoxy",
+        "submodule:vendor/wayland/libglvnd",
+        "submodule:vendor/wayland/libx11",
+        "submodule:vendor/wayland/libxau",
+        "submodule:vendor/wayland/libxcvt",
+        "submodule:vendor/wayland/libxfont2",
+        "submodule:vendor/wayland/libxkbfile",
+        "submodule:vendor/wayland/libxshmfence",
+        "submodule:vendor/wayland/mesa",
+        "submodule:vendor/wayland/pixman",
+        "submodule:vendor/wayland/wayland",
+        "submodule:vendor/wayland/wayland-protocols",
+        "submodule:vendor/wayland/xorgproto"
+      ],
+      "consumedBy": [
+        "file:factory/wayland/closure.json",
+        "file:factory/wayland/wslg-deps.json",
+        "file:factory/images/bunos-hyprland/hyprland.packages"
+      ],
+      "note": "xwayland xwayland-24.1.14 (2026-10-07) meson; consumers bun-os+wslg; factory/wayland/closure.json"
     }
   ]
 }

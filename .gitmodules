@@ -883,3 +883,393 @@
 	path = vendor/microsoft/CsWinRT
 	url = https://github.com/microsoft/CsWinRT.git
 	shallow = true
+[submodule "vendor/hyprland/aquamarine"]
+	path = vendor/hyprland/aquamarine
+	url = https://github.com/hyprwm/aquamarine.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/cairo"]
+	path = vendor/wayland/cairo
+	url = https://gitlab.freedesktop.org/cairo/cairo.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/directx-headers"]
+	path = vendor/wayland/directx-headers
+	url = https://github.com/microsoft/DirectX-Headers.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/freerdp"]
+	path = vendor/wayland/freerdp
+	url = https://github.com/FreeRDP/FreeRDP.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/glaze"]
+	path = vendor/wayland/glaze
+	url = https://github.com/stephenberry/glaze.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprcursor"]
+	path = vendor/hyprland/hyprcursor
+	url = https://github.com/hyprwm/hyprcursor.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprgraphics"]
+	path = vendor/hyprland/hyprgraphics
+	url = https://github.com/hyprwm/hyprgraphics.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland"]
+	path = vendor/hyprland/hyprland
+	url = https://github.com/hyprwm/Hyprland.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland-guiutils"]
+	path = vendor/hyprland/hyprland-guiutils
+	url = https://github.com/hyprwm/hyprland-guiutils.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland-preview-share-picker"]
+	path = vendor/hyprland/hyprland-preview-share-picker
+	url = https://github.com/aphrody-labs/hyprland-preview-share-picker.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland-protocols"]
+	path = vendor/hyprland/hyprland-protocols
+	url = https://github.com/hyprwm/hyprland-protocols.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland-qtutils"]
+	path = vendor/hyprland/hyprland-qtutils
+	url = https://github.com/hyprwm/hyprland-qtutils.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprlang"]
+	path = vendor/hyprland/hyprlang
+	url = https://github.com/hyprwm/hyprlang.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprtoolkit"]
+	path = vendor/hyprland/hyprtoolkit
+	url = https://github.com/hyprwm/hyprtoolkit.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprutils"]
+	path = vendor/hyprland/hyprutils
+	url = https://github.com/hyprwm/hyprutils.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprwayland-scanner"]
+	path = vendor/hyprland/hyprwayland-scanner
+	url = https://github.com/hyprwm/hyprwayland-scanner.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprwire"]
+	path = vendor/hyprland/hyprwire
+	url = https://github.com/hyprwm/hyprwire.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/lcms2"]
+	path = vendor/wayland/lcms2
+	url = https://github.com/mm2/Little-CMS.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libdecor"]
+	path = vendor/wayland/libdecor
+	url = https://gitlab.freedesktop.org/libdecor/libdecor.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libdisplay-info"]
+	path = vendor/wayland/libdisplay-info
+	url = https://gitlab.freedesktop.org/emersion/libdisplay-info.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libdrm"]
+	path = vendor/wayland/libdrm
+	url = https://gitlab.freedesktop.org/mesa/drm.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libei"]
+	path = vendor/wayland/libei
+	url = https://gitlab.freedesktop.org/libinput/libei.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libepoxy"]
+	path = vendor/wayland/libepoxy
+	url = https://github.com/anholt/libepoxy.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libevdev"]
+	path = vendor/wayland/libevdev
+	url = https://gitlab.freedesktop.org/libevdev/libevdev.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libfontenc"]
+	path = vendor/wayland/libfontenc
+	url = https://gitlab.freedesktop.org/xorg/lib/libfontenc.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libglvnd"]
+	path = vendor/wayland/libglvnd
+	url = https://gitlab.freedesktop.org/glvnd/libglvnd.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libinput"]
+	path = vendor/wayland/libinput
+	url = https://gitlab.freedesktop.org/libinput/libinput.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libliftoff"]
+	path = vendor/wayland/libliftoff
+	url = https://gitlab.freedesktop.org/emersion/libliftoff.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libpciaccess"]
+	path = vendor/wayland/libpciaccess
+	url = https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libx11"]
+	path = vendor/wayland/libx11
+	url = https://gitlab.freedesktop.org/xorg/lib/libx11.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxau"]
+	path = vendor/wayland/libxau
+	url = https://gitlab.freedesktop.org/xorg/lib/libxau.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxcb"]
+	path = vendor/wayland/libxcb
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxcomposite"]
+	path = vendor/wayland/libxcomposite
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcomposite.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxcursor"]
+	path = vendor/wayland/libxcursor
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcursor.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxcvt"]
+	path = vendor/wayland/libxcvt
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcvt.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxdamage"]
+	path = vendor/wayland/libxdamage
+	url = https://gitlab.freedesktop.org/xorg/lib/libxdamage.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxdmcp"]
+	path = vendor/wayland/libxdmcp
+	url = https://gitlab.freedesktop.org/xorg/lib/libxdmcp.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxext"]
+	path = vendor/wayland/libxext
+	url = https://gitlab.freedesktop.org/xorg/lib/libxext.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxfixes"]
+	path = vendor/wayland/libxfixes
+	url = https://gitlab.freedesktop.org/xorg/lib/libxfixes.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxfont2"]
+	path = vendor/wayland/libxfont2
+	url = https://gitlab.freedesktop.org/xorg/lib/libxfont.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxi"]
+	path = vendor/wayland/libxi
+	url = https://gitlab.freedesktop.org/xorg/lib/libxi.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxkbcommon"]
+	path = vendor/wayland/libxkbcommon
+	url = https://github.com/xkbcommon/libxkbcommon.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxkbfile"]
+	path = vendor/wayland/libxkbfile
+	url = https://gitlab.freedesktop.org/xorg/lib/libxkbfile.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxrandr"]
+	path = vendor/wayland/libxrandr
+	url = https://gitlab.freedesktop.org/xorg/lib/libxrandr.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxrender"]
+	path = vendor/wayland/libxrender
+	url = https://gitlab.freedesktop.org/xorg/lib/libxrender.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxshmfence"]
+	path = vendor/wayland/libxshmfence
+	url = https://gitlab.freedesktop.org/xorg/lib/libxshmfence.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxtst"]
+	path = vendor/wayland/libxtst
+	url = https://gitlab.freedesktop.org/xorg/lib/libxtst.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxxf86vm"]
+	path = vendor/wayland/libxxf86vm
+	url = https://gitlab.freedesktop.org/xorg/lib/libxxf86vm.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/mesa"]
+	path = vendor/wayland/mesa
+	url = https://gitlab.freedesktop.org/mesa/mesa.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/mtdev"]
+	path = vendor/wayland/mtdev
+	url = https://bitmath.org/git/mtdev.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/muparser"]
+	path = vendor/wayland/muparser
+	url = https://github.com/beltoforion/muparser.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/pango"]
+	path = vendor/wayland/pango
+	url = https://gitlab.gnome.org/GNOME/pango.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/pipewire"]
+	path = vendor/wayland/pipewire
+	url = https://gitlab.freedesktop.org/pipewire/pipewire.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/pixman"]
+	path = vendor/wayland/pixman
+	url = https://gitlab.freedesktop.org/pixman/pixman.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/polkit"]
+	path = vendor/wayland/polkit
+	url = https://github.com/polkit-org/polkit.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/re2"]
+	path = vendor/wayland/re2
+	url = https://github.com/google/re2.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/sdbus-cpp"]
+	path = vendor/wayland/sdbus-cpp
+	url = https://github.com/Kistler-Group/sdbus-cpp.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/seatd"]
+	path = vendor/wayland/seatd
+	url = https://git.sr.ht/~kennylevinsen/seatd
+	shallow = true
+	update = none
+[submodule "vendor/wayland/tomlplusplus"]
+	path = vendor/wayland/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/wayland"]
+	path = vendor/wayland/wayland
+	url = https://gitlab.freedesktop.org/wayland/wayland.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/wayland-protocols"]
+	path = vendor/wayland/wayland-protocols
+	url = https://gitlab.freedesktop.org/wayland/wayland-protocols.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/weston"]
+	path = vendor/wayland/weston
+	url = https://gitlab.freedesktop.org/wayland/weston.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-proto"]
+	path = vendor/wayland/xcb-proto
+	url = https://gitlab.freedesktop.org/xorg/proto/xcbproto.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util"]
+	path = vendor/wayland/xcb-util
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-util.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-cursor"]
+	path = vendor/wayland/xcb-util-cursor
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-cursor.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-errors"]
+	path = vendor/wayland/xcb-util-errors
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-errors.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-image"]
+	path = vendor/wayland/xcb-util-image
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-image.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-keysyms"]
+	path = vendor/wayland/xcb-util-keysyms
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-keysyms.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-renderutil"]
+	path = vendor/wayland/xcb-util-renderutil
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-render-util.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-wm"]
+	path = vendor/wayland/xcb-util-wm
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-wm.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xdg-desktop-portal"]
+	path = vendor/wayland/xdg-desktop-portal
+	url = https://github.com/flatpak/xdg-desktop-portal.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xdg-desktop-portal-gtk"]
+	path = vendor/wayland/xdg-desktop-portal-gtk
+	url = https://github.com/flatpak/xdg-desktop-portal-gtk.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/xdg-desktop-portal-hyprland"]
+	path = vendor/hyprland/xdg-desktop-portal-hyprland
+	url = https://github.com/hyprwm/xdg-desktop-portal-hyprland.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xkbcomp"]
+	path = vendor/wayland/xkbcomp
+	url = https://gitlab.freedesktop.org/xorg/app/xkbcomp.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xkeyboard-config"]
+	path = vendor/wayland/xkeyboard-config
+	url = https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xorg-util-macros"]
+	path = vendor/wayland/xorg-util-macros
+	url = https://gitlab.freedesktop.org/xorg/util/macros.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xorgproto"]
+	path = vendor/wayland/xorgproto
+	url = https://gitlab.freedesktop.org/xorg/proto/xorgproto.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xwayland"]
+	path = vendor/wayland/xwayland
+	url = https://gitlab.freedesktop.org/xorg/xserver.git
+	shallow = true
+	update = none
