@@ -169,6 +169,7 @@
     "packages/web-to-tauri",
     "packages/webos-wasm",
     "packages/winclean",
+    "packages/winreg",
     "packages/yolo-cli",
     "packages/yolo-core",
     "packages/google",

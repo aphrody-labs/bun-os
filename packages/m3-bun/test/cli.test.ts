@@ -65,7 +65,6 @@ describe("runCli", () => {
       "coolify",
       "vscode",
       "windows",
-      "linux-image",
     ])
       expect(targets.text).toContain(id);
   });

@@ -59,7 +59,7 @@ export interface M3BunConfig {
   splitting?: boolean;
   /** Content-Security-Policy of the file server, or `false` to omit it. */
   csp?: string | false;
-  /** Record every `m3-bun build` in a `bun:graph` registry: `true` for `.m3-bun/graph.sqlite`, or its path relative to the config. */
+  /** Record every `m3-bun build` in a graph registry (SQLite): `true` for `.m3-bun/graph.sqlite`, or its path relative to the config. */
   graph?: boolean | string;
   compile?: {
     /** Default target of `m3-bun compile` (default: the host). */

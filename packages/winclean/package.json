@@ -30,7 +30,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@aphrody/os": "workspace:*"
+    "@aphrody/os": "workspace:*",
+    "@aphrody/winreg": "workspace:*"
   },
   "engines": {
     "bun": "=1.4.4"

@@ -25,7 +25,8 @@
     "typecheck": "bun check --noEmit -p ."
   },
   "dependencies": {
-    "@aphrody/paths": "workspace:*"
+    "@aphrody/paths": "workspace:*",
+    "@aphrody/winreg": "workspace:*"
   },
   "engines": {
     "bun": "=1.4.4"

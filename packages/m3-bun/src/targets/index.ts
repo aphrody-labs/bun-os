@@ -11,7 +11,6 @@ import { coolify } from "./coolify.ts";
 import { docker } from "./docker.ts";
 import { fly } from "./fly.ts";
 import { lambda } from "./lambda.ts";
-import { linuxImage } from "./linux-image.ts";
 import { next } from "./next.ts";
 import { nginx } from "./nginx.ts";
 import { osThemes } from "./os-themes.ts";
@@ -39,7 +38,6 @@ export const TARGETS: readonly Target[] = [
   coolify,
   vscode,
   windows,
-  linuxImage,
   tauri,
   webos,
   lambda,

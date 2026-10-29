@@ -83,7 +83,8 @@
     "@aphrody/m3-tokens": "workspace:*",
     "@aphrody/material-design-icons": "workspace:*",
     "@aphrody/scaffold": "workspace:*",
-    "@aphrody/web-to-tauri": "workspace:*"
+    "@aphrody/web-to-tauri": "workspace:*",
+    "@aphrody/winreg": "workspace:*"
   },
   "devDependencies": {
     "@aphrody/bun-debug-adapter-protocol": "0.0.1-aphrody.1",

@@ -55,6 +55,6 @@ schemas 1–15 remain in the native library. Resources default to
 
 Library input: `storytold/filmcraft`, commit
 `87b845138e2cecf43e97e2c2e011b820a6e70ecd`, version 0.7.2,
-MIT OR Apache-2.0. The input is an open source library. `Bun.Video` is exposed
-separately through `./native`; its availability does not qualify codecs or
-encoding. No FFmpeg subprocess or copied decoder is introduced.
+MIT OR Apache-2.0. The input is an open source library. Upstream Bun has no video
+API: `./native` only reports whether `ffmpeg` and `ffprobe` are on PATH and probes
+media files with `ffprobe`; its availability does not qualify codecs or encoding.

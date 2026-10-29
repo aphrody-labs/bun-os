@@ -98,43 +98,6 @@ describe.skipIf(!enabled)("generated images run", () => {
     },
     240_000,
   );
-
-  test.skipIf(!Bun.which("qemu-system-x86_64") || !Bun.env.M3_BUN_KERNEL || !existsSync(Bun.env.M3_BUN_KERNEL ?? ""))(
-    "the minimal Linux image boots in QEMU and serves over the forwarded port",
-    async () => {
-      const dir = fixtureCopy();
-      const app = await loadApp(dir);
-      const { outfile } = await compileApp({ app });
-      await generateTargets(["linux-image"], contextFor(app), join(dir, "deploy"));
-      const build = sh(["bash", join(dir, "deploy/linux-image/build-image.sh"), outfile, join(dir, "image")]);
-      expect(build.code).toBe(0);
-      const port = freePort();
-      const qemu = Bun.spawn(
-        ["bash", join(dir, "deploy/linux-image/run-qemu.sh"), join(dir, "image/initramfs.cpio.gz")],
-        {
-          windowsHide: true,
-          env: {
-            ...process.env,
-            KERNEL: Bun.env.M3_BUN_KERNEL!,
-            HOST_PORT: String(port),
-          },
-          stdout: "ignore",
-          stderr: "ignore",
-        },
-      );
-      try {
-        const health = await until(`http://127.0.0.1:${port}/healthz`, 300);
-        expect(health.status).toBe(200);
-        expect(await (await fetch(`http://127.0.0.1:${port}/api/hello/qemu`)).json()).toEqual({
-          hello: "qemu",
-        });
-      } finally {
-        qemu.kill();
-        await qemu.exited;
-      }
-    },
-    240_000,
-  );
 });
 
 describe.skipIf(!enabled)("cross-compiled executables", () => {

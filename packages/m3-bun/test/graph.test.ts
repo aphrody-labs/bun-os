@@ -51,14 +51,7 @@ describe("moduleGraph", () => {
   });
 });
 
-let hasGraph = true;
-try {
-  await import("bun:graph");
-} catch {
-  hasGraph = false;
-}
-
-describe.skipIf(!hasGraph)("m3-bun build --graph (bun:graph)", () => {
+describe("m3-bun build --graph", () => {
   test("a build is a run with its artifacts and duration, and the module graph a snapshot", async () => {
     const dir = fixtureCopy();
     const report = await buildApp({ dir, graph: true });
@@ -116,5 +109,46 @@ describe.skipIf(!hasGraph)("m3-bun build --graph (bun:graph)", () => {
     expect(found.some(n => n.kind === "output" && n.label.endsWith(".js"))).toBe(true);
     expect(await graphReport(app)).toContain("m3-app:hello-m3");
     expect(dependents(app, "src/none.ts")).rejects.toThrow("is not an input");
+  });
+});
+
+describe("graph registry", () => {
+  test("a recorded module graph answers dependents, coverage and the report without the m3 build", async () => {
+    const dir = tmp();
+    await Bun.write(join(dir, "index.html"), '<script type="module" src="./a.ts"></script>');
+    await Bun.write(join(dir, "a.ts"), 'import { b } from "./b.ts"; console.log(b);');
+    await Bun.write(join(dir, "b.ts"), "export const b = 1;");
+    const { metafile } = await Bun.build({
+      entrypoints: [join(dir, "index.html")],
+      root: dir,
+      outdir: join(dir, "out"),
+      metafile: true,
+    });
+    const graph = moduleGraph(metafile!, "index.html", dir);
+    const path = join(dir, ".m3-bun", "graph.sqlite");
+    {
+      using registry = await openGraph(path);
+      const repository = registry.repository("demo", "m3-app", dir, null);
+      const run = registry.startRun("m3-bun.build", [], dir);
+      registry.sample(run, "build", "bun", 0, 12.5);
+      await registry.artifact(join(dir, "index.html"), "m3-bun.output", run, { path: "index.html" });
+      const imported = await registry.importGraph(repository, graph, "h1");
+      registry.finishRun(run, 0, "1 files");
+      expect(imported).toEqual({ nodes: graph.nodes.length, edges: graph.links.length });
+      expect(registry.queryRuns({ kind: "m3-bun.build" }).map(r => r.status)).toEqual(["passed"]);
+      const coverage = registry.coverage({ repositoryId: repository });
+      expect({ nodes: coverage.nodes, edges: coverage.edges, unresolved: coverage.unresolvedNodes }).toEqual({
+        nodes: graph.nodes.length,
+        edges: graph.links.length,
+        unresolved: 0,
+      });
+      expect(registry.queryNodes({ repositoryId: repository }).map(n => n.label)).toContain("b.ts");
+    }
+    const app = { name: "demo", dir } as never;
+    const found = await dependents(app, "b.ts");
+    expect(found.map(n => n.label)).toContain("a.ts");
+    expect(found.some(n => n.kind === "output")).toBe(true);
+    expect(await graphReport(app)).toContain("m3-app:demo");
+    expect(dependents(app, "none.ts")).rejects.toThrow("is not an input");
   });
 });

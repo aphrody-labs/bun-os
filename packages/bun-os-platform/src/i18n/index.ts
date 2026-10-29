@@ -53,17 +53,19 @@ export function catalogSources(tag: string, domains?: readonly string[]): string
 export function osLocales(): string[] {
   if (process.platform === "win32") {
     try {
-      // bun:windows binds kernel32 through its generated Win32 families.
-      const windows = require("bun:windows") as {
-        family(name: string): Record<string, (...args: unknown[]) => number>;
-      };
-      const kernel32 = windows.family("kernel32");
+      const { dlopen, FFIType, ptr } = require("bun:ffi") as typeof import("bun:ffi");
+      const kernel32 = dlopen("kernel32.dll", {
+        GetUserPreferredUILanguages: {
+          args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr],
+          returns: FFIType.bool,
+        },
+      }).symbols;
       const MUI_LANGUAGE_NAME = 0x8;
       const count = new Uint32Array(1);
       const size = new Uint32Array(1);
-      if (kernel32.GetUserPreferredUILanguages?.(MUI_LANGUAGE_NAME, count, null, size) && size[0]) {
+      if (kernel32.GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, ptr(count), null, ptr(size)) && size[0]) {
         const buffer = new Uint16Array(size[0]);
-        if (kernel32.GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, count, buffer, size))
+        if (kernel32.GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, ptr(count), ptr(buffer), ptr(size)))
           return String.fromCharCode(...buffer)
             .split("\0")
             .filter(Boolean);

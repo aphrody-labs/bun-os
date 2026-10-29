@@ -66,7 +66,7 @@ export interface BuildReport {
   memory: BuildMemory;
   /** Problems that did not stop the build, such as a Bun outside the app's `engines.bun` range. */
   warnings: string[];
-  /** The `bun:graph` record of this build, when the build was recorded. */
+  /** The graph registry record of this build, when the build was recorded. */
   graph?: GraphRecord;
 }
 
@@ -143,7 +143,7 @@ export interface BuildAppOptions {
   outdir?: string;
   /** A pre-loaded app, for callers that already read the config. */
   app?: M3App;
-  /** Record the build in a `bun:graph` registry (default: `bun.graph` of the config): `true` for the app default, or a path. */
+  /** Record the build in a graph registry (SQLite) (default: `bun.graph` of the config): `true` for the app default, or a path. */
   graph?: boolean | string;
 }
 

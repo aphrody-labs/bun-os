@@ -4,7 +4,7 @@
 import { dlopen, FFIType, ptr } from "bun:ffi";
 import { hostname, userInfo } from "node:os";
 import type { BunWindowsApi } from "./bun-windows";
-import * as nativeRegistry from "./registry";
+import * as nativeRegistry from "@aphrody/winreg";
 
 function run(command: string, args: string[], input?: string): string {
   const result = Bun.spawnSync([command, ...args], {

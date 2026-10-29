@@ -1,9 +1,9 @@
 // Windows registry, process list and fixed disks for the Steam owner, on upstream Bun: bun:ffi (advapi32, kernel32) for
 // the registry and disks, tasklist.exe and PowerShell for processes. Every function throws on non-Windows hosts.
 import { dlopen, FFIType, ptr } from "bun:ffi";
-import * as nativeRegistry from "./registry";
+import * as nativeRegistry from "@aphrody/winreg";
 
-export type { RegistryListing, RegistryValue } from "./registry";
+export type { RegistryListing, RegistryValue } from "@aphrody/winreg";
 
 function run(command: string, args: string[]): string {
   if (process.platform !== "win32") throw new Error("Windows only");

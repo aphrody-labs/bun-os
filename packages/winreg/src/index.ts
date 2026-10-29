@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Windows registry through bun:ffi (advapi32): Unicode-safe and fast, with no reg.exe code-page or process cost.
-// The same module is kept in packages/winclean/src/registry.ts; change both together.
+// The single owner of the registry for the Steam, WinClean and M3 packages.
 import { dlopen, FFIType, ptr } from "bun:ffi";
 
 export type RegistryData = string | string[] | number | bigint | Uint8Array;
