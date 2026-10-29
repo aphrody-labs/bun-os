@@ -426,7 +426,7 @@
         "tag": "v6.31.0",
         "sha": "911a815687a14389895df3e658235de2450bc294"
       },
-      "deps": ["ecm", "qtbase", "qttools"],
+      "deps": ["ecm", "qtbase", "qttools", "qtdeclarative"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -447,7 +447,7 @@
         "tag": "v6.31.0",
         "sha": "df98b98f001721f83ebf3e36b73e346f6d29670a"
       },
-      "deps": ["ecm", "qtbase", "qttools"],
+      "deps": ["ecm", "qtbase", "qttools", "qtdeclarative"],
       "options": ["-DBUILD_TESTING=OFF", "-DBUILD_QCH=OFF", "-DBUILD_PYTHON_BINDINGS=OFF"],
       "needsTools": ["gettext"],
       "note": "needs msgfmt/xgettext (mlocati gettext-iconv-windows) and Qt6 Qml/Core5Compat only when QML is on"
@@ -523,7 +523,7 @@
     "gtk4": ["glib", "fribidi", "harfbuzz", "cairo", "pango", "gdk-pixbuf", "graphene", "libepoxy", "gtk4"],
     "libadwaita": ["gtk4", "libadwaita"],
     "qt6": ["qtbase", "qtshadertools", "qttools", "qtdeclarative"],
-    "kf6": ["qtbase", "qttools", "ecm", "kcoreaddons", "ki18n"],
+    "kf6": ["qtbase", "qtshadertools", "qttools", "qtdeclarative", "ecm", "kcoreaddons", "ki18n"],
     "plasma-libs": ["kf6", "plasma-workspace"],
     "samples": ["hello-gtk4", "hello-qt", "hello-qml", "hello-kcoreaddons"]
   }
