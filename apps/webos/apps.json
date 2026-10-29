@@ -87,10 +87,6 @@
     "m3-web": { "kind": "example", "related": "showcase" },
     "m3-next-example": { "kind": "example", "related": "showcase" },
     "m3-next-tauri-example": { "kind": "example", "related": "showcase" },
-    "m3-example-tauri": {
-      "kind": "example",
-      "desc": "Tauri examples: commands, multiwindow, multiwebview, streaming, isolation"
-    },
     "m3-published-consumer": { "kind": "example", "related": "showcase" },
     "play": { "kind": "server", "related": "play" },
     "rg-website": {
