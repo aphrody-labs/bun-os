@@ -165,9 +165,7 @@ test("vswhere and vcvars helpers", () => {
     "-utf8",
   ]);
   expect(vswhereArgs(true).at(-1)).toBe("-prerelease");
-  expect(parseVswhere('[{"installationPath":"C:\\\\VS","installationVersion":"18.1"}]')[0]?.path).toBe(
-    "C:\\VS",
-  );
+  expect(parseVswhere('[{"installationPath":"C:\\\\VS","installationVersion":"18.1"}]')[0]?.path).toBe("C:\\VS");
   expect(parseVswhere("garbage")).toEqual([]);
   expect(vcvarsArch("x64")).toBe("x64");
   expect(vcvarsArch("arm64")).toBe("x64_arm64");
