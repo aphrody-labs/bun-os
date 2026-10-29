@@ -1,10 +1,13 @@
-import { repositoryRoot } from "./index.ts";
+import { appendFileSync } from "node:fs";
+import { resolve as resolvePath } from "node:path";
+import { classify } from "./git-affected.ts";
 import { writeAttributes, writeCodeowners, writeGitmodulesKeys, writeIgnoreRevs } from "./git-generate.ts";
 import {
   applyConfig,
   applyProfile,
   doctor,
   git,
+  gitlinks,
   loadProfiles,
   measure,
   prune,
@@ -19,7 +22,12 @@ const usage = `aphrody-bun git <command>
   status                                   profile, sparse state, submodule count, timed git status
   prune [--profile <name>]                 deinit submodules outside a profile, refresh commit-graph and MIDX
   measure [--json]                         median-of-3 timings without/with the recommended settings
+  ci-prepare <profile>                     CI: cone for the profile, update=none for every submodule outside it
+  affected [--base <ref>] [--github-output]  areas touched by git diff <base>...HEAD (js, rust, docs, infra, all)
   generate attributes|codeowners|ignore-revs|gitmodules|all`;
+
+// Not imported from index.ts: CI runs this entry before `bun install`, when workspace dependencies are absent.
+const repositoryRoot = resolvePath(import.meta.dir, "../../..");
 
 export async function gitCommand(args: string[]): Promise<number> {
   const ri = args.indexOf("--root");
@@ -98,6 +106,30 @@ export async function gitCommand(args: string[]): Promise<number> {
       else for (const r of rows) console.log(`${r.mode.padEnd(9)} ${r.label.padEnd(24)} ${r.ms} ms`);
       return 0;
     }
+    case "ci-prepare": {
+      const name = rest[0];
+      if (!name) throw new Error(usage);
+      const plan = await applyProfile(root, name, { submodules: false });
+      const wanted = new Set(plan.submodules);
+      const skipped: string[] = [];
+      for (const link of await gitlinks(root)) {
+        if (wanted.has(link) || plan.sparse === false && name === "all") continue;
+        await git(root, ["config", "--local", `submodule.${link}.update`, "none"]);
+        skipped.push(link);
+      }
+      console.log(`profile ${name}: ${plan.cone.length} cone dirs, ${wanted.size} submodules kept, ${skipped.length} skipped`);
+      return 0;
+    }
+    case "affected": {
+      const base = opt("--base") ?? "origin/os";
+      const diff = await git(root, ["diff", "--name-only", `${base}...HEAD`]);
+      if (diff.code) throw new Error(diff.err);
+      const areas = classify(diff.out.split("\n").filter(Boolean));
+      console.log(JSON.stringify(areas));
+      if (flag("--github-output") && Bun.env.GITHUB_OUTPUT)
+        appendFileSync(Bun.env.GITHUB_OUTPUT, Object.entries(areas).map(([k, v]) => `${k}=${v}\n`).join(""));
+      return 0;
+    }
     case "generate": {
       const what = rest[0] ?? "all";
       if (["attributes", "all"].includes(what)) (await writeAttributes(root), console.log("wrote .gitattributes"));
@@ -111,3 +143,5 @@ export async function gitCommand(args: string[]): Promise<number> {
       return cmd === "help" ? 0 : 1;
   }
 }
+
+if (import.meta.main) process.exitCode = await gitCommand(Bun.argv.slice(2));

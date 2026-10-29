@@ -71,3 +71,11 @@ test("config and profile application are idempotent on a real repository", async
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("diff classification selects only the touched areas", async () => {
+  const { classify } = await import("../src/git-affected.ts");
+  expect(classify(["docs/a.mdx"])).toEqual({ all: false, js: false, rust: false, docs: true, distro: false });
+  expect(classify(["crates/x/src/lib.rs"])).toMatchObject({ rust: true, js: false });
+  expect(classify([".github/workflows/ci.yml"])).toMatchObject({ all: true, js: true, rust: true });
+  expect(classify(["packages/a/src/i.ts"])).toMatchObject({ js: true, rust: false });
+});
