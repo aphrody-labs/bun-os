@@ -676,6 +676,10 @@
         "@aphrody/m3-config": "workspace:*",
       },
     },
+    "packages/fluent": {
+      "name": "@aphrody/fluent",
+      "version": "1.4.7",
+    },
     "packages/google": {
       "name": "@aphrody/google",
       "version": "1.4.7",
@@ -2268,6 +2272,8 @@
 
 
     "@aphrody/eslint-plugin-m3": ["@aphrody/eslint-plugin-m3@workspace:packages/eslint-plugin-m3"],
+
+    "@aphrody/fluent": ["@aphrody/fluent@workspace:packages/fluent"],
 
     "@aphrody/fuzzy": ["@aphrody/fuzzy@1.4.7", "", {}, "sha512-IwMwBVjfo0Gy38PqTHvJfGbXDMRv2H8UWQnczR5vnWc43v4XBH4IHBt82cuSu/u1tf0XSE4CSKJLJTTaD4ZzNg=="],
 

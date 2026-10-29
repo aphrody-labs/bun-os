@@ -129,10 +129,10 @@ jobs:
       - name: Bun loads a NativeAOT shared library with bun:ffi
         run: |
           bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/native -r "$(bun -p 'process.arch==="arm64"?"linux-arm64":"linux-x64"')" --channel ${{ matrix.channel }} --aot --native-lib -o "$OUT/native" --exec -- -p:BunosTfm=${{ matrix.tfm }}
-          ls -l "$OUT/native"
-          BUNOS_NATIVE_LIB="$OUT/native/bunos_native.so" bun test factory/dotnet-linux/ffi-interop.test.ts 2>&1 | tee "$OUT/ffi.txt"
+          ls -l "$OUT/native"; NATIVE=$(ls "$OUT"/native/*bunos_native.so | grep -v ".dbg$" | head -1); echo "native lib: $NATIVE"
+          BUNOS_NATIVE_LIB="$NATIVE" bun test factory/dotnet-linux/ffi-interop.test.ts 2>&1 | tee "$OUT/ffi.txt"
           grep -q ' 1 pass' "$OUT/ffi.txt"
-          echo "{\"name\":\"bun:ffi -> NativeAOT .so ${{ matrix.tfm }}\",\"bytes\":$(stat -c %s "$OUT/native/bunos_native.so"),\"note\":\"$(grep -o 'runtime description from NativeAOT: .*' "$OUT/ffi.txt" | head -1)\"}" >> "$RES"
+          echo "{\"name\":\"bun:ffi -> NativeAOT .so ${{ matrix.tfm }}\",\"bytes\":$(stat -c %s "$NATIVE"),\"note\":\"$(grep -o 'runtime description from NativeAOT: .*' "$OUT/ffi.txt" | head -1)\"}" >> "$RES"
       - name: pwsh startup (measured)
         run: bun factory/dotnet-linux/bench.ts --name "${{ matrix.pwsh }} -NoProfile -c 1" --size "$PREFIX/pwsh" --runs 5 -- "$PREFIX/bin/${{ matrix.pwsh }}" -NoProfile -NonInteractive -Command 1 | tee -a "$RES"
       - name: Pester v5 (profile, pins, every PowerShell script parses, buncc sh and pwsh interop)

@@ -21,9 +21,8 @@ Describe 'PowerShell runtime' {
     It 'runs the pinned upstream version when CI says so' -Skip:(-not $env:BUNOS_PWSH_PIN) {
         $PSVersionTable.PSVersion.ToString() | Should -Be $env:BUNOS_PWSH_PIN
     }
-    It 'is a Linux build on Linux' -Skip:(-not $IsLinux) {
+    It 'is a Unix build with IsLinux set (PSVersionTable.OS carries the distribution name, not Linux)' -Skip:(-not $IsLinux) {
         $PSVersionTable.Platform | Should -Be 'Unix'
-        $PSVersionTable.OS | Should -Match 'Linux'
     }
     It 'ships PSReadLine and PSResourceGet (bundled since 7.4)' {
         (Get-Module -ListAvailable PSReadLine).Count | Should -BeGreaterThan 0
