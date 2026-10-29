@@ -255,16 +255,19 @@
     {
       "id": "wayland",
       "layer": "factory",
-      "title": "factory/wayland (Wayland closure)",
+      "title": "factory/wayland (Wayland, Weston, Xwayland and Hyprland closure, WSLg subset)",
       "owner": "factory/wayland",
       "module": null,
-      "entry": [],
+      "entry": [
+        "bun factory/wayland/compute-closure.ts",
+        "bun factory/wayland/verify-closure.ts",
+        "bun factory/wayland/integrate.ts"
+      ],
       "docs": ["docs/WAYLAND-CLOSURE.md"],
       "ci": [],
-      "pins": [],
-      "status": "unverified",
-      "pending": true,
-      "note": "announced by the Wayland owner; not on os yet"
+      "pins": ["factory/wayland/closure.json"],
+      "status": "built",
+      "note": "78 shallow update=none submodules under vendor/wayland and vendor/hyprland; closure counts are generated into docs/WAYLAND-CLOSURE.md; nothing is built from them yet"
     },
     {
       "id": "buncc-desktop",

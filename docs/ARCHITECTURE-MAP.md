@@ -17,7 +17,7 @@ Platform facades    | windows, windows-posix, wasm
                     v
 Workspace tooling   | bun-workspace, components, windows-samples
                     v
-factory             | distro, kernel, wsl, wsl-kernel, wslg*, wayland*, buncc-desktop*, linux-desktop*
+factory             | distro, kernel, wsl, wsl-kernel, wslg*, wayland, buncc-desktop*, linux-desktop*
                     v
 Images              | images, release, sites
 ```
@@ -58,7 +58,7 @@ Images              | images, release, sites
 | factory | **wsl**: factory/wsl (Arch rootfs for WSL) (Linux host only; wsl-rootfs.yml proves the rootfs checks (no kernel in the archive, no shadow hashes) when green) | `factory/wsl` | `bash factory/wsl/build-rootfs.sh` | `docs/WSL.md` | `wsl-rootfs.yml#rootfs` | - | unverified |
 | factory | **wsl-kernel**: factory/wsl/kernel (WSL2 kernel 7.3 with Rust, patch series) (Linux host only; bzImage and modules.vhdx exist only when the workflow uploads them) | `factory/wsl/kernel` | `bash factory/wsl/kernel/build-wsl-kernel.sh` | `docs/WSL.md`<br>`docs/KERNEL-ROADMAP.md` | `wsl-kernel.yml#kernel`<br>`wsl-kernel.yml#nvidia-open-build-check` | - | unverified |
 | factory | **wslg**: WSLg (bunos-wslg) (announced by the WSLg owner (workflow bunos-wslg on the fork); not on os yet) | `factory/wsl` | - | `docs/WSLG.md` | - | - | unverified (pending) |
-| factory | **wayland**: factory/wayland (Wayland closure) (announced by the Wayland owner; not on os yet) | `factory/wayland` | - | `docs/WAYLAND-CLOSURE.md` | - | - | unverified (pending) |
+| factory | **wayland**: factory/wayland (Wayland, Weston, Xwayland and Hyprland closure, WSLg subset) (78 shallow update=none submodules under vendor/wayland and vendor/hyprland; closure counts are generated into docs/WAYLAND-CLOSURE.md; nothing is built from them yet) | `factory/wayland` | `bun factory/wayland/compute-closure.ts`<br>`bun factory/wayland/verify-closure.ts`<br>`bun factory/wayland/integrate.ts` | `docs/WAYLAND-CLOSURE.md` | - | `factory/wayland/closure.json` | built |
 | factory | **buncc-desktop**: buncc desktop entries (announced by the buncc desktop owner; workflow and doc not on os yet) | `packages/buncc` | - | `docs/BUNCC-DESKTOP.md` | `buncc-desktop.yml#desktop` | - | unverified (pending) |
 | factory | **linux-desktop**: factory/linux-desktop (announced by the Linux-desktop owner; not on os yet) | `factory/linux-desktop` | - | - | `buncc-linux-desktop.yml#desktop` | - | unverified (pending) |
 | images | **images**: Images (factory/images, factory/arch, factory/usr) (images build on a Linux host; no image has been produced by CI) | `factory/images` | `just iso` | `docs/UNIFIED-INSTALL.md` | - | `factory/arch/sources.json` | unverified |
