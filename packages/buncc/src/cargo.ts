@@ -106,7 +106,9 @@ export const DEFAULT_CARGO_DEADLINE = 30 * 60_000;
  */
 export async function runCargo(args: string[], options: CargoOptions): Promise<RunResult> {
   const log = options.log ?? ((line: string) => process.stderr.write(line + "\n"));
-  const total = options.timeoutMs ?? DEFAULT_CARGO_DEADLINE;
+  // BUNCC_CARGO_DEADLINE_MS lifts the default for whole-workspace runs (clippy --all-targets on CI outlasts 30 minutes).
+  const configured = Number(Bun.env.BUNCC_CARGO_DEADLINE_MS);
+  const total = options.timeoutMs ?? (configured > 0 ? configured : DEFAULT_CARGO_DEADLINE);
   const started = Date.now();
   const slots = Math.max(
     1,

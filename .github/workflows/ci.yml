@@ -146,6 +146,8 @@ jobs:
       # Deny-by-default lints only: the imported bevy forks do not pass -D warnings yet (non-ASCII test identifiers, unused deps).
       - name: Clippy
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        env:
+          BUNCC_CARGO_DEADLINE_MS: "7200000"
         run: bun packages/buncc/src/cli.ts exec -- clippy --workspace --all-targets --locked --keep-going ${{ runner.os == 'Windows' && '--exclude ruzu' || '' }}
 
   release-plan:

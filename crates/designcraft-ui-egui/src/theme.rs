@@ -20,7 +20,11 @@ pub enum Brightness {
 }
 
 impl Brightness {
-    pub const ALL: [Brightness; 3] = [Brightness::Dark, Brightness::Light, Brightness::HighContrast];
+    pub const ALL: [Brightness; 3] = [
+        Brightness::Dark,
+        Brightness::Light,
+        Brightness::HighContrast,
+    ];
     pub fn label(self) -> &'static str {
         match self {
             Brightness::Dark => "M3 Dark",
