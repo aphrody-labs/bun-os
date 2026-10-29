@@ -27,7 +27,7 @@ function sourceRuntimeIdentity(commit: string, runtime: SourceRuntimeDeployment[
     !/^[a-f0-9]{64}$/.test(runtime.sha256) ||
     !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(runtime.version) ||
     !/^[a-f0-9]{40}$/.test(runtime.revision) ||
-    !/^https:\/\/github\.com\/aphrody-labs\/bun\/releases\/download\/[^\s]+$/.test(runtime.sourceUrl)
+    !/^https:\/\/github\.com\/oven-sh\/bun\/releases\/download\/[^\s]+$/.test(runtime.sourceUrl)
   )
     throw Error("Source/runtime deployment requires exact qualified runtime pins");
   const schema = "shenron-source-runtime/v1";

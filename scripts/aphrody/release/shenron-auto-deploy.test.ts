@@ -14,7 +14,7 @@ test("a runtime-only change builds a distinct deployment without changing the Sh
     runtimeExpected: {
       version: "1.4.5",
       revision: "c".repeat(40),
-      sourceUrl: "https://github.com/aphrody-labs/bun/releases/download/bun-v1.4.5/bun-linux-x64-full.zip",
+      sourceUrl: "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64.zip",
     },
   };
   const expected = deploymentSelection(commit, config);
@@ -33,7 +33,7 @@ test("a runtime-only change builds a distinct deployment without changing the Sh
     {
       runtimeExpected: {
         ...config.runtimeExpected,
-        sourceUrl: config.runtimeExpected.sourceUrl.replace("full.zip", "other.zip"),
+        sourceUrl: config.runtimeExpected.sourceUrl.replace("x64.zip", "arm64.zip"),
       },
     },
   ]) {
@@ -77,8 +77,8 @@ test("a runtime-only change builds a distinct deployment without changing the Sh
 const nativeEvidence = {
   version: "1.4.4+fixture",
   revision: "a".repeat(40),
-  sourceUrl: "https://github.com/aphrody-labs/bun/releases/download/fixture/bun.zip",
-  features: { yolo: true, crawl: true, curl: true, vectorIndex: true },
+  sourceUrl: "https://github.com/oven-sh/bun/releases/download/fixture/bun.zip",
+  features: { serve: true, fetch: true, sqlite: true, image: true },
 };
 test("runtime hash is checked before execution and evidence binds provenance and all native fixtures", async () => {
   const root = mkdtempSync(join(tmpdir(), "shenron-runtime-pin-"));
@@ -104,7 +104,7 @@ test("runtime hash is checked before execution and evidence binds provenance and
     runtimeEvidence(
       JSON.stringify({
         ...nativeEvidence,
-        features: { ...nativeEvidence.features, curl: false },
+        features: { ...nativeEvidence.features, fetch: false },
       }),
     ),
   ).toThrow("differs");
@@ -326,7 +326,7 @@ test("runtime probe kills a stalled runtime and accepts bounded output", async (
   expect(await probe([process.execPath, "-e", "console.log('bounded')"], process.env)).toBe("bounded\n");
 });
 
-test.each(["yolo", "curl", "crawl", "vector-index", "untrusted-secret"])(
+test.each(["availability", "fetch", "sqlite", "image", "untrusted-secret"])(
   "runtime probe reports only a recognized fixture failure stage [%s]",
   async stage => {
     const failure = JSON.stringify({
@@ -355,5 +355,5 @@ test("canonical auto-deploy configuration requires exact runtime qualification p
   expect(configuration.runtimeSha256).toMatch(/^[a-f0-9]{64}$/);
   expect(configuration.runtimeExpected.version).toMatch(/^\d+\.\d+\.\d+/);
   expect(configuration.runtimeExpected.revision).toMatch(/^[a-f0-9]{40}$/);
-  expect(configuration.runtimeExpected.sourceUrl).toStartWith("https://github.com/aphrody-labs/bun/releases/download/");
+  expect(configuration.runtimeExpected.sourceUrl).toStartWith("https://github.com/oven-sh/bun/releases/download/");
 });

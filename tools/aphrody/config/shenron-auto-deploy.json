@@ -20,7 +20,7 @@
   "runtimeSha256": "890af6a675e1dc58b15a15777c53de3b2e82668690c9be5f6e87ec690246ac0e",
   "runtimeExpected": {
     "version": "1.4.4",
-    "revision": "dfde053a3045d6076ad315b6f63160c4ced71513",
-    "sourceUrl": "https://github.com/aphrody-labs/bun/releases/download/bun-v1.4.4/bun-linux-x64-full.zip"
+    "revision": "11c367163a4baa77d3627d14764c376c856a630a",
+    "sourceUrl": "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64.zip"
   }
 }

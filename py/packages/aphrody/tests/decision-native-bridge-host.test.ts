@@ -19,7 +19,7 @@ async function digest(path: string) {
 test.skipIf(!selected)(
   "one real CPython host delegates sequential scoped decisions to the installed SDK",
   async () => {
-    const { Python } = await import("bun:python");
+    const { Python } = await import("@aphrody/runtime-sdk/python");
     const configuration: NativeDecisionOptions = {
       runtime: {
         directory: process.env.BUN_DECISION_RUNTIME_DIRECTORY!,

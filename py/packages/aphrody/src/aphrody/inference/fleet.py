@@ -94,7 +94,7 @@ def pipeline_plan(
 
 
 def plan_json(argument: str) -> str:
-    """Stable bun:python call boundary; no provider credentials cross this API."""
+    """Stable Python host call boundary (@aphrody/runtime-sdk/python); no provider credentials cross this API."""
     value = json.loads(argument)
     result = pipeline_plan(
         [Node.parse(n) for n in value["nodes"]],

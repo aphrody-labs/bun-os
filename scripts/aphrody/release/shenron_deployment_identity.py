@@ -13,7 +13,7 @@ def deployment(value, commit):
     if not isinstance(runtime, dict) or set(runtime) != {"sha256", "version", "revision", "sourceUrl"}:
         raise ValueError("invalid qualified runtime pins")
     patterns = {"sha256": r"[a-f0-9]{64}", "version": r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?",
-                "revision": r"[a-f0-9]{40}", "sourceUrl": r"https://github\.com/aphrody-labs/bun/releases/download/[^\s]+"}
+                "revision": r"[a-f0-9]{40}", "sourceUrl": r"https://github\.com/oven-sh/bun/releases/download/[^\s]+"}
     if value["schema"] != "shenron-source-runtime/v1" or value["commit"] != commit or not re.fullmatch(r"[a-f0-9]{40}", commit):
         raise ValueError("deployment source differs")
     if any(not isinstance(runtime[key], str) or not re.fullmatch(pattern, runtime[key]) for key, pattern in patterns.items()):

@@ -1,9 +1,6 @@
-import type { GoogleClientOptions } from "bun:google";
-import {
-  createAntigravityCredentialProvider,
-  createAntigravityServices,
-  type AntigravityServicesOptions,
-} from "@aphrody/bun-google";
+import type { GoogleClientOptions } from "./client.ts";
+import { createAntigravityServices, type AntigravityServicesOptions } from "./antigravity.ts";
+import { createAntigravityCredentialProvider } from "./credentials.ts";
 
 export interface GoogleNativeAuthOptions {
   credentialProvider?: GoogleClientOptions["credentialProvider"];

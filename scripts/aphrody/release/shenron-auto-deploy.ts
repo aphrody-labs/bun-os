@@ -19,9 +19,9 @@ import {
 
 const infra = resolve(dirname(fileURLToPath(import.meta.url)), "../../../");
 const config = JSON.parse(
-  readFileSync(process.env.SHENRON_AUTO_DEPLOY_CONFIG ?? join(infra, "tools/config/shenron-auto-deploy.json"), "utf8"),
+  readFileSync(process.env.SHENRON_AUTO_DEPLOY_CONFIG ?? join(infra, "tools/aphrody/config/shenron-auto-deploy.json"), "utf8"),
 );
-const factoryPath = join(infra, "tools/config/build-factory.json");
+const factoryPath = join(infra, "tools/aphrody/config/build-factory.json");
 const factory = JSON.parse(readFileSync(factoryPath, "utf8")) as BuildFactoryConfig;
 const resources = factoryResourcePolicy(factory);
 const env: Record<string, string | undefined> = {
@@ -31,7 +31,7 @@ const env: Record<string, string | undefined> = {
   SHENRON_COMPILE_BUN: config.bun,
   SHENRON_CARGO_REMOTE: "off",
   APHRODY_BUILD_HOST: "vps",
-  APHRODY_CARGO_SERIAL: join(infra, "scripts/build/rust/cargo-serial.sh"),
+  APHRODY_CARGO_SERIAL: join(infra, "scripts/aphrody/build/rust/cargo-serial.sh"),
   APHRODY_CARGO_TARGET_DIR: join(factory.cacheRoot, "cargo/shenron"),
   CARGO_TARGET_DIR: join(factory.cacheRoot, "cargo/shenron"),
   SCCACHE_DIR: join(factory.cacheRoot, "sccache"),
@@ -52,49 +52,33 @@ export interface RuntimeEvidence {
   revision: string;
   sourceUrl: string;
   features: {
-    yolo: boolean;
-    crawl: boolean;
-    curl: boolean;
-    vectorIndex: boolean;
+    serve: boolean;
+    fetch: boolean;
+    sqlite: boolean;
+    image: boolean;
   };
 }
 export const runtimeFixture = `
-const {mkdtemp,rm}=await import('node:fs/promises');
-const {tmpdir}=await import('node:os');const {join}=await import('node:path');
 const check=(value)=>{if(!value)throw Error('Native runtime fixture failed')};
-const root=await mkdtemp(join(tmpdir(),'shenron-runtime-'));
 let server;let stage='setup';
 const reportFailure=()=>console.error(JSON.stringify({schema:'shenron-runtime-failure/v1',stage}));
 const watchdog=setTimeout(()=>{reportFailure();process.exit(1)},20000);
 try {
-  stage='yolo';
-  const y=await import('bun:yolo');
-  const request={state:'public fixture',questions:{valid:y.noul('Valid?'),route:y.choice('Route?',{yes:'Yes',no:'No'}),support:y.score('Support?',['No','Yes'])}};
-  const provider=y.code(()=>({model:'fixture',answers:{valid:{type:'noul',noul:0.5},route:{type:'choice',choice:'yes',confidence:0.8,probabilities:{yes:0.9,no:0.1}},support:{type:'score',score:1,confidence:1,legend:{0:'No',1:'Yes'},probabilities:{0:0,1:1}}},usage:null}));
-  const result=await y.decide(request,{provider});check(result.valid===false&&result.route==='yes'&&result.support===1);
-  const inspected=await y.inspect(request,{provider});check(y.selections(request,inspected,0.99).route===null);
-  stage='availability';check(Bun.Curl?.available&&Bun.Crawl?.available&&Bun.VectorIndex?.available);
+  stage='availability';check(typeof Bun.serve==='function'&&typeof Bun.Image==='function'&&typeof Bun.sql==='function');
   stage='http-fixture';
-  server=Bun.serve({hostname:'127.0.0.1',port:0,fetch(req){return new URL(req.url).pathname==='/robots.txt'?new Response('User-agent: *\\nAllow: /\\n'):new Response('<html><title>Fixture</title><body>public fixture</body></html>',{headers:{'content-type':'text/html'}})}});
-  stage='curl';const response=await Bun.Curl.request(server.url.href,{timeout:5000,maxBytes:4096});check(response.status===200&&(await response.body.text()).includes('public fixture'));
-  stage='crawl';const crawl=await Bun.Crawl.run({action:'run',store:join(root,'crawl'),seed:server.url.href,maxRequests:1,concurrency:1,timeout:10000,allowPrivate:true});check(crawl.owner==='bun_browser_crawl'&&crawl.pages>=1);
-  stage='vector-index';
-  const path=join(root,'vectors.idx');let index=new Bun.VectorIndex(path,{dimensions:2,metric:'l2'});
-  try{index.add(1n,[0,0]);index.add(9007199254740993n,[1,0]);const filtered=index.search([0,0],1,{allowedKeys:[9007199254740993n]})[0];check(filtered?.key===9007199254740993n&&filtered.score===-1);index.save()}finally{index.close()}
-  index=new Bun.VectorIndex(path,{dimensions:2,metric:'l2'});try{check(index.count===2&&index.search([0,0],1)[0]?.key===1n)}finally{index.close()}
-  console.log(JSON.stringify({version:Bun.version,revision:Bun.revision,sourceUrl:process.release.sourceUrl,features:{yolo:true,crawl:true,curl:true,vectorIndex:true}}));
+  server=Bun.serve({hostname:'127.0.0.1',port:0,fetch(){return new Response('public fixture',{headers:{'content-type':'text/plain'}})}});
+  stage='fetch';const response=await fetch(server.url.href);check(response.status===200&&(await response.text())==='public fixture');
+  stage='sqlite';
+  const {Database}=await import('bun:sqlite');const db=new Database(':memory:');
+  try{db.run('create table fixture(id integer primary key, name text)');db.run('insert into fixture(name) values (?)',['shenron']);check(db.query('select name from fixture').get().name==='shenron')}finally{db.close()}
+  stage='image';
+  const png=Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='),(c)=>c.charCodeAt(0));
+  const meta=await new Bun.Image(png).metadata();check(meta.width===1&&meta.height===1);
+  console.log(JSON.stringify({version:Bun.version,revision:Bun.revision,sourceUrl:process.release.sourceUrl,features:{serve:true,fetch:true,sqlite:true,image:true}}));
 }catch{reportFailure();throw Error('Native runtime fixture failed')}
-finally{clearTimeout(watchdog);if(server)await server.stop(true);await rm(root,{recursive:true,force:true})}
+finally{clearTimeout(watchdog);if(server)await server.stop(true)}
 `;
-const runtimeFailureStages = new Set([
-  "setup",
-  "yolo",
-  "availability",
-  "http-fixture",
-  "curl",
-  "crawl",
-  "vector-index",
-]);
+const runtimeFailureStages = new Set(["setup", "availability", "http-fixture", "fetch", "sqlite", "image"]);
 function runtimeFailureStage(stderr: string): string {
   for (const line of stderr.split("\n")) {
     try {
@@ -159,9 +143,9 @@ export function runtimeEvidence(output: string, expected: RuntimeExpectation = {
     typeof result.version !== "string" ||
     typeof result.revision !== "string" ||
     typeof result.sourceUrl !== "string" ||
-    !result.sourceUrl.startsWith("https://github.com/aphrody-labs/bun/releases/download/") ||
+    !result.sourceUrl.startsWith("https://github.com/oven-sh/bun/releases/download/") ||
     !result.features ||
-    ["yolo", "crawl", "curl", "vectorIndex"].some(
+    ["serve", "fetch", "sqlite", "image"].some(
       key => result.features[key as keyof RuntimeEvidence["features"]] !== true,
     ) ||
     Object.entries(expected).some(([key, value]) => result[key as keyof RuntimeExpectation] !== value)

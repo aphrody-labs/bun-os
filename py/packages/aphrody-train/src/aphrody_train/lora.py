@@ -420,7 +420,7 @@ def main(
 
 
 def run_lora_job(request: dict[str, Any]) -> dict[str, Any]:
-    """JSON facade for the existing trainer, callable through native bun:python.
+    """JSON facade for the existing trainer, callable through the Python host (@aphrody/runtime-sdk/python).
 
     GPU allocation belongs to the host scheduler; this function does not stop
     services, synchronize provider stores, promote models or invent a GPU lease.

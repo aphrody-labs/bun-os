@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
-/** Private product binding; runtime and native host remain owned by the Bun fork.
+/** Private product binding; the native host library is built from crates/aphrody-ffi and driven through @aphrody/runtime-sdk/python.
  * The caller supplies its qualified host/CPython environment and PYTHONPATH.
  * JSON is an explicit serialization boundary, never shared object memory.
  */
-import type { PythonAsync } from "bun:python";
+import type { PythonAsync } from "@aphrody/runtime-sdk/python";
 
 export async function decideJson(python: PythonAsync, argument: string): Promise<string> {
   return await python.call("aphrody.decision.workflow", "decide_json", argument);
