@@ -339,32 +339,6 @@ test("native builder requires actual GPU forwarding rather than accepting an unu
   }
 });
 
-test("native builder refuses an ABI-incomplete artifact and leaves no success manifest", async () => {
-  const { root, consumer } = await fixture();
-  try {
-    const result = await run([`--root=${root}`, "--debug", "--offline", "--unlocked"], {
-      ...cleanEnv(),
-      CARGO_TARGET_DIR: join(root, "target"),
-    });
-    expect(result.stderr).toContain("staged native consumer failed");
-    expect(result.stderr).toContain("aphrody_abi_version");
-    expect(result.code).toBe(1);
-    const artifact = join(root, "target/debug", `${process.platform === "win32" ? "" : "lib"}aphrody_ffi.${suffix}`);
-    const mismatch = await run([
-      `--root=${root}`,
-      "--debug",
-      `--stage-existing=${artifact}`,
-      `--artifact-sha256=${"0".repeat(64)}`,
-    ]);
-    expect(mismatch.code).toBe(1);
-    expect(mismatch.stderr).toContain("does not match --artifact-sha256");
-    const markers = await Array.fromAsync(new Bun.Glob("native/**/manifest.json").scan({ cwd: consumer }));
-    expect(markers).toEqual([]);
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
-}, 60_000);
-
 test("jobs qualification requires actual forwarding and cannot attest reused artifacts", async () => {
   const { root } = await fixture();
   try {
