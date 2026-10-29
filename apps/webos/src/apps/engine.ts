@@ -169,11 +169,6 @@ const CAPABILITIES: Capability[] = [
     detail: "Need the native Bun binary (JavaScriptCore, sockets, processes). Bare package imports are rejected: no registry or node_modules here.",
   },
   {
-    name: "bun n2b, bun:yolo, bun:graph, bun:privacy",
-    status: "no",
-    detail: "Native crates (src/migrate, src/graph, src/privacy) with no wasm build.",
-  },
-  {
     name: "bun:rio terminal screen (src/vt)",
     status: "no",
     detail: "Dependency-free crate but not exported to wasm. The Terminal app already uses the Rio VT state of aphrody-shell-web.",

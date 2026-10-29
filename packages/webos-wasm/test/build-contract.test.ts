@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { join, resolve } from "node:path";
 
-test("bun:wasm (wasm-package.ts) writes the browser glue beside the package consumer", async () => {
+test("wasm-package.ts writes the browser glue beside the package consumer", async () => {
   const root = resolve(import.meta.dir, "..");
   const repository = resolve(root, "../..");
   const manifest = await Bun.file(join(root, "package.json")).json();
