@@ -1,5 +1,5 @@
 /**
- * `buncc dotnet <pins|install|env|doctor|publish|pwsh>` and `buncc pwsh`: upstream .NET SDK and PowerShell on Linux,
+ * `buncc dotnet <pins|install|env|check|publish|pwsh>` and `buncc pwsh`: upstream .NET SDK and PowerShell on Linux,
  * pinned in factory/dotnet-linux/pins.json. Dry run unless --run is given (install) or --exec (publish).
  */
 import { existsSync } from "node:fs";
@@ -17,7 +17,7 @@ export const DOTNET_USAGE = `buncc dotnet: upstream .NET SDK and PowerShell on L
   buncc dotnet install [sdk10|sdk11|pwsh|pwsh-preview|all] [--rid linux-x64|linux-arm64|linux-musl-x64|linux-musl-arm64] [--prefix d] [--run]
                                                       checksum-verified tarball install (SHA-512 .NET, SHA-256 PowerShell); dry run without --run
   buncc dotnet env [--prefix d] [--shell sh|pwsh|json]
-  buncc dotnet doctor [--prefix d]                    installed versions vs pins, NativeAOT prerequisites
+  buncc dotnet check [--prefix d]                     installed versions vs pins, NativeAOT prerequisites (provider rows are in buncc doctor)
   buncc dotnet publish <project> -r <rid> [--aot] [--native-lib] [--self-contained] [--channel 10.0|11.0] [-o dir] [--exec] [-- msbuild args]
                                                       plan (and with --exec run) dotnet publish; NativeAOT cross-OS is refused as Microsoft documents
   buncc pwsh [pwsh arguments]                         run the pinned PowerShell with the prefix environment`;
@@ -97,7 +97,7 @@ export async function dotnetLinuxMain(args: string[], root: string, command = "d
           console.log(shell === "pwsh" ? `$env:${k} = '${v.replaceAll("'", "''")}'` : `export ${k}='${v.replaceAll("'", "'\\''")}'`);
       return 0;
     }
-    case "doctor": {
+    case "check": {
       const p = pins();
       const env = { ...Bun.env, ...prefixEnv(prefix) } as Record<string, string>;
       let bad = 0;
@@ -136,7 +136,13 @@ export async function dotnetLinuxMain(args: string[], root: string, command = "d
       if (!plan.ok) return 2;
       if (!flags.has("exec")) return 0;
       const env = { ...Bun.env, ...prefixEnv(prefix) } as Record<string, string>;
-      return (await run([join(prefix, "dotnet", "dotnet"), ...plan.args], { output: "inherit", env })).code;
+      const pinnedDotnet = join(prefix, "dotnet", "dotnet");
+      const exe = existsSync(pinnedDotnet) ? pinnedDotnet : Bun.which("dotnet");
+      if (!exe) {
+        console.error(`buncc dotnet: no dotnet in ${prefix} or on PATH; run buncc dotnet install sdk10 --run`);
+        return 127;
+      }
+      return (await run([exe, ...plan.args], { output: "inherit", env })).code;
     }
     default:
       console.error(DOTNET_USAGE);

@@ -4,6 +4,7 @@ import { rust } from "./rust.ts";
 import { toolProviders } from "./tools.ts";
 import { REPLACES_CORE_IDS, toolchainProviders } from "./toolchains.ts";
 import { probeSccache } from "../sccache.ts";
+import { pwshProvider } from "../dotnet-linux/provider.ts";
 
 /** sccache health, not just presence: a crashing wrapper is reported as unhealthy. */
 const sccacheHealth: Provider = {
@@ -30,7 +31,7 @@ const sccacheHealth: Provider = {
 const replaced = new Set<string>(REPLACES_CORE_IDS);
 export const providers: Provider[] = [
   ...toolchainProviders,
-  ...[msvc, rust, sccacheHealth, ...toolProviders].filter(provider => !replaced.has(provider.id)),
+  ...[msvc, rust, sccacheHealth, ...toolProviders, pwshProvider].filter(provider => !replaced.has(provider.id)),
 ];
 
 export function getProvider(id: string): Provider {

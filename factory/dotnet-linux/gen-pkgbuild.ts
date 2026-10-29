@@ -28,7 +28,7 @@ function dotnet(name: string, channel: "10.0" | "11.0", stable: boolean) {
   const provides = stable
     ? `provides=("dotnet-sdk=\${_runtime}" "dotnet-runtime=\${_runtime}" "aspnet-runtime=\${_runtime}" "dotnet-host=\${_runtime}" "dotnet-targeting-pack=\${_runtime}" "dotnet-sdk-${channel}=\${_runtime}" "dotnet-runtime-${channel}=\${_runtime}")
 conflicts=(dotnet-sdk dotnet-runtime aspnet-runtime dotnet-host dotnet-targeting-pack aspnet-targeting-pack dotnet-sdk-${channel} dotnet-runtime-${channel} dotnet-source-built-artifacts)`
-    : `provides=("dotnet-sdk-preview=\${_runtime}")`;
+    : `provides=("dotnet-sdk-preview=\${pkgver}")`; // pkgver form: a pre-release version string has no hyphen
   const profile = stable
     ? `
   install -Dm644 /dev/stdin "$pkgdir/etc/profile.d/dotnet.sh" <<'PROFILE'
@@ -95,7 +95,7 @@ license=(MIT)
 depends=(glibc gcc-libs icu krb5 openssl zlib)
 makedepends=(libarchive)
 optdepends=('lttng-ust2.12: CoreCLR tracing')
-provides=("powershell${kind === "preview" ? "-preview" : ""}=\${_ver}")
+provides=("powershell${kind === "preview" ? "-preview" : ""}=\${${kind === "preview" ? "pkgver" : "_ver"}}")
 conflicts=(powershell${kind === "preview" ? "-preview" : ""} powershell${kind === "preview" ? "-preview" : ""}-bin)
 options=(!strip !debug)
 install=${name}.install

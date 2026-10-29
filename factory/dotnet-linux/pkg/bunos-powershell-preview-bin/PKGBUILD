@@ -13,7 +13,7 @@ license=(MIT)
 depends=(glibc gcc-libs icu krb5 openssl zlib)
 makedepends=(libarchive)
 optdepends=('lttng-ust2.12: CoreCLR tracing')
-provides=("powershell-preview=${_ver}")
+provides=("powershell-preview=${pkgver}")
 conflicts=(powershell-preview powershell-preview-bin)
 options=(!strip !debug)
 install=bunos-powershell-preview-bin.install

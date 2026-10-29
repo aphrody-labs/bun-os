@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the Bun OS WSL rootfs tarball for `wsl --import`. Run as root inside archlinux:base-devel with
 # --privileged (pacstrap/arch-chroot need mount namespaces). Never run on the Windows workstation.
-# Usage: build-rootfs.sh <repo-root> <out.tar.gz>   env: BUNOS_TIER (x86-64|x86-64-v3|x86-64-v4|znver4), BUNOS_PROFILE (base|cosmic|hyprland)
+# Usage: build-rootfs.sh <repo-root> <out.tar.gz>   env: BUNOS_TIER (x86-64|x86-64-v3|x86-64-v4|znver4), BUNOS_PROFILE (base|cosmic|hyprland), BUNOS_DOTNET (1 = .NET SDK + PowerShell), BUNOS_DEFAULT_SHELL (pwsh)
 set -euo pipefail
 repo=$(realpath "${1:?repo root}"); out=${2:?output tarball}
 root=$(mktemp -d /tmp/bunos-rootfs.XXXXXX)
@@ -20,7 +20,7 @@ echo bunos >"$root/etc/hostname"
 curl -fsSL -o /tmp/bun.tgz https://registry.npmjs.org/@oven/bun-linux-x64/-/bun-linux-x64-1.4.4-canary.20261028.1.tgz
 echo "a9b0e5d28fa06e6ff548da99de85e6e7cfe95a536603b0ad1a9252a906f6796c  /tmp/bun.tgz" | sha256sum -c -
 tar xzf /tmp/bun.tgz -C /tmp && install -Dm755 /tmp/package/bin/bun "$root/usr/bin/bun"
-arch-chroot "$root" env BUNOS_TIER="${BUNOS_TIER:-x86-64-v3}" BUNOS_PROFILE="${BUNOS_PROFILE:-base}" bash /opt/bunos/factory/wsl/bunos-wsl.sh
+arch-chroot "$root" env BUNOS_TIER="${BUNOS_TIER:-x86-64-v3}" BUNOS_PROFILE="${BUNOS_PROFILE:-base}" BUNOS_DOTNET="${BUNOS_DOTNET:-0}" BUNOS_DEFAULT_SHELL="${BUNOS_DEFAULT_SHELL:-}" bash /opt/bunos/factory/wsl/bunos-wsl.sh
 # Learn "Configuration file recommendations": checks before archiving.
 rm -f "$root/etc/resolv.conf"
 fail() { echo "rootfs check failed: $*" >&2; exit 1; }

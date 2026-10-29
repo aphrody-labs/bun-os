@@ -89,7 +89,7 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - name: Install the pinned SDK and PowerShell (SHA-512 / SHA-256 verified before extraction)
         run: |
-          PREFIX="$RUNNER_TEMP/bunos-prefix"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          PREFIX="$RUNNER_TEMP/bunos-prefix"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"; echo "BUNOS_DOTNET_LINUX_PREFIX=$PREFIX" >> "$GITHUB_ENV"
           mkdir -p "$OUT"; : > "$RES"
           for what in ${{ matrix.sdk }} ${{ matrix.pwsh }}; do
             bun packages/buncc/src/cli.ts dotnet install "$what" --run --prefix "$PREFIX" | tee -a "$OUT/receipts.jsonl"
@@ -110,7 +110,7 @@ jobs:
           echo "SDK_PIN=$want_sdk" >> "$GITHUB_ENV"
           # the pinned dotnet must win over the runner's preinstalled one
           cd "$RUNNER_TEMP" && [ "$(dotnet --version)" = "$want_sdk" ]
-          buncc_doctor=$(bun "$GITHUB_WORKSPACE/packages/buncc/src/cli.ts" dotnet doctor --prefix "$PREFIX" || true); echo "$buncc_doctor"
+          buncc_doctor=$(bun "$GITHUB_WORKSPACE/packages/buncc/src/cli.ts" dotnet check --prefix "$PREFIX" || true); echo "$buncc_doctor"
           dotnet --info | head -30
       - name: hello (framework-dependent), measured
         run: |
@@ -188,7 +188,7 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - name: Install the pinned musl SDK and PowerShell on the host (checksums verified), musl Bun from npm
         run: |
-          PREFIX="$RUNNER_TEMP/bunos-musl"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          PREFIX="$RUNNER_TEMP/bunos-musl"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"; echo "BUNOS_DOTNET_LINUX_PREFIX=$PREFIX" >> "$GITHUB_ENV"
           mkdir -p "$OUT"
           for what in sdk10 pwsh; do
             bun packages/buncc/src/cli.ts dotnet install "$what" --rid linux-musl-x64 --run --prefix "$PREFIX" | tee -a "$OUT/receipts.jsonl"
@@ -261,7 +261,7 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - name: Install the pinned x64 SDK
         run: |
-          PREFIX="$RUNNER_TEMP/bunos-prefix"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          PREFIX="$RUNNER_TEMP/bunos-prefix"; echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"; echo "BUNOS_DOTNET_LINUX_PREFIX=$PREFIX" >> "$GITHUB_ENV"
           mkdir -p "$OUT"
           bun packages/buncc/src/cli.ts dotnet install sdk10 --run --prefix "$PREFIX"
           bun packages/buncc/src/cli.ts dotnet env --prefix "$PREFIX" --shell json | jq -r 'to_entries[] | select(.key!="PATH") | "\(.key)=\(.value)"' >> "$GITHUB_ENV"
@@ -354,3 +354,44 @@ jobs:
             /out/namcap.txt
             /out/pester-arch.xml
           if-no-files-found: warn
+
+  wsl-layer:
+    name: WSL rootfs layer (factory/wsl/dotnet-layer.sh) in an Arch container
+    needs: pins
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    container:
+      image: archlinux:base-devel
+    env:
+      BUN_VERSION: 1.4.4-canary.20261028.1
+    steps:
+      - name: Toolchain
+        run: pacman -Syu --noconfirm --needed git npm jq
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /factory/wsl
+            /factory/dotnet-linux
+            /packages/buncc
+            /package.json
+            /Cargo.toml
+          sparse-checkout-cone-mode: false
+      - name: Same layout as the rootfs (/opt/bunos/factory, /opt/bunos/buncc), pinned Bun
+        run: |
+          npm install -g "bun@$BUN_VERSION" && bun --revision
+          mkdir -p /opt/bunos/buncc
+          cp -r factory /opt/bunos/factory
+          cp -r packages/buncc/. /opt/bunos/buncc/
+      - name: Run the layer
+        run: |
+          s=$SECONDS
+          bash /opt/bunos/factory/wsl/dotnet-layer.sh
+          echo "layer seconds: $((SECONDS - s))"
+          du -sm /opt/bunos/dotnet-linux | tee /tmp/layer-size.txt
+      - name: A new user with PowerShell as login shell gets the Bun OS profile and a working toolchain
+        run: |
+          useradd -m -s /usr/local/bin/pwsh probe
+          test -f /home/probe/.config/powershell/Microsoft.PowerShell_profile.ps1
+          su probe -c 'pwsh -NoLogo -Command "bunos-info | ConvertTo-Json -Compress"'
+          su probe -c 'source /etc/profile.d/dotnet.sh; mkdir -p /tmp/h && cp -r /opt/bunos/factory/dotnet-linux/sample/hello /tmp/h/ && cd /tmp/h/hello && dotnet publish -c Release -f net10.0 -o out --nologo && ./out/hello'
+          { echo '### WSL layer'; echo "installed under /opt/bunos/dotnet-linux: $(cut -f1 /tmp/layer-size.txt) MiB"; } >> "$GITHUB_STEP_SUMMARY"

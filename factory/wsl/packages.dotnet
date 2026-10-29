@@ -1,0 +1,9 @@
+# Runtime dependencies of the upstream .NET SDK and PowerShell tarballs (Arch dotnet-runtime depends: glibc, icu, krb5, libgcc,
+# libstdc++, libunwind, zlib, openssl). Most are already in base; listed so that the layer stands on its own.
+icu
+krb5
+openssl
+zlib
+libunwind
+gcc-libs
+# NativeAOT publish links with clang (already in packages.base) and needs zlib headers, which the zlib package carries.

@@ -40,9 +40,18 @@ cp -r /opt/bunos/src-buncc/. /opt/bunos/buncc/
 printf '#!/bin/sh\nexec /usr/bin/bun /opt/bunos/buncc/src/cli.ts "$@"\n' >/usr/local/bin/buncc
 chmod 755 /usr/local/bin/buncc
 
+# .NET SDK 10 and PowerShell (opt in: BUNOS_DOTNET=1): factory/wsl/dotnet-layer.sh. Upstream tarballs pinned and checksum-verified
+# (factory/dotnet-linux/pins.json); Arch extra/dotnet-sdk is one servicing release and one SDK band behind and PowerShell is AUR
+# only (docs/DOTNET-LINUX.md). BUNOS_DEFAULT_SHELL=pwsh makes PowerShell the login shell of the bun user.
+login_shell=/bin/bash
+if [[ ${BUNOS_DOTNET:-0} == 1 ]]; then
+  bash /opt/bunos/factory/wsl/dotnet-layer.sh
+  if [[ ${BUNOS_DEFAULT_SHELL:-} == pwsh ]]; then login_shell=/usr/local/bin/pwsh; fi
+fi
+
 # User, sudo, locale, os-release, services
 echo 'en_US.UTF-8 UTF-8' >/etc/locale.gen && locale-gen && echo LANG=en_US.UTF-8 >/etc/locale.conf
-useradd -m -G wheel -s /bin/bash bun
+useradd -m -G wheel -s "$login_shell" bun
 passwd -l bun
 # The Windows user already owns this VM; passwordless wheel keeps `wsl -d` + sudo usable without an OOBE.
 echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' >/etc/sudoers.d/10-bunos-wheel && chmod 440 /etc/sudoers.d/10-bunos-wheel
