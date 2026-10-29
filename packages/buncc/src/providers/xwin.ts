@@ -20,7 +20,8 @@ export const xwinRelease: GithubToolSpec = {
     if (!cpu) return undefined;
     if (platform === "win32") return arch === "x64" ? `xwin-${v}-x86_64-pc-windows-msvc.tar.gz` : undefined;
     if (platform === "linux") return `xwin-${v}-${cpu}-unknown-linux-musl.tar.gz`;
-    return `xwin-${v}-${cpu}-apple-darwin.tar.gz`;
+    // xwin publishes no macOS release asset (releases: linux musl x86_64/aarch64 and windows x86_64 only).
+    return undefined;
   },
 };
 
@@ -36,7 +37,8 @@ export const xwinProvider = toolProvider({
   extraEnv: () => ({ XWIN_ACCEPT_LICENSE: "1" }),
 });
 
-export type XwinArch = "x86_64" | "aarch64" | "x86" | "arm";
+/** Values of `xwin --arch`: x86, x86_64, aarch (32-bit ARM), aarch64. */
+export type XwinArch = "x86_64" | "aarch64" | "x86" | "aarch";
 
 export function defaultSysroot(): string {
   return join(toolsDir(), "winsysroot");
@@ -68,7 +70,7 @@ const TRIPLE: Record<XwinArch, string> = {
   x86_64: "x86_64-pc-windows-msvc",
   aarch64: "aarch64-pc-windows-msvc",
   x86: "i686-pc-windows-msvc",
-  arm: "thumbv7a-pc-windows-msvc",
+  aarch: "thumbv7a-pc-windows-msvc",
 };
 
 /** A splat is complete when the CRT headers and the SDK `um` import libraries of every requested arch exist. */
