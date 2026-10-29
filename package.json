@@ -94,6 +94,7 @@
     "packages/menu-render",
     "packages/nie-ui",
     "packages/nie-web",
+    "packages/ntcore",
     "packages/ovh",
     "packages/package-converter",
     "packages/paths",

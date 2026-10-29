@@ -3019,6 +3019,35 @@
       "status": "present"
     },
     {
+      "id": "submodule:vendor/reactos",
+      "kind": "submodule",
+      "path": "vendor/reactos",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/reactos.git",
+        "pin": "e46f4bb1a1ea7c722f941231565144fe0c286d3e"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["npm:@aphrody/ntcore"]
+    },
+    {
+      "id": "npm:@aphrody/ntcore",
+      "kind": "npm-package",
+      "path": "packages/ntcore",
+      "source": {
+        "type": "workspace",
+        "name": "@aphrody/ntcore",
+        "version": "1.4.7"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/reactos", "submodule:vendor/wine-cachyos", "npm:@aphrody/buncc", "npm:@aphrody/windows"],
+      "note": "NT personality of the Bun OS kernel layer (docs/NTCORE.md): ReactOS cmlib registry hives, the ReactOS Executive handle table and PE image helpers compiled to wasm32 by factory/ntcore/build.ts. GPL-2.0-or-later. The wasmos x86 emulator edge is recorded in docs/NTCORE.md until that component is registered."
+    },
+    {
       "id": "submodule:vendor/winit",
       "kind": "submodule",
       "path": "vendor/winit",

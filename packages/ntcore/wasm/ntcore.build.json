@@ -1,0 +1,112 @@
+{
+  "wasm": "ntcore.wasm",
+  "bytes": 36746,
+  "clang": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)",
+  "target": "wasm32-unknown-unknown (freestanding, bulk-memory, sign-ext)",
+  "reactos": {
+    "revision": "e46f4bb1a1ea7c722f941231565144fe0c286d3e",
+    "license": "GPL-2.0-or-later"
+  },
+  "objects": [
+    {
+      "name": "cm_cmcheck",
+      "origin": "reactos",
+      "bytes": 11392
+    },
+    {
+      "name": "cm_cminit",
+      "origin": "reactos",
+      "bytes": 1090
+    },
+    {
+      "name": "cm_cmheal",
+      "origin": "reactos",
+      "bytes": 4287
+    },
+    {
+      "name": "cm_cmindex",
+      "origin": "reactos",
+      "bytes": 11077
+    },
+    {
+      "name": "cm_cmkeydel",
+      "origin": "reactos",
+      "bytes": 2134
+    },
+    {
+      "name": "cm_cmname",
+      "origin": "reactos",
+      "bytes": 2070
+    },
+    {
+      "name": "cm_cmse",
+      "origin": "reactos",
+      "bytes": 1073
+    },
+    {
+      "name": "cm_cmvalue",
+      "origin": "reactos",
+      "bytes": 4513
+    },
+    {
+      "name": "cm_hivebin",
+      "origin": "reactos",
+      "bytes": 1333
+    },
+    {
+      "name": "cm_hivecell",
+      "origin": "reactos",
+      "bytes": 4984
+    },
+    {
+      "name": "cm_hiveinit",
+      "origin": "reactos",
+      "bytes": 10998
+    },
+    {
+      "name": "cm_hivesum",
+      "origin": "reactos",
+      "bytes": 494
+    },
+    {
+      "name": "cm_hivewrt",
+      "origin": "reactos",
+      "bytes": 4567
+    },
+    {
+      "name": "ex_handle",
+      "origin": "reactos",
+      "bytes": 10872
+    },
+    {
+      "name": "rtl_image",
+      "origin": "reactos",
+      "bytes": 2542
+    },
+    {
+      "name": "cm_glue",
+      "origin": "glue",
+      "bytes": 6227
+    },
+    {
+      "name": "ex_glue",
+      "origin": "glue",
+      "bytes": 7096
+    },
+    {
+      "name": "libc",
+      "origin": "glue",
+      "bytes": 2417
+    },
+    {
+      "name": "libc_alloc2",
+      "origin": "glue",
+      "bytes": 631
+    }
+  ],
+  "timingMs": {
+    "headers": 237,
+    "compile": 673,
+    "link": 48
+  }
+}

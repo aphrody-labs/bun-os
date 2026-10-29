@@ -1273,3 +1273,9 @@
 	url = https://gitlab.freedesktop.org/xorg/xserver.git
 	shallow = true
 	update = none
+[submodule "vendor/reactos"]
+	path = vendor/reactos
+	url = https://github.com/aphrody-labs/reactos.git
+	branch = master
+	shallow = true
+	update = none

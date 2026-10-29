@@ -1,0 +1,106 @@
+{
+  "clang": "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)",
+  "reactos": "e46f4bb1a1ea7c722f941231565144fe0c286d3e",
+  "report": {
+    "ntoskrnl/ob": {
+      "ok": 11,
+      "total": 11,
+      "failed": {}
+    },
+    "ntoskrnl/ex": {
+      "ok": 30,
+      "total": 31,
+      "failed": {
+        "ntoskrnl/ex/init.c": "'reactos/buildno.h' file not found\r"
+      }
+    },
+    "ntoskrnl/ps": {
+      "ok": 15,
+      "total": 15,
+      "failed": {}
+    },
+    "ntoskrnl/io": {
+      "ok": 45,
+      "total": 45,
+      "failed": {}
+    },
+    "ntoskrnl/mm": {
+      "ok": 36,
+      "total": 39,
+      "failed": {
+        "ntoskrnl/mm/ARM3/mdlsup.c": "Non-Emscripten WebAssembly hasn't implemented __builtin_return_address\r",
+        "ntoskrnl/mm/ARM3/pool.c": "Non-Emscripten WebAssembly hasn't implemented __builtin_return_address\r",
+        "ntoskrnl/mm/i386/pagepae.c": "use of undeclared identifier 'PAGE_SYSTEM'\r"
+      }
+    },
+    "ntoskrnl/se": {
+      "ok": 18,
+      "total": 18,
+      "failed": {}
+    },
+    "ntoskrnl/config": {
+      "ok": 23,
+      "total": 23,
+      "failed": {}
+    },
+    "sdk/lib/rtl (_BLDR_)": {
+      "ok": 58,
+      "total": 84,
+      "failed": {
+        "sdk/lib/rtl/actctx.c": "unknown type name 'OLEMISC'\r",
+        "sdk/lib/rtl/avlsupp.c": "unknown type name 'RTL_BALANCED_LINKS'\r",
+        "sdk/lib/rtl/byteswap.c": "\"Use rtlswap.S!\"\r",
+        "sdk/lib/rtl/condvar.c": "NTDDI_VERSION and _WIN32_WINNT mismatch!\r",
+        "sdk/lib/rtl/critical.c": "use of undeclared identifier 'EVENT_ALL_ACCESS'\r",
+        "sdk/lib/rtl/i386/except.c": "use of undeclared identifier 'DISPATCHER_CONTEXT'\r",
+        "sdk/lib/rtl/largeint.c": "redefinition of 'RtlConvertLongToLargeInteger'\r",
+        "sdk/lib/rtl/locale.c": "use of undeclared identifier 'RTL_LOCALE_ALLOW_NEUTRAL_NAMES'\r",
+        "sdk/lib/rtl/memstream.c": "variable has incomplete type 'const struct IStreamVtbl'\r",
+        "sdk/lib/rtl/ntuserpfn.c": "use of undeclared identifier 'RTLP_NUMBER_OF_NTUSER_WNDPROCS'\r",
+        "sdk/lib/rtl/propvar.c": "unknown type name 'PROPVARIANT'\r",
+        "sdk/lib/rtl/registry.c": "use of undeclared identifier 'REG_SZ'\r",
+        "sdk/lib/rtl/res.c": "use of undeclared identifier 'EXCEPTION_ACCESS_VIOLATION'\r",
+        "sdk/lib/rtl/resource.c": "use of undeclared identifier 'SEMAPHORE_ALL_ACCESS'\r",
+        "sdk/lib/rtl/runonce.c": "NTDDI_VERSION and _WIN32_WINNT mismatch!\r",
+        "sdk/lib/rtl/rxact.c": "use of undeclared identifier 'INVALID_HANDLE_VALUE'\r",
+        "sdk/lib/rtl/security.c": "use of undeclared identifier 'SE_SECURITY_PRIVILEGE'\r",
+        "sdk/lib/rtl/srw.c": "NTDDI_VERSION and _WIN32_WINNT mismatch!\r",
+        "sdk/lib/rtl/sysvol.c": "use of undeclared identifier 'SE_TAKE_OWNERSHIP_PRIVILEGE'\r",
+        "sdk/lib/rtl/threadpool.c": "NTDDI_VERSION and _WIN32_WINNT mismatch!\r",
+        "sdk/lib/rtl/timerqueue.c": "use of undeclared identifier 'INFINITE'\r",
+        "sdk/lib/rtl/timezone.c": "use of undeclared identifier 'REG_DWORD'\r",
+        "sdk/lib/rtl/utf8.c": "NTDDI_VERSION and _WIN32_WINNT mismatch!\r",
+        "sdk/lib/rtl/wait.c": "use of undeclared identifier 'INFINITE'\r",
+        "sdk/lib/rtl/waitaddress.c": "NTDDI_VERSION and _WIN32_WINNT mismatch!\r",
+        "sdk/lib/rtl/workitem.c": "use of undeclared identifier 'TimerThreadHandle'\r"
+      }
+    },
+    "sdk/lib/cmlib": {
+      "ok": 13,
+      "total": 13,
+      "failed": {}
+    },
+    "wine dlls/ntdll (PE side)": {
+      "ok": 20,
+      "total": 36,
+      "failed": {
+        "dlls/ntdll/actctx.c": "Unexpected token in operand: (\r",
+        "dlls/ntdll/exception.c": "Unexpected token in operand: (\r",
+        "dlls/ntdll/heap.c": "invalid instruction\r",
+        "dlls/ntdll/large_int.c": "invalid output constraint '=a' in asm\r",
+        "dlls/ntdll/loader.c": "Unexpected token in operand: (\r",
+        "dlls/ntdll/math.c": "invalid operand in inline asm: 'fstpl $0;fwait'\r",
+        "dlls/ntdll/printf.c": "redefinition of '_vsnprintf'\r",
+        "dlls/ntdll/process.c": "Unexpected token in operand: (\r",
+        "dlls/ntdll/relay.c": "Unexpected token in operand: (\r",
+        "dlls/ntdll/resource.c": "Unexpected token in operand: (\r",
+        "dlls/ntdll/rtl.c": "Unexpected token in operand: (\r",
+        "dlls/ntdll/sec.c": "Unexpected token in operand: (\r",
+        "dlls/ntdll/signal_i386.c": "'ntsyscalls.h' file not found\r",
+        "dlls/ntdll/string.c": "redefinition of 'sscanf'\r",
+        "dlls/ntdll/sync.c": "invalid instruction\r",
+        "dlls/ntdll/wcstring.c": "conflicting types for 'wcstok'\r"
+      }
+    }
+  }
+}
