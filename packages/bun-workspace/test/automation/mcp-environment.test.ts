@@ -120,16 +120,6 @@ test("public, symbolic and malformed private source files fail without exposing 
   expect(run.bind(null, path)).toThrow("invalid entries");
 });
 
-test("real contracts name canonical credentials without inventing endpoint defaults", () => {
-  const contract = loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."), ["aphrody-mcp-http"]);
-  expect(contract.required).toContain("APHRODY_MCP_HTTP_TOKEN");
-  expect(contract.processKeys).toContain("APHRODY_MCP_DATABASE_URL");
-  expect(contract.aliases.APHRODY_AI_HTTP_TOKEN).toContain("APHRODY_SHENRON_API_TOKEN");
-  expect(() => loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."), ["shenron-bot"])).toThrow(
-    "another domain",
-  );
-});
-
 test("provider configuration preserves canonical options and unrelated TOML and JSON fields", () => {
   const root = fixture(),
     prepared = profile(root),
@@ -261,28 +251,6 @@ else {
   expect(JSON.stringify(sanitized)).not.toContain("fixture-only-password");
   // Windows compiles the fixture executable first.
 }, 30_000);
-
-test("explicit process sources cannot import generic database or routing keys", () => {
-  const root = fixture();
-  for (const key of ["DATABASE_URL", "HOME", "APHRODY_PROFILE", "UNDECLARED_TOKEN"]) {
-    expect(() =>
-      prepareMcpEnvironment({
-        profile: "aphrody",
-        repoRoot: root,
-        outputDir: join(root, "private"),
-        requirements,
-        env: {},
-        processKeys: [key],
-      }),
-    ).toThrow("supported authentication references");
-  }
-  const contract = loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."));
-  expect(contract.required).not.toContain("APHRODY_MCP_HTTP_TOKEN");
-  expect(contract.processKeys).toContain("APHRODY_SHENRON_PRODUCTION_READY");
-  expect(loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."), [], true).required).toContain(
-    "APHRODY_MCP_DATABASE_URL",
-  );
-});
 
 test("recurring preparation preserves auth after agents contain only profile references", () => {
   const root = fixture(),

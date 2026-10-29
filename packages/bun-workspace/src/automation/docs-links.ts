@@ -71,7 +71,7 @@ export function backtickRepositoryPaths(content: string, rootEntries: Set<string
       continue;
     let value = match[1]!.trim();
     value = value.replace(/:\d+(?:[-:]\d+)?$/, "").replace(/#.*$/, "");
-    if (value.startsWith(".//")) value = value.slice(2);
+    if (value.startsWith("./")) value = value.slice(2);
     if (!BACKTICK_PATH.test(value) || !value.includes("/") || value.includes("//")) continue;
     if (value.includes("...") || MCP_TOOL_METHODS.has(value)) continue;
     const first = value.split("/", 1)[0]!;

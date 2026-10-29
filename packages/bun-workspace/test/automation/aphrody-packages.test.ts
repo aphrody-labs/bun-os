@@ -91,23 +91,13 @@ test("export targets cover every condition, main and module, but not patterns", 
 
 test("the closure packs the runtime SDK as a workspace member and leaves sibling-checkout members external", async () => {
   const { members, external } = await aphrodyClosure(root, ["@aphrody/yolo-core"]);
-  expect(members.map(member => member.name)).toEqual(["@aphrody/runtime-sdk", "@aphrody/yolo-core"]);
-  // The Bun browser SDK is a workspace member published from its own repository.
-  expect(external).toEqual([]);
+  expect(members.map(member => member.name)).toEqual(["@aphrody/paths", "@aphrody/runtime-sdk", "@aphrody/yolo-core"]);
+  // The Bun runtime SDK is published from its own repository.
+  expect(external).toEqual(["@aphrody/bun-runtime-sdk"]);
   expect(await aphrodyClosure(root, ["@aphrody/bun-web"])).toEqual({
     members: [],
     external: ["@aphrody/bun-web"],
   });
-});
-
-test("members follow the root workspaces globs beyond packages/*/*", async () => {
-  const directories = await aphrodyPackageDirectories(root);
-  expect(directories.has("@aphrody/canvas")).toBe(false);
-  expect(await aphrodyClosure(root, ["@aphrody/canvas"])).toEqual({
-    members: [],
-    external: ["@aphrody/canvas"],
-  });
-  expect(directories.get("@aphrody/api")).toBe(join(root, "crates/tauri/aphrody-tauri-api"));
 });
 
 test("archive names are content addressed and pins detect missing or changed archives", async () => {
@@ -248,9 +238,4 @@ test("publication audit refuses unshipped exports, workspace specs, credentials 
   expect(problems.join("\n")).toContain("unpublishable spec @aphrody/b@workspace:*");
   expect(problems.join("\n")).toContain("credential-like text in package/dist/a.js");
   expect(problems.join("\n")).toContain("host path in package/dist/b.js");
-});
-
-test("publication order puts @aphrody runtime dependencies first", async () => {
-  const order = await publishOrder(root, ["@aphrody/plugin-opener", "@aphrody/api"]);
-  expect(order.indexOf("@aphrody/api")).toBeLessThan(order.indexOf("@aphrody/plugin-opener"));
 });

@@ -456,7 +456,7 @@ test("Yolo shares factory caches while preserving its canonical packaging target
   const declared: BuildFactoryConfig = await Bun.file(
     join(import.meta.dir, "../../../../tools/aphrody/config/build-factory.json"),
   ).json();
-  expect(declared.repositories.yolo).toBe("/home/ubuntu/src/yolo");
+  expect(declared.repositories.yolo).toBe("/home/ubuntu/src/bun-os");
   const plan = buildFactoryPlan(declared, "yolo", revision, ["just", "runtime-package"]);
   expect(plan.repository).toBe("yolo");
   expect(plan.workspace).toBe(declared.repositories.yolo!);

@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { generateSourceReference } from "../../src/automation/docs-source.ts";
 
-test("source references extract three languages deterministically without executing modules", async () => {
+test.skipIf(!Bun.which("uv"))("source references extract three languages deterministically without executing modules", async () => {
   const root = await mkdtemp(join(tmpdir(), "docs-source-"));
   try {
     await writeFile(

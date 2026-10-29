@@ -143,8 +143,7 @@ print(json.dumps(dict(doc=ast.get_docstring(tree, clean=False), items=items)))
 
 function pythonCommand(): string[] {
   return [
-    process.execPath,
-    "uv",
+    Bun.which("uv") ?? "uv", // the real uv; upstream Bun has no `bun uv`
     "run",
     "--no-project",
     "--offline",
