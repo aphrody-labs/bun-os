@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { containerPlan, hostLimits, planBuild, verifyOutput } from "../src/linux-target/build.ts";
+import { containerPlan, hostLimits, mirrorUrl, planBuild, verifyOutput } from "../src/linux-target/build.ts";
 import {
   buildOrder,
   closureProblems,
@@ -374,4 +374,11 @@ test("host tools are linked into the sysroot bin dir, replacing target binaries"
   expect(r).toEqual({ linked: ["glib-mkenums", "wayland-scanner"], present: [], missing: ["gresource"] });
   expect(links.map(l => l[0])).toEqual(["/host/glib-mkenums", "/host/wayland-scanner"]);
   expect(links[0]![1].replaceAll("\\", "/")).toContain("/usr/bin/glib-mkenums");
+});
+
+test("GNOME GitLab and KDE Invent sources fall back to their GitHub mirror, other hosts do not", async () => {
+  expect(mirrorUrl("https://gitlab.gnome.org/GNOME/gtk.git")).toBe("https://github.com/GNOME/gtk.git");
+  expect(mirrorUrl("https://gitlab.gnome.org/GNOME/gnome-shell")).toBe("https://github.com/GNOME/gnome-shell.git");
+  expect(mirrorUrl("https://invent.kde.org/plasma/kwin.git")).toBe("https://github.com/KDE/kwin.git");
+  expect(mirrorUrl("https://github.com/GNOME/glib.git")).toBeUndefined();
 });

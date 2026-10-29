@@ -77,6 +77,12 @@ async function runSteps(steps: Step[], log: (s: string) => void): Promise<number
       log(`attempt ${attempt + 1} failed (exit ${code}); retrying in ${wait / 1000}s`);
       await Bun.sleep(wait);
     }
+    for (const alt of code !== 0 ? (s.fallbacks ?? []) : []) {
+      log(`falling back: ${alt.join(" ")}`);
+      const p = Bun.spawn(alt, { cwd: s.cwd, env: { ...process.env, ...s.env }, stdout: "inherit", stderr: "inherit" });
+      code = await p.exited;
+      if (code === 0) break;
+    }
     if (code !== 0) return code;
     if (s.expect && !verifyOutput(s, out)) {
       log(`pin mismatch: got ${out.trim()}, expected ${s.expect}`);

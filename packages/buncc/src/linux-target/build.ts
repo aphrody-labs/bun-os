@@ -16,6 +16,8 @@ export interface Step {
   skipIfExists?: string;
   /** Extra attempts after a failure (upstream git servers answer 503 now and then). */
   retries?: number;
+  /** Commands tried in turn when `cmd` still fails after its retries (a mirror of the same pinned source). */
+  fallbacks?: string[][];
 }
 
 export interface PlanFile {
@@ -49,14 +51,24 @@ export interface PlanOptions {
 
 const fwd = (p: string) => p.replace(/\\/g, "/");
 
+/** GitHub mirror of a GNOME GitLab or KDE Invent repository, used when the primary host is down; the pinned SHA is verified either way. */
+export function mirrorUrl(url: string): string | undefined {
+  const m = /^https:\/\/(gitlab\.gnome\.org\/GNOME|invent\.kde\.org\/[^/]+)\/(.+?)(?:\.git)?$/.exec(url);
+  if (!m) return undefined;
+  const org = m[1]!.startsWith("gitlab.gnome.org") ? "GNOME" : "KDE";
+  return `https://github.com/${org}/${m[2]!.split("/").pop()}.git`;
+}
+
 /** Shallow clone of the pinned tag, then a check that HEAD is the pinned SHA. */
 export function checkoutSteps(s: SourcePin, dir: string): Step[] {
+  const mirror = mirrorUrl(s.url);
   return [
     {
       title: `clone ${s.id} ${s.tag}`,
       cmd: ["git", "clone", "--depth", "1", "--branch", s.tag, s.url, fwd(dir)],
       skipIfExists: `${fwd(dir)}/.git`,
       retries: 4,
+      fallbacks: mirror ? [["git", "clone", "--depth", "1", "--branch", s.tag, mirror, fwd(dir)]] : undefined,
     },
     {
       title: `verify ${s.id} is ${s.sha.slice(0, 12)}`,
