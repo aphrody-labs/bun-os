@@ -33,8 +33,9 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - id: areas
         env:
-          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
-        # git diff <base>...HEAD classified by path (packages/bun-workspace/src/git-affected.ts); unknown base = everything.
+          # Pull requests: git diff <base>...HEAD classified by path (packages/bun-workspace/src/git-affected.ts). Pushes run everything:
+        # concurrency cancels superseded runs, so a push-to-push diff would silently skip the areas an earlier, cancelled run never checked.
+        BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
         run: |
           if [ -n "$BASE" ] && git cat-file -e "$BASE^{commit}" 2>/dev/null; then
             bun packages/bun-workspace/src/git-cli.ts affected --base "$BASE" --github-output
