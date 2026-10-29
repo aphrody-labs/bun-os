@@ -7,6 +7,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { homedir, platform as osPlatform } from "node:os";
 import { delimiter, dirname, join, resolve } from "node:path";
+import { captureVcvars, findVisualStudio } from "../providers/msvc.ts";
 
 export interface CTarget {
   triple: string;
@@ -80,6 +81,8 @@ export function sysrootFor(t: CTarget): string | undefined {
 
 export interface BuildPlan {
   env?: Record<string, string>;
+  /** Set when the Visual Studio environment of this arch must be entered before running `cmd` (see vsEnv). */
+  vsArch?: string;
   ok: boolean;
   reason?: string;
   cmd?: string[];
@@ -117,7 +120,7 @@ export function planBuild(t: CTarget, src: string, outDir: string): BuildPlan {
             "needs an xwin sysroot (buncc c sysroot --accept-ms-license) or a local Visual Studio of the same arch",
           out,
         };
-      return { ok: true, cmd, out, env: vsEnv(t.arch) };
+      return { ok: true, cmd, out, vsArch: t.arch };
     }
     return { ok: true, cmd, out };
   }
@@ -144,37 +147,22 @@ export function planBuild(t: CTarget, src: string, outDir: string): BuildPlan {
   return { ok: true, cmd, out };
 }
 
-/** INCLUDE/LIB/PATH of the user's own Visual Studio (found with vswhere, then vcvarsall); read-only, nothing is installed. */
+/** INCLUDE/LIB/PATH of the user's own Visual Studio, through the one vswhere/vcvarsall implementation (providers/msvc.ts); read-only. */
 const vsCache = new Map<string, Record<string, string>>();
-import { writeFileSync } from "node:fs";
-export function vsEnv(arch: string): Record<string, string> | undefined {
+export async function vsEnv(arch: string): Promise<Record<string, string> | undefined> {
   if (!isWin) return undefined;
   if (vsCache.has(arch)) return vsCache.get(arch);
-  const vswhere = join(
-    process.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)",
-    "Microsoft Visual Studio/Installer/vswhere.exe",
-  );
-  if (!existsSync(vswhere)) return undefined;
-  const q = Bun.spawnSync([vswhere, "-latest", "-products", "*", "-property", "installationPath"]);
-  const root = q.stdout.toString().trim().split(/\r?\n/)[0];
-  const bat = root && join(root, "VC/Auxiliary/Build/vcvarsall.bat");
-  if (!bat || !existsSync(bat)) return undefined;
-  const tmp = join(process.env.TEMP ?? ".", `bunos-c-vs-${arch}.bat`);
-  writeFileSync(
-    tmp,
-    `@echo off
-call "${bat}" ${arch === "x86_64" ? "x64" : arch === "aarch64" ? "arm64" : "x86"} >nul
-set
-`,
-  );
-  const r = Bun.spawnSync(["cmd", "/d", "/c", tmp]);
-  const env: Record<string, string> = {};
-  for (const line of r.stdout.toString().split(/\r?\n/)) {
-    const i = line.indexOf("=");
-    if (i > 0) env[line.slice(0, i)] = line.slice(i + 1);
+  const studio = await findVisualStudio();
+  if (!studio) return undefined;
+  try {
+    const { env } = await captureVcvars(studio, {
+      arch: arch === "x86_64" ? "x64" : arch === "aarch64" ? "arm64" : "x86",
+    });
+    vsCache.set(arch, env);
+    return env;
+  } catch {
+    return undefined;
   }
-  vsCache.set(arch, env);
-  return env;
 }
 
 export function hostArch(): string {
@@ -211,7 +199,9 @@ export function pickRunner(t: CTarget, binary: string): { cmd?: string[]; skip?:
   if (kind === "native" && archMatch) return { cmd: [binary] };
   if (t.runner[hostKind()] === "qemu-user") {
     const q = which(`qemu-${t.arch}`) ?? which(`qemu-${t.arch}-static`);
-    return q ? { cmd: [q, "-L", process.env.BUNOS_C_QEMU_PREFIX ?? sysrootFor(t) ?? "/", binary] } : { skip: `qemu-${t.arch} not installed` };
+    return q
+      ? { cmd: [q, "-L", process.env.BUNOS_C_QEMU_PREFIX ?? sysrootFor(t) ?? "/", binary] }
+      : { skip: `qemu-${t.arch} not installed` };
   }
   if (kind === "wine") {
     const w = which("wine64") ?? which("wine");
@@ -383,7 +373,7 @@ export async function cCommand(argv: string[]): Promise<number> {
       if (!plan.ok) return (console.error(`${t.triple}: ${plan.reason}`), 3);
       console.log(plan.cmd!.join(" "));
       if (rest.includes("--dry")) return 0;
-      const r = await sh(plan.cmd!, { env: plan.env });
+      const r = await sh(plan.cmd!, { env: plan.env ?? (plan.vsArch ? await vsEnv(plan.vsArch) : undefined) });
       if (r.code) console.error(r.stderr || r.stdout);
       return r.code;
     }
@@ -403,7 +393,7 @@ export async function cCommand(argv: string[]): Promise<number> {
           rows.push(row);
           continue;
         }
-        const r = await sh(plan.cmd!, { env: plan.env });
+        const r = await sh(plan.cmd!, { env: plan.env ?? (plan.vsArch ? await vsEnv(plan.vsArch) : undefined) });
         if (r.code || !existsSync(plan.out)) {
           row.build = "FAIL";
           row.detail = (r.stderr || r.stdout).split("\n").slice(0, 3).join(" | ");

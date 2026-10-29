@@ -46,7 +46,8 @@
   },
   "noBunSetup": {
     "wsl-kernel.yml": "builds the WSL kernel on an ubuntu runner with the distribution toolchain; no Bun step",
-    "wsl-rootfs.yml": "builds the rootfs inside an archlinux:base-devel container; Bun is bootstrapped inside the chroot by build-rootfs.sh"
+    "wsl-rootfs.yml": "builds the rootfs inside an archlinux:base-devel container; Bun is bootstrapped inside the chroot by build-rootfs.sh",
+    "rustbase.yml": "jobs run in Arch and Ubuntu containers; the Bun step uses oven-sh/setup-bun directly (owner: rustbase, to move to the setup action)"
   },
   "entries": [
     {
@@ -272,30 +273,33 @@
     {
       "id": "buncc-desktop",
       "layer": "factory",
-      "title": "buncc desktop entries",
-      "owner": "packages/buncc",
-      "module": "npm:@aphrody/buncc",
-      "entry": [],
+      "title": "buncc desktop (GNOME/GTK4, Qt6 and KDE builds on Windows)",
+      "owner": "factory/desktop",
+      "module": "factory:desktop/recipes",
+      "entry": ["buncc desktop doctor", "buncc desktop plan"],
       "docs": ["docs/BUNCC-DESKTOP.md"],
-      "ci": ["buncc-desktop.yml#desktop"],
-      "pins": [],
+      "ci": ["buncc-desktop.yml#plan", "buncc-desktop.yml#build"],
+      "pins": ["factory/desktop/recipes.json"],
       "status": "unverified",
-      "pending": true,
-      "note": "announced by the buncc desktop owner; workflow and doc not on os yet"
+      "note": "driver in packages/buncc/src/desktop; recipes in factory/desktop",
+      "covers": ["packages/buncc/src/desktop"]
     },
     {
       "id": "linux-desktop",
       "layer": "factory",
-      "title": "factory/linux-desktop",
+      "title": "factory/linux-desktop (GNOME, Plasma, Qt 6 closures; buncc linux)",
       "owner": "factory/linux-desktop",
       "module": null,
-      "entry": [],
-      "docs": [],
-      "ci": ["buncc-linux-desktop.yml#desktop"],
-      "pins": [],
+      "entry": ["buncc linux pins"],
+      "docs": ["docs/BUNCC-LINUX-DESKTOP.md"],
+      "ci": [
+        "buncc-linux-desktop.yml#unit",
+        "buncc-linux-desktop.yml#windows-cross",
+        "buncc-linux-desktop.yml#arch-build"
+      ],
+      "pins": ["factory/linux-desktop/closure-gnome.json"],
       "status": "unverified",
-      "pending": true,
-      "note": "announced by the Linux-desktop owner; not on os yet"
+      "note": "workflow installs Bun with npm instead of the setup action"
     },
     {
       "id": "images",
@@ -334,6 +338,67 @@
       "ci": ["aphrody-sites.yml#webos"],
       "pins": [],
       "status": "ci-verified"
+    },
+    {
+      "id": "c",
+      "layer": "factory",
+      "title": "factory/c (Bun OS C environment: targets, sysroots, runners)",
+      "owner": "factory/c",
+      "module": "factory:c/env",
+      "entry": ["buncc c doctor", "buncc c env", "buncc c targets"],
+      "docs": ["docs/BUNOS-C.md"],
+      "ci": ["bunos-c.yml#linux", "bunos-c.yml#musl", "bunos-c.yml#windows"],
+      "pins": ["factory/c/c-env.json"],
+      "status": "unverified",
+      "note": "driver in packages/buncc/src/c; CI result not checked by the map",
+      "covers": ["packages/buncc/src/c"]
+    },
+    {
+      "id": "rustbase",
+      "layer": "factory",
+      "title": "factory/rustbase (Rust userland: uutils, sudo-rs, nushell packages)",
+      "owner": "factory/rustbase",
+      "module": "factory:rustbase",
+      "entry": ["bun factory/rustbase/check.ts"],
+      "docs": ["docs/RUSTBASE.md"],
+      "ci": [
+        "rustbase.yml#check",
+        "rustbase.yml#packages",
+        "rustbase.yml#gnu-coreutils",
+        "rustbase.yml#util-linux-tests"
+      ],
+      "pins": ["factory/rustbase/pins.json"],
+      "status": "unverified",
+      "note": "workflow uses oven-sh/setup-bun directly"
+    },
+    {
+      "id": "wasmos",
+      "layer": "factory",
+      "title": "wasmos (factory/wasmos, packages/wasmos)",
+      "owner": "packages/wasmos",
+      "module": null,
+      "entry": [],
+      "docs": [],
+      "ci": [],
+      "pins": [],
+      "status": "unverified",
+      "pending": true,
+      "note": "announced by the wasmos owner; nothing on os yet",
+      "covers": ["factory/wasmos"]
+    },
+    {
+      "id": "ntcore",
+      "layer": "facade",
+      "title": "ntcore (packages/ntcore)",
+      "owner": "packages/ntcore",
+      "module": null,
+      "entry": [],
+      "docs": [],
+      "ci": [],
+      "pins": [],
+      "status": "unverified",
+      "pending": true,
+      "note": "announced by the ntcore owner; nothing on os yet"
     }
   ],
   "pinExemptions": {
@@ -404,7 +469,9 @@
     "packages/bun-workspace/src/git-cli.ts": "bun packages/bun-workspace/src/cli.ts git doctor",
     "factory/distro/cli.ts": "bun factory/distro/cli.ts doctor",
     "packages/buncc/src/posix-cli.ts": "bun packages/buncc/src/cli.ts posix doctor",
-    "src/cli.ts": "bun src/cli.ts doctor"
+    "src/cli.ts": "bun src/cli.ts doctor",
+    "packages/buncc/src/c/index.ts": "bun packages/buncc/src/cli.ts c doctor",
+    "packages/buncc/src/desktop/index.ts": "bun packages/buncc/src/cli.ts desktop doctor"
   },
   "doctorsNote": "buncc doctor --all runs buncc's own toolchain report, then each command above, then the repository consistency check. These stay as sub-commands for their owners; nobody adds a new top-level doctor."
 }

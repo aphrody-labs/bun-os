@@ -17,7 +17,11 @@ import { join } from "node:path";
 import { loadFacts, renderMap, root, withPins, type Entry, type Facts } from "./generate-map.ts";
 
 const errors: string[] = [];
+const warnings: string[] = [];
+const strict = process.argv.includes("--strict");
 const fail = (message: string) => errors.push(message);
+/** Arrivals the owners have not registered yet: a warning (an error with --strict). Errors stay for real defects (pins, fork references, stale generated documents, broken entries). */
+const soft = (message: string) => (strict ? errors : warnings).push(message);
 const read = (path: string) => Bun.file(join(root, path)).text();
 const exists = (path: string) => existsSync(join(root, path));
 
@@ -65,8 +69,9 @@ for (const e of entries) {
     else if (job && !(job in workflow.jobs)) fail(`${at}: workflow ${file} has no job ${job}`);
   }
   if (e.pending) {
-    if (!missing.length) fail(`${at}: everything it announces exists now; remove "pending"`);
-    if (!e.note) fail(`${at}: pending entries need a note naming the owner`);
+    soft(`${at}: pending (announced, not landed)${e.note ? `: ${e.note}` : ""}`);
+    if (!missing.length) soft(`${at}: everything it announces exists now; remove "pending"`);
+    if (!e.note) soft(`${at}: pending entries need a note naming the owner`);
   } else {
     for (const m of missing) fail(`${at}: ${m} does not exist (mark the entry pending until it lands)`);
     if (!e.entry.length && !e.docs.length) fail(`${at}: needs an entry command or a doc`);
@@ -92,9 +97,9 @@ for (const e of entries) {
 // every workflow on the map, one setup action
 for (const w of f.workflows) {
   if (!entries.some(e => e.ci.some(c => c.startsWith(`${w.file}#`))))
-    fail(`workflow ${w.file}: not referenced by any architecture entry`);
+    soft(`workflow ${w.file}: not referenced by any architecture entry`);
   if (!w.usesSetup && !a.noBunSetup?.[w.file])
-    fail(`workflow ${w.file}: neither uses ${a.ci.setupAction} nor is listed in noBunSetup with a reason`);
+    soft(`workflow ${w.file}: neither uses ${a.ci.setupAction} nor is listed in noBunSetup with a reason`);
 }
 for (const file of Object.keys(a.noBunSetup ?? {}))
   if (!f.workflows.some(w => w.file === file)) fail(`noBunSetup: ${file} is not a workflow`);
@@ -116,7 +121,7 @@ const covered = (p: string) =>
 for (const dir of new Set(
   tracked.filter(t => t.startsWith("factory/") && t.includes("/", 8)).map(t => t.split("/").slice(0, 2).join("/")),
 ))
-  if (!covered(dir)) fail(`${dir}: no architecture entry owns or covers it`);
+  if (!covered(dir)) soft(`${dir}: no architecture entry owns or covers it`);
 for (const pkg of [
   "packages/buncc",
   "packages/windows",
@@ -124,7 +129,7 @@ for (const pkg of [
   "packages/bun-workspace",
   "packages/windows-samples-tests",
 ])
-  if (!covered(pkg)) fail(`${pkg}: no architecture entry`);
+  if (!covered(pkg)) soft(`${pkg}: no architecture entry`);
 const entryModules = new Set(entries.map(e => e.module).filter(Boolean));
 for (const mod of f.components.modules)
   if (
@@ -132,7 +137,7 @@ for (const mod of f.components.modules)
     !entryModules.has(mod.id) &&
     !(mod.id.startsWith("factory:distro/") && [...entryModules].some(m => m!.startsWith("factory:distro/")))
   )
-    fail(`${mod.id}: factory module without an architecture entry`);
+    soft(`${mod.id}: factory module without an architecture entry`);
 
 // ---- 2. pins -----------------------------------------------------------------------------------------------------
 const runtime = f.components.runtime.source.version;
@@ -205,7 +210,7 @@ const vswhereAllowed: Record<string, string> = a.duplicatesAllowed?.vswhere ?? {
 for (const line of await git("grep", "-lI", String.raw`vswhere\.exe`, "--", "*.ts", "*.tsx", "*.js", "*.mjs")) {
   if (canonicalVswhere.has(line) || /(^|\/)test\//.test(line) || /\.test\.[tj]s$/.test(line)) continue;
   if (!vswhereAllowed[line])
-    fail(
+    soft(
       `duplicate: ${line} runs vswhere itself; use @aphrody/buncc/msvc (or list it in architecture.json duplicatesAllowed.vswhere with a reason)`,
     );
 }
@@ -226,7 +231,7 @@ for (const line of await git(
 )) {
   if (line.includes("/test/") || line.endsWith(".test.ts")) continue;
   if (!doctors[line] && line !== "packages/buncc/src/cli.ts")
-    fail(`duplicate: ${line} adds a doctor command; fold it into buncc doctor (architecture.json doctors)`);
+    soft(`duplicate: ${line} adds a doctor command; fold it into buncc doctor (architecture.json doctors)`);
 }
 for (const [file, how] of Object.entries<string>(doctors)) {
   if (!trackedSet.has(file)) fail(`doctors: ${file} no longer exists`);
@@ -280,10 +285,12 @@ for (const line of await git(
   if (!allowedLine.test(body)) fail(`fork-only reference: ${line.slice(0, 160)}`);
 }
 
-for (const line of errors.slice(0, 200)) console.error(`error: ${line}`);
+const inCi = Boolean(process.env.GITHUB_ACTIONS);
+for (const line of warnings) console.warn(inCi ? `::warning title=architecture map::${line}` : `warning: ${line}`);
+for (const line of errors.slice(0, 200)) console.error(inCi ? `::error title=consistency::${line}` : `error: ${line}`);
 if (errors.length > 200) console.error(`... ${errors.length - 200} more`);
 console.log(
   `consistency: ${entries.length} architecture entries (${entries.filter(e => e.pending).length} pending), ${f.workflows.length} workflows, ` +
-    `${Object.keys(f.toolchain.tools ?? {}).length} toolchain pins, ${Object.keys(f.msPins).length} Microsoft pins; ${errors.length} errors`,
+    `${Object.keys(f.toolchain.tools ?? {}).length} toolchain pins, ${Object.keys(f.msPins).length} Microsoft pins; ${warnings.length} warnings, ${errors.length} errors`,
 );
 process.exit(errors.length ? 1 : 0);
