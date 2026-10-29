@@ -184,6 +184,21 @@ export function settingsApp(
     watch(a.watch, () => b.setAttribute("aria-checked", String(a.get())));
     return b;
   };
+  const textCtl = (a: Acc<string>, label: string, opts: { password?: boolean; placeholder?: string } = {}) => {
+    const input = h("input", {
+      class: "fld",
+      type: opts.password ? "password" : "text",
+      "aria-label": label,
+      placeholder: opts.placeholder,
+      autocomplete: "off",
+      spellcheck: "false",
+    }) as HTMLInputElement;
+    input.addEventListener("change", () => a.set(input.value.trim()));
+    watch(a.watch, () => {
+      if (document.activeElement !== input) input.value = a.get();
+    });
+    return input;
+  };
   const segCtl = <T extends string>(
     a: Acc<T>,
     label: string,
@@ -1225,6 +1240,42 @@ export function settingsApp(
             (v) => String(v),
           ),
           "virtual desktops count",
+        ),
+      ),
+      group(
+        "Assistant",
+        row(
+          "Shake to ask",
+          "Wiggle the pointer to open the assistant",
+          switchCtl(acc("assistant.enabled"), "Shake to ask"),
+          "assistant ai ask shake wiggle",
+        ),
+        row(
+          "Model",
+          "Local llama.cpp server, or a hosted API with your own key",
+          segCtl(acc("assistant.backend"), "Assistant backend", [
+            ["llama", "Local", "memory"],
+            ["hosted", "Hosted", "cloud"],
+          ]),
+          "assistant model llama.cpp local hosted api",
+        ),
+        row(
+          "API URL",
+          "OpenAI-compatible root, e.g. http://127.0.0.1:8080/v1",
+          textCtl(acc("assistant.baseUrl"), "Assistant API URL"),
+          "assistant url endpoint",
+        ),
+        row(
+          "Model name",
+          "Sent with every request",
+          textCtl(acc("assistant.model"), "Assistant model name"),
+          "assistant model name",
+        ),
+        row(
+          "API key",
+          "Only for a hosted API; stored in this browser, never sent anywhere else",
+          textCtl(acc("assistant.apiKey"), "Assistant API key", { password: true }),
+          "assistant api key token",
         ),
       ),
       group(

@@ -146,6 +146,14 @@ export interface PrefMap {
   "windows.gap": number;
   "windows.border": number;
   "windows.tiling": "dwindle" | "master" | "scrolling" | "floating";
+  /** Pointer-shake assistant (assistant/overlay.ts). */
+  "assistant.enabled": boolean;
+  "assistant.backend": "llama" | "hosted";
+  /** OpenAI-compatible API root: the local llama-server, or a hosted API. */
+  "assistant.baseUrl": string;
+  "assistant.model": string;
+  /** The user's own key for a hosted API; kept in this browser only. */
+  "assistant.apiKey": string;
   /** Launch id per file kind. */
   "files.openWith": Record<FileTypeId, string>;
   /** Chords per action id (shortcuts.ts); missing actions use their defaults. */
@@ -383,6 +391,11 @@ export const SCHEMA: { [K in PrefKey]: Spec<PrefMap[K]> } = {
   "windows.gap": num(10, 0, 32),
   "windows.border": num(2, 0, 6),
   "windows.tiling": oneOf("dwindle", ["dwindle", "master", "scrolling", "floating"]),
+  "assistant.enabled": bool(true),
+  "assistant.backend": oneOf("llama", ["llama", "hosted"]),
+  "assistant.baseUrl": text("http://127.0.0.1:8080/v1", 300),
+  "assistant.model": text("local", 100),
+  "assistant.apiKey": text("", 400),
   "files.openWith": {
     default: {
       text: "editor",

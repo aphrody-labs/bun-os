@@ -35,6 +35,9 @@ import {
 } from "./apps/craft-host";
 import { h, icon } from "./dom";
 import { catalog, HOME, webos, type CatalogApp } from "./os";
+import { searchContents } from "./apps/files-wire";
+import { openAiCompatible } from "./assistant/backend";
+import { installAssistant } from "./assistant/overlay";
 import {
   install,
   installed,
@@ -1817,6 +1820,21 @@ for (const key of [
 ] as const)
   prefs.subscribe(key, configureWm);
 narrow.addEventListener("change", configureWm);
+
+// Pointer-shake assistant: backend from the preferences, context from the content index of the user's files.
+let indexOs: Awaited<ReturnType<typeof webos>> | undefined;
+void webos().then(o => (indexOs = o));
+installAssistant({
+  enabled: () => prefs.get("assistant.enabled"),
+  backend: () =>
+    openAiCompatible({
+      kind: prefs.get("assistant.backend"),
+      baseUrl: prefs.get("assistant.baseUrl"),
+      model: prefs.get("assistant.model"),
+      apiKey: prefs.get("assistant.apiKey"),
+    }),
+  search: query => (indexOs ? searchContents(indexOs, query, 5) : []),
+});
 prefs.subscribe("dock.pinned", () => {
   renderDock();
   renderDeskIcons();
