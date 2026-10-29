@@ -744,7 +744,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/bun-video.git",
-        "pin": "48cc73f2dd5fdd3ffca34293ecc539f13407a7f5"
+        "pin": "984aa35014d1a244e77a0b17f29a2d2cd956f5d1"
       },
       "registration": ["none"],
       "aot": true,
