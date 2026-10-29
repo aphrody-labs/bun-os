@@ -163,3 +163,66 @@ test.skipIf(!win || !builtMsix)(
     expect(classify(m).kind).toBe("win32-packaged");
   },
 );
+
+import { dump, toDts, WINMD } from "../src/winmd.ts";
+
+test("winmd projection: enum values and kinds map to TypeScript", () => {
+  const dts = toDts([
+    {
+      ns: "Windows.Foo",
+      name: "Reason",
+      kind: "enum",
+      base: "System.Enum",
+      methods: [],
+      fields: [
+        { name: "A", type: "Int32", value: 0 },
+        { name: "B", type: "Int32", value: 1 },
+      ],
+    },
+    {
+      ns: "Windows.Foo",
+      name: "IThing",
+      kind: "interface",
+      base: "",
+      methods: [
+        {
+          name: "GetAsync",
+          returns: "Windows.Foundation.IAsyncOperation`1<System.String>",
+          parameters: [{ name: "id", type: "System.Int32" }],
+        },
+      ],
+      fields: [],
+    },
+  ]);
+  expect(dts).toContain("enum Reason {\n    A = 0,\n    B = 1,");
+  expect(dts).toContain("GetAsync(id: number): Promise<string>;");
+});
+
+test.skipIf(!win || !existsSync(WINMD) || !Bun.which("dotnet"))(
+  "winmd projection: real Windows.winmd, Windows.UI.Notifications",
+  async () => {
+    const types = await dump(["Windows.UI.Notifications"]);
+    const names = types.map(t => t.name);
+    expect(names).toContain("ToastNotificationManager");
+    expect(names).toContain("ToastNotification");
+    const reason = types.find(t => t.name === "ToastDismissalReason")!;
+    expect(reason.kind).toBe("enum");
+    expect(reason.fields.map(f => [f.name, f.value])).toEqual([
+      ["UserCanceled", 0],
+      ["ApplicationHidden", 1],
+      ["TimedOut", 2],
+    ]);
+    const statics = types.find(t => t.name === "IToastNotificationManagerStatics")!;
+    expect(statics.methods.map(m => m.name)).toContain("CreateToastNotifier");
+  },
+  240_000,
+);
+
+test("Office add-in manifest has a task pane runtime and the pages it points to exist", async () => {
+  const dir = new URL("../officejs/", import.meta.url);
+  const m = await Bun.file(new URL("manifest.json", dir)).json();
+  const rt = m.extensions[0].runtimes[0];
+  expect(rt.actions[0].type).toBe("openPage");
+  expect(await Bun.file(new URL("taskpane.html", dir)).text()).toContain("office.js");
+  expect(rt.code.page).toContain("taskpane.html");
+});

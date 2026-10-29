@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Reads Windows.winmd (ECMA-335 metadata of the Windows SDK) with System.Reflection.Metadata and prints the types of chosen namespaces as JSON.
+       bun packages/microsoft/src/winmd.ts runs it and turns the JSON into TypeScript declarations. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+</Project>

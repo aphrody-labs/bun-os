@@ -1,0 +1,67 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/vDevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "version": "1.4.7",
+  "id": "7f3a2d10-5b0e-4c8e-9c39-6b0f4a2d1c10",
+  "developer": {
+    "name": "Bun OS",
+    "websiteUrl": "https://localhost:3000",
+    "privacyUrl": "https://localhost:3000/privacy",
+    "termsOfUseUrl": "https://localhost:3000/terms"
+  },
+  "name": { "short": "Bun OS add-in" },
+  "description": {
+    "short": "Minimal task pane",
+    "full": "Minimal task pane that reports the Office host and inserts text."
+  },
+  "icons": { "outline": "assets/outline.png", "color": "assets/color.png" },
+  "accentColor": "#0F6CBD",
+  "validDomains": ["localhost:3000"],
+  "extensions": [
+    {
+      "requirements": { "scopes": ["workbook", "document"] },
+      "runtimes": [
+        {
+          "id": "TaskPaneRuntime",
+          "type": "general",
+          "code": { "page": "https://localhost:3000/taskpane.html" },
+          "actions": [{ "id": "ShowTaskPane", "type": "openPage", "pageId": "TaskPane", "view": "homepage" }]
+        }
+      ],
+      "ribbons": [
+        {
+          "tabs": [
+            {
+              "builtInTabId": "TabHome",
+              "groups": [
+                {
+                  "id": "BunOsGroup",
+                  "label": "Bun OS",
+                  "icons": [
+                    { "size": 16, "url": "https://localhost:3000/assets/icon-16.png" },
+                    { "size": 32, "url": "https://localhost:3000/assets/icon-32.png" },
+                    { "size": 80, "url": "https://localhost:3000/assets/icon-80.png" }
+                  ],
+                  "controls": [
+                    {
+                      "id": "ShowTaskPaneButton",
+                      "type": "button",
+                      "label": "Show",
+                      "icons": [
+                        { "size": 16, "url": "https://localhost:3000/assets/icon-16.png" },
+                        { "size": 32, "url": "https://localhost:3000/assets/icon-32.png" },
+                        { "size": 80, "url": "https://localhost:3000/assets/icon-80.png" }
+                      ],
+                      "supertip": { "title": "Bun OS", "description": "Open the task pane" },
+                      "actionId": "ShowTaskPane"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

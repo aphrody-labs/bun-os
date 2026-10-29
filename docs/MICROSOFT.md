@@ -115,3 +115,15 @@ ILCompiler through NuGet (nuget.org terms, packages restored by `dotnet build`),
   `win32-packaged` (Wine import coverage applies), `winui-or-appsdk-dependent` and `uwp` (not covered by it). Test: the MSIX built above reads
   back as `win32-packaged`, x64, `FluentApp.exe`, `Windows.FullTrustApplication`. `parseWingetList` parses the `winget list` table by header columns (fixture test).
 - UI Automation capture is now deterministic: `capture.ps1` polls with bounded deadlines (window, all controls in the UIA tree, a non-uniform rendered frame, the dialog text) instead of fixed sleeps; three consecutive local runs passed.
+
+## Typed projection from Windows.winmd and an Office.js add-in (measured 2026-10-29)
+
+- `bun packages/microsoft/src/winmd.ts <out.d.ts> <Namespace>...` reads `Windows.winmd` (Windows SDK 10.0.26100.0, `UnionMetadata`) with the .NET tool in
+  `packages/microsoft/winmd` (`System.Reflection.Metadata`, no CsWinRT needed) and writes TypeScript declarations: enums with their real values, structs, interfaces
+  and methods with parameter names, `IAsyncOperation<T>` as `Promise<T>`. `types/windows-notifications.d.ts` (212 types, `Windows.UI.Notifications` and
+  `Windows.ApplicationModel.DataTransfer`) was generated this way. Test: `ToastDismissalReason` is `UserCanceled=0, ApplicationHidden=1, TimedOut=2` and
+  `IToastNotificationManagerStatics` has `CreateToastNotifier`. These are declarations only; calling WinRT from Bun still goes through the existing windows-rs addon or a .NET host.
+- `packages/microsoft/officejs` is a minimal task-pane add-in (unified manifest, `taskpane.html`, `taskpane.js`). It loads Office.js from the Microsoft CDN
+  (`https://officeapis.public.onecdn.static.microsoft/1/office.js`, as in Learn) and, opened in a plain browser here, `Office.onReady` resolves with no host and the pane says
+  "not running inside Office"; `Office.HostType` lists Word, Excel, PowerPoint, Outlook, OneNote. Inside Word or Excel it would insert text; that path is **not tested** (no Office installed here).
+  The manifest was not validated with `office-addin-manifest`, and the add-in was not sideloaded.
