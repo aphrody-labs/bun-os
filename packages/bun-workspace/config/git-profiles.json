@@ -43,6 +43,21 @@
       ],
       "verify": ["cargo", "metadata", "--offline", "--no-deps", "--format-version", "1"]
     },
+    "emulation": {
+      "description": "Emulation stack (docs/EMULATION.md): bun-engine, its in-tree cores, the headless ROM suite and the console matrix. Cargo needs every workspace member present, hence crates/* and the uutils and chipi-spec trees.",
+      "paths": ["crates", "docs", "scripts/emulation", "vendor/uutils", "vendor/chipi-spec"],
+      "submodules": [
+        "crates/*",
+        "vendor/chipi-spec",
+        "vendor/cubeb-rs",
+        "vendor/rustboyadvance-ng",
+        "vendor/starpsx",
+        "vendor/tetanes",
+        "vendor/uutils/*",
+        "vendor/zakuro"
+      ],
+      "verify": ["cargo", "metadata", "--offline", "--no-deps", "--format-version", "1"]
+    },
     "web": {
       "description": "Bun workspaces (apps and packages), design system, fonts and the web vendor trees.",
       "paths": [
