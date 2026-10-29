@@ -464,6 +464,21 @@
       "build": "bun packages/bun-app-host/src/build.ts build (filtered frozen install of bun-app-host, bun-artifacts, bun-workspace)"
     },
     {
+      "id": "spacedrive",
+      "path": "apps/spacedrive",
+      "size": "Rust workspace (core, 25 crates, server, CLI, Tauri shell) plus the React interface; imported from aphrody-labs/spacedrive at 4d41a379f6",
+      "origin": "github.com/spacedriveapp/spacedrive via the aphrody-labs/spacedrive fork (Apache-2.0)",
+      "kind": "binary",
+      "integration": {
+        "mode": "pacman-bunos",
+        "package": "bun-os-spacedrive",
+        "units": ["/usr/lib/systemd/user/bun-os-spacedrive.service"]
+      },
+      "build": "cargo build --release --locked -p sd-server -p sd-cli --bin sd-server --bin sd-daemon after bun run build in apps/web (factory/bunos/pkgbuilds/bun-os-spacedrive)",
+      "license": "apps/spacedrive/LICENSE",
+      "provenance": "docs/spacedrive/PROVENANCE.md"
+    },
+    {
       "id": "bun-engine",
       "path": "crates/bun-engine-core",
       "size": "crates/bun-engine-core and its in-tree cores (dust, rdynarmic)",
