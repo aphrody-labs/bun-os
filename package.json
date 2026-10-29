@@ -175,7 +175,8 @@
     "packages/winreg",
     "packages/yolo-cli",
     "packages/yolo-core",
-    "vendor/rea"
+    "vendor/rea",
+    "vendor/shenron-config"
   ],
   "type": "module",
   "exports": {

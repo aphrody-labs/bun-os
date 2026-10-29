@@ -2090,6 +2090,51 @@
       "status": "present"
     },
     {
+      "id": "submodule:vendor/mediabunny",
+      "kind": "submodule",
+      "path": "vendor/mediabunny",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/Vanilagy/mediabunny.git",
+        "pin": "0f80f47e617b576737ffd4ce39a626eb7c7e934e"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "edges": {"consumers": ["shenron"], "npm": "mediabunny@1.63.0 (latest on npm, 2026-10-29)"},
+      "note": "Migrated from aphrody-labs/shenron vendor/mediabunny; pin = upstream HEAD of 2026-10-28T17:42:43Z."
+    },
+    {
+      "id": "submodule:vendor/ui-ux-pro-max-skill",
+      "kind": "submodule",
+      "path": "vendor/ui-ux-pro-max-skill",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+        "pin": "28b3b8dee8c976df4fa3e94aed4e092ad43fcb03"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "edges": {"consumers": ["skill:ui-ux-pro-max"]},
+      "note": "Migrated from aphrody-labs/shenron vendor/ui-ux-pro-max-skill; pin = upstream HEAD of 2026-10-26T10:07:27Z."
+    },
+    {
+      "id": "submodule:vendor/shenron-config",
+      "kind": "submodule",
+      "path": "vendor/shenron-config",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/shenron-config.git",
+        "pin": "ceda94cc34f2463c835546e1399dea0fc8276096"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "edges": {"workspace": "@aphrody/shenron-config", "dependsOn": ["npm:@aphrody/paths", "zod"], "consumers": ["shenron"]},
+      "note": "Migrated from aphrody-labs/shenron packages/config; pin = main HEAD of 2026-10-26T12:21:27Z; linked as root workspace."
+    },
+    {
       "id": "submodule:vendor/recalbox",
       "kind": "submodule",
       "path": "vendor/recalbox",
