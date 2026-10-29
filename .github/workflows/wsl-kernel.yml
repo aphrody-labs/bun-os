@@ -99,6 +99,8 @@ jobs:
           # The compile check has no Module.symvers, so the driver's conftest cannot see that hrtimer_setup() is exported and falls back to
           # hrtimer_init(), which kernels since 6.15 no longer have. Both kernels under test are newer than that.
           sed -i 's/^#if NV_IS_EXPORT_SYMBOL_PRESENT_hrtimer_setup/#if 1/' nv/kernel-open/nvidia/nv-nano-timer.c
+          # sys_close() is gone from kernels 6.x+; close_fd() is the in-kernel replacement.
+          sed -i 's/sys_close(fd)/close_fd(fd)/' nv/kernel-open/nvidia/nv-caps.c
           make -C linux-${{ matrix.kver }} defconfig modules_prepare -j"$(nproc)"
           make -C nv modules -j"$(nproc)" SYSSRC="$PWD/linux-${{ matrix.kver }}" SYSOUT="$PWD/linux-${{ matrix.kver }}" 2>&1 | tee nv-build.log | tail -n 60
           ls -l nv/kernel-open/*.ko
