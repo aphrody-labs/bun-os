@@ -1339,6 +1339,7 @@
         "@aphrody/m3-fonts": "workspace:*",
         "@aphrody/m3-tokens": "workspace:*",
         "@aphrody/paths": "workspace:*",
+        "@aphrody/runtime-sdk": "workspace:*",
         "@aphrody/web": "1.4.7",
       },
     },

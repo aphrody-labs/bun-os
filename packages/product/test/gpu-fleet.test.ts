@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { expect, test } from "bun:test";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { diskCommand } from "../src/admin/lib/fleet/disks.ts";
 import { openPlanner } from "../src/admin/lib/fleet/native.ts";
@@ -8,7 +9,7 @@ test("a missing Python application owner is rejected before interpreter initiali
   await expect(openPlanner(join(import.meta.dir, "missing-owner"))).rejects.toThrow("source missing");
 });
 
-test.skipIf(!process.env.BUN_PYTHON_HOST_LIBRARY)(
+test.skipIf(!process.env.BUN_PYTHON_HOST_LIBRARY || !existsSync(process.env.BUN_PYTHON_HOST_LIBRARY))(
   "real embedded Python uses this Bun process and preserves queued operations",
   async () => {
     // CPython is process-global: qualification uses the dedicated owner process,

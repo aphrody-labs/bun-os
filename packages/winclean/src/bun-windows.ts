@@ -72,14 +72,14 @@ function registryInput(value: string, type: string): string | string[] | number 
   }
 }
 
-/** Execute WinClean compatibility tools whose stable primitive is owned by `bun:windows`. */
+/** Execute WinClean compatibility tools whose stable primitive is a native Windows host (`windows-host.ts`). */
 export async function callBunWindows(
   name: string,
   args: Record<string, unknown>,
   injected?: BunWindowsApi,
 ): Promise<{ handled: boolean; value?: unknown }> {
   if (process.platform !== "win32" && !injected) return { handled: false };
-  const windows = injected ?? ((await import("bun:windows")) as unknown as BunWindowsApi);
+  const windows = injected ?? (await import("./windows-host")).windowsHost();
   const text = (key: string) => String(args[key] ?? "");
 
   switch (name) {

@@ -1,19 +1,9 @@
-// Windows registry, process list and fixed disks for the Steam owner, on upstream Bun: reg.exe, tasklist.exe and
-// PowerShell for the registry and processes, bun:ffi (kernel32) for disks. Every function throws on non-Windows hosts.
+// Windows registry, process list and fixed disks for the Steam owner, on upstream Bun: bun:ffi (advapi32, kernel32) for
+// the registry and disks, tasklist.exe and PowerShell for processes. Every function throws on non-Windows hosts.
 import { dlopen, FFIType, ptr } from "bun:ffi";
+import * as nativeRegistry from "./registry";
 
-export type RegistryType = "REG_SZ" | "REG_EXPAND_SZ" | "REG_DWORD" | "REG_QWORD" | "REG_MULTI_SZ" | "REG_BINARY" | string;
-
-export interface RegistryValue {
-  name: string;
-  type: RegistryType;
-  value: string | number;
-}
-
-export interface RegistryListing {
-  keys: string[];
-  values: RegistryValue[];
-}
+export type { RegistryListing, RegistryValue } from "./registry";
 
 function run(command: string, args: string[]): string {
   if (process.platform !== "win32") throw new Error("Windows only");
@@ -22,46 +12,19 @@ function run(command: string, args: string[]): string {
   return result.stdout.toString();
 }
 
-function parseValue(type: string, data: string): string | number {
-  if (type === "REG_DWORD") return Number.parseInt(data, 16);
-  if (type === "REG_QWORD") return Number(BigInt(data));
-  return data;
-}
-
-const VALUE_LINE = /^ {4}(.*?) {4}(REG_[A-Z_]+)(?: {4}(.*))?$/;
-
-/** Direct subkeys and values of a registry key (`HKCU\Software\...`), as `reg query` lists them. */
-function list(path: string): RegistryListing {
-  const out = run("reg", ["query", path]);
-  const keys: string[] = [];
-  const values: RegistryValue[] = [];
-  const prefix = path.replace(/^HKCU\\/i, "HKEY_CURRENT_USER\\").replace(/^HKLM\\/i, "HKEY_LOCAL_MACHINE\\");
-  for (const line of out.split(/\r?\n/)) {
-    if (!line.trim()) continue;
-    const value = VALUE_LINE.exec(line);
-    if (value) {
-      const [, name, type, data = ""] = value;
-      values.push({ name: name === "(Default)" ? "" : name!, type: type!, value: parseValue(type!, data) });
-    } else if (line.toUpperCase().startsWith(`${prefix.toUpperCase()}\\`)) {
-      keys.push(line.slice(prefix.length + 1));
-    }
-  }
-  return { keys, values };
-}
-
 export const registry = {
-  list,
+  /** Direct subkeys and values of a key (`HKCU\Software\...`); throws when the key does not exist. */
+  list(path: string): nativeRegistry.RegistryListing {
+    const listing = nativeRegistry.list(path);
+    if (!listing) throw new Error(`registry key not found: ${path}`);
+    return listing;
+  },
   /** One value of a key, or null when the key or value does not exist. */
-  get(path: string, name: string): { type: RegistryType; value: string | number } | null {
-    try {
-      const found = list(path).values.find(entry => entry.name.toLowerCase() === name.toLowerCase());
-      return found ? { type: found.type, value: found.value } : null;
-    } catch {
-      return null;
-    }
+  get(path: string, name: string): { type: string; value: nativeRegistry.RegistryData } | null {
+    return nativeRegistry.get(path, name);
   },
   set(path: string, name: string, value: string | number, type: "REG_SZ" | "REG_DWORD" = "REG_SZ"): void {
-    run("reg", ["add", path, "/v", name, "/t", type, "/d", String(value), "/f"]);
+    nativeRegistry.set(path, name, value, type);
   },
 };
 

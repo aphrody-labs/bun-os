@@ -13,9 +13,6 @@ export * from "./vfs-catalog.js";
 export * from "./nie-re-map.js";
 export * from "./openapi.js";
 export * from "./llm-docs.js";
-export * from "./fork-capabilities.js";
-
-import { generateForkCapabilityArtifacts, type ForkDocumentation } from "./fork-capabilities.js";
 
 import { generateOpenApiJson, generateOpenApiYaml } from "./openapi.js";
 import { generateLlmsFullTxt, generateLlmsTxt } from "./llm-docs.js";
@@ -328,7 +325,7 @@ const spec = generateOpenApiSpec();
 /**
  * Writes all static documentation artifacts to a target directory.
  */
-export async function exportDocsToDirectory(outDir: string, fork?: ForkDocumentation): Promise<string[]> {
+export async function exportDocsToDirectory(outDir: string): Promise<string[]> {
   await fs.mkdir(outDir, { recursive: true });
 
   const files: Record<string, string> = {
@@ -340,7 +337,6 @@ export async function exportDocsToDirectory(outDir: string, fork?: ForkDocumenta
     "CROSS-LANGUAGE-ARCHITECTURE.md": generateCrossLanguageArchitectureMarkdown(),
     "llms.txt": generateLlmsTxt(),
     "llms-full.txt": generateLlmsFullTxt(),
-    ...(fork ? generateForkCapabilityArtifacts(fork) : {}),
   };
 
   const writtenFiles: string[] = [];

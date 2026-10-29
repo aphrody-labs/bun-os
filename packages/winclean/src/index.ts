@@ -24,7 +24,7 @@ export class Winclean extends GeneratedTools implements Disposable {
 
   private constructor(readonly endpoint?: string) {
     super();
-    this.path = endpoint ? "kernel://aphrody-os" : "bun:windows+kernel://aphrody-os";
+    this.path = endpoint ? "kernel://aphrody-os" : "windows-host+kernel://aphrody-os";
   }
 
   static open(endpoint?: string): Winclean {
