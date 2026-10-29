@@ -9,10 +9,9 @@ d'automatisation dans Niers.
 
 | Surface | Dépôt canonique | Consommateurs | Règle |
 | --- | --- | --- | --- |
-| Applications Azalée, site rosegriffon, nginx, publication bleu/vert | `rg` | VPS de production | Le code web et les migrations publiables sont versionnés ici. |
-| Formats IEVR, parseurs Rust/Bun, manifests, données de jeu et outils NIE.exe | `nie` | RG, services NIE, poste de travail | Les données lourdes et dérivées restent locales et ne sont jamais auto-ajoutées. |
+| Formats IEVR, parseurs Rust/Bun, manifests, données de jeu et outils NIE.exe | `nie` | services NIE, poste de travail | Les données lourdes et dérivées restent locales et ne sont jamais auto-ajoutées. |
 | Miroirs SQLite, `var/`, `target/`, `.next/`, cache modèle | machine qui exécute le service | services locaux | Artefacts régénérables, hors Git et hors synchronisation. |
-| CDN originaux et variantes | service partagé du VPS | RG et Niers | `rg-cdn.service` et `cdn-variants.service` restent actifs : les arrêter casserait les deux sites. |
+| CDN originaux et variantes | service partagé du VPS | Niers | `cdn-variants.service` reste actif : l'arrêter casserait le site. |
 
 `nie/data/azalee` (ex-`nie/apps/azalee/data` : l'app `apps/azalee` (not in repo) de
 `niers` n'existe plus) est encore un chemin de compatibilité consommé par le
@@ -178,12 +177,8 @@ doit être suivie de `/health`, d'une requête GLB réelle et d'une mesure
 
 ```bash
 bun scripts/ops/repo-sync.ts --repo all --pull --commit --push
-git -C ../rg status --short --branch
 git -C ~/nie status --short --branch
-systemctl is-active website-web.service nie-model-serve.service rg-cdn.service cdn-variants.service
-curl --fail --silent https://rosegriffon.fr/wiki
-curl --head https://azalee.rosegriffon.fr/
-curl --fail --silent https://cdn.rosegriffon.fr/health
+systemctl is-active website-web.service nie-model-serve.service cdn-variants.service
 ```
 
 Pour le wiki Azalée intégré, rejouer ensuite les tests pertinents de Website, le type-check, le lint/build et

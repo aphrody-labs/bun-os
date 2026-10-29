@@ -10,10 +10,9 @@ or organization, and nothing is published without an owner decision
 
 | Login | Role |
 | --- | --- |
-| `aphrody-dev` | Human owner account; owner of `aphrody-labs`. Its SSH key (`~/.ssh/github_aphrody_dev`, alias `github-dev`) is the Git transport for `aphrody-labs` and `rose-griffon` through `url.insteadOf`. |
-| `aphrody-code` | Legacy account and commit identity (`aphrody-code <contact@aphrody.com>`); member of `aphrody-labs`, admin of `rose-griffon`. Keeps personal projects, upstream mirrors and archived repositories. |
+| `aphrody-dev` | Human owner account; owner of `aphrody-labs`. Its SSH key (`~/.ssh/github_aphrody_dev`, alias `github-dev`) is the Git transport for `aphrody-labs` through `url.insteadOf`. |
+| `aphrody-code` | Legacy account and commit identity (`aphrody-code <contact@aphrody.com>`); member of `aphrody-labs`. Keeps personal projects, upstream mirrors and archived repositories. |
 | `aphrody-labs` | Organization for **production and build repositories only, with no duplicate** (owner decisions, 2026-10-01): a source lives in exactly one repository. |
-| `rose-griffon` | Rose Griffon organization (`rg`, `achillea`, `canvas`, …). Making `aphrody-dev` an owner still needs an `admin:org` refresh of the `aphrody-code` token through a browser device flow. |
 
 Both accounts are logged in with `gh` on WSL, vps and dbfr. Scripts select one
 explicitly with `gh auth token --user <login>`; MCP servers use the same
@@ -35,7 +34,7 @@ the former Windows and remote copies were removed after SHA-256 verification
 on 2026-10-02 under the single-copy rule): the former split layer
 repositories `aphrody-ai`, `-os`, `-ui`, `-web`, `-compat`, `-contracts`,
 `-shell`, `-native`, `-infra`, `-discord`, `-koharu`, `-src`, `-go`, `-ts`,
-`aphrody-legacy`, `shenron` (imported into `shenron:apps` and `shenron:packages` at its last commit `58e03b40`; the running vps release is a self-contained artifact), and `bxc`, `fut`, `n2b`, `winclean`, `nie`, `iepy`,
+`aphrody-legacy`, and `bxc`, `fut`, `n2b`, `winclean`, `nie`, `iepy`,
 `iecode-cpp`, `diffutils`, `findutils`, `grep`, `sed`, `tar`. Their content
 lives in the monorepo or in IECODE. An organization owner can restore a deleted
 repository for 90 days from the organization settings.

@@ -38,7 +38,6 @@ Used by **aphrody**, **Claude**, and compatible agents. Structure:
 | `BXC_MEMORY_DB` | aphrody, bxc | Agent memory SQLite |
 | `REDIS_URL` | aphrody, bxc | Local Redis |
 | `DATABASE_URL` | aphrody | Postgres (rpb_neon) |
-| `DATABASE_URL_AZALEE` | aphrody | Postgres (rose_griffon) |
 
 Do **not** commit tokens into `mcp.json`; prefer env at spawn time.
 

@@ -40,10 +40,9 @@ Related: [`wgpu-webgpu.md`](../../reference/WASM/wgpu-webgpu.md) (pins) and
 
 ## Spacedrive, SpaceUI and the desktop app
 
-<!-- docs-hub:begin include="SPACEUI-M3-FUSION.md;SPACEUI-SPACEDRIVE-MIGRATION.md;DRIVE-INTERFACE-SOURCE-AUDIT.md;DRIVE-ROUTE-PARITY.md;DRAGON-BALL-READER.md" -->
+<!-- docs-hub:begin include="SPACEUI-M3-FUSION.md;SPACEUI-SPACEDRIVE-MIGRATION.md;DRIVE-INTERFACE-SOURCE-AUDIT.md;DRIVE-ROUTE-PARITY.md" -->
 | Document | Contenu | Statut | Mis à jour |
 | --- | --- | --- | --- |
-| [Dragon Ball readers in the M3 family](DRAGON-BALL-READER.md) | @aphrody/m3-reader owns the manga, databook, and collection reading controls. | imported | 2026-09-29 |
 | [Drive interface source audit](DRIVE-INTERFACE-SOURCE-AUDIT.md) | Snapshot of drive/packages/interface/src (FSL-1.1-ALv2 archive) against the active packages/app-ui/src. | historical | 2026-09-29 |
 | [Drive route parity: file kinds, jobs, redundancy](DRIVE-ROUTE-PARITY.md) | The active webview is packages/app-ui. | imported | 2026-09-29 |
 | [SpaceUI -> Material Design 3 fusion](SPACEUI-M3-FUSION.md) | SpaceUI (Spacedrive and Spacebot design system, MIT) is rebuilt on the Aphrody M3 system. | imported | 2026-09-29 |

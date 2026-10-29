@@ -7,13 +7,7 @@ one immutable train manifest; promote that same train to all declared sites and
 binary channels. `latest` is one pointer to that train, never a separately
 rebuilt artifact.
 
-This means one **train version** (`release_id`) across the ecosystem, not one
-SemVer substituted into every component. Aphrody, Yolo/Bun, setup, creator-kit,
-RG, Shenron, and plugins keep their component version or source revision where
-compatibility, installers, or upstream ownership requires it. The train
-manifest binds those identities and hashes to one release ID and one source
-closure. A site's content and every downloadable binary must report the same
-train ID after promotion.
+This means one **train version** (`release_id`) across the ecosystem, not one SemVer substituted into every component. The train manifest binds those identities and hashes to one release ID and one source closure. A site's content and every downloadable binary must report the same train ID after promotion.
 
 ## Current gap
 
@@ -23,7 +17,6 @@ The repository currently has independent publishers and current pointers:
   binaries plus plugins under `/srv/aphrody-downloads/current`.
 - `scripts/release/publish-creator.ts` independently builds and promotes the
   creator site under `/srv/aphrody-creator/current`.
-- Shenron and RG use separate immutable release assemblers and current links.
 - Other product sites may live in separately owned repositories and have their
   own source revisions and build owners.
 
@@ -85,8 +78,7 @@ probes fail.
    validation that every enabled catalog item has a pinned source, build/stage
    adapter, smoke gate, and rollback operation.
 3. Refactor the existing downloads and creator publishers to accept a shared
-   train ID and prebuilt staged artifacts. Extend Shenron/RG adapters to carry
-   and attest the same ID without removing their component-specific commits.
+   train ID and prebuilt staged artifacts.
 4. Implement the Infra coordinator and simulated failure/rollback tests for
    prepare, transfer, checksum, each site promotion, latest-pointer update, and
    post-promotion probes. Test with Aphrody's Bun fork for Bun-owned code.

@@ -2,7 +2,7 @@
 /**
  * Checkout roots shared by the inagle/azalee CLIs and maintenance scripts.
  *
- * Bun OS owns the IEVR libraries, game data and Rose Griffon product apps.
+ * Bun OS owns the IEVR libraries and game data.
  * Resolve all source paths from this checkout; only game-data storage can be
  * relocated independently.
  */
@@ -43,19 +43,19 @@ export function iecodeDataPath(...parts: string[]): string {
   return path.join(iecodeDataRoot(), ...parts);
 }
 
-/** Rose Griffon sources integrated into the Bun OS checkout. */
-export function rgRoot(): string {
+/** Source tree integrated into the Bun OS checkout. */
+export function sourceRoot(): string {
   return iecodeRoot();
 }
 
-/** Rose Griffon website root in the canonical repository. */
-export function rgWebsiteRoot(): string {
-  return path.join(rgRoot(), "apps", "rg-website");
+/** Web app data root; override with WEB_APP_ROOT. */
+export function webAppRoot(): string {
+  return firstEnv(["WEB_APP_ROOT"]) ?? path.join(sourceRoot(), "apps", "web");
 }
 
-/** Path inside the Rose Griffon website root. */
-export function rgWebsitePath(...parts: string[]): string {
-  return path.join(rgWebsiteRoot(), ...parts);
+/** Path inside the web app root. */
+export function webAppPath(...parts: string[]): string {
+  return path.join(webAppRoot(), ...parts);
 }
 
 /** Current user's home directory, without assuming a host account name. */

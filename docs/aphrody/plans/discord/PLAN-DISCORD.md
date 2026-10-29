@@ -30,27 +30,15 @@ de bot ou un consentement OAuth ne prouve pas que la capacité existe.
 | AD-03 | `@aphrody/messaging` est privé, exporte le source TS et n'a qu'un typecheck.                                                                                   | Exports, types, artefact, tests REST et installation externe vérifiés.                        |
 | AD-04 | Le callback OAuth Carbon échange le code et affiche le profil; il ne conserve ni grants, ni refresh tokens, ni identifiants webhook malgré `webhook.incoming`. | Parcours par capacité, session et révocation testées; webhook exploité ou scope retiré.       |
 | AD-05 | `bot.aphrody.com` sert Gateway, HTTP interactions, `/ping` et OAuth. L'utilisateur a confirmé un aller-retour OAuth.                                           | Smoke d'une release figée, monitoring, permissions de production et rollback démontrés.       |
-| SH-01 | Shenron lie cinq workspaces DiscordX hors racine; Turbo échoue sur cette découverte, tandis que sa CI ne clone que Shenron.                                    | `bun ci` et gates Shenron passent en checkout vierge sans dossier frère implicite.            |
-| SH-02 | Plusieurs tests Shenron ne résolvent pas `@discordjs/collection` depuis `@discordjs/rest`.                                                                     | Graphe Discord.js unique et résolution reproductible.                                         |
-| SH-03 | Tests Shenron : ancien libellé `bxc`, fixture DragonBallCN manquante; dernier essai strict : 9 échecs, 7 erreurs, 337 tests.                                   | Attentes corrigées selon le contrat actuel, fixture légitime réparée, suite stricte verte.    |
-| SH-04 | Services Shenron actifs, mais release `/srv/shenron/current` sur `4cac743f`, alors ancêtre de 59 commits du `main` local.                                      | Build depuis SHA propre, activation Infra, SHA actif et sondes vérifiés, rollback disponible. |
 
-La release Discord de développement observée était
-`30f49b8913c01ef5cbc92e7ff557e757e20b776e`; le dépôt était à
-`a36a2b9e`. Ces SHA sont historiques. Les métriques de
-`../aphrody-ai/docs/ROADMAP-AGENT-PILLARS.md` le sont aussi. Les objectifs
-éditoriaux RAG/OCR Shenron ne constituent pas une gate Discord.
+La release Discord de développement observée était `30f49b8913c01ef5cbc92e7ff557e757e20b776e`; le dépôt était à `a36a2b9e`. Ces SHA sont historiques. Les métriques de `../aphrody-ai/docs/ROADMAP-AGENT-PILLARS.md` le sont aussi.
 
 ## Séquence exécutable
 
 ### 0. Reconstituer la vérité courante
 
 1. Lire les règles, `README.md`, ce plan, `docs/PLAN.md` (not in repo),
-   `docs/UPSTREAMS.md` (not in repo), `m3/packages/material-web/docs/STACK.md` (not in repo)
-   et les audits. Dans Shenron lire `AGENTS.md`, `shenron:docs/products/GOALS.md`,
-   `shenron:docs/operations/ADMIN-REPORTS.md`, `shenron:docs/operations/INFRA-DELEGATION.md`. Dans Infra lire les
-   contrats et runbooks de release. `aphrody-ui` appartient à son agent : ne
-   pas l'inspecter ni le modifier.
+   `docs/UPSTREAMS.md` (not in repo), `m3/packages/material-web/docs/STACK.md` (not in repo)    et les audits. Dans Infra lire les    contrats et runbooks de release. `aphrody-ui` appartient à son agent : ne    pas l'inspecter ni le modifier.
 2. Relever branches, SHAs, arbres Git, lockfiles, versions upstream/publiées,
    workflows et release active. Revalider scopes, intents et interactions dans
    la [documentation officielle Discord](https://docs.discord.com/developers/topics/oauth2)
@@ -140,13 +128,8 @@ n'est qu'une preuve du parcours de développement actuel.
 | Aphrody AI     | Raccorder notifications et transport partagé au client Rust via interface explicite; laisser logique agent et secrets chez AI.                                                                                                                                                             | Tests de contrats et notification en guilde de test.                              |
 | RG et Achilléa | Revérifier les audits dans [`docs/architecture/discord/architecture/upstreams`](../../architecture/discord/architecture/README.md); remplacer connexions et REST dupliqués, garder files, données et commandes métier.                                                                                                                | Une pile par bot, CI locale et smoke de guilde.                                   |
 | NIE Wunderbot  | Vérifier qu'une application actuelle existe; l'audit n'attestait qu'un paquet historique.                                                                                                                                                                                                  | Migration si code actif, sinon `NON_FAIT` motivé.                                 |
-| Shenron        | Résoudre les cinq workspaces externes avec versions publiées/pinnées ou clôture de sources explicite en CI/release; retirer le couplage Turbo externe. Unifier Discord.js, réparer `@discordjs/collection`, les tests BXC et la fixture. Régénérer les entrées après commande/event/guard. | `bun ci`, audits, typecheck, lint, tests stricts et smoke depuis checkout vierge. |
 
-Shenron garde son bot Bun/TypeScript, ses données et API éditoriales. Réparer
-les attentes BXC selon le contrat présent; ne pas réintroduire un ancien
-bridge pour satisfaire un test périmé. Actualiser ou retirer
-`../shenron/PLAN-BOT-SHENRON.md` quand la migration y est reflétée. Ne pas
-toucher `aphrody-ui` dans cette campagne.
+Réparer les attentes BXC selon le contrat présent; ne pas réintroduire un ancien bridge pour satisfaire un test périmé. Ne pas toucher `aphrody-ui` dans cette campagne.
 
 **Sortie :** chaque consommateur actif utilise une version ou un SHA traçable,
 ses gates passent et aucun runtime ne dépend d'un checkout frère implicite.
@@ -164,10 +147,6 @@ Les facades provisoires ont des usages mesurés et une échéance de retrait.
    préconditions de l'adaptateur Infra : checksums, secrets hors release,
    rollback. Tester d'abord la guilde de développement, puis santé Gateway,
    interactions signées, commandes, OAuth, renouvellement TLS et journaux.
-3. Bâtir Shenron site et bot depuis une source propre alignée sur les paquets
-   Discord. Activer avec l'adaptateur immutable Infra; vérifier SHA actif,
-   unités, HTTPS, commandes et retour arrière. Ne jamais déduire la production
-   du SHA de `main`. Laisser sauvegardes et données sous politique Infra.
 4. Étendre RG/AI après leurs gates et smokes isolés. Publier notes de version,
    matrice des capacités et sondes. Revenir à la release précédente si santé
    ou commandes échouent, puis corriger avant une nouvelle activation.
@@ -191,9 +170,7 @@ bun run build:typedoc
 bun run build
 bun run test
 
-# shenron, après résolution reproductible des dépendances Discord
 bun ci
-bun --filter @shenron/bot gen:entries
 bun run check:catalog
 bun run deps:dedupe:check
 bun run check:packages --strict
@@ -216,8 +193,6 @@ script de déploiement depuis un chemin ou un état supposé.
   verts, exports et licences valides, une pile Discord par application.
 - **Sécurité :** scopes liés à du code testé; OAuth, interactions, permissions,
   secrets et erreurs couverts; profil production distinct de la guilde admin.
-- **Consommateurs :** AI, RG/Achilléa et Shenron actifs migrés et vérifiés;
-  NIE classé selon son code présent. Aucun dossier frère requis implicitement.
 - **Exploitation :** artefacts immuables, SHA actif, sondes réelles, rollback
   vérifié et propriété Infra respectée.
 

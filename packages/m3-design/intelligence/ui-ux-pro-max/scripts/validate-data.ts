@@ -107,7 +107,6 @@ export const STACK_OFFICIAL_HOSTS: Record<string, Set<string>> = {
   "html-tailwind": new Set(["tailwindcss.com"]),
   shadcn: new Set(["ui.shadcn.com"]),
   m3: new Set(["m3.material.io", "material-web.dev", "github.com", "base-ui.com"]),
-  "rg-ui": new Set(["github.com", "ui.shadcn.com", "base-ui.com", "tailwindcss.com", "nextjs.org"]),
   nuxtjs: new Set(["nuxt.com"]),
   "nuxt-ui": new Set(["ui.nuxt.com"]),
   "react-native": new Set(["reactnative.dev", "react.dev"]),

@@ -2,10 +2,8 @@
 /**
  * Profile management & multi-account credential resolution for OVHcloud.
  *
- * Reconciles the three segregated accounts and domain sets on the Aphrody infrastructure:
+ * Resolves the segregated accounts and domain sets of the Aphrody infrastructure:
  *  - aphrody.com: aphrody.com (host secret file, env vars)
- *  - rosegriffon.fr: rosegriffon.fr (~/.ovh.conf)
- *  - dragonballfr.com: dragonballfr.com (~/.config/ovh/dbfr.conf)
  *
  * Authentication priority: OAuth2 service account from the environment (OVH_CLIENT_ID /
  * OVH_CLIENT_SECRET), then `client_id` / `client_secret` of a profile file, then the legacy
@@ -36,20 +34,6 @@ export const KNOWN_PROFILES: Record<string, ProfileDefinition> = {
     region: "ovh-eu",
     domains: ["aphrody.com"],
     candidatePaths: [join(homedir(), ".bash_secrets"), join(homedir(), ".config", "ovh", "aphrody.conf")],
-  },
-  "rosegriffon.fr": {
-    id: "rosegriffon.fr",
-    name: "Rose Griffon (rosegriffon.fr)",
-    region: "ovh-eu",
-    domains: ["rosegriffon.fr"],
-    candidatePaths: [join(homedir(), ".ovh.conf"), join(homedir(), ".config", "ovh", "rosegriffon.conf")],
-  },
-  "dragonballfr.com": {
-    id: "dragonballfr.com",
-    name: "Dragon Ball FR (dragonballfr.com)",
-    region: "ovh-eu",
-    domains: ["dragonballfr.com"],
-    candidatePaths: [join(homedir(), ".config", "ovh", "dbfr.conf"), "/etc/letsencrypt/ovh-dbfr.ini"],
   },
 };
 
@@ -137,8 +121,6 @@ function matchProfile(profileOrDomain?: string): ProfileDefinition | undefined {
     if (prof.domains.some(d => d === target || target.endsWith(`.${d}`))) return prof;
   }
   if (target === "aphrody" || target === "vps") return KNOWN_PROFILES["aphrody.com"];
-  if (target === "rosegriffon" || target === "rg") return KNOWN_PROFILES["rosegriffon.fr"];
-  if (target === "dbfr" || target === "dragonball") return KNOWN_PROFILES["dragonballfr.com"];
   return undefined;
 }
 

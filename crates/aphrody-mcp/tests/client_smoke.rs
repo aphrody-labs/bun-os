@@ -134,7 +134,7 @@ fn client_loader_returns_empty_on_missing_file() {
 /// The standard 2026 MCP lifecycle is stateless: discovery and tools/list both
 /// carry their own protocol/client metadata and need no `initialize` request.
 #[tokio::test]
-async fn stateless_mcp_discovers_and_lists_the_full_shenron_catalog() {
+async fn stateless_mcp_discovers_and_lists_the_full_catalog() {
     let mut child = Command::new(aphrody_bin())
         .arg("mcp-server")
         .stdin(Stdio::piped())
@@ -213,11 +213,6 @@ async fn stateless_mcp_discovers_and_lists_the_full_shenron_catalog() {
         .filter_map(|tool| tool["name"].as_str())
         .collect();
     assert!(!names.is_empty(), "stateless tools/list returned no tools");
-    // The Dragon Ball tools are served by shenron-mcp (aphrody-labs/shenron), not this server.
-    assert!(
-        !names.iter().any(|name| name.starts_with("dragonball.")),
-        "dragonball.* tools must not be served by aphrody-mcp"
-    );
     for tool in tools {
         let name = tool["name"].as_str().unwrap_or_default();
         assert!(

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-/* Shenron's live --dbz-* palette drives the reader, including /admin/design overrides. */
+/* The host site's live --dbz-* palette drives the reader, including its design overrides. */
 .m3-reader--dragon-ball.m3-reader,
 .m3-reader--dragon-ball .m3-reader {
   --reader-surface: var(--dbz-bg, #0a0a0a);

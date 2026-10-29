@@ -4,7 +4,7 @@
 //!
 //! `/mcp` exposes every tool of the server, so it never answers without a token. The token is read once at start from
 //! the process environment (a systemd `EnvironmentFile` on a host, never the repository): `APHRODY_MCP_HTTP_TOKEN`, else
-//! the AI HTTP token (`APHRODY_AI_HTTP_TOKEN`, alias `APHRODY_SHENRON_API_TOKEN`) so a deployment that already injects
+//! the AI HTTP token (`APHRODY_AI_HTTP_TOKEN`) so a deployment that already injects
 //! `Authorization: Bearer <that token>` in front of the listener keeps working. The dedicated name scopes `/mcp` apart from
 //! the REST gateway. A missing or too short token is fail-closed (503), a wrong or absent header is 401, the comparison is
 //! constant time. `/healthz` and the REST routes are outside this layer and keep their own rules.
@@ -196,10 +196,6 @@ mod tests {
         );
         assert_eq!(
             resolve_token(&lookup(&[("APHRODY_AI_HTTP_TOKEN", TOKEN)])),
-            Ok(Some(TOKEN.to_owned()))
-        );
-        assert_eq!(
-            resolve_token(&lookup(&[("APHRODY_SHENRON_API_TOKEN", TOKEN)])),
             Ok(Some(TOKEN.to_owned()))
         );
     }

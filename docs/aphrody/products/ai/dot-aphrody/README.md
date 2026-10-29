@@ -43,7 +43,6 @@ Resolution order ([`aphrody-agent-home`](../../../../../crates/aphrody-agent-hom
 | --- | --- |
 | `workspace/` | default |
 | `workspace-azalee/` | Azalée (+ `.coord/` A2A JSONL) |
-| `workspace-shenron/` | Shenron |
 | `workspace-debug/` | debug |
 
 ### Per-workspace files

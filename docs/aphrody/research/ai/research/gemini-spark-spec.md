@@ -28,16 +28,12 @@
    - 4.2 [Spécification RFC 9728 (OAuth 2.0 Protected Resource Metadata)](#42-spécification-rfc-9728-oauth-20-protected-resource-metadata)
    - 4.3 [Spécification RFC 8414 (OAuth 2.0 Authorization Server Metadata)](#43-spécification-rfc-8414-oauth-20-authorization-server-metadata)
    - 4.4 [Schéma de Nommage Google des Client IDs User-Bound](#44-schéma-de-nommage-google-des-client-ids-user-bound)
-5. [Étude de Cas Réelle : Le Connecteur `shenron-gemini-spark` (Dragon Ball FR)](#5-étude-de-cas-réelle--le-connecteur-shenron-gemini-spark-dragon-ball-fr)
-   - 5.1 [Architecture du Serveur `apps/mcp` (not in repo)](#51-architecture-du-serveur-appsmcp)
-   - 5.2 [Surface d'Outils Publics vs Admin Protégée](#52-surface-doutils-publics-vs-admin-protégée)
-   - 5.3 [Fiche de Configuration Gemini Spark du Serveur](#53-fiche-de-configuration-gemini-spark-du-serveur)
-6. [Exploration du Code Source Existant & Points de Convergence](#6-exploration-du-code-source-existant--points-de-convergence)
-   - 6.1 [Crate `crates/ai/mcp` (`aphrody-mcp`)](#61-crate-cratesgoogle_mcp-aphrody-mcp)
-   - 6.2 [Crate `crates/google/gemini-runtime`](#62-crate-cratesgemini-runtime)
-   - 6.3 [Crate `crates/google/antigravity`](#63-crate-cratesantigravity-sdk)
-   - 6.4 [Blueprint de Convergence & Passerelle Unifiée](#64-blueprint-de-convergence--passerelle-unifiée)
-7. [Références Normatives, Spécifications & URLs](#7-références-normatives-spécifications--urls)
+5. [Exploration du Code Source Existant & Points de Convergence](#5-exploration-du-code-source-existant--points-de-convergence)
+   - 5.1 [Crate `crates/ai/mcp` (`aphrody-mcp`)](#51-crate-cratesgoogle_mcp-aphrody-mcp)
+   - 5.2 [Crate `crates/google/gemini-runtime`](#52-crate-cratesgemini-runtime)
+   - 5.3 [Crate `crates/google/antigravity`](#53-crate-cratesantigravity-sdk)
+   - 5.4 [Blueprint de Convergence & Passerelle Unifiée](#54-blueprint-de-convergence--passerelle-unifiée)
+6. [Références Normatives, Spécifications & URLs](#6-références-normatives-spécifications--urls)
 
 ---
 
@@ -249,13 +245,10 @@ Format du manifeste d'extension (évolution de `gemini-extension.json` vers `plu
   "description_for_model": "Plugin for accessing canonical Dragon Ball lore, databooks and wiki.",
   "auth": {
     "type": "oauth",
-    "client_url": "https://mcp.dragonballfr.com/oauth/authorize",
     "scope": "admin",
-    "authorization_url": "https://mcp.dragonballfr.com/oauth/token"
   },
   "api": {
     "type": "openapi",
-    "url": "https://mcp.dragonballfr.com/openapi.json"
   }
 }
 ```
@@ -328,7 +321,6 @@ Publiée en **avril 2025** par l'IETF (M.B. Jones, P. Hunt, A. Parecki), la **RF
 Lorsqu'un client non authentifié contacte le serveur MCP, le serveur doit renvoyer une réponse HTTP 401 portant l'en-tête :
 ```http
 HTTP/1.1 401 Unauthorized
-WWW-Authenticate: Bearer resource_metadata="https://mcp.dragonballfr.com/.well-known/oauth-protected-resource"
 ```
 
 #### 2. Format de l'URL Well-Known (Section 3.1)
@@ -337,9 +329,7 @@ L'URL de métadonnées est construite en insérant `/.well-known/oauth-protected
 #### 3. Schéma JSON de Réponse (`application/json`) (Section 2)
 ```json
 {
-  "resource": "https://mcp.dragonballfr.com/mcp",
   "authorization_servers": [
-    "https://mcp.dragonballfr.com"
   ],
   "bearer_methods_supported": [
     "header"
@@ -347,10 +337,6 @@ L'URL de métadonnées est construite en insérant `/.well-known/oauth-protected
   "scopes_supported": [
     "admin"
   ],
-  "resource_name": "Shenron Dragon Ball MCP",
-  "resource_documentation": "https://mcp.dragonballfr.com/",
-  "resource_policy_uri": "https://mcp.dragonballfr.com/policy",
-  "resource_tos_uri": "https://mcp.dragonballfr.com/tos",
   "dpop_bound_access_tokens_required": false,
   "tls_client_certificate_bound_access_tokens": false
 }
@@ -374,9 +360,6 @@ La RFC 8414 permet au client de découvrir dynamiquement les capacités de l'Aut
 #### Schéma de Réponse
 ```json
 {
-  "issuer": "https://mcp.dragonballfr.com",
-  "authorization_endpoint": "https://mcp.dragonballfr.com/oauth/authorize",
-  "token_endpoint": "https://mcp.dragonballfr.com/oauth/token",
   "response_types_supported": ["code"],
   "grant_types_supported": ["authorization_code", "client_credentials", "refresh_token"],
   "token_endpoint_auth_methods_supported": ["client_secret_post", "client_secret_basic"],
@@ -399,87 +382,32 @@ user_bound_custom-mcp-<google_gaia_id>-<sanitized_domain>
 #### Décomposition des Composants
 1. **`user_bound_custom-mcp-`** : Préfixe obligatoire indiquant que le connecteur est restreint au compte Google propriétaire de la session agentique.
 2. **`<google_gaia_id>`** : Identifiant numérique unique du compte Google (GAIA ID / champ `sub` du jeton OpenID, ex: `101187968385849974848`).
-3. **`<sanitized_domain>`** : Nom de domaine cible du serveur MCP, où les points (`.`) et tirets sont substitués par des underscores (`_`) (ex: `mcp_dragonballfr_com` pour `mcp.dragonballfr.com`).
 
 #### Exemple Concret Vérifié
 ```
-user_bound_custom-mcp-101187968385849974848-mcp_dragonballfr_com
 ```
 
 #### Variantes Dédiées / Statiques
 Pour des intégrations de production ou des serveurs d'entreprise pré-enregistrés, Gemini Spark accepte également des identifiants statiques explicites, tels que :
 ```
-shenron-gemini-spark
 ```
 
 ---
 
-## 5. Étude de Cas Réelle : Le Connecteur `shenron-gemini-spark` (Dragon Ball FR)
-
-Le déploiement en production sur le serveur distant `dbfr` (`51.255.162.6`) illustre l'implémentation complète de cette architecture.
-
-### 5.1 Architecture du Serveur `apps/mcp` (not in repo)
-
-Le service MCP Dragon Ball FR est développé en TypeScript / Bun (`apps/mcp/src/index.ts` (not in repo)) :
-- **Framework :** `@modelcontextprotocol/sdk` (`McpServer`).
-- **Transport :** `WebStandardStreamableHTTPServerTransport` (natif Bun, sans `node:http`).
-- **Stateless pur :** Une instance serveur et transport neuve par requête HTTP (`sessionIdGenerator: undefined`, `enableJsonResponse: true`).
-- **Passerelle Nginx :** Terminaison TLS sur `https://mcp.dragonballfr.com/mcp`, configuration CORS complète (`Access-Control-Allow-Origin: *`, `mcp-session-id`, `mcp-protocol-version`).
-
-### 5.2 Surface d'Outils Publics vs Admin Protégée
-
-Le serveur implémente une isolation stricte des privilèges :
-
-#### 1. Outils Publics (19 outils, en lecture seule)
-Accessibles sans authentification (`readOnlyHint: true`) :
-- `rag_search`, `rag_ask` : Recherche hybride (BM25 + embeddings denses `pgvector` + rerank).
-- `sources`, `data_coverage` : Télémétrie du corpus et métriques de couverture.
-- `wiki_search`, `wiki_list`, `wiki_get` : Entités encyclopédiques structurées.
-- `manga_search`, `manga_tomes`, `manga_page` : Corpus manga OCR.
-- `databooks_search`, `databooks_get` : Databooks avec transcriptions japonaises.
-- `canon_check`, `canon_references` : Arbitre de canonicité Toriyama en 5 rangs.
-- `bot_stats`, `bot_personas`, `bot_leaderboard`, `bot_commands`, `news`.
-
-#### 2. Outils d'Administration Déverrouillés par OAuth (7 outils)
-Déverrouillés uniquement si un jeton Bearer valide (`MCP_ADMIN_TOKEN` ou jeton émis via `/oauth/token`) est fourni :
-- `admin_databooks_deposit` : Dépôt sécurisé de transcriptions validées.
-- `admin_bot_commands`, `admin_bot_command_execute` : Pilotage du bot Discord.
-- `admin_services`, `admin_service_action` : Gestion du cycle de vie systemd sur `dbfr`.
-- `admin_aphrody_doctor`, `admin_aphrody_git` : Diagnostic et synchronisation de code.
-
-### 5.3 Fiche de Configuration Gemini Spark du Serveur
-
-Pour raccorder Gemini Spark à `mcp.dragonballfr.com` avec privilèges complets :
-
-| Paramètre | Valeur de Configuration |
-|---|---|
-| **Server URL** | `https://mcp.dragonballfr.com/mcp` |
-| **Authentication** | `OAuth 2.0` |
-| **Client ID** | `shenron-gemini-spark` *(ou `user_bound_custom-mcp-101187968385849974848-mcp_dragonballfr_com`)* |
-| **Client Secret** | Secret extrait de `/etc/shenron/mcp-admin.env` (`MCP_ADMIN_TOKEN`) |
-| **Authorization URL** | `https://mcp.dragonballfr.com/oauth/authorize` |
-| **Token URL** | `https://mcp.dragonballfr.com/oauth/token` |
-| **Scope** | `admin` |
-| **Découverte RFC 8414** | `https://mcp.dragonballfr.com/.well-known/oauth-authorization-server` |
-| **Découverte OIDC** | `https://mcp.dragonballfr.com/.well-known/openid-configuration` |
-| **Découverte RFC 9728** | `https://mcp.dragonballfr.com/.well-known/oauth-protected-resource` |
-
----
-
-## 6. Exploration du Code Source Existant & Points de Convergence
+## 5. Exploration du Code Source Existant & Points de Convergence
 
 Notre monorepo dispose de trois briques logicielles majeures écrites en Rust qui convergent pour former la passerelle unifiée vers Gemini Spark.
 
-### 6.1 Crate `crates/ai/mcp` (`aphrody-mcp`)
+### 5.1 Crate `crates/ai/mcp` (`aphrody-mcp`)
 
 - **Binaire produit :** `aphrody-mcp` (6.5 Mo, compilation pure Rust).
 - **Architecture :** Construit sur le framework `rmcp` avec macro `#[tool_router]`.
 - **Mode Double (Serveur & Client) :**
   - **Serveur stdio :** Expose les outils système de la machine locale (`screen_capture`, `bxc_fetch`, `re_triage`, `firefly_generate`, `photoshop_live_*`).
   - **Client MCP (`client_cmd.rs`) :** Permet à `aphrody-mcp` d'agir en client pour sonder (`probe`), lister (`list`) ou invoquer (`call`) des serveurs tiers via `gemini_runtime::McpClient`.
-- **Toolbox feature-gated :** `--features toolbox` active les modules `ocr` (PP-OCRv5 ONNX + llama.cpp), `vision` (Florence-2), `stt-local` (Whisper), `jobs` (queue SQLite) et `dbfr`.
+- **Toolbox feature-gated :** `--features toolbox` active les modules `ocr` (PP-OCRv5 ONNX + llama.cpp), `vision` (Florence-2), `stt-local` (Whisper), `jobs` (queue SQLite).
 
-### 6.2 Crate `crates/google/gemini-runtime`
+### 5.2 Crate `crates/google/gemini-runtime`
 
 - **Rôle :** Adaptateur d'exécution du CLI Gemini et client MCP universel.
 - **Client MCP Réutilisable (`mcp_client.rs`) :**
@@ -497,7 +425,7 @@ Notre monorepo dispose de trois briques logicielles majeures écrites en Rust qu
   - `ToolRegistry` et trait polymorphe `Tool`.
   - `McpProxyTool` : Emballe n'importe quel outil MCP (distant ou local) pour le rendre immédiatement appelable dans la boucle d'inférence de Gemini CLI.
 
-### 6.3 Crate `crates/google/antigravity`
+### 5.3 Crate `crates/google/antigravity`
 
 - **Rôle :** SDK natif Rust pour l'environnement Antigravity et l'inférence Cloud Code / Vertex AI.
 - **Authentification Keyless Windows :**
@@ -516,7 +444,7 @@ Notre monorepo dispose de trois briques logicielles majeures écrites en Rust qu
 
 ---
 
-### 6.4 Blueprint de Convergence & Passerelle Unifiée
+### 5.4 Blueprint de Convergence & Passerelle Unifiée
 
 La convergence de ces trois composants établit une passerelle bidirectionnelle transparente :
 
@@ -535,11 +463,11 @@ La convergence de ces trois composants établit une passerelle bidirectionnelle 
         │                                                        │
         ▼ Local stdio                                            ▼ Remote Streamable HTTP
 ┌───────────────────────────────┐        ┌───────────────────────────────┐
-│     crates/aphrody-mcp         │        │    Remote Service: dbfr       │
-│     (aphrody-mcp.exe)         │        │    (https://mcp.dragonballfr) │
-│  • Screen capture, Vision     │        │  • 19 outils RAG / Wiki DBFR  │
-│  • OCR ONNX / Whisper STT     │        │  • 7 outils admin (OAuth)     │
-│  • Forensics / Reverse Eng.   │        └───────────────────────────────┘
+│     crates/aphrody-mcp         │        │    Remote MCP service         │
+│     (aphrody-mcp.exe)         │        │    (https://mcp.example.com)  │
+│  • Screen capture, Vision     │        │  • Outils distants (OAuth)    │
+│  • OCR ONNX / Whisper STT     │        └───────────────────────────────┘
+│  • Forensics / Reverse Eng.   │
 └───────▲───────────────────────┘
         │
         │ In-Process Link via ToolRegistry & McpProxyTool
@@ -567,7 +495,7 @@ La convergence de ces trois composants établit une passerelle bidirectionnelle 
 
 ---
 
-## 7. Références Normatives, Spécifications & URLs
+## 6. Références Normatives, Spécifications & URLs
 
 ### 1. Spécifications IETF (Standards Track)
 - **RFC 9728 :** *OAuth 2.0 Protected Resource Metadata* (Avril 2025)  
@@ -605,7 +533,6 @@ La convergence de ces trois composants établit une passerelle bidirectionnelle 
 ### 4. Dépôts & Artefacts Internes Associés
 - **Reverse-Engineering Antigravity IDE :** [antigravity-ide-re.md](./antigravity-ide-re.md)
 - **Audit Web Scrape Gemini Spark :** [historical snapshot](https://github.com/aphrody-code/aphrody-ai/blob/51c8502949c420b9c8d4945fef0a63dcf2aaea33/docs/audits/gemini-web-scrape.md)
-- **Serveur MCP Dragon Ball FR :** `~/shenron/apps/mcp/src/index.ts`
 - **Crates Cœur Aphrody :**
   - [crates/aphrody-mcp](../../../products/ai/crates/aphrody-mcp)
   - crates/aphrody-gemini-runtime

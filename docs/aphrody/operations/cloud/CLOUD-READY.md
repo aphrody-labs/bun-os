@@ -2,7 +2,7 @@
 # Cloud-ready setup, end to end
 
 One procedure for GitHub, Claude Code cloud sessions, the two VPS (`vps`, `dbfr`) and WSL, with no human in the
-loop. Applies to `aphrody-labs/{aphrody,vu,shenron,bun}`; Yolo ships from the aphrody monorepo.
+loop. Applies to `aphrody-labs/{aphrody,vu,bun}`; Yolo ships from the aphrody monorepo.
 
 ## Per-repository hooks (committed, secret-free)
 
@@ -10,7 +10,6 @@ loop. Applies to `aphrody-labs/{aphrody,vu,shenron,bun}`; Yolo ships from the ap
 | --- | --- | --- |
 | aphrody | `session-start.sh` (pinned Bun, `bun install`, `cloud-setup.sh`), `cloud-ssh.sh`, `session-start.ts` | `.claude/hooks/`, `scripts/dev/` |
 | vu | `cloud-setup.sh`, `cloud-ssh.sh`, `session-start.ts` | `scripts/dev/` |
-| shenron | `cloud-setup.sh`, `cloud-ssh.sh`, `session-start.ts` | `scripts/dev/` |
 | bun fork | `cloud-ssh.sh`, `session-start.ts` (builds go to the VPS factory) | `scripts/dev/` |
 
 All hooks are idempotent, tolerant (exit 0) and do nothing outside a cloud session except `session-start.ts`, which
@@ -31,7 +30,6 @@ secrets: never commit them, never print them.
 | `APHRODY_DOWNLOAD_BASE` | optional: `https://downloads.aphrody.com`, installs the released `aphrody` and `yolo` |
 | `GH_TOKEN` | GitHub token for `gh` and HTTPS pushes (`cloud-ssh.sh` sets the identity and the credential helper) |
 
-`SHENRON_SSH_KEY_B64`, `SHENRON_VPS_HOST`, `SHENRON_DBFR_HOST` and `SHENRON_SSH_USER` remain accepted.
 `cloud-ssh.sh` writes the `vps`, `dbfr` and `wsl` aliases in `~/.ssh/config` so `aphrody infra ssh exec --host <alias>`
 and `ssh <alias>` work as on the owner machine.
 
@@ -101,9 +99,9 @@ reachability, push remote) and exits non-zero on a missing required item. Sessio
   repository it enables delete-branch-on-merge, auto-merge, update-branch, Dependabot alerts and security updates.
   `.github/dependabot.yml` keeps the workflow actions current weekly.
 - Hosts (`vps`, `dbfr`): `aphrody-selfheal.timer` (units in `tools/config/host/systemd/aphrody/`, installed on both)
-  runs every 5 minutes: clears failed units whose file is gone, restarts failed `aphrody-*`, `shenron-*`, `nie-*`,
-  `rg-*` services (not `shenron-cdn-sync`, a long one-shot), vacuums the journal and apt cache above 85 % disk.
-  Unattended upgrades, certbot, log rotation and the Shenron backup/pull timers were already active.
+  runs every 5 minutes: clears failed units whose file is gone, restarts failed `aphrody-*`, `nie-*`
+  services, vacuums the journal and apt cache above 85 % disk.
+  Unattended upgrades, certbot, log rotation and backup timers were already active.
 
 ## Browser automation (Aphrody Web, live sites)
 

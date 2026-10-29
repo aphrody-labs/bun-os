@@ -367,7 +367,7 @@ impl SystemdSupervisor for ServiceManager {
     }
 }
 
-/// Controller for the host Linux systemd init system (e.g. on production VPS or DBFR).
+/// Controller for the host Linux systemd init system (e.g. on a production VPS).
 #[derive(Debug, Default, Clone)]
 pub struct HostSystemdBackend {
     /// Whether to scope commands to the user session (`systemctl --user`).

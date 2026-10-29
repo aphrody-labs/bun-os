@@ -4,7 +4,7 @@
  *
  * Provides type-safe, zero-hardcoding bilingual localization (EN/FR)
  * mapped to the real Aphrody OS backend capabilities (FFI, CLI, App-Server,
- * OS Kernel, Drive, Koharu, Shenron, Shell).
+ * OS Kernel, Drive, Koharu, Shell).
  */
 import enCatalog from "./locales/en.json";
 import frCatalog from "./locales/fr.json";

@@ -2,14 +2,14 @@
 
 - **Name:** `aphrody-labs/aphrody-m3` is the single design and UI repository (private). No separate `aphrody-design` or `aphrody-ui` repo.
 - **Layout:** `packages/` (m3-*, app-ui, scaffold, material-design-icons, m3-mcp), `forks/` (submodules: tailwindcss, base-ui, material-web, material-color-utilities, material-design-icons), `templates/` (base, web, desktop, react, elysia, hono), `examples/`, `docs/` (including `research/GOOGLE-LINKS.md`).
-- **App UI:** `packages/nie-ui` (submodule `aphrody-labs/nie-ui`) and `packages/shenron-ui`; Aphrody mounts this repo at `m3/` (owner decision, 2026-10-05); other consumers retain their own mount points. Rose Griffon UI source is owned by its external repository and is not a Bun OS workspace package.
+- **App UI:** `packages/nie-ui` (submodule `aphrody-labs/nie-ui`); Aphrody mounts this repo at `m3/` (owner decision, 2026-10-05); other consumers retain their own mount points.
 - **MCP:** `packages/m3-mcp` is the only design MCP (10 tools, including `m3_os_themes_list` and `m3_os_themes_generate`); the Claude plugin `aphrody-m3` launches it.
 - **Icons:** `bun packages/material-design-icons/scripts/svg-to-ico.ts <symbol|file.svg> --out src-tauri/icons` produces ICO, ICNS and PNG sets for Tauri apps; `templates/desktop/src-tauri/icons` is generated this way.
 - **Ownership split:** Bun FFI in yolo (`@aphrody/runtime-sdk/ffi`), Rust in aphrody, systemd/nginx/host config in yolo `config/host`.
 
 ## Standalone install (2026-10-04)
 
-This repository's own workspace manifest and lockfile define its install graph. Packages bound to host workspaces (`app-ui`, `shenron-ui`, `web-to-tauri`) are excluded here and resolve from the host monorepo (Aphrody) that mounts this repo at `m3/`.
+This repository's own workspace manifest and lockfile define its install graph. Packages bound to host workspaces (`app-ui`, `web-to-tauri`) are excluded here and resolve from the host monorepo (Aphrody) that mounts this repo at `m3/`.
 
 ## Complete framework (2026-10-04)
 

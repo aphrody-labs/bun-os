@@ -3,7 +3,7 @@
 //! legacy `message/send` JSON-RPC params used on the `/a2a` endpoint, the peer
 //! roster, and machine-readable JSON Schemas for all of them.
 //!
-//! These contracts are shared by `aphrody`, `aphrody-infra` and `shenron`.
+//! These contracts are shared by `aphrody` and `aphrody-infra`.
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -18,7 +18,7 @@ pub const FLEET_MESSAGE_SEND: &str = "message/send";
 pub const ENVELOPE_VERSION: u32 = 1;
 
 /// Known fleet peers.
-pub const PEERS: [&str; 6] = ["shenron", "codex", "agycli", "claude", "ocr", "rag"];
+pub const PEERS: [&str; 5] = ["codex", "agycli", "claude", "ocr", "rag"];
 
 /// Returns true when `name` is a known fleet peer.
 #[must_use]
@@ -284,7 +284,7 @@ mod tests {
 
     #[test]
     fn envelope_roundtrip_matches_wire_format() {
-        let wire = r#"{"v":1,"ts":"2026-09-14T12:00:00Z","id":"env-1","from":"codex","to":"shenron","kind":"ask","topic":"t","body":"b","re":"env-0","channel_hint":["file_jsonl","http_jsonrpc"]}"#;
+        let wire = r#"{"v":1,"ts":"2026-09-14T12:00:00Z","id":"env-1","from":"codex","to":"claude","kind":"ask","topic":"t","body":"b","re":"env-0","channel_hint":["file_jsonl","http_jsonrpc"]}"#;
         let env: CoordEnvelope = serde_json::from_str(wire).unwrap();
         assert_eq!(env.kind, EnvelopeKind::Ask);
         env.validate().unwrap();

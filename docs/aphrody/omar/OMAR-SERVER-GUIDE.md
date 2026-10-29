@@ -72,7 +72,7 @@ Le build WebOS s'exécute dans `server/apps/bun-webos`. Le démarrage automatiqu
 - Le passthrough GPU de Docker VMM pour vLLM n'est pas qualifié.
 - Wayland n'est pas fourni comme serveur d'affichage Windows.
 - Une compilation locale Bun est distincte d'une publication distante de release.
-- Le proxy Japon est réservé aux consommateurs Aphrody Web/Shenron; il ne change pas la route globale du PC.
+- Le proxy Japon est réservé aux consommateurs Aphrody Web; il ne change pas la route globale du PC.
 
 ## Secrets et sécurité
 

@@ -400,7 +400,7 @@
       "role": "dependency",
       "license": "MIT OR Apache-2.0",
       "patches": [],
-      "note": "ML base crates of Koharu 0.83.5 (tag 0.83.5, commit 52bb4f55e2266f72c1523562a583c827ec191ceb) (bindgen, config, runtime, llama, llama-sys, torch, torch-sys, diffusion, diffusion-sys) integrated under crates/ml as aphrody-* packages: crates.io holds older koharu-* releases under the upstream names. Divergence from the tag is not yet audited, so no patch is recorded. On-disk contracts kept: ~/.koharu/config.toml, the `koharu` runtime store and the libkoharu-torch shim of koharu-rs/torch releases. The Koharu product crates live in aphrody-labs/shenron.",
+      "note": "ML base crates of Koharu 0.83.5 (tag 0.83.5, commit 52bb4f55e2266f72c1523562a583c827ec191ceb) (bindgen, config, runtime, llama, llama-sys, torch, torch-sys, diffusion, diffusion-sys) integrated under crates/ml as aphrody-* packages: crates.io holds older koharu-* releases under the upstream names. Divergence from the tag is not yet audited, so no patch is recorded. On-disk contracts kept: ~/.koharu/config.toml, the `koharu` runtime store and the libkoharu-torch shim of koharu-rs/torch releases.",
       "integratedPath": "crates/ml/llama",
       "upstreamPackageIdentityPreserved": false
     },

@@ -63,9 +63,9 @@ export const LEGACY_STREAMING_METHODS: ReadonlySet<string> = new Set(["message/s
 
 /** How outgoing (downgraded) payloads are written. Incoming payloads accept both spellings. */
 export interface LegacyProfile {
-  /** Member that names the type of a part or an event: `kind` (A2A 0.3) or `type` (Shenron hub). */
+  /** Member that names the type of a part or an event: `kind` (A2A 0.3) or `type` (hub dialect). */
   discriminator: "kind" | "type";
-  /** `input-required` (A2A 0.3) or `input_required` (Shenron hub). */
+  /** `input-required` (A2A 0.3) or `input_required` (hub dialect). */
   stateStyle: "kebab" | "snake";
   /** `message/send` result: the task or message itself (A2A 0.3), or the hub's `{taskId, status, response, task}`. */
   sendResult: "a2a" | "hub";
@@ -77,8 +77,8 @@ export const A2A_03_PROFILE: LegacyProfile = {
   stateStyle: "kebab",
   sendResult: "a2a",
 };
-/** Wire dialect of the former Shenron A2A hub. */
-export const SHENRON_HUB_PROFILE: LegacyProfile = {
+/** Wire dialect of the pre-1.0 snake-case A2A hub. */
+export const HUB_PROFILE: LegacyProfile = {
   discriminator: "type",
   stateStyle: "snake",
   sendResult: "hub",
@@ -637,7 +637,7 @@ function rpcError(id: LegacyRpcResponse["id"], code: number, message: string, da
  * Serve legacy JSON-RPC requests from an A2A 1.0 agent. One `LegacyBridge` per upstream client:
  *
  * ```ts
- * const bridge = new LegacyBridge(await A2AClient.connect(url), { profile: SHENRON_HUB_PROFILE });
+ * const bridge = new LegacyBridge(await A2AClient.connect(url), { profile: HUB_PROFILE });
  * const reply = await bridge.handle(await request.json()); // legacy in, legacy out
  * ```
  *

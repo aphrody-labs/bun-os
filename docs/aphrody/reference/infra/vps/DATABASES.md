@@ -28,17 +28,13 @@ socket and loopback TCP only; the local `ubuntu` role uses `peer` authentication
 |---|---|---|
 | `aphrody_web` | `aphrody-site` and the BXC Web API (Web rankings, SEO) | `APHRODY_WEB_DATABASE_URL` |
 | `aphrody` | `aphrody-ai-http` RAG (`aphrody rag web-ingest`, `search`, `stats`) | `APHRODY_MCP_DATABASE_URL` |
-| RG databases | `rg-api`, `rg-bot`, `rg-cron` (Better Auth, Drizzle ORM) | defined by the `rg` release environment |
-| `shenron_site` | Shenron site and bot, on `dbfr`, reached through `shenron-pg-tunnel` | see [`docs/reference/infra/SHENRON-MIGRATION.md`](../SHENRON-MIGRATION.md) |
 
 DSNs live in the root-owned `/etc/<plane>/*.env` files (mode `0600`). The relationships between
 the Web and AI databases are described in [`docs/reference/infra/TOPOLOGY.md`](../TOPOLOGY.md).
 
 ## 2. Redis
 
-`redis-server.service` on loopback, without a password for local clients. RG Discord services use
-it for the offline queue, distributed locks and transient Discord state (dedicated logical
-database); Shenron keys are prefixed `dbz:*`. Redis is a cache: nothing in it is the only copy of
+`redis-server.service` on loopback, without a password for local clients. Redis is a cache: nothing in it is the only copy of
 application data, and it is excluded from the backup data classes unless
 [`tools/config/scheduler-policy.json`](../../../../../tools/aphrody/config/scheduler-policy.json) says otherwise.
 
@@ -65,9 +61,3 @@ Embedded `bun:sqlite` stores for crawl, inference and scraping logs.
   cover URL, timestamp, canonical URL, content hash and each SimHash band.
 - Cookie jars are sensitive runtime state: they are never copied into Git or agent memory
   ([`docs/operations/infra/COOKIE-OPERATIONS.md`](../../../operations/infra/COOKIE-OPERATIONS.md)).
-
-### C. Shenron local caches
-
-Bounded SQLite mirrors in the Shenron shared root (`sharedRoot` of `shenron-site` in the
-catalog), backed up by the Shenron timers under `systemd/`
-(`shenron-backup`, `shenron-sqlite-replica-backup`).

@@ -128,7 +128,7 @@ fn ssh_on_path() -> bool {
         .is_ok_and(|output| output.status.success())
 }
 
-/// `APHRODY_SSH_BIN`: the override `aphrody ssh` and the Shenron scripts already honour.
+/// `APHRODY_SSH_BIN`: the override `aphrody ssh` and the deployment scripts already honour.
 ///
 /// It is authoritative when set, including when it is invalid, so a typo never silently selects
 /// another binary. A bare command name is left to the operating system's `PATH` lookup; a value

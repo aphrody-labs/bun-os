@@ -53,7 +53,7 @@ describe("bun workspace contract", () => {
   test("a qualified fork contract preserves the required fork version", () => {
     const forkRoot = { ...root, packageManager: "bun@1.4.3-aphrody.4" };
     const manifest = {
-      name: "@rosegriffon/db",
+      name: "@fixture/db",
       engines: { bun: ">=1.4.3-aphrody.4" },
     };
     const context = {

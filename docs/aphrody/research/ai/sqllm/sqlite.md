@@ -140,9 +140,7 @@ RRF over the FTS5 and `vec0` CTEs, each with `row_number()`, combined with a
 ## 7. Placement guidance
 
 - **SQLite fits** per-user or per-agent state: memory, local RAG over a
-  repository, job queues, crawl caches, OCR stores and the offline Shenron RAG
-  bundle. It is a single file, has no server, and can be backed up with
-  `VACUUM INTO`.
+It is a single file, has no server, and can be backed up with   `VACUUM INTO`.
 - **Move to PostgreSQL** when several hosts or processes write concurrently,
   when vectors exceed about 10^6, or when you need server-side BM25 plus ANN in
   one query.

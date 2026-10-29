@@ -37,16 +37,14 @@ own repositories.
 | AI                             | [README](../../products/ai/_source/README.md.a7d252bc425b), [index](../../products/ai/_source/README.md), [architecture](../../architecture/ai/ARCHITECTURE.md) |
 | System                         | [README](../../products/os/_source/README.md.712b5622bf2b)                                                                                                      |
 | UI                             | [README](../../../m3/docs/products/_source/README.md.8c1fe132fe5c), [index](../../../m3/docs/products/_source/README.md)                                        |
-| Manga, OCR and databook review | Aphrody manga adapter, Shenron review boundary                                                                                                                  |
+| Manga, OCR and databook review | Aphrody manga adapter                                                                                                                  |
 | Web                            | [README](../../products/web/README.md)                                                                                                                          |
 | Contracts                      | [README](../../products/contracts/README.md), [A2A](../../products/contracts/a2a/README.md)                                                                     |
 | Native                         | [README](../../products/native/README.md)                                                                                                                       |
 | Shell                          | [README](../../products/shell/README.md)                                                                                                                        |
 | Compatibility                  | [README](../../products/compat/README.md)                                                                                                                       |
 | Infrastructure                 | [README](../../products/infra/README.md), [shared integration context](../infra/UNIFIED-AGENT-CONTEXT.md)                                                       |
-| Discord integration            | [aphrody-discord](../../products/discord/README.md), Shenron boundary                                                                                           |
-| RG                             | README                                                                                                                                                          |
-| Shenron                        | README                                                                                                                                                          |
+| Discord integration            | [aphrody-discord](../../products/discord/README.md)                                                                                           |
 | NIE                            | README                                                                                                                                                          |
 | IECODE                         | README                                                                                                                                                          |
 

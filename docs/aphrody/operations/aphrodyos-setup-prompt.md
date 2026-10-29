@@ -15,7 +15,7 @@ Tu es l'agent d'ingénierie système en charge du déploiement, de la compilatio
 2. **Noyau & Runtime AphrodyOS** : `aphrody_ffi` (cdylib), `aphrody-kernel`, agent PC unifié (`aphrody-pc-agent.service`), WinClean desktop broker.
 3. **Crates Rust** : Compilation et validation de toutes les crates first-party (`aphrody`, `aphrody-mcp`, `rag-core`, `obscura`, `ui`, `ffi`).
 4. **Packages Bun / TypeScript** : Installation des dépendances du monorepo, gates `@aphrody/*` (`workspace`, `product`, `discord-kit`, `sql`, `interop-native`, `web`).
-5. **Applications Client & Surfaces Produit** : Application desktop CEF (`tauri-runtime-cef`), canonical UI (`m3/packages/app-ui`), applications Shenron.
+5. **Applications Client & Surfaces Produit** : Application desktop CEF (`tauri-runtime-cef`), canonical UI (`m3/packages/app-ui`).
 6. **Conteneurs Docker** : Déploiement et vérification du projet compose unique de chaque hôte (`~/apps/compose.yaml`), vaults de conteneurs et tunnels PostgreSQL.
 7. **Infrastructure & Services Systemd** : Activation et surveillance des services VPS, DBFR et PC local selon le catalogue d'unités `tools/config/host/systemd/`.
 8. **Maillage Réseau & Agent Home** : Vérification du réseau WireGuard `wg1`, synchronisation RAG / Agent Home (`~/.aphrody/db/aphrody.sqlite`).
@@ -97,12 +97,11 @@ Exécuter les vérifications strictes sur les crates du monorepo :
    ```sh
    docker ps -a
    ```
-2. **Stacks conteneurisées Shenron** :
+2. **Stacks conteneurisées** :
    - Sur les hôtes déclarés (VPS / DBFR), s'assurer de l'état des conteneurs :
      - `aphrody-bot-1` (Gateway Discord, health check OK)
      - `aphrody-site-1` (Site web public et interface)
-3. **Tunnels et Vaults** :
-   - Tunnels PostgreSQL sécurisés (`shenron-pg-tunnel.service`).
+3. **Vaults** :
    - Vault de conteneurs chiffré (`aphrody-container-vault.service`).
 
 ### PHASE 7 : DÉPLOIEMENT INFRASTRUCTURE & SYSTEMD
@@ -149,7 +148,7 @@ Exécuter les vérifications strictes sur les crates du monorepo :
     "rust_crates": { "total": "<n>", "checked": "<n>", "failures": "<n>" },
     "bun_packages": { "status": "PASS", "typecheck": "PASS", "lint": "PASS" },
     "desktop_app": "READY",
-    "docker": { "shenron_bot": "RUNNING", "shenron_site": "RUNNING" },
+    "docker": { "aphrody_bot": "RUNNING", "aphrody_site": "RUNNING" },
     "infra_services": { "systemd_active": "<n>", "timers_active": "<n>" },
     "wireguard_mesh": { "vps": "OK", "dbfr": "OK", "aphro_pc": "OK", "omar_wsl": "PENDING" }
   },

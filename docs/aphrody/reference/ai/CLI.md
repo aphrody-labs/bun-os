@@ -66,11 +66,11 @@ aphrody ssh proxy --switch us
 
 # Tunnels SSH directs vers les deux VPS
 aphrody ssh vps    # Serveur Inazuma & Niers VFS (51.77.147.152)
-aphrody ssh dbfr   # Serveur Dragon Ball FR & Shenron (51.255.162.6)
+aphrody ssh dbfr   # Serveur de production (51.255.162.6)
 ```
 
 ### 2.4. `aphrody translate` — Traduction Multilingue Haute Fidélité
-Combine le moteur BXC Google Translate et le pont de terminologie Shenron (JP -> FR) avec masquage des termes clés :
+Combine le moteur BXC Google Translate et un pont de terminologie (JP -> FR) avec masquage des termes clés :
 ```bash
 aphrody translate "亜風炉照美のヘブンズタイム" --from ja --to fr
 ```

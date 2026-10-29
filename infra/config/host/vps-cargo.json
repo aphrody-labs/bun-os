@@ -1,5 +1,5 @@
 {
-  "$comment": "SSH build context defaults. Override with --config or VPS_CARGO_CONFIG and --host or VPS_CARGO_HOST. Local checkout paths resolve from this worktree. Primary factory is vps. Owner directive 2026-10-09 (\"exploite nos deux VPS pour build et prod\") restores dbfr as a bounded secondary host (production: Postgres, Redis, nginx, Shenron containers): `--host dbfr`, or `--host auto` when the vps heavy lock is busy; 3 jobs at most, nice 10, sccache 8G, no desktop libraries. Existing remote -wsl names are retained store/cache identifiers; no protected data is moved.",
+  "$comment": "SSH build context defaults. Override with --config or VPS_CARGO_CONFIG and --host or VPS_CARGO_HOST. Local checkout paths resolve from this worktree. Primary factory is vps. Owner directive 2026-10-09 (\"exploite nos deux VPS pour build et prod\") restores dbfr as a bounded secondary host (production: Postgres, Redis, nginx): `--host dbfr`, or `--host auto` when the vps heavy lock is busy; 3 jobs at most, nice 10, sccache 8G, no desktop libraries. Existing remote -wsl names are retained store/cache identifiers; no protected data is moved.",
   "schemaVersion": 1,
   "host": "vps",
   "controlPath": "~/.ssh/cm/vps-cargo",
@@ -44,30 +44,6 @@
       "remoteWorkspace": "/home/ubuntu/build/wsl/vu",
       "remoteTargetDir": "/home/ubuntu/build/storage/cache/cargo/vu-wsl",
       "snapshotRef": "refs/vu/snapshot",
-      "cargoSerial": "/home/ubuntu/build/wsl/aphrody/scripts/aphrody/build/rust/cargo-serial.sh"
-    },
-    "shenron": {
-      "root": "../shenron",
-      "remoteWorkspace": "/home/ubuntu/build/wsl/shenron",
-      "remoteSeed": "",
-      "remoteTargetDir": "/home/ubuntu/build/storage/cache/cargo/shenron-wsl",
-      "snapshotRef": "refs/shenron/snapshot",
-      "cargoSerial": "/home/ubuntu/build/wsl/aphrody/scripts/aphrody/build/rust/cargo-serial.sh"
-    },
-    "shenron-release": {
-      "root": "../shenron",
-      "remoteWorkspace": "/home/ubuntu/build/wsl/shenron",
-      "remoteSeed": "",
-      "remoteTargetDir": "/home/ubuntu/build/storage/cache/cargo/shenron-wsl",
-      "snapshotRef": "refs/shenron/snapshot",
-      "cargoSerial": "/home/ubuntu/build/wsl/aphrody/scripts/aphrody/build/rust/cargo-serial.sh"
-    },
-    "shenron-omar": {
-      "root": "../shenron",
-      "remoteWorkspace": "/home/ubuntu/build/wsl/shenron",
-      "remoteSeed": "",
-      "remoteTargetDir": "/home/ubuntu/build/storage/cache/cargo/shenron-wsl",
-      "snapshotRef": "refs/shenron/snapshot",
       "cargoSerial": "/home/ubuntu/build/wsl/aphrody/scripts/aphrody/build/rust/cargo-serial.sh"
     }
   },

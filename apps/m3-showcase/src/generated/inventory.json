@@ -356,7 +356,7 @@
   {
     "name": "@aphrody/inagle-ui",
     "version": "1.4.7",
-    "description": "Inagle explorer/maps UI helpers: re-exports @rosegriffon/inagle/ui (iecode packages/inagle), provided by the iecode workspace.",
+    "description": "Inagle explorer/maps UI helpers: re-exports @aphrody/inagle/ui (iecode packages/inagle), provided by the iecode workspace.",
     "dir": "packages/inagle-ui",
     "kind": "package",
     "workspace": true,
@@ -1007,7 +1007,7 @@
     "bin": []
   },
   {
-    "name": "@rosegriffon/inagle",
+    "name": "@aphrody/inagle",
     "version": "1.4.7",
     "description": "Universal Game Data API for Inazuma Eleven: Victory Road — parsers, types, and tools for IEVR game data",
     "dir": "packages/inagle",
@@ -1020,7 +1020,7 @@
     ]
   },
   {
-    "name": "@rosegriffon/inagle-cross",
+    "name": "@aphrody/inagle-cross",
     "version": "1.4.7",
     "description": "API de données et de rétro-conception pour Inazuma Eleven Cross — types, schémas, et analyseurs d'assets",
     "dir": "packages/inagle-cross",
@@ -1031,7 +1031,7 @@
     "bin": []
   },
   {
-    "name": "@rosegriffon/menu-render",
+    "name": "@aphrody/menu-render",
     "version": "1.4.7",
     "description": "React menu renderer with a caller-supplied Lua runtime and game-host adapter.",
     "dir": "packages/menu-render",
@@ -1042,7 +1042,7 @@
     "bin": []
   },
   {
-    "name": "@rosegriffon/menu-render-webgpu",
+    "name": "@aphrody/menu-render-webgpu",
     "version": "1.4.7",
     "description": "Renderer WebGPU 2D pixel-perfect pour les écrans de menu IEVR (quads texturés instanciés, projection ortho 1280×720, sampler nearest, premultiplied alpha, blend par drawType, z-order painter par drawPriority). Fallback D",
     "dir": "packages/menu-render-webgpu",

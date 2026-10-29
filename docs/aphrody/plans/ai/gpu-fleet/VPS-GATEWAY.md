@@ -1,11 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # VPS cache, file depot and inference gateway
 
-Owner extension, 2026-10-09. Measured through Infra SSH: VPS root disk has
-146 GiB available; RAM has 36623 MiB available. DBFR has 43 GiB disk and
-6576 MiB RAM available. Native nginx is inactive on both; production routing
-uses the existing DBFR gateway container. The actual domain is
-`dragonballfr.com`, alongside the declared `aphrody.com` hosts.
+Owner extension, 2026-10-09. Measured through Infra SSH: VPS root disk has 146 GiB available; RAM has 36623 MiB available. DBFR has 43 GiB disk and 6576 MiB RAM available. Native nginx is inactive on both; production routing uses the existing DBFR gateway container.
 
 ## Selected topology
 
@@ -23,22 +19,11 @@ uses the existing DBFR gateway container. The actual domain is
 4. A private authenticated Bun gateway on VPS fronts Omar's GPU API over
    the existing tunnel, with streaming and backpressure. Health gates reject
    unavailable models. Retry only before a generation has produced output.
-5. DBFR's existing TLS gateway forwards the selected authenticated
-   `/api/inference/` route to that private service for `aphrody.com` or
-   `dragonballfr.com`. Keep existing sites, cookies and domain profiles isolated.
-   An upstream OpenAI-compatible API does not imply OpenAI provider access.
+5. Keep existing sites, cookies and domain profiles isolated. An upstream OpenAI-compatible API does not imply OpenAI provider access.
 
 ## Active gateway deployment (2026-10-11)
 
-For the current activation, the owner requested deployment through the reachable
-`vps`/`dbfr` Infra hosts. The selected GPU API at `10.200.77.10:8180` timed out
-from both VPS and DBFR, while DBFR's existing `shenron-chat-v2` endpoint passed a
-real local OpenAI-compatible generation. The gateway therefore runs on DBFR at
-`127.0.0.1:8786`, authenticated with a DBFR-local token, and forwards to
-`127.0.0.1:8799/v1`. Port 8786 is declared internal-only, the Nginx route stays
-absent, and the health probe checks upstream model readiness. This deployment
-uses the existing four-billion-parameter CPU model; the selected GPU topology
-remains pending restored transport and CUDA qualification.
+For the current activation, the owner requested deployment through the reachable `vps`/`dbfr` Infra hosts. The gateway therefore runs on DBFR at `127.0.0.1:8786`, authenticated with a DBFR-local token, and forwards to `127.0.0.1:8799/v1`. Port 8786 is declared internal-only, the Nginx route stays absent, and the health probe checks upstream model readiness. This deployment uses the existing four-billion-parameter CPU model; the selected GPU topology remains pending restored transport and CUDA qualification.
 
 The systemd unit is `aphrody-ai-gateway-dbfr.service`, managed by the host unit
 catalog and applied with the pinned Aphrody binary through `host-plan` / `host-apply`.

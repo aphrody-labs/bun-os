@@ -1,5 +1,5 @@
 {
-  "$comment": "Locales shipped by the Bun OS platform. en is the source and the last fallback. The set follows the owner's other products: Rose Griffon (fr, en, ja), the NIE wiki (de, es, it, ko, pt, zh-Hans, zh-Hant) and figcraft (pt-BR). `name` is the autonym shown in language pickers.",
+  "$comment": "Locales shipped by the Bun OS platform. en is the source and the last fallback. The set follows the owner's other products: French, English and Japanese, the NIE wiki (de, es, it, ko, pt, zh-Hans, zh-Hant) and figcraft (pt-BR). `name` is the autonym shown in language pickers.",
   "default": "en",
   "locales": [
     { "tag": "en", "name": "English", "direction": "ltr" },

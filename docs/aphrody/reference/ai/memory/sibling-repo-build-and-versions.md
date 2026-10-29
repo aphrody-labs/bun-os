@@ -16,9 +16,6 @@ metadata:
 - For builds that must land in the repo's own `target/` (e.g. bxc's
   `scripts/build-standalone.ts` (not in repo) expects `rust-bridge/target/release/libbxc_rust_bridge.so`),
   prefix with `env -u CARGO_TARGET_DIR`.
-- `shenron/scripts/bun-migrate.sh` hardcodes `~/n2b/target/release/n2b`
-  (with a `command -v n2b` PATH fallback) — that primary path is empty under the
-  override, so keep `~/.local/bin/n2b` fresh.
 
 **bxc CLI version is compile-time baked.** `bin/bxc` (not in repo) execs the compiled
 `dist/standalone/bxc-linux-x64` (not in repo) (generated or machine-local artifact; presence depends on the build host) when present; that binary embeds `BUILD_VERSION`

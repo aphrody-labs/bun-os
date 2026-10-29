@@ -38,7 +38,7 @@ Le tunnel Windows lance un superviseur Bun natif, SSH natif et le daemon Git
 local sous tmux natif. Il n'utilise ni shell WSL ni socket ControlMaster Unix.
 L'hôte distant reste Linux et utilise le wrapper Cargo sérialisé et tmux.
 La configuration est [vps-cargo.json](../../../../infra/config/host/vps-cargo.json).
-Les chemins distants existants `aphrody-wsl`, `vu-wsl`, `shenron-wsl` restent
+Les chemins distants existants `aphrody-wsl`, `vu-wsl` restent
 des identifiants de stores/caches : ce lot ne les déplace ni ne les purge.
 
 Pour Linux local, utiliser les wrappers de jobs tmux du fork sélectionné
@@ -113,6 +113,6 @@ concurrents restent distingués des correctifs qualifiés dans
   conservé. Les variables utilisateur `APHRODY_ROOT`,
   `APHRODY_MONOREPO_ROOT` et `APHRODY_PY_ROOT` résolvent sous `C:\src`.
 - Aucun processus autonome `aphrody.exe` ou `aphrody-mcp` n'a été trouvé.
-  Les MCP Bun, les builds du fork, les processus Shenron et WireGuard restent
+  Les MCP Bun, les builds du fork et WireGuard restent
   des propriétaires ou usages distincts ; ne les arrêtez pas comme processus
   Aphrody.

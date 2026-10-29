@@ -222,39 +222,39 @@ fn selected_home_agent_profile_atomically_replaces_isolated_components() {
             url = "redis://127.0.0.1:6379/0"
             prefix = "global:"
 
-            [profiles.shenron]
-            plugins = ["shenron-plugin"]
+            [profiles.worker]
+            plugins = ["worker-plugin"]
             developer_instructions = "must not escape typed profile"
 
-            [profiles.shenron.database]
+            [profiles.worker.database]
             db_type = "postgres"
             url_env = "DATABASE_URL"
-            schema = "shenron"
+            schema = "worker"
             cache = "sqlite_wal"
 
-            [profiles.shenron.rag]
+            [profiles.worker.rag]
             embed_backend = "ort"
             mode = "hybrid+rerank"
             vector_dim = 384
 
-            [profiles.shenron.mcp_servers.shenron]
+            [profiles.worker.mcp_servers.worker]
             command = "bun"
             args = ["apps/mcp/src/index.ts"]
 
-            [profiles.shenron.skills]
-            whitelist = ["rag.canon", "ocr.continuous", "dbfr-databooks"]
+            [profiles.worker.skills]
+            whitelist = ["rag.canon", "ocr.continuous", "docs-index"]
 
-            [profiles.shenron.a2a]
-            id = "shenron@dragonballfr.com"
-            mailbox = ".coord/inbox-from-shenron.jsonl"
+            [profiles.worker.a2a]
+            id = "worker@example.com"
+            mailbox = ".coord/inbox-from-worker.jsonl"
 
-            [profiles.shenron.ocr]
+            [profiles.worker.ocr]
             engines = ["pp-ocr-v5", "dots.ocr-3b"]
-            state_path = "workspace-shenron/ocr"
+            state_path = "workspace-worker/ocr"
 
-            [profiles.shenron.redis]
+            [profiles.worker.redis]
             url = "redis://127.0.0.1:6379/1"
-            prefix = "shenron:"
+            prefix = "worker:"
 
             [profiles.niers]
             plugins = ["niers-only-plugin"]
@@ -266,7 +266,7 @@ fn selected_home_agent_profile_atomically_replaces_isolated_components() {
         ),
     ];
     let overrides = CliOverrides {
-        profile: Some("shenron".to_string()),
+        profile: Some("worker".to_string()),
         ..CliOverrides::default()
     };
     let (config, warnings) =
@@ -284,17 +284,17 @@ fn selected_home_agent_profile_atomically_replaces_isolated_components() {
         "root retrieval settings must not leak"
     );
     assert_eq!(config.rag.vector_dim, Some(384));
-    assert_eq!(config.plugins.paths, vec!["shenron-plugin"]);
+    assert_eq!(config.plugins.paths, vec!["worker-plugin"]);
     assert_eq!(
         config.skills.whitelist,
-        vec!["rag.canon", "ocr.continuous", "dbfr-databooks"]
+        vec!["rag.canon", "ocr.continuous", "docs-index"]
     );
-    assert_eq!(config.a2a.id.as_deref(), Some("shenron@dragonballfr.com"));
+    assert_eq!(config.a2a.id.as_deref(), Some("worker@example.com"));
     assert_ne!(config.a2a.id.as_deref(), Some("niers@aphrody.com"));
     assert_eq!(config.ocr.engines.len(), 2);
-    assert_eq!(config.redis.prefix.as_deref(), Some("shenron:"));
+    assert_eq!(config.redis.prefix.as_deref(), Some("worker:"));
     assert_eq!(config.mcp_servers.len(), 1);
-    assert!(config.mcp_servers.contains_key("shenron"));
+    assert!(config.mcp_servers.contains_key("worker"));
     assert!(!config.mcp_servers.contains_key("global"));
     assert_eq!(
         config.developer_instructions.as_deref(),

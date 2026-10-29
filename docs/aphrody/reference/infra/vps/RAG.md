@@ -2,7 +2,7 @@
 # VPS RAG and inference engines
 
 > **Historical capability description.** The deployment described here uses
-> the Aphrody AI services (`aphrody-ai-http`, `aphrody-shenron-embed`) which are
+> the Aphrody AI services (`aphrody-ai-http`, `aphrody-embed`) which are
 > marked retired in the root production/service catalogues. Their config/model
 > entries describe a prior or proposed contract; they do not establish an
 > active VPS capability. For current placement and dated runtime evidence, see
@@ -29,14 +29,7 @@ the pipelines. Restored from the retired `aphrody` monolith (`docs/reference/inf
   Querying an index with another model or dimension is forbidden (`mix-embedding-spaces`); a
   mismatch falls back to lexical search.
 
-## 2. Shenron retrieval
-
-- Embeddings: `aphrody-shenron-embed` serves the multilingual E5 model declared for the
-  `shenron-rag` index (loopback only, `aphrody-embed serve` from `aphrody-ai`).
-- Gateway: Shenron reaches search, documents, ingestion, chat and OCR through the `ai-http`
-  gateway of `tools/config/local-ai.json` with a bearer token from its client environment file.
-
-## 3. X / Autopilot hybrid retrieval (recorded design)
+## 2. X / Autopilot hybrid retrieval (recorded design)
 
 The crawling agents of the former autopilot combined semantic and lexical retrieval over
 `x-store.sqlite` (schema in [DATABASES.md](./DATABASES.md), store code in
@@ -59,7 +52,7 @@ The crawling agents of the former autopilot combined semantic and lexical retrie
 Before relying on these weights, locate the live implementation in `aphrody-web` or
 `aphrody-ai`; this section records intent and is not a validated contract.
 
-## 4. Local open-weight models
+## 3. Local open-weight models
 
 Managed `llama-server` instances (chat, code, reasoning, small, vision, embeddings, rerank) are
 planned and supervised by `aphrody-ai` (`crates/ai/llama-server`) with dynamic loopback

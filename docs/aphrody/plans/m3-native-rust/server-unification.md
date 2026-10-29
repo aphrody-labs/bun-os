@@ -16,7 +16,6 @@ des services ou suppression générale de JavaScript n'est revendiquée.
 | Outil MCP catalogue | `crates/ai/mcp/src/site_tools.rs`, `src/lib.rs`, `src/protocol.rs` | `aphrody_site_catalog` charge le même `Catalog` ; lecture, racine explicite, schéma MCP distinct |
 | App-server agent | `crates/ai/app-server/src/lib.rs` | Même moteur JSON-RPC sur stdio/HTTP, `/rpc`, `/events`, `/notifications` ; HTTP non authentifié limité au loopback |
 | Application desktop | `crates/ui/app` | Hôte desktop et broker app-server en processus ; surfaces métier, transport et runtime desktop distincts |
-| REST IA | `crates/ai/mcp/src/http_rest.rs` | Modèles, chat OpenAI, RAG et endpoints Shenron ; readiness/authentification propres, limites de requêtes |
 | Contrôle Infra | `crates/infra/infra/src/api.rs` | API TCP Rust loopback, catalogue/services/validation/pipeline ; propriétaire lifecycle/catalog/validate existant |
 | Capacités runtime système | Fork Bun, selon `docs/aphrody/LAYERS.md` (not in repo) du fork | OS/Windows/Linux/interop/moteurs ; Aphrody consomme les artefacts/SDK qualifiés |
 
@@ -64,11 +63,7 @@ stores modèles, appels fournisseurs et historiques restent derrière leurs
 politiques et transports. Garder séparés les profils `aphrody`, `dbfr` et `ie`,
 les bases, cookies, conversations et credentials.
 
-Préserver la règle loopback de l'app-server non authentifié. Ne pas fusionner ses
-routes publiques avec les endpoints privilégiés sans authentification explicite.
-Préserver les gardes de readiness/auth Shenron et les limites de corps/requêtes.
-Un accès réseau existant n'accorde pas l'administration DBFR : Yoyo administre
-Aphrody Labs et Omar DBFR. Les changements d'hôte suivent Infra et son allocation.
+Préserver la règle loopback de l'app-server non authentifié. Ne pas fusionner ses routes publiques avec les endpoints privilégiés sans authentification explicite. Un accès réseau existant n'accorde pas l'administration DBFR : Yoyo administre Aphrody Labs et Omar DBFR. Les changements d'hôte suivent Infra et son allocation.
 
 Les collisions de routes (`/`, `/health`, `/healthz`, `/api/*`) doivent être
 résolues explicitement lors de la composition : choisir un préfixe produit et

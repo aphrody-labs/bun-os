@@ -4,7 +4,6 @@
   "defaultDomain": "aphrody",
   "allowedDomains": [
     "aphrody",
-    "dbfr",
     "ie"
   ],
   "profiles": {
@@ -12,12 +11,6 @@
       "workspace": "workspaces/aphrody",
       "codeRoot": ".",
       "context": "Aphrody monorepo"
-    },
-    "dbfr": {
-      "workspace": "workspaces/dbfr",
-      "codeRoot": ".",
-      "context": "Shenron / Dragon Ball FR",
-      "driveSyncOwner": "packages/infra/workspace/src/agent-home-drive-sync.ts"
     },
     "ie": {
       "workspace": "workspaces/ie",

@@ -235,7 +235,7 @@ describe("streamChatCompletion", () => {
     const events = await collect(
       streamChatCompletion({
         baseUrl: "http://127.0.0.1:8080/v1/",
-        model: "shenron",
+        model: "grounded-model",
         messages: [{ id: "1", role: "user", content: "Hi" }],
         body: { temperature: 0 },
         fetch: fakeFetch,
@@ -244,7 +244,7 @@ describe("streamChatCompletion", () => {
     expect(request!.url).toBe("http://127.0.0.1:8080/v1/chat/completions");
     expect(request!.body).toEqual({
       temperature: 0,
-      model: "shenron",
+      model: "grounded-model",
       messages: [{ role: "user", content: "Hi" }],
       stream: true,
     });

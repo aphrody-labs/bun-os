@@ -20,8 +20,7 @@ le lanceur est `tools/config/hub-tunnel.cmd`. La tâche a deux déclencheurs : o
 de session et répétition chaque minute (`MultipleInstances=IgnoreNew`). Le tunnel
 quitte avec le code 0 : la répétition, et non le redémarrage sur échec, le relance.
 
-Le MCP 8793 de dbfr (`aphrody-mcp-http-dbfr`, RAG des débats Discord) reste, avec
-`shenron-compute` (8789). L'ancien A2A 8788 de dbfr est retiré.
+Le MCP 8793 de dbfr (`aphrody-mcp-http-dbfr`, RAG des débats Discord) reste. L'ancien A2A 8788 de dbfr est retiré.
 
 ## Jetons
 

@@ -4,7 +4,7 @@
 
 Status 2026-10-01. Goal: the server-rendered HTML of the m3 packages (`m3/packages`) is easy to
 read, navigate and address for the Rust crawler (`aphrody-web crawl`, static HTTP stack, no
-JavaScript) and for LLM agents. The product sites (`shenron:apps/site`, `iecode/apps/rg/website`) need
+JavaScript) and for LLM agents. The product sites need
 databases, so the gate renders a deterministic fixture site from the component libraries instead.
 
 ## Run it

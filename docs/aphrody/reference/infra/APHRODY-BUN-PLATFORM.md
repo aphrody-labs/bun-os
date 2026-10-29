@@ -38,8 +38,7 @@ and runtime revisions before making those claims.
 
 ## Single web owner
 
-Only `aphrody-web*` owns crawling and scraping infrastructure. RG, Shenron and
-IECODE retain domain parsing, indexing and caller configuration behind thin
+Only `aphrody-web*` owns crawling and scraping infrastructure. IECODE retains domain parsing, indexing and caller configuration behind thin
 bindings. Retired BXC or split-repository implementations must not be kept as
 fallback engines. Preserve rendered-page acquisition and bounded-response
 behavior when migrating a consumer; a static crawl is not rendered-page parity.
@@ -48,8 +47,7 @@ behavior when migrating a consumer; a static crawl is not rendered-page parity.
 
 Use root workspace commands and the owning package's scoped checks. Native
 Cargo commands are serialized through `scripts/build/rust/cargo-serial.sh`.
-The WSL build family remains parked until Aphrody deployment, following the
-[Infra handoff](../../plans/infra/sql-convergence-handoff.md).
+The WSL build family remains parked until Aphrody deployment.
 
 Private source archives and manifests carry revisions and SHA-256 evidence.
 A successful install, static typecheck or narrow test does not establish live

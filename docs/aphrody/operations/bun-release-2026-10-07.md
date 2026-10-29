@@ -13,7 +13,7 @@ Le [catalogue](../../../tools/aphrody/config/npm-packages.json) conserve version
 - Audit de dépendances : zéro avis pour le consommateur des 74 paquets et pour le dépôt après mise à jour de React Router vers 7.18.2 ; app-ui conserve 215 tests passés et un typecheck valide.
 - oxlint/oxfmt des modifications et contrôle whitespace passés ; avertissements globaux préexistants conservés.
 - Archives : 92 valides, zéro échec. Outils de release et copies des configurations canoniques : dix tests passés.
-- Routage de la fabrique : 24 tests passés ; trois identités de dépôt Shenron épinglées à DBFR.
+- Routage de la fabrique : 24 tests passés.
 - Canvas : 11 tests passés, un contrôle checkout-only ignoré ; provenance upstream immuable et Skia natif vérifiés.
 - RAG : 14 tests passés ; WASM optimisé construit par la fabrique VPS.
 - Shell web : dix tests passés, trois contrôles plateforme/intégration ignorés ; WASM optimisé construit par la fabrique.
@@ -29,6 +29,6 @@ Le [catalogue](../../../tools/aphrody/config/npm-packages.json) conserve version
 
 ## Capacité et placement
 
-Directive propriétaire conservée dans le contexte opératoire durable : production et builds Shenron sur DBFR ; VPS réservé à Aphrody. La migration des stores protégés appartient au lot Infra de cutover existant.
+Directive propriétaire conservée dans le contexte opératoire durable : VPS réservé à Aphrody. La migration des stores protégés appartient au lot Infra de cutover existant.
 
 Le nettoyage borné a retiré 27 anciens exécutables de tests inactifs à lien unique et observé 14 389 207 040 octets libérés sur `/srv` (environ 13,4 Gio). Binaires actifs, bibliothèques, caches de dépendances, sccache, installations et stores protégés sont préservés. Le [runbook](../../../scripts/aphrody/audit/infra/reclaim-cargo-test-binaries.py) planifie par défaut et revérifie l’identité des candidats avant une application explicite.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Contrat et observabilité de la stack Aphrody/RG/Niers.
+ * Contrat et observabilité de la stack Aphrody/Niers.
  *
  * Commands:
  *   status [--json] [--strict] [--deep] [--host=<alias>]  live units, host resources and probes (Linux host);

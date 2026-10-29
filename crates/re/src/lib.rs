@@ -125,7 +125,7 @@ pub mod steam;
 /// (feature `nie`).
 pub mod nie;
 
-/// Game RE engine absorbed from shenron-re (AOB, live memory, DBXV2 format parsers, Dragon Ball
+/// Game RE engine (AOB, live memory, DBXV2 format parsers, Dragon Ball
 /// catalog, install inspection, unified state) and the game-agnostic asset pipeline
 /// (`game::assets`, feature `assets`: engine detection, profiles, container mounting, export).
 pub mod game;

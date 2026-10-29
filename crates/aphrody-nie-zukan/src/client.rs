@@ -10,7 +10,7 @@ use tracing::debug;
 pub const BASE_URL: &str = "https://zukan.inazuma.jp";
 
 /// Identifying User-Agent used by the shared Web transport.
-pub const USER_AGENT: &str = "AphrodyWeb/1.0 (+https://rosegriffon.fr; zukan)";
+pub const USER_AGENT: &str = "AphrodyWeb/1.0 (+https://aphrody.com; zukan)";
 
 /// Minimum delay between requests to the same host.
 pub const RATE_LIMIT_MS: u64 = 350;

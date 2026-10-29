@@ -4,7 +4,7 @@
   "sharedDiscord": {
     "repository": "aphrody-discord",
     "role": "transport-and-framework-adapters",
-    "consumers": ["aphrody", "rg", "shenron", "nie"],
+    "consumers": ["aphrody", "nie"],
     "invariants": [
       "one-gateway-connection-per-discord-application",
       "gateway-and-http-interactions-are-explicitly-exclusive",
@@ -14,32 +14,6 @@
     "deploymentAuthority": "aphrody-infra"
   },
   "applications": {
-    "rg": {
-      "role": "external-source-owner",
-      "sourceRepository": "https://github.com/aphrody-labs/rosegriffon",
-      "binaryWorkflow": "https://github.com/aphrody-labs/rosegriffon/blob/main/.github/workflows/binaries.yml",
-      "releases": "https://github.com/aphrody-labs/rosegriffon/releases",
-      "libraries": ["@rosegriffon/assets", "@rosegriffon/config", "@rosegriffon/db", "@rosegriffon/i18n"]
-    },
-    "shenron": {
-      "role": "external-product",
-      "source": "aphrody-labs/shenron",
-      "website": {
-        "runtime": "next-bun",
-        "package": "@shenron/site",
-        "ui": "@shenron/ui",
-        "auth": "@shenron/auth",
-        "api": "shenron-bot"
-      },
-      "api": {
-        "runtime": "bun",
-        "database": "postgresql",
-        "localCache": "sqlite",
-        "mcp": "shenron-mcp dragonball.* (aphrody-labs/shenron)"
-      },
-      "bot": { "runtime": "bun-discord.js", "api": "shenron-bot", "database": "postgresql-with-sqlite-cache" },
-      "data": { "primary": "postgresql", "media": "shared-nginx-storage", "backup": "aphrody-infra-backup-policy" }
-    },
     "nie": {
       "role": "specialized-engine-and-3d-asset-plane",
       "website": { "runtime": "rust-http", "package": "nie-site", "unit": "nie-site.service", "port": 8085 },
@@ -130,7 +104,6 @@
     }
   },
   "deduplication": {
-    "ui": "rg-ui-is-canonical; shenron-consumes-the-contract",
     "auth": "one-better-auth-boundary-per-public-origin",
     "api": "one-public-api-per-application; MCP-remains-internal",
     "database": "postgresql-primary; sqlite-is-a-bounded-local-cache",

@@ -11,14 +11,13 @@ de jeton ici, aucun contenu de DM). Contexte : [OMAR-REMOTE-CONTROL.md](OMAR-REM
 ## 1. Cartographie du serveur (avant la mise en place)
 
 Guilde `1554189180030947338` « Aphrody · AI Lab », propriétaire `goku_duo` (281114294152724491), 4 membres, aucun webhook,
-2 intégrations (bots Aphrody et Shenron), niveau de vérification 0.
+1 intégration (bot Aphrody), niveau de vérification 0.
 
 | Rôle                         | Droits                              | Remarques                                                                      |
 | ---------------------------- | ----------------------------------- | ------------------------------------------------------------------------------ |
 | `@everyone`                  | aucun                               | n'a accès à aucun salon (VIEW_CHANNEL refusé dans chaque catégorie)            |
 | `Aphrody` (géré, bot)        | administrateur                      | bot Aphrody `1544463751279812740`                                              |
 | `Aphrody Administrator`      | administrateur                      | porté par `goku_duo` et `omlar_` : les deux voient et peuvent tout             |
-| `Shenron` (x2, dont un géré) | administrateur                      | bot Shenron `1497194276025663680` (dépôt aphrody-labs/shenron, hors périmètre) |
 | `AI Researcher`              | droits de lecture/écriture standard | aucun membre ; voit `start-here` et `chat`                                     |
 | `Server Booster` (géré)      | aucun                               | `goku_duo`                                                                     |
 

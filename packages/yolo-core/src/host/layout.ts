@@ -68,7 +68,7 @@ export function hostLayout(home = String(table["home"])): HostLayout {
 
 export const HOST_LAYOUT: HostLayout = hostLayout();
 
-/** `<root>/<parts...>` on the host, e.g. hostPath("apps", "shenron", "shared"). */
+/** `<root>/<parts...>` on the host, e.g. hostPath("apps", "demoapp", "shared"). */
 export const hostPath = (root: LayoutRoot, ...parts: string[]): string => posix.join(HOST_LAYOUT[root], ...parts);
 
 /** The retired prefix `path` starts with (path-boundary aware), or null. */

@@ -87,6 +87,4 @@ WebFetch, Context7), plus a read-only scan of this checkout and
 - **Neon project facts** (PG 18, Free plan, 1 GiB branch limit) come from the
   Neon API on 2026-10-01 and may change.
 - **Postgres RAG DDL not found:** the DDL for `aphrody_rag_documents` and
-  `aphrody_shenron_vectors` is not in this repository; only its consumers
-  are. Its index type and pgvector version on the serving host are
-  UNVERIFIED.
+Its index type and pgvector version on the serving host are   UNVERIFIED.

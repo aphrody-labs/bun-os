@@ -5,7 +5,7 @@ import {
   A2A_03_PROFILE,
   LEGACY_METHODS,
   LegacyBridge,
-  SHENRON_HUB_PROFILE,
+  HUB_PROFILE,
   downgradeMessage,
   downgradePart,
   downgradeSendResponse,
@@ -186,7 +186,7 @@ describe("request upgrade", () => {
       "message/send",
       {
         target: "codex",
-        sourceAgent: "shenron-site",
+        sourceAgent: "site-agent",
         instruction: "run it",
         yolo: true,
         data: { a: 1 },
@@ -204,7 +204,7 @@ describe("request upgrade", () => {
       },
       metadata: {
         target: "codex",
-        sourceAgent: "shenron-site",
+        sourceAgent: "site-agent",
         yolo: true,
         aphrody_peer: "codex",
       },
@@ -392,8 +392,8 @@ describe("response downgrade", () => {
     expect(legacy.history[0].role).toBe("user");
   });
 
-  test("Shenron hub profile: type discriminators and snake states", () => {
-    const legacy = downgradeTask(task as never, SHENRON_HUB_PROFILE) as any;
+  test("Hub profile: type discriminators and snake states", () => {
+    const legacy = downgradeTask(task as never, HUB_PROFILE) as any;
     expect(legacy.kind).toBeUndefined();
     expect(legacy.status.state).toBe("input_required");
     expect(legacy.artifacts[0].parts[0]).toEqual({
@@ -449,7 +449,7 @@ describe("response downgrade", () => {
           lastChunk: true,
         },
       },
-      SHENRON_HUB_PROFILE,
+      HUB_PROFILE,
     ) as any;
     expect(artifact).toMatchObject({
       type: "artifact-update",
@@ -462,7 +462,7 @@ describe("response downgrade", () => {
   test("send results: the task itself (0.3) or the hub's { taskId, status, response }", () => {
     const response = { task: task as never };
     expect((downgradeSendResponse(response, A2A_03_PROFILE) as any).kind).toBe("task");
-    const hub = downgradeSendResponse(response, SHENRON_HUB_PROFILE) as any;
+    const hub = downgradeSendResponse(response, HUB_PROFILE) as any;
     expect(hub).toMatchObject({
       taskId: "t1",
       status: "input_required",
@@ -507,7 +507,7 @@ describe("LegacyBridge over a 1.0 agent", () => {
     agent = startFakeAgent();
     const client = await A2AClient.connect(agent.url);
     bridge = new LegacyBridge(client);
-    hub = new LegacyBridge(client, { profile: SHENRON_HUB_PROFILE });
+    hub = new LegacyBridge(client, { profile: HUB_PROFILE });
   });
   afterAll(() => agent.stop());
 

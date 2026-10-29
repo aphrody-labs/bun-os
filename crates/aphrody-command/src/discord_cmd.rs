@@ -55,10 +55,10 @@ pub(crate) enum DiscordAction {
         /// Shell command line to execute
         command: String,
     },
-    /// Compile one or all Discord bots into a native standalone binary via Bun + Oxc.
+    /// Compile a Discord bot project into a native standalone binary via Bun + Oxc.
     Compile {
-        /// Target bot: shenron, rg, achillea, all, or custom path
-        #[arg(default_value = "all")]
+        /// Path of the bot project directory
+        #[arg(default_value = ".")]
         target: String,
         /// Run smoke check after compilation
         #[arg(long, default_value_t = true)]
@@ -72,14 +72,11 @@ pub(crate) enum DiscordAction {
         /// Cross-compilation target (e.g. bun-linux-x64, bun-windows-x64, bun-linux-arm64)
         #[arg(long)]
         target_triple: Option<String>,
-        /// Skip pre-build hooks (e.g. Tailwind CSS)
-        #[arg(long)]
-        no_pre_build: bool,
     },
     /// Inspect a Discord bot configuration, TypeScript decorators, and Oxc AST syntax.
     Inspect {
-        /// Target bot: shenron, rg, achillea, or custom path
-        #[arg(default_value = "shenron")]
+        /// Path of the bot project directory
+        #[arg(default_value = ".")]
         target: String,
         /// Output inspection as JSON
         #[arg(long)]
@@ -187,7 +184,6 @@ pub(crate) async fn run_discord(action: DiscordAction) -> Result<()> {
             no_minify,
             no_sourcemap,
             target_triple,
-            no_pre_build,
         } => {
             let compiler = DiscordCompiler::new()?;
             let options = CompilerOptions {
@@ -195,15 +191,10 @@ pub(crate) async fn run_discord(action: DiscordAction) -> Result<()> {
                 sourcemap: !no_sourcemap,
                 smoke_check: smoke,
                 target_triple,
-                pre_build: !no_pre_build,
             };
-            if target == "all" {
-                compiler.compile_all(&options)?;
-            } else if let Some(bot_target) = BotTarget::parse(&target) {
-                compiler.compile(&bot_target, &options)?;
-            } else {
-                compiler.compile(&BotTarget::Custom(PathBuf::from(&target)), &options)?;
-            }
+            let bot_target =
+                BotTarget::parse(&target).unwrap_or(BotTarget::Custom(PathBuf::from(&target)));
+            compiler.compile(&bot_target, &options)?;
             Ok(())
         }
         DiscordAction::Inspect { target, json } => {

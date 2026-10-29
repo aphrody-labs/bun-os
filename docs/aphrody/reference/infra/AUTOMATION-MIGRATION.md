@@ -46,8 +46,6 @@ est relu après chaque migration. Les surfaces restantes ont la frontière suiva
 | `bun`, `oxc` | Forks upstream; leurs scripts de build, publication et synchronisation restent alignés sur leurs projets sources. |
 | `aphrody-ui/drive`, `aphrody-os/drive` | Arbres Drive upstream synchronisés. |
 | `nie` | Reconstruction, assets de jeu, Steam, forge et validations mathématiques propres au produit. |
-| `rg` | Résolution de modules et audit SEO qui dépendent du graphe de workspaces et des routes RG. |
-| `shenron` | Données Discord, SQLite, OCR et document Google propres au produit. |
 | `aphrody-ai` | Tests d’inférence et déploiements de fournisseurs IA propres à ses services. |
 | `aphrody-os` | WinClean, WSLg, noyau et intégration Windows propres au système. |
 

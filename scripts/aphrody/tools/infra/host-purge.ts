@@ -209,7 +209,7 @@ if (import.meta.main) {
   ])
     .out.split("\n")
     .map(l => l.split(/\s+/)[0] ?? "")
-    .filter(u => /^(aphrody|shenron|nie|rg)-/.test(u));
+    .filter(u => /^(aphrody|nie)-/.test(u));
   for (const u of active) if (!declaredUnit(rt.native.units, u)) console.log(`drift: host unit ${u} not declared`);
   for (const c of run(["docker", "ps", "--format", "{{.Names}}"]).out.split("\n").filter(Boolean))
     if (!declaredContainer(rt.docker.containers, c)) console.log(`drift: container ${c} not declared`);

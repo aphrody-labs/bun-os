@@ -5,7 +5,6 @@
 
 > Contexte courant (2026-10-09) : développement et builds selon l'hôte, la cible et les ressources disponibles ; aucun produit n'est réservé à un poste. Voir le [contexte](../../operations/workspace/windows-native.md).
 
-
 > Path reconciliation (2026-10-07): `crates/compat/n2b-native` (not in repo) → `crates/interop/ffi/src/n2b_native.rs`. Original dated observations below retain their historical scope.
 
 Décision de cible : 2026-09-29. Ce plan organise le travail demandé ; ses
@@ -30,19 +29,9 @@ secrets, routes, runbooks et déploiements. Son code library/Rust et ses outils
 Bun/Python rejoignent respectivement les deux monorepos ; les interfaces
 opérationnelles restent dans Infra.
 
-La consolidation de code conserve les responsabilités de domaine : RG,
-Shenron, IECODE, Files, Koharu et les services gardent leurs identités, bases,
-permissions, routes et cycles de vie. Leur implantation change de dépôt et
-leur métier reste isolé en modules. Tous les fichiers de `src`, y compris
-ceux hors catalogue, reçoivent une destination ou une justification vérifiée.
-Le C/C++, Zig, C#, assets, modèles et archives sont répertoriés avec leur
-propriétaire ; ils ne sont pas supprimés par le tri en trois langages.
+Leur implantation change de dépôt et leur métier reste isolé en modules. Tous les fichiers de `src`, y compris ceux hors catalogue, reçoivent une destination ou une justification vérifiée. Le C/C++, Zig, C#, assets, modèles et archives sont répertoriés avec leur propriétaire ; ils ne sont pas supprimés par le tri en trois langages.
 
-L'extraction locale commence dans `<repo>` et
-`../aphrody-py`, créés à côté de `src`. `rg` et `shenron` restent
-entièrement dans `src` jusqu'à stabilité démontrée des deux cibles, fermeture
-du plan et validation de tous leurs consommateurs. Aucun gitlink, remote,
-service ou source de ces deux dépôts ne change avant cette barrière.
+L'extraction locale commence dans `<repo>` et `../aphrody-py`, créés à côté de `src`. Aucun gitlink, remote, service ou source de ces deux dépôts ne change avant cette barrière.
 
 La décision finale réunit Rust et Bun dans `aphrody` : aucun dépôt
 `aphrody-ts` séparé n'est à créer. Un package dépendant de Rust et ses crates
@@ -78,7 +67,6 @@ répertoires ; son total ne prouve pas la couverture complète de `src`.
 | --- | --- |
 | `aphrody-ui/packages/bun/package.json`, `crates/ui/bun/Cargo.toml` | `@aphrody/bun` 3.3.3, crate `aphrody-bun` 1.0.0-canary, bibliothèque `bun_rs`, cdylib + rlib. Les versions ne sont pas un contrat ABI commun. |
 | `aphrody-ui/packages/bun/src/`, `packages/svg/src/` (not in repo) | Plusieurs chargements du même `bun_rs`, recherche de `target/`, appels natifs dès l'import du module principal. M3, Sass, icônes, SVG, rendu et reproduction doivent tous être conservés. |
-| `crates/interop/ffi/src/lib.rs` | ABI Aphrody v1, exports CLI, Shenron/RAG/persona et manga, runtime Tokio persistant, capture stdio. Le seul wrapper `bun/index.ts` ne couvre pas toute cette surface. |
 | [Fork `aphrody-labs/bun`](../../reference/upstream-bun/APHRODY-FORK.md) | Pas de module `bun:aphrody` ni de liaison Rust statique au moteur : `aphrody_ffi`, N2B et Oxc se chargent par `bun:ffi`. |
 | `crates/interop/ffi/src/n2b_native.rs`, `oxc/apps/aphrody-oxc` | Sources natives spécifiques déjà présentes ; comparer leur graphe Oxc, leurs fonctions et leurs features avant fusion. |
 | `aphrody-web/Cargo.toml` | Web est déjà une famille de crates : moteur, bridge, FFI, render, extract, index, service, Chromium et Obscura ; sa simple façade ne supprime pas leurs duplications. |
@@ -135,19 +123,7 @@ workspace cible initial. Le relevé est dans
 `aphrody/docs/migration/ievr-iecode-extraction.json`. Ceci ne valide pas les
 autres crates IEVR, les données de jeu, le binding Bun, le MCP ou le plugin.
 
-Les 453 scripts sont des copies de travail : leur exécution, les scripts
-imbriqués dans les apps/packages, les liens/attachements doc et la résolution
-des conflits de manifests restent ouverts. `aphrody-mcp` demeure le seul
-endpoint configuré dans `nie/.mcp.json`. `nie-mcp` reste un binaire fin
-(`nie-cli::main_entry_with(["nie", "mcp"])`), avec l'implémentation dans
-`nie-cli/src/mcp.rs`. AI le relaie par un processus persistant et expose en
-plus ses outils typés. Le package source IECODE `@nie/plugin` enregistre des
-loaders IEVR et dépend de l'ancien `@aphrody/nie`, qui charge `iecode` via
-`bun:ffi`. Le staging de ces wrappers dans Aphrody a été retiré faute de parité;
-leur réintroduction exige le contrat FFI/API IECODE et une parité de capacités
-avant le retrait du proxy MCP.
-`rg` et `shenron` restent entièrement dans `src`. Aucune app/package complète
-n'a encore passé son installation propre dans le workspace cible.
+Les 453 scripts sont des copies de travail : leur exécution, les scripts imbriqués dans les apps/packages, les liens/attachements doc et la résolution des conflits de manifests restent ouverts. `aphrody-mcp` demeure le seul endpoint configuré dans `nie/.mcp.json`. `nie-mcp` reste un binaire fin (`nie-cli::main_entry_with(["nie", "mcp"])`), avec l'implémentation dans `nie-cli/src/mcp.rs`. AI le relaie par un processus persistant et expose en plus ses outils typés. Le package source IECODE `@nie/plugin` enregistre des loaders IEVR et dépend de l'ancien `@aphrody/nie`, qui charge `iecode` via `bun:ffi`. Le staging de ces wrappers dans Aphrody a été retiré faute de parité; leur réintroduction exige le contrat FFI/API IECODE et une parité de capacités avant le retrait du proxy MCP. Aucune app/package complète n'a encore passé son installation propre dans le workspace cible.
 
 ## 3. Topologie de code proposée
 
@@ -215,8 +191,6 @@ avec le même package public et le même contrat. La dualité de deux nouvelles
 façades du plan précédent est abandonnée.
 
 - [ ] Recenser **chaque symbole** C, wrapper TS, header, feature et consommateur,
-  y compris exports `shenron_*`, `manga_*`, `bun_rs_*`, `node2bun_*`, Oxc,
-  IECODE/NIE, Web/render/embed/curl et interfaces Python/.NET concernées.
 - [ ] Définir version ABI distincte de SemVer, taille des structures, capacités,
   erreurs, encodage, tailles bornées, alignement, entiers 64 bits, handles et
   politique de panic. Aucun `String`/`Vec` Rust brut à travers la frontière.
@@ -392,7 +366,6 @@ d'exécuter le kernel privilégié dans une application Bun ordinaire.
 | OS, UI, Web | Kernel/Files, rendu/M3, hôtes, moteur Web unifié | Apps web/desktop, M3/SVG, Drive, BXC transitoire | Automatisations et traitement d'assets |
 | Infra | Git/SSH/VPN, contrôleur, maintenance, YOLO | `@aphrody/workspace`, OVH, audits et opérations | Outils de maintenance ; configuration reste Infra |
 | IECODE, NIE | Moteurs métier, formats/forge, FFI et anciennes crates en absorption | `iecode-ffi`, packages NIE, plugin, vues et applications | `iepy`, `niepy`, projets IECODE, Python NIE/Blender |
-| RG, Shenron, fut | Toute crate effectivement trouvée, aucun total présumé | Sites, bots, packages métier et pipelines | Tout script trouvé, avec données et propriétaire |
 | Bun, Oxc, Bevy, dépendances tierces | Sources épinglées sous `upstream/`, workspaces conservés | Sources nécessaires référencées à leur propriétaire upstream | Projets Python upstream épinglés, licence inchangée |
 
 Chaque ligne est développée en correspondances fichier/package/crate. Un
@@ -453,9 +426,7 @@ Au contrôle API de cette passe, l'organisation expose cinq forks publics
 Droits, quotas, rulesets et capacité Actions sont à vérifier avant exécution.
 
 - [ ] G0 — Inventory GitHub et registres : noms/IDs, visibilité, droits réels,
-  branches, HEADs, upstream, releases, issues/PR, secrets par **nom seulement**,
-  webhooks, règles, packages npm/PyPI/crates/GHCR et usages par CI/déploiement.
-  Traiter le propriétaire `rose-griffon` de RG selon ses droits effectifs.
+  branches, HEADs, upstream, releases, issues/PR, secrets par **nom seulement**,   webhooks, règles, packages npm/PyPI/crates/GHCR et usages par CI/déploiement.
 - [ ] G1 — Transférer d'abord le fork Bun, puis Oxc et les dépôts retenus,
   dans l'ordre du plan Infra. Vérifier absence de collision, mêmes SHAs et
   association upstream. Une fusion de sources n'est pas un transfert GitHub.
@@ -500,14 +471,12 @@ la preuve de son exécution.
 
 | Lot | Dépendances | Livrable obligatoire | Gate de sortie |
 | --- | --- | --- | --- |
-| P0 — Graphe complet | Aucune | Inventaire récursif via `@aphrody/workspace` des dépôts de `src`, `../iecode`, forks upstream, workspaces, plans, docs, scripts, apps/packages, crates, ABI/call-sites/commandes, changements locaux et matrice ancien → nouveau | 100 % des sources candidates affectées ; `rg`/`shenron` marqués en attente ; autres exclusions justifiées ; aucun dossier masqué par profondeur du scanner |
 | P1 — Baseline | P0 | Corpus par capacité, résultats anciens, source closure, données restaurables, benchmarks contrôlés | Échecs existants enregistrés, sorties et scénarios de référence disponibles |
 | P2 — Fondation et extraction docs | P0–P1 | Git local des cibles, manifestes source→SHA/path/status, `docs/` catégorisé, doublons exacts dédupliqués avec registre d'alias, liens corrigés et scripts migrés par catégories | Couverture exhaustive des docs/scripts inclus ; liens valides ; aucun original supprimé |
 | P3 — Workspaces et extraction Rust/Bun | P2 | Un Cargo et un Bun workspace dans `aphrody`; crates sous `crates/<domain>/<name>`, apps/packages sous `apps/<domain>`/`packages/<domain>` ; Infra garde `@aphrody/workspace` | Graphe packages→crates/features/apps complet, imports/exports/licences résolus et provenance conservée |
 | P4 — FFI/façade uniques | P3 | Chargeur, contrat, export map, agrégateur `aphrody-ffi`, `@aphrody/bun`, aliases transitoires | Tous symboles et consommateurs pilotes couverts, mémoire et async qualifiés |
 | P5 — Web/runtime fusionné | P4 | `aphrody-web` complet, backends nécessaires, Oxc/N2B et builtin Bun raccordés | Parité Web/JS/crawl et gates du fork ; aucune ancienne façade nécessaire hors shims déclarés |
 | P6 — Workspace Python et intégration Infra | P0–P5 | `aphrody-py` complet ; Infra/`@aphrody/workspace` orchestre les cibles, inventaires, checks et releases | Clones propres et builds hors de `src`, orchestration, artefacts et rollback attestés |
-| P7 — Stabilité et retrait | G1–G8, P3–P6 | Releases corrélées, stabilité prouvée ; migrer `rg` et `shenron` seulement après clôture | Zéro consommateur oublié, deux monorepos stables, plans fermés, docs/gitlinks/licences cohérents |
 
 P0 étend les commandes existantes `bridge status`, `binaries`, inventaire de
 workspaces, `automation-inventory`, `workspace-layout` et `cargo-boundaries`
@@ -718,8 +687,6 @@ une case ouverte ne rouvre pas une décision ci-dessous.
   web/mobile et accessibilité. La fusion Rust ne supprime pas un parcours GUI.
 - AI : CLI, MCP, app-server, RAG, workers/modèles/OCR, capacités Shell/OS et
   parcours Koharu. Respecter les frontières de sessions, annulation et stockage.
-- Web/RG/Shenron : mêmes URLs, auth, données, commandes Discord, SEO, contenus,
-  licences et erreurs ; changement de dépôt indépendant de la bascule service.
 
 <a id="bun-adapter-handoffs"></a>
 ### Adaptateur de code Bun et entraînement

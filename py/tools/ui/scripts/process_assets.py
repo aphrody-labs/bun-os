@@ -171,10 +171,10 @@ ITEMS = [
         "screen_name": "Claude Desktop Workspace & User Account Dropdown",
         "component": "Light Theme Workspace, Workspace Tree, Header with Workspace Pill, Floating Account Menu, Quota Warning Banner",
         "category": "workspace_chat",
-        "description": "Vue principale de Claude Desktop en thème clair chaleureux (#FBFBF9). Affiche la barre latérale avec recherche, raccourcis (+ Nouveau, Projets, Artéfacts, Personnaliser) et l'arborescence des dépôts de code ('aphrody', 'aphrody-src', 'nie', 'shenron'). En bas à gauche, le menu profil utilisateur est déployé (Paramètres avec raccourci Ctrl+,, Utilisation, Langue, Réabonnement Max, Clés API). En bas de page, une bannière d'alerte sur le quota hebdomadaire s'affiche au-dessus du champ de prompt avec sélecteur de modèle Opus 5.5 Extra.",
+        "description": "Vue principale de Claude Desktop en thème clair chaleureux (#FBFBF9). Affiche la barre latérale avec recherche, raccourcis (+ Nouveau, Projets, Artéfacts, Personnaliser) et l'arborescence des dépôts de code ('aphrody', 'aphrody-src', 'nie'). En bas à gauche, le menu profil utilisateur est déployé (Paramètres avec raccourci Ctrl+,, Utilisation, Langue, Réabonnement Max, Clés API). En bas de page, une bannière d'alerte sur le quota hebdomadaire s'affiche au-dessus du champ de prompt avec sélecteur de modèle Opus 5.5 Extra.",
         "ux_ui_highlights": [
             "Palette lumineuse douce et chaleureuse évitant la fatigue oculaire lors des longues sessions de revue de code",
-            "Organisation des espaces de travail sous forme d'arborescence de dossiers multi-dépôts (aphrody, aphrody-src, nie, shenron) avec boutons '+' et filtre rapides",
+            "Organisation des espaces de travail sous forme d'arborescence de dossiers multi-dépôts (aphrody, aphrody-src, nie) avec boutons '+' et filtre rapides",
             "Pill d'en-tête dynamique indiquant le workspace actif lié à la session en cours ('aphrody-src')",
             "Menu utilisateur flottant complet avec accès direct aux préférences, à la consommation de tokens et aux clés API",
             "Bannière d'alerte proactive d'épuisement de quota hebdomadaire avec CTA 'Mettre à niveau' et bouton de fermeture",

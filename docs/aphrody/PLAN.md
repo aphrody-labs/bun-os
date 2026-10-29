@@ -62,7 +62,6 @@ Architecture, contracts and open queue. Evidence: [MEMORY.md](MEMORY.md). Rules:
 | Prod dbfr on the fork Bun | Done, see 05eb852704. Remaining: yolo-tool-host, `install-yolo.*` |
 | Native runtime acquisition | Verified artifact on a fresh machine without engine rebuild; install, upgrade, rollback |
 | Desktop | Windows installer for `aphrody-app`; real Windows run; rendering in the real CEF app |
-| Shenron production | Restart `shenron-site`/`shenron-bot` after the release; measure `/api/chat`; verify the agent card |
 | MCP HTTP auth | Bearer token in a 0600 EnvironmentFile (`APHRODY_MCP_HTTP_TOKEN`); finish `workspace/wip/infra-mcp-auth` (free port, `infra validate` fix), gate, rebase, push |
 | agent-home | Land `workspace/wip/agent-home-gaps`; gate `aphrody-agent-home`, `aphrody-config` |
 | code-graph | Python/TS extractors and `scripts/audit/ai/graph-parity.ts`; Graphify stays the parity oracle |

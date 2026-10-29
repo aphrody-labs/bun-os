@@ -14,7 +14,7 @@
  * Ne PAS remplacer par les normaliseurs de `matcher.ts`.
  *
  * Pas de dépendance lourde (ni navigateur, ni cheerio, ni pg/sqlite) : module pur.
- * Importable en leaf `@rosegriffon/inagle/zukan/audit`. NON ré-exporté par le
+ * Importable en leaf `@aphrody/inagle/zukan/audit`. NON ré-exporté par le
  * barrel.
  */
 

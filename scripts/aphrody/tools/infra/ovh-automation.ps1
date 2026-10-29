@@ -9,7 +9,6 @@ $declared=Get-Content -LiteralPath (Join-Path $repositoryRoot 'tools/config/ovh-
 $entries=@($declared.boot.entries)
 $expected=@{
     'Aphrody OVH protected audit'='ovh-protected.ps1'
-    'Aphrody OVH Dragon Ball FR audit'='ovh-protected-dbfr.ps1'
 }
 if($entries.Count -ne $expected.Count){throw 'Unexpected OVH task declaration count'}
 foreach($entry in $entries){
@@ -40,7 +39,6 @@ $plans|ConvertTo-Json -Depth 5|Write-Output
 if(-not $Apply){return}
 New-Item -ItemType Directory -Force -Path (Join-Path $deploymentRoot 'tools/config')|Out-Null
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ovh-protected.ps1') -Destination (Join-Path $deploymentRoot 'ovh-protected.ps1')
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ovh-protected-dbfr.ps1') -Destination (Join-Path $deploymentRoot 'ovh-protected-dbfr.ps1')
 Copy-Item -LiteralPath (Join-Path $repositoryRoot 'tools/config/ovh-automation.json') -Destination (Join-Path $deploymentRoot 'infra/config/service-catalog.json')
 $logon=New-ScheduledTaskTrigger -AtLogOn -User $user
 $principal=New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Limited
@@ -57,4 +55,4 @@ foreach($entry in $entries){
     }
     Start-ScheduledTask -TaskName $entry.name -TaskPath $entry.path
 }
-Write-Output 'Registered and started both declared limited interactive read-only OVH audit tasks.'
+Write-Output 'Registered and started the declared limited interactive read-only OVH audit task.'

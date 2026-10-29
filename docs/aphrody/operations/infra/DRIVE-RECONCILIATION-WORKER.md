@@ -87,7 +87,7 @@ initialiser cette projection sans tâche A2A ni écriture Google.
 Revue pending/blocked, échec ou publication partielle suspendent `drive-replica` et
 `drive-retrieval`. Leurs reçus `waiting` exposent explicitement le compteur correspondant.
 La réplication utilise la génération validée, pas les documents actifs éventuellement
-modifiés entre deux ticks. Elle vérifie les SHA distants et indexe DBFR/Shenron via le
+modifiés entre deux ticks. Elle vérifie les SHA distants et indexe DBFR via le
 propriétaire natif. Le contrat installé et la liaison SSH protégée de l'unité restent des
 prérequis du plan Infra. Les configurations sans `driveReview` gardent leur comportement.
 

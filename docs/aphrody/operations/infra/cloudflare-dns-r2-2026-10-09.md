@@ -53,5 +53,5 @@ Order matters: DNSSEC on OVH must be removed from the parent before the nameserv
 
 - Orange-cloud proxying of web records: needs origin TLS and route parity first (dbfr nginx, certbot).
 - `www` to apex redirect: nginx change on dbfr through the Infra catalog.
-- Other zones on the OVH account (`rpbey.fr`) and the other profiles (`rosegriffon.fr`, `dragonballfr.com`).
+- Other zones on the OVH account (`rpbey.fr`)  and the other OVH profiles.
 - `aphrody-infra ovh dns info` crashes on the `isSigned` field: owned by claim `domain-cloudflare-ovh` (`crates/infra/ovh/src/dns.rs`).

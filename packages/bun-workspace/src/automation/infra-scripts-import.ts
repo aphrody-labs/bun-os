@@ -7,12 +7,7 @@ import { existsSync } from "node:fs";
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 
-const SCRIPT_PATHS = [
-  "scripts/ops/backup-shenron-pg.sh",
-  "scripts/ops/backup-shenron-sqlite.sh",
-  "scripts/ops/repo-sync.ts",
-  "scripts/tools/workspace/source-sync.ts",
-] as const;
+const SCRIPT_PATHS = ["scripts/ops/repo-sync.ts", "scripts/tools/workspace/source-sync.ts"] as const;
 
 type SourceEntry = {
   source: string;

@@ -37,10 +37,7 @@ Aucun service retiré n'est activé par cette rédaction.
 
 ## P2 — Dépôts et Git
 
-Organisations actives : aphrody-labs et rose-griffon. Dépôts privés et remotes
-existants ; transferts/publication seulement dans leur autorité explicite.
-Conserver redirects, identities packages/npm, upstreams, règles et gitlinks.
-Pas force-push, reset/stash/clean de changements concurrents.
+Dépôts privés et remotes existants ; transferts/publication seulement dans leur autorité explicite. Conserver redirects, identities packages/npm, upstreams, règles et gitlinks. Pas force-push, reset/stash/clean de changements concurrents.
 
 Travailler sur la branche autorisée dans le checkout existant ; claims disjoints,
 un intégrateur et gates requis. Pas worktree jetable par agent.

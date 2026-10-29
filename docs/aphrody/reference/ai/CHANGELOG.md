@@ -40,8 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `whisper-large-v3-turbo-q5_0.bin` speech-to-text on `whisper.cpp`.
   - `Qwen3-VL-8B-Instruct-Q4_K_M.gguf` multimodal vision and bounding box extraction.
   - `Qwen3-Embedding-0.6B` and `Qwen3-Reranker-0.6B` Matryoshka dimension reduction (1024 -> 512) and cross-encoder re-ranking.
-- Verified `aphrody-mcp` HTTP REST bridge (`/api/v1/shenron/*`) end-to-end with Shenron's `@shenron/ai` and Vercel AI SDK `generateText()`.
-- Validated Shenron's 203 unit and integration tests across `@shenron/ai`, `@shenron/aphrody`, `apps/shenron/site`, and `apps/bot`.
 
 ### NIE tools converge into aphrody-mcp (2026-09-26)
 
@@ -64,26 +62,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (web 3 < ai 5) holds without moving code into a lower layer.
 - New `aphrody-embed` binary (feature `server`): `worker` is the BXC framed stdio
   protocol unchanged; `serve` exposes `GET /health` and `POST /v1/embeddings`
-  with the exact contract of the Bun `apps/shenron-embed` (model name
+  with the contract of the former Bun embedding service (model name
   `Xenova/multilingual-e5-small`, 384 dims, 1-16 inputs of at most 8,192
   characters, caller-supplied `query: ` / `passage: ` prefixes, 503 until the
   model is loaded, never downloads); `install` fetches the pinned
   `intfloat/multilingual-e5-small` files with sha256 checks.
-- `apps/shenron-embed` is deleted. Measured on five French query/passage inputs,
+- The former Bun embedding service is deleted. Measured on five French query/passage inputs,
   the native f32 E5 vectors against the q8 ONNX service are at cosine
   0.99586-0.99768, the same band the q8 service had against the archived
-  snapshot (0.99736-0.99832), so the Shenron index vectors stay usable.
+  snapshot (0.99736-0.99832), so existing index vectors stay usable.
 
 ### Dragon Ball tools converge into aphrody-mcp (2026-09-26)
 
 - `aphrody-mcp` serves `dragonball.*` (feature `dragonball`, on by default): the
-  30 public and 5 editorial admin tools of the Bun `apps/shenron-mcp`, same
-  backends (`SHENRON_API_URL`, `SHENRON_SITE_API_URL`) and schemas.
+  30 public and 5 editorial admin tools of the former Bun MCP server, same
+  backends and schemas.
 - `aphrody-rag::dragonball` holds the reusable part: `APHRODY_DRAGONBALL_*`
   corpus paths, the naive local index over the dataset corpus and the runtime
   `rag.sqlite` store, the single-bot persona (Akira Toriyama by default under
   YOLO/NHITL) and the local answer through the `APHRODY_AI_CHAT_*` contract.
-- `apps/shenron-mcp` is deleted (its production unit was already retired on
+- The former Bun MCP server is deleted (its production unit was already retired on
   2026-09-25). `admin_aphrody_doctor`/`admin_aphrody_git` are not ported: they
   only wrapped `aphrody doctor --json` and `aphrody git inspect`, which agents run directly.
 
@@ -212,7 +210,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   MUI→M3 migration kit under `design/aphrody-m3/packages/material-web/{docs,migration}/`.
 - **`apps/web`** — public consumer client (React + `@aphrody-code/m3-react`
   + TanStack Router/Query, Bun-native `Bun.serve` + `bun build`), powered by
-  custom RAG/LLMs (shenron). Includes a React port of the Angular
+  custom RAG/LLMs. Includes a React port of the Angular
   admin (`apps/desktop`) under `/a` (assistant, dashboard, skills, mcp,
   commands, reverse, forensics, network, diagnostic, settings, about).
 - `aphrody doctor` subcommand — environment health check with rustls
@@ -260,7 +258,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   verified (commit b228509).
 - `crates/os/ostd/backend/benches/backend_bench.rs` — 180-line criterion bench
   suite for the backend crate (commit b228509).
-- `.github/shenron/workflows/codeql.yml` — 70-line CodeQL security scan, on
+- `.github/workflows/codeql.yml` — 70-line CodeQL security scan, on
   push/pr to main, weekly cron (commit b228509).
 - `.github/workflows/release-please.yml` + `release-please-config.json`
   + `.release-please-manifest.json` — automated semver release + tag +
@@ -384,7 +382,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-- `.github/shenron/workflows/codeql.yml` CodeQL security analysis pipeline —
+- `.github/workflows/codeql.yml` CodeQL security analysis pipeline —
   push + pr + weekly cron (commit b228509).
 - `docs/extensions/honest-delivery-v1.md` A2A extension formalising
   FAIT/NON_FAIT/INCOMPLET delivery classification so security claims

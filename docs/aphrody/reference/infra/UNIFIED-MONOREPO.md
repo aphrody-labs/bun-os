@@ -9,7 +9,7 @@ Ce document constitue la référence unique pour l'architecture, la topologie et
 
 | Emplacement | Sous-système | Stack & Rôle |
 |---|---|---|
-| `/home/aphro/aphrody` | **Grand Monorepo Produit & Applications** | Monorepo racine Bun + Cargo (Apps, packages TS, Crates Rust, Web, Shenron) |
+| `/home/aphro/aphrody` | **Grand Monorepo Produit & Applications** | Monorepo racine Bun + Cargo (Apps, packages TS, Crates Rust, Web) |
 | `/home/aphro/aphrody/m3` | **Aphrody Material 3 UI** | Submodule Git racine unifié (Forks Google M3, Base-UI, Fonts, TailwindCSS, Nie-UI) |
 | `/home/aphro/aphrody/crates/compat` | **Tooling & N2B Bridge** | `yolo-tooling` (C ABI), `aphrody-n2b*`, `aphrody-oxc-bridge` bornés |
 | `/home/aphro/yolo` | **Runtime & Engine Factory** | Fork Bun natif, Obscura V8/Headless, Tauri (CEF), FFI C ABI |

@@ -1,21 +1,21 @@
-# @rosegriffon/menu-render
+# @aphrody/menu-render
 
 Renderer React pixel-perfect pour les écrans de menu IEVR, depuis un `menu-layout.json`.
 
 ## Usage rapide
 
 ```tsx
-import { GameMenu } from "@rosegriffon/menu-render";
+import { GameMenu } from "@aphrody/menu-render";
 import layout from "./50_title.layout.json";
 
-<GameMenu layout={layout} assetBase="https://cdn.rosegriffon.fr" />;
+<GameMenu layout={layout} assetBase="https://cdn.example.com" />;
 ```
 
 ## Lua runtime ownership
 
-Import `LuaRuntimeAdapter` from `@rosegriffon/menu-render/lua-host` and supply
+Import `LuaRuntimeAdapter` from `@aphrody/menu-render/lua-host` and supply
 the real interpreter and game host to `useLuaScreen` from
-`@rosegriffon/menu-render/use-lua-screen`. Its options require `runtime` and
+`@aphrody/menu-render/use-lua-screen`. Its options require `runtime` and
 `layerIds`. No default game runtime is provided; missing adapters fail explicitly.
 The adapter executes source and resolves menu names, includes and hashes using
 the owning game implementation. The renderer does not synthesize those APIs.
@@ -73,7 +73,7 @@ Dans `apps/azalee/package.json` (catalog rg ou chemin direct) :
 
 ```json
 "dependencies": {
-  "@rosegriffon/menu-render": "workspace:*"
+  "@aphrody/menu-render": "workspace:*"
 }
 ```
 
@@ -86,11 +86,11 @@ Copier `re/azalee-integration/components/menu/GameMenuClient.tsx`
 
 ```tsx
 "use client";
-import { GameMenu, type MenuLayout } from "@rosegriffon/menu-render";
+import { GameMenu, type MenuLayout } from "@aphrody/menu-render";
 
 export function GameMenuClient({
   layout,
-  assetBase = "https://cdn.rosegriffon.fr",
+  assetBase = "https://cdn.example.com",
 }) {
   return <GameMenu layout={layout} assetBase={assetBase} />;
 }
@@ -101,7 +101,7 @@ export function GameMenuClient({
 Copier `re/azalee-integration/app/menu/[screen]/page.tsx`
 → `apps/azalee/app/menu/[screen]/page.tsx`
 
-URL : `https://azalee.rosegriffon.fr/menu/50_title`
+URL : `https://inagle.example.com/menu/50_title`
 
 Le layout est chargé depuis :
 
@@ -118,7 +118,7 @@ bun run iecode menu export 50_title --locale fr --out apps/azalee/public/menu-la
 ### 5. Variables d'environnement
 
 ```env
-NEXT_PUBLIC_CDN_BASE=https://cdn.rosegriffon.fr   # Base URL des PNG sprites
+NEXT_PUBLIC_CDN_BASE=https://cdn.example.com   # Base URL des PNG sprites
 IECODE_DATA_URL=http://localhost:4242               # API iecode-data (dev seulement)
 ```
 

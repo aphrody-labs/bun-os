@@ -2,7 +2,7 @@
 import type { Runner } from "./agent-home-drive-sync.ts";
 
 export interface RagMonitorConfig {
-  unit: "shenron-rag-sync.service";
+  unit: `aphrody-${string}.service`;
   reportPath: string;
   intervalSeconds: number;
 }
@@ -52,7 +52,7 @@ export function ragCounters(unit: string, report: Record<string, unknown>, journ
 }
 
 export async function readRagStatus(config: RagMonitorConfig, run: Runner) {
-  if (config.unit !== "shenron-rag-sync.service") throw Error("Invalid RAG monitor unit");
+  if (!/^aphrody-[a-z0-9-]+\.service$/.test(config.unit)) throw Error("Invalid RAG monitor unit");
   const unit = await run([
     "systemctl",
     "--user",

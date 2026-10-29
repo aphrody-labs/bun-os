@@ -12,7 +12,7 @@ Observed on 2026-10-14. Aphrody Infra owns the host configuration and the
   reverse-proxy API authentication and account auto-registration.
 - Source HTTPS uses the issued Let's Encrypt certificate, with the existing
   Certbot timer, webroot and Nginx renewal hook. No local CA trust was installed.
-- Cloudflare routes the full `/24` through the existing healthy `shenron-dbfr`
+- Cloudflare routes the full `/24` through the existing healthy dbfr
   tunnel. Its public ingress was preserved. The account profile includes exactly
   this private subnet by subtracting it from the old `10.0.0.0/8` exclusion.
 - The new `aphrody-labs.cloudflareaccess.com` organization permits WARP enrollment

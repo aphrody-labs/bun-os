@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Smoke the five packaged Aphrody loopback services with disposable credentials.
+"""Smoke the four packaged Aphrody loopback services with disposable credentials.
 
 Services: aphrody-web-api (:3007), aphrody-a2a (:8788), aphrody-ai-http
-(:8789, whose MCP transport must list the dragonball.* tools that replaced
-shenron-mcp), aphrody-shenron-embed (:8794) and aphrody-site (:8083). With
+(:8789) and aphrody-site (:8083). With
 --attest FILE a successful run writes the attestation the activation adapter
 requires, bound to the release's SHA256SUMS.
 """
@@ -13,7 +12,6 @@ import datetime
 import hashlib
 import http.server
 import json
-import math
 import os
 import secrets
 import subprocess
@@ -31,7 +29,6 @@ SERVICES = [
     "aphrody-web-api",
     "aphrody-a2a",
     "aphrody-ai-http",
-    "aphrody-shenron-embed",
     "aphrody-site",
 ]
 MCP_HEADERS = {
@@ -46,14 +43,6 @@ parser.add_argument(
 )
 args = parser.parse_args()
 release = args.release.resolve(strict=True)
-embed_cache_value = os.environ.get("APHRODY_EMBED_MODEL_DIR")
-if not embed_cache_value:
-    raise SystemExit(
-        "set APHRODY_EMBED_MODEL_DIR to the E5 files provisioned by `aphrody-embed install`"
-    )
-embed_cache = Path(embed_cache_value).resolve(strict=True)
-if not embed_cache.is_dir():
-    raise SystemExit("APHRODY_EMBED_MODEL_DIR must be a directory")
 public_token = secrets.token_hex(32)
 backend_token = secrets.token_hex(32)
 procs = []
@@ -235,15 +224,6 @@ with tempfile.TemporaryDirectory(prefix="aphrody-stack-smoke-") as temp:
             },
         )
         start(
-            "aphrody-shenron-embed",
-            [str(release / "bin/aphrody-embed"), "serve"],
-            {
-                "APHRODY_EMBED_HOST": "127.0.0.1",
-                "APHRODY_EMBED_PORT": "8794",
-                "APHRODY_EMBED_MODEL_DIR": str(embed_cache),
-            },
-        )
-        start(
             "aphrody-site",
             [str(release / "bin/aphrody-site")],
             {
@@ -258,29 +238,7 @@ with tempfile.TemporaryDirectory(prefix="aphrody-stack-smoke-") as temp:
         assert probe("http://127.0.0.1:3007/health") == b"OK"
         assert json.loads(probe("http://127.0.0.1:8788/ping"))["a2a_version"] == "1.0"
         assert json.loads(probe("http://127.0.0.1:8789/healthz"))["status"] == "ok"
-        embed_health = json.loads(probe("http://127.0.0.1:8794/health", attempts=120))
-        assert embed_health["status"] == "ready" and embed_health["dimensions"] == 384
-        e5_status, e5_payload = request(
-            "http://127.0.0.1:8794/v1/embeddings",
-            "POST",
-            {
-                "model": "Xenova/multilingual-e5-small",
-                "input": ["query: Son Goku", "query: Son Goku"],
-            },
-        )
-        e5_vectors = json.loads(e5_payload)["data"]
-        assert e5_status == 200 and len(e5_vectors) == 2
-        first, second = (item["embedding"] for item in e5_vectors)
-        assert len(first) == len(second) == 384 and all(
-            math.isfinite(value) for value in first + second
-        )
-        assert 0.99 < math.sqrt(sum(value * value for value in first)) < 1.01
-        assert first == second, "E5 fixture produced inconsistent vectors"
-        tools = mcp_tool_names("http://127.0.0.1:8789/mcp")
-        dragonball_tools = sorted(
-            name for name in tools if name.startswith("dragonball.")
-        )
-        assert dragonball_tools, "aphrody-mcp does not list the dragonball.* tools"
+        assert mcp_tool_names("http://127.0.0.1:8789/mcp"), "aphrody-mcp lists no tools"
         assert json.loads(probe("http://127.0.0.1:8083/healthz"))["status"] == "ok"
         assert request("http://127.0.0.1:8789/api/v1/models")[0] == 200
         card = json.loads(probe("http://127.0.0.1:8788/.well-known/agent-card.json"))
@@ -373,8 +331,7 @@ with tempfile.TemporaryDirectory(prefix="aphrody-stack-smoke-") as temp:
         for name, proc in zip(SERVICES, procs, strict=True):
             assert proc.poll() is None, f"{name} exited during the smoke"
         print(
-            f"five services, E5 inference, MCP dragonball.* tools ({len(dragonball_tools)}), "
-            "Web auth/ingest, A2A, AI models, site static/render: ok"
+            "four services, Web auth/ingest, A2A, AI models, site static/render: ok"
         )
         if args.attest:
             attestation = {
@@ -385,7 +342,6 @@ with tempfile.TemporaryDirectory(prefix="aphrody-stack-smoke-") as temp:
                     (release / "SHA256SUMS").read_bytes()
                 ).hexdigest(),
                 "services": SERVICES,
-                "dragonballTools": len(dragonball_tools),
                 "checkedAt": datetime.datetime.now(datetime.UTC)
                 .isoformat()
                 .replace("+00:00", "Z"),

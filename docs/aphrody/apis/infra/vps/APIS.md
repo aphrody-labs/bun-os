@@ -25,10 +25,6 @@ the retired `aphrody` monolith (docs/vps/APIS.md) and updated to the category re
 | `aphrody-site` | Public `aphrody.com` origin (Rust) | `aphrody-web` crates/aphrody-site (hors du monorepo) | Public host route |
 | `aphrody-a2a` | A2A JSON-RPC listener (`aphrody a2a serve`) | `aphrody-ai` `crates/infra/aphrody` over the `aphrody-contracts` A2A stack | Loopback; RPC path and agent card routed on `aphrody.com` |
 | `aphrody-ai-http` | AI REST gateway (`aphrody-mcp http`) | `aphrody-ai` `crates/ai/mcp` | Loopback; model and RAG read paths routed on `aphrody.com` |
-| `aphrody-shenron-embed` | E5 embeddings (Rust, `aphrody-embed serve`) | `aphrody-ai` `crates/ai/embed` | Loopback only |
-| `shenron-mcp` | Retired 2026-09-25; its tools are `dragonball.*` in `aphrody-mcp` | `aphrody-ai` `crates/ai/mcp` (feature `dragonball`) | None (route retired) |
-| `rg-api`, `rg-website`, `rg-achillea-bot` | RG platform APIs and sites | `rg` | Public host routes |
-| `shenron-bot`, `shenron-site` | Shenron REST/GraphQL/OpenAPI bot process and site | `shenron` | Public host routes |
 
 ## 2. BXC browser-automation API (`aphrody-web-api`)
 
@@ -58,9 +54,8 @@ Typed interface for agent integrations, built with Type-GraphQL:
 
 Routes are defined in `aphrody-ai/crates/aphrody-mcp/src/http_rest.rs`: `GET /healthz`, the
 OpenAI-compatible `/v1/models` and `/v1/chat/completions`, `/api/v1/models`,
-`/api/v1/rag/{query,stats}`, `/api/v1/aphrody/status` and the Shenron compute surface under
-`/api/v1/shenron/` (health, embed, LLM chat, RAG search/document/stats/ingest/sync). Only the
-paths listed for this service in `yolo/tools/config/host/nginx/routes.json` are public; the Shenron surface is
+`/api/v1/rag/{query,stats}`, `/api/v1/aphrody/status`. Only the
+paths listed for this service in `yolo/tools/config/host/nginx/routes.json` are public; the compute surface is
 consumed privately through the contract in [`tools/config/local-ai.json`](../../../../../tools/aphrody/config/local-ai.json)
 (gateway `ai-http`).
 

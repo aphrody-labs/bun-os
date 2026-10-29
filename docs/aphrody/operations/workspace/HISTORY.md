@@ -30,9 +30,6 @@ Current state is generated: see [STATE.md](../../reference/workspace/STATE.md).
 | `docs/operations/infra/db-dedup-2026-10-01.md` | 1 | 0aac07295 2026-10-02 |
 | `docs/operations/infra/document-links-coverage-qualification-2026-10-01` | 7 | c3f89c37d 2026-10-01 |
 | `docs/operations/infra/iecode-workspace-2026-10-01.md` | 1 | 985715b10 2026-10-01 |
-| `docs/operations/shenron/canonical-rule-exports-2026-10-01.json` | 1 | b2a1ea30c 2026-10-01 |
-| `docs/operations/shenron/native-artifact-qualification-2026-10-01` | 16 | 68dc5e4bd 2026-10-01 |
-| `docs/operations/shenron/native-loader-consolidation-2026-10-01.json` | 1 | e487be2e3 2026-10-01 |
 | `docs/operations/workspace/deployability-audit-2026-10-01.json` | 1 | 6e469ec9d 2026-10-01 |
 | `docs/operations/workspace/deployability-audit-2026-10-01` | 50 | 6e469ec9d 2026-10-01 |
 | `docs/operations/workspace/infra-e2e-2026-10-01` | 23 | 36d361b46 2026-10-01 |
@@ -47,8 +44,6 @@ Current state is generated: see [STATE.md](../../reference/workspace/STATE.md).
 | `docs/reference/web/web/RAPPORT-DEFAUTS-2026-09-05.md` | 1 | 3ef7bcec4 2026-09-29 |
 | `docs/research/os/LIBAPHRODY-LOW-LEVEL-AUDIT-2026-10-01.md` | 1 | 4c97c1060 2026-10-01 |
 | `docs/research/os/low-level-audit-2026-10-01` | 158 | 02171cbc1 2026-10-02 |
-| `docs/rg/achillea-live-qa-2026-09-25.md` | 1 | e464e97d6 2026-09-29 |
-| `docs/rg/ui-ux-redesign-plan-2026-09-25.md` | 1 | e464e97d6 2026-09-29 |
 | `docs/INDEX.md` | 1 | eddd8ddc0 2026-10-01 |
 | `docs/ARCHITECTURE-legacy.md` | 1 | 4c97c1060 2026-10-01 |
 | `docs/nu-legacy.md` | 1 | 4c97c1060 2026-10-01 |

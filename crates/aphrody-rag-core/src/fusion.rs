@@ -55,7 +55,7 @@ pub fn rrf_weighted<Id: Clone + Eq + Hash>(lists: &[(&[Id], f64)], k: f64) -> Ve
 }
 
 /// Keep the first occurrence of each `key_fn(item)`, preserving relative
-/// order — the generic form of shenron's URL/title dedup pass in
+/// order — the generic form of the TypeScript reference's URL/title dedup pass in
 /// `apps/bot/src/lib/rag.ts`.
 #[must_use]
 pub fn dedup_by_key<T, K, F>(items: Vec<T>, key_fn: F) -> Vec<T>
@@ -74,7 +74,7 @@ where
 }
 
 /// A multiplicative boost applied to every candidate whose `source_id`
-/// matches, before the final sort — shenron's `RAG_MANGA_WEIGHT`.
+/// matches, before the final sort — the TypeScript reference's `RAG_MANGA_WEIGHT`.
 #[derive(Debug, Clone)]
 pub struct SourceWeight {
     pub source_id: String,
@@ -82,7 +82,7 @@ pub struct SourceWeight {
 }
 
 /// Guarantee at least `quota` results from `source_id` in the final top-N,
-/// provided a candidate scores at least `min_score` (boosted) — shenron's
+/// provided a candidate scores at least `min_score` (boosted) — the TypeScript reference's
 /// `RAG_MANGA_QUOTA` / `RAG_MANGA_QUOTA_MIN_SCORE`. A quota candidate never
 /// evicts a result whose `kind` is in the caller's protected set.
 #[derive(Debug, Clone)]
@@ -110,7 +110,7 @@ fn boosted(weights: &[SourceWeight], c: &WeightedCandidate<impl Clone>) -> f64 {
     c.score * mult
 }
 
-/// Port of shenron's `boost()` + `MANGA_QUOTA` promotion pass
+/// Port of the TypeScript reference's `boost()` + `MANGA_QUOTA` promotion pass
 /// (`apps/bot/src/lib/rag.ts`, read 2026-09-19): sort all candidates by
 /// boosted score, take the top `top_n`, then — if a `quota` is configured —
 /// promote enough matching, sufficiently-scored candidates from the

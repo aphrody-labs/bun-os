@@ -9,7 +9,7 @@
     "./items/*": "./src/items/*.ts",
     "./preset.json": "./preset.json"
   },
-  "shenron": {
+  "bunos": {
     "runtime": {
       "./pure": "pure",
       "./server": "server",

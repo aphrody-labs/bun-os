@@ -156,15 +156,7 @@ JOIN gold_examples g USING (text_sha256);   -- must be 0
 
 ## 7. Current Aphrody state (observed 2026-10-01)
 
-**Registry:** none. On 2026-10-01 the owner dropped the first draft
-(`training` schema, Shenron-only) and emptied the Neon database: no schema
-exists until the code and its migrations are written. The registry must be
-generic, reusable by every Aphrody training (any model, any domain), and
-lives in the Neon project `aphrody` (`APHRODY_TRAINING_DATABASE_URL`, direct;
-`APHRODY_TRAINING_DATABASE_URL_POOLED`, runtime). The draft's lessons still
-apply to the next design: dataset lineage, code commit on runs, validated
-`sha256`, generic metrics instead of hard-coded Recall@5, one live promotion
-per alias.
+**Registry:** none. The registry must be generic, reusable by every Aphrody training (any model, any domain), and lives in the Neon project `aphrody` (`APHRODY_TRAINING_DATABASE_URL`, direct; `APHRODY_TRAINING_DATABASE_URL_POOLED`, runtime). The draft's lessons still apply to the next design: dataset lineage, code commit on runs, validated `sha256`, generic metrics instead of hard-coded Recall@5, one live promotion per alias.
 
 **No code writes the registry.** Searching this repository and
 `../aphrody-py` finds no writer of `training.*` or of

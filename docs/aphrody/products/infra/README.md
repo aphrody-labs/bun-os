@@ -82,7 +82,6 @@ aphrody-infra quality lint --repo <catalogued-repo> --run --json
   current action and repository constraints. The old `crates:scan`,
   `crates:update`, `crates:fix`, `crates:clean`, and `crates:build` aliases are
   not declared in the current package manifests.
-- [Immutable release runbook](../../operations/infra/IMMUTABLE-RELEASES.md), [Shenron migration](../../reference/infra/SHENRON-MIGRATION.md)
 - [Operations index](./ops/README.md), [VPS](./vps/README.md), [OVH](./ovh/README.md)
 - [Shared automation migration](../../reference/infra/AUTOMATION-MIGRATION.md)
 - [Authority map](../../reference/infra/UNIFIED-AGENT-CONTEXT.md), [repository layering](../../reference/infra/REPO-LAYERING.md)
@@ -122,7 +121,4 @@ scripts/build/rust/cargo-serial.sh run -p aphrody-infra -- service catalog
 
 Deploy adapters (Linux or WSL, as root; systemd, Nginx, curl and Bun are stubbed):
 
-The repository has standalone shell adapter fixtures at
-`scripts/test-atomic-deploy-{rg,shenron,bundle}.sh`; invoke a specific fixture
-with `bash scripts/test-atomic-deploy-<stack>.sh` on Linux/WSL. There is no
-root `test:adapters` package script in the current manifest.
+There is no root `test:adapters` package script in the current manifest.

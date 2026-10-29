@@ -48,7 +48,7 @@ docker compose --env-file <host-protected.env> -f compose.yaml run --rm --no-dep
 
 L'allocation GPU est exclusive : arrêter le service vLLM **déclaré** et vérifier
 sa sortie avant d'appliquer `standalone`. Ne jamais lancer en même temps
-Mistral.rs, vLLM et le train Shenron. Pour rollback, arrêter Mistral.rs puis
+Mistral.rs, vLLM et un train GPU. Pour rollback, arrêter Mistral.rs puis
 reprendre le profil vLLM déjà qualifié ; conserver les volumes et les poids.
 
 ```sh
@@ -64,7 +64,7 @@ Mistral.rs et sans second agent disposant de shell privilégié.
 ## Consommateur Rust commun
 
 Configurer le provider dans le home Aphrody d'Omar, en préservant le reste du
-fichier et les profils DBFR. `model` doit être exactement l'identité renvoyée
+fichier. `model` doit être exactement l'identité renvoyée
 par `GET http://127.0.0.1:8181/v1/models`, pas une identité inventée.
 
 ```toml
@@ -84,8 +84,7 @@ nouvel adaptateur gateway réutilise le même `ModelClient` :
 aphrody ai gateway serve --provider mistralrs --addr 127.0.0.1:8786
 ```
 
-`--provider configured` prend le provider actif du home ; `--provider shenron`
-sélectionne une table custom `model_providers.shenron` déjà déclarée, sans
+`--provider configured` prend le provider actif du home, sans
 inventer de checkpoint entraîné ni de nouveau builtin. Le gateway actuel est un
 contrat **chat texte** : historique, sampling, streaming et usage. Les appels
 d'outils et les entrées vision riches restent sur `ModelClient`/MCP ; des
@@ -106,7 +105,7 @@ persistante dans le Mesh. Un `/health` 200 ne suffit pas.
 | Chat texte, historique, sampling, SSE, usage | `model-client` → adaptateur `gateway` ; tests source sur VPS |
 | Outils, vision et contrats structurés | `ModelClient` et MCP existants ; pas de parité ajoutée au gateway texte |
 | RAG, mémoire, index et contexte | Owners Aphrody `rag*`, `embed`, `memory`, `context` ; aucune base copiée dans le moteur |
-| Train, checkpoints et LoRA Shenron | Owners `train` et Shenron ; poids/adaptateurs et compatibilité distincts du candidat Gemma |
+| Train, checkpoints et LoRA | Owner `train` ; poids/adaptateurs et compatibilité distincts du candidat Gemma |
 | Réseau, release et service persistant | Infra/Mesh de l'hôte ; allocation GPU exclusive et activation après vrai chat/rollback |
 | CLI, desktop et agents | `ModelFactory` existant ; provider déclaré dans le home et modèle réellement servi |
 

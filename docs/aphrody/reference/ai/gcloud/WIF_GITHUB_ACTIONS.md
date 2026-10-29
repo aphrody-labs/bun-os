@@ -43,7 +43,7 @@ gcloud iam workload-identity-pools providers create-oidc "github-provider" \
 ```
 
 ### Étape D : Autoriser le dépôt GitHub à usurper le compte de service
-Liez le compte de service `aphrody-bot` à l'identité GitHub. Remplacez `<owner>/<repo>` par votre dépôt (ex. `aphrody-code/aphrody` ou `rose-griffon/rg`).
+Liez le compte de service `aphrody-bot` à l'identité GitHub. Remplacez `<owner>/<repo>` par votre dépôt (ex. `aphrody-code/aphrody`).
 ```bash
 # Récupérer l'identifiant complet du pool
 POOL_ID=$(gcloud iam workload-identity-pools describe "github-pool" \

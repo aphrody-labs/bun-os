@@ -366,12 +366,6 @@ export { runCargoPackageRepair } from "./cargo-package-repair.ts";
 export { runCargoReleaseAudit, auditCargoRelease, classifyRequirements, } from "./cargo-release-audit.ts";
 ```
 
-### Source line 64
-
-```typescript
-export { runShenron } from "./shenron.ts";
-```
-
 ### Source line 65
 
 ```typescript

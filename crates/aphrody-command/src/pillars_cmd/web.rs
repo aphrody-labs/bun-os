@@ -11,9 +11,6 @@ mod crawl_index;
 #[path = "web_design_sync.rs"]
 mod design_sync;
 
-#[path = "web_dragon_ball.rs"]
-mod dragon_ball;
-
 /// Execute the product Web ingestion pipeline in process, without printing or
 /// invoking the command facade. FFI and CLI share the same typed owners.
 pub async fn run_web_pipeline(args: Vec<String>) -> miette::Result<serde_json::Value> {
@@ -26,13 +23,12 @@ pub async fn run_web_pipeline(args: Vec<String>) -> miette::Result<serde_json::V
         .map_err(|error| miette!("invalid Web pipeline arguments: {error}"))?;
     obscura_net::ensure_rustls_crypto_provider();
     match request.action {
-        WebAction::DragonBall { action } => dragon_ball::run(action).await,
         WebAction::CrawlIndex(args) => {
             serde_json::to_value(crawl_index::run(args).await?).into_diagnostic()
         }
         WebAction::DesignSync(args) => design_sync::run(args).await,
         _ => Err(miette!(
-            "Web pipeline accepts dragon-ball, crawl-index and design-sync actions"
+            "Web pipeline accepts crawl-index and design-sync actions"
         )),
     }
 }
@@ -237,11 +233,6 @@ pub(crate) enum WebAction {
     },
     /// Crawl into a private persistent frontier and index the selected home in process
     CrawlIndex(crawl_index::CrawlIndexArgs),
-    /// Native Dragon Ball campaign, provenance, export and home indexing
-    DragonBall {
-        #[command(subcommand)]
-        action: dragon_ball::DragonBallAction,
-    },
     /// Enumerate and extract pages through a MediaWiki Action API
     Mediawiki {
         /// Action API endpoint, such as https://example.org/w/api.php
@@ -515,9 +506,6 @@ pub(crate) async fn handle_web(action: WebAction) -> miette::Result<()> {
                 "bounded-crawl",
                 "persistent-crawl-index",
                 "crawl-redirect-allowlist-before-network",
-                "dragon-ball-campaign",
-                "dragon-ball-assets",
-                "dragon-ball-bxc-migration",
                 "crawl-url-regex-filters",
                 "structured-crawl-extraction",
                 "robots",
@@ -915,10 +903,6 @@ pub(crate) async fn handle_web(action: WebAction) -> miette::Result<()> {
         WebAction::CrawlIndex(args) => {
             let report = crawl_index::run(args).await?;
             print_web_json(&serde_json::to_value(&report).into_diagnostic()?)?;
-        }
-        WebAction::DragonBall { action } => {
-            let report = dragon_ball::run(action).await?;
-            print_web_json(&report)?;
         }
         WebAction::Mediawiki {
             api_url,
@@ -1726,28 +1710,7 @@ mod web_cli_tests {
     }
 
     #[tokio::test]
-    async fn ffi_pipeline_plan_is_readonly_and_rejects_unrelated_web_actions() {
-        let state = tempfile::tempdir().unwrap();
-        let args = [
-            "dragon-ball",
-            "plan",
-            "--source",
-            "official",
-            "--profile",
-            "shenron",
-            "--state",
-            state.path().to_str().unwrap(),
-            "--max-depth",
-            "1",
-            "--json",
-        ];
-        let report = run_web_pipeline(args.into_iter().map(str::to_owned).collect())
-            .await
-            .unwrap();
-        assert_eq!(report["mode"], "plan");
-        assert_eq!(report["profile"], "shenron");
-        assert_eq!(report["targets"].as_array().unwrap().len(), 1);
-        assert_eq!(std::fs::read_dir(state.path()).unwrap().count(), 0);
+    async fn ffi_pipeline_rejects_unrelated_web_actions() {
         assert!(
             run_web_pipeline(vec!["status".into(), "--json".into()])
                 .await

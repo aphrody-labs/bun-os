@@ -1,12 +1,11 @@
 #!/usr/bin/env bun
 // SPDX-License-Identifier: Apache-2.0
 /**
- * aphrody-build: the single VPS build image for Aphrody and Shenron
+ * aphrody-build: the single VPS build image for Aphrody
  * (tools/config/container/build/Dockerfile).
  *
  *   bun scripts/aphrody/build/container/aphrody-build.ts image                 # build + tag (versioned, latest)
  *   bun scripts/aphrody/build/container/aphrody-build.ts run [options] -- CMD   # run CMD on a bind-mounted checkout
- *   bun scripts/aphrody/build/container/aphrody-build.ts source-job plan|apply --config PRIVATE --plan PRIVATE [--plan-sha256 HASH]
  *
  * `run` options:
  *   --repo DIR            checkout to mount (default: this repository); mounted at the same absolute path
@@ -16,18 +15,17 @@
  *   --host-network        share the host network (loopback services such as a database tunnel)
  *   --no-lock             do not take the factory heavy lock
  *
- * Contract shared with Shenron's scripts/aphrody/build/container.ts: image `aphrody-build:latest`, caller uid
+ * Contract: image `aphrody-build:latest`, caller uid
  * plus the shared build group (gid 1500), named cache volumes aphrody-build-{cargo,sccache,bun,xwin,xdg},
  * bounded resources (APHRODY_BUILD_CPUS, default 6; APHRODY_BUILD_MEMORY, default 16g, no swap) and the
  * factory heavy lock `/home/ubuntu/build/locks/heavy.lock` when it exists.
  *
- * Private Git dependencies (Shenron pins aphrody-labs/aphrody by revision): the image's system Git
+ * Private Git dependencies: the image's system Git
  * credential helper answers for github.com with `APHRODY_GIT_TOKEN`. `run` resolves it from the
  * caller (APHRODY_GIT_TOKEN, GH_TOKEN, GITHUB_TOKEN, else `gh auth token`) and passes it by name only.
  */
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { sourceJobCli } from "./shenron-source-job.ts";
 
 export const IMAGE = "aphrody-build";
 export const BUILD_GID = 1500;
@@ -282,10 +280,9 @@ if (import.meta.main) {
   const [command, ...rest] = process.argv.slice(2);
   if (command === "image") await image();
   else if (command === "run") run(rest);
-  else if (command === "source-job") await sourceJobCli(rest);
   else {
     console.error(
-      "usage: aphrody-build.ts image | run [--repo DIR] [--target-volume NAME] [--env NAME]… [--host-network] [--no-lock] -- CMD… | source-job plan|apply --config PRIVATE --plan PRIVATE [--plan-sha256 HASH]",
+      "usage: aphrody-build.ts image | run [--repo DIR] [--target-volume NAME] [--env NAME]… [--host-network] [--no-lock] -- CMD…",
     );
     process.exit(64);
   }

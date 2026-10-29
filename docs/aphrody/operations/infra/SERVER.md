@@ -89,13 +89,13 @@ just host audit --host vps                              # same thing through the
 ## Space accounting (`yolo host space`)
 
 `du` over several directories counts a hard-linked file once per name, and a file whose other links stay outside
-the deleted set frees nothing. A deletion of a stale copy of Shenron, predicted at 43 GiB from `du`, freed 12 GiB
+the deleted set frees nothing. A deletion of a stale checkout copy, predicted at 43 GiB from `du`, freed 12 GiB
 on 2026-10-03. `host space` applies the exact rule instead: unlinking a set of paths returns the allocated blocks
 (`%b`, 512 bytes) of an inode if and only if every one of its links (`%n`) is inside the set. It reports the sum per
 name, the unique bytes, the bytes really freed and the bytes kept alive from outside, then checks the free-space
 floor on the result: free >= ceil(total x ratio), in integer arithmetic. The functions are pure
 (`packages/engine/yolo/src/host-space.ts`); `test/host-space.test.ts` checks freed <= unique <= naive on 300 seeded random sets
-and the shenron case, and a real run on hard-linked files gave 9.5 MiB freed and 47.7 MiB kept for a copy that
+and the stale-copy case, and a real run on hard-linked files gave 9.5 MiB freed and 47.7 MiB kept for a copy that
 shared 50 MB with a live one, matching `du`.
 
 The floor is a variable, not a constant (the first version fixed it at 50 %, which was only meant to be temporary).

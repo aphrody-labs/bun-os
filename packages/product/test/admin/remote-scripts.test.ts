@@ -176,7 +176,7 @@ detached("flags reach aphrody expanded and quoted; ~/ is expanded on the host", 
   const { ctx } = testContext();
   const flags = request("embeddings", "kit-test-args", {
     entree: "~/data/triples.jsonl",
-    domaine: "dbfr",
+    domaine: "wiki",
     steps: 7,
   });
   const started = await launchJob(remote, ctx.paths, flags, host);

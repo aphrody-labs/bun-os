@@ -56,7 +56,6 @@
 | **Bloc 1** | Portail Bun & Typecheck (mcp & cron) | ~4 | ~120k |
 | **Bloc 2** | J2 Wiki Serverless (zéro lecture locale + assets nie-web) | ~10 | ~350k |
 | **Bloc 3** | J3 Optimisation poids & ISR (/chara < 250Ko) | ~6 | ~180k |
-| **Bloc 4** | J4 Débranding Rose Griffon vers aphrody-dev | ~5 | ~150k |
 | **Bloc 5** | nie-site production rebuild (correctif WAL) | ~3 | ~80k |
 | **Bloc 6** | J7 Moka cache + baseline criterion + doc audits | ~6 | ~200k |
 | **Bloc 7** | Couverture Ultime (manquant = 0, 583 capacités) | ~35 | ~1200k |

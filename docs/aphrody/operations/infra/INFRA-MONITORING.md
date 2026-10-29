@@ -41,10 +41,6 @@ not discover arbitrary systemd units. Use a dated host observation when
 reporting complete unit inventory. `validate` checks the current service,
 route and port-policy catalogues; it is not a runtime health probe.
 
-The `rg-infra-monitor.timer` was observed active on the VPS on 2026-10-02; see
-the dated observation. The 2026-09-22 note about
-its removal is historical and is superseded for that observation only.
-
 ## Catalog rules
 
 The root JSON catalogues are authoritative for declared policy:

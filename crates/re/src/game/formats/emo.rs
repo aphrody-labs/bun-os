@@ -615,10 +615,10 @@ pub(crate) mod tests {
         assert!(EmoFile::parse(b"#EMD\xfe\xff").is_err());
     }
 
-    /// `SHENRON_REAL_EMO_DIR`: every `.emo` below it must parse into sane geometry.
+    /// `DBXV2_REAL_EMO_DIR`: every `.emo` below it must parse into sane geometry.
     #[test]
     fn parses_real_objects_when_provided() {
-        let Ok(dir) = std::env::var("SHENRON_REAL_EMO_DIR") else {
+        let Ok(dir) = std::env::var("DBXV2_REAL_EMO_DIR") else {
             return;
         };
         let mut files = Vec::new();

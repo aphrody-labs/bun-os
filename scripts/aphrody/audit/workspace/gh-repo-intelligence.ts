@@ -27,13 +27,7 @@ const repos = JSON.parse(
     "nameWithOwner,url,description,isPrivate,isArchived,isFork,stargazerCount,forkCount,updatedAt",
   ]),
 ) as Repo[];
-const priorities = [
-  "aphrody-labs/shenron",
-  "aphrody-code/nie",
-  "aphrody-code/bxc",
-  "aphrody-code/n2b",
-  "aphrody-code/aphrody",
-];
+const priorities = ["aphrody-code/nie", "aphrody-code/bxc", "aphrody-code/n2b", "aphrody-code/aphrody"];
 const packageTypes = ["npm", "container", "maven", "rubygems", "nuget", "docker"];
 const packages = (
   await Promise.all(
@@ -84,7 +78,6 @@ const report = {
   generatedAt: new Date().toISOString(),
   owner: "aphrody-code",
   priorities,
-  externalPriorities: ["rosegriffon/rg", "rosegriffon/azchilea"],
   activeCount: active.length,
   archivedCount: repos.length - active.length,
   ranked,

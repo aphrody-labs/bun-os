@@ -18,84 +18,38 @@ use colored::Colorize;
 use miette::{Context, IntoDiagnostic, Result, bail};
 use serde::{Deserialize, Serialize};
 
-/// The Shenron bot lives in aphrody-labs/shenron (`apps/bot`): the current checkout when it is
-/// the Shenron one, else `SHENRON_ROOT`, else the `shenron` checkout beside this repository.
-fn shenron_bot_dir(root: &Path) -> PathBuf {
-    if root.join("apps/site").is_dir() && root.join("apps/bot/package.json").is_file() {
-        return root.join("apps/bot");
-    }
-    std::env::var_os("SHENRON_ROOT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| root.parent().unwrap_or(root).join("shenron"))
-        .join("apps/bot")
-}
-
-/// Target Discord bots recognized by Aphrody.
+/// Target Discord bot: a bot project directory.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BotTarget {
-    Shenron,
-    RoseGriffon,
-    Achillea,
     Custom(PathBuf),
 }
 
 impl BotTarget {
     pub fn parse(s: &str) -> Option<Self> {
-        match s.to_lowercase().as_str() {
-            "shenron" | "shenron-bot" => Some(Self::Shenron),
-            "rg" | "rosegriffon" | "rose-griffon" | "rg-bot" => Some(Self::RoseGriffon),
-            "achillea" | "achillea-bot" => Some(Self::Achillea),
-            _ => {
-                let p = PathBuf::from(s);
-                if p.exists() {
-                    Some(Self::Custom(p))
-                } else {
-                    None
-                }
-            }
-        }
+        let p = PathBuf::from(s);
+        p.exists().then_some(Self::Custom(p))
     }
 
     pub fn id(&self) -> &str {
-        match self {
-            Self::Shenron => "shenron",
-            Self::RoseGriffon => "rg",
-            Self::Achillea => "achillea",
-            Self::Custom(_) => "custom",
-        }
+        "custom"
     }
 
     pub fn display_name(&self) -> &str {
-        match self {
-            Self::Shenron => "Shenron Discord Bot + Public API",
-            Self::RoseGriffon => "Rose Griffon Discord Bot (RG / Azalée)",
-            Self::Achillea => "Achillea (Rose Griffon Unified Engine & API)",
-            Self::Custom(_) => "Custom Discord Bot",
-        }
+        "Custom Discord Bot"
     }
 
-    pub fn default_dir(&self, root: &Path) -> PathBuf {
+    pub fn default_dir(&self, _root: &Path) -> PathBuf {
         match self {
-            Self::Shenron => shenron_bot_dir(root),
-            Self::RoseGriffon | Self::Achillea => root.join("apps/rg/bot"),
             Self::Custom(p) => p.clone(),
         }
     }
 
     pub fn entrypoint(&self) -> &str {
-        match self {
-            Self::Shenron | Self::RoseGriffon | Self::Achillea => "src/entry-standalone.ts",
-            Self::Custom(_) => "src/entry-standalone.ts",
-        }
+        "src/entry-standalone.ts"
     }
 
     pub fn default_outfile(&self) -> &str {
-        match self {
-            Self::Shenron => "dist/shenron",
-            Self::RoseGriffon => "dist/rg-bot",
-            Self::Achillea => "dist/achillea",
-            Self::Custom(_) => "dist/bot",
-        }
+        "dist/bot"
     }
 }
 
@@ -106,7 +60,6 @@ pub struct CompilerOptions {
     pub sourcemap: bool,
     pub smoke_check: bool,
     pub target_triple: Option<String>,
-    pub pre_build: bool,
 }
 
 impl Default for CompilerOptions {
@@ -116,7 +69,6 @@ impl Default for CompilerOptions {
             sourcemap: true,
             smoke_check: true,
             target_triple: None,
-            pre_build: true,
         }
     }
 }
@@ -325,23 +277,6 @@ impl DiscordCompiler {
             "======================================================".cyan()
         );
 
-        // Pre-build hook
-        if options.pre_build && target == &BotTarget::Shenron {
-            let css_script = dir.join("scripts/build-dashboard-css.sh");
-            if css_script.exists() {
-                println!("  [pre-build] Generating Tailwind CSS for Shenron dashboard...");
-                let status = Command::new("bash")
-                    .no_window()
-                    .arg("scripts/build-dashboard-css.sh")
-                    .current_dir(&dir)
-                    .status()
-                    .into_diagnostic()?;
-                if !status.success() {
-                    bail!("Tailwind pre-build failed for Shenron");
-                }
-            }
-        }
-
         let start = Instant::now();
         let outfile = target.default_outfile();
         let mut build_args = vec![
@@ -437,25 +372,6 @@ impl DiscordCompiler {
             smoke_passed,
             smoke_output,
         })
-    }
-
-    /// Compile all primary Discord bots in the monorepo.
-    pub fn compile_all(&self, options: &CompilerOptions) -> Result<Vec<CompilationResult>> {
-        let targets = [BotTarget::Shenron, BotTarget::RoseGriffon];
-        let mut results = Vec::new();
-        for t in &targets {
-            // Each bot ships from its product checkout; a missing one is reported, not fatal.
-            if !t.default_dir(&self.root).exists() {
-                println!(
-                    "skip {}: no checkout at {}",
-                    t.display_name(),
-                    t.default_dir(&self.root).display()
-                );
-                continue;
-            }
-            results.push(self.compile(t, options)?);
-        }
-        Ok(results)
     }
 
     /// Run full monorepo discord verification suite.
@@ -639,13 +555,12 @@ mod tests {
 
     #[test]
     fn parse_bot_target() {
-        assert_eq!(BotTarget::parse("shenron"), Some(BotTarget::Shenron));
-        assert_eq!(BotTarget::parse("rg"), Some(BotTarget::RoseGriffon));
+        let dir = std::env::temp_dir();
         assert_eq!(
-            BotTarget::parse("rose-griffon"),
-            Some(BotTarget::RoseGriffon)
+            BotTarget::parse(dir.to_str().unwrap()),
+            Some(BotTarget::Custom(dir))
         );
-        assert_eq!(BotTarget::parse("achillea"), Some(BotTarget::Achillea));
+        assert_eq!(BotTarget::parse("/nonexistent/bot-fixture"), None);
     }
 
     #[test]

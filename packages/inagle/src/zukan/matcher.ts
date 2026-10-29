@@ -17,7 +17,7 @@
  *
  * IMPORTANT : ce module ne tire AUCUNE dépendance lourde (pas de navigateur, pas de
  * cheerio, pas de pg). Il peut donc être importé en leaf
- * `@rosegriffon/inagle/zukan/matcher`. Il n'est PAS ré-exporté par le barrel
+ * `@aphrody/inagle/zukan/matcher`. Il n'est PAS ré-exporté par le barrel
  * `zukan/index.ts` (réservé aux types/parser/library) par prudence, mais reste
  * sans danger pour le bundle Next.
  */

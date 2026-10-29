@@ -70,20 +70,20 @@ Adapter les chemins de claim à la tâche réelle. `--dry-run` vérifie la comma
 résolue sans lancer de tâche. Les claims sont des verrous coopératifs ; les
 commits observés ne constituent pas une attribution certaine à un agent.
 
-Aphrody, DBFR/Shenron et IE ont des contextes de domaine séparés. Le contexte
+Aphrody et IE ont des contextes de domaine séparés. Le contexte
 partagé entre CLI reste rattaché au workspace concerné. Les bases natives de
 conversation restent dans leurs stores ; leurs projections ne deviennent pas
 des règles. Les poids entraînés et les données privées conservent leur store.
 Voir [TOOLS.md](../../TOOLS.md) pour les profils effectivement configurés.
-Le défaut de configuration est `aphrody`. Pour DBFR/Shenron :
+Le défaut de configuration est `aphrody`. Pour le domaine Inazuma :
 
 ```bash
-APHRODY_AGENT_DOMAIN=dbfr APHRODY_PROFILE=dbfr \
-APHRODY_WORKSPACE=~/.aphrody/workspaces/dbfr \
-aphrody a2a invoke --peer codex --claim crates/ai/shenron "tâche DBFR"
+APHRODY_AGENT_DOMAIN=ie APHRODY_PROFILE=ie \
+APHRODY_WORKSPACE=~/.aphrody/workspaces/ie \
+aphrody a2a invoke --peer codex --claim crates/ai "tâche IE"
 ```
 
-Remplacer `dbfr` par `ie` pour le domaine Inazuma. Les pairs continuent de
+Les pairs continuent de
 booter depuis ce checkout ; leurs stores et conversations sont filtrés par profil.
 
 ## Commandes de coordination vérifiées
@@ -250,5 +250,5 @@ Le catalogue `tools/config/cli-catalog.json` choisit un seul outil par capacité
 `systemctl` reste le superviseur hôte et `ssh` le transport.
 
 Les jetons, conversations brutes et valeurs de configuration privées ne sont
-pas inclus dans cet inventaire. La synchronisation DBFR/Drive et les modèles
-Shenron sont documentés par leurs propriétaires Agent Home et Infra.
+pas inclus dans cet inventaire. La synchronisation Drive et les modèles
+sont documentés par leurs propriétaires Agent Home et Infra.

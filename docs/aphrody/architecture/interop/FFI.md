@@ -10,22 +10,22 @@ State on 2026-10-02 (runtime note 2026-10-08). The Bun runtime is the [aphrody-l
 
 ```
 crates/interop/ffi            aphrody-ffi, the only cdylib/rlib handed to Bun (libaphrody_ffi.so | aphrody_ffi.dll | libaphrody_ffi.dylib)
-  src/lib.rs                  aphrody_* run/version/free/error + shenron_* + manga_* adapters (27 symbols)
+  src/lib.rs                  aphrody_* run/version/free/error + manga_* adapters (27 symbols)
   src/web/*.rs                aphrody_web_* adapters (extract, dom, index, media, net, jobs, embed, cookies, http)
   src/zerocopy.rs             caller-buffer exports: aphrody_zerocopy_*, aphrody_toolcall_*, aphrody_raster_*
   re-exports (pub use)        aphrody-bun (bun_rs_*), aphrody-n2b-native (node2bun_*, find_newlines_u16), aphrody-oxc-bridge (aphrody_oxc_*)
 packages/interop/native       @aphrody/bun
   src/library.ts              SYMBOLS table (the dlopen definitions), path resolution, ABI checks, shared handle
-  src/engine.ts               Shenron/Web/CLI wrappers (index, DOM trees, jobs, embeddings, HTTP, X, Gemini)
+  src/engine.ts               Web/CLI wrappers (index, DOM trees, jobs, embeddings, HTTP, X, Gemini)
   src/{manga,n2b,oxc,svg,render,icons,reproduce,zerocopy}.ts   one module per exported domain
   test/                       ffi-drift.test.ts (static, always runs), zerocopy.test.ts (skips without the cdylib)
 ```
 
-Exported symbols per Rust module (static count of `no_mangle` functions, 119 in total): `ffi/src/lib.rs` 27, `web/mod.rs` 22, `web/net_aliases.rs` 15, `web/index.rs` 12, `web/extract.rs` 3, `web/media.rs` 2, `web/native_http.rs` 2, `zerocopy.rs` 4, `ui/bun/src/lib.rs` 14, `render.rs` 3, `icons_ffi.rs` 2, `reproduce.rs` 2, `svg.rs` 1, `n2b-native` 5, `oxc-bridge` 5. Each domain has its own ABI version function: `aphrody_abi_version` (1), `aphrody_web_bridge_abi_version` (4), `shenron_abi_version` (1), `manga_abi_version` (1), `bun_rs_abi_version` (1), `node2bun_abi_version` (2), `aphrody_oxc_abi_version` (1), `aphrody_zerocopy_abi_version` (1).
+Exported symbols per Rust module (static count of `no_mangle` functions, 119 in total): `ffi/src/lib.rs` 27, `web/mod.rs` 22, `web/net_aliases.rs` 15, `web/index.rs` 12, `web/extract.rs` 3, `web/media.rs` 2, `web/native_http.rs` 2, `zerocopy.rs` 4, `ui/bun/src/lib.rs` 14, `render.rs` 3, `icons_ffi.rs` 2, `reproduce.rs` 2, `svg.rs` 1, `n2b-native` 5, `oxc-bridge` 5. Each domain has its own ABI version function: `aphrody_abi_version` (1), `aphrody_web_bridge_abi_version` (4), `manga_abi_version` (1), `bun_rs_abi_version` (1), `node2bun_abi_version` (2), `aphrody_oxc_abi_version` (1), `aphrody_zerocopy_abi_version` (1).
 
 ## Library resolution (`library.ts`)
 
-Order: `APHRODY_FFI_LIB` (or the compatibility `SHENRON_FFI_LIB`; two different values throw), then `packages/interop/native/native/<triple>/<file>`, then `native/<file>`, then, only with `APHRODY_FFI_DEV=1`, `target/<triple>/{release,debug}` and `target/{release,debug}` (`CARGO_TARGET_DIR` honoured). Artifacts are verified against their manifest (`native-artifact.ts`) before `dlopen`. One handle is shared by every subpath through `Symbol.for("aphrody.ffi.library.v1")`; importing a module never opens the library. After `dlopen`, each ABI version is compared with the expected one and the handle is closed on mismatch.
+Order: `APHRODY_FFI_LIB`, then `packages/interop/native/native/<triple>/<file>`, then `native/<file>`, then, only with `APHRODY_FFI_DEV=1`, `target/<triple>/{release,debug}` and `target/{release,debug}` (`CARGO_TARGET_DIR` honoured). Artifacts are verified against their manifest (`native-artifact.ts`) before `dlopen`. One handle is shared by every subpath through `Symbol.for("aphrody.ffi.library.v1")`; importing a module never opens the library. After `dlopen`, each ABI version is compared with the expected one and the handle is closed on mismatch.
 
 ## Conventions
 

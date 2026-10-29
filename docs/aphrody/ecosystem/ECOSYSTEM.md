@@ -9,7 +9,7 @@ from the checkout. Companion files: [CLI.md](CLI.md) (exact command trees), [MCP
 (every MCP tool), [ecosystem.json](ecosystem.json) (machine-readable). Check here before writing new
 code: reuse an existing crate, command or tool instead of duplicating it.
 
-Totals: 2 repositories (2 aphrody, 0 shared, 0 experiments), 198 crates, 36 binaries, 69 Bun packages, 10 uv packages, 777 CLI commands, 334 MCP tools.
+Totals: 2 repositories (2 aphrody, 0 shared, 0 experiments), 198 crates, 36 binaries, 47 Bun packages, 10 uv packages, 775 CLI commands, 330 MCP tools.
 
 | Repository | Kind | Role |
 | --- | --- | --- |
@@ -96,7 +96,7 @@ Canonical Rust/Bun monorepo
 | `aphrody-pkg-store` | crates/pkg/store | Verified content-addressed package blob store |  |  |
 | `aphrody-proc` | crates/os/ostd/proc | Process supervision primitives shared by the llama-server supervisor, the command sandbox and the training runner: process groups that die with their owner (Linux session + killpg, Windows Job Object with KILL_ON_JOB_CLOSE), detached daemons, liveness probes, elevated execution without a new console window (Sudo for Windows inline, UAC, sudo-rs), free-port allocation, advisory file locks and the single-GPU lease (shared for inference, exclusive for training). |  | tokio |
 | `aphrody-rag` | crates/ai/rag | Unified RAG storage, embedding, vector scan, hybrid search, and agent tools for aphrody (P8). |  | default, native, ort |
-| `aphrody-rag-core` | crates/ai/rag-core | Pure, wasm32-safe core of the aphrody RAG layer: source-aware chunkers (Rust/JS-TS/Markdown/structural/prose), reciprocal-rank-fusion + MMR + vector helpers, and a bit-for-bit port of shenron's retrieval eval harness. |  | default, oxc |
+| `aphrody-rag-core` | crates/ai/rag-core | Pure, wasm32-safe core of the aphrody RAG layer: source-aware chunkers (Rust/JS-TS/Markdown/structural/prose), reciprocal-rank-fusion + MMR + vector helpers. |  | default, oxc |
 | `aphrody-rag-eval` | crates/ai/rag-eval | RAG retrieval evaluation harness (Recall@k, MRR, nDCG) over HTTP, MCP or a local index. |  |  |
 | `aphrody-remote-desktop` | crates/infra/remote-desktop | Cross-platform remote-desktop server (JPEG over WebSocket, embedded browser viewer) for `aphrody infra remote serve`. |  | default, vnc, vnc-client, vnc-server |
 | `aphrody-render` | crates/ui/render | Unified Aphrody native renderer contract: M3 layout, 2D GPU backends and CPU fallback. |  | all-gpu, cpu, default, dx12, gpu, metal, parallel, vulkan, webgl, webgpu |
@@ -288,38 +288,16 @@ Active game-domain workspace
 | `aphrody-wii-runtime` | crates/emu/wii/core | Retained Gecko Wii/GameCube interpreter and device runtime |  | default, fps-counter, gx-stats, hooks, hooks-mut-traps, rendersink-blackbox |
 | `aphrody-wii-web` | apps/web/wii/crate | Wii WebAssembly browser adapter. |  | debug, default |
 
-### Bun packages (31)
+### Bun packages (9)
 
 | Package | Path | Description | Bin |
 | --- | --- | --- | --- |
 | `@aphrody/iecode-web` | apps/web |  |  |
-| `@aphrody/inagle-ui` | packages/nie-ui/packages/inagle-ui | Inagle explorer/maps UI helpers: re-exports @rosegriffon/inagle/ui (iecode packages/inagle), provided by the iecode workspace. |  |
 | `@aphrody/nie-ui` | packages/nie-ui | NIE UI and design, unified: emulator web UI (src), menu renderers, NIE web/site libraries and scripts, pixel-perfect tooling, skills, docs and the Rust crates (rust/). |  |
 | `@aphrody/nie-web` | packages/nie-ui/packages/nie-web | NIE web/site: wasm bindings (nie-wasm-web), engine/game loaders, build/audit/release/tools scripts of the former nie-web app, viewer assets. |  |
-| `@rosegriffon/achillea-client` | packages/rg/achillea-client | Versioned HTTP client and runtime contracts for the Achillea guild API |  |
-| `@rosegriffon/achillea-contract` | packages/rg/achillea-contract | Contrat Achilléa exporté en JSON Schema et en types natifs (Rust, Swift, Kotlin) — la brique qui rend le domaine portable hors TypeScript |  |
-| `@rosegriffon/achillea-core` | packages/rg/achillea-core | Logique métier portable (multi-runtime : navigateur, edge Deno/Web, Node, Bun) — Elo, classement, sanctions, licences, votes, validation. Aucune dépendance Discord / ORM / DI. |  |
-| `@rosegriffon/achillea-types` | packages/rg/achillea-types | Contrats d'API partagés (DTO + enums) — source unique pour le bot et le web |  |
-| `@rosegriffon/app-shell` | packages/rg/app-shell | Chrome applicatif partagé de website (navigation, barre latérale, barre supérieure, pied de page) |  |
-| `@rosegriffon/assets` | packages/rg/assets | Shared static assets for Rose Griffon apps |  |
-| `@rosegriffon/auth` | packages/rg/auth | Shared authentication logic and guards for Rose Griffon apps |  |
-| `@rosegriffon/azalee` | packages/azalee | Bibliothèque Bun du wiki Azalée (Inazuma Eleven: Victory Road) — accès PostgreSQL, index CPK, recherche et CLI. | `azalee` |
-| `@rosegriffon/azalee-web` | packages/nie-ui/apps/azalee-web |  |  |
-| `@rosegriffon/bot` | apps/rg/bot | Bot Discord Rose Griffon — slash commands public + admin, sync members, canvas cards |  |
-| `@rosegriffon/config` | packages/rg/config | Configs partagées : TypeScript, Oxc et Tailwind preset |  |
-| `@rosegriffon/cron` | packages/rg/cron | Daemon de tâches planifiées (cron) pour la maintenance DB, CDN et API |  |
-| `@rosegriffon/db` | packages/rg/db | Accès PostgreSQL partagé, façades SQL et types Database générés (site + bot) |  |
-| `@rosegriffon/discord-sync` | packages/rg/discord-sync |  |  |
-| `@rosegriffon/i18n` | packages/rg/i18n | Noyau i18n pur Rose Griffon : locales BCP-47, négociation, replis et formatage Intl |  |
-| `@rosegriffon/identity` | packages/rg/identity | Compte unique Rose Griffon : identité native et connexions liées (Discord, Patreon, Twitch, Google, Steam, Achilléa) |  |
-| `@rosegriffon/inagle` | packages/inagle | Universal Game Data API for Inazuma Eleven: Victory Road — parsers, types, and tools for IEVR game data | `inagle` |
-| `@rosegriffon/inagle-cross` | packages/inagle-cross | API de données et de rétro-conception pour Inazuma Eleven Cross — types, schémas, et analyseurs d'assets |  |
-| `@rosegriffon/menu-render` | packages/nie-ui/packages/menu-render | React menu renderer with a caller-supplied Lua runtime and game-host adapter. |  |
-| `@rosegriffon/menu-render-webgpu` | packages/nie-ui/packages/menu-render-webgpu | Renderer WebGPU 2D pixel-perfect pour les écrans de menu IEVR (quads texturés instanciés, projection ortho 1280×720, sampler nearest, premultiplied alpha, blend par drawType, z-order painter par drawPriority). Fallback DOM <GameMenu> de @rosegriffon/menu-render. |  |
-| `@rosegriffon/preferences` | packages/rg/preferences | Pure cross-runtime resolution of Rose Griffon presentation preferences |  |
-| `@rosegriffon/search` | packages/rg/search | Recherche unifiée sur les trois domaines du réseau : association, wiki Azalée, e-sport Achilléa |  |
-| `@rosegriffon/types` | packages/rg/types | Types métier partagés (roles, user, discord) — source unique de vérité bot/azalee/website |  |
-| `@rosegriffon/website` | apps/rg/website |  |  |
+| `@aphrody/inagle-ui` | packages/nie-ui/packages/inagle-ui | Inagle explorer/maps UI helpers: re-exports @aphrody/inagle/ui (packages/inagle), provided by the iecode workspace. |  |
+| `@aphrody/inagle` | packages/inagle | Universal Game Data API for Inazuma Eleven: Victory Road — parsers, types, and tools for IEVR game data | `inagle` |
+| `@aphrody/inagle-cross` | packages/inagle-cross | API de données et de rétro-conception pour Inazuma Eleven Cross — types, schémas, et analyseurs d'assets |  |
 | `iecode-homebrew` | packages/iecode-homebrew | Bun commands for the IECODE DS/DSi and 3DS homebrew toolchains | `iecode-homebrew` |
 | `iecode-workspace` | . | Game-format tooling, Inazuma Eleven data libraries and console-emulation components, with Rust, Bun, Python, .NET and C++ interfaces. |  |
 | `ieverse` | packages/ieverse | Canonical Inazuma Eleven media catalogue, source URLs, navigation and player contracts. |  |

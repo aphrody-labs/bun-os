@@ -4,12 +4,12 @@
  *
  *   bun scripts/search.ts "<query>" [--domain <domain>] [--stack <stack>] [-n 3] [--json] [--full]
  *   bun scripts/search.ts "<query>" --design-system [-p "Project Name"] [-f ascii|markdown]
- *   bun scripts/search.ts "<query>" --design-system --brand rose-griffon-roy
+ *   bun scripts/search.ts "<query>" --design-system --brand m3-baseline-light
  *   bun scripts/search.ts "<query>" --design-system --persist -p "Project" --output-dir "<project-root>" [--page dashboard] [--force]
  *   bun scripts/search.ts "<query>" --design-system --variance 8 --motion 9 --density 7
  *
  * Domains: style, color, chart, landing, product, ux, typography, google-fonts, icons, gsap, react, web, brand
- * Stacks: see --help (includes m3 and rg-ui for the Bun OS / Aphrody workspace)
+ * Stacks: see --help (includes m3 for the Bun OS / Aphrody workspace)
  */
 
 import { parseArgs } from "node:util";
@@ -101,7 +101,7 @@ options:
   -ds, --design-system  Generate complete design system recommendation
   -p, --project-name    Project name for design system output
   -f, --format          Output format for design system: ascii (default) or markdown (ignored with --json)
-  -b, --brand BRAND     Use a real brand theme from brands.csv (e.g. rose-griffon-roy, azalee-light)
+  -b, --brand BRAND     Use a real brand theme from brands.csv (e.g. m3-baseline-light, azalee-light)
   --persist             Save to design-system/<project-slug>/MASTER.md
   --page PAGE           Also create design-system/<project-slug>/pages/<page>.md
   -o, --output-dir DIR  Directory the design-system/ folder is created under (pass the project root)

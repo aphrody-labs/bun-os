@@ -1,6 +1,6 @@
 # @aphrody/discord-kit
 
-Shared Discord bot core kit, published as `@aphrody/discord-kit` and used by the Shenron and Rose Griffon bots.
+Shared Discord bot core kit, published as `@aphrody/discord-kit` and used by Aphrody Discord bots.
 
 ## Features
 

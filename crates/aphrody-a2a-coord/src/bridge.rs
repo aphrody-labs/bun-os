@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Cross-repo `/a2a` JSON-RPC 2.0 bridge (`message/send` with
-//! `target`/`sourceAgent`/`instruction`/`yolo`), shared with aphrody-os,
-//! aphrody-infra and shenron. Each call is mirrored as a `.coord` envelope.
+//! `target`/`sourceAgent`/`instruction`/`yolo`), shared with aphrody-os and
+//! aphrody-infra. Each call is mirrored as a `.coord` envelope.
 
 use axum::{Json, Router, extract::State, routing::post};
 use serde::{Deserialize, Serialize};
@@ -166,14 +166,14 @@ mod tests {
         SendParams {
             target: target.into(),
             source_agent: "aphrody".into(),
-            instruction: "ping shenron".into(),
+            instruction: "ping codex".into(),
             yolo: true,
         }
     }
 
     #[test]
     fn request_shape_is_camel_case() {
-        let r = build_request("1", &params("shenron"));
+        let r = build_request("1", &params("codex"));
         assert_eq!(r["method"], "message/send");
         assert_eq!(r["params"]["sourceAgent"], "aphrody");
         assert_eq!(r["params"]["yolo"], true);

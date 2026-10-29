@@ -12,7 +12,7 @@
 
 /** Atlas décodé (PNG) servi par le CDN + ses dimensions natives. */
 export const GAIJI_ATLAS = {
-  url: "https://cdn.rosegriffon.fr/dx11/font/fr/gaiji_game2.png",
+  url: "https://cdn.example.com/dx11/font/fr/gaiji_game2.png",
   width: 416,
   height: 436,
 } as const;

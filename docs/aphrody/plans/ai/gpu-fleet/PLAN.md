@@ -211,14 +211,7 @@ BitsAndBytes loaded the complete model, reporting 6.63 GiB, but the first runtim
 profile had negative available KV memory at 85% GPU utilization. This is a
 failed serving qualification, not a working model API.
 
-The explicit 2 GiB CPU-offload candidate left the same negative KV budget.
-Raising GPU utilization to 93% failed the measured initial free-memory check.
-Both are failed candidates. Their configurable commands remain bounded before
-launch; distributed roles refuse the standalone offload setting. See the exact
-[vLLM 0.26 offload contract](https://github.com/vllm-project/vllm/blob/v0.26.0/vllm/config/offload.py).
-Real generation, stable restart and model-backed client activation still gate
-delivery. This Gemma candidate is distinct from the existing trained
-`shenron-chat-v2` Qwen adapter; no model alias invents a training result.
+The explicit 2 GiB CPU-offload candidate left the same negative KV budget. Raising GPU utilization to 93% failed the measured initial free-memory check. Both are failed candidates. Their configurable commands remain bounded before launch; distributed roles refuse the standalone offload setting. See the exact [vLLM 0.26 offload contract](https://github.com/vllm-project/vllm/blob/v0.26.0/vllm/config/offload.py). Real generation, stable restart and model-backed client activation still gate delivery.
 
 ## Real model API qualification, 2026-10-09
 
@@ -236,34 +229,4 @@ request receipt, not a throughput benchmark, RAG eval or tool-call qualification
 Fourteen Python tests now pass, including the SDK's optional-provider-free
 planner import. The inference package retains its public exports lazily.
 
-Omar now has the qualified fork as `bun.exe` in its versioned directory and
-Buv's actual `uv 0.12.24` installed CPython 3.12.15. Buv dispatch depends on the
-supported executable basename: the earlier renamed `.exe` did not expose UV.
-Its unmanaged existing Python launcher was preserved. SDK bridge distribution
-and model-backed Shenron clients still require their host receipts.
-
-## Shenron delivery and remaining host qualification, 2026-10-09
-
-The pinned Shenron pipeline `1545a33f` was built and run on the VPS, then
-delivered to DBFR with its exact locked Zod dependency and SHA-256 receipts.
-Inlining Zod failed before execution; the qualified package keeps it external.
-After a checksum-verified PostgreSQL source-registry backup, the native import
-applied 396 records and preserved 57 from 17 official documents and 436 media
-references. Canon promotion remains zero; references do not prove fetched media
-or fresh RAG embeddings. The crawl respects robots with 25 requests and depth two.
-
-The production audit checked all 381 listed images of Soshuhen volume one,
-receiving 381 image responses with HTTP 206. The other 17 volume API records
-have no listed pages. No complete CDN, OCR, wiki or RAG delivery is inferred.
-
-The configured provider is consumed by `aphrody ai agent app-server` and the
-shared site/desktop daemon. The installed help states that
-`aphrody ai agent exec [PROMPT]` currently returns unsupported. Source-level
-authenticated MCP/SSE changes require newly distributed binaries before
-activation; the older installed binary is not this qualification.
-
-At 19:10 UTC, Omar's direct private SSH connection timed out and the VPS no
-longer listened on reverse ports 22010 or 22011. The earlier real generation
-receipt remains valid, but current reachability, Python host DLL delivery,
-GPU training, Mistral.rs activation and reboot persistence remain unqualified.
-The owner workstation started no Cargo or GPU jobs for this batch.
+Omar now has the qualified fork as `bun.exe` in its versioned directory and Buv's actual `uv 0.12.24` installed CPython 3.12.15. Buv dispatch depends on the supported executable basename: the earlier renamed `.exe` did not expose UV. Its unmanaged existing Python launcher was preserved.

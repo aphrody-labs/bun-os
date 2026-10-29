@@ -5,7 +5,7 @@
 Infra adapter: `scripts/tools/infra/site-gateway.ts` (Bun, no PowerShell; registry
 proof through `bun:ffi` in `win32-net.ts`). It adds only
 a marked Aphrody server/upstream to the existing Nginx configuration, generated
-by `aphrody infra nginx render` from its typed JSON model. It preserves Shenron,
+by `aphrody infra nginx render` from its typed JSON model. It preserves existing
 bot and CDN blocks, container lifecycle, firewall and authentication stores.
 
 Host configuration lives in the configured Aphrody home's `host/` directory:
@@ -13,8 +13,8 @@ Host configuration lives in the configured Aphrody home's `host/` directory:
 ```json
 {
   "home": "C:/Users/OWNER/.aphrody",
-  "sourceConfig": "C:/shenron/deploy/docker/compose-gateway.nginx.conf",
-  "container": "shenron-gateway",
+  "sourceConfig": "C:/path/to/compose-gateway.nginx.conf",
+  "container": "gateway",
   "registry": "C:/ProgramData/Aphrody/site/run/native-services/site.json",
   "serverNames": ["localhost", "127.0.0.1", "aphrody.local", "aphrody.com", "www.aphrody.com"],
   "expectedSourceSha256": "REVIEWED_PLAN_SHA256"

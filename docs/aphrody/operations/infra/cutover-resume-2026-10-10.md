@@ -100,9 +100,7 @@ HSTS does not extend to broken subdomain origins. This adapter does not attach
 R2 domains or repair service ingress; those remain separate required tasks.
 
 DBFR ingress was identified through Docker mount inspection as
-`aphrody-gateway-1`, mounting the current immutable Shenron release nginx
-directory. Its successful `nginx -T` contains only Dragonballfr vhosts,
-including mcp.dragonballfr.com. Aphrody ingress must be delivered through the
+`aphrody-gateway-1`. Aphrody ingress must be delivered through the
 existing release/catalog owner, preserving this gateway and its TLS store.
 
 ## Follow-up: VPS catalog and public WASM, 22:39 UTC
@@ -281,7 +279,7 @@ dependent publication and completion. Ten tests / 29 assertions, scoped strict
 TypeScript, oxlint and oxfmt pass. No versions were changed or republished.
 
 The same live recheck confirms changed-content blockers for discord-kit,
-m3-os-themes, rg-ui, timeline and web-to-tauri. The six m3 version violations
+m3-os-themes, timeline and web-to-tauri. The six m3 version violations
 come from the actual root lockstep contract (3.3.9 versus selected 3.3.10
 producers); committing alone cannot remove them. A coordinated family release
-and dependency update is still required, preserving active RG/UI ownership.
+and dependency update is still required.

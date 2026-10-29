@@ -2952,7 +2952,7 @@ nginx failed failed
             "aphrody-ssh",
             "tunnel",
             "--services",
-            "shenron-pg-tunnel,redis",
+            "db-tunnel,redis",
             "--offset",
             "500",
             "--catalog",
@@ -2962,7 +2962,7 @@ nginx failed failed
         .unwrap();
         match cli.command {
             Commands::Tunnel { args, action } => {
-                assert_eq!(args.services.as_deref(), Some("shenron-pg-tunnel,redis"));
+                assert_eq!(args.services.as_deref(), Some("db-tunnel,redis"));
                 assert_eq!(args.offset, 500);
                 assert_eq!(
                     args.catalog.as_deref(),

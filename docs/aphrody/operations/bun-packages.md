@@ -33,9 +33,9 @@ Une archive valide ne suffit pas à qualifier une release : les tests, lint, for
 
 ## Capacité et placement
 
-Directive propriétaire du 2026-10-07 : tout Shenron (production et builds) sur DBFR ; VPS réservé à Aphrody. Libérer substantiellement l’espace lorsque le disque bloque un gate, en préservant les données protégées, les copies vérifiées, le travail actif et les caches partagés.
+Directive propriétaire du 2026-10-07 : VPS réservé à Aphrody. Libérer substantiellement l’espace lorsque le disque bloque un gate, en préservant les données protégées, les copies vérifiées, le travail actif et les caches partagés.
 
-Le runbook `scripts/audit/infra/reclaim-cargo-test-binaries.py` a retiré 27 exécutables de tests inactifs de plus de deux heures, sans lien partagé, et a libéré 14 389 207 040 octets sur `/srv`. Les bibliothèques, sccache, sources Cargo/Bun, stores et binaires installés restent préservés. Le routage Cargo de Shenron est épinglé à DBFR ; la migration des stores reste dans le lot Infra de cutover existant.
+Le runbook `scripts/audit/infra/reclaim-cargo-test-binaries.py` a retiré 27 exécutables de tests inactifs de plus de deux heures, sans lien partagé, et a libéré 14 389 207 040 octets sur `/srv`. Les bibliothèques, sccache, sources Cargo/Bun, stores et binaires installés restent préservés. La migration des stores reste dans le lot Infra de cutover existant.
 
 ## Catalogue de cette livraison
 

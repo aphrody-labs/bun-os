@@ -33,7 +33,7 @@ test("local sync paths follow the selected context without rewriting remote stor
     contract: "~/contract.json",
     directory: "/remote",
     stateRoot: "/state",
-    shenronRoot: "/shenron",
+    extraStateRoot: "/extra",
     intervalSeconds: 300,
   };
   expect(resolveSyncContext({ ...config, replica }, cwd, home).replica?.contract).toBe(join(home, "contract.json"));

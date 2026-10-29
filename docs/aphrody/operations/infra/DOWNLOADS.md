@@ -3,7 +3,7 @@
 
 Owner order of 2026-10-06 (explicit publication authority for exactly this scope): the single `aphrody`
 multi-call binary (it carries the MCP server, `aphrody-mcp`), the Bun CLI `yolo` with its runtime artifact, SDK and
-templates, and the Aphrody, yolo and Shenron plugins are downloadable from our site and from GitHub releases of
+templates, and the Aphrody and yolo plugins are downloadable from our site and from GitHub releases of
 existing repositories.
 
 ## Public path and its limits
@@ -59,7 +59,7 @@ Declared in `tools/config/downloads.json`.
 | `aphrody-setup` (kind `desktop`) | local stage `scripts/release/stage-setup.ts`: Bun compile of `packages/infra/product`, pet icon by rcedit under Wine, not signed; the `.exe` and its flat `.tar.gz` update archive | windows x86_64 |
 | `omar-kit` (kind `kit`) | local stage `scripts/release/stage-omar-kit.ts`: the pack zip and the flat `.tar.gz` its updater reads | windows x86_64 |
 | `aphrody-app` (kind `desktop-app`) | Tauri NSIS installer of `crates/ui/app`, installed by the setup with `/S` | declared, disabled: no Windows build of the desktop app yet |
-| `plugin-aphrody`, `plugin-yolo`, `plugin-shenron` | `git archive` of the pushed HEAD of `plugins/aphrody`, `plugins/yolo` and `plugin/` of `aphrody-labs/shenron` (tracked files only) | any (tar.gz and zip) |
+| `plugin-aphrody`, `plugin-yolo` | `git archive` of the pushed HEAD of `plugins/aphrody` and `plugins/yolo` (tracked files only) | any (tar.gz and zip) |
 
 Not published, and why (also written in `latest.json` `notes`): macOS (no target declared by the factory or the
 toolchain catalog), Windows `yolo` (no packaged `yolo-runtime` artifact for Windows).
@@ -124,12 +124,11 @@ over the current uplink was not practical).
 Observed with `aphrody infra service status` and `systemctl`: `aphrody-downloads` (new), `aphrody-fonts-proxy` (declared
 active but never installed: unit, app tree `/home/ubuntu/apps/cdn/{app,src}` from the yolo release, certificate and vhost
 `cdn.aphrody.com` now installed; the vhost challenge webroot was aligned on `/var/www/letsencrypt`),
-`aphrody-discord-dev`, `shenron-site`, `shenron-bot`, `shenron-mcp-http`, `shenron-pg-tunnel`, `redis-server`: enabled and active.
-Shenron units were not touched. Declared `retired` services (`aphrody-site`, `aphrody-web-api`, `aphrody-ai-http`,
-`aphrody-shenron-embed`, `aphrody-a2a`, `shenron-mcp`) stay retired: reviving them is a catalog decision (convergence plan).
-Gap left: `shenron-backup.timer` is declared active but not installed on the vps (Shenron owner decision).
+`aphrody-discord-dev`, `redis-server`: enabled and active.
+Declared `retired` services (`aphrody-site`, `aphrody-web-api`, `aphrody-ai-http`,
+`aphrody-embed`, `aphrody-a2a`) stay retired: reviving them is a catalog decision (convergence plan).
 
 Public without authentication, by catalog design: `downloads.aphrody.com`/`aphrody.com`, `cdn.aphrody.com` (font proxy,
-GET/HEAD only), `dragonballfr.com`, `cdn.dragonballfr.com`, `bot.dragonballfr.com` and `bot.aphrody.com` (Discord endpoints,
+GET/HEAD only), and `bot.aphrody.com` (Discord endpoints,
 signature-checked by the bot). Observed, not changed: Postgres listens on 0.0.0.0:5432 behind the INPUT DROP firewall, and
 ufw allows 3080/tcp with no listener.

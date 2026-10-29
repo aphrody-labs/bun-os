@@ -30,14 +30,7 @@ pub const DEFAULT_ALIAS: &str = "vps";
 pub const REDIS_SERVICE_ID: &str = "redis";
 
 /// Default set of service ids opened by `aphrody ssh tunnel` when `--services` is omitted.
-pub const DEFAULT_TUNNEL_SERVICE_IDS: &[&str] = &[
-    "shenron-pg-tunnel",
-    "aphrody-ai-http",
-    "aphrody-shenron-embed",
-    "shenron-bot",
-    "shenron-mcp",
-    REDIS_SERVICE_ID,
-];
+pub const DEFAULT_TUNNEL_SERVICE_IDS: &[&str] = &["aphrody-ai-http", REDIS_SERVICE_ID];
 
 /// Shared flags for `tunnel` and `tunnel status`.
 #[derive(Debug, Clone, Args)]
@@ -606,19 +599,11 @@ mod tests {
                 "health": "http://127.0.0.1:8789/healthz"
             },
             {
-                "id": "aphrody-shenron-embed",
+                "id": "aphrody-embed",
                 "health": "http://127.0.0.1:8794/health"
             },
             {
-                "id": "shenron-bot",
-                "health": "http://127.0.0.1:5006/health"
-            },
-            {
-                "id": "shenron-mcp",
-                "health": "http://127.0.0.1:5010/health"
-            },
-            {
-                "id": "shenron-pg-tunnel",
+                "id": "db-tunnel",
                 "health": "tcp://127.0.0.1:15433",
                 "target": "dbfr:127.0.0.1:5432"
             },
@@ -658,13 +643,19 @@ mod tests {
 
     #[test]
     fn resolve_plan_default_offset_matches_spec() {
-        let ids = parse_service_ids(None);
+        let ids = [
+            "db-tunnel",
+            "aphrody-ai-http",
+            "aphrody-embed",
+            REDIS_SERVICE_ID,
+        ]
+        .map(String::from);
         let plan = resolve_plan(FIXTURE, &ids, DEFAULT_OFFSET).expect("plan resolves");
         assert_eq!(
             plan,
             vec![
                 TunnelPlanEntry {
-                    id: "shenron-pg-tunnel".into(),
+                    id: "db-tunnel".into(),
                     alias: "dbfr".into(),
                     local_port: 15433,
                     remote_port: 5432,
@@ -676,22 +667,10 @@ mod tests {
                     remote_port: 8789,
                 },
                 TunnelPlanEntry {
-                    id: "aphrody-shenron-embed".into(),
+                    id: "aphrody-embed".into(),
                     alias: "vps".into(),
                     local_port: 18794,
                     remote_port: 8794,
-                },
-                TunnelPlanEntry {
-                    id: "shenron-bot".into(),
-                    alias: "vps".into(),
-                    local_port: 15006,
-                    remote_port: 5006,
-                },
-                TunnelPlanEntry {
-                    id: "shenron-mcp".into(),
-                    alias: "vps".into(),
-                    local_port: 15010,
-                    remote_port: 5010,
                 },
                 TunnelPlanEntry {
                     id: "redis".into(),
@@ -747,14 +726,20 @@ mod tests {
 
     #[test]
     fn group_by_alias_groups_and_preserves_order() {
-        let ids = parse_service_ids(None);
+        let ids = [
+            "db-tunnel",
+            "aphrody-ai-http",
+            "aphrody-embed",
+            REDIS_SERVICE_ID,
+        ]
+        .map(String::from);
         let plan = resolve_plan(FIXTURE, &ids, DEFAULT_OFFSET).unwrap();
         let groups = group_by_alias(&plan);
         assert_eq!(groups.len(), 2);
         assert_eq!(groups[0].alias, "dbfr");
         assert_eq!(groups[0].forwards, vec![(15433, 5432)]);
         assert_eq!(groups[1].alias, "vps");
-        assert_eq!(groups[1].forwards.len(), 5);
+        assert_eq!(groups[1].forwards.len(), 3);
     }
 
     #[test]

@@ -27,7 +27,7 @@ aphrody-certificates --output <absolute-production-directory> --workspace <absol
 
 Contact is `mailto:contact@aphrody.com`. Staging is the default. Production
 requires an explicit flag; ToS agreement is always explicit. SAN scope cannot
-expand to apex, DBFR or another name. Delay before challenge activation defaults
+expand to the apex or another name. Delay before challenge activation defaults
 to 60 seconds; the delay is not proof of DNS propagation. Issuer validation is
 the actual acceptance gate. Whole issuance is bounded to 900 seconds.
 

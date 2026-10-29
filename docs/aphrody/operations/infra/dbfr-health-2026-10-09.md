@@ -8,10 +8,10 @@
 - Bun : `BUN_OPTIONS=--smol` pour site et bot. Après 20 min : site 321 → 261 Mio, bot 200 → 179 Mio. Le site remonte à 370 Mio après 2 h ; à remesurer sur 24 h.
 - Système : sysctl alignés sur le profil Alpine (`aphrody infra ssh tune`, fichier 95-aphrody-tune.conf, dbfr à swappiness 20). zram recréé. sshd en `ClientAliveCountMax 3`. Toutes les mises à jour apt appliquées, phasées comprises.
 - Purgés : redis hôte, postgresql-18 hôte, toolchains (clang/llvm-21, gcc, cmake, nodejs), fwupd, modemmanager, multipath, lxd, landscape. Supprimés aussi : la base Q4, codex 0.160, les traces dans ~, 860 doublons de médias remplacés par des liens physiques (809 Mo).
-- Unit `shenron-container-backup` : on garde les 3 dernières sauvegardes. Forward MCP PC : backoff de 30 s à 900 s. `aphrody-jobs-worker-dbfr` est désactivé, car le binaire n'a pas la feature jobs (jobs.db est conservé).
-- Retour arrière : les fichiers `compose.yaml.bak-D-*` et `release.json.bak-D-*` sont dans la release courante, `/var/backups/99-keepalive.conf.bak-D-20261009` et `/var/backups/aphrody-sysctl/`. Pour le modèle, voir LLAMA-MODELS.md : base Q4 téléchargée depuis HF, plus `adapter.gguf`. Les traces de ~ sont archivées dans vps:/srv/archive/dbfr-home-2026-10-09.tar.gz.
-- Outils : `aphrody infra status/start/stop/logs` pilote les conteneurs (`docker:`) et filtre les services par hôte. Le catalogue déclare shenron-postgres et shenron-gateway. internalOnly de dbfr est à jour.
+- Forward MCP PC : backoff de 30 s à 900 s. `aphrody-jobs-worker-dbfr` est désactivé, car le binaire n'a pas la feature jobs (jobs.db est conservé).
+- Retour arrière : les fichiers `compose.yaml.bak-D-*` et `release.json.bak-D-*` sont dans la release courante, `/var/backups/99-keepalive.conf.bak-D-20261009` et `/var/backups/aphrody-sysctl/`. Pour le modèle, base Q4 téléchargée depuis HF, plus `adapter.gguf`. Les traces de ~ sont archivées dans vps:/srv/archive/dbfr-home-2026-10-09.tar.gz.
+- Outils : `aphrody infra status/start/stop/logs` pilote les conteneurs (`docker:`) et filtre les services par hôte. internalOnly de dbfr est à jour.
 - Commits aphrody : 709f185532, 9e62e343ac, 9a1e8660d6, a8031887d9, e9e6d3d422, beefb250c3, 5e55f4615a, fc0405ad8c.
 - Ouvert : redémarrer sur le noyau 7.0.0-38, une fois que P aura écrit « P: migration terminée, reboot OK » dans ~/.coord-dbfr.log, puis purger le noyau 7.0.0-27.
 - Ouvert : V doit reconstruire le binaire aphrody (lifecycle docker, tune, feature jobs). Le build de site et bot n'inclut pas 046736e6c49 (`--max-old-space-size`).
-- Ouvert : ~/shenron-dev (467 Mo, modifications locales) est gardé. cloud-init, mesa et ffmpeg sont conservés.
+- Ouvert : cloud-init, mesa et ffmpeg sont conservés.

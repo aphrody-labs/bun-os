@@ -1,5 +1,5 @@
 {
-  "name": "@rosegriffon/menu-render",
+  "name": "@aphrody/menu-render",
   "version": "1.4.7",
   "private": false,
   "description": "React menu renderer with a caller-supplied Lua runtime and game-host adapter.",

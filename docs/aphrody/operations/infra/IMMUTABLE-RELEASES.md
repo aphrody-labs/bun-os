@@ -1,15 +1,10 @@
 # Immutable release workflow
 
-The owner-directed DBFR container flow is documented in
-[Shenron Docker releases](SHENRON-DOCKER.md). The systemd procedures below
-describe the earlier deployment format; they do not activate container releases.
-
 This is a historical release design. At the 2026-10-02 catalog state, the
-Aphrody Web/AI plane is retired; RG and Shenron are the active application
-planes, with a separate Aphrody Discord development service. Do not run the
+Aphrody Web/AI plane is retired, with a separate Aphrody Discord development service. Do not run the
 Aphrody all-in-one bundle procedure below unless the catalogs, data source,
 release assembly and activation authorization have all been updated together.
-The historical design has three production planes, each an immutable
+The historical design has immutable
 `releases/<id>` tree behind an atomically switched `current` link, with durable
 data under `shared/` and secrets in root-owned `0600` env files under `/etc`.
 The separate Aphrody Discord development service is a fourth, non-production
@@ -21,8 +16,6 @@ per-service contracts; for example, the Discord development env is
 | Plane | Root | Contents | Adapter (installed name) | 2026-10-02 declared status |
 | --- | --- | --- | --- |
 | Aphrody | `/home/ubuntu/apps/aphrody` | historical five services from `aphrody-web` and `aphrody-ai` | historical adapter (`aphrody-infra-deploy-aphrody`) | retired |
-| Shenron | `/home/ubuntu/apps/shenron` | `shenron-site` and `shenron-bot` | `scripts/release/atomic-deploy-shenron.sh` (`aphrody-infra-deploy-shenron`) | active in catalog |
-| RG | `/home/ubuntu/apps/rg` | RG applications assembled on VPS | `scripts/release/atomic-deploy-rg.sh` (`aphrody-infra-deploy-rg`) | active in catalog |
 | Aphrody Discord dev | `/home/ubuntu/apps/discord` | Bun bundle from pinned `aphrody-discord` commit | `scripts/build/build-aphrody-discord-release.sh` + `scripts/release/atomic-deploy-aphrody-discord.sh` | active in catalog; development service |
 
 ### VPS observation (2026-10-02, read-only)
@@ -32,13 +25,10 @@ state. `systemctl list-units --type=service --state=running --no-legend --plain`
 reported 28 running services, and `systemctl --failed --no-legend --plain`
 reported no failed services; disk use was 57%. A separate
 `aphrody-ssh audit --host vps --json` reported `Healthy`. The running-unit
-listing included Aphrody Discord development; RG (`rg-achillea-bot`, API, bot,
-cron and website); Shenron (bot, site and PostgreSQL tunnel); PostgreSQL 18;
-and nginx, SSH, Docker and Redis.
+listing included Aphrody Discord development, PostgreSQL 18,
+nginx, SSH, Docker and Redis.
 
-The release links observed were `/home/ubuntu/apps/rg/current` →
-`/home/ubuntu/apps/rg/releases/5691ba4be97b94279878e00d264793c1b28f8cf1` and
-`/home/ubuntu/apps/shenron/current` → `/home/ubuntu/apps/shenron/releases/4cac743f`. The paths
+The paths
 `/home/ubuntu/apps/aphrody/current` and `/home/ubuntu/apps/infra/current` were absent. These
 observations establish systemd/SSH and filesystem state only. No application
 health, database integrity, public endpoint, release checksum or rollback
@@ -119,13 +109,13 @@ The rollback drill reactivated `084964f4a95c1d4231a75d282b61c371b4852120`,
 verified health/Gateway, then reactivated `4cf6332cdc66b3ec9c0f2b0c288f0a3024acf808`
 with the same checks passing. A fresh authorized OAuth callback remains open.
 
-The historical **all-in-one bundle** pins all three to one superproject commit and
-activates them in order Aphrody → Shenron → RG through
+The historical **all-in-one bundle** pins the planes to one superproject commit and
+activates them through
 `scripts/release/atomic-deploy-bundle.sh` (`aphrody-infra-deploy-bundle`). Every
 adapter checks checksums and preconditions before touching anything, keeps the
 previous release, and restores the previous `current`, units, vhost and service
 states on any failure. `aphrody-infra deploy --target vps --stack
-shenron|rg|bundle --release PATH [--apply]` is the deployment entry point
+bundle --release PATH [--apply]` is the deployment entry point
 (`ssh vps sudo -n <adapter> PATH`); without `--apply` it prints the plan.
 Nothing is ever deleted: old releases stay until pruned explicitly.
 
@@ -140,10 +130,10 @@ are met.
 | Unit | Binary (release `bin/`) | Listener | Source |
 | --- | --- | --- | --- |
 | `aphrody-site` | `aphrody-site` | `127.0.0.1:8083` | `aphrody-web` |
-| `aphrody-web-api` | `aphrody-web-api` (Bun `--compile` of `shenron:packages/api/src/server/index.ts`) + `lib/libaphrody_web_ffi.so`, `lib/libbxc_render.so` | `127.0.0.1:3007` | `aphrody-web` |
+| `aphrody-web-api` | `aphrody-web-api` + `lib/libaphrody_web_ffi.so`, `lib/libbxc_render.so` | `127.0.0.1:3007` | `aphrody-web` |
 | `aphrody-a2a` | `aphrody a2a serve` | `127.0.0.1:8788` | `aphrody-ai` (feature `aphrody/rag`) |
-| `aphrody-ai-http` | `aphrody-mcp http` (MCP on `/mcp`, incl. the `dragonball.*` tools that replaced `shenron-mcp`; REST `/api/v1/*`) | `127.0.0.1:8789` | `aphrody-ai` (feature `aphrody-mcp/ocr`) |
-| `aphrody-shenron-embed` | `aphrody-embed serve` (pure Rust E5) | `127.0.0.1:8794` | `aphrody-ai` (feature `server`) |
+| `aphrody-ai-http` | `aphrody-mcp http` (MCP on `/mcp`, REST `/api/v1/*`) | `127.0.0.1:8789` | `aphrody-ai` (feature `aphrody-mcp/ocr`) |
+| `aphrody-embed` | `aphrody-embed serve` (pure Rust E5) | `127.0.0.1:8794` | `aphrody-ai` (feature `server`) |
 
 The agent console served by `aphrody` is `aphrody-ui`'s tracked
 `crates/ui/app/ui-dist`, embedded at compile time by
@@ -161,7 +151,7 @@ active `ai.json` and to the `shared/coord` mailbox), AI state in `shared/ai`
 `shared/models/e5-native` (`config.json`, `tokenizer.json`,
 `model.safetensors`, preloaded with `aphrody-embed install --model-dir`; the
 service never downloads). Web rankings/SEO live in PostgreSQL `aphrody_web`
-(role `aphrody_web`); the AI RAG and Shenron corpus in PostgreSQL `aphrody`
+(role `aphrody_web`); the AI RAG corpus in PostgreSQL `aphrody`
 (role `aphrody_ai_http`).
 
 ### Secrets (`/etc/aphrody`, root `0600`, key names only)
@@ -170,14 +160,10 @@ service never downloads). Web rankings/SEO live in PostgreSQL `aphrody_web`
 | --- | --- |
 | `aphrody-site.next.env` → `aphrody-site.env` | `APHRODY_WEB_DATABASE_URL`, `APHRODY_SITE_DATABASE_URL` (equal alias), `APHRODY_SITE_WEB_API_TOKEN`, `APHRODY_BXC_API_TOKEN` (equal alias), `APHRODY_SITE_WEB_BACKEND_TOKEN` |
 | `aphrody-web-api.next.env` → `aphrody-web-api.env` | `BXC_API_TOKEN` (= site backend token), `APHRODY_WEB_DATABASE_URL` (= site DSN) |
-| `aphrody-ai-http.env` | `APHRODY_MCP_DATABASE_URL`, `APHRODY_SHENRON_API_TOKEN` (server-side name), `APHRODY_AI_EMBED_MODEL=Xenova/multilingual-e5-small`, `APHRODY_AI_EMBED_BASE_URL=http://127.0.0.1:8794/v1`, `APHRODY_SHENRON_LLM_PROVIDER=gemini-web`, `APHRODY_SHENRON_GEMINI_COOKIE_FILE=/home/ubuntu/apps/aphrody/shared/ai/google-cookies.json` |
+| `aphrody-ai-http.env` | `APHRODY_MCP_DATABASE_URL`, `APHRODY_AI_EMBED_MODEL=Xenova/multilingual-e5-small`, `APHRODY_AI_EMBED_BASE_URL=http://127.0.0.1:8794/v1` |
 | `aphrody-a2a.env` | optional |
-| `shenron-compute-client.env` | `APHRODY_AI_HTTP_URL`, `APHRODY_AI_HTTP_TOKEN` (+ legacy `APHRODY_SHENRON_API_URL`/`_TOKEN`), read by `shenron-site`/`shenron-bot` |
 
-`APHRODY_AI_*` names are canonical (`tools/config/local-ai.json`); the adapter also
-accepts the legacy aliases `APHRODY_SHENRON_EMBED_MODEL` and
-`APHRODY_SHENRON_EMBED_BASE_URL`, and refuses a canonical/alias pair with
-different values. The key list is mirrored in `tools/config/secrets-contract.json`.
+The key list is mirrored in `tools/config/secrets-contract.json`.
 
 ### Activation checks
 
@@ -221,9 +207,6 @@ RELEASE_SHA      one `repo=sha` line per repository (aphrody-src first)
 SHA256SUMS       every file of the bundle
 aphrody/         the Aphrody release (bin/, lib/, systemd/, nginx/, ops/, ai.json,
                  RELEASE_SHA, RELEASE_ID, SHA256SUMS, .coord -> shared/coord, SMOKE.json)
-shenron/         release.json, source.tar.gz (git archive), site-build.tar.gz,
-                 systemd/shenron-{site,bot}.service, nginx/shenron.conf, SHA256SUMS
-rg/release.json  the RG commit; RG is assembled on the VPS (scripts/rg/assemble-vps-release.sh)
 ```
 
 NIE and IECode ship no VPS release. The bundle contains no secret.
@@ -264,10 +247,8 @@ NIE and IECode ship no VPS release. The bundle contains no secret.
    paths or assume the 2026-09-25 dumps remain available. If no valid data
    source is available, the Aphrody production plane is not ready to activate.
 3. **Secrets.** `provision-aphrody-stack-env.sh --fresh-host` generates every
-   Aphrody credential (table above) and the Shenron compute client env; nothing
-   is copied from the old host. Shenron and RG keep their existing
-   `/etc/rose-griffon/*.env` and RG `/etc` files (`0600`), which the Shenron
-   adapter checks against `tools/config/secrets-contract.json`.
+   Aphrody credential (table above); nothing
+   is copied from the old host.
 4. **TLS.** `aphrody.com`, `www.aphrody.com` and `mcp.aphrody.com` have no
    certificate on the host any more. Check their A/AAAA records point to the
    VPS first (`aphrody-infra ovh dns records aphrody.com --type A`). Prefer
@@ -300,10 +281,6 @@ NIE and IECode ship no VPS release. The bundle contains no secret.
    `aphrody-infra` pin), then `sudo bash scripts/tools/install-vps-adapter.sh`: it
    installs the four adapters, the catalog snapshots and `ADAPTER.json`, and
    removes the retired site-only `aphrody-infra-deploy`.
-8. **RG release.** `git -C ../rg fetch && git -C ../rg
-   checkout --detach RG_SHA`, then as `ubuntu`
-   `bash ~/scripts/rg/assemble-vps-release.sh RG_SHA`
-   (builds `/home/ubuntu/apps/rg/releases/RG_SHA`; retired catalog services are skipped).
 
 ### Ordered commands (historical; do not execute without reactivation gates)
 
@@ -322,7 +299,7 @@ VERIFIED_APHRODY_DUMP=/approved/private/path/aphrody.dump
 VERIFIED_APHRODY_WEB_DUMP=/approved/private/path/aphrody_web.dump
 PGOPTIONS=-cdefault_transaction_read_only=off $B/copy-aphrody-web-tables.sh --fresh-host \
   "$VERIFIED_APHRODY_DUMP" "$VERIFIED_APHRODY_WEB_DUMP"
-# prerequisites 4-8 (TLS, E5, cookie, adapters, RG release)
+# prerequisites 4-7 (TLS, E5, cookie, adapters)
 # Windows or WSL, from the pinned aphrody-infra checkout:
 scripts/build/rust/cargo-serial.sh run -p aphrody-infra -- deploy --target vps --stack bundle --release /home/ubuntu/apps/infra/bundles/ID
 scripts/build/rust/cargo-serial.sh run -p aphrody-infra -- deploy --target vps --stack bundle --release /home/ubuntu/apps/infra/bundles/ID --apply
@@ -330,10 +307,8 @@ scripts/build/rust/cargo-serial.sh run -p aphrody-infra -- deploy --target vps -
 
 The bundle adapter verifies the bundle, compares `ADAPTER.json` with the
 pinned infra commit, copies `aphrody/` to `/home/ubuntu/apps/aphrody/releases/ID`,
-assembles `/home/ubuntu/apps/shenron/releases/SHENRON_SHA` (`git archive` + site artifact +
-`bun install --frozen-lockfile`, shared links, tracked seed), requires
-`/home/ubuntu/apps/rg/releases/RG_SHA`, records the current targets in
-`/home/ubuntu/apps/infra/state/ID/BUNDLE.previous.json`, then runs the three
+records the current targets in
+`/home/ubuntu/apps/infra/state/ID/BUNDLE.previous.json`, then runs the
 adapters in order (a stack already on its pinned release is left untouched).
 If a step fails, its adapter restores that stack and the bundle adapter
 restores the completed steps newest first from their activation backups; the
@@ -342,8 +317,7 @@ active. On success `/home/ubuntu/apps/infra/BUNDLE.json` (with `activatedAt`) an
 `BUNDLE.previous.json` describe the active and previous states;
 `sudo aphrody-infra-deploy-bundle --rollback` restores the previous state.
 
-After activation: run `$B/provision-shenron-ai-access.sh` as root to prove
-Shenron → AI (RAG search returns passages), drop `"status": "retired"` from the
+After activation: drop `"status": "retired"` from the
 five Aphrody services, their routes, the `vps` allocation and the `vps`
 local-AI target in `config/`, refresh `tools/config/host/inventory/vps-source.json`, then run
 the `live` pipeline stage (`bun run audit:live`).

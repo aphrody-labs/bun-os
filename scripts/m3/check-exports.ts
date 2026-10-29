@@ -138,9 +138,7 @@ export function listPackages(root = REPO): Pkg[] {
 export function hostPackageNames(
   roots = (
     process.env["M3_HOST_ROOTS"] ??
-    (process.platform === "win32"
-      ? ["C:\\aphrody", "C:\\iecode", "C:\\shenron"].join(";")
-      : `${homedir()}/aphrody:/mnt/c/iecode`)
+    (process.platform === "win32" ? ["C:\\aphrody", "C:\\iecode"].join(";") : `${homedir()}/aphrody:/mnt/c/iecode`)
   ).split(process.platform === "win32" ? ";" : ":"),
 ): Set<string> {
   const names = new Set<string>();

@@ -32,7 +32,7 @@ impl RedisRagCache {
     /// Create a cache instance from an optional `REDIS_URL` (e.g. `redis://127.0.0.1:6379/1`).
     /// If `url` is None, empty, or unparseable, caching operations will gracefully no-op.
     pub fn from_url(url: Option<&str>, prefix: Option<&str>) -> Self {
-        let prefix = prefix.unwrap_or("shenron:rag:").to_string();
+        let prefix = prefix.unwrap_or("aphrody:rag:").to_string();
         let Some(raw) = url.map(str::trim).filter(|s| !s.is_empty()) else {
             return Self {
                 host: "127.0.0.1".to_string(),

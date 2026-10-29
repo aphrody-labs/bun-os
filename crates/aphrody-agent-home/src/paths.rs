@@ -145,13 +145,13 @@ mod tests {
     #[test]
     fn named_profile_uses_canonical_home_before_legacy_within_the_selected_state() {
         let state = tempfile::tempdir().unwrap();
-        let legacy = state.path().join("workspace-dbfr");
+        let legacy = state.path().join("workspace-docs");
         std::fs::create_dir_all(&legacy).unwrap();
-        assert_eq!(named_profile_workspace(state.path(), "DBFR"), legacy);
-        let canonical = state.path().join("workspaces/dbfr");
+        assert_eq!(named_profile_workspace(state.path(), "DOCS"), legacy);
+        let canonical = state.path().join("workspaces/docs");
         std::fs::create_dir_all(&canonical).unwrap();
-        assert_eq!(named_profile_workspace(state.path(), "DBFR"), canonical);
-        assert_eq!(named_profile_workspace(state.path(), "../dbfr"), canonical);
+        assert_eq!(named_profile_workspace(state.path(), "DOCS"), canonical);
+        assert_eq!(named_profile_workspace(state.path(), "../docs"), canonical);
         assert_eq!(
             named_profile_workspace(state.path(), ""),
             state.path().join("workspace")

@@ -80,7 +80,7 @@ env_key = "OPENAI_API_KEY"
 # app-server all call it. Precedence: the canonical `APHRODY_AI_EMBED_*` /
 # `APHRODY_AI_RERANK_*` environment variable (see "The canonical
 # `APHRODY_AI_*` environment" below), then its legacy aliases
-# (`APHRODY_SHENRON_EMBED_MODEL`, `EMBED_URL`, `APHRODY_RAG_EMBED_DIM`, ...),
+# (`EMBED_URL`, `APHRODY_RAG_EMBED_DIM`, ...),
 # then the values below, then the local model catalog's default
 # (`aphrody_models::LocalRole::Embed` / `LocalRole::Rerank`). An explicit
 # `APHRODY_AI_EMBED_DIMENSIONS` that disagrees with the catalog's dimension
@@ -187,42 +187,38 @@ environment = "windows"
 # Isolated Home Agent Profiles (`[profiles.<name>]`)
 # ==============================================================================
 
-[profiles.shenron]
+[profiles.example]
 plugins = ["~/src/aphrody-ai/plugins/aphrody"]
 
-[profiles.shenron.database]
+[profiles.example.database]
 db_type = "postgres"
 url_env = "DATABASE_URL"
-schema = "shenron"
+schema = "example"
 cache = "sqlite_wal"
-cache_path = "workspace-shenron/cache.sqlite3"
+cache_path = "workspace-example/cache.sqlite3"
 
-[profiles.shenron.rag]
-db_path = "workspace-shenron/rag/index.db"
+[profiles.example.rag]
+db_path = "workspace-example/rag/index.db"
 embed_backend = "ort"
 embed_model = "multilingual-e5-small"
 mode = "hybrid+rerank"
 rerank_model = "bge-reranker-base"
 vector_dim = 384
 
-[profiles.shenron.mcp_servers.shenron]
-command = "bun"
-args = ["apps/mcp/src/index.ts"]
+[profiles.example.skills]
+whitelist = ["rag.canon", "ocr.continuous"]
 
-[profiles.shenron.skills]
-whitelist = ["rag.canon", "ocr.continuous", "dbfr-databooks"]
+[profiles.example.a2a]
+id = "example@aphrody.com"
+mailbox = ".coord/inbox-from-example.jsonl"
 
-[profiles.shenron.a2a]
-id = "shenron@dragonballfr.com"
-mailbox = ".coord/inbox-from-shenron.jsonl"
-
-[profiles.shenron.ocr]
+[profiles.example.ocr]
 engines = ["ppocr-v5-mobile", "dots-ocr"]
-state_path = "workspace-shenron/ocr"
+state_path = "workspace-example/ocr"
 
-[profiles.shenron.redis]
+[profiles.example.redis]
 url = "redis://127.0.0.1:6379/1"
-prefix = "shenron:"
+prefix = "example:"
 
 # When a profile supplies one of the eight Home Agent components above, that
 # component replaces the root value atomically. Paths, MCP servers, skill
@@ -236,7 +232,7 @@ prefix = "shenron:"
 # `[profiles.<name>]` (`ConfigProfile`, above) is the switch for "run this
 # model on this provider": `-p fast` merges a named profile onto the root
 # config, later than the plain root-level settings but earlier than `-c`
-# overrides and CLI flags. It shares its shape with `[profiles.shenron]`
+# overrides and CLI flags. It shares its shape with `[profiles.example]`
 # above (model, model_provider, approval_policy, sandbox_mode, rag, database,
 # plugins, skills, mcp_servers, a2a, ocr, redis, wire_api — there is no
 # `model_temperature` field anywhere in this schema; sampling temperature is
@@ -274,8 +270,8 @@ profiles for the model families it targets (Qwen2.5-Coder, Qwen3, GPT-OSS,
 and the OCR/STT/vision model ids are not only `config.toml` keys: they are
 also named by eighteen canonical environment variables
 ([`aphrody_config::ai_env`](../../../crates/ai/config/src/ai_env.rs)), the
-same contract `[`tools/config/local-ai.json`](../../../../tools/aphrody/config/local-ai.json)` publishes to shenron,
-`aphrody-os`, `rg` and `nie`:
+same contract `[`tools/config/local-ai.json`](../../../../tools/aphrody/config/local-ai.json)` publishes to
+`aphrody-os` and `nie`:
 
 | Canonical name | What it names |
 | --- | --- |
@@ -291,7 +287,7 @@ same contract `[`tools/config/local-ai.json`](../../../../tools/aphrody/config/l
 | `APHRODY_AI_RERANK_BASE_URL` / `_MODEL` | The `[rag]` reranker. |
 
 Every reader resolves the canonical name first, then each documented legacy
-alias (`APHRODY_SHENRON_EMBED_MODEL`, `EMBED_URL`, `APHRODY_RAG_EMBED_DIM`,
+alias (`EMBED_URL`, `APHRODY_RAG_EMBED_DIM`,
 ...) in order, then falls back to the value above, then to the local model
 catalog's default. **`aphrody ai env`** is the one writer: it resolves this
 machine's current values (the llama-server URL/port a managed instance is

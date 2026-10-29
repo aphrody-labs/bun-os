@@ -50,7 +50,6 @@ training stores**, **more than a dozen user-facing entry points** that index, se
 | `crates/ai/agent-home` | Soul/identity/user/tools documents, bootstrap budget, mmap cache, hot reload, workspace and profile path resolution, `sync_defaults` snapshot | files under `~/.aphrody/workspace[s/<p>]`; path authority delegated to `aphrody-models::paths` | `aphrody oc-onboard`, `aphrody-ops agent-home` | agent-runtime, memory (`ingest_agent_home`) |
 | `crates/ai/models` (`paths`) | Single authority for `~/.aphrody` (`APHRODY_HOME`, `state_dir`, `memory_sqlite_path`, `vector_dir`, `sessions_dir`) | none | n/a | everything |
 | `crates/ai/rag-core` | Chunkers (Rust via syn, JS/TS via oxc, Markdown, structural, prose), RRF, MMR, top-k, eval harness | none (pure, wasm-safe) | n/a | rag, train, memory, rag-eval, rag-python |
-| `crates/ai/rag` | `RagStore` (docs, chunks, `chunks_fts`, vectors BLOB, meta), `RagIndexer` (blake3 incremental), `RagSearcher` (lexical, vector brute force, hybrid RRF, rerank), PG/Shenron path, web ingest, agent tools | SQLite (default `~/.aphrody/vector/rag.sqlite`); CLI/MCP default `~/.aphrody/rag/index.db`; PG `aphrody_rag_documents` | `aphrody rag index/web-ingest`, MCP ingest | `aphrody rag search/context`, MCP `aphrody_rag_search/context`, app-server, agent-runtime, rag-eval |
 | `crates/ai/rag-eval` | Recall/MRR/nDCG harness | reads a local index or HTTP/MCP | CLI | CI gates |
 | `crates/ai/rag-python` (`aphrody-rust`) | PyO3 kernels over rag-core (vector kernels, fusion); owned by the vu agent | none | n/a | `py/` wheel |
 | `crates/ai/memory` | `MemoryBackend` (JSONL, brute-force "HNSW", SQLite `memory_items`, LanceDB optional) and `MemoryProvider` (SqliteLocal `memory_records`, Mem0, Honcho) | `~/.aphrody/memory/memory.sqlite` (14 327 records) plus root `memory.sqlite` and `workspaces/*/db/agent.db` | chat loop, session sync (`feature memory`), `aphrody-agent-home-memory` | chat, `aphrody memory` |
@@ -80,7 +79,6 @@ training stores**, **more than a dozen user-facing entry points** that index, se
 
 | Surface | Today | Target |
 | --- | --- | --- |
-| aphrody-mcp (`crates/ai/mcp`) | `aphrody_rag_search`, `aphrody_rag_context` (default `~/.aphrody/rag/index.db`), `aphrody_shenron_rag_search/ingest` (PG, server data, unchanged), `sync_external_agents`, `infra_sync`, `upstream_*` | add `home_*` tools backed by the common library; the two rag tools resolve the common database |
 | aphrody-mcp tools | `yolo_scan`, `yolo_vector_search`, `yolo_traindb_stats` | delegate to the Rust library through the `aphrody` binary; Redis path removed after parity |
 | Plugin skills (`plugins/aphrody`, own repo `aphrody-labs/plugin-aphrody`; `plugins/` is repo `aphrody-labs/plugins`) | `aphrody-rag`, `aphrody-train`, `ecosystem`, `upstreams`, `graphify` (user skill) cite `aphrody rag ...`, `aphrody train ...`, `knowledge.db`, `graphify query` | cite `aphrody index|graph|query|memory|session|train|sync` and the home database |
 | Docs | `docs/ecosystem/{CLI,MCP-TOOLS,ECOSYSTEM}`, `CLAUDE.md`/`AGENTS.md` Graphify paragraph | regenerated or edited after each batch |
@@ -259,7 +257,6 @@ contracts and stay as aliases.
 | `aphrody index` (fsindex), `aphrody scan` (manifests) | `index` becomes the pipeline verb (fsindex data imported into `files`); manifest analytics stays under `aphrody scan` |
 | `knowledge.db` (4 files) and legacy `~/.aphrody/packages/knowledge` | imported, files kept read-only; legacy scripts replaced by the pipeline |
 | `jobs.db`, `ocr/results.db`, `translations.sqlite`, `cache.sqlite` | owners unchanged in this plan; OCR becomes a pipeline source in a later batch |
-| Shenron PG RAG (`aphrody_rag_documents`, MCP `aphrody_shenron_rag_*`) | server data, untouched |
 | Graphify skill and `CLAUDE.md`/`AGENTS.md` paragraph | rewritten to `aphrody graph` after parity |
 
 ## 4. Graphify absorption
@@ -321,8 +318,6 @@ only in `tests/oracle`.
    and its counts are recorded in `MEMORY.md`.
 5. The pipeline refuses paths matching the secret deny list and never stores credential
    files; message text of sessions is opt-in.
-6. No host, VPS or Shenron data is touched; `aphrody infra sync --apply` keeps its
-   existing semantics for repositories.
 
 ## 6. Batches (ordered by value and risk)
 

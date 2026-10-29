@@ -49,7 +49,6 @@ Regenerate with `bun run docs:gen`; `bun run docs:check` gates drift; the `aphro
 | operations | [bun-1.4.4](operations/bun-1.4.4/) | 2 | [Bun 1.4.4 alignment dossier](operations/bun-1.4.4/README.md) |
 | operations | [cloud](operations/cloud/) | 4 | - |
 | operations | [container](operations/container/) | 2 | - |
-| operations | [discord](operations/discord/) | 2 | [Discord Operations Runbooks & Guides](operations/discord/README.md) |
 | operations | [infra](operations/infra/) | 65 | - |
 | operations | [os](operations/os/) | 1 | - |
 | operations | [release](operations/release/) | 1 | - |

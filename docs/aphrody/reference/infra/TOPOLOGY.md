@@ -12,12 +12,10 @@
 
 | Surface | Repository | Responsibility |
 |---|---|---|
-| Public web origin, Web API, BXC, browser/render FFI | `aphrody-web` | `aphrody-site` on `127.0.0.1:8083`; the integrated Web API (`shenron:packages/api/src/server/index.ts`) on `127.0.0.1:3007` with `libaphrody_web_ffi.so` and the V8 renderer `libbxc_render.so`; BXC has one source tree under `apps/bxc` (not in repo). |
+| Public web origin, Web API, BXC, browser/render FFI | `aphrody-web` | `aphrody-site` on `127.0.0.1:8083`; the integrated Web API on `127.0.0.1:3007` with `libaphrody_web_ffi.so` and the V8 renderer `libbxc_render.so`; BXC has one source tree under `apps/bxc` (not in repo). |
 | AI agents, A2A, RAG, MCP, embeddings | `aphrody-ai` | `aphrody a2a serve` on `127.0.0.1:8788`; `aphrody-mcp http` on `127.0.0.1:8789` (MCP on `/mcp` with the `dragonball.*` tools, REST under `/api/v1`); `aphrody-embed serve` (E5) on `127.0.0.1:8794`. |
 | Agent console, M3 design system, `bun_rs` | `aphrody-ui` | Tracked `crates/ui/app/ui-dist` embedded into the `aphrody` binary at build time; `@aphrody/bun` over the `aphrody-bun` crate. |
 | OS control plane | `aphrody-os` | `aphrody-kernel`; not deployed on the VPS (a build-time path dependency of the category workspaces). |
-| Dragon Ball site and bot | `shenron` | `shenron-site` `127.0.0.1:5011`, `shenron-bot` (bot + public API) `127.0.0.1:5006`, released under `/home/ubuntu/apps/shenron`. |
-| Rose Griffon platform | `rg` | `rg-*` services released under `/home/ubuntu/apps/rg`. |
 | Deployment and host inventory | `aphrody-infra` | Catalogs, unit and vhost templates, release build, deploy adapters, probes and migration evidence. |
 
 The superproject `aphrody-src` pins all 13 repositories; a release is built from
@@ -25,10 +23,10 @@ one superproject commit (`docs/operations/infra/IMMUTABLE-RELEASES.md`).
 
 ## VPS boundary
 
-Three release planes run on the VPS: `/home/ubuntu/apps/aphrody/current` (five Aphrody
-services), `/home/ubuntu/apps/shenron/current` and `/home/ubuntu/apps/rg/current`; the all-in-one bundle
+Release planes run on the VPS: `/home/ubuntu/apps/aphrody/current` (five Aphrody
+services); the all-in-one bundle
 state lives in `/home/ubuntu/apps/infra` (`bundles/`, `state/`, `BUNDLE.json`,
-`BUNDLE.previous.json`). As of 2026-09-26 RG and Shenron are live and the
+`BUNDLE.previous.json`). As of 2026-09-26 the
 Aphrody plane is retired (removed 2026-09-25) until the first bundle
 activation; `tools/config/host/inventory/vps-source.json` records the observed state.
 
@@ -39,7 +37,7 @@ SQLite, crawler storage and cookies in `/home/ubuntu/apps/aphrody/shared/bxc`, A
 `shared/a2a`, mailbox in `shared/coord`, AI state in `shared/ai`, E5 weights in
 `shared/models/e5-native`. BXC SQLite is the source for Web crawl, page and
 index data; the site and BXC share `APHRODY_WEB_DATABASE_URL` for rankings and
-SEO in PostgreSQL `aphrody_web`. AI HTTP RAG and the Shenron corpus use
+SEO in PostgreSQL `aphrody_web`. AI HTTP RAG uses
 `APHRODY_MCP_DATABASE_URL` for PostgreSQL `aphrody`; with that DSN,
 `aphrody rag web-ingest`, `search` and `stats` use AI PostgreSQL, while an
 explicit `--db` selects a local SQLite index. Secrets live in root-owned
@@ -48,13 +46,8 @@ explicit `--db` selects a local SQLite index. Secrets live in root-owned
 The site accepts public Web clients with `APHRODY_SITE_WEB_API_TOKEN` (equal
 alias `APHRODY_BXC_API_TOKEN`); its upstream token
 `APHRODY_SITE_WEB_BACKEND_TOKEN` equals the Web API's `BXC_API_TOKEN`, which
-the AI client receives as `APHRODY_WEB_API_TOKEN`. Shenron reaches the AI
-through `APHRODY_AI_HTTP_URL`/`APHRODY_AI_HTTP_TOKEN` from
-`/etc/aphrody/shenron-compute-client.env`. Release staging and activation
+the AI client receives as `APHRODY_WEB_API_TOKEN`. Release staging and activation
 check these relationships.
-
-The public MCP of `mcp.dragonballfr.com` (`shenron-mcp`, :5010) is retired; its
-tools are `dragonball.*` in `aphrody-mcp`.
 
 ## Migration gates
 

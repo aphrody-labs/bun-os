@@ -2,7 +2,7 @@
 
 The ownership tables below describe the former split-repository deployment
 design. On 2026-10-02, the root production topology marked Aphrody Web and AI
-planes retired; the active host observation found RG and Shenron releases on
+planes retired; the active host observation found application releases on
 VPS. Consult the dated VPS status,
 topology observation,
 and root `config/` catalogs before operational use. This page remains a
@@ -17,7 +17,7 @@ The catalog is the authority for one unit per workload. It covers Rust HTTP,
 Bun/Next HTTP, Discord bots, workers and PostgREST. Nginx is the single public
 proxy. Systemd remains the host supervisor. `aphrody-infra service` is the
 native lifecycle surface; deployment remains atomic and release-based through the Rust CLI and the per-stack adapters
-(`scripts/atomic-deploy-{aphrody-stack,shenron,rg,bundle}.sh`).
+(`scripts/atomic-deploy-{aphrody-stack,bundle}.sh`).
 
 ## Commands
 
@@ -29,7 +29,7 @@ aphrody-infra dev-env --target linux-container-26.04
 aphrody-infra sync --target windows-local
 aphrody-infra deploy --target vps --stack bundle --release /home/ubuntu/apps/infra/bundles/<id>
 aphrody-infra deploy --target vps --stack bundle --release /home/ubuntu/apps/infra/bundles/<id> --apply
-aphrody-infra deploy --target vps --stack shenron|rg --release /home/ubuntu/apps/<stack>/releases/<id>
+aphrody-infra deploy --target vps --stack <stack> --release /home/ubuntu/apps/<stack>/releases/<id>
 aphrody-infra service catalog
 aphrody-infra service status --target local
 ```
@@ -49,9 +49,9 @@ adapters (`ssh`, `wsl.exe`, `systemctl`) to succeed. `sync` and `deploy` are
 plan-only unless `--apply` is explicit; dirty worktrees are never reset.
 
 The VPS deploy adapters are installed by `scripts/tools/install-vps-adapter.sh` as
-`/usr/local/sbin/aphrody-infra-deploy-{aphrody,shenron,rg,bundle}` (reviewed
-copies of `scripts/release/atomic-deploy-aphrody-stack.sh`, `atomic-deploy-shenron.sh`,
-`atomic-deploy-rg.sh` and `atomic-deploy-bundle.sh`, with
+`/usr/local/sbin/aphrody-infra-deploy-{aphrody,bundle}` (reviewed
+copies of `scripts/release/atomic-deploy-aphrody-stack.sh`
+and `atomic-deploy-bundle.sh`, with
 `/usr/local/share/aphrody-infra/ADAPTER.json` recording the infra commit). Each
 accepts only a release below its own root, verifies checksums and preconditions,
 probes loopback and HTTPS routes and restores the previous `current` on failure

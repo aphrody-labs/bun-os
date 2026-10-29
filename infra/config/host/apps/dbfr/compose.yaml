@@ -4,8 +4,6 @@
 # wrapper. Installed by scripts/tools/infra/host-apps.ts; ~/apps/.env (env next to this file) selects the profiles.
 name: aphrody
 include:
-  # Generated from shenron/current by scripts/release/atomic-deploy-shenron-container.py.
-  - path: [shenron/compose.yaml, bun-release-gateway.yaml]
   # Legacy: generated from the abandoned the former Bun fork fork (scripts/aphrody/deploy/docker/compose.yaml); the runtime is now upstream oven-sh/bun.
   - path: [aphrody-bun/compose.yaml, bun-prod-runtime.yaml]
   # tools/config/container/compose.yaml.

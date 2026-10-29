@@ -4,7 +4,7 @@ import type { GuardFunction } from "discordx";
 
 /**
  * Creates a DiscordX Guard that restricts commands exclusively to an authorized guild ID.
- * Helpful for private monorepo bots (such as Shenron) where execution outside production guild
+ * Helpful for private monorepo bots where execution outside production guild
  * must be rejected immediately.
  */
 export function createMonoGuildGuard(targetGuildId: string): GuardFunction<unknown> {

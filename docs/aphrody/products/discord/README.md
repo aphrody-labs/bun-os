@@ -2,7 +2,7 @@
 
 # Intégration Discord
 
-Aphrody fournit un socle Discord partagé dans le paquet Bun @aphrody/discord-kit. Il regroupe les commandes, gardes, cycle de vie, REST, applications et transport de messages. Shenron est maintenu dans son dépôt produit ; cette intégration ne contient pas une copie de son application.
+Aphrody fournit un socle Discord partagé dans le paquet Bun @aphrody/discord-kit. Il regroupe les commandes, gardes, cycle de vie, REST, applications et transport de messages.
 
 ## Propriétaire unique
 

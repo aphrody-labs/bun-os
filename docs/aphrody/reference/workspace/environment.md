@@ -24,22 +24,11 @@ ne sont pas magiquement disponibles à une commande `cargo` lancée séparément
 ## Fichiers et propriétaires observés
 
 - `.env` à la racine : Bun le charge lorsqu’un programme est lancé depuis cette
-  racine; `shenron:scripts/dev/local-env.ts` le lit aussi pour
-  construire les environnements locaux des applications. Les autres outils
+  racine; les autres outils
   peuvent charger un fichier explicite.
-- `iecode/apps/rg/.env`, `iecode/apps/rg/.env.local`, `iecode/apps/rg/website/.env`,
-  `iecode/apps/rg/website/.env.production.local` et `iecode/apps/rg/bot/.env` : configuration
-  locale RG; les commandes Next/Bun les lisent selon leur cwd, mode ou appelant.
-- `iecode/packages/rg/cron/.env` : configuration du cron RG lorsque lancé depuis ce
-  package.
-- `shenron:apps/site/.env` (not in repo) et `shenron:apps/bot/.env` (not in repo) : secrets privés
-  facultatifs lus explicitement par plusieurs scripts Shenron. Le dépôt ne
-  fournit pas ces fichiers privés; les exemples suivis sont
-  `shenron:apps/bot/.env.example` ([aphrody-labs/shenron](https://github.com/aphrody-labs/shenron)).
 - `.env.remote-db` : fichier privé distinct, lu explicitement par des outils
-  d’audit et d’administration Shenron. Il n’est pas créé par l’initialiseur.
-- `~/.shenron-neon.env` et les fichiers `/etc/aphrody/*.env` ou
-  `/etc/rose-griffon/*.env` : configurations opérateur ou systemd. Elles ne
+  d’audit et d’administration. Il n’est pas créé par l’initialiseur.
+- Les fichiers `/etc/aphrody/*.env` : configurations opérateur ou systemd. Elles ne
   sont ni importées ni copiées dans le dépôt.
 - `config/*.env.example`, `tools/config/host/privoxy/*.env.example` et les exemples propres
   aux applications sont des modèles; ils ne sont pas chargés globalement par
@@ -98,8 +87,8 @@ Références officielles : [Bun environment variables](https://bun.sh/docs/runti
 Pour changer de profil agent dans une session :
 
 ```sh
-APHRODY_AGENT_DOMAIN=dbfr
-APHRODY_WORKSPACE="$APHRODY_HOME/workspaces/dbfr"
+APHRODY_AGENT_DOMAIN=ie
+APHRODY_WORKSPACE="$APHRODY_HOME/workspaces/ie"
 ```
 
 Sous Nushell ou PowerShell, utilise les affectations natives de `$env`.

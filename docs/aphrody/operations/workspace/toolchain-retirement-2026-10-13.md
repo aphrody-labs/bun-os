@@ -18,7 +18,7 @@ the toolchains required by the selected repositories.
   Existing processes were not terminated or deprived of their open resources.
 - Rust `1.97.1-x86_64-pc-windows-msvc` was uninstalled through rustup after checking
   its resolved store path and absence of active compiler processes using it.
-  Rust 1.98.1 remains pinned by Aphrody, IECODE and Shenron. Bun requires
+  Rust 1.98.1 remains pinned by Aphrody and IECODE. Bun requires
   `nightly-2026-09-15`; the newer default stable installation reports 1.99.0.
 - Bun hygiene now recognizes a current base version when comparing historical
   fork releases, preventing a 1.4.4 installation from being downgraded to 1.4.3.

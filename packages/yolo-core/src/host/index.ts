@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Host config: systemd units, nginx sites, the cross-host inventory and the toolchain
-// manifest live under `infra/config/host` (the single home for aphrody, shenron, rg and nie). Units keep only their own
+// manifest live under `infra/config/host` (the single home for aphrody and nie). Units keep only their own
 // directives; shared sandbox/identity blocks are drop-ins listed in
 // `catalog.json` and composed back into one flat unit at install/package time.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -141,7 +141,7 @@ export function checkCatalog(root = hostRoot()): string[] {
       for (const f of readdirSync(join(root, c.inventory.dir)))
         if (!c.inventory.files.includes(f)) problems.push(`unlisted inventory file: ${f}`);
   }
-  for (const dir of ["aphrody", "shenron"])
+  for (const dir of ["aphrody"])
     for (const f of readdirSync(join(root, "systemd", dir)))
       if (f.endsWith(".service") || f.endsWith(".timer"))
         if (!listed.has(`systemd/${dir}/${f}`)) problems.push(`unlisted unit: systemd/${dir}/${f}`);

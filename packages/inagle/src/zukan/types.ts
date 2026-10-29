@@ -1,5 +1,5 @@
 /**
- * Enhanced Zukan Types for Rose Griffon API
+ * Enhanced Zukan Types for the Inagle API
  * Based on zukan.inazuma.jp (Inazugle)
  */
 

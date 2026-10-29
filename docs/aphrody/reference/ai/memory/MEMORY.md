@@ -28,7 +28,7 @@ repository is now `aphrody-ai`. Treat the closeout notes below as history.
 
 ## Historical deployment notes (not live status)
 
-- At snapshot time, deployment was recorded as owned by the separate `aphrody-infra` repository and the VPS service mix was recorded as RG/Shenron. The repo boundary and production state must be checked against current Infra sources and live probes.
+- At snapshot time, deployment was recorded as owned by the separate `aphrody-infra` repository and the VPS service mix was recorded at that time. The repo boundary and production state must be checked against current Infra sources and live probes.
 
 ## Agent home (`~/.aphrody`)
 

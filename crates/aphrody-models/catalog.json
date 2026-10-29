@@ -384,7 +384,7 @@
       "title": "Multilingual E5 Small (ONNX)",
       "task": "text-embedding",
       "backend": "onnx-runtime",
-      "summary": "Lightweight 384-dimensional dense text embedding model supporting 100 languages. Standard embedder for shenron and aphrody RAG vector retrieval.",
+      "summary": "Lightweight 384-dimensional dense text embedding model supporting 100 languages. Standard embedder for aphrody RAG vector retrieval.",
       "files": [
         {
           "role": "weights",

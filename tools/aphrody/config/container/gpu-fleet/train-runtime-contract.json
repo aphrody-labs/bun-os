@@ -30,7 +30,7 @@
     "buildHost": "declared VPS factory",
     "trainingHost": "declared Omar CUDA allocation",
     "gpuLease": "exclusive; suspend inference allocation before starting training",
-    "promotion": "independent heldout evaluation against active Shenron model; training does not promote"
+    "promotion": "independent heldout evaluation against the active model; training does not promote"
   },
   "qualification": {
     "nativeRuntimeArtifact": false,

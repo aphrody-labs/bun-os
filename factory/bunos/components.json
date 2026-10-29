@@ -447,7 +447,7 @@
         "apps": "factory/bunos/webapps.json"
       },
       "build": "bun run build per app; static dist served on 127.0.0.1 by bunos-webapp, one .desktop per app",
-      "remainingApps": "IECODE web apps need a server or WASM launcher contract. Rose Griffon is maintained in aphrody-labs/rosegriffon and publishes its self-hosted binaries there."
+      "remainingApps": "IECODE web apps need a server or WASM launcher contract."
     },
     {
       "id": "bun-engine",
@@ -2298,10 +2298,9 @@
       "status": "present",
       "consumedBy": ["npm:@frontend/source"],
       "edges": {
-        "consumers": ["shenron"],
         "npm": "mediabunny@1.63.0 (latest on npm, 2026-10-29)"
       },
-      "note": "Migrated from aphrody-labs/shenron vendor/mediabunny; pin = upstream HEAD of 2026-10-28T17:42:43Z."
+      "note": "Pin = upstream HEAD of 2026-10-28T17:42:43Z."
     },
     {
       "id": "submodule:vendor/ui-ux-pro-max-skill",
@@ -2319,7 +2318,7 @@
       "edges": {
         "consumers": ["skill:ui-ux-pro-max"]
       },
-      "note": "Migrated from aphrody-labs/shenron vendor/ui-ux-pro-max-skill; pin = upstream HEAD of 2026-10-26T10:07:27Z."
+      "note": "Pin = upstream HEAD of 2026-10-26T10:07:27Z."
     },
     {
       "id": "submodule:vendor/recalbox",
@@ -3667,12 +3666,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@rosegriffon/inagle-cross",
+      "id": "npm:@aphrody/inagle-cross",
       "kind": "npm-package",
       "path": "packages/inagle-cross",
       "source": {
         "type": "workspace",
-        "name": "@rosegriffon/inagle-cross",
+        "name": "@aphrody/inagle-cross",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -3693,12 +3692,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@rosegriffon/inagle",
+      "id": "npm:@aphrody/inagle",
       "kind": "npm-package",
       "path": "packages/inagle",
       "source": {
         "type": "workspace",
-        "name": "@rosegriffon/inagle",
+        "name": "@aphrody/inagle",
         "version": "1.4.7"
       },
       "registration": ["bun-ffi"],
@@ -4044,12 +4043,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@rosegriffon/menu-render-webgpu",
+      "id": "npm:@aphrody/menu-render-webgpu",
       "kind": "npm-package",
       "path": "packages/menu-render-webgpu",
       "source": {
         "type": "workspace",
-        "name": "@rosegriffon/menu-render-webgpu",
+        "name": "@aphrody/menu-render-webgpu",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -4057,12 +4056,12 @@
       "status": "present"
     },
     {
-      "id": "npm:@rosegriffon/menu-render",
+      "id": "npm:@aphrody/menu-render",
       "kind": "npm-package",
       "path": "packages/menu-render",
       "source": {
         "type": "workspace",
-        "name": "@rosegriffon/menu-render",
+        "name": "@aphrody/menu-render",
         "version": "1.4.7"
       },
       "registration": ["none"],

@@ -624,7 +624,7 @@ mod tests {
         let hits = aphrody_rag::home::unified_search(&db, "native ingestion", &Default::default())
             .unwrap();
         assert!(!hits.is_empty());
-        let other = HomeLayout::in_state(state.path(), &HomeScope::Profile("dbfr".into())).unwrap();
+        let other = HomeLayout::in_state(state.path(), &HomeScope::Profile("docs".into())).unwrap();
         assert!(!other.db_path.exists());
     }
 }

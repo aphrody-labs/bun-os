@@ -124,8 +124,8 @@ test("real contracts name canonical credentials without inventing endpoint defau
   const contract = loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."), ["aphrody-mcp-http"]);
   expect(contract.required).toContain("APHRODY_MCP_HTTP_TOKEN");
   expect(contract.processKeys).toContain("APHRODY_MCP_DATABASE_URL");
-  expect(contract.aliases.APHRODY_AI_HTTP_TOKEN).toContain("APHRODY_SHENRON_API_TOKEN");
-  expect(() => loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."), ["shenron-bot"])).toThrow(
+  expect(contract.aliases.APHRODY_AI_HTTP_TOKEN).toEqual([]);
+  expect(() => loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."), ["other-bot"])).toThrow(
     "another domain",
   );
 });
@@ -228,7 +228,7 @@ else {
   if(server.command!==(process.platform==='win32'?process.execPath:process.argv[1])||server.args[0]!=='--env-file'||server.args[1]!==args[1])process.exit(9);
   if(args.includes('list')){
     console.log(JSON.stringify({kind:'server_info',tool_count:1}));
-    console.log(JSON.stringify({kind:'tool',name:'aphrody_shenron_rag_search'}));
+    console.log(JSON.stringify({kind:'tool',name:'aphrody_rag_search'}));
   }else if(args.includes('call'))console.log(JSON.stringify({result:{content:[{type:'text',text:JSON.stringify(process.env.PROBE_FIXTURE_ERROR?{error:{code:'503',message:process.env.PROBE_FIXTURE_ERROR}}:{results:[],mode:'lexical'})}]}}));
   else process.exit(10);
 }
@@ -278,7 +278,7 @@ test("explicit process sources cannot import generic database or routing keys", 
   }
   const contract = loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."));
   expect(contract.required).not.toContain("APHRODY_MCP_HTTP_TOKEN");
-  expect(contract.processKeys).toContain("APHRODY_SHENRON_PRODUCTION_READY");
+  expect(contract.processKeys).toContain("APHRODY_MCP_DATABASE_URL");
   expect(loadMcpEnvironmentRequirements(join(import.meta.dir, "../../../.."), [], true).required).toContain(
     "APHRODY_MCP_DATABASE_URL",
   );

@@ -6,7 +6,7 @@ import { factoryLeaseHeld } from "./build-factory-cleanup.ts";
 
 export interface UiAllocation {
   enabled: boolean;
-  classes: ["shenron-ui-reuse"];
+  classes: string[];
   lockPath: string;
   workRoot: string;
   maxJobs: 1;
@@ -33,8 +33,8 @@ export function qualifyUiAllocation(factory: UiFactory, capacity: UiCapacity): U
   if (!factory.enabled || factory.target !== "vps" || !ui?.enabled)
     throw Error("Canonical factory UI allocation is disabled");
   if (
-    ui.classes?.length !== 1 ||
-    ui.classes[0] !== "shenron-ui-reuse" ||
+    !ui.classes?.length ||
+    ui.classes.some(name => typeof name !== "string" || !name) ||
     ui.maxJobs !== 1 ||
     ui.lockPath !== posix.join(posix.dirname(factory.lockPath), "ui.lock") ||
     ui.workRoot !== posix.join(factory.artifactRoot, "ui", "jobs")

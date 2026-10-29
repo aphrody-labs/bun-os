@@ -8,7 +8,7 @@
  */
 
 import { afterEach, describe, expect, test } from "bun:test";
-import type { MenuLayout, MenuObject } from "@rosegriffon/menu-render";
+import type { MenuLayout, MenuObject } from "@aphrody/menu-render";
 import {
   buildDrawList,
   buildGlyphInstances,

@@ -88,9 +88,6 @@ does not exempt package units from target-host systemd and health checks.
 For example, DBFR's `redis-server.service` must be verified on DBFR instead
 of adding a fabricated Redis template to this repository.
 
-Stopping RG and moving Shenron to DBFR are operations owned by Infra. A Rust
-wrapper change does not prove either operation happened. DBFR remains the
-Shenron runtime host; the VPS produces verified artifacts for delivery there.
 Keep production inputs, databases and credentials in their protected stores.
 
 On Windows `cargo-serial.ts` (Bun, kernel32 through `bun:ffi`) holds the

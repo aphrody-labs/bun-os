@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Game RE engine absorbed from `shenron-re` (Apache-2.0, aphrody-labs/shenron):
+//! Game RE engine (Apache-2.0):
 //! AOB signature scanning, live process-memory inspection, the DBXV2 binary format
 //! parsers (BAC/BDM/CMS/CUS/EMB/EMD/EMM/ESK/MSG/PUP/SAV), the Dragon Ball game
 //! catalog, Steam install inspection, text extraction and the unified state; plus the

@@ -11,7 +11,7 @@
 //! compiles is not a tool that is wired").
 //!
 //! Every call site in this workspace that used to read
-//! `std::env::var("APHRODY_SHENRON_EMBED_BASE_URL")` (or hardcode a fallback
+//! `std::env::var("APHRODY_RAG_EMBED_ENDPOINT")` (or hardcode a fallback
 //! such as `http://127.0.0.1:8080`) goes through [`CanonicalEnv::resolve`]
 //! instead, so the precedence (`resolution.precedence` in the contract:
 //! canonical name, then each alias in the order listed) is enforced in one
@@ -33,7 +33,7 @@
 //! // A legacy alias still works.
 //! assert_eq!(
 //!     EMBED_MODEL.resolve_with(&|name| {
-//!         (name == "APHRODY_SHENRON_EMBED_MODEL").then(|| "qwen3-embedding-0.6b".to_owned())
+//!         (name == "APHRODY_RAG_EMBED_MODEL").then(|| "qwen3-embedding-0.6b".to_owned())
 //!     }),
 //!     Some("qwen3-embedding-0.6b".to_owned())
 //! );
@@ -103,7 +103,7 @@ pub const MCP_BIN: CanonicalEnv = CanonicalEnv {
 /// `gateways.ai-http` — the `aphrody-ai-http` REST gateway origin.
 pub const HTTP_URL: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_HTTP_URL",
-    aliases: &["APHRODY_SHENRON_API_URL"],
+    aliases: &[],
 };
 
 /// `gateways.ai-http` — the bearer token for [`HTTP_URL`]. Never write the
@@ -111,7 +111,7 @@ pub const HTTP_URL: CanonicalEnv = CanonicalEnv {
 /// name where it lives, not to move it.
 pub const HTTP_TOKEN: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_HTTP_TOKEN",
-    aliases: &["APHRODY_SHENRON_API_TOKEN"],
+    aliases: &[],
 };
 
 /// `capabilities.chat` — the managed llama-server base URL (`.../v1`), also
@@ -119,17 +119,13 @@ pub const HTTP_TOKEN: CanonicalEnv = CanonicalEnv {
 /// (`baseUrlFrom: "chat"` in the contract: one instance, several roles).
 pub const CHAT_BASE_URL: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_CHAT_BASE_URL",
-    aliases: &[
-        "APHRODY_SHENRON_LLM_BASE_URL",
-        "APHRODY_OSS_BASE_URL",
-        "APHRODY_LOCAL_MODEL_URL",
-    ],
+    aliases: &["APHRODY_OSS_BASE_URL", "APHRODY_LOCAL_MODEL_URL"],
 };
 
 /// `capabilities.chat` — the model id served at [`CHAT_BASE_URL`].
 pub const CHAT_MODEL: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_CHAT_MODEL",
-    aliases: &["APHRODY_LLM_MODEL", "APHRODY_SHENRON_LLM_MODEL"],
+    aliases: &["APHRODY_LLM_MODEL"],
 };
 
 /// Bearer credential for the configured chat upstream only. This is distinct
@@ -137,11 +133,7 @@ pub const CHAT_MODEL: CanonicalEnv = CanonicalEnv {
 /// Keep the value in the host's protected environment store, never in a provider table.
 pub const CHAT_API_KEY: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_CHAT_API_KEY",
-    aliases: &[
-        "APHRODY_AI_CHAT_TOKEN",
-        "VLLM_API_KEY",
-        "SHENRON_OPENAI_API_KEY",
-    ],
+    aliases: &["APHRODY_AI_CHAT_TOKEN", "VLLM_API_KEY"],
 };
 
 /// `capabilities.code` — model id; base URL is [`CHAT_BASE_URL`].
@@ -165,13 +157,13 @@ pub const SMALL_MODEL: CanonicalEnv = CanonicalEnv {
 /// `capabilities.vision` — base URL of the visual-transcription endpoint.
 pub const VISION_BASE_URL: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_VISION_BASE_URL",
-    aliases: &["APHRODY_SHENRON_VISION_BASE_URL"],
+    aliases: &[],
 };
 
 /// `capabilities.vision` — the model id served at [`VISION_BASE_URL`].
 pub const VISION_MODEL: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_VISION_MODEL",
-    aliases: &["APHRODY_SHENRON_VISION_MODEL"],
+    aliases: &[],
 };
 
 /// `capabilities.ocr` — the model id `aphrody ocr` runs by default.
@@ -192,17 +184,13 @@ pub const STT_MODEL: CanonicalEnv = CanonicalEnv {
 /// CLAUDE.md §7).
 pub const EMBED_BASE_URL: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_EMBED_BASE_URL",
-    aliases: &[
-        "APHRODY_SHENRON_EMBED_BASE_URL",
-        "EMBED_URL",
-        "APHRODY_RAG_EMBED_ENDPOINT",
-    ],
+    aliases: &["EMBED_URL", "APHRODY_RAG_EMBED_ENDPOINT"],
 };
 
 /// `capabilities.embed` — the model id served at [`EMBED_BASE_URL`].
 pub const EMBED_MODEL: CanonicalEnv = CanonicalEnv {
     canonical: "APHRODY_AI_EMBED_MODEL",
-    aliases: &["APHRODY_SHENRON_EMBED_MODEL", "APHRODY_RAG_EMBED_MODEL"],
+    aliases: &["APHRODY_RAG_EMBED_MODEL"],
 };
 
 /// `capabilities.embed` — vector width of [`EMBED_MODEL`]. An override that

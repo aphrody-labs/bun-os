@@ -13,9 +13,6 @@ own applications.
 
 ## Completed baseline — 2026-09-28
 
-- Audited Aphrody AI messaging, Shenron, RG community bot, Achilléa bot, and NIE's
-  historical Wonderbot package. Reports and source caveats are in
-  [`architecture/upstreams`](../../architecture/discord/architecture/README.md).
 - Ported the Aphrody AI common channel contract and Discord REST adapter to
   Bun-first TypeScript as `@aphrody/messaging`. It supports message/file sends,
   DM creation, room enumeration, and cancellable inbox polling; it has no direct
@@ -57,10 +54,6 @@ instead of starting a broken OAuth flow.
 3. Add thin adapters for selected upstream frameworks. Reuse maintained
    Discord.js/DiscordX capabilities instead of maintaining parallel REST or
    Gateway implementations.
-4. Migrate consumers in order: Aphrody AI notifications, Shenron's transport
-   boundary, RG and Achilléa, then NIE if a current Discord application is
-   restored. Preserve app-owned data,
-   permissions, policies, and command/domain logic.
 5. Add import-boundary and dependency-duplication checks; migrate old entry
    points through temporary facades, then retire duplicate clients.
 6. For each consumer, require Bun typecheck/lint, package export validation,

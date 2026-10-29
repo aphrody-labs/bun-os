@@ -16,7 +16,7 @@ this operation does not migrate those production domains.
   `http_v3_module`. The existing `/usr/bin/certbot` is installed. An unprivileged
   listing returned no readable certificate directories; this is not proof that
   no protected certificate store exists.
-- PC `shenron-gateway` contains nginx1.31.6 with OpenSSL3.5.8 at runtime and both
+- PC `gateway` contains nginx1.31.6 with OpenSSL3.5.8 at runtime and both
   H2/H3 modules. Its Docker mapping currently publishes port80 only. A compiled
   QUIC module does not prove external UDP443 reachability or HTTP/3 negotiation.
 
@@ -104,7 +104,7 @@ matching certificate/SNI, firewall/NAT reachability and a real H3 client request
 <https://nginx.org/en/docs/http/ngx_http_v2_module.html> and
 <https://nginx.org/en/docs/http/ngx_http_v3_module.html>.
 
-PC gateway adaptation must preserve existing Shenron and DBFR domains, mounts,
+PC gateway adaptation must preserve existing DBFR domains, mounts,
 container identities and data stores. Adding TCP/UDP443 mappings usually requires
 container recreation through its declared deployment owner; module support alone
 does not authorize an ad hoc gateway replacement. The configured native Infra

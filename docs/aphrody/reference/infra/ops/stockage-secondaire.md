@@ -96,7 +96,7 @@ n'est pas une source : c'est un cache du décodage G4TX→PNG que
 `nie-model-serve` (:8790) sait faire à la volée depuis les CPK, qui eux restent en
 local.
 
-Trois vérifications, parce que `cdn.rosegriffon.fr` en dépend :
+Trois vérifications, parce que le CDN en dépend :
 
 1. **Image identique.** Le PNG rendu par le décodeur et celui du dump : mêmes
    dimensions (3924 × 2932), même sRGB 8 bits, et `compare -metric RMSE` **nul** —
@@ -166,15 +166,14 @@ est donc passé en primaire, `LIVE_ORIGIN` en simple repli.
 ## Ce qui ne doit jamais être déporté
 
 - **`data/packs` (not in repo) (57 Go)** — les archives CPK. C'est la source de tout le contenu
-  décodé en direct par le CDN. Les déporter couperait `cdn.rosegriffon.fr`.
+  décodé en direct par le CDN. Les déporter couperait le CDN.
 - **`data/dx11/model` (not in repo)** — référencé par l'unité `nie-model-serve`.
 - **`/opt/google/chrome`** — le navigateur que pilote `bxc`.
 - **`niers/target`** — contient le binaire `nie-model-serve` en service.
 
 ## Le second VPS aujourd'hui
 
-Il n'héberge plus que **shenron** (bot Discord, site `dragonballfr.com`, serveur
-MCP, sidecar d'embeddings) et **bxc** (automatisation de navigateur : API,
+Il n'héberge plus que **bxc** (automatisation de navigateur : API,
 crawler, ordonnanceur), plus PostgreSQL, Redis, nginx et un serveur de fichiers.
 Son disque de 96 Go était plein à 91 % le 21 août 2026 ; après rapatriement et
 nettoyage il est redescendu à environ 60 %.
@@ -182,7 +181,7 @@ nettoyage il est redescendu à environ 60 %.
 Deux pièges rencontrés ce jour-là, qui valent pour n'importe quel nettoyage :
 
 - **Un dossier vide peut être une dépendance.** Supprimer les caches
-  `apps/*/.bun-cache` a mis `shenron-embed.service` en échec instantané
+  `apps/*/.bun-cache` a mis un service en échec instantané
   (`226/NAMESPACE`) : l'unité les monte via ses directives d'espace de noms, et
   systemd refuse de démarrer si le point de montage n'existe pas. Recréer les
   dossiers vides a suffi.

@@ -11,7 +11,7 @@
       "bytes": 1375902
     },
     "maintainedAppUi": {
-      "files": 291,
+      "files": 290,
       "bytes": 1578839
     }
   },
@@ -313,7 +313,7 @@
       ]
     },
     "appUiOnly": {
-      "count": 48,
+      "count": 47,
       "fslBytes": 0,
       "appUiBytes": 383523,
       "paths": [
@@ -360,7 +360,6 @@
         "routes/explorer/ai-helpers.ts",
         "routes/explorer/components/FileSelectionAiBar.tsx",
         "routes/explorer/explorer-ai-actions.test.ts",
-        "shenron-theme.ts",
         "stores/aphrodyJobStore.ts",
         "stores/chat-store.ts",
         "system-presets.ts",
@@ -2571,10 +2570,6 @@
       "routes/tag/index.tsx": {
         "sha256": "55dd1f7f13ad1fa986ffa0b3c60bfc1e8369d7b8a116b01951bfd5c9569f36e4",
         "bytes": 688
-      },
-      "shenron-theme.ts": {
-        "sha256": "3074cd8d97d3112599bbaa8f06aaf1eca023071bfa86a1085e2e97d07eb4d1d6",
-        "bytes": 1726
       },
       "stores/aphrodyJobStore.ts": {
         "sha256": "7c2459b8e8836a1a564f411f5b1ace211d9fe535b18ecf95773c1af72e8a4c32",

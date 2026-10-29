@@ -10,16 +10,7 @@ services:
   fonts-proxy:
     volumes:
       - /home/ubuntu/.local/share/aphrody-runtime-20261011/bun-linux-x64/bun:/usr/local/bin/bun:ro
-  shenron-timeline-api:
-    volumes:
-      - /home/ubuntu/.local/share/aphrody-runtime-20261011/bun-linux-x64/bun:/usr/local/bin/bun:ro
   mcp-http:
-    volumes:
-      - /home/ubuntu/.local/share/aphrody-runtime-20261011/bun-linux-x64/bun:/usr/local/bin/bun:ro
-  shenron-compute:
-    volumes:
-      - /home/ubuntu/.local/share/aphrody-runtime-20261011/bun-linux-x64/bun:/usr/local/bin/bun:ro
-  shenron-embed:
     volumes:
       - /home/ubuntu/.local/share/aphrody-runtime-20261011/bun-linux-x64/bun:/usr/local/bin/bun:ro
   jobs-worker:

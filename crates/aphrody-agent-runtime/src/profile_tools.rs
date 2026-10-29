@@ -250,26 +250,26 @@ mod tests {
     #[test]
     fn resolves_exact_profile_and_plugin_skills() {
         let temp = tempfile::tempdir().unwrap();
-        let profile = temp.path().join("workspace-shenron");
+        let profile = temp.path().join("workspace-worker");
         let direct = profile.join("skills/rag.canon");
-        let plugin = temp.path().join("dragon-ball");
-        let plugin_skill = plugin.join("skills/dbfr-databooks");
+        let plugin = temp.path().join("example-plugin");
+        let plugin_skill = plugin.join("skills/docs-index");
         fs::create_dir_all(&direct).unwrap();
         fs::create_dir_all(&plugin_skill).unwrap();
         fs::write(direct.join("SKILL.md"), "# rag").unwrap();
-        fs::write(plugin_skill.join("SKILL.md"), "# dbfr").unwrap();
-        fs::write(plugin.join("plugin.json"), r#"{"name":"dragon-ball"}"#).unwrap();
+        fs::write(plugin_skill.join("SKILL.md"), "# docs").unwrap();
+        fs::write(plugin.join("plugin.json"), r#"{"name":"example-plugin"}"#).unwrap();
 
         let mut config = config();
-        config.active_profile = Some("shenron".into());
-        config.skills.whitelist = vec!["rag.canon".into(), "dbfr-databooks".into()];
+        config.active_profile = Some("worker".into());
+        config.skills.whitelist = vec!["rag.canon".into(), "docs-index".into()];
         config.plugins.paths = vec![plugin.display().to_string()];
         let spec = resolve_tool_profile(&config, &profile, temp.path())
             .unwrap()
             .unwrap();
         assert_eq!(spec.skills[0].name, "rag_canon");
-        assert_eq!(spec.plugins[0].id, "dragon-ball");
-        assert_eq!(spec.plugins[0].skills[0].name, "dbfr-databooks");
+        assert_eq!(spec.plugins[0].id, "example-plugin");
+        assert_eq!(spec.plugins[0].skills[0].name, "docs-index");
     }
 
     #[test]

@@ -16,7 +16,7 @@
   "quantization": "isq-4",
   "maximumContextTokens": 2048,
   "maximumConcurrentSequences": 1,
-  "exclusiveWith": ["vllm", "shenron-train"],
+  "exclusiveWith": ["vllm"],
   "engineEndpoint": "http://127.0.0.1:8181/v1",
   "remoteEngineAuthentication": false,
   "meshExposureOwner": "aphrody-gateway",

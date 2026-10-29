@@ -76,7 +76,7 @@ critères dans sa portée complète.
 
 Les autres items ouverts du plan conservent leurs exigences : consolidation
 du monorepo, MCP unique, kernel/shell, purge CLI, téléchargements, Yolo Windows,
-activation et acquisition du runtime, desktop réel, production Shenron,
+activation et acquisition du runtime, desktop réel,
 authentification MCP HTTP, agent-home, parité du graphe, publications et
 hygiène des dépôts. Leurs reçus antérieurs servent de points de départ ; ce
 lot ne les marque pas terminés. Les échecs globaux web et TypeScript restent

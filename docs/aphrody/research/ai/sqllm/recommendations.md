@@ -1,5 +1,4 @@
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-<!-- docs-links: external-paths — backtick paths in this dated document name files of the repository at the time it records (Shenron and Koharu moved to aphrody-labs/shenron on 2026-10-05), not of this checkout. -->
+-->
 # Recommendations for Aphrody (2026-10-01)
 
 These recommendations follow from [training.md](training.md),
@@ -14,21 +13,16 @@ T2a/b/c engines, T5 MCP, T11 sweep). Every dependency change goes through
 
 | Fact | Evidence |
 |---|---|
-| The Neon project `aphrody` (renamed from `shenron`, emptied 2026-10-01) runs **PG 18** on the Free plan (1 GiB branch limit, 0.25–2 CU autoscaling, 6 h history retention) | Neon API `describe_project`, 2026-10-01 |
 | The root workspace bundles SQLite **3.53.2** (rusqlite 0.40.2 / libsqlite3-sys 0.38.2); Bun 1.4.2 also embeds 3.53.2; the system CLI is 3.45.1 | `Cargo.lock`, `bun -e`, `sqlite3 --version` |
 | The training registry has DDL but **no writer** in either repository | grep of `aphrody` and `aphrody-py` |
 | Triples use **positional negatives** (`(idx + n/2) % n`) and first-sentence queries | `aphrody-py/.../aphrody_train/triples.py` |
-| PG dense search binds vectors as `$n::text::vector` strings; PG connections are opened per call with `NoTls` | `crates/ai/mcp/src/shenron_vector.rs`, `crates/ai/rag/src/postgres.rs`, `crates/ai/mcp/src/http_rest.rs` |
 | SQLite dense search loads every BLOB and scans exactly, under an async mutex | `crates/ai/rag/src/store.rs::search_vector` |
 | `tokio-postgres-rustls` 0.14 is declared in `[workspace.dependencies]` but **no member uses it** | root `Cargo.toml:47` |
-| The Shenron pipeline pins npm `sqlite-vec ^0.1.1`; upstream stable is 0.1.9 | `packages/shenron/pipeline/package.json` |
 
 ## 1. Top 10 (priority order)
 
 1. **Write the generic training registry: code and migrations together, then create the schema.**
    - Owner: `crates/ai/train` for both the migrations (`migrations/0001_*.sql`,
-     generic for any training, not Shenron-specific) and the writer (T11),
-     behind an opt-in `registry` feature.
    - Schema changes:
      - `dataset_versions` with `parent_id`, `source_commit` and
        `content_sha256`, checked against `^[0-9a-f]{64}$`.
@@ -68,8 +62,6 @@ T2a/b/c engines, T5 MCP, T11 sweep). Every dependency change goes through
 
 4. **Use pgvector-native binding and `halfvec` HNSW for the PostgreSQL dense
    channel.**
-   - Owners: `crates/ai/mcp/src/shenron_vector.rs` (T5) and
-     `crates/ai/rag/src/postgres.rs` (T1).
    - Add `pgvector = { version = "0.4.2", features = ["postgres", "halfvec"] }`
      (MIT OR Apache-2.0) to `[workspace.dependencies]`.
    - Bind `Vector` values instead of building `[..]::text::vector` strings.
@@ -122,17 +114,6 @@ T2a/b/c engines, T5 MCP, T11 sweep). Every dependency change goes through
      Bundled 3.53.2 qualifies; the system CLI (3.45.1) must not write them.
    - Backups: nightly `VACUUM INTO`. Use Litestream 0.5.17 (Apache-2.0) for
      continuous replication on Linux hosts.
-
-9. **Bring the Shenron SQLite bundle up to date and decide its format.**
-   - Owners: `packages/shenron/pipeline` and `apps/shenron/bot`.
-   - Raise npm `sqlite-vec` to **0.1.9** (MIT/Apache-2.0); it reclaims space
-     on `DELETE`.
-   - Use `vec0` `partition key` on `model` and auxiliary columns instead of
-     side tables.
-   - Optionally share the same `vec0` layout with `crates/ai/rag` through the
-     `sqlite-vec` crate 0.1.9, registered via `sqlite3_auto_extension`. That
-     gives one on-disk format for Rust and Bun. Keep the 0.1.10 ANN alphas
-     out of production.
 
 10. **Backup and comparison tooling.**
     - Owners: Infra (`packages/infra/workspace`, `scripts/release`).

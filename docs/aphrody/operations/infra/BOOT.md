@@ -36,14 +36,10 @@ Sans `--host`, tous les hôtes déclarés sont traités. Les hôtes distants pas
 checkout) enregistre une tâche déclarée sans appliquer les entrées propres au PC du propriétaire. Tâches déclarées
 qui remplacent d'anciens scripts PowerShell : `Container` (`scripts/install/container-service.ts`, `--pc` lu dans
 `APHRODY_PC`), `Aphrody self update` (`aphrody self update`), `AphrodyBunHygiene` (`scripts/tools/bun-hygiene.ts`).
-La copie hors hôte des sauvegardes Shenron n'est plus une tâche Windows : `shenron-offsite-backup.timer` tourne sur
-le vps (`scripts/tools/infra/shenron-offsite-backup.ts`, restauration à blanc comprise).
-
 ## État observé (2026-10-09)
 
 - `vps` et `local` : conformes (la tâche `Aphrody MCP HTTP` a reçu le déclencheur AtStartup, principal S4U).
 - `dbfr` : conforme sauf deux entrées retenues : `aphrody-jobs-worker-dbfr.service` (désactivé, en échec ; worker corrigé séparément) et `aphrody-a2a.service` (déclaré sur dbfr par le catalogue mais unité absente ; à déployer via `aphrody infra deploy`).
-- Conteneurs `shenron-*` de dbfr : `unless-stopped`. Les conteneurs de build du vps (`stab-rel-glibc`, `aphrody-setup-ubuntu`) sont éphémères et non déclarés.
-- Unités Shenron retirées sur le vps (`shenron-bot`, `shenron-site`, `shenron-mcp-http`, minuteries) : non touchées.
+- Les conteneurs de build du vps (`stab-rel-glibc`, `aphrody-setup-ubuntu`) sont éphémères et non déclarés.
 
 Implémentation : `crates/infra/infra/src/boot.rs`, `wintask.rs` (XML du Planificateur et COM), `winsvc.rs` (SCM), tests unitaires inclus (aller-retour réel sur le Planificateur local sous Windows).

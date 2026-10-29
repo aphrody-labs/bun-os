@@ -38,16 +38,15 @@ aphrody-infra (its pipeline and `scripts/`).
 
 ```powershell
 cargo run -p aphrody-ssh -- tunnel --dry-run --json
-cargo run -p aphrody-ssh -- tunnel --services shenron-pg-tunnel,redis --offset 20000
+cargo run -p aphrody-ssh -- tunnel --services db-tunnel,redis --offset 20000
 cargo run -p aphrody-ssh -- tunnel status --json
 ```
 
 `tunnel` opens local port-forwards to `tools/config/service-catalog.json` services, one `ssh -N -L ...`
-process per SSH alias, so application repositories (Shenron first) stop hand-rolling `ssh -L`.
-Without `--services` it opens the default Shenron dev set (`shenron-pg-tunnel`, `aphrody-ai-http`,
-`aphrody-shenron-embed`, `shenron-bot`, `shenron-mcp`, `redis`). The local port is the remote port
+process per SSH alias, so application repositories stop hand-rolling `ssh -L`.
+Without `--services` it opens the default dev set (`aphrody-ai-http`, `redis`). The local port is the remote port
 plus `--offset` (default `10000`), except for entries whose catalog `health` is already a
-`tcp://` probe of a local-facing port (`shenron-pg-tunnel` keeps its `15433`); the SSH alias comes
+`tcp://` probe of a local-facing port (a `db-tunnel` entry keeps its `15433`); the SSH alias comes
 from the entry's `target` prefix (`dbfr:...`) when present, else defaults to `vps`. Local ports
 already listening are skipped. The catalog path is `--catalog`, `APHRODY_INFRA_CATALOG`,
 `APHRODY_INFRA_ROOT`, or auto-discovered by walking up from the current directory to find

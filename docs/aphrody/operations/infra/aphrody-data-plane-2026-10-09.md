@@ -12,7 +12,7 @@ The new owner request targets PostgreSQL `aphrody-db`, Redis acceleration and a 
 | `crates/ai/store` (`aphrody-store`) | Per-home SQLite schema migrations 0001–0007; RAG, graph, memory, session metadata and training tables | Installed native `aphrody home status` succeeds, schema 7 |
 | RAG/code graph/training | Typed consumers of local store plus existing server-side capabilities | PostgreSQL home adapter and cross-backend parity not established |
 | Better Auth | Desired new product auth contract | No installed/source Better Auth integration found in current manifests/source; provider credentials and callbacks unqualified |
-| Workspace/Infra | Service, container, host, backup and deploy catalogs | Existing DBFR PostgreSQL/Redis runtime is cataloged for Shenron; connectivity does not allocate a new Aphrody database |
+| Workspace/Infra | Service, container, host, backup and deploy catalogs | Existing DBFR PostgreSQL/Redis runtime is cataloged; connectivity does not allocate a new Aphrody database |
 
 Native global home metadata at inspection: 89,467 files, 15,765 docs, 152,497 chunks, zero vectors, 514,533 graph nodes, 1,217,058 edges, 14,332 memories, 1,186 sessions, zero messages and 18 backup ledger entries. Only aggregate status was read. Profile homes remain separate; no SQLite contents or transcript text were exported.
 
@@ -28,7 +28,7 @@ The [agent-home plan](../../plans/agent-home-pipeline/PLAN.md) uses one canonica
 
 1. Allocate the host, database identity, least-privilege roles and profile isolation. Reuse existing PostgreSQL/Redis infrastructure only after its owning administrator allocates capacity and grants. Plan in Infra before apply.
 2. Implement the Better Auth adapter under the product owner, using `@aphrody/sql`; install only the required version through the declared Bun toolchain. Register exact Google/GitHub/Discord callbacks; validate email transport and Aphrody OAuth behavior independently. Tokens/session secrets live in protected auth stores, never in RAG/training/catalog/graph data.
-3. Assign one PostgreSQL schema migration owner and introduce a checksummed additive migration. Do not invent Better Auth tables before its supported schema and adapter are verified. Existing Shenron/RG schema owners remain unchanged.
+3. Assign one PostgreSQL schema migration owner and introduce a checksummed additive migration. Do not invent Better Auth tables before its supported schema and adapter are verified.
 4. Implement a durable SQL outbox/version for catalog/index changes, then profile-scoped Redis keys with TTL and content hashes. Commit SQL first, publish invalidation afterwards; rebuild missed events from durable state. Redis loss is cache loss, not data loss.
 5. Back up and checksum-verify eligible SQLite stores. Dry-run approved metadata export only, compare counts/hashes and enforce exclusions. Raw provider sessions, cookies, protected conversation data, credentials, models and unapproved datasets are excluded. Do not delete or overwrite SQLite files.
 6. Qualify dual reads, isolation failures, cache outage, offline execution, migration restart and rollback before any cutover. Run real auth login/logout/expiry and OAuth callback tests on web and desktop separately. Provider login is not established by schema creation.

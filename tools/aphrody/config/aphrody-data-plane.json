@@ -21,7 +21,7 @@
     "pooledUrlEnv": "APHRODY_DATABASE_URL_POOLED",
     "tlsRequiredOutsideLoopback": true,
     "consumers": ["product-auth", "ai-auth", "catalog", "rag", "mcp", "cli", "code-graph", "training-metadata"],
-    "profiles": ["aphrody", "dbfr", "ie"],
+    "profiles": ["aphrody", "ie"],
     "profileIsolation": "separate credentials and databases or schemas with enforced grants; never a caller-supplied profile alone",
     "migrationOwnerRequired": true,
     "metadataSchema": "aphrody_product",

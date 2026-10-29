@@ -436,7 +436,7 @@ activé avec le worker Bun gelé `b066500744b6e1bffd1187f922afe2a2e51c24a4e8ca6f
 Les sept artefacts installés correspondent à leurs SHA et le credential Google
 conserve son SHA et son mode 0600. Le passage réel de 15:52 UTC a qualifié
 les quatre jobs avec zéro échec : sept documents Drive inchangés, sept
-références vérifiées, 45 fichiers protégés copiés et deux homes DBFR/Shenron
+références vérifiées, 45 fichiers protégés copiés et deux homes DBFR
 indexés (32 éléments indexés au total). Le reçu est publié et frais, sans
 revue en attente ; le oneshot termine avec `Result=success`, et son timer
 reste actif et activé au démarrage.
@@ -477,9 +477,6 @@ Google et les documents restent dans leurs magasins privés.
 
 - Le PC d'Omar est hors ligne lors de cette qualification. Sa présence dans
   l'inventaire ne prouve pas une connexion WireGuard/SSH ni une exécution agente.
-- Le bot Shenron n'est pas encore admis dans le serveur Discord Aphrody. Les
-  résultats du hub ne prouvent donc pas encore son dialogue avec Aphrody dans
-  ce serveur.
 - Les SVG Material Symbols sont absents du checkout VPS observé. Le catalogue
   MCP et la génération pure de thèmes sont qualifiés ; les appels nécessitant
   ces SVG restent à qualifier avec leurs assets.
@@ -504,7 +501,7 @@ l'activation du nouveau plan VPS du 2026-10-07.
 - Sans l'exception `SystemCallFilter=@pkey`, V8 a provoqué un SIGSYS
   (`status=31/SYS`) lors de `pkey_alloc`.
 - `systemd-analyze security --offline` a donné 1,7 aux deux unités de cette
-  qualification, contre 3,1 pour `shenron-mcp-http`, 3,9 pour
+  qualification, contre 3,9 pour
   `aphrody-llama-gemma4`, 7,1 pour `aphrody-fonts-proxy` et 7,5 pour
   `aphrody-downloads`. Ces scores ne qualifient pas les nouveaux bindings de home.
 - `upstream_list`, seul des cinq outils `upstream_*` alors exercé, a échoué faute

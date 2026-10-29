@@ -36,15 +36,6 @@ Host deployment belongs to `crates/infra` and `packages/infra/workspace`.
 | `gh-repo-intelligence.ts` | GitHub repository intelligence metadata extraction. |
 | `github-account-audit.ts` | GitHub user/organization audit and repository discovery. |
 
-## Shenron & RAG Datastores
-
-| Script | Purpose |
-|---|---|
-| `shenron-rag-indexes.sql` | PostgreSQL DDL: concurrent unique index and FTS GIN index for `aphrody_rag_documents`. |
-| `shenron-rag-vectors.sql` | PostgreSQL DDL: `aphrody_shenron_vectors` pgvector storage with cosine HNSW index. |
-| `rag-nice.sh` | Linux priority/niceness wrapper for batch RAG indexing passes. |
-| `test-gemini-embedding-2.py` | Embedding generation validation for Gemini embeddings. |
-
 ## Ingestion, Databooks & OCR
 
 | Script | Purpose |

@@ -14,13 +14,6 @@ The trusted main window's core commands include:
 | `aphrody_rpc(request)` | JSON-RPC result | app-server v2 sessions, turns and interruption |
 | `aphrody_shell_window(action)` | native window state | main-only window controls and navigation |
 
-Shenron's public, read-only grounded chat is available in the existing Chat
-surface with `/shenron <question>`. Its typed `aphrody_shenron_chat` command calls
-only `https://dragonballfr.com/api/chat`; it accepts no arbitrary URL or token.
-It does not represent an authenticated Shenron account or grant admin access.
-See [`../../docs/integrations/SHENRON.md`](../../../reference/integrations/SHENRON.md)
-for the API, FFI, auth, and database ownership decisions.
-
 The main window also exposes `koharu_rpc(method, params)`. Its broker starts the
 `koharu-sdk` executable from the `aphrody-koharu` sibling checkout on demand,
 passes JSON Lines requests over stdio, and emits SDK events as `koharu://event`.

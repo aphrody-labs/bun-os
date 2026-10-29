@@ -72,7 +72,6 @@ in [README.md](README.md) pass. Kinds:
 
 | Repository   | Count (files with `1.4.3` or `1.4.2` matches) | Note                                                                                                                                                      |
 | ------------ | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `C:/shenron` | 34 occurrences in 21 files                    | mostly `package.json` engines and `bun.lock`; `Dockerfile` in `deploy/docker/all-in-one`; `docs/operations/*`                                             |
 | `C:/IECODE`  | 99 occurrences in 53 files                    | many are unrelated dependency versions (`pnpm-lock.yaml`, forks); `.github/workflows/ci.yml` (not in repo) and `deploy.yml` (not in repo); `PLAN.md` (not in repo); `docs/development/WORKSPACE.md` (not in repo) |
 
 Each repository needs its own claim and a classification pass (Bun runtime vs. unrelated dependency version) before

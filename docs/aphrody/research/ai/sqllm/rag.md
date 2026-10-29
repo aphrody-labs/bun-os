@@ -186,7 +186,6 @@ Practice:
 ## 8. Evaluation hooks
 
 - Track Recall@k and nDCG@10 per tag, comparing the shadow index with the
-  baseline before swapping any index or model. This is the rule the Shenron
-  `training.evals` table already encodes.
+  baseline before swapping any index or model.
 - Log the ANN parameters (`ef_search`, `iterative_scan`, quantization) next to
   each eval. Recall depends on them as much as on the model.

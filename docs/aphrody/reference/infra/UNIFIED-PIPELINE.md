@@ -47,11 +47,9 @@ L’ancien stage `release` exécutait `verify:release` d'`aphrody-ai` puis
 superprojet `aphrody-src` sur ext4 dans le conteneur `aphrody/build-linux:26.04` (ex-WSL Ubuntu-24.04, désinstallée ; préparé par
 `scripts/prepare-release-workspace.sh` (not in repo), sous-modules à leur gitlink), il
 construit le bundle unique de la VPS — la release Aphrody (cinq services, smoke
-local attesté par `SMOKE.json`), l'artefact Shenron (`bun run site:artifact` et
-`git archive`) et l'épinglage du commit RG — et enregistre les 13 SHA des
+local attesté par `SMOKE.json`), et enregistre les 13 SHA des
 sous-modules dans `BUNDLE.json` et `RELEASE_SHA`
-([`IMMUTABLE-RELEASES.md`](../../operations/infra/IMMUTABLE-RELEASES.md)). La release RG restait
-assemblée sur la VPS par `iecode/scripts/rg/assemble-vps-release.sh`. NIE et IECode ne
+([`IMMUTABLE-RELEASES.md`](../../operations/infra/IMMUTABLE-RELEASES.md)). NIE et IECode ne
 publient plus de release VPS selon cet état historique. Les tests Shell des
 adaptateurs sont appelés directement (`bash scripts/test-atomic-deploy-<stack>.sh`)
 quand le fixture correspondant est disponible ; aucun script racine
@@ -63,10 +61,9 @@ Ce pipeline historique ne constitue pas une autorisation de déployer. Pour un
 déploiement actuel, revalider l’état et les prérequis dans le plan Infra et le
 runbook immuable avant toute activation. La commande CLI Rust, quand elle est
 explicitement choisie, est `aphrody-infra deploy --target vps --stack bundle --release
-/home/ubuntu/apps/infra/bundles/ID --apply`, qui active Aphrody, puis Shenron, puis
-RG, chacun par son adaptateur atomique (Nginx validé, sondes loopback et HTTPS,
+/home/ubuntu/apps/infra/bundles/ID --apply`, qui active Aphrody, chacun par son adaptateur atomique (Nginx validé, sondes loopback et HTTPS,
 rollback), enregistre `BUNDLE.previous.json` et restaure les étapes déjà
-activées si une étape échoue. `--stack aphrody|shenron|rg` active une seule
+activées si une étape échoue. `--stack <pile>` active une seule
 pile. Les crawlers, mirrors et jobs lourds ne font pas partie du chemin
 critique.
 

@@ -130,7 +130,7 @@ pub fn resolve() -> Vec<ResolvedVar> {
                 )
             } else {
                 "not configured on this machine (vps-only capability); see \
-                 /etc/aphrody/shenron-compute-client.env on the vps target"
+                 the AI gateway environment file on the vps target"
                     .to_owned()
             }),
         },

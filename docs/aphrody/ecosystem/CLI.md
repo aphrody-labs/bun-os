@@ -6,13 +6,13 @@ Exact subcommand trees of every shipped binary, read from its clap derive defini
 commands omitted; `cfg:` marks commands compiled only under a feature or target). Flags are not
 listed: run `<command> --help` for them. See [ECOSYSTEM.md](ECOSYSTEM.md) for the crates behind them.
 
-Totals: 34 binaries with a clap surface, 777 commands.
+Totals: 34 binaries with a clap surface, 775 commands.
 
 ## aphrody
 
 ### `aphrody`
 
-Crate `aphrody`, parser `crates/infra/aphrody-command/src/lib.rs#Cli`, 316 commands.
+Crate `aphrody`, parser `crates/infra/aphrody-command/src/lib.rs#Cli`, 314 commands.
 
 - `aphrody pkg` — Unified native package indexes and verified content-addressed store. _(cfg: not(target_arch = "wasm32"))_
 - `aphrody site` — Native product site, sharing its catalog and renderer with HTTP and MCP. _(cfg: not(target_arch = "wasm32"))_
@@ -82,7 +82,6 @@ Crate `aphrody`, parser `crates/infra/aphrody-command/src/lib.rs#Cli`, 316 comma
       - `aphrody ai ocr db stats` — Report how many pages the corpus holds, per final status.
       - `aphrody ai ocr db list` — List stored pages, newest deposit first.
       - `aphrody ai ocr db show` — Print the full stored record for one page.
-    - `aphrody ai ocr databooks` — Transcribe a Shenron Dragon Ball databook lot with the safe preset.
   - `aphrody ai translate` — Web translation through aphrody-translate, with a local result cache.
   - `aphrody ai memory` — Local memory store (write, recall, list, delete, clear, migrate).
     - `aphrody ai memory write` — Store one memory; prints `{"id": …}`. An existing `--id` is replaced.
@@ -301,7 +300,6 @@ Crate `aphrody`, parser `crates/infra/aphrody-command/src/lib.rs#Cli`, 316 comma
     - `aphrody ocr db stats` — Report how many pages the corpus holds, per final status.
     - `aphrody ocr db list` — List stored pages, newest deposit first.
     - `aphrody ocr db show` — Print the full stored record for one page.
-  - `aphrody ocr databooks` — Transcribe a Shenron Dragon Ball databook lot with the safe preset.
 - `aphrody completions` — Génère des completions shell pour bash / zsh / fish / pwsh / elvish
 - `aphrody self` — Installer / bootstrap natif (remplace les .ps1/.sh scripts/).
   - `aphrody self install-path` — Register the release binary on the user PATH (HKCU on Windows, symlink into $HOME/.local/bin on Unix) and link the former standalone binary names (aphrody-infra, aphrody-kernel, …) to it.

@@ -97,7 +97,7 @@ ci-dessus; sinon le préserver et examiner les changements.
   d'entrée/sortie. Ces compteurs ne prouvent pas une corruption; aucun cache
   n'a été supprimé ni réinitialisé.
 - La sonde a attendu puis acquis le verrou lourd sans interrompre le build
-  Shenron existant. Une micro-crate temporaire a été compilée deux fois avec
+  existant. Une micro-crate temporaire a été compilée deux fois avec
   Cargo stable, `--offline`, `CARGO_INCREMENTAL=0` et `RUSTC_WRAPPER` explicitement
   absent. La première passe a ajouté un miss Rust (53 hits / 23 248 misses avant,
   puis 53 / 23 249); `cargo clean` a retiré uniquement les 10 fichiers de la

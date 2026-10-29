@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Unattended candidate training when a DBFR gold set and input are ready.
+//! Unattended candidate training when a gold set and input are ready.
 
 use std::{
     env,
@@ -125,12 +125,12 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     let job_id = format!(
-        "dbfr-{}-{}-{}",
+        "unattended-{}-{}-{}",
         config.kind.as_str(),
         &snapshot.revision[..8],
         &input_hash[..8]
     );
-    let state_dir = root.join(".aphrody/train/dbfr");
+    let state_dir = root.join(".aphrody/train/unattended");
     let output = state_dir.join("jobs").join(&job_id);
     let mut job = TrainingJob::new(&job_id, config.kind, output);
     job.input_path = Some(config.input_path);

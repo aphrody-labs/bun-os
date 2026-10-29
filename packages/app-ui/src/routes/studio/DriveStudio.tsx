@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-// Drive dbfr: authorise Google Drive once (OAuth loopback, crates/ui/app/src/studio.rs) and mount
-// the dbfr folder as a Spacedrive cloud volume (OpenDAL gdrive) with an indexed location.
+// Google Drive: authorise once (OAuth loopback, crates/ui/app/src/studio.rs) and mount
+// a Drive folder as a Spacedrive cloud volume (OpenDAL gdrive) with an indexed location.
 import { useState } from "react";
 import { Button, Card } from "@aphrody/m3-primitives";
 import type { LocationAddInput, VolumeAddCloudInput } from "@aphrody/drive-client";
@@ -15,13 +15,13 @@ const fieldClass = "min-h-12 rounded-xl border border-outline bg-surface-contain
 export function DriveStudio() {
   const addCloudVolume = useLibraryMutation("volumes.add_cloud");
   const addLocation = useLibraryMutation("locations.add");
-  const [root, setRoot] = useState("/dbfr");
+  const [root, setRoot] = useState("/aphrody");
   const [step, setStep] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (!isTauri()) {
-    return <p className="text-[18px] text-on-surface-variant">Le Drive dbfr nécessite l’application Aphrody.</p>;
+    return <p className="text-[18px] text-on-surface-variant">Google Drive nécessite l’application Aphrody.</p>;
   }
 
   const connect = async () => {
@@ -31,10 +31,10 @@ export function DriveStudio() {
       setStep("Autorisation Google dans le navigateur…");
       const grant = await authorizeGoogleDrive();
       setStep("Montage du dossier…");
-      const folder = root.trim() || "/dbfr";
+      const folder = root.trim() || "/aphrody";
       const volume: VolumeAddCloudInput = {
         service: "gdrive",
-        display_name: "Drive dbfr",
+        display_name: "Google Drive",
         config: {
           type: "GoogleDrive",
           root: folder,
@@ -48,7 +48,7 @@ export function DriveStudio() {
       setStep("Indexation…");
       const location: LocationAddInput = {
         path: { Cloud: { service: "gdrive", identifier: folder, path: "" } },
-        name: "Drive dbfr",
+        name: "Google Drive",
         mode: "Deep",
         job_policies: {},
       };
@@ -64,9 +64,9 @@ export function DriveStudio() {
   return (
     <div className="flex flex-col gap-6">
       <StudioHeader
-        eyebrow="dbfr"
+        eyebrow="Google Drive"
         title="Drive"
-        subtitle="Dossier Google Drive dbfr monté dans Fichiers (Spacedrive)"
+        subtitle="Dossier Google Drive monté dans Fichiers (Spacedrive)"
       />
       <Card className="flex flex-col gap-4 p-6">
         <label className="flex flex-col gap-2 text-[18px]">

@@ -13,55 +13,7 @@
     "frozenInstall": "passed",
     "iecodeArchiveFormat": "canonical-tar-gzip-v2",
     "iecodeArchivesIdenticalAcrossHosts": true,
-    "qualificationScope": "Linux Infra CLI and Shenron builds; Python lock consistency",
-    "shenronSourceRevision": "749cc9dd40317fd5749a891f6d753a880bfe3e7c"
-  },
-  "shenron": {
-    "currentRuntime": "vps",
-    "requestedRuntime": "dbfr",
-    "migrationQualified": false,
-    "dbfrCpu": 6,
-    "dbfrMemoryMiB": 11671,
-    "dbfrDiskAvailableGiB": 12,
-    "privateEnvironments": "transferred-directly-with-0600-permissions",
-    "privatePostgresqlConnection": "SELECT 1 passed on DBFR",
-    "sharedStateTransfer": "prepass passed; final checksums pending",
-    "prepassTotalFileBytes": 33820000000,
-    "prepassTransferredBytes": 31010000000,
-    "prepassByteCounts": "rounded rsync human-readable counters",
-    "prepassMegabytesPerSecond": 52.02,
-    "dbfrDiskObservation": "after runtime cache and payload staging; assembly ongoing",
-    "sealedPayload": "six checksums passed independently on VPS and DBFR",
-    "runtimeRelease": "749cc9dd40317fd5749a891f6d753a880bfe3e7c",
-    "assembly": "passed on DBFR; frozen install --ignore-scripts, no native compiler",
-    "stagedBotConfiguration": "compiled dry-run passed with private production configuration",
-    "stagedCanvas": "native Linux x64 PNG rendering passed",
-    "localRedisProbe": "PING passed for site and bot configurations",
-    "redisTransfer": "required historical analytics/reports; snapshot migration pending"
-  },
-  "rg": {
-    "applicationState": "stopped",
-    "unitsStoppedAndDisabled": [
-      "rg-infra-monitor.timer",
-      "rg-sauvegarde.timer",
-      "rg-cron.service",
-      "rg-bot.service",
-      "rg-achillea-bot.service",
-      "rg-api.service",
-      "rg-website.service",
-      "rg-infra-monitor.service",
-      "rg-sauvegarde.service",
-      "rg-cdn.service",
-      "rg-storage.service",
-      "rg-realtime.service"
-    ],
-    "protectedDataPreserved": true,
-    "hostSwapUnitPreserved": "rg-zram-swap.service",
-    "runningDockerContainers": 0,
-    "retainedContainerRestartPolicies": {
-      "rg-studio": "no",
-      "rg-pg-meta": "no"
-    }
+    "qualificationScope": "Linux Infra CLI builds; Python lock consistency"
   },
   "validation": {
     "workerCargoBuilds": 0,
@@ -69,7 +21,6 @@
     "factoryFixtureTests": 23,
     "factoryFixtureAssertions": 98,
     "workspaceTypecheck": "passed",
-    "shenronAdapterFixtures": "passed",
     "realFactoryBuild": "Infra check/clippy, bot compile and Next build passed on VPS",
     "dbfrActivation": "pending runtime assembly and final state transfer",
     "infraColdCheckSeconds": 101.65,
@@ -77,12 +28,6 @@
     "infraClippyAllTargets": "passed",
     "infraNativeBinary": "built on VPS, hash-qualified and installed on WSL with backup",
     "pythonUvLock": "passed offline with pinned uv 0.12.22 and CPython 3.12.13",
-    "shenronBotCompileSeconds": 2.19,
-    "shenronNextBuildSeconds": 80,
-    "shenronNextCompileSeconds": 25.8,
-    "shenronSiteAndBotTypechecks": "passed",
-    "shenronHealthTests": "7 tests / 34 assertions passed",
-    "shenronBotBootWithoutServicesTests": "1 test / 36 assertions passed",
     "nieFfi": "blocked: six generated compile-time metadata JSON missing in clean IECODE clone; local copies empty and unverified",
     "niePairedAphrodyRevision": "98a728a9fe31c76526e566341d752ec9bcad942c",
     "niePairedIecodeRevision": "c832e6c553a99ccad92cc64e4ff5b952f7c28c42"

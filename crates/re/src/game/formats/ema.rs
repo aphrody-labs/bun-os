@@ -339,11 +339,11 @@ mod tests {
         assert!(EmaFile::parse(b"#EMO\xfe\xff").is_err());
     }
 
-    /// `SHENRON_REAL_EMA_DIR`: every `.ema` below it must parse without NaN. Half-float
+    /// `DBXV2_REAL_EMA_DIR`: every `.ema` below it must parse without NaN. Half-float
     /// infinities are real data (translations beyond 65504 in large cutscene motions).
     #[test]
     fn parses_real_motions_when_provided() {
-        let Ok(dir) = std::env::var("SHENRON_REAL_EMA_DIR") else {
+        let Ok(dir) = std::env::var("DBXV2_REAL_EMA_DIR") else {
             return;
         };
         let mut files = Vec::new();

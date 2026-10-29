@@ -79,7 +79,7 @@ Une version inconnue signifie que la sonde --version a échoué, pas que le bina
 
 ## Séparation des domaines et collaboration
 
-Choisir un profil avant le lancement : ~/.aphrody/workspaces/aphrody, dbfr ou ie.
+Choisir un profil avant le lancement : ~/.aphrody/workspaces/aphrody ou ie.
 APHRODY_WORKSPACE désigne le profil Agent Home ; le cwd de travail reste la racine de code du domaine.
 Claude, Codex, agy et modèles locaux partagent les règles et le contexte uniquement au sein du domaine choisi.
 Les règles du dépôt (AGENTS.md, et projections CLAUDE.md/GEMINI.md) restent applicables.
@@ -87,10 +87,9 @@ Partager une branche exige de vérifier branche et HEAD avant chaque tâche ; r�
 Ne pas créer de worktree/branche isolée pour ce mode ; ne pas attribuer une modification Git à un PID sans preuve.
 
 `aphrody ai sync-sessions --watch --interval-secs 30 --json` existe ; son mode historique agrège tous les agents.
-Avec APHRODY_AGENT_DOMAIN=aphrody|dbfr|ie, le miroir et la mémoire utilisent le profil choisi ; les sessions non marquées sont exclues.
+Avec APHRODY_AGENT_DOMAIN=aphrody|ie, le miroir et la mémoire utilisent le profil choisi ; les sessions non marquées sont exclues.
 Les associations PID/session historiques fondées sur cwd et mtime sont heuristiques si plusieurs sessions partagent un cwd.
 Les conversations natives restent dans leurs stores privés ; le miroir filtré exige le marqueur de domaine du premier tour utilisateur.
-Pour dbfr/Shenron, le dossier synchronisé Google Drive conserve corpus/poids et entraînements ; vérifier le mapping privé avant de lancer.
 
 ## Inventaire kernel effectif
 

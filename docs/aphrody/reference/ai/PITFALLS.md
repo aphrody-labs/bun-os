@@ -164,17 +164,13 @@ repository's docs.
 
 ## RAG and data
 
-- **Chunk sizes are UTF-16 units, like JavaScript.** Shenron's
-  `maxChunkChars = 1400` counts JS string length; `aphrody-rag-core` measures
-  `LengthUnit::Utf16` by default and `ChunkOptions::shenron_parity()`
-  reproduces Shenron exactly for the parity goldens.
+- **Chunk sizes are UTF-16 units, like JavaScript.** JS string length counts
+  UTF-16 units; `aphrody-rag-core` measures `LengthUnit::Utf16` by default so
+  chunk boundaries match JavaScript consumers.
 - **Embedding spaces never mix.** Vectors from `multilingual-e5-small` cannot
   be compared with another model's; re-index or isolate by `model_id`.
 - **Evaluation gold sets stay disjoint from training data.** Generated
   training triples are checked against `rag-gold.jsonl` hashes.
-- **The Shenron production database host is read-only for this repository.**
-  Its disk is nearly full: replicate SQLite databases locally for evaluation
-  and never write benchmarks, logs or indexes there.
 - **A discovery filter stricter than the correction filter hides results
   silently.** When discarding candidates, count and log what is discarded; a
   detector annotates, it does not filter. A correction rule with a high

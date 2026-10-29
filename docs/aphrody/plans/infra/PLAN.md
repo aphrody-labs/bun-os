@@ -4,18 +4,6 @@
 
 # Aphrody Infra plan
 
-## 2026-10-15 — Rechargement du pool manga Shenron
-
-Le lot source Shenron `efb921af` a été installé par root avec staging SFTP,
-CAS et sauvegardes des deux fichiers, puis le seul service
-`shenron-manga-workers.service` a été redémarré via Infra SSH. Relecture :
-`enabled`, `active/running`, PID `140289`, 16 workers prêts et egress Tokyo
-à 15 h 23 min 02 s UTC. Le cycle de reprise observé par root a réindexé 241
-documents ; le cycle suivant relu ne présente aucun changement ni candidat
-émis. Aucune publication de pages ou complétude de tome n'est établie.
-Voir les [preuves datées du pool](../../operations/infra/SHENRON-MANGA-WORKERS.md#rechargement-des-sources-vérifié-le-15-octobre-2026-à-15-h-30-utc)
-et l'[inventaire expurgé](../../../../infra/config/host/inventory/shenron-manga-workers-source-reload-2026-10-15.json).
-
 ## 2026-10-13 — Accès SSH Windows persistant
 
 Le tunnel du propriétaire démarre désormais par `WireGuardTunnel$aphrody`,
@@ -32,7 +20,6 @@ Voir [SSH Omar](../../operations/infra/omar-ssh-recovery-2026-10-13.md).
 
 > Contexte courant (2026-10-09) : développement et builds selon l'hôte, la cible et les ressources disponibles ; aucun produit n'est réservé à un poste. Voir le [contexte](../../operations/workspace/windows-native.md).
 
-
 Open infrastructure work. `config/` owns topology/routing and
 inventory holds dated observations. Execute authorized tasks
 under [NHITL](../../reference/infra/AGENTS.md); backups, integrity checks and rollback remain technical gates.
@@ -42,29 +29,12 @@ observations below must be revalidated before operational use.
 ## 1. Objective
 
 One declared control plane and reproducible releases from pinned owner repositories.
-Use [immutable releases](../../operations/infra/IMMUTABLE-RELEASES.md), [Shenron migration](../../reference/infra/SHENRON-MIGRATION.md)
-and [authority map](../../reference/infra/UNIFIED-AGENT-CONTEXT.md); avoid duplicate registries or supervisors.
 
 ## 2. Current state (observed 2026-10-02, read-only)
 
-The latest read-only VPS observations supersede the 2026-09-26 host snapshot
-and older inventory snapshots. `systemctl list-units --type=service
---state=running --no-legend --plain` reported 28 running services and
-`systemctl --failed --no-legend --plain` reported no failed services. Disk use
-was 57%; `aphrody-ssh audit --host vps --json` reported `Healthy`.
-The unit listing included the Aphrody Discord development service; RG
-(`rg-achillea-bot`, API, bot, cron and website); Shenron (bot, site and
-PostgreSQL tunnel); PostgreSQL 18; and nginx, SSH, Docker and Redis. These are
-host/service-manager observations only, not application-level health checks.
+The latest read-only VPS observations supersede the 2026-09-26 host snapshot and older inventory snapshots. `systemctl list-units --type=service --state=running --no-legend --plain` reported 28 running services and `systemctl --failed --no-legend --plain` reported no failed services. Disk use was 57%; `aphrody-ssh audit --host vps --json` reported `Healthy`. These are host/service-manager observations only, not application-level health checks.
 
-Observed release links: `/srv/rg/current` pointed to release
-`5691ba4be97b94279878e00d264793c1b28f8cf1` and `/srv/shenron/current` pointed
-to `4cac743f`. `/srv/aphrody/current` and `/srv/aphrody-infra/current` were
-absent. Do not infer that missing links are healthy, deployed, or safe to
-recreate. The old `yolo/tools/config/host/inventory/vps-source.json` and
-`yolo/tools/config/host/inventory/vps-unit-catalog.json` remain historical records; use the dated
-read-only observations above for this snapshot, and refresh inventory only
-after an authorized inventory capture or host mutation.
+`/srv/aphrody/current` and `/srv/aphrody-infra/current` were absent. Do not infer that missing links are healthy, deployed, or safe to recreate. The old `yolo/tools/config/host/inventory/vps-source.json` and `yolo/tools/config/host/inventory/vps-unit-catalog.json` remain historical records; use the dated read-only observations above for this snapshot, and refresh inventory only after an authorized inventory capture or host mutation.
 
 `aphrody-infra status --target vps --json` uses the target/matrix live adapter
 and reports selected host totals/state; it is distinct from
@@ -99,11 +69,7 @@ promotion, and advance the canonical latest pointer only after every required
 site is healthy. The detailed contract, current gaps, migration sequence and
 acceptance gates are in [Unified release train](./unified-release-train/PLAN.md).
 
-Current downloads, creator, Shenron and RG publishers still have independent
-release IDs/current pointers. Do not describe them as unified or remove their
-independent adapters until the coordinator, cross-site rollback tests and
-compatibility projections pass. Do not reactivate retired Aphrody services as
-part of this release work.
+Do not describe them as unified or remove their independent adapters until the coordinator, cross-site rollback tests and compatibility projections pass. Do not reactivate retired Aphrody services as part of this release work.
 
 ### P0 — Aphrody Bun fork
 
@@ -120,21 +86,13 @@ do not treat old counts or Git state as current evidence.
 
 ### P1 — data safety
 
-
-
 - Verify the first scheduled DBFR PostgreSQL/SQLite and Windows pull cycles,
 
   hashes, acknowledgement and control restore; manual runs alone do not close this.
 
-- After the Shenron release/shared backup location exists, qualify the VPS runtime
-
   SQLite backup timer and restore; retain unverified data-class markers until then.
 
-
-
 ### P1 — production activation
-
-
 
 Do not activate the legacy all-in-one bundle while its Aphrody plane is marked
 retired in the current catalog. Re-evaluate whether bundle deployment remains
@@ -144,8 +102,6 @@ these data and runtime gates:
 
 1. Inspect PostgreSQL state and verify integrity; do not restart an active
    cluster without a diagnosed need.
-
-2. Pin a clean source closure; build on WSL with the required Shenron database tunnel.
 
 3. Establish an approved, checksum-verified database source. The old
    2026-09-25 Aphrody dumps were removed during the 2026-10-01 database
@@ -160,12 +116,6 @@ these data and runtime gates:
    prove application probes and rollback. Only then update retirement markers
    and live inventory.
 
-
-
-Existing RG/Shenron deployments and adapters do not prove bundle activation.
-
-
-
 ### P2 — host hygiene
 
 - Decide required PostgreSQL/Redis/Docker boot behavior from live workloads.
@@ -173,8 +123,6 @@ Existing RG/Shenron deployments and adapters do not prove bundle activation.
 - Re-declare VPN/forwarding only for an observed need.
 
 - Refresh VPS inventory after mutations and add DBFR/WSL inventories.
-
-
 
 ### P3 — control-plane consolidation
 
@@ -203,10 +151,7 @@ Existing RG/Shenron deployments and adapters do not prove bundle activation.
   2026-09-29 scan/import counts below are historical evidence, not current
   completion criteria.
 
-
 ### Post-split follow-ups (step-back review 2026-09-25, `src/docs/governance/STEP-BACK-REVIEW-2026-09-25.md`)
-
-
 
 - Qualify remaining API inconsistencies in [API](../../apis/contracts/API.md),
 
@@ -222,17 +167,9 @@ Existing RG/Shenron deployments and adapters do not prove bundle activation.
 
   close it. Legacy repository archival is not part of a documentation update.
 
-
-
 ### Open decisions
 
-
-
-- Resolve the Shenron asset CDN/media-proxy owner from live requirements.
-
 - Keep distribution systemd as PID 1; alternatives require a disposable-host trial.
-
-
 
 Previously listed domain/port questions were closed later in the old ledger:
 
@@ -244,11 +181,7 @@ Do not reopen these as unresolved solely because an earlier section listed them.
 
 See [ports and domains](../../reference/infra/PORTS-AND-DOMAINS.md) and current catalogues.
 
-
-
 ## 4. Protected data (never reclaim without a verified off-host copy)
-
-
 
 Protect application PostgreSQL/SQLite, runtime caches with user data, model/data
 
@@ -258,19 +191,13 @@ checksum-verified off-host backup and restore proof before destructive migration
 
 Source cleanup never authorizes removal of active runtime data.
 
-
-
 ## 5. Done (verified)
-
-
 
 The previous ledger records registry consolidation, layered dependencies, utility
 
 moves, retirement/backup operations, route fixes and bundle adapter checks. Those
 
 results apply to their named revisions and dates, not current host health.
-
-
 
 ## 6. Decision ledger (append-only)
 
@@ -298,7 +225,6 @@ results apply to their named revisions and dates, not current host health.
   install, package typecheck, oxlint and oxfmt check passed at this source state.
   Targets: `<repo>` and `../aphrody-py`.
 
-
 The pre-cleanup ledger is retained at [revision 917cb93c0afd](https://github.com/aphrody-labs/aphrody/blob/917cb93c0afd7b8883ad1dd5ee6397365609af10/docs/PLAN.md).
 
 Retrieve locally with `git show 917cb93c0afd7b8883ad1dd5ee6397365609af10:docs/PLAN.md`.
@@ -306,8 +232,6 @@ Retrieve locally with `git show 917cb93c0afd7b8883ad1dd5ee6397365609af10:docs/PL
 Append new dated decisions here with owner/revision/evidence; keep the open-work
 
 sections current and store operational detail in its existing runbook.
-
-
 
 - **2026-09-28:** condensed documentation; preserved outstanding backup, activation,
   hygiene and consolidation gates; removed questions already closed in later entries.
@@ -450,8 +374,6 @@ sections current and store operational detail in its existing runbook.
 
   inspected the 0.14.0 crate source and checked the current upstream Obscura manifest.
 
-
-
 - **2026-09-28:** expanded the read-only scanner's footprint section to all Aphrody owner
   repositories and their nested vendor/third-party trees, excluding `.git` metadata from source
   footprint totals. Current source trees include 26 MiB under `aphrody-os/third_party`, 14 MiB
@@ -551,16 +473,3 @@ sections current and store operational detail in its existing runbook.
   curated Bun rollout/gold dataset and a QLoRA-capable trainer. The existing RAG/index/model
   stack needs no duplicate Codex plugin; `rag-rat` remains uninstalled because its hooks execute
   outside the sandbox.
-
-## 2026-10-03 — VPS factory and DBFR Shenron owner decision
-
-The current owner decision supersedes the prior WSL build and VPS-only Shenron placement. Heavy build/test/release operations run through `build:factory` on VPS; WSL/Windows retain source editing and scoped static checks. RG application units and timers are stopped and disabled, with protected data and rollback releases retained. Host zram remains infrastructure swap. DBFR runtime activation is pending qualified artifact, private environment, state and route checks; keep a single bot gateway. See [factory runbook](../../operations/infra/BUILD-FACTORY.md) and dated observations (`yolo/tools/config/host/inventory/build-factory-2026-10-03.json`).
-
-### 2026-10-03 — DBFR cache cleanup
-
-Removed only the allowlisted Bun package cache, Cargo registry cache and user
-trash on DBFR. The command measured 4.34 GiB across those paths; free filesystem
-space rose by 531,767,296 bytes (from 89% to 88% use). PostgreSQL, Redis and
-Nginx remain active, with databases, `/srv` releases/data and `/tmp` preserved.
-DBFR still has an 88% disk warning and is not designated as the build factory.
-See the cleanup observation.

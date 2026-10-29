@@ -15,8 +15,6 @@ Tous les services écoutent localement sur `127.0.0.1`. Nginx termine le chiffre
 | **`nie.aphrody.com`** | `8085` / `8790` | `vps` (`51.77.147.152`) | `nie-site` / `nie-model-serve` | Service Niers séparé, conteneurs Nie VFS et assets 3D |
 | **BXC** | interne | `vps` (`51.77.147.152`) | backend `aphrody-web/apps/bxc` | Scraping, CDP et indexation exposés par `/api/v1/web/*` et le MCP Web |
 | **N2B** | in-process | `vps` (`51.77.147.152`) | `aphrody-site` | Schémas et opérations de migration exposés uniquement par `/api/v1/n2b/*` |
-| **`rosegriffon.fr`** | `3003` | `vps` (`51.77.147.152`) | `azalee-web` | Interface web du bot Discord communautaire Azalée |
-| **`dragonballfr.com`** | `3000` | `dbfr` (`51.255.162.6`) | `shenron-site` | Portail Dragon Ball FR (Next.js 16 Blue/Green, Databooks OCR, API RAG) |
 
 ---
 

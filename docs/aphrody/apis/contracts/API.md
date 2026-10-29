@@ -32,7 +32,7 @@ pub struct RagSearchParams {
 ```
 
 ```ts
-// consumer (e.g. aphrody-ui m3/packages/app-ui/src/shenron-studio.tsx)
+// consumer (e.g. an aphrody-ui app)
 await aphrodyRpc("aphrody/rag/search", { query, topK: ragTopK });
 ```
 
@@ -224,10 +224,10 @@ and `EventMsg` enums tagged `rename_all = "snake_case"`.
 
 | # | Where | Problem | Fix |
 | --- | --- | --- | --- |
-| 1 | `aphrody-contracts` `aphrody-app-protocol` + `aphrody-ui` `shenron-studio.tsx` | `probeAppServer()` called `aphrodyRpc("aphrody/status")`. The method turned out to be real and working (`aphrody-ai lib.rs:805`, aliased `system/status`) but was **not typed in `aphrody-contracts`** — a genuine contracts gap, not a client bug. | Added `AphrodyStatusParams`/`AphrodyStatusCapabilities`/`AphrodyStatusResponse` and a `ClientRequest::AphrodyStatus` (`aphrody/status`) variant to `aphrody-app-protocol`, matching the shape `aphrody-ai` already returns, plus a contract test (`tier1_contract.rs`). The TS client call needed no change. |
-| 2 | `aphrody-ui` `m3/packages/app-ui/src/shenron-studio.tsx` (not in repo) (`runModelInferenceTest`) | Called `turn/start` without `threadId`, which `TurnStartParams.thread_id` requires (not `Option`); always failed with an invalid-params error. | Calls `thread/start` first, then `turn/start` with the returned `threadId`, mirroring the working pattern already used in `quickbar.tsx`/`app.tsx`. |
-| 3 | `aphrody-ui` `m3/packages/app-ui/src/shenron-studio.tsx` (not in repo) | `RagSearchResult.chunkId` read as `r.chunkId ?? r.chunk_id`, a dead fallback masking uncertainty about the wire shape (the contract is unconditionally camelCase). | Removed the `chunk_id` fallback; kept `chunkId` only, with a comment pointing at the contract. |
-| 4 | `aphrody-ui` `m3/packages/app-ui/src/shenron-studio.tsx` (not in repo) | Local `AppServerThread.updated_at` interface field declared snake_case while the real wire field (`Thread.updatedAt`) is camelCase (latent — the field was never read). | Renamed the interface field to `updatedAt`. |
+| 1 | `aphrody-contracts` `aphrody-app-protocol` + `aphrody-ui` | `probeAppServer()` called `aphrodyRpc("aphrody/status")`. The method turned out to be real and working (`aphrody-ai lib.rs:805`, aliased `system/status`) but was **not typed in `aphrody-contracts`** — a genuine contracts gap, not a client bug. | Added `AphrodyStatusParams`/`AphrodyStatusCapabilities`/`AphrodyStatusResponse` and a `ClientRequest::AphrodyStatus` (`aphrody/status`) variant to `aphrody-app-protocol`, matching the shape `aphrody-ai` already returns, plus a contract test (`tier1_contract.rs`). The TS client call needed no change. |
+| 2 | `aphrody-ui` `runModelInferenceTest` | Called `turn/start` without `threadId`, which `TurnStartParams.thread_id` requires (not `Option`); always failed with an invalid-params error. | Calls `thread/start` first, then `turn/start` with the returned `threadId`, mirroring the working pattern already used in `quickbar.tsx`/`app.tsx`. |
+| 3 | `aphrody-ui` | `RagSearchResult.chunkId` read as `r.chunkId ?? r.chunk_id`, a dead fallback masking uncertainty about the wire shape (the contract is unconditionally camelCase). | Removed the `chunk_id` fallback; kept `chunkId` only, with a comment pointing at the contract. |
+| 4 | `aphrody-ui` | Local `AppServerThread.updated_at` interface field declared snake_case while the real wire field (`Thread.updatedAt`) is camelCase (latent — the field was never read). | Renamed the interface field to `updatedAt`. |
 | 5 | `aphrody-web` `apps/bxc/src/mcp/server.ts` (not in repo) (`bxc_x_algorithm_rank`) | MCP tool schema exposed `top_k` (snake_case) even though the TS binding one layer below (`@aphrody/x` `rankPosts(candidates, context, topK)`, `packages/web/x/src/algo.ts`) already renamed the same value to `topK`. Same concept, casing flipped mid-chain. | Schema's primary field is now `topK`; `top_k` kept as a deprecated optional alias so already-shipped callers keep working (`args.topK ?? args.top_k`). |
 | 6 | `aphrody-web` `apps/bxc/src/mcp/server.ts` (not in repo) (`bxc_xpro_deck`) | `deck_id` was the only snake_case field in an otherwise camelCase tool (`name`, `query`, `count`, `cookie`). | Schema's primary field is now `deckId`; `deck_id` kept as a deprecated optional alias. |
 
@@ -280,7 +280,7 @@ Open items are recorded so the next pass has a starting point.
    sibling tool/route in the same files is camelCase. `aphrody-mcp`'s
    `ChatRequest`/`OcrRequest`/`VisionRequest` (`crates/aphrody-mcp/src/
    http_rest.rs:74-96`) have no `rename_all` at all, unlike the camelCase
-   `Shenron*` structs in the same file. Both need the owning repo to pick a
+   structs in the same file. Both need the owning repo to pick a
    compat window (dual-emit or an `/api/v1` version bump) rather than a
    silent rename.
 6. **No shared TS wire-type package, and `aphrody-ui` doesn't import
@@ -299,8 +299,8 @@ Open items are recorded so the next pass has a starting point.
    `aphrody-app-protocol` as a path dependency of `crates/ui/app` and
    have `broker.rs` deserialize into `ClientRequest` for at least
    validation/logging; generate a matching TS package for the frontend
-   (e.g. via `ts-rs`) so `tauri-bridge.ts`/`app.tsx`/`quickbar.tsx`/
-   `shenron-studio.tsx` stop re-typing method names and payload shapes by
+   (e.g. via `ts-rs`) so `tauri-bridge.ts`/`app.tsx`/`quickbar.tsx`
+   stop re-typing method names and payload shapes by
    hand. Same root cause applies to `aphrody-web`'s MCP/HTTP layer.
 7. **DONE (documented residue) — dispatcher routed through `ClientRequest`.**
    `aphrody-ai` `AppServer::dispatch` now matches `ClientRequest` variants
@@ -318,8 +318,7 @@ Open items are recorded so the next pass has a starting point.
    Protocol-mandated exceptions, intentionally not unified: `aphrody-gateway`
    (OpenAI `{"error":{"message","type"}}`) and `aphrody-jev` (Anthropic
    `{"detail":{"error_type","message"}}`) — their clients require those
-   shapes. External consumer to adapt if adopted: `shenron`
-   `packages/ai/src/wire.ts` (not in repo) `ErrorBody` (unused today).
+   shapes.
 9. **The same "OpenAI chat message" shape is independently defined at least
    three times inside `aphrody-ai`**: `aphrody-gateway`'s
    `OpenAiChatCompletionsRequest`, `aphrody-mcp`'s `ChatRequest`

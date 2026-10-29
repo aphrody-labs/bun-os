@@ -3,7 +3,7 @@
   "owner": "crates/web/web-engine",
   "launcher": "/usr/local/bin/aphrody-web-japan-crawl",
   "transport": "native aphrody web-engine crawl --proxy socks5h://127.0.0.1:1080",
-  "proxyScope": "single Aphrody Web or Shenron crawl invocation",
+  "proxyScope": "single Aphrody Web crawl invocation",
   "region": "Japan",
   "seedPolicy": "public HTTPS websites; discovered links remain within the native crawler's seed-host scope",
   "defaults": {

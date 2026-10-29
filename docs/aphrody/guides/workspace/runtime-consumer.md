@@ -53,7 +53,7 @@ sérialisée. Un worker documentaire n’exécute aucun build moteur.
 Conserver les contrats et preuves avant/après, y compris les erreurs et refus.
 La [grille de qualification](../../architecture/runtime-native/qualification.md)
 précise les preuves pour chaque état. Une réussite du producteur n’est pas
-une réussite de déploiement Shenron, RG ou d’un autre consommateur.
+une réussite de déploiement d’un consommateur.
 
 ## 5. Livrer et conserver le retour arrière
 

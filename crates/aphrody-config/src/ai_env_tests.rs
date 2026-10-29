@@ -7,26 +7,26 @@ use super::*;
 
 #[test]
 fn resolve_prefers_canonical_then_each_alias_in_order() {
-    assert_eq!(EMBED_MODEL.resolve_with(&|_| None), None);
+    assert_eq!(EMBED_BASE_URL.resolve_with(&|_| None), None);
     assert_eq!(
-        EMBED_MODEL.resolve_with(
-            &|name| (name == "APHRODY_RAG_EMBED_MODEL").then(|| "second-alias".to_owned())
+        EMBED_BASE_URL.resolve_with(
+            &|name| (name == "APHRODY_RAG_EMBED_ENDPOINT").then(|| "second-alias".to_owned())
         ),
         Some("second-alias".to_owned())
     );
     assert_eq!(
-        EMBED_MODEL.resolve_with(&|name| match name {
-            "APHRODY_SHENRON_EMBED_MODEL" => Some("first-alias".to_owned()),
-            "APHRODY_RAG_EMBED_MODEL" => Some("second-alias".to_owned()),
+        EMBED_BASE_URL.resolve_with(&|name| match name {
+            "EMBED_URL" => Some("first-alias".to_owned()),
+            "APHRODY_RAG_EMBED_ENDPOINT" => Some("second-alias".to_owned()),
             _ => None,
         }),
         Some("first-alias".to_owned()),
         "the first alias in declaration order wins over a later one"
     );
     assert_eq!(
-        EMBED_MODEL.resolve_with(&|name| match name {
-            "APHRODY_AI_EMBED_MODEL" => Some("canonical".to_owned()),
-            "APHRODY_SHENRON_EMBED_MODEL" => Some("alias".to_owned()),
+        EMBED_BASE_URL.resolve_with(&|name| match name {
+            "APHRODY_AI_EMBED_BASE_URL" => Some("canonical".to_owned()),
+            "EMBED_URL" => Some("alias".to_owned()),
             _ => None,
         }),
         Some("canonical".to_owned()),

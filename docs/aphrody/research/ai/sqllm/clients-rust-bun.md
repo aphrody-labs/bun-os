@@ -1,5 +1,4 @@
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-<!-- docs-links: external-paths — backtick paths in this dated document name files of the repository at the time it records (Shenron and Koharu moved to aphrody-labs/shenron on 2026-10-05), not of this checkout. -->
+-->
 # Rust and Bun database clients (2026-10-01)
 
 Versions come from crates.io, npm and GitHub on 2026-10-01. Workspace
@@ -159,18 +158,14 @@ crate needs checked macros across many queries.
   - `CREATE EXTENSION vector` must be added to the migration by hand.
   - [guide](https://orm.drizzle.team/docs/guides/vector-similarity-search)
 - **1.0** is at rc.4 (2026-06-27). It splits `bun-sql` into postgres, mysql
-  and sqlite drivers and adds Turso. Wait for GA before migrating
-  `@shenron/db`.
+  and sqlite drivers and adds Turso.
 
 ## 5. What the workspace uses today
 
 | Owner | Client(s) | Store | Notes |
 |---|---|---|---|
 | `crates/ai/rag` | rusqlite 0.40 (FTS5 + `vectors` BLOB table), tokio-postgres 0.7.18 (`aphrody_rag_documents`, lexical only) | SQLite + PG | Dense search is an exact in-process scan over all BLOBs (`store.rs::search_vector`); PG connects per call with `NoTls` and a 5 s timeout |
-| `crates/ai/mcp` | tokio-postgres (`shenron_vector.rs`, `http_rest.rs`) | PG + pgvector | Vectors are passed as `$n::text::vector` string literals; fixed 384-dim E5 space |
 | `crates/ai/memory` | rusqlite (`sqlite.rs`, `sqlite_local.rs`), optional lancedb 0.29 | SQLite | Tags as JSON text matched with `LIKE`; hand-rolled brute-force "hnsw" module |
 | `crates/os/kernel/comps/jobs`, `fsindex`, `ocr-core`, `web-*`, `x`, `google`, `antigravity`, `winclean` | rusqlite | SQLite | `busy_timeout = 5000` already set in jobs and ocr-core |
 | `crates/os/kernel/comps/drive` (separate workspace) | sqlx 0.8 sqlite, sea-orm 1.1, rusqlite 0.32 | SQLite | Imported Spacedrive; isolated graph |
-| `packages/shenron/db` | drizzle-orm 0.45.3 over postgres.js 3.4.9 and `Bun.SQL` (`bun-sql.ts`) | PG | `prepare` already configurable per URL |
-| `packages/shenron/pipeline` | `bun:sqlite` + `sqlite-vec` **^0.1.1** (npm), postgres.js | SQLite (FTS5 `rag_chunks` + `vec0 vec_chunks`) + PG; Neon training registry DDL | sqlite-vec is 8 patch releases behind (0.1.9 reclaims space on DELETE) |
 | `iecode/packages/rg/db` | kysely + pg + `@supabase/ssr` | Supabase PG | RG product, Supabase-managed |

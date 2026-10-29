@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `coord` module: `.coord` envelope (ai.json v1), fleet `message/send` params, peer roster
-  (shenron/codex/agycli/claude/ocr/rag), `/a2a` and `/.well-known/agent-card.json` paths, and JSON
+  (codex/agycli/claude/ocr/rag), `/a2a` and `/.well-known/agent-card.json` paths, and JSON
   Schemas (envelope, JSON-RPC request/response, agent card) with serde roundtrip tests. Decision:
   aphrody-a2a is the single protocol-contract owner; siblings consume it instead of redefining.
 

@@ -23,7 +23,7 @@ pub const DB_FILE: &str = "aphrody.sqlite";
 pub enum HomeScope {
     /// The unprofiled home: the state root (`~/.aphrody`).
     Global,
-    /// A domain profile home (`aphrody`, `dbfr`, `ie`, ...), isolated from every other.
+    /// A domain profile home (`aphrody`, `ie`, ...), isolated from every other.
     Profile(String),
 }
 
@@ -123,20 +123,20 @@ mod tests {
     #[test]
     fn profiles_resolve_inside_their_own_home_and_never_share_a_file() {
         let state = tempfile::tempdir().unwrap();
-        let legacy = state.path().join("workspace-dbfr");
+        let legacy = state.path().join("workspace-docs");
         std::fs::create_dir_all(&legacy).unwrap();
-        let dbfr = HomeLayout::in_state(state.path(), &HomeScope::Profile("DBFR".into())).unwrap();
-        assert_eq!(dbfr.home, legacy);
-        std::fs::create_dir_all(state.path().join("workspaces/dbfr")).unwrap();
-        let dbfr = HomeLayout::in_state(state.path(), &HomeScope::Profile("dbfr".into())).unwrap();
+        let docs = HomeLayout::in_state(state.path(), &HomeScope::Profile("DOCS".into())).unwrap();
+        assert_eq!(docs.home, legacy);
+        std::fs::create_dir_all(state.path().join("workspaces/docs")).unwrap();
+        let docs = HomeLayout::in_state(state.path(), &HomeScope::Profile("docs".into())).unwrap();
         assert_eq!(
-            dbfr.db_path,
-            state.path().join("workspaces/dbfr/db/aphrody.sqlite")
+            docs.db_path,
+            state.path().join("workspaces/docs/db/aphrody.sqlite")
         );
         let ie = HomeLayout::in_state(state.path(), &HomeScope::Profile("ie".into())).unwrap();
         let global = HomeLayout::in_state(state.path(), &HomeScope::Global).unwrap();
-        assert_ne!(dbfr.db_path, ie.db_path);
-        assert_ne!(dbfr.db_path, global.db_path);
+        assert_ne!(docs.db_path, ie.db_path);
+        assert_ne!(docs.db_path, global.db_path);
     }
 
     #[test]

@@ -1,10 +1,10 @@
 /**
- * `@rosegriffon/inagle-cross` — API de données d'Inazuma Eleven Cross.
+ * `@aphrody/inagle-cross` — API de données d'Inazuma Eleven Cross.
  *
  * Jeu mobile Unity IL2CPP (`jp.co.level5.inazumacross`), DISTINCT d'Inazuma
- * Eleven: Victory Road (`@rosegriffon/inagle`). Ce package fournit le schéma
+ * Eleven: Victory Road (`@aphrody/inagle`). Ce package fournit le schéma
  * masterdata typé (extrait du dump IL2CPP), les enums, et — en Phase 1 — les
- * pushers vers `public.inagle_cross_*` (réutilisant `@rosegriffon/inagle/push-adapter`).
+ * pushers vers `public.inagle_cross_*` (réutilisant `@aphrody/inagle/push-adapter`).
  *
  * Phase 0 (présent) : schéma + enums + DDL figés (valeurs de jeu non encore
  * récupérables — serveur sous anti-triche). Phase 1 : parsers de bundles Unity

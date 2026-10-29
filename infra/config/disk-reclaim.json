@@ -6,7 +6,7 @@
     "paths are relative to the remote $HOME; absolute paths and '..' are rejected",
     "never list data read by a running unit (nie-model-serve reads .local/share/Steam/iecode and nie/var/model-cache; nie-site runs from nie/target/release)",
     "/tmp is tmpfs: reclaiming it frees RAM and swap, not disk",
-    "system steps run through sudo -n: docker prunes only unreferenced images older than 7 days and the build cache (never containers or volumes); absolute system paths must sit below a non-protected root and never under /home, /root, /etc, /boot, /var/lib/docker, /var/lib/postgresql, /var/lib/mysql or /home/ubuntu/apps/shenron/shared"
+    "system steps run through sudo -n: docker prunes only unreferenced images older than 7 days and the build cache (never containers or volumes); absolute system paths must sit below a non-protected root and never under /home, /root, /etc, /boot, /var/lib/docker, /var/lib/postgresql or /var/lib/mysql"
   ],
   "targets": {
     "vps-manga-build-cache": {
@@ -84,10 +84,6 @@
           "reason": "deployment archive duplicate of retained rollback release; internal SHA256SUMS matches unpacked release"
         },
         {
-          "path": ".aphrody-shenron-e5.tar.gz",
-          "reason": "model archive duplicate; all payload SHA-256 hashes match the active shared E5 model copy"
-        },
-        {
           "path": ".rgfix-transfer",
           "reason": "stale Git transfer bundles; every bundled ref is present and reachable in clean local main branches"
         },
@@ -112,10 +108,6 @@
           "reason": "stale pre-factory checkout (clean, nothing unpushed 2026-10-05); source lives in /home/ubuntu/src/aphrody"
         },
         {
-          "path": ".cache/shenron-bench-host",
-          "reason": "tool/bench cache, rebuilt on demand"
-        },
-        {
           "path": ".cache/cargo-xwin",
           "reason": "tool/bench cache, rebuilt on demand"
         },
@@ -134,18 +126,6 @@
         {
           "path": ".cache/aphrody-build-testctx",
           "reason": "tool/bench cache, rebuilt on demand"
-        },
-        {
-          "path": "shenron-docker/target",
-          "reason": "build output of a non-git Shenron copy, rebuildable"
-        },
-        {
-          "path": "shenron-docker/node_modules",
-          "reason": "build output of a non-git Shenron copy, rebuildable"
-        },
-        {
-          "path": "shenron-docker/dist",
-          "reason": "build output of a non-git Shenron copy, rebuildable"
         },
         {
           "path": ".cache/uv",
@@ -190,30 +170,9 @@
         "varTmpOlderThanDays": 7
       }
     },
-    "dbfr-stale-shenron-build": {
-      "sshAlias": "dbfr",
-      "paths": [
-        {
-          "path": "shenron-build/cache/cargo/shenron-wsl",
-          "reason": "Retired isolated Shenron Cargo target, qualified 2026-10-07: no process cwd/exe/fd or Docker mount references it; current factory namespace is aphrody-build/cache. Source, registry, compiler caches, runtime slots and private data remain outside this target."
-        }
-      ]
-    },
     "dbfr": {
       "sshAlias": "dbfr",
       "paths": [
-        {
-          "path": "shenron-build/target-aphrody",
-          "reason": "regenerable Shenron Rust build output; no active Cargo/rustc process uses it and the live production release remains under ~/apps"
-        },
-        {
-          "path": "shenron-build/node_modules",
-          "reason": "regenerable build dependencies; the production release carries its own runtime dependencies"
-        },
-        {
-          "path": "shenron-build/target",
-          "reason": "regenerable Cargo build output; no active compiler process uses this tree"
-        },
         {
           "path": ".bun/install/cache",
           "reason": "4.5 GiB Bun package download cache, unused by the observed services and re-fetched on demand; production release dependencies remain under ~/apps"
@@ -229,18 +188,6 @@
         {
           "path": ".yolo/transfers",
           "reason": "image and bundle transfer staging of a finished deploy; the loaded images live in Docker and sealed releases under ~/apps"
-        },
-        {
-          "path": "shenron-container-stage",
-          "reason": "staging tree of a finished container release; the sealed release lives under /home/ubuntu/apps/shenron/releases"
-        },
-        {
-          "path": "shenron-transfer.oci",
-          "reason": "OCI archive already loaded with docker image load; the image ID is pinned in the sealed release"
-        },
-        {
-          "path": "shenron-dev/node_modules",
-          "reason": "regenerable dependencies of a source checkout; DBFR is not the build factory"
         },
         {
           "path": ".cache",

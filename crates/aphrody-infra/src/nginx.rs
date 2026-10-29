@@ -15,7 +15,7 @@ use std::{collections::BTreeMap, fmt::Write as _, path::Path};
 pub enum UpstreamTarget {
     /// TCP host:port, e.g. "127.0.0.1:3004".
     Tcp(String),
-    /// Unix domain socket path, e.g. "/run/aphrody/rg-api.sock".
+    /// Unix domain socket path, e.g. "/run/aphrody/app-api.sock".
     UnixSocket(String),
 }
 
@@ -592,12 +592,12 @@ mod tests {
             UpstreamTarget::Tcp("127.0.0.1:8800".to_string())
         );
         assert_eq!(
-            UpstreamTarget::parse("unix:/run/aphrody/rg-api.sock"),
-            UpstreamTarget::UnixSocket("/run/aphrody/rg-api.sock".to_string())
+            UpstreamTarget::parse("unix:/run/aphrody/app-api.sock"),
+            UpstreamTarget::UnixSocket("/run/aphrody/app-api.sock".to_string())
         );
         assert_eq!(
-            UpstreamTarget::parse("/run/aphrody/shenron.sock"),
-            UpstreamTarget::UnixSocket("/run/aphrody/shenron.sock".to_string())
+            UpstreamTarget::parse("/run/aphrody/app.sock"),
+            UpstreamTarget::UnixSocket("/run/aphrody/app.sock".to_string())
         );
     }
 
@@ -616,28 +616,28 @@ mod tests {
     fn render_virtual_host_with_unix_socket() {
         let config = NginxConfig::new()
             .with_upstream(
-                UpstreamBlock::new("rg_api_upstream")
+                UpstreamBlock::new("app_api_upstream")
                     .with_target(UpstreamTarget::UnixSocket(
-                        "/run/aphrody/rg-api.sock".to_string(),
+                        "/run/aphrody/app-api.sock".to_string(),
                     ))
                     .with_keepalive(32),
             )
             .with_server(
-                ServerBlock::new("api.rosegriffon.fr")
+                ServerBlock::new("api.example.org")
                     .with_tls(
-                        "/etc/letsencrypt/live/api.rosegriffon.fr/fullchain.pem",
-                        "/etc/letsencrypt/live/api.rosegriffon.fr/privkey.pem",
+                        "/etc/letsencrypt/live/api.example.org/fullchain.pem",
+                        "/etc/letsencrypt/live/api.example.org/privkey.pem",
                     )
-                    .with_location(LocationBlock::new("/").with_proxy("rg_api_upstream")),
+                    .with_location(LocationBlock::new("/").with_proxy("app_api_upstream")),
             );
 
         let rendered = config.render();
-        assert!(rendered.contains("upstream rg_api_upstream {"));
-        assert!(rendered.contains("server unix:/run/aphrody/rg-api.sock;"));
+        assert!(rendered.contains("upstream app_api_upstream {"));
+        assert!(rendered.contains("server unix:/run/aphrody/app-api.sock;"));
         assert!(rendered.contains("keepalive 32;"));
         assert!(rendered.contains("listen 443 ssl http2;"));
-        assert!(rendered.contains("server_name api.rosegriffon.fr;"));
-        assert!(rendered.contains("proxy_pass http://rg_api_upstream;"));
+        assert!(rendered.contains("server_name api.example.org;"));
+        assert!(rendered.contains("proxy_pass http://app_api_upstream;"));
         assert!(rendered.contains("proxy_set_header Host $host;"));
     }
 

@@ -21,12 +21,6 @@ mod public_web_tools;
 #[path = "search_tools.rs"]
 mod search_tools;
 #[cfg(not(target_arch = "wasm32"))]
-#[path = "shenron_gemini_web.rs"]
-mod shenron_gemini_web;
-#[cfg(not(target_arch = "wasm32"))]
-mod shenron_llm_backend;
-mod shenron_vector;
-#[cfg(not(target_arch = "wasm32"))]
 mod site_tools;
 mod x_tools;
 // Voice MCP tools (TTS via aphrody-voice + STT via aphrody-voice-stt).
@@ -2819,61 +2813,6 @@ impl GoogleMcpServer {
 // below.
 // ---------------------------------------------------------------------------
 
-#[tool_router(router = shenron_router)]
-impl GoogleMcpServer {
-    #[tool(
-        description = "Search the Dragon Ball corpus held by Aphrody. Accepts q, limit, lang, \
-                          kind, sourceId (the original corpus ID), and entity. Returns stable \
-                          sourceId values, source URL, a bounded passage, and lexical mode."
-    )]
-    async fn aphrody_shenron_rag_search(
-        &self,
-        Parameters(request): Parameters<http_rest::ShenronSearchQuery>,
-    ) -> String {
-        http_rest::mcp_shenron_rag_search(request).await
-    }
-
-    #[tool(
-        description = "Upsert one Shenron passage into Aphrody's RAG corpus using a stable \
-                          sourceId such as shenron:<rowid>. Optional originSourceId, kind, lang \
-                          and entity preserve source metadata. Requires the Aphrody RAG database."
-    )]
-    async fn aphrody_shenron_rag_ingest(
-        &self,
-        Parameters(request): Parameters<http_rest::ShenronDocument>,
-    ) -> String {
-        http_rest::mcp_shenron_rag_ingest(request).await
-    }
-
-    #[tool(
-        description = "Chat through Aphrody's configured local OpenAI-compatible model for \
-                          Shenron. Returns answer and model. Requires the configured model \
-                          backend."
-    )]
-    async fn aphrody_shenron_llm_chat(
-        &self,
-        Parameters(request): Parameters<http_rest::ChatRequest>,
-    ) -> String {
-        http_rest::mcp_shenron_llm_chat(request).await
-    }
-}
-
-#[cfg(all(feature = "ocr", not(target_arch = "wasm32")))]
-#[tool_router(router = shenron_ocr_router)]
-impl GoogleMcpServer {
-    #[tool(
-        description = "Transcribe one base64 image with Aphrody's local OCR for Shenron. \
-                          Returns text, textless, suspect, findings and languageApplied=false. \
-                          Requires a binary built with the ocr feature and installed OCR model."
-    )]
-    async fn aphrody_shenron_ocr(
-        &self,
-        Parameters(request): Parameters<http_rest::OcrRequest>,
-    ) -> String {
-        http_rest::mcp_shenron_ocr(request).await
-    }
-}
-
 #[cfg(all(feature = "ocr", not(target_arch = "wasm32")))]
 #[tool_router(router = ocr_router)]
 impl GoogleMcpServer {
@@ -3071,7 +3010,7 @@ impl GoogleMcpServer {
         description = "Search the agent home database (one SQLite file per home: `<home>/db/aphrody.sqlite`) \
                           with a single hybrid query over document chunks, code-graph nodes and \
                           memories (FTS5 plus one reciprocal-rank fusion). Optional kinds filter \
-                          (chunk, node, memory) and profile (aphrody, dbfr, ie). Build it with \
+                          (chunk, node, memory) and profile (aphrody, ie). Build it with \
                           `aphrody home index <dir>`. Returns ranked hits with path, line and snippet."
     )]
     async fn aphrody_home_query(
@@ -3156,7 +3095,6 @@ impl GoogleMcpServer {
     pub fn all_tools() -> rmcp::handler::server::router::tool::ToolRouter<Self> {
         #[allow(unused_mut, reason = "each `+=` below is behind an opt-in feature")]
         let mut router = Self::core_router();
-        router += Self::shenron_router();
         #[cfg(not(target_arch = "wasm32"))]
         {
             router += Self::external_sessions_router();
@@ -3165,7 +3103,6 @@ impl GoogleMcpServer {
         #[cfg(all(feature = "ocr", not(target_arch = "wasm32")))]
         {
             router += Self::ocr_router();
-            router += Self::shenron_ocr_router();
         }
         #[cfg(all(feature = "vision", not(target_arch = "wasm32")))]
         {
@@ -3511,7 +3448,7 @@ fn init_adaptive_env(env_file: Option<&std::path::Path>) -> Result<()> {
     // a child then fails against an address nobody chose.
     //
     // `DATABASE_URL_AZALEE` used to sit in this list as
-    // `postgresql://ubuntu@/rose_griffon?host=/var/run/postgresql` - one
+    // `postgresql://ubuntu@/<db>?host=/var/run/postgresql` - one
     // deployment's unix user, database name and socket path, compiled into
     // the binary. No crate in this workspace reads it. Removed rather than
     // parameterised: set it in the environment where that database exists.
@@ -4185,17 +4122,12 @@ mod aphrody_mcp_call_tests {
             "upstream_search",
             "awesome_fetch",
             "awesome_search",
-            "aphrody_shenron_rag_search",
-            "aphrody_shenron_rag_ingest",
-            "aphrody_shenron_llm_chat",
         ] {
             assert!(
                 router.get(name).is_some(),
                 "unified MCP tool missing: {name}"
             );
         }
-        #[cfg(all(feature = "ocr", not(target_arch = "wasm32")))]
-        assert!(router.get("aphrody_shenron_ocr").is_some());
         // Always on for host builds: its own router is merged in `all_tools`.
         #[cfg(not(target_arch = "wasm32"))]
         assert!(

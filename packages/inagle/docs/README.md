@@ -1,4 +1,4 @@
-# @rosegriffon/inagle/docs
+# @aphrody/inagle/docs
 
 Universal technical documentation, OpenAPI 3.1 specifications, VFS architecture catalog,
 and `nie.exe` reverse-engineering reference for **Inazuma Eleven: Victory Road**.
@@ -32,7 +32,7 @@ import {
   getNieReMap,
   VFS_FORMATS,
   NIE_CRITICAL_OFFSETS,
-} from "@rosegriffon/inagle/docs";
+} from "@aphrody/inagle/docs";
 
 // Query VFS formats
 const formats = VFS_FORMATS;

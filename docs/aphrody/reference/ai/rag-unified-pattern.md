@@ -107,10 +107,10 @@ RAG_LLM_MODEL # model id
 ```
 
 - **Default (no URL set):** extractive synthesis from retrieved passages. Deterministic, zero-hallucination, citations intact. This is the mandatory default for conformant clients.
-- **aphrody gateway:** point the seam at the aphrody backend (`aphrody antigravity chat` / Gemini) for grounded rewriting. shenron B1 targets exactly this.
-- **Local model:** point the seam at a llama.cpp/vLLM `--api` server (shenron B5: `shenron-llm.service`, GGUF q4_k_m). Same contract, no code change.
+- **aphrody gateway:** point the seam at the aphrody backend (`aphrody antigravity chat` / Gemini) for grounded rewriting.
+- **Local model:** point the seam at a llama.cpp/vLLM `--api` server (GGUF q4_k_m). Same contract, no code change.
 
-**Training/distillation** (shenron B3–B4) reuses the seam in reverse: batched
+**Training/distillation** reuses the seam in reverse: batched
 gateway calls produce an SFT dataset (`data/llm/*-sft.jsonl`), fine-tune a 2–3B
 model (LoRA, rented GPU), serve the GGUF behind the same seam. The dataset
 schema is `{messages:[{role,content}], meta:{sources:[...]}}` — sources are the
@@ -159,8 +159,8 @@ ProtectSystem=strict
   belongs behind `rag-nice.sh`.
 - **Incremental over full rebuild** where possible: hash each chunk
   (`sha256(content)`), re-embed only changed rows, bump `rag_meta.built_at`.
-  This is shenron PLAN A7 and the single biggest CPU saving — a content edit
-  re-embeds 1 row, not 1041.
+  This is the single biggest CPU saving — a content edit re-embeds 1 row,
+  not 1041.
 - **Batch = 64** everywhere (the sidecar cap). Larger batches blow ONNX memory;
   smaller wastes the warm model.
 - **Single-flight**: never run two embedding rebuilds concurrently (the `flock`

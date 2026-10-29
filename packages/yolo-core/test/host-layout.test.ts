@@ -23,7 +23,7 @@ test("every root lives in the one declared home", () => {
     expect(root.startsWith(`${HOST_LAYOUT.home}/`)).toBe(true);
   expect(HOST_LAYOUT.compose).toBe(`${HOST_LAYOUT.apps}/compose.yaml`);
   expect(HOST_LAYOUT.composeProject).toBe("aphrody");
-  expect(hostPath("apps", "shenron", "shared")).toBe("/home/ubuntu/apps/shenron/shared");
+  expect(hostPath("apps", "demoapp", "shared")).toBe("/home/ubuntu/apps/demoapp/shared");
   expect(hostLayout("/home/x").src).toBe("/home/x/src");
 });
 
@@ -31,11 +31,10 @@ test("retired locations map to their replacement, longest prefix first", () => {
   expect(migratePath("/srv/aphrody-build/workspaces/vu-wsl/x")).toBe("/home/ubuntu/build/wsl/vu/x");
   expect(migratePath("/srv/aphrody-build/cache")).toBe("/home/ubuntu/build/cache");
   expect(migratePath("/srv/aphrody-downloads/site")).toBe("/home/ubuntu/apps/downloads/site");
-  expect(migratePath("/srv/shenron/shared")).toBe("/home/ubuntu/apps/shenron/shared");
+  expect(migratePath("/srv/demoapp/shared")).toBe("/home/ubuntu/apps/demoapp/shared");
   expect(migratePath("/etc/aphrody/container/compose.yaml")).toBe("/home/ubuntu/apps/aphrody/compose.yaml");
-  expect(migratePath("/home/ubuntu/shenron-release")).toBe("/home/ubuntu/src/shenron");
   expect(retiredPrefix("/srvx")).toBeNull();
-  expect(retiredPrefix("/home/ubuntu/apps/shenron")).toBeNull();
+  expect(retiredPrefix("/home/ubuntu/apps/demoapp")).toBeNull();
 });
 
 test("each host runs one compose project that includes ~/apps/<app>/compose.yaml", () => {

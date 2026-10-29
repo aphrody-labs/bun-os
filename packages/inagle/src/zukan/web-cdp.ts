@@ -47,7 +47,7 @@ async function defaultFactory(): Promise<CdpPageFactory> {
     module = await import(specifier);
   } catch (error) {
     throw new Error(
-      `No CDP transport: install @rosegriffon/inagle inside the Aphrody workspace (optional peer ${APHRODY_CDP_MODULE}) or call setWebCdpPageFactory().`,
+      `No CDP transport: install @aphrody/inagle inside the Aphrody workspace (optional peer ${APHRODY_CDP_MODULE}) or call setWebCdpPageFactory().`,
       { cause: error },
     );
   }

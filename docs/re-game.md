@@ -114,7 +114,7 @@ Generic = title-independent capability; Level-5 = specific to Level-5 formats or
 ### Moved and deleted
 
 - Deleted from `crates/re/src/game/fs/`: `cpk.rs`, `crilayla.rs`, `cpk_extract.rs` (a second
-  CPK/CRILAYLA implementation absorbed from shenron-re, duplicating the canonical
+  CPK/CRILAYLA implementation absorbed from an earlier DBXV2 tool, duplicating the canonical
   `aphrody-nie-formats` readers) and `vfs.rs` (`XenoverseVfs`, an in-memory DBXV2-only mount
   that loaded whole archives and looked for `data*.cpk` at the wrong level). Superseded by
   `game::assets::{archive::cpk, vfs}`. Callers updated: `game/wasm.rs` (canonical reader,

@@ -3,7 +3,6 @@
 
 > Contexte courant (2026-10-09) : développement et builds selon l'hôte, la cible et les ressources disponibles ; aucun produit n'est réservé à un poste. Voir le [contexte](../../operations/workspace/windows-native.md).
 
-
 > Historical source references (2026-10-07): links to removed modules use verified Git revisions. These records do not establish a current CLI route or installed capability.
 
 Active cross-repository backlog, updated 2026-09-29. [Architecture](../../architecture/ai/ARCHITECTURE.md)
@@ -41,24 +40,11 @@ execution. Full access is the supported initial policy. The UI contract now reco
 canonical `danger-full-access` with a legacy alias; preserve that correction rather
 than reopening the old spelling mismatch.
 
-Koharu has a headless library/SDK and extracted editor/settings integration;
-full editor, published source closure and Shenron's active review/deposit remain open.
-All release rows below remain **INCOMPLET**. Source, reported checks and installed
-proof are distinct. The [previous detailed baseline](https://github.com/aphrody-labs/aphrody/blob/914a4bf5006366f05d030bd7976bcccd17ce93e2/docs/PLAN.md)
-preserves dated evidence; none of its test counts is a current guarantee.
+All release rows below remain **INCOMPLET**. Source, reported checks and installed proof are distinct. The [previous detailed baseline](https://github.com/aphrody-labs/aphrody/blob/914a4bf5006366f05d030bd7976bcccd17ce93e2/docs/PLAN.md) preserves dated evidence; none of its test counts is a current guarantee.
 
 ## Organization and ownership
 
-[Workspace architecture](../../architecture/workspace/ARCHITECTURE.md) is the ownership map:
-Contracts owns wire types; AI owns runtime/adapters; OS owns jobs/process policy;
-Shell owns PTY; Web owns browser/extraction; UI owns presentation; Koharu owns
-manga processing/scenes; Infra owns hosts/releases; Shenron owns editorial state.
-Use the [ecosystem catalogue](../../ecosystem/ECOSYSTEM.md)
-for discovery, then inspect the implementation. No reverse Cargo dependency on AI.
-This domain map is independent of the planned source layout: AI Rust crates and Bun/TS
-packages will share the `aphrody` monorepo; its Python projects join `aphrody-py`, as set by
-the [root consolidation plan](../workspace/PLAN.md). Repo consolidation does not change AI's wire,
-process or domain ownership boundaries.
+Use the [ecosystem catalogue](../../ecosystem/ECOSYSTEM.md) for discovery, then inspect the implementation. No reverse Cargo dependency on AI. This domain map is independent of the planned source layout: AI Rust crates and Bun/TS packages will share the `aphrody` monorepo; its Python projects join `aphrody-py`, as set by the [root consolidation plan](../workspace/PLAN.md). Repo consolidation does not change AI's wire, process or domain ownership boundaries.
 
 The [LiteLLM review](../../research/ai/litellm-review-2026-10-01.md) records
 the current gateway integration boundary: connect to a configured remote
@@ -101,12 +87,7 @@ lost/duplicate items. Never silently discard terminal results, approvals or muta
 
 ### D3 — Connect every capability family natively
 
-**Owners:** AI adapters, capability owners, UI. **Depends on D0/D2.** Implement the
-matrix below in slices using existing libraries/workers and `aphrody-jobs`.
-Publish discovery only for actual handler/feature/model readiness. Manga/editor
-and Shenron work follows K0–K9; native UI host work follows the M3 plan.
-**Exit:** every enabled family has a real object→job→artifact flow with progress,
-cancel/error/restart behavior. Unsupported families give a truthful reason.
+**Owners:** AI adapters, capability owners, UI. **Depends on D0/D2.** Implement the matrix below in slices using existing libraries/workers and `aphrody-jobs`. Publish discovery only for actual handler/feature/model readiness. **Exit:** every enabled family has a real object→job→artifact flow with progress, cancel/error/restart behavior. Unsupported families give a truthful reason.
 
 ### D3T — Qualify a Bun coding adapter for Qwen3-Coder 30B
 
@@ -155,111 +136,6 @@ AI stays `publish = false`, with CLI releases on GitHub; library publication fol
 core coding; R2 is the complete capability workstation. Tauri proof alone does not
 complete the native host target.
 
-## Koharu, Aphrody and Shenron convergence
-
-Refines D3/D5/D6. Last source inventory: Koharu `cf9451c2`, AI `fc293f8`, UI `2557448`,
-Shenron `c216a5b0` (2026-09-28); recheck before implementation. Every package remains
-**INCOMPLET** until its exit evidence is attached. Rich manga output and generic
-OCR v2 are separate contracts with a checked projection. Candidates remain unreviewed.
-
-### K0 — Make the independent library reproducible
-
-**Owners:** Koharu, UI, Infra. Reconcile the original dirty extraction without
-resetting it; preserve upstream mapping/licenses. Provide a stable remote/pinned
-artifact, clean Rust/Bun builds, generated resources and packaged sidecar. Align
-standalone Tauri major versions or exclude that host from supported builds.
-**Exit:** reproducible frozen-lockfile source closure on supported platforms,
-including runtime/weight terms; no developer-local sibling assumption.
-
-### K1 — Converge the native and Bun contracts
-
-**Owners:** Koharu; UI/Shenron consumers. **Depends on K0 authority.** Version Rust
-methods/events/errors/resources for projects, scene edits, canvas, jobs, models,
-settings and agents; generate Bun types. Inject host-neutral transport and migrate
-editor command consumers. Type results/revisions, reject unsupported versions and
-bound event/artifact payloads.
-**Exit:** common Bun/broker fixtures cover failure, malformed requests, ordered events,
-reconnect and version refusal; replaced command consumers are removed.
-
-### K2 — Reuse model sessions and make native jobs cancellable
-
-**Owners:** Koharu, AI adapter. **Depends on K1.** Reuse configuration-aware Library
-sessions; initialize only selected stages. Unify start/run lifecycle, narrow project
-locks and retain revision checks. Processing must permit concurrent status/cancel;
-bound slow-reader buffering and emit one terminal state after cancellation/crash.
-**Exit:** multi-page run loads each required model once per compatible session,
-cancels while active, preserves state and records cold/warm time/device/peak memory.
-
-### K3 — Remove duplicate manga execution and redundant work
-
-**Owners:** AI, Koharu. **Depends on K2.** Request only needed stages/artifacts:
-inpaint/OCR must not trigger unused translation or PSD/PNG exports. Keep the CPU mask
-path only for an independent use case; reduce re-encoding/copies and reuse batches.
-Migrate live PSD/typesetting consumers to Koharu and remove duplicate owners.
-Validate OCR v2 projection of reading order, polygons, scores, hashes and provenance.
-**Exit:** meaningful page content and editable PSD semantics retained; no obsolete
-caller; measured correctness and resource comparison on representative inputs.
-
-### K4 — Unify configuration and model readiness without conflating catalogs
-
-**Owners:** Koharu, AI model adapter, UI. **Depends on K1; coordinate K2 invalidation.**
-Use owner-validated settings/schema and credential store across CLI/Bun/UI; refresh
-running processes, reject invalid values and never expose secrets. Retire competing
-TypeScript shapes. Map Koharu model choices to digest-pinned Aphrody artifacts only
-where equivalent; expose readiness/device/download failures and coordinate GPU/cache
-admission. Compare actual digests before consolidating caches.
-**Exit:** live CLI/UI changes agree and model readiness is consistent without secrets.
-
-### K5 — Mount the complete editor in the one Aphrody desktop
-
-**Owners:** UI, editor package. **Depends on K1/K4, jobs on K2.** Integrate project
-import, pages, revisioned scene/canvas edits, undo/redo, inspector, activity and export
-inside the existing shell. Merge settings, shortcuts/locales/themes; retire duplicate
-presentation. Connect progress/cancel/agent actions to existing Jobs/Chat contracts.
-Keep durable preparation/export native; qualify the actual canvas host and GPU loss.
-**Exit:** packaged import→edit→pipeline→review→PNG/PSD workflow, accessibility and
-restart/error/cancel evidence. A standalone example or typecheck is insufficient.
-
-### K6 — Consolidate Shenron candidate adapters
-
-**Owner:** Shenron with AI/Koharu producers. **Depends on K1 result contract; parallel
-with K2–K5.** One manifest/image binding implementation for native Koharu, manga v1
-and OCR v2: unique page lookup, confined paths, original and processed hashes,
-dimensions, format-specific provenance and atomic JSONL output. Migrate/remove old
-entry points; reject empty, failed or unreadable OCR.
-**Exit:** deterministic candidates reject ambiguous/mismatched/changed images, preserve
-relevant geometry/text evidence and never write editorial data or clear quarantine.
-
-### K7 — Feed the active manga review and preserve editorial judgment
-
-**Owner:** Shenron. **Depends on K6.** Feed candidates to active `run-manga-ocr.ts`,
-not only offline preparation. Recheck bindings; retain two independent source-image
-readings, explicit coverage and guarded deposit. Replace hard-coded reviewer model
-selection with a versioned policy proving independence; record disagreements.
-**Exit:** traced active run uses hints, stops on disagreement and deposits only sealed,
-coverage-confirmed results. Model proposals never become automatic editorial acceptance.
-
-### K8 — Complete databook review, deposit and derived indexing
-
-**Owner:** Shenron, AI workers. **Depends on K6 and write-freeze/runbook requirements.**
-Add hash-bound intake to the PostgreSQL review queue; judge scan, normalized image,
-Japanese OCR, identity and quarantine reason. Migrate filename-derived depositor
-identity to reviewed manifest contracts. Preserve authorization, idempotency and audit.
-Translate only accepted Japanese text, then refresh/evaluate RAG from accepted records;
-review no-text pages against sources.
-**Exit:** traced candidate→source review→authorized deposit→optional translation/index;
-frozen/rejected pages produce no writes. Historical backlog counts are not proof.
-
-### K9 — Qualify the integrated product and release
-
-**Owners:** all owners, Infra release. **Depends on K0–K8 for claimed capabilities.**
-Run owner gates on pinned revisions and install the artifact. Exercise SDK/CLI/editor,
-canvas, models, cancellation and representative manga/databook handoff. Measure
-cold/warm latency, throughput, memory, queues and cache use. Verify duplicate engines,
-obsolete commands and extra shells are removed; publish platform/license limitations.
-**Exit:** reproducible installed evidence plus separate Shenron API/database proof;
-update D3/D5/D6 and release rows. Unrun gates remain incomplete.
-
 ## Capability integration
 
 Method names outside the existing-method column are intentionally not invented.
@@ -271,8 +147,6 @@ Define/version new typed requests in `aphrody-contracts` before exposing them.
 | Models / model and llama crates | `model/list`, `aphrody/llama/status` | Models hardware detection (real VRAM/AVX2), resumable download with SHA-256 verification, load/unload, progress and selected-model readiness |
 | RAG / `aphrody-rag` | `aphrody/rag/search`, `aphrody/rag/context`, `aphrody/rag/status` | File/folder indexing jobs, source provenance, retrieval attachments and freshness |
 | OCR/vision / existing AI owners | No qualified typed GUI adapter | Extract selected image/PDF, progress, text/artifact preview and failure handling |
-| Manga/editor / Koharu | Headless SDK, CLI feature, extracted UI and settings broker; no qualified full editor path | Complete [K0–K5](#koharu-aphrody-and-shenron-convergence): project/scene/canvas, exact stages and exports, shared preferences/models, one desktop shell and jobs |
-| Shenron manga/databooks | Candidate artifacts and partial offline manga review intake | Complete [K6–K8](#koharu-aphrody-and-shenron-convergence): one hashed handoff, active visual review, guarded databook deposit and derived indexing |
 | Voice / Whisper and voice owners | No qualified typed GUI adapter | Transcribe selected/recorded audio, timestamps and artifacts; optional voice features only when enabled |
 | Training / `aphrody-train` | `aphrody/train/status` | Dataset/model action, durable job, resource admission, cancellation and evaluated output; no implicit promotion |
 | Web / BXC and Obscura | No qualified typed GUI adapter | Browse/extract/crawl object actions, source links and resumable job results |

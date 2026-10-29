@@ -37,7 +37,6 @@
     "contract": "/home/ubuntu/apps/lab/drive-sync-contract.json",
     "directory": "/home/ubuntu/.aphrody/workspaces/dbfr/incoming/drive-cloud",
     "stateRoot": "/home/ubuntu/.aphrody",
-    "shenronRoot": "/home/ubuntu/apps/shenron/shared/agent-home",
     "intervalSeconds": 300
   },
   "jobs": ["drive", "drive-review", "drive-replica", "drive-retrieval"],

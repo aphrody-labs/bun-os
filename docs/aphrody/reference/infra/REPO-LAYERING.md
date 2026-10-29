@@ -68,7 +68,7 @@ consume it as a sibling, the same way they already consume `aphrody-bun-docs`.
 
 `aphrody-discord` is a shared Bun/TypeScript integration repository, outside
 the Rust category DAG above. It owns reusable Discord transport, framework
-adapters and protocol lifecycle. It may be consumed by Shenron, RG, Achilléa
+adapters and protocol lifecycle. It may be consumed by Achilléa
 and Aphrody notifications through a published package or an explicit immutable
 SHA. It must not own their commands, databases, auth policy or secrets, and
 application repositories must not add a reverse dependency into the category

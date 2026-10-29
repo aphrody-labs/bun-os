@@ -63,9 +63,6 @@ export async function runOps(argv: readonly string[]): Promise<number> {
   if (operation === "consolidation") {
     return await (await import("./consolidation.ts")).runConsolidation(rest);
   }
-  if (operation === "shenron") {
-    return await (await import("./shenron.ts")).runShenron(rest);
-  }
   if (operation === "bridge") {
     const [bridgeOperation, ...bridgeArgs] = rest;
     if (!bridgeOperation || bridgeOperation === "status") {

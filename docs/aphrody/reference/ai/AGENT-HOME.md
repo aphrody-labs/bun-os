@@ -12,7 +12,7 @@ fichiers d'amorçage sont intégrés dans
 
 | Élément | Contenu | Portée et règle |
 | --- | --- | --- |
-| Profil | Configuration d'un domaine (`aphrody`, `dbfr`, `ie`) | Isolé des autres domaines |
+| Profil | Configuration d'un domaine (`aphrody`, `ie`) | Isolé des autres domaines |
 | Espace de travail | Instructions, identité, préférences et mémoire curatée | Un espace actif par profil |
 | Session | Échange natif d'un agent | Reste dans le store de cet agent |
 | Dépôt | Code, docs et règles locales du projet | Le dépôt courant fait autorité pour la tâche |

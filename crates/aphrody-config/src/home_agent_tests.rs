@@ -4,31 +4,31 @@ use pretty_assertions::assert_eq;
 use super::*;
 
 #[test]
-fn shenron_components_round_trip_without_losing_types() {
+fn worker_components_round_trip_without_losing_types() {
     let source = r#"
-        plugins = ["../shenron/plugins/dragon-ball"]
+        plugins = ["../worker/plugins/example"]
 
         [database]
         db_type = "postgres"
         url_env = "DATABASE_URL"
-        schema = "shenron"
+        schema = "worker"
         cache = "sqlite_wal"
-        cache_path = "workspace-shenron/cache.sqlite3"
+        cache_path = "workspace-worker/cache.sqlite3"
 
         [skills]
-        whitelist = ["rag.canon", "ocr.continuous", "dbfr-databooks"]
+        whitelist = ["rag.canon", "ocr.continuous", "docs-index"]
 
         [a2a]
-        id = "shenron@dragonballfr.com"
-        mailbox = ".coord/inbox-from-shenron.jsonl"
+        id = "worker@example.com"
+        mailbox = ".coord/inbox-from-worker.jsonl"
 
         [ocr]
         engines = ["pp-ocr-v5", "dots.ocr-3b"]
-        state_path = "workspace-shenron/ocr"
+        state_path = "workspace-worker/ocr"
 
         [redis]
         url = "redis://127.0.0.1:6379/1"
-        prefix = "shenron:"
+        prefix = "worker:"
     "#;
     let value: toml::Value = toml::from_str(source).expect("parse source");
     let database: DatabaseConfig = value["database"].clone().try_into().expect("database");
@@ -42,9 +42,9 @@ fn shenron_components_round_trip_without_losing_types() {
     assert_eq!(database.cache, Some(DatabaseCache::SqliteWal));
     assert_eq!(plugins.paths.len(), 1);
     assert_eq!(skills.whitelist.len(), 3);
-    assert_eq!(a2a.id.as_deref(), Some("shenron@dragonballfr.com"));
+    assert_eq!(a2a.id.as_deref(), Some("worker@example.com"));
     assert_eq!(ocr.engines, vec![OcrEngine::PpOcrV5, OcrEngine::DotsOcr3b]);
-    assert_eq!(redis.prefix.as_deref(), Some("shenron:"));
+    assert_eq!(redis.prefix.as_deref(), Some("worker:"));
 
     let encoded = toml::to_string(&ocr).expect("serialize OCR");
     assert_eq!(
@@ -67,7 +67,7 @@ fn ocr_engine_serialises_as_the_catalog_id_and_still_accepts_legacy_names() {
     assert!(encoded.contains("dots-ocr"), "{encoded}");
     assert!(!encoded.contains("dots.ocr-3b"), "{encoded}");
 
-    // The pre-catalog names a shenron config already carries still parse.
+    // The pre-catalog names an older config already carries still parse.
     let legacy_form: OcrConfig =
         toml::from_str("engines = [\"pp-ocr-v5\", \"dots.ocr-3b\"]").expect("legacy aliases");
     assert_eq!(legacy_form.engines, catalog_form.engines);

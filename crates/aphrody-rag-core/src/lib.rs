@@ -11,9 +11,9 @@
 //!    guaranteed-quota promotion pass, Maximal Marginal Relevance diversification, and the small
 //!    vector kernels (dot, cosine, int8 quantization, bounded-heap exact top-k) a retrieval
 //!    pipeline needs around them.
-//! 3. **Eval** ([`eval`]): a bit-for-bit port of shenron's retrieval eval harness
+//! 3. **Eval** ([`eval`]): a bit-for-bit port of the TypeScript reference's retrieval eval harness
 //!    (`apps/bot/src/lib/rag-eval.ts` + `apps/bot/scripts/ rag-eval.ts`), so aphrody's RAG can be
-//!    benchmarked against shenron's production numbers on the same gold set and the same metric
+//!    benchmarked against the TypeScript reference's production numbers on the same gold set and the same metric
 //!    definitions.
 //!
 //! ## wasm32 support

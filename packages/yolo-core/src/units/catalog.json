@@ -3,22 +3,6 @@
   "scope": "user",
   "units": [
     {
-      "name": "shenron-data-tunnel",
-      "unit": {
-        "Description": "Private Shenron PostgreSQL and Redis access through Aphrody Infra",
-        "After": "network-online.target",
-        "Wants": "network-online.target"
-      },
-      "service": {
-        "WorkingDirectory": "%h/aphrody",
-        "ExecStart": "%h/.local/bin/aphrody-ssh tunnel --services shenron-pg-tunnel,shenron-redis",
-        "Restart": "on-failure",
-        "RestartSec": "5",
-        "UMask": "0077",
-        "NoNewPrivileges": "yes"
-      }
-    },
-    {
       "name": "aphrody-local-mcp",
       "unit": {
         "Description": "Aphrody local native MCP and HTTP backend",
@@ -101,20 +85,6 @@
       }
     },
     {
-      "name": "aphrody-shenron-embed",
-      "unit": {
-        "Description": "Aphrody native multilingual E5 embeddings for the Shenron RAG",
-        "After": "network-online.target"
-      },
-      "service": {
-        "ExecStart": "%h/.local/bin/aphrody-embed serve --host 127.0.0.1 --port 8085 --threads 4",
-        "Restart": "on-failure",
-        "RestartSec": "5",
-        "UMask": "0077",
-        "NoNewPrivileges": "yes"
-      }
-    },
-    {
       "name": "aphrody-source-sync",
       "unit": {
         "Description": "Aphrody source workspace synchronisation",
@@ -139,19 +109,18 @@
     {
       "name": "aphrody-ai-http",
       "unit": {
-        "Description": "Aphrody AI HTTP (Shenron /api/v1/shenron, managed llama.cpp chat, loopback only)",
+        "Description": "Aphrody AI HTTP (managed llama.cpp chat, loopback only)",
         "Documentation": "file://%h/aphrody/docs/plans/ai/native-integration-master.md"
       },
       "service": {
         "WorkingDirectory": "%h/aphrody",
         "#1": "llama-server, aphrody-llama-daemon and aphrody are resolved from the user bin dir.",
         "Environment": "PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin",
-        "#2": "Loopback only. Shenron reads APHRODY_AI_HTTP_URL / APHRODY_AI_HTTP_TOKEN from the same file.",
+        "#2": "Loopback only. Clients read APHRODY_AI_HTTP_URL / APHRODY_AI_HTTP_TOKEN from the same file.",
         "ExecStart": "%h/.local/bin/aphrody-mcp http --bind 127.0.0.1:8789",
-        "#3": "Outside the repository: APHRODY_AI_HTTP_TOKEN, APHRODY_SHENRON_PRODUCTION_READY=1,",
+        "#3": "Outside the repository: APHRODY_AI_HTTP_TOKEN,",
         "#4": "APHRODY_AI_CHAT_MODEL (catalog id; the managed llama-server daemon is planned per GPU),",
-        "#5": "optional APHRODY_SHENRON_LLM_FALLBACK=gemini-web.",
-        "EnvironmentFile": "%h/.aphrody/private/shenron/ai-http.env",
+        "EnvironmentFile": "%h/.aphrody/private/ai-http.env",
         "Restart": "on-failure",
         "RestartSec": "5",
         "UMask": "0077",
@@ -193,32 +162,6 @@
       }
     },
     {
-      "name": "shenron-agent-home-drive-sync",
-      "unit": {
-        "Description": "Shenron dbfr read-only native Markdown Drive projection and memory reconciliation",
-        "After": "network-online.target",
-        "Wants": "network-online.target",
-        "ConditionPathExists": ["%h/.aphrody/workspaces/dbfr", "%h/aphrody/.env"]
-      },
-      "service": {
-        "WorkingDirectory": "%h/aphrody",
-        "Environment": [
-          "APHRODY_ROOT=%h/aphrody",
-          "APHRODY_AGENT_DOMAIN=dbfr",
-          "APHRODY_WORKSPACE=%h/.aphrody/workspaces/dbfr",
-          "APHRODY_AGENT_HOME=%h/.aphrody/workspaces/dbfr",
-          "PATH=%h/.local/bin:%h/.bun/bin:%h/.cargo/bin:/usr/local/bin:/usr/bin:/bin"
-        ],
-        "ExecStart": "%h/.bun/bin/bun packages/bun-workspace/src/automation/agent-home-drive-sync.ts daemon",
-        "Restart": "on-failure",
-        "RestartSec": "30s",
-        "UMask": "0077",
-        "Nice": "15",
-        "NoNewPrivileges": "true",
-        "PrivateTmp": "true"
-      }
-    },
-    {
       "name": "aphrody-agent-domain-sync@",
       "unit": {
         "Description": "Claude Codex agy %i domain session and memory ingestion",
@@ -250,35 +193,6 @@
         "RestartSec": "3",
         "UMask": "0077",
         "NoNewPrivileges": "yes"
-      }
-    },
-    {
-      "name": "shenron-trained-artifact-sync",
-      "kind": "oneshot",
-      "unit": {
-        "Description": "Verified resumable backup of dbfr Shenron trained models and datasets",
-        "After": "network-online.target",
-        "Wants": "network-online.target",
-        "ConditionPathExists": ["%h/aphrody/.env", "%h/.aphrody/private/shenron/home/models"],
-        "StartLimitIntervalSec": "900",
-        "StartLimitBurst": "5"
-      },
-      "service": {
-        "WorkingDirectory": "%h/aphrody",
-        "Environment": "PATH=%h/.local/bin:%h/.bun/bin:%h/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
-        "ExecStart": "%h/.bun/bin/bun --env-file=%h/aphrody/.env packages/google/google/src/drive-model-sync.ts",
-        "TimeoutStartSec": "12h",
-        "Restart": "on-failure",
-        "RestartSec": "60s",
-        "UMask": "0077",
-        "Nice": "15",
-        "NoNewPrivileges": "true",
-        "PrivateTmp": "true"
-      },
-      "timer": {
-        "description": "Daily dbfr Shenron trained artifact backup",
-        "OnBootSec": "5min",
-        "OnCalendar": "*-*-* 04:00:00"
       }
     },
     {
@@ -321,29 +235,6 @@
         "TasksMax": "512",
         "StandardOutput": "null",
         "StandardError": "journal"
-      }
-    },
-    {
-      "name": "shenron-rag-sync",
-      "kind": "oneshot",
-      "unit": {
-        "Description": "Refresh the full Shenron editorial corpus in the Aphrody RAG",
-        "After": "shenron-data-tunnel.service aphrody-shenron-embed.service aphrody-ai-http.service",
-        "Requires": "shenron-data-tunnel.service aphrody-shenron-embed.service aphrody-ai-http.service"
-      },
-      "service": {
-        "WorkingDirectory": "%h/src/shenron",
-        "Environment": "PATH=%h/.local/bin:%h/.bun/bin:/usr/local/bin:/usr/bin:/bin",
-        "EnvironmentFile": "%h/.aphrody/private/shenron/ai-http.env",
-        "ExecStart": "%h/.bun/bin/bun packages/pipeline/scripts/rag-sync-aphrody.ts --toutes --appliquer --report=%h/.aphrody/workspaces/dbfr/indexes/shenron-rag-latest.json",
-        "TimeoutStartSec": "infinity",
-        "UMask": "0077",
-        "NoNewPrivileges": "yes"
-      },
-      "timer": {
-        "description": "Keep the Shenron editorial RAG fresh",
-        "OnBootSec": "2min",
-        "OnUnitInactiveSec": "15min"
       }
     },
     {

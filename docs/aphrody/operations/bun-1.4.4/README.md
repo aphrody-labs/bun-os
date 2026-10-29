@@ -73,8 +73,8 @@ Each gate has a named owner. The pins move only when all are green.
 - B3: dbfr is administered by Omar. Read-only checks were run; no host change is authorised here.
 - B4: `docs/reference/upstream-bun` is the only copy of the Bun docs. It is refreshed with `bun run docs:bun:update`,
   not edited by hand. The fork distribution section gets its 1.4.4 line from that flow after G1.
-- B5: Shenron (`C:/shenron`, 34 occurrences in 21 files) and IECODE (`C:/IECODE`, 99 occurrences in 53 files) are
-  separate repositories. Not every occurrence is the Bun runtime: many are dependency versions. Their references
+- B5: IECODE (`C:/IECODE`, 99 occurrences in 53 files) is a
+  separate repository. Not every occurrence is the Bun runtime: many are dependency versions. Their references
   need their own claims and classification; nothing was edited there.
 
 ## Plan

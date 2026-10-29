@@ -21,7 +21,6 @@ plan; its old repository paths and status claims require current evidence.
 | How do the native UI, agent and workers connect? | [ARCHITECTURE.md](../../../architecture/ai/ARCHITECTURE.md) |
 | Which repository owns a capability? | [Organization and ownership](../../../plans/ai/PLAN.md#organization-and-ownership), [generated ecosystem inventory](../../../ecosystem/ECOSYSTEM.md) |
 | What does each capability contribute to the product? | [Capability integration](../../../plans/ai/PLAN.md#capability-integration) |
-| What remains for Koharu, Aphrody and Shenron? | [Koharu convergence work packages](../../../plans/ai/PLAN.md#koharu-aphrody-and-shenron-convergence) |
 | What does responsive mean? | [Latency budgets](../../../plans/ai/PLAN.md#latency-budgets) |
 | How are changes maintained and checked? | [DOCUMENTATION-PIPELINE.md](../../../reference/ai/DOCUMENTATION-PIPELINE.md), [agent rules](../../../reference/ai/AGENTS.md) |
 

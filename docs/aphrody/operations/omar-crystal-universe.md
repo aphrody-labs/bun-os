@@ -119,65 +119,13 @@ Indexation native effectuée le 2026-10-07 :
 
 ### Livrable carte
 
-`examples/crystal-universe/age1000-map.js` définit un plan de cinq secteurs originaux ; `game.js` le dessine sur Canvas dans le mini-jeu local. Shenron rend un schéma original sur `/games/dragon-pixel` et possède maintenant la source canonique Rust de la branche Shenron `omar/xenoverse3-map-20261007` (six zones, huit repères et sept routes), ainsi que `wasm_get_xenoverse3_prototype_map` et le wrapper Bun/TS `getXenoverse3PrototypeMap()`. Le mini-jeu standalone et la page Shenron n’ont pas encore été reliés à l’export Rust. Il s’agit d’un prototype jouable/consultable, non d’un « full game AAA » ; contenu réseau, monde ouvert, assets licenciés et progression persistante ne sont pas présents.
-
-Le graphe Rust et les tests natifs ont été commités dans la branche locale Shenron `omar/xenoverse3-map-20261007`, commits `8db6c0f1` et `030b797e`, créée depuis `origin/main` `4c45010c`. 24 tests Rust, 10 tests Bun/TS (49 assertions), Clippy `-D warnings`, `cargo check` wasm32, génération `wasm-bindgen 0.2.129`, lint, format et diff-check passent. Le push Shenron a été réessayé et refusé par GitHub (« Write access to repository not granted »); ces commits restent locaux à la branche et ne sont pas revendiqués comme publiés. Le prototype reste non déployé.
+`examples/crystal-universe/age1000-map.js` définit un plan de cinq secteurs originaux ; `game.js` le dessine sur Canvas dans le mini-jeu local. Il s’agit d’un prototype jouable/consultable, non d’un « full game AAA » ; contenu réseau, monde ouvert, assets licenciés et progression persistante ne sont pas présents.
 
 ### Périmètre dbxv2, actifs et Steam
 
-Le plan de fusion dbxv2 de Shenron marque cette intégration incomplète. Le sous-module attendu vers `aphrody-code/dbxv2`, épinglé à `fabc19c0021e3e992786dc2a093a749c8a1c26f0`, est identifié comme propriétaire/sous licence Proprietary. Son checkout est actuellement vide, et aucun checkout/asset dbxv2 correspondant n’a été trouvé au chemin local attendu. Le commit Shenron `10fdd60c` apporte un moteur de formats en Rust, un scan des seuls manifests d’installation Steam et des wrappers WASM; cela ne prouve ni portage complet Bun/Rust, ni extraction de ressources.
+Le plan de fusion dbxv2 marque cette intégration incomplète. Le sous-module attendu vers `aphrody-code/dbxv2`, épinglé à `fabc19c0021e3e992786dc2a093a749c8a1c26f0`, est identifié comme propriétaire/sous licence Proprietary. Son checkout est actuellement vide, et aucun checkout/asset dbxv2 correspondant n’a été trouvé au chemin local attendu.
 
 Le scanner Steam existant lit `steamapps/appmanifest_*.acf`, sans jetons ni profils privés ; aucun flux de données de compte, dépôt d'assets de jeu, copie vers le PC/VPS/DBFR ou production CDN n'a été effectué. La licence et l'inventaire complet des assets du jeu/du toolkit ne permettent pas une redistribution publique dans la carte/CDN. Le contenu du jeu reste dans les stores du propriétaire ; aucun résultat d'extraction/données privées n'est ajouté à Git.
-
-## 2026-10-07 — Connexion Dragon Pixel au RAG Shenron
-
-L'écran Dragon Pixel expose maintenant une recherche d'archives Dragon Ball. Le serveur local valide `q` (2–120 caractères), limite la réponse à huit résultats et relaie vers l'API publique Shenron sans exposer de secret. L'interface n'insère que du texte avec `textContent` et affiche les liens sources dans un nouvel onglet isolé. Aucun scan/page d'image n'est embarqué.
-
-Vérification réelle : serveur Bun local sur `127.0.0.1:4328`, `GET /` → 200 ; `GET /api/lore/search?q=Goku%20Namek` → 200, résultats sourcés dont « Planète Namek » et « Goku — Saga Namek » avec URLs dragonballfr.com ; entrée d'un caractère → 400. `aphrody_shenron_rag_search` confirme les mêmes corpus et extraits côté MCP. Gates du lot : `bun test examples/crystal-universe/engine.test.js` (5 tests, 20 assertions), `oxlint --deny-warnings examples/crystal-universe/*.js`, `oxfmt --check examples/crystal-universe`, `git diff --check` — tous verts.
-
-Cette liaison fournit une recherche du RAG, pas l'ingestion/la redistribution de toutes les planches OCR. Le catalogue MCP expose 147 volumes/tomes OCR sur plusieurs séries, mais ce décompte seul ne prouve pas que les 42 tomes d'une édition précise ou tout Dragon Ball Super soient complets. Le jeu reste un mini-jeu Canvas 2D solo : pas de moteur Xenoverse 2, rendu 3D/WebGPU ni multijoueur réseau. Les assets et les données de Xenoverse 2 restent indisponibles localement ; le sous-module attendu était absent/vide selon le relevé précédent et les assets suivis du checkout ne comprennent aucun paquet Xenoverse. Leur licence d'extraction/redistribution n'est pas établie. Aucun asset de jeu, donnée privée ou scan sous droit n'a été copié ou publié. Ces dépendances maintiennent l'objectif global ouvert.
-
-## 2026-10-07 — Référence RAG Dragon Ball (profil Shenron isolé)
-
-La campagne native `aphrody web dragon-ball` a collecté les cibles bornées
-`wikipedia-fr,wikipedia-en`, sans galerie ni média, avec profondeur 2 et budget
-global 25. `robots.txt` actuel ne bloque pas le User-Agent de la campagne sur ces
-domaines. Résultat : 25 requêtes, 25 documents FR, 988 chunks indexés dans le profil
-`shenron`, aucune erreur; Wikipédia EN reste en attente (9 seeds) car le budget est
-épuisé. Le rapport natif `aphrody web dragon-ball status --profile shenron --json`
-confirme `completed:false`, `documents:25`, `network_requests:25`.
-
-Vérification : `aphrody home query ... --profile shenron` retrouve l’article Dragon
-Ball et l’information des 42 volumes/519 chapitres, une fiche _Dragon Ball Super_
-et des extraits de l’arc Moro, en français et en anglais. Le corpus est documentaire
-et partiel : il ne contient pas les pages intégrales ni les images des 42 tomes; il
-ne prouve pas l’exhaustivité de DBS. Aucun profil aphrody/dbfr/ie n’a été utilisé
-pour cette campagne.
-
-Reprises natives le 2026-10-07 : plusieurs tranches FR/EN, chacune plafonnée à 25
-requêtes et profondeur 2, sans médias. La sortie privée compte désormais 150
-documents (75 FR + 75 EN); les dernières tranches ont ajouté 25 documents et 956
-chunks FR, puis 25 documents et 1 485 chunks EN, sans erreur. Les recherches du
-profil `shenron` retrouvent la référence aux 42 tomes/519 chapitres et des entrées
-DBS/Moro en anglais et en français. La frontier conserve 168 pages FR et 179 EN en
-attente; le rapport natif reste `completed:false`. Ces références ne sont pas les
-chapitres intégraux et ne démontrent pas l’exhaustivité du RAG source.
-
-Contrôle de métadonnées du corpus manga via `dragonball.manga_tomes` (profil source
-Shenron, sans conserver ni citer le texte renvoyé) : DB `vol1` indique 221 pages,
-DB `vol42` 234 pages, un chapitre DBS `ch1370` 45 pages. Cela confirme des entrées
-OCR aux deux extrémités de la série et dans DBS. Un contrôle du listing complet
-compte 42 identifiants distincts DB (`vol1` à `vol42`), tous avec un nombre non nul
-de planches OCR dans les métadonnées. La sortie MCP est tronquée après 90 000
-caractères; le champ `count` annonce 147 entrées au total. Un nouveau comptage des
-objets metadata extraits de cette sortie trouve les 42 identifiants DB contigus et
-103 identifiants DBS contigus (`ch1315` à `ch1417`), tous avec des planches non
-nulles. Les agrégats déclarés par les métadonnées sont : DB 7 844 pages, dont 3 213
-avec `pagesWithJa`; DBS 4 355 pages, dont 2 122 avec ce champ. Cela confirme un
-catalogue OCR substantiel pour les deux séries, pas la complétude des transcriptions
-de chaque planche, l'exhaustivité éditoriale de DBS, ni les droits de réutilisation.
-Les réponses de détail incluent des transcriptions; aucun passage de manga n’a été
-copié dans le dépôt ou affiché dans le jeu au cours de ce contrôle.
 
 ## 2026-10-07 — Commandes manette
 
@@ -312,9 +260,7 @@ d'instances individuelles ni un netcode qualifié contre latence, triche,
 reconnexion ou charge. Il n'y a ni comptes, persistance, TLS, service public ni
 déploiement. Le navigateur embarqué ne peut pas ouvrir le loopback dans cette
 session et l'adaptateur GPU réel reste non testé. Aucun moteur Bevy, asset/data
-Xenoverse, contenu Xenoverse 3 ou texte de manga n'a été ajouté. Le RAG demeure
-fondé sur l'index Shenron existant; ses limites de couverture et de droits restent
-inchangées.
+Xenoverse, contenu Xenoverse 3 ou texte de manga n'a été ajouté. 
 
 ## 2026-10-07 — Renderer Bevy/WebGPU dans le client WASM
 
@@ -403,79 +349,6 @@ de code ni paquet généré n'a été ajouté par cette reprise. L'objectif comp
 reste ouvert : le moteur Xenoverse 2 et ses assets propriétaires sont absents,
 Bevy n'est pas intégré, et les métadonnées RAG ne prouvent pas la transcription
 exhaustive de chaque page.
-
-## 2026-10-07 — Catalogue OCR consultable dans Dragon Pixel
-
-L'interface interroge aussi l'endpoint public filtrable
-`/api/public/manga/tomes?series=DB|DBS`. Une table native présente l'identifiant,
-les pages déclarées et les pages avec japonais. Elle ne charge aucune transcription
-ni image; les 2 fiches DB auxiliaires hors `vol1`–`vol42` sont comptées puis omises.
-Le proxy accepte uniquement `DB` et `DBS`, normalise les lignes, vérifie les
-compteurs et ordonne les volumes/chapitres numériquement. Sur mobile la table garde
-ses en-têtes sémantiques et peut défiler horizontalement dans une région focalisable.
-
-Inventaire direct actuel via l'API : DB retourne 44 fiches, dont les 42 volumes
-`vol1`–`vol42` (7 844 pages déclarées, 3 213 avec japonais) et deux entrées
-auxiliaires `t901`/`t902`; DBS retourne 103 identifiants continus `ch1315`–`ch1417`
-(4 355 pages déclarées, 2 122 avec japonais). Le serveur local `127.0.0.1:4336`
-renvoie HTTP 200 pour chaque série avec ces comptes, trie correctement les bornes,
-omet les fiches DB auxiliaires, et renvoie 400 pour une série non autorisée; la page
-retourne également 200. Assertions directes sur le normaliseur, bundle navigateur
-(6 modules), Bun (12 tests, 53 expect() calls via `bun test --reporter=dots
-/home/ubuntu/src/aphrody-crystal-universe/apps/community/crystal-universe/engine.test.js`
-depuis `/tmp` pour éviter le preload `@happy-dom/global-registrator` absent du
-clone sparse), Oxlint strict, Oxfmt et `git diff --check` passent. Ces métadonnées
-n'établissent pas la transcription complète de toutes les pages, l'exhaustivité
-éditoriale de DBS ni les droits de redistribution du manga. Aucun texte OCR n'a été
-ajouté au dépôt.
-
-## 2026-10-07 — Recherche RAG séparée par série
-
-Le sélecteur permet de chercher Dragon Ball classique ou Dragon Ball Super
-séparément. Le service préfixe la requête avec le nom de série, interroge le
-corpus manga Shenron partagé sur 25 résultats au plus, puis conserve jusqu'à huit
-titres correspondant à la série. Le mode général et le mode manga mixte restent
-disponibles. Cette méthode élimine les résultats de l'autre série quand ils sont
-présents dans la fenêtre récupérée; le classement lexical peut laisser une série
-sans résultat, et cette recherche ne prouve pas l'exhaustivité OCR des 42 tomes ou
-de Dragon Ball Super.
-
-Vérification réelle sur Bun local `127.0.0.1:4335` contre Shenron : recherche
-`Moro` en DBS → HTTP 200, huit titres `Dragon Ball Super — chapitre …`; recherche
-`Goku` en DB → HTTP 200, huit titres `Dragon Ball — tome …`; source non prise en
-charge → HTTP 400. Les tests unitaires, lint strict, format et diff-check sont
-relancés pour cette modification; aucun texte OCR n'est conservé dans le dépôt.
-
-## 2026-10-07 — Audit de continuité du catalogue OCR
-
-Le normaliseur retourne maintenant un audit calculé des identifiants reçus. Pour
-DB, il compare le catalogue aux identifiants attendus `vol1`–`vol42` et liste les
-tomes absents. Pour DBS, il signale les trous dans la plage OCR observée sans
-présumer que cette plage couvre l'intégralité éditoriale de la série. L'écran
-affiche ces résultats à côté des compteurs déclarés et précise qu'ils ne vérifient
-pas la transcription de chaque page.
-
-Contrôle réel du proxy local `127.0.0.1:4343` : `DB` → HTTP 200, 42/42 identifiants
-standards, 7 844 pages déclarées (3 213 avec japonais), deux fiches auxiliaires
-omises; `DBS` → HTTP 200, 103 identifiants consécutifs `ch1315`–`ch1417`, 4 355
-pages déclarées (2 122 avec japonais). Recherches live également vérifiées :
-`Goku`/DB et `Moro`/DBS renvoient chacune huit extraits dont tous les titres
-correspondent à la série demandée. Les nouvelles assertions de trous de catalogue
-et les contrôles JS locaux passent : 13 tests, 61 assertions, Oxlint strict,
-Oxfmt et `git diff --check`.
-
-La couverture publiée par `dragonball_data_coverage` indique 256 161 passages
-agrégés, dont 10 030 de type `manga_page`; ce total regroupe les corpus et n'établit
-pas le nombre de transcriptions complètes pour chaque volume. L'inventaire DBS
-reste un constat de catalogue OCR, sans certification éditoriale ou page-par-page.
-
-L'interface permet aussi de demander ces compteurs via `GET /api/lore/coverage`.
-Contrôle local `127.0.0.1:4344` → HTTP 200 : 256 161 passages, 10 030
-`manga_page`, 922 `manga_chapter` et 254 `manga_volume`; la date d'index n'est pas
-fournie par Shenron. Le proxy n'expose aucun extrait ou secret et marque ces
-chiffres comme agrégés, non ventilés par série. Après cet ajout, bundle navigateur
-(7 modules, 42,46 Ko), 14 tests JS (63 assertions), Oxlint strict, Oxfmt et
-`git diff --check` passent.
 
 ## 2026-10-07 — URL WebSocket configurable pour l'hébergement
 

@@ -164,7 +164,6 @@ describe("publish-downloads", () => {
       "aphrody-app",
       "plugin-aphrody",
       "plugin-yolo",
-      "plugin-shenron",
     ]);
     for (const release of cfg.github.releases) expect(release.repository.startsWith("aphrody-labs/")).toBe(true);
     expect(Object.keys(cfg.assets)).toEqual([

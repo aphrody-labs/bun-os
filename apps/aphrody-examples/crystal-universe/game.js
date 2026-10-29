@@ -8,8 +8,6 @@ import { buildMultiplayerSocketUrl } from "./multiplayer-url.js";
 let initDragonPixelWasm = async () => {};
 let RustGameSession = null;
 let bevyApi = null;
-const formatCoverageCount = (value) =>
-  Number.isSafeInteger(value) ? value.toLocaleString("fr-FR") : "non fourni";
 try {
   const wasmModule = await import("./dragon-pixel-wasm.js");
   ({ default: initDragonPixelWasm, Session: RustGameSession } = wasmModule);
@@ -56,13 +54,6 @@ const avatarFields = {
   outfit: document.querySelector("#color"),
 };
 let avatar = loadAvatar(localStorage);
-const loreForm = document.querySelector("#lore-search");
-const loreStatus = document.querySelector("#lore-status");
-const loreResults = document.querySelector("#lore-results");
-const loreCatalogForm = document.querySelector("#lore-catalog-form");
-const loreCatalogStatus = document.querySelector("#lore-catalog-status");
-const loreCatalogRows = document.querySelector("#lore-catalog-rows");
-const loreCoverageStatus = document.querySelector("#lore-coverage-status");
 const multiplayerStatus = document.querySelector("#multiplayer-status");
 const roomName = document.querySelector("#room-name");
 let multiplayerSocket = null,
@@ -515,131 +506,3 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-
-function renderLoreResults(payload) {
-  loreResults.replaceChildren();
-  const entries = payload.results || payload.hits || [];
-  if (!entries.length) {
-    loreStatus.textContent = "Aucun passage trouvé pour cette recherche.";
-    return;
-  }
-  for (const entry of entries) {
-    const item = document.createElement("li");
-    const article = document.createElement("article");
-    const title = document.createElement("h3");
-    const kind = document.createElement("small");
-    const passage = document.createElement("p");
-    const source = document.createElement("a");
-    title.textContent = entry.title || entry.entity || "Passage Dragon Ball";
-    kind.textContent = entry.kind || entry.sourceId || "archive";
-    passage.textContent =
-      entry.snippet || entry.content || "Aucun extrait disponible.";
-    source.href = entry.url || "https://dragonballfr.com/";
-    source.textContent = "Ouvrir la source";
-    source.target = "_blank";
-    source.rel = "noopener noreferrer";
-    article.append(title, kind, passage, source);
-    item.append(article);
-    loreResults.append(item);
-  }
-  loreStatus.textContent = `${entries.length} passage(s) sourcé(s) trouvé(s).`;
-}
-
-loreForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const form = new FormData(loreForm);
-  const query = form.get("q").trim();
-  const sourceId = form.get("sourceId");
-  loreStatus.textContent = "Recherche dans les archives…";
-  loreResults.replaceChildren();
-  try {
-    const params = new URLSearchParams({ q: query });
-    if (sourceId) params.set("sourceId", sourceId);
-    const response = await fetch(`/api/lore/search?${params}`);
-    const payload = await response.json();
-    if (!response.ok)
-      throw new Error(payload.error || "La recherche a échoué.");
-    renderLoreResults(payload);
-  } catch (error) {
-    loreStatus.textContent =
-      error.message || "Les archives sont momentanément indisponibles.";
-  }
-});
-
-loreCatalogForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const series = new FormData(loreCatalogForm).get("series");
-  loreCatalogStatus.textContent = "Chargement des métadonnées de l’inventaire…";
-  loreCatalogRows.replaceChildren();
-  try {
-    const response = await fetch(
-      `/api/lore/catalog?series=${encodeURIComponent(series)}`,
-    );
-    const payload = await response.json();
-    if (!response.ok)
-      throw new Error(payload.error || "Le catalogue n’a pas pu être chargé.");
-    if (payload.series !== series || !Array.isArray(payload.records))
-      throw new Error("La réponse du catalogue est invalide.");
-    const catalog = payload;
-    for (const record of catalog.records) {
-      const row = document.createElement("tr");
-      const volume = document.createElement("th");
-      const pages = document.createElement("td");
-      const japanesePages = document.createElement("td");
-      volume.scope = "row";
-      volume.textContent = record.id;
-      pages.textContent = String(record.pages);
-      japanesePages.textContent = String(record.pagesWithJa);
-      row.append(volume, pages, japanesePages);
-      loreCatalogRows.append(row);
-    }
-    const pages = catalog.records.reduce(
-      (total, record) => total + record.pages,
-      0,
-    );
-    const pagesWithJa = catalog.records.reduce(
-      (total, record) => total + record.pagesWithJa,
-      0,
-    );
-    const label =
-      series === "DB" ? "volumes Dragon Ball" : "chapitres Dragon Ball Super";
-    const omitted = catalog.omittedCount
-      ? ` ${catalog.omittedCount} fiche(s) hors série ou hors numérotation standard masquée(s).`
-      : "";
-    const coverage = catalog.coverage;
-    const audit =
-      series === "DB"
-        ? `${coverage.observedCount}/42 tomes standards présents${coverage.missingNumbers.length ? ` · manquants : ${coverage.missingNumbers.join(", ")}` : ""}.`
-        : coverage.observedCount === 0
-          ? "Aucun identifiant de chapitre n’est présent dans le catalogue."
-          : `${coverage.observedCount} identifiants OCR observés${coverage.firstNumber === null ? "" : ` sur ch${coverage.firstNumber}–ch${coverage.lastNumber}`} · ${coverage.missingNumbers.length} trou(s) dans cette plage${coverage.missingNumbers.length ? ` : ${coverage.missingNumbers.join(", ")}` : ""}.`;
-    loreCatalogStatus.textContent = `${audit} ${catalog.records.length} ${label} · ${pages.toLocaleString("fr-FR")} pages déclarées · ${pagesWithJa.toLocaleString("fr-FR")} avec japonais.${omitted} Ce contrôle porte sur les identifiants et métadonnées du catalogue; il ne certifie pas une transcription OCR complète ni l’exhaustivité éditoriale.`;
-  } catch (error) {
-    loreCatalogRows.replaceChildren();
-    loreCatalogStatus.textContent =
-      error.message || "Le catalogue Shenron est momentanément indisponible.";
-  }
-});
-
-document
-  .querySelector("#lore-coverage-check")
-  .addEventListener("click", async () => {
-    loreCoverageStatus.textContent = "Lecture des compteurs globaux du RAG…";
-    try {
-      const response = await fetch("/api/lore/coverage", { cache: "no-store" });
-      const coverage = await response.json();
-      if (!response.ok)
-        throw new Error(
-          coverage.error || "La couverture n’a pas pu être chargée.",
-        );
-      if (!Number.isSafeInteger(coverage.chunks))
-        throw new Error("La réponse de couverture est invalide.");
-      const builtAt = coverage.builtAt
-        ? ` · index daté ${coverage.builtAt}`
-        : "";
-      loreCoverageStatus.textContent = `${formatCoverageCount(coverage.chunks)} passages au total · ${formatCoverageCount(coverage.mangaPagePassages)} pages manga · ${formatCoverageCount(coverage.mangaChapterPassages)} entrées chapitre · ${formatCoverageCount(coverage.mangaVolumePassages)} entrées volume${builtAt}. Compteurs globaux, non ventilés par série et non équivalents à une vérification OCR page par page.`;
-    } catch (error) {
-      loreCoverageStatus.textContent =
-        error.message || "La couverture du RAG est momentanément indisponible.";
-    }
-  });

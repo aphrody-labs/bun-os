@@ -3,7 +3,7 @@
 //! chunker builds on:
 //!
 //! * [`pack_sentences_with_overlap`] — a faithful Rust port of the sentence-packing loop in
-//!   shenron's `apps/bot/scripts/_rag-chunk.ts` (`chunkDocument`'s `emitSectionChunks`, lines 45-96
+//!   the TypeScript reference's `_rag-chunk.ts` (`chunkDocument`'s `emitSectionChunks`, lines 45-96
 //!   as read on 2026-09-19). Used directly by [`crate::prose_chunker::ProseChunker`] and,
 //!   per-section, by [`crate::markdown_chunker::MarkdownChunker`].
 //! * [`pack_lines_with_overlap`] — the same greedy/overlap shape applied to whole source lines
@@ -12,7 +12,7 @@
 //!
 //! Length is measured via [`measure`] in the caller-chosen
 //! [`crate::chunk::LengthUnit`] — `Utf16` by default, matching JavaScript's
-//! `.length` (and therefore shenron's `maxChunkChars`), since the reference
+//! `.length` (and therefore the TypeScript reference's `maxChunkChars`), since the reference
 //! corpus is French + Japanese and byte-sizing distorts both (see
 //! [`crate::chunk::LengthUnit`]'s doc comment for the exact ratios). Every
 //! packer below only ever compares/accumulates whole, already-valid
@@ -182,7 +182,7 @@ pub struct PackedUnit {
 ///   (`currentChunkLen += sLen`, no separator term), and for ASCII prose it is a harmless
 ///   approximation — the trailing space the sentence regex consumes and `trim()`s away roughly
 ///   cancels the space `join(" ")` re-inserts. Used by
-///   [`crate::chunk::ChunkOptions::shenron_parity`] so chunk boundaries match a `bun`-generated
+///   [`crate::chunk::ChunkOptions::ts_parity`] so chunk boundaries match a `bun`-generated
 ///   golden bit-for-bit.
 /// - `true` — **exact accounting**: `current_len` tracks the true length of `current.join(" ")`,
 ///   separators included. Required for CJK sentences (`。！？．`), which unlike `. ! ?` consume no

@@ -12,7 +12,7 @@ what DNS and the registrar hold, and how to change it without breaking mail or T
 > requiring `--apply`. The command examples below are the measured 2026-09-07 procedure and keep the old
 > script names for provenance.
 
-## 1. Three accounts, three disjoint sets of zones
+## 1. Disjoint sets of zones per account
 
 Confusing them is the single most expensive mistake here, because the failure mode lies:
 **an account that cannot see a zone returns `404` on it, not `403`.** That reads as "this zone
@@ -21,10 +21,8 @@ does not exist" and sends you to the registrar instead of to the other key file.
 | Account | Credentials file | Format | Nichandle | Zones it can see |
 |---|---|---|---|---|
 | `aphrody` | `~/.bash_secrets` | `export OVH_APPLICATION_KEY=…` (+ `_SECRET`, `OVH_CONSUMER_KEY`) | *(the `/me` call is not authorised)* | `aphrody.com`; API also currently lists `rpbey.fr`, which remains outside the managed profile |
-| `rosegriffon` | `~/.ovh.conf` | `[ovh-eu]` ini | `ka1038251-ovh` — `Rosegriffonfr@gmail.com` | `rosegriffon.fr` |
-| `dbfr` | `~/.config/ovh/dbfr.conf`, and `/etc/letsencrypt/ovh-dbfr.ini` with `dns_ovh_*` keys | `[ovh-eu]` ini | `gl839461-ovh` — `dragonballfrdiscord@gmail.com` | `dragonballfr.com` |
 
-The three files are secrets: never print them, never copy a value into a document, a log or a
+The credential files are secrets: never print them, never copy a value into a document, a log or a
 commit. `scripts/ops/ovh.py` (not in repo) reads them and prints only the answers.
 
 The python `ovh` module is **not** installed and there is no plan to install it. Requests are
@@ -44,7 +42,6 @@ by a zone refresh, because a record created without a refresh is invisible to re
 
 ```bash
 scripts/ops/ovh.py zones                        # aphrody account, the default
-scripts/ops/ovh.py --account rosegriffon zones
 scripts/ops/ovh.py zone    aphrody.com          # SOA, nameservers, DNSSEC flag
 scripts/ops/ovh.py export  aphrody.com          # the whole zone as a BIND file
 scripts/ops/ovh.py records aphrody.com          # id, type, subdomain, ttl, target
@@ -121,25 +118,6 @@ it because OVH publishes both, but the API lists it under `fieldType: "SPF"`.
 
 ## 4. The other zones
 
-### `rosegriffon.fr` — account `rosegriffon`
-
-`dnssecActivated: true`, anycast, same nameservers as `aphrody.com`. Points here
-(`51.77.147.152`): `@`, `www`, `api`, `azalee`, `bot`, `cdn`, `db`, `mcp`, `realtime`,
-`storage`, `studio`, `supabase`. Points at the archive host `51.255.162.6`: `achillea`,
-`ranked`. `shop` is a `CNAME` to `cname.vercel-dns.com.`; four `_vercel` `TXT` hold the domain
-verifications for `@`, `www`, `azalee` and `test`. Mail is on `ssl0.ovh.net` with a Google DKIM
-`TXT` plus two OVH selectors, and there are GitHub Pages / Google site verifications.
-
-`bot.rosegriffon.fr` resolves here but has **no `server_name`** on this machine — a name
-pointing at the VPS with nothing serving it. Left as measured, not changed.
-
-### `dragonballfr.com` — account `dbfr`
-
-DNSSEC on, no anycast, nameservers `dns109/ns109.ovh.net`. Everything points at
-`51.255.162.6`, **not this VPS**: `@`, `www`, `bot`, `files`, `mcp`. Its zone carries ~20 stale
-`_acme-challenge` `TXT` from DNS-01 renewals run elsewhere; `/etc/letsencrypt/ovh-dbfr.ini`
-exists here for that flow but no certificate on this machine uses it.
-
 ### `rpbey.fr` — no records
 
 On 2026-10-09, on the owner's decision, its six `A` records (`@` twice, `www`, `api`, `cdn`, `play` → `51.77.147.152`) were deleted with `aphrody infra ovh dns delete`. The zone itself and the domain registration are untouched. No nginx, certificate, catalogue or profile entry references it.
@@ -147,8 +125,8 @@ On 2026-10-09, on the owner's decision, its six `A` records (`@` twice, `www`, `
 ## 5. Certificates — the OVH API is not in the loop
 
 Every certificate on this VPS renews over HTTP, not DNS: `aphrody.com` uses
-`authenticator = nginx` (and `installer = nginx`), as do `rosegriffon.fr`,
-`azalee.`, `cdn.`, `mcp.`, `supabase.`; `api.` and `studio.` use `webroot`. **No renewal needs
+`authenticator = nginx` (and `installer = nginx`), as do the other hosts of
+this VPS (some use `webroot`). **No renewal needs
 an OVH key**, so a rotated API key cannot break TLS here.
 
 Two consequences:

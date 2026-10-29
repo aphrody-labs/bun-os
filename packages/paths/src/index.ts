@@ -63,11 +63,6 @@ export function checkoutRoot(
   }
 }
 
-/** Root of the Rose Griffon website integrated in the Bun OS checkout. */
-export function rgWebsiteRoot(): string {
-  return workspacePath("apps", "rg-website");
-}
-
 /** Root of the Inazuma sources integrated in this checkout. */
 export function iecodeRoot(): string {
   return checkoutRoot("iecode");

@@ -3,7 +3,6 @@
 
 > Contexte courant (2026-10-09) : développement et builds selon l'hôte, la cible et les ressources disponibles ; aucun produit n'est réservé à un poste. Voir le [contexte](../../operations/workspace/windows-native.md).
 
-
 Décisions communes : [plan AI](native-integration-master.md).
 Inventaire initial : 2026-10-01 ; état courant à qualifier par lot.
 Aucune parité live Ollama/vLLM/mistral.rs déduite des sources.
@@ -66,20 +65,9 @@ Présence des APIs et lecture des manifests ne valent pas test d'exécution.
 
 ## Lot Rust GPU du 2026-10-09
 
-Le crate sans consommateur `engine-mistralrs` et ses dépendances ont été retirés
-par `81d968bf69`. La nouvelle demande propriétaire sélectionne un **moteur
-Rust réel**, fourni par l'image officielle Mistral.rs 0.9.4 CUDA 12.8/SM89,
-plutôt que de restaurer le crate retiré. Le manifeste AMD64 vérifié par le
-VPS est épinglé dans [le runtime Infra](../../../../tools/aphrody/config/container/mistral-fleet/README.md).
-Le catalogue conserve les poids Gemma 4 vérifiés ; ce candidat n'est pas le
-modèle Shenron-chat-v2 entraîné ni une LoRA Qwen implicitement compatible.
+Le crate sans consommateur `engine-mistralrs` et ses dépendances ont été retirés par `81d968bf69`. La nouvelle demande propriétaire sélectionne un **moteur Rust réel**, fourni par l'image officielle Mistral.rs 0.9.4 CUDA 12.8/SM89, plutôt que de restaurer le crate retiré. Le manifeste AMD64 vérifié par le VPS est épinglé dans [le runtime Infra](../../../../tools/aphrody/config/container/mistral-fleet/README.md).
 
-La façade `aphrody-gateway` conserve son contrat HTTP et consomme désormais un
-`ModelClientAdapter` sur le même `ModelFactory` que les agents :
-`aphrody ai gateway serve --provider configured|mistralrs|shenron`. Le custom
-provider Mistral.rs pointe sur le moteur privé d'Omar, sans Python ni moteur
-Rust copié dans Aphrody. Le gateway reprend l'environnement canonique
-`APHRODY_AI_HTTP_TOKEN` et refuse un bind hors loopback sans credential.
+Le custom provider Mistral.rs pointe sur le moteur privé d'Omar, sans Python ni moteur Rust copié dans Aphrody. Le gateway reprend l'environnement canonique `APHRODY_AI_HTTP_TOKEN` et refuse un bind hors loopback sans credential.
 
 Qualification encore ouverte : pull/sonde du runtime d'Omar, chargement ISQ4
 et consommation mémoire réelle, chat et SSE, annulation, rollback vLLM puis

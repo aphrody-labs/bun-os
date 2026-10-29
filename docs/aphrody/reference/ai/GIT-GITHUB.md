@@ -96,8 +96,7 @@ render, install, and rollout functions.
 ## Managed caller and local installation
 
 The reusable workflow at `.github/workflows/aphrody-reusable-ci.yml` (not in repo) is
-consumed through one generated file,
-`shenron:.github/workflows/aphrody-ci.yml`, containing this shape:
+consumed through one generated workflow file containing this shape:
 
 ```yaml
 # SPDX-License-Identifier: Apache-2.0

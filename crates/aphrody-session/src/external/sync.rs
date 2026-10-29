@@ -761,7 +761,7 @@ mod domain_isolation_tests {
             modified: None,
         };
         let options = SyncOptions::new(AgentRoots::from_home(dir.path()), dir.path().join("out"))
-            .with_domain("dbfr")
+            .with_domain("ie")
             .with_workspace("/repo");
         let write = |domains: &[&str], role: &str| {
             let mut lines = vec![
@@ -772,13 +772,13 @@ mod domain_isolation_tests {
             }
             fs::write(&path, lines.join("\n") + "\n").unwrap();
         };
-        write(&["dbfr"], "user");
+        write(&["ie"], "user");
         assert!(source_matches_filters(&source, &options).unwrap());
         write(&["aphrody"], "user");
         assert!(!source_matches_filters(&source, &options).unwrap());
         write(&[], "user");
         assert!(!source_matches_filters(&source, &options).unwrap());
-        write(&["dbfr", "aphrody"], "user");
+        write(&["ie", "aphrody"], "user");
         assert!(!source_matches_filters(&source, &options).unwrap());
         let mirror = File::create(dir.path().join("mirror.jsonl")).unwrap();
         let mut context = LineContext::default();
@@ -789,7 +789,7 @@ mod domain_isolation_tests {
             "fixture",
             0,
             0,
-            Some("dbfr"),
+            Some("ie"),
             &mut context,
             &mirror,
             0,
@@ -804,19 +804,19 @@ mod domain_isolation_tests {
             fed.is_empty(),
             "cross-domain records must not reach the memory sink"
         );
-        write(&["dbfr"], "user");
+        write(&["ie"], "user");
         let tagged = fs::read_to_string(&path).unwrap();
         let unknown = serde_json::json!({"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"untagged earlier task"}]}}).to_string();
         let bootstrap = serde_json::json!({"type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"# AGENTS.md instructions"}],"internal_chat_message_metadata_passthrough":{"content_item_kinds":["agents_md.instructions","environments.environment_context"]}}}).to_string();
-        write(&["dbfr"], "user");
+        write(&["ie"], "user");
         let original = std::fs::read_to_string(&path).unwrap();
         std::fs::write(&path, format!("{bootstrap}\n{original}")).unwrap();
         assert!(source_matches_filters(&source, &options).unwrap());
         fs::write(&path, format!("{unknown}\n{tagged}")).unwrap();
         assert!(!source_matches_filters(&source, &options).unwrap());
-        write(&["dbfr"], "assistant");
+        write(&["ie"], "assistant");
         assert!(!source_matches_filters(&source, &options).unwrap());
-        write(&["dbfr"], "user");
+        write(&["ie"], "user");
         assert!(!source_matches_filters(&source, &options.with_workspace("/other")).unwrap());
     }
 }

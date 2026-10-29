@@ -11,7 +11,7 @@
  * Bun facts (bun-types 1.4.2): commands auto-connect; `maxRetries` exhausted
  * runs `onclose` and the client stays closed; `idleTimeout` (ms) closes the
  * connection without reconnecting. Long-lived services should therefore drop
- * a closed client and build a new one (see `@shenron/db/redis`).
+ * a closed client and build a new one.
  */
 import type { RedisClient, RedisOptions } from "bun";
 import { type EnvSource, isUsableEnvValue } from "./env";

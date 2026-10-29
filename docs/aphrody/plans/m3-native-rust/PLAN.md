@@ -220,10 +220,7 @@ sur latence p95 et débit ; accessibilité/auth/contrats restent des critères b
    conserver DB et secrets existants. Le retrait du serveur historique vient après
    la fenêtre de qualification, avec preuve qu'aucun consommateur ne le requiert.
 
-Builds sur un hôte natif, SSH ou Docker qualifié, résolu depuis la configuration.
-Le poste actuel utilise Windows natif. Les host applies conservent leurs autorités :
-Yoyo pour Aphrody Labs, Omar pour DBFR. Le support M3 Bun/Rust peut être offert à
-Shenron, mais sa migration et son déploiement constituent un lot de son propriétaire.
+Builds sur un hôte natif, SSH ou Docker qualifié, résolu depuis la configuration. Le poste actuel utilise Windows natif. Les host applies conservent leurs autorités : Yoyo pour Aphrody Labs, Omar pour DBFR.
 
 ## Critères de clôture
 

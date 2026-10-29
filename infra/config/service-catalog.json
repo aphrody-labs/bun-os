@@ -152,7 +152,7 @@
         "ref": "hf:unsloth/gemma-4-E2B-it-GGUF/gemma-4-E2B-it-Q4_K_M.gguf@0314792d7f1f7e229411f620751375812bb9faf2",
         "sha256": "740185b21d22ceb83a11c3aa62ad5842ef32c70f6096d756bbee85a1e4ec34b8"
       },
-      "note": "Arrêté sur décision utilisateur (2026-10-09), unit et poids conservés sur le vps, jamais redémarré ; ai-lab et debate utilisent shenron-chat-v2 sur dbfr (127.0.0.1:8799).",
+      "note": "Arrêté sur décision utilisateur (2026-10-09), unit et poids conservés sur le vps, jamais redémarré.",
       "public": false,
       "status": "retired",
       "retiredAt": "2026-10-09"
@@ -172,26 +172,6 @@
       "note": "Omar GPU gateway alias over the existing boot-managed Omar Llama CUDA service. The process remains owned by OmarServer and authenticates through its protected api-key file. Replace DBFR gateway only after an authenticated remote health and chat probe through the declared tunnel."
     },
     {
-      "id": "aphrody-llama-shenron-chat",
-      "application": "aphrody",
-      "kind": "llama-server-openai",
-      "runtime": "native",
-      "host": "dbfr",
-      "container": "aphrody-chat-1",
-      "health": "http://127.0.0.1:8799/health",
-      "port": 8799,
-      "capabilities": ["chat"],
-      "sourceRepo": "aphrody",
-      "model": {
-        "catalogId": "shenron-chat-v2-merged-q4km",
-        "alias": "shenron-chat-v2",
-        "ref": "local:llama-export-lora b11415 (Qwen3-4B-Instruct-2507-F16 + adapter sha256 aab485357c68fdcbb6d4ba55911632b8228964106047db035e0223e2aecc6107) -> llama-quantize Q4_K_M --imatrix unsloth",
-        "sha256": "22362d5729eab45a4f2238246e6b5a448d26c01b5a541671e730415ec0d731b4"
-      },
-      "note": "Fine-tuned shenron-chat-v2 served on DBFR by the Compose service chat of project shenron (container aphrody-chat-1, llama.cpp b11415, OpenAI-compatible /v1 on loopback only, never proxied by nginx). Single merged GGUF /home/ubuntu/apps/shenron/shared/models/shenron-chat-v2/shenron-chat-v2-merged-Q4_K_M.gguf mounted read-only; --cache-ram 256 -fa on -ctk q8_0 -ctv q8_0, ctx 8192, parallel 1, threads 4, mem_limit 5g. Rollback: adapter.gguf stays beside it; re-download the base Q4_K_M (hf:unsloth/Qwen3-4B-Instruct-2507-GGUF@a06e946b, sha256 3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597) and serve it with --lora. The native systemd unit was removed on 2026-10-09; see docs/operations/infra/SHENRON-DOCKER.md",
-      "public": false
-    },
-    {
       "id": "aphrody-ai-gateway-dbfr",
       "application": "aphrody",
       "kind": "openai-compatible-gateway",
@@ -200,11 +180,10 @@
       "host": "dbfr",
       "health": "http://127.0.0.1:8786/health",
       "port": 8786,
-      "modelId": "shenron-chat-v2",
       "capabilities": ["chat"],
       "sourceRepo": "aphrody",
       "public": false,
-      "note": "Persistent authenticated Aphrody OpenAI-compatible gateway on DBFR, bound to loopback only. Forwards to the existing Shenron chat model at 127.0.0.1:8799/v1; no Nginx route or public inference endpoint."
+      "note": "Persistent authenticated Aphrody OpenAI-compatible gateway on DBFR, bound to loopback only. Forwards to the local llama server at 127.0.0.1:8799/v1; no Nginx route or public inference endpoint."
     },
     {
       "id": "aphrody-discord-dev",
@@ -288,21 +267,6 @@
       "retiredAt": "2026-10-09"
     },
     {
-      "id": "aphrody-shenron-embed",
-      "application": "aphrody",
-      "kind": "rust-http",
-      "runtime": "rust",
-      "unit": "aphrody-shenron-embed.service",
-      "health": "http://127.0.0.1:8794/health",
-      "port": 8794,
-      "capabilities": ["embed"],
-      "sourceRepo": "aphrody-ai",
-      "workingDirectory": "/home/ubuntu/apps/aphrody/current",
-      "public": false,
-      "status": "retired",
-      "retiredAt": "2026-09-25"
-    },
-    {
       "id": "aphrody-a2a",
       "application": "aphrody",
       "kind": "rust-http",
@@ -324,185 +288,6 @@
       "host": "dbfr",
       "status": "retired",
       "retiredAt": "2026-10-09"
-    },
-    {
-      "id": "shenron-manga-workers",
-      "application": "shenron",
-      "kind": "systemd-worker",
-      "runtime": "bun",
-      "unit": "shenron-manga-workers.service",
-      "host": "vps",
-      "sourceRepo": "shenron",
-      "workingDirectory": "/home/ubuntu/src/shenron",
-      "public": false,
-      "note": "Sixteen continuous recursive manga discovery workers use qualified installed Bun1.4.4 revision dfde053a3045d6076ad315b6f63160c4ced71513 in the foreground under systemd (Type=simple; shenron bunfig noOrphans kills detached children) and persistent private SQLite frontier. The private runtime-capabilities.json explicitly quarantines unavailable anonymous Google search while direct publisher acquisition and native private indexing continue; no challenged provider is bypassed. The owner authorizes the 12-vCPU factory capacity with a 20-GiB memory ceiling and headroom for concurrent qualified jobs. Existing mullvad namespace supplies Japan egress. Public progress is sanitized; captures and credentials remain private."
-    },
-    {
-      "id": "shenron-site",
-      "application": "shenron",
-      "kind": "next-bun-http",
-      "runtime": "bun",
-      "unit": "shenron-site.service",
-      "host": "dbfr",
-      "container": "aphrody-site-1",
-      "health": "http://127.0.0.1:5011/api/health",
-      "readiness": "http://127.0.0.1:5011/api/health/ready",
-      "port": 5011,
-      "sourceRepo": "shenron",
-      "workingDirectory": "/home/ubuntu/apps/shenron/current/apps/site",
-      "releaseRoot": "/home/ubuntu/apps/shenron/releases",
-      "sharedRoot": "/home/ubuntu/apps/shenron/shared",
-      "deployAdapter": "scripts/release/atomic-deploy-shenron.sh",
-      "note": "Next.js site: /api/health (liveness), /api/health/live (alias) and /api/health/ready (readiness)",
-      "public": true
-    },
-    {
-      "id": "shenron-mcp",
-      "application": "aphrody",
-      "kind": "bun-mcp-http",
-      "runtime": "bun",
-      "unit": "shenron-mcp.service",
-      "health": "http://127.0.0.1:5010/health",
-      "sourceRepo": "aphrody-ai",
-      "workingDirectory": "/home/ubuntu/apps/aphrody/current",
-      "releaseRoot": "/home/ubuntu/apps/aphrody/releases",
-      "publicProxy": "nginx",
-      "a2a": {
-        "registry": "tools/config/a2a-peers.json",
-        "peer": "shenron",
-        "rpcPath": "/a2a",
-        "agentCardPath": "/.well-known/agent-card.json"
-      },
-      "public": true,
-      "status": "retired",
-      "retiredAt": "2026-09-25",
-      "supersededBy": "shenron-mcp dragonball.* tools in aphrody-labs/shenron (crates/shenron-mcp, served by the Shenron plugin; aphrody-ai d0cb59d deleted apps/shenron-mcp, its systemd unit and mcp.dragonballfr.com vhost template)"
-    },
-    {
-      "id": "shenron-bot",
-      "application": "shenron",
-      "kind": "discord-bot-and-api",
-      "runtime": "bun",
-      "unit": "shenron-bot.service",
-      "host": "dbfr",
-      "container": "aphrody-bot-1",
-      "health": "http://127.0.0.1:5006/health",
-      "port": 5006,
-      "sourceRepo": "shenron",
-      "workingDirectory": "/home/ubuntu/apps/shenron/current/apps/bot",
-      "releaseRoot": "/home/ubuntu/apps/shenron/releases",
-      "sharedRoot": "/home/ubuntu/apps/shenron/shared",
-      "deployAdapter": "scripts/release/atomic-deploy-shenron.sh",
-      "note": "single Bun process (discordx + Bun.serve REST/GraphQL/OpenAPI); no separate shenron-api.service, see docs/reference/infra/SHENRON-MIGRATION.md",
-      "public": true
-    },
-    {
-      "id": "shenron-mcp-http",
-      "application": "shenron",
-      "kind": "rust-mcp-http",
-      "runtime": "native",
-      "unit": "shenron-mcp-http.service",
-      "health": "http://127.0.0.1:8790/health",
-      "port": 8790,
-      "sourceRepo": "shenron",
-      "workingDirectory": "/home/ubuntu/apps/shenron/current",
-      "releaseRoot": "/home/ubuntu/apps/shenron/releases",
-      "sharedRoot": "/home/ubuntu/apps/shenron/shared",
-      "deployAdapter": "scripts/release/atomic-deploy-shenron.sh",
-      "note": "Retired on 2026-10-09: on DBFR shenron-mcp runs inside the site container on 127.0.0.1:3599 and the site relays /mcp to it. The former native unit on 8790 and its SSH forward are gone",
-      "public": false,
-      "status": "retired",
-      "retiredAt": "2026-10-09"
-    },
-    {
-      "id": "shenron-pg-tunnel",
-      "application": "shenron",
-      "kind": "ssh-tunnel",
-      "runtime": "native",
-      "unit": "shenron-pg-tunnel.service",
-      "host": "vps",
-      "health": "tcp://127.0.0.1:15433",
-      "target": "dbfr:127.0.0.1:5432",
-      "note": "Removed on 2026-10-09: its only consumer (vps aphrody-mcp-http, debate RAG) now runs on dbfr against 127.0.0.1:5432.",
-      "public": false,
-      "status": "retired",
-      "retiredAt": "2026-10-09"
-    },
-    {
-      "id": "shenron-redis",
-      "application": "shenron",
-      "kind": "cache",
-      "runtime": "redis",
-      "container": "shenron-redis",
-      "host": "dbfr",
-      "health": "tcp://127.0.0.1:6379",
-      "target": "dbfr:127.0.0.1:6379",
-      "note": "Shenron Redis 8 on DBFR, Compose service redis (container shenron-redis, maxmemory 1gb noeviction, mem_limit 1536m). The host redis-server package was purged on 2026-10-09: its unattended restart collided with the container on 6379. The VPS reaches it through shenron-pg-tunnel's forward",
-      "public": false
-    },
-    {
-      "id": "shenron-postgres",
-      "application": "shenron",
-      "kind": "database",
-      "runtime": "postgres",
-      "host": "dbfr",
-      "container": "shenron-postgres",
-      "health": "tcp://127.0.0.1:5432",
-      "port": 5432,
-      "sourceRepo": "aphrody",
-      "note": "PostgreSQL 18 of Shenron on DBFR, Compose service postgres (container shenron-postgres, data /home/ubuntu/apps/shenron/shared/state/postgres, mem_limit 2560m, shared_buffers 768MB, max_connections 40). Production database: never deleted",
-      "public": false
-    },
-    {
-      "id": "shenron-gateway",
-      "application": "shenron",
-      "kind": "nginx-gateway",
-      "runtime": "nginx",
-      "host": "dbfr",
-      "container": "aphrody-gateway-1",
-      "sourceRepo": "aphrody",
-      "note": "Public TLS ingress of DBFR (ports 80/443, host network), Compose service gateway built from tools/config/host/nginx/shenron; mem_limit 256m"
-    },
-    {
-      "id": "shenron-backup",
-      "application": "shenron",
-      "kind": "backup",
-      "runtime": "native",
-      "unit": "shenron-backup.timer",
-      "public": false,
-      "status": "retired",
-      "retiredAt": "2026-10-09"
-    },
-    {
-      "id": "shenron-neon-pull",
-      "application": "shenron",
-      "kind": "replica-sync",
-      "runtime": "bun",
-      "unit": "shenron-neon-pull.timer",
-      "note": "every 15 min: apps/bot/scripts/sync-neon-to-sqlite.ts of /home/ubuntu/apps/shenron/current refreshes /home/ubuntu/apps/shenron/shared/bot/data/bot.db from PostgreSQL (never empties a table without --allow-empty)",
-      "public": false,
-      "status": "retired",
-      "retiredAt": "2026-10-09"
-    },
-    {
-      "id": "shenron-container-backup",
-      "application": "shenron",
-      "kind": "backup",
-      "runtime": "native",
-      "unit": "shenron-container-backup.timer",
-      "host": "dbfr",
-      "public": false,
-      "note": "Daily container-owned PostgreSQL, Redis and live SQLite snapshots, integrity/checksum-verified; protected under /home/ubuntu/apps/shenron/shared/backups/container."
-    },
-    {
-      "id": "shenron-offsite-backup",
-      "application": "shenron",
-      "kind": "backup",
-      "runtime": "bun",
-      "unit": "shenron-offsite-backup.timer",
-      "host": "vps",
-      "public": false,
-      "note": "Daily 04:30 UTC pull of the DBFR container snapshots over wg (aphrody-labs/shenron scripts/ops/shenron-offsite-backup.ts in ~/src/shenron): SHA-256 verified against VERIFIED.json under /home/ubuntu/archive/dbfr/backups/shenron, PostgreSQL dump restored into a disposable pgvector/pgvector:0.8.1-pg18 container and SQLite quick_check (.restore-verified); rotation 1 (older snapshots deleted only after the newest is verified and restored); fails when the newest DBFR snapshot is older than 36 h."
     },
     {
       "id": "aphrody-mcp-http-dbfr",
@@ -557,41 +342,6 @@
       "target": "local:127.0.0.1:6379",
       "public": false,
       "note": "Redis 8.10.2, authenticated loopback; Bun native Redis client, durable AOF/RDB volume. Compose owner C:/SSH/omar-server/config/redis.compose.yml; maxmemory 512MiB, Docker memory 768MiB."
-    },
-    {
-      "id": "shenron-cloudflared",
-      "application": "shenron",
-      "kind": "cloudflare-tunnel",
-      "runtime": "native",
-      "unit": "shenron-cloudflared.service",
-      "health": "http://127.0.0.1:20243/ready",
-      "port": 20243,
-      "host": "dbfr",
-      "public": false,
-      "sourceRepo": "shenron",
-      "note": "Remote-managed tunnel f2ddf195-5d19-4321-8b12-259c7c57659b; token via systemd LoadCredential; no DNS cutover by this service."
-    },
-    {
-      "id": "shenron-cloudflare-audit",
-      "application": "shenron",
-      "kind": "read-only-audit",
-      "runtime": "bun",
-      "unit": "shenron-cloudflare-audit.service",
-      "host": "dbfr",
-      "public": false,
-      "sourceRepo": "shenron",
-      "note": "Daily RO reconciliation via shenron-cloudflare-audit.timer; unavailable auth is persisted as failed, never a successful sync."
-    },
-    {
-      "id": "shenron-cloudflare-s3-renew",
-      "application": "shenron",
-      "kind": "credential-renewal",
-      "runtime": "bun",
-      "unit": "shenron-cloudflare-s3-renew.service",
-      "host": "dbfr",
-      "public": false,
-      "sourceRepo": "shenron",
-      "note": "Temporary one-hour R2 object credentials for shenron-cdn prefixes _objects/ and _migration/; no corpus, DNS or worker mutation."
     },
     {
       "id": "omar-browser-client-vps",
@@ -684,54 +434,6 @@
       "staged": true,
       "required": false,
       "note": "Unified Bun OS read-only catalog API. Linux x86-64 binary compiled/executed at root1eedaa8;9 localHTTP checks pass, install SHA matches. Existing Infra lifecycle and source.aphrody.app ingress own activation. Protected bearer provisioned; candidate unit/nginx syntax pass. Automatic tool review rejected grouped unit/snippet installation and service activation before execution (blocked by policy). Staged/unrequired; no Nginx reload or deployment qualification. /api/product/v1/ preserves Gitea /api/v1/."
-    },
-    {
-      "id": "shenron-manga-publication",
-      "application": "shenron",
-      "kind": "systemd-worker",
-      "runtime": "bun",
-      "unit": "shenron-manga-publication.service",
-      "host": "dbfr",
-      "sourceRepo": "shenron",
-      "workingDirectory": "/home/ubuntu/.aphrody/private/shenron/manga-publication",
-      "public": false,
-      "note": "Consumes sealed acquired manga with exact edition identity, private provenance, canonical editorial CAS, fresh complete backup, public CDN activation and production replica readback. Empty queue means waiting for source scans."
-    },
-    {
-      "id": "shenron-manga-handoff",
-      "application": "shenron",
-      "kind": "systemd-worker",
-      "runtime": "bun",
-      "unit": "shenron-manga-handoff.service",
-      "host": "vps",
-      "sourceRepo": "shenron",
-      "workingDirectory": "/home/ubuntu/.aphrody/profiles/dbfr/jobs/manga-source-pool",
-      "public": false,
-      "note": "Timer transfers bounded sealed acquisition subsets from the existing source pool to DBFR; no credentials or raw corpus cross hosts."
-    },
-    {
-      "id": "shenron-wiki-proposals",
-      "application": "shenron",
-      "kind": "systemd-worker",
-      "runtime": "bun",
-      "unit": "shenron-wiki-proposals.service",
-      "host": "dbfr",
-      "sourceRepo": "shenron",
-      "workingDirectory": "/home/ubuntu/.aphrody/profiles/dbfr/jobs/wiki-completion-20261015",
-      "public": false,
-      "note": "Private proposal-only six-hour supervisor: canonical protected read inventory, exact implementation smoke, at most four independent Codex runners and twenty candidates per pass; bounded transport retries only, immutable approved exports, no automatic editorial publication."
-    },
-    {
-      "id": "shenron-wiki-proposals-timer",
-      "application": "shenron",
-      "kind": "systemd-timer",
-      "runtime": "bun",
-      "unit": "shenron-wiki-proposals.timer",
-      "host": "dbfr",
-      "sourceRepo": "shenron",
-      "workingDirectory": "/home/ubuntu/.aphrody/profiles/dbfr/jobs/wiki-completion-20261015",
-      "public": false,
-      "note": "Private proposal-only six-hour supervisor: canonical protected read inventory, exact implementation smoke, at most four independent Codex runners and twenty candidates per pass; bounded transport retries only, immutable approved exports, no automatic editorial publication."
     }
   ],
   "policies": {
@@ -741,36 +443,14 @@
       "aphrody": {
         "current": "/home/ubuntu/apps/aphrody/current",
         "adapter": "scripts/release/atomic-deploy-aphrody-stack.sh"
-      },
-      "shenron": {
-        "current": "/home/ubuntu/apps/shenron/current",
-        "adapter": "scripts/release/atomic-deploy-shenron.sh"
-      },
-      "bundle": {
-        "root": "/home/ubuntu/apps/infra",
-        "adapter": "scripts/release/atomic-deploy-bundle.sh",
-        "order": ["aphrody", "shenron"]
       }
     },
     "applicationRoots": {
       "aphrody-web": "/home/ubuntu/apps/aphrody/current",
-      "aphrody-ai": "/home/ubuntu/apps/aphrody/current",
-      "shenron": "/home/ubuntu/apps/shenron/current"
+      "aphrody-ai": "/home/ubuntu/apps/aphrody/current"
     },
     "secrets": "operator-managed-environment-files",
-    "retiredUnits": [
-      "shenron.service",
-      "shenron-site-b.service",
-      "shenron-api.service",
-      "shenron-mcp.service",
-      "shenron-watchdog.service",
-      "shenron-watchdog.timer",
-      "shenron-clean-vps.service",
-      "shenron-clean-vps.timer",
-      "shenron-log-watcher.service",
-      "shenron-zswap.service",
-      "filebrowser.service"
-    ],
+    "retiredUnits": ["filebrowser.service"],
     "sharedRuntimes": ["bun", "postgresql", "redis", "nginx"],
     "databasePolicy": "postgresql-primary-with-sqlite-local-cache",
     "authPolicy": "one-better-auth-contract-per-public-origin"
@@ -782,11 +462,6 @@
         "host": "vps",
         "kind": "systemd",
         "unit": "aphrody-selfheal.timer"
-      },
-      {
-        "host": "vps",
-        "kind": "systemd",
-        "unit": "aphrody-shenron-build-runner.service"
       },
       {
         "host": "dbfr",
@@ -802,26 +477,6 @@
         "host": "dbfr",
         "kind": "systemd",
         "unit": "aphrody-wg-proxy@8793.socket"
-      },
-      {
-        "host": "dbfr",
-        "kind": "docker",
-        "container": "aphrody-shenron-compute-1"
-      },
-      {
-        "host": "dbfr",
-        "kind": "docker",
-        "container": "aphrody-shenron-embed-1"
-      },
-      {
-        "host": "dbfr",
-        "kind": "docker",
-        "container": "aphrody-shenron-timeline-api-1"
-      },
-      {
-        "host": "dbfr",
-        "kind": "systemd",
-        "unit": "shenron-timeline-refresh.timer"
       },
       {
         "host": "local",
@@ -1007,52 +662,6 @@
         "host": "local",
         "kind": "docker",
         "container": "omar-redis"
-      },
-      {
-        "host": "dbfr",
-        "kind": "systemd",
-        "unit": "shenron-cloudflare-audit.service",
-        "hold": "oneshot driven by daily read-only timer"
-      },
-      {
-        "host": "dbfr",
-        "kind": "systemd",
-        "unit": "shenron-cloudflare-audit.timer"
-      },
-      {
-        "host": "dbfr",
-        "kind": "systemd",
-        "unit": "shenron-cloudflare-s3-renew.service",
-        "hold": "oneshot driven by scoped credential renewal timer"
-      },
-      {
-        "host": "dbfr",
-        "kind": "systemd",
-        "unit": "shenron-cloudflare-s3-renew.timer"
-      },
-      {
-        "host": "vps",
-        "kind": "systemd",
-        "unit": "shenron-manga-handoff.service",
-        "hold": "oneshot driven by permanent handoff timer"
-      },
-      {
-        "host": "vps",
-        "kind": "systemd",
-        "unit": "shenron-manga-handoff.timer"
-      },
-      {
-        "host": "local",
-        "kind": "scheduledTask",
-        "name": "Shenron R2 S3 scoped renewal",
-        "triggers": ["every:10m", "atLogon"],
-        "principal": "user",
-        "runLevel": "limited",
-        "periodic": true,
-        "execute": "pwsh.exe",
-        "arguments": "-NoLogo -NoProfile -NonInteractive -File \"%USERPROFILE%\\.aphrody\\tools\\cloudflare-cli\\s3-profile.ps1\" -Action renew -Apply -BunExe \"C:/shenron/var/runtimes/bun-1.4.4-current-ae5a09dc/bun.exe\"",
-        "timeLimitMinutes": 3,
-        "description": "Renew one-hour Shenron R2 S3 object credentials scoped to shenron-cdn _objects/ and _migration/, protected by DPAPI CurrentUser."
       },
       {
         "host": "vps",

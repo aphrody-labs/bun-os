@@ -47,7 +47,7 @@ service is deployed or healthy.
 - `aphrody-os`, UI, Web, Shell, Native, Contracts and Compat do not depend on
   `aphrody-ai`. Shared contracts and relative sibling dependencies express
   supported integration.
-- RG, Shenron, NIE and IECODE retain domain ownership. Do not infer a migration,
+- NIE and IECODE retain domain ownership. Do not infer a migration,
   service retirement or data/schema move from a plan or historical audit.
 - Keep one document per authority. Treat dated plans and memories as leads;
   verify current source and live state with the actual owner.

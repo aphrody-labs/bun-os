@@ -63,13 +63,7 @@ Yoyo administers Aphrody Labs; DBFR administration remains Omar's authority.
 
 ## Windows port80 and direct native hosting
 
-Observed on the owner workstation at 2026-10-09: port80 has listeners owned by
-`com.docker.backend` PID7156 (`::`) and `wslrelay` PID39044 (`::1`). These are live
-existing bindings, not proof that the Rust site owns port80. No listener was
-stopped, WSL started or Docker gateway changed by this work. Recheck native
-listener/PID/service ownership before any activation because PIDs and bindings
-change. The existing Shenron gateway routing must be inspected by its owner;
-process names alone do not prove a particular application's route.
+Observed on the owner workstation at 2026-10-09: port80 has listeners owned by `com.docker.backend` PID7156 (`::`) and `wslrelay` PID39044 (`::1`). These are live existing bindings, not proof that the Rust site owns port80. No listener was stopped, WSL started or Docker gateway changed by this work. Recheck native listener/PID/service ownership before any activation because PIDs and bindings change.
 
 Windows can run the native site behind the existing gateway, or use the normal
 loopback site listener for local development. Request a hostname/path route from

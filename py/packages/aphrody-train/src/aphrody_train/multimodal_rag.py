@@ -95,7 +95,7 @@ def load_multimodal_corpus(
                 # Resolve image reference from url or id
                 image_ref = None
                 if "#planche-" in url:
-                    # url like https://dragonballfr.com/wiki/databooks/4#planche-127
+                    # url like <site>/wiki/databooks/4#planche-127
                     parts = url.split("/databooks/")
                     if len(parts) > 1:
                         book_part = parts[1].split("#planche-")
@@ -287,7 +287,7 @@ class GpuRagEngine:
 
 @click.group()
 def cli():
-    """Shenron Multimodal RAG & GPU Training Suite."""
+    """Multimodal RAG & GPU Training Suite."""
     pass
 
 
@@ -353,7 +353,7 @@ def loop(
         test_queries, iterations=iterations, rerank=not no_rerank
     )
 
-    out_file = Path("home/shenron/rag_gpu_stats.json")
+    out_file = Path("home/aphrody/rag_gpu_stats.json")
     out_file.parent.mkdir(parents=True, exist_ok=True)
     out_file.write_text(json.dumps(stats, indent=2), encoding="utf-8")
     print(f"\nStats recorded in: {out_file}")

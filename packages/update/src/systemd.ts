@@ -110,7 +110,7 @@ export function check(c: Ctx): number {
   }
   const live = existsSync(unitDir()) ? readdirSync(unitDir()).filter(isUnit) : [];
   const own = new Set(repoUnits(c));
-  const orphan = live.filter(u => !own.has(u) && /^(aphrody|shenron|rg)-/.test(u));
+  const orphan = live.filter(u => !own.has(u) && u.startsWith("aphrody-"));
   for (const u of orphan) console.log(`unit   ${u.padEnd(46)} live-only (not in the yolo unit catalog)`);
   const tpl = "tools/config/wsl/wsl.conf";
   if (c.exists(tpl) && existsSync("/etc/wsl.conf")) {
@@ -158,7 +158,7 @@ export function restart(c: Ctx, needles: string[]): number {
     .run("systemctl", ["--user", "list-units", "--type=service", "--state=active", "--no-legend", "--plain"])
     .stdout.split("\n")
     .map(l => l.split(/\s+/)[0]!)
-    .filter(u => /^(aphrody|shenron|rg)-/.test(u));
+    .filter(u => u.startsWith("aphrody-"));
   for (const u of active) {
     const text = c.run("systemctl", ["--user", "cat", u]).stdout;
     if (!needles.some(n => text.includes(n))) continue;

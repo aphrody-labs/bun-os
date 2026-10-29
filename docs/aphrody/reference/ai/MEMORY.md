@@ -14,7 +14,7 @@ Archived snapshot: **2026-09-25**. Historical project path: `~/src/aphrody-ai` (
 
 ## Historical deployment notes (not live status)
 
-- At snapshot time, deployment was recorded as owned by the separate `aphrody-infra` repository and the VPS service mix was recorded as RG/Shenron. The repo boundary and production state must be checked against current Infra sources and live probes.
+- At snapshot time, deployment was recorded as owned by the separate `aphrody-infra` repository and the VPS service mix was recorded at that time. The repo boundary and production state must be checked against current Infra sources and live probes.
 
 ## Agent home (`~/.aphrody`)
 
@@ -32,7 +32,7 @@ Archived snapshot: **2026-09-25**. Historical project path: `~/src/aphrody-ai` (
 
 - Shared: `~/.config/aphrody/mcp.json` — `aphrody-mcp`, `bxc-mcp`; secrets in `~/.aphrody/.env`, not JSON
 - Claude uses aphrody plugin + same binaries
-- Dragon Ball tools are `dragonball.*` in `aphrody-mcp` (feature `dragonball`, default); the Bun `apps/shenron-mcp` (not in repo) is retired
+- Dragon Ball tools are `dragonball.*` in `aphrody-mcp` (feature `dragonball`, default)
 
 ## Tooling / Bun & Python
 
@@ -44,7 +44,6 @@ Archived snapshot: **2026-09-25**. Historical project path: `~/src/aphrody-ai` (
 - Architecture: `aphrody-ai` owns AI, agents, inference, RAG and models.
 - System & Web: `aphrody-os` owns OS kernel, browser/BXC, GUI, Canvas and Tauri.
 - Infra & Deploy: `aphrody-infra` owns targets, systemd services, releases and Nginx routes.
-- Product plane: `rg`, `shenron`, `nie`, `iecode` consume infra and models.
 - `docs/reference/ai/rag-unified-pattern.md` — shared e5-small sidecar + RRF retrieval
 
 ## A2A (Rust)

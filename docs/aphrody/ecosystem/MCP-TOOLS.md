@@ -9,7 +9,7 @@ Every MCP tool registered in source, grouped by server: rmcp `#[tool]` routers, 
 full text is in [ecosystem.json](ecosystem.json). The kernel re-exports its subsystems' tools through
 `aphrody-kernel`, so one tool name can appear under several servers.
 
-Totals: 19 servers, 334 tool registrations, 332 unique tool names.
+Totals: 19 servers, 330 tool registrations, 328 unique tool names.
 
 ## aphrody — @aphrody/workspace subsystem `workspace`
 
@@ -175,7 +175,7 @@ Kind: json-catalog. 2 tools.
 
 ## aphrody — aphrody-mcp (GoogleMcpServer)
 
-Kind: rmcp. 69 tools.
+Kind: rmcp. 65 tools.
 
 | Tool | Description |
 | --- | --- |
@@ -194,10 +194,6 @@ Kind: rmcp. 69 tools.
 | `aphrody_rag_search` | Search the local aphrody RAG index (SQLite FTS5, built by `aphrody rag index`; $APHRODY_RAG_DB or ~/.aphrody/rag/index.db). Returns ranked chunks with path, lines and score as JSON. |
 | `aphrody_remote_vnc` | Computer use on any VNC (RFB) server: a tunnel member (`omar`), `host[:port]` or `vnc://host:port`, e.g. `aphrody infra remote serve` on a WireGuard peer. Actions: screenshot (JPEG image), click, dou… |
 | `aphrody_schema` | Return machine-readable backend contracts from the unified endpoint. `aphrody` returns the live MCP tool schemas, `web` lists the web backend tools, `n2b` returns its canonical report JSON Schema, `a… |
-| `aphrody_shenron_llm_chat` | Chat through Aphrody's configured local OpenAI-compatible model for Shenron. Returns answer and model. Requires the configured model backend. |
-| `aphrody_shenron_ocr` | Transcribe one base64 image with Aphrody's local OCR for Shenron. Returns text, textless, suspect, findings and languageApplied=false. Requires a binary built with the ocr feature and installed OCR m… |
-| `aphrody_shenron_rag_ingest` | Upsert one Shenron passage into Aphrody's RAG corpus using a stable sourceId such as shenron:<rowid>. Optional originSourceId, kind, lang and entity preserve source metadata. Requires the Aphrody RAG… |
-| `aphrody_shenron_rag_search` | Search the Dragon Ball corpus held by Aphrody. Accepts q, limit, lang, kind, sourceId (the original corpus ID), and entity. Returns stable sourceId values, source URL, a bounded passage, and lexical… |
 | `aphrody_site_catalog` | Read the native Aphrody product documentation/template catalog from an explicit workspace root. Read-only, no network or host execution. Section docs/templates matches HTTP; omit for both. |
 | `aphrody_transcribe` | Transcribe audio fully locally by driving whisper.cpp with weights from the aphrody model store (catalog id such as whisper-base-en, or a GGML path). Never falls back to a network API and never downl… |
 | `aphrody_web_call` | Call native Aphrody Web tools by their public or historical name through this endpoint (browser, crawl, Google, Gemini, X, archive). Use aphrody_capabilities to inspect the tools available in this bu… |

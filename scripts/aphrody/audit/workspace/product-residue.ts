@@ -5,8 +5,7 @@
 //!
 //! Counts, per tracked file, the lines that name Shenron, Koharu, Dragon Ball or the databooks.
 //! `tools/config/product-residue.baseline.json` holds what Aphrody keeps on purpose: the Infra host
-//! plane, the `/api/v1/shenron/*` gateway and its environment aliases, the `shenron` A2A peer,
-//! the `koharu-*` ML base until it is renamed, and dated records. A file missing from the baseline
+//! plane and dated records. A file missing from the baseline
 //! or above its count fails; `--write-baseline` records the current counts, which may only go down.
 
 import { lstatSync } from "node:fs";

@@ -92,16 +92,6 @@ administrateur relit sa politique toutes les deux minutes.
 encore aucun handshake, endpoint ou octet transféré. Sa présence et ses droits
 Discord ne constituent pas une connexion réseau de son PC.
 
-Shenron s'authentifie bien comme application `1497194276025663680`.
-L'application est publique et n'exige pas de code grant, mais son accès à la
-guilde Aphrody renvoie `404`. Son
-[invitation Discord officielle](https://discord.com/oauth2/authorize?client_id=1497194276025663680&scope=bot%20applications.commands&permissions=68608&guild_id=1554189180030947338&disable_guild_select=true)
-demande les permissions de lecture et d'envoi nécessaires. L'admission exige
-une session utilisateur possédant `Manage Guild`, selon le
-[contrat OAuth Discord](https://docs.discord.com/developers/topics/oauth2#bot-authorization-flow).
-Le navigateur natif testé n'a pas rendu l'interface d'autorisation ; aucune
-admission n'a été effectuée et aucun token ou cookie utilisateur n'a été extrait.
-
 ## Portée restante
 
 Codex, Claude et AGY ne sont pas présents dans le PATH de DBFR ni dans les

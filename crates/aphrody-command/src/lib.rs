@@ -647,7 +647,7 @@ pub(crate) enum A2aAction {
     /// JSON-RPC `message/send` to a federation peer (HTTP `/a2a` or `.coord` fallback).
     Send {
         instruction: String,
-        #[arg(long, default_value = "shenron")]
+        #[arg(long)]
         target: String,
         /// Sender peer id; defaults to this agent's hub identity, else `aphrody`.
         #[arg(long)]
@@ -1577,8 +1577,7 @@ async fn dispatch(ctx: &GoogleContext, cli: Cli) -> miette::Result<()> {
         }
         #[cfg(all(not(target_arch = "wasm32"), feature = "ocr"))]
         Some(Commands::Ocr { action }) => {
-            // Synchrone de bout en bout (llama.cpp en processus fils), sauf le
-            // pont `dbfr` qui parle HTTP.
+            // Synchrone de bout en bout (llama.cpp en processus fils).
             ocr_cmd::run(action).await?;
         }
 

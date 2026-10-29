@@ -329,7 +329,7 @@ export interface GameMenuProps {
   layout: MenuLayout;
   /**
    * Base URL des assets PNG.
-   * - Production CDN : "https://cdn.rosegriffon.fr"
+   * - Production CDN : "https://cdn.example.com"
    * - Dev local      : "/menu-assets" (dossier public Next.js ou serveur Bun)
    */
   assetBase: string;
@@ -362,7 +362,7 @@ export interface GameMenuProps {
  * @example
  * ```tsx
  * import layout from "@/data/50_title.layout.json";
- * <GameMenu layout={layout} assetBase="https://cdn.rosegriffon.fr" />
+ * <GameMenu layout={layout} assetBase="https://cdn.example.com" />
  * ```
  */
 export const GameMenu = ({ assetBase, className, layout, style, overrides }: GameMenuProps): ReactNode => {

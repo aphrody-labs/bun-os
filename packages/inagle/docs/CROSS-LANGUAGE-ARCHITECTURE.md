@@ -11,7 +11,7 @@
 +---------------------------------------------------------------------------------+
 |                       USER INTERFACES & WORKSPACE CONSUMERS                     |
 |  - CLI: `inagle <command>`                                                      |
-|  - Web Application: `apps/azalee-web` in aphrody-labs/rosegriffon                 |
+|  - Web Application: external web consumers (separate repositories)                 |
 |  - Shared Components: `packages/ieverse`                                       |
 +---------------------------------------+-----------------------------------------+
                                         |
@@ -70,13 +70,13 @@ See the [current bridge contract](../../../docs/development/INAGLE-NIE-FFI.md).
 ## 3. High-Performance TypeScript Usage
 
 ```typescript
-import { Inagle } from "@rosegriffon/inagle";
+import { Inagle } from "@aphrody/inagle";
 import {
   nieCrc32,
   nieDecompressCrilayla,
   nieProbeHeader,
-} from "@rosegriffon/inagle/ffi";
-import { IecodeDotnet } from "@rosegriffon/inagle/dotnet";
+} from "@aphrody/inagle/ffi";
+import { IecodeDotnet } from "@aphrody/inagle/dotnet";
 
 // 1. Instant header probe
 const probe = nieProbeHeader(rawBuffer);

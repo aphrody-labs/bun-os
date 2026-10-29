@@ -12,7 +12,6 @@ Les choix de développement/build suivent le [contexte](windows-native.md).
 | Propriétaire (yoyo) | `aphrody-dev` | `goku_duo` 281114294152724491 | Yoyo : propriétaire, admin de tout Aphrody Labs |
 | Omar | `KyrioFox` (confirmé par le propriétaire 2026-10-08) | `omlar_` 1527405876695142620 | admin DBFR ; les accès techniques existants ne définissent pas une autorité globale |
 | Bot Aphrody | — | `Aphrody` 1544463751279812740 | ops, annonces |
-| Bot Shenron | — | `Shenron` 1497194276025663680 | dragonballfr.com |
 
 Org GitHub `aphrody-labs` (3 membres, dépôts privés, lecture par défaut). Salon admin : `#admin-console` 1557354144149405806.
 
@@ -21,7 +20,7 @@ Org GitHub `aphrody-labs` (3 membres, dépôts privés, lecture par défaut). Sa
 |---|---|---|---|
 | vps (hub) | 10.200.77.1 | `ssh vps` (ubuntu) | endpoint public 51.77.147.152:51821, `wg-quick@wg1`, fabrique de build, llama-server 8798/8799, bots Discord, downloads |
 | ancien wsl | 10.200.77.2 | — | allocation historique, aucun workflow de développement |
-| dbfr | 10.200.77.3 | `ssh dbfr` (ubuntu) | prod dragonballfr, `wg-quick@wg1` |
+| dbfr | 10.200.77.3 | `ssh dbfr` (ubuntu) | prod, `wg-quick@wg1` |
 | aphro-pc (Windows, propriétaire) | 10.200.77.4 | — | tunnel natif Aphrody (tâche `\Aphrody\Aphrody WG aphro-pc`), MCP HTTP 127.0.0.1:8793 |
 | omar (Windows) | 10.200.77.10 | — | installation en cours via son Codex |
 
@@ -38,7 +37,7 @@ Org GitHub `aphrody-labs` (3 membres, dépôts privés, lecture par défaut). Sa
 ## 7. Build et release
 - `cargo build --release --locked -p aphrody -p aphrody-mcp --features aphrody-mcp/winclean` produit le binaire complet Windows.
 - Release publique : `bun run downloads:publish plan|build|release|verify --revision <sha>` → https://downloads.aphrody.com (`latest.json`). La release publiée au 2026-10-08 (5bf7eed5a) n'a pas encore `wg`/`remote` : nouvelle release en cours.
-- Conteneur de build unique (Aphrody + Shenron) en cours dans `tools/config/container/`, utilisé par le runner self-hosted Shenron du vps.
+- Conteneur de build unique en cours dans `tools/config/container/`.
 
 ## 8. En cours (2026-10-08) — ne pas dupliquer, coordonner
 - Omar : tunnel + remote + MCP + SSH sur son PC (prompt Codex en 8 blocs + étape 12 dans `#admin-console`), jetons à remettre hors Discord.

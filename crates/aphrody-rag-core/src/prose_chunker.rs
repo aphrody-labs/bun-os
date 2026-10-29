@@ -2,8 +2,8 @@
 //! Plain-prose chunker: sentence-boundary splitting at `max_chars` with
 //! `overlap_pct` trailing overlap, ported bit-for-bit (see
 //! [`crate::text::split_sentences_with_offsets`] and
-//! [`crate::text::pack_sentences_with_overlap`]) from shenron's
-//! `apps/bot/scripts/_rag-chunk.ts` `chunkDocument`. This is the whole-file
+//! [`crate::text::pack_sentences_with_overlap`]) from the TypeScript reference's
+//! `_rag-chunk.ts` `chunkDocument`. This is the whole-file
 //! special case of that algorithm: one section, no heading prefix.
 
 use crate::{

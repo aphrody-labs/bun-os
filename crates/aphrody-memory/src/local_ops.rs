@@ -4,8 +4,7 @@
 //! application owns): write, recall, list, delete, clear.
 //!
 //! They back `aphrody memory write|recall|list|delete|clear --db <file>
-//! --agent-id <id>`, the JSON surface a Bun or Tauri host drives (Shenron
-//! Studio keeps its memories in `<SHENRON_HOME>/data/memory.sqlite`).
+//! --agent-id <id>`, the JSON surface a Bun or Tauri host drives.
 //!
 //! Recall is lexical: the query is split into words (lower-cased, Unicode
 //! aware, CJK characters taken one by one), each record scores the share of

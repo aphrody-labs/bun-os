@@ -1,4 +1,4 @@
-# @rosegriffon/inagle
+# @aphrody/inagle
 
 > Universal Game Data API, CRI VFS stream engine, and nie.exe reverse-engineering specification for Inazuma Eleven: Victory Road.
 
@@ -11,7 +11,7 @@
 - [Complete Full Knowledge Base (llms-full.txt)](docs/llms-full.txt): Single-pass token-efficient ingestion context containing all schemas, offsets, format tables, and C-ABI symbols.
 
 ## Core Repositories & Crates
-- Bun OS libraries: `packages/inagle` (Universal API), `packages/inagle-cross` (cross-language data); Rose Griffon apps and Azalee live in [aphrody-labs/rosegriffon](https://github.com/aphrody-labs/rosegriffon)
+- Bun OS libraries: `packages/inagle` (Universal API), `packages/inagle-cross` (cross-language data); web apps built on them live in their own repositories
 - Rust NIE Workspace (`crates/nie/*`): `aphrody-nie-core`, `aphrody-nie-formats`, `aphrody-nie-save`, `aphrody-nie-ffi`
 - C# .NET 10 Solution (`src/IECODE`): `IECODE.Core` (CriFs archive manager), `IECODE.Ffi` (NativeAOT C-ABI export)
 

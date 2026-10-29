@@ -49,10 +49,6 @@ const REPOS: readonly RepoSpec[] = [
     dir: "aphrody",
     role: "Monorepo Rust/Bun : fondations, infrastructure et capacités publiées.",
   },
-  {
-    dir: "shenron",
-    role: "Produit Shenron (dragonballfr.com) et Koharu ; consomme Aphrody par npm et crates.io.",
-  },
   { dir: "iecode", role: "Workspace actif du domaine jeu." },
 ];
 
@@ -391,7 +387,7 @@ function renderRepos(all: readonly RepoFacts[], generatedAt: string, source: str
   lines.push(
     "- Le monorepo `aphrody` contient les domaines Rust/Bun ; ne pas restaurer les anciens checkouts catégoriels.",
     "- Python vit dans `py/` du monorepo, le domaine jeu dans sa racine active vérifiée.",
-    "- Les contextes Agent Home `aphrody`, `dbfr` (Shenron) et `ie` restent distincts.",
+    "- Les contextes Agent Home `aphrody`, `dbfr` et `ie` restent distincts.",
     "- Un seul contexte par domaine est partagé par Claude, Codex, agy et les modèles locaux.",
     "- Les poids, conversations, mémoires et bases utilisateur restent dans leurs stores privés.",
     "",
@@ -459,7 +455,7 @@ export function renderTools(generatedAt: string, home: string, root: string): st
     "Avec APHRODY_AGENT_DOMAIN=aphrody|dbfr|ie, le miroir et la mémoire utilisent le profil choisi ; les sessions non marquées sont exclues.",
     "Les associations PID/session historiques fondées sur cwd et mtime sont heuristiques si plusieurs sessions partagent un cwd.",
     "Les conversations natives restent dans leurs stores privés ; le miroir filtré exige le marqueur de domaine du premier tour utilisateur.",
-    "Pour dbfr/Shenron, le dossier synchronisé Google Drive conserve corpus/poids et entraînements ; vérifier le mapping privé avant de lancer.",
+    "Pour dbfr, le dossier synchronisé Google Drive conserve corpus/poids et entraînements ; vérifier le mapping privé avant de lancer.",
     "",
     "## Inventaire kernel effectif",
     "",

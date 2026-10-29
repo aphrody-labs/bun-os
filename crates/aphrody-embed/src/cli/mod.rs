@@ -3,9 +3,8 @@
 //!
 //! - `aphrody-embed worker`: framed stdio worker for the unified Aphrody bridge.
 //! - `aphrody-embed serve --port <port> [--host <ip>] [--model-dir <dir>] [--threads <n>]`:
-//!   OpenAI-compatible `/v1/embeddings` for the multilingual E5 space (the former
-//!   shenron-embed service). Port and host also come from `APHRODY_EMBED_PORT` /
-//!   `APHRODY_EMBED_HOST` (legacy `APHRODY_SHENRON_EMBED_*`), the model directory from
+//!   OpenAI-compatible `/v1/embeddings` for the multilingual E5 space. Port and host also come from `APHRODY_EMBED_PORT` /
+//!   `APHRODY_EMBED_HOST`, the model directory from
 //!   `APHRODY_EMBED_MODEL_DIR`. Serving never downloads.
 //! - `aphrody-embed install [--model-dir <dir>]`: fetch and verify the pinned E5 files.
 
@@ -41,11 +40,11 @@ fn model_dir(args: &[String]) -> Option<PathBuf> {
 
 fn server_config(args: &[String]) -> Result<ServerConfig, String> {
     let host = flag(args, "--host")
-        .or_else(|| env(&["APHRODY_EMBED_HOST", "APHRODY_SHENRON_EMBED_HOST"]))
+        .or_else(|| env(&["APHRODY_EMBED_HOST"]))
         .unwrap_or_else(|| "127.0.0.1".into());
     let host: IpAddr = host.parse().map_err(|_| format!("invalid host {host}"))?;
     let port = flag(args, "--port")
-        .or_else(|| env(&["APHRODY_EMBED_PORT", "APHRODY_SHENRON_EMBED_PORT"]))
+        .or_else(|| env(&["APHRODY_EMBED_PORT"]))
         .ok_or("set --port or APHRODY_EMBED_PORT")?;
     let port: u16 = port
         .parse()

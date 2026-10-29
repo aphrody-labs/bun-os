@@ -7,7 +7,7 @@
  *
  * The source host owns the image (the VPS builds it). Every other host whose image creation date differs receives it
  * through `docker save | gzip | docker load` over SSH (or the local engine for the PC); images are never pushed
- * to a registry. Private Shenron images stay on their host: only the listed Aphrody images move.
+ * to a registry. Only the listed Aphrody images move.
  */
 export const HOSTS = ["pc", "vps", "dbfr"] as const;
 export type Host = (typeof HOSTS)[number];

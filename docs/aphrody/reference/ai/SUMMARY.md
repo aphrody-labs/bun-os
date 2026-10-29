@@ -60,7 +60,6 @@
 - [Automation-And-Deployment](../../operations/ai/automation_and_deployment.md)
 - [Computer-Use](./computer-use.md)
 - [Config](./config.md)
-- [Databooks-Transcription-Bridge](./databooks-transcription-bridge.md)
 - [Gemini-Embedding-2](./gemini-embedding-2.md)
 - [Google-Interaction-Patterns](./google-interaction-patterns.md)
 - [Jev-Links](./jev-links.md)
@@ -68,7 +67,6 @@
 - [Nanobanana-Extract](./nanobanana-extract.md)
 - [Nanobanana-Pro](./nanobanana-pro.md)
 - [Python-Image-Toolchain](./python-image-toolchain.md)
-- [Rag-Benchmark](../../research/ai/rag-benchmark.md)
 - [Rag-Unified-Pattern](./rag-unified-pattern.md)
 - [Training](./training.md)
 

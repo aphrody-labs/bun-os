@@ -1,10 +1,9 @@
 # syntax=docker/dockerfile:1.8
 # SPDX-License-Identifier: Apache-2.0
 #
-# aphrody-build: the single VPS build image for Aphrody and Shenron.
+# aphrody-build: the single VPS build image for Aphrody.
 # Build it with scripts/aphrody/build/container/aphrody-build.ts image (pins read from rust-toolchain.toml,
-# package.json#packageManager and Cargo.lock); run builds with `aphrody-build.ts run` (Aphrody) or
-# Shenron's scripts/aphrody/build/container.ts. Neither copies a checkout, an env file or a secret into the image:
+# package.json#packageManager and Cargo.lock); run builds with `aphrody-build.ts run`. It copies no checkout, env file or secret into the image:
 # sources are bind mounted, caches are named volumes, tokens arrive as runtime environment names.
 #
 # Contents: Rust (pinned channel, every target/component of rust-toolchain.toml: Linux, Windows MSVC,
@@ -81,7 +80,7 @@ RUN curl -fsSL https://bun.com/install \
  && curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | env UV_INSTALL_DIR=/usr/local/bin INSTALLER_NO_MODIFY_PATH=1 sh \
  && uv --version
 
-# Private Git dependencies (aphrody-labs/aphrody pinned by revision in Shenron): the system credential
+# Private Git dependencies (aphrody-labs/aphrody pinned by revision): the system credential
 # helper answers for github.com from APHRODY_GIT_TOKEN, passed at run time by name only; nothing stored.
 RUN git config --system credential.https://github.com.helper \
       '!f() { test "$1" = get && test -n "${APHRODY_GIT_TOKEN:-}" && printf "username=x-access-token\npassword=%s\n" "$APHRODY_GIT_TOKEN"; }; f'
@@ -107,7 +106,7 @@ ENV CARGO_HOME=/cache/cargo \
     APHRODY_CLOUD=1 CONTAINER=true HOME=/tmp/home \
     NEXT_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1
 LABEL org.opencontainers.image.title="aphrody-build" \
-      org.opencontainers.image.description="Aphrody/Shenron VPS build image" \
+      org.opencontainers.image.description="Aphrody VPS build image" \
       org.opencontainers.image.licenses="Apache-2.0" \
       dev.aphrody.rust="${RUST_CHANNEL}" dev.aphrody.bun="${BUN_VERSION}" dev.aphrody.bun-release="${BUN_RELEASE_VERSION}" \
       dev.aphrody.wasm-bindgen="${WASM_BINDGEN_VERSION}"

@@ -170,7 +170,7 @@ BatchMode tests from the workstation:
 | `vps` | OK |
 | `bun-forge` | OK (authenticated as `aphrody-dev`, key `aphrody-owner-pc`) |
 | `github.com` | OK (`aphrody-dev`) |
-| `dbfr` / `shenron` | OK |
+| `dbfr` | OK |
 | `omar` | Timeout |
 
 `omar` (10.200.77.10) is offline: its last WireGuard handshake was 4 h 25 min earlier, so the
@@ -197,8 +197,7 @@ VPS:
 - Docker 29.7.2.
 - Disk: `/` at 88 % (36 GB free); `/home` at 82 %.
 - Docker reclaimable space: 24 GB of images, 23 GB of volumes, 5 GB of build cache.
-- Failed user units: `bun-release-{linux,windows}-x64`, `depot-tools-update`,
-  `shenron-auto-deploy`, `shenron-sync`.
+- Failed user units: `bun-release-{linux,windows}-x64`, `depot-tools-update`.
 - `sdc1` (305 GB) is device 2 of the `/home` btrfs (`btrfs filesystem show /home`), so its writes
   are `/home` writes. `sdb` and `sdc` each saturate at 250 IOPS, which looks like a provider cap.
 
@@ -211,7 +210,7 @@ VPS:
   - new `--host=<alias>` / `APHRODY_CATALOG_HOST` filter;
   - stale header and usage text.
   - On the VPS (`--host=vps`), the report is degraded. Most catalog units are not installed
-    (`loaded:false`) and `shenron-mcp` is a duplicate id. This is catalog drift for the owner
+    (`loaded:false`) and a duplicate id exists. This is catalog drift for the owner
     to reconcile.
 - `host-apps.ts` fixed: the repository root depth and the container compose path
   (`tools/aphrody/config/container/compose.yaml`). The dry run now resolves every source.

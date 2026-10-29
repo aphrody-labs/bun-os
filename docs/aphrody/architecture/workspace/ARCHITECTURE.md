@@ -18,7 +18,7 @@ layout; they are not current checkout instructions.
 
 Bun OS is one product, including its runtime, AI, UI, Infra, Workspace and
 imported application domains. These capability names do not reserve separate
-products or exclude Shenron from integration. Canonical members belong to the
+products or exclude imported domains from integration. Canonical members belong to the
 root `crates/`, `packages/` and `apps/` graph; imported histories, licenses and
 service-specific contracts remain with their actual source owners until their
 migration is qualified. Host and production permissions remain explicit and
@@ -39,8 +39,6 @@ history under `upstream/`.
 | CLI | [Command owner](../../../../crates/aphrody-command): argument handling and invocation of capability owners |
 | Infra and Workspace | [Workspace implementation](../../../../packages/bun-workspace), [root Infra configuration](../../../../infra/config): inventories, orchestration and operations within Bun OS |
 | UI | [M3](../../../../packages/m3), [App UI](../../../../packages/app-ui): canonical flat source owners, not a sibling product |
-| RG contracts | [Auth](https://github.com/aphrody-labs/rosegriffon/tree/main/packages/rg-auth), [DB](https://github.com/aphrody-labs/rosegriffon/tree/main/packages/rg-db): owned by the separate Rose Griffon workspace |
-| Shenron contracts | [Auth](../../../../packages/shenron-auth), [DB](../../../../packages/shenron-db), [Admin UI](../../../../packages/admin-ui): restored owners; missing host adapters and production qualification remain explicit |
 
 This is a verified source navigation subset, not an exhaustive qualification
 matrix. The root manifests and source inventory resolve all other capability
@@ -105,6 +103,6 @@ records declared commands; actual exit codes, logs and coverage establish
 passing gates. Missing qualification scripts need real checks.
 
 The root plan requires owner checks, real FFI tests, browser import/build
-qualification, RAG parity, application smoke tests and assembled Shenron
+qualification, RAG parity, application smoke tests and assembled application
 validation. A production deployment is a separate operation. Record scope and
 limits with every result; document edits alone do not qualify the runtime.

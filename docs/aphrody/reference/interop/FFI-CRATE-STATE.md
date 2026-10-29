@@ -1,4 +1,4 @@
-<!-- docs-links: external-paths — backtick paths in this dated document name files of the repository at the time it records (Shenron and Koharu moved to aphrody-labs/shenron on 2026-10-05), not of this checkout. -->
+<!-- docs-links: external-paths — backtick paths in this dated document name files of the repository at the time it records (Koharu moved out of this repository on 2026-10-05), not of this checkout. -->
 # FFI crate state (factual inventory)
 
 Generated 2026-10-02 by static inspection only (no cargo run). Method and limits are at the end. Counts are the output of the scripts described in "Method"; "unverified" marks what was not checked.
@@ -22,8 +22,8 @@ Columns: Kind = lib/bin/cdylib targets; FFI = how the crate reaches the single `
 
 | Path | Package | Kind | FFI | Bun consumer | Tests | Stubs | Gates (wasm/win) | Membership |
 |---|---|---|---|---|---:|---:|---|---|
-| `crates/infra/aphrody` | `aphrody` | lib+bin*1 | aphrody_run / run_json / run_captured (CLI surface in-process; direct dep) | @aphrody/bun (engine.ts); shenron_run* too | 231 | 0/0 | 173/41 | member(glob) |
-| `crates/ai/agent-home` | `aphrody-agent-home` | lib | linked (direct dep); shenron persona/auth adapters | @aphrody/bun/shenron (engine.ts) | 111 | 0/0 | 17/2 | member(glob) |
+| `crates/infra/aphrody` | `aphrody` | lib+bin*1 | aphrody_run / run_json / run_captured (CLI surface in-process; direct dep) | @aphrody/bun (engine.ts) | 231 | 0/0 | 173/41 | member(glob) |
+| `crates/ai/agent-home` | `aphrody-agent-home` | lib | linked (direct dep) | @aphrody/bun (engine.ts) | 111 | 0/0 | 17/2 | member(glob) |
 | `crates/ai/agent-runtime` | `aphrody-agent-runtime` | lib | linked transitively, no C symbols | - | 37 | 0/0 | 0/6 | member(glob) |
 | `crates/ai/agent-tools` | `aphrody-agent-tools` | lib | linked transitively, no C symbols | - | 39 | 0/0 | 0/13 | member(glob) |
 | `crates/ai/ai` | `aphrody-ai` | lib | linked transitively, no C symbols | - | 0 | 0/0 | 0/0 | member(glob) |
@@ -62,7 +62,7 @@ Columns: Kind = lib/bin/cdylib targets; FFI = how the crate reaches the single `
 | `crates/ai/prompts` | `aphrody-prompts` | lib | linked transitively, no C symbols | - | 14 | 0/0 | 0/0 | member(glob) |
 | `crates/ai/providers` | `aphrody-providers` | lib | linked transitively, no C symbols | - | 12 | 0/0 | 0/0 | member(glob) |
 | `crates/ai/rag` | `aphrody-rag` | lib | linked transitively, no C symbols | - | 54 | 0/0 | 0/0 | member(glob) |
-| `crates/ai/rag-core` | `aphrody-rag-core` | lib | shenron_rag_* adapters in aphrody-ffi (direct dep) | @aphrody/bun (engine.ts) | 71 | 0/0 | 1/0 | member(glob) |
+| `crates/ai/rag-core` | `aphrody-rag-core` | lib | rag adapters in aphrody-ffi (direct dep) | @aphrody/bun (engine.ts) | 71 | 0/0 | 1/0 | member(glob) |
 | `crates/ai/rag-eval` | `aphrody-rag-eval` | lib+bin*1 | linked transitively, no C symbols | - | 21 | 0/0 | 0/0 | member(glob) |
 | `crates/ai/rag-python` | `aphrody-rust` | lib+cdylib | pyo3 cdylib (Python, not Bun) | - | 0 | 0/0 | 0/0 | member(glob) |
 | `crates/ai/rollout` | `aphrody-rollout` | lib | linked transitively, no C symbols | - | 14 | 0/0 | 0/0 | member(glob) |
@@ -109,7 +109,7 @@ Columns: Kind = lib/bin/cdylib targets; FFI = how the crate reaches the single `
 | `crates/infra/ssh` | `aphrody-ssh` | lib+bin*1 | linked transitively, no C symbols | - | 45 | 0/0 | 0/4 | member(glob) |
 | `crates/infra/vpn` | `aphrody-vpn` | lib | linked transitively, no C symbols | - | 3 | 0/0 | 0/4 | member(glob) |
 | `crates/infra/yolo` | `aphrody-yolo` | lib+bin*2 | not linked | - | 10 | 0/0 | 0/1 | member(glob) |
-| `crates/interop/ffi` | `aphrody-ffi` | lib+cdylib | aphrody_run*, shenron_*, manga_*, aphrody_web_*, aphrody_zerocopy_* (own C symbols) | @aphrody/bun: library.ts, engine.ts, manga.ts, n2b.ts, zerocopy.ts | 50 | 0/0 | 11/0 | member(glob) |
+| `crates/interop/ffi` | `aphrody-ffi` | lib+cdylib | aphrody_run*, manga_*, aphrody_web_*, aphrody_zerocopy_* (own C symbols) | @aphrody/bun: library.ts, engine.ts, manga.ts, n2b.ts, zerocopy.ts | 50 | 0/0 | 11/0 | member(glob) |
 | `crates/koharu/koharu` | `koharu` | lib+bin*1 | 1 no_mangle but not linked into aphrody-ffi | - | 10 | 0/0 | 0/3 | member(glob) |
 | `crates/koharu/koharu-agent` | `koharu-agent` | lib | linked transitively, no C symbols | - | 1 | 0/0 | 0/0 | member(glob) |
 | `crates/koharu/koharu-app` | `koharu-app` | lib+bin*1 | not linked | - | 0 | 0/0 | 0/1 | member(glob) |

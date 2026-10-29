@@ -14,13 +14,13 @@ import { NIE_CRITICAL_OFFSETS, NIE_CRYPTO_CONSTANTS, NIE_RTTI_CLASSES } from "./
  */
 export function getLlmIndexDocument(): LlmIndexDocument {
   return {
-    projectName: "@rosegriffon/inagle",
+    projectName: "@aphrody/inagle",
     version: "2.0.4",
     description:
       "Universal Game Data API, CRI VFS stream engine, and nie.exe reverse-engineering specification for Inazuma Eleven: Victory Road.",
     updatedAt: "2026-10-01",
     quickstartPrompt:
-      "You are working on Inazuma Eleven: Victory Road reverse engineering and data extraction. Use @rosegriffon/inagle/docs for authoritative format signatures, CPK decryption rules, nie.exe memory offsets, and cross-language FFI bindings across Bun, Rust, and .NET.",
+      "You are working on Inazuma Eleven: Victory Road reverse engineering and data extraction. Use @aphrody/inagle/docs for authoritative format signatures, CPK decryption rules, nie.exe memory offsets, and cross-language FFI bindings across Bun, Rust, and .NET.",
     sections: {
       Architecture: [
         {
@@ -91,7 +91,7 @@ export function generateLlmsTxt(): string {
 - [Complete Full Knowledge Base (llms-full.txt)](docs/llms-full.txt): Single-pass token-efficient ingestion context containing all schemas, offsets, format tables, and C-ABI symbols.
 
 ## Core Repositories & Crates
-- Bun OS libraries: \`packages/inagle\` (Universal API), \`packages/inagle-cross\` (cross-language data); Rose Griffon apps and Azalee live in [aphrody-labs/rosegriffon](https://github.com/aphrody-labs/rosegriffon)
+- Bun OS libraries: \`packages/inagle\` (Universal API), \`packages/inagle-cross\` (cross-language data); web apps built on them live in their own repositories
 - Rust NIE Workspace (\`crates/nie/*\`): \`aphrody-nie-core\`, \`aphrody-nie-formats\`, \`aphrody-nie-save\`, \`aphrody-nie-ffi\`
 - C# .NET 10 Solution (\`src/IECODE\`): \`IECODE.Core\` (CriFs archive manager), \`IECODE.Ffi\` (NativeAOT C-ABI export)
 
@@ -308,10 +308,10 @@ Runtime Memory Structures & Layouts:
 Using Inagle in Bun TypeScript:
 --------------------------------------------------------------------------------
 \`\`\`typescript
-import { Inagle } from "@rosegriffon/inagle";
-import { nieCrc32, nieDecompressCrilayla } from "@rosegriffon/inagle/ffi";
-import { IecodeDotnet } from "@rosegriffon/inagle/dotnet";
-import { getVfsCatalog, resolveFormat } from "@rosegriffon/inagle/docs";
+import { Inagle } from "@aphrody/inagle";
+import { nieCrc32, nieDecompressCrilayla } from "@aphrody/inagle/ffi";
+import { IecodeDotnet } from "@aphrody/inagle/dotnet";
+import { getVfsCatalog, resolveFormat } from "@aphrody/inagle/docs";
 
 // 1. Inspect format magic
 const fmt = resolveFormat("G4TX");

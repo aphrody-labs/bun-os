@@ -21,9 +21,9 @@ const windows = process.platform === "win32";
 
 const config: GatewayConfig = {
   home: "C:/Users/owner/.aphrody",
-  sourceConfig: "C:/shenron/deploy/docker/compose-gateway.nginx.conf",
+  sourceConfig: "C:/aphrody/deploy/docker/compose-gateway.nginx.conf",
   registry: "C:/ProgramData/Aphrody/site/run/native-services/site.json",
-  container: "shenron-gateway",
+  container: "aphrody-gateway",
   serverNames: ["localhost", "aphrody.local"],
 };
 
@@ -32,7 +32,7 @@ events { worker_connections 1024; }
 http {
     # a } in a comment and "a { in quotes" are not structure
     map $http_upgrade $connection_upgrade { default upgrade; '' close; }
-    server { listen 80; server_name shenron.local; location / { return 204; } }
+    server { listen 80; server_name gateway.local; location / { return 204; } }
 }
 `;
 
@@ -85,7 +85,7 @@ describe("gateway text", () => {
       return candidateText(base, httpClosing(base), rendered);
     };
     const first = once(gateway);
-    expect(first).toContain("server_name shenron.local;");
+    expect(first).toContain("server_name gateway.local;");
     expect(first).toContain(`${BEGIN}\n${rendered}\n${END}\n}`);
     expect(stripOwnedBlock(first).marked).toBe(1);
     expect(once(first)).toBe(first);
@@ -98,8 +98,8 @@ describe("gateway text", () => {
   });
 
   test("Docker Desktop bind sources map back to host paths", () => {
-    expect(hostPath("/run/desktop/mnt/host/c/shenron/deploy/x.conf")).toBe("c:/shenron/deploy/x.conf");
-    expect(hostPath("C:\\shenron\\x.conf")).toBe("C:\\shenron\\x.conf");
+    expect(hostPath("/run/desktop/mnt/host/c/aphrody/deploy/x.conf")).toBe("c:/aphrody/deploy/x.conf");
+    expect(hostPath("C:\\aphrody\\x.conf")).toBe("C:\\aphrody\\x.conf");
   });
 });
 

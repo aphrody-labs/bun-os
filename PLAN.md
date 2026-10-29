@@ -25,9 +25,6 @@ Component index (owners, entry commands, CI jobs, pins, status, announced-but-pe
 - Product source is organized under `apps/`, `crates/` and `packages/`.
   Upstream projects and independently owned code retain their source boundaries
   and licenses.
-- Rose Griffon application source belongs to `aphrody-labs/rosegriffon`.
-  Bun OS no longer contains its application/package copies; the integration
-  state is documented in `docs/ROSEGRIFFON.md`.
 - The root Cargo workspace is not yet the sole Rust workspace. For example,
   `apps/aphrody-drive` and `packages/bun-tauri` declare nested workspaces, and
   the root manifest excludes them. Do not report Cargo consolidation complete.

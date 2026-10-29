@@ -27,7 +27,6 @@ Supprimer la dépendance externe à l'environnement Bun/Zig/Chromium de BXC en t
 | **Frontier & File d'attente** | `queue/sharded/`, SQLite FTS5 | `web-crawl::Frontier` (SQLite WAL) | ✅ Porté : Frontier persistante SQLite WAL multi-host avec OPIC scoring. |
 | **Scraper FUT** | `cli/fut.ts`, `scrapers/fut.ts` | `@aphrody/fut` (TypeScript local) | Traité : Délégation pure locale TS/Bun sans binaire BXC. |
 | **Scrapers Anime / Streaming**| `scrapers/voiranime.ts`, `animesama.ts` | `web-extract::media::streaming` | ✅ Porté : Extracteur Rust natif `extract_streaming_players` (DOM + JS regex). |
-| **Dragon Ball Portal** | `sources/dragonball.ts`, `archive/` | `shenron-pipeline` TS & tools MCP | ✅ Porté : Intégré nativement dans les MCP et plugins Shenron. |
 | **Archives Web & Wayback** | `archive/`, `cli/archive.ts` | `crates/ai/mcp/src/public_web_tools.rs` | ✅ Porté : Outils natifs Rust `aphrody_archive_wayback`. |
 | **Enregistreur HAR** | `cli/har.ts` | `obscura-net::har` | ✅ Porté : Structures RFC HAR 1.2, export et `from_exchange` en Rust pur. |
 | **CAPTCHA Solving** | `captcha/` (CapSolver, 2Captcha, Turnstile) | `web-service` | In-process native browser automation via `aphrody_web_service`. |

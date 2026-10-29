@@ -243,14 +243,18 @@ pub const CDN_BASE: &str = "https://cdn.rosegriffon.fr";
 /// Configuration des URI de textures (permet de surcharger le CDN de base en test).
 #[derive(Debug, Clone)]
 pub struct TextureUriConfig {
-    /// Préfixe CDN (défaut : [`CDN_BASE`]).
+    /// Préfixe CDN (défaut : variable d'environnement `NIE_CDN_BASE`, sinon [`CDN_BASE`]).
     pub cdn_base: String,
 }
 
 impl Default for TextureUriConfig {
     fn default() -> Self {
         Self {
-            cdn_base: CDN_BASE.to_string(),
+            cdn_base: std::env::var("NIE_CDN_BASE")
+                .ok()
+                .map(|v| v.trim().trim_end_matches('/').to_string())
+                .filter(|v| !v.is_empty())
+                .unwrap_or_else(|| CDN_BASE.to_string()),
         }
     }
 }

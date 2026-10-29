@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://rosegriffon.fr/schemas/vfs/rdbn.schema.json",
+  "$id": "https://aphrody.com/schemas/vfs/rdbn.schema.json",
   "title": "RdbnDatabaseSchema",
   "description": "Validation schema for Level-5 RDBN (cfg.bin / T2B) relational database sheets.",
   "type": "object",

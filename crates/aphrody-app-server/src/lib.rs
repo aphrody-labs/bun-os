@@ -2577,7 +2577,7 @@ wire_api = "chat"
                 0,
                 None,
                 None,
-                "Shenron retrieval is isolated per Aphrody profile.",
+                "Profile retrieval is isolated per Aphrody profile.",
                 1,
                 1,
                 10,
@@ -2589,7 +2589,7 @@ wire_api = "chat"
         let search = request(
             &mut server,
             "aphrody/rag/search",
-            json!({"query": "Shenron retrieval", "topK": 3}),
+            json!({"query": "Profile retrieval", "topK": 3}),
         )
         .await;
         assert_eq!(search["result"]["results"][0]["path"], "notes.md");
@@ -2597,14 +2597,14 @@ wire_api = "chat"
         let context = request(
             &mut server,
             "aphrody/rag/context",
-            json!({"query": "Shenron retrieval", "maxTokens": 100}),
+            json!({"query": "Profile retrieval", "maxTokens": 100}),
         )
         .await;
         assert!(
             context["result"]["promptContext"]
                 .as_str()
                 .unwrap()
-                .contains("Shenron retrieval")
+                .contains("Profile retrieval")
         );
         assert_eq!(context["result"]["sources"], json!(["notes.md"]));
 
@@ -2694,25 +2694,25 @@ name = "Deterministic test provider"
 base_url = "http://127.0.0.1:9/v1"
 wire_api = "chat"
 
-[profiles.shenron]
-model = "shenron-model"
+[profiles.worker]
+model = "worker-model"
 model_provider = "fixture"
 "#,
         )
         .unwrap();
         let mut server = AppServer::with_home(base.path());
-        request(&mut server, "initialize", json!({"profile": "shenron"})).await;
+        request(&mut server, "initialize", json!({"profile": "worker"})).await;
         server.handle(r#"{"method":"initialized"}"#).await.unwrap();
         let started = request(&mut server, "thread/start", json!({})).await;
-        assert_eq!(started["result"]["thread"]["model"], "shenron-model");
+        assert_eq!(started["result"]["thread"]["model"], "worker-model");
         assert_eq!(
             server.home,
-            base.path().join("workspace-shenron"),
+            base.path().join("workspace-worker"),
             "profile state must be derived from the base without replacing it for config loading"
         );
         let id = started["result"]["thread"]["id"].clone();
         request(&mut server, "thread/close", json!({"threadId": id})).await;
-        assert!(base.path().join("workspace-shenron/sessions").is_dir());
+        assert!(base.path().join("workspace-worker/sessions").is_dir());
         assert!(!base.path().join("sessions").exists());
     }
 

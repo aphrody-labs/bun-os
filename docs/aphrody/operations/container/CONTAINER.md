@@ -18,7 +18,7 @@ image stays independent of GNU binaries.
 | File                                                                                                  | Role                                                                                      |
 | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | [tools/config/container/Dockerfile](../../../../tools/aphrody/config/container/Dockerfile)                       | `runtime`, `dev`, `wasm-toolchain`, portable `wasm-artifacts`, and full `release-builder` |
-| [tools/config/container/build/Dockerfile](../../../../tools/aphrody/config/container/build/Dockerfile)           | `aphrody-build`: the VPS build image shared by Aphrody and Shenron (see below)            |
+| [tools/config/container/build/Dockerfile](../../../../tools/aphrody/config/container/build/Dockerfile)           | `aphrody-build`: the VPS build image (see below)            |
 | [tools/config/container/desktop/Dockerfile](../../../../tools/aphrody/config/container/desktop/Dockerfile)       | Ubuntu GTK4/CEF builder and non-root desktop runtime                                      |
 | [tools/config/container/aphrody-os/Dockerfile](../../../../tools/aphrody/config/container/aphrody-os/Dockerfile) | Alpine musl Bun runtime, CLI userland, and COSMIC desktop                                 |
 | [tools/config/container/entrypoint.sh](../../../../tools/aphrody/config/container/entrypoint.sh)                 | Selects `mcp`, `api`, `yolo`, `aphrody` or `shell`                                        |
@@ -66,7 +66,7 @@ compatible with Bun's JavaScriptCore and browser engines.
 
 ## VPS build image (`aphrody-build`)
 
-One build image serves Aphrody and Shenron on the VPS factory:
+One build image serves the VPS factory:
 [tools/config/container/build/Dockerfile](../../../../tools/aphrody/config/container/build/Dockerfile), driven by
 [scripts/build/container/aphrody-build.ts](../../../../scripts/aphrody/build/container/aphrody-build.ts). Its build context is that
 directory only: no checkout, env file or secret enters the image.
@@ -82,15 +82,14 @@ directory only: no checkout, env file or secret enters the image.
 It covers `aws-lc-sys` (cmake, clang, nasm), the WireGuard crates (`defguard_wireguard_rs` netlink and boringtun are
 pure Rust), remote desktop/VNC (`rustvncserver`, `vnc-rs`, `x11rb` and `jpeg-encoder` are pure Rust), Windows MSVC
 cross builds such as `aphrody-mcp --features winclean` through `cargo xwin` (the MSVC CRT/SDK download is cached in
-a volume), Dragon Pixel and Koharu wasm32 and Shenron's Bun builds. Linux links use clang + mold.
+a volume), Dragon Pixel and Koharu wasm32 and Bun builds. Linux links use clang + mold.
 
 Base choice (2026-10-09): Ubuntu 26.04 LTS has the newest glibc of the candidates checked on the VPS (2.43; Fedora 43
 2.42, Debian 13 2.41) and is the OS of both deployment hosts (vps, dbfr), so artifacts built here run there
 natively; a binary linked against glibc 2.43 does not run on older distributions. The MSVC STL that cargo-xwin
 fetches requires clang-cl 19 or newer; Windows C/C++ is compiled for x86-64-v2 (`-msse4.2 -mpopcnt`, the Windows 11
 24H2 baseline) because clang-cl needs the ISA enabled for SSE4.1 intrinsics. `CMAKE_POLICY_VERSION_MINIMUM=3.5` keeps
-vendored CMake projects that predate CMake 4 building. Private GitHub dependencies (Shenron pins
-`aphrody-labs/aphrody`) authenticate through the image's system credential helper with `APHRODY_GIT_TOKEN`, which
+vendored CMake projects that predate CMake 4 building. Private GitHub dependencies authenticate through the image's system credential helper with `APHRODY_GIT_TOKEN`, which
 `run` resolves from the caller (`APHRODY_GIT_TOKEN`, `GH_TOKEN`, `GITHUB_TOKEN`, then `gh auth token`) and passes by
 name only.
 
@@ -100,13 +99,13 @@ bun scripts/build/container/aphrody-build.ts run -- scripts/build/rust/cargo-ser
 bun scripts/build/container/aphrody-build.ts run --target-volume aphrody -- cargo xwin check --target x86_64-pc-windows-msvc -p aphrody-mcp --features winclean
 ```
 
-Run contract (also implemented by Shenron's `scripts/build/container.ts` (not in repo)):
+Run contract:
 
 - The checkout is bind mounted at its own absolute path; the process runs as the caller's uid/gid plus the shared
   `aphrody-build` group (gid 1500) with umask 002, `--cap-drop ALL`, `no-new-privileges` and `--init`.
 - Caches are named volumes on the system disk (the release disk is nearly full): `aphrody-build-cargo` (registry and git),
   `-sccache` (local disk, 20 GiB cap), `-bun`, `-xwin`, `-xdg`. Volume roots are setgid and group writable, so
-  `ubuntu` (releases) and `shenron-build` (runner) share them. `--target-volume NAME` moves `CARGO_TARGET_DIR` to
+  `ubuntu` (releases) and the runner user share them. `--target-volume NAME` moves `CARGO_TARGET_DIR` to
   `aphrody-build-target-NAME` for checkouts that CI cleans between jobs.
 - Limits: `--cpus` 6 (`APHRODY_BUILD_CPUS`, at most 6), `--memory` 16g without swap (`APHRODY_BUILD_MEMORY`),
   `--cpu-shares 512`, `--pids-limit 8192` and `--oom-score-adj 500`, so earlyoom and the kernel kill a build before

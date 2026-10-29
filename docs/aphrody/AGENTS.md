@@ -13,8 +13,7 @@ directives still take precedence.
 
 # Aphrody repository instructions
 
-**Before any code change, read [START-HERE.md](START-HERE.md)** (team, rules, hosts, tunnel, remote control,
-work in progress; shared with Shenron).
+**Before any code change, read [START-HERE.md](START-HERE.md)** (team, rules, hosts, tunnel, remote control, work in progress).
 
 ## Authority and scope
 
@@ -100,8 +99,6 @@ glue; shared M3 and Tauri framework sources are external.
 - Bun: `packages/<domain>/<package>`; installation/admin/creator are modules of `packages/infra/product`.
 - No first-party `apps/` or `community/` tree: fold product surfaces into their product owner; consume shared UI from Material packages.
 - Docs: `docs/<category>/<domain>`; scripts: `scripts/{audit,build,dev,migration,release,tools}`.
-- Infra: `tools/config/host/` (`inventory/`, `systemd/`, `nginx/`, `rg/`, `nie/`, Shenron host plane); live
-  audits: `scripts/audit/live*`. Shenron and Koharu source live in `aphrody-labs/shenron`.
 
 [Rust naming](docs/architecture/rust-crate-naming.md) applies. Package/library/
 binary/CLI/schema/permission identities are compatibility contracts.
@@ -246,11 +243,7 @@ and shared caches. Never format, repartition, or wipe a disk as part of storage
 cleanup. If a filesystem or checkout cannot be fully inspected, keep it and
 record the blocker; do not treat unknown as empty.
 
-Never stage secrets, private data, database contents, model weights or build output.
-No AI bots/apps added to organizations/repositories. Commits:
-`aphrody-dev <contact@aphrody.com>`, no assistant attribution/coauthor.
-Push only existing authorized remotes. Active orgs: aphrody-labs, rose-griffon.
-Public publication (npm, releases, downloads) and host apply are authorised by the owner directive of 2026-10-07; no secret, credential or database content is ever staged or published.
+Never stage secrets, private data, database contents, model weights or build output. No AI bots/apps added to organizations/repositories. Commits: `aphrody-dev <contact@aphrody.com>`, no assistant attribution/coauthor. Push only existing authorized remotes. Public publication (npm, releases, downloads) and host apply are authorised by the owner directive of 2026-10-07; no secret, credential or database content is ever staged or published.
 
 ## Optimization and migrations
 

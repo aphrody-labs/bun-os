@@ -14,7 +14,6 @@ Evidence lives in [MEMORY.md](../../MEMORY.md), [PLAN.md](../../PLAN.md) and the
 | `aphrody-labs/aphrody` | the monorepo (this one), branch `main` |
 | `aphrody-labs/bun` | Bun fork pinned for Yolo (draft PR #1 merges upstream) |
 | `aphrody-labs/vu` | Python runtime `vu` (uv, ruff, PyO3 forks), plan [docs/plans/vu/PLAN.md](../../plans/vu/PLAN.md) |
-| `aphrody-labs/shenron` | Shenron site, bot, API, MCP (dragonballfr.com) |
 | `aphrody-labs/plugins`, `plugin-aphrody`, `plugin-yolo` | Claude plugins (submodules) |
 | `aphrody-labs/uv`, `ruff`, `pyo3`, `deno` | forks pinned by `vu` and the arena |
 | not attached on purpose | `iecode` (keeps its own repository and authority), `taffy` (now integrated in `crates/ui/taffy`) |
@@ -39,7 +38,7 @@ Evidence lives in [MEMORY.md](../../MEMORY.md), [PLAN.md](../../PLAN.md) and the
 
 No secret, cookie, token, database content or transcript in any repository or message. Owner directive 2026-10-07 lifts the publication and host-apply prohibitions. No
 visibility change, no public publication beyond the owner-ordered downloads. No destructive action on production
-data or hosts (dbfr: Shenron nginx, PostgreSQL, Redis, `/home/ubuntu/apps/shenron`). Heavy Rust beyond 4 CPU goes to the VPS
+data or hosts (dbfr: nginx, PostgreSQL, Redis). Heavy Rust beyond 4 CPU goes to the VPS
 factory. Preserve other sessions: `.coord/claims` is local to the owner machine, so check `git log` on a path
 before editing it and log what you take in [CLOUD-SYNC.md](CLOUD-SYNC.md).
 

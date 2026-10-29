@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Local chat for desktop applications
 
-The contract an application (Shenron Studio first) uses to ship a local chat model, a chat
+The contract an application uses to ship a local chat model, a chat
 router and a local memory, through the `aphrody` binary it already carries. Every command prints
 one JSON object per line on stdout; diagnostics go to stderr. Owners: `aphrody-llama-server`
 (`local_chat`, `router`, `chat_cli`), `aphrody-models` (catalog, store), `aphrody-memory`
@@ -67,8 +67,8 @@ aphrody llama router --home <dir> --config router.json [--bind 127.0.0.1:0] \
 {
   "catalog": "/path/product-catalog.json",
   "models": [
-    { "backend": "llama", "id": "shenron-chat-v2", "model": "qwen3-4b-instruct-2507-q4km",
-      "lora": [{ "spec": "file:/app/models/shenron-chat-v2.gguf", "sha256": "aab48535…", "scale": 1.0 }],
+    { "backend": "llama", "id": "product-chat-v2", "model": "qwen3-4b-instruct-2507-q4km",
+      "lora": [{ "spec": "file:/app/models/product-chat-v2.gguf", "sha256": "aab48535…", "scale": 1.0 }],
       "ctx": 8192 },
     { "backend": "llama", "id": "gemma-4-e2b", "model": "gemma-4-e2b-it-q4km", "ctx": 8192 },
     { "backend": "gemini-web", "id": "gemini-web/flash", "variant": "flash", "language": "fr" },

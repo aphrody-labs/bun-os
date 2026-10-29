@@ -83,7 +83,6 @@
     "paths:audit": "bun packages/engine/yolo/src/index.ts ops path-audit",
     "paths:fix": "bun packages/engine/yolo/src/index.ts ops path-audit --apply",
     "env:example:sync": "bun scripts/audit/workspace/env-inventory.ts",
-    "db:compare": "bun scripts/audit/infra/db-compare/compare-rg-shenron.ts",
     "infra:pipeline:sync": "bun packages/engine/yolo/src/index.ts ops pipeline-catalog --root . --apply",
     "docs": "bun packages/engine/yolo/src/index.ts ops docs",
     "docs:audit": "bun packages/engine/yolo/src/index.ts ops docs audit --root . --json",

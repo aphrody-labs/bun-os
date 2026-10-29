@@ -44,32 +44,11 @@ administration and was inspected read-only.
   volume remains full. Its pruning plan only removes unreferenced Docker images
   and build cache older than seven days; that plan recovered no Docker space.
 - DBFR was not modified. Its root volume is 75% used with about 25 GiB free;
-  all declared Shenron site, bot, PostgreSQL, Redis, gateway, MCP and worker
-  containers reported healthy, and no systemd units were failed. A HEAD request
-  to `https://dragonballfr.com` from DBFR returned HTTP 200. The host audit's
-  `nginx` system-unit finding remains separate from this external probe.
-- The existing Dragon Ball FR profile had pointed at the legacy
-  `ka1038251-ovh` account and zero VPS. The new profile was verified and
-  corrected to the OVH account `gl839461-ovh`, which owns `dragonballfr.com`
-  (domain, zone and email service) and one VPS. Credentials are outside the
-  repository: `~/.config/ovh/dbfr.conf` has owner/SYSTEM-only ACLs, with a
-  CurrentUser-DPAPI copy under `~/.aphrody/auth/ovh/`. The separately supplied
-  OAuth service-account pair is also DPAPI-protected. The legacy `.ovh.conf`
-  was left unchanged.
-- On the corrected profile, `auth status` succeeded; the domain is `ok`,
-  auto-renewing, DNSSEC-enabled and transfer-locked through 2027-05-31. The
-  service watch returned exit 0 with no alerts, 54 DNS records were verified,
-  and one VPS was listed with automatic renewal through 2027-07-07.
+  all declared containers reported healthy, and no systemd units were failed.
+  The host audit's `nginx` system-unit finding remains separate.
 - Two local OVH read-only scheduled audits are now registered at logon and
   every six hours as the interactive owner at Limited privilege with a
-  five-minute deadline. Both latest task results were 0. The Dragon Ball FR
-  report stores only account/auth status, registrar fields, record count,
-  renewal-watch result and VPS count; `mutation=false`.
-- The key `Aphrody - dragonballfr.com` is active and authenticates as
-  `gl839461-ovh`; its application details endpoint does not return permission
-  paths. The creation form had left the `DELETE` path blank. `DELETE /*` remains
-  unverified and is not claimed. The open OVH Manager session identifies Omar
-  and shows his DBFR key; no access policy was changed in that session.
+  five-minute deadline. Both latest task results were 0.
 - A fresh allowlisted reclaim plan on the Aphrody VPS estimated 23.70 GiB for
   Docker, but the apply reclaimed 0.01 GiB total. `/home/ubuntu/build` remains
   full at 100%; its latest `df` reports 331 MiB free. A detailed directory-size
@@ -136,8 +115,7 @@ regions, as in the official python-ovh and go-ovh SDKs), keeps the Bearer token 
 
 **Selection order**: `OVH_CLIENT_ID`/`OVH_CLIENT_SECRET` from the environment (aphrody account
 only) -> `client_id`/`client_secret` of a profile file (`~/.config/aphrody/ovh.env`,
-`~/.config/ovh/aphrody.conf`) -> the legacy application key triplet (unchanged). Other profiles
-(`rosegriffon.fr`, `dragonballfr.com`) are separate accounts and keep their own files.
+`~/.config/ovh/aphrody.conf`) -> the legacy application key triplet (unchanged). Other profiles are separate accounts and keep their own files.
 
 ```bash
 aphrody ovh auth status [--json] [--profile <name>]

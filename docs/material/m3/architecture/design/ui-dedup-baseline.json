@@ -51,7 +51,7 @@
         "routes/settings/index.tsx",
         "routes/sources/index.tsx"
       ],
-      "appOnlyCount": 48,
+      "appOnlyCount": 47,
       "driveOnlyCount": 32,
       "driveOnlyPaths": [
         "Spacebot/ChatComposer.tsx",
@@ -1155,10 +1155,6 @@
         "ShellLayout.tsx": {
           "sha256": "32ed81dd743e047fc693df6e2c4a9df6bd7d2e9bcc16b32bcaa4dbe255350bf1",
           "size": 9551
-        },
-        "shenron-theme.ts": {
-          "sha256": "3074cd8d97d3112599bbaa8f06aaf1eca023071bfa86a1085e2e97d07eb4d1d6",
-          "size": 1726
         },
         "stores/aphrodyJobStore.ts": {
           "sha256": "7c2459b8e8836a1a564f411f5b1ace211d9fe535b18ecf95773c1af72e8a4c32",

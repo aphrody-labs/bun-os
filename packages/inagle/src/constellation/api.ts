@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { createConstellationAPI } from '@rosegriffon/inagle';
+ * import { createConstellationAPI } from '@aphrody/inagle';
  *
  * const constellations = createConstellationAPI();
  *

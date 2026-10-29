@@ -45,7 +45,7 @@ pollster.workspace = true
 bytemuck = { workspace = true, features = ["derive"] }
 # Encodage PNG des captures/exports (le décodage DDS/BCn est passé dans aphrody-nie-formats).
 png = { workspace = true }
-# Export du layout de menu (JSON contrat `@rose-griffon/menu-render` pour azalee).
+# Export du layout de menu (JSON contrat `menu-render` pour azalee).
 serde = { workspace = true, features = ["std", "derive"] }
 serde_json = { workspace = true }
 # Dump exhaustif des packs (example dump_packs) : parallélisme CPU par-CPK (rayon),

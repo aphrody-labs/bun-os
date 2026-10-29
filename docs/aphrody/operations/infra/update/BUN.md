@@ -46,7 +46,6 @@ Root `package.json` `overrides` force one resolution for everything that depends
 | Override | Why |
 | --- | --- |
 | `axios` `^1.20.0`, `qs` `^6.16.0`, `undici` `^7.30.0` | Floors for transitive consumers so the lockfile resolves the patched releases (2026-10-01 advisory pass). `undici` stays on 7: its dependents ask for `^7` (`@ai-sdk/provider-utils`, `cheerio`, `jsdom`, `shadcn`, `@dotenvx`), `miniflare` pins 7.29.0 and Discord's libraries are forced up from 6. |
-| `@rosegriffon/azalee`, `@rosegriffon/inagle`, `@rosegriffon/inagle-cross` | Local tarballs under `.cache/iecode-packages` (not in repo) (generated or machine-local artifact; presence depends on the build host) (the IECODE packages, one commit hash each). `status` flags a missing tarball. |
 
 `yolo update bun status` prints each override with the versions `bun.lock` resolves and the registry latest, so a
 floor that no longer matters can be dropped.
@@ -141,7 +140,6 @@ A newer release exists but is younger than the 3-day window, so `apply` leaves i
 
 | Package | Now | Target | Installable from | Prepared change |
 | --- | --- | --- | --- | --- |
-| `stripe` | ^22.6.2 | 23.0.0 | 2026-10-04 | In `iecode/apps/rg/website/src/lib/shop/stripe.ts` set `apiVersion: "2026-09-30.endive"` (v23 types accept that single literal). Checkout Sessions there do not pass `payment_method_types` (removed in endive). After the bump confirm the Stripe dashboard webhook still delivers `collected_information.shipping_details`. |
 | `@stripe/stripe-js` | ^9.17.0 | 10.0.0 | 2026-10-04 | None (no importer). |
 
 ## Bump log
@@ -156,7 +154,6 @@ failures already present before the bump).
 
 | Package | From | To | Note |
 | --- | --- | --- | --- |
-| `vitest` | ^4.1.11 | ^5.0.2 | `shenron:packages/koharu` (12 files, 102 tests) passes; matcher typing unchanged. 5.0.3 waits for the age window. |
 | `@testing-library/jest-dom` | ^6.10.0 | ^7.0.1 | Node 22+, `@testing-library/dom` peer already met. |
 | `three` | ^0.184.0 | ^0.186.1 | Code fix: `PCFSoftShadowMap` was removed from `WebGLShadowMap` in r186 (runtime warning, falls back), `m3/packages/material-web/scene3d/scene-3d.ts` (not in repo) now sets `PCFShadowMap`. |
 | `motion` | ^12.43.0 | ^13.4.4 | Only the removed emotion integration changed; unused. |
@@ -168,7 +165,6 @@ failures already present before the bump).
 | `@better-auth/agent-auth` | ^0.5.1 | ^0.6.2 | Revoke endpoint and hook scoping; plugin usage unchanged. |
 | `@better-auth/passkey` (website) | 1.6.28 | 1.7.6 | Aligned with `better-auth` 1.7.6. |
 | `@supabase/ssr` | ^0.10.3 | ^0.12.7 | Only `createBrowserClient` is used. |
-| `@asteasolutions/zod-to-openapi` | ^8.5.0 | ^9.1.0 | Type-only breaks; `iecode/packages/rg/cron` tests pass. |
 | `googleapis` | ^173.0.0 | ^182.0.0 | Node 22+; drive, docs, calendar and sheets types diffed, nothing removed. |
 | `firebase`, `firebase-admin` | ^10.13.0, ^12.4.0 | ^12.19.0, ^14.5.0 | Catalog-only entries, no importer. |
 | `patreon-api.ts` | ^0.19.0 | ^0.20.0 | Catalog-only. |
@@ -182,5 +178,4 @@ failures already present before the bump).
 
 Not part of this pass: the Bun runtime (1.4.2 is latest), TypeScript 7.0.2, oxlint 1.86.0 and oxfmt 0.71.0 (all
 current), and the Tauri family (`tauri-sync --check` reports no drift; `@aphrody/plugin-opener` alpha.2 waits for the
-age window). The non-workspace mirrors `config/rg/package.json` (not in repo), `shenron:package.json` and
-`docs/reference/rg/root/package.json` (not in repo) keep their own ranges and are out of scope of the first-party manifest scan.
+age window). The non-workspace mirrors keep their own ranges and are out of scope of the first-party manifest scan.

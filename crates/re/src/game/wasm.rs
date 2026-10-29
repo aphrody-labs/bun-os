@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! WebAssembly bindings of the DBXV2 game engine (feature `wasm`), absorbed from `shenron-re`.
+//! WebAssembly bindings of the DBXV2 game engine (feature `wasm`), absorbed from an earlier DBXV2 RE crate.
 //!
 //! Exposes CPK archive triage, CRILAYLA decompression, CUS skill decoding,
 //! AOB memory scanning, and Dragon Ball game catalog discovery to JS/WASM runtimes.

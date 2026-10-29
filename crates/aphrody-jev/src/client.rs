@@ -345,7 +345,6 @@ impl JevRouter {
             let Some(url) = explicit
                 .or_else(|| endpoint.map(str::to_owned))
                 .or_else(|| var("APHRODY_AI_CHAT_BASE_URL"))
-                .or_else(|| var("APHRODY_SHENRON_LLM_BASE_URL"))
                 .or_else(|| var("APHRODY_OSS_BASE_URL"))
                 .or_else(|| var("APHRODY_LOCAL_MODEL_URL"))
             else {

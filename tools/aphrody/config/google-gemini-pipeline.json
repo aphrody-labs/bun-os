@@ -10,10 +10,7 @@
     "aphrody-os": { "project": "aphrody" },
     "aphrody-web": { "project": "aphrody" },
     "aphrody-infra": { "project": "aphrody" },
-    "nie": { "project": "aphrody" },
-    "dbfr": { "project": "aphrody" },
-    "shenron": { "project": "aphrody" },
-    "rg": { "project": "rgfr" }
+    "nie": { "project": "aphrody" }
   },
   "providers": {
     "google-web": {

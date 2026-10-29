@@ -696,7 +696,7 @@
         {
           "name": "aphrody-rag-core",
           "path": "crates/ai/rag-core",
-          "description": "Pure, wasm32-safe core of the aphrody RAG layer: source-aware chunkers (Rust/JS-TS/Markdown/structural/prose), reciprocal-rank-fusion + MMR + vector helpers, and a bit-for-bit port of shenron's retrieval eval harness.",
+          "description": "Pure, wasm32-safe core of the aphrody RAG layer: source-aware chunkers (Rust/JS-TS/Markdown/structural/prose), reciprocal-rank-fusion + MMR + vector helpers.",
           "bins": [],
           "features": [
             "default",
@@ -2255,7 +2255,7 @@
         {
           "name": "@aphrody/inagle-ui",
           "path": "packages/nie-ui/packages/inagle-ui",
-          "description": "Inagle explorer/maps UI helpers: re-exports @rosegriffon/inagle/ui (iecode packages/inagle), provided by the iecode workspace.",
+          "description": "Inagle explorer/maps UI helpers: re-exports @aphrody/inagle/ui (packages/inagle), provided by the iecode workspace.",
           "bins": []
         },
         {
@@ -2271,105 +2271,7 @@
           "bins": []
         },
         {
-          "name": "@rosegriffon/achillea-client",
-          "path": "packages/rg/achillea-client",
-          "description": "Versioned HTTP client and runtime contracts for the Achillea guild API",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/achillea-contract",
-          "path": "packages/rg/achillea-contract",
-          "description": "Contrat Achilléa exporté en JSON Schema et en types natifs (Rust, Swift, Kotlin) — la brique qui rend le domaine portable hors TypeScript",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/achillea-core",
-          "path": "packages/rg/achillea-core",
-          "description": "Logique métier portable (multi-runtime : navigateur, edge Deno/Web, Node, Bun) — Elo, classement, sanctions, licences, votes, validation. Aucune dépendance Discord / ORM / DI.",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/achillea-types",
-          "path": "packages/rg/achillea-types",
-          "description": "Contrats d'API partagés (DTO + enums) — source unique pour le bot et le web",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/app-shell",
-          "path": "packages/rg/app-shell",
-          "description": "Chrome applicatif partagé de website (navigation, barre latérale, barre supérieure, pied de page)",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/assets",
-          "path": "packages/rg/assets",
-          "description": "Shared static assets for Rose Griffon apps",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/auth",
-          "path": "packages/rg/auth",
-          "description": "Shared authentication logic and guards for Rose Griffon apps",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/azalee",
-          "path": "packages/azalee",
-          "description": "Bibliothèque Bun du wiki Azalée (Inazuma Eleven: Victory Road) — accès PostgreSQL, index CPK, recherche et CLI.",
-          "bins": [
-            "azalee"
-          ]
-        },
-        {
-          "name": "@rosegriffon/azalee-web",
-          "path": "packages/nie-ui/apps/azalee-web",
-          "description": "",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/bot",
-          "path": "apps/rg/bot",
-          "description": "Bot Discord Rose Griffon — slash commands public + admin, sync members, canvas cards",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/config",
-          "path": "packages/rg/config",
-          "description": "Configs partagées : TypeScript, Oxc et Tailwind preset",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/cron",
-          "path": "packages/rg/cron",
-          "description": "Daemon de tâches planifiées (cron) pour la maintenance DB, CDN et API",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/db",
-          "path": "packages/rg/db",
-          "description": "Accès PostgreSQL partagé, façades SQL et types Database générés (site + bot)",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/discord-sync",
-          "path": "packages/rg/discord-sync",
-          "description": "",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/i18n",
-          "path": "packages/rg/i18n",
-          "description": "Noyau i18n pur Rose Griffon : locales BCP-47, négociation, replis et formatage Intl",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/identity",
-          "path": "packages/rg/identity",
-          "description": "Compte unique Rose Griffon : identité native et connexions liées (Discord, Patreon, Twitch, Google, Steam, Achilléa)",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/inagle",
+          "name": "@aphrody/inagle",
           "path": "packages/inagle",
           "description": "Universal Game Data API for Inazuma Eleven: Victory Road — parsers, types, and tools for IEVR game data",
           "bins": [
@@ -2377,45 +2279,9 @@
           ]
         },
         {
-          "name": "@rosegriffon/inagle-cross",
+          "name": "@aphrody/inagle-cross",
           "path": "packages/inagle-cross",
           "description": "API de données et de rétro-conception pour Inazuma Eleven Cross — types, schémas, et analyseurs d'assets",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/menu-render",
-          "path": "packages/nie-ui/packages/menu-render",
-          "description": "React menu renderer with a caller-supplied Lua runtime and game-host adapter.",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/menu-render-webgpu",
-          "path": "packages/nie-ui/packages/menu-render-webgpu",
-          "description": "Renderer WebGPU 2D pixel-perfect pour les écrans de menu IEVR (quads texturés instanciés, projection ortho 1280×720, sampler nearest, premultiplied alpha, blend par drawType, z-order painter par drawPriority). Fallback DOM <GameMenu> de @rosegriffon/menu-render.",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/preferences",
-          "path": "packages/rg/preferences",
-          "description": "Pure cross-runtime resolution of Rose Griffon presentation preferences",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/search",
-          "path": "packages/rg/search",
-          "description": "Recherche unifiée sur les trois domaines du réseau : association, wiki Azalée, e-sport Achilléa",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/types",
-          "path": "packages/rg/types",
-          "description": "Types métier partagés (roles, user, discord) — source unique de vérité bot/azalee/website",
-          "bins": []
-        },
-        {
-          "name": "@rosegriffon/website",
-          "path": "apps/rg/website",
-          "description": "",
           "bins": []
         },
         {
@@ -2966,13 +2832,6 @@
                       "children": []
                     }
                   ]
-                },
-                {
-                  "name": "databooks",
-                  "about": "Transcribe a Shenron Dragon Ball databook lot with the safe preset.",
-                  "aliases": [],
-                  "cfg": [],
-                  "children": []
                 }
               ]
             },
@@ -4618,13 +4477,6 @@
                   "children": []
                 }
               ]
-            },
-            {
-              "name": "databooks",
-              "about": "Transcribe a Shenron Dragon Ball databook lot with the safe preset.",
-              "aliases": [],
-              "cfg": [],
-              "children": []
             }
           ]
         },
@@ -8989,26 +8841,6 @@
           "file": "crates/ai/mcp/src/lib.rs"
         },
         {
-          "name": "aphrody_shenron_llm_chat",
-          "description": "Chat through Aphrody's configured local OpenAI-compatible model for Shenron. Returns answer and model. Requires the configured model backend.",
-          "file": "crates/ai/mcp/src/lib.rs"
-        },
-        {
-          "name": "aphrody_shenron_ocr",
-          "description": "Transcribe one base64 image with Aphrody's local OCR for Shenron. Returns text, textless, suspect, findings and languageApplied=false. Requires a binary built with the ocr feature and installed OCR model.",
-          "file": "crates/ai/mcp/src/lib.rs"
-        },
-        {
-          "name": "aphrody_shenron_rag_ingest",
-          "description": "Upsert one Shenron passage into Aphrody's RAG corpus using a stable sourceId such as shenron:<rowid>. Optional originSourceId, kind, lang and entity preserve source metadata. Requires the Aphrody RAG database.",
-          "file": "crates/ai/mcp/src/lib.rs"
-        },
-        {
-          "name": "aphrody_shenron_rag_search",
-          "description": "Search the Dragon Ball corpus held by Aphrody. Accepts q, limit, lang, kind, sourceId (the original corpus ID), and entity. Returns stable sourceId values, source URL, a bounded passage, and lexical mode.",
-          "file": "crates/ai/mcp/src/lib.rs"
-        },
-        {
           "name": "aphrody_site_catalog",
           "description": "Read the native Aphrody product documentation/template catalog from an explicit workspace root. Read-only, no network or host execution. Section docs/templates matches HTTP; omit for both.",
           "file": "crates/ai/mcp/src/lib.rs"
@@ -10273,12 +10105,12 @@
     "sharedRepos": 0,
     "crates": 198,
     "binaries": 36,
-    "bunPackages": 69,
+    "bunPackages": 47,
     "pythonPackages": 10,
     "cliBinaries": 34,
-    "cliCommands": 777,
+    "cliCommands": 775,
     "mcpServers": 19,
-    "mcpTools": 334,
-    "mcpUniqueToolNames": 332
+    "mcpTools": 330,
+    "mcpUniqueToolNames": 328
   }
 }

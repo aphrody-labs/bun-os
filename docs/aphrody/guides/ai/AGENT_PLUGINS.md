@@ -85,8 +85,7 @@ limitée au dépôt, `--cwd` choisit ce dépôt, `--home` fournit un profil de
 qualification isolé. Le retrait Codex d'un projet conserve le paquet utilisateur
 pour les autres projets. Une destination de skill différente n'est jamais écrasée.
 
-Aphrody reste limité à `aphrody`/`aphrody-py`, IECODE à `iecode`; Shenron et
-Rose Griffon suivent les racines déclarées. Les skills de ces bundles héritent
+Aphrody reste limité à `aphrody`/`aphrody-py`, IECODE à `iecode`. Les skills de ces bundles héritent
 également de leur restriction. YOLO, Bun, BXC et Google Gemini autorisent le
 scope utilisateur. Un scope interdit échoue avant les mutations.
 

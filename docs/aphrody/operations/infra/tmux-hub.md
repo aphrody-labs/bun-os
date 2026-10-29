@@ -4,7 +4,7 @@
 Observation du 2026-10-15 : OpenSSH Windows (Win32 et MSYS, 10.5p1) ouvre un
 maître `ControlMaster` mais ne peut pas y rattacher de session
 (`mux_client_request_session: Connection reset by peer`). Le multiplexage
-reste donc côté Linux : `~/.ssh/shenron-multiplex.conf` sur vps et dbfr.
+reste donc côté Linux : `~/.ssh/multiplex.conf` sur vps et dbfr.
 
 Le poste Windows ouvre une seule connexion interactive, `ssh vps-t`, qui
 s'attache à la session tmux `main` du VPS. Sa fenêtre `dbfr` rejoint la

@@ -91,7 +91,6 @@ wasm-opt = ["-O", "--enable-simd", "--enable-bulk-memory"]
 
 - `.github/workflows/cross-platform.yml` (not in repo) — default `release` profile for the matrix (Linux, Windows, WASM); caps `CARGO_PROFILE_DEV_DEBUG=limited`.
 - `.github/workflows/bench.yml` (not in repo) — Criterion harness auto-selects `bench`.
-- `shenron:.github/workflows/release.yml` — shipped binary built with `--profile reproducible` for byte-for-byte verifiable artefacts.
 - `.github/workflows/build.yml` (not in repo) — workspace defaults, no override.
 
 ## 8. Choosing a profile

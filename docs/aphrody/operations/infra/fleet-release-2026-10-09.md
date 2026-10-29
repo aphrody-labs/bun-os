@@ -17,7 +17,6 @@ protected stores were preserved.
 | Repository | Pushed source | Scope |
 | --- | --- | --- |
 | Aphrody | `21ff48ba62cf1bb3affd10f94ecb8a5d4e4ab330` | Rust inference gateway, Docker-independent Mesh recovery, native Windows setup producer, WireGuard peer patch and platform cfg fixes |
-| Shenron | `4332b0bcf4299a5037e5d468cb0baf9b121c530b` | Native pipeline, lazy Aphrody Python SDK adapter, authenticated provider and classified official-crawl ingestion |
 | Bun fork | `292de960af2bff1b8ae9bf50d7dc05409e5797e5` | Owner integrated ConPTY and Python header/exit-status batches during the release; runtime qualification uses the separate immutable release pin below |
 
 The Cargo lock reconciliation in Aphrody was generated on the serialized VPS
@@ -33,14 +32,6 @@ a private prerelease and does not change the public downloads manifest. Its
 aggregate `release.json` SHA-256 is
 `8241c5819f34b4e94951f89f505cdeca8d4cd68218f1585ba5e1b11e2d6f36a6`.
 The published tag resolves to source `21ff48ba62`.
-
-The [Shenron private release](https://github.com/aphrody-labs/shenron/releases/tag/native-20261009-4332b0bc)
-contains the pipeline CLI, its locked Zod dependency and the bundled lazy Python
-adapter. The archive SHA-256 is
-`280980db17c439c1c67d08d6be4676475ae9a87165e481939d9f26c74bdecad0`.
-All inner-file checksums were verified on the VPS and DBFR. The packaged CLI
-processed the protected official corpus as a dry run: 17 documents, 453
-references, complete receipt, no database writes.
 
 The [Bun fork runtime release](https://github.com/aphrody-labs/bun/releases/tag/aphrody-v1.4.3-aphrody.4)
 is pinned to `41211b56872ca2957e5c037ad1756f56f8f89b7c`. The downloaded
@@ -111,14 +102,6 @@ in WebP's SSE4.1 C source; the corrected run passed. No heavy Cargo, GPU or
 engine build ran on the owner workstation.
 
 ## Host delivery and activation
-
-The immutable Shenron pipeline component is staged under the resolved Aphrody
-home on both VPS and DBFR, in the `lib/shenron/releases/native-4332b0bc`
-directory. No production service or image was restarted for that delivery.
-OCR dependencies, native Bun/CPython libraries and the Aphrody Python
-application source are selected separately on each host. This component release
-does not establish a GPU training run, a complete RAG evaluation or production
-model promotion.
 
 At 20:08 UTC Omar's public SSH reverse client was connected to the VPS, but its
 forwarded Windows SSH, desktop, MCP and VNC destinations returned no service

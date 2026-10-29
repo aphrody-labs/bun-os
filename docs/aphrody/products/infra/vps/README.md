@@ -50,9 +50,6 @@ Each plane has its own release root (`releases/`, `current`, `shared/`) declared
 
 | Plane | Catalog services | Built from |
 |---|---|---|
-| `aphrody` | retired: `aphrody-site`, `aphrody-web-api`, `aphrody-a2a`, `aphrody-ai-http`, `aphrody-shenron-embed` | retired allocation; do not treat as a deployable active plane |
-| `rg` | `rg-website`, `rg-api`, `rg-bot`, `rg-achillea-bot`, `rg-cron`, `rg-sauvegarde` (timer) | `rg` |
-| `shenron` | `shenron-site`, `shenron-bot`, `shenron-pg-tunnel`, `shenron-backup` | `shenron` |
 | `nie` | retired: `nie-site`, `nie-model-serve` | retired VPS allocation |
 
 The historical Aphrody release procedure is recorded in

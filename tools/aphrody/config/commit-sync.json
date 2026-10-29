@@ -3,8 +3,7 @@
   "owners": [
     "aphrody-labs",
     "aphrody-dev",
-    "yohan971",
-    "rose-griffon"
+    "yohan971"
   ],
   "pollIntervalMs": 60000,
   "debounceMs": 250,

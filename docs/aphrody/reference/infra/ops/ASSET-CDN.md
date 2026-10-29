@@ -69,7 +69,7 @@ back). Builds run on the vps: build and publish there from a checkout of the rep
 Serving on dbfr: `aphrody-fonts-proxy` (`tools/config/host/systemd/aphrody/aphrody-fonts-proxy.service`,
 `127.0.0.1:8796`) answers `/h/` and `/s/` from its `--static` roots (catalog release first, then
 the Material Symbols release) with the cache, type and CORS headers above, before its Google Fonts
-proxy. The gateway vhost is `tools/config/host/nginx/shenron/zz-cdn.aphrody.com.conf` in the
+proxy. The gateway vhost is `zz-cdn.aphrody.com.conf` under `tools/config/host/nginx/` in the
 `aphrody-gateway-1` container: `docker exec aphrody-gateway-1 nginx -t`, then `nginx -s reload`.
 The root path answers 404.
 

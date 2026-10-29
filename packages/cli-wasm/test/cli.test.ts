@@ -22,7 +22,7 @@ const cases: [string, string[], RunOptions][] = [
   ["rag ops", ["rag", "ops"], {}],
   ["rag call", ["rag", "call", "rrf", '{"lists":[["a","b"],["b"]]}'], {}],
   ["rag chunk", ["rag", "chunk", "-", "--path", "a.rs"], { stdin: RUST }],
-  ["rag chunk file", ["rag", "chunk", "src/a.rs", "--profile", "shenron_parity"], { files: { "src/a.rs": RUST } }],
+  ["rag chunk file", ["rag", "chunk", "src/a.rs", "--profile", "ts_parity"], { files: { "src/a.rs": RUST } }],
   ["toolcall repair", ["toolcall", "repair", "-"], { stdin: "```json\n{'a': 1,}\n```" }],
   [
     "toolcall extract",

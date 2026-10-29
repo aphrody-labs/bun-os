@@ -166,9 +166,6 @@ export function loadMcpEnvironmentRequirements(
     for (const item of Object.values(record)) visit(item);
   };
   visit(ai);
-  const index = object(object(ai.indexes)["shenron-rag"]);
-  if (typeof index.store !== "string" || !index.store.includes("APHRODY_MCP_DATABASE_URL"))
-    throw new Error("MCP RAG store contract is invalid");
   if (requireRag) required.add("APHRODY_MCP_DATABASE_URL");
   const entries = object(secrets.services);
   for (const service of new Set(["aphrody-mcp-http", ...services])) {
@@ -253,11 +250,7 @@ export function prepareMcpEnvironment(options: PrepareMcpEnvironmentOptions): Pr
     Object.fromEntries(Object.entries(options.env ?? process.env).filter(([, value]) => value !== undefined)),
   );
   for (const selectedDomain of [env.APHRODY_AGENT_DOMAIN, env.APHRODY_PROFILE]) {
-    if (
-      selectedDomain &&
-      selectedDomain !== options.profile &&
-      !(selectedDomain === "shenron" && options.profile === "dbfr")
-    )
+    if (selectedDomain && selectedDomain !== options.profile)
       throw new Error("MCP profile does not match the inherited domain");
   }
   const sources = [{ id: "bun-environment", keys: Object.keys(env).toSorted() }];
@@ -302,8 +295,7 @@ export function prepareMcpEnvironment(options: PrepareMcpEnvironmentOptions): Pr
   if (existsSync(path)) {
     const previous = environment(safeJson(privateText(path)));
     for (const domain of [previous.APHRODY_PROFILE, previous.APHRODY_AGENT_DOMAIN]) {
-      if (domain && domain !== options.profile && !(domain === "shenron" && options.profile === "dbfr"))
-        throw new Error("MCP saved profile belongs to another domain");
+      if (domain && domain !== options.profile) throw new Error("MCP saved profile belongs to another domain");
     }
     delete previous.APHRODY_MCP_ENV_FILE;
     delete previous.APHRODY_MCP_CONFIG;
@@ -342,8 +334,7 @@ export function loadPreparedMcpEnvironment(options: {
     throw new Error("MCP saved profile belongs to another domain");
   const env = environment(safeJson(privateText(options.path)));
   for (const domain of [env.APHRODY_PROFILE, env.APHRODY_AGENT_DOMAIN]) {
-    if (domain && domain !== options.profile && !(domain === "shenron" && options.profile === "dbfr"))
-      throw new Error("MCP saved profile belongs to another domain");
+    if (domain && domain !== options.profile) throw new Error("MCP saved profile belongs to another domain");
   }
   if (env.APHRODY_MCP_ENV_FILE || env.APHRODY_MCP_CONFIG)
     throw new Error("MCP saved profile contains recursive routing references");
@@ -557,7 +548,7 @@ export async function probeMcpEnvironment(
         result.failure = "required-environment-unavailable";
         return result;
       }
-      if (!tools.some(tool => tool.name === "aphrody_shenron_rag_search")) {
+      if (!tools.some(tool => tool.name === "aphrody_rag_search")) {
         result.failure = "native-rag-tool-unavailable";
         return result;
       }
@@ -569,7 +560,7 @@ export async function probeMcpEnvironment(
           "client",
           "call",
           "aphrody",
-          "aphrody_shenron_rag_search",
+          "aphrody_rag_search",
           "--config",
           configPath,
           "--args",

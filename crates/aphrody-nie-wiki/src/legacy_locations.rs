@@ -194,7 +194,7 @@ fn stadium_value(row: &Value) -> Value {
                 code.into()
             }
         });
-    let image = format!("https://cdn.rosegriffon.fr/dx11/menu/220_img/stadium/{code}.png");
+    let image = format!("{}/dx11/menu/220_img/stadium/{code}.png", crate::cdn_base());
     json!({"id":row["id"],"code":code,"index":row["field_index"],"title":title,"image":image,"thumb":format!("{image}?w=400&format=webp&crop=bandes"),"full":format!("{image}?w=1600&format=webp&crop=bandes")})
 }
 fn stadium_order(value: &Value) -> f64 {

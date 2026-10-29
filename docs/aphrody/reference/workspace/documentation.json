@@ -1814,26 +1814,6 @@
       "canonical": "docs/architecture/ai/research/adobe-connector/skills/adobe-design-from-template/SKILL.md"
     },
     {
-      "path": "docs/architecture/convergence/BUN-ELYSIA-COLYSEUS-ARCHITECTURE.md",
-      "title": "Référence d'Architecture : Architecture Unifiée Bun, ElysiaJS & Colyseus pour Rose Griffon",
-      "sha256": "c49c97122892346297fc9817e2e7b0a4e294f9657d0e5e35ce5dd0018b88e0cd",
-      "bytes": 3815,
-      "domain": "convergence",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "docs/architecture/convergence/BUN-ELYSIA-COLYSEUS-ARCHITECTURE.md"
-    },
-    {
-      "path": "docs/architecture/discord/COMPILER.md",
-      "title": "Discord Bot Compiler Architecture (aphrody-discord-compiler)",
-      "sha256": "a4b3ca4337ce33bd159a20a91d8a1e2e644eed86d189c5a3f50963f3f5592239",
-      "bytes": 10782,
-      "domain": "discord",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "docs/architecture/discord/COMPILER.md"
-    },
-    {
       "path": "docs/architecture/discord/README.md",
       "title": "Architecture Discord",
       "sha256": "48840bd9a93f86aa9d1347ba012c9754df8fd7c16bf682ed35354d1f31421952",
@@ -2022,16 +2002,6 @@
       "status": "canonical",
       "visibility": "private",
       "canonical": "docs/architecture/workspace/M3-LOCATION.md"
-    },
-    {
-      "path": "docs/architecture/workspace/SHENRON-DEDUP.md",
-      "title": "Shared Shenron / Aphrody implementation — 2026-10-05",
-      "sha256": "15433663298b707282316c44164091196aeb9a99eabd19d75c6928410def63ac",
-      "bytes": 3075,
-      "domain": "workspace",
-      "status": "historical",
-      "visibility": "private",
-      "canonical": "docs/architecture/workspace/SHENRON-DEDUP.md"
     },
     {
       "path": "docs/cli/HELP.md",
@@ -2404,16 +2374,6 @@
       "canonical": "docs/operations/ai/automation_and_deployment.md"
     },
     {
-      "path": "docs/operations/ai/shenron-local-bridge.md",
-      "title": "Shenron local bridge",
-      "sha256": "7dbf6ef01d05cce5e2de7ca33dcbf72f422208c4b14d7d1b51257c295290296c",
-      "bytes": 3043,
-      "domain": "ai",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "docs/operations/ai/shenron-local-bridge.md"
-    },
-    {
       "path": "docs/operations/aphrodyos-setup-prompt.md",
       "title": "MISSION AUTONOME : SETUP COMPLET APHRODYOS, CONFIGURATION, CRATES, PACKAGES, APPS, DOCKER & INFRA",
       "sha256": "4c75c8ef88712e80a1cbf6f81d05a71fa5acf7572bdb39a20c64adb97385fabf",
@@ -2534,26 +2494,6 @@
       "canonical": "docs/operations/container/SECRETS.md"
     },
     {
-      "path": "docs/operations/discord/README.md",
-      "title": "Discord Operations Runbooks & Guides",
-      "sha256": "ed426f2f7cbf4a191ba137fa7a1b4377efa2cc23ae5b0f33b62b3d256d4809ff",
-      "bytes": 1602,
-      "domain": "discord",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "docs/operations/discord/README.md"
-    },
-    {
-      "path": "docs/operations/discord/SYSTEMD-SERVICES.md",
-      "title": "Discord Systemd Services & Autonomous Native Binaries",
-      "sha256": "617bb760b58f3d5062c8f19c85acdf67e030c7790612d6b8c8ec54d81bc73efd",
-      "bytes": 8176,
-      "domain": "discord",
-      "status": "historical",
-      "visibility": "private",
-      "canonical": "docs/operations/discord/SYSTEMD-SERVICES.md"
-    },
-    {
       "path": "docs/operations/forge-yolo-consolidation.md",
       "title": "Fusion Forge et Yolo — 2026-10-07",
       "sha256": "256071cb8a61da2c3fb8a8321506f6f08e7e3fc458a09f84fb54e4be0d72bd4c",
@@ -2595,7 +2535,7 @@
     },
     {
       "path": "docs/operations/infra/BUILD-FACTORY.md",
-      "title": "VPS build factory and DBFR Shenron runtime",
+      "title": "VPS build factory",
       "sha256": "e77e7cdfd1bbc2f906a41adbb0784a9edb26f6e6dd78ba1f050da7ccbeeb9580",
       "bytes": 19547,
       "domain": "infra",
@@ -2712,16 +2652,6 @@
       "status": "canonical",
       "visibility": "private",
       "canonical": "docs/operations/infra/INSTALL.md"
-    },
-    {
-      "path": "docs/operations/infra/LLAMA-MODELS.md",
-      "title": "llama-server models",
-      "sha256": "33f50b17ecd91d8d3462d4bce861f1ca94d86e018d69502d78af61de30124ff2",
-      "bytes": 1855,
-      "domain": "infra",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "docs/operations/infra/LLAMA-MODELS.md"
     },
     {
       "path": "docs/operations/infra/MCP-A2A.md",
@@ -2852,26 +2782,6 @@
       "status": "canonical",
       "visibility": "private",
       "canonical": "docs/operations/infra/SHELL-OPERATIONS.md"
-    },
-    {
-      "path": "docs/operations/infra/SHENRON-BUILD-RUNNER.md",
-      "title": "Shenron build factory runner",
-      "sha256": "7189c09e5533a28e56d53b309d186047a2aed3689c8803cdfb4d20930ffdbb9b",
-      "bytes": 5213,
-      "domain": "infra",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "docs/operations/infra/SHENRON-BUILD-RUNNER.md"
-    },
-    {
-      "path": "docs/operations/infra/SHENRON-DOCKER.md",
-      "title": "Shenron Docker releases on DBFR",
-      "sha256": "7dc0e60d486a0a48234360b6045d62a0dda8598505923363acce3e9dfbbf03e7",
-      "bytes": 12371,
-      "domain": "infra",
-      "status": "historical",
-      "visibility": "private",
-      "canonical": "docs/operations/infra/SHENRON-DOCKER.md"
     },
     {
       "path": "docs/operations/infra/TOOLCHAIN-SYNC.md",
@@ -3864,16 +3774,6 @@
       "canonical": "docs/plans/ai/rag-native-integration.md"
     },
     {
-      "path": "docs/plans/ai/shenron-targets.md",
-      "title": "Shenron : trois cibles RAG (WASM web, natif desktop, FFI Bun)",
-      "sha256": "d7b8bec726c33052c596d5fd03d471534f64e220a58878eb8c009031b41be720",
-      "bytes": 8768,
-      "domain": "ai",
-      "status": "historical",
-      "visibility": "private",
-      "canonical": "docs/plans/ai/shenron-targets.md"
-    },
-    {
       "path": "docs/plans/compat/PLAN.md",
       "title": "PLAN — aphrody-compat",
       "sha256": "57a19e1dc1dc0562120e66305441f3f817311bf9ab91ea0baef146d70b026fa8",
@@ -3892,16 +3792,6 @@
       "status": "historical",
       "visibility": "private",
       "canonical": "docs/plans/contracts/PLAN.md"
-    },
-    {
-      "path": "docs/plans/convergence/ROSE-GRIFFON-ACHILLEA-CONVERGENCE.md",
-      "title": "Plan de Convergence et Unification Totale : Rose Griffon, Achilléa, ElysiaJS, Colyseus & Bun",
-      "sha256": "46ef0b713f8025fbe7c1068a76f51e8efe4bdc734e64e77f4ee5c5d43ffaef44",
-      "bytes": 5843,
-      "domain": "convergence",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "docs/plans/convergence/ROSE-GRIFFON-ACHILLEA-CONVERGENCE.md"
     },
     {
       "path": "docs/plans/desktop-web/INVENTORY.md",
@@ -4012,16 +3902,6 @@
       "status": "canonical",
       "visibility": "private",
       "canonical": "docs/plans/infra/mesh-container/PLAN.md"
-    },
-    {
-      "path": "docs/plans/infra/sql-convergence-handoff.md",
-      "title": "Handoff: GitHub, SQL convergence and data dedup (session 2026-10-01)",
-      "sha256": "4e71cc0353549a9579e58325e45c7898f9919fe2a535ef30c7ad5a989af81287",
-      "bytes": 14700,
-      "domain": "infra",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "docs/plans/infra/sql-convergence-handoff.md"
     },
     {
       "path": "docs/plans/infra/unified-release-train/PLAN.md",
@@ -5304,16 +5184,6 @@
       "canonical": "docs/reference/ai/config.md"
     },
     {
-      "path": "docs/reference/ai/databooks-transcription-bridge.md",
-      "title": "Pont aphrody ↔ shenron — transcription des databooks",
-      "sha256": "c50f5efe2d0d9063ce5f66cb535af90f4b512ac3726a669f73530f0fb9858aed",
-      "bytes": 13089,
-      "domain": "ai",
-      "status": "historical",
-      "visibility": "private",
-      "canonical": "docs/reference/ai/databooks-transcription-bridge.md"
-    },
-    {
       "path": "docs/reference/ai/discord/client-electron-re.md",
       "title": "Client Discord Desktop — reverse engineering (Electron / V8)",
       "sha256": "1fb1b6767eda067d327d0d51ab45fd4326e0e69ea80504899b5a32cb666849fc",
@@ -5852,16 +5722,6 @@
       "status": "canonical",
       "visibility": "private",
       "canonical": "docs/reference/infra/SECRET-MANAGEMENT.md"
-    },
-    {
-      "path": "docs/reference/infra/SHENRON-MIGRATION.md",
-      "title": "Migration Shenron vers Aphrody Infra",
-      "sha256": "2fa3b2098ef1e052d6e56a38f3c0a7cf9e45de725a972a4fc7cefede6112d5f3",
-      "bytes": 16830,
-      "domain": "infra",
-      "status": "historical",
-      "visibility": "private",
-      "canonical": "docs/reference/infra/SHENRON-MIGRATION.md"
     },
     {
       "path": "docs/reference/infra/STACK-TRAINING.md",
@@ -6672,16 +6532,6 @@
       "status": "canonical",
       "visibility": "private",
       "canonical": "docs/research/ai/plugin-providers/codex.md"
-    },
-    {
-      "path": "docs/research/ai/rag-benchmark.md",
-      "title": "Aphrody RAG Architecture and Shenron Benchmark",
-      "sha256": "a8fcd467c7edfd3308e3b9b2bf0deec8c9a7a5bca3ffce46f5acd4bcdc3e532f",
-      "bytes": 5207,
-      "domain": "ai",
-      "status": "historical",
-      "visibility": "private",
-      "canonical": "docs/research/ai/rag-benchmark.md"
     },
     {
       "path": "docs/research/ai/research/NEXTJS_VERCEL_RUST_CRATES.md",
@@ -7762,16 +7612,6 @@
       "status": "canonical",
       "visibility": "private",
       "canonical": "tools/config/container/mistral-fleet/README.md"
-    },
-    {
-      "path": "tools/config/container/shenron-gateway/README.md",
-      "title": "Shenron gateway image",
-      "sha256": "79b4d99d1bef391f77904f6772341159d56aa23881fb89ad4b5b394a3ec04002",
-      "bytes": 2015,
-      "domain": "",
-      "status": "canonical",
-      "visibility": "private",
-      "canonical": "tools/config/container/shenron-gateway/README.md"
     },
     {
       "path": "tools/config/host/aphrody-os/VPS-TUNING.md",

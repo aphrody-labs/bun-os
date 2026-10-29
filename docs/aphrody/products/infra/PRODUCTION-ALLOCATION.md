@@ -2,15 +2,7 @@
 
 ## Décision
 
-La topologie déclarée est portée par
-[`tools/config/production-topology.json`](../../../../infra/config/production-topology.json),
-les unités par [`tools/config/service-catalog.json`](../../../../infra/config/service-catalog.json)
-et les routes par `yolo/tools/config/host/nginx/routes.json`.
-Le VPS héberge les allocations actives RG, Shenron et Nginx ; les allocations
-Aphrody Web/AI et NIE sont marquées retired dans le catalogue. La pile Aphrody
-ne doit donc pas être décrite comme redéployée par le bundle sans nouvelle
-observation et activation vérifiables. Le point-in-time du 2026-10-02 se trouve
-dans le rapport VPS.
+La topologie déclarée est portée par [`tools/config/production-topology.json`](../../../../infra/config/production-topology.json), les unités par [`tools/config/service-catalog.json`](../../../../infra/config/service-catalog.json) et les routes par `yolo/tools/config/host/nginx/routes.json`. La pile Aphrody ne doit donc pas être décrite comme redéployée par le bundle sans nouvelle observation et activation vérifiables. Le point-in-time du 2026-10-02 se trouve dans le rapport VPS.
 
 DBFR est déclaré nœud de données et sauvegardes secondaire : PostgreSQL, Redis,
 CDN d’assets, sauvegardes et un slot de rollback. La politique lui interdit les
@@ -23,15 +15,7 @@ nécessaires au runtime.
 
 ## Ports et sous-domaines
 
-La topologie déclare les ports publics VPS `80/443` et les ports applicatifs
-comme internes. Les routes actives du catalogue pointent RG vers `3004`, `8800`,
-`4000` et `4002`, et Shenron vers `5011` et `5006`; le tunnel Shenron utilise
-`15433` vers DBFR `5432`. Le service catalogue déclare PostgreSQL `5432` et
-Redis `6379` sur VPS comme actifs ; DBFR déclare aussi ses propres services
-internes. Les ports `3007`, `8083`, `8788`, `8789`, `8794`, `5010`, `8085` et
-`8790` correspondent à des entrées retirées, et `8801`, `8810`, `8812` à des
-services RG retirés/supplantés. Cela décrit le catalogue, pas des sockets
-observés en direct. Voir le [référentiel routes et ports](../../reference/infra/PORTS-AND-DOMAINS.md).
+La topologie déclare les ports publics VPS `80/443` et les ports applicatifs comme internes. Le service catalogue déclare PostgreSQL `5432` et Redis `6379` sur VPS comme actifs ; DBFR déclare aussi ses propres services internes. Les ports `3007`, `8083`, `8788`, `8789`, `8794`, `5010`, `8085` et `8790` correspondent à des entrées retirées, et `8801`, `8810`, `8812` à des services RG retirés/supplantés. Cela décrit le catalogue, pas des sockets observés en direct. Voir le [référentiel routes et ports](../../reference/infra/PORTS-AND-DOMAINS.md).
 
 ## Priorités
 

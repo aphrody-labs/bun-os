@@ -131,7 +131,7 @@ fn vllm_uses_shared_chat_endpoint_and_credential_reference() {
 #[test]
 fn vllm_retains_chat_aliases_and_keyless_local_default() {
     let providers = builtin_providers(&|key| match key {
-        "APHRODY_SHENRON_LLM_BASE_URL" => Some("http://declared:8180/v1".to_owned()),
+        "APHRODY_OSS_BASE_URL" => Some("http://declared:8180/v1".to_owned()),
         "VLLM_API_KEY" => Some("fixture-token".to_owned()),
         _ => None,
     });

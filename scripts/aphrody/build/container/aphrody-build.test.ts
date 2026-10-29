@@ -40,20 +40,20 @@ test("image build is tagged versioned and latest, from the small build context",
 
 test("run is bounded, non-root, cache-backed and passes secrets by name only", () => {
   const args = runArgs({
-    repo: "/home/u/shenron",
+    repo: "/home/u/demo",
     command: ["cargo", "build"],
     uid: 1002,
     gid: 1002,
-    targetVolume: "shenron",
+    targetVolume: "demo",
     env: ["SITE_BUILD_DATABASE_URL"],
     lock: false,
   });
   expect(args.slice(0, 2)).toEqual(["docker", "run"]);
   expect(args).toContain("1002:1002");
   expect(args).toContain("--memory-swap");
-  expect(args).toContain("/home/u/shenron:/home/u/shenron");
+  expect(args).toContain("/home/u/demo:/home/u/demo");
   expect(args).toContain("aphrody-build-sccache:/cache/sccache");
-  expect(args).toContain("aphrody-build-target-shenron:/cache/target");
+  expect(args).toContain("aphrody-build-target-demo:/cache/target");
   expect(args).toContain("SITE_BUILD_DATABASE_URL");
   expect(args.join(" ")).not.toContain("SITE_BUILD_DATABASE_URL=");
   expect(args.slice(-3)).toEqual(["aphrody-build:latest", "cargo", "build"]);

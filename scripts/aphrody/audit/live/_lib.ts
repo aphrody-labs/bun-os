@@ -8,11 +8,7 @@
  * against the public API the page calls.
  *
  * Environment:
- *   LIVE_AUDIT_RG_ORIGIN     rosegriffon origin (default https://rosegriffon.fr)
- *   LIVE_AUDIT_RG_API        rg-api origin (default https://api.rosegriffon.fr)
  *   LIVE_AUDIT_APHRODY       aphrody.com origin (default https://aphrody.com)
- *   LIVE_AUDIT_RG_COOKIE     Better Auth session cookie header value; enables the
- *                            authenticated tests (never logged)
  *   BXC_RENDER_LIB           libbxc_render path; enables the JS diagnostics pass
  */
 
@@ -21,10 +17,7 @@ import { collectPageDiagnostics, TestPage, type PageDiagnostics } from "@aphrody
 
 export { TestPage };
 
-export const RG = (process.env.LIVE_AUDIT_RG_ORIGIN ?? "https://rosegriffon.fr").replace(/\/$/, "");
-export const RG_API = (process.env.LIVE_AUDIT_RG_API ?? "https://api.rosegriffon.fr").replace(/\/$/, "");
 export const APHRODY = (process.env.LIVE_AUDIT_APHRODY ?? "https://aphrody.com").replace(/\/$/, "");
-export const RG_COOKIE = process.env.LIVE_AUDIT_RG_COOKIE ?? "";
 
 /** Per-test budgets (ms). */
 export const T_PAGE = 60_000;
@@ -38,7 +31,6 @@ export const ERROR_MARKERS = [
   "Internal Server Error",
   "NEXT_NOT_FOUND",
   "This page could not be found",
-  "404_-_HORS_JEU_!",
 ];
 
 const UA = "aphrody-live-audit/1.0 (+https://github.com/aphrody-labs/aphrody)";

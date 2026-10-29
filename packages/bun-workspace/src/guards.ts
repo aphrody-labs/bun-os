@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
-// Read-only subset of packages/shenron/config/src/guards.ts at 8172f535ce.
+// Read-only portable export contract guards.
 /**
  * Read-only, opt-in portable export contract for flat Bun OS workspace members.
  * This is not universal Bun OS policy: native/FFI owners remain legitimate,
  * but are intentionally forbidden by this portable consumer contract.
  *
- * The walker reads a package manifest (`exports` + canonical `bunos.runtime`,
- * with `shenron.runtime` accepted as historical input compatibility), follows
+ * The walker reads a package manifest (`exports` + `bunos.runtime`), follows
  * the relative-import closure of each entry and applies the runtime class
  * table plus the cross-cutting rules. It is a lexical checker: comments and
  * string contents are blanked (length-preserving) before any pattern runs, so
@@ -237,7 +236,6 @@ interface Manifest {
   name?: string;
   exports?: unknown;
   bunos?: { runtime?: Record<string, unknown> };
-  shenron?: { runtime?: Record<string, unknown> };
   workspaces?: unknown;
 }
 
@@ -304,7 +302,7 @@ function toPosix(p: string): string {
 export function listExportEntries(packageDir: string): ExportEntry[] {
   const manifest = readManifest(packageDir);
   if (!manifest) return [];
-  const runtime = manifest.bunos?.runtime ?? manifest.shenron?.runtime ?? {};
+  const runtime = manifest.bunos?.runtime ?? {};
   const exportsField = manifest.exports;
   const map: Record<string, unknown> =
     typeof exportsField === "string"
@@ -417,7 +415,7 @@ function packageSpecifierClass(
   const dir = workspacePackages(root).get(name);
   if (!dir) return { found: false };
   const manifest = readManifest(dir);
-  const runtime = manifest?.bunos?.runtime ?? manifest?.shenron?.runtime ?? {};
+  const runtime = manifest?.bunos?.runtime ?? {};
   if (typeof runtime[sub] === "string") return { found: true, declared: runtime[sub] as string };
   for (const [key, value] of Object.entries(runtime)) {
     if (!key.includes("*") || typeof value !== "string") continue;

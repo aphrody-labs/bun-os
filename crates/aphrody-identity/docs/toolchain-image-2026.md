@@ -1,11 +1,11 @@
 <!--
 Rapatrié depuis aphrody-code/aphrody `docs/python-image-toolchain.md` le 2026-09-05.
 
-Complément de `pipeline-svg.md`, rapatrié à côté depuis une branche de shenron. Celui-ci
+Complément de `pipeline-svg.md`, rapatrié à côté depuis une autre branche. Celui-ci
 couvre l'outillage raster (icônes, sprites, compression, animation) ; l'autre décrit la chaîne
 vectorielle.
 
-Ce que shenron porte côté image, mesuré le même jour : `sharp` 0.34.5, et sept scripts orientés
+Ce que la branche d'origine portait côté image, mesuré le même jour : `sharp` 0.34.5, et sept scripts orientés
 scans de manga. Aucune bibliothèque SVG, aucune bibliothèque d'icônes, aucun générateur de
 favicon. La seule chose transposable était sa chaîne d'outils raster, résumée en tête de son
 `optimize-assets.sh` : pngquant + oxipng pour le PNG, mozjpeg pour le JPEG, gifsicle, svgo,

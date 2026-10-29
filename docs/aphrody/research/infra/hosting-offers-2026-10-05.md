@@ -26,8 +26,7 @@ garde la production et dbfr reste l'hôte secondaire.
   - le dépôt pilote déjà l'API OVH (`crates/infra/ovh`) ;
   - la machine est livrable en 1 h à Roubaix et Gravelines.
 - **Alternative A, tout-en-un** : un RISE-L (16 c / 32 t, 128 Go, 2 × 960 Go) à 142,49 €/mois sur 12 mois porte la
-  fabrique et toute la production, puis le VPS-4 est résilié. Elle se justifie quand Rose Griffon et NIE reviennent
-  en production : leurs plafonds `MemoryHigh` additionnés atteignent 61,5 Gio, au-delà des 48 Go du VPS-4.
+  fabrique et toute la production, puis le VPS-4 est résilié.
 
 ## Étape 1 : besoins réels
 
@@ -48,13 +47,7 @@ vient de `automatic_renew = false` [D : `crates/infra/ovh/src/vps.rs`].
 | CPU de la fabrique Rust | 233 membres de workspace (16 globs), 2 766 paquets dans `Cargo.lock` (dont 2 532 externes) ; dépendances lourdes : `v8` 150.4.0 (bibliothèque précompilée, `V8_FROM_SOURCE` absent), `deno_core` 0.412, `wgpu` 23 et 30, `candle` 0.11, `mistralrs` 0.9.4, `ort` rc.12, 54 crates de fork Tauri | [D] `Cargo.toml`, `Cargo.lock` | ≥ 12 cœurs **physiques** à haute fréquence (Zen 4/5) |
 | Parallélisme imposé | `rust.maxJobs = 6`, sérialisé, `incremental = false`, sccache, verrou `heavy.lock` ; `cargo-serial.sh` refuse `APHRODY_CARGO_JOBS` > 6 | [D] `tools/config/build-factory.json`, `scripts/build/rust/cargo-serial.sh:32-41` | relever le plafond pour exploiter plus de 6 cœurs |
 | Fork Bun (LLVM) | `bun-forge` : LLVM 23.1.1, cmake 3.30.5, release avec LTO, un build par commit de `yolo` (sondage toutes les 120 s), zone temporaire de **96 Go** par commit ; premier build complet sur la fabrique en **7 min 10 s** | [D] `tools/config/bun-forge.json`, PLAN §6 | RAM et NVMe locaux |
-| Références de temps | Infra : `check` à froid 101,65 s, à chaud 2,95 s ; Next Shenron 80 s ; `aphrody-mcp` construit en local en 3 min 46 | [D] `tools/config/host/inventory/build-factory-2026-10-03.json`, MEMORY | bancs à rejouer sur le nouvel hôte |
-| RAM | La fabrique a été qualifiée avec 34 133 Mio libres une fois Rose Griffon arrêté ; conteneur Next limité à 16 Gio et 6 CPU ; services Shenron limités à `MemoryHigh` 10 Gio chacun ; somme des `MemoryHigh` de toutes les unités déclarées (Shenron, Rose Griffon, NIE) : **61,5 Gio** (somme des `MemoryMax` ≈ 83 Gio) | [D] inventaire, `tools/config/host/systemd/**` | fabrique seule : 64 Go ; tout-en-un : 128 Go |
-| Disque NVMe | Le 2026-09-25, `/` était **plein à 100 %** (309,6 Go sur 311), récupérés en vidant sccache et le cache Bun. `target/debug` (not in repo) atteignait ≈ 250 Gio avec le DWARF complet (avant le passage à `line-tables-only`). Caches actuels : cargo 20 Go, sccache 2,8 Go (plafond 10 Gio), bun 3,5 Go, bun-forge 2,8 Go. Médias Shenron : 31 Gio (wiki 20, assets 11) | [D] `vps-source.json`, `Cargo.toml:480`, MEMORY ; [H] `du` | fabrique : ≥ 1 To ; tout-en-un : ≥ 1 To plus médias |
 | GPU | Aucun besoin au build : `aphrody-llama-sys` et `torch-sys` chargent llama.cpp et libtorch par `libloading`, et `ml-runtime` télécharge les bibliothèques CUDA 13 et cuDNN 9.25 à l'exécution (détection HIP et Vulkan présente). En production, aucun LLM local : la génération passe par Gemini (service distant). L'inférence locale tourne sur le poste Windows (GPU de 12 Go). Le modèle principal (30B MoE Q4_K_M) pèse 17,28 Gio, donc 24 Go de VRAM sont nécessaires pour le loger entièrement | [D] `crates/ml/*`, `tools/config/local-ai.json`, `docs/reference/ai/LOCAL-AI-MODELS.md` | **GPU facultatif**, à la demande |
-| Réseau | 5 routes publiques actives (`bot.aphrody.com`, `cdn.aphrody.com`, `dragonballfr.com`, `bot.` et `cdn.dragonballfr.com`) et 11 certificats TLS ; HTTP/3 (UDP 443) ; synchronisation CDN de dbfr vers le VPS par WireGuard | [D] `tools/config/host/nginx/routes.json`, `vps-source.json`, MEMORY | 1 Gbit/s sans quota, 1 IPv4, IPv6 |
-| UE et RGPD | Données Shenron (PostgreSQL, Redis) et public français | [D] `service-catalog.json` | centre de données UE, contrat de sous-traitance (DPA) |
-| Sauvegardes et snapshots | Timers `shenron-backup`, `shenron-pg-backup`, `shenron-sqlite-replica-backup`, `rg-sauvegarde` ; snapshot en option sur le VPS | [D] systemd | une cible hors de l'hôte |
 | Automatisation | `crates/infra/ovh` : `/vps`, `/service/{id}/renew` (devis, commande, paiement), `/me/order` ; `aphrody-infra ovh dns\|vps\|email`. **Les serveurs dédiés (`/dedicated/server`) ne sont pas encore couverts**, mais le client signé est réutilisable | [D] | OVH : extension d'un client existant ; autre fournisseur : nouveau client |
 | Renouvellement | Expiration du 2026-10-01 | énoncé et [D] | renouvellement automatique, ou 12 mois payés d'avance |
 | Compatibilité glibc | La fabrique (Ubuntu 26.04, glibc 2.43) produit des binaires refusés par WSL (glibc 2.39) | MEMORY « Fabrique 2026-10-05 » | sur un nouvel hôte, Ubuntu 24.04 (2.39) produit des binaires exécutables sur les deux [E] |
@@ -165,7 +158,6 @@ Aucune mesure n'a été faite sur le matériel cible. Le raisonnement :
 - **VPS-6 (scénario C)** double les vCPU de même classe : les phases parallèles gagnent peut-être 1,5 fois, la chaîne
   critique presque rien.
 - **À qualifier** en rejouant sur la même révision : `check` à froid de l'Infra (référence 101,65 s), `bun-forge`
-  (7 min 10 s), build Next de Shenron (80 s) et build release d'`aphrody-mcp`.
 
 ### Risques
 
@@ -180,7 +172,6 @@ Aucune mesure n'a été faite sur le matériel cible. Le raisonnement :
   - production et builds sur le même hôte, contention à contenir par des slices systemd (les unités portent déjà
     `CPUWeight` et `MemoryHigh`) ;
   - pas de snapshot d'hyperviseur, point de défaillance unique ;
-  - migration plus lourde : DNS, TLS, 11 certificats, nginx, données Rose Griffon conservées sur le VPS.
 - **C** :
   - vCPU partagés, aucun gain par cœur, 400 Go de disque déjà proche de l'incident du 2026-09-25 ;
   - la possibilité de passer en place à `vps-2025-model6` **n'est pas vérifiée** : la page publique n'affiche plus que
@@ -218,13 +209,11 @@ Aucune mesure n'a été faite sur le matériel cible. Le raisonnement :
    fabrique par la liste blanche Infra et libérer le rôle de `heavy.lock`. Conserver la fabrique du VPS intacte
    jusqu'à la qualification pour pouvoir revenir en arrière.
 9. **dbfr** : traiter le disque à 93 % en passant en VPS-4 2027 (+11,25 €/mois) ou en déplaçant les médias, que le
-   VPS sert déjà en copie depuis `/srv/shenron-cdn`.
 
 Pour le scénario A, il s'ajoute :
 
 - abaisser le TTL DNS ;
 - installer nginx, les unités systemd et les certificats depuis `tools/config/host/` ;
-- copier les médias Shenron (31 Gio) et les données Rose Griffon conservées ;
 - configurer le Backup Storage de 500 Go ;
 - résilier le VPS-4 une fois les sondes de santé vertes.
 

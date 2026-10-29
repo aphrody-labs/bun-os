@@ -8,8 +8,6 @@ Research input for the centralized plugin/skill/MCP manager. Captured 2026-10-03
   (the generated `TOOLS.md` still lists 2.1.286).
 - Verified by `claude <cmd> --help` and read-only `claude plugin validate`/`list`/`marketplace list`/`mcp list`.
   Nothing was installed, removed or reconfigured.
-- Plugin sources now live in `~/plugins` (`aphrody`, `bxc`, `iecode`, `shenron`, `yolo`, `google-gemini`,
-  `rose-griffon`; `_registrations` and `_copies` hold load links; move log `relocation-2026-10-03.json`).
 
 ## Primary sources
 
