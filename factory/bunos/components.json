@@ -4118,7 +4118,15 @@
         "bun-spawn"
       ],
       "aot": true,
-      "status": "present"
+      "status": "present",
+      "providers": {
+        "posix": "uutils coreutils/findutils/diffutils, busybox-w32, ripgrep, fd, sd as pinned portable binaries; buncc env posix, buncc sh (Bun Shell)",
+        "mingw": "llvm-mingw pinned (x86_64-w64-mingw32, aarch64-w64-mingw32); winlibs, w64devkit and MSYS2 trees detected read-only",
+        "msys2": "existing install detected read-only; optional managed copy from the pinned msys2-base archive",
+        "wine": "Linux and macOS hosts only: pinned Wine build, buncc-owned prefixes, dxvk, vkd3d-proton",
+        "proton": "Linux hosts only: pinned proton-cachyos"
+      },
+      "note": "docs/POSIX-ON-WINDOWS.md; buncc posix uninstall <msys2|mingw|gnuwin32|cygwin|all> is a dry run unless --yes"
     },
     {
       "id": "npm:@aphrody/canvas",

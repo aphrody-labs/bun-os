@@ -21,6 +21,9 @@ import { getProfile, profiles } from "./profiles.ts";
 import { applicable, getProvider, makeContext } from "./providers/index.ts";
 import { run } from "./process.ts";
 import { cargoArgs, type CargoAction } from "./tasks.ts";
+import { posixCommand, wineCommand } from "./posix-cli.ts";
+import { ensureManaged, isManaged } from "./providers/ensure.ts";
+import { shMain } from "./sh.ts";
 
 const USAGE = `buncc: Bun C Compiler, toolchain manager and workspace builder
 
@@ -31,6 +34,9 @@ C LSP:        lsp [--out dir]          merge the driver's compile log into compi
 Build:        bundle <entry...> [--minify] [--splitting] | compile <entry> --outfile f [--aot] [--target bun-linux-x64] | aot <entry> --outfile f | wasm ...
 Package:      package <msix|appx|msi|exe|zip> --dir d --out o --name N --publisher P ... | sign ... | store <package>
 Profiles:     profile list|show|apply <id> [--run] | bench aot-bun <entry>
+POSIX:        sh [-c script | file]       Bun Shell (cross-platform); env posix --ensure adds pinned uutils/busybox/ripgrep shims
+              install posix|mingw|msys2|wine|proton [--run] | posix doctor|smoke|uninstall <msys2|mingw|gnuwin32|cygwin|all> [--yes]
+Wine:         wine run <exe> [args] | wine prefix <name> [--dxvk --vkd3d] | wine doctor   (Linux and macOS hosts)
 
 Nothing is signed, published or licence-accepted unless you pass --run and the command says so. Default is a dry run for install/package/profile apply.`;
 
@@ -146,7 +152,18 @@ async function main(): Promise<number> {
       );
       return failures ? 1 : 0;
     }
+    case "sh":
+      return shMain(rest);
+    case "posix":
+      return posixCommand(rest, root);
+    case "wine":
+      return wineCommand(rest, root);
     case "install": {
+      if (isManaged(rest[0] ?? "")) {
+        for (const line of await ensureManaged(rest[0] as never, !has("run"))) console.log(line);
+        if (!has("run")) console.log("dry run: pass --run to download");
+        return 0;
+      }
       const provider = getProvider(rest[0] ?? "");
       const plan = provider.install(makeContext(root));
       if (plan.manual) console.log(`manual: ${plan.manual}`);
@@ -160,6 +177,7 @@ async function main(): Promise<number> {
     }
     case "env": {
       const ctx = makeContext(root);
+      if (has("ensure") && isManaged(rest[0] ?? "")) for (const line of await ensureManaged(rest[0] as never, false)) console.error(line);
       const selected = rest[0] === "all" || !rest[0] ? applicable(ctx) : [getProvider(rest[0])];
       const merged: Record<string, string> = {};
       for (const provider of selected) Object.assign(merged, await provider.env(ctx));

@@ -16,6 +16,10 @@ import { vcpkgProvider } from "./vcpkg.ts";
 import { wasmBindgenProvider, wasmOptProvider } from "./wasm.ts";
 import { wingetProvider } from "./winget.ts";
 import { xwinProvider } from "./xwin.ts";
+import { mingwProvider } from "./mingw.ts";
+import { msys2Provider } from "./msys2.ts";
+import { posixProvider } from "./posix.ts";
+import { protonProvider, wineProvider } from "./wine.ts";
 import type { Provider } from "./types.ts";
 
 export const toolchainProviders: Provider[] = [
@@ -40,6 +44,11 @@ export const toolchainProviders: Provider[] = [
   wasmOptProvider,
   uvProvider,
   justProvider,
+  posixProvider,
+  mingwProvider,
+  msys2Provider,
+  wineProvider,
+  protonProvider,
 ];
 
 export {
@@ -52,14 +61,19 @@ export {
   makeProvider,
   makepkgProvider,
   mesonProvider,
+  mingwProvider,
+  msys2Provider,
   msixProvider,
   msvcLayoutProvider,
   ninjaProvider,
   pkgconfProvider,
+  posixProvider,
+  protonProvider,
   uvProvider,
   vcpkgProvider,
   wasmBindgenProvider,
   wasmOptProvider,
+  wineProvider,
   wingetProvider,
   wixProvider,
   xwinProvider,

@@ -4,6 +4,7 @@ import { detectDialect, translate, type Dialect, type Translation } from "./flag
 import { overlayEnv, sanitizeEnv, type Env } from "./env.ts";
 import { run } from "./process.ts";
 import { captureVcvars, findVisualStudio } from "./providers/msvc.ts";
+import { mingwBinDirs } from "./providers/mingw.ts";
 import { findBinary } from "./providers/tools.ts";
 import { decideWrapper, sccacheProbe } from "./sccache.ts";
 
@@ -140,7 +141,7 @@ export async function hasTool(name: string, platform: ChooseInput["platform"], e
   if (name === "cl" || name === "lib" || name === "link")
     return platform === "win32" && !!(await findVisualStudio(env));
   return !!findBinary(
-    { bins: [name], dirs: platform === "win32" ? ["C:\\Program Files\\LLVM\\bin", "C:\\msys64\\ucrt64\\bin"] : [] },
+    { bins: [name], dirs: platform === "win32" ? ["C:\\Program Files\\LLVM\\bin", ...mingwBinDirs()] : [] },
     platform,
   );
 }

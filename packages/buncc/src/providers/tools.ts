@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { run } from "../process.ts";
+import { mingwBinDirs } from "./mingw.ts";
 import {
   compareVersions,
   type Context,
@@ -208,23 +209,22 @@ export const toolSpecs: ToolSpec[] = [
   },
   {
     id: "gcc",
-    description: "GNU C compiler (MSYS2 ucrt64 on Windows)",
+    description: "GNU C compiler (Windows: the buncc mingw provider)",
     bins: ["gcc"],
-    dirs: ["C:\\msys64\\ucrt64\\bin"],
+    dirs: mingwBinDirs(),
     versionArgs: ["--version"],
-    winget: "MSYS2.MSYS2",
     apt: "gcc",
     pacman: "gcc",
     brew: "gcc",
-    manual: "After MSYS2: pacman -S --needed mingw-w64-ucrt-x86_64-gcc",
+    manual: "Windows: buncc install mingw --run (llvm-mingw, checksum verified; no MSYS2 needed)",
   },
   {
     id: "g++",
     description: "GNU C++ compiler",
     bins: ["g++"],
-    dirs: ["C:\\msys64\\ucrt64\\bin"],
+    dirs: mingwBinDirs(),
     versionArgs: ["--version"],
-    winget: "MSYS2.MSYS2",
+    manual: "Windows: buncc install mingw --run",
     apt: "g++",
     pacman: "gcc",
     brew: "gcc",
