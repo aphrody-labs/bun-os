@@ -61,14 +61,22 @@ async function runSteps(steps: Step[], log: (s: string) => void): Promise<number
       continue;
     }
     log(`$ ${s.cmd.join(" ")}   # ${s.title}`);
-    const p = Bun.spawn(s.cmd, {
-      cwd: s.cwd,
-      env: { ...process.env, ...s.env },
-      stdout: s.expect ? "pipe" : "inherit",
-      stderr: "inherit",
-    });
-    const out = s.expect ? await new Response(p.stdout as ReadableStream).text() : "";
-    const code = await p.exited;
+    let out = "";
+    let code = 0;
+    for (let attempt = 0; ; attempt++) {
+      const p = Bun.spawn(s.cmd, {
+        cwd: s.cwd,
+        env: { ...process.env, ...s.env },
+        stdout: s.expect ? "pipe" : "inherit",
+        stderr: "inherit",
+      });
+      out = s.expect ? await new Response(p.stdout as ReadableStream).text() : "";
+      code = await p.exited;
+      if (code === 0 || attempt >= (s.retries ?? 0)) break;
+      const wait = 15_000 * (attempt + 1);
+      log(`attempt ${attempt + 1} failed (exit ${code}); retrying in ${wait / 1000}s`);
+      await Bun.sleep(wait);
+    }
     if (code !== 0) return code;
     if (s.expect && !verifyOutput(s, out)) {
       log(`pin mismatch: got ${out.trim()}, expected ${s.expect}`);

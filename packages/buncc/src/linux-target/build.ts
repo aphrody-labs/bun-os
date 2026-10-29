@@ -14,6 +14,8 @@ export interface Step {
   expect?: string;
   /** Skip the step when this path exists (an earlier clone; the following verify step still checks the pin). */
   skipIfExists?: string;
+  /** Extra attempts after a failure (upstream git servers answer 503 now and then). */
+  retries?: number;
 }
 
 export interface PlanFile {
@@ -54,6 +56,7 @@ export function checkoutSteps(s: SourcePin, dir: string): Step[] {
       title: `clone ${s.id} ${s.tag}`,
       cmd: ["git", "clone", "--depth", "1", "--branch", s.tag, s.url, fwd(dir)],
       skipIfExists: `${fwd(dir)}/.git`,
+      retries: 4,
     },
     {
       title: `verify ${s.id} is ${s.sha.slice(0, 12)}`,
