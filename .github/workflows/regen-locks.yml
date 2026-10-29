@@ -79,7 +79,11 @@ jobs:
           fi
           git commit -m "chore: regenerate Cargo.lock, bun.lock, component pins and architecture map"
           for attempt in 1 2 3; do
-            if git push origin HEAD:main; then exit 0; fi
+            if git push origin HEAD:main; then
+              # GITHUB_TOKEN pushes start no workflow, so sync-os-mirror does not see this commit: fast-forward the mirror here (never forced).
+              git push origin HEAD:refs/heads/os || echo "::warning::os mirror not fast-forwarded; sync-os-mirror will retry on the next push to main"
+              exit 0
+            fi
             git fetch origin main
             git rebase origin/main
           done
