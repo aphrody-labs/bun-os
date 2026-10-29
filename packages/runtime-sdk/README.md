@@ -3,7 +3,7 @@
 Light TypeScript SDK of the YOLO native runtime: loads the precompiled `yolo_runtime` library through
 its versioned C ABI with `bun:ffi`. Core modules are `runtime:system` and `runtime:process`;
 optional clients are `runtime:desktop` and `runtime:browser`.
-Nothing here compiles an engine. See the repository's [runtime ABI](../../docs/aphrody/architecture/runtime-native/RUNTIME-ABI.md) and [runtime decisions](../../docs/aphrody/decisions/runtime/DECISIONS.md).
+Nothing here compiles an engine. See the repository's runtime ABI and runtime decisions.
 
 ```ts
 import { Runtime } from "@aphrody/runtime-sdk";

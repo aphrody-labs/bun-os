@@ -9,7 +9,7 @@ the pre-1.0 dialect. Zero runtime dependencies, standard `fetch` only.
 Specification: [A2A Protocol 1.0](https://a2a-protocol.org/latest/specification/) (latest released
 version `1.0.0`, checked on 2026-10-06). Server side: the Rust crates `aphrody-a2a`,
 `aphrody-a2a-pb`, `aphrody-a2a-server`, `aphrody-a2a-coord` (`aphrody a2a serve`), documented in
-[docs/products/contracts/a2a](../../docs/aphrody/products/contracts/a2a/README.md).
+docs/products/contracts/a2a.
 
 Status: source and tested behavior only. The package is **not published** to npm; publication is
 the owner's decision. `npm pack --dry-run` lists exactly `src/`, `README.md` and `package.json`.

@@ -88,4 +88,4 @@ oxfmt --check examples/crystal-universe
 ```
 
 Téléchargements Android, preuves et limites :
-[rapport d'exécution](../../../docs/aphrody/operations/omar-crystal-universe.md).
+rapport d'exécution.

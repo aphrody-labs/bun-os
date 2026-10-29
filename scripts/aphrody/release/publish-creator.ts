@@ -15,7 +15,7 @@
  *   --compile-executable-path <bun-windows-x64.exe>
  *                            Windows runtime matching the running Bun, when --target cannot download one
  *
- * Runbook: docs/aphrody/operations/infra/CREATOR.md. Remote commands go through OpenSSH in batch mode.
+ * Remote commands go through OpenSSH in batch mode.
  */
 import { createHash } from "node:crypto";
 import { cp, mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";

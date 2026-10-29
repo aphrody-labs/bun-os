@@ -8,7 +8,7 @@ server (bundle mode, with the backend proxy) and sidecar. Contract:
 [`src/wrap/config.rs`](../../src/wrap/config.rs) in this crate.
 
 The crate also hosts the debug bridge of Tauri 3 apps (`aphrody_tauri_wrap::debug::init()`, the
-former `aphrody-tauri-debug` crate; guide: [`docs/guides/web/TAURI-DEBUG.md`](https://github.com/aphrody-labs/bun-os/blob/os/docs/aphrody-source/guides/web/TAURI-DEBUG.md)).
+former `aphrody-tauri-debug` crate; guide: `docs/guides/web/TAURI-DEBUG.md`).
 
 | Feature        | Default | Pulls in                                         | Without it                                           |
 | -------------- | ------- | ------------------------------------------------ | ---------------------------------------------------- |

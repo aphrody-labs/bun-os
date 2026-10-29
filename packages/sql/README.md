@@ -4,7 +4,7 @@
 
 Shared Bun database mechanics for Aphrody. The package implements decisions
 D6, D7, D9 and D10 of
-[ADR sql-convergence](../../docs/aphrody/decisions/infra/sql-convergence.md). The
+ADR sql-convergence. The
 Rust counterpart is the `aphrody-sql` crate (`crates/infra/sql`), which applies
 the same SQLite policy.
 

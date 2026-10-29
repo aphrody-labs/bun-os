@@ -4,7 +4,7 @@
 A uv workspace for Python libraries, applications and tools, fused into the Aphrody
 monorepo on 2026-10-05 (it was the separate `aphrody-py` repository). The Rust source is owned by the
 monorepo: the SDK wheel builds `crates/ai/rag-python` in place. The longer-term direction is the
-`vu` runtime ([plan](../docs/aphrody/plans/vu/PLAN.md)).
+`vu` runtime (plan).
 
 ## Development
 
@@ -66,7 +66,7 @@ existing credential helper; ordinary unit tests do not claim live provider parit
 
 See [current contracts](docs/sdk/workspace-audit.md),
 [SDK validation](docs/sdk/validation.md), [native build](docs/sdk/native-build.md)
-and [the extraction plan](../docs/aphrody/PLAN.md). Historical migration evidence
+and the extraction plan. Historical migration evidence
 stays under `docs/migration/`; protected datasets, model weights and secrets
 stay in their existing private stores.
 

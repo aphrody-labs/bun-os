@@ -75,8 +75,6 @@ async function main(): Promise<void> {
 
   const required = [
     "README.md",
-    "docs/aphrody/reference/infra/TOPOLOGY.md",
-    "docs/aphrody/reference/infra/MIGRATION-GUARDRAILS.md",
     "tools/aphrody/config/local-ai.json",
     "tools/aphrody/config/local-ai.env.example",
   ];

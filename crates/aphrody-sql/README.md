@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # aphrody-sql
 
-Shared SQL owner of Aphrody (ADR [`docs/decisions/infra/sql-convergence.md`](../../docs/aphrody/decisions/infra/sql-convergence.md),
+Shared SQL owner of Aphrody (ADR `docs/decisions/infra/sql-convergence.md`,
 D4/D5/D8/D9). One crate for the PostgreSQL pool, the SQLite open policy, the
 migration runner and database URL resolution. Consumers: `aphrody-rag`,
 `aphrody-mcp`, `aphrody-memory`, `aphrody-train` (feature `registry`).

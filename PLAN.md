@@ -87,10 +87,6 @@ remain UNVERIFIED here.
    runtime fixtures. One tracked `vendor/rea` manifest is absent from the
    initialized sparse `unblob` checkout and is recorded separately as an
    omitted manifest. Keep counts derived from this inventory rather than prose.
-   Regenerate `docs/aphrody/ecosystem/` only when both owner checkouts are
-   available and complete; the available Aphrody checkout is missing, so the
-   generator's zero-entry result is not a valid replacement for its current
-   committed inventory.
 2. Migrate Rust owners into the root Cargo workspace in bounded batches. Before
    each migration, verify dependency consumers, nested workspace behavior,
    submodule history, licenses, build ownership and qualification.

@@ -243,8 +243,7 @@ export async function runBunUpstreamDocs(args: string[]): Promise<number> {
   try {
     if (!isDocsSite(join(checkout, "docs")))
       throw new Error(`${checkout}/docs is not the Bun docs site (no docs.json)`);
-    // docs/aphrody holds the fork's work plans, not Bun documentation: their commits must not move the pin.
-    const docsPaths = ["--", "docs", ":(exclude)docs/aphrody"];
+    const docsPaths = ["--", "docs"];
     const commit = git(checkout, ["log", "-1", "--format=%H", base, ...docsPaths]);
     const date = git(checkout, ["log", "-1", "--format=%cs", base, ...docsPaths]);
     const target = join(repoRoot, BUN_PIN_DIR);

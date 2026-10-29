@@ -45,7 +45,7 @@ userspace control plane for BPF and sched_ext. It does not pursue an in-kernel J
    `CONFIG_INITRAMFS_SOURCE` for appliance images); PID 1 duties (zombie reaping, signals, mounts,
    switch_root, shutdown) in a documented module (`bun-supervisor` is the natural owner); a boot receipt
    (kernel hash, initramfs hash, boot log, idle memory) on QEMU and real hardware. The repository claim of a
-   6.18.55 kernel booting into a Bun `/init` under QEMU/KVM (`docs/aphrody/merge/M-osbun.md`, status
+   6.18.55 kernel booting into a Bun `/init` under QEMU/KVM (status
    partial) is UNVERIFIED. The `linux-bun` config fragment already builds overlayfs, squashfs, erofs and
    virtio-net into the kernel for this step; the third Limine entry in
    `linux-bun/limine-linux-bun.conf.template` is its placeholder and is NOT QUALIFIED.

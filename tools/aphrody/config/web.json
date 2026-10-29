@@ -3,11 +3,6 @@
   "name": "aphrody-web",
   "owner": "Bun src/browser/crates/engine (bun_browser_engine) and packages/bun-web (@aphrody/bun-web)",
   "description": "Single configuration contract of the Aphrody web layer: engine binary and listener, fetch/crawl defaults, allowed hosts, robots policy, storage paths and Tauri debug bridge. Consumers read it through @aphrody/agent-browser/config; environment variables listed under env override the file, command-line flags override both. Secrets, cookies and browser profiles never live here.",
-  "docs": {
-    "contract": "../bun/docs/aphrody-source/apis/web/WEB-SERVICE-CONTRACT.md",
-    "operations": "../bun/docs/aphrody-source/operations/web/AUTOMATION.md",
-    "architecture": "docs/aphrody/architecture/web/ARCHITECTURE.md"
-  },
   "engine": {
     "package": "aphrody-web-engine",
     "binary": "aphrody-web",

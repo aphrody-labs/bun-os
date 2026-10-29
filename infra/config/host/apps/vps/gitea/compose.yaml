@@ -34,7 +34,7 @@ services:
       GITEA__actions__DEFAULT_ACTIONS_URL: self
       GITEA__actions__ENDLESS_TASK_TIMEOUT: 12h
       GITEA__log__LEVEL: Warn
-      # SQLite write-contention mitigation (docs/aphrody/operations/infra/infra-repair-2026-10-25.md).
+      # SQLite write-contention mitigation (infra repair of 2026-10-25).
       GITEA__database__SQLITE_TIMEOUT: "60000"
       GITEA__database__SQLITE_JOURNAL_MODE: WAL
       # SQLite and the LevelDB queues live on the root SSD: /home (btrfs on sdb+sdc) is capped at 250 IOPS per

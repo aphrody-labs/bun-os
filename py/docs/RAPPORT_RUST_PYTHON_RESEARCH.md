@@ -86,5 +86,5 @@ Data-intensive applications require cross-language data interchange without seri
 No benchmark in this repository backs the comparison figures that used to stand here
 (lint time, `uv lock`, vector similarity, FFI call overhead, wheel packaging, binary size);
 they were removed. The only recorded Rust-versus-Python kernel measurement is J22 in
-[`docs/plans/vu/PLAN.md`](../../docs/aphrody/plans/vu/PLAN.md) (`scripts/bench-kernels.py`, 20 000 x 384 float32,
+`docs/plans/vu/PLAN.md` (`scripts/bench-kernels.py`, 20 000 x 384 float32,
 best of 7): Rust similarities 5.3 ms against NumPy 7.9 ms, Rust normalize 47.5 ms against NumPy 7.1 ms.

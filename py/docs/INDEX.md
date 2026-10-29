@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Aphrody Python Documentation Index
 
-This index categorizes all architectural guides, engineering standards, technical reports, and package documentation across the **Aphrody Python** workspace. Shared architecture and cross-monorepo specifications live in the [Aphrody monorepo docs](../../docs/aphrody/README.md).
+This index categorizes all architectural guides, engineering standards, technical reports, and package documentation across the **Aphrody Python** workspace. Shared architecture and cross-monorepo specifications live in the Aphrody monorepo docs.
 
 ---
 

@@ -66,4 +66,4 @@ gates, then rebuild and verify the wheel with `tools/sdk/verify-wheel.py`. No ge
 Rust source exists in this package any more.
 
 The longer-term direction (a `vu` runtime that embeds CPython through PyO3 and ships uv and
-ruff as libraries) is described in [docs/plans/vu/PLAN.md](../../../docs/aphrody/plans/vu/PLAN.md).
+ruff as libraries) is described in docs/plans/vu/PLAN.md.

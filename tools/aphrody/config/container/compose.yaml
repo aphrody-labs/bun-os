@@ -10,8 +10,8 @@
 name: aphrody
 
 x-build: &build
-  context: ../../../../docs/aphrody
-  dockerfile: tools/config/container/Dockerfile
+  context: ../../../..
+  dockerfile: tools/aphrody/config/container/Dockerfile
   args:
     APHRODY_RELEASE: ${APHRODY_RELEASE:-}
 

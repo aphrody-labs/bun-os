@@ -167,7 +167,6 @@ const nightly = await git(
   ".",
   ":!vendor",
   ":!packages/re",
-  ":!docs/aphrody",
   ":!*.lock",
   ":!packages/buncc/test",
 );

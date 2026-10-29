@@ -49,7 +49,7 @@ This is a Bun port of the transport/router in OpenAI Codex
 [`sdk/python/src/openai_codex`](https://github.com/openai/codex/tree/78245b47af2a7aafcabe025828ceecca69db4df1/sdk/python/src/openai_codex),
 revision `78245b47af2a7aafcabe025828ceecca69db4df1`, licensed Apache-2.0.
 The Python client and its real Rust integration suite live in
-[`py/aphrody`](../../docs/aphrody/reference/ai/py/aphrody/docs/agent.md).
+`py/aphrody`.
 
 - FAIT: handshake, threads, streaming turns, interruption, structured errors,
   timeouts and process shutdown; seven real-child tests, TypeScript and Oxlint

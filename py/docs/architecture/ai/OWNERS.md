@@ -2,7 +2,7 @@
 # Logique IA, inférence et RAG
 
 Relevé du 2026-10-05 (les trois checkouts sont depuis fusionnés dans le monorepo). Architecture commune :
-[plan Aphrody](../../../../docs/aphrody/PLAN.md).
+plan Aphrody.
 
 | Contrat | Propriétaire observé | Consommation |
 | --- | --- | --- |
@@ -11,7 +11,7 @@ Relevé du 2026-10-05 (les trois checkouts sont depuis fusionnés dans le monore
 | Inférence Python unifiée | [façade](../../../packages/aphrody/src/aphrody/inference/unified.py) | Un seul client HTTP/Harmony existant ; exécution chez le fournisseur configuré |
 | Produit IA natif | [Aphrody AI](../../../../crates/ai/ai/src/lib.rs) | Fournisseurs, modèles, agents et RAG appartiennent à Aphrody |
 | Calcul vectoriel Bun | [math/vectors](../../../../packages/yolo-core/src/math/vectors.ts) | Redis et adaptateurs Gemma ; aucun import métier dans le module de calcul |
-| Runtime et ressources natives | [Yolo](../../../../docs/aphrody/PLAN.md) | SDK et artefacts versionnés ; pas de copie des moteurs dans Python |
+| Runtime et ressources natives | Yolo | SDK et artefacts versionnés ; pas de copie des moteurs dans Python |
 
 ## Changements qualifiés
 
