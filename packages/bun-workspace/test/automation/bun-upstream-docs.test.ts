@@ -1,18 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 import { describe, expect, test } from "bun:test";
-import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import {
-  BUN_PIN_DIR,
-  bunDataDir,
-  fetchForkDocs,
-  readBunDocsPin,
-  resolveBunDocs,
-} from "../../src/automation/bun-upstream-docs.ts";
-
-const root = resolve(import.meta.dir, "../../../..");
+import { dirname, join } from "node:path";
+import { bunDataDir, fetchForkDocs, resolveBunDocs } from "../../src/automation/bun-upstream-docs.ts";
 
 function scratch(files: Record<string, string> = {}): string {
   const dir = mkdtempSync(join(tmpdir(), "bun-docs-"));

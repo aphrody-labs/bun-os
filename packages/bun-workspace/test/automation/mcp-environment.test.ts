@@ -6,7 +6,6 @@ import { join } from "node:path";
 import {
   existingMcpConfigTargets,
   loadPreparedMcpEnvironment,
-  loadMcpEnvironmentRequirements,
   planMcpEnvironmentConfiguration,
   prepareMcpEnvironment,
   probeMcpEnvironment,

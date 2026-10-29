@@ -6,14 +6,12 @@ import { join } from "node:path";
 import { readTar } from "../../src/automation/canonical-tar.ts";
 import {
   aphrodyClosure,
-  aphrodyPackageDirectories,
   archiveName,
   assertPublicEntries,
   auditArchive,
   embedExternalImports,
   exportTargets,
   portableArchive,
-  publishOrder,
   publishAphrodyPackages,
   staleArchives,
   type AphrodyPackagesManifest,
