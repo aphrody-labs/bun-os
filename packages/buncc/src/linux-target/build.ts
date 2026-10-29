@@ -99,24 +99,51 @@ export function verifyOutput(step: Step, stdout: string): boolean {
   return step.expect === undefined || stdout.trim() === step.expect;
 }
 
-/** Arch container invocation: pacman installs the closure inside the container only (never on the host). */
+/** Pinned Bun that drives buncc inside the container (npm `bun` canary, same pin as factory/bunos/components.json). */
+export const CONTAINER_BUN = "1.4.4-canary.20261028.1";
+
+/** Post-install checks: files that must exist in the stage and, for programs, a headless `--version` run. */
+export const SMOKE: Record<string, { files: string[]; run?: string[] }> = {
+  glib: { files: ["usr/lib/libglib-2.0.so.0"] },
+  gtk4: { files: ["usr/lib/libgtk-4.so.1"] },
+  libadwaita: { files: ["usr/lib/libadwaita-1.so.0"] },
+  gjs: { files: ["usr/bin/gjs"], run: ["usr/bin/gjs", "--version"] },
+  mutter: { files: ["usr/bin/mutter", "usr/lib/libmutter-18.so.0"], run: ["usr/bin/mutter", "--version"] },
+  "gnome-shell": { files: ["usr/bin/gnome-shell"], run: ["usr/bin/gnome-shell", "--version"] },
+  "gnome-session": { files: ["usr/bin/gnome-session"], run: ["usr/bin/gnome-session", "--version"] },
+  "gnome-settings-daemon": { files: ["usr/lib/gnome-settings-daemon/gsd-power"] },
+  "gnome-control-center": { files: ["usr/bin/gnome-control-center"] },
+  kwin: { files: ["usr/bin/kwin_wayland"], run: ["usr/bin/kwin_wayland", "--version"] },
+  "plasma-workspace": { files: ["usr/bin/plasmashell"], run: ["usr/bin/plasmashell", "--version"] },
+  "plasma-desktop": { files: ["usr/lib/qt6/plugins/plasma/kcms/systemsettings/kcm_keyboard.so"] },
+  libplasma: { files: ["usr/lib/libPlasma.so"] },
+  qtbase: { files: ["usr/lib/libQt6Core.so"] },
+};
+
+/**
+ * Arch container invocation: pacman installs the closure inside the container only (never on the host);
+ * buncc is driven by the pinned npm Bun canary. `cwd` is the checkout mounted at /work.
+ */
 export function containerPlan(
   closure: Closure,
   target: string,
   engine: "podman" | "docker" = "podman",
-  image = "docker.io/library/archlinux:latest",
+  image = "docker.io/library/archlinux:base-devel",
+  cwd = ".",
+  deep = false,
 ): Step[] {
   const names = closure.sysroot.packages.map(p => p.name);
   const script = [
     "set -euo pipefail",
-    "pacman -Syu --noconfirm --needed base-devel git meson ninja cmake pkgconf python",
+    "pacman -Syu --noconfirm --needed base-devel git meson ninja cmake pkgconf python nodejs npm wayland-protocols dbus glib2-devel gobject-introspection sassc",
     `pacman -S --noconfirm --needed ${names.join(" ")}`,
-    `bun /work/packages/buncc/src/cli.ts linux build ${target} --src /work/out/src --out /work/out`,
+    `npm install -g bun@${CONTAINER_BUN}`,
+    `bun /work/packages/buncc/src/cli.ts linux build ${target} --run${deep ? " --deep" : ""} --dir /work/.buncc/linux-desktop`,
   ].join("\n");
   return [
     {
       title: `build ${target} in ${image}`,
-      cmd: [engine, "run", "--rm", "-v", "./:/work", "-w", "/work", image, "bash", "-ec", script],
+      cmd: [engine, "run", "--rm", "-v", `${cwd}:/work`, "-w", "/work", image, "bash", "-ec", script],
     },
   ];
 }
