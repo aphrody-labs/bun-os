@@ -4785,7 +4785,9 @@
         "name": "@aphrody/media",
         "version": "1.4.7"
       },
-      "registration": ["none"],
+      "registration": [
+        "none"
+      ],
       "aot": true,
       "status": "present"
     },
@@ -12382,7 +12384,9 @@
         "name": "media-core",
         "version": "0.1.0"
       },
-      "registration": ["none"],
+      "registration": [
+        "none"
+      ],
       "aot": true,
       "status": "present"
     },
