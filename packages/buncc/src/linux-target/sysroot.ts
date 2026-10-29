@@ -3,7 +3,7 @@
  * `sysrootManifest` is pure; `fetchIndex`, `downloadPackages` and `extractPackage` do the I/O.
  */
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, unlinkSync, mkdirSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
 import { ARCH_MIRROR, ArchIndex, archClosure, packageUrl, parseDb, type ArchPackage } from "./pacmandb.ts";
 import { untar, type TarEntry } from "./tar.ts";
@@ -229,4 +229,72 @@ export function findGccInstallDir(root: string): string | undefined {
     for (const ver of readdirSync(join(base, triple)))
       if (existsSync(join(base, triple, ver, "crtbeginS.o"))) return join(base, triple, ver).replaceAll("\\", "/");
   return undefined;
+}
+
+/**
+ * Build-machine tools that pkg-config variables of target packages point at (`${prefix}/bin/glib-mkenums` becomes
+ * `<sysroot>/usr/bin/glib-mkenums` under PKG_CONFIG_SYSROOT_DIR). They must run on the host, so they are linked in
+ * from the host PATH, never taken from the target packages.
+ */
+export const HOST_TOOLS = [
+  "glib-mkenums",
+  "glib-genmarshal",
+  "glib-compile-resources",
+  "glib-compile-schemas",
+  "gdbus-codegen",
+  "gresource",
+  "glib-gettextize",
+  "wayland-scanner",
+  "g-ir-scanner",
+  "g-ir-compiler",
+  "g-ir-annotation-tool",
+  "qtpaths6",
+  "moc",
+  "rcc",
+  "uic",
+];
+
+export interface ShimResult {
+  linked: string[];
+  present: string[];
+  missing: string[];
+}
+
+/** Links host tools into `<sysroot>/usr/bin` (symlinks, or `.cmd`-free skip on Windows where they are only reported). */
+export function shimHostTools(
+  sysroot: string,
+  find: (name: string) => string | null = n => Bun.which(n),
+  tools: string[] = HOST_TOOLS,
+  link: (target: string, path: string) => void = symlinkSync,
+): ShimResult {
+  const bin = join(sysroot, "usr/bin");
+  mkdirSync(bin, { recursive: true });
+  const r: ShimResult = { linked: [], present: [], missing: [] };
+  for (const t of tools) {
+    const dest = join(bin, t);
+    let exists = false;
+    try {
+      lstatSync(dest);
+      exists = true;
+    } catch {}
+    const host = find(t);
+    if (exists && host) {
+      // A target-architecture binary in the sysroot cannot run on the build machine: replace it by the host tool.
+      try {
+        unlinkSync(dest);
+        exists = false;
+      } catch {}
+    }
+    if (exists) r.present.push(t);
+    else if (!host) r.missing.push(t);
+    else {
+      try {
+        link(host, dest);
+        r.linked.push(t);
+      } catch {
+        r.missing.push(t);
+      }
+    }
+  }
+  return r;
 }

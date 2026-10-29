@@ -216,7 +216,8 @@
         "-Dintrospection=false",
         "-Ddocs=false",
         "-Dprofiler=false",
-        "-Dinstalled_tests=false"
+        "-Dinstalled_tests=false",
+        "-Dbash_completion=false"
       ],
       "declared": [
         "atk",

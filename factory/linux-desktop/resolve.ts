@@ -131,6 +131,7 @@ const GNOME: Spec[] = [
       "-Ddocs=false",
       "-Dprofiler=false",
       "-Dinstalled_tests=false",
+      "-Dbash_completion=false",
     ],
     hostRun: [
       NOTE_GLIBTOOLS,

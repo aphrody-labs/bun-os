@@ -15,6 +15,7 @@ import {
   extractPackage,
   fetchIndex,
   findGccInstallDir,
+  shimHostTools,
   sysrootManifest,
   TOOLCHAIN_ROOTS,
   type SysrootManifest,
@@ -268,6 +269,10 @@ export async function linuxMain(args: string[], root: string, log: (s: string) =
             gccInstallDir: existsSync(sysroot) ? findGccInstallDir(sysroot) : undefined,
           }
         : undefined;
+    if (cross && existsSync(sysroot)) {
+      const shim = shimHostTools(sysroot);
+      log(`host tools in ${sysroot}/usr/bin: ${shim.linked.length} linked, ${shim.present.length} present, missing: ${shim.missing.join(" ") || "none"}`);
+    }
     const chain = rest.includes("--deep")
       ? resolved.order
       : [{ closure: resolved.closure.id, source: resolved.source }];

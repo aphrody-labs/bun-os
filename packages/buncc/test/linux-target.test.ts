@@ -28,7 +28,7 @@ import {
   parseDesc,
 } from "../src/linux-target/pacmandb.ts";
 import { parsePc, pcFlags, splitRequires } from "../src/linux-target/pkgconfig.ts";
-import { keepPath, resolveLink, sysrootManifest } from "../src/linux-target/sysroot.ts";
+import { keepPath, resolveLink, shimHostTools, sysrootManifest } from "../src/linux-target/sysroot.ts";
 import { untar } from "../src/linux-target/tar.ts";
 
 const sha = "a".repeat(40);
@@ -356,4 +356,17 @@ test("the committed closure files are valid, pinned to full SHAs and ordered", (
   expect(kwin.order.find(o => o.source.id === "qtbase")!.closure).toBe("qt6");
   expect(kwin.order.at(-1)!.source.id).toBe("kwin");
   expect(sysrootPackages(closures, "plasma").some(p => p.name === "qt6-base")).toBe(true);
+});
+
+test("host tools are linked into the sysroot bin dir, replacing target binaries", () => {
+  const root = mkdtempSync(join(tmpdir(), "shim-"));
+  const links: Array<[string, string]> = [];
+  const found = new Map([
+    ["glib-mkenums", "/host/glib-mkenums"],
+    ["wayland-scanner", "/host/wayland-scanner"],
+  ]);
+  const r = shimHostTools(root, n => found.get(n) ?? null, ["glib-mkenums", "wayland-scanner", "gresource"], (t, p) => links.push([t, p]));
+  expect(r).toEqual({ linked: ["glib-mkenums", "wayland-scanner"], present: [], missing: ["gresource"] });
+  expect(links.map(l => l[0])).toEqual(["/host/glib-mkenums", "/host/wayland-scanner"]);
+  expect(links[0]![1].replaceAll("\\", "/")).toContain("/usr/bin/glib-mkenums");
 });
