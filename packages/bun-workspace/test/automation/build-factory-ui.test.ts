@@ -10,7 +10,7 @@ const factory: UiFactory = {
   rust: { maxJobs: 6 },
   ui: {
     enabled: true,
-    classes: ["shenron-ui-reuse"],
+    classes: ["ui-reuse"],
     lockPath: "/home/ubuntu/build/locks/ui.lock",
     workRoot: "/home/ubuntu/build/artifacts/ui/jobs",
     maxJobs: 1,

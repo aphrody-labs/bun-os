@@ -162,7 +162,7 @@ struct Cli {
     #[arg(long)]
     verify: bool,
 
-    /// Exporte le LAYOUT de l'écran `--menu` en JSON (contrat `@rose-griffon/menu-render`,
+    /// Exporte le LAYOUT de l'écran `--menu` en JSON (contrat `menu-render`,
     /// consommé par azalee). Au lieu de composer un PNG, écrit objets + transforms (placement
     /// motion-fallback D1.a + sélection texture D1.b, déterministe) au chemin indiqué.
     #[arg(long)]
@@ -2435,7 +2435,7 @@ fn setting_objbin_paths_with_lookup(
         .collect()
 }
 
-// ── Export de layout (contrat azalee `@rose-griffon/menu-render`) ─────────────
+// ── Export de layout (contrat azalee `menu-render`) ─────────────
 
 /// Exporte le LAYOUT d'un écran de menu en JSON consommé par azalee (renderer WebGPU /
 /// PNG serveur), en lieu et place de l'export iecode. Réutilise le pipeline nie amélioré :

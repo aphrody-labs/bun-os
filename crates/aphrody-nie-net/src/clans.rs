@@ -1,6 +1,6 @@
 //! Clan and club management, member rosters, roles, and clan leaderboards.
 //!
-//! Reconstructed and ported from the Rose Griffon Achillea clan system
+//! Reconstructed and ported from a previous clan system
 //! (`apps/achillea-bot/src/services/ClanService.ts` and `@achillea/core/clan`):
 //! - Clan creation, tag validation (`[TAG]`), and emblem selection
 //! - Role hierarchy: Leader, CoLeader, Officer, Member

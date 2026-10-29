@@ -14,7 +14,9 @@ use std::{
 };
 
 const COLUMNS: &str = "id,name_fr,name_en,name_ja,emblems,kits,data,description_fr,description_en";
-const CDN: &str = "https://cdn.rosegriffon.fr/dx11/menu";
+fn cdn() -> String {
+    format!("{}/dx11/menu", crate::cdn_base())
+}
 
 struct OrderedObject(Vec<(String, Value)>);
 impl<'de> Deserialize<'de> for OrderedObject {
@@ -85,6 +87,7 @@ fn rank(name: &str) -> anyhow::Result<u64> {
 }
 
 fn emblem(row: &Value) -> Value {
+    let cdn = cdn();
     static CRC: OnceLock<Value> = OnceLock::new();
     let map = CRC.get_or_init(|| json!({}));
     let entries = ordered(&row["emblems"]);
@@ -116,13 +119,14 @@ fn emblem(row: &Value) -> Value {
         .as_array()
         .is_some_and(|codes| codes.iter().any(|entry| entry == code));
     if known {
-        json!(format!("{CDN}/200_icon/01_icon_emblem/{code}.png"))
+        json!(format!("{cdn}/200_icon/01_icon_emblem/{code}.png"))
     } else {
         Value::Null
     }
 }
 
 fn face(code: &str) -> String {
+    let cdn = cdn();
     static CODES: OnceLock<HashSet<String>> = OnceLock::new();
     let codes = CODES.get_or_init(HashSet::new);
     let base = code
@@ -130,7 +134,7 @@ fn face(code: &str) -> String {
         .filter(|(_, suffix)| suffix.len() == 4 && suffix.bytes().all(|byte| byte.is_ascii_digit()))
         .map_or(code, |(base, _)| base);
     if codes.contains(base) {
-        format!("{CDN}/200_icon/10_icon_chr/face/{base}_l.g4tx/{base}_1_l00.png")
+        format!("{cdn}/200_icon/10_icon_chr/face/{base}_l.g4tx/{base}_1_l00.png")
     } else {
         "/ievr.webp".into()
     }

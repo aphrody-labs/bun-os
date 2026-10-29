@@ -51,9 +51,8 @@ pub enum Finding {
     /// Cyrillic, Arabic, Thai and Hangul are never a real reading of a
     /// Japanese or Chinese databook page — a fragment in one of them is the
     /// model inventing a plausible-looking glyph, not transcribing one.
-    /// Mirrors `shenron`'s own `ETRANGER` rule
-    /// (`apps/site/src/lib/databooks-defauts.ts`), so a page that passes one
-    /// judge's alphabet check passes the other's for the same reason.
+    /// Mirrors an external reference `ETRANGER` rule
+    /// so a page that passes one judge's alphabet check passes the other's for the same reason.
     ForeignScript {
         /// A short sample of text around the offending character.
         sample: String,
@@ -180,14 +179,14 @@ pub fn audit_batch<'a>(pages: impl IntoIterator<Item = (PathBuf, Option<&'a str>
 /// deposit) is one unbroken run with no spaces at all, and a stuck generation
 /// on CJK text always looks like this, never like repeated Latin words.
 ///
-/// This instead scans at the character level, mirroring `shenron`'s own
+/// This instead scans at the character level, mirroring an external reference's
 /// `BOUCLE` rule exactly, floor included: a segment of 4 to 40 characters,
 /// containing at least two distinct characters, repeated three times or more.
 /// The floor of 4 is not arbitrary — a 2- or 3-character floor was tried
 /// first and found two false positives on real Traditional Chinese prose in
 /// this same corpus: `非常非常非常` ("very very very", emphatic tripling, a
 /// normal Chinese intensifier) and a vertical "我我我" shout in a stylised
-/// panel layout. `shenron`'s own comment on `BOUCLE` explains the same
+/// panel layout. the reference's comment on `BOUCLE` explains the same
 /// reasoning; this rule adopts its already-tuned floor rather than
 /// re-discovering it by trial. A single character repeated at length is
 /// handled separately and needs a much longer run before it counts —
@@ -242,7 +241,7 @@ fn longest_run(text: &str) -> Option<(String, usize)> {
 
 /// Whether `c` belongs to a script that has no business in this corpus.
 ///
-/// Same ranges as `shenron`'s `ETRANGER` regex: Cyrillic, Arabic, Thai,
+/// Same ranges as the reference `ETRANGER` regex: Cyrillic, Arabic, Thai,
 /// Hangul. Deliberately narrow — Latin (credits, ISBNs) and every CJK range
 /// are never flagged, so an actually multilingual page is untouched.
 fn is_foreign_script(c: char) -> bool {
@@ -366,7 +365,7 @@ mod tests {
     #[test]
     fn a_long_run_of_form_boxes_is_not_a_loop() {
         // Answer-sheet boxes and rating stars are layout, not corruption —
-        // shenron's own BOUCLE rule carries the same exemption.
+        // the reference BOUCLE rule carries the same exemption.
         let boxes = "　".repeat(30);
         assert!(
             !audit_text(&boxes)
@@ -498,7 +497,7 @@ mod tests {
     fn traditional_chinese_alone_is_not_foreign_script() {
         // Dragon Ball Landmark/Forever are genuinely Traditional Chinese
         // editions — Han characters are never flagged by this rule (unlike
-        // shenron's separate, narrower `han-sans-kana` heuristic).
+        // a separate, narrower `han-sans-kana` heuristic).
         assert!(
             !audit_text(
                 "狂怒的菲利殘殺無限！聽到無限的最後叫喊，悟空體內沉睡的超級撒亞人之血覺醒了。"

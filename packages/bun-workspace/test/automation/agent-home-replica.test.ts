@@ -74,7 +74,7 @@ test("replica verifies every upload before indexing and repairs corrupted snapsh
       homeDocuments: ["MEMORY.md"],
       directory: join(dir, "remote"),
       stateRoot: dir,
-      shenronRoot: dir,
+      extraStateRoot: dir,
       intervalSeconds: 300,
     };
     await expect(replicateHome(config, home, join(dir, "receipts"), "aphrody", run)).rejects.toThrow();

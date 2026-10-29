@@ -1,7 +1,7 @@
 # DBXV2 `.emo` objects and `.ema` motions
 
-Readers: `crates/re/src/game/formats/{emo,ema}.rs`, exposed by `api::summarize` (FFI
-`shenron_dbxv2_summarize`, WASM `wasm_summarize`) and listed as `full` by `api::support`.
+Readers: `crates/re/src/game/formats/{emo,ema}.rs`, exposed by `api::summarize` (WASM
+`wasm_summarize`) and listed as `full` by `api::support`.
 Established on 2026-10-22 from the game files themselves, then checked against the
 `xgcore.dll` decompilation (Ghidra export of the installed game, read-only). No game byte is
 committed: the tests encode their own fixtures and the real-data gates read a local corpus.
@@ -65,7 +65,7 @@ i16 part, i16`, padding to 16, then a row-major 4×4 transform (translation in t
 ## Verification
 
 - Unit tests encode a one-triangle object and a two-key motion, and reject out-of-range indices.
-- Real data: `SHENRON_REAL_EMO_DIR=<dir> SHENRON_REAL_EMA_DIR=<dir> cargo test -p bun-re --lib -- game::formats::em`
+- Real data: `DBXV2_REAL_EMO_DIR=<dir> DBXV2_REAL_EMA_DIR=<dir> cargo test -p bun-re --lib -- game::formats::em`
   parses every file below the directories. On the factory, the corpus is every `.emo` and
   `.ema` of every CPK, fetched through the local DBXV2 CPK service into
   `/games/cache/dbxv2-ema-emo/corpus` (outside Git). Result on 2026-10-22: all 1,959 `.emo`

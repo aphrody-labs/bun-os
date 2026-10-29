@@ -22,7 +22,7 @@ Restart=on-failure
 RestartSec=5
 TimeoutStopSec=20
 
-# Resources: the Shenron site and bot share the host, so this server yields under contention.
+# Resources: the host is shared with other workloads, so this server yields under contention.
 MemoryAccounting=true
 MemoryHigh=3G
 MemoryMax=4G

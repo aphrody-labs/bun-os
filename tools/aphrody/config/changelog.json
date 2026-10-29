@@ -18,7 +18,7 @@
     "shell": ["shell", "terminal", "tauri"],
     "os": ["os", "systemd", "infra", "kernel"],
     "ai": ["ai", "mcp"],
-    "web": ["web", "ui", "rg"],
+    "web": ["web", "ui"],
     "deps": ["deps", "tauri,uv"]
   }
 }

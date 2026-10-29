@@ -217,7 +217,7 @@ else {
   if(server.command!==(process.platform==='win32'?process.execPath:process.argv[1])||server.args[0]!=='--env-file'||server.args[1]!==args[1])process.exit(9);
   if(args.includes('list')){
     console.log(JSON.stringify({kind:'server_info',tool_count:1}));
-    console.log(JSON.stringify({kind:'tool',name:'aphrody_shenron_rag_search'}));
+    console.log(JSON.stringify({kind:'tool',name:'aphrody_rag_search'}));
   }else if(args.includes('call'))console.log(JSON.stringify({result:{content:[{type:'text',text:JSON.stringify(process.env.PROBE_FIXTURE_ERROR?{error:{code:'503',message:process.env.PROBE_FIXTURE_ERROR}}:{results:[],mode:'lexical'})}]}}));
   else process.exit(10);
 }

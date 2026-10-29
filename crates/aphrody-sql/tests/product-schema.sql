@@ -1,10 +1,10 @@
 -- SPDX-License-Identifier: Apache-2.0
 -- Run on a disposable database only; the test transaction always rolls back.
 BEGIN;
-INSERT INTO aphrody_product.scopes(profile) VALUES ('aphrody'), ('dbfr');
+INSERT INTO aphrody_product.scopes(profile) VALUES ('aphrody'), ('ie');
 INSERT INTO aphrody_product.catalog(profile, entity_id, kind, owner, label, source_ref, content_sha256)
 VALUES ('aphrody', 'repo', 'repository', 'workspace', 'Aphrody', 'git:aphrody', repeat('a', 64)),
-       ('dbfr', 'repo', 'repository', 'workspace', 'DBFR', 'git:dbfr', repeat('b', 64));
+       ('ie', 'repo', 'repository', 'workspace', 'IE', 'git:ie', repeat('b', 64));
 INSERT INTO aphrody_product.graph_nodes(profile, repository_id, node_id, symbol, relative_path, kind)
 VALUES ('aphrody', 'repo', 'node1', 'main', 'src/main.rs', 'function');
 INSERT INTO aphrody_product.outbox(profile, entity_id, entity_version, topic)
@@ -15,7 +15,7 @@ DECLARE
 BEGIN
     BEGIN
         INSERT INTO aphrody_product.graph_edges(profile, repository_id, src, dst, relation, confidence)
-        VALUES ('dbfr', 'repo', 'node1', 'node1', 'calls', 'EXTRACTED');
+        VALUES ('ie', 'repo', 'node1', 'node1', 'calls', 'EXTRACTED');
         RAISE EXCEPTION 'cross-profile graph reference unexpectedly accepted';
     EXCEPTION WHEN foreign_key_violation THEN NULL;
     END;

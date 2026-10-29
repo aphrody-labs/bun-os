@@ -90,7 +90,6 @@ qualification will succeed.
 | Craft suite                   | `apps/*craft*`: PDF, CAD web, film, photo, vector, sound, word, deck, design, grid, light, effect, fig |
 | Reverse engineering (`re`)    | `packages/re`, `crates/re` (`bunre`)                                                               |
 | IECODE and nie game tooling   | `crates/aphrody-nie-*`, `packages/inagle`, `apps/iecode-*`                                         |
-| Rose Griffon                  | [Canonical source](https://github.com/aphrody-labs/rosegriffon), [ownership and binaries](docs/ROSEGRIFFON.md) |
 | Aphrody agents, MCP and A2A   | `crates/aphrody-*`, `packages/a2a`, `packages/m3-mcp`                                              |
 | Android                       | `apps/bun-android`, `packages/bun-android`, `crates/android-native`                                |
 

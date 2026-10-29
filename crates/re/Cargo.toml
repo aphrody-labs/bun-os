@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Single Bun OS reverse-engineering core. Merges bun-re (aphrody-labs/aphrody re, Apache-2.0), the
-# DBXV2 game RE engine of shenron-re (Apache-2.0), the nie RE engine and minidump helpers
+# DBXV2 game RE engine (Apache-2.0), the nie RE engine and minidump helpers
 # (aphrody-nie-re, aphrody-nie-dump). Steam installs, VDF, client configuration and depot acquisition
 # moved to the `bun-steam` crate; this crate keeps the SteamStub/DRM binary inspection.
 # The crates.io name `bun-re` is kept so `aphrody-re = { package = "bun-re" }` consumers resolve here

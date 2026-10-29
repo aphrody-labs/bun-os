@@ -22,7 +22,7 @@ The single module also exposes the structured RAG transport and dense-vector ker
 `@aphrody/rag-core/wasm` use this same loader, module instance and linear memory.
 No separate RAG WASM binary is built or shipped.
 
-Build (`wasm/`, git-ignored): `bun run build:wasm`. Plan: `docs/plans/ai/shenron-targets.md`.
+Build (`wasm/`, git-ignored): `bun run build:wasm`.
 
 ## Portable release
 

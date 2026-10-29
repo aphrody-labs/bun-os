@@ -181,7 +181,7 @@ export const M3_TOOLS: M3Tool[] = [
   ),
   tool(
     "m3_design_search",
-    "Search the bundled UI/UX Pro Max catalogs of @aphrody/m3-design (styles, colours, typography, UX guidelines, charts, icons, stacks including m3 and rg-ui) with calibrated BM25; omit domain and stack to auto-detect the domain.",
+    "Search the bundled UI/UX Pro Max catalogs of @aphrody/m3-design (styles, colours, typography, UX guidelines, charts, icons, stacks including m3) with calibrated BM25; omit domain and stack to auto-detect the domain.",
     {
       query: z.string().min(1),
       domain: z
@@ -190,7 +190,7 @@ export const M3_TOOLS: M3Tool[] = [
         .describe(
           "style, color, chart, landing, product, ux, typography, google-fonts, icons, gsap, react, web, brand",
         ),
-      stack: z.string().optional().describe("Stack guidelines, e.g. m3, rg-ui, react, nextjs, html-tailwind"),
+      stack: z.string().optional().describe("Stack guidelines, e.g. m3, react, nextjs, html-tailwind"),
       limit: z.number().int().min(1).max(20).default(3),
       json: z.boolean().default(false),
     },

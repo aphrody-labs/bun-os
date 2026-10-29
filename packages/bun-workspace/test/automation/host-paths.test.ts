@@ -33,13 +33,13 @@ test("rules classify each span once, in priority order", () => {
 test("rewrites make prose, records and data location-independent, never code", () => {
   const text = [
     `Run from \`${HOME}/aphrody\` then open ${HOME}/aphrody/docs/x.md.`,
-    `{"imagePath":"${VPS}/shenron/apps/site/public/a.jpg","bot":"${VPS}/shenron/apps/shenron/bot/x"}`,
+    `{"imagePath":"${VPS}/app/site/public/a.jpg","bot":"${VPS}/app/bot/x"}`,
     `Sibling ${HOME}/yolo/PLAN.md, cache ${HOME}/.cache/x, windows C:\\Users\\someone\\x`,
   ].join("\n");
   expect(rewriteHostPaths(text, "docs")).toBe(
     [
       "Run from `<repo>` then open docs/x.md.",
-      '{"imagePath":"~/shenron/apps/site/public/a.jpg","bot":"~/shenron/apps/shenron/bot/x"}',
+      '{"imagePath":"~/app/site/public/a.jpg","bot":"~/app/bot/x"}',
       "Sibling ../yolo/PLAN.md, cache ~/.cache/x, windows %USERPROFILE%\\x",
     ].join("\n"),
   );
@@ -57,7 +57,7 @@ test("areas separate runtime sources from prose, records and data", () => {
   expect(hostPathArea("systemd/x.service")).toBe("host");
   expect(hostPathArea("docs/guides/a.md")).toBe("docs");
   expect(hostPathArea("docs/migration/a.json")).toBe("record");
-  expect(hostPathArea("data/shenron/lots/a.jsonl")).toBe("data");
+  expect(hostPathArea("data/lots/a.jsonl")).toBe("data");
 });
 
 test("apply skips dirty files and the ratchet reports regressions", async () => {

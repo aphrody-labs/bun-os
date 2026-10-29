@@ -55,11 +55,10 @@ historical.
 
 ## Integrations
 
-<!-- docs-hub:begin include="integrations/KOHARU.md;integrations/SHENRON.md" -->
+<!-- docs-hub:begin include="integrations/KOHARU.md" -->
 | Document | Contenu | Statut | Mis à jour |
 | --- | --- | --- | --- |
 | [Koharu integration map for Aphrody](integrations/KOHARU.md) | Status: source comparison snapshot dated 2026-09-27; standalone UI extraction and native settings integration updated 2026-09-28. | historical | 2026-10-01 |
-| [Shenron desktop integration](integrations/SHENRON.md) | The Aphrody desktop remains an independent UI-layer process. | imported | 2026-09-29 |
 <!-- docs-hub:end -->
 
 ## Archived notes (historical)

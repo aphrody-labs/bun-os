@@ -364,7 +364,7 @@ const COLLECTED = [
   "snapd.service loaded active running Snap Daemon",
   "mystery.service loaded active running Something",
   "@@@ failed",
-  "● aphrody-shenron-build-20261003.service loaded failed failed Shenron build",
+  "● aphrody-demoapp-build-20261003.service loaded failed failed Demo build",
   "@@@ timers",
   "Sun 2026-10-04 00:29:49 UTC 10h Sat 2026-10-03 00:34:42 UTC 13h ago logrotate.timer logrotate.service",
   "@@@ ports",
@@ -383,7 +383,7 @@ const COLLECTED = [
   "132000000000\t/home",
   "129000000000\t/home/ubuntu",
   "61000000000\t/home/ubuntu/apps",
-  "13000000000\t/home/ubuntu/apps/shenron",
+  "13000000000\t/home/ubuntu/apps/demoapp",
   "4400000000\t/var/lib",
   "2300000000\t/var/lib/postgresql",
   "@@@ cron",
@@ -1279,7 +1279,7 @@ describe("archive plan", () => {
   it("builds the pipeline with low priority, verification steps, and removal last", () => {
     const plan = planArchive(
       a,
-      { ...opts, pull: "/tmp/pulled", pgDump: "shenron", pgUser: "postgres" },
+      { ...opts, pull: "/tmp/pulled", pgDump: "demoapp", pgUser: "postgres" },
       "vps",
       DEFAULT_POLICY,
       now,
@@ -1307,7 +1307,7 @@ describe("archive plan", () => {
     expect(plan.steps.find(s => s.id.startsWith("verify-zstd"))?.cmd).toContain("zstd -t");
     expect(plan.steps.find(s => s.id.startsWith("manifest"))?.cmd).toContain("sha256sum -c");
     expect(plan.steps.find(s => s.id.startsWith("pg-dump"))?.cmd).toContain(
-      "sudo -n -u 'postgres' pg_dump -Fc 'shenron'",
+      "sudo -n -u 'postgres' pg_dump -Fc 'demoapp'",
     );
     expect(plan.steps.find(s => s.id.startsWith("pg-verify"))?.cmd).toContain("pg_restore -l");
     expect(plan.steps.find(s => s.id.startsWith("pull:"))?.cmd).toContain("--partial --append-verify");
@@ -1350,7 +1350,7 @@ describe("archive plan", () => {
       {
         ...opts,
         sources: ["/home/ubuntu/apps/a", "/home/ubuntu/apps/b"],
-        pgDump: "shenron",
+        pgDump: "demoapp",
         pull: "/tmp/p",
       },
       "vps",
@@ -1362,12 +1362,12 @@ describe("archive plan", () => {
     expect(new Set(plan.steps.map(s => s.id)).size).toBe(plan.steps.length); // ids are unique
     const dumpOnly = planArchive(
       a,
-      { ...opts, sources: [], removeSource: false, pgDump: "shenron" },
+      { ...opts, sources: [], removeSource: false, pgDump: "demoapp" },
       "vps",
       DEFAULT_POLICY,
       now,
     );
-    expect(dumpOnly.steps.map(s => s.id)).toEqual(["pg-dump:shenron", "pg-verify:shenron"]);
+    expect(dumpOnly.steps.map(s => s.id)).toEqual(["pg-dump:demoapp", "pg-verify:demoapp"]);
   });
 
   it("labels archives from the path", () => {

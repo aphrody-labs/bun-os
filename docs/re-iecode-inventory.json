@@ -2463,34 +2463,6 @@
     },
     {
       "submodule": null,
-      "component": "iecode-docs-rg",
-      "path": null,
-      "type": "documentation",
-      "source": {
-        "repository": "aphrody-labs/rosegriffon",
-        "visibility": "public",
-        "revision": "0d68a2e6dece2deec223b2d8b75de5a97daa993c",
-        "path": "docs/rg"
-      },
-      "migrationState": "migrated",
-      "notes": "Rose Griffon product documentation is owned by the canonical repository; Bun OS keeps only this ownership and binary handoff reference."
-    },
-    {
-      "submodule": null,
-      "component": "iecode-rg",
-      "path": null,
-      "type": "bun-apps",
-      "source": {
-        "repository": "aphrody-labs/rosegriffon",
-        "visibility": "public",
-        "revision": "0d68a2e6dece2deec223b2d8b75de5a97daa993c",
-        "path": "apps/rg-website, apps/rg-bot, apps/azalee-web, apps/rosegriffon, packages/rg-*, packages/achillea-*, packages/azalee, crates/aphrody-rg-server"
-      },
-      "migrationState": "migrated",
-      "notes": "The canonical source and history live in aphrody-labs/rosegriffon. Bun OS no longer carries these copies; packages/inagle and packages/inagle-cross remain Bun OS owners."
-    },
-    {
-      "submodule": null,
       "component": "iecode-root-orchestration",
       "path": null,
       "type": "workspace-root",
@@ -2570,10 +2542,10 @@
       "path": "crates/re",
       "type": "rust-crate",
       "source": {
-        "repository": "aphrody-labs/aphrody, aphrody-labs/shenron, aphrody-labs/iecode",
+        "repository": "aphrody-labs/aphrody, aphrody-labs/iecode",
         "visibility": "mixed",
         "revision": null,
-        "path": "aphrody re, crates/shenron-re, crates/nie/aphrody-nie-{re,dump,steam}"
+        "path": "aphrody re, crates/nie/aphrody-nie-{re,dump,steam}"
       },
       "cargoOwner": "root-workspace",
       "buildOwner": "bun scripts/cargo.ts",
@@ -2601,20 +2573,7 @@
       "buildOwner": "bun uv",
       "releaseOwner": "root factory",
       "migrationState": "submodule",
-      "notes": "Dragon Ball Xenoverse 2 extraction and modding CLI; the Rust DBXV2 engine from shenron-re lives in crates/re (bunre-dbxv2) with partial command parity"
-    },
-    {
-      "submodule": null,
-      "component": "shenron-product",
-      "path": null,
-      "type": "product",
-      "source": {
-        "repository": "aphrody-labs/shenron",
-        "visibility": "private",
-        "revision": "09e8da0045c07a9f8ed08abe7b8571ab4fc18644"
-      },
-      "migrationState": "out-of-scope",
-      "notes": "only shenron-re belongs to this scope and is folded into crates/re"
+      "notes": "Dragon Ball Xenoverse 2 extraction and modding CLI; the Rust DBXV2 engine lives in crates/re (bunre-dbxv2) with partial command parity"
     },
     {
       "submodule": null,

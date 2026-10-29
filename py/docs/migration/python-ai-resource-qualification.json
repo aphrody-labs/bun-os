@@ -29,7 +29,6 @@
         "src/aphrody_train/triples.py": "9aefb01f41f94f5a1fbc4051f4019445814602b7b99a1cf3cef4f8a5e9c4fa9b",
         "src/aphrody_train/lora.py": "d8557d0bf3e3f78ccb03f7eaa163140cbf06364bf25b1bf539fdb036fa7aba8e",
         "src/aphrody_train/training_data.py": "4fd92480c18f2f6d71118cc9f18981d14aa4b3c3fd1eab78ff097ab22dc2a1f2",
-        "src/aphrody_train/shenron_ffi.py": "4ae932b8453b00222fd066f59e097e1df75ca9b3bebfccf304ca3aea070dcdaf",
         "src/aphrody_train/rerank.py": "e2bbc10638bfa6580d274f8e4b867131002cc916aaf5dd7d482a4957527cb1a7",
         "src/aphrody_train/dry_run.py": "0c73b048cdba083f551e4600f40c084a17f0127273510fa3eff49cd23c9311c4",
         "src/aphrody_train/embed.py": "9d3dd1b2a349456b6062310bc71739a57e0d52615ecf3f28bd75a8007457ccf6",
@@ -64,7 +63,6 @@
   },
   "unqualified": [
     "Model generation/training",
-    "Native Shenron provider",
     "CPU/CUDA full extras",
     "Windows/macOS release artifacts"
   ],

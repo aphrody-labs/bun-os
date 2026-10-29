@@ -101,7 +101,7 @@ Cloudflare MCP.
 
 `bun scripts/release.ts <verify|plan|npm|crates|all> [--apply]` is the one entry point; nothing publishes
 without `--apply`. Stages: `verify` (check, lint, format check, docs check, manifests), `plan` (what npm and
-crates.io lack), `npm` (dependency order, owned scopes `@aphrody` and `@rosegriffon`), `crates` (dependency
+crates.io lack), `npm` (dependency order, owned scope `@aphrody`), `crates` (dependency
 order, `--limit`, `--pause`). Stages are idempotent: a published version is skipped. Credentials come from the
 environment only (`NPM_CONFIG_TOKEN`, `CARGO_REGISTRY_TOKEN`). `.github/workflows/release.yml` runs verify,
 binaries, npm and crates on a `v*` tag or a manual dispatch (dry run unless `publish` is set).
@@ -120,7 +120,7 @@ workflow triggered, no tag). Tree: `origin/os` at `56018b4aa7`, plus the `bun.lo
 | `lint` | pass, 5923 files |
 | `format:check` | fails: 141 files differ (85 `packages/`, 19 `factory/`, 17 `scripts/`, 7 `src/`). `verify` stops here. Not reformatted: `bun fmt` would rewrite whole files, so it needs its own reviewed commit |
 | `docs:check` | pass, 53 pages (54 with this page), links resolve |
-| manifests | `scripts/workspace-manifests.ts` is a generator, not a check: it exits 0 and rewrites the root `package.json`, `tsconfig.json` and about twenty member manifests (adds `packages/admin-ui` to the workspaces, which then breaks `check`). The rewrite was reverted; the gate proves nothing and needs a `--check` mode |
+| manifests | `scripts/workspace-manifests.ts` is a generator, not a check: it exits 0 and rewrites the root `package.json`, `tsconfig.json` and about twenty member manifests (adds a package to the workspaces, which then breaks `check`). The rewrite was reverted; the gate proves nothing and needs a `--check` mode |
 
 Other findings: `bun install --frozen-lockfile` failed because `bun.lock` lacked the `@aphrody/identity` and
 `@aphrody/m3` links of `packages/artcraft-frontend` and `apps/artcraft-web-app`; fixed (4 lines). A fresh
@@ -131,7 +131,7 @@ exec -- metadata ...` exits 1 without output; plain `cargo metadata --no-deps --
 
 | Registry | Local | Unpublished | Notes |
 | --- | --- | --- | --- |
-| npm | 434 public packages in `@aphrody` and `@rosegriffon` (`packages/*`, `apps/*`) | 2 | `@aphrody/paths`, `@aphrody/canvas`; both have no unpublished dependency. Other scopes (for example `@storyteller`) are skipped by design |
+| npm | 434 public packages in `@aphrody` (`packages/*`, `apps/*`) | 2 | `@aphrody/paths`, `@aphrody/canvas`; both have no unpublished dependency. Other scopes (for example `@storyteller`) are skipped by design |
 | crates.io | 574 publishable crates (693 members, the rest `publish = false`) | 486 | 12 dependency layers of 130, 76, 66, 65, 52, 32, 22, 16, 13, 8, 4 and 2 crates. Layer 0 includes `aphrody-patch`, `aphrody-a2a`, `aphrody-config`, `aphrody-secrets`, `aphrody-guard`, `aphrody-agent-proto`, `aphrody-sql`, `aphrody-http-error`, `aphrody-app-protocol`, `aphrody-subsystem`; layer 1 starts with `aphrody-toolcall-repair`, `aphrody-a2a-pb`, `aphrody-models`, `aphrody-mcp-client`, `aphrody-nie-core` |
 
 At the workflow default (`--limit 5 --pause 600`) the crates stage publishes five crates per run, so 486 crates

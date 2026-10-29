@@ -69,9 +69,9 @@ args = ["--stdio"]
 [mcp_servers.aphrody.env]
 RUST_LOG = "info"
 
-[mcp_servers.dbfr]
-url = "https://mcp.dragonballfr.com/mcp"
-bearer_token_env_var = "DBFR_MCP_TOKEN"
+[mcp_servers.docs]
+url = "https://mcp.example.com/mcp"
+bearer_token_env_var = "DOCS_MCP_TOKEN"
 enabled_tools = ["rag_search"]
 
 [rag]

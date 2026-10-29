@@ -125,9 +125,9 @@ for (const [name, load] of backends) {
     test("retrieval eval harness", () => {
       const gold = rag.evalParseGold('// c\n{"q":"x","expectUrl":["/a"],"tags":["t"]}\nbad\n');
       expect(gold).toHaveLength(1);
-      const results = [hit("/zzz"), hit("https://dragonballfr.com/a/")];
+      const results = [hit("/zzz"), hit("https://example.org/a/")];
       const c = gold[0]!;
-      expect(rag.evalNormalizeUrl("https://dragonballfr.com/A/")).toBe("/a");
+      expect(rag.evalNormalizeUrl("https://example.org/A/")).toBe("/a");
       expect(rag.evalMatchesUrl("/a/b", "/a")).toBe(true);
       expect(rag.evalMatchesUrl("/ab", "/a")).toBe(false);
       expect(rag.evalIsHit(hit("/a"), c)).toBe(true);

@@ -9,14 +9,7 @@ import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 export type HostPathRule =
-  | "repo-absolute"
-  | "sibling-absolute"
-  | "source-checkouts"
-  | "vps-shenron-checkout"
-  | "user-home"
-  | "vps-home"
-  | "wsl-mount"
-  | "legacy-layout";
+  "repo-absolute" | "sibling-absolute" | "source-checkouts" | "user-home" | "vps-home" | "wsl-mount" | "legacy-layout";
 /** `host` is the declared VPS catalog, `platform` a WSL/Windows tool by design `test` fixture data. */
 export type HostPathArea = "platform" | "code" | "config" | "host" | "test" | "docs" | "record" | "data";
 export interface HostPathFinding {
@@ -87,12 +80,6 @@ const RULES: {
     rewrite: () => ".cache/upstream",
   },
   {
-    rule: "vps-shenron-checkout",
-    pattern: /\/home\/ubuntu\/shenron\/apps\/(?:shenron\/)?(?=[\w-]+\/)/g,
-    // Shenron is an external owner; normalizing a home must not invent a monorepo move.
-    rewrite: match => match.replace(/^\/home\/ubuntu/, "~"),
-  },
-  {
     rule: "user-home",
     pattern:
       /(?<![\w.-])\/home\/(?!ubuntu\b)[\w.-]+(?=\/)|\/Users\/[\w.-]+(?=\/)|[A-Za-z]:(?:\\\\|\\|\/)Users(?:\\\\|\\|\/)[\w.-]+/g,
@@ -119,7 +106,7 @@ const COMMENT_LINE = /^\s*(\/\/|\/\*|\*|#(?!!)|<!--|--\s)/;
 /** Rules a zone legitimately carries: fixtures and the declared VPS catalog name hosts on purpose. */
 const ALLOWED: Partial<Record<HostPathArea, HostPathRule[]>> = {
   platform: ["wsl-mount"],
-  host: ["vps-home", "legacy-layout", "vps-shenron-checkout"],
+  host: ["vps-home", "legacy-layout"],
 };
 
 const OWN_FILES = new Set([
@@ -141,9 +128,8 @@ export function hostPathArea(path: string): HostPathArea {
   if (/(^|\/)(examples?|benchmarks\/results|adapters)\//.test(path)) return "test";
   if (path === "crates/engine/yolo-core/src/mapper/audit.rs") return "test";
   if (/^(systemd|nginx|config\/infra)\//.test(path)) return "host";
-  if (/^(config\/(service-catalog\.json|shenron\/deploy\/)|\.github\/)|\/\.github\/workflows\//.test(path))
-    return "host";
-  if (/^scripts\/(atomic-deploy-|rg\/assemble-vps|ops\/provision|shenron\/install-)/.test(path)) return "host";
+  if (/^(config\/service-catalog\.json|\.github\/)|\/\.github\/workflows\//.test(path)) return "host";
+  if (/^scripts\/(atomic-deploy-|rg\/assemble-vps|ops\/provision)/.test(path)) return "host";
   if (/^scripts\/(migration|audit\/live-candidates|test-atomic-)/.test(path)) return "host";
   if (/(^|\/)(tests?|__tests__)\/|\.(test|spec)\.[a-z]+$|_tests?\.rs$|\/tests\.rs$/.test(path)) return "test";
   if (/(^|\/)data\//.test(path) || name.endsWith(".jsonl") || /\/inventaires\//.test(path)) return "data";

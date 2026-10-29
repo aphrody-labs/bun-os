@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { NativeLocalAI, type LocalAISelection, type LocalAIResult } from "../../src/lab/local-ai.ts";
 
 const gemma = { model: "gemma-4-e2b-it-q4km", profile: "aphrody" };
-const shenron = { model: "qwen3-4b-instruct-2507-q4km", profile: "dbfr" };
+const dbfrProfile = { model: "qwen3-4b-instruct-2507-q4km", profile: "dbfr" };
 const input = { messages: [{ role: "user" as const, content: "Bonjour" }] };
 const result = (selection: LocalAISelection): LocalAIResult => ({
   text: "Bonjour",
@@ -36,7 +36,7 @@ test("the next model cannot open until native destruction completes", async () =
     };
   });
   const first = ai.chat(gemma, input);
-  const second = ai.chat(shenron, input);
+  const second = ai.chat(dbfrProfile, input);
   await closing.promise;
   expect(order).toEqual(["open:aphrody"]);
   release.resolve();
@@ -60,7 +60,7 @@ test("failed generation is closed and does not poison subsequent turns", async (
     },
   }));
   await expect(ai.chat(gemma, input)).rejects.toThrow("Generation failed");
-  expect((await ai.chat(shenron, input)).profile).toBe("dbfr");
+  expect((await ai.chat(dbfrProfile, input)).profile).toBe("dbfr");
   expect(closed).toBe(2);
 });
 
@@ -82,7 +82,7 @@ test("an aborted queued turn does not load its model", async () => {
   const first = ai.chat(gemma, input);
   await started.promise;
   const abort = new AbortController();
-  const second = ai.chat(shenron, { ...input, signal: abort.signal });
+  const second = ai.chat(dbfrProfile, { ...input, signal: abort.signal });
   abort.abort();
   release.resolve();
   await first;
@@ -102,7 +102,7 @@ test("queue wait counts against the request deadline", async () => {
     async close() {},
   }));
   const first = ai.chat(gemma, input);
-  const expired = ai.chat(shenron, { ...input, timeoutMs: 1 });
+  const expired = ai.chat(dbfrProfile, { ...input, timeoutMs: 1 });
   await Bun.sleep(10);
   release.resolve();
   await first;
@@ -117,7 +117,7 @@ test("invalid profile or output identity fails closed and native session is free
     opens++;
     return {
       async chat() {
-        return result(shenron);
+        return result(dbfrProfile);
       },
       async close() {
         closed++;

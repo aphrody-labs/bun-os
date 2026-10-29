@@ -1,7 +1,0 @@
-# Keep the existing Shenron gateway routes and certificate store intact.
-services:
-  gateway:
-    volumes:
-      - /home/ubuntu/apps/aphrody-bun-release/gateway-nginx.conf:/etc/nginx/nginx.conf:ro
-      - /home/ubuntu/apps/aphrody-bun-release/bun-release.conf:/etc/aphrody-bun-release/bun-release.conf:ro
-      - /etc/aphrody/bun-release-tls:/etc/bun-release-tls:ro

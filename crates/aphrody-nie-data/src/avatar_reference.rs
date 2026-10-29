@@ -423,6 +423,15 @@ fn query_value(query: &str, key: &str) -> Option<String> {
 }
 
 #[cfg(feature = "serde")]
+/// Host of the NIE wiki whose `chara/<id>` links are accepted: host of `NIE_WIKI_BASE`, else the public default.
+fn wiki_host() -> String {
+    std::env::var("NIE_WIKI_BASE")
+        .ok()
+        .and_then(|base| url_host(base.trim()).map(str::to_owned))
+        .unwrap_or_else(|| "azalee.rosegriffon.fr".to_owned())
+}
+
+#[cfg(feature = "serde")]
 fn url_host(value: &str) -> Option<&str> {
     let tail = value.split_once("://")?.1;
     Some(tail.split(['/', '?', '#']).next().unwrap_or(tail))
@@ -590,7 +599,7 @@ pub fn import_avatar_reference(
                 reference_only: true,
             });
         }
-        if host.eq_ignore_ascii_case("azalee.rosegriffon.fr") {
+        if host.eq_ignore_ascii_case(&wiki_host()) {
             let tail = reference
                 .split_once("://")
                 .map_or(reference, |(_, tail)| tail);

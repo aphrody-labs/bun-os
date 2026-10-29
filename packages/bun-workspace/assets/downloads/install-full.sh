@@ -15,8 +15,7 @@
 # Environment:
 #   APHRODY_DOWNLOAD_URL  base URL of the download server (default https://downloads.aphrody.com)
 #   APHRODY_RELEASE       immutable release ID (default: select latest.json once)
-#   APHRODY_COMPONENTS    `all` (default) or space separated: aphrody plugin-aphrody plugin-yolo
-#                         plugin-shenron mcp
+#   APHRODY_COMPONENTS    `all` (default) or space separated: aphrody plugin-aphrody plugin-yolo mcp
 #   APHRODY_PREFIX        install prefix (default ~/.local): binaries in <prefix>/lib/aphrody/<release>,
 #                         links in ~/.local/bin, plugins in <prefix>/share/aphrody/plugins
 #   APHRODY_NO_LINKS=1    do not run `aphrody self install-path`
@@ -30,7 +29,7 @@ COMPONENTS="${APHRODY_COMPONENTS:-all}"
 ALL=""
 if [ "$COMPONENTS" = all ]; then
   ALL=1
-  COMPONENTS="aphrody plugin-aphrody plugin-yolo plugin-shenron mcp"
+  COMPONENTS="aphrody plugin-aphrody plugin-yolo mcp"
 fi
 PREFIX="${APHRODY_PREFIX:-$HOME/.local}"
 
@@ -210,7 +209,7 @@ for component in $COMPONENTS; do
   say "Installing $component ($TARGET)"
   case "$component" in
     aphrody) install_aphrody ;;
-    plugin-aphrody | plugin-yolo | plugin-shenron) install_plugin "$component" ;;
+    plugin-aphrody | plugin-yolo) install_plugin "$component" ;;
     mcp) install_mcp ;;
     *) die "unknown component: $component" ;;
   esac

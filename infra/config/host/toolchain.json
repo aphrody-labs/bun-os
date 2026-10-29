@@ -180,7 +180,7 @@
   },
   "hostTools": {
     "vps": {
-      "purpose": "lossless CDN optimizer scripts/release/cdn-optimize.ts (shenron-cdn-sync.service)",
+      "purpose": "lossless CDN optimizer scripts/release/cdn-optimize.ts",
       "apt": ["libjpeg-turbo-progs", "gifsicle", "webp", "ffmpeg", "zopfli", "imagemagick"],
       "binstall": ["oxipng"]
     }

@@ -17,21 +17,19 @@
     "packages": {
       "docker.io containerd docker-buildx docker-compose-v2 docker-model-plugin": "Docker engine",
       "xvfb openbox": "virtual desktop :99 of aphrody-remote",
-      "jq nftables microsocks": "relay metadata selection (jq), namespace-scoped input firewall (nftables), and private SOCKS5 listener bound to the VPS-to-Mullvad veth; callers use it only through the Windows loopback SSH forward or a scoped Shenron crawl"
+      "jq nftables microsocks": "relay metadata selection (jq), namespace-scoped input firewall (nftables), and private SOCKS5 listener bound to the VPS-to-Mullvad veth; callers use it only through the Windows loopback SSH forward"
     },
     "units": {
       "aphrody-desktop-xvfb.service aphrody-desktop-wm.service aphrody-remote.service": "virtual desktop and VNC on wg1 (host X11)",
-      "aphrody-mullvad-netns.service aphrody-mullvad-socks.service aphrody-mullvad-loopback.socket aphrody-mullvad-loopback.service": "Japan-only egress namespace, private SOCKS5 listener and loopback-only SSH bridge for Aphrody Web/Shenron crawl; never changes the VPS default route or public firewall",
-      "aphrody-shenron-build-runner.service": "GitHub Actions runner of the Shenron releases (account shenron-build)",
+      "aphrody-mullvad-netns.service aphrody-mullvad-socks.service aphrody-mullvad-loopback.socket aphrody-mullvad-loopback.service": "Japan-only egress namespace, private SOCKS5 listener and loopback-only SSH bridge for Aphrody Web crawl; never changes the VPS default route or public firewall",
       "aphrody-site.service": "kept native (measured 2026-10-09): static Rust site on public 0.0.0.0:80 (vps.aphrody.com), 4.5 MB RSS, 1.6 ms local response, systemd sandbox (ProtectSystem=strict, only CAP_NET_BIND_SERVICE, dedicated user); a container adds image and daemon overhead and a Docker-published :80 would bypass ufw",
       "aphrody-discord-sync.timer": "Discord sync tick (Bun)",
       "aphrody-selfheal.timer": "self-heal pass",
       "aphrody-wg-proxy@.socket aphrody-wg-proxy@.service": "wg1 forwarders (disabled)",
-      "aphrody-compute-dbfr-tunnel.service shenron-cdn-sync.timer": "disabled",
+      "aphrody-compute-dbfr-tunnel.service": "disabled",
       "user: aphrody-a2a.service aphrody-mcp-http.service": "A2A hub 23888 and MCP HTTP 23889 for the Windows tunnels (toolbox tools absent from aphrody:runtime)",
       "user: aphrody-deploy.timer": "Bun fork deploy queue, build role (needs ~/src/bun, gh auth and the wg SSH path to dbfr; the bun-build compose service does not mount them yet)",
-      "user: aphrody-sync.timer aphrody-site-publish.timer aphrody-vllm-update.timer": "aphrody fast-forward/build/install, site publication, vLLM CPU fork build",
-      "shenron-offsite-backup.timer": "04:30 UTC pull of the newest DBFR container snapshot over wg, SHA-256 + blank restore (pgvector/pgvector:0.8.1-pg18), preserve history under /mnt/aphrody-storage/disk500/archive/dbfr/backups/shenron"
+      "user: aphrody-sync.timer aphrody-site-publish.timer aphrody-vllm-update.timer": "aphrody fast-forward/build/install, site publication, vLLM CPU fork build"
     },
     "bin": {
       "/usr/local/bin/rclone /usr/local/bin/rsync": "transfer tools",

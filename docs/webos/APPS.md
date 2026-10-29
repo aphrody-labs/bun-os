@@ -143,7 +143,6 @@ Android app installs on a device; a library has no window; an example is read an
 | m3-next-example, m3-next-tauri-example, m3-published-consumer | Example                                                  | `/source/<member>`            | Material 3 components  |
 | m3-showcase                                                                             | Server                                                   | `/source/m3-showcase`         | Material 3 components  |
 | play                                                                                    | Server (Bun.serve + NGINX: Steam, LAN cache, gamestream) | `/source/play`                | Play                   |
-| rg-website                                                                              | Server (Next.js)                                         | `/source/rg-website`          |                        |
 | webos                                                                                   | Web                                                      | About                         | itself                 |
 | webos-server                                                                            | Server                                                   | `/source/webos-server`        | About                  |
 
@@ -155,7 +154,7 @@ Android app installs on a device; a library has no window; an example is read an
   and the Workspace.
 - Command-line tools (the Craft `-cli` members): terminal programs and MCP servers.
 - Servers (`play`, `webos-server`, `figcraft-server`, `m3-showcase`, `iecode-web`,
-  `artcraft-web-app`, `rg-website`): each needs its own backend process; `play` streams games over
+  `artcraft-web-app`): each needs its own backend process; `play` streams games over
   WebRTC from its own host.
 - `bun-android`, `java-ffi`: Android only.
 - Published builds: the member window lists the artifacts of the downloads service; when the service

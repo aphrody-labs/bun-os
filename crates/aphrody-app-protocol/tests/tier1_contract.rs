@@ -369,7 +369,7 @@ fn test_aphrody_extensions() {
         "method": "aphrody/rag/search",
         "id": "rag-1",
         "params": {
-            "query": "shenron eval harness",
+            "query": "retrieval eval harness",
             "topK": 3
         }
     });
@@ -378,7 +378,7 @@ fn test_aphrody_extensions() {
 
     if let ClientRequest::RagSearch { id, params } = rag_req {
         assert_eq!(id, RequestId::String("rag-1".to_string()));
-        assert_eq!(params.query, "shenron eval harness");
+        assert_eq!(params.query, "retrieval eval harness");
         assert_eq!(params.top_k, 3);
     } else {
         panic!("Expected RagSearch variant");

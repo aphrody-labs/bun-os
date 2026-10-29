@@ -13,7 +13,7 @@
 //! same resolver `aphrody rag` uses — against an empty [`RagConfig`] (this
 //! server never parses `config.toml`), so the canonical `APHRODY_AI_EMBED_*`
 //! / `APHRODY_AI_RERANK_*` environment and every legacy
-//! `APHRODY_RAG_EMBED_*` / `APHRODY_SHENRON_EMBED_*` alias both resolve the
+//! `APHRODY_RAG_EMBED_*` alias resolve the
 //! same way the CLI does. Nothing configured or discoverable degrades to
 //! lexical search, honestly reported in `fallback_reason`.
 //!

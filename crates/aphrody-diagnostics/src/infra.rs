@@ -3,12 +3,7 @@
 
 use serde_json::{Value, json};
 
-const TARGETS: [&str; 4] = [
-    "windows-local",
-    "linux-container-26.04",
-    "vps-ubuntu-26.04",
-    "dbfr-database",
-];
+const TARGETS: [&str; 3] = ["windows-local", "linux-container-26.04", "vps-ubuntu-26.04"];
 
 /// Configured infrastructure targets and services.
 #[must_use]
@@ -19,9 +14,7 @@ pub fn infra_status() -> Value {
         "services": [
             "aphrody-gateway",
             "nie-site",
-            "nie-model-serve",
-            "rosegriffon",
-            "shenron-bot"
+            "nie-model-serve"
         ],
         "status": "nominal"
     })

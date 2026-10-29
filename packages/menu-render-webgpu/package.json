@@ -1,8 +1,8 @@
 {
-  "name": "@rosegriffon/menu-render-webgpu",
+  "name": "@aphrody/menu-render-webgpu",
   "version": "1.4.7",
   "private": false,
-  "description": "Renderer WebGPU 2D pixel-perfect pour les écrans de menu IEVR (quads texturés instanciés, projection ortho 1280×720, sampler nearest, premultiplied alpha, blend par drawType, z-order painter par drawPriority). Fallback DOM <GameMenu> de @rosegriffon/menu-render.",
+  "description": "Renderer WebGPU 2D pixel-perfect pour les écrans de menu IEVR (quads texturés instanciés, projection ortho 1280×720, sampler nearest, premultiplied alpha, blend par drawType, z-order painter par drawPriority). Fallback DOM <GameMenu> de @aphrody/menu-render.",
   "license": "UNLICENSED",
   "files": [
     "src",
@@ -31,7 +31,7 @@
     "typecheck": "bun check --noEmit"
   },
   "dependencies": {
-    "@rosegriffon/menu-render": "workspace:*"
+    "@aphrody/menu-render": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "catalog:",

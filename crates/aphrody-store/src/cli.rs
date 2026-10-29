@@ -18,7 +18,7 @@ use crate::{
 /// Home selection shared by every verb that opens the home database.
 #[derive(Debug, Clone, Args)]
 pub struct StoreArgs {
-    /// Domain profile (`aphrody`, `dbfr`, `ie`...); omitted selects the global home.
+    /// Domain profile (`aphrody`, `ie`...); omitted selects the global home.
     #[arg(long, global = true)]
     pub profile: Option<String>,
     /// Explicit state root (default: `$APHRODY_HOME` or `~/.aphrody`).

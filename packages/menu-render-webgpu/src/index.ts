@@ -38,7 +38,7 @@ export type { TextBitmap } from "./text-atlas";
 export { GameMenuGpu, shouldUseWebGpu } from "./game-menu-gpu";
 export type { GameMenuGpuProps } from "./game-menu-gpu";
 
-// Ré-export du contrat (provenant de @rosegriffon/menu-render) pour confort.
+// Ré-export du contrat (provenant de @aphrody/menu-render) pour confort.
 export type {
   MenuLayout,
   MenuObject,
@@ -46,7 +46,7 @@ export type {
   MenuTransform,
   MenuSprite,
   MenuText,
-} from "@rosegriffon/menu-render";
+} from "@aphrody/menu-render";
 
 // NB : AvatarRenderer3d / cpk-loader importent nie-wasm (glue wasm-pack qui require 'fs')
 // → casse le bundle navigateur Turbopack d'azalee. Ils ne sont PAS ré-exportés par l'index

@@ -262,7 +262,7 @@
       {
         "runtime": "CEF (tauri-runtime-cef 3.0.0-alpha.5)",
         "mechanism": "tauri_runtime_cef::RemoteDebugging::{Disabled (default), Port{port,allowed_origins}, Pipe} and WebviewCefExt::{send_dev_tools_message,on_dev_tools_protocol}",
-        "inUse": "aphrody-app (APHRODY_CEF_REMOTE_DEBUGGING_PORT, loopback opt-in, crates/ui/app/src/cef.rs), the mcp-bridge screenshot (Page.captureScreenshot through WebviewCefExt) and aphrody-labs/shenron crates/koharu-app/src/app.rs (Port 4000 under cfg(debug_assertions))",
+        "inUse": "aphrody-app (APHRODY_CEF_REMOTE_DEBUGGING_PORT, loopback opt-in, crates/ui/app/src/cef.rs) and the mcp-bridge screenshot (Page.captureScreenshot through WebviewCefExt)",
         "tauriSupport": "Tauri 3"
       }
     ]

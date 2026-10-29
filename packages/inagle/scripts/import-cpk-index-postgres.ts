@@ -3,9 +3,9 @@ import { gunzipSync } from "node:zlib";
 import { existsSync, readFileSync } from "node:fs";
 import { createInagleSql, type Insertable } from "@rosegriffon/db/inagle-sql";
 import type { Database } from "@rosegriffon/db/schema";
-import { rgWebsitePath } from "../src/core/roots.ts";
+import { webAppPath } from "../src/core/roots.ts";
 
-const sourceCandidates = [process.env.CPK_INDEX_PATH, rgWebsitePath("data", "cpk-index.ndjson.gz")].filter(
+const sourceCandidates = [process.env.CPK_INDEX_PATH, webAppPath("data", "cpk-index.ndjson.gz")].filter(
   (v): v is string => Boolean(v),
 );
 const source = sourceCandidates.find(v => existsSync(v));

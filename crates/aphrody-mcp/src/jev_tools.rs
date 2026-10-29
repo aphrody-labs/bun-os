@@ -35,9 +35,7 @@ pub(crate) struct JevDecideRequest {
 fn router() -> Result<&'static Arc<JevRouter>, String> {
     static ROUTER: OnceLock<Arc<JevRouter>> = OnceLock::new();
     configured_router(&ROUTER, || {
-        let endpoint = aphrody_config::ai_env::CHAT_BASE_URL.resolve().or_else(|| {
-            crate::shenron_llm_backend::running_managed_url().map(|url| url.to_string())
-        });
+        let endpoint = aphrody_config::ai_env::CHAT_BASE_URL.resolve();
         JevRouter::from_env_with_native_endpoint(endpoint.as_deref())
     })
 }

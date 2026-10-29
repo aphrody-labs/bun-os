@@ -32,13 +32,7 @@
     "homeDocuments": ["MEMORY.md"],
     "directory": "/home/ubuntu/.aphrody/workspaces/dbfr/incoming/drive",
     "stateRoot": "/home/ubuntu/.aphrody",
-    "shenronRoot": "/home/ubuntu/apps/shenron/shared/agent-home",
     "intervalSeconds": 300
-  },
-  "ragMonitor": {
-    "unit": "shenron-rag-sync.service",
-    "reportPath": "~/.aphrody/workspaces/dbfr/indexes/shenron-rag-latest.json",
-    "intervalSeconds": 60
   },
   "publication": {
     "host": "vps",

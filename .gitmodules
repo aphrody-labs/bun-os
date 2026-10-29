@@ -815,11 +815,6 @@
 	path = vendor/ui-ux-pro-max-skill
 	url = https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
 	shallow = true
-[submodule "vendor/shenron-config"]
-	path = vendor/shenron-config
-	url = https://github.com/aphrody-labs/shenron-config.git
-	branch = main
-	shallow = true
 [submodule "vendor/microsoft/microsoft-ui-xaml"]
 	path = vendor/microsoft/microsoft-ui-xaml
 	url = https://github.com/microsoft/microsoft-ui-xaml.git

@@ -1,6 +1,6 @@
 //! Tournament bracket generation, match scheduling, Swiss stages, and circuit points.
 //!
-//! Reconstructed and ported from the Rose Griffon Achillea tournament engine
+//! Reconstructed and ported from a previous tournament engine
 //! (`apps/achillea-bot/src/services/TournamentsService.ts`, `BracketService.ts`,
 //! `SwissStageService.ts` and `@achillea/core/tournaments`):
 //! - Single Elimination, Double Elimination, and Swiss Stage tournament formats

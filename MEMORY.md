@@ -15,9 +15,6 @@ rolling status narrative.
 - Product members belong under the root `apps/`, `crates/` and `packages/`
   directories. Imported projects retain their upstream history, licenses and
   ownership until a deliberate migration is completed.
-- Rose Griffon application source belongs to
-  `aphrody-labs/rosegriffon`; integration references are in
-  `docs/ROSEGRIFFON.md`.
 - The distribution direction is Arch Linux with pacman/libalpm. Server, COSMIC
   Desktop and Gamescope Gaming are separate compositions. Alpine and Ubuntu
   remain compatibility targets. The final goal is Bun integrated into the Linux

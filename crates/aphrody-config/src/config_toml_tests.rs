@@ -14,7 +14,7 @@ fn realistic_fixture_parses_with_zero_errors() {
     assert_eq!(config.sandbox_mode, Some(SandboxMode::WorkspaceWrite));
     assert_eq!(config.notify, vec!["notify-send", "aphrody turn finished"]);
     assert!(config.mcp_servers.contains_key("aphrody"));
-    assert!(config.mcp_servers.contains_key("dbfr"));
+    assert!(config.mcp_servers.contains_key("docs"));
     assert!(config.model_providers.contains_key("custom-vllm-cluster"));
     assert!(config.profiles.contains_key("fast-local"));
     assert!(config.rag.is_some());

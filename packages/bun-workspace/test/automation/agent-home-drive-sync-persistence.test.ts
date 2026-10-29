@@ -58,7 +58,7 @@ test("a selected Drive worker needs no agent settings and cannot retain unrelate
     {
       ...config,
       ragMonitor: {
-        unit: "shenron-rag-sync.service",
+        unit: "aphrody-rag-sync.service",
         reportPath: "/private/rag.json",
         intervalSeconds: 60,
       },
@@ -225,7 +225,7 @@ test("review pending and blocked receipts gate downstream consumers even between
             incoming: "/private/incoming",
             directory: "/private/dest",
             stateRoot: "/private/stateRoot",
-            shenronRoot: "/private/shenron",
+            extraStateRoot: "/private/extra",
             contract: "/private/contract",
             intervalSeconds: 300,
           },

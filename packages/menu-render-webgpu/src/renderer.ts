@@ -16,7 +16,7 @@
  * exige un navigateur.
  */
 
-import type { MenuLayout, MenuObject, MenuObjectOverride, MenuText } from "@rosegriffon/menu-render";
+import type { MenuLayout, MenuObject, MenuObjectOverride, MenuText } from "@aphrody/menu-render";
 import { blendForDrawType } from "./blend";
 import { renderTextBitmap, textCacheKey, type TextBitmap } from "./text-atlas";
 import { type GlyphAtlas, layoutText, parseFontMetrics } from "./glyph-atlas";

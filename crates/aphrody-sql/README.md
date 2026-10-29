@@ -153,7 +153,7 @@ Contract (ADR D8):
   unnamed typed statements, so it also works behind a pooler, but run it on the
   direct URL.
 * One owner per database or schema: the tracking table is keyed by version.
-  Shenron (drizzle-kit) and RG (its SQL migrations) keep their own tools.
+  Other products keep their own migration tools.
 
 ```rust
 let mut client = pool.get().await?;

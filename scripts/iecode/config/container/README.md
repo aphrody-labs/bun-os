@@ -16,8 +16,8 @@ come from the serialized Aphrody factory. Compilation receipts preserve targets,
 features, source revisions and hashes. A compiled desktop binary still requires its
 display and graphics runtime qualification.
 
-The runtime follows the sealed precompiled artifact pattern used by Aphrody and
-Shenron. It uses Ubuntu 26.04 for the Bun GNU release ABI, the pinned .NET 10 runtime,
+The runtime follows the sealed precompiled artifact pattern used by Aphrody. It uses
+Ubuntu 26.04 for the Bun GNU release ABI, the pinned .NET 10 runtime,
 and a non-root user. Build only the generated `image` directory. Keep the image ID
 in the host-specific Infra plan before activation; this recipe does not change host
 allocation or install a new deployment controller.

@@ -196,7 +196,7 @@
       "oxlintPassed": true,
       "systemdVerifyPassed": true,
       "unitCatalogTestsPassed": 3,
-      "globalHostCatalogCheck": "Five unrelated unlisted inventory/unit files remain in concurrent Shenron work",
+      "globalHostCatalogCheck": "Five unrelated unlisted inventory/unit files remain in concurrent work",
       "windowsMcpCheck": "passed (x86_64-pc-windows-msvc, no-default-features)"
     },
     "observedAt": "2026-10-07T14:20:39.258Z",

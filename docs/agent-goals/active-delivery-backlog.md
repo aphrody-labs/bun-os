@@ -55,5 +55,5 @@ owners and at most four compiler jobs per lane. Preserve concurrent source work,
 protected stores and existing licenses throughout.
 
 Cross-session coordination was explicitly authorized by the owner on 2026-10-20.
-Coordinate Bun Video, Shenron recovery and Craft/M3 changes before touching their
+Coordinate Bun Video and Craft/M3 changes before touching their
 owned paths or factory lanes. Preserve their source checkpoints during sync.

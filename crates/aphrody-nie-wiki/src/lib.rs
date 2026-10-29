@@ -25,6 +25,15 @@ pub mod auxiliary;
 pub mod cards;
 pub mod catalog;
 pub mod cross;
+/// Origin of the NIE asset CDN: `NIE_CDN_BASE` (no trailing slash), else the public default.
+pub(crate) fn cdn_base() -> String {
+    std::env::var("NIE_CDN_BASE")
+        .ok()
+        .map(|v| v.trim().trim_end_matches('/').to_string())
+        .filter(|v| !v.is_empty())
+        .unwrap_or_else(|| "https://cdn.rosegriffon.fr".to_string())
+}
+
 pub mod desktop;
 pub mod entities;
 pub mod episodes;

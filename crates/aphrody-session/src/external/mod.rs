@@ -357,7 +357,7 @@ pub fn default_output_dir() -> Result<PathBuf, SyncError> {
 
 /// Canonical allowlisted domain profile. Existing global stores are never migrated.
 pub fn domain_profile_dir(domain: &str) -> Result<PathBuf, SyncError> {
-    if !matches!(domain, "aphrody" | "dbfr" | "ie") {
+    if !matches!(domain, "aphrody" | "ie") {
         return Err(SyncError::InvalidDomain(domain.into()));
     }
     let state = aphrody_models::paths::state_dir()

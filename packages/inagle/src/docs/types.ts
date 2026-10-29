@@ -1,6 +1,6 @@
 /**
  * @file types.ts
- * @description Types and schemas for @rosegriffon/inagle/docs.
+ * @description Types and schemas for @aphrody/inagle/docs.
  * Covers OpenAPI 3.1.0 specifications, VFS architecture catalog,
  * nie.exe reverse engineering mappings, and Answer.AI llms.txt models.
  */

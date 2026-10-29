@@ -155,15 +155,6 @@
     "specta_bindings": "Liaisons IPC Specta typées de bout en bout",
     "in_process_execution": "Exécution native directe en bibliothèque (zéro sous-processus)"
   },
-  "shenron": {
-    "title": "Moteur d'Agent Shenron & DBFR",
-    "rag_query": "Requête RAG sur base de connaissances certifiée",
-    "character_persona": "Personnalité Shenron active",
-    "databooks": "Guides et archives canoniques",
-    "wiki_references": "Entités du wiki Dragon Ball FR",
-    "pipeline_status": "Chaîne de traitement des connaissances",
-    "grounded_response": "Réponse ancrée et vérifiée"
-  },
   "shell": {
     "title": "Shell natif Aphrody & PTY",
     "nushell_backend": "Moteur NuShell structuré",

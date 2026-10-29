@@ -1,6 +1,6 @@
 //! Competitive ELO rating, progressive tier progression, and ranked ladder system.
 //!
-//! Reconstructed and ported from the Rose Griffon Achillea competitive core
+//! Reconstructed and ported from a previous competitive core
 //! (`apps/achillea-bot/src/services/EloService.ts` and `@achillea/core/elo`):
 //! - 11 official competitive rank tiers (Fer to Légendaire)
 //! - Progressive directional AP / ELO delta calculation (winK / lossK)
@@ -150,7 +150,7 @@ pub struct TierEloFactors {
     pub loss_k: u32,
 }
 
-/// Official Achillea / Rose Griffon calibration table for directional K-factors.
+/// Official calibration table for directional K-factors.
 const TIER_FACTORS_TABLE: [TierEloFactors; 11] = [
     TierEloFactors {
         win_k: 40,

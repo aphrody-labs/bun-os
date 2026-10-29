@@ -45,21 +45,17 @@ dns_ovh_application_key = cb_ak
 dns_ovh_application_secret = cb_as
 dns_ovh_consumer_key = cb_ck
 `;
-    const parsed = parseCredentialsText(text, "ovh-dbfr.ini");
+    const parsed = parseCredentialsText(text, "ovh-certbot.ini");
     expect(parsed).not.toBeNull();
     expect(parsed?.applicationKey).toBe("cb_ak");
     expect(parsed?.applicationSecret).toBe("cb_as");
     expect(parsed?.consumerKey).toBe("cb_ck");
   });
 
-  it("includes all three segregated infrastructure profiles", () => {
+  it("includes the segregated infrastructure profile", () => {
     expect(KNOWN_PROFILES["aphrody.com"]).toBeDefined();
-    expect(KNOWN_PROFILES["rosegriffon.fr"]).toBeDefined();
-    expect(KNOWN_PROFILES["dragonballfr.com"]).toBeDefined();
 
     expect(KNOWN_PROFILES["aphrody.com"].domains).toContain("aphrody.com");
-    expect(KNOWN_PROFILES["rosegriffon.fr"].domains).toContain("rosegriffon.fr");
-    expect(KNOWN_PROFILES["dragonballfr.com"].domains).toContain("dragonballfr.com");
   });
 });
 

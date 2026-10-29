@@ -17,7 +17,9 @@ const MENU_CATEGORIES: &[&str] = &[
     "telop_waza",
 ];
 const SELECTION_CATEGORIES: &[&str] = &["story", "chronicle", "special", "kizuna", "other"];
-const IMAGE_ROOT: &str = "https://cdn.rosegriffon.fr/dx11/menu/220_img";
+fn image_root() -> String {
+    format!("{}/dx11/menu/220_img", crate::cdn_base())
+}
 
 #[derive(Debug, Default, Deserialize)]
 pub struct GalleryRequest {
@@ -112,6 +114,7 @@ fn scalar(row: &rusqlite::Row<'_>, index: usize) -> rusqlite::Result<Value> {
 }
 
 fn selection(connection: &Connection, input: &GalleryRequest) -> anyhow::Result<(Vec<Value>, u64)> {
+    let image_root = image_root();
     let mut filter = vec!["1".to_owned()];
     let mut values = Vec::<SqlValue>::new();
     if let Some(category) = input
@@ -143,7 +146,7 @@ fn selection(connection: &Connection, input: &GalleryRequest) -> anyhow::Result<
                 let token = scalar(row, 2)?;
                 let flag = scalar(row, 3)?;
                 let mut result = variants(
-                    (!path.is_empty()).then(|| format!("{IMAGE_ROOT}/gallery_img2/{path}.png")),
+                    (!path.is_empty()).then(|| format!("{image_root}/gallery_img2/{path}.png")),
                 );
                 let object = result.as_object_mut().expect("gallery object");
                 object.insert("id".into(), scalar(row, 0)?);
@@ -164,6 +167,7 @@ fn selection(connection: &Connection, input: &GalleryRequest) -> anyhow::Result<
 }
 
 fn menu(input: &GalleryRequest) -> anyhow::Result<(Vec<Value>, u64)> {
+    let image_root = image_root();
     // One inventory reconstruction, independent of page size and the presence of a mirror table.
     let inventory = crate::gallery::manifest_records()?;
     let search = input.q.as_deref().unwrap_or_default().trim().to_lowercase();
@@ -202,7 +206,7 @@ fn menu(input: &GalleryRequest) -> anyhow::Result<(Vec<Value>, u64)> {
             .take(limit as usize)
             .map(|(id, category, title, path)| {
                 // Materialize image variants only for the requested page, not all 3,579 entries.
-                let mut value = variants(Some(format!("{IMAGE_ROOT}/{path}")));
+                let mut value = variants(Some(format!("{image_root}/{path}")));
                 let object = value.as_object_mut().expect("gallery object");
                 object.insert("id".into(), json!(id));
                 object.insert("imgPath".into(), json!(path));
@@ -257,6 +261,7 @@ mod tests {
 
     #[test]
     fn selection_preserves_text_order_nulls_titles_and_literal_legacy_patterns() {
+        let image_root = image_root();
         let connection = Connection::open_in_memory().unwrap();
         connection.execute_batch("CREATE TABLE inagle_gallery(id TEXT,img_path TEXT,need_token_num TEXT,flg_no TEXT);
             INSERT INTO inagle_gallery VALUES ('two','img_story_two','2','2'),('ten','img_story_ten','10','10'),('null','img_other_null',NULL,NULL);").unwrap();
@@ -274,7 +279,7 @@ mod tests {
         assert_eq!(page["data"][0]["title"], "Story Ten");
         assert_eq!(
             page["data"][0]["full"],
-            format!("{IMAGE_ROOT}/gallery_img2/img_story_ten.png?w=1600&format=webp&crop=bandes")
+            format!("{image_root}/gallery_img2/img_story_ten.png?w=1600&format=webp&crop=bandes")
         );
         let second = list(
             &connection,

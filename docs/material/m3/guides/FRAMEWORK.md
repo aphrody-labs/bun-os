@@ -52,7 +52,7 @@ apps and scripts. The build pipeline still emits declarations for packages with 
 the root task wrapper currently forwards extra arguments only for benchmarks and theme installation.
 
 Workspace tests include the apps and nested `packages/m3-next/examples/*` members. The root manifest
-and test runner exclude the host-bound `packages/app-ui`, `packages/shenron-ui`,
+and test runner exclude the host-bound `packages/app-ui`,
 `packages/web-to-tauri`, and the independent `packages/nie-ui` repository. Those owners keep their own
 installation and gates. `app-ui` builds Rust and belongs to the integrator using the enclosing
 Aphrody repository's `scripts/build/rust/cargo-serial.sh`.

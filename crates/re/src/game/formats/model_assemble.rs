@@ -6,7 +6,7 @@
 //!
 //! Assembles `.emd` meshes, `.emb` textures, `.esk` skeletal bones, and `.emm` materials into
 //! a unified standard GLTF 2.0 binary (`.glb`) asset that can be rendered directly by
-//! `shenron-engine`'s GPU pipeline or any standard 3D/WebGPU viewer.
+//! a GPU pipeline or any standard 3D/WebGPU viewer.
 
 use crate::game::error::{ReError, Result};
 use crate::game::formats::emb::{EmbFile, EmbRgbaTexture};
@@ -268,7 +268,7 @@ impl AssembledCharacterModel {
         let gltf = json!({
             "asset": {
                 "version": "2.0",
-                "generator": "Shenron DBXV2 Model Assembler"
+                "generator": "DBXV2 Model Assembler"
             },
             "scene": 0,
             "scenes": [{

@@ -85,7 +85,7 @@ pub enum ChunkKind {
 #[derive(Default)]
 pub enum LengthUnit {
     /// UTF-16 code units — what JavaScript's `String.prototype.length`
-    /// counts, and therefore what shenron's `maxChunkChars = 1400` actually
+    /// counts, and therefore what the TypeScript reference's `maxChunkChars = 1400` actually
     /// measures. **Default**: the reference corpus (`docs/plans/
     /// codex-oss.md` P9) is French + Japanese, and byte-sizing cuts Japanese
     /// passages roughly 3x too early (each kana/kanji is ~3 UTF-8 bytes but
@@ -123,9 +123,9 @@ pub struct ChunkOptions {
     /// — no trailing space required, unlike the ASCII `. ! ?` rule — so a
     /// Japanese/Chinese passage without ASCII punctuation still splits at
     /// `max_chars` instead of becoming one oversized "unsplittable
-    /// sentence". Set to `false` for bit-for-bit parity with shenron's
+    /// sentence". Set to `false` for bit-for-bit parity with the TypeScript reference's
     /// `_rag-chunk.ts`, which has no CJK support (see
-    /// [`ChunkOptions::shenron_parity`]).
+    /// [`ChunkOptions::ts_parity`]).
     pub cjk_sentence_breaks: bool,
 }
 
@@ -142,13 +142,13 @@ impl Default for ChunkOptions {
 }
 
 impl ChunkOptions {
-    /// Options reproducing shenron's `_rag-chunk.ts` `chunkDocument` exactly:
+    /// Options reproducing the TypeScript reference's `_rag-chunk.ts` `chunkDocument` exactly:
     /// `max_chars = 1400`, `overlap_pct = 0.15`, lengths measured the way JS
     /// measures them (`LengthUnit::Utf16`), and no CJK sentence-boundary
     /// extension (upstream has none). Every TS-parity test in this crate
     /// runs under this profile.
     #[must_use]
-    pub fn shenron_parity() -> Self {
+    pub fn ts_parity() -> Self {
         Self {
             max_chars: 1400,
             overlap_pct: 0.15,

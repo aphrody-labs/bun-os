@@ -28,7 +28,7 @@ fn empty_profile_is_all_none() {
 #[test]
 fn explicit_profile_wins_over_environment() {
     assert_eq!(
-        select_profile(Some(" niers "), Some("shenron")),
+        select_profile(Some(" niers "), Some("worker")),
         Some("niers".to_owned())
     );
 }
@@ -36,8 +36,8 @@ fn explicit_profile_wins_over_environment() {
 #[test]
 fn environment_selects_profile_when_cli_is_absent() {
     assert_eq!(
-        select_profile(None, Some(" shenron ")),
-        Some("shenron".to_owned())
+        select_profile(None, Some(" worker ")),
+        Some("worker".to_owned())
     );
     assert_eq!(select_profile(None, Some("  ")), None);
     assert_eq!(
@@ -49,7 +49,7 @@ fn environment_selects_profile_when_cli_is_absent() {
 #[test]
 fn home_agent_profile_round_trip_preserves_all_eight_components() {
     let source = r#"
-        plugins = ["../shenron/plugins/dragon-ball"]
+        plugins = ["../worker/plugins/example"]
 
         [database]
         db_type = "postgres"
@@ -60,24 +60,24 @@ fn home_agent_profile_round_trip_preserves_all_eight_components() {
         mode = "hybrid+rerank"
         vector_dim = 384
 
-        [mcp_servers.shenron]
+        [mcp_servers.worker]
         command = "bun"
         args = ["apps/mcp/src/index.ts"]
 
         [skills]
-        whitelist = ["rag.canon", "ocr.continuous", "dbfr-databooks"]
+        whitelist = ["rag.canon", "ocr.continuous", "docs-index"]
 
         [a2a]
-        id = "shenron@dragonballfr.com"
-        mailbox = ".coord/inbox-from-shenron.jsonl"
+        id = "worker@example.com"
+        mailbox = ".coord/inbox-from-worker.jsonl"
 
         [ocr]
         engines = ["pp-ocr-v5", "dots.ocr-3b"]
-        state_path = "workspace-shenron/ocr"
+        state_path = "workspace-worker/ocr"
 
         [redis]
         url = "redis://127.0.0.1:6379/1"
-        prefix = "shenron:"
+        prefix = "worker:"
     "#;
     let profile: ConfigProfile = toml::from_str(source).expect("parse profile");
     let encoded = toml::to_string(&profile).expect("serialize profile");
@@ -94,16 +94,16 @@ fn home_agent_profile_round_trip_preserves_all_eight_components() {
         decoded
             .mcp_servers
             .expect("MCP servers")
-            .contains_key("shenron")
+            .contains_key("worker")
     );
     assert_eq!(decoded.skills.expect("skills").whitelist.len(), 3);
     assert_eq!(
         decoded.a2a.expect("A2A").mailbox.as_deref(),
-        Some(".coord/inbox-from-shenron.jsonl")
+        Some(".coord/inbox-from-worker.jsonl")
     );
     assert_eq!(decoded.ocr.expect("OCR").engines.len(), 2);
     assert_eq!(
         decoded.redis.expect("Redis").prefix.as_deref(),
-        Some("shenron:")
+        Some("worker:")
     );
 }

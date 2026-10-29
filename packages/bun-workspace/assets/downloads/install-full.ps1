@@ -9,8 +9,7 @@
 # named explicitly must install. Environment:
 #   APHRODY_DOWNLOAD_URL  base URL (default https://downloads.aphrody.com)
 #   APHRODY_RELEASE       immutable release ID (default: select latest.json once)
-#   APHRODY_COMPONENTS    `all` (default) or space separated: aphrody desktop plugin-aphrody plugin-yolo
-#                         plugin-shenron mcp
+#   APHRODY_COMPONENTS    `all` (default) or space separated: aphrody desktop plugin-aphrody plugin-yolo mcp
 #   APHRODY_PREFIX        install prefix (default %USERPROFILE%\.local)
 #   APHRODY_NO_LINKS=1    do not run `aphrody self install-path`
 # Every download is verified against SHA256SUMS of the same release.
@@ -21,7 +20,7 @@ $ProgressPreference = "SilentlyContinue"
 $Base = if ($env:APHRODY_DOWNLOAD_URL) { $env:APHRODY_DOWNLOAD_URL.TrimEnd("/") } else { "https://downloads.aphrody.com" }
 $Requested = if ($env:APHRODY_COMPONENTS) { $env:APHRODY_COMPONENTS.Trim() } else { "all" }
 $All = $Requested -eq "all"
-$Components = if ($All) { @("aphrody", "desktop", "plugin-aphrody", "plugin-yolo", "plugin-shenron", "mcp") } else { $Requested -split "\s+" | Where-Object { $_ } }
+$Components = if ($All) { @("aphrody", "desktop", "plugin-aphrody", "plugin-yolo", "mcp") } else { $Requested -split "\s+" | Where-Object { $_ } }
 $Prefix = if ($env:APHRODY_PREFIX) { $env:APHRODY_PREFIX } else { Join-Path $env:USERPROFILE ".local" }
 $Target = "x86_64-pc-windows-msvc"
 if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne "X64") { throw "unsupported architecture (x86_64 only)" }
@@ -139,7 +138,7 @@ try {
         Write-Host "aphrody MCP server declared in Claude Code (Aphrody-Setup.exe also declares it in Claude Desktop)"
       }
       "plugin-*" {
-        if ($Component -notin @("plugin-aphrody", "plugin-yolo", "plugin-shenron")) { throw "unknown component: $Component" }
+        if ($Component -notin @("plugin-aphrody", "plugin-yolo")) { throw "unknown component: $Component" }
         $Name = Find-File $Component ".zip"
         if (-not $Name) { Skip "no $Component archive in this release"; continue }
         $Zip = Get-Verified $Name

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "../../../");
@@ -34,21 +34,9 @@ for (const gate of ["typecheck", "test", "build"]) {
   run(discordKit, "run", gate);
 }
 
-// 3. Gate consumer bots typecheck & integrity if requested with --full. The Shenron bot lives in
-// aphrody-labs/shenron (SHENRON_ROOT, else the sibling checkout of this repository).
-if (process.argv.includes("--full")) {
-  const shenronBot = resolve(process.env.SHENRON_ROOT?.trim() || resolve(root, "..", "shenron"), "apps/bot");
-  if (existsSync(shenronBot)) {
-    run(shenronBot, "run", "type-check");
-    run(shenronBot, "run", "test");
-  } else {
-    console.log(`\nskip Shenron bot gates: no checkout at ${shenronBot}`);
-  }
-}
-
-// 4. Gate native standalone compilation if requested with --compile
+// 3. Gate native standalone compilation if requested with --compile
 if (process.argv.includes("--compile")) {
   run(root, "run", "packages/engine/yolo/src/index.ts", "ops", "discord", "compile", "all", "--smoke");
 }
 
-console.log("\nAll Discord monorepo gates, shared packages, and bot integrations passed successfully.");
+console.log("\nAll Discord monorepo gates, and shared packages passed successfully.");

@@ -83,10 +83,6 @@
     "m3-next-tauri-example": { "kind": "example", "related": "showcase" },
     "m3-published-consumer": { "kind": "example", "related": "showcase" },
     "play": { "kind": "server", "related": "play" },
-    "rg-website": {
-      "kind": "server",
-      "desc": "RG website (Next.js) and its static assets"
-    },
     "designcraft": {
       "desc": "DesignCraft desktop app"
     },

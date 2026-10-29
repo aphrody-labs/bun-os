@@ -1,13 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Parity tests for the `eval` module against shenron's `rag-eval.ts` rules.
-//!
-//! Two sources of ground truth:
-//! 1. **Hand-derived goldens** (this file): each expected value below is computed by hand-tracing
-//!    the TS algorithm quoted in `eval.rs`'s doc comments against the given input, documented
-//!    inline at each case.
-//! 2. **shenron's real gold file** (`gold_file_parses_when_present`): loaded from the sibling
-//!    checkout at test time when it exists; skipped with a printed note otherwise (CI on a host
-//!    without a shenron checkout).
+//! Parity tests for the `eval` module against the TypeScript `rag-eval.ts` rules.
+//! Two sources of ground truth: hand-derived goldens, computed by tracing the TypeScript reference
+//! algorithm quoted in `eval.rs`'s doc comments against each input and documented inline at each
+//! case.
 
 use aphrody_rag_core::eval::{
     Gate, GoldCase, RetrievedHit, aggregate, aggregate_by_tag, compare, first_hit_rank, is_hit,
@@ -45,11 +40,11 @@ fn text_case(q: &str, expect: &[&str]) -> GoldCase {
 #[test]
 fn normalize_url_strips_origin_and_trailing_slash() {
     assert_eq!(
-        normalize_url("https://www.dragonballfr.com/wiki/Freezer/"),
+        normalize_url("https://www.example.com/wiki/Freezer/"),
         "/wiki/freezer"
     );
     assert_eq!(
-        normalize_url("https://dragonballfr.com/wiki/Freezer"),
+        normalize_url("https://example.com/wiki/Freezer"),
         "/wiki/freezer"
     );
     assert_eq!(normalize_url("/wiki/Freezer"), "/wiki/freezer");
@@ -326,31 +321,7 @@ fn compare_flags_per_tag_recall5_regression() {
     assert!(cmp.recall[&5].delta < 0.0);
 }
 
-// --- real shenron gold file, best-effort ----------------------------------------
-
-#[test]
-fn gold_file_parses_when_present() {
-    // `SHENRON_ROOT` overrides the sibling checkout next to this repository.
-    let shenron = std::env::var_os("SHENRON_ROOT").map_or_else(
-        || std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../shenron"),
-        std::path::PathBuf::from,
-    );
-    let path = shenron.join("apps/bot/tests/rag-gold.jsonl");
-    let path = path.as_path();
-    if !path.exists() {
-        eprintln!("note: shenron checkout not found at {path:?}; skipping gold-file parity check");
-        return;
-    }
-    let text = std::fs::read_to_string(path).expect("read shenron gold file");
-    let cases = parse_gold(&text);
-    assert_eq!(
-        cases.len(),
-        172,
-        "shenron's gold file was 172 cases as read on 2026-09-19"
-    );
-}
-
-// --- RetrievedHit round-trips shenron's real production hit shape ----------
+// --- RetrievedHit round-trips the reference production hit shape ----------
 
 #[test]
 fn retrieved_hit_round_trips_production_json_losslessly() {

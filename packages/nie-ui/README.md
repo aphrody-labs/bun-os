@@ -6,7 +6,7 @@ Single home of NIE UI and design (private, aphrody-labs).
 - `packages/menu-render`, `packages/menu-render-webgpu` pixel-perfect IEVR menu renderers (DOM, WebGPU)
 - `packages/nie-web` NIE site/wasm libs, build/audit/release scripts, viewer assets, docs
 - `packages/inagle-ui` explorer/maps helpers
-- `apps/tauri/model-view` Tauri 3D model viewer; the Azalee wiki frontend is owned by the external Rose Griffon repository (`apps/azalee-web`)
+- `apps/tauri/model-view` Tauri 3D model viewer; the Azalee wiki frontend lives outside this package
 - `rust/` NIE UI crates (`nie-ui` design tokens, render, render3d, viewer-web, wasm, lua-web, tauri-3d reference); serial cargo only via Aphrody
 - `tools/pixel-perfect/` validators and examples; `skills/` design skills; `docs/`
 - `HISTORY.md` provenance of every file

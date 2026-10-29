@@ -9,7 +9,7 @@
     "applied_at": "2026-09-22T23:54:19Z",
     "operator_intent": "clean slate: every application stopped, rebuilt later through aphrody-infra",
     "backup": "$HOME/.infra-reset-backup-20260922T235419Z.tar.gz (custom units, drop-ins, /etc/nginx, user units, shell profiles, bunlight, /root/.bun) and $HOME/.infra-reset-nodesource.sources.bak",
-    "systemd": "all non-package units and drop-ins removed from /etc/systemd/system (40 units incl. nie-*, rg-*, achillea-*, website-web*, mullvad-*, wg-forward@, stack-py, vnc-desktop) and 11 user units; failed units: 0",
+    "systemd": "all non-package units and drop-ins removed from /etc/systemd/system (40 units incl. nie-*, achillea-*, website-web*, mullvad-*, wg-forward@, stack-py, vnc-desktop) and 11 user units; failed units: 0",
     "nginx": "service disabled and stopped; conf.d, sites-enabled and custom snippets removed",
     "bun": "no bun on PATH; bunlight and /root/.bun removed",
     "node": "nodejs, npm, nsolid, libnode and all node-* apt packages purged; NodeSource apt source removed; fnm, global node_modules and npm caches removed",
@@ -32,10 +32,6 @@
       "/usr/local/sbin/aphrody-infra-deploy": {
         "sha256": "c1834eb1c2b762436f02a5d452947a25d6d3897f3ddc768086cc2d177c33cf45",
         "source": "scripts/atomic-deploy.sh (site-only, removed from the repository; install-vps-adapter.sh deletes it)"
-      },
-      "/usr/local/sbin/aphrody-infra-deploy-rg": {
-        "sha256": "d2fba88e20235096af9d153f102894ebc8d632f107172f22c1761a026f951631",
-        "source": "scripts/release/atomic-deploy-rg.sh"
       }
     },
     "catalog_snapshots": {
@@ -44,60 +40,32 @@
     },
     "adapter_manifest": "absent (ADAPTER.json is written by the current install-vps-adapter.sh)",
     "release_current": {
-      "/srv/rg/current": "/srv/rg/releases/5691ba4be97b94279878e00d264793c1b28f8cf1",
-      "/srv/shenron/current": "/srv/shenron/releases/4cac743f",
       "/srv/aphrody/current": "absent (retired 2026-09-25)"
     }
   },
   "current_observation": {
     "captured_at": "2026-09-26T16:44:41Z",
     "method": "read-only ssh (BatchMode): systemctl, pg_lsclusters, ls, sha256sum",
-    "active_application_units": [
-      "rg-website.service",
-      "rg-api.service",
-      "rg-bot.service",
-      "rg-achillea-bot.service",
-      "rg-cron.service",
-      "shenron-site.service",
-      "shenron-bot.service",
-      "shenron-pg-tunnel.service"
-    ],
+    "active_application_units": [],
     "active_host_units": [
       "nginx.service",
       "redis-server.service",
-      "rg-zram-swap.service",
       "fail2ban.service",
       "docker.service",
       "containerd.service",
       "ufw.service"
     ],
-    "enabled_timers": ["rg-infra-monitor.timer", "rg-sauvegarde.timer", "shenron-backup.timer"],
-    "disabled_installed_units": ["rg-cdn.service", "rg-storage.service", "rg-realtime.service"],
-    "failed_units": [
-      "postgresql@18-main.service (failed since 2026-09-25T11:46:54Z, after the disk-full)",
-      "rg-infra-monitor.service",
-      "rg-sauvegarde.service"
-    ],
+    "enabled_timers": [],
+    "disabled_installed_units": [],
+    "failed_units": ["postgresql@18-main.service (failed since 2026-09-25T11:46:54Z, after the disk-full)"],
     "postgresql": {
       "cluster": "18/main",
       "port": 5432,
       "status": "down",
       "data_directory": "/var/lib/postgresql/18/main"
     },
-    "nginx_conf_d": ["00-default.conf", "rg.conf", "shenron.conf"],
-    "tls_renewal_configs": [
-      "achillea.rosegriffon.fr",
-      "api.rosegriffon.fr",
-      "azalee.rosegriffon.fr",
-      "bot.dragonballfr.com",
-      "cdn.dragonballfr.com",
-      "cdn.rosegriffon.fr",
-      "dragonballfr.com",
-      "mcp.rosegriffon.fr",
-      "ranked.rosegriffon.fr",
-      "rosegriffon.fr",
-      "rpbey.fr"
-    ],
+    "nginx_conf_d": ["00-default.conf"],
+    "tls_renewal_configs": ["rpbey.fr"],
     "absent": ["/srv/aphrody", "/etc/aphrody", "/srv/aphrody-infra", "/srv/aphrody-cdn", "aphrody.com certificate"],
     "system_user_aphrody": "present (uid 997)",
     "runtimes": { "python3": "3.14.4", "nginx": "1.28.3", "jq": "1.8.1" },
@@ -119,12 +87,7 @@
       "usage_percent": 100
     },
     "reclaimed_paths": [".bun/install/cache", ".cache/sccache"],
-    "verified_active_units": [
-      "aphrody-site.service",
-      "aphrody-web-api.service",
-      "shenron-site.service",
-      "rg-website.service"
-    ],
+    "verified_active_units": ["aphrody-site.service", "aphrody-web-api.service"],
     "reclaim_plan_remaining_gib": 0
   },
   "last_retirement_observation": {
@@ -181,31 +144,19 @@
       "aphrody-site.service",
       "aphrody-web-api.service",
       "aphrody-ai-http.service",
-      "aphrody-shenron-embed.service",
       "aphrody-a2a.service",
-      "shenron-mcp.service",
       "nie-site.service",
       "nie-model-serve.service"
     ],
-    "removed_certificates": ["aphrody.com", "mcp.dragonballfr.com"],
-    "remaining_routes": {
-      "cdn.rosegriffon.fr/dx11/*": "rg-core -> nie-model-serve /tex (nginx/rg/rg-core.conf)",
-      "cdn.rosegriffon.fr/dynamic-game-assets": "rg-core -> nie-model-serve (snippets/nie-assets.inc)"
-    },
-    "verified_active_services": [
-      "nginx.service",
-      "rg-core.service",
-      "rg-website.service",
-      "shenron-site.service",
-      "shenron-bot.service"
-    ],
-    "unrelated_failed_units": ["postgresql@18-main.service", "rg-infra-monitor.service"],
+    "removed_certificates": ["aphrody.com"],
+    "verified_active_services": ["nginx.service"],
+    "unrelated_failed_units": ["postgresql@18-main.service"],
     "disk": {
       "size_bytes": 311227166720,
       "used_bytes": 151220928512,
       "available_bytes": 159989460992,
       "usage_percent": 49
     },
-    "note": "PostgreSQL cluster was down before retirement and remains on host; all six Aphrody backup dumps passed pg_restore --list but no live restore was tested. IECode tree, source checkout, local data and launcher were removed as requested; RG and Shenron non-MCP data/services were not removed."
+    "note": "PostgreSQL cluster was down before retirement and remains on host; all six Aphrody backup dumps passed pg_restore --list but no live restore was tested. IECode tree, source checkout, local data and launcher were removed as requested."
   }
 }

@@ -66,7 +66,6 @@ fn report(runtime: &GoogleRuntime) -> StatusReport {
         project: runtime.project.id(),
         project_kind: match runtime.project {
             GoogleProject::Aphrody => "aphrody",
-            GoogleProject::Rgfr => "rgfr",
         },
         location: runtime.location.clone(),
         home: runtime.home.clone(),

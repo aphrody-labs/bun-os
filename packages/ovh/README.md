@@ -22,7 +22,7 @@ Native in-process OVHcloud SDK for Aphrody Infra, built exclusively for **Bun** 
   - Aliases and redirections management.
   - Deliverability Scorecard (`auditEmailDns`): checks MX (`mail.ovh.net`), SPF (`include:mx.ovh.com`), DMARC (`_dmarc`), and DKIM selectors (`ovhmo-selector-{1,2}`).
 - **Profile Resolution**:
-  - Native multi-account segregation: `aphrody.com`, `rosegriffon.fr`, `dragonballfr.com`.
+  - Native multi-account segregation (`aphrody.com` profile, extensible through profile files).
   - Multi-format parser: Bash exports (`.bash_secrets`), INI format (`.ovh.conf`), and Certbot (`dns_ovh_*`).
 
 ## Command line

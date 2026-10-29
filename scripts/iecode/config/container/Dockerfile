@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# GNU Bun release and Shenron native artifacts require Ubuntu 26.04 / glibc 2.43.
+# GNU Bun release and native artifacts require Ubuntu 26.04 / glibc 2.43.
 ARG BASE_IMAGE=ubuntu@sha256:88a381d5b5eeb2b35d3ad70925a362c37ce569daf43ede89ff818ec20e4d3794
 ARG DOTNET_IMAGE=mcr.microsoft.com/dotnet/runtime@sha256:5b280fe869ce058778531aa13d9a3ddf1efa0e889524904753da6fc48aada91e
 FROM ${DOTNET_IMAGE} AS managed-runtime

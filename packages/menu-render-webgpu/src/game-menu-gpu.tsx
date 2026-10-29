@@ -2,7 +2,7 @@
  * <GameMenuGpu> — wrapper React du renderer WebGPU du menu IEVR.
  *
  * Monte un `<canvas>`, pilote `WebGpuMenuRenderer` dans un `useEffect`, et **retombe**
- * sur le `<GameMenu>` DOM de `@rosegriffon/menu-render` quand :
+ * sur le `<GameMenu>` DOM de `@aphrody/menu-render` quand :
  *   - `navigator.gpu` est absent, OU
  *   - `forceFallback` est vrai (tests / forçage), OU
  *   - l'initialisation/le rendu WebGPU échoue.
@@ -19,7 +19,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { GameMenu, type MenuLayout, type MenuObjectOverride } from "@rosegriffon/menu-render";
+import { GameMenu, type MenuLayout, type MenuObjectOverride } from "@aphrody/menu-render";
 import { CANVAS_SIZE, computeLetterbox, WebGpuMenuRenderer } from "./renderer";
 
 export interface GameMenuGpuProps {

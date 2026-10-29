@@ -40,10 +40,10 @@ Related: [`wgpu-webgpu.md`](../../reference/WASM/wgpu-webgpu.md) (pins) and
 
 ## Desktop app
 
-<!-- docs-hub:begin include="DRAGON-BALL-READER.md" -->
+<!-- docs-hub:begin include="DRIVE-ROUTE-PARITY.md" -->
 | Document | Contenu | Statut | Mis à jour |
 | --- | --- | --- | --- |
-| [Dragon Ball readers in the M3 family](DRAGON-BALL-READER.md) | @aphrody/m3-reader owns the manga, databook, and collection reading controls. | imported | 2026-09-29 |
+| [Drive route parity: file kinds, jobs, redundancy](DRIVE-ROUTE-PARITY.md) | The active webview is packages/app-ui. | imported | 2026-09-29 |
 <!-- docs-hub:end -->
 
 Evidence data: [`drive-interface-source-hashes.json`](./drive-interface-source-hashes.json) and

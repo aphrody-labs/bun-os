@@ -6,7 +6,7 @@
 # globals, verified with pg_restore --list and sha256, 4. DROP DATABASE.
 set -euo pipefail
 DB="$1"; OUT="$2"
-case "$DB" in rg|shenron_site|postgres|template0|template1) echo "refusing to retire $DB" >&2; exit 2;; esac
+case "$DB" in postgres|template0|template1) echo "refusing to retire $DB" >&2; exit 2;; esac
 PSQL=(sudo -n -u postgres psql -X -v ON_ERROR_STOP=1 -At)
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 "${PSQL[@]}" -c "select 1 from pg_database where datname='$DB'" | grep -q 1 || { echo "$DB absent"; exit 0; }

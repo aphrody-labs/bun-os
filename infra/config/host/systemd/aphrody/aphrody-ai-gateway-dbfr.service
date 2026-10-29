@@ -12,7 +12,6 @@ User=ubuntu
 Group=ubuntu
 Environment=HOME=/home/ubuntu
 Environment=APHRODY_HOME=/home/ubuntu/.aphrody
-Environment=APHRODY_AI_CHAT_MODEL=shenron-chat-v2
 Environment=OPENAI_BASE_URL=http://127.0.0.1:8799/v1
 Environment=OPENAI_API_KEY=loopback
 EnvironmentFile=/etc/aphrody/aphrody-ai-gateway.env

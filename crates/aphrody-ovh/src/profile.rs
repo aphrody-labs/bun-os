@@ -20,26 +20,12 @@ pub struct ProfileInfo {
 }
 
 pub fn known_profiles() -> Vec<ProfileInfo> {
-    vec![
-        ProfileInfo {
-            id: "aphrody.com".into(),
-            name: "Aphrody Core".into(),
-            region: "ovh-eu".into(),
-            domains: vec!["aphrody.com".into()],
-        },
-        ProfileInfo {
-            id: "rosegriffon.fr".into(),
-            name: "Rose Griffon".into(),
-            region: "ovh-eu".into(),
-            domains: vec!["rosegriffon.fr".into()],
-        },
-        ProfileInfo {
-            id: "dragonballfr.com".into(),
-            name: "Dragon Ball FR".into(),
-            region: "ovh-eu".into(),
-            domains: vec!["dragonballfr.com".into()],
-        },
-    ]
+    vec![ProfileInfo {
+        id: "aphrody.com".into(),
+        name: "Aphrody Core".into(),
+        region: "ovh-eu".into(),
+        domains: vec!["aphrody.com".into()],
+    }]
 }
 
 /// Per-user file (outside the repository) holding the service account as
@@ -125,12 +111,6 @@ fn candidate_files(home: &Path, profile_or_domain: Option<&str>) -> Vec<PathBuf>
         candidates.push(home.join(SERVICE_ACCOUNT_ENV_FILE));
         candidates.push(home.join(".bash_secrets"));
         candidates.push(home.join(".config/ovh/aphrody.conf"));
-    } else if target.contains("rosegriffon") || target == "rg" {
-        candidates.push(home.join(".ovh.conf"));
-        candidates.push(home.join(".config/ovh/rosegriffon.conf"));
-    } else if target.contains("dragonball") || target.contains("dbfr") {
-        candidates.push(home.join(".config/ovh/dbfr.conf"));
-        candidates.push(PathBuf::from("/etc/letsencrypt/ovh-dbfr.ini"));
     }
 
     candidates.push(home.join(".ovh.conf"));
@@ -323,7 +303,7 @@ mod tests {
             ("OVH_CLIENT_ID", "env-id"),
             ("OVH_CLIENT_SECRET", "env-secret"),
         ]);
-        let (creds, _) = resolve_credentials(&env, home.path(), Some("rosegriffon.fr")).unwrap();
+        let (creds, _) = resolve_credentials(&env, home.path(), Some("example.org")).unwrap();
         assert_eq!(creds.auth_mode(), Some(AuthMode::ApplicationKey));
     }
 

@@ -135,7 +135,7 @@ interface RawChunk {
 /**
  * Decode one `data:` payload of a chat-completions stream into events. `[DONE]` yields `done`.
  * A payload carrying `error` throws a `stream` error; malformed JSON throws a `parse` error.
- * Top-level `citations` / `refusal: true` (grounded backends such as Shenron) are passed on.
+ * Top-level `citations` / `refusal: true` (grounded RAG backends) are passed on.
  */
 export function parseChatCompletionChunk(payload: string): ChatStreamEvent[] {
   const trimmed = payload.trim();

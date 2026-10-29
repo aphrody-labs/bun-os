@@ -76,7 +76,7 @@ describe("Preflight intent & token checks", () => {
   it("asserts token matches configured client profile", async () => {
     const mockFetch = mock(
       async () =>
-        new Response(JSON.stringify({ id: "123456789", name: "Shenron" }), {
+        new Response(JSON.stringify({ id: "123456789", name: "Aphrody Bot" }), {
           status: 200,
         }),
     );
@@ -84,7 +84,7 @@ describe("Preflight intent & token checks", () => {
     await expect(
       assertDiscordTokenMatchesProfile(
         "token_valid",
-        { clientId: "123456789", name: "Shenron" },
+        { clientId: "123456789", name: "Aphrody Bot" },
         { fetchImpl: mockFetch as unknown as typeof fetch },
       ),
     ).resolves.toBeUndefined();
@@ -92,7 +92,7 @@ describe("Preflight intent & token checks", () => {
     await expect(
       assertDiscordTokenMatchesProfile(
         "token_invalid",
-        { clientId: "999999999", name: "Shenron" },
+        { clientId: "999999999", name: "Aphrody Bot" },
         { fetchImpl: mockFetch as unknown as typeof fetch },
       ),
     ).rejects.toThrow("does NOT match");

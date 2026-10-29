@@ -15,8 +15,7 @@ set -euo pipefail
 #       Fresh host (no /etc/aphrody env yet, e.g. after the 2026-09-25
 #       retirement): creates the aphrody system user, /home/ubuntu/apps/aphrody/shared,
 #       the two login roles (or rotates their passwords: no env file on the host
-#       holds the old ones), the staged site/Web env, the AI HTTP env and the
-#       Shenron compute client env. Run it after the PostgreSQL cluster is back
+#       holds the old ones), the staged site/Web env and the AI HTTP env. Run it after the PostgreSQL cluster is back
 #       online and before `copy-aphrody-web-tables.sh --fresh-host`, which
 #       restores the aphrody and aphrody_web databases from their dumps.
 #
@@ -37,8 +36,6 @@ next_site_env="$env_dir/aphrody-site.next.env"
 web_env="$env_dir/aphrody-web-api.env"
 next_web_env="$env_dir/aphrody-web-api.next.env"
 ai_env="$env_dir/aphrody-ai-http.env"
-client_env="$env_dir/shenron-compute-client.env"
-ai_url=http://127.0.0.1:8789
 psql_admin() { runuser -u ubuntu -- psql -X -q -v ON_ERROR_STOP=1 "$@"; }
 role_exists() { runuser -u ubuntu -- psql -X -d postgres -Atqc "SELECT 1 FROM pg_roles WHERE rolname = '$1'" | grep -qx 1; }
 
@@ -53,8 +50,6 @@ shared_layout() {
   install -d -m 0700 -o ubuntu -g ubuntu "$root/shared/bxc" "$root/shared/bxc/storage" "$root/shared/bxc/cookies" \
     "$root/shared/coord" "$root/shared/a2a" "$root/shared/db-backups"
   install -d -m 0700 -o aphrody -g aphrody "$root/shared/ai" "$root/shared/ai/models"
-  install -d -m 0755 -o aphrody -g aphrody "$root/shared/models"
-  install -d -m 0750 -o aphrody -g aphrody "$root/shared/models/e5-native"
   [[ -L "$root/shared/a2a/ai.json" ]] || ln -s "$root/current/ai.json" "$root/shared/a2a/ai.json"
   [[ -L "$root/shared/a2a/.coord" ]] || ln -s "$root/shared/coord" "$root/shared/a2a/.coord"
 }
@@ -68,7 +63,7 @@ printf -v web_dsn '%s://%s:%s@%s/%s' postgresql aphrody_web "$web_password" 127.
 printf -v ai_dsn '%s://%s:%s@%s/%s' postgresql aphrody_ai_http "$ai_password" 127.0.0.1:5432 aphrody
 
 if [[ "$mode" = fresh ]]; then
-  for file in "$site_env" "$next_site_env" "$web_env" "$next_web_env" "$ai_env" "$client_env"; do
+  for file in "$site_env" "$next_site_env" "$web_env" "$next_web_env" "$ai_env"; do
     [[ ! -e "$file" ]] || { echo "$file exists: this is not a fresh host (use the default mode)" >&2; exit 2; }
   done
   command -v useradd >/dev/null || { echo "missing useradd" >&2; exit 2; }
@@ -77,7 +72,6 @@ if [[ "$mode" = fresh ]]; then
     useradd --system --user-group --home-dir "$root/shared/ai" --no-create-home --shell /usr/sbin/nologin aphrody
   fi
   shared_layout
-  shenron_token="$(openssl rand -hex 32)"
   # Feed SQL on stdin, not argv. Passwords are hex and cannot alter SQL quoting.
   {
     printf "SET password_encryption = 'scram-sha-256';\n"
@@ -93,23 +87,14 @@ if [[ "$mode" = fresh ]]; then
   printf 'BXC_API_TOKEN=%s\nAPHRODY_WEB_DATABASE_URL=%s\n' "$web_backend_token" "$web_dsn" > "$next_web_env"
   printf 'APHRODY_WEB_DATABASE_URL=%s\nAPHRODY_SITE_DATABASE_URL=%s\nAPHRODY_SITE_WEB_API_TOKEN=%s\nAPHRODY_BXC_API_TOKEN=%s\nAPHRODY_SITE_WEB_BACKEND_TOKEN=%s\n' \
     "$web_dsn" "$web_dsn" "$web_public_token" "$web_public_token" "$web_backend_token" > "$next_site_env"
-  # The aphrody-ai-http process reads the Shenron token, LLM provider and cookie
-  # under their server names; embeddings use the canonical APHRODY_AI_* names.
-  {
-    printf 'APHRODY_MCP_DATABASE_URL=%s\n' "$ai_dsn"
-    printf 'APHRODY_SHENRON_API_TOKEN=%s\n' "$shenron_token"
-    printf 'APHRODY_AI_EMBED_BASE_URL=http://127.0.0.1:8794/v1\nAPHRODY_AI_EMBED_MODEL=Xenova/multilingual-e5-small\nAPHRODY_AI_EMBED_DIMENSIONS=384\n'
-    printf 'APHRODY_SHENRON_LLM_PROVIDER=gemini-web\nAPHRODY_SHENRON_GEMINI_COOKIE_FILE=%s\n' "$root/shared/ai/google-cookies.json"
-  } > "$ai_env"
-  # Canonical names first; the legacy ones stay while Shenron still reads them.
-  printf 'APHRODY_AI_HTTP_URL=%s\nAPHRODY_AI_HTTP_TOKEN=%s\nAPHRODY_SHENRON_API_URL=%s\nAPHRODY_SHENRON_API_TOKEN=%s\n' \
-    "$ai_url" "$shenron_token" "$ai_url" "$shenron_token" > "$client_env"
-  chmod 0600 "$next_site_env" "$next_web_env" "$ai_env" "$client_env"
-  chown root:root "$next_site_env" "$next_web_env" "$ai_env" "$client_env"
+  printf 'APHRODY_MCP_DATABASE_URL=%s
+' "$ai_dsn" > "$ai_env"
+  chmod 0600 "$next_site_env" "$next_web_env" "$ai_env"
+  chown root:root "$next_site_env" "$next_web_env" "$ai_env"
   PGPASSWORD="$web_password" psql -X -h 127.0.0.1 -U aphrody_web -d postgres -Atqc 'SELECT 1' | grep -qx 1
   PGPASSWORD="$ai_password" psql -X -h 127.0.0.1 -U aphrody_ai_http -d postgres -Atqc 'SELECT 1' | grep -qx 1
-  echo 'fresh host provisioned: aphrody user, shared layout, roles, staged site/Web env, AI and Shenron client env (0600)'
-  echo 'next: copy-aphrody-web-tables.sh --fresh-host, E5 weights, Gemini cookie, TLS, then the bundle adapter'
+  echo 'fresh host provisioned: aphrody user, shared layout, roles, staged site/Web env, AI env (0600)'
+  echo 'next: copy-aphrody-web-tables.sh --fresh-host, TLS, then the stack adapter'
   exit 0
 fi
 

@@ -12,7 +12,7 @@
     "~/src": {
       "kind": "bind",
       "source": "~/build/workspaces",
-      "note": "une copie git par dépôt : aphrody, bun, shenron, forks/<nom>"
+      "note": "une copie git par dépôt : aphrody, bun, forks/<nom>"
     },
     "~/apps": {
       "kind": "bind",
@@ -35,16 +35,7 @@
   "removed": {
     "/srv": "supprimé (plus de liens de transition)",
     "~/.git": "dossier vide à la racine du home, supprimé",
-    "/home/omar/src": "lien symbolique vers /home/ubuntu/src (copies omar propres, sans commit non poussé, supprimées)",
-    "/home/shenron-build/runner": "copie retirée après bascule du runner"
-  },
-  "services": {
-    "aphrody-shenron-build-runner.service": {
-      "user": "ubuntu",
-      "group": "aphrody",
-      "workingDirectory": "~/build/runners/shenron",
-      "note": "runner réenregistré non requis (même jeton) ; le compte shenron-build reste en place, sans service"
-    }
+    "/home/omar/src": "lien symbolique vers /home/ubuntu/src (copies omar propres, sans commit non poussé, supprimées)"
   },
   "kept": {
     "~/yolo/w/rel-glibc, ~/yolo/w/rel-musl": "workspaces des builds yolo en cours (conteneur yolo-rel-musl), à déplacer quand le build est arrêté",

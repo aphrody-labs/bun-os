@@ -16,19 +16,17 @@ pub mod languages;
 pub mod search;
 use serde::{Deserialize, Serialize};
 
-/// Cloud target for a workload. DBFR and NIE use `Aphrody`; RG uses `Rgfr`.
+/// Cloud target for a workload.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum GoogleProject {
     Aphrody,
-    Rgfr,
 }
 
 impl GoogleProject {
     pub const fn id(self) -> &'static str {
         match self {
             Self::Aphrody => "aphrody",
-            Self::Rgfr => "rgfr",
         }
     }
 }
@@ -45,13 +43,7 @@ pub struct GoogleRuntime {
 impl GoogleRuntime {
     /// Resolve only non-secret configuration from the process environment.
     pub fn from_env() -> Self {
-        let project_name = std::env::var("APHRODY_VERTEX_PROJECT")
-            .ok()
-            .or_else(|| std::env::var("GOOGLE_CLOUD_PROJECT").ok());
-        let project = match project_name.as_deref() {
-            Some("rgfr") | Some("rgfr-8927d") => GoogleProject::Rgfr,
-            _ => GoogleProject::Aphrody,
-        };
+        let project = GoogleProject::Aphrody;
         Self {
             project,
             location: std::env::var("GOOGLE_CLOUD_LOCATION")
@@ -70,6 +62,5 @@ mod tests {
     #[test]
     fn project_ids_are_canonical() {
         assert_eq!(GoogleProject::Aphrody.id(), "aphrody");
-        assert_eq!(GoogleProject::Rgfr.id(), "rgfr");
     }
 }

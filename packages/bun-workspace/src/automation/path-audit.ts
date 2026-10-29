@@ -50,7 +50,7 @@ export async function runPathAudit(args: string[]): Promise<number> {
     for (const node of nodes) {
       const value = node.getLiteralValue();
       if (absolute === resolve(root, "packages/bun-workspace/src/automation/path-audit.ts")) continue;
-      const isTemp = value.startsWith("/tmp/") && !value.startsWith("/tmp/shenron-");
+      const isTemp = value.startsWith("/tmp/");
       const isUserPath = /^\/home\/[^/]+\/|^\/Users\/[^/]+\/|^[A-Za-z]:[\\/]Users[\\/]/.test(value);
       if (!isTemp && !isUserPath) continue;
       const line = node.getStartLineNumber();

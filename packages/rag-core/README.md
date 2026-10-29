@@ -16,7 +16,7 @@ The native desktop app links `aphrody-rag-core` directly as a Rust crate (no bin
 ```ts
 import { loadRagWasm } from "@aphrody/rag-core/wasm"; // web
 const rag = await loadRagWasm();
-rag.chunk("docs/guide.md", markdown, { profile: "shenron_parity" });
+rag.chunk("docs/guide.md", markdown, { profile: "default" });
 rag.topKCosineF32(query, matrix, 384, 10);
 
 import { openRagFfi } from "@aphrody/rag-core/ffi"; // Bun backend
@@ -31,4 +31,3 @@ whose single binary is `aphrody_command_wasm_bg.wasm`. CLI and typed RAG calls s
 loader and memory. The `loadRagWasm` and `loadRagWasmSync` APIs remain unchanged; explicit
 bytes or module inputs must now be the CLI module. The old generated `wasm/*` resource
 exports are replaced by `@aphrody/cli-wasm/wasm/*`. No second module is copied into this package.
-Plan: `docs/plans/ai/shenron-targets.md`.

@@ -20,7 +20,7 @@ simules jamais un résultat.
 - `MEMORY.md` est une mémoire durable et curatée ; `memory/` reçoit les notes
   datées. Les sessions brutes restent dans leur store natif.
 
-Un profil désigne un domaine isolé (`aphrody`, `dbfr` ou `ie`). Son espace de
+Un profil désigne un domaine isolé (`aphrody` ou `ie`). Son espace de
 travail contient son contexte et sa mémoire. Les sessions appartiennent à leur
 agent et à leur store natif ; ne les déplace pas, ne les fusionne pas et ne
 déduis pas leur auteur à partir du seul cwd. Ne copie jamais les secrets ou

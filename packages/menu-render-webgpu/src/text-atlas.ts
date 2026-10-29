@@ -15,7 +15,7 @@
  * dimensionnement ; le rendu réel des glyphes exige un navigateur.
  */
 
-import type { MenuText } from "@rosegriffon/menu-render";
+import type { MenuText } from "@aphrody/menu-render";
 
 /** Résultat du rendu d'un label : un canvas prêt à uploader + ses dimensions px. */
 export interface TextBitmap {

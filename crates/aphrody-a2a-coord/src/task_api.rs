@@ -502,7 +502,7 @@ mod tests {
             StatusCode::CONFLICT
         );
         assert_eq!(
-            request(&app, "GET", "/coord/dbfr/tasks", None, Some("test-token")).await,
+            request(&app, "GET", "/coord/ie/tasks", None, Some("test-token")).await,
             (StatusCode::OK, json!({"tasks":[],"total":0}))
         );
         let updated = request(

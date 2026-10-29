@@ -11,17 +11,6 @@
     "bin": []
   },
   {
-    "name": "@aphrody/admin-ui",
-    "version": "1.4.7",
-    "description": "Canonical Aphrody M3 administration, served by the existing authenticated Shenron web host",
-    "dir": "packages/admin-ui",
-    "kind": "package",
-    "workspace": true,
-    "private": false,
-    "exports": 150,
-    "bin": []
-  },
-  {
     "name": "@aphrody/android-web",
     "version": "1.4.7",
     "description": "",
@@ -74,7 +63,9 @@
     "workspace": true,
     "private": false,
     "exports": 3,
-    "bin": ["bun-android"]
+    "bin": [
+      "bun-android"
+    ]
   },
   {
     "name": "@aphrody/bun-app-host",
@@ -85,7 +76,9 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": ["aphrody-server"]
+    "bin": [
+      "aphrody-server"
+    ]
   },
   {
     "name": "@aphrody/bun-arch-mcp",
@@ -96,7 +89,10 @@
     "workspace": true,
     "private": false,
     "exports": 2,
-    "bin": ["bun-arch-docs", "bun-arch-mcp"]
+    "bin": [
+      "bun-arch-docs",
+      "bun-arch-mcp"
+    ]
   },
   {
     "name": "@aphrody/bun-artifacts",
@@ -107,7 +103,9 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": ["aphrody-artifacts"]
+    "bin": [
+      "aphrody-artifacts"
+    ]
   },
   {
     "name": "@aphrody/bun-blender",
@@ -118,7 +116,10 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": ["bun-blender", "bun-blender-mcp"]
+    "bin": [
+      "bun-blender",
+      "bun-blender-mcp"
+    ]
   },
   {
     "name": "@aphrody/bun-desktop",
@@ -140,7 +141,9 @@
     "workspace": true,
     "private": false,
     "exports": 1,
-    "bin": ["bun-emu-host"]
+    "bin": [
+      "bun-emu-host"
+    ]
   },
   {
     "name": "@aphrody/bun-engine",
@@ -151,7 +154,11 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": ["bep", "bun-engine", "bun-engine-formats"]
+    "bin": [
+      "bep",
+      "bun-engine",
+      "bun-engine-formats"
+    ]
   },
   {
     "name": "@aphrody/bun-engine-android",
@@ -195,7 +202,9 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": ["bun-steam"]
+    "bin": [
+      "bun-steam"
+    ]
   },
   {
     "name": "@aphrody/bun-video-project",
@@ -206,7 +215,9 @@
     "workspace": true,
     "private": false,
     "exports": 3,
-    "bin": ["aphrody-video"]
+    "bin": [
+      "aphrody-video"
+    ]
   },
   {
     "name": "@aphrody/bun-workspace",
@@ -217,7 +228,9 @@
     "workspace": true,
     "private": false,
     "exports": 14,
-    "bin": ["aphrody-bun"]
+    "bin": [
+      "aphrody-bun"
+    ]
   },
   {
     "name": "@aphrody/buncc",
@@ -228,7 +241,9 @@
     "workspace": true,
     "private": false,
     "exports": 9,
-    "bin": ["buncc"]
+    "bin": [
+      "buncc"
+    ]
   },
   {
     "name": "@aphrody/canvas",
@@ -332,7 +347,7 @@
   {
     "name": "@aphrody/inagle-ui",
     "version": "1.4.7",
-    "description": "Inagle explorer/maps UI helpers: re-exports @rosegriffon/inagle/ui (iecode packages/inagle), provided by the iecode workspace.",
+    "description": "Inagle explorer/maps UI helpers: re-exports @aphrody/inagle/ui (iecode packages/inagle), provided by the iecode workspace.",
     "dir": "packages/inagle-ui",
     "kind": "package",
     "workspace": true,
@@ -360,7 +375,9 @@
     "workspace": true,
     "private": false,
     "exports": 10,
-    "bin": ["m3"]
+    "bin": [
+      "m3"
+    ]
   },
   {
     "name": "@aphrody/m3-ai",
@@ -393,7 +410,9 @@
     "workspace": true,
     "private": false,
     "exports": 26,
-    "bin": ["m3-bun"]
+    "bin": [
+      "m3-bun"
+    ]
   },
   {
     "name": "@aphrody/m3-codemods",
@@ -426,7 +445,9 @@
     "workspace": true,
     "private": false,
     "exports": 0,
-    "bin": ["m3-design"]
+    "bin": [
+      "m3-design"
+    ]
   },
   {
     "name": "@aphrody/m3-explorer",
@@ -514,7 +535,9 @@
     "workspace": true,
     "private": false,
     "exports": 7,
-    "bin": ["m3-next"]
+    "bin": [
+      "m3-next"
+    ]
   },
   {
     "name": "@aphrody/m3-next-example",
@@ -536,7 +559,10 @@
     "workspace": true,
     "private": false,
     "exports": 17,
-    "bin": ["m3-next-migrate", "next-migrate"]
+    "bin": [
+      "m3-next-migrate",
+      "next-migrate"
+    ]
   },
   {
     "name": "@aphrody/m3-next-tauri-example",
@@ -558,7 +584,9 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": ["m3-os-themes"]
+    "bin": [
+      "m3-os-themes"
+    ]
   },
   {
     "name": "@aphrody/m3-primitives",
@@ -646,7 +674,9 @@
     "workspace": true,
     "private": false,
     "exports": 1,
-    "bin": ["m3-svg-to-ico"]
+    "bin": [
+      "m3-svg-to-ico"
+    ]
   },
   {
     "name": "@aphrody/nie-ui",
@@ -723,7 +753,12 @@
     "workspace": true,
     "private": false,
     "exports": 17,
-    "bin": ["aphrody-omar", "aphrody-product", "aphrody-setup", "creator-kit"]
+    "bin": [
+      "aphrody-omar",
+      "aphrody-product",
+      "aphrody-setup",
+      "creator-kit"
+    ]
   },
   {
     "name": "@aphrody/rag-core",
@@ -767,7 +802,9 @@
     "workspace": true,
     "private": false,
     "exports": 7,
-    "bin": ["aphrody-scaffold"]
+    "bin": [
+      "aphrody-scaffold"
+    ]
   },
   {
     "name": "@aphrody/shell-web",
@@ -800,7 +837,9 @@
     "workspace": true,
     "private": false,
     "exports": 8,
-    "bin": ["bun-tauri-sidecar"]
+    "bin": [
+      "bun-tauri-sidecar"
+    ]
   },
   {
     "name": "@aphrody/update",
@@ -822,7 +861,9 @@
     "workspace": true,
     "private": false,
     "exports": 3,
-    "bin": ["aphrody-wasm"]
+    "bin": [
+      "aphrody-wasm"
+    ]
   },
   {
     "name": "@aphrody/web-to-tauri",
@@ -833,7 +874,9 @@
     "workspace": true,
     "private": false,
     "exports": 8,
-    "bin": ["web-to-tauri"]
+    "bin": [
+      "web-to-tauri"
+    ]
   },
   {
     "name": "@aphrody/webos",
@@ -899,7 +942,9 @@
     "workspace": true,
     "private": false,
     "exports": 4,
-    "bin": ["yolo"]
+    "bin": [
+      "yolo"
+    ]
   },
   {
     "name": "@aphrody/yolo-core",
@@ -921,7 +966,9 @@
     "workspace": true,
     "private": true,
     "exports": 3,
-    "bin": ["ds-dotnet"]
+    "bin": [
+      "ds-dotnet"
+    ]
   },
   {
     "name": "@bun-os/package-converter",
@@ -932,7 +979,10 @@
     "workspace": true,
     "private": true,
     "exports": 3,
-    "bin": ["package-converter", "pacman2apt"]
+    "bin": [
+      "package-converter",
+      "pacman2apt"
+    ]
   },
   {
     "name": "@bun-os/platform",
@@ -943,7 +993,9 @@
     "workspace": true,
     "private": true,
     "exports": 12,
-    "bin": ["bun-os-platform"]
+    "bin": [
+      "bun-os-platform"
+    ]
   },
   {
     "name": "@bun-os/re",
@@ -954,7 +1006,9 @@
     "workspace": true,
     "private": true,
     "exports": 1,
-    "bin": ["re"]
+    "bin": [
+      "re"
+    ]
   },
   {
     "name": "@frontend/source",
@@ -965,94 +1019,6 @@
     "workspace": true,
     "private": true,
     "exports": 0,
-    "bin": []
-  },
-  {
-    "name": "@rosegriffon/inagle",
-    "version": "1.4.7",
-    "description": "Universal Game Data API for Inazuma Eleven: Victory Road — parsers, types, and tools for IEVR game data",
-    "dir": "packages/inagle",
-    "kind": "package",
-    "workspace": true,
-    "private": false,
-    "exports": 27,
-    "bin": ["inagle"]
-  },
-  {
-    "name": "@rosegriffon/inagle-cross",
-    "version": "1.4.7",
-    "description": "API de données et de rétro-conception pour Inazuma Eleven Cross — types, schémas, et analyseurs d'assets",
-    "dir": "packages/inagle-cross",
-    "kind": "package",
-    "workspace": true,
-    "private": false,
-    "exports": 1,
-    "bin": []
-  },
-  {
-    "name": "@rosegriffon/menu-render",
-    "version": "1.4.7",
-    "description": "React menu renderer with a caller-supplied Lua runtime and game-host adapter.",
-    "dir": "packages/menu-render",
-    "kind": "package",
-    "workspace": true,
-    "private": false,
-    "exports": 3,
-    "bin": []
-  },
-  {
-    "name": "@rosegriffon/menu-render-webgpu",
-    "version": "1.4.7",
-    "description": "Renderer WebGPU 2D pixel-perfect pour les écrans de menu IEVR (quads texturés instanciés, projection ortho 1280×720, sampler nearest, premultiplied alpha, blend par drawType, z-order painter par drawPriority). Fallback D",
-    "dir": "packages/menu-render-webgpu",
-    "kind": "package",
-    "workspace": true,
-    "private": false,
-    "exports": 1,
-    "bin": []
-  },
-  {
-    "name": "@shenron/auth",
-    "version": "1.4.7",
-    "description": "Briques Better Auth partagées (site Next, bot Bun, API) : secret, origines, cookies, fournisseur Discord, handler Request/Response",
-    "dir": "packages/shenron-auth",
-    "kind": "package",
-    "workspace": true,
-    "private": true,
-    "exports": 16,
-    "bin": []
-  },
-  {
-    "name": "@shenron/db",
-    "version": "1.4.7",
-    "description": "PostgreSQL partagé Shenron : schéma Drizzle, pool postgres-js (Next) et driver Bun.SQL (scripts, API), indépendant du framework",
-    "dir": "packages/shenron-db",
-    "kind": "package",
-    "workspace": true,
-    "private": true,
-    "exports": 18,
-    "bin": []
-  },
-  {
-    "name": "@shenron/dbxv2",
-    "version": "1.4.7",
-    "description": "DBXV2 reverse engineering for Shenron: typed bun:ffi and WebAssembly loaders over the bun-re DBXV2 surface (identify, CPK list/extract, EMB/EMD/ESK/gameplay JSON, ACB/AWB to WAV)",
-    "dir": "packages/shenron-dbxv2",
-    "kind": "package",
-    "workspace": true,
-    "private": true,
-    "exports": 5,
-    "bin": []
-  },
-  {
-    "name": "@shenron/ui",
-    "version": "1.4.7",
-    "description": "",
-    "dir": "packages/shenron-ui",
-    "kind": "package",
-    "workspace": true,
-    "private": true,
-    "exports": 33,
     "bin": []
   },
   {
@@ -1262,7 +1228,9 @@
     "workspace": true,
     "private": false,
     "exports": 0,
-    "bin": ["iecode-homebrew"]
+    "bin": [
+      "iecode-homebrew"
+    ]
   },
   {
     "name": "ieverse",
@@ -1273,6 +1241,52 @@
     "workspace": true,
     "private": false,
     "exports": 8,
+    "bin": []
+  },
+  {
+    "name": "@aphrody/inagle",
+    "version": "1.4.7",
+    "description": "Universal Game Data API for Inazuma Eleven: Victory Road — parsers, types, and tools for IEVR game data",
+    "dir": "packages/inagle",
+    "kind": "package",
+    "workspace": true,
+    "private": false,
+    "exports": 27,
+    "bin": [
+      "inagle"
+    ]
+  },
+  {
+    "name": "@aphrody/inagle-cross",
+    "version": "1.4.7",
+    "description": "API de données et de rétro-conception pour Inazuma Eleven Cross — types, schémas, et analyseurs d'assets",
+    "dir": "packages/inagle-cross",
+    "kind": "package",
+    "workspace": true,
+    "private": false,
+    "exports": 1,
+    "bin": []
+  },
+  {
+    "name": "@aphrody/menu-render",
+    "version": "1.4.7",
+    "description": "React menu renderer with a caller-supplied Lua runtime and game-host adapter.",
+    "dir": "packages/menu-render",
+    "kind": "package",
+    "workspace": true,
+    "private": false,
+    "exports": 3,
+    "bin": []
+  },
+  {
+    "name": "@aphrody/menu-render-webgpu",
+    "version": "1.4.7",
+    "description": "Renderer WebGPU 2D pixel-perfect pour les écrans de menu IEVR (quads texturés instanciés, projection ortho 1280×720, sampler nearest, premultiplied alpha, blend par drawType, z-order painter par drawPriority). Fallback D",
+    "dir": "packages/menu-render-webgpu",
+    "kind": "package",
+    "workspace": true,
+    "private": false,
+    "exports": 1,
     "bin": []
   }
 ]

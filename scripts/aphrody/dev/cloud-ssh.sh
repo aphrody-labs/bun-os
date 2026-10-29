@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SSH from a Claude Code cloud session to the owner hosts: writes ~/.ssh/config aliases `vps`, `dbfr` and `wsl`
 # from the cloud environment, never from the repository. Idempotent, tolerant (exit code 0).
-#   APHRODY_SSH_KEY_B64   base64 of the private key (cloud secret; SHENRON_SSH_KEY_B64 accepted)
+#   APHRODY_SSH_KEY_B64   base64 of the private key (cloud secret)
 #   APHRODY_VPS_HOST      first VPS address     APHRODY_DBFR_HOST  second VPS address
 #   APHRODY_WSL_HOST      optional WSL address reachable from the cloud (reverse tunnel or private network)
 #   APHRODY_WSL_PORT      optional WSL port (default 22)   APHRODY_WSL_USER  optional WSL login (default aphro)
@@ -18,9 +18,9 @@ if [[ -n "${GH_TOKEN:-}" ]] && command -v gh >/dev/null 2>&1; then
   git config --global credential.https://github.com.helper '!gh auth git-credential'
   gh auth status >/dev/null 2>&1 && echo "cloud-ssh: gh authenticated" || echo "cloud-ssh: gh token rejected"
 fi
-key_b64="${APHRODY_SSH_KEY_B64:-${SHENRON_SSH_KEY_B64:-}}"
-vps="${APHRODY_VPS_HOST:-${SHENRON_VPS_HOST:-}}"
-dbfr="${APHRODY_DBFR_HOST:-${SHENRON_DBFR_HOST:-}}"
+key_b64="${APHRODY_SSH_KEY_B64:-}"
+vps="${APHRODY_VPS_HOST:-}"
+dbfr="${APHRODY_DBFR_HOST:-}"
 if [[ -z "$key_b64" || ( -z "$vps" && -z "$dbfr" ) ]]; then
   echo "cloud-ssh: APHRODY_SSH_KEY_B64 and APHRODY_VPS_HOST/APHRODY_DBFR_HOST absent, SSH aliases not written"
   exit 0
@@ -32,7 +32,7 @@ printf '%s' "$key_b64" | base64 -d >"$key" 2>/dev/null && chmod 600 "$key" || {
   echo "cloud-ssh: APHRODY_SSH_KEY_B64 is not valid base64"
   exit 0
 }
-user="${APHRODY_SSH_USER:-${SHENRON_SSH_USER:-ubuntu}}"
+user="${APHRODY_SSH_USER:-ubuntu}"
 config="$HOME/.ssh/config"
 touch "$config"
 host_block() { # alias address user port

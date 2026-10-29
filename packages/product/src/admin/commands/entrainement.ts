@@ -37,7 +37,7 @@ fenêtre) ; rien n'est jamais supprimé ni écrasé ; un seul travail à la fois
       --entree <chemin>         fichier ou dossier d'entrée, sur le serveur
       --reference <chemin>      fichier de référence (jamais utilisé pour apprendre), sur le serveur
       --modele-base <nom>       modèle de base, sur le serveur
-      --domaine <nom>           domaine (ex : dbfr)
+      --domaine <nom>           domaine (ex : wiki)
       --cpu                     accepte de tourner sans carte graphique (lent)
       --id <numéro>             numéro choisi (défaut : date + type)
       --lancer                  lance pour de vrai, après confirmation OUI
@@ -240,7 +240,7 @@ export async function wizard(ctx: Context): Promise<number> {
     ...(info.needs.includes("reference") ? { reference: ask("Fichier de référence") } : {}),
     ...(info.needs.includes("modele-base") ? { modeleBase: ask("Modèle de base") } : {}),
   } as TrainRequest;
-  const domaine = ui.ask("Domaine (ex : dbfr, vide si aucun)")?.trim();
+  const domaine = ui.ask("Domaine (ex : wiki, vide si aucun)")?.trim();
   if (domaine) request.domaine = domaine;
   if (info.gpu && ui.confirm("Accepter de tourner sans carte graphique si le serveur n'en a pas (très lent) ?", false))
     request.allowCpu = true;

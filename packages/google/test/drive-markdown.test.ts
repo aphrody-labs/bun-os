@@ -35,7 +35,7 @@ describe("read-only native Google Docs Markdown projection", () => {
                     {
                       richLink: {
                         richLinkProperties: {
-                          title: "shenron.png",
+                          title: "avatar.png",
                           uri: "https://drive.google.com/file/d/avatar/view",
                         },
                       },
@@ -55,7 +55,7 @@ describe("read-only native Google Docs Markdown projection", () => {
       ],
     };
     const md = nativeMarkdown(doc);
-    expect(md).toContain("[shenron.png](https://drive.google.com/file/d/avatar/view)");
+    expect(md).toContain("[avatar.png](https://drive.google.com/file/d/avatar/view)");
     expect(md).toContain("[aphrody-labs](https://github.com/aphrody-labs)");
   });
   test("walks all nested API tabs and renders headings and text styling", () => {
@@ -69,7 +69,7 @@ describe("read-only native Google Docs Markdown projection", () => {
                 {
                   paragraph: {
                     paragraphStyle: { namedStyleType: "HEADING_1" },
-                    elements: [{ textRun: { content: "Shenron\n", textStyle: { bold: true } } }],
+                    elements: [{ textRun: { content: "Aphrody\n", textStyle: { bold: true } } }],
                   },
                 },
               ],
@@ -86,7 +86,7 @@ describe("read-only native Google Docs Markdown projection", () => {
     };
     const md = nativeMarkdown(doc);
     expect(md).toContain("## Parent");
-    expect(md).toContain("# **Shenron**");
+    expect(md).toContain("# **Aphrody**");
     expect(md).toContain("## Child");
     expect(md).toContain("Yoyo et Omar");
   });
@@ -128,7 +128,7 @@ describe("read-only native Google Docs Markdown projection", () => {
                   tableCells: [{ content: [paragraph("Name")] }, { content: [paragraph("Role")] }],
                 },
                 {
-                  tableCells: [{ content: [paragraph("Shenron")] }, { content: [paragraph("Dragon | dbfr")] }],
+                  tableCells: [{ content: [paragraph("Aphrody")] }, { content: [paragraph("Dragon | Ball")] }],
                 },
               ],
             },
@@ -138,12 +138,12 @@ describe("read-only native Google Docs Markdown projection", () => {
     });
     expect(md).toContain("| Name | Role |");
     expect(md).toContain("| --- | --- |");
-    expect(md).toContain("Dragon \\| dbfr");
+    expect(md).toContain("Dragon \\| Ball");
   });
   test("retains reviewed persona frontmatter and is idempotent UTF8 LF without BOM", () => {
-    const local = '\uFEFF---\r\nidentity: "Shenron"\r\nbrevity: "terse"\r\n---\r\nold\r\n';
+    const local = '\uFEFF---\r\nidentity: "Aphrody"\r\nbrevity: "terse"\r\n---\r\nold\r\n';
     const md = projectionMarkdown({ body: { content: [paragraph("Dragon\r\n")] } }, local);
-    expect(md).toStartWith('---\nidentity: "Shenron"\nbrevity: "terse"\n---\n');
+    expect(md).toStartWith('---\nidentity: "Aphrody"\nbrevity: "terse"\n---\n');
     expect(md).not.toContain("\r");
     expect(normalizeMarkdown(md)).toBe(md);
     expect(projectionMarkdown({ body: { content: [paragraph("Dragon\n")] } }, md)).toBe(md);

@@ -3,7 +3,7 @@
  *
  * @example
  * ```typescript
- * import { createGlobalSearch, createSearchIndex } from '@rosegriffon/inagle/search';
+ * import { createGlobalSearch, createSearchIndex } from '@aphrody/inagle/search';
  *
  * // Global search across all data
  * const search = createGlobalSearch({ basara, characters, skills });

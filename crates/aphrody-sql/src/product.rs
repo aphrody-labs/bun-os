@@ -5,7 +5,7 @@
 
 use crate::{MigrateOptions, MigrationSet, Result};
 
-/// Schema is separate from local home and existing Shenron/RG migration ledgers.
+/// Schema is separate from local home and existing product migration ledgers.
 pub const SCHEMA: &str = "aphrody_product";
 
 /// Additive PostgreSQL metadata migrations (no auth credentials or private payloads).

@@ -251,10 +251,6 @@
         "Windows installer for `aphrody-app`; real Windows run; rendering in the real CEF app"
       ],
       [
-        "Shenron production",
-        "Restart `shenron-site`/`shenron-bot` after the release; measure `/api/chat`; verify the agent card"
-      ],
-      [
         "MCP HTTP auth",
         "Bearer token in a 0600 EnvironmentFile (`APHRODY_MCP_HTTP_TOKEN`); finish `workspace/wip/infra-mcp-auth` (free port, `infra validate` fix), gate, rebase, push"
       ],
@@ -268,7 +264,7 @@
       ],
       [
         "Publication",
-        "2026-10-09: all 73 npm producer versions have verified registry tarballs and a clean frozen consumer installation. Full Rust publication remains open: 169 Aphrody members, 73 IECODE members, source/package gates and the crates.io new-name quota. Preserve fork licences, exact registry requirements and protected stores. IECODE/NIE/Inagle/RG require the qualified Aphrody Bun fork. Evidence and remaining blockers: [registry release](docs/operations/workspace/registry-release-2026-10-09.md); npm [receipt](docs/operations/workspace/npm-source-release-2026-10-09.md). PyPI remains a separate release queue."
+        "2026-10-09: all 73 npm producer versions have verified registry tarballs and a clean frozen consumer installation. Full Rust publication remains open: 169 Aphrody members, 73 IECODE members, source/package gates and the crates.io new-name quota. Preserve fork licences, exact registry requirements and protected stores. IECODE/NIE/Inagle require the qualified Aphrody Bun fork. Evidence and remaining blockers: [registry release](docs/operations/workspace/registry-release-2026-10-09.md); npm [receipt](docs/operations/workspace/npm-source-release-2026-10-09.md). PyPI remains a separate release queue."
       ],
       [
         "Repository hygiene",
@@ -552,7 +548,7 @@
           ],
           [
             "2026-10-06",
-            "Imports after dry-run: global home 14,331 memories, 720 sessions; dbfr 421 documents, 2,362 chunks; aphrody 37 memories.",
+            "Imports after dry-run: global home 14,331 memories, 720 sessions; aphrody 37 memories.",
             "Home sync is preview-first; `--apply` takes a verified backup."
           ],
           [
@@ -567,7 +563,7 @@
           ],
           [
             "2026-10-09",
-            "Owner-requested Claude/agy import through native aphrody home: previews followed by checksum-backed additive imports, 120 memory files and 367 session references split across global/aphrody/dbfr/ie. Original provider sessions remain in their stores; no transcript content copied into the sessions table.",
+            "Owner-requested Claude/agy import through native aphrody home: previews followed by checksum-backed additive imports, 120 memory files and 367 session references split across global/aphrody/ie. Original provider sessions remain in their stores; no transcript content copied into the sessions table.",
             "Configuration has three protected source references only; one empty settings file cannot be converted. Installed CLI has no Claude/agy configuration importer. No provider authentication migration or provider-memory synchronization claimed."
           ]
         ]
@@ -575,16 +571,6 @@
       {
         "title": "Infra, hosts, release",
         "rows": [
-          [
-            "2026-10-05",
-            "Shenron/Koharu extracted to `aphrody-labs/shenron` (169 commits, 4,325 files); private state moved to `~/shenron` (6,181 files, SHA-256 verified). Host plan and `/api/v1/shenron/*` gateway stay in Infra.",
-            "Public opening pending audit of the local corpus."
-          ],
-          [
-            "2026-10-05",
-            "vps CDN for dragonballfr.com: vhosts, hourly `shenron-cdn-sync.timer` from dbfr (21,067 + 66,690 + 286 files), HTTP/3 and TLS 1.3 `X25519MLKEM768` verified; lossless optimizer `scripts/release/cdn-optimize.ts` (PNG −13…−20%, br text −95%).",
-            "dbfr disk at 93%; `shenron-cdn` on dbfr has no pull."
-          ],
           [
             "2026-10-05",
             "Factory builds are installed atomically with SHA-256 and `--version` probe; VPS glibc 2.43 binaries are refused by WSL (2.39).",
@@ -620,11 +606,6 @@
             "2026-10-07",
             "Downloads release `20261007T094136Z-2072d221e312-wasm-0b7fccd7`: 14 artifacts, prior 13 preserved. Portable WASM archive 1,562,486 B, SHA-256 `8d2a34b5a0cb6ca2a14108d84f80cb82b689e1013d1a4fa95a10074b70d538be`. Public download and package provenance verified; Node/V8 and Bun bytes/sync/HTTP streaming smokes passed; 26 tests passed.",
             "Native CLI parity skipped; real browser execution unverified. Composite WASM source/patch provenance retained. Windows kits qualified under Wine, not physical Windows."
-          ],
-          [
-            "2026-10-07",
-            "Owner directive: all Shenron belongs on DBFR; VPS is reserved for Aphrody. Reclaim substantial disk space when capacity blocks execution. Training belongs on Omar’s WSL; the owner plans to uninstall their own WSL.",
-            "Placement and reclamation policy in tools/config/production-topology.json; preserve active work and authentication, verify retained protected-data copies before source deletion. Migration completion requires live cutover evidence."
           ],
           [
             "2026-10-07",

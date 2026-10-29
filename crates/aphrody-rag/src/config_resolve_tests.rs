@@ -51,7 +51,7 @@ fn legacy_alias_for_embed_model_is_still_honoured() {
         embed_endpoint: Some("http://127.0.0.1:9200/v1".to_owned()),
         ..Default::default()
     };
-    let env = env_map(&[("APHRODY_SHENRON_EMBED_MODEL", "bge-small-en-v1.5")]);
+    let env = env_map(&[("APHRODY_RAG_EMBED_MODEL", "bge-small-en-v1.5")]);
     let resolved = resolve_embed_with(&config, &env)
         .unwrap()
         .expect("configured backend");

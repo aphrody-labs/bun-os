@@ -114,7 +114,7 @@ mod tests {
         let l = &*HOST_LAYOUT;
         assert_eq!(l.home, "/home/ubuntu");
         assert_eq!(l.src, "/home/ubuntu/src");
-        assert_eq!(l.app("shenron"), "/home/ubuntu/apps/shenron");
+        assert_eq!(l.app("aphrody"), "/home/ubuntu/apps/aphrody");
         assert_eq!(l.build, "/home/ubuntu/build");
         assert_eq!(l.compose, "/home/ubuntu/apps/compose.yaml");
         for root in [&l.src, &l.apps, &l.build, &l.archive, &l.state] {
@@ -124,9 +124,9 @@ mod tests {
             l.retired_prefix("/srv/aphrody-build/cache"),
             Some("/srv/aphrody-build")
         );
-        assert_eq!(l.retired_prefix("/srv/shenron/shared"), Some("/srv"));
+        assert_eq!(l.retired_prefix("/srv/aphrody/shared"), Some("/srv"));
         assert_eq!(l.retired_prefix("/srvx"), None);
-        assert_eq!(l.retired_prefix("/home/ubuntu/apps/shenron"), None);
+        assert_eq!(l.retired_prefix("/home/ubuntu/apps/aphrody"), None);
     }
 
     #[test]

@@ -7,7 +7,7 @@
 # scripts, systemd units, nginx, compose, logrotate and sudoers derive their paths from `$HOME` or `home` below.
 [layout]
 home = "/home/ubuntu"
-# ONE git checkout per repository: ~/src/aphrody, ~/src/bun, ~/src/shenron, ~/src/forks/<name>.
+# ONE git checkout per repository: ~/src/aphrody, ~/src/bun, ~/src/forks/<name>.
 src = "~/src"
 # Runtime of one service: ~/apps/<app>/{compose.yaml,.env,data/,releases/,current,shared/}.
 apps = "~/apps"
@@ -28,7 +28,6 @@ releases_keep = 2
 # fails when a retired prefix reappears in code or config; dated documents under docs/ keep their history.
 [layout.retired]
 "/srv/aphrody-build/workspaces/aphrody-wsl" = "~/build/wsl/aphrody"
-"/srv/aphrody-build/workspaces/shenron-wsl" = "~/build/wsl/shenron"
 "/srv/aphrody-build/workspaces/vu-wsl" = "~/build/wsl/vu"
 "/srv/aphrody-build/workspaces" = "~/src"
 "/srv/aphrody-build" = "~/build"
@@ -53,9 +52,6 @@ releases_keep = 2
 "~/aphrody-infra" = "~/src/aphrody"
 "~/aphrody-build" = "~/build"
 "~/bun-src" = "~/src/bun"
-"~/shenron-docker" = "~/src/shenron"
-"~/shenron-release" = "~/src/shenron"
-"~/shenron" = "~/src/shenron"
 
 [services]
 # Never stopped or disabled. Globs match the unit name without ".service".
@@ -65,7 +61,6 @@ keep = [
   "fail2ban",
   "aphrody-*",
   "yolo-*",
-  "shenron-*",
   "cron",
   "docker",
   "containerd",
@@ -137,4 +132,4 @@ vps_delete_at_expiration = false
 vps_alert_threshold_days = 14
 
 # [hosts.vps.services]
-# keep = ["shenron-pg-tunnel"]
+# keep = ["aphrody-mcp-http-dbfr"]

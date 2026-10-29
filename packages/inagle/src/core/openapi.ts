@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { generateOpenAPI } from '@rosegriffon/inagle/openapi'
+ * import { generateOpenAPI } from '@aphrody/inagle/openapi'
  *
  * const spec = generateOpenAPI({ characters, skills })
  * // Serve at /openapi.json
@@ -163,7 +163,7 @@ export function generateOpenAPI(config: OpenAPIConfig = {}): object {
                   schema: {
                     type: "object",
                     properties: {
-                      name: { type: "string", example: "@rosegriffon/inagle" },
+                      name: { type: "string", example: "@aphrody/inagle" },
                       version: { type: "string", example: "0.3.0" },
                       stats: {
                         type: "object",

@@ -64,7 +64,7 @@ mod model;
 pub mod native;
 
 /// OpenAI-compatible `/v1/embeddings` HTTP service over the native engine
-/// (the contract of the former shenron-embed app).
+/// (`GET /health`, `POST /v1/embeddings`).
 #[cfg(feature = "server")]
 pub mod server;
 

@@ -28,7 +28,6 @@
       "kind": "reference-build-host",
       "os": "Ubuntu 26.04 / Docker container aphrody/build-linux:26.04 (glibc 2.43)",
       "releaseWorkspace": {
-        "build": "scripts/build/build-aphrody-stack-release.sh --compute-only MONOREPO COMMIT",
         "bundles": "$APHRODY_RELEASE_ROOT/bundles",
         "cargoTarget": "$APHRODY_RELEASE_ROOT/target",
         "forbidden": [
@@ -48,27 +47,17 @@
       "id": "vps",
       "kind": "production-host",
       "os": "Ubuntu 26.04",
-      "applicationRoots": ["/srv/aphrody", "/srv/rg", "/srv/shenron", "/srv/aphrody-infra"],
-      "consumers": [
-        "aphrody-site",
-        "aphrody-web-api",
-        "aphrody-a2a",
-        "aphrody-ai-http",
-        "aphrody-mcp-http",
-        "aphrody-shenron-embed",
-        "rg-services",
-        "rg-infra-monitor",
-        "shenron"
-      ],
+      "applicationRoots": ["/srv/aphrody", "/srv/aphrody-infra"],
+      "consumers": ["aphrody-site", "aphrody-web-api", "aphrody-a2a", "aphrody-ai-http", "aphrody-mcp-http"],
       "authority": "immutable-release-runtime",
-      "lifecycle": "rg-and-shenron-live; aphrody-redeployed-through-the-all-in-one-bundle",
+      "lifecycle": "aphrody-redeployed-through-the-all-in-one-bundle",
       "state": "tools/config/host/inventory/vps-source.json"
     },
     {
       "id": "dbfr",
       "kind": "secondary-host",
       "os": "Ubuntu",
-      "lifecycle": "active: postgresql@18 (shenron_site)",
+      "lifecycle": "active: postgresql@18",
       "consumers": ["postgresql", "redis", "asset-cdn", "backups", "release-slot"],
       "authority": "service-specific"
     },

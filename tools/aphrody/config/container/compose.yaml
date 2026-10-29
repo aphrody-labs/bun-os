@@ -88,48 +88,6 @@ services:
       timeout: 5s
       retries: 3
 
-  # Private MCP and RAG bridge of shenron-bot (127.0.0.1:8789).
-  shenron-compute:
-    <<: *toolbox
-    command: ["aphrody-mcp", "http", "--bind", "127.0.0.1:8789"]
-    working_dir: /home/ubuntu/apps/shenron/shared/agent-home
-    env_file: [/etc/aphrody/shenron-compute.env]
-    environment:
-      HOME: /home/ubuntu
-      APHRODY_HOME: /home/ubuntu/apps/shenron/shared/agent-home
-    volumes:
-      - /home/ubuntu/apps/shenron/shared/agent-home:/home/ubuntu/apps/shenron/shared/agent-home
-    mem_limit: 3g
-    depends_on: [shenron-embed]
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8789/healthz"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-  # Multilingual E5 embeddings (127.0.0.1:8085).
-  shenron-embed:
-    <<: *toolbox
-    command:
-      - aphrody-embed
-      - serve
-      - --host
-      - 127.0.0.1
-      - --port
-      - "8085"
-      - --threads
-      - "4"
-      - --model-dir
-      - /home/ubuntu/apps/shenron/shared/models/intfloat--multilingual-e5-small
-    volumes:
-      - /home/ubuntu/apps/shenron/shared/models:/home/ubuntu/apps/shenron/shared/models:ro
-    mem_limit: 2500m
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8085/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
   # Persistent job worker (jobs.db in ~/.aphrody, shared with mcp-http as on the host).
   jobs-worker:
     <<: *toolbox
@@ -193,29 +151,6 @@ services:
     mem_limit: 256m
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8796/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-  # Private JSON/GraphQL projections of the Shenron timeline (127.0.0.1:8813); the host timer
-  # shenron-timeline-refresh rewrites the tree it reads.
-  shenron-timeline-api:
-    <<: *bun
-    command:
-      - /home/ubuntu/.local/lib/aphrody/shenron/workspace.mjs
-      - timeline
-      - serve
-      - --output
-      - /home/ubuntu/.aphrody/workspaces/dbfr/private/web/timeline
-      - --port
-      - "8813"
-    working_dir: /home/ubuntu/.aphrody/workspaces/dbfr/private/web
-    volumes:
-      - /home/ubuntu/.local/lib/aphrody/shenron:/home/ubuntu/.local/lib/aphrody/shenron:ro
-      - /home/ubuntu/.aphrody/workspaces/dbfr/private/web:/home/ubuntu/.aphrody/workspaces/dbfr/private/web:ro
-    mem_limit: 256m
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8813/health"]
       interval: 30s
       timeout: 5s
       retries: 3

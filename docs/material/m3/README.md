@@ -2,13 +2,13 @@
 
 Private UI framework monorepo of Aphrody-labs. Aphrody mounts this Git submodule
 at `m3/`; its product UI is `m3/packages/app-ui`. Yolo and IECODE keep their
-own pinned consumer mount points. Shenron UI lives here as `packages/shenron-ui`.
+own pinned consumer mount points.
 
 - Install: [INSTALL.md](INSTALL.md) (quick start with tokens, theme, fonts and React in a Bun app; Tailwind v4;
   the `m3-bun` plugin; the `m3-design` CLI; Next.js; current npm release status).
 - `packages/*`: Bun workspace packages. The `@aphrody/m3-*` family, `@aphrody/material-design-icons` and
-  `@aphrody/eslint-plugin-m3` are published on npm; the umbrella `@aphrody/m3`, `@aphrody/libm3`
-  and `@shenron/ui` stay private.
+  `@aphrody/eslint-plugin-m3` are published on npm; the umbrella `@aphrody/m3` and `@aphrody/libm3`
+  stay private.
 - Framework: `docs/guides/FRAMEWORK.md` (package map, yolo orchestration, theme install per OS). Root scripts
   `build`, `serve`, `compile`, `test`, `lint`, `typecheck`, `install:theme` run through the yolo CLI.
 - App runtime: [`@aphrody/m3-bun`](docs/guides/M3-BUN.md) shares the M3 plugin and owns the UI/API server,

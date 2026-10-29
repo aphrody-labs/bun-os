@@ -22,7 +22,7 @@ pub(crate) enum GatewayAction {
         #[arg(long, default_value = "127.0.0.1:8786")]
         addr: String,
 
-        /// Provider: "configured" (canonical ModelClient), "mistralrs", "shenron", "auto", "google-antigravity", "gemini-cli", or "openai".
+        /// Provider: "configured" (canonical ModelClient), "mistralrs", "auto", "google-antigravity", "gemini-cli", or "openai".
         #[arg(long, default_value = "auto")]
         provider: String,
     },
@@ -151,7 +151,7 @@ async fn gateway_models_request(
 }
 
 fn resolve_adapter(provider: &str) -> miette::Result<(Arc<dyn GatewayAdapter>, Vec<String>)> {
-    if matches!(provider, "configured" | "mistralrs" | "shenron") {
+    if matches!(provider, "configured" | "mistralrs") {
         // Reuse the same configuration/factory as the agent surfaces. A
         // custom Mistral.rs provider selects the actual declared Rust server;
         // discovery alone never starts an engine or allocates a GPU.
@@ -328,8 +328,8 @@ mod tests {
                 .all(|id| id.starts_with("gemini-"))
         );
         assert_eq!(
-            advertised_models_for("openai", Some("shenron-chat-v2")),
-            ["shenron-chat-v2"]
+            advertised_models_for("openai", Some("fixture-chat-v2")),
+            ["fixture-chat-v2"]
         );
         assert!(advertised_models_for("openai", Some("  ")).is_empty());
         assert!(advertised_models_for("openai", None).is_empty());

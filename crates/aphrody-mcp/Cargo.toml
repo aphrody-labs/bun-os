@@ -17,12 +17,7 @@ path = "src/lib.rs"
 # The Obscura browser (HTTP + DOM + V8, plus the layout/paint engine for
 # screenshots and PDF) served natively. On by default: V8 ships prebuilt for
 # Linux and Windows MSVC (the only Windows toolchain aphrody uses).
-default = ["native-browser", "managed-llama", "gateway-cache"]
-# Redis cache of the Shenron HTTP gateway search (`/api/v1/shenron/rag/search`), built on
-# `aphrody-rag::redis_cache`. On by default, as it was under the former `dragonball` feature.
-gateway-cache = ["dep:aphrody-rag"]
-# Managed llama.cpp daemon as the Shenron LLM backend when no chat base URL is configured.
-managed-llama = ["dep:aphrody-llama-server"]
+default = ["native-browser"]
 native-browser = ["aphrody-web-service/render"]
 # Obscura stealth (fingerprint + tracker blocking, wreq TLS impersonation).
 browser-stealth = ["native-browser", "aphrody-web-service/stealth"]
@@ -141,7 +136,6 @@ base64 = { version = "0.23.1" }
 aphrody-re = { package = "bun-re", version = "1.4.7", features = [] }
 dirs = { version = "7.0.0" }
 aphrody-gemini-web = { path = "../aphrody-gemini-web", version = "1.4.7", features = [] }
-aphrody-llama-server = { path = "../aphrody-llama-server", version = "1.4.7", features = [], optional = true }
 aphrody-web-service = { package = "bun_browser_service", version = "1.4.7", features = [] }
 regex = { version = "1.11", features = [] }
 aphrody-session = { path = "../aphrody-session", version = "1.4.7", features = ["memory"] }

@@ -334,7 +334,7 @@ export interface GenerateOptions {
   variance?: number | null;
   motion?: number | null;
   density?: number | null;
-  /** Brand ID from brands.csv (e.g. rose-griffon-roy): its real tokens replace the palette and fonts. */
+  /** Brand ID from brands.csv (e.g. m3-baseline-light): its real tokens replace the palette and fonts. */
   brand?: string | null;
 }
 

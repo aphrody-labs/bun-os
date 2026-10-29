@@ -30,9 +30,9 @@ Scan: aphrody 1948 commits (all branches), yolo 199, iecode 176, aphrody-labs/rg
 | iecode                  | `b337ab25`    | `.agents/skills/pixel-perfect`                                                                             | `skills/pixel-perfect`                                                 | 3     |
 | iecode                  | `b337ab25`    | `.agents/skills/nie-render-pipeline`                                                                       | `skills/nie-render-pipeline`                                           | 2     |
 | iecode                  | `b337ab25`    | `docs/nie/skills/nie-render-pipeline`                                                                      | `skills/nie-render-pipeline-docs`                                      | 1     |
-| iecode                  | `b337ab25`    | `apps/rg-website/src/lib/nie-wasm-web`                                                                     | `packages/nie-web/src/nie-wasm-web`                                    | 4     |
-| iecode                  | `b337ab25`    | `apps/rg-website/src/lib/nie-engine.ts`                                                                    | `packages/nie-web/src/nie-engine.ts`                                   | 1     |
-| iecode                  | `b337ab25`    | `apps/rg-website/src/lib/nie-game.ts`                                                                      | `packages/nie-web/src/nie-game.ts`                                     | 1     |
+| iecode                  | `b337ab25`    | `apps/<website>/src/lib/nie-wasm-web`                                                                      | `packages/nie-web/src/nie-wasm-web`                                    | 4     |
+| iecode                  | `b337ab25`    | `apps/<website>/src/lib/nie-engine.ts`                                                                     | `packages/nie-web/src/nie-engine.ts`                                   | 1     |
+| iecode                  | `b337ab25`    | `apps/<website>/src/lib/nie-game.ts`                                                                       | `packages/nie-web/src/nie-game.ts`                                     | 1     |
 | iecode                  | `b337ab25`    | `packages/inagle/src/ui`                                                                                   | `packages/inagle-ui/src`                                               | 1     |
 | aphrody                 | `6bed3c00e^`  | `scripts/iecode/audit/ui/apps/nie-web`                                                                     | `packages/nie-web/audit`                                               | 4     |
 | aphrody                 | `6bed3c00e^`  | `scripts/iecode/build/ui/apps/nie-web`                                                                     | `packages/nie-web/build`                                               | 5     |
@@ -62,23 +62,22 @@ Scan: aphrody 1948 commits (all branches), yolo 199, iecode 176, aphrody-labs/rg
 
 ## Adapted
 
-- `packages/menu-render*`: iecode-config/catalog refs replaced by root tsconfig.base.json and root catalog; `@rose-griffon/iecode-inagle` (lua-host.ts) is provided by the iecode workspace.
+- `packages/menu-render*`: iecode-config/catalog refs replaced by root tsconfig.base.json and root catalog; the iecode-inagle package (lua-host.ts) is provided by the iecode workspace.
 - `rust/Cargo.toml`: new manifest mirroring iecode root workspace.package and the needed workspace.dependencies (path deps via sibling iecode/aphrody checkouts). No cargo was run.
 - `src/` (emulator web UI) keeps the layout expected by iecode `apps/iecode-web` through `design/aphrody-m3/packages/nie-ui`.
 
 ## Kept in source repos (reason)
 
 - iecode `crates/nie/aphrody-nie-{ui,render,render3d,viewer-web,wasm,lua-web}`: iecode Rust crate dedup is in progress by another agent; remove after it lands. render3d is still a dependency of nie-app/runtime.
-- iecode `apps/rg-website/src/lib/{nie-wasm-web,nie-engine.ts,nie-game.ts}`: imported by the RG website pages.
+- iecode `apps/<website>/src/lib/{nie-wasm-web,nie-engine.ts,nie-game.ts}`: imported by the RG website pages.
 - iecode `.agents/skills/{pixel-perfect,nie-render-pipeline}`, yolo `plugins/iecode/skills/*`: skills are consumed by plugins; the nie-ui skill points here.
 - iecode `packages/inagle/src/ui`: inside packages/inagle (FFI dedup agent).
 - iecode docs `DESIGN.md`, `DESIGN-UI.md`, `RENDER-QA.md`, `SITE.md`, `ievr-site`, `azalee-tauri.md`: referenced by crates, READMEs and migration manifests (provenance).
 - iecode `config/nie/host/systemd/nie-site.service`, yolo `config/host/{systemd,nginx}/nie`: host config owned by Infra.
-- rg `packages/ui`, `apps/website/src/components/ui`, `apps/bot/src/lib/ui`: Rose Griffon site UI (not NIE), owned by `design/aphrody-m3/packages/rg-ui`.
 
 ## Not found
 
-- The full former `nie-web` app (src/desktop, src/inacord, inacord gallery/three sources) and any inagle/inacord Tauri app: only its scripts and READMEs exist in any of the four histories; no ex-NIE repository exists in aphrody-labs or rose-griffon.
+- The full former `nie-web` app (src/desktop, src/inacord, inacord gallery/three sources) and any inagle/inacord Tauri app: only its scripts and READMEs exist in any of the four histories; no ex-NIE repository exists in aphrody-labs.
 - `packages/inacord-ui` (source of game-tokens.css): absent from all histories; tokens live in rust/nie-ui.
 - No pixel-perfect screenshots/renderer binaries beyond the skills, examples and wasm-equality validators listed above.
 - src/message.ts: copied from iecode apps/iecode-web/src/message.ts (2026-10-04) so typecheck:ui resolves standalone.

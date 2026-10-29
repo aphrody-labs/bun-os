@@ -189,7 +189,7 @@ mod tests {
         std::fs::write(root.join("note.txt"), "ignored").unwrap();
         let mut db = HomeDb::open_in_memory().unwrap();
 
-        let dry = import_sessions(&mut db, root, Some("dbfr"), false).unwrap();
+        let dry = import_sessions(&mut db, root, Some("docs"), false).unwrap();
         assert_eq!(dry.counts["files_found"], 2);
         assert_eq!(
             db.conn()
@@ -198,7 +198,7 @@ mod tests {
             0
         );
 
-        let applied = import_sessions(&mut db, root, Some("dbfr"), true).unwrap();
+        let applied = import_sessions(&mut db, root, Some("docs"), true).unwrap();
         assert_eq!(applied.counts["agent:codex"], 1);
         assert_eq!(applied.counts["agent:aphrody"], 1);
         let (records, domain): (i64, String) = db
@@ -209,13 +209,13 @@ mod tests {
                 |r| Ok((r.get(0)?, r.get(1)?)),
             )
             .unwrap();
-        assert_eq!((records, domain.as_str()), (2, "dbfr"));
+        assert_eq!((records, domain.as_str()), (2, "docs"));
         let messages: i64 = db
             .conn()
             .query_row("SELECT count(*) FROM messages", [], |r| r.get(0))
             .unwrap();
         assert_eq!(messages, 0);
-        let again = import_sessions(&mut db, root, Some("dbfr"), true).unwrap();
+        let again = import_sessions(&mut db, root, Some("docs"), true).unwrap();
         assert_eq!(again.counts["unchanged"], 2);
     }
 }

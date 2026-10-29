@@ -58,10 +58,7 @@ async function main(): Promise<void> {
     const credentials = await loadCredentials(envFile);
     const token = tokenKey
       ? credentials[tokenKey]
-      : (credentials.DISCORD_TOKEN_SHENRON ??
-        credentials.DISCORD_BOT_TOKEN ??
-        credentials.DISCORD_TOKEN ??
-        credentials.TOKEN);
+      : (credentials.DISCORD_BOT_TOKEN ?? credentials.DISCORD_TOKEN ?? credentials.TOKEN);
     if (!token) throw new Error("missing credential");
     const api = makeApi(token);
     stage = "bot";

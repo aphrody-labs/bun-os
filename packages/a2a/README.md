@@ -123,10 +123,10 @@ shape. It replaces a method-renaming proxy (which left the payloads untranslated
 
 ```ts
 import { A2AClient } from "@aphrody/a2a";
-import { LegacyBridge, SHENRON_HUB_PROFILE } from "@aphrody/a2a/legacy";
+import { LegacyBridge, HUB_PROFILE } from "@aphrody/a2a/legacy";
 
 const bridge = new LegacyBridge(await A2AClient.connect(url), {
-  profile: SHENRON_HUB_PROFILE,
+  profile: HUB_PROFILE,
 });
 // route handler of a legacy endpoint:
 const body = await request.json();
@@ -179,7 +179,7 @@ way: the role and `metadata` (`status`, `verdict`, ...) are kept as sent.
 
 **Results (1.0 to legacy).** Two profiles choose the spelling: `A2A_03_PROFILE` (default: `kind`
 discriminators, `input-required`, `message/send` answers the task or message itself) and
-`SHENRON_HUB_PROFILE` (`type` discriminators, `input_required`, `message/send` answers
+`HUB_PROFILE` (`type` discriminators, `input_required`, `message/send` answers
 `{taskId, status, verdict?, response: {role, parts}, task}`). Stream events become `status-update`
 (with `final`) and `artifact-update`. A non-object `data` part is wrapped as `{value}`.
 

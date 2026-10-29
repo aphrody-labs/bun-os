@@ -16,7 +16,7 @@
  * donc les marquer exists=false produirait de faux négatifs (le résolveur azalee remappe).
  *
  * Conventions de `path` : relatif à la racine CDN `/dx11/` (ce que le résolveur
- * azalee construit : `https://cdn.rosegriffon.fr/dx11/<path>`). Ex. `menu/icon_chr/face/c01000010_l_c01000010_1_l00.png`.
+ * azalee construit : `https://cdn.example.com/dx11/<path>`). Ex. `menu/icon_chr/face/c01000010_l_c01000010_1_l00.png`.
  *
  * Colonnes peuplées : path (PK), bucket (200_icon|220_img|icon_chr|210_minimap|movie),
  * kind (extension), size (octets), exists (true), buildid (Steam).

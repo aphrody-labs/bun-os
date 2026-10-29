@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Retrieval-quality evaluation, ported bit-for-bit from shenron's
+//! Retrieval-quality evaluation, ported bit-for-bit from the TypeScript reference's
 //! `apps/bot/src/lib/rag-eval.ts` (gold-case parsing, URL matching, ranks,
 //! nDCG) and `apps/bot/scripts/rag-eval.ts` (the `quantile` percentile
 //! method), both read 2026-09-19. Every subtle rule below cites the TS line
@@ -11,7 +11,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-/// Rank thresholds shenron reports Recall@ for (`rag-eval.ts:31`).
+/// Rank thresholds the TypeScript reference reports Recall@ for (`rag-eval.ts:31`).
 pub const RANKS: [u32; 4] = [1, 3, 5, 10];
 
 /// One row of the gold set (`rag-eval.ts:22-29`). `q` is required; a row
@@ -32,7 +32,7 @@ pub struct GoldCase {
 
 /// A single retrieved result, in the shape a target (`aphrody-rag-eval`'s
 /// `HttpTarget`/`McpTarget`/`LocalIndexTarget`) hands to this crate. Field
-/// names and shape match shenron's `RagHit` (`rag.ts:45-62`) exactly, so a
+/// names and shape match the TypeScript reference's `RagHit` (`rag.ts:45-62`) exactly, so a
 /// production response `{rowid, kind, title, url, snippet, sourceId, lang,
 /// score}` round-trips through this type losslessly (`rowid`/`kind` are
 /// optional here because a target without a backing row, e.g. an HTTP-only
@@ -54,9 +54,9 @@ pub struct RetrievedHit {
 }
 
 /// Strips a configurable origin prefix and normalises a trailing slash the
-/// same way `normalizeUrl` does (`rag-eval.ts:34-40`). The default mirrors
-/// shenron's hardcoded `dragonballfr.com` origin; a caller targeting a
-/// different site's index supplies its own `strip_origin`.
+/// same way `normalizeUrl` does (`rag-eval.ts:34-40`). The default strips any
+/// `http(s)://host` origin; a caller targeting an
+/// index with another URL shape supplies its own `strip_origin`.
 pub struct UrlNormalizer {
     pub strip_origin: Option<Regex>,
 }
@@ -64,7 +64,7 @@ pub struct UrlNormalizer {
 impl Default for UrlNormalizer {
     fn default() -> Self {
         Self {
-            strip_origin: Regex::new(r"(?i)^https?://(www\.)?dragonballfr\.com").ok(),
+            strip_origin: Regex::new(r"(?i)^https?://[^/?#]+").ok(),
         }
     }
 }
@@ -88,7 +88,7 @@ impl UrlNormalizer {
     }
 }
 
-/// `normalizeUrl` (`rag-eval.ts:34`) with the default (`dragonballfr.com`)
+/// `normalizeUrl` (`rag-eval.ts:34`) with the default
 /// origin stripper.
 #[must_use]
 pub fn normalize_url(url: &str) -> String {
@@ -175,7 +175,7 @@ pub fn ndcg_at_k(results: &[RetrievedHit], case: &GoldCase, k: usize) -> f64 {
 
 /// The three hits surfaced for eyeballing a case's result (`CaseResult.top`,
 /// `rag-eval.ts:100`), now carrying `kind` too (correction: `RetrievedHit`
-/// gained `rowid`/`kind` to round-trip shenron's production hit shape).
+/// gained `rowid`/`kind` to round-trip the TypeScript reference's production hit shape).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct TopHit {
     pub title: String,
@@ -383,7 +383,7 @@ pub enum EvalError {
 
 /// A parsed threshold gate such as `recall@5>=0.80`, `mrr>=0.6`, or
 /// `ndcg@10>0.7`. `ndcg@N` always checks [`Aggregate::ndcg`] regardless of
-/// `N` — shenron's own harness only ever computes nDCG@10, so `N` besides
+/// `N` — the TypeScript reference's own harness only ever computes nDCG@10, so `N` besides
 /// `10` is accepted syntactically (interface parity) but evaluated against
 /// the same figure.
 #[derive(Debug, Clone, Copy)]

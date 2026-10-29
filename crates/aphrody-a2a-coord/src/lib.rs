@@ -40,4 +40,4 @@ pub use proxy::{
     CoordBody, CoordError, CoordProxy, CoordResponseKind, DEFAULT_TAIL_INTERVAL,
     HttpResponse as CoordHttpResponse, NDJSON_CONTENT_TYPE, SSE_CONTENT_TYPE,
 };
-pub use registry::{PeerRegistry, SHENRON_DEFAULT_URL};
+pub use registry::PeerRegistry;

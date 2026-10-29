@@ -49,7 +49,7 @@ export function hostAppFiles(host: (typeof HOSTS)[number], layout: HostLayout, r
         join(layout.apps, "aphrody-site", "compose.yaml"),
       ],
     );
-    for (const filename of ["bun-prod-runtime.yaml", "bun-services-runtime.yaml", "bun-release-gateway.yaml"])
+    for (const filename of ["bun-prod-runtime.yaml", "bun-services-runtime.yaml"])
       files.push([join(repo, "infra/config/host/apps/dbfr", filename), join(layout.apps, filename)]);
   }
   return files;

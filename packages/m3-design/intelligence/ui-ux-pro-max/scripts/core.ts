@@ -309,7 +309,6 @@ export const STACK_CONFIG: Readonly<Record<string, { file: string }>> = {
   "html-tailwind": { file: "stacks/html-tailwind.csv" },
   shadcn: { file: "stacks/shadcn.csv" },
   m3: { file: "stacks/m3.csv" },
-  "rg-ui": { file: "stacks/rg-ui.csv" },
   "jetpack-compose": { file: "stacks/jetpack-compose.csv" },
   threejs: { file: "stacks/threejs.csv" },
   angular: { file: "stacks/angular.csv" },
@@ -352,12 +351,7 @@ export const WEB_STACK_CURRENT_MAJORS: Readonly<Record<string, number>> = {
   nuxtjs: 4,
   "nuxt-ui": 4,
 };
-export const WEB_STACKS: ReadonlySet<string> = new Set([
-  ...Object.keys(WEB_STACK_CURRENT_MAJORS),
-  "shadcn",
-  "m3",
-  "rg-ui",
-]);
+export const WEB_STACKS: ReadonlySet<string> = new Set([...Object.keys(WEB_STACK_CURRENT_MAJORS), "shadcn", "m3"]);
 
 export const STACK_CURRENT_VERSIONS: Readonly<Record<string, readonly number[]>> = {
   ...Object.fromEntries(Object.entries(WEB_STACK_CURRENT_MAJORS).map(([stack, major]) => [stack, [major]])),
@@ -371,7 +365,6 @@ export const STACK_CURRENT_VERSIONS: Readonly<Record<string, readonly number[]>>
   threejs: [0, 185],
   laravel: [13],
   m3: [1, 4],
-  "rg-ui": [1, 4],
 };
 export const LEGACY_ONLY_STACKS: ReadonlySet<string> = new Set(["uwp"]);
 export const STACK_CURRENT_APPLICABILITY: Readonly<Record<string, string>> = {
@@ -384,7 +377,6 @@ export const STACK_CURRENT_APPLICABILITY: Readonly<Record<string, string>> = {
   "html-tailwind": "html-tailwind 4.3",
   shadcn: "shadcn cli 4",
   m3: "m3 1.4.4",
-  "rg-ui": "rg-ui 1.4.4",
   nuxtjs: "nuxtjs 4.5",
   "nuxt-ui": "nuxt-ui 4.11.1",
   "react-native": "react-native 0.86.x",
@@ -421,7 +413,6 @@ const STACK_QUERY_NAMES: Readonly<Record<string, string>> = {
   threejs: "three(?:\\.js|js)?",
   laravel: "laravel",
   m3: "(?:@aphrody/)?m3",
-  "rg-ui": "rg[\\s-]*ui|rose\\s*griffon\\s*ui|@rosegriffon/ui",
 };
 
 export const AVAILABLE_STACKS = Object.keys(STACK_CONFIG);
@@ -449,11 +440,23 @@ const DOMAIN_SCORE_FLOORS: Partial<Record<Domain, number>> = {
 export const SEARCH_THRESHOLDS = Object.fromEntries(
   DOMAINS.map(domain => [
     domain,
-    { min_score: DOMAIN_SCORE_FLOORS[domain] ?? 0, min_margin: 0, min_coverage: domain === "landing" ? 0.5 : 0 },
+    {
+      min_score: DOMAIN_SCORE_FLOORS[domain] ?? 0,
+      min_margin: 0,
+      min_coverage: domain === "landing" ? 0.5 : 0,
+    },
   ]),
 ) as Record<Domain, Threshold>;
-export const STACK_THRESHOLD: Threshold = { min_score: 3.6, min_margin: 0, min_coverage: 1 / 3 };
-export const NO_THRESHOLD: Threshold = { min_score: 0, min_margin: 0, min_coverage: 0 };
+export const STACK_THRESHOLD: Threshold = {
+  min_score: 3.6,
+  min_margin: 0,
+  min_coverage: 1 / 3,
+};
+export const NO_THRESHOLD: Threshold = {
+  min_score: 0,
+  min_margin: 0,
+  min_coverage: 0,
+};
 const STYLE_IDENTITY_FIELDS = ["Style ID", "Style Category", "Aliases"];
 const LANDING_IDENTITY_FIELDS = ["Pattern ID", "Pattern Name", "Aliases"];
 const BRAND_IDENTITY_FIELDS = ["Brand ID", "Brand", "Theme", "Aliases"];
@@ -465,13 +468,35 @@ export const DOMAIN_QUERY_REWRITES: Partial<Record<Domain, Record<string, string
     ]),
   ),
   landing: { testimonial: "testimonials" },
-  style: { css: null, implementation: null, variable: null, checklist: null, tailwind: null },
-  ux: { ux: "accessibility", usability: "accessibility", wcag: "accessibility" },
+  style: {
+    css: null,
+    implementation: null,
+    variable: null,
+    checklist: null,
+    tailwind: null,
+  },
+  ux: {
+    ux: "accessibility",
+    usability: "accessibility",
+    wcag: "accessibility",
+  },
   "google-fonts": { typography: "font" },
   icons: { lucide: null, symbol: null, glyph: null, pictogram: null },
-  gsap: { gsap: "animation", quickto: null, scrolltrigger: "scroll", "flip plugin": null, splittext: null },
+  gsap: {
+    gsap: "animation",
+    quickto: null,
+    scrolltrigger: "scroll",
+    "flip plugin": null,
+    splittext: null,
+  },
   react: { nextjs: "react", usecallback: "memoization", useeffect: "effects" },
-  web: { aria: "accessibility", outline: "focus", semantic: null, autocomplete: "input", preconnect: null },
+  web: {
+    aria: "accessibility",
+    outline: "focus",
+    semantic: null,
+    autocomplete: "input",
+    preconnect: null,
+  },
   brand: { "brand palette": "theme", "brand tokens": "theme" },
 };
 
@@ -736,7 +761,10 @@ export async function searchCsvDetailed(
     return {
       results: [],
       index: null,
-      diagnostic: { reason: "read-error", error: `Unable to read search data: ${name}` },
+      diagnostic: {
+        reason: "read-error",
+        error: `Unable to read search data: ${name}`,
+      },
     };
   }
   if (data.length === 0) return { results: [], index: null, diagnostic: { reason: "empty-data" } };
@@ -914,7 +942,10 @@ async function loadProductKeywords(): Promise<string[]> {
   return [...keywords].sort((a, b) => pyLength(b) - pyLength(a));
 }
 
-let domainKeywordsCache: { signature: Signature | null; keywords: Record<Domain, string[]> } | null = null;
+let domainKeywordsCache: {
+  signature: Signature | null;
+  keywords: Record<Domain, string[]>;
+} | null = null;
 
 export async function domainKeywords(): Promise<Record<Domain, string[]>> {
   const productPath = join(DATA_DIR, CSV_CONFIG.product.file);
@@ -1040,15 +1071,12 @@ export async function domainKeywords(): Promise<Record<Domain, string[]>> {
       "brand theme",
       "brand palette",
       "brand tokens",
-      "rose griffon",
-      "rosegriffon",
       "azalee",
       "azalée",
       "achillea",
       "achilléa",
       "gaelle",
       "gaëlle",
-      "rg-ui theme",
       "bun os brand",
       "aphrody brand",
     ],
@@ -1320,10 +1348,20 @@ export async function search(
 
   if (searchDomain === "icons" && containsPhrase(normalize(query.toLowerCase()), "lucide")) {
     results = [];
-    diagnostic = { ...diagnostic, abstained: true, reason: "unsupported-library" };
+    diagnostic = {
+      ...diagnostic,
+      abstained: true,
+      reason: "unsupported-library",
+    };
   }
 
-  const out: SearchResult = { domain, query, file: config.file, count: results.length, results };
+  const out: SearchResult = {
+    domain,
+    query,
+    file: config.file,
+    count: results.length,
+    results,
+  };
   if (autoDetected) {
     out.auto_detected = true;
     if (runnerUp) out.runner_up_domain = runnerUp;
@@ -1404,7 +1442,7 @@ function stackRowFilter(rows: readonly Row[], query: string, stack: string): [Ro
     variant = "non-legacy";
   }
 
-  if (stack !== "shadcn" && stack !== "rg-ui") return [statusFilter, variant];
+  if (stack !== "shadcn") return [statusFilter, variant];
   const normalized = normalize(String(query ?? "").toLowerCase());
   let requestedBase: string;
   if (normalized.includes("base ui")) requestedBase = "base";
@@ -1417,10 +1455,6 @@ function stackRowFilter(rows: readonly Row[], query: string, stack: string): [Ro
     const bases = match ? match[1]!.split("|") : [];
     return statusFilter(row) && bases.includes(requestedBase);
   };
-  // rg-ui is Base UI only: never filter its rows away for a base it does not tag.
-  if (stack === "rg-ui" && !rows.some(row => /\bbase=/.test((row["Applies To"] ?? "").toLowerCase()))) {
-    return [statusFilter, variant];
-  }
   return [matchesBase, `${variant};base=${requestedBase}`];
 }
 
@@ -1463,7 +1497,10 @@ export async function searchStack(
   diagnostics = false,
 ): Promise<SearchResult> {
   if (!validMaxResults(maxResults)) return { error: "max_results must be an integer from 1 to 20", stack };
-  if (!(stack in STACK_CONFIG)) return { error: `Unknown stack: ${stack}. Available: ${AVAILABLE_STACKS.join(", ")}` };
+  if (!(stack in STACK_CONFIG))
+    return {
+      error: `Unknown stack: ${stack}. Available: ${AVAILABLE_STACKS.join(", ")}`,
+    };
   const file = STACK_CONFIG[stack]!.file;
   const path = join(DATA_DIR, file);
   if (!(await Bun.file(path).exists())) return { error: `Stack file not found: ${path}`, stack };
@@ -1495,7 +1532,14 @@ export async function searchStack(
       cacheVariant,
     ));
   }
-  const out: SearchResult = { domain: "stack", stack, query, file, count: results.length, results };
+  const out: SearchResult = {
+    domain: "stack",
+    stack,
+    query,
+    file,
+    count: results.length,
+    results,
+  };
   if (diagnostic.error) out.error = diagnostic.error;
   if (results.length === 0) out.suggestions = suggestTerms(bm25, query, 6, threshold);
   if (diagnostics) out.diagnostics = diagnostic;

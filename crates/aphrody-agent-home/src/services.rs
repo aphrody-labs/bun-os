@@ -312,7 +312,7 @@ fn resolve_profile_path(root: &Path, raw: &str) -> Result<PathBuf, ServiceConfig
     Ok(root.join(path))
 }
 
-/// Preserve simple canonical profile names (`shenron` -> `shenron`) while
+/// Preserve simple canonical profile names (`worker` -> `worker`) while
 /// making arbitrary TOML profile keys collision-resistant and service-safe.
 fn profile_namespace(profile: &str) -> String {
     let trimmed = profile.trim();
@@ -341,15 +341,15 @@ mod tests {
     #[test]
     fn two_profiles_share_no_durable_service_namespace() {
         let state = Path::new("/var/lib/aphrody");
-        let shenron = ProfileServiceContext::new(state.join("workspace-shenron"), Some("shenron"));
+        let worker = ProfileServiceContext::new(state.join("workspace-worker"), Some("worker"));
         let niers = ProfileServiceContext::new(state.join("workspace-niers"), Some("niers"));
 
-        let shenron_paths = [
-            shenron.database_path(),
-            shenron.sqlite_cache_path(),
-            shenron.a2a_mailbox_dir(),
-            shenron.ocr_database_path(),
-            shenron.ocr_cache_dir(),
+        let worker_paths = [
+            worker.database_path(),
+            worker.sqlite_cache_path(),
+            worker.a2a_mailbox_dir(),
+            worker.ocr_database_path(),
+            worker.ocr_cache_dir(),
         ];
         let niers_paths = [
             niers.database_path(),
@@ -360,24 +360,24 @@ mod tests {
         ];
 
         assert!(
-            shenron_paths
+            worker_paths
                 .iter()
-                .all(|path| path.starts_with(shenron.root()))
+                .all(|path| path.starts_with(worker.root()))
         );
         assert!(
             niers_paths
                 .iter()
                 .all(|path| path.starts_with(niers.root()))
         );
-        for left in &shenron_paths {
+        for left in &worker_paths {
             for right in &niers_paths {
                 assert_ne!(left, right);
             }
         }
-        assert_eq!(shenron.redis_prefix(), "shenron:");
-        assert_eq!(shenron.redis_key("rag:answer"), "shenron:rag:answer");
+        assert_eq!(worker.redis_prefix(), "worker:");
+        assert_eq!(worker.redis_key("rag:answer"), "worker:rag:answer");
         assert_eq!(niers.redis_prefix(), "niers:");
-        assert_ne!(shenron.postgres_schema(), niers.postgres_schema());
+        assert_ne!(worker.postgres_schema(), niers.postgres_schema());
     }
 
     #[test]
@@ -396,8 +396,8 @@ mod tests {
     #[test]
     fn construction_is_pure_and_does_not_create_the_root() {
         let temp = tempfile::tempdir().expect("tempdir");
-        let root = temp.path().join("missing").join("workspace-shenron");
-        let context = ProfileServiceContext::new(&root, Some("shenron"));
+        let root = temp.path().join("missing").join("workspace-worker");
+        let context = ProfileServiceContext::new(&root, Some("worker"));
 
         assert!(!root.exists());
         assert_eq!(context.a2a_mailbox_dir(), root.join(".coord"));
@@ -406,12 +406,12 @@ mod tests {
 
     #[test]
     fn resolved_components_drive_profile_specific_domain_values() {
-        let root = Path::new("/state/workspace-shenron");
+        let root = Path::new("/state/workspace-worker");
         let database = DatabaseConfig {
             db_type: Some(DatabaseType::Postgres),
             url: None,
-            url_env: Some("SHENRON_DATABASE_URL".into()),
-            schema: Some("shenron_canon".into()),
+            url_env: Some("WORKER_DATABASE_URL".into()),
+            schema: Some("worker_canon".into()),
             cache: Some(DatabaseCache::SqliteWal),
             cache_path: Some("cache/memory.db".into()),
         };
@@ -421,24 +421,24 @@ mod tests {
         };
         let redis = RedisConfig {
             url: Some("redis://127.0.0.1:6379/1".into()),
-            prefix: Some("shenron:".into()),
+            prefix: Some("worker:".into()),
         };
         let context = ProfileServiceContext::from_components(
             root,
-            Some("shenron"),
+            Some("worker"),
             &database,
             &ocr,
             &redis,
-            |name| (name == "SHENRON_DATABASE_URL").then(|| "postgres://db/shenron".into()),
+            |name| (name == "WORKER_DATABASE_URL").then(|| "postgres://db/worker".into()),
         )
         .unwrap();
 
-        assert_eq!(context.database_url(), Some("postgres://db/shenron"));
+        assert_eq!(context.database_url(), Some("postgres://db/worker"));
         assert_eq!(
             context.local_memory_path(),
             Some(root.join("cache/memory.db").as_path())
         );
-        assert_eq!(context.postgres_schema(), "shenron_canon");
+        assert_eq!(context.postgres_schema(), "worker_canon");
         assert_eq!(
             context.ocr_database_path(),
             root.join("ocr-state/corpus.db")
@@ -448,7 +448,7 @@ mod tests {
             &[OcrEngine::PpOcrV5, OcrEngine::DotsOcr3b]
         );
         assert_eq!(context.redis_url(), Some("redis://127.0.0.1:6379/1"));
-        assert_eq!(context.redis_key("rag:answer"), "shenron:rag:answer");
+        assert_eq!(context.redis_key("rag:answer"), "worker:rag:answer");
     }
 
     #[test]

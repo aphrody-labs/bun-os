@@ -147,7 +147,7 @@ pub enum RagCommand {
         /// Path used to pick the chunker (defaults to the file name).
         #[arg(long)]
         path: Option<String>,
-        /// Options profile: `default` or `shenron_parity`.
+        /// Options profile: `default` or `ts_parity`.
         #[arg(long)]
         profile: Option<String>,
         #[arg(long)]
@@ -533,7 +533,7 @@ mod tests {
                 "--path",
                 "a.rs",
                 "--profile",
-                "shenron_parity",
+                "ts_parity",
             ],
             src,
             &[],

@@ -86,42 +86,12 @@
       "vhost": "nginx/aphrody/bun.aphrody.com.conf"
     },
     {
-      "host": "dragonballfr.com",
-      "service": "shenron-site",
-      "upstream": "127.0.0.1:5011",
-      "probePath": "/api/health",
-      "vhost": "nginx/shenron/dragonballfr.com.conf"
-    },
-    {
-      "host": "bot.dragonballfr.com",
-      "service": "shenron-bot",
-      "upstream": "127.0.0.1:5006",
-      "probePath": "/health",
-      "vhost": "nginx/shenron/bot.dragonballfr.com.conf"
-    },
-    {
       "host": "cdn.aphrody.com",
       "service": "aphrody-fonts-proxy",
       "upstream": "127.0.0.1:8796",
       "probePath": "/health",
       "paths": ["/css2", "/css", "/icon", "/s/", "/h/"],
       "vhost": "nginx/aphrody/cdn.aphrody.com.conf"
-    },
-    {
-      "host": "cdn.dragonballfr.com",
-      "service": "shenron-site",
-      "upstream": "127.0.0.1:5011",
-      "probePath": "/health",
-      "paths": ["/_next/static/", "/_next/image", "/wiki/", "/assets/wiki/", "/assets/", "/health", "/api/health", "/"],
-      "vhost": "nginx/shenron/cdn.dragonballfr.com.conf"
-    },
-    {
-      "host": "mcp.dragonballfr.com",
-      "service": "shenron-mcp",
-      "upstream": "127.0.0.1:5010",
-      "protocol": "mcp-a2a",
-      "status": "retired",
-      "retiredAt": "2026-09-25"
     },
     {
       "host": "git.aphrody.app",

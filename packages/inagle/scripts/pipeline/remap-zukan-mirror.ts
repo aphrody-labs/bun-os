@@ -5,7 +5,7 @@
  *
  * This is a faithful port of scripts/inagle/pipeline/map-zukan-images.ts matching
  * logic, adapted to read/write the active SQLite mirror instead of the (drifted /
- * auth-broken) local pg `rose_griffon`. Only zukan_hash and zukan_order are touched.
+ * auth-broken) local Postgres database. Only zukan_hash and zukan_order are touched.
  *
  * Sources of truth:
  *   - DATA_PATH/zukan/param_en.json  (5407 EN zukan entries)
@@ -33,7 +33,7 @@ import {
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { existsSync } from "node:fs";
-import { iecodeDataRoot, iecodePath, rgWebsitePath } from "../../src/core/roots.ts";
+import { iecodeDataRoot, iecodePath, webAppPath } from "../../src/core/roots.ts";
 
 const requireNiers = createRequire(import.meta.url);
 let Kuroshiro: any = null;
@@ -62,7 +62,7 @@ function mirrorPath(): string {
   if (MIRROR_ARG) return MIRROR_ARG;
   const fs = require("node:fs");
   const candidates = [
-    [rgWebsitePath("data", "backups"), /^supabase-.*\.sqlite$/],
+    [webAppPath("data", "backups"), /^supabase-.*\.sqlite$/],
     [iecodePath("var", "miroir"), /^inagle-.*\.sqlite$/],
     [iecodePath("var"), /^mirror\.sqlite$/],
   ] as const;
