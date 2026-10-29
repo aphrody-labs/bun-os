@@ -7,8 +7,8 @@
  * play.aphrody.app.conf (nginx -t, then reload only). Nothing is compiled on the VPS.
  *
  * Usage: bun apps/play/scripts/deploy.ts [--build] [--host vps] [--skip-vhost]
- * Prerequisites on the VPS: an installed Bun with bun:nginx and the existing play.env, plus the
- * engine ~/apps/play/nginx/sbin/nginx (toolchains/bun/packages/bun-nginx build-provider.ts).
+ * Prerequisites on the VPS: an installed upstream Bun and the existing play.env, plus an nginx
+ * executable at ~/apps/play/nginx/sbin/nginx (stock nginx, or one built with the optional Bun module).
  */
 import { $ } from "bun";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -52,7 +52,8 @@ fi
 case "$RUNTIME" in /*) ;; *) echo 'Runtime must be an absolute installed path' >&2; exit 1 ;; esac
 case "$RUNTIME" in *[!a-zA-Z0-9_./-]*) echo 'Unsupported runtime path characters' >&2; exit 1 ;; esac
 test -x "$RUNTIME"
-"$RUNTIME" -e 'await import("bun:nginx")'
+"$RUNTIME" --revision >/dev/null
+"$P/nginx/sbin/nginx" -v
 rm -rf "$P/next" && mkdir -p "$P/next" "$P/data/usr" && tar -xzf /tmp/play.tgz -C "$P/next" && rm -f /tmp/play.tgz
 # Existing host-specific environment and protected session stores stay untouched.
 mkdir -p "$HOME/.config/systemd/user"

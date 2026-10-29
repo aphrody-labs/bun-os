@@ -5,7 +5,7 @@
  *   /play/<md5>  in-browser emulation through published web cores
  *   /steam       Steam on the gaming host (signed in)
  *   /stream      gamestream client (signed in)
- *   /engine      Bun Engine systems, jobs and the bun:nginx engine (signed in)
+ *   /engine      Bun Engine systems, jobs and the nginx engine (signed in)
  * Strings come from messages.ts, colors from the per-game M3 scheme (theme.ts).
  */
 import { observeWindowClass } from "@aphrody/m3-front/window-class";

@@ -8,17 +8,16 @@ import { dirname, isAbsolute, join, resolve } from "node:path";
 import type { Subprocess } from "bun";
 import { updateMain, validateUpdate, type UpdateConfig } from "./mesh-update.ts";
 
-/** The complete native fork surface, loaded lazily; this does not execute any Windows operation. */
+/** The Windows surface this supervisor uses (job objects, bun:ffi), loaded lazily; it executes no Windows operation. */
 export async function windows() {
-  return import("bun:windows");
+  const { WindowsJob } = await import("@aphrody/bun-workspace/windows-job");
+  return { Job: WindowsJob };
 }
 export async function windowsCapabilities() {
   const api = await windows();
   return {
-    supported: api.isSupported,
-    exports: Object.keys(api)
-      .filter(key => key !== "default")
-      .toSorted(),
+    supported: process.platform === "win32",
+    exports: Object.keys(api).toSorted(),
   };
 }
 

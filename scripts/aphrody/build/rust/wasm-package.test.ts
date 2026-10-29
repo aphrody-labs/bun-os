@@ -47,7 +47,7 @@ async function fixture(mode: Mode = "success") {
 }
 
 describe("WASM release package", () => {
-  test("cloud sessions use the canonical serialized owner before bun:wasm packaging", async () => {
+  test("cloud sessions use the canonical serialized owner before wasm-bindgen packaging", async () => {
     const f = await fixture();
     const result = await buildWasmPackage({ crate: "command-wasm", out: f.out }, { ...f, env: { APHRODY_CLOUD: "1" } });
     const cargo = f.calls.find(command => command.includes("build"))!;

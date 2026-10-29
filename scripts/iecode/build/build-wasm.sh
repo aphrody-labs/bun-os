@@ -2,8 +2,8 @@
 # Reproducible WebAssembly build for the NIE WASM library adapter.
 #
 # Étapes :
-#   1. bun build --target=wasm (bun:wasm) : cargo build --release --target wasm32-unknown-unknown,
-#      wasm-bindgen --target web à la version du Cargo.lock (glue ESM + .d.ts), wasm-opt -O3
+#   1. scripts/aphrody/build/rust/wasm-package.ts : cargo build --release --target wasm32-unknown-unknown,
+#      wasm-bindgen --target web à la version du Cargo.lock (glue ESM + .d.ts), wasm-opt -Oz si binaryen est installé
 #   2. patch Turbopack : `new URL(..., import.meta.url)` -> throw (force module_or_path)
 #   3. publication in the canonical nie-web WASM surface
 set -euo pipefail
@@ -14,8 +14,8 @@ PKG="${NIE_WASM_PKG:-$ROOT/crates/aphrody-nie-wasm/pkg}"
 
 cd "$ROOT"
 
-echo "[1/3] bun build --target=wasm (cargo, wasm-bindgen, wasm-opt -O3)…"
-bun build --target=wasm --package aphrody-nie-wasm --locked --release --opt-level=O3 --no-pack -o "$PKG"
+echo "[1/3] wasm-package.ts (cargo, wasm-bindgen, wasm-opt -Oz)…"
+bun scripts/aphrody/build/rust/wasm-package.ts --crate aphrody-nie-wasm --out "$PKG"
 
 echo "[2/3] patch Turbopack…"
 sed -i "s|module_or_path = new URL('aphrody_nie_wasm_bg.wasm', import.meta.url);|throw new Error(\"aphrody-nie-wasm: module_or_path requis\");|" "$PKG/aphrody_nie_wasm.js"

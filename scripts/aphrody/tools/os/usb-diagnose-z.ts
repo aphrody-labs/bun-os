@@ -1,64 +1,42 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
  * Diagnostic approfondi du lecteur USB Z: (Disque 1, General UDisk 2TB)
- * Exploite le runtime Bun de notre fork (Bun v1.4.3-aphrody.3) et le module natif `bun:windows`.
+ * Utilise Bun amont (bun:ffi, wevtutil) via l'hôte Windows de @aphrody/winclean.
  */
 import { readdirSync, statSync, writeFileSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
+import { isElevated, windowsHost } from "@aphrody/winclean/windows-host";
 
-interface DriveInfo {
-  root: string;
-  type: string;
-  totalBytes: number;
-  freeBytes: number;
-  availableBytes: number;
-}
-
-interface BunWindowsModule {
-  isSupported: boolean;
-  isElevated(): boolean;
-  systemInfo(): {
-    computerName: string;
-    userName: string;
-    processors: number;
-    totalMemory: number;
-    freeMemory: number;
-    memoryLoad: number;
-    uptime: number;
-    theme: string;
-  };
-  storage: {
-    drives(): DriveInfo[];
-  };
-  eventLog: {
-    query(channel?: string, options?: { xpath?: string; limit?: number; newestFirst?: boolean }): string[];
-  };
-  registry: {
-    get(path: string, name?: string): { type: string; value: unknown } | null;
-  };
+/** Raw event XML records of a channel, newest first, filtered by an XPath expression (wevtutil). */
+function queryEventLog(channel: string, options: { xpath: string; limit: number }): string[] {
+  const result = Bun.spawnSync(
+    ["wevtutil", "qe", channel, `/q:${options.xpath}`, `/c:${options.limit}`, "/rd:true", "/f:xml"],
+    { stdout: "pipe", stderr: "pipe", windowsHide: true },
+  );
+  if (result.exitCode !== 0) throw new Error(result.stderr.toString().trim() || `wevtutil exited with ${result.exitCode}`);
+  return result.stdout.toString().match(/<Event[ >][\s\S]*?<\/Event>/g) ?? [];
 }
 
 async function main() {
-  console.log("=== DIAGNOSTIC AMOVIBLE Z: VIA BUN:WINDOWS (FORK APHRODY) ===\n");
+  console.log("=== DIAGNOSTIC AMOVIBLE Z: (HÔTE WINDOWS) ===\n");
 
-  // 1. Chargement de bun:windows
-  let win: BunWindowsModule;
-  try {
-    win = (await import("bun:windows" as string)) as unknown as BunWindowsModule;
-  } catch (err) {
-    console.error("Échec du chargement de bun:windows:", err);
+  // 1. Hôte Windows
+  if (process.platform !== "win32") {
+    console.error("Ce diagnostic ne s'exécute que sous Windows.");
     process.exit(1);
   }
+  const win = windowsHost();
 
   // 2. Privilèges et Système
-  const elevated = win.isElevated();
-  const sys = win.systemInfo();
+  const elevated = isElevated();
+  const sys = win.systemInfo as { computerName: string; userName: string };
+  const memory = win.memory.status();
   console.log(
     `[Hôte] Machine: ${sys.computerName} | Utilisateur: ${sys.userName} | Élévation Admin: ${elevated ? "OUI" : "NON"}`,
   );
   console.log(
-    `[Mémoire] RAM Totale: ${(sys.totalMemory / 1024 / 1024 / 1024).toFixed(2)} Go | Libre: ${(sys.freeMemory / 1024 / 1024 / 1024).toFixed(2)} Go (Charge: ${sys.memoryLoad}%)\n`,
+    `[Mémoire] RAM Totale: ${(memory.totalPhysical! / 1024 / 1024 / 1024).toFixed(2)} Go | Libre: ${(memory.availablePhysical! / 1024 / 1024 / 1024).toFixed(2)} Go (Charge: ${memory.memoryLoad}%)\n`,
   );
 
   // 3. Inspection des disques logiques
@@ -142,13 +120,12 @@ async function main() {
     console.error(`  [ALERTE I/O] Le test sonde a échoué : ${err.message}`);
   }
 
-  // 6. Analyse des événements Windows via bun:windows.eventLog
+  // 6. Analyse des événements Windows via wevtutil
   console.log(`\n[Événements Système Récents sur le stockage / Harddisk1]`);
   try {
-    const rawEvents = win.eventLog.query("System", {
+    const rawEvents = queryEventLog("System", {
       xpath: "*[System[Provider[@Name='disk'] or Provider[@Name='USBSTOR'] or Provider[@Name='partmgr']]]",
       limit: 40,
-      newestFirst: true,
     });
 
     let disk1Events = 0;

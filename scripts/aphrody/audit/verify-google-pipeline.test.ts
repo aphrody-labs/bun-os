@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 import { expect, test } from "bun:test";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { tempDir } from "../../../toolchains/bun/test/harness";
 import {
   type CargoPackage,
   literalKeyFiles,
@@ -10,6 +10,18 @@ import {
   qualificationPlan,
   verifyStatic,
 } from "./verify-google-pipeline.ts";
+
+/** A disposable temporary directory seeded with files (paths relative to it). */
+function tempDir(prefix: string, files: Record<string, string>) {
+  const root = mkdtempSync(join(tmpdir(), `${prefix}-`));
+  for (const [file, text] of Object.entries(files)) {
+    mkdirSync(dirname(join(root, file)), { recursive: true });
+    writeFileSync(join(root, file), text);
+  }
+  return Object.assign(new String(root), {
+    [Symbol.dispose]: () => rmSync(root, { recursive: true, force: true }),
+  });
+}
 
 function fixture(root: string) {
   const paths = owners(root);
@@ -20,8 +32,7 @@ function fixture(root: string) {
   write(
     join(root, "package.json"),
     JSON.stringify({
-      scripts: { bd: "bun build.ts" },
-      workspaces: ["./packages/*", "./toolchains/bun/packages/bun-google"],
+      workspaces: ["./packages/*"],
     }),
   );
   for (const file of [
@@ -30,11 +41,9 @@ function fixture(root: string) {
     paths.rustCli,
     paths.boqManifest,
     join(dirname(paths.boqManifest), "src/lib.rs"),
-    paths.bunEntry,
     paths.facadeEntry,
   ])
     write(file, "");
-  write(paths.bunManifest, JSON.stringify({ name: "@aphrody/bun-google", scripts: { test: "fixture" } }));
   write(
     paths.facadeManifest,
     JSON.stringify({ name: "@aphrody/google", scripts: { test: "fixture", build: "fixture", verify: "fixture" } }),
@@ -80,13 +89,13 @@ test("finds literal key assignments while leaving protected stores and fixture d
 test("source ownership fails on literal assignments without disclosing their value", () => {
   using directory = tempDir("google-pipeline-key-owner", {});
   const { paths, metadata } = fixture(String(directory));
-  writeFileSync(paths.bunEntry, `GOOGLE_API_KEY${"="}synthetic-fixture\n`);
+  writeFileSync(paths.facadeEntry, `GOOGLE_API_KEY${"="}synthetic-fixture\n`);
   expect(() => verifyStatic(paths, metadata)).toThrow(
-    `Literal API key assignment found under ${dirname(paths.bunEntry)}.`,
+    `Literal API key assignment found under ${dirname(paths.facadeEntry)}.`,
   );
 });
 
-test("Rust source and changed-binary native SDK qualifications use independent own-root plans", () => {
+test("Rust source and facade qualifications use independent own-root plans", () => {
   using directory = tempDir("google-pipeline-plan", {});
   const { paths, metadata } = fixture(String(directory));
   const result = verifyStatic(paths, metadata);
@@ -97,12 +106,12 @@ test("Rust source and changed-binary native SDK qualifications use independent o
   const windows = qualificationPlan(paths, result, "rust", "win32", "fixture-bun");
   expect(windows[0]!.argv.slice(0, 4)).toEqual(["fixture-bun", paths.cargoSerial, "--msvc", "clippy"]);
   const sdk = qualificationPlan(paths, result, "sdk", "linux", "fixture-bun");
-  expect(sdk.map(item => item.stage)).toEqual(["native-sdk", "facade-build"]);
-  expect(sdk[0]!.argv).toEqual(["fixture-bun", "bd", "test", paths.nativeTests, paths.facadeTests]);
+  expect(sdk.map(item => item.stage)).toEqual(["facade-tests", "facade-build"]);
+  expect(sdk[0]!.argv).toEqual(["fixture-bun", "test", paths.facadeTests]);
   expect(sdk.every(item => item.cwd.startsWith(paths.root))).toBe(true);
 });
 
-test("native SDK qualification remains available when the independent Rust workspace is unqualified", () => {
+test("facade qualification remains available when the independent Rust workspace is unqualified", () => {
   using directory = tempDir("google-pipeline-independent-sdk", {});
   const { paths } = fixture(String(directory));
   const result = verifyStatic(
@@ -114,7 +123,7 @@ test("native SDK qualification remains available when the independent Rust works
   );
   expect(result.crates).toEqual([]);
   expect(qualificationPlan(paths, result, "sdk", "linux", "fixture-bun").map(item => item.stage)).toEqual([
-    "native-sdk",
+    "facade-tests",
     "facade-build",
   ]);
 });

@@ -2,7 +2,8 @@
 // The Windows host behind the WinClean compatibility tools, on upstream Bun: reg.exe, PowerShell and sc.exe through
 // Bun.spawnSync, and bun:ffi (kernel32) for drives and memory. Synchronous on purpose, like the BunWindowsApi it fills.
 import { dlopen, FFIType, ptr } from "bun:ffi";
-import { hostname, userInfo } from "node:os";
+import { homedir, hostname, userInfo } from "node:os";
+import { join } from "node:path";
 import type { BunWindowsApi } from "./bun-windows";
 import * as nativeRegistry from "@aphrody/winreg";
 
@@ -134,6 +135,25 @@ function versionInfo(): Record<string, unknown> {
     installationType: text("InstallationType"),
     nativeArch: process.arch === "arm64" ? "arm64" : "x64",
   };
+}
+
+export function isElevated(): boolean {
+  return dlopen("shell32.dll", { IsUserAnAdmin: { args: [], returns: FFIType.bool } }).symbols.IsUserAnAdmin();
+}
+
+/** The current user's profile and local application data folders. */
+export function knownFolder(name: "Profile" | "LocalAppData"): string {
+  return name === "Profile" ? homedir() : (process.env.LOCALAPPDATA ?? join(homedir(), "AppData", "Local"));
+}
+
+/** Running processes (image name and pid), from tasklist. */
+export function processes(): Array<{ pid: number; name: string }> {
+  return run("tasklist", ["/fo", "csv", "/nh"])
+    .split(/\r?\n/)
+    .flatMap(line => {
+      const match = /^"([^"]*)","(\d+)"/.exec(line);
+      return match ? [{ name: match[1]!, pid: Number(match[2]) }] : [];
+    });
 }
 
 /** The BunWindowsApi on this machine; only valid on Windows. */

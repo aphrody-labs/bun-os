@@ -3,13 +3,13 @@
 /**
  * Builds the play.aphrody.app release on this workstation (no build runs on the VPS):
  *
- *   dist/server.js                       Bun server bundle (target bun, bun:nginx external)
+ *   dist/server.js                       Bun server bundle (target bun)
  *   dist/public/                         client (Bun.build HTML entry + M3 plugin), hashed /assets/
  *   dist/public/stream-client/index.html the unchanged packages/bun-gamestream client
  *   dist/public/catalog.json, roms/      public catalog: Bun Engine systems + free ROM packs only
  *   dist/public/emulation/               dist/web-emulation/<core>/ when published (else empty)
  *   dist/public/assets/art/              libretro-thumbnails and Systematic icons (scripts/art.ts)
- *   dist/nginx/engine.conf               bun:nginx engine template (infra/config/host/nginx/play)
+ *   dist/nginx/engine.conf               nginx engine template (infra/config/host/nginx/play)
  *   dist/packages/bun-engine/plugins/    data files the bundled Bun Engine frontend reads
  *
  * Usage: bun apps/play/scripts/build.ts
@@ -226,7 +226,6 @@ check(
     naming: "server.js",
     target: "bun",
     minify: { syntax: true, whitespace: true },
-    external: ["bun:nginx"],
     plugins: [releasePaths],
   }),
   "server",

@@ -17,6 +17,7 @@
     "./hash": "./src/hash.ts",
     "./guards": "./src/guards.ts",
     "./process": "./src/process.ts",
+    "./windows-job": "./src/windows-job.ts",
     "./runtime": "./src/runtime.ts",
     "./automation": "./src/automation/index.ts",
     "./automation/*": "./src/automation/*"

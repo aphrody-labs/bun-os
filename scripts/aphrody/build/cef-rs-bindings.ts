@@ -1,7 +1,9 @@
 // Generates and qualifies the cef-rs bindings of the vendor/cef-rs fork from owner-built CEF headers.
-// Moved from aphrody-labs/bun scripts/aphrody/cef-rs-bindings.ts with the cef-rs source (runtime-heavy-migration B1).
+// The Chromium pins below are the revisions the owner-built CEF headers were produced from.
 import { isAbsolute, join, resolve } from "node:path";
-import { CHROMIUM_BASE_REVISION, CHROMIUM_REVISION } from "../../../toolchains/bun/scripts/aphrody/cef.ts";
+
+export const CHROMIUM_REVISION = "95ff46fdacff0d4973f17710418f12e1ceedeed9";
+export const CHROMIUM_BASE_REVISION = "ce0615a76d6347f1914d673f1da66285b328d494";
 
 const root = resolve(import.meta.dir, "../../..");
 const source = join(root, "vendor/cef-rs");

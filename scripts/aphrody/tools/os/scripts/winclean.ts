@@ -13,7 +13,7 @@
 
 import { createHash } from "node:crypto";
 import { basename, extname, join, relative, resolve, sep } from "node:path";
-import * as windows from "bun:windows";
+import { isElevated, knownFolder, processes, windowsHost } from "@aphrody/winclean/windows-host";
 
 const SCHEMA = "aphrody.winclean.local.v1";
 const PROCESS_FILTER = /bun|rust|cargo|docker|claude|agy|vnc|wireguard|ssh|aphrody/i;
@@ -189,7 +189,7 @@ function localProfile(machine: string): Record<string, unknown> {
   }
   const os = payload?.structuredContent;
   if (!os || String(os.MachineName).toUpperCase() !== machine.toUpperCase())
-    throw new Error("WinClean CLI and bun:windows report different machines; refusing cleanup");
+    throw new Error("WinClean CLI and the Windows host report different machines; refusing cleanup");
   return os as Record<string, unknown>;
 }
 
@@ -234,14 +234,14 @@ async function applyCandidates(
 }
 
 async function main(): Promise<void> {
-  if (process.platform !== "win32" || !windows.isSupported)
-    throw new Error("This script requires the supported native Windows bun:windows runtime");
+  if (process.platform !== "win32") throw new Error("This script requires native Windows");
+  const windows = windowsHost();
 
   const options = parseOptions(process.argv.slice(2));
-  const system = windows.systemInfo();
+  const system = windows.systemInfo;
   const machine = String(system.computerName);
-  const profile = windows.knownFolder("Profile");
-  const localAppData = windows.knownFolder("LocalAppData");
+  const profile = knownFolder("Profile");
+  const localAppData = knownFolder("LocalAppData");
   const tempEnvPath = resolve(requiredEnv("TEMP"));
   const expectedTempPath = resolve(localAppData, "Temp");
   if (tempEnvPath.toUpperCase() !== expectedTempPath.toUpperCase())
@@ -250,8 +250,7 @@ async function main(): Promise<void> {
   if (!(await Bun.file(tempRoot).stat()).isDirectory()) throw new Error("TEMP is not a directory");
   if (tempRoot.toUpperCase() === resolve(tempRoot, "..").toUpperCase()) throw new Error("Refusing an unsafe TEMP root");
 
-  const processes = windows.processes
-    .list()
+  const runningProcesses = processes()
     .filter(item => PROCESS_FILTER.test(String(item.name)))
     .map(item => ({ pid: item.pid, name: item.name }));
   const services = windows.services
@@ -272,14 +271,14 @@ async function main(): Promise<void> {
     machine,
     runtime: {
       bun: Bun.version,
-      windows: windows.version(),
-      elevated: windows.isElevated(),
+      windows: windows.version,
+      elevated: isElevated(),
     },
     system: { ...system, memory, drives: disk },
     installedTools: ["bun", "cargo", "rustc", "docker", "claude", "agy", "vncviewer", "wg", "ssh", "sshfs"].map(
       name => ({ name, path: Bun.which(name) ?? null }),
     ),
-    processes,
+    processes: runningProcesses,
     services,
     filesystemIndex: {
       configured: Boolean(process.env.APHRODY_FSINDEX_DB),

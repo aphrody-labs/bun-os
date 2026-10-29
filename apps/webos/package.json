@@ -16,6 +16,7 @@
     "@aphrody/app-ui": "workspace:*",
     "@aphrody/bun-workspace": "workspace:*",
     "@aphrody/m3-tokens": "workspace:*",
+    "@aphrody/typesafe-sdk": "0.6.2",
     "@aphrody/webos-wasm": "workspace:*"
   },
   "devDependencies": {

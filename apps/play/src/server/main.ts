@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
  * Production entry (systemd user unit bun-os-play.service): the Bun API/WebSocket server on
- * loopback and the bun:nginx-owned engine in front of it. SIGHUP re-renders and reloads the
+ * loopback and the nginx engine it owns in front of it. SIGHUP re-renders and reloads the
  * engine; SIGTERM/SIGINT quit it gracefully before exiting.
  */
 import { createServer } from "./app";
