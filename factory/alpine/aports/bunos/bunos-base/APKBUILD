@@ -1,0 +1,16 @@
+# Maintainer: aphrody-dev <contact@aphrody.com>
+pkgname=bunos-base
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Bun OS Alpine base: Rust userland (uutils, sudo-rs, nushell, ripgrep, fd, eza, bat, zoxide, starship) and Bun"
+url="https://github.com/aphrody-labs/bun-os"
+arch="noarch"
+license="Apache-2.0"
+depends="alpine-base bash uutils-coreutils sudo-rs nushell ripgrep fd eza bat zoxide starship bun gcompat ca-certificates curl dpkg"
+options="!check"
+source="bunos-release"
+builddir="$srcdir"
+package() {
+	install -Dm644 "$srcdir/bunos-release" "$pkgdir/etc/bunos-release"
+}
+sha512sums="fb2020e961cc4a61b7982ad2492377fdc494647624adba170dbbd88c7722d09754192a8aed0c4e8cc40dd3ba81a426fb8c257b5dc24e08457d6c72f212ff57b4  bunos-release"

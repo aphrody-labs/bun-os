@@ -1,0 +1,20 @@
+# Maintainer: aphrody-dev <contact@aphrody.com>
+pkgname=bunos-run
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="bunos run <file>: run ELF, Alpine apk, Windows exe, wasm, deb and scripts"
+url="https://github.com/aphrody-labs/bun-os"
+arch="noarch"
+license="Apache-2.0"
+depends="bun"
+options="!check"
+source="bunos.ts"
+builddir="$srcdir"
+
+package() {
+	install -Dm644 "$srcdir/bunos.ts" "$pkgdir/usr/lib/bunos/bunos.ts"
+	mkdir -p "$pkgdir/usr/bin"
+	printf '#!/bin/sh\nexec bun /usr/lib/bunos/bunos.ts "$@"\n' > "$pkgdir/usr/bin/bunos"
+	chmod 755 "$pkgdir/usr/bin/bunos"
+}
+sha512sums="SHA_BUNOS_TS  bunos.ts"
