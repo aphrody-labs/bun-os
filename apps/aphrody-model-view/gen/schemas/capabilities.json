@@ -1,14 +1,1 @@
-{
-  "main-capability": {
-    "identifier": "main-capability",
-    "description": "The model view: drag/close its own window and drive its native 3D layer.",
-    "local": true,
-    "windows": ["main"],
-    "permissions": [
-      "core:default",
-      "core:window:allow-start-dragging",
-      "core:window:allow-close",
-      "aphrody-3d:default"
-    ]
-  }
-}
+{"main-capability":{"identifier":"main-capability","description":"The model view: drag/close its own window and drive its native 3D layer.","local":true,"windows":["main"],"permissions":["core:default","core:window:allow-start-dragging","core:window:allow-close","aphrody-3d:default"]}}

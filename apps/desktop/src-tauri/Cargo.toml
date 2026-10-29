@@ -7,23 +7,17 @@ edition = "2024"
 rust-version = "1.97"
 license = "MIT"
 
-[workspace]
-resolver = "3"
-
 [build-dependencies]
-tauri-build = { package = "aphrody-tauri-build", version = "=1.4.7", path = "../../../packages/bun-tauri/crates/aphrody-tauri-build" }
+tauri-build = { workspace = true }
 
 [dependencies]
-tauri = { package = "aphrody-tauri", version = "=1.4.7", path = "../../../packages/bun-tauri/crates/aphrody-tauri", default-features = false, features = [
-  "compression",
-] }
-tauri-runtime-cef = { package = "aphrody-tauri-runtime-cef", version = "=1.4.7", path = "../../../packages/bun-tauri/crates/aphrody-tauri-runtime-cef" }
-tauri-plugin-aphrody = { version = "=1.4.7", path = "../../../packages/bun-tauri/crates/tauri-plugin-aphrody", default-features = false }
+tauri = { workspace = true, features = ["compression"] }
+tauri-runtime-wry = { workspace = true }
+tauri-runtime-cef = { workspace = true, optional = true }
+tauri-plugin-aphrody = { workspace = true }
+serde_json = { workspace = true }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
-
-[profile.release]
-codegen-units = 1
-lto = "thin"
-strip = true
+# Chromium Embedded Framework instead of the system webview (cef-dll-sys needs CMake).
+cef = ["dep:tauri-runtime-cef"]

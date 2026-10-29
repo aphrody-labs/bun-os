@@ -386,7 +386,7 @@ pub fn host_info() -> Value {
       "name": "yolo-desktop", "version": env!("CARGO_PKG_VERSION"),
       "protocol": "yolo.desktop/1", "target": env!("YOLO_DESKTOP_TARGET"),
       "git_rev": env!("YOLO_DESKTOP_GIT_REV"), "rustc": env!("YOLO_DESKTOP_RUSTC"),
-      "panic_recovery": cfg!(panic = "unwind"), "engine": "cef"
+      "panic_recovery": cfg!(panic = "unwind"), "engine": crate::webview::ENGINE
     })
 }
 
@@ -434,8 +434,8 @@ pub fn run(mut context: tauri::Context) -> Result<i32, Box<dyn std::error::Error
     let events = Arc::new(Mutex::new(Events::default()));
     let policy = Arc::new(policy);
     context.config_mut().app.windows.clear();
-    let session = crate::cef::session_dir();
-    let app = tauri::Builder::default().runtime(crate::cef::runtime_host(&session)?).setup(move |app| {
+    let session = crate::webview::session_dir();
+    let app = tauri::Builder::default().runtime(crate::webview::runtime_host(&session)?).setup(move |app| {
     let app = app.handle().clone();
     *lock(&setup_worker) = Some(thread::Builder::new().name("yolo-desktop-control".into()).spawn(move || {
       while !setup_stopping.load(Ordering::Acquire) {

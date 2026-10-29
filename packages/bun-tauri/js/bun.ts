@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Webview side of the `aphrody` plugin: the Bun server started by the app (see `plugins > aphrody > bun`).
-import { invoke } from "./api/core";
-import { listen, type UnlistenFn } from "./api/event";
+import { invoke } from "@tauri-apps/api/core";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
 export interface BunInfo {
   running: boolean;

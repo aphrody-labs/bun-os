@@ -16,7 +16,9 @@
 //! serving it with the window subsystem.
 
 pub mod broker;
+#[cfg(feature = "cef")]
 pub mod cef;
+pub mod webview;
 pub mod desktop;
 pub mod explorer;
 pub mod identity;
@@ -779,38 +781,38 @@ pub fn run_runtime_host() -> Result<i32, Box<dyn std::error::Error>> {
 /// Build and run the desktop application.
 pub fn run() {
     tauri::Builder::default()
-        // Tauri 3 has no implicit runtime: Chromium Embedded Framework is the one Aphrody runtime.
-        .runtime(cef::runtime())
+        // Tauri 3 has no implicit runtime: wry (system webview), or CEF with the `cef` feature.
+        .runtime(webview::runtime())
         // single-instance must be the first plugin: a second launch focuses this window.
         // Its callback forwards the second launch's files and `aphrody://` links to this window.
-        .plugin(tauri_plugin_aphrody::single_instance::init(
+        .plugin(tauri_plugin_single_instance::init(
             |app, args, cwd| {
                 integration::on_second_instance(app, &args, &cwd);
             },
         ))
-        .plugin(tauri_plugin_aphrody::deep_link::init())
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(
-            tauri_plugin_aphrody::window_state::Builder::default()
+            tauri_plugin_window_state::Builder::default()
                 // Every window that starts hidden is parked off-screen (see `parking`): tracking
                 // it would persist the parking spot. The pet and the widget keep their own position.
                 .with_denylist(&parking::HIDDEN_AT_START)
                 // Visibility is owned by the splash flow and the pet/widget preferences.
                 .with_state_flags(
-                    tauri_plugin_aphrody::window_state::StateFlags::all()
-                        - tauri_plugin_aphrody::window_state::StateFlags::VISIBLE,
+                    tauri_plugin_window_state::StateFlags::all()
+                        - tauri_plugin_window_state::StateFlags::VISIBLE,
                 )
                 .build(),
         )
-        .plugin(tauri_plugin_aphrody::os::init())
-        .plugin(tauri_plugin_aphrody::process::init())
-        .plugin(tauri_plugin_aphrody::dialog::init())
-        .plugin(tauri_plugin_aphrody::clipboard_manager::init())
-        .plugin(tauri_plugin_aphrody::notification::init())
-        .plugin(tauri_plugin_aphrody::global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         // The plugin defaults to `Trace`, which floods stdout and the log file with dependency
         // internals (html5ever, selectors, nu_parser: megabytes per minute).
         .plugin(
-            tauri_plugin_aphrody::log::Builder::new()
+            tauri_plugin_log::Builder::new()
                 .level(if cfg!(debug_assertions) {
                     log::LevelFilter::Debug
                 } else {
@@ -818,18 +820,18 @@ pub fn run() {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_aphrody::store::Builder::new().build())
-        .plugin(tauri_plugin_aphrody::opener::init())
-        .plugin(tauri_plugin_aphrody::fs::init())
+        .plugin(tauri_plugin_store::Builder::new().build())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_fs::init())
         .plugin(
-            tauri_plugin_aphrody::autostart::Builder::new()
+            tauri_plugin_autostart::Builder::new()
                 .arg(integration::AUTOSTART_FLAG)
                 .build(),
         )
         // Endpoints and the minisign public key come from `plugins.updater` in the Tauri
         // config, injected at bundle time by aphrody-ops tauri; a build without them reports
         // the missing configuration from `check` instead of pretending there is no update.
-        .plugin(tauri_plugin_aphrody::updater::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(aphrody_shell_tauri::init())
         // Managed before `setup`: the config windows (splash, pet, widget) are created first and
         // their pages invoke integration commands as soon as they load.
@@ -867,7 +869,7 @@ pub fn run() {
                 integration::set_widget(app, !integration::load_prefs(app).widget);
             }
             "menu_docs" => {
-                let _ = tauri_plugin_aphrody::opener::OpenerExt::opener(app)
+                let _ = tauri_plugin_opener::OpenerExt::opener(app)
                     .open_url("https://aphrody.dev/docs", None::<&str>);
             }
             "menu_showcase" => {

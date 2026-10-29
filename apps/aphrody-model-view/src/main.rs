@@ -77,7 +77,7 @@ fn main() -> std::process::ExitCode {
         .plugin(aphrody_tauri_3d::init())
         // Empty unless built with `--features debug-bridge` in a debug build and started with
         // APHRODY_TAURI_DEBUG=1; see docs/guides/web/TAURI-DEBUG.md.
-        .plugin(aphrody_tauri_wrap::debug::init())
+        .plugin(tauri_plugin_aphrody::wrap::debug::init())
         .setup(move |app| {
             let size = f64::from(args.size.unwrap_or(640));
             let window =

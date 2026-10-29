@@ -1,0 +1,38 @@
+[package]
+name = "tauri-plugin-mcp-bridge"
+version = "1.4.7"
+description = "MCP bridge for Tauri 3 apps: IPC monitor, window/backend inspection, script execution and screenshots over a local WebSocket (CEF runtime)."
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license = "MIT"
+authors.workspace = true
+links = "tauri-plugin-mcp-bridge"
+build = "build.rs"
+
+[dependencies]
+tauri = { workspace = true }
+tauri-runtime = { workspace = true }
+tauri-runtime-cef = { workspace = true, optional = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true, features = ["kv"] }
+url = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tokio-tungstenite = { version = "0.30" }
+futures-util = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }
+image = { version = "0.25.10", default-features = false, features = ["png", "jpeg"] }
+
+[features]
+default = []
+# Native screenshots through the CEF DevTools protocol (pulls cef-dll-sys, needs CMake).
+cef = ["dep:tauri-runtime-cef"]
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"

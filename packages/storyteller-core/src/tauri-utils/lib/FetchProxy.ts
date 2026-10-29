@@ -1,5 +1,5 @@
 import { IsDesktopApp } from "./IsDesktopApp";
-import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
+import { fetch as tauriFetch } from "@artcraft/plugin-http";
 
 // TODO: Match the function signature in typescript annotations:
 // export declare function fetch(input: URL | Request | string, init?: RequestInit & ClientOptions): Promise<Response>;

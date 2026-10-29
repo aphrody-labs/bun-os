@@ -155,6 +155,7 @@ pub fn run() {
   println!("Initializing backend runtime...");
 
   let builder = tauri::Builder::default()
+    .runtime(tauri_runtime_wry::Wry::default())
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_opener::init())

@@ -68,7 +68,7 @@ fn build_window(app: &AppHandle, origin: Url) -> tauri::Result<()> {
         .on_navigation(move |url| url.origin() == navigation_origin)
         .on_new_window(move |url, _features| {
             if matches!(url.scheme(), "http" | "https") {
-                let _ = tauri_plugin_aphrody::opener::OpenerExt::opener(&opener)
+                let _ = tauri_plugin_opener::OpenerExt::opener(&opener)
                     .open_url(url.as_str(), None::<&str>);
             }
             NewWindowResponse::Deny

@@ -107,16 +107,15 @@ const text = await (await bunFetch("/")).text();
 
 ### Other imports
 
-```ts
-import { menu, window, webviewWindow } from "@aphrody/tauri";
-import { invoke } from "@aphrody/tauri/api/core";
-import { Store } from "@aphrody/tauri/plugins/store";
-```
+The Tauri API and the official plugin bindings come from the repository catalog
+(`@tauri-apps/api`, `@tauri-apps/plugin-*`, one version for every app); this package only
+adds the Bun sidecar bridge and the MCP bridge binding.
 
-All API namespaces are also available from `@aphrody/tauri/api`. Plugin guest
-bindings require the corresponding Cargo feature and initialization of the
-native `tauri-plugin-aphrody` crate. The JavaScript package alone does not
-create a native application.
+```ts
+import { invoke } from "@tauri-apps/api/core";
+import { Store } from "@tauri-apps/plugin-store";
+import { bunFetch } from "@aphrody/tauri/bun";
+```
 
 ## Checks
 

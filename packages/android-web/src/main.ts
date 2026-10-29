@@ -1,5 +1,5 @@
-import { isTauri } from "@aphrody/tauri/api/core";
-import { getName, getVersion } from "@aphrody/tauri/api/app";
+import { isTauri } from "@tauri-apps/api/core";
+import { getName, getVersion } from "@tauri-apps/api/app";
 
 const status = document.querySelector<HTMLParagraphElement>("#status")!;
 if (isTauri()) {

@@ -149,8 +149,8 @@ aphrody-m3-reproduce = { path = "../aphrody-m3-reproduce", version = "1.4.7", fe
 aphrody-render = { path = "../aphrody-render", version = "1.4.7" }
 aphrody-bindgen = { path = "../aphrody-bindgen", version = "1.4.7" }
 aphrody-rag-eval = { path = "../aphrody-rag-eval", version = "1.4.7", features = [] }
-tauri-cli = { path = "../../packages/bun-tauri/crates/aphrody-tauri-cli", package = "aphrody-tauri-cli" }
-create-tauri-app = { path = "../../packages/bun-tauri/crates/aphrody-create-tauri-app", package = "aphrody-create-tauri-app" }
+tauri-cli = { workspace = true }
+create-tauri-app = { workspace = true }
 aphrody-embed = { path = "../aphrody-embed", version = "1.4.7", default-features = false, features = ["server"] }
 aphrody-oxc-bridge = { version = "0.2.0" }
 aphrody-voice = { path = "../aphrody-voice", version = "1.4.7", features = [] }

@@ -79,7 +79,7 @@ pub async fn studio_google_drive_authorize(
     app: tauri::AppHandle,
     window: tauri::WebviewWindow,
 ) -> Result<Value, String> {
-    use tauri_plugin_aphrody::opener::OpenerExt;
+    use tauri_plugin_opener::OpenerExt;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     main_window_only(&window)?;
     let home = std::env::var_os("HOME")
