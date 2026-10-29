@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: 0BSD
+# Prebuilt NVIDIA open kernel modules for linux-bun (bare metal). Not built yet: CI job
+# `nvidia-open-build-check` in .github/workflows/wsl-kernel.yml is the first compile check against the 7.2.11 and 7.3 headers.
+# Userspace must be the same version: extra/nvidia-utils 615.78.08 (verified in the Arch repo on 2026-10-29).
+# Not for WSL: WSL gets the Windows driver through /dev/dxg and /usr/lib/wsl/lib.
+pkgname=nvidia-open-linux-bun
+_nvver=615.78.08
+pkgver=${_nvver}
+pkgrel=1
+pkgdesc="NVIDIA open kernel modules ${_nvver} built for linux-bun"
+arch=(x86_64)
+url="https://github.com/aphrody-labs/open-gpu-kernel-modules"
+license=(GPL-2.0-only MIT)
+depends=(linux-bun "nvidia-utils=${_nvver}")
+makedepends=(linux-bun-headers git)
+conflicts=(nvidia-open-dkms nvidia-dkms)
+# Commit 1a82fbfda8f321b056eb3568850f9316c5e465c5 is the peeled tag 615.78.08 of NVIDIA/open-gpu-kernel-modules.
+source=("git+https://github.com/aphrody-labs/open-gpu-kernel-modules.git#commit=1a82fbfda8f321b056eb3568850f9316c5e465c5")
+b2sums=(SKIP)
+
+build() {
+  local _kernver
+  _kernver=$(basename "$(ls -d /usr/lib/modules/*-bun | sort -V | tail -n 1)")
+  cd open-gpu-kernel-modules
+  make modules -j"$(nproc)" SYSSRC="/usr/lib/modules/${_kernver}/build" SYSOUT="/usr/lib/modules/${_kernver}/build"
+}
+
+package() {
+  local _kernver
+  _kernver=$(basename "$(ls -d /usr/lib/modules/*-bun | sort -V | tail -n 1)")
+  cd open-gpu-kernel-modules/kernel-open
+  install -Dm644 -t "${pkgdir}/usr/lib/modules/${_kernver}/updates" nvidia.ko nvidia-modeset.ko nvidia-drm.ko nvidia-uvm.ko
+  # Compress as the kernel package does so depmod finds them.
+  find "${pkgdir}" -name '*.ko' -exec zstd -19 --rm {} +
+  install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modprobe.d/nvidia-open-linux-bun.conf" <<<'blacklist nouveau
+blacklist nova_core
+options nvidia_drm modeset=1'
+}

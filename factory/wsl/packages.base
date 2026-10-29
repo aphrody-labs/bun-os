@@ -1,0 +1,36 @@
+# Bun OS WSL distro: base set (Arch core/extra). No kernel, no firmware, no NVIDIA: WSL supplies the kernel
+# and /dev/dxg + /usr/lib/wsl/lib come from the Windows host driver.
+base
+base-devel
+sudo
+git
+openssh
+curl
+jq
+less
+nano
+man-db
+man-pages
+ca-certificates
+zstd
+which
+bash-completion
+iproute2
+inetutils
+# graphics userspace for WSLg (Mesa d3d12 gallium driver is part of `mesa`; vulkan-dzn is the Vulkan-on-D3D12 ICD)
+mesa
+vulkan-dzn
+vulkan-icd-loader
+libva-mesa-driver
+mesa-utils
+wayland
+xorg-xwayland
+xorg-xeyes
+pipewire-pulse
+# Rust toolchain used by the kernel and by buncc (distro rust, not rustup)
+rust
+rust-src
+rust-bindgen
+clang
+lld
+npm

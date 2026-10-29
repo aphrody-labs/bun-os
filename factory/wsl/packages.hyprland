@@ -1,0 +1,10 @@
+# Hyprland nested under WSLg's Weston (Wayland backend of Aquamarine). Subset of
+# factory/images/bunos-omarchy/candidate.packages that exists in Arch core/extra.
+hyprland
+xdg-desktop-portal-hyprland
+uwsm
+foot
+wayvnc
+dbus
+wayland-protocols
+quickshell

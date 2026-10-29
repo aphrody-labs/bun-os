@@ -1,0 +1,4 @@
+# COSMIC from the Arch `cosmic` group (extra). Runs under WSLg as a nested Wayland client only if cosmic-comp
+# starts with its winit/Wayland backend; unverified (see docs/WSL.md).
+cosmic
+xdg-desktop-portal-cosmic
