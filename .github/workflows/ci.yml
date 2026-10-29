@@ -40,7 +40,7 @@ jobs:
         run: bun scripts/workspace-manifests.ts
       - name: Component manifest
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
-        run: bun factory/bunos/check-components.ts
+        run: bun factory/bunos/generate-components.ts --check && bun factory/bunos/check-components.ts
 
   rust:
     name: Rust ${{ matrix.os }}

@@ -2101,7 +2101,10 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "edges": {"consumers": ["shenron"], "npm": "mediabunny@1.63.0 (latest on npm, 2026-10-29)"},
+      "edges": {
+        "consumers": ["shenron"],
+        "npm": "mediabunny@1.63.0 (latest on npm, 2026-10-29)"
+      },
       "note": "Migrated from aphrody-labs/shenron vendor/mediabunny; pin = upstream HEAD of 2026-10-28T17:42:43Z."
     },
     {
@@ -2116,7 +2119,9 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "edges": {"consumers": ["skill:ui-ux-pro-max"]},
+      "edges": {
+        "consumers": ["skill:ui-ux-pro-max"]
+      },
       "note": "Migrated from aphrody-labs/shenron vendor/ui-ux-pro-max-skill; pin = upstream HEAD of 2026-10-26T10:07:27Z."
     },
     {
@@ -2131,7 +2136,11 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "edges": {"workspace": "@aphrody/shenron-config", "dependsOn": ["npm:@aphrody/paths", "zod"], "consumers": ["shenron"]},
+      "edges": {
+        "workspace": "@aphrody/shenron-config",
+        "dependsOn": ["npm:@aphrody/paths", "zod"],
+        "consumers": ["shenron"]
+      },
       "note": "Migrated from aphrody-labs/shenron packages/config; pin = main HEAD of 2026-10-26T12:21:27Z; linked as root workspace."
     },
     {
@@ -2960,7 +2969,7 @@
       "source": {
         "type": "workspace",
         "name": "@aphrody/admin-ui",
-        "version": "1.4.4"
+        "version": "1.4.7"
       },
       "registration": ["none"],
       "aot": true,
