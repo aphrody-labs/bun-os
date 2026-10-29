@@ -145,7 +145,7 @@ export interface PrefMap {
   "workspaces.count": number;
   "windows.gap": number;
   "windows.border": number;
-  "windows.tiling": "dwindle" | "scrolling" | "floating";
+  "windows.tiling": "dwindle" | "master" | "scrolling" | "floating";
   /** Launch id per file kind. */
   "files.openWith": Record<FileTypeId, string>;
   /** Chords per action id (shortcuts.ts); missing actions use their defaults. */
@@ -382,7 +382,7 @@ export const SCHEMA: { [K in PrefKey]: Spec<PrefMap[K]> } = {
   "workspaces.count": num(5, 1, 10),
   "windows.gap": num(10, 0, 32),
   "windows.border": num(2, 0, 6),
-  "windows.tiling": oneOf("dwindle", ["dwindle", "scrolling", "floating"]),
+  "windows.tiling": oneOf("dwindle", ["dwindle", "master", "scrolling", "floating"]),
   "files.openWith": {
     default: {
       text: "editor",

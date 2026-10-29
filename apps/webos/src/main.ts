@@ -1417,11 +1417,13 @@ const timeEl = h("time", { class: "bar-time" });
 const dateEl = h("span", { class: "bar-date" });
 const LAYOUT_GLYPH: Record<Layout, string> = {
   dwindle: "dashboard",
+  master: "vertical_split",
   scrolling: "view_column",
   floating: "filter_none",
 };
 const LAYOUT_NAME: Record<Layout, string> = {
   dwindle: "Tiled",
+  master: "Master and stack",
   scrolling: "Scrolling columns",
   floating: "Floating",
 };

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 import { h, icon } from "./dom";
+import { dwindleRects, masterRects, scrollingRects, type Rect } from "./tile";
 
-export type Layout = "floating" | "dwindle" | "scrolling";
+export type Layout = "floating" | "dwindle" | "master" | "scrolling";
 export type Direction = "left" | "right" | "up" | "down";
-export const LAYOUTS: Layout[] = ["dwindle", "scrolling", "floating"];
+export const LAYOUTS: Layout[] = ["dwindle", "master", "scrolling", "floating"];
 export const WORKSPACES = 10;
 
 export interface AppWindow {
@@ -56,13 +57,6 @@ export interface Insets {
 
 type Listener = () => void;
 const LAYOUT_KEY = "aph.layouts";
-
-interface Rect {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
 
 /**
  * Windows on the desktop, after the Omarchy navigation model: ten workspaces, a layout per workspace
@@ -436,41 +430,14 @@ export class WindowManager {
     for (const w of all) if (!tiled.includes(w)) this.unplace(w);
     const area = this.freeArea();
     if (!tiled.length || area.w <= 0) return;
-    if (layout === "dwindle") this.dwindle(tiled, area);
-    else this.scrolling(tiled, area);
-  }
-
-  private dwindle(list: AppWindow[], r: Rect) {
-    const [first, ...rest] = list;
-    if (!first) return;
-    if (!rest.length) return this.place(first, r);
-    const horizontal = r.w >= r.h;
-    const half: Rect = horizontal
-      ? { ...r, w: (r.w - this.gap) / 2 }
-      : { ...r, h: (r.h - this.gap) / 2 };
-    this.place(first, half);
-    const next: Rect = horizontal
-      ? { x: r.x + half.w + this.gap, y: r.y, w: half.w, h: r.h }
-      : { x: r.x, y: r.y + half.h + this.gap, w: r.w, h: half.h };
-    this.dwindle(rest, next);
-  }
-
-  /** Columns of 70% width, the focused one centred, neighbours peeking in from the sides. */
-  private scrolling(list: AppWindow[], r: Rect) {
-    const colW = list.length === 1 ? r.w : r.w * 0.7;
-    const focused = Math.max(
-      0,
-      list.findIndex((w) => w.el.classList.contains("active")),
-    );
-    const start = r.x + (r.w - colW) / 2 - focused * (colW + this.gap);
-    list.forEach((w, i) =>
-      this.place(w, {
-        x: start + i * (colW + this.gap),
-        y: r.y,
-        w: colW,
-        h: r.h,
-      }),
-    );
+    const focused = tiled.findIndex(w => w.el.classList.contains("active"));
+    const rects =
+      layout === "dwindle"
+        ? dwindleRects(tiled.length, area, this.gap)
+        : layout === "master"
+          ? masterRects(tiled.length, area, this.gap)
+          : scrollingRects(tiled.length, area, this.gap, focused);
+    tiled.forEach((w, i) => this.place(w, rects[i]!));
   }
 
   // Directional focus and swap -------------------------------------------------------------------

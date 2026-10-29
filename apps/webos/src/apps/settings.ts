@@ -1234,10 +1234,11 @@ export function settingsApp(
           "For workspaces you have not changed",
           segCtl(acc("windows.tiling"), "Default layout", [
             ["dwindle", "Tiled", "dashboard"],
+            ["master", "Master", "vertical_split"],
             ["scrolling", "Columns", "view_column"],
             ["floating", "Floating", "filter_none"],
           ]),
-          "tiling dwindle scrolling",
+          "tiling dwindle master scrolling",
         ),
         row(
           "Gaps",
