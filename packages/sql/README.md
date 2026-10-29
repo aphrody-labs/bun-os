@@ -135,5 +135,5 @@ existing tests cover these contracts.
 ```sh
 bun test                              # in packages/infra/sql (no network)
 bun check -p tsconfig.json --noEmit
-bun lint -c ../../docs/aphrody/.oxlintrc.json src test
+bun lint -c ../../.oxlintrc.json src test
 ```

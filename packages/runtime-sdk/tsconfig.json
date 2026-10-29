@@ -1,4 +1,4 @@
 {
-  "extends": "../../docs/aphrody/tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "include": ["src/**/*", "runtime.d.ts", "examples/**/*"]
 }

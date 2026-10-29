@@ -1,9 +1,9 @@
 {
-  "extends": "../../docs/aphrody/tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "module": "preserve",
     "moduleResolution": "bundler"
   },
-  "include": ["**/*.ts", "**/*.mts", "**/*.mjs", "../../docs/aphrody/package.json", "../*.mjs", "../*.mts"],
+  "include": ["**/*.ts", "**/*.mts", "**/*.mjs", "../*.mjs", "../*.mts"],
   "exclude": ["**/node_modules"]
 }
