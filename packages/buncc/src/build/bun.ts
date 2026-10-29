@@ -82,7 +82,11 @@ export interface CompileOptions {
  * `bun build --compile [--aot]`. The long form is used on purpose: `bun compile` is an alias that a package.json script named
  * `compile` would shadow. Windows metadata flags only work on a Windows host; only --windows-hide-console works when cross-compiling.
  */
-export function compileArgs(options: CompileOptions, hostOs: string = process.platform): string[] {
+export function compileArgs(
+  options: CompileOptions,
+  hostOs: string = process.platform,
+  hostArch: string = process.arch,
+): string[] {
   const args = ["build", "--compile"];
   if (options.aot) args.push("--aot");
   if (options.aotAllowCodeFromDisk) {
@@ -92,6 +96,12 @@ export function compileArgs(options: CompileOptions, hostOs: string = process.pl
   let target: CompileTarget | undefined;
   if (options.target) {
     target = parseTarget(options.target);
+    const hostTargetOs = hostOs === "win32" ? "windows" : hostOs;
+    const hostTargetArch = hostArch === "arm64" ? "arm64" : "x64";
+    if (options.aot && (target.os !== hostTargetOs || target.arch !== hostTargetArch))
+      throw new Error(
+        `bun build --compile --aot can't cross-compile: ${canonicalTarget(target)} differs from this host (${hostTargetOs}-${hostTargetArch}). Run the AOT build on the target platform, or drop --aot for a cross-compiled executable.`,
+      );
     args.push(`--target=${canonicalTarget(target)}`);
   }
   if (options.minify) args.push("--minify");

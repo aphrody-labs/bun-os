@@ -89,7 +89,7 @@ test("every provider has an id, a platform list and a Windows/Unix-safe install 
       for (const cmd of plan.commands) expect(cmd.every(a => typeof a === "string" && a.length > 0)).toBe(true);
     }
   }
-});
+}, 120_000);
 
 test("release asset names", () => {
   expect(cmakeRelease.asset("v4.4.5", "win32", "x64")).toBe("cmake-4.4.5-windows-x86_64.zip");

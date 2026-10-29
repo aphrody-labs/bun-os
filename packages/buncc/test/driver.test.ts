@@ -122,7 +122,11 @@ test("bun build and compile arguments", () => {
     "--splitting",
   ]);
   expect(
-    compileArgs({ entry: "a.ts", outfile: "app", aot: true, minify: true, target: "bun-linux-x64-baseline" }),
+    compileArgs(
+      { entry: "a.ts", outfile: "app", aot: true, minify: true, target: "bun-linux-x64-baseline" },
+      "linux",
+      "x64",
+    ),
   ).toEqual(["build", "--compile", "--aot", "--target=bun-linux-x64", "--minify", "a.ts", "--outfile", "app"]);
   expect(() => compileArgs({ entry: "a.ts", outfile: "x", aotAllowCodeFromDisk: true })).toThrow(/requires --aot/);
 });
@@ -287,4 +291,26 @@ test("audit fixes: store plan, manifest version, MinVersion, vcpkg clone, winget
   expect(cloneCommands("C:\v")[0]).not.toContain("--depth");
   for (const code of [0x8a150109, 0x8a15010a, 0x8a15010b, 3010, 1641]) expect(interpretExit(code | 0)).toBe("reboot");
   expect(interpretExit(0x8a150010 | 0)).toBe("no-applicable-installer");
+});
+
+test("--aot refuses a foreign --target before calling Bun, plain cross-compiles still work", () => {
+  expect(() =>
+    compileArgs({ entry: "a.ts", outfile: "x", aot: true, target: "bun-linux-x64" }, "win32", "x64"),
+  ).toThrow(/can't cross-compile/);
+  expect(() =>
+    compileArgs({ entry: "a.ts", outfile: "x", aot: true, target: "bun-linux-arm64" }, "linux", "x64"),
+  ).toThrow(/can't cross-compile/);
+  expect(compileArgs({ entry: "a.ts", outfile: "x", aot: true, target: "bun-windows-x64" }, "win32", "x64")).toContain(
+    "--aot",
+  );
+  expect(compileArgs({ entry: "a.ts", outfile: "x", target: "bun-linux-x64" }, "win32", "x64")).not.toContain("--aot");
+});
+
+test("xwin: no macOS asset, 32-bit ARM is spelled aarch, triples follow", async () => {
+  const { xwinRelease, splatArgs, crossEnv } = await import("../src/providers/xwin.ts");
+  expect(xwinRelease.asset("0.10.0", "darwin", "arm64")).toBeUndefined();
+  expect(xwinRelease.asset("0.10.0", "darwin", "x64")).toBeUndefined();
+  expect(xwinRelease.asset("0.10.0", "linux", "arm64")).toBe("xwin-0.10.0-aarch64-unknown-linux-musl.tar.gz");
+  expect(splatArgs({ acceptLicense: true, arch: ["x86_64", "aarch"] }).join(" ")).toContain("--arch x86_64,aarch");
+  expect(Object.keys(crossEnv("/s", ["aarch"])).some(key => key.includes("THUMBV7A_PC_WINDOWS_MSVC"))).toBe(true);
 });
