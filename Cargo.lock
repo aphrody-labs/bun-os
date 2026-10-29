@@ -4053,6 +4053,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "aphrody-wasm-bindgen-hello"
+version = "1.4.7"
+dependencies = [
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "aphrody-wasm-raw"
+version = "1.4.7"
+
+[[package]]
+name = "aphrody-wasm-wasi-hello"
+version = "1.4.7"
+
+[[package]]
 name = "aphrody-web-crawl"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

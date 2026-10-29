@@ -16,6 +16,9 @@ members = [
   "crates/aphrody-site",
   "crates/aphrody-webos-wasm",
     "apps/webos-server",
+  "crates/aphrody-wasm-raw",
+  "crates/aphrody-wasm-bindgen-hello",
+  "crates/aphrody-wasm-wasi-hello",
   "crates/bun-os-git",
   "crates/bun-os-native",
   "crates/bun-os-pkg-core",
@@ -1080,7 +1083,7 @@ io-lifetimes = { version = "3.0.1", default-features = false }
 itertools = "0.14.0"
 ittapi = "0.4.0"
 jobserver = "0.1"
-js-sys = { version = "0.3.104", default-features = false }
+js-sys = { version = "0.3.106", default-features = false }
 json-from-wast = "0.251.0"
 kamadak-exif = "0.6"
 khronos-egl = "6"
@@ -1250,7 +1253,7 @@ ureq = { version = "3.2.0", default-features = false }
 walkdir = "2.5.0"
 wasip1 = { version = "1.0.0", default-features = false }
 wasip2 = "1.0"
-wasm-bindgen = { version = "0.2.127", default-features = false }
+wasm-bindgen = { version = "0.2.129", default-features = false }
 wasm-bindgen-futures = "0.4"
 wasm-compose = { version = "0.251.0", default-features = false }
 wasm-encoder = "0.251.0"
