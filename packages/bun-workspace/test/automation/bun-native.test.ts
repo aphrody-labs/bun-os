@@ -62,7 +62,13 @@ test("SDK staging resolves transitive source dependencies without copying runtim
 });
 
 // A workstation that exports the root of another checkout must not decide which aphrody.config.json the builder reads.
-const hostRoots = ["BUN_OS_ROOT", "APHRODY_ROOT", "APHRODY_WORKSPACE_ROOT", "APHRODY_MONOREPO_ROOT", "APHRODY_BUN_CHECKOUT"];
+const hostRoots = [
+  "BUN_OS_ROOT",
+  "APHRODY_ROOT",
+  "APHRODY_WORKSPACE_ROOT",
+  "APHRODY_MONOREPO_ROOT",
+  "APHRODY_BUN_CHECKOUT",
+];
 const cleanEnv = () => Object.fromEntries(Object.entries(process.env).filter(([key]) => !hostRoots.includes(key)));
 
 async function run(args: string[], env: Record<string, string | undefined> = cleanEnv()) {

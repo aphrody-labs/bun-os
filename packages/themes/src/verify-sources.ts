@@ -5,30 +5,23 @@
 // Run by hand or in CI with network; unit tests never touch the network.
 import { join } from "node:path";
 
-const tok = async (f: string) =>
-  JSON.parse(await Bun.file(join(import.meta.dir, "..", "tokens", f)).text());
+const tok = async (f: string) => JSON.parse(await Bun.file(join(import.meta.dir, "..", "tokens", f)).text());
 const hex = (r: number, g: number, b: number) =>
   "#" +
   [r, g, b]
-    .map((n) => n.toString(16).padStart(2, "0"))
+    .map(n => n.toString(16).padStart(2, "0"))
     .join("")
     .toUpperCase();
 let bad = 0;
 const eq = (what: string, got: unknown, want: unknown) => {
   if (JSON.stringify(got) !== JSON.stringify(want)) {
-    console.error(
-      `MISMATCH ${what}: tokens=${JSON.stringify(want)} vendor=${JSON.stringify(got)}`,
-    );
+    console.error(`MISMATCH ${what}: tokens=${JSON.stringify(want)} vendor=${JSON.stringify(got)}`);
     bad++;
   }
 };
 
 // Apple colors: "![R-255,G-56,B-60](colors-unified-red-light.png)" cells of the SwiftUI table.
-const hig = await (
-  await fetch(
-    "https://developer.apple.com/design/human-interface-guidelines/color.md",
-  )
-).text();
+const hig = await (await fetch("https://developer.apple.com/design/human-interface-guidelines/color.md")).text();
 const apple = await tok("apple-glass.tokens.json");
 const vendor: Record<string, { light: string; dark: string }> = {};
 for (const m of hig.matchAll(
@@ -39,17 +32,12 @@ for (const m of hig.matchAll(
     dark: hex(+m[5]!, +m[6]!, +m[7]!),
   };
 }
-if (Object.keys(vendor).length !== 7)
-  throw new Error(`HIG table not parsed: ${Object.keys(vendor)}`);
+if (Object.keys(vendor).length !== 7) throw new Error(`HIG table not parsed: ${Object.keys(vendor)}`);
 for (const [k, v] of Object.entries(vendor)) {
   eq(`apple accent ${k} light`, v.light, apple.accent[k].$value);
   eq(`apple accent ${k} dark`, v.dark, apple.accentDark[k].$value);
 }
-const typo = await (
-  await fetch(
-    "https://developer.apple.com/design/human-interface-guidelines/typography.md",
-  )
-).text();
+const typo = await (await fetch("https://developer.apple.com/design/human-interface-guidelines/typography.md")).text();
 const rows = (start: string, end: string) => {
   const i = typo.indexOf(start);
   const part = typo.slice(i, typo.indexOf(end, i));
@@ -79,16 +67,12 @@ for (const [label, start, end, key] of [
   ["mac", "### macOS built-in text styles", "### tvOS built-in", "rampMac"],
 ] as const) {
   const v = rows(start, end);
-  if (Object.keys(v).length < 11)
-    throw new Error(`HIG ${label} typography not parsed`);
+  if (Object.keys(v).length < 11) throw new Error(`HIG ${label} typography not parsed`);
   for (const [n, [size, line]] of Object.entries(v))
     eq(
       `apple ${label} ${n}`,
       [size, line],
-      [
-        apple.typography[key][names[n]!].size,
-        apple.typography[key][names[n]!].line,
-      ],
+      [apple.typography[key][names[n]!].size, apple.typography[key][names[n]!].line],
     );
 }
 
@@ -99,7 +83,7 @@ const xaml = await (
   )
 ).text();
 const dicts = xaml.split(/<ResourceDictionary x:Key="/).slice(1);
-const pick = (name: string) => dicts.find((d) => d.startsWith(name))!;
+const pick = (name: string) => dicts.find(d => d.startsWith(name))!;
 const fl = await tok("fluent-win11.tokens.json");
 const map: Record<string, string> = {
   bg: "SolidBackgroundFillColorBase",
@@ -123,25 +107,14 @@ const map: Record<string, string> = {
   success: "SystemFillColorSuccess",
   focus: "FocusStrokeColorOuter",
 };
-const argb = (s: string) =>
-  (s.length === 9 ? `#${s.slice(3)}${s.slice(1, 3)}` : s).toUpperCase();
+const argb = (s: string) => (s.length === 9 ? `#${s.slice(3)}${s.slice(1, 3)}` : s).toUpperCase();
 for (const scheme of ["Light", "Dark"]) {
   const d = pick(scheme === "Dark" ? "Default" : "Light");
   for (const [slot, key] of Object.entries(map)) {
-    const m = new RegExp(`<Color x:Key="${key}">(#[0-9A-Fa-f]+)</Color>`).exec(
-      d,
-    );
+    const m = new RegExp(`<Color x:Key="${key}">(#[0-9A-Fa-f]+)</Color>`).exec(d);
     if (!m) throw new Error(`${scheme}/${key} missing`);
-    eq(
-      `fluent ${scheme}.${slot} (${key})`,
-      argb(m[1]!),
-      fl.color[scheme.toLowerCase()][slot].$value.toUpperCase(),
-    );
+    eq(`fluent ${scheme}.${slot} (${key})`, argb(m[1]!), fl.color[scheme.toLowerCase()][slot].$value.toUpperCase());
   }
 }
-console.log(
-  bad
-    ? `${bad} mismatches`
-    : "vendor sources match the tokens (Apple HIG colors + type, WinUI Light/Dark)",
-);
+console.log(bad ? `${bad} mismatches` : "vendor sources match the tokens (Apple HIG colors + type, WinUI Light/Dark)");
 process.exit(bad ? 1 : 0);

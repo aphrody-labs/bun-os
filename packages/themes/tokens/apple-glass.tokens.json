@@ -182,28 +182,12 @@
   "typography": {
     "fontUi": {
       "$type": "fontFamily",
-      "$value": [
-        "-apple-system",
-        "BlinkMacSystemFont",
-        "SF Pro Text",
-        "SF Pro",
-        "Inter",
-        "system-ui",
-        "sans-serif"
-      ],
+      "$value": ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "SF Pro", "Inter", "system-ui", "sans-serif"],
       "$description": "SF Pro is not redistributable (developer.apple.com/fonts: licensed for mockups of Apple platforms). The system font keyword -apple-system resolves to it on Apple devices; Inter (SIL OFL) is the open fallback elsewhere. Nothing is bundled here."
     },
     "fontDisplay": {
       "$type": "fontFamily",
-      "$value": [
-        "-apple-system",
-        "BlinkMacSystemFont",
-        "SF Pro Display",
-        "SF Pro",
-        "Inter",
-        "system-ui",
-        "sans-serif"
-      ]
+      "$value": ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "SF Pro", "Inter", "system-ui", "sans-serif"]
     },
     "fontMono": {
       "$type": "fontFamily",

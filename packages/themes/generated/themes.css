@@ -1409,9 +1409,12 @@
   --lineHeightHero800: 40px;
   --lineHeightHero900: 52px;
   --lineHeightHero1000: 92px;
-  --fontFamilyBase: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --fontFamilyBase:
+    'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
   --fontFamilyMonospace: Consolas, 'Courier New', Courier, monospace;
-  --fontFamilyNumeric: Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --fontFamilyNumeric:
+    Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto,
+    'Helvetica Neue', sans-serif;
   --fontWeightRegular: 400;
   --fontWeightMedium: 500;
   --fontWeightSemibold: 600;
@@ -2023,9 +2026,12 @@
   --lineHeightHero800: 40px;
   --lineHeightHero900: 52px;
   --lineHeightHero1000: 92px;
-  --fontFamilyBase: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --fontFamilyBase:
+    'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
   --fontFamilyMonospace: Consolas, 'Courier New', Courier, monospace;
-  --fontFamilyNumeric: Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+  --fontFamilyNumeric:
+    Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto,
+    'Helvetica Neue', sans-serif;
   --fontWeightRegular: 400;
   --fontWeightMedium: 500;
   --fontWeightSemibold: 600;
@@ -2662,7 +2668,7 @@
     --t-text-caption2-line: 13px;
     --t-text-caption2-weight: 500;
   }
-  }
+}
 [data-theme="apple"]:not([data-scheme="dark"]) {
   --t-bg: #FFFFFF;
   --t-bg-alt: #F2F2F7;
@@ -2863,8 +2869,7 @@
 }
 .t-glass {
   background: var(--t-glass-bg);
-  -webkit-backdrop-filter: blur(var(--t-glass-blur))
-    saturate(var(--t-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--t-glass-blur)) saturate(var(--t-glass-saturate));
   backdrop-filter: blur(var(--t-glass-blur)) saturate(var(--t-glass-saturate));
   border: 1px solid var(--t-glass-border);
   box-shadow:
@@ -3012,8 +3017,7 @@
 /* Shape language per theme. */
 [data-theme="apple"] .t-card {
   background: var(--t-glass-bg);
-  -webkit-backdrop-filter: blur(var(--t-glass-blur))
-    saturate(var(--t-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--t-glass-blur)) saturate(var(--t-glass-saturate));
   backdrop-filter: blur(var(--t-glass-blur)) saturate(var(--t-glass-saturate));
   border-color: var(--t-glass-border);
   box-shadow: inset 0 1px 0 var(--t-glass-highlight);

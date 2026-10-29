@@ -246,36 +246,16 @@
   "typography": {
     "fontUi": {
       "$type": "fontFamily",
-      "$value": [
-        "Segoe UI Variable Text",
-        "Segoe UI Variable",
-        "Segoe UI",
-        "Selawik",
-        "system-ui",
-        "sans-serif"
-      ],
+      "$value": ["Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", "Selawik", "system-ui", "sans-serif"],
       "$description": "Segoe UI Variable is not redistributable (ships with Windows 11). Selawik (open source, metrically compatible with Segoe UI, github.com/Microsoft/Selawik) is the cross-platform fallback. Nothing is bundled here."
     },
     "fontDisplay": {
       "$type": "fontFamily",
-      "$value": [
-        "Segoe UI Variable Display",
-        "Segoe UI Variable",
-        "Segoe UI",
-        "Selawik",
-        "system-ui",
-        "sans-serif"
-      ]
+      "$value": ["Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", "Selawik", "system-ui", "sans-serif"]
     },
     "fontMono": {
       "$type": "fontFamily",
-      "$value": [
-        "Cascadia Mono",
-        "Cascadia Code",
-        "Consolas",
-        "ui-monospace",
-        "monospace"
-      ]
+      "$value": ["Cascadia Mono", "Cascadia Code", "Consolas", "ui-monospace", "monospace"]
     },
     "ramp": {
       "caption": { "size": 12, "line": 16, "weight": 400 },

@@ -24,9 +24,7 @@
   },
   "fluent": {
     "windows": {
-      "effects": [
-        "mica"
-      ],
+      "effects": ["mica"],
       "transparent": true,
       "cssBlurFallback": false,
       "windowTheme": "follow-scheme"
@@ -54,10 +52,7 @@
       "windowTheme": "follow-scheme"
     },
     "macos": {
-      "effects": [
-        "liquidGlassRegular",
-        "underWindowBackground"
-      ],
+      "effects": ["liquidGlassRegular", "underWindowBackground"],
       "radius": 26,
       "state": "followsWindowActiveState",
       "transparent": true,

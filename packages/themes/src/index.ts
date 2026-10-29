@@ -11,9 +11,4 @@ export {
   STORAGE_KEY,
   TAURI_EVENT,
 } from "./runtime.ts";
-export type {
-  ControllerOptions,
-  Selection,
-  TauriBridge,
-  ThemeController,
-} from "./runtime.ts";
+export type { ControllerOptions, Selection, TauriBridge, ThemeController } from "./runtime.ts";

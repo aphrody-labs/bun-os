@@ -11,10 +11,7 @@ import {
 import { join } from "node:path";
 import { mix, parseHex, toHex, withAlpha } from "./color.ts";
 // Type scale and Expressive springs come from the existing M3 owner, not copied.
-import {
-  EMPHASIZED_STYLES,
-  TYPE_BASE,
-} from "../../m3-tokens/src/expressive.ts";
+import { EMPHASIZED_STYLES, TYPE_BASE } from "../../m3-tokens/src/expressive.ts";
 
 export const SLOTS = [
   "bg",
@@ -109,13 +106,10 @@ const v = (n: Node | undefined): any => {
 const px = (s: string) => parseFloat(s);
 const ms = (s: string) => parseFloat(s);
 const dir = join(import.meta.dir, "..", "tokens");
-const load = async (f: string): Promise<Node> =>
-  JSON.parse(await Bun.file(join(dir, f)).text());
+const load = async (f: string): Promise<Node> => JSON.parse(await Bun.file(join(dir, f)).text());
 const fam = (n: Node) =>
-  (v(n) as string[])
-    .map((f) => (/[\s]|^-/.test(f) && !f.startsWith("-apple") ? `"${f}"` : f))
-    .join(", ");
-const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+  (v(n) as string[]).map(f => (/[\s]|^-/.test(f) && !f.startsWith("-apple") ? `"${f}"` : f)).join(", ");
+const kebab = (s: string) => s.replace(/[A-Z]/g, c => `-${c.toLowerCase()}`);
 const hexOf = (argb: number) => hexFromArgb(argb).toUpperCase();
 
 function statics(t: Node, id: ThemeId): ThemeStatic {
@@ -133,7 +127,7 @@ function statics(t: Node, id: ThemeId): ThemeStatic {
   const base: ThemeStatic = {
     id,
     name: meta.name,
-    accents: Object.keys(t.accent).filter((k) => !k.startsWith("$")),
+    accents: Object.keys(t.accent).filter(k => !k.startsWith("$")),
     defaultAccent: meta.defaultAccent,
     shape,
     fonts: {
@@ -171,7 +165,7 @@ function statics(t: Node, id: ThemeId): ThemeStatic {
     base.ramp = {
       ...base.ramp,
       ...Object.fromEntries(
-        EMPHASIZED_STYLES.map((s) => [
+        EMPHASIZED_STYLES.map(s => [
           `${s.name}-emphasized`,
           { size: toPx(s.size), line: toPx(s.lineHeight), weight: s.weight },
         ]),
@@ -192,8 +186,7 @@ function statics(t: Node, id: ThemeId): ThemeStatic {
       dim: mat.clear.dim,
     };
   }
-  if (id === "fluent")
-    base.glass = { ...base.glass, opacity: { light: 0.7, dark: 0.7 } };
+  if (id === "fluent") base.glass = { ...base.glass, opacity: { light: 0.7, dark: 0.7 } };
   return base;
 }
 
@@ -211,9 +204,7 @@ export async function build(): Promise<Model> {
     load("m3-googlebook.tokens.json"),
     load("fluent-win11.tokens.json"),
     load("apple-glass.tokens.json"),
-    Bun.file(
-      join(import.meta.dir, "..", "..", "fluent", "tokens", "fluent2.json"),
-    ).json() as Promise<Node>,
+    Bun.file(join(import.meta.dir, "..", "..", "fluent", "tokens", "fluent2.json")).json() as Promise<Node>,
   ]);
   const st: Record<ThemeId, ThemeStatic> = {
     m3: statics(m3, "m3"),
@@ -223,10 +214,8 @@ export async function build(): Promise<Model> {
   const out: Resolved[] = [];
   for (const scheme of SCHEMES) {
     for (const accent of st.m3.accents) out.push(resolveM3(m3, scheme, accent));
-    for (const accent of st.fluent.accents)
-      out.push(resolveFluent(fl, fluent2, scheme, accent));
-    for (const accent of st.apple.accents)
-      out.push(resolveApple(ap, scheme, accent));
+    for (const accent of st.fluent.accents) out.push(resolveFluent(fl, fluent2, scheme, accent));
+    for (const accent of st.apple.accents) out.push(resolveApple(ap, scheme, accent));
   }
   return {
     statics: st,
@@ -236,9 +225,7 @@ export async function build(): Promise<Model> {
 }
 
 /** Fills the slots every theme derives the same way once its base slots are known. */
-function finish(
-  r: Omit<Resolved, "colors"> & { colors: Partial<Record<Slot, string>> },
-): Resolved {
+function finish(r: Omit<Resolved, "colors"> & { colors: Partial<Record<Slot, string>> }): Resolved {
   const c = r.colors as Record<Slot, string>;
   return { ...r, colors: c };
 }
@@ -247,10 +234,7 @@ function resolveM3(t: Node, scheme: Scheme, accent: string): Resolved {
   const dark = scheme === "dark";
   const seed = Hct.fromInt(argbFromHex(v(t.accent[accent])));
   const s = new SchemeTonalSpot(seed, dark, 0);
-  const D = MaterialDynamicColors as unknown as Record<
-    string,
-    { getArgb(s: SchemeTonalSpot): number } | undefined
-  >;
+  const D = MaterialDynamicColors as unknown as Record<string, { getArgb(s: SchemeTonalSpot): number } | undefined>;
   const role: Record<string, string> = {};
   const extra: Record<string, string> = {};
   for (const k of Object.getOwnPropertyNames(MaterialDynamicColors)) {
@@ -331,8 +315,7 @@ function fluentShades(
     };
   const base = v(t.accent[accent]);
   const h = Hct.fromInt(argbFromHex(base));
-  const atTone = (tone: number) =>
-    hexOf(Hct.from(h.hue, h.chroma, Math.min(98, Math.max(2, tone))).toInt());
+  const atTone = (tone: number) => hexOf(Hct.from(h.hue, h.chroma, Math.min(98, Math.max(2, tone))).toInt());
   const at = (dt: number) => atTone(h.tone + dt);
   return {
     light3: at(88.6 - 49.7),
@@ -343,12 +326,7 @@ function fluentShades(
   };
 }
 
-function resolveFluent(
-  t: Node,
-  f2: Node,
-  scheme: Scheme,
-  accent: string,
-): Resolved {
+function resolveFluent(t: Node, f2: Node, scheme: Scheme, accent: string): Resolved {
   const dark = scheme === "dark";
   const c = t.color[scheme] as Node;
   const g = (k: string): string => v(c[k]);
@@ -357,8 +335,7 @@ function resolveFluent(
   const accentText = dark ? sh.light3 : sh.dark2;
   const glassTint = g("bgAlt");
   const extra: Record<string, string> = {};
-  for (const [k, val] of Object.entries(f2[scheme] as Node))
-    extra[`--${k}`] = String(val);
+  for (const [k, val] of Object.entries(f2[scheme] as Node)) extra[`--${k}`] = String(val);
   // Fluent 2 web components speak the brand ramp: point it at the Windows accent so the two layers agree.
   const brand: Record<string, string> = {
     colorBrandBackground: a,

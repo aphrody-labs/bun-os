@@ -223,7 +223,11 @@ export function pickRunner(t: CTarget, binary: string): { cmd?: string[]; skip?:
 }
 
 async function sh(cmd: string[], opts: { env?: Record<string, string>; timeoutMs?: number } = {}) {
-  const r = await run(cmd, { env: { ...process.env, ...opts.env }, output: "capture", timeoutMs: opts.timeoutMs ?? 120_000 });
+  const r = await run(cmd, {
+    env: { ...process.env, ...opts.env },
+    output: "capture",
+    timeoutMs: opts.timeoutMs ?? 120_000,
+  });
   return { stdout: r.stdout, stderr: r.stderr, code: r.code };
 }
 

@@ -35,8 +35,7 @@ export function toHex(c: Rgba): string {
 export function over(top: Rgba, bottom: Rgba): Rgba {
   const a = top.a + bottom.a * (1 - top.a);
   if (a === 0) return { r: 0, g: 0, b: 0, a: 0 };
-  const f = (t: number, b: number) =>
-    (t * top.a + b * bottom.a * (1 - top.a)) / a;
+  const f = (t: number, b: number) => (t * top.a + b * bottom.a * (1 - top.a)) / a;
   return {
     r: f(top.r, bottom.r),
     g: f(top.g, bottom.g),
@@ -75,10 +74,7 @@ export function luminance(c: Rgba): number {
 export function wcag(fg: string, bg: string): number {
   const b = parseHex(bg);
   const f = over(parseHex(fg), b);
-  const [l1, l2] = [luminance(f), luminance(b)].sort((x, y) => y - x) as [
-    number,
-    number,
-  ];
+  const [l1, l2] = [luminance(f), luminance(b)].sort((x, y) => y - x) as [number, number];
   return (l1 + 0.05) / (l2 + 0.05);
 }
 

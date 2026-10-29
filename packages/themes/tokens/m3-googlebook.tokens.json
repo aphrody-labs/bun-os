@@ -80,26 +80,12 @@
   "typography": {
     "fontUi": {
       "$type": "fontFamily",
-      "$value": [
-        "Google Sans Flex",
-        "Google Sans",
-        "Roboto Flex",
-        "Roboto",
-        "system-ui",
-        "sans-serif"
-      ],
+      "$value": ["Google Sans Flex", "Google Sans", "Roboto Flex", "Roboto", "system-ui", "sans-serif"],
       "$description": "Google Sans Flex and Roboto Flex are SIL OFL, bundled by @aphrody/m3-fonts."
     },
     "fontDisplay": {
       "$type": "fontFamily",
-      "$value": [
-        "Google Sans Flex",
-        "Google Sans",
-        "Roboto Flex",
-        "Roboto",
-        "system-ui",
-        "sans-serif"
-      ]
+      "$value": ["Google Sans Flex", "Google Sans", "Roboto Flex", "Roboto", "system-ui", "sans-serif"]
     },
     "fontMono": {
       "$type": "fontFamily",
