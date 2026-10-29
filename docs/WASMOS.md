@@ -33,6 +33,18 @@ Browser boot (Google Chrome 155 headless on the VPS, Web Worker, `@bjorn3/browse
 serial log, `code: 0`, 3.98 s in the worker. The page must be cross-origin isolated (COOP/COEP headers) because `poll.ts` sleeps with
 `Atomics.wait` on a `SharedArrayBuffer`; the shim's own `poll_oneoff` accepts one subscription only and the emulator submits two.
 
+## Real apps in the guest (GitHub Actions run 40920519749, 2026-10-29)
+
+Pinned Alpine 3.24 packages (`factory/wasmos/pins.json` "apps") converted with the same container2wasm, booted under Bun 1.4.4-canary on an `ubuntu-24.04` hosted runner. Boot time is the wall clock of `boot()` in `packages/wasmos/test/boot.test.ts` including the command run.
+
+| Image | Packages | Artifact bytes | c2w build (CI) | Boot + commands |
+| --- | --- | --- | --- | --- |
+| base `alpine:3.24.2` | busybox | 109,947,160 | 928 s | 3.2 s |
+| `lang` | python3 3.14.10, helix 25.07.1, nano 9.3 | 160,767,739 | 953 s | 6.3 s |
+| `tools` | uutils 0.11.0, bash 5.3.9, nushell 0.104.1, curl 8.23.0, git 2.54.0, jq 1.8.2, ripgrep 15.1.0, fd 10.2.0, eza 0.23.4, htop 3.5.3, vim 9.2.1202 | 200,525,740 | 623 s | 9.3 s |
+
+`lang` passed its assertions (python3 3.14 + hashlib, helix and nano versions). `tools` ran every program with the expected output (sha256 via uutils, bash 5, nushell sum, jq, ripgrep, fd, eza, git, curl, htop, vim); the first CI run failed only because jq and ripgrep printed ANSI colour codes on the guest tty, fixed with `jq -M` and `rg --color never`. Bun is not in the guest: Alpine has no musl package for it. Sizes and times are one run each, not averaged.
+
 ## Facts from source (clones under `C:\Users\aphro\src\ref`)
 
 1. container2wasm `3f0f9be4d5e` (2026-06-09), release v0.8.4 (2026-03-16): converts an OCI image to one wasm file.
