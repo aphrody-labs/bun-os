@@ -10,7 +10,7 @@ Cell legend: `-` not-started, `B` builds, `R` runs-headless, `I` runs-interactiv
 
 | Submodule | Pin | Commit | Date | Size (KB) | Prerelease seen |
 |---|---|---|---|---|---|
-| microsoft-ui-xaml | winui3/release/1.8.12 | `91da8f530365` | 2026-09-24 | 494811 | winui3/release/2.5.4-experimental (`7b1270934752`) |
+| microsoft-ui-xaml | winui3/release/2.5.1 | `ba3a8d59e6de` | 2026-09-19 | 494811 | winui3/release/2.5.4-experimental (`7b1270934752`) |
 | WindowsAppSDK | v2.6.4 | `5e215b73121e` | 2026-10-16 | 241120 | v2.5.4-exp (`28e5c76e3e91`) |
 | WindowsAppSDK-Samples | main | `f1be017f26a0` | 2026-10-12 | 325694 | - |
 | WinUI-Gallery | v3.0.4 | `71b5f04d3f7e` | 2026-10-12 | 70239 | - |

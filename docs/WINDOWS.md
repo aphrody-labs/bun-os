@@ -75,6 +75,15 @@ packaged when identity APIs are needed (`buncc` has an `msix` provider).
 `Application.Start`; `WinUIHost` handles both. Known limit: `XamlControlsResources` cannot load without a compiled app
 (`resources.pri`), so controls use default styles; a visible (non `headless`) window was not exercised.
 
+### Runtime installer and manifest facts (Microsoft Learn, "Windows App SDK deployment guide for framework-dependent apps packaged with external location or unpackaged", "Use the Windows App SDK runtime ...", "Application manifests")
+
+- **Silent install:** `WindowsAppRuntimeInstall.exe --quiet` runs with no user interaction and no text output; `--force` updates the MSIX packages and shuts down running Windows App SDK processes; `--h` lists the options. There is one installer per architecture (x64, x86, Arm64).
+- **Return codes:** `0x0` success; `0x80073d06` one or more packages failed to install (the Appx code behind it is a package downgrade: a higher version is already installed); `0x80070005` system-wide install or provisioning was not possible because the process is not elevated or the user is not an admin. Without elevation the installer falls back to a per-user install.
+- **Prerequisite:** the Visual C++ Redistributable is required for unpackaged and packaged-with-external-location apps (Learn links the "latest supported" download page). Experimental and preview runtimes also need sideloading (Developer mode).
+- **Application manifest:** an unpackaged app should ship a side-by-side manifest with a `compatibility` / `application` / `maxversiontested Id="10.0.xxxxx.x"` element (value 10.0.17763.0 or later) so the Windows App SDK does not default to Windows 8 behavior and crash; `maxversiontested` is supported from Windows 10 1903. A larger value means older Windows versions will not run the app properly, so add several `maxversiontested` elements to cover more versions.
+- **Framework package name:** Learn gives the framework package family name only as "release-dependent". On this machine the installed 2.x framework is `Microsoft.WindowsAppRuntime.2` with family name `Microsoft.WindowsAppRuntime.2_8wekyb3d8bbwe` (`Get-AppxPackage`, 2026-10-29), which is what `probe()` and `WINDOWS_APP_RUNTIME_FRAMEWORK` use; the 1.x line is `Microsoft.WindowsAppRuntime.1.<minor>`.
+- **Source line:** the pinned `vendor/microsoft/microsoft-ui-xaml` is `winui3/release/2.5.1`, the newest stable ui-xaml tag (2.5.4-experimental is a prerelease), on the same 2.x line as Windows App SDK 2.6.4; the earlier 1.8.12 pin belonged to the 1.x line and was repinned.
+
 ## Registry safety
 
 Tests use a temporary `HKCU\Software\aphrody-*-<pid>` key and delete it in `afterAll`. Services are read-only

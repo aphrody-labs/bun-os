@@ -28,6 +28,12 @@ describe("path translation", () => {
   test("WSL network paths map to Linux paths", () => {
     expect(toWsl("\\\\wsl$\\Ubuntu\\home\\me")).toBe("/home/me");
     expect(parsePath("\\\\wsl.localhost\\Arch\\etc").wslDistro).toBe("Arch");
+    expect(toWsl("\\\\wsl.localhost\\Ubuntu\\home\\me")).toBe("/home/me");
+  });
+  test("WSL paths are written as \\\\wsl.localhost and \\\\wsl$ is still read", () => {
+    expect(toWindows("\\\\wsl$\\Ubuntu\\home\\me")).toBe("\\\\wsl.localhost\\Ubuntu\\home\\me");
+    expect(toWindows("\\\\wsl.localhost\\Arch\\etc")).toBe("\\\\wsl.localhost\\Arch\\etc");
+    expect(parsePath("\\\\wsl$\\Arch\\etc").wslDistro).toBe("Arch");
   });
   test("relative and plain POSIX paths only change separators", () => {
     expect(toWindows("src/lib/x.ts")).toBe("src\\lib\\x.ts");

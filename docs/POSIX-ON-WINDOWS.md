@@ -42,7 +42,7 @@ those constructs stay `.sh` for a real bash or become TypeScript.
 
 ## @aphrody/windows posix module
 
-`packages/windows/src/posix/` (path, env, spawn): `C:\ <-> /c/ <-> /cygdrive/c/ <-> /mnt/c/`, UNC, `\\?\`, `\\wsl$\`;
+`packages/windows/src/posix/` (path, env, spawn): `C:\ <-> /c/ <-> /cygdrive/c/ <-> /mnt/c/`, UNC, `\\?\`, `\\wsl.localhost\` (written by default; it can start the distro on Windows 11) and `\\wsl$\` (still read);
 PATH-list and variable translation; spawn helpers that put the shim directory first. WSL's mount root is configurable
 (`[automount] root`, default `/mnt/`, Microsoft Learn "Advanced settings configuration in WSL"), hence the `wslMount` option.
 

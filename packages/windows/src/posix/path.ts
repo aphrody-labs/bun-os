@@ -4,7 +4,7 @@
  *   windows  C:\Users\me\x      (also C:/Users/me/x, \\?\C:\..., \\server\share\...)
  *   msys     /c/Users/me/x      (MSYS2, Git for Windows bash)   UNC: //server/share/...
  *   cygwin   /cygdrive/c/Users/me/x
- *   wsl      /mnt/c/Users/me/x  (automount root is configurable in /etc/wsl.conf; default /mnt/), \\wsl$\Distro\p <-> /p
+ *   wsl      /mnt/c/Users/me/x  (automount root is configurable in /etc/wsl.conf; default /mnt/), \\wsl.localhost\Distro\p (legacy \\wsl$\Distro\p also read) <-> /p
  *   posix    any other absolute or relative POSIX path (returned unchanged)
  *
  * Pure string functions: no file system access, so scripts can stop depending on a particular bash to convert paths.
@@ -95,7 +95,7 @@ export function convertPath(p: string, target: PathStyle, o: PathOptions = {}): 
       if (parsed.drive)
         return `${parsed.drive.toUpperCase()}:${tail.length || parsed.absolute ? sep : ""}${tail.join(sep)}`;
       if (parsed.unc) return `${sep}${sep}${[parsed.unc.server, parsed.unc.share, ...tail].join(sep)}`;
-      if (parsed.wslDistro) return `\\\\wsl$\\${parsed.wslDistro}\\${tail.join("\\")}`;
+      if (parsed.wslDistro) return `\\\\wsl.localhost\\${parsed.wslDistro}\\${tail.join("\\")}`;
       // A plain POSIX absolute path has no Windows spelling without a distro; separators change only.
       return (parsed.absolute ? sep : "") + tail.join(sep);
     }

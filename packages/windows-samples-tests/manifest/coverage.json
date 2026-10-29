@@ -3,8 +3,8 @@
   "pins": {
     "microsoft-ui-xaml": {
       "repo": "microsoft/microsoft-ui-xaml",
-      "ref": "winui3/release/1.8.12",
-      "sha": "91da8f5303651791acbb96e63a8ac4c38851e678"
+      "ref": "winui3/release/2.5.1",
+      "sha": "ba3a8d59e6de4e2b86ca4f61c78bc26ccf129afd"
     },
     "WindowsAppSDK": {
       "repo": "microsoft/WindowsAppSDK",
