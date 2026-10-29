@@ -584,7 +584,7 @@
           "timeoutMs": 300000
         },
         {
-          "cmd": ["bun", "msvc", "--arch", "x64", "exec", "--", "cmake", "--build", "{out}/build", "--parallel", "2"],
+          "cmd": ["cmake", "--build", "{out}/build", "--parallel", "2"],
           "timeoutMs": 7200000
         }
       ],

@@ -58,17 +58,7 @@ if (command === "build") {
   });
   if (!backend.success) throw new AggregateError(backend.logs, "Bun sidecar compilation failed");
 }
-const argv = [
-  ...(process.platform === "win32" ? [bun, "msvc", "exec", "--", aphrody] : [aphrody]),
-  "tauri",
-  command,
-  "--config",
-  JSON.stringify(nativeConfig),
-  "--",
-  "--locked",
-  "--jobs",
-  "1",
-];
+const argv = [aphrody, "tauri", command, "--config", JSON.stringify(nativeConfig), "--", "--locked", "--jobs", "1"];
 process.exitCode = await runNative(config, argv, {
   root: repositoryRoot,
   cwd: desktopRoot,

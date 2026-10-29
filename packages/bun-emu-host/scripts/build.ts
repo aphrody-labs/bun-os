@@ -110,35 +110,38 @@ async function run(cmd: string[], env: Record<string, string> = {}) {
   if (code !== 0) throw new Error(`${cmd[0]} exited with ${code}`);
 }
 
-const msvc = ["bun", "msvc", "--toolset", "14.44"];
-
-await run(
-  [
-    ...msvc,
-    "vcpkg",
-    "install",
-    `--x-manifest-root=${join(root, "packages/iecode-cpp")}`,
-    "--x-feature=emu-host",
-    `--triplet=${triplet}`,
-    `--host-triplet=${triplet}`,
-    `--x-install-root=${installRoot}`,
-  ],
-  { VCPKG_MAX_CONCURRENCY: String(jobs) },
-);
-
-// The MSVC developer environment of a toolset. When that toolset was installed
-// without its C++ standard library and CRT (an unfinished Visual Studio
-// install), the headers and import libraries of the default toolset are used
-// with its compiler, so objects still link against msvcp140/vcruntime140.
+// The MSVC developer environment of a toolset (vcvarsall.bat of the newest Visual Studio, found with vswhere; upstream
+// Bun has no `bun msvc`). When that toolset was installed without its C++ standard library and CRT (an unfinished
+// Visual Studio install), the headers and import libraries of the default toolset are used with its compiler, so
+// objects still link against msvcp140/vcruntime140.
 async function msvcEnv(toolset: string): Promise<Record<string, string>> {
-  const read = async (t: string) =>
-    JSON.parse(
-      await new Response(
-        Bun.spawn(["bun", "msvc", "--toolset", t, "env", "--format", "json"], {
-          stdout: "pipe",
-        }).stdout,
-      ).text(),
-    ) as Record<string, string>;
+  const vswhere = join(
+    process.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)",
+    "Microsoft Visual Studio",
+    "Installer",
+    "vswhere.exe",
+  );
+  const install = (
+    await new Response(
+      Bun.spawn([vswhere, "-latest", "-products", "*", "-property", "installationPath"], { stdout: "pipe" }).stdout,
+    ).text()
+  ).trim();
+  if (!install) throw new Error("Visual Studio with the C++ toolset was not found (vswhere)");
+  const read = async (t: string) => {
+    const vcvars = join(install, "VC", "Auxiliary", "Build", "vcvarsall.bat");
+    const out = await new Response(
+      Bun.spawn(["cmd.exe", "/d", "/c", `"${vcvars}" x64 -vcvars_ver=${t} >nul && set`], {
+        stdout: "pipe",
+        windowsVerbatimArguments: true,
+      }).stdout,
+    ).text();
+    const env: Record<string, string> = {};
+    for (const line of out.split(/\r?\n/)) {
+      const at = line.indexOf("=");
+      if (at > 0) env[line.slice(0, at)] = line.slice(at + 1);
+    }
+    return env;
+  };
   const env = await read(toolset);
   const first = (list: string) => list.split(";")[0]!;
   if (toolset !== "14.44" && !existsSync(join(first(env.INCLUDE!), "vector"))) {
@@ -151,6 +154,19 @@ async function msvcEnv(toolset: string): Promise<Record<string, string>> {
   }
   return env;
 }
+
+await run(
+  [
+    "vcpkg",
+    "install",
+    `--x-manifest-root=${join(root, "packages/iecode-cpp")}`,
+    "--x-feature=emu-host",
+    `--triplet=${triplet}`,
+    `--host-triplet=${triplet}`,
+    `--x-install-root=${installRoot}`,
+  ],
+  { VCPKG_MAX_CONCURRENCY: String(jobs), ...(await msvcEnv("14.44")) },
+);
 
 for (const core of selected) {
   const { cc, cxx, source, project, toolset, defines = [] } = cores[core]!;

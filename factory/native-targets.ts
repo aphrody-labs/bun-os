@@ -205,23 +205,28 @@ async function prerequisites(plan: NativePlan, flags: Record<string, string>) {
   if (target.id === "wsl-windows") {
     if (await Bun.file(join(source, "UserConfig.cmake")).exists())
       throw new Error("UserConfig.cmake may enable automatic deployment; select a clean build source without it");
-    await run(
+    // Upstream Bun has no `bun msvc`: ask vswhere for a Visual Studio with the x64 C++ tools.
+    const vswhere = join(
+      Bun.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)",
+      "Microsoft Visual Studio",
+      "Installer",
+      "vswhere.exe",
+    );
+    const studio = await run(
       [
-        process.execPath,
-        "msvc",
-        "--instance",
-        "2022",
-        "--toolset",
-        "v143",
-        "--sdk",
-        "10.0.26100.0",
-        "--arch",
-        "x64",
-        "doctor",
+        vswhere,
+        "-latest",
+        "-products",
+        "*",
+        "-requires",
+        "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+        "-property",
+        "installationPath",
       ],
       source,
       30_000,
     );
+    if (!studio) throw new Error("WSL requires Visual Studio with the MSVC v143 x64 tools (vswhere found none)");
     const version = await run(["cmake", "--version"], source, 15_000);
     const match = /cmake version (\d+)\.(\d+)/.exec(version);
     if (!match || Number(match[1]) < 3 || (Number(match[1]) === 3 && Number(match[2]) < 25))

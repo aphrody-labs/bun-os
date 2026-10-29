@@ -31,7 +31,7 @@ with FTS5, Magika labels for unrecognised files), `export`, `serve` (HTTP API be
 (native GLB renderer, CPU or wgpu). An app id resolves through the Steam owner
 (`@aphrody/bun-steam` `installedGames()` in Bun, `bun-steam` `list_installed_games` in Rust).
 
-Build: `bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build --release -p bun-re --bin bunre --features assets`.
+Build: `bun scripts/cargo.ts exec -- build --release -p bun-re --bin bunre --features assets`.
 
 ### HTTP API (`re game serve`)
 

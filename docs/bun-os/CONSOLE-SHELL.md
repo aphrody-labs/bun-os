@@ -20,7 +20,7 @@ interface, the Bun Engine machines in the same App and Steam games through the S
 ```sh
 # sccache cannot spawn bevy_internal's rustc command line on Windows (os error 206):
 # run the cargo wrapper with an empty RUSTC_WRAPPER.
-RUSTC_WRAPPER= CARGO_BUILD_RUSTC_WRAPPER= bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build --release -p bun-os-shell
+RUSTC_WRAPPER= CARGO_BUILD_RUSTC_WRAPPER= bun scripts/cargo.ts exec -- build --release -p bun-os-shell
 target/release/bun-os-shell                    # 1600x900 window
 target/release/bun-os-shell --session          # borderless full screen, hidden cursor
 target/release/bun-os-shell status             # JSON: library, NVIDIA, display, encoders, busy state

@@ -542,7 +542,7 @@ async function depot(args: string[]): Promise<number> {
   const bin = findNativeBinary("bun-steam-depot", "BUN_STEAM_DEPOT_BIN");
   if (!bin) {
     console.error(
-      "bun-steam-depot not found; build it with `bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build --release -p bun-steam --features depot --bin bun-steam-depot`, or set BUN_STEAM_DEPOT_BIN",
+      "bun-steam-depot not found; build it with `bun scripts/cargo.ts exec -- build --release -p bun-steam --features depot --bin bun-steam-depot`, or set BUN_STEAM_DEPOT_BIN",
     );
     return 2;
   }

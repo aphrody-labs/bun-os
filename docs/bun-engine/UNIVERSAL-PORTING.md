@@ -17,7 +17,7 @@ that the payload can already be decoded, rebuilt or executed.
 
 - Bun owns orchestration, streams, globs, packaging, `bun:ffi`, JavaScript/TypeScript parsing and the LSP.
 - Rust owns the portable engine kernel, binary model and emulator plugins.
-- `bun msvc`, LLVM/Clang and platform SDKs own native code generation.
+- Visual Studio (MSVC), LLVM/Clang and platform SDKs own native code generation.
 - JSC owns WebAssembly execution; registered plugins own WASI and container lowering.
 - `bun:dotnet` owns managed hosting. JNI/Ghidra uses the unified out-of-process analysis owner.
 - Bevy ECS, wgpu and winit are required and pinned to the Aphrody forks.

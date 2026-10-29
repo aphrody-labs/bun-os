@@ -2202,7 +2202,7 @@
       },
       "cargoOwner": null,
       "bunOwner": null,
-      "buildOwner": "bun msvc vcpkg + CMake (vcpkg feature iecode-cpp)",
+      "buildOwner": "vcpkg + CMake (vcpkg feature iecode-cpp)",
       "releaseOwner": "root factory",
       "qualification": "not built: the vcpkg dependency closure is not installed on this host",
       "migrationState": "submodule",

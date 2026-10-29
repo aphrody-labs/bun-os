@@ -136,8 +136,8 @@ Every command accepts `--json`. The MCP server (`re mcp`) lists 228 tools; 21 ar
 Native builds are not run on the workstation. Pending commands:
 
 ```sh
-bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build -p bun-re --bin bunre
-bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build -p bun-engine --bin bun-engine
+bun scripts/cargo.ts exec -- build -p bun-re --bin bunre
+bun scripts/cargo.ts exec -- build -p bun-engine --bin bun-engine
 re recompile vendor/tetanes/tetanes/assets/roms/alter_ego.nes --target wasm --out var/rea-matrix/proof/recompile-nes-wasm --frames 300 --json
 re recompile vendor/tetanes/tetanes/assets/roms/alter_ego.nes --target exe --out var/rea-matrix/proof/recompile-nes-exe --frames 300 --json
 var/rea-matrix/proof/recompile-nes-exe/bin/recomp-nes-alter-ego --frames 300 --json

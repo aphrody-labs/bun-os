@@ -16,7 +16,7 @@ Nothing here handles Steam credentials: the engine talks to the running Steam cl
 
 ## Steamworks in Bun Engine
 
-Build: `bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build -p bun-engine --features steam`.
+Build: `bun scripts/cargo.ts exec -- build -p bun-engine --features steam`.
 The SDK comes from steamworks-rs 0.13 (`steamworks`, `steamworks-sys`, MIT/Apache-2.0), which
 bundles Valve's redistributable `steam_api64.dll` / `libsteam_api.so`. Ship that library next to
 `bun-engine`. On Windows it is delay-loaded (`build.rs`), so a build with `steam` still starts

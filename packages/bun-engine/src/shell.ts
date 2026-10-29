@@ -27,7 +27,7 @@ export async function runShell(args: string[]): Promise<number> {
   const shell = nativeShell();
   if (!shell) {
     console.error(
-      "bun-os-shell is not built: bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build --release -p bun-os-shell",
+      "bun-os-shell is not built: bun scripts/cargo.ts exec -- build --release -p bun-os-shell",
     );
     return 1;
   }

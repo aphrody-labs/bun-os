@@ -16,7 +16,7 @@ layout. The site only integrates these artifacts; it does not build them.
 
 Builds run on the build host (the VPS, Linux x86_64), not on the workstation. `build.ts` picks
 the pinned wasm-bindgen/Binaryen archive for the host (`linux-x64` or `win32-x64`), runs cargo
-through `scripts/cargo.ts` (with `bun msvc` only on Windows), and waits for other Docker builds
+through `scripts/cargo.ts` (from a Visual Studio developer prompt on Windows), and waits for other Docker builds
 before starting one.
 
 ```sh
