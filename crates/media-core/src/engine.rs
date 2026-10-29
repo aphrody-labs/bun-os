@@ -37,8 +37,8 @@ fn from_f32(img: &Image<[f32; 4]>) -> Result<RgbaImage> {
     for p in &img.data {
         let a = p[3].clamp(0.0, 1.0);
         let inv = if a > 0.0 { 1.0 / a } else { 0.0 };
-        for c in 0..3 {
-            raw.push(((p[c] * inv).clamp(0.0, 1.0) * 255.0 + 0.5) as u8);
+        for v in p.iter().take(3) {
+            raw.push(((v * inv).clamp(0.0, 1.0) * 255.0 + 0.5) as u8);
         }
         raw.push((a * 255.0 + 0.5) as u8);
     }
@@ -62,7 +62,7 @@ pub fn blur(img: &RgbaImage, sigma: f32) -> Result<RgbaImage> {
 
 fn map_rgb(img: &mut RgbaImage, f: impl Fn(u8) -> u8 + Sync) {
     img.par_chunks_mut(4096 * 4).for_each(|chunk| {
-        for px in chunk.chunks_exact_mut(4) {
+        for px in chunk.as_chunks_mut::<4>().0.iter_mut() {
             px[0] = f(px[0]);
             px[1] = f(px[1]);
             px[2] = f(px[2]);
@@ -104,7 +104,7 @@ pub fn apply(img: RgbaImage, op: &Op, ai: &dyn AiBackend) -> Result<RgbaImage> {
         Op::Grayscale => {
             let mut img = img;
             img.par_chunks_mut(4096 * 4).for_each(|chunk| {
-                for px in chunk.chunks_exact_mut(4) {
+                for px in chunk.as_chunks_mut::<4>().0.iter_mut() {
                     // Rec. 709 luma on the stored (display-encoded) values.
                     let y = (0.2126 * px[0] as f32 + 0.7152 * px[1] as f32 + 0.0722 * px[2] as f32)
                         .round() as u8;
