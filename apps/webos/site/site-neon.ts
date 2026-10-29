@@ -4,7 +4,7 @@ export interface SiteQuery {
 export type SiteSnapshotInfo = {
   id: string;
   profile: "bun";
-  repository: "aphrody-labs/bun";
+  repository: "aphrody-labs/bun-os";
   source: string;
   sourceDate: string;
   importedAt: string;

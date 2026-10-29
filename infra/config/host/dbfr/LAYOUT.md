@@ -46,7 +46,7 @@ Consigne du propriétaire : tout fusionner dans UN SEUL home par hôte. Plus de 
 
 ## Retour arrière = rebuild (décision du 2026-10-09)
 
-On ne garde que la version courante de tout. Aucune release N-1, aucun binaire `.bak`/aphrody.N-1, aucune archive de migration ou de purge. Pour revenir en arrière, on reconstruit depuis git ou un tag. Seule exception : le dernier backup hors hôte des bases prod (un seul, le plus récent, vérifié). L'activation garde l'ancienne release le temps du contrôle de santé, puis `clean.ts` la supprime (`scripts/aphrody/deploy` de l'ancien fork abandonné aphrody-labs/bun).
+On ne garde que la version courante de tout. Aucune release N-1, aucun binaire `.bak`/aphrody.N-1, aucune archive de migration ou de purge. Pour revenir en arrière, on reconstruit depuis git ou un tag. Seule exception : le dernier backup hors hôte des bases prod (un seul, le plus récent, vérifié). L'activation garde l'ancienne release le temps du contrôle de santé, puis `clean.ts` la supprime (`scripts/aphrody/deploy` de l'ancien fork abandonné the former Bun fork).
 
 ### Purge restante (interrompue le 2026-10-09 à 17:40 UTC, rien n'a encore été supprimé sur les hôtes)
 
@@ -71,7 +71,7 @@ Sur le vps, l'inventaire reste à faire (`du` lancé dans `~/build/tmp/purge/du.
 - `~/build/archive/rescue` : pousser d'abord les patchs et le bundle sur des branches `rescue/*` ;
 - les liens `~/{archive,dbfr-archive,k-archive}` ;
 - `~/apps/{cdn-src,shenron-cdn-src,shenron-cdn-state}` s'ils doublonnent `~/src/forks` ;
-- `docker builder prune -a` et les images sans conteneur, sauf `alpine:3.24` et `ghcr.io/aphrody-labs/bun:1.4.3-aphrody.3 (image of the abandoned fork, legacy)`.
+- `docker builder prune -a` et les images sans conteneur, sauf `alpine:3.24` et `ghcr.io/the former Bun fork:1.4.3-aphrody.3 (image of the abandoned fork, legacy)`.
 
 ### Bascule finale /srv (agent code, interrompue le 2026-10-09 à 17:40 UTC)
 

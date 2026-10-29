@@ -72,7 +72,7 @@ objection) are inference, UNVERIFIED.
 sched_ext schedulers tuned for the Bun event loop (Rust `scx` schedulers ship in Arch; `CONFIG_SCHED_CLASS_EXT=y`
 in Arch's 7.2.11 config, VERIFIED, and re-checked here against `linux-bun/config.x86_64`), BPF LSM policies,
 cgroup/PSI management, all driven from Bun in userspace; kernel tooling kept `tools/`-style, never a kernel
-build dependency. That `bun:linux` already has eBPF/netlink/perf bindings is UNVERIFIED (skill description
+build dependency. That a Bun Linux module already has eBPF/netlink/perf bindings is UNVERIFIED (skill description
 only).
 
 ### Phase 4 (research, 12+ months, optional)

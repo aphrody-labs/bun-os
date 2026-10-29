@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Source directories of every crate whose C symbols the single aphrody-ffi cdylib re-exports.
-// n2b-core and oxc-bridge come from crates.io (sources in aphrody-labs/bun packages/bun-n2b
+// n2b-core and oxc-bridge come from crates.io (sources in the former Bun fork packages/bun-n2b
 // and packages/bun-oxc), so their sources are read from the Cargo registry at the pinned version.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";

@@ -13,7 +13,7 @@
       "aphrody-chat-1": "llama-server 8799 (shenron-chat-v2)",
       "shenron-postgres": "PostgreSQL 18, 127.0.0.1:5432, data ~/apps/shenron/shared/state/postgres",
       "shenron-redis": "Redis, 127.0.0.1:6379, data ~/apps/shenron/shared/state/redis",
-      "aphrody-bun-prod-1": "Legacy Bun fork probe 47660 (ghcr.io/aphrody-labs/bun, abandoned fork), the only Bun probe outside k8s",
+      "aphrody-bun-prod-1": "Legacy Bun fork probe 47660 (image of the abandoned fork), the only Bun probe outside k8s",
       "aphrody-prod": "aphrody:runtime, aphrody-mcp http 127.0.0.1:8999 (compose profile prod)",
       "aphrody-control-plane": "kind (Kubernetes)",
       "docker-model-runner": "Docker Model Runner 12434",

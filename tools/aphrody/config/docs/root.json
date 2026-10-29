@@ -1,6 +1,6 @@
 {
   "readme": {
-    "summary": "Aphrody is the product repository: application workflows, integration and delivery. Runtime and SDK capabilities belong to [Bun](https://github.com/aphrody-labs/bun); Material owns the shared M3 framework and UI packages. Google, M3, Obscura and Tauri framework sources live outside Aphrody. Remaining local sources are tracked migration work, not the target ownership (owner directive 2026-10-13).",
+    "summary": "Aphrody is the product repository: application workflows, integration and delivery. Runtime and SDK capabilities belong to [Bun](https://github.com/oven-sh/bun); Material owns the shared M3 framework and UI packages. Google, M3, Obscura and Tauri framework sources live outside Aphrody. Remaining local sources are tracked migration work, not the target ownership (owner directive 2026-10-13).",
     "sections": [
       {
         "id": "os",
@@ -11,7 +11,7 @@
           "",
           "| Layer | Source | Role |",
           "| --- | --- | --- |",
-          "| Runtime | [aphrody-labs/bun](https://github.com/aphrody-labs/bun) | Fork of Bun: runs the JavaScript and TypeScript parts and hosts the native bindings (Windows, .NET, Python) |",
+          "| Runtime | [oven-sh/bun](https://github.com/oven-sh/bun) | Upstream Bun canary: runs the JavaScript and TypeScript parts |",
           "| Kernel | `crates/os/kernel`, `crates/os/ostd` | Privileged user-space control plane: administration, MCP tools, skills and bus events over local IPC; process supervision, guardrails, secrets, jobs |",
           "| Desktop | `crates/ui/app`, `crates/ui/drive` | Tauri 3 GUI and window manager; file explorer |",
           "| Shell | `crates/shell` | Terminal engine, PTY sessions, embedded Nushell, WebAssembly shell |",
@@ -32,7 +32,6 @@
           "- A distribution release is an immutable snapshot on [downloads.aphrody.com](https://downloads.aphrody.com), named `<UTC timestamp>-<commit>` after the monorepo commit it was built from. `latest.json` names the current release and lists every artifact with its version, size and SHA-256; `/releases/<id>/` serves a given release, and the host keeps the last five.",
           "- Each artifact keeps its own version: the Cargo workspace version for `aphrody`, the package version for the others.",
           "- Releases follow no calendar: `scripts/release/publish-downloads.ts` cuts one after the build factory has built a pushed revision.",
-          "- The runtime is versioned after the Bun release it is based on, with an `-aphrody.<n>` suffix, and tagged `aphrody-v<version>` in aphrody-labs/bun. Upstream `oven-sh/bun` `main` is merged into the fork.",
           "- Packages under the `@aphrody` npm scope are published one by one, each with its own version."
         ]
       },
@@ -41,7 +40,7 @@
         "title": "Documentation",
         "public": true,
         "body": [
-          "- Runtime: [aphrody.com/docs](https://aphrody.com/docs), built from `docs/` of aphrody-labs/bun (the Bun documentation plus the pages the fork adds); [llms.txt](https://aphrody.com/llms.txt) indexes every page.",
+          "- Runtime: [aphrody.com/docs](https://aphrody.com/docs), built from the upstream Bun `docs/`; [llms.txt](https://aphrody.com/llms.txt) indexes every page.",
           "- Components and versions: [aphrody.com/components](https://aphrody.com/components), generated from the monorepo, the runtime and the aphrody-labs organization at each site build.",
           "- Distribution internals: `docs/` of the monorepo (index in `docs/README.md`), private with it."
         ]
@@ -52,7 +51,6 @@
         "public": true,
         "body": [
           "- Aphrody is developed in the [aphrody-labs](https://github.com/aphrody-labs) GitHub organization, owned by the `aphrody-dev` account, which decides what is published. Owner directives are recorded with their date in `AGENTS.md`.",
-          "- The monorepo is private. The runtime, the component forks and the Python runtime `vu` are public repositories; issues are disabled on aphrody-labs/bun.",
           "- Contribution rules: [CONTRIBUTING.md](CONTRIBUTING.md). First-party code is Apache-2.0 (some crates `Apache-2.0 OR MIT`); forks and upstream inputs keep their authors' licences, listed in `THIRD-PARTY.md` and `tools/config/upstream-sources.json`."
         ]
       },
@@ -61,7 +59,7 @@
         "title": "Security",
         "public": true,
         "body": [
-          "Report vulnerabilities privately through [GitHub private vulnerability reporting on aphrody-labs/bun](https://github.com/aphrody-labs/bun/security/advisories/new). Supported versions and artifact verification: [SECURITY.md](SECURITY.md)."
+          "Report vulnerabilities privately through [GitHub private vulnerability reporting on oven-sh/bun](https://github.com/oven-sh/bun/security/advisories/new). Supported versions and artifact verification: [SECURITY.md](SECURITY.md)."
         ]
       }
     ],
@@ -138,7 +136,6 @@
         "Product workflows, application glue, integration and delivery; no duplicated runtime/framework SDK sources"
       ],
       [
-        "Bun fork (`aphrody-labs/bun`)",
         "Precompiled runtime and SDK, Google, Obscura and Tauri capabilities; yolo is absorbed and is no longer an owner"
       ],
       ["Workspace/Infra", "Orchestration, inventories, factories, release, hosts"],
@@ -397,7 +394,6 @@
           ],
           [
             "2026-10-05",
-            "`aphrody-labs/bun` has one branch, `main` (upstream + Aphrody fixes); monorepo branches merged and deleted, only `main` remains.",
             "Fork keeps 12,458 inherited remote branches (not deleted)."
           ],
           [

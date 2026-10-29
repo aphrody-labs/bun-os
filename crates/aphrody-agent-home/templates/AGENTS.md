@@ -72,6 +72,6 @@ toute écriture.
 
 ## Commandes qualité Bun
 
-- Lancer les contrôles TypeScript avec `bun check`, le lint avec `bun lint`, le formatage avec `bun fmt` et les migrations Node vers Bun avec `bun n2b`, directement.
+- Lancer les contrôles TypeScript avec `bun check`, le lint avec `bun lint`, le formatage avec `bun fmt`, directement.
 - Ne pas utiliser de wrapper shell, `bunx`, OXC autonome, `tsgo`/`tsc`, ESLint, Prettier ou binaire n2b externe pour ces tâches. Un propriétaire peut lancer l'exécutable Bun courant avec `check`, `lint` ou `fmt` uniquement pour qualifier un worktree isolé ou formater un brouillon généré unique.
 - Les scripts de package peuvent exposer ces mêmes commandes Bun natives avec leurs chemins et configurations locales.

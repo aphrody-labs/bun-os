@@ -1,4 +1,4 @@
 #!/bin/sh
 # SPDX-License-Identifier: MIT
-# System Python entry through Bun's CPython host (`bun app.py`); requires a Bun runtime with bun:python.
+# System Python entry through Bun's CPython host (`bun app.py`); requires the bun binary at /usr/bin/bun.
 exec /usr/bin/bun "$@"

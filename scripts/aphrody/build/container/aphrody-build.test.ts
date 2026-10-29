@@ -14,7 +14,7 @@ test("pins come from the repository manifests", async () => {
   );
   expect(pins.rustChannel).toMatch(/^\d+\.\d+\.\d+$/);
   expect(pins.bun).toMatch(/^\d+\.\d+\.\d+$/);
-  expect(pins.bunRelease).toBe("bun-v1.4.5");
+  expect(pins.bunRelease).toBe(`bun-v${pins.bun}`);
   expect(pins.wasmBindgen).toMatch(/^\d+\.\d+\.\d+$/);
   expect(pins.rustTargets).toContain("x86_64-pc-windows-msvc");
   expect(pins.rustTargets).toContain("wasm32-unknown-unknown");
@@ -27,14 +27,14 @@ test("image build is tagged versioned and latest, from the small build context",
     rustTargets: ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"],
     rustComponents: ["rustfmt", "clippy"],
     bun: "1.4.2",
-    bunRelease: "aphrody-v1.4.2-aphrody.1",
+    bunRelease: "bun-v1.4.2",
     wasmBindgen: "0.2.129",
   };
   const args = buildArgs(pins, "0123456789abcdef");
   expect(imageTag(pins, "0123456789abcdef")).toBe("aphrody-build:1.98.1-bun1.4.2-012345678");
   expect(args).toContain("aphrody-build:latest");
   expect(args).toContain("RUST_TARGETS=x86_64-unknown-linux-gnu wasm32-unknown-unknown");
-  expect(args).toContain("BUN_RELEASE_VERSION=aphrody-v1.4.2-aphrody.1");
+  expect(args).toContain("BUN_RELEASE_VERSION=bun-v1.4.2");
   expect(args.at(-1)).toBe("tools/aphrody/config/container/build");
 });
 

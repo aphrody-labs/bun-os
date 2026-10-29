@@ -4,7 +4,7 @@ import { pluginStorePath } from "@aphrody/paths";
  * n2b coverage audit
  *
  * Vérifie que le plugin (agents/skills/commands) et n2b (rules) couvrent
- * toutes les APIs Bun documentées dans `docs/` du fork aphrody-labs/bun.
+ * toutes les APIs Bun documentées dans `docs/` du fork the former Bun fork.
  *
  * Usage :
  *   bun scripts/audit/compat/scripts/n2b/coverage-check.ts              # run once, print summary + write report

@@ -41,7 +41,7 @@ and [Rust-Python research](docs/RAPPORT_RUST_PYTHON_RESEARCH.md).
 - `packages/model-tools`: Koharu model exporters.
 - `apps/meetings`: audio meeting application built on the SDK.
 - `tools/`: operational, migration and packaging tools.
-- `vendor/`: removed 2026-10-05; Bun is not vendored (fork `aphrody-labs/bun`, its own repository).
+- `vendor/`: removed 2026-10-05; Bun is not vendored (fork the former Bun fork, its own repository).
 
 The root owns workspace dependencies and tooling. Standalone SDK and training
 locks are checked in temporary copies outside workspace discovery. Source

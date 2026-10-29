@@ -92,7 +92,7 @@ test("export targets cover every condition, main and module, but not patterns", 
 test("the closure packs the runtime SDK as a workspace member and leaves sibling-checkout members external", async () => {
   const { members, external } = await aphrodyClosure(root, ["@aphrody/yolo-core"]);
   expect(members.map(member => member.name)).toEqual(["@aphrody/runtime-sdk", "@aphrody/yolo-core"]);
-  // The Bun browser SDK is a workspace member linked from toolchains/bun, published by that repository.
+  // The Bun browser SDK is a workspace member published from its own repository.
   expect(external).toEqual([]);
   expect(await aphrodyClosure(root, ["@aphrody/bun-web"])).toEqual({
     members: [],

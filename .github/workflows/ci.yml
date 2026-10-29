@@ -46,7 +46,7 @@ jobs:
     name: Rust ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
-    # Windows stays advisory until a green run on windows-latest is recorded (the fork-only `bun msvc` calls are removed).
+    # Windows stays advisory until a green run on windows-latest is recorded (the fork-only MSVC wrapper calls are removed).
     continue-on-error: ${{ matrix.os == 'windows-latest' }}
     strategy:
       fail-fast: false

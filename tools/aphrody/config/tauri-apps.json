@@ -49,7 +49,7 @@
       "id": "m3-next-migrate",
       "kind": "generator",
       "path": "m3/packages/m3-next-migrate",
-      "note": "Migrates Next.js projects to Tauri 3 apps. Writes them through @aphrody/scaffold (the single scaffolder); TAURI_3 is re-exported from there. Its next16/tailwind4 codemods come from @aphrody/next-bun (aphrody-labs/bun); mui-to-m3 stays here."
+      "note": "Migrates Next.js projects to Tauri 3 apps. Writes them through @aphrody/scaffold (the single scaffolder); TAURI_3 is re-exported from there. Its next16/tailwind4 codemods come from @aphrody/next-bun (the former Bun fork); mui-to-m3 stays here."
     },
     {
       "id": "m3",

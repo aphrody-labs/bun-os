@@ -113,7 +113,7 @@ bun scripts/cargo.ts check
 ```
 
 Type checking, lint and format use the upstream `bun check`, `bun lint` and
-`bun fmt` (`bun n2b` was fork-only and no longer exists). Cargo runs through the serialized wrapper `scripts/cargo.ts`. Build
+`bun fmt` (the fork-only n2b command no longer exists). Cargo runs through the serialized wrapper `scripts/cargo.ts`. Build
 outputs go to `build/` and `target/`, and installed binaries to `install/`.
 The [contributor guide](AGENTS.md) and [CI](.github/workflows) define the gates.
 

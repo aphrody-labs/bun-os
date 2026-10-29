@@ -7,12 +7,7 @@
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "types": [
-      "bun-types"
-    ]
+    "types": ["bun-types"]
   },
-  "include": [
-    "src/**/*.ts",
-    "scripts/**/*.mjs"
-  ]
+  "include": ["src/**/*.ts", "scripts/**/*.mjs"]
 }

@@ -52,8 +52,8 @@ test("product members are flat and no toolchain checkout supplies workspace memb
     "packages/../../outside",
     "packages/./x",
     "packages\\member",
-    "toolchains/bun/packages/bun-types",
-    "toolchains/bun/packages/x/../../outside",
+    "vendor/example/packages/bun-types",
+    "vendor/example/packages/x/../../outside",
   ])
     expect(allowedWorkspace(root, path)).toBe(false);
 });

@@ -7,7 +7,7 @@ The input sources are:
 
 - `aphrody-labs/aphrody` at `6c325505c6b686744b0711373a37308de3570ed9`,
   `crates/ui/m3-tokens`.
-- `aphrody-labs/bun` at `176fa03201a78cd9f4ac6e839294d81ef4852435`,
+- the former Bun fork at `176fa03201a78cd9f4ac6e839294d81ef4852435`,
   `packages/web/rust/integrations/crates/ui/m3-tokens/src/google_sans_code.rs`
   and `google_sans_flex.rs`.
 

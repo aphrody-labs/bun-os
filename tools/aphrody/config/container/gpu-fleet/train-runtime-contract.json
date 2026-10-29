@@ -3,7 +3,7 @@
   "runtimeImage": {
     "buildArgument": "APHRODY_NATIVE_RUNTIME_IMAGE",
     "requiredReference": "immutable registry image digest",
-    "capabilities": ["Bun fork", "Buv/uv", "PyJS/bun:python", "shared CPython 3.12", "aphrody train"],
+    "capabilities": ["Bun", "Buv/uv", "PyJS", "shared CPython 3.12", "aphrody train"],
     "pythonSdkWheelBuildArgument": "APHRODY_SDK_WHEEL",
     "pythonSdkWheelSha256BuildArgument": "APHRODY_SDK_WHEEL_SHA256",
     "pythonSdkWheel": "verified precompiled Aphrody wheel inside that immutable image; native binding built from the pinned Bun fork"

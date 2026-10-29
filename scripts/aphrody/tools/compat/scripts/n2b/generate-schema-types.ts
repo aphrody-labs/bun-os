@@ -5,7 +5,7 @@
 // Generates the Yolo runtime SDK TypeScript types of the canonical n2b report schema
 // (crates/contracts/schema/v2.json) into packages/engine/runtime/src/tooling-schema.ts via
 // `json-schema-to-typescript --unreachableDefinitions`. The Rust types are generated in
-// aphrody-labs/bun packages/bun-n2b (scripts/generate-schema-types.ts) and published as aphrody-n2b-types.
+// the former Bun fork packages/bun-n2b (scripts/generate-schema-types.ts) and published as aphrody-n2b-types.
 //
 // Usage:
 //   bun scripts/tools/compat/scripts/n2b/generate-schema-types.ts           # regenerate

@@ -30,7 +30,6 @@
     "web:smoke": "bun ../bun/scripts/aphrody-source/audit/web-smoke.ts",
     "web:crawl": "bun ../bun/scripts/aphrody-source/tools/web/web-crawl.ts",
     "web:crawlability": "bun ../bun/scripts/aphrody-source/audit/web-crawlability.ts",
-    "n2b:google": "bun n2b ../bun/packages/bun-google/aphrody/packages/google --dry-run",
     "scan": "bash scripts/audit/ai/scripts/scan-repo.sh",
     "docs:check-links": "bun packages/engine/yolo/src/index.ts ops docs links --root .",
     "docs:gen": "bun packages/engine/yolo/src/index.ts ops docs generate --root .",
@@ -135,10 +134,10 @@
   },
   "overrides": {
     "@aphrody/bun-webview-page": "workspace:*",
-    "@next/env": "file:third_party/next-fork/next-env-16.5.0-canary.5-dac376c6fe-f32e63fa.tgz",
-    "@next/third-parties": "file:third_party/next-fork/next-third-parties-16.5.0-canary.5-dac376c6fe-14a34de8.tgz",
+    "@next/env": "16.5.0-canary.30",
+    "@next/third-parties": "16.5.0-canary.30",
     "axios": "^1.20.0",
-    "next": "file:third_party/next-fork/next-16.5.0-canary.5-dac376c6fe-80cae9ab.tgz",
+    "next": "16.5.0-canary.30",
     "qs": "^6.16.0",
     "undici": "^7.30.0",
     "zod-to-json-schema": "3.25.2"

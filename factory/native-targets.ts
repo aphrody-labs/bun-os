@@ -205,7 +205,7 @@ async function prerequisites(plan: NativePlan, flags: Record<string, string>) {
   if (target.id === "wsl-windows") {
     if (await Bun.file(join(source, "UserConfig.cmake")).exists())
       throw new Error("UserConfig.cmake may enable automatic deployment; select a clean build source without it");
-    // Upstream Bun has no `bun msvc`: ask vswhere for a Visual Studio with the x64 C++ tools.
+    // Upstream Bun has no MSVC command: ask vswhere for a Visual Studio with the x64 C++ tools.
     const vswhere = join(
       Bun.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)",
       "Microsoft Visual Studio",

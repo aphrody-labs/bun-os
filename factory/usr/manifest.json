@@ -139,7 +139,7 @@
     "validate": "bun factory/bunos/validate.ts",
     "reason": "Extra packages of the local bunos repository (aphrody, fonts, icons) and the heavy-component inventory; compositions select them through compositionPackages once the builder consumes factory/bunos/pkgbuilds next to localRepository.packages.",
     "unpublished": {
-      "aphrody": "its Cargo path dependencies into the removed toolchains/bun fork submodule (the fork is abandoned; the runtime is upstream oven-sh/bun) must move into crates/ before this package builds"
+      "aphrody": "its Cargo path dependencies into a removed fork submodule (the fork is abandoned; the runtime is upstream oven-sh/bun) must move into crates/ before this package builds"
     }
   },
   "localRepository": {

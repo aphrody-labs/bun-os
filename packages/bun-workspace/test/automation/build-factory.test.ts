@@ -57,8 +57,8 @@ test("declared source names and branches drive canonical OS and runtime verifica
     expect(() => buildFactoryPreparePlan(declared, id, "main", source)).toThrow("pinned");
   }
   for (const url of [
-    "git@wrong-alias:aphrody-labs/bun.git",
-    "https://fixture:secret@github.com/aphrody-labs/bun.git",
+    "git@wrong-alias:aphrody-labs/example.git",
+    "https://fixture:secret@github.com/aphrody-labs/example.git",
     "https://github.com/unowned/bun.git",
   ])
     expect(() => factoryRemoteUrl(url, "bun", ["aphrody-labs"])).toThrow("declared private");

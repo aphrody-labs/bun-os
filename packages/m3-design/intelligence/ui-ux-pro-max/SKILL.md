@@ -337,7 +337,7 @@ Search specific domains using the CLI tool below.
 
 # Prerequisites
 
-The bundled scripts run with [Bun](https://bun.sh) 1.4.4 or newer (the Aphrody runtime, aphrody-labs/bun, is the reference runtime). They use only Bun built-ins — no npm packages, no network access. Check that it is available:
+The bundled scripts run with [Bun](https://bun.sh) 1.4.4 or newer (the Aphrody runtime, the former Bun fork, is the reference runtime). They use only Bun built-ins — no npm packages, no network access. Check that it is available:
 
 ```bash
 bun --version

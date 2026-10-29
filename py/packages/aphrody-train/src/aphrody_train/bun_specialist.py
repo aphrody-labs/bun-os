@@ -142,7 +142,7 @@ def build(fork: Path, output: Path) -> dict:
         "splits": manifests,
         "sources": sources,
         "policy": SYSTEM,
-        "license_source": "aphrody-labs/bun:LICENSE.md",
+        "license_source": "oven-sh/bun:LICENSE.md",
         "limits": "Documentation snippets are not independently executed programs; held-out executable task evaluation is required before deployment.",
     }
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")

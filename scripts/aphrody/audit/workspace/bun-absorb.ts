@@ -6,7 +6,7 @@
 //! Fails when a `builtin` package is declared by a workspace package, when a root catalog entry
 //! is used by no workspace package, or when a `native` package is imported by more files than
 //! `tools/config/bun-absorb.baseline.json` records. Declared `fork` packages were absorbed by the
-//! abandoned aphrody-labs/bun fork; upstream Bun does not resolve them, so they only warn (`--fork-active`
+//! abandoned the former Bun fork fork; upstream Bun does not resolve them, so they only warn (`--fork-active`
 //! refuses them, for a runtime that does). `--write-baseline` records the
 //! current import counts, which may only go down.
 

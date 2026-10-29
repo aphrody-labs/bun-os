@@ -41,7 +41,7 @@ const HOST = (() => {
   return host;
 })();
 /**
- * A Windows x64 Bun of the same build as the compiling Bun (a release pair of aphrody-labs/bun) when the target
+ * A Windows x64 Bun of the same build as the compiling Bun (a release pair of the former Bun fork) when the target
  * runtime cannot be downloaded for this version, as for canary builds of the fork.
  */
 const WINDOWS_RUNTIME = (() => {

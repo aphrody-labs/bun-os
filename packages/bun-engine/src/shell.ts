@@ -26,9 +26,7 @@ export function nativeShell(): string | undefined {
 export async function runShell(args: string[]): Promise<number> {
   const shell = nativeShell();
   if (!shell) {
-    console.error(
-      "bun-os-shell is not built: bun scripts/cargo.ts exec -- build --release -p bun-os-shell",
-    );
+    console.error("bun-os-shell is not built: bun scripts/cargo.ts exec -- build --release -p bun-os-shell");
     return 1;
   }
   const child = Bun.spawn([shell, ...args], {

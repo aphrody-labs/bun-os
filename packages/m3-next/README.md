@@ -120,10 +120,10 @@ is not Bun (`node: --bun is not allowed in NODE_OPTIONS`). `m3-next` puts a `nod
 build, workers included, runs on one runtime and Turbopack stays the bundler (no `--webpack` fallback: `apps/m3-next-example`, cold, back to back on one machine: 4.5 s with
 Turbopack, 15.3 s with `--webpack`). `m3-next dev`, `build` and `start` pass their arguments to `next`.
 
-### Moved to aphrody-labs/bun
+### Moved to the former Bun fork
 
 The runner (`bunNodeShim`, `nextBin`, `nextCommand`) and its tests now live in `@aphrody/next-bun`
-(`packages/bun-next/lib/run.js` and `test/integration/next-bun/` of aphrody-labs/bun, also `next-bun dev|build|start`).
+(`packages/bun-next/lib/run.js` and `test/integration/next-bun/` of the former Bun fork, also `next-bun dev|build|start`).
 `bin/m3-next.ts` re-exports them and keeps the `m3-next` usage. The dependency is the published
 `@aphrody/next-bun` (npm, exact pin `0.2.0-aphrody.1`).
 

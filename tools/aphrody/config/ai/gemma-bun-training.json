@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "baseModel": "unsloth/gemma-4-E2B-it",
   "baseRevision": "d36bdd3855c82a6a1a23f7c459b749f5724ae75d",
-  "fork": "aphrody-labs/bun",
+  "fork": "oven-sh/bun",
   "forkRevision": "8c744781ed9e9940999b7012c4dc48ac31863cbb",
   "protectedStore": "~/.aphrody/train/gemma-bun",
   "trainer": "aphrody_train.bun_finetune",

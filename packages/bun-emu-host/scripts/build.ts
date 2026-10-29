@@ -111,7 +111,7 @@ async function run(cmd: string[], env: Record<string, string> = {}) {
 }
 
 // The MSVC developer environment of a toolset (vcvarsall.bat of the newest Visual Studio, found with vswhere; upstream
-// Bun has no `bun msvc`). When that toolset was installed without its C++ standard library and CRT (an unfinished
+// Bun has no MSVC command). When that toolset was installed without its C++ standard library and CRT (an unfinished
 // Visual Studio install), the headers and import libraries of the default toolset are used with its compiler, so
 // objects still link against msvcp140/vcruntime140.
 async function msvcEnv(toolset: string): Promise<Record<string, string>> {

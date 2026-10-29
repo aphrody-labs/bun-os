@@ -3,7 +3,7 @@
 //! `replaces_id`, urgency, actions, expiry, transient) for console toasts and a history list.
 //!
 //! The shell shows active notifications as M3 snackbars and the history in the quick menu; on
-//! Windows the platform may mirror them to toasts, on Linux `bun:cosmic` `notify` reaches the
+//! Windows the platform may mirror them to toasts, on Linux the cosmic notification service reaches the
 //! COSMIC daemon. Do-not-disturb keeps everything except critical notifications out of the toasts.
 
 use serde::{Deserialize, Serialize};

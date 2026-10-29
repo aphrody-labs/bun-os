@@ -61,14 +61,14 @@ export function readPins(toolchain: string, packageJson: string, cargoLock: stri
     [...(new RegExp(`^${key}\\s*=\\s*\\[([^\\]]*)\\]`, "m").exec(toolchain)?.[1] ?? "").matchAll(/"([^"]+)"/g)].map(
       m => m[1]!,
     );
-  const bunMatch = /^bun@(\d+\.\d+\.\d+)(-aphrody\.\d+)?$/.exec(
+  const bunMatch = /^bun@(\d+\.\d+\.\d+)$/.exec(
     (JSON.parse(packageJson) as { packageManager?: string }).packageManager ?? "",
   );
   const bun = bunMatch?.[1];
-  const bunRelease = bun ? (bunMatch?.[2] ? `aphrody-v${bun}${bunMatch[2]}` : `bun-v${bun}`) : undefined;
+  const bunRelease = bun ? `bun-v${bun}` : undefined;
   const wasmBindgen = /\[\[package\]\]\r?\nname = "wasm-bindgen"\r?\nversion = "([^"]+)"/.exec(cargoLock)?.[1];
   if (!channel) throw new Error("rust-toolchain.toml: channel introuvable");
-  if (!bun || !bunRelease) throw new Error("package.json: packageManager bun@x.y.z[-aphrody.N] introuvable");
+  if (!bun || !bunRelease) throw new Error("package.json: packageManager bun@x.y.z introuvable");
   if (!wasmBindgen) throw new Error("Cargo.lock: wasm-bindgen introuvable");
   return {
     rustChannel: channel,

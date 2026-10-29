@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// The codemod set: Next 14/15 -> 16 and Tailwind v3 -> v4 from @aphrody/next-bun (aphrody-labs/bun,
+// The codemod set: Next 14/15 -> 16 and Tailwind v3 -> v4 from @aphrody/next-bun (the former Bun fork,
 // packages/bun-next/codemods), plus MUI -> M3 (Base UI) and the M3 preset header in the converted tailwind.config.
 import {
   NEXT16_CODEMODS,

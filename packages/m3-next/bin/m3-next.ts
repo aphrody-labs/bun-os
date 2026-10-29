@@ -4,7 +4,7 @@
 //
 //   m3-next dev | build | start [next arguments]        (in the Aphrody checkout: yolo m3 next ...)
 //
-// The runner lives in @aphrody/next-bun (aphrody-labs/bun, packages/bun-next): this Bun runs the app's `next` with a
+// The runner lives in @aphrody/next-bun (the former Bun fork, packages/bun-next): this Bun runs the app's `next` with a
 // `node` that is Bun first on PATH, so Turbopack workers run on Bun too.
 import { bunExecutable, bunNodeShim, nextBin, nextCommand, runNext } from "@aphrody/next-bun/run";
 

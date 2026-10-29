@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Bun-first dependency contract. Each npm package maps to the Bun capability that absorbs it. builtin: the Bun runtime resolves the specifier to its own native module, so declaring it is dead weight. fork: the abandoned aphrody-labs/bun fork resolved it natively (upstream Bun does not; treated as a warning, not an error). native: a Bun API covers it; new imports are refused and the baseline only goes down. gap: no Bun equivalent yet; a fork candidate. Audited by `bun scripts/audit/workspace/bun-absorb.ts`.",
+  "description": "Bun-first dependency contract. Each npm package maps to the Bun capability that absorbs it. builtin: the Bun runtime resolves the specifier to its own native module, so declaring it is dead weight. fork: the abandoned Bun fork resolved it natively (upstream Bun does not; treated as a warning, not an error). native: a Bun API covers it; new imports are refused and the baseline only goes down. gap: no Bun equivalent yet; a fork candidate. Audited by `bun scripts/audit/workspace/bun-absorb.ts`.",
   "scan": {
     "include": "**/*.{ts,tsx,mts,cts,js,mjs,jsx}",
     "exclude": [
