@@ -78,9 +78,9 @@ jobs:
         run: |
           bun test packages/buncc
           bun packages/buncc/src/cli.ts doctor || true
-      - name: Component manifest
+      - name: Repository consistency (component manifest, pins, architecture map)
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
-        run: bun factory/bunos/generate-components.ts --check && bun factory/bunos/check-components.ts
+        run: bun packages/buncc/src/cli.ts doctor --repo
 
   rust:
     name: Rust ${{ matrix.os }}

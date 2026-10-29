@@ -28,7 +28,7 @@ import { shMain } from "./sh.ts";
 const USAGE = `buncc: Bun C Compiler, toolchain manager and workspace builder
 
 Driver (use as CC / CXX / AR):  buncc cc|c++|ar|link <compiler arguments>
-Toolchains:   doctor [--repo] [--all] | install <provider> [--run] | env <provider|all> [--shims] | which <tool> | pin
+Toolchains:   doctor [--repo (repository checks only)] [--all] | install <provider> [--run] | env <provider|all> [--shims] | which <tool> | pin
 Workspace:    plan [--affected[=base]] [-p crate] | check|build|test|clippy|fmt [-p crate ...] [--affected[=base]] [--jobs N] [--release] [-- extra]
 C LSP:        lsp [--out dir]          merge the driver's compile log into compile_commands.json and write .clangd
 Build:        bundle <entry...> [--minify] [--splitting] | compile <entry> --outfile f [--aot] [--target bun-linux-x64] | aot <entry> --outfile f | wasm ...
@@ -160,6 +160,7 @@ async function main(): Promise<number> {
       return result.code;
     }
     case "doctor": {
+      if (has("repo") && !has("all")) return (await repoDoctor(root)) ? 1 : 0;
       const ctx = makeContext(root);
       let failures = 0;
       const required = new Set(["rust", ctx.platform === "win32" ? "msvc" : "clang"]);
@@ -184,7 +185,7 @@ async function main(): Promise<number> {
       console.log(
         "WiX: buncc never accepts the OSMF EULA. If `wix` is installed, run `wix eula accept wix7` yourself before `buncc package msi`.",
       );
-      if (has("repo") || has("all")) failures += await repoDoctor(root);
+      if (has("all")) failures += await repoDoctor(root);
       if (has("all")) failures += await subDoctors(root);
       return failures ? 1 : 0;
     }
