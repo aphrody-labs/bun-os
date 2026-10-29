@@ -38,6 +38,7 @@ import { catalog, HOME, webos, type CatalogApp } from "./os";
 import { searchContents } from "./apps/files-wire";
 import { openAiCompatible } from "./assistant/backend";
 import { installAssistant } from "./assistant/overlay";
+import { syncConfigFile } from "./configfile";
 import {
   install,
   installed,
@@ -1820,6 +1821,19 @@ for (const key of [
 ] as const)
   prefs.subscribe(key, configureWm);
 narrow.addEventListener("change", configureWm);
+
+// Settings file (~/.config/bunos/settings.json): read at start, re-read on edit, written on every Settings change.
+void Promise.all([prefs.ready, webos()]).then(([, os]) => {
+  for (const dir of ["/home/user/.config", "/home/user/.config/bunos"])
+    try {
+      os.fs.mkdir(dir);
+    } catch {
+      // already there
+    }
+  syncConfigFile({ read: p => os.fs.read(p), write: (p, d) => os.fs.write(p, d), flush: () => os.flush() }, prefs, {
+    poll: 2000,
+  });
+});
 
 // Pointer-shake assistant: backend from the preferences, context from the content index of the user's files.
 let indexOs: Awaited<ReturnType<typeof webos>> | undefined;

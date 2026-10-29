@@ -694,6 +694,17 @@ class PrefStore {
     };
   }
 
+  /** Apply only the keys present (a hand-written config file); unknown or invalid keys are skipped. */
+  applyPartial(data: unknown): { applied: number; skipped: string[] } {
+    const incoming =
+      isObject(data) && isObject(data.prefs) ? (data.prefs as Record<string, unknown>) : isObject(data) ? data : undefined;
+    if (!incoming) throw new TypeError("The settings file must be a JSON object.");
+    const entries = Object.entries(incoming).filter(([k]) => k !== "format" && k !== "version" && k !== "exported");
+    const skipped = entries.filter(([k, v]) => !isKey(k) || SCHEMA[k].parse(v) === undefined).map(([k]) => k);
+    const applied = this.setMany(entries.filter(([k]) => !skipped.includes(k)) as [PrefKey, unknown][]);
+    return { applied, skipped };
+  }
+
   /** Replace every preference from an exported document; unknown or invalid keys are skipped. */
   import(data: unknown): { applied: number; skipped: string[] } {
     if (
