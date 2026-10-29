@@ -577,7 +577,6 @@ members = [
   "crates/aphrody-nie-play",
   "crates/aphrody-nie-queue",
   "crates/re",
-  "crates/shenron-dbxv2",
   "crates/aphrody-nie-render",
   "crates/aphrody-nie-render3d",
   "crates/aphrody-nie-runtime",

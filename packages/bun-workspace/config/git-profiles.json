@@ -104,7 +104,6 @@
         "packages/*",
         "crates/*",
         "vendor/rea",
-        "vendor/shenron-config",
         "vendor/cubeb-rs",
         "vendor/rustboyadvance-ng",
         "vendor/starpsx",

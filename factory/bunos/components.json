@@ -2322,25 +2322,6 @@
       "note": "Migrated from aphrody-labs/shenron vendor/ui-ux-pro-max-skill; pin = upstream HEAD of 2026-10-26T10:07:27Z."
     },
     {
-      "id": "submodule:vendor/shenron-config",
-      "kind": "submodule",
-      "path": "vendor/shenron-config",
-      "source": {
-        "type": "submodule",
-        "url": "https://github.com/aphrody-labs/shenron-config.git",
-        "pin": "ceda94cc34f2463c835546e1399dea0fc8276096"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present",
-      "edges": {
-        "workspace": "@aphrody/shenron-config",
-        "dependsOn": ["npm:@aphrody/paths", "zod"],
-        "consumers": ["shenron"]
-      },
-      "note": "Migrated from aphrody-labs/shenron packages/config; pin = main HEAD of 2026-10-26T12:21:27Z; linked as root workspace."
-    },
-    {
       "id": "submodule:vendor/recalbox",
       "kind": "submodule",
       "path": "vendor/recalbox",
@@ -3220,19 +3201,6 @@
       "source": {
         "type": "workspace",
         "name": "@aphrody/a2a",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@aphrody/admin-ui",
-      "kind": "npm-package",
-      "path": "packages/admin-ui",
-      "source": {
-        "type": "workspace",
-        "name": "@aphrody/admin-ui",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -4251,58 +4219,6 @@
       "source": {
         "type": "workspace",
         "name": "@aphrody/shell-web",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@shenron/auth",
-      "kind": "npm-package",
-      "path": "packages/shenron-auth",
-      "source": {
-        "type": "workspace",
-        "name": "@shenron/auth",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@shenron/db",
-      "kind": "npm-package",
-      "path": "packages/shenron-db",
-      "source": {
-        "type": "workspace",
-        "name": "@shenron/db",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@shenron/dbxv2",
-      "kind": "npm-package",
-      "path": "packages/shenron-dbxv2",
-      "source": {
-        "type": "workspace",
-        "name": "@shenron/dbxv2",
-        "version": "1.4.7"
-      },
-      "registration": ["bun-ffi"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "npm:@shenron/ui",
-      "kind": "npm-package",
-      "path": "packages/shenron-ui",
-      "source": {
-        "type": "workspace",
-        "name": "@shenron/ui",
         "version": "1.4.7"
       },
       "registration": ["none"],
@@ -13621,19 +13537,6 @@
         "version": "1.4.7"
       },
       "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/shenron-dbxv2",
-      "kind": "crate",
-      "path": "crates/shenron-dbxv2",
-      "source": {
-        "type": "path-crate",
-        "name": "shenron-dbxv2",
-        "version": "1.4.7"
-      },
-      "registration": ["bun-ffi"],
       "aot": true,
       "status": "present"
     },

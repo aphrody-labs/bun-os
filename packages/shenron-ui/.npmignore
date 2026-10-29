@@ -1,7 +1,0 @@
-.turbo/
-test/
-src/**/*.test.ts
-scripts/*
-!scripts/sync-assets.ts
-components.json
-tsconfig.json

@@ -11,17 +11,6 @@
     "bin": []
   },
   {
-    "name": "@aphrody/admin-ui",
-    "version": "1.4.4",
-    "description": "Canonical Aphrody M3 administration, served by the existing authenticated Shenron web host",
-    "dir": "packages/admin-ui",
-    "kind": "package",
-    "workspace": false,
-    "private": false,
-    "exports": 150,
-    "bin": []
-  },
-  {
     "name": "@aphrody/ag-ui",
     "version": "1.4.7",
     "description": "Aphrody AG-UI Protocol — Pure Bun & TypeScript 7 suite connecting Agentic UI events, streaming lifecycle, Protobuf codec, A2UI surfaces, and Agent-to-User bridges.",
@@ -1061,50 +1050,6 @@
     "workspace": true,
     "private": false,
     "exports": 1,
-    "bin": []
-  },
-  {
-    "name": "@shenron/auth",
-    "version": "1.4.7",
-    "description": "Briques Better Auth partagées (site Next, bot Bun, API) : secret, origines, cookies, fournisseur Discord, handler Request/Response",
-    "dir": "packages/shenron-auth",
-    "kind": "package",
-    "workspace": true,
-    "private": true,
-    "exports": 16,
-    "bin": []
-  },
-  {
-    "name": "@shenron/db",
-    "version": "1.4.7",
-    "description": "PostgreSQL partagé Shenron : schéma Drizzle, pool postgres-js (Next) et driver Bun.SQL (scripts, API), indépendant du framework",
-    "dir": "packages/shenron-db",
-    "kind": "package",
-    "workspace": true,
-    "private": true,
-    "exports": 18,
-    "bin": []
-  },
-  {
-    "name": "@shenron/dbxv2",
-    "version": "1.4.7",
-    "description": "DBXV2 reverse engineering for Shenron: typed bun:ffi and WebAssembly loaders over the bun-re DBXV2 surface (identify, CPK list/extract, EMB/EMD/ESK/gameplay JSON, ACB/AWB to WAV)",
-    "dir": "packages/shenron-dbxv2",
-    "kind": "package",
-    "workspace": true,
-    "private": true,
-    "exports": 5,
-    "bin": []
-  },
-  {
-    "name": "@shenron/ui",
-    "version": "1.4.7",
-    "description": "",
-    "dir": "packages/shenron-ui",
-    "kind": "package",
-    "workspace": true,
-    "private": true,
-    "exports": 33,
     "bin": []
   },
   {

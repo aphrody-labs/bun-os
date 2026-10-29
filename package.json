@@ -26,7 +26,6 @@
     "apps/play",
     "apps/webos",
     "packages/a2a",
-    "packages/admin-ui",
     "packages/ag-ui",
     "packages/android-pipeline",
     "packages/android-web",
@@ -105,10 +104,6 @@
     "packages/runtime-sdk",
     "packages/scaffold",
     "packages/shell-web",
-    "packages/shenron-auth",
-    "packages/shenron-db",
-    "packages/shenron-dbxv2",
-    "packages/shenron-ui",
     "packages/sql",
     "packages/storyteller-api-enums",
     "packages/storyteller-api",
@@ -179,8 +174,7 @@
     "packages/windows",
     "packages/yolo-cli",
     "packages/yolo-core",
-    "vendor/rea",
-    "vendor/shenron-config"
+    "vendor/rea"
   ],
   "type": "module",
   "exports": {

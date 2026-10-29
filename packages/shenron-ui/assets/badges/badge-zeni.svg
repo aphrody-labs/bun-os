@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="銭">
-  <circle cx="64" cy="64" r="60" fill="#151412"/>
-  <circle cx="64" cy="64" r="60" fill="none" stroke="#fec93a" stroke-width="4"/>
-  <circle cx="64" cy="64" r="50" fill="none" stroke="#fec93a" stroke-opacity=".35" stroke-width="1.5"/>
-  <circle cx="64" cy="64" r="40" fill="#f7f3ea"/>
-  <text x="64" y="64" text-anchor="middle" dominant-baseline="central" font-family="'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif" font-weight="900" font-size="52" fill="#15120d">銭</text>
-</svg>
