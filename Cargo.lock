@@ -8504,6 +8504,7 @@ dependencies = [
  "core",
  "hid_core",
  "js-sys",
+ "libloading 0.8.9",
  "log",
  "miniz_oxide 0.9.1",
  "rcgen",

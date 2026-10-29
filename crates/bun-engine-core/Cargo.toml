@@ -11,7 +11,7 @@ crate-type = ["rlib", "cdylib", "staticlib"]
 
 # Every consumer selects what it shares; nothing is duplicated in another crate.
 [features]
-default = ["window", "audio", "gamepad", "nds", "nes", "gba", "psx", "host", "arm", "x86", "wii", "cartridge", "stream", "display-filter", "shell", "home"]
+default = ["window", "audio", "gamepad", "nds", "nes", "gba", "psx", "host", "arm", "x86", "wii", "cartridge", "libretro", "stream", "display-filter", "shell", "home"]
 # Nintendo DS on Dust through aphrody-nds-sdk (software 2D/3D rendering, saves, saved states).
 nds = ["dep:aphrody-nds-sdk", "aphrody-nds-sdk/nds"]
 # Dust 2D/3D on the host's existing WGPU 30 device; CPU mode remains available.
@@ -35,6 +35,8 @@ switch = ["dep:ruzu-core", "dep:ruzu-common", "dep:video_core", "dep:hid_core", 
 wii = ["dep:aphrody-wii-runtime", "dep:aphrody-wii-image"]
 # x86 guests on the Windows Hypervisor Platform.
 x86 = ["dep:windows"]
+# libretro host: any libretro core loaded with libloading, driven headless as a Machine.
+libretro = ["dep:libloading"]
 # C++ cores (melonDS, Dolphin, Azahar, Kyty) loaded from packages/bun-emu-host plugins.
 cpp-host = ["dep:bun-emu-host"]
 # Bevy runtime (`bun_engine::runtime`, `bun_engine::bevy`): BunEnginePlugin, MachinePlugin and the
@@ -123,6 +125,7 @@ ruzu-common = { package = "common", path = "../ruzu-common", version = "1.4.7", 
 video_core = { path = "../ruzu-video-core", version = "1.4.7", default-features = false, optional = true }
 hid_core = { path = "../ruzu-hid-core", version = "1.4.7", optional = true }
 log = { workspace = true, optional = true }
+libloading = { workspace = true, optional = true }
 rustboyadvance-core = { path = "../../vendor/rustboyadvance-ng/core", default-features = false, optional = true }
 aphrody-wii-runtime = { path = "../aphrody-wii-runtime", version = "0.1.1", optional = true }
 aphrody-wii-image = { path = "../aphrody-wii-image", version = "0.1.1", default-features = false, optional = true }
@@ -167,6 +170,7 @@ windows = { workspace = true, features = [
 ], optional = true }
 
 [dev-dependencies]
+sha2 = { workspace = true }
 aphrody-dust-soft-2d = { path = "../aphrody-dust-soft-2d", version = "0.0.1" }
 aphrody-dust-soft-3d = { path = "../aphrody-dust-soft-3d", version = "0.0.1" }
 serde_json = { workspace = true }
@@ -179,3 +183,8 @@ required-features = ["window", "nds", "nes", "gba", "psx", "arm", "wii", "cartri
 [[example]]
 name = "bevy_web"
 required-features = ["runtime-web", "nes"]
+
+[[test]]
+name = "rom_suite"
+path = "tests/rom_suite.rs"
+required-features = ["nes", "gba"]

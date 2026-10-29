@@ -48,6 +48,7 @@
     "wsl-kernel.yml": "builds the WSL kernel on an ubuntu runner with the distribution toolchain; no Bun step",
     "wsl-rootfs.yml": "builds the rootfs inside an archlinux:base-devel container; Bun is bootstrapped inside the chroot by build-rootfs.sh",
     "rustbase.yml": "jobs run in Arch and Ubuntu containers; the Bun step uses oven-sh/setup-bun directly (owner: rustbase, to move to the setup action)",
+    "emulation.yml": "jobs install the pinned Bun with npm install -g bun@BUN_VERSION on ubuntu (same version source as setup-bun, no integrity check); owner: emulation, to move to the setup action",
     "wasmos.yml": "jobs install the pinned Bun with npm install -g bun@BUN_VERSION (same version source as setup-bun, no integrity check) and drive Chromium; owner: wasmos, to move to the setup action",
     "buncc-linux-desktop.yml": "jobs install the pinned Bun with npm install -g bun@BUN_VERSION on ubuntu and windows runners and build in an Arch container; owner: linux-desktop, to move to the setup action"
   },
@@ -373,6 +374,20 @@
       "status": "unverified",
       "note": "recipes in factory/wasmos/wasmos.just (imported by the justfile); CI result not checked by the map",
       "covers": ["factory/wasmos"]
+    },
+    {
+      "id": "emulation",
+      "layer": "factory",
+      "title": "emulation (bun-engine cores, libretro host, headless ROM suite, console matrix)",
+      "owner": "crates/bun-engine-core",
+      "module": null,
+      "entry": ["cargo test -p bun-engine --release --test rom_suite", "bun scripts/emulation/fetch-roms.ts", "bun scripts/emulation/matrix.ts"],
+      "docs": ["docs/EMULATION.md"],
+      "ci": ["emulation.yml#suite", "emulation.yml#openbios", "emulation.yml#nes-accuracy"],
+      "pins": ["scripts/emulation/pins.json", "crates/bun-engine-core/tests/rom-suite.json"],
+      "status": "unverified",
+      "note": "the matrix in docs/EMULATION.md is generated from measured results (docs/emulation-results.json); CI result not checked by the map",
+      "covers": ["scripts/emulation"]
     },
     {
       "id": "dotnet-linux",

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "note": "Free test ROMs and homebrew fetched for the headless suite (never committed, never commercial). Each entry is pinned by sha256; fromRoms entries reuse the pins of packages/bun-engine/plugins/consoles/roms.json. The PlayStation BIOS is built from source by the emulation workflow (pcsx-redux/nugget OpenBIOS, MIT).",
+  "fromRoms": ["fbi", "fbi-cia", "godmode9i", "nx-hbmenu"],
+  "downloads": [
+    {
+      "id": "ps1-tests",
+      "url": "https://github.com/JaCzekanski/ps1-tests/releases/download/build-158/tests.zip",
+      "sha256": "5de0e82854c1a511697a7ade381c2d778ec4b2fff4a7d7ac79e8098c35eb859b",
+      "extractTo": "ps1tests",
+      "license": "MIT, JaCzekanski/ps1-tests build-158"
+    },
+    {
+      "id": "swiss",
+      "url": "https://github.com/emukidid/swiss-gc/releases/download/v0.6r2119/swiss_r2119.tar.xz",
+      "sha256": "97825799dfbe44cca08d1e49f95d15cc996bd15a052f48827b48162005cbe916",
+      "extractTo": "swiss",
+      "only": ["swiss_r2119/ActionReplay/AUTOEXEC.DOL"],
+      "license": "GPL-2.0, emukidid/swiss-gc r2119 (GameCube loader, DOL)"
+    },
+    {
+      "id": "mooneye",
+      "url": "https://gekkio.fi/files/mooneye-test-suite/mts-20260714-0944-31510e1/mts-20260714-0944-31510e1.zip",
+      "sha256": "18aa29462dfe1fcd32a2cb3621733abdc72410074918b9245aa99a6920f7d3f2",
+      "extractTo": "mts",
+      "license": "MIT, Gekkio/mooneye-test-suite mts-20260714-0944-31510e1"
+    }
+  ],
+  "openbios": {
+    "repo": "https://github.com/pcsx-redux/nugget",
+    "container": "ghcr.io/grumpycoders/pcsx-redux-build:latest",
+    "license": "MIT"
+  },
+  "libretroCores": {
+    "mgba": {
+      "repo": "https://github.com/mgba-emu/mgba",
+      "tag": "0.10.5",
+      "commit": "26b7884bc25a5933960f3cdcd98bac1ae14d42e2",
+      "license": "MPL-2.0",
+      "build": "cmake -DBUILD_LIBRETRO=ON"
+    }
+  }
+}

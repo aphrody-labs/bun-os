@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "note": "Every console the owner asked for, with the route that exists in this repository. `route` states what is wired; the status column of the matrix comes from the ROM suite results, never from this file. Routes other than `in-tree` have no CI measurement yet.",
+  "consoles": [
+    { "id": "nintendo-nes", "name": "NES", "route": "in-tree", "core": "TetaNES (vendor/tetanes)", "needs": "nothing" },
+    {
+      "id": "nintendo-snes",
+      "name": "SNES",
+      "route": "libretro",
+      "core": "snes9x / bsnes via RetroArch (emulation.packages)",
+      "needs": "nothing for homebrew"
+    },
+    {
+      "id": "nintendo-game-boy",
+      "name": "Game Boy / Color",
+      "route": "libretro",
+      "core": "mGBA / SameBoy via RetroArch (emulation.packages); vendor/retroboy pinned, not wired",
+      "needs": "nothing"
+    },
+    {
+      "id": "nintendo-game-boy-advance",
+      "name": "Game Boy Advance",
+      "route": "in-tree",
+      "core": "RustBoyAdvance-NG (vendor/rustboyadvance-ng) + Normmatt BIOS",
+      "needs": "nothing (free BIOS bundled)"
+    },
+    {
+      "id": "nintendo-ds",
+      "name": "Nintendo DS",
+      "route": "in-tree",
+      "core": "Dust (crates/aphrody-dust-core)",
+      "needs": "nothing (free firmware)"
+    },
+    {
+      "id": "nintendo-3ds",
+      "name": "Nintendo 3DS",
+      "route": "in-tree",
+      "core": "Zakuro (vendor/zakuro, crates/aphrody-ctr-emu)",
+      "needs": "nothing for NoCrypto homebrew; retail needs the user keys"
+    },
+    {
+      "id": "nintendo-64",
+      "name": "Nintendo 64",
+      "route": "libretro",
+      "core": "mupen64plus / RMG via RetroArch (emulation.packages); vendor/gopher64 pinned, not wired",
+      "needs": "nothing for homebrew"
+    },
+    {
+      "id": "nintendo-gamecube",
+      "name": "GameCube",
+      "route": "in-tree",
+      "core": "Gekko interpreter (crates/aphrody-wii-runtime); Dolphin via RetroArch",
+      "needs": "nothing for DOL homebrew; retail may need the user IPL"
+    },
+    {
+      "id": "nintendo-wii",
+      "name": "Wii",
+      "route": "in-tree",
+      "core": "Broadway interpreter (crates/aphrody-wii-runtime); Dolphin via RetroArch",
+      "needs": "nothing for DOL homebrew"
+    },
+    {
+      "id": "nintendo-switch",
+      "name": "Switch",
+      "route": "in-tree",
+      "core": "Ruzu (crates/ruzu*, rdynarmic JIT)",
+      "needs": "nothing for NRO homebrew; retail needs the user prod.keys and firmware"
+    },
+    {
+      "id": "sony-playstation",
+      "name": "PlayStation",
+      "route": "in-tree",
+      "core": "StarPSX (vendor/starpsx) + OpenBIOS",
+      "needs": "nothing for PS-EXE with OpenBIOS; retail discs run best on the user BIOS"
+    },
+    {
+      "id": "sony-playstation-2",
+      "name": "PlayStation 2",
+      "route": "external",
+      "core": "PCSX2 (emulation.packages)",
+      "needs": "user BIOS"
+    },
+    {
+      "id": "sony-playstation-3",
+      "name": "PlayStation 3",
+      "route": "external",
+      "core": "RPCS3 (emulation.packages)",
+      "needs": "user firmware; needs a powerful native host"
+    },
+    {
+      "id": "sony-psp",
+      "name": "PSP",
+      "route": "external",
+      "core": "PPSSPP (emulation.packages)",
+      "needs": "nothing for homebrew"
+    },
+    {
+      "id": "sony-vita",
+      "name": "PS Vita",
+      "route": "external",
+      "core": "Vita3K (emulation.packages)",
+      "needs": "user firmware"
+    },
+    {
+      "id": "sega-genesis",
+      "name": "Genesis / Mega Drive",
+      "route": "libretro",
+      "core": "Genesis Plus GX / Beetle via RetroArch; vendor/jgenesis pinned, not wired",
+      "needs": "nothing"
+    },
+    {
+      "id": "sega-saturn",
+      "name": "Saturn",
+      "route": "external",
+      "core": "ares / Mednafen (emulation.packages)",
+      "needs": "user BIOS"
+    },
+    {
+      "id": "sega-dreamcast",
+      "name": "Dreamcast",
+      "route": "external",
+      "core": "Flycast (emulation.packages)",
+      "needs": "user BIOS recommended"
+    },
+    {
+      "id": "microsoft-xbox",
+      "name": "Xbox",
+      "route": "external",
+      "core": "xemu (emulation.packages)",
+      "needs": "user BIOS, MCPX and HDD image"
+    },
+    {
+      "id": "microsoft-xbox-360",
+      "name": "Xbox 360",
+      "route": "none",
+      "core": "no emulator packaged",
+      "needs": "not available"
+    },
+    {
+      "id": "pc-x86",
+      "name": "x86 PC",
+      "route": "qemu",
+      "core": "QEMU (vendor/qemu, qemu-full), v86 and container2wasm (wasmos)",
+      "needs": "a user disk image or an open OS"
+    },
+    {
+      "id": "arcade",
+      "name": "Arcade",
+      "route": "external",
+      "core": "MAME (vendor/mame, emulation.packages)",
+      "needs": "user ROM sets"
+    }
+  ]
+}
