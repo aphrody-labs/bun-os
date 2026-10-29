@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: wsl-kernel-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   kernel:
     runs-on: ubuntu-latest
