@@ -74,10 +74,10 @@ cone because git rejects them. Commands: `doctor`, `setup`, `profile <name|list>
 | Profile | Use |
 | --- | --- |
 | `core` | factory, scripts, docs, infra, tools: gates that read tracked files |
-| `rust-workspace` | crates, vendor/cargo, apps, tools, bun-tauri, uutils + 12 shallow submodules; verified with `cargo metadata --offline --no-deps` |
+| `rust-workspace` | crates, apps, tools, bun-tauri, uutils + 12 shallow submodules; verified with `cargo metadata --offline --no-deps` |
 | `web` | apps, packages, design system, fonts |
 | `kernel-distro` | vendor, container, infra; `includeOptional` fetches the kernel/Wine/LLVM sources |
-| `vendor-minimal` | crates + vendor/cargo only |
+| `vendor-minimal` | crates only (registry crates come from Cargo.lock) |
 | `ci` | everything first-party plus the vendor trees Cargo and Bun workspaces reference; skips about 163 of 183 submodules |
 | `all` | disables sparse-checkout |
 

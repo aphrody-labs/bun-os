@@ -182,11 +182,6 @@
 	url = https://github.com/aphrody-labs/bash.git
 	shallow = true
 
-[submodule "vendor/bevy"]
-	path = vendor/bevy
-	url = https://github.com/aphrody-labs/bevy.git
-	shallow = true
-
 [submodule "vendor/chwd"]
 	path = vendor/chwd
 	url = https://github.com/aphrody-labs/chwd.git

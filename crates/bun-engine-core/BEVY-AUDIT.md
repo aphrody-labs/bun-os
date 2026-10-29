@@ -1,6 +1,6 @@
 # Bevy 0.20 audit for Bun Engine
 
-Scope: what the absorbed Bevy 0.20 (`crates/bevy*`, wgpu 30) offers that `crates/bun-engine-core`
+Scope: what Bevy 0.20 (crates.io `bevy` 0.20.1, wgpu 30) offers that `crates/bun-engine-core`
 does not use yet. Each claim cites the Bevy source. Ratings are value / effort / risk
 (H high, M medium, L low) against Bun Engine's needs: a console-grade home and quick menu, display
 filters that work on native and web, controller handling and CI captures.
@@ -13,7 +13,7 @@ filters that work on native and web, controller handling and CI captures.
 mouse, plus `bevy_audio` and `bevy_gilrs`/`gamepad`. Not enabled: `bevy_state`, `bevy_input_focus`,
 `bevy_picking`, `bevy_ui_widgets`, `bevy_dev_tools`, `bevy_remote`, `bevy_post_process`,
 `bevy_animation`, `file_watcher`, `asset_processor`, `bevy_clipboard`, `bevy_settings`. The
-`default` profile of `crates/bevy/Cargo.toml` (`2d`, `3d`, `ui`, `audio`) pulls most of these; the
+`default` profile of the `bevy` crate manifest (`2d`, `3d`, `ui`, `audio`) pulls most of these; the
 engine opts out of all of them, so every item below is a deliberate opt-in.
 
 ## Findings
@@ -54,7 +54,7 @@ engine opts out of all of them, so every item below is a deliberate opt-in.
 
 ## Caveats
 
-- Everything above was read in `crates/bevy*`; only items 1 and 2 were compiled.
+- Everything above was read in the published `bevy` 0.20 sources; only items 1 and 2 were compiled.
 - The filter shader is validated by wgpu/naga when the pipeline is first built, i.e. at runtime
   on a machine with a GPU adapter.
 

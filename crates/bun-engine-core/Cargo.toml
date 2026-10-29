@@ -112,7 +112,7 @@ cartridge = ["aphrody-dust-core/nds-complete", "dep:serde_json"]
 aphrody-dust-core = { workspace = true }
 serde = { workspace = true, features = ["std", "derive"] }
 aphrody-nds-sdk = { path = "../aphrody-nds-sdk", version = "1.4.7", default-features = false, optional = true }
-# Bevy 0.20 (wgpu 30, absorbed in crates/bevy*), re-exported as `bun_engine::bevy`. The key must
+# Bevy 0.20 (wgpu 30, crates.io bevy 0.20.1), re-exported as `bun_engine::bevy`. The key must
 # stay `bevy`: Bevy's derive macros resolve `bevy::ecs` through the dependency named `bevy`.
 bevy = { workspace = true, optional = true }
 rdynarmic = { path = "../rdynarmic", version = "0.1.0", optional = true }

@@ -23,10 +23,9 @@
       "submodules": []
     },
     "rust-workspace": {
-      "description": "Cargo workspace members and the path dependencies they reference (crates, vendored crates, pdfcraft, bun-tauri, cubeb-rs).",
+      "description": "Cargo workspace members and the path dependencies they reference (crates, pdfcraft, bun-tauri, cubeb-rs).",
       "paths": [
         "crates",
-        "vendor/cargo",
         "tools",
         "apps",
         "packages/bun-tauri",
@@ -67,8 +66,8 @@
       "includeOptional": true
     },
     "vendor-minimal": {
-      "description": "Only the vendored cargo crates and the shallow sources the runtime build links.",
-      "paths": ["vendor/cargo", "crates"],
+      "description": "Only the first-party crates; registry crates come from Cargo.lock.",
+      "paths": ["crates"],
       "submodules": []
     },
     "all": {
@@ -94,7 +93,6 @@
         "py",
         "replica",
         "tools",
-        "vendor/cargo",
         "vendor/microsoft",
         "vendor/tailwindcss",
         "vendor/uutils"

@@ -1,5 +1,11 @@
 # Product Cargo source vendor
 
+`vendor/cargo` is **not committed**. It used to hold 543 crates.io sources (674 MB) but never fed a build:
+`.cargo/config.toml` has no `[source]` replacement, CI and `release.yml` build with `--locked` against the registry,
+and the snapshot covered 543 of the 2805 registry packages in `Cargo.lock` (and `cc-1.8.0` lacked its `src/target/*`
+files). Builds resolve from `Cargo.lock`. The directory is gitignored; the commands below regenerate it
+with `cargo vendor` when an offline or audited snapshot is wanted.
+
 `scripts/vendor-cargo.ts` owns the root Cargo source snapshot. It uses the
 existing native admission wrapper, root nightly and shared process deadlines.
 It does not create another workspace, modify root manifests/lockfiles, compile

@@ -71,3 +71,6 @@ twitch_secrets.toml
 .vs/
 *.user
 Thumbs.db
+
+# Regenerated on demand by `bun scripts/vendor-cargo.ts prepare` (cargo vendor); never committed
+/vendor/cargo/

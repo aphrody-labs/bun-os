@@ -214,6 +214,7 @@ server-verify binary:
 crate-inventory:
     bun scripts/crate-inventory.ts
 
+# `vendor/cargo` is not committed: `vendor-prepare` regenerates it with `cargo vendor` (docs/vendor/README.md).
 [group('plans')]
 vendor-plan:
     bun scripts/vendor-cargo.ts plan
