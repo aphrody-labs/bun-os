@@ -1,5 +1,10 @@
 # Bun OS workspace
 
+## Branches — 2026-10-29
+
+- main is the default and only integration branch. os is a fast-forward mirror kept by .github/workflows/sync-os-mirror.yml; do not push to it.
+- Push with a normal git push origin HEAD:main, never forced. Synchronisation of the workstation, GitHub and the VPS: [docs/SYNC.md](docs/SYNC.md); VPS build and recovery: [docs/VPS-BUILD.md](docs/VPS-BUILD.md).
+
 ## Owner workflow update — 2026-10-18
 
 - No new Git worktrees. Consolidate existing branches and worktrees into the

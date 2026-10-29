@@ -7,7 +7,7 @@ on:
         description: Mainline version
         default: "7.3"
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - factory/wsl/kernel/**
       - .github/workflows/wsl-kernel.yml

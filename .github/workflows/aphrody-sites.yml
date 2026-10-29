@@ -2,7 +2,7 @@ name: Aphrody Sites
 
 on:
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - apps/webos/**
       - apps/craft*/**

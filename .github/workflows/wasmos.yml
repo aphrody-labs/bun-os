@@ -3,7 +3,7 @@ name: WASM OS
 on:
   workflow_dispatch:
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - packages/wasmos/**
       - factory/wasmos/**

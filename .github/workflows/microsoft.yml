@@ -5,7 +5,7 @@ name: microsoft
 on:
   workflow_dispatch:
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - packages/fluent/**
       - packages/microsoft/**

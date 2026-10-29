@@ -3,7 +3,7 @@ name: Media core
 on:
   workflow_dispatch:
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - crates/media-core/**
       - crates/lightcraft-raster/**

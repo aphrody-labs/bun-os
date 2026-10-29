@@ -3,7 +3,7 @@ name: Alpine (Bun OS line)
 on:
   workflow_dispatch:
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - factory/alpine/**
       - packages/bunos-run/**

@@ -13,7 +13,7 @@ on:
         type: boolean
         default: false
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - packages/buncc/src/linux-target/**
       - packages/buncc/test/linux-target.test.ts

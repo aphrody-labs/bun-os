@@ -94,7 +94,7 @@ cone because git rejects them. Commands: `doctor`, `setup`, `profile <name|list>
 * New `plan` job: `git diff <base>...HEAD` classified by path (`git-affected.ts`: js, rust, docs, distro, all). The `rust` job runs only
   when Rust paths or global files (`.github`, `turbo.json`, `.gitmodules`, toolchain) change; an unknown base runs everything.
 * Caches: `.git/modules` (key from `.gitmodules` + `sources.lock.json`), plus the existing Bun and Cargo caches.
-* Package-level selection: `bun run affected` = `turbo run typecheck lint --affected` (the script sets `TURBO_SCM_BASE=origin/os`: turbo's default base is `main`, which does not exist on origin; CI should `git fetch origin os` first). Remote cache needs
+* Package-level selection: `bun run affected` = `turbo run typecheck lint --affected` (the script sets `TURBO_SCM_BASE=origin/main`: turbo's default base is `main`, which does not exist on origin; CI should `git fetch origin os` first). Remote cache needs
   `TURBO_TOKEN` and `TURBO_TEAM` in the environment (not set; local cache only until the owner provides them).
 
 ## 6. Measurements (this workstation, before and after)

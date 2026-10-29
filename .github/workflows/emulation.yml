@@ -20,7 +20,7 @@ on:
       - docs/emulation-results.json
       - .github/workflows/emulation.yml
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - crates/bun-engine-core/**
       - scripts/emulation/**

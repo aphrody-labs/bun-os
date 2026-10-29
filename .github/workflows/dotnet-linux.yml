@@ -11,7 +11,7 @@ on:
         type: boolean
         default: false
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - factory/dotnet-linux/**
       - packages/buncc/src/dotnet-linux/**

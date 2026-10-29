@@ -69,7 +69,7 @@ becomes an optional module, plugin or package of this workspace. Preserve import
 only to first-party material.
 
 Finish by qualifying the integrated setup and workspace, committing precise
-owned paths on branch `os`, and pushing after verifying remote ancestry.
+owned paths on branch `main` (`os` is a fast-forward mirror of `main`), and pushing after verifying remote ancestry.
 
 ## Target crate and infrastructure contract
 

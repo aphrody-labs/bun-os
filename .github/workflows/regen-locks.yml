@@ -1,0 +1,82 @@
+name: Regenerate locks and generated docs
+
+# Cargo.lock, bun.lock, factory/bunos/components.json pins and docs/ARCHITECTURE-MAP.md are derived files. Merges of long-lived
+# branches leave them stale; this job rebuilds them on a runner (the workstation and the VPS never regenerate them) and commits the
+# result to main as aphrody-dev. A normal push only, never a force push. Pushes made with GITHUB_TOKEN do not start new runs, so
+# this cannot loop; the path filter below also excludes the generated files themselves.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "Cargo.toml"
+      - "**/Cargo.toml"
+      - "package.json"
+      - "**/package.json"
+      - "rust-toolchain.toml"
+      - ".gitmodules"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: regen-locks
+  cancel-in-progress: false
+
+jobs:
+  regen:
+    name: Regenerate lockfiles and generated docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          filter: blob:none
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+          sparse-checkout: |
+            .github
+            packages/bun-workspace
+            packages/buncc
+      - name: System libraries for cargo metadata (build scripts are not run)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends pkg-config libssl-dev
+      - id: setup
+        uses: ./.github/actions/setup-workspace
+        with:
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+          profile: ci
+          rust: "true"
+      - name: Expand the cone to the generators' inputs
+        run: git sparse-checkout add factory docs infra
+      - name: Cargo.lock (resolve new members, then pin only the workspace)
+        run: |
+          rustc --version
+          cargo metadata --format-version 1 > /dev/null
+          cargo update --workspace
+      - name: bun.lock
+        run: bun install --lockfile-only --ignore-scripts
+      - name: Component pins (reads Cargo.lock) and architecture map
+        run: |
+          bun factory/bunos/generate-components.ts
+          bun factory/bunos/generate-map.ts
+      - name: Commit the regenerated files to main
+        run: |
+          git config user.name aphrody-dev
+          git config user.email contact@aphrody.com
+          git add Cargo.lock bun.lock factory/bunos/components.json docs/ARCHITECTURE-MAP.md docs/BUNCC.md
+          if git diff --cached --quiet; then
+            echo "Lockfiles and generated docs are up to date."
+            exit 0
+          fi
+          git commit -m "chore: regenerate Cargo.lock, bun.lock, component pins and architecture map"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "::error::could not push the regenerated files to main"
+          exit 1

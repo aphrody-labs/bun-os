@@ -10,7 +10,7 @@ on:
         description: Package profile on top of base (base, cosmic, hyprland)
         default: base
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - factory/wsl/**
       - .github/workflows/wsl-rootfs.yml

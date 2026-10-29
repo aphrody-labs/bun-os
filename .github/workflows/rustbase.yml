@@ -8,7 +8,7 @@ on:
         type: boolean
         default: true
   push:
-    branches: [os]
+    branches: [main, os]
     paths:
       - factory/rustbase/**
       - docs/RUSTBASE.md

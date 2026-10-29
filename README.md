@@ -10,7 +10,7 @@
 [Architecture](docs/architecture.md) ·
 [Plan](PLAN.md)
 
-[![CI](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml/badge.svg?branch=os)](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml)
+[![CI](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml)
 [![Bun](https://img.shields.io/badge/bun-1.4.4--canary.20261028.1-black?logo=bun)](https://www.npmjs.com/package/bun/v/1.4.4-canary.20261028.1)
 [![Rust](https://img.shields.io/badge/rust-nightly-orange?logo=rust)](rust-toolchain.toml)
 [![License](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue)](LICENSE)

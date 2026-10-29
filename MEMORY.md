@@ -6,7 +6,7 @@ rolling status narrative.
 
 ## Ownership
 
-- `bun-distribution`, branch `os`, is the canonical Bun OS distribution
+- `bun-distribution`, branch `main` (`os` mirrors it), is the canonical Bun OS distribution
   workspace. It owns product assembly, workspace configuration, factory,
   packaging and release coordination.
 - The runtime is unmodified upstream Bun, npm `bun@1.4.4-canary.20261028.1` (gitHead
