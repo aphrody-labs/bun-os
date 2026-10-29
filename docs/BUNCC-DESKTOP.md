@@ -58,3 +58,56 @@ Ninja graph.
 
 Targets: `x86_64-pc-windows-msvc` (default), `aarch64-pc-windows-msvc`, `x86_64-pc-windows-gnullvm`,
 `aarch64-pc-windows-gnullvm` (llvm-mingw). Linux targets belong to the Linux-target agent's lane and are not handled.
+
+## Measured (2026-10-29, this workstation: Windows 11, 24 logical CPUs, MSVC 19.51, Meson 1.12.1, CMake 4.4.4)
+
+Baseline: official MSYS2 `clang64` prebuilt packages (`mingw64` has no gtk4; its Qt6 targets libstdc++), downloaded
+into a fresh directory, SHA256 verified, hello apps compiled with llvm-mingw 20261020 (gtk4 4.24.1, glib 2.90.1,
+qt6 6.12.0). Same upstream versions as the buncc pins. buncc side: `x86_64-pc-windows-msvc`, `cl`, release,
+one shared prefix. Single runs for builds, medians of 10 runs (after one warm-up) for startup; every startup
+figure includes the app's own 1 s self-quit timer.
+
+| Metric | MSYS2 clang64 | buncc desktop | Verdict |
+| --- | --- | --- | --- |
+| Time to a usable GTK4 dev prefix | 57 s for the 89-package closure shared with Qt (download 29 s + extract 28 s, 180 MB) | 156 s setup (wrap downloads) + 711 s build = 867 s from source (`--mode mono`, whole GTK4 stack incl. cairo, pango, harfbuzz, gdk-pixbuf, graphene, epoxy, accesskit Rust crates; sccache cold; another process was running during part of it) | MSYS2 is about 15x faster to first build: it ships binaries. Not an improvement |
+| Time to Qt6 Widgets dev prefix | included above | 461 s (qtbase configure + build) | MSYS2 faster |
+| Qt Quick (qtshadertools + qtdeclarative) | included above | 68 s + 979 s | MSYS2 faster |
+| KDE: ECM + qttools + KCoreAddons 6.31.0 | not packaged in MSYS2 clang64 for this test | 48 s (qttools) + 20 s (kcoreaddons) + 4 s hello; `hello-kcoreaddons` prints `KCoreAddons 6.31.0` | Works; no baseline |
+| Incremental rebuild of the hello app (touch main, rebuild) | 0.8 to 1.0 s (gtk), 1.9 to 3.0 s (qt) via a shell script | 2.9 s (gtk, meson/ninja), 1.0 s (qt, ninja, incl. cmake re-run check) | Different tools, one-file apps: no conclusion |
+| Disk footprint, GTK4 | 780 MB installed (82 packages) | 90.9 MiB, 1911 files (shared prefix right after GTK4 + hello) | Smaller, but not equal content: buncc builds only what GTK4 needs (no gstreamer, cups, introspection, docs, locales, jpeg/tiff) |
+| Disk footprint, Qt6 base + Quick | 869 MB installed (40 packages) | qtbase + hello: about 108 MiB; with shadertools + qttools + qtdeclarative the whole shared prefix (GTK4 + Qt6 + Quick + KF6 base) is 499.6 MiB, 9270 files | Smaller; same caveat on features (qtbase built without sql, dbus, testlib, printsupport) |
+| Runtime pack (GTK4 + Qt6 + KDE base, no headers or import libs) | n/a | `desktop pack --runtime`: 60.3 MiB zip | informational |
+| hello GTK4 startup to exit | 2.79 / 3.70 / 6.90 s (min / median / max), 59 DLLs, 45.1 MB | 2.75 / 3.13 / 4.72 s, 39 DLLs | Within noise of each other; not proven faster |
+| hello Qt Widgets startup | 1.27 / 1.32 / 1.46 s | 1.23 / 1.24 / 1.34 s | About 5 percent lower median; not proven (one machine, interleaved with other load) |
+| hello QML startup | 1.44 / 1.72 / 5.66 s | 1.66 / 1.72 / 1.76 s | Equal median |
+
+What can be said: with these options buncc produces smaller prefixes (disk), the same startup within noise, and
+it builds MSVC-ABI binaries that MSYS2 does not offer. What cannot be said: that it is faster to first build
+(it is not) or that incremental rebuilds are better. "More optimized than MSYS2" is therefore **not proven** for
+build time; it is shown only for disk footprint with a reduced feature set. A warm sccache rebuild and the clang-cl
+variant were not measured.
+
+Findings that changed the code:
+- Qt picks up GLib's pcre2 header from a shared prefix when `system_pcre2` is auto: the qtbase recipe forces every
+  `FEATURE_system_*` OFF. A shared prefix needs this care for every CMake consumer.
+- Disabling `FEATURE_network` breaks `windeployqt`; ECM's `ecm_process_po_files_as_qm` needs `Qt6LinguistTools`, so
+  `qttools` is a dependency of every KDE Framework.
+- `gui_app: true` in meson needs a `WinMain`; the hello app is a console-subsystem exe that still opens a window.
+
+## Where each piece ran
+
+| Piece | Local (this machine) | CI only | Not verified |
+| --- | --- | --- | --- |
+| `desktop doctor/plan/fetch/env/pack/bench` | yes | | |
+| GLib (MSVC) | yes (41 s alone, wraps libffi, pcre2, zlib, proxy-libintl) | | |
+| GTK4 full stack in one Ninja DAG (`--mode mono`) + hello-gtk4 | yes | | |
+| GTK4 graph mode (package by package into the prefix) | glib only | workflow `buncc-desktop.yml` | pango, cairo, harfbuzz, gdk-pixbuf, graphene, epoxy, gtk4 in graph mode were not run; recipe options for them are untested |
+| libadwaita 1.10.0 | | | not built anywhere (needs sassc/appstream wraps; `status` is a recipe only) |
+| Qt 6.12.0 qtbase, qtshadertools, qttools, qtdeclarative, hello-qt, hello-qml | yes (MSVC) | | clang-cl (`--cc clang-cl`, unsupported by Qt) not run; Qt LTS 6.8.3 not built |
+| ECM, KCoreAddons 6.31.0, hello-kcoreaddons | yes | | KI18n: recipe and gettext zip pinned, not built |
+| Plasma workspace, Kate (Gear) | | | plan-only; Linux-centric, not buildable here |
+| glib for `x86_64-pc-windows-gnullvm` (llvm-mingw cross) | yes (90 s) | | executables not run (cross) |
+| glib for `aarch64-pc-windows-gnullvm` | yes (68 s) | | not run (no ARM64 host) |
+| glib for `aarch64-pc-windows-msvc` | failed: `iphlpapi` not found, ARM64 MSVC libraries are not installed | | needs VC.Tools.ARM64 or an xwin splat |
+| Cross GTK4/Qt (needs host tools for glib-compile-resources, moc, rcc via `QT_HOST_PATH`) | | | not wired |
+| Linux targets | | | out of scope (Linux-target lane) |

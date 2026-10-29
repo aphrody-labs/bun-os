@@ -317,12 +317,17 @@
         "-DFEATURE_sql=OFF",
         "-DFEATURE_dbus=OFF",
         "-DFEATURE_testlib=OFF",
-        "-DFEATURE_network=OFF",
         "-DFEATURE_printsupport=OFF",
-        "-DFEATURE_concurrent=OFF",
-        "-DFEATURE_xml=OFF"
+        "-DFEATURE_system_pcre2=OFF",
+        "-DFEATURE_system_zlib=OFF",
+        "-DFEATURE_system_freetype=OFF",
+        "-DFEATURE_system_harfbuzz=OFF",
+        "-DFEATURE_system_png=OFF",
+        "-DFEATURE_system_jpeg=OFF",
+        "-DFEATURE_system_doubleconversion=OFF",
+        "-DFEATURE_system_sqlite=OFF"
       ],
-      "note": "qtbase vendors zlib/harfbuzz/freetype/pcre2/libpng; no external dependencies"
+      "note": "qtbase vendors zlib/harfbuzz/freetype/pcre2/libpng; system_* features are forced OFF so GLib/GTK headers in the shared prefix are never picked up"
     },
     {
       "id": "qtshadertools",
@@ -338,6 +343,35 @@
       },
       "deps": ["qtbase"],
       "options": ["-DQT_BUILD_EXAMPLES=OFF", "-DQT_BUILD_TESTS=OFF"]
+    },
+    {
+      "id": "qttools",
+      "group": "qt6",
+      "build": "cmake",
+      "repo": "https://github.com/qt/qttools",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.12.0",
+        "sha": "613a6fbf0a7998010ab2fda260b64066d66a021d"
+      },
+      "deps": ["qtbase"],
+      "options": [
+        "-DQT_BUILD_EXAMPLES=OFF",
+        "-DQT_BUILD_TESTS=OFF",
+        "-DFEATURE_assistant=OFF",
+        "-DFEATURE_designer=OFF",
+        "-DFEATURE_qdoc=OFF",
+        "-DFEATURE_pixeltool=OFF",
+        "-DFEATURE_qtdiag=OFF",
+        "-DFEATURE_qtplugininfo=OFF",
+        "-DFEATURE_distancefieldgenerator=OFF",
+        "-DFEATURE_kmap2qmap=OFF",
+        "-DFEATURE_qtattributionsscanner=OFF",
+        "-DFEATURE_linguist=ON"
+      ],
+      "note": "LinguistTools (lrelease/lupdate) is what ECMPoQmTools needs"
     },
     {
       "id": "qtdeclarative",
@@ -393,7 +427,7 @@
         "tag": "v6.31.0",
         "sha": "911a815687a14389895df3e658235de2450bc294"
       },
-      "deps": ["ecm", "qtbase"],
+      "deps": ["ecm", "qtbase", "qttools"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -414,7 +448,7 @@
         "tag": "v6.31.0",
         "sha": "df98b98f001721f83ebf3e36b73e346f6d29670a"
       },
-      "deps": ["ecm", "qtbase"],
+      "deps": ["ecm", "qtbase", "qttools"],
       "options": ["-DBUILD_TESTING=OFF", "-DBUILD_QCH=OFF", "-DBUILD_PYTHON_BINDINGS=OFF"],
       "needsTools": ["gettext"],
       "note": "needs msgfmt/xgettext (mlocati gettext-iconv-windows) and Qt6 Qml/Core5Compat only when QML is on"
@@ -431,7 +465,7 @@
         "tag": "v6.8.2",
         "sha": "30beb0095873364c6b34ebcfd292ecafd4db7f61"
       },
-      "deps": ["ecm", "qtbase", "kcoreaddons", "ki18n"],
+      "deps": ["ecm", "qtbase", "qttools", "kcoreaddons", "ki18n"],
       "options": ["-DBUILD_TESTING=OFF"],
       "status": "plan-only",
       "note": "Linux-centric (KWin, Wayland, systemd); only libs that ship Windows support are buildable. Verified only as a plan node."
@@ -448,7 +482,7 @@
         "tag": "v26.08.2",
         "sha": "2b6465a886b9d3bfc6eab25065c14ffe025e6ac3"
       },
-      "deps": ["ecm", "qtbase", "kcoreaddons", "ki18n"],
+      "deps": ["ecm", "qtbase", "qttools", "kcoreaddons", "ki18n"],
       "options": ["-DBUILD_TESTING=OFF"],
       "status": "plan-only",
       "note": "KDE Gear app; example for `build app:kate`. KDE ships Windows builds of it through Craft, so the dependency closure is known to exist."
@@ -489,8 +523,8 @@
   "groups": {
     "gtk4": ["glib", "fribidi", "harfbuzz", "cairo", "pango", "gdk-pixbuf", "graphene", "libepoxy", "gtk4"],
     "libadwaita": ["gtk4", "libadwaita"],
-    "qt6": ["qtbase", "qtshadertools", "qtdeclarative"],
-    "kf6": ["qtbase", "ecm", "kcoreaddons", "ki18n"],
+    "qt6": ["qtbase", "qtshadertools", "qttools", "qtdeclarative"],
+    "kf6": ["qtbase", "qttools", "ecm", "kcoreaddons", "ki18n"],
     "plasma-libs": ["kf6", "plasma-workspace"],
     "samples": ["hello-gtk4", "hello-qt", "hello-qml", "hello-kcoreaddons"]
   }

@@ -37,6 +37,7 @@ export function pinFor(r: Recipe, lts: boolean) {
   return (lts && r.lts) || r.pin;
 }
 
+const fwd = (p: string) => p.split("\\").join("/");
 const log = (message: string) => console.log(`desktop: ${message}`);
 
 async function sh(argv: string[], env: Record<string, string | undefined>, cwd?: string): Promise<void> {
@@ -275,7 +276,7 @@ export async function buildPackage(
     throw new Error(`${r.id}: plan-only recipe (${r.note ?? "not buildable on Windows yet"})`);
   const hash = optionHash(r, opts, pin);
   const stamp = stampPath(prefix, r.id);
-  if (existsSync(stamp)) {
+  if (!r.local && existsSync(stamp)) {
     const old = JSON.parse(readFileSync(stamp, "utf8")) as Stamp;
     if (old.hash === hash) return { id: r.id, skipped: true, seconds: 0 };
   }
@@ -308,12 +309,12 @@ export async function buildPackage(
         "-G",
         "Ninja",
         "-S",
-        src,
+        fwd(src),
         "-B",
-        bdir,
+        fwd(bdir),
         "-DCMAKE_BUILD_TYPE=Release",
-        `-DCMAKE_INSTALL_PREFIX=${prefix}`,
-        `-DCMAKE_PREFIX_PATH=${prefix}`,
+        `-DCMAKE_INSTALL_PREFIX=${fwd(prefix)}`,
+        `-DCMAKE_PREFIX_PATH=${fwd(prefix)}`,
         ...r.options,
       ];
       if (opts.sccache && Bun.which("sccache"))
@@ -322,13 +323,13 @@ export async function buildPackage(
         args.push("-DCMAKE_POLICY_DEFAULT_CMP0141=NEW", "-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded");
       if (opts.cc === "clang-cl" && target.kind === "msvc")
         args.push("-DCMAKE_C_COMPILER=clang-cl", "-DCMAKE_CXX_COMPILER=clang-cl");
-      if (cross.cmake) args.push(`-DCMAKE_TOOLCHAIN_FILE=${cross.cmake}`);
+      if (cross.cmake) args.push(`-DCMAKE_TOOLCHAIN_FILE=${fwd(cross.cmake)}`);
       if (r.group === "kf6" || r.group === "plasma-libs" || r.group === "apps") {
-        const ecm = join(prefix, "share", "ECM", "cmake");
+        const ecm = fwd(join(prefix, "share", "ECM", "cmake"));
         args.push(`-DCMAKE_MODULE_PATH=${ecm}`, `-DECM_DIR=${ecm}`);
       }
       if (!["qtbase"].includes(r.id) && existsSync(join(prefix, "lib", "cmake", "Qt6")))
-        args.push(`-DQt6_DIR=${join(prefix, "lib", "cmake", "Qt6")}`);
+        args.push(`-DQt6_DIR=${fwd(join(prefix, "lib", "cmake", "Qt6"))}`);
       await sh(["cmake", ...args], env);
     }
     await sh(["cmake", "--build", bdir, "--parallel", String(opts.jobs)], env);
