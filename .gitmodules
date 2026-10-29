@@ -1285,3 +1285,6 @@
 	branch = main
 	shallow = true
 	update = none
+[submodule "vendor/waydroid"]
+	path = vendor/waydroid
+	url = https://github.com/aphrody-labs/waydroid.git

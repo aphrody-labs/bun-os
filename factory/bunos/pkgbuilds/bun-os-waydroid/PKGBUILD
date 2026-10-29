@@ -1,0 +1,42 @@
+# Bun OS control plane for Waydroid: the `bun-waydroid` CLI (OTA verify, binder planning, host doctor) and the
+# browser gateway with its <android-screen> component. The Android container itself is the `waydroid` package of
+# Arch [extra] (GPL-3.0-or-later, vendored in this repository as vendor/waydroid); it is not repackaged here.
+pkgname=bun-os-waydroid
+pkgver=0.1.0
+pkgrel=1
+_commit=0000000000000000000000000000000000000000
+pkgdesc='Bun OS control plane and web gateway for Waydroid (Android container)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/bun-os'
+license=('GPL-3.0-or-later')
+depends=('glibc' 'gcc-libs' 'waydroid' 'lxc' 'android-tools' 'bun-canary')
+optdepends=('weston: headless Wayland compositor for a Waydroid session without a desktop'
+            'linux-zen: kernel built with binder support (or use binder_linux-dkms)')
+makedepends=('git' 'rustup')
+options=('!lto' '!debug')
+source=("bun-os::git+https://github.com/aphrody-labs/bun-os.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  cd bun-os
+  bash scripts/aphrody/build/rust/cargo-serial.sh build --release --locked -p bun-waydroid --bin bun-waydroid
+}
+
+check() {
+  cd bun-os
+  bash scripts/aphrody/build/rust/cargo-serial.sh test --release --locked -p bun-waydroid
+}
+
+package() {
+  cd bun-os
+  install -Dm755 target/release/bun-waydroid "$pkgdir/usr/bin/bun-waydroid"
+  install -dm755 "$pkgdir/usr/lib/aphrody/waydroid"
+  cp -a packages/waydroid/src packages/waydroid/package.json "$pkgdir/usr/lib/aphrody/waydroid/"
+  install -Dm755 /dev/stdin "$pkgdir/usr/bin/bun-waydroid-gateway" <<'WRAP'
+#!/bin/sh
+exec bun /usr/lib/aphrody/waydroid/src/cli.ts "$@"
+WRAP
+  install -Dm644 factory/wsl/kernel/wsl-android.config "$pkgdir/usr/share/aphrody/waydroid/kernel-android.config"
+  install -Dm644 crates/bun-waydroid/LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 docs/android/PROVENANCE.md "$pkgdir/usr/share/licenses/$pkgname/PROVENANCE.md"
+}
