@@ -27,21 +27,37 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
-      - name: Require production credential
-        run: test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Set the CLOUDFLARE_API_TOKEN repository secret."; exit 1; }
+      - name: Check the production credential
+        id: credential
+        # The deploy needs the CLOUDFLARE_API_TOKEN repository secret. Without it (forks, a fresh repository) the
+        # job reports a notice and skips the build instead of failing every push; workflow_dispatch fails loudly.
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          elif [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            echo "::error::Set the CLOUDFLARE_API_TOKEN repository secret."; exit 1
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CLOUDFLARE_API_TOKEN is not set: skipping the Cloudflare deploy."
+          fi
       - uses: actions/checkout@v4
+        if: steps.credential.outputs.present == 'true'
       - name: Skip the distribution-only kernel, LLVM and Wine forks
+        if: steps.credential.outputs.present == 'true'
         run: |
           for path in vendor/cachyos-linux vendor/ogc-linux vendor/linux-cachyos vendor/kernel-patches vendor/ogc-kernel-packages vendor/nvidia-kernels vendor/open-gpu-kernel-modules vendor/llvm vendor/proton vendor/proton-cachyos vendor/wine-cachyos; do
             git config "submodule.$path.update" none
           done
       - uses: ./.github/actions/setup-workspace
+        if: steps.credential.outputs.present == 'true'
         with:
           token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
           rust: "true"
       - name: Compile the complete installable Craft suite
+        if: steps.credential.outputs.present == 'true'
         run: |
           rustup target add wasm32-unknown-unknown
           bun apps/webos/build-craft.ts
       - name: Build, deploy and verify all unified Worker hosts
+        if: steps.credential.outputs.present == 'true'
         run: bun apps/webos/deploy.ts
