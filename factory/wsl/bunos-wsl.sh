@@ -63,5 +63,5 @@ install -Dm644 /opt/bunos/factory/wsl/wsl-distribution.conf /etc/wsl-distributio
 install -Dm644 /opt/bunos/factory/wsl/bunos.ico /usr/lib/wsl/bunos.ico
 usermod -p '!' root
 usermod -p '!' bun
-rm -f /etc/resolv.conf
+# /etc/resolv.conf is bind-mounted by arch-chroot; build-rootfs.sh removes it after the chroot exits.
 rm -rf /var/cache/pacman/pkg/* /etc/pacman.d/gnupg/S.* 2>/dev/null || true
