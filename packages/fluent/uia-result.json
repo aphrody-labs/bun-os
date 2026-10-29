@@ -1,0 +1,17 @@
+{
+  "pid": 78884,
+  "title": "Bun OS Fluent",
+  "printWindow": true,
+  "width": 1000,
+  "height": 640,
+  "controls": {
+    "AppTitleBar": "ControlType.TitleBar",
+    "MainNav": "ControlType.Custom",
+    "NavHome": "ControlType.ListItem",
+    "NavApps": "ControlType.ListItem",
+    "InfoBar": "ControlType.StatusBar",
+    "PageTitle": "ControlType.Text",
+    "DialogButton": "ControlType.Button",
+    "ContentDialogText": "found"
+  }
+}

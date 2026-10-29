@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bun OS Fluent shell</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>body{margin:0;font-family:"Segoe UI Variable","Segoe UI",system-ui,sans-serif;background:var(--colorNeutralBackground2);color:var(--colorNeutralForeground1)}
+  nav{display:flex;gap:8px;padding:8px 16px;background:var(--colorNeutralBackground1)}main{padding:24px}</style>
+  <link rel="stylesheet" href="./fluent2.css">
+</head>
+<body>
+  <nav aria-label="Bun OS"><fluent-text weight="semibold">Bun OS</fluent-text><fluent-button appearance="subtle" id="open">Open dialog</fluent-button></nav>
+  <fluent-divider></fluent-divider>
+  <main><fluent-text size="600" weight="semibold" id="title">Fluent 2 on the wasm desktop</fluent-text></main>
+  <fluent-dialog id="dlg" modal><fluent-dialog-body><span slot="title">Bun OS</span>@fluentui/web-components dialog<fluent-button slot="action" appearance="primary" onclick="this.closest('fluent-dialog').hide()">Close</fluent-button></fluent-dialog-body></fluent-dialog>
+  <script type="module" src="./shell.js"></script>
+</body>
+</html>
