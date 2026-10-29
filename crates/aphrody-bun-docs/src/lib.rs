@@ -917,10 +917,9 @@ impl SystemSubsystem for BunDocsSubsystem {
     fn skills(&self) -> Vec<SkillManifest> {
         vec![SkillManifest {
             name: "bun_docs_lookup".into(),
-            description:
-                "Answer a Bun question from oven-sh/bun docs: ranked pages plus the \
+            description: "Answer a Bun question from oven-sh/bun docs: ranked pages plus the \
                           best page's Markdown."
-                    .into(),
+                .into(),
             parameters: vec!["query".into()],
             steps: vec![SkillStep {
                 tool: "bun_docs_search".into(),
