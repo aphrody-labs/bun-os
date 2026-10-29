@@ -13,7 +13,12 @@ if (cmd === "build-compositor") {
   const opts = dash < 0 ? rest : rest.slice(0, dash);
   const guest = dash < 0 ? ["uname", "-a"] : rest.slice(dash + 1);
   const arg = (k: string, d: string) => (opts.includes(k) ? opts[opts.indexOf(k) + 1]! : d);
-  const r = await boot({ wasm: opts[0]!, args: guest, timeoutMs: Number(arg("--timeout", "600")) * 1000, logPath: arg("--log", "serial.log") });
+  const r = await boot({
+    wasm: opts[0]!,
+    args: guest,
+    timeoutMs: Number(arg("--timeout", "600")) * 1000,
+    logPath: arg("--log", "serial.log"),
+  });
   console.log(JSON.stringify({ exitCode: r.exitCode, ms: r.ms, timedOut: r.timedOut, bytes: r.output.length }));
   process.exit(r.timedOut ? 124 : r.exitCode);
 } else {

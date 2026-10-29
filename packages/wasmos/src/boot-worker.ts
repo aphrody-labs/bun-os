@@ -16,7 +16,8 @@ const wasi = new WASI({
 const module = new WebAssembly.Module(readFileSync(wasmPath));
 // Bun's node:wasi has no sock_accept (verified on 1.4.4); the image imports it for optional networking. ENOSYS = 52.
 const imp: Record<string, unknown> = { ...wasi.wasiImport };
-for (const i of WebAssembly.Module.imports(module)) if (i.kind === "function" && typeof imp[i.name] !== "function") imp[i.name] = () => 52;
+for (const i of WebAssembly.Module.imports(module))
+  if (i.kind === "function" && typeof imp[i.name] !== "function") imp[i.name] = () => 52;
 let memory: WebAssembly.Memory;
 imp.poll_oneoff = makePollOneoff(() => memory);
 const instance = new WebAssembly.Instance(module, { wasi_snapshot_preview1: imp });

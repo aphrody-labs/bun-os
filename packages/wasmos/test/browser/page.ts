@@ -1,7 +1,9 @@
 import { Client, Compositor } from "../../src/compositor.ts";
 
 declare global {
-  interface Window { __result: unknown }
+  interface Window {
+    __result: unknown;
+  }
 }
 const out: Record<string, unknown> = {};
 try {
@@ -23,7 +25,7 @@ try {
   if (!adapter) out.webgpu = { available: false };
   else {
     const dev = await adapter.requestDevice();
-    const tex = dev.createTexture({ size: [640, 400], format: "rgba8unorm", usage: 0x01 | 0x02 | 0x04 | 0x10 }); // COPY_SRC|COPY_DST|TEXTURE_BINDING|... 
+    const tex = dev.createTexture({ size: [640, 400], format: "rgba8unorm", usage: 0x01 | 0x02 | 0x04 | 0x10 }); // COPY_SRC|COPY_DST|TEXTURE_BINDING|...
     dev.queue.writeTexture({ texture: tex }, fb, { bytesPerRow: 640 * 4 }, [640, 400]);
     const buf = dev.createBuffer({ size: 640 * 4 * 400, usage: 0x01 | 0x08 }); // MAP_READ|COPY_DST
     const enc = dev.createCommandEncoder();
@@ -32,7 +34,11 @@ try {
     await buf.mapAsync(1);
     const back = new Uint8Array(buf.getMappedRange());
     let same = true;
-    for (let i = 0; i < back.length; i++) if (back[i] !== fb[i]) { same = false; break; }
+    for (let i = 0; i < back.length; i++)
+      if (back[i] !== fb[i]) {
+        same = false;
+        break;
+      }
     out.webgpu = { available: true, info: adapter.info?.description ?? adapter.info?.vendor ?? "", identical: same };
   }
 } catch (e) {

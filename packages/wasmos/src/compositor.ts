@@ -40,7 +40,8 @@ export class Compositor {
 
   /** Send raw wire bytes, return the number of messages the compositor handled. */
   send(bytes: Uint8Array): number {
-    if (bytes.length > this.x.in_cap()) throw new Error(`message batch of ${bytes.length} bytes exceeds ${this.x.in_cap()}`);
+    if (bytes.length > this.x.in_cap())
+      throw new Error(`message batch of ${bytes.length} bytes exceeds ${this.x.in_cap()}`);
     new Uint8Array(this.x.memory.buffer, this.x.in_ptr(), bytes.length).set(bytes);
     return this.x.feed(bytes.length);
   }
@@ -52,7 +53,7 @@ export class Compositor {
     this.x.out_clear();
     const dv = new DataView(raw.buffer);
     const out: WireEvent[] = [];
-    for (let p = 0; p + 8 <= n; ) {
+    for (let p = 0; p + 8 <= n;) {
       const id = dv.getUint32(p, true);
       const w = dv.getUint32(p + 4, true);
       const size = w >>> 16;
@@ -120,7 +121,10 @@ export class Msg {
 export const concat = (parts: Uint8Array[]): Uint8Array => {
   const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
   let o = 0;
-  for (const p of parts) (out.set(p, o), (o += p.length));
+  for (const p of parts) {
+    out.set(p, o);
+    o += p.length;
+  }
   return out;
 };
 
@@ -164,13 +168,22 @@ export class Client {
       new Msg(top, 2).str(title),
     );
     const configure = this.c.events();
-    const serial = new DataView(configure.find(e => e.id === xdg && e.op === 0)!.args.buffer.slice(0)).getUint32(0, true);
+    const serial = new DataView(configure.find(e => e.id === xdg && e.op === 0)!.args.buffer.slice(0)).getUint32(
+      0,
+      true,
+    );
     const size = w * h * 4;
     this.send(new Msg(g.shm, 0).u32(pool).u32(size));
     const mem = this.c.pool(pool, size);
     new Uint32Array(mem.buffer, mem.byteOffset, w * h).fill(argb >>> 0);
     this.send(
-      new Msg(pool, 0).u32(buffer).u32(0).u32(w).u32(h).u32(w * 4).u32(1), // XRGB8888
+      new Msg(pool, 0)
+        .u32(buffer)
+        .u32(0)
+        .u32(w)
+        .u32(h)
+        .u32(w * 4)
+        .u32(1), // XRGB8888
       new Msg(xdg, 4).u32(serial),
       new Msg(surface, 1).u32(buffer).u32(0).u32(0),
       new Msg(surface, 3).u32(frame),

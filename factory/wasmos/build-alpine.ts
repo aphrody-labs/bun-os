@@ -39,4 +39,11 @@ const t0 = performance.now();
 await sh(args);
 const bytes = Bun.file(join(out, pins.artifact)).size;
 const digest = new Bun.CryptoHasher("sha256").update(await Bun.file(join(out, pins.artifact)).bytes()).digest("hex");
-console.log(JSON.stringify({ artifact: pins.artifact, bytes, sha256: digest, buildSeconds: Math.round((performance.now() - t0) / 1000) }));
+console.log(
+  JSON.stringify({
+    artifact: pins.artifact,
+    bytes,
+    sha256: digest,
+    buildSeconds: Math.round((performance.now() - t0) / 1000),
+  }),
+);

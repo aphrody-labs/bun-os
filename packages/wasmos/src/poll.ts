@@ -3,7 +3,8 @@
 // emulator then calls a blocking read(0) that never returns on an idle stdin. This one never reports stdin as ready,
 // honours clock subscriptions (relative or absolute) and sleeps with Atomics.wait instead of spinning.
 const sleepBuf = new Int32Array(new SharedArrayBuffer(4));
-const nowNs = (clock: number) => (clock === 0 ? BigInt(Date.now()) * 1_000_000n : BigInt(Math.round(performance.now() * 1e6)));
+const nowNs = (clock: number) =>
+  clock === 0 ? BigInt(Date.now()) * 1_000_000n : BigInt(Math.round(performance.now() * 1e6));
 
 export function makePollOneoff(getMemory: () => WebAssembly.Memory) {
   return (inPtr: number, outPtr: number, n: number, neventsPtr: number): number => {

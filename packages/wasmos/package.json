@@ -5,7 +5,9 @@
   "license": "Apache-2.0",
   "type": "module",
   "private": true,
-  "bin": { "wasmos": "./src/cli.ts" },
+  "bin": {
+    "wasmos": "./src/cli.ts"
+  },
   "scripts": {
     "build:compositor": "bun src/cli.ts build-compositor",
     "test": "bun test"
