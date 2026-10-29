@@ -69,7 +69,7 @@ jobs:
         shell: pwsh
         run: |
           $sw = [Diagnostics.Stopwatch]::StartNew()
-          bun packages/buncc/src/cli.ts linux sysroot --roots libadwaita,gtk4,glib2-devel --arch x86_64 --dir $env:RUNNER_TEMP/ld --run
+          bun packages/buncc/src/cli.ts linux sysroot --roots "libadwaita,gtk4,glib2-devel" --arch x86_64 --dir $env:RUNNER_TEMP/ld --run
           "sysroot seconds: $($sw.Elapsed.TotalSeconds)" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
       - name: Cross-compile smoke programs with clang and lld
         shell: pwsh
