@@ -1,7 +1,7 @@
 ## Default Permission
 
 No features are enabled by default, as we believe
-the clipboard can be inherently dangerous and it is
+the clipboard can be inherently dangerous and it is 
 application specific if read and/or write access is needed.
 
 Clipboard interaction needs to be explicitly enabled.
@@ -13,6 +13,7 @@ Clipboard interaction needs to be explicitly enabled.
 <th>Identifier</th>
 <th>Description</th>
 </tr>
+
 
 <tr>
 <td>
@@ -140,6 +141,32 @@ Enables the write_image command without any pre-configured scope.
 <td>
 
 Denies the write_image command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`clipboard-manager:allow-write-secret`
+
+</td>
+<td>
+
+Enables the write_secret command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`clipboard-manager:deny-write-secret`
+
+</td>
+<td>
+
+Denies the write_secret command without any pre-configured scope.
 
 </td>
 </tr>

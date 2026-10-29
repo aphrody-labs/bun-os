@@ -11,11 +11,15 @@ if ("__TAURI__" in window) {
           (this.rawJson = e.rawJson));
       }
       async download(e, t) {
-        s(t);
-        const d = new n.Channel();
-        e && (d.onmessage = e);
-        const o = await n.invoke("plugin:updater|download", { onEvent: d, rid: this.rid, ...t });
-        this.downloadedBytes = new n.Resource(o);
+        const s = new n.Channel();
+        e && (s.onmessage = e);
+        const a = await n.invoke("plugin:updater|download", {
+          onEvent: s,
+          rid: this.rid,
+          ...t,
+          headers: d(t?.headers),
+        });
+        (await this.downloadedBytes?.close().catch(() => {}), (this.downloadedBytes = new n.Resource(a)));
       }
       async install(e) {
         if (!this.downloadedBytes) throw new Error("Update.install called before Update.download");
@@ -23,24 +27,27 @@ if ("__TAURI__" in window) {
           (this.downloadedBytes = void 0));
       }
       async downloadAndInstall(e, t) {
-        s(t);
-        const d = new n.Channel();
-        (e && (d.onmessage = e),
-          await n.invoke("plugin:updater|download_and_install", { onEvent: d, rid: this.rid, ...t }));
+        const s = new n.Channel();
+        (e && (s.onmessage = e),
+          await n.invoke("plugin:updater|download_and_install", {
+            onEvent: s,
+            rid: this.rid,
+            ...t,
+            headers: d(t?.headers),
+          }));
       }
       async close() {
         (await this.downloadedBytes?.close(), await super.close());
       }
     }
-    function s(e) {
-      e?.headers && (e.headers = Array.from(new Headers(e.headers).entries()));
+    function d(e) {
+      return e ? Array.from(new Headers(e).entries()) : void 0;
     }
     return (
       (e.Update = t),
       (e.check = async function (e) {
-        s(e);
-        const d = await n.invoke("plugin:updater|check", { ...e });
-        return d ? new t(d) : null;
+        const s = await n.invoke("plugin:updater|check", { ...e, headers: d(e?.headers) });
+        return s ? new t(s) : null;
       }),
       e
     );

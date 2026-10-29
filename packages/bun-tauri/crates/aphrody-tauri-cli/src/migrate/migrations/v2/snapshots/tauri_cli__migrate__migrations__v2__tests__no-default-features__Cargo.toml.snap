@@ -9,11 +9,10 @@ version = "0.1.0"
 edition = "2021"
 
 [build-dependencies.tauri-build]
-version = "1.4.4"
-package = "aphrody-tauri-build"
+version = "[version]"
 
 [dependencies.tauri]
-version = "1.4.4"
+version = "[version]"
 default-features = false
 features = [
   "compression",
@@ -21,5 +20,4 @@ features = [
 package = "aphrody-tauri"
 
 [dependencies]
-tauri-runtime-cef = { package = "aphrody-tauri-runtime-cef", version = "1.4.4", default-features = false, features = ["unstable"] }
-tauri-runtime-wry = "2.0.0"
+tauri-runtime-wry = { version = "[version]", features = ["x11", "unstable"] }

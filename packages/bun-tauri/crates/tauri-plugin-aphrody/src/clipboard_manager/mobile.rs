@@ -126,6 +126,22 @@ impl<R: Runtime> Clipboard<R> {
         ))
     }
 
+    /// Writes plain text to the system clipboard, marked as sensitive.
+    ///
+    /// On Android the clip is flagged with `ClipDescription.EXTRA_IS_SENSITIVE`, which hides it
+    /// from the clipboard preview. On iOS the text is written as local only, so it is not
+    /// synced to other devices through Universal Clipboard.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::clipboard_manager::Error::PluginInvoke`] if the underlying mobile plugin call fails.
+    pub fn write_secret<'a, T: Into<Cow<'a, str>>>(&self, text: T) -> crate::clipboard_manager::Result<()> {
+        let text = text.into().to_string();
+        self.0
+            .run_mobile_plugin("writeSecret", WriteSecretArgs { text })
+            .map_err(Into::into)
+    }
+
     /// Clears the system clipboard.
     ///
     /// On Android this only works on SDK 28 and above; on older versions the clipboard is
@@ -143,6 +159,11 @@ impl<R: Runtime> Clipboard<R> {
 #[serde(rename_all = "camelCase")]
 enum ClipKind {
     PlainText { label: Option<String>, text: String },
+}
+
+#[derive(Debug, Serialize)]
+struct WriteSecretArgs {
+    text: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

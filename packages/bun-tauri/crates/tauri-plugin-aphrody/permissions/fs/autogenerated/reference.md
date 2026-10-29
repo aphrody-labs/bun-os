@@ -40,6 +40,7 @@ of the Tauri application by default.
 <th>Description</th>
 </tr>
 
+
 <tr>
 <td>
 
@@ -3599,6 +3600,7 @@ Denies the write_file command without any pre-configured scope.
 
 This permissions allows to create the application specific directories.
 
+
 </td>
 </tr>
 
@@ -3680,6 +3682,7 @@ This enables all read related commands without any pre-configured accessible pat
 This permission allows recursive read functionality on the application
 specific base directories.
 
+
 </td>
 </tr>
 
@@ -3742,12 +3745,17 @@ An empty permission you can use to modify the global scope.
     "fs:allow-read",
     {
       "identifier": "fs:scope",
-      "allow": ["$APPDATA/documents/**/*"],
-      "deny": ["$APPDATA/documents/secret.txt"]
+      "allow": [
+        "$APPDATA/documents/**/*"
+      ],
+      "deny": [
+        "$APPDATA/documents/secret.txt"
+      ]
     }
   ]
 }
 ```
+
 
 </td>
 </tr>

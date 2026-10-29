@@ -1,10 +1,11 @@
 {
   "name": "@aphrody/tauri",
   "version": "1.4.7",
-  "description": "Tauri API, every plugin guest binding of tauri-plugin-aphrody, and the Bun runtime bridge",
+  "description": "Tauri API, every plugin guest binding of tauri-plugin-aphrody, and a Bun sidecar bridge for apps run by unmodified upstream Bun",
   "license": "Apache-2.0 OR MIT",
   "files": [
     "js",
+    "bin",
     "crates/tauri-plugin-aphrody/iife",
     "README.md",
     "LICENSE-*"
@@ -17,13 +18,30 @@
     "./plugins/*": "./js/plugins/*.ts",
     "./bun": "./js/bun.ts",
     "./server": "./js/server.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./sidecar": "./js/sidecar.ts"
   },
   "scripts": {
     "check": "bun ../../scripts/cargo.ts exec -- check --locked -p tauri-plugin-aphrody --tests",
-    "test": "bun ../../scripts/cargo.ts exec -- test --locked -p tauri-plugin-aphrody"
+    "test": "bun ../../scripts/cargo.ts exec -- test --locked -p tauri-plugin-aphrody",
+    "typecheck": "tsc --noEmit -p ."
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": ">=1.4.4"
+  },
+  "bin": {
+    "bun-tauri-sidecar": "./bin/sidecar.ts"
+  },
+  "peerDependencies": {
+    "@tauri-apps/cli": "3.0.0-alpha.5"
+  },
+  "peerDependenciesMeta": {
+    "@tauri-apps/cli": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.4",
+    "typescript": "^6.0.3"
   }
 }

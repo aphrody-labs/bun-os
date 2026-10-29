@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-//! Every Tauri plugin of the aphrody fork in one crate, plus Bun as a first-class runtime.
+//! Every Tauri 3 plugin in one crate, plus upstream Bun as a first-class backend runtime.
 //!
 //! Each module stays its own runtime plugin (`plugin:fs|read_file`, `fs:allow-read-file`, …) and is
 //! gated by the Cargo feature of the same name. The `aphrody` plugin itself ([`bun`]) runs a Bun

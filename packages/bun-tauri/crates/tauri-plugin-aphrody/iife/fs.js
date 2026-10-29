@@ -68,7 +68,7 @@ if ("__TAURI__" in window) {
     async function c(e, n, i) {
       if (e instanceof URL && "file:" !== e.protocol) throw new TypeError("Must be a file URL.");
       if (n instanceof ReadableStream) {
-        const t = await a(e, { read: !1, create: !0, write: !0, ...i }),
+        const t = await a(e, { read: !1, create: !0, write: !0, ...i, truncate: !i?.append }),
           o = n.getReader();
         try {
           for (;;) {

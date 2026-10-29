@@ -40,11 +40,14 @@ fn manifests() -> BTreeMap<String, Manifest> {
             .join(format!("bundle-{name}-permission-files"));
         let paths: Vec<PathBuf> =
             serde_json::from_str(&std::fs::read_to_string(&list).unwrap()).unwrap();
+        // entries inside the out dir are listed relative to the list file
+        let dir = list.parent().unwrap();
         let files = paths
             .iter()
             .filter(|p| p.extension().is_some_and(|e| e == "toml"))
             .map(|p| {
-                toml::from_str::<PermissionFile>(&std::fs::read_to_string(p).unwrap()).unwrap()
+                toml::from_str::<PermissionFile>(&std::fs::read_to_string(dir.join(p)).unwrap())
+                    .unwrap()
             })
             .collect();
         acl.insert(name.to_string(), Manifest::new(files, None));

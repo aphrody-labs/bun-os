@@ -17,6 +17,9 @@ mod mobile;
 mod commands;
 mod error;
 
+#[cfg(desktop)]
+mod secret;
+
 pub use error::{Error, Result};
 
 #[cfg(desktop)]
@@ -45,7 +48,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::read_image,
             commands::write_image,
             commands::write_html,
-            commands::clear
+            commands::clear,
+            commands::write_secret,
         ])
         .setup(|app, api| {
             #[cfg(mobile)]
