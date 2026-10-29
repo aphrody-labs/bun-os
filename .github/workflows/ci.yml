@@ -38,6 +38,11 @@ jobs:
       - name: Workspace manifests
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun scripts/workspace-manifests.ts
+      - name: Buncc unit tests and toolchain report
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: |
+          bun test packages/buncc
+          bun packages/buncc/src/cli.ts doctor || true
       - name: Component manifest
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun factory/bunos/generate-components.ts --check && bun factory/bunos/check-components.ts
@@ -68,15 +73,15 @@ jobs:
         run: bun scripts/cargo-fmt.ts
       - name: Check every workspace member
         if: ${{ !cancelled() && steps.setup.outcome == 'success' && runner.os == 'Linux' }}
-        run: bun scripts/cargo.ts check
+        run: bun packages/buncc/src/cli.ts check
       # ruzu is a GTK 4 frontend: glib/gdk4 need pkg-config and the GTK 4 development files, which Windows runners lack.
       - name: Check every workspace member except the GTK 4 frontend
         if: ${{ !cancelled() && steps.setup.outcome == 'success' && runner.os == 'Windows' }}
-        run: bun scripts/cargo.ts exec -- check --locked --workspace --exclude ruzu
+        run: bun packages/buncc/src/cli.ts exec -- check --locked --workspace --exclude ruzu
       # Deny-by-default lints only: the imported bevy forks do not pass -D warnings yet (non-ASCII test identifiers, unused deps).
       - name: Clippy
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
-        run: bun scripts/cargo.ts exec -- clippy --workspace --all-targets --locked ${{ runner.os == 'Windows' && '--exclude ruzu' || '' }}
+        run: bun packages/buncc/src/cli.ts exec -- clippy --workspace --all-targets --locked ${{ runner.os == 'Windows' && '--exclude ruzu' || '' }}
 
   release-plan:
     name: Release plan

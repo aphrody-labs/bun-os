@@ -610,6 +610,7 @@
       },
       "dependencies": {
         "@aphrody/a2a": "workspace:*",
+        "@aphrody/buncc": "workspace:*",
         "@aphrody/os": "workspace:*",
         "@aphrody/paths": "workspace:*",
         "@aphrody/runtime-sdk": "workspace:*",
@@ -620,6 +621,13 @@
       },
       "devDependencies": {
         "@aphrody/yolo-cli": "workspace:*",
+      },
+    },
+    "packages/buncc": {
+      "name": "@aphrody/buncc",
+      "version": "1.4.7",
+      "bin": {
+        "buncc": "./src/cli.ts",
       },
     },
     "packages/canvas": {
@@ -2459,6 +2467,8 @@
     "@aphrody/bun-webview-page": ["@aphrody/bun-webview-page@0.1.1-aphrody.2", "", {}, "sha512-LIiyIcAJeeDR7LUnR9btkNwWrPTCpKrkdKTJmf22dn0rCdfpKVKe7JGekeO7+iozH7tyy/8LXKEEFoWXx6utuQ=="],
 
     "@aphrody/bun-workspace": ["@aphrody/bun-workspace@workspace:packages/bun-workspace"],
+
+    "@aphrody/buncc": ["@aphrody/buncc@workspace:packages/buncc"],
 
     "@aphrody/canvas": ["@aphrody/canvas@workspace:packages/canvas"],
 

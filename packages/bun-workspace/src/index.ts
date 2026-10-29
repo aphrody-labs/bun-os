@@ -1,3 +1,4 @@
+import { runCargo } from "@aphrody/buncc/cargo";
 import { availableParallelism } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import {
@@ -894,22 +895,22 @@ export async function runNative(config: Config, argv: string[], options: NativeE
   return (await runNativeResult(config, argv, options)).code;
 }
 
-/** Resolve Bun's existing native MSVC owner, with an explicit checkout override. */
+/** Run Cargo through buncc: MSVC environment, stale-path sanitising, sccache bypass, build slot and target-directory lock. */
 async function serializedCargo(
-  config: Config,
+  _config: Config,
   args: string[],
   cwd: string,
   root: string,
   timeoutMs: number,
   captureStdout = false,
-  runtimePolicy: RuntimePolicy = "release",
+  _runtimePolicy: RuntimePolicy = "release",
 ): Promise<CommandResult> {
-  const cargo = Bun.which("cargo");
-  if (!cargo) throw new Error("Native Cargo missing on this host.");
-  const argv = [cargo, ...args];
-  // Cargo locates the host MSVC toolchain itself (vswhere); upstream Bun needs no wrapper.
-  return runNativeResult(config, argv, { root, cwd, timeoutMs, runtimePolicy }, captureStdout);
+  const result = await runCargo(args, { root, cwd, timeoutMs, capture: captureStdout });
+  return { code: result.code, stdout: result.stdout, stderr: result.stderr };
 }
+
+/** buncc owns the Cargo, MSVC and driver logic; re-exported here for existing callers. */
+export { prepareEnv as prepareCargoEnvironment, runCargo } from "@aphrody/buncc/cargo";
 
 export interface CargoWorkspaceReport {
   version: string;

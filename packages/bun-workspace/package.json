@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@aphrody/a2a": "workspace:*",
+    "@aphrody/buncc": "workspace:*",
     "@aphrody/os": "workspace:*",
     "@aphrody/paths": "workspace:*",
     "@aphrody/runtime-sdk": "workspace:*",
