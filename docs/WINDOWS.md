@@ -53,9 +53,12 @@ loading the other modules. Every `dlopen` is lazy, so importing on another platf
   code is a Node-API module. Hence the layer keeps `bun:ffi` to flat read-only Win32 calls with tests and puts WinRT in the
   N-API addon. `JSCallback` thread-safe mode is experimental and `close()` must be called to free the callback. In a
   `bun compile` executable on Linux 6.7 or later, `cc()` fails with `PR_SET_MDWE` (compile the C at build time and load it
-  with `dlopen()`); this is Linux-only and does not touch the Windows modules, which never use `cc()`. A limit of 256
-  `JSCallback` objects was reported to us but is not stated anywhere in the upstream docs or sources checked, so it is not
-  documented here as a fact.
+  with `dlopen()`); this is Linux-only and does not touch the Windows modules, which never use `cc()`. Verified in upstream
+  `docs/compiler/compatibility.mdx` (lines 191-192, oven-sh/bun@11c367163a4b): a compiled executable can have only 256
+  `JSCallback`s open at a time (`RangeError: bun:ffi: a compiled executable can have 256 JSCallbacks open at a time`;
+  remedy: `close()` the unused ones, the rest of `bun:ffi` keeps working), and `cc()` on Linux 6.7 or later throws
+  `Cannot compile C code because this process can't create executable memory (PR_SET_MDWE)` (remedy: compile the C at
+  build time and load it with `dlopen()`). The layer creates no `JSCallback`.
 
 ## Build the providers
 
