@@ -83,6 +83,7 @@ export async function posixCommand(args: string[], root: string): Promise<number
         await protectedRoots(host),
         join(cacheDir(), "uninstall-backup", stamp),
         await host.isElevated(),
+        { purge: rest.includes("--purge") },
       );
       const yes = rest.includes("--yes");
       console.log(renderPlan(plan, yes));
@@ -99,7 +100,7 @@ export async function posixCommand(args: string[], root: string): Promise<number
       return 0;
     }
     default:
-      console.error("usage: buncc posix doctor | smoke | uninstall <msys2|mingw|gnuwin32|cygwin|all> [--yes]");
+      console.error("usage: buncc posix doctor | smoke | uninstall <msys2|mingw|gnuwin32|cygwin|all> [--yes] [--purge]");
       return 2;
   }
 }

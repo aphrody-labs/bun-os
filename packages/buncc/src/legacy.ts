@@ -60,6 +60,8 @@ export interface LegacyInstall {
   uninstallers: string[][];
   /** Registry key of the product each uninstaller belongs to (same index); used to verify removal. */
   uninstallerKeys: (string | undefined)[];
+  /** Scoop installs: app name, global (-g, needs admin) or per user. */
+  scoop?: { app: string; global: boolean; appDir: string };
   registryKeys: string[];
   pathEntries: { scope: "user" | "machine" | "process"; value: string }[];
   shortcuts: string[];
@@ -99,6 +101,45 @@ interface Finder {
   marker(root: string, host: LegacyHost): boolean;
 }
 
+/** winget package ids (winget-pkgs manifests, checked with gh api). Empty: no winget package exists for it. */
+export const WINGET_IDS: Record<LegacyId, string[]> = {
+  msys2: ["MSYS2.MSYS2"],
+  cygwin: ["Cygwin.Cygwin"],
+  mingw: ["BrechtSanders.WinLibs.POSIX.UCRT", "BrechtSanders.WinLibs.POSIX.MSVCRT", "BrechtSanders.WinLibs.MCF.UCRT"],
+  gnuwin32: [],
+};
+
+/** Scoop roots: per user ($env:SCOOP or %USERPROFILE%\scoop) and global ($env:SCOOP_GLOBAL or %ProgramData%\scoop). */
+export function scoopBases(env: Record<string, string | undefined>): { dir: string; global: boolean }[] {
+  const out: { dir: string; global: boolean }[] = [];
+  const add = (dir: string | undefined, global: boolean) => {
+    if (dir && !out.some(o => lower(o.dir) === lower(dir))) out.push({ dir, global });
+  };
+  add(env.SCOOP, false);
+  add(join(env.USERPROFILE ?? "", "scoop"), false);
+  add(env.SCOOP_GLOBAL, true);
+  add(join(env.ProgramData ?? "C:\\ProgramData", "scoop"), true);
+  return out;
+}
+const scoopAppRoots = (env: Record<string, string | undefined>, app: string, ...rest: string[]) =>
+  scoopBases(env).map(b => join(b.dir, "apps", app, "current", ...rest));
+
+/** Is `root` inside a Scoop apps directory? Which app, and is it a global install? */
+export function scoopInfo(
+  root: string,
+  env: Record<string, string | undefined>,
+): { app: string; global: boolean; appDir: string } | undefined {
+  for (const b of scoopBases(env)) {
+    const apps = join(b.dir, "apps");
+    if (within(apps, root) && lower(root) !== lower(apps)) {
+      const app = root.replace(/[\\/]+$/, "").slice(apps.replace(/[\\/]+$/, "").length + 1).split(/[\\/]/)[0]!;
+      return { app, global: b.global, appDir: join(apps, app) };
+    }
+  }
+  const m = /^(.*\\scoop\\apps\\([^\\]+))/i.exec(root.replace(/\//g, "\\"));
+  return m ? { app: m[2]!, global: false, appDir: m[1]! } : undefined;
+}
+
 const finders: Record<LegacyId, Finder> = {
   msys2: {
     names: /^msys2\b/i,
@@ -106,7 +147,7 @@ const finders: Record<LegacyId, Finder> = {
       env.MSYS2_ROOT ?? "",
       "C:\\msys64",
       "C:\\msys32",
-      join(env.USERPROFILE ?? "", "scoop", "apps", "msys2", "current"),
+      ...scoopAppRoots(env, "msys2"),
       join(env.ChocolateyInstall ?? "C:\\ProgramData\\chocolatey", "lib", "msys2", "tools", "msys64"),
       "C:\\tools\\msys64",
     ],
@@ -123,8 +164,8 @@ const finders: Record<LegacyId, Finder> = {
       "C:\\w64devkit",
       env.W64DEVKIT_HOME ?? "",
       env.WINLIBS_HOME ?? "",
-      join(env.USERPROFILE ?? "", "scoop", "apps", "mingw", "current"),
-      join(env.USERPROFILE ?? "", "scoop", "apps", "w64devkit", "current"),
+      ...scoopAppRoots(env, "mingw"),
+      ...scoopAppRoots(env, "w64devkit"),
       join(env.ChocolateyInstall ?? "C:\\ProgramData\\chocolatey", "lib", "mingw", "tools", "install", "mingw64"),
     ],
     marker: (r, h) =>
@@ -138,7 +179,7 @@ const finders: Record<LegacyId, Finder> = {
       join(env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)", "GnuWin32"),
       join(env.ProgramFiles ?? "C:\\Program Files", "GnuWin32"),
       "C:\\GnuWin32",
-      join(env.USERPROFILE ?? "", "scoop", "apps", "gnuwin32", "current"),
+      ...scoopAppRoots(env, "gnuwin32"),
     ],
     marker: (r, h) =>
       h.isDir(join(r, "bin")) &&
@@ -152,7 +193,7 @@ const finders: Record<LegacyId, Finder> = {
     roots: env => [
       "C:\\cygwin64",
       "C:\\cygwin",
-      join(env.USERPROFILE ?? "", "scoop", "apps", "cygwin", "current", "root"),
+      ...scoopAppRoots(env, "cygwin", "root"),
     ],
     marker: (r, h) => h.exists(join(r, "bin", "cygwin1.dll")) || h.exists(join(r, "bin", "bash.exe")),
   },
@@ -164,7 +205,7 @@ function modeOf(
   host: LegacyHost,
 ): { mode: InstallMode; uninstaller?: string[]; note?: string } {
   const r = lower(root);
-  if (r.includes("\\scoop\\apps\\")) return { mode: "scoop" };
+  if (scoopInfo(root, host.env)) return { mode: "scoop" };
   if (r.includes("\\chocolatey\\") || r.startsWith("c:\\tools\\")) return { mode: "chocolatey" };
   if (entry?.UninstallString) {
     const cmd = entry.UninstallString;
@@ -283,6 +324,7 @@ export async function detectLegacy(id: LegacyId, host: LegacyHost): Promise<Lega
       mode: m.mode,
       root,
       version: entry?.DisplayVersion,
+      scoop: m.mode === "scoop" ? scoopInfo(root, host.env) : undefined,
       uninstaller: uninstallers[0],
       uninstallers,
       uninstallerKeys,
@@ -350,11 +392,13 @@ export interface PlanStep {
   needsElevation?: boolean;
   /** How the effect is checked after the step. A step is "done" only when this holds. */
   verify?: {
-    kind: "reg-gone" | "path-gone" | "path-exists" | "path-entry-gone";
+    kind: "reg-gone" | "path-gone" | "path-exists" | "path-entry-gone" | "winget-gone";
     target: string;
     scope?: "user" | "machine";
   };
   timeoutMs?: number;
+  /** Run first; a non-zero exit means the step does not apply (e.g. the package is not installed) and it is skipped. */
+  precheck?: string[];
 }
 export interface UninstallPlan {
   installs: LegacyInstall[];
@@ -433,6 +477,7 @@ export function planUninstall(
   protectedList: string[],
   backupDir: string,
   elevated = false,
+  options: { purge?: boolean } = {},
 ): UninstallPlan {
   const warnings: string[] = [];
   const removable = installs.filter(i => {
@@ -448,27 +493,30 @@ export function planUninstall(
     command: ["buncc", "posix", "smoke", ...(gates.has("msys2") || gates.has("mingw") ? ["--mingw"] : [])],
   });
   for (const i of removable) {
-    if (i.mode === "scoop")
+    if (i.mode === "scoop") {
+      const sc = i.scoop ?? { app: basename(dirname(i.root)), global: false, appDir: i.root };
       steps.push({
         kind: "scoop",
-        title: `scoop uninstall ${i.id}`,
-        command: ["scoop", "uninstall", i.id === "mingw" ? basename(dirname(i.root)) : i.id],
+        title: `scoop uninstall ${sc.app}${sc.global ? " -g (global install)" : ""}${options.purge ? " --purge (also deletes persisted data)" : ""}`,
+        command: ["scoop", "uninstall", sc.app, ...(sc.global ? ["-g"] : []), ...(options.purge ? ["--purge"] : [])],
         install: i.id,
+        needsElevation: sc.global,
+        verify: { kind: "path-gone", target: sc.appDir },
       });
-    else if (i.mode === "winget")
-      steps.push({
-        kind: "winget",
-        title: `winget uninstall ${i.id}`,
-        command: [
-          "winget",
-          "uninstall",
-          "--name",
-          i.id === "msys2" ? "MSYS2" : i.id,
-          "--silent",
-          "--disable-interactivity",
-        ],
-        install: i.id,
-      });
+    } else if (i.mode === "winget") {
+      const ids = WINGET_IDS[i.id];
+      if (!ids.length) warnings.push(`${i.id}: no winget package id is known; the winget uninstall step was not planned`);
+      for (const id of ids)
+        steps.push({
+          kind: "winget",
+          title: `winget uninstall ${id} (only if \`winget list --id ${id}\` finds it)`,
+          precheck: ["winget", "list", "--id", id, "--exact", "--source", "winget", "--disable-interactivity", "--accept-source-agreements"],
+          command: ["winget", "uninstall", "--id", id, "--exact", "--source", "winget", "--silent", "--disable-interactivity", "--accept-source-agreements"],
+          install: i.id,
+          needsElevation: needsElevation("winget", i.root),
+          verify: { kind: "winget-gone", target: id },
+        });
+    }
     else if (i.mode === "chocolatey")
       steps.push({
         kind: "chocolatey",
@@ -658,6 +706,10 @@ async function verifyStep(step: PlanStep, host: LegacyHost): Promise<string | un
   switch (v.kind) {
     case "reg-gone":
       return (await host.regKeyExists(v.target)) ? `registry key still exists: ${v.target}` : undefined;
+    case "winget-gone": {
+      const r = await host.exec(["winget", "list", "--id", v.target, "--exact", "--source", "winget", "--disable-interactivity", "--accept-source-agreements"], { timeoutMs: 120_000 });
+      return r.code === 0 ? `winget still lists ${v.target}` : undefined;
+    }
     case "path-gone":
       return host.exists(v.target) ? `still exists: ${v.target}` : undefined;
     case "path-exists":
@@ -706,6 +758,13 @@ export async function executePlan(
         "needs elevation: run this from an elevated shell (buncc does not elevate itself); nothing was attempted",
       );
     try {
+      if (step.precheck) {
+        const found = await host.exec(step.precheck, { timeoutMs: 120_000 });
+        if (found.code !== 0) {
+          result.executed.push({ step, ok: true, detail: `skipped: not installed (${step.precheck.slice(0, 4).join(" ")} exited ${found.code})` });
+          continue;
+        }
+      }
       if (step.kind === "backup") {
         mkdirSync(plan.backupDir, { recursive: true });
         if (step.title.startsWith("save the persistent")) {

@@ -3,6 +3,9 @@ import {
   detectLegacy,
   executePlan,
   isInnoUninstaller,
+  scoopInfo,
+  WINGET_IDS,
+  type LegacyInstall,
   planUninstall,
   protectedRoots,
   renderPlan,
@@ -24,7 +27,10 @@ function fakeHost(opts: {
   machinePath?: string;
   configs?: Record<string, string>;
   elevated?: boolean;
-  silent?: ("uninstaller" | "reg-delete")[];
+  silent?: ("uninstaller" | "reg-delete" | "winget-uninstall" | "scoop")[];
+  /** winget package ids reported by `winget list`. */
+  winget?: string[];
+  env?: Record<string, string>;
   /** Effect of the uninstaller appears this long after it returned. */
   uninstallerDelayMs?: number;
   eperm?: string[];
@@ -36,6 +42,7 @@ function fakeHost(opts: {
     for (let i = 1; i < parts.length; i++) dirs.add(parts.slice(0, i).join("\\").toLowerCase());
   };
   for (const f of opts.files) addDirs(f);
+  const winget = new Set(opts.winget ?? []);
   const keys = new Set((opts.uninstall ?? []).map(e => e.key.toLowerCase()));
   const state = { user: opts.userPath ?? "", machine: opts.machinePath ?? "" };
   const log = {
@@ -45,7 +52,7 @@ function fakeHost(opts: {
   };
   const norm = (p: string) => p.toLowerCase().replace(/\\+$/, "");
   const host: LegacyHost = {
-    env: { ProgramFiles: "C:\\Program Files", USERPROFILE: "C:\\Users\\me", PATH: "C:\\msys64\\usr\\bin;C:\\Windows" },
+    env: { ProgramFiles: "C:\\Program Files", USERPROFILE: "C:\\Users\\me", PATH: "C:\\msys64\\usr\\bin;C:\\Windows", ...opts.env },
     exists: p => files.has(norm(p)) || dirs.has(norm(p)),
     isDir: p => dirs.has(norm(p)),
     list: p => {
@@ -63,7 +70,18 @@ function fakeHost(opts: {
     exec: async (argv, o) => {
       log.exec.push({ argv, timeoutMs: o?.timeoutMs });
       const [cmd] = argv;
-      if (cmd === "reg" && argv[1] === "delete") {
+      if (cmd === "winget" && argv[1] === "list") {
+        const id = argv[argv.indexOf("--id") + 1]!;
+        return { code: winget.has(id) ? 0 : 2316632084, stdout: "", stderr: "" };
+      } else if (cmd === "winget" && argv[1] === "uninstall") {
+        const id = argv[argv.indexOf("--id") + 1]!;
+        if (!opts.silent?.includes("winget-uninstall")) winget.delete(id);
+      } else if (cmd === "scoop" && argv[1] === "uninstall") {
+        if (!opts.silent?.includes("scoop")) {
+          const marker = "\\apps\\" + argv[2]!.toLowerCase();
+          for (const set of [files, dirs]) for (const x of [...set]) if (x.includes(marker + "\\") || x.endsWith(marker)) set.delete(x);
+        }
+      } else if (cmd === "reg" && argv[1] === "delete") {
         if (!opts.silent?.includes("reg-delete")) keys.delete(argv[2]!.toLowerCase());
       } else if (cmd === "robocopy") {
         addDirs(argv[2]! + "\\_");
@@ -390,5 +408,101 @@ describe("plan and execution", () => {
     expect(plan.installs).toEqual([]);
     expect(plan.warnings[0]).toContain("skipped");
     expect(plan.steps.some(s => s.kind === "delete-dir")).toBe(false);
+  });
+});
+
+const bare = (over: Partial<LegacyInstall>): LegacyInstall => ({
+  id: "msys2", mode: "portable", root: "C:\\msys64", uninstallers: [], uninstallerKeys: [], registryKeys: [], pathEntries: [], shortcuts: [], dependents: [], notes: [], ...over,
+});
+
+describe("winget uninstall (exact id, checked first)", () => {
+  test("plan: --id --exact --source winget, never --name; winget list --id runs first", () => {
+    const plan = planUninstall([bare({ mode: "winget" })], [], "C:\\b", true);
+    const step = plan.steps.find(s => s.kind === "winget")!;
+    expect(step.command).toEqual(["winget", "uninstall", "--id", "MSYS2.MSYS2", "--exact", "--source", "winget", "--silent", "--disable-interactivity", "--accept-source-agreements"]);
+    expect(step.command).not.toContain("--name");
+    expect(step.precheck!.slice(0, 5)).toEqual(["winget", "list", "--id", "MSYS2.MSYS2", "--exact"]);
+    expect(renderPlan(plan, false)).toContain("only if");
+  });
+
+  test("not installed through winget: skipped, uninstall never runs", async () => {
+    const { host, log } = fakeHost({ files: MSYS, winget: [] });
+    const plan = planUninstall([bare({ mode: "winget" })], [], "C:\\b", true);
+    plan.steps = plan.steps.filter(s => s.kind === "winget");
+    const r = await executePlan(plan, host, OK, fast);
+    expect(r.executed[0]!.ok).toBe(true);
+    expect(r.executed[0]!.detail).toContain("skipped");
+    expect(log.exec.some(c => c.argv[1] === "uninstall")).toBe(false);
+  });
+
+  test("installed: uninstall runs and is verified by winget list; a silent failure is a FAIL", async () => {
+    const good = fakeHost({ files: MSYS, winget: ["MSYS2.MSYS2"] });
+    const plan = planUninstall([bare({ mode: "winget" })], [], "C:\\b", true);
+    plan.steps = plan.steps.filter(s => s.kind === "winget");
+    expect((await executePlan(plan, good.host, OK, fast)).executed[0]!.detail).toBe("effect verified");
+    const bad = fakeHost({ files: MSYS, winget: ["MSYS2.MSYS2"], silent: ["winget-uninstall"] });
+    const r = await executePlan(plan, bad.host, OK, fast);
+    expect(r.stoppedAt).toBe(0);
+    expect(r.executed[0]!.detail).toContain("winget still lists MSYS2.MSYS2");
+  });
+
+  test("ids come from winget-pkgs; gnuwin32 has none and the plan says so", () => {
+    expect(WINGET_IDS.cygwin).toEqual(["Cygwin.Cygwin"]);
+    expect(WINGET_IDS.mingw[0]).toBe("BrechtSanders.WinLibs.POSIX.UCRT");
+    const plan = planUninstall([bare({ id: "gnuwin32", mode: "winget", root: "C:\\GnuWin32" })], [], "C:\\b", true);
+    expect(plan.steps.some(s => s.kind === "winget")).toBe(false);
+    expect(plan.warnings.join()).toContain("no winget package id");
+  });
+});
+
+describe("scoop: per user, global, SCOOP and SCOOP_GLOBAL, --purge", () => {
+  const env = { USERPROFILE: "C:\\Users\\me", ProgramData: "C:\\ProgramData", SCOOP: "D:\\sc", SCOOP_GLOBAL: "E:\\scg" };
+
+  test("scoopInfo tells user from global and finds the app", () => {
+    expect(scoopInfo("C:\\Users\\me\\scoop\\apps\\msys2\\current", env)).toMatchObject({ app: "msys2", global: false });
+    expect(scoopInfo("D:\\sc\\apps\\gnuwin32\\current", env)).toMatchObject({ app: "gnuwin32", global: false });
+    expect(scoopInfo("E:\\scg\\apps\\mingw\\current", env)).toMatchObject({ app: "mingw", global: true, appDir: "E:\\scg\\apps\\mingw" });
+    expect(scoopInfo("C:\\ProgramData\\scoop\\apps\\w64devkit\\current", { ...env, SCOOP_GLOBAL: undefined })).toMatchObject({ app: "w64devkit", global: true });
+    expect(scoopInfo("C:\\msys64", env)).toBeUndefined();
+  });
+
+  test("a global install under SCOOP_GLOBAL is detected and planned with -g, elevation, no purge by default", async () => {
+    const root = "E:\\scg\\apps\\msys2\\current";
+    const { host } = fakeHost({ files: [`${root}\\usr\\bin\\msys-2.0.dll`], env });
+    const [found] = await detectLegacy("msys2", host);
+    expect(found!.mode).toBe("scoop");
+    expect(found!.scoop).toMatchObject({ app: "msys2", global: true });
+    const plan = planUninstall([found!], [], "C:\\b", false);
+    const step = plan.steps.find(s => s.kind === "scoop")!;
+    expect(step.command).toEqual(["scoop", "uninstall", "msys2", "-g"]);
+    expect(step.needsElevation).toBe(true);
+    expect(renderPlan(plan, false)).toContain("[needs elevation]");
+  });
+
+  test("--purge is opt in; per user installs need no elevation", async () => {
+    const root = "D:\\sc\\apps\\mingw\\current";
+    const { host } = fakeHost({ files: [`${root}\\bin\\gcc.exe`], env });
+    const [found] = await detectLegacy("mingw", host);
+    expect(found!.scoop).toMatchObject({ app: "mingw", global: false });
+    const plain = planUninstall([found!], [], "C:\\b", false).steps.find(s => s.kind === "scoop")!;
+    const purged = planUninstall([found!], [], "C:\\b", false, { purge: true }).steps.find(s => s.kind === "scoop")!;
+    expect(plain.command).toEqual(["scoop", "uninstall", "mingw"]);
+    expect(purged.command).toEqual(["scoop", "uninstall", "mingw", "--purge"]);
+    expect(purged.title).toContain("persisted data");
+    expect(plain.needsElevation).toBe(false);
+  });
+
+  test("scoop step is verified on the app directory; a silent failure is a FAIL", async () => {
+    const root = "E:\\scg\\apps\\msys2\\current";
+    const mk = (silent: boolean) => fakeHost({ files: [`${root}\\usr\\bin\\msys-2.0.dll`], env, silent: silent ? ["scoop"] : [] });
+    for (const silent of [false, true]) {
+      const { host } = mk(silent);
+      const [found] = await detectLegacy("msys2", host);
+      const plan = planUninstall([found!], [], "C:\\b", true);
+      plan.steps = plan.steps.filter(s => s.kind === "scoop");
+      const r = await executePlan(plan, host, OK, fast);
+      expect(r.executed[0]!.ok).toBe(!silent);
+      if (silent) expect(r.executed[0]!.detail).toContain("still exists");
+    }
   });
 });
