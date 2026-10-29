@@ -74,3 +74,10 @@ export async function run(argv: string[], options: RunOptions = {}): Promise<Run
   if (timer) clearTimeout(timer);
   return { code: timedOut ? 124 : code, stdout, stderr, timedOut };
 }
+
+/** First line a program prints (stdout, else stderr), trimmed to `max` characters; undefined when it cannot start. */
+export async function firstLine(argv: string[], max = 100, timeoutMs = 15_000): Promise<string | undefined> {
+  const r = await run(argv, { output: "capture", timeoutMs });
+  if (r.code === 127) return undefined;
+  return ((r.stdout || r.stderr).split(/\r?\n/)[0] ?? "").trim().slice(0, max);
+}

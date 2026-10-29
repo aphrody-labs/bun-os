@@ -5,6 +5,7 @@
  * --accept-ms-license or BUNOS_C_ACCEPT_MS_LICENSE=1 (the xwin crate downloads the MSVC CRT and Windows SDK).
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
+import { firstLine, run } from "../process.ts";
 import { homedir, platform as osPlatform } from "node:os";
 import { delimiter, dirname, join, resolve } from "node:path";
 import { captureVcvars, findVisualStudio } from "../providers/msvc.ts";
@@ -222,26 +223,14 @@ export function pickRunner(t: CTarget, binary: string): { cmd?: string[]; skip?:
 }
 
 async function sh(cmd: string[], opts: { env?: Record<string, string>; timeoutMs?: number } = {}) {
-  const proc = Bun.spawn(cmd, { stdout: "pipe", stderr: "pipe", env: { ...process.env, ...opts.env } });
-  const timer = setTimeout(() => proc.kill(), opts.timeoutMs ?? 120_000);
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(proc.stdout).text(),
-    new Response(proc.stderr).text(),
-    proc.exited,
-  ]);
-  clearTimeout(timer);
-  return { stdout, stderr, code };
+  const r = await run(cmd, { env: { ...process.env, ...opts.env }, output: "capture", timeoutMs: opts.timeoutMs ?? 120_000 });
+  return { stdout: r.stdout, stderr: r.stderr, code: r.code };
 }
 
 async function version(tool: string, args = ["--version"]): Promise<string | undefined> {
   const p = which(tool, tool.includes("mingw") ? [llvmMingwBin() ?? ""] : []);
   if (!p) return undefined;
-  try {
-    const r = await sh([p, ...args], { timeoutMs: 15_000 });
-    return ((r.stdout || r.stderr).split(/\r?\n/)[0] ?? "").trim().slice(0, 100) || "present";
-  } catch {
-    return "present";
-  }
+  return (await firstLine([p, ...args])) || "present";
 }
 
 // ---- commands -----------------------------------------------------------------------------------------------------

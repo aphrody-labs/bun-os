@@ -1,7 +1,7 @@
 /** `buncc desktop doctor|plan|fetch|build|env|pack|bench`: GNOME/GTK4, Qt6 and KDE builds on Windows. See docs/BUNCC-DESKTOP.md. */
 import { existsSync, mkdirSync, readdirSync } from "node:fs";
 import { basename, delimiter, join } from "node:path";
-import { run } from "../process.ts";
+import { firstLine, run } from "../process.ts";
 import {
   buildEnv,
   buildPackage,
@@ -61,8 +61,7 @@ function options(root: string, flags: Map<string, string>): BuildOptions {
 const wanted = (pos: string[]) => pos.map(p => (p.startsWith("app:") ? p.slice(4) : p));
 
 async function version(argv: string[]): Promise<string> {
-  const r = await run(argv, { output: "capture", timeoutMs: 15_000 });
-  return (r.stdout || r.stderr).split(/\r?\n/)[0]?.slice(0, 70) ?? "";
+  return (await firstLine(argv, 70)) ?? "";
 }
 
 export async function desktopCommand(args: string[], root: string): Promise<number> {
