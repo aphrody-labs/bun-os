@@ -13,8 +13,8 @@
       "host": "vps",
       "port": 8765,
       "health": "http://127.0.0.1:8765/health",
-      "sourceRepo": "bun",
-      "workingDirectory": "/home/ubuntu/src/bun/packages/bun-video",
+      "sourceRepo": "bun-distribution",
+      "workingDirectory": "/home/ubuntu/src/bun-os/vendor/bun-video",
       "releaseRoot": "/home/ubuntu/apps/aphrody-video-editor/releases",
       "public": true,
       "publicProxy": "nginx",
@@ -134,28 +134,6 @@
       "note": "reserved hosts bot, mcp, nie and admin on aphrody.com: valid HTTPS answering 410 JSON from nginx (vhost nginx/aphrody/reserved.aphrody.com.conf) until a backend is declared; no application origin and no unit.",
       "public": true,
       "host": "vps"
-    },
-    {
-      "id": "aphrody-llama-gemma4",
-      "application": "aphrody",
-      "kind": "llama-server-openai",
-      "runtime": "native",
-      "unit": "aphrody-llama-gemma4.service",
-      "health": "http://127.0.0.1:8798/health",
-      "port": 8798,
-      "capabilities": ["chat"],
-      "sourceRepo": "aphrody",
-      "workingDirectory": "/home/ubuntu/.aphrody/runtimes/llama-b11415",
-      "model": {
-        "catalogId": "gemma-4-e2b-it-q4km",
-        "alias": "gemma4-e2b",
-        "ref": "hf:unsloth/gemma-4-E2B-it-GGUF/gemma-4-E2B-it-Q4_K_M.gguf@0314792d7f1f7e229411f620751375812bb9faf2",
-        "sha256": "740185b21d22ceb83a11c3aa62ad5842ef32c70f6096d756bbee85a1e4ec34b8"
-      },
-      "note": "Arrêté sur décision utilisateur (2026-10-09), unit et poids conservés sur le vps, jamais redémarré ; ai-lab et debate utilisent shenron-chat-v2 sur dbfr (127.0.0.1:8799).",
-      "public": false,
-      "status": "retired",
-      "retiredAt": "2026-10-09"
     },
     {
       "id": "aphrody-ai-gateway-omar",
@@ -520,20 +498,6 @@
       "host": "dbfr"
     },
     {
-      "id": "aphrody-jobs-worker-vps",
-      "application": "aphrody",
-      "kind": "rust-worker",
-      "runtime": "rust",
-      "unit": "aphrody-jobs-worker-vps.service",
-      "sourceRepo": "aphrody",
-      "workingDirectory": "/home/ubuntu/.aphrody",
-      "public": false,
-      "host": "vps",
-      "note": "Removed from the vps on 2026-10-09 (vps = build only); aphrody-jobs-worker-dbfr is the production worker.",
-      "status": "retired",
-      "retiredAt": "2026-10-09"
-    },
-    {
       "id": "aphrody-jobs-worker-dbfr",
       "application": "aphrody",
       "kind": "rust-worker",
@@ -681,9 +645,8 @@
       "releaseRoot": "/home/ubuntu/src/bun-os/install/bin",
       "public": false,
       "publicProxy": "nginx",
-      "staged": true,
-      "required": false,
-      "note": "Unified Bun OS read-only catalog API. Linux x86-64 binary compiled/executed at root1eedaa8;9 localHTTP checks pass, install SHA matches. Existing Infra lifecycle and source.aphrody.app ingress own activation. Protected bearer provisioned; candidate unit/nginx syntax pass. Automatic tool review rejected grouped unit/snippet installation and service activation before execution (blocked by policy). Staged/unrequired; no Nginx reload or deployment qualification. /api/product/v1/ preserves Gitea /api/v1/."
+      "required": true,
+      "note": "Unified Bun OS read-only catalog API. Linux x86-64 binary compiled/executed at root1eedaa8;9 localHTTP checks pass, install SHA matches. Existing Infra lifecycle and source.aphrody.app ingress own activation. Protected bearer provisioned; candidate unit/nginx syntax pass. Automatic tool review rejected grouped unit/snippet installation and service activation before execution (blocked by policy). Promoted to the active unified server (required): the one Bun server behind the product API; activation itself stays with Infra. /api/product/v1/ preserves Gitea /api/v1/."
     },
     {
       "id": "shenron-manga-publication",
