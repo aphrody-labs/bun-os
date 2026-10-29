@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# Standalone workspace (excluded from the root one, like apps/aphrody-drive): the accounts layer and
+# the cloud clients build and test without the 270 vendor submodules of the monorepo.
+[workspace]
+resolver = "3"
+members = ["aphrody-accounts", "craft-cloud"]
+
+[workspace.package]
+version = "1.4.7"
+edition = "2024"
+rust-version = "1.97"
+authors = ["aphrody-dev <contact@aphrody.com>"]
+license = "Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"

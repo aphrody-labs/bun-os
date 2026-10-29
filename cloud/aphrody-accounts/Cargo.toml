@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aphrody-accounts"
+version = "1.4.7"
+edition = "2024"
+rust-version = "1.97"
+authors = ["aphrody-dev <contact@aphrody.com>"]
+homepage = "https://aphrody.app"
+repository = "https://github.com/aphrody-labs/bun-os"
+license = "Apache-2.0"
+description = "Aphrody OS identity layer: Google OAuth 2.0 and Microsoft identity platform (Entra) sign-in with PKCE loopback and device code, scope catalogs, multiple accounts, token refresh and OS keyring storage."
+
+[features]
+default = ["os-keyring"]
+# OS credential store (Windows Credential Manager, macOS Keychain, Linux keyutils).
+os-keyring = ["dep:keyring"]
+# Adapter over aphrody-secrets (encrypted file store, env store) for headless hosts.
+secrets = ["dep:aphrody-secrets", "dep:tokio"]
+
+[dependencies]
+serde = { version = "1.0.228", features = ["derive", "std"], default-features = false }
+serde_json = "1.0.151"
+thiserror = "2.0.20"
+sha2 = "0.11.0"
+base64 = "0.23.1"
+getrandom = "0.4.3"
+url = "2.5.8"
+ureq = { version = "3", default-features = false, features = ["rustls"] }
+keyring = { version = "3.6", default-features = false, features = ["windows-native", "apple-native", "linux-native"], optional = true }
+aphrody-secrets = { path = "../../crates/aphrody-secrets", version = "1.4.7", optional = true }
+tokio = { version = "1.53.1", default-features = false, features = ["rt"], optional = true }
+
+[dev-dependencies]
+tempfile = "3.27.0"
+
+[[bin]]
+name = "aphrody-accounts"
+path = "src/bin/aphrody-accounts.rs"
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"
+non_ascii_idents = "deny"
+
+[lints.clippy]
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+correctness = { level = "warn", priority = -1 }
+perf = { level = "warn", priority = -1 }
