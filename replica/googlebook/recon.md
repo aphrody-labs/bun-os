@@ -88,3 +88,5 @@ equivalents: llama.cpp or a user-keyed hosted API, F-Droid and Flathub, Waydroid
 Screens 10, flows 7, entities 4 (inferred). Hard parts: pointer assistant, voice, phone sync, Android apps, security. Size: XL at
 parity; M for the shell slice already started (pointer shake, backend client and overlay in `apps/webos/src/assistant`).
 Next step: `/replica-architect`.
+
+Note 2026-10-29 (owner order): Google Play and the Google apps are in scope, not excluded. Use official APIs and the owner own accounts (cloud/aphrody-accounts, craft-cloud); GMS and Play Store binaries stay under Google licence.

@@ -13,7 +13,7 @@ Bun OS uses. A line is "built" only when a test proves it; everything else is a 
 | "Hey Google" voice conversation, share screen | wake word + streaming speech, screen capture through the compositor | not built |
 | AI file descriptions, search by content | Spacedrive on the web side, COSMIC Files / Nautilus / Dolphin on the desktop, content indexing with local embeddings | not built |
 | Phone sync: apps, handoff, files | KDE Connect protocol (open), Android apps through Waydroid or the Android runtime crates (`android-native`) | not built |
-| Play Store, millions of apps | Flathub and F-Droid on the distro, Waydroid for Android apps; Play Store needs Google's licence and is out of scope | not built |
+| Play Store, millions of apps | Flathub and F-Droid on the distro, Waydroid for Android apps; Play and the Google apps are in scope (owner order 2026-10-29): Google and Microsoft accounts through `cloud/aphrody-accounts`, official Play APIs, GMS only under Google licence (see docs/GOOGLE.md, planned) | not built |
 | Games: mobile and PC via streaming | `bun-engine` emulation stack, Steam/Proton (`bunos-compat`), cloud streaming clients | in progress, see `docs/EMULATION.md` |
 | Titan C security chip, fingerprint / face unlock | TPM 2.0, passkeys, `fprintd`, Howdy-style face unlock, secure boot on the Arch variant | not built |
 | Hardware: 16 GB RAM, 256 GB, 14 h battery | out of scope for the software project; tuned power profiles in `factory/distro` | not built |
@@ -25,3 +25,5 @@ Bun OS uses. A line is "built" only when a test proves it; everything else is a 
   system; the craft apps carry the Fluent / Windows 11 look.
 - Google trademarks, the Play Store and Gemini model weights are not available to us. Where Googlebook uses them, Bun OS uses open
   or user-supplied equivalents and says so.
+
+Note 2026-10-29 (owner order): Google Play and the Google apps are in scope, not excluded. Use official APIs and the owner own accounts (cloud/aphrody-accounts, craft-cloud); GMS and Play Store binaries stay under Google licence.

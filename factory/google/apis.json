@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "project": "aphrody",
+  "note": "Idempotent list of the Google APIs the OS uses. Enabling an API is free; billing applies only to calls on paid APIs (Vertex AI, Vision, Speech, Translate, Text-to-Speech, Maps). No VM, bucket or database is created by this recipe.",
+  "apis": [
+    { "name": "drive.googleapis.com", "use": "Native Drive volumes, craft-cloud open/save/share/revisions/changes" },
+    { "name": "docs.googleapis.com", "use": "wordcraft <-> Google Docs structural JSON" },
+    { "name": "sheets.googleapis.com", "use": "gridcraft <-> Sheets values, formulas, formatting" },
+    { "name": "slides.googleapis.com", "use": "deckcraft <-> Slides" },
+    { "name": "calendar-json.googleapis.com", "use": "Shell calendar" },
+    { "name": "gmail.googleapis.com", "use": "Shell mail" },
+    { "name": "people.googleapis.com", "use": "Shell contacts" },
+    { "name": "tasks.googleapis.com", "use": "Shell tasks" },
+    { "name": "photoslibrary.googleapis.com", "use": "Photos append-only upload (photoslibrary.appendonly)" },
+    { "name": "photospicker.googleapis.com", "use": "Photos Picker API (user-selected media)" },
+    { "name": "youtube.googleapis.com", "use": "filmcraft upload, channel reads" },
+    { "name": "androidpublisher.googleapis.com", "use": "Play Developer API: tracks, reviews, listings" },
+    { "name": "playintegrity.googleapis.com", "use": "Play Integrity verdicts" },
+    { "name": "storage.googleapis.com", "use": "Cloud Storage" },
+    { "name": "aiplatform.googleapis.com", "use": "Vertex AI / Gemini" },
+    { "name": "generativelanguage.googleapis.com", "use": "Gemini API (AI Studio keys)" },
+    { "name": "vision.googleapis.com", "use": "Cloud Vision" },
+    { "name": "speech.googleapis.com", "use": "Cloud Speech-to-Text" },
+    { "name": "texttospeech.googleapis.com", "use": "Cloud Text-to-Speech" },
+    { "name": "translate.googleapis.com", "use": "Cloud Translation" },
+    { "name": "maps-backend.googleapis.com", "use": "Maps JavaScript API" },
+    { "name": "secretmanager.googleapis.com", "use": "OAuth client and key references" },
+    { "name": "iamcredentials.googleapis.com", "use": "Service account impersonation (aphrody-bot)" },
+    { "name": "cloudresourcemanager.googleapis.com", "use": "Project metadata for gcloud" }
+  ]
+}
