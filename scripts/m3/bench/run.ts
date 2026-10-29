@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 // SPDX-License-Identifier: Apache-2.0
-// m3 + yolo benchmark harness: reproduces the numbers of docs/reports/PERF.md and enforces docs/reports/perf-budget.json.
+// m3 + yolo benchmark harness: reproduces the numbers of docs/material/m3/reports/PERF.md and enforces docs/material/m3/reports/perf-budget.json.
 //
 //   bun scripts/m3/bench/run.ts [--only yolo,mcp,...] [--runs N] [--repeat N] [--out snapshot.json]
-//   bun scripts/m3/bench/run.ts --check [--budget docs/reports/perf-budget.json] [--retries 2]
-//   bun scripts/m3/bench/run.ts --update-budget [--baseline docs/reports/perf-before.json]
+//   bun scripts/m3/bench/run.ts --check [--budget docs/material/m3/reports/perf-budget.json] [--retries 2]
+//   bun scripts/m3/bench/run.ts --update-budget [--baseline docs/material/m3/reports/perf-before.json]
 //   bun scripts/m3/bench/run.ts --compare before.json after.json [--md]
 //
 // Groups (all but `build` run by default; `--cold-cache` adds a registry download to `install`):
@@ -47,7 +47,7 @@ import { bundlePackage, workspacePackages } from "./workspace.ts";
 
 const REPO = resolve(dirname(import.meta.path), "../../..");
 const FIXTURES = join(import.meta.dir, "fixtures");
-const BUDGET_FILE = join(REPO, "docs/reports/perf-budget.json");
+const BUDGET_FILE = join(REPO, "docs/material/m3/reports/perf-budget.json");
 /** Per-process scratch directory, so two harness runs never clobber each other. */
 const SCRATCH = join(tmpdir(), `m3-bench-${process.pid}`);
 

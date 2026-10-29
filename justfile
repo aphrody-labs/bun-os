@@ -261,4 +261,9 @@ c-test *args:
 c-bench *args:
     bun factory/c/bench/bench.ts {{ args }}
 
+[group('everyday')]
+[doc('m3 benchmark harness: bun scripts/m3/bench/run.ts (--check enforces docs/material/m3/reports/perf-budget.json)')]
+m3-bench *args:
+    bun scripts/m3/bench/run.ts {{ args }}
+
 import 'factory/wasmos/wasmos.just'
