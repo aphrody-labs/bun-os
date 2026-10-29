@@ -1,0 +1,397 @@
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import { listen } from "@tauri-apps/api/event";
+import { loadLanguage, supportedLanguages, resolveLanguage } from "./i18n";
+import { useDistroStore } from "./store/distroStore";
+import { useMountStore } from "./store/mountStore";
+import { useSettingsStore } from "./store/settingsStore";
+import { useNotificationStore } from "./store/notificationStore";
+import { usePreflightStore } from "./store/preflightStore";
+import { useActionsStore } from "./store/actionsStore";
+import { usePolling } from "./hooks/usePolling";
+import { useReviewPrompt } from "./hooks/useReviewPrompt";
+import { Header } from "./components/Header";
+import { DistroList } from "./components/DistroList";
+import { StatusBar } from "./components/StatusBar";
+import { SettingsPage } from "./components/SettingsPage";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { NotificationBanner } from "./components/NotificationBanner";
+import { PreflightBanner } from "./components/PreflightBanner";
+import { Button } from "./components/ui/Button";
+import { DiskMountDialog } from "./components/DiskMountDialog";
+import { ConfirmDialog } from "./components/ConfirmDialog";
+import { CloseActionDialog } from "./components/CloseActionDialog";
+import { TelemetryOptInDialog } from "./components/TelemetryOptInDialog";
+import { ReviewPromptDialog } from "./components/ReviewPromptDialog";
+import { wslService } from "./services/wslService";
+import { trackAppStarted } from "./services/telemetryService";
+import { info, debug } from "./utils/logger";
+
+type AppPage = "main" | "settings";
+
+function App() {
+  const { t, i18n } = useTranslation("errors");
+  const { distributions, fetchDistros, error, errorId, isTimeoutError, clearError, forceKillWsl, actionInProgress, isLoading: distrosLoading } = useDistroStore();
+  const { showMountDialog, closeMountDialog, loadMountedDisks } = useMountStore();
+  const { settings, loadSettings, updateSetting, hasLoaded } = useSettingsStore();
+  const { notifications, removeNotification } = useNotificationStore();
+  const { checkPreflight, isReady: wslReady } = usePreflightStore();
+  const { startupActionOutput, clearStartupActionOutput } = useActionsStore();
+  const [currentPage, setCurrentPage] = useState<AppPage>("main");
+  const [showForceRestartConfirm, setShowForceRestartConfirm] = useState(false);
+  const [showCloseDialog, setShowCloseDialog] = useState(false);
+  const [showTelemetryOptIn, setShowTelemetryOptIn] = useState(false);
+  const telemetryTrackedRef = useRef(false);
+  const {
+    shouldShowPrompt: showReviewPrompt,
+    handleReview,
+    handleMaybeLater,
+    handleNoThanks,
+  } = useReviewPrompt();
+  const timeoutRef = useRef<number | null>(null);
+  const mainContentRef = useRef<HTMLElement>(null);
+
+  // Handle close action dialog
+  const handleMinimize = useCallback(() => {
+    setShowCloseDialog(false);
+    wslService.hideWindow().catch((e) => {
+      console.error("Failed to hide window:", e);
+    });
+  }, []);
+
+  const handleQuit = useCallback(() => {
+    setShowCloseDialog(false);
+    wslService.quitApp().catch((e) => {
+      console.error("Failed to quit app:", e);
+    });
+  }, []);
+
+  const handleRememberChoice = useCallback((action: "minimize" | "quit") => {
+    // Save the choice to settings
+    updateSetting("closeAction", action);
+  }, [updateSetting]);
+
+  const handleCloseDialogCancel = useCallback(() => {
+    setShowCloseDialog(false);
+  }, []);
+
+  // Telemetry opt-in handlers
+  const handleTelemetryAccept = useCallback(async () => {
+    // Must await settings save before tracking, as Rust checks telemetry_enabled from disk
+    await updateSetting("telemetryEnabled", true);
+    await updateSetting("telemetryPromptSeen", true);
+    setShowTelemetryOptIn(false);
+    // Track app started now that settings are saved
+    trackAppStarted(distributions);
+  }, [updateSetting, distributions]);
+
+  const handleTelemetryDecline = useCallback(async () => {
+    await updateSetting("telemetryEnabled", false);
+    await updateSetting("telemetryPromptSeen", true);
+    setShowTelemetryOptIn(false);
+  }, [updateSetting]);
+
+  // Load settings and run preflight check on app start (before polling starts)
+  useEffect(() => {
+    info("[App] Application starting");
+    loadSettings();
+    // Run preflight check to verify WSL is installed
+    checkPreflight();
+  }, [loadSettings, checkPreflight]);
+
+  // Show telemetry opt-in dialog if user hasn't seen it yet
+  useEffect(() => {
+    if (settings && !settings.telemetryPromptSeen) {
+      // Delay slightly so user sees the app first
+      const timer = setTimeout(() => {
+        setShowTelemetryOptIn(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [settings]);
+
+  // Sync locale from settings to i18next (only after real settings are loaded)
+  useEffect(() => {
+    if (!hasLoaded) {
+      debug("[App] Locale sync: waiting for settings to load");
+      return;
+    }
+    const locale = settings.locale || "auto";
+    const targetLang = locale === "auto"
+      ? resolveLanguage(navigator.language)
+      : locale;
+    debug(`[App] Locale sync: locale=${locale}, targetLang=${targetLang}, i18n.language=${i18n.language}, navigator.language=${navigator.language}`);
+    // Sync localStorage so i18next LanguageDetector uses the correct language
+    // on next startup before Tauri settings load asynchronously
+    localStorage.setItem("bunos-wsl-language", targetLang);
+    // Always load language resources then apply — do NOT guard on i18n.language
+    // already matching, because LanguageDetector may set i18n.language from
+    // localStorage without actually loading the lazy translation bundle.
+    loadLanguage(targetLang).then(() => i18n.changeLanguage(targetLang));
+    // Set RTL direction for Arabic
+    const langConfig = supportedLanguages.find((l) => l.code === targetLang);
+    document.documentElement.dir = langConfig && "dir" in langConfig && langConfig.dir === "rtl" ? "rtl" : "ltr";
+  }, [hasLoaded, settings?.locale, i18n]);
+
+  // Track app_started event (once per session, if telemetry enabled and distros loaded)
+  useEffect(() => {
+    if (settings?.telemetryEnabled && settings?.telemetryPromptSeen && !distrosLoading && !telemetryTrackedRef.current) {
+      telemetryTrackedRef.current = true;
+      trackAppStarted(distributions);
+    }
+  }, [settings?.telemetryEnabled, settings?.telemetryPromptSeen, distrosLoading, distributions]);
+
+  // Scroll to top when error appears so user can see the error banner
+  useEffect(() => {
+    if (error && mainContentRef.current) {
+      mainContentRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [error]);
+
+  // Scroll to top when notifications appear so user can see them
+  useEffect(() => {
+    if (notifications.length > 0 && mainContentRef.current) {
+      mainContentRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [notifications.length]);
+
+  // Initialize centralized polling (handles distros, resources, health)
+  usePolling();
+
+  useEffect(() => {
+    // Listen for state changes triggered by tray actions
+    // This triggers an immediate refresh instead of waiting for the next poll
+    debug("[App] Setting up distro-state-changed event listener");
+    const unlisten = listen<{ shutdown?: boolean } | null>("distro-state-changed", (event) => {
+      debug("[App] Received distro-state-changed event");
+      if (event.payload?.shutdown === true) {
+        useMountStore.setState({ mountedDisks: [], trackedMounts: [] });
+      }
+      // Clear any pending timeout to prevent multiple fetches
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      // Small delay to let WSL state settle after terminal opens
+      timeoutRef.current = window.setTimeout(() => {
+        fetchDistros();
+        // Refresh filesystem discovery; bare attachments need the explicit shutdown signal.
+        loadMountedDisks();
+        timeoutRef.current = null;
+      }, 1000);
+    });
+
+    return () => {
+      debug("[App] Cleaning up event listener");
+      // Clean up event listener
+      unlisten.then((fn) => fn());
+
+      // Clear any pending timeout to prevent state updates after unmount
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [fetchDistros, loadMountedDisks]);
+
+  // Listen for close-requested event from backend
+  useEffect(() => {
+    debug("[App] Setting up close-requested event listener");
+    const unlisten = listen("close-requested", () => {
+      debug("[App] Received close-requested event");
+      setShowCloseDialog(true);
+    });
+
+    return () => {
+      debug("[App] Cleaning up close-requested event listener");
+      unlisten.then((fn) => fn());
+    };
+  }, []);
+
+  if (currentPage === "settings") {
+    return (
+      <ErrorBoundary>
+        <div className="flex flex-col h-screen">
+          <SettingsPage onBack={() => setCurrentPage("main")} />
+        </div>
+        {/* Close dialog must be rendered on all pages */}
+        <CloseActionDialog
+          isOpen={showCloseDialog}
+          onMinimize={handleMinimize}
+          onQuit={handleQuit}
+          onCancel={handleCloseDialogCancel}
+          onRememberChoice={handleRememberChoice}
+        />
+        {/* Telemetry opt-in dialog */}
+        <TelemetryOptInDialog
+          isOpen={showTelemetryOptIn}
+          onAccept={handleTelemetryAccept}
+          onDecline={handleTelemetryDecline}
+        />
+        {/* Review prompt dialog */}
+        <ReviewPromptDialog
+          isOpen={showReviewPrompt}
+          onReview={handleReview}
+          onMaybeLater={handleMaybeLater}
+          onNoThanks={handleNoThanks}
+        />
+        {/* Startup action output dialog */}
+        {startupActionOutput && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/50" onClick={clearStartupActionOutput} />
+            <div className="relative bg-theme-bg-secondary border border-theme-border rounded-lg p-4 max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-theme-text-primary">{startupActionOutput.actionName} {t('common:output')}</h3>
+                <button
+                  onClick={clearStartupActionOutput}
+                  className="text-theme-text-muted hover:text-theme-text-primary"
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="font-mono text-xs bg-theme-bg-primary p-3 rounded">
+                {startupActionOutput.output && (
+                  <pre className="text-sm text-theme-text-secondary font-mono whitespace-pre-wrap">{startupActionOutput.output}</pre>
+                )}
+                {startupActionOutput.error && (
+                  <pre className="mt-2 text-sm text-theme-status-error font-mono whitespace-pre-wrap">{startupActionOutput.error}</pre>
+                )}
+                {!startupActionOutput.output && !startupActionOutput.error && (
+                  <p className="text-theme-text-muted italic">{t('common:noOutput')}</p>
+                )}
+              </div>
+              <p className="mt-2 text-xs text-theme-text-muted">
+                {t('common:ranOn', { distro: startupActionOutput.distro })}
+              </p>
+            </div>
+          </div>
+        )}
+      </ErrorBoundary>
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <div className="flex flex-col h-screen">
+        <Header onOpenSettings={() => setCurrentPage("settings")} />
+        <main ref={mainContentRef} className="flex-1 overflow-auto px-6 pb-4">
+          {/* WSL Preflight Banner - shows when WSL is not installed/configured */}
+          <PreflightBanner />
+          {/* System Error Banner */}
+          {error && wslReady && (
+            <NotificationBanner
+              type="error"
+              title={t('system.title')}
+              message={error}
+              key={errorId}
+              onDismiss={() => clearError(errorId)}
+              testId="error-banner"
+            >
+              {isTimeoutError && (
+                <div className="space-y-3">
+                  <p className="text-xs text-theme-text-muted">
+                    {t('system.timeoutTip')}
+                  </p>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => setShowForceRestartConfirm(true)}
+                    loading={actionInProgress?.includes("Force")}
+                  >
+                    {t('system.forceShutdown')}
+                  </Button>
+                </div>
+              )}
+            </NotificationBanner>
+          )}
+          {/* Notifications */}
+          {notifications.map((notification) => (
+            <NotificationBanner
+              key={notification.id}
+              type={notification.type}
+              title={notification.title}
+              message={notification.message}
+              autoDismiss={notification.autoDismiss}
+              onDismiss={() => removeNotification(notification.id)}
+            />
+          ))}
+          <DistroList />
+        </main>
+        <StatusBar />
+
+        {/* Global Dialogs */}
+        <DiskMountDialog isOpen={showMountDialog} onClose={closeMountDialog} />
+
+        <ConfirmDialog
+          isOpen={showForceRestartConfirm}
+          title={t('system.forceShutdownTitle')}
+          message={t('system.forceShutdownMessage')}
+          confirmLabel={t('system.forceShutdownConfirm')}
+          onConfirm={() => {
+            setShowForceRestartConfirm(false);
+            forceKillWsl();
+          }}
+          onCancel={() => setShowForceRestartConfirm(false)}
+          danger
+        />
+
+        <CloseActionDialog
+          isOpen={showCloseDialog}
+          onMinimize={handleMinimize}
+          onQuit={handleQuit}
+          onCancel={handleCloseDialogCancel}
+          onRememberChoice={handleRememberChoice}
+        />
+
+        {/* Telemetry opt-in dialog */}
+        <TelemetryOptInDialog
+          isOpen={showTelemetryOptIn}
+          onAccept={handleTelemetryAccept}
+          onDecline={handleTelemetryDecline}
+        />
+
+        {/* Review prompt dialog */}
+        <ReviewPromptDialog
+          isOpen={showReviewPrompt}
+          onReview={handleReview}
+          onMaybeLater={handleMaybeLater}
+          onNoThanks={handleNoThanks}
+        />
+
+        {/* Startup action output dialog */}
+        {startupActionOutput && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/50" onClick={clearStartupActionOutput} />
+            <div className="relative bg-theme-bg-secondary border border-theme-border rounded-lg p-4 max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-theme-text-primary">{startupActionOutput.actionName} {t('common:output')}</h3>
+                <button
+                  onClick={clearStartupActionOutput}
+                  className="text-theme-text-muted hover:text-theme-text-primary"
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="font-mono text-xs bg-theme-bg-primary p-3 rounded">
+                {startupActionOutput.output && (
+                  <pre className="text-sm text-theme-text-secondary font-mono whitespace-pre-wrap">{startupActionOutput.output}</pre>
+                )}
+                {startupActionOutput.error && (
+                  <pre className="mt-2 text-sm text-theme-status-error font-mono whitespace-pre-wrap">{startupActionOutput.error}</pre>
+                )}
+                {!startupActionOutput.output && !startupActionOutput.error && (
+                  <p className="text-theme-text-muted italic">{t('common:noOutput')}</p>
+                )}
+              </div>
+              <p className="mt-2 text-xs text-theme-text-muted">
+                {t('common:ranOn', { distro: startupActionOutput.distro })}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
+  );
+}
+
+export default App;

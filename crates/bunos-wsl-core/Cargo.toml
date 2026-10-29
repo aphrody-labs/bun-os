@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Derived from crates/wsl-core of octasoft-ltd/wsl-ui (GPL-3.0); see docs/wsl/PROVENANCE.md.
+[package]
+name = "bunos-wsl-core"
+description = "wsl.exe output parsing and types for the Bun OS WSL manager (fixture-tested, platform independent)."
+version.workspace = true
+edition = "2021"
+rust-version.workspace = true
+license = "GPL-3.0-only"
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde = { workspace = true, features = ["derive", "std"] }
+thiserror = { workspace = true }

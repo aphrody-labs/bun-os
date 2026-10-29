@@ -1,9 +1,11 @@
 [workspace]
 # apps/artcraft + crates/sqlite_tasks: sqlx 0.7 (libsqlite3-sys 0.27; sqlx 0.9 caps <0.38) cannot share a lock with rookie-cookies (=libsqlite3-sys 0.38.2); artcraft repeats the exact Tauri pins of [workspace.dependencies].
 # apps/aphrody-drive is the nested FSL Spacedrive workspace. Tauri apps are members: the CEF runtime (cef-dll-sys, needs CMake) is an opt-in `cef` feature, wry is the default runtime.
-exclude = ["apps/lu/src-tauri", "crates/lu-native", "apps/artcraft", "crates/sqlite_tasks", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
+exclude = ["apps/bunos-wsl/src-tauri", "apps/lu/src-tauri", "crates/lu-native", "apps/artcraft", "crates/sqlite_tasks", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
 resolver = "3"
 members = [
+  "crates/bunos-wsl",
+  "crates/bunos-wsl-core",
   "crates/aphrody",
   "crates/aphrody-agent-runtime",
   "crates/aphrody-agent-tools",
@@ -1279,6 +1281,15 @@ input_common = { path = "crates/ruzu-input-common", version = "1.4.7" }
 video_core = { path = "crates/ruzu-video-core", version = "1.4.7" }
 frontend_common = { path = "crates/ruzu-frontend-common", version = "1.4.7" }
 shader_recompiler = { path = "crates/ruzu-shader-recompiler", version = "1.4.7" }
+# bunos-wsl (GPL-3.0, derived from octasoft-ltd/wsl-ui; docs/wsl/PROVENANCE.md)
+tar = "0.4"
+ruzstd = "0.9"
+jsonc-parser = "0.34"
+configparser = "3"
+lazy_static = "1.5"
+shell-escape = "0.1"
+winreg = "0.56"
+wiremock = "0.6"
 # One Tauri line for the whole monorepo: upstream tauri-apps/tauri v3 alpha from crates.io (the aphrody-labs/tauri fork carries no patch).
 # Members consume these with `workspace = true` and only add features; bump here and nowhere else.
 tauri = { version = "=3.0.0-alpha.5", default-features = false }
