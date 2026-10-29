@@ -1,0 +1,12 @@
+[FREELOADER]
+DefaultOS=ReactOS
+TimeOut=3
+Debug=Yes
+
+[Operating Systems]
+ReactOS="ReactOS LiveCD tree on btrfs (serial debug)"
+
+[ReactOS]
+BootType=Windows2003
+SystemPath=\reactos
+Options=/DEBUG /DEBUGPORT=COM1 /BAUDRATE=115200 /SOS /FASTDETECT /MININT

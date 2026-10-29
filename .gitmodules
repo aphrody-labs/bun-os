@@ -1278,3 +1278,9 @@
 [submodule "vendor/waydroid"]
 	path = vendor/waydroid
 	url = https://github.com/aphrody-labs/waydroid.git
+[submodule "vendor/reactos"]
+	path = vendor/reactos
+	url = https://github.com/aphrody-labs/reactos.git
+	branch = master
+	shallow = true
+	update = none
