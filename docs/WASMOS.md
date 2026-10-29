@@ -29,8 +29,9 @@ Build and boot on the VPS (12 cores, `nice`, Docker 29.7.2 buildx 0.36.1), Bun `
 The 3.7 s is short because container2wasm pre-boots the kernel at build time with wizer (README, "Packaging"), so
 the module starts from a memory snapshot of an already booted guest. It is not a cold boot of Linux on Bochs.
 
-Browser boot (Chromium, `@bjorn3/browser_wasi_shim`): see the CI section for the recorded result; a boot is claimed
-only where a serial log exists.
+Browser boot (Google Chrome 155 headless on the VPS, Web Worker, `@bjorn3/browser_wasi_shim` 0.4.2 with our `poll_oneoff`): same
+serial log, `code: 0`, 3.98 s in the worker. The page must be cross-origin isolated (COOP/COEP headers) because `poll.ts` sleeps with
+`Atomics.wait` on a `SharedArrayBuffer`; the shim's own `poll_oneoff` accepts one subscription only and the emulator submits two.
 
 ## Facts from source (clones under `C:\Users\aphro\src\ref`)
 
@@ -123,7 +124,7 @@ Tests (`packages/wasmos/test`):
 | Goal                                         | Feasible now                            | Expectation                                                                                         |
 | -------------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | Alpine x86_64 console in Bun/browser         | Yes (measured)                          | ~3.7 s to a command result from the pre-booted snapshot; interpreter speed afterwards (ips 40M model) |
-| Alpine with the 105 MiB image in a browser   | Yes, size is the cost                   | 41 MB gzipped download; instantiate time in Chromium: see CI receipt                                |
+| Alpine with the 105 MiB image in a browser   | Yes, size is the cost                   | 41 MB gzipped download; 3.98 s to a command result in headless Chrome 155 (VPS)                                |
 | Linux 7.3 kernel                             | Needs our kernel build                  | Bochs path: x86_64 config in `config/bochs/linux_x86_config` rebased to 7.3; boot with real kernel init would be tens of seconds to minutes (no snapshot trick unless we rerun wizer) |
 | Graphical Alpine (X/Wayland in the guest)    | Not with c2w                            | Bochs has no display in this build; would need v86-style VGA or virtio-gpu; 32-bit only on v86     |
 | Full-wasm compositor                         | Subset done; real Wayland needs a port  | Software blit at 640x400 is trivial; 1080p software compositing in wasm is estimated at a few ms per window (not measured) |
@@ -132,7 +133,7 @@ Tests (`packages/wasmos/test`):
 
 ## Unverified
 
-- Browser (Chromium) boot of the Alpine wasm: the test is written; result in the CI receipt only.
+- GitHub Actions results of `wasmos.yml` (see the run ids in the delivery report); local numbers are from the VPS only.
 - Run time on Windows (this workstation) was not measured: the Alpine build runs on Linux only.
 - WebGPU readback of the framebuffer: no adapter in headless Chrome here.
 - Linux 7.3 release date comes from a single secondary source.

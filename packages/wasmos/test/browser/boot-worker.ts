@@ -5,7 +5,7 @@ import { makePollOneoff } from "../../src/poll.ts";
 self.onmessage = async (ev: MessageEvent<{ wasm: string; args: string[] }>) => {
   const t0 = performance.now();
   let out = "";
-  const sink = (tag: string) => ConsoleStdout.lineBuffered(line => (out += (tag ? tag : "") + line + "\n"));
+  const sink = (tag: string) => ConsoleStdout.lineBuffered(line => ((out += tag + line + "\n"), console.log("[guest]", tag + line)));
   try {
     const bytes = await (await fetch(ev.data.wasm)).arrayBuffer();
     const wasi = new WASI(["wasmos", ...ev.data.args], [], [new OpenFile(new File([])), sink(""), sink("[err] ")]);
