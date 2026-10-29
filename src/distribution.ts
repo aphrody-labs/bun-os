@@ -636,11 +636,11 @@ async function assembleArchImage(
   );
   if (
     !Array.isArray(productCommands) ||
-    !["mcp", "agent-plugin", "wasm"].every(name =>
+    !["design", "engine", "re", "rea"].every(name =>
       productCommands.some(entry => entry.group === "" && entry.name === name),
     )
   )
-    throw new Error("Image product CLI does not expose the required native capability routes");
+    throw new Error("Image product CLI does not expose the required first-party capability routes");
   const containerVerification = JSON.parse(
     await command([
       "docker",
@@ -661,7 +661,7 @@ async function assembleArchImage(
     };
   };
   const imageQualification = containerVerification.imageQualification;
-  const requiredImageGates = ["product-cli", "cli-wasm", "ffi", "agent-plugin", "mcp"];
+  const requiredImageGates = ["product-cli", "cli-wasm", "ffi"];
   if (
     containerVerification.runtime !== "verified" ||
     imageQualification?.passed !== true ||
@@ -687,8 +687,7 @@ async function assembleArchImage(
       installedModesSHA256: product.receipt.installedModesSHA256,
       commandDiscovery: productCommands.length,
       imageQualification: { passed: true, gates: imageQualification.gates },
-      scope:
-        "In-image CLI, CLI-WASM, FFI, agent-plugin and MCP surfaces; full OS product qualification remains separate",
+      scope: "In-image CLI, CLI-WASM and FFI surfaces; full OS product qualification remains separate",
     },
     packageManager: "pacman",
     rootfs: {

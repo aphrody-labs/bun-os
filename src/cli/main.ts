@@ -55,6 +55,14 @@ function registerTools(tools: ToolBin[]) {
   }
 }
 
+/** Commands of the abandoned Aphrody Bun fork. The runtime is now unmodified upstream Bun, which has none of them. */
+const REMOVED: Record<string, string> = {
+  mcp: "the fork's native MCP server; upstream Bun has no `bun mcp`.",
+  "agent-plugin": "the fork's agent plugin installer; upstream Bun has no `bun agent-plugin`.",
+  n2b: "the fork's Node.js migration tool; upstream Bun has no `bun n2b`. Use `bun check` and `bun lint`.",
+  wasm: "the fork's WebAssembly toolchain; upstream Bun has no `bun wasm`. For the portable libm3 library use `bunos build wasm`.",
+};
+
 const label = (c: Command) => `${c.group ? `${c.group} ` : ""}${c.name}`;
 const pad = (s: string, n: number) => s + " ".repeat(Math.max(1, n - s.length));
 
@@ -159,6 +167,12 @@ export async function main(argv: string[]): Promise<number> {
   }
   const group = GROUPS.find(g => g.name === first);
   if (!group) {
+    if (Object.hasOwn(REMOVED, first)) {
+      console.error(
+        `bunos ${first} was removed: ${REMOVED[first]} Upstream commands: bun check, bun lint, bun fmt, bun compile (see bun --help).`,
+      );
+      return 2;
+    }
     console.error(`Unknown command "${first}". Run bunos for the command center.`);
     return 2;
   }

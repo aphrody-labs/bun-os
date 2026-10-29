@@ -679,17 +679,17 @@ export async function planFactoryGraph(options: FactoryGraphOptions): Promise<Fa
     dependsOn: ["product:payload"],
     state: "blocked",
     reasons: [
-      "Execute CLI discovery, route-target, CLI-WASM, native FFI, all agent-plugin provider adapters and MCP protocol/resource gates on the matching Linux factory runtime. Remaining native commands and the full product retain separate qualification.",
+      "Execute CLI discovery, route-target, CLI-WASM, native FFI gates on the matching Linux factory runtime. Remaining native commands and the full product retain separate qualification.",
     ],
     requiredReceipts: [
       await receipt(
         "factory/product-qualification.ts",
-        "Passed product-cli, cli-wasm, ffi, agent-plugin and mcp gates bound to installed bytes, permissions, runtime and source revision",
+        "Passed product-cli, cli-wasm and ffi gates bound to installed bytes, permissions, runtime and source revision",
       ),
     ],
     metadata: {
       route: ["build", "product-qualify"],
-      scope: "CLI discovery, CLI-WASM, native FFI, all plugin adapters dry-run, MCP tools/resources/prompts",
+      scope: "CLI discovery, CLI-WASM, native FFI",
     },
   });
   nodes.find(node => node.id === "arch:payload")?.dependsOn.push("qualification:product-surfaces");
@@ -731,7 +731,7 @@ export async function planFactoryGraph(options: FactoryGraphOptions): Promise<Fa
       ),
       await receipt(
         "src/cli.ts image",
-        "Immutable image digest, in-rootfs CLI/WASM/FFI/plugin/MCP qualification and target/composition runtime smoke; boot/session remains separate",
+        "Immutable image digest, in-rootfs CLI/WASM/FFI qualification and target/composition runtime smoke; boot/session remains separate",
       ),
     ],
   });
