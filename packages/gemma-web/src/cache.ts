@@ -25,7 +25,7 @@ export class MemoryStorage implements PartStorage {
     this.parts.set(key, data.slice());
   }
   async remove(prefix: string) {
-    for (const k of [...this.parts.keys()]) if (k.startsWith(prefix)) this.parts.delete(k);
+    for (const k of this.parts.keys()) if (k.startsWith(prefix)) this.parts.delete(k);
   }
 }
 

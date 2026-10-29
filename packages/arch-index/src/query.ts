@@ -32,7 +32,10 @@ export function search(store: Store, pattern: string, options: SearchOptions = {
   const like = hasGlob ? globToLike(pattern) : null;
   const args: (string | number)[] = [];
   const filters: string[] = [];
-  if (options.source) (filters.push("p.source = ?"), args.push(options.source));
+  if (options.source) {
+    filters.push("p.source = ?");
+    args.push(options.source);
+  }
   if (!options.testing) filters.push("p.repo NOT LIKE '%-testing' AND p.repo NOT LIKE '%-staging'");
   let sql: string;
   const eq = (col: string) => (like ? `${col} LIKE ? ESCAPE '\\'` : `${col} = ? COLLATE NOCASE`);
@@ -385,7 +388,10 @@ export function lineDiff(a: string, b: string): string[] {
   let i = 0;
   let j = 0;
   while (i < n && j < m) {
-    if (x[i] === y[j]) (i++, j++);
+    if (x[i] === y[j]) {
+      i++;
+      j++;
+    }
     else if (lcs[i + 1]![j]! >= lcs[i]![j + 1]!) out.push(`-${x[i++]}`);
     else out.push(`+${y[j++]}`);
   }

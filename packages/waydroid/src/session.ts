@@ -102,7 +102,7 @@ export class ScrcpySession {
         const p = await readVideoPacket(q);
         if (p.kind === "session") {
           if (this.meta) this.meta = { ...this.meta, width: p.width, height: p.height };
-          for (const s of this.#sinks) this.meta && s.meta(this.meta);
+          for (const s of this.#sinks) if (this.meta) s.meta(this.meta);
           continue;
         }
         if (p.config) this.#config = p;

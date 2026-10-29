@@ -127,7 +127,7 @@ function patchCargo(path: string) {
   let t = readFileSync(path, "utf8");
   const before = t;
   for (const [k, v] of Object.entries(PKG))
-    t = t.replace(new RegExp(`^(${k})\s*\.workspace\s*=\s*true`, "gm"), `$1 = ${v}`);
+    t = t.replace(new RegExp(`^(${k})\\s*\\.workspace\\s*=\\s*true`, "gm"), `$1 = ${v}`);
   t = t.replace(/^([A-Za-z0-9_-]+)\s*\.workspace\s*=\s*true\s*$/gm, (m, name) =>
     expand.has(name) ? `${name} = { ${innerFields(upDeps.get(name)!)} }` : m,
   );
@@ -183,4 +183,4 @@ walk(dest, p => {
   if (p.endsWith("Cargo.toml")) patchCargo(p);
   else if (p.endsWith("package.json") && !p.includes(UPSTREAM_STASH) && !p.includes("/mobile/")) patchPackage(p);
 });
-console.log(`synced ${src} -> apps/spacedrive (${[...expand].length} workspace deps expanded)`);
+console.log(`synced ${src} -> apps/spacedrive (${expand.size} workspace deps expanded)`);

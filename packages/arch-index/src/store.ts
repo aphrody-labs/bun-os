@@ -293,10 +293,22 @@ export class Store {
   ): IndexEvent[] {
     const where: string[] = [];
     const args: (string | number)[] = [];
-    if (options.sinceId !== undefined) (where.push("id > ?"), args.push(options.sinceId));
-    if (options.sinceTs !== undefined) (where.push("ts >= ?"), args.push(options.sinceTs));
-    if (options.type) (where.push("type = ?"), args.push(options.type));
-    if (options.name) (where.push("name = ?"), args.push(options.name));
+    if (options.sinceId !== undefined) {
+      where.push("id > ?");
+      args.push(options.sinceId);
+    }
+    if (options.sinceTs !== undefined) {
+      where.push("ts >= ?");
+      args.push(options.sinceTs);
+    }
+    if (options.type) {
+      where.push("type = ?");
+      args.push(options.type);
+    }
+    if (options.name) {
+      where.push("name = ?");
+      args.push(options.name);
+    }
     const sql = `SELECT id, ts, type, source, repo, name, old, new, data FROM events ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY id ${options.sinceId !== undefined ? "ASC" : "DESC"} LIMIT ?`;
     const rows = this.db.query(sql).all(...args, options.limit ?? 200) as (Omit<IndexEvent, "data"> & {
       data: string | null;

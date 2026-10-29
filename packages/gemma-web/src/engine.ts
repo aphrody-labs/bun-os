@@ -94,7 +94,6 @@ export class GemmaWebEngine {
     const gen = JSON.parse(await this.#store.text("generation_config.json", file("generation_config.json")));
     for (const id of [gen.eos_token_id].flat()) this.#eos.add(id);
 
-    const t1 = performance.now();
     const base = (p: string) => p.slice(p.lastIndexOf("/") + 1);
     // Fetch and build one session at a time and drop the weight bytes right after, so the page never
     // holds more than one multi-GB buffer next to the sessions it already created.
