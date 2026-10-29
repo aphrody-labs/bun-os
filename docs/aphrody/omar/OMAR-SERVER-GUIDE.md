@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document predates the move to the unmodified upstream `bun` npm package (`1.4.4-canary.20261028.1`). The abandoned Bun fork, its fork-only commands, `bun:*` modules and `toolchains/bun` named here are history, not current instructions.
+
 # Guide d'exploitation — Omar Server
 
 Ce guide décrit la configuration locale vérifiée le 11 octobre 2026. Il ne contient aucun jeton, mot de passe, clé privée, cookie ou profil exporté.

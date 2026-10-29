@@ -57,7 +57,7 @@ bun lint
 bun fmt
 ```
 
-These quality commands (`bun n2b` was fork-only and is gone) use Bun's built-in implementations
+These quality commands (the fork-only n2b command is gone) use Bun's built-in implementations
 directly. Do not add subprocess-backed linters or formatters, `bunx`, standalone
 Oxc tools, TypeScript compiler binaries, ESLint, Prettier, or an external n2b
 backend to workspace scripts or CI.

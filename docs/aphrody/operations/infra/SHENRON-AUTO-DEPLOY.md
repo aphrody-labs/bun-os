@@ -1,9 +1,9 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-Correction du 2026-10-14 : le checkout Shenron actuel suit les archives Next dans
-`vendor/next-fork/`. Le service vérifie leurs SHA-256 contre le manifeste avant
-l'installation gelée ; il n'appelle plus le script retiré `prepare-vendor.ts`.
-Les cinq tests ciblés passent (synchronisation et intégrité des archives).
+Correction du 2026-10-29 : Shenron prend Next.js depuis le registre npm (`next`, `@next/env` et
+`@next/third-parties` épinglés à une même version exacte dans le catalogue). Le service vérifie
+ce catalogue et `bun.lock` avant l'installation gelée (`verifyNextCatalog`) ; les archives
+`vendor/next-fork/` n'existent plus.
 Une attente du verrou de factory (code 75) est réessayée par le timer et ne prouve
 pas un déploiement terminé.
 

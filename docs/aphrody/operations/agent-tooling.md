@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document predates the move to the unmodified upstream `bun` npm package (`1.4.4-canary.20261028.1`). The abandoned Bun fork, its fork-only commands, `bun:*` modules and `toolchains/bun` named here are history, not current instructions.
+
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Agent tooling brief (subagents included)
 
@@ -31,14 +33,12 @@ Execution context (2026-10-09): develop and build on any qualified native, SSH o
 | Bun type check | `bun check <paths>` (or `bun check -p <tsconfig>` for one package) |
 | Bun lint | `bun lint <paths>` |
 | Bun format | `bun fmt --check <paths>` / `bun fmt <paths>` |
-| Node to Bun migration | `bun n2b <path> --dry-run` then the selected native Bun migration mode |
 | Bun tests | `bun test <paths>` |
 | Declared quality stages | `aphrody infra quality <stage> --repo aphrody --run`, `aphrody infra pipeline`, `aphrody infra workflow <stage>` |
 | Cargo on the selected context | Native scoped gates, qualified Docker or `bun scripts/build/rust/vps-cargo.ts run -- <cargo args>` for an allocated SSH factory; preserve locks and sccache |
 | Cargo in a cloud session | `scripts/build/rust/cargo-serial.sh <cargo args>` |
 | Hosts, services, probes | `aphrody infra ssh exec\|status\|logs`, `aphrody infra service`, `aphrody infra probe`, `yolo host … --host vps\|dbfr` |
 | Factory build of pushed main | `yolo ship` |
-| Node to Bun | `bun n2b` |
 | Docs | `yolo docs <query>` (Bun), `aphrody docs search`, MCP `docs_auto_search` |
 | Git and GitHub | `aphrody git inspect\|api\|repo\|search`, `aphrody infra git` |
 | Web fetch and crawl | `aphrody web`, MCP `universal_web_fetch` |

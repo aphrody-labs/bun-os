@@ -37,11 +37,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install the aphrody-labs/bun runtime
+      - name: Install the upstream Bun canary from npm
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.sh | bash -s "$BUN_VERSION"
+          npm install --global "bun@$BUN_VERSION"
           echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - run: bun install --frozen-lockfile
       - name: Release scripts and host catalog

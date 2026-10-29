@@ -99,7 +99,7 @@ binds it to the runtime: `SteamPaused` -> `MachineStatus::paused`, `SteamKeys` -
   title (exact name, else the same base title ranked by shared No-Intro tags). Thumbnails come from
   `thumbnails.libretro.com` (cached in `usr/var/cache/bep/thumbnails`) or a local
   libretro-thumbnails tree (`--thumbnails DIR`). The Bun Engine entry uses Bun's own logo
-  (`assets/logo-square.png` of the abandoned fork (legacy `toolchains/bun`) icon, `logo@4x.png` logo). Nothing is generated: a slot
+  (`assets/logo-square.png` of the former Bun fork icon, `logo@4x.png` logo). Nothing is generated: a slot
   without real art keeps Steam's default.
 
 Shortcut ids follow Steam: `crc32(quoted exe + name) | 0x80000000`; `steam://rungameid/` takes

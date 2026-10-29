@@ -4,7 +4,7 @@ Status: planning, 2026-10-29. Nothing in this document has been built, booted or
 
 ## Architecture this roadmap sits on
 
-- The runtime is unmodified upstream Bun: npm `bun@1.4.4-canary.20261028.1`, gitHead `11c367163a4b`. `bun --revision` prints `1.4.4-canary.1+11c367163`. The `aphrody-labs/bun` fork is abandoned.
+- The runtime is unmodified upstream Bun: npm `bun@1.4.4-canary.20261028.1`, gitHead `11c367163a4b`. `bun --revision` prints `1.4.4-canary.1+11c367163`. The Bun fork is abandoned.
 - Bun OS is an Arch-inspired Linux distribution (pacman/libalpm, Server, COSMIC Desktop and Gamescope Gaming compositions).
 - Final goal: Bun integrated into the Linux kernel the way Rust was.
 

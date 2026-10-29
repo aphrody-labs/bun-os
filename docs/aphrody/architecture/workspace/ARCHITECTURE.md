@@ -35,7 +35,6 @@ history under `upstream/`.
 
 | Owner | Source and responsibility |
 | --- | --- |
-| Runtime source | [Bun source](../../../../toolchains/bun): managed runtime history; source presence does not establish completion of root Cargo migration |
 | Interop | [Rust FFI](../../../../crates/aphrody-ffi), [Bun native adapter](../../../../packages/aphrody-bun): shared library boundary |
 | CLI | [Command owner](../../../../crates/aphrody-command): argument handling and invocation of capability owners |
 | Infra and Workspace | [Workspace implementation](../../../../packages/bun-workspace), [root Infra configuration](../../../../infra/config): inventories, orchestration and operations within Bun OS |

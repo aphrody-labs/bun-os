@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document predates the move to the unmodified upstream `bun` npm package (`1.4.4-canary.20261028.1`). The abandoned Bun fork, its fork-only commands, `bun:*` modules and `toolchains/bun` named here are history, not current instructions.
+
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Consommateurs Python du Bun Yolo natif
 
