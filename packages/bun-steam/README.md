@@ -10,7 +10,7 @@ Both read and write the same VDF dialects byte for byte.
 
 | Area          | Commands                                                                                                    | Module                                                                                       |
 | ------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Client config | `client`, `client users`, `client autologin <account>`                                                      | `config.ts` (Windows registry through `bun:windows`, Linux `registry.vdf`, `loginusers.vdf`) |
+| Client config | `client`, `client users`, `client autologin <account>`                                                      | `config.ts` (Windows registry through `reg.exe`, Linux `registry.vdf`, `loginusers.vdf`) |
 | steamcmd      | `steamcmd status`, `steamcmd update <appid>`, `steamcmd run +cmd ...`                                       | `steamcmd.ts`                                                                                |
 | Libraries     | `libraries`, `libraries games`, `libraries disks`, `libraries move <from> <to>`                             | `libraries.ts`                                                                               |
 | Proton        | `proton list`, `catalog`, `latest`, `install`/`update <ge\|cachyos>`, `valve`, `runtimes`, `mapping`, `set` | `proton.ts`, `config.ts`                                                                     |

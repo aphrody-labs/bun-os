@@ -447,19 +447,11 @@ async function classify(path: string, name: string, digest: Digest, options: Ing
 
 // ---- ACLs -------------------------------------------------------------------------------------
 
-type Advapi32 = {
-  ConvertStringSecurityDescriptorToSecurityDescriptorW(
-    sddl: string,
-    revision: number,
-    descriptor: BigUint64Array,
-    size: null,
-  ): boolean;
-  SetFileSecurityW(path: string, information: number, descriptor: bigint): boolean;
-};
-type Kernel32 = { LocalFree(memory: bigint): bigint };
+/** NUL-terminated UTF-16 for the Win32 W functions. */
+const wide = (value: string) => Buffer.from(`${value}\0`, "utf16le");
 
 /**
- * Owner-only access: a protected DACL (OWNER RIGHTS and SYSTEM) through bun:windows on Windows,
+ * Owner-only access: a protected DACL (OWNER RIGHTS and SYSTEM) through bun:ffi (advapi32) on Windows,
  * 0700/0600 elsewhere.
  */
 export async function restrict(path: string, directory: boolean): Promise<void> {
@@ -467,32 +459,42 @@ export async function restrict(path: string, directory: boolean): Promise<void> 
     await chmod(path, directory ? 0o700 : 0o600);
     return;
   }
-  const windows = (await import("bun:windows")).default;
-  const advapi = windows.family("advapi32") as Advapi32;
+  const { dlopen, FFIType, ptr } = await import("bun:ffi");
+  const advapi = dlopen("advapi32.dll", {
+    ConvertStringSecurityDescriptorToSecurityDescriptorW: {
+      args: [FFIType.ptr, FFIType.u32, FFIType.ptr, FFIType.ptr],
+      returns: FFIType.bool,
+    },
+    SetFileSecurityW: { args: [FFIType.ptr, FFIType.u32, FFIType.ptr], returns: FFIType.bool },
+  }).symbols;
+  const kernel = dlopen("kernel32.dll", {
+    GetLastError: { args: [], returns: FFIType.u32 },
+    LocalFree: { args: [FFIType.ptr], returns: FFIType.ptr },
+  }).symbols;
   const descriptor = new BigUint64Array(1);
   const inherit = directory ? "OICI" : "";
   if (
     !advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW(
-      `D:P(A;${inherit};FA;;;OW)(A;${inherit};FA;;;SY)`,
+      ptr(wide(`D:P(A;${inherit};FA;;;OW)(A;${inherit};FA;;;SY)`)),
       1,
-      descriptor,
+      ptr(descriptor),
       null,
     )
   )
-    throw new Error(`cannot build the owner-only ACL (Win32 error ${windows.win32.lastError()})`);
+    throw new Error(`cannot build the owner-only ACL (Win32 error ${kernel.GetLastError()})`);
   try {
     const DACL_SECURITY_INFORMATION = 0x4;
     const PROTECTED_DACL_SECURITY_INFORMATION = 0x80000000;
     if (
       !advapi.SetFileSecurityW(
-        path,
+        ptr(wide(path)),
         (DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION) >>> 0,
         descriptor[0],
       )
     )
-      throw new Error(`cannot restrict ${basename(path)} (Win32 error ${windows.win32.lastError()})`);
+      throw new Error(`cannot restrict ${basename(path)} (Win32 error ${kernel.GetLastError()})`);
   } finally {
-    (windows.family("kernel32") as Kernel32).LocalFree(descriptor[0]);
+    kernel.LocalFree(descriptor[0]);
   }
 }
 

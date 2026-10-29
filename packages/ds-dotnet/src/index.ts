@@ -1,4 +1,4 @@
-import { unmanaged } from "bun:dotnet";
+import { unmanaged } from "./hostfxr";
 import { ptr } from "bun:ffi";
 import { join } from "node:path";
 import { build, isBuilt, outputDirectory } from "./build";

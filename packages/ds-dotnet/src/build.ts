@@ -15,12 +15,12 @@ const projects = {
 const vendors = ["kuriimu2", "spica", "pk3ds"];
 
 function dotnet(args: string[]): void {
-  const result = Bun.spawnSync([process.execPath, "dotnet", ...args], {
+  const result = Bun.spawnSync([Bun.which("dotnet") ?? "dotnet", ...args], {
     stdout: "inherit",
     stderr: "inherit",
     env: { ...process.env, DOTNET_CLI_TELEMETRY_OPTOUT: "1", DOTNET_NOLOGO: "1" },
   });
-  if (result.exitCode !== 0) throw new Error(`bun dotnet ${args[0]} failed (${result.exitCode})`);
+  if (result.exitCode !== 0) throw new Error(`dotnet ${args[0]} failed (${result.exitCode})`);
 }
 
 /** True when the assemblies are built. */

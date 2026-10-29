@@ -3,7 +3,7 @@
  * Steam locations on Windows and Linux: client root, steamcmd, user data and compatibility tool
  * directories. Every lookup accepts an explicit override and never guesses a workstation path.
  */
-import { registry as winRegistry } from "bun:windows";
+import { registry as winRegistry } from "./win";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";

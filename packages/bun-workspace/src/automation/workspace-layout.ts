@@ -72,7 +72,7 @@ export async function runWorkspaceLayout(args: string[]): Promise<number> {
 
     if (!allowedWorkspace(root, workspacePath)) {
       errors.push(
-        `workspace must live below ${[...INTERNAL_ROOTS, ...EXTERNAL_PACKAGE_ROOTS].join(", ")}: ${workspacePath}`,
+        `workspace must live below ${INTERNAL_ROOTS.join(", ")}: ${workspacePath}`,
       );
     }
     if (!existsSync(packageManifest)) {

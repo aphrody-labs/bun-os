@@ -43,11 +43,6 @@ interface OwnedJob {
   close(): void;
 }
 
-interface WindowsJobs {
-  isSupported: boolean;
-  Job?: new (options: { killOnClose: boolean }) => OwnedJob;
-}
-
 async function reap(child: Bun.Subprocess): Promise<void> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
@@ -65,8 +60,8 @@ async function reap(child: Bun.Subprocess): Promise<void> {
 async function createJob(): Promise<OwnedJob | undefined> {
   if (process.platform !== "win32") return;
   try {
-    const windows = (await import("bun:windows")) as unknown as WindowsJobs;
-    if (windows.isSupported && windows.Job) return new windows.Job({ killOnClose: true });
+    const { WindowsJob } = await import("./windows-job");
+    return new WindowsJob({ killOnClose: true });
   } catch {
     // The native host can instead own this process tree through taskkill.
   }

@@ -1,3 +1,4 @@
+import * as os from "node:os";
 export interface NativeProbe {
   runtime: { version: string; revision: string; platform: string; arch: string };
   network: {
@@ -8,7 +9,7 @@ export interface NativeProbe {
   };
   media: {
     image: { available: boolean; backend?: string };
-    video: { available: boolean; decoder?: string; backend?: string };
+    video: { available: boolean; decoder?: string };
   };
   packages: { winget: { available: boolean; executable: string | null } };
   os: Record<string, unknown>;
@@ -40,56 +41,58 @@ async function probeTcp(host: string): Promise<NativeProbe["network"]["tcp443"]>
   }
 }
 
+/** Windows facts through bun:ffi (kernel32, shell32) and node:os: no fork module. */
+async function probeWindows(): Promise<Record<string, unknown>> {
+  const { dlopen, FFIType } = await import("bun:ffi");
+  const kernel32 = dlopen("kernel32.dll", { GetLogicalDrives: { args: [], returns: FFIType.u32 } }).symbols;
+  const shell32 = dlopen("shell32.dll", { IsUserAnAdmin: { args: [], returns: FFIType.bool } }).symbols;
+  const mask = kernel32.GetLogicalDrives();
+  const drives: string[] = [];
+  for (let i = 0; i < 26; i++) if (mask & (1 << i)) drives.push(`${String.fromCharCode(65 + i)}:\\`);
+  return {
+    api: "node:os+bun:ffi",
+    supported: true,
+    elevated: shell32.IsUserAnAdmin(),
+    version: os.version(),
+    release: os.release(),
+    system: {
+      processors: os.availableParallelism(),
+      totalMemory: os.totalmem(),
+      freeMemory: os.freemem(),
+      uptime: os.uptime(),
+    },
+    drives,
+  };
+}
+
+/** Linux facts from procfs: capability sets and whether io_uring is allowed by the kernel. */
+async function probeLinux(): Promise<Record<string, unknown>> {
+  const status = await Bun.file("/proc/self/status")
+    .text()
+    .catch(() => "");
+  const set = (name: string) => {
+    const hex = status.match(new RegExp(`^${name}:\\s*([0-9a-fA-F]+)`, "m"))?.[1] ?? "0";
+    return BigInt(`0x${hex}`);
+  };
+  const disabled = await Bun.file("/proc/sys/kernel/io_uring_disabled")
+    .text()
+    .then(value => Number.parseInt(value.trim(), 10))
+    .catch(() => null);
+  return {
+    api: "procfs",
+    supported: status.length > 0,
+    ioUring: { disabled },
+    capabilities: {
+      effective: set("CapEff").toString(),
+      permitted: set("CapPrm").toString(),
+      inheritable: set("CapInh").toString(),
+    },
+  };
+}
+
 async function probeOs(): Promise<Record<string, unknown>> {
-  if (process.platform === "win32") {
-    const windows = (await import("bun:windows")).default;
-    const info = windows.systemInfo();
-    const toolchain = windows.toolchain();
-    return {
-      api: "bun:windows",
-      supported: windows.isSupported,
-      elevated: windows.isElevated(),
-      version: windows.version(),
-      system: {
-        processors: info.processors,
-        totalMemory: info.totalMemory,
-        freeMemory: info.freeMemory,
-        memoryLoad: info.memoryLoad,
-        uptime: info.uptime,
-        theme: info.theme,
-      },
-      drives: windows.storage.drives(),
-      toolchain: {
-        error: toolchain.error,
-        msvc: toolchain.msvc?.version ?? null,
-        sdk: toolchain.sdk?.version ?? null,
-        llvm: toolchain.llvm?.version ?? null,
-      },
-    };
-  }
-  if (process.platform === "linux") {
-    const moduleName = "bun:linux";
-    const linux = (
-      (await import(moduleName)) as {
-        default: {
-          isSupported: boolean;
-          ioUring: { probe(): { supported: boolean; ops: number[] } };
-          capabilities: { get(): { effective: bigint; permitted: bigint; inheritable: bigint } };
-        };
-      }
-    ).default;
-    const capabilities = linux.capabilities.get();
-    return {
-      api: "bun:linux",
-      supported: linux.isSupported,
-      ioUring: linux.ioUring.probe(),
-      capabilities: {
-        effective: capabilities.effective.toString(),
-        permitted: capabilities.permitted.toString(),
-        inheritable: capabilities.inheritable.toString(),
-      },
-    };
-  }
+  if (process.platform === "win32") return probeWindows();
+  if (process.platform === "linux") return probeLinux();
   return { api: process.platform, supported: false };
 }
 
@@ -101,6 +104,7 @@ export async function probeNativeCapabilities(host = "www.retrostic.com"): Promi
     probeOs(),
   ]);
   const winget = Bun.which("winget");
+  const ffprobe = Bun.which("ffprobe");
   return {
     runtime: { version: Bun.version, revision: Bun.revision, platform: process.platform, arch: process.arch },
     network: { host, dns, dnsCache: Bun.dns.getCacheStats(), tcp443 },
@@ -109,15 +113,22 @@ export async function probeNativeCapabilities(host = "www.retrostic.com"): Promi
         available: typeof Bun.Image === "function",
         backend: typeof Bun.Image === "function" ? Bun.Image.backend : undefined,
       },
-      video: {
-        available: typeof Bun.Video === "function" && Bun.Video.available,
-        decoder: typeof Bun.Video === "function" ? Bun.Video.decoder : undefined,
-        backend: typeof Bun.Video === "function" ? Bun.Video.backend : undefined,
-      },
+      video: { available: ffprobe !== null, decoder: ffprobe ? "ffprobe" : undefined },
     },
     packages: { winget: { available: winget !== null, executable: winget } },
     os,
   };
+}
+
+/** Video metadata through the ffprobe executable (upstream Bun has no video decoder). */
+async function probeVideo(path: string, ffprobe: string): Promise<Record<string, unknown>> {
+  const child = Bun.spawn([ffprobe, "-v", "error", "-print_format", "json", "-show_format", "-show_streams", path], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const [out, err, code] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]);
+  if (code !== 0) throw new Error(`ffprobe failed for ${path}: ${err.trim()}`);
+  return { kind: "video", path, metadata: JSON.parse(out), decoder: "ffprobe" };
 }
 
 export async function probeMedia(path: string): Promise<Record<string, unknown>> {
@@ -127,14 +138,8 @@ export async function probeMedia(path: string): Promise<Record<string, unknown>>
     const image = new Bun.Image(file);
     return { kind: "image", path, metadata: await image.metadata(), backend: Bun.Image.backend };
   } catch (imageError) {
-    if (!Bun.Video.available) throw imageError;
-    const video = new Bun.Video(path);
-    return {
-      kind: "video",
-      path,
-      metadata: await video.metadata(),
-      decoder: Bun.Video.decoder,
-      backend: Bun.Video.backend,
-    };
+    const ffprobe = Bun.which("ffprobe");
+    if (!ffprobe) throw imageError;
+    return probeVideo(path, ffprobe);
   }
 }
