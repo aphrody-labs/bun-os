@@ -831,15 +831,7 @@ pub fn run() {
         // Endpoints and the minisign public key come from `plugins.updater` in the Tauri
         // config, injected at bundle time by aphrody-ops tauri; a build without them reports
         // the missing configuration from `check` instead of pretending there is no update.
-<<<<<<< ours
         .plugin(tauri_plugin_updater::Builder::new().build())
-||||||| base
-        .plugin(tauri_plugin_aphrody::updater::Builder::new().build())
-        .plugin(aphrody_drive::init())
-=======
-        .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(aphrody_drive::init())
->>>>>>> theirs
         .plugin(aphrody_shell_tauri::init())
         // Managed before `setup`: the config windows (splash, pet, widget) are created first and
         // their pages invoke integration commands as soon as they load.
