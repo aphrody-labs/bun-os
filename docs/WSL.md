@@ -11,7 +11,7 @@ used, no Linux build ran locally. Build checks are GitHub Actions workflows (`.g
 | `WSL` | `microsoft/WSL` | `master` | 0 | 119 | fast-forward (`merge-upstream` API) | `afa988cfb498fb9794718683823fb38dbc96673d` (equals upstream) |
 | `WSL2-Linux-Kernel` | `microsoft/WSL2-Linux-Kernel` | `linux-msft-wsl-6.18.y` | 0 | 1496 | fast-forward | `a989171929bed4ea681be8d77333845ce1c1732a` (equals upstream and tag `linux-msft-wsl-6.18.58.1`) |
 | `weston-mirror` (WSLg compositor) | `microsoft/weston-mirror` | `working` | 0 | 0 | none | identical |
-| WSLg (`microsoft/wslg`) | - | - | - | - | **no fork exists** (`gh repo list aphrody-labs` has no `wslg`); nothing created | upstream `main`, release branch `release/1.0.73` |
+| WSLg (`microsoft/wslg`) | `microsoft/wslg` | `main` | 0 at creation, now a patch queue | 0 | fork exists (`aphrody-labs/wslg`, mounted at `vendor/wslg`); see `docs/WSLG.md` | `6942bb534b53` base (equals upstream when forked) |
 
 Both merges were pure fast-forwards: the forks carried no custom commits, so there was nothing to conflict.
 
@@ -69,7 +69,8 @@ over `/dev/dxg`; frames reach Weston through system memory. `config-wsl` of the 
 
 Consequence for Hyprland: WSLg gives **no DRM/KMS output, no seat and no wlroots-class backend**. Hyprland (Aquamarine) can only run
 as a **nested Wayland client inside a Weston window** (`start-hyprland` style nested session), if Aquamarine's Wayland backend and its GBM
-allocator work on the vgem render node and Mesa d3d12. That is the only feasible shape, and it is **not tested**. `PLAN.md` already says
+allocator work on the vgem render node and Mesa d3d12. That is the only feasible shape, and it is **not tested**.
+**Correction 2026-10-29 (`docs/WSLG.md`):** that shape cannot work against the stock WSLg Weston (no `zwp_linux_dmabuf_v1`, `wl_compositor` v4, `xdg_wm_base` v1, `wl_seat` v7 versus Aquamarine's 6, 6, 9 and dmabuf v4). It needs an upstream Weston 16 host and the Aquamarine clamp patch, and still has not run. `PLAN.md` already says
 Omarchy Hyprland is blocked; this does not unblock it. The `hyprland` profile exists so CI/Linux can try it; COSMIC (`cosmic-comp`
 has a winit/Wayland backend) is the same kind of experiment. For a full desktop the existing alternatives stay valid:
 the `try-omarchy-windows` QEMU guest path in `factory/images/bunos-omarchy`, or VNC (`wayvnc` is in the Hyprland list).

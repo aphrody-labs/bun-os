@@ -39,6 +39,10 @@ Component index (owners, entry commands, CI jobs, pins, status, announced-but-pe
   to COSMIC, whose exact closure and boot/display qualification remain pending;
   Omarchy Hyprland is explicitly blocked until its package subset and signed
   closure are selected. Neither session is represented as qualified.
+  Evidence note (2026-10-29, `docs/WSLG.md`): Hyprland 0.57.0 built from source and its headless backend ran in CI
+  (`hyprctl` answered, 33 of 33 checked Wayland globals, Linux runner with a vgem DRM node). Nested Hyprland under WSLg's
+  Weston did not run and cannot against the stock compositor. Nothing here selects the package subset or the signed
+  closure, so the blocker above stands.
 - No kernel source is selected in the root profile. The `/usr` boot path and
   gaming image's bootable target are blocked until a kernel composition and
   artifact qualification exist; container gaming continues to use its host

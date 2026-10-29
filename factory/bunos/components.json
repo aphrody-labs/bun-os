@@ -1539,6 +1539,22 @@
       "status": "present"
     },
     {
+      "id": "submodule:vendor/wslg",
+      "kind": "submodule",
+      "path": "vendor/wslg",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wslg.git",
+        "pin": "c147eb77b2bbccedd11fc1513f3812b8df6b8117"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "dependsOn": ["submodule:vendor/omarchy"],
+      "consumedBy": ["factory:wsl"],
+      "note": "Fork of microsoft/wslg with the BunOS patch queue (WSL2_COMPOSITOR switch, Weston 16 / Xwayland / Hyprland source stack, CI probes); see docs/WSLG.md."
+    },
+    {
       "id": "submodule:vendor/inputplumber",
       "kind": "submodule",
       "path": "vendor/inputplumber",
@@ -3044,7 +3060,12 @@
       "registration": ["none"],
       "aot": true,
       "status": "present",
-      "dependsOn": ["submodule:vendor/reactos", "submodule:vendor/wine-cachyos", "npm:@aphrody/buncc", "npm:@aphrody/windows"],
+      "dependsOn": [
+        "submodule:vendor/reactos",
+        "submodule:vendor/wine-cachyos",
+        "npm:@aphrody/buncc",
+        "npm:@aphrody/windows"
+      ],
       "note": "NT personality of the Bun OS kernel layer (docs/NTCORE.md): ReactOS cmlib registry hives, the ReactOS Executive handle table and PE image helpers compiled to wasm32 by factory/ntcore/build.ts. GPL-2.0-or-later. The wasmos x86 emulator edge is recorded in docs/NTCORE.md until that component is registered."
     },
     {

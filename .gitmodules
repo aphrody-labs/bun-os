@@ -1279,3 +1279,9 @@
 	branch = master
 	shallow = true
 	update = none
+[submodule "vendor/wslg"]
+	path = vendor/wslg
+	url = https://github.com/aphrody-labs/wslg.git
+	branch = main
+	shallow = true
+	update = none
