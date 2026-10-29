@@ -75,18 +75,3 @@ touches it. Upstream history stays in the fork; this repository records only the
 - The previous M3-refactored copy (`apps/aphrody-drive`, `crates/aphrody-drive`,
   `packages/drive-client`) is deleted; its last commit is tagged `legacy/aphrody-drive-last`
   and its unique features are in [UNIQUE-FEATURES.md](UNIQUE-FEATURES.md).
-
-## State of the workspace membership (2026-10-29)
-
-The tree is imported on `os`, but the Cargo and Bun workspace entries are not enabled there yet:
-the root `Cargo.lock` and `bun.lock` have not been regenerated for them, and `--locked` /
-`--frozen-lockfile` jobs would fail. The full membership (25 crates, core, server, CLI, Tauri shell,
-web/interface/ts-client/assets/config packages, 26 additional `[workspace.dependencies]`) is on branch
-`claude/wip-spacedrive` (commit `c19e9f065e` and later). Enable it by merging those two manifest hunks
-and regenerating both lock files on the VPS.
-
-Verified so far, on the upstream commit built standalone (`~/build/spacedrive`, nightly-2026-09-15):
-`cargo check --workspace` passes the dependency graph up to `ffmpeg-sys-next`, which needs the system
-FFmpeg development libraries (`sd-ffmpeg` is a default workspace member); the Tauri shell requires
-porting from Tauri 2 to the unified Tauri 3 pins. `bun install` of the upstream tree works; `tsc -b` of
-the Tauri frontend reports 14 errors, all in the two `DragSelect.tsx` files (react-selecto typings).
