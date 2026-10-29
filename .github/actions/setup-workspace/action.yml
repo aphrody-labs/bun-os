@@ -24,6 +24,9 @@ runs:
       shell: bash
       run: |
         git config --global core.longpaths true
+        # rea-agents `prepare` runs `bun` through node_modules/.bin/bun, a Windows shim whose npm postinstall has not run yet
+        # ("could not create process"). The Windows job only checks Rust, so skip lifecycle scripts there.
+        echo "NPM_CONFIG_IGNORE_SCRIPTS=true" >> "$GITHUB_ENV"
         git config submodule.packages/re/third_party/unblob.update none
         # Kernel, LLVM and Wine forks are Linux-only distribution sources: their checkout alone outlasts the setup deadline on NTFS.
         for path in vendor/cachyos-linux vendor/ogc-linux vendor/linux-cachyos vendor/kernel-patches vendor/ogc-kernel-packages vendor/nvidia-kernels vendor/open-gpu-kernel-modules vendor/llvm vendor/proton vendor/proton-cachyos vendor/wine-cachyos; do
