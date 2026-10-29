@@ -20,22 +20,23 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-workspace
+      - id: setup
+        uses: ./.github/actions/setup-workspace
         with:
           token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
       - name: Type check
         run: bun run check
       - name: Lint
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun run lint
       - name: Format
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun run format:check
       - name: Documentation links and navigation
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun run docs:check
       - name: Workspace manifests
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun scripts/workspace-manifests.ts
 
   rust:
@@ -56,18 +57,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends pkg-config libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libssl-dev libfontconfig1-dev libvulkan-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
-      - uses: ./.github/actions/setup-workspace
+      - id: setup
+        uses: ./.github/actions/setup-workspace
         with:
           token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
           rust: "true"
       - name: Format
         run: bun scripts/cargo-fmt.ts
       - name: Check every workspace member
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun scripts/cargo.ts check
       # Deny-by-default lints only: the imported bevy forks do not pass -D warnings yet (non-ASCII test identifiers, unused deps).
       - name: Clippy
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun scripts/cargo.ts exec -- clippy --workspace --all-targets --locked
 
   release-plan:
@@ -77,7 +79,8 @@ jobs:
     needs: quality
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-workspace
+      - id: setup
+        uses: ./.github/actions/setup-workspace
         with:
           token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
           rust: "true"
