@@ -257,3 +257,34 @@ test("every profile renders its steps without running anything", () => {
     profiles["glibc-gnu"].steps({ target: "x86_64-linux-gnu.2.28", source: "m.c" })[0]!.command.slice(0, 3),
   ).toEqual(["zig", "cc", "-target"]);
 });
+
+test("audit fixes: store plan, manifest version, MinVersion, vcpkg clone, winget reboot codes", async () => {
+  const { storePlan } = await import("../src/packaging/index.ts");
+  const { manifestProblems } = await import("../src/providers/msix.ts");
+  const { cloneCommands } = await import("../src/providers/vcpkg.ts");
+  const { interpretExit } = await import("../src/providers/winget.ts");
+  const plan = storePlan("out/app.msix", "9NBLGGH4NNS1");
+  expect(plan[0]).toMatchObject({ command: ["appcert", "reset"], optional: true });
+  expect(plan[1]).toMatchObject({ optional: true });
+  const publish = plan.find(step => step.command?.[1] === "publish")!;
+  expect(publish.command).toEqual(["msstore", "publish", "-i", "out/app.msix", "--appId", "9NBLGGH4NNS1"]);
+  expect(publish.needsApproval).toBe(true);
+  expect(plan.find(step => step.command?.[1] === "reconfigure")?.needsApproval).toBe(true);
+  const identity = { name: "Aphrody.BunOS", publisher: "CN=Aphrody", executable: "a.exe" };
+  expect(manifestProblems({ ...identity, version: "1.4.7.0" })).toEqual([]);
+  expect(manifestProblems({ ...identity, version: "1.4.7" })).toHaveLength(1);
+  expect(manifestProblems({ ...identity, version: "1.4.7.70000" })).toHaveLength(1);
+  expect(
+    msixManifest({
+      name: "Aphrody.BunOS",
+      publisher: "CN=A",
+      displayName: "A",
+      publisherDisplayName: "A",
+      version: "1.0.0",
+      executable: "a.exe",
+    }),
+  ).toContain('MinVersion="10.0.19041.0"');
+  expect(cloneCommands("C:\v")[0]).not.toContain("--depth");
+  for (const code of [0x8a150109, 0x8a15010a, 0x8a15010b, 3010, 1641]) expect(interpretExit(code | 0)).toBe("reboot");
+  expect(interpretExit(0x8a150010 | 0)).toBe("no-applicable-installer");
+});

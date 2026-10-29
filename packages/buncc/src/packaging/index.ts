@@ -53,7 +53,7 @@ export function msixManifest(app: AppIdentity): string {
     <Logo>Assets\\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
   </Dependencies>
   <Resources>
     <Resource Language="en-us" />
@@ -152,6 +152,8 @@ export interface PlanStep {
   writes?: { path: string; content: string }[];
   /** True when the step publishes, signs for real or accepts a licence; never run without an explicit flag from the owner. */
   needsApproval?: boolean;
+  /** Optional or deprecated step: failure does not stop the plan. */
+  optional?: boolean;
 }
 
 export interface PackagePlan {
@@ -235,16 +237,41 @@ export function stableGuid(name: string): string {
   return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-5${hash.slice(13, 16)}-${variant}${hash.slice(18, 20)}-${hash.slice(20, 32)}`;
 }
 
-/** Microsoft Store submission uploads the package unsigned (the Store re-signs). Always requires an explicit owner approval. */
-export function storePlan(packagePath: string): PlanStep[] {
+/**
+ * Microsoft Store submission of an MSIX. Only MSIX is re-signed by the Store, so only an MSIX is submitted unsigned; an MSI or EXE
+ * installer submitted as a package must already be signed. `msstore publish` takes a project directory by default: a ready package
+ * goes through `-i`, with `--appId` and Microsoft Entra credentials configured by `msstore reconfigure` (secrets are never
+ * written here). Publishing needs explicit owner approval.
+ */
+export function storePlan(packagePath: string, appId = "<STORE_APP_ID>"): PlanStep[] {
   return [
     {
-      title: "run the Windows App Certification Kit locally (Windows only)",
-      command: ["appcert", "test", "-appxpackagepath", packagePath, "-reportoutputpath", "wack-report.xml"],
+      title: "Windows App Certification Kit: reset the test state (optional, WACK is deprecated on Microsoft Learn)",
+      command: ["appcert", "reset"],
+      optional: true,
     },
     {
-      title: "submit to Partner Center with the Store CLI",
-      command: ["msstore", "publish", packagePath],
+      title: "Windows App Certification Kit on the package (optional, Windows only)",
+      command: ["appcert", "test", "-appxpackagepath", packagePath, "-reportoutputpath", "wack-report.xml"],
+      optional: true,
+    },
+    {
+      title: "configure the Store CLI with your Microsoft Entra tenant, client id and secret (set them yourself)",
+      command: [
+        "msstore",
+        "reconfigure",
+        "--tenantId",
+        "<TENANT_ID>",
+        "--clientId",
+        "<CLIENT_ID>",
+        "--clientSecret",
+        "<CLIENT_SECRET>",
+      ],
+      needsApproval: true,
+    },
+    {
+      title: "submit the ready package to Partner Center",
+      command: ["msstore", "publish", "-i", packagePath, "--appId", appId],
       needsApproval: true,
     },
   ];

@@ -308,7 +308,7 @@ async function main(): Promise<number> {
           return 3;
         }
         for (const write of step.writes ?? []) writeFileSync(write.path, write.content);
-        if (step.command && (await run(step.command, { output: "inherit" })).code !== 0) return 1;
+        if (step.command && (await run(step.command, { output: "inherit" })).code !== 0 && !step.optional) return 1;
       }
       return 0;
     }
@@ -324,7 +324,7 @@ async function main(): Promise<number> {
     case "store":
       printSteps(storePlan(rest[0] ?? "out/app.msix"));
       console.log(
-        "The Store re-signs the package: submit it unsigned. Publishing always needs your explicit approval.",
+        "The Store re-signs an MSIX only: submit an MSIX unsigned, but MSI and EXE installers must already be signed. Publishing always needs your explicit approval.",
       );
       return 0;
     case "profile": {
