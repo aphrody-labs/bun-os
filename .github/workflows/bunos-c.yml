@@ -60,7 +60,8 @@ jobs:
         run: bun packages/buncc/src/cli.ts c doctor
       - name: Smoke matrix
         env:
-          BUNOS_C_SYSROOT_ARCH_GLIBC_AARCH64: /usr/aarch64-linux-gnu
+          BUNOS_C_SYSROOT_ARCH_GLIBC_AARCH64: /
+          BUNOS_C_QEMU_PREFIX: /usr/aarch64-linux-gnu
           WINEDEBUG: -all
           WINEPREFIX: ${{ runner.temp }}/wine
         run: |
@@ -94,7 +95,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: factory/c
-      - run: apk add --no-cache clang lld musl-dev binutils file
+      - run: apk add --no-cache clang lld musl-dev binutils file gcc
       - name: Build, inspect and run
         run: |
           clang --target=x86_64-alpine-linux-musl -fuse-ld=lld -O2 -static factory/c/smoke/hello.c -o hello-musl

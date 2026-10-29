@@ -211,7 +211,7 @@ export function pickRunner(t: CTarget, binary: string): { cmd?: string[]; skip?:
   if (kind === "native" && archMatch) return { cmd: [binary] };
   if (t.runner[hostKind()] === "qemu-user") {
     const q = which(`qemu-${t.arch}`) ?? which(`qemu-${t.arch}-static`);
-    return q ? { cmd: [q, "-L", sysrootFor(t) ?? "/", binary] } : { skip: `qemu-${t.arch} not installed` };
+    return q ? { cmd: [q, "-L", process.env.BUNOS_C_QEMU_PREFIX ?? sysrootFor(t) ?? "/", binary] } : { skip: `qemu-${t.arch} not installed` };
   }
   if (kind === "wine") {
     const w = which("wine64") ?? which("wine");
@@ -223,7 +223,7 @@ export function pickRunner(t: CTarget, binary: string): { cmd?: string[]; skip?:
     (archMatch || (t.arch === "i686" && hostArch() === "x86_64"))
   )
     return { cmd: [binary] };
-  if (!isWin && t.os === "windows" && t.arch !== "aarch64") {
+  if (!isWin && (t.os === "windows" || t.os === "reactos") && t.arch !== "aarch64") {
     const w = which("wine64") ?? which("wine");
     if (w) return { cmd: [w, binary] };
   }
