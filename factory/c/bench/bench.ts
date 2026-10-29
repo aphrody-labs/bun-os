@@ -35,27 +35,74 @@ function genProject(dir: string) {
   writeFileSync(join(dir, "main.c"), main);
 }
 
-type Cfg = { name: string; env?: Record<string, string>; cc: (src: string, obj: string) => string[]; link: (objs: string[], exe: string) => string[] };
+type Cfg = {
+  name: string;
+  env?: Record<string, string>;
+  cc: (src: string, obj: string) => string[];
+  link: (objs: string[], exe: string) => string[];
+};
 const cfgs: Cfg[] = [];
 const vs = vsEnv("x86_64");
 if (vs) {
-  cfgs.push({ name: "msvc cl 19.51", env: vs, cc: (s, o) => ["cl", "/nologo", "/O2", "/MD", "/c", s, `/Fo${o}`], link: (os, e) => ["link", "/nologo", ...os, `/OUT:${e}`] });
-  cfgs.push({ name: "clang-cl 23.1.4 (local VS SDK)", env: vs, cc: (s, o) => ["clang-cl", "/nologo", "/O2", "/MD", "-c", s, `/Fo${o}`], link: (os, e) => ["lld-link", "/nologo", ...os, `/OUT:${e}`] });
+  cfgs.push({
+    name: "msvc cl 19.51",
+    env: vs,
+    cc: (s, o) => ["cl", "/nologo", "/O2", "/MD", "/c", s, `/Fo${o}`],
+    link: (os, e) => ["link", "/nologo", ...os, `/OUT:${e}`],
+  });
+  cfgs.push({
+    name: "clang-cl 23.1.4 (local VS SDK)",
+    env: vs,
+    cc: (s, o) => ["clang-cl", "/nologo", "/O2", "/MD", "-c", s, `/Fo${o}`],
+    link: (os, e) => ["lld-link", "/nologo", ...os, `/OUT:${e}`],
+  });
 }
 const mingw = llvmMingwBin();
-if (mingw) cfgs.push({ name: "llvm-mingw clang 23.1.4 ucrt x86_64", cc: (s, o) => [join(mingw, process.platform === "win32" ? "x86_64-w64-mingw32-clang.exe" : "x86_64-w64-mingw32-clang"), "-O2", "-c", s, "-o", o], link: (os, e) => [join(mingw, process.platform === "win32" ? "x86_64-w64-mingw32-clang.exe" : "x86_64-w64-mingw32-clang"), ...os, "-o", e] });
+if (mingw)
+  cfgs.push({
+    name: "llvm-mingw clang 23.1.4 ucrt x86_64",
+    cc: (s, o) => [
+      join(mingw, process.platform === "win32" ? "x86_64-w64-mingw32-clang.exe" : "x86_64-w64-mingw32-clang"),
+      "-O2",
+      "-c",
+      s,
+      "-o",
+      o,
+    ],
+    link: (os, e) => [
+      join(mingw, process.platform === "win32" ? "x86_64-w64-mingw32-clang.exe" : "x86_64-w64-mingw32-clang"),
+      ...os,
+      "-o",
+      e,
+    ],
+  });
 const gcc = Bun.which("x86_64-w64-mingw32-gcc");
-if (gcc) cfgs.push({ name: "mingw-w64 gcc", cc: (s, o) => [gcc, "-O2", "-c", s, "-o", o], link: (os, e) => [gcc, ...os, "-o", e] });
+if (gcc)
+  cfgs.push({
+    name: "mingw-w64 gcc",
+    cc: (s, o) => [gcc, "-O2", "-c", s, "-o", o],
+    link: (os, e) => [gcc, ...os, "-o", e],
+  });
 // Native Linux hosts (CI): gcc and clang against the system glibc.
 if (process.platform === "linux") {
   for (const c of ["gcc", "clang"]) {
     const p = Bun.which(c);
-    if (p) cfgs.push({ name: `${c} (linux glibc)`, cc: (s, o) => [p, "-O2", "-c", s, "-o", o], link: (os, e) => [p, ...os, "-o", e, "-lm"] });
+    if (p)
+      cfgs.push({
+        name: `${c} (linux glibc)`,
+        cc: (s, o) => [p, "-O2", "-c", s, "-o", o],
+        link: (os, e) => [p, ...os, "-o", e, "-lm"],
+      });
   }
 }
 
 async function exec(cmd: string[], env: Record<string, string> | undefined, cwd: string) {
-  const p = Bun.spawn(cmd, { cwd, env: env ?? process.env as Record<string, string>, stdout: "pipe", stderr: "pipe" });
+  const p = Bun.spawn(cmd, {
+    cwd,
+    env: env ?? (process.env as Record<string, string>),
+    stdout: "pipe",
+    stderr: "pipe",
+  });
   const [o, e, c] = await Promise.all([new Response(p.stdout).text(), new Response(p.stderr).text(), p.exited]);
   if (c) throw new Error(`${cmd[0]} failed: ${(e || o).slice(0, 300)}`);
 }
@@ -84,9 +131,18 @@ for (const cfg of cfgs) {
     if (existsSync(exe)) size = statSync(exe).size;
   }
   times.sort((a, b) => a - b);
-  results.push({ compiler: cfg.name, files: sources.length, runs: RUNS, medianMs: Math.round(times[Math.floor(times.length / 2)]!), minMs: Math.round(times[0]!), exeBytes: size });
+  results.push({
+    compiler: cfg.name,
+    files: sources.length,
+    runs: RUNS,
+    medianMs: Math.round(times[Math.floor(times.length / 2)]!),
+    minMs: Math.round(times[0]!),
+    exeBytes: size,
+  });
 }
 for (const r of results) console.log(JSON.stringify(r));
 if (!results.length) console.log("no compiler found");
 const wanted = ["msvc cl", "clang-cl", "llvm-mingw", "mingw-w64 gcc"];
-for (const w of wanted) if (!cfgs.some(c => c.name.startsWith(w))) console.log(JSON.stringify({ compiler: w, measured: false, reason: "not installed on this host" }));
+for (const w of wanted)
+  if (!cfgs.some(c => c.name.startsWith(w)))
+    console.log(JSON.stringify({ compiler: w, measured: false, reason: "not installed on this host" }));

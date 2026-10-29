@@ -55,7 +55,7 @@ export function packageFromDesc(repo: string, text: string): ArchPackage {
 
 /** Parses a `.db` file (gzip-compressed tar). */
 export function parseDb(repo: string, gz: Uint8Array): ArchPackage[] {
-  const tar = Bun.gunzipSync(gz);
+  const tar = Bun.gunzipSync(new Uint8Array(gz));
   const dec = new TextDecoder();
   return untar(tar)
     .filter(e => e.path.endsWith("/desc"))

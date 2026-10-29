@@ -51,11 +51,21 @@ async function sh(argv: string[], env: Record<string, string | undefined>, cwd?:
 
 export function toolBins(): string[] {
   const t = toolsRoot();
-  return [join(t, "venv", "Scripts"), join(t, "venv", "bin"), join(t, "pkgconf", "bin"), join(t, "win-flex-bison"), join(t, "gettext", "bin")].filter(existsSync);
+  return [
+    join(t, "venv", "Scripts"),
+    join(t, "venv", "bin"),
+    join(t, "pkgconf", "bin"),
+    join(t, "win-flex-bison"),
+    join(t, "gettext", "bin"),
+  ].filter(existsSync);
 }
 
 /** Install the pinned build tools into the desktop work dir (idempotent). Python tools go into a private venv. */
-export async function ensureTools(file: RecipeFile, opts: BuildOptions, env: Record<string, string | undefined>): Promise<void> {
+export async function ensureTools(
+  file: RecipeFile,
+  opts: BuildOptions,
+  env: Record<string, string | undefined>,
+): Promise<void> {
   const t = toolsRoot();
   mkdirSync(t, { recursive: true });
   const venv = join(t, "venv");
@@ -90,7 +100,17 @@ export async function ensureTools(file: RecipeFile, opts: BuildOptions, env: Rec
     if (!existsSync(src)) await cloneAt(pk.repo!, pk.tag!, pk.sha!, src, env);
     const env2 = { ...env, PATH: [...toolBins(), env.PATH ?? ""].join(delimiter) };
     const bdir = join(t, "build", "pkgconf");
-    await sh([join(venv, process.platform === "win32" ? "Scripts" : "bin", "meson"), "setup", bdir, src, `--prefix=${pkDest}`, "--buildtype=release"], env2);
+    await sh(
+      [
+        join(venv, process.platform === "win32" ? "Scripts" : "bin", "meson"),
+        "setup",
+        bdir,
+        src,
+        `--prefix=${pkDest}`,
+        "--buildtype=release",
+      ],
+      env2,
+    );
     await sh([join(venv, process.platform === "win32" ? "Scripts" : "bin", "ninja"), "-C", bdir, "install"], env2);
     // pkg-config is the name that meson looks for first.
     const exe = process.platform === "win32" ? ".exe" : "";
@@ -102,13 +122,23 @@ export async function ensureTools(file: RecipeFile, opts: BuildOptions, env: Rec
 }
 
 async function probe(venv: string, name: string, version: string): Promise<boolean> {
-  const bin = join(venv, process.platform === "win32" ? "Scripts" : "bin", name + (process.platform === "win32" ? ".exe" : ""));
+  const bin = join(
+    venv,
+    process.platform === "win32" ? "Scripts" : "bin",
+    name + (process.platform === "win32" ? ".exe" : ""),
+  );
   if (!existsSync(bin)) return false;
   const r = await run([bin, "--version"], { output: "capture", timeoutMs: 20_000 });
   return r.code === 0 && r.stdout.trim().startsWith(version.split(".").slice(0, 2).join("."));
 }
 
-export async function cloneAt(repo: string, tag: string, sha: string, dest: string, env: Record<string, string | undefined>): Promise<void> {
+export async function cloneAt(
+  repo: string,
+  tag: string,
+  sha: string,
+  dest: string,
+  env: Record<string, string | undefined>,
+): Promise<void> {
   if (existsSync(join(dest, ".git"))) {
     const head = await run(["git", "rev-parse", "HEAD"], { cwd: dest, output: "capture" });
     if (head.stdout.trim() === sha || !sha) return;
@@ -133,7 +163,11 @@ export function mingwDir(): string | undefined {
   const v = versions.at(-1);
   if (!v) return undefined;
   const dir = join(base, v);
-  const inner = existsSync(join(dir, "bin")) ? dir : readdirSync(dir).map(n => join(dir, n)).find(p => existsSync(join(p, "bin")));
+  const inner = existsSync(join(dir, "bin"))
+    ? dir
+    : readdirSync(dir)
+        .map(n => join(dir, n))
+        .find(p => existsSync(join(p, "bin")));
   return inner;
 }
 
@@ -193,7 +227,10 @@ function crossFiles(opts: BuildOptions, target: Target): { meson?: string; cmake
       meson,
       `[binaries]\nc = 'cl'\ncpp = 'cl'\nar = 'lib'\nlinker = 'link'\npkg-config = 'pkgconf'\n\n[host_machine]\nsystem = 'windows'\ncpu_family = '${cpu}'\ncpu = '${cpu}'\nendian = 'little'\n\n[properties]\nneeds_exe_wrapper = true\n`,
     );
-    writeFileSync(cmake, `set(CMAKE_SYSTEM_NAME Windows)\nset(CMAKE_SYSTEM_PROCESSOR ARM64)\nset(CMAKE_C_COMPILER cl)\nset(CMAKE_CXX_COMPILER cl)\n`);
+    writeFileSync(
+      cmake,
+      `set(CMAKE_SYSTEM_NAME Windows)\nset(CMAKE_SYSTEM_PROCESSOR ARM64)\nset(CMAKE_C_COMPILER cl)\nset(CMAKE_CXX_COMPILER cl)\n`,
+    );
   }
   return { meson, cmake };
 }
@@ -223,12 +260,19 @@ export interface BuildResult {
   seconds: number;
 }
 
-export async function buildPackage(r: Recipe, file: RecipeFile, opts: BuildOptions, env: Record<string, string>, repoRoot: string): Promise<BuildResult> {
+export async function buildPackage(
+  r: Recipe,
+  file: RecipeFile,
+  opts: BuildOptions,
+  env: Record<string, string>,
+  repoRoot: string,
+): Promise<BuildResult> {
   const target = file.targets[opts.target]!;
   const prefix = prefixOf(opts.target);
   const pin = r.local ? { tag: "local", sha: "" } : pinFor(r, opts.lts);
   if (!pin?.tag) throw new Error(`${r.id}: no pin; run \`buncc desktop plan --pin\``);
-  if (r.status === "plan-only") throw new Error(`${r.id}: plan-only recipe (${r.note ?? "not buildable on Windows yet"})`);
+  if (r.status === "plan-only")
+    throw new Error(`${r.id}: plan-only recipe (${r.note ?? "not buildable on Windows yet"})`);
   const hash = optionHash(r, opts, pin);
   const stamp = stampPath(prefix, r.id);
   if (existsSync(stamp)) {
@@ -244,23 +288,47 @@ export async function buildPackage(r: Recipe, file: RecipeFile, opts: BuildOptio
   if (r.build === "meson") {
     const wrap = opts.mode === "mono" ? "forcefallback" : "default";
     if (!existsSync(join(bdir, "build.ninja"))) {
-      const args = ["setup", bdir, src, `--prefix=${prefix}`, "--buildtype=release", `--wrap-mode=${wrap}`, "--libdir=lib", ...r.options];
+      const args = [
+        "setup",
+        bdir,
+        src,
+        `--prefix=${prefix}`,
+        "--buildtype=release",
+        `--wrap-mode=${wrap}`,
+        "--libdir=lib",
+        ...r.options,
+      ];
       if (cross.meson) args.push("--cross-file", cross.meson);
       await sh([bin("meson"), ...args], env);
     }
     await sh([bin("ninja"), "-C", bdir, "-j", String(opts.jobs), "install"], env);
   } else {
     if (!existsSync(join(bdir, "build.ninja"))) {
-      const args = ["-G", "Ninja", "-S", src, "-B", bdir, "-DCMAKE_BUILD_TYPE=Release", `-DCMAKE_INSTALL_PREFIX=${prefix}`, `-DCMAKE_PREFIX_PATH=${prefix}`, ...r.options];
-      if (opts.sccache && Bun.which("sccache")) args.push("-DCMAKE_C_COMPILER_LAUNCHER=sccache", "-DCMAKE_CXX_COMPILER_LAUNCHER=sccache");
-      if (target.kind === "msvc") args.push("-DCMAKE_POLICY_DEFAULT_CMP0141=NEW", "-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded");
-      if (opts.cc === "clang-cl" && target.kind === "msvc") args.push("-DCMAKE_C_COMPILER=clang-cl", "-DCMAKE_CXX_COMPILER=clang-cl");
+      const args = [
+        "-G",
+        "Ninja",
+        "-S",
+        src,
+        "-B",
+        bdir,
+        "-DCMAKE_BUILD_TYPE=Release",
+        `-DCMAKE_INSTALL_PREFIX=${prefix}`,
+        `-DCMAKE_PREFIX_PATH=${prefix}`,
+        ...r.options,
+      ];
+      if (opts.sccache && Bun.which("sccache"))
+        args.push("-DCMAKE_C_COMPILER_LAUNCHER=sccache", "-DCMAKE_CXX_COMPILER_LAUNCHER=sccache");
+      if (target.kind === "msvc")
+        args.push("-DCMAKE_POLICY_DEFAULT_CMP0141=NEW", "-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded");
+      if (opts.cc === "clang-cl" && target.kind === "msvc")
+        args.push("-DCMAKE_C_COMPILER=clang-cl", "-DCMAKE_CXX_COMPILER=clang-cl");
       if (cross.cmake) args.push(`-DCMAKE_TOOLCHAIN_FILE=${cross.cmake}`);
       if (r.group === "kf6" || r.group === "plasma-libs" || r.group === "apps") {
         const ecm = join(prefix, "share", "ECM", "cmake");
         args.push(`-DCMAKE_MODULE_PATH=${ecm}`, `-DECM_DIR=${ecm}`);
       }
-      if (!["qtbase"].includes(r.id) && existsSync(join(prefix, "lib", "cmake", "Qt6"))) args.push(`-DQt6_DIR=${join(prefix, "lib", "cmake", "Qt6")}`);
+      if (!["qtbase"].includes(r.id) && existsSync(join(prefix, "lib", "cmake", "Qt6")))
+        args.push(`-DQt6_DIR=${join(prefix, "lib", "cmake", "Qt6")}`);
       await sh(["cmake", ...args], env);
     }
     await sh(["cmake", "--build", bdir, "--parallel", String(opts.jobs)], env);

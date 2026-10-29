@@ -75,6 +75,14 @@ int main(int argc, char **argv) {
 };
 
 /** clang command line for a sample. `flags` come from pcFlags, `target` from targetFlags/linkOnlyFlags. */
-export function helloCommand(clang: string, target: string[], link: string[], cflags: string[], libs: string[], src: string, out: string): string[] {
+export function helloCommand(
+  clang: string,
+  target: string[],
+  link: string[],
+  cflags: string[],
+  libs: string[],
+  src: string,
+  out: string,
+): string[] {
   return [clang, ...target, ...cflags, "-O2", "-Wall", src, "-o", out, ...link, ...libs];
 }

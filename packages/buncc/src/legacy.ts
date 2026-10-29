@@ -6,7 +6,10 @@
  * The machine is reached through `LegacyHost`, so the tests run on fake directories and a simulated registry.
  */
 import { existsSync, readdirSync, readFileSync, rmSync, statSync, mkdirSync, writeFileSync } from "node:fs";
-import { basename, delimiter, dirname, join } from "node:path";
+import { win32 } from "node:path";
+
+// The detected stacks live on Windows: path logic stays win32 on every host (the simulated-host tests run on Linux CI too).
+const { basename, delimiter, dirname, join } = win32;
 import { run } from "./process.ts";
 
 export type LegacyId = "msys2" | "mingw" | "gnuwin32" | "cygwin";

@@ -23,15 +23,19 @@ const baseSet = new Set<string>(closure.distroBase);
 if (byId.size !== items.length) fail("duplicate item ids");
 
 // ---- 3. resolution
-let edges = 0, providedByDistro = 0;
+let edges = 0,
+  providedByDistro = 0;
 for (const it of items)
   for (const d of [...it.depends, ...it.makedepends]) {
     edges++;
-    if (d.startsWith("base:")) { providedByDistro++; if (!baseSet.has(d.slice(5))) fail(`${it.id}: ${d} not in distroBase`); }
-    else if (!byId.has(d)) fail(`${it.id}: dependency ${d} does not resolve inside the closure`);
+    if (d.startsWith("base:")) {
+      providedByDistro++;
+      if (!baseSet.has(d.slice(5))) fail(`${it.id}: ${d} not in distroBase`);
+    } else if (!byId.has(d)) fail(`${it.id}: dependency ${d} does not resolve inside the closure`);
   }
 for (const it of items) {
-  if (it.kind === "distro" && !(it.arch?.packages?.length && it.version)) fail(`${it.id}: distro item without Arch package/version`);
+  if (it.kind === "distro" && !(it.arch?.packages?.length && it.version))
+    fail(`${it.id}: distro item without Arch package/version`);
   if (it.kind !== "distro" && !/^[a-f0-9]{40}$/.test(it.sha ?? "")) fail(`${it.id}: sha is not a 40-hex commit`);
   if (it.kind === "source" && !it.tag) fail(`${it.id}: source item without tag`);
 }
@@ -42,28 +46,35 @@ const srcSet = new Set(srcIds);
 const indeg = new Map<string, number>(srcIds.map(i => [i, 0]));
 const rev = new Map<string, string[]>();
 for (const id of srcIds)
-  for (const d of [...byId.get(id).depends, ...byId.get(id).makedepends]) if (srcSet.has(d)) {
-    indeg.set(id, indeg.get(id)! + 1);
-    (rev.get(d) ?? rev.set(d, []).get(d)!).push(id);
-  }
+  for (const d of [...byId.get(id).depends, ...byId.get(id).makedepends])
+    if (srcSet.has(d)) {
+      indeg.set(id, indeg.get(id)! + 1);
+      (rev.get(d) ?? rev.set(d, []).get(d)!).push(id);
+    }
 const q = srcIds.filter(i => indeg.get(i) === 0);
 let sorted = 0;
 while (q.length) {
   const n = q.pop()!;
   sorted++;
-  for (const m of rev.get(n) ?? []) { indeg.set(m, indeg.get(m)! - 1); if (indeg.get(m) === 0) q.push(m); }
+  for (const m of rev.get(n) ?? []) {
+    indeg.set(m, indeg.get(m)! - 1);
+    if (indeg.get(m) === 0) q.push(m);
+  }
 }
 if (sorted !== srcIds.length) fail(`source graph has a cycle: ${srcIds.filter(i => indeg.get(i)! > 0).join(", ")}`);
 const pos = new Map<string, number>((closure.buildOrder as string[]).map((id, n) => [id, n]));
 for (const id of srcIds) if (!pos.has(id)) fail(`buildOrder lacks ${id}`);
 for (const id of srcIds)
-  for (const d of [...byId.get(id).depends, ...byId.get(id).makedepends]) if (srcSet.has(d) && pos.get(d)! > pos.get(id)!) fail(`buildOrder: ${d} must precede ${id}`);
+  for (const d of [...byId.get(id).depends, ...byId.get(id).makedepends])
+    if (srcSet.has(d) && pos.get(d)! > pos.get(id)!) fail(`buildOrder: ${d} must precede ${id}`);
 const wpos = new Map<string, number>(wslg.entries.map((e: any) => [e.id, e.order]));
-for (const e of wslg.entries) for (const a of e.after) if (!(wpos.get(a)! < e.order)) fail(`wslg-deps: ${a} must precede ${e.id}`);
+for (const e of wslg.entries)
+  for (const a of e.after) if (!(wpos.get(a)! < e.order)) fail(`wslg-deps: ${a} must precede ${e.id}`);
 for (const e of wslg.entries) if (!byId.has(e.id)) fail(`wslg-deps: ${e.id} not in closure`);
 // every source dependency of a WSLg entry is itself a WSLg entry
 for (const e of wslg.entries)
-  for (const d of [...byId.get(e.id).depends, ...byId.get(e.id).makedepends]) if (srcSet.has(d) && !wpos.has(d)) fail(`wslg-deps: ${e.id} needs ${d} which is not an entry`);
+  for (const d of [...byId.get(e.id).depends, ...byId.get(e.id).makedepends])
+    if (srcSet.has(d) && !wpos.has(d)) fail(`wslg-deps: ${e.id} needs ${d} which is not an entry`);
 
 // ---- 1. pins on remotes
 const run = async (cmd: string[]) => {
@@ -75,14 +86,25 @@ const stats = { verified: 0, unchecked: [] as string[] };
 async function checkPin(it: any) {
   if (it.tag) {
     const out = await run(["git", "ls-remote", it.url, `refs/tags/${it.tag}`, `refs/tags/${it.tag}^{}`]);
-    const shas = out.split("\n").filter(Boolean).map(l => l.split("\t")[0]);
+    const shas = out
+      .split("\n")
+      .filter(Boolean)
+      .map(l => l.split("\t")[0]);
     if (shas.includes(it.sha)) return void stats.verified++;
     // a fork mirror may lag: fall through to the canonical URLs
     for (const u of it.urls ?? []) {
       const o2 = await run(["git", "ls-remote", u, `refs/tags/${it.tag}`, `refs/tags/${it.tag}^{}`]);
-      if (o2.split("\n").filter(Boolean).some(l => l.split("\t")[0] === it.sha)) return void stats.verified++;
+      if (
+        o2
+          .split("\n")
+          .filter(Boolean)
+          .some(l => l.split("\t")[0] === it.sha)
+      )
+        return void stats.verified++;
     }
-    return fail(`${it.id}: tag ${it.tag} does not point at ${it.sha} on ${it.url} (remote: ${shas.join(",") || "tag missing"})`);
+    return fail(
+      `${it.id}: tag ${it.tag} does not point at ${it.sha} on ${it.url} (remote: ${shas.join(",") || "tag missing"})`,
+    );
   }
   const gh = it.url.match(/github\.com\/([^/]+\/[^/.]+)/);
   if (gh) {
@@ -91,7 +113,9 @@ async function checkPin(it: any) {
   }
   const gl = it.url.match(/^https:\/\/([^/]+)\/(.+?)(?:\.git)?$/);
   if (gl && /gitlab/.test(gl[1])) {
-    const r = await fetch(`https://${gl[1]}/api/v4/projects/${encodeURIComponent(gl[2])}/repository/commits/${it.sha}`).catch(() => null);
+    const r = await fetch(
+      `https://${gl[1]}/api/v4/projects/${encodeURIComponent(gl[2])}/repository/commits/${it.sha}`,
+    ).catch(() => null);
     return r?.ok ? void stats.verified++ : fail(`${it.id}: commit ${it.sha} not found on ${it.url}`);
   }
   stats.unchecked.push(it.id);
@@ -99,7 +123,11 @@ async function checkPin(it: any) {
 if (!offline) {
   const todo = items.filter(i => i.kind !== "distro");
   let k = 0;
-  await Promise.all(Array.from({ length: 8 }, async () => { while (k < todo.length) await checkPin(todo[k++]); }));
+  await Promise.all(
+    Array.from({ length: 8 }, async () => {
+      while (k < todo.length) await checkPin(todo[k++]);
+    }),
+  );
 }
 
 for (const e of errors.slice(0, 100)) console.error("error:", e);

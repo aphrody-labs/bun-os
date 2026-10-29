@@ -67,7 +67,15 @@ export function untar(buf: Uint8Array): TarEntry[] {
     longName = longLink = undefined;
     pax = new Map();
     const type =
-      flag === "5" ? "dir" : flag === "2" ? "symlink" : flag === "1" ? "hardlink" : flag === "0" || flag === "\0" ? "file" : undefined;
+      flag === "5"
+        ? "dir"
+        : flag === "2"
+          ? "symlink"
+          : flag === "1"
+            ? "hardlink"
+            : flag === "0" || flag === "\0"
+              ? "file"
+              : undefined;
     if (type) out.push({ path: path.replace(/^\.\//, "").replace(/\/$/, ""), type, link, mode, data });
   }
   return out;

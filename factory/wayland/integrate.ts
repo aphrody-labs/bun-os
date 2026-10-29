@@ -26,16 +26,20 @@ const git = async (...a: string[]) => {
 let gm = await Bun.file(join(root, ".gitmodules")).text();
 const have = new Map<string, string>();
 for (const b of gm.split(/\[submodule /).slice(1)) {
-  const p = b.match(/path\s*=\s*(.*)/)?.[1].trim(), u = b.match(/url\s*=\s*(.*)/)?.[1].trim();
+  const p = b.match(/path\s*=\s*(.*)/)?.[1].trim(),
+    u = b.match(/url\s*=\s*(.*)/)?.[1].trim();
   if (p && u) have.set(p, u);
 }
 const mounts = items.filter(i => i.mount);
 let added = 0;
 for (const it of mounts) {
   if (have.has(it.mount)) {
-    if (have.get(it.mount) !== it.url) throw new Error(`${it.mount}: .gitmodules url ${have.get(it.mount)} != ${it.url}`);
+    if (have.get(it.mount) !== it.url)
+      throw new Error(`${it.mount}: .gitmodules url ${have.get(it.mount)} != ${it.url}`);
   } else {
-    gm = gm.replace(/\n*$/, "\n") + `[submodule "${it.mount}"]\n\tpath = ${it.mount}\n\turl = ${it.url}\n\tshallow = true\n\tupdate = none\n`;
+    gm =
+      gm.replace(/\n*$/, "\n") +
+      `[submodule "${it.mount}"]\n\tpath = ${it.mount}\n\turl = ${it.url}\n\tshallow = true\n\tupdate = none\n`;
     added++;
   }
 }
@@ -49,7 +53,10 @@ const idOf = (i: any) => `submodule:${i.mount}`;
 const ours = new Set(mounts.map(idOf));
 manifest.modules = manifest.modules.filter((m: any) => !ours.has(m.id));
 for (const it of mounts) {
-  const deps = [...it.depends, ...it.makedepends].map(d => byId.get(d)).filter(d => d?.mount).map(idOf);
+  const deps = [...it.depends, ...it.makedepends]
+    .map(d => byId.get(d))
+    .filter(d => d?.mount)
+    .map(idOf);
   const consumedBy = ["file:factory/wayland/closure.json"];
   if (it.consumers.includes("wslg")) consumedBy.push("file:factory/wayland/wslg-deps.json");
   if (it.consumers.includes("bun-os")) consumedBy.push("file:factory/images/bunos-hyprland/hyprland.packages");
@@ -70,20 +77,42 @@ await Bun.write(file, JSON.stringify(manifest, null, 2) + "\n");
 
 // ---- PKGBUILD stubs for image items that Arch ships at a different version (or not at all)
 const archName = (i: any) => i.arch?.packages?.[0] ?? i.id;
-const pkgOf = (d: string) => (d.startsWith("arch:") || d.startsWith("base:") ? d.slice(d.indexOf(":") + 1) : byId.get(d) ? archName(byId.get(d)) : d);
-const stubs = items.filter(i => i.kind === "source" && i.consumers.includes("bun-os") && i.imageProvision && !i.imageProvision.startsWith("pacman") && i.id !== "hyprland-qtutils");
+const pkgOf = (d: string) =>
+  d.startsWith("arch:") || d.startsWith("base:")
+    ? d.slice(d.indexOf(":") + 1)
+    : byId.get(d)
+      ? archName(byId.get(d))
+      : d;
+const stubs = items.filter(
+  i =>
+    i.kind === "source" &&
+    i.consumers.includes("bun-os") &&
+    i.imageProvision &&
+    !i.imageProvision.startsWith("pacman") &&
+    i.id !== "hyprland-qtutils",
+);
 for (const it of stubs) {
   const dir = join(root, "factory/wayland/pkgbuilds", archName(it));
   mkdirSync(dir, { recursive: true });
-  const deps = [...new Set([...it.depends].filter((d: string) => !byId.get(d) || byId.get(d).kind !== "bundled").map(pkgOf))].sort();
+  const deps = [
+    ...new Set([...it.depends].filter((d: string) => !byId.get(d) || byId.get(d).kind !== "bundled").map(pkgOf)),
+  ].sort();
   const mk = [...new Set(it.makedepends.map(pkgOf))].sort();
   const bs = it.buildSystem;
   const build =
-    bs === "meson" ? `  arch-meson build "$_src"\n  meson compile -C build`
-    : bs === "cmake" ? `  cmake -S "$_src" -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr\n  cmake --build build`
-    : bs === "cargo" ? `  cd "$_src" && cargo build --release --locked`
-    : `  echo "UNVERIFIED build system ${bs}" >&2; false`;
-  const pack = bs === "meson" ? `  meson install -C build --destdir "$pkgdir"` : bs === "cmake" ? `  DESTDIR="$pkgdir" cmake --install build` : `  install -Dm755 "$_src/target/release/${it.id}" "$pkgdir/usr/bin/${it.id}"`;
+    bs === "meson"
+      ? `  arch-meson build "$_src"\n  meson compile -C build`
+      : bs === "cmake"
+        ? `  cmake -S "$_src" -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr\n  cmake --build build`
+        : bs === "cargo"
+          ? `  cd "$_src" && cargo build --release --locked`
+          : `  echo "UNVERIFIED build system ${bs}" >&2; false`;
+  const pack =
+    bs === "meson"
+      ? `  meson install -C build --destdir "$pkgdir"`
+      : bs === "cmake"
+        ? `  DESTDIR="$pkgdir" cmake --install build`
+        : `  install -Dm755 "$_src/target/release/${it.id}" "$pkgdir/usr/bin/${it.id}"`;
   const ver = (it.version ?? "0").replace(/-/g, ".").replace(/^v/, "");
   writeFileSync(
     join(dir, "PKGBUILD"),
@@ -116,18 +145,50 @@ ${pack}
 }
 
 // ---- opt-in composition package list
-const hypr = items.filter(i => i.kind === "source" && i.compositions?.includes("hyprland") && i.consumers.includes("bun-os"));
-const top = ["hyprland", "hyprland-guiutils", "xdg-desktop-portal-hyprland", "hyprlock", "hypridle", "hyprpaper", "hyprpicker", "hyprsunset", "hyprpolkitagent", "hyprshutdown", "xorg-xwayland", "xdg-desktop-portal", "xdg-desktop-portal-gtk", "polkit", "pipewire", "wireplumber", "mesa", "vulkan-icd-loader", "qt6-wayland", "qt6-base", "gtk4", "wayland-utils"];
+const hypr = items.filter(
+  i => i.kind === "source" && i.compositions?.includes("hyprland") && i.consumers.includes("bun-os"),
+);
+const top = [
+  "hyprland",
+  "hyprland-guiutils",
+  "xdg-desktop-portal-hyprland",
+  "hyprlock",
+  "hypridle",
+  "hyprpaper",
+  "hyprpicker",
+  "hyprsunset",
+  "hyprpolkitagent",
+  "hyprshutdown",
+  "xorg-xwayland",
+  "xdg-desktop-portal",
+  "xdg-desktop-portal-gtk",
+  "polkit",
+  "pipewire",
+  "wireplumber",
+  "mesa",
+  "vulkan-icd-loader",
+  "qt6-wayland",
+  "qt6-base",
+  "gtk4",
+  "wayland-utils",
+];
 const stubNames = new Set(stubs.map(archName));
 const lines = [
   "# OPT-IN Hyprland composition. NOT part of server, desktop (COSMIC) or gaming and never selected by default:",
   "# PLAN.md keeps Omarchy Hyprland blocked until a package subset, a signed closure and boot/session qualification exist.",
-  "# Facts: these names exist in Arch core/extra on " + closure.computedAt + " (factory/wayland/closure.json); nothing here is built, booted or qualified.",
+  "# Facts: these names exist in Arch core/extra on " +
+    closure.computedAt +
+    " (factory/wayland/closure.json); nothing here is built, booted or qualified.",
   "# Items marked (source) need a local PKGBUILD from factory/wayland/pkgbuilds (stubs, UNVERIFIED) because Arch ships a different version than the pin.",
   ...top.map(p => `${p}${stubNames.has(p) ? "   # (source) pinned, see factory/wayland/pkgbuilds/" + p : ""}`),
-  ...[...stubNames].filter(n => !top.includes(n) && hypr.some(h => archName(h) === n)).sort().map(n => `${n}   # (source) pinned, see factory/wayland/pkgbuilds/${n}`),
+  ...[...stubNames]
+    .filter(n => !top.includes(n) && hypr.some(h => archName(h) === n))
+    .sort()
+    .map(n => `${n}   # (source) pinned, see factory/wayland/pkgbuilds/${n}`),
   "",
 ];
 mkdirSync(join(root, "factory/images/bunos-hyprland"), { recursive: true });
 writeFileSync(join(root, "factory/images/bunos-hyprland/hyprland.packages"), lines.join("\n"));
-console.log(JSON.stringify({ mounts: mounts.length, newGitmodules: added, stubs: stubs.map(archName), hyprPackages: top.length }));
+console.log(
+  JSON.stringify({ mounts: mounts.length, newGitmodules: added, stubs: stubs.map(archName), hyprPackages: top.length }),
+);

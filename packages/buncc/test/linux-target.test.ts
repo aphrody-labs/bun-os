@@ -12,8 +12,21 @@ import {
   type Closure,
   type SourcePin,
 } from "../src/linux-target/closure.ts";
-import { cmakeToolchain, mesonCrossFile, parseTriple, pkgConfigEnv, targetFlags } from "../src/linux-target/crossfile.ts";
-import { ArchIndex, archClosure, depKey, packageFromDesc, packageUrl, parseDesc } from "../src/linux-target/pacmandb.ts";
+import {
+  cmakeToolchain,
+  mesonCrossFile,
+  parseTriple,
+  pkgConfigEnv,
+  targetFlags,
+} from "../src/linux-target/crossfile.ts";
+import {
+  ArchIndex,
+  archClosure,
+  depKey,
+  packageFromDesc,
+  packageUrl,
+  parseDesc,
+} from "../src/linux-target/pacmandb.ts";
 import { parsePc, pcFlags, splitRequires } from "../src/linux-target/pkgconfig.ts";
 import { keepPath, resolveLink, sysrootManifest } from "../src/linux-target/sysroot.ts";
 import { untar } from "../src/linux-target/tar.ts";
@@ -114,18 +127,28 @@ test("closure follows provides, skips excluded host tools and makedepends of tra
 
 test("sysroot manifest adds the toolchain roots and uses the right mirror per architecture", () => {
   const idx = new ArchIndex(
-    ["glibc", "linux-api-headers", "gcc-libs", "gcc"].map(n => packageFromDesc("core", desc(n, "1-1", []))).concat(index().byName.get("glib2")!, index().byName.get("libffi")!),
+    ["glibc", "linux-api-headers", "gcc-libs", "gcc"]
+      .map(n => packageFromDesc("core", desc(n, "1-1", [])))
+      .concat(index().byName.get("glib2")!, index().byName.get("libffi")!),
   );
   const m = sysrootManifest(idx, "x86_64", ["glib2"]);
   expect(m.packages.map(p => p.name)).toEqual(["gcc", "gcc-libs", "glib2", "glibc", "libffi", "linux-api-headers"]);
   expect(m.packages[0]!.url).toBe("https://geo.mirror.pkgbuild.com/core/os/x86_64/gcc-1-1-x86_64.pkg.tar.zst");
   expect(m.totals).toEqual({ packages: 6, csize: 600, isize: 2400 });
-  expect(sysrootManifest(idx, "aarch64", ["glib2"]).packages[0]!.url).toContain("mirror.archlinuxarm.org/aarch64/core/");
+  expect(sysrootManifest(idx, "aarch64", ["glib2"]).packages[0]!.url).toContain(
+    "mirror.archlinuxarm.org/aarch64/core/",
+  );
   expect(packageUrl({ repo: "extra", filename: "x.pkg.tar.zst", arch: "any" })).toContain("/extra/os/x86_64/x.pkg");
 });
 
 test("build order puts dependencies first and is deterministic", () => {
-  const src = [pin("shell", ["mutter", "gjs"]), pin("mutter", ["gtk"]), pin("gjs", ["gtk"]), pin("gtk", []), pin("other", [])];
+  const src = [
+    pin("shell", ["mutter", "gjs"]),
+    pin("mutter", ["gtk"]),
+    pin("gjs", ["gtk"]),
+    pin("gtk", []),
+    pin("other", []),
+  ];
   expect(buildOrder(src, ["shell"])).toEqual({ order: ["gtk", "gjs", "mutter", "shell"], cycle: [] });
   expect(buildOrder([pin("a", ["b"]), pin("b", ["a"])], ["a"]).cycle).toEqual(["a", "b"]);
   expect(buildOrder([pin("a", ["external"])], ["a"]).order).toEqual(["a"]);
@@ -178,15 +201,24 @@ test("triples", () => {
 });
 
 test("meson cross file for clang + lld", () => {
-  const f = mesonCrossFile({ triple: parseTriple("aarch64"), sysroot: "C:\\sr", llvmBin: "C:\\llvm\\bin", gccInstallDir: "C:\\sr\\usr\\lib\\gcc\\x\\16" });
+  const f = mesonCrossFile({
+    triple: parseTriple("aarch64"),
+    sysroot: "C:\\sr",
+    llvmBin: "C:\\llvm\\bin",
+    gccInstallDir: "C:\\sr\\usr\\lib\\gcc\\x\\16",
+  });
   expect(f).toContain("c = ['C:/llvm/bin/clang']");
-  expect(f).toContain("c_args = ['--target=aarch64-unknown-linux-gnu', '--sysroot=C:/sr', '--gcc-install-dir=C:/sr/usr/lib/gcc/x/16']");
+  expect(f).toContain(
+    "c_args = ['--target=aarch64-unknown-linux-gnu', '--sysroot=C:/sr', '--gcc-install-dir=C:/sr/usr/lib/gcc/x/16']",
+  );
   expect(f).toContain("cpu_family = 'aarch64'");
   expect(f).toContain("system = 'linux'");
   expect(f).toContain("needs_exe_wrapper = true");
   expect(f).toContain("pkg_config_libdir = ['C:/sr/usr/lib/pkgconfig', 'C:/sr/usr/share/pkgconfig']");
   expect(f).toContain("'-fuse-ld=lld'");
-  expect(mesonCrossFile({ triple: parseTriple("aarch64"), sysroot: "/sr", exeWrapper: ["qemu-aarch64", "-L", "/sr"] })).toContain("exe_wrapper = ['qemu-aarch64', '-L', '/sr']");
+  expect(
+    mesonCrossFile({ triple: parseTriple("aarch64"), sysroot: "/sr", exeWrapper: ["qemu-aarch64", "-L", "/sr"] }),
+  ).toContain("exe_wrapper = ['qemu-aarch64', '-L', '/sr']");
 });
 
 test("meson and cmake files for zig cc", () => {
@@ -204,12 +236,17 @@ test("cmake toolchain for clang", () => {
   expect(cm).toContain('set(CMAKE_SYSROOT "C:/sr")');
   expect(cm).toContain("set(CMAKE_C_COMPILER_TARGET x86_64-unknown-linux-gnu)");
   expect(cm).toContain("CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER");
-  expect(pkgConfigEnv({ triple: parseTriple("x86_64"), sysroot: "C:\\sr" }, ";").PKG_CONFIG_LIBDIR).toBe("C:/sr/usr/lib/pkgconfig;C:/sr/usr/share/pkgconfig");
+  expect(pkgConfigEnv({ triple: parseTriple("x86_64"), sysroot: "C:\\sr" }, ";").PKG_CONFIG_LIBDIR).toBe(
+    "C:/sr/usr/lib/pkgconfig;C:/sr/usr/share/pkgconfig",
+  );
 });
 
 test("pkg-config files: variables, requires and sysroot prefixing", () => {
   const dir = mkdtempSync(join(tmpdir(), "pc-"));
-  writeFileSync(join(dir, "a.pc"), "prefix=/usr\nincludedir=${prefix}/include\nName: a\nVersion: 1.2\nRequires: b >= 2, c\nLibs: -L${prefix}/lib -la\nCflags: -I${includedir}/a -DA=1\nLibs.private: -lm\n");
+  writeFileSync(
+    join(dir, "a.pc"),
+    "prefix=/usr\nincludedir=${prefix}/include\nName: a\nVersion: 1.2\nRequires: b >= 2, c\nLibs: -L${prefix}/lib -la\nCflags: -I${includedir}/a -DA=1\nLibs.private: -lm\n",
+  );
   writeFileSync(join(dir, "b.pc"), "Name: b\nLibs: -lb\nCflags: -I/usr/include/b\n");
   writeFileSync(join(dir, "c.pc"), "Name: c\nLibs: -lc2\n");
   const pc = parsePc("a", "prefix=/usr\nName: a\nCflags: -I${prefix}/x\n");
@@ -232,7 +269,16 @@ test("meson build plan clones, verifies the pin, configures with a cross file an
     fileDir: "/w/cross",
     cross: { triple: parseTriple("x86_64"), sysroot: "/sr" },
   });
-  expect(plan.steps[0]!.cmd).toEqual(["git", "clone", "--depth", "1", "--branch", "51.1", "https://example.org/mutter.git", "/w/src/mutter"]);
+  expect(plan.steps[0]!.cmd).toEqual([
+    "git",
+    "clone",
+    "--depth",
+    "1",
+    "--branch",
+    "51.1",
+    "https://example.org/mutter.git",
+    "/w/src/mutter",
+  ]);
   expect(plan.steps[1]!.expect).toBe(sha);
   expect(verifyOutput(plan.steps[1]!, sha + "\n")).toBe(true);
   expect(verifyOutput(plan.steps[1]!, "b".repeat(40))).toBe(false);
@@ -243,7 +289,15 @@ test("meson build plan clones, verifies the pin, configures with a cross file an
   expect(plan.files.map(f => f.path)).toEqual(["/w/cross/meson-x86_64.ini", "/w/cross/meson-native.ini"]);
   expect(configure).toContain("--native-file");
   expect(plan.files[1]!.content).toContain("c = ['clang']");
-  expect(plan.steps.at(-1)!.cmd).toEqual(["meson", "install", "-C", "/w/build/mutter-x86_64", "--destdir", "/w/stage", "--no-rebuild"]);
+  expect(plan.steps.at(-1)!.cmd).toEqual([
+    "meson",
+    "install",
+    "-C",
+    "/w/build/mutter-x86_64",
+    "--destdir",
+    "/w/stage",
+    "--no-rebuild",
+  ]);
 });
 
 test("cmake build plan passes the toolchain, host Qt and KF6 host tooling", () => {

@@ -16,12 +16,7 @@
       "date": "2026-10-06T16:22:44.000+01:00",
       "build": "meson",
       "needs": [],
-      "options": [
-        "-Dtests=false",
-        "-Dman-pages=disabled",
-        "-Ddocumentation=false",
-        "-Dintrospection=disabled"
-      ],
+      "options": ["-Dtests=false", "-Dman-pages=disabled", "-Ddocumentation=false", "-Dintrospection=disabled"],
       "declared": [
         "bash-completion >=2.0",
         "gobject-introspection-1.0",
@@ -43,15 +38,9 @@
       "sha": "1db238b6a349ea7fae6f1c0713afe04d1bb7ea5c",
       "date": "2026-09-13T22:44:58.000+02:00",
       "build": "meson",
-      "needs": [
-        "glib"
-      ],
-      "options": [
-        "-Dintrospection=false"
-      ],
-      "declared": [
-        "gsettings-desktop-schemas"
-      ],
+      "needs": ["glib"],
+      "options": ["-Dintrospection=false"],
+      "declared": ["gsettings-desktop-schemas"],
       "hostRun": [
         "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)"
       ]
@@ -63,16 +52,8 @@
       "sha": "fd610b86a526a504a217c5532c47865273c95b10",
       "date": "2026-09-14T15:55:46.000-04:00",
       "build": "meson",
-      "needs": [
-        "glib",
-        "gsettings-desktop-schemas",
-        "gtk4"
-      ],
-      "options": [
-        "-Dgtk_doc=false",
-        "-Ddebug_tools=false",
-        "-Dintrospection=false"
-      ],
+      "needs": ["glib", "gsettings-desktop-schemas", "gtk4"],
+      "options": ["-Dgtk_doc=false", "-Ddebug_tools=false", "-Dintrospection=false"],
       "declared": [
         "fontconfig",
         "gdk-pixbuf-2.0",
@@ -97,9 +78,7 @@
       "sha": "2ea935e3ec680fb122f245b28e18c3495df8c344",
       "date": "2026-10-01T11:47:40.000-04:00",
       "build": "meson",
-      "needs": [
-        "glib"
-      ],
+      "needs": ["glib"],
       "options": [
         "-Dintrospection=disabled",
         "-Dbuild-demos=false",
@@ -180,10 +159,7 @@
       "sha": "c9ab118612eee92324143783c4641c98eaded3f0",
       "date": "2026-09-14T15:34:42.000+04:00",
       "build": "meson",
-      "needs": [
-        "glib",
-        "gtk4"
-      ],
+      "needs": ["glib", "gtk4"],
       "options": [
         "-Dtests=false",
         "-Dexamples=false",
@@ -191,15 +167,7 @@
         "-Dvapi=false",
         "-Ddocumentation=false"
       ],
-      "declared": [
-        "appleframeworks",
-        "fribidi",
-        "gio-2.0",
-        "glib-2.0",
-        "gtk4",
-        "gtk4-win32",
-        "ministream"
-      ],
+      "declared": ["appleframeworks", "fribidi", "gio-2.0", "glib-2.0", "gtk4", "gtk4-win32", "ministream"],
       "hostRun": [
         "glib-compile-resources, glib-compile-schemas, gdbus-codegen, glib-mkenums must run on the build host (Windows host: MSYS2/mingw glib, else CI)"
       ]
@@ -211,15 +179,8 @@
       "sha": "b755c24b9b0580623d4ed82013dbbfcb0ae37499",
       "date": "2026-10-11T17:01:17.000-07:00",
       "build": "meson",
-      "needs": [
-        "glib",
-        "gtk4"
-      ],
-      "options": [
-        "-Dskip_dbus_tests=true",
-        "-Dskip_gtk_tests=true",
-        "-Dinstalled_tests=false"
-      ],
+      "needs": ["glib", "gtk4"],
+      "options": ["-Dskip_dbus_tests=true", "-Dskip_gtk_tests=true", "-Dinstalled_tests=false"],
       "declared": [
         "cairo",
         "cairo-gobject",
@@ -249,14 +210,7 @@
       "sha": "9134e3a5869ce232bf95b77519005865747ba603",
       "date": "2026-10-12T20:12:35.000+02:00",
       "build": "meson",
-      "needs": [
-        "glib",
-        "gtk4",
-        "libadwaita",
-        "gnome-desktop",
-        "gsettings-desktop-schemas",
-        "gnome-settings-daemon"
-      ],
+      "needs": ["glib", "gtk4", "libadwaita", "gnome-desktop", "gsettings-desktop-schemas", "gnome-settings-daemon"],
       "options": [
         "-Dtests=disabled",
         "-Dintrospection=false",
@@ -343,12 +297,7 @@
       "sha": "4a75955f7481e2bb19fa73fa67456e83d67e8563",
       "date": "2026-10-14T13:24:39.000+02:00",
       "build": "meson",
-      "needs": [
-        "glib",
-        "gtk4",
-        "gnome-desktop",
-        "gsettings-desktop-schemas"
-      ],
+      "needs": ["glib", "gtk4", "gnome-desktop", "gsettings-desktop-schemas"],
       "options": [],
       "declared": [
         "colord >= 1.4.5",
@@ -392,19 +341,8 @@
       "sha": "33da06854e229c256afd5872fedd83c28cbfa176",
       "date": "2026-10-14T13:10:58.000+02:00",
       "build": "meson",
-      "needs": [
-        "glib",
-        "gtk4",
-        "gjs",
-        "mutter",
-        "gnome-desktop",
-        "gsettings-desktop-schemas"
-      ],
-      "options": [
-        "-Dtests=false",
-        "-Dgtk_doc=false",
-        "-Dman=false"
-      ],
+      "needs": ["glib", "gtk4", "gjs", "mutter", "gnome-desktop", "gsettings-desktop-schemas"],
+      "options": ["-Dtests=false", "-Dgtk_doc=false", "-Dman=false"],
       "declared": [
         "atk-bridge-2.0",
         "cairo",
@@ -450,22 +388,9 @@
       "sha": "aed00cf18229a98231c23e14f5798ddb918c4956",
       "date": "2026-09-14T19:52:26.000-04:00",
       "build": "meson",
-      "needs": [
-        "glib",
-        "gtk4"
-      ],
-      "options": [
-        "-Ddocbook=false",
-        "-Dman=false"
-      ],
-      "declared": [
-        "gio-2.0",
-        "gio-unix-2.0",
-        "glib-2.0",
-        "gnome-desktop-4",
-        "libsystemd >= 209",
-        "systemd >= 242"
-      ]
+      "needs": ["glib", "gtk4"],
+      "options": ["-Ddocbook=false", "-Dman=false"],
+      "declared": ["gio-2.0", "gio-unix-2.0", "glib-2.0", "gnome-desktop-4", "libsystemd >= 209", "systemd >= 242"]
     },
     {
       "id": "gnome-control-center",
@@ -474,18 +399,8 @@
       "sha": "348dd99d9f3a51a39fe9c60c967a6aabaeb34813",
       "date": "2026-10-12T12:00:43.000+02:00",
       "build": "meson",
-      "needs": [
-        "glib",
-        "gtk4",
-        "libadwaita",
-        "gnome-desktop",
-        "gsettings-desktop-schemas",
-        "gnome-settings-daemon"
-      ],
-      "options": [
-        "-Ddocumentation=false",
-        "-Dtests=false"
-      ],
+      "needs": ["glib", "gtk4", "libadwaita", "gnome-desktop", "gsettings-desktop-schemas", "gnome-settings-daemon"],
+      "options": ["-Ddocumentation=false", "-Dtests=false"],
       "declared": [
         "accountsservice >= 26.27.3",
         "colord >= 0.1.34",

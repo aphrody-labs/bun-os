@@ -57,7 +57,12 @@ export function targetFlags(o: CrossOptions): string[] {
 /** Linker-only arguments (without the target flags). */
 export function linkOnlyFlags(o: CrossOptions): string[] {
   if (o.compiler === "zig") return [];
-  return ["-fuse-ld=lld", "-Wl,--as-needed", `-Wl,-rpath-link=${fwd(o.sysroot)}/usr/lib`, "-Wl,--allow-shlib-undefined"];
+  return [
+    "-fuse-ld=lld",
+    "-Wl,--as-needed",
+    `-Wl,-rpath-link=${fwd(o.sysroot)}/usr/lib`,
+    "-Wl,--allow-shlib-undefined",
+  ];
 }
 
 function tool(o: CrossOptions, name: string): string[] {
@@ -163,7 +168,10 @@ export function cmakeToolchain(o: CrossOptions): string {
     l.push(`set(CMAKE_CXX_COMPILER "${cxx[0]}")`, `set(CMAKE_CXX_COMPILER_ARG1 "${cxx.slice(1).join(" ")}")`);
   } else {
     l.push(`set(CMAKE_C_COMPILER "${cc[0]}")`, `set(CMAKE_CXX_COMPILER "${cxx[0]}")`);
-    l.push(`set(CMAKE_AR "${tool(o, "ar")[0]}" CACHE FILEPATH "")`, `set(CMAKE_RANLIB "${tool(o, "ranlib")[0]}" CACHE FILEPATH "")`);
+    l.push(
+      `set(CMAKE_AR "${tool(o, "ar")[0]}" CACHE FILEPATH "")`,
+      `set(CMAKE_RANLIB "${tool(o, "ranlib")[0]}" CACHE FILEPATH "")`,
+    );
     l.push(`set(CMAKE_C_COMPILER_TARGET ${o.triple.llvm})`, `set(CMAKE_CXX_COMPILER_TARGET ${o.triple.llvm})`);
   }
   l.push(
@@ -180,6 +188,9 @@ export function cmakeToolchain(o: CrossOptions): string {
 }
 
 /** Environment for pkg-config in a cross build (path separator of the host). */
-export function pkgConfigEnv(o: CrossOptions, hostSep = process.platform === "win32" ? ";" : ":"): Record<string, string> {
+export function pkgConfigEnv(
+  o: CrossOptions,
+  hostSep = process.platform === "win32" ? ";" : ":",
+): Record<string, string> {
   return { PKG_CONFIG_LIBDIR: pcPath(o, hostSep), PKG_CONFIG_SYSROOT_DIR: fwd(o.sysroot) };
 }

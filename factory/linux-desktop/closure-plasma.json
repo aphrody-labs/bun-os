@@ -16,14 +16,8 @@
       "date": "2026-09-24T11:27:52.000+03:00",
       "build": "cmake",
       "needs": [],
-      "options": [
-        "-DBUILD_TESTING=OFF"
-      ],
-      "declared": [
-        "ECM",
-        "WaylandScanner",
-        "Wayland[Client,REQUIRED]"
-      ]
+      "options": ["-DBUILD_TESTING=OFF"],
+      "declared": ["ECM", "WaylandScanner", "Wayland[Client,REQUIRED]"]
     },
     {
       "id": "kdecoration",
@@ -32,20 +26,14 @@
       "sha": "3cd4373b90578e95685dcbda13a34fcfd445fa4c",
       "date": "2026-10-27T15:49:51.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase"
-      ],
+      "needs": ["qtbase"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
         "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
         "-DCMAKE_BUILD_TYPE=Release"
       ],
-      "declared": [
-        "ECM",
-        "KF6I18n",
-        "Qt6[Core,Gui,Test]"
-      ],
+      "declared": ["ECM", "KF6I18n", "Qt6[Core,Gui,Test]"],
       "hostRun": [
         "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
         "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
@@ -58,10 +46,7 @@
       "sha": "c97883a8fe41bce774835c25d7f7e321c71fa618",
       "date": "2026-10-27T15:47:28.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "kdecoration"
-      ],
+      "needs": ["qtbase", "kdecoration"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -96,11 +81,7 @@
       "sha": "1bbc4071d50e7e41d68322fc369adedf71b21607",
       "date": "2026-10-27T15:53:27.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtwayland",
-        "plasma-wayland-protocols"
-      ],
+      "needs": ["qtbase", "qtwayland", "plasma-wayland-protocols"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -132,19 +113,14 @@
       "sha": "f17cdb507d5c949aa99abcea1a520856981c13c9",
       "date": "2026-10-27T15:56:56.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative"
-      ],
+      "needs": ["qtbase", "qtdeclarative"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
         "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
         "-DCMAKE_BUILD_TYPE=Release"
       ],
-      "declared": [
-        "ECM"
-      ],
+      "declared": ["ECM"],
       "hostRun": [
         "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
         "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
@@ -157,25 +133,14 @@
       "sha": "f70c548d8eab4df47a60454cbbc6220ad345c345",
       "date": "2026-10-27T15:57:10.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "plasma-activities"
-      ],
+      "needs": ["qtbase", "plasma-activities"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
         "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
         "-DCMAKE_BUILD_TYPE=Release"
       ],
-      "declared": [
-        "Boost",
-        "ECM",
-        "KF6Config",
-        "KF6CoreAddons",
-        "PlasmaActivities",
-        "Qt6[Core,DBus,Sql]",
-        "Threads"
-      ],
+      "declared": ["Boost", "ECM", "KF6Config", "KF6CoreAddons", "PlasmaActivities", "Qt6[Core,DBus,Sql]", "Threads"],
       "hostRun": [
         "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
         "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
@@ -188,9 +153,7 @@
       "sha": "2c0cc38bc800c43fd5bceff304fa1ce9ebbad3e0",
       "date": "2026-10-27T15:50:24.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase"
-      ],
+      "needs": ["qtbase"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -219,10 +182,7 @@
       "sha": "842f397180f349380e9f7d466c9e746e4dd7faaa",
       "date": "2026-10-27T15:54:55.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtwayland"
-      ],
+      "needs": ["qtbase", "qtwayland"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -250,13 +210,7 @@
       "sha": "6f6566e4ec44a432abdcdd4854cbed3582bcddd1",
       "date": "2026-10-27T15:55:39.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative",
-        "qtsvg",
-        "kwayland",
-        "plasma-activities"
-      ],
+      "needs": ["qtbase", "qtdeclarative", "qtsvg", "kwayland", "plasma-activities"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -287,25 +241,14 @@
       "sha": "f9ca271de44ebb0e36e15e50f5ca1386d7d26b5c",
       "date": "2026-10-27T15:55:07.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtwayland",
-        "plasma-wayland-protocols"
-      ],
+      "needs": ["qtbase", "qtwayland", "plasma-wayland-protocols"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
         "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
         "-DCMAKE_BUILD_TYPE=Release"
       ],
-      "declared": [
-        "ECM",
-        "PlasmaWaylandProtocols",
-        "Qt6",
-        "Qt6GuiPrivate",
-        "WaylandScanner",
-        "Wayland[Client]"
-      ],
+      "declared": ["ECM", "PlasmaWaylandProtocols", "Qt6", "Qt6GuiPrivate", "WaylandScanner", "Wayland[Client]"],
       "hostRun": [
         "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
         "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
@@ -318,13 +261,7 @@
       "sha": "972baf4a25e08991c7c0451d983497eaf30cb0a8",
       "date": "2026-10-27T15:52:13.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative",
-        "libplasma",
-        "kwayland",
-        "layer-shell-qt"
-      ],
+      "needs": ["qtbase", "qtdeclarative", "libplasma", "kwayland", "layer-shell-qt"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -354,20 +291,14 @@
       "sha": "7f7795b8bca0b64212b8c0578082b9d6b325342d",
       "date": "2026-10-27T15:51:05.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase"
-      ],
+      "needs": ["qtbase"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
         "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON",
         "-DCMAKE_BUILD_TYPE=Release"
       ],
-      "declared": [
-        "ECM",
-        "KF6[Config,CoreAddons,DBusAddons,Holidays,I18n]",
-        "Qt6[Core,Gui,DBus,Positioning]"
-      ],
+      "declared": ["ECM", "KF6[Config,CoreAddons,DBusAddons,Holidays,I18n]", "Qt6[Core,Gui,DBus,Positioning]"],
       "hostRun": [
         "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required",
         "kconfig_compiler_kf6 and other KF6 code generators run at build time: KF6_HOST_TOOLING to a host KF6 install is required"
@@ -380,10 +311,7 @@
       "sha": "fe5feb687ec21d0f39b57b311e0823fc2e5e55cc",
       "date": "2026-10-27T16:11:41.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative"
-      ],
+      "needs": ["qtbase", "qtdeclarative"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -422,10 +350,7 @@
       "sha": "5f687fba7d8a9e847282f712539d44d8850a6ddb",
       "date": "2026-10-27T15:51:18.000+05:30",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative"
-      ],
+      "needs": ["qtbase", "qtdeclarative"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -5763,7 +5688,5 @@
     "csize": 930026368,
     "isize": 3824507492
   },
-  "extends": [
-    "qt6"
-  ]
+  "extends": ["qt6"]
 }

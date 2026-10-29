@@ -40,7 +40,8 @@ export const loadCatalog = (): CEnv => JSON.parse(readFileSync(join(repoRoot, "f
 const isWin = osPlatform() === "win32";
 const exe = (n: string) => (isWin ? `${n}.exe` : n);
 export const hostKind = () => (isWin ? "windows" : osPlatform() === "linux" ? "linux" : osPlatform());
-export const cacheRoot = () => process.env.BUNOS_C_CACHE ?? join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "bunos-c");
+export const cacheRoot = () =>
+  process.env.BUNOS_C_CACHE ?? join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "bunos-c");
 
 export function msLicenseAccepted(args: string[]): boolean {
   return args.includes("--accept-ms-license") || process.env.BUNOS_C_ACCEPT_MS_LICENSE === "1";
@@ -110,7 +111,12 @@ export function planBuild(t: CTarget, src: string, outDir: string): BuildPlan {
       );
     } else {
       if (!(isWin && hostArch() === t.arch))
-        return { ok: false, reason: "needs an xwin sysroot (buncc c sysroot --accept-ms-license) or a local Visual Studio of the same arch", out };
+        return {
+          ok: false,
+          reason:
+            "needs an xwin sysroot (buncc c sysroot --accept-ms-license) or a local Visual Studio of the same arch",
+          out,
+        };
       return { ok: true, cmd, out, env: vsEnv(t.arch) };
     }
     return { ok: true, cmd, out };
@@ -126,7 +132,12 @@ export function planBuild(t: CTarget, src: string, outDir: string): BuildPlan {
   const sys = sysrootFor(t);
   const triple = t.clangTriple ?? t.triple;
   const native = hostKind() === "linux" && hostArch() === t.arch && t.abi === "gnu" && t.os === "linux" && !sys;
-  if (!sys && !native) return { ok: false, reason: `needs a ${t.sysroot} sysroot (BUNOS_C_SYSROOT_${t.sysroot.toUpperCase().replace(/[^A-Z0-9]/g, "_")})`, out };
+  if (!sys && !native)
+    return {
+      ok: false,
+      reason: `needs a ${t.sysroot} sysroot (BUNOS_C_SYSROOT_${t.sysroot.toUpperCase().replace(/[^A-Z0-9]/g, "_")})`,
+      out,
+    };
   const cmd = [clang, `--target=${triple}`, "-O2", "-fuse-ld=lld", src, "-o", out];
   if (sys) cmd.splice(2, 0, `--sysroot=${sys}`);
   if (t.abi === "musl") cmd.push("-static");
@@ -139,17 +150,23 @@ import { writeFileSync } from "node:fs";
 export function vsEnv(arch: string): Record<string, string> | undefined {
   if (!isWin) return undefined;
   if (vsCache.has(arch)) return vsCache.get(arch);
-  const vswhere = join(process.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)", "Microsoft Visual Studio/Installer/vswhere.exe");
+  const vswhere = join(
+    process.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)",
+    "Microsoft Visual Studio/Installer/vswhere.exe",
+  );
   if (!existsSync(vswhere)) return undefined;
   const q = Bun.spawnSync([vswhere, "-latest", "-products", "*", "-property", "installationPath"]);
   const root = q.stdout.toString().trim().split(/\r?\n/)[0];
   const bat = root && join(root, "VC/Auxiliary/Build/vcvarsall.bat");
   if (!bat || !existsSync(bat)) return undefined;
   const tmp = join(process.env.TEMP ?? ".", `bunos-c-vs-${arch}.bat`);
-  writeFileSync(tmp, `@echo off
+  writeFileSync(
+    tmp,
+    `@echo off
 call "${bat}" ${arch === "x86_64" ? "x64" : arch === "aarch64" ? "arm64" : "x86"} >nul
 set
-`);
+`,
+  );
   const r = Bun.spawnSync(["cmd", "/d", "/c", tmp]);
   const env: Record<string, string> = {};
   for (const line of r.stdout.toString().split(/\r?\n/)) {
@@ -168,7 +185,11 @@ export function hostArch(): string {
 const PE_MACHINE: Record<number, string> = { 0x8664: "x86_64", 0xaa64: "aarch64", 0x14c: "i686" };
 const ELF_MACHINE: Record<number, string> = { 62: "x86_64", 183: "aarch64", 3: "i686" };
 
-export function inspectBinary(buf: Uint8Array): { format: "pe" | "elf" | "unknown"; arch?: string; imports?: string[] } {
+export function inspectBinary(buf: Uint8Array): {
+  format: "pe" | "elf" | "unknown";
+  arch?: string;
+  imports?: string[];
+} {
   const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
   if (buf[0] === 0x4d && buf[1] === 0x5a) {
     const pe = dv.getUint32(0x3c, true);
@@ -196,7 +217,12 @@ export function pickRunner(t: CTarget, binary: string): { cmd?: string[]; skip?:
     const w = which("wine64") ?? which("wine");
     return w ? { cmd: [w, binary] } : { skip: "wine not installed (CI installs it on the runner only)" };
   }
-  if (isWin && (t.os === "windows" || t.os === "reactos") && (archMatch || (t.arch === "i686" && hostArch() === "x86_64"))) return { cmd: [binary] };
+  if (
+    isWin &&
+    (t.os === "windows" || t.os === "reactos") &&
+    (archMatch || (t.arch === "i686" && hostArch() === "x86_64"))
+  )
+    return { cmd: [binary] };
   if (!isWin && t.os === "windows" && t.arch !== "aarch64") {
     const w = which("wine64") ?? which("wine");
     if (w) return { cmd: [w, binary] };
@@ -207,7 +233,11 @@ export function pickRunner(t: CTarget, binary: string): { cmd?: string[]; skip?:
 async function sh(cmd: string[], opts: { env?: Record<string, string>; timeoutMs?: number } = {}) {
   const proc = Bun.spawn(cmd, { stdout: "pipe", stderr: "pipe", env: { ...process.env, ...opts.env } });
   const timer = setTimeout(() => proc.kill(), opts.timeoutMs ?? 120_000);
-  const [stdout, stderr, code] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text(), proc.exited]);
+  const [stdout, stderr, code] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    proc.exited,
+  ]);
   clearTimeout(timer);
   return { stdout, stderr, code };
 }
@@ -249,26 +279,63 @@ export async function cCommand(argv: string[]): Promise<number> {
       if (rest.includes("--json")) console.log(JSON.stringify(cat.targets, null, 2));
       else
         for (const t of cat.targets)
-          console.log(`${t.triple.padEnd(28)} ${t.os.padEnd(8)} ${t.compiler.split(" (")[0]!.padEnd(18)} ${t.libc.split(" (")[0]!.padEnd(18)} headers=${t.headers}${t.optIn ? " [opt-in " + t.optIn + "]" : ""}`);
+          console.log(
+            `${t.triple.padEnd(28)} ${t.os.padEnd(8)} ${t.compiler.split(" (")[0]!.padEnd(18)} ${t.libc.split(" (")[0]!.padEnd(18)} headers=${t.headers}${t.optIn ? " [opt-in " + t.optIn + "]" : ""}`,
+          );
       return 0;
     }
     case "doctor": {
       console.log(`host ${hostKind()}/${hostArch()}  catalog LLVM ${cat.llvm.version}`);
-      for (const tool of ["clang", "clang-cl", "lld-link", "ld.lld", "llvm-ar", "llvm-readelf", "llvm-objdump", "cl", "gcc", "x86_64-w64-mingw32-clang", "cmake", "ninja", "meson", "make", "pkgconf", "sccache", "cargo-xwin", "xwin", "wine", "qemu-x86_64", "qemu-aarch64"]) {
+      for (const tool of [
+        "clang",
+        "clang-cl",
+        "lld-link",
+        "ld.lld",
+        "llvm-ar",
+        "llvm-readelf",
+        "llvm-objdump",
+        "cl",
+        "gcc",
+        "x86_64-w64-mingw32-clang",
+        "cmake",
+        "ninja",
+        "meson",
+        "make",
+        "pkgconf",
+        "sccache",
+        "cargo-xwin",
+        "xwin",
+        "wine",
+        "qemu-x86_64",
+        "qemu-aarch64",
+      ]) {
         const v = await version(tool, tool === "cl" ? [] : ["--version"]);
         console.log(`${v ? "ok " : "-- "} ${tool.padEnd(26)} ${v ?? "not found"}`);
       }
       console.log(`llvm-mingw bin: ${llvmMingwBin() ?? "not found"}`);
-      console.log(`Microsoft licence: ${msLicenseAccepted(rest) ? "opt-in given" : "not accepted (msvc sysroots are not downloaded)"}`);
+      console.log(
+        `Microsoft licence: ${msLicenseAccepted(rest) ? "opt-in given" : "not accepted (msvc sysroots are not downloaded)"}`,
+      );
       return 0;
     }
     case "env": {
       const t = find(rest[0]);
       const sys = sysrootFor(t);
       const lines: string[] = [`BUNOS_C_TARGET=${t.triple}`];
-      if (t.abi === "msvc") lines.push("CC=clang-cl", "CXX=clang-cl", "LD=lld-link", "AR=llvm-lib", `CL_FLAGS=--target=${t.triple}`);
-      else if (t.sysroot === "llvm-mingw") lines.push(`CC=${t.clangTriple ?? t.triple}-clang`, `CXX=${t.clangTriple ?? t.triple}-clang++`, `AR=llvm-ar`, `PATH+=${llvmMingwBin() ?? "<llvm-mingw>/bin"}`);
-      else lines.push(`CC=clang --target=${t.clangTriple ?? t.triple}${sys ? ` --sysroot=${sys}` : ""} -fuse-ld=lld`, "AR=llvm-ar");
+      if (t.abi === "msvc")
+        lines.push("CC=clang-cl", "CXX=clang-cl", "LD=lld-link", "AR=llvm-lib", `CL_FLAGS=--target=${t.triple}`);
+      else if (t.sysroot === "llvm-mingw")
+        lines.push(
+          `CC=${t.clangTriple ?? t.triple}-clang`,
+          `CXX=${t.clangTriple ?? t.triple}-clang++`,
+          `AR=llvm-ar`,
+          `PATH+=${llvmMingwBin() ?? "<llvm-mingw>/bin"}`,
+        );
+      else
+        lines.push(
+          `CC=clang --target=${t.clangTriple ?? t.triple}${sys ? ` --sysroot=${sys}` : ""} -fuse-ld=lld`,
+          "AR=llvm-ar",
+        );
       if (sys) lines.push(`SYSROOT=${sys}`);
       console.log(lines.join("\n"));
       return 0;
@@ -276,7 +343,9 @@ export async function cCommand(argv: string[]): Promise<number> {
     case "sysroot": {
       const t = find(rest[0]);
       if (t.abi !== "msvc") {
-        console.log(`${t.triple}: sysroot "${t.sysroot}" is fully open (${t.headers}); provide it with BUNOS_C_SYSROOT_* or the bunos-c package. Nothing to download here.`);
+        console.log(
+          `${t.triple}: sysroot "${t.sysroot}" is fully open (${t.headers}); provide it with BUNOS_C_SYSROOT_* or the bunos-c package. Nothing to download here.`,
+        );
         return 0;
       }
       if (!msLicenseAccepted(rest)) {
@@ -288,7 +357,17 @@ export async function cCommand(argv: string[]): Promise<number> {
         return 2;
       }
       const out = flag("out") ?? join(cacheRoot(), "sysroots", "xwin");
-      const cmd = ["xwin", "--accept-license", "--cache-dir", join(cacheRoot(), "xwin-cache"), "splat", "--output", out, "--arch", "x86_64,aarch64,x86"];
+      const cmd = [
+        "xwin",
+        "--accept-license",
+        "--cache-dir",
+        join(cacheRoot(), "xwin-cache"),
+        "splat",
+        "--output",
+        out,
+        "--arch",
+        "x86_64,aarch64,x86",
+      ];
       console.log(cmd.join(" "));
       if (!rest.includes("--run")) return (console.log("dry run; add --run to execute"), 0);
       mkdirSync(out, { recursive: true });

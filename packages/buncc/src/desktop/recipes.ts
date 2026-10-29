@@ -118,7 +118,11 @@ export async function resolveAll(root: string, only: string[] | undefined, write
     todo.map(async pkg => {
       try {
         const lines = await remoteTags(pkg.repo!);
-        return { pkg, latest: newestTag(lines, pkg.track!.pattern), lts: pkg.track!.lts ? newestTag(lines, pkg.track!.lts) : undefined };
+        return {
+          pkg,
+          latest: newestTag(lines, pkg.track!.pattern),
+          lts: pkg.track!.lts ? newestTag(lines, pkg.track!.lts) : undefined,
+        };
       } catch (error) {
         console.error(`plan: ${pkg.id}: ${(error as Error).message}`);
         return { pkg, latest: undefined, lts: undefined };

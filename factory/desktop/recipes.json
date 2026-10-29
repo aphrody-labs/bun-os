@@ -96,11 +96,7 @@
         "sha": "b93119f5fdc7ea47672cc304c1455ffa6dfe7536"
       },
       "deps": [],
-      "options": [
-        "-Ddocs=false",
-        "-Dbin=false",
-        "-Dtests=false"
-      ]
+      "options": ["-Ddocs=false", "-Dbin=false", "-Dtests=false"]
     },
     {
       "id": "harfbuzz",
@@ -114,9 +110,7 @@
         "tag": "15.0.0",
         "sha": "35f656a1a2bab548ea7f54a6dd3fba2b09680d14"
       },
-      "deps": [
-        "glib"
-      ],
+      "deps": ["glib"],
       "options": [
         "-Dtests=disabled",
         "-Ddocs=disabled",
@@ -142,9 +136,7 @@
         "tag": "1.18.6",
         "sha": "018b3424a10ecd37450360f21454ecf0f3007e17"
       },
-      "deps": [
-        "glib"
-      ],
+      "deps": ["glib"],
       "options": [
         "-Dtests=disabled",
         "-Dfontconfig=disabled",
@@ -172,12 +164,7 @@
         "tag": "1.58.2",
         "sha": "d360f14004e4a4824f2352f6e2722016f9a51dd6"
       },
-      "deps": [
-        "glib",
-        "fribidi",
-        "harfbuzz",
-        "cairo"
-      ],
+      "deps": ["glib", "fribidi", "harfbuzz", "cairo"],
       "options": [
         "-Dintrospection=disabled",
         "-Dfontconfig=disabled",
@@ -201,9 +188,7 @@
         "tag": "2.90.3",
         "sha": "aab1a96d46a5b96dfe316cd897880637db98791c"
       },
-      "deps": [
-        "glib"
-      ],
+      "deps": ["glib"],
       "options": [
         "-Dtests=false",
         "-Dinstalled_tests=false",
@@ -231,9 +216,7 @@
         "tag": "1.10.8",
         "sha": "4e2578450809c2099400cf85caf18eafcd7100aa"
       },
-      "deps": [
-        "glib"
-      ],
+      "deps": ["glib"],
       "options": [
         "-Dtests=false",
         "-Dinstalled_tests=false",
@@ -256,12 +239,7 @@
         "sha": "c84bc9459357a40e46e2fec0408d04fbdde2c973"
       },
       "deps": [],
-      "options": [
-        "-Dtests=false",
-        "-Degl=no",
-        "-Dglx=no",
-        "-Dx11=false"
-      ]
+      "options": ["-Dtests=false", "-Degl=no", "-Dglx=no", "-Dx11=false"]
     },
     {
       "id": "gtk4",
@@ -275,16 +253,7 @@
         "tag": "4.24.1",
         "sha": "2ea935e3ec680fb122f245b28e18c3495df8c344"
       },
-      "deps": [
-        "glib",
-        "pango",
-        "cairo",
-        "gdk-pixbuf",
-        "graphene",
-        "libepoxy",
-        "harfbuzz",
-        "fribidi"
-      ],
+      "deps": ["glib", "pango", "cairo", "gdk-pixbuf", "graphene", "libepoxy", "harfbuzz", "fribidi"],
       "options": [
         "-Dbuild-demos=false",
         "-Dbuild-tests=false",
@@ -312,9 +281,7 @@
         "tag": "1.10.0",
         "sha": "c9ab118612eee92324143783c4641c98eaded3f0"
       },
-      "deps": [
-        "gtk4"
-      ],
+      "deps": ["gtk4"],
       "options": [
         "-Dintrospection=disabled",
         "-Dvapi=false",
@@ -369,13 +336,8 @@
         "tag": "v6.12.0",
         "sha": "bccd516b990a6396900051470ac86cc27a7042ea"
       },
-      "deps": [
-        "qtbase"
-      ],
-      "options": [
-        "-DQT_BUILD_EXAMPLES=OFF",
-        "-DQT_BUILD_TESTS=OFF"
-      ]
+      "deps": ["qtbase"],
+      "options": ["-DQT_BUILD_EXAMPLES=OFF", "-DQT_BUILD_TESTS=OFF"]
     },
     {
       "id": "qtdeclarative",
@@ -389,10 +351,7 @@
         "tag": "v6.12.0",
         "sha": "4332fbbb4c340463dc8cee36dda0c85d932122d8"
       },
-      "deps": [
-        "qtbase",
-        "qtshadertools"
-      ],
+      "deps": ["qtbase", "qtshadertools"],
       "options": [
         "-DQT_BUILD_EXAMPLES=OFF",
         "-DQT_BUILD_TESTS=OFF",
@@ -420,12 +379,7 @@
         "sha": "2958379fb49c71129f119ec17f88df0b5ea21550"
       },
       "deps": [],
-      "options": [
-        "-DBUILD_HTML_DOCS=OFF",
-        "-DBUILD_MAN_DOCS=OFF",
-        "-DBUILD_QTHELP_DOCS=OFF",
-        "-DBUILD_TESTING=OFF"
-      ]
+      "options": ["-DBUILD_HTML_DOCS=OFF", "-DBUILD_MAN_DOCS=OFF", "-DBUILD_QTHELP_DOCS=OFF", "-DBUILD_TESTING=OFF"]
     },
     {
       "id": "kcoreaddons",
@@ -439,10 +393,7 @@
         "tag": "v6.31.0",
         "sha": "911a815687a14389895df3e658235de2450bc294"
       },
-      "deps": [
-        "ecm",
-        "qtbase"
-      ],
+      "deps": ["ecm", "qtbase"],
       "options": [
         "-DBUILD_TESTING=OFF",
         "-DBUILD_QCH=OFF",
@@ -463,18 +414,9 @@
         "tag": "v6.31.0",
         "sha": "df98b98f001721f83ebf3e36b73e346f6d29670a"
       },
-      "deps": [
-        "ecm",
-        "qtbase"
-      ],
-      "options": [
-        "-DBUILD_TESTING=OFF",
-        "-DBUILD_QCH=OFF",
-        "-DBUILD_PYTHON_BINDINGS=OFF"
-      ],
-      "needsTools": [
-        "gettext"
-      ],
+      "deps": ["ecm", "qtbase"],
+      "options": ["-DBUILD_TESTING=OFF", "-DBUILD_QCH=OFF", "-DBUILD_PYTHON_BINDINGS=OFF"],
+      "needsTools": ["gettext"],
       "note": "needs msgfmt/xgettext (mlocati gettext-iconv-windows) and Qt6 Qml/Core5Compat only when QML is on"
     },
     {
@@ -489,15 +431,8 @@
         "tag": "v6.8.2",
         "sha": "30beb0095873364c6b34ebcfd292ecafd4db7f61"
       },
-      "deps": [
-        "ecm",
-        "qtbase",
-        "kcoreaddons",
-        "ki18n"
-      ],
-      "options": [
-        "-DBUILD_TESTING=OFF"
-      ],
+      "deps": ["ecm", "qtbase", "kcoreaddons", "ki18n"],
+      "options": ["-DBUILD_TESTING=OFF"],
       "status": "plan-only",
       "note": "Linux-centric (KWin, Wayland, systemd); only libs that ship Windows support are buildable. Verified only as a plan node."
     },
@@ -513,15 +448,8 @@
         "tag": "v26.08.2",
         "sha": "2b6465a886b9d3bfc6eab25065c14ffe025e6ac3"
       },
-      "deps": [
-        "ecm",
-        "qtbase",
-        "kcoreaddons",
-        "ki18n"
-      ],
-      "options": [
-        "-DBUILD_TESTING=OFF"
-      ],
+      "deps": ["ecm", "qtbase", "kcoreaddons", "ki18n"],
+      "options": ["-DBUILD_TESTING=OFF"],
       "status": "plan-only",
       "note": "KDE Gear app; example for `build app:kate`. KDE ships Windows builds of it through Craft, so the dependency closure is known to exist."
     },
@@ -530,9 +458,7 @@
       "group": "samples",
       "build": "meson",
       "local": "factory/desktop/hello/gtk4",
-      "deps": [
-        "gtk4"
-      ],
+      "deps": ["gtk4"],
       "options": []
     },
     {
@@ -540,9 +466,7 @@
       "group": "samples",
       "build": "cmake",
       "local": "factory/desktop/hello/qt",
-      "deps": [
-        "qtbase"
-      ],
+      "deps": ["qtbase"],
       "options": []
     },
     {
@@ -550,9 +474,7 @@
       "group": "samples",
       "build": "cmake",
       "local": "factory/desktop/hello/qml",
-      "deps": [
-        "qtdeclarative"
-      ],
+      "deps": ["qtdeclarative"],
       "options": []
     },
     {
@@ -560,48 +482,16 @@
       "group": "samples",
       "build": "cmake",
       "local": "factory/desktop/hello/kcoreaddons",
-      "deps": [
-        "kcoreaddons"
-      ],
+      "deps": ["kcoreaddons"],
       "options": []
     }
   ],
   "groups": {
-    "gtk4": [
-      "glib",
-      "fribidi",
-      "harfbuzz",
-      "cairo",
-      "pango",
-      "gdk-pixbuf",
-      "graphene",
-      "libepoxy",
-      "gtk4"
-    ],
-    "libadwaita": [
-      "gtk4",
-      "libadwaita"
-    ],
-    "qt6": [
-      "qtbase",
-      "qtshadertools",
-      "qtdeclarative"
-    ],
-    "kf6": [
-      "qtbase",
-      "ecm",
-      "kcoreaddons",
-      "ki18n"
-    ],
-    "plasma-libs": [
-      "kf6",
-      "plasma-workspace"
-    ],
-    "samples": [
-      "hello-gtk4",
-      "hello-qt",
-      "hello-qml",
-      "hello-kcoreaddons"
-    ]
+    "gtk4": ["glib", "fribidi", "harfbuzz", "cairo", "pango", "gdk-pixbuf", "graphene", "libepoxy", "gtk4"],
+    "libadwaita": ["gtk4", "libadwaita"],
+    "qt6": ["qtbase", "qtshadertools", "qtdeclarative"],
+    "kf6": ["qtbase", "ecm", "kcoreaddons", "ki18n"],
+    "plasma-libs": ["kf6", "plasma-workspace"],
+    "samples": ["hello-gtk4", "hello-qt", "hello-qml", "hello-kcoreaddons"]
   }
 }

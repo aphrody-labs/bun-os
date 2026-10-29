@@ -153,7 +153,8 @@ export async function downloadPackages(
       if (!res.ok) throw new Error(`${e.url}: HTTP ${res.status}`);
       const bytes = new Uint8Array(await res.arrayBuffer());
       const got = sha256(bytes);
-      if (got !== e.sha256) throw new Error(`${e.name}: sha256 ${got} does not match the repository database (${e.sha256})`);
+      if (got !== e.sha256)
+        throw new Error(`${e.name}: sha256 ${got} does not match the repository database (${e.sha256})`);
       writeFileSync(file, bytes);
       log(`downloaded ${e.name} ${e.version}`);
       out.set(e.name, file);
@@ -204,7 +205,9 @@ export function extractPackage(file: string, root: string, full = false): Extrac
 /** Archive path a link points to: absolute targets are relative to the sysroot, relative ones to the link's dir. */
 export function resolveLink(e: Pick<TarEntry, "path" | "link" | "type">): string {
   if (e.type === "hardlink") return e.link;
-  return e.link.startsWith("/") ? posix.normalize(e.link.slice(1)) : posix.normalize(posix.join(posix.dirname(e.path), e.link));
+  return e.link.startsWith("/")
+    ? posix.normalize(e.link.slice(1))
+    : posix.normalize(posix.join(posix.dirname(e.path), e.link));
 }
 
 function write(root: string, path: string, data: Uint8Array, stats: ExtractStats) {

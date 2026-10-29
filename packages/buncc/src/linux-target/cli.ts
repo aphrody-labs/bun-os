@@ -56,7 +56,12 @@ export function closuresDir(root: string): string {
 async function runSteps(steps: Step[], log: (s: string) => void): Promise<number> {
   for (const s of steps) {
     log(`$ ${s.cmd.join(" ")}   # ${s.title}`);
-    const p = Bun.spawn(s.cmd, { cwd: s.cwd, env: { ...process.env, ...s.env }, stdout: s.expect ? "pipe" : "inherit", stderr: "inherit" });
+    const p = Bun.spawn(s.cmd, {
+      cwd: s.cwd,
+      env: { ...process.env, ...s.env },
+      stdout: s.expect ? "pipe" : "inherit",
+      stderr: "inherit",
+    });
     const out = s.expect ? await new Response(p.stdout as ReadableStream).text() : "";
     const code = await p.exited;
     if (code !== 0) return code;
@@ -86,7 +91,11 @@ async function smokeCheck(id: string, stage: string, log: (s: string) => void): 
   log(`smoke: ${spec.files.length} files present`);
   if (!spec.run || process.platform !== "linux") return 0;
   const lib = ["usr/lib", "usr/lib64", "usr/lib/x86_64-linux-gnu"].map(d => join(stage, d)).join(":");
-  const p = Bun.spawn([join(stage, spec.run[0]!), ...spec.run.slice(1)], { env: { ...process.env, LD_LIBRARY_PATH: lib }, stdout: "pipe", stderr: "pipe" });
+  const p = Bun.spawn([join(stage, spec.run[0]!), ...spec.run.slice(1)], {
+    env: { ...process.env, LD_LIBRARY_PATH: lib },
+    stdout: "pipe",
+    stderr: "pipe",
+  });
   const [out, err] = await Promise.all([new Response(p.stdout).text(), new Response(p.stderr).text()]);
   const code = await p.exited;
   log(`smoke: ${spec.run.join(" ")} -> exit ${code}: ${(out || err).trim().split("\n")[0]}`);
@@ -96,7 +105,23 @@ async function smokeCheck(id: string, stage: string, log: (s: string) => void): 
 export async function linuxMain(args: string[], root: string, log: (s: string) => void = console.log): Promise<number> {
   const [sub = "help", ...rest] = args;
   const closures = loadClosures(closuresDir(root));
-  const positional = rest.filter((a, i) => !a.startsWith("--") && !["--arch", "--dir", "--cache", "--sysroot", "--compiler", "--engine", "--out", "--src", "--roots", "--qt-host", "--kf6-host"].includes(rest[i - 1] ?? ""));
+  const positional = rest.filter(
+    (a, i) =>
+      !a.startsWith("--") &&
+      ![
+        "--arch",
+        "--dir",
+        "--cache",
+        "--sysroot",
+        "--compiler",
+        "--engine",
+        "--out",
+        "--src",
+        "--roots",
+        "--qt-host",
+        "--kf6-host",
+      ].includes(rest[i - 1] ?? ""),
+  );
   const run = rest.includes("--run");
 
   if (sub === "help" || sub === "--help") {
@@ -121,11 +146,18 @@ export async function linuxMain(args: string[], root: string, log: (s: string) =
         pk.forEach(p => log(p.name));
         continue;
       }
-      log(`${c.id} (resolved ${c.resolvedAt}${c.extends ? ", extends " + c.extends.join(",") : ""}): ${c.sources.length} sources, sysroot ${pk.length} packages, ${MIB(pk.reduce((a, p) => a + p.csize, 0))} compressed / ${MIB(pk.reduce((a, p) => a + p.isize, 0))} installed`);
-      const { order } = buildOrder(c.sources, c.sources.map(s => s.id));
+      log(
+        `${c.id} (resolved ${c.resolvedAt}${c.extends ? ", extends " + c.extends.join(",") : ""}): ${c.sources.length} sources, sysroot ${pk.length} packages, ${MIB(pk.reduce((a, p) => a + p.csize, 0))} compressed / ${MIB(pk.reduce((a, p) => a + p.isize, 0))} installed`,
+      );
+      const { order } = buildOrder(
+        c.sources,
+        c.sources.map(s => s.id),
+      );
       for (const sid of order) {
         const s = c.sources.find(x => x.id === sid)!;
-        log(`  ${s.id.padEnd(28)} ${s.tag.padEnd(10)} ${s.sha.slice(0, 12)} ${s.date.slice(0, 10)} ${s.build}  needs: ${s.needs.join(",") || "-"}`);
+        log(
+          `  ${s.id.padEnd(28)} ${s.tag.padEnd(10)} ${s.sha.slice(0, 12)} ${s.date.slice(0, 10)} ${s.build}  needs: ${s.needs.join(",") || "-"}`,
+        );
       }
     }
     return closures.size ? 0 : 1;
@@ -137,19 +169,29 @@ export async function linuxMain(args: string[], root: string, log: (s: string) =
   if (sub === "sysroot") {
     const name = positional[0];
     const custom = opt(rest, "roots")?.split(",").filter(Boolean);
-    if (!name && !custom) return log("usage: buncc linux sysroot <closure|target> | --roots pkg,pkg"), 2;
+    if (!name && !custom) return (log("usage: buncc linux sysroot <closure|target> | --roots pkg,pkg"), 2);
     const found = name ? (closures.get(name) ?? resolveTarget(closures, name)?.closure) : undefined;
-    if (name && !found) return log(`unknown closure or target "${name}"`), 2;
-    const closure = found ?? { id: name ?? "custom", sysrootRoots: custom ?? [], sysrootExclude: [] as string[], extends: undefined };
+    if (name && !found) return (log(`unknown closure or target "${name}"`), 2);
+    const closure = found ?? {
+      id: name ?? "custom",
+      sysrootRoots: custom ?? [],
+      sysrootExclude: [] as string[],
+      extends: undefined,
+    };
     const index: ArchIndex = await fetchIndex(arch.arch, cache);
-    const roots = custom ?? [...closure.sysrootRoots, ...(closure.extends ?? []).flatMap(e => closures.get(e)?.sysrootRoots ?? [])];
+    const roots = custom ?? [
+      ...closure.sysrootRoots,
+      ...(closure.extends ?? []).flatMap(e => closures.get(e)?.sysrootRoots ?? []),
+    ];
     const manifest: SysrootManifest = sysrootManifest(index, arch.arch, roots, closure.sysrootExclude);
     const dir = resolve(opt(rest, "sysroot") ?? join(work, `sysroot-${closure.id}-${arch.arch}`));
     mkdirSync(work, { recursive: true });
     const mf = join(work, `sysroot-${closure.id}-${arch.arch}.json`);
     writeFileSync(mf, JSON.stringify(manifest, null, 2) + "\n");
-    log(`manifest ${mf}: ${manifest.totals.packages} packages, ${MIB(manifest.totals.csize)} compressed, ${MIB(manifest.totals.isize)} installed, unresolved: ${manifest.unresolved.join(",") || "none"}`);
-    if (!run) return log(`dry run: pass --run to download into ${cache} and extract into ${dir}`), 0;
+    log(
+      `manifest ${mf}: ${manifest.totals.packages} packages, ${MIB(manifest.totals.csize)} compressed, ${MIB(manifest.totals.isize)} installed, unresolved: ${manifest.unresolved.join(",") || "none"}`,
+    );
+    if (!run) return (log(`dry run: pass --run to download into ${cache} and extract into ${dir}`), 0);
     const files = await downloadPackages(manifest.packages, cache, log);
     let n = 0;
     for (const p of manifest.packages) {
@@ -164,12 +206,20 @@ export async function linuxMain(args: string[], root: string, log: (s: string) =
     const id = positional[0] as keyof typeof SAMPLES;
     const sample = SAMPLES[id];
     const sysroot = opt(rest, "sysroot");
-    if (!sample || !sysroot) return log("usage: buncc linux hello <glib|gtk4|libadwaita> --sysroot <dir>"), 2;
+    if (!sample || !sysroot) return (log("usage: buncc linux hello <glib|gtk4|libadwaita> --sysroot <dir>"), 2);
     const out = resolve(opt(rest, "out") ?? join(work, "hello"));
     mkdirSync(out, { recursive: true });
-    const cross: CrossOptions = { triple: arch, sysroot: resolve(sysroot), gccInstallDir: findGccInstallDir(resolve(sysroot)) };
-    const pc = pcFlags(sample.modules, [join(resolve(sysroot), "usr/lib/pkgconfig"), join(resolve(sysroot), "usr/share/pkgconfig")], resolve(sysroot));
-    if (pc.missing.length) return log(`missing pkg-config modules in the sysroot: ${pc.missing.join(", ")}`), 1;
+    const cross: CrossOptions = {
+      triple: arch,
+      sysroot: resolve(sysroot),
+      gccInstallDir: findGccInstallDir(resolve(sysroot)),
+    };
+    const pc = pcFlags(
+      sample.modules,
+      [join(resolve(sysroot), "usr/lib/pkgconfig"), join(resolve(sysroot), "usr/share/pkgconfig")],
+      resolve(sysroot),
+    );
+    if (pc.missing.length) return (log(`missing pkg-config modules in the sysroot: ${pc.missing.join(", ")}`), 1);
     const src = join(out, `${id}.c`);
     writeFileSync(src, sample.source);
     const exe = join(out, `${id}-hello-${arch.arch}`);
@@ -182,16 +232,25 @@ export async function linuxMain(args: string[], root: string, log: (s: string) =
 
   if (sub === "cross" || sub === "build" || sub === "container") {
     const target = positional[0];
-    if (!target) return log(`usage: buncc linux ${sub} <target>`), 2;
+    if (!target) return (log(`usage: buncc linux ${sub} <target>`), 2);
     if (target.startsWith("app:")) {
-      log(`app targets: point meson/cmake at ${target.slice(4)} with the generated files; see docs/BUNCC-LINUX-DESKTOP.md`);
+      log(
+        `app targets: point meson/cmake at ${target.slice(4)} with the generated files; see docs/BUNCC-LINUX-DESKTOP.md`,
+      );
       return 0;
     }
     const resolved = resolveTarget(closures, target);
-    if (!resolved) return log(`unknown target "${target}"; run: buncc linux closure`), 2;
+    if (!resolved) return (log(`unknown target "${target}"; run: buncc linux closure`), 2);
     const hostLinux = process.platform === "linux";
     if (sub === "container") {
-      const steps = containerPlan(resolved.closure, target, (opt(rest, "engine") as "podman" | "docker") ?? "podman", undefined, process.cwd(), rest.includes("--deep"));
+      const steps = containerPlan(
+        resolved.closure,
+        target,
+        (opt(rest, "engine") as "podman" | "docker") ?? "podman",
+        undefined,
+        process.cwd(),
+        rest.includes("--deep"),
+      );
       steps.forEach(s => log(`$ ${s.cmd.slice(0, 7).join(" ")} ...   # ${s.title}`));
       return run ? runSteps(steps, log) : (log("dry run: pass --run"), 0);
     }
@@ -205,7 +264,9 @@ export async function linuxMain(args: string[], root: string, log: (s: string) =
             gccInstallDir: existsSync(sysroot) ? findGccInstallDir(sysroot) : undefined,
           }
         : undefined;
-    const chain = rest.includes("--deep") ? resolved.order : [{ closure: resolved.closure.id, source: resolved.source }];
+    const chain = rest.includes("--deep")
+      ? resolved.order
+      : [{ closure: resolved.closure.id, source: resolved.source }];
     for (const { source } of chain) {
       const limits = hostLimits(source, hostLinux, cross?.triple.arch, process.arch === "arm64" ? "aarch64" : "x86_64");
       const plan = planBuild({
@@ -218,7 +279,9 @@ export async function linuxMain(args: string[], root: string, log: (s: string) =
         qtHostPath: opt(rest, "qt-host"),
         kf6HostTooling: opt(rest, "kf6-host"),
       });
-      log(`== ${source.id} ${source.tag} (${source.sha.slice(0, 12)}) ${cross ? "cross " + cross.triple.llvm : "native"}`);
+      log(
+        `== ${source.id} ${source.tag} (${source.sha.slice(0, 12)}) ${cross ? "cross " + cross.triple.llvm : "native"}`,
+      );
       limits.forEach(l => log(`   ${l}`));
       for (const f of plan.files) {
         mkdirSync(join(f.path, ".."), { recursive: true });

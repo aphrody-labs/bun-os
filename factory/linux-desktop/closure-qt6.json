@@ -36,19 +36,9 @@
       "sha": "bccd516b990a6396900051470ac86cc27a7042ea",
       "date": "2026-09-26T10:11:54Z",
       "build": "cmake",
-      "needs": [
-        "qtbase"
-      ],
-      "options": [
-        "-DQT_BUILD_TESTS=OFF",
-        "-DQT_BUILD_EXAMPLES=OFF",
-        "-DBUILD_TESTING=OFF"
-      ],
-      "declared": [
-        "Qt6",
-        "Qt6[BuildInternals]",
-        "Qt6[Gui]"
-      ],
+      "needs": ["qtbase"],
+      "options": ["-DQT_BUILD_TESTS=OFF", "-DQT_BUILD_EXAMPLES=OFF", "-DBUILD_TESTING=OFF"],
+      "declared": ["Qt6", "Qt6[BuildInternals]", "Qt6[Gui]"],
       "hostRun": [
         "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required"
       ]
@@ -60,15 +50,8 @@
       "sha": "4332fbbb4c340463dc8cee36dda0c85d932122d8",
       "date": "2026-09-26T10:48:03Z",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtshadertools"
-      ],
-      "options": [
-        "-DQT_BUILD_TESTS=OFF",
-        "-DQT_BUILD_EXAMPLES=OFF",
-        "-DBUILD_TESTING=OFF"
-      ],
+      "needs": ["qtbase", "qtshadertools"],
+      "options": ["-DQT_BUILD_TESTS=OFF", "-DQT_BUILD_EXAMPLES=OFF", "-DBUILD_TESTING=OFF"],
       "declared": [
         "BuildInternals",
         "Qt6",
@@ -88,21 +71,9 @@
       "sha": "883a58532078d003cefef0a549bfe9f885ce41f5",
       "date": "2026-09-26T10:12:01Z",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative"
-      ],
-      "options": [
-        "-DQT_BUILD_TESTS=OFF",
-        "-DQT_BUILD_EXAMPLES=OFF",
-        "-DBUILD_TESTING=OFF"
-      ],
-      "declared": [
-        "BuildInternals",
-        "Qt6[BuildInternals]",
-        "Qt6[Core]",
-        "Qt6[Gui,Widgets,Xml,Network]"
-      ],
+      "needs": ["qtbase", "qtdeclarative"],
+      "options": ["-DQT_BUILD_TESTS=OFF", "-DQT_BUILD_EXAMPLES=OFF", "-DBUILD_TESTING=OFF"],
+      "declared": ["BuildInternals", "Qt6[BuildInternals]", "Qt6[Core]", "Qt6[Gui,Widgets,Xml,Network]"],
       "hostRun": [
         "moc, rcc, uic, qsb must run on the build host: QT_HOST_PATH to a matching host Qt (stage 1) is required"
       ]
@@ -114,15 +85,8 @@
       "sha": "c4f85cd060e3e80a7d71829defac9cf5a40e8ffa",
       "date": "2026-09-26T14:27:12Z",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative"
-      ],
-      "options": [
-        "-DQT_BUILD_TESTS=OFF",
-        "-DQT_BUILD_EXAMPLES=OFF",
-        "-DBUILD_TESTING=OFF"
-      ],
+      "needs": ["qtbase", "qtdeclarative"],
+      "options": ["-DQT_BUILD_TESTS=OFF", "-DQT_BUILD_EXAMPLES=OFF", "-DBUILD_TESTING=OFF"],
       "declared": [
         "Qt6",
         "Qt6WaylandScannerTools",
@@ -142,15 +106,8 @@
       "sha": "9c2a1b4c8298c750f8632e2fd19f7a1a539c5f09",
       "date": "2026-09-26T14:27:19Z",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative"
-      ],
-      "options": [
-        "-DQT_BUILD_TESTS=OFF",
-        "-DQT_BUILD_EXAMPLES=OFF",
-        "-DBUILD_TESTING=OFF"
-      ],
+      "needs": ["qtbase", "qtdeclarative"],
+      "options": ["-DQT_BUILD_TESTS=OFF", "-DQT_BUILD_EXAMPLES=OFF", "-DBUILD_TESTING=OFF"],
       "declared": [
         "BuildInternals",
         "Qt6[BuildInternals]",
@@ -169,15 +126,8 @@
       "sha": "613a6fbf0a7998010ab2fda260b64066d66a021d",
       "date": "2026-09-26T14:27:14Z",
       "build": "cmake",
-      "needs": [
-        "qtbase",
-        "qtdeclarative"
-      ],
-      "options": [
-        "-DQT_BUILD_TESTS=OFF",
-        "-DQT_BUILD_EXAMPLES=OFF",
-        "-DBUILD_TESTING=OFF"
-      ],
+      "needs": ["qtbase", "qtdeclarative"],
+      "options": ["-DQT_BUILD_TESTS=OFF", "-DQT_BUILD_EXAMPLES=OFF", "-DBUILD_TESTING=OFF"],
       "declared": [
         "BuildInternals",
         "Qt6[BuildInternals]",

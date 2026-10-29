@@ -52,7 +52,11 @@ export function checkoutSteps(s: SourcePin, dir: string): Step[] {
       title: `clone ${s.id} ${s.tag}`,
       cmd: ["git", "clone", "--depth", "1", "--branch", s.tag, s.url, fwd(dir)],
     },
-    { title: `verify ${s.id} is ${s.sha.slice(0, 12)}`, cmd: ["git", "-C", fwd(dir), "rev-parse", "HEAD"], expect: s.sha },
+    {
+      title: `verify ${s.id} is ${s.sha.slice(0, 12)}`,
+      cmd: ["git", "-C", fwd(dir), "rev-parse", "HEAD"],
+      expect: s.sha,
+    },
   ];
 }
 
@@ -65,7 +69,18 @@ export function planBuild(o: PlanOptions): BuildPlan {
   const steps: Step[] = [...checkoutSteps(s, src)];
   const env = o.cross ? pkgConfigEnv(o.cross) : undefined;
   if (s.build === "meson") {
-    const args = ["meson", "setup", build, src, "--prefix", o.cross?.prefix ?? "/usr", "--buildtype", "release", "--wrap-mode", "nodownload"];
+    const args = [
+      "meson",
+      "setup",
+      build,
+      src,
+      "--prefix",
+      o.cross?.prefix ?? "/usr",
+      "--buildtype",
+      "release",
+      "--wrap-mode",
+      "nodownload",
+    ];
     if (o.cross) {
       const f = `${fwd(o.fileDir)}/meson-${o.cross.triple.arch}.ini`;
       const n = `${fwd(o.fileDir)}/meson-native.ini`;
@@ -74,10 +89,28 @@ export function planBuild(o: PlanOptions): BuildPlan {
     }
     args.push(...s.options);
     steps.push({ title: `configure ${s.id} (meson)`, cmd: args, env });
-    steps.push({ title: `compile ${s.id}`, cmd: ["meson", "compile", "-C", build, ...(o.jobs ? ["-j", String(o.jobs)] : [])], env });
-    steps.push({ title: `install ${s.id} into ${stage}`, cmd: ["meson", "install", "-C", build, "--destdir", stage, "--no-rebuild"], env });
+    steps.push({
+      title: `compile ${s.id}`,
+      cmd: ["meson", "compile", "-C", build, ...(o.jobs ? ["-j", String(o.jobs)] : [])],
+      env,
+    });
+    steps.push({
+      title: `install ${s.id} into ${stage}`,
+      cmd: ["meson", "install", "-C", build, "--destdir", stage, "--no-rebuild"],
+      env,
+    });
   } else {
-    const args = ["cmake", "-S", src, "-B", build, "-G", "Ninja", "-DCMAKE_INSTALL_PREFIX=/usr", "-DCMAKE_BUILD_TYPE=Release"];
+    const args = [
+      "cmake",
+      "-S",
+      src,
+      "-B",
+      build,
+      "-G",
+      "Ninja",
+      "-DCMAKE_INSTALL_PREFIX=/usr",
+      "-DCMAKE_BUILD_TYPE=Release",
+    ];
     if (o.cross) {
       const f = `${fwd(o.fileDir)}/toolchain-${o.cross.triple.arch}.cmake`;
       files.push({ path: f, content: cmakeToolchain(o.cross) });
@@ -88,8 +121,16 @@ export function planBuild(o: PlanOptions): BuildPlan {
     }
     args.push(...s.options);
     steps.push({ title: `configure ${s.id} (cmake)`, cmd: args, env });
-    steps.push({ title: `compile ${s.id}`, cmd: ["cmake", "--build", build, ...(o.jobs ? ["-j", String(o.jobs)] : [])], env });
-    steps.push({ title: `install ${s.id} into ${stage}`, cmd: ["cmake", "--install", build], env: { ...env, DESTDIR: stage } });
+    steps.push({
+      title: `compile ${s.id}`,
+      cmd: ["cmake", "--build", build, ...(o.jobs ? ["-j", String(o.jobs)] : [])],
+      env,
+    });
+    steps.push({
+      title: `install ${s.id} into ${stage}`,
+      cmd: ["cmake", "--install", build],
+      env: { ...env, DESTDIR: stage },
+    });
   }
   return { target: s.id, files, steps };
 }
@@ -149,7 +190,12 @@ export function containerPlan(
 }
 
 /** Environment and notes explaining what cannot run on a given build host. */
-export function hostLimits(s: SourcePin, hostIsLinux: boolean, crossArch: string | undefined, hostArch: string): string[] {
+export function hostLimits(
+  s: SourcePin,
+  hostIsLinux: boolean,
+  crossArch: string | undefined,
+  hostArch: string,
+): string[] {
   const out: string[] = [];
   if (!s.hostRun?.length) return out;
   const canRunTarget = hostIsLinux && (!crossArch || crossArch === hostArch);

@@ -9,7 +9,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const recipe = JSON.parse(readFileSync(join(import.meta.dir, "bundle.json"), "utf8"));
-const root = resolve(process.argv.includes("--root") ? process.argv[process.argv.indexOf("--root") + 1]! : join(process.env.LOCALAPPDATA ?? ".", "bunos-c"));
+const root = resolve(
+  process.argv.includes("--root")
+    ? process.argv[process.argv.indexOf("--root") + 1]!
+    : join(process.env.LOCALAPPDATA ?? ".", "bunos-c"),
+);
 const run = process.argv.includes("--run");
 let failed = 0;
 for (const a of recipe.assets) {
@@ -41,6 +45,12 @@ for (const a of recipe.assets) {
   if (t.exitCode) failed++;
   else writeFileSync(join(dest, ".bunos-c-ok"), digest);
 }
-console.log(run ? (failed ? `${failed} asset(s) failed` : "bundle ready; add these to PATH in your shell only:") : "dry run (add --run to download)");
+console.log(
+  run
+    ? failed
+      ? `${failed} asset(s) failed`
+      : "bundle ready; add these to PATH in your shell only:"
+    : "dry run (add --run to download)",
+);
 if (run && !failed) for (const a of recipe.assets) console.log("  " + join(root, a.id, a.bin));
 process.exit(failed ? 1 : 0);

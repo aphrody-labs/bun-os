@@ -66,7 +66,10 @@ export function closureProblems(c: Closure): string[] {
   }
   for (const s of c.sources)
     for (const n of s.needs) if (!ids.has(n) && !c.extends?.length) p.push(`${s.id}: needs unknown source ${n}`);
-  const order = buildOrder(c.sources, c.sources.map(s => s.id));
+  const order = buildOrder(
+    c.sources,
+    c.sources.map(s => s.id),
+  );
   if (order.cycle.length) p.push(`dependency cycle: ${order.cycle.join(" -> ")}`);
   const names = new Set(c.sysroot.packages.map(x => x.name));
   if (names.size !== c.sysroot.packages.length) p.push("duplicate sysroot package");
@@ -114,7 +117,9 @@ export function buildOrder(
 export function loadClosures(dir: string): Map<string, Closure> {
   const out = new Map<string, Closure>();
   if (!existsSync(dir)) return out;
-  for (const f of readdirSync(dir).filter(f => /^closure-.*\.json$/.test(f)).sort()) {
+  for (const f of readdirSync(dir)
+    .filter(f => /^closure-.*\.json$/.test(f))
+    .sort()) {
     const c = JSON.parse(readFileSync(join(dir, f), "utf8")) as Closure;
     out.set(c.id, c);
   }

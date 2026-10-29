@@ -203,23 +203,37 @@ let closureSummary = "";
     .catch(() => undefined);
   if (!closure) fail("factory/wayland/closure.json missing");
   else {
-    const verify = Bun.spawn(["bun", join(root, "factory/wayland/verify-closure.ts"), "--offline"], { stdout: "pipe", stderr: "pipe" });
-    const [vout, verr, vcode] = await Promise.all([new Response(verify.stdout).text(), new Response(verify.stderr).text(), verify.exited]);
+    const verify = Bun.spawn(["bun", join(root, "factory/wayland/verify-closure.ts"), "--offline"], {
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const [vout, verr, vcode] = await Promise.all([
+      new Response(verify.stdout).text(),
+      new Response(verify.stderr).text(),
+      verify.exited,
+    ]);
     if (vcode) fail(`wayland closure: ${verr.trim().split(String.fromCharCode(10)).slice(0, 5).join("; ")}`);
     const gmBlocks = new Map<string, string>();
-    for (const b of (await read(".gitmodules")).split(/\[submodule /).slice(1)) gmBlocks.set(b.match(/path\s*=\s*(.*)/)?.[1].trim() ?? "", b);
+    for (const b of (await read(".gitmodules")).split(/\[submodule /).slice(1))
+      gmBlocks.set(b.match(/path\s*=\s*(.*)/)?.[1].trim() ?? "", b);
     let mounted = 0;
     for (const it of closure.items) {
       if (!it.mount) continue;
       mounted++;
-      if (gitmodules.get(it.mount) !== it.url) fail(`closure ${it.id}: .gitmodules url ${gitmodules.get(it.mount)} != ${it.url}`);
-      if (gitlinks.get(it.mount) !== it.sha) fail(`closure ${it.id}: gitlink ${gitlinks.get(it.mount)} != pin ${it.sha}`);
+      if (gitmodules.get(it.mount) !== it.url)
+        fail(`closure ${it.id}: .gitmodules url ${gitmodules.get(it.mount)} != ${it.url}`);
+      if (gitlinks.get(it.mount) !== it.sha)
+        fail(`closure ${it.id}: gitlink ${gitlinks.get(it.mount)} != pin ${it.sha}`);
       const block = gmBlocks.get(it.mount) ?? "";
       if (!/update\s*=\s*none/.test(block) || !/shallow\s*=\s*true/.test(block))
         fail(`closure ${it.id}: submodule must be shallow with update = none`);
       if (!ids.has(`submodule:${it.mount}`)) fail(`closure ${it.id}: no components.json entry`);
     }
-    for (const rel of ["factory/wayland/wslg-deps.json", "factory/images/bunos-hyprland/hyprland.packages", "docs/WAYLAND-CLOSURE.md"])
+    for (const rel of [
+      "factory/wayland/wslg-deps.json",
+      "factory/images/bunos-hyprland/hyprland.packages",
+      "docs/WAYLAND-CLOSURE.md",
+    ])
       if (!tracked.has(rel)) fail(`${rel}: not a tracked file`);
     closureSummary = `; wayland closure ${closure.counts.items} items (${closure.counts.sources} source, ${closure.counts.distroPackages} distro), ${mounted} mounted; ${vout.trim()}`;
   }
