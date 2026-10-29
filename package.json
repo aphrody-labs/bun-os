@@ -196,6 +196,8 @@
     "cargo:nie:build": "bun src/cli.ts nie cargo-build",
     "turbo:nie": "bun src/cli.ts nie build",
     "turbo:nie:build": "bun src/cli.ts nie turbo-cargo-build",
+    "affected": "turbo run typecheck lint --affected",
+    "git:doctor": "bun packages/bun-workspace/src/git-cli.ts doctor",
     "plan": "bun src/cli.ts build plan",
     "workspace:source": "bun src/cli.ts workspace inventory",
     "sources": "bun src/cli.ts build sources",

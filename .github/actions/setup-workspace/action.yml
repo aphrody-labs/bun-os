@@ -5,6 +5,10 @@ inputs:
   token:
     description: Token with read access to the aphrody-labs submodules.
     required: true
+  profile:
+    description: Sparse-checkout and submodule profile from packages/bun-workspace/config/git-profiles.json ("all" keeps the full checkout).
+    default: all
+    required: false
   rust:
     description: Also install the nightly Rust toolchain from rust-toolchain.toml.
     default: "false"
@@ -29,6 +33,19 @@ runs:
         for path in vendor/cachyos-linux vendor/ogc-linux vendor/linux-cachyos vendor/kernel-patches vendor/ogc-kernel-packages vendor/nvidia-kernels vendor/open-gpu-kernel-modules vendor/llvm vendor/proton vendor/proton-cachyos vendor/wine-cachyos; do
           git config "submodule.$path.update" none
         done
+    - name: Sparse checkout and submodule profile
+      if: inputs.profile != 'all'
+      shell: bash
+      env:
+        PROFILE: ${{ inputs.profile }}
+      # Expands the cone to the profile and marks every submodule outside it update=none, so `bun run setup` fetches only the profile.
+      run: bun packages/bun-workspace/src/git-cli.ts ci-prepare "$PROFILE"
+    - name: Cache submodule objects
+      uses: actions/cache@v4
+      with:
+        path: .git/modules
+        key: git-modules-${{ runner.os }}-${{ inputs.profile }}-${{ hashFiles('.gitmodules', 'sources.lock.json') }}
+        restore-keys: git-modules-${{ runner.os }}-${{ inputs.profile }}-
     - name: Cache Bun packages
       uses: actions/cache@v4
       with:
