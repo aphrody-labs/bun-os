@@ -24,6 +24,7 @@ members = [
   "crates/bun-os-pkg",
   "crates/bun-os-google",
   "crates/apkeep",
+  "crates/bun-waydroid",
   "crates/aphrody-gemini-web",
   "crates/aphrody-antigravity",
   "crates/aphrody-model-antigravity",
