@@ -1,0 +1,44 @@
+# Spacedrive, the Bun OS file service: sd-server (HTTP + web UI, runs the daemon in-process),
+# sd-daemon (standalone core) and the `spacedrive` CLI, built from the aphrody-labs/spacedrive
+# fork (tracks spacedriveapp/spacedrive, Apache-2.0) with its own Cargo.lock and Bun for the UI.
+pkgname=bun-os-spacedrive
+pkgver=2.0.0alpha2
+pkgrel=1
+_commit=4d41a379f612e23ac43a66ffd67df52ca77f57d4
+pkgdesc='Spacedrive file service for Bun OS: indexing daemon, HTTP/web UI server and CLI'
+arch=('x86_64' 'aarch64')
+url='https://github.com/aphrody-labs/spacedrive'
+license=('Apache-2.0')
+depends=('glibc' 'openssl' 'gcc-libs')
+makedepends=('bun-canary' 'cargo' 'git' 'protobuf' 'clang' 'pkgconf')
+backup=('etc/bun-os/spacedrive.env')
+options=('!strip' '!debug')
+source=("spacedrive::git+https://github.com/aphrody-labs/spacedrive.git#commit=${_commit}"
+        'bun-os-spacedrive.service'
+        'spacedrive.env')
+sha256sums=('SKIP' 'SKIP' 'SKIP')
+
+prepare() {
+  cd spacedrive
+  cargo fetch --locked
+  bun install --frozen-lockfile --ignore-scripts
+}
+
+build() {
+  cd spacedrive
+  # sd-server embeds apps/web/dist, so the UI is built first.
+  (cd apps/web && bun run build)
+  export CARGO_TARGET_DIR=target
+  cargo build --release --locked -p sd-server -p sd-cli -p sd-core --bin sd-server --bin sd-daemon --bin sd
+}
+
+package() {
+  cd spacedrive
+  install -Dm755 target/release/sd-server "$pkgdir/usr/bin/sd-server"
+  install -Dm755 target/release/sd-daemon "$pkgdir/usr/bin/sd-daemon"
+  install -Dm755 target/release/sd "$pkgdir/usr/bin/sd"
+  install -Dm644 "$srcdir/bun-os-spacedrive.service" "$pkgdir/usr/lib/systemd/user/bun-os-spacedrive.service"
+  install -Dm600 "$srcdir/spacedrive.env" "$pkgdir/etc/bun-os/spacedrive.env"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 NOTICE "$pkgdir/usr/share/licenses/$pkgname/NOTICE"
+}

@@ -1,0 +1,15 @@
+[Unit]
+Description=Spacedrive file service (indexing daemon and web UI) for the Bun OS shell
+Documentation=https://github.com/aphrody-labs/spacedrive
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/bun-os/spacedrive.env
+Environment=DATA_DIR=%h/.spacedrive
+ExecStart=/usr/bin/sd-server --host ${SD_HOST} --port ${PORT}
+Restart=on-failure
+RestartSec=2
+Nice=10
+
+[Install]
+WantedBy=default.target
