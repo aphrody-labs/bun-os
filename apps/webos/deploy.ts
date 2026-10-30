@@ -4,6 +4,7 @@ import { cp, mkdir, rename } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { stageIso } from "./vm";
 import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
+import { buildInventory, checkInventory, printCounts } from "./inventory";
 
 if (process.platform !== "linux")
   throw new Error("Deploy WebOS from the VPS factory");
@@ -45,6 +46,22 @@ for (const required of [
 ])
   if (!(await Bun.file(join(release, "dist", required)).exists()))
     throw new Error(`Missing ${required}`);
+// Coverage gate: every member of the repository has a WebOS surface and an API record in the release.
+{
+  const registry = (await Bun.file(join(release, "dist/registry.json")).json()) as {
+    packages: { id: string; name: string; description: string; category: string; version?: string; license?: string }[];
+  };
+  const inventory = await buildInventory({
+    games: registry.packages.filter((p) => p.category === "games"),
+    wasmModules: new Set(["aphrody-webos-wasm"]),
+  });
+  const gate = await checkInventory(inventory, join(release, "dist"));
+  printCounts(inventory);
+  if (gate.errors.length)
+    throw new Error(`WebOS inventory gate failed:
+${gate.errors.slice(0, 30).join("
+")}`);
+}
 if (!imported) {
   const registry = (await Bun.file(
     join(release, "dist/registry.json"),

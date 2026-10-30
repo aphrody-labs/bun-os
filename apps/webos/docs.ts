@@ -43,7 +43,7 @@ interface Entry {
   text: string;
 }
 
-function frontmatter(source: string): { meta: Record<string, string>; body: string } {
+export function frontmatter(source: string): { meta: Record<string, string>; body: string } {
   if (!source.startsWith("---")) return { meta: {}, body: source };
   const end = source.indexOf("\n---", 3);
   if (end < 0) return { meta: {}, body: source };
@@ -56,7 +56,7 @@ function frontmatter(source: string): { meta: Record<string, string>; body: stri
 }
 
 /** Remove MDX-only syntax (imports, exports, JSX wrappers) so the page is plain Markdown. */
-function plain(body: string): string {
+export function plain(body: string): string {
   const lines: string[] = [];
   let fence = false;
   for (const line of body.split("\n")) {
@@ -108,7 +108,7 @@ export async function buildDocs(dist: string): Promise<Record<string, number>> {
       id: "bunos",
       label: "Bun OS",
       root: join(root, "docs"),
-      include: ["*.md", "architecture/**/*.md", "agent-goals/**/*.md", "product/**/*.md", "webos/**/*.md", "aphrody/plans/**/*.md", "aphrody/architecture/**/*.md", "aphrody/products/**/*.md"],
+      include: ["**/*.md", "**/*.mdx"],
       exclude: /(^|\/)(node_modules|vendor)\//,
     },
   ];

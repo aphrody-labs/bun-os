@@ -206,7 +206,7 @@
       "keep": true
     }
   },
-  "source": "https://github.com/aphrody-labs/bun-os/tree/os",
+  "source": "https://github.com/aphrody-labs/bun-os/tree/main",
   "memberPath": "/source/",
   "apps": {
     "/art": "creative",

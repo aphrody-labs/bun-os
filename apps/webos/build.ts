@@ -10,141 +10,16 @@ import { buildDocs } from "./docs";
 import { stageWorkspace, stageWorkspaceCatalogs } from "./workspace";
 import { stageGamesContent } from "./games-content";
 import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
-import { APPS, ROUTES, appPath, type MemberKind } from "./src/config";
+import { ROUTES, appPath } from "./src/config";
+import { buildInventory, checkInventory, catalogMembers, printCounts, writeInventory } from "./inventory";
 
 const root = resolve(import.meta.dir, "../..");
 const dist = join(import.meta.dir, "dist");
 
-interface Entry {
-  id: string;
-  d: string;
-  k?: string;
-}
-
-/** How a monorepo app runs in the desktop (src/apps/member.ts renders the non-web kinds). */
-interface AppEntry extends Entry {
-  run: MemberKind;
-  opens?: string;
-  related?: string;
-  artifact?: string;
-  readme?: boolean;
-}
-
-const tomlDesc = (text: string) => {
-  const line = text.split("\n").find((l) => l.startsWith("description"));
-  const start = line?.indexOf('"') ?? -1;
-  const end = line?.lastIndexOf('"') ?? -1;
-  return line && end > start
-    ? line
-        .slice(start + 1, end)
-        .split(String.fromCharCode(92, 34))
-        .join('"')
-    : "";
-};
-
-async function scan(
-  dir: string,
-  read: (path: string) => Promise<{ d: string; k?: string } | undefined>,
-) {
-  const tracked = Bun.spawnSync(["git", "ls-files", "--", dir], { cwd: root });
-  if (tracked.exitCode !== 0)
-    throw new Error(
-      `Could not list tracked ${dir} sources for the product catalog`,
-    );
-  const trackedChildren = new Set(
-    new TextDecoder()
-      .decode(tracked.stdout)
-      .split("\n")
-      .filter(Boolean)
-      .map((path) => path.split("/")[1]),
-  );
-  const out: Entry[] = [];
-  for (const e of await readdir(join(root, dir), { withFileTypes: true })) {
-    if (
-      !e.isDirectory() ||
-      e.name.startsWith(".") ||
-      !trackedChildren.has(e.name)
-    )
-      continue;
-    const meta = await read(join(root, dir, e.name));
-    if (meta) out.push({ id: e.name, ...meta });
-  }
-  return out.sort((a, b) => a.id.localeCompare(b.id));
-}
-
-// Every tracked member of apps/ is an app of the desktop; its manifests only refine the description and kind.
+// Apps, packages and crates come from the inventory module (inventory.ts), which also writes the full
+// inventory (every member of the repository) served at /api/inventory.
 const capabilities = allAppCapabilities();
-/** Craft family of a member: pdfcraft, pdfcraft-web and pdfcraft-cli all belong to the pdfcraft capability. */
-const familyOf = (id: string) => {
-  const base = id.replace(/(-web-app|-web|-cli|-server|_native)$/, "");
-  return capabilities.find((capability) => capability.libraryId === base);
-};
-const readmes = new Map<string, string>();
-const scanned = await scan("apps", async (p) => {
-  const pkg = Bun.file(join(p, "package.json"));
-  const cargo = Bun.file(join(p, "Cargo.toml"));
-  const html = Bun.file(join(p, "index.html"));
-  const trunk = Bun.file(join(p, "Trunk.toml"));
-  let d = "";
-  if (await pkg.exists()) d = (await pkg.json()).description ?? "";
-  if (!d && (await cargo.exists())) d = tomlDesc(await cargo.text());
-  const kind =
-    (await html.exists()) || (await trunk.exists())
-      ? "web"
-      : (await pkg.exists())
-        ? "js"
-        : (await cargo.exists())
-          ? "native"
-          : "source";
-  const readme = join(p, "README.md");
-  if (await Bun.file(readme).exists()) readmes.set(p, readme);
-  return { d, k: kind };
-});
-const apps: AppEntry[] = scanned.map((entry) => {
-  const config = APPS.members[entry.id] ?? {};
-  const family = familyOf(entry.id);
-  const run: MemberKind =
-    config.kind ??
-    (entry.id.endsWith("-cli")
-      ? "cli"
-      : entry.id.endsWith("-server")
-        ? "server"
-        : entry.id.endsWith("-web") && family?.webosPackageId
-          ? "web"
-          : "native");
-  const opens =
-    config.opens ?? (run === "web" ? family?.webosPackageId : undefined);
-  const related =
-    config.related ??
-    (opens ? undefined : (family?.webosPackageId ?? (family && "creative")));
-  return {
-    ...entry,
-    d: config.desc ?? (entry.d || family?.description || ""),
-    run,
-    ...(opens ? { opens } : {}),
-    ...(related ? { related } : {}),
-    ...(config.artifact ? { artifact: config.artifact } : {}),
-    ...(readmes.has(join(root, "apps", entry.id)) ? { readme: true } : {}),
-  };
-});
-for (const id of Object.keys(APPS.members))
-  if (!apps.some((entry) => entry.id === id))
-    throw new Error(
-      `apps.json declares ${id}, which is not a tracked apps/ member`,
-    );
-
-const packages = await scan("packages", async (p) => {
-  const pkg = Bun.file(join(p, "package.json"));
-  if (!(await pkg.exists())) return undefined;
-  const j = await pkg.json();
-  return { d: j.description ?? "" };
-});
-
-const crates = await scan("crates", async (p) => {
-  const cargo = Bun.file(join(p, "Cargo.toml"));
-  if (!(await cargo.exists())) return undefined;
-  return { d: tomlDesc(await cargo.text()) };
-});
+const { apps, packages, crates, readmes } = await catalogMembers();
 
 // Application identities (docs/APP-DOMAINS.md): canonical host, library alias and the aphrody.com path that
 // both redirect to, all derived from the capability catalog and infra/config/routes.catalog.json.
@@ -451,6 +326,21 @@ console.log(
 );
 const built = await buildPackages(dist);
 await stageGamesContent(dist);
+// The full inventory: every member of the repository with the WebOS surface that serves it (inventory.ts).
+const inventory = await buildInventory({
+  apps,
+  games: built.filter((p) => p.category === "games"),
+  // The crates whose WebAssembly module this deployment ships (copied to dist/wasm below).
+  wasmModules: new Set(["aphrody-webos-wasm"]),
+});
+await writeInventory(dist, inventory);
+printCounts(inventory);
+const gate = await checkInventory(inventory, dist);
+if (gate.flags.length) console.warn(`inventory flags: ${gate.flags.length}`);
+if (gate.errors.length)
+  throw new Error(`WebOS inventory gate failed:
+${gate.errors.slice(0, 30).join("
+")}`);
 await buildSeo(dist, catalog);
 console.log(`packages: ${built.map((p) => p.id).join(", ") || "none"}`);
 console.log(

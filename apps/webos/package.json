@@ -10,6 +10,8 @@
     "build:shell": "bun build.ts",
     "dev": "bun build-product.ts && wrangler dev",
     "deploy": "bun deploy.ts",
+    "inventory": "bun inventory.ts",
+    "check:coverage": "bun inventory.ts --check",
     "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "dependencies": {
