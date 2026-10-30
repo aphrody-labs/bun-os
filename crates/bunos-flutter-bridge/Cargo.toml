@@ -1,0 +1,17 @@
+[package]
+name = "bunos-flutter-bridge"
+version = "0.1.0"
+edition = "2024"
+publish = false
+license = "MIT"
+description = "flutter_rust_bridge API of the Bun OS Rust core for Flutter apps (M3 dynamic colour from crates/aphrody-m3-tokens)"
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+aphrody-m3-tokens = { workspace = true }
+flutter_rust_bridge = "=2.13.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
