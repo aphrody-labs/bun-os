@@ -10,12 +10,16 @@
  *   bun factory/os/rust-desktop.ts publish            Redox pkgar repo -> /repo/redox/, image -> /downloads/os/redox/, apt/pacman via the Store
  *   bun factory/os/rust-desktop.ts qualify            boot the Redox image in QEMU (KVM when /dev/kvm is usable), screendump Orbital,
  *                                                     open COSMIC Files from the launcher (Super+F) and screendump again
- *   bun factory/os/rust-desktop.ts all                check, redox, cosmic, publish, qualify
+ *   bun factory/os/rust-desktop.ts all                check, cosmic, publish (the COSMIC packages consumed by the unified Bun OS image)
+ *
+ * Owner direction 2026-10-30: one unified Bun OS image without OS VMs. Redox is a code-sharing partner (forks, cookbook and the
+ * shared [patch] table stay); `redox` and `qualify` build and boot its image on demand only and are not part of `all`.
  *
  * Environment: BUNOS_REDOX_TREE (default vendor/redox/redox), STORE_ROOT (default ~/apps/webos/store),
  * BUNOS_RUST_DESKTOP_OUT (default ~/work/rust-desktop).
  */
 import {
+  chmodSync,
   copyFileSync,
   existsSync,
   mkdirSync,
@@ -110,6 +114,11 @@ function redox() {
   if (!existsSync(join(tree, "Makefile"))) run(["git", "submodule", "update", "--init", "vendor/redox/redox"]);
   mkdirSync(join(tree, "bunos"), { recursive: true });
   copyFileSync(patchFile, join(tree, "bunos/cargo-patch.toml"));
+  // The pkgar signing key of /repo/redox lives in the protected Store secrets; the cookbook creates one on first build.
+  const keys = join(store, "../secrets/store/redox");
+  mkdirSync(join(tree, "build"), { recursive: true });
+  for (const k of ["id_ed25519.toml", "id_ed25519.pub.toml"])
+    if (existsSync(join(keys, k)) && !existsSync(join(tree, "build", k))) copyFileSync(join(keys, k), join(tree, "build", k));
   const make = [
     "make",
     "all",
@@ -121,6 +130,11 @@ function redox() {
     "-j1",
   ];
   run(make, { cwd: tree });
+  if (!existsSync(join(keys, "id_ed25519.toml")) && existsSync(join(tree, "build/id_ed25519.toml"))) {
+    mkdirSync(keys, { recursive: true, mode: 0o700 });
+    for (const k of ["id_ed25519.toml", "id_ed25519.pub.toml"]) copyFileSync(join(tree, "build", k), join(keys, k));
+    chmodSync(join(keys, "id_ed25519.toml"), 0o600);
+  }
   log("image", image(), `${(statSync(image()).size / 2 ** 20).toFixed(0)} MiB`);
 }
 
@@ -135,13 +149,17 @@ function cosmic(apps: string[]) {
   if (missing.length)
     run([join(root, "infra/config/host/libexec/aphrody-native-apps"), "container", "cosmic", ...missing]);
   else log("COSMIC debs already built by the native-apps lane:", COSMIC_APPS.join(", "));
-  run(["bun", join(root, "apps/webos/store/cli.ts"), "build", "apt"]);
 }
 
 // ------------------------------------------------------------------------------------------------ publish
 function publish() {
+  // deb + pacman for the COSMIC session first: the Store indexes the native-apps debs (suite resolute) and its pacman builds.
+  run(["bun", join(root, "apps/webos/store/cli.ts"), "build", "apt"]);
   const repo = join(tree, "repo", TARGET);
-  if (!existsSync(repo)) throw new Error(`no cookbook repo at ${repo}; run redox first`);
+  if (!existsSync(repo) || !existsSync(image())) {
+    log(`no Redox build at ${tree}; Redox repo and image not published (run \`redox\` on demand)`);
+    return;
+  }
   const dest = join(store, "repo/redox");
   mkdirSync(join(dest, TARGET), { recursive: true });
   // pkg reads <url>/<target>/repo.toml and <url>/id_ed25519.pub.toml; /repo/redox/x86_64 is the short alias.
@@ -178,8 +196,6 @@ function publish() {
     ) + "\n",
   );
   log(`image -> https://aphrody.com/downloads/os/redox/${IMAGE_NAME}.zst`);
-  // deb + pacman for the COSMIC session: the Store indexes the native-apps debs and its pacman builds.
-  run(["bun", join(root, "apps/webos/store/cli.ts"), "build", "apt"], { allowFail: true });
 }
 
 // ------------------------------------------------------------------------------------------------ qualify
@@ -346,10 +362,9 @@ switch (cmd) {
     process.exit((await qualify()) ? 0 : 1);
   case "all":
     if (!check()) process.exit(1);
-    redox();
     cosmic([]);
     publish();
-    process.exit((await qualify()) ? 0 : 1);
+    break;
   default:
     console.error("usage: rust-desktop.ts check|redox|cosmic [app...]|publish|qualify|all");
     process.exit(2);
