@@ -1,0 +1,15 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# bunos-launch-webapp URL APP_ID: open URL as a standalone app window whose Wayland app_id is APP_ID, so the
+# COSMIC dock, app library and window switcher group it under its own .desktop entry (StartupWMClass=APP_ID).
+# After Omarchy's omarchy-launch-webapp (basecamp/omarchy, MIT): first Chromium-family browser found wins.
+set -eu
+url="${1:?usage: bunos-launch-webapp URL APP_ID}"
+app_id="${2:?usage: bunos-launch-webapp URL APP_ID}"
+for b in chromium chromium-browser google-chrome-stable google-chrome brave-browser microsoft-edge-stable; do
+  if command -v "$b" >/dev/null 2>&1; then
+    exec "$b" --app="$url" --class="$app_id" --ozone-platform-hint=auto \
+      --user-data-dir="${XDG_DATA_HOME:-$HOME/.local/share}/bunos/webapps/$app_id"
+  fi
+done
+exec xdg-open "$url"

@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Flycast
-Comment=Flycast emulator (Bun OS package of flyinghead/flycast v2.7)
-Exec=flycast %f
-Icon=flycast
-Terminal=false
-Categories=Game;Emulator;
-StartupWMClass=Flycast

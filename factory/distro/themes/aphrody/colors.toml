@@ -1,0 +1,62 @@
+# Aphrody theme: the default Bun OS theme (COSMIC session, Omarchy theme system).
+# Keys follow Omarchy's canonical colors.toml (basecamp/omarchy docs/theming.md, quattro 51bfd1d).
+# Values are the WebOS "Aphrody" Material 3 dark roles (apps/webos/src/themes.ts, seed #4c62d9):
+# surface #11131d, surface-container-lowest #0c0e17, surface-container #1b1e2b, on-surface #e1e3f2,
+# on-surface-variant #a9aec8, outline #6d7393, outline-variant #353a50, primary #a9b8ff,
+# primary-container #2e3f95, tertiary #7fd6c6. The COSMIC theme (cosmic.ron here, = ThemeBuilder::dark() of
+# the aphrody-labs/libcosmic fork) carries the same values.
+mode = "dark"
+
+accent = "#a9b8ff"
+tertiary = "#7fd6c6"
+selection = "#2e3f95"
+muted = "#353a50"
+outline = "#6d7393"
+cursor = "#a9b8ff"
+
+background = "#11131d"
+dark_background = "#0c0e17"
+darker_background = "#080a11"
+lighter_background = "#1b1e2b"
+highest_background = "#2c3142"
+
+foreground = "#e1e3f2"
+dark_foreground = "#a9aec8"
+light_foreground = "#eceefa"
+bright_foreground = "#f7f8ff"
+
+selection_foreground = "#e1e3f2"
+selection_background = "#2e3f95"
+
+red = "#f28b9b"
+yellow = "#f0c674"
+orange = "#f5a97f"
+green = "#8fd694"
+cyan = "#7fd6c6"
+blue = "#a9b8ff"
+magenta = "#c9a7ff"
+error = "#ffb4ab"
+
+bright_red = "#ff9fae"
+bright_yellow = "#ffd58f"
+bright_green = "#a8e6ab"
+bright_cyan = "#a6f2e2"
+bright_blue = "#c4cfff"
+bright_magenta = "#dcc2ff"
+
+color0 = "#1b1e2b"
+color1 = "#f28b9b"
+color2 = "#8fd694"
+color3 = "#f0c674"
+color4 = "#a9b8ff"
+color5 = "#c9a7ff"
+color6 = "#7fd6c6"
+color7 = "#c3c7dc"
+color8 = "#4a5070"
+color9 = "#ff9fae"
+color10 = "#a8e6ab"
+color11 = "#ffd58f"
+color12 = "#c4cfff"
+color13 = "#dcc2ff"
+color14 = "#a6f2e2"
+color15 = "#f3f4fc"

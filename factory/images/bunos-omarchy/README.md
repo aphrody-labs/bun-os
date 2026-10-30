@@ -83,14 +83,43 @@ checks to three seconds.
 
 ## Browser terminal conversion
 
-`c2w-terminal` is a separate shell-only image target. Convert it with the
-qualified Linux VPS container2wasm v0.8.4 binary and `--to-js`. The v0.8.4
-embedded Dockerfile defaults VM memory to 128 MiB, too small for this image;
-the reviewed conversion must set `VM_MEMORY_SIZE_MB=2048` and
-`VM_CORE_NUMS=2`, and replace every `make -j$(nproc)` with `make -j4` in a
-hash-recorded Dockerfile copy before conversion. These are converter build
-inputs, not an assertion that the browser can allocate that full guest memory.
-This target is shell-only. Current c2w upstream evidence says GUI display is
-not supported; the separate headless desktop-to-c2w experiment must still be
-attempted and recorded as experimental, then qualified independently. See
-[NOTICES.md](NOTICES.md) for converter pins and third-party notices.
+`c2w-convert.sh` and [c2w-conversion.json](c2w-conversion.json) prepare an
+experimental terminal-only browser bundle from the imported
+`bunos-omarchy:imported-rootfs` image. The pinned Linux VPS binary, embedded
+Dockerfile hash, and all 25 `nproc` compiler invocations are checked; each is
+rewritten to `-j4`. A stable named BuildKit builder preserves its cache and
+serializes build steps to one under the shared factory lock. The script exports
+the complete image as an external OCI Image Layout, then invokes c2w with
+`--external-bundle --to-js`. It separately checks out the exact v0.8.4 source
+commit, builds the upstream Go imagemounter with parallelism capped at four,
+and bundles the upstream xterm frontend using Bun. Resulting static assets are
+assembled in `web/htdocs/`; serve that directory as the site root, with the OCI
+layout at `/omarchy/`. The browser requires `COOP: same-origin`,
+`COEP: require-corp`, and CORS-capable access to the OCI layout. The upstream
+page loads xterm modules from CDNs, so cross-origin availability and browser
+isolation remain runtime qualification gates. This is not a graphical desktop
+claim. See the [upstream Emscripten example](https://github.com/container2wasm/container2wasm/tree/v0.8.4/examples/no-conversion-emscripten)
+and [imagemounter guide](https://github.com/container2wasm/container2wasm/tree/v0.8.4/extras/imagemounter).
+
+The conversion is prepared but not launched while the factory slot is busy.
+After the imported Docker image is built and the shared factory lock is free,
+the root owner should launch on the VPS with:
+
+```sh
+bash factory/images/bunos-omarchy/c2w-convert.sh \
+  bunos-omarchy:imported-rootfs \
+  /home/ubuntu/bun-os-images/bunos-omarchy-c2w-<unique-job> \
+  /home/ubuntu/bun-os-images \
+  <factoryConfig.lockPath>
+```
+
+Use a new private job directory and the exact lock path from the configured
+factory; the script refuses existing output, leaves the default Docker builder
+alone, and retains the stable `bunos-omarchy-c2w-j4` builder cache for future
+conversions. The BuildKit config is installed once at
+`$PRIVATE_ROOT/bunos-omarchy-c2w-buildkitd.toml`; a mismatch causes a safe stop.
+The 2 GiB guest-memory setting is an experiment budget, not proof browsers can
+allocate it. The frontend and imagemounter are packaged but the browser session,
+network headers, memory pressure, and image boot remain unqualified. GUI output
+remains unsupported. See [NOTICES.md](NOTICES.md) for converter pins and
+third-party notices.

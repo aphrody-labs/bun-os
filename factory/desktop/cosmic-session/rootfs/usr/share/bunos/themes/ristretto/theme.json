@@ -1,0 +1,12 @@
+{
+  "name": "ristretto",
+  "mode": "dark",
+  "icons": "Yaru-yellow",
+  "backgrounds": [
+    "0-launch.webp",
+    "1-color-curves.webp",
+    "2-coffee-beans.jpg",
+    "3-industrial-moon.webp",
+    "omarchy.webp"
+  ]
+}

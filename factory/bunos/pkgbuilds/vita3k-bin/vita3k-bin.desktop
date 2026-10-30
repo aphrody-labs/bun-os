@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Vita3K
-Comment=Vita3K emulator (Bun OS package of Vita3K/Vita3K continuous)
-Exec=Vita3K %f
-Icon=vita3k-bin
-Terminal=false
-Categories=Game;Emulator;
-StartupWMClass=Vita3K

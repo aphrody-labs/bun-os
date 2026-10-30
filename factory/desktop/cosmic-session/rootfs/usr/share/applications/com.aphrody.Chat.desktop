@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Aphrody Chat
+Comment=Chat with Aphrody
+Exec=bunos-launch-webapp https://aphrody.com/chat com.aphrody.Chat
+Icon=com.aphrody.Chat
+StartupWMClass=com.aphrody.Chat
+Categories=Network;Chat;
+Terminal=false

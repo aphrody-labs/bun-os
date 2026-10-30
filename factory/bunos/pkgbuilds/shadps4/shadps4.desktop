@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=shadPS4
-Comment=shadPS4 emulator (Bun OS package of shadps4-emu/shadPS4 v.0.21.0)
-Exec=shadps4 %f
-Icon=shadps4
-Terminal=false
-Categories=Game;Emulator;
-StartupWMClass=shadPS4

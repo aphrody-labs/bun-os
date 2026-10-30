@@ -103,10 +103,10 @@ describe("windows installer script", () => {
 
 describe("cosmic", () => {
   it("writes RON builder keys for both modes", () => {
-    expect(text("cosmic/config/com.system76.CosmicTheme.Dark.Builder/v1/accent")).toMatch(
+    expect(text("cosmic/config/com.system76.CosmicTheme.Dark.Builder/v2/accent")).toMatch(
       /^Some\(\(red: 0\.\d+, green: 0\.\d+, blue: 0\.\d+\)\)$/,
     );
-    expect(text("cosmic/config/com.system76.CosmicTheme.Light.Builder/v1/bg_color")).toContain("alpha: 1.000000");
+    expect(text("cosmic/config/com.system76.CosmicTheme.Light.Builder/v2/bg_color")).toContain("alpha: 1.000000");
     expect(text("cosmic/M3-Test-dark.ron")).toContain("accent: Some(");
     expect(text("cosmic/install-cosmic.sh")).toContain("--uninstall");
   });
