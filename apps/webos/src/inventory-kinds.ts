@@ -18,12 +18,14 @@ export const KINDS = {
 } as const;
 export type Kind = keyof typeof KINDS;
 export const KIND_IDS = Object.keys(KINDS) as Kind[];
-export type SurfaceType = "app" | "wasm" | "viewer" | "download" | "api" | "info";
+export type SurfaceType = "app" | "wasm" | "viewer" | "download" | "api";
+/** Real backing of a surface. There is no placeholder backing: a member without one fails the gate. */
+export type Backing = "desktop-app" | "wasm-module" | "api" | "download" | "repository";
+export const BACKINGS: readonly Backing[] = ["desktop-app", "wasm-module", "api", "download", "repository"];
 export const SURFACE_LABEL: Record<SurfaceType, string> = {
   app: "Opens in the desktop",
   wasm: "WebAssembly module",
-  viewer: "Viewer",
+  viewer: "Repository page",
   download: "Downloads",
   api: "API",
-  info: "Info page",
 };

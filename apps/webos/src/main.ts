@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { activityApp } from "./apps/activity";
 import { memberApp, memberKindLabel } from "./apps/member";
-import { showcaseApp } from "./apps/showcase";
-import { themeBuilderApp } from "./apps/themebuilder";
-import { videoApp } from "./apps/video";
 import {
   ROUTES,
   WORKSPACE_ROUTES,
@@ -13,7 +10,6 @@ import {
 } from "./config";
 import { appStore } from "./apps/appstore";
 import { calculatorApp } from "./apps/calculator";
-import { creativeApp } from "./apps/creative";
 import { mediaApp } from "./apps/media";
 import { storageApp } from "./apps/storage";
 import { openWebApp, webApps, webAppsApp } from "./apps/webapps";
@@ -22,7 +18,6 @@ import { editorApp } from "./apps/editor";
 import { engineApp } from "./apps/engine";
 import { emulatorsApp } from "./apps/emulators";
 import { filesApp } from "./apps/files";
-import { docsApp } from "./apps/docs";
 import { linuxApp } from "./apps/linux";
 import { inspectorApp } from "./apps/inspector";
 import {
@@ -82,6 +77,8 @@ installAppearance();
 
 interface Builtin {
   id: string;
+  /** What runs the app: WebAssembly, the App UI build, an HTTP API of this deployment, or a web-platform feature. No other backing exists. */
+  backing: "wasm" | "app-ui" | "api" | "browser";
   name: string;
   icon: string;
   desc: string;
@@ -132,6 +129,7 @@ function openEditor(path: string, text: string) {
 const builtins: Builtin[] = [
   {
     id: "aphrody-workspace",
+    backing: "app-ui",
     tone: "primary",
     name: "Aphrody Workspace",
     icon: "app",
@@ -152,6 +150,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "files",
+    backing: "wasm",
     tone: "primary",
     name: "Files",
     icon: "folder",
@@ -168,6 +167,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "browser",
+    backing: "api",
     tone: "secondary",
     name: "Browser",
     icon: "globe",
@@ -179,6 +179,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "apps",
+    backing: "api",
     tone: "tertiary",
     name: "Apps",
     icon: "store",
@@ -189,49 +190,8 @@ const builtins: Builtin[] = [
     mount: (root) => loading(root, appStore(root, refreshApps, launchPackage)),
   },
   {
-    id: "creative",
-    tone: "tertiary",
-    name: "Aphrody Creative",
-    icon: "pen",
-    desc: "Creative apps, projects and shared Drive files",
-    group: "core",
-    width: 980,
-    height: 680,
-    mount: (root) =>
-      loading(
-        root,
-        creativeApp(
-          root,
-          refreshApps,
-          launchPackage,
-          () => openApp("drive"),
-          openApp,
-        ),
-      ),
-  },
-  {
-    id: "drive",
-    tone: "primary",
-    name: "Aphrody Drive",
-    icon: "folder",
-    desc: "Creative projects and assets in the shared WebOS workspace",
-    group: "core",
-    width: 1120,
-    height: 740,
-    // Keep browser Drive on the same Rust VFS as Files. Projects saved here
-    // remain available in both windows across WebOS sessions.
-    mount: (root) =>
-      loading(
-        root,
-        filesApp(root, openEditor, {
-          start: `${HOME}/Projects`,
-          openCraft: openCraftFile,
-          openWith: openFileWith,
-        }),
-      ),
-  },
-  {
     id: "settings",
+    backing: "browser",
     name: "Settings",
     icon: "gear",
     desc: "Appearance, wallpaper, desktop, keyboard, region and privacy",
@@ -243,6 +203,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "linux",
+    backing: "wasm",
     name: "Alpine Linux",
     icon: "cube",
     desc: "A real Linux machine in your browser",
@@ -253,6 +214,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "emulators",
+    backing: "wasm",
     name: "Emulators",
     icon: "game",
     desc: "Every emulator: play, save states, qualification status",
@@ -262,18 +224,8 @@ const builtins: Builtin[] = [
     mount: (root) => loading(root, emulatorsApp(root, { open: (id) => openApp(id) })),
   },
   {
-    id: "docs",
-    tone: "secondary",
-    name: "Docs",
-    icon: "doc",
-    desc: "Bun, the Bun fork and Bun OS documentation, searchable",
-    group: "core",
-    width: 980,
-    height: 640,
-    mount: (root) => loading(root, docsApp(root)),
-  },
-  {
     id: "terminal",
+    backing: "wasm",
     name: "Terminal",
     icon: "terminal",
     desc: "Command line (Rust shell in WebAssembly)",
@@ -284,6 +236,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "inspector",
+    backing: "wasm",
     name: "Inspector",
     icon: "cube",
     desc: "Analyse any file: format, sections, hashes",
@@ -294,9 +247,10 @@ const builtins: Builtin[] = [
   },
   {
     id: "engine",
-    name: "Bun Engine",
+    backing: "wasm",
+    name: "TypeScript playground",
     icon: "bolt",
-    desc: "Run JavaScript in an isolated worker",
+    desc: "Bundle a TypeScript project with esbuild-wasm and run it in an isolated worker",
     group: "advanced",
     width: 820,
     height: 560,
@@ -304,6 +258,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "workspace",
+    backing: "api",
     name: "Atlas",
     icon: "code",
     desc: "Every Bun OS member: apps, packages, crates, docs, factory, engines, tools and more",
@@ -314,6 +269,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "media",
+    backing: "browser",
     tone: "tertiary",
     name: "Media",
     icon: "film",
@@ -324,39 +280,8 @@ const builtins: Builtin[] = [
     mount: (root) => loading(root, mediaApp(root)),
   },
   {
-    id: "video",
-    tone: "tertiary",
-    name: "Video Studio",
-    icon: "film",
-    desc: "Compose clips, titles and music, export WebM",
-    group: "core",
-    width: 1100,
-    height: 700,
-    mount: (root) =>
-      loading(root, videoApp(root, { openFilm: () => openApp("craft-film") })),
-  },
-  {
-    id: "showcase",
-    name: "Material 3 components",
-    icon: "image",
-    desc: "Every Material 3 web component, live with its code",
-    group: "advanced",
-    width: 1040,
-    height: 700,
-    mount: (root) => showcaseApp(root),
-  },
-  {
-    id: "themebuilder",
-    name: "Theme builder",
-    icon: "pen",
-    desc: "Material 3 scheme from one colour: contrast and exports",
-    group: "advanced",
-    width: 1040,
-    height: 720,
-    mount: (root) => themeBuilderApp(root),
-  },
-  {
     id: "webapps",
+    backing: "browser",
     tone: "secondary",
     name: "Web Apps",
     icon: "globe",
@@ -368,6 +293,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "calculator",
+    backing: "wasm",
     name: "Calculator",
     icon: "table",
     desc: "Calculator",
@@ -379,6 +305,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "storage",
+    backing: "browser",
     tone: "primary",
     name: "Disk Usage",
     icon: "folder",
@@ -390,6 +317,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "activity",
+    backing: "browser",
     name: "Activity",
     icon: "bolt",
     desc: "Windows, memory and storage in use",
@@ -400,6 +328,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "keys",
+    backing: "browser",
     name: "Keyboard",
     icon: "gear",
     desc: "Keyboard shortcuts and navigation",
@@ -411,6 +340,7 @@ const builtins: Builtin[] = [
   },
   {
     id: "about",
+    backing: "api",
     name: "About",
     icon: "info",
     desc: "About this system",
@@ -586,7 +516,6 @@ const INVENTORY_ICON: Record<Kind, string> = {
   apps: "app",
   packages: "code",
   crates: "code",
-  docs: "doc",
   factory: "folder",
   ospackages: "app",
   engines: "game",

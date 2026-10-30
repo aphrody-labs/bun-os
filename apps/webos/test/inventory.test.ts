@@ -5,7 +5,7 @@ import { expect, test } from "bun:test";
 import { buildInventory, checkInventory } from "../inventory";
 import { KIND_IDS } from "../src/inventory-kinds";
 
-test("every member of apps, packages, crates, docs, factory, tools, infra, sources and root has a WebOS surface", async () => {
+test("every member of apps, packages, crates, factory, tools, infra, sources and root has a WebOS surface", async () => {
   const inventory = await buildInventory();
   const { errors } = await checkInventory(inventory);
   expect(errors).toEqual([]);

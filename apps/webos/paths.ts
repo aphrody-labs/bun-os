@@ -34,11 +34,6 @@ export const PATHS: Record<string, PathMeta> = {
     description:
       "Install games and creative apps into your browser. Every download is SHA-256 verified and runs offline after the first launch.",
   },
-  "/art": {
-    title: `Aphrody Creative · ${SITE}`,
-    description:
-      "Creative apps, projects and shared Drive files: generate, edit and organise your work in the browser.",
-  },
   "/film": craft(
     "Video editing",
     "Cut, arrange and export video on a timeline.",
@@ -74,10 +69,6 @@ Object.assign(PATHS, {
     "Files",
     "Your files in the browser, on a Rust file system stored in OPFS: folders, search, trash and previews.",
   ),
-  "/drive": tool(
-    "Aphrody Drive",
-    "Creative projects and assets in the shared desktop workspace, on the same file system as Files.",
-  ),
   "/browser": tool(
     "Browser",
     "Browse the web in tabs; pages are fetched by the Aphrody edge and shown script-free in a sandbox.",
@@ -86,10 +77,6 @@ Object.assign(PATHS, {
     "Terminal",
     "A command line in WebAssembly: the Rust shell over your browser files.",
   ),
-  "/docs": tool(
-    "Docs",
-    "Bun, the Bun fork and Bun OS documentation, searchable in one window.",
-  ),
   "/linux": tool(
     "Alpine Linux",
     "A real Alpine Linux machine running in your browser, with a shared folder to your files.",
@@ -97,10 +84,6 @@ Object.assign(PATHS, {
   "/media": tool(
     "Media",
     "Play videos, music and pictures from your files or your device.",
-  ),
-  "/video": tool(
-    "Video Studio",
-    "Compose clips, titles and music on a timeline and export WebM in the browser.",
   ),
   "/playground": tool(
     "TypeScript playground",
@@ -116,15 +99,7 @@ Object.assign(PATHS, {
   ),
   "/inventory": tool(
     "Bun OS inventory",
-    "Every member of Bun OS (apps, packages, crates, docs, factory, engines, games, tools, infra, releases, sources) with its page, README and API.",
-  ),
-  "/components": tool(
-    "Material 3 components",
-    "Every Material 3 web component of the Aphrody design system, live with its code.",
-  ),
-  "/theme-builder": tool(
-    "Theme builder",
-    "Build a Material 3 colour scheme from one colour, check contrast and export it.",
+    "Every member of Bun OS (apps, packages, crates, factory, engines, games, tools, infra, releases, sources) with its page, README and API.",
   ),
   "/web-apps": tool(
     "Web apps",

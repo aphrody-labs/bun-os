@@ -5,7 +5,7 @@
 // downloads, WebAssembly status and the JSON of the member. Nothing is simulated; what cannot run in a browser says so.
 import { h } from "../dom";
 import { KIND_IDS, KINDS, SURFACE_LABEL, type Kind, type SurfaceType } from "../inventory-kinds";
-import { renderMarkdown } from "./docs";
+import { renderMarkdown } from "../markdown";
 
 export interface InvMember {
   kind: Kind;

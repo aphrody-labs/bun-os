@@ -45,15 +45,7 @@ async function load(assets: Assets, base: URL): Promise<Entry[]> {
   const key = base.origin;
   if (cache && cache.key === key && Date.now() - cache.at < TTL_MS) return cache.entries;
   const entries: Entry[] = [];
-  const [docs, templates, catalog, inventory] = await Promise.all([
-    json<
-      { id: string; title: string; summary?: string; category?: string; tags?: string[]; content?: string }[]
-    >(assets, base, "/api/docs.json"),
-    json<{ id: string; name: string; tagline?: string; description?: string; tags?: string[] }[]>(
-      assets,
-      base,
-      "/api/templates.json",
-    ),
+  const [catalog, inventory] = await Promise.all([
     json<{
       apps?: { id: string; d?: string }[];
       packages?: { id: string; d?: string }[];
@@ -64,32 +56,7 @@ async function load(assets: Assets, base: URL): Promise<Entry[]> {
       "/api/inventory.json",
     ),
   ]);
-  for (const doc of docs ?? [])
-    entries.push({
-      title: doc.title,
-      url: `${ORIGIN}/docs/${encodeURIComponent(doc.id)}`,
-      snippet: clip(doc.summary ?? doc.content ?? ""),
-      fields: [
-        [doc.title, 6],
-        [(doc.tags ?? []).join(" "), 4],
-        [doc.category ?? "", 2],
-        [doc.summary ?? "", 3],
-        [doc.content ?? "", 1],
-      ],
-    });
-  for (const template of templates ?? [])
-    entries.push({
-      title: template.name,
-      url: `${ORIGIN}/templates/${encodeURIComponent(template.id)}`,
-      snippet: clip(template.tagline ?? template.description ?? ""),
-      fields: [
-        [template.name, 6],
-        [(template.tags ?? []).join(" "), 4],
-        [template.tagline ?? "", 3],
-        [template.description ?? "", 1],
-      ],
-    });
-  // Every inventory member (apps, packages, crates, docs pages, factory, engines, tools, infra, ...) is searchable.
+  // Every inventory member (apps, packages, crates, factory, engines, tools, infra, ...) is searchable.
   for (const member of inventory?.members ?? [])
     entries.push({
       title: member.name,

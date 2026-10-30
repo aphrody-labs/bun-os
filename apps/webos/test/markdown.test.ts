@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-// The Docs app's renderer on the repository's own documentation, not on toy strings.
+// The Markdown renderer on the repository's own documentation, not on toy strings.
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { renderMarkdown } from "../src/apps/docs";
+import { renderMarkdown } from "../src/markdown";
 
 const root = join(import.meta.dir, "../../..");
 

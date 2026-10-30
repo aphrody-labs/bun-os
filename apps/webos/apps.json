@@ -7,20 +7,6 @@
       "name": "Play",
       "icon": "game",
       "desc": "Bun Engine game library and the qualified emulators"
-    },
-    {
-      "id": "templates",
-      "route": "templates",
-      "name": "Templates",
-      "icon": "doc",
-      "desc": "Project and document templates"
-    },
-    {
-      "id": "material",
-      "route": "material-3",
-      "name": "Material 3",
-      "icon": "image",
-      "desc": "Material 3 guidelines and components of the App UI"
     }
   ],
   "members": {
@@ -45,16 +31,12 @@
       "kind": "native",
       "related": "files"
     },
-    "aphrody-examples": {
-      "kind": "example",
-      "desc": "Examples: Crystal Universe web map and a Rust extension on the prebuilt SDK"
-    },
-    "artcraft": { "kind": "native", "related": "creative" },
-    "artcraft_native": { "kind": "native", "related": "creative" },
+    "artcraft": { "kind": "native", "related": "apps" },
+    "artcraft_native": { "kind": "native", "related": "apps" },
     "artcraft-web-app": {
       "kind": "server",
       "desc": "ArtCraft (Storyteller) React web app; needs the ArtCraft API backend",
-      "related": "creative"
+      "related": "apps"
     },
     "bun-android": {
       "kind": "android",
@@ -78,10 +60,6 @@
       "desc": "IECODE .NET: CLI, core, FFI and GUI of the IECODE tool set",
       "artifact": "iecode-dotnet"
     },
-    "m3-showcase": { "kind": "server", "related": "showcase" },
-    "m3-next-example": { "kind": "example", "related": "showcase" },
-    "m3-next-tauri-example": { "kind": "example", "related": "showcase" },
-    "m3-published-consumer": { "kind": "example", "related": "showcase" },
     "designcraft": {
       "desc": "DesignCraft desktop app"
     },

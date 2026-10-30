@@ -5,7 +5,7 @@
 import { h } from "../dom";
 import { appPath, sourceUrl, type MemberKind } from "../config";
 import type { CatalogApp } from "../os";
-import { renderMarkdown } from "./docs";
+import { renderMarkdown } from "../markdown";
 
 /** Why a member of this kind runs outside the browser, in one sentence. */
 const REASON: Record<MemberKind, string> = {

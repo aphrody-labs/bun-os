@@ -209,7 +209,6 @@
   "source": "https://github.com/aphrody-labs/bun-os/tree/main",
   "memberPath": "/source/",
   "apps": {
-    "/art": "creative",
     "/apps": "apps",
     "/film": "craft-film",
     "/photo": "craft-photo",
@@ -225,18 +224,13 @@
     "/grid": "craft-grid",
     "/fig": "craft-fig",
     "/files": "files",
-    "/drive": "drive",
     "/browser": "browser",
     "/terminal": "terminal",
-    "/docs": "docs",
     "/linux": "linux",
     "/media": "media",
-    "/video": "video",
     "/playground": "engine",
     "/inspector": "inspector",
     "/source": "workspace",
-    "/components": "showcase",
-    "/theme-builder": "themebuilder",
     "/web-apps": "webapps",
     "/calculator": "calculator",
     "/storage": "storage",
@@ -245,8 +239,6 @@
     "/about": "about",
     "/settings": "settings",
     "/play": "play",
-    "/templates": "templates",
-    "/material": "material",
     "/ds": "game-dust-nds"
   }
 }

@@ -334,20 +334,6 @@ export default {
         new Request(new URL("/catalog.json", url).href, request),
       );
     }
-    // Read-only Workspace catalogs (Documentation, Templates), assembled by build.ts from their owners.
-    if (url.pathname === "/api/docs" || url.pathname === "/api/templates") {
-      if (request.method !== "GET" && request.method !== "HEAD")
-        return new Response("Method not allowed", {
-          status: 405,
-          headers: { allow: "GET, HEAD" },
-        });
-      const res = await env.ASSETS.fetch(
-        new Request(new URL(`${url.pathname}.json`, url).href, request),
-      );
-      const out = new Response(res.body, res);
-      out.headers.set("cache-control", "no-cache");
-      return out;
-    }
     if (
       url.pathname === "/api/health" ||
       url.pathname === "/health" ||

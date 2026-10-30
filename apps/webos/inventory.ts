@@ -15,7 +15,7 @@ import { mkdir } from "node:fs/promises";
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
 import { APPS, ROUTES, type MemberKind } from "./src/config";
-import { KIND_IDS, KINDS, type Kind, type SurfaceType } from "./src/inventory-kinds";
+import { BACKINGS, KIND_IDS, KINDS, type Backing, type Kind, type SurfaceType } from "./src/inventory-kinds";
 import { FILE_DESCRIPTIONS, MEMBER_DESCRIPTIONS } from "./descriptions";
 
 const root = resolve(import.meta.dir, "../..");
@@ -26,6 +26,8 @@ export interface Link {
 }
 export interface Surface {
   type: SurfaceType;
+  /** What stands behind the page: a desktop app, a WebAssembly module, an API, a download or tracked repository content. */
+  backing: Backing;
   /** Deep link in the desktop. */
   page: string;
   /** JSON of this member. */
@@ -216,8 +218,17 @@ const tomlDesc = (text: string) => {
   return line && end > start ? line.slice(start + 1, end).split(String.fromCharCode(92, 34)).join('"') : "";
 };
 
+const BACKING_OF: Record<SurfaceType, Backing> = {
+  app: "desktop-app",
+  wasm: "wasm-module",
+  api: "api",
+  download: "download",
+  viewer: "repository",
+};
+
 const surface = (kind: Kind, id: string, type: SurfaceType, reason: string, extra: Partial<Surface> = {}): Surface => ({
   type,
+  backing: BACKING_OF[type],
   page: `/inventory/${kind}/${id}`,
   api: `/api/inventory/${kind}/${id}`,
   reason,
@@ -281,7 +292,7 @@ export async function catalogMembers() {
             ? "web"
             : "native");
     const opens = config.opens ?? (run === "web" ? family?.webosPackageId : undefined);
-    const related = config.related ?? (opens ? undefined : (family?.webosPackageId ?? (family && "creative")));
+    const related = config.related ?? (opens ? undefined : (family?.webosPackageId ?? (family && "apps")));
     return {
       ...entry,
       d: config.desc ?? (entry.d || family?.description || ""),
@@ -427,7 +438,7 @@ async function crateMembers(out: Detail[], wasmModules: Map<string, string>) {
           : []),
       ],
       surface: wasm
-        ? surface("crates", child.name, "wasm", module ? "Built into a WebAssembly module by the VPS factory and served by this deployment." : "A wasm-bindgen crate: the factory builds it into a module (build-wasm.ts); until that build succeeds its page shows metadata, README and the API.", module ? { module } : {})
+        ? surface("crates", child.name, module ? "wasm" : "api", module ? "Built into a WebAssembly module by the VPS factory and served by this deployment." : "A wasm-bindgen crate: the factory builds it into a module (build-wasm.ts); until that build succeeds it is reachable through the API.", module ? { module } : {})
         : surface("crates", child.name, "api", `${capable ? "A library that compiles for WebAssembly but exports no module of its own; reachable through the API." : "Native crate reachable through the API"}: metadata, dependencies, README and versions on its page, /api/inventory/crates/<id> and the /api/rpc methods.`),
       hasDoc: Boolean(readme),
       meta: {
@@ -1015,10 +1026,31 @@ export async function writeInventory(dist: string, inv: Inventory) {
 // ---------------------------------------------------------------------------------------------------------
 // coverage gate
 
+const BUILTIN_BACKINGS = new Set(["wasm", "app-ui", "api", "browser"]);
+const builtinSource = async () => (await readText("apps/webos/src/main.ts", 5e6)) ?? "";
 const builtinIds = async () => {
-  const main = (await readText("apps/webos/src/main.ts", 5e6)) ?? "";
+  const main = await builtinSource();
   return new Set([...main.matchAll(/^ {4}id: "([a-z0-9-]+)",$/gm)].map((m) => m[1]!));
 };
+
+/** Every desktop app declares a real backing; the stub vocabulary cannot come back. */
+const STUB_WORDS = /coming soon|placeholder|mock|stub|fake|not implemented|lorem|demo/i;
+export async function checkBuiltins(): Promise<string[]> {
+  const errors: string[] = [];
+  const main = await builtinSource();
+  const blocks = main.split(/
+  {
+(?=    id: ")/).slice(1);
+  for (const block of blocks) {
+    const id = /^    id: "([a-z0-9-]+)",/.exec(block)?.[1];
+    if (!id) continue;
+    const backing = /^    backing: "([a-z-]+)",/m.exec(block)?.[1];
+    if (!backing || !BUILTIN_BACKINGS.has(backing)) errors.push(`desktop app ${id}: no real backing (wasm, app-ui, api or browser)`);
+    const desc = /^    desc: "([^"]*)",/m.exec(block)?.[1] ?? "";
+    if (STUB_WORDS.test(desc)) errors.push(`desktop app ${id}: stub wording in its description`);
+  }
+  return errors;
+}
 
 /** Characters the release activator and URLs cannot carry in a member id (backslash, colon, NUL, ?, #, %). */
 const UNSAFE = new RegExp("[" + String.fromCharCode(92, 92) + ":" + String.fromCharCode(0) + "?#%]");
@@ -1046,8 +1078,11 @@ export async function checkInventory(inv: Inventory, dist?: string): Promise<{ e
     if (seen.has(key)) errors.push(`${key}: duplicate member`);
     seen.add(key);
     const s = m.surface;
-    if (!s || !s.type || !s.page || !s.api || !s.reason) errors.push(`${key}: no WebOS surface (type, page, api, reason)`);
+    if (!s || !s.type || !s.page || !s.api || !s.reason || !s.backing) errors.push(`${key}: no WebOS surface (type, page, api, reason, backing)`);
     else {
+      if (!BACKINGS.includes(s.backing)) errors.push(`${key}: unknown backing ${s.backing}`);
+      if (s.backing === "desktop-app" && !s.opens) errors.push(`${key}: desktop-app backing without an app to open`);
+      if (s.backing === "wasm-module" && dist && !s.module) errors.push(`${key}: wasm-module backing without a built module`);
       if (s.page !== `/inventory/${key}` || s.api !== `/api/inventory/${key}`) errors.push(`${key}: surface routes do not match the member`);
       if (s.opens && !known.has(s.opens) && !(registry?.has(s.opens) ?? false) && !/^[a-z0-9-]+$/.test(s.opens))
         errors.push(`${key}: opens unknown app ${s.opens}`);
@@ -1065,6 +1100,7 @@ export async function checkInventory(inv: Inventory, dist?: string): Promise<{ e
     if (child.name !== "node_modules" && !seen.has(`workspace/${child.name}`)) errors.push(`${child.name}: root entry is missing from the inventory`);
   for (const child of children("factory"))
     if (!seen.has(`factory/${child.name}`)) errors.push(`factory/${child.name}: missing from the inventory`);
+  errors.push(...(await checkBuiltins()));
   for (const kind of KIND_IDS)
     if (!inv.counts[kind]) errors.push(`${kind}: kind has no members`);
   if (dist) {
