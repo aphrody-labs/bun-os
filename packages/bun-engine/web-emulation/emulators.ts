@@ -284,22 +284,14 @@ export const SESSION: Record<string, SessionLaunch> = {
   cemu: { package: "cemu", app: "Cemu", blocker: "Wii U titles need the user's keys" },
   rpcs3: { package: "rpcs3", app: "rpcs3", blocker: "PlayStation 3 needs the user's firmware (PS3UPDAT.PUP)" },
   xemu: { package: "xemu", app: "xemu", blocker: "Xbox needs the user's MCPX boot ROM and BIOS" },
-  flycast: { package: "flycast", app: "flycast", blocker: "no free Dreamcast homebrew fixture pinned yet" },
+  flycast: { package: "flycast", app: "flycast", rom: "kos-2ndmix/2ndmix.elf" },
   vita3k: { package: "vita3k", app: "Vita3K", blocker: "PlayStation Vita needs the user's firmware" },
   shadps4: { package: "shadps4", app: "shadps4", blocker: "no free PlayStation 4 homebrew fixture pinned yet" },
-  ppsspp: { package: "ppsspp", app: "PPSSPPSDL", blocker: "no free PSP homebrew fixture pinned yet" },
+  ppsspp: { package: "ppsspp", app: "PPSSPPSDL", rom: "pspsdk-cube/EBOOT.PBP" },
   gopher64: { package: "gopher64", app: "gopher64", rom: "peterlemon-n64/Mandelbrot32BPP320X240.N64" },
   mame: { package: "mame", app: "mame -rompath /roms/mamedev-gridlee -skip_gameinfo -video bgfx gridlee" },
   wine: { package: "wine", app: "wine notepad" },
-<<<<<<< Updated upstream
-  proton: {
-    package: "proton-bunos",
-    app: "umu-run winecfg",
-    blocker: "aphrody-labs/Proton and umu-launcher are not packaged yet",
-  },
-=======
   proton: { package: "proton-bunos", app: "env PROTONPATH=/usr/share/steam/compatibilitytools.d/proton-bunos GAMEID=0 umu-run winecfg" },
->>>>>>> Stashed changes
 };
 for (const [id, name, systems, owner] of [
   ["melonds-native", "melonDS (native, Gamescope session)", ["nds"], "vendor/melonds"],

@@ -15,7 +15,7 @@ import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { EMULATORS, SESSION, type QualificationEntry, type QualificationReport } from "./emulators";
-import { stageFixtures, stageSessionFixtures, writeCatalog } from "./fixtures.ts";
+import { stageBuiltFixtures, stageFixtures, stageSessionFixtures, writeCatalog } from "./fixtures.ts";
 import { pngHasLitPixel } from "./png.ts";
 
 const root = resolve(import.meta.dir, "../../..");
@@ -180,6 +180,7 @@ if ((await sh(["docker", "image", "inspect", image])).code)
   throw new Error(`session image ${image} is not built (bun factory image build bunos-gaming --target session)`);
 await stageFixtures(objects);
 await stageSessionFixtures(objects);
+await stageBuiltFixtures(objects);
 await writeCatalog(objects);
 const fixtures = join(objects, "emulation/fixtures");
 const reportPath = join(objects, "emulators/qualification.json");
