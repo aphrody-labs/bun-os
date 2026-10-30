@@ -90,9 +90,7 @@ async function pass(): Promise<Outcome> {
 async function main() {
   if (!loop) {
     const outcome = await pass();
-    process.exit(
-      outcome === "diverged" || outcome === "dirty" ? 2 : outcome === "error" ? 1 : 0,
-    );
+    process.exit(outcome === "diverged" || outcome === "dirty" ? 2 : outcome === "error" ? 1 : 0);
   }
   for (;;) {
     await pass();
