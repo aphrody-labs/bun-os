@@ -59,7 +59,7 @@ struct ChunkDelta {
 
 /// POST the conversation and turn the SSE body into deltas.
 fn ask(endpoint: String, model: String, turns: Vec<Turn>) -> impl cosmic::iced::futures::Stream<Item = Delta> {
-    cosmic::iced::stream::channel(64, move |mut out| async move {
+    cosmic::iced::stream::channel(64, move |mut out: cosmic::iced::futures::channel::mpsc::Sender<Delta>| async move {
         let mut messages = vec![Turn { role: "system", content: SYSTEM_PROMPT.into() }];
         messages.extend(turns);
         let body = serde_json::json!({ "model": model, "stream": true, "messages": messages });
