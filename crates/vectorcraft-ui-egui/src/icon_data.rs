@@ -4,1046 +4,1046 @@
 pub static ICONS: &[(&str, &[u8])] = &[
     (
         "align-center-horizontal",
-        include_bytes!("../../../assets/vectorcraft/icons/align-center-horizontal.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-center-horizontal.svg"),
     ),
     (
         "align-center-vertical",
-        include_bytes!("../../../assets/vectorcraft/icons/align-center-vertical.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-center-vertical.svg"),
     ),
     (
         "align-end-horizontal",
-        include_bytes!("../../../assets/vectorcraft/icons/align-end-horizontal.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-end-horizontal.svg"),
     ),
     (
         "align-end-vertical",
-        include_bytes!("../../../assets/vectorcraft/icons/align-end-vertical.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-end-vertical.svg"),
     ),
     (
         "align-horizontal-justify-center",
-        include_bytes!("../../../assets/vectorcraft/icons/align-horizontal-justify-center.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-horizontal-justify-center.svg"),
     ),
     (
         "align-horizontal-justify-end",
-        include_bytes!("../../../assets/vectorcraft/icons/align-horizontal-justify-end.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-horizontal-justify-end.svg"),
     ),
     (
         "align-horizontal-justify-start",
-        include_bytes!("../../../assets/vectorcraft/icons/align-horizontal-justify-start.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-horizontal-justify-start.svg"),
     ),
     (
         "align-start-horizontal",
-        include_bytes!("../../../assets/vectorcraft/icons/align-start-horizontal.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-start-horizontal.svg"),
     ),
     (
         "align-start-vertical",
-        include_bytes!("../../../assets/vectorcraft/icons/align-start-vertical.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-start-vertical.svg"),
     ),
     (
         "align-vertical-justify-center",
-        include_bytes!("../../../assets/vectorcraft/icons/align-vertical-justify-center.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-vertical-justify-center.svg"),
     ),
     (
         "align-vertical-justify-end",
-        include_bytes!("../../../assets/vectorcraft/icons/align-vertical-justify-end.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-vertical-justify-end.svg"),
     ),
     (
         "align-vertical-justify-start",
-        include_bytes!("../../../assets/vectorcraft/icons/align-vertical-justify-start.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/align-vertical-justify-start.svg"),
     ),
     (
         "arrow-left-right",
-        include_bytes!("../../../assets/vectorcraft/icons/arrow-left-right.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/arrow-left-right.svg"),
     ),
     (
         "arrow-up-down",
-        include_bytes!("../../../assets/vectorcraft/icons/arrow-up-down.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/arrow-up-down.svg"),
     ),
     (
         "blend",
-        include_bytes!("../../../assets/vectorcraft/icons/blend.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/blend.svg"),
     ),
     (
         "brush",
-        include_bytes!("../../../assets/vectorcraft/icons/brush.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/brush.svg"),
     ),
     (
         "chart-column",
-        include_bytes!("../../../assets/vectorcraft/icons/chart-column.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/chart-column.svg"),
     ),
     (
         "chevron-down",
-        include_bytes!("../../../assets/vectorcraft/icons/chevron-down.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/chevron-down.svg"),
     ),
     (
         "chevron-left",
-        include_bytes!("../../../assets/vectorcraft/icons/chevron-left.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/chevron-left.svg"),
     ),
     (
         "chevron-right",
-        include_bytes!("../../../assets/vectorcraft/icons/chevron-right.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/chevron-right.svg"),
     ),
     (
         "chevrons-left",
-        include_bytes!("../../../assets/vectorcraft/icons/chevrons-left.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/chevrons-left.svg"),
     ),
     (
         "chevrons-right",
-        include_bytes!("../../../assets/vectorcraft/icons/chevrons-right.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/chevrons-right.svg"),
     ),
     (
         "circle",
-        include_bytes!("../../../assets/vectorcraft/icons/circle.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/circle.svg"),
     ),
     (
         "clipboard-paste",
-        include_bytes!("../../../assets/vectorcraft/icons/clipboard-paste.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/clipboard-paste.svg"),
     ),
     (
         "cloud",
-        include_bytes!("../../../assets/vectorcraft/icons/cloud.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/cloud.svg"),
     ),
     (
         "combine",
-        include_bytes!("../../../assets/vectorcraft/icons/combine.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/combine.svg"),
     ),
     (
         "copy",
-        include_bytes!("../../../assets/vectorcraft/icons/copy.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/copy.svg"),
     ),
     (
         "dc-actions",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-actions.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-actions.svg"),
     ),
     (
         "dc-al-bottom",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-al-bottom.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-al-bottom.svg"),
     ),
     (
         "dc-al-center",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-al-center.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-al-center.svg"),
     ),
     (
         "dc-al-hcenter",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-al-hcenter.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-al-hcenter.svg"),
     ),
     (
         "dc-al-left",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-al-left.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-al-left.svg"),
     ),
     (
         "dc-al-right",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-al-right.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-al-right.svg"),
     ),
     (
         "dc-al-top",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-al-top.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-al-top.svg"),
     ),
     (
         "dc-al-vcenter",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-al-vcenter.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-al-vcenter.svg"),
     ),
     (
         "dc-align",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-align.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-align.svg"),
     ),
     (
         "dc-alignto-artboard",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-alignto-artboard.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-alignto-artboard.svg"),
     ),
     (
         "dc-alignto-key",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-alignto-key.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-alignto-key.svg"),
     ),
     (
         "dc-alignto-selection",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-alignto-selection.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-alignto-selection.svg"),
     ),
     (
         "dc-anchor",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-anchor.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-anchor.svg"),
     ),
     (
         "dc-anchor-smooth",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-anchor-smooth.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-anchor-smooth.svg"),
     ),
     (
         "dc-appearance",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-appearance.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-appearance.svg"),
     ),
     (
         "dc-arc",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-arc.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-arc.svg"),
     ),
     (
         "dc-arrow-down",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-arrow-down.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-arrow-down.svg"),
     ),
     (
         "dc-arrow-extend",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-arrow-extend.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-arrow-extend.svg"),
     ),
     (
         "dc-arrow-tip",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-arrow-tip.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-arrow-tip.svg"),
     ),
     (
         "dc-arrow-up",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-arrow-up.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-arrow-up.svg"),
     ),
     (
         "dc-artboard-options",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-artboard-options.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-artboard-options.svg"),
     ),
     (
         "dc-artboards",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-artboards.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-artboards.svg"),
     ),
     (
         "dc-blend",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-blend.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-blend.svg"),
     ),
     (
         "dc-bloat",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-bloat.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-bloat.svg"),
     ),
     (
         "dc-cap-butt",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-cap-butt.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-cap-butt.svg"),
     ),
     (
         "dc-cap-round",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-cap-round.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-cap-round.svg"),
     ),
     (
         "dc-cap-square",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-cap-square.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-cap-square.svg"),
     ),
     (
         "dc-center-hide",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-center-hide.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-center-hide.svg"),
     ),
     (
         "dc-center-show",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-center-show.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-center-show.svg"),
     ),
     (
         "dc-clear",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-clear.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-clear.svg"),
     ),
     (
         "dc-color-guide",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-color-guide.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-color-guide.svg"),
     ),
     (
         "dc-crystallize",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-crystallize.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-crystallize.svg"),
     ),
     (
         "dc-cube",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-cube.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-cube.svg"),
     ),
     (
         "dc-dash-align",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dash-align.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dash-align.svg"),
     ),
     (
         "dc-dash-exact",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dash-exact.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dash-exact.svg"),
     ),
     (
         "dc-dir-off",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dir-off.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dir-off.svg"),
     ),
     (
         "dc-dir-on",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dir-on.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dir-on.svg"),
     ),
     (
         "dc-direct",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-direct.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-direct.svg"),
     ),
     (
         "dc-arrow-fill",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-arrow-fill.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-arrow-fill.svg"),
     ),
     (
         "dc-dist-bottom",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dist-bottom.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dist-bottom.svg"),
     ),
     (
         "dc-dist-hcenter",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dist-hcenter.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dist-hcenter.svg"),
     ),
     (
         "dc-dist-hspace",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dist-hspace.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dist-hspace.svg"),
     ),
     (
         "dc-dist-left",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dist-left.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dist-left.svg"),
     ),
     (
         "dc-dist-right",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dist-right.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dist-right.svg"),
     ),
     (
         "dc-dist-top",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dist-top.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dist-top.svg"),
     ),
     (
         "dc-dist-vcenter",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dist-vcenter.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dist-vcenter.svg"),
     ),
     (
         "dc-dist-vspace",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-dist-vspace.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-dist-vspace.svg"),
     ),
     (
         "dc-draw-behind",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-draw-behind.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-draw-behind.svg"),
     ),
     (
         "dc-draw-inside",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-draw-inside.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-draw-inside.svg"),
     ),
     (
         "dc-draw-normal",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-draw-normal.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-draw-normal.svg"),
     ),
     (
         "dc-ellipse",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-ellipse.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-ellipse.svg"),
     ),
     (
         "dc-fill-none",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-fill-none.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-fill-none.svg"),
     ),
     (
         "dc-flare",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-flare.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-flare.svg"),
     ),
     (
         "dc-folder",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-folder.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-folder.svg"),
     ),
     (
         "dc-free-transform",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-free-transform.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-free-transform.svg"),
     ),
     (
         "dc-fx",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-fx.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-fx.svg"),
     ),
     (
         "dc-gamut",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-gamut.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-gamut.svg"),
     ),
     (
         "dc-grad-freeform",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-grad-freeform.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-grad-freeform.svg"),
     ),
     (
         "dc-grad-linear",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-grad-linear.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-grad-linear.svg"),
     ),
     (
         "dc-grad-radial",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-grad-radial.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-grad-radial.svg"),
     ),
     (
         "dc-grad-stroke-across",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-grad-stroke-across.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-grad-stroke-across.svg"),
     ),
     (
         "dc-grad-stroke-along",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-grad-stroke-along.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-grad-stroke-along.svg"),
     ),
     (
         "dc-grad-stroke-within",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-grad-stroke-within.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-grad-stroke-within.svg"),
     ),
     (
         "dc-gradient",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-gradient.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-gradient.svg"),
     ),
     (
         "dc-graphic-styles",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-graphic-styles.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-graphic-styles.svg"),
     ),
     (
         "dc-grid-view",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-grid-view.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-grid-view.svg"),
     ),
     (
         "dc-group-select",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-group-select.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-group-select.svg"),
     ),
     (
         "dc-join",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-join.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-join.svg"),
     ),
     (
         "dc-join-bevel",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-join-bevel.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-join-bevel.svg"),
     ),
     (
         "dc-join-miter",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-join-miter.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-join-miter.svg"),
     ),
     (
         "dc-join-round",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-join-round.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-join-round.svg"),
     ),
     (
         "dc-knife",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-knife.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-knife.svg"),
     ),
     (
         "dc-line",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-line.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-line.svg"),
     ),
     (
         "dc-line-cut",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-line-cut.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-line-cut.svg"),
     ),
     (
         "dc-list-view",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-list-view.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-list-view.svg"),
     ),
     (
         "dc-live-bucket",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-live-bucket.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-live-bucket.svg"),
     ),
     (
         "dc-live-select",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-live-select.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-live-select.svg"),
     ),
     (
         "dc-mask-none",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-mask-none.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-mask-none.svg"),
     ),
     (
         "dc-measure",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-measure.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-measure.svg"),
     ),
     (
         "dc-mesh",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-mesh.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-mesh.svg"),
     ),
     (
         "dc-mirror-cut",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-mirror-cut.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-mirror-cut.svg"),
     ),
     (
         "dc-new-fill",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-new-fill.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-new-fill.svg"),
     ),
     (
         "dc-new-item",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-new-item.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-new-item.svg"),
     ),
     (
         "dc-new-stroke",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-new-stroke.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-new-stroke.svg"),
     ),
     (
         "dc-options",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-options.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-options.svg"),
     ),
     (
         "dc-para-center",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-center.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-center.svg"),
     ),
     (
         "dc-para-justify-all",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-justify-all.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-justify-all.svg"),
     ),
     (
         "dc-para-justify-center",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-justify-center.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-justify-center.svg"),
     ),
     (
         "dc-para-justify-left",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-justify-left.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-justify-left.svg"),
     ),
     (
         "dc-para-justify-right",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-justify-right.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-justify-right.svg"),
     ),
     (
         "dc-para-left",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-left.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-left.svg"),
     ),
     (
         "dc-para-ltr",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-ltr.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-ltr.svg"),
     ),
     (
         "dc-para-right",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-right.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-right.svg"),
     ),
     (
         "dc-para-rtl",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-para-rtl.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-para-rtl.svg"),
     ),
     (
         "dc-path-eraser",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-path-eraser.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-path-eraser.svg"),
     ),
     (
         "dc-pathfinder",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pathfinder.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pathfinder.svg"),
     ),
     (
         "dc-perspective",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-perspective.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-perspective.svg"),
     ),
     (
         "dc-pf-crop",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-crop.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-crop.svg"),
     ),
     (
         "dc-pf-divide",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-divide.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-divide.svg"),
     ),
     (
         "dc-pf-exclude",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-exclude.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-exclude.svg"),
     ),
     (
         "dc-pf-intersect",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-intersect.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-intersect.svg"),
     ),
     (
         "dc-pf-merge",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-merge.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-merge.svg"),
     ),
     (
         "dc-pf-minus-back",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-minus-back.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-minus-back.svg"),
     ),
     (
         "dc-pf-minus-front",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-minus-front.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-minus-front.svg"),
     ),
     (
         "dc-pf-outline",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-outline.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-outline.svg"),
     ),
     (
         "dc-pf-trim",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-trim.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-trim.svg"),
     ),
     (
         "dc-pf-unite",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pf-unite.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pf-unite.svg"),
     ),
     (
         "dc-place-symbol",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-place-symbol.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-place-symbol.svg"),
     ),
     (
         "dc-polar-grid",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-polar-grid.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-polar-grid.svg"),
     ),
     (
         "dc-polygon",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-polygon.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-polygon.svg"),
     ),
     (
         "dc-pucker",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-pucker.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-pucker.svg"),
     ),
     (
         "dc-puppet",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-puppet.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-puppet.svg"),
     ),
     (
         "dc-rearrange",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-rearrange.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-rearrange.svg"),
     ),
     (
         "dc-rect-cut",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-rect-cut.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-rect-cut.svg"),
     ),
     (
         "dc-rect-grid",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-rect-grid.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-rect-grid.svg"),
     ),
     (
         "dc-reference-point",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-reference-point.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-reference-point.svg"),
     ),
     (
         "dc-remove-brush",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-remove-brush.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-remove-brush.svg"),
     ),
     (
         "dc-reshape",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-reshape.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-reshape.svg"),
     ),
     (
         "dc-reverse",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-reverse.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-reverse.svg"),
     ),
     (
         "dc-rotate-view",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-rotate-view.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-rotate-view.svg"),
     ),
     (
         "dc-rounded-rect",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-rounded-rect.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-rounded-rect.svg"),
     ),
     (
         "dc-rule-evenodd",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-rule-evenodd.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-rule-evenodd.svg"),
     ),
     (
         "dc-rule-nonzero",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-rule-nonzero.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-rule-nonzero.svg"),
     ),
     (
         "dc-scallop",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-scallop.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-scallop.svg"),
     ),
     (
         "dc-screen-mode",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-screen-mode.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-screen-mode.svg"),
     ),
     (
         "dc-selection",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-selection.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-selection.svg"),
     ),
     (
         "dc-shape-builder",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-shape-builder.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-shape-builder.svg"),
     ),
     (
         "dc-shear",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-shear.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-shear.svg"),
     ),
     (
         "dc-smooth",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-smooth.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-smooth.svg"),
     ),
     (
         "dc-stroke",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-stroke.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-stroke.svg"),
     ),
     (
         "dc-stroke-center",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-stroke-center.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-stroke-center.svg"),
     ),
     (
         "dc-stroke-inside",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-stroke-inside.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-stroke-inside.svg"),
     ),
     (
         "dc-stroke-outside",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-stroke-outside.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-stroke-outside.svg"),
     ),
     (
         "dc-swap",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-swap.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-swap.svg"),
     ),
     (
         "dc-swatch-kinds",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-swatch-kinds.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-swatch-kinds.svg"),
     ),
     (
         "dc-symbol-sprayer",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-symbol-sprayer.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-symbol-sprayer.svg"),
     ),
     (
         "dc-touch-type",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-touch-type.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-touch-type.svg"),
     ),
     (
         "dc-transform-panel",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-transform-panel.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-transform-panel.svg"),
     ),
     (
         "dc-transparency",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-transparency.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-transparency.svg"),
     ),
     (
         "dc-twirl",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-twirl.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-twirl.svg"),
     ),
     (
         "dc-type-area",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-type-area.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-type-area.svg"),
     ),
     (
         "dc-type-path",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-type-path.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-type-path.svg"),
     ),
     (
         "dc-type-vertical",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-type-vertical.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-type-vertical.svg"),
     ),
     (
         "dc-width",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-width.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-width.svg"),
     ),
     (
         "dc-width-profile",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-width-profile.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-width-profile.svg"),
     ),
     (
         "dc-wrinkle",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-wrinkle.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-wrinkle.svg"),
     ),
     (
         "dc-zoom-large",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-zoom-large.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-zoom-large.svg"),
     ),
     (
         "dc-zoom-small",
-        include_bytes!("../../../assets/vectorcraft/icons/dc-zoom-small.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/dc-zoom-small.svg"),
     ),
     (
         "ellipsis",
-        include_bytes!("../../../assets/vectorcraft/icons/ellipsis.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/ellipsis.svg"),
     ),
     (
         "eraser",
-        include_bytes!("../../../assets/vectorcraft/icons/eraser.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/eraser.svg"),
     ),
     (
         "eye",
-        include_bytes!("../../../assets/vectorcraft/icons/eye.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/eye.svg"),
     ),
     (
         "eye-off",
-        include_bytes!("../../../assets/vectorcraft/icons/eye-off.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/eye-off.svg"),
     ),
     (
         "file-plus",
-        include_bytes!("../../../assets/vectorcraft/icons/file-plus.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/file-plus.svg"),
     ),
     (
         "flip-horizontal-2",
-        include_bytes!("../../../assets/vectorcraft/icons/flip-horizontal-2.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/flip-horizontal-2.svg"),
     ),
     (
         "flip-vertical-2",
-        include_bytes!("../../../assets/vectorcraft/icons/flip-vertical-2.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/flip-vertical-2.svg"),
     ),
     (
         "folder-open",
-        include_bytes!("../../../assets/vectorcraft/icons/folder-open.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/folder-open.svg"),
     ),
     (
         "frame",
-        include_bytes!("../../../assets/vectorcraft/icons/frame.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/frame.svg"),
     ),
     (
         "grid-3x3",
-        include_bytes!("../../../assets/vectorcraft/icons/grid-3x3.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/grid-3x3.svg"),
     ),
     (
         "group",
-        include_bytes!("../../../assets/vectorcraft/icons/group.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/group.svg"),
     ),
     (
         "hand",
-        include_bytes!("../../../assets/vectorcraft/icons/hand.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/hand.svg"),
     ),
     (
         "hexagon",
-        include_bytes!("../../../assets/vectorcraft/icons/hexagon.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/hexagon.svg"),
     ),
     (
         "history",
-        include_bytes!("../../../assets/vectorcraft/icons/history.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/history.svg"),
     ),
     (
         "house",
-        include_bytes!("../../../assets/vectorcraft/icons/house.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/house.svg"),
     ),
     (
         "image",
-        include_bytes!("../../../assets/vectorcraft/icons/image.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/image.svg"),
     ),
     (
         "info",
-        include_bytes!("../../../assets/vectorcraft/icons/info.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/info.svg"),
     ),
     (
         "lasso",
-        include_bytes!("../../../assets/vectorcraft/icons/lasso.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/lasso.svg"),
     ),
     (
         "layers",
-        include_bytes!("../../../assets/vectorcraft/icons/layers.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/layers.svg"),
     ),
     (
         "layout-grid",
-        include_bytes!("../../../assets/vectorcraft/icons/layout-grid.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/layout-grid.svg"),
     ),
     (
         "library",
-        include_bytes!("../../../assets/vectorcraft/icons/library.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/library.svg"),
     ),
     (
         "link",
-        include_bytes!("../../../assets/vectorcraft/icons/link.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/link.svg"),
     ),
     (
         "external-link",
-        include_bytes!("../../../assets/vectorcraft/icons/external-link.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/external-link.svg"),
     ),
     (
         "git-branch",
-        include_bytes!("../../../assets/vectorcraft/icons/git-branch.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/git-branch.svg"),
     ),
     (
         "globe",
-        include_bytes!("../../../assets/vectorcraft/icons/globe.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/globe.svg"),
     ),
     (
         "message-circle",
-        include_bytes!("../../../assets/vectorcraft/icons/message-circle.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/message-circle.svg"),
     ),
     (
         "link-2-off",
-        include_bytes!("../../../assets/vectorcraft/icons/link-2-off.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/link-2-off.svg"),
     ),
     (
         "lock",
-        include_bytes!("../../../assets/vectorcraft/icons/lock.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/lock.svg"),
     ),
     (
         "lock-open",
-        include_bytes!("../../../assets/vectorcraft/icons/lock-open.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/lock-open.svg"),
     ),
     (
         "map",
-        include_bytes!("../../../assets/vectorcraft/icons/map.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/map.svg"),
     ),
     (
         "maximize-2",
-        include_bytes!("../../../assets/vectorcraft/icons/maximize-2.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/maximize-2.svg"),
     ),
     (
         "menu",
-        include_bytes!("../../../assets/vectorcraft/icons/menu.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/menu.svg"),
     ),
     (
         "minus",
-        include_bytes!("../../../assets/vectorcraft/icons/minus.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/minus.svg"),
     ),
     (
         "monitor",
-        include_bytes!("../../../assets/vectorcraft/icons/monitor.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/monitor.svg"),
     ),
     (
         "move",
-        include_bytes!("../../../assets/vectorcraft/icons/move.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/move.svg"),
     ),
     (
         "move-diagonal-2",
-        include_bytes!("../../../assets/vectorcraft/icons/move-diagonal-2.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/move-diagonal-2.svg"),
     ),
     (
         "paint-bucket",
-        include_bytes!("../../../assets/vectorcraft/icons/paint-bucket.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/paint-bucket.svg"),
     ),
     (
         "paintbrush",
-        include_bytes!("../../../assets/vectorcraft/icons/paintbrush.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/paintbrush.svg"),
     ),
     (
         "palette",
-        include_bytes!("../../../assets/vectorcraft/icons/palette.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/palette.svg"),
     ),
     (
         "pen-tool",
-        include_bytes!("../../../assets/vectorcraft/icons/pen-tool.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/pen-tool.svg"),
     ),
     (
         "pen-tool-add",
-        include_bytes!("../../../assets/vectorcraft/icons/pen-tool-add.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/pen-tool-add.svg"),
     ),
     (
         "pen-tool-delete",
-        include_bytes!("../../../assets/vectorcraft/icons/pen-tool-delete.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/pen-tool-delete.svg"),
     ),
     (
         "pencil",
-        include_bytes!("../../../assets/vectorcraft/icons/pencil.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/pencil.svg"),
     ),
     (
         "pilcrow",
-        include_bytes!("../../../assets/vectorcraft/icons/pilcrow.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/pilcrow.svg"),
     ),
     (
         "pin",
-        include_bytes!("../../../assets/vectorcraft/icons/pin.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/pin.svg"),
     ),
     (
         "pipette",
-        include_bytes!("../../../assets/vectorcraft/icons/pipette.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/pipette.svg"),
     ),
     (
         "plus",
-        include_bytes!("../../../assets/vectorcraft/icons/plus.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/plus.svg"),
     ),
     (
         "printer",
-        include_bytes!("../../../assets/vectorcraft/icons/printer.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/printer.svg"),
     ),
     (
         "redo-2",
-        include_bytes!("../../../assets/vectorcraft/icons/redo-2.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/redo-2.svg"),
     ),
     (
         "rotate-3d",
-        include_bytes!("../../../assets/vectorcraft/icons/rotate-3d.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/rotate-3d.svg"),
     ),
     (
         "rotate-ccw",
-        include_bytes!("../../../assets/vectorcraft/icons/rotate-ccw.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/rotate-ccw.svg"),
     ),
     (
         "rotate-cw",
-        include_bytes!("../../../assets/vectorcraft/icons/rotate-cw.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/rotate-cw.svg"),
     ),
     (
         "ruler",
-        include_bytes!("../../../assets/vectorcraft/icons/ruler.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/ruler.svg"),
     ),
     (
         "save",
-        include_bytes!("../../../assets/vectorcraft/icons/save.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/save.svg"),
     ),
     (
         "scaling",
-        include_bytes!("../../../assets/vectorcraft/icons/scaling.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/scaling.svg"),
     ),
     (
         "scissors",
-        include_bytes!("../../../assets/vectorcraft/icons/scissors.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/scissors.svg"),
     ),
     (
         "search",
-        include_bytes!("../../../assets/vectorcraft/icons/search.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/search.svg"),
     ),
     (
         "settings",
-        include_bytes!("../../../assets/vectorcraft/icons/settings.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/settings.svg"),
     ),
     (
         "shapes",
-        include_bytes!("../../../assets/vectorcraft/icons/shapes.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/shapes.svg"),
     ),
     (
         "share-2",
-        include_bytes!("../../../assets/vectorcraft/icons/share-2.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/share-2.svg"),
     ),
     (
         "slice",
-        include_bytes!("../../../assets/vectorcraft/icons/slice.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/slice.svg"),
     ),
     (
         "sparkles",
-        include_bytes!("../../../assets/vectorcraft/icons/sparkles.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/sparkles.svg"),
     ),
     (
         "spline",
-        include_bytes!("../../../assets/vectorcraft/icons/spline.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/spline.svg"),
     ),
     (
         "spline-pointer",
-        include_bytes!("../../../assets/vectorcraft/icons/spline-pointer.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/spline-pointer.svg"),
     ),
     (
         "spray-can",
-        include_bytes!("../../../assets/vectorcraft/icons/spray-can.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/spray-can.svg"),
     ),
     (
         "square",
-        include_bytes!("../../../assets/vectorcraft/icons/square.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/square.svg"),
     ),
     (
         "square-dashed",
-        include_bytes!("../../../assets/vectorcraft/icons/square-dashed.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/square-dashed.svg"),
     ),
     (
         "squares-exclude",
-        include_bytes!("../../../assets/vectorcraft/icons/squares-exclude.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/squares-exclude.svg"),
     ),
     (
         "squares-intersect",
-        include_bytes!("../../../assets/vectorcraft/icons/squares-intersect.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/squares-intersect.svg"),
     ),
     (
         "squares-subtract",
-        include_bytes!("../../../assets/vectorcraft/icons/squares-subtract.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/squares-subtract.svg"),
     ),
     (
         "squares-unite",
-        include_bytes!("../../../assets/vectorcraft/icons/squares-unite.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/squares-unite.svg"),
     ),
     (
         "squircle",
-        include_bytes!("../../../assets/vectorcraft/icons/squircle.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/squircle.svg"),
     ),
     (
         "star",
-        include_bytes!("../../../assets/vectorcraft/icons/star.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/star.svg"),
     ),
     (
         "sun",
-        include_bytes!("../../../assets/vectorcraft/icons/sun.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/sun.svg"),
     ),
     (
         "swatch-book",
-        include_bytes!("../../../assets/vectorcraft/icons/swatch-book.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/swatch-book.svg"),
     ),
     (
         "text-cursor-input",
-        include_bytes!("../../../assets/vectorcraft/icons/text-cursor-input.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/text-cursor-input.svg"),
     ),
     (
         "tornado",
-        include_bytes!("../../../assets/vectorcraft/icons/tornado.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/tornado.svg"),
     ),
     (
         "trash-2",
-        include_bytes!("../../../assets/vectorcraft/icons/trash-2.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/trash-2.svg"),
     ),
     (
         "triangle",
-        include_bytes!("../../../assets/vectorcraft/icons/triangle.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/triangle.svg"),
     ),
     (
         "type",
-        include_bytes!("../../../assets/vectorcraft/icons/type.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/type.svg"),
     ),
     (
         "undo-2",
-        include_bytes!("../../../assets/vectorcraft/icons/undo-2.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/undo-2.svg"),
     ),
     (
         "ungroup",
-        include_bytes!("../../../assets/vectorcraft/icons/ungroup.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/ungroup.svg"),
     ),
     (
         "wand-sparkles",
-        include_bytes!("../../../assets/vectorcraft/icons/wand-sparkles.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/wand-sparkles.svg"),
     ),
     (
         "waves",
-        include_bytes!("../../../assets/vectorcraft/icons/waves.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/waves.svg"),
     ),
     (
         "x",
-        include_bytes!("../../../assets/vectorcraft/icons/x.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/x.svg"),
     ),
     (
         "zoom-in",
-        include_bytes!("../../../assets/vectorcraft/icons/zoom-in.svg"),
+        include_bytes!("../embedded/assets/vectorcraft/icons/zoom-in.svg"),
     ),
 ];

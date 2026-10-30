@@ -353,7 +353,7 @@ fn clip_mask(camera: &Rgb32f) -> Rgb32f {
 /// private ILCE-7CR photos with DRO off, the curve differs by at most 1.2 L* between scene luminance
 /// 0.01 and 0.5. Issue #244, `docs/camera-preview-colour.md`.
 const SONY_DRO_OFF_TONE: &str =
-    include_str!("../../../assets/lightcraft/camera-tone/sony-dro-off.json");
+    include_str!("../embedded/assets/lightcraft/camera-tone/sony-dro-off.json");
 
 /// [`SONY_DRO_OFF_TONE`]'s curve (`None` only if the built-in file were invalid; a test checks it).
 fn sony_dro_off_tone() -> Option<CameraTone> {

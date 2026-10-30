@@ -295,17 +295,17 @@ pub fn install_fonts(ctx: &egui::Context) {
     add(
         &mut fonts,
         "SourceSans3",
-        include_bytes!("../../../assets/vectorcraft/fonts/SourceSans3-Regular.ttf"),
+        include_bytes!("../embedded/assets/vectorcraft/fonts/SourceSans3-Regular.ttf"),
     );
     add(
         &mut fonts,
         "SourceSans3-Semibold",
-        include_bytes!("../../../assets/vectorcraft/fonts/SourceSans3-Semibold.ttf"),
+        include_bytes!("../embedded/assets/vectorcraft/fonts/SourceSans3-Semibold.ttf"),
     );
     add(
         &mut fonts,
         "JetBrainsMono",
-        include_bytes!("../../../assets/vectorcraft/fonts/JetBrainsMono-Regular.ttf"),
+        include_bytes!("../embedded/assets/vectorcraft/fonts/JetBrainsMono-Regular.ttf"),
     );
     let fallback: Vec<String> = fonts
         .families

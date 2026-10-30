@@ -17,15 +17,15 @@ use skrifa::{GlyphId, MetadataProvider, Tag};
 pub const FALLBACK_FAMILY: &str = "Source Sans 3";
 
 static BUNDLED: &[&[u8]] = &[
-    include_bytes!("../../../assets/vectorcraft/fonts/SourceSans3-Regular.ttf"),
-    include_bytes!("../../../assets/vectorcraft/fonts/SourceSans3-Semibold.ttf"),
-    include_bytes!("../../../assets/vectorcraft/fonts/SourceSans3-Bold.ttf"),
-    include_bytes!("../../../assets/vectorcraft/fonts/SourceSans3-It.ttf"),
-    include_bytes!("../../../assets/vectorcraft/fonts/SourceSerif4-Regular.ttf"),
-    include_bytes!("../../../assets/vectorcraft/fonts/Inter-Regular.ttf"),
-    include_bytes!("../../../assets/vectorcraft/fonts/Inter-Medium.ttf"),
-    include_bytes!("../../../assets/vectorcraft/fonts/Inter-SemiBold.ttf"),
-    include_bytes!("../../../assets/vectorcraft/fonts/JetBrainsMono-Regular.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/SourceSans3-Regular.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/SourceSans3-Semibold.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/SourceSans3-Bold.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/SourceSans3-It.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/SourceSerif4-Regular.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/Inter-Regular.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/Inter-Medium.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/Inter-SemiBold.ttf"),
+    include_bytes!("../embedded/assets/vectorcraft/fonts/JetBrainsMono-Regular.ttf"),
 ];
 
 /// An axis setting of a variable font: the axis tag (`wght`) and its value in user units (700).

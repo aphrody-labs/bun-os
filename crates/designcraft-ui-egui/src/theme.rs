@@ -317,17 +317,17 @@ fn font_definitions(craft: &'static [designcraft_fonts::CraftFont], lang: &str) 
     add(
         &mut fonts,
         "ui",
-        include_bytes!("../../../assets/designcraft/fonts/SourceSans3-Regular.ttf"),
+        include_bytes!("../embedded/assets/designcraft/fonts/SourceSans3-Regular.ttf"),
     );
     add(
         &mut fonts,
         "ui-semibold",
-        include_bytes!("../../../assets/designcraft/fonts/SourceSans3-Semibold.ttf"),
+        include_bytes!("../embedded/assets/designcraft/fonts/SourceSans3-Semibold.ttf"),
     );
     add(
         &mut fonts,
         "mono",
-        include_bytes!("../../../assets/designcraft/fonts/JetBrainsMono-Regular.ttf"),
+        include_bytes!("../embedded/assets/designcraft/fonts/JetBrainsMono-Regular.ttf"),
     );
     fonts
         .families

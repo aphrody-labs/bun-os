@@ -321,13 +321,13 @@ pub fn font_definitions_with_chinese(
     fonts.font_data.insert(
         "Inter".into(),
         Arc::new(FontData::from_static(include_bytes!(
-            "../../../assets/lightcraft/fonts/Inter-Regular.ttf"
+            "../embedded/assets/lightcraft/fonts/Inter-Regular.ttf"
         ))),
     );
     fonts.font_data.insert(
         "Inter-SemiBold".into(),
         Arc::new(FontData::from_static(include_bytes!(
-            "../../../assets/lightcraft/fonts/Inter-SemiBold.ttf"
+            "../embedded/assets/lightcraft/fonts/Inter-SemiBold.ttf"
         ))),
     );
     // Craft-fonts faces in preference order for a family drawn in `style`.
@@ -615,13 +615,13 @@ mod tests {
                 family: "BIZ UDPGothic",
                 style: "Regular",
                 scripts: &["Jpan", "Latn"],
-                bytes: include_bytes!("../../../assets/lightcraft/fonts/Inter-Regular.ttf"),
+                bytes: include_bytes!("../embedded/assets/lightcraft/fonts/Inter-Regular.ttf"),
             },
             lightcraft_engine::CraftFont {
                 family: "Noto Sans CJK SC",
                 style: "Regular",
                 scripts: &["Hans", "Latn"],
-                bytes: include_bytes!("../../../assets/lightcraft/fonts/Inter-Regular.ttf"),
+                bytes: include_bytes!("../embedded/assets/lightcraft/fonts/Inter-Regular.ttf"),
             },
         ];
         set_language(Locale::ZhHans);
@@ -671,13 +671,13 @@ mod tests {
             family: "BIZ UDPGothic",
             style: "Regular",
             scripts: &["Jpan", "Latn"],
-            bytes: include_bytes!("../../../assets/lightcraft/fonts/Inter-Regular.ttf"),
+            bytes: include_bytes!("../embedded/assets/lightcraft/fonts/Inter-Regular.ttf"),
         }];
         let embedded = lightcraft_engine::CRAFT_FONTS
             .iter()
             .find(|font| font.family == "Noto Sans CJK SC" && font.style == "Regular");
         let fallback: &'static [u8] =
-            include_bytes!("../../../assets/lightcraft/fonts/Inter-Regular.ttf");
+            include_bytes!("../embedded/assets/lightcraft/fonts/Inter-Regular.ttf");
         let source = embedded.map_or(fallback, |font| font.bytes);
         let chinese = Arc::new(FontData::from_static(source));
         set_language(Locale::ZhHans);
@@ -858,7 +858,7 @@ mod tests {
         plain.font_data.insert(
             "Inter".into(),
             Arc::new(FontData::from_static(include_bytes!(
-                "../../../assets/lightcraft/fonts/Inter-Regular.ttf"
+                "../embedded/assets/lightcraft/fonts/Inter-Regular.ttf"
             ))),
         );
         plain.font_data.insert(
@@ -900,7 +900,7 @@ mod tests {
             family: "Static Sans",
             style: "Regular",
             scripts: &["Thai"],
-            bytes: include_bytes!("../../../assets/lightcraft/fonts/Inter-Regular.ttf"),
+            bytes: include_bytes!("../embedded/assets/lightcraft/fonts/Inter-Regular.ttf"),
         }];
         set_language(Locale::En);
         for craft in [FACES, &[]] {

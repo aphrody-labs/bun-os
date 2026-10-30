@@ -19,18 +19,18 @@ use crate::sfnt::{FaceNames, read_faces, read_faces_bytes};
 
 /// Bundled fonts (SIL OFL 1.1; see `assets/fonts/*.attribution` and ATTRIBUTION.md).
 pub static INTER_REGULAR: &[u8] =
-    include_bytes!("../../../assets/effectcraft/fonts/Inter-Regular.ttf");
+    include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Regular.ttf");
 pub static INTER_MEDIUM: &[u8] =
-    include_bytes!("../../../assets/effectcraft/fonts/Inter-Medium.ttf");
+    include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Medium.ttf");
 pub static INTER_SEMIBOLD: &[u8] =
-    include_bytes!("../../../assets/effectcraft/fonts/Inter-SemiBold.ttf");
-pub static INTER_BOLD: &[u8] = include_bytes!("../../../assets/effectcraft/fonts/Inter-Bold.ttf");
+    include_bytes!("../embedded/assets/effectcraft/fonts/Inter-SemiBold.ttf");
+pub static INTER_BOLD: &[u8] = include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Bold.ttf");
 pub static INTER_ITALIC: &[u8] =
-    include_bytes!("../../../assets/effectcraft/fonts/Inter-Italic.ttf");
+    include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Italic.ttf");
 pub static JETBRAINS_MONO_REGULAR: &[u8] =
-    include_bytes!("../../../assets/effectcraft/fonts/JetBrainsMono-Regular.ttf");
+    include_bytes!("../embedded/assets/effectcraft/fonts/JetBrainsMono-Regular.ttf");
 pub static NOTO_SERIF_REGULAR: &[u8] =
-    include_bytes!("../../../assets/effectcraft/fonts/NotoSerif-Regular.ttf");
+    include_bytes!("../embedded/assets/effectcraft/fonts/NotoSerif-Regular.ttf");
 
 /// The default family for new text.
 pub const DEFAULT_FAMILY: &str = "Inter";

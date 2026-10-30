@@ -182,7 +182,7 @@ mod tests {
     fn invalid_sources_release_build_lock() {
         let dir = tempfile::tempdir().unwrap();
         let mut c = Config::parse(
-            include_bytes!("../../../../tools/aphrody/config/os/wsl-build.json"),
+            include_bytes!("../../embedded/tools/aphrody/config/os/wsl-build.json"),
             &std::env::temp_dir().join("aphrody-workspace"),
         )
         .unwrap();

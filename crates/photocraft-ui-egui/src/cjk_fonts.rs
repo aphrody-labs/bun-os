@@ -550,7 +550,7 @@ mod tests {
             std::fs::create_dir_all(&dir).unwrap();
             std::fs::write(
                 dir.join("font.ttf"),
-                include_bytes!("../../../assets/photocraft/fonts/Inter-Regular.ttf"),
+                include_bytes!("../embedded/assets/photocraft/fonts/Inter-Regular.ttf"),
             )
             .unwrap();
             std::fs::write(dir.join("empty.ttf"), b"").unwrap();
@@ -906,7 +906,7 @@ mod tests {
     #[test]
     fn vertical_metrics_parse_and_reject_garbage() {
         let (asc, desc, gap) = vertical_metrics(
-            include_bytes!("../../../assets/photocraft/fonts/Inter-Regular.ttf"),
+            include_bytes!("../embedded/assets/photocraft/fonts/Inter-Regular.ttf"),
             0,
         )
         .unwrap();

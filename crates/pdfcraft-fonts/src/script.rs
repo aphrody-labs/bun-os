@@ -4,12 +4,12 @@ use skrifa::instance::{LocationRef, Size};
 use skrifa::outline::{DrawSettings, OutlinePen};
 use skrifa::{FontRef, GlyphId, MetadataProvider};
 
-static FONT: &[u8] = include_bytes!("../../../assets/pdfcraft/fonts/DancingScript.ttf");
+static FONT: &[u8] = include_bytes!("../embedded/assets/pdfcraft/fonts/DancingScript.ttf");
 
 /// Inter Regular, the interface font. Typed signatures fall back to it, slanted, for characters
 /// the script font lacks (Dancing Script is Latin and Vietnamese only: no Cyrillic or Greek).
 pub static INTER_REGULAR: &[u8] =
-    include_bytes!("../../../assets/pdfcraft/fonts/Inter-Regular.ttf");
+    include_bytes!("../embedded/assets/pdfcraft/fonts/Inter-Regular.ttf");
 
 /// Forward slant of fallback glyphs in a typed signature (about 12°), so they lean like the script.
 const FALLBACK_SLANT: f64 = 0.21;

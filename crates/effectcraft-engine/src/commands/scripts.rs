@@ -152,7 +152,7 @@ pub const BUNDLED: &[(&str, bool, &str, &str)] = &[
         "Ease Presets.jsx",
         true,
         "extension",
-        include_str!("../../../../apps/effectcraft/extensions/scriptui-panels/Ease Presets.jsx"),
+        include_str!("../../embedded/apps/effectcraft/extensions/scriptui-panels/Ease Presets.jsx"),
     ),
 ];
 

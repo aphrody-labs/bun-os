@@ -1389,7 +1389,7 @@ mod tests {
     fn embedded_editor_fonts_are_validated_without_installing_or_exporting() {
         use pdfcraft_cos::Stream;
         let mut doc = Document::new_empty();
-        let bytes = include_bytes!("../../../assets/pdfcraft/fonts/Inter-Regular.ttf");
+        let bytes = include_bytes!("../embedded/assets/pdfcraft/fonts/Inter-Regular.ttf");
         let program = doc.add(Object::Stream(Stream::flate(Dict::new(), bytes)));
         let mut descriptor = Dict::new();
         descriptor.set(b"FontFile2".to_vec(), Object::Ref(program));
@@ -1416,7 +1416,7 @@ mod tests {
     #[test]
     fn mac_subset_cmap_uses_pdf_unicode_without_changing_source_program() {
         use skrifa::{MetadataProvider as _, raw::TableProvider as _};
-        let original = include_bytes!("../../../assets/pdfcraft/fonts/Inter-Regular.ttf");
+        let original = include_bytes!("../embedded/assets/pdfcraft/fonts/Inter-Regular.ttf");
         let face = skrifa::FontRef::new(original).unwrap();
         let expected = face.charmap().map('Ω').unwrap();
         let mut subset = original.to_vec();

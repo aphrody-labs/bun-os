@@ -589,7 +589,7 @@ mod tests {
     use super::*;
     fn config() -> Config {
         Config::parse(
-            include_bytes!("../../../../tools/aphrody/config/os/wsl-build.json"),
+            include_bytes!("../../embedded/tools/aphrody/config/os/wsl-build.json"),
             &std::env::temp_dir().join("aphrody-workspace"),
         )
         .unwrap()

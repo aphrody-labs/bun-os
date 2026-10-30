@@ -3416,7 +3416,7 @@ mod tests {
         let mut doc = Document::with_version("1.7");
         let program = doc.add_object(Stream::new(
             dictionary! {},
-            include_bytes!("../../../assets/pdfcraft/fonts/Inter-Regular.ttf").to_vec(),
+            include_bytes!("../embedded/assets/pdfcraft/fonts/Inter-Regular.ttf").to_vec(),
         ));
         let descriptor =
             doc.add_object(dictionary! { "Type" => "FontDescriptor", "FontName" => "Inter-Regular", "Flags" => flags, "FontFile2" => program });

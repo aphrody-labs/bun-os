@@ -1109,7 +1109,7 @@ fn ws_menu(app: &mut EffectcraftApp, ui: &mut egui::Ui) {
 
 /// The ArtCraft mark as supplied in `docs/brand` (the README's and getartcraft.com's logo; used
 /// unmodified, see `docs/brand/LICENSE-brand.txt`).
-static ARTCRAFT_MARK: &[u8] = include_bytes!("../../../docs/libraries/brand/artcraft-mark.png");
+static ARTCRAFT_MARK: &[u8] = include_bytes!("../embedded/docs/libraries/brand/artcraft-mark.png");
 
 /// The ArtCraft mark in `r` (decoded once into a mipmapped texture, so it stays crisp from the
 /// 24 px Tools bar to the About dialog). Nothing is drawn if it can't be decoded.

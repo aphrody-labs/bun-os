@@ -27,12 +27,12 @@ pub use crate::lang::ProofLang;
 pub use dict::Dictionary;
 pub use patterns::Patterns;
 
-static EN_US_DIC: &[u8] = include_bytes!("../../../assets/wordcraft/hyphenation/en-us.dic");
-static EN_US_PAT: &str = include_str!("../../../assets/wordcraft/hyphenation/en-us.pat");
+static EN_US_DIC: &[u8] = include_bytes!("../embedded/assets/wordcraft/hyphenation/en-us.dic");
+static EN_US_PAT: &str = include_str!("../embedded/assets/wordcraft/hyphenation/en-us.pat");
 /// hyph-utf8's `hyph-pl.tex`, unmodified (its licence header is in the file).
-static PL_PAT: &str = include_str!("../../../assets/wordcraft/hyphenation/pl.pat");
+static PL_PAT: &str = include_str!("../embedded/assets/wordcraft/hyphenation/pl.pat");
 /// hyph-utf8's `hyph-pt.tex`, unmodified (its BSD 3-clause header is in the file).
-static PT_PAT: &str = include_str!("../../../assets/wordcraft/hyphenation/pt.pat");
+static PT_PAT: &str = include_str!("../embedded/assets/wordcraft/hyphenation/pt.pat");
 
 impl Dictionary {
     /// The bundled US English dictionary (decoded on first use).

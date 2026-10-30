@@ -370,7 +370,7 @@ mod tests {
 
     #[test]
     fn full_unicode_embedding_keeps_outlines_advances_and_roundtrip_codes() {
-        let bytes = include_bytes!("../../../assets/pdfcraft/fonts/Inter-Regular.ttf");
+        let bytes = include_bytes!("../embedded/assets/pdfcraft/fonts/Inter-Regular.ttf");
         let mut doc = Document::new_empty();
         let mut fonts = Dict::new();
         let name = embed(&mut doc, &mut fonts, bytes, "Inter").unwrap();

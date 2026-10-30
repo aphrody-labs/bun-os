@@ -239,7 +239,7 @@ pub const ABOUT_TABS: &[(&str, &str)] = &[
 ];
 
 /// Help ▸ What's New (docs/whats-new.md).
-pub const WHATS_NEW: &str = include_str!("../../../../docs/libraries/lightcraft/whats-new.md");
+pub const WHATS_NEW: &str = include_str!("../../embedded/docs/libraries/lightcraft/whats-new.md");
 
 /// The import review and Settings keep window ids of their own, so the size each is given
 /// doesn't carry over to the other dialogs.

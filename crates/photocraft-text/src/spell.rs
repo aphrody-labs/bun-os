@@ -13,7 +13,7 @@ use std::collections::{HashMap, HashSet};
 use std::io::Read;
 use std::sync::OnceLock;
 
-static WORDS_GZ: &[u8] = include_bytes!("../../../assets/photocraft/dict/en_US-scowl-50.txt.gz");
+static WORDS_GZ: &[u8] = include_bytes!("../embedded/assets/photocraft/dict/en_US-scowl-50.txt.gz");
 
 /// A word list with frequency levels.
 pub struct Dictionary {

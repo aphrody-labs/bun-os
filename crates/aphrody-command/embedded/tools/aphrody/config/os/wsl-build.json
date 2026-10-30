@@ -1,0 +1,71 @@
+{
+  "sourceRoot": "${workspace}/.cache/upstream",
+  "outputRoot": "${data}/aphrody/wsl-artifacts",
+  "workspace": "${workspace}",
+  "jobs": 4,
+  "timeoutSeconds": 21600,
+  "distribution": "AphrodyOS",
+  "suite": "resolute",
+  "mirror": "https://archive.ubuntu.com/ubuntu",
+  "sources": [
+    {
+      "name": "WSL",
+      "url": "https://github.com/microsoft/WSL.git",
+      "revision": "c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67"
+    },
+    {
+      "name": "wslg",
+      "url": "https://github.com/microsoft/wslg.git",
+      "revision": "6942bb534b537302a7a22617261d9274db3cfa37"
+    },
+    {
+      "name": "WSL2-Linux-Kernel",
+      "url": "https://github.com/microsoft/WSL2-Linux-Kernel.git",
+      "revision": "14794180686c2fb6307fbe359c359bec765249f3"
+    },
+    {
+      "name": "terminal",
+      "url": "https://github.com/microsoft/terminal.git",
+      "revision": "2b5336c1fca1e53ceeaac09710a13c478938cc8d"
+    },
+    {
+      "name": "linux-stable",
+      "url": "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git",
+      "tag": "v7.2.9",
+      "revision": "5fce161649b4d779d1b76d9fcd52dc77779774b8"
+    }
+  ],
+  "distro": {
+    "packages": [
+      "rust-coreutils",
+      "sudo-rs",
+      "systemd",
+      "locales",
+      "cosmic-session",
+      "rustup",
+      "bindgen",
+      "clang",
+      "lld",
+      "llvm",
+      "cmake",
+      "ninja-build",
+      "bc",
+      "bison",
+      "flex",
+      "dwarves",
+      "libelf-dev",
+      "libssl-dev",
+      "cpio",
+      "kmod"
+    ],
+    "repositories": [
+      {
+        "name": "pop-os",
+        "url": "https://apt.pop-os.org/release",
+        "suite": "resolute",
+        "components": "main",
+        "fingerprint": "63C46DF0140D738961429F4E204DD8AEC33A7AFF"
+      }
+    ]
+  }
+}

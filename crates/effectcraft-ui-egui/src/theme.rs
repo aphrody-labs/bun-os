@@ -364,12 +364,12 @@ fn default_labels() -> [Color32; 17] {
     })
 }
 
-static INTER_REGULAR: &[u8] = include_bytes!("../../../assets/effectcraft/fonts/Inter-Regular.ttf");
-static INTER_MEDIUM: &[u8] = include_bytes!("../../../assets/effectcraft/fonts/Inter-Medium.ttf");
+static INTER_REGULAR: &[u8] = include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Regular.ttf");
+static INTER_MEDIUM: &[u8] = include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Medium.ttf");
 static INTER_SEMIBOLD: &[u8] =
-    include_bytes!("../../../assets/effectcraft/fonts/Inter-SemiBold.ttf");
+    include_bytes!("../embedded/assets/effectcraft/fonts/Inter-SemiBold.ttf");
 static JETBRAINS_MONO: &[u8] =
-    include_bytes!("../../../assets/effectcraft/fonts/JetBrainsMono-Regular.ttf");
+    include_bytes!("../embedded/assets/effectcraft/fonts/JetBrainsMono-Regular.ttf");
 
 /// Install fonts (Inter, Inter Medium/SemiBold, JetBrains Mono) and egui visuals. `language` is the
 /// resolved interface language from [`crate::i18n::language`] (`en`, `ja`, `zh-hans` or `zh-hant`),

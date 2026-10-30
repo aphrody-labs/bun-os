@@ -477,27 +477,27 @@ pub fn font_definitions(prefer_hans: bool, system_cjk: bool) -> FontDefinitions 
     add(
         &mut fonts,
         "Inter",
-        include_bytes!("../../../assets/wordcraft/fonts/Inter-Regular.ttf"),
+        include_bytes!("../embedded/assets/wordcraft/fonts/Inter-Regular.ttf"),
     );
     add(
         &mut fonts,
         "InterMedium",
-        include_bytes!("../../../assets/wordcraft/fonts/Inter-Medium.ttf"),
+        include_bytes!("../embedded/assets/wordcraft/fonts/Inter-Medium.ttf"),
     );
     add(
         &mut fonts,
         "InterSemiBold",
-        include_bytes!("../../../assets/wordcraft/fonts/Inter-SemiBold.ttf"),
+        include_bytes!("../embedded/assets/wordcraft/fonts/Inter-SemiBold.ttf"),
     );
     add(
         &mut fonts,
         "SourceSans",
-        include_bytes!("../../../assets/wordcraft/fonts/SourceSans3-Regular.ttf"),
+        include_bytes!("../embedded/assets/wordcraft/fonts/SourceSans3-Regular.ttf"),
     );
     add(
         &mut fonts,
         "Mono",
-        include_bytes!("../../../assets/wordcraft/fonts/JetBrainsMono-Regular.ttf"),
+        include_bytes!("../embedded/assets/wordcraft/fonts/JetBrainsMono-Regular.ttf"),
     );
     if let Some(prop) = fonts.families.get_mut(&FontFamily::Proportional) {
         prop.insert(0, "Inter".into());

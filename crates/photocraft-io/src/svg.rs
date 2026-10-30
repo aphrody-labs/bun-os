@@ -1039,7 +1039,7 @@ mod tests {
         // The report's file: PhotoCraft's own icon opens without the clip-path warning.
         let icon = import_svg(
             "photocraft.svg",
-            include_bytes!("../../../assets/photocraft/app-icon/photocraft.svg"),
+            include_bytes!("../embedded/assets/photocraft/app-icon/photocraft.svg"),
         )
         .unwrap();
         assert!(

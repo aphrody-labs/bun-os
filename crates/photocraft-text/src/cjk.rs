@@ -848,7 +848,7 @@ mod tests {
             face_index_for_family(b"ttcf\0\0\0\0garbage", "PingFang SC"),
             0
         );
-        let inter = include_bytes!("../../../assets/photocraft/fonts/Inter-Regular.ttf");
+        let inter = include_bytes!("../embedded/assets/photocraft/fonts/Inter-Regular.ttf");
         assert_eq!(face_index_for_family(inter, "Inter"), 0);
         assert_eq!(face_index_for_family(inter, ""), 0);
     }
@@ -856,7 +856,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn fontconfig_candidates_must_cover_the_requested_script() {
-        let inter = include_bytes!("../../../assets/photocraft/fonts/Inter-Regular.ttf");
+        let inter = include_bytes!("../embedded/assets/photocraft/fonts/Inter-Regular.ttf");
         for script in [Japanese, SimplifiedChinese, TraditionalChinese, Korean] {
             assert!(
                 !fontconfig_font_covers_sample(inter, "Inter", script),

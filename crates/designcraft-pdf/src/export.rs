@@ -1739,7 +1739,7 @@ fn relabel_pdf_header(data: &[u8], from: &[u8], to: &[u8]) -> Option<Vec<u8>> {
 
 /// The sRGB profile (ICC v2.1) that untagged RGB images carry in PDF/X-4.
 pub(crate) static SRGB_ICC: &[u8] =
-    include_bytes!("../../../assets/designcraft/icc/sRGB-v2-magic.icc");
+    include_bytes!("../embedded/assets/designcraft/icc/sRGB-v2-magic.icc");
 
 /// How raster images are written for the export's standard.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

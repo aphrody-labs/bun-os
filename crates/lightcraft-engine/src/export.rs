@@ -313,7 +313,7 @@ fn turn(turns: u8, x: f32, y: f32, w: f32, h: f32) -> (f32, f32) {
 
 /// Inter SemiBold (OFL, see assets/ATTRIBUTION.md).
 static WATERMARK_FONT: &[u8] =
-    include_bytes!("../../../assets/lightcraft/fonts/Inter-SemiBold.ttf");
+    include_bytes!("../embedded/assets/lightcraft/fonts/Inter-SemiBold.ttf");
 
 /// The watermark faces: Inter first, then the craft-fonts CJK faces (Mincho first, the watermark's
 /// serif look; then any other CJK face — a watermark has no UI language, so every CJK script is

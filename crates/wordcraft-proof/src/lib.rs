@@ -286,7 +286,7 @@ const COMMON: &str = "a an the and or but if of to in on at by for with from as 
 
 /// Our supplement of common words the Moby list lacks (`desktop`, `email`, `download`…): one
 /// lowercase base form per line, `#` comments. Inflections come from [`known_core`].
-const EXTRA_EN: &str = include_str!("../../../assets/wordcraft/spelling/en-extra.txt");
+const EXTRA_EN: &str = include_str!("../embedded/assets/wordcraft/spelling/en-extra.txt");
 
 fn extra_words() -> &'static HashSet<&'static str> {
     static E: OnceLock<HashSet<&'static str>> = OnceLock::new();
