@@ -9,7 +9,6 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": true,
   },
-  "services": [{ "binding": "LEGACY", "service": "aphrody-app" }],
   "r2_buckets": [{ "binding": "VM", "bucket_name": "aphrody-assets" }],
   "routes": [
     { "pattern": "craft.aphrody.app/", "zone_name": "aphrody.app" },

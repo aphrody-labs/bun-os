@@ -23,11 +23,7 @@ Craft compilation uses the root serialized Cargo owner and four compiler jobs.
 `build:shell` assembles the site from an already staged App UI artifact.
 `superapp deploy` runs the product build and stages a hashed native VPS release.
 
-For local serving, set `BUN_OS_API_ORIGIN` to an existing API backend's HTTP(S)
-origin, or set `WEBOS_DATABASE_URL_FILE` to the protected local PostgreSQL reader
-connection reference. Production reads the `aphrody_site` schema through native
-`Bun.SQL`, with four connections, a read-only role and an eight-second statement
-timeout. No provider secret enters a bundle or release receipt.
+WebOS serves no documentation, templates, showcases or examples, and has no database.
 
 ## VPS deployment
 

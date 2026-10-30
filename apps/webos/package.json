@@ -19,7 +19,6 @@
     "@aphrody/app-ui": "workspace:*",
     "@aphrody/bun-workspace": "workspace:*",
     "@aphrody/m3-tokens": "workspace:*",
-    "@aphrody/typesafe-sdk": "0.6.2",
     "@aphrody/webos-wasm": "workspace:*",
     "@codemirror/lang-css": "6.3.1",
     "@codemirror/lang-html": "6.4.12",

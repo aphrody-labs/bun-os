@@ -3,7 +3,7 @@
 // Arch Linux container. Packages and the database are signed with a key kept in the protected store (never served).
 import { cp, mkdir, readdir, rm } from "node:fs/promises";
 import { join } from "node:path";
-import { docker, run, safeName, sha256, step, tail, writeIndex, type Ctx, type IndexEntry, type QualResult, type QualStep } from "./common";
+import { docker, run, sha256, step, tail, writeIndex, type Ctx, type IndexEntry, type QualResult, type QualStep } from "./common";
 
 const IMAGE = "archlinux:latest";
 /** PKGBUILDs that build without a Rust or Bun compile; the rest is recorded as skipped. */

@@ -2,7 +2,6 @@
 // Native Bun host for the shared HTTP handler; production uses an immutable release.
 import { join, relative, resolve, isAbsolute } from "node:path";
 import worker from "./worker/index";
-import { nativeAPI } from "./native-api";
 import { publicFetch } from "./public-fetch";
 import { storeApi } from "./store/api";
 
@@ -10,31 +9,6 @@ const dist = resolve(Bun.env.WEBOS_DIST ?? join(import.meta.dir, "dist"));
 const objects = resolve(
   Bun.env.WEBOS_OBJECTS ?? join(import.meta.dir, "../../build/webos-objects"),
 );
-const apiOrigin = Bun.env.BUN_OS_API_ORIGIN
-  ? new URL(Bun.env.BUN_OS_API_ORIGIN)
-  : undefined;
-if (
-  apiOrigin &&
-  (!/^https?:$/.test(apiOrigin.protocol) ||
-    apiOrigin.username ||
-    apiOrigin.password ||
-    apiOrigin.pathname !== "/" ||
-    apiOrigin.search ||
-    apiOrigin.hash)
-)
-  throw new Error(
-    "BUN_OS_API_ORIGIN must be an HTTP(S) origin without credentials, path, query or fragment.",
-  );
-const api = {
-  async fetch(request: Request): Promise<Response> {
-    if (!apiOrigin) return nativeAPI(request);
-    const url = new URL(request.url);
-    return fetch(
-      new Request(new URL(url.pathname + url.search, apiOrigin).href, request),
-      { redirect: "manual" },
-    );
-  },
-};
 async function objectFile(key: string) {
   if (
     !key ||
@@ -139,7 +113,6 @@ const server = Bun.serve({
       BROWSE_FETCH: publicFetch,
       ASSETS: assets,
       VM: vm,
-      LEGACY: api,
       SOURCE_COMMIT: Bun.env.SOURCE_COMMIT,
     });
   },

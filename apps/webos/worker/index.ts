@@ -25,7 +25,6 @@ interface Env {
   BROWSE_FETCH?: (url: string, init: RequestInit) => Promise<Response>;
   ASSETS: { fetch(request: Request): Promise<Response> };
   /** The former aphrody-app Worker, kept as the private backend of the merged API routes (service binding). */
-  LEGACY: { fetch(request: Request): Promise<Response> };
   /** R2 bucket aphrody-assets; large VM images live under webos/vm/. */
   VM: {
     get(
@@ -265,11 +264,6 @@ function withPathMeta(res: Response, pathname: string, override?: PathMeta): Res
   return rewriter.transform(res);
 }
 
-/** Routes of the former aphrody.app Worker, now served under aphrody.com (same handler, same bindings). */
-const LEGACY_ROUTES = ["/api/site/", "/api/yolo/", "/mcp", "/v1/"];
-/** Origin the legacy Worker answers on (its former apex host); the request goes through the service binding. */
-const LEGACY_ORIGIN = `https://${Object.keys(ROUTES.hosts).find((host) => ROUTES.hosts[host]!.kind === "legacy-apex")}`;
-
 const PATH_BY_PACKAGE = new Map(
   Object.entries(ROUTES.apps).map(([path, pkg]) => [pkg, path]),
 );
@@ -301,13 +295,7 @@ export default {
     const game = await gameContentResponse(request, env.ASSETS, env.VM);
     if (game) return game;
     if (APP_SERVER_PATHS.has(url.pathname)) return appServerResponse(request);
-    const legacyPath = LEGACY_ROUTES.some(
-      (prefix) =>
-        url.pathname === prefix ||
-        url.pathname.startsWith(prefix.endsWith("/") ? prefix : `${prefix}/`),
-    );
-    // API clients of the old hosts keep working (no redirect): the same routes answer on every host.
-    const moved = legacyPath ? undefined : redirectFor(url);
+    const moved = redirectFor(url);
     if (moved) return Response.redirect(moved, 301);
     const emulators = await emulatorsResponse(request, env.VM);
     if (emulators) return emulators;
@@ -318,13 +306,6 @@ export default {
         out.headers.set(key, value);
       out.headers.set("x-content-type-options", "nosniff");
       return out;
-    }
-    if (legacyPath) {
-      const target = new Request(
-        `${LEGACY_ORIGIN}${url.pathname}${url.search}`,
-        request,
-      );
-      return env.LEGACY.fetch(target);
     }
     if (url.pathname === "/api/rpc") return rpcResponse(request, env.ASSETS);
     const inventory = await inventoryResponse(request, env.ASSETS);

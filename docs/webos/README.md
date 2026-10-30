@@ -32,8 +32,7 @@ One site for the whole product: a desktop that runs in the browser. Owner: `apps
 
 ## Merged routes
 
-The Worker serves `aphrody.com`. `/api/site/*`, `/api/yolo/*`, `/mcp` and `/v1/*` reach the former
-`aphrody-app` Worker through a service binding (same handler, same bindings, no copied secrets). Old product
+The Worker serves `aphrody.com`. Old product
 hosts (`app-*.aphrody.app`, `*craft.aphrody.app`, `aphrody.app`, `www`) answer with a 301 to the Web OS.
 `/api/health`, `/api/catalog` (every app, package and crate), `/api/browse` and `/vm/alpine.iso` are native.
 
