@@ -81,9 +81,7 @@
               "/control-plane",
               "/PRODUCT-SERVER",
               "/APP-DOMAINS",
-              "/source-private-network",
-              "/CI-TRANSPORT",
-              "/FORGE-TRANSPORT"
+              "/source-private-network"
             ]
           }
         ]

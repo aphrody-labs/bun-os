@@ -19,16 +19,12 @@ export function hostAppFiles(host: (typeof HOSTS)[number], layout: HostLayout, r
     [join(repo, "tools/aphrody/config/container/compose.yaml"), join(layout.apps, "aphrody", "compose.yaml")],
   ];
   if (host === "vps") {
-    for (const app of ["gitea", "komodo", "gitea-runner"]) {
+    for (const app of ["komodo"]) {
       files.push([
         join(repo, "infra/config/host/apps/vps", app, "compose.yaml"),
         join(layout.apps, app, "compose.yaml"),
       ]);
     }
-    files.push([
-      join(repo, "infra/config/host/apps/vps/gitea-runner/config.yaml"),
-      join(layout.apps, "gitea-runner/config.yaml"),
-    ]);
   }
   if (host === "dbfr") {
     files.push([
