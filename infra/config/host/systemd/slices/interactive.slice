@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Latency-sensitive Bun OS services: nginx, gateways, the Hyprland/wayvnc session, WebOS, session containers.
+# Weights, not caps: under contention it gets 50x the CPU and I/O share of build.slice; idle cores stay free.
+[Unit]
+Description=Bun OS interactive services
+Before=slices.target
+
+[Slice]
+CPUWeight=1000
+IOWeight=1000

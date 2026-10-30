@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-# Google access of the Bun OS backend (crates/bun-os-google `bun-os-google serve`, 127.0.0.1:8796):
+# Google access of the Bun OS backend (crates/bun-os-google `bun-os-google serve`, 127.0.0.1:8802):
 # status, the owner's OAuth consent and callback, token broker and Google API reads (admin bearer in the service).
 # Included inside the aphrody.com server block, before the generic /api/ location.
 location ^~ /api/google/ {
-    proxy_pass http://127.0.0.1:8796;
+    proxy_pass http://127.0.0.1:8802;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;

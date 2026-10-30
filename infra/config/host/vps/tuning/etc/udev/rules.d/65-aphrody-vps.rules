@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Bun OS VPS device rules (infra/config/host/vps/tuning).
+# Virtualisation devices for the kvm group (ubuntu is a member).
+KERNEL=="kvm", GROUP="kvm", MODE="0660"
+KERNEL=="vhost-net", GROUP="kvm", MODE="0660"
+KERNEL=="vhost-vsock", GROUP="kvm", MODE="0660"
+# udmabuf: lavapipe/gamescope dmabufs, also for non-root users inside session containers.
+KERNEL=="udmabuf", GROUP="kvm", MODE="0666"
+# OVH virtual disks (Ceph-backed): no guest-side scheduling, larger read-ahead for btrfs/ext4 streams.
+ACTION=="add|change", SUBSYSTEM=="block", KERNEL=="sd[a-z]|vd[a-z]", ATTR{queue/scheduler}="none", ATTR{queue/read_ahead_kb}="1024"

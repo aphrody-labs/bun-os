@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Moves running build processes into build.slice (renice 10, ionice best-effort 7) and sets the CPU/IO weights
+# of the build and session containers (/usr/local/libexec/aphrody-priority, policy aphrody-priority.json).
+[Unit]
+Description=Bun OS CPU/IO priority classes (builds to build.slice)
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/aphrody-priority
+Nice=-5

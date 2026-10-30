@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
+# Bun OS CPU/IO priority classes (policy /etc/aphrody/priority.json, source
+# infra/config/host/systemd/slices/aphrody-priority.json). Run as root by aphrody-priority.timer every 30 s:
+#  1. interactive units get CPUWeight/IOWeight 1000 live (their drop-in moves them to interactive.slice at
+#     their next restart; nothing is restarted here);
+#  2. session containers get cpu.weight 1000, build containers cpu.weight 20 (docker update persists it);
+#  3. build processes started from user sessions (tmux, ssh) are adopted, with all their descendants, into a
+#     transient scope of build.slice, reniced to 10 and set to ionice best-effort 7.
+# Processes in containers or system services are never moved (docker/systemd own those cgroups).
+set -uo pipefail
+
+POLICY=${APHRODY_PRIORITY_POLICY:-/etc/aphrody/priority.json}
+build_re=$(jq -r .buildCommands "$POLICY")
+ic_re=$(jq -r .interactiveContainers "$POLICY")
+bc_re=$(jq -r .buildContainers "$POLICY")
+
+# runc >= 1.2 maps cpu-shares to cgroup v2 cpu.weight non-linearly (1024 -> 100):
+#   weight = ceil(10^((log2(s)^2 + 125*log2(s)) / 612 - 7/34))
+SHARES_INTERACTIVE=17620   # cpu.weight 1000
+SHARES_BUILD=126           # cpu.weight 20
+
+# 1. Interactive units.
+while read -r u; do
+  systemctl -q is-active "$u" 2>/dev/null || continue
+  [ "$(systemctl show -P CPUWeight "$u")" = 1000 ] && continue
+  systemctl set-property --runtime "$u" CPUWeight=1000 IOWeight=1000
+done < <(jq -r '.interactiveUnits[]' "$POLICY")
+
+# 2. Containers.
+if command -v docker >/dev/null; then
+  docker ps --format '{{.Names}}' | while read -r n; do
+    if [[ $n =~ $ic_re ]]; then want=$SHARES_INTERACTIVE; bw=1000
+    elif [[ $n =~ $bc_re ]]; then want=$SHARES_BUILD; bw=10
+    else continue; fi
+    [ "$(docker inspect -f "{{.HostConfig.CpuShares}}" "$n" 2>/dev/null </dev/null)" = "$want" ] && continue
+    docker update --cpu-shares "$want" --blkio-weight "$bw" "$n" >/dev/null 2>&1 </dev/null ||
+      docker update --cpu-shares "$want" "$n" >/dev/null 2>&1 </dev/null || true
+  done
+fi
+
+# 3. Build processes in user sessions.
+declare -A children=() comm=()
+while read -r pid ppid name; do
+  children[$ppid]+="$pid "
+  comm[$pid]=$name
+done < <(ps -e -o pid=,ppid=,comm=)
+
+in_user_slice() { local cg; cg=$(cat "/proc/$1/cgroup" 2>/dev/null) && [[ $cg == 0::/user.slice/* ]]; }
+
+declare -A adopt=()
+queue=()
+for pid in "${!comm[@]}"; do
+  [[ ${comm[$pid]} =~ $build_re ]] && in_user_slice "$pid" && queue+=("$pid")
+done
+while ((${#queue[@]})); do
+  pid=${queue[0]}; queue=("${queue[@]:1}")
+  [[ -n ${adopt[$pid]:-} ]] && continue
+  in_user_slice "$pid" || continue
+  adopt[$pid]=1
+  for c in ${children[$pid]:-}; do queue+=("$c"); done
+done
+
+((${#adopt[@]})) || exit 0
+pids=("${!adopt[@]}")
+busctl call org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager \
+  StartTransientUnit 'ssa(sv)a(sa(sv))' "aphrody-build-$(date +%s%N).scope" fail 3 \
+  PIDs au "${#pids[@]}" "${pids[@]}" Slice s build.slice CollectMode s inactive-or-failed 0 >/dev/null 2>&1 || true
+for pid in "${pids[@]}"; do
+  for t in /proc/"$pid"/task/*; do
+    t=${t##*/}
+    ni=$(sed 's/.*) //' "/proc/$pid/task/$t/stat" 2>/dev/null | awk '{print $17}')
+    [[ $ni =~ ^-?[0-9]+$ ]] && ((ni < 10)) && renice -n 10 -p "$t" >/dev/null 2>&1
+    ionice -c 2 -n 7 -p "$t" >/dev/null 2>&1
+  done
+done
+echo "adopted ${#pids[@]} build processes into build.slice"

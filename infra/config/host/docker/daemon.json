@@ -1,14 +1,28 @@
 {
+  "live-restore": true,
   "log-driver": "local",
   "log-opts": {
     "max-size": "20m",
-    "max-file": "3"
+    "max-file": "5"
   },
   "default-ulimits": {
     "nofile": {
       "Name": "nofile",
       "Hard": 1048576,
       "Soft": 1048576
+    },
+    "memlock": {
+      "Name": "memlock",
+      "Hard": -1,
+      "Soft": -1
+    }
+  },
+  "max-concurrent-downloads": 10,
+  "max-concurrent-uploads": 8,
+  "builder": {
+    "gc": {
+      "enabled": true,
+      "defaultKeepStorage": "40GB"
     }
   },
   "runtimes": {
@@ -17,6 +31,7 @@
     }
   },
   "features": {
-    "containerd-snapshotter": true
+    "containerd-snapshotter": true,
+    "buildkit": true
   }
 }

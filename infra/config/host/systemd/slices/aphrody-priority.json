@@ -1,0 +1,20 @@
+{
+  "interactiveUnits": [
+    "nginx.service",
+    "aphrody-android-gateway.service",
+    "aphrody-chat-gateway.service",
+    "aphrody-wayland-gateway.service",
+    "aphrody-hyprland.service",
+    "aphrody-wayvnc.service",
+    "aphrody-webos.service",
+    "aphrody-bun-os-server.service",
+    "aphrody-remote.service",
+    "aphrody-store.service",
+    "aphrody-site.service",
+    "aphrody-fonts-proxy.service",
+    "aphrody-google.service"
+  ],
+  "interactiveContainers": "^(aphrody-redroid|aphrody-gamescope-.*|bunos-android-.*|aphrody-cosmic.*|aphrody-session.*|aphrody-webos-db|auto-web|auto-api|auto-worker|auto-tunnel|auto-pg-prod)$",
+  "buildContainers": "^(buildx_buildkit_.*|bunos-native-.*|.*-builder.*|.*helium.*build.*|aphrody-build-.*)$",
+  "buildCommands": "^(cargo|cargo-serial|rustc|sccache|cc1|cc1plus|clang|clang[+][+]|clang-[0-9]+|ld|ld[.]lld|ld[.]mold|ld[.]gold|mold|make|gmake|ninja|cmake|makepkg|soong_ui|soong_build|javac|kotlinc|ffmpeg_oracle.*|repo|meson|bazel)$"
+}

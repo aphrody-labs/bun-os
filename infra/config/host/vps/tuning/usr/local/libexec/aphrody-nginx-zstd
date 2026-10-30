@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
+# zstd for the Ubuntu nginx package: builds tokers/zstd-nginx-module as dynamic modules against the exact
+# packaged nginx version (--with-compat), installs and enables them, and keeps nginx valid across package
+# upgrades (APT hooks in /etc/apt/apt.conf.d/90-aphrody-nginx-zstd).
+#   aphrody-nginx-zstd build   build if the stamp differs from the running package, then enable + reload
+#   aphrody-nginx-zstd pre     APT Pre-Install-Pkgs: disable zstd before an nginx package is unpacked
+#   aphrody-nginx-zstd post    APT Post-Invoke: rebuild and re-enable after an nginx upgrade
+# Run as root.
+set -euo pipefail
+
+ZSTD_MODULE_REPO=https://github.com/tokers/zstd-nginx-module
+ZSTD_MODULE_REV=057a7d339af1111d04b5a9ac5ae9b0250d17cd94
+WORK=/var/cache/aphrody/nginx-zstd
+MODDIR=/usr/share/nginx/modules
+STAMP=$MODDIR/ngx_http_zstd.version
+LOADCONF=/etc/nginx/modules-available/mod-http-zstd.conf
+LOADLINK=/etc/nginx/modules-enabled/50-mod-http-zstd.conf
+HTTPCONF=/etc/nginx/conf.d/03-zstd.conf
+HTTPSRC=/etc/nginx/aphrody/03-zstd.conf
+
+nginx_version() { nginx -v 2>&1 | sed -E 's#^.*nginx/([0-9.]+).*#\1#'; }
+log() { echo "aphrody-nginx-zstd: $*" >&2; }
+
+disable() {
+  rm -f "$LOADLINK" "$HTTPCONF"
+}
+
+enable() {
+  printf 'load_module %s/ngx_http_zstd_filter_module.so;\nload_module %s/ngx_http_zstd_static_module.so;\n' "$MODDIR" "$MODDIR" >"$LOADCONF"
+  ln -sfn "$LOADCONF" "$LOADLINK"
+  install -m 0644 "$HTTPSRC" "$HTTPCONF"
+  if nginx -t -q; then
+    systemctl reload nginx
+  else
+    log "nginx -t failed with zstd enabled; disabling it again"
+    disable
+    nginx -t -q && systemctl reload nginx
+    return 1
+  fi
+}
+
+build() {
+  local v
+  v=$(nginx_version)
+  if [ "$(cat "$STAMP" 2>/dev/null)" = "$v $ZSTD_MODULE_REV" ] && [ -f "$MODDIR/ngx_http_zstd_filter_module.so" ]; then
+    enable
+    return
+  fi
+  local deps="build-essential libpcre2-dev zlib1g-dev libssl-dev libzstd-dev curl git"
+  # shellcheck disable=SC2086
+  if ! dpkg -s $deps >/dev/null 2>&1; then
+    # Only the first build installs the toolchain; the APT hook (dpkg lock held) never gets here.
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends $deps >/dev/null
+  fi
+  rm -rf "$WORK" && install -d "$WORK"
+  curl -fsSL "https://nginx.org/download/nginx-$v.tar.gz" | tar -xz -C "$WORK"
+  git -C "$WORK" init -q zstd && git -C "$WORK/zstd" fetch -q --depth 1 "$ZSTD_MODULE_REPO" "$ZSTD_MODULE_REV"
+  git -C "$WORK/zstd" checkout -q FETCH_HEAD
+  (cd "$WORK/nginx-$v" && ./configure --with-compat --add-dynamic-module="$WORK/zstd" >/dev/null && make -j"$(nproc)" modules >/dev/null)
+  install -m 0644 "$WORK/nginx-$v"/objs/ngx_http_zstd_{filter,static}_module.so "$MODDIR/"
+  echo "$v $ZSTD_MODULE_REV" >"$STAMP"
+  rm -rf "$WORK"
+  enable
+}
+
+case "${1:-}" in
+  build) build ;;
+  pre)
+    # stdin: one .deb path per line. Disable before the package's postinst tests and restarts nginx.
+    if grep -qE '/(nginx|nginx-common|nginx-core|nginx-full|nginx-light|nginx-extras)_' -; then
+      log "nginx package upgrade: disabling zstd until it is rebuilt"
+      disable
+    fi
+    ;;
+  post)
+    if [ ! -e "$LOADLINK" ] && [ -f "$HTTPSRC" ]; then
+      timeout 900 "$0" build || log "rebuild failed; nginx runs without zstd (brotli/gzip still active)"
+    fi
+    ;;
+  *) echo "usage: $0 build|pre|post" >&2; exit 2 ;;
+esac

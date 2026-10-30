@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
+// Keeps the locally built zstd nginx modules in step with the nginx package (infra/config/host/vps/tuning).
+DPkg::Pre-Install-Pkgs { "[ ! -x /usr/local/libexec/aphrody-nginx-zstd ] || /usr/local/libexec/aphrody-nginx-zstd pre || true"; };
+DPkg::Post-Invoke { "[ -x /usr/local/libexec/aphrody-nginx-zstd ] && /usr/local/libexec/aphrody-nginx-zstd post || true"; };

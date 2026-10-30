@@ -50,6 +50,13 @@ One session, six windows, a summary writer. Heavy work goes through the factory 
 (`bun factory run -- <command>` takes a free slot; `bun factory slots` lists them). CPU budget: 12 cores; keep
 `CARGO_BUILD_JOBS=8` for the Rust windows and leave 4 cores for bun, wasm and docker.
 
+Priority: within 30 s, `aphrody-priority.timer` moves build processes started from tmux or ssh (cargo, rustc, clang,
+make, ninja, makepkg, soong...) into `build.slice` (CPU/IO weight 20, nice 10, ionice best-effort 7). They still use
+every idle core, but they yield to nginx, the gateways and the session containers. To start a build there directly, use
+`systemd-run --user --scope -p CPUWeight=20 ...` or `sudo systemd-run --scope --slice=build.slice --uid=ubuntu ...`.
+For Docker builds, use `--cgroup-parent build.slice` (buildx: `--driver-opt cgroup-parent=build.slice`). See
+[VPS-TUNING.md](VPS-TUNING.md).
+
 ```bash
 SRC=~/src/bun-os; OUT=~/build/out/bun-os; mkdir -p "$OUT"
 cd "$SRC" && git pull --ff-only origin main && git submodule update --init --depth 1 --recommend-shallow   # profile "ci" is enough for the Rust gates

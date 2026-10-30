@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# IOWeight only takes effect with BFQ or blk-iocost; the virtual disks use the none scheduler, so enable
+# iocost (auto QoS) on every sd/vd disk at boot.
+[Unit]
+Description=Enable blk-iocost so cgroup IOWeight applies
+After=systemd-udev-settle.service local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'for d in /sys/block/sd? /sys/block/vd?; do [ -e "$d/dev" ] && echo "$(cat $d/dev) enable=1 ctrl=auto" > /sys/fs/cgroup/io.cost.qos; done; true'
+
+[Install]
+WantedBy=multi-user.target

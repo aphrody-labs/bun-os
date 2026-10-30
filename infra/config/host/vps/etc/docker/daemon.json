@@ -5,8 +5,17 @@
     "max-size": "20m",
     "max-file": "5"
   },
-  "features": {
-    "containerd-snapshotter": true
+  "default-ulimits": {
+    "nofile": {
+      "Name": "nofile",
+      "Hard": 1048576,
+      "Soft": 1048576
+    },
+    "memlock": {
+      "Name": "memlock",
+      "Hard": -1,
+      "Soft": -1
+    }
   },
   "max-concurrent-downloads": 10,
   "max-concurrent-uploads": 8,
@@ -15,5 +24,14 @@
       "enabled": true,
       "defaultKeepStorage": "40GB"
     }
+  },
+  "runtimes": {
+    "io.containerd.wasmtime.v1": {
+      "runtimeType": "io.containerd.wasmtime.v1"
+    }
+  },
+  "features": {
+    "containerd-snapshotter": true,
+    "buildkit": true
   }
 }

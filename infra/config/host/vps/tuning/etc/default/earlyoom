@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# earlyoom of the VPS (systemd-oomd stays off: one OOM policy). Kills at 5 % free RAM and swap,
+# warns at 15/10 %. Never kills the services that keep the host reachable; prefers compiler
+# processes and browsers so a runaway build loses one job instead of the box.
+EARLYOOM_ARGS="-m 15,5 -s 10,5 -r 60 -p --avoid '(^|/)(systemd|systemd-journal|sshd|init|nginx|dockerd|containerd|containerd-shim.*|postgres|postmaster|bun|cron|dbus|Hyprland|wayvnc)$' --prefer '(^|/)(rustc|cc1plus|cc1|ld\.lld|ld\.mold|next-server|next|node|chrome|firefox|electron|java)$'"

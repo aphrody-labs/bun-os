@@ -1,0 +1,33 @@
+[Unit]
+# Swap compressé en RAM, servi avant le swapfile disque.
+#
+# Le VPS a 45 Gio de RAM et n'avait que 4 Gio de swap sur disque, saturés en permanence :
+# plus aucun amortisseur, et earlyoom tuait le type-check pendant les déploiements. Agrandir
+# le fichier disque aurait coûté du disque (déjà à 94 %) et gardé la latence d'un swap SSD.
+#
+# zram échange contre de la RAM compressée : zstd tient environ 3 pour 1 sur des pages
+# anonymes, donc ces 12 Gio déclarés coûtent ~4 Gio réels, et une page réclamée revient en
+# microsecondes au lieu de millisecondes. Le swapfile disque reste, en priorité basse, pour
+# les pages vraiment froides que zram n'a pas à garder en mémoire.
+Description=Swap compressé zram (12 Gio ~25 % RAM, zstd, priorité haute)
+DefaultDependencies=no
+Before=swap.target
+After=systemd-modules-load.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/sbin/modprobe zram
+# L'algorithme et la taille ne s'écrivent que sur un périphérique vierge : réinitialiser
+# d'abord rend le service rejouable sans redémarrage de la machine.
+ExecStart=/bin/sh -c 'echo 1 > /sys/block/zram0/reset || true'
+ExecStart=/bin/sh -c 'echo zstd > /sys/block/zram0/comp_algorithm'
+ExecStart=/bin/sh -c 'echo 12G > /sys/block/zram0/disksize'
+ExecStart=/sbin/mkswap --label zram0 /dev/zram0
+# Priorité 100 : le noyau remplit zram avant le /swapfile disque (priorité négative).
+ExecStart=/sbin/swapon --priority 100 /dev/zram0
+ExecStop=/sbin/swapoff /dev/zram0
+ExecStopPost=/bin/sh -c 'echo 1 > /sys/block/zram0/reset || true'
+
+[Install]
+WantedBy=multi-user.target

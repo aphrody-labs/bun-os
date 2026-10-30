@@ -16,7 +16,7 @@ SupplementaryGroups=docker
 Environment=SIZE=1280x720
 ExecStartPre=/bin/sh -c 'install -d -m 700 /run/user/1000/gamescope-%i; docker rm -f aphrody-gamescope-%i >/dev/null 2>&1 || true'
 ExecStart=/bin/sh -c 'exec /usr/bin/docker run --rm --name aphrody-gamescope-%i --cpus 4 --memory 8g \
-  --device /dev/udmabuf --group-add $(stat -c %%g /dev/udmabuf) --device-cgroup-rule="c 13:* rmw" -v /dev/input:/dev/input:ro -v /run/udev:/run/udev:ro \
+  --cgroup-parent interactive.slice --device /dev/udmabuf --device /dev/kvm --group-add $(stat -c %%g /dev/udmabuf) --device-cgroup-rule="c 13:* rmw" -v /dev/input:/dev/input:ro -v /run/udev:/run/udev:ro \
   -v /run/user/1000/gamescope-%i:/run/user/1000 -v aphrody-gamescope-%i-home:/home/player \
   -e BUNOS_SESSION=%i -e BUNOS_SESSION_SIZE=$SIZE bunos-gaming:session'
 ExecStop=/usr/bin/docker stop -t 10 aphrody-gamescope-%i
