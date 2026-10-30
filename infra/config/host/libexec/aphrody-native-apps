@@ -8,7 +8,8 @@
 #   cosmic-src                    aphrody-labs/cosmic-epoch at the gitlink pinned by this repository, app submodules
 #   cosmic [app...]               build + package COSMIC apps (default: the session set, dependencies first)
 #   calculator                    aphrody-labs/cosmic-calculator (fork of cosmic-utils/cosmic-ext-calculator)
-#   spacedrive                    apps/spacedrive of this repository: sd-daemon, sd-server, desktop (Tauri)
+#   spacedrive                    aphrody-labs/spacedrive at the apps/spacedrive import: sd-daemon, sd-server, desktop
+#   aphrody                       crates/aphrody-chat and crates/aphrody-search (libcosmic), with desktop/metainfo/icon
 #   all                           everything above in order, one lane
 # Cargo runs through scripts/aphrody/build/rust/cargo-serial.sh (factory lock), 4 jobs. Run in tmux.
 set -eu
@@ -111,18 +112,35 @@ calculator() {
   deb cosmic-calculator "$(version_of "$d/Cargo.toml")+bunos$(git -C "$d" rev-parse --short HEAD)" "$s" "COSMIC Calculator"
 }
 
+# Spacedrive builds from the aphrody-labs/spacedrive fork at the revision imported under apps/spacedrive (its own
+# Cargo workspace and lock; root workspace membership waits on the lock regeneration, see a54a754c83).
+SPACEDRIVE_REV=${SPACEDRIVE_REV:-4d41a379f612e23ac43a66ffd67df52ca77f57d4}
 spacedrive() {
-  sd=$ROOT/apps/spacedrive; s=$WORK/stage/spacedrive; rm -rf "$s"
-  (cd "$sd" && nice -n 10 "$CARGO" build --release -j 4 --bin sd-daemon --bin sd-server)
+  sd=$WORK/src/spacedrive; clone "$sd" spacedrive "$SPACEDRIVE_REV"
+  s=$WORK/stage/spacedrive; rm -rf "$s"
+  (cd "$sd" && nice -n 10 "$CARGO" build --release --locked -j 4 --bin sd-daemon --bin sd-server)
   install -Dm755 "$sd/target/release/sd-daemon" "$s/usr/bin/sd-daemon"
   install -Dm755 "$sd/target/release/sd-server" "$s/usr/bin/sd-server"
-  (cd "$sd/apps/tauri" && bun install && bun run build && nice -n 10 "$CARGO" build --release -j 4 --manifest-path src-tauri/Cargo.toml)
+  (cd "$sd" && bun install && cd apps/tauri && bun run build)
+  (cd "$sd" && nice -n 10 "$CARGO" build --release --locked -j 4 -p spacedrive)
   install -Dm755 "$sd/target/release/Spacedrive" "$s/usr/bin/spacedrive"
   install -Dm644 "$ROOT/factory/native-apps/icons/spacedrive/icon.png" "$s/usr/share/icons/hicolor/256x256/apps/spacedrive.png"
   mkdir -p "$s/usr/share/applications"
   printf '[Desktop Entry]\nType=Application\nName=Spacedrive\nComment=The virtual distributed file manager\nExec=spacedrive\nIcon=spacedrive\nStartupWMClass=Spacedrive\nCategories=System;FileManager;\n' >"$s/usr/share/applications/spacedrive.desktop"
   install -Dm644 "$sd/LICENSE" "$s/usr/share/doc/spacedrive/copyright"
-  deb spacedrive "$(version_of "$sd/apps/tauri/src-tauri/Cargo.toml")+bunos$(git -C "$ROOT" rev-parse --short HEAD)" "$s" "Spacedrive file manager (core daemon, headless server, desktop)"
+  deb spacedrive "$(version_of "$sd/apps/tauri/src-tauri/Cargo.toml")+bunos$(git -C "$sd" rev-parse --short HEAD)" "$s" "Spacedrive file manager (core daemon, headless server, desktop)"
+}
+
+# Aphrody Chat and Aphrody Search: native libcosmic apps of this repository (crates/aphrody-chat, crates/aphrody-search).
+aphrody_app() { # aphrody_app <chat|search> <Chat|Search>
+  n=$1 N=$2 c=$ROOT/crates/aphrody-$1
+  (cd "$ROOT" && nice -n 10 "$CARGO" build --release -j 4 -p "aphrody-$n")
+  s=$WORK/stage/aphrody-$n; rm -rf "$s"
+  install -Dm755 "$ROOT/target/release/aphrody-$n" "$s/usr/bin/aphrody-$n"
+  install -Dm644 "$c/res/com.aphrody.$N.desktop" "$s/usr/share/applications/com.aphrody.$N.desktop"
+  install -Dm644 "$c/res/com.aphrody.$N.metainfo.xml" "$s/usr/share/metainfo/com.aphrody.$N.metainfo.xml"
+  install -Dm644 "$c/res/com.aphrody.$N.svg" "$s/usr/share/icons/hicolor/scalable/apps/com.aphrody.$N.svg"
+  deb "aphrody-$n" "$(version_of "$ROOT/Cargo.toml")+bunos$(git -C "$ROOT" rev-parse --short HEAD)" "$s" "Aphrody $N (native COSMIC app)"
 }
 
 cmd=${1:-all}; shift || true
@@ -133,6 +151,7 @@ cosmic-src) cosmic_src ;;
 cosmic) cosmic "$@" ;;
 calculator) calculator ;;
 spacedrive) spacedrive ;;
-all) deps; rio; cosmic_src; cosmic || true; calculator || true; spacedrive ;;
-*) echo "usage: $0 deps|rio|cosmic-src|cosmic [app...]|calculator|spacedrive|all" >&2; exit 2 ;;
+aphrody) aphrody_app chat Chat; aphrody_app search Search ;;
+all) deps; rio; aphrody_app chat Chat || true; aphrody_app search Search || true; cosmic_src; cosmic || true; calculator || true; spacedrive ;;
+*) echo "usage: $0 deps|rio|cosmic-src|cosmic [app...]|calculator|spacedrive|aphrody|all" >&2; exit 2 ;;
 esac
