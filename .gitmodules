@@ -1281,3 +1281,12 @@
 [submodule "vendor/pop-os"]
 	path = vendor/pop-os
 	url = https://github.com/aphrody-labs/pop.git
+[submodule "vendor/distinst"]
+	path = vendor/distinst
+	url = https://github.com/aphrody-labs/distinst.git
+[submodule "vendor/system76-power"]
+	path = vendor/system76-power
+	url = https://github.com/aphrody-labs/system76-power.git
+[submodule "vendor/system76-firmware"]
+	path = vendor/system76-firmware
+	url = https://github.com/aphrody-labs/system76-firmware.git
