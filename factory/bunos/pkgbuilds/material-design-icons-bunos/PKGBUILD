@@ -1,7 +1,7 @@
 # Material Symbols and icon fonts from the aphrody-labs/material-design-icons submodule.
 pkgname=material-design-icons-bunos
 pkgver=r1
-pkgrel=1
+pkgrel=2
 _commit=b45878038c54b89ec8405dce1da18aba6379f5df
 pkgdesc='Material Design icons and Material Symbols fonts for Bun OS'
 arch=('any')
@@ -16,4 +16,19 @@ package() {
   [[ -d font ]] && find font -type f \( -name '*.ttf' -o -name '*.otf' -o -name '*.woff2' \) -exec install -Dm644 -t "$pkgdir/usr/share/fonts/material-design-icons" {} +
   [[ -d symbols ]] && { install -dm755 "$pkgdir/usr/share/icons/material-symbols"; cp -a symbols/. "$pkgdir/usr/share/icons/material-symbols/"; }
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  # AppStream metadata for software centers (cosmic-store, GNOME Software, Discover).
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/metainfo/com.aphrody.bunos.MaterialSymbols.metainfo.xml" <<META
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="font">
+  <id>com.aphrody.bunos.MaterialSymbols</id>
+  <name>Material Symbols for Bun OS</name>
+  <summary>Material Design icons and Material Symbols fonts</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+  <developer id="com.aphrody"><name>Aphrody</name></developer>
+  <description><p>Material Design icon fonts and Material Symbols from aphrody-labs/material-design-icons, used by the Bun OS Material 3 interface.</p></description>
+  <url type="homepage">$url</url>
+  <content_rating type="oars-1.1"/>
+</component>
+META
 }

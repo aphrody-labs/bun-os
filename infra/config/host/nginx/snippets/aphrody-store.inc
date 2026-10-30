@@ -17,6 +17,9 @@ location ^~ /repo/ {
         application/vnd.flatpak.ref flatpakref;
         application/vnd.android.package-archive apk;
         application/gzip gz;
+        image/png png;
+        image/webp webp;
+        application/xml xml;
     }
     add_header Cache-Control "no-cache" always;
     add_header Access-Control-Allow-Origin "*" always;

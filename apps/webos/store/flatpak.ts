@@ -27,6 +27,28 @@ interface App {
   category: string;
   url: string;
   icon: string;
+  /** Real captures hosted under /repo/screenshots/. */
+  screenshots?: { url: string; caption: string }[];
+}
+
+/** Registry id "craft-pdf" becomes the product name "PDFCraft". */
+export function craftName(id: string): string {
+  const base = id.replace(/^craft-/, "");
+  return (["pdf", "cad"].includes(base) ? base.toUpperCase() : base[0]!.toUpperCase() + base.slice(1)) + "Craft";
+}
+
+/** Copy real captures into the served store and return their public URLs (missing files are left out). */
+async function hostScreenshots(ctx: Ctx, id: string, shots: { file: string; caption: string }[]) {
+  const out: { url: string; caption: string }[] = [];
+  const dir = join(ctx.store, "repo/screenshots");
+  await mkdir(dir, { recursive: true });
+  for (const [i, s] of shots.entries()) {
+    if (!(await Bun.file(s.file).exists())) continue;
+    const name = `${id}-${i + 1}.${s.file.split(".").pop()}`;
+    await cp(s.file, join(dir, name));
+    out.push({ url: `${ctx.origin}/repo/screenshots/${name}`, caption: s.caption });
+  }
+  return out;
 }
 
 async function apps(ctx: Ctx): Promise<App[]> {
@@ -45,13 +67,17 @@ async function apps(ctx: Ctx): Promise<App[]> {
       category: "System",
       url: `${ctx.origin}/os`,
       icon: fallback,
+      screenshots: await hostScreenshots(ctx, "com.aphrody.WebOS", [
+        { file: join(ctx.root, "apps/webos/public/screens/wide.webp"), caption: "The Bun OS desktop with its welcome window, launcher and dock" },
+        { file: join(ctx.root, "apps/webos/public/screens/narrow.webp"), caption: "The Bun OS desktop on a narrow screen" },
+      ]),
     },
   ];
   for (const p of registry.packages) {
     const own = join(dist, "apps", p.id, "aphrody-icon.png");
     list.push({
       id: `com.aphrody.webos.${camel(p.id)}`,
-      name: p.name,
+      name: p.id.startsWith("craft-") ? craftName(p.id) : p.name,
       summary: p.description,
       license: p.license,
       version: p.version.split("+")[0]!,
@@ -88,38 +114,72 @@ export async function build(ctx: Ctx): Promise<void> {
   const entries: IndexEntry[] = [];
   const skipped: { name: string; reason: string }[] = [];
   const sign = [`--gpg-sign=${fpr}`, `--gpg-homedir=${home}`];
+  // 1. Assemble each app tree: files/ carries the desktop file, icon and metainfo (AppStream compose input) and
+  //    export/ mirrors them for the host integration.
   for (const a of list) {
     const dir = join(work, a.id);
-    const share = join(dir, "export/share");
     await mkdir(join(dir, "files/bin"), { recursive: true });
-    await mkdir(join(share, "applications"), { recursive: true });
-    await mkdir(join(share, "metainfo"), { recursive: true });
-    await mkdir(join(share, "icons/hicolor/512x512/apps"), { recursive: true });
     await Bun.write(join(dir, "metadata"), `[Application]\nname=${a.id}\nruntime=${RUNTIME}\nsdk=${SDK}\ncommand=aphrody-open\n`);
     await Bun.write(join(dir, "files/bin/aphrody-open"), `#!/bin/sh\nexec xdg-open '${a.url}'\n`);
     await chmod(join(dir, "files/bin/aphrody-open"), 0o755);
-    await Bun.write(
-      join(share, "applications", `${a.id}.desktop`),
-      `[Desktop Entry]\nType=Application\nName=${a.name}\nComment=${a.summary}\nExec=aphrody-open\nIcon=${a.id}\nCategories=${a.category};\nTerminal=false\n`,
-    );
-    await cp(a.icon, join(share, "icons/hicolor/512x512/apps", `${a.id}.png`));
-    await Bun.write(
-      join(share, "metainfo", `${a.id}.metainfo.xml`),
-      `<?xml version="1.0" encoding="UTF-8"?>
+    const screenshots = a.screenshots?.length
+      ? `  <screenshots>\n${a.screenshots.map((s, i) => `    <screenshot${i ? "" : ' type="default"'}><caption>${esc(s.caption)}</caption><image type="source">${esc(s.url)}</image></screenshot>`).join("\n")}\n  </screenshots>\n`
+      : "";
+    for (const share of [join(dir, "files/share"), join(dir, "export/share")]) {
+      await mkdir(join(share, "applications"), { recursive: true });
+      await mkdir(join(share, "metainfo"), { recursive: true });
+      await mkdir(join(share, "icons/hicolor/512x512/apps"), { recursive: true });
+      await Bun.write(
+        join(share, "applications", `${a.id}.desktop`),
+        `[Desktop Entry]\nType=Application\nName=${a.name}\nComment=${a.summary}\nExec=aphrody-open\nIcon=${a.id}\nCategories=${a.category};\nTerminal=false\n`,
+      );
+      await cp(a.icon, join(share, "icons/hicolor/512x512/apps", `${a.id}.png`));
+      await Bun.write(
+        join(share, "metainfo", `${a.id}.metainfo.xml`),
+        `<?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>${a.id}</id>
   <name>${esc(a.name)}</name>
-  <summary>${esc(a.summary.slice(0, 120))}</summary>
+  <summary>${esc(a.summary.replace(/\.$/, "").slice(0, 120))}</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>${esc(a.license)}</project_license>
+  <developer id="com.aphrody"><name>Aphrody</name></developer>
   <description><p>${esc(a.summary)} Opens the app on ${esc(new URL(a.url).host)}, which installs it into your browser and keeps it available offline.</p></description>
   <launchable type="desktop-id">${a.id}.desktop</launchable>
+  <icon type="stock">${a.id}</icon>
   <url type="homepage">${ctx.origin}/apps</url>
-  <releases><release version="${esc(a.version)}" date="${new Date().toISOString().slice(0, 10)}"/></releases>
+${screenshots}  <releases><release version="${esc(a.version)}" date="${new Date().toISOString().slice(0, 10)}"/></releases>
   <content_rating type="oars-1.1"/>
 </component>
 `,
-    );
+      );
+    }
+  }
+  // 2. AppStream compose (Arch appstream, appstreamcli-compose) writes files/share/app-info/{xmls,icons}, which
+  //    `flatpak build-export --update-appstream` turns into the appstream/appstream2 branches with icons.
+  const composed = await docker(
+    "archlinux:latest",
+    `set -eu
+pacman -Sy --noconfirm --needed appstream >/dev/null 2>&1
+for d in /w/*/; do
+  id=$(basename "$d")
+  appstreamcli compose --no-net --origin=flatpak --prefix=/ --components="$id" --result-root="$d/files" \
+    --data-dir="$d/files/share/app-info/xmls" --icons-dir="$d/files/share/app-info/icons/flatpak" "$d/files" >/tmp/c.log 2>&1 || { echo "COMPOSE FAILED $id"; tail -n 8 /tmp/c.log; continue; }
+  mv "$d/files/share/app-info/xmls/flatpak.xml.gz" "$d/files/share/app-info/xmls/$id.xml.gz"
+  echo "composed $id: $(ls "$d/files/share/app-info/icons/flatpak" | tr '\n' ' ')"
+done
+chmod -R a+rwX /w`,
+    { mounts: [`${work}:/w`], timeout: 900_000 },
+  );
+  console.log(tail(composed.out, 20));
+  if (composed.code) throw new Error("AppStream compose failed");
+  // 3. Export into the signed OSTree repository.
+  for (const a of list) {
+    const dir = join(work, a.id);
+    if (!(await Bun.file(join(dir, "files/share/app-info/xmls", `${a.id}.xml.gz`)).exists())) {
+      skipped.push({ name: a.id, reason: "AppStream compose produced no catalog entry" });
+      continue;
+    }
     const r = await flatpak(["build-export", ...sign, "--update-appstream", repo, dir, BRANCH]);
     if (r.code) skipped.push({ name: a.id, reason: tail(r.out, 3) });
     else

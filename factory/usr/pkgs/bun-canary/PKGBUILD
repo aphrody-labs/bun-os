@@ -6,7 +6,7 @@ pkgname=bun-canary
 _npmver=1.4.4-canary.20261028.1
 pkgver=1.4.4.canary.20261028.1
 _rev=11c367163a4baa77d3627d14764c376c856a630a
-pkgrel=1
+pkgrel=2
 pkgdesc="Bun JavaScript and TypeScript runtime, official oven-sh/bun canary ${_npmver}"
 arch=(x86_64)
 url="https://github.com/oven-sh/bun"
@@ -30,4 +30,26 @@ package() {
   install -Dm755 package/bin/bun "${pkgdir}/usr/bin/bun"
   ln -s bun "${pkgdir}/usr/bin/bunx"
   install -Dm644 "LICENSE-${_rev:0:9}.md" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.md"
+  # AppStream metadata for software centers (cosmic-store, GNOME Software, Discover).
+  install -Dm644 /dev/stdin "${pkgdir}/usr/share/metainfo/sh.bun.bun.metainfo.xml" <<META
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="console-application">
+  <id>sh.bun.bun</id>
+  <name>Bun</name>
+  <summary>JavaScript and TypeScript runtime, bundler, test runner and package manager</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="sh.bun"><name>Oven</name></developer>
+  <description>
+    <p>Bun is the JavaScript and TypeScript runtime of Bun OS. This package is the official oven-sh/bun canary ${_npmver}, repackaged without changes.</p>
+    <p>It runs scripts, bundles, tests and installs npm packages with one binary.</p>
+  </description>
+  <url type="homepage">https://bun.sh</url>
+  <url type="vcs-browser">https://github.com/oven-sh/bun</url>
+  <provides><binary>bun</binary><binary>bunx</binary></provides>
+  <categories><category>Development</category></categories>
+  <releases><release version="${_npmver}"/></releases>
+  <content_rating type="oars-1.1"/>
+</component>
+META
 }

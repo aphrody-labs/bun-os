@@ -1,7 +1,7 @@
 # Bun OS font collection from the aphrody-labs/fonts submodule.
 pkgname=bun-os-fonts
 pkgver=r1
-pkgrel=1
+pkgrel=2
 _commit=9710da1eacb3be272583c3224dcb70f9da6eadbb
 pkgdesc='Bun OS fonts (aphrody-labs/fonts)'
 arch=('any')
@@ -17,4 +17,19 @@ package() {
     while read -r f; do install -Dm644 "$f" "$pkgdir/usr/share/fonts/bun-os/${f#./}"; done
   find . -path ./.git -prune -o -type f \( -iname 'LICENSE*' -o -iname 'OFL*' -o -iname 'NOTICE*' -o -iname 'COPYING*' \) -print |
     while read -r f; do install -Dm644 "$f" "$pkgdir/usr/share/licenses/$pkgname/${f#./}"; done
+  # AppStream metadata for software centers (cosmic-store, GNOME Software, Discover).
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/metainfo/com.aphrody.bunos.fonts.metainfo.xml" <<META
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="font">
+  <id>com.aphrody.bunos.fonts</id>
+  <name>Bun OS fonts</name>
+  <summary>Typefaces of the Bun OS desktop</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>OFL-1.1 AND Apache-2.0</project_license>
+  <developer id="com.aphrody"><name>Aphrody</name></developer>
+  <description><p>The font collection of Bun OS from aphrody-labs/fonts, installed under /usr/share/fonts/bun-os.</p></description>
+  <url type="homepage">$url</url>
+  <content_rating type="oars-1.1"/>
+</component>
+META
 }
