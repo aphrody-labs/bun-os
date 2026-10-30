@@ -61,4 +61,3 @@ function paeth(a: number, b: number, c: number) {
   const pc = Math.abs(p - c);
   return pa <= pb && pa <= pc ? a : pb <= pc ? b : c;
 }
-

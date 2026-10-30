@@ -23,7 +23,8 @@ const { values } = parseArgs({
     uid: { type: "string", default: "1000" },
   },
 });
-if (!values.import || !values.home) throw new Error("usage: --import <dir> --home <home> [--policy-root /] [--uid 1000]");
+if (!values.import || !values.home)
+  throw new Error("usage: --import <dir> --home <home> [--policy-root /] [--uid 1000]");
 
 /** Profile directories read by the Helium fork and by plain Chromium. */
 const PROFILE_DIRS = [".config/net.imput.helium/Default", ".config/chromium/Default"];
@@ -46,7 +47,12 @@ const PORTABLE = [
   "webkit",
 ];
 /** Keys inside "profile" that are portable (content settings, cookie and default content policies). */
-const PORTABLE_PROFILE = ["content_settings", "default_content_setting_values", "block_third_party_cookies", "cookie_controls_mode"];
+const PORTABLE_PROFILE = [
+  "content_settings",
+  "default_content_setting_values",
+  "block_third_party_cookies",
+  "cookie_controls_mode",
+];
 /** Content setting types that record the user's own allow/block decisions. */
 const PERMISSION_TYPES = [
   "automatic_downloads",
@@ -88,16 +94,21 @@ if (profile) {
 }
 // Window placement and per-machine browser state are not portable.
 if (portable.browser && typeof portable.browser === "object") {
-  const { window_placement: _w, app_window_placement: _a, last_known_google_url: _g, ...rest } = portable.browser as Record<string, unknown>;
+  const {
+    window_placement: _w,
+    app_window_placement: _a,
+    last_known_google_url: _g,
+    ...rest
+  } = portable.browser as Record<string, unknown>;
   portable.browser = rest;
 }
 
 const extensions = (await Bun.file(join(dir, "extensions.jsonl")).text())
   .split("\n")
-  .filter((line) => line.trim())
-  .map((line) => JSON.parse(line) as { id: string; name: string });
-const forced = extensions.filter((e) => /^[a-p]{32}$/.test(e.id) && !UNINSTALLABLE.has(e.id));
-const skipped = extensions.filter((e) => !forced.includes(e));
+  .filter(line => line.trim())
+  .map(line => JSON.parse(line) as { id: string; name: string });
+const forced = extensions.filter(e => /^[a-p]{32}$/.test(e.id) && !UNINSTALLABLE.has(e.id));
+const skipped = extensions.filter(e => !forced.includes(e));
 
 const uid = Number(values.uid);
 for (const rel of PROFILE_DIRS) {
@@ -116,7 +127,7 @@ for (const rel of PROFILE_DIRS) {
 }
 
 const policy = {
-  ExtensionInstallForcelist: forced.map((e) => `${e.id};${UPDATE_URL}`),
+  ExtensionInstallForcelist: forced.map(e => `${e.id};${UPDATE_URL}`),
   BrowserSignin: 1,
   SyncDisabled: false,
 };
@@ -128,10 +139,10 @@ for (const rel of POLICY_DIRS) {
 
 console.log(
   JSON.stringify({
-    profiles: PROFILE_DIRS.map((rel) => join(values.home!, rel)),
+    profiles: PROFILE_DIRS.map(rel => join(values.home!, rel)),
     preferences: Object.keys(portable),
-    forced: forced.map((e) => e.id),
-    skipped: skipped.map((e) => ({ id: e.id, reason: "not installable from the Chrome Web Store" })),
-    policies: POLICY_DIRS.map((rel) => join(values["policy-root"]!, rel)),
+    forced: forced.map(e => e.id),
+    skipped: skipped.map(e => ({ id: e.id, reason: "not installable from the Chrome Web Store" })),
+    policies: POLICY_DIRS.map(rel => join(values["policy-root"]!, rel)),
   }),
 );

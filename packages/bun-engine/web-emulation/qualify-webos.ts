@@ -283,10 +283,15 @@ const pageServer = Bun.serve({
     if (url.pathname === "/api/emulators") return Response.json({ emulators: EMULATORS }, { headers: isolation });
     const published = /^\/emulation\/(.+)$/.exec(url.pathname)?.[1];
     if (published) {
-      if (published.split("/").some((part) => !part || part === "." || part === "..")) return new Response("bad path", { status: 400 });
+      if (published.split("/").some(part => !part || part === "." || part === ".."))
+        return new Response("bad path", { status: 400 });
       const file = Bun.file(join(objects, "emulation", published));
       if (!(await file.exists())) return new Response("not found", { status: 404, headers: isolation });
-      const type = published.endsWith(".wasm") ? "application/wasm" : published.endsWith(".js") ? "text/javascript" : file.type;
+      const type = published.endsWith(".wasm")
+        ? "application/wasm"
+        : published.endsWith(".js")
+          ? "text/javascript"
+          : file.type;
       return new Response(file, { headers: { ...isolation, "content-type": type } });
     }
     const upstream = await fetch(`${base}${url.pathname}${url.search}`, { headers: request.headers });
@@ -305,7 +310,12 @@ try {
     let entry: QualificationEntry;
     if (emulator.mode === "session") {
       // Qualified by qualify-session.ts inside the Gamescope Gaming session; keep its last result.
-      entry = previous?.entries[emulator.id] ?? { id: emulator.id, status: "untested", errors: [], detail: emulator.reason };
+      entry = previous?.entries[emulator.id] ?? {
+        id: emulator.id,
+        status: "untested",
+        errors: [],
+        detail: emulator.reason,
+      };
     } else if (emulator.mode === "native") {
       entry = {
         id: emulator.id,

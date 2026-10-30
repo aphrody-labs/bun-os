@@ -260,14 +260,26 @@ export interface SessionLaunch {
   blocker?: string;
 }
 export const SESSION: Record<string, SessionLaunch> = {
-  retroarch: { package: "bunos-retroarch", app: "retroarch --appendconfig=/usr/share/bun-os/retroarch-vulkan.cfg -L /usr/lib/libretro/nestopia_libretro.so", rom: "tetanes-test-roms/spritecans.nes" },
+  retroarch: {
+    package: "bunos-retroarch",
+    app: "retroarch --appendconfig=/usr/share/bun-os/retroarch-vulkan.cfg -L /usr/lib/libretro/nestopia_libretro.so",
+    rom: "tetanes-test-roms/spritecans.nes",
+  },
   "melonds-native": { package: "melonds", app: "melonDS", rom: "godmode9i/GodMode9i.nds" },
   "azahar-native": { package: "azahar", app: "azahar", rom: "fbi/FBI.3dsx" },
   "tetanes-native": { package: "tetanes", app: "tetanes", rom: "tetanes-test-roms/spritecans.nes" },
   mgba: { package: "mgba-qt", app: "mgba-qt", rom: "gba-tests/hello.gba" },
   ares: { package: "ares-emu", app: "ares", rom: "tetanes-test-roms/spritecans.nes" },
-  dolphin: { package: "bunos-dolphin-emu", app: "dolphin-emu", blocker: "no free GameCube/Wii homebrew fixture pinned yet" },
-  pcsx2: { package: "pcsx2", app: "pcsx2-qt", blocker: "PlayStation 2 needs the user's own BIOS; no open replacement exists" },
+  dolphin: {
+    package: "bunos-dolphin-emu",
+    app: "dolphin-emu",
+    blocker: "no free GameCube/Wii homebrew fixture pinned yet",
+  },
+  pcsx2: {
+    package: "pcsx2",
+    app: "pcsx2-qt",
+    blocker: "PlayStation 2 needs the user's own BIOS; no open replacement exists",
+  },
   cemu: { package: "cemu", app: "Cemu", blocker: "Wii U titles need the user's keys" },
   rpcs3: { package: "rpcs3", app: "rpcs3", blocker: "PlayStation 3 needs the user's firmware (PS3UPDAT.PUP)" },
   xemu: { package: "xemu", app: "xemu", blocker: "Xbox needs the user's MCPX boot ROM and BIOS" },
@@ -278,7 +290,11 @@ export const SESSION: Record<string, SessionLaunch> = {
   gopher64: { package: "gopher64", app: "gopher64", blocker: "no free Nintendo 64 homebrew fixture pinned yet" },
   mame: { package: "mame", app: "mame", blocker: "no free arcade ROM pinned yet" },
   wine: { package: "wine", app: "wine notepad" },
-  proton: { package: "proton-bunos", app: "umu-run winecfg", blocker: "aphrody-labs/Proton and umu-launcher are not packaged yet" },
+  proton: {
+    package: "proton-bunos",
+    app: "umu-run winecfg",
+    blocker: "aphrody-labs/Proton and umu-launcher are not packaged yet",
+  },
 };
 for (const [id, name, systems, owner] of [
   ["melonds-native", "melonDS (native, Gamescope session)", ["nds"], "vendor/melonds"],
