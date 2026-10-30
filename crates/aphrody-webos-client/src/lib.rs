@@ -12,12 +12,15 @@
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use aphrody_webos_protocol::{GamepadState, Input, OsEntry, ServerEvent, SessionInfo, StartSession};
+use aphrody_webos_protocol::{
+    GamepadState, Input, OsEntry, ServerEvent, SessionInfo, StartSession,
+};
 use wasm_bindgen::{JsCast, JsValue, prelude::*};
 use wasm_bindgen_futures::{JsFuture, spawn_local};
 use web_sys::{
-    BinaryType, Blob, CanvasRenderingContext2d, Document, Element, HtmlCanvasElement, ImageBitmap, KeyboardEvent,
-    MessageEvent, PointerEvent, Request, RequestInit, Response, WebSocket, WheelEvent, Window,
+    BinaryType, Blob, CanvasRenderingContext2d, Document, Element, HtmlCanvasElement, ImageBitmap,
+    KeyboardEvent, MessageEvent, PointerEvent, Request, RequestInit, Response, WebSocket,
+    WheelEvent, Window,
 };
 
 fn window() -> Window {
@@ -40,7 +43,9 @@ fn el(tag: &str, class: &str, text: &str) -> Result<Element, JsValue> {
 }
 
 fn root() -> Result<Element, JsValue> {
-    document().get_element_by_id("app").ok_or_else(|| JsValue::from_str("#app is missing"))
+    document()
+        .get_element_by_id("app")
+        .ok_or_else(|| JsValue::from_str("#app is missing"))
 }
 
 fn status(text: &str) -> Result<(), JsValue> {
@@ -50,7 +55,11 @@ fn status(text: &str) -> Result<(), JsValue> {
     Ok(())
 }
 
-async fn fetch_json(method: &str, path: &str, body: Option<String>) -> Result<(u16, String), JsValue> {
+async fn fetch_json(
+    method: &str,
+    path: &str,
+    body: Option<String>,
+) -> Result<(u16, String), JsValue> {
     let init = RequestInit::new();
     init.set_method(method);
     if let Some(body) = body {
@@ -60,13 +69,20 @@ async fn fetch_json(method: &str, path: &str, body: Option<String>) -> Result<(u
     if method != "GET" {
         request.headers().set("content-type", "application/json")?;
     }
-    let response: Response = JsFuture::from(window().fetch_with_request(&request)).await?.dyn_into()?;
-    let text = JsFuture::from(response.text()?).await?.as_string().unwrap_or_default();
+    let response: Response = JsFuture::from(window().fetch_with_request(&request))
+        .await?
+        .dyn_into()?;
+    let text = JsFuture::from(response.text()?)
+        .await?
+        .as_string()
+        .unwrap_or_default();
     Ok((response.status(), text))
 }
 
 fn error_text(body: &str) -> String {
-    serde_json::from_str::<aphrody_webos_protocol::ApiError>(body).map(|e| e.error).unwrap_or_else(|_| body.into())
+    serde_json::from_str::<aphrody_webos_protocol::ApiError>(body)
+        .map(|e| e.error)
+        .unwrap_or_else(|_| body.into())
 }
 
 async fn picker() -> Result<(), JsValue> {
@@ -80,7 +96,11 @@ async fn picker() -> Result<(), JsValue> {
     let r = root()?;
     r.set_inner_html("");
     r.append_child(&el("h1", "", "Bun OS in your browser")?)?;
-    r.append_child(&el("p", "lead", "Pick an operating system. It runs on Bun OS and streams to this tab.")?)?;
+    r.append_child(&el(
+        "p",
+        "lead",
+        "Pick an operating system. It runs on Bun OS and streams to this tab.",
+    )?)?;
     let list = el("ul", "os-list", "")?;
     for entry in entries {
         let item = el("li", "", "")?;
@@ -89,13 +109,23 @@ async fn picker() -> Result<(), JsValue> {
         button.append_child(&el("span", "", &entry.summary)?)?;
         if !entry.available {
             button.set_attribute("disabled", "")?;
-            button.append_child(&el("em", "", entry.reason.as_deref().unwrap_or("Not available on this host."))?)?;
+            button.append_child(&el(
+                "em",
+                "",
+                entry
+                    .reason
+                    .as_deref()
+                    .unwrap_or("Not available on this host."),
+            )?)?;
         }
         let os = entry.id;
         let click = Closure::<dyn FnMut()>::new(move || {
             spawn_local(async move {
                 if let Err(e) = start(os).await {
-                    let _ = status(&format!("The session could not start: {}", e.as_string().unwrap_or_default()));
+                    let _ = status(&format!(
+                        "The session could not start: {}",
+                        e.as_string().unwrap_or_default()
+                    ));
                 }
             });
         });
@@ -114,7 +144,8 @@ async fn start(os: aphrody_webos_protocol::OsId) -> Result<(), JsValue> {
     let ratio = w.device_pixel_ratio().max(1.0);
     let width = (w.inner_width()?.as_f64().unwrap_or(1280.0) * ratio) as u32;
     let height = (w.inner_height()?.as_f64().unwrap_or(720.0) * ratio) as u32;
-    let body = serde_json::to_string(&StartSession { os, width, height }).map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let body = serde_json::to_string(&StartSession { os, width, height })
+        .map_err(|e| JsValue::from_str(&e.to_string()))?;
     let (code, text) = fetch_json("POST", "/api/sessions", Some(body)).await?;
     if !(200..300).contains(&code) {
         return Err(JsValue::from_str(&error_text(&text)));
@@ -151,10 +182,16 @@ fn stream(session: SessionInfo) -> Result<(), JsValue> {
     let canvas: HtmlCanvasElement = el("canvas", "stream", "")?.dyn_into()?;
     canvas.set_tab_index(0);
     r.append_child(&canvas)?;
-    let ctx: CanvasRenderingContext2d =
-        canvas.get_context("2d")?.ok_or_else(|| JsValue::from_str("no 2d context"))?.dyn_into()?;
+    let ctx: CanvasRenderingContext2d = canvas
+        .get_context("2d")?
+        .ok_or_else(|| JsValue::from_str("no 2d context"))?
+        .dyn_into()?;
     let location = window().location();
-    let scheme = if location.protocol()? == "https:" { "wss" } else { "ws" };
+    let scheme = if location.protocol()? == "https:" {
+        "wss"
+    } else {
+        "ws"
+    };
     let url = format!("{scheme}://{}{}", location.host()?, session.stream);
     let protocols = js_sys::Array::of1(&JsValue::from_str(&format!("bearer.{}", session.token)));
     let ws = WebSocket::new_with_str_sequence(&url, &protocols)?;
@@ -176,12 +213,18 @@ fn stream(session: SessionInfo) -> Result<(), JsValue> {
                 }
                 return;
             }
-            let Ok(blob) = event.data().dyn_into::<Blob>() else { return };
+            let Ok(blob) = event.data().dyn_into::<Blob>() else {
+                return;
+            };
             let canvas = canvas.clone();
             let ctx = ctx.clone();
             spawn_local(async move {
-                let Ok(promise) = window().create_image_bitmap_with_blob(&blob) else { return };
-                let Ok(bitmap) = JsFuture::from(promise).await else { return };
+                let Ok(promise) = window().create_image_bitmap_with_blob(&blob) else {
+                    return;
+                };
+                let Ok(bitmap) = JsFuture::from(promise).await else {
+                    return;
+                };
                 let bitmap: ImageBitmap = bitmap.unchecked_into();
                 if canvas.width() != bitmap.width() || canvas.height() != bitmap.height() {
                     canvas.set_width(bitmap.width());
@@ -207,9 +250,20 @@ fn stream(session: SessionInfo) -> Result<(), JsValue> {
         let canvas = canvas.clone();
         move |x: f64, y: f64| {
             let rect = canvas.get_bounding_client_rect();
-            let sx = if rect.width() > 0.0 { f64::from(canvas.width()) / rect.width() } else { 1.0 };
-            let sy = if rect.height() > 0.0 { f64::from(canvas.height()) / rect.height() } else { 1.0 };
-            (((x - rect.left()) * sx) as f32, ((y - rect.top()) * sy) as f32)
+            let sx = if rect.width() > 0.0 {
+                f64::from(canvas.width()) / rect.width()
+            } else {
+                1.0
+            };
+            let sy = if rect.height() > 0.0 {
+                f64::from(canvas.height()) / rect.height()
+            } else {
+                1.0
+            };
+            (
+                ((x - rect.left()) * sx) as f32,
+                ((y - rect.top()) * sy) as f32,
+            )
         }
     };
     for name in ["pointermove", "pointerdown", "pointerup"] {
@@ -222,28 +276,53 @@ fn stream(session: SessionInfo) -> Result<(), JsValue> {
                 let _ = canvas.set_pointer_capture(e.pointer_id());
             }
             let (x, y) = to_stream(f64::from(e.client_x()), f64::from(e.client_y()));
-            send(&ws, &Input::Pointer { x, y, buttons: e.buttons() as u8 });
+            send(
+                &ws,
+                &Input::Pointer {
+                    x,
+                    y,
+                    buttons: e.buttons() as u8,
+                },
+            );
         })?;
     }
     {
         let ws = ws.clone();
         listen(&target, "wheel", move |e: WheelEvent| {
             e.prevent_default();
-            send(&ws, &Input::Wheel { dx: e.delta_x() as f32, dy: e.delta_y() as f32 });
+            send(
+                &ws,
+                &Input::Wheel {
+                    dx: e.delta_x() as f32,
+                    dy: e.delta_y() as f32,
+                },
+            );
         })?;
     }
-    listen(&target, "contextmenu", |e: web_sys::Event| e.prevent_default())?;
+    listen(&target, "contextmenu", |e: web_sys::Event| {
+        e.prevent_default()
+    })?;
     for (name, down) in [("keydown", true), ("keyup", false)] {
         let ws = ws.clone();
         listen(&target, name, move |e: KeyboardEvent| {
             e.prevent_default();
-            send(&ws, &Input::Key { code: e.code(), key: e.key(), down });
+            send(
+                &ws,
+                &Input::Key {
+                    code: e.code(),
+                    key: e.key(),
+                    down,
+                },
+            );
         })?;
     }
     {
         let ws = ws.clone();
         listen(&target, "paste", move |e: web_sys::ClipboardEvent| {
-            if let Some(text) = e.clipboard_data().and_then(|d| d.get_data("text/plain").ok()) {
+            if let Some(text) = e
+                .clipboard_data()
+                .and_then(|d| d.get_data("text/plain").ok())
+            {
                 send(&ws, &Input::Clipboard { text });
             }
         })?;
@@ -253,8 +332,18 @@ fn stream(session: SessionInfo) -> Result<(), JsValue> {
         let resize = move |_: web_sys::Event| {
             let w = window();
             let ratio = w.device_pixel_ratio().max(1.0);
-            let width = (w.inner_width().ok().and_then(|v| v.as_f64()).unwrap_or(1280.0) * ratio) as u32;
-            let height = (w.inner_height().ok().and_then(|v| v.as_f64()).unwrap_or(720.0) * ratio) as u32;
+            let width = (w
+                .inner_width()
+                .ok()
+                .and_then(|v| v.as_f64())
+                .unwrap_or(1280.0)
+                * ratio) as u32;
+            let height = (w
+                .inner_height()
+                .ok()
+                .and_then(|v| v.as_f64())
+                .unwrap_or(720.0)
+                * ratio) as u32;
             send(&ws, &Input::Resize { width, height });
         };
         listen(&window().into(), "resize", resize)?;
@@ -266,7 +355,8 @@ fn stream(session: SessionInfo) -> Result<(), JsValue> {
 
 /// Polls the Gamepad API every animation frame and sends a full snapshot of each pad that changed.
 fn gamepads(ws: WebSocket) -> Result<(), JsValue> {
-    let last: Rc<RefCell<[Option<GamepadState>; 4]>> = Rc::new(RefCell::new([None, None, None, None]));
+    let last: Rc<RefCell<[Option<GamepadState>; 4]>> =
+        Rc::new(RefCell::new([None, None, None, None]));
     let frame: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
     let again = frame.clone();
     let running = Rc::new(Cell::new(true));
@@ -289,7 +379,12 @@ fn gamepads(ws: WebSocket) -> Result<(), JsValue> {
                     for (i, a) in pad.axes().iter().take(4).enumerate() {
                         axes[i] = a.as_f64().unwrap_or(0.0) as f32;
                     }
-                    GamepadState { pad: slot as u8, connected: pad.connected(), buttons, axes }
+                    GamepadState {
+                        pad: slot as u8,
+                        connected: pad.connected(),
+                        buttons,
+                        axes,
+                    }
                 });
                 let mut last = last.borrow_mut();
                 let previous = &mut last[slot as usize];
@@ -300,7 +395,13 @@ fn gamepads(ws: WebSocket) -> Result<(), JsValue> {
                         *previous = state.clone();
                     }
                     (None, Some(before)) => {
-                        send(&ws, &Input::Gamepad(GamepadState { connected: false, ..before.clone() }));
+                        send(
+                            &ws,
+                            &Input::Gamepad(GamepadState {
+                                connected: false,
+                                ..before.clone()
+                            }),
+                        );
                         *previous = None;
                     }
                     (None, None) => {}
@@ -322,7 +423,10 @@ fn gamepads(ws: WebSocket) -> Result<(), JsValue> {
 pub fn main() {
     spawn_local(async {
         if let Err(e) = picker().await {
-            let _ = status(&format!("aphrody.com could not start: {}", e.as_string().unwrap_or_else(|| format!("{e:?}"))));
+            let _ = status(&format!(
+                "aphrody.com could not start: {}",
+                e.as_string().unwrap_or_else(|| format!("{e:?}"))
+            ));
         }
     });
 }
