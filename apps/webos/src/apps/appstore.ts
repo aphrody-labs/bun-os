@@ -326,7 +326,7 @@ export async function appStore(
         ),
       ),
       actions(a),
-      commands(a),
+      commands(a) ?? "",
     );
     const facts: [string, string][] = [
       ["Version", a.version],

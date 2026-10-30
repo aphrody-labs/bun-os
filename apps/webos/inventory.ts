@@ -587,7 +587,7 @@ async function osPackageMembers(out: Detail[]) {
         { label: "Arch package search", url: `https://archlinux.org/packages/?q=${encodeURIComponent(name)}` },
         sourceLink(`factory/arch/${catalog}`),
       ],
-      surface: surface("ospackages", id, "info", "Package page: catalog, list and upstream search link."),
+      surface: surface("ospackages", id, "viewer", "Package page: catalog, list and upstream search link."),
       data,
     });
   };
@@ -619,7 +619,7 @@ async function engineMembers(out: Detail[]) {
       run: "data",
       tags: ["console", c.route],
       links: [sourceLink("scripts/emulation/consoles.json")],
-      surface: surface("engines", `console/${c.id}`, c.id === "nintendo-ds" ? "app" : "info", c.id === "nintendo-ds" ? "Runs in the desktop as the Nintendo DS app." : "Status page: core, route, required content and qualification state.", c.id === "nintendo-ds" ? { opens: "ds" } : {}),
+      surface: surface("engines", `console/${c.id}`, c.id === "nintendo-ds" ? "app" : "viewer", c.id === "nintendo-ds" ? "Runs in the desktop as the Nintendo DS app." : "Status page: core, route, required content and qualification state.", c.id === "nintendo-ds" ? { opens: "ds" } : {}),
       data: c,
     });
   for (const entry of children("packages/bun-engine/src"))
@@ -630,7 +630,7 @@ async function engineMembers(out: Detail[]) {
 
 /** The game library and the emulators that always ship in the shell, plus every game package of the registry. */
 async function gameMembers(out: Detail[], games: { id: string; name: string; description: string; version?: string; license?: string }[]) {
-  const fixed = [
+  const fixed: typeof games = [
     { id: "play", name: "Play", description: APPS.workspace.find((w) => w.id === "play")?.desc ?? "Bun Engine game library and the qualified emulators." },
     { id: "ds", name: "Nintendo DS", description: "The qualified Dust Nintendo DS emulator of Bun Engine, with open-source test content." },
   ];
@@ -656,7 +656,7 @@ async function gameMembers(out: Detail[], games: { id: string; name: string; des
       name: "Inazuma Eleven: Victory Road (IEVR)",
       desc: "IEVR tooling: the IECODE web, .NET and C++ owners, the ieverse and inagle libraries and the aphrody-nie engine crates. The game is read from your own install; no game files are hosted.",
       tags: ["launcher", "level5"],
-      test: (m) => /^(iecode-(web|dotnet|cpp|homebrew|scripts)|ieverse|inagle|aphrody-nie-)/.test(m.id) && m.kind !== "docs" && m.kind !== "ospackages",
+      test: (m) => /^(iecode-(web|dotnet|cpp|homebrew|scripts)|ieverse|inagle|aphrody-nie-)/.test(m.id) && m.kind !== "ospackages",
     },
     {
       id: "dbxv2",
@@ -697,7 +697,7 @@ async function gameMembers(out: Detail[], games: { id: string; name: string; des
       run: "data",
       tags: ["game", ...o.tags],
       links: [],
-      surface: surface("games", o.id, "info", o.tags.includes("private") ? "Private-aware info page: owners and status only, no game content." : "Launcher page: owners, status and how to run it from your own install."),
+      surface: surface("games", o.id, "viewer", o.tags.includes("private") ? "Private-aware info page: owners and status only, no game content." : "Launcher page: owners, status and how to run it from your own install."),
       members,
       meta: { owners: members.length },
     });
@@ -717,7 +717,7 @@ function privatize(m: Detail) {
   m.links = [];
   m.meta = {};
   m.tags = [...new Set([...m.tags, "private"])];
-  m.surface = surface(m.kind, m.id, "info", "Private owner material: the member is listed, its content is not published.");
+  m.surface = surface(m.kind, m.id, "viewer", "Private owner material: the member is listed, its content is not published.");
 }
 
 async function sourceMembers(out: Detail[]) {
@@ -741,7 +741,7 @@ async function sourceMembers(out: Detail[]) {
       run: "data",
       tags: ["submodule", ...(/update\s*=\s*none/.test(block) ? ["on-demand"] : [])],
       links: [{ label: "Repository", url: repo }, sourceLink(path)],
-      surface: surface("sources", id, "info", "Source page: upstream repository, pinned revision, checkout policy and links."),
+      surface: surface("sources", id, "viewer", "Source page: upstream repository, pinned revision, checkout policy and links."),
       meta: { url, revision: revisions.get(path) },
     });
   }
@@ -759,7 +759,7 @@ async function sourceMembers(out: Detail[]) {
       run: "data",
       tags: [c.integration ?? "component"],
       links: c.repository ? [{ label: "Repository", url: `https://github.com/${c.repository}` }] : [],
-      surface: surface("sources", sid, "info", "Source page: owner, integration state and pinned revision."),
+      surface: surface("sources", sid, "viewer", "Source page: owner, integration state and pinned revision."),
       meta: { revision: c.integratedRevision },
       data: c,
     });
