@@ -278,24 +278,6 @@
       ]
     },
     {
-      "id": "bun-discord",
-      "parallel": false,
-      "steps": [
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/discord-kit", "typecheck"]
-        },
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/discord-kit", "test"]
-        },
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/discord-kit", "build"]
-        }
-      ]
-    },
-    {
       "id": "bun-apps",
       "parallel": false,
       "steps": [

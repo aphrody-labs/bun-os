@@ -117,7 +117,6 @@
     },
     { "id": "maps", "name": "Google Maps", "url": "https://maps.google.com" },
     { "id": "whatsapp", "name": "WhatsApp", "url": "https://web.whatsapp.com" },
-    { "id": "discord", "name": "Discord", "url": "https://discord.com/app" },
     { "id": "outlook", "name": "Outlook", "url": "https://outlook.office.com" },
     { "id": "word", "name": "Word", "url": "https://word.cloud.microsoft" },
     { "id": "teams", "name": "Teams", "url": "https://teams.microsoft.com" }

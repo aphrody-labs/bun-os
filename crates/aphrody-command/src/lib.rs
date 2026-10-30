@@ -22,10 +22,6 @@ mod config_cmd;
 #[cfg(not(target_arch = "wasm32"))]
 mod context;
 #[cfg(not(target_arch = "wasm32"))]
-mod discord_cmd;
-#[cfg(not(target_arch = "wasm32"))]
-mod discord_compiler;
-#[cfg(not(target_arch = "wasm32"))]
 mod docs_cmd;
 #[cfg(not(target_arch = "wasm32"))]
 mod ecosystem;
@@ -392,12 +388,6 @@ enum Commands {
     Mcp {
         #[command(subcommand)]
         action: McpAction,
-    },
-    /// Discord bot compilation, inspection, and monorepo verification.
-    #[cfg(not(target_arch = "wasm32"))]
-    Discord {
-        #[command(subcommand)]
-        action: discord_cmd::DiscordAction,
     },
     /// Native Git inspection, GitHub REST/GraphQL, and ecosystem distribution.
     #[cfg(not(target_arch = "wasm32"))]
@@ -1298,9 +1288,6 @@ async fn dispatch(ctx: &GoogleContext, cli: Cli) -> miette::Result<()> {
                 .await?;
             }
         },
-        Some(Commands::Discord { action }) => {
-            discord_cmd::run_discord(action).await?;
-        }
         Some(Commands::Git { action }) => {
             git_cmd::run(action).await?;
         }

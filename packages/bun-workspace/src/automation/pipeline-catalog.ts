@@ -13,7 +13,6 @@ const DOMAIN_ORDER = [
   "web",
   "google",
   "ai",
-  "discord",
   "fut",
   "rg",
 ];

@@ -14,7 +14,6 @@
       "docker-model-runner": "Docker Model Runner 12434",
       "aphrody-mcp-http-1": "aphrody:toolbox, aphrody-mcp http 127.0.0.1:8793 for the wg clients (341 tools)",
       "aphrody-jobs-worker-1": "aphrody:toolbox, aphrody job run (jobs.db in ~/.aphrody)",
-      "aphrody-discord-1": "Bun image, bot.aphrody.com 127.0.0.1:4010 (atomic-deploy-aphrody-discord.sh recreates it)",
       "aphrody-downloads-1": "Bun image, aphrody.com and downloads.aphrody.com 127.0.0.1:8797 (publish-downloads.ts)",
       "aphrody-fonts-proxy-1": "Bun image, cdn.aphrody.com 127.0.0.1:8796 (source ~/apps/cdn/src at REVISION)"
     }
@@ -31,7 +30,6 @@
       "aphrody-web-browser-dbfr.service": "Obscura CDP 127.0.0.1:9222",
       "aphrody-wg-proxy@.socket aphrody-wg-proxy@.service": "wg1 forwarder 10.200.77.3:8793 to loopback",
       "aphrody-selfheal.timer certbot.timer": "self-heal pass, certificate renewal",
-      "aphrody-discord-ai-lab.service aphrody-discord-debate.service": "disabled lab units (Bun)",
       "nginx.service redis-server.service": "kept masked (/dev/null) as a guard: a reinstalled host nginx or redis cannot take 80/443/6379 from the containers"
     },
     "bin": {

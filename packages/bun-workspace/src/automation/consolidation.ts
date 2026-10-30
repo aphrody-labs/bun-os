@@ -945,7 +945,6 @@ export async function runConsolidation(args: string[]): Promise<number> {
       ["aphrody-ai", "ai", "extract"],
       ["aphrody-compat", "compat", "extract"],
       ["aphrody-contracts", "contracts", "extract"],
-      ["aphrody-discord", "discord", "extract"],
       ["aphrody-infra", "infra", "orchestrator-split"],
       ["aphrody-koharu", "koharu", "extract"],
       ["aphrody-native", "native", "extract"],

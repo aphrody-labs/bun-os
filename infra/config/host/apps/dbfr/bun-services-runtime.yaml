@@ -4,9 +4,6 @@ services:
   downloads:
     volumes:
       - /home/ubuntu/.local/share/aphrody-runtime-20261011/bun-linux-x64/bun:/usr/local/bin/bun:ro
-  discord:
-    volumes:
-      - /home/ubuntu/.local/share/aphrody-runtime-20261011/bun-linux-x64/bun:/usr/local/bin/bun:ro
   fonts-proxy:
     volumes:
       - /home/ubuntu/.local/share/aphrody-runtime-20261011/bun-linux-x64/bun:/usr/local/bin/bun:ro

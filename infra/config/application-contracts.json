@@ -1,18 +1,6 @@
 {
   "schemaVersion": 1,
   "authority": "aphrody-infra",
-  "sharedDiscord": {
-    "repository": "aphrody-discord",
-    "role": "transport-and-framework-adapters",
-    "consumers": ["aphrody", "nie"],
-    "invariants": [
-      "one-gateway-connection-per-discord-application",
-      "gateway-and-http-interactions-are-explicitly-exclusive",
-      "applications-retain-domain-commands-data-auth-and-secrets"
-    ],
-    "release": "published-package-or-immutable-sha",
-    "deploymentAuthority": "aphrody-infra"
-  },
   "applications": {
     "nie": {
       "role": "specialized-engine-and-3d-asset-plane",

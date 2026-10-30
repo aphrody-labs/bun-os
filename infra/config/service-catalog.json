@@ -164,23 +164,6 @@
       "note": "Persistent authenticated Aphrody OpenAI-compatible gateway on DBFR, bound to loopback only. Forwards to the local llama server at 127.0.0.1:8799/v1; no Nginx route or public inference endpoint."
     },
     {
-      "id": "aphrody-discord-dev",
-      "application": "aphrody-discord",
-      "kind": "discord-interactions-and-gateway",
-      "runtime": "bun",
-      "unit": "aphrody-discord-dev.service",
-      "container": "aphrody-discord-1",
-      "health": "http://127.0.0.1:4010/healthz",
-      "port": 4010,
-      "sourceRepo": "aphrody-discord",
-      "workingDirectory": "/home/ubuntu/apps/discord/current",
-      "releaseRoot": "/home/ubuntu/apps/discord/releases",
-      "publicProxy": "nginx",
-      "note": "bot.aphrody.com resolves to the vps and answers 410 (reserved) there; the interactions endpoint stays private until a route to this origin is declared.",
-      "public": false,
-      "host": "dbfr"
-    },
-    {
       "id": "aphrody-site",
       "application": "aphrody",
       "kind": "rust-site",

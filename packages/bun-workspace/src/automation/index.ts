@@ -55,8 +55,6 @@ export { runRepositoryHealth } from "./repository-health.ts";
 export { runWorkspaceRepair } from "./workspace-repair.ts";
 export { runCargoPackageRepair } from "./cargo-package-repair.ts";
 export { runCargoReleaseAudit, auditCargoRelease, classifyRequirements } from "./cargo-release-audit.ts";
-export { getDiscordBotsStatus, runDiscord } from "./discord.ts";
-export type { DiscordBotStatus } from "./discord.ts";
 
 export { pipelineCatalog, runPipelineCatalog } from "./pipeline-catalog.ts";
 export { collectAgentLive, runAgentLive } from "./agent-live.ts";

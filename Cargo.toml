@@ -64,7 +64,6 @@ members = [
   "crates/aphrody-remote-desktop",
   "crates/aphrody-ovh",
   "crates/aphrody-infra",
-  "crates/aphrody-discord",
   "crates/aphrody-certificates",
   "crates/aphrody-command-wasm",
   "crates/aphrody-command-pure",

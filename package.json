@@ -50,7 +50,6 @@
     "packages/buncc",
     "packages/canvas",
     "packages/cli-wasm",
-    "packages/discord-kit",
     "packages/doc-ai",
     "packages/docs-sync",
     "packages/ds-dotnet",
@@ -410,7 +409,6 @@
     "zod": "^4.6.5",
     "zustand": "^5.0.15",
     "@ai-sdk/google-vertex": "^5.0.98",
-    "@discordjs/rest": "^2.6.3",
     "@googleapis/docs": "^14.1.0",
     "@googleapis/drive": "^26.0.2",
     "@mkkellogg/gaussian-splats-3d": "^0.4.7",
@@ -436,9 +434,6 @@
     "ai": "^7.0.122",
     "cheerio": "^1.2.0",
     "d3": "^7.9.0",
-    "discord-api-types": "^0.38.56",
-    "discord.js": "^14.27.0",
-    "discordx": "11.13.3",
     "google-auth-library": "11.1.0",
     "graphql": "17.0.2",
     "happy-dom": "^20.14.5",
@@ -529,7 +524,6 @@
     "jsdom": "^29.1.1",
     "tailwindcss-animate": "^1.0.7",
     "@aphrody/canvas": "1.0.9-aphrody.6",
-    "@aphrody/discord-kit": "0.1.2",
     "@colyseus/bun-websockets": "^0.18.3",
     "@colyseus/core": "^0.18.17",
     "@colyseus/schema": "^5.0.34",
@@ -600,7 +594,6 @@
   },
   "patchedDependencies": {
     "@ag-ui/core@1.0.1": "patches/ag-ui-core-1.0.1.patch",
-    "@aphrody/agent-browser@1.0.0-canary.2": "patches/aphrody/@aphrody%2Fagent-browser@1.0.0-canary.2.patch",
-    "@discordjs/rest@2.6.3": "patches/aphrody/@discordjs%2Frest@2.6.3.patch"
+    "@aphrody/agent-browser@1.0.0-canary.2": "patches/aphrody/@aphrody%2Fagent-browser@1.0.0-canary.2.patch"
   }
 }

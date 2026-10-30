@@ -23,7 +23,6 @@
       "aphrody-desktop-xvfb.service aphrody-desktop-wm.service aphrody-remote.service": "virtual desktop and VNC on wg1 (host X11)",
       "aphrody-mullvad-netns.service aphrody-mullvad-socks.service aphrody-mullvad-loopback.socket aphrody-mullvad-loopback.service": "Japan-only egress namespace, private SOCKS5 listener and loopback-only SSH bridge for Aphrody Web crawl; never changes the VPS default route or public firewall",
       "aphrody-site.service": "kept native (measured 2026-10-09): static Rust site on public 0.0.0.0:80 (vps.aphrody.com), 4.5 MB RSS, 1.6 ms local response, systemd sandbox (ProtectSystem=strict, only CAP_NET_BIND_SERVICE, dedicated user); a container adds image and daemon overhead and a Docker-published :80 would bypass ufw",
-      "aphrody-discord-sync.timer": "Discord sync tick (Bun)",
       "aphrody-selfheal.timer": "self-heal pass",
       "aphrody-wg-proxy@.socket aphrody-wg-proxy@.service": "wg1 forwarders (disabled)",
       "aphrody-compute-dbfr-tunnel.service": "disabled",

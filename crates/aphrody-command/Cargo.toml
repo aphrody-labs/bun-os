@@ -131,7 +131,6 @@ aphrody-backend = { path = "../aphrody-backend", version = "1.4.7", features = [
 aphrody-proc = { path = "../aphrody-proc", version = "1.4.7", features = ["tokio"] }
 rustls = { version = "0.23", default-features = false, features = ["ring","std","tls12"] }
 aphrody-native = { package = "bun_native", path = "../bun-os-native" }
-aphrody-discord = { path = "../aphrody-discord", version = "1.4.7", features = [] }
 aphrody-terminal-backend = { path = "../aphrody-terminal-backend", version = "1.4.7", features = [] }
 aphrody-term = { path = "../aphrody-term", version = "1.4.7", features = [] }
 aphrody-a2a = { path = "../aphrody-a2a", version = "1.4.7", features = [] }

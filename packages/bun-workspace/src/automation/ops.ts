@@ -39,9 +39,6 @@ export async function runOps(argv: readonly string[]): Promise<number> {
   if (operation === "docs") {
     return await (await import("./documentation.ts")).runDocumentation(rest);
   }
-  if (operation === "discord") {
-    return await (await import("./discord.ts")).runDiscord(rest);
-  }
   if (operation === "agent-sync") {
     return await (await import("./agent-sync.ts")).runAgentSync(rest);
   }
