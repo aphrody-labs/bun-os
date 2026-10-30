@@ -80,7 +80,7 @@ for (const path of [
 ])
   if (!receipt.files.some((file) => file.path === path))
     throw new Error(`Unreceipted ${path}`);
-const isPublished = join(app, "current");
+const current = join(app, "current");
 const previous = await readlink(current).catch(() => undefined);
 if (previous === release) {
   await rename(pending, join(handoff, "activated"));
