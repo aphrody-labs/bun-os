@@ -5,6 +5,9 @@
 //!   WEBOS_SESSION_<OS>=ws://127.0.0.1:<port>/ws          stream endpoint of an `aphrody-remote-desktop` process
 //!   WEBOS_SESSION_<OS>_TOKEN_FILE=/path/to/token         its access token (query `?token=`)
 //!
+//!   WEBOS_SESSION_<OS>_MODE=native                        the upstream already speaks aphrody-webos-protocol
+//!                                                          (Input JSON in, ServerEvent JSON and frames out)
+//!
 //! with `<OS>` one of POP_OS, REDOX, ANDROID, WINE, PROTON. `POST /api/sessions` hands out a session id and a
 //! per-session bearer token; `GET /api/sessions/{id}/stream` (WebSocket, subprotocol `bearer.<token>`) bridges the
 //! client to the upstream desktop and translates `aphrody-webos-protocol` [`Input`] into the remote-desktop wire
@@ -32,6 +35,8 @@ use tokio_tungstenite::tungstenite::Message as UpMessage;
 struct Upstream {
     url: String,
     token: Option<String>,
+    /// Upstream speaks the client protocol: forward both ways unchanged, authenticate with a bearer header.
+    native: bool,
 }
 
 struct Session {
@@ -72,7 +77,8 @@ impl Sessions {
                     .and_then(|path| std::fs::read_to_string(path).ok())
                     .map(|t| t.trim().to_owned())
                     .filter(|t| !t.is_empty());
-                upstreams.insert(os, Upstream { url, token });
+                let native = std::env::var(format!("WEBOS_SESSION_{key}_MODE")).is_ok_and(|m| m == "native");
+                upstreams.insert(os, Upstream { url, token, native });
             }
         }
         Sessions { upstreams: Arc::new(upstreams), live: Arc::new(Mutex::new(HashMap::new())) }
@@ -189,12 +195,29 @@ fn translate(input: Input, buttons: &mut u8) -> Vec<serde_json::Value> {
 }
 
 async fn bridge(socket: WebSocket, upstream: Upstream) {
-    let url = match &upstream.token {
-        Some(token) => format!("{}{}token={token}", upstream.url, if upstream.url.contains('?') { '&' } else { '?' }),
-        None => upstream.url.clone(),
+    use tokio_tungstenite::tungstenite::client::IntoClientRequest;
+    let url = match (&upstream.token, upstream.native) {
+        (Some(token), false) => {
+            format!("{}{}token={token}", upstream.url, if upstream.url.contains('?') { '&' } else { '?' })
+        }
+        _ => upstream.url.clone(),
     };
     let (mut client_tx, mut client_rx) = socket.split();
-    let remote = match tokio_tungstenite::connect_async(url.as_str()).await {
+    let mut request = match url.as_str().into_client_request() {
+        Ok(request) => request,
+        Err(e) => {
+            let event = ServerEvent::Error { message: format!("bad desktop stream address: {e}") };
+            let _ = client_tx.send(WsMessage::Text(serde_json::to_string(&event).unwrap_or_default().into())).await;
+            return;
+        }
+    };
+    if let (Some(token), true) = (&upstream.token, upstream.native)
+        && let Ok(value) = format!("Bearer {token}").parse()
+    {
+        request.headers_mut().insert("authorization", value);
+    }
+    let native = upstream.native;
+    let remote = match tokio_tungstenite::connect_async(request).await {
         Ok((remote, _)) => remote,
         Err(e) => {
             let event = ServerEvent::Error { message: format!("the desktop stream is unreachable: {e}") };
@@ -202,13 +225,16 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
             return;
         }
     };
-    let state = ServerEvent::State { state: SessionState::Running };
-    let _ = client_tx.send(WsMessage::Text(serde_json::to_string(&state).unwrap_or_default().into())).await;
+    if !native {
+        let state = ServerEvent::State { state: SessionState::Running };
+        let _ = client_tx.send(WsMessage::Text(serde_json::to_string(&state).unwrap_or_default().into())).await;
+    }
     let (mut remote_tx, mut remote_rx) = remote.split();
     let down = async {
         while let Some(Ok(message)) = remote_rx.next().await {
             let forwarded = match message {
                 UpMessage::Binary(frame) => WsMessage::Binary(frame),
+                UpMessage::Text(text) if native => WsMessage::Text(text.as_str().into()),
                 UpMessage::Close(_) => break,
                 // hello/config replies of the remote-desktop wire are not part of the client protocol.
                 _ => continue,
@@ -227,6 +253,12 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
                 }
                 continue;
             };
+            if native {
+                if remote_tx.send(UpMessage::Text(text.as_str().into())).await.is_err() {
+                    return;
+                }
+                continue;
+            }
             let Ok(input) = serde_json::from_str::<Input>(&text) else { continue };
             for wire in translate(input, &mut buttons) {
                 if remote_tx.send(UpMessage::Text(wire.to_string().into())).await.is_err() {

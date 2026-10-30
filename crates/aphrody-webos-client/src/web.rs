@@ -92,6 +92,76 @@ fn decode(bytes: &[u8]) -> Option<StreamEvent> {
     ))
 }
 
+/// H.264 session video through WebCodecs: `ServerEvent::Video` configures a `VideoDecoder`; binary chunks are
+/// `[kind u8][pts u64 BE, µs][Annex B]` with kind 1 SPS/PPS (kept and prepended to the next key frame), 2 key, 3 delta.
+/// Decoded `VideoFrame`s are drawn on an `OffscreenCanvas` and handed to iced as RGBA (the zero-copy wgpu external
+/// texture path replaces this copy when our iced fork exposes it).
+struct H264 {
+    decoder: web_sys::VideoDecoder,
+    config: Vec<u8>,
+}
+
+impl H264 {
+    fn new(codec: &str, width: u32, height: u32, out: mpsc::UnboundedSender<StreamEvent>) -> Result<H264, String> {
+        let canvas = web_sys::OffscreenCanvas::new(width.max(1), height.max(1)).map_err(js_error)?;
+        let context: web_sys::OffscreenCanvasRenderingContext2d = canvas
+            .get_context("2d")
+            .map_err(js_error)?
+            .ok_or("no 2d context")?
+            .dyn_into()
+            .map_err(js_error)?;
+        let output = Closure::<dyn FnMut(web_sys::VideoFrame)>::new(move |frame: web_sys::VideoFrame| {
+            let (w, h) = (frame.display_width(), frame.display_height());
+            if canvas.width() != w || canvas.height() != h {
+                canvas.set_width(w);
+                canvas.set_height(h);
+            }
+            let drawn = context.draw_image_with_video_frame(&frame, 0.0, 0.0);
+            frame.close();
+            if drawn.is_err() {
+                return;
+            }
+            if let Ok(pixels) = context.get_image_data(0.0, 0.0, f64::from(w), f64::from(h)) {
+                let rgba = pixels.data().0;
+                let _ = out.unbounded_send(StreamEvent::Frame(image::Handle::from_rgba(w, h, rgba), w, h));
+            }
+        });
+        let error = Closure::<dyn FnMut(JsValue)>::new(|e: JsValue| log_error(&format!("video decoder: {}", js_error(e))));
+        let init = web_sys::VideoDecoderInit::new(error.as_ref().unchecked_ref(), output.as_ref().unchecked_ref());
+        let decoder = web_sys::VideoDecoder::new(&init).map_err(js_error)?;
+        output.forget();
+        error.forget();
+        let config = web_sys::VideoDecoderConfig::new(codec);
+        config.set_coded_width(width);
+        config.set_coded_height(height);
+        config.set_optimize_for_latency(true);
+        decoder.configure(&config).map_err(js_error)?;
+        Ok(H264 { decoder, config: Vec::new() })
+    }
+
+    fn chunk(&mut self, bytes: &[u8]) {
+        if bytes.len() < 9 {
+            return;
+        }
+        let kind = bytes[0];
+        let pts = u64::from_be_bytes(bytes[1..9].try_into().unwrap_or([0; 8]));
+        let payload = &bytes[9..];
+        let (data, kind) = match kind {
+            1 => {
+                self.config = payload.to_vec();
+                return;
+            }
+            2 => ([self.config.as_slice(), payload].concat(), web_sys::EncodedVideoChunkType::Key),
+            _ => (payload.to_vec(), web_sys::EncodedVideoChunkType::Delta),
+        };
+        let buffer = js_sys::Uint8Array::from(data.as_slice());
+        let init = web_sys::EncodedVideoChunkInit::new(&buffer, pts as f64, kind);
+        if let Ok(chunk) = web_sys::EncodedVideoChunk::new(&init) {
+            let _ = self.decoder.decode(&chunk);
+        }
+    }
+}
+
 /// The session stream: binary messages are encoded frames, text messages are [`ServerEvent`]s, and [`Input`] sent
 /// through the [`StreamEvent::Ready`] sender goes back as JSON.
 pub fn stream(session: SessionInfo) -> Subscription<StreamEvent> {
@@ -117,14 +187,27 @@ pub fn stream(session: SessionInfo) -> Subscription<StreamEvent> {
             let (incoming, mut events) = mpsc::unbounded::<StreamEvent>();
             let on_message = {
                 let incoming = incoming.clone();
+                let mut video: Option<H264> = None;
                 Closure::<dyn FnMut(MessageEvent)>::new(move |event: MessageEvent| {
                     let data = event.data();
                     let item = if let Some(text) = data.as_string() {
-                        serde_json::from_str::<ServerEvent>(&text)
-                            .ok()
-                            .map(StreamEvent::Server)
+                        let parsed = serde_json::from_str::<ServerEvent>(&text).ok();
+                        if let Some(ServerEvent::Video { codec, width, height }) = &parsed {
+                            match H264::new(codec, *width, *height, incoming.clone()) {
+                                Ok(decoder) => video = Some(decoder),
+                                Err(e) => log_error(&format!("WebCodecs H.264 is unavailable: {e}")),
+                            }
+                        }
+                        parsed.map(StreamEvent::Server)
                     } else if let Ok(buffer) = data.dyn_into::<js_sys::ArrayBuffer>() {
-                        decode(&js_sys::Uint8Array::new(&buffer).to_vec())
+                        let bytes = js_sys::Uint8Array::new(&buffer).to_vec();
+                        match video.as_mut() {
+                            Some(video) => {
+                                video.chunk(&bytes);
+                                None
+                            }
+                            None => decode(&bytes),
+                        }
                     } else {
                         None
                     };

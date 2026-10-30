@@ -32,7 +32,7 @@ cargo_serial() {
 cargo_serial build --release -p aphrody-webos-server -p aphrody-inventory
 # WebAssembly at full feature level (owner order): SIMD, relaxed SIMD, bulk memory, saturating float conversion, sign
 # extension, reference types. Threads (atomics + build-std) follow when the toolchain owner enables them.
-CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS="-C target-feature=+simd128,+relaxed-simd,+bulk-memory,+nontrapping-fptoint,+sign-ext,+reference-types" \
+CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS="-C target-feature=+simd128,+relaxed-simd,+bulk-memory,+nontrapping-fptoint,+sign-ext,+reference-types --cfg=web_sys_unstable_apis" \
   cargo_serial build --release -p aphrody-webos-client -p bun-ui-web --target wasm32-unknown-unknown
 
 handoff="${WEBOS_DEPLOY_ROOT:-$root/build/webos-deploy}"
