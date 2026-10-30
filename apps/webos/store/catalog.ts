@@ -50,6 +50,12 @@ async function readJson<T>(path: string): Promise<T | undefined> {
   }
 }
 
+/** "pdfcraft-web" becomes "PDFCraft": the product name of a craft member. */
+function productName(id: string): string {
+  const base = id.replace(/-web$/, "").replace(/craft$/, "");
+  return (base.length <= 3 ? base.toUpperCase() : base[0]!.toUpperCase() + base.slice(1)) + "Craft";
+}
+
 export async function buildCatalog(ctx: Ctx, dist: string): Promise<StoreCatalog> {
   const inventory = await readJson<{ members: InvMember[] }>(join(dist, "api/inventory.json"));
   const registry = (await readJson<{ packages: RegEntry[] }>(join(dist, "registry.json")))?.packages ?? [];
@@ -86,11 +92,11 @@ export async function buildCatalog(ctx: Ctx, dist: string): Promise<StoreCatalog
     const owner = members.find((m) => m.surface.opens === e.id);
     add({
       id: `bunos:${e.id}`,
-      name: e.name,
+      name: owner ? productName(owner.id) : e.name,
       pkg: e.id,
       source: "bunos",
       category: e.category,
-      summary: e.description,
+      summary: owner ? `${e.description} ${productName(owner.id)} runs in your browser and works offline once installed.` : e.description,
       version: e.version,
       size: e.size,
       license: e.license,
@@ -298,7 +304,7 @@ export async function buildCatalog(ctx: Ctx, dist: string): Promise<StoreCatalog
   for (const a of apps) cats.set(a.category, (cats.get(a.category) ?? 0) + 1);
   const categories = [...cats].map(([id, count]) => ({ id, label: CATEGORIES[id] ?? id, count })).sort((a, b) => b.count - a.count);
   const featured = apps
-    .filter((a) => a.featured || (a.source === "flatpak" && a.pkg === "com.aphrody.WebOS") || (a.source === "pacman" && a.pkg === "bun-canary"))
+    .filter((a) => ["flatpak:com.aphrody.WebOS", "pacman:bun-canary", "apk:bun", "bunos:craft-pdf", "bunos:craft-photo", "bunos:craft-film", "bunos:craft-cad"].includes(a.id))
     .slice(0, 12)
     .map((a) => a.id);
   return { schemaVersion: 1, generated: new Date().toISOString(), origin, sources, categories, apps, featured };
