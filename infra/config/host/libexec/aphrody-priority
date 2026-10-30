@@ -31,7 +31,7 @@ done < <(jq -r '.interactiveUnits[]' "$POLICY")
 if command -v docker >/dev/null; then
   docker ps --format '{{.Names}}' | while read -r n; do
     if [[ $n =~ $ic_re ]]; then want=$SHARES_INTERACTIVE; bw=1000
-    elif [[ $n =~ $bc_re ]]; then want=$SHARES_BUILD; bw=10
+    elif [[ $n =~ $bc_re ]]; then want=$SHARES_BUILD; bw=50
     else continue; fi
     [ "$(docker inspect -f "{{.HostConfig.CpuShares}}" "$n" 2>/dev/null </dev/null)" = "$want" ] && continue
     docker update --cpu-shares "$want" --blkio-weight "$bw" "$n" >/dev/null 2>&1 </dev/null ||

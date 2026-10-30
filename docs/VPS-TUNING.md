@@ -17,7 +17,7 @@ infra/config/host/systemd/slices/apply.sh  # interactive.slice / build.slice pri
 ## Kernel and virtualisation (`vps/tuning/etc`)
 
 - Modules (`modules-load.d/aphrody-vps.conf`): `kvm_intel` (nested=1), `vhost_net`, `vhost_vsock`, `vsock`,
-  `macvtap`, `binder_linux`, `vkms`, `tcp_bbr`, `sch_fq`, `zram` and `ntsync`. `tun`, `udmabuf` and `memfd` are built in.
+  `macvtap`, `binder_linux`, `vkms`, `veth`, `bridge`, `br_netfilter`, `nf_tables`, `nf_nat`, `nft_masq`, `tcp_bbr`, `sch_fq`, `zram` and `ntsync`. `tun`, `udmabuf` and `memfd` are built in.
   `modprobe.d` sets `softdep vkms pre: cirrus_qemu`, so the Cirrus VGA stays `/dev/dri/card0` for Hyprland and vkms
   takes card1. `kvm ignore_msrs=1` is set for Windows and macOS guests.
 - binderfs is mounted at `/dev/binderfs` by `aphrody-binderfs.service`. ashmem left the kernel in 5.18; redroid 17
@@ -62,12 +62,14 @@ infra/config/host/systemd/slices/apply.sh  # interactive.slice / build.slice pri
   now. Session containers (redroid, bunos-android, gamescope, auto-*, webos-db) get cpu.weight 1000 through
   `docker update --cpu-shares 17620`, which persists with the container. gamescope starts with
   `--cgroup-parent interactive.slice`.
-- `build.slice` (weight 20): every 30 s, `aphrody-priority.timer` adopts build commands started from user sessions,
+- `build.slice` (CPU weight 20, IO weight 50): every 30 s, `aphrody-priority.timer` adopts build commands started from user sessions,
   with their descendants, into a transient scope of the slice. It also renices them to 10 and sets ionice best-effort 7.
   Build containers (buildx, bunos-native, helium) get cpu.weight 20 (`--cpu-shares 126`). These are weights, not caps:
   builds use every idle core.
-- `aphrody-iocost.service` turns on blk-iocost (auto QoS) on every disk. Without it, IOWeight does nothing under
-  the `none` scheduler.
+- `aphrody-iocost.service` turns on blk-iocost on every disk. Without it, IOWeight does nothing under the `none`
+  scheduler. The Ceph-backed sdb and sdc report rotational=1, so the auto model assumed a hard disk (370 random IOPS)
+  and builds crawled in `ioc_rqos_throttle`. They now get an explicit SSD-class linear model. Every disk keeps vrate
+  between 50 and 150 % with p95 latency targets of 50/100 ms. Build containers use blkio weight 50.
 - runc 1.2 and later map cpu-shares to cpu.weight non-linearly (1024 gives 100); the values above match that mapping.
 
 ## nginx (`nginx/shared`, `nginx/aphrody/aphrody.com.conf`)
