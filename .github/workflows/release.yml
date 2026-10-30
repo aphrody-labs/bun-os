@@ -92,6 +92,8 @@ jobs:
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    outputs:
+      published: ${{ steps.publish.outputs.published }}
     env:
       CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
     steps:
@@ -104,9 +106,30 @@ jobs:
           token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
           rust: "true"
       - name: Publish the unpublished crates in dependency order
+        id: publish
         env:
           APPLY: ${{ (startsWith(github.ref, 'refs/tags/') || inputs.publish) && '--apply' || '' }}
-        run: bun scripts/release.ts crates $APPLY --limit "${{ inputs.crate-limit || '5' }}" --pause 0 --budget 290
+        run: |
+          set +e
+          bun scripts/release.ts crates $APPLY --limit "${{ inputs.crate-limit || '5' }}" --pause 0 --budget 290 2>&1 | tee crates.log
+          code=${PIPESTATUS[0]}
+          echo "published=$(grep -oE '^crates.io: [0-9]+ published' crates.log | tail -1 | grep -oE '[0-9]+')" >> "$GITHUB_OUTPUT"
+          exit $code
+
+  continue:
+    name: Continue publishing
+    if: always() && inputs.publish && needs.crates.outputs.published != '' && needs.crates.outputs.published != '0'
+    needs: crates
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      # crates.io admits one new crate per ten minutes after a burst, so a run publishes a bounded batch and the
+      # next one picks up the rest; it stops by itself when a run publishes nothing.
+      - name: Dispatch the next batch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run release.yml --repo "$GITHUB_REPOSITORY" --ref "${{ github.ref_name }}" -f publish=true -f crate-limit="${{ inputs.crate-limit }}"
 
   github-release:
     name: GitHub release
