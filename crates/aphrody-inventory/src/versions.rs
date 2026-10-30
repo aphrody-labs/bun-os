@@ -49,10 +49,19 @@ enum Lookup {
 
 fn fetch(agent: &ureq::Agent, lookup: &Lookup) -> Option<VersionInfo> {
     let now = crate::text::now_rfc3339();
-    let missing = || VersionInfo { versions: Vec::new(), latest: None, total: 0, published: false, checked: now.clone() };
+    let missing = || VersionInfo {
+        versions: Vec::new(),
+        latest: None,
+        total: 0,
+        published: false,
+        checked: now.clone(),
+    };
     match lookup {
         Lookup::Crate(name) => {
-            let mut res = agent.get(&format!("https://index.crates.io/{}", sparse_path(name))).call().ok()?;
+            let mut res = agent
+                .get(&format!("https://index.crates.io/{}", sparse_path(name)))
+                .call()
+                .ok()?;
             match res.status().as_u16() {
                 404 => return Some(missing()),
                 200 => {}
@@ -66,11 +75,20 @@ fn fetch(agent: &ureq::Agent, lookup: &Lookup) -> Option<VersionInfo> {
                 .filter_map(|v| v["vers"].as_str().map(str::to_string))
                 .collect();
             all.reverse();
-            Some(VersionInfo { latest: all.first().cloned(), total: all.len(), published: !all.is_empty(), versions: all.into_iter().take(30).collect(), checked: now })
+            Some(VersionInfo {
+                latest: all.first().cloned(),
+                total: all.len(),
+                published: !all.is_empty(),
+                versions: all.into_iter().take(30).collect(),
+                checked: now,
+            })
         }
         Lookup::Npm(name) => {
             let mut res = agent
-                .get(&format!("https://registry.npmjs.org/{}", name.replacen('/', "%2f", 1)))
+                .get(&format!(
+                    "https://registry.npmjs.org/{}",
+                    name.replacen('/', "%2f", 1)
+                ))
                 .header("Accept", "application/vnd.npm.install-v1+json")
                 .call()
                 .ok()?;
@@ -80,26 +98,49 @@ fn fetch(agent: &ureq::Agent, lookup: &Lookup) -> Option<VersionInfo> {
                 _ => return None,
             }
             let doc: Value = serde_json::from_str(&res.body_mut().read_to_string().ok()?).ok()?;
-            let mut all: Vec<String> = doc["versions"].as_object().map(|v| v.keys().cloned().collect()).unwrap_or_default();
+            let mut all: Vec<String> = doc["versions"]
+                .as_object()
+                .map(|v| v.keys().cloned().collect())
+                .unwrap_or_default();
             all.reverse();
-            let latest = doc["dist-tags"]["latest"].as_str().map(str::to_string).or_else(|| all.first().cloned());
-            Some(VersionInfo { latest, total: all.len(), published: !all.is_empty(), versions: all.into_iter().take(30).collect(), checked: now })
+            let latest = doc["dist-tags"]["latest"]
+                .as_str()
+                .map(str::to_string)
+                .or_else(|| all.first().cloned());
+            Some(VersionInfo {
+                latest,
+                total: all.len(),
+                published: !all.is_empty(),
+                versions: all.into_iter().take(30).collect(),
+                checked: now,
+            })
         }
     }
 }
 
 fn stale(info: &VersionInfo) -> bool {
-    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
     crate::text::parse_rfc3339(&info.checked).is_none_or(|t| now.saturating_sub(t) > DAY)
 }
 
 /// Attach `meta.history` to every crates.io crate and npm package; reads and rewrites the cache file.
 pub fn attach(members: &mut [Member], cache_path: &Path) -> Stats {
-    let cache: BTreeMap<String, VersionInfo> = std::fs::read(cache_path).ok().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or_default();
+    let cache: BTreeMap<String, VersionInfo> = std::fs::read(cache_path)
+        .ok()
+        .and_then(|b| serde_json::from_slice(&b).ok())
+        .unwrap_or_default();
     let mut jobs: Vec<(usize, String, Lookup)> = Vec::new();
     for (i, m) in members.iter().enumerate() {
         if m.kind == "crates" && m.tags.iter().any(|t| t == "crates.io") {
-            let name = m.meta.get("crateName").and_then(|v| v.as_str()).unwrap_or(&m.name).to_string();
+            let name = m
+                .meta
+                .get("crateName")
+                .and_then(|v| v.as_str())
+                .unwrap_or(&m.name)
+                .to_string();
             jobs.push((i, format!("crate:{name}"), Lookup::Crate(name)));
         } else if m.kind == "packages" {
             if let Some(name) = m.meta.get("npm").and_then(|v| v.as_str()) {
@@ -121,8 +162,13 @@ pub fn attach(members: &mut [Member], cache_path: &Path) -> Stats {
             scope.spawn(|| {
                 loop {
                     let i = next.fetch_add(1, Ordering::Relaxed);
-                    let Some((_, key, lookup)) = jobs.get(i) else { break };
-                    let fresh = cache.lock().ok().is_some_and(|c| c.get(key).is_some_and(|v| !stale(v)));
+                    let Some((_, key, lookup)) = jobs.get(i) else {
+                        break;
+                    };
+                    let fresh = cache
+                        .lock()
+                        .ok()
+                        .is_some_and(|c| c.get(key).is_some_and(|v| !stale(v)));
                     if fresh {
                         continue;
                     }
@@ -152,5 +198,9 @@ pub fn attach(members: &mut [Member], cache_path: &Path) -> Stats {
     if let Ok(bytes) = serde_json::to_vec(&cache) {
         let _ = std::fs::write(cache_path, bytes);
     }
-    Stats { jobs: jobs.len(), fetched: fetched.into_inner(), cached }
+    Stats {
+        jobs: jobs.len(),
+        fetched: fetched.into_inner(),
+        cached,
+    }
 }

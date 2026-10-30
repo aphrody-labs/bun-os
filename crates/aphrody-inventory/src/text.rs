@@ -55,8 +55,14 @@ pub fn first_paragraph(markdown: &str) -> String {
             }
             continue;
         }
-        let structural = ["#", ">", "|", "![", "[![", "<", "---", "===", "- ", "* ", "import ", "export "].iter().any(|p| line.starts_with(p))
-            || line.split_once(". ").is_some_and(|(n, _)| !n.is_empty() && n.chars().all(|c| c.is_ascii_digit()));
+        let structural = [
+            "#", ">", "|", "![", "[![", "<", "---", "===", "- ", "* ", "import ", "export ",
+        ]
+        .iter()
+        .any(|p| line.starts_with(p))
+            || line
+                .split_once(". ")
+                .is_some_and(|(n, _)| !n.is_empty() && n.chars().all(|c| c.is_ascii_digit()));
         if structural {
             if !lines.is_empty() {
                 break;
@@ -86,21 +92,58 @@ pub fn header_text(text: &str, length: usize) -> String {
             if line.contains("*/") {
                 block = false;
             }
-            body = line.trim_start_matches('*').split("*/").next().unwrap_or("").trim().to_string();
+            body = line
+                .trim_start_matches('*')
+                .split("*/")
+                .next()
+                .unwrap_or("")
+                .trim()
+                .to_string();
         } else if let Some(rest) = line.strip_prefix("/*") {
             block = !rest.contains("*/");
-            body = rest.trim_start_matches('*').trim_start_matches('!').split("*/").next().unwrap_or("").trim().to_string();
+            body = rest
+                .trim_start_matches('*')
+                .trim_start_matches('!')
+                .split("*/")
+                .next()
+                .unwrap_or("")
+                .trim()
+                .to_string();
         } else if line.starts_with("//") {
-            body = line.trim_start_matches('/').trim_start_matches('!').trim().to_string();
+            body = line
+                .trim_start_matches('/')
+                .trim_start_matches('!')
+                .trim()
+                .to_string();
         } else if line.starts_with('#') && !line.starts_with("#!") && !line.starts_with("#[") {
             body = line.trim_start_matches('#').trim().to_string();
-        } else if out.is_empty() && !["\"use ", "import ", "export ", "use ", "mod ", "pub ", "const ", "let ", "{", "#!", "#["].iter().any(|p| line.starts_with(p)) {
+        } else if out.is_empty()
+            && ![
+                "\"use ", "import ", "export ", "use ", "mod ", "pub ", "const ", "let ", "{",
+                "#!", "#[",
+            ]
+            .iter()
+            .any(|p| line.starts_with(p))
+        {
             continue;
         } else {
             break;
         }
         let lower = body.to_ascii_lowercase();
-        if body.is_empty() || ["spdx", "copyright", "eslint", "@ts-", "prettier", "biome", "-*-", "vim:"].iter().any(|p| lower.starts_with(p)) {
+        if body.is_empty()
+            || [
+                "spdx",
+                "copyright",
+                "eslint",
+                "@ts-",
+                "prettier",
+                "biome",
+                "-*-",
+                "vim:",
+            ]
+            .iter()
+            .any(|p| lower.starts_with(p))
+        {
             continue;
         }
         out.push(body.replace("**", "").replace('`', ""));
@@ -113,7 +156,9 @@ pub fn header_text(text: &str, length: usize) -> String {
 
 /// The `description = "..."` line of a Cargo manifest, without parsing the whole file.
 pub fn toml_desc(text: &str) -> String {
-    let Some(line) = text.lines().find(|l| l.starts_with("description")) else { return String::new() };
+    let Some(line) = text.lines().find(|l| l.starts_with("description")) else {
+        return String::new();
+    };
     match (line.find('"'), line.rfind('"')) {
         (Some(a), Some(b)) if b > a => line[a + 1..b].replace("\\\"", "\""),
         _ => String::new(),
@@ -122,17 +167,28 @@ pub fn toml_desc(text: &str) -> String {
 
 /// Files whose content is shown as text on their page.
 pub fn is_text_name(name: &str) -> bool {
-    const EXT: &[&str] = &["md", "mdx", "json", "toml", "ts", "tsx", "js", "mjs", "sh", "ps1", "yaml", "yml", "rs", "txt", "conf", "css", "html", "py", "just", "lock", "cfg"];
+    const EXT: &[&str] = &[
+        "md", "mdx", "json", "toml", "ts", "tsx", "js", "mjs", "sh", "ps1", "yaml", "yml", "rs",
+        "txt", "conf", "css", "html", "py", "just", "lock", "cfg",
+    ];
     let lower = name.to_ascii_lowercase();
-    if ["justfile", "dockerfile", "license", "notice"].iter().any(|p| lower.starts_with(p)) {
+    if ["justfile", "dockerfile", "license", "notice"]
+        .iter()
+        .any(|p| lower.starts_with(p))
+    {
         return true;
     }
-    lower.rsplit_once('.').is_some_and(|(_, ext)| EXT.contains(&ext))
+    lower
+        .rsplit_once('.')
+        .is_some_and(|(_, ext)| EXT.contains(&ext))
 }
 
 /// Current UTC time as RFC 3339 (seconds), without a date crate.
 pub fn now_rfc3339() -> String {
-    let secs = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
+    let secs = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
     rfc3339(secs)
 }
 
@@ -150,7 +206,12 @@ pub fn rfc3339(secs: u64) -> String {
     let d = doy - (153 * mp + 2) / 5 + 1;
     let m = if mp < 10 { mp + 3 } else { mp - 9 };
     let y = if m <= 2 { y + 1 } else { y };
-    format!("{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z", rem / 3600, (rem % 3600) / 60, rem % 60)
+    format!(
+        "{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z",
+        rem / 3600,
+        (rem % 3600) / 60,
+        rem % 60
+    )
 }
 
 /// Seconds since the epoch of an RFC 3339 timestamp written by [`rfc3339`]; None for anything else.
@@ -158,8 +219,15 @@ pub fn parse_rfc3339(s: &str) -> Option<u64> {
     let (date, time) = s.split_once('T')?;
     let mut d = date.split('-').map(|p| p.parse::<i64>());
     let (y, m, day) = (d.next()?.ok()?, d.next()?.ok()?, d.next()?.ok()?);
-    let mut t = time.trim_end_matches('Z').split(':').map(|p| p.split('.').next().unwrap_or("0").parse::<u64>());
-    let (hh, mm, ss) = (t.next()?.ok()?, t.next()?.ok()?, t.next().unwrap_or(Ok(0)).ok()?);
+    let mut t = time
+        .trim_end_matches('Z')
+        .split(':')
+        .map(|p| p.split('.').next().unwrap_or("0").parse::<u64>());
+    let (hh, mm, ss) = (
+        t.next()?.ok()?,
+        t.next()?.ok()?,
+        t.next().unwrap_or(Ok(0)).ok()?,
+    );
     let y = if m <= 2 { y - 1 } else { y };
     let era = y.div_euclid(400);
     let yoe = y - era * 400;
@@ -167,6 +235,7 @@ pub fn parse_rfc3339(s: &str) -> Option<u64> {
     let doy = (153 * mp + 2) / 5 + day - 1;
     let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
     let days = era * 146_097 + doe - 719_468;
-    u64::try_from(days).ok().map(|d| d * 86_400 + hh * 3600 + mm * 60 + ss)
+    u64::try_from(days)
+        .ok()
+        .map(|d| d * 86_400 + hh * 3600 + mm * 60 + ss)
 }
-

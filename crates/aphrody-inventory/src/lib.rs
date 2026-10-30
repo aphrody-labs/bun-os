@@ -26,19 +26,71 @@ use text::{first_paragraph, header_text, toml_desc};
 
 /// Kinds of members, in display order: id, label, description.
 pub const KINDS: &[(&str, &str, &str)] = &[
-    ("apps", "Apps", "Every apps/ member: published builds, status and source."),
-    ("packages", "Packages", "Every packages/ member with README, version and npm link."),
-    ("crates", "Crates", "Every crates/ member with README, version, crates.io link and WebAssembly module."),
-    ("factory", "Factory", "Images, compositions (Server, COSMIC, Gaming), pacman catalogs and build catalogs."),
-    ("ospackages", "OS packages", "Pacman packages and recipes of the Omarchy, CachyOS and ChimeraOS catalogs."),
-    ("engines", "Engines", "Bun Engine cores, consoles and emulators."),
-    ("games", "Games", "Game owners of the repository: launchers and status, private-aware."),
-    ("tools", "Tools", "Scripts, command-line tools and installers."),
-    ("infra", "Infrastructure", "Hosts, routes, services and release configuration."),
-    ("releases", "Releases", "Published release manifests and the live downloads catalogue."),
-    ("sources", "Sources", "Pinned upstream source owners (Git submodules)."),
-    ("workspace", "Workspace", "Every top-level entry of the repository."),
-    ("collections", "Collections", "Cross-cutting groups: Android owners, Material 3, engines, compositions."),
+    (
+        "apps",
+        "Apps",
+        "Every apps/ member: published builds, status and source.",
+    ),
+    (
+        "packages",
+        "Packages",
+        "Every packages/ member with README, version and npm link.",
+    ),
+    (
+        "crates",
+        "Crates",
+        "Every crates/ member with README, version, crates.io link and WebAssembly module.",
+    ),
+    (
+        "factory",
+        "Factory",
+        "Images, compositions (Server, COSMIC, Gaming), pacman catalogs and build catalogs.",
+    ),
+    (
+        "ospackages",
+        "OS packages",
+        "Pacman packages and recipes of the Omarchy, CachyOS and ChimeraOS catalogs.",
+    ),
+    (
+        "engines",
+        "Engines",
+        "Bun Engine cores, consoles and emulators.",
+    ),
+    (
+        "games",
+        "Games",
+        "Game owners of the repository: launchers and status, private-aware.",
+    ),
+    (
+        "tools",
+        "Tools",
+        "Scripts, command-line tools and installers.",
+    ),
+    (
+        "infra",
+        "Infrastructure",
+        "Hosts, routes, services and release configuration.",
+    ),
+    (
+        "releases",
+        "Releases",
+        "Published release manifests and the live downloads catalogue.",
+    ),
+    (
+        "sources",
+        "Sources",
+        "Pinned upstream source owners (Git submodules).",
+    ),
+    (
+        "workspace",
+        "Workspace",
+        "Every top-level entry of the repository.",
+    ),
+    (
+        "collections",
+        "Collections",
+        "Cross-cutting groups: Android owners, Material 3, engines, compositions.",
+    ),
 ];
 
 pub fn kind_ids() -> impl Iterator<Item = &'static str> {
@@ -106,7 +158,13 @@ pub struct Member {
 
 impl Default for Surface {
     fn default() -> Self {
-        Surface { kind: "info".into(), page: String::new(), api: String::new(), module: None, reason: String::new() }
+        Surface {
+            kind: "info".into(),
+            page: String::new(),
+            api: String::new(),
+            module: None,
+            reason: String::new(),
+        }
     }
 }
 
@@ -161,11 +219,17 @@ fn surface(kind: &str, id: &str, ty: &str, reason: impl Into<String>) -> Surface
 }
 
 fn source_link(path: &str) -> Link {
-    Link { label: "Source".into(), url: format!("{SOURCE_URL}/{path}") }
+    Link {
+        label: "Source".into(),
+        url: format!("{SOURCE_URL}/{path}"),
+    }
 }
 
 fn tags(list: &[&str]) -> Vec<String> {
-    list.iter().filter(|t| !t.is_empty()).map(|t| t.to_string()).collect()
+    list.iter()
+        .filter(|t| !t.is_empty())
+        .map(|t| t.to_string())
+        .collect()
 }
 
 const MAX_TEXT: usize = 64 * 1024;
@@ -174,18 +238,46 @@ const MAX_DOC: usize = 160 * 1024;
 /// Description from the entry files of a directory (lib.rs, main.rs, index.ts, ...) or its first source file.
 fn source_description(repo: &Repo, dir: &str, files: &[String]) -> String {
     const ENTRY: &[&str] = &[
-        "src/lib.rs", "src/main.rs", "src/index.ts", "src/mod.ts", "src/main.ts", "index.ts", "mod.ts", "main.ts", "index.js",
-        "build.ts", "index.mjs", "src/index.tsx", "lib.rs", "main.rs", "src/lib.ts",
+        "src/lib.rs",
+        "src/main.rs",
+        "src/index.ts",
+        "src/mod.ts",
+        "src/main.ts",
+        "index.ts",
+        "mod.ts",
+        "main.ts",
+        "index.js",
+        "build.ts",
+        "index.mjs",
+        "src/index.tsx",
+        "lib.rs",
+        "main.rs",
+        "src/lib.ts",
     ];
     let rank = |f: &String| -> usize {
-        let rel = f.strip_prefix(dir).map(|r| r.trim_start_matches('/')).unwrap_or(f);
-        ENTRY.iter().position(|e| *e == rel).unwrap_or(100 + rel.matches('/').count())
+        let rel = f
+            .strip_prefix(dir)
+            .map(|r| r.trim_start_matches('/'))
+            .unwrap_or(f);
+        ENTRY
+            .iter()
+            .position(|e| *e == rel)
+            .unwrap_or(100 + rel.matches('/').count())
     };
     let mut candidates: Vec<&String> = files
         .iter()
         .filter(|f| {
-            let source = [".rs", ".ts", ".tsx", ".js", ".mjs", ".py", ".sh", ".ps1", ".just"].iter().any(|e| f.ends_with(e));
-            let skip = f.ends_with(".test.ts") || f.ends_with(".spec.ts") || f.ends_with(".d.ts") || f.contains("node_modules") || f.contains("/test/") || f.contains("/tests/");
+            let source = [
+                ".rs", ".ts", ".tsx", ".js", ".mjs", ".py", ".sh", ".ps1", ".just",
+            ]
+            .iter()
+            .any(|e| f.ends_with(e));
+            let skip = f.ends_with(".test.ts")
+                || f.ends_with(".spec.ts")
+                || f.ends_with(".d.ts")
+                || f.contains("node_modules")
+                || f.contains("/test/")
+                || f.contains("/tests/");
             source && !skip
         })
         .collect();
@@ -205,15 +297,25 @@ fn readme_of(repo: &Repo, dir: &str, files: &[String]) -> Option<String> {
     files
         .iter()
         .find(|f| {
-            let rel = f.strip_prefix(dir).map(|r| r.trim_start_matches('/')).unwrap_or(f).to_ascii_lowercase();
-            matches!(rel.as_str(), "readme" | "readme.md" | "readme.mdx" | "readme.markdown" | "readme.txt")
+            let rel = f
+                .strip_prefix(dir)
+                .map(|r| r.trim_start_matches('/'))
+                .unwrap_or(f)
+                .to_ascii_lowercase();
+            matches!(
+                rel.as_str(),
+                "readme" | "readme.md" | "readme.mdx" | "readme.markdown" | "readme.txt"
+            )
         })
         .and_then(|f| repo.read_text(f, MAX_DOC))
 }
 
 /// Generated fallback text that says nothing about the member.
 pub fn is_placeholder(desc: &str) -> bool {
-    desc.trim().is_empty() || desc.starts_with("Bun OS package at ") || desc.starts_with("Bun OS crate at ") || desc.ends_with(" app at .")
+    desc.trim().is_empty()
+        || desc.starts_with("Bun OS package at ")
+        || desc.starts_with("Bun OS crate at ")
+        || desc.ends_with(" app at .")
 }
 
 /// Well-known file names, whatever directory they sit in (their meaning is fixed by the tool that reads them).
@@ -221,13 +323,17 @@ fn file_description(name: &str) -> Option<&'static str> {
     Some(match name {
         "LICENSE" => "License text of this repository.",
         "LICENSE-APACHE" => "Apache-2.0 license text of this repository.",
-        "bun.lock" => "Bun lockfile pinning every JavaScript and TypeScript dependency of the root workspace.",
+        "bun.lock" => {
+            "Bun lockfile pinning every JavaScript and TypeScript dependency of the root workspace."
+        }
         "Cargo.lock" => "Cargo lockfile pinning every Rust dependency of the root workspace.",
         "Cargo.toml" => "Root Cargo manifest: workspace members, shared dependencies and lints.",
         "package.json" => "Root package manifest of the Bun workspace.",
         "bunfig.toml" => "Bun configuration of the workspace.",
         "tsconfig.json" => "TypeScript project configuration.",
-        "tsconfig.base.json" => "Shared TypeScript compiler options extended by the workspace projects.",
+        "tsconfig.base.json" => {
+            "Shared TypeScript compiler options extended by the workspace projects."
+        }
         "turbo.json" => "Task pipeline definition for the workspace build orchestration.",
         "clippy.toml" => "Clippy lint configuration of the Rust workspace.",
         "rustfmt.toml" => "rustfmt formatting rules of the Rust workspace.",
@@ -240,7 +346,14 @@ fn file_description(name: &str) -> Option<&'static str> {
 /// Facts read from the member itself when nothing describes it: the sections of a JSON file, the exports of a module,
 /// the entries of a directory, the length of a file.
 fn factual_description(m: &Member) -> String {
-    let name = m.path.as_deref().unwrap_or(&m.id).rsplit('/').next().unwrap_or("").to_string();
+    let name = m
+        .path
+        .as_deref()
+        .unwrap_or(&m.id)
+        .rsplit('/')
+        .next()
+        .unwrap_or("")
+        .to_string();
     if let Some(d) = file_description(&name) {
         return d.into();
     }
@@ -256,14 +369,30 @@ fn factual_description(m: &Member) -> String {
                 return format!("JSON file {path} with the sections {}.", keys.join(", "));
             }
         }
-        if [".ts", ".tsx", ".js", ".mjs"].iter().any(|e| path.ends_with(e)) {
+        if [".ts", ".tsx", ".js", ".mjs"]
+            .iter()
+            .any(|e| path.ends_with(e))
+        {
             let mut names: Vec<String> = Vec::new();
             for line in text.lines() {
-                let Some(rest) = line.strip_prefix("export ") else { continue };
+                let Some(rest) = line.strip_prefix("export ") else {
+                    continue;
+                };
                 let rest = rest.strip_prefix("async ").unwrap_or(rest);
-                for kw in ["function* ", "function ", "const ", "class ", "interface ", "type ", "enum "] {
+                for kw in [
+                    "function* ",
+                    "function ",
+                    "const ",
+                    "class ",
+                    "interface ",
+                    "type ",
+                    "enum ",
+                ] {
                     if let Some(after) = rest.strip_prefix(kw) {
-                        let ident: String = after.chars().take_while(|c| c.is_ascii_alphanumeric() || *c == '_').collect();
+                        let ident: String = after
+                            .chars()
+                            .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+                            .collect();
                         if !ident.is_empty() && !names.contains(&ident) {
                             names.push(ident);
                         }
@@ -272,7 +401,10 @@ fn factual_description(m: &Member) -> String {
                 }
             }
             if !names.is_empty() {
-                return format!("Module {name} exporting {}.", names.into_iter().take(8).collect::<Vec<_>>().join(", "));
+                return format!(
+                    "Module {name} exporting {}.",
+                    names.into_iter().take(8).collect::<Vec<_>>().join(", ")
+                );
             }
             return format!("Script {name} ({} lines).", text.lines().count());
         }
@@ -282,14 +414,31 @@ fn factual_description(m: &Member) -> String {
         let prefix = format!("{path}/");
         let mut names: Vec<&str> = Vec::new();
         for f in files {
-            let first = f.strip_prefix(&prefix).unwrap_or(f).split('/').next().unwrap_or("");
+            let first = f
+                .strip_prefix(&prefix)
+                .unwrap_or(f)
+                .split('/')
+                .next()
+                .unwrap_or("");
             if !first.is_empty() && !names.contains(&first) {
                 names.push(first);
             }
         }
         if !names.is_empty() {
-            let more = if names.len() > 10 { format!(" and {} more", names.len() - 10) } else { String::new() };
-            return format!("Directory {path} containing {}{more}.", names.iter().take(10).copied().collect::<Vec<_>>().join(", "));
+            let more = if names.len() > 10 {
+                format!(" and {} more", names.len() - 10)
+            } else {
+                String::new()
+            };
+            return format!(
+                "Directory {path} containing {}{more}.",
+                names
+                    .iter()
+                    .take(10)
+                    .copied()
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
         }
     }
     String::new()
@@ -305,7 +454,11 @@ fn app_members(repo: &Repo, out: &mut Vec<Member>) {
         let path = format!("apps/{}", child.name);
         let pkg = repo.read_json(&format!("{path}/package.json"));
         let cargo = repo.read_text(&format!("{path}/Cargo.toml"), 1 << 20);
-        let mut desc = pkg.as_ref().and_then(|p| p["description"].as_str()).unwrap_or("").to_string();
+        let mut desc = pkg
+            .as_ref()
+            .and_then(|p| p["description"].as_str())
+            .unwrap_or("")
+            .to_string();
         if desc.is_empty() {
             if let Some(c) = &cargo {
                 desc = toml_desc(c);
@@ -318,7 +471,10 @@ fn app_members(repo: &Repo, out: &mut Vec<Member>) {
             "server"
         } else if id.contains("android") {
             "android"
-        } else if repo.has(&format!("{path}/index.html")) || repo.has(&format!("{path}/Trunk.toml")) || id.ends_with("-web") {
+        } else if repo.has(&format!("{path}/index.html"))
+            || repo.has(&format!("{path}/Trunk.toml"))
+            || id.ends_with("-web")
+        {
             "web"
         } else {
             "native"
@@ -332,7 +488,9 @@ fn app_members(repo: &Repo, out: &mut Vec<Member>) {
         }
         let download = NATIVE_RUN.contains(&run);
         let reason = if download {
-            format!("A {run} app: its page lists published builds from the downloads service, its README and source.")
+            format!(
+                "A {run} app: its page lists published builds from the downloads service, its README and source."
+            )
         } else {
             "A web build: its page carries README, source and published builds.".to_string()
         };
@@ -344,15 +502,34 @@ fn app_members(repo: &Repo, out: &mut Vec<Member>) {
             name: id.clone(),
             desc,
             path: Some(path.clone()),
-            version: pkg.as_ref().and_then(|p| p["version"].as_str()).map(str::to_string),
-            license: pkg.as_ref().and_then(|p| p["license"].as_str()).map(str::to_string),
+            version: pkg
+                .as_ref()
+                .and_then(|p| p["version"].as_str())
+                .map(str::to_string),
+            license: pkg
+                .as_ref()
+                .and_then(|p| p["license"].as_str())
+                .map(str::to_string),
             run: Some(run.into()),
             tags: tags(&[run]),
-            links: vec![source_link(&path), Link { label: "Downloads".into(), url: "/api/downloads".into() }],
-            surface: surface("apps", &id, if download { "download" } else { "viewer" }, reason),
+            links: vec![
+                source_link(&path),
+                Link {
+                    label: "Downloads".into(),
+                    url: "/api/downloads".into(),
+                },
+            ],
+            surface: surface(
+                "apps",
+                &id,
+                if download { "download" } else { "viewer" },
+                reason,
+            ),
             has_doc: Some(readme.is_some()),
             meta,
-            files: readme.is_none().then(|| child.files.iter().take(200).cloned().collect()),
+            files: readme
+                .is_none()
+                .then(|| child.files.iter().take(200).cloned().collect()),
             readme,
             ..Default::default()
         });
@@ -364,14 +541,24 @@ fn package_members(repo: &Repo, out: &mut Vec<Member>) {
         let path = format!("packages/{}", child.name);
         let pkg = repo.read_json(&format!("{path}/package.json"));
         let readme = readme_of(repo, &path, &child.files);
-        let name = pkg.as_ref().and_then(|p| p["name"].as_str()).unwrap_or(&child.name).to_string();
-        let publishable = pkg.as_ref().is_some_and(|p| p["private"] != json!(true) && p["name"].is_string());
+        let name = pkg
+            .as_ref()
+            .and_then(|p| p["name"].as_str())
+            .unwrap_or(&child.name)
+            .to_string();
+        let publishable = pkg
+            .as_ref()
+            .is_some_and(|p| p["private"] != json!(true) && p["name"].is_string());
         let bin: Vec<String> = match pkg.as_ref().map(|p| &p["bin"]) {
             Some(Value::String(_)) => vec![name.clone()],
             Some(Value::Object(o)) => o.keys().cloned().collect(),
             _ => Vec::new(),
         };
-        let mut desc = pkg.as_ref().and_then(|p| p["description"].as_str()).unwrap_or("").to_string();
+        let mut desc = pkg
+            .as_ref()
+            .and_then(|p| p["description"].as_str())
+            .unwrap_or("")
+            .to_string();
         if desc.is_empty() {
             desc = readme.as_deref().map(first_paragraph).unwrap_or_default();
         }
@@ -380,7 +567,10 @@ fn package_members(repo: &Repo, out: &mut Vec<Member>) {
         }
         let mut links = vec![source_link(&path)];
         if publishable {
-            links.push(Link { label: "npm".into(), url: format!("https://www.npmjs.com/package/{name}") });
+            links.push(Link {
+                label: "npm".into(),
+                url: format!("https://www.npmjs.com/package/{name}"),
+            });
         }
         let mut meta = Map::new();
         if publishable {
@@ -388,22 +578,46 @@ fn package_members(repo: &Repo, out: &mut Vec<Member>) {
         }
         meta.insert("bin".into(), json!(bin));
         meta.insert("files".into(), json!(child.files.len()));
-        meta.insert("dependencies".into(), json!(pkg.as_ref().and_then(|p| p["dependencies"].as_object()).map_or(0, |d| d.len())));
+        meta.insert(
+            "dependencies".into(),
+            json!(
+                pkg.as_ref()
+                    .and_then(|p| p["dependencies"].as_object())
+                    .map_or(0, |d| d.len())
+            ),
+        );
         out.push(Member {
             kind: "packages".into(),
             id: child.name.clone(),
             name,
             desc,
             path: Some(path),
-            version: pkg.as_ref().and_then(|p| p["version"].as_str()).map(str::to_string),
-            license: pkg.as_ref().and_then(|p| p["license"].as_str()).map(str::to_string),
+            version: pkg
+                .as_ref()
+                .and_then(|p| p["version"].as_str())
+                .map(str::to_string),
+            license: pkg
+                .as_ref()
+                .and_then(|p| p["license"].as_str())
+                .map(str::to_string),
             run: Some(if bin.is_empty() { "library" } else { "cli" }.into()),
-            tags: tags(&[if bin.is_empty() { "library" } else { "cli" }, if publishable { "npm" } else { "unpublished" }, if pkg.is_none() { "no-manifest" } else { "" }]),
+            tags: tags(&[
+                if bin.is_empty() { "library" } else { "cli" },
+                if publishable { "npm" } else { "unpublished" },
+                if pkg.is_none() { "no-manifest" } else { "" },
+            ]),
             links,
-            surface: surface("packages", &child.name, "viewer", "README, manifest, versions and links on its page."),
+            surface: surface(
+                "packages",
+                &child.name,
+                "viewer",
+                "README, manifest, versions and links on its page.",
+            ),
             has_doc: Some(readme.is_some()),
             meta,
-            files: readme.is_none().then(|| child.files.iter().take(200).cloned().collect()),
+            files: readme
+                .is_none()
+                .then(|| child.files.iter().take(200).cloned().collect()),
             readme,
             ..Default::default()
         });
@@ -429,44 +643,101 @@ fn dep_summary(v: &toml::Value) -> String {
 }
 
 fn crate_members(repo: &Repo, out: &mut Vec<Member>, wasm_modules: &HashMap<String, String>) {
-    let root_manifest: toml::Table = repo.read_text("Cargo.toml", 4 << 20).and_then(|t| t.parse().ok()).unwrap_or_default();
-    let inherited = root_manifest.get("workspace").and_then(|w| w.get("package")).cloned().unwrap_or(toml::Value::Table(Default::default()));
+    let root_manifest: toml::Table = repo
+        .read_text("Cargo.toml", 4 << 20)
+        .and_then(|t| t.parse().ok())
+        .unwrap_or_default();
+    let inherited = root_manifest
+        .get("workspace")
+        .and_then(|w| w.get("package"))
+        .cloned()
+        .unwrap_or(toml::Value::Table(Default::default()));
     for child in repo.children("crates") {
         let path = format!("crates/{}", child.name);
         let text = repo.read_text(&format!("{path}/Cargo.toml"), 1 << 20);
-        let manifest: toml::Table = text.as_deref().and_then(|t| t.parse().ok()).unwrap_or_default();
-        let pk = manifest.get("package").and_then(|p| p.as_table()).cloned().unwrap_or_default();
+        let manifest: toml::Table = text
+            .as_deref()
+            .and_then(|t| t.parse().ok())
+            .unwrap_or_default();
+        let pk = manifest
+            .get("package")
+            .and_then(|p| p.as_table())
+            .cloned()
+            .unwrap_or_default();
         let pick = |key: &str| -> Option<String> {
             match pk.get(key) {
                 Some(toml::Value::String(s)) => Some(s.clone()),
-                Some(toml::Value::Table(t)) if t.get("workspace").and_then(|w| w.as_bool()) == Some(true) => inherited.get(key).and_then(|v| v.as_str()).map(str::to_string),
+                Some(toml::Value::Table(t))
+                    if t.get("workspace").and_then(|w| w.as_bool()) == Some(true) =>
+                {
+                    inherited
+                        .get(key)
+                        .and_then(|v| v.as_str())
+                        .map(str::to_string)
+                }
                 _ => None,
             }
         };
-        let name = pk.get("name").and_then(|n| n.as_str()).unwrap_or(&child.name).to_string();
-        let publish = !matches!(pk.get("publish"), Some(toml::Value::Boolean(false))) && !matches!(pk.get("publish"), Some(toml::Value::Array(a)) if a.is_empty()) && text.is_some();
-        let deps = manifest.get("dependencies").and_then(|d| d.as_table()).cloned().unwrap_or_default();
-        let build_deps = manifest.get("build-dependencies").and_then(|d| d.as_table()).cloned().unwrap_or_default();
+        let name = pk
+            .get("name")
+            .and_then(|n| n.as_str())
+            .unwrap_or(&child.name)
+            .to_string();
+        let publish = !matches!(pk.get("publish"), Some(toml::Value::Boolean(false)))
+            && !matches!(pk.get("publish"), Some(toml::Value::Array(a)) if a.is_empty())
+            && text.is_some();
+        let deps = manifest
+            .get("dependencies")
+            .and_then(|d| d.as_table())
+            .cloned()
+            .unwrap_or_default();
+        let build_deps = manifest
+            .get("build-dependencies")
+            .and_then(|d| d.as_table())
+            .cloned()
+            .unwrap_or_default();
         let types: Vec<String> = manifest
             .get("lib")
             .and_then(|l| l.get("crate-type"))
             .and_then(|t| t.as_array())
-            .map(|a| a.iter().filter_map(|v| v.as_str().map(str::to_string)).collect())
+            .map(|a| {
+                a.iter()
+                    .filter_map(|v| v.as_str().map(str::to_string))
+                    .collect()
+            })
             .unwrap_or_default();
         let has_dep = |d: &str| deps.contains_key(d) || build_deps.contains_key(d);
-        let wasm_target = manifest.get("target").and_then(|t| t.as_table()).is_some_and(|t| t.keys().any(|k| k.contains("wasm32")));
+        let wasm_target = manifest
+            .get("target")
+            .and_then(|t| t.as_table())
+            .is_some_and(|t| t.keys().any(|k| k.contains("wasm32")));
         let capable = wasm_target
-            || ["wasm-bindgen", "js-sys", "web-sys", "wasm-bindgen-futures", "gloo"].iter().any(|d| has_dep(d))
+            || [
+                "wasm-bindgen",
+                "js-sys",
+                "web-sys",
+                "wasm-bindgen-futures",
+                "gloo",
+            ]
+            .iter()
+            .any(|d| has_dep(d))
             || child.name.split(['-', '_']).any(|p| p == "wasm");
         // A wasm-bindgen cdylib: the factory builds it into a WebAssembly module (aphrody-inventory wasm-build).
         let wasm = types.iter().any(|t| t == "cdylib") && has_dep("wasm-bindgen");
-        let readme_file = pk.get("readme").and_then(|r| r.as_str()).map(|r| format!("{path}/{r}"));
+        let readme_file = pk
+            .get("readme")
+            .and_then(|r| r.as_str())
+            .map(|r| format!("{path}/{r}"));
         let readme = match readme_file {
             Some(f) if repo.has(&f) => repo.read_text(&f, MAX_DOC),
             _ => readme_of(repo, &path, &child.files),
         };
         let module = wasm_modules.get(&child.name).cloned();
-        let mut desc = pk.get("description").and_then(|d| d.as_str()).unwrap_or("").to_string();
+        let mut desc = pk
+            .get("description")
+            .and_then(|d| d.as_str())
+            .unwrap_or("")
+            .to_string();
         if desc.is_empty() {
             desc = readme.as_deref().map(first_paragraph).unwrap_or_default();
         }
@@ -475,8 +746,14 @@ fn crate_members(repo: &Repo, out: &mut Vec<Member>, wasm_modules: &HashMap<Stri
         }
         let mut links = vec![source_link(&path)];
         if publish {
-            links.push(Link { label: "crates.io".into(), url: format!("https://crates.io/crates/{name}") });
-            links.push(Link { label: "docs.rs".into(), url: format!("https://docs.rs/{name}") });
+            links.push(Link {
+                label: "crates.io".into(),
+                url: format!("https://crates.io/crates/{name}"),
+            });
+            links.push(Link {
+                label: "docs.rs".into(),
+                url: format!("https://docs.rs/{name}"),
+            });
         }
         let mut s = if wasm {
             surface(
@@ -496,7 +773,11 @@ fn crate_members(repo: &Repo, out: &mut Vec<Member>, wasm_modules: &HashMap<Stri
                 "api",
                 format!(
                     "{}: metadata, dependencies, README and versions on its page, /api/inventory/crates/<id> and the /api/rpc methods.",
-                    if capable { "A library that compiles for WebAssembly but exports no module of its own" } else { "Native crate reachable through the API" }
+                    if capable {
+                        "A library that compiles for WebAssembly but exports no module of its own"
+                    } else {
+                        "Native crate reachable through the API"
+                    }
                 ),
             )
         };
@@ -513,15 +794,33 @@ fn crate_members(repo: &Repo, out: &mut Vec<Member>, wasm_modules: &HashMap<Stri
         }
         meta.insert("dependencies".into(), json!(deps.len()));
         meta.insert("files".into(), json!(child.files.len()));
-        let features: Vec<&String> = manifest.get("features").and_then(|f| f.as_table()).map(|f| f.keys().collect()).unwrap_or_default();
-        let bins: Vec<&str> = manifest.get("bin").and_then(|b| b.as_array()).map(|a| a.iter().filter_map(|b| b.get("name").and_then(|n| n.as_str())).collect()).unwrap_or_default();
+        let features: Vec<&String> = manifest
+            .get("features")
+            .and_then(|f| f.as_table())
+            .map(|f| f.keys().collect())
+            .unwrap_or_default();
+        let bins: Vec<&str> = manifest
+            .get("bin")
+            .and_then(|b| b.as_array())
+            .map(|a| {
+                a.iter()
+                    .filter_map(|b| b.get("name").and_then(|n| n.as_str()))
+                    .collect()
+            })
+            .unwrap_or_default();
         let data = json!({
             "dependencies": deps.iter().map(|(k, v)| (k.clone(), json!(dep_summary(v)))).collect::<Map<String, Value>>(),
             "features": features,
             "bins": bins,
             "libCrateTypes": types,
         });
-        let tag_wasm = if wasm { "wasm" } else if capable { "wasm-capable" } else { "native" };
+        let tag_wasm = if wasm {
+            "wasm"
+        } else if capable {
+            "wasm-capable"
+        } else {
+            "native"
+        };
         out.push(Member {
             kind: "crates".into(),
             id: child.name.clone(),
@@ -529,14 +828,24 @@ fn crate_members(repo: &Repo, out: &mut Vec<Member>, wasm_modules: &HashMap<Stri
             desc,
             path: Some(path),
             version: pick("version"),
-            license: pick("license").or_else(|| pk.get("license-file").and_then(|v| v.as_str()).map(str::to_string)),
+            license: pick("license").or_else(|| {
+                pk.get("license-file")
+                    .and_then(|v| v.as_str())
+                    .map(str::to_string)
+            }),
             run: Some(if wasm { "wasm" } else { "library" }.into()),
-            tags: tags(&[tag_wasm, if publish { "crates.io" } else { "unpublished" }, if text.is_none() { "no-manifest" } else { "" }]),
+            tags: tags(&[
+                tag_wasm,
+                if publish { "crates.io" } else { "unpublished" },
+                if text.is_none() { "no-manifest" } else { "" },
+            ]),
             links,
             surface: s,
             has_doc: Some(readme.is_some()),
             meta,
-            files: readme.is_none().then(|| child.files.iter().take(200).cloned().collect()),
+            files: readme
+                .is_none()
+                .then(|| child.files.iter().take(200).cloned().collect()),
             readme,
             data: Some(data),
             ..Default::default()
@@ -545,8 +854,19 @@ fn crate_members(repo: &Repo, out: &mut Vec<Member>, wasm_modules: &HashMap<Stri
 }
 
 /// One directory or file member of a generic listing (factory, tools, infra, releases, workspace, engine cores).
-fn entry_member(repo: &Repo, kind: &str, prefix: &str, dir: &str, entry: &Entry, extra: &[&str]) -> Member {
-    let path = if dir.is_empty() { entry.name.clone() } else { format!("{dir}/{}", entry.name) };
+fn entry_member(
+    repo: &Repo,
+    kind: &str,
+    prefix: &str,
+    dir: &str,
+    entry: &Entry,
+    extra: &[&str],
+) -> Member {
+    let path = if dir.is_empty() {
+        entry.name.clone()
+    } else {
+        format!("{dir}/{}", entry.name)
+    };
     let id = format!("{prefix}{}", entry.name);
     let mut desc = String::new();
     let mut readme = None;
@@ -558,12 +878,22 @@ fn entry_member(repo: &Repo, kind: &str, prefix: &str, dir: &str, entry: &Entry,
     if entry.dir {
         readme = readme_of(repo, &path, &entry.files);
         let pkg = repo.read_json(&format!("{path}/package.json"));
-        desc = pkg.as_ref().and_then(|p| p["description"].as_str()).unwrap_or("").to_string();
+        desc = pkg
+            .as_ref()
+            .and_then(|p| p["description"].as_str())
+            .unwrap_or("")
+            .to_string();
         if desc.is_empty() {
             desc = readme.as_deref().map(first_paragraph).unwrap_or_default();
         }
-        version = pkg.as_ref().and_then(|p| p["version"].as_str()).map(str::to_string);
-        license = pkg.as_ref().and_then(|p| p["license"].as_str()).map(str::to_string);
+        version = pkg
+            .as_ref()
+            .and_then(|p| p["version"].as_str())
+            .map(str::to_string);
+        license = pkg
+            .as_ref()
+            .and_then(|p| p["license"].as_str())
+            .map(str::to_string);
         if desc.is_empty() {
             desc = source_description(repo, &path, &entry.files);
         }
@@ -571,7 +901,11 @@ fn entry_member(repo: &Repo, kind: &str, prefix: &str, dir: &str, entry: &Entry,
             files = Some(entry.files.iter().take(400).cloned().collect::<Vec<_>>());
         }
     } else if text::is_text_name(&entry.name) {
-        let ext = entry.name.rsplit_once('.').map(|(_, e)| e.to_ascii_lowercase()).unwrap_or_default();
+        let ext = entry
+            .name
+            .rsplit_once('.')
+            .map(|(_, e)| e.to_ascii_lowercase())
+            .unwrap_or_default();
         if let Some(t) = repo.read_text(&path, MAX_TEXT) {
             if ext == "md" || ext == "mdx" {
                 desc = first_paragraph(&t);
@@ -579,9 +913,15 @@ fn entry_member(repo: &Repo, kind: &str, prefix: &str, dir: &str, entry: &Entry,
             } else {
                 if ext == "json" {
                     if let Ok(j) = serde_json::from_str::<Value>(&t) {
-                        desc = j["description"].as_str().map(str::to_string).unwrap_or_default();
+                        desc = j["description"]
+                            .as_str()
+                            .map(str::to_string)
+                            .unwrap_or_default();
                         if desc.is_empty() {
-                            desc = j["$comment"].as_str().map(|c| c.chars().take(240).collect()).unwrap_or_default();
+                            desc = j["$comment"]
+                                .as_str()
+                                .map(|c| c.chars().take(240).collect())
+                                .unwrap_or_default();
                         }
                         if desc.is_empty() {
                             if let Some(k) = j["kind"].as_str() {
@@ -595,7 +935,11 @@ fn entry_member(repo: &Repo, kind: &str, prefix: &str, dir: &str, entry: &Entry,
                 } else {
                     desc = header_text(&t, 240);
                 }
-                lang = Some(if ext.is_empty() { "text".to_string() } else { ext });
+                lang = Some(if ext.is_empty() {
+                    "text".to_string()
+                } else {
+                    ext
+                });
                 text = Some(t);
             }
         }
@@ -618,8 +962,16 @@ fn entry_member(repo: &Repo, kind: &str, prefix: &str, dir: &str, entry: &Entry,
         surface: surface(
             kind,
             &id,
-            if kind == "releases" { "download" } else { "viewer" },
-            if entry.dir { "Directory page: README, file listing and source link." } else { "File page: content, source link and the JSON record through the API." },
+            if kind == "releases" {
+                "download"
+            } else {
+                "viewer"
+            },
+            if entry.dir {
+                "Directory page: README, file listing and source link."
+            } else {
+                "File page: content, source link and the JSON record through the API."
+            },
         ),
         has_doc: Some(readme.is_some()),
         meta,
@@ -631,7 +983,13 @@ fn entry_member(repo: &Repo, kind: &str, prefix: &str, dir: &str, entry: &Entry,
     }
 }
 
-fn directory_kind(repo: &Repo, out: &mut Vec<Member>, kind: &str, specs: &[(&str, &str)], extra: &[&str]) {
+fn directory_kind(
+    repo: &Repo,
+    out: &mut Vec<Member>,
+    kind: &str,
+    specs: &[(&str, &str)],
+    extra: &[&str],
+) {
     for (dir, prefix) in specs {
         for entry in repo.children(dir) {
             if kind == "workspace" && entry.name == "node_modules" {
@@ -642,7 +1000,17 @@ fn directory_kind(repo: &Repo, out: &mut Vec<Member>, kind: &str, specs: &[(&str
     }
 }
 
-fn data_member(kind: &str, id: String, name: String, desc: String, path: &str, tag: &[&str], ty: &str, reason: &str, data: Value) -> Member {
+fn data_member(
+    kind: &str,
+    id: String,
+    name: String,
+    desc: String,
+    path: &str,
+    tag: &[&str],
+    ty: &str,
+    reason: &str,
+    data: Value,
+) -> Member {
     Member {
         kind: kind.into(),
         surface: surface(kind, &id, ty, reason),
@@ -662,16 +1030,47 @@ fn composition_members(repo: &Repo, out: &mut Vec<Member>) {
     if let Some(d) = repo.read_json("distribution.json") {
         if let Some(profiles) = d["profiles"].as_object() {
             for (id, p) in profiles {
-                let desc = p["description"].as_str().map(str::to_string).unwrap_or_else(|| format!("Bun OS distribution profile {id} of distribution.json."));
-                out.push(data_member("factory", format!("composition/{id}"), format!("Composition {id}"), desc, "distribution.json", &["composition"], "viewer", "Distribution profile page with its declared components.", p.clone()));
+                let desc = p["description"]
+                    .as_str()
+                    .map(str::to_string)
+                    .unwrap_or_else(|| {
+                        format!("Bun OS distribution profile {id} of distribution.json.")
+                    });
+                out.push(data_member(
+                    "factory",
+                    format!("composition/{id}"),
+                    format!("Composition {id}"),
+                    desc,
+                    "distribution.json",
+                    &["composition"],
+                    "viewer",
+                    "Distribution profile page with its declared components.",
+                    p.clone(),
+                ));
             }
         }
     }
     if let Some(m) = repo.read_json("factory/images/manifest.json") {
         if let Some(images) = m["images"].as_object() {
             for (id, image) in images {
-                let desc = image["description"].as_str().or(image["purpose"].as_str()).map(str::to_string).unwrap_or_else(|| format!("Bun OS image {id} of factory/images/manifest.json."));
-                out.push(data_member("factory", format!("image/{id}"), format!("Image {id}"), desc, "factory/images/manifest.json", &["image"], "viewer", "Image page: manifest entry, build recipe and downloads.", image.clone()));
+                let desc = image["description"]
+                    .as_str()
+                    .or(image["purpose"].as_str())
+                    .map(str::to_string)
+                    .unwrap_or_else(|| {
+                        format!("Bun OS image {id} of factory/images/manifest.json.")
+                    });
+                out.push(data_member(
+                    "factory",
+                    format!("image/{id}"),
+                    format!("Image {id}"),
+                    desc,
+                    "factory/images/manifest.json",
+                    &["image"],
+                    "viewer",
+                    "Image page: manifest entry, build recipe and downloads.",
+                    image.clone(),
+                ));
             }
         }
     }
@@ -687,14 +1086,25 @@ fn os_package_members(repo: &Repo, out: &mut Vec<Member>) {
         let path = format!("factory/arch/{catalog}");
         out.push(Member {
             kind: "ospackages".into(),
-            surface: surface("ospackages", &id, "info", "Package page: catalog, list and upstream search link."),
+            surface: surface(
+                "ospackages",
+                &id,
+                "info",
+                "Package page: catalog, list and upstream search link.",
+            ),
             id,
             name: name.into(),
             desc,
             path: Some(path.clone()),
             run: Some("data".into()),
             tags: tags(&[catalog, list]),
-            links: vec![Link { label: "Arch package search".into(), url: format!("https://archlinux.org/packages/?q={name}") }, source_link(&path)],
+            links: vec![
+                Link {
+                    label: "Arch package search".into(),
+                    url: format!("https://archlinux.org/packages/?q={name}"),
+                },
+                source_link(&path),
+            ],
             data: Some(data),
             ..Default::default()
         });
@@ -704,24 +1114,59 @@ fn os_package_members(repo: &Repo, out: &mut Vec<Member>) {
             let lid = list["id"].as_str().unwrap_or("");
             for p in list["packages"].as_array().into_iter().flatten() {
                 if let Some(p) = p.as_str() {
-                    add("omarchy", p, lid, json!({ "list": lid, "source": list["source"] }), format!("Pacman package of the Omarchy list {lid}."));
+                    add(
+                        "omarchy",
+                        p,
+                        lid,
+                        json!({ "list": lid, "source": list["source"] }),
+                        format!("Pacman package of the Omarchy list {lid}."),
+                    );
                 }
             }
         }
     }
     if let Some(c) = repo.read_json("factory/arch/chimeraos/catalog.json") {
-        for key in ["packages", "buildPackages", "installerPackages", "installerBuildPackages", "bootstrapPackages"] {
+        for key in [
+            "packages",
+            "buildPackages",
+            "installerPackages",
+            "installerBuildPackages",
+            "bootstrapPackages",
+        ] {
             for p in c[key].as_array().into_iter().flatten() {
                 if let Some(p) = p.as_str() {
-                    add("chimeraos", p, key, json!({ "list": key }), format!("Pacman package of the ChimeraOS {key} list."));
+                    add(
+                        "chimeraos",
+                        p,
+                        key,
+                        json!({ "list": key }),
+                        format!("Pacman package of the ChimeraOS {key} list."),
+                    );
                 }
             }
         }
-        for p in c["aurPackages"].as_array().into_iter().flatten().chain(c["localPackages"].as_array().into_iter().flatten()) {
+        for p in c["aurPackages"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .chain(c["localPackages"].as_array().into_iter().flatten())
+        {
             let name = p["name"].as_str().unwrap_or("");
             let aur = p["repository"].is_string();
-            let version = p["version"].as_str().map(|v| format!(" {v}")).unwrap_or_default();
-            add("chimeraos", name, if aur { "aur" } else { "local" }, p.clone(), format!("ChimeraOS {} package{version}.", if aur { "AUR" } else { "local" }));
+            let version = p["version"]
+                .as_str()
+                .map(|v| format!(" {v}"))
+                .unwrap_or_default();
+            add(
+                "chimeraos",
+                name,
+                if aur { "aur" } else { "local" },
+                p.clone(),
+                format!(
+                    "ChimeraOS {} package{version}.",
+                    if aur { "AUR" } else { "local" }
+                ),
+            );
         }
     }
     if let Some(c) = repo.read_json("factory/arch/cachyos/catalog.json") {
@@ -729,9 +1174,18 @@ fn os_package_members(repo: &Repo, out: &mut Vec<Member>) {
             let cid = catalog["id"].as_str().unwrap_or("");
             let repository = catalog["repository"].as_str().unwrap_or("");
             for r in catalog["recipes"].as_array().into_iter().flatten() {
-                let name = r["recipe"].as_str().unwrap_or("").trim_end_matches("/PKGBUILD");
+                let name = r["recipe"]
+                    .as_str()
+                    .unwrap_or("")
+                    .trim_end_matches("/PKGBUILD");
                 if !name.is_empty() {
-                    add("cachyos", &format!("{cid}/{name}"), cid, r.clone(), format!("CachyOS PKGBUILD recipe {name} of {repository}."));
+                    add(
+                        "cachyos",
+                        &format!("{cid}/{name}"),
+                        cid,
+                        r.clone(),
+                        format!("CachyOS PKGBUILD recipe {name} of {repository}."),
+                    );
                 }
             }
         }
@@ -750,7 +1204,13 @@ fn engine_members(repo: &Repo, out: &mut Vec<Member>) {
                 "engines",
                 format!("console/{id}"),
                 s("name"),
-                format!("{} via {} (route {}, needs {}).", s("name"), s("core"), s("route"), s("needs")),
+                format!(
+                    "{} via {} (route {}, needs {}).",
+                    s("name"),
+                    s("core"),
+                    s("route"),
+                    s("needs")
+                ),
                 "scripts/emulation/consoles.json",
                 &["console", console["route"].as_str().unwrap_or("")],
                 "info",
@@ -760,10 +1220,24 @@ fn engine_members(repo: &Repo, out: &mut Vec<Member>) {
         }
     }
     for entry in repo.children("packages/bun-engine/src") {
-        out.push(entry_member(repo, "engines", "core/", "packages/bun-engine/src", &entry, &["core"]));
+        out.push(entry_member(
+            repo,
+            "engines",
+            "core/",
+            "packages/bun-engine/src",
+            &entry,
+            &["core"],
+        ));
     }
     for entry in repo.children("packages/bun-engine/web-emulation") {
-        out.push(entry_member(repo, "engines", "web/", "packages/bun-engine/web-emulation", &entry, &["web-emulation"]));
+        out.push(entry_member(
+            repo,
+            "engines",
+            "web/",
+            "packages/bun-engine/web-emulation",
+            &entry,
+            &["web-emulation"],
+        ));
     }
 }
 
@@ -782,7 +1256,18 @@ fn game_members(out: &mut Vec<Member>) {
             desc: "IEVR tooling: the IECODE web, .NET and C++ owners, the ieverse and inagle libraries and the aphrody-nie engine crates. The game is read from your own install; no game files are hosted.",
             tags: &["launcher", "level5"],
             test: |m| {
-                ["iecode-web", "iecode-dotnet", "iecode-cpp", "iecode-homebrew", "iecode-scripts", "ieverse", "inagle", "aphrody-nie-"].iter().any(|p| m.id.starts_with(p))
+                [
+                    "iecode-web",
+                    "iecode-dotnet",
+                    "iecode-cpp",
+                    "iecode-homebrew",
+                    "iecode-scripts",
+                    "ieverse",
+                    "inagle",
+                    "aphrody-nie-",
+                ]
+                .iter()
+                .any(|p| m.id.starts_with(p))
                     && m.kind != "ospackages"
             },
         },
@@ -791,7 +1276,10 @@ fn game_members(out: &mut Vec<Member>) {
             name: "Dragon Ball Xenoverse 2 (DBXV2)",
             desc: "DBXV2 tooling: the unified streamed asset layer and the reverse engineering crates shared with IEVR. Private owner material: only the owners are listed, no game content or corpus is published.",
             tags: &["launcher", "private"],
-            test: |m| m.kind == "crates" && (m.id == "re" || m.id == "aphrody-re" || m.id.starts_with("re-")),
+            test: |m| {
+                m.kind == "crates"
+                    && (m.id == "re" || m.id == "aphrody-re" || m.id.starts_with("re-"))
+            },
         },
         Owner {
             id: "ctr",
@@ -805,26 +1293,45 @@ fn game_members(out: &mut Vec<Member>) {
             name: "Nintendo DS (Dust)",
             desc: "The Dust Nintendo DS emulator crates of Bun Engine and the NDS SDK.",
             tags: &["emulator"],
-            test: |m| m.kind == "crates" && (m.id.starts_with("aphrody-dust") || m.id.starts_with("aphrody-nds")),
+            test: |m| {
+                m.kind == "crates"
+                    && (m.id.starts_with("aphrody-dust") || m.id.starts_with("aphrody-nds"))
+            },
         },
         Owner {
             id: "steam",
             name: "Steam and game streaming",
             desc: "Steam client integration and game streaming owners: bun-steam, bun-gamestream and the emulator host.",
             tags: &["launcher", "steam"],
-            test: |m| m.kind == "packages" && ["bun-steam", "bun-gamestream", "bun-emu-host"].contains(&m.id.as_str()),
+            test: |m| {
+                m.kind == "packages"
+                    && ["bun-steam", "bun-gamestream", "bun-emu-host"].contains(&m.id.as_str())
+            },
         },
         Owner {
             id: "nie-play",
             name: "NIE play",
             desc: "The aphrody-nie game and play crates: the Inazuma Eleven engine runtime and match simulation.",
             tags: &["engine"],
-            test: |m| m.kind == "crates" && ["aphrody-nie-game", "aphrody-nie-play", "aphrody-nie-runtime"].iter().any(|p| m.id.starts_with(p)),
+            test: |m| {
+                m.kind == "crates"
+                    && [
+                        "aphrody-nie-game",
+                        "aphrody-nie-play",
+                        "aphrody-nie-runtime",
+                    ]
+                    .iter()
+                    .any(|p| m.id.starts_with(p))
+            },
         },
     ];
     let mut games = Vec::new();
     for o in owners {
-        let members: Vec<String> = out.iter().filter(|m| m.kind != "games" && m.kind != "collections" && (o.test)(m)).map(Member::key).collect();
+        let members: Vec<String> = out
+            .iter()
+            .filter(|m| m.kind != "games" && m.kind != "collections" && (o.test)(m))
+            .map(Member::key)
+            .collect();
         let private = o.tags.contains(&"private");
         let mut meta = Map::new();
         meta.insert("owners".into(), json!(members.len()));
@@ -841,7 +1348,11 @@ fn game_members(out: &mut Vec<Member>) {
                 "games",
                 o.id,
                 "info",
-                if private { "Private-aware info page: owners and status only, no game content." } else { "Launcher page: owners, status and how to run it from your own install." },
+                if private {
+                    "Private-aware info page: owners and status only, no game content."
+                } else {
+                    "Launcher page: owners, status and how to run it from your own install."
+                },
             ),
             members: Some(members),
             meta,
@@ -859,7 +1370,12 @@ fn source_members(repo: &Repo, out: &mut Vec<Member>) {
         .and_then(|l| l["repositories"].as_array())
         .into_iter()
         .flatten()
-        .filter_map(|r| Some((r["mount"].as_str()?.to_string(), r["revision"].as_str()?.to_string())))
+        .filter_map(|r| {
+            Some((
+                r["mount"].as_str()?.to_string(),
+                r["revision"].as_str()?.to_string(),
+            ))
+        })
         .collect();
     for block in modules.split("[submodule ").skip(1) {
         let field = |k: &str| {
@@ -868,8 +1384,13 @@ fn source_members(repo: &Repo, out: &mut Vec<Member>) {
                 (key.trim() == k).then(|| value.trim().to_string())
             })
         };
-        let (Some(path), Some(url)) = (field("path"), field("url")) else { continue };
-        if path.split('/').any(|p| p.is_empty() || p == "." || p == "..") {
+        let (Some(path), Some(url)) = (field("path"), field("url")) else {
+            continue;
+        };
+        if path
+            .split('/')
+            .any(|p| p.is_empty() || p == "." || p == "..")
+        {
             continue;
         }
         let repository = url.trim_end_matches(".git").to_string();
@@ -881,14 +1402,28 @@ fn source_members(repo: &Repo, out: &mut Vec<Member>) {
         let on_demand = field("update").as_deref() == Some("none");
         out.push(Member {
             kind: "sources".into(),
-            surface: surface("sources", &path, "info", "Source page: upstream repository, pinned revision, checkout policy and links."),
+            surface: surface(
+                "sources",
+                &path,
+                "info",
+                "Source page: upstream repository, pinned revision, checkout policy and links.",
+            ),
             id: path.clone(),
             name: path.rsplit('/').next().unwrap_or(&path).to_string(),
-            desc: format!("Pinned upstream source {} mounted at {path}.", repository.trim_start_matches("https://github.com/")),
+            desc: format!(
+                "Pinned upstream source {} mounted at {path}.",
+                repository.trim_start_matches("https://github.com/")
+            ),
             path: Some(path.clone()),
             run: Some("data".into()),
             tags: tags(&["submodule", if on_demand { "on-demand" } else { "" }]),
-            links: vec![Link { label: "Repository".into(), url: repository }, source_link(&path)],
+            links: vec![
+                Link {
+                    label: "Repository".into(),
+                    url: repository,
+                },
+                source_link(&path),
+            ],
             meta,
             ..Default::default()
         });
@@ -896,8 +1431,12 @@ fn source_members(repo: &Repo, out: &mut Vec<Member>) {
     if let Some(ws) = repo.read_json("infra/source-workspace.json") {
         for c in ws["components"].as_array().into_iter().flatten() {
             let cid = c["id"].as_str().unwrap_or("");
-            let checkout = c["checkout"].as_str().filter(|c| *c != "." && !c.is_empty());
-            let id = checkout.map(str::to_string).unwrap_or_else(|| format!("component/{cid}"));
+            let checkout = c["checkout"]
+                .as_str()
+                .filter(|c| *c != "." && !c.is_empty());
+            let id = checkout
+                .map(str::to_string)
+                .unwrap_or_else(|| format!("component/{cid}"));
             if cid.is_empty() || out.iter().any(|m| m.kind == "sources" && m.id == id) {
                 continue;
             }
@@ -908,14 +1447,33 @@ fn source_members(repo: &Repo, out: &mut Vec<Member>) {
             }
             out.push(Member {
                 kind: "sources".into(),
-                surface: surface("sources", &id, "info", "Source page: owner, integration state and pinned revision."),
+                surface: surface(
+                    "sources",
+                    &id,
+                    "info",
+                    "Source page: owner, integration state and pinned revision.",
+                ),
                 id,
                 name: cid.into(),
-                desc: format!("{}: {}.", repository.unwrap_or(cid), c["owner"].as_str().or(c["integration"].as_str()).unwrap_or("source owner")),
+                desc: format!(
+                    "{}: {}.",
+                    repository.unwrap_or(cid),
+                    c["owner"]
+                        .as_str()
+                        .or(c["integration"].as_str())
+                        .unwrap_or("source owner")
+                ),
                 path: checkout.map(str::to_string),
                 run: Some("data".into()),
                 tags: tags(&[c["integration"].as_str().unwrap_or("component")]),
-                links: repository.map(|r| vec![Link { label: "Repository".into(), url: format!("https://github.com/{r}") }]).unwrap_or_default(),
+                links: repository
+                    .map(|r| {
+                        vec![Link {
+                            label: "Repository".into(),
+                            url: format!("https://github.com/{r}"),
+                        }]
+                    })
+                    .unwrap_or_default(),
                 meta,
                 data: Some(c.clone()),
                 ..Default::default()
@@ -937,22 +1495,48 @@ fn release_members(repo: &Repo, out: &mut Vec<Member>) {
         ..Default::default()
     });
     for entry in repo.children("infra/releases") {
-        out.push(entry_member(repo, "releases", "manifest/", "infra/releases", &entry, &["manifest"]));
+        out.push(entry_member(
+            repo,
+            "releases",
+            "manifest/",
+            "infra/releases",
+            &entry,
+            &["manifest"],
+        ));
     }
 }
 
 fn collection_members(out: &mut Vec<Member>) {
-    let by = |out: &[Member], kind: &str, test: &dyn Fn(&Member) -> bool| -> Vec<String> { out.iter().filter(|m| m.kind == kind && test(m)).map(Member::key).collect() };
-    const ANDROID: &[&str] = &["apps/bun-android", "apps/java-ffi", "crates/android-native", "packages/bun-android", "packages/android-pipeline", "packages/android-web"];
+    let by = |out: &[Member], kind: &str, test: &dyn Fn(&Member) -> bool| -> Vec<String> {
+        out.iter()
+            .filter(|m| m.kind == kind && test(m))
+            .map(Member::key)
+            .collect()
+    };
+    const ANDROID: &[&str] = &[
+        "apps/bun-android",
+        "apps/java-ffi",
+        "crates/android-native",
+        "packages/bun-android",
+        "packages/android-pipeline",
+        "packages/android-web",
+    ];
     let groups: Vec<(&str, &str, &str, Vec<String>)> = vec![
         (
             "android",
             "Android",
             "Android owners: apps/bun-android, apps/java-ffi, crates/android-native, packages/bun-android, packages/android-pipeline and packages/android-web, with AOSP and Waydroid.",
             [
-                out.iter().filter(|m| m.path.as_deref().is_some_and(|p| ANDROID.contains(&p))).map(Member::key).collect::<Vec<_>>(),
-                by(out, "packages", &|m| m.id.contains("waydroid") || m.id.contains("android")),
-                by(out, "factory", &|m| m.id.contains("aosp") || m.id.contains("google")),
+                out.iter()
+                    .filter(|m| m.path.as_deref().is_some_and(|p| ANDROID.contains(&p)))
+                    .map(Member::key)
+                    .collect::<Vec<_>>(),
+                by(out, "packages", &|m| {
+                    m.id.contains("waydroid") || m.id.contains("android")
+                }),
+                by(out, "factory", &|m| {
+                    m.id.contains("aosp") || m.id.contains("google")
+                }),
             ]
             .concat(),
         ),
@@ -961,7 +1545,12 @@ fn collection_members(out: &mut Vec<Member>) {
             "Material 3",
             "The Material 3 design system: tokens, components, icons and themes.",
             [
-                by(out, "packages", &|m| m.id.split('-').any(|p| p == "m3") || m.id.starts_with("libm3") || m.id.contains("material") || m.id == "themes"),
+                by(out, "packages", &|m| {
+                    m.id.split('-').any(|p| p == "m3")
+                        || m.id.starts_with("libm3")
+                        || m.id.contains("material")
+                        || m.id == "themes"
+                }),
                 by(out, "apps", &|m| m.id.contains("m3")),
                 by(out, "workspace", &|m| m.id == "design-system"),
             ]
@@ -974,7 +1563,16 @@ fn collection_members(out: &mut Vec<Member>) {
             [
                 by(out, "engines", &|_| true),
                 by(out, "games", &|_| true),
-                by(out, "packages", &|m| ["bun-engine", "bun-emu-host", "bun-gamestream", "bun-loaders", "bun-steam"].contains(&m.id.as_str())),
+                by(out, "packages", &|m| {
+                    [
+                        "bun-engine",
+                        "bun-emu-host",
+                        "bun-gamestream",
+                        "bun-loaders",
+                        "bun-steam",
+                    ]
+                    .contains(&m.id.as_str())
+                }),
             ]
             .concat(),
         ),
@@ -983,14 +1581,26 @@ fn collection_members(out: &mut Vec<Member>) {
             "Compositions: Server, COSMIC Desktop, Gaming",
             "The separate distribution compositions and the images and catalogs they are assembled from.",
             by(out, "factory", &|m| {
-                m.id.starts_with("composition/") || m.id.starts_with("image/") || ["gaming", "omarchy", "hyprland", "alpine", "ubuntu", "disk", "desktop", "distro"].iter().any(|k| m.id.contains(k))
+                m.id.starts_with("composition/")
+                    || m.id.starts_with("image/")
+                    || [
+                        "gaming", "omarchy", "hyprland", "alpine", "ubuntu", "disk", "desktop",
+                        "distro",
+                    ]
+                    .iter()
+                    .any(|k| m.id.contains(k))
             }),
         ),
         (
             "craft",
             "Craft apps",
             "The Craft creative suite: every craft app, library, CLI and web build.",
-            [by(out, "apps", &|m| m.id.contains("craft")), by(out, "packages", &|m| m.id.contains("craft")), by(out, "crates", &|m| m.id.contains("craft"))].concat(),
+            [
+                by(out, "apps", &|m| m.id.contains("craft")),
+                by(out, "packages", &|m| m.id.contains("craft")),
+                by(out, "crates", &|m| m.id.contains("craft")),
+            ]
+            .concat(),
         ),
     ];
     for (id, title, desc, members) in groups {
@@ -1009,7 +1619,12 @@ fn collection_members(out: &mut Vec<Member>) {
             desc: desc.into(),
             run: Some("data".into()),
             tags: tags(&["collection"]),
-            surface: surface("collections", id, "viewer", "Collection page listing every member with its surface."),
+            surface: surface(
+                "collections",
+                id,
+                "viewer",
+                "Collection page listing every member with its surface.",
+            ),
             members: Some(unique),
             meta,
             ..Default::default()
@@ -1020,14 +1635,20 @@ fn collection_members(out: &mut Vec<Member>) {
 /// Private owner material (DBXV2, iecode-docs) is listed for completeness but its content never leaves the repository.
 fn is_private(m: &Member) -> bool {
     let hay = format!("{} {}", m.path.as_deref().unwrap_or(""), m.id).to_ascii_lowercase();
-    hay.contains("dbxv2") || m.path.as_deref().is_some_and(|p| p == "packages/iecode-docs" || p.starts_with("packages/iecode-docs/"))
+    hay.contains("dbxv2")
+        || m.path
+            .as_deref()
+            .is_some_and(|p| p == "packages/iecode-docs" || p.starts_with("packages/iecode-docs/"))
 }
 
 fn privatize(m: &mut Member) {
     if m.kind == "games" || m.kind == "collections" || !is_private(m) {
         return;
     }
-    m.desc = format!("Private owner material ({}): listed for completeness, content is not published.", m.kind);
+    m.desc = format!(
+        "Private owner material ({}): listed for completeness, content is not published.",
+        m.kind
+    );
     m.readme = None;
     m.text = None;
     m.files = None;
@@ -1039,7 +1660,12 @@ fn privatize(m: &mut Member) {
     if !m.tags.iter().any(|t| t == "private") {
         m.tags.push("private".into());
     }
-    m.surface = surface(&m.kind, &m.id, "info", "Private owner material: the member is listed, its content is not published.");
+    m.surface = surface(
+        &m.kind,
+        &m.id,
+        "info",
+        "Private owner material: the member is listed, its content is not published.",
+    );
 }
 
 /// Read every member of the checkout at `root`.
@@ -1049,21 +1675,54 @@ pub fn generate(root: &Path, options: &Options) -> std::io::Result<Inventory> {
     app_members(&repo, &mut members);
     package_members(&repo, &mut members);
     crate_members(&repo, &mut members, &options.wasm_modules);
-    directory_kind(&repo, &mut members, "factory", &[("factory", "")], &["factory"]);
+    directory_kind(
+        &repo,
+        &mut members,
+        "factory",
+        &[("factory", "")],
+        &["factory"],
+    );
     composition_members(&repo, &mut members);
     os_package_members(&repo, &mut members);
     engine_members(&repo, &mut members);
     game_members(&mut members);
-    directory_kind(&repo, &mut members, "tools", &[("scripts", "scripts/"), ("tools/aphrody", "tools/"), ("bin", "bin/"), ("install", "install/")], &[]);
-    directory_kind(&repo, &mut members, "infra", &[("infra", ""), ("infra/config", "config/"), ("infra/config/host", "host/")], &[]);
+    directory_kind(
+        &repo,
+        &mut members,
+        "tools",
+        &[
+            ("scripts", "scripts/"),
+            ("tools/aphrody", "tools/"),
+            ("bin", "bin/"),
+            ("install", "install/"),
+        ],
+        &[],
+    );
+    directory_kind(
+        &repo,
+        &mut members,
+        "infra",
+        &[
+            ("infra", ""),
+            ("infra/config", "config/"),
+            ("infra/config/host", "host/"),
+        ],
+        &[],
+    );
     release_members(&repo, &mut members);
     source_members(&repo, &mut members);
     directory_kind(&repo, &mut members, "workspace", &[("", "")], &[]);
     collection_members(&mut members);
     if options.versions {
-        let cache = options.versions_cache.clone().unwrap_or_else(|| root.join("build/webos-versions.json"));
+        let cache = options
+            .versions_cache
+            .clone()
+            .unwrap_or_else(|| root.join("build/webos-versions.json"));
         let stats = versions::attach(&mut members, &cache);
-        eprintln!("versions: {} lookups, {} fetched, {} cached", stats.jobs, stats.fetched, stats.cached);
+        eprintln!(
+            "versions: {} lookups, {} fetched, {} cached",
+            stats.jobs, stats.fetched, stats.cached
+        );
     }
     for m in &mut members {
         privatize(m);
@@ -1076,12 +1735,18 @@ pub fn generate(root: &Path, options: &Options) -> std::io::Result<Inventory> {
     }
     let mut counts = BTreeMap::new();
     for kind in kind_ids() {
-        counts.insert(kind.to_string(), members.iter().filter(|m| m.kind == kind).count());
+        counts.insert(
+            kind.to_string(),
+            members.iter().filter(|m| m.kind == kind).count(),
+        );
     }
     Ok(Inventory {
         schema_version: 1,
         generated: text::now_rfc3339(),
-        commit: std::env::var("WEBOS_COMMIT").ok().filter(|c| !c.is_empty()).unwrap_or_else(|| repo.head()),
+        commit: std::env::var("WEBOS_COMMIT")
+            .ok()
+            .filter(|c| !c.is_empty())
+            .unwrap_or_else(|| repo.head()),
         total: members.len(),
         counts,
         members,
@@ -1090,7 +1755,10 @@ pub fn generate(root: &Path, options: &Options) -> std::io::Result<Inventory> {
 
 /// A member id is a URL path and a file name of the release: no backslash, colon, NUL, ?, #, % or dot segments.
 pub fn safe_id(id: &str) -> bool {
-    !id.is_empty() && !id.split('/').any(|p| p.is_empty() || p == "." || p == ".." || p.contains(['\\', ':', '\0', '?', '#', '%']))
+    !id.is_empty()
+        && !id.split('/').any(|p| {
+            p.is_empty() || p == "." || p == ".." || p.contains(['\\', ':', '\0', '?', '#', '%'])
+        })
 }
 
 /// The coverage gate. Errors: a member without a surface or description, an unsafe or duplicate id, a tracked
@@ -1112,28 +1780,47 @@ pub fn check(root: &Path, inv: &Inventory, dist: Option<&Path>) -> std::io::Resu
             errors.push(format!("{key}: duplicate member"));
         }
         let s = &m.surface;
-        if s.kind.is_empty() || s.reason.is_empty() || s.page != format!("/inventory/{key}") || s.api != format!("/api/inventory/{key}") {
-            errors.push(format!("{key}: no surface (type, page, api and reason matching the member)"));
+        if s.kind.is_empty()
+            || s.reason.is_empty()
+            || s.page != format!("/inventory/{key}")
+            || s.api != format!("/api/inventory/{key}")
+        {
+            errors.push(format!(
+                "{key}: no surface (type, page, api and reason matching the member)"
+            ));
         }
         if is_placeholder(&m.desc) {
             errors.push(format!("{key}: no description (add a manifest description, a README or a header comment to the member)"));
         }
     }
-    for (kind, dir) in [("apps", "apps"), ("packages", "packages"), ("crates", "crates")] {
+    for (kind, dir) in [
+        ("apps", "apps"),
+        ("packages", "packages"),
+        ("crates", "crates"),
+    ] {
         for child in repo.children(dir) {
             if child.dir && !seen.contains(&format!("{kind}/{}", child.name)) {
-                errors.push(format!("{dir}/{}: tracked member is missing from the inventory", child.name));
+                errors.push(format!(
+                    "{dir}/{}: tracked member is missing from the inventory",
+                    child.name
+                ));
             }
         }
     }
     for child in repo.children("") {
         if child.name != "node_modules" && !seen.contains(&format!("workspace/{}", child.name)) {
-            errors.push(format!("{}: root entry is missing from the inventory", child.name));
+            errors.push(format!(
+                "{}: root entry is missing from the inventory",
+                child.name
+            ));
         }
     }
     for child in repo.children("factory") {
         if !seen.contains(&format!("factory/{}", child.name)) {
-            errors.push(format!("factory/{}: missing from the inventory", child.name));
+            errors.push(format!(
+                "factory/{}: missing from the inventory",
+                child.name
+            ));
         }
     }
     for kind in kind_ids() {
@@ -1145,9 +1832,23 @@ pub fn check(root: &Path, inv: &Inventory, dist: Option<&Path>) -> std::io::Resu
         if !dist.join("inventory.json").is_file() {
             errors.push("inventory.json: not written".into());
         }
-        let missing: Vec<String> = inv.members.iter().filter(|m| !dist.join(&m.kind).join(format!("{}.json", m.id)).is_file()).map(Member::key).collect();
+        let missing: Vec<String> = inv
+            .members
+            .iter()
+            .filter(|m| !dist.join(&m.kind).join(format!("{}.json", m.id)).is_file())
+            .map(Member::key)
+            .collect();
         if !missing.is_empty() {
-            errors.push(format!("{} members have no JSON record, first {}", missing.len(), missing.iter().take(5).cloned().collect::<Vec<_>>().join(", ")));
+            errors.push(format!(
+                "{} members have no JSON record, first {}",
+                missing.len(),
+                missing
+                    .iter()
+                    .take(5)
+                    .cloned()
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ));
         }
     }
     Ok(errors)
@@ -1165,7 +1866,10 @@ pub fn write(dir: &Path, inv: &Inventory) -> std::io::Result<()> {
     use std::fs;
     fs::create_dir_all(dir)?;
     let light: Vec<Member> = inv.members.iter().map(Member::summary).collect();
-    let kinds: Vec<Value> = KINDS.iter().map(|(id, label, desc)| json!({ "id": id, "label": label, "desc": desc })).collect();
+    let kinds: Vec<Value> = KINDS
+        .iter()
+        .map(|(id, label, desc)| json!({ "id": id, "label": label, "desc": desc }))
+        .collect();
     let index = json!({
         "schemaVersion": inv.schema_version,
         "generated": inv.generated,

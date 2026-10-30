@@ -37,25 +37,42 @@ pub struct InventoryState {
 
 impl InventoryState {
     /// Open `dir` (holding `inventory.json`); `wasm_dir` holds the staged modules (`<id>/<file>.wasm`).
-    pub fn open(dir: impl Into<PathBuf>, wasm_dir: Option<PathBuf>) -> std::io::Result<InventoryState> {
+    pub fn open(
+        dir: impl Into<PathBuf>,
+        wasm_dir: Option<PathBuf>,
+    ) -> std::io::Result<InventoryState> {
         let dir = dir.into();
-        let index: Value = serde_json::from_slice(&std::fs::read(dir.join("inventory.json"))?).map_err(std::io::Error::other)?;
-        Ok(InventoryState { inner: Arc::new(Inner { dir, wasm_dir, index }) })
+        let index: Value = serde_json::from_slice(&std::fs::read(dir.join("inventory.json"))?)
+            .map_err(std::io::Error::other)?;
+        Ok(InventoryState {
+            inner: Arc::new(Inner {
+                dir,
+                wasm_dir,
+                index,
+            }),
+        })
     }
 
     /// `WEBOS_INVENTORY_DIR` (default `inventory`, relative to the working directory, the release root) and
     /// `WEBOS_WASM_DIR` (default `<inventory dir>/../wasm/modules` when it exists).
     pub fn from_env() -> std::io::Result<InventoryState> {
-        let dir = std::env::var_os("WEBOS_INVENTORY_DIR").map(PathBuf::from).unwrap_or_else(|| PathBuf::from("inventory"));
-        let wasm = std::env::var_os("WEBOS_WASM_DIR").map(PathBuf::from).or_else(|| {
-            let guess = dir.join("../wasm/modules");
-            guess.is_dir().then_some(guess)
-        });
+        let dir = std::env::var_os("WEBOS_INVENTORY_DIR")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("inventory"));
+        let wasm = std::env::var_os("WEBOS_WASM_DIR")
+            .map(PathBuf::from)
+            .or_else(|| {
+                let guess = dir.join("../wasm/modules");
+                guess.is_dir().then_some(guess)
+            });
         InventoryState::open(dir, wasm)
     }
 
     fn members(&self) -> &[Value] {
-        self.inner.index["members"].as_array().map(Vec::as_slice).unwrap_or(&[])
+        self.inner.index["members"]
+            .as_array()
+            .map(Vec::as_slice)
+            .unwrap_or(&[])
     }
 }
 
@@ -71,7 +88,14 @@ pub struct InventoryHealth {
 
 pub fn health(state: &InventoryState) -> InventoryHealth {
     let index = &state.inner.index;
-    let counts: BTreeMap<String, u64> = index["counts"].as_object().map(|c| c.iter().map(|(k, v)| (k.clone(), v.as_u64().unwrap_or(0))).collect()).unwrap_or_default();
+    let counts: BTreeMap<String, u64> = index["counts"]
+        .as_object()
+        .map(|c| {
+            c.iter()
+                .map(|(k, v)| (k.clone(), v.as_u64().unwrap_or(0)))
+                .collect()
+        })
+        .unwrap_or_default();
     let total = index["total"].as_u64().unwrap_or(0);
     InventoryHealth {
         ok: total > 0 && counts.values().all(|n| *n > 0),
@@ -85,15 +109,28 @@ pub fn health(state: &InventoryState) -> InventoryHealth {
 fn json_bytes(bytes: Vec<u8>) -> Response {
     let mut res = Response::new(Body::from(bytes));
     let h = res.headers_mut();
-    h.insert(header::CONTENT_TYPE, HeaderValue::from_static("application/json; charset=utf-8"));
+    h.insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static("application/json; charset=utf-8"),
+    );
     h.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
-    h.insert(header::ACCESS_CONTROL_ALLOW_ORIGIN, HeaderValue::from_static("*"));
-    h.insert(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
+    h.insert(
+        header::ACCESS_CONTROL_ALLOW_ORIGIN,
+        HeaderValue::from_static("*"),
+    );
+    h.insert(
+        header::X_CONTENT_TYPE_OPTIONS,
+        HeaderValue::from_static("nosniff"),
+    );
     res
 }
 
 fn not_found() -> Response {
-    (StatusCode::NOT_FOUND, Json(json!({ "error": "No such inventory member" }))).into_response()
+    (
+        StatusCode::NOT_FOUND,
+        Json(json!({ "error": "No such inventory member" })),
+    )
+        .into_response()
 }
 
 /// Serve `<dir>/<rel>.json`, where `rel` is `<kind>` or `<kind>/<id>`.
@@ -116,17 +153,27 @@ async fn index(State(state): State<InventoryState>) -> Response {
     }
 }
 
-async fn inventory_path(State(state): State<InventoryState>, UrlPath(rest): UrlPath<String>) -> Response {
+async fn inventory_path(
+    State(state): State<InventoryState>,
+    UrlPath(rest): UrlPath<String>,
+) -> Response {
     record(&state, &rest).await
 }
 
-async fn wasm_module(State(state): State<InventoryState>, UrlPath(rest): UrlPath<String>) -> Response {
-    let Some(dir) = state.inner.wasm_dir.as_ref() else { return StatusCode::NOT_FOUND.into_response() };
+async fn wasm_module(
+    State(state): State<InventoryState>,
+    UrlPath(rest): UrlPath<String>,
+) -> Response {
+    let Some(dir) = state.inner.wasm_dir.as_ref() else {
+        return StatusCode::NOT_FOUND.into_response();
+    };
     if !safe_id(&rest) {
         return StatusCode::NOT_FOUND.into_response();
     }
     let path = dir.join(&rest);
-    let Ok(bytes) = tokio::fs::read(&path).await else { return StatusCode::NOT_FOUND.into_response() };
+    let Ok(bytes) = tokio::fs::read(&path).await else {
+        return StatusCode::NOT_FOUND.into_response();
+    };
     let ty = match Path::new(&rest).extension().and_then(|e| e.to_str()) {
         Some("wasm") => "application/wasm",
         Some("js") => "text/javascript; charset=utf-8",
@@ -134,20 +181,43 @@ async fn wasm_module(State(state): State<InventoryState>, UrlPath(rest): UrlPath
         _ => "application/octet-stream",
     };
     let mut res = Response::new(Body::from(bytes));
-    res.headers_mut().insert(header::CONTENT_TYPE, HeaderValue::from_static(ty));
-    res.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
-    res.headers_mut().insert(header::CROSS_ORIGIN_RESOURCE_POLICY, HeaderValue::from_static("same-origin"));
+    res.headers_mut()
+        .insert(header::CONTENT_TYPE, HeaderValue::from_static(ty));
+    res.headers_mut()
+        .insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
+    res.headers_mut().insert(
+        header::CROSS_ORIGIN_RESOURCE_POLICY,
+        HeaderValue::from_static("same-origin"),
+    );
     res
 }
 
 const METHODS: &[(&str, &str)] = &[
-    ("inventory.counts", "Member counts per kind and the source commit."),
-    ("inventory.list", "{kind?, query?, offset?, limit?} Members of a kind filtered by the words of the query (limit at most 200)."),
-    ("inventory.search", "{query, offset?, limit?} Members of every kind ranked by name, id, tags and description."),
-    ("inventory.get", "{kind, id} One member with its README, text, data and members."),
-    ("crate.dependencies", "{id} Direct dependencies of a crate with their version requirements."),
+    (
+        "inventory.counts",
+        "Member counts per kind and the source commit.",
+    ),
+    (
+        "inventory.list",
+        "{kind?, query?, offset?, limit?} Members of a kind filtered by the words of the query (limit at most 200).",
+    ),
+    (
+        "inventory.search",
+        "{query, offset?, limit?} Members of every kind ranked by name, id, tags and description.",
+    ),
+    (
+        "inventory.get",
+        "{kind, id} One member with its README, text, data and members.",
+    ),
+    (
+        "crate.dependencies",
+        "{id} Direct dependencies of a crate with their version requirements.",
+    ),
     ("crate.features", "{id} Cargo features of a crate."),
-    ("wasm.modules", "Crates served as WebAssembly modules with the module URL."),
+    (
+        "wasm.modules",
+        "Crates served as WebAssembly modules with the module URL.",
+    ),
 ];
 
 fn rpc_error(id: &Value, code: i64, message: &str) -> Value {
@@ -155,17 +225,41 @@ fn rpc_error(id: &Value, code: i64, message: &str) -> Value {
 }
 
 fn words(s: &str) -> Vec<String> {
-    s.to_lowercase().split(|c: char| !c.is_alphanumeric()).filter(|w| !w.is_empty()).map(str::to_string).collect()
+    s.to_lowercase()
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|w| !w.is_empty())
+        .map(str::to_string)
+        .collect()
 }
 
 fn haystack(m: &Value) -> String {
-    let tags = m["tags"].as_array().map(|t| t.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>().join(" ")).unwrap_or_default();
-    format!("{} {} {} {} {}", m["name"].as_str().unwrap_or(""), m["id"].as_str().unwrap_or(""), m["desc"].as_str().unwrap_or(""), tags, m["path"].as_str().unwrap_or("")).to_lowercase()
+    let tags = m["tags"]
+        .as_array()
+        .map(|t| {
+            t.iter()
+                .filter_map(|v| v.as_str())
+                .collect::<Vec<_>>()
+                .join(" ")
+        })
+        .unwrap_or_default();
+    format!(
+        "{} {} {} {} {}",
+        m["name"].as_str().unwrap_or(""),
+        m["id"].as_str().unwrap_or(""),
+        m["desc"].as_str().unwrap_or(""),
+        tags,
+        m["path"].as_str().unwrap_or("")
+    )
+    .to_lowercase()
 }
 
 fn page(hits: Vec<&Value>, params: &Map<String, Value>) -> Value {
     let offset = params.get("offset").and_then(Value::as_u64).unwrap_or(0) as usize;
-    let limit = params.get("limit").and_then(Value::as_u64).unwrap_or(50).clamp(1, 200) as usize;
+    let limit = params
+        .get("limit")
+        .and_then(Value::as_u64)
+        .unwrap_or(50)
+        .clamp(1, 200) as usize;
     json!({ "total": hits.len(), "offset": offset, "members": hits.into_iter().skip(offset).take(limit).collect::<Vec<_>>() })
 }
 
@@ -174,16 +268,30 @@ async fn read_member(state: &InventoryState, kind: &str, id: &str) -> Option<Val
     if !KINDS.iter().any(|k| k.0 == kind) || !safe_id(&rel) {
         return None;
     }
-    let bytes = tokio::fs::read(state.inner.dir.join(format!("{rel}.json"))).await.ok()?;
+    let bytes = tokio::fs::read(state.inner.dir.join(format!("{rel}.json")))
+        .await
+        .ok()?;
     serde_json::from_slice(&bytes).ok()
 }
 
-async fn call(state: &InventoryState, method: &str, params: &Map<String, Value>) -> Result<Option<Value>, (i64, &'static str)> {
-    let s = |k: &str| params.get(k).and_then(Value::as_str).unwrap_or("").to_string();
+async fn call(
+    state: &InventoryState,
+    method: &str,
+    params: &Map<String, Value>,
+) -> Result<Option<Value>, (i64, &'static str)> {
+    let s = |k: &str| {
+        params
+            .get(k)
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .to_string()
+    };
     Ok(match method {
         "inventory.counts" => {
             let i = &state.inner.index;
-            Some(json!({ "counts": i["counts"], "total": i["total"], "commit": i["commit"], "generated": i["generated"], "kinds": KINDS.iter().map(|k| k.0).collect::<Vec<_>>() }))
+            Some(
+                json!({ "counts": i["counts"], "total": i["total"], "commit": i["commit"], "generated": i["generated"], "kinds": KINDS.iter().map(|k| k.0).collect::<Vec<_>>() }),
+            )
         }
         "inventory.list" => {
             let kind = s("kind");
@@ -215,18 +323,35 @@ async fn call(state: &InventoryState, method: &str, params: &Map<String, Value>)
                         if !hay.contains(t.as_str()) {
                             return None;
                         }
-                        score += if name == *t { 20 } else if name.starts_with(t.as_str()) { 10 } else if name.contains(t.as_str()) { 5 } else { 1 };
+                        score += if name == *t {
+                            20
+                        } else if name.starts_with(t.as_str()) {
+                            10
+                        } else if name.contains(t.as_str()) {
+                            5
+                        } else {
+                            1
+                        };
                     }
                     Some((score, m))
                 })
                 .collect();
-            scored.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1["name"].as_str().cmp(&b.1["name"].as_str())));
+            scored.sort_by(|a, b| {
+                b.0.cmp(&a.0)
+                    .then_with(|| a.1["name"].as_str().cmp(&b.1["name"].as_str()))
+            });
             Some(page(scored.into_iter().map(|(_, m)| m).collect(), params))
         }
         "inventory.get" => read_member(state, &s("kind"), &s("id")).await,
         "crate.dependencies" | "crate.features" => {
             let member = read_member(state, "crates", &s("id")).await;
-            member.map(|m| if method == "crate.features" { m["data"]["features"].clone() } else { m["data"]["dependencies"].clone() })
+            member.map(|m| {
+                if method == "crate.features" {
+                    m["data"]["features"].clone()
+                } else {
+                    m["data"]["dependencies"].clone()
+                }
+            })
         }
         "wasm.modules" => Some(Value::Array(
             state
@@ -241,26 +366,45 @@ async fn call(state: &InventoryState, method: &str, params: &Map<String, Value>)
 }
 
 async fn rpc_get() -> Response {
-    let methods: Map<String, Value> = METHODS.iter().map(|(k, v)| (k.to_string(), json!(v))).collect();
-    let mut res = Json(json!({ "jsonrpc": "2.0", "endpoint": "/api/rpc", "methods": methods })).into_response();
-    res.headers_mut().insert(header::ACCESS_CONTROL_ALLOW_ORIGIN, HeaderValue::from_static("*"));
+    let methods: Map<String, Value> = METHODS
+        .iter()
+        .map(|(k, v)| (k.to_string(), json!(v)))
+        .collect();
+    let mut res = Json(json!({ "jsonrpc": "2.0", "endpoint": "/api/rpc", "methods": methods }))
+        .into_response();
+    res.headers_mut().insert(
+        header::ACCESS_CONTROL_ALLOW_ORIGIN,
+        HeaderValue::from_static("*"),
+    );
     res
 }
 
 async fn rpc_post(State(state): State<InventoryState>, body: Bytes) -> Response {
     let reply = |v: Value| {
         let mut res = Json(v).into_response();
-        res.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
-        res.headers_mut().insert(header::ACCESS_CONTROL_ALLOW_ORIGIN, HeaderValue::from_static("*"));
+        res.headers_mut()
+            .insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
+        res.headers_mut().insert(
+            header::ACCESS_CONTROL_ALLOW_ORIGIN,
+            HeaderValue::from_static("*"),
+        );
         res
     };
     if body.len() > 16 * 1024 {
         return reply(rpc_error(&Value::Null, -32600, "Request too large"));
     }
-    let Ok(request) = serde_json::from_slice::<Value>(&body) else { return reply(rpc_error(&Value::Null, -32700, "Parse error")) };
+    let Ok(request) = serde_json::from_slice::<Value>(&body) else {
+        return reply(rpc_error(&Value::Null, -32700, "Parse error"));
+    };
     let id = request.get("id").cloned().unwrap_or(Value::Null);
-    let Some(method) = request.get("method").and_then(Value::as_str) else { return reply(rpc_error(&id, -32600, "Invalid request")) };
-    let params = request.get("params").and_then(Value::as_object).cloned().unwrap_or_default();
+    let Some(method) = request.get("method").and_then(Value::as_str) else {
+        return reply(rpc_error(&id, -32600, "Invalid request"));
+    };
+    let params = request
+        .get("params")
+        .and_then(Value::as_object)
+        .cloned()
+        .unwrap_or_default();
     match call(&state, method, &params).await {
         Ok(Some(result)) => reply(json!({ "jsonrpc": "2.0", "id": id, "result": result })),
         Ok(None) => reply(rpc_error(&id, -32602, "No such member or invalid params")),

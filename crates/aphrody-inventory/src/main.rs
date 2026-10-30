@@ -16,7 +16,9 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 fn usage() -> ExitCode {
-    eprintln!("usage: aphrody-inventory <check|write DIR|wasm-build|counts> [--root DIR] [--dist DIR] [--versions] [--wasm SRC] [--force] [ID ...]");
+    eprintln!(
+        "usage: aphrody-inventory <check|write DIR|wasm-build|counts> [--root DIR] [--dist DIR] [--versions] [--wasm SRC] [--force] [ID ...]"
+    );
     ExitCode::from(64)
 }
 
@@ -24,7 +26,9 @@ fn checkout_root(explicit: Option<PathBuf>) -> PathBuf {
     if let Some(root) = explicit {
         return root;
     }
-    let out = std::process::Command::new("git").args(["rev-parse", "--show-toplevel"]).output();
+    let out = std::process::Command::new("git")
+        .args(["rev-parse", "--show-toplevel"])
+        .output();
     match out {
         Ok(o) if o.status.success() => PathBuf::from(String::from_utf8_lossy(&o.stdout).trim()),
         _ => PathBuf::from("."),
@@ -53,7 +57,9 @@ fn gate(root: &Path, inv: &aphrody_inventory::Inventory, dist: Option<&Path>) ->
 
 fn main() -> ExitCode {
     let mut args = std::env::args().skip(1);
-    let Some(command) = args.next() else { return usage() };
+    let Some(command) = args.next() else {
+        return usage();
+    };
     let mut root = None;
     let mut dist = None;
     let mut wasm_src = None;
@@ -82,17 +88,23 @@ fn main() -> ExitCode {
     };
     match command.as_str() {
         "counts" => {
-            let Some(inv) = generate_with(&Options::default()) else { return ExitCode::FAILURE };
+            let Some(inv) = generate_with(&Options::default()) else {
+                return ExitCode::FAILURE;
+            };
             println!("{}", counts_line(&inv));
             ExitCode::SUCCESS
         }
         "check" => {
-            let Some(inv) = generate_with(&Options::default()) else { return ExitCode::FAILURE };
+            let Some(inv) = generate_with(&Options::default()) else {
+                return ExitCode::FAILURE;
+            };
             println!("{}", counts_line(&inv));
             gate(&root, &inv, dist.as_deref())
         }
         "write" => {
-            let Some(dir) = positional.first().map(PathBuf::from) else { return usage() };
+            let Some(dir) = positional.first().map(PathBuf::from) else {
+                return usage();
+            };
             let src = wasm_src.unwrap_or_else(|| wasm::modules_dir(&root));
             let modules_dest = dir.join("../wasm/modules");
             let modules = match wasm::stage(&src, &modules_dest, "/wasm/modules") {
@@ -103,8 +115,14 @@ fn main() -> ExitCode {
                 }
             };
             eprintln!("wasm modules staged: {}", modules.len());
-            let options = Options { versions, versions_cache: None, wasm_modules: modules };
-            let Some(inv) = generate_with(&options) else { return ExitCode::FAILURE };
+            let options = Options {
+                versions,
+                versions_cache: None,
+                wasm_modules: modules,
+            };
+            let Some(inv) = generate_with(&options) else {
+                return ExitCode::FAILURE;
+            };
             if let Err(e) = write(&dir, &inv) {
                 eprintln!("writing {}: {e}", dir.display());
                 return ExitCode::FAILURE;
@@ -117,9 +135,15 @@ fn main() -> ExitCode {
                 eprintln!("Build WebAssembly modules on the VPS factory");
                 return ExitCode::from(64);
             }
-            let Some(inv) = generate_with(&Options::default()) else { return ExitCode::FAILURE };
+            let Some(inv) = generate_with(&Options::default()) else {
+                return ExitCode::FAILURE;
+            };
             let status = wasm::build(&root, &inv, &positional, force);
-            if status.values().any(|s| !s.ok) { ExitCode::FAILURE } else { ExitCode::SUCCESS }
+            if status.values().any(|s| !s.ok) {
+                ExitCode::FAILURE
+            } else {
+                ExitCode::SUCCESS
+            }
         }
         _ => usage(),
     }

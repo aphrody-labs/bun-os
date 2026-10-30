@@ -27,20 +27,34 @@ pub fn excluded(name: &str) -> bool {
     if matches!(name, "docs" | "example" | "examples") {
         return true;
     }
-    name.split(['-', '_']).any(|part| matches!(part, "example" | "examples" | "showcase" | "showcases" | "template" | "templates"))
+    name.split(['-', '_']).any(|part| {
+        matches!(
+            part,
+            "example" | "examples" | "showcase" | "showcases" | "template" | "templates"
+        )
+    })
 }
 
 impl Repo {
     pub fn open(root: &Path) -> std::io::Result<Repo> {
-        let out = Command::new("git").arg("-C").arg(root).args(["-c", "core.quotepath=off", "ls-files", "-s", "-z"]).output()?;
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(root)
+            .args(["-c", "core.quotepath=off", "ls-files", "-s", "-z"])
+            .output()?;
         if !out.status.success() {
-            return Err(std::io::Error::other(format!("git ls-files failed: {}", String::from_utf8_lossy(&out.stderr).trim())));
+            return Err(std::io::Error::other(format!(
+                "git ls-files failed: {}",
+                String::from_utf8_lossy(&out.stderr).trim()
+            )));
         }
         let mut tracked = Vec::new();
         let mut gitlinks = HashSet::new();
         for record in out.stdout.split(|b| *b == 0).filter(|r| !r.is_empty()) {
             let record = String::from_utf8_lossy(record);
-            let Some((meta, path)) = record.split_once('\t') else { continue };
+            let Some((meta, path)) = record.split_once('\t') else {
+                continue;
+            };
             if meta.starts_with("160000") {
                 gitlinks.insert(path.to_string());
             }
@@ -49,7 +63,12 @@ impl Repo {
         tracked.sort();
         tracked.dedup();
         let set = tracked.iter().cloned().collect();
-        Ok(Repo { root: root.to_path_buf(), tracked, set, gitlinks })
+        Ok(Repo {
+            root: root.to_path_buf(),
+            tracked,
+            set,
+            gitlinks,
+        })
     }
 
     pub fn root(&self) -> &Path {
@@ -62,10 +81,16 @@ impl Repo {
 
     /// Direct children of a tracked directory ("" for the root), without dot entries and excluded names.
     pub fn children(&self, dir: &str) -> Vec<Entry> {
-        let prefix = if dir.is_empty() { String::new() } else { format!("{dir}/") };
+        let prefix = if dir.is_empty() {
+            String::new()
+        } else {
+            format!("{dir}/")
+        };
         let mut out: BTreeMap<String, Entry> = BTreeMap::new();
         for file in &self.tracked {
-            let Some(rest) = file.strip_prefix(&prefix) else { continue };
+            let Some(rest) = file.strip_prefix(&prefix) else {
+                continue;
+            };
             let (name, nested) = match rest.split_once('/') {
                 Some((n, _)) => (n, true),
                 None => (rest, false),
@@ -73,7 +98,11 @@ impl Repo {
             if name.is_empty() || name.starts_with('.') || excluded(name) {
                 continue;
             }
-            let entry = out.entry(name.to_string()).or_insert_with(|| Entry { name: name.to_string(), dir: false, files: Vec::new() });
+            let entry = out.entry(name.to_string()).or_insert_with(|| Entry {
+                name: name.to_string(),
+                dir: false,
+                files: Vec::new(),
+            });
             if nested || self.gitlinks.contains(file) {
                 entry.dir = true;
             }
@@ -83,7 +112,12 @@ impl Repo {
     }
 
     fn safe(&self, path: &str) -> Option<PathBuf> {
-        if path.is_empty() || path.split('/').any(|p| p.is_empty() || p == "." || p == "..") || path.contains(['\\', ':', '\0']) {
+        if path.is_empty()
+            || path
+                .split('/')
+                .any(|p| p.is_empty() || p == "." || p == "..")
+            || path.contains(['\\', ':', '\0'])
+        {
             return None;
         }
         Some(self.root.join(path))
