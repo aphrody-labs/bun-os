@@ -1333,3 +1333,143 @@
 	url = https://github.com/aphrody-labs/helium-linux.git
 	branch = main
 	shallow = true
+[submodule "vendor/wasm/wasmtime"]
+	path = vendor/wasm/wasmtime
+	url = https://github.com/aphrody-labs/wasmtime.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wasmer"]
+	path = vendor/wasm/wasmer
+	url = https://github.com/aphrody-labs/wasmer.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wasmi"]
+	path = vendor/wasm/wasmi
+	url = https://github.com/aphrody-labs/wasmi.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wamr"]
+	path = vendor/wasm/wamr
+	url = https://github.com/aphrody-labs/wasm-micro-runtime.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wasm-tools"]
+	path = vendor/wasm/wasm-tools
+	url = https://github.com/aphrody-labs/wasm-tools.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wit-bindgen"]
+	path = vendor/wasm/wit-bindgen
+	url = https://github.com/aphrody-labs/wit-bindgen.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wasm-pack"]
+	path = vendor/wasm/wasm-pack
+	url = https://github.com/aphrody-labs/wasm-pack.git
+	branch = master
+	shallow = true
+[submodule "vendor/wasm/wasm-bindgen"]
+	path = vendor/wasm/wasm-bindgen
+	url = https://github.com/aphrody-labs/wasm-bindgen.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/cargo-component"]
+	path = vendor/wasm/cargo-component
+	url = https://github.com/aphrody-labs/cargo-component.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wac"]
+	path = vendor/wasm/wac
+	url = https://github.com/aphrody-labs/wac.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/jco"]
+	path = vendor/wasm/jco
+	url = https://github.com/aphrody-labs/jco.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/componentize-js"]
+	path = vendor/wasm/componentize-js
+	url = https://github.com/aphrody-labs/ComponentizeJS.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/binaryen"]
+	path = vendor/wasm/binaryen
+	url = https://github.com/aphrody-labs/binaryen.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wabt"]
+	path = vendor/wasm/wabt
+	url = https://github.com/aphrody-labs/wabt.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/emsdk"]
+	path = vendor/wasm/emsdk
+	url = https://github.com/aphrody-labs/emsdk.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wasi-sdk"]
+	path = vendor/wasm/wasi-sdk
+	url = https://github.com/aphrody-labs/wasi-sdk.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wasi-libc"]
+	path = vendor/wasm/wasi-libc
+	url = https://github.com/aphrody-labs/wasi-libc.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/v86"]
+	path = vendor/wasm/v86
+	url = https://github.com/aphrody-labs/v86.git
+	branch = master
+	shallow = true
+[submodule "vendor/wasm/container2wasm"]
+	path = vendor/wasm/container2wasm
+	url = https://github.com/aphrody-labs/container2wasm.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/pyodide"]
+	path = vendor/wasm/pyodide
+	url = https://github.com/aphrody-labs/pyodide.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/ruby-wasm"]
+	path = vendor/wasm/ruby-wasm
+	url = https://github.com/aphrody-labs/ruby.wasm.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/php-wasm"]
+	path = vendor/wasm/php-wasm
+	url = https://github.com/aphrody-labs/php-wasm.git
+	branch = master
+	shallow = true
+[submodule "vendor/wasm/ffmpeg-wasm"]
+	path = vendor/wasm/ffmpeg-wasm
+	url = https://github.com/aphrody-labs/ffmpeg.wasm.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/sqlite-wasm"]
+	path = vendor/wasm/sqlite-wasm
+	url = https://github.com/aphrody-labs/sqlite-wasm.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/duckdb-wasm"]
+	path = vendor/wasm/duckdb-wasm
+	url = https://github.com/aphrody-labs/duckdb-wasm.git
+	branch = main
+	shallow = true
+[submodule "vendor/wasm/wasm-git"]
+	path = vendor/wasm/wasm-git
+	url = https://github.com/aphrody-labs/wasm-git.git
+	branch = master
+	shallow = true
+[submodule "vendor/wasm/opencv"]
+	path = vendor/wasm/opencv
+	url = https://github.com/aphrody-labs/opencv.git
+	branch = 5.x
+	shallow = true
+[submodule "vendor/wasm/onnxruntime"]
+	path = vendor/wasm/onnxruntime
+	url = https://github.com/aphrody-labs/onnxruntime.git
+	branch = main
+	shallow = true

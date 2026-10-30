@@ -484,6 +484,146 @@
     "bun-ui": {
       "origin": "https://github.com/aphrody-labs/bun-ui.git",
       "path": "bun-ui"
+    },
+    "wasm-wasmtime": {
+      "origin": "https://github.com/aphrody-labs/wasmtime.git",
+      "upstream": "https://github.com/bytecodealliance/wasmtime.git",
+      "path": "wasm/wasmtime"
+    },
+    "wasm-wasmer": {
+      "origin": "https://github.com/aphrody-labs/wasmer.git",
+      "upstream": "https://github.com/wasmerio/wasmer.git",
+      "path": "wasm/wasmer"
+    },
+    "wasm-wasmi": {
+      "origin": "https://github.com/aphrody-labs/wasmi.git",
+      "upstream": "https://github.com/wasmi-labs/wasmi.git",
+      "path": "wasm/wasmi"
+    },
+    "wasm-wamr": {
+      "origin": "https://github.com/aphrody-labs/wasm-micro-runtime.git",
+      "upstream": "https://github.com/wasm-micro-runtime/wasm-micro-runtime.git",
+      "path": "wasm/wamr"
+    },
+    "wasm-wasm-tools": {
+      "origin": "https://github.com/aphrody-labs/wasm-tools.git",
+      "upstream": "https://github.com/bytecodealliance/wasm-tools.git",
+      "path": "wasm/wasm-tools"
+    },
+    "wasm-wit-bindgen": {
+      "origin": "https://github.com/aphrody-labs/wit-bindgen.git",
+      "upstream": "https://github.com/bytecodealliance/wit-bindgen.git",
+      "path": "wasm/wit-bindgen"
+    },
+    "wasm-wasm-pack": {
+      "origin": "https://github.com/aphrody-labs/wasm-pack.git",
+      "upstream": "https://github.com/wasm-bindgen/wasm-pack.git",
+      "path": "wasm/wasm-pack"
+    },
+    "wasm-wasm-bindgen": {
+      "origin": "https://github.com/aphrody-labs/wasm-bindgen.git",
+      "upstream": "https://github.com/wasm-bindgen/wasm-bindgen.git",
+      "path": "wasm/wasm-bindgen"
+    },
+    "wasm-cargo-component": {
+      "origin": "https://github.com/aphrody-labs/cargo-component.git",
+      "upstream": "https://github.com/bytecodealliance/cargo-component.git",
+      "path": "wasm/cargo-component"
+    },
+    "wasm-wac": {
+      "origin": "https://github.com/aphrody-labs/wac.git",
+      "upstream": "https://github.com/bytecodealliance/wac.git",
+      "path": "wasm/wac"
+    },
+    "wasm-jco": {
+      "origin": "https://github.com/aphrody-labs/jco.git",
+      "upstream": "https://github.com/bytecodealliance/jco.git",
+      "path": "wasm/jco"
+    },
+    "wasm-componentize-js": {
+      "origin": "https://github.com/aphrody-labs/ComponentizeJS.git",
+      "upstream": "https://github.com/bytecodealliance/ComponentizeJS.git",
+      "path": "wasm/componentize-js"
+    },
+    "wasm-binaryen": {
+      "origin": "https://github.com/aphrody-labs/binaryen.git",
+      "upstream": "https://github.com/WebAssembly/binaryen.git",
+      "path": "wasm/binaryen"
+    },
+    "wasm-wabt": {
+      "origin": "https://github.com/aphrody-labs/wabt.git",
+      "upstream": "https://github.com/WebAssembly/wabt.git",
+      "path": "wasm/wabt"
+    },
+    "wasm-emsdk": {
+      "origin": "https://github.com/aphrody-labs/emsdk.git",
+      "upstream": "https://github.com/emscripten-core/emsdk.git",
+      "path": "wasm/emsdk"
+    },
+    "wasm-wasi-sdk": {
+      "origin": "https://github.com/aphrody-labs/wasi-sdk.git",
+      "upstream": "https://github.com/WebAssembly/wasi-sdk.git",
+      "path": "wasm/wasi-sdk"
+    },
+    "wasm-wasi-libc": {
+      "origin": "https://github.com/aphrody-labs/wasi-libc.git",
+      "upstream": "https://github.com/WebAssembly/wasi-libc.git",
+      "path": "wasm/wasi-libc"
+    },
+    "wasm-v86": {
+      "origin": "https://github.com/aphrody-labs/v86.git",
+      "upstream": "https://github.com/copy/v86.git",
+      "path": "wasm/v86"
+    },
+    "wasm-container2wasm": {
+      "origin": "https://github.com/aphrody-labs/container2wasm.git",
+      "upstream": "https://github.com/container2wasm/container2wasm.git",
+      "path": "wasm/container2wasm"
+    },
+    "wasm-pyodide": {
+      "origin": "https://github.com/aphrody-labs/pyodide.git",
+      "upstream": "https://github.com/pyodide/pyodide.git",
+      "path": "wasm/pyodide"
+    },
+    "wasm-ruby-wasm": {
+      "origin": "https://github.com/aphrody-labs/ruby.wasm.git",
+      "upstream": "https://github.com/ruby/ruby.wasm.git",
+      "path": "wasm/ruby-wasm"
+    },
+    "wasm-php-wasm": {
+      "origin": "https://github.com/aphrody-labs/php-wasm.git",
+      "upstream": "https://github.com/seanmorris/php-wasm.git",
+      "path": "wasm/php-wasm"
+    },
+    "wasm-ffmpeg-wasm": {
+      "origin": "https://github.com/aphrody-labs/ffmpeg.wasm.git",
+      "upstream": "https://github.com/ffmpegwasm/ffmpeg.wasm.git",
+      "path": "wasm/ffmpeg-wasm"
+    },
+    "wasm-sqlite-wasm": {
+      "origin": "https://github.com/aphrody-labs/sqlite-wasm.git",
+      "upstream": "https://github.com/sqlite/sqlite-wasm.git",
+      "path": "wasm/sqlite-wasm"
+    },
+    "wasm-duckdb-wasm": {
+      "origin": "https://github.com/aphrody-labs/duckdb-wasm.git",
+      "upstream": "https://github.com/duckdb/duckdb-wasm.git",
+      "path": "wasm/duckdb-wasm"
+    },
+    "wasm-wasm-git": {
+      "origin": "https://github.com/aphrody-labs/wasm-git.git",
+      "upstream": "https://github.com/petersalomonsen/wasm-git.git",
+      "path": "wasm/wasm-git"
+    },
+    "wasm-opencv": {
+      "origin": "https://github.com/aphrody-labs/opencv.git",
+      "upstream": "https://github.com/opencv/opencv.git",
+      "path": "wasm/opencv"
+    },
+    "wasm-onnxruntime": {
+      "origin": "https://github.com/aphrody-labs/onnxruntime.git",
+      "upstream": "https://github.com/microsoft/onnxruntime.git",
+      "path": "wasm/onnxruntime"
     }
   },
   "references": {

@@ -1483,6 +1483,230 @@
       "mount": "vendor/tinke",
       "branch": "master",
       "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasmtime",
+      "repository": "aphrody-labs/wasmtime",
+      "revision": "c57fe5644237b90edda3132a14e1ca25b4e0cf72",
+      "mount": "vendor/wasm/wasmtime",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasmer",
+      "repository": "aphrody-labs/wasmer",
+      "revision": "2e1bff7d9d345c2a5e44179239e4c720691c066a",
+      "mount": "vendor/wasm/wasmer",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasmi",
+      "repository": "aphrody-labs/wasmi",
+      "revision": "f0c20dc5d5dfbeee63fa496f83a99a6bc2e2cfc9",
+      "mount": "vendor/wasm/wasmi",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wamr",
+      "repository": "aphrody-labs/wasm-micro-runtime",
+      "revision": "f8ed1f442969c806ced7b127d4e4d397bf051737",
+      "mount": "vendor/wasm/wamr",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasm-tools",
+      "repository": "aphrody-labs/wasm-tools",
+      "revision": "7a2fa422cdf9aeeaf488a2acac8bc94a078bfa32",
+      "mount": "vendor/wasm/wasm-tools",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wit-bindgen",
+      "repository": "aphrody-labs/wit-bindgen",
+      "revision": "f4548f7f91576569fb6360c5a624e197ebdc5843",
+      "mount": "vendor/wasm/wit-bindgen",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasm-pack",
+      "repository": "aphrody-labs/wasm-pack",
+      "revision": "b4586ca5bdd34360d7c3f58bdc4953449061a303",
+      "mount": "vendor/wasm/wasm-pack",
+      "branch": "master",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasm-bindgen",
+      "repository": "aphrody-labs/wasm-bindgen",
+      "revision": "c93b8ae848d4d9e6beaeaf9516e18a7cadd818a2",
+      "mount": "vendor/wasm/wasm-bindgen",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/cargo-component",
+      "repository": "aphrody-labs/cargo-component",
+      "revision": "1495f6141420528dfb745dd7da94a618e58d84b2",
+      "mount": "vendor/wasm/cargo-component",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wac",
+      "repository": "aphrody-labs/wac",
+      "revision": "5a7480c69ae7a4dc9eb161f485cbcb8c95e372c9",
+      "mount": "vendor/wasm/wac",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/jco",
+      "repository": "aphrody-labs/jco",
+      "revision": "1e218e9bf8366328c5a6ee891e944ac95804a025",
+      "mount": "vendor/wasm/jco",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/componentize-js",
+      "repository": "aphrody-labs/ComponentizeJS",
+      "revision": "7df33ddcdaa5f598027962bd876939d36b1552de",
+      "mount": "vendor/wasm/componentize-js",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/binaryen",
+      "repository": "aphrody-labs/binaryen",
+      "revision": "3f5032bec0f7f9dcece36232448d1c0a80ccb17e",
+      "mount": "vendor/wasm/binaryen",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wabt",
+      "repository": "aphrody-labs/wabt",
+      "revision": "ed1a832d9553158a2a67bf6c6d98a96207a4ee6b",
+      "mount": "vendor/wasm/wabt",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/emsdk",
+      "repository": "aphrody-labs/emsdk",
+      "revision": "d7b4130688bfa348392b921ab04015aa15c4f154",
+      "mount": "vendor/wasm/emsdk",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasi-sdk",
+      "repository": "aphrody-labs/wasi-sdk",
+      "revision": "2b65040ed01044c978468e545473cb3c1b69e097",
+      "mount": "vendor/wasm/wasi-sdk",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasi-libc",
+      "repository": "aphrody-labs/wasi-libc",
+      "revision": "d9ad2d11991c51475d024b86757310f515fec704",
+      "mount": "vendor/wasm/wasi-libc",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/v86",
+      "repository": "aphrody-labs/v86",
+      "revision": "315b2b0b758703ef0e6cc7b4088d6068f83f3c20",
+      "mount": "vendor/wasm/v86",
+      "branch": "master",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/container2wasm",
+      "repository": "aphrody-labs/container2wasm",
+      "revision": "d43b6d723532ab71f57f727a79e08f28dc1f1c59",
+      "mount": "vendor/wasm/container2wasm",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/pyodide",
+      "repository": "aphrody-labs/pyodide",
+      "revision": "da07082034752726b3a21252b7177cf11d10b726",
+      "mount": "vendor/wasm/pyodide",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/ruby-wasm",
+      "repository": "aphrody-labs/ruby.wasm",
+      "revision": "58a51e12b1bad5ba23155c2e2d49fef7e9e10472",
+      "mount": "vendor/wasm/ruby-wasm",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/php-wasm",
+      "repository": "aphrody-labs/php-wasm",
+      "revision": "1e1fb6703730759181e84c62bce35ee9129febb9",
+      "mount": "vendor/wasm/php-wasm",
+      "branch": "master",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/ffmpeg-wasm",
+      "repository": "aphrody-labs/ffmpeg.wasm",
+      "revision": "f876f907c7e9b9bf51d4ed0b913a855a63ae63fc",
+      "mount": "vendor/wasm/ffmpeg-wasm",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/sqlite-wasm",
+      "repository": "aphrody-labs/sqlite-wasm",
+      "revision": "ccbb81134a3b5a824f8a3cc3c5d8edd6e799ab5a",
+      "mount": "vendor/wasm/sqlite-wasm",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/duckdb-wasm",
+      "repository": "aphrody-labs/duckdb-wasm",
+      "revision": "1f85a503e0c25f0c0980f205915de328c923f476",
+      "mount": "vendor/wasm/duckdb-wasm",
+      "branch": "main",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/wasm-git",
+      "repository": "aphrody-labs/wasm-git",
+      "revision": "b629c73fb659780134a0ca12dbfbbfcac2bdb47f",
+      "mount": "vendor/wasm/wasm-git",
+      "branch": "master",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/opencv",
+      "repository": "aphrody-labs/opencv",
+      "revision": "490dc83542a81cfb09c455e8381cc22e94f9483f",
+      "mount": "vendor/wasm/opencv",
+      "branch": "5.x",
+      "gitlinks": []
+    },
+    {
+      "id": "vendor/wasm/onnxruntime",
+      "repository": "aphrody-labs/onnxruntime",
+      "revision": "f5ff8ca8f1ff21141d4621b182b5750ea1e3a63a",
+      "mount": "vendor/wasm/onnxruntime",
+      "branch": "main",
+      "gitlinks": []
     }
   ]
 }

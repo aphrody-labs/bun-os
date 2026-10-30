@@ -2979,6 +2979,426 @@
       "consumedBy": ["npm:@aphrody/bun-engine"]
     },
     {
+      "id": "submodule:vendor/wasm/wasmtime",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasmtime",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasmtime.git",
+        "pin": "c57fe5644237b90edda3132a14e1ca25b4e0cf72"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "Wasmtime CLI and embedding (WASI 0.2/0.3, components); the plugin host crates/aphrody-wasm-host pins the same revision. Fork of bytecodealliance/wasmtime; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wasmer",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasmer",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasmer.git",
+        "pin": "2e1bff7d9d345c2a5e44179239e4c720691c066a"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "Wasmer runtime (WASIX, LLVM/Cranelift/Singlepass backends); alternative host for WASIX packages. Fork of wasmerio/wasmer; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wasmi",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasmi",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasmi.git",
+        "pin": "f0c20dc5d5dfbeee63fa496f83a99a6bc2e2cfc9"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "Wasmi interpreter: portable no-JIT engine for constrained targets and wasm-in-wasm. Fork of wasmi-labs/wasmi; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wamr",
+      "kind": "submodule",
+      "path": "vendor/wasm/wamr",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasm-micro-runtime.git",
+        "pin": "f8ed1f442969c806ced7b127d4e4d397bf051737"
+      },
+      "registration": ["bun-ffi"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "WebAssembly Micro Runtime (interpreter, fast-JIT, AOT) for embedded and Android targets. Fork of wasm-micro-runtime/wasm-micro-runtime; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wasm-tools",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasm-tools",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasm-tools.git",
+        "pin": "7a2fa422cdf9aeeaf488a2acac8bc94a078bfa32"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "wasm-tools CLI: validate, print, component new/embed/wit, compose, strip. Fork of bytecodealliance/wasm-tools; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wit-bindgen",
+      "kind": "submodule",
+      "path": "vendor/wasm/wit-bindgen",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wit-bindgen.git",
+        "pin": "f4548f7f91576569fb6360c5a624e197ebdc5843"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "wit-bindgen CLI and guest bindings generators (Rust, C, C++, C#, Go, MoonBit). Fork of bytecodealliance/wit-bindgen; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wasm-pack",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasm-pack",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasm-pack.git",
+        "pin": "b4586ca5bdd34360d7c3f58bdc4953449061a303"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "wasm-pack: wasm-bindgen packaging of Rust crates for the web and Bun. Fork of wasm-bindgen/wasm-pack; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wasm-bindgen",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasm-bindgen",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasm-bindgen.git",
+        "pin": "c93b8ae848d4d9e6beaeaf9516e18a7cadd818a2"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "wasm-bindgen CLI and runtime (JS bindings of wasm32-unknown-unknown); the CLI must match the wasm-bindgen crate version of each consumer. Fork of wasm-bindgen/wasm-bindgen; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/cargo-component",
+      "kind": "submodule",
+      "path": "vendor/wasm/cargo-component",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/cargo-component.git",
+        "pin": "1495f6141420528dfb745dd7da94a618e58d84b2"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "cargo-component: Rust component builds with WIT dependency resolution (maintenance mode upstream; native wasm32-wasip2 plus wit-bindgen preferred). Fork of bytecodealliance/cargo-component; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wac",
+      "kind": "submodule",
+      "path": "vendor/wasm/wac",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wac.git",
+        "pin": "5a7480c69ae7a4dc9eb161f485cbcb8c95e372c9"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "WAC: WebAssembly composition of components (wac plug, wac compose). Fork of bytecodealliance/wac; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/jco",
+      "kind": "submodule",
+      "path": "vendor/wasm/jco",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/jco.git",
+        "pin": "1e218e9bf8366328c5a6ee891e944ac95804a025"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "jco: JavaScript toolchain of the component model (transpile components to ES modules run by Bun, componentize). Fork of bytecodealliance/jco; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/componentize-js",
+      "kind": "submodule",
+      "path": "vendor/wasm/componentize-js",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/ComponentizeJS.git",
+        "pin": "7df33ddcdaa5f598027962bd876939d36b1552de"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "ComponentizeJS: JavaScript to component on the StarlingMonkey engine, used by jco componentize. Fork of bytecodealliance/ComponentizeJS; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/binaryen",
+      "kind": "submodule",
+      "path": "vendor/wasm/binaryen",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/binaryen.git",
+        "pin": "3f5032bec0f7f9dcece36232448d1c0a80ccb17e"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "Binaryen: wasm-opt, wasm-merge, wasm-metadce, wasm2js; the optimiser of every Bun OS web build. Fork of WebAssembly/binaryen; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wabt",
+      "kind": "submodule",
+      "path": "vendor/wasm/wabt",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wabt.git",
+        "pin": "ed1a832d9553158a2a67bf6c6d98a96207a4ee6b"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "WABT: wat2wasm, wasm2wat, wasm-objdump, wasm-interp, wasm2c. Fork of WebAssembly/wabt; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/emsdk",
+      "kind": "submodule",
+      "path": "vendor/wasm/emsdk",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/emsdk.git",
+        "pin": "d7b4130688bfa348392b921ab04015aa15c4f154"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "Emscripten SDK manager (C/C++ to wasm32-unknown-emscripten); versions pinned in buncc.toolchain.json wasm.emsdk. Fork of emscripten-core/emsdk; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wasi-sdk",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasi-sdk",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasi-sdk.git",
+        "pin": "2b65040ed01044c978468e545473cb3c1b69e097"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "WASI SDK: clang/LLVM sysroot for C/C++ to wasm32-wasip1/p2. Fork of WebAssembly/wasi-sdk; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wasi-libc",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasi-libc",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasi-libc.git",
+        "pin": "d9ad2d11991c51475d024b86757310f515fec704"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "wasi-libc: the C library of the WASI SDK sysroot. Fork of WebAssembly/wasi-libc; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/v86",
+      "kind": "submodule",
+      "path": "vendor/wasm/v86",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/v86.git",
+        "pin": "315b2b0b758703ef0e6cc7b4088d6068f83f3c20"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "v86: x86 PC emulator (JIT to wasm) running Linux, ReactOS and DOS in the browser. Fork of copy/v86; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/container2wasm",
+      "kind": "submodule",
+      "path": "vendor/wasm/container2wasm",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/container2wasm.git",
+        "pin": "d43b6d723532ab71f57f727a79e08f28dc1f1c59"
+      },
+      "registration": ["bun-spawn"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "container2wasm: OCI container images converted to WASI or browser wasm (Bochs/TinyEMU/QEMU-wasm). Fork of container2wasm/container2wasm; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/pyodide",
+      "kind": "submodule",
+      "path": "vendor/wasm/pyodide",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/pyodide.git",
+        "pin": "da07082034752726b3a21252b7177cf11d10b726"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "Pyodide: CPython and the scientific stack on Emscripten for the browser and Bun. Fork of pyodide/pyodide; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/ruby-wasm",
+      "kind": "submodule",
+      "path": "vendor/wasm/ruby-wasm",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/ruby.wasm.git",
+        "pin": "58a51e12b1bad5ba23155c2e2d49fef7e9e10472"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "ruby.wasm: CRuby for WASI and the browser. Fork of ruby/ruby.wasm; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/php-wasm",
+      "kind": "submodule",
+      "path": "vendor/wasm/php-wasm",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/php-wasm.git",
+        "pin": "1e1fb6703730759181e84c62bce35ee9129febb9"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "php-wasm: PHP on Emscripten for the browser and Bun. Fork of seanmorris/php-wasm; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/ffmpeg-wasm",
+      "kind": "submodule",
+      "path": "vendor/wasm/ffmpeg-wasm",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/ffmpeg.wasm.git",
+        "pin": "f876f907c7e9b9bf51d4ed0b913a855a63ae63fc"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "ffmpeg.wasm: FFmpeg on Emscripten (core and multithread builds). Fork of ffmpegwasm/ffmpeg.wasm; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/sqlite-wasm",
+      "kind": "submodule",
+      "path": "vendor/wasm/sqlite-wasm",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/sqlite-wasm.git",
+        "pin": "ccbb81134a3b5a824f8a3cc3c5d8edd6e799ab5a"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "Official SQLite Wasm (OPFS VFS) npm distribution of sqlite.org. Fork of sqlite/sqlite-wasm; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/duckdb-wasm",
+      "kind": "submodule",
+      "path": "vendor/wasm/duckdb-wasm",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/duckdb-wasm.git",
+        "pin": "1f85a503e0c25f0c0980f205915de328c923f476"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "DuckDB-Wasm: analytical SQL in the browser (eh/mvp/coi bundles). Fork of duckdb/duckdb-wasm; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/wasm-git",
+      "kind": "submodule",
+      "path": "vendor/wasm/wasm-git",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/wasm-git.git",
+        "pin": "b629c73fb659780134a0ca12dbfbbfcac2bdb47f"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "wasm-git: libgit2 on Emscripten with an in-browser filesystem. Fork of petersalomonsen/wasm-git; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/opencv",
+      "kind": "submodule",
+      "path": "vendor/wasm/opencv",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/opencv.git",
+        "pin": "490dc83542a81cfb09c455e8381cc22e94f9483f"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "OpenCV, built to OpenCV.js through platforms/js with emsdk. Fork of opencv/opencv; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
+      "id": "submodule:vendor/wasm/onnxruntime",
+      "kind": "submodule",
+      "path": "vendor/wasm/onnxruntime",
+      "source": {
+        "type": "submodule",
+        "url": "https://github.com/aphrody-labs/onnxruntime.git",
+        "pin": "f5ff8ca8f1ff21141d4621b182b5750ea1e3a63a"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present",
+      "consumedBy": ["bun"],
+      "note": "ONNX Runtime, the source of onnxruntime-web (wasm SIMD/threads and WebGPU execution providers). Fork of microsoft/onnxruntime; built from source on the VPS by scripts/aphrody/build/wasm/build-toolchain.sh."
+    },
+    {
       "id": "submodule:vendor/wgpu",
       "kind": "submodule",
       "path": "vendor/wgpu",
