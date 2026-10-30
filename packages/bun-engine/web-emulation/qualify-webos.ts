@@ -279,14 +279,25 @@ async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Pr
 if (flag("--watch")) {
   const seen = new Map<string, number>();
   for (;;) {
-    const changed = EMULATORS.filter((e) => {
+    const changed = EMULATORS.filter(e => {
       const manifest = e.core && join(dist, e.core, "manifest.json");
       return manifest && existsSync(manifest) && Bun.file(manifest).lastModified > (seen.get(e.id) ?? 0);
     });
     if (changed.length) {
-      const stamp = Object.fromEntries(changed.map((e) => [e.id, Bun.file(join(dist, e.core!, "manifest.json")).lastModified]));
+      const stamp = Object.fromEntries(
+        changed.map(e => [e.id, Bun.file(join(dist, e.core!, "manifest.json")).lastModified]),
+      );
       const child = Bun.spawn(
-        [process.execPath, import.meta.path, "--only", changed.map((e) => e.id).join(","), "--base", base, "--timeout-ms", String(timeoutMs)],
+        [
+          process.execPath,
+          import.meta.path,
+          "--only",
+          changed.map(e => e.id).join(","),
+          "--base",
+          base,
+          "--timeout-ms",
+          String(timeoutMs),
+        ],
         { stdout: "inherit", stderr: "inherit" },
       );
       await child.exited;

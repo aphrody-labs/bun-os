@@ -152,7 +152,15 @@ export function captureSshConfig(envText: string, file = join(homedir(), ".ssh",
 /** Send only the NET_LIVE_* lines (no secret) to `host` over SSH, atomically, for the hub synchronisation. */
 export async function pushLive(lines: string[], host: string, path: string): Promise<boolean> {
   const proc = Bun.spawn(
-    ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, `mkdir -p "$(dirname ${path})" && cat > ${path}.tmp && mv ${path}.tmp ${path}`],
+    [
+      "ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=8",
+      host,
+      `mkdir -p "$(dirname ${path})" && cat > ${path}.tmp && mv ${path}.tmp ${path}`,
+    ],
     { stdin: "pipe", stdout: "ignore", stderr: "ignore", timeout: 20_000 },
   );
   proc.stdin.write(lines.filter(l => l.startsWith("NET_LIVE_")).join("\n") + "\n");
