@@ -11,6 +11,7 @@ COPY install-packages.sh /usr/local/sbin/bunos-install-packages
 COPY entrypoint.sh /usr/local/sbin/bunos-omarchy-start
 COPY probe.sh /usr/local/sbin/bunos-omarchy-probe
 COPY c2w-terminal.sh /usr/local/sbin/bunos-c2w-terminal
+COPY native-apps.sh /usr/local/sbin/bunos-native-apps
 COPY headless.lua /usr/share/bun-os/headless.lua
 COPY NOTICES.md /usr/share/licenses/bun-os-omarchy/NOTICES.md
 RUN chmod 0755 /usr/local/sbin/bunos-install-packages /usr/local/sbin/bunos-omarchy-start /usr/local/sbin/bunos-omarchy-probe /usr/local/sbin/bunos-c2w-terminal \
@@ -23,7 +24,7 @@ RUN chmod 0755 /usr/local/sbin/bunos-install-packages /usr/local/sbin/bunos-omar
  && pacman -Ql omarchy-settings | grep -F '/default/hypr/bootstrap.lua' >/dev/null \
  && for bin in Hyprland hyprctl wayvnc dbus-run-session runuser useradd timeout; do command -v "$bin" >/dev/null || { echo "missing candidate package executable: $bin" >&2; exit 21; }; done \
  && useradd --no-create-home --uid 1000 --user-group --home-dir /run/bun-os/home --shell /bin/bash omarchy \
- && pacman -Q > /usr/share/bun-os/source-candidate-pacman-Q.txt \
+ && sh /usr/local/sbin/bunos-native-apps \n && pacman -Q > /usr/share/bun-os/source-candidate-pacman-Q.txt \
  && printf '%s\n' 'status=source-candidate-unqualified' 'omarchy=4.0.4' 'desktop-session=Hyprland-headless' > /usr/share/bun-os/source-candidate-status.txt \
  && rm -rf /var/cache/pacman/pkg/*
 ENV XDG_SESSION_TYPE=wayland \

@@ -46,6 +46,18 @@ const candidatePackages = [
   "wayland-protocols",
   "foot",
   "shadow",
+  // Native apps of the desktop session (real upstream packages; launchers in native-apps.sh)
+  "rio",
+  "epiphany",
+  "fuzzel",
+  "papirus-icon-theme",
+  "cosmic-icon-theme",
+  "cosmic-files",
+  "cosmic-terminal",
+  "cosmic-text-editor",
+  "cosmic-store",
+  "cosmic-settings",
+  "cosmic-player",
 ];
 
 export function planOmarchyCandidate(

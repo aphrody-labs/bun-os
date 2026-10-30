@@ -76,8 +76,6 @@ const editorApp = async (...args: Parameters<typeof import("./apps/editor").edit
   (await import("./apps/editor")).editorApp(...args);
 const engineApp = async (...args: Parameters<typeof import("./apps/engine").engineApp>) =>
   (await import("./apps/engine")).engineApp(...args);
-const emulatorsApp = async (...args: Parameters<typeof import("./apps/emulators").emulatorsApp>) =>
-  (await import("./apps/emulators")).emulatorsApp(...args);
 const filesApp = async (...args: Parameters<typeof import("./apps/files").filesApp>) =>
   (await import("./apps/files")).filesApp(...args);
 const linuxApp = async (...args: Parameters<typeof import("./apps/linux").linuxApp>) =>
@@ -260,17 +258,7 @@ const builtins: Builtin[] = [
     height: 620,
     mount: (root) => loading(root, linuxApp(root)),
   },
-  {
-    id: "emulators",
-    backing: "wasm",
-    name: "Bun Engine Emulators",
-    icon: "game",
-    desc: "Every emulator: play, save states, qualification status",
-    group: "core",
-    width: 980,
-    height: 640,
-    mount: (root) => loading(root, emulatorsApp(root, { open: (id) => openApp(id) })),
-  },
+
   {
     id: "terminal",
     backing: "wasm",

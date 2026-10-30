@@ -7,7 +7,7 @@
 #   spacedrive      Spacedrive (apps/spacedrive of this repository) via its Tauri build
 # Builds are serialised and capped at 4 compiler jobs (shared factory slots). Run inside tmux; log in ~/native-apps/log.
 set -eu
-ROOT=${APHRODY_ROOT:-$HOME/src/bun-os}
+ROOT=${BUNOS_NATIVE_ROOT:-$HOME/src/bun-os}
 WORK=$HOME/native-apps
 PREFIX=$HOME/.local
 EPOCH=${COSMIC_EPOCH:-epoch-1.11.0}
