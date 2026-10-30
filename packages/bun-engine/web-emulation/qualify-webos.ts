@@ -173,7 +173,7 @@ async function launch() {
 
 async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Promise<QualificationEntry> {
   const emulator = EMULATORS.find(e => e.id === id)!;
-  const url = `${base}/emulator.html?core=${id}&autotest=1&frames=${frames}&timeout=${timeoutMs}`;
+  const url = `${pageOrigin}/emulator.html?core=${id}&autotest=1&frames=${frames}&timeout=${timeoutMs}`;
   const entry: QualificationEntry = { id, status: "fail", errors: [], url, testedAt: new Date().toISOString() };
   if (emulator.fixture)
     entry.fixture = {
@@ -325,6 +325,27 @@ const report: QualificationReport = {
   sourceCommit: git("rev-parse", "HEAD"),
   entries: { ...(only ? previous?.entries : {}) },
 };
+// The test page (qualify-page/) is served here; every other request (/emulation/, /api/emulators, /vm/) is proxied to
+// the WebOS origin under test, so the cores, fixtures and API are the ones WebOS serves.
+const pageDir = join(import.meta.dir, "qualify-page");
+const isolation = { "cross-origin-opener-policy": "same-origin", "cross-origin-embedder-policy": "credentialless" };
+const pageServer = Bun.serve({
+  hostname: "127.0.0.1",
+  port: 0,
+  async fetch(request) {
+    const url = new URL(request.url);
+    const local = /^\/(emulator(?:-probe)?\.(?:html|js|css))$/.exec(url.pathname)?.[1];
+    if (local) return new Response(Bun.file(join(pageDir, local)), { headers: { ...isolation, "cache-control": "no-store" } });
+    if (url.pathname === "/favicon.ico") return new Response(null, { status: 204 });
+    const upstream = await fetch(`${base}${url.pathname}${url.search}`, { headers: request.headers });
+    const headers = new Headers(upstream.headers);
+    for (const [k, v] of Object.entries(isolation)) headers.set(k, v);
+    headers.delete("content-encoding");
+    headers.delete("content-length");
+    return new Response(upstream.body, { status: upstream.status, headers });
+  },
+});
+const pageOrigin = pageServer.url.origin;
 const browser = await launch();
 try {
   for (const emulator of EMULATORS) {
@@ -374,6 +395,7 @@ try {
   }
 } finally {
   await browser.close();
+  pageServer.stop(true);
 }
 await Bun.write(join(root, "build/web-emulation/webos-qualification.json"), `${JSON.stringify(report, null, 2)}\n`);
 const failing = Object.values(report.entries).filter(e => e.status === "fail");
