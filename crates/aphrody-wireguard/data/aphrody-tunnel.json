@@ -1,0 +1,411 @@
+{
+  "$comment": "Owner authorized full administrator access on 2026-10-07. SSH and WireGuard applied on vps/dbfr/WSL; MCP/A2A socket proxies remain unactivated. Private keys remain on their own hosts. Canonical application: scripts/tools/apply-omar-private-access.py; evidence: docs/operations/infra/PRIVATE-TUNNEL.md.",
+  "schemaVersion": 1,
+  "name": "aphrody-private",
+  "status": "applied-ssh-and-wireguard",
+  "interface": "wg1",
+  "windowsTunnelName": "aphrody",
+  "subnet": "10.200.77.0/24",
+  "clientAllowedIps": "10.200.77.0/24",
+  "keepalive": 25,
+  "keyFiles": {
+    "private": "/etc/wireguard/wg1.key",
+    "public": "/etc/wireguard/wg1.pub"
+  },
+  "existingNetworks": [
+    {
+      "name": "wg0, historical Shenron link (vps 10.8.0.1, dbfr 10.8.0.3, ufw trusts the whole /24 for every port, PostgreSQL and the Shenron admin list)",
+      "cidr": "10.8.0.0/24"
+    },
+    {
+      "name": "docker0 of the vps",
+      "cidr": "172.17.0.0/16"
+    },
+    {
+      "name": "other Docker bridges, WSL2 NAT, RFC 1918 172.16/12",
+      "cidr": "172.16.0.0/12"
+    },
+    {
+      "name": "Mullvad tunnel addresses and SOCKS5 (10.64.0.1)",
+      "cidr": "10.64.0.0/10"
+    },
+    {
+      "name": "Tailscale and carrier-grade NAT",
+      "cidr": "100.64.0.0/10"
+    },
+    {
+      "name": "typical home and office LANs",
+      "cidr": "192.168.0.0/16"
+    },
+    {
+      "name": "link-local",
+      "cidr": "169.254.0.0/16"
+    }
+  ],
+  "hub": {
+    "peer": "vps",
+    "address": "10.200.77.1",
+    "endpoint": "51.77.147.152:51821",
+    "listenPort": 51821,
+    "publicKey": "McWuNyGdzU81q9MEyfvnxoGYIHqGW1UcRqpcge3NxB4=",
+    "publicKeyNote": "Generated on VPS and verified from the live wg1 interface on 2026-10-07; private key never exported."
+  },
+  "peers": [
+    {
+      "id": "wsl",
+      "host": "wsl",
+      "os": "linux",
+      "address": "10.200.77.2",
+      "publicKey": "WFynN57cgG2iRqQ+bsk0ofJ3dphXkHAyfjX4UuATyxk=",
+      "keyOrigin": "wg genkey on the WSL at apply; the public half is collected by the plan",
+      "udpSource": {
+        "mode": "covered-by-shenron-admin"
+      }
+    },
+    {
+      "id": "dbfr",
+      "host": "dbfr",
+      "os": "linux",
+      "address": "10.200.77.3",
+      "publicKey": "o1eCVLfJXLScX3wKMxBeXr70zyUdq/61XI6qTdYG6Fc=",
+      "keyOrigin": "wg genkey on dbfr at apply; the public half is collected by the plan",
+      "udpSource": {
+        "mode": "covered-by-shenron-admin"
+      }
+    },
+    {
+      "id": "aphro-pc",
+      "host": "windows",
+      "os": "windows",
+      "address": "10.200.77.4",
+      "publicKey": "VewVolGGwY3Lvp78jp9dKB7RIxg2xUR2pbVS+y+uj2I=",
+      "keyOrigin": "wg.exe generated on the owner's Windows PC on 2026-10-07; the private key stays in its protected local store",
+      "udpSource": {
+        "mode": "covered-by-shenron-admin",
+        "note": "the WireGuard key is the authentication; the workstation public address is already an all-ports ufw source of scripts/ops/admin-access.ts (Shenron), refreshed every 15 minutes when the address changes, so no second ufw rule is declared"
+      }
+    },
+    {
+      "id": "omar",
+      "host": "windows",
+      "os": "windows",
+      "address": "10.200.77.10",
+      "publicKey": "EXfatxgVFs8Lr9k7QoJ2wiznY5MYO4C19+4gLbGmCEw=",
+      "keyOrigin": "WireGuard app on Omar's Windows PC (empty tunnel); he sends only the public key",
+      "publicKeyNote": "key actually configured on Omar's PC, relayed by the owner on 2026-10-08 (pair verified); replaces A42Sm27u… (2026-10-06), which never handshaked. Applied on the vps wg1 the same day",
+      "udpSource": {
+        "mode": "open",
+        "note": "2026-10-09: the IP-pinned rule (92.170.252.46) silently dropped every handshake once Omar's dynamic public IP changed, with zero RX ever recorded on the hub for this peer. Widened 51821/udp to Anywhere on vps, matching the existing wg0/51820 precedent; the WireGuard key remains the actual authentication.",
+        "comment": "aphrody-wg-omar"
+      }
+    }
+  ],
+  "services": [
+    {
+      "id": "ssh-vps",
+      "host": "vps",
+      "address": "10.200.77.1",
+      "port": 22,
+      "proto": "tcp",
+      "expose": "listener",
+      "auth": "ssh-key"
+    },
+    {
+      "id": "ssh-dbfr",
+      "host": "dbfr",
+      "address": "10.200.77.3",
+      "port": 22,
+      "proto": "tcp",
+      "expose": "listener",
+      "auth": "ssh-key"
+    },
+    {
+      "id": "ssh-wsl",
+      "host": "wsl",
+      "address": "10.200.77.2",
+      "port": 22,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "ssh-key"
+    },
+    {
+      "id": "ssh-aphro-pc",
+      "host": "windows",
+      "address": "10.200.77.4",
+      "port": 22,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "ssh-key"
+    },
+    {
+      "id": "ssh-omar",
+      "host": "omar",
+      "address": "10.200.77.10",
+      "port": 22,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "ssh-key",
+      "caveat": "Windows OpenSSH Server on Omar PC (step 12 of OMAR-REMOTE-CONTROL.md); firewall rule Aphrody-SSH-In-Tunnel admits 10.200.77.0/24 on 10.200.77.10 only; authorized keys: owner (GitHub aphrody-dev and aphrody-owner-pc) and aphrody-vps-to-omar-pc."
+    },
+    {
+      "id": "ssh-omar-wsl",
+      "host": "omar",
+      "address": "10.200.77.10",
+      "port": 2222,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "ssh-key",
+      "caveat": "Native OpenSSH of Omar's WSL2 Ubuntu (owner note 2026-10-09). Port 22 stays the Windows OpenSSH Server; WSL sshd listens on 2222 (sshd_config.d/60-aphrody-wsl.conf). WSL networkingMode=mirrored makes it a 10.200.77.10 listener through the Windows wg1 adapter; NAT mode needs netsh portproxy 10.200.77.10:2222 to the WSL address, refreshed at logon. WSL runs no WireGuard of its own (the Windows tunnel owns the omar key). Same authorized keys as ssh-omar, LF endings, ~/.ssh 700 and authorized_keys 600."
+    },
+    {
+      "id": "mcp-http",
+      "host": "vps",
+      "address": "10.200.77.1",
+      "port": 8793,
+      "proto": "tcp",
+      "expose": "socket-proxyd",
+      "upstream": "127.0.0.1:8793",
+      "unit": "aphrody-mcp-http",
+      "auth": "bearer-token",
+      "caveat": "Private WireGuard socket-proxyd reaches the canonical loopback MCP listener. /mcp requires APHRODY_MCP_HTTP_TOKEN from its protected host store; no public listener. Tool capabilities are verified from the deployed binary.",
+      "status": "pending",
+      "pendingReason": "vps reduced to the build machine on 2026-10-09 (docs/operations/infra/hosts-minimal-2026-10-09.md): the unit does not run there; the DBFR MCP (mcp-http-dbfr) serves the tunnel"
+    },
+    {
+      "id": "a2a",
+      "host": "vps",
+      "address": "10.200.77.1",
+      "port": 8788,
+      "proto": "tcp",
+      "expose": "socket-proxyd",
+      "upstream": "127.0.0.1:8788",
+      "unit": "aphrody-a2a",
+      "auth": "unverified",
+      "caveat": "runs with APHRODY_A2A_DRY_RUN=1 (messages recorded and answered, no peer CLI spawned); no authentication layer is declared for it",
+      "status": "pending",
+      "pendingReason": "vps reduced to the build machine on 2026-10-09 (docs/operations/infra/hosts-minimal-2026-10-09.md): the unit does not run there; the DBFR MCP (mcp-http-dbfr) serves the tunnel"
+    },
+    {
+      "id": "training",
+      "host": "wsl",
+      "address": "10.200.77.2",
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "status": "pending",
+      "pendingReason": "no training service with a declared port exists in the catalogs (managed llama ports are dynamic per run); the owner names the ports, then the routed ufw rules are generated"
+    },
+    {
+      "id": "mcp-http-dbfr",
+      "host": "dbfr",
+      "address": "10.200.77.3",
+      "port": 8793,
+      "proto": "tcp",
+      "expose": "socket-proxyd",
+      "upstream": "127.0.0.1:8793",
+      "unit": "aphrody-mcp-http-dbfr",
+      "auth": "bearer-token",
+      "caveat": "DBFR protected host-local bearer and queue; enable only after native jobs binary and authenticated endpoint probes pass."
+    },
+    {
+      "id": "remote-desktop-omar",
+      "host": "omar",
+      "address": "10.200.77.10",
+      "port": 8795,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "bearer-token",
+      "caveat": "aphrody infra remote serve on Omar PC (screen stream + input); token generated on that PC, transmitted out of band; Windows firewall admits 10.200.77.0/24 only."
+    },
+    {
+      "id": "vnc-omar",
+      "host": "omar",
+      "address": "10.200.77.10",
+      "port": 5900,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "vnc-password",
+      "caveat": "RFB server of aphrody infra remote serve --vnc on Omar PC (any VNC viewer); password from APHRODY_VNC_PASSWORD or derived from the remote token, peer allowlist 10.200.77.4 in the server and the Windows firewall."
+    },
+    {
+      "id": "mcp-http-omar",
+      "host": "omar",
+      "address": "10.200.77.10",
+      "port": 8793,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "bearer-token",
+      "caveat": "aphrody-mcp http with WinClean computer_* tools on Omar PC; per-action computer use target `omar` of crates/ai/agent-tools."
+    },
+    {
+      "id": "remote-desktop-aphro-pc",
+      "host": "windows",
+      "address": "10.200.77.4",
+      "port": 8795,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "bearer-token",
+      "caveat": "aphrody infra remote serve on the owner PC (task \\Aphrody\\Aphrody Remote Desktop, interactive session); token in <aphrody home>/private/remote-serve.env, given to Omar out of band; Windows firewall admits the granted peers only."
+    },
+    {
+      "id": "vnc-aphro-pc",
+      "host": "windows",
+      "address": "10.200.77.4",
+      "port": 5900,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "vnc-password",
+      "caveat": "RFB server of the same aphrody infra remote serve on the owner PC; allowlist = peers granted vnc-aphro-pc (Omar) in the server and the Windows firewall."
+    },
+    {
+      "id": "mcp-http-aphro-pc",
+      "host": "windows",
+      "address": "10.200.77.4",
+      "port": 8793,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "bearer-token",
+      "caveat": "aphrody-mcp http (WinClean computer_* tools) on 127.0.0.1:8793 of the owner PC, published on 10.200.77.4:8793 by netsh portproxy; bearer APHRODY_MCP_HTTP_TOKEN from <aphrody home>/private/mcp-http.env."
+    },
+    {
+      "id": "device-portal-aphro-pc",
+      "host": "windows",
+      "address": "10.200.77.4",
+      "port": 50080,
+      "proto": "tcp",
+      "expose": "peer-listener",
+      "auth": "wireguard-peer",
+      "caveat": "Windows Device Portal is reachable only through the private mesh. The durable fallback is vps:127.0.0.1:25080 through the aphro-pc reverse SSH task; it must never bind a public VPS address."
+    },
+    {
+      "id": "remote-desktop-vps",
+      "host": "vps",
+      "address": "10.200.77.1",
+      "port": 8795,
+      "proto": "tcp",
+      "expose": "listener",
+      "auth": "bearer-token",
+      "caveat": "Browser viewer of the virtual desktop of vps (unit aphrody-remote); bearer token in /etc/aphrody/remote.env (root 0600), bound to the wg1 address only."
+    },
+    {
+      "id": "vnc-vps",
+      "host": "vps",
+      "address": "10.200.77.1",
+      "port": 5900,
+      "proto": "tcp",
+      "expose": "listener",
+      "auth": "vnc-password",
+      "caveat": "RFB server of aphrody infra remote serve on vps (unit aphrody-remote, Xvfb :99 + openbox, user ubuntu); password in /etc/aphrody/remote.env (root 0600), never in the repository; peers admitted by --vnc-allow, loopback otherwise."
+    },
+    {
+      "id": "remote-desktop-dbfr",
+      "host": "dbfr",
+      "address": "10.200.77.3",
+      "port": 8795,
+      "proto": "tcp",
+      "expose": "listener",
+      "auth": "bearer-token",
+      "caveat": "Browser viewer of the virtual desktop of dbfr (unit aphrody-remote); bearer token in /etc/aphrody/remote.env (root 0600), bound to the wg1 address only."
+    },
+    {
+      "id": "vnc-dbfr",
+      "host": "dbfr",
+      "address": "10.200.77.3",
+      "port": 5900,
+      "proto": "tcp",
+      "expose": "listener",
+      "auth": "vnc-password",
+      "caveat": "RFB server of aphrody infra remote serve on dbfr (unit aphrody-remote, Xvfb :99 + openbox, user ubuntu); password in /etc/aphrody/remote.env (root 0600), never in the repository; peers admitted by --vnc-allow, loopback otherwise."
+    }
+  ],
+  "grants": {
+    "omar": [
+      "ssh-vps",
+      "ssh-dbfr",
+      "ssh-wsl",
+      "ssh-aphro-pc",
+      "mcp-http",
+      "a2a",
+      "training",
+      "remote-desktop-aphro-pc",
+      "vnc-aphro-pc",
+      "mcp-http-aphro-pc",
+      "device-portal-aphro-pc",
+      "remote-desktop-dbfr",
+      "vnc-dbfr",
+      "mcp-http-dbfr",
+      "remote-desktop-vps",
+      "vnc-vps"
+    ],
+    "aphro-pc": [
+      "ssh-vps",
+      "ssh-dbfr",
+      "ssh-omar",
+      "ssh-omar-wsl",
+      "mcp-http",
+      "a2a",
+      "training",
+      "mcp-http-dbfr",
+      "remote-desktop-omar",
+      "mcp-http-omar",
+      "vnc-omar",
+      "remote-desktop-vps",
+      "vnc-vps",
+      "remote-desktop-dbfr",
+      "vnc-dbfr"
+    ],
+    "wsl": ["ssh-vps", "ssh-dbfr", "mcp-http", "a2a", "mcp-http-dbfr"],
+    "dbfr": [
+      "ssh-aphro-pc",
+      "ssh-vps",
+      "mcp-http",
+      "ssh-omar",
+      "ssh-omar-wsl",
+      "remote-desktop-omar",
+      "vnc-omar",
+      "mcp-http-omar",
+      "remote-desktop-vps",
+      "vnc-vps"
+    ],
+    "vps": [
+      "mcp-http-dbfr",
+      "ssh-aphro-pc",
+      "ssh-omar",
+      "ssh-omar-wsl",
+      "mcp-http-aphro-pc",
+      "device-portal-aphro-pc",
+      "mcp-http-omar",
+      "ssh-dbfr",
+      "remote-desktop-omar",
+      "vnc-omar",
+      "remote-desktop-dbfr",
+      "vnc-dbfr"
+    ]
+  },
+  "firewall": {
+    "marker": "aphrody-wg",
+    "foreignMarkers": ["shenron-admin"],
+    "neverOpen": [5432, 6379],
+    "note": "Rules carry the aphrody-wg-<peer> comment. scripts/ops/admin-access.ts of Shenron only deletes rules whose comment is shenron-admin, so the two never collide. The tunnel subnet is RFC 1918 outside 10.8.0.0/24: admin-access-host.ts skips it (no ufw, fail2ban, pg_hba or admin-IP entry). meshDenied: dbfr hosts PostgreSQL and Redis, so it is reached per declared port only, never through a mesh.",
+    "meshDenied": ["dbfr"]
+  },
+  "mesh": [
+    {
+      "id": "dev-pcs",
+      "from": ["aphro-pc", "omar"],
+      "to": ["aphro-pc", "omar"],
+      "note": "Owner decision 2026-10-09: the two dev PCs (Defender and Windows Firewall off on purpose) reach each other on every port and protocol: SMB, desktop, VNC, MCP, dev servers, debuggers."
+    },
+    {
+      "id": "pcs-to-build-hub",
+      "from": ["aphro-pc", "omar", "dbfr"],
+      "to": ["vps"],
+      "note": "Owner decision 2026-10-09: the vps is the build machine; members reach every port it binds on wg1 or 0.0.0.0 (loopback services stay loopback)."
+    },
+    {
+      "id": "dbfr-to-pcs",
+      "from": ["dbfr"],
+      "to": ["aphro-pc", "omar"],
+      "note": "Owner decision 2026-10-09: the production host reaches every port of both dev PCs (agents, jobs, MCP, SSH)."
+    }
+  ]
+}

@@ -17,7 +17,7 @@ pub const INVENTORY_PATH: &str = "infra/config/host/wireguard/aphrody-tunnel.jso
 
 /// The declared tunnel compiled into the binary, used when no checkout is at hand (an operator
 /// PC running only the installed `aphrody`).
-pub const EMBEDDED: &str = include_str!("../../../infra/config/host/wireguard/aphrody-tunnel.json");
+pub const EMBEDDED: &str = include_str!("../data/aphrody-tunnel.json");
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

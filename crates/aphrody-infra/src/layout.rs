@@ -8,7 +8,7 @@ use std::sync::LazyLock;
 use serde::Deserialize;
 
 /// The shipped policy, embedded so a compiled binary needs no checkout.
-pub const POLICY: &str = include_str!("../../../infra/config/host/host-policy.toml");
+pub const POLICY: &str = include_str!("../data/host-policy.toml");
 
 #[derive(Debug, Deserialize)]
 struct PolicyFile {

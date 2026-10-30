@@ -9,8 +9,17 @@ fn main() {
         .join("../..")
         .canonicalize()
         .expect("workspace root");
-    let header = root.join("packages/bun-emu-host/include/bun_emu_host.h");
+    // A published crate cannot reach outside its directory: it builds from its own copy of the header,
+    // refreshed from `packages/bun-emu-host` whenever the checkout is present.
+    let header = manifest.join("include/bun_emu_host.h");
+    let canonical = root.join("packages/bun-emu-host/include/bun_emu_host.h");
+    println!("cargo:rerun-if-changed={}", canonical.display());
     println!("cargo:rerun-if-changed={}", header.display());
+    if let Ok(bytes) = std::fs::read(&canonical)
+        && std::fs::read(&header).ok().as_deref() != Some(bytes.as_slice())
+    {
+        std::fs::write(&header, bytes).expect("refresh the crate-local header");
+    }
     println!("cargo:rerun-if-env-changed=BUN_EMU_HOST_DIR");
     let plugins = env::var("BUN_EMU_HOST_DIR")
         .map(PathBuf::from)

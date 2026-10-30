@@ -1,0 +1,133 @@
+# Policy for `yolo host` (see docs/operations/infra/SERVER.md). Lists add to the built-in defaults; they cannot remove the
+# hard-coded protections (ssh and the base system are never stopped, protected paths are never reclaimed,
+# nothing is formatted or wiped). Per-host tables ([hosts.vps.*]) add to the global ones.
+
+# Single source of truth of the host disposition (owner decision 2026-10-09): ONE home per host, no /srv, no /opt.
+# TypeScript reads it through packages/engine/core/src/host/layout.ts, Rust through aphrody_infra::layout; shell
+# scripts, systemd units, nginx, compose, logrotate and sudoers derive their paths from `$HOME` or `home` below.
+[layout]
+home = "/home/ubuntu"
+# ONE git checkout per repository: ~/src/aphrody, ~/src/bun, ~/src/forks/<name>.
+src = "~/src"
+# Runtime of one service: ~/apps/<app>/{compose.yaml,.env,data/,releases/,current,shared/}.
+apps = "~/apps"
+# On the vps, ~/src and ~/apps are bind mounts of ~/build/{workspaces,apps} (tools/config/host/vps/etc/fstab.aphrody-build).
+# Build workspace, caches, locks and artifacts (vps): one build per commit, from ~/src/<repo>.
+build = "~/build"
+# Cold data (vps), including the archives moved off dbfr.
+archive = "~/archive"
+# APHRODY_HOME.
+state = "~/.aphrody"
+# ONE compose project per host, named `aphrody`, that `include:`s every ~/apps/<app>/compose.yaml.
+compose = "~/apps/compose.yaml"
+compose_project = "aphrody"
+# Releases kept per app: the current one and one previous.
+releases_keep = 2
+
+# Retired location -> replacement (longest prefix wins). The guard test packages/engine/core/test/host-layout.test.ts
+# fails when a retired prefix reappears in code or config; dated documents under docs/ keep their history.
+[layout.retired]
+"/srv/aphrody-build/workspaces/aphrody-wsl" = "~/build/wsl/aphrody"
+"/srv/aphrody-build/workspaces/vu-wsl" = "~/build/wsl/vu"
+"/srv/aphrody-build/workspaces" = "~/src"
+"/srv/aphrody-build" = "~/build"
+"/srv/archive" = "~/archive"
+# Apps drop the `aphrody-` prefix (applied on dbfr 2026-10-09), except aphrody-bun.
+"/srv/aphrody-bun-app" = "~/apps/aphrody-bun"
+"/srv/aphrody-bun" = "~/apps/aphrody-bun"
+"/srv/app" = "~/apps/aphrody-bun/app"
+"/srv/aphrody-cdn-src" = "~/apps/cdn-src"
+"/srv/aphrody-cdn" = "~/apps/cdn"
+"/srv/aphrody-creator" = "~/apps/creator"
+"/srv/aphrody-downloads" = "~/apps/downloads"
+"/srv/aphrody-infra" = "~/apps/infra"
+"/srv/aphrody-lab" = "~/apps/lab"
+"/srv" = "~/apps"
+"/etc/aphrody/container" = "~/apps/aphrody"
+"~/yolo/src/aphrody" = "~/src/aphrody"
+"~/release/aphrody" = "~/src/aphrody"
+"~/aphrody-root" = "~/src/aphrody"
+"~/aphrody-infra" = "~/src/aphrody"
+"~/aphrody-build" = "~/build"
+"~/bun-src" = "~/src/bun"
+
+[services]
+# Never stopped or disabled. Globs match the unit name without ".service".
+keep = [
+  "ssh",
+  "nginx",
+  "fail2ban",
+  "aphrody-*",
+  "yolo-*",
+  "cron",
+  "docker",
+  "containerd",
+  "postgresql*",
+  "redis*",
+  "certbot*",
+]
+# Proposed for stopping by `yolo host services` (still needs --apply, and never overrides the keep list).
+stop = [
+  "snapd",
+  "ModemManager",
+  "multipathd",
+  "udisks2",
+  "packagekit",
+  "apport*",
+  "motd-news",
+  "ubuntu-advantage*",
+  "esm-cache",
+  "lxd*",
+  "lxcfs",
+  "irqbalance",
+  "bluetooth",
+  "cups*",
+  "avahi-daemon",
+  "wpa_supplicant",
+]
+
+[locks]
+# No mutation while one of these files is flock-held (the Aphrody build factory heavy lock is added for its host).
+paths = []
+
+[protect]
+# Extra trees only reachable through `yolo host archive` (the build factory cache and artifacts are added for its host).
+paths = []
+
+[space]
+# Free-space floor of `yolo host audit` and `yolo ship` (ratio 0..1). A variable: --min-free and YOLO_MIN_FREE win
+# over this value, a [hosts.<name>.space] table wins over it for one host.
+min_free = 0.2
+# `yolo host space`: commands in flight, and how many directory levels are scanned as independent subtrees.
+parallel = 8
+split_depth = 2
+
+[reclaim]
+build_artifact_min_age_days = 7
+journal_max_size = "500M"
+journal_max_age_days = 14
+rotated_log_age_days = 30
+# Where to look for target/ (next to Cargo.toml), node_modules/ (next to package.json) and .next/ directories.
+scan_roots = ["~", "/tmp"]
+# Regenerable caches below ~/.cache or ~/.npm. sccache, ~/.cargo/registry and ~/.bun/install/cache are never cleaned.
+cache_dirs = ["~/.cache/pip", "~/.cache/thumbnails", "~/.npm/_logs"]
+# directory names the scan never enters
+exclude_names = ["aphrody-ui", ".git", ".rustup", ".cargo"]
+swap_file_globs = ["/swapfile*", "/swap.img", "/var/swapfile*"]
+
+[tune]
+nginx_workers = "auto"
+governor = "performance"
+thp = "madvise"
+swappiness = 10
+
+[billing]
+# OVH VPS service policy: renewal, expiration alerts.
+# `aphrody ovh services watch` (every service) and `aphrody ovh vps watch` check against these
+# thresholds daily (systemd timer aphrody-ovh-watch).
+vps_renewal = "automatic"
+vps_delete_at_expiration = false
+vps_alert_threshold_days = 14
+
+# [hosts.vps.services]
+# keep = ["aphrody-mcp-http-dbfr"]
