@@ -2,7 +2,7 @@
 // Pacman repository `aphrody` (libalpm layout /repo/os/x86_64/), built on the VPS from the factory PKGBUILDs inside an
 // Arch Linux container. Packages and the database are signed with a key kept in the protected store (never served).
 //
-// PKGBUILDs whose source is this repository (git+…/bun-distribution, bun-os, src-tree) are built from the VPS checkout:
+// PKGBUILDs whose source is this repository (git+.../bun-distribution, bun-os, src-tree) are built from the VPS checkout:
 // the compile runs on the host first (Cargo through scripts/aphrody/build/rust/cargo-serial.sh with the shared target
 // directory and sccache, at most four jobs; Bun builds with the host Bun), the outputs are staged as a tree that stands
 // in for the git checkout, and makepkg in the container only runs package() of the unchanged PKGBUILD.
@@ -247,6 +247,11 @@ export async function build(ctx: Ctx): Promise<void> {
   }
   const bun = Bun.which("bun") ?? join(Bun.env.HOME ?? "", ".local/bin/bun");
   const script = `set -eu
+# [multilib]: lib32 and mingw dependencies of DXVK, vkd3d-proton and Proton.
+grep -qx '.multilib.' /etc/pacman.conf || printf '
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+' >> /etc/pacman.conf
 pacman -Syu --noconfirm --needed base-devel git gnupg rsync >/dev/null
 export GNUPGHOME=/gnupg
 if ! gpg --list-secret-keys aphrody-store >/dev/null 2>&1; then
