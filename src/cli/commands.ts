@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Every Bun OS command, defined once. package.json scripts are aliases of these; nothing else hard-codes a path.
 import { existsSync } from "node:fs";
-import { abs, define, native, script, sequence, spawn, root, type Command } from "./registry.ts";
+import { abs, define, native, script, spawn, root, type Command } from "./registry.ts";
 
 const workspaceCli = "packages/bun-workspace/src/cli.ts";
 
