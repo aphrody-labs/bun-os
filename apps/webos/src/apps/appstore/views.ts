@@ -8,6 +8,7 @@ import { viewHome } from "./home";
 import { viewCollection } from "./collection";
 import { viewSearch } from "./search";
 import { viewDetail } from "./detail";
+import { viewLibrary } from "./library";
 
 type ViewFn = (s: Store) => HTMLElement;
 /** Plain catalog grid; screens replace their entry as they are built. */
@@ -21,7 +22,7 @@ export const views: Record<View, ViewFn> = {
   home: viewHome,
   collection: viewCollection,
   search: viewSearch,
-  library: basic,
+  library: viewLibrary,
   sources: basic,
   app: viewDetail,
   notfound: basic,
