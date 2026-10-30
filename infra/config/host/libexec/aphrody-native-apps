@@ -48,7 +48,7 @@ base() {
   # COSMIC icon theme (pop-os/cosmic-icons, CC-BY-SA-4.0)
   [ -d "$WORK/cosmic-icons" ] || git clone --depth 1 https://github.com/pop-os/cosmic-icons "$WORK/cosmic-icons"
   (cd "$WORK/cosmic-icons" && just rootdir= prefix="$PREFIX" install 2>/dev/null || { mkdir -p "$PREFIX/share/icons" && cp -r freedesktop "$PREFIX/share/icons/Cosmic" 2>/dev/null; })
-  icon aphrody-browser aphrody; icon aphrody-chat aphrody-workspace; icon aphrody-search aphrody
+  icon aphrody-browser aphrody; icon aphrody-chat aphrody; icon aphrody-search aphrody
   icon spacedrive spacedrive png
   # Aphrody apps are real GNOME Web (WebKitGTK) application-mode windows with their own profile and identity.
   web() { epi="epiphany --application-mode --profile=$HOME/.local/share/aphrody-$1"; echo "$epi $2"; }
@@ -62,14 +62,26 @@ base() {
 cosmic() { # cosmic cosmic-files ... : the checksum-pinned Pop!_OS archive debs of container/cosmic-packages.json
   d=$WORK/cosmic-debs; mkdir -p "$d"
   ROOT=$ROOT D=$d bun -e '
+    // The archive rotates old builds out, so the pin is used when it still resolves and the newest build otherwise.
     const lock = await Bun.file(`${process.env.ROOT}/container/cosmic-packages.json`).json();
+    const links = async (u) => [...(await (await fetch(u)).text()).matchAll(/href="([^"?][^"]*)"/g)].map((m) => m[1]).filter((x) => x !== "../");
     for (const n of process.argv.slice(1)) {
       const e = lock.packages.find((p) => p.name === n);
       if (!e) throw new Error(`${n} is not in the pinned COSMIC set`);
-      const r = await fetch(`${lock.repository}/${e.path}`);
-      if (!r.ok) throw new Error(`${n}: ${r.status}`);
-      const buf = await r.arrayBuffer();
-      if (new Bun.CryptoHasher("sha256").update(buf).digest("hex") !== e.sha256) throw new Error(`${n}: checksum mismatch`);
+      let r = await fetch(`${lock.repository}/${e.path}`);
+      let buf;
+      if (r.ok) {
+        buf = await r.arrayBuffer();
+        if (new Bun.CryptoHasher("sha256").update(buf).digest("hex") !== e.sha256) throw new Error(`${n}: checksum mismatch`);
+      } else {
+        const base = `${lock.repository}/pool/${lock.suite}/${n}/`;
+        const dirs = await links(base);
+        const dir = dirs[dirs.length - 1];
+        const deb = (await links(base + dir)).find((f) => f.endsWith("_amd64.deb"));
+        if (!deb) throw new Error(`${n}: no amd64 deb in ${base}${dir}`);
+        buf = await (await fetch(base + dir + deb)).arrayBuffer();
+        console.log(`${n}: pin gone, installed ${deb} sha256=${new Bun.CryptoHasher("sha256").update(buf).digest("hex")}`);
+      }
       await Bun.write(`${process.env.D}/${n}.deb`, buf);
     }' "$@"
   sudo apt-get install -y --no-install-recommends $(for n in "$@"; do echo "$d/$n.deb"; done)
