@@ -3075,9 +3075,9 @@
     },
     {
       "path": "docs/operations/infra/public-webos-2026-10-11.md",
-      "title": "Public Bun WebOS static release",
-      "sha256": "f31cc604f2a9a6680e9c8f11b8bc15b582c50f1c15ac00be8081b658d3b4c6c4",
-      "bytes": 9655,
+      "title": "Retired public static WebOS deployment",
+      "sha256": "dd0356bc783cb6590c6df7cf2f6fa6d2c8b0802208e4b891ab4a2bd910bb0a70",
+      "bytes": 671,
       "domain": "infra",
       "status": "historical",
       "visibility": "private",

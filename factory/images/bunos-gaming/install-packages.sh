@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT
-# install-packages.sh LIST...: install every package from the pinned repositories, fall back to an AUR
-# build for packages the repositories lack, and record the rest in /usr/share/bun-os/missing-packages.txt.
+# install-packages.sh LIST...: install from configured pacman repositories and the staged Bun OS repo.
+# Missing packages are recorded and fail the image build; AUR is not an implicit source owner.
 set -euo pipefail
-repo=() aur=()
+repo=() missing=()
 for list in "$@"; do
   while read -r pkg; do
     [ -z "$pkg" ] || [ "${pkg:0:1}" = "#" ] && continue
-    if pacman -Si "$pkg" >/dev/null 2>&1 || pacman -Sg "$pkg" >/dev/null 2>&1; then repo+=("$pkg"); else aur+=("$pkg"); fi
+    if pacman -Si "$pkg" >/dev/null 2>&1 || pacman -Sg "$pkg" >/dev/null 2>&1; then
+      repo+=("$pkg")
+    else
+      missing+=("$pkg")
+    fi
   done <"$list"
 done
 install -d /usr/share/bun-os
+printf '%s\n' "${missing[@]}" > /usr/share/bun-os/missing-packages.txt
+if [ ${#missing[@]} -gt 0 ]; then
+  printf 'Refusing image: %d packages are absent from the configured signed repositories.\n' "${#missing[@]}" >&2
+  printf '  %s\n' "${missing[@]}" >&2
+  exit 20
+fi
 [ ${#repo[@]} -eq 0 ] || pacman -S --noconfirm --needed "${repo[@]}"
-for pkg in "${aur[@]}"; do
-  if timeout 1200 runuser -u builder -- bash -c "set -e; cd /tmp && rm -rf aur-$pkg && git clone -q --depth 1 https://aur.archlinux.org/$pkg.git aur-$pkg && cd aur-$pkg && test -f PKGBUILD && makepkg -s --noconfirm --needed --skippgpcheck" \
-    && pacman -U --noconfirm --needed /tmp/aur-"$pkg"/*.pkg.tar.zst; then
-    echo "$pkg" >>/usr/share/bun-os/aur-packages.txt
-  else
-    echo "$pkg" >>/usr/share/bun-os/missing-packages.txt
-  fi
-  rm -rf /tmp/aur-"$pkg"
-done
-touch /usr/share/bun-os/missing-packages.txt

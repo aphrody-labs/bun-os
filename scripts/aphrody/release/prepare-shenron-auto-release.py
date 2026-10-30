@@ -83,6 +83,43 @@ def public_preview_json_guards(text):
     return "".join(lines)
 
 
+def public_vfs_gateway_candidate(previous, candidate, source_sha256):
+    """Accept only a VFS gateway rendered from the currently sealed CDN config."""
+    require(re.fullmatch(r"[a-f0-9]{64}", source_sha256), "invalid CDN source digest")
+    require(
+        hashlib.sha256(previous.encode()).hexdigest() == source_sha256,
+        "CDN source digest differs from active sealed config",
+    )
+    include_lines = lambda value: re.findall(r"(?m)^\s*include\s+[^;]+;\s*$", value)
+    require(
+        include_lines(candidate) == include_lines(previous),
+        "candidate changed sealed CDN includes",
+    )
+    cdn_fallbacks = len(re.findall(r"location\s+@cdn_(?:worker|public_origin)\s*\{", candidate))
+    require(
+        candidate.count("map $request_uri $shenron_vfs_asset_path {") == 1
+        and candidate.count("location @vfs_asset {") >= 1
+        and candidate.count("error_page 404 = @vfs_asset;") == cdn_fallbacks
+        and cdn_fallbacks >= 1,
+        "public VFS 404 gateway missing or duplicated",
+    )
+    require(
+        "proxy_pass http://127.0.0.1:5011/api/v1/vfs/file?path=$shenron_vfs_asset_path;"
+        in candidate
+        and 'if ($shenron_vfs_asset_path = "") { return 404; }' in candidate
+        and "proxy_pass_request_headers off;" in candidate
+        and "proxy_pass_request_body off;" in candidate,
+        "public VFS gateway target or request policy is invalid",
+    )
+    require(
+        "$http_cookie" not in candidate
+        and "$http_authorization" not in candidate
+        and "shenron-vfs.sqlite" not in candidate,
+        "public VFS gateway exposes a private credential or store",
+    )
+    return public_preview_json_guards(candidate)
+
+
 def prepare(args):
     require(re.fullmatch(r"[a-f0-9]{40}", args.commit), "invalid commit")
     require(re.fullmatch(r"sha256:[a-f0-9]{64}", args.image_id), "invalid image ID")
@@ -207,8 +244,19 @@ def prepare(args):
                 "immutable chunk collision",
             )
     nginx_updates = {}
+    vfs_name = "nginx/cdn-dragonballfr-ssl.conf"
+    require(vfs_name in files, "sealed CDN config is not declared")
+    candidate_path = artifact / vfs_name
+    regular(candidate_path, artifact)
+    source_hash_path = artifact / (vfs_name + ".source.sha256")
+    regular(source_hash_path, artifact)
+    source_hash = source_hash_path.read_text().strip()
+    old_cdn_config = (previous / vfs_name).read_text()
+    nginx_updates[vfs_name] = public_vfs_gateway_candidate(
+        old_cdn_config, candidate_path.read_text(), source_hash
+    )
     for name in files:
-        if name.startswith("nginx/") and name.endswith((".conf", ".inc")):
+        if name != vfs_name and name.startswith("nginx/") and name.endswith((".conf", ".inc")):
             before = (previous / name).read_text()
             after = public_preview_json_guards(before)
             if after != before:

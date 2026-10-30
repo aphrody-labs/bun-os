@@ -25,7 +25,8 @@ test("public fallback strips inbound authentication and preserves range conditio
     "private",
     "proxy_set_header Range $http_range",
     "proxy_set_header If-Range $http_if_range",
-    "proxy_intercept_errors off",
+    "proxy_intercept_errors on",
+    "error_page 404 = @vfs_asset",
     "proxy_cache off",
     "wiki|dbz|adn|media",
     "Accept-Encoding identity",
@@ -35,6 +36,55 @@ test("public fallback strips inbound authentication and preserves range conditio
   expect(result).not.toContain("$http_authorization");
   expect(() => publicCdnFallback("@cdn_worker", "http://10.200.77.1")).toThrow();
   expect(() => renderPublicCdnGateway("server {}", "http://127.0.0.1:9077")).toThrow();
+});
+
+test("404s from the CDN origin reach only the public VFS asset API", () => {
+  const source = `# keep this include\ninclude /etc/nginx/conf.d/zz-cdn-origin.locations.inc;\nserver {\n location /assets/ { try_files $uri @cdn_worker; }\n location @cdn_worker { proxy_pass http://127.0.0.1:9077; }\n location @cdn_public_origin { proxy_pass http://127.0.0.1:9077; }\n}`;
+  const result = renderPublicCdnGateway(source, "http://127.0.0.1:9077");
+  expect(result).toContain("include /etc/nginx/conf.d/zz-cdn-origin.locations.inc;");
+  expect(result).toContain("error_page 404 = @vfs_asset;");
+  expect(result).toContain("map $request_uri $shenron_vfs_asset_path {");
+  expect(result).toContain("proxy_pass http://127.0.0.1:5011/api/v1/vfs/file?path=$shenron_vfs_asset_path;");
+  expect(result.match(/location @vfs_asset \{/g)).toHaveLength(1);
+  expect(result.match(/error_page 404 = @vfs_asset;/g)).toHaveLength(2);
+  expect(result).not.toContain("proxy_pass http://127.0.0.1:5011/api/v1/vfs/file?path=$request_uri");
+  for (const forbidden of [
+    "$http_cookie",
+    "$http_authorization",
+    "shenron-vfs.sqlite",
+    "proxy_set_header Cookie",
+    "proxy_set_header Authorization",
+  ])
+    expect(result).not.toContain(forbidden);
+  expect(renderPublicCdnGateway(result, "http://127.0.0.1:9077")).toBe(result);
+});
+
+test("public VFS URI map rejects non-assets, encoded paths, and traversal", () => {
+  const result = renderPublicCdnGateway("server {\n location @cdn_worker { return 404; }\n}", "http://127.0.0.1:9077");
+  const expression = result
+    .split("\n")
+    .map(line => line.trim().match(/^"(~\^.*)" \$vfs_asset_path;$/)?.[1])
+    .find(Boolean);
+  expect(expression).toBeDefined();
+  const allowed = new RegExp(expression!.slice(1));
+  for (const path of ["/assets/manga/dbz/001.webp", "/assets/file-name_1.webp?x=1"])
+    expect(allowed.test(path)).toBe(true);
+  for (const path of [
+    "/wiki/manga/001.webp",
+    "/assets/../private.env",
+    "/assets/a/../../private.env",
+    "/assets/%2e%2e/private.env",
+    "/assets/a b.webp",
+    "/assets/",
+  ])
+    expect(allowed.test(path), path).toBe(false);
+});
+
+test("conflicting VFS routes fail closed instead of replacing sealed configuration", () => {
+  const source = "server {\n location @cdn_worker { return 404; }\n location @vfs_asset { return 200; }\n}";
+  expect(() => renderPublicCdnGateway(source, "http://127.0.0.1:9077")).toThrow(
+    "Conflicting public VFS asset location",
+  );
 });
 
 test("public fallback admits catalog video and audio paths without broadening private routes", () => {

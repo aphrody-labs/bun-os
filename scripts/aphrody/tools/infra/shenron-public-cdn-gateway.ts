@@ -25,8 +25,70 @@ export function publicCdnFallback(name: string, upstream: string): string {
   proxy_set_header If-Modified-Since $http_if_modified_since;
   proxy_connect_timeout 5s;
   proxy_read_timeout 60s;
+  proxy_intercept_errors on;
+  error_page 404 = @vfs_asset;
+}`;
+}
+
+const VFS_ASSET_MAP = `map $request_uri $shenron_vfs_asset_path {
+    default "";
+    "~^(?<vfs_asset_path>/assets/(?!\\.{1,2}(/|\\?|$)|.*?/\\.{1,2}(/|\\?|$))[A-Za-z0-9._~-]+(?:/[A-Za-z0-9._~-]+)*)(?:\\?.*)?$" $vfs_asset_path;
+}`;
+
+const VFS_ASSET_LOCATION = `location @vfs_asset {
+  if ($request_method !~ "^(GET|HEAD)$") { return 405; }
+  if ($shenron_vfs_asset_path = "") { return 404; }
+  proxy_pass http://127.0.0.1:5011/api/v1/vfs/file?path=$shenron_vfs_asset_path;
+  proxy_http_version 1.1;
+  proxy_cache off;
+  proxy_pass_request_headers off;
+  proxy_pass_request_body off;
+  proxy_set_header Host dragonballfr.com;
+  proxy_set_header Content-Length "";
+  proxy_set_header Connection "";
+  proxy_set_header Accept $http_accept;
+  proxy_set_header Accept-Encoding identity;
+  proxy_set_header Range $http_range;
+  proxy_set_header If-Range $http_if_range;
+  proxy_set_header If-None-Match $http_if_none_match;
+  proxy_set_header If-Modified-Since $http_if_modified_since;
+  proxy_connect_timeout 3s;
+  proxy_read_timeout 30s;
   proxy_intercept_errors off;
 }`;
+
+function insertVfsAssetMap(source: string) {
+  const maps = blocks(source, /map\s+\$request_uri\s+\$shenron_vfs_asset_path\s*\{/y);
+  if (maps.length > 1) throw Error("Duplicate public VFS asset map");
+  if (maps.length) {
+    const current = source.slice(maps[0]!.start, maps[0]!.end + 1).trim();
+    if (current !== VFS_ASSET_MAP) throw Error("Conflicting public VFS asset map");
+    return source;
+  }
+  return `${VFS_ASSET_MAP}\n\n${source}`;
+}
+
+function insertVfsAssetLocation(source: string) {
+  let result = "",
+    previous = 0,
+    owners = 0;
+  for (const server of blocks(source, /server\s*\{/y)) {
+    const body = source.slice(server.start, server.end);
+    if (!blocks(body, /location\s+@cdn_(?:worker|public_origin)\s*\{/y).length) continue;
+    const existing = blocks(body, /location\s+@vfs_asset\s*\{/y);
+    if (existing.length > 1) throw Error("Duplicate public VFS asset location");
+    if (existing.length) {
+      const current = body.slice(existing[0]!.start, existing[0]!.end + 1).trim();
+      if (current !== VFS_ASSET_LOCATION) throw Error("Conflicting public VFS asset location");
+      result += source.slice(previous, server.end + 1);
+    } else {
+      result += source.slice(previous, server.end) + `\n${VFS_ASSET_LOCATION}\n` + source[server.end]!;
+    }
+    previous = server.end + 1;
+    owners++;
+  }
+  if (!owners) throw Error("No owned server for public VFS asset location");
+  return result + source.slice(previous);
 }
 
 function* syntaxPositions(source: string, start = 0) {
@@ -135,7 +197,7 @@ export function renderPublicCdnGateway(source: string, upstream: string, include
     count++;
   }
   if (!count) throw Error("No owned CDN fallback blocks found");
-  const rendered = result + source.slice(previous);
+  const rendered = insertVfsAssetLocation(insertVfsAssetMap(result + source.slice(previous)));
   return includeBunVideoAssets ? insertBunVideoAssets(rendered) : rendered;
 }
 

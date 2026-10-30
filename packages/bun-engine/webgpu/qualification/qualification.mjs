@@ -7,6 +7,8 @@ const output = document.querySelector("#receipt");
 const canvas = document.querySelector("#target");
 const uncaptured = [];
 let seq = 1;
+const packetTrace = [];
+const captureWireTrace = query.get("trace") === "1";
 const expectedNagaWasmSha256 = "d1433557ebd58176855b6bff0f40de9c4aa7cd120668110a3570fc2c5987ec48";
 
 class Writer {
@@ -79,8 +81,25 @@ async function withValidation(device, label, operation) {
 }
 
 async function dispatch(plugin, device, cmd, payload, { gpu = true } = {}) {
-  const run = () => plugin.dispatch(cmd, seq++, payload);
+  const sequence = seq++;
+  const run = () => plugin.dispatch(cmd, sequence, payload);
   const result = gpu ? await withValidation(device, `dispatch 0x${cmd.toString(16)}`, run) : await run();
+  if (captureWireTrace) {
+    const base64 = bytes => {
+      let text = "";
+      for (let i = 0; i < bytes.length; i += 8192) {
+        text += String.fromCharCode(...bytes.subarray(i, i + 8192));
+      }
+      return btoa(text);
+    };
+    packetTrace.push({
+      command: cmd,
+      sequence,
+      payloadBase64: base64(payload),
+      result: result.result,
+      responseBase64: base64(result.data),
+    });
+  }
   resultOk(result, cmd);
   return result.data;
 }
@@ -326,6 +345,7 @@ async function run() {
     vertexSpirvSha256: vertexSha256,
     fragmentSpirvSha256: fragmentSha256,
     imageSize: [pixels.width, pixels.height],
+    wireTrace: captureWireTrace ? packetTrace : undefined,
     centerPixel: center,
     backgroundPixel: corner,
     uncapturedErrors: uncaptured,

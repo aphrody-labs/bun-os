@@ -1,95 +1,68 @@
-# Aphrody super-site
+# Aphrody WebOS
 
-This app assembles the WebOS desktop, the canonical App UI under `/workspace/`,
-the shared M3 theme, workspace catalog and installable Craft/Engine browser
-packages. `packages/app-ui` owns the shared interface consumed by this site and
-the native `apps/aphrody-app` host. WebOS-WASM owns the browser filesystem and
-its RPC adapter; the native Drive transport keeps its own storage and permissions.
+This app assembles the Bun OS browser desktop, the shared Workspace UI under
+`/workspace/`, the M3 theme, workspace catalog, and installable Craft and Engine
+packages. `packages/app-ui` owns the shared interface. `packages/webos-wasm`
+wraps the Rust filesystem and RPC adapter; the browser persists user files in
+the Origin Private File System (OPFS).
 
-From the repository root on the Linux VPS factory:
+## Production stack
 
-```sh
-bun src/cli.ts superapp craft
-bun src/cli.ts superapp build
-bun src/cli.ts superapp serve
-```
+`aphrody.com` is served by the native Bun service on the VPS:
 
-The product build compiles App UI with `--base /workspace/` into `build/app-ui`,
-then assembles this site using that artifact. Set `BUN_OS_APP_UI_DIST` to select
-a different intermediate directory under the root `build/`. Build WebOS-WASM through its native owner
-before assembly; the App UI build reports missing WASM inputs explicitly.
-Craft compilation uses the root serialized Cargo owner and four compiler jobs.
+1. Cloudflare provides authoritative DNS. The apex and `www` records are
+   DNS-only and point to the VPS.
+2. Nginx terminates TLS, redirects `www`, compresses assets, limits API request
+   rates, and proxies to `127.0.0.1:8790`.
+3. `aphrody-webos.service` runs Bun's `Bun.serve` and the shared HTTP handler in
+   `worker/index.ts`. Static files come from the activated immutable `dist/`.
+4. The local PostgreSQL reader serves the public documentation/catalog API.
+   Alpine Linux runs in the browser through v86/WebAssembly; it is not a VPS
+   desktop session.
 
-`build:shell` assembles the site from an already staged App UI artifact.
-`superapp deploy` runs the product build and stages a hashed native VPS release.
+The Cloudflare Worker named `aphrody-webos` remains for the `aphrody.app`
+application hosts and aliases. The apex and `www.aphrody.com` are not Worker
+routes. Keep the production route manifest in `wrangler.jsonc` aligned with
+that boundary.
 
-For local serving, set `BUN_OS_API_ORIGIN` to an existing API backend's HTTP(S)
-origin, or set `WEBOS_DATABASE_URL_FILE` to the protected local PostgreSQL reader
-connection reference. Production reads the `aphrody_site` schema through native
-`Bun.SQL`, with four connections, a read-only role and an eight-second statement
-timeout. No provider secret enters a bundle or release receipt.
+The public app-server endpoints do not host conversations or provider sessions.
+Those require the native Aphrody app on the user's machine. The public model
+list is empty; the unqualified inference and decision routes return an explicit
+unavailable response.
 
-## VPS deployment
+## Build and activation
 
-The Sites runner writes complete releases below `/cache/webos-deploy/releases`,
-then atomically publishes `ready`. The host's `aphrody-webos-deploy.timer` checks
-the handoff every 30 seconds. Its root-owned activator verifies artifact hashes,
-switches `~/apps/webos/current`, restarts `aphrody-webos.service` and checks the
-served source commit. A failed activation restores the previous release. The
-queue does not give build jobs host SSH credentials or the Docker socket.
-The activator reads the published `os` tip from the existing local forge and
-ignores a superseded queued release, preventing an older build from rolling
-back a newer deployment.
+Production builds run on the VPS factory through
+`.gitea/workflows/aphrody-sites.yaml`. The workflow builds the Craft packages,
+assembles the site, and writes an immutable release with a SHA-256 receipt to
+the deployment handoff. The root-owned activation timer verifies the receipt,
+checks that the source commit is still the published `os` tip, switches the
+release, restarts the service, and confirms both local and public health. A
+failed health check restores the previous release.
 
-`WEBOS_PREBUILT_DIST` explicitly imports an existing static artifact during a
-migration; the receipt records that import. Ordinary deployments build App UI
-and WebOS from source. The ISO is verified against its official checksum and
-included as a local release object. Shared immutable game objects may also live
-under `WEBOS_OBJECTS`; no R2 client is used by the native service.
+`build-product.ts` builds `packages/app-ui` for `/workspace/` and then assembles
+`dist/`. `build.ts` expects the App UI artifact to exist already. Build the Rust
+WebAssembly owner before assembly; missing WASM inputs are reported explicitly.
+The site build stages the pinned v86 runtime, BIOS images, and verified Alpine
+ISO. No Cloudflare credentials are needed for the native VPS deployment.
 
-The public ingress is `infra/config/host/nginx/aphrody/webos-vps.conf`. It serves
-`aphrody.com` through loopback port 8790, redirects `www`, compresses assets and
-limits API traffic. TLS uses the `aphrody-webos-vps` Certbot certificate, renewed
-by HTTP-01 through `/var/www/letsencrypt`. It also covers the direct VPS
-`downloads.aphrody.com` and `cdn.aphrody.com` endpoints.
+## API and data
 
-## Migration evidence, 2026-10-24
+`serve.ts` adapts the shared Worker handler to Bun's native server and local
+filesystem. In production, `WEBOS_DATABASE_URL_FILE` points to the protected
+PostgreSQL read-only connection. The database is local to the VPS and uses a
+bounded four-connection pool. `BUN_OS_API_ORIGIN` is only for a deliberately
+configured local backend; it is not set for the production site.
 
-The apex, www, downloads and CDN records are DNS-only A/CNAME records targeting
-the VPS. The apex and www Worker routes were removed. The first activated API reported
-source commit `d988e5630dc554ec9f6779efbc8edad9a63e64fb` and no Cloudflare colo.
-The first release preserves the deployed static artifact: the shell JavaScript
-and Workspace HTML matched their public versions by SHA-256 before cutover.
+The browser filesystem and Alpine VM state remain in the visitor's browser.
+The VM's ISO and static site assets are served from the VPS release. Game and
+large media objects use the service local immutable object paths.
 
-The existing source database was dumped and restored into the dedicated
-`aphrody-webos-db` service through the host's root Compose project. All ten table
-counts matched: 4,413 documents, 5,545 chunks, 40,000 native graph nodes and
-58,495 graph edges. The source and protected backup remain intact. The 51,380,224
-byte Alpine image matched its official SHA-256; partial requests returned 206.
-Types, lint, formatting, native bundling, the Git private-content guard and
-nginx configuration checks ran on the VPS. No test suite was added or run.
+## Production evidence
 
-The production package registry was already empty before migration. This
-cutover does not qualify the missing Craft/emulator packages or enable a new
-inference provider. The source catalog is the preserved read-only snapshot;
-future source publication must target its new local database deliberately.
-
-Measured deployment bottlenecks: the Sites pipeline initializes a broad source
-closure and compiles the complete Craft suite on each run; its persistent
-workspace log contains a missing nested Dolphin/pugixml revision. At inspection
-the VPS root filesystem was 94% full, swap was almost full, and I/O pressure
-showed roughly 30–50% stalled time while `/home` still had about 125 GiB free.
-These are capacity and pipeline findings, not evidence that Cloudflare itself
-was slow. The former loopback WebOS process ran a deleted binary without a
-service supervisor; the new service replaces that public dependency.
-The native qualification workflow now ignores website-only/deployment-only
-pushes and uses a shallow checkout. Its separate manual dispatch still permits
-native qualification and admitted app builds. During this cutover its former
-full-history checkout ran alongside Sites and I/O stalled time exceeded 60%.
-
-Remaining provider scope: authoritative DNS still uses Cloudflare. The distinct
-Bun homepage, Auto tunnel, R2 video endpoint and legacy `aphrody.app` aliases
-have separate live owners. Changing the parent nameservers requires preserving
-or migrating those services first; the OVH mirror currently lacks some of their
-records. The native service, its database, VM image, downloads, CDN and HTTP-01
-certificate no longer require Cloudflare in their serving path.
+On 2026-10-25, `https://aphrody.com/api/health` returned HTTP 200 with
+`service: aphrody-webos`, no Cloudflare colo, and source commit
+`0fba9d6611d9371a93c2153e324a54fdde5679d7`. A read-only Cloudflare account
+inspection found no Worker route for the apex or `www`; both DNS records are
+DNS-only. The deployed Worker still has the application-host routes and custom
+domains under `aphrody.app`.

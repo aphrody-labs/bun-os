@@ -16,11 +16,14 @@ R2 custom domains retain their existing owners.
 
 The canonical origin is https://aphrody.com. Product hosts are no longer
 separate identities: each one answers a permanent 301 to a path of the apex,
-preserving the sub-path and query string. The declarative source is
+preserving the sub-path and query string. The apex is served by the native Bun
+WebOS service on the VPS; Cloudflare DNS is authoritative but does not proxy the
+apex or `www`. The declarative source is
 `infra/config/routes.catalog.json` (host to `{kind, path, keep}`, plus the
-path to WebOS package map). The WebOS Worker (`apps/webos/worker/index.ts`)
-derives `redirectFor` from it, the WebOS shell opens the package of a catalog
-path, and the legacy `/?app=<package>` link redirects to the package path.
+path to WebOS package map). The shared WebOS request handler
+(`apps/webos/worker/index.ts`), hosted natively on the apex and by the Worker on
+app aliases, derives `redirectFor` from it. The shell opens the package of a
+catalog path, and the legacy `/?app=<package>` link redirects to that path.
 `bun.aphrody.com` and `bun.aphrody.app` are the Bun site (Worker `aphrody-app`, owned by the bun repo) and are not routed by this catalog.
 
 Hosts that stay separate (`keep: true`): `git.aphrody.app`, `source.aphrody.app`, `deploy.aphrody.app`, `downloads.aphrody.com`, `cdn.aphrody.com`, `assets.aphrody.app`, `dist.aphrody.app`, `nie.aphrody.com`.
@@ -66,14 +69,15 @@ Hosts that stay separate (`keep: true`): `git.aphrody.app`, `source.aphrody.app`
 | www.aphrody.com | www | https://aphrody.com/ (sub-paths kept) |
 
 `play.aphrody.app/` still goes through `playRedirect` to `/workspace/games`
-first. `os.aphrody.com` and `creator.aphrody.com` are served by their nginx
-vhosts today and only follow the catalog once their vhosts redirect. The
-sections below describe the pre-consolidation hostnames and the DNS, Worker
-route and custom-domain ownership those redirects still rely on.
+first. The apex and `www` are served by the native VPS origin; Worker-backed
+application aliases redirect to it. `os.aphrody.com` and `creator.aphrody.com`
+retain their Nginx owners until their vhosts redirect.
 
 ## Previous hosts
 
-The 14 library applications keep `app-<capability>.aphrody.app` plus the library alias until Cloudflare routes are removed; both redirect as listed above.
+The 14 library applications keep `app-<capability>.aphrody.app` routes and
+their capability-alias custom domains on the `aphrody-webos` Worker. Those
+hosts redirect to the native apex as listed above.
 
 ## Routing and qualification
 
@@ -89,19 +93,18 @@ application behavior, native backends and independent deployment require their
 own build and deployment receipts. A hostname response does not qualify those
 application capabilities.
 
-The 14 canonical `app-*` DNS records remain proxied; 14 Worker routes bind them
-to `aphrody-app`. The library-name aliases use enabled `aphrody-app` Worker
-custom domains. APT, desktop, the apex, and `www` also use enabled custom domains
-with previews disabled. `video.aphrody.app` remains an R2 custom domain and is
-not an application alias.
+The 14 canonical `app-*` Worker routes and the capability-alias custom domains
+belong to `aphrody-webos`. Its other enabled `aphrody.app` custom domains
+include the apex, `www`, APT, and desktop. `video.aphrody.app` remains an R2
+custom domain, not an application alias. The `aphrody.com` and `www` records
+are DNS-only and have no Worker route or custom domain.
 
-Live Cloudflare readback on 2026-10-13 found 50 DNS records, all 14 canonical
-Worker routes, and 18 enabled Worker custom domains (14 library aliases plus
-APT, desktop, the apex, and `www`). A native HTTPS HEAD check returned 200 for
-the apex, all 14 canonical hosts, all 14 aliases, APT, and desktop; `www`
-returned 301. This supersedes the earlier 12/14 HTTP 200 observation. These
-responses qualify hostname routing only; they do not establish application
-readiness, native artifact availability, behavior, or independent deployment.
+Read-only Cloudflare inspection on 2026-10-25 found the 14 deployed `app-*`
+routes and `play.aphrody.app/` on `aphrody-webos`; no route or custom domain
+for `aphrody.com` or `www.aphrody.com`; and DNS-only apex/www records to the VPS.
+The live `https://aphrody.com/api/health` response returned HTTP 200 with no
+Cloudflare colo and identified the native WebOS service. These checks establish
+the serving path and health response, not full application qualification.
 
 The ignored out/app-domains/receipt.json records preflight DNS/domain ownership,
 creation results, read-back checks, public DNS/HTTPS observations, and separate
@@ -147,14 +150,15 @@ discovery; generation and account operations still require the desktop host.
 This is separate from the thirteen standalone WebAssembly editor start-up
 checks and must not be reported as a qualified browser generation backend.
 
-## Applied on Cloudflare (2026-10-22)
+## Applied on Cloudflare (read-only state, 2026-10-25)
 
 - Zone `aphrody.com`: the `bun.aphrody.com` redirect rule created earlier the same day was deleted again
   (the Bun site lives on `bun.aphrody.com` and `bun.aphrody.app`, attached to the `aphrody-app` Worker by the bun
   repo). No redirect rule remains in that zone from this catalog.
-- Not applied: the Worker `aphrody-webos` is deployed only by `apps/webos/deploy.ts` from a pushed commit in the
-  protected environment. Craft hosts already answer `301 https://aphrody.com/?app=<id>` from the deployed Worker;
-  the path form (`/light`) arrives with the next deployment.
+- The apex and `www` Worker routes were removed during the native VPS migration.
+  `apps/webos/deploy.ts` now creates a native release handoff; it does not
+  publish the apex Worker. The existing Worker remains deployed for application
+  aliases and product hosts under `aphrody.app`.
 - Zone `aphrody.app`, ruleset `4189be37cb1b498390a81986470650a7` (phase `http_request_dynamic_redirect`), rule
   `8d637dcb359446369ad4d93fdf21b8d2`: on host `aphrody.app`, `/install`, `/install.sh`, `/install.ps1`,
   `/llms.txt`, `/llms-full.txt`, `/docs/*` and `/api/bun/*` answer a 301 to the same path on

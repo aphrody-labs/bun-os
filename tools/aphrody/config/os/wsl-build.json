@@ -68,5 +68,113 @@
       }
     ],
     "toolchainManifests": ["tools/config/bun-forge.json"]
+  },
+  "arch": {
+    "owner": "factory/usr plus scripts/aphrody/build/os/build-wsl-distro.sh",
+    "format": "Microsoft native .wsl rootfs archive",
+    "kernelProvider": "Microsoft WSL2 kernel; kernel and initramfs stay out of the rootfs",
+    "portableCpuBaseline": "x86-64",
+    "tunedVariants": ["x86-64-v3", "x86-64-v4", "znver4"],
+    "requestedKernel": {
+      "version": "7.3",
+      "owner": "factory/native-targets.json and the WSL kernel owner",
+      "state": "blocked",
+      "reason": "The WSL rootfs intentionally excludes kernels; no exact Linux 7.3 WSL kernel artifact and compatibility receipt is attached to this target yet."
+    },
+    "targets": {
+      "portable-x86_64": {
+        "state": "blocked",
+        "composition": "server",
+        "requiredPackages": [
+          "bunos-filesystem",
+          "base",
+          "systemd",
+          "pacman",
+          "archlinux-keyring",
+          "bun-aphrody",
+          "bunos-utils",
+          "ca-certificates"
+        ],
+        "blockers": [
+          "The current bun-aphrody PKGBUILD pins unpublished toolchains/bun 46709d69939f; no qualified BunOS package receipt exists.",
+          "A matching factory/usr lock and verified rootfs.tar.zst package inventory are required before export."
+        ]
+      },
+      "omarchy-preview": {
+        "state": "experimental",
+        "sourceOwner": "factory/images/bunos-omarchy",
+        "sourceRelease": "omacom/try-omarchy-windows v0.12.0",
+        "sourceRevision": "3b497519f5f4b320b33aa7bfaf8e3ec12ecb2b64",
+        "omarchyRevision": "c668141e9c42b13c80c9ca4ea108e11708c5e8a5",
+        "omarchyVersion": "4.0.4-10",
+        "bunRuntimeVersion": "1.4.5",
+        "bunRuntimeSourceRevision": "1d019cb1b558453c2f8901434d51d63ff1c5f014",
+        "bunRuntimeReleaseAsset": "bun-linux-x64.tar.gz",
+        "bunRuntimeReleaseAssetSha256": "d44789d83d4119347a99ea90b7214a7c1ab1dbc9b13d455ef69efcc89bdf5469",
+        "requiredPackages": ["hyprland", "mesa", "quickshell", "vulkan-virtio"],
+        "requiredPackageVersions": {
+          "hyprland": "0.56.2-4",
+          "mesa": "1:26.2.4-1",
+          "quickshell": "0.3.2-1",
+          "vulkan-virtio": "1:26.2.4-1"
+        },
+        "blockers": [
+          "Requires the imported rootfs tar, import receipt, manifest, official signed package lock and generated package inventory from the same image-owner job.",
+          "Requires a separate pinned and checksum-qualified Aphrody Bun runtime payload; Omarchy provenance does not qualify BunOS artifacts.",
+          "The locked v0.12.0 Omarchy guest is a reproducible pinned source, not a claim that every Arch package is the latest rolling release; refresh only through a new verified upstream package lock.",
+          "This preview carries Omarchy/Hyprland only. COSMIC, Steam/Proton, the complete Rust nightly toolchain, and all prebuilt BunOS crates/apps remain separately gated."
+        ]
+      },
+      "desktop-full": {
+        "state": "blocked",
+        "composition": "desktop",
+        "defaultSession": "omarchy-hyprland",
+        "alternateSession": "cosmic",
+        "requiredPackages": [
+          "bunos-filesystem",
+          "base",
+          "systemd",
+          "pacman",
+          "archlinux-keyring",
+          "bun-aphrody",
+          "bunos-utils",
+          "ca-certificates",
+          "omarchy-keyring",
+          "hyprland",
+          "quickshell",
+          "uwsm",
+          "sddm",
+          "cosmic-session",
+          "rustup",
+          "chromium",
+          "sudo-rs",
+          "uutils-coreutils",
+          "steam"
+        ],
+        "additionalArtifactGates": [
+          "Install and hash the rustup-managed nightly-2026-09-15 toolchain; rustup package presence alone is insufficient.",
+          "Record native wgpu/winit crate build receipts and license inventory from the repository package owner.",
+          "Record the Steam-owned Proton runtime provision path; the Steam package does not mean Proton has been downloaded or qualified.",
+          "Qualify Omarchy's pinned package/config set without running its system installer and separately qualify COSMIC as the alternate session."
+        ],
+        "blockers": [
+          "The selected Omarchy package subset has no exact signed desktop closure or session qualification; factory/profile.json marks omarchy-hyprland blocked.",
+          "The uutils-coreutils Arch package installs uu-* tools and does not replace the GNU coreutils command names; command replacement needs an explicit safe packaging/integration receipt.",
+          "COSMIC is unqualified and not present in the current factory/usr desktop composition.",
+          "Steam/Proton and native wgpu/winit artifacts need explicit package receipts and license inventory; they are not implied by this target.",
+          "Rust nightly-2026-09-15 is the workspace pin but no installed toolchain artifact receipt is part of the current /usr factory.",
+          "The current BunOS runtime PKGBUILD pins an unpublished source commit."
+        ]
+      },
+      "portable-x86_64-tuned": {
+        "state": "blocked",
+        "composition": "server",
+        "cpuBaseline": "x86-64",
+        "variants": ["x86-64-v3", "x86-64-v4", "znver4"],
+        "blockers": [
+          "CPU-specific output is opt-in and requires a matching qualified factory variant and machine compatibility receipt; the portable x86-64 profile remains the default."
+        ]
+      }
+    }
   }
 }

@@ -44,21 +44,34 @@
       "port": 18803,
       "host": "dbfr",
       "sourceRepo": "aphrody",
-      "public": true,
-      "publicProxy": "nginx",
-      "note": "Actual existing apex origin through WireGuard, confirmed 2026-10-11: /health204, /docs200. Lifecycle remains owned by the existing DBFR deployment; public WebOS adds only an exact static prefix at the VPS edge. The separate staged Rust aphrody-site service is preserved."
+      "public": false,
+      "note": "Retained internal DBFR origin. The public apex moved to the native VPS WebOS service on 2026-10-24; this DBFR service was not stopped or modified."
     },
     {
-      "id": "aphrody-public-webos",
+      "id": "aphrody-webos",
+      "application": "aphrody",
+      "kind": "bun-webos-native",
+      "runtime": "bun",
+      "unit": "aphrody-webos.service",
+      "health": "http://127.0.0.1:8790/api/health",
+      "port": 8790,
+      "workingDirectory": "/home/ubuntu/apps/webos/current",
+      "sourceRepo": "aphrody",
+      "publicProxy": "nginx",
+      "public": true,
+      "host": "vps",
+      "note": "Native Bun server for aphrody.com, published from the immutable WebOS release handoff and activated by aphrody-webos-deploy.service. Nginx terminates TLS and proxies to loopback. The Cloudflare Worker remains for app hosts and aliases under aphrody.app; the apex and www are DNS-only."
+    },
+    {
+      "id": "aphrody-omar-deny",
       "application": "aphrody",
       "kind": "nginx-static",
       "runtime": "none",
       "sourceRepo": "aphrody",
-      "releaseRoot": "/var/www/aphrody-public-webos/releases",
       "publicProxy": "nginx",
       "public": true,
       "host": "vps",
-      "note": "Browser-local public WebOS demonstration and three public checksummed Bun package archives at /labs/webos/. Exact Nginx allowlist only; no host/model/application upstream. Omar remains private at10.200.77.10; the VPS omar.aphrody.com vhost refuses public requests with403 and preserves its dedicated certificate. Source packages/bun-webos/public-site in aphrody-labs/bun; docs/operations/infra/public-webos-2026-10-11.md. Existing private Omar services and DBFR apex origin remain separate."
+      "note": "The public VPS vhost intentionally returns 403 for omar.aphrody.com. The private Omar service is reachable only through its authorized local and WireGuard paths."
     },
     {
       "id": "aphrody-fonts-proxy",

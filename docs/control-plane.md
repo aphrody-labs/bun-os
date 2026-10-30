@@ -18,9 +18,10 @@ owned. No local Windows build or WSL is part of this deployment.
 | Git SSH | 29022 | Private tunnel only |
 | Product API (staged) | 29030 | source.aphrody.app/api/product/v1/ |
 
-The `app-*.aphrody.app` and `*craft.aphrody.app` names are routes and custom domains of the
-`aphrody-webos` Cloudflare Worker (`apps/webos/wrangler.jsonc`); no VPS loopback service or Nginx
-vhost backs them.
+The `app-*.aphrody.app` and capability-alias custom domains are handled by the
+`aphrody-webos` Cloudflare Worker (`apps/webos/wrangler.jsonc`). The apex
+`aphrody.com` and `www` are DNS-only and served by the native Bun WebOS service
+on the VPS through Nginx. `craft.aphrody.app` has its own VPS Nginx frontend.
 
 The Gitea vhost uses a Cloudflare Origin CA certificate for
 `source.aphrody.app` and `git.aphrody.app`, issued from a CSR generated on the

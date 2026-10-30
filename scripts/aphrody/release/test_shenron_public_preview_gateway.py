@@ -48,6 +48,39 @@ class PublicPreviewGatewayTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unrecognized"):
             prepare.public_preview_json_guards('location @cdn_worker {\n if ($uri !~* "^/unknown$") { return 404; }\n}')
 
+    def test_vfs_candidate_is_bound_to_active_config_and_keeps_includes(self):
+        previous = "include /etc/nginx/conf.d/zz-cdn-origin.locations.inc;\nlocation @cdn_worker { return 404; }"
+        candidate = """include /etc/nginx/conf.d/zz-cdn-origin.locations.inc;
+map $request_uri $shenron_vfs_asset_path {
+    default "";
+}
+location @cdn_worker { error_page 404 = @vfs_asset; }
+location @vfs_asset {
+  if ($shenron_vfs_asset_path = "") { return 404; }
+  proxy_pass http://127.0.0.1:5011/api/v1/vfs/file?path=$shenron_vfs_asset_path;
+  proxy_pass_request_headers off;
+  proxy_pass_request_body off;
+}
+"""
+        source_digest = prepare.hashlib.sha256(previous.encode()).hexdigest()
+        self.assertEqual(
+            prepare.public_vfs_gateway_candidate(previous, candidate, source_digest), candidate
+        )
+        with self.assertRaisesRegex(ValueError, "active sealed config"):
+            prepare.public_vfs_gateway_candidate(previous, candidate, "0" * 64)
+        with self.assertRaisesRegex(ValueError, "includes"):
+            prepare.public_vfs_gateway_candidate(
+                previous,
+                candidate.replace("zz-cdn-origin.locations.inc", "other.inc"),
+                source_digest,
+            )
+        with self.assertRaisesRegex(ValueError, "target or request policy"):
+            prepare.public_vfs_gateway_candidate(
+                previous,
+                candidate.replace("/api/v1/vfs/file", "/api/v1/vfs/list"),
+                source_digest,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

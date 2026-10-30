@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-// Search metadata for the public paths of https://aphrody.com that boot the desktop shell. The Worker
-// rewrites the shell's <head> with these values (title, description, canonical, Open Graph, Twitter) and
+// Search metadata for public aphrody.com paths that boot the desktop shell. The shared HTTP handler
+// rewrites the shell's <head> with these values (title, description, canonical, Open Graph, Twitter), and
 // seo.ts lists them in sitemap.xml. Old product hosts 301 to these paths (infra/config/routes.catalog.json),
 // so each page has exactly one canonical address.
 import { ROUTES, WORKSPACE_ROUTES } from "./src/config";

@@ -4,6 +4,7 @@ import { mkdirSync, readdirSync, lstatSync, copyFileSync, rmSync } from "node:fs
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { activeDeployment, deploymentSelection } from "./shenron-deployment-identity.ts";
+import { renderPublicCdnGateway } from "../tools/infra/shenron-public-cdn-gateway.ts";
 
 const infra = resolve(dirname(fileURLToPath(import.meta.url)), "../../../");
 const config = await Bun.file(join(infra, "tools/config/shenron-auto-deploy.json")).json();
@@ -48,6 +49,27 @@ const upload = join(job!, "transfer");
 mkdirSync(upload, { recursive: true, mode: 0o700 });
 const imagePath = join(upload, "image.tar");
 command(["docker", "image", "save", "--output", imagePath, image!], true);
+const activePath = remote(`readlink -f ${config.remoteRoot}/current`);
+const beforeBuildIdentity = activeDeployment(
+  JSON.parse(
+    remote(
+      js(
+        `const release=${JSON.stringify(activePath)};const m=await Bun.file(release+'/release.json').json();console.log(JSON.stringify({release,commit:m.commit,deployment:m.deployment}));`,
+      ),
+    ),
+  ),
+);
+if (beforeBuildIdentity.id !== previous) throw new Error("Production changed before CDN config rendering");
+const sealedCdn = JSON.parse(
+  remote(
+    js(
+      `const release=${JSON.stringify(activePath)};const name='nginx/cdn-dragonballfr-ssl.conf';const m=await Bun.file(release+'/release.json').json();const expected=m.files?.[name];if(!/^[a-f0-9]{64}$/.test(expected??''))throw Error('Sealed CDN config missing from manifest');const path=release+'/'+name;const file=Bun.file(path);if(!(await file.exists()))throw Error('Sealed CDN config missing');const source=await file.text();const hash=new Bun.CryptoHasher('sha256').update(source).digest('hex');if(hash!==expected)throw Error('Sealed CDN config digest mismatch');console.log(JSON.stringify({source,sha256:hash}));`,
+    ),
+  ),
+);
+if (typeof sealedCdn.source !== "string" || !/^[a-f0-9]{64}$/.test(sealedCdn.sha256 ?? ""))
+  throw new Error("Invalid sealed CDN config response");
+const renderedCdn = renderPublicCdnGateway(sealedCdn.source, "http://127.0.0.1:9077");
 const entries: Record<string, Blob> = {};
 function add(dir: string, prefix = "") {
   for (const name of readdirSync(dir)) {
@@ -61,6 +83,8 @@ function add(dir: string, prefix = "") {
   }
 }
 add(join(work!, "dist/cdn"));
+entries["nginx/cdn-dragonballfr-ssl.conf"] = new Blob([renderedCdn]);
+entries["nginx/cdn-dragonballfr-ssl.conf.source.sha256"] = new Blob([`${sealedCdn.sha256}\n`]);
 if (
   !Object.keys(entries).some(p => p.startsWith("site/")) ||
   !Object.keys(entries).some(p => p.startsWith("_next/static/"))
@@ -111,7 +135,6 @@ remote(
   ),
   true,
 );
-const activePath = remote(`readlink -f ${config.remoteRoot}/current`);
 const activeIdentity = activeDeployment(
   JSON.parse(
     remote(

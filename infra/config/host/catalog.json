@@ -85,6 +85,15 @@
   ],
   "units": [
     {
+      "service": "aphrody-webos",
+      "unit": "aphrody-webos.service",
+      "path": "systemd/aphrody/aphrody-webos.service",
+      "dropIns": [],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps",
+      "site": "aphrody.com"
+    },
+    {
       "service": "aphrody-web-browser-vps",
       "unit": "aphrody-web-browser-vps.service",
       "path": "systemd/aphrody/aphrody-web-browser-vps.service",

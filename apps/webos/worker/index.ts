@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// aphrody.com edge: static Bun OS shell + /api/health + /api/browse (script-free reader proxy for the Bun Browser).
+// Shared WebOS handler: static Bun OS shell + /api/health + /api/browse (script-free reader proxy for the Bun Browser).
 import { workspaceResponse } from "./workspace";
 import { gameContentResponse } from "./game-content";
 import { playRedirect, playResponse } from "./play";

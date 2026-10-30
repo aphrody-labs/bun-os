@@ -10,6 +10,7 @@ pub enum SqliteTasksError {
     task_id: String,
     column: &'static str,
     value: String,
+    source: EnumError,
   },
   //TaskNotFound,
   //TaskAlreadyExists,
@@ -18,7 +19,15 @@ pub enum SqliteTasksError {
   //InvalidGenerationProvider,
 }
 
-impl Error for SqliteTasksError {}
+impl Error for SqliteTasksError {
+  fn source(&self) -> Option<&(dyn Error + 'static)> {
+    match self {
+      Self::SqlxError(err) => Some(err),
+      Self::EnumError(err) => Some(err),
+      Self::InvalidTaskEnum { source, .. } => Some(source),
+    }
+  }
+}
 
 impl Display for SqliteTasksError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -39,10 +48,11 @@ pub(crate) fn decode_task_enum<T>(
   value: &str,
   decode: impl FnOnce(&str) -> Result<T, EnumError>,
 ) -> Result<T, SqliteTasksError> {
-  decode(value).map_err(|_| SqliteTasksError::InvalidTaskEnum {
+  decode(value).map_err(|source| SqliteTasksError::InvalidTaskEnum {
     task_id: task_id.to_owned(),
     column,
     value: value.to_owned(),
+    source,
   })
 }
 
@@ -79,6 +89,7 @@ mod tests {
         task_id,
         column: "task_status",
         value,
+        ..
       } if task_id == "task_123" && value == "future_status"
     ));
   }

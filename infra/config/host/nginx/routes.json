@@ -6,7 +6,7 @@
   "routes": [
     {
       "host": "omar.aphrody.com",
-      "service": "aphrody-public-webos",
+      "service": "aphrody-omar-deny",
       "upstream": "static:403",
       "probePath": "/",
       "response": 403,
@@ -14,9 +14,9 @@
     },
     {
       "host": "aphrody.com",
-      "service": "aphrody-dbfr-site",
-      "upstream": "10.200.77.3:18803",
-      "probePath": "/docs",
+      "service": "aphrody-webos",
+      "upstream": "127.0.0.1:8790",
+      "probePath": "/api/health",
       "vhost": "nginx/aphrody/aphrody.com.conf"
     },
     {
