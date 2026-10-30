@@ -22,6 +22,9 @@ const FORMAT_IGNORE = [
   "packages/iecode-scripts/**",
   "packages/iecode-docs/**",
   "packages/bun-tauri/crates/aphrody-tauri-cli/templates/**",
+  // Generated or fetched files: wasm-bindgen output and the upstream Material Symbols typings.
+  "packages/webos-wasm/wasm/**",
+  "packages/m3-fonts/fonts/upstream/**",
 ].flatMap(p => ["--ignore-pattern", p]);
 const FORMAT_PATHS = ["src", "container", "factory", "infra", "packages", "apps/desktop", "scripts"];
 const LINT_PATHS = ["src", "container", "factory", "infra", "packages", "apps", "scripts"];
