@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Installs the Bun OS auto-sync on the VPS (user level, no root): a systemd --user timer when a user bus exists,
-# otherwise a tmux loop. Idempotent. NOT RUN by the session that wrote it (the VPS was down on 2026-10-29);
-# run it by hand once access is restored and /home is healthy (docs/VPS-BUILD.md, "Recovery").
+# otherwise a tmux loop. Idempotent. Installed on the VPS (bunos-sync.timer, every 10 min); safe to re-run.
 #
 #   bash factory/sync/vps-install.sh [--tmux] [--uninstall]
 set -euo pipefail
