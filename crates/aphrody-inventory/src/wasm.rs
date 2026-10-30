@@ -104,19 +104,13 @@ fn build_one(root: &Path, out: &Path, id: &str, krate: &str) -> Result<u64, Stri
         Ok(f) if !f.is_empty() => format!("{f} {remap}"),
         _ => remap,
     };
-    let cargo = Command::new(root.join("scripts/aphrody/build/rust/cargo-serial.sh"))
-        .current_dir(root)
-        .args([
-            "build",
-            "--locked",
-            "-p",
-            krate,
-            "--target",
-            "wasm32-unknown-unknown",
-            "--release",
-            "--target-dir",
-        ])
-        .arg(&target_dir)
+    let mut command = Command::new(root.join("scripts/aphrody/build/rust/cargo-serial.sh"));
+    command.current_dir(root).args(["build", "--locked", "-p", krate, "--target", "wasm32-unknown-unknown", "--release"]);
+    // cargo-serial.sh owns the target directory when the lane sets APHRODY_CARGO_TARGET_DIR; otherwise name it here.
+    if std::env::var_os("APHRODY_CARGO_TARGET_DIR").is_none() {
+        command.arg("--target-dir").arg(&target_dir);
+    }
+    let cargo = command
         .env("APHRODY_LOCAL_CARGO", "1")
         .env("APHRODY_BUILD_HOST", "")
         .env("CARGO_BUILD_JOBS", "4")
