@@ -1493,3 +1493,8 @@
 	path = vendor/microsoft/vscode
 	url = https://github.com/microsoft/vscode.git
 	shallow = true
+[submodule "vendor/redox/redox"]
+	path = vendor/redox/redox
+	url = https://github.com/aphrody-labs/redox.git
+	branch = bunos
+	shallow = true
