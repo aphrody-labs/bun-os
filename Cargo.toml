@@ -3,7 +3,7 @@
 # apps/aphrody-drive is the nested FSL Spacedrive workspace. Tauri apps are members: the CEF runtime (cef-dll-sys, needs CMake) is an opt-in `cef` feature, wry is the default runtime.
 # apps/desktop/src-tauri needs the compiled aphrody-server sidecar (build/apps/desktop/native); crates/bunos-wsl is the Windows-only WSL manager (winreg, WSL executor): both build from their own CI jobs, not the Linux workspace gate.
 # crates/aphrody-chat and crates/aphrody-search build standalone (infra/config/host/libexec/aphrody-native-apps) until the next lock regeneration adds them as members.
-exclude = ["crates/aphrody-chat", "crates/aphrody-search", "apps/desktop/src-tauri", "crates/bunos-wsl", "cloud", "apps/bunos-wsl/src-tauri", "apps/lu/src-tauri", "crates/lu-native", "apps/artcraft", "crates/sqlite_tasks", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/nushell", "vendor/cosmic-epoch", "vendor/pop-os", "vendor/distinst", "vendor/system76-power", "vendor/system76-firmware", "vendor/pop-launcher", "vendor/pop-upgrade", "vendor/cef-rs", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
+exclude = ["crates/aphrody-chat", "crates/aphrody-search", "apps/desktop/src-tauri", "crates/bunos-wsl", "cloud", "apps/bunos-wsl/src-tauri", "apps/lu/src-tauri", "crates/lu-native", "apps/artcraft", "crates/sqlite_tasks", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/nushell", "vendor/sudo-rs", "vendor/ntpd-rs", "vendor/crosvm", "vendor/minijail", "vendor/rustls", "vendor/rustls-ffi", "vendor/rustls-openssl-compat", "vendor/zlib-rs", "vendor/rav1e", "vendor/rav1d", "vendor/smithay", "vendor/niri", "vendor/rio", "vendor/cloud-hypervisor", "vendor/firecracker", "vendor/rsbinder", "vendor/oven-bun", "vendor/cosmic-epoch", "vendor/pop-os", "vendor/distinst", "vendor/system76-power", "vendor/system76-firmware", "vendor/pop-launcher", "vendor/pop-upgrade", "vendor/cef-rs", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
 resolver = "3"
 members = [
   "crates/bunos-wsl-core",
@@ -44,6 +44,7 @@ members = [
   "crates/aphrody-terminal-core",
   "crates/aphrody-shell-web",
   "crates/android-native",
+  "crates/bunos-flutter-bridge",
   "crates/bunos-utils",
   "crates/aphrody-svg",
   "crates/aphrody-switch",
@@ -1386,6 +1387,10 @@ hayro-jbig2 = { path = "apps/pdfcraft/vendor/hayro-jbig2" }
 lopdf = { path = "apps/pdfcraft/vendor/lopdf" }
 winit = { path = "apps/pdfcraft/vendor/winit" }
 egui-wgpu = { path = "apps/pdfcraft/vendor/egui-wgpu" }
+# Rust base (docs/RUST-BASE.md, factory/rustbase/forks.json): one aphrody-labs fork per shared crate, same rev as the
+# vendor/ submodule. rustls is the TLS stack of first-party code (ring provider); zlib-rs is flate2's zlib backend.
+rustls = { git = "https://github.com/aphrody-labs/rustls", rev = "f04804fa13341a9b1dc02b5d1dd8a746f2c4b7fb" }
+zlib-rs = { git = "https://github.com/aphrody-labs/zlib-rs", rev = "0254e07204884bfc902d6ebb68c8b703d0ea49cf" }
 
 # Zakuro's hot crates are unusable without optimisation, as in its own workspace.
 [profile.dev.package.zakuro-cpu]

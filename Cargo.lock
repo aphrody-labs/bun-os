@@ -33274,9 +33274,8 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.45"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d41d731c7d2f962d1ccc364cec258de3c0e93b38c2fb3ba97ac74513048d634"
+version = "0.23.46"
+source = "git+https://github.com/aphrody-labs/rustls?rev=f04804fa13341a9b1dc02b5d1dd8a746f2c4b7fb#f04804fa13341a9b1dc02b5d1dd8a746f2c4b7fb"
 dependencies = [
  "aws-lc-rs",
  "log",
@@ -47102,8 +47101,7 @@ dependencies = [
 [[package]]
 name = "zlib-rs"
 version = "0.6.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b268e58e7c693d7c271f93ffc4ba3b380412554231c85bf61ca7af91042a4112"
+source = "git+https://github.com/aphrody-labs/zlib-rs?rev=0254e07204884bfc902d6ebb68c8b703d0ea49cf#0254e07204884bfc902d6ebb68c8b703d0ea49cf"
 
 [[package]]
 name = "zmij"

@@ -151,7 +151,8 @@ fn install(dir: &Path) -> ExitCode {
 fn main() -> ExitCode {
     let mut args: Vec<OsString> = std::env::args_os().collect();
     let mut name = args.first().map(applet_of).unwrap_or_default();
-    if name == "bunos-utils" {
+    // `coreutils` is the uutils multicall name Debian/Ubuntu install in /usr/bin (rust-coreutils).
+    if name == "bunos-utils" || name == "coreutils" {
         args.remove(0);
         match args.first().and_then(|a| a.to_str()) {
             None | Some("--help" | "-h") => {

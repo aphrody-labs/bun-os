@@ -1498,3 +1498,93 @@
 	url = https://github.com/aphrody-labs/redox.git
 	branch = bunos
 	shallow = true
+[submodule "vendor/ntpd-rs"]
+	path = vendor/ntpd-rs
+	url = https://github.com/aphrody-labs/ntpd-rs.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/crosvm"]
+	path = vendor/crosvm
+	url = https://github.com/aphrody-labs/crosvm.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/minijail"]
+	path = vendor/minijail
+	url = https://github.com/aphrody-labs/minijail.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/rustls"]
+	path = vendor/rustls
+	url = https://github.com/aphrody-labs/rustls.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/rustls-ffi"]
+	path = vendor/rustls-ffi
+	url = https://github.com/aphrody-labs/rustls-ffi.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/rustls-openssl-compat"]
+	path = vendor/rustls-openssl-compat
+	url = https://github.com/aphrody-labs/rustls-openssl-compat.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/zlib-rs"]
+	path = vendor/zlib-rs
+	url = https://github.com/aphrody-labs/zlib-rs.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/rav1e"]
+	path = vendor/rav1e
+	url = https://github.com/aphrody-labs/rav1e.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/rav1d"]
+	path = vendor/rav1d
+	url = https://github.com/aphrody-labs/rav1d.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/smithay"]
+	path = vendor/smithay
+	url = https://github.com/aphrody-labs/smithay.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/niri"]
+	path = vendor/niri
+	url = https://github.com/aphrody-labs/niri.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/rio"]
+	path = vendor/rio
+	url = https://github.com/aphrody-labs/rio.git
+	branch = main
+	shallow = true
+[submodule "vendor/cloud-hypervisor"]
+	path = vendor/cloud-hypervisor
+	url = https://github.com/aphrody-labs/cloud-hypervisor.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/firecracker"]
+	path = vendor/firecracker
+	url = https://github.com/aphrody-labs/firecracker.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/rsbinder"]
+	path = vendor/rsbinder
+	url = https://github.com/aphrody-labs/rsbinder.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/uutils/sed"]
+	path = vendor/uutils/sed
+	url = https://github.com/aphrody-labs/uutils-sed.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/uutils/grep"]
+	path = vendor/uutils/grep
+	url = https://github.com/aphrody-labs/uutils-grep.git
+	branch = aphrody
+	shallow = true
+[submodule "vendor/oven-bun"]
+	path = vendor/oven-bun
+	url = https://github.com/oven-sh/bun.git
+	branch = main
+	shallow = true

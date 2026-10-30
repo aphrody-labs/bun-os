@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# crosvm (ChromiumOS Rust VMM) from the aphrody-labs fork (factory/rustbase/forks.json): the KVM VMM of Bun OS
+# VM sessions. The store compiles it on the VPS with cargo-serial (factory/rustbase/rust-base.ts) and stages crosvm/
+# and target/ in place of the git checkout.
+pkgname=bunos-crosvm
+_commit=4ef337987a6a768d1081618bb5337b438cf30992
+pkgver=r20261030.4ef33798
+pkgrel=1
+pkgdesc="crosvm, the ChromiumOS virtual machine monitor (KVM, virtio), built from the Bun OS fork"
+arch=(x86_64)
+url="https://github.com/aphrody-labs/crosvm"
+license=(BSD-3-Clause)
+depends=(glibc gcc-libs libcap)
+makedepends=(cargo git clang pkgconf)
+provides=(crosvm)
+conflicts=(crosvm)
+options=(!lto !debug)
+source=("crosvm::git+https://github.com/aphrody-labs/crosvm.git#commit=${_commit}")
+sha256sums=(SKIP)
+
+prepare() { cd "$srcdir/crosvm" && git submodule update --init --recursive third_party/minijail; }
+
+build() {
+  cd "$srcdir/crosvm"
+  cargo build --release --locked --bin crosvm --no-default-features --features balloon,net,qcow,usb --target-dir "$srcdir/target"
+}
+
+package() {
+  install -Dm755 "$srcdir/target/release/crosvm" "$pkgdir/usr/bin/crosvm"
+  install -Dm644 "$srcdir/crosvm/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

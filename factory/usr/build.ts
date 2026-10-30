@@ -26,6 +26,8 @@ interface UsrManifest {
   localArtifacts: string;
   repositories: Repository[];
   basePackages: string[];
+  /** Rust base packages fetched from the signed aphrody repository (docs/RUST-BASE.md). */
+  rustBase?: { repository: string; key: string; packages: string[] };
   kernelFallback: string | null;
   kernelSelection: {
     source: string | null;
@@ -353,6 +355,9 @@ async function build(composition: UsrComposition, host: string, options: BuildOp
       SOURCE_DATE_EPOCH: String(manifest.localRepository.sourceDateEpoch),
       JOB: job,
       BUNOS_PACKAGES: localPackages.join(" "),
+      RUST_BASE_PACKAGES: (manifest.rustBase?.packages ?? []).join(" "),
+      RUST_BASE_REPO: manifest.rustBase?.repository ?? "",
+      RUST_BASE_KEY: manifest.rustBase?.key ?? "",
     };
     await Bun.write(
       join(stage, "env"),

@@ -70,6 +70,8 @@ all: [
     "tail" => uu_tail,
     "tee" => uu_tee,
     "test" => uu_test,
+    // GNU coreutils installs `[` as well; uu_test switches to bracket syntax when argv[0] is `[`.
+    "[" => uu_test,
     "touch" => uu_touch,
     "tr" => uu_tr,
     "true" => uu_true,

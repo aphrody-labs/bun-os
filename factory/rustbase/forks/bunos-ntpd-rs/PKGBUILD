@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# ntpd-rs from the aphrody-labs fork (factory/rustbase/forks.json). The store compiles it on the VPS with
+# cargo-serial (factory/rustbase/rust-base.ts) and stages ntpd-rs/ and target/ in place of the git checkout.
+pkgname=bunos-ntpd-rs
+pkgver=1.9.0
+pkgrel=1
+pkgdesc="ntpd-rs (memory-safe NTP/NTS client and server) as the Bun OS time daemon"
+arch=(x86_64)
+url="https://github.com/aphrody-labs/ntpd-rs"
+license=(Apache-2.0 MIT)
+depends=(glibc gcc-libs)
+makedepends=(cargo git)
+provides=(ntpd-rs=1.9.0)
+conflicts=(ntpd-rs)
+backup=(etc/ntpd-rs/ntp.toml)
+options=(!lto !debug)
+install=bunos-ntpd-rs.install
+source=("ntpd-rs::git+https://github.com/aphrody-labs/ntpd-rs.git#commit=46ec9bb4d5b6cb24f814f5543d85b9138afb4cba" sysusers.conf)
+sha256sums=(SKIP SKIP)
+
+build() {
+  cd "$srcdir/ntpd-rs"
+  cargo build --release --locked -p ntpd --target-dir "$srcdir/target"
+}
+
+package() {
+  for b in ntp-daemon ntp-ctl ntp-metrics-exporter; do install -Dm755 "$srcdir/target/release/$b" "$pkgdir/usr/bin/$b"; done
+  install -Dm644 "$srcdir/ntpd-rs/docs/examples/conf/ntp.toml.default" "$pkgdir/etc/ntpd-rs/ntp.toml"
+  install -Dm644 "$srcdir/ntpd-rs/docs/examples/conf/ntpd-rs.service" "$pkgdir/usr/lib/systemd/system/ntpd-rs.service"
+  install -Dm644 "$srcdir/ntpd-rs/docs/examples/conf/ntpd-rs-metrics.service" "$pkgdir/usr/lib/systemd/system/ntpd-rs-metrics.service"
+  install -Dm644 "$srcdir/sysusers.conf" "$pkgdir/usr/lib/sysusers.d/ntpd-rs.conf"
+  for m in ntp-ctl.8 ntp-daemon.8 ntp.toml.5; do
+    [ -f "$srcdir/ntpd-rs/docs/precompiled/man/$m" ] && install -Dm644 "$srcdir/ntpd-rs/docs/precompiled/man/$m" "$pkgdir/usr/share/man/man${m##*.}/$m"
+  done
+  install -Dm644 "$srcdir/ntpd-rs/LICENSE-MIT" "$pkgdir/usr/share/licenses/$pkgname/LICENSE-MIT"
+  install -Dm644 "$srcdir/ntpd-rs/LICENSE-APACHE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE-APACHE"
+}

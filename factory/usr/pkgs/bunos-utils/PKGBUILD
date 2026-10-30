@@ -1,16 +1,26 @@
 # SPDX-License-Identifier: MIT
-# Bun OS multicall utilities (crates/bunos-utils). The /usr factory stages the crate as a
-# standalone Cargo package in ./src-tree with its vendored uutils path dependencies.
+# Bun OS multicall utilities (crates/bunos-utils), built from the aphrody-labs uutils forks (factory/rustbase/forks.json).
+# The /usr factory stages the crate as a standalone Cargo package in ./src-tree with its vendored uutils path
+# dependencies; the Store (apps/webos/store/pacman.ts) compiles it on the VPS with cargo-serial and stages target/.
+# uutils coreutils, findutils and diffutils replace the GNU packages in /usr/bin. procps, util-linux and binutils
+# applets are linked in /usr/lib/bunos-utils/bin only, because procps-ng, util-linux and binutils (required by
+# systemd and base-devel) keep owning those names in /usr/bin.
 pkgname=bunos-utils
 pkgver=1.4.4
-pkgrel=1
-pkgdesc="Bun OS multicall coreutils, findutils, diffutils, procps and binutils applets"
+pkgrel=2
+pkgdesc="Bun OS Rust userland: uutils coreutils, findutils and diffutils as the system tools, plus procps, util-linux and binutils applets"
 arch=(x86_64)
-url="https://github.com/aphrody-labs/bun-distribution"
-license=(MIT)
+url="https://github.com/aphrody-labs/bun-os"
+license=(MIT Apache-2.0)
 depends=(glibc gcc-libs)
 makedepends=(rust)
-options=(!lto !debug)
+provides=(coreutils=9.12 findutils=4.11.0 diffutils=3.12 uutils-coreutils uutils-findutils uutils-diffutils)
+conflicts=(coreutils findutils diffutils uutils-coreutils uutils-findutils uutils-diffutils)
+replaces=(bunos-uutils-multicall)
+options=(!lto !debug !strip)
+
+# Names other base packages own in /usr/bin: util-linux (kill, more), procps-ng (uptime), inetutils (hostname).
+_keep_out="kill more uptime hostname"
 
 build() {
   cd "$startdir/src-tree/$(cat "$startdir/src-tree/crate")"
@@ -19,5 +29,22 @@ build() {
 }
 
 package() {
-  install -Dm755 "$srcdir/target/x86_64-unknown-linux-gnu/release/bunos-utils" "$pkgdir/usr/bin/bunos-utils"
+  local bin="$srcdir/target/x86_64-unknown-linux-gnu/release/bunos-utils"
+  install -Dm755 "$bin" "$pkgdir/usr/bin/bunos-utils"
+  install -dm755 "$pkgdir/usr/lib/bunos-utils/bin" "$pkgdir/usr/share/bun-os"
+  "$bin" --list > "$pkgdir/usr/share/bun-os/bunos-utils.applets"
+  local applet suite
+  while IFS=$'\t' read -r applet suite; do
+    ln -sf /usr/bin/bunos-utils "$pkgdir/usr/lib/bunos-utils/bin/$applet"
+    case "$suite" in
+      coreutils|findutils|diffutils)
+        case " $_keep_out " in *" $applet "*) continue ;; esac
+        ln -sf bunos-utils "$pkgdir/usr/bin/$applet" ;;
+    esac
+  done < "$pkgdir/usr/share/bun-os/bunos-utils.applets"
+  local l
+  for l in "$srcdir"/target/vendor/uutils/*/LICENSE*; do
+    [ -f "$l" ] || continue
+    install -Dm644 "$l" "$pkgdir/usr/share/licenses/$pkgname/$(basename "$(dirname "$l")")-$(basename "$l")"
+  done
 }

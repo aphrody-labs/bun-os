@@ -47,6 +47,27 @@ for name in ${BUNOS_PACKAGES}; do
   fi
   cp "$cached"/*.pkg.tar.zst "$repo/"
 done
+# Rust base (docs/RUST-BASE.md): packages compiled from the aphrody-labs forks with cargo-serial and published in the
+# signed aphrody repository; each file is verified against the repository key before it joins the local repository.
+if [ -n "${RUST_BASE_PACKAGES:-}" ]; then
+  log "Rust base from ${RUST_BASE_REPO}: ${RUST_BASE_PACKAGES}"
+  rbgpg=$(mktemp -d)
+  curl -fsS "${RUST_BASE_KEY}" -o "$rbgpg/key.gpg"
+  gpg --homedir "$rbgpg" --batch -q --import "$rbgpg/key.gpg"
+  curl -fsS "${RUST_BASE_REPO}/aphrody.db.tar.zst" -o "$rbgpg/db"
+  curl -fsS "${RUST_BASE_REPO}/aphrody.db.tar.zst.sig" -o "$rbgpg/db.sig"
+  gpg --homedir "$rbgpg" --batch -q --verify "$rbgpg/db.sig" "$rbgpg/db"
+  for name in ${RUST_BASE_PACKAGES}; do
+    desc=$(bsdtar -tf "$rbgpg/db" | grep -E "^${name}-[^-]+-[^-]+/desc$" | head -1)
+    [ -n "$desc" ] || { log "Rust base package $name is not published"; exit 3; }
+    file=$(bsdtar -xOf "$rbgpg/db" "$desc" | awk '/^%FILENAME%$/{getline; print; exit}')
+    curl -fsS "${RUST_BASE_REPO}/$file" -o "$repo/$file"
+    curl -fsS "${RUST_BASE_REPO}/$file.sig" -o "$rbgpg/pkg.sig"
+    gpg --homedir "$rbgpg" --batch -q --verify "$rbgpg/pkg.sig" "$repo/$file"
+    log "Rust base $file verified"
+  done
+  rm -rf "$rbgpg"
+fi
 repo-add -q "$repo/bunos.db.tar.zst" "$repo"/*.pkg.tar.zst
 mkdir -p "$out/repo" && cp "$repo"/*.pkg.tar.zst "$out/repo/"
 

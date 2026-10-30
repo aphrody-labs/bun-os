@@ -1,0 +1,13 @@
+# ntpd-rs replaces systemd-timesyncd as the default time daemon.
+post_install() {
+  systemd-sysusers ntpd-rs.conf >/dev/null 2>&1 || true
+  if [ -d /run/systemd/system ]; then
+    systemctl disable --now systemd-timesyncd.service >/dev/null 2>&1 || true
+    systemctl enable --now ntpd-rs.service >/dev/null 2>&1 || true
+  else
+    systemctl disable systemd-timesyncd.service >/dev/null 2>&1 || true
+    systemctl enable ntpd-rs.service >/dev/null 2>&1 || true
+  fi
+}
+post_upgrade() { systemd-sysusers ntpd-rs.conf >/dev/null 2>&1 || true; }
+pre_remove() { systemctl disable --now ntpd-rs.service >/dev/null 2>&1 || true; }

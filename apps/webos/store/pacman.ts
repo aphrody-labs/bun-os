@@ -11,12 +11,21 @@ import { cp, mkdir, readdir, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { docker, run, sha256, step, tail, writeIndex, type Ctx, type IndexEntry, type QualResult, type QualStep } from "./common";
 
+// Rust base (docs/RUST-BASE.md): sudo-rs, ntpd-rs and crosvm built from the aphrody-labs forks with cargo-serial.
+// Loaded from the repository checkout, so a Store CLI copied out of the tree (git archive) still finds it.
+const REPO = Bun.env.WEBOS_STORE_REPO ?? join(import.meta.dir, "../../..");
+const { PKGBUILDS: RUST_BASE_PKGBUILDS, PREBUILD: RUST_BASE_PREBUILD } = (await import(join(REPO, "factory/rustbase/rust-base.ts")).catch((error) => {
+  console.log(`pacman: Rust base packages skipped: ${(error as Error).message}`);
+  return { PKGBUILDS: [], PREBUILD: {} };
+})) as { PKGBUILDS: string[]; PREBUILD: Record<string, unknown> };
+
 const IMAGE = "archlinux:latest";
 /** Every PKGBUILD published to the repository. */
 const BUILD = [
   "factory/usr/pkgs/bunos-filesystem",
   "factory/usr/pkgs/bun-canary",
   "factory/usr/pkgs/bunos-utils",
+  ...RUST_BASE_PKGBUILDS,
   "factory/bunos/pkgbuilds/material-design-icons-bunos",
   "factory/bunos/pkgbuilds/bun-os-fonts",
   "factory/bunos/pkgbuilds/bun-os-server",
@@ -90,9 +99,24 @@ const PREBUILD: Record<string, Prebuild> = {
       const m = (await Bun.file(join(ctx.root, "factory/usr/manifest.json")).json()) as { multicall: { features: string[]; target: string } };
       await must("cargo build bunos-utils", cargoSerial(ctx, ["build", "--release", "--locked", "-p", "bunos-utils", "--target", m.multicall.target, "--features", m.multicall.features.join(",")]));
     },
-    // package() installs $srcdir/target/x86_64-unknown-linux-gnu/release/bunos-utils.
-    tree: { name: "target", files: () => ["target/x86_64-unknown-linux-gnu/release/bunos-utils"] },
+    // package() installs $srcdir/target/x86_64-unknown-linux-gnu/release/bunos-utils and the uutils licences.
+    // The tree is $srcdir/target itself, so files are placed relative to it (not to the checkout root).
+    tree: {
+      name: "target",
+      files: () => [],
+      async extra(ctx, dir) {
+        await mkdir(join(dir, "x86_64-unknown-linux-gnu/release"), { recursive: true });
+        await cp(join(ctx.root, "target/x86_64-unknown-linux-gnu/release/bunos-utils"), join(dir, "x86_64-unknown-linux-gnu/release/bunos-utils"));
+        for (const suite of ["coreutils", "findutils", "diffutils", "procps", "util-linux"]) {
+          for (const f of (await readdir(join(ctx.root, "vendor/uutils", suite))).filter((n) => n.startsWith("LICENSE"))) {
+            await mkdir(join(dir, "vendor/uutils", suite), { recursive: true });
+            await cp(join(ctx.root, "vendor/uutils", suite, f), join(dir, "vendor/uutils", suite, f));
+          }
+        }
+      },
+    },
   },
+  ...(RUST_BASE_PREBUILD as Record<string, Prebuild>),
   aphrody: {
     compile: (ctx) => must("cargo build aphrody", cargoSerial(ctx, ["build", "--release", "--locked", "-p", "aphrody"])),
     tree: { name: "bun-os", files: () => ["target/release/aphrody", "crates/aphrody/Cargo.toml", ...LICENSES] },
