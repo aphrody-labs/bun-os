@@ -121,20 +121,24 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
       entry.screenshot = `/api/emulators/qualification/${id}.png`;
     }
     // Audio: the client's output stream in the session PipeWire graph, and its level over two seconds.
-    const dump = await sh(["docker", "exec", name, "pw-dump"]);
+    // Clients open and reopen their stream as they start (ares, MAME): look for it over ten seconds.
     let stream: { id: number; props: Record<string, unknown> } | undefined;
-    try {
-      const objectsList = JSON.parse(dump.out) as {
-        id: number;
-        type: string;
-        info?: { props?: Record<string, unknown> };
-      }[];
-      const node = objectsList.find(
-        o => o.type === "PipeWire:Interface:Node" && o.info?.props?.["media.class"] === "Stream/Output/Audio",
-      );
-      if (node) stream = { id: node.id, props: node.info!.props! };
-    } catch {
-      entry.errors.push("pw-dump output was not JSON");
+    for (let attempt = 0; attempt < 5 && !stream; attempt++) {
+      if (attempt) await Bun.sleep(2000);
+      const dump = await sh(["docker", "exec", name, "pw-dump"]);
+      try {
+        const objectsList = JSON.parse(dump.out) as {
+          id: number;
+          type: string;
+          info?: { props?: Record<string, unknown> };
+        }[];
+        const node = objectsList.find(
+          o => o.type === "PipeWire:Interface:Node" && o.info?.props?.["media.class"] === "Stream/Output/Audio",
+        );
+        if (node) stream = { id: node.id, props: node.info!.props! };
+      } catch {
+        if (attempt === 4) entry.errors.push("pw-dump output was not JSON");
+      }
     }
     let level = 0;
     if (stream) {
