@@ -1290,3 +1290,9 @@
 [submodule "vendor/system76-firmware"]
 	path = vendor/system76-firmware
 	url = https://github.com/aphrody-labs/system76-firmware.git
+[submodule "vendor/pop-launcher"]
+	path = vendor/pop-launcher
+	url = https://github.com/aphrody-labs/pop-launcher.git
+[submodule "vendor/pop-upgrade"]
+	path = vendor/pop-upgrade
+	url = https://github.com/aphrody-labs/pop-upgrade.git

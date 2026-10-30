@@ -11,7 +11,7 @@ Status: 2026-10-30. Upstream merges done; Cargo workspace migration pending.
 | `vendor/nushell` | `aphrody-labs/nushell` | `nushell/nushell` | nested workspace, external pinned owner |
 | `vendor/cosmic-epoch` | `aphrody-labs/cosmic-epoch` | `pop-os/cosmic-epoch` | 31 component submodules, no single workspace; stable Rust |
 | `vendor/pop-os` | `aphrody-labs/pop` | `pop-os/pop` | meta/index repo, no Rust code |
-| `vendor/{distinst,system76-power,system76-firmware}` | `aphrody-labs/*` | `pop-os/*` | nested workspaces, external pinned owners |
+| `vendor/{distinst,system76-power,system76-firmware,pop-launcher,pop-upgrade}` | `aphrody-labs/*` | `pop-os/*` (`launcher` and `upgrade` upstream) | nested workspaces, external pinned owners |
 
 Add a remote named `upstream` in each fork checkout and merge from it; never
 force-push.
