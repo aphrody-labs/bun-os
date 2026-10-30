@@ -1,0 +1,53 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# Bun OS Gamescope Gaming session, headless, for the container the WebOS session manager starts (OsId gaming, wine,
+# proton). One full-screen client runs under gamescope; the gateway reads frames from gamescope's PipeWire capture
+# node and audio from the session's PipeWire graph through the shared $XDG_RUNTIME_DIR, and injects gamepads created
+# with uinput on the host (the container sees them through /dev/input).
+#
+# Environment:
+#   BUNOS_SESSION       launcher (default), wine, proton or app
+#   BUNOS_SESSION_APP   command for app/wine/proton sessions (wine/proton default: winecfg)
+#   BUNOS_SESSION_SIZE  WIDTHxHEIGHT of the headless output (default 1280x720), BUNOS_SESSION_FPS (default 60)
+#
+# Defaults follow factory/bunos/pkgbuilds/bun-engine/bunos-gamescope-session (from ChimeraOS gamescope-session-plus, MIT).
+set -eu
+: "${XDG_RUNTIME_DIR:=/run/user/$(id -u)}"
+export XDG_RUNTIME_DIR
+mkdir -p -m 700 "$XDG_RUNTIME_DIR"
+export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=gamescope
+export SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS=0 ENABLE_GAMESCOPE_WSI=1 vk_xwayland_wait_ready=false
+size=${BUNOS_SESSION_SIZE:-1280x720}
+fps=${BUNOS_SESSION_FPS:-60}
+
+# Audio graph of the session (the gateway connects to $XDG_RUNTIME_DIR/pipewire-0).
+pipewire >/tmp/pipewire.log 2>&1 &
+sleep 1
+wireplumber >/tmp/wireplumber.log 2>&1 &
+pipewire-pulse >/tmp/pipewire-pulse.log 2>&1 &
+
+case "${BUNOS_SESSION:-launcher}" in
+  launcher)
+    # RetroArch (Bun OS fork) is the controller-first launcher: Ozone menu, cores, playlists and the standalone
+    # emulators registered as RetroArch "external" entries through their desktop files.
+    set -- retroarch --fullscreen --menu
+    ;;
+  wine)
+    export WINEPREFIX="${WINEPREFIX:-$HOME/.wine}" WINEDEBUG="${WINEDEBUG:--all}"
+    [ -f "$WINEPREFIX/.bunos-dxvk" ] || { wineboot -i >/dev/null 2>&1 && bunos-wine-dxvk "$WINEPREFIX" && touch "$WINEPREFIX/.bunos-dxvk"; } || true
+    # shellcheck disable=SC2086
+    set -- wine ${BUNOS_SESSION_APP:-winecfg}
+    ;;
+  proton)
+    export WINEPREFIX="${WINEPREFIX:-$HOME/.proton}" PROTONPATH="${PROTONPATH:-/usr/share/steam/compatibilitytools.d/proton-bunos}" GAMEID="${GAMEID:-0}"
+    # shellcheck disable=SC2086
+    set -- umu-run ${BUNOS_SESSION_APP:-winecfg}
+    ;;
+  app)
+    # shellcheck disable=SC2086
+    set -- ${BUNOS_SESSION_APP:?BUNOS_SESSION_APP is required for app sessions}
+    ;;
+  *) echo "unknown BUNOS_SESSION ${BUNOS_SESSION}" >&2; exit 2 ;;
+esac
+
+exec gamescope --backend headless -W "${size%x*}" -H "${size#*x}" -r "$fps" -e --expose-wayland -- "$@"
