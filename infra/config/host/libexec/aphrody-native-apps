@@ -4,6 +4,7 @@
 #   base            Rio (upstream release deb, replaces Ubuntu's unrelated "rio" MP3 CLI), GNOME Web (WebKitGTK), fuzzel,
 #                   icon themes (Papirus, Adwaita, COSMIC), Aphrody Browser/Chat/Search launchers, upstream icons.
 #   cosmic <name>.. COSMIC apps from the checksum-pinned Pop!_OS archive debs (container/cosmic-packages.json)
+#   fork <n> <repo> <pkg> <bin>  build an aphrody-labs fork and install it to /usr/local/bin (Rio: fork rio rio rioterm rio)
 #   spacedrive      Spacedrive (apps/spacedrive of this repository) via its Tauri build
 # Builds are serialised and capped at 4 compiler jobs (shared factory slots). Run inside tmux; log in ~/native-apps/log.
 set -eu
@@ -38,12 +39,8 @@ D
 }
 
 base() {
-  sudo apt-get remove -y rio >/dev/null 2>&1 || true # Diamond Rio MP3 CLI, not the terminal
-  if ! rio --version 2>/dev/null | grep -q rioterm; then
-    d=$WORK/rio; mkdir -p "$d"
-    curl -fsSL -o "$d/rioterm.deb" "https://github.com/raphamorim/rio/releases/download/v$RIO/rioterm_${RIO}_amd64_wayland.deb"
-    sudo apt-get install -y "$d/rioterm.deb"
-  fi
+  sudo apt-get remove -y rio >/dev/null 2>&1 || true # Ubuntu "rio" is a Diamond Rio MP3 CLI, never the terminal
+  # Rio itself is built from the aphrody-labs/rio fork: aphrody-native-apps fork rio
   sudo apt-get install -y epiphany-browser fuzzel papirus-icon-theme adwaita-icon-theme libglib2.0-bin
   # COSMIC icon theme (pop-os/cosmic-icons, CC-BY-SA-4.0)
   [ -d "$WORK/cosmic-icons" ] || git clone --depth 1 https://github.com/pop-os/cosmic-icons "$WORK/cosmic-icons"
@@ -90,6 +87,14 @@ cosmic() { # cosmic [names...] (default: the whole pinned set, the apps depend o
   sudo apt-get install -y --no-install-recommends $(for n in "$@"; do echo "$d/$n.deb"; done)
 }
 
+fork() { # fork <name> <repo> <cargo package> <bin> : build a pinned aphrody-labs fork (serialised, 4 jobs) and install the binary
+  n=$1; d=$WORK/src/$n
+  [ -d "$d" ] || git clone --depth 1 "https://github.com/aphrody-labs/$2" "$d"
+  (cd "$d" && nice -n 10 cargo build --release --locked -p "$3" -j 4)
+  sudo install -D "$d/target/release/$4" "/usr/local/bin/$4"
+  echo "$n: $(git -C "$d" rev-parse HEAD) installed as /usr/local/bin/$4"
+}
+
 spacedrive() {
   cd "$ROOT/apps/spacedrive/apps/tauri"
   bun install --frozen-lockfile 2>/dev/null || bun install
@@ -99,4 +104,4 @@ spacedrive() {
 }
 
 cmd=${1:-base}; shift || true
-case $cmd in base) base ;; cosmic) cosmic "$@" ;; spacedrive) spacedrive ;; *) echo "usage: $0 base|cosmic <repo>...|spacedrive" >&2; exit 2 ;; esac
+case $cmd in base) base ;; fork) fork "$@" ;; cosmic) cosmic "$@" ;; spacedrive) spacedrive ;; *) echo "usage: $0 base|cosmic <repo>...|spacedrive" >&2; exit 2 ;; esac
