@@ -58,6 +58,10 @@ const candidatePackages = [
   "cosmic-store",
   "cosmic-settings",
   "cosmic-player",
+  // Store sources (store-sources.sh): PackageKit-alpm and the AppStream pool for system packages, Flatpak remotes
+  "packagekit",
+  "appstream",
+  "flatpak",
 ];
 
 export function planOmarchyCandidate(
