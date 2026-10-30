@@ -9,7 +9,7 @@
  * /api/emulators/qualification and shown in the Emulators app) with one screenshot per emulator.
  *
  *   bun packages/bun-engine/web-emulation/qualify-webos.ts [--base http://127.0.0.1:8790] [--only id,id]
- *     [--frames 120] [--timeout-ms 600000] [--no-publish] [--no-run]
+ *     [--frames 120] [--timeout-ms 600000] [--no-publish] [--no-run] [--watch]
  */
 import { cp, mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -272,6 +272,27 @@ async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Pr
   } finally {
     cdp.listeners.splice(cdp.listeners.indexOf(listener), 1);
     await cdp.send("Target.closeTarget", { targetId }).catch(() => {});
+  }
+}
+
+// --watch: keep qualifying cores as the build-all pipeline finishes them (publish, then qualify only those).
+if (flag("--watch")) {
+  const seen = new Map<string, number>();
+  for (;;) {
+    const changed = EMULATORS.filter((e) => {
+      const manifest = e.core && join(dist, e.core, "manifest.json");
+      return manifest && existsSync(manifest) && Bun.file(manifest).lastModified > (seen.get(e.id) ?? 0);
+    });
+    if (changed.length) {
+      const stamp = Object.fromEntries(changed.map((e) => [e.id, Bun.file(join(dist, e.core!, "manifest.json")).lastModified]));
+      const child = Bun.spawn(
+        [process.execPath, import.meta.path, "--only", changed.map((e) => e.id).join(","), "--base", base, "--timeout-ms", String(timeoutMs)],
+        { stdout: "inherit", stderr: "inherit" },
+      );
+      await child.exited;
+      for (const [id, time] of Object.entries(stamp)) seen.set(id, time);
+    }
+    await Bun.sleep(300_000);
   }
 }
 
