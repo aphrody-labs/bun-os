@@ -42,7 +42,7 @@ async function stageFixture(packID: string): Promise<QualificationFixture> {
   return { path, sha256: pin.sha256, license: pack.license, source: pack.url };
 }
 
-function chromePath() {
+export function chromePath() {
   const candidates = [
     Bun.env.CHROME,
     "C:/Program Files/Google/Chrome/Application/chrome.exe",
@@ -53,7 +53,7 @@ function chromePath() {
   return candidates.find(p => p && Bun.file(p).size > 0);
 }
 
-class Cdp {
+export class Cdp {
   #ws: WebSocket;
   #id = 0;
   #pending = new Map<number, (value: any) => void>();

@@ -20,6 +20,7 @@ import { openWebApp, webApps, webAppsApp } from "./apps/webapps";
 import { browserApp } from "./apps/browser";
 import { editorApp } from "./apps/editor";
 import { engineApp } from "./apps/engine";
+import { emulatorsApp } from "./apps/emulators";
 import { filesApp } from "./apps/files";
 import { docsApp } from "./apps/docs";
 import { linuxApp } from "./apps/linux";
@@ -249,6 +250,16 @@ const builtins: Builtin[] = [
     width: 900,
     height: 620,
     mount: (root) => loading(root, linuxApp(root)),
+  },
+  {
+    id: "emulators",
+    name: "Emulators",
+    icon: "game",
+    desc: "Every emulator: play, save states, qualification status",
+    group: "core",
+    width: 980,
+    height: 640,
+    mount: (root) => loading(root, emulatorsApp(root, { open: (id) => openApp(id) })),
   },
   {
     id: "docs",

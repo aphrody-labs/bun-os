@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Build every emulator WebAssembly recipe of recipes.json on the VPS, then index and smoke-qualify them.
-//   bun packages/bun-engine/web-emulation/build-all.ts [--tmux] [--only id,id] [--no-smoke]
+//   bun packages/bun-engine/web-emulation/build-all.ts [--tmux] [--only id,id] [--no-smoke] [--qualify]
 // --tmux relaunches this script in a detached tmux session (web-emulation) so the long builds survive the SSH session.
 // Builds wait until the 1-minute load average leaves room for four compiler jobs on top of the other factory lanes.
 import { cpus, loadavg } from "node:os";
@@ -76,6 +76,10 @@ if (!argv.includes("--no-smoke")) {
   }
   await run("index (qualified)", [process.execPath, join(here, "build.ts"), "index"]);
 }
+// Publish the cores and free test ROMs to the WebOS objects directory; --qualify then boots each one inside the
+// running WebOS (needs the deployed shell with /emulator.html): bun apps/webos/package.json qualify:emulators.
+await run("webos publish", [process.execPath, join(here, "qualify-webos.ts"), "--no-run"]);
+if (argv.includes("--qualify")) await run("webos qualification", [process.execPath, join(here, "qualify-webos.ts")]);
 await Bun.write(join(root, "build/web-emulation/recipes-report.json"), `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify(report, null, 2));
 if (Object.values(report).some(r => !r.built)) process.exitCode = 1;

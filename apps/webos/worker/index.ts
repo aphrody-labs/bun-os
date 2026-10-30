@@ -4,6 +4,7 @@ import { workspaceResponse } from "./workspace";
 import { gameContentResponse } from "./game-content";
 import { ISOLATION, isolated } from "./isolation";
 import { playResponse } from "./play";
+import { emulatorsResponse } from "./emulators";
 import { downloadsResponse } from "./downloads";
 import { searchResponse } from "./search";
 import { APP_SERVER_PATHS, appServerResponse } from "./app-server";
@@ -308,6 +309,8 @@ export default {
     // API clients of the old hosts keep working (no redirect): the same routes answer on every host.
     const moved = legacyPath ? undefined : redirectFor(url);
     if (moved) return Response.redirect(moved, 301);
+    const emulators = await emulatorsResponse(request, env.VM);
+    if (emulators) return emulators;
     const gaming = await playResponse(request, env.ASSETS);
     if (gaming) {
       const out = new Response(gaming.body, gaming);

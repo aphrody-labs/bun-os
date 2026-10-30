@@ -12,6 +12,7 @@
     "deploy": "bun deploy.ts",
     "inventory": "bun inventory.ts",
     "check:coverage": "bun inventory.ts --check",
+    "qualify:emulators": "bun ../../packages/bun-engine/web-emulation/qualify-webos.ts",
     "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "dependencies": {

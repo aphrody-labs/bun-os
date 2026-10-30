@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emulator</title>
+<link rel="stylesheet" href="/emulator.css">
+<script src="/emulator-probe.js"></script>
+</head>
+<body>
+<header id="bar">
+  <strong id="title">Emulator</strong>
+  <span id="status" role="status">loading</span>
+  <span class="grow"></span>
+  <button id="test" type="button" disabled>Test ROM</button>
+  <label class="btn" for="file">Load ROM</label>
+  <input id="file" type="file" hidden disabled>
+  <button id="save" type="button" disabled>Save state</button>
+  <button id="load" type="button" disabled>Load state</button>
+  <button id="export" type="button" disabled title="Download the last state">Export</button>
+  <button id="fs" type="button">Fullscreen</button>
+</header>
+<main id="stage"><canvas id="screen" tabindex="0"></canvas></main>
+<footer id="pad" hidden>
+  <div class="dpad">
+    <button data-k="64">&#9650;</button><button data-k="32">&#9664;</button><button data-k="16">&#9654;</button><button data-k="128">&#9660;</button>
+  </div>
+  <div class="face">
+    <button data-k="4">Select</button><button data-k="8">Start</button><button data-k="2">B</button><button data-k="1">A</button>
+    <button data-k="512">L</button><button data-k="256">R</button><button data-k="2048">Y</button><button data-k="1024">X</button>
+  </div>
+</footer>
+<script type="module" src="/emulator.js"></script>
+</body>
+</html>
