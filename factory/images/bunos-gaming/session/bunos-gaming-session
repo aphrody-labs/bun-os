@@ -30,6 +30,10 @@ pipewire >/tmp/pipewire.log 2>&1 &
 sleep 1
 wireplumber >/tmp/wireplumber.log 2>&1 &
 pipewire-pulse >/tmp/pipewire-pulse.log 2>&1 &
+# A real default sink (a container has no sound card; wireplumber's auto_null is a placeholder some clients refuse).
+# The gateway records its monitor port as the session audio.
+sleep 1
+pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=bunos-session media.class=Audio/Sink object.linger=true audio.position=[FL FR] priority.session=2000 priority.driver=2000 }' >/dev/null 2>&1 || true
 
 case "${BUNOS_SESSION:-launcher}" in
   launcher)
