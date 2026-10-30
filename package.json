@@ -194,6 +194,7 @@
     "factory:resolve": "bun src/cli.ts factory arch --action resolve",
     "factory:rootfs": "bun src/cli.ts factory arch --action rootfs",
     "factory:ubuntu": "bun src/cli.ts factory ubuntu",
+    "factory:rust-base": "bun factory/rustbase/rust-base.ts",
     "graph": "bun src/cli.ts workspace graph",
     "docs:check": "bun src/cli.ts docs check",
     "desktop:web:build": "bun src/cli.ts desktop web-build",

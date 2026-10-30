@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "description": "Bun OS Rust base: one aphrody-labs fork per project, pinned as a gitlink submodule (branch `aphrody` = upstream point + Bun OS patches). factory/rustbase/rust-base.ts builds, packages and qualifies the `build` entries on the VPS; docs/RUST-BASE.md renders this file.",
+  "observedAt": "2026-10-30",
+  "components": {
+    "uutils-coreutils": {
+      "path": "vendor/uutils/coreutils",
+      "fork": "aphrody-labs/uutils-coreutils",
+      "upstream": "uutils/coreutils",
+      "ref": "aphrody",
+      "replaces": "GNU coreutils",
+      "consumers": ["crates/bunos-utils (Linux multicall)", "bunos-utils pacman/deb/apk", "aphrody-kernel coreutils"],
+      "package": "bunos-utils"
+    },
+    "uutils-findutils": {
+      "path": "vendor/uutils/findutils",
+      "fork": "aphrody-labs/uutils-findutils",
+      "upstream": "uutils/findutils",
+      "ref": "aphrody",
+      "replaces": "GNU findutils",
+      "consumers": ["crates/bunos-utils"],
+      "package": "bunos-utils"
+    },
+    "uutils-diffutils": {
+      "path": "vendor/uutils/diffutils",
+      "fork": "aphrody-labs/uutils-diffutils",
+      "upstream": "uutils/diffutils",
+      "ref": "aphrody",
+      "replaces": "GNU diffutils (diff, cmp)",
+      "consumers": ["crates/bunos-utils"],
+      "package": "bunos-utils"
+    },
+    "uutils-util-linux": {
+      "path": "vendor/uutils/util-linux",
+      "fork": "aphrody-labs/uutils-util-linux",
+      "upstream": "uutils/util-linux",
+      "ref": "main",
+      "replaces": "util-linux (non-mount applets)",
+      "consumers": ["crates/bunos-utils (feature util-linux)"],
+      "package": "bunos-utils"
+    },
+    "uutils-procps": {
+      "path": "vendor/uutils/procps",
+      "fork": "aphrody-labs/uutils-procps",
+      "upstream": "uutils/procps",
+      "ref": "main",
+      "replaces": "procps-ng",
+      "consumers": ["crates/bunos-utils (feature procps)"],
+      "package": "bunos-utils"
+    },
+    "uutils-sed": {
+      "path": "vendor/uutils/sed",
+      "fork": "aphrody-labs/uutils-sed",
+      "upstream": "uutils/sed",
+      "ref": "aphrody",
+      "sha": "42bffb9d3018a586a889c790bea4be58e249586a",
+      "replaces": "GNU sed",
+      "consumers": [],
+      "state": "pinned, not yet in an image (upstream below GNU parity)"
+    },
+    "uutils-grep": {
+      "path": "vendor/uutils/grep",
+      "fork": "aphrody-labs/uutils-grep",
+      "upstream": "uutils/grep",
+      "ref": "aphrody",
+      "sha": "0be8c54f268d66185faaee9d30f8a6f3c55c0a8b",
+      "replaces": "GNU grep",
+      "consumers": [],
+      "state": "pinned, early upstream; ripgrep stays the interactive grep"
+    },
+    "sudo-rs": {
+      "path": "vendor/sudo-rs",
+      "fork": "aphrody-labs/sudo-rs",
+      "upstream": "trifectatechfoundation/sudo-rs",
+      "ref": "main",
+      "sha": "baa7fcea2181f4b26a636bb29e2589a76682f8f4",
+      "version": "0.2.15",
+      "replaces": "sudo (C)",
+      "consumers": ["bunos-sudo-rs pacman/deb", "session images"],
+      "package": "bunos-sudo-rs",
+      "build": {
+        "cargo": ["build", "--release", "--locked", "--bin", "sudo", "--bin", "su", "--bin", "visudo"],
+        "bins": ["sudo", "su", "visudo"],
+        "licenses": ["LICENSE-MIT", "LICENSE-APACHE"],
+        "pkgbuild": "factory/rustbase/pkg/bunos-sudo-rs"
+      }
+    },
+    "ntpd-rs": {
+      "path": "vendor/ntpd-rs",
+      "fork": "aphrody-labs/ntpd-rs",
+      "upstream": "pendulum-project/ntpd-rs",
+      "ref": "aphrody",
+      "tag": "v1.9.0",
+      "sha": "46ec9bb4d5b6cb24f814f5543d85b9138afb4cba",
+      "version": "1.9.0",
+      "replaces": "chrony / systemd-timesyncd / ntpd",
+      "consumers": ["bunos-ntpd-rs pacman/deb", "session images"],
+      "package": "bunos-ntpd-rs",
+      "build": {
+        "cargo": ["build", "--release", "--locked", "-p", "ntpd"],
+        "bins": ["ntp-daemon", "ntp-ctl", "ntp-metrics-exporter"],
+        "licenses": ["LICENSE-MIT", "LICENSE-APACHE"],
+        "files": ["docs/examples/conf", "docs/precompiled/man"],
+        "pkgbuild": "factory/rustbase/forks/bunos-ntpd-rs"
+      }
+    },
+    "crosvm": {
+      "path": "vendor/crosvm",
+      "fork": "aphrody-labs/crosvm",
+      "upstream": "google/crosvm",
+      "ref": "aphrody",
+      "sha": "4ef337987a6a768d1081618bb5337b438cf30992",
+      "replaces": "QEMU (KVM session VMs)",
+      "consumers": ["bunos-crosvm pacman/deb", "factory/rustbase/crosvm-boot.sh", "VM sessions (Linux guests)"],
+      "package": "bunos-crosvm",
+      "submodules": ["third_party/minijail"],
+      "build": {
+        "cargo": [
+          "build",
+          "--release",
+          "--locked",
+          "--bin",
+          "crosvm",
+          "--no-default-features",
+          "--features",
+          "balloon,net,qcow,usb"
+        ],
+        "bins": ["crosvm"],
+        "licenses": ["LICENSE"],
+        "pkgbuild": "factory/rustbase/forks/bunos-crosvm"
+      }
+    },
+    "minijail": {
+      "path": "vendor/minijail",
+      "fork": "aphrody-labs/minijail",
+      "upstream": "google/minijail",
+      "ref": "aphrody",
+      "sha": "8787d1a4fdd7c64791607a1122d2408b3b35ade4",
+      "replaces": "-",
+      "consumers": ["crosvm (third_party/minijail, Rust bindings minijail + minijail-sys)"],
+      "note": "C library with Rust bindings; crosvm's own submodule pin is what links today"
+    },
+    "rustls": {
+      "path": "vendor/rustls",
+      "fork": "aphrody-labs/rustls",
+      "upstream": "rustls/rustls",
+      "ref": "aphrody",
+      "tag": "v/0.23.46",
+      "sha": "f04804fa13341a9b1dc02b5d1dd8a746f2c4b7fb",
+      "replaces": "OpenSSL TLS in first-party code",
+      "consumers": [
+        "root [patch.crates-io] rustls",
+        "aphrody-gateway (reqwest rustls-no-provider + ring)",
+        "aphrody-inventory (ureq rustls)",
+        "tokio-rustls users",
+        "ntpd-rs NTS"
+      ],
+      "patch": ["rustls"]
+    },
+    "rustls-ffi": {
+      "path": "vendor/rustls-ffi",
+      "fork": "aphrody-labs/rustls-ffi",
+      "upstream": "rustls/rustls-ffi",
+      "ref": "aphrody",
+      "tag": "v0.15.7",
+      "sha": "8f0eadf96fa21ade96d867c7ea06f8f5fddda856",
+      "replaces": "OpenSSL for C consumers (curl --with-rustls)",
+      "consumers": [],
+      "state": "pinned; curl-with-rustls build not done"
+    },
+    "rustls-openssl-compat": {
+      "path": "vendor/rustls-openssl-compat",
+      "fork": "aphrody-labs/rustls-openssl-compat",
+      "upstream": "rustls/rustls-openssl-compat",
+      "ref": "aphrody",
+      "tag": "v/0.2.2",
+      "sha": "604e9d1d9931a374c6227ca5596509bd098535af",
+      "replaces": "libssl for nginx",
+      "consumers": [],
+      "state": "pinned; nginx still links OpenSSL"
+    },
+    "zlib-rs": {
+      "path": "vendor/zlib-rs",
+      "fork": "aphrody-labs/zlib-rs",
+      "upstream": "trifectatechfoundation/zlib-rs",
+      "ref": "aphrody",
+      "tag": "v0.6.8",
+      "sha": "0254e07204884bfc902d6ebb68c8b703d0ea49cf",
+      "replaces": "zlib",
+      "consumers": ["root [patch.crates-io] zlib-rs (flate2 zlib-rs backend)"],
+      "patch": ["zlib-rs"]
+    },
+    "rav1e": {
+      "path": "vendor/rav1e",
+      "fork": "aphrody-labs/rav1e",
+      "upstream": "xiph/rav1e",
+      "ref": "aphrody",
+      "tag": "v0.8.1",
+      "sha": "1fe82de02510767539e89b2ee6fa846920ae2686",
+      "replaces": "libaom encoder",
+      "consumers": ["root lock rav1e 0.8.1 (image encoders)"],
+      "state": "pinned; crates.io 0.8.1 is the same tag"
+    },
+    "rav1d": {
+      "path": "vendor/rav1d",
+      "fork": "aphrody-labs/rav1d",
+      "upstream": "memorysafety/rav1d",
+      "ref": "aphrody",
+      "tag": "v1.1.0",
+      "sha": "782dab2135ea64a057c097088a13eb8ed3cc3320",
+      "replaces": "dav1d",
+      "consumers": [],
+      "state": "pinned; dav1d still used by Mesa/ffmpeg"
+    },
+    "nushell": {
+      "path": "vendor/nushell",
+      "fork": "aphrody-labs/nushell",
+      "upstream": "nushell/nushell",
+      "ref": "aphrody",
+      "replaces": "bash (interactive)",
+      "consumers": ["bunos-nushell-default"]
+    },
+    "rio": {
+      "path": "vendor/rio",
+      "fork": "aphrody-labs/rio",
+      "upstream": "raphamorim/rio",
+      "ref": "main",
+      "sha": "59203ccd5fa1e6b760a738c1ad653bb29f2f3465",
+      "replaces": "xterm/kitty/gnome-terminal",
+      "consumers": ["native-apps rio deb (resolute)", "Redox rioterm recipe (factory/os/rust-desktop/forks.json)"]
+    },
+    "ion": {
+      "path": null,
+      "fork": "aphrody-labs/redox-ion",
+      "upstream": "redox-os/ion",
+      "ref": "recipe",
+      "replaces": "Redox shell",
+      "consumers": ["Redox cookbook recipe (factory/os/rust-desktop/forks.json)"],
+      "note": "pinned by Redox recipe rev, owned by the Redox lane"
+    },
+    "smithay": {
+      "path": "vendor/smithay",
+      "fork": "aphrody-labs/smithay",
+      "upstream": "Smithay/smithay",
+      "ref": "aphrody",
+      "sha": "f581531d479cf2e3307bafb913c5d2bb12860bb3",
+      "replaces": "wlroots",
+      "consumers": ["cosmic-comp (vendor/cosmic-epoch)", "niri"]
+    },
+    "cosmic-comp": {
+      "path": "vendor/cosmic-epoch/cosmic-comp",
+      "fork": "aphrody-labs/cosmic-comp",
+      "upstream": "pop-os/cosmic-comp",
+      "ref": "epoch",
+      "replaces": "Mutter",
+      "consumers": ["COSMIC session (factory/desktop/cosmic-session)"]
+    },
+    "niri": {
+      "path": "vendor/niri",
+      "fork": "aphrody-labs/niri",
+      "upstream": "niri-wm/niri",
+      "ref": "aphrody",
+      "tag": "v26.04",
+      "sha": "8ed0da44d974c32c6877d2f4630c314da0717ecb",
+      "replaces": "Sway/Hyprland (alternative)",
+      "consumers": [],
+      "state": "pinned alternative compositor"
+    },
+    "cloud-hypervisor": {
+      "path": "vendor/cloud-hypervisor",
+      "fork": "aphrody-labs/cloud-hypervisor",
+      "upstream": "cloud-hypervisor/cloud-hypervisor",
+      "ref": "aphrody",
+      "tag": "v54.0",
+      "sha": "038ce5a72d761380a02f714a4eb4ca63e0ea073d",
+      "replaces": "QEMU (UEFI guests)",
+      "consumers": [],
+      "state": "pinned alternative VMM (UEFI via rust-hypervisor-firmware/OVMF)"
+    },
+    "firecracker": {
+      "path": "vendor/firecracker",
+      "fork": "aphrody-labs/firecracker",
+      "upstream": "firecracker-microvm/firecracker",
+      "ref": "aphrody",
+      "tag": "v1.17.0",
+      "sha": "95f868c8e345b1cc8faccd1a3c910b4989dc3f58",
+      "replaces": "QEMU microvm",
+      "consumers": [],
+      "state": "pinned alternative microVM"
+    },
+    "rsbinder": {
+      "path": "vendor/rsbinder",
+      "fork": "aphrody-labs/rsbinder",
+      "upstream": "hiking90/rsbinder",
+      "ref": "aphrody",
+      "tag": "v0.12.0",
+      "sha": "b7a8fc940c250fa1dbc208dca1c1e99c13868712",
+      "replaces": "libbinder (C++) outside Android",
+      "consumers": [],
+      "state": "pinned; binder IPC for Linux hosts (Waydroid/redroid binderfs)"
+    },
+    "bun": {
+      "path": "vendor/oven-bun",
+      "fork": "oven-sh/bun (upstream, unforked by policy)",
+      "upstream": "oven-sh/bun",
+      "ref": "bun-v1.4.4 canary",
+      "sha": "11c367163a4baa77d3627d14764c376c856a630a",
+      "replaces": "Node.js",
+      "consumers": ["bun-canary pacman/deb/apk (npm binary of this gitHead)"],
+      "note": "upstream Bun is a Rust workspace (nightly-2026-09-15, same channel as the root); AGENTS.md forbids the aphrody-labs/bun fork, so the upstream source is pinned read-only"
+    }
+  }
+}

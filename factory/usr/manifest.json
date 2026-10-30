@@ -62,10 +62,18 @@
     "cachyos-mirrorlist",
     "bun-canary",
     "bunos-utils",
+    "bunos-sudo-rs",
+    "bunos-ntpd-rs",
     "ca-certificates",
     "man-db",
     "man-pages"
   ],
+  "rustBase": {
+    "description": "Rust base packages built from the aphrody-labs forks by factory/rustbase/rust-base.ts and published in the signed aphrody pacman repository; the builder verifies each file against the repository key (docs/RUST-BASE.md).",
+    "repository": "https://aphrody.com/repo/os/x86_64",
+    "key": "https://aphrody.com/repo/os/aphrody.gpg",
+    "packages": ["bunos-sudo-rs", "bunos-ntpd-rs", "bunos-crosvm"]
+  },
   "kernelFallback": null,
   "kernelSelection": {
     "source": null,
@@ -116,7 +124,7 @@
     "crate": "crates/bunos-utils",
     "binary": "usr/bin/bunos-utils",
     "target": "x86_64-unknown-linux-gnu",
-    "features": ["binutils", "procps", "diffutils", "coreutils", "findutils"],
+    "features": ["binutils", "procps", "diffutils", "coreutils", "findutils", "util-linux"],
     "appletList": "usr/share/bun-os/bunos-utils.applets",
     "linkDir": "usr/lib/bunos-utils/bin",
     "install": "usr/lib/bun-os/install-bunos-utils <root>",
