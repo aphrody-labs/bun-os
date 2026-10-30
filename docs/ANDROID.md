@@ -33,7 +33,8 @@ with the complete Google Play stack. It is the Android of the unified Bun OS ses
 - Qualified 2026-10-31: release 17, x86_64, tablet; the Launcher3 Quickstep home shows the large-screen
   taskbar (app drawer, pinned apps, navigation on the right); the Play Store opens on its Sign in screen;
   `aphrody-remote-desktop --android 192.168.240.112:5555 --max-size 2560` streams 2560x1600 H.264
-  (avc1.42c032) to a WebSocket client.
+  (avc1.42c032); `aphrody-android-gateway.service` serves it at `/api/android/` (5121478265, first frame about 3.5 s),
+  redroid 13 stays on 127.0.0.1:5555 as the fallback serial.
 - Play registration: GSF Android ID from `gservices.db` (`main.android_id`), registered at
   `https://www.google.com/android/uncertified`; the owner signs in.
 - Unified image: `rootfs/usr/share/bunos/waydroid/waydroid_base.prop.d/20-android17.prop` and
@@ -81,5 +82,4 @@ to `/opt/android-sdk`. Why API 37: see [GOOGLEBOOK.md](GOOGLEBOOK.md).
   emulation of x86_64; no measurement exists, so no claim. APK without Android (ART in wasm): nothing exists.
 
 ## Remaining
-Android 17 inside the unified session container (vgem render node and waydroid0 netns there), the gateway unit on the Android 17
-serial instead of redroid 13, notification bridge, CI workflow `waydroid.yml`, e2e numbers on the VPS.
+Android 17 inside the unified session container (vgem render node and waydroid0 netns there), notification bridge, CI workflow `waydroid.yml`, e2e numbers on the VPS.
