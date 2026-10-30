@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0
+# One GTK 4 app on GDK Broadway for bun-ui (/ui/gtk/%i/ on aphrody.com). Settings: /etc/bun-ui/broadway/%i.env.
+# Install: crates/bun-ui-web/broadway/install.sh. The app runs as a throwaway user with no home, no writable
+# system and loopback-only networking; every visitor of the page shares the one display.
+[Unit]
+Description=bun-ui GTK Broadway app %i
+After=network.target
+
+[Service]
+Type=exec
+EnvironmentFile=/etc/bun-ui/broadway/%i.env
+ExecStart=/usr/local/libexec/bun-ui-broadway
+DynamicUser=yes
+RuntimeDirectory=bun-ui-broadway-%i
+Environment=XDG_RUNTIME_DIR=/run/bun-ui-broadway-%i HOME=/run/bun-ui-broadway-%i
+Restart=always
+RestartSec=2
+KillMode=control-group
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=localhost
+LockPersonality=yes
+MemoryMax=768M
+TasksMax=96
+CPUQuota=100%
+
+[Install]
+WantedBy=multi-user.target

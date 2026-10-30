@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
+# Run one GTK 4 app on GDK Broadway for bun-ui: gtk4-broadwayd on 127.0.0.1:$BROADWAY_PORT (display :$BROADWAY_DISPLAY),
+# then the app with GDK_BACKEND=broadway. aphrody.com proxies /ui/gtk/<id>/ to that port (crates/bun-ui-web).
+# Started by bun-ui-broadway@<id>.service with /etc/bun-ui/broadway/<id>.env:
+#   BROADWAY_PORT=8101  BROADWAY_DISPLAY=1  APP_COMMAND="gnome-calculator"
+set -euo pipefail
+: "${BROADWAY_PORT:?}" "${BROADWAY_DISPLAY:?}" "${APP_COMMAND:?}"
+display=${BROADWAY_DISPLAY#:}
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-${RUNTIME_DIRECTORY:-/tmp}}" HOME="${HOME:-$XDG_RUNTIME_DIR}"
+export GDK_BACKEND=broadway BROADWAY_DISPLAY=":$display" GSK_RENDERER=cairo NO_AT_BRIDGE=1 GTK_A11Y=none
+gtk4-broadwayd --address 127.0.0.1 --port "$BROADWAY_PORT" ":$display" &
+daemon=$!
+trap 'kill "$daemon" 2>/dev/null || true' EXIT
+for _ in $(seq 50); do
+  # GTK 4 names the socket broadway<display + 1>.socket.
+  compgen -G "$XDG_RUNTIME_DIR/broadway*.socket" >/dev/null && break
+  sleep 0.1
+done
+# The app is restarted when a visitor closes its window; broadwayd keeps the page connected meanwhile.
+while kill -0 "$daemon" 2>/dev/null; do
+  # shellcheck disable=SC2086
+  dbus-run-session -- $APP_COMMAND || true
+  sleep 1
+done

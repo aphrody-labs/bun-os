@@ -3840,6 +3840,7 @@ dependencies = [
  "aphrody-inventory",
  "aphrody-webos-protocol",
  "axum",
+ "bun-ui-web",
  "serde_json",
  "tokio",
  "tower-http 0.7.1",
@@ -7992,6 +7993,24 @@ dependencies = [
  "tracing-subscriber",
  "windows 0.62.2",
  "zip 8.6.0",
+]
+
+[[package]]
+name = "bun-ui-web"
+version = "1.4.7"
+dependencies = [
+ "axum",
+ "hyper",
+ "hyper-util",
+ "js-sys",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+ "tower-http 0.7.1",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]

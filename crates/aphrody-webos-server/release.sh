@@ -17,7 +17,7 @@ commit="$(git rev-parse HEAD)"
 # A published commit (on origin/main); main moves fast with concurrent agents, the activator re-checks ancestry.
 git merge-base --is-ancestor "$commit" refs/remotes/origin/main ||
   { echo "Release a published commit of main (git fetch origin && git merge --ff-only origin/main)" >&2; exit 1; }
-git diff --quiet HEAD -- crates/aphrody-webos-server crates/aphrody-webos-client crates/aphrody-webos-protocol crates/aphrody-inventory ||
+git diff --quiet HEAD -- crates/aphrody-webos-server crates/aphrody-webos-client crates/aphrody-webos-protocol crates/aphrody-inventory crates/bun-ui-web ||
   { echo "Commit the WebOS crates before releasing" >&2; exit 1; }
 
 # The web lane of the shared factory (AGENTS.md: at most four compiler jobs per concurrent lane): its own serialized
@@ -33,7 +33,7 @@ cargo_serial build --release -p aphrody-webos-server -p aphrody-inventory
 # WebAssembly at full feature level (owner order): SIMD, relaxed SIMD, bulk memory, saturating float conversion, sign
 # extension, reference types. Threads (atomics + build-std) follow when the toolchain owner enables them.
 CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS="-C target-feature=+simd128,+relaxed-simd,+bulk-memory,+nontrapping-fptoint,+sign-ext,+reference-types" \
-  cargo_serial build --release -p aphrody-webos-client --target wasm32-unknown-unknown
+  cargo_serial build --release -p aphrody-webos-client -p bun-ui-web --target wasm32-unknown-unknown
 
 handoff="${WEBOS_DEPLOY_ROOT:-$root/build/webos-deploy}"
 release="$handoff/releases/$commit-$(date +%s%3N)"
@@ -47,6 +47,16 @@ wasm-opt -Oz --all-features \
 mkdir -p "$release/emulator"
 install -m 0644 packages/bun-engine/web-emulation/qualify-page/* "$release/emulator/"
 install -m 0644 crates/aphrody-webos-client/web/index.html crates/aphrody-webos-client/web/boot.js "$release/client/"
+# bun-ui (crates/bun-ui-web): the wasm host, then the app bundles `buncc build` wrote to the shared artifact store
+# (iced, libcosmic, Qt wasm; GTK Broadway manifests from crates/bun-ui-web/broadway/install.sh). /ui does not gate deploys.
+mkdir -p "$release/ui/host"
+wasm-bindgen --target web --no-typescript --out-dir "$release/ui/host" target/wasm32-unknown-unknown/release/bun_ui_web.wasm
+wasm-opt -O4 --all-features "$release/ui/host/bun_ui_web_bg.wasm" -o "$release/ui/host/bun_ui_web_bg.wasm"
+install -m 0644 crates/bun-ui-web/web/index.html crates/bun-ui-web/web/boot.js "$release/ui/host/"
+ui_store="${BUN_UI_STORE:-$HOME/build/storage/artifacts/bun-ui/ui}"
+for toolkit in iced libcosmic gtk qt servo cef; do
+  if [[ -d "$ui_store/$toolkit" ]]; then cp -a "$ui_store/$toolkit" "$release/ui/"; fi
+done
 # Content-hashed names (cached immutably by the server), then brotli and gzip copies served precompressed.
 (
   cd "$release/client"

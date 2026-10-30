@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "bun-ui-web"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license = "Apache-2.0"
+description = "bun-ui in the browser: the bundle manifest that buncc writes for iced, libcosmic, GTK and Qt WebAssembly apps, the /ui routes of aphrody.com (feature server: static bundles, per-bundle CSP, Broadway HTTP/WebSocket proxy) and the wasm host that composes those apps as windows (wasm32)."
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+server = ["dep:axum", "dep:tokio", "dep:tower", "dep:tower-http", "dep:hyper", "dep:hyper-util", "dep:serde_json"]
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true, optional = true }
+axum = { workspace = true, optional = true, features = ["json", "tokio", "http1"] }
+hyper = { workspace = true, optional = true, features = ["client", "http1"] }
+hyper-util = { version = "0.1.21", optional = true, default-features = false, features = ["tokio"] }
+tokio = { workspace = true, optional = true, features = ["net", "fs", "io-util", "rt", "time"] }
+tower = { workspace = true, optional = true }
+tower-http = { workspace = true, optional = true, features = ["fs"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+js-sys = { workspace = true }
+serde_json = { workspace = true }
+wasm-bindgen = { workspace = true, features = ["std"] }
+wasm-bindgen-futures = { workspace = true }
+web-sys = { workspace = true, features = [
+  "std",
+  "Blob",
+  "Clipboard",
+  "FileSystemGetDirectoryOptions",
+  "HtmlHeadElement",
+  "NodeList",
+  "WritableStream",
+  "CssStyleDeclaration",
+  "Document",
+  "DomTokenList",
+  "Element",
+  "EventTarget",
+  "FileSystemDirectoryHandle",
+  "FileSystemFileHandle",
+  "FileSystemGetFileOptions",
+  "FileSystemWritableFileStream",
+  "HtmlElement",
+  "HtmlIFrameElement",
+  "Location",
+  "MessageEvent",
+  "MouseEvent",
+  "Navigator",
+  "Node",
+  "Response",
+  "StorageManager",
+  "Window",
+] }
+
+[lints]
+workspace = true

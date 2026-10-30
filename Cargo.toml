@@ -23,6 +23,7 @@ members = [
   "crates/aphrody-webos-server",
   "crates/aphrody-webos-protocol",
   "crates/aphrody-webos-client",
+  "crates/bun-ui-web",
   "crates/aphrody-wasm-raw",
   "crates/aphrody-wasm-bindgen-hello",
   "crates/aphrody-wasm-wasi-hello",

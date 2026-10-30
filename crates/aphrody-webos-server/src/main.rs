@@ -135,6 +135,8 @@ fn app(state: Arc<AppState>) -> Router {
             env_path("WEBOS_OBJECTS", "objects"),
             env_path("WEBOS_EMULATOR_PAGE", "emulator"),
         ))
+        // bun-ui: iced, libcosmic, Qt and GTK apps in the browser (crates/bun-ui-web).
+        .merge(bun_ui_web::router(env_path("WEBOS_UI_DIR", "ui")))
         .fallback_service(assets)
         .layer(middleware::from_fn(log))
         .layer(middleware::from_fn(caching))

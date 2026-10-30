@@ -1,0 +1,4 @@
+# id	port	display	title	command
+gnome-calculator	8101	1	GNOME Calculator	gnome-calculator
+gtk4-widget-factory	8102	2	GTK 4 Widget Factory	gtk4-widget-factory
+gtk4-demo	8103	3	GTK 4 Demo	gtk4-demo
