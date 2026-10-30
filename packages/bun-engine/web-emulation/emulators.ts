@@ -250,8 +250,7 @@ export const EMULATORS: Emulator[] = [
 
 /**
  * Native packages qualified inside the Gamescope Gaming session (factory/images/bunos-gaming, target session).
- * `app` is the command run under gamescope; `rom` is a fixture path under /roms (the staged fixtures directory),
- * substituted for `{rom}` in `app` or appended to it.
+ * `app` is the command run under gamescope; `rom` is a fixture path under /roms (the staged fixtures directory).
  * Without `rom` the emulator has no free boot path and only its own UI is checked; `blocker` says why.
  */
 export interface SessionLaunch {
@@ -285,21 +284,17 @@ export const SESSION: Record<string, SessionLaunch> = {
   rpcs3: { package: "rpcs3", app: "rpcs3", blocker: "PlayStation 3 needs the user's firmware (PS3UPDAT.PUP)" },
   xemu: { package: "xemu", app: "xemu", blocker: "Xbox needs the user's MCPX boot ROM and BIOS" },
   flycast: { package: "flycast", app: "flycast", blocker: "no free Dreamcast homebrew fixture pinned yet" },
-  vita3k: { package: "vita3k", app: "Vita3K", blocker: "PlayStation Vita needs the user's firmware" },
+  vita3k: { package: "vita3k-bin", app: "Vita3K", blocker: "PlayStation Vita needs the user's firmware" },
   shadps4: { package: "shadps4", app: "shadps4", blocker: "no free PlayStation 4 homebrew fixture pinned yet" },
   ppsspp: { package: "ppsspp", app: "PPSSPPSDL", blocker: "no free PSP homebrew fixture pinned yet" },
-  gopher64: { package: "gopher64", app: "gopher64", rom: "peterlemon-n64/Mandelbrot32BPP320X240.N64" },
-  mame: { package: "mame", app: "mame -rompath /roms/mamedev-gridlee -skip_gameinfo -video bgfx gridlee" },
+  gopher64: { package: "gopher64", app: "gopher64", blocker: "no free Nintendo 64 homebrew fixture pinned yet" },
+  mame: { package: "mame", app: "mame", blocker: "no free arcade ROM pinned yet" },
   wine: { package: "wine", app: "wine notepad" },
-<<<<<<< Updated upstream
   proton: {
     package: "proton-bunos",
     app: "umu-run winecfg",
     blocker: "aphrody-labs/Proton and umu-launcher are not packaged yet",
   },
-=======
-  proton: { package: "proton-bunos", app: "env PROTONPATH=/usr/share/steam/compatibilitytools.d/proton-bunos GAMEID=0 umu-run winecfg" },
->>>>>>> Stashed changes
 };
 for (const [id, name, systems, owner] of [
   ["melonds-native", "melonDS (native, Gamescope session)", ["nds"], "vendor/melonds"],

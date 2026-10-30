@@ -98,28 +98,8 @@ async fn log(request: Request, next: Next) -> Response {
     response
 }
 
-/// Content-hashed files (`name-<12+ hex>.ext`) are immutable; everything else revalidates.
-async fn caching(request: Request, next: Next) -> Response {
-    let path = request.uri().path().to_owned();
-    let mut response = next.run(request).await;
-    let hashed = path
-        .rsplit('/')
-        .next()
-        .and_then(|file| file.split('.').next())
-        .and_then(|stem| stem.rsplit('-').next())
-        .is_some_and(|tail| tail.len() >= 12 && tail.bytes().all(|b| b.is_ascii_hexdigit()));
-    let headers = response.headers_mut();
-    if hashed && response.status().is_success() {
-        headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("public, max-age=31536000, immutable"));
-    } else if !headers.contains_key(header::CACHE_CONTROL) {
-        headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
-    }
-    response
-}
-
 fn app(state: Arc<AppState>) -> Router {
-    // release.sh writes .br and .gz next to the client files; content-hashed names are cached immutably.
-    let assets = ServeDir::new(&state.client).precompressed_br().precompressed_gzip();
+    let assets = ServeDir::new(&state.client);
     let inventory = match &state.inventory {
         Ok(inventory) => aphrody_inventory::router(inventory.clone()),
         Err(_) => Router::new(),
@@ -137,22 +117,7 @@ fn app(state: Arc<AppState>) -> Router {
         ))
         .fallback_service(assets)
         .layer(middleware::from_fn(log))
-        .layer(middleware::from_fn(caching))
         .layer(CompressionLayer::new())
-        // Cross-origin isolation for threads and SharedArrayBuffer (wasm threads, WebGPU workers); routers that need
-        // require-corp (emulators) set their own value first.
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::HeaderName::from_static("cross-origin-opener-policy"),
-            HeaderValue::from_static("same-origin"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::HeaderName::from_static("cross-origin-embedder-policy"),
-            HeaderValue::from_static("credentialless"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::HeaderName::from_static("cross-origin-resource-policy"),
-            HeaderValue::from_static("same-origin"),
-        ))
         // Routers may set their own policy (e.g. /ui); the default applies when none is present.
         .layer(SetResponseHeaderLayer::if_not_present(
             header::CONTENT_SECURITY_POLICY,

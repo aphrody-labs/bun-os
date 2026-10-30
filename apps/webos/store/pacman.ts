@@ -2,7 +2,7 @@
 // Pacman repository `aphrody` (libalpm layout /repo/os/x86_64/), built on the VPS from the factory PKGBUILDs inside an
 // Arch Linux container. Packages and the database are signed with a key kept in the protected store (never served).
 //
-// PKGBUILDs whose source is this repository (git+…/bun-distribution, bun-os, src-tree) are built from the VPS checkout:
+// PKGBUILDs whose source is this repository (git+â€¦/bun-distribution, bun-os, src-tree) are built from the VPS checkout:
 // the compile runs on the host first (Cargo through scripts/aphrody/build/rust/cargo-serial.sh with the shared target
 // directory and sccache, at most four jobs; Bun builds with the host Bun), the outputs are staged as a tree that stands
 // in for the git checkout, and makepkg in the container only runs package() of the unchanged PKGBUILD.
@@ -25,12 +25,12 @@ const BUILD = [
   "factory/bunos/pkgbuilds/aphrody",
   "factory/bunos/pkgbuilds/bun-engine",
   "factory/bunos/pkgbuilds/bun-os-spacedrive",
-  // Emulators and the gaming session stack, every one built from its aphrody-labs fork at a pinned commit.
+  // Emulators and the gaming session stack (factory/arch/emulators renders the upstream-binary ones; forks build from aphrody-labs).
   "factory/bunos/pkgbuilds/cemu",
   "factory/bunos/pkgbuilds/rpcs3",
   "factory/bunos/pkgbuilds/xemu",
   "factory/bunos/pkgbuilds/flycast",
-  "factory/bunos/pkgbuilds/vita3k",
+  "factory/bunos/pkgbuilds/vita3k-bin",
   "factory/bunos/pkgbuilds/shadps4",
   "factory/bunos/pkgbuilds/melonds",
   "factory/bunos/pkgbuilds/azahar",
@@ -42,8 +42,6 @@ const BUILD = [
   "factory/bunos/pkgbuilds/tetanes",
   "factory/bunos/pkgbuilds/bunos-dxvk",
   "factory/bunos/pkgbuilds/bunos-vkd3d-proton",
-  "factory/bunos/pkgbuilds/umu-launcher",
-  "factory/bunos/pkgbuilds/proton-bunos",
 ];
 
 interface Prebuild {
@@ -54,12 +52,18 @@ interface Prebuild {
 }
 
 const HOURS = 3_600_000;
+/** The shared factory lease gives up after 30 minutes; a busy factory is waited for, up to eight times. */
+async function serialized(cmd: string[], cwd: string, timeout: number, env: Record<string, string> = {}) {
+  let r = { code: 1, out: "" };
+  for (let attempt = 0; attempt < 8; attempt++) {
+    r = await run(cmd, { cwd, timeout, env: { APHRODY_BUILD_HOST: "vps", APHRODY_CARGO_JOBS: "4", APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800", MAKEFLAGS: "-j4", ...env } });
+    if (r.code === 0 || !/lease was not acquired|Timed out waiting|failed to get lock/i.test(r.out)) return r;
+    console.log(`pacman: factory busy, waiting again (${attempt + 1}/8)`);
+  }
+  return r;
+}
 const cargoSerial = (ctx: Ctx, args: string[], timeout = 4 * HOURS) =>
-  run(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), ...args], {
-    cwd: ctx.root,
-    timeout,
-    env: { APHRODY_BUILD_HOST: "vps", APHRODY_CARGO_JOBS: "4", APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800", MAKEFLAGS: "-j4" },
-  });
+  serialized(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), ...args], ctx.root, timeout);
 async function must(label: string, r: Promise<{ code: number; out: string }>) {
   const x = await r;
   if (x.code !== 0) throw new Error(`${label}: ${tail(x.out, 6)}`);
@@ -152,11 +156,12 @@ const PREBUILD: Record<string, Prebuild> = {
       await must("spacedrive web build", run(["bun", "run", "build"], { cwd: join(dir, "apps/web"), timeout: HOURS }));
       await must(
         "cargo build spacedrive",
-        run(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), "build", "--release", "--locked", "-p", "sd-server", "-p", "sd-cli", "-p", "sd-core", "--bin", "sd-server", "--bin", "sd-daemon", "--bin", "sd"], {
-          cwd: dir,
-          timeout: 6 * HOURS,
-          env: { APHRODY_BUILD_HOST: "vps", APHRODY_CARGO_JOBS: "4", APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800", CARGO_TARGET_DIR: join(dir, "target") },
-        }),
+        serialized(
+          ["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), "build", "--release", "--locked", "-p", "sd-server", "-p", "sd-cli", "-p", "sd-core", "--bin", "sd-server", "--bin", "sd-daemon", "--bin", "sd"],
+          dir,
+          6 * HOURS,
+          { CARGO_TARGET_DIR: join(dir, "target") },
+        ),
       );
     },
     tree: {

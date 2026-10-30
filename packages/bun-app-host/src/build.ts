@@ -67,7 +67,8 @@ export async function productCatalog(root: string): Promise<ProductCatalog> {
     paths.set(owner.path, owner.url);
   }
   const workspaceSources: ProductCatalog["sources"] = [];
-  const tree = await command(["git", "ls-tree", "-r", "-z", sourceRevision, "--", "crates/", "packages/"], root);
+  // Owners are direct children of crates/ and packages/: list one level, not every committed file below them.
+  const tree = await command(["git", "ls-tree", "-z", sourceRevision, "--", "crates/", "packages/"], root);
   for (const entry of tree.split("\0").filter(Boolean)) {
     const match = /^(\d{6}) (\w+) ([a-f0-9]{40})\t(.+)$/.exec(entry);
     if (!match) throw new Error("Invalid committed workspace tree entry.");

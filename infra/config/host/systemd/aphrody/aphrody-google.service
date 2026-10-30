@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+# Google access of the Bun OS backend (crates/bun-os-google, `bun-os-google serve`): 127.0.0.1:8796 behind nginx /api/google/.
+# /etc/aphrody/google.env (root:ubuntu 0640): GOOGLE_APPLICATION_CREDENTIALS (/etc/aphrody/google/adc.json, impersonated
+# aphrody-bot), APHRODY_GOOGLE_OAUTH_CLIENT_ID/SECRET (from Secret Manager GOOGLE_CLIENT_ID/SECRET),
+# APHRODY_GOOGLE_OAUTH_REDIRECT, APHRODY_GOOGLE_OWNER_EMAIL, APHRODY_GOOGLE_STATE_DIR (/var/lib/aphrody/google, 0700,
+# sealed owner refresh token + key), APHRODY_GOOGLE_ADMIN_TOKEN (copy in Secret Manager BUNOS_GOOGLE_ADMIN_TOKEN).
+# Binary: cargo-serial build -p bun-os-google --features server --release, installed to /home/ubuntu/.local/bin.
+[Unit]
+Description=Bun OS Google access (service account, owner OAuth, Google API routes)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+EnvironmentFile=/etc/aphrody/google.env
+ExecStart=/home/ubuntu/.local/bin/bun-os-google serve --listen 127.0.0.1:8796
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/aphrody/google
+MemoryMax=256M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

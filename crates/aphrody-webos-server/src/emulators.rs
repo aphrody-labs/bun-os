@@ -42,37 +42,24 @@ async fn qualification(State(store): State<Store>) -> Response {
 
 async fn catalog(State(store): State<Store>) -> Response {
     let report = read_json(&store.objects.join("emulators/qualification.json")).await;
-    let Some(Value::Array(list)) = read_json(&store.objects.join("emulators/emulators.json")).await
-    else {
+    let Some(Value::Array(list)) = read_json(&store.objects.join("emulators/emulators.json")).await else {
         return (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(json!({ "error": "no emulator catalog published (emulators/emulators.json)" })),
         )
             .into_response();
     };
-    let entries = report
-        .as_ref()
-        .and_then(|r| r.get("entries"))
-        .cloned()
-        .unwrap_or_else(|| json!({}));
+    let entries = report.as_ref().and_then(|r| r.get("entries")).cloned().unwrap_or_else(|| json!({}));
     let mut totals = [0u64; 4];
     let mut emulators = Vec::with_capacity(list.len());
     for mut emulator in list {
-        let id = emulator
-            .get("id")
-            .and_then(Value::as_str)
-            .unwrap_or_default()
-            .to_owned();
+        let id = emulator.get("id").and_then(Value::as_str).unwrap_or_default().to_owned();
         let served = match emulator.get("core").and_then(Value::as_str) {
-            Some(core) if safe(core) => tokio::fs::try_exists(
-                store
-                    .objects
-                    .join("emulation")
-                    .join(core)
-                    .join("manifest.json"),
-            )
-            .await
-            .unwrap_or(false),
+            Some(core) if safe(core) => {
+                tokio::fs::try_exists(store.objects.join("emulation").join(core).join("manifest.json"))
+                    .await
+                    .unwrap_or(false)
+            }
             _ => false,
         };
         let native = emulator.get("mode").and_then(Value::as_str) == Some("native");
@@ -110,32 +97,15 @@ async fn catalog(State(store): State<Store>) -> Response {
 }
 
 fn safe(id: &str) -> bool {
-    !id.is_empty()
-        && id
-            .bytes()
-            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+    !id.is_empty() && id.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
 }
 
 async fn shot(State(store): State<Store>, UrlPath(file): UrlPath<String>) -> Response {
     let Some(id) = file.strip_suffix(".png").filter(|id| safe(id)) else {
         return StatusCode::NOT_FOUND.into_response();
     };
-    match tokio::fs::read(
-        store
-            .objects
-            .join("emulators/shots")
-            .join(format!("{id}.png")),
-    )
-    .await
-    {
-        Ok(bytes) => (
-            [
-                (header::CONTENT_TYPE, "image/png"),
-                (header::CACHE_CONTROL, "no-cache"),
-            ],
-            bytes,
-        )
-            .into_response(),
+    match tokio::fs::read(store.objects.join("emulators/shots").join(format!("{id}.png"))).await {
+        Ok(bytes) => ([(header::CONTENT_TYPE, "image/png"), (header::CACHE_CONTROL, "no-cache")], bytes).into_response(),
         Err(_) => StatusCode::NOT_FOUND.into_response(),
     }
 }
@@ -161,16 +131,8 @@ pub fn router(objects: PathBuf, page: PathBuf) -> Router {
     let mut static_files = Router::new()
         .nest_service("/emulation", ServeDir::new(objects.join("emulation")))
         .nest_service("/vm", ServeDir::new(objects.join("vm")));
-    for file in [
-        "emulator.html",
-        "emulator.js",
-        "emulator.css",
-        "emulator-probe.js",
-    ] {
-        static_files = static_files.route_service(
-            &format!("/{file}"),
-            tower_http::services::ServeFile::new(page.join(file)),
-        );
+    for file in ["emulator.html", "emulator.js", "emulator.css", "emulator-probe.js"] {
+        static_files = static_files.route_service(&format!("/{file}"), tower_http::services::ServeFile::new(page.join(file)));
     }
     Router::new()
         .route("/api/emulators", get(catalog))
