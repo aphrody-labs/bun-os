@@ -46,14 +46,13 @@ FROM ${ARCH_BOOTSTRAP_IMAGE} AS session
 # --device-cgroup-rule 'c 13:* rmw' -v /dev/input:/dev/input (host uinput pads).
 COPY session/pacman.conf /etc/pacman.conf
 COPY session.packages session-emulators.packages /usr/share/bun-os/
-COPY install-packages.sh /usr/local/sbin/bunos-install-packages
 COPY session/bunos-gaming-session session/bunos-wine-dxvk /usr/bin/
 COPY session/retroarch-vulkan.cfg /usr/share/bun-os/
 ADD https://aphrody.com/repo/os/aphrody.gpg /tmp/aphrody.gpg
 RUN set -e; pacman-key --init && pacman-key --populate archlinux \
   && pacman-key --add /tmp/aphrody.gpg && pacman-key --lsign-key "$(gpg --with-colons --show-keys /tmp/aphrody.gpg | awk -F: '/^fpr/{print $10; exit}')" \
   && pacman -Syu --noconfirm \
-  && bash /usr/local/sbin/bunos-install-packages /usr/share/bun-os/session.packages /usr/share/bun-os/session-emulators.packages \
+  && pacman -S --noconfirm --needed $(grep -hv '^#' /usr/share/bun-os/session.packages /usr/share/bun-os/session-emulators.packages) \
   && rm -rf /var/cache/pacman/pkg/* \
   && chmod 755 /usr/bin/bunos-gaming-session /usr/bin/bunos-wine-dxvk \
   && useradd -m -u 1000 -G input player
