@@ -33,6 +33,14 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
             ),
         ),
     );
+    let inventory = match &state.inventory {
+        Ok(inventory) => {
+            let summary = aphrody_inventory::health(inventory);
+            check(summary.ok, false, format!("inventory incomplete: {} members", summary.total))
+        }
+        Err(error) => check(false, false, format!("no inventory: {error}")),
+    };
+    checks.insert("inventory".to_owned(), inventory);
     // The Hyprland session gateway that runs beside this service until the Rust gateway replaces it.
     let gateway = tokio::time::timeout(
         std::time::Duration::from_millis(500),

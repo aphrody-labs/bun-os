@@ -16,13 +16,13 @@ git fetch --quiet origin
 commit="$(git rev-parse HEAD)"
 [[ "$commit" == "$(git rev-parse refs/remotes/origin/main)" ]] ||
   { echo "Release the published main tip (git fetch origin && git merge --ff-only origin/main)" >&2; exit 1; }
-git diff --quiet HEAD -- crates/aphrody-webos-server crates/aphrody-webos-client crates/aphrody-webos-protocol ||
+git diff --quiet HEAD -- crates/aphrody-webos-server crates/aphrody-webos-client crates/aphrody-webos-protocol crates/aphrody-inventory ||
   { echo "Commit the WebOS crates before releasing" >&2; exit 1; }
 
 cargo_serial() {
   CARGO_BUILD_JOBS=4 APHRODY_BUILD_HOST='' APHRODY_LOCAL_CARGO=1 scripts/aphrody/build/rust/cargo-serial.sh "$@"
 }
-cargo_serial build --release -p aphrody-webos-server
+cargo_serial build --release -p aphrody-webos-server -p aphrody-inventory
 cargo_serial build --release -p aphrody-webos-client --target wasm32-unknown-unknown
 
 handoff="${WEBOS_DEPLOY_ROOT:-$root/build/webos-deploy}"
@@ -34,6 +34,8 @@ wasm-bindgen --target web --no-typescript --out-dir "$release/client" \
 wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext \
   "$release/client/aphrody_webos_client_bg.wasm" -o "$release/client/aphrody_webos_client_bg.wasm"
 install -m 0644 crates/aphrody-webos-client/web/index.html crates/aphrody-webos-client/web/boot.js "$release/client/"
+# Inventory of every member plus the built wasm modules, with the coverage gate (exits non-zero on failure).
+target/release/aphrody-inventory write "$release/inventory" --versions
 printf 'SOURCE_COMMIT=%s\n' "$commit" > "$release/release.env"
 
 (

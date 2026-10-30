@@ -6,6 +6,8 @@ pub use aphrody_capture::RawFrame;
 
 #[cfg(windows)]
 mod win32;
+#[cfg(all(target_os = "linux", feature = "wayland"))]
+pub mod wayland;
 #[cfg(target_os = "linux")]
 mod x11;
 
@@ -42,7 +44,7 @@ impl MouseButton {
 /// returned by [`ScreenBackend::capture`] is `(origin_x, origin_y)` in that
 /// space (virtual desktop coordinates on Windows).
 pub trait ScreenBackend: Send {
-    /// Short backend identifier (`gdi`, `x11`).
+    /// Short backend identifier (`gdi`, `x11`, `wayland`).
     fn name(&self) -> &'static str;
     /// Grab the whole (virtual) screen as top-down BGRA.
     fn capture(&mut self) -> Result<RawFrame>;
@@ -75,9 +77,18 @@ pub fn create_backend() -> Result<Box<dyn ScreenBackend>> {
     Ok(Box::new(win32::Win32Backend))
 }
 
-/// Open the backend of the current platform.
+/// Open the backend of the current platform: Wayland (pure-Rust wlr-screencopy and virtual
+/// input) when `APHRODY_REMOTE_BACKEND=wayland`, or when only `WAYLAND_DISPLAY` is set; else X11.
 #[cfg(target_os = "linux")]
 pub fn create_backend() -> Result<Box<dyn ScreenBackend>> {
+    let set = |k: &str| std::env::var(k).is_ok_and(|v| !v.is_empty());
+    let forced = std::env::var("APHRODY_REMOTE_BACKEND").unwrap_or_default();
+    if forced == "wayland" || (forced != "x11" && set("WAYLAND_DISPLAY") && !set("DISPLAY")) {
+        #[cfg(feature = "wayland")]
+        return Ok(Box::new(wayland::WaylandBackend::connect()?));
+        #[cfg(not(feature = "wayland"))]
+        anyhow::bail!("unsupported: Wayland session (build with the `wayland` feature)");
+    }
     Ok(Box::new(x11::X11Backend::connect()?))
 }
 

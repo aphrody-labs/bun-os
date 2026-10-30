@@ -33,6 +33,8 @@ pub struct AppState {
     /// Built wasm client (index.html, the wasm-bindgen glue and the .wasm), inside the release.
     pub client: PathBuf,
     pub source_commit: Option<String>,
+    /// Inventory of every Bun OS member (crates/aphrody-inventory), when the release carries one.
+    pub inventory: Result<aphrody_inventory::InventoryState, String>,
 }
 
 fn env_path(name: &str, default: &str) -> PathBuf {
@@ -97,16 +99,22 @@ async fn log(request: Request, next: Next) -> Response {
 
 fn app(state: Arc<AppState>) -> Router {
     let assets = ServeDir::new(&state.client);
+    let inventory = match &state.inventory {
+        Ok(inventory) => aphrody_inventory::router(inventory.clone()),
+        Err(_) => Router::new(),
+    };
     Router::new()
         .route("/", get(root))
         .route("/api/health", get(health::health))
         .route("/healthz", get(health::health))
         .route("/api/os", get(os_catalog))
-        .fallback_service(assets)
         .with_state(state)
+        .merge(inventory)
+        .fallback_service(assets)
         .layer(middleware::from_fn(log))
         .layer(CompressionLayer::new())
-        .layer(SetResponseHeaderLayer::overriding(
+        // Routers may set their own policy (e.g. /ui); the default applies when none is present.
+        .layer(SetResponseHeaderLayer::if_not_present(
             header::CONTENT_SECURITY_POLICY,
             HeaderValue::from_static(CSP),
         ))
@@ -135,6 +143,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         source_commit: std::env::var("SOURCE_COMMIT")
             .ok()
             .filter(|s| !s.is_empty()),
+        inventory: aphrody_inventory::InventoryState::from_env().map_err(|e| e.to_string()),
     });
     let listener = tokio::net::TcpListener::bind(addr).await?;
     println!(

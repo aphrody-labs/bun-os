@@ -82,7 +82,7 @@ for (const entry of receipt.files) {
   )
     throw new Error(`Artifact differs from receipt: ${entry.path}`);
 }
-for (const path of ["aphrody-webos", "release.env", "client/index.html", "client/aphrody_webos_client_bg.wasm"])
+for (const path of ["aphrody-webos", "release.env", "client/index.html", "client/aphrody_webos_client_bg.wasm", "inventory/inventory.json"])
   if (!receipt.files.some(file => file.path === path)) throw new Error(`Unreceipted ${path}`);
 const current = join(app, "current");
 const previous = await readlink(current).catch(() => undefined);
@@ -128,7 +128,7 @@ try {
     ((await publicHealth.json()) as { sourceCommit?: string }).sourceCommit !== receipt.sourceCommit
   )
     throw new Error("Public ingress did not confirm the activated source");
-  for (const path of ["/", "/api/os"]) {
+  for (const path of ["/", "/api/os", "/api/inventory"]) {
     const response = await fetch(`https://aphrody.com${path}`, {
       signal: AbortSignal.timeout(8000),
     });

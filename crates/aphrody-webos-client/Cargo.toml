@@ -8,7 +8,7 @@ authors.workspace = true
 homepage.workspace = true
 repository.workspace = true
 license = "Apache-2.0"
-description = "aphrody.com thin client in Rust/WebAssembly (ADR-003): OS picker, fullscreen session stream, keyboard, pointer, clipboard and gamepad input."
+description = "aphrody.com client (ADR-003): an iced application themed with libcosmic, built for wasm32 with the wgpu backend and natively for the in-session tools: OS picker, session stream, input and gamepad."
 publish = false
 
 [lib]
@@ -16,42 +16,34 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 aphrody-webos-protocol = { path = "../aphrody-webos-protocol" }
-js-sys = { workspace = true }
+# Our pinned libcosmic fork (aphrody-labs/libcosmic, its iced submodule is our iced fork).
+libcosmic = { git = "https://github.com/aphrody-labs/libcosmic", rev = "dbc62f2d899cdbfbe43d170689ddc0290db663f4", default-features = false, features = ["winit", "wgpu"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# JPEG/PNG frames of the WebSocket fallback, decoded in Rust until the WebCodecs video widget lands.
+image = { workspace = true, features = ["jpeg", "png"] }
+js-sys = { workspace = true }
 wasm-bindgen = { workspace = true, features = ["std"] }
 wasm-bindgen-futures = { workspace = true }
+# Transport only (fetch, WebSocket, Gamepad API); no DOM UI is built by hand.
 web-sys = { workspace = true, features = [
   "std",
-  "Blob",
   "BinaryType",
-  "CanvasRenderingContext2d",
+  "Blob",
   "Clipboard",
-  "ClipboardEvent",
-  "DataTransfer",
-  "Document",
-  "DomRect",
-  "Element",
-  "Event",
-  "EventTarget",
+  "console",
   "Gamepad",
   "GamepadButton",
   "Headers",
-  "HtmlButtonElement",
-  "HtmlCanvasElement",
-  "HtmlElement",
-  "ImageBitmap",
-  "KeyboardEvent",
   "Location",
   "MessageEvent",
   "Navigator",
-  "Node",
-  "PointerEvent",
   "Request",
   "RequestInit",
   "Response",
   "WebSocket",
-  "WheelEvent",
   "Window",
 ] }
 

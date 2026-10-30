@@ -16,6 +16,7 @@ name = "aphrody-webos"
 path = "src/main.rs"
 
 [dependencies]
+aphrody-inventory = { workspace = true, features = ["server"] }
 aphrody-webos-protocol = { path = "../aphrody-webos-protocol" }
 axum = { workspace = true, features = ["json", "query", "tokio", "http1"] }
 serde_json = { workspace = true }
