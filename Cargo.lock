@@ -3797,6 +3797,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "aphrody-webos-client"
+version = "1.4.7"
+dependencies = [
+ "aphrody-webos-protocol",
+ "js-sys",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
 name = "aphrody-webos-protocol"
 version = "1.4.7"
 dependencies = [
