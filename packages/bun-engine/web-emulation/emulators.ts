@@ -268,7 +268,8 @@ export const SESSION: Record<string, SessionLaunch> = {
     app: "retroarch --appendconfig=/usr/share/bun-os/retroarch-vulkan.cfg -L /usr/lib/libretro/nestopia_libretro.so",
     rom: "tetanes-test-roms/spritecans.nes",
   },
-  "melonds-native": { package: "melonds", app: "melonDS", rom: "godmode9i/GodMode9i.nds" },
+  // GodMode9i is a file manager without sound: melonDS opens no PipeWire stream for it.
+  "melonds-native": { package: "melonds", app: "melonDS", rom: "godmode9i/GodMode9i.nds", silent: true },
   "azahar-native": { package: "azahar", app: "azahar", rom: "fbi/FBI.3dsx" },
   "tetanes-native": { package: "tetanes", app: "tetanes", rom: "tetanes-test-roms/spritecans.nes" },
   mgba: { package: "mgba-qt", app: "mgba-qt", rom: "gba-tests/hello.gba" },

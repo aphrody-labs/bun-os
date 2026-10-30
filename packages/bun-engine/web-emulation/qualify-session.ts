@@ -145,7 +145,8 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
           name,
           "sh",
           "-c",
-          `timeout 2 pw-record --target ${stream.id} --format s16 --rate 48000 --channels 2 --raw /tmp/a.pcm; true`,
+          // The level is read on the monitor of the session sink the stream plays into (bunos-session).
+          `timeout 2 pw-record --target bunos-session -P '{ stream.capture.sink=true }' --format s16 --rate 48000 --channels 2 --raw /tmp/a.pcm; true`,
         ],
         30_000,
       );
