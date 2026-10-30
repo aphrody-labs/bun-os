@@ -4,7 +4,7 @@
 # metainfo. It is also the controller-first launcher of the gaming session (Ozone/XMB).
 pkgname=bunos-retroarch
 pkgver=1.22.2.r5f2f529
-pkgrel=1
+pkgrel=2
 _commit=5f2f529b476fbaa165241c19518b76d4bbd98b04
 pkgdesc='Reference frontend for the libretro API (Bun OS fork)'
 arch=('x86_64')

@@ -53,4 +53,6 @@ case "${BUNOS_SESSION:-launcher}" in
   *) echo "unknown BUNOS_SESSION ${BUNOS_SESSION}" >&2; exit 2 ;;
 esac
 
-exec gamescope --backend headless -W "${size%x*}" -H "${size#*x}" -r "$fps" -e --expose-wayland -- "$@"
+# No -e (Steam integration): there is no Steam client in the session, and with it gamescope ignores
+# gamescopectl screenshot requests (verified with gamescope 3.17 headless).
+exec gamescope --backend headless -W "${size%x*}" -H "${size#*x}" -r "$fps" --expose-wayland -- "$@"

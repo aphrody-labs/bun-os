@@ -3,7 +3,7 @@
 # (lavapipe) need the fork's allocation-failure handling. Recipe follows Arch's extra/gamescope.
 pkgname=bunos-gamescope
 pkgver=3.16.24.r2b5cf19
-pkgrel=1
+pkgrel=2
 _commit=2b5cf191d1047d6895516a834de8a72ac1c342f3
 pkgdesc='SteamOS session compositing window manager (Bun OS fork)'
 arch=('x86_64')
