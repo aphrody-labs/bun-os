@@ -49,7 +49,7 @@ export interface Member {
   tags: string[];
   links: Link[];
   surface: Surface;
-  readme?: boolean;
+  hasDoc?: boolean;
   meta?: Record<string, unknown>;
 }
 export interface Detail extends Member {
@@ -288,7 +288,7 @@ async function appMembers(out: Detail[], apps: AppEntry[]) {
       tags: [app.run, ...(app.related ? [`related:${app.related}`] : [])],
       links: [sourceLink(path), ...(app.artifact || NATIVE_RUN.has(app.run) ? [{ label: "Downloads", url: "/api/downloads" }] : [])],
       surface: surface("apps", app.id, type, reason, opens ? { opens } : {}),
-      readme: Boolean(readme),
+      hasDoc: Boolean(readme),
       meta: { related: app.related, artifact: app.artifact, files: child.files.length },
       ...(readme ? { readme } : {}),
     });
@@ -318,7 +318,7 @@ async function packageMembers(out: Detail[]) {
         ...(publishable ? [{ label: "npm", url: `https://www.npmjs.com/package/${name}` }] : []),
       ],
       surface: surface("packages", child.name, "viewer", "README, manifest, versions and links rendered in its page."),
-      readme: Boolean(readme),
+      hasDoc: Boolean(readme),
       meta: { npm: publishable ? name : undefined, bin, files: child.files.length, dependencies: Object.keys(pkg?.dependencies ?? {}).length },
       ...(readme ? { readme } : {}),
       ...(!readme ? { files: child.files.slice(0, 200) } : {}),
@@ -375,7 +375,7 @@ async function crateMembers(out: Detail[], wasmModules: Set<string>) {
       surface: wasm
         ? surface("crates", child.name, "wasm", module ? "Ships as a WebAssembly module served by this deployment." : "WebAssembly-capable: its page shows build target, metadata and README; a module is served once the factory publishes one.", module ? { module } : {})
         : surface("crates", child.name, "api", "Native crate: metadata, README and versions through its page and /api/inventory/crates/<id> (RPC over HTTP JSON)."),
-      readme: Boolean(readme),
+      hasDoc: Boolean(readme),
       meta: {
         crateName: name,
         publish: publish && Boolean(text),
@@ -475,7 +475,7 @@ async function entryMember(kind: Kind, idPrefix: string, dir: string, entry: Ret
     tags: [entry.dir ? "directory" : "file", ...extraTags],
     links: [sourceLink(path)],
     surface: surface(kind, id, isDownload ? "download" : "viewer", entry.dir ? "Directory page: README, file listing and source link." : "File page: rendered content, source link and raw JSON through the API."),
-    readme: Boolean(readme),
+    hasDoc: Boolean(readme),
     meta: { files: entry.files.length, bytes: undefined },
     ...(readme ? { readme } : {}),
     ...(text !== undefined ? { text, lang } : {}),

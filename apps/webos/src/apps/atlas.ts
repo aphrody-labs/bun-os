@@ -26,7 +26,7 @@ export interface InvMember {
     module?: string;
     reason: string;
   };
-  readme?: boolean;
+  hasDoc?: boolean;
   meta?: Record<string, unknown>;
 }
 interface InvDetail extends InvMember {
