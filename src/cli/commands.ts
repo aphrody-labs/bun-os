@@ -498,60 +498,6 @@ define(
     ...bunRun("apps/desktop", "build"),
   },
 
-  // webos -------------------------------------------------------------------------------------
-  {
-    group: "webos",
-    name: "build",
-    summary: "Build aphrody.com into apps/webos/dist",
-    ...script("apps/webos/make.ts", "build"),
-  },
-  {
-    group: "webos",
-    name: "craft",
-    summary: "Compile Craft browser apps to WebAssembly",
-    usage: "[id ...]",
-    ...script("apps/webos/make.ts", "craft"),
-  },
-  {
-    group: "webos",
-    name: "serve",
-    summary: "Serve apps/webos/dist with the WebOS Bun service",
-    usage: "[port]",
-    ...script("apps/webos/make.ts", "serve"),
-  },
-  {
-    group: "webos",
-    name: "deploy",
-    summary: "Build and stage an aphrody.com release on the VPS (the root activator gates and switches it)",
-    ...script("apps/webos/make.ts", "deploy"),
-  },
-  {
-    group: "superapp",
-    name: "build",
-    summary: "Build the unified Aphrody super-site and workspace catalog",
-    ...script("apps/webos/make.ts", "build"),
-  },
-  {
-    group: "superapp",
-    name: "craft",
-    summary: "Compile Craft apps for the super-site WebAssembly app store",
-    usage: "[id ...]",
-    ...script("apps/webos/make.ts", "craft"),
-  },
-  {
-    group: "superapp",
-    name: "serve",
-    summary: "Serve the unified Aphrody super-site locally",
-    usage: "[port]",
-    ...script("apps/webos/make.ts", "serve"),
-  },
-  {
-    group: "superapp",
-    name: "deploy",
-    summary: "Build and deploy the unified Aphrody super-site",
-    ...script("apps/webos/deploy.ts"),
-  },
-
   // iecode ------------------------------------------------------------------------------------
   {
     group: "iecode",

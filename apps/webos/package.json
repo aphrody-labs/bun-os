@@ -1,39 +1,17 @@
 {
   "name": "@aphrody/webos",
   "version": "1.4.7",
-  "description": "aphrody.com: the Bun OS web client and the WebOS Bun service (APIs, catalog, inventory), served natively from the VPS.",
+  "description": "Bun OS inventory and catalog data of aphrody.com; the site itself is the Rust crates/aphrody-webos-server.",
   "license": "Apache-2.0",
   "author": "aphrody-dev <contact@aphrody.com>",
   "type": "module",
   "scripts": {
-    "build": "bun make.ts build",
-    "build:shell": "bun make.ts shell",
-    "dev": "bun make.ts build && bun make.ts serve",
-    "deploy": "bun make.ts deploy",
     "inventory": "bun inventory.ts",
     "check:coverage": "bun inventory.ts --check",
-    "qualify:emulators": "bun ../../packages/bun-engine/web-emulation/qualify-webos.ts",
-    "typecheck": "bun check -p tsconfig.json --noEmit",
-    "serve": "bun make.ts serve",
-    "wasm": "bun make.ts wasm",
-    "craft": "bun make.ts craft"
+    "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aphrody/app-ui": "workspace:*",
-    "@aphrody/bun-workspace": "workspace:*",
-    "@aphrody/m3-tokens": "workspace:*",
-    "@aphrody/webos-wasm": "workspace:*",
-    "@codemirror/lang-css": "6.3.1",
-    "@codemirror/lang-html": "6.4.12",
-    "@codemirror/lang-javascript": "6.2.5",
-    "@codemirror/lang-json": "6.0.2",
-    "@codemirror/lang-markdown": "6.5.2",
-    "@codemirror/lang-rust": "6.0.2",
-    "@codemirror/language": "6.13.1",
-    "@codemirror/state": "6.7.6",
-    "@codemirror/view": "6.43.15",
-    "codemirror": "6.0.2",
-    "fend-wasm": "1.5.9"
+    "@aphrody/bun-workspace": "workspace:*"
   },
   "devDependencies": {
     "bun-types": "catalog:"

@@ -33,8 +33,6 @@ export const GROUPS: Group[] = [
   { name: "factory", summary: "Distribution factory: plans, graphs, Arch rootfs, images, MSYS2, usr" },
   { name: "docs", summary: "Documentation gates" },
   { name: "desktop", summary: "Bun desktop app" },
-  { name: "webos", summary: "aphrody.com: the Bun OS in the browser (build, craft apps, serve, deploy)" },
-  { name: "superapp", summary: "Unified Aphrody super-site entrypoint (WebOS shell, catalog, Craft apps, WASM)" },
   { name: "iecode", summary: "IECODE data, storage, database and web tooling" },
   { name: "rg", summary: "Rose Griffon workspace builds" },
   { name: "nie", summary: "NIE Rust and web builds" },

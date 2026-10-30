@@ -1037,29 +1037,8 @@ export async function writeInventory(dist: string, inv: Inventory) {
 // ---------------------------------------------------------------------------------------------------------
 // coverage gate
 
-const BUILTIN_BACKINGS = new Set(["wasm", "app-ui", "api", "browser"]);
-const builtinSource = async () => (await readText("apps/webos/src/main.ts", 5e6)) ?? "";
-const builtinIds = async () => {
-  const main = await builtinSource();
-  return new Set([...main.matchAll(/^ {4}id: "([a-z0-9-]+)",$/gm)].map((m) => m[1]!));
-};
-
-/** Every desktop app declares a real backing; the stub vocabulary cannot come back. */
-const STUB_WORDS = /coming soon|placeholder|mock|stub|fake|not implemented|lorem|\bdemo\b/i;
-export async function checkBuiltins(): Promise<string[]> {
-  const errors: string[] = [];
-  const main = await builtinSource();
-  const blocks = main.split(/^  \{\r?$/m).slice(1);
-  for (const block of blocks) {
-    const id = /^    id: "([a-z0-9-]+)",/.exec(block)?.[1];
-    if (!id) continue;
-    const backing = /^    backing: "([a-z-]+)",/m.exec(block)?.[1];
-    if (!backing || !BUILTIN_BACKINGS.has(backing)) errors.push(`desktop app ${id}: no real backing (wasm, app-ui, api or browser)`);
-    const desc = /^    desc: "([^"]*)",/m.exec(block)?.[1] ?? "";
-    if (STUB_WORDS.test(desc)) errors.push(`desktop app ${id}: stub wording in its description`);
-  }
-  return errors;
-}
+/** The desktop shell is retired: no built-in desktop app ids remain. */
+const builtinIds = async () => new Set<string>();
 
 /** Characters the release activator and URLs cannot carry in a member id (backslash, colon, NUL, ?, #, %). */
 const UNSAFE = new RegExp("[" + String.fromCharCode(92, 92) + ":" + String.fromCharCode(0) + "?#%]");
@@ -1109,7 +1088,6 @@ export async function checkInventory(inv: Inventory, dist?: string): Promise<{ e
     if (child.name !== "node_modules" && !seen.has(`workspace/${child.name}`)) errors.push(`${child.name}: root entry is missing from the inventory`);
   for (const child of children("factory"))
     if (!seen.has(`factory/${child.name}`)) errors.push(`factory/${child.name}: missing from the inventory`);
-  errors.push(...(await checkBuiltins()));
   for (const kind of KIND_IDS)
     if (!inv.counts[kind]) errors.push(`${kind}: kind has no members`);
   if (dist) {
