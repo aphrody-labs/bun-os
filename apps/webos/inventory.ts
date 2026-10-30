@@ -561,7 +561,7 @@ async function osPackageMembers(out: Detail[]) {
   for (const catalog of cachy?.catalogs ?? [])
     for (const recipe of catalog.recipes ?? []) {
       const name = String(recipe.recipe ?? "").replace(/\/PKGBUILD$/, "");
-      if (name) add("cachyos", `${catalog.id}:${name}`, catalog.id, recipe, `CachyOS PKGBUILD recipe ${name} of ${catalog.repository}.`);
+      if (name) add("cachyos", `${catalog.id}/${name}`, catalog.id, recipe, `CachyOS PKGBUILD recipe ${name} of ${catalog.repository}.`);
     }
 }
 
@@ -629,17 +629,19 @@ async function sourceMembers(out: Detail[]) {
   }
   const workspace = await readJson("infra/source-workspace.json");
   for (const c of workspace?.components ?? []) {
-    if (out.some((m) => m.kind === "sources" && m.id === c.checkout)) continue;
+    const checkout = c.checkout && c.checkout !== "." ? c.checkout : undefined;
+    const sid = checkout ?? `component/${c.id}`;
+    if (out.some((m) => m.kind === "sources" && m.id === sid)) continue;
     out.push({
       kind: "sources",
-      id: c.checkout ?? c.id,
+      id: sid,
       name: c.id,
       desc: `${c.repository ?? c.id}: ${c.owner ?? c.integration ?? "source owner"}.`,
-      path: c.checkout,
+      path: checkout,
       run: "data",
       tags: [c.integration ?? "component"],
       links: c.repository ? [{ label: "Repository", url: `https://github.com/${c.repository}` }] : [],
-      surface: surface("sources", c.checkout ?? c.id, "info", "Source page: owner, integration state and pinned revision."),
+      surface: surface("sources", sid, "info", "Source page: owner, integration state and pinned revision."),
       meta: { revision: c.integratedRevision },
       data: c,
     });
@@ -814,6 +816,9 @@ export async function checkInventory(inv: Inventory, dist?: string): Promise<{ e
     const key = `${m.kind}/${m.id}`;
     if (!(m.kind in KINDS)) errors.push(`${key}: unknown kind`);
     if (!m.id) errors.push(`${key}: empty id`);
+    // The id is a URL path and a file name of the release: the activator rejects backslash, colon, NUL and dot segments.
+    if (m.id.split("/").some((part) => !part || part === "." || part === ".." || /[\: ?#%]/.test(part)))
+      errors.push(`${key}: id is not a safe path`);
     if (seen.has(key)) errors.push(`${key}: duplicate member`);
     seen.add(key);
     const s = m.surface;
