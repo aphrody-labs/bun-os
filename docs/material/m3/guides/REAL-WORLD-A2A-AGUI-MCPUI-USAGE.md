@@ -12,7 +12,7 @@ Dans l'application desktop Aphrody :
 1. Cliquez sur l'onglet **Studio** dans la barre de navigation latérale.
 2. Sélectionnez la section **Flotte A2A & Apps MCP** (icône `hub`).
 3. L'interface propose 4 onglets :
-   - **Inspecteur Flotte A2A & Claims** : Visualise les pairs connectés (`agy`, `codex`, `claude`, `shenron`), leurs compétences, leurs verrous de ressources (`.coord/claims`) et permet de leur envoyer des enveloppes directes.
+   - **Inspecteur Flotte A2A & Claims** : Visualise les pairs connectés (`agy`, `codex`, `claude`), leurs compétences, leurs verrous de ressources (`.coord/claims`) et permet de leur envoyer des enveloppes directes.
    - **Chronologie de Délégation** : Affiche les étapes successives d'exécution et les transitions d'état entre agents.
    - **Bac à sable Apps MCP-UI** : Démonstrateur des applications interactives générées par les outils MCP (visualiseur de tokens, palette M3 dynamique).
    - **Flux d'Événements AG-UI** : Simulateur de streaming pour tester la réaction de l'accumulateur d'événements.

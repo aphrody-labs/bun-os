@@ -110,19 +110,19 @@ test("prompt shows branch, duration and failure", () => {
   expect(colorMode({ NO_COLOR: "1", COLORTERM: "truecolor" })).toBe("none");
 });
 
-test("native modules select the host API and expose WASM tooling", async () => {
+test("native modules select the host API and expose WebAssembly", async () => {
   const modules = await loadNativeModules();
-  expect(typeof modules.wasm.build).toBe("function");
-  expect(typeof modules.wasm.optimize).toBe("function");
+  expect(typeof modules.wasm.validate).toBe("function");
+  expect(() => modules.wasm.build()).toThrow("not available on upstream Bun");
   expect(modules.windows !== undefined).toBe(process.platform === "win32");
   expect(modules.linux !== undefined).toBe(process.platform === "linux");
   const portable = await loadNativeModules("darwin");
   expect(portable.windows).toBeUndefined();
   expect(portable.linux).toBeUndefined();
-  expect(portable.wasm).toBe(modules.wasm);
+  expect(typeof portable.wasm.compile).toBe("function");
 });
 
-test("coreutils probe executes the runtime with an empty PATH", async () => {
+test("coreutils probe reports the CPU count", async () => {
   expect(await probeCoreutils()).toBeGreaterThan(0);
 });
 
@@ -139,11 +139,11 @@ test("compiled-runtime probe guard exits before opening an interactive session",
 test("JavaScript expressions use native modules and Bun Shell in the parent VM", async () => {
   const modules = await loadNativeModules();
   expect(await evaluateNative("await $`echo native-shell`.text()", modules)).toBe("native-shell\n");
-  expect(await evaluateNative("wasm === undefined ? 0 : typeof wasm.build", modules)).toBe("function");
+  expect(await evaluateNative("typeof wasm.validate", modules)).toBe("function");
   expect(await evaluateNative("globalThis", modules)).toBe(globalThis);
   if (process.platform === "win32") {
-    const version = await evaluateNative("windows.version()", modules);
-    expect(version).toEqual(modules.windows!.version());
+    const version = await evaluateNative("windows.version", modules);
+    expect(version).toEqual(modules.windows!.version);
   }
 });
 

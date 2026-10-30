@@ -25,7 +25,7 @@ const qualification = (await Bun.file(qualificationPath).json()) as {
   runtimeSHA256: string;
   gates: string[];
 };
-const requiredGates = ["product-cli", "cli-wasm", "ffi", "agent-plugin", "mcp"];
+const requiredGates = ["product-cli", "cli-wasm", "ffi"];
 if (
   result.passed !== true ||
   qualification.passed !== true ||

@@ -118,22 +118,6 @@ impl From<JobKind> for TrainKind {
     }
 }
 
-/// Default `--input` for dbfr triple-based jobs: `<workspaces>/dbfr/training/triples.jsonl`,
-/// only when `domain` is `dbfr` and the kind consumes triples.
-fn default_dbfr_input(kind: JobKind, domain: Option<&str>, state: &Path) -> Option<PathBuf> {
-    if !matches!(kind, JobKind::Embed | JobKind::Rerank | JobKind::Triples) {
-        return None;
-    }
-    if domain.map(str::trim) != Some("dbfr") {
-        return None;
-    }
-    Some(
-        aphrody_agent_home::paths::named_profile_workspace(state, "dbfr")
-            .join("training")
-            .join("triples.jsonl"),
-    )
-}
-
 /// Measured scores of one side of the shadow-index A/B evaluation.
 #[derive(Debug, serde::Deserialize)]
 struct EvalSide {
@@ -348,10 +332,7 @@ pub(crate) async fn run(args: TrainArgs) -> Result<()> {
             let mut job = TrainingJob::new(&job_id, kind.into(), &out);
             job.steps = steps as u64;
             job.allow_cpu = allow_cpu;
-            job.input_path = input.or_else(|| {
-                let domain = std::env::var("APHRODY_AGENT_DOMAIN").ok();
-                default_dbfr_input(kind, domain.as_deref(), &state_dir)
-            });
+            job.input_path = input;
             if let Some(path) = &job.input_path {
                 println!("Input: {}", path.display());
             }
@@ -403,28 +384,5 @@ mod tests {
         };
         let error = run(args).await.unwrap_err().to_string();
         assert!(error.contains("read evaluation report"));
-    }
-
-    #[test]
-    fn dbfr_domain_defaults_triple_input() {
-        let state = tempfile::tempdir().unwrap();
-        let canonical = state.path().join("workspaces").join("dbfr");
-        std::fs::create_dir_all(&canonical).unwrap();
-        let expected = canonical.join("training").join("triples.jsonl");
-        for kind in [JobKind::Embed, JobKind::Rerank, JobKind::Triples] {
-            assert_eq!(
-                default_dbfr_input(kind, Some("dbfr"), state.path()).as_deref(),
-                Some(expected.as_path())
-            );
-        }
-        assert_eq!(
-            default_dbfr_input(JobKind::Lora, Some("dbfr"), state.path()),
-            None
-        );
-        assert_eq!(
-            default_dbfr_input(JobKind::Embed, Some("aphrody"), state.path()),
-            None
-        );
-        assert_eq!(default_dbfr_input(JobKind::Embed, None, state.path()), None);
     }
 }

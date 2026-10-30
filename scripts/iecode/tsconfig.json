@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": { "types": ["@aphrody/bun-types"] },
+  "compilerOptions": { "types": ["bun-types"] },
   "include": ["**/*.ts"],
   "exclude": ["**/node_modules", "rg/campagnes", "rg/test"]
 }

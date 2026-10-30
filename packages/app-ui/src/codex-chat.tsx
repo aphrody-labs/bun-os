@@ -47,7 +47,7 @@ import {
   tauriInvoke,
   runRagSearch,
 } from "./tauri-bridge";
-import { buildTurnInputItems } from "./routes/explorer/ai-helpers";
+import { buildTurnInputItems } from "./turn-input";
 import { useChatStore } from "./stores/chat-store";
 import { TITLE_GRADIENT_STOPS } from "./brand-tokens";
 

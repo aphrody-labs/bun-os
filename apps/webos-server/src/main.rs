@@ -7,7 +7,9 @@ use std::path::PathBuf;
 
 use axum::{Json, Router, http::header, response::IntoResponse, routing::get};
 use serde_json::json;
-use tower_http::{compression::CompressionLayer, services::ServeDir, set_header::SetResponseHeaderLayer};
+use tower_http::{
+    compression::CompressionLayer, services::ServeDir, set_header::SetResponseHeaderLayer,
+};
 
 /// Directory of the built site (`bun build.ts` in apps/webos writes it).
 fn site_dir() -> PathBuf {
@@ -17,7 +19,9 @@ fn site_dir() -> PathBuf {
 }
 
 async fn health() -> impl IntoResponse {
-    Json(json!({ "ok": true, "service": "bunos-webos-server", "version": env!("CARGO_PKG_VERSION") }))
+    Json(
+        json!({ "ok": true, "service": "bunos-webos-server", "version": env!("CARGO_PKG_VERSION") }),
+    )
 }
 
 fn app(site: PathBuf) -> Router {
@@ -34,13 +38,22 @@ fn app(site: PathBuf) -> Router {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr: SocketAddr = std::env::var("WEBOS_ADDR").unwrap_or_else(|_| "127.0.0.1:8080".into()).parse()?;
+    let addr: SocketAddr = std::env::var("WEBOS_ADDR")
+        .unwrap_or_else(|_| "127.0.0.1:8080".into())
+        .parse()?;
     let site = site_dir();
     if !site.join("index.html").exists() {
-        return Err(format!("no site at {}: run `bun build.ts` in apps/webos first", site.display()).into());
+        return Err(format!(
+            "no site at {}: run `bun build.ts` in apps/webos first",
+            site.display()
+        )
+        .into());
     }
     let listener = tokio::net::TcpListener::bind(addr).await?;
-    println!("bunos webos-server listening on http://{addr} serving {}", site.display());
+    println!(
+        "bunos webos-server listening on http://{addr} serving {}",
+        site.display()
+    );
     axum::serve(listener, app(site))
         .with_graceful_shutdown(async {
             let _ = tokio::signal::ctrl_c().await;

@@ -46,28 +46,6 @@ define(
   // Top level ---------------------------------------------------------------------------------
   {
     group: "",
-    name: "mcp",
-    summary: "Run the native Bun MCP server",
-    usage: "[native MCP arguments]",
-    passthroughHelp: true,
-    ...native("mcp"),
-    run: args =>
-      spawn([process.execPath, "mcp", ...args], {
-        env: {
-          // A later root replaces an earlier skill of the same name (toolchains/bun src/mcp/tools/skills.rs).
-          // vendor/rea/plugin/skills stays for the reverse-engineering skills only REA ships, but the REA
-          // submodule also carries an older copy of the Replica skills: the canonical
-          // packages/replica-skills/skills comes after it so its replica-* skills win.
-          BUN_MCP_SKILLS_PATH: [
-            abs("vendor/rea/plugin/skills"),
-            abs("packages/m3-design/intelligence"),
-            abs("packages/replica-skills/skills"),
-          ].join(process.platform === "win32" ? ";" : ":"),
-        },
-      }),
-  },
-  {
-    group: "",
     name: "design",
     summary: "Search UI/UX guidance and generate M3 design systems",
     usage: "<query> [--stack m3] [options] | compile --prompt <brief> [--color <hex>] [--design-system <id>]",
@@ -97,22 +75,6 @@ define(
   },
   {
     group: "",
-    name: "agent-plugin",
-    summary: "Install, inspect and update the runtime's agent plugin",
-    usage: "<install|uninstall|doctor> [args]",
-    passthroughHelp: true,
-    ...native("agent-plugin"),
-  },
-  {
-    group: "",
-    name: "wasm",
-    summary: "Use the native Bun WebAssembly toolchain",
-    usage: "[native WASM arguments]",
-    passthroughHelp: true,
-    ...native("wasm"),
-  },
-  {
-    group: "",
     name: "setup",
     summary: "Install dependencies, submodules and shared setup",
     ...script("scripts/setup.ts"),
@@ -138,22 +100,23 @@ define(
   {
     group: "",
     name: "check",
-    summary: "Type check the workspace (native bun check)",
-    ...native("check", "-p", "tsconfig.json", "--threads=2", "--no-pretty"),
+    summary: "Type check the workspace (upstream bun check)",
+    ...native("check", "--no-script", "-p", "tsconfig.json", "--threads=2", "--no-pretty"),
   },
   {
     group: "",
     name: "lint",
-    summary: "Lint the workspace (native bun lint)",
+    summary: "Lint the workspace (upstream bun lint)",
     ...native(
       "lint",
+      "--no-script",
       "-c",
       ".oxlintrc.json",
-      "--deny-warnings",
-      "--ignore-pattern",
-      "toolchains/**",
+      "--max-warnings=0",
       "--ignore-pattern",
       "**/fixtures/**",
+      "--ignore-pattern",
+      "packages/wasm/test/programs/**",
       "--ignore-pattern",
       "**/node_modules/**",
       ...LINT_PATHS,
@@ -162,24 +125,19 @@ define(
   {
     group: "",
     name: "format",
-    summary: "Format the workspace (native bun fmt)",
+    summary: "Format the workspace (upstream bun fmt)",
     usage: "[--check]",
     run: args =>
       spawn([
         process.execPath,
         "fmt",
+        "--no-script",
         args.includes("--check") ? "--check" : "--write",
         "--config",
         "bun-format.json",
         ...FORMAT_IGNORE,
         ...FORMAT_PATHS,
       ]),
-  },
-  {
-    group: "",
-    name: "n2b",
-    summary: "Migrate Node.js code to Bun (native bun n2b)",
-    ...native("n2b"),
   },
   {
     group: "",
@@ -512,7 +470,16 @@ define(
     target: "scripts/source-portal.ts",
     ...sequence(
       () => spawn([process.execPath, abs("scripts/source-portal.ts"), "refresh"]),
-      () => spawn([process.execPath, "fmt", "--write", "--config", "bun-format.json", "infra/source-portal.json"]),
+      () =>
+        spawn([
+          process.execPath,
+          "fmt",
+          "--no-script",
+          "--write",
+          "--config",
+          "bun-format.json",
+          "infra/source-portal.json",
+        ]),
     ),
   },
   {

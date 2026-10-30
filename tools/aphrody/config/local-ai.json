@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "aphrody-local-ai",
   "owner": "aphrody-infra",
-  "description": "Single contract exposing the local/open-source AI stack of the aphrody-ai repository to shenron, aphrody-os, aphrody-ui, aphrody-web, rg and nie. Consumers read the canonical env names; legacy aliases stay readable until each consumer has migrated.",
+  "description": "Single contract exposing the local/open-source AI stack of the aphrody-ai repository to aphrody-os, aphrody-ui, aphrody-web and nie. Consumers read the canonical env names; legacy aliases stay readable until each consumer has migrated.",
   "generated": { "envExample": "tools/config/local-ai.env.example", "generator": "scripts/tools/infra/gen-local-ai-env.ts" },
   "modelAuthority": {
     "sourceRepo": "aphrody-ai",
@@ -57,8 +57,8 @@
       "auth": "bearer",
       "operations": ["/health", "/rag/search", "/rag/document", "/rag/stats", "/rag/ingest", "/rag/sync/finish", "/llm/chat", "/embed", "/vision/structured", "/ocr"],
       "env": [
-        { "canonical": "APHRODY_AI_HTTP_URL", "kind": "url", "form": "origin", "aliases": ["APHRODY_SHENRON_API_URL"] },
-        { "canonical": "APHRODY_AI_HTTP_TOKEN", "kind": "secret", "aliases": ["APHRODY_SHENRON_API_TOKEN"] }
+        { "canonical": "APHRODY_AI_HTTP_URL", "kind": "url", "form": "origin" },
+        { "canonical": "APHRODY_AI_HTTP_TOKEN", "kind": "secret" }
       ],
       "serverEnv": "The canonical Aphrody MCP and compute service consume the private per-profile APHRODY_MCP_DATABASE_URL, including its configured search_path and authenticated host route; canonical AI environment keys and their declared compatibility aliases remain valid."
     }
@@ -71,9 +71,9 @@
       "operations": ["/chat/completions"],
       "defaultModel": "qwen3-30b-a3b-instruct-2507-q4km",
       "env": [
-        { "canonical": "APHRODY_AI_CHAT_BASE_URL", "kind": "url", "form": "base", "aliases": ["APHRODY_SHENRON_LLM_BASE_URL", "APHRODY_OSS_BASE_URL", "APHRODY_LOCAL_MODEL_URL"], "aliasForms": { "APHRODY_LOCAL_MODEL_URL": "origin" } },
-        { "canonical": "APHRODY_AI_CHAT_MODEL", "kind": "model", "aliases": ["APHRODY_LLM_MODEL", "APHRODY_SHENRON_LLM_MODEL"] },
-        { "canonical": "APHRODY_AI_CHAT_API_KEY", "kind": "secret", "aliases": ["APHRODY_AI_CHAT_TOKEN", "VLLM_API_KEY", "SHENRON_OPENAI_API_KEY"] }
+        { "canonical": "APHRODY_AI_CHAT_BASE_URL", "kind": "url", "form": "base", "aliases": ["APHRODY_OSS_BASE_URL", "APHRODY_LOCAL_MODEL_URL"], "aliasForms": { "APHRODY_LOCAL_MODEL_URL": "origin" } },
+        { "canonical": "APHRODY_AI_CHAT_MODEL", "kind": "model", "aliases": ["APHRODY_LLM_MODEL"] },
+        { "canonical": "APHRODY_AI_CHAT_API_KEY", "kind": "secret", "aliases": ["APHRODY_AI_CHAT_TOKEN", "VLLM_API_KEY"] }
       ]
     },
     "code": {
@@ -116,8 +116,8 @@
       "operations": ["/chat/completions"],
       "defaultModel": "qwen3-vl-8b-instruct-q4km",
       "env": [
-        { "canonical": "APHRODY_AI_VISION_BASE_URL", "kind": "url", "form": "base", "aliases": ["APHRODY_SHENRON_VISION_BASE_URL"] },
-        { "canonical": "APHRODY_AI_VISION_MODEL", "kind": "model", "aliases": ["APHRODY_SHENRON_VISION_MODEL"] }
+        { "canonical": "APHRODY_AI_VISION_BASE_URL", "kind": "url", "form": "base" },
+        { "canonical": "APHRODY_AI_VISION_MODEL", "kind": "model" }
       ]
     },
     "ocr": {
@@ -158,8 +158,8 @@
       "defaultModel": "qwen3-embedding-0.6b",
       "dimensions": 1024,
       "env": [
-        { "canonical": "APHRODY_AI_EMBED_BASE_URL", "kind": "url", "form": "base", "aliases": ["APHRODY_SHENRON_EMBED_BASE_URL", "EMBED_URL", "APHRODY_RAG_EMBED_ENDPOINT"], "aliasForms": { "EMBED_URL": "origin", "APHRODY_RAG_EMBED_ENDPOINT": "endpoint" } },
-        { "canonical": "APHRODY_AI_EMBED_MODEL", "kind": "model", "aliases": ["APHRODY_SHENRON_EMBED_MODEL", "APHRODY_RAG_EMBED_MODEL"] },
+        { "canonical": "APHRODY_AI_EMBED_BASE_URL", "kind": "url", "form": "base", "aliases": ["EMBED_URL", "APHRODY_RAG_EMBED_ENDPOINT"], "aliasForms": { "EMBED_URL": "origin", "APHRODY_RAG_EMBED_ENDPOINT": "endpoint" } },
+        { "canonical": "APHRODY_AI_EMBED_MODEL", "kind": "model", "aliases": ["APHRODY_RAG_EMBED_MODEL"] },
         { "canonical": "APHRODY_AI_EMBED_DIMENSIONS", "kind": "dimensions", "aliases": ["APHRODY_RAG_EMBED_DIM"] }
       ],
       "note": "The default model is for new local indexes only. Querying an existing index uses that index's model and dimensions (see indexes)."
@@ -174,50 +174,25 @@
         { "canonical": "APHRODY_AI_RERANK_BASE_URL", "kind": "url", "form": "base", "aliases": ["RERANK_URL", "APHRODY_RAG_RERANK_ENDPOINT"], "aliasForms": { "RERANK_URL": "endpoint", "APHRODY_RAG_RERANK_ENDPOINT": "endpoint" } },
         { "canonical": "APHRODY_AI_RERANK_MODEL", "kind": "model", "aliases": ["APHRODY_RAG_RERANK_MODEL"] }
       ],
-      "note": "llama-server rerank dialect: {model, query, documents} -> {results: [{index, relevance_score}]}. Shenron's RERANK_URL targets its own sidecar dialect ({query, passages} -> {scores}); a consumer falling back to it must keep that dialect."
+      "note": "llama-server rerank dialect: {model, query, documents} -> {results: [{index, relevance_score}]}."
     }
   },
-  "indexes": {
-    "shenron-rag": {
-      "owner": "shenron",
-      "readThrough": "ai-http",
-      "store": "Private PostgreSQL RAG store served by the canonical Aphrody MCP and compute service (per-profile APHRODY_MCP_DATABASE_URL, preserving search_path and authenticated host route)",
-      "model": "multilingual-e5-small",
-      "servedModel": "Xenova/multilingual-e5-small",
-      "quantization": "q8",
-      "dimensions": 384,
-      "service": "aphrody-shenron-embed",
-      "preprocessing": { "queryPrefix": "query: ", "passagePrefix": "passage: ", "pooling": "mean", "normalize": "l2" },
-      "rule": "never-mix-spaces",
-      "onMismatch": "lexical-fallback",
-      "note": "Production vector space of the Shenron RAG corpus. A different model with the same dimension is still a different space: re-indexing is the only way to change it."
-    }
-  },
+  "indexes": {},
   "targets": {
     "vps": {
       "resolution": "static",
       "topologyHost": "vps",
       "status": "retired",
       "retiredAt": "2026-09-25",
-      "note": "aphrody-ai-http and aphrody-shenron-embed were retired from vps on 2026-09-25 (see tools/config/service-catalog.json); bindings below are the redeploy recipe, not a live binding, until Aphrody converges back onto vps",
+      "note": "aphrody-ai-http was retired from vps on 2026-09-25 (see tools/config/service-catalog.json); bindings below are the redeploy recipe, not a live binding, until Aphrody converges back onto vps",
       "bindings": {
         "ai-http": {
           "service": "aphrody-ai-http",
-          "env": { "APHRODY_AI_HTTP_URL": "http://127.0.0.1:8789" },
-          "secretsFrom": "/etc/aphrody/shenron-compute-client.env"
-        },
-        "embed": {
-          "service": "aphrody-shenron-embed",
-          "index": "shenron-rag",
-          "env": {
-            "APHRODY_AI_EMBED_BASE_URL": "http://127.0.0.1:8794/v1",
-            "APHRODY_AI_EMBED_MODEL": "Xenova/multilingual-e5-small",
-            "APHRODY_AI_EMBED_DIMENSIONS": "384"
-          }
+          "env": { "APHRODY_AI_HTTP_URL": "http://127.0.0.1:8789" }
         }
       },
       "unavailable": {
-        "chat": "no local LLM on vps; generation goes through ai-http /llm/chat, routed to Gemini Web (remote) by APHRODY_SHENRON_LLM_PROVIDER",
+        "chat": "no local LLM on vps; generation goes through ai-http /llm/chat, routed to Gemini Web (remote)",
         "code": "no local LLM on vps",
         "reasoning": "no local LLM on vps",
         "small": "no local LLM on vps",
@@ -225,6 +200,7 @@
         "ocr": "use ai-http /ocr (aphrody OCR engine inside aphrody-ai-http)",
         "stt": "no STT workload on vps",
         "tts": "no TTS workload on vps",
+        "embed": "no embedding service on vps",
         "rerank": "no rerank service in tools/config/service-catalog.json"
       }
     },
@@ -244,13 +220,6 @@
     }
   },
   "consumers": {
-    "shenron": {
-      "uses": ["ai-http", "embed", "rerank", "chat"],
-      "indexes": ["shenron-rag"],
-      "readsToday": ["APHRODY_SHENRON_API_URL", "APHRODY_SHENRON_API_TOKEN", "APHRODY_SHENRON_EMBED_BASE_URL", "EMBED_URL", "RERANK_URL", "APHRODY_LLM_MODEL"],
-      "surfaces": ["apps/bot/src/lib/rag.ts", "apps/site", "scripts/dev/local-env.ts"],
-      "migration": "Read APHRODY_AI_* first and keep the aliases as fallback; query embeddings must match indexes.shenron-rag or fall back to lexical search."
-    },
     "aphrody-os": {
       "uses": ["aphrody-mcp"],
       "indexes": [],
@@ -278,13 +247,6 @@
       "readsToday": ["APHRODY_OSS_BASE_URL", "APHRODY_LOCAL_MODEL_URL", "APHRODY_AI_CHAT_MODEL", "APHRODY_AI_CODE_MODEL", "APHRODY_AI_REASONING_MODEL", "APHRODY_AI_SMALL_MODEL", "APHRODY_AI_VISION_MODEL", "APHRODY_AI_OCR_MODEL", "APHRODY_AI_STT_MODEL", "APHRODY_AI_EMBED_MODEL", "APHRODY_AI_RERANK_MODEL", "APHRODY_RAG_EMBED_ENDPOINT", "APHRODY_RAG_EMBED_MODEL", "APHRODY_RAG_EMBED_DIM", "APHRODY_RAG_RERANK_ENDPOINT", "APHRODY_RAG_RERANK_MODEL", "APHRODY_SHENRON_EMBED_BASE_URL", "APHRODY_SHENRON_EMBED_MODEL", "APHRODY_SHENRON_LLM_BASE_URL", "APHRODY_SHENRON_LLM_MODEL", "APHRODY_SHENRON_VISION_BASE_URL", "APHRODY_SHENRON_VISION_MODEL", "APHRODY_SHENRON_API_TOKEN"],
       "surfaces": ["crates/aphrody-models/src/roles.rs", "crates/aphrody-config/src/provider.rs", "crates/aphrody-mcp/src/rag_tools.rs", "crates/aphrody-mcp/src/http_rest.rs"],
       "migration": "Provider of the stack; aphrody ai env is its writer of the canonical names."
-    },
-    "rg": {
-      "uses": [],
-      "indexes": [],
-      "readsToday": [],
-      "surfaces": [],
-      "migration": "No local AI consumption today; packages/cron ie-crawl calls api.x.ai, a remote provider outside this contract. New AI features read the canonical names."
     },
     "nie": {
       "uses": [],

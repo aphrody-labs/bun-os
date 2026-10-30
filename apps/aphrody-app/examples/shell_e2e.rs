@@ -59,7 +59,7 @@ fn report(text: String) {
 
 // `tauri::generate_context!()` expands to code that calls `std::process::exit`.
 #[allow(clippy::exit)]
-#[tauri_runtime_cef::cef_entry_point]
+#[cfg_attr(feature = "cef", tauri_runtime_cef::cef_entry_point)]
 fn main() {
     let Some(frontend) = std::env::var_os("APHRODY_SHELL_E2E_FRONTEND") else {
         eprintln!("shell_e2e: set APHRODY_SHELL_E2E_FRONTEND (run bun run desktop:e2e)");
@@ -73,7 +73,7 @@ fn main() {
     config.app.security.csp = None;
     config.app.security.dev_csp = None;
     tauri::Builder::default()
-        .runtime(aphrody_app_lib::cef::runtime())
+        .runtime(aphrody_app_lib::webview::runtime())
         .plugin(aphrody_shell_tauri::init())
         .on_page_load(|_, payload| eprintln!("page {:?} {}", payload.event(), payload.url()))
         .invoke_handler(tauri::generate_handler![report])

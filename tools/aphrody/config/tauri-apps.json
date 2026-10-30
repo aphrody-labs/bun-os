@@ -16,15 +16,6 @@
       "note": "Desktop agent console, the only desktop application. Embeds the prebuilt ui-dist bundle until @aphrody/app-ui joins the workspace. Also the Yolo desktop SDK host (--host-info, --runtime-host: former yolo-desktop), opens the M3 showcase window with --showcase (former m3-showcase; the Bun sidecar of m3/packages/app-ui/showcase serves UI and API) and hosts the real-webview shell e2e as the shell_e2e example (former aphrody-shell-tauri-e2e)."
     },
     {
-      "id": "aphrody-drive",
-      "kind": "plugin",
-      "path": "crates/ui/drive",
-      "package": "aphrody-drive",
-      "workspace": "member",
-      "gate": true,
-      "note": "Tauri plugin: Drive daemon commands for aphrody-app."
-    },
-    {
       "id": "scaffold",
       "kind": "generator",
       "path": "m3/packages/scaffold",
@@ -49,7 +40,7 @@
       "id": "m3-next-migrate",
       "kind": "generator",
       "path": "m3/packages/m3-next-migrate",
-      "note": "Migrates Next.js projects to Tauri 3 apps. Writes them through @aphrody/scaffold (the single scaffolder); TAURI_3 is re-exported from there. Its next16/tailwind4 codemods come from @aphrody/next-bun (aphrody-labs/bun); mui-to-m3 stays here."
+      "note": "Migrates Next.js projects to Tauri 3 apps. Writes them through @aphrody/scaffold (the single scaffolder); TAURI_3 is re-exported from there. Its next16/tailwind4 codemods come from @aphrody/next-bun (the former Bun fork); mui-to-m3 stays here."
     },
     {
       "id": "m3",

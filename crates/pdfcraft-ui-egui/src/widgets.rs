@@ -790,12 +790,12 @@ pub fn artcraft_logo(ui: &mut egui::Ui, height: f32) -> Response {
     let (uri, bytes): (&str, &'static [u8]) = if dark {
         (
             "bytes://artcraft-logo-white.svg",
-            include_bytes!("../../../docs/libraries/pdfcraft/brand/artcraft-logo-white.svg"),
+            include_bytes!("../../../docs/libraries/brand/artcraft-logo-white.svg"),
         )
     } else {
         (
             "bytes://artcraft-logo.svg",
-            include_bytes!("../../../docs/libraries/pdfcraft/brand/artcraft-logo.svg"),
+            include_bytes!("../../../docs/libraries/brand/artcraft-logo.svg"),
         )
     };
     ui.add(
@@ -810,7 +810,7 @@ pub fn artcraft_mark(ui: &mut egui::Ui, size: f32) -> Response {
     ui.add(
         egui::Image::from_bytes(
             "bytes://artcraft-mark.svg",
-            include_bytes!("../../../docs/libraries/pdfcraft/brand/artcraft-mark.svg"),
+            include_bytes!("../../../docs/libraries/brand/artcraft-mark.svg"),
         )
         .fit_to_exact_size(vec2(size, size))
         .alt_text("ArtCraft"),

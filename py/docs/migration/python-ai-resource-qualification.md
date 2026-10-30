@@ -42,7 +42,7 @@ hashed minimal dependencies and rebuilt wheels. `uv pip check` passes. Public
 loading NumPy, torch or SentenceTransformers. Both fixture-generator CLI help
 paths execute. These checks qualify redistribution of the measured code and
 notices and minimal import behavior; they do not execute model generation,
-training, native Shenron providers or CPU/CUDA extras.
+training or CPU/CUDA extras.
 
 No datasets, credentials, weights or synthetic replacement model fixtures were
 added. The copied upstream notices remain intact; the first-party source license

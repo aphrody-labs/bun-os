@@ -1,0 +1,20 @@
+feature,area,priority,original,clone,notes
+Pointer shake invokes assistant,shell,must,yes,partial,apps/webos/src/assistant shake detector and overlay pushed; compositor wasm hook partial
+Pluggable model backend (local or user API key),assistant,must,yes,partial,OpenAI-compatible client tested against a local server; llama.cpp launch not wired
+Dictation with cleanup,input,should,yes,no,whisper.cpp plus an assistant cleanup pass planned
+Voice conversation with wake word,input,should,yes,no,wake word model plus streaming speech planned
+Share screen with assistant,shell,could,yes,no,compositor capture planned
+AI descriptions for downloads,files,must,yes,no,Spacedrive content indexing planned
+Search files by meaning,files,must,yes,partial,BM25 content search in the webos explorer; embeddings not built
+Phone apps on laptop,continuity,should,yes,no,Waydroid or an Android runtime
+Handoff phone to laptop,continuity,should,yes,no,KDE Connect protocol
+Phone files on laptop,continuity,should,yes,no,KDE Connect or MTP
+App store with large-screen apps,apps,must,yes,partial,appstore app exists in webos; Flathub and F-Droid planned
+Cloud game streaming,games,could,yes,no,Moonlight or Steam Link clients
+Local game emulation,games,should,no,partial,bun-engine stack in progress (extra versus the original)
+Fingerprint or face unlock,security,should,yes,no,fprintd and Howdy-style unlock on the Arch variant
+Hardware secure element (Titan C),security,skip,yes,no,hardware; TPM 2.0 and passkeys instead
+Glow bar and G key,hardware,skip,yes,no,hardware only
+Google Play Store,apps,skip,yes,no,licence; out of scope
+Gemini model and Google AI Pro,assistant,skip,yes,no,proprietary; open or user-supplied models instead
+14 h battery and 1.29 kg hardware,hardware,skip,yes,no,not a software feature

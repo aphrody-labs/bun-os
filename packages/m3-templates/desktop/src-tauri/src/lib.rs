@@ -16,12 +16,13 @@ fn system_stats() -> SystemStats {
 
 #[tauri::command]
 fn greet(name: &str) -> String {
-  format!("Hello, {name}! (Tauri 3, Aphrody fork)")
+  format!("Hello, {name}! (Tauri 3)")
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    .runtime(tauri_runtime_wry::Wry::default())
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![greet, system_stats])
     .run(tauri::generate_context!())

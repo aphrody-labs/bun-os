@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-29",
+  "source": "catalog.json picks; fork head from the GitHub API; GNU versions from archlinux.org (core)",
+  "components": {
+    "coreutils": {
+      "repo": "uutils/coreutils",
+      "tag": "0.12.0",
+      "sha": "dc1efd89948a9ca4c78c3a4b9a6ac891019a8c69",
+      "date": "2026-09-17",
+      "version": "0.12.0",
+      "license": "MIT",
+      "archOfficial": "extra/uutils-coreutils 0.12.0-1"
+    },
+    "findutils": {
+      "repo": "uutils/findutils",
+      "tag": "0.10.0",
+      "sha": "41e7a599f59198617e2e152da5bc3eaa2f87ac0b",
+      "date": "2026-08-03",
+      "version": "0.10.0",
+      "license": "MIT",
+      "archOfficial": null
+    },
+    "diffutils": {
+      "repo": "uutils/diffutils",
+      "tag": "v0.6.0",
+      "sha": "815ed7d8de89a236e5f636749f80a5b061017521",
+      "date": "2026-10-23",
+      "version": "0.6.0",
+      "license": "Apache-2.0",
+      "archOfficial": null
+    },
+    "sudo-rs": {
+      "repo": "trifectatechfoundation/sudo-rs",
+      "tag": "v0.2.15",
+      "sha": "e4cfa9cf7b71e287dd5046633c0f5276072d147d",
+      "date": "2026-08-31",
+      "version": "0.2.15",
+      "license": "Apache-2.0",
+      "archOfficial": "extra/sudo-rs 0.2.15-1"
+    },
+    "nushell": {
+      "repo": "nushell/nushell",
+      "tag": "0.116.1",
+      "sha": "b632ef0994e07b5176ec45171e8cee2c127c5563",
+      "date": "2026-10-04",
+      "version": "0.116.1",
+      "license": "MIT",
+      "archOfficial": "extra/nushell 0.116.1-1"
+    },
+    "util-linux": {
+      "repo": "aphrody-labs/uutils-util-linux",
+      "upstream": "uutils/util-linux",
+      "upstreamLatestTag": "0.0.1",
+      "branch": "main",
+      "sha": "09959d43054c2af206c4fb9c725224d629e47e7f",
+      "date": "2026-10-14",
+      "version": "0.0.1",
+      "license": "MIT"
+    }
+  },
+  "gnuReplaced": {
+    "coreutils": "9.12-2",
+    "findutils": "4.11.0-1",
+    "diffutils": "3.12-2",
+    "util-linux": "2.42.4-1",
+    "sudo": "1.9.17.p2-6"
+  }
+}

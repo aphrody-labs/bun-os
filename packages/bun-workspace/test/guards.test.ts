@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Read-only test sections from packages/shenron/config/test/guards.test.ts at 8172f535ce.
+// Read-only test sections of the portable export contract guards.
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
 import { checkNoEscapingImports, checkPackageRuntimes, stripNonCode, type Offence } from "../src/guards";
@@ -44,7 +44,7 @@ describe("checkPackageRuntimes", () => {
         "src/pure-node.ts pure:node",
         "src/pure-process.ts pure:process",
         "src/pure-react.ts pure:react",
-        "src/pure-shenron.ts pure:package-server",
+        "src/pure-server.ts pure:package-server",
         "src/react-node.ts react:node",
         "src/reflect.ts reflect-metadata",
         "src/aphrody.ts aphrody-discord",

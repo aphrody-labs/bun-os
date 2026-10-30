@@ -150,11 +150,9 @@ const sections: [string, (key: string) => boolean][] = [
     key => /DATABASE|POSTGRES|SUPABASE|REDIS|SQLITE|STORAGE|CDN|RAG_DB|KNOWLEDGE_DB/.test(key),
   ],
   [
-    "Rose Griffon and game data",
-    key =>
-      /^(RG_|ACHILLEA_|AZALEE_|INAGLE_|GAME_|DATA_|JA_DATA_|FR_TITLES|CROSS_CATALOG|CFGBIN_|IEVR_|STEAM_)/.test(key),
+    "Game data",
+    key => /^(ACHILLEA_|AZALEE_|INAGLE_|GAME_|DATA_|JA_DATA_|FR_TITLES|CROSS_CATALOG|CFGBIN_|IEVR_|STEAM_)/.test(key),
   ],
-  ["Shenron host plane and gateway", key => /^(SHENRON_|APHRODY_SHENRON_|DBFR_)/.test(key)],
   [
     "Discord and notifications",
     key => /^(DISCORD_|GUILD_|OWNER_|BOT_|CRON_|MAIL_|SMTP_|RESEND_|TELEGRAM_|MATRIX_|SLACK_)/.test(key),
@@ -169,7 +167,7 @@ const sections: [string, (key: string) => boolean][] = [
   [
     "Browser, system and rendering",
     key =>
-      /^(OBSCURA_|APHRODY_WEB_|APHRODY_BROWSER_|CHROME_|AGENT_BROWSER_|FFMPEG_|CUDA_|HIP_|VULKAN_|AMD|BLAS_|OPENBLAS_|WINE|WINCLEAN_|SD_|SPACEDRIVE_)/.test(
+      /^(OBSCURA_|APHRODY_WEB_|APHRODY_BROWSER_|CHROME_|AGENT_BROWSER_|FFMPEG_|CUDA_|HIP_|VULKAN_|AMD|BLAS_|OPENBLAS_|WINE|WINCLEAN_|SD_)/.test(
         key,
       ),
   ],

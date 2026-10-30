@@ -43,6 +43,8 @@ tauri-winres = "0.3"
 semver = { workspace = true }
 dirs = { workspace = true }
 glob = { workspace = true }
+static_vcruntime = "3.0"
+strsim = "0.11"
 schemars = { workspace = true, features = ["preserve_order"] }
 
 [features]

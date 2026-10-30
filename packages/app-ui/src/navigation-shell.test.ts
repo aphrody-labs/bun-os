@@ -10,17 +10,14 @@ import { getProjectGroups } from "./stores/chat-store";
 import { desktopRoutes, legacyRouteRedirects } from "./desktop-navigation";
 
 describe("Single Navigation & Shell Architecture (UI-DESIGN.md §3, §4.6, §10)", () => {
-  const sidebarPath = resolve(__dirname, "components/SpacesSidebar/index.tsx");
+  const sidebarPath = resolve(__dirname, "components/AppSidebar.tsx");
   const sidebarCode = readFileSync(sidebarPath, "utf-8");
 
   const settingsRoutePath = resolve(__dirname, "routes/settings/index.tsx");
   const settingsRouteCode = readFileSync(settingsRoutePath, "utf-8");
 
-  const spaceSwitcherPath = resolve(__dirname, "components/SpacesSidebar/SpaceSwitcher.tsx");
-  const spaceSwitcherCode = readFileSync(spaceSwitcherPath, "utf-8");
-
   it("enforces a single navigation sidebar with no secondary sidebar anywhere", () => {
-    // SpacesSidebar must have the unique <nav> element
+    // AppSidebar must have the unique <nav> element
     expect(sidebarCode).toContain("<nav");
 
     // routes/settings must NEVER contain an inner <nav> sidebar
@@ -43,13 +40,7 @@ describe("Single Navigation & Shell Architecture (UI-DESIGN.md §3, §4.6, §10)
     expect(legacyRouteRedirects).not.toHaveProperty("remote");
   });
 
-  it("SpaceSwitcher features the Aphrody branding/avatar with 48dp row", () => {
-    expect(spaceSwitcherCode).toContain("Avatar Aphrody");
-    expect(spaceSwitcherCode).toContain("h-12"); // 48dp
-    expect(spaceSwitcherCode).toContain("text-label-large"); // 18px
-  });
-
-  it("SpacesSidebar declares consumer destinations with M3 icons, 48dp height and label-large 18px", () => {
+  it("AppSidebar declares consumer destinations with M3 icons, 48dp height and label-large 18px", () => {
     expect(sidebarCode).toContain("Chat");
     expect(sidebarCode).toContain("Files");
     expect(sidebarCode).toContain("Models");
@@ -71,7 +62,7 @@ describe("Single Navigation & Shell Architecture (UI-DESIGN.md §3, §4.6, §10)
     expect(sidebarCode).toContain("Récents");
     expect(sidebarCode).toContain("edit_square"); // Compose icon
 
-    // Files active: canonical Spacedrive groups
+    // Files active
     expect(sidebarCode).toContain("isFilesActive && !isSettingsActive");
 
     // Models active: Installés, Catalogue

@@ -6,7 +6,11 @@
  * here implements OS behavior: this file loads the module once and adapts it to the callers.
  */
 import { openWebOs, type WebOs } from "@aphrody/webos-wasm";
-import type { Transport } from "@aphrody/drive-client";
+/** Request/subscribe transport of the explorer wire protocol served by the webos backend. */
+export interface Transport {
+  sendRequest(request: unknown): Promise<unknown>;
+  subscribe(...args: unknown[]): Promise<() => void>;
+}
 
 /** The `.wasm` is copied next to `app.js` by `build.ts`. */
 export const WEBOS_WASM_FILE = "wasm/aphrody_webos_wasm_bg.wasm";

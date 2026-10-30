@@ -1,9 +1,0 @@
-{
-  "family": "api-ms-win-core-comm-l1-1-2",
-  "dll": "api-ms-win-core-comm-l1-1-2.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Devices.Communication"],
-  "functions": {
-    "GetCommPorts": ["u32", ["*u32", "u32", "*u32"], ["lpPortNumbers", "uPortNumbersCount", "puPortNumbersFound"], 0]
-  }
-}

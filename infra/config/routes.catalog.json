@@ -148,11 +148,6 @@
       "keep": false,
       "passthrough": true
     },
-    "play.aphrody.app": {
-      "kind": "product",
-      "path": "/play",
-      "keep": false
-    },
     "apt.aphrody.app": {
       "kind": "product",
       "path": "/apps",

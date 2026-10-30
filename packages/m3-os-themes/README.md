@@ -42,7 +42,7 @@ Tests generate everything in memory or in a temp directory and never touch the s
 `bun test test/`. The COSMIC key layout and the GNOME Shell selectors follow the upstream formats and
 were not exercised on a live COSMIC or GNOME session.
 
-Pending (work item C1): once the Bun fork ships `bun:cosmic` (cosmic-config read/write), replace the hand-written
+Pending (work item C1): once a cosmic-config binding (read/write) exists, replace the hand-written
 cosmic-config writes in `src/cosmic.ts`/`install-cosmic.sh` and validate the keys through it. Same candidate on the
 Rust side: the hand-rolled `.desktop` parser in `crates/ui/drive/src/file_opening/linux.rs` (vs
 `freedesktop-desktop-entry`).

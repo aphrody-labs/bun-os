@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // The existing desktop owns native windows; this app supplies only its UI/API sidecar.
-import { runTauri as runDesktopShowcase, showcaseHostPlan } from "../../../packages/app-ui/showcase/scripts/tauri";
+import { runTauri as runDesktopShowcase, showcaseHostPlan } from "./tauri-host";
 import { SHOWCASE_ROOT } from "./icons";
 
 export {
@@ -8,9 +8,13 @@ export {
   CARGO_RUNNER,
   DESKTOP_ROOT,
   sidecarCommand,
-} from "../../../packages/app-ui/showcase/scripts/tauri";
+} from "./tauri-host";
 
-export function tauriHostPlan(args: string[], platform: NodeJS.Platform = process.platform, which = Bun.which) {
+export function tauriHostPlan(
+  args: string[],
+  platform: NodeJS.Platform = process.platform,
+  which = Bun.which,
+) {
   return showcaseHostPlan(args, platform, which, SHOWCASE_ROOT);
 }
 

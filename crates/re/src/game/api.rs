@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! In-memory DBXV2 surface shared by the WebAssembly bindings and the `shenron-dbxv2` C ABI
+//! In-memory DBXV2 surface shared by the WebAssembly bindings and the DBXV2 C ABI
 //! (feature `dbxv2`): identify a buffer, list and extract plain CPK entries, summarise a
 //! container or gameplay file as JSON, and decode CRI audio to WAV. Nothing here touches the
 //! file system, so a host (browser, Bun, C) only ever hands over bytes it already owns.

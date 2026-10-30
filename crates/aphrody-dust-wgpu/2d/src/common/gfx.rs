@@ -885,7 +885,9 @@ impl GfxThreadData {
             // }
 
             self.queue.submit([command_encoder.finish()]);
-            self.shared_data.submitted_frames.fetch_add(1, Ordering::Release);
+            self.shared_data
+                .submitted_frames
+                .fetch_add(1, Ordering::Release);
             true
         } else {
             false

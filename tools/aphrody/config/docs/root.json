@@ -1,6 +1,6 @@
 {
   "readme": {
-    "summary": "Aphrody is the product repository: application workflows, integration and delivery. Runtime and SDK capabilities belong to [Bun](https://github.com/aphrody-labs/bun); Material owns the shared M3 framework and UI packages. Google, M3, Obscura and Tauri framework sources live outside Aphrody. Remaining local sources are tracked migration work, not the target ownership (owner directive 2026-10-13).",
+    "summary": "Aphrody is the product repository: application workflows, integration and delivery. Runtime and SDK capabilities belong to [Bun](https://github.com/oven-sh/bun); Material owns the shared M3 framework and UI packages. Google, M3, Obscura and Tauri framework sources live outside Aphrody. Remaining local sources are tracked migration work, not the target ownership (owner directive 2026-10-13).",
     "sections": [
       {
         "id": "os",
@@ -11,7 +11,7 @@
           "",
           "| Layer | Source | Role |",
           "| --- | --- | --- |",
-          "| Runtime | [aphrody-labs/bun](https://github.com/aphrody-labs/bun) | Fork of Bun: runs the JavaScript and TypeScript parts and hosts the native bindings (Windows, .NET, Python) |",
+          "| Runtime | [oven-sh/bun](https://github.com/oven-sh/bun) | Upstream Bun canary: runs the JavaScript and TypeScript parts |",
           "| Kernel | `crates/os/kernel`, `crates/os/ostd` | Privileged user-space control plane: administration, MCP tools, skills and bus events over local IPC; process supervision, guardrails, secrets, jobs |",
           "| Desktop | `crates/ui/app`, `crates/ui/drive` | Tauri 3 GUI and window manager; file explorer |",
           "| Shell | `crates/shell` | Terminal engine, PTY sessions, embedded Nushell, WebAssembly shell |",
@@ -32,7 +32,6 @@
           "- A distribution release is an immutable snapshot on [downloads.aphrody.com](https://downloads.aphrody.com), named `<UTC timestamp>-<commit>` after the monorepo commit it was built from. `latest.json` names the current release and lists every artifact with its version, size and SHA-256; `/releases/<id>/` serves a given release, and the host keeps the last five.",
           "- Each artifact keeps its own version: the Cargo workspace version for `aphrody`, the package version for the others.",
           "- Releases follow no calendar: `scripts/release/publish-downloads.ts` cuts one after the build factory has built a pushed revision.",
-          "- The runtime is versioned after the Bun release it is based on, with an `-aphrody.<n>` suffix, and tagged `aphrody-v<version>` in aphrody-labs/bun. Upstream `oven-sh/bun` `main` is merged into the fork.",
           "- Packages under the `@aphrody` npm scope are published one by one, each with its own version."
         ]
       },
@@ -41,7 +40,7 @@
         "title": "Documentation",
         "public": true,
         "body": [
-          "- Runtime: [aphrody.com/docs](https://aphrody.com/docs), built from `docs/` of aphrody-labs/bun (the Bun documentation plus the pages the fork adds); [llms.txt](https://aphrody.com/llms.txt) indexes every page.",
+          "- Runtime: [aphrody.com/docs](https://aphrody.com/docs), built from the upstream Bun `docs/`; [llms.txt](https://aphrody.com/llms.txt) indexes every page.",
           "- Components and versions: [aphrody.com/components](https://aphrody.com/components), generated from the monorepo, the runtime and the aphrody-labs organization at each site build.",
           "- Distribution internals: `docs/` of the monorepo (index in `docs/README.md`), private with it."
         ]
@@ -52,7 +51,6 @@
         "public": true,
         "body": [
           "- Aphrody is developed in the [aphrody-labs](https://github.com/aphrody-labs) GitHub organization, owned by the `aphrody-dev` account, which decides what is published. Owner directives are recorded with their date in `AGENTS.md`.",
-          "- The monorepo is private. The runtime, the component forks and the Python runtime `vu` are public repositories; issues are disabled on aphrody-labs/bun.",
           "- Contribution rules: [CONTRIBUTING.md](CONTRIBUTING.md). First-party code is Apache-2.0 (some crates `Apache-2.0 OR MIT`); forks and upstream inputs keep their authors' licences, listed in `THIRD-PARTY.md` and `tools/config/upstream-sources.json`."
         ]
       },
@@ -61,7 +59,7 @@
         "title": "Security",
         "public": true,
         "body": [
-          "Report vulnerabilities privately through [GitHub private vulnerability reporting on aphrody-labs/bun](https://github.com/aphrody-labs/bun/security/advisories/new). Supported versions and artifact verification: [SECURITY.md](SECURITY.md)."
+          "Report vulnerabilities privately through [GitHub private vulnerability reporting on oven-sh/bun](https://github.com/oven-sh/bun/security/advisories/new). Supported versions and artifact verification: [SECURITY.md](SECURITY.md)."
         ]
       }
     ],
@@ -138,7 +136,6 @@
         "Product workflows, application glue, integration and delivery; no duplicated runtime/framework SDK sources"
       ],
       [
-        "Bun fork (`aphrody-labs/bun`)",
         "Precompiled runtime and SDK, Google, Obscura and Tauri capabilities; yolo is absorbed and is no longer an owner"
       ],
       ["Workspace/Infra", "Orchestration, inventories, factories, release, hosts"],
@@ -254,10 +251,6 @@
         "Windows installer for `aphrody-app`; real Windows run; rendering in the real CEF app"
       ],
       [
-        "Shenron production",
-        "Restart `shenron-site`/`shenron-bot` after the release; measure `/api/chat`; verify the agent card"
-      ],
-      [
         "MCP HTTP auth",
         "Bearer token in a 0600 EnvironmentFile (`APHRODY_MCP_HTTP_TOKEN`); finish `workspace/wip/infra-mcp-auth` (free port, `infra validate` fix), gate, rebase, push"
       ],
@@ -271,7 +264,7 @@
       ],
       [
         "Publication",
-        "2026-10-09: all 73 npm producer versions have verified registry tarballs and a clean frozen consumer installation. Full Rust publication remains open: 169 Aphrody members, 73 IECODE members, source/package gates and the crates.io new-name quota. Preserve fork licences, exact registry requirements and protected stores. IECODE/NIE/Inagle/RG require the qualified Aphrody Bun fork. Evidence and remaining blockers: [registry release](docs/operations/workspace/registry-release-2026-10-09.md); npm [receipt](docs/operations/workspace/npm-source-release-2026-10-09.md). PyPI remains a separate release queue."
+        "2026-10-09: all 73 npm producer versions have verified registry tarballs and a clean frozen consumer installation. Full Rust publication remains open: 169 Aphrody members, 73 IECODE members, source/package gates and the crates.io new-name quota. Preserve fork licences, exact registry requirements and protected stores. IECODE/NIE/Inagle require the qualified Aphrody Bun fork. Evidence and remaining blockers: [registry release](docs/operations/workspace/registry-release-2026-10-09.md); npm [receipt](docs/operations/workspace/npm-source-release-2026-10-09.md). PyPI remains a separate release queue."
       ],
       [
         "Repository hygiene",
@@ -397,7 +390,6 @@
           ],
           [
             "2026-10-05",
-            "`aphrody-labs/bun` has one branch, `main` (upstream + Aphrody fixes); monorepo branches merged and deleted, only `main` remains.",
             "Fork keeps 12,458 inherited remote branches (not deleted)."
           ],
           [
@@ -526,7 +518,7 @@
           ],
           [
             "2026-10-08",
-            "Resolved app-ui module state leakage and stock Bun test dependencies: inlined typed invariant assertion helper in @aphrody/drive-client, isolated kit-bridge catalog cache and tauri-bridge initialization promises across test suites. Full app-ui test suite passes with 216 tests, 990 assertions; app-ui build packages 640 files into ui-dist; aphrody-terminal-backend checks and passes all 33 unit and integration tests.",
+            "Resolved app-ui module state leakage and stock Bun test dependencies: isolated kit-bridge catalog cache and tauri-bridge initialization promises across test suites. Full app-ui test suite passes with 216 tests, 990 assertions; app-ui build packages 640 files into ui-dist; aphrody-terminal-backend checks and passes all 33 unit and integration tests.",
             "Linux host tests; physical Windows and CEF graphics rendering qualified separately."
           ]
         ]
@@ -556,7 +548,7 @@
           ],
           [
             "2026-10-06",
-            "Imports after dry-run: global home 14,331 memories, 720 sessions; dbfr 421 documents, 2,362 chunks; aphrody 37 memories.",
+            "Imports after dry-run: global home 14,331 memories, 720 sessions; aphrody 37 memories.",
             "Home sync is preview-first; `--apply` takes a verified backup."
           ],
           [
@@ -571,7 +563,7 @@
           ],
           [
             "2026-10-09",
-            "Owner-requested Claude/agy import through native aphrody home: previews followed by checksum-backed additive imports, 120 memory files and 367 session references split across global/aphrody/dbfr/ie. Original provider sessions remain in their stores; no transcript content copied into the sessions table.",
+            "Owner-requested Claude/agy import through native aphrody home: previews followed by checksum-backed additive imports, 120 memory files and 367 session references split across global/aphrody/ie. Original provider sessions remain in their stores; no transcript content copied into the sessions table.",
             "Configuration has three protected source references only; one empty settings file cannot be converted. Installed CLI has no Claude/agy configuration importer. No provider authentication migration or provider-memory synchronization claimed."
           ]
         ]
@@ -579,16 +571,6 @@
       {
         "title": "Infra, hosts, release",
         "rows": [
-          [
-            "2026-10-05",
-            "Shenron/Koharu extracted to `aphrody-labs/shenron` (169 commits, 4,325 files); private state moved to `~/shenron` (6,181 files, SHA-256 verified). Host plan and `/api/v1/shenron/*` gateway stay in Infra.",
-            "Public opening pending audit of the local corpus."
-          ],
-          [
-            "2026-10-05",
-            "vps CDN for dragonballfr.com: vhosts, hourly `shenron-cdn-sync.timer` from dbfr (21,067 + 66,690 + 286 files), HTTP/3 and TLS 1.3 `X25519MLKEM768` verified; lossless optimizer `scripts/release/cdn-optimize.ts` (PNG −13…−20%, br text −95%).",
-            "dbfr disk at 93%; `shenron-cdn` on dbfr has no pull."
-          ],
           [
             "2026-10-05",
             "Factory builds are installed atomically with SHA-256 and `--version` probe; VPS glibc 2.43 binaries are refused by WSL (2.39).",
@@ -624,11 +606,6 @@
             "2026-10-07",
             "Downloads release `20261007T094136Z-2072d221e312-wasm-0b7fccd7`: 14 artifacts, prior 13 preserved. Portable WASM archive 1,562,486 B, SHA-256 `8d2a34b5a0cb6ca2a14108d84f80cb82b689e1013d1a4fa95a10074b70d538be`. Public download and package provenance verified; Node/V8 and Bun bytes/sync/HTTP streaming smokes passed; 26 tests passed.",
             "Native CLI parity skipped; real browser execution unverified. Composite WASM source/patch provenance retained. Windows kits qualified under Wine, not physical Windows."
-          ],
-          [
-            "2026-10-07",
-            "Owner directive: all Shenron belongs on DBFR; VPS is reserved for Aphrody. Reclaim substantial disk space when capacity blocks execution. Training belongs on Omar’s WSL; the owner plans to uninstall their own WSL.",
-            "Placement and reclamation policy in tools/config/production-topology.json; preserve active work and authentication, verify retained protected-data copies before source deletion. Migration completion requires live cutover evidence."
           ],
           [
             "2026-10-07",

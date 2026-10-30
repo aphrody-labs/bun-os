@@ -155,15 +155,6 @@
     "specta_bindings": "Type-Safe Specta IPC Bindings",
     "in_process_execution": "Direct Native Library Execution (Zero Subprocess)"
   },
-  "shenron": {
-    "title": "Shenron Agent & DBFR Engine",
-    "rag_query": "Grounded Knowledge RAG Query",
-    "character_persona": "Shenron Persona Active",
-    "databooks": "Canonical Databooks & Archive",
-    "wiki_references": "Dragon Ball FR Wiki Entities",
-    "pipeline_status": "Site Knowledge Pipeline",
-    "grounded_response": "Verified Grounded Response"
-  },
   "shell": {
     "title": "Aphrody Native Shell & PTY",
     "nushell_backend": "Structured NuShell Engine",

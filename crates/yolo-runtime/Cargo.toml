@@ -7,32 +7,23 @@ rust-version = "1.97"
 authors = ["aphrody-code"]
 license = "Apache-2.0"
 repository = "https://github.com/aphrody-labs/aphrody"
-description = "Bun OS build of the YOLO runtime ABI owned by the Bun fork, with the browser and GPU providers"
+description = "Bun OS build of the YOLO runtime ABI with the GPU provider"
 
 [lib]
 name = "yolo_runtime"
-# One copy of the runtime and ABI: the pinned Bun fork. This crate adds the browser and GPU providers (ext/).
-path = "../../toolchains/bun/packages/bun-runtime-sdk/crates/yolo-runtime/src/lib.rs"
 # The dynamic library is the single `aphrody_ffi` cdylib, which re-exports the yolo_* ABI.
 crate-type = ["rlib"]
 
-# Default ABI graph remains light. Browser releases opt into the pinned Obscura/V8 owner.
 [features]
 default = []
-browser = ["dep:obscura-browser", "dep:obscura-net", "dep:tokio", "dep:url", "dep:base64", "dep:async-trait"]
-# Process-wide GPU hub (wgpu) shared with Obscura and Tauri hosts in the same process.
+# Process-wide GPU hub (wgpu) shared with Tauri hosts in the same process.
 gpu = ["dep:aphrody-gpu-backend", "aphrody-gpu-backend/hub", "dep:base64"]
 # NVIDIA CUDA through the official driver, loaded at run time.
 cuda = ["gpu", "aphrody-gpu-backend/cuda"]
 
 [dependencies]
-obscura-browser = { path = "../../toolchains/bun/src/browser/crates/browser", package = "bun_browser_browser", features = ["render"], optional = true }
-obscura-net = { path = "../../toolchains/bun/src/browser/crates/net", package = "bun_browser_net", optional = true }
 aphrody-gpu-backend = { path = "../aphrody-gpu-backend", version = "1.4.7", optional = true }
-tokio = { version = "1.53.1", features = ["process", "rt-multi-thread", "macros", "time", "signal", "sync", "fs", "io-util", "full"], optional = true }
-url = { version = "2.5.8", features = ["serde"], optional = true }
 base64 = { version = "0.23.1", optional = true }
-async-trait = { version = "0.1.92", optional = true }
 yolo-core = "1.0.0"
 serde = { version = "1.0.228", features = ["derive", "std"], default-features = false }
 serde_json = "1.0.151"

@@ -1,18 +1,39 @@
 [workspace]
-exclude = ["vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "packages/bun-tauri", "apps/aphrody-model-view", "toolchains/bun", "apps/aphrody-drive", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "apps/artcraft", "crates/artcraft-tauri-plugin-http", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
+# apps/artcraft + crates/sqlite_tasks: sqlx 0.7 (libsqlite3-sys 0.27; sqlx 0.9 caps <0.38) cannot share a lock with rookie-cookies (=libsqlite3-sys 0.38.2); artcraft repeats the exact Tauri pins of the workspace dependency table.
+# apps/aphrody-drive is the nested FSL Spacedrive workspace. Tauri apps are members: the CEF runtime (cef-dll-sys, needs CMake) is an opt-in `cef` feature, wry is the default runtime.
+# apps/desktop/src-tauri needs the compiled aphrody-server sidecar (build/apps/desktop/native); crates/bunos-wsl is the Windows-only WSL manager (winreg, WSL executor): both build from their own CI jobs, not the Linux workspace gate.
+exclude = ["apps/desktop/src-tauri", "crates/bunos-wsl", "cloud", "apps/bunos-wsl/src-tauri", "apps/lu/src-tauri", "crates/lu-native", "apps/artcraft", "crates/sqlite_tasks", "vendor/cargo-3ds", "vendor/ctru-rs", "vendor/citro3d-rs", "vendor/starpsx", "vendor/zakuro", "vendor/tetanes", "vendor/rustboyadvance-ng", "vendor/uutils", "vendor/cef-rs", "apps/pdfcraft/vendor", "apps/figcraft/plugins", "crates/sqlite_tasks", "vendor/magika", "crates/bevy/tests-integration", "crates/bevy/examples/mobile/android_basic", "crates/bevy_color/crates/gen_tests", "apps/aphrody-examples/runtime-rust-extension", "apps/effectcraft/examples/plugins/posterize-bands", "apps/photocraft/examples/plugins/invert-rs", "crates/aphrody-nds-sdk/devkit/templates", "crates/ghidra-decompiler/fuzz", "crates/pdfcraft-filters/fuzz", "crates/photocraft-affinity/fuzz", "crates/photocraft-codecs/fuzz", "crates/photocraft-format/fuzz", "crates/photocraft-psd/fuzz", "crates/photocraft-raw/fuzz", "crates/soundcraft-clap-host/tests/fixture", "crates/soundcraft-vst3-host/tests/fixture", "crates/vectorcraft-affinity/fuzz", "crates/vectorcraft-plugins/example"]
 resolver = "3"
 members = [
-    "apps/webos-server",
-  "crates/apkeep",
-  "crates/aphrody-google",
-  "crates/aphrody-gemini-web",
+  "crates/bunos-wsl-core",
+  "crates/aphrody",
+  "crates/aphrody-agent-runtime",
+  "crates/aphrody-agent-tools",
+  "crates/aphrody-app-server",
+  "crates/aphrody-command",
+  "crates/aphrody-ffi",
   "crates/aphrody-gemini-runtime",
+  "crates/aphrody-google",
+  "crates/aphrody-mcp",
+  "crates/aphrody-mcp-client",
+  "crates/aphrody-site",
+  "crates/aphrody-webos-wasm",
+    "apps/webos-server",
+  "crates/aphrody-wasm-raw",
+  "crates/aphrody-wasm-bindgen-hello",
+  "crates/aphrody-wasm-wasi-hello",
+  "crates/bun-os-git",
+  "crates/bun-os-native",
+  "crates/bun-os-pkg",
+  "crates/bun-os-google",
+  "crates/apkeep",
+  "crates/bun-waydroid",
+  "crates/aphrody-gemini-web",
   "crates/aphrody-antigravity",
   "crates/aphrody-model-antigravity",
   "crates/aphrody-boq",
+  "crates/aphrody-accounts",
   "packages/bun-windows-winclean",
-  "crates/aphrody-site",
-  "crates/aphrody-webos-wasm",
   "crates/aphrody-shell-session",
   "crates/aphrody-shell-vfs",
   "crates/aphrody-terminal-core",
@@ -29,15 +50,12 @@ members = [
   "crates/bun-os-shell",
   "crates/bun-os-platform",
   "crates/bun-steam",
-  "crates/ghidra-decompiler",
   "crates/aphrody-sprite-sheet",
   "crates/aphrody-softraster",
   "crates/aphrody-render",
   "crates/aphrody-m3-reproduce",
   "crates/aphrody-identity",
-  "crates/aphrody-drive",
   "crates/aphrody-bun",
-  "apps/aphrody-app",
   "crates/aphrody-yolo",
   "crates/aphrody-wireguard",
   "crates/aphrody-vpn",
@@ -50,8 +68,6 @@ members = [
   "crates/aphrody-certificates",
   "crates/aphrody-command-wasm",
   "crates/aphrody-command-pure",
-  "crates/aphrody-command",
-  "crates/aphrody",
   "crates/aphrody-secrets",
   "crates/aphrody-backend",
   "crates/aphrody-kernel",
@@ -67,6 +83,11 @@ members = [
   "crates/aphrody-capture",
   "crates/aphrody-terminal-backend",
   "crates/aphrody-shell-tauri",
+  "crates/tauri-plugin-aphrody",
+  "crates/tauri-plugin-mcp-bridge",
+  "crates/artcraft-tauri-plugin-http",
+  "apps/aphrody-app",
+  "apps/aphrody-model-view",
   "crates/aphrody-nu",
   "crates/aphrody-term",
   "crates/aphrody-toolchains",
@@ -97,8 +118,6 @@ members = [
   "crates/aphrody-models",
   "crates/aphrody-model-client",
   "crates/aphrody-memory",
-  "crates/aphrody-mcp-client",
-  "crates/aphrody-mcp",
   "crates/aphrody-llama-server",
   "crates/aphrody-infer",
   "crates/aphrody-gateway",
@@ -106,14 +125,11 @@ members = [
   "crates/aphrody-engine",
   "crates/aphrody-embed",
   "crates/aphrody-code-graph",
-  "crates/aphrody-app-server",
-  "crates/aphrody-agent-tools",
-  "crates/aphrody-agent-runtime",
   "crates/aphrody-agent-home",
-  "crates/aphrody-ffi",
   "crates/yolo-runtime",
   "crates/aphrody-m3",
   "crates/aphrody-m3-tokens",
+  "crates/aphrody-themes",
   "crates/libm3",
   "crates/libm3-wasm",
     "crates/craft-atomic",
@@ -124,8 +140,6 @@ members = [
     "crates/craft-docpath",
     "crates/craft-ui",
     "crates/craft-fonts",
-    "crates/craft-fonts-tests",
-    "crates/pdfcraft-compare",
     "crates/cadcraft-cli",
     "crates/cadcraft",
     "crates/cadcraft-color",
@@ -140,7 +154,6 @@ members = [
     "crates/cadcraft-mcp",
     "crates/cadcraft-render",
     "crates/cadcraft-ui-egui",
-    "crates/gridcraft-pdf",
     "crates/aphrody-a2a",
     "crates/aphrody-agent-proto",
     "crates/aphrody-app-protocol",
@@ -202,9 +215,7 @@ members = [
     "crates/designcraft-compose",
     "crates/designcraft-doc",
     "crates/designcraft-engine",
-    "crates/designcraft-epub",
     "crates/designcraft-fonts",
-    "crates/designcraft-format",
     "crates/designcraft-geom",
     "crates/designcraft-idml",
     "crates/designcraft-images",
@@ -266,7 +277,6 @@ members = [
     "crates/figcraft-text",
     "crates/figcraft-ui-egui",
     "crates/figcraft-xtask",
-    "crates/file_to_base64_url",
     "crates/filmcraft-aac",
     "crates/filmcraft-ac3",
     "crates/filmcraft-apv",
@@ -344,12 +354,9 @@ members = [
     "crates/lightcraft-engine",
     "crates/lightcraft-faces",
     "crates/lightcraft-fetch",
-    "crates/lightcraft-geocode",
     "crates/lightcraft-geom",
     "crates/lightcraft-gpu",
     "crates/lightcraft-heif",
-    "crates/lightcraft-inpaint",
-    "crates/lightcraft-lensdb",
     "crates/lightcraft-mcp",
     "crates/lightcraft-merge",
     "crates/lightcraft-meta",
@@ -363,11 +370,11 @@ members = [
     "crates/lightcraft-tiff",
     "crates/lightcraft-ui-egui",
     "crates/lightcraft-xtask",
+    "crates/media-core",
     "crates/midjourney_client",
     "crates/openai_sora_client",
     "crates/pdfcraft-a11y",
     "crates/pdfcraft-annot",
-    "crates/pdfcraft-audit",
     "crates/pdfcraft-automation",
     "crates/pdfcraft-content",
     "crates/pdfcraft-cos",
@@ -379,15 +386,12 @@ members = [
     "crates/pdfcraft-filters",
     "crates/pdfcraft-fonts",
     "crates/pdfcraft-forms",
-    "crates/pdfcraft-geom",
     "crates/pdfcraft-js",
     "crates/pdfcraft-measure",
     "crates/pdfcraft-model",
-    "crates/pdfcraft-ocr",
     "crates/pdfcraft-optimize",
     "crates/pdfcraft-organize",
     "crates/pdfcraft-platform",
-    "crates/pdfcraft-preflight",
     "crates/pdfcraft-print",
     "crates/pdfcraft-redact",
     "crates/pdfcraft-render",
@@ -408,9 +412,7 @@ members = [
     "crates/photocraft-format",
     "crates/photocraft-geom",
     "crates/photocraft-gpu",
-    "crates/photocraft-heif",
     "crates/photocraft-io",
-    "crates/photocraft-ops",
     "crates/photocraft-paint",
     "crates/photocraft-plugins",
     "crates/photocraft-psd",
@@ -567,7 +569,6 @@ members = [
   "crates/aphrody-nie-play",
   "crates/aphrody-nie-queue",
   "crates/re",
-  "crates/shenron-dbxv2",
   "crates/aphrody-nie-render",
   "crates/aphrody-nie-render3d",
   "crates/aphrody-nie-runtime",
@@ -604,90 +605,6 @@ members = [
   "crates/ruzu-shader-recompiler",
   "crates/ruzu-video-core",
   "crates/ruzu-web-service",
-  # Bevy 0.20 (absorbed bevyengine/bevy, crates/bevy/BUN-OS-PROVENANCE.md): the umbrella crate,
-  # its crates, compile-fail suites, benches, error codes, example crates and tools.
-  "crates/bevy",
-  "crates/bevy_a11y",
-  "crates/bevy_android",
-  "crates/bevy_animation",
-  "crates/bevy_anti_alias",
-  "crates/bevy_app",
-  "crates/bevy_asset",
-  "crates/bevy_audio",
-  "crates/bevy_camera",
-  "crates/bevy_camera_controller",
-  "crates/bevy_clipboard",
-  "crates/bevy_color",
-  "crates/bevy_core_pipeline",
-  "crates/bevy_curve",
-  "crates/bevy_derive",
-  "crates/bevy_dev_tools",
-  "crates/bevy_diagnostic",
-  "crates/bevy_dylib",
-  "crates/bevy_ecs",
-  "crates/bevy_encase_derive",
-  "crates/bevy_extract",
-  "crates/bevy_feathers",
-  "crates/bevy_gilrs",
-  "crates/bevy_gizmos",
-  "crates/bevy_gizmos_render",
-  "crates/bevy_gltf",
-  "crates/bevy_image",
-  "crates/bevy_input",
-  "crates/bevy_input_focus",
-  "crates/bevy_internal",
-  "crates/bevy_light",
-  "crates/bevy_log",
-  "crates/bevy_macro_utils",
-  "crates/bevy_material",
-  "crates/bevy_math",
-  "crates/bevy_mesh",
-  "crates/bevy_pbr",
-  "crates/bevy_picking",
-  "crates/bevy_platform",
-  "crates/bevy_post_process",
-  "crates/bevy_ptr",
-  "crates/bevy_reflect",
-  "crates/bevy_remote",
-  "crates/bevy_render",
-  "crates/bevy_scene",
-  "crates/bevy_settings",
-  "crates/bevy_shader",
-  "crates/bevy_shape",
-  "crates/bevy_solari",
-  "crates/bevy_sprite",
-  "crates/bevy_sprite_render",
-  "crates/bevy_state",
-  "crates/bevy_tasks",
-  "crates/bevy_text",
-  "crates/bevy_time",
-  "crates/bevy_transform",
-  "crates/bevy_ui",
-  "crates/bevy_ui_render",
-  "crates/bevy_ui_widgets",
-  "crates/bevy_utils",
-  "crates/bevy_window",
-  "crates/bevy_winit",
-  "crates/bevy_world_serialization",
-  "crates/build-easefunction-graphs",
-  "crates/build-templated-pages",
-  "crates/build-wasm-example",
-  "crates/compile_fail_utils",
-  "crates/example-showcase",
-  "crates/export-content",
-  "crates/bevy_derive/compile_fail",
-  "crates/bevy_ecs/compile_fail",
-  "crates/bevy_reflect/compile_fail",
-  "crates/bevy/benches",
-  "crates/bevy/errors",
-  "crates/bevy/examples/mobile",
-  "crates/bevy/examples/no_std/library",
-  "crates/bevy/examples/reflection/auto_register_static",
-  "crates/bevy/examples/large_scenes/bistro",
-  "crates/bevy/examples/large_scenes/caldera_hotel",
-  "crates/bevy/examples/large_scenes/bevy_city",
-  "crates/bevy/examples/large_scenes/mipmap_generator",
-  "tools/bevy/ci",
 ]
 
 [workspace.package]
@@ -714,6 +631,12 @@ correctness = { level = "warn", priority = -1 }
 perf = { level = "warn", priority = -1 }
 
 [workspace.dependencies]
+bun_git = { path = "crates/bun-os-git", version = "1.4.7" }
+bun_native = { path = "crates/bun-os-native", version = "1.4.7" }
+bun_pkg = { path = "crates/bun-os-pkg", version = "1.4.7" }
+gix = { version = "0.88", default-features = false, features = ["sha1", "basic", "extras", "comfort", "max-performance-safe", "revision", "index", "worktree-mutation"] }
+octocrab = { version = "0.54", default-features = false, features = ["default-client", "follow-redirect", "retry", "rustls", "rustls-ring", "timeout"] }
+serde_yaml = { package = "yaml_serde", version = "0.10" }
 slog = { version = "2.7" }
 arm-decoder = { git = "https://github.com/kelpsyberry/arm-decoder" }
 cocoa = { version = "0.25" }
@@ -721,7 +644,7 @@ objc = { version = "0.2" }
 magika = { version = "1.1.0" }
 rusty-leveldb = { version = "4", default-features = false }
 yara-x = { version = "1.7.0", default-features = false }
-cairo-rs = { version = "0.21" }
+cairo-rs = { version = "0.22" }
 core-graphics = { version = "0.23" }
 core-foundation = { version = "0.9" }
 gdk4-x11 = { version = "0.11" }
@@ -751,8 +674,8 @@ aphrody-models = { path = "crates/aphrody-models", version = "1.4.7", features =
 aphrody-rag-core = { path = "crates/aphrody-rag-core", version = "1.4.7", features = [] }
 rookie-cookies = { version = "0.6.0" }
 yolo-runtime = { path = "crates/yolo-runtime", version = "1.4.7" }
-bun-python-host = { path = "toolchains/bun/packages/bun-python-native/crates/bun-python-host" }
-# PyO3 resolves to the fork pinned by toolchains/bun ([patch.crates-io] below).
+bun-python-host = { version = "0.1.0" }
+# PyO3 resolves to the aphrody-labs fork pinned in [patch.crates-io] below.
 pyo3 = { version = "0.29.3" }
 mimalloc = { version = "0.1", default-features = false, features = [] }
 aphrody-backend = { path = "crates/aphrody-backend", version = "1.4.7", features = [] }
@@ -770,8 +693,8 @@ soundcraft-engine = { path = "crates/soundcraft-engine", version = "0.6.1" }
 soundcraft-ui-egui = { path = "crates/soundcraft-ui-egui", version = "0.6.1" }
 soundcraft-playback = { path = "crates/soundcraft-playback", version = "0.6.1" }
 soundcraft-model = { path = "crates/soundcraft-model", version = "0.6.1" }
-aphrody-web-extract = { package = "bun_browser_extract", path = "toolchains/bun/src/browser/crates/extract" }
-aphrody-web-index = { package = "bun_browser_index", path = "toolchains/bun/src/browser/crates/index" }
+aphrody-web-extract = { package = "bun_browser_extract", version = "1.4.7" }
+aphrody-web-index = { package = "bun_browser_index", version = "1.4.7" }
 aphrody-gemini-web = { path = "crates/aphrody-gemini-web", version = "1.4.7" }
 aphrody-site = { path = "crates/aphrody-site", version = "1.4.7" }
 aphrody-webos-wasm = { path = "crates/aphrody-webos-wasm", version = "1.4.7" }
@@ -780,7 +703,7 @@ aphrody-shell-vfs = { path = "crates/aphrody-shell-vfs", version = "1.4.7" }
 aphrody-terminal-core = { path = "crates/aphrody-terminal-core", version = "1.4.7" }
 aphrody-shell-web = { path = "crates/aphrody-shell-web", version = "1.4.7" }
 aphrody-google = { path = "crates/aphrody-google", version = "1.4.7" }
-rio-vt = { path = "toolchains/bun/src/rio/rio-vt", default-features = false }
+rio-vt = { version = "0.5.28", default-features = false }
 tower = { version = "0.5.3", features = ["util"] }
 tower-http = { version = "0.7.1", features = ["cors"] }
 aphrody-gemini-runtime = { path = "crates/aphrody-gemini-runtime", version = "1.4.7" }
@@ -794,18 +717,17 @@ tonic-prost = { version = "0.14.6" }
 tonic-prost-build = { version = "0.14.6" }
 protoc-bin-vendored = { version = "3.2.0" }
 aphrody-mcp-client = { path = "crates/aphrody-mcp-client", version = "1.4.7" }
-aphrody-x = { package = "bun_x", path = "toolchains/bun/src/x" }
-obscura-dom = { package = "bun_browser_dom", path = "toolchains/bun/src/browser/crates/dom" }
-obscura-net = { package = "bun_browser_net", path = "toolchains/bun/src/browser/crates/net" }
+aphrody-x = { package = "bun_x", version = "1.4.7" }
+obscura-dom = { package = "bun_browser_dom", version = "1.4.7" }
+obscura-net = { package = "bun_browser_net", version = "1.4.7" }
 craft-fonts = { path = "crates/craft-fonts", version = "1.4.7" }
-craft-fonts-tests = { path = "crates/craft-fonts-tests", version = "1.4.7" }
 craft-atomic = { path = "crates/craft-atomic", version = "1.4.7" }
 craft-settings = { path = "crates/craft-settings", version = "1.4.7" }
 craft-cms = { path = "crates/craft-cms", version = "1.4.7" }
 craft-print = { path = "crates/craft-print", version = "1.4.7" }
 craft-quit = { path = "crates/craft-quit", version = "1.4.7" }
 craft-ui = { path = "crates/craft-ui", version = "1.4.7" }
-pdfcraft-compare = { path = "crates/pdfcraft-compare", version = "1.4.7" }
+aphrody-themes = { path = "crates/aphrody-themes", version = "1.4.7" }
 cadcraft-color = { path = "crates/cadcraft-color", version = "1.4.7" }
 cadcraft-geom = { path = "crates/cadcraft-geom", version = "1.4.7" }
 cadcraft-doc = { path = "crates/cadcraft-doc", version = "1.4.7" }
@@ -819,7 +741,6 @@ cadcraft-mcp = { path = "crates/cadcraft-mcp", version = "1.4.7" }
 cadcraft-render = { path = "crates/cadcraft-render", version = "1.4.7" }
 cadcraft-ui-egui = { path = "crates/cadcraft-ui-egui", version = "1.4.7" }
 cadcraft = { path = "crates/cadcraft", version = "1.4.7" }
-gridcraft-pdf = { path = "crates/gridcraft-pdf", version = "1.4.7" }
 aphrody-a2a = { path = "crates/aphrody-a2a", version = "1.4.7" }
 aphrody-agent-proto = { path = "crates/aphrody-agent-proto", version = "1.4.7" }
 aphrody-app-protocol = { path = "crates/aphrody-app-protocol", version = "1.4.7" }
@@ -880,6 +801,8 @@ sha2 = { version = "0.11.1", default-features = false }
 similar = { version = "3.2.0", default-features = false }
 taffy = { version = "0.9.2" }
 tempfile = { version = "3.27.0", default-features = false, features = ["getrandom"] }
+open = { version = "5.4.3" }
+dunce = "1.0.5"
 thiserror = { version = "2.0.21", default-features = false }
 tiny-skia = { version = "0.11.4", default-features = false, features = ["std", "simd", "png-format"] }
 toml = { version = "1.1.8+spec-1.1.0", default-features = false }
@@ -900,18 +823,18 @@ zbus = { version = "5.19.0", default-features = false }
 # Vendored crates carried by PdfCraft (patch notes in apps/pdfcraft/vendor/README.md).
 # DesignCraft's former winit git patch (skylartaylor/winit 3d51077) is superseded by this vendored copy.
 # Dependencies absorbed from iecode.
-bevy = { path = "crates/bevy", version = "0.20.0", default-features = false, features = ["std"] }
-bevy_app = { path = "crates/bevy_app", version = "0.20.0", default-features = false, features = ["std"] }
-iecode-bevy-app = { package = "bevy_app", path = "crates/bevy_app", version = "0.20.0", default-features = false, features = ["std"] }
-bevy_asset = { path = "crates/bevy_asset", version = "0.20.0", default-features = false }
-bevy_ecs = { path = "crates/bevy_ecs", version = "0.20.0", default-features = false, features = ["std"] }
-iecode-bevy-ecs = { package = "bevy_ecs", path = "crates/bevy_ecs", version = "0.20.0", default-features = false, features = ["std"] }
-bevy_image = { path = "crates/bevy_image", version = "0.20.0", default-features = false, features = ["bevy_reflect"] }
-bevy_math = { path = "crates/bevy_math", version = "0.20.0", default-features = false }
-bevy_mesh = { path = "crates/bevy_mesh", version = "0.20.0", default-features = false }
-bevy_reflect = { path = "crates/bevy_reflect", version = "0.20.0", default-features = false }
-bevy_input = { path = "crates/bevy_input", version = "0.20.0", default-features = false, features = ["std", "keyboard"] }
-bevy_time = { path = "crates/bevy_time", version = "0.20.0", default-features = false, features = ["std"] }
+bevy = { version = "0.20.1", default-features = false, features = ["std"] }
+bevy_app = { version = "0.20.1", default-features = false, features = ["std"] }
+iecode-bevy-app = { package = "bevy_app", version = "0.20.1", default-features = false, features = ["std"] }
+bevy_asset = { version = "0.20.1", default-features = false }
+bevy_ecs = { version = "0.20.1", default-features = false, features = ["std"] }
+iecode-bevy-ecs = { package = "bevy_ecs", version = "0.20.1", default-features = false, features = ["std"] }
+bevy_image = { version = "0.20.1", default-features = false, features = ["bevy_reflect"] }
+bevy_math = { version = "0.20.1", default-features = false }
+bevy_mesh = { version = "0.20.1", default-features = false }
+bevy_reflect = { version = "0.20.1", default-features = false }
+bevy_input = { version = "0.20.1", default-features = false, features = ["std", "keyboard"] }
+bevy_time = { version = "0.20.1", default-features = false, features = ["std"] }
 bevy-wgpu-types = { package = "wgpu-types", version = "30.0.1", default-features = false }
 wgpu = { version = "30.0.1", default-features = false, features = ["std", "wgsl", "vulkan", "gles", "dx12", "metal", "web", "webgpu"] }
 wgpu-types = { version = "30.0.1", default-features = false, features = ["std"] }
@@ -943,7 +866,7 @@ aphrody-gpu-backend = { path = "crates/aphrody-gpu-backend", version = "1.4.7", 
 aphrody-wii = { path = "crates/aphrody-wii", version = "0.1.1" }
 aphrody-wii-image = { path = "crates/aphrody-wii-image", version = "0.1.1" }
 aphrody-switch = { path = "crates/aphrody-switch", version = "0.1.1" }
-ghidra-decompiler = { path = "crates/ghidra-decompiler", version = "2.1.0" }
+ghidra-decompiler = "2.1.0"
 parking_lot = "0.12.3"
 proc-bitfield = { version = "0.5" }
 bitfield-struct = "0.12"
@@ -1064,7 +987,7 @@ io-lifetimes = { version = "3.0.1", default-features = false }
 itertools = "0.14.0"
 ittapi = "0.4.0"
 jobserver = "0.1"
-js-sys = { version = "0.3.104", default-features = false }
+js-sys = { version = "0.3.106", default-features = false }
 json-from-wast = "0.251.0"
 kamadak-exif = "0.6"
 khronos-egl = "6"
@@ -1234,7 +1157,7 @@ ureq = { version = "3.2.0", default-features = false }
 walkdir = "2.5.0"
 wasip1 = { version = "1.0.0", default-features = false }
 wasip2 = "1.0"
-wasm-bindgen = { version = "0.2.127", default-features = false }
+wasm-bindgen = { version = "0.2.129", default-features = false }
 wasm-bindgen-futures = "0.4"
 wasm-compose = { version = "0.251.0", default-features = false }
 wasm-encoder = "0.251.0"
@@ -1358,9 +1281,50 @@ input_common = { path = "crates/ruzu-input-common", version = "1.4.7" }
 video_core = { path = "crates/ruzu-video-core", version = "1.4.7" }
 frontend_common = { path = "crates/ruzu-frontend-common", version = "1.4.7" }
 shader_recompiler = { path = "crates/ruzu-shader-recompiler", version = "1.4.7" }
-tauri = { package = "aphrody-tauri", path = "packages/bun-tauri/crates/aphrody-tauri", version = "1.4.7", default-features = false }
-tauri-build = { package = "aphrody-tauri-build", path = "packages/bun-tauri/crates/aphrody-tauri-build", version = "1.4.7" }
-tauri-plugin = { package = "aphrody-tauri-plugin", path = "packages/bun-tauri/crates/aphrody-tauri-plugin", version = "1.4.7" }
+# bunos-wsl (GPL-3.0, derived from octasoft-ltd/wsl-ui; docs/wsl/PROVENANCE.md)
+tar = "0.4"
+ruzstd = "0.9"
+jsonc-parser = "0.34"
+configparser = "3"
+lazy_static = "1.5"
+shell-escape = "0.1"
+winreg = "0.56"
+wiremock = "0.6"
+# One Tauri line for the whole monorepo: upstream tauri-apps/tauri v3 alpha from crates.io (the aphrody-labs/tauri fork carries no patch).
+# Members consume these with `workspace = true` and only add features; bump here and nowhere else.
+tauri = { version = "=3.0.0-alpha.5", default-features = false }
+tauri-build = { version = "=3.0.0-alpha.4" }
+tauri-plugin = { version = "=3.0.0-alpha.4" }
+tauri-utils = { version = "=3.0.0-alpha.4" }
+tauri-runtime = { version = "=3.0.0-alpha.4" }
+tauri-runtime-wry = { version = "=3.0.0-alpha.5" }
+tauri-runtime-cef = { version = "=3.0.0-alpha.6" }
+tauri-cli = { version = "=3.0.0-alpha.5" }
+create-tauri-app = { version = "=4.8.0" }
+wry = { version = "0.57.1" }
+tao = { version = "0.37.2" }
+tray-icon = { version = "0.26.1" }
+webview2-com = { version = "0.39.1" }
+tauri-plugin-autostart = { version = "=3.0.0-alpha.3" }
+tauri-plugin-clipboard-manager = { version = "=3.0.0-alpha.3" }
+tauri-plugin-deep-link = { version = "=3.0.0-alpha.3" }
+tauri-plugin-dialog = { version = "=3.0.0-alpha.4" }
+tauri-plugin-fs = { version = "=3.0.0-alpha.3" }
+tauri-plugin-global-shortcut = { version = "=3.0.0-alpha.3" }
+tauri-plugin-http = { version = "=3.0.0-alpha.3" }
+tauri-plugin-log = { version = "=3.0.0-alpha.3" }
+tauri-plugin-notification = { version = "=3.0.0-alpha.3" }
+tauri-plugin-opener = { version = "=3.0.0-alpha.3" }
+tauri-plugin-os = { version = "=3.0.0-alpha.3" }
+tauri-plugin-process = { version = "=3.0.0-alpha.3" }
+tauri-plugin-shell = { version = "=3.0.0-alpha.3" }
+tauri-plugin-single-instance = { version = "=3.0.0-alpha.3" }
+tauri-plugin-store = { version = "=3.0.0-alpha.3" }
+tauri-plugin-updater = { version = "=3.0.0-alpha.3" }
+tauri-plugin-upload = { version = "=3.0.0-alpha.2" }
+tauri-plugin-window-state = { version = "=3.0.0-alpha.2" }
+tauri-plugin-mcp-bridge = { path = "crates/tauri-plugin-mcp-bridge", version = "1.4.7" }
+tauri-plugin-aphrody = { path = "crates/tauri-plugin-aphrody", version = "1.4.7", default-features = false }
 aphrody-render = { path = "crates/aphrody-render", version = "1.4.7" }
 aphrody-m3-tokens = { path = "crates/aphrody-m3-tokens", version = "1.4.7" }
 cubeb = "0.34"
@@ -1378,8 +1342,27 @@ vk-mem = "0.5"
 spirv-cross2 = "0.7"
 
 [patch.crates-io]
+# Obscura headless browser crates (aphrody-labs/bun-obscura, snapshot of the fork src/browser merged with h4ckf0r0day/obscura 3285fbc2357a); replaces the crates.io 1.4.7 releases.
+bun_browser = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_browser = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_cdp = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_crawl = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_detect = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_dom = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_engine = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_extract = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_frames = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_index = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_js = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_layout = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_mcp = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_net = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_process = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_render = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_service = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
+bun_browser_ssrf = { git = "https://github.com/aphrody-labs/bun-obscura", rev = "897dcbbe13d80fbc47b2aa760fc9b8c7296fae91" }
 cubeb-sys = { path = "vendor/cubeb-rs/cubeb-sys" }
-# PyO3: same fork and pin as the [patch.crates-io] of toolchains/bun/Cargo.toml.
+# PyO3: aphrody-labs fork, pinned.
 pyo3 = { git = "https://github.com/aphrody-labs/pyo3", rev = "451d99fdcdcddf159e8e0a1186960b332cdb5d7c" }
 pyo3-build-config = { git = "https://github.com/aphrody-labs/pyo3", rev = "451d99fdcdcddf159e8e0a1186960b332cdb5d7c" }
 pyo3-ffi = { git = "https://github.com/aphrody-labs/pyo3", rev = "451d99fdcdcddf159e8e0a1186960b332cdb5d7c" }
@@ -1419,7 +1402,6 @@ debug = false
 strip = true
 incremental = false
 
-# Bevy (crates/bevy): stress tests and the mobile example, as upstream.
 # Craft browser apps (apps/webos/build-craft.ts): smallest download; wasm-bindgen and wasm-opt -Oz run afterwards.
 [profile.web-craft]
 inherits = "release"
@@ -1431,9 +1413,3 @@ debug = false
 strip = true
 incremental = false
 
-[profile.stress-test]
-inherits = "release"
-lto = "fat"
-panic = "abort"
-[profile.dev.package.bevy_mobile_example]
-strip = true

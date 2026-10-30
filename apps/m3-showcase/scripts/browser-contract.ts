@@ -6,7 +6,7 @@ import { mkdir } from "node:fs/promises";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, type Page } from "playwright-core";
-import { PAGES } from "../src/pages/index.ts";
+import { PAGES } from "@aphrody/app-ui/material/pages/index.ts";
 import { CHROMIUM_ARGS } from "./shots.ts";
 
 const RUNS = fileURLToPath(

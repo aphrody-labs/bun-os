@@ -34,8 +34,8 @@ fn stdio_transport_parses() {
 #[test]
 fn streamable_http_transport_parses() {
     let toml_str = r#"
-        url = "https://mcp.dragonballfr.com/mcp"
-        bearer_token_env_var = "DBFR_MCP_TOKEN"
+        url = "https://mcp.example.com/mcp"
+        bearer_token_env_var = "DOCS_MCP_TOKEN"
         enabled = false
         tool_timeout_sec = 30
         disabled_tools = ["dangerous_tool"]
@@ -47,8 +47,8 @@ fn streamable_http_transport_parses() {
             bearer_token_env_var,
             http_headers,
         } => {
-            assert_eq!(url, "https://mcp.dragonballfr.com/mcp");
-            assert_eq!(bearer_token_env_var.as_deref(), Some("DBFR_MCP_TOKEN"));
+            assert_eq!(url, "https://mcp.example.com/mcp");
+            assert_eq!(bearer_token_env_var.as_deref(), Some("DOCS_MCP_TOKEN"));
             assert_eq!(http_headers, None);
         }
         McpServerTransportConfig::Stdio { .. } => panic!("expected streamable http"),

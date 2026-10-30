@@ -1,4 +1,0 @@
-Source: https://github.com/spacedriveapp/spacedrive/tree/4d41a379f612e23ac43a66ffd67df52ca77f57d4/packages/interface
-Repository commit: 4d41a379f612e23ac43a66ffd67df52ca77f57d4
-License and attribution: LICENSE.spacedrive and NOTICE.spacedrive copied from that exact repository commit.
-This is a provenance-preserving source archive. The active Bun OS Files surface remains packages/app-ui and consumes @aphrody/m3-explorer plus @aphrody/drive-client; this snapshot does not claim route or runtime parity.

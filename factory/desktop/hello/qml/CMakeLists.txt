@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.21)
+project(hello-qml LANGUAGES CXX)
+find_package(Qt6 REQUIRED COMPONENTS Qml Quick)
+add_executable(hello-qml WIN32 main.cpp)
+target_link_libraries(hello-qml PRIVATE Qt6::Qml Qt6::Quick)
+install(TARGETS hello-qml RUNTIME DESTINATION bin)

@@ -4,8 +4,8 @@
 # home, remote_vnc, site_catalog; the published release behind aphrody:runtime has none of them) on the Bun fork
 # image, which also gives the in-container `bun` the M3 tool host needs. Built and shipped by
 # scripts/release/toolbox-image.ts on the vps (context: a staging directory holding this file and `aphrody`).
-# dbfr runs it as the compose services mcp-http, compute, embed and jobs (tools/config/container/compose.yaml).
-ARG BASE=ghcr.io/aphrody-labs/bun:1.4.3-aphrody.3
+# dbfr runs it as the compose services mcp-http and jobs-worker (tools/config/container/compose.yaml).
+ARG BASE=docker.io/oven/bun:1.4.4
 FROM ${BASE}
 USER root
 COPY --chmod=0755 aphrody /usr/local/bin/aphrody

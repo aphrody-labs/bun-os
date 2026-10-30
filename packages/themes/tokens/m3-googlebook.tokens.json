@@ -1,0 +1,124 @@
+{
+  "$description": "Material 3 Expressive theme for the Google Book OS look. Colors are not listed: every scheme is derived from the accent seed by @material/material-color-utilities (dynamic color, variant tonalSpot). Shape, motion and type mirror @aphrody/m3-tokens (generated from material-web).",
+  "$extensions": {
+    "aphrody": {
+      "id": "m3",
+      "name": "Material 3 (Google Book OS)",
+      "accentModel": "m3-dynamic",
+      "defaultAccent": "purple",
+      "variant": "tonalSpot",
+      "sources": [
+        {
+          "what": "Dynamic color engine",
+          "url": "https://github.com/material-foundation/material-color-utilities",
+          "version": "@material/material-color-utilities 0.4.0"
+        },
+        {
+          "what": "Component tokens and web components",
+          "url": "https://github.com/material-components/material-web",
+          "version": "@material/web 2.5.0 (2026-10-23)"
+        },
+        {
+          "what": "Shape, motion, typescale, Expressive springs and emphasized type",
+          "url": "packages/m3-tokens/src/m3-tokens.css and expressive.ts",
+          "version": "@aphrody/m3-tokens 1.4.7"
+        },
+        {
+          "what": "Googlebook: Material 3 Expressive UI, Android-based, Linux kernel, formerly Aluminium OS, launch 2026-09-22 coverage",
+          "url": "https://www.pcwelt.de/article/3240725/googles-neues-betriebssystem-ist-da-unter-neuem-namen-googlebookos-aluminiumos.html"
+        },
+        {
+          "what": "Official page (hardware only: no UI, color or type statement)",
+          "url": "https://googlebook.google/intl/fr_fr/"
+        }
+      ],
+      "unknown": [
+        "Googlebook OS accent/seed colors, wallpaper-derived color source, and shell font are not published: default seed is the M3 baseline purple 6750A4.",
+        "Whether Googlebook uses blur or glass surfaces is not published: this theme has none.",
+        "Window controls: no published spec for the Googlebook shell, caption buttons follow the M3 icon button."
+      ]
+    }
+  },
+  "accent": {
+    "$type": "color",
+    "$description": "Seeds. purple is the M3 baseline seed; the others are Google brand colors.",
+    "purple": { "$value": "#6750A4" },
+    "blue": { "$value": "#4285F4" },
+    "red": { "$value": "#DB4437" },
+    "yellow": { "$value": "#F4B400" },
+    "green": { "$value": "#0F9D58" },
+    "teal": { "$value": "#009688" },
+    "orange": { "$value": "#E8710A" },
+    "pink": { "$value": "#C2185B" }
+  },
+  "extra": {
+    "$type": "color",
+    "$description": "M3 has no success or warning roles; these are fixed extensions, not M3 tokens.",
+    "light": {
+      "success": { "$value": "#146C2E" },
+      "warning": { "$value": "#7A5900" }
+    },
+    "dark": {
+      "success": { "$value": "#81C995" },
+      "warning": { "$value": "#F2C94C" }
+    }
+  },
+  "shape": {
+    "$type": "dimension",
+    "none": { "$value": "0px" },
+    "sm": { "$value": "8px", "$description": "md.sys.shape.corner.small" },
+    "md": { "$value": "12px", "$description": "medium" },
+    "lg": { "$value": "16px", "$description": "large" },
+    "xl": { "$value": "28px", "$description": "extra-large" },
+    "full": { "$value": "9999px" },
+    "control": {
+      "$value": "9999px",
+      "$description": "buttons and chips are fully rounded in M3 Expressive"
+    },
+    "container": { "$value": "28px" }
+  },
+  "typography": {
+    "fontUi": {
+      "$type": "fontFamily",
+      "$value": ["Google Sans Flex", "Google Sans", "Roboto Flex", "Roboto", "system-ui", "sans-serif"],
+      "$description": "Google Sans Flex and Roboto Flex are SIL OFL, bundled by @aphrody/m3-fonts."
+    },
+    "fontDisplay": {
+      "$type": "fontFamily",
+      "$value": ["Google Sans Flex", "Google Sans", "Roboto Flex", "Roboto", "system-ui", "sans-serif"]
+    },
+    "fontMono": {
+      "$type": "fontFamily",
+      "$value": ["Google Sans Code", "Roboto Mono", "ui-monospace", "monospace"]
+    }
+  },
+  "motion": {
+    "fast": {
+      "$type": "duration",
+      "$value": "150ms",
+      "$description": "md.sys.motion.duration.short3"
+    },
+    "normal": {
+      "$type": "duration",
+      "$value": "300ms",
+      "$description": "medium2"
+    },
+    "slow": { "$type": "duration", "$value": "500ms", "$description": "long2" },
+    "easing": {
+      "$type": "cubicBezier",
+      "$value": [0.2, 0, 0, 1],
+      "$description": "md.sys.motion.easing.emphasized / standard"
+    },
+    "springs": {
+      "fast": { "damping": 0.6, "stiffness": 800 },
+      "default": { "damping": 0.8, "stiffness": 380 },
+      "slow": { "damping": 0.8, "stiffness": 200 }
+    }
+  },
+  "material": {
+    "blur": 0,
+    "saturate": 100,
+    "controls": "m3",
+    "windowEffects": { "windows": [], "macos": [], "other": [] }
+  }
+}

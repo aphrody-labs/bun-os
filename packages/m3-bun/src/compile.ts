@@ -11,8 +11,8 @@
 //
 // Limit, measured: the executable is the Bun runtime plus the app. It is not static. The glibc targets need
 // libc, libm, libdl, libpthread and the loader at run time; the `-musl` targets need musl and libstdc++. A
-// container or distro image therefore carries those libraries (see `rootfs` in package.ts and the `docker` and
-// `linux-image` targets) instead of being empty.
+// container or distro image therefore carries those libraries (see `rootfs` in package.ts and the `docker`
+// target) instead of being empty.
 import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";

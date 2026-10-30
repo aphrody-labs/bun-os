@@ -8,8 +8,6 @@
 //!     haute disponibilité)
 //!   - `Backend::MyMemory`  -> API MyMemory historique (repli)
 //!
-//! La chaîne JP -> FR des databooks Dragon Ball (protection du lexique canonique, contrôle qualité)
-//! appartient à Shenron (`shenron-translate`, aphrody-labs/shenron) et s'appuie sur ce moteur.
 
 #[cfg(not(target_arch = "wasm32"))]
 use aphrody_proc::NoWindow as _;

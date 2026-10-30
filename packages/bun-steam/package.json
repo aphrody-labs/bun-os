@@ -25,9 +25,10 @@
     "typecheck": "bun check --noEmit -p ."
   },
   "dependencies": {
-    "@aphrody/paths": "workspace:*"
+    "@aphrody/paths": "workspace:*",
+    "@aphrody/windows": "workspace:*"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

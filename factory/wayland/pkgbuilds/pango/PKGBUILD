@@ -1,0 +1,25 @@
+# STUB, UNVERIFIED (never built): pango 1.90 pinned to the exact commit of factory/wayland/closure.json.
+# Replaces Arch 1.58.2 for the opt-in Hyprland composition; same package name, so the local repository must precede core/extra.
+pkgname=pango
+pkgver=1.90
+pkgrel=1
+_commit=45522cd5c68ef9ef6e67a902a45a4e39dfcddaf7
+pkgdesc='pango pinned by the Bun OS Wayland closure'
+arch=(x86_64)
+url='https://gitlab.gnome.org/GNOME/pango'
+license=(custom)
+depends=('cairo' 'fontconfig' 'freetype2' 'fribidi' 'glib2' 'glibc' 'harfbuzz' 'libsysprof-capture' 'libthai' 'libx11' 'libxft' 'libxrender')
+makedepends=('gi-docgen' 'git' 'glib2-devel' 'gobject-introspection' 'help2man' 'meson' 'python-docutils' 'ninja')
+source=("$pkgname::git+https://gitlab.gnome.org/GNOME/pango.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  _src="$srcdir/$pkgname"
+  arch-meson build "$_src"
+  meson compile -C build
+}
+
+package() {
+  _src="$srcdir/$pkgname"
+  meson install -C build --destdir "$pkgdir"
+}

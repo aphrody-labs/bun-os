@@ -13,7 +13,7 @@
     "paths": {
       "~/*": ["./src/*"]
     },
-    "types": ["@aphrody/bun-types", "@react-three/fiber"]
+    "types": ["bun-types", "@react-three/fiber"]
   },
   "include": [
     "src",
@@ -23,8 +23,7 @@
     "undeclared-deps.ts",
     "m3.config.ts",
     "../assets/types.d.ts",
-    "../bun-tauri/js/api/global.d.ts",
-    "../drive-client/src/tiny-invariant.d.ts"
+    "../bun-tauri/js/api/global.d.ts"
   ],
   "exclude": ["src/**/*.test.ts"]
 }

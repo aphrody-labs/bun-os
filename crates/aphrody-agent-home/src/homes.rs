@@ -284,9 +284,9 @@ mod tests {
             root.agent_home("Bot 1").unwrap(),
             state.path().join("workspace-bot-1")
         );
-        assert_eq!(root.home("dbfr"), state.path().join("workspaces/dbfr"));
-        std::fs::create_dir_all(state.path().join("workspace-dbfr")).unwrap();
-        assert_eq!(root.home("dbfr"), state.path().join("workspace-dbfr"));
+        assert_eq!(root.home("docs"), state.path().join("workspaces/docs"));
+        std::fs::create_dir_all(state.path().join("workspace-docs")).unwrap();
+        assert_eq!(root.home("docs"), state.path().join("workspace-docs"));
         assert_eq!(root.home(""), state.path().join("workspace"));
     }
 
@@ -336,7 +336,7 @@ mod tests {
         for d in [
             "workspaces/aphrody",
             "workspaces/.hidden",
-            "workspace-dbfr",
+            "workspace-docs",
             "workspace-aphrody",
         ] {
             std::fs::create_dir_all(state.path().join(d)).unwrap();
@@ -350,7 +350,7 @@ mod tests {
             .collect();
         assert_eq!(
             names,
-            [("aphrody".to_string(), false), ("dbfr".to_string(), true)]
+            [("aphrody".to_string(), false), ("docs".to_string(), true)]
         );
         assert!(root.new_home_path("..").is_err());
     }

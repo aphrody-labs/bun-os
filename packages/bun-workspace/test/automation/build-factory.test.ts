@@ -57,8 +57,8 @@ test("declared source names and branches drive canonical OS and runtime verifica
     expect(() => buildFactoryPreparePlan(declared, id, "main", source)).toThrow("pinned");
   }
   for (const url of [
-    "git@wrong-alias:aphrody-labs/bun.git",
-    "https://fixture:secret@github.com/aphrody-labs/bun.git",
+    "git@wrong-alias:aphrody-labs/example.git",
+    "https://fixture:secret@github.com/aphrody-labs/example.git",
     "https://github.com/unowned/bun.git",
   ])
     expect(() => factoryRemoteUrl(url, "bun", ["aphrody-labs"])).toThrow("declared private");
@@ -456,7 +456,7 @@ test("Yolo shares factory caches while preserving its canonical packaging target
   const declared: BuildFactoryConfig = await Bun.file(
     join(import.meta.dir, "../../../../tools/aphrody/config/build-factory.json"),
   ).json();
-  expect(declared.repositories.yolo).toBe("/home/ubuntu/src/yolo");
+  expect(declared.repositories.yolo).toBe("/home/ubuntu/src/bun-os");
   const plan = buildFactoryPlan(declared, "yolo", revision, ["just", "runtime-package"]);
   expect(plan.repository).toBe("yolo");
   expect(plan.workspace).toBe(declared.repositories.yolo!);

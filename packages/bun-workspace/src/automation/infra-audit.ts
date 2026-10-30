@@ -502,7 +502,7 @@ export async function runInfraAudit(args: string[]): Promise<number> {
     ]);
     // OVH belongs to the Rust Infra owner (`aphrody ovh` = `aphrody infra ovh`).
     await observe("Native OVH profiles", [...binary, "--root", root, "ovh", "profiles"]);
-    for (const profile of ["aphrody.com", "rosegriffon.fr", "dragonballfr.com"])
+    for (const profile of ["aphrody.com"])
       await observe(
         `Native OVH API ${profile}`,
         [...binary, "--root", root, "ovh", "status", "--profile", profile],

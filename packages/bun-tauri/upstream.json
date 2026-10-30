@@ -1,0 +1,70 @@
+{
+  "checkedAt": "2026-10-29",
+  "tauri": {
+    "repository": "https://github.com/tauri-apps/tauri",
+    "v3": {
+      "branch": "v3",
+      "sha": "78f49ba3993fed5a1b921235c547731006ad2a74",
+      "date": "2026-10-21",
+      "tauri": "3.0.0-alpha.5",
+      "tauri-cli": "3.0.0-alpha.5",
+      "tauri-runtime-cef": "3.0.0-alpha.6",
+      "tauri-utils": "3.0.0-alpha.4"
+    },
+    "stable": {
+      "branch": "dev",
+      "sha": "548a3692f59405aeb239c5b63fa589824eee51e8",
+      "date": "2026-10-28",
+      "tauri": "2.12.5",
+      "tauri-cli": "2.12.4",
+      "release": "tauri-v2.12.5 (993038c49185, 2026-10-21)"
+    }
+  },
+  "plugins": {
+    "repository": "https://github.com/tauri-apps/plugins-workspace",
+    "branch": "v3",
+    "sha": "3d836244bcb97cb1620405e8d1887da285a793d4",
+    "date": "2026-10-14"
+  },
+  "tao": {
+    "release": "tao-v0.37.2",
+    "date": "2026-10-23",
+    "dev": "39d130f9bd604bea1b183581b5fb47939a193a40"
+  },
+  "wry": {
+    "release": "wry-v0.57.1",
+    "date": "2026-10-23",
+    "dev": "5006b49b3a643b5544263ff9863b797a810d549b"
+  },
+  "npm": {
+    "@tauri-apps/cli": {
+      "next": "3.0.0-alpha.5",
+      "latest": "2.12.4"
+    },
+    "@tauri-apps/api": {
+      "next": "3.0.0-alpha.3",
+      "latest": "2.12.4"
+    }
+  },
+  "previousBase": {
+    "aphrody-tauri": "tauri-v3.0.0-alpha.4",
+    "aphrody-tauri-utils": "tauri-utils-v3.0.0-alpha.3",
+    "aphrody-tauri-runtime": "tauri-runtime-v3.0.0-alpha.3",
+    "aphrody-tauri-runtime-cef": "tauri-runtime-cef-v3.0.0-alpha.5",
+    "aphrody-tauri-plugin": "tauri-plugin-v3.0.0-alpha.3",
+    "aphrody-tauri-build": "tauri-build-v3.0.0-alpha.3",
+    "aphrody-tauri-codegen": "tauri-codegen-v3.0.0-alpha.3",
+    "aphrody-tauri-macros": "tauri-macros-v3.0.0-alpha.3",
+    "aphrody-tauri-cli": "tauri-cli-v3.0.0-alpha.4",
+    "aphrody-tauri-bundler": "tauri-bundler-v3.0.0-alpha.3",
+    "aphrody-tauri-macos-sign": "tauri-macos-sign-v3.0.0-alpha.3",
+    "aphrody-tauri-schema-generator": "tauri-v3.0.0-alpha.4",
+    "tauri-plugin-aphrody": "plugins-workspace <plugin>-v3.0.0-alpha.2 (every plugin)"
+  },
+  "syncedTo": {
+    "crates": "tauri-apps/tauri@78f49ba3993fed5a1b921235c547731006ad2a74 (branch v3) for every crates/aphrody-tauri* crate",
+    "tauri-plugin-aphrody": "tauri-apps/plugins-workspace@3d836244bcb97cb1620405e8d1887da285a793d4 (branch v3) for every bundled plugin",
+    "js/api": "@tauri-apps/api 3.0.0-alpha.3 (unchanged on v3 since the previous base)",
+    "next-merge": "three-way merge base = syncedTo; re-run against the new upstream head"
+  }
+}

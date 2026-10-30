@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.21)
+project(hello-qt LANGUAGES CXX)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+add_executable(hello-qt WIN32 main.cpp)
+target_link_libraries(hello-qt PRIVATE Qt6::Widgets)
+install(TARGETS hello-qt RUNTIME DESTINATION bin)

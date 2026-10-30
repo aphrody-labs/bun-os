@@ -37,6 +37,7 @@ mod faces_index;
 mod faces_worker;
 pub mod files;
 pub mod fonts;
+pub mod geocode;
 pub mod guard;
 pub mod import;
 mod import_move;

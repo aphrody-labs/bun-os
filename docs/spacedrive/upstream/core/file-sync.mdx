@@ -1,0 +1,170 @@
+---
+title: File Sync
+description: Explicit, verified movement of file bytes between sources
+sidebarTitle: File Sync
+---
+
+File sync changes where file bytes live. It connects a source scope to a
+destination source through an explicit policy, then plans, transfers, verifies,
+and records each change.
+
+File sync is separate from library sync and remote browsing:
+
+| Operation | Result |
+| --- | --- |
+| Library sync | Devices share registry state and assertions |
+| Remote browse | A client reads an online source without creating a full copy |
+| Cache | A client retains replaceable local data for faster access |
+| File sync | A destination origin gains, updates, or removes durable bytes |
+
+This distinction prevents browsing a remote folder from silently consuming
+storage or creating a backup promise.
+
+## Sync relationships
+
+A sync relationship names:
+
+- a source and source-relative scope;
+- a destination source and path;
+- direction;
+- inclusion policy;
+- deletion policy;
+- conflict behavior;
+- verification strength;
+- schedule or trigger.
+
+Relationships use source and record identity. Mount paths are resolved only when
+work runs, so a removable drive can reconnect at a different operating-system
+path.
+
+## Modes
+
+### Copy
+
+Copy sends selected files to the destination and leaves existing destination
+data alone. It is useful for one-time migration and export.
+
+### Mirror
+
+Mirror makes the destination represent the selected source scope. New and
+changed files flow in one direction. Deletion propagation is a separate,
+visible option because a mirror with deletion is not the same safety property
+as a backup.
+
+### Two-way
+
+Two-way sync accepts changes from either origin. Concurrent changes preserve
+both versions until policy or a person resolves them. A wall-clock timestamp
+alone never silently destroys one side.
+
+### Archive
+
+Archive transfers content to long-term storage, verifies the destination, and
+then releases the source copy if policy allows. The removal step is its own
+auditable action.
+
+### On-demand cache
+
+An on-demand cache keeps selected remote bytes near a client. Cached data can be
+reclaimed because its authoritative source remains known. A pinned cache adds a
+retention requirement and is not evicted automatically.
+
+## Planning from source stores
+
+Source stores make planning efficient because they already contain names,
+hierarchy, sizes, content evidence, and errors. A planner compares source
+generations and produces a concrete change set.
+
+The index is evidence, not permission to assume the origin is unchanged. Before
+mutating data, the executor checks current source availability and validates
+the relevant record at the origin. Stale evidence causes a replan or a visible
+conflict.
+
+## Transfer lifecycle
+
+Each run follows the same lifecycle:
+
+1. **Plan** the required creates, updates, conflicts, and optional removals.
+2. **Authorize** the exact source and destination scopes.
+3. **Transfer** into temporary destination names where the provider permits it.
+4. **Verify** size and content to the configured evidence level.
+5. **Commit** destination names atomically where possible.
+6. **Record** provenance, results, and failures.
+7. **Remove** source bytes only for an approved archive or deletion policy.
+
+The job system persists progress and deduplicates dispatch. A retry continues
+from verified work instead of assuming that an attempted transfer completed.
+
+## Content evidence
+
+Candidate sampled hashes can avoid unnecessary full reads during planning, but
+a destructive decision requires confirmed content.
+
+For a move or archive, Spacedrive verifies the destination against the source
+before deleting the source instance. For a duplicate cleanup, it also checks
+the required number of independent failure domains. Two paths on the same
+physical disk are not two protected copies.
+
+## Conflicts and versions
+
+A conflict exists when both origins changed relative to the last acknowledged
+state or when the current origin no longer matches the planned record.
+
+Spacedrive preserves conflicting bytes under distinct version identity and
+records:
+
+- which origin produced each version;
+- the observed generation and timestamps;
+- content hashes and verification state;
+- the policy decision or person that resolved it.
+
+Views can present one preferred version without erasing the alternatives.
+
+## Remote transfer
+
+Paired nodes request authenticated byte ranges through the common byte-provider
+protocol. Transfers are encrypted end to end and scoped to the granted source
+or subtree.
+
+Interrupted transfers resume from verified ranges when the source and
+destination support it. Provider adapters may choose multipart uploads,
+server-side copies, or local streaming, but they report the same operation
+state.
+
+Index replication between paired devices is not file sync, but it is the one
+transfer Spacedrive starts on its own, and it follows the same rules: a
+partial copy survives a restart and resumes from its length, a bandwidth cap
+and a pause switch are persisted daemon settings, and progress is visible in
+`sd status` and `sd sources list`. See
+[Source replication](/core/networking#source-replication).
+
+## Deletion safety
+
+Deletion propagation is off unless the relationship explicitly enables it.
+Before removing an instance, Spacedrive checks:
+
+- the plan still matches the origin;
+- the destination copy committed;
+- required verification succeeded;
+- retention and legal-hold policy allow removal;
+- the remaining copies satisfy failure-domain policy.
+
+A failed check leaves the source bytes in place and records the reason.
+
+## Visibility
+
+Every sync run exposes planned work, bytes transferred, verification state,
+conflicts, retries, and errors through the same operation API. The desktop app,
+CLI, and agents receive the same facts.
+
+Source availability is always visible. A relationship waiting for an offline
+drive is paused, not reported as complete.
+
+## Related systems
+
+- [Library Sync](/core/library-sync) shares small state and assertions.
+- [Indexing](/core/indexing) creates the source evidence used for planning.
+- [Data Model](/core/data-model) defines content identity and failure-domain
+  reasoning.
+- [File Copy Operations](/core/file-copy-operations) describes individual
+  transfer primitives.

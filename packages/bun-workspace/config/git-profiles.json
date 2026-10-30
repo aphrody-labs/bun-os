@@ -1,0 +1,168 @@
+{
+  "$comment": "Sparse-checkout (cone mode) profiles for `aphrody-bun git profile <name>`. paths are directories (cone mode accepts directories only; top-level files are always checked out). submodules are gitlink paths initialised shallow (--depth 1) after the cone is set; entries ending in /* match every gitlink below that directory. optionalSubmodules get `update = none` in .gitmodules and are only fetched by a profile that lists them.",
+  "schemaVersion": 1,
+  "alwaysPaths": [".cargo", ".github", ".claude", ".gitea", "factory", "scripts", "src"],
+  "optionalSubmodules": [
+    "packages/re/third_party/unblob",
+    "vendor/cachyos-linux",
+    "vendor/ogc-linux",
+    "vendor/linux-cachyos",
+    "vendor/kernel-patches",
+    "vendor/ogc-kernel-packages",
+    "vendor/nvidia-kernels",
+    "vendor/open-gpu-kernel-modules",
+    "vendor/llvm",
+    "vendor/proton",
+    "vendor/proton-cachyos",
+    "vendor/wine-cachyos"
+  ],
+  "profiles": {
+    "core": {
+      "description": "Tooling, factory, docs, infra: enough to run the quality gates that read tracked files only.",
+      "paths": ["docs", "infra", "container", "patches", "tools", "assets"],
+      "submodules": []
+    },
+    "rust-workspace": {
+      "description": "Cargo workspace members and the path dependencies they reference (crates, pdfcraft, bun-tauri, cubeb-rs).",
+      "paths": [
+        "cloud",
+        "crates",
+        "tools",
+        "apps",
+        "packages/bun-tauri",
+        "packages/bun-windows-winclean",
+        "vendor/uutils"
+      ],
+      "submodules": [
+        "crates/*",
+        "vendor/cubeb-rs",
+        "vendor/rustboyadvance-ng",
+        "vendor/starpsx",
+        "vendor/tetanes",
+        "vendor/uutils/*",
+        "vendor/zakuro"
+      ],
+      "verify": ["cargo", "metadata", "--offline", "--no-deps", "--format-version", "1"]
+    },
+    "emulation": {
+      "description": "Emulation stack (docs/EMULATION.md): bun-engine, its in-tree cores, the headless ROM suite and the console matrix. Cargo needs every workspace member present, hence crates/* and the uutils and chipi-spec trees.",
+      "paths": ["crates", "docs", "scripts/emulation", "vendor/uutils", "vendor/chipi-spec"],
+      "submodules": [
+        "crates/*",
+        "vendor/chipi-spec",
+        "vendor/cubeb-rs",
+        "vendor/rustboyadvance-ng",
+        "vendor/starpsx",
+        "vendor/tetanes",
+        "vendor/uutils/*",
+        "vendor/zakuro"
+      ],
+      "verify": ["cargo", "metadata", "--offline", "--no-deps", "--format-version", "1"]
+    },
+    "web": {
+      "description": "Bun workspaces (apps and packages), design system, fonts and the web vendor trees.",
+      "paths": [
+        "apps",
+        "packages",
+        "design-system",
+        "fonts",
+        "docs",
+        "assets",
+        "vendor/base-ui",
+        "vendor/tailwindcss",
+        "vendor/fonts",
+        "vendor/material-design-icons"
+      ],
+      "submodules": ["vendor/fonts", "vendor/material-design-icons"]
+    },
+    "kernel-distro": {
+      "description": "Distribution and kernel sources (Linux only): pkgbuilds, kernels, Wine/Proton, LLVM.",
+      "paths": ["vendor", "container", "infra", "patches"],
+      "submodules": ["vendor/*"],
+      "includeOptional": true
+    },
+    "vendor-minimal": {
+      "description": "Only the first-party crates; registry crates come from Cargo.lock.",
+      "paths": ["crates"],
+      "submodules": []
+    },
+    "all": {
+      "description": "Full checkout: disables sparse-checkout and initialises every non-optional submodule shallow.",
+      "paths": [],
+      "submodules": ["*"],
+      "full": true
+    },
+    "ci": {
+      "description": "CI jobs (quality, rust, release plan): every first-party tree plus the vendor trees that Cargo path dependencies and the Bun workspaces need; the other ~165 vendor submodules (kernels, Wine, LLVM, CachyOS, ...) are skipped.",
+      "paths": [
+        "apps",
+        "assets",
+        "cloud",
+        "container",
+        "crates",
+        "design-system",
+        "docs",
+        "examples",
+        "fonts",
+        "infra",
+        "packages",
+        "patches",
+        "py",
+        "replica",
+        "tools",
+        "vendor/chipi-spec",
+        "vendor/microsoft",
+        "vendor/tailwindcss",
+        "vendor/uutils"
+      ],
+      "submodules": [
+        "apps/*",
+        "packages/*",
+        "crates/*",
+        "vendor/rea",
+        "vendor/cubeb-rs",
+        "vendor/rustboyadvance-ng",
+        "vendor/starpsx",
+        "vendor/tetanes",
+        "vendor/uutils/*",
+        "vendor/zakuro",
+        "vendor/material-web",
+        "vendor/magika",
+        "vendor/cargo-3ds",
+        "vendor/cef-rs",
+        "vendor/citro3d-rs",
+        "vendor/ctru-rs",
+        "vendor/chipi-spec"
+      ]
+    },
+    "microsoft": {
+      "description": "Microsoft/Windows track: Fluent tokens and WinUI app, Microsoft app probes, the Windows facade, buncc and the Microsoft SDK sources.",
+      "paths": [
+        "docs",
+        "packages/fluent",
+        "packages/microsoft",
+        "packages/windows",
+        "packages/buncc",
+        "packages/ntcore",
+        "vendor/microsoft"
+      ],
+      "submodules": []
+    },
+    "themes": {
+      "description": "Themes track: @aphrody/themes and aphrody-themes (Material 3, Windows 11 Fluent, Apple Liquid Glass), the M3 token owners, Fluent tokens, craft-ui and the webos shell.",
+      "paths": [
+        "docs",
+        "packages/themes",
+        "packages/fluent",
+        "packages/m3-tokens",
+        "packages/m3-fonts",
+        "packages/m3-tailwind",
+        "crates/aphrody-themes",
+        "crates/aphrody-m3-tokens",
+        "crates/craft-ui",
+        "apps/webos"
+      ],
+      "submodules": []
+    }
+  }
+}

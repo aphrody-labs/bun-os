@@ -26,9 +26,9 @@
     "@aphrody/paths": "workspace:*"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "workspace:*"
+    "bun-types": "catalog:"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

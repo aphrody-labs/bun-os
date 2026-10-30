@@ -1,0 +1,162 @@
+name: Emulation (headless ROM suite)
+
+# Boots free homebrew and test ROMs on the in-tree cores (crates/bun-engine-core) with no window and
+# no GPU, then checks final-frame hashes, determinism, audio hashes and save-state round trips
+# (crates/bun-engine-core/tests/rom_suite.rs). The console matrix in docs/EMULATION.md is generated
+# from these measurements. No commercial ROM, BIOS, firmware or key is fetched or stored.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - crates/bun-engine-core/**
+      - crates/aphrody-wii*/**
+      - crates/aphrody-nds-*/**
+      - crates/aphrody-ctr*/**
+      - crates/ruzu*/**
+      - crates/rdynarmic/**
+      - scripts/emulation/**
+      - docs/EMULATION.md
+      - docs/emulation-results.json
+      - .github/workflows/emulation.yml
+  push:
+    branches: [main, os]
+    paths:
+      - crates/bun-engine-core/**
+      - scripts/emulation/**
+      - docs/EMULATION.md
+      - docs/emulation-results.json
+      - .github/workflows/emulation.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: emulation-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: never
+  BUN_VERSION: 1.4.4-canary.20261028.1
+  # pcsx-redux/nugget commit that OpenBIOS is built from (MIT).
+  NUGGET_SHA: 175f329db302892e4aac146a22778d1876cae48f
+
+jobs:
+  openbios:
+    name: PlayStation OpenBIOS (built from source, MIT)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    container: ghcr.io/grumpycoders/pcsx-redux-build:latest
+    steps:
+      - name: Fetch nugget at the pinned commit
+        run: |
+          git init nugget && cd nugget
+          git remote add origin https://github.com/pcsx-redux/nugget.git
+          git fetch --depth 1 origin "$NUGGET_SHA"
+          git checkout FETCH_HEAD
+          git submodule update --init --recursive --depth 1
+      - name: Build OpenBIOS
+        run: make -C nugget/openbios -j2 all
+      - name: Check the image
+        run: |
+          ls -l nugget/openbios/openbios.bin
+          test "$(stat -c %s nugget/openbios/openbios.bin)" = 524288
+          sha256sum nugget/openbios/openbios.bin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openbios
+          path: nugget/openbios/openbios.bin
+          if-no-files-found: error
+
+  cores:
+    name: libretro cores built from source (mGBA)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/emulation
+      - name: mGBA at the pinned commit (MPL-2.0)
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build
+          git init mgba && cd mgba
+          git remote add origin https://github.com/mgba-emu/mgba.git
+          git fetch --depth 1 origin "$(jq -r .libretroCores.mgba.commit ../scripts/emulation/pins.json)"
+          git checkout FETCH_HEAD
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_LIBRETRO=ON             -DBUILD_QT=OFF -DBUILD_SDL=OFF -DBUILD_GL=OFF -DBUILD_GLES2=OFF -DBUILD_GLES3=OFF             -DBUILD_TEST=OFF -DBUILD_EXAMPLE=OFF -DUSE_FFMPEG=OFF -DUSE_LIBZIP=OFF -DUSE_MINIZIP=OFF             -DUSE_EPOLL=OFF -DUSE_SQLITE3=OFF -DUSE_DEBUGGERS=OFF -DUSE_EDITLINE=OFF -DENABLE_SCRIPTING=OFF
+          cmake --build build --target mgba_libretro
+          find build -name 'mgba_libretro.so' -exec cp {} ../mgba_libretro.so ;
+      - run: ls -l mgba_libretro.so && sha256sum mgba_libretro.so
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libretro-cores
+          path: mgba_libretro.so
+          if-no-files-found: error
+
+  suite:
+    name: ROM suite (NES, GBA, GB, DS, 3DS, GameCube, PlayStation, libretro)
+    needs: [openbios, cores]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Submodules the Cargo workspace and the suite read
+        run: |
+          git submodule update --init --depth 1 \
+            crates/apkeep crates/capture_harness vendor/cubeb-rs vendor/chipi-spec \
+            vendor/uutils/coreutils vendor/uutils/diffutils vendor/uutils/findutils vendor/uutils/procps vendor/uutils/util-linux \
+            vendor/tetanes vendor/starpsx vendor/rustboyadvance-ng vendor/zakuro
+          git -C vendor/rustboyadvance-ng submodule update --init --depth 1 external/gba-tests
+      - run: npm install -g bun@${BUN_VERSION} && bun -e 'console.log(Bun.version, Bun.revision)'
+      - name: Rust toolchain (rust-toolchain.toml)
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: emulation-suite
+      - name: Fetch the pinned free test ROMs
+        run: bun scripts/emulation/fetch-roms.ts target/rom-suite/downloads
+      - uses: actions/download-artifact@v4
+        with:
+          name: openbios
+          path: target/rom-suite/downloads
+      - uses: actions/download-artifact@v4
+        with:
+          name: libretro-cores
+          path: target/rom-suite/cores
+      - name: Boot every case and check hashes
+        env:
+          BUN_ENGINE_ROMS_REQUIRED: "1"
+          BUN_ENGINE_ROMS: ${{ github.workspace }}/target/rom-suite/downloads
+          BUN_ENGINE_RESULTS: ${{ github.workspace }}/target/rom-suite/results.json
+          BUN_ENGINE_CORES: ${{ github.workspace }}/target/rom-suite/cores
+        run: cargo test -p bun-engine --release --no-default-features --features nes,gba,psx,wii,nds,ctr,libretro --test rom_suite -- --nocapture
+      - name: Matrix equals the committed measurements
+        if: ${{ !cancelled() }}
+        run: |
+          bun scripts/emulation/matrix.ts target/rom-suite/results.json --check
+          { echo '## Console matrix (measured in this run)'; bun scripts/emulation/matrix.ts target/rom-suite/results.json; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: rom-suite-results
+          path: target/rom-suite/results.json
+
+  nes-accuracy:
+    name: TetaNES accuracy suite (blargg and others, upstream harness)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            vendor
+            rust-toolchain.toml
+          sparse-checkout-cone-mode: true
+      - run: git submodule update --init --depth 1 vendor/tetanes
+      - run: rustup toolchain install nightly-2026-09-15 --profile minimal && rustup default nightly-2026-09-15
+      - name: cargo test -p tetanes-core
+        working-directory: vendor/tetanes
+        run: cargo test -p tetanes-core --release 2>&1 | tee /tmp/tetanes.log
+      - name: Result line
+        if: ${{ !cancelled() }}
+        run: grep -E '^test result' /tmp/tetanes.log >> "$GITHUB_STEP_SUMMARY" || true

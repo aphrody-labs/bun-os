@@ -518,8 +518,8 @@ mod tests {
     }
     #[test]
     fn fast_rsync_differential_cycle() {
-        let base = b"Aphrody OS control plane with Spacedrive VDFS, Russh 0.63 and FastRsync.";
-        let modified = b"Aphrody OS control plane with Spacedrive VDFS, Russh 0.63, FastRsync and full VPS integration!";
+        let base = b"Aphrody OS control plane with the VFS, Russh 0.63 and FastRsync.";
+        let modified = b"Aphrody OS control plane with the VFS, Russh 0.63, FastRsync and full VPS integration!";
 
         let sig = FastRsyncSync::calculate_signature(base, 16);
         let delta = FastRsyncSync::compute_delta(&sig, modified).expect("delta");

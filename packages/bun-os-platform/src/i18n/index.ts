@@ -3,9 +3,8 @@
  * Catalog loading and locale negotiation for Bun hosts (play server, bun-engine CLI, sidecar).
  * Order of precedence: explicit override (settings / query / cookie) > OS UI languages
  * (Windows GetUserPreferredUILanguages, POSIX LANGUAGE/LC_ALL/LC_MESSAGES/LANG) or the
- * Accept-Language header > `en`. Accept-Language parsing reuses @rosegriffon/i18n.
+ * Accept-Language header > `en`.
  */
-import { parseAcceptLanguage } from "@rosegriffon/i18n";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { platformPaths, readSettings } from "../paths";
@@ -15,6 +14,21 @@ export * from "./fluent";
 export * from "./localizer";
 
 export const DEFAULT_LOCALE = "en";
+
+/** Accept-Language ranges with their q-values, best first (stable for equal q). */
+function parseAcceptLanguage(header: string): { range: string; quality: number }[] {
+  return header
+    .split(",")
+    .map((part, index) => {
+      const [range = "", ...params] = part.trim().split(";");
+      const q = params.map(p => /^s*qs*=s*([0-9.]+)s*$/i.exec(p)?.[1]).find(Boolean);
+      const quality = q === undefined ? 1 : Number(q);
+      return { range: range.trim(), quality: Number.isFinite(quality) ? quality : 0, index };
+    })
+    .filter(p => p.range)
+    .sort((a, b) => b.quality - a.quality || a.index - b.index)
+    .map(({ range, quality }) => ({ range, quality }));
+}
 
 /** Declared locales (`locales/locales.json`), plus locales contributed by plugins. */
 export function locales(extra: LocaleInfo[] = []): LocaleInfo[] {
@@ -53,17 +67,19 @@ export function catalogSources(tag: string, domains?: readonly string[]): string
 export function osLocales(): string[] {
   if (process.platform === "win32") {
     try {
-      // bun:windows binds kernel32 through its generated Win32 families.
-      const windows = require("bun:windows") as {
-        family(name: string): Record<string, (...args: unknown[]) => number>;
-      };
-      const kernel32 = windows.family("kernel32");
+      const { dlopen, FFIType, ptr } = require("bun:ffi") as typeof import("bun:ffi");
+      const kernel32 = dlopen("kernel32.dll", {
+        GetUserPreferredUILanguages: {
+          args: [FFIType.u32, FFIType.ptr, FFIType.ptr, FFIType.ptr],
+          returns: FFIType.bool,
+        },
+      }).symbols;
       const MUI_LANGUAGE_NAME = 0x8;
       const count = new Uint32Array(1);
       const size = new Uint32Array(1);
-      if (kernel32.GetUserPreferredUILanguages?.(MUI_LANGUAGE_NAME, count, null, size) && size[0]) {
+      if (kernel32.GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, ptr(count), null, ptr(size)) && size[0]) {
         const buffer = new Uint16Array(size[0]);
-        if (kernel32.GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, count, buffer, size))
+        if (kernel32.GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, ptr(count), ptr(buffer), ptr(size)))
           return String.fromCharCode(...buffer)
             .split("\0")
             .filter(Boolean);

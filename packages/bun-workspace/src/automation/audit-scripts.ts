@@ -18,21 +18,11 @@ export async function runScriptAudit(repo: string, workspaceRoot?: string): Prom
       const label = relative(root, file).split(sep).join("/");
       if (/postgres(?:ql)?:\/\/[^\s"']+:[^\s"'@]+@/i.test(text))
         violations.push(`${label}: hard-coded PostgreSQL credential`);
-      if (/SHENRON_ADMIN_TOKEN\s*=\s*["'][^"']+/u.test(text)) violations.push(`${label}: hard-coded admin token`);
       if (label.startsWith("scripts/ops/") && /\/home\/ubuntu|C:\/Users\/aphro/u.test(text))
         violations.push(`${label}: machine-specific absolute path`);
       if (/DELETE\s+FROM\s+bot\.db_(wishes|timeline_events|power_levels)\b/i.test(text))
         violations.push(`${label}: physical deletion of editorial data`);
     }
-  if (repo === "shenron") {
-    for await (const file of new Glob("**/*.{js,mjs,cjs}").scan({
-      cwd: join(root, "apps/bot"),
-      absolute: true,
-    })) {
-      if (!file.includes(`${sep}node_modules${sep}`) && !file.includes(`${sep}dist${sep}`))
-        violations.push(`${relative(root, file).split(sep).join("/")}: bot scripts must be TypeScript`);
-    }
-  }
   if (violations.length) throw new Error(violations.join("\n"));
   console.log(`script audit passed: ${repo}`);
 }

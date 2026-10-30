@@ -9,8 +9,7 @@ import { readdir, readFile } from "node:fs/promises";
  *
  * Rules:
  * - Code, skills, MCP definitions, and plugin definitions under plugins/ or crates/ai are exempt.
- * - Public apps (the Shenron site: apps/site of aphrody-labs/shenron, passed with --root), public
- *   pages, and git history are audited.
+ * - Public apps (passed with --root), public pages, and git history are audited.
  */
 
 // Patterns to detect in public files and commit messages

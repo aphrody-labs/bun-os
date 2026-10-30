@@ -11,7 +11,7 @@ repository.workspace = true
 [dependencies]
 aphrody-google.workspace = true
 aphrody-m3-tokens.workspace = true
-axum.workspace = true
+axum = { workspace = true, features = ["json", "query", "tokio", "http1"] }
 clap = { workspace = true, features = ["derive", "env"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true

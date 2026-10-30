@@ -87,7 +87,7 @@ mod tests {
     #[test]
     fn profile_mailboxes_are_disjoint() {
         let root = std::path::Path::new("/state");
-        let left = root.join("workspace-shenron");
+        let left = root.join("workspace-worker");
         let right = root.join("workspace-niers");
 
         let left_mailbox = Mailbox::for_profile_root(&left);

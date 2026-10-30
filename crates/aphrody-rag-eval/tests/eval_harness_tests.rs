@@ -40,14 +40,14 @@ async fn test_harness_eval_metrics_and_markdown() {
         return_hits: vec![
             RetrievedHit {
                 title: "Goku Ultra Instinct".to_string(),
-                url: "https://dragonballfr.com/goku-ui".to_string(),
+                url: "https://example.com/goku-ui".to_string(),
                 snippet: "Goku reaches divine speed.".to_string(),
                 score: 0.95,
                 ..Default::default()
             },
             RetrievedHit {
                 title: "Vegeta Ultra Ego".to_string(),
-                url: "https://dragonballfr.com/vegeta-ue".to_string(),
+                url: "https://example.com/vegeta-ue".to_string(),
                 snippet: "Destruction power unleashed.".to_string(),
                 score: 0.85,
                 ..Default::default()

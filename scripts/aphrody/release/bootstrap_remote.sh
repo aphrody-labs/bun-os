@@ -37,8 +37,8 @@ rustup default "${RUST_STABLE:-stable}"
 [ -n "$RUST_BUN" ] && rustup toolchain install "$RUST_BUN" --profile minimal -c rust-src -c rustfmt -c clippy -c llvm-tools || true
 
 if ! command -v bun >/dev/null; then
-  say "bun (release, bootstraps the Bun fork build)"
-  curl -fsSL https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.sh | bash
+  say "bun (upstream release)"
+  curl -fsSL https://bun.com/install | bash
 fi
 
 # cargo reuses one sccache store on the factory volume; Bun's own build uses ccache under BUN_BUILD_CACHE_DIR

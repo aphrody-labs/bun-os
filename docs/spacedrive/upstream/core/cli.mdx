@@ -1,0 +1,94 @@
+---
+title: CLI Architecture
+description: How sd-cli connects automation to the daemon operation registry
+sidebarTitle: CLI Architecture
+---
+
+**sd-cli** is a thin client of **sd-daemon**. It parses command-line input,
+selects the daemon instance and library, calls registered operations, and
+formats structured output.
+
+Filesystem and database behavior remain in core. The CLI does not implement a
+second file-management path.
+
+## Request path
+
+The terminal command becomes a typed request over the local daemon socket. The
+daemon dispatches it through the operation registry as a query, bounded action,
+or durable job.
+
+Remote work still enters through the local daemon. That daemon authenticates
+the paired peer and forwards a typed operation to the authorized node.
+
+## Binaries
+
+Build the client and daemon together:
+
+~~~bash
+cargo build --release --bin sd-cli --bin sd-daemon
+~~~
+
+The client can start, stop, and restart the daemon. Named instances receive
+separate state directories and sockets.
+
+## Command domains
+
+Commands group the operation surface:
+
+- library;
+- sources;
+- files and search;
+- jobs, events, and logs;
+- devices and networking;
+- tags and spaces;
+- redundancy and volumes;
+- sync;
+- configuration and daemon lifecycle.
+
+The generic **op** command reaches any registered operation by stable name.
+
+## Output
+
+Human output favors readable tables and progress. JSON output preserves typed
+fields for scripts:
+
+~~~bash
+sd-cli --format json sources list
+~~~
+
+Scripts should use stable UUIDs and error fields. They should not parse display
+labels or diagnostic logs.
+
+## Configuration
+
+Global options select:
+
+- a custom data directory;
+- a named daemon instance;
+- human or JSON output.
+
+The selected library is stored in CLI configuration. Secrets remain in the
+daemon key manager.
+
+## Auto-start and updates
+
+The installed release keeps client and daemon versions together. `sd update`
+replaces both binaries atomically, verifies the published checksums, and
+restarts the daemon. `update.channel` selects the stable release or the
+rolling nightly build, and `sd update install-timer` checks on a schedule; see
+[Releases](/core/releases#nightly-channel).
+
+Platform service integration starts the daemon at login or boot. Its service
+definition passes the same instance and data-directory arguments used during
+installation.
+
+## Adding a command
+
+Add a domain command only when it makes a common operation easier to discover.
+Map it directly to an existing typed input and output.
+
+Do not add command-only business rules. If behavior matters to another client,
+it belongs in the registered core operation.
+
+See the [CLI guide](/cli/overview) for usage and [Operations](/core/ops) for
+handler design.

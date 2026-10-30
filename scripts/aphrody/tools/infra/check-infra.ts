@@ -73,13 +73,7 @@ function escapeRegExp(value: string): string {
 async function main(): Promise<void> {
   await checkSensitiveFiles();
 
-  const required = [
-    "README.md",
-    "docs/aphrody/reference/infra/TOPOLOGY.md",
-    "docs/aphrody/reference/infra/MIGRATION-GUARDRAILS.md",
-    "tools/aphrody/config/local-ai.json",
-    "tools/aphrody/config/local-ai.env.example",
-  ];
+  const required = ["README.md", "tools/aphrody/config/local-ai.json", "tools/aphrody/config/local-ai.env.example"];
   const yoloUnits = ["infra/config/host/catalog.json", "infra/config/host/inventory/vps-source.json"];
   for (const relative of yoloUnits) {
     try {

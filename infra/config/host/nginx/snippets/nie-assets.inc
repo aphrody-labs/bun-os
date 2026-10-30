@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
-# Public IEVR asset routes shared by nie.aphrody.app and cdn.rosegriffon.fr. Upstream: rg-core
-# (systemd/rg/rg-core.service, 127.0.0.1:8810), which relays these hosts to its supervised
+# Public IEVR asset routes shared by nie.aphrody.app. Upstream: 127.0.0.1:8810,
+# which relays this host to its supervised
 # nie-model-serve child. Requires the `nie_assets` / `nie_conn` zones of nginx/nie/nie.aphrody.app.conf.
 
 location = /robots.txt {

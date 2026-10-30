@@ -5,11 +5,12 @@
   "identifier": "dev.aphrody.__IDENT__",
   "build": {
     "beforeDevCommand": "bun run start",
+    "beforeBuildCommand": "bun run build",
     "devUrl": "http://127.0.0.1:3000",
     "frontendDist": "../dist"
   },
   "app": {
-    "windows": [{ "title": "__NAME__", "width": 900, "height": 640 }],
+    "windows": [{ "title": "__NAME__", "width": 900, "height": 640, "transparent": true }],
     "security": { "csp": null }
   },
   "bundle": {

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 // SPDX-License-Identifier: Apache-2.0
-// Writes src/generated/inventory.json: every package and app of the monorepo (name, version, description, entry
+// Writes packages/app-ui/src/material/generated/inventory.json: every package and app of the monorepo (name, version, description, entry
 // points, location, whether it is in the Bun workspace). The showcase serves it from its own API (`/api/packages`)
 // and its pages read the same data. A test checks the committed file is current: run `bun run inventory` after a
 // version or description change.
@@ -9,7 +9,7 @@ import { dirname, join, resolve } from "node:path";
 
 const here = dirname(import.meta.path);
 export const ROOT = resolve(here, "../../..");
-export const OUT = join(here, "../src/generated/inventory.json");
+export const OUT = join(here, "../../../packages/app-ui/src/material/generated/inventory.json");
 
 export interface InventoryEntry {
   name: string;
@@ -57,6 +57,7 @@ export function collect(root: string = ROOT): InventoryEntry[] {
         exports?: Record<string, unknown> | string;
         bin?: string | Record<string, string>;
       };
+      if (!manifest.name) continue; // a manifest without a name is not a package (e.g. a template stub)
       const rel = `${base}/${name}`;
       const exported = manifest.exports;
       entries.push({

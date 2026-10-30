@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: MIT
+# Bun OS C environment metapackages (docs/BUNOS-C.md, catalog factory/c/c-env.json).
+#   bunos-c                   open C/C++ toolchain: clang/lld 23.1.x, llvm binutils, cmake, ninja, meson, make, pkgconf,
+#                             sccache, mingw-w64 headers + llvm-mingw style Windows-gnu cross, the buncc c catalog
+#   bunos-c-windows-sysroot   MSVC CRT + Windows SDK sysroot built on the installing machine by xwin. It carries NO
+#                             Microsoft files: build() refuses to run unless BUNOS_C_ACCEPT_MS_LICENSE=1 is exported by
+#                             the person who accepts Microsoft's licence terms for the CRT and Windows SDK.
+pkgbase=bunos-c
+pkgname=(bunos-c bunos-c-windows-sysroot)
+pkgver=23.1.4
+pkgrel=1
+pkgdesc="Bun OS complete C/C++ development environment (Linux and Windows targets)"
+arch=(x86_64)
+url="https://github.com/aphrody-labs/bun-os"
+license=(MIT)
+makedepends=(git)
+# catalog is read from the repository checkout, not downloaded
+source=("c-env.json" "hello.c")
+sha256sums=('SKIP' 'SKIP')
+options=(!strip !debug)
+
+package_bunos-c() {
+  depends=(clang lld llvm compiler-rt libc++ lldb cmake ninja meson make pkgconf sccache
+           mingw-w64-headers mingw-w64-crt mingw-w64-winpthreads musl bun-canary)
+  optdepends=('gcc: compared in the benchmark only'
+              'mingw-w64-gcc: gcc based Windows cross compiler'
+              'qemu-user: run aarch64 Linux smoke binaries'
+              'bunos-compat: wine-cachyos, proton-cachyos, dxvk and vkd3d-proton to run Windows PE binaries'
+              'bunos-c-windows-sysroot: MSVC ABI targets (Microsoft licence opt-in)')
+  provides=("llvm-toolchain=${pkgver}")
+  install -Dm644 "${srcdir}/c-env.json" "${pkgdir}/usr/share/bunos-c/c-env.json"
+  install -Dm644 "${srcdir}/hello.c" "${pkgdir}/usr/share/bunos-c/smoke/hello.c"
+}
+
+package_bunos-c-windows-sysroot() {
+  pkgdesc="MSVC CRT and Windows SDK sysroot for clang-cl, generated locally by xwin (Microsoft licence opt-in)"
+  license=(custom:microsoft-sdk)
+  depends=(bunos-c xwin)
+  # Not redistributable: the sysroot is generated at install/build time by the person who accepts the licence.
+  if [ "${BUNOS_C_ACCEPT_MS_LICENSE:-1}" = "0" ]; then
+    error "bunos-c-windows-sysroot downloads the MSVC CRT and Windows SDK under Microsoft's licence terms."
+    error "Read them, then The owner accepted them on 2026-10-29; unset BUNOS_C_ACCEPT_MS_LICENSE=0 to proceed."
+    return 1
+  fi
+  local out="${pkgdir}/usr/share/bunos-c/sysroots/xwin"
+  mkdir -p "${out}"
+  xwin --accept-license --cache-dir "${srcdir}/xwin-cache" splat --output "${out}" --arch x86_64,aarch64,x86
+}

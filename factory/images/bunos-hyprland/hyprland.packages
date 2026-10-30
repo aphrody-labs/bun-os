@@ -1,0 +1,30 @@
+# OPT-IN Hyprland composition. NOT part of server, desktop (COSMIC) or gaming and never selected by default:
+# PLAN.md keeps Omarchy Hyprland blocked until a package subset, a signed closure and boot/session qualification exist.
+# Facts: these names exist in Arch core/extra on 2026-10-29 (factory/wayland/closure.json); nothing here is built, booted or qualified.
+# Items marked (source) need a local PKGBUILD from factory/wayland/pkgbuilds (stubs, UNVERIFIED) because Arch ships a different version than the pin.
+hyprland
+hyprland-guiutils
+xdg-desktop-portal-hyprland   # (source) pinned, see factory/wayland/pkgbuilds/xdg-desktop-portal-hyprland
+hyprlock
+hypridle
+hyprpaper
+hyprpicker
+hyprsunset
+hyprpolkitagent
+hyprshutdown
+xorg-xwayland
+xdg-desktop-portal
+xdg-desktop-portal-gtk
+polkit
+pipewire
+wireplumber
+mesa   # (source) pinned, see factory/wayland/pkgbuilds/mesa
+vulkan-icd-loader
+qt6-wayland
+qt6-base
+gtk4
+wayland-utils
+glaze   # (source) pinned, see factory/wayland/pkgbuilds/glaze
+libdisplay-info   # (source) pinned, see factory/wayland/pkgbuilds/libdisplay-info
+pango   # (source) pinned, see factory/wayland/pkgbuilds/pango
+xkeyboard-config   # (source) pinned, see factory/wayland/pkgbuilds/xkeyboard-config

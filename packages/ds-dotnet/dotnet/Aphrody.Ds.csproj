@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Glue assembly for bun:dotnet. Vendor sources are referenced in place, never copied. -->
+  <!-- Glue assembly hosted through hostfxr (src/hostfxr.ts). Vendor sources are referenced in place, never copied. -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
@@ -11,6 +11,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
     <NoWarn>$(NoWarn);CS8632;CS0168;CS0219;CS0649;CS0169;CS0414;CS8981;CA1416;WFO1000;SYSLIB0011</NoWarn>
     <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

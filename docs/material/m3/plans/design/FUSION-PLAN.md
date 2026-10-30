@@ -26,7 +26,7 @@ aphrody-m3-tokens (seed -> HCT -> roles)
 - `aphrody design tokens` (CLI in `../aphrody-ai`) prints the sheets: `--fusion`, `--dark`,
   `--format shadcn-registry` (a shadcn `registry:theme` item generated from the same map).
 - In the Bun workspace the generated sheets are `@aphrody/m3-theme/tokens.css` and
-  `tailwind.css` ([`SPACEUI-M3-FUSION.md`](../../architecture/design/SPACEUI-M3-FUSION.md)). Import one palette sheet per
+  `tailwind.css`. Import one palette sheet per
   app.
 - Cascade order, when mixing systems: reset, M3 tokens, Tailwind utilities, component layers,
   each in its own `@layer`.

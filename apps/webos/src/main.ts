@@ -35,6 +35,10 @@ import {
 } from "./apps/craft-host";
 import { h, icon } from "./dom";
 import { catalog, HOME, webos, type CatalogApp } from "./os";
+import { searchContents } from "./apps/files-wire";
+import { openAiCompatible } from "./assistant/backend";
+import { installAssistant } from "./assistant/overlay";
+import { syncConfigFile } from "./configfile";
 import {
   install,
   installed,
@@ -1417,11 +1421,13 @@ const timeEl = h("time", { class: "bar-time" });
 const dateEl = h("span", { class: "bar-date" });
 const LAYOUT_GLYPH: Record<Layout, string> = {
   dwindle: "dashboard",
+  master: "vertical_split",
   scrolling: "view_column",
   floating: "filter_none",
 };
 const LAYOUT_NAME: Record<Layout, string> = {
   dwindle: "Tiled",
+  master: "Master and stack",
   scrolling: "Scrolling columns",
   floating: "Floating",
 };
@@ -1815,6 +1821,34 @@ for (const key of [
 ] as const)
   prefs.subscribe(key, configureWm);
 narrow.addEventListener("change", configureWm);
+
+// Settings file (~/.config/bunos/settings.json): read at start, re-read on edit, written on every Settings change.
+void Promise.all([prefs.ready, webos()]).then(([, os]) => {
+  for (const dir of ["/home/user/.config", "/home/user/.config/bunos"])
+    try {
+      os.fs.mkdir(dir);
+    } catch {
+      // already there
+    }
+  syncConfigFile({ read: p => os.fs.read(p), write: (p, d) => os.fs.write(p, d), flush: () => os.flush() }, prefs, {
+    poll: 2000,
+  });
+});
+
+// Pointer-shake assistant: backend from the preferences, context from the content index of the user's files.
+let indexOs: Awaited<ReturnType<typeof webos>> | undefined;
+void webos().then(o => (indexOs = o));
+installAssistant({
+  enabled: () => prefs.get("assistant.enabled"),
+  backend: () =>
+    openAiCompatible({
+      kind: prefs.get("assistant.backend"),
+      baseUrl: prefs.get("assistant.baseUrl"),
+      model: prefs.get("assistant.model"),
+      apiKey: prefs.get("assistant.apiKey"),
+    }),
+  search: query => (indexOs ? searchContents(indexOs, query, 5) : []),
+});
 prefs.subscribe("dock.pinned", () => {
   renderDock();
   renderDeskIcons();

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * Bun.serve routes of the platform for web hosts (play.aphrody.app). Spread `platformRoutes()`
+ * Bun.serve routes of the platform for web hosts (web hosts). Spread `platformRoutes()`
  * into `routes`; pass the host's auth wrapper as `guard` for routes that act on the host
  * (plugin commands, file inspection, transfers). Locale: `?lang=` > `bun-os-locale` cookie >
  * Accept-Language > `en`.
@@ -39,7 +39,7 @@ export function requestLocale(request: Request) {
 }
 
 /** A localizer for a web request (server-rendered strings, errors). */
-export function requestLocalizer(request: Request, domains: string[] = ["common", "play"]) {
+export function requestLocalizer(request: Request, domains: string[] = ["common"]) {
   return localizer(requestLocale(request).chain, domains);
 }
 
@@ -47,7 +47,7 @@ const MAX_INSPECT_BYTES = 512 * 1024 * 1024;
 
 export function platformRoutes(options: { guard?: Guard; domains?: string[] } = {}) {
   const guard: Guard = options.guard ?? (h => h);
-  const allowed = new Set(options.domains ?? ["common", "play", "engine"]);
+  const allowed = new Set(options.domains ?? ["common", "engine"]);
   return {
     "/api/platform/i18n": {
       GET: (request: Request) => {

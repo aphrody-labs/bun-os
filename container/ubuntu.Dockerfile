@@ -57,7 +57,7 @@ FROM cosmic-core AS perf
 ARG DISTRIBUTION_VERSION
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.title="Bun OS perf COSMIC" \
-    org.opencontainers.image.source="https://github.com/aphrody-labs/bun" \
+    org.opencontainers.image.source="https://github.com/aphrody-labs/bun-os" \
     org.opencontainers.image.version=$DISTRIBUTION_VERSION \
     org.opencontainers.image.revision=$SOURCE_REVISION
 ENV BUN_OS_PROFILE=perf
@@ -71,7 +71,7 @@ FROM cosmic-core AS full
 ARG DISTRIBUTION_VERSION
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.title="Bun OS full COSMIC" \
-    org.opencontainers.image.source="https://github.com/aphrody-labs/bun" \
+    org.opencontainers.image.source="https://github.com/aphrody-labs/bun-os" \
     org.opencontainers.image.version=$DISTRIBUTION_VERSION \
     org.opencontainers.image.revision=$SOURCE_REVISION
 RUN apt-get update \

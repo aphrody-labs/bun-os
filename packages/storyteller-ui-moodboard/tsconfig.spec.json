@@ -1,7 +1,7 @@
 {
   "extends": "../artcraft-frontend/tsconfig.base.json",
   "compilerOptions": {
-    "types": ["@aphrody/bun-types", "node"],
+    "types": ["bun-types", "node"],
     "jsx": "react-jsx"
   },
   "include": ["src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.test.tsx", "src/**/*.spec.tsx", "src/**/*.d.ts"]

@@ -14,8 +14,7 @@
   not vendored; use the upstream repository at the commit above as the reference.
 - `SKILL.md` gained the Bun OS and Aphrody Labs Material 3 contract, and its commands call
   the Bun scripts (also shipped as `m3-design search` / `m3-design system`).
-- Data additions: `data/brands.csv` (Aphrody brand themes), `data/stacks/m3.csv` and
-  `data/stacks/rg-ui.csv`, plus Bun OS edits in `ux-guidelines.csv`, `catalog-summary.json`
+- Data additions: `data/brands.csv` (Aphrody brand themes), `data/stacks/m3.csv`, plus Bun OS edits in `ux-guidelines.csv`, `catalog-summary.json`
   and the `astro`, `html-tailwind`, `nextjs`, `nuxt-ui`, `shadcn`, `threejs` and `vue` stacks.
   `references/bun-os.md` is first-party.
 - The design-system checklist adds Bun OS accessibility and performance items (Material

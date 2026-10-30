@@ -384,7 +384,6 @@ export const DEFAULT_POLICY: Policy = {
       "fail2ban",
       "aphrody-*",
       "yolo-*",
-      "shenron-*",
       "docker",
       "containerd",
       "postgresql*",

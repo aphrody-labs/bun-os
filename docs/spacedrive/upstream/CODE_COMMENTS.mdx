@@ -1,0 +1,147 @@
+---
+title: Code Comments
+sidebarTitle: Code Comments
+---
+
+Spacedrive comments explain why a decision exists and which correctness
+boundary it protects. Code already shows what happens.
+
+## Module documentation
+
+Start a public module with a title, a short purpose, the important lifetime or
+ownership rule, and a runnable example when one adds value.
+
+~~~rust
+//! # Source store
+//!
+//! A source store preserves one origin's records and assertions. Generation
+//! rows may be replaced after a complete ingest, while assertions survive
+//! because the origin cannot reproduce them.
+~~~
+
+Do not describe a planned architecture as if the code implements it. Put design
+work in **docs/plans** and update the public page when behavior lands.
+
+## Function documentation
+
+The first sentence says what the function guarantees. Later sentences explain
+why the guarantee matters, platform behavior, and failure semantics.
+
+~~~rust
+/// Commits one hashing batch before claiming more records.
+///
+/// The claim query selects rows without a committed integrity hash, so queued
+/// writes would let the same rows be claimed indefinitely.
+async fn flush_hash_batch(batch: HashBatch) -> Result<()> {
+    // ...
+}
+~~~
+
+Document errors when callers need them for recovery:
+
+~~~rust
+/// Resolves a source root through its current volume attachment.
+///
+/// Returns `SourceUnavailable` when the retained store exists but the origin
+/// is not attached. Callers may still query stored records.
+async fn resolve_source_root(source: SourceId) -> Result<PathBuf, SourceError> {
+    // ...
+}
+~~~
+
+## Inline comments
+
+Keep an inline comment when removing it would hide a non-obvious consequence.
+
+Good:
+
+~~~rust
+// A partial visitor set cannot prove deletion, so restarted walks begin at zero.
+let resume = false;
+~~~
+
+Bad:
+
+~~~rust
+// Set resume to false.
+let resume = false;
+~~~
+
+Good:
+
+~~~rust
+// Preserve valid rows from a failed batch so one bad name cannot create a ledger hole.
+salvage_rows_individually(batch).await?;
+~~~
+
+Bad:
+
+~~~rust
+// Try each row.
+salvage_rows_individually(batch).await?;
+~~~
+
+## Platform differences
+
+Explain the effect and fallback, not a generic difference:
+
+~~~rust
+#[cfg(windows)]
+fn birth_time(metadata: &Metadata) -> Option<SystemTime> {
+    // Return no birth time when the filesystem omits it; modification time is not equivalent.
+    metadata.created().ok()
+}
+~~~
+
+Platform comments name the filesystem or API assumption when it affects stored
+evidence.
+
+## Safety comments
+
+Destructive or security-sensitive code should explain the invariant:
+
+~~~rust
+// Candidate hashes can collide, so deletion requires a full-byte integrity hash.
+ensure_confirmed_content(record)?;
+~~~
+
+~~~rust
+// The data directory contains changing SQLite journals and can never be a source input.
+if path.starts_with(data_dir) {
+    return WalkDecision::Exclude;
+}
+~~~
+
+Do not leave a comment that promises future validation. Implement the check or
+track the missing work.
+
+## What to remove
+
+Delete comments that:
+
+- repeat a function or variable name;
+- narrate control flow;
+- explain code that no longer exists;
+- contain stale phase plans;
+- use section-divider decoration;
+- say “temporary” without an owned plan;
+- restate a type signature.
+
+## Tracking future work
+
+Code comments describe current behavior. Use:
+
+- **PROJECT_STATUS.md** for immediate cross-session context;
+- **docs/plans** for phased design and acceptance criteria;
+- GitHub issues for the durable backlog.
+
+The **.tasks** tree is frozen and must not receive new work.
+
+## Review checklist
+
+- Does the comment explain why?
+- Does it name the relevant ownership, lifetime, or safety rule?
+- Is it still true in the source-store architecture?
+- Could a test express the guarantee more reliably?
+- Is future work tracked outside the code?
+- Is the shortest useful wording used?

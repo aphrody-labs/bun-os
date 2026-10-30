@@ -367,6 +367,7 @@ impl System {
         align_audio(size, 0x1000)
     }
 
+    #[allow(clippy::not_unsafe_ptr_arg_deref)] // port of ruzu: transfer memory is owned by the guest process for the call
     pub fn initialize(
         &mut self,
         params: &AudioRendererParameterInternal,

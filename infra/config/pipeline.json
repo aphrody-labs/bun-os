@@ -41,22 +41,6 @@
       "steps": [
         {
           "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/drive-client", "lint"]
-        },
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/drive-client", "typecheck"]
-        },
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/drive-client", "test"]
-        },
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/drive-client", "build"]
-        },
-        {
-          "repo": "aphrody",
           "command": ["run", "--filter", "@aphrody/os", "lint"]
         },
         {
@@ -355,14 +339,6 @@
       "id": "bun-packages",
       "parallel": false,
       "steps": [
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/ag-ui", "typecheck"]
-        },
-        {
-          "repo": "aphrody",
-          "command": ["run", "--filter", "@aphrody/ag-ui", "test"]
-        },
         {
           "repo": "aphrody",
           "command": ["run", "--filter", "@aphrody/app-ui", "typecheck"]

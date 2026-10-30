@@ -66,12 +66,6 @@ The canonical MCP client sends the bearer credential from
 the HTTP request; it never falls back to anonymous access. Credential files
 remain in the private store, and are read per call to support rotation.
 
-Shenron's server routes use this API when `APHRODY_A2A_COORD_API` is set to the
-Aphrody listener base URL, with optional `APHRODY_A2A_COORD_TOKEN`. They address
-the `shenron-dragonball` namespace. Without that setting, the Shenron process
-uses request-local memory only; it does not write task snapshots or envelopes to
-its own filesystem.
-
 ## Quick start
 
 ```rust,no_run

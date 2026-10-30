@@ -1,7 +1,0 @@
-{
-  "family": "winml",
-  "dll": "winml.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["AI.MachineLearning.WinML"],
-  "functions": { "WinMLCreateRuntime": ["hr", ["*i:AI.MachineLearning.WinML.IWinMLRuntime"], ["runtime"], 0] }
-}

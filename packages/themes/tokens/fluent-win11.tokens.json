@@ -1,0 +1,301 @@
+{
+  "$description": "Windows 11 Fluent theme. Surfaces, text, strokes and status colors are the WinUI 3 theme resources (Light/Dark dictionaries); accent is the Windows system accent. Alpha colors are #RRGGBBAA (WinUI stores #AARRGGBB, converted).",
+  "$extensions": {
+    "aphrody": {
+      "id": "fluent",
+      "name": "Windows 11 Fluent",
+      "accentModel": "fluent-shades",
+      "defaultAccent": "blue",
+      "sources": [
+        {
+          "what": "WinUI 3 theme resources",
+          "url": "https://github.com/microsoft/microsoft-ui-xaml/blob/0a03f68d586d1c100f753ca3221597c3ee550f4a/controls/dev/CommonStyles/Common_themeresources_any.xaml",
+          "version": "microsoft-ui-xaml main @ 0a03f68d586d (2026-10-29)"
+        },
+        {
+          "what": "Geometry: 8px overlay and window, 4px controls",
+          "url": "https://learn.microsoft.com/windows/apps/design/signature-experiences/geometry"
+        },
+        {
+          "what": "Type ramp (Segoe UI Variable)",
+          "url": "https://learn.microsoft.com/windows/apps/design/signature-experiences/typography"
+        },
+        {
+          "what": "Mica, Acrylic",
+          "url": "https://learn.microsoft.com/windows/apps/develop/ui/materials"
+        },
+        {
+          "what": "Default accent palette 99EBFF 4CC2FF 0091F8 0078D4 0067C0 003E92 001A68",
+          "url": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Accent\\AccentPalette",
+          "version": "measured on Windows 11 10.0.28120, 2026-10-29"
+        },
+        {
+          "what": "Fluent 2 web tokens (extras, motion)",
+          "url": "packages/fluent/tokens/fluent2.json",
+          "version": "@fluentui/react-theme 9.2.2"
+        }
+      ]
+    }
+  },
+  "accent": {
+    "$type": "color",
+    "blue": {
+      "$value": "#0078D4",
+      "$description": "Windows 11 default accent, measured"
+    },
+    "purple": {
+      "$value": "#8764B8",
+      "$description": "preset, not verified in WinUI sources"
+    },
+    "pink": { "$value": "#E3008C", "$description": "preset, not verified" },
+    "red": { "$value": "#E81123", "$description": "preset, not verified" },
+    "orange": { "$value": "#F7630C", "$description": "preset, not verified" },
+    "yellow": { "$value": "#FFB900", "$description": "preset, not verified" },
+    "green": { "$value": "#10893E", "$description": "preset, not verified" },
+    "teal": { "$value": "#00B7C3", "$description": "preset, not verified" }
+  },
+  "accentShades": {
+    "$description": "Measured Windows 11 palette for the default accent. Other accents are derived in HCT from these tone offsets: an approximation, not the Windows algorithm.",
+    "$type": "color",
+    "light3": { "$value": "#99EBFF" },
+    "light2": { "$value": "#4CC2FF" },
+    "light1": { "$value": "#0091F8" },
+    "base": { "$value": "#0078D4" },
+    "dark1": { "$value": "#0067C0" },
+    "dark2": { "$value": "#003E92" },
+    "dark3": { "$value": "#001A68" }
+  },
+  "color": {
+    "$type": "color",
+    "light": {
+      "bg": {
+        "$value": "#F3F3F3",
+        "$description": "SolidBackgroundFillColorBase"
+      },
+      "bgAlt": {
+        "$value": "#EEEEEE",
+        "$description": "SolidBackgroundFillColorSecondary"
+      },
+      "surface": {
+        "$value": "#F9F9F9",
+        "$description": "SolidBackgroundFillColorTertiary"
+      },
+      "surfaceRaised": {
+        "$value": "#FFFFFF",
+        "$description": "SolidBackgroundFillColorQuarternary"
+      },
+      "layer": {
+        "$value": "#FFFFFF80",
+        "$description": "LayerFillColorDefault"
+      },
+      "fg": { "$value": "#000000E4", "$description": "TextFillColorPrimary" },
+      "fgMuted": {
+        "$value": "#0000009E",
+        "$description": "TextFillColorSecondary"
+      },
+      "fgSubtle": {
+        "$value": "#00000072",
+        "$description": "TextFillColorTertiary"
+      },
+      "fgDisabled": {
+        "$value": "#0000005C",
+        "$description": "TextFillColorDisabled"
+      },
+      "border": {
+        "$value": "#0000000F",
+        "$description": "ControlStrokeColorDefault"
+      },
+      "borderStrong": {
+        "$value": "#00000072",
+        "$description": "ControlStrongStrokeColorDefault"
+      },
+      "divider": {
+        "$value": "#0000000F",
+        "$description": "DividerStrokeColorDefault"
+      },
+      "control": {
+        "$value": "#FFFFFFB3",
+        "$description": "ControlFillColorDefault"
+      },
+      "controlHover": {
+        "$value": "#F9F9F980",
+        "$description": "ControlFillColorSecondary"
+      },
+      "controlPressed": {
+        "$value": "#F9F9F94D",
+        "$description": "ControlFillColorTertiary"
+      },
+      "onAccent": {
+        "$value": "#FFFFFF",
+        "$description": "TextOnAccentFillColorPrimary"
+      },
+      "danger": {
+        "$value": "#C42B1C",
+        "$description": "SystemFillColorCritical"
+      },
+      "onDanger": { "$value": "#FFFFFF" },
+      "warning": {
+        "$value": "#9D5D00",
+        "$description": "SystemFillColorCaution"
+      },
+      "success": {
+        "$value": "#0F7B0F",
+        "$description": "SystemFillColorSuccess"
+      },
+      "focus": {
+        "$value": "#000000E4",
+        "$description": "FocusStrokeColorOuter"
+      },
+      "scrim": { "$value": "#00000052" },
+      "shadow": { "$value": "#00000029" }
+    },
+    "dark": {
+      "bg": {
+        "$value": "#202020",
+        "$description": "SolidBackgroundFillColorBase"
+      },
+      "bgAlt": {
+        "$value": "#1C1C1C",
+        "$description": "SolidBackgroundFillColorSecondary"
+      },
+      "surface": {
+        "$value": "#282828",
+        "$description": "SolidBackgroundFillColorTertiary"
+      },
+      "surfaceRaised": {
+        "$value": "#2C2C2C",
+        "$description": "SolidBackgroundFillColorQuarternary"
+      },
+      "layer": {
+        "$value": "#3A3A3A4C",
+        "$description": "LayerFillColorDefault"
+      },
+      "fg": { "$value": "#FFFFFF", "$description": "TextFillColorPrimary" },
+      "fgMuted": {
+        "$value": "#FFFFFFC5",
+        "$description": "TextFillColorSecondary"
+      },
+      "fgSubtle": {
+        "$value": "#FFFFFF87",
+        "$description": "TextFillColorTertiary"
+      },
+      "fgDisabled": {
+        "$value": "#FFFFFF5D",
+        "$description": "TextFillColorDisabled"
+      },
+      "border": {
+        "$value": "#FFFFFF12",
+        "$description": "ControlStrokeColorDefault"
+      },
+      "borderStrong": {
+        "$value": "#FFFFFF8B",
+        "$description": "ControlStrongStrokeColorDefault"
+      },
+      "divider": {
+        "$value": "#FFFFFF15",
+        "$description": "DividerStrokeColorDefault"
+      },
+      "control": {
+        "$value": "#FFFFFF0F",
+        "$description": "ControlFillColorDefault"
+      },
+      "controlHover": {
+        "$value": "#FFFFFF15",
+        "$description": "ControlFillColorSecondary"
+      },
+      "controlPressed": {
+        "$value": "#FFFFFF08",
+        "$description": "ControlFillColorTertiary"
+      },
+      "onAccent": {
+        "$value": "#000000",
+        "$description": "TextOnAccentFillColorPrimary"
+      },
+      "danger": {
+        "$value": "#FF99A4",
+        "$description": "SystemFillColorCritical"
+      },
+      "onDanger": { "$value": "#000000" },
+      "warning": {
+        "$value": "#FCE100",
+        "$description": "SystemFillColorCaution"
+      },
+      "success": {
+        "$value": "#6CCB5F",
+        "$description": "SystemFillColorSuccess"
+      },
+      "focus": { "$value": "#FFFFFF", "$description": "FocusStrokeColorOuter" },
+      "scrim": { "$value": "#00000066" },
+      "shadow": { "$value": "#00000047" }
+    }
+  },
+  "shape": {
+    "$type": "dimension",
+    "none": { "$value": "0px" },
+    "sm": { "$value": "2px", "$description": "Fluent 2 borderRadiusSmall" },
+    "md": { "$value": "4px", "$description": "ControlCornerRadius" },
+    "lg": {
+      "$value": "8px",
+      "$description": "OverlayCornerRadius, top-level window"
+    },
+    "xl": { "$value": "12px", "$description": "Fluent 2 borderRadius2XLarge" },
+    "full": { "$value": "9999px" },
+    "control": { "$value": "4px" },
+    "container": { "$value": "8px" }
+  },
+  "typography": {
+    "fontUi": {
+      "$type": "fontFamily",
+      "$value": ["Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", "Selawik", "system-ui", "sans-serif"],
+      "$description": "Segoe UI Variable is not redistributable (ships with Windows 11). Selawik (open source, metrically compatible with Segoe UI, github.com/Microsoft/Selawik) is the cross-platform fallback. Nothing is bundled here."
+    },
+    "fontDisplay": {
+      "$type": "fontFamily",
+      "$value": ["Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", "Selawik", "system-ui", "sans-serif"]
+    },
+    "fontMono": {
+      "$type": "fontFamily",
+      "$value": ["Cascadia Mono", "Cascadia Code", "Consolas", "ui-monospace", "monospace"]
+    },
+    "ramp": {
+      "caption": { "size": 12, "line": 16, "weight": 400 },
+      "body": { "size": 14, "line": 20, "weight": 400 },
+      "bodyStrong": { "size": 14, "line": 20, "weight": 600 },
+      "bodyLarge": { "size": 18, "line": 24, "weight": 400 },
+      "subtitle": { "size": 20, "line": 28, "weight": 600 },
+      "title": { "size": 28, "line": 36, "weight": 600 },
+      "titleLarge": { "size": 40, "line": 52, "weight": 600 },
+      "display": { "size": 68, "line": 92, "weight": 600 }
+    }
+  },
+  "motion": {
+    "fast": {
+      "$type": "duration",
+      "$value": "150ms",
+      "$description": "Fluent 2 durationFast"
+    },
+    "normal": {
+      "$type": "duration",
+      "$value": "200ms",
+      "$description": "durationNormal"
+    },
+    "slow": {
+      "$type": "duration",
+      "$value": "300ms",
+      "$description": "durationSlow"
+    },
+    "easing": {
+      "$type": "cubicBezier",
+      "$value": [0, 0, 0, 1],
+      "$description": "curveDecelerateMid"
+    }
+  },
+  "material": {
+    "$description": "Acrylic is for transient surfaces, Mica for the window base (Microsoft Learn: Materials). Blur radius and saturation for the CSS fallback are approximations; Microsoft publishes none.",
+    "blur": 30,
+    "saturate": 125,
+    "controls": "caption",
+    "windowEffects": { "windows": ["mica"], "macos": [], "other": [] },
+    "transientEffects": { "windows": ["acrylic"] }
+  }
+}

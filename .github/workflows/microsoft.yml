@@ -1,0 +1,117 @@
+name: microsoft
+
+# Windows: WinUI 3 app (Windows App SDK) built, launched and captured, UI Automation test, NativeAOT win-x64 through buncc, COM/Office probes,
+# Wine import-coverage matrix. Ubuntu: Fluent tokens regenerated and compared, Fluent web components shell in headless Chrome.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, os]
+    paths:
+      - packages/fluent/**
+      - packages/microsoft/**
+      - docs/MICROSOFT.md
+      - .github/workflows/microsoft.yml
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+concurrency:
+  group: microsoft-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Windows 11 runner (WinUI 3, UIA, COM, NativeAOT, matrix)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/actions
+            /package.json
+            /Cargo.toml
+            /packages/fluent
+            /packages/microsoft
+            /packages/buncc
+            /factory/dotnet-linux
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - name: Build the WinUI 3 app (self-contained, unpackaged)
+        shell: bash
+        working-directory: packages/fluent/app
+        run: dotnet build FluentApp.csproj -c Release -p:Platform=x64
+      - name: Launch from Bun, capture the window (PrintWindow), find the controls with UI Automation
+        shell: bash
+        run: bun test packages/fluent
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fluent-winui-capture
+          path: |
+            packages/fluent/test/capture.png
+            packages/fluent/test/uia.json
+          if-no-files-found: warn
+      - name: NativeAOT win-x64 through buncc dotnet publish
+        shell: bash
+        run: |
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r win-x64 --aot -o "$RUNNER_TEMP/hello-win" --exec
+          "$RUNNER_TEMP/hello-win/hello.exe" | tee "$RUNNER_TEMP/hello-win.json"
+          echo "BUNOS_AOT_EXE=$(cygpath -w "$RUNNER_TEMP/hello-win/hello.exe")" >> "$GITHUB_ENV"
+          ls -l "$RUNNER_TEMP/hello-win/hello.exe"
+      - name: win-arm64 NativeAOT (cross-architecture, needs the VS ARM64 build tools)
+        continue-on-error: true
+        shell: bash
+        run: |
+          bun packages/buncc/src/cli.ts dotnet publish factory/dotnet-linux/sample/hello -r win-arm64 --aot -o "$RUNNER_TEMP/hello-arm64" --exec
+          ls -l "$RUNNER_TEMP/hello-arm64/hello.exe"
+      - name: COM, PE, Wine spec and Start-app tests
+        shell: bash
+        run: bun test packages/microsoft
+      - name: Windows 11 feature probes and Wine coverage matrix
+        shell: bash
+        run: |
+          bun packages/microsoft/src/cli.ts probe | tee probe.json
+          bun packages/microsoft/src/cli.ts matrix 'C:\Windows\System32\notepad.exe' 'C:\Windows\explorer.exe' 'C:\Windows\System32\cmd.exe' "$BUNOS_AOT_EXE" packages/fluent/app/bin/x64/Release/net10.0-windows10.0.26100.0/win-x64/FluentApp.exe | tee matrix.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: microsoft-probe
+          path: |
+            probe.json
+            matrix.json
+          if-no-files-found: warn
+
+  ubuntu:
+    name: Fluent tokens and web components (headless Chrome)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/actions
+            /package.json
+            /Cargo.toml
+            /packages/fluent
+            /packages/microsoft
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - name: Tokens regenerate to the committed files
+        run: |
+          bun packages/fluent/src/gen-tokens.ts
+          git diff --stat -- packages/fluent/tokens packages/fluent/app/FluentTokens.xaml
+          # formatting is applied by the repository formatter after generation; compare values, not whitespace
+          bun test packages/fluent/test/fluent.test.ts
+      - name: Bundle the web components shell
+        run: bun packages/fluent/src/build-web.ts
+      - name: Headless Chrome check
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && (cd "$RUNNER_TEMP/pw" && npm init -y >/dev/null && npm install --no-package-lock playwright-core@1.63.0)
+          PLAYWRIGHT_CORE="$RUNNER_TEMP/pw/node_modules/playwright-core/index.mjs" WASMOS_CHROME=/usr/bin/google-chrome bun packages/fluent/src/check-web.ts
+      - name: Pure-logic tests of packages/microsoft (PE, Wine spec, coverage)
+        run: bun test packages/microsoft

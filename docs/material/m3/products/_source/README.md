@@ -34,7 +34,6 @@ a provenance/release gate.
 - [`design/UI-DEDUPLICATION-PLAN.md`](../../plans/design/UI-DEDUPLICATION-PLAN.md): measured UI/package overlaps, canonical owners, migration order and removal gates.
 - [`design/M3-FRAMEWORK.md`](../../architecture/design/M3-FRAMEWORK.md): `@aphrody/m3` packages, plugin, build and pitfalls.
 - [`design/FUSION-PLAN.md`](../../plans/design/FUSION-PLAN.md): M3 tokens to Tailwind v4 and shadcn aliases.
-- [`design/SPACEUI-M3-FUSION.md`](../../architecture/design/SPACEUI-M3-FUSION.md): SpaceUI rebuild, component rules, Base UI.
 - [`design/aphrody-m3-tokens.md`](../../architecture/design/aphrody-m3-tokens.md): brand colour seeds ([`aphrody-m3-theme.json`](../../architecture/design/aphrody-m3-theme.json)).
 - [`design/TYPOGRAPHY.md`](../../architecture/design/TYPOGRAPHY.md): type owners and font axes.
 - [`design/FONTS-AND-ICONS.md`](../../architecture/design/FONTS-AND-ICONS.md): font subsets, fallbacks, Tauri delivery, app icons.
@@ -49,7 +48,3 @@ a provenance/release gate.
 - [`WASM/wgpu-webgpu.md`](../../reference/WASM/wgpu-webgpu.md): wgpu and wasm-bindgen pins, 26 -> 29 migration.
 - [`CANVAS-UPSTREAM.md`](../../reference/CANVAS-UPSTREAM.md): `@aphrody/canvas` and its upstream.
 
-## Drive
-
-- [`design/SPACEUI-SPACEDRIVE-MIGRATION.md`](../../architecture/design/SPACEUI-SPACEDRIVE-MIGRATION.md): Drive ownership, known gaps, gates.
-- [`DRIVE-UPSTREAM-DIFF.md`](../../reference/DRIVE-UPSTREAM-DIFF.md): `drive/` versus upstream Spacedrive.

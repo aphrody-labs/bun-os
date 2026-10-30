@@ -54,7 +54,7 @@ const fake = {
   },
 } satisfies BunWindowsApi;
 
-test("adapts bun:windows registry, service and system DTOs", async () => {
+test("adapts the Windows host registry, service and system DTOs", async () => {
   expect(await callBunWindows("get_registry_value", { path: "HKCU:\\Software", name: "Mode" }, fake)).toEqual({
     handled: true,
     value: {

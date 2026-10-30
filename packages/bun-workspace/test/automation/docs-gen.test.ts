@@ -42,7 +42,7 @@ describe("docs-gen", () => {
   });
   test("domainOf reads the domain segment", () => {
     expect(domainOf("crates/ai/mcp")).toBe("ai");
-    expect(domainOf("packages/bun-workspace")).toBe("infra");
+    expect(domainOf("packages/bun-workspace")).toBe("bun-workspace");
     expect(domainOf("apps/rg/website")).toBe("rg");
     expect(domainOf("crates/infra/aphrody")).toBe("infra");
   });

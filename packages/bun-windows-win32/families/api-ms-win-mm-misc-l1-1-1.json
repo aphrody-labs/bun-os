@@ -1,7 +1,0 @@
-{
-  "family": "api-ms-win-mm-misc-l1-1-1",
-  "dll": "api-ms-win-mm-misc-l1-1-1.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Media.Multimedia"],
-  "functions": { "sndOpenSound": ["i32", ["w", "w", "i32", "p"], ["EventName", "AppName", "Flags", "FileHandle"], 0] }
-}

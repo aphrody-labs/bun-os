@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT
+# PowerShell as the default login shell of new users, with the Bun OS profile. The shell itself comes from bunos-powershell-bin.
+pkgname=bunos-powershell-default
+pkgver=1
+pkgrel=1
+pkgdesc="PowerShell as the default login shell for new users, with Bun and .NET on PATH and completions (root keeps its shell)"
+arch=(any)
+url="https://github.com/PowerShell/PowerShell"
+license=(MIT)
+depends=(bunos-powershell-bin)
+backup=(etc/skel/.config/powershell/Microsoft.PowerShell_profile.ps1)
+source=(Microsoft.PowerShell_profile.ps1 LICENSE)
+sha256sums=(SKIP SKIP)
+install=bunos-powershell-default.install
+
+package() {
+  install -Dm644 "$srcdir/Microsoft.PowerShell_profile.ps1" "$pkgdir/etc/skel/.config/powershell/Microsoft.PowerShell_profile.ps1"
+  install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

@@ -1,3 +1,4 @@
+import "@aphrody/tauri-theme/boot";
 import { bunFetch } from "@aphrody/tauri/bun";
 import type { Catalog, Inspection, Library } from "../shared.ts";
 

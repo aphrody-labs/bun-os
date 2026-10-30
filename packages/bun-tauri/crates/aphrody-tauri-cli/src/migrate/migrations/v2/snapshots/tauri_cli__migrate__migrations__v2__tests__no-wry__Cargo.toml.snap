@@ -9,7 +9,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tauri = { version = "1.4.4", default-features = false, features = ["test", "devtools"] , package = "aphrody-tauri" }
+tauri = { version = "[version]", default-features = false, features = ["test", "devtools"] }
 
 [features]
 devtools = ["tauri/devtools"]

@@ -3,9 +3,16 @@
 // picks the light palette. Shell integration: OSC 133 A/B/C/D marks, OSC 7 and 9;9 cwd, OSC 0 title,
 // OSC 9;4 progress for commands over 1 s, synchronized output (DECSET 2026) around prompt redraws.
 // History lives in $APHRODY_HOME/bun-shell-history (default ~/.aphrody); arrows browse it on a TTY.
+//
+// Runs on the unmodified upstream Bun canary. The fork-only modules map as follows:
+//   windows     -> windowsHost() of @aphrody/winclean/windows-host (bun:ffi + @aphrody/windows/registry + Bun.spawnSync), win32 only;
+//   linux       -> a small node:os / /proc / Bun.spawn host (`linux`), linux only;
+//   wasm        -> the standard WebAssembly global (`wasm`: compile, instantiate, validate, Module, Instance).
+// No upstream equivalent, removed: wasm.build / wasm.optimize (wasm toolchain); the linux namespace, cgroup, seccomp and
+// io_uring helpers; the native coreutils (nproc) probe, now os.availableParallelism().
 import { $ } from "bun";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, writeSync } from "node:fs";
-import { homedir, hostname } from "node:os";
+import { availableParallelism, homedir, hostname, loadavg, release, totalmem, freemem, uptime } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { inflateSync } from "node:zlib";
@@ -454,33 +461,60 @@ const expand = (p: string, home: string) =>
   p === "~" || p.startsWith("~/") || p.startsWith("~\\") ? home + p.slice(1) : p;
 const unquote = (s: string) => s.trim().replace(/^["']|["']$/g, "");
 
+const unsupported = (name: string, why: string) => () => {
+  throw new Error(`${name} is not available on upstream Bun (${why})`);
+};
+
+/** WebAssembly through the standard global; the fork's wasm build and optimize toolchain has no upstream equivalent. */
+export function wasmHost() {
+  return {
+    compile: WebAssembly.compile,
+    instantiate: WebAssembly.instantiate,
+    validate: WebAssembly.validate,
+    Module: WebAssembly.Module,
+    Instance: WebAssembly.Instance,
+    Memory: WebAssembly.Memory,
+    Table: WebAssembly.Table,
+    build: unsupported("wasm.build", "use an external wasm toolchain"),
+    optimize: unsupported("wasm.optimize", "use an external wasm toolchain"),
+  };
+}
+
+/** Linux host facts from node:os and Bun.spawn; namespaces, cgroups, seccomp and io_uring have no upstream API. */
+export function linuxHost() {
+  return {
+    release,
+    uptime,
+    loadavg,
+    memory: () => ({ total: totalmem(), free: freemem() }),
+    cpus: availableParallelism,
+    exec: async (cmd: string, ...args: string[]) => {
+      await using proc = Bun.spawn({ cmd: [cmd, ...args], stdin: "ignore", stdout: "pipe", stderr: "pipe" });
+      const [stdout, stderr, code] = await Promise.all([
+        Bun.readableStreamToText(proc.stdout),
+        Bun.readableStreamToText(proc.stderr),
+        proc.exited,
+      ]);
+      return { stdout, stderr, code };
+    },
+  };
+}
+
 export async function loadNativeModules(platform: NodeJS.Platform = process.platform) {
-  const wasm = (await import("bun:wasm")).default;
-  const windows = platform === "win32" ? (await import("bun:windows")).default : undefined;
-  const linux = platform === "linux" ? (await import("bun:linux")).default : undefined;
-  return { windows, linux, wasm, $ };
+  const windows =
+    platform === "win32" && process.platform === "win32"
+      ? (await import("@aphrody/winclean/windows-host")).windowsHost()
+      : undefined;
+  const linux = platform === "linux" ? linuxHost() : undefined;
+  return { windows, linux, wasm: wasmHost(), $ };
 }
 
 type NativeModules = Awaited<ReturnType<typeof loadNativeModules>>;
 
+/** The logical CPU count, like `nproc`; the fork-only native coreutils probe is replaced by node:os. */
 export async function probeCoreutils(): Promise<number> {
-  await using proc = Bun.spawn({
-    cmd: [process.execPath],
-    argv0: "nproc",
-    env: { ...process.env, PATH: "", BUN_RIO_COREUTILS_PROBE: "1" },
-    stdin: "ignore",
-    stdout: "pipe",
-    stderr: "pipe",
-    timeout: 3000,
-  });
-  const [stdout, , code] = await Promise.all([
-    Bun.readableStreamToText(proc.stdout),
-    Bun.readableStreamToText(proc.stderr),
-    proc.exited,
-  ]);
-  const count = Number(stdout.trim());
-  if (code !== 0 || !/^\d+$/.test(stdout.trim()) || !Number.isSafeInteger(count) || count < 1)
-    throw new Error("Bun Shell requiert un runtime Aphrody avec les coreutils natifs (nproc).");
+  const count = availableParallelism();
+  if (!Number.isSafeInteger(count) || count < 1) throw new Error("Bun Shell could not read the CPU count.");
   return count;
 }
 
@@ -610,8 +644,9 @@ async function main() {
     return;
   }
 
-  const platform = modules.windows ? "bun:windows" : modules.linux ? "bun:linux" : "WASM tooling";
-  out(`Bun Shell ${Bun.version} · coreutils · ${platform} · bun:wasm (outillage) — js <expression>, exit\n`);
+  const platform = modules.windows ? "windows host" : modules.linux ? "linux host" : "portable";
+  out(`Bun Shell ${Bun.version} · ${platform} · WebAssembly — js <expression>, exit
+`);
   for (;;) {
     const p = prompt();
     const ed = new LineEditor(history.entries);

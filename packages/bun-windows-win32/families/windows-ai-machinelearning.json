@@ -1,9 +1,0 @@
-{
-  "family": "windows-ai-machinelearning",
-  "dll": "windows.ai.machinelearning.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["AI.MachineLearning.WinML"],
-  "functions": {
-    "MLCreateOperatorRegistry": ["hr", ["*i:AI.MachineLearning.WinML.IMLOperatorRegistry"], ["registry"], 0]
-  }
-}

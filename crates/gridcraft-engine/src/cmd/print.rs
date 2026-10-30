@@ -9,9 +9,9 @@
 //! sparklines. Headers and footers support `&L`/`&C`/`&R` sections and the `&P &N &D &T &A &F &Z`
 //! codes.
 
+use crate::pdf_export::{Font, Page, PdfDoc, Rgb};
 use gridcraft_core::{CellRef, MAX_COLS, MAX_ROWS, RangeRef, Value};
 use gridcraft_model::*;
-use gridcraft_pdf::{Font, Page, PdfDoc, Rgb};
 use serde_json::{Value as Json, json};
 
 use super::*;
@@ -811,7 +811,7 @@ struct PdfMeasure;
 
 impl gridcraft_chart::Measure for PdfMeasure {
     fn text_width(&self, text: &str, size: f32, bold: bool) -> f32 {
-        gridcraft_pdf::text_width(
+        crate::pdf_export::text_width(
             if bold {
                 Font::HelveticaBold
             } else {
@@ -949,7 +949,7 @@ fn draw_prims(pg: &mut Page, prims: &[gridcraft_chart::Prim], xf: Xf) {
                     Font::Helvetica
                 };
                 let size = size * k;
-                let w = gridcraft_pdf::text_width(font, size, text);
+                let w = crate::pdf_export::text_width(font, size, text);
                 let dx = match align {
                     H::Left => 0.0,
                     H::Center => -w / 2.0,
@@ -993,19 +993,21 @@ fn wrap_lines(text: &str, font: Font, size: f32, width: f32) -> Vec<String> {
             } else {
                 format!("{line} {word}")
             };
-            if line.is_empty() || gridcraft_pdf::text_width(font, size, &cand) <= width {
+            if line.is_empty() || crate::pdf_export::text_width(font, size, &cand) <= width {
                 line = cand;
             } else {
                 out.push(std::mem::take(&mut line));
                 line = word.to_string();
             }
             // Break a single over-long word by characters.
-            while gridcraft_pdf::text_width(font, size, &line) > width && line.chars().count() > 1 {
+            while crate::pdf_export::text_width(font, size, &line) > width
+                && line.chars().count() > 1
+            {
                 let mut cut = String::new();
                 let mut rest = String::new();
                 for ch in line.chars() {
                     if rest.is_empty()
-                        && gridcraft_pdf::text_width(font, size, &format!("{cut}{ch}")) <= width
+                        && crate::pdf_export::text_width(font, size, &format!("{cut}{ch}")) <= width
                         || cut.is_empty()
                     {
                         cut.push(ch);
@@ -1399,7 +1401,7 @@ fn draw_text(
     } else if code == "General"
         && let Value::Number(n) = v
     {
-        let digit = gridcraft_pdf::text_width(font, size, "0").max(0.1);
+        let digit = crate::pdf_export::text_width(font, size, "0").max(0.1);
         let max_chars = (avail / digit).floor().max(1.0) as usize;
         gridcraft_numfmt::format_general_fit(n, max_chars.min(11))
             .unwrap_or_else(|| "#".repeat(max_chars.min(255)))
@@ -1412,15 +1414,15 @@ fn draw_text(
     if text.is_empty() {
         return;
     }
-    let mut tw = gridcraft_pdf::text_width(font, size, &text);
+    let mut tw = crate::pdf_export::text_width(font, size, &text);
     if st.align.shrink && !wrap && tw > avail && tw > 0.0 {
         size = (size * avail / tw).max(1.0);
-        tw = gridcraft_pdf::text_width(font, size, &text);
+        tw = crate::pdf_export::text_width(font, size, &text);
     }
     if is_num && !wrap && tw > avail + 0.01 && !sh.show_formulas {
-        let hash = gridcraft_pdf::text_width(font, size, "#").max(0.1);
+        let hash = crate::pdf_export::text_width(font, size, "#").max(0.1);
         text = "#".repeat(((avail / hash).floor().max(1.0) as usize).min(255));
-        tw = gridcraft_pdf::text_width(font, size, &text);
+        tw = crate::pdf_export::text_width(font, size, &text);
     }
     let h_align = match st.align.h {
         HAlign::General => {
@@ -1530,7 +1532,7 @@ fn draw_text(
         let mut yy = y + pad + size * 0.8;
         for ch in chars {
             let s = ch.to_string();
-            let cw = gridcraft_pdf::text_width(font, size, &s);
+            let cw = crate::pdf_export::text_width(font, size, &s);
             pg.text(x + (w - cw) / 2.0, yy, size, font, color, &s);
             yy += line_h;
             if yy > y + h + line_h {
@@ -1541,7 +1543,7 @@ fn draw_text(
         return;
     }
     for (i, line) in lines.iter().enumerate() {
-        let lw = gridcraft_pdf::text_width(font, size, line);
+        let lw = crate::pdf_export::text_width(font, size, line);
         let lx = match h_align {
             HAlign::Right => x + w - pad - lw - indent,
             HAlign::Center => x + (w + across - lw) / 2.0,
@@ -1753,7 +1755,7 @@ fn draw_objects(pg: &mut Page, wb: &Workbook, si: usize, sh: &Sheet, b: &Block) 
                 ShapeTextAnchor::Bottom => y + h - 2.0 * b.k - block_h,
             } + size * 0.8;
             for l in lines.iter().take(500) {
-                let lw = gridcraft_pdf::text_width(font, size, l);
+                let lw = crate::pdf_export::text_width(font, size, l);
                 let lx = match align {
                     ShapeTextAlign::Left => x + 2.0 * b.k,
                     ShapeTextAlign::Center => x + (w - lw) / 2.0,
@@ -1807,7 +1809,7 @@ fn draw_headings(
             pg.fill_rect(x0, y, x1 - x0, size.1, fill);
             pg.rect_stroke(x0, y, x1 - x0, size.1, lw, line);
             let t = gridcraft_core::col_to_letters(col);
-            let tw = gridcraft_pdf::text_width(Font::Helvetica, fsize, &t);
+            let tw = crate::pdf_export::text_width(Font::Helvetica, fsize, &t);
             pg.text(
                 x0 + (x1 - x0 - tw) / 2.0,
                 y + size.1 / 2.0 + fsize * 0.35,
@@ -1828,7 +1830,7 @@ fn draw_headings(
             pg.fill_rect(x, y0, size.0, y1 - y0, fill);
             pg.rect_stroke(x, y0, size.0, y1 - y0, lw, line);
             let t = (row + 1).to_string();
-            let tw = gridcraft_pdf::text_width(Font::Helvetica, fsize, &t);
+            let tw = crate::pdf_export::text_width(Font::Helvetica, fsize, &t);
             pg.text(
                 x + (size.0 - tw) / 2.0,
                 y0 + (y1 - y0) / 2.0 + fsize * 0.35,
@@ -1863,11 +1865,11 @@ fn draw_header_footer(
                 continue;
             }
             let size = sec.size.unwrap_or(10.0).clamp(1.0, 72.0);
-            let font = Font::styled(gridcraft_pdf::Family::Sans, sec.bold, sec.italic);
+            let font = Font::styled(crate::pdf_export::Family::Sans, sec.bold, sec.italic);
             let lines: Vec<&str> = sec.text.split('\n').take(20).collect();
             let n = lines.len() as f32;
             for (j, line) in lines.iter().enumerate() {
-                let lw = gridcraft_pdf::text_width(font, size, line);
+                let lw = crate::pdf_export::text_width(font, size, line);
                 let x = match i {
                     0 => l,
                     1 => (pw - lw) / 2.0,
@@ -2918,7 +2920,7 @@ mod tests {
         let w = wrap_lines("the quick brown fox jumps", Font::Helvetica, 10.0, 50.0);
         assert!(w.len() >= 2);
         assert!(w.iter().all(
-            |l| gridcraft_pdf::text_width(Font::Helvetica, 10.0, l) <= 50.0 || !l.contains(' ')
+            |l| crate::pdf_export::text_width(Font::Helvetica, 10.0, l) <= 50.0 || !l.contains(' ')
         ));
         let w = wrap_lines("Supercalifragilistic", Font::Helvetica, 10.0, 20.0);
         assert!(w.len() > 2);

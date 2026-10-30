@@ -22,9 +22,9 @@
   "dependencies": {
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-dialog": "catalog:",
-    "@tauri-apps/plugin-upload": "2.4.0"
+    "@tauri-apps/plugin-upload": "catalog:"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

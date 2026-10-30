@@ -1,3 +1,5 @@
+> **Legacy fork notice (2026-10-29).** This document describes a matrix whose `bun:windows` references target the abandoned fork's API. The Bun OS runtime is now the unmodified upstream `bun` npm package pinned at `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`, `bun --revision` prints `1.4.4-canary.1+11c367163`). Fork-only commands, APIs and modules named here (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`, `bun:nginx`, ...) are not available on upstream Bun. Read it as history, not as current instructions.
+
 # rea capability matrix
 
 Every reverse-engineering need of Bun OS mapped to one `re` (rea) command, its MCP tool, its canonical owner and a real run on this workstation. Machine-readable copy: [`rea-matrix.json`](rea-matrix.json). Proof outputs live under `var/rea-matrix/proof/` (local, not versioned).
@@ -134,8 +136,8 @@ Every command accepts `--json`. The MCP server (`re mcp`) lists 228 tools; 21 ar
 Native builds are not run on the workstation. Pending commands:
 
 ```sh
-bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build -p bun-re --bin bunre
-bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build -p bun-engine --bin bun-engine
+bun scripts/cargo.ts exec -- build -p bun-re --bin bunre
+bun scripts/cargo.ts exec -- build -p bun-engine --bin bun-engine
 re recompile vendor/tetanes/tetanes/assets/roms/alter_ego.nes --target wasm --out var/rea-matrix/proof/recompile-nes-wasm --frames 300 --json
 re recompile vendor/tetanes/tetanes/assets/roms/alter_ego.nes --target exe --out var/rea-matrix/proof/recompile-nes-exe --frames 300 --json
 var/rea-matrix/proof/recompile-nes-exe/bin/recomp-nes-alter-ego --frames 300 --json

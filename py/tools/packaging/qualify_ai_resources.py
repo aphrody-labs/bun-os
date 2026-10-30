@@ -79,7 +79,6 @@ def qualify(work: Path, python: str) -> dict:
         "packages": {},
         "unqualified": [
             "Model generation/training",
-            "Native Shenron provider",
             "CPU/CUDA full extras",
             "Windows/macOS release artifacts",
         ],

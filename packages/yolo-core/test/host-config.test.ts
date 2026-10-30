@@ -29,7 +29,7 @@ test("YOLO_ROOT overrides the default monorepo checkout", () => {
 });
 
 test("composed units carry every dropped-in directive", () => {
-  const text = composeUnit("shenron-site.service");
+  const text = composeUnit("aphrody-mcp-http-dbfr.service");
   for (const d of ["User=ubuntu", "NoNewPrivileges=true", "SystemCallFilter=@system-service"])
     expect(text).toContain(d);
   expect(text.indexOf("[Service]")).toBeLessThan(text.indexOf("User=ubuntu"));

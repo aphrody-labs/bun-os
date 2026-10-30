@@ -1,12 +1,5 @@
 {
   "schemaVersion": 1,
   "note": "Forks the repository depends on. `yolo update sources forks` compares each fork's default branch with its parent through the GitHub API (read only). The parent is discovered from the API; `repo` is the fork.",
-  "forks": [
-    {
-      "repo": "aphrody-labs/bun",
-      "parent": "oven-sh/bun",
-      "role": "Bun of Aphrody: runtime releases (npm @aphrody/bun-runtime), @aphrody/bun-types, crates aphrody-bun-*, docs read from the fork checkout, commit pinned in docs/reference/upstream-bun/SOURCE.json",
-      "keep": "Carries every Aphrody Bun change as commits on main (thirdparty built-ins, bun:ffi dlopen global, argv0 aliases, @aphrody packages, Next.js layer); upstream merged by the fork's scripts/aphrody/sync-upstream.ts every 6 hours."
-    }
-  ]
+  "forks": []
 }

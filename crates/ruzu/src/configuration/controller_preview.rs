@@ -1447,6 +1447,8 @@ fn draw_gc_body(cr: &cairo::Context, center: (f64, f64), colors: &Colors) {
 /// The eight-point gate upstream builds inline in `DrawGCBody` with
 /// `angle = 2 * 3.1415f / 8`.
 fn octagon(cr: &cairo::Context, center: (f64, f64), radius: f64, color: (f64, f64, f64)) {
+    // Upstream computes the angle with the truncated constant; keep the exact value.
+    #[allow(clippy::approx_constant)]
     const ANGLE: f64 = 2.0 * 3.1415 / 8.0;
     for point in 0..8 {
         let x = center.0 + radius * (point as f64 * ANGLE).cos();

@@ -1,0 +1,129 @@
+---
+title: Cloud Integration
+description: Provider adapters that produce ordinary Spacedrive sources
+sidebarTitle: Cloud Integration
+---
+
+Cloud storage enters Spacedrive through the source adapter contract. A bucket,
+drive, account, or selected provider subtree becomes an origin. Its adapter
+ingests records into the same store shape used by local filesystems.
+
+Clouds are optional sources and destinations. Spacedrive does not require a
+hosted account of its own.
+
+## Adapter contract
+
+A cloud adapter provides:
+
+- origin discovery and authentication;
+- paginated hierarchy listing;
+- stable provider identity and version evidence;
+- metadata and capability mapping;
+- range reads and streaming;
+- safe create, update, move, and delete operations;
+- change watermarks or polling;
+- explicit error and rate-limit state.
+
+Provider-specific facts live in facets. Common facts such as name, kind,
+parent, size, timestamps, and content identity use the standard record model.
+
+## Connect a source
+
+The connection flow shows:
+
+1. which provider and account will receive credentials;
+2. which subtree or bucket will be visible;
+3. which read and write permissions are requested;
+4. where the portable source store will live;
+5. whether content may be cached locally;
+6. which network requests the adapter can make.
+
+Credentials are stored through the key manager, not in source records or log
+output. OAuth tokens refresh through the adapter and can be revoked without
+deleting the retained source store.
+
+## Indexing
+
+The adapter ingests provider pages into bounded store transactions. Stable
+provider object and version IDs help distinguish a rename from replacement.
+Change tokens or cursors advance only after the corresponding rows commit.
+
+When a provider lacks a reliable event feed, the adapter performs incremental
+polling and periodic full reconciliation. An incomplete listing cannot sweep
+unseen records.
+
+The source reports partial state during throttling, authentication failure, or
+provider outage instead of pretending that missing results were deleted.
+
+## Content identity
+
+Provider checksums are recorded as evidence with their algorithm and semantics.
+An object-store ETag is not assumed to be a full content hash.
+
+Spacedrive can identify content through range reads and confirm it through a
+full stream. The same candidate and confirmed distinction applies to local and
+cloud sources.
+
+Server-side copy can make transfer faster, but verification still records what
+the destination provider actually committed.
+
+## Offline behavior
+
+The source store keeps names, hierarchy, metadata, content evidence, and
+assertions available while the provider is offline. Original bytes and
+uncached previews remain unavailable until the origin answers.
+
+The interface identifies stale generations and the last successful ingest. A
+cached result never silently presents itself as a complete live listing.
+
+## File operations
+
+Operations target common capabilities and let the adapter choose the provider
+mechanism:
+
+- range read or full stream;
+- multipart upload;
+- server-side copy;
+- conditional update;
+- version-aware delete;
+- trash or permanent deletion;
+- restore a provider version.
+
+Before mutation, the adapter validates the current provider version against the
+planned record. A stale plan becomes a conflict.
+
+Cross-provider copy streams through the byte-provider boundary unless both ends
+share a safe native mechanism. Job progress, retry state, checksums, and errors
+remain visible through the common API.
+
+## Version history
+
+When a provider exposes object versions, the adapter records their identities
+and relationships. Spacedrive history can then connect a source generation to
+the exact provider version that supplied its bytes.
+
+Provider retention is still provider policy. A source freeze preserves index
+knowledge, not a cloud object's bytes.
+
+## Security
+
+- Request the narrowest provider scopes.
+- Encrypt credentials at rest.
+- Never log secrets or signed download URLs.
+- Bind every operation to the selected account and source scope.
+- Treat redirects and provider-supplied URLs as untrusted input.
+- Make external processing and data recipients visible.
+- Revoke adapter access when a source is detached, unless the user chooses to
+  preserve the credential for later reattachment.
+
+## Adding a provider
+
+A new provider belongs in an adapter or extension. It should not add a parallel
+cloud file table or a special UI-only operation path.
+
+The adapter is complete when it can ingest stable records, report capabilities,
+stream bytes, handle version conflicts, preserve errors, and participate in the
+same search, sync, and permission model as every other source.
+
+See [Architecture](/core/architecture) for the source boundary and [File
+Sync](/core/file-sync) for explicit byte placement.

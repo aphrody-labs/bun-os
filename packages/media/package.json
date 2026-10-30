@@ -1,0 +1,12 @@
+{
+  "name": "@aphrody/media",
+  "version": "1.4.7",
+  "description": "Shared media API (assets, non-destructive edit stacks, proxies, cross-app handoff) over the media-core Rust crate",
+  "type": "module",
+  "license": "MIT OR Apache-2.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "bun test"
+  }
+}

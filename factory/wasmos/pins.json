@@ -1,0 +1,55 @@
+{
+  "note": "Pinned inputs of the wasmos Alpine boot artifact. build-alpine.ts verifies every pin; nothing is fetched unpinned.",
+  "container2wasm": {
+    "version": "v0.8.4",
+    "repo": "https://github.com/container2wasm/container2wasm",
+    "release": "https://github.com/container2wasm/container2wasm/releases/download/v0.8.4/container2wasm-v0.8.4-linux-amd64.tar.gz",
+    "sha256": "1142ab95212578c0c7f666de830de6945f2abbea1713d1e07a7cb04072e00f31",
+    "emulator": "Bochs (ktock/Bochs a88d1f687ec83ff82b5318f59dcecb8dab44fc83), x86_64, wasi-sdk 19 + wizer",
+    "guestKernel": "Linux 6.1 (c2w Dockerfile: git clone -b v6.1 torvalds/linux)"
+  },
+  "dockerfilePatches": [
+    {
+      "why": "rust:1.74.1-bullseye: Debian 11 security archive no longer serves its packages (404), the tinyemu/bochs tool stages fail at apt-get",
+      "from": "rust:1.74.1-bullseye",
+      "to": "rust:1.74.1-bookworm"
+    },
+    {
+      "why": "the embedded Dockerfile clones ktock/container2wasm at v0.8.4, a tag that does not exist there; the project lives at container2wasm/container2wasm",
+      "from": "https://github.com/ktock/container2wasm",
+      "to": "https://github.com/container2wasm/container2wasm"
+    }
+  ],
+  "image": "alpine:3.24.2",
+  "artifact": "alpine-3.24.2-x86_64.wasm",
+  "apps": {
+    "note": "Real Alpine packages, pinned to the exact apk version from dl-cdn.alpinelinux.org/alpine/v3.24 (APKINDEX read 2026-10-29). Alpine drops superseded -rN builds, so a build failing with 'no such package' means re-read the APKINDEX and bump here. Two images keep each wasm module small enough for a hosted runner. Bun has no musl package in Alpine, so it is not in the guest.",
+    "base": "alpine:3.24.2",
+    "images": {
+      "tools": {
+        "artifact": "alpine-tools-3.24.2-x86_64.wasm",
+        "packages": {
+          "uutils": "0.11.0-r1",
+          "bash": "5.3.9-r1",
+          "nushell": "0.104.1-r0",
+          "curl": "8.23.0-r0",
+          "git": "2.54.0-r0",
+          "jq": "1.8.2-r0",
+          "ripgrep": "15.1.0-r0",
+          "fd": "10.2.0-r3",
+          "eza": "0.23.4-r0",
+          "htop": "3.5.3-r0",
+          "vim": "9.2.1202-r0"
+        }
+      },
+      "lang": {
+        "artifact": "alpine-lang-3.24.2-x86_64.wasm",
+        "packages": {
+          "python3": "3.14.10-r1",
+          "helix": "25.07.1-r3",
+          "nano": "9.3-r0"
+        }
+      }
+    }
+  }
+}

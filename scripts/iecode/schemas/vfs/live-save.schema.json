@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://rosegriffon.fr/schemas/vfs/live-save.schema.json",
+  "$id": "https://aphrody.com/schemas/vfs/live-save.schema.json",
   "title": "LiveSaveContainerSchema",
   "description": "Validation schema for decrypted Level-5 Lives save file headers and 0xEEFF blob payloads.",
   "type": "object",

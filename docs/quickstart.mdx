@@ -21,8 +21,8 @@ dependencies or qualify the workspace.
 ## Inspect a factory plan
 
 ```bash
-bun src/cli.ts factory --action plan --composition server --snapshot YYYY-MM-DD
-bun src/cli.ts graph --composition server
+bun src/cli.ts factory arch --action plan --composition server --snapshot YYYY-MM-DD
+bun src/cli.ts workspace graph --profile full --target linux-x64
 ```
 
 These commands request a plan and graph for a declared composition. The

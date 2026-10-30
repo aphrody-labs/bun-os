@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
-// The build graph of an M3 app in `bun:graph`, the SQLite registry of the Aphrody fork of Bun: the app is a
-// repository, each `m3-bun build` a run (status, duration sample, output artifacts with their SHA-256) and the
-// module graph of `Bun.build`'s metafile a snapshot (inputs, outputs, imports, which input went into which output).
-// `m3-bun graph` reads it back: the markdown report of `bun:graphx`, or what depends on a file.
+// The build graph of an M3 app in a SQLite registry (graph-registry.ts): the app is a repository, each `m3-bun build`
+// a run (status, duration sample, output artifacts with their SHA-256) and the module graph of `Bun.build`'s metafile
+// a snapshot (inputs, outputs, imports, which input went into which output).
+// `m3-bun graph` reads it back: the markdown report, or what depends on a file.
 import type { BuildMetafile } from "bun";
-import type { BunPython } from "bun:graph";
 import { join, relative, resolve } from "node:path";
 import type { BuildReport } from "./build.ts";
 import type { M3App } from "./config.ts";
+import { GraphRegistry } from "./graph-registry.ts";
 import { sha256 } from "./util.ts";
 
 /** Registry of an app when no path is given: next to its config, out of the build directory. */
@@ -16,18 +16,9 @@ export const graphPath = (app: M3App): string => join(app.dir, ".m3-bun", "graph
 /** Repository id of an app in the registry. */
 export const repositoryId = (app: M3App): string => `m3-app:${app.name}`;
 
-/** `bun:graph` exists in the Aphrody fork of Bun only. */
-export async function openGraph(path: string): Promise<BunPython> {
-  let graph: typeof import("bun:graph");
-  try {
-    graph = await import("bun:graph");
-  } catch (error) {
-    throw new Error(
-      `m3-bun graph: this Bun (${Bun.version}+${Bun.revision.slice(0, 9)}) has no bun:graph module; run m3-bun with a build of the Aphrody fork of Bun that ships it`,
-      { cause: error },
-    );
-  }
-  return new graph.BunPython(path);
+/** Opens (creating it when needed) the registry file at `path`. */
+export async function openGraph(path: string): Promise<GraphRegistry> {
+  return new GraphRegistry(path);
 }
 
 // A type alias, not an interface: `importGraph` takes records with an index signature.
@@ -194,11 +185,10 @@ export async function recordBuild(
   }
 }
 
-/** The `bun:graphx` markdown report of an app's builds. */
+/** The markdown report of an app's builds. */
 export async function graphReport(app: M3App, path = graphPath(app)): Promise<string> {
   using registry = await openGraph(path);
-  const { markdown } = await import("bun:graphx");
-  return await markdown(registry, { repository: repositoryId(app) });
+  return registry.markdown(repositoryId(app));
 }
 
 /** Inputs and outputs that depend on `file` (relative to the app) in the latest build: its importers, transitively. */
@@ -212,11 +202,11 @@ export async function dependents(
   if (!snapshot) throw new Error(`m3-bun graph: no build of ${app.name} recorded in ${path} (m3-bun build --graph)`);
   const node = registry.getNode(`${snapshot.id}:input:${file.replaceAll("\\", "/")}`);
   if (!node) throw new Error(`m3-bun graph: ${file} is not an input of build snapshot ${snapshot.id}`);
-  const { nodes } = await registry.traverse(node.id, {
+  const { nodes } = registry.traverse(node.id, {
     direction: "incoming",
     maxDepth: 32,
   });
-  const bundled = await registry.traverse(node.id, {
+  const bundled = registry.traverse(node.id, {
     direction: "outgoing",
     kind: "bundled-into",
     maxDepth: 1,

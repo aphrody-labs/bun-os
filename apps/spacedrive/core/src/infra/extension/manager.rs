@@ -1,0 +1,605 @@
+//! WASM Plugin Manager
+//!
+//! Manages the lifecycle of WASM extensions: discovery under the data
+//! directory, loading, unloading, and running their registered jobs.
+
+use std::collections::HashMap;
+use std::path::PathBuf;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex};
+
+use chrono::Utc;
+use sd_extension_ui::UiManifest;
+use thiserror::Error;
+use tokio::sync::RwLock;
+use wasmer::{imports, Function, FunctionEnv, Instance, Memory, Module, Store, TypedFunction};
+
+use super::host_functions::{self, host_spacedrive_log, JobBridge, PluginEnv};
+use super::job_registry::ExtensionJobRegistry;
+use super::model_registry::ExtensionModelRegistry;
+use super::types::{ExtensionManifest, LoadedPlugin};
+use crate::filetype::{ExtensionKind, FileTypeRegistry};
+use crate::ops::indexing::VolumeIndex;
+
+#[derive(Error, Debug)]
+pub enum PluginError {
+	#[error("Plugin not found: {0}")]
+	NotFound(String),
+
+	#[error("Failed to load manifest: {0}")]
+	ManifestLoadFailed(String),
+
+	#[error("Failed to compile WASM module: {0}")]
+	CompilationFailed(String),
+
+	#[error("Failed to instantiate WASM module: {0}")]
+	InstantiationFailed(String),
+
+	#[error("Plugin already loaded: {0}")]
+	AlreadyLoaded(String),
+
+	#[error("Plugin export missing or mistyped: {0}")]
+	BadExport(String),
+
+	#[error("WASM trap: {0}")]
+	Trap(String),
+
+	#[error("I/O error: {0}")]
+	Io(#[from] std::io::Error),
+}
+
+/// A plugin's compiled module, its store and its instance, which must stay
+/// together for the plugin's lifetime and are used from one thread at a time.
+pub struct PluginRuntime {
+	store: Store,
+	instance: Instance,
+	env: FunctionEnv<PluginEnv>,
+	/// Set once a guest call trapped. A panic aborts the guest wherever it
+	/// is, so its heap and locks cannot be trusted by the next call. Shared
+	/// with `LoadedPlugin` so the manager can read it without taking the
+	/// mutex a running job holds.
+	poisoned: Arc<AtomicBool>,
+}
+
+impl PluginRuntime {
+	/// Run one registered job export to completion on the calling thread.
+	///
+	/// The context and state JSON go through the guest's own allocator, so the
+	/// guest reads them with plain slices. The bridge is installed for the
+	/// duration of the call and removed after, whatever the guest did.
+	/// Returns the guest's exit code: 0 completed, 1 interrupted, 2 failed.
+	pub fn run_job(
+		&mut self,
+		export_fn: &str,
+		ctx_json: &str,
+		state_json: &str,
+		bridge: JobBridge,
+	) -> Result<i32, PluginError> {
+		if self.poisoned.load(Ordering::SeqCst) {
+			return Err(PluginError::Trap(
+				"instance trapped earlier and is waiting to be reloaded".into(),
+			));
+		}
+		let store = &mut self.store;
+		let exports = &self.instance.exports;
+		let alloc: TypedFunction<i32, i32> = exports
+			.get_typed_function(store, "wasm_alloc")
+			.map_err(|e| PluginError::BadExport(format!("wasm_alloc: {e}")))?;
+		let free: TypedFunction<(i32, i32), ()> = exports
+			.get_typed_function(store, "wasm_free")
+			.map_err(|e| PluginError::BadExport(format!("wasm_free: {e}")))?;
+		let run: TypedFunction<(u32, u32, u32, u32), i32> = exports
+			.get_typed_function(store, export_fn)
+			.map_err(|e| PluginError::BadExport(format!("{export_fn}: {e}")))?;
+		let memory = exports
+			.get_memory("memory")
+			.map_err(|e| PluginError::BadExport(format!("memory: {e}")))?
+			.clone();
+
+		let mut write_guest = |store: &mut Store, bytes: &[u8]| -> Result<i32, PluginError> {
+			let len = bytes.len().max(1) as i32;
+			let ptr = alloc
+				.call(store, len)
+				.map_err(|e| PluginError::Trap(format!("wasm_alloc: {e}")))?;
+			memory
+				.view(store)
+				.write(ptr as u64, bytes)
+				.map_err(|e| PluginError::Trap(format!("write guest memory: {e}")))?;
+			Ok(ptr)
+		};
+		let ctx_ptr = write_guest(store, ctx_json.as_bytes())?;
+		let state_ptr = write_guest(store, state_json.as_bytes())?;
+
+		self.env.as_mut(store).current_job = Some(bridge);
+		let result = run.call(
+			store,
+			ctx_ptr as u32,
+			ctx_json.len() as u32,
+			state_ptr as u32,
+			state_json.len() as u32,
+		);
+		self.env.as_mut(store).current_job = None;
+
+		// Best-effort: a leaked buffer costs guest memory until the plugin is
+		// reloaded, never correctness.
+		let _ = free.call(store, ctx_ptr, ctx_json.len().max(1) as i32);
+		let _ = free.call(store, state_ptr, state_json.len().max(1) as i32);
+
+		result.map_err(|e| {
+			self.poisoned.store(true, Ordering::SeqCst);
+			PluginError::Trap(e.to_string())
+		})
+	}
+}
+
+/// Manages WASM plugin lifecycle
+pub struct PluginManager {
+	plugins: Arc<RwLock<HashMap<String, LoadedPlugin>>>,
+	plugin_dir: PathBuf,
+	job_registry: Arc<ExtensionJobRegistry>,
+	model_registry: Arc<ExtensionModelRegistry>,
+	/// The kinds of every loaded extension, in load order, which is the
+	/// order the file type registry resolves a contested file extension in.
+	kinds: Vec<(String, Vec<ExtensionKind>)>,
+	/// Where open stores are found, so a load with kinds can name the rows
+	/// those stores already hold. `None` only in tests of the manager alone.
+	volume_index: Option<Arc<VolumeIndex>>,
+}
+
+impl PluginManager {
+	/// Create new plugin manager
+	pub fn new(plugin_dir: PathBuf, volume_index: Option<Arc<VolumeIndex>>) -> Self {
+		Self {
+			plugins: Arc::new(RwLock::new(HashMap::new())),
+			plugin_dir,
+			job_registry: Arc::new(ExtensionJobRegistry::new()),
+			model_registry: Arc::new(ExtensionModelRegistry::new()),
+			kinds: Vec::new(),
+			volume_index,
+		}
+	}
+
+	/// Put this extension's kinds into the registry every lookup uses, and
+	/// name the rows open stores already hold after them.
+	async fn add_kinds(&mut self, plugin_id: &str, kinds: &[ExtensionKind]) {
+		if kinds.is_empty() {
+			return;
+		}
+		self.kinds.push((plugin_id.to_string(), kinds.to_vec()));
+		let registry = FileTypeRegistry::install_current(&self.kinds);
+		for conflict in registry.conflicts() {
+			if conflict.kind.starts_with(&format!("{plugin_id}:")) {
+				tracing::warn!(
+					extension = %plugin_id,
+					file_extension = %conflict.extension,
+					kind = %conflict.kind,
+					claimed_by = %conflict.claimed_by,
+					"file extension already claimed by an earlier extension; claim dropped"
+				);
+			}
+		}
+		if let Some(volume_index) = &self.volume_index {
+			crate::ops::indexing::kinds::name_kinds_in_open_stores(volume_index).await;
+		}
+	}
+
+	/// Take this extension's kinds back out of the registry. Rows already
+	/// named keep their name; readers fall back to the parent kind.
+	fn remove_kinds(&mut self, plugin_id: &str) {
+		let before = self.kinds.len();
+		self.kinds.retain(|(id, _)| id != plugin_id);
+		if self.kinds.len() != before {
+			FileTypeRegistry::install_current(&self.kinds);
+		}
+	}
+
+	/// Get the job registry for extension jobs
+	pub fn job_registry(&self) -> Arc<ExtensionJobRegistry> {
+		self.job_registry.clone()
+	}
+
+	/// The data models extensions declared
+	pub fn model_registry(&self) -> Arc<ExtensionModelRegistry> {
+		self.model_registry.clone()
+	}
+
+	/// The directory extensions are installed under: `<data dir>/extensions`.
+	pub fn plugin_dir(&self) -> &PathBuf {
+		&self.plugin_dir
+	}
+
+	/// Load every extension installed under the plugin directory.
+	///
+	/// A directory is an extension when it holds a `manifest.json`. One broken
+	/// extension is logged and skipped so it cannot keep the others, or the
+	/// daemon, from starting. Returns the ids that loaded.
+	pub async fn load_all(&mut self) -> Vec<String> {
+		let mut dirs = match tokio::fs::read_dir(&self.plugin_dir).await {
+			Ok(dirs) => dirs,
+			Err(e) => {
+				tracing::warn!(dir = %self.plugin_dir.display(), "Cannot read extensions directory: {e}");
+				return Vec::new();
+			}
+		};
+
+		// Sorted, so the extension that wins a contested file extension is
+		// the same on every machine rather than whichever the filesystem
+		// listed first.
+		let mut dir_names = Vec::new();
+		while let Ok(Some(entry)) = dirs.next_entry().await {
+			if entry.path().join("manifest.json").is_file() {
+				dir_names.push(entry.file_name().to_string_lossy().to_string());
+			}
+		}
+		dir_names.sort();
+
+		let mut loaded = Vec::new();
+		for dir_name in dir_names {
+			match self.load_plugin(&dir_name).await {
+				Ok(id) => loaded.push(id),
+				Err(e) => tracing::error!(extension = %dir_name, "Extension did not load: {e}"),
+			}
+		}
+		loaded
+	}
+
+	/// Load a WASM plugin from its directory under the plugin directory.
+	///
+	/// Expected structure:
+	/// ```text
+	/// extensions/finance/
+	///   ├── manifest.json
+	///   └── finance.wasm
+	/// ```
+	///
+	/// The plugin is keyed by the id in its manifest, which may differ from the
+	/// directory name. Returns that id.
+	pub async fn load_plugin(&mut self, dir_name: &str) -> Result<String, PluginError> {
+		let plugin = self.instantiate(dir_name).await?;
+		if self.plugins.read().await.contains_key(&plugin.id) {
+			return Err(PluginError::AlreadyLoaded(plugin.id));
+		}
+		self.activate(plugin).await
+	}
+
+	/// Read, compile and instantiate a plugin without touching the registry
+	/// or the loaded set, so a failure here changes nothing.
+	async fn instantiate(&self, dir_name: &str) -> Result<LoadedPlugin, PluginError> {
+		let plugin_path = self.plugin_dir.join(dir_name);
+		let manifest_path = plugin_path.join("manifest.json");
+		let manifest: ExtensionManifest = {
+			let manifest_str = tokio::fs::read_to_string(&manifest_path)
+				.await
+				.map_err(|e| {
+					PluginError::ManifestLoadFailed(format!("Failed to read manifest: {}", e))
+				})?;
+
+			serde_json::from_str(&manifest_str).map_err(|e| {
+				PluginError::ManifestLoadFailed(format!("Failed to parse manifest: {}", e))
+			})?
+		};
+		manifest
+			.validate()
+			.map_err(PluginError::ManifestLoadFailed)?;
+		let ui = UiManifest::read_from(&plugin_path)
+			.await
+			.map_err(PluginError::ManifestLoadFailed)?;
+		manifest
+			.validate_viewers(&ui)
+			.map_err(PluginError::ManifestLoadFailed)?;
+		let plugin_id = manifest.id.clone();
+
+		tracing::info!(
+			extension = %plugin_id,
+			"Loading extension {} v{}",
+			manifest.name,
+			manifest.version
+		);
+
+		let wasm_path = plugin_path.join(&manifest.wasm_file);
+		let wasm_bytes = tokio::fs::read(&wasm_path).await?;
+
+		// Each plugin owns a store so one plugin's job never holds another's
+		// instance.
+		let mut store = Store::default();
+		let poisoned = Arc::new(AtomicBool::new(false));
+		let module = Module::new(&store, wasm_bytes).map_err(|e| {
+			PluginError::CompilationFailed(format!("Failed to compile WASM: {}", e))
+		})?;
+
+		// Placeholder memory until the instance exists; host functions only run
+		// after it is swapped for the real export.
+		let temp_memory = Memory::new(&mut store, wasmer::MemoryType::new(1, None, false))
+			.map_err(|e| {
+				PluginError::InstantiationFailed(format!("Failed to create temp memory: {}", e))
+			})?;
+
+		let plugin_env = PluginEnv {
+			extension_id: manifest.id.clone(),
+			memory: temp_memory,
+			alloc: None,
+			job_registry: self.job_registry.clone(),
+			model_registry: self.model_registry.clone(),
+			current_job: None,
+		};
+
+		let env = FunctionEnv::new(&mut store, plugin_env);
+
+		let import_object = imports! {
+			"spacedrive" => {
+				"spacedrive_log" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_spacedrive_log
+				),
+				"job_report_progress" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_job_report_progress
+				),
+				"job_checkpoint" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_job_checkpoint
+				),
+				"job_check_interrupt" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_job_check_interrupt
+				),
+				"job_add_warning" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_job_add_warning
+				),
+				"job_increment_bytes" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_job_increment_bytes
+				),
+				"job_increment_items" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_job_increment_items
+				),
+				"register_job" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_register_job
+				),
+				"register_model" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_register_model
+				),
+				"spacedrive_random" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_spacedrive_random
+				),
+				"spacedrive_now_ms" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_spacedrive_now_ms
+				),
+				"spacedrive_op" => Function::new_typed_with_env(
+					&mut store,
+					&env,
+					host_functions::host_spacedrive_op
+				),
+			}
+		};
+
+		let instance = Instance::new(&mut store, &module, &import_object).map_err(|e| {
+			PluginError::InstantiationFailed(format!("Failed to instantiate WASM: {}", e))
+		})?;
+
+		let memory = instance.exports.get_memory("memory").map_err(|e| {
+			PluginError::InstantiationFailed(format!("Plugin missing memory export: {}", e))
+		})?;
+		env.as_mut(&mut store).memory = memory.clone();
+		let alloc: TypedFunction<i32, i32> = instance
+			.exports
+			.get_typed_function(&store, "wasm_alloc")
+			.map_err(|e| PluginError::BadExport(format!("wasm_alloc: {e}")))?;
+		env.as_mut(&mut store).alloc = Some(alloc);
+
+		Ok(LoadedPlugin {
+			id: plugin_id,
+			dir_name: dir_name.to_string(),
+			manifest: Arc::new(manifest),
+			ui: Arc::new(ui),
+			loaded_at: Utc::now(),
+			poisoned: poisoned.clone(),
+			runtime: Arc::new(Mutex::new(PluginRuntime {
+				store,
+				instance,
+				env,
+				poisoned,
+			})),
+		})
+	}
+
+	/// Run `plugin_init`, which registers the plugin's jobs, and record the
+	/// plugin as loaded.
+	async fn activate(&mut self, plugin: LoadedPlugin) -> Result<String, PluginError> {
+		let plugin_id = plugin.id.clone();
+		{
+			let mut runtime = plugin
+				.runtime
+				.lock()
+				.map_err(|_| PluginError::InstantiationFailed("runtime lock poisoned".into()))?;
+			let runtime = &mut *runtime;
+			match runtime.instance.exports.get_function("plugin_init") {
+				Ok(init_fn) => {
+					if let Err(e) = init_fn.call(&mut runtime.store, &[]) {
+						self.job_registry.unregister_extension_jobs(&plugin_id);
+						self.model_registry.unregister_extension(&plugin_id);
+						return Err(PluginError::InstantiationFailed(format!(
+							"plugin_init() failed: {}",
+							e
+						)));
+					}
+				}
+				Err(_) => {
+					tracing::warn!(extension = %plugin_id, "Plugin has no plugin_init() function")
+				}
+			}
+		}
+
+		let jobs = self.job_registry.list_jobs_for_extension(&plugin_id);
+		tracing::info!(
+			extension = %plugin_id,
+			jobs = ?jobs.iter().map(|j| j.job_name.as_str()).collect::<Vec<_>>(),
+			"Extension loaded"
+		);
+
+		let kinds = plugin.manifest.kinds.clone();
+		self.plugins.write().await.insert(plugin_id.clone(), plugin);
+		self.add_kinds(&plugin_id, &kinds).await;
+		Ok(plugin_id)
+	}
+
+	/// Unload a plugin, returning it so a caller can put it back.
+	pub async fn unload_plugin(&mut self, plugin_id: &str) -> Result<LoadedPlugin, PluginError> {
+		tracing::info!("Unloading plugin: {}", plugin_id);
+
+		let plugin = self
+			.plugins
+			.write()
+			.await
+			.remove(plugin_id)
+			.ok_or_else(|| PluginError::NotFound(plugin_id.to_string()))?;
+		self.job_registry.unregister_extension_jobs(plugin_id);
+		self.model_registry.unregister_extension(plugin_id);
+		self.remove_kinds(plugin_id);
+
+		// A trapped guest cannot be trusted to run cleanup, and a guest still
+		// running a job keeps its instance alive until that job returns; the
+		// instance is dropped with the last Arc either way.
+		if !plugin.poisoned.load(Ordering::SeqCst) {
+			if let Ok(mut runtime) = plugin.runtime.try_lock() {
+				if let Ok(cleanup) = runtime.instance.exports.get_function("plugin_cleanup") {
+					let cleanup = cleanup.clone();
+					if let Err(e) = cleanup.call(&mut runtime.store, &[]) {
+						tracing::warn!(extension = %plugin_id, "plugin_cleanup() failed: {e}");
+					}
+				}
+			}
+		}
+
+		Ok(plugin)
+	}
+
+	/// Reload a plugin from its directory, for development and after a trap.
+	///
+	/// The new instance is read, compiled and instantiated before the old one
+	/// goes, so a reload that fails leaves the loaded plugin as it was.
+	pub async fn reload_plugin(&mut self, plugin_id: &str) -> Result<(), PluginError> {
+		let dir_name = self
+			.plugins
+			.read()
+			.await
+			.get(plugin_id)
+			.map(|plugin| plugin.dir_name.clone())
+			.ok_or_else(|| PluginError::NotFound(plugin_id.to_string()))?;
+		let fresh = self.instantiate(&dir_name).await?;
+		let previous_jobs = self.job_registry.list_jobs_for_extension(plugin_id);
+		let previous_schema = self.model_registry.schema_for(plugin_id);
+		let previous = self.unload_plugin(plugin_id).await?;
+		if let Err(e) = self.activate(fresh).await {
+			// The replacement's plugin_init failed; put the old plugin back so
+			// one bad reload is one error, not a missing extension.
+			for job in previous_jobs {
+				let _ = self.job_registry.register(
+					job.extension_id,
+					job.job_name,
+					job.export_fn,
+					job.resumable,
+				);
+			}
+			for (name, def) in previous_schema.models {
+				// The built-in custom field model is not the guest's to
+				// register; the registry adds it to every schema itself.
+				if name == super::model_registry::CUSTOM_FIELD_MODEL {
+					continue;
+				}
+				let _ = self.model_registry.register(
+					plugin_id,
+					super::model_registry::ModelDefinition {
+						name,
+						fields: def.fields,
+					},
+				);
+			}
+			let kinds = previous.manifest.kinds.clone();
+			self.plugins
+				.write()
+				.await
+				.insert(plugin_id.to_string(), previous);
+			self.add_kinds(plugin_id, &kinds).await;
+			return Err(e);
+		}
+		Ok(())
+	}
+
+	/// List all loaded plugins
+	pub async fn list_plugins(&self) -> Vec<String> {
+		self.plugins.read().await.keys().cloned().collect()
+	}
+
+	/// Get plugin manifest
+	pub async fn get_manifest(&self, plugin_id: &str) -> Option<Arc<ExtensionManifest>> {
+		self.plugins
+			.read()
+			.await
+			.get(plugin_id)
+			.map(|p| p.manifest.clone())
+	}
+
+	/// The viewers a loaded plugin's `ui_manifest.json` declares.
+	pub async fn ui_manifest(&self, plugin_id: &str) -> Option<Arc<UiManifest>> {
+		self.plugins
+			.read()
+			.await
+			.get(plugin_id)
+			.map(|p| p.ui.clone())
+	}
+
+	/// The directory a loaded plugin was installed from.
+	pub async fn plugin_path(&self, plugin_id: &str) -> Option<PathBuf> {
+		self.plugins
+			.read()
+			.await
+			.get(plugin_id)
+			.map(|p| self.plugin_dir.join(&p.dir_name))
+	}
+
+	/// The runtime of a loaded plugin, for running one of its jobs.
+	pub async fn runtime(&self, plugin_id: &str) -> Option<Arc<Mutex<PluginRuntime>>> {
+		self.plugins
+			.read()
+			.await
+			.get(plugin_id)
+			.map(|p| p.runtime.clone())
+	}
+
+	/// Whether the plugin's last guest call trapped, read without touching
+	/// the mutex a running job holds.
+	pub async fn is_poisoned(&self, plugin_id: &str) -> bool {
+		self.plugins
+			.read()
+			.await
+			.get(plugin_id)
+			.map(|p| {
+				// A panic that unwound out of a guest call poisons the mutex
+				// without reaching the flag; both mean the instance is done.
+				p.poisoned.load(Ordering::SeqCst)
+					|| matches!(
+						p.runtime.try_lock(),
+						Err(std::sync::TryLockError::Poisoned(_))
+					)
+			})
+			.unwrap_or(false)
+	}
+}

@@ -2,7 +2,7 @@
 //! A local chat model with its LoRA adapters, provisioned into a caller-owned
 //! directory and served by a supervised `llama-server`.
 //!
-//! This is the path a desktop application takes (Shenron Studio ships it):
+//! This is the path a desktop application takes (a bundled application ships it):
 //!
 //! 1. [`provision_chat`] makes the base GGUF and every adapter present in a model store rooted
 //!    where the caller says (`<home>/models`), from catalog ids (the built-in catalog of

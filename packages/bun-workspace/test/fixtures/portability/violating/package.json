@@ -20,7 +20,7 @@
     "./pure-process": "./src/pure-process.ts",
     "./pure-dom": "./src/pure-dom.ts",
     "./pure-react": "./src/pure-react.ts",
-    "./pure-shenron": "./src/pure-shenron.ts",
+    "./pure-server": "./src/pure-server.ts",
     "./server-bun": "./src/server-bun.ts",
     "./server-react": "./src/server-react.ts",
     "./react-node": "./src/react-node.ts",
@@ -29,7 +29,7 @@
     "./unclassified": "./src/escape.ts",
     "./missing": "./src/missing.ts"
   },
-  "shenron": {
+  "bunos": {
     "runtime": {
       "./server-only": "server",
       "./t3": "server",
@@ -48,7 +48,7 @@
       "./pure-process": "pure",
       "./pure-dom": "pure",
       "./pure-react": "pure",
-      "./pure-shenron": "pure",
+      "./pure-server": "pure",
       "./server-bun": "server",
       "./server-react": "server",
       "./react-node": "react",

@@ -6,10 +6,10 @@ After=network.target
 Type=simple
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/ubuntu/src/bun/packages/bun-video
+WorkingDirectory=/home/ubuntu/src/bun-os/vendor/bun-video
 Environment=PORT=8765
 Environment=FILMCRAFT_DIST=/home/ubuntu/apps/aphrody-video-editor/current
-ExecStart=/home/ubuntu/.bun/bin/bun /home/ubuntu/src/bun/packages/bun-video/src/apps/filmcraft/server.ts
+ExecStart=/home/ubuntu/.bun/bin/bun /home/ubuntu/src/bun-os/vendor/bun-video/src/apps/filmcraft/server.ts
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=true

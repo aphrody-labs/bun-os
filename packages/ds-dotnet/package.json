@@ -2,7 +2,7 @@
   "name": "@bun-os/ds-dotnet",
   "version": "1.4.7",
   "private": true,
-  "description": "Nintendo DS and 3DS managed format readers (Kuriimu2 Konnect plugins, SPICA H3D, pk3DS ExeFS) hosted in Bun through bun:dotnet.",
+  "description": "Nintendo DS and 3DS managed format readers (Kuriimu2 Konnect plugins, SPICA H3D, pk3DS ExeFS) hosted in Bun through hostfxr and bun:ffi.",
   "license": "GPL-3.0-or-later",
   "bin": {
     "ds-dotnet": "./src/cli.ts"
@@ -18,6 +18,6 @@
     "inspect": "bun run ./src/cli.ts"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

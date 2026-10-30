@@ -91,7 +91,11 @@ fn software_renderers() -> Renderers {
         renderer: Renderer::new(),
         output: unsafe { Box::new_zeroed().assume_init() },
     }));
-    let rx = Rx { shared: shared.clone(), line: 0, output: Scanline([0; 256]) };
+    let rx = Rx {
+        shared: shared.clone(),
+        line: 0,
+        output: Scanline([0; 256]),
+    };
     Renderers {
         two_d: Box::new(aphrody_dust_soft_2d::sync::Renderer::new(Box::new(rx))),
         three_d: Box::new(Tx(shared)),
@@ -225,24 +229,44 @@ impl Nds {
             return Err(err("DS GPU", "resolution scale must be between 1x and 16x"));
         }
         let (tx, rx, three_d) = aphrody_dust_wgpu::render_3d::local::init(
-            Arc::clone(&device), Arc::clone(&queue), resolution_scale_shift,
+            Arc::clone(&device),
+            Arc::clone(&queue),
+            resolution_scale_shift,
         );
         let output = three_d.output_view();
         let next_view = three_d.clone();
-        let (two_d, view, frontend) = aphrody_dust_wgpu::render_2d::threaded::lockstep_scanlines::Renderer::new(
-            device, queue, resolution_scale_shift,
-            aphrody_dust_wgpu::render_2d::Renderer3dRx::LocalAccel {
-                rx: Box::new(rx), color_output_view: output,
-                new_color_output_view: Box::new(move || next_view.output_view()),
+        let (two_d, view, frontend) =
+            aphrody_dust_wgpu::render_2d::threaded::lockstep_scanlines::Renderer::new(
+                device,
+                queue,
+                resolution_scale_shift,
+                aphrody_dust_wgpu::render_2d::Renderer3dRx::LocalAccel {
+                    rx: Box::new(rx),
+                    color_output_view: output,
+                    new_color_output_view: Box::new(move || next_view.output_view()),
+                },
+            );
+        Self::from_rom_with_renderers(
+            rom,
+            options,
+            Renderers {
+                two_d: Box::new(two_d),
+                three_d: Box::new(tx),
+                gpu: Some(GpuPresentation {
+                    two_d: frontend,
+                    three_d,
+                    view,
+                    scale_shift: resolution_scale_shift,
+                }),
             },
-        );
-        Self::from_rom_with_renderers(rom, options, Renderers {
-            two_d: Box::new(two_d), three_d: Box::new(tx),
-            gpu: Some(GpuPresentation { two_d: frontend, three_d, view, scale_shift: resolution_scale_shift }),
-        })
+        )
     }
 
-    fn from_rom_with_renderers(rom: &[u8], options: &Options, renderers: Renderers) -> Result<Self> {
+    fn from_rom_with_renderers(
+        rom: &[u8],
+        options: &Options,
+        renderers: Renderers,
+    ) -> Result<Self> {
         let existing = options
             .save_path
             .as_ref()
@@ -434,12 +458,15 @@ impl Handheld for Nds {
     #[cfg(feature = "nds-gpu")]
     fn gpu_frame(&mut self) -> Option<crate::GpuFrame> {
         let gpu = self.gpu.as_mut()?;
-        if let Some(view) = gpu.two_d.new_color_output_view() { gpu.view = view; }
+        if let Some(view) = gpu.two_d.new_color_output_view() {
+            gpu.view = view;
+        }
         let gpu2d_submitted_frames = gpu.two_d.submitted_frames();
         let gpu3d_submitted_frames = gpu.three_d.submitted_frames();
         Some(crate::GpuFrame {
             texture: gpu.view.texture().clone(),
-            view: gpu.view.clone(), width: WIDTH << gpu.scale_shift,
+            view: gpu.view.clone(),
+            width: WIDTH << gpu.scale_shift,
             height: (HEIGHT * 2) << gpu.scale_shift,
             submitted_frames: gpu2d_submitted_frames.saturating_add(gpu3d_submitted_frames),
             gpu2d_submitted_frames,

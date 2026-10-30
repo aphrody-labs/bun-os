@@ -1,3 +1,5 @@
+# Self-hosted: runs only on the Gitea runner label aphrody-bun-linux (VPS), which provides BUN_EXECUTABLE (pinned upstream Bun),
+# the git-ssh transport under /run/aphrody/git-ssh and the /cache volume. GitHub-hosted CI is .github/workflows/ci.yml.
 name: Aphrody / Bun qualification
 on:
   workflow_dispatch:
@@ -24,7 +26,7 @@ jobs:
           persist-credentials: false
       - name: Runtime
         run: |
-          "$BUN_EXECUTABLE" -e 'import { assertRuntimeFacts, currentRuntimeFacts } from "./packages/workspace/src/runtime.ts"; console.log(JSON.stringify(assertRuntimeFacts(await Bun.file("infra/runtime-pins/linux-x64.json").json(), currentRuntimeFacts())));'
+          "$BUN_EXECUTABLE" scripts/assert-runtime-pin.ts
           printf '%s\n' "${BUN_EXECUTABLE%/*}" >> "$GITHUB_PATH"
       - name: Install
         run: bun install --frozen-lockfile

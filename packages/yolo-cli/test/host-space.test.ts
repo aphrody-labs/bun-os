@@ -41,8 +41,8 @@ describe("estimateReclaim", () => {
     });
   });
 
-  it("frees nothing when the other link lives outside the set (the 2026-10-03 shenron case)", () => {
-    // /home/ubuntu/shenron/.../file is hard-linked to /home/ubuntu/apps/shenron/shared/.../file; only the home copy is deleted
+  it("frees nothing when the other link lives outside the set", () => {
+    // /home/ubuntu/demoapp/.../file is hard-linked to /home/ubuntu/apps/demoapp/shared/.../file; only the home copy is deleted
     const e = estimateReclaim([link(10, 2, 1_000_000)]);
     expect(e.naiveBytes).toBe(1_000_000 * 512);
     expect(e.freedBytes).toBe(0);

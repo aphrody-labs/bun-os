@@ -14,6 +14,9 @@ const nativeFetch = globalThis.fetch;
 const nativeRequest = globalThis.Request;
 const nativeResponse = globalThis.Response;
 const nativeHeaders = globalThis.Headers;
+// Native fetch rejects a signal that is not its own AbortSignal, so keep the native pair too.
+const nativeAbortController = globalThis.AbortController;
+const nativeAbortSignal = globalThis.AbortSignal;
 
 if (!GlobalRegistrator.isRegistered) {
   GlobalRegistrator.register();
@@ -26,6 +29,8 @@ if (nativeFetch) globalThis.fetch = nativeFetch;
 if (nativeRequest) globalThis.Request = nativeRequest;
 if (nativeResponse) globalThis.Response = nativeResponse;
 if (nativeHeaders) globalThis.Headers = nativeHeaders;
+if (nativeAbortController) globalThis.AbortController = nativeAbortController;
+if (nativeAbortSignal) globalThis.AbortSignal = nativeAbortSignal;
 try {
   await import("element-internals-polyfill");
 } catch {}

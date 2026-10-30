@@ -12,7 +12,7 @@
  * - prepare `"auto"`: `false` behind a transaction pooler (PgBouncer port 6432,
  *   Supavisor 6543, Neon `-pooler`, `?pgbouncer=true`), otherwise Bun's default.
  * `"inherit"` leaves either setting to the URL and Bun's defaults, which is what
- * the compatibility wrappers in `@rosegriffon/db` and `@shenron/db` use.
+ * consumer wrappers use.
  * Bun.SQL has no COPY: use postgres.js or a Rust path for bulk ingest.
  */
 import { SQL, type TransactionSQL } from "bun";

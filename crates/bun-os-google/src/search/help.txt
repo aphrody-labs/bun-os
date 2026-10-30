@@ -1,0 +1,20 @@
+Usage: bun search [options] <query>
+
+Native Google Search using the existing Rust SERP owner.
+Account cookies are read only from the protected canonical jar; values are never arguments.
+
+  --json                 Output JSON
+  --rich                 Include structured SERP evidence
+  --anonymous            Do not read account cookies
+  --num <1..20>          Maximum results (default 10)
+  --hl <language>        Search language (default en)
+  --gl <country>         Search country (default US)
+  --domain <google-host> Google domain (default google.com)
+  --safe <active|off>    SafeSearch policy
+  --start <0..1000>      Result offset
+  --timeout-ms <1..120000> Total deadline (default 30000)
+  -h, --help             Show this help
+
+Default jar: ~/.aphrody/google-cookies.json
+An explicit APHRODY_GOOGLE_COOKIES_JSON path overrides the canonical jar.
+No browser rendering or external CLI fallback is used by the search-only build.

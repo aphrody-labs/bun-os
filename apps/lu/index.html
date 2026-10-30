@@ -1,0 +1,40 @@
+<!doctype html>
+<!--
+  Bug (h): paint dark from the very first frame. The previous default
+  (no class on <html>) gave Tailwind nothing to match against until
+  AppShell's useEffect ran one render later — that's the "weiß flash"
+  you'd see between window-show and the first React commit, and the
+  reason the app could even render fully white if the user happened to
+  pick Light in the (now-removed) onboarding theme step. Hard-code dark
+  here; AppShell still toggles `light` on top if the user opts into it
+  via Settings → General → Appearance.
+-->
+<html lang="en" class="dark" style="background:#161616">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- viewport-fit=cover: without it env(safe-area-inset-*) answers 0 on a
+         phone. It has no effect in a desktop window. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Brand faces (Inter / JetBrains Mono / Space Grotesk), self-hosted.
+         index.css declares the Inter stack but nothing ever shipped the face,
+         so every install outside this dev box rendered in system-ui. -->
+    <link rel="stylesheet" href="/fonts/lu-fonts.css" />
+    <!-- A phone gets the ground colour of the phone shell from the first frame,
+         light or dark (public/first-paint.js marks <html>). Nothing in it
+         matches on a desktop. A file and not a style block: one style
+         element in this page makes Tauri put a nonce into style-src, and the
+         style attributes below are refused from then on (public/first-paint.css). -->
+    <link rel="stylesheet" href="/first-paint.css" />
+    <script src="/first-paint.js"></script>
+    <!-- An Android web view that is too old to carry the app says so before
+         the app is loaded (public/webview-check.js). Nothing happens on a
+         desktop or on iOS. -->
+    <script src="/webview-check.js"></script>
+    <title>Locally Uncensored</title>
+  </head>
+  <body style="background:#161616;margin:0">
+    <div id="root"><div id="splash" style="position:fixed;inset:0;background:#161616;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999"><img src="/LU-monogram.svg" width="80" height="80" alt="" style="margin-bottom:20px;opacity:0.9" /><div style="color:#444;font-size:12px;font-family:system-ui,sans-serif;letter-spacing:0.1em;text-transform:uppercase">Loading</div></div></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

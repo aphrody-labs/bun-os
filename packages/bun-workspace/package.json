@@ -17,16 +17,18 @@
     "./hash": "./src/hash.ts",
     "./guards": "./src/guards.ts",
     "./process": "./src/process.ts",
+    "./windows-job": "./src/windows-job.ts",
     "./runtime": "./src/runtime.ts",
     "./automation": "./src/automation/index.ts",
     "./automation/*": "./src/automation/*"
   },
   "dependencies": {
     "@aphrody/a2a": "workspace:*",
+    "@aphrody/buncc": "workspace:*",
     "@aphrody/os": "workspace:*",
     "@aphrody/paths": "workspace:*",
-    "@aphrody/runtime-sdk": "catalog:",
-    "@aphrody/timeline": "workspace:*",
+    "@aphrody/runtime-sdk": "workspace:*",
+    "@aphrody/timeline": "1.4.7",
     "@aphrody/update": "workspace:*",
     "@aphrody/yolo-core": "workspace:*",
     "ts-morph": "catalog:"
@@ -35,7 +37,7 @@
     "@aphrody/yolo-cli": "workspace:*"
   },
   "engines": {
-    "bun": "1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   },
   "bunos": {
     "runtime": {

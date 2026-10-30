@@ -13,7 +13,7 @@ fn a_commit_failure_reports_the_completed_prefix_and_cleans_staging() {
     let old = (*s.doc().unwrap().doc).clone();
     let mut changed = old.clone();
     changed.sections.first_mut().unwrap().start_number = Some(9);
-    let old_bytes = designcraft_format::save(&old).unwrap();
+    let old_bytes = crate::format::save(&old).unwrap();
     for path in [&first, &second, &third] {
         std::fs::write(path, &old_bytes).unwrap();
     }
@@ -45,7 +45,7 @@ fn a_commit_failure_reports_the_completed_prefix_and_cleans_staging() {
         "{error}"
     );
     assert_eq!(
-        designcraft_format::load(&std::fs::read(first).unwrap())
+        crate::format::load(&std::fs::read(first).unwrap())
             .unwrap()
             .sections
             .first()

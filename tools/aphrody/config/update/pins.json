@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "note": "Bun follows the releases of the Aphrody fork aphrody-labs/bun (tags aphrody-v<base>-aphrody.<n>; the pin is the upstream base version). Every hardcoded tool version, grouped by tool. Each target is a file (or glob) and a regex with exactly one capture group holding the version. `yolo update pins check` fails when targets disagree; `pins apply` rewrites them all. The first target is the source of truth.",
+  "note": "Bun follows the stable releases of upstream oven-sh/bun (tags bun-v<x.y.z>); the runtime itself is the unmodified canary pinned in package.json. Every hardcoded tool version, grouped by tool. Each target is a file (or glob) and a regex with exactly one capture group holding the version. `yolo update pins check` fails when targets disagree; `pins apply` rewrites them all. The first target is the source of truth.",
   "tools": {
     "bun": {
       "latest": {
-        "github": "aphrody-labs/bun",
-        "stripTag": "^aphrody-v|-aphrody[.][0-9]+$"
+        "github": "oven-sh/bun",
+        "stripTag": "^bun-v"
       },
       "targets": [
         {

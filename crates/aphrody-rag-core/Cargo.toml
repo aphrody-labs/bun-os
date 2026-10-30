@@ -7,7 +7,7 @@ rust-version = "1.97"
 authors = ["aphrody-code"]
 repository = "https://github.com/aphrody-labs/aphrody"
 license = "Apache-2.0"
-description            = "Pure, wasm32-safe core of the aphrody RAG layer: source-aware chunkers (Rust/JS-TS/Markdown/structural/prose), reciprocal-rank-fusion + MMR + vector helpers, and a bit-for-bit port of shenron's retrieval eval harness."
+description            = "Pure, wasm32-safe core of the aphrody RAG layer: source-aware chunkers (Rust/JS-TS/Markdown/structural/prose), reciprocal-rank-fusion + MMR + vector helpers, and a bit-for-bit port of a TypeScript retrieval eval harness."
 
 [features]
 default = ["oxc"]

@@ -28,7 +28,7 @@ export function materialCheckout(config: Config = {}): string {
 export function runtimeCheckout(config: Config = {}): string {
   const explicitCheckout = config.checkouts?.bun;
   const configured = explicitCheckout ?? Bun.env.APHRODY_BUN_CHECKOUT;
-  const workspaceCheckout = join(packageRoot, "toolchains/bun");
+  const workspaceCheckout = join(packageRoot, "sources/bun");
   if (configured) {
     const root = resolve(configured);
     if (!existsSync(join(root, "scripts/build.ts")))
@@ -126,7 +126,7 @@ function cargoOwner(config: Config): string[] {
 }
 export interface RuntimeReceipt {
   schemaVersion: 1;
-  repository: "aphrody-labs/bun";
+  repository: "oven-sh/bun";
   revision: string;
   version: string;
   target: Exclude<Target, "wasm">;
@@ -290,7 +290,7 @@ export async function stageRuntime(
   const binaryABI = linux ? await inspectLinuxABI(binary, target === "linux-x64" ? "x64" : "arm64") : undefined;
   if (
     receipt.schemaVersion !== 1 ||
-    receipt.repository !== "aphrody-labs/bun" ||
+    receipt.repository !== "oven-sh/bun" ||
     receipt.revision !== source.revision ||
     receipt.target !== target ||
     receipt.version !== "1.4.4" ||
@@ -636,11 +636,11 @@ async function assembleArchImage(
   );
   if (
     !Array.isArray(productCommands) ||
-    !["mcp", "agent-plugin", "wasm"].every(name =>
+    !["design", "engine", "re", "rea"].every(name =>
       productCommands.some(entry => entry.group === "" && entry.name === name),
     )
   )
-    throw new Error("Image product CLI does not expose the required native capability routes");
+    throw new Error("Image product CLI does not expose the required first-party capability routes");
   const containerVerification = JSON.parse(
     await command([
       "docker",
@@ -661,7 +661,7 @@ async function assembleArchImage(
     };
   };
   const imageQualification = containerVerification.imageQualification;
-  const requiredImageGates = ["product-cli", "cli-wasm", "ffi", "agent-plugin", "mcp"];
+  const requiredImageGates = ["product-cli", "cli-wasm", "ffi"];
   if (
     containerVerification.runtime !== "verified" ||
     imageQualification?.passed !== true ||
@@ -687,8 +687,7 @@ async function assembleArchImage(
       installedModesSHA256: product.receipt.installedModesSHA256,
       commandDiscovery: productCommands.length,
       imageQualification: { passed: true, gates: imageQualification.gates },
-      scope:
-        "In-image CLI, CLI-WASM, FFI, agent-plugin and MCP surfaces; full OS product qualification remains separate",
+      scope: "In-image CLI, CLI-WASM and FFI surfaces; full OS product qualification remains separate",
     },
     packageManager: "pacman",
     rootfs: {

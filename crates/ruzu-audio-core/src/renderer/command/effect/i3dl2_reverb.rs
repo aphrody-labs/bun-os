@@ -135,6 +135,7 @@ pub const EARLY_GAINS: [f32; 20] = [
     0.641_96, 0.548_79, 0.929_25, 0.3827, 0.728_67, 0.697_94, 0.5464, 0.245_63, 0.452_14, 0.440_42,
 ];
 
+#[allow(clippy::approx_constant)] // hardware-exact coefficient (1/sqrt(2)) from the audio renderer
 pub fn update_i3dl2_reverb_effect_parameter(
     parameter: &i3dl2::ParameterVersion2,
     state: &mut I3dl2ReverbState,

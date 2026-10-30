@@ -2,21 +2,11 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 
 const INTERNAL_ROOTS = ["apps/", "packages/"];
-/** Runtime-owned packages retain the pinned toolchain's independent source boundary. */
-const EXTERNAL_PACKAGE_ROOTS = ["toolchains/bun/packages/"];
-
-/** In-repository roots, or external owner packages without any further escape. */
+/** Workspace members live in-repository, one level below an internal root, without any escape. */
 export function allowedWorkspace(root: string, workspacePath: string): boolean {
   const segments = workspacePath.split("/");
   if (workspacePath.includes("\\") || segments.some(segment => segment === "" || segment === "." || segment === ".."))
     return false;
-  const externalRoot = EXTERNAL_PACKAGE_ROOTS.find(prefix => workspacePath.startsWith(prefix));
-  if (externalRoot) {
-    const rest = workspacePath.slice(externalRoot.length);
-    const ownerPackages = resolve(root, externalRoot);
-    const target = relative(ownerPackages, resolve(root, workspacePath));
-    return rest.length > 0 && !rest.split("/").includes("..") && !!target && !target.startsWith("..");
-  }
   return (
     segments.length === 2 &&
     INTERNAL_ROOTS.some(prefix => workspacePath.startsWith(prefix)) &&
@@ -81,9 +71,7 @@ export async function runWorkspaceLayout(args: string[]): Promise<number> {
     const gitMetadata = join(absolutePath, ".git");
 
     if (!allowedWorkspace(root, workspacePath)) {
-      errors.push(
-        `workspace must live below ${[...INTERNAL_ROOTS, ...EXTERNAL_PACKAGE_ROOTS].join(", ")}: ${workspacePath}`,
-      );
+      errors.push(`workspace must live below ${INTERNAL_ROOTS.join(", ")}: ${workspacePath}`);
     }
     if (!existsSync(packageManifest)) {
       errors.push(`workspace has no package.json: ${workspacePath}`);

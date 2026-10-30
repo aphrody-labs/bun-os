@@ -61,7 +61,7 @@ The pipeline handles one file at a time:
    `bep cache prune` never removes them. The metadata lives in the `owned`
    table of `usr/var/lib/bep/library.db` (bun:sqlite).
 5. **Keys.** The keys store is owner-only. On Windows it has a protected DACL
-   (OWNER RIGHTS and SYSTEM) set through `bun:windows`. Elsewhere it uses
+   (OWNER RIGHTS and SYSTEM) set through `bun:windows` (fork-only API, not available on upstream Bun). Elsewhere it uses
    modes 0700 and 0600. Key values are never logged or returned. Listings
    show the key names and the store id only, with no digests of the key
    material.

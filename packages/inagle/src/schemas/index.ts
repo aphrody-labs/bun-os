@@ -1,5 +1,5 @@
 /**
- * Schema exports for @rosegriffon/inagle
+ * Schema exports for @aphrody/inagle
  *
  * All schemas are based on actual CFG.BIN JSON structures from IEVR dump:
  * - dump/data/common/gamedata/ (13924 JSON files)

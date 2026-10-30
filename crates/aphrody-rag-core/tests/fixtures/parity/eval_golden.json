@@ -1,6 +1,6 @@
 {
   "normalizeUrl": {
-    "https://www.dragonballfr.com/wiki/Freezer/": "/wiki/freezer",
+    "https://www.example.com/wiki/Freezer/": "/wiki/freezer",
     "/wiki/Freezer/?x=1": "/wiki/freezer?x=1"
   },
   "matchesExpectedUrl": {

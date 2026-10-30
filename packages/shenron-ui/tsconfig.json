@@ -1,4 +1,0 @@
-{
-  "extends": "../rg-config/tsconfig-nextjs.json",
-  "include": ["src/**/*", "test/**/*", "scripts/**/*"]
-}

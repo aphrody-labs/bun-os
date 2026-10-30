@@ -286,7 +286,7 @@ mod tests {
         let s = resolve_in(dir.path(), TokenKind::Remote, Some("omar")).unwrap();
         assert_eq!(s.expose(), "scoped");
         assert_eq!(
-            resolve_in(dir.path(), TokenKind::Remote, Some("dbfr"))
+            resolve_in(dir.path(), TokenKind::Remote, Some("ie"))
                 .unwrap()
                 .expose(),
             "global"

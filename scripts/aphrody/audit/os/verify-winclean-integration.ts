@@ -14,7 +14,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { sessionStamp, withKernel } from "../../tools/os/scripts/kernel-session.ts";
 
-/** Bun OS checkout root (the catalog owners live there, not under docs/aphrody). */
+/** Bun OS checkout root (the catalog owners live there). */
 const workspaceRoot = join(import.meta.dir, "../../../..");
 
 export const rustCatalog = join(workspaceRoot, "packages/bun-windows-winclean/src/tools.json");

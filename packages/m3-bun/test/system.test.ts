@@ -2,7 +2,7 @@
 // System tests: the generated images really build and run. Opt in with M3_BUN_SYSTEM=1 (they need docker,
 // and for the boot test QEMU and a kernel in M3_BUN_KERNEL; they take about a minute and write ~300 MB).
 import { afterAll, describe, expect, test } from "bun:test";
-import { existsSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { compileApp } from "../src/compile.ts";
 import { packageApp } from "../src/package.ts";
@@ -94,43 +94,6 @@ describe.skipIf(!enabled)("generated images run", () => {
       } finally {
         sh(["docker", "rm", "-f", name]);
         sh(["docker", "rmi", "-f", tag]);
-      }
-    },
-    240_000,
-  );
-
-  test.skipIf(!Bun.which("qemu-system-x86_64") || !Bun.env.M3_BUN_KERNEL || !existsSync(Bun.env.M3_BUN_KERNEL ?? ""))(
-    "the minimal Linux image boots in QEMU and serves over the forwarded port",
-    async () => {
-      const dir = fixtureCopy();
-      const app = await loadApp(dir);
-      const { outfile } = await compileApp({ app });
-      await generateTargets(["linux-image"], contextFor(app), join(dir, "deploy"));
-      const build = sh(["bash", join(dir, "deploy/linux-image/build-image.sh"), outfile, join(dir, "image")]);
-      expect(build.code).toBe(0);
-      const port = freePort();
-      const qemu = Bun.spawn(
-        ["bash", join(dir, "deploy/linux-image/run-qemu.sh"), join(dir, "image/initramfs.cpio.gz")],
-        {
-          windowsHide: true,
-          env: {
-            ...process.env,
-            KERNEL: Bun.env.M3_BUN_KERNEL!,
-            HOST_PORT: String(port),
-          },
-          stdout: "ignore",
-          stderr: "ignore",
-        },
-      );
-      try {
-        const health = await until(`http://127.0.0.1:${port}/healthz`, 300);
-        expect(health.status).toBe(200);
-        expect(await (await fetch(`http://127.0.0.1:${port}/api/hello/qemu`)).json()).toEqual({
-          hello: "qemu",
-        });
-      } finally {
-        qemu.kill();
-        await qemu.exited;
       }
     },
     240_000,

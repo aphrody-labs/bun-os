@@ -214,7 +214,9 @@ fn main() -> eframe::Result {
     }
     let icon = services::window_icon();
     let mut viewport = egui::ViewportBuilder::default()
-        .with_title(figcraft_ui_egui::aphrody_brand::app_title("Interface Design"))
+        .with_title(figcraft_ui_egui::aphrody_brand::app_title(
+            "Interface Design",
+        ))
         .with_inner_size([1440.0, 900.0])
         .with_min_inner_size([800.0, 500.0])
         .with_drag_and_drop(true);

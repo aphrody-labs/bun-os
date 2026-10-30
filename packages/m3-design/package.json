@@ -35,13 +35,13 @@
     "typecheck:fast": "bun check --noEmit"
   },
   "dependencies": {
-    "@aphrody/bun": "^3.3.0",
+    "@aphrody/bun": "workspace:*",
     "@material/material-color-utilities": "catalog:"
   },
   "devDependencies": {
     "@aphrody/m3-config": "workspace:*"
   },
   "engines": {
-    "bun": ">=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

@@ -1,0 +1,107 @@
+{
+  "sdk": "11.0.100-rc.3.26522.148",
+  "tfm": "net11.0",
+  "templates": {
+    "console": {
+      "generated": true,
+      "build": true,
+      "run": true
+    },
+    "console-aot": {
+      "generated": true,
+      "build": true,
+      "aot": true,
+      "run": true
+    },
+    "classlib": {
+      "generated": true,
+      "build": true
+    },
+    "winforms": {
+      "generated": true,
+      "build": true,
+      "interactive": true
+    },
+    "winformslib": {
+      "generated": true,
+      "build": true
+    },
+    "winformscontrollib": {
+      "generated": true,
+      "build": true
+    },
+    "wpf": {
+      "generated": true,
+      "build": true,
+      "interactive": true
+    },
+    "wpflib": {
+      "generated": true,
+      "build": true
+    },
+    "wpfusercontrollib": {
+      "generated": true,
+      "build": true
+    },
+    "wpfcustomcontrollib": {
+      "generated": true,
+      "build": true
+    },
+    "worker": {
+      "generated": true,
+      "build": true
+    },
+    "web": {
+      "generated": true,
+      "build": true
+    },
+    "webapi": {
+      "generated": true,
+      "build": true
+    },
+    "webapiaot": {
+      "generated": true,
+      "build": true,
+      "aot": true
+    },
+    "mvc": {
+      "generated": true,
+      "build": true
+    },
+    "razor": {
+      "generated": true,
+      "build": true
+    },
+    "razorclasslib": {
+      "generated": true,
+      "build": true
+    },
+    "blazor": {
+      "generated": true,
+      "build": true
+    },
+    "grpc": {
+      "generated": true,
+      "build": true
+    },
+    "mcpserver": {
+      "generated": true,
+      "build": true
+    },
+    "mstest-tests": {
+      "generated": true,
+      "build": true,
+      "run": true
+    },
+    "xunit-tests": {
+      "generated": true,
+      "build": true,
+      "run": true
+    },
+    "nunit-tests": {
+      "generated": true,
+      "build": true,
+      "run": true
+    }
+  }
+}

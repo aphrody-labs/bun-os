@@ -14,13 +14,6 @@ The trusted main window's core commands include:
 | `aphrody_rpc(request)` | JSON-RPC result | app-server v2 sessions, turns and interruption |
 | `aphrody_shell_window(action)` | native window state | main-only window controls and navigation |
 
-Shenron's public, read-only grounded chat is available in the existing Chat
-surface with `/shenron <question>`. Its typed `aphrody_shenron_chat` command calls
-only `https://dragonballfr.com/api/chat`; it accepts no arbitrary URL or token.
-It does not represent an authenticated Shenron account or grant admin access.
-See [`../../docs/integrations/SHENRON.md`](../../../reference/integrations/SHENRON.md)
-for the API, FFI, auth, and database ownership decisions.
-
 The main window also exposes `koharu_rpc(method, params)`. Its broker starts the
 `koharu-sdk` executable from the `aphrody-koharu` sibling checkout on demand,
 passes JSON Lines requests over stdio, and emits SDK events as `koharu://event`.
@@ -59,7 +52,7 @@ not copy or delete them during startup.
 | Agent sessions | `aphrody app-server` | broker-managed stdio JSON-RPC |
 | Web tools | Aphrody kernel | `aphrody_web` Obscura/provider subsystem |
 | Web retrieval and crawl | Aphrody kernel / Obscura | backend capability; no embedded browser or crawler-management view in the public webview |
-| File libraries | `aphrody-drive` + `sd-daemon` | local socket; daemon stays outside this Cargo graph |
+| File libraries | Spacedrive `sd-daemon` | local socket; daemon stays outside this Cargo graph |
 
 ## Capability surface (default-deny)
 
@@ -90,13 +83,7 @@ ui_dist_assets` checks that every listed file is staged byte-for-byte and that e
 `app.css` loads is present. The shipped configuration (`--features custom-protocol`) fails the
 build if a source is missing; a plain `cargo check` only warns.
 
-The daemon source lives in `apps/aphrody-drive/core/Cargo.toml`, outside the root Cargo graph.
-`crates/aphrody-drive` locates it from `APHRODY_DRIVE_DAEMON`, beside the app executable, or on
-`PATH`. The checked-in `tauri.drive.conf.json` declares a sidecar, but no current unified build
-command has been verified to compile and stage it for each target. Treat sidecar packaging and
-installed startup as open gates. The Files surface already composes `packages/app-ui`,
-`packages/m3-explorer`, `packages/drive-client`, and the native bridge. Android Files workflows
-still need to be brought into the unified Android product and qualified.
+The file service daemon is Spacedrive (`vendor/spacedrive`). The checked-in `tauri.drive.conf.json` declares no daemon sidecar until it is staged; treat sidecar packaging and installed startup as open gates.
 
 The supported serialized Cargo entry point is
 `bun scripts/aphrody/build/rust/cargo-serial.ts`; qualification must run through the VPS factory.

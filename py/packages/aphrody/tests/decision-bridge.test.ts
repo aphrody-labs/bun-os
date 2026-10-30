@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 import { expect, test } from "bun:test";
-import { Python } from "bun:python";
-import { Python as BuvPython } from "buv:python";
+import { Python } from "@aphrody/runtime-sdk/python";
 import { decideJson } from "../src/aphrody/decision/bridge";
 
-test("Bun and Buv retain one native Python host owner", () => {
-  expect(Python).toBe(BuvPython);
+test("the decision bridge is built on the runtime SDK Python host", () => {
+  expect(typeof Python.open).toBe("function");
   expect(typeof decideJson).toBe("function");
 });
 

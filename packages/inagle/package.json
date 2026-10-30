@@ -1,5 +1,5 @@
 {
-  "name": "@rosegriffon/inagle",
+  "name": "@aphrody/inagle",
   "version": "1.4.7",
   "private": false,
   "description": "Universal Game Data API for Inazuma Eleven: Victory Road — parsers, types, and tools for IEVR game data",
@@ -13,7 +13,7 @@
     "victory-road",
     "zukan"
   ],
-  "homepage": "https://azalee.rosegriffon.fr",
+  "homepage": "https://inagle.example.com",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -199,7 +199,7 @@
     "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aphrody/runtime-sdk": "catalog:",
+    "@aphrody/runtime-sdk": "workspace:*",
     "@leeoniya/ufuzzy": "catalog:",
     "@rosegriffon/assets": "catalog:",
     "@rosegriffon/db": "catalog:",
@@ -229,7 +229,7 @@
     }
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   },
   "trustedDependencies": [
     "esbuild"

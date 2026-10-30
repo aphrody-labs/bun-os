@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Windows Bun version management and package-manager hygiene, twin of bun-hygiene.sh (Linux user timer). Same policy
-// (docs/operations/infra/update/BUN.md): the newest stable aphrody-labs/bun runtime release that is at least
+// (docs/operations/infra/update/BUN.md): the newest stable oven-sh/bun release that is at least
 // --min-age-days old (bunfig minimumReleaseAge = 3 days); every host applies the same rule and converges.
 //
 //   bun scripts/tools/bun-hygiene.ts [--min-age-days 3] [--dry-run]
@@ -34,8 +34,8 @@ export type Release = {
   published_at: string | null;
 };
 
-/** Runtime release tags of the fork; the repository also publishes tools and n2b releases. */
-export const RUNTIME_TAG = /^aphrody-v\d+\.\d+\.\d+-aphrody\.\d+$/;
+/** Stable release tags of upstream Bun (`bun-v1.4.4`); canary and other tags are ignored. */
+export const RUNTIME_TAG = /^bun-v\d+\.\d+\.\d+$/;
 const ALIASES = ["bunx.exe", "node.exe", "npm.exe", "npx.exe"] as const;
 const CACHE_MAX_BYTES = 5 * 1024 ** 3;
 const CACHE_IDLE_DAYS = 30;
@@ -50,17 +50,15 @@ export function eligibleTag(releases: Release[], now: number, minAgeDays: number
     .toSorted((a, b) => b.at - a.at)[0]?.tag;
 }
 
-/** `bun --version` of the fork (`1.4.3-aphrody.3`) as its release tag. */
-export const tagOf = (version: string) => `aphrody-v${version.trim()}`;
+/** `bun --version` (`1.4.4`) as its release tag. */
+export const tagOf = (version: string) => `bun-v${version.trim().split(/[-+]/)[0]}`;
 
 const runtimeParts = (t: string) => (RUNTIME_TAG.test(t) ? t.match(/\d+/g)!.map(Number) : undefined);
 
-/** `aphrody-vX.Y.Z-aphrody.N` is newer than `current` (a non-runtime current tag is always older). */
+/** `bun-vX.Y.Z` is newer than `current` (a non-release current tag is always older). */
 export function isNewer(tag: string, current: string): boolean {
   const next = runtimeParts(tag);
-  // A modern native build reports the base version without the historical fork suffix.
-  const base = /^aphrody-v(\d+)\.(\d+)\.(\d+)$/.exec(current);
-  const now = runtimeParts(current) ?? (base ? base.slice(1).map(Number) : undefined);
+  const now = runtimeParts(current);
   if (!next) return false;
   if (!now) return true;
   const diff = next.map((n, i) => n - (now[i] ?? 0)).find(d => d !== 0);
@@ -168,9 +166,9 @@ async function download(url: string): Promise<Uint8Array> {
 
 export async function install(tag: string, binDir: string, log: (line: string) => void): Promise<void> {
   const target = `bun-windows-${process.arch === "arm64" ? "aarch64" : "x64"}`;
-  const base = `https://github.com/aphrody-labs/bun/releases/download/${tag}`;
+  const base = `https://github.com/oven-sh/bun/releases/download/${tag}`;
   const zip = await download(`${base}/${target}.zip`);
-  const want = expectedSum(new TextDecoder().decode(await download(`${base}/SHA256SUMS.txt`)), `${target}.zip`);
+  const want = expectedSum(new TextDecoder().decode(await download(`${base}/SHASUMS256.txt`)), `${target}.zip`);
   const got = new Bun.CryptoHasher("sha256").update(zip).digest("hex");
   if (!want || want !== got) throw new Error(`checksum mismatch for ${target}.zip`);
   const work = mkdtempSync(join(tmpdir(), "aphrody-bun-"));
@@ -226,7 +224,7 @@ export async function main(argv = Bun.argv.slice(2)): Promise<number> {
   for (const name of sweepOld(binDir)) log(`removed ${name}`);
 
   const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
-  const response = await fetch("https://api.github.com/repos/aphrody-labs/bun/releases?per_page=30", {
+  const response = await fetch("https://api.github.com/repos/oven-sh/bun/releases?per_page=30", {
     headers: {
       Accept: "application/vnd.github+json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

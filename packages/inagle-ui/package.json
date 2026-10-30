@@ -2,7 +2,7 @@
   "name": "@aphrody/inagle-ui",
   "version": "1.4.7",
   "private": false,
-  "description": "Inagle explorer/maps UI helpers: re-exports @rosegriffon/inagle/ui (iecode packages/inagle), provided by the iecode workspace.",
+  "description": "Inagle explorer/maps UI helpers: re-exports @aphrody/inagle/ui (iecode packages/inagle), provided by the iecode workspace.",
   "license": "UNLICENSED",
   "files": [
     "src"
@@ -21,14 +21,14 @@
     "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
-    "@rosegriffon/inagle": "workspace:*"
+    "@aphrody/inagle": "workspace:*"
   },
   "peerDependenciesMeta": {
-    "@rosegriffon/inagle": {
+    "@aphrody/inagle": {
       "optional": true
     }
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

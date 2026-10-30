@@ -129,7 +129,7 @@ export async function runTauri(args: string[]): Promise<number> {
 
   /**
    * Stage the `aphrody` CLI as the `binaries/aphrody` sidecar (Tauri appends the target triple
-   * to externalBin names, as for the Drive daemon in drive/xtask) and beside the unbundled
+   * to externalBin names) and beside the unbundled
    * desktop binary, where broker.rs resolves it before `PATH`.
    *
    * Source: `$APHRODY_SIDECAR_SOURCE` when set (a prebuilt binary), otherwise this workspace is
@@ -202,23 +202,9 @@ export async function runTauri(args: string[]): Promise<number> {
       }
     }
 
-    // Step 2: Prepare Drive daemon unless action is 'check'
+    // Step 2: Stage the aphrody sidecar unless action is check
     if (action !== "check") {
       const profileFlag = action === "dev" ? "--debug" : "--release";
-      console.log(`[tauri] Staging Drive daemon (${profileFlag})...`);
-      runSync(
-        [
-          process.execPath,
-          join(repo, "packages/yolo-cli/src/index.ts"),
-          "ops",
-          "drive-daemon",
-          "--root",
-          repo,
-          profileFlag,
-        ],
-        repo,
-        "Drive daemon preparation failed",
-      );
       console.log(`[tauri] Staging aphrody sidecar (${profileFlag})...`);
       await stageAphrodySidecar(action === "dev" ? "debug" : "release");
     }

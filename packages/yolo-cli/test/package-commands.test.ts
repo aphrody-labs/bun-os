@@ -101,9 +101,7 @@ describe("yolo package commands", () => {
   it("servers and watchers keep the process alive; one-shot commands end it", () => {
     expect(resolvePackageCommand("m3", ["dev"])?.keepAlive).toBe(true);
     expect(resolvePackageCommand("m3", ["bun", "serve"])?.keepAlive).toBe(true);
-    expect(resolvePackageCommand("forge", ["watch"])?.keepAlive).toBe(true);
     expect(resolvePackageCommand("m3", ["scaffold", "list"])?.keepAlive).toBeUndefined();
-    expect(resolvePackageCommand("browser", ["open"])?.keepAlive).toBeUndefined();
   });
 
   it("dispatches in-process with the literal arguments and returns the runner status", async () => {
@@ -121,7 +119,6 @@ describe("yolo package commands", () => {
     expect(await runPackageCommand("doc-ai", [], throwing)).toBe(1);
     const noExport = owner("google", "export const unrelated = 1;\n");
     expect(await runPackageCommand("google", [], noExport)).toBe(70);
-    expect(await runPackageCommand("browser", [], join(fixture, "empty"))).toBe(127);
     expect(await runPackageCommand("unknown", [], root)).toBe(2);
   });
 
@@ -182,9 +179,6 @@ describe("yolo package commands", () => {
       [["update", "help"], "yolo update check"],
       [["google", "--help"], "yolo google <drive|fonts>"],
       [["doc-ai", "--help"], "yolo doc-ai translate"],
-      [["browser", "--version"], "@aphrody/bun-web"],
-      [["forge", "--help"], "yolo forge doctor"],
-      [["forge", "version"], "yolo forge 0.1.1"],
       [["m3", "--help"], "Tools (yolo m3 <tool> ...):"],
       [["m3", "help"], "m3 new <dir>"],
       [["m3", "next", "--help"], "usage: m3-next"],
@@ -206,11 +200,7 @@ describe("yolo package commands", () => {
     expect(google.status).toBe(2);
     expect(google.stderr).toContain("aphrody google models");
     expect(isPackageCommand("ovh")).toBe(false);
-    expect(yolo("browser", "mcp").status).toBe(2);
     expect(yolo("update", "no-such-module").status).toBe(2);
-    const forge = yolo("forge", "deploy");
-    expect(forge.status).toBe(2);
-    expect(forge.stderr).toContain("yolo forge: unknown command: deploy");
     const icons = yolo("m3", "svg-to-ico");
     expect(icons.status).toBe(2);
     expect(icons.stderr).toContain("usage: svg-to-ico");

@@ -284,23 +284,14 @@ pub(crate) async fn run(args: RagArgs, overrides: CliOverrides) -> miette::Resul
                         "PostgreSQL RAG supports lexical search only; use --mode lexical"
                     ));
                 }
-                let result = if lang.is_some() || entity.is_some() || kind.is_some() {
-                    let params = aphrody_rag::ShenronSearchParams {
-                        query: query.clone(),
-                        limit: *limit,
-                        lang: lang.clone(),
-                        kind: kind.clone(),
-                        origin_source_id: None,
-                        entity: entity.clone(),
-                    };
-                    aphrody_rag::search_shenron_documents(&database_url, &params)
-                        .await
-                        .map_err(|message| miette::miette!("rag search: {message}"))?
-                } else {
-                    aphrody_rag::search_documents(&database_url, query, *limit)
-                        .await
-                        .map_err(|message| miette::miette!("rag search: {message}"))?
-                };
+                if lang.is_some() || entity.is_some() || kind.is_some() {
+                    return Err(miette::miette!(
+                        "PostgreSQL RAG does not support --lang, --entity or --kind; use the local SQLite index"
+                    ));
+                }
+                let result = aphrody_rag::search_documents(&database_url, query, *limit)
+                    .await
+                    .map_err(|message| miette::miette!("rag search: {message}"))?;
                 println!("{}", serde_json::to_string(&result).into_diagnostic()?);
                 return Ok(());
             }
@@ -381,7 +372,6 @@ pub(crate) async fn run(args: RagArgs, overrides: CliOverrides) -> miette::Resul
                 return Err(miette::miette!("RAG limit must be between 1 and 100"));
             }
             let redis_url = std::env::var("APHRODY_REDIS_URL")
-                .or_else(|_| std::env::var("SHENRON_REDIS_URL"))
                 .or_else(|_| std::env::var("REDIS_URL"))
                 .ok();
             let redis_cache =

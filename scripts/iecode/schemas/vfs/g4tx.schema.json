@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://rosegriffon.fr/schemas/vfs/g4tx.schema.json",
+  "$id": "https://aphrody.com/schemas/vfs/g4tx.schema.json",
   "title": "G4txContainerSchema",
   "description": "Validation schema for Level-5 G4TX Texture Container decoded metadata and sprite atlas subregions.",
   "type": "object",

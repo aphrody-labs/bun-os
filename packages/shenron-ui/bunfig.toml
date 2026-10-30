@@ -1,2 +1,0 @@
-[test]
-preload = ["../m3-reader/test/setup.ts"]

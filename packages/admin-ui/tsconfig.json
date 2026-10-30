@@ -1,8 +1,0 @@
-{
-  "extends": "../rg-config/tsconfig-nextjs.json",
-  "compilerOptions": {
-    "types": ["@aphrody/bun-types", "react", "react-dom"]
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "dist", ".next"]
-}

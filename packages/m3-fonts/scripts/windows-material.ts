@@ -9,9 +9,11 @@
 //   bun scripts/windows-material.ts shell apply [--force]
 //   bun scripts/windows-material.ts shell rollback
 import { dlopen, FFIType } from "bun:ffi";
-import windows from "bun:windows";
+import * as registry from "@aphrody/windows/registry";
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+
+const windows = { registry };
 
 if (process.platform !== "win32") throw new Error("windows-material.ts ne s'exécute que sous Windows");
 

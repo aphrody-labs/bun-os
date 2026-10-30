@@ -1572,7 +1572,8 @@ fn dialogs(app: &mut PdfCraftApp, ctx: &egui::Context) {
                         ui.horizontal(|ui| {
                             ui.vertical(|ui| {
                                 ui.label(
-                                    egui::RichText::new(craft_ui::brand::app_title("PDF")).font(theme::semibold(20.0)),
+                                    egui::RichText::new(craft_ui::brand::app_title("PDF"))
+                                        .font(theme::semibold(20.0)),
                                 );
                                 ui.label(crate::i18n::fmt(
                                     tl!("Version {v}"),

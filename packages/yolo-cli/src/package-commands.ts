@@ -1,5 +1,5 @@
 /**
- * `yolo ops|workspace|optimize|update|google|doc-ai|browser|forge|m3`: the command lines of the Bun owner packages,
+ * `yolo ops|workspace|optimize|update|google|doc-ai|m3`: the command lines of the Bun owner packages,
  * folded into yolo. Each command imports its owner's CLI module in-process and returns the runner's exit status;
  * the owners keep their code. Internal packages no longer publish a binary of their own; the npm-published m3
  * packages keep theirs for external consumers, and the repository calls them through `yolo m3 <tool>`.
@@ -20,7 +20,7 @@ export interface PackageRunner {
   /** One-line description for `yolo help`. */
   readonly summary: string;
   /**
-   * A successful run may leave a server or a watcher running (`m3 dev`, `m3 bun serve`, `forge watch`): yolo then
+   * A successful run may leave a server or a watcher running (`m3 dev`, `m3 bun serve`): yolo then
    * lets the process live on its handles and ends it only on failure. Other commands end the process on return.
    */
   readonly keepAlive?: boolean;
@@ -109,17 +109,6 @@ export const PACKAGE_COMMANDS = {
     module: "packages/doc-ai/src/cli.ts",
     run: "main",
     summary: "Translate Markdown, generate Lit API guides, sync docs/",
-  },
-  browser: {
-    module: "toolchains/bun/packages/bun-web/src/cli.ts",
-    run: "runAgentBrowser",
-    summary: "One CDP browser command on the Bun browser endpoint, as a JSON line",
-  },
-  forge: {
-    module: "packages/yolo-cli/src/cli/forge/main.ts",
-    run: "runForge",
-    summary: "Build the aphrody-labs/bun fork: doctor | bootstrap | build | watch | status | unit",
-    keepAlive: true,
   },
   m3: {
     module: "packages/m3/src/cli.ts",
@@ -224,7 +213,7 @@ export async function runPackageCommand(
   }
   const { label, module, run, tools } = resolved;
   const path = join(root, module);
-  if (name !== "forge" && !existsSync(path)) {
+  if (!existsSync(path)) {
     console.error(
       `yolo ${label}: ${module} is missing under ${root}; run inside an Aphrody checkout or set YOLO_APHRODY_ROOT`,
     );
@@ -237,9 +226,7 @@ export async function runPackageCommand(
       stdio: ["inherit", "inherit", "inherit"],
     }).exited;
   }
-  const owner = (
-    name === "forge" ? await import("./cli/forge/main.ts") : await import(pathToFileURL(path).href)
-  ) as Record<string, unknown>;
+  const owner = (await import(pathToFileURL(path).href)) as Record<string, unknown>;
   const runner = owner[run];
   if (typeof runner !== "function") {
     console.error(`yolo ${label}: ${module} does not export ${run}()`);

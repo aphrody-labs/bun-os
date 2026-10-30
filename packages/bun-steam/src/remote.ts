@@ -23,7 +23,11 @@ async function run(cmd: string[], timeoutMs: number) {
   const p = Bun.spawn(cmd, { stdout: "pipe", stderr: "pipe" });
   const t = setTimeout(() => p.kill(), timeoutMs);
   try {
-    const [out, err, code] = await Promise.all([p.stdout.text(), p.stderr.text(), p.exited]);
+    const [out, err, code] = await Promise.all([
+      new Response(p.stdout).text(),
+      new Response(p.stderr).text(),
+      p.exited,
+    ]);
     return { out, err, code };
   } finally {
     clearTimeout(t);

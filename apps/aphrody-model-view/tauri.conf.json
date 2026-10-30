@@ -4,7 +4,6 @@
   "identifier": "dev.aphrody.modelview",
   "build": { "frontendDist": "ui" },
   "app": {
-    "macOSPrivateApi": true,
     "withGlobalTauri": true,
     "windows": [],
     "security": {

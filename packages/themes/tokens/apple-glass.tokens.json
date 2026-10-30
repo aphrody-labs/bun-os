@@ -1,0 +1,257 @@
+{
+  "$description": "Apple Liquid Glass theme (iOS/iPadOS 27, macOS 27 Golden Gate generation, released 2026-09-14). System accent colors, text styles and the Liquid Glass guidance are from the Human Interface Guidelines. Neutral backgrounds and label colors are the UIKit dynamic colors as observed (the HIG names them but publishes no numbers): marked unverified. Glass blur, saturation and radii are our CSS approximations: Apple publishes none.",
+  "$extensions": {
+    "aphrody": {
+      "id": "apple",
+      "name": "Apple Liquid Glass",
+      "accentModel": "apple-system",
+      "defaultAccent": "blue",
+      "sources": [
+        {
+          "what": "HIG Color: system color values (default light and dark)",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/color",
+          "version": "page updated 2025-12-16"
+        },
+        {
+          "what": "HIG Typography: Dynamic Type Large table and macOS built-in text styles",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/typography"
+        },
+        {
+          "what": "HIG Materials: regular and clear Liquid Glass, 35% dimming layer over bright content",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/materials"
+        },
+        {
+          "what": "iOS 27 / macOS 27 Liquid Glass changes: transparency slider, darker edge, brighter specular highlights",
+          "url": "https://macrumors.com/2026/06/10/how-liquid-glass-is-changing-in-ios-27"
+        },
+        {
+          "what": "Release 2026-09-14: iOS 27, macOS Golden Gate 27",
+          "url": "https://www.osnews.com/?p=145962"
+        },
+        {
+          "what": "Tauri window effects LiquidGlassRegular / LiquidGlassClear (macOS 26+), interactive (macOS 27+)",
+          "url": "https://github.com/tauri-apps/tauri/blob/dev/crates/tauri-utils/src/lib.rs",
+          "version": "tauri 2.12.5 dev"
+        }
+      ]
+    }
+  },
+  "accent": {
+    "$type": "color",
+    "$description": "Default (non-increased-contrast) HIG system colors, light value. Dark values in accentDark.",
+    "blue": { "$value": "#0088FF" },
+    "purple": { "$value": "#CB30E0" },
+    "pink": { "$value": "#FF2D55" },
+    "red": { "$value": "#FF383C" },
+    "orange": { "$value": "#FF8D28" },
+    "yellow": { "$value": "#FFCC00" },
+    "green": { "$value": "#34C759" },
+    "graphite": { "$value": "#8E8E93", "$description": "HIG systemGray" }
+  },
+  "accentDark": {
+    "$type": "color",
+    "blue": { "$value": "#0091FF" },
+    "purple": { "$value": "#DB34F2" },
+    "pink": { "$value": "#FF375F" },
+    "red": { "$value": "#FF4245" },
+    "orange": { "$value": "#FF9230" },
+    "yellow": { "$value": "#FFD600" },
+    "green": { "$value": "#30D158" },
+    "graphite": { "$value": "#8E8E93" }
+  },
+  "color": {
+    "$type": "color",
+    "light": {
+      "bg": {
+        "$value": "#FFFFFF",
+        "$description": "systemBackground (unverified numbers)"
+      },
+      "bgAlt": {
+        "$value": "#F2F2F7",
+        "$description": "secondarySystemBackground (unverified)"
+      },
+      "surface": {
+        "$value": "#FFFFFF",
+        "$description": "tertiarySystemBackground (unverified)"
+      },
+      "surfaceRaised": { "$value": "#FFFFFF" },
+      "layer": { "$value": "#F2F2F7" },
+      "fg": { "$value": "#000000", "$description": "label" },
+      "fgMuted": {
+        "$value": "#3C3C4399",
+        "$description": "secondaryLabel 60% (unverified)"
+      },
+      "fgSubtle": {
+        "$value": "#3C3C434D",
+        "$description": "tertiaryLabel 30% (unverified)"
+      },
+      "fgDisabled": {
+        "$value": "#3C3C432E",
+        "$description": "quaternaryLabel 18% (unverified)"
+      },
+      "border": {
+        "$value": "#3C3C434A",
+        "$description": "separator (unverified)"
+      },
+      "borderStrong": {
+        "$value": "#C6C6C8",
+        "$description": "opaqueSeparator (unverified)"
+      },
+      "divider": { "$value": "#3C3C434A" },
+      "control": {
+        "$value": "#78788033",
+        "$description": "systemFill (unverified)"
+      },
+      "controlHover": { "$value": "#7878802E" },
+      "controlPressed": { "$value": "#78788047" },
+      "onAccent": { "$value": "#FFFFFF" },
+      "danger": { "$value": "#FF383C", "$description": "HIG red" },
+      "onDanger": { "$value": "#FFFFFF" },
+      "warning": { "$value": "#FF8D28", "$description": "HIG orange" },
+      "success": { "$value": "#34C759", "$description": "HIG green" },
+      "scrim": { "$value": "#00000040" },
+      "shadow": { "$value": "#0000001F" }
+    },
+    "dark": {
+      "bg": {
+        "$value": "#000000",
+        "$description": "systemBackground (unverified numbers)"
+      },
+      "bgAlt": {
+        "$value": "#1C1C1E",
+        "$description": "secondarySystemBackground (unverified)"
+      },
+      "surface": {
+        "$value": "#2C2C2E",
+        "$description": "tertiarySystemBackground (unverified)"
+      },
+      "surfaceRaised": { "$value": "#3A3A3C" },
+      "layer": { "$value": "#1C1C1E" },
+      "fg": { "$value": "#FFFFFF", "$description": "label" },
+      "fgMuted": {
+        "$value": "#EBEBF599",
+        "$description": "secondaryLabel 60% (unverified)"
+      },
+      "fgSubtle": {
+        "$value": "#EBEBF54D",
+        "$description": "tertiaryLabel 30% (unverified)"
+      },
+      "fgDisabled": {
+        "$value": "#EBEBF529",
+        "$description": "quaternaryLabel 16% (unverified)"
+      },
+      "border": {
+        "$value": "#54545899",
+        "$description": "separator (unverified)"
+      },
+      "borderStrong": {
+        "$value": "#38383A",
+        "$description": "opaqueSeparator (unverified)"
+      },
+      "divider": { "$value": "#54545899" },
+      "control": {
+        "$value": "#7878805C",
+        "$description": "systemFill (unverified)"
+      },
+      "controlHover": { "$value": "#78788052" },
+      "controlPressed": { "$value": "#78788070" },
+      "onAccent": { "$value": "#FFFFFF" },
+      "danger": { "$value": "#FF4245", "$description": "HIG red dark" },
+      "onDanger": { "$value": "#FFFFFF" },
+      "warning": { "$value": "#FF9230", "$description": "HIG orange dark" },
+      "success": { "$value": "#30D158", "$description": "HIG green dark" },
+      "scrim": { "$value": "#00000066" },
+      "shadow": { "$value": "#00000066" }
+    }
+  },
+  "shape": {
+    "$type": "dimension",
+    "$description": "Approximations. The HIG asks for concentric shapes and capsules for controls but gives no radii.",
+    "none": { "$value": "0px" },
+    "sm": { "$value": "8px" },
+    "md": { "$value": "12px" },
+    "lg": { "$value": "20px" },
+    "xl": { "$value": "28px" },
+    "full": { "$value": "9999px" },
+    "control": { "$value": "9999px", "$description": "capsule controls" },
+    "container": {
+      "$value": "26px",
+      "$description": "window and card radius; inner radius = container - padding (concentric)"
+    }
+  },
+  "typography": {
+    "fontUi": {
+      "$type": "fontFamily",
+      "$value": ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "SF Pro", "Inter", "system-ui", "sans-serif"],
+      "$description": "SF Pro is not redistributable (developer.apple.com/fonts: licensed for mockups of Apple platforms). The system font keyword -apple-system resolves to it on Apple devices; Inter (SIL OFL) is the open fallback elsewhere. Nothing is bundled here."
+    },
+    "fontDisplay": {
+      "$type": "fontFamily",
+      "$value": ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "SF Pro", "Inter", "system-ui", "sans-serif"]
+    },
+    "fontMono": {
+      "$type": "fontFamily",
+      "$value": ["ui-monospace", "SF Mono", "Menlo", "Monaco", "monospace"]
+    },
+    "ramp": {
+      "largeTitle": { "size": 34, "line": 41, "weight": 400 },
+      "title1": { "size": 28, "line": 34, "weight": 400 },
+      "title2": { "size": 22, "line": 28, "weight": 400 },
+      "title3": { "size": 20, "line": 25, "weight": 400 },
+      "headline": { "size": 17, "line": 22, "weight": 600 },
+      "body": { "size": 17, "line": 22, "weight": 400 },
+      "callout": { "size": 16, "line": 21, "weight": 400 },
+      "subhead": { "size": 15, "line": 20, "weight": 400 },
+      "footnote": { "size": 13, "line": 18, "weight": 400 },
+      "caption1": { "size": 12, "line": 16, "weight": 400 },
+      "caption2": { "size": 11, "line": 13, "weight": 400 }
+    },
+    "rampMac": {
+      "largeTitle": { "size": 26, "line": 32, "weight": 400 },
+      "title1": { "size": 22, "line": 26, "weight": 400 },
+      "title2": { "size": 17, "line": 22, "weight": 400 },
+      "title3": { "size": 15, "line": 20, "weight": 400 },
+      "headline": { "size": 13, "line": 16, "weight": 700 },
+      "body": { "size": 13, "line": 16, "weight": 400 },
+      "callout": { "size": 12, "line": 15, "weight": 400 },
+      "subhead": { "size": 11, "line": 14, "weight": 400 },
+      "footnote": { "size": 10, "line": 13, "weight": 400 },
+      "caption1": { "size": 10, "line": 13, "weight": 400 },
+      "caption2": { "size": 10, "line": 13, "weight": 500 }
+    }
+  },
+  "motion": {
+    "fast": { "$type": "duration", "$value": "150ms" },
+    "normal": { "$type": "duration", "$value": "250ms" },
+    "slow": { "$type": "duration", "$value": "400ms" },
+    "easing": {
+      "$type": "cubicBezier",
+      "$value": [0.2, 0.8, 0.2, 1],
+      "$description": "approximation of a critically damped spring; Apple publishes spring parameters per API, not a curve"
+    }
+  },
+  "material": {
+    "$description": "CSS approximation of Liquid Glass. Verified from Apple: two variants (regular, clear), a 35% dark dimming layer over bright content for clear glass, darker edge and brighter specular highlights since iOS 27, a user transparency slider from ultra clear to fully tinted. Everything numeric below is ours.",
+    "blur": 28,
+    "saturate": 180,
+    "controls": "traffic-lights",
+    "regular": {
+      "light": { "tint": "#FFFFFF", "alpha": 0.55 },
+      "dark": { "tint": "#1C1C1E", "alpha": 0.5 },
+      "blur": 28
+    },
+    "clear": {
+      "light": { "tint": "#FFFFFF", "alpha": 0.12 },
+      "dark": { "tint": "#1C1C1E", "alpha": 0.1 },
+      "blur": 14,
+      "dim": 0.35
+    },
+    "specular": { "light": 0.7, "dark": 0.28 },
+    "edgeDark": { "light": 0.1, "dark": 0.45 },
+    "windowEffects": {
+      "windows": [],
+      "macos": ["liquidGlassRegular", "underWindowBackground"],
+      "other": []
+    }
+  }
+}

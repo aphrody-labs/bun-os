@@ -89,7 +89,7 @@ function runtimePin(value: unknown): RuntimePin {
     !isObject(value) ||
     typeof value.version !== "string" ||
     !/^\d+\.\d+\.\d+$/.test(value.version) ||
-    value.repository !== "aphrody-labs/bun" ||
+    value.repository !== "oven-sh/bun" ||
     typeof value.revision !== "string" ||
     !/^[0-9a-f]{40}$/.test(value.revision)
   )

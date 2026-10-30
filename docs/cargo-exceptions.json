@@ -10,11 +10,6 @@
   },
   "workspaces": [
     {
-      "path": "apps/aphrody-drive/Cargo.toml",
-      "class": "migrate",
-      "reason": "Product app with its own SDK/core workspace; fold members into the root workspace."
-    },
-    {
       "path": "apps/aphrody-examples/runtime-rust-extension/Cargo.toml",
       "class": "example",
       "reason": "Standalone sample of an external Rust runtime extension; builds outside the product graph."
@@ -121,26 +116,6 @@
     }
   ],
   "lockfiles": [
-    {
-      "path": "apps/aphrody-drive/Cargo.lock",
-      "class": "migrate",
-      "reason": "Lock of the aphrody-drive workspace; retire when it joins the root lock."
-    },
-    {
-      "path": "apps/aphrody-drive/core/Cargo.lock",
-      "class": "migrate",
-      "reason": "Stray nested lock under aphrody-drive; retire with the workspace migration."
-    },
-    {
-      "path": "apps/aphrody-drive/crates/sdk-macros/Cargo.lock",
-      "class": "migrate",
-      "reason": "Stray nested lock under aphrody-drive; retire with the workspace migration."
-    },
-    {
-      "path": "apps/aphrody-drive/crates/sdk/Cargo.lock",
-      "class": "migrate",
-      "reason": "Stray nested lock under aphrody-drive; retire with the workspace migration."
-    },
     {
       "path": "apps/aphrody-examples/runtime-rust-extension/Cargo.lock",
       "class": "example",

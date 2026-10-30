@@ -1,0 +1,68 @@
+name: Media core
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, os]
+    paths:
+      - crates/media-core/**
+      - crates/lightcraft-raster/**
+      - crates/lightcraft-geom/**
+      - crates/lightcraft-color/**
+      - packages/media/**
+      - docs/MEDIA.md
+      - .github/workflows/media.yml
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: never
+
+concurrency:
+  group: media-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  media-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            crates/media-core
+            crates/lightcraft-raster
+            crates/lightcraft-geom
+            crates/lightcraft-color
+            packages/media
+            rust-toolchain.toml
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-09-15
+          components: clippy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            crates/media-core/target
+          key: media-core-${{ hashFiles('crates/media-core/Cargo.toml') }}
+      # The crate builds as its own workspace root here (the sparse checkout has no root Cargo.toml).
+      - name: Test the Rust core
+        working-directory: crates/media-core
+        run: |
+          printf '\n[workspace]\n' >> Cargo.toml
+          cargo test --release
+      - name: Clippy
+        working-directory: crates/media-core
+        run: cargo clippy --release --all-targets -- -D warnings
+      - name: Build the CLI
+        working-directory: crates/media-core
+        run: cargo build --release --bin media-core
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary
+      - name: Test @aphrody/media
+        env:
+          MEDIA_CORE_BIN: ${{ github.workspace }}/crates/media-core/target/release/media-core
+        run: bun test packages/media

@@ -82,6 +82,7 @@ pub mod mode_cmds;
 pub mod multichannel_cmds;
 pub mod new_layer;
 pub mod notes_cmds;
+pub mod ops;
 pub mod paint_cmds;
 mod param_check;
 mod path_edit_cmds;
@@ -135,8 +136,8 @@ mod wia_cmds;
 
 use std::sync::Arc;
 
+use crate::ops::{History, LayerTarget};
 use photocraft_doc::{Document, LayerId};
-use photocraft_ops::{History, LayerTarget};
 use serde_json::Value;
 
 pub use commands::{CommandSpec, command_specs};

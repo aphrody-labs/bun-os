@@ -177,8 +177,7 @@
       "license": "MIT",
       "tier": "reference",
       "checkout": "../bun",
-      "fork": "https://github.com/aphrody-labs/bun",
-      "purpose": "Bun runtime upstream; Aphrody runs the aphrody-labs/bun fork, checked out next to this repository, which merges oven-sh/bun main. upstream_search reads that checkout when no GitHub token is available.",
+      "purpose": "Bun runtime upstream; Aphrody runs the unmodified oven-sh/bun canary pinned in package.json. upstream_search reads a checkout of oven-sh/bun next to this repository when no GitHub token is available.",
       "consumers": "docs/reference/upstream-bun (pin and licence); packages/infra/update; aphrody yolo verify (Bun source gates)"
     },
     {
@@ -401,7 +400,7 @@
       "role": "dependency",
       "license": "MIT OR Apache-2.0",
       "patches": [],
-      "note": "ML base crates of Koharu 0.83.5 (tag 0.83.5, commit 52bb4f55e2266f72c1523562a583c827ec191ceb) (bindgen, config, runtime, llama, llama-sys, torch, torch-sys, diffusion, diffusion-sys) integrated under crates/ml as aphrody-* packages: crates.io holds older koharu-* releases under the upstream names. Divergence from the tag is not yet audited, so no patch is recorded. On-disk contracts kept: ~/.koharu/config.toml, the `koharu` runtime store and the libkoharu-torch shim of koharu-rs/torch releases. The Koharu product crates live in aphrody-labs/shenron.",
+      "note": "ML base crates of Koharu 0.83.5 (tag 0.83.5, commit 52bb4f55e2266f72c1523562a583c827ec191ceb) (bindgen, config, runtime, llama, llama-sys, torch, torch-sys, diffusion, diffusion-sys) integrated under crates/ml as aphrody-* packages: crates.io holds older koharu-* releases under the upstream names. Divergence from the tag is not yet audited, so no patch is recorded. On-disk contracts kept: ~/.koharu/config.toml, the `koharu` runtime store and the libkoharu-torch shim of koharu-rs/torch releases.",
       "integratedPath": "crates/ml/llama",
       "upstreamPackageIdentityPreserved": false
     },

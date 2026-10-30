@@ -1,9 +1,0 @@
-{
-  "interfaces": {
-    "IDirect3DDxgiInterfaceAccess": {
-      "g": "a9b3d012-3df2-4ee3-b8d1-8695f457d3c1",
-      "b": "System.Com.IUnknown",
-      "m": [["GetInterface", "hr", "*s16:Foundation.GUID", "@p"]]
-    }
-  }
-}

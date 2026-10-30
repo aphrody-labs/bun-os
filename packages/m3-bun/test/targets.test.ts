@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { loadApp } from "../src/config.ts";
 import { generateTargets, getTarget, TARGETS, contextFor, type TargetContext } from "../src/targets/index.ts";
 import { RUNTIME_IMAGE } from "../src/targets/docker.ts";
@@ -54,7 +54,6 @@ describe("registry", () => {
       "coolify",
       "vscode",
       "windows",
-      "linux-image",
       "tauri",
       "webos",
       "lambda",
@@ -544,46 +543,4 @@ describe("windows", () => {
     },
     30_000,
   );
-});
-
-describe("linux-image", () => {
-  const git = Bun.which("git");
-  const gitBash = git && join(dirname(dirname(git)), "bin/bash.exe");
-  const bash =
-    process.platform === "win32" ? (gitBash && existsSync(gitBash) ? gitBash : undefined) : Bun.which("bash");
-  test("README states the limit and generated scripts contain executable payloads", () => {
-    const readme = read("linux-image", "README.md");
-    expect(readme).toContain('a one-file or "no libc" image');
-    expect(readme).toContain("libc, libm, libdl, libpthread");
-    for (const file of ["build-image.sh", "run-qemu.sh"]) {
-      const path = join(out, "linux-image", file);
-      expect(Bun.file(path).size).toBeGreaterThan(200);
-    }
-  });
-  test.skipIf(!bash)("a qualified native Bash validates generated shell syntax", () => {
-    for (const file of ["build-image.sh", "run-qemu.sh"]) {
-      expect(
-        Bun.spawnSync([bash!, "-n", join(out, "linux-image", file).replaceAll("\\", "/")], {
-          windowsHide: true,
-        }).exitCode,
-      ).toBe(0);
-    }
-  });
-  test.skipIf(process.platform === "win32")("a native POSIX host qualifies executable permissions", () => {
-    for (const file of ["build-image.sh", "run-qemu.sh"]) {
-      const path = join(out, "linux-image", file);
-      expect(Bun.spawnSync(["test", "-x", path], { windowsHide: true }).exitCode).toBe(0);
-    }
-  });
-  test("build-image.sh delegates to the fork's initramfs.ts with the executable as the only Bun", () => {
-    const script = read("linux-image", "build-image.sh");
-    expect(script).toContain('BUN_BE_BUN=1 "$BIN" -e \'require("bun:linux")\'');
-    for (const f of ["initramfs.ts", "initramfs-init.ts", "initramfs-net.ts"]) expect(script).toContain(f);
-    expect(script).toContain(
-      'args=(--bun "$BIN" --argv0 hello-m3 --sysroot "$SYSROOT" --hostname hello-m3 --ip "$M3_IP")',
-    );
-    expect(script).toContain("args+=(--env PORT=3456 --env HOST=0.0.0.0)");
-    expect(script).toContain('bun "$SRC/initramfs.ts" "${args[@]}" --out "$OUT/initramfs.cpio.gz" -- /bin/bun');
-    expect(existsSync(join(out, "linux-image", "init.c"))).toBe(false);
-  });
 });

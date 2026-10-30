@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MIT
+# Bun OS runtime: the official oven-sh/bun canary, repackaged without changes (replaces extra/bun).
+# Source: npm @oven/bun-linux-x64 (immutable; npm dist.integrity sha512-TZGwV33dDiiHJuszDGUB1QIyB6kTL6WTF0EyZfbNcvAq9kN3wFkhqa6nSyu4SrJtwz6T81+/pgNm4FHzVYIBOw==,
+# dist.shasum 97341f5319204bc0096c79351f44e2bd0f6b1c06); the GitHub `canary` release is mutable and is not used.
+pkgname=bun-canary
+_npmver=1.4.4-canary.20261028.1
+pkgver=1.4.4.canary.20261028.1
+_rev=11c367163a4baa77d3627d14764c376c856a630a
+pkgrel=1
+pkgdesc="Bun JavaScript and TypeScript runtime, official oven-sh/bun canary ${_npmver}"
+arch=(x86_64)
+url="https://github.com/oven-sh/bun"
+license=(MIT)
+depends=(glibc)
+provides=("bun=${pkgver}")
+conflicts=(bun bun-bin)
+replaces=(bun)
+options=(!strip !debug)
+source=("bun-linux-x64-${_npmver}.tgz::https://registry.npmjs.org/@oven/bun-linux-x64/-/bun-linux-x64-${_npmver}.tgz"
+        "LICENSE-${_rev:0:9}.md::https://raw.githubusercontent.com/oven-sh/bun/${_rev}/LICENSE.md")
+sha256sums=('a9b0e5d28fa06e6ff548da99de85e6e7cfe95a536603b0ad1a9252a906f6796c'
+            '5f555cf60a9004284bd44f769953995386c0fc628133f49ea52a2e69b95af3a6')
+
+check() {
+  [ "$(package/bin/bun --revision)" = "1.4.4-canary.1+${_rev:0:9}" ]
+  [ "$(package/bin/bun -p 'Bun.revision')" = "${_rev}" ]
+}
+
+package() {
+  install -Dm755 package/bin/bun "${pkgdir}/usr/bin/bun"
+  ln -s bun "${pkgdir}/usr/bin/bunx"
+  install -Dm644 "LICENSE-${_rev:0:9}.md" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.md"
+}

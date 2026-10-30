@@ -15,8 +15,6 @@ export { runScriptAudit } from "./audit-scripts.ts";
 export { runImportsExports, scanImportsExports } from "./imports-exports.ts";
 export { runMonorepoAudit } from "./monorepo-audit.ts";
 export { runBunWorkspace } from "./bun-workspace.ts";
-export { runDriveUpstreamAudit } from "./drive-upstream-audit.ts";
-export { runDriveDaemon } from "./drive-daemon.ts";
 export { runTauri } from "./tauri.ts";
 export { runTauriApps } from "@aphrody/update/src/tauri/apps.ts";
 export { runTauriSync } from "@aphrody/update/src/tauri/sync.ts";
@@ -57,7 +55,6 @@ export { runRepositoryHealth } from "./repository-health.ts";
 export { runWorkspaceRepair } from "./workspace-repair.ts";
 export { runCargoPackageRepair } from "./cargo-package-repair.ts";
 export { runCargoReleaseAudit, auditCargoRelease, classifyRequirements } from "./cargo-release-audit.ts";
-export { runShenron } from "./shenron.ts";
 export { getDiscordBotsStatus, runDiscord } from "./discord.ts";
 export type { DiscordBotStatus } from "./discord.ts";
 

@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "lib": ["ESNext", "DOM"],
-    "types": ["@aphrody/bun-types"],
+    "types": ["bun-types"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,

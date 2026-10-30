@@ -28,11 +28,8 @@ export interface Owners {
   cargoManifest: string;
   rustCli: string;
   boqManifest: string;
-  bunManifest: string;
-  bunEntry: string;
   facadeManifest: string;
   facadeEntry: string;
-  nativeTests: string;
   facadeTests: string;
   cargoSerial: string;
 }
@@ -45,13 +42,10 @@ export function owners(root = resolve(import.meta.dir, "../../..")): Owners {
     cargoManifest: join(root, "crates/aphrody-google/Cargo.toml"),
     rustCli: join(root, "crates/aphrody-google/src/cli.rs"),
     boqManifest: join(root, "crates/aphrody-boq/Cargo.toml"),
-    bunManifest: join(root, "toolchains/bun/packages/bun-google/package.json"),
-    bunEntry: join(root, "toolchains/bun/packages/bun-google/src/index.ts"),
     facadeManifest: join(root, "packages/google/package.json"),
     facadeEntry: join(root, "packages/google/src/index.ts"),
-    nativeTests: join(root, "toolchains/bun/packages/bun-google/test"),
     facadeTests: join(root, "packages/google/test"),
-    cargoSerial: join(root, "toolchains/bun/scripts/aphrody/build/rust/cargo-serial.ts"),
+    cargoSerial: join(root, "scripts/aphrody/build/rust/cargo-serial.ts"),
   };
 }
 
@@ -138,14 +132,12 @@ export function verifyStatic(paths: Owners, metadata = cargoMetadata, scope: Sco
   requireFile(join(paths.root, "package.json"));
   const rustOwners = scope === "sdk" ? [] : verifyRustOwners(paths, metadata);
   if (scope !== "rust") {
-    for (const path of [paths.bunManifest, paths.bunEntry, paths.facadeManifest, paths.facadeEntry]) requireFile(path);
-    hasScripts(paths.bunManifest, "@aphrody/bun-google", ["test"]);
+    for (const path of [paths.facadeManifest, paths.facadeEntry]) requireFile(path);
     hasScripts(paths.facadeManifest, "@aphrody/google", ["test", "build", "verify"]);
     const rootPackage = readJson<{ workspaces?: string[]; scripts?: Record<string, string> }>(
       join(paths.root, "package.json"),
     );
-    if (!rootPackage.scripts?.bd) throw new Error(`Bun root has no changed-binary 'bd' gate: ${paths.root}`);
-    for (const manifest of [paths.bunManifest, paths.facadeManifest]) {
+    for (const manifest of [paths.facadeManifest]) {
       const directory = dirname(manifest);
       if (
         !rootPackage.workspaces?.some(pattern =>
@@ -157,7 +149,7 @@ export function verifyStatic(paths: Owners, metadata = cargoMetadata, scope: Sco
         throw new Error(`Bun package is not owned by the root workspace: ${manifest}`);
       }
     }
-    for (const dir of [join(dirname(paths.bunManifest), "src"), join(dirname(paths.facadeManifest), "src")]) {
+    for (const dir of [join(dirname(paths.facadeManifest), "src")]) {
       if (literalKeyFiles(dir).length) throw new Error(`Literal API key assignment found under ${dir}.`);
     }
   }
@@ -167,7 +159,7 @@ export function verifyStatic(paths: Owners, metadata = cargoMetadata, scope: Sco
 
 export type Scope = "all" | "rust" | "sdk";
 export interface Qualification {
-  stage: "rust-source" | "native-sdk" | "facade-build";
+  stage: "rust-source" | "facade-tests" | "facade-build";
   name: string;
   argv: string[];
   cwd: string;
@@ -201,9 +193,9 @@ export function qualificationPlan(
   }
   if (scope !== "rust") {
     plan.push({
-      stage: "native-sdk",
-      name: "Google SDK and facade changed-binary fixture tests",
-      argv: [bun, "bd", "test", paths.nativeTests, paths.facadeTests],
+      stage: "facade-tests",
+      name: "@aphrody/google fixture tests",
+      argv: [bun, "test", paths.facadeTests],
       cwd: paths.root,
     });
     plan.push({

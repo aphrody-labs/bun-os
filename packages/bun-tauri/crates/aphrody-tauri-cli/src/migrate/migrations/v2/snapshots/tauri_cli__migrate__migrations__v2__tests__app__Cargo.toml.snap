@@ -14,14 +14,14 @@ name = "app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "1.4.4", features = [] , package = "aphrody-tauri-build" }
+tauri-build = { version = "[version]", features = [] }
 
 [dependencies]
 # the core crate
-tauri = { version = "1.4.4", features = ["tray-icon", "tracing"] , package = "aphrody-tauri" }
-tauri-runtime-cef = { package = "aphrody-tauri-runtime-cef", version = "1.4.4", features = ["devtools"] }
-tauri-plugin-opener = { package = "aphrody-tauri-plugin-opener", version = "1.4.4" }
-tauri-plugin-log = { version = "1.4.4", features = ["colored"] , package = "aphrody-tauri-plugin-log" }
+tauri = { version = "[version]", features = ["tray-icon", "tracing"] }
+tauri-runtime-wry = { version = "[version]", features = ["devtools", "tracing"] }
+tauri-plugin-opener = "3.0.0-alpha"
+tauri-plugin-log = { version = "3.0.0-alpha", features = ["colored"] }
 tauri-plugin-community = "0.3" # not an official plugin
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -32,7 +32,7 @@ tauri-plugin-updater = { package = "aphrody-tauri-plugin-updater", version = "1.
 tauri-plugin-window-state = { package = "aphrody-tauri-plugin-window-state", version = "1.4.4" }
 
 [dev-dependencies]
-tauri = { version = "1.4.4", features = ["test"] , package = "aphrody-tauri" }
+tauri = { version = "[version]", features = ["test"] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

@@ -16,7 +16,7 @@ Nothing here handles Steam credentials: the engine talks to the running Steam cl
 
 ## Steamworks in Bun Engine
 
-Build: `bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build -p bun-engine --features steam`.
+Build: `bun scripts/cargo.ts exec -- build -p bun-engine --features steam`.
 The SDK comes from steamworks-rs 0.13 (`steamworks`, `steamworks-sys`, MIT/Apache-2.0), which
 bundles Valve's redistributable `steam_api64.dll` / `libsteam_api.so`. Ship that library next to
 `bun-engine`. On Windows it is delay-loaded (`build.rs`), so a build with `steam` still starts
@@ -99,7 +99,7 @@ binds it to the runtime: `SteamPaused` -> `MachineStatus::paused`, `SteamKeys` -
   title (exact name, else the same base title ranked by shared No-Intro tags). Thumbnails come from
   `thumbnails.libretro.com` (cached in `usr/var/cache/bep/thumbnails`) or a local
   libretro-thumbnails tree (`--thumbnails DIR`). The Bun Engine entry uses Bun's own logo
-  (`toolchains/bun/assets/logo-square.png` icon, `logo@4x.png` logo). Nothing is generated: a slot
+  (`assets/logo-square.png` of the former Bun fork icon, `logo@4x.png` logo). Nothing is generated: a slot
   without real art keeps Steam's default.
 
 Shortcut ids follow Steam: `crc32(quoted exe + name) | 0x80000000`; `steam://rungameid/` takes

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
  * Steam client configuration across hosts: auto-login flags (Windows registry through
- * `bun:windows`, Linux `registry.vdf`), `loginusers.vdf`, per-game compatibility tool mapping
+ * `reg.exe`, Linux `registry.vdf`), `loginusers.vdf`, per-game compatibility tool mapping
  * (`config.vdf` `CompatToolMapping`) and running-client detection.
  *
  * Credential contract: only account names and boolean flags are read or written. Passwords,
  * refresh tokens, `ConnectCache` values and `local.vdf` are never read, logged or returned.
  */
-import { processes as winProcesses, registry as winRegistry } from "bun:windows";
+import { processes as winProcesses, registry as winRegistry } from "./win";
 import { readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { HKCU_STEAM, IS_WINDOWS, linuxRegistryVdf, norm, resolveSteamRoot } from "./paths.js";

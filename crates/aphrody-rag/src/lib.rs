@@ -36,10 +36,7 @@ pub use embedder::{
 pub use error::{RagError, Result};
 pub use home::{HitKind, UnifiedHit, UnifiedOptions, unified_search};
 pub use indexer::{IndexOptions, IndexStats, RagIndexer};
-pub use postgres::{
-    PgWebIngestResult, ShenronSearchParams, ingest_web_document, search_documents,
-    search_shenron_documents, stats as pg_stats,
-};
+pub use postgres::{PgWebIngestResult, ingest_web_document, search_documents, stats as pg_stats};
 pub use redis_cache::RedisRagCache;
 #[cfg(feature = "native")]
 pub use reranker::NativeReranker;

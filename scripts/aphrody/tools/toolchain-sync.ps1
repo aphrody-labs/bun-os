@@ -32,7 +32,7 @@ foreach ($id in $ids) {
 winget upgrade --id astral-sh.uv --exact --silent --accept-package-agreements --accept-source-agreements 2>&1 | Select-Object -Last 1
 $bunPin = $m.versions.bun
 if ((Get-Command bun -ErrorAction SilentlyContinue) -and (bun --version).Trim() -eq $bunPin) { "bun $bunPin" } else {
-  & ([scriptblock]::Create((Invoke-RestMethod 'https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.ps1'))) -Version $bunPin 2>&1 | Select-Object -Last 1
+  npm install -g "bun@$bunPin" 2>&1 | Select-Object -Last 1
 }
 
 Log windows-extras
@@ -52,16 +52,18 @@ if ($sudo) {
   }
   gsudo { Set-Service ssh-agent -StartupType Automatic; Start-Service ssh-agent }
 }
-$msys = 'C:\msys64\usr\bin\bash.exe'
+# rsync and pigz still come from an existing MSYS2 (no pinned portable build yet): the root is configurable, never installed or modified here.
+$msysRoot = if ($env:MSYS2_ROOT) { $env:MSYS2_ROOT } else { 'C:\msys64' }
+$msys = Join-Path $msysRoot 'usr\bin\bash.exe'
 if (Test-Path $msys) {
   & $msys -lc 'pacman -Sy --noconfirm --needed rsync mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-zlib git' 2>&1 | Select-Object -Last 1
   # msys rsync runs with msys ssh; its home (/home/<user>/.ssh) is a junction to the Windows ~/.ssh.
-  $msysSsh = "C:\msys64\home\$($env:USERNAME)\.ssh"
+  $msysSsh = "$msysRoot\home\$($env:USERNAME)\.ssh"
   if (-not (Test-Path $msysSsh)) { New-Item -ItemType Junction -Path $msysSsh -Target "$home_\.ssh" | Out-Null }
-  Set-Content "$home_\.local\bin\rsync.cmd" "@echo off`r`nsetlocal`r`nset `"PATH=C:\msys64\usr\bin;%PATH%`"`r`nC:\msys64\usr\bin\rsync.exe %*"
+  Set-Content "$home_\.local\bin\rsync.cmd" "@echo off`r`nsetlocal`r`nset `"PATH=$msysRoot\usr\bin;%PATH%`"`r`n$msysRoot\usr\bin\rsync.exe %*"
   if (-not (Test-Path "$home_\.local\bin\pigz.exe")) {
     & $msys -lc 'export PATH=/ucrt64/bin:/usr/bin; rm -rf /tmp/pigz && git clone -q --depth 1 https://github.com/madler/pigz /tmp/pigz && cd /tmp/pigz && gcc -O3 -static -o pigz.exe pigz.c yarn.c try.c zopfli/src/zopfli/*.c -Izopfli/src/zopfli -lz -lm -lpthread' 2>&1 | Select-Object -Last 2
-    Copy-Item C:\msys64\tmp\pigz\pigz.exe "$home_\.local\bin\pigz.exe" -Force
+    Copy-Item "$msysRoot\tmp\pigz\pigz.exe" "$home_\.local\bin\pigz.exe" -Force
   }
 }
 if (-not (Get-Command claude -ErrorAction SilentlyContinue)) { Invoke-RestMethod https://claude.ai/install.ps1 | Invoke-Expression }

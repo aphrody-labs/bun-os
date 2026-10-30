@@ -1,6 +1,6 @@
 ---
 name: ui-ux-pro-max
-description: "UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 123 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, 9 Aphrody brand themes, and 24 stacks (including Bun OS Material 3 and rg-ui)."
+description: "UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 123 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, 2 Aphrody brand themes, and 23 stacks (including Bun OS Material 3)."
 ---
 
 # UI/UX Pro Max - Design Intelligence
@@ -19,7 +19,7 @@ The guidance below remains the broader UI/UX reference catalog; this product
 contract binds its recommendations to the Bun OS and Aphrody Labs M3 design
 system.
 
-UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 123 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, 9 Aphrody brand themes, and 24 stacks (including Bun OS Material 3 and rg-ui).
+UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 123 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, 2 Aphrody brand themes, and 23 stacks (including Bun OS Material 3).
 
 ## When to Apply
 
@@ -337,7 +337,7 @@ Search specific domains using the CLI tool below.
 
 # Prerequisites
 
-The bundled scripts run with [Bun](https://bun.sh) 1.4.4 or newer (the Aphrody runtime, aphrody-labs/bun, is the reference runtime). They use only Bun built-ins — no npm packages, no network access. Check that it is available:
+The bundled scripts run with [Bun](https://bun.sh) 1.4.4 or newer (the Aphrody runtime, the former Bun fork, is the reference runtime). They use only Bun built-ins — no npm packages, no network access. Check that it is available:
 
 ```bash
 bun --version
@@ -518,7 +518,7 @@ bun scripts/search.ts "<keyword>" --domain <domain> [-n <max_results>]
 | Icon suggestions              | `icons`        | `"decorative icon aria hidden" --domain icons`       |
 | Individual Google Fonts       | `google-fonts` | `"variable sans serif" --domain google-fonts`        |
 | GSAP animation snippets       | `gsap`         | `"scroll reveal stagger" --domain gsap`              |
-| Aphrody brand tokens          | `brand`        | `"rose griffon roy" --domain brand`                  |
+| Aphrody brand tokens          | `brand`        | `"m3 baseline dark" --domain brand`                  |
 
 ### Step 4: Stack Guidelines
 
@@ -540,27 +540,27 @@ bun scripts/search.ts "virtualized list" --stack react-native
 
 ### Available Domains
 
-| Domain         | Use For                                                     | Example Keywords                                             |
-| -------------- | ----------------------------------------------------------- | ------------------------------------------------------------ |
-| `product`      | Product type recommendations                                | SaaS, e-commerce, portfolio, healthcare, beauty, service     |
-| `style`        | UI styles, colors, effects                                  | glassmorphism, minimalism, dark mode, brutalism              |
-| `typography`   | Font pairings, Google Fonts                                 | elegant, playful, professional, modern                       |
-| `color`        | Color palettes by product type                              | saas, ecommerce, healthcare, beauty, fintech, service        |
-| `landing`      | Page structure, CTA strategies                              | hero, hero-centric, testimonial, pricing, social-proof       |
-| `chart`        | Chart types, library recommendations                        | trend, comparison, timeline, funnel, pie                     |
-| `ux`           | Best practices, anti-patterns                               | animation, accessibility, z-index, loading                   |
-| `gsap`         | GSAP animation skeletons by intensity tier                  | scroll reveal, stagger, magnetic cursor, page transition     |
-| `react`        | React/Next.js performance                                   | waterfall, bundle, suspense, memo, rerender, cache           |
-| `web`          | App interface guidelines (iOS/Android/React Native)         | accessibilityLabel, touch targets, safe areas, Dynamic Type  |
-| `icons`        | Icon recommendations with import code                       | arrow, navigation, lucide, phosphor                          |
-| `google-fonts` | Individual Google Fonts lookup                              | sans serif, monospace, japanese, variable font, popular      |
-| `brand`        | Aphrody brand themes extracted from the real rg-ui / M3 CSS | rose griffon roy, gaelle, azalee dark, achillea, m3 baseline |
+| Domain         | Use For                                             | Example Keywords                                            |
+| -------------- | --------------------------------------------------- | ----------------------------------------------------------- |
+| `product`      | Product type recommendations                        | SaaS, e-commerce, portfolio, healthcare, beauty, service    |
+| `style`        | UI styles, colors, effects                          | glassmorphism, minimalism, dark mode, brutalism             |
+| `typography`   | Font pairings, Google Fonts                         | elegant, playful, professional, modern                      |
+| `color`        | Color palettes by product type                      | saas, ecommerce, healthcare, beauty, fintech, service       |
+| `landing`      | Page structure, CTA strategies                      | hero, hero-centric, testimonial, pricing, social-proof      |
+| `chart`        | Chart types, library recommendations                | trend, comparison, timeline, funnel, pie                    |
+| `ux`           | Best practices, anti-patterns                       | animation, accessibility, z-index, loading                  |
+| `gsap`         | GSAP animation skeletons by intensity tier          | scroll reveal, stagger, magnetic cursor, page transition    |
+| `react`        | React/Next.js performance                           | waterfall, bundle, suspense, memo, rerender, cache          |
+| `web`          | App interface guidelines (iOS/Android/React Native) | accessibilityLabel, touch targets, safe areas, Dynamic Type |
+| `icons`        | Icon recommendations with import code               | arrow, navigation, lucide, phosphor                         |
+| `google-fonts` | Individual Google Fonts lookup                      | sans serif, monospace, japanese, variable font, popular     |
+| `brand`        | Aphrody brand themes extracted from the real M3 CSS | m3 baseline light, m3 baseline dark                         |
 
 ### Available Stacks
 
-`react`, `nextjs`, `vue`, `svelte`, `astro`, `swiftui`, `react-native`, `flutter`, `nuxtjs`, `nuxt-ui`, `html-tailwind`, `shadcn`, `jetpack-compose`, `threejs`, `angular`, `laravel`, `javafx`, `wpf`, `winui`, `avalonia`, `uno`, `uwp`, `m3`, `rg-ui`
+`react`, `nextjs`, `vue`, `svelte`, `astro`, `swiftui`, `react-native`, `flutter`, `nuxtjs`, `nuxt-ui`, `html-tailwind`, `shadcn`, `jetpack-compose`, `threejs`, `angular`, `laravel`, `javafx`, `wpf`, `winui`, `avalonia`, `uno`, `uwp`, `m3`
 
-**Bun OS / Aphrody stacks:** `m3` covers Material 3 in the Bun OS monorepo (`@aphrody/m3-tokens`, the `m3*` packages, material-web, the `m3` theme of `@aphrody/bun-plugin-tailwind`); `rg-ui` covers rg-ui / rg-app-shell (Rose Griffon `roy` and `gaelle`, `azalee-light`/`azalee-dark`, `achillea`; shadcn components on Base UI; app-shell sidebar). For the exact brand tokens use the `brand` domain or `--design-system --brand <brand-id>`.
+**Bun OS / Aphrody stacks:** `m3` covers Material 3 in the Bun OS monorepo (`@aphrody/m3-tokens`, the `m3*` packages, material-web, the `m3` theme of `@aphrody/bun-plugin-tailwind`). For the exact brand tokens use the `brand` domain or `--design-system --brand <brand-id>`.
 
 **JavaFX enterprise examples:**
 

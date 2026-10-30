@@ -3,10 +3,10 @@
 /**
  * Build a wasm-bindgen crate into a web package. Cargo runs where this repository builds:
  * the canonical serialized root Cargo owner in local/cloud sessions, and the
- * checksum-verifying VPS factory on the explicitly selected remote route. Packaging is Bun's `bun:wasm` (aphrody-labs/bun, the
- * engine of `bun wasm build` and `bun build --target=wasm`): wasm-bindgen pinned by Cargo.lock,
- * wasm-opt -Oz with the JavaScriptCore-safe feature set (never --all-features), validation, the
- * size ratchet and an atomic replacement of the output that keeps the last usable package.
+ * checksum-verifying VPS factory on the explicitly selected remote route. Packaging runs the wasm-bindgen CLI
+ * (its version must equal the wasm-bindgen crate pinned by Cargo.lock), wasm-opt -Oz when binaryen is installed with
+ * the JavaScriptCore-safe feature set (never --all-features), `WebAssembly.validate`, the size ratchet and an
+ * atomic replacement of the output that keeps the last usable package.
  *
  * bun scripts/aphrody/build/rust/wasm-package.ts --crate <package> --out <dir> [--manifest-path <Cargo.toml>] [--name <name>] [--profile <p>] [--max-bytes <N>] [--skip-cargo] [--no-opt]
  *
@@ -14,6 +14,8 @@
  * artifact still lands in the repository target directory.
  */
 import { $ } from "bun";
+import { build } from "../../../../packages/wasm/src/build.ts";
+import { existsSync, readFileSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
@@ -33,7 +35,7 @@ export type BuildOptions = {
   skipCargo?: boolean;
   noOpt?: boolean;
 };
-/** The subset of `bun:wasm`'s `build()` options this script uses. */
+/** What the packer needs to turn a cargo artifact into a web package. */
 export type PackOptions = {
   crate: string;
   package: string;
@@ -64,16 +66,35 @@ const runTool: ToolRunner = async (command, cwd) => {
   };
 };
 
-const bunWasm: Packer = async options => {
-  // Not a literal, so a Bun without the module fails here with this message rather than at load.
-  const id = "bun:wasm";
-  let wasm: { build: Packer };
-  try {
-    wasm = (await import(id)).default;
-  } catch {
-    throw new Error(`Bun ${Bun.version} has no bun:wasm: use the aphrody-labs/bun build (bun wasm build)`);
+/** The wasm-bindgen crate version pinned by the Cargo.lock that belongs to `manifest`. */
+export function pinnedBindgenVersion(manifest: string, root: string): string | undefined {
+  for (const lock of [join(dirname(manifest), "Cargo.lock"), join(root, "Cargo.lock")]) {
+    if (!existsSync(lock)) continue;
+    const match = /name = "wasm-bindgen"\r?\nversion = "([^"]+)"/.exec(readFileSync(lock, "utf8"));
+    if (match) return match[1];
   }
-  return wasm.build(options);
+  return undefined;
+}
+
+/**
+ * Packs a cargo artifact with `@aphrody/wasm` (wasm-bindgen pinned by Cargo.lock and installed on
+ * demand, wasm-opt with the JavaScriptCore-safe features, validation, size ratchet, atomic swap).
+ */
+const bindgenPack: Packer = async options => {
+  const built = await build({
+    crate: options.crate,
+    package: options.package,
+    artifact: options.artifact,
+    cargo: false,
+    outdir: options.outdir,
+    name: options.name,
+    target: options.target,
+    optimize: options.optimize,
+    maxBytes: options.maxBytes,
+    packageJson: false,
+    quiet: true,
+  });
+  return { wasm: built.wasm, bytes: built.bytes, rawBytes: built.rawBytes };
 };
 
 /**
@@ -95,7 +116,7 @@ export async function buildWasmPackage(options: BuildOptions, dependencies: Buil
   const root = dependencies.root ?? repositoryRoot;
   const env = dependencies.env ?? process.env;
   const run = dependencies.run ?? runTool;
-  const pack = dependencies.pack ?? bunWasm;
+  const pack = dependencies.pack ?? bindgenPack;
   const platform = dependencies.platform ?? process.platform;
   env.RUSTFLAGS = [env.RUSTFLAGS, ...remapFlags(root, env)].filter(Boolean).join(" ");
   const crate = options.crate;

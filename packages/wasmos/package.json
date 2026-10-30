@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "//": "Unnamed on purpose: not a root workspace member (see factory/bunos/components.json workspaceIntegration), so the root bun.lock stays untouched.",
+  "description": "Bun OS as a WASM OS: boot a container2wasm Alpine (x86_64 emulator) under Bun and Chromium, plus a wasm32 Wayland-subset compositor with pixel tests.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "wasmos": "./src/cli.ts"
+  },
+  "scripts": {
+    "build:compositor": "bun src/cli.ts build-compositor",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@bjorn3/browser_wasi_shim": "0.4.2",
+    "playwright-core": "1.63.0"
+  }
+}

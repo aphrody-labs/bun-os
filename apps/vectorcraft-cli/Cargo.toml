@@ -40,3 +40,7 @@ log = "0.4"
 [dev-dependencies]
 vectorcraft-testkit = { path = "../../crates/vectorcraft-testkit" }
 serde_json = { version = "1", features = ["float_roundtrip"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = ["Win32_Graphics_DirectWrite"] }
+winsafe = { workspace = true, features = ["kernel", "psapi"] }

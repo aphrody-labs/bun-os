@@ -24,6 +24,6 @@ Shared fixtures in `tests/fixtures` (`text.vdf`, `shortcuts.vdf`, `types.bin.vdf
 `*.expected.json`) are parsed by both implementations.
 
 ```sh
-bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- test -p bun-steam
-bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build -p bun-steam --features depot --bin bun-steam-depot
+bun scripts/cargo.ts exec -- test -p bun-steam
+bun scripts/cargo.ts exec -- build -p bun-steam --features depot --bin bun-steam-depot
 ```

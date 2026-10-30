@@ -1,0 +1,47 @@
+{
+  "name": "@aphrody/windows",
+  "version": "1.4.7",
+  "description": "One Windows layer for upstream Bun: Win32 (bun:ffi), registry, services, shell folders, WinRT (windows-rs N-API addon), WinUI 3 (.NET host) and WinClean.",
+  "license": "Apache-2.0",
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "files": [
+    "src",
+    "native",
+    "README.md",
+    "LICENSE-APACHE"
+  ],
+  "os": [
+    "win32"
+  ],
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./win32": "./src/win32.ts",
+    "./registry": "./src/registry.ts",
+    "./services": "./src/services.ts",
+    "./shell": "./src/shell.ts",
+    "./winrt": "./src/winrt.ts",
+    "./winui": "./src/winui.ts",
+    "./provider": "./src/provider.ts"
+  },
+  "scripts": {
+    "build:napi": "bun src/provider.ts build",
+    "build:winui": "bun -e \"import {buildHost} from './src/winui'; await buildHost()\"",
+    "test": "bun test",
+    "typecheck": "bun check -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/windows"
+  },
+  "homepage": "https://github.com/aphrody-labs/bun-os/tree/os/packages/windows",
+  "publishConfig": {
+    "access": "public"
+  }
+}

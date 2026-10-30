@@ -50,7 +50,7 @@ export const HOME = "/home/user";
 const WELCOME = `# Welcome to Bun OS
 
 Your files live in this browser (OPFS), on a Rust file system compiled to WebAssembly.
-Open Terminal and try: ls, cat README.md, echo hi > note.txt.
+Open Terminal for a real Alpine Linux shell (its own file system; the first start downloads the image once).
 `;
 
 /** First run: create the home directory and a few starter files. Existing data is never touched. */

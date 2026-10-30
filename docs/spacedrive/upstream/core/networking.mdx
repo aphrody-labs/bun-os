@@ -1,0 +1,255 @@
+---
+title: Networking
+description: Direct encrypted transport for paired Spacedrive nodes
+sidebarTitle: Networking
+---
+
+Spacedrive connects trusted devices through Iroh over QUIC. It attempts a
+direct path first and uses a relay when network topology requires one. The
+transport carries typed protocols for operations, source queries, byte ranges,
+sync, and device presence.
+
+A relay forwards encrypted traffic. It does not become a library authority or
+receive permission to inspect a source.
+
+## Network identity
+
+Each daemon has a persistent cryptographic node identity. Pairing associates
+that identity with a library device record and explicit grants.
+
+Network discovery and authorization are separate:
+
+- Discovery answers how to reach a node.
+- Authentication proves which node connected.
+- Authorization decides which libraries, sources, subtrees, and operations it
+  may use.
+
+Seeing a node on the local network never grants file access.
+
+## Reachability
+
+Spacedrive combines:
+
+- local network discovery for nearby nodes;
+- direct QUIC connections when addresses permit them;
+- internet discovery for a known node identity;
+- relay fallback when NAT or firewalls block a direct path.
+
+Connections can migrate between viable paths without changing device identity
+or operation semantics.
+
+The daemon uses the n0 public relays by default. `SD_RELAY_URL` in the
+daemon's environment replaces them with one relay, such as a self-hosted
+`iroh-relay`, and a joiner that knows only a node id dials it through that
+relay without waiting for internet discovery. `SD_DISABLE_MDNS` turns local
+network discovery off; the relay pairing test uses both so two cores on one
+host can only reach each other through the relay it runs.
+
+## Protocol registry
+
+Each protocol has a stable identifier, version, request limits, and
+authorization rule. The network service routes an accepted stream to its
+registered handler.
+
+Core protocols include:
+
+| Protocol | Purpose |
+| --- | --- |
+| Pairing | Establish and confirm device trust |
+| Operations | Run scoped queries and actions |
+| Source query | Browse or search a served source generation |
+| Byte range | Stream original files and sidecars |
+| Library sync | Exchange small shared state and assertions |
+| Source sync | Replicate an authority-owned generation |
+| Presence | Report device and source availability |
+| Spacedrop | Offer an explicit file transfer |
+
+Protocol versions are negotiated before application data is processed. An
+unsupported version fails clearly instead of decoding with the wrong schema.
+
+## Remote operations
+
+Remote operation requests use the same registry as local clients. The serving
+node creates a request context from the paired identity and grant, dispatches
+the operation, and returns structured output or a typed error.
+
+Long work remains a durable job on the executing node. The caller receives a
+job ID and can query progress or logs later, including after reconnecting.
+
+## Source queries
+
+A node can serve one source without sending its entire library database. Query
+responses name the source and generation that produced them.
+
+Clients combine local, cached, and live remote results while preserving
+completeness:
+
+- complete means all required sources answered;
+- partial means one or more sources were offline or denied;
+- stale means a retained generation is older than the known authority.
+
+## Byte streaming
+
+The byte-range protocol reads local files, provider objects, caches, and
+sidecars through one provider boundary. It supports:
+
+- bounded ranges;
+- backpressure;
+- cancellation;
+- content length and version evidence;
+- resuming from verified offsets;
+- authorization per request.
+
+Control messages do not carry large file bodies. This keeps queries responsive
+while previews, mounts, and transfers stream in parallel.
+
+## Source replication
+
+When a paired device connects, this device copies the index of every source
+the peer serves into `mounts-remote/<device>/` and loads it as a read-only
+replica. The copy is an arena snapshot for a source at its volume root, or a
+single-file database export for a nested source. The owner's response header
+names the whole artifact: its length, its generation, and the blake3 hash of
+its bytes. A delivery must match that hash and parse before it replaces the
+replica already published.
+
+### Partial transfers
+
+A transfer lands in `<source>.<generation>.<blake3 prefix>.part` and stays
+there when the stream breaks or the daemon stops. The next attempt asks the
+owner for the artifact's tail from the part's length (`FetchSnapshotFrom` or
+`FetchDatabaseFrom`). The owner answers with the same whole-artifact header
+and streams only the bytes past the offset; a resumed snapshot request skips
+the owner's pre-fetch save so the bytes stay the ones the part was cut from.
+A header whose generation or hash prefix does not match the part discards it
+and starts over. A part is removed only when the owner's listing no longer
+carries its generation, so an owner that is offline for a week leaves the
+part waiting. The finished file is validated against the header hash before
+it replaces the live replica.
+
+Both peers must run a build that knows the `From` requests. An owner that
+does not answers them with an error, and the receiver starts the transfer
+from zero as before.
+
+### Bandwidth cap
+
+`replication.max_bytes_per_sec` in the daemon config bounds replica bytes
+moved per second, artifacts and thumbnail sidecar pages, serving and
+receiving combined, through one token bucket with a one-second burst. Zero is unlimited. Set it with
+`sd config set replication.max_bytes_per_sec 200K` (bytes, or K, M, G in
+powers of 1024); the change applies to transfers already in flight. An
+initial replica runs to gigabytes and starts as soon as a device connects, so
+set the cap before pairing on a metered or shared link.
+
+### Pause
+
+`sd sources replication pause` stops this device starting replica transfers
+and halts any in flight at its next chunk, keeping the partial file. The
+daemon still refreshes peer listings, owner facts and fleet totals, still
+serves its own sources to peers, and still answers remote operations.
+`sd sources replication resume` continues each partial file where it stopped
+and runs a replication pass against every connected device at once. The
+switch is `replication.paused` in the daemon config, so a paused daemon stays
+paused across a restart; `sd config get replication.paused` reads it and
+`sd config set replication.paused true` is the same as the pause command.
+A pause is not a fetch failure: no backoff accrues.
+
+### Progress
+
+Every fetch in flight reports `bytes` on disk (including what an earlier
+attempt left in the part), `total`, a `bytes_per_sec` rate averaged over the
+last few seconds, and `resumed_from`. `sources.list` carries the figures on
+the replica's row, or on a `replica_fetching` row for a first copy that has
+no replica yet. `core.status` and `mounts.replication_status` return the
+pause switch, the cap, and every transfer; `sd status` prints them as one
+line (`Replicating 2 sources, 553.0 MB of 2.9 GB, 212.0 KB/s`), and
+`sd sources list` appends `fetching ...` to the status column. The daemon
+emits `ReplicationProgress { transfer }` about once a second per transfer
+and once more with `finished: true` when the transfer leaves the active set,
+complete or stopped.
+
+### Offline copies
+
+A source whose catalog is placed on its drive (`StorePlacement::OnSource`)
+with `keep_offline_copy` on keeps a replica of that store in the library,
+at `<data>/sources/<id>/offline-copy.db`, under the same rules as a peer
+replica: the on-drive store is the origin and the only writer, the copy is
+a `VACUUM INTO` export named by the origin's revision, and it is validated
+before a rename publishes it. Only the transport differs: the origin is a
+local file, so there is no byterange stream, nothing to resume, and the
+bandwidth cap and pause switch do not apply. The copy is refreshed on the
+same 30 s cadence once the origin's revision has held for one poll, at once
+when a walk lands, and regardless after ten minutes behind. While the drive
+is away the library's store reads answer from the copy and `sources.list`
+reports it under `offline_copy` (`present`, `serving`, `last_synced`,
+`behind_by`); `sd sources list` shows `detached, offline copy`. Turning the
+setting off (`sd sources update <id> --keep-offline-copy false`) removes
+the copy only once the origin store opens again.
+
+## Sync traffic
+
+Library assertions and source generations use separate streams and watermarks.
+Source generation follows one ingest authority. Multi-writer assertions merge
+according to their type.
+
+Backpressure prevents an initial source replication from starving interactive
+queries. Peers can resume from acknowledged watermarks after a disconnect.
+
+File bytes do not replicate merely because metadata synchronized. [File
+Sync](/core/file-sync) controls durable byte placement.
+
+## Security
+
+The network boundary enforces:
+
+- authenticated peer identity;
+- protocol and message-size limits;
+- library membership;
+- source and subtree grants;
+- query versus mutation permission;
+- expiry and revocation;
+- request timeouts and cancellation;
+- audit context for durable actions.
+
+Provider credentials, key material, and raw database handles never cross the
+network protocol.
+
+## Failure behavior
+
+Network loss does not make a durable action silently succeed. The executing
+node continues or stops according to the job contract. The caller observes an
+unknown connection state until it can query the job again.
+
+Remote reads fail with explicit availability. Cached metadata can remain
+browsable, but the interface does not pretend that unavailable bytes are local.
+
+Paired devices reconnect on their own. The device with the lower endpoint ID
+dials as soon as a connection drops or the daemon starts; the other side waits
+15 seconds for that dial and then dials itself, so a peer whose retry state was
+lost (its own restart, a dial that cannot reach us) does not leave the pair
+stuck. Each dial has a 30 second bound, retries back off from 2 seconds to 30
+seconds for 12 attempts, one loop runs per device, and a 30 second sweep
+re-arms any device still unconnected. Shutdown closes the endpoint so peers see
+the drop at once rather than at the QUIC idle timeout.
+
+## Observability
+
+Status and logs expose:
+
+- peer identity and connection state;
+- direct or relayed path;
+- protocol version;
+- bytes and active streams;
+- reconnect attempts;
+- rejected authorization;
+- source and job context.
+
+Logs must not contain pairing secrets, bearer credentials, or signed provider
+URLs.
+
+## Related systems
+
+- [Device Pairing](/core/pairing)
+- [Library Sync](/core/library-sync)
+- [API](/core/api)
+- [Devices](/core/devices)

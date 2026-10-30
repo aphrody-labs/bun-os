@@ -20,7 +20,7 @@ interface, the Bun Engine machines in the same App and Steam games through the S
 ```sh
 # sccache cannot spawn bevy_internal's rustc command line on Windows (os error 206):
 # run the cargo wrapper with an empty RUSTC_WRAPPER.
-RUSTC_WRAPPER= CARGO_BUILD_RUSTC_WRAPPER= bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec -- build --release -p bun-os-shell
+RUSTC_WRAPPER= CARGO_BUILD_RUSTC_WRAPPER= bun scripts/cargo.ts exec -- build --release -p bun-os-shell
 target/release/bun-os-shell                    # 1600x900 window
 target/release/bun-os-shell --session          # borderless full screen, hidden cursor
 target/release/bun-os-shell status             # JSON: library, NVIDIA, display, encoders, busy state
@@ -84,8 +84,7 @@ regenerated from it. Everything else stays quiet.
 - **Accessibility.** Every control carries an AccessKit button node named by its action (icon-only
   controls included); focus targets are at least 48 px (56 px icon buttons, 64 px buttons); focus
   feedback is a transform and a ring, so it never shifts layout.
-- **Sounds.** None: the repository has no free-licensed UI sound set (the Spacedrive sounds in
-  `packages/assets` are FSL-1.1). Machine audio plays through the engine's `bevy_audio` sink.
+- **Sounds.** None: the repository has no free-licensed UI sound set. Machine audio plays through the engine's `bevy_audio` sink.
 
 ## Input
 

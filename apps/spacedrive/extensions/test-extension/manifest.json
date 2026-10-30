@@ -1,0 +1,39 @@
+{
+	"id": "test-extension",
+	"name": "Test Extension",
+	"version": "0.1.0",
+	"description": "Minimal extension demonstrating beautiful SDK API",
+	"author": "Spacedrive Team",
+	"homepage": "https://spacedrive.com",
+	"wasm_file": "test_extension.wasm",
+	"permissions": {
+		"read_records": {},
+		"write_sidecars": [
+			"digest"
+		],
+		"write_tags": true,
+		"write_custom_fields": [
+			"test"
+		],
+		"dispatch_jobs": true
+	},
+	"kinds": [
+		{
+			"name": "fake",
+			"display_name": "Fake file",
+			"parent": "text",
+			"extensions": [
+				"fake"
+			],
+			"magic": [
+				{
+					"pattern": "46 41 4B 45",
+					"offset": 0
+				}
+			],
+			"preview": {
+				"viewer": "fake_viewer"
+			}
+		}
+	]
+}

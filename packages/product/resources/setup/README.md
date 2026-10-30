@@ -12,7 +12,7 @@ aphrody.com (artefact `aphrody-setup`, kind `desktop`, de `tools/config/download
 | aphrody             | le binaire unique (CLI et serveur MCP) par `install.ps1` du site, empreintes vérifiées                      |
 | yolo                | l'installateur officiel de yolo sur une release vérifiée                                                    |
 | Application Aphrody | l'installeur NSIS de l'app desktop (`aphrody-app`, `/S`) dès qu'il est publié                               |
-| Plugins Claude      | aphrody, yolo, shenron dans une marketplace locale `aphrody-local`, installés par `claude plugin`           |
+| Plugins Claude      | aphrody et yolo dans une marketplace locale `aphrody-local`, installés par `claude plugin`                  |
 | MCP                 | `aphrody-mcp` (ou `aphrody mcp-server`) dans Claude Desktop (sauvegarde avant) et Claude Code               |
 | Raccourci           | « Aphrody » sur le Bureau (l'app crée le sien quand elle est installée)                                     |
 | Rôle administrateur | Git et WireGuard, clés, accès de l'équipe, copie du dépôt, puis `Aphrody-Omar.exe` (route `admin` de l'app) |

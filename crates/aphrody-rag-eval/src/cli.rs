@@ -56,7 +56,7 @@ struct Args {
     #[arg(long)]
     url: Option<String>,
 
-    /// Read-only MCP search tool name (`rag_search`, `shenron_rag_search`, or `aphrody_shenron_rag_search`).
+    /// Read-only MCP search tool name (`rag_search`).
     #[arg(long, default_value = "rag_search")]
     mcp_tool: String,
 
@@ -172,9 +172,7 @@ async fn run(args: Args) -> i32 {
     let target: Box<dyn EvalTarget> = match args.target.as_str() {
         "mcp" => {
             if !valid_mcp_tool(&args.mcp_tool) {
-                eprintln!(
-                    "Error: --mcp-tool must be rag_search, shenron_rag_search, or aphrody_shenron_rag_search."
-                );
+                eprintln!("Error: --mcp-tool must be rag_search.");
                 return 2;
             }
             Box::new(
@@ -266,10 +264,7 @@ fn mcp_endpoint_url(explicit: Option<&str>) -> String {
 }
 
 fn valid_mcp_tool(name: &str) -> bool {
-    matches!(
-        name,
-        "rag_search" | "shenron_rag_search" | "aphrody_shenron_rag_search"
-    )
+    name == "rag_search"
 }
 
 /// Normalise `raw` into a full `/v1/<suffix>` endpoint, accepting a server
@@ -374,13 +369,7 @@ mod tests {
 
     #[test]
     fn cli_accepts_only_read_only_mcp_search_tools() {
-        for name in [
-            "rag_search",
-            "shenron_rag_search",
-            "aphrody_shenron_rag_search",
-        ] {
-            assert!(valid_mcp_tool(name));
-        }
+        assert!(valid_mcp_tool("rag_search"));
         assert!(!valid_mcp_tool("delete_document"));
     }
 

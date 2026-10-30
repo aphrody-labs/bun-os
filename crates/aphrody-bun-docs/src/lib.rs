@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Bun documentation as an Aphrody OS subsystem.
 //!
-//! The corpus is the `docs/` tree of the Bun fork aphrody-labs/bun, read in place; Aphrody keeps
+//! The corpus is the `docs/` tree of the oven-sh/bun, read in place; Aphrody keeps
 //! no copy of it. It is indexed once, in memory, the first time a tool runs. The n2b registry
 //! supplies the Node-to-Bun equivalents (`node:*` modules, npm packages, API call patterns).
 //!
 //! Tools: `bun_docs_search`, `bun_docs_read`, `bun_docs_list`, `bun_node_equivalent`.
 //! Skill: `bun_docs_lookup` (search and return the best page in one call).
 //!
-//! Root resolution ([`resolve_root`]): `APHRODY_BUN_DOCS`, the fork checkout
+//! Root resolution ([`resolve_root`]): `APHRODY_BUN_DOCS`, the upstream checkout
 //! (`APHRODY_BUN_CHECKOUT`, else a sibling of the configured workspace), installed corpora, then a previous
-//! versioned download. When none exists, [`BunDocsSubsystem::index`] downloads `docs/` of the fork
-//! at the commit pinned in `docs/reference/upstream-bun/SOURCE.json` ([`download_root`], a partial
+//! versioned download. When none exists, [`BunDocsSubsystem::index`] downloads `docs/` of upstream Bun
+//! at the commit pinned in `data/SOURCE.json` ([`download_root`], a partial
 //! `git` clone, reported in `bun_docs_list`); `APHRODY_BUN_DOCS_FETCH=0` turns that into an error.
 
 use aphrody_proc::NoWindow as _;
@@ -32,15 +32,15 @@ use serde_json::{Value, json};
 pub const DOCS_BASE_URL: &str = "https://bun.com/docs";
 /// Environment variable overriding the docs root.
 pub const ROOT_ENV: &str = "APHRODY_BUN_DOCS";
-/// Environment variable naming the Bun fork checkout (aphrody-labs/bun) whose `docs/` is read.
+/// Environment variable naming upstream Bun checkout (oven-sh/bun) whose `docs/` is read.
 pub const CHECKOUT_ENV: &str = "APHRODY_BUN_CHECKOUT";
 /// Set to `0` to forbid the versioned download fallback.
 pub const FETCH_ENV: &str = "APHRODY_BUN_DOCS_FETCH";
 /// Commit or branch downloaded by the fallback instead of the pinned commit.
 pub const REF_ENV: &str = "APHRODY_BUN_DOCS_REF";
-/// Git URL of the Bun fork.
-pub const FORK_URL: &str = "https://github.com/aphrody-labs/bun.git";
-/// Paths of the fork checked out by the download: `docs/` without its image directories.
+/// Git URL of upstream Bun.
+pub const FORK_URL: &str = "https://github.com/oven-sh/bun.git";
+/// Paths of upstream Bun checked out by the download: `docs/` without its image directories.
 const SPARSE_PATTERNS: [&str; 5] = [
     "/docs/",
     "!/docs/images/",
@@ -48,10 +48,10 @@ const SPARSE_PATTERNS: [&str; 5] = [
     "!/docs/logo/",
     "/LICENSE.md",
 ];
-/// `docs/reference/upstream-bun/SOURCE.json`: the fork commit Aphrody is pinned to.
-const PIN: &str = include_str!("../../../docs/aphrody/reference/upstream-bun/SOURCE.json");
+/// `data/SOURCE.json`: the upstream commit Aphrody is pinned to.
+const PIN: &str = include_str!("../data/SOURCE.json");
 
-/// Fork commit pinned by `bun run docs:bun:update`.
+/// Upstream commit pinned by `bun run docs:bun:update`.
 #[must_use]
 pub fn pinned_commit() -> Option<String> {
     serde_json::from_str::<Value>(PIN)
@@ -395,7 +395,7 @@ fn snippet(body: &str, terms: &[String]) -> String {
     }
 }
 
-/// Docs root: `APHRODY_BUN_DOCS`, the fork checkout's `docs/`, installed corpora, then a previous
+/// Docs root: `APHRODY_BUN_DOCS`, the upstream checkout's `docs/`, installed corpora, then a previous
 /// versioned download ([`download_root`]).
 ///
 /// Install a corpus at `<executable-directory>/bun-docs`,
@@ -468,7 +468,7 @@ fn download_dir(data: &Path, reference: &str) -> PathBuf {
     data.join("aphrody/bun").join(format!("docs-{name}"))
 }
 
-/// Versioned download fallback: a partial `git` clone of `docs/` of the fork at `APHRODY_BUN_DOCS_REF`
+/// Versioned download fallback: a partial `git` clone of `docs/` of upstream Bun at `APHRODY_BUN_DOCS_REF`
 /// (else the pinned commit) under the user data directory. Returns the downloaded docs root.
 ///
 /// # Errors
@@ -560,7 +560,7 @@ fn download_into(url: &str, reference: &str, dest: &Path) -> Result<PathBuf, Str
     Ok(docs)
 }
 
-/// Read a configured fork or its sibling layout without assuming any host drive.
+/// Read a configured upstream checkout or its sibling layout without assuming any host drive.
 fn fork_docs(checkout: Option<&Path>, workspace: Option<&Path>) -> Option<PathBuf> {
     let checkout = checkout.map(Path::to_path_buf).or_else(|| {
         workspace
@@ -699,7 +699,7 @@ impl BunDocsSubsystem {
                     None => download_root().map_err(|error| {
                         format!(
                             "Bun docs not found and not downloaded ({error}): set {CHECKOUT_ENV} \
-                             to the aphrody-labs/bun checkout, {ROOT_ENV} to a docs directory, or \
+                             to the oven-sh/bun checkout, {ROOT_ENV} to a docs directory, or \
                              install the corpus in the user data directory at aphrody/bun/docs"
                         )
                     })?,
@@ -762,14 +762,14 @@ impl SystemSubsystem for BunDocsSubsystem {
     }
 
     fn description(&self) -> &str {
-        "Offline Bun documentation (docs/ of the aphrody-labs/bun fork) and n2b Node-to-Bun equivalents."
+        "Offline Bun documentation (docs/ of oven-sh/bun) and n2b Node-to-Bun equivalents."
     }
 
     fn tools(&self) -> Vec<ToolDefinition> {
         vec![
             ToolDefinition::new(
                 "bun_docs_search",
-                "Search the Bun docs of the aphrody-labs/bun fork (checkout APHRODY_BUN_CHECKOUT, else a versioned download of its docs/): runtime, bundler, package manager, test runner, guides. Returns ranked pages with slug, url and a snippet; set include_content to also return the best page.",
+                "Search the Bun docs of oven-sh/bun (checkout APHRODY_BUN_CHECKOUT, else a versioned download of its docs/): runtime, bundler, package manager, test runner, guides. Returns ranked pages with slug, url and a snippet; set include_content to also return the best page.",
                 json!({
                     "type": "object",
                     "properties": {
@@ -784,7 +784,7 @@ impl SystemSubsystem for BunDocsSubsystem {
             .read_only(),
             ToolDefinition::new(
                 "bun_docs_read",
-                "Read one page of the aphrody-labs/bun fork docs as Markdown by slug (`runtime/file-io`) or bun.com/docs URL, optionally only the section under a heading.",
+                "Read one page of oven-sh/bun docs as Markdown by slug (`runtime/file-io`) or bun.com/docs URL, optionally only the section under a heading.",
                 json!({
                     "type": "object",
                     "properties": {
@@ -798,7 +798,7 @@ impl SystemSubsystem for BunDocsSubsystem {
             .read_only(),
             ToolDefinition::new(
                 "bun_docs_list",
-                "List the aphrody-labs/bun fork docs pages (slug, title, description, url), optionally under a slug prefix such as `runtime/` or `guides/test/`.",
+                "List oven-sh/bun docs pages (slug, title, description, url), optionally under a slug prefix such as `runtime/` or `guides/test/`.",
                 json!({
                     "type": "object",
                     "properties": { "prefix": { "type": "string" } }
@@ -917,10 +917,9 @@ impl SystemSubsystem for BunDocsSubsystem {
     fn skills(&self) -> Vec<SkillManifest> {
         vec![SkillManifest {
             name: "bun_docs_lookup".into(),
-            description:
-                "Answer a Bun question from the aphrody-labs/bun fork docs: ranked pages plus the \
+            description: "Answer a Bun question from oven-sh/bun docs: ranked pages plus the \
                           best page's Markdown."
-                    .into(),
+                .into(),
             parameters: vec!["query".into()],
             steps: vec![SkillStep {
                 tool: "bun_docs_search".into(),

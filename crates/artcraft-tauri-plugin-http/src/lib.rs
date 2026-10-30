@@ -43,10 +43,13 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 std::fs::create_dir_all(&cache_dir)?;
 
                 let path = cache_dir.join(COOKIES_FILENAME);
-                
+
                 // NB(bt): Let's always log this.
-                println!("Tauri plugin http: using cookie store at {}", path.display());
-                
+                println!(
+                    "Tauri plugin http: using cookie store at {}",
+                    path.display()
+                );
+
                 let file = File::options()
                     .create(true)
                     .append(true)

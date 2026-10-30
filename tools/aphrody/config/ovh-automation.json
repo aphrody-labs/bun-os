@@ -22,22 +22,6 @@
         "workingDirectory": "{root}",
         "timeLimitMinutes": 5,
         "description": "Read-only native OVH OAuth health/domain rights audit; credentials remain user DPAPI. No DNS, nameserver, renewal or mail mutation."
-      },
-      {
-        "host": "local",
-        "kind": "scheduledTask",
-        "name": "Aphrody OVH Dragon Ball FR audit",
-        "path": "\\Aphrody\\",
-        "triggers": ["atLogon", "every:360m"],
-        "principal": "user",
-        "runLevel": "limited",
-        "desktop": true,
-        "periodic": true,
-        "execute": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "arguments": "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{root}\\ovh-protected-dbfr.ps1\" -Action Audit",
-        "workingDirectory": "{root}",
-        "timeLimitMinutes": 5,
-        "description": "Read-only OVH Dragon Ball FR domain, DNS, service and VPS health audit through the owner-only per-profile credential file. No DNS, IAM, renewal, billing or deletion mutation."
       }
     ]
   }

@@ -60,7 +60,20 @@ pub enum ThemeKind {
 impl ThemeKind {
     pub const ALL: [ThemeKind; 2] = [ThemeKind::ProMedium, ThemeKind::ProLight];
     pub fn label(self) -> &'static str {
-        if matches!(self, Self::Pro | Self::ProMedium | Self::Studio | Self::AdwaitaDark | Self::SolarizedDark | Self::BreezeDark | Self::SoftDark) { "M3 Dark" } else { "M3 Light" }
+        if matches!(
+            self,
+            Self::Pro
+                | Self::ProMedium
+                | Self::Studio
+                | Self::AdwaitaDark
+                | Self::SolarizedDark
+                | Self::BreezeDark
+                | Self::SoftDark
+        ) {
+            "M3 Dark"
+        } else {
+            "M3 Light"
+        }
     }
     /// The canonical name: `ui.set {theme}` accepts it and the Window › Theme commands are
     /// `window.theme.<id>`.

@@ -65,13 +65,11 @@ describe("explorer backend in Rust WASM", () => {
     expect(unsupported.error).toContain("not served");
   });
 
-  test("terminal and explorer share files, which persist across reopen", async () => {
+  test("files written through the API are seen by the explorer and persist across reopen", async () => {
     const store = slotImageStore(fakeDirectory());
     const os = await open(store);
     expect(os.persistent).toBe(true);
-    const term = os.terminal(80, 24);
-    expect(term.snapshot().lines.join("\n")).toContain("aphrody>");
-    term.type("echo persisted > note.txt\r");
+    os.fs.write("/home/user/note.txt", new TextEncoder().encode("persisted\n"));
     const reply = (await os.rpc(listing("/home/user"))) as {
       json: { files: { name: string; size: number }[] };
     };
@@ -115,7 +113,7 @@ describe("explorer backend in Rust WASM", () => {
     expect(JSON.parse(os.fs.triage("/home/user/blob"))).toBeObject();
   });
 
-  test("language detection labels search hits and terminal output", async () => {
+  test("language detection labels search hits", async () => {
     const os = await open(memoryImageStore());
     expect(os.detectLanguage("こんにちは")).toEqual({
       language: "ja",
@@ -127,7 +125,5 @@ describe("explorer backend in Rust WASM", () => {
       results: { path: string; language: string }[];
     };
     expect(hits.results[0]).toMatchObject({ path: "/home/user/lettre.md", language: "fr" });
-    const screen = os.terminal(100, 30).type("detect-lang lettre.md\r");
-    expect(screen.lines.join("\n")).toContain('"language":"fr"');
   });
 });

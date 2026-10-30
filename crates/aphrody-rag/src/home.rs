@@ -372,14 +372,14 @@ mod tests {
 
     #[test]
     fn explicit_profiles_select_their_own_scope() {
-        assert_eq!(scope_for(Some("dbfr")), HomeScope::Profile("dbfr".into()));
+        assert_eq!(scope_for(Some("docs")), HomeScope::Profile("docs".into()));
     }
 
     #[tokio::test]
     async fn the_rag_store_opens_on_the_home_database_and_sees_the_same_rows() {
         let state = tempfile::tempdir().unwrap();
         let layout =
-            HomeLayout::in_state(state.path(), &HomeScope::Profile("dbfr".into())).unwrap();
+            HomeLayout::in_state(state.path(), &HomeScope::Profile("docs".into())).unwrap();
         let store = RagStore::open_home_layout(&layout).unwrap();
         store
             .upsert_doc("a.md", "h", None, None, 1, 1)

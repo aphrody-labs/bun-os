@@ -15,7 +15,7 @@ Native in-process Rust engine for OVHcloud operations in Aphrody Infrastructure.
 - **VPS**: Hardware specifications, IP routing, operational status, ping checks, and guarded reboot (`--apply`).
 - **Email**: Domains, redirections/aliases, and email deliverability audit (MX, SPF, DMARC, DKIM).
 - **Services, domains, IAM**: `services` (list, watch, renew for every product), `domain` (list, info, renew, autorenew), `iam sync` (policy `aphrody-automation` and groups `aphrody-all*`), `auth status`, `dns backup`.
-- **Multi-Profile Resolution**: Resolves credentials across `aphrody.com`, `rosegriffon.fr`, and `dragonballfr.com` from `.bash_secrets`, `~/.ovh.conf`, and environment variables.
+- **Multi-Profile Resolution**: Resolves credentials for the `aphrody.com` profile or an explicit file from `.bash_secrets`, `~/.ovh.conf`, and environment variables.
 
 ## CLI Usage
 

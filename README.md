@@ -2,7 +2,7 @@
 
 # Bun OS
 
-**An Arch-based Linux distribution and product workspace built on the Aphrody Bun runtime.**
+**An Arch-based Linux distribution and product workspace built on the unmodified upstream Bun runtime.**
 
 [Docs](docs/index.mdx) ·
 [Quickstart](docs/quickstart.mdx) ·
@@ -10,15 +10,15 @@
 [Architecture](docs/architecture.md) ·
 [Plan](PLAN.md)
 
-[![CI](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml/badge.svg?branch=os)](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml)
-[![Bun](https://img.shields.io/badge/bun-1.4.4-black?logo=bun)](toolchains/bun)
+[![CI](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml)
+[![Bun](https://img.shields.io/badge/bun-1.4.4--canary.20261028.1-black?logo=bun)](https://www.npmjs.com/package/bun/v/1.4.4-canary.20261028.1)
 [![Rust](https://img.shields.io/badge/rust-nightly-orange?logo=rust)](rust-toolchain.toml)
 [![License](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue)](LICENSE)
 
 </div>
 
 Bun OS is the distribution workspace for an Arch-based system using the
-[Aphrody Bun runtime](https://github.com/aphrody-labs/bun). This repository
+[upstream Bun runtime](https://github.com/oven-sh/bun), pinned to the canary `bun@1.4.4-canary.20261028.1`. This repository
 owns assembly and the root Bun workspace. Product sources live under `apps/`,
 `crates/` and `packages/`, while Cargo ownership is still split by nested
 workspace boundaries and excluded sources. The image factory uses
@@ -42,7 +42,7 @@ separate compatibility path. See [`distribution.json`](distribution.json),
 
 ## Quickstart
 
-Requires Bun 1.4.4, Git, the nightly Rust toolchain from [`rust-toolchain.toml`](rust-toolchain.toml),
+Requires the upstream Bun canary `1.4.4-canary.20261028.1` (`npm install -g bun@1.4.4-canary.20261028.1`; `bun --revision` prints `1.4.4-canary.1+11c367163`), Git, the nightly Rust toolchain from [`rust-toolchain.toml`](rust-toolchain.toml),
 and the native toolchain of each target you build.
 
 ```bash
@@ -54,7 +54,7 @@ bun run setup
 ```
 
 ```bash
-bun src/cli.ts plan --profile full --target linux-x64
+bun src/cli.ts build plan --profile full --target linux-x64
 ```
 
 ```bash
@@ -77,7 +77,7 @@ qualification will succeed.
 | `packages/`          | Bun packages; the root Bun manifest declares the workspace members         |
 | `apps/`              | Desktop, web, CLI and Android application sources                          |
 | `vendor/`            | Imported sources; inspect `sources.lock.json` and `.gitmodules` for declared pins |
-| `toolchains/bun`    | The Aphrody Bun runtime and Tauri SDK                                      |
+| `package.json`      | Pins the upstream Bun runtime (`bun@1.4.4-canary.20261028.1`, oven-sh/bun `11c367163a4b`) |
 | `infra/`            | Host, nginx, systemd and DNS desired state                                 |
 | `fonts/`, `assets/` | Shared fonts and app assets with their licenses                            |
 | `docs/`             | Documentation site ([`docs/docs.json`](docs/docs.json))                    |
@@ -90,7 +90,6 @@ qualification will succeed.
 | Craft suite                   | `apps/*craft*`: PDF, CAD web, film, photo, vector, sound, word, deck, design, grid, light, effect, fig |
 | Reverse engineering (`re`)    | `packages/re`, `crates/re` (`bunre`)                                                               |
 | IECODE and nie game tooling   | `crates/aphrody-nie-*`, `packages/inagle`, `apps/iecode-*`                                         |
-| Rose Griffon                  | [Canonical source](https://github.com/aphrody-labs/rosegriffon), [ownership and binaries](docs/ROSEGRIFFON.md) |
 | Aphrody agents, MCP and A2A   | `crates/aphrody-*`, `packages/a2a`, `packages/m3-mcp`                                              |
 | Android                       | `apps/bun-android`, `packages/bun-android`, `crates/android-native`                                |
 
@@ -112,8 +111,8 @@ bun fmt --check
 bun scripts/cargo.ts check
 ```
 
-Type checking, lint, format and Node-to-Bun migration use the native `bun check`, `bun lint`,
-`bun fmt` and `bun n2b`. Cargo runs through the serialized wrapper `scripts/cargo.ts`. Build
+Type checking, lint and format use the upstream `bun check`, `bun lint` and
+`bun fmt` (the fork-only n2b command no longer exists). Cargo runs through the serialized wrapper `scripts/cargo.ts`. Build
 outputs go to `build/` and `target/`, and installed binaries to `install/`.
 The [contributor guide](AGENTS.md) and [CI](.github/workflows) define the gates.
 
@@ -121,9 +120,10 @@ The [contributor guide](AGENTS.md) and [CI](.github/workflows) define the gates.
 
 - [Introduction](docs/index.mdx), [installation](docs/installation.mdx), [quickstart](docs/quickstart.mdx)
 - [Architecture](docs/architecture.md) and [Arch distribution](docs/architecture/arch-distribution.md)
-- [Factory](factory/README.md), [native targets](docs/NATIVE-TARGETS.md), [builds](docs/builds.md)
+- [Architecture map](docs/ARCHITECTURE-MAP.md): every component with its owner, entry command, docs, CI job, pins and status (generated)
+- [Factory](factory/README.md), [native targets](docs/NATIVE-TARGETS.md), [builds](docs/APP-BUILDS.md)
 - [Reverse-engineering pipeline](docs/re-pipeline.md) and [fonts](docs/fonts.md)
-- [Deployment control](docs/control-plane.md) and [qualification](docs/qualification.md)
+- [Deployment control](docs/control-plane.md) and [qualification](docs/NATIVE-QUALIFICATION.md)
 
 ## License
 

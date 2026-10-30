@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Backend of the Bun OS WSL manager. Derived from src-tauri/src of octasoft-ltd/wsl-ui (GPL-3.0),
+# with the Tauri shell split out into apps/bunos-wsl/src-tauri; see docs/wsl/PROVENANCE.md.
+[package]
+name = "bunos-wsl"
+description = "WSL manager backend: wsl.exe executor (real and mock), settings, OCI/LXC/Store catalogs, downloads and the Bun OS layer (rootfs, kernel, WSLg)."
+version.workspace = true
+edition = "2021"
+rust-version.workspace = true
+license = "GPL-3.0-only"
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "bunos_wsl"
+path = "src/lib.rs"
+
+[[bin]]
+name = "bunos-wsl-cli"
+path = "src/bin/bunos-wsl-cli.rs"
+
+[dependencies]
+bunos-wsl-core = { path = "../bunos-wsl-core", version = "1.4.7" }
+serde = { workspace = true, features = ["derive", "std"] }
+serde_json = { workspace = true, features = ["std"] }
+thiserror = { workspace = true }
+log = { workspace = true }
+chrono = { workspace = true, features = ["clock", "std", "serde"] }
+regex = { workspace = true, features = ["std", "unicode", "perf"] }
+reqwest = { workspace = true, features = ["stream", "blocking", "json", "rustls"] }
+tokio = { workspace = true, features = ["fs", "rt", "rt-multi-thread", "macros", "time", "sync", "io-util"] }
+futures-util = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+flate2 = { workspace = true }
+jsonc-parser = { workspace = true }
+lazy_static = { workspace = true }
+shell-escape = { workspace = true }
+configparser = { workspace = true }
+ruzstd = { workspace = true }
+tar = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+winreg = { workspace = true }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tempfile = { workspace = true }

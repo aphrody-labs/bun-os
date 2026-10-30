@@ -1,0 +1,90 @@
+WSL2 patchset port to mainline v7.3: swiotlb helpers used by hv-pci
+Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3 (gregkh/linux tag v7.3).
+Build/boot: NOT verified (no Linux host). SPDX of the touched files is preserved.
+
+diff --git a/include/linux/swiotlb.h b/include/linux/swiotlb.h
+index 2a421241b980cad469889fcf10a7dd94b945e3ec..a6aa4961b708c6f7927ca51448e11582ba2f4ff2 100644
+--- a/include/linux/swiotlb.h
++++ b/include/linux/swiotlb.h
+@@ -192,6 +192,8 @@ bool is_swiotlb_active(struct device *dev);
+ void __init swiotlb_adjust_size(unsigned long size);
+ phys_addr_t default_swiotlb_base(void);
+ phys_addr_t default_swiotlb_limit(void);
++struct io_tlb_mem *swiotlb_create_pool(phys_addr_t base, void* vaddr,
++		                       size_t size, const char *name);
+ #else
+ static inline void swiotlb_init(bool addressing_limited, unsigned int flags)
+ {
+diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
+index 5edea93ec635455292401713371365a460977731..638017548b09b2777e9f72169be1da0f63a16ef7 100644
+--- a/kernel/dma/swiotlb.c
++++ b/kernel/dma/swiotlb.c
+@@ -2096,3 +2096,68 @@ static const struct reserved_mem_ops rmem_swiotlb_ops = {
+ 
+ RESERVEDMEM_OF_DECLARE(dma, "restricted-dma-pool", &rmem_swiotlb_ops);
+ #endif /* CONFIG_DMA_RESTRICTED_POOL */
++
++/**
++ * swiotlb_create_pool() - create a swiotlb pool from a physical memory region
++ * @base:	Physical base address of the region.
++ * @vaddr:	Virtual base address of the region.
++ * @size:	Size of the region in bytes.
++ * @name:	Name for debugfs (may be NULL).
++ *
++ * Allocates and initializes an io_tlb_mem with its default pool backed by the
++ * caller-provided physical memory.  The region must already be reserved (e.g.
++ * via memblock_reserve or firmware memory map) and within the linear mapping.
++ *
++ * The returned pool has force_bounce set so that streaming DMA is bounced
++ * through this region.  Assign it to dev->dma_io_tlb_mem to direct a device's
++ * DMA bounce buffering into this region.  Coherent DMA allocations
++ * (dma_alloc_coherent) are not affected and will use normal memory.
++ *
++ * Return: pointer to a new io_tlb_mem on success, ERR_PTR on failure.
++ */
++struct io_tlb_mem *swiotlb_create_pool(phys_addr_t base, void *vaddr,
++				       size_t size, const char *name)
++{
++	struct io_tlb_mem *mem;
++	struct io_tlb_pool *pool;
++	unsigned long nslabs = size >> IO_TLB_SHIFT;
++	unsigned int nareas = 1;
++
++	if (PageHighMem(pfn_to_page(PHYS_PFN(base))))
++		return ERR_PTR(-EINVAL);
++
++	mem = kzalloc(sizeof(*mem), GFP_KERNEL);
++	if (!mem)
++		return ERR_PTR(-ENOMEM);
++	pool = &mem->defpool;
++
++	pool->slots = kcalloc(nslabs, sizeof(*pool->slots), GFP_KERNEL);
++	if (!pool->slots) {
++		kfree(mem);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	pool->areas = kcalloc(nareas, sizeof(*pool->areas), GFP_KERNEL);
++	if (!pool->areas) {
++		kfree(pool->slots);
++		kfree(mem);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	set_memory_decrypted((unsigned long)phys_to_virt(base),
++			     size >> PAGE_SHIFT);
++	swiotlb_init_io_tlb_pool(pool, base, vaddr, nslabs, false, nareas);
++	mem->force_bounce = true;
++	mem->for_alloc = false;
++#ifdef CONFIG_SWIOTLB_DYNAMIC
++	spin_lock_init(&mem->lock);
++	INIT_LIST_HEAD_RCU(&mem->pools);
++#endif
++	add_mem_pool(mem, pool);
++	swiotlb_create_debugfs_files(mem, name ?: "swiotlb-pool");
++
++	pr_info("created restricted pool at %pa, size %zuMiB\n",
++		&base, size / SZ_1M);
++	return mem;
++}
++EXPORT_SYMBOL_GPL(swiotlb_create_pool);

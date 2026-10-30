@@ -26,15 +26,18 @@ RUN printf '%s\n' 'path-exclude=/usr/share/doc/*' 'path-include=/usr/share/doc/*
 FROM base AS bun
 ARG BUN_URL
 ARG BUN_SHA256_AMD64
-# aphrody-labs/bun 1.4.4 (bun:python, Bun Shell): the build packaged as factory/usr bun-aphrody.
-ADD --checksum=sha256:${BUN_SHA256_AMD64} ${BUN_URL} /tmp/bun.tar.gz
-RUN cd /tmp && tar -xzf bun.tar.gz && install -m755 bun-linux-x64/bun /usr/local/bin/bun \
-  && install -Dm644 -t /usr/share/licenses/bun-aphrody bun-linux-x64/LICENSE.md bun-linux-x64/MULLVAD-*.md \
-  && rm -rf /tmp/bun*
+ARG BUN_LICENSE_URL
+ARG BUN_LICENSE_SHA256
+# Official oven-sh/bun canary (npm @oven/bun-linux-x64), the build packaged as factory/usr bun-canary.
+ADD --checksum=sha256:${BUN_SHA256_AMD64} ${BUN_URL} /tmp/bun.tgz
+ADD --checksum=sha256:${BUN_LICENSE_SHA256} ${BUN_LICENSE_URL} /tmp/bun-LICENSE.md
+RUN cd /tmp && tar -xzf bun.tgz && install -m755 package/bin/bun /usr/local/bin/bun \
+  && install -Dm644 /tmp/bun-LICENSE.md /usr/share/licenses/bun-canary/LICENSE.md \
+  && rm -rf /tmp/bun* /tmp/package
 
 FROM base AS desktop
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
-COPY --from=bun /usr/share/licenses/bun-aphrody/ /usr/share/licenses/bun-aphrody/
+COPY --from=bun /usr/share/licenses/bun-canary/ /usr/share/licenses/bun-canary/
 ARG COSMIC_APT_SERVER
 ARG COSMIC_APT_SUITE
 ARG COSMIC_APT_KEY

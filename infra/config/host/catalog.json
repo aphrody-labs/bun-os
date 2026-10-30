@@ -18,11 +18,6 @@
       "unit": "nginx.service",
       "path": "systemd/shared/nginx.service.d",
       "hosts": ["vps"]
-    },
-    {
-      "unit": "privoxy.service",
-      "path": "systemd/shenron/privoxy.service.d",
-      "hosts": ["vps"]
     }
   ],
   "nginxSnippets": {
@@ -44,7 +39,6 @@
       "private-tunnel-2026-10-06.json",
       "discord-ai-lab-2026-10-07.json",
       "pc-connectivity-2026-10-07.json",
-      "shenron-timeline-2026-10-07.json",
       "ssh-mesh-2026-10-08.json",
       "targets.json",
       "vps-source.json",
@@ -101,14 +95,6 @@
       "targetHost": "dbfr"
     },
     {
-      "service": "aphrody-shenron-build-runner",
-      "unit": "aphrody-shenron-build-runner.service",
-      "path": "systemd/aphrody/aphrody-shenron-build-runner.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps"
-    },
-    {
       "service": "aphrody-compute-dbfr-tunnel",
       "unit": "aphrody-compute-dbfr-tunnel.service",
       "path": "systemd/aphrody/aphrody-compute-dbfr-tunnel.service",
@@ -132,20 +118,6 @@
       "dropIns": [],
       "ownerRepo": "aphrody",
       "targetHost": "wsl"
-    },
-    {
-      "service": "rg-website",
-      "unit": "rg-website.service",
-      "path": "systemd/rg/rg-website.service",
-      "ownerRepo": "iecode",
-      "targetHost": "vps"
-    },
-    {
-      "service": "rg-core",
-      "unit": "rg-core.service",
-      "path": "systemd/rg/rg-core.service",
-      "ownerRepo": "iecode",
-      "targetHost": "vps"
     },
     {
       "service": "aphrody-fonts-proxy",
@@ -273,179 +245,6 @@
       "ownerRepo": "aphrody",
       "targetHost": "dbfr",
       "pairs": "aphrody-self-update-dbfr.service"
-    },
-    {
-      "service": "shenron-manga-workers",
-      "unit": "shenron-manga-workers.service",
-      "path": "systemd/shenron/shenron-manga-workers.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps"
-    },
-    {
-      "service": "shenron-sync",
-      "unit": "shenron-sync.service",
-      "path": "systemd/shenron/shenron-sync.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "scope": "user"
-    },
-    {
-      "service": "shenron-sync",
-      "unit": "shenron-sync.timer",
-      "path": "systemd/shenron/shenron-sync.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "scope": "user",
-      "pairs": "shenron-sync.service"
-    },
-    {
-      "service": "shenron-auto-deploy",
-      "unit": "shenron-auto-deploy.service",
-      "path": "systemd/shenron/shenron-auto-deploy.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "scope": "user"
-    },
-    {
-      "service": "shenron-auto-deploy",
-      "unit": "shenron-auto-deploy.timer",
-      "path": "systemd/shenron/shenron-auto-deploy.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "scope": "user",
-      "pairs": "shenron-auto-deploy.service"
-    },
-    {
-      "service": "shenron-cdn-sync",
-      "unit": "shenron-cdn-sync.service",
-      "path": "systemd/shenron/shenron-cdn-sync.service",
-      "dropIns": ["run-as-ubuntu", "sandbox-base", "sandbox-home-ro", "net-inet-only"],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "site": "cdn.dragonballfr.com"
-    },
-    {
-      "service": "shenron-cdn-sync",
-      "unit": "shenron-cdn-sync.timer",
-      "path": "systemd/shenron/shenron-cdn-sync.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "pairs": "shenron-cdn-sync.service"
-    },
-    {
-      "service": "shenron-bot",
-      "unit": "shenron-bot.service",
-      "path": "systemd/shenron/shenron-bot.service",
-      "dropIns": ["run-as-ubuntu", "sandbox-base", "sandbox-home-ro", "syscall-service"],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr",
-      "site": "bot.dragonballfr.com"
-    },
-    {
-      "service": "shenron-offsite-backup",
-      "unit": "shenron-offsite-backup.service",
-      "path": "systemd/shenron/shenron-offsite-backup.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps"
-    },
-    {
-      "service": "shenron-offsite-backup",
-      "unit": "shenron-offsite-backup.timer",
-      "path": "systemd/shenron/shenron-offsite-backup.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "pairs": "shenron-offsite-backup.service"
-    },
-    {
-      "service": "shenron-site",
-      "unit": "shenron-site.service",
-      "path": "systemd/shenron/shenron-site.service",
-      "dropIns": ["run-as-ubuntu", "sandbox-base", "sandbox-home-ro", "sandbox-kernel", "syscall-service"],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr",
-      "site": "dragonballfr.com"
-    },
-    {
-      "service": "shenron-sqlite-replica-backup",
-      "unit": "shenron-sqlite-replica-backup.service",
-      "path": "systemd/shenron/shenron-sqlite-replica-backup.service",
-      "dropIns": ["run-as-ubuntu", "sandbox-base"],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-sqlite-replica-backup",
-      "unit": "shenron-sqlite-replica-backup.timer",
-      "path": "systemd/shenron/shenron-sqlite-replica-backup.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr",
-      "pairs": "shenron-sqlite-replica-backup.service"
-    },
-    {
-      "service": "shenron-timeline-refresh",
-      "unit": "shenron-timeline-refresh.service",
-      "path": "systemd/shenron/shenron-timeline-refresh.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-timeline-refresh-timer",
-      "unit": "shenron-timeline-refresh.timer",
-      "path": "systemd/shenron/shenron-timeline-refresh.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-timeline-api",
-      "unit": "shenron-timeline-api.service",
-      "path": "systemd/shenron/shenron-timeline-api.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-compute",
-      "unit": "shenron-compute.service",
-      "path": "systemd/shenron/shenron-compute.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-container-backup",
-      "unit": "shenron-container-backup.service",
-      "path": "systemd/shenron/shenron-container-backup.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-container-backup",
-      "unit": "shenron-container-backup.timer",
-      "path": "systemd/shenron/shenron-container-backup.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr",
-      "pairs": "shenron-container-backup.service"
-    },
-    {
-      "service": "shenron-embed",
-      "unit": "shenron-embed.service",
-      "path": "systemd/shenron/shenron-embed.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
     },
     {
       "service": "aphrody-jobs-worker-dbfr",
@@ -585,65 +384,6 @@
       "dropIns": [],
       "ownerRepo": "aphrody",
       "targetHost": "vps"
-    },
-    {
-      "service": "shenron-cloudflared",
-      "unit": "shenron-cloudflared.service",
-      "path": "systemd/shenron/shenron-cloudflared.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-cloudflare-audit",
-      "unit": "shenron-cloudflare-audit.service",
-      "path": "systemd/shenron/shenron-cloudflare-audit.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-cloudflare-audit",
-      "unit": "shenron-cloudflare-audit.timer",
-      "path": "systemd/shenron/shenron-cloudflare-audit.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr",
-      "pairs": "shenron-cloudflare-audit.service"
-    },
-    {
-      "service": "shenron-cloudflare-s3-renew",
-      "unit": "shenron-cloudflare-s3-renew.service",
-      "path": "systemd/shenron/shenron-cloudflare-s3-renew.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-cloudflare-s3-renew",
-      "unit": "shenron-cloudflare-s3-renew.timer",
-      "path": "systemd/shenron/shenron-cloudflare-s3-renew.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr",
-      "pairs": "shenron-cloudflare-s3-renew.service"
-    },
-    {
-      "service": "shenron-wiki-proposals",
-      "unit": "shenron-wiki-proposals.service",
-      "path": "systemd/shenron/shenron-wiki-proposals.service",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr"
-    },
-    {
-      "service": "shenron-wiki-proposals-timer",
-      "unit": "shenron-wiki-proposals.timer",
-      "path": "systemd/shenron/shenron-wiki-proposals.timer",
-      "dropIns": [],
-      "ownerRepo": "aphrody",
-      "targetHost": "dbfr",
-      "pairs": "shenron-wiki-proposals.service"
     }
   ],
   "scheduledTasks": [
@@ -721,27 +461,6 @@
       "service": "aphrody-bun-site"
     },
     {
-      "file": "nginx/rg/rosegriffon.fr.conf",
-      "ownerRepo": "iecode",
-      "targetHost": "vps",
-      "site": "rosegriffon.fr",
-      "service": "rg-website"
-    },
-    {
-      "file": "nginx/nie/nie.aphrody.app.conf",
-      "ownerRepo": "iecode",
-      "targetHost": "vps",
-      "site": "nie.aphrody.app",
-      "service": "rg-core"
-    },
-    {
-      "file": "nginx/rg/rg-core.conf",
-      "ownerRepo": "iecode",
-      "targetHost": "vps",
-      "site": "ranked.rosegriffon.fr",
-      "service": "rg-core"
-    },
-    {
       "file": "nginx/shared/00-default.conf",
       "ownerRepo": "aphrody",
       "targetHost": "vps",
@@ -752,33 +471,6 @@
       "ownerRepo": "aphrody",
       "targetHost": "vps",
       "site": "source-tunnel-auth"
-    },
-    {
-      "file": "nginx/shenron/00-shenron.conf",
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "site": "00-shenron"
-    },
-    {
-      "file": "nginx/shenron/bot.dragonballfr.com.conf",
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "site": "bot.dragonballfr.com",
-      "service": "shenron-bot"
-    },
-    {
-      "file": "nginx/shenron/cdn.dragonballfr.com.conf",
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "site": "cdn.dragonballfr.com",
-      "service": "shenron-cdn-sync"
-    },
-    {
-      "file": "nginx/shenron/dragonballfr.com.conf",
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "site": "dragonballfr.com",
-      "service": "shenron-site"
     }
   ]
 }

@@ -9,9 +9,7 @@
     "m3.config.ts",
     "scripts",
     "src",
-    "undeclared-deps.ts",
-    "showcase",
-    "!showcase/scripts"
+    "undeclared-deps.ts"
   ],
   "type": "module",
   "main": "./src/index.ts",
@@ -21,7 +19,7 @@
     "./backend": "./backend.ts",
     "./webos": "./webos.ts",
     "./styles.css": "./src/styles.css",
-    "./showcase": "./showcase/src/App.tsx"
+    "./material/*": "./src/material/*"
   },
   "publishConfig": {
     "access": "public"
@@ -31,27 +29,14 @@
     "build": "bun run build.ts",
     "typecheck": "bun check -p tsconfig.json --noEmit",
     "test": "bun test src",
-    "brand": "bun run scripts/brand-theme.ts",
-    "showcase:inventory": "cd showcase && bun scripts/inventory.ts",
-    "showcase:dev": "cd showcase && bun scripts/inventory.ts && bun ../../m3-bun/bin/m3-bun.ts dev",
-    "showcase:build": "cd showcase && bun scripts/inventory.ts && bun ../../m3-bun/bin/m3-bun.ts build",
-    "showcase:serve": "cd showcase && bun ../../m3-bun/bin/m3-bun.ts serve",
-    "showcase:compile": "cd showcase && bun scripts/inventory.ts && bun ../../m3-bun/bin/m3-bun.ts compile",
-    "showcase:package": "cd showcase && bun ../../m3-bun/bin/m3-bun.ts package",
-    "showcase:deploy": "cd showcase && bun ../../m3-bun/bin/m3-bun.ts deploy all",
-    "showcase:smoke": "cd showcase && bun ../../m3-bun/bin/m3-bun.ts smoke",
-    "showcase:typecheck": "cd showcase && bun check -p tsconfig.json --noEmit",
-    "showcase:test": "cd showcase && bun test ./test && bun test --preload @aphrody/m3-config/test/dom ./test-dom",
-    "showcase:tauri": "cd showcase && bun scripts/tauri.ts",
-    "showcase:test:dom": "cd showcase && bun test --preload @aphrody/m3-config/test/dom ./test-dom"
+    "brand": "bun run scripts/brand-theme.ts"
   },
   "dependencies": {
     "@aphrody/assets": "workspace:*",
     "@aphrody/bun-webview-page": "0.1.1-aphrody.2",
     "@aphrody/canvas": "workspace:*",
-    "@aphrody/drive-client": "workspace:*",
     "@aphrody/eslint-plugin-m3": "workspace:*",
-    "@aphrody/fuzzy": "workspace:*",
+    "@aphrody/fuzzy": "1.4.7",
     "@aphrody/identity": "workspace:*",
     "@aphrody/m3": "workspace:*",
     "@aphrody/m3-ai": "workspace:*",
@@ -75,9 +60,9 @@
     "@aphrody/m3-theme": "workspace:*",
     "@aphrody/m3-tokens": "workspace:*",
     "@aphrody/material-design-icons": "workspace:*",
-    "@aphrody/qr": "workspace:*",
+    "@aphrody/qr": "1.4.7",
     "@aphrody/scaffold": "workspace:*",
-    "@aphrody/tauri": "catalog:",
+    "@aphrody/tauri": "workspace:*",
     "@aphrody/webos-wasm": "workspace:*",
     "@dnd-kit/core": "catalog:",
     "@dnd-kit/sortable": "catalog:",
@@ -114,6 +99,6 @@
     "tailwindcss": "catalog:"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

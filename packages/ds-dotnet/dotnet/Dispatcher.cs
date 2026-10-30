@@ -35,7 +35,7 @@ internal static class Dispatcher
         {
             var path = Path.Combine(hostDirectory, new System.Reflection.AssemblyName(args.Name).Name + ".dll");
             if (!File.Exists(path)) return null;
-            // bun:dotnet loads this assembly into its own context; share that context's copies with the plugins.
+            // The hostfxr loader loads this assembly into its own context; share that context's copies with the plugins.
             var context = System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Dispatcher).Assembly)!;
             return context.LoadFromAssemblyPath(path);
         };

@@ -25,11 +25,11 @@ Full guide: [M3-BUN.md](https://github.com/aphrody-labs/bun-distribution/blob/os
 ```sh
 m3-bun dev                     # HMR dev server: UI and API in one process (bunfig [serve.static] plugins)
 m3-bun build [--minify none|basic|full] [--graph[=<registry>]]
-m3-bun graph [file]            # recorded builds (bun:graph), or what depends on a file
+m3-bun graph [file]            # recorded builds, or what depends on a file
 m3-bun serve                   # production server of the build directory
 m3-bun compile [--target linux-x64-musl|windows-x64|darwin-arm64|...]
 m3-bun package [--rootfs] [--deploy]
-m3-bun deploy docker systemd nginx vercel fly cloudflare coolify vscode windows linux-image   # or: all
+m3-bun deploy docker systemd nginx vercel fly cloudflare coolify vscode windows   # or: all
 m3-bun smoke                   # run the executable (yolo runtime when installed), GET /, /healthz, /api/m3/info
 ```
 
@@ -70,15 +70,15 @@ The fork's Bun plugins compose behind options of `m3Bun` (`src/plugins.ts`): `ya
 match. The m3 packages are modules too (`src/plugins-m3.ts`): `m3:icon/<style>/<name>` (`@aphrody/m3-icons`),
 `m3:theme/{tokens,tailwind,spaceui}.css` (`@aphrody/m3-theme`) and `m3:assets/<path>[?url]` (`@aphrody/assets`).
 
-## Build graph (`bun:graph`)
+## Build graph
 
-`m3-bun build --graph` (or `bun: { graph: true }` in `m3.config.ts`) records the build in the `bun:graph` SQLite registry of
-the Aphrody fork of Bun, `.m3-bun/graph.sqlite` by default: the app is a repository, the build a run with its duration
+`m3-bun build --graph` (or `bun: { graph: true }` in `m3.config.ts`) records the build in a SQLite registry (`bun:sqlite`,
+`src/graph-registry.ts`), `.m3-bun/graph.sqlite` by default: the app is a repository, the build a run with its duration
 sample and one artifact (path, SHA-256, bytes) per output file, and the `Bun.build` metafile a graph snapshot. Its nodes
 are the inputs (virtual `m3:` modules included), the outputs and the external imports; its edges the imports, keyed by
-import kind, and `bundled-into` from an input to each output it contributed to. `m3-bun graph` prints the `bun:graphx`
+import kind, and `bundled-into` from an input to each output it contributed to. `m3-bun graph` prints the
 markdown report; `m3-bun graph src/main.ts` lists the modules that import the file, transitively, and the outputs it went
-into. Runtimes without `bun:graph` fail with an explicit error.
+into.
 
 ## One process, UI and API
 
@@ -124,7 +124,7 @@ the executable, so start-up skips parsing. Measured on the fixture app (medians,
 Bytecode output is CommonJS, so the generated entry has no top-level await. `compile: { bytecode: false }` turns it off.
 
 The executable is not static: glibc targets link libc, libm, libdl, libpthread and the loader, musl targets link musl and
-libstdc++. Images carry those libraries (`m3-bun package --rootfs`, the `linux-image` target); the `docker` target
+libstdc++. Images carry those libraries (`m3-bun package --rootfs`); the `docker` target
 compiles and runs on `ghcr.io/aphrody-labs/alpine:3.24-runtime` (musl, libstdc++, CA certificates, tzdata). Windows
 metadata (`compile.windows`) is applied only when compiling on Windows; elsewhere the report says so.
 

@@ -5,15 +5,21 @@ import { A2A_ERROR_CODES, A2A_METHODS, A2A_STREAMING_METHODS, TASK_STATE_VALUES 
 import { renderGenerated } from "../scripts/generate-types.ts";
 import { generateTypes, jsonName, parseProto } from "../scripts/proto-to-ts.ts";
 
-const repoRoot = join(import.meta.dir, "..", "..", "..", "..");
-const protoPath = join(repoRoot, "crates", "os", "kernel", "comps", "a2a-pb", "proto", "a2a.proto");
-const rustErrors = join(repoRoot, "crates", "contracts", "a2a", "src", "errors.rs");
-const rustJsonRpc = join(repoRoot, "crates", "contracts", "a2a", "src", "jsonrpc.rs");
+const repoRoot = join(import.meta.dir, "..", "..", "..");
+const protoPath = join(repoRoot, "crates", "aphrody-a2a-pb", "proto", "a2a.proto");
+const rustErrors = join(repoRoot, "crates", "aphrody-a2a", "src", "errors.rs");
+const rustJsonRpc = join(repoRoot, "crates", "aphrody-a2a", "src", "jsonrpc.rs");
 
 describe("generated types", () => {
   test("src/generated/a2a.ts is the projection of the current proto", async () => {
     const committed = await Bun.file(join(import.meta.dir, "..", "src", "generated", "a2a.ts")).text();
-    expect(await renderGenerated()).toBe(committed);
+    // The committed file is run through the repo formatter (wrapping, leading `|`, trailing commas).
+    const squash = (s: string) =>
+      s
+        .replace(/\s+/g, "")
+        .replace(/=\|/g, "=")
+        .replace(/,([)\]}])/g, "$1");
+    expect(squash(await renderGenerated())).toBe(squash(committed));
   });
 });
 

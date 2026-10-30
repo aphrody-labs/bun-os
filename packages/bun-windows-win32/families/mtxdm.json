@@ -1,7 +1,0 @@
-{
-  "family": "mtxdm",
-  "dll": "mtxdm.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["System.ComponentServices"],
-  "functions": { "GetDispenserManager": ["hr", ["*i:System.ComponentServices.IDispenserManager"], ["param0"], 0] }
-}

@@ -15,7 +15,7 @@
   "bunWorkspace": "package.json",
   "cmakeWorkspace": "crates/bun-engine-core/CMakeLists.txt",
   "owners": {
-    "runtime": "toolchains/bun",
+    "runtime": "sources/bun",
     "linux": ["vendor/linux-cachyos", "vendor/kernel-patches"],
     "windowsCompatibility": ["vendor/proton-cachyos", "vendor/wine-cachyos"],
     "windowsOmarchy": "vendor/omarchy-windows",

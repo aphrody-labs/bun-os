@@ -21,6 +21,7 @@ const help = `Aphrody Bun 1.4.4
   aphrody-bun run <id> [args...]    Run an explicit headless engine CLI
   aphrody-bun check <id>            Check a native library owner
   aphrody-bun build <id>            Build a native library owner in release mode
+  aphrody-bun git doctor|setup|profile|clone|status|prune|measure|generate   Git at monorepo scale (docs/MONOREPO-SCALE.md)
 
 Native builds are serialized. Release and application builds enforce their target-specific Bun pin.`;
 
@@ -155,6 +156,8 @@ async function main(): Promise<number> {
       }
       return ok ? 0 : 1;
     }
+    case "git":
+      return (await import("./git-cli.ts")).gitCommand(args);
     case "sync":
       if (args.length) throw new Error("Usage: aphrody-bun sync");
       await syncModules(config);

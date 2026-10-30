@@ -643,7 +643,9 @@ mod tests {
             .find(|companion| companion.tool == "sed")
             .unwrap();
         if !super::companion_binary(sed).is_file() {
-            eprintln!("uutils sed not installed: bun scripts/aphrody/build/os/build-uutils-coreutils.ts");
+            eprintln!(
+                "uutils sed not installed: bun scripts/aphrody/build/os/build-uutils-coreutils.ts"
+            );
             return;
         }
         let result = CoreutilsSubsystem::new()

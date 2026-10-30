@@ -19,7 +19,7 @@ pub(crate) struct HomeQueryRequest {
     /// Restrict to kinds: `chunk`, `node`, `memory` (default: all).
     #[serde(default)]
     pub(crate) kinds: Option<Vec<String>>,
-    /// Domain profile (`aphrody`, `dbfr`, `ie`); default `$APHRODY_PROFILE`, else the global home.
+    /// Domain profile (`aphrody`, `ie`); default `$APHRODY_PROFILE`, else the global home.
     #[serde(default)]
     pub(crate) profile: Option<String>,
 }

@@ -43,7 +43,7 @@ code.
   - Creative Commons with redistribution allowed.
 - **Every asset file must have a row in [`ATTRIBUTION.md`](ATTRIBUTION.md)** (path, author, source,
   licence, notes). `cargo xtask assets` (part of `cargo xtask ci`) fails on any unlisted file under
-  `assets/`, `docs/brand/` or `docs/images/`.
+  `assets/`, `../brand/` or `docs/images/`.
 - FigCraft's UI icons are drawn in code (`crates/ui-egui/src/icons.rs`) from simple primitives and
   are original. Keep it that way: new icons are new code, designed from scratch.
 - The app icon is the owner's chameleon drawing, vectorised (`assets/app-icon/README.md`); `cargo xtask icon`
@@ -54,8 +54,8 @@ code.
   embeds it). Everything must build, test and run without it (system fonts are scanned at runtime).
 - Demo and test content is synthetic or public domain; never personal photos or data.
 - Code and original assets are MIT OR Apache-2.0 (`LICENSE-MIT`, `LICENSE-APACHE`, `NOTICE`). The
-  ArtCraft logos in `docs/brand/` are trademarks, not open source, under
-  `docs/brand/LICENSE-brand.txt`: never modify them or use them outside FigCraft.
+  ArtCraft logos in `../brand/` are trademarks, not open source, under
+  `brand/LICENSE-brand.txt`: never modify them or use them outside FigCraft.
 - If the provenance of an asset is unclear, don't add it.
 
 ### Never crash

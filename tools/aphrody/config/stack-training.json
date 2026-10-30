@@ -12,8 +12,8 @@
     },
     {
       "id": "bun",
-      "role": "Bun runtime and SDK: JavaScriptCore/WebKit, built-ins, package manager, system APIs, native integrations and Bun Cloudflare capabilities. Runtime source changes belong to the aphrody-labs/bun fork; product configuration and release orchestration stay with Aphrody Infra.",
-      "source": "https://github.com/aphrody-labs/bun",
+      "role": "Bun runtime and SDK: JavaScriptCore/WebKit, built-ins, package manager, system APIs, native integrations and Bun Cloudflare capabilities. Runtime source changes belong to upstream oven-sh/bun; product configuration and release orchestration stay with Aphrody Infra.",
+      "source": "https://github.com/oven-sh/bun",
       "production": true,
       "note": "Canonical runtime and system SDK owner; produces SDK artifacts consumed by Bun OS and served from bun-lib.aphrody.app. Infra owns DNS and R2 state. Resolve the checkout from workspace configuration."
     },
@@ -33,7 +33,7 @@
     },
     {
       "id": "aphrody-ai",
-      "role": "AI layer: agents, model clients, inference, RAG, MCP servers, the AI side of A2A and the aphrody CLI; builds the aphrody, aphrody-mcp (with the dragonball.* tools) and aphrody-embed release binaries",
+      "role": "AI layer: agents, model clients, inference, RAG, MCP servers, the AI side of A2A and the aphrody CLI; builds the aphrody, aphrody-mcp and aphrody-embed release binaries",
       "source": "https://github.com/aphrody-labs/aphrody",
       "production": true,
       "monorepoPaths": "crates/ai, packages/ai",
@@ -104,20 +104,6 @@
       "note": "Domain of the aphrody monorepo since 2026-10-01; the former split repository was deleted after a verified backup (~/.aphrody/private/backups/github/aphrody-labs-2026-10-01)."
     },
     {
-      "id": "rg",
-      "role": "canonical Rose Griffon application source and self-hosted binary owner",
-      "source": "https://github.com/aphrody-labs/rosegriffon",
-      "production": true,
-      "monorepoPaths": "apps/rg-website, apps/rg-bot, apps/azalee-web, apps/rosegriffon, packages/rg-*, packages/achillea-*, packages/azalee, crates/aphrody-rg-server"
-    },
-    {
-      "id": "shenron",
-      "role": "independent Dragon Ball domain application",
-      "source": "https://github.com/aphrody-labs/shenron",
-      "production": true,
-      "note": "Source remains in aphrody-labs/shenron; deployment is managed separately from the Rose Griffon product."
-    },
-    {
       "id": "aphrody-discord",
       "role": "Development-only Bun Discord bot, interactions endpoint and OAuth test app",
       "source": "https://github.com/aphrody-labs/aphrody",
@@ -175,14 +161,14 @@
       "name": "@aphrody/challonge",
       "value": "medium",
       "role": "tournament data adapter",
-      "source": "https://github.com/aphrody-labs/shenron (packages/pipeline BxcBridge; former bxc repository deleted 2026-10-01)",
+      "source": "former bxc repository, deleted 2026-10-01",
       "policy": "domain-optional"
     },
     {
       "name": "@aphrody/zukan",
       "value": "medium",
       "role": "catalog/data adapter",
-      "source": "local: rg workspace catalog",
+      "source": "local: workspace catalog",
       "policy": "reuse-before-reimplementation"
     },
     {
@@ -203,9 +189,8 @@
   "canonicalExternalStack": {
     "runtime": "Bun workspace + Rust native bridge + uv Python projects",
     "web": "Next 16 canary only where already pinned; one build per release",
-    "api": "Elysia/Kysely in RG; Rust/Axum for new infra control endpoints",
+    "api": "Elysia/Kysely; Rust/Axum for new infra control endpoints",
     "database": "PostgreSQL primary, Redis cache, SQLite bounded local mirror",
-    "ui": "RG UI/app-shell contract reused by Shenron",
     "proxy": "one Nginx route registry",
     "observability": "systemd journal + structured JSON evidence manifests"
   },

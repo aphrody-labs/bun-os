@@ -8,12 +8,6 @@
     "model": "gemma4-e2b",
     "smokeMessageId": "1557356424818991269"
   },
-  "shenronChat": {
-    "unit": "aphrody-llama-shenron-chat.service",
-    "state": "active",
-    "model": "shenron-chat-v2",
-    "adapterSha256": "aab485357c68fdcbb6d4ba55911632b8228964106047db035e0223e2aecc6107"
-  },
   "telemetry": {
     "timer": "aphrody-discord-lab-telemetry.timer",
     "state": "active",

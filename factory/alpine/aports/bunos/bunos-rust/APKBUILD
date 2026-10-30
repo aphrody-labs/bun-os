@@ -1,0 +1,15 @@
+# Maintainer: aphrody-dev <contact@aphrody.com>
+pkgname=bunos-rust
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Rust toolchain for Bun OS: rust, cargo, wasm32 std"
+url="https://github.com/aphrody-labs/bun-os"
+arch="noarch"
+license="Apache-2.0"
+depends="rust cargo rust-wasm"
+options="!check"
+
+builddir="$srcdir"
+package() {
+	mkdir -p "$pkgdir"
+}

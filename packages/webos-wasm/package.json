@@ -29,11 +29,13 @@
     "typecheck": "bun check --noEmit",
     "test": "bun test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@bjorn3/browser_wasi_shim": "0.4.2"
+  },
   "devDependencies": {
-    "@types/bun": "npm:@aphrody/bun-types@1.4.4"
+    "@types/bun": "catalog:"
   },
   "engines": {
-    "bun": ">=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

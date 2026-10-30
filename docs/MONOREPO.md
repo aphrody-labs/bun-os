@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Bun OS monorepo
 
-Entry page for the canonical Bun OS workspace (`aphrody-labs/bun-os` (renamed from `aphrody-labs/bun-distribution` on 2026-10-25), branch `os`; forge
+Entry page for the canonical Bun OS workspace (`aphrody-labs/bun-os` (renamed from `aphrody-labs/bun-distribution` on 2026-10-25), branch `main` (`os` is a fast-forward mirror); forge
 `bun-forge:aphrody-dev/bun-os`). It states the rules, the measured state and the open decisions, and links to
 the pages that own the details. Generated data is not copied here: see
 [`generated/component-inventory.json`](generated/component-inventory.json) (regenerate with
@@ -18,10 +18,10 @@ the pages that own the details. Generated data is not copied here: see
 | `packages/` | Bun and TypeScript packages, one direct child per member (Bun Engine in `packages/bun-engine`) |
 | `crates/` | Rust crates, one direct child per member, most of them flat Git submodules |
 | `vendor/` | External pinned owners and third-party sources (Bazzite, Omarchy, CachyOS, ChimeraOS, RetroArch, emulators); not Cargo members |
-| `toolchains/` | The pinned Bun runtime fork (`toolchains/bun`), excluded from the root Cargo workspace |
+| `toolchains/` | Legacy: held the abandoned Bun runtime fork (`toolchains/bun`, removed). The runtime is now unmodified upstream Bun, pinned by `packageManager` in `package.json` (`bun@1.4.4-canary.20261028.1`) |
 | `factory/` | OS composition: Arch package profile, `/usr` composition, container images (`factory/images/*`), qualification |
 | `infra/` | Routes, hosts, runtime pins, shared assets and deployment control |
-| `docs/` | Documentation; this page, [architecture](architecture.md), [builds](builds.md), [qualification](qualification.md) |
+| `docs/` | Documentation; this page, [architecture](architecture.md), [builds](APP-BUILDS.md), [qualification](NATIVE-QUALIFICATION.md) |
 | `replica/` | Recon, screens and feature matrices for reference products (study only) |
 | `scripts/`, `src/` | Root CLI (`bun src/cli.ts`), release and workspace tooling |
 
@@ -47,7 +47,6 @@ Native Bun commands only; never `bunx`, `tsc`, ESLint or Prettier:
 bun check          # type check (native)
 bun lint           # native lint
 bun fmt            # native format (use `bun run format:check` to only check)
-bun n2b            # Node-to-Bun rewrite
 bun src/cli.ts workspace check       # root invariants and the exceptions ledger
 bun scripts/cargo.ts metadata        # members-contract workspace report
 bun scripts/cargo.ts check           # serialized `cargo check --locked --workspace`
@@ -72,7 +71,7 @@ Measured on `origin/os` at `15d3c89088` (`bun src/cli.ts workspace check`: 0 vio
 | Git submodules | pinned, initialised on demand | 168 declared at the root; 155 initialised on the VPS checkout, 65 on the workstation |
 | Flat members | every member `crates/<name>`, `apps/<name>`, `packages/<name>` | 19 formerly non-flat: 6 `tools/bevy/*` are flat now; `tools/bevy/ci` and 12 `crates/bevy*` members remain |
 
-Still open: the five `migrate` workspaces (`apps/aphrody-drive`, `apps/desktop/src-tauri`,
+Still open: the four `migrate` workspaces (`apps/desktop/src-tauri`,
 `apps/figcraft/plugins`, `apps/m3-published-consumer`, `packages/bun-tauri`), `crates/sqlite_tasks`,
 unflattened Bevy members, active Cargo vendor source replacement, native qualification of the whole
 graph ([NATIVE-QUALIFICATION](NATIVE-QUALIFICATION.md)), and the Aphrody/Bun unification as a whole.
@@ -102,7 +101,7 @@ Cloudflare MCP.
 
 `bun scripts/release.ts <verify|plan|npm|crates|all> [--apply]` is the one entry point; nothing publishes
 without `--apply`. Stages: `verify` (check, lint, format check, docs check, manifests), `plan` (what npm and
-crates.io lack), `npm` (dependency order, owned scopes `@aphrody` and `@rosegriffon`), `crates` (dependency
+crates.io lack), `npm` (dependency order, owned scope `@aphrody`), `crates` (dependency
 order, `--limit`, `--pause`). Stages are idempotent: a published version is skipped. Credentials come from the
 environment only (`NPM_CONFIG_TOKEN`, `CARGO_REGISTRY_TOKEN`). `.github/workflows/release.yml` runs verify,
 binaries, npm and crates on a `v*` tag or a manual dispatch (dry run unless `publish` is set).
@@ -121,7 +120,7 @@ workflow triggered, no tag). Tree: `origin/os` at `56018b4aa7`, plus the `bun.lo
 | `lint` | pass, 5923 files |
 | `format:check` | fails: 141 files differ (85 `packages/`, 19 `factory/`, 17 `scripts/`, 7 `src/`). `verify` stops here. Not reformatted: `bun fmt` would rewrite whole files, so it needs its own reviewed commit |
 | `docs:check` | pass, 53 pages (54 with this page), links resolve |
-| manifests | `scripts/workspace-manifests.ts` is a generator, not a check: it exits 0 and rewrites the root `package.json`, `tsconfig.json` and about twenty member manifests (adds `packages/admin-ui` to the workspaces, which then breaks `check`). The rewrite was reverted; the gate proves nothing and needs a `--check` mode |
+| manifests | `scripts/workspace-manifests.ts` is a generator, not a check: it exits 0 and rewrites the root `package.json`, `tsconfig.json` and about twenty member manifests (adds a package to the workspaces, which then breaks `check`). The rewrite was reverted; the gate proves nothing and needs a `--check` mode |
 
 Other findings: `bun install --frozen-lockfile` failed because `bun.lock` lacked the `@aphrody/identity` and
 `@aphrody/m3` links of `packages/artcraft-frontend` and `apps/artcraft-web-app`; fixed (4 lines). A fresh
@@ -132,7 +131,7 @@ exec -- metadata ...` exits 1 without output; plain `cargo metadata --no-deps --
 
 | Registry | Local | Unpublished | Notes |
 | --- | --- | --- | --- |
-| npm | 434 public packages in `@aphrody` and `@rosegriffon` (`packages/*`, `apps/*`) | 2 | `@aphrody/paths`, `@aphrody/canvas`; both have no unpublished dependency. Other scopes (for example `@storyteller`) are skipped by design |
+| npm | 434 public packages in `@aphrody` (`packages/*`, `apps/*`) | 2 | `@aphrody/paths`, `@aphrody/canvas`; both have no unpublished dependency. Other scopes (for example `@storyteller`) are skipped by design |
 | crates.io | 574 publishable crates (693 members, the rest `publish = false`) | 486 | 12 dependency layers of 130, 76, 66, 65, 52, 32, 22, 16, 13, 8, 4 and 2 crates. Layer 0 includes `aphrody-patch`, `aphrody-a2a`, `aphrody-config`, `aphrody-secrets`, `aphrody-guard`, `aphrody-agent-proto`, `aphrody-sql`, `aphrody-http-error`, `aphrody-app-protocol`, `aphrody-subsystem`; layer 1 starts with `aphrody-toolcall-repair`, `aphrody-a2a-pb`, `aphrody-models`, `aphrody-mcp-client`, `aphrody-nie-core` |
 
 At the workflow default (`--limit 5 --pause 600`) the crates stage publishes five crates per run, so 486 crates
@@ -165,7 +164,7 @@ workflow environment (not checked), and non-current GitHub mirrors, on which `re
 4. **GitHub mirror**: `aphrody-labs/bun-os` has no `os` branch (see Release state); decide whether it is a
    mirror of `os` or a separate repository, because the `github` remote of this checkout is
    `aphrody-labs/bun-distribution`. Resolved 2026-10-25: `aphrody-labs/bun-distribution` was renamed
-   `aphrody-labs/bun-os` (default branch `os`) and the former `aphrody-labs/bun-os` became the archived
+   `aphrody-labs/bun-os` (default branch `main`, mirrored to `os`) and the former `aphrody-labs/bun-os` became the archived
    `aphrody-labs/bun-os-legacy`.
 5. **Migrate-class workspaces** (five) and the `Cargo.lock` stanza of the removed `aphrody-rg-server`
    package (see `PLAN.md`).

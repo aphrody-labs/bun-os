@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// The M3 additions to the @aphrody/next-bun codemods (aphrody-labs/bun, packages/bun-next/codemods), whose own tests
+// The M3 additions to the @aphrody/next-bun codemods (the former Bun fork, packages/bun-next/codemods), whose own tests
 // live in the fork (test/integration/next-bun/codemods.test.ts): MUI -> M3 and the M3 preset header.
 import { describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";

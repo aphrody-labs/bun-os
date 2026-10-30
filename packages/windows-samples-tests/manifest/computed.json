@@ -1,0 +1,63 @@
+{
+  "perLang": {
+    "cpp": {
+      "total": 240,
+      "counts": {
+        "not-started": 107,
+        "builds": 0,
+        "runs-headless": 133,
+        "runs-interactive-only-CI-or-manual": 0
+      },
+      "implementedPct": 55.4,
+      "runsHeadlessPct": 55.4,
+      "functionalImplementedPct": 6.1,
+      "functionalRunsPct": 6.1
+    },
+    "cs": {
+      "total": 240,
+      "counts": {
+        "not-started": 67,
+        "builds": 32,
+        "runs-headless": 137,
+        "runs-interactive-only-CI-or-manual": 4
+      },
+      "implementedPct": 72.1,
+      "runsHeadlessPct": 57.1,
+      "functionalImplementedPct": 41.2,
+      "functionalRunsPct": 9.6
+    },
+    "rust": {
+      "total": 240,
+      "counts": {
+        "not-started": 107,
+        "builds": 0,
+        "runs-headless": 133,
+        "runs-interactive-only-CI-or-manual": 0
+      },
+      "implementedPct": 55.4,
+      "runsHeadlessPct": 55.4,
+      "functionalImplementedPct": 6.1,
+      "functionalRunsPct": 6.1
+    },
+    "bun": {
+      "total": 240,
+      "counts": {
+        "not-started": 107,
+        "builds": 0,
+        "runs-headless": 133,
+        "runs-interactive-only-CI-or-manual": 0
+      },
+      "implementedPct": 55.4,
+      "runsHeadlessPct": 55.4,
+      "functionalImplementedPct": 6.1,
+      "functionalRunsPct": 6.1
+    }
+  },
+  "categoryRows": {
+    "d3d12": 40,
+    "dotnet10": 23,
+    "dotnet11": 23,
+    "windowsappsdk": 28,
+    "winui-gallery": 126
+  }
+}

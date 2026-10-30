@@ -1,0 +1,24 @@
+# STUB, UNVERIFIED (never built): hyprland-preview-share-picker v0.2.1 pinned to the exact commit of factory/wayland/closure.json.
+# Replaces Arch (not packaged) for the opt-in Hyprland composition; same package name, so the local repository must precede core/extra.
+pkgname=hyprland-preview-share-picker
+pkgver=0.2.1
+pkgrel=1
+_commit=211b7890ed3332f4d1bb1f1a96999e18874a9c3c
+pkgdesc='hyprland-preview-share-picker pinned by the Bun OS Wayland closure'
+arch=(x86_64)
+url='https://github.com/aphrody-labs/hyprland-preview-share-picker'
+license=(custom)
+depends=('gtk4' 'gtk4-layer-shell' 'hyprland-protocols' 'pkgconf' 'rust' 'xdg-desktop-portal-hyprland')
+makedepends=('git' 'ninja')
+source=("$pkgname::git+https://github.com/aphrody-labs/hyprland-preview-share-picker.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  _src="$srcdir/$pkgname"
+  cd "$_src" && cargo build --release --locked
+}
+
+package() {
+  _src="$srcdir/$pkgname"
+  install -Dm755 "$_src/target/release/hyprland-preview-share-picker" "$pkgdir/usr/bin/hyprland-preview-share-picker"
+}

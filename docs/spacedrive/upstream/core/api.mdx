@@ -1,0 +1,175 @@
+---
+title: API
+description: The typed operation surface shared by every Spacedrive client
+sidebarTitle: API
+---
+
+Spacedrive exposes one registered operation surface. Desktop, web, CLI, MCP,
+extensions, and remote clients all use the same core actions and queries.
+
+The API is a capability boundary. A transport can carry a request, but only the
+operation registry, session scope, and library policy decide what it may do.
+
+## Operations
+
+Every operation is either a query or an action.
+
+### Queries
+
+Queries read state without changing it. They list sources, browse records,
+search content, inspect jobs, and report availability.
+
+### Actions
+
+Actions request a state change. Small actions can commit immediately. File
+transfers, indexing, verification, and other long-running work dispatch durable
+jobs and return stable job IDs.
+
+Risky operations expose a preview before commit and a verification result after
+work completes.
+
+## Registration
+
+Operations register at compile time through macros:
+
+~~~rust
+pub struct SourceListQuery;
+
+crate::register_library_query!(SourceListQuery, "sources.list");
+
+pub struct FileCopyAction;
+
+crate::register_library_action!(FileCopyAction, "files.copy");
+~~~
+
+Do not implement the wire contract manually. Registration places the handler in
+the correct core or library registry and makes its input and output available
+to client generation.
+
+Operation names are stable strings. Scope is explicit:
+
+- **Core** operations address daemon state, library discovery, and setup.
+- **Library** operations address sources, records, jobs, organization, and
+  policy inside one library.
+
+## Request context
+
+The dispatcher evaluates each request with:
+
+- authenticated client or device identity;
+- selected library;
+- granted source and subtree scopes;
+- allowed operation classes;
+- request and trace identity;
+- transport metadata.
+
+Read access does not imply mutation access. A peer allowed to browse one shared
+subtree cannot call a delete action on the rest of the source.
+
+The same rules apply to a human interface, script, extension, or agent.
+
+## Transports
+
+| Client | Transport |
+| --- | --- |
+| Local desktop and CLI | Platform IPC to the daemon |
+| Web interface | Authenticated web transport |
+| Paired Spacedrive node | Encrypted peer-to-peer protocol |
+| Rust application | sd-client |
+| TypeScript application | Generated ts-client |
+| Agent client | CLI skill or MCP |
+| WASM extension | Declared host functions |
+
+Transport adapters decode a request and call the registry. They do not contain
+separate file-management logic.
+
+## Structured errors
+
+Operations return typed errors that distinguish:
+
+- invalid input;
+- missing library, source, or record;
+- unavailable origin;
+- denied capability;
+- stale generation or conflict;
+- job dispatch failure;
+- provider or filesystem error;
+- failed verification.
+
+Clients can present useful recovery without parsing log text. Detailed
+diagnostics remain available through request and job logs.
+
+## Durable jobs
+
+An action that dispatches a job returns enough information to inspect it later.
+Job queries expose status, progress, output, and failure reason.
+
+~~~bash
+sd-cli job info <JOB_ID>
+sd-cli logs show --job-id <JOB_ID>
+~~~
+
+Resumability is declared per job kind. A job resumes only when its checkpoint
+proves that replay is safe.
+
+## Generated clients
+
+Public Rust types derive the metadata used to generate client bindings. After
+changing a backend type exposed to TypeScript, regenerate the client:
+
+~~~bash
+cargo run --bin generate_typescript_types
+~~~
+
+Frontend code imports generated types from **packages/ts-client**. It must not
+redefine a backend type or erase it with an unsafe cast.
+
+## Generic CLI access
+
+The CLI can call any registered operation by name:
+
+~~~bash
+sd-cli op sources.list --json '{}'
+sd-cli op files.duplicates --library <LIBRARY_ID> --json '{}'
+~~~
+
+Use **--format json** for scripts. Stable IDs and structured results form the
+automation contract.
+
+## Remote operations
+
+A paired node exposes only operations granted to the requesting device. Remote
+queries identify the source generation that produced a result. Remote actions
+remain durable on the executing node, so another authorized client can inspect
+their progress and logs.
+
+Byte reads use a separate range protocol under the same authorization context.
+This keeps large content out of ordinary JSON responses.
+
+## Extension host API
+
+Extensions do not receive a database connection or arbitrary daemon pointer.
+They call a narrow host API to:
+
+- query permitted records and models;
+- read or write granted file scopes;
+- create extension-owned assertions;
+- dispatch declared jobs and actions;
+- report progress and logs;
+- register supported file kinds and interface contributions.
+
+The host validates capabilities before crossing the WASM boundary.
+
+## Design rules
+
+- Register an operation once and consume it everywhere.
+- Return structured data and stable identity.
+- Keep reads free of hidden mutations.
+- Make source availability and partial results explicit.
+- Use durable jobs for work that can outlive a request.
+- Require stronger evidence as an operation becomes more destructive.
+- Keep file bytes in the byte-provider path, not in control responses.
+- Never give an agent or extension a privileged path around authorization.
+
+See [Operations](/core/ops) for implementation structure and [Architecture](/core/architecture)
+for the runtime around the registry.

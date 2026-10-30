@@ -299,7 +299,7 @@ export function validateStore(store: string, names: string[] = []): Problem[] {
             for (const key of ["skills", "mcpServers", "hooks", "commands", "agents"]) {
               for (const ref of Array.isArray(value[key]) ? value[key] : [value[key]]) {
                 if (typeof ref !== "string") continue;
-                if (!ref.startsWith(".//")) throw new Error(`${key} must be a .// relative path`);
+                if (!ref.startsWith("./")) throw new Error(`${key} must be a ./ relative path`);
                 if (!existsSync(containedPath(plugin.path, ref))) throw new Error(`Missing ${key}: ${ref}`);
               }
             }

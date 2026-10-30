@@ -56,9 +56,10 @@
     "@aphrody/m3-fonts": "workspace:*",
     "@aphrody/m3-tokens": "workspace:*",
     "@aphrody/paths": "workspace:*",
-    "@aphrody/web": "workspace:*"
+    "@aphrody/runtime-sdk": "workspace:*",
+    "@aphrody/web": "1.4.7"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

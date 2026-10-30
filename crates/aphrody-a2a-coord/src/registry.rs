@@ -4,7 +4,7 @@
 //! Resolution order per peer (first hit wins):
 //! 1. env `APHRODY_A2A_PEER_<ID>_URL` (upper-case id, `-` -> `_`);
 //! 2. `tools/config/a2a-peers.json` (or `APHRODY_A2A_PEERS_FILE`),
-//!    shape `{"peers":[{"id":"shenron","transport":"https-jsonrpc","endpoint":"https://..."}]}`
+//!    shape `{"peers":[{"id":"claude","transport":"https-jsonrpc","endpoint":"https://..."}]}`
 //!    (the legacy `url` field is still accepted; `coord-file` endpoints are paths,
 //!    not URLs, and keep the peer on the file channel);
 //! 3. local file coordination (no implicit retired public endpoint).
@@ -16,10 +16,7 @@ use std::path::{Path, PathBuf};
 use serde::{Deserialize, Serialize};
 
 /// Canonical peers of the aphrody federation.
-pub const KNOWN_PEERS: &[&str] = &["shenron", "codex", "agycli", "claude", "ocr", "rag"];
-
-/// Canonical public endpoint of the shenron agent.
-pub const SHENRON_DEFAULT_URL: &str = "https://mcp.dragonballfr.com/a2a";
+pub const KNOWN_PEERS: &[&str] = &["codex", "agycli", "claude", "ocr", "rag"];
 
 /// Channel a peer is reached through.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -165,7 +162,7 @@ mod tests {
     fn defaults_use_file_coordination() {
         let r = PeerRegistry::resolve(None, |_| None);
         assert_eq!(r.peers().len(), KNOWN_PEERS.len());
-        assert_eq!(r.get("shenron").unwrap().channel(), Channel::FileJsonl);
+        assert_eq!(r.get("claude").unwrap().channel(), Channel::FileJsonl);
         assert_eq!(r.get("codex@x").unwrap().channel(), Channel::FileJsonl);
     }
 
@@ -173,10 +170,10 @@ mod tests {
     fn retired_catalog_peer_never_revives_its_http_endpoint() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("peers.json");
-        std::fs::write(&path, r#"{"peers":[{"id":"shenron","status":"retired","transport":"https-jsonrpc","endpoint":"https://retired.invalid/a2a"}]}"#).unwrap();
+        std::fs::write(&path, r#"{"peers":[{"id":"claude","status":"retired","transport":"https-jsonrpc","endpoint":"https://retired.invalid/a2a"}]}"#).unwrap();
         assert_eq!(
             PeerRegistry::resolve(Some(&path), |_| None)
-                .get("shenron")
+                .get("claude")
                 .unwrap()
                 .channel(),
             Channel::FileJsonl
@@ -193,10 +190,10 @@ mod tests {
         )
         .unwrap();
         let r = PeerRegistry::resolve(Some(&f), |k| {
-            (k == "APHRODY_A2A_PEER_SHENRON_URL").then(|| "http://s/a2a".to_owned())
+            (k == "APHRODY_A2A_PEER_CLAUDE_URL").then(|| "http://s/a2a".to_owned())
         });
         assert_eq!(
-            r.get("shenron").unwrap().url.as_deref(),
+            r.get("claude").unwrap().url.as_deref(),
             Some("http://s/a2a")
         );
         assert_eq!(
@@ -214,7 +211,7 @@ mod tests {
             &f,
             r#"{"peers":[
                 {"id":"aphrody","transport":"https-jsonrpc","endpoint":"https://aphrody.com/api/v1/a2a"},
-                {"id":"shenron","transport":"https-jsonrpc","endpoint":"https://s.example/a2a"},
+                {"id":"claude","transport":"https-jsonrpc","endpoint":"https://s.example/a2a"},
                 {"id":"codex","transport":"coord-file","endpoint":".coord/inbox-from-codex.jsonl"}
             ]}"#,
         )
@@ -225,7 +222,7 @@ mod tests {
             Some("https://aphrody.com/api/v1/a2a")
         );
         assert_eq!(
-            r.get("shenron").unwrap().url.as_deref(),
+            r.get("claude").unwrap().url.as_deref(),
             Some("https://s.example/a2a")
         );
         assert_eq!(r.get("codex").unwrap().channel(), Channel::FileJsonl);

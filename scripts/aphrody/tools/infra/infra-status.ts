@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Contrat et observabilité de la stack Aphrody/RG/Niers.
+ * Contrat et observabilité de la stack Aphrody/Niers.
  *
  * Commands:
  *   status [--json] [--strict] [--deep] [--host=<alias>]  live units, host resources and probes (Linux host);
@@ -541,7 +541,9 @@ async function status() {
 let exitCode: number;
 if (command === "status") exitCode = await status();
 else {
-  console.error("usage: bun scripts/aphrody/tools/infra/infra-status.ts [status] [--json] [--strict] [--deep] [--host=<alias>]");
+  console.error(
+    "usage: bun scripts/aphrody/tools/infra/infra-status.ts [status] [--json] [--strict] [--deep] [--host=<alias>]",
+  );
   exitCode = 2;
 }
 process.exit(exitCode);

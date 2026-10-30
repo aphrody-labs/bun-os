@@ -123,7 +123,9 @@ pub(crate) fn menu_manifest() -> &'static Value {
     DATA.get_or_init(|| json!({}))
 }
 
-const CDN: &str = "https://cdn.rosegriffon.fr/dx11/menu";
+fn cdn() -> String {
+    format!("{}/dx11/menu", crate::cdn_base())
+}
 
 fn member(value: &Value, needle: &str) -> bool {
     value
@@ -132,15 +134,17 @@ fn member(value: &Value, needle: &str) -> bool {
 }
 
 fn telop(code: &str) -> Option<String> {
+    let cdn = cdn();
     for locale in ["fr", "en"] {
         if member(&menu_manifest()["telop"][locale], code) {
-            return Some(format!("{CDN}/220_img/telop_waza/{locale}/{code}.png"));
+            return Some(format!("{cdn}/220_img/telop_waza/{locale}/{code}.png"));
         }
     }
     None
 }
 
 fn resolve_image(value: &Value) -> Value {
+    let cdn = cdn();
     let Some(path) = value.as_str().filter(|path| !path.is_empty()) else {
         return Value::Null;
     };
@@ -166,7 +170,7 @@ fn resolve_image(value: &Value) -> Value {
             {
                 let texture = entry[1].as_str().unwrap_or(code);
                 return Value::String(format!(
-                    "{CDN}/{}.g4tx/{texture}.png",
+                    "{cdn}/{}.g4tx/{texture}.png",
                     container.strip_suffix(".g4tx").unwrap_or(container)
                 ));
             }
@@ -177,7 +181,7 @@ fn resolve_image(value: &Value) -> Value {
         .and_then(|path| path.strip_suffix(".webp"))
         && member(&menu_manifest()["emblems"], code)
     {
-        return Value::String(format!("{CDN}/200_icon/01_icon_emblem/{code}.png"));
+        return Value::String(format!("{cdn}/200_icon/01_icon_emblem/{code}.png"));
     }
     if let Some(raw) = path
         .strip_prefix("220_img/telop_waza/")
@@ -197,7 +201,7 @@ fn resolve_image(value: &Value) -> Value {
         }
     }
     Value::String(if path.ends_with(".png") {
-        format!("{CDN}/{path}")
+        format!("{cdn}/{path}")
     } else {
         "/ievr.webp".into()
     })

@@ -4,35 +4,6 @@
   "principle": "one-scheduler-per-data-class",
   "timers": [
     {
-      "id": "shenron-container-backup",
-      "host": "dbfr",
-      "cadence": "daily",
-      "priority": "critical",
-      "owns": [
-        "shenron_site-postgresql",
-        "shenron-redis",
-        "shenron-bot-sqlite",
-        "shenron-server-sqlite"
-      ],
-      "unit": "shenron-container-backup.timer",
-      "source": "docker exec pg_dump/pg_restore --list (shenron-postgres), redis-cli --rdb + redis-check-rdb (shenron-redis), SQLite online backup + quick_check",
-      "retention": "newest snapshot only under /home/ubuntu/apps/shenron/shared/backups/container",
-      "capacityPolicy": {
-        "archiveMaxBytes": 8589934592,
-        "minFreeBytes": 4294967296
-      }
-    },
-    {
-      "id": "shenron-offsite-backup",
-      "host": "vps",
-      "cadence": "daily",
-      "priority": "critical",
-      "owns": ["shenron-container-offsite-copy", "shenron-restore-verification"],
-      "unit": "shenron-offsite-backup.timer",
-      "destination": "/mnt/aphrody-storage/disk500/archive/dbfr/backups/shenron",
-      "retention": "preserve all verified snapshots until the owner resolves the conflicting one/two/three-copy policies"
-    },
-    {
       "id": "infra-sync",
       "host": "dbfr",
       "cadence": "on-demand-or-hourly",
@@ -45,63 +16,17 @@
       "cadence": "daily",
       "priority": "low",
       "owns": ["journal-retention", "release-retention", "temporary-files"]
-    },
-    {
-      "id": "shenron-backup",
-      "host": "vps",
-      "cadence": "daily",
-      "priority": "low",
-      "owns": ["shenron-sqlite-local-cache"],
-      "desiredState": "stopped-after-dbfr-cutover",
-      "supersededBy": "shenron-container-backup"
-    },
-    {
-      "id": "rg-sauvegarde",
-      "host": "vps",
-      "cadence": "daily",
-      "priority": "critical",
-      "owns": ["rg-postgresql", "rg-storage-objects"]
-    },
-    {
-      "id": "rg-infra-monitor",
-      "host": "vps",
-      "cadence": "every-60-seconds",
-      "priority": "low",
-      "owns": ["stack-observation"]
-    },
-    {
-      "id": "shenron-cloudflare-audit",
-      "host": "dbfr",
-      "cadence": "daily",
-      "priority": "low",
-      "unit": "shenron-cloudflare-audit.timer",
-      "owns": ["shenron-cloudflare-read-only-reconciliation"],
-      "mutationPolicy": "read-only; no DNS, worker deploy, R2 copy or tunnel config mutation"
-    },
-    {
-      "id": "shenron-cloudflare-s3-renew",
-      "host": "dbfr",
-      "cadence": "every-10-minutes",
-      "priority": "low",
-      "unit": "shenron-cloudflare-s3-renew.timer",
-      "owns": ["shenron-scoped-r2-s3-credential"],
-      "mutationPolicy": "temporary scoped credential renewal only; no DNS, worker deploy, R2 objects or tunnel mutation"
     }
   ],
   "disabledByDefault": [
     "crawler",
     "full-site-mirror",
     "duplicate-db-mirror",
-    "per-app-cron",
-    "shenron-watchdog",
-    "rg-watchdog"
+    "per-app-cron"
   ],
   "unverifiedBackupDataClasses": [
     "redis-config",
     "release-slot",
-    "shenron-sqlite-local-cache-on-runtime-vps",
-    "rg-postgresql",
-    "rg-storage-objects",
     "nie-sqlite",
     "nie-postgresql-schema",
     "aphrody-rag-postgresql",
@@ -109,10 +34,6 @@
   ],
   "rules": [
     "no crawler runs continuously in production",
-    "primary-data backup creation is infra-owned on dbfr (shenron-container-backup); the VPS shenron-offsite-backup only pulls, verifies SHA-256 and restores into a disposable container",
-    "the Shenron offsite pull runs on the always-on VPS (systemd timer, Persistent=true), not on the owner PC",
-    "DBFR keeps the two newest container snapshots; the VPS copy fails loudly when the newest DBFR snapshot is older than 36 h",
-    "shenron-container-backup owns every Shenron data class on dbfr (PostgreSQL, Redis, bot and server SQLite); the former VPS shenron-backup and the host shenron-pg-backup timers are retired",
     "no database has more than one active mirror direction",
     "sync is checksum-based and resumable",
     "cleanup never touches active release, primary data or non-regenerable assets"

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// UI sounds (Spacedrive set, FSL-1.1-ALv2, see /sounds/LICENSE.spacedrive). On/off, volume and each cue follow the
+// UI sounds (Spacedrive set, Apache-2.0, see /sounds/LICENSE.apache). On/off, volume and each cue follow the
 // "sound.*" preferences. Call initSounds() once; it watches the desktop for windows opening and closing.
 // Dispatch `new CustomEvent("aph:notify", { detail: { title, body } })` for notifications.
 import { prefs } from "./prefs";

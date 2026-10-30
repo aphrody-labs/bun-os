@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 [package]
 name = "aphrody-shell-web"
-description = "Aphrody shell for WebAssembly: browser and Tauri webview terminal, local shell and wire protocol."
+description = "Aphrody terminal for WebAssembly: Rio VT state for browser and Tauri webview terminals, OPFS VFS and wire protocol."
 version = "1.4.7"
 edition.workspace = true
 rust-version.workspace = true
@@ -15,7 +15,6 @@ crate-type = ["cdylib", "rlib"]
 workspace = true
 
 [dependencies]
-aphrody-shell-session = { workspace = true }
 aphrody-shell-vfs = { workspace = true }
 crc32fast = { workspace = true }
 aphrody-terminal-core = { workspace = true }

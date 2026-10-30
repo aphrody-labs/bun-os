@@ -28,7 +28,7 @@ import { importedUpstreamMatcher, markdownLinkDestinations } from "./docs-links.
 // ---------------------------------------------------------------------------
 
 export type Topic =
-  | "spacedrive-spaceui"
+  | "spaceui"
   | "agent-skills"
   | "tauri"
   | "gpu-render"
@@ -305,7 +305,7 @@ export function domainOf(path: string): {
 }
 
 const TOPIC_RULES: Array<[RegExp, Topic]> = [
-  [/(^|\/)ui\/drive\/|^crates\/web\/drive-server\/|spaceui|spacedrive/i, "spacedrive-spaceui"],
+  [/(^|\/)ui\/drive\/|^crates\/web\/drive-server\/|spaceui/i, "spaceui"],
   [/\/skills\/|\/\.agents\/|\/agents\/|^config\/ai\/plugins\//i, "agent-skills"],
   [/tauri|desktop|native-desktop|(^|\/)gui\.md$/i, "tauri"],
   [/render|softraster|wgpu|webgpu|(^|\/)wasm\/|3d|gpu|scene3d/i, "gpu-render"],

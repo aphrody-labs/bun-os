@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { afterAll, beforeAll, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { composeUnit, hostRoot, loadCatalog } from "../src/host/index.ts";
@@ -72,7 +72,7 @@ beforeAll(() => {
           id: "aphrody-ai-gateway-dbfr",
           port: 8786,
           health: "http://127.0.0.1:8786/health",
-          modelId: "shenron-chat-v2",
+          modelId: "demo-chat-v2",
         },
       ],
     }),
@@ -117,7 +117,7 @@ test("gateway host plan pins and authenticates the installed binary and generati
   expect(ids).toContain("aphrody-ai-gateway-dbfr/auth-required");
   expect(ids).toContain("aphrody-ai-gateway-dbfr/auth-wrong-token");
   expect(ids).toContain("aphrody-ai-gateway-dbfr/authenticated-generation");
-  expect(plan.steps.find(step => step.id.endsWith("authenticated-generation"))?.run).toContain("shenron-chat-v2");
+  expect(plan.steps.find(step => step.id.endsWith("authenticated-generation"))?.run).toContain("demo-chat-v2");
 });
 
 test("a unit that would bind anything but loopback is refused", () => {
@@ -226,15 +226,6 @@ test("the declared loopback units plan against the real catalog", () => {
     expect(text).toContain("Restart=on-failure");
     expect(text).not.toMatch(/(SECRET|TOKEN|PASSWORD|DATABASE_URL)=/);
   }
-});
-
-test("the persistent VPS build runner restarts after a clean wrapper exit", () => {
-  const unit = readFileSync(join(hostRoot(), "systemd/aphrody/aphrody-shenron-build-runner.service"), "utf8");
-  expect(unit).toContain("ConditionPathExists=/home/ubuntu/build/runners/shenron/.runner");
-  expect(unit).toContain("User=ubuntu");
-  expect(unit).toContain("WorkingDirectory=/home/ubuntu/build/runners/shenron");
-  expect(unit).toContain("Restart=always");
-  expect(unit).toContain("RestartSec=15");
 });
 
 const BUILD = {

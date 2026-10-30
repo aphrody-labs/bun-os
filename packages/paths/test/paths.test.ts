@@ -29,7 +29,7 @@ test("integrated owners resolve inside the selected workspace", () => {
   const root = mkdtempSync(join(tmpdir(), "aphrody-moved-workspace-"));
   try {
     const env = { APHRODY_WORKSPACE_ROOT: root };
-    expect(checkoutRoot("bun", env)).toBe(join(root, "toolchains/bun"));
+    expect(checkoutRoot("bun", env)).toBe(join(root, "sources/bun"));
     expect(checkoutRoot("material", env)).toBe(root);
     expect(checkoutRoot("m3", env)).toBe(checkoutRoot("material", env));
     expect(checkoutRoot("iecode", env)).toBe(root);

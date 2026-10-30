@@ -43,12 +43,11 @@ historical.
 
 ## Packages, forks, publishing and upstreams
 
-<!-- docs-hub:begin include="BUN.md;PUBLISHING.md;UPSTREAM-FORKS.md;CANVAS-UPSTREAM.md;SVG.md;DRIVE-UPSTREAM-DIFF.md" -->
+<!-- docs-hub:begin include="BUN.md;PUBLISHING.md;UPSTREAM-FORKS.md;CANVAS-UPSTREAM.md;SVG.md" -->
 | Document | Contenu | Statut | Mis à jour |
 | --- | --- | --- | --- |
 | [Bun workspace policy](BUN.md) | The repository root is the package-manager boundary: Bun 1.4.2, the sole text lockfile (bun.lock), workspace globs, default and drive catalogs, and g… | imported | 2026-09-29 |
 | [Canvas upstream integration](CANVAS-UPSTREAM.md) | The submodule third_party/canvas tracks the non-fork upstream https://github.com/Brooooooklyn/canvas at 8411071 (upstream 1.0.9). | canonical | 2026-10-01 |
-| [Aphrody Drive vs upstream Spacedrive](DRIVE-UPSTREAM-DIFF.md) | drive/ is vendored from spacedriveapp/spacedrive. | imported | 2026-09-29 |
 | [Publishing the @aphrody/ Material 3 packages](PUBLISHING.md) | The first-party M3 packages publish to the public npm registry (registry.npmjs.org) under the @aphrody scope. | canonical | 2026-10-01 |
 | [SVG convergence: aphrody-svg](SVG.md) | One owner for SVG across the workspace: the Rust crate crates/aphrody-svg, its bun:ffi surface (bun_rs_svg in crates/aphrody-bun/src/svg.rs) and the… | canonical | 2026-10-01 |
 | [External UI forks](UPSTREAM-FORKS.md) | Upstream-derived frameworks are maintained in separate Git repositories. | notice | 2026-09-29 |
@@ -56,11 +55,10 @@ historical.
 
 ## Integrations
 
-<!-- docs-hub:begin include="integrations/KOHARU.md;integrations/SHENRON.md" -->
+<!-- docs-hub:begin include="integrations/KOHARU.md" -->
 | Document | Contenu | Statut | Mis à jour |
 | --- | --- | --- | --- |
 | [Koharu integration map for Aphrody](integrations/KOHARU.md) | Status: source comparison snapshot dated 2026-09-27; standalone UI extraction and native settings integration updated 2026-09-28. | historical | 2026-10-01 |
-| [Shenron desktop integration](integrations/SHENRON.md) | The Aphrody desktop remains an independent UI-layer process. | imported | 2026-09-29 |
 <!-- docs-hub:end -->
 
 ## Archived notes (historical)
@@ -75,8 +73,6 @@ historical.
 
 ## Imported material and notices
 
-- `drive/`: imported Spacedrive documentation (tasks, core and CLI docs, React UI docs, whitepaper);
-  start from [`drive/docs/overview/introduction.mdx`](./drive/docs/overview/introduction.mdx).
 - `packages/` and `crates/`: remaining import snapshots whose text differs from the owner copy only
   by link paths, upstream changelogs and font/icon license notices. Canonical copies live next to
   the code (`packages/*`, `crates/ui/*`); the consolidation report lists each pending case.

@@ -1,27 +1,43 @@
 // SPDX-License-Identifier: Apache-2.0
+import { basicSetup } from "codemirror";
+import { EditorState } from "@codemirror/state";
+import { EditorView, keymap } from "@codemirror/view";
 import { h } from "../dom";
+import { languageFor } from "./editor-lang";
 import { webos } from "../os";
 
-/** Plain text editor over the Rust file system; Ctrl+S saves to OPFS. */
+/** Text editor (CodeMirror 6) over the Rust file system; Ctrl+S saves to OPFS. */
 export async function editorApp(root: HTMLElement, path: string, text: string) {
   const os = await webos();
-  const area = h("textarea", { class: "editor", spellcheck: "false", "aria-label": path });
-  area.value = text;
   const status = h("div", { class: "files-status" }, path);
   const save = async () => {
     try {
-      os.fs.write(path, new TextEncoder().encode(area.value));
+      os.fs.write(path, new TextEncoder().encode(view.state.doc.toString()));
       await os.flush();
       status.textContent = `${path} · saved`;
     } catch (error) {
       status.textContent = String(error);
     }
+    return true;
   };
-  area.addEventListener("keydown", e => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-      e.preventDefault();
-      void save();
-    }
+  const host = h("div", { class: "editor", "aria-label": path });
+  const view = new EditorView({
+    parent: host,
+    state: EditorState.create({
+      doc: text,
+      extensions: [
+        basicSetup,
+        languageFor(path),
+        keymap.of([{ key: "Mod-s", preventDefault: true, run: () => {
+              void save();
+              return true;
+            },
+          }]),
+        EditorView.updateListener.of(update => {
+          if (update.docChanged) status.textContent = `${path} · modified`;
+        }),
+      ],
+    }),
   });
-  root.append(h("div", { class: "editor-wrap" }, area, status));
+  root.append(h("div", { class: "editor-wrap" }, host, status));
 }

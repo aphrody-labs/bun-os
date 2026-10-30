@@ -1,5 +1,5 @@
-# Tauri fork of aphrody (aphrody-labs/aphrody@55652e3f56, crates/tauri + crates/ui) merged into one
-# separate Cargo workspace: the core crates keep their names, every plugin lives in tauri-plugin-aphrody.
+# Tauri 3 crates of upstream tauri-apps/tauri (branch v3, see upstream.json) under the aphrody-* package names,
+# in a separate Cargo workspace: every plugin lives in tauri-plugin-aphrody.
 [workspace]
 resolver = "3"
 members = ["crates/*"]
@@ -7,7 +7,7 @@ members = ["crates/*"]
 [workspace.package]
 edition = "2024"
 rust-version = "1.97"
-repository = "https://github.com/aphrody-labs/bun"
+repository = "https://github.com/aphrody-labs/bun-os"
 authors = ["aphrody-code"]
 
 [workspace.dependencies]

@@ -1,6 +1,6 @@
 {
   "$schema": "../../../node_modules/oxlint/configuration_schema.json",
-  "extends": ["../../docs/aphrody/.oxlintrc.json"],
+  "extends": ["../../.oxlintrc.json"],
   "overrides": [
     {
       "files": ["src/creator/**", "src/shared/**", "test/creator/**"],

@@ -12,7 +12,7 @@
  * ⚠️ CONTRAINTE BARREL : ce module dépend du transport CDP. Il NE DOIT JAMAIS
  * être ré-exporté par `zukan/index.ts` ni `src/index.ts` (le barrel est
  * value-importé en runtime par Azalée → bundle Next cassé). Importer en leaf :
- *   import { crawlZukanOrderPages } from "@rosegriffon/inagle/zukan/order";
+ *   import { crawlZukanOrderPages } from "@aphrody/inagle/zukan/order";
  *
  * Le helper pur `buildOrderMap` est aussi exporté ici pour les
  * scripts qui crawlent en `fetch()` statique (cf. crawl-zukan-order.ts).

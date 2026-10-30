@@ -71,7 +71,7 @@ digest, source/runtime pins and shared asset reference. Hostnames come from the
 canonical deployment configuration. Publishing a manifest does not qualify DNS,
 TLS, a native host or application operations.
 
-For application build qualification, see [qualification](qualification.md). Library source and native engine ownership remain with their pinned repositories; distribution and activation qualifications are maintained separately.
+For application build qualification, see [qualification](NATIVE-QUALIFICATION.md). Library source and native engine ownership remain with their pinned repositories; distribution and activation qualifications are maintained separately.
 No tests are added.
 
 ## Artifact verification

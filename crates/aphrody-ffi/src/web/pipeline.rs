@@ -28,7 +28,7 @@ pub extern "C" fn aphrody_web_pipeline_pending_count() -> u64 {
     jobs::local_pending_count()
 }
 
-/// Submit a Dragon Ball campaign or crawl/index operation without a subprocess.
+/// Submit a crawl/index operation without a subprocess.
 ///
 /// Arguments omit the `aphrody web` prefix. Input bytes are borrowed only during
 /// this call; serde copies them into Rust-owned strings before the job starts.

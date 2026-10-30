@@ -4,7 +4,7 @@ using System.Text;
 namespace Aphrody.Ds;
 
 /// <summary>
-/// bun:dotnet entry point. One JSON request in, one JSON response out, through caller-owned UTF-8 buffers.
+/// Native-hosting entry point (src/hostfxr.ts). One JSON request in, one JSON response out, through caller-owned UTF-8 buffers.
 /// Returns the response length, or the negated required capacity when the buffer is too small.
 /// </summary>
 public static unsafe class Exports

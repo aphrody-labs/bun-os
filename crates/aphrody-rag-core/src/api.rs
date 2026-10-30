@@ -520,7 +520,7 @@ fn hex(bytes: &[u8]) -> String {
 #[derive(Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 struct OptionsIn {
-    /// `default` (aphrody) or `shenron_parity`.
+    /// `default` (aphrody) or `ts_parity`.
     profile: Option<String>,
     max_chars: Option<usize>,
     overlap_pct: Option<f32>,
@@ -533,7 +533,7 @@ impl OptionsIn {
     fn resolve(self) -> Result<ChunkOptions, String> {
         let mut o = match self.profile.as_deref() {
             None | Some("default") => ChunkOptions::default(),
-            Some("shenron_parity") => ChunkOptions::shenron_parity(),
+            Some("ts_parity") => ChunkOptions::ts_parity(),
             Some(other) => return Err(format!("unknown options profile: {other}")),
         };
         if let Some(v) = self.max_chars {
@@ -1107,7 +1107,7 @@ mod tests {
         let md = "# A\n\ntext one.\n\n## B\n\ntext two.\n";
         let got = jv(
             "chunk",
-            &json!({ "path": "a.md", "text": md, "options": { "profile": "shenron_parity" } }),
+            &json!({ "path": "a.md", "text": md, "options": { "profile": "ts_parity" } }),
         );
         assert!(!got.as_array().unwrap().is_empty());
         assert!(
@@ -1204,11 +1204,11 @@ mod tests {
         assert_eq!(gold.as_array().unwrap().len(), 1);
         let case = gold[0].clone();
         let hit = |url: &str| json!({ "title": "t", "url": url, "snippet": "s", "score": 1.0 });
-        let results = json!([hit("/zzz"), hit("https://dragonballfr.com/a/")]);
+        let results = json!([hit("/zzz"), hit("https://example.com/a/")]);
         assert_eq!(
             jv(
                 "eval_normalize_url",
-                &json!({ "url": "https://dragonballfr.com/A/" })
+                &json!({ "url": "https://example.com/A/" })
             ),
             "/a"
         );

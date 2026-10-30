@@ -20,15 +20,15 @@
 ARG ALPINE_VERSION=3.24
 ARG BUN_VERSION=1.4.4
 
-# The aphrody-labs/bun musl release (newest aphrody.N of BUN_VERSION), checksum-verified by its installer.
+# The upstream oven-sh/bun musl release of BUN_VERSION, from the official installer.
 FROM alpine:${ALPINE_VERSION} AS bun
 ARG BUN_VERSION
-RUN apk add --no-cache bash curl unzip ca-certificates libgcc libstdc++     && curl -fsSL https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.sh        | env BUN_INSTALL=/usr/local bash -s "${BUN_VERSION}"
+RUN apk add --no-cache bash curl unzip ca-certificates libgcc libstdc++     && curl -fsSL https://bun.com/install | env BUN_INSTALL=/usr/local bash -s "bun-v${BUN_VERSION}"
 
 FROM alpine:${ALPINE_VERSION} AS runtime
 
 LABEL org.opencontainers.image.title="aphrody/bun-alpine" \
-      org.opencontainers.image.description="Minimal non-root Alpine runtime using the aphrody-labs/bun musl binary" \
+      org.opencontainers.image.description="Minimal non-root Alpine runtime using the upstream Bun musl binary" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 # Keep the runtime free of compilers and agent/desktop tools. The bun stage
@@ -55,7 +55,7 @@ CMD ["/usr/local/bin/bun", "--version"]
 # Aphrody Alpine apk repository (aphrody-labs/aports, aphrody/aphrody-rust-base):
 # uutils coreutils/findutils/diffutils, sudo-rs + su, ntpd-rs, Sequoia sq/sqv,
 # Nushell, fish, Ion, eza, ripgrep, fd, bottom, helix, yazi, zellij, starship.
-# See PLAN-ALPINE-BUN.md section C2 in aphrody-labs/bun.
+#
 FROM runtime AS cli
 
 LABEL org.opencontainers.image.title="aphrody/rust-bun" \
@@ -116,7 +116,7 @@ CMD ["/usr/bin/nu"]
 # the Aphrody Alpine apk repository (aphrody-labs/aports, aphrody/aphrody-desktop-cosmic):
 # COSMIC 1.0.15 from 3.24 community plus the 1.10 apps 3.24 lacks, portals,
 # PipeWire, Mesa, fonts, Xwayland. Bare-metal/VM hosts add aphrody-desktop-cosmic-host
-# (seatd, cosmic-greeter, system76-scheduler). See PLAN-ALPINE-BUN.md section C1 in aphrody-labs/bun.
+# (seatd, cosmic-greeter, system76-scheduler).
 FROM cli AS desktop
 
 # The Aphrody apk key and repository come from the cli stage.

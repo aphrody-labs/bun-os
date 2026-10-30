@@ -33,13 +33,13 @@ async function fixture(loader = "/lib/ld-musl-x86_64.so.1") {
   const binary = join(root, "bun");
   const bytes = elf(loader);
   await Bun.write(binary, bytes);
-  const expected = { repository: "aphrody-labs/bun", version: "1.4.6", revision: "a".repeat(40) };
+  const expected = { repository: "oven-sh/bun", version: "1.4.6", revision: "a".repeat(40) };
   const receipt = {
     target: "bun-linux-x64-musl",
     sha256: hashContent(bytes),
     facts: {
       ...expected,
-      sourceUrl: "https://github.com/aphrody-labs/bun/releases/download/bun-v1.4.6/bun-linux-x64-musl.zip",
+      sourceUrl: "https://github.com/oven-sh/bun/releases/download/bun-v1.4.6/bun-linux-x64-musl.zip",
       executable: binary,
     },
     qualification: { host: "fixture", mode: "docker", observedAt: "2026-10-19T00:00:00Z" },
@@ -67,9 +67,10 @@ test("Alpine staging retains exact qualified bytes and receipt without executing
   expect(await Bun.file(join(context, "runtime/amd64/receipt.json")).json()).toEqual(value.receipt);
 });
 
-test("Alpine staging rejects upstream provenance, altered bytes and GNU artifacts", async () => {
+test("Alpine staging rejects the abandoned fork provenance, altered bytes and GNU artifacts", async () => {
   const value = await fixture();
-  value.receipt.facts.sourceUrl = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.6/bun-linux-x64-musl.zip";
+  value.receipt.facts.sourceUrl =
+    "https://github.com/aphrody-labs/bun/releases/download/bun-v1.4.6/bun-linux-x64-musl.zip";
   await Bun.write(value.receiptPath, JSON.stringify(value.receipt));
   await expect(
     stageAlpineRuntime(join(value.root, "bad"), "amd64", value.binary, value.receiptPath, value.expected),

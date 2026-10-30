@@ -1,7 +1,0 @@
-{
-  "family": "api-ms-win-core-sysinfo-l1-2-6",
-  "dll": "api-ms-win-core-sysinfo-l1-2-6.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["System.SystemInformation"],
-  "functions": { "GetDeveloperDriveEnablementState": ["i32", [], [], 0] }
-}

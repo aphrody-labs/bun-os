@@ -1,0 +1,204 @@
+name: Rust userland (rustbase)
+
+on:
+  workflow_dispatch:
+    inputs:
+      gnu:
+        description: Run the uutils GNU coreutils conformance job (long)
+        type: boolean
+        default: true
+  push:
+    branches: [main, os]
+    paths:
+      - factory/rustbase/**
+      - docs/RUSTBASE.md
+      - .github/workflows/rustbase.yml
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: never
+
+concurrency:
+  group: rustbase-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      coreutils_sha: ${{ steps.pins.outputs.coreutils_sha }}
+      util_linux_sha: ${{ steps.pins.outputs.util_linux_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory/rustbase
+            docs/RUSTBASE.md
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Catalog, pins, PKGBUILDs and docs are consistent; patches apply to the pinned tags
+        run: |
+          bun factory/rustbase/check.ts --patches
+          bun factory/rustbase/render-docs.ts --check
+      - id: pins
+        run: |
+          echo "coreutils_sha=$(jq -r '.components.coreutils.sha' factory/rustbase/pins.json)" >>"$GITHUB_OUTPUT"
+          echo "util_linux_sha=$(jq -r '.components["util-linux"].sha' factory/rustbase/pins.json)" >>"$GITHUB_OUTPUT"
+
+  packages:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    container:
+      image: archlinux:base-devel
+    env:
+      CARGO_HOME: /var/cache/cargo
+    steps:
+      - name: Toolchain
+        run: |
+          pacman -Syu --noconfirm --needed git rust clang namcap pam jq
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: factory/rustbase
+      - uses: actions/cache@v4
+        with:
+          path: /var/cache/cargo
+          key: cargo-${{ hashFiles('factory/rustbase/pins.json') }}
+          restore-keys: cargo-
+      - name: Build packages with makepkg
+        run: |
+          useradd -m builder
+          mkdir -p /var/cache/cargo /out /home/builder/build
+          # build outside the checkout: cargo would otherwise pick up the repository root workspace
+          cp -r factory/rustbase/pkg/. /home/builder/build/
+          chown -R builder:builder /var/cache/cargo /out /home/builder/build
+          for p in bunos-uutils-multicall bunos-sudo-rs bunos-nushell-default bunos-rust-base; do
+            echo "::group::makepkg $p"
+            su builder -c "cd /home/builder/build/$p && CARGO_HOME=/var/cache/cargo PKGDEST=/out makepkg -f -d --noconfirm --skippgpcheck"
+            echo "::endgroup::"
+          done
+          ls -l /out
+      - name: namcap (PKGBUILDs and packages)
+        run: |
+          { for p in factory/rustbase/pkg/*/PKGBUILD; do namcap "$p"; done; namcap /out/*.pkg.tar.zst; } 2>&1 | tee /out/namcap.txt || true
+          e=$(grep -c ' E: ' /out/namcap.txt || true); w=$(grep -c ' W: ' /out/namcap.txt || true)
+          echo "namcap: errors=$e warnings=$w" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Install (GNU coreutils, findutils, diffutils and sudo are replaced) and smoke test
+        run: |
+          pacman -U --noconfirm --ask 4 /out/*.pkg.tar.zst
+          SMOKE_OUT=/out/smoke.json bash factory/rustbase/smoke.sh 2>&1 | tee /out/smoke.txt
+        continue-on-error: true
+      - name: Receipt
+        if: always()
+        run: |
+          { echo '### rustbase packages'; ls -l /out; tail -n 3 /out/smoke.txt 2>/dev/null; cat /out/smoke.json 2>/dev/null; } >>"$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rustbase-packages
+          path: /out/
+          if-no-files-found: warn
+
+  gnu-coreutils:
+    needs: check
+    if: github.event_name == 'push' || inputs.gnu
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: factory/rustbase
+          path: bunos
+      - name: Fetch uutils coreutils at the pinned SHA
+        run: |
+          git init -q uutils
+          git -C uutils fetch -q --depth 1 https://github.com/uutils/coreutils "${{ needs.check.outputs.coreutils_sha }}"
+          git -C uutils checkout -q FETCH_HEAD
+          git -C uutils log -1 --format='uutils %H %ad'
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./uutils -> target"
+      - name: Fetch GNU coreutils (uutils fetch-gnu.sh)
+        run: (mkdir -p gnu && cd gnu && bash ../uutils/util/fetch-gnu.sh)
+      - name: Dependencies and locales
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gperf gdb python3-pyinotify valgrind libexpect-perl libacl1-dev libattr1-dev libcap-dev attr quilt
+          for l in fr_FR fr_FR.UTF-8 es_ES.UTF-8 sv_SE sv_SE.UTF-8 en_US en_US.UTF-8 ru_RU.KOI8-R fa_IR.UTF-8 am_ET.UTF-8 th_TH.UTF-8 zh_CN.GB18030; do
+            sudo locale-gen --keep-existing "$l" || true
+          done
+          sudo update-locale
+      - name: Build uutils for the GNU harness
+        run: cd uutils && env PROFILE=release-small bash util/build-gnu.sh
+      - name: Run the GNU test suite as user
+        continue-on-error: true
+        run: |
+          sudo sysctl -w kernel.unprivileged_userns_clone=1 || true
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          path_GNU=gnu path_UUTILS=uutils bash uutils/util/run-gnu-test.sh
+      - name: Pass rates
+        if: always()
+        run: |
+          python3 uutils/util/gnu-json-result.py gnu/tests > gnu-result.json
+          set -o pipefail
+          python3 - <<'PY' | tee gnu-summary.json
+          import json
+          from collections import Counter
+          def walk(n, c):
+              for v in n.values():
+                  if isinstance(v, dict): walk(v, c)
+                  else: c[v] += 1
+          c = Counter(); walk(json.load(open("gnu-result.json")), c)
+          total = sum(c.values()); run = total - c["SKIP"]
+          print(json.dumps({"total": total, **{k: c[k] for k in ("PASS","FAIL","SKIP","ERROR")}, "pass_rate_of_run_percent": round(100 * c["PASS"] / run, 2) if run else None}))
+          if total == 0: raise SystemExit("no GNU test results parsed")
+          PY
+          { echo '### GNU coreutils conformance (uutils '"${{ needs.check.outputs.coreutils_sha }}"')'; echo '```'; cat gnu-summary.json; echo '```'; } >>"$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gnu-coreutils-results
+          path: |
+            gnu-result.json
+            gnu-summary.json
+          if-no-files-found: warn
+
+  util-linux-tests:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: aphrody-labs/uutils-util-linux
+          ref: ${{ needs.check.outputs.util_linux_sha }}
+      - name: libsmartcols and libclang for smartcols-sys
+        run: sudo apt-get update && sudo apt-get install -y libsmartcols-dev libmount-dev libblkid-dev uuid-dev libclang-dev pkg-config
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo test (uutils util-linux fork at the pinned commit)
+        continue-on-error: true
+        run: cargo test --locked --no-fail-fast 2>&1 | tee test.log
+      - name: Totals
+        if: always()
+        run: |
+          set -o pipefail
+          python3 - <<'PY' | tee util-linux-summary.json
+          import re, json
+          p = f = i = 0
+          for m in re.finditer(r"test result: \w+\. (\d+) passed; (\d+) failed; (\d+) ignored", open("test.log").read()):
+              p += int(m[1]); f += int(m[2]); i += int(m[3])
+          print(json.dumps({"passed": p, "failed": f, "ignored": i, "total": p + f + i}))
+          if p + f + i == 0: raise SystemExit("no test results parsed")
+          PY
+          { echo '### uutils util-linux cargo test'; echo '```'; cat util-linux-summary.json; echo '```'; } >>"$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: util-linux-test-results
+          path: |
+            test.log
+            util-linux-summary.json

@@ -51,9 +51,10 @@
     "prepack": "bun ../../scripts/m3/fonts-sync.ts --quiet"
   },
   "devDependencies": {
-    "@aphrody/m3-config": "workspace:*"
+    "@aphrody/m3-config": "workspace:*",
+    "@aphrody/windows": "workspace:*"
   },
   "engines": {
-    "bun": ">=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

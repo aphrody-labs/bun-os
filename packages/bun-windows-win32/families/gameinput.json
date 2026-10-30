@@ -1,7 +1,0 @@
-{
-  "family": "gameinput",
-  "dll": "gameinput.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["UI.Input.GameInput"],
-  "functions": { "GameInputCreate": ["hr", ["*i:UI.Input.GameInput.IGameInput"], ["gameInput"], 0] }
-}

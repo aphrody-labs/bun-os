@@ -45,17 +45,17 @@ describe("lockDiff", () => {
 });
 
 describe("tools.install bun", () => {
-  test("runs the aphrody-labs/bun installer for the pinned base version", async () => {
+  test("runs the upstream Bun installer for the pinned base version", async () => {
     const { install, BUN_INSTALLER } = await import("../src/tools.ts");
     const calls: string[][] = [];
     const ctx = {
       run: (cmd: string, args: string[]) => (calls.push([cmd, ...args]), { status: 0, stdout: "", stderr: "" }),
     };
     expect(install(ctx as never, "bun", "1.4.3")).toBe(true);
-    expect(BUN_INSTALLER).toStartWith("https://raw.githubusercontent.com/aphrody-labs/bun/");
+    expect(BUN_INSTALLER).toBe("https://bun.com/install");
     const line = calls[0].join(" ");
     expect(line).toContain(BUN_INSTALLER);
     expect(line).toContain("1.4.3");
-    expect(line).not.toContain("bun.sh");
+    expect(line).not.toContain("aphrody");
   });
 });

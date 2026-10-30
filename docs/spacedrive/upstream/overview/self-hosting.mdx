@@ -1,0 +1,132 @@
+---
+title: Self-Hosting Spacedrive
+description: Run a headless node on hardware you control
+sidebarTitle: Self-Hosting
+---
+
+A self-hosted Spacedrive node keeps source indexing, search, remote access, and
+durable jobs running on a server or NAS you control. Other devices pair with
+the node and use the same libraries and operations as a local daemon.
+
+You do not need a Spacedrive account or hosted control plane.
+
+## Choose the data directory
+
+The data directory holds library state, source stores, logs, and job state. Put
+it on storage that is backed up and restrict it to the daemon account.
+
+Do not place it inside a source you plan to track. Spacedrive excludes its own
+data directory automatically, but keeping runtime state separate makes backup
+and recovery clearer.
+
+## Run the server
+
+Release archives contain the headless server and CLI for Linux on x86-64 and
+ARM64. Verify the published checksum before installing them.
+
+Run the server as a dedicated operating-system user:
+
+~~~bash
+sd-server --data-dir /var/lib/spacedrive
+~~~
+
+For a source build:
+
+~~~bash
+cargo build --release --bin sd-server --bin sd-cli
+./target/release/sd-server --data-dir /var/lib/spacedrive
+~~~
+
+Use your service manager to restart the process after failure and to provide the
+same data-directory argument on every start.
+
+## Filesystem permissions
+
+Grant the daemon read access to every source it indexes and write access only
+where file operations require it. Read-only archive mounts remain useful for
+indexing and verification.
+
+Unreadable objects are retained as metadata with a failure reason. Review those
+errors before treating an archival index as complete.
+
+## Open the web interface
+
+The server hosts the web client on its configured HTTP address. Bind it to a
+private interface or place it behind a trusted reverse proxy. Use TLS for any
+browser connection that leaves the host.
+
+Browser authentication protects the web session. Peer pairing protects
+device-to-device operations. Keep both enabled because they address different
+entry points.
+
+## Pair a client
+
+On the server:
+
+~~~bash
+sd-cli network pair generate
+~~~
+
+On the client:
+
+~~~bash
+sd-cli network pair join "<PAIRING_CODE>"
+~~~
+
+Grant only the libraries, sources, subtrees, and operations that client needs.
+The network attempts a direct encrypted connection and falls back to a relay
+when necessary.
+
+## Track server storage
+
+Track each meaningful custody or policy boundary as a source:
+
+~~~bash
+sd-cli sources track /srv/documents
+sd-cli sources track /mnt/archive --unfiltered
+sd-cli sources list
+~~~
+
+Separate datasets are usually clearer as separate sources. A pin inside a
+source is enough when you only need a convenient sidebar path.
+
+## Back up the node
+
+Protect two classes of data:
+
+1. **Origins**, which hold file bytes.
+2. **Spacedrive state**, which holds indexes, assertions, policy, and history.
+
+Finish or pause mutations before copying the data directory. Freeze important
+source stores, copy the state to another failure domain, and verify the copy.
+
+~~~bash
+sd-cli sources verify <SOURCE_ID>
+sd-cli sources freeze <SOURCE_ID>
+~~~
+
+A RAID pool or mirrored vdev improves availability. It is not an off-machine
+backup.
+
+## Monitor it
+
+The CLI can inspect the node without opening the web interface:
+
+~~~bash
+sd-cli status
+sd-cli sources list
+sd-cli job list
+sd-cli logs follow --timestamps --show-job-id
+~~~
+
+Alerts should cover process health, failed jobs, unavailable sources, low
+capacity, content errors, and unmet redundancy policy.
+
+## Updates
+
+Back up the data directory before changing versions. Install the server and CLI
+from the same release, restart the service, and confirm that libraries and
+sources reopen before resuming destructive work.
+
+See [Library Sync](/core/library-sync) for the remote data model and
+[Indexing](/core/indexing) for source integrity gates.

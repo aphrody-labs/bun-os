@@ -114,7 +114,7 @@ mod tests {
             "codex",
             42,
             "run-fixture".into(),
-            Some("dbfr"),
+            Some("ie"),
             Some(root.path()),
         )
         .unwrap();
@@ -129,7 +129,7 @@ mod tests {
         let value: Value = serde_json::from_str(&bytes).unwrap();
         assert_eq!(value["session_id"], "native-123");
         assert_eq!(value["pid"], 42);
-        assert_eq!(value["agent_domain"], "dbfr");
+        assert_eq!(value["agent_domain"], "ie");
         assert!(!bytes.contains("secret output"));
         assert!(value.get("commits_authored").is_none());
         assert!(value["ended_at"].is_string());

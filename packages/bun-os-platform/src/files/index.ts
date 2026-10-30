@@ -6,10 +6,10 @@
  *      documents, databases, saves, themes, catalogs, plugins);
  *   2. plugin detectors (built-ins: Bun Engine console images and firmware with typed headers;
  *      then installed plugins);
- *   3. Magika (packages/re, bun:python) when asked and still unknown;
+ *   3. Magika (packages/re, through the runtime SDK Python host) when asked and still unknown;
  *   4. the extension, at low confidence.
- * Previews use native Bun APIs: Bun.Image (thumbnails, `nearest` for pixel art), Bun.Video
- * (frame, metadata), Bun.Archive (tar, tar.gz, zip listings), 7-Zip for 7z/rar, plugin previewers
+ * Previews use native Bun APIs: Bun.Image (thumbnails, `nearest` for pixel art), ffmpeg/ffprobe when
+ * installed (video frame, video and audio metadata; upstream Bun has no video API), Bun.Archive (tar, tar.gz, zip listings), 7-Zip for 7z/rar, plugin previewers
  * (ROM headers, PE/APK inspectors). Large files are read through bounded slices of a BunFile.
  */
 import { basename, extname, join } from "node:path";
@@ -397,7 +397,7 @@ export async function readHead(path: string, bytes = 0x10000): Promise<{ head: U
 }
 
 export interface DetectOptions {
-  /** Ask Magika (bun:python) when the content is still unknown. */
+  /** Ask Magika (Python host) when the content is still unknown. */
   magika?: boolean;
   registry?: PluginRegistry;
 }
@@ -486,31 +486,72 @@ async function imagePreview(path: string, width: number): Promise<Preview> {
   return { kind: "image", thumbnail, metadata: { ...metadata, pixelArt } };
 }
 
+type Metadata = Record<string, unknown>;
+
+async function capture(argv: string[]): Promise<Uint8Array> {
+  const child = Bun.spawn(argv, { stdin: "ignore", stdout: "pipe", stderr: "ignore", windowsHide: true });
+  const [bytes, code] = await Promise.all([new Response(child.stdout).bytes(), child.exited]);
+  if (code !== 0) throw new Error(`${argv[0]} exited with ${code}`);
+  return bytes;
+}
+
+/** Container and stream facts through ffprobe; null when ffprobe is missing or rejects the file. */
+async function probeMedia(path: string): Promise<Metadata | null> {
+  const ffprobe = Bun.which("ffprobe");
+  if (!ffprobe) return null;
+  try {
+    const out = await capture([ffprobe, "-v", "error", "-print_format", "json", "-show_format", "-show_streams", path]);
+    return JSON.parse(new TextDecoder().decode(out)) as Metadata;
+  } catch {
+    return null;
+  }
+}
+
 async function videoPreview(path: string, width: number): Promise<Preview> {
-  const video = new Bun.Video(path);
-  const metadata = (await video.metadata()) as unknown as Record<string, unknown> & {
-    duration?: number;
-    width?: number;
-    height?: number;
+  const probe = await probeMedia(path);
+  if (!probe) return { kind: "video", metadata: { size: Bun.file(path).size, probe: "ffprobe unavailable" } };
+  const streams =
+    (probe.streams as { codec_type?: string; width?: number; height?: number; codec_name?: string }[]) ?? [];
+  const stream = streams.find(s => s.codec_type === "video");
+  const duration = Number((probe.format as { duration?: string } | undefined)?.duration ?? 0);
+  const metadata = {
+    width: stream?.width,
+    height: stream?.height,
+    codec: stream?.codec_name,
+    duration,
+    ...probe,
   };
-  const at = Math.min(Math.max(0, (metadata.duration ?? 0) * 0.1), 10);
-  const thumbnail = await new Bun.Video(path)
-    .frame(at)
-    .resize(width, Math.round((width * (metadata.height ?? 9)) / (metadata.width ?? 16)))
-    .webp({ quality: 80 })
-    .bytes();
-  return { kind: "video", thumbnail, metadata };
+  const ffmpeg = Bun.which("ffmpeg");
+  if (!ffmpeg) return { kind: "video", metadata };
+  const at = Math.min(Math.max(0, duration * 0.1), 10);
+  try {
+    const png = await capture([
+      ffmpeg,
+      "-v",
+      "error",
+      "-ss",
+      String(at),
+      "-i",
+      path,
+      "-frames:v",
+      "1",
+      "-vf",
+      `scale=${width}:-2`,
+      "-f",
+      "image2pipe",
+      "-c:v",
+      "png",
+      "pipe:1",
+    ]);
+    const thumbnail = await new Bun.Image(png).webp({ quality: 80 }).bytes();
+    return { kind: "video", thumbnail, metadata };
+  } catch {
+    return { kind: "video", metadata };
+  }
 }
 
 async function audioPreview(path: string): Promise<Preview> {
-  try {
-    return {
-      kind: "audio",
-      metadata: (await new Bun.Video(path).metadata()) as unknown as Record<string, unknown>,
-    };
-  } catch {
-    return { kind: "audio", metadata: { size: Bun.file(path).size } };
-  }
+  return { kind: "audio", metadata: (await probeMedia(path)) ?? { size: Bun.file(path).size } };
 }
 
 async function archivePreview(path: string, format: string): Promise<Preview> {

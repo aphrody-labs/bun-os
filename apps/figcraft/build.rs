@@ -9,7 +9,10 @@ fn main() {
             res.set_icon(ico);
         }
         res.set("ProductName", "Aphrody / Bun · Interface Design");
-        res.set("FileDescription", "Aphrody / Bun interface design workspace");
+        res.set(
+            "FileDescription",
+            "Aphrody / Bun interface design workspace",
+        );
         res.set("CompanyName", "ArtCraft");
         if let Err(e) = res.compile() {
             println!("cargo::warning=winresource: {e}");

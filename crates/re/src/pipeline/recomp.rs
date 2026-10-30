@@ -402,7 +402,7 @@ pub fn emit(ctx: &mut Ctx) -> StageReport {
 }
 
 /// Cargo command prefix: `BUNRE_CARGO` (JSON array or a single program), else the serialized
-/// Bun OS wrapper on Windows (`bun msvc exec --toolset 14.44 -- bun scripts/cargo.ts exec --`),
+/// Bun OS wrapper on Windows (`bun scripts/cargo.ts exec --`),
 /// else `cargo`.
 fn cargo_prefix(root: &Path) -> Vec<String> {
     if let Ok(v) = std::env::var("BUNRE_CARGO") {
@@ -417,7 +417,7 @@ fn cargo_prefix(root: &Path) -> Vec<String> {
     }
     let script = root.join("scripts").join("cargo.ts");
     if cfg!(windows) && script.is_file() && which("bun").is_some() {
-        return ["bun", "msvc", "exec", "--toolset", "14.44", "--", "bun"]
+        return ["bun"]
             .iter()
             .map(|s| (*s).to_string())
             .chain([script.display().to_string(), "exec".into(), "--".into()])

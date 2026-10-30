@@ -1,0 +1,80 @@
+---
+title: The Spacedrive Philosophy
+sidebarTitle: Philosophy
+---
+
+Your data should not have to live on somebody else's computer to be useful.
+Spacedrive gives you one open filesystem interface across your drives, devices,
+private servers, and optional clouds. It adds identity, indexing, protection,
+and a file manager while you decide where your files and metadata live.
+
+## Ownership without retreat
+
+Cloud services made custody feel like the price of convenience. Personal files
+and behavioral data became concentrated on infrastructure whose security,
+policies, and future remain outside your control. Automated attacks increase
+the scale of that exposure. AI also increases the value of accumulated personal
+data as material for training, inference, and profiling.
+
+Putting files on a disconnected disk does not provide search, remote access,
+sharing, history, or reliable backup. Spacedrive exists to make self-controlled
+storage practical without giving up those capabilities. Privacy becomes a
+product property rather than a promise made by the current provider.
+
+## One filesystem surface
+
+Operating systems and cloud providers expose files differently. Search,
+permissions, version history, mounting, backup, and sharing vary again. Agents
+usually receive another isolated file API tied to the machine where they run.
+
+Spacedrive makes those systems available through one typed operation surface.
+The desktop app, web app, CLI, generated clients, skills, and MCP tools all call
+the same core.
+
+## You keep control
+
+- Files remain in their existing locations until you approve an operation.
+- Local use requires no hosted account or telemetry.
+- The index stays useful when a drive is unplugged.
+- Assertions and metadata can travel with a source.
+- Permissions are explicit and revocable.
+- Risky changes can be previewed, committed as durable jobs, and verified.
+
+External AI is part of the threat environment Spacedrive helps you reduce by
+limiting unnecessary data custody. An agent you choose is a separate case. It
+receives the same scoped capabilities as a person and no hidden path around the
+operation and permission model.
+
+## Small core, broad extensions
+
+The default install should be fast and lightweight. Specialized codecs,
+providers, models, and workflows belong in extensions.
+
+Extensions can teach Spacedrive about a new source, file type, metadata shape,
+preview renderer, sidecar, operation, or focused view. A file format should
+become understandable without adding its entire software stack to every
+installation.
+
+## Evidence before confidence
+
+Spacedrive distinguishes a possible duplicate from confirmed identical bytes.
+It distinguishes a catalog projection from the source that owns a file. It
+records unreadable content as an error instead of silently omitting it.
+
+This standard applies to automation, backup, deduplication, and history. The
+system should say what it knows, how it knows it, and what remains unavailable.
+
+## Working software first
+
+Earlier versions carried too many systems that only worked in part. This
+version keeps the primitives that serve the filesystem and removes product
+surfaces that compete with them.
+
+A stable release requires automated coverage of the core workflows, restart
+safety, cross-platform validation, and testing against real filesystems at real
+scale. A smaller reliable product is the foundation for every extension that
+follows.
+
+Developers should read [Product Direction](/core/product-direction) for the
+full product boundary and the decisions it imposes on agents, extensions, sync,
+mounts, interface work, and retired product surfaces.

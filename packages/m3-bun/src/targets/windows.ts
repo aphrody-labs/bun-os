@@ -6,7 +6,7 @@
 // The desktop side installs per user without elevation: Start menu and desktop shortcuts and an Apps & features
 // entry under HKCU. The application icon is an SVG (a Material Symbol from @aphrody/material-design-icons, the
 // app's own, or the Aphrody emblem of @aphrody/identity) that build-windows.ts turns into icon.ico with
-// m3-svg-to-ico before compiling; windows-check.ts reads the result back through `bun:windows` (inspectWindows).
+// m3-svg-to-ico before compiling; windows-check.ts reads the result back through the registry (inspectWindows).
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
 import { GENERATED_NOTE } from "../util.ts";
@@ -116,7 +116,7 @@ Write-Host 'removed ${c.name}'
 
 export const checkScript = (c: TargetContext): string => `#!/usr/bin/env bun
 // ${GENERATED_NOTE}
-// Read-only check of the Windows install of ${c.name} through bun:windows (Bun fork): executable, shortcuts,
+// Read-only check of the Windows install of ${c.name} through the registry and sc.exe: executable, shortcuts,
 // Apps & features entry, service. Exit status 1 when the executable is missing or not version ${c.version}.
 import { inspectWindows } from "@aphrody/m3-bun/targets";
 
@@ -277,7 +277,7 @@ export const windows: Target = {
   id: "windows",
   title: "Windows",
   description:
-    "build-windows.ps1/.ts (.exe with icon.ico from m3-svg-to-ico), per-user install (shortcuts, Apps & features), WinSW service or boot task, windows-check.ts (bun:windows)",
+    "build-windows.ps1/.ts (.exe with icon.ico from m3-svg-to-ico), per-user install (shortcuts, Apps & features), WinSW service or boot task, windows-check.ts (registry)",
   async generate(c): Promise<TargetFile[]> {
     return [
       await iconFile(c),

@@ -1,29 +1,46 @@
 {
   "name": "@aphrody/tauri",
   "version": "1.4.7",
-  "description": "Tauri API, every plugin guest binding of tauri-plugin-aphrody, and the Bun runtime bridge",
+  "description": "Bun sidecar bridge and MCP bridge guest binding for Tauri apps run by unmodified upstream Bun; the Tauri API itself comes from @tauri-apps/api (catalog)",
   "license": "Apache-2.0 OR MIT",
   "files": [
     "js",
-    "crates/tauri-plugin-aphrody/iife",
+    "bin",
     "README.md",
     "LICENSE-*"
   ],
   "type": "module",
   "exports": {
     ".": "./js/index.ts",
-    "./api": "./js/api/index.ts",
-    "./api/*": "./js/api/*.ts",
-    "./plugins/*": "./js/plugins/*.ts",
     "./bun": "./js/bun.ts",
     "./server": "./js/server.ts",
+    "./sidecar": "./js/sidecar.ts",
+    "./mcp-bridge": "./js/plugins/mcp-bridge.ts",
     "./package.json": "./package.json"
   },
   "scripts": {
-    "check": "bun ../../scripts/cargo.ts exec -- check --locked -p tauri-plugin-aphrody --tests",
-    "test": "bun ../../scripts/cargo.ts exec -- test --locked -p tauri-plugin-aphrody"
+    "typecheck": "tsc --noEmit -p ."
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
+  },
+  "bin": {
+    "bun-tauri-sidecar": "./bin/sidecar.ts"
+  },
+  "peerDependencies": {
+    "@tauri-apps/cli": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@tauri-apps/cli": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:",
+    "@tauri-apps/cli": "catalog:"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "catalog:"
   }
 }

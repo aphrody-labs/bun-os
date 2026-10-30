@@ -1,8 +1,0 @@
-{
-  "extends": "../rg-config/tsconfig-base.json",
-  "compilerOptions": {
-    "types": ["@aphrody/bun-types"],
-    "noEmit": true
-  },
-  "include": ["src/**/*"]
-}

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Game RE engine absorbed from `shenron-re` (Apache-2.0, aphrody-labs/shenron):
+//! Game RE engine (Apache-2.0):
 //! AOB signature scanning, live process-memory inspection, the DBXV2 binary format
 //! parsers (BAC/BDM/CMS/CUS/EMB/EMD/EMM/ESK/MSG/PUP/SAV), the Dragon Ball game
 //! catalog, Steam install inspection, text extraction and the unified state; plus the
@@ -11,6 +11,9 @@ pub mod api;
 pub mod assets;
 pub mod catalog;
 pub mod convert;
+/// Export a DBXV2 `.emd` object to GLB so it renders through the nie 3D pipeline.
+#[cfg(feature = "dbxv2")]
+pub mod emd_gltf;
 pub mod error;
 pub mod formats;
 pub mod fs;
@@ -20,18 +23,15 @@ pub mod index;
 pub mod inventory;
 pub mod live;
 pub mod reverse;
-pub mod steam;
-pub mod text;
-pub mod unified;
-/// Export a DBXV2 `.emd` object to GLB so it renders through the nie 3D pipeline.
-#[cfg(feature = "dbxv2")]
-pub mod emd_gltf;
-/// Streamed mount of several game installs under one `<game>/<path>` namespace.
-#[cfg(feature = "assets")]
-pub mod unified_vfs;
 /// Engine-facing asset runtime: streams and format-decodes assets from the merged games.
 #[cfg(feature = "assets")]
 pub mod runtime;
+pub mod steam;
+pub mod text;
+pub mod unified;
+/// Streamed mount of several game installs under one `<game>/<path>` namespace.
+#[cfg(feature = "assets")]
+pub mod unified_vfs;
 pub mod world;
 
 #[cfg(feature = "wasm")]

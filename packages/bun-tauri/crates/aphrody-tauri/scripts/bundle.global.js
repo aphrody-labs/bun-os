@@ -13,188 +13,203 @@ var __TAURI_IIFE__ = (function (e) {
       throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return ("a" === i ? r.call(e, t) : r ? (r.value = t) : n.set(e, t), t);
   }
-  var i, r, s, a, l;
+  var i, r, s, a, l, o, u;
   "function" == typeof SuppressedError && SuppressedError;
-  const o = "__TAURI_TO_IPC_KEY__";
-  function u(e, n = !1) {
+  const c = "__TAURI_TO_IPC_KEY__";
+  function d(e, n = !1) {
     return window.__TAURI_INTERNALS__.transformCallback(e, n);
   }
-  class c {
+  class p {
     constructor(e) {
-      (i.set(this, void 0),
-        r.set(this, 0),
-        s.set(this, []),
-        a.set(this, void 0),
-        t(this, i, e || (() => {}), "f"),
-        (this.id = u(e => {
-          const l = e.index;
-          if ("end" in e) return void (l == n(this, r, "f") ? this.cleanupCallback() : t(this, a, l, "f"));
-          const o = e.message;
-          if (l == n(this, r, "f")) {
+      (i.add(this),
+        r.set(this, void 0),
+        s.set(this, 0),
+        a.set(this, []),
+        l.set(this, void 0),
+        t(this, r, e || (() => {}), "f"),
+        (this.id = d(e => {
+          const r = e.index;
+          if ("end" in e) return void (r == n(this, s, "f") ? this.cleanupCallback() : t(this, l, r, "f"));
+          const u = e.message;
+          if (r == n(this, s, "f")) {
             for (
-              n(this, i, "f").call(this, o), t(this, r, n(this, r, "f") + 1, "f");
-              n(this, r, "f") in n(this, s, "f");
+              n(this, i, "m", o).call(this, u), t(this, s, n(this, s, "f") + 1, "f");
+              n(this, s, "f") in n(this, a, "f");
             ) {
-              const e = n(this, s, "f")[n(this, r, "f")];
-              (n(this, i, "f").call(this, e),
-                delete n(this, s, "f")[n(this, r, "f")],
-                t(this, r, n(this, r, "f") + 1, "f"));
+              const e = n(this, a, "f")[n(this, s, "f")];
+              (n(this, i, "m", o).call(this, e),
+                delete n(this, a, "f")[n(this, s, "f")],
+                t(this, s, n(this, s, "f") + 1, "f"));
             }
-            n(this, r, "f") === n(this, a, "f") && this.cleanupCallback();
-          } else n(this, s, "f")[l] = o;
+            n(this, s, "f") === n(this, l, "f") && this.cleanupCallback();
+          } else n(this, a, "f")[r] = u;
         })));
     }
     cleanupCallback() {
       window.__TAURI_INTERNALS__.unregisterCallback(this.id);
     }
     set onmessage(e) {
-      t(this, i, e, "f");
+      t(this, r, e, "f");
     }
     get onmessage() {
-      return n(this, i, "f");
+      return n(this, r, "f");
     }
-    [((i = new WeakMap()), (r = new WeakMap()), (s = new WeakMap()), (a = new WeakMap()), o)]() {
+    [((r = new WeakMap()),
+    (s = new WeakMap()),
+    (a = new WeakMap()),
+    (l = new WeakMap()),
+    (i = new WeakSet()),
+    (o = function (e) {
+      try {
+        n(this, r, "f").call(this, e);
+      } catch (e) {
+        queueMicrotask(() => {
+          throw e;
+        });
+      }
+    }),
+    c)]() {
       return `__CHANNEL__:${this.id}`;
     }
     toJSON() {
-      return this[o]();
+      return this[c]();
     }
   }
-  class d {
+  class h {
     constructor(e, n, t) {
       ((this.plugin = e), (this.event = n), (this.channelId = t));
     }
     async unregister() {
-      return h(`plugin:${this.plugin}|remove_listener`, { event: this.event, channelId: this.channelId });
+      return _(`plugin:${this.plugin}|remove_listener`, { event: this.event, channelId: this.channelId });
     }
   }
-  async function p(e, n, t) {
-    const i = new c(t);
+  async function w(e, n, t) {
+    const i = new p(t);
     try {
-      return (await h(`plugin:${e}|register_listener`, { event: n, handler: i }), new d(e, n, i.id));
+      return (await _(`plugin:${e}|register_listener`, { event: n, handler: i }), new h(e, n, i.id));
     } catch {
-      return (await h(`plugin:${e}|registerListener`, { event: n, handler: i }), new d(e, n, i.id));
+      return (await _(`plugin:${e}|registerListener`, { event: n, handler: i }), new h(e, n, i.id));
     }
   }
-  async function h(e, n = {}, t) {
+  async function _(e, n = {}, t) {
     return window.__TAURI_INTERNALS__.invoke(e, n, t);
   }
-  class w {
+  class y {
     get rid() {
-      return n(this, l, "f");
+      return n(this, u, "f");
     }
     constructor(e) {
-      (l.set(this, void 0), t(this, l, e, "f"));
+      (u.set(this, void 0), t(this, u, e, "f"));
     }
     async close() {
-      return h("plugin:resources|close", { rid: this.rid });
+      return _("plugin:resources|close", { rid: this.rid });
     }
-    async [((l = new WeakMap()), Symbol.asyncDispose)]() {
+    async [((u = new WeakMap()), Symbol.asyncDispose)]() {
       await this.close();
     }
   }
-  var _ = Object.freeze({
+  var g = Object.freeze({
     __proto__: null,
-    Channel: c,
-    PluginListener: d,
-    Resource: w,
-    SERIALIZE_TO_IPC_FN: o,
-    addPluginListener: p,
+    Channel: p,
+    PluginListener: h,
+    Resource: y,
+    SERIALIZE_TO_IPC_FN: c,
+    addPluginListener: w,
     checkPermissions: async function (e) {
-      return h(`plugin:${e}|check_permissions`);
+      return _(`plugin:${e}|check_permissions`);
     },
     convertFileSrc: function (e, n = "asset") {
       return window.__TAURI_INTERNALS__.convertFileSrc(e, n);
     },
-    invoke: h,
+    invoke: _,
     isTauri: function () {
       return !!(globalThis || window).isTauri;
     },
     requestPermissions: async function (e) {
-      return h(`plugin:${e}|request_permissions`);
+      return _(`plugin:${e}|request_permissions`);
     },
-    transformCallback: u,
+    transformCallback: d,
   });
-  class y extends w {
+  class b extends y {
     constructor(e) {
       super(e);
     }
     static async new(e, n, t) {
-      return h("plugin:image|new", { rgba: e, width: n, height: t }).then(e => new y(e));
+      return _("plugin:image|new", { rgba: e, width: n, height: t }).then(e => new b(e));
     }
     static async fromBytes(e) {
-      return h("plugin:image|from_bytes", { bytes: e }).then(e => new y(e));
+      return _("plugin:image|from_bytes", { bytes: e }).then(e => new b(e));
     }
     static async fromPath(e) {
-      return h("plugin:image|from_path", { path: e }).then(e => new y(e));
+      return _("plugin:image|from_path", { path: e }).then(e => new b(e));
     }
     async rgba() {
-      return h("plugin:image|rgba", { rid: this.rid }).then(e => new Uint8Array(e));
+      return _("plugin:image|rgba", { rid: this.rid }).then(e => new Uint8Array(e));
     }
     async size() {
-      return h("plugin:image|size", { rid: this.rid });
+      return _("plugin:image|size", { rid: this.rid });
     }
   }
-  function g(e) {
-    return null == e ? null : "string" == typeof e ? e : e instanceof y ? e.rid : e;
+  function m(e) {
+    return null == e ? null : "string" == typeof e ? e : e instanceof b ? e.rid : e;
   }
-  var b,
-    m = Object.freeze({ __proto__: null, Image: y, transformImage: g });
+  var v,
+    f = Object.freeze({ __proto__: null, Image: b, transformImage: m });
   !(function (e) {
     ((e.Nsis = "nsis"), (e.Msi = "msi"), (e.Deb = "deb"), (e.Rpm = "rpm"), (e.AppImage = "appimage"), (e.App = "app"));
-  })(b || (b = {}));
-  var v = Object.freeze({
+  })(v || (v = {}));
+  var k = Object.freeze({
     __proto__: null,
     get BundleType() {
-      return b;
+      return v;
     },
     defaultWindowIcon: async function () {
-      return h("plugin:app|default_window_icon").then(e => (e ? new y(e) : null));
+      return _("plugin:app|default_window_icon").then(e => (e ? new b(e) : null));
     },
     exit: async function (e = 0) {
-      return h("plugin:app|exit", { code: e });
+      return _("plugin:app|exit", { code: e });
     },
     fetchDataStoreIdentifiers: async function () {
-      return h("plugin:app|fetch_data_store_identifiers");
+      return _("plugin:app|fetch_data_store_identifiers");
     },
     getBundleType: async function () {
-      return h("plugin:app|bundle_type");
+      return _("plugin:app|bundle_type");
     },
     getIdentifier: async function () {
-      return h("plugin:app|identifier");
+      return _("plugin:app|identifier");
     },
     getName: async function () {
-      return h("plugin:app|name");
+      return _("plugin:app|name");
     },
     getTauriVersion: async function () {
-      return h("plugin:app|tauri_version");
+      return _("plugin:app|tauri_version");
     },
     getVersion: async function () {
-      return h("plugin:app|version");
+      return _("plugin:app|version");
     },
     hide: async function () {
-      return h("plugin:app|app_hide");
+      return _("plugin:app|app_hide");
     },
     onBackButtonPress: async function (e) {
-      return p("app", "back-button", e);
+      return w("app", "back-button", e);
     },
     removeDataStore: async function (e) {
-      return h("plugin:app|remove_data_store", { uuid: e });
+      return _("plugin:app|remove_data_store", { uuid: e });
     },
     setDockVisibility: async function (e) {
-      return h("plugin:app|set_dock_visibility", { visible: e });
+      return _("plugin:app|set_dock_visibility", { visible: e });
     },
     setTheme: async function (e) {
-      return h("plugin:app|set_app_theme", { theme: e });
+      return _("plugin:app|set_app_theme", { theme: e });
     },
     show: async function () {
-      return h("plugin:app|app_show");
+      return _("plugin:app|app_show");
     },
     supportsMultipleWindows: async function () {
-      return h("plugin:app|supports_multiple_windows");
+      return _("plugin:app|supports_multiple_windows");
     },
   });
-  class f {
+  class A {
     constructor(...e) {
       ((this.type = "Logical"),
         1 === e.length
@@ -204,16 +219,16 @@ var __TAURI_IIFE__ = (function (e) {
           : ((this.width = e[0]), (this.height = e[1])));
     }
     toPhysical(e) {
-      return new k(this.width * e, this.height * e);
+      return new T(this.width * e, this.height * e);
     }
-    [o]() {
+    [c]() {
       return { width: this.width, height: this.height };
     }
     toJSON() {
-      return this[o]();
+      return this[c]();
     }
   }
-  class k {
+  class T {
     constructor(...e) {
       ((this.type = "Physical"),
         1 === e.length
@@ -223,33 +238,33 @@ var __TAURI_IIFE__ = (function (e) {
           : ((this.width = e[0]), (this.height = e[1])));
     }
     toLogical(e) {
-      return new f(this.width / e, this.height / e);
+      return new A(this.width / e, this.height / e);
     }
-    [o]() {
+    [c]() {
       return { width: this.width, height: this.height };
     }
     toJSON() {
-      return this[o]();
+      return this[c]();
     }
   }
-  class A {
+  class I {
     constructor(e) {
       this.size = e;
     }
     toLogical(e) {
-      return this.size instanceof f ? this.size : this.size.toLogical(e);
+      return this.size instanceof A ? this.size : this.size.toLogical(e);
     }
     toPhysical(e) {
-      return this.size instanceof k ? this.size : this.size.toPhysical(e);
+      return this.size instanceof T ? this.size : this.size.toPhysical(e);
     }
-    [o]() {
+    [c]() {
       return { [`${this.size.type}`]: { width: this.size.width, height: this.size.height } };
     }
     toJSON() {
-      return this[o]();
+      return this[c]();
     }
   }
-  class T {
+  class E {
     constructor(...e) {
       ((this.type = "Logical"),
         1 === e.length
@@ -259,16 +274,16 @@ var __TAURI_IIFE__ = (function (e) {
           : ((this.x = e[0]), (this.y = e[1])));
     }
     toPhysical(e) {
-      return new I(this.x * e, this.y * e);
+      return new R(this.x * e, this.y * e);
     }
-    [o]() {
+    [c]() {
       return { x: this.x, y: this.y };
     }
     toJSON() {
-      return this[o]();
+      return this[c]();
     }
   }
-  class I {
+  class R {
     constructor(...e) {
       ((this.type = "Physical"),
         1 === e.length
@@ -278,47 +293,47 @@ var __TAURI_IIFE__ = (function (e) {
           : ((this.x = e[0]), (this.y = e[1])));
     }
     toLogical(e) {
-      return new T(this.x / e, this.y / e);
+      return new E(this.x / e, this.y / e);
     }
-    [o]() {
+    [c]() {
       return { x: this.x, y: this.y };
     }
     toJSON() {
-      return this[o]();
+      return this[c]();
     }
   }
-  class E {
+  class D {
     constructor(e) {
       this.position = e;
     }
     toLogical(e) {
-      return this.position instanceof T ? this.position : this.position.toLogical(e);
+      return this.position instanceof E ? this.position : this.position.toLogical(e);
     }
     toPhysical(e) {
-      return this.position instanceof I ? this.position : this.position.toPhysical(e);
+      return this.position instanceof R ? this.position : this.position.toPhysical(e);
     }
-    [o]() {
+    [c]() {
       return { [`${this.position.type}`]: { x: this.position.x, y: this.position.y } };
     }
     toJSON() {
-      return this[o]();
+      return this[c]();
     }
   }
-  var R,
-    D = Object.freeze({
+  var S,
+    N = Object.freeze({
       __proto__: null,
-      LogicalPosition: T,
-      LogicalSize: f,
-      PhysicalPosition: I,
-      PhysicalSize: k,
-      Position: E,
-      Size: A,
+      LogicalPosition: E,
+      LogicalSize: A,
+      PhysicalPosition: R,
+      PhysicalSize: T,
+      Position: D,
+      Size: I,
     });
-  async function S(e, n) {
+  async function L(e, n) {
     (window.__TAURI_EVENT_PLUGIN_INTERNALS__.unregisterListener(e, n),
-      await h("plugin:event|unlisten", { event: e, eventId: n }));
+      await _("plugin:event|unlisten", { event: e, eventId: n }));
   }
-  async function N(e, n, t) {
+  async function C(e, n, t) {
     var i;
     const r =
       "string" == typeof (null == t ? void 0 : t.target)
@@ -326,23 +341,23 @@ var __TAURI_IIFE__ = (function (e) {
         : null !== (i = null == t ? void 0 : t.target) && void 0 !== i
           ? i
           : { kind: "Any" };
-    return h("plugin:event|listen", { event: e, target: r, handler: u(n) }).then(n => async () => S(e, n));
+    return _("plugin:event|listen", { event: e, target: r, handler: d(n) }).then(n => async () => L(e, n));
   }
-  async function L(e, n, t) {
-    return N(
+  async function x(e, n, t) {
+    return C(
       e,
       t => {
-        (S(e, t.id), n(t));
+        (L(e, t.id), n(t));
       },
       t,
     );
   }
-  async function C(e, n) {
-    await h("plugin:event|emit", { event: e, payload: n });
+  async function P(e, n) {
+    await _("plugin:event|emit", { event: e, payload: n });
   }
-  async function x(e, n, t) {
+  async function W(e, n, t) {
     const i = "string" == typeof e ? { kind: "AnyLabel", label: e } : e;
-    await h("plugin:event|emit_to", { target: i, event: n, payload: t });
+    await _("plugin:event|emit_to", { target: i, event: n, payload: t });
   }
   !(function (e) {
     ((e.WINDOW_RESIZED = "tauri://resize"),
@@ -361,125 +376,123 @@ var __TAURI_IIFE__ = (function (e) {
       (e.DRAG_OVER = "tauri://drag-over"),
       (e.DRAG_DROP = "tauri://drag-drop"),
       (e.DRAG_LEAVE = "tauri://drag-leave"));
-  })(R || (R = {}));
-  var W,
-    P,
-    z,
-    O = Object.freeze({
+  })(S || (S = {}));
+  var z,
+    O,
+    U,
+    F = Object.freeze({
       __proto__: null,
       get TauriEvent() {
-        return R;
+        return S;
       },
-      emit: C,
-      emitTo: x,
-      listen: N,
-      once: L,
+      emit: P,
+      emitTo: W,
+      listen: C,
+      once: x,
     });
-  function U(e) {
+  function M(e) {
     var n;
-    if ("items" in e) e.items = null === (n = e.items) || void 0 === n ? void 0 : n.map(e => ("rid" in e ? e : U(e)));
+    if ("items" in e) e.items = null === (n = e.items) || void 0 === n ? void 0 : n.map(e => ("rid" in e ? e : M(e)));
     else if ("action" in e && e.action) {
-      const n = new c();
+      const n = new p();
       return ((n.onmessage = e.action), delete e.action, { ...e, handler: n });
     }
     return e;
   }
-  async function F(e, n) {
-    const t = new c();
-    if (
-      n &&
-      "object" == typeof n &&
-      ("action" in n && n.action && ((t.onmessage = n.action), delete n.action),
-      "item" in n &&
-        n.item &&
-        "object" == typeof n.item &&
-        "About" in n.item &&
-        n.item.About &&
-        "object" == typeof n.item.About &&
-        "icon" in n.item.About &&
-        n.item.About.icon &&
-        (n.item.About.icon = g(n.item.About.icon)),
-      "icon" in n && n.icon && (n.icon = g(n.icon)),
-      "items" in n && n.items)
-    ) {
-      function i(e) {
-        var n;
-        return "rid" in e
-          ? [e.rid, e.kind]
-          : ("item" in e &&
-              "object" == typeof e.item &&
-              (null === (n = e.item.About) || void 0 === n ? void 0 : n.icon) &&
-              (e.item.About.icon = g(e.item.About.icon)),
-            "icon" in e && e.icon && (e.icon = g(e.icon)),
-            "items" in e && e.items && (e.items = e.items.map(i)),
-            U(e));
-      }
-      n.items = n.items.map(i);
-    }
-    return h("plugin:menu|new", { kind: e, options: n, handler: t });
+  function B(e) {
+    var n;
+    return "rid" in e
+      ? [e.rid, e.kind]
+      : ("item" in e &&
+          "object" == typeof e.item &&
+          (null === (n = e.item.About) || void 0 === n ? void 0 : n.icon) &&
+          (e.item.About.icon = m(e.item.About.icon)),
+        "icon" in e && e.icon && (e.icon = m(e.icon)),
+        "items" in e && e.items && (e.items = e.items.map(B)),
+        M(e));
   }
-  class M extends w {
+  async function G(e, n) {
+    const t = new p();
+    return (
+      n &&
+        "object" == typeof n &&
+        ("action" in n && n.action && ((t.onmessage = n.action), delete n.action),
+        "item" in n &&
+          n.item &&
+          "object" == typeof n.item &&
+          "About" in n.item &&
+          n.item.About &&
+          "object" == typeof n.item.About &&
+          "icon" in n.item.About &&
+          n.item.About.icon &&
+          (n.item.About.icon = m(n.item.About.icon)),
+        "icon" in n && n.icon && (n.icon = m(n.icon)),
+        "items" in n && n.items && (n.items = n.items.map(B))),
+      _("plugin:menu|new", { kind: e, options: n, handler: t })
+    );
+  }
+  class V extends y {
     get id() {
-      return n(this, W, "f");
+      return n(this, z, "f");
     }
     get kind() {
-      return n(this, P, "f");
+      return n(this, O, "f");
     }
     constructor(e, n, i) {
-      (super(e), W.set(this, void 0), P.set(this, void 0), t(this, W, n, "f"), t(this, P, i, "f"));
+      (super(e), z.set(this, void 0), O.set(this, void 0), t(this, z, n, "f"), t(this, O, i, "f"));
     }
   }
-  ((W = new WeakMap()), (P = new WeakMap()));
-  class B extends M {
+  ((z = new WeakMap()), (O = new WeakMap()));
+  class j extends V {
     constructor(e, n) {
       super(e, n, "MenuItem");
     }
     static async new(e) {
-      return F("MenuItem", e).then(([e, n]) => new B(e, n));
+      return G("MenuItem", e).then(([e, n]) => new j(e, n));
     }
     async text() {
-      return h("plugin:menu|text", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|text", { rid: this.rid, kind: this.kind });
     }
     async setText(e) {
-      return h("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
+      return _("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
     }
     async isEnabled() {
-      return h("plugin:menu|is_enabled", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|is_enabled", { rid: this.rid, kind: this.kind });
     }
     async setEnabled(e) {
-      return h("plugin:menu|set_enabled", { rid: this.rid, kind: this.kind, enabled: e });
+      return _("plugin:menu|set_enabled", { rid: this.rid, kind: this.kind, enabled: e });
     }
     async setAccelerator(e) {
-      return h("plugin:menu|set_accelerator", { rid: this.rid, kind: this.kind, accelerator: e });
+      return _("plugin:menu|set_accelerator", { rid: this.rid, kind: this.kind, accelerator: e });
     }
   }
-  class G extends M {
+  class H extends V {
     constructor(e, n) {
       super(e, n, "Check");
     }
     static async new(e) {
-      return F("Check", e).then(([e, n]) => new G(e, n));
+      return G("Check", e).then(([e, n]) => new H(e, n));
     }
     async text() {
-      return h("plugin:menu|text", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|text", { rid: this.rid, kind: this.kind });
     }
     async setText(e) {
-      return h("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
+      return _("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
     }
     async isEnabled() {
-      return h("plugin:menu|is_enabled", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|is_enabled", { rid: this.rid, kind: this.kind });
     }
     async setEnabled(e) {
-      return h("plugin:menu|set_enabled", { rid: this.rid, kind: this.kind, enabled: e });
+      return _("plugin:menu|set_enabled", { rid: this.rid, kind: this.kind, enabled: e });
     }
     async setAccelerator(e) {
-      return h("plugin:menu|set_accelerator", { rid: this.rid, kind: this.kind, accelerator: e });
+      return _("plugin:menu|set_accelerator", { rid: this.rid, kind: this.kind, accelerator: e });
     }
     async isChecked() {
-      return h("plugin:menu|is_checked", { rid: this.rid });
+      return _("plugin:menu|is_checked", { rid: this.rid });
     }
     async setChecked(e) {
-      return h("plugin:menu|set_checked", { rid: this.rid, checked: e });
+      return _("plugin:menu|set_checked", { rid: this.rid, checked: e });
     }
   }
   !(function (e) {
@@ -539,218 +552,202 @@ var __TAURI_IIFE__ = (function (e) {
       (e.UserAccounts = "UserAccounts"),
       (e.UserGroup = "UserGroup"),
       (e.UserGuest = "UserGuest"));
-  })(z || (z = {}));
-  class V extends M {
+  })(U || (U = {}));
+  class $ extends V {
     constructor(e, n) {
       super(e, n, "Icon");
     }
     static async new(e) {
-      return F("Icon", e).then(([e, n]) => new V(e, n));
+      return G("Icon", e).then(([e, n]) => new $(e, n));
     }
     async text() {
-      return h("plugin:menu|text", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|text", { rid: this.rid, kind: this.kind });
     }
     async setText(e) {
-      return h("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
+      return _("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
     }
     async isEnabled() {
-      return h("plugin:menu|is_enabled", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|is_enabled", { rid: this.rid, kind: this.kind });
     }
     async setEnabled(e) {
-      return h("plugin:menu|set_enabled", { rid: this.rid, kind: this.kind, enabled: e });
+      return _("plugin:menu|set_enabled", { rid: this.rid, kind: this.kind, enabled: e });
     }
     async setAccelerator(e) {
-      return h("plugin:menu|set_accelerator", { rid: this.rid, kind: this.kind, accelerator: e });
+      return _("plugin:menu|set_accelerator", { rid: this.rid, kind: this.kind, accelerator: e });
     }
     async setIcon(e) {
-      return h("plugin:menu|set_icon", { rid: this.rid, kind: this.kind, icon: g(e) });
+      return _("plugin:menu|set_icon", { rid: this.rid, kind: this.kind, icon: m(e) });
     }
   }
-  class j extends M {
+  class q extends V {
     constructor(e, n) {
       super(e, n, "Predefined");
     }
     static async new(e) {
-      return F("Predefined", e).then(([e, n]) => new j(e, n));
+      return G("Predefined", e).then(([e, n]) => new q(e, n));
     }
     async text() {
-      return h("plugin:menu|text", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|text", { rid: this.rid, kind: this.kind });
     }
     async setText(e) {
-      return h("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
+      return _("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
     }
   }
-  function H([e, n, t]) {
+  function J([e, n, t]) {
     switch (t) {
       case "Submenu":
-        return new $(e, n);
+        return new Q(e, n);
       case "Predefined":
-        return new j(e, n);
+        return new q(e, n);
       case "Check":
-        return new G(e, n);
+        return new H(e, n);
       case "Icon":
-        return new V(e, n);
+        return new $(e, n);
       default:
-        return new B(e, n);
+        return new j(e, n);
     }
   }
-  class $ extends M {
+  class Q extends V {
     constructor(e, n) {
       super(e, n, "Submenu");
     }
     static async new(e) {
-      return F("Submenu", e).then(([e, n]) => new $(e, n));
+      return G("Submenu", e).then(([e, n]) => new Q(e, n));
     }
     async text() {
-      return h("plugin:menu|text", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|text", { rid: this.rid, kind: this.kind });
     }
     async setText(e) {
-      return h("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
+      return _("plugin:menu|set_text", { rid: this.rid, kind: this.kind, text: e });
     }
     async isEnabled() {
-      return h("plugin:menu|is_enabled", { rid: this.rid, kind: this.kind });
+      return _("plugin:menu|is_enabled", { rid: this.rid, kind: this.kind });
     }
     async setEnabled(e) {
-      return h("plugin:menu|set_enabled", { rid: this.rid, kind: this.kind, enabled: e });
+      return _("plugin:menu|set_enabled", { rid: this.rid, kind: this.kind, enabled: e });
     }
     async append(e) {
-      return h("plugin:menu|append", {
-        rid: this.rid,
-        kind: this.kind,
-        items: (Array.isArray(e) ? e : [e]).map(e => ("rid" in e ? [e.rid, e.kind] : e)),
-      });
+      return _("plugin:menu|append", { rid: this.rid, kind: this.kind, items: (Array.isArray(e) ? e : [e]).map(B) });
     }
     async prepend(e) {
-      return h("plugin:menu|prepend", {
-        rid: this.rid,
-        kind: this.kind,
-        items: (Array.isArray(e) ? e : [e]).map(e => ("rid" in e ? [e.rid, e.kind] : e)),
-      });
+      return _("plugin:menu|prepend", { rid: this.rid, kind: this.kind, items: (Array.isArray(e) ? e : [e]).map(B) });
     }
     async insert(e, n) {
-      return h("plugin:menu|insert", {
+      return _("plugin:menu|insert", {
         rid: this.rid,
         kind: this.kind,
-        items: (Array.isArray(e) ? e : [e]).map(e => ("rid" in e ? [e.rid, e.kind] : e)),
+        items: (Array.isArray(e) ? e : [e]).map(B),
         position: n,
       });
     }
     async remove(e) {
-      return h("plugin:menu|remove", { rid: this.rid, kind: this.kind, item: [e.rid, e.kind] });
+      return _("plugin:menu|remove", { rid: this.rid, kind: this.kind, item: [e.rid, e.kind] });
     }
     async removeAt(e) {
-      return h("plugin:menu|remove_at", { rid: this.rid, kind: this.kind, position: e }).then(H);
+      return _("plugin:menu|remove_at", { rid: this.rid, kind: this.kind, position: e }).then(J);
     }
     async items() {
-      return h("plugin:menu|items", { rid: this.rid, kind: this.kind }).then(e => e.map(H));
+      return _("plugin:menu|items", { rid: this.rid, kind: this.kind }).then(e => e.map(J));
     }
     async get(e) {
-      return h("plugin:menu|get", { rid: this.rid, kind: this.kind, id: e }).then(e => (e ? H(e) : null));
+      return _("plugin:menu|get", { rid: this.rid, kind: this.kind, id: e }).then(e => (e ? J(e) : null));
     }
     async popup(e, n) {
       var t;
-      return h("plugin:menu|popup", {
+      return _("plugin:menu|popup", {
         rid: this.rid,
         kind: this.kind,
         window: null !== (t = null == n ? void 0 : n.label) && void 0 !== t ? t : null,
-        at: e instanceof E ? e : e ? new E(e) : null,
+        at: e instanceof D ? e : e ? new D(e) : null,
       });
     }
     async setAsWindowsMenuForNSApp() {
-      return h("plugin:menu|set_as_windows_menu_for_nsapp", { rid: this.rid });
+      return _("plugin:menu|set_as_windows_menu_for_nsapp", { rid: this.rid });
     }
     async setAsHelpMenuForNSApp() {
-      return h("plugin:menu|set_as_help_menu_for_nsapp", { rid: this.rid });
+      return _("plugin:menu|set_as_help_menu_for_nsapp", { rid: this.rid });
     }
     async setIcon(e) {
-      return h("plugin:menu|set_icon", { rid: this.rid, kind: this.kind, icon: g(e) });
+      return _("plugin:menu|set_icon", { rid: this.rid, kind: this.kind, icon: m(e) });
     }
   }
-  class q extends M {
+  class Z extends V {
     constructor(e, n) {
       super(e, n, "Menu");
     }
     static async new(e) {
-      return F("Menu", e).then(([e, n]) => new q(e, n));
+      return G("Menu", e).then(([e, n]) => new Z(e, n));
     }
     static async default() {
-      return h("plugin:menu|create_default").then(([e, n]) => new q(e, n));
+      return _("plugin:menu|create_default").then(([e, n]) => new Z(e, n));
     }
     async append(e) {
-      return h("plugin:menu|append", {
-        rid: this.rid,
-        kind: this.kind,
-        items: (Array.isArray(e) ? e : [e]).map(e => ("rid" in e ? [e.rid, e.kind] : e)),
-      });
+      return _("plugin:menu|append", { rid: this.rid, kind: this.kind, items: (Array.isArray(e) ? e : [e]).map(B) });
     }
     async prepend(e) {
-      return h("plugin:menu|prepend", {
-        rid: this.rid,
-        kind: this.kind,
-        items: (Array.isArray(e) ? e : [e]).map(e => ("rid" in e ? [e.rid, e.kind] : e)),
-      });
+      return _("plugin:menu|prepend", { rid: this.rid, kind: this.kind, items: (Array.isArray(e) ? e : [e]).map(B) });
     }
     async insert(e, n) {
-      return h("plugin:menu|insert", {
+      return _("plugin:menu|insert", {
         rid: this.rid,
         kind: this.kind,
-        items: (Array.isArray(e) ? e : [e]).map(e => ("rid" in e ? [e.rid, e.kind] : e)),
+        items: (Array.isArray(e) ? e : [e]).map(B),
         position: n,
       });
     }
     async remove(e) {
-      return h("plugin:menu|remove", { rid: this.rid, kind: this.kind, item: [e.rid, e.kind] });
+      return _("plugin:menu|remove", { rid: this.rid, kind: this.kind, item: [e.rid, e.kind] });
     }
     async removeAt(e) {
-      return h("plugin:menu|remove_at", { rid: this.rid, kind: this.kind, position: e }).then(H);
+      return _("plugin:menu|remove_at", { rid: this.rid, kind: this.kind, position: e }).then(J);
     }
     async items() {
-      return h("plugin:menu|items", { rid: this.rid, kind: this.kind }).then(e => e.map(H));
+      return _("plugin:menu|items", { rid: this.rid, kind: this.kind }).then(e => e.map(J));
     }
     async get(e) {
-      return h("plugin:menu|get", { rid: this.rid, kind: this.kind, id: e }).then(e => (e ? H(e) : null));
+      return _("plugin:menu|get", { rid: this.rid, kind: this.kind, id: e }).then(e => (e ? J(e) : null));
     }
     async popup(e, n) {
       var t;
-      return h("plugin:menu|popup", {
+      return _("plugin:menu|popup", {
         rid: this.rid,
         kind: this.kind,
         window: null !== (t = null == n ? void 0 : n.label) && void 0 !== t ? t : null,
-        at: e instanceof E ? e : e ? new E(e) : null,
+        at: e instanceof D ? e : e ? new D(e) : null,
       });
     }
     async setAsAppMenu() {
-      return h("plugin:menu|set_as_app_menu", { rid: this.rid }).then(e => (e ? new q(e[0], e[1]) : null));
+      return _("plugin:menu|set_as_app_menu", { rid: this.rid }).then(e => (e ? new Z(e[0], e[1]) : null));
     }
     async setAsWindowMenu(e) {
       var n;
-      return h("plugin:menu|set_as_window_menu", {
+      return _("plugin:menu|set_as_window_menu", {
         rid: this.rid,
         window: null !== (n = null == e ? void 0 : e.label) && void 0 !== n ? n : null,
-      }).then(e => (e ? new q(e[0], e[1]) : null));
+      }).then(e => (e ? new Z(e[0], e[1]) : null));
     }
   }
-  var J = Object.freeze({
+  var K = Object.freeze({
     __proto__: null,
-    CheckMenuItem: G,
-    IconMenuItem: V,
-    Menu: q,
-    MenuItem: B,
+    CheckMenuItem: H,
+    IconMenuItem: $,
+    Menu: Z,
+    MenuItem: j,
     get NativeIcon() {
-      return z;
+      return U;
     },
-    PredefinedMenuItem: j,
-    Submenu: $,
-    itemFromKind: H,
+    PredefinedMenuItem: q,
+    Submenu: Q,
+    itemFromKind: J,
   });
-  function Q() {
+  function Y() {
     var e, n;
     ((window.__TAURI_INTERNALS__ = null !== (e = window.__TAURI_INTERNALS__) && void 0 !== e ? e : {}),
       (window.__TAURI_EVENT_PLUGIN_INTERNALS__ =
         null !== (n = window.__TAURI_EVENT_PLUGIN_INTERNALS__) && void 0 !== n ? n : {}));
   }
-  var Z,
-    K = Object.freeze({
+  var X,
+    ee = Object.freeze({
       __proto__: null,
       clearMocks: function () {
         "object" == typeof window.__TAURI_INTERNALS__ &&
@@ -765,7 +762,7 @@ var __TAURI_IIFE__ = (function (e) {
             delete window.__TAURI_EVENT_PLUGIN_INTERNALS__.unregisterListener);
       },
       mockConvertFileSrc: function (e) {
-        (Q(),
+        (Y(),
           (window.__TAURI_INTERNALS__.convertFileSrc = function (n, t = "asset") {
             const i = encodeURIComponent(n);
             return "windows" === e ? `http://${t}.localhost/${i}` : `${t}://localhost/${i}`;
@@ -795,7 +792,7 @@ var __TAURI_IIFE__ = (function (e) {
               })(n);
           }
         }
-        Q();
+        Y();
         const i = new Map(),
           r = new Map();
         function s(e) {
@@ -829,7 +826,7 @@ var __TAURI_IIFE__ = (function (e) {
           }));
       },
       mockWindows: function (e, ...n) {
-        (Q(),
+        (Y(),
           (window.__TAURI_INTERNALS__.metadata = {
             currentWindow: { label: e },
             currentWebview: { windowLabel: e, label: e },
@@ -860,126 +857,126 @@ var __TAURI_IIFE__ = (function (e) {
       (e[(e.Home = 21)] = "Home"),
       (e[(e.Runtime = 22)] = "Runtime"),
       (e[(e.Template = 23)] = "Template"));
-  })(Z || (Z = {}));
-  var Y = Object.freeze({
+  })(X || (X = {}));
+  var ne = Object.freeze({
     __proto__: null,
     get BaseDirectory() {
-      return Z;
+      return X;
     },
     appCacheDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.AppCache });
+      return _("plugin:path|resolve_directory", { directory: X.AppCache });
     },
     appConfigDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.AppConfig });
+      return _("plugin:path|resolve_directory", { directory: X.AppConfig });
     },
     appDataDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.AppData });
+      return _("plugin:path|resolve_directory", { directory: X.AppData });
     },
     appLocalDataDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.AppLocalData });
+      return _("plugin:path|resolve_directory", { directory: X.AppLocalData });
     },
     appLogDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.AppLog });
+      return _("plugin:path|resolve_directory", { directory: X.AppLog });
     },
     audioDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Audio });
+      return _("plugin:path|resolve_directory", { directory: X.Audio });
     },
     basename: async function (e, n) {
-      return h("plugin:path|basename", { path: e, ext: n });
+      return _("plugin:path|basename", { path: e, ext: n });
     },
     cacheDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Cache });
+      return _("plugin:path|resolve_directory", { directory: X.Cache });
     },
     configDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Config });
+      return _("plugin:path|resolve_directory", { directory: X.Config });
     },
     dataDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Data });
+      return _("plugin:path|resolve_directory", { directory: X.Data });
     },
     delimiter: function () {
       return window.__TAURI_INTERNALS__.plugins.path.delimiter;
     },
     desktopDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Desktop });
+      return _("plugin:path|resolve_directory", { directory: X.Desktop });
     },
     dirname: async function (e) {
-      return h("plugin:path|dirname", { path: e });
+      return _("plugin:path|dirname", { path: e });
     },
     documentDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Document });
+      return _("plugin:path|resolve_directory", { directory: X.Document });
     },
     downloadDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Download });
+      return _("plugin:path|resolve_directory", { directory: X.Download });
     },
     executableDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Executable });
+      return _("plugin:path|resolve_directory", { directory: X.Executable });
     },
     extname: async function (e) {
-      return h("plugin:path|extname", { path: e });
+      return _("plugin:path|extname", { path: e });
     },
     fontDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Font });
+      return _("plugin:path|resolve_directory", { directory: X.Font });
     },
     homeDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Home });
+      return _("plugin:path|resolve_directory", { directory: X.Home });
     },
     isAbsolute: async function (e) {
-      return h("plugin:path|is_absolute", { path: e });
+      return _("plugin:path|is_absolute", { path: e });
     },
     join: async function (...e) {
-      return h("plugin:path|join", { paths: e });
+      return _("plugin:path|join", { paths: e });
     },
     localDataDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.LocalData });
+      return _("plugin:path|resolve_directory", { directory: X.LocalData });
     },
     normalize: async function (e) {
-      return h("plugin:path|normalize", { path: e });
+      return _("plugin:path|normalize", { path: e });
     },
     pictureDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Picture });
+      return _("plugin:path|resolve_directory", { directory: X.Picture });
     },
     publicDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Public });
+      return _("plugin:path|resolve_directory", { directory: X.Public });
     },
     resolve: async function (...e) {
-      return h("plugin:path|resolve", { paths: e });
+      return _("plugin:path|resolve", { paths: e });
     },
     resolveResource: async function (e) {
-      return h("plugin:path|resolve_directory", { directory: Z.Resource, path: e });
+      return _("plugin:path|resolve_directory", { directory: X.Resource, path: e });
     },
     resourceDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Resource });
+      return _("plugin:path|resolve_directory", { directory: X.Resource });
     },
     runtimeDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Runtime });
+      return _("plugin:path|resolve_directory", { directory: X.Runtime });
     },
     sep: function () {
       return window.__TAURI_INTERNALS__.plugins.path.sep;
     },
     tempDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Temp });
+      return _("plugin:path|resolve_directory", { directory: X.Temp });
     },
     templateDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Template });
+      return _("plugin:path|resolve_directory", { directory: X.Template });
     },
     videoDir: async function () {
-      return h("plugin:path|resolve_directory", { directory: Z.Video });
+      return _("plugin:path|resolve_directory", { directory: X.Video });
     },
   });
-  class X extends w {
+  class te extends y {
     constructor(e, n) {
       (super(e), (this.id = n));
     }
     static async getById(e) {
-      return h("plugin:tray|get_by_id", { id: e }).then(n => (n ? new X(n, e) : null));
+      return _("plugin:tray|get_by_id", { id: e }).then(n => (n ? new te(n, e) : null));
     }
     static async removeById(e) {
-      return h("plugin:tray|remove_by_id", { id: e });
+      return _("plugin:tray|remove_by_id", { id: e });
     }
     static async new(e) {
       ((null == e ? void 0 : e.menu) && (e.menu = [e.menu.rid, e.menu.kind]),
-        (null == e ? void 0 : e.icon) && (e.icon = g(e.icon)));
-      const n = new c();
+        (null == e ? void 0 : e.icon) && (e.icon = m(e.icon)));
+      const n = new p();
       if (null == e ? void 0 : e.action) {
         const t = e.action;
         ((n.onmessage = e =>
@@ -987,57 +984,57 @@ var __TAURI_IIFE__ = (function (e) {
             (function (e) {
               const n = e;
               return (
-                (n.position = new I(e.position)),
-                (n.rect.position = new I(e.rect.position)),
-                (n.rect.size = new k(e.rect.size)),
+                (n.position = new R(e.position)),
+                (n.rect.position = new R(e.rect.position)),
+                (n.rect.size = new T(e.rect.size)),
                 n
               );
             })(e),
           )),
           delete e.action);
       }
-      return h("plugin:tray|new", { options: null != e ? e : {}, handler: n }).then(([e, n]) => new X(e, n));
+      return _("plugin:tray|new", { options: null != e ? e : {}, handler: n }).then(([e, n]) => new te(e, n));
     }
     async setIcon(e) {
       let n = null;
-      return (e && (n = g(e)), h("plugin:tray|set_icon", { rid: this.rid, icon: n }));
+      return (e && (n = m(e)), _("plugin:tray|set_icon", { rid: this.rid, icon: n }));
     }
     async setMenu(e) {
-      return (e && (e = [e.rid, e.kind]), h("plugin:tray|set_menu", { rid: this.rid, menu: e }));
+      return (e && (e = [e.rid, e.kind]), _("plugin:tray|set_menu", { rid: this.rid, menu: e }));
     }
     async setTooltip(e) {
-      return h("plugin:tray|set_tooltip", { rid: this.rid, tooltip: e });
+      return _("plugin:tray|set_tooltip", { rid: this.rid, tooltip: e });
     }
     async setTitle(e) {
-      return h("plugin:tray|set_title", { rid: this.rid, title: e });
+      return _("plugin:tray|set_title", { rid: this.rid, title: e });
     }
     async setVisible(e) {
-      return h("plugin:tray|set_visible", { rid: this.rid, visible: e });
+      return _("plugin:tray|set_visible", { rid: this.rid, visible: e });
     }
     async setTempDirPath(e) {
-      return h("plugin:tray|set_temp_dir_path", { rid: this.rid, path: e });
+      return _("plugin:tray|set_temp_dir_path", { rid: this.rid, path: e });
     }
     async setIconAsTemplate(e) {
-      return h("plugin:tray|set_icon_as_template", { rid: this.rid, asTemplate: e });
+      return _("plugin:tray|set_icon_as_template", { rid: this.rid, asTemplate: e });
     }
     async setIconWithAsTemplate(e, n) {
       let t = null;
-      return (e && (t = g(e)), h("plugin:tray|set_icon_with_as_template", { rid: this.rid, icon: t, asTemplate: n }));
+      return (e && (t = m(e)), _("plugin:tray|set_icon_with_as_template", { rid: this.rid, icon: t, asTemplate: n }));
     }
     async setMenuOnLeftClick(e) {
-      return h("plugin:tray|set_show_menu_on_left_click", { rid: this.rid, onLeft: e });
+      return _("plugin:tray|set_show_menu_on_left_click", { rid: this.rid, onLeft: e });
     }
     async setShowMenuOnLeftClick(e) {
-      return h("plugin:tray|set_show_menu_on_left_click", { rid: this.rid, onLeft: e });
+      return _("plugin:tray|set_show_menu_on_left_click", { rid: this.rid, onLeft: e });
     }
   }
-  var ee,
-    ne,
-    te = Object.freeze({ __proto__: null, TrayIcon: X });
+  var ie,
+    re,
+    se = Object.freeze({ __proto__: null, TrayIcon: te });
   !(function (e) {
     ((e[(e.Critical = 1)] = "Critical"), (e[(e.Informational = 2)] = "Informational"));
-  })(ee || (ee = {}));
-  class ie {
+  })(ie || (ie = {}));
+  class ae {
     constructor(e) {
       ((this._preventDefault = !1), (this.event = e.event), (this.id = e.id));
     }
@@ -1048,11 +1045,11 @@ var __TAURI_IIFE__ = (function (e) {
       return this._preventDefault;
     }
   }
-  function re() {
-    return new le(window.__TAURI_INTERNALS__.metadata.currentWindow.label, { skip: !0 });
+  function le() {
+    return new ce(window.__TAURI_INTERNALS__.metadata.currentWindow.label, { skip: !0 });
   }
-  async function se() {
-    return h("plugin:window|get_all_windows").then(e => e.map(e => new le(e, { skip: !0 })));
+  async function oe() {
+    return _("plugin:window|get_all_windows").then(e => e.map(e => new ce(e, { skip: !0 })));
   }
   !(function (e) {
     ((e.None = "none"),
@@ -1060,15 +1057,15 @@ var __TAURI_IIFE__ = (function (e) {
       (e.Indeterminate = "indeterminate"),
       (e.Paused = "paused"),
       (e.Error = "error"));
-  })(ne || (ne = {}));
-  const ae = ["tauri://created", "tauri://error"];
-  class le {
+  })(re || (re = {}));
+  const ue = ["tauri://created", "tauri://error"];
+  class ce {
     constructor(e, n = {}) {
       var t;
       ((this.label = e),
         (this.listeners = Object.create(null)),
         (null == n ? void 0 : n.skip) ||
-          h("plugin:window|create", {
+          _("plugin:window|create", {
             options: {
               ...n,
               parent:
@@ -1081,16 +1078,16 @@ var __TAURI_IIFE__ = (function (e) {
     }
     static async getByLabel(e) {
       var n;
-      return null !== (n = (await se()).find(n => n.label === e)) && void 0 !== n ? n : null;
+      return null !== (n = (await oe()).find(n => n.label === e)) && void 0 !== n ? n : null;
     }
     static getCurrent() {
-      return re();
+      return le();
     }
     static async getAll() {
-      return se();
+      return oe();
     }
     static async getFocusedWindow() {
-      for (const e of await se()) if (await e.isFocused()) return e;
+      for (const e of await oe()) if (await e.isFocused()) return e;
       return null;
     }
     async listen(e, n) {
@@ -1099,7 +1096,7 @@ var __TAURI_IIFE__ = (function (e) {
             const t = this.listeners[e];
             t.splice(t.indexOf(n), 1);
           }
-        : N(e, n, { target: { kind: "Window", label: this.label } });
+        : C(e, n, { target: { kind: "Window", label: this.label } });
     }
     async once(e, n) {
       return this._handleTauriEvent(e, n)
@@ -1107,172 +1104,172 @@ var __TAURI_IIFE__ = (function (e) {
             const t = this.listeners[e];
             t.splice(t.indexOf(n), 1);
           }
-        : L(e, n, { target: { kind: "Window", label: this.label } });
+        : x(e, n, { target: { kind: "Window", label: this.label } });
     }
     async emit(e, n) {
-      if (!ae.includes(e)) return C(e, n);
+      if (!ue.includes(e)) return P(e, n);
       for (const t of this.listeners[e] || []) t({ event: e, id: -1, payload: n });
     }
     async emitTo(e, n, t) {
-      if (!ae.includes(n)) return x(e, n, t);
+      if (!ue.includes(n)) return W(e, n, t);
       for (const e of this.listeners[n] || []) e({ event: n, id: -1, payload: t });
     }
     _handleTauriEvent(e, n) {
-      return !!ae.includes(e) && (e in this.listeners ? this.listeners[e].push(n) : (this.listeners[e] = [n]), !0);
+      return !!ue.includes(e) && (e in this.listeners ? this.listeners[e].push(n) : (this.listeners[e] = [n]), !0);
     }
     async scaleFactor() {
-      return h("plugin:window|scale_factor", { label: this.label });
+      return _("plugin:window|scale_factor", { label: this.label });
     }
     async innerPosition() {
-      return h("plugin:window|inner_position", { label: this.label }).then(e => new I(e));
+      return _("plugin:window|inner_position", { label: this.label }).then(e => new R(e));
     }
     async outerPosition() {
-      return h("plugin:window|outer_position", { label: this.label }).then(e => new I(e));
+      return _("plugin:window|outer_position", { label: this.label }).then(e => new R(e));
     }
     async innerSize() {
-      return h("plugin:window|inner_size", { label: this.label }).then(e => new k(e));
+      return _("plugin:window|inner_size", { label: this.label }).then(e => new T(e));
     }
     async outerSize() {
-      return h("plugin:window|outer_size", { label: this.label }).then(e => new k(e));
+      return _("plugin:window|outer_size", { label: this.label }).then(e => new T(e));
     }
     async isFullscreen() {
-      return h("plugin:window|is_fullscreen", { label: this.label });
+      return _("plugin:window|is_fullscreen", { label: this.label });
     }
     async isMinimized() {
-      return h("plugin:window|is_minimized", { label: this.label });
+      return _("plugin:window|is_minimized", { label: this.label });
     }
     async isMaximized() {
-      return h("plugin:window|is_maximized", { label: this.label });
+      return _("plugin:window|is_maximized", { label: this.label });
     }
     async isFocused() {
-      return h("plugin:window|is_focused", { label: this.label });
+      return _("plugin:window|is_focused", { label: this.label });
     }
     async isDecorated() {
-      return h("plugin:window|is_decorated", { label: this.label });
+      return _("plugin:window|is_decorated", { label: this.label });
     }
     async isResizable() {
-      return h("plugin:window|is_resizable", { label: this.label });
+      return _("plugin:window|is_resizable", { label: this.label });
     }
     async isMaximizable() {
-      return h("plugin:window|is_maximizable", { label: this.label });
+      return _("plugin:window|is_maximizable", { label: this.label });
     }
     async isMinimizable() {
-      return h("plugin:window|is_minimizable", { label: this.label });
+      return _("plugin:window|is_minimizable", { label: this.label });
     }
     async isClosable() {
-      return h("plugin:window|is_closable", { label: this.label });
+      return _("plugin:window|is_closable", { label: this.label });
     }
     async isVisible() {
-      return h("plugin:window|is_visible", { label: this.label });
+      return _("plugin:window|is_visible", { label: this.label });
     }
     async title() {
-      return h("plugin:window|title", { label: this.label });
+      return _("plugin:window|title", { label: this.label });
     }
     async theme() {
-      return h("plugin:window|theme", { label: this.label });
+      return _("plugin:window|theme", { label: this.label });
     }
     async isAlwaysOnTop() {
-      return h("plugin:window|is_always_on_top", { label: this.label });
+      return _("plugin:window|is_always_on_top", { label: this.label });
     }
     async activityName() {
-      return h("plugin:window|activity_name", { label: this.label });
+      return _("plugin:window|activity_name", { label: this.label });
     }
     async sceneIdentifier() {
-      return h("plugin:window|scene_identifier", { label: this.label });
+      return _("plugin:window|scene_identifier", { label: this.label });
     }
     async center() {
-      return h("plugin:window|center", { label: this.label });
+      return _("plugin:window|center", { label: this.label });
     }
     async requestUserAttention(e) {
       let n = null;
       return (
-        e && (n = e === ee.Critical ? { type: "Critical" } : { type: "Informational" }),
-        h("plugin:window|request_user_attention", { label: this.label, value: n })
+        e && (n = e === ie.Critical ? { type: "Critical" } : { type: "Informational" }),
+        _("plugin:window|request_user_attention", { label: this.label, value: n })
       );
     }
     async setResizable(e) {
-      return h("plugin:window|set_resizable", { label: this.label, value: e });
+      return _("plugin:window|set_resizable", { label: this.label, value: e });
     }
     async setEnabled(e) {
-      return h("plugin:window|set_enabled", { label: this.label, value: e });
+      return _("plugin:window|set_enabled", { label: this.label, value: e });
     }
     async isEnabled() {
-      return h("plugin:window|is_enabled", { label: this.label });
+      return _("plugin:window|is_enabled", { label: this.label });
     }
     async setMaximizable(e) {
-      return h("plugin:window|set_maximizable", { label: this.label, value: e });
+      return _("plugin:window|set_maximizable", { label: this.label, value: e });
     }
     async setMinimizable(e) {
-      return h("plugin:window|set_minimizable", { label: this.label, value: e });
+      return _("plugin:window|set_minimizable", { label: this.label, value: e });
     }
     async setClosable(e) {
-      return h("plugin:window|set_closable", { label: this.label, value: e });
+      return _("plugin:window|set_closable", { label: this.label, value: e });
     }
     async setTitle(e) {
-      return h("plugin:window|set_title", { label: this.label, value: e });
+      return _("plugin:window|set_title", { label: this.label, value: e });
     }
     async maximize() {
-      return h("plugin:window|maximize", { label: this.label });
+      return _("plugin:window|maximize", { label: this.label });
     }
     async unmaximize() {
-      return h("plugin:window|unmaximize", { label: this.label });
+      return _("plugin:window|unmaximize", { label: this.label });
     }
     async toggleMaximize() {
-      return h("plugin:window|toggle_maximize", { label: this.label });
+      return _("plugin:window|toggle_maximize", { label: this.label });
     }
     async minimize() {
-      return h("plugin:window|minimize", { label: this.label });
+      return _("plugin:window|minimize", { label: this.label });
     }
     async unminimize() {
-      return h("plugin:window|unminimize", { label: this.label });
+      return _("plugin:window|unminimize", { label: this.label });
     }
     async show() {
-      return h("plugin:window|show", { label: this.label });
+      return _("plugin:window|show", { label: this.label });
     }
     async hide() {
-      return h("plugin:window|hide", { label: this.label });
+      return _("plugin:window|hide", { label: this.label });
     }
     async close() {
-      return h("plugin:window|close", { label: this.label });
+      return _("plugin:window|close", { label: this.label });
     }
     async destroy() {
-      return h("plugin:window|destroy", { label: this.label });
+      return _("plugin:window|destroy", { label: this.label });
     }
     async setDecorations(e) {
-      return h("plugin:window|set_decorations", { label: this.label, value: e });
+      return _("plugin:window|set_decorations", { label: this.label, value: e });
     }
     async setShadow(e) {
-      return h("plugin:window|set_shadow", { label: this.label, value: e });
+      return _("plugin:window|set_shadow", { label: this.label, value: e });
     }
     async setEffects(e) {
-      return h("plugin:window|set_effects", { label: this.label, value: e });
+      return _("plugin:window|set_effects", { label: this.label, value: e });
     }
     async clearEffects() {
-      return h("plugin:window|set_effects", { label: this.label, value: null });
+      return _("plugin:window|set_effects", { label: this.label, value: null });
     }
     async setAlwaysOnTop(e) {
-      return h("plugin:window|set_always_on_top", { label: this.label, value: e });
+      return _("plugin:window|set_always_on_top", { label: this.label, value: e });
     }
     async setAlwaysOnBottom(e) {
-      return h("plugin:window|set_always_on_bottom", { label: this.label, value: e });
+      return _("plugin:window|set_always_on_bottom", { label: this.label, value: e });
     }
     async setContentProtected(e) {
-      return h("plugin:window|set_content_protected", { label: this.label, value: e });
+      return _("plugin:window|set_content_protected", { label: this.label, value: e });
     }
     async setSize(e) {
-      return h("plugin:window|set_size", { label: this.label, value: e instanceof A ? e : new A(e) });
+      return _("plugin:window|set_size", { label: this.label, value: e instanceof I ? e : new I(e) });
     }
     async setMinSize(e) {
-      return h("plugin:window|set_min_size", { label: this.label, value: e instanceof A ? e : e ? new A(e) : null });
+      return _("plugin:window|set_min_size", { label: this.label, value: e instanceof I ? e : e ? new I(e) : null });
     }
     async setMaxSize(e) {
-      return h("plugin:window|set_max_size", { label: this.label, value: e instanceof A ? e : e ? new A(e) : null });
+      return _("plugin:window|set_max_size", { label: this.label, value: e instanceof I ? e : e ? new I(e) : null });
     }
     async setSizeConstraints(e) {
       function n(e) {
         return e ? { Logical: e } : null;
       }
-      return h("plugin:window|set_size_constraints", {
+      return _("plugin:window|set_size_constraints", {
         label: this.label,
         value: {
           minWidth: n(null == e ? void 0 : e.minWidth),
@@ -1283,143 +1280,143 @@ var __TAURI_IIFE__ = (function (e) {
       });
     }
     async setPosition(e) {
-      return h("plugin:window|set_position", { label: this.label, value: e instanceof E ? e : new E(e) });
+      return _("plugin:window|set_position", { label: this.label, value: e instanceof D ? e : new D(e) });
     }
     async setFullscreen(e) {
-      return h("plugin:window|set_fullscreen", { label: this.label, value: e });
+      return _("plugin:window|set_fullscreen", { label: this.label, value: e });
     }
     async setFullscreenOnMonitor(e) {
-      return h("plugin:window|set_fullscreen_on_monitor", { label: this.label, value: e });
+      return _("plugin:window|set_fullscreen_on_monitor", { label: this.label, value: e });
     }
     async setSimpleFullscreen(e) {
-      return h("plugin:window|set_simple_fullscreen", { label: this.label, value: e });
+      return _("plugin:window|set_simple_fullscreen", { label: this.label, value: e });
     }
     async setFocus() {
-      return h("plugin:window|set_focus", { label: this.label });
+      return _("plugin:window|set_focus", { label: this.label });
     }
     async setFocusable(e) {
-      return h("plugin:window|set_focusable", { label: this.label, value: e });
+      return _("plugin:window|set_focusable", { label: this.label, value: e });
     }
     async setIcon(e) {
-      return h("plugin:window|set_icon", { label: this.label, value: g(e) });
+      return _("plugin:window|set_icon", { label: this.label, value: m(e) });
     }
     async setSkipTaskbar(e) {
-      return h("plugin:window|set_skip_taskbar", { label: this.label, value: e });
+      return _("plugin:window|set_skip_taskbar", { label: this.label, value: e });
     }
     async setCursorGrab(e) {
-      return h("plugin:window|set_cursor_grab", { label: this.label, value: e });
+      return _("plugin:window|set_cursor_grab", { label: this.label, value: e });
     }
     async setCursorVisible(e) {
-      return h("plugin:window|set_cursor_visible", { label: this.label, value: e });
+      return _("plugin:window|set_cursor_visible", { label: this.label, value: e });
     }
     async setCursorIcon(e) {
-      return h("plugin:window|set_cursor_icon", { label: this.label, value: e });
+      return _("plugin:window|set_cursor_icon", { label: this.label, value: e });
     }
     async setBackgroundColor(e) {
-      return h("plugin:window|set_background_color", { label: this.label, value: e });
+      return _("plugin:window|set_background_color", { label: this.label, value: e });
     }
     async setCursorPosition(e) {
-      return h("plugin:window|set_cursor_position", { label: this.label, value: e instanceof E ? e : new E(e) });
+      return _("plugin:window|set_cursor_position", { label: this.label, value: e instanceof D ? e : new D(e) });
     }
     async setIgnoreCursorEvents(e) {
-      return h("plugin:window|set_ignore_cursor_events", { label: this.label, value: e });
+      return _("plugin:window|set_ignore_cursor_events", { label: this.label, value: e });
     }
     async startDragging() {
-      return h("plugin:window|start_dragging", { label: this.label });
+      return _("plugin:window|start_dragging", { label: this.label });
     }
     async startResizeDragging(e) {
-      return h("plugin:window|start_resize_dragging", { label: this.label, value: e });
+      return _("plugin:window|start_resize_dragging", { label: this.label, value: e });
     }
     async setBadgeCount(e) {
-      return h("plugin:window|set_badge_count", { label: this.label, value: e });
+      return _("plugin:window|set_badge_count", { label: this.label, value: e });
     }
     async setBadgeLabel(e) {
-      return h("plugin:window|set_badge_label", { label: this.label, value: e });
+      return _("plugin:window|set_badge_label", { label: this.label, value: e });
     }
     async setOverlayIcon(e) {
-      return h("plugin:window|set_overlay_icon", { label: this.label, value: e ? g(e) : void 0 });
+      return _("plugin:window|set_overlay_icon", { label: this.label, value: e ? m(e) : void 0 });
     }
     async setProgressBar(e) {
-      return h("plugin:window|set_progress_bar", { label: this.label, value: e });
+      return _("plugin:window|set_progress_bar", { label: this.label, value: e });
     }
     async setVisibleOnAllWorkspaces(e) {
-      return h("plugin:window|set_visible_on_all_workspaces", { label: this.label, value: e });
+      return _("plugin:window|set_visible_on_all_workspaces", { label: this.label, value: e });
     }
     async setTitleBarStyle(e) {
-      return h("plugin:window|set_title_bar_style", { label: this.label, value: e });
+      return _("plugin:window|set_title_bar_style", { label: this.label, value: e });
     }
     async setTheme(e) {
-      return h("plugin:window|set_theme", { label: this.label, value: e });
+      return _("plugin:window|set_theme", { label: this.label, value: e });
     }
     async onResized(e) {
-      return this.listen(R.WINDOW_RESIZED, n => {
-        ((n.payload = new k(n.payload)), e(n));
+      return this.listen(S.WINDOW_RESIZED, n => {
+        ((n.payload = new T(n.payload)), e(n));
       });
     }
     async onMoved(e) {
-      return this.listen(R.WINDOW_MOVED, n => {
-        ((n.payload = new I(n.payload)), e(n));
+      return this.listen(S.WINDOW_MOVED, n => {
+        ((n.payload = new R(n.payload)), e(n));
       });
     }
     async onCloseRequested(e) {
-      return this.listen(R.WINDOW_CLOSE_REQUESTED, async n => {
-        const t = new ie(n);
+      return this.listen(S.WINDOW_CLOSE_REQUESTED, async n => {
+        const t = new ae(n);
         (await e(t), t.isPreventDefault() || (await this.destroy()));
       });
     }
     async onDragDropEvent(e) {
-      const n = await this.listen(R.DRAG_ENTER, n => {
-          e({ ...n, payload: { type: "enter", paths: n.payload.paths, position: new I(n.payload.position) } });
+      const n = await this.listen(S.DRAG_ENTER, n => {
+          e({ ...n, payload: { type: "enter", paths: n.payload.paths, position: new R(n.payload.position) } });
         }),
-        t = await this.listen(R.DRAG_OVER, n => {
-          e({ ...n, payload: { type: "over", position: new I(n.payload.position) } });
+        t = await this.listen(S.DRAG_OVER, n => {
+          e({ ...n, payload: { type: "over", position: new R(n.payload.position) } });
         }),
-        i = await this.listen(R.DRAG_DROP, n => {
-          e({ ...n, payload: { type: "drop", paths: n.payload.paths, position: new I(n.payload.position) } });
+        i = await this.listen(S.DRAG_DROP, n => {
+          e({ ...n, payload: { type: "drop", paths: n.payload.paths, position: new R(n.payload.position) } });
         }),
-        r = await this.listen(R.DRAG_LEAVE, n => {
+        r = await this.listen(S.DRAG_LEAVE, n => {
           e({ ...n, payload: { type: "leave" } });
         });
-      return () => {
-        (n(), i(), t(), r());
+      return async () => {
+        await Promise.all([n(), i(), t(), r()]);
       };
     }
     async onFocusChanged(e) {
-      const n = await this.listen(R.WINDOW_FOCUS, n => {
+      const n = await this.listen(S.WINDOW_FOCUS, n => {
           e({ ...n, payload: !0 });
         }),
-        t = await this.listen(R.WINDOW_BLUR, n => {
+        t = await this.listen(S.WINDOW_BLUR, n => {
           e({ ...n, payload: !1 });
         });
-      return () => {
-        (n(), t());
+      return async () => {
+        await Promise.all([n(), t()]);
       };
     }
     async onScaleChanged(e) {
-      return this.listen(R.WINDOW_SCALE_FACTOR_CHANGED, e);
+      return this.listen(S.WINDOW_SCALE_FACTOR_CHANGED, e);
     }
     async onThemeChanged(e) {
-      return this.listen(R.WINDOW_THEME_CHANGED, e);
+      return this.listen(S.WINDOW_THEME_CHANGED, e);
     }
   }
-  var oe, ue, ce, de;
-  function pe(e) {
+  var de, pe, he, we;
+  function _e(e) {
     return null === e
       ? null
       : {
           name: e.name,
           scaleFactor: e.scaleFactor,
-          position: new I(e.position),
-          size: new k(e.size),
-          workArea: { position: new I(e.workArea.position), size: new k(e.workArea.size) },
+          position: new R(e.position),
+          size: new T(e.size),
+          workArea: { position: new R(e.workArea.position), size: new T(e.workArea.size) },
         };
   }
   (!(function (e) {
     ((e.Disabled = "disabled"), (e.Throttle = "throttle"), (e.Suspend = "suspend"));
-  })(oe || (oe = {})),
+  })(de || (de = {})),
     (function (e) {
       ((e.Default = "default"), (e.FluentOverlay = "fluentOverlay"));
-    })(ue || (ue = {})),
+    })(pe || (pe = {})),
     (function (e) {
       ((e.AppearanceBased = "appearanceBased"),
         (e.Light = "light"),
@@ -1448,76 +1445,76 @@ var __TAURI_IIFE__ = (function (e) {
         (e.Tabbed = "tabbed"),
         (e.TabbedDark = "tabbedDark"),
         (e.TabbedLight = "tabbedLight"));
-    })(ce || (ce = {})),
+    })(he || (he = {})),
     (function (e) {
       ((e.FollowsWindowActiveState = "followsWindowActiveState"), (e.Active = "active"), (e.Inactive = "inactive"));
-    })(de || (de = {})));
-  var he = Object.freeze({
+    })(we || (we = {})));
+  var ye = Object.freeze({
     __proto__: null,
-    CloseRequestedEvent: ie,
+    CloseRequestedEvent: ae,
     get Effect() {
-      return ce;
+      return he;
     },
     get EffectState() {
-      return de;
+      return we;
     },
-    LogicalPosition: T,
-    LogicalSize: f,
-    PhysicalPosition: I,
-    PhysicalSize: k,
+    LogicalPosition: E,
+    LogicalSize: A,
+    PhysicalPosition: R,
+    PhysicalSize: T,
     get ProgressBarStatus() {
-      return ne;
+      return re;
     },
     get UserAttentionType() {
-      return ee;
+      return ie;
     },
-    Window: le,
+    Window: ce,
     availableMonitors: async function () {
-      return h("plugin:window|available_monitors").then(e => e.map(pe));
+      return _("plugin:window|available_monitors").then(e => e.map(_e));
     },
     currentMonitor: async function () {
-      return h("plugin:window|current_monitor").then(pe);
+      return _("plugin:window|current_monitor").then(_e);
     },
     cursorPosition: async function () {
-      return h("plugin:window|cursor_position").then(e => new I(e));
+      return _("plugin:window|cursor_position").then(e => new R(e));
     },
-    getAllWindows: se,
-    getCurrentWindow: re,
+    getAllWindows: oe,
+    getCurrentWindow: le,
     monitorFromPoint: async function (e, n) {
-      return h("plugin:window|monitor_from_point", { x: e, y: n }).then(pe);
+      return _("plugin:window|monitor_from_point", { x: e, y: n }).then(_e);
     },
     primaryMonitor: async function () {
-      return h("plugin:window|primary_monitor").then(pe);
+      return _("plugin:window|primary_monitor").then(_e);
     },
   });
-  function we() {
-    return new ge(re(), window.__TAURI_INTERNALS__.metadata.currentWebview.label, { skip: !0 });
+  function ge() {
+    return new ve(le(), window.__TAURI_INTERNALS__.metadata.currentWebview.label, { skip: !0 });
   }
-  async function _e() {
-    return h("plugin:webview|get_all_webviews").then(e =>
-      e.map(e => new ge(new le(e.windowLabel, { skip: !0 }), e.label, { skip: !0 })),
+  async function be() {
+    return _("plugin:webview|get_all_webviews").then(e =>
+      e.map(e => new ve(new ce(e.windowLabel, { skip: !0 }), e.label, { skip: !0 })),
     );
   }
-  const ye = ["tauri://created", "tauri://error"];
-  class ge {
+  const me = ["tauri://created", "tauri://error"];
+  class ve {
     constructor(e, n, t) {
       ((this.window = e),
         (this.label = n),
         (this.listeners = Object.create(null)),
         (null == t ? void 0 : t.skip) ||
-          h("plugin:webview|create_webview", { windowLabel: e.label, options: { ...t, label: n } })
+          _("plugin:webview|create_webview", { windowLabel: e.label, options: { ...t, label: n } })
             .then(async () => this.emit("tauri://created"))
             .catch(async e => this.emit("tauri://error", e)));
     }
     static async getByLabel(e) {
       var n;
-      return null !== (n = (await _e()).find(n => n.label === e)) && void 0 !== n ? n : null;
+      return null !== (n = (await be()).find(n => n.label === e)) && void 0 !== n ? n : null;
     }
     static getCurrent() {
-      return we();
+      return ge();
     }
     static async getAll() {
-      return _e();
+      return be();
     }
     async listen(e, n) {
       return this._handleTauriEvent(e, n)
@@ -1525,7 +1522,7 @@ var __TAURI_IIFE__ = (function (e) {
             const t = this.listeners[e];
             t.splice(t.indexOf(n), 1);
           }
-        : N(e, n, { target: { kind: "Webview", label: this.label } });
+        : C(e, n, { target: { kind: "Webview", label: this.label } });
     }
     async once(e, n) {
       return this._handleTauriEvent(e, n)
@@ -1533,93 +1530,93 @@ var __TAURI_IIFE__ = (function (e) {
             const t = this.listeners[e];
             t.splice(t.indexOf(n), 1);
           }
-        : L(e, n, { target: { kind: "Webview", label: this.label } });
+        : x(e, n, { target: { kind: "Webview", label: this.label } });
     }
     async emit(e, n) {
-      if (!ye.includes(e)) return C(e, n);
+      if (!me.includes(e)) return P(e, n);
       for (const t of this.listeners[e] || []) t({ event: e, id: -1, payload: n });
     }
     async emitTo(e, n, t) {
-      if (!ye.includes(n)) return x(e, n, t);
+      if (!me.includes(n)) return W(e, n, t);
       for (const e of this.listeners[n] || []) e({ event: n, id: -1, payload: t });
     }
     _handleTauriEvent(e, n) {
-      return !!ye.includes(e) && (e in this.listeners ? this.listeners[e].push(n) : (this.listeners[e] = [n]), !0);
+      return !!me.includes(e) && (e in this.listeners ? this.listeners[e].push(n) : (this.listeners[e] = [n]), !0);
     }
     async position() {
-      return h("plugin:webview|webview_position", { label: this.label }).then(e => new I(e));
+      return _("plugin:webview|webview_position", { label: this.label }).then(e => new R(e));
     }
     async size() {
-      return h("plugin:webview|webview_size", { label: this.label }).then(e => new k(e));
+      return _("plugin:webview|webview_size", { label: this.label }).then(e => new T(e));
     }
     async close() {
-      return h("plugin:webview|webview_close", { label: this.label });
+      return _("plugin:webview|webview_close", { label: this.label });
     }
     async setSize(e) {
-      return h("plugin:webview|set_webview_size", { label: this.label, value: e instanceof A ? e : new A(e) });
+      return _("plugin:webview|set_webview_size", { label: this.label, value: e instanceof I ? e : new I(e) });
     }
     async setPosition(e) {
-      return h("plugin:webview|set_webview_position", { label: this.label, value: e instanceof E ? e : new E(e) });
+      return _("plugin:webview|set_webview_position", { label: this.label, value: e instanceof D ? e : new D(e) });
     }
     async setFocus() {
-      return h("plugin:webview|set_webview_focus", { label: this.label });
+      return _("plugin:webview|set_webview_focus", { label: this.label });
     }
     async setAutoResize(e) {
-      return h("plugin:webview|set_webview_auto_resize", { label: this.label, value: e });
+      return _("plugin:webview|set_webview_auto_resize", { label: this.label, value: e });
     }
     async hide() {
-      return h("plugin:webview|webview_hide", { label: this.label });
+      return _("plugin:webview|webview_hide", { label: this.label });
     }
     async show() {
-      return h("plugin:webview|webview_show", { label: this.label });
+      return _("plugin:webview|webview_show", { label: this.label });
     }
     async setZoom(e) {
-      return h("plugin:webview|set_webview_zoom", { label: this.label, value: e });
+      return _("plugin:webview|set_webview_zoom", { label: this.label, value: e });
     }
     async reparent(e) {
-      return h("plugin:webview|reparent", { label: this.label, window: "string" == typeof e ? e : e.label });
+      return _("plugin:webview|reparent", { label: this.label, window: "string" == typeof e ? e : e.label });
     }
     async clearAllBrowsingData() {
-      return h("plugin:webview|clear_all_browsing_data");
+      return _("plugin:webview|clear_all_browsing_data");
     }
     async setBackgroundColor(e) {
-      return h("plugin:webview|set_webview_background_color", { label: this.label, value: e });
+      return _("plugin:webview|set_webview_background_color", { label: this.label, value: e });
     }
     async onDragDropEvent(e) {
-      const n = await this.listen(R.DRAG_ENTER, n => {
-          e({ ...n, payload: { type: "enter", paths: n.payload.paths, position: new I(n.payload.position) } });
+      const n = await this.listen(S.DRAG_ENTER, n => {
+          e({ ...n, payload: { type: "enter", paths: n.payload.paths, position: new R(n.payload.position) } });
         }),
-        t = await this.listen(R.DRAG_OVER, n => {
-          e({ ...n, payload: { type: "over", position: new I(n.payload.position) } });
+        t = await this.listen(S.DRAG_OVER, n => {
+          e({ ...n, payload: { type: "over", position: new R(n.payload.position) } });
         }),
-        i = await this.listen(R.DRAG_DROP, n => {
-          e({ ...n, payload: { type: "drop", paths: n.payload.paths, position: new I(n.payload.position) } });
+        i = await this.listen(S.DRAG_DROP, n => {
+          e({ ...n, payload: { type: "drop", paths: n.payload.paths, position: new R(n.payload.position) } });
         }),
-        r = await this.listen(R.DRAG_LEAVE, n => {
+        r = await this.listen(S.DRAG_LEAVE, n => {
           e({ ...n, payload: { type: "leave" } });
         });
-      return () => {
-        (n(), i(), t(), r());
+      return async () => {
+        await Promise.all([n(), i(), t(), r()]);
       };
     }
   }
-  var be,
-    me,
-    ve = Object.freeze({ __proto__: null, Webview: ge, getAllWebviews: _e, getCurrentWebview: we });
-  function fe() {
-    const e = we();
-    return new Ae(e.label, { skip: !0 });
+  var fe,
+    ke,
+    Ae = Object.freeze({ __proto__: null, Webview: ve, getAllWebviews: be, getCurrentWebview: ge });
+  function Te() {
+    const e = ge();
+    return new Ee(e.label, { skip: !0 });
   }
-  async function ke() {
-    return h("plugin:window|get_all_windows").then(e => e.map(e => new Ae(e, { skip: !0 })));
+  async function Ie() {
+    return _("plugin:window|get_all_windows").then(e => e.map(e => new Ee(e, { skip: !0 })));
   }
-  class Ae {
+  class Ee {
     constructor(e, n = {}) {
       var t;
       ((this.label = e),
         (this.listeners = Object.create(null)),
         (null == n ? void 0 : n.skip) ||
-          h("plugin:webview|create_webview_window", {
+          _("plugin:webview|create_webview_window", {
             options: {
               ...n,
               parent:
@@ -1632,14 +1629,14 @@ var __TAURI_IIFE__ = (function (e) {
     }
     static async getByLabel(e) {
       var n;
-      const t = null !== (n = (await ke()).find(n => n.label === e)) && void 0 !== n ? n : null;
-      return t ? new Ae(t.label, { skip: !0 }) : null;
+      const t = null !== (n = (await Ie()).find(n => n.label === e)) && void 0 !== n ? n : null;
+      return t ? new Ee(t.label, { skip: !0 }) : null;
     }
     static getCurrent() {
-      return fe();
+      return Te();
     }
     static async getAll() {
-      return ke();
+      return Ie();
     }
     async listen(e, n) {
       return this._handleTauriEvent(e, n)
@@ -1647,7 +1644,7 @@ var __TAURI_IIFE__ = (function (e) {
             const t = this.listeners[e];
             t.splice(t.indexOf(n), 1);
           }
-        : N(e, n, { target: { kind: "WebviewWindow", label: this.label } });
+        : C(e, n, { target: { kind: "WebviewWindow", label: this.label } });
     }
     async once(e, n) {
       return this._handleTauriEvent(e, n)
@@ -1655,41 +1652,41 @@ var __TAURI_IIFE__ = (function (e) {
             const t = this.listeners[e];
             t.splice(t.indexOf(n), 1);
           }
-        : L(e, n, { target: { kind: "WebviewWindow", label: this.label } });
+        : x(e, n, { target: { kind: "WebviewWindow", label: this.label } });
     }
     async setBackgroundColor(e) {
-      return h("plugin:window|set_background_color", { label: this.label, value: e }).then(() =>
-        h("plugin:webview|set_webview_background_color", { label: this.label, value: e }),
+      return _("plugin:window|set_background_color", { label: this.label, value: e }).then(() =>
+        _("plugin:webview|set_webview_background_color", { label: this.label, value: e }),
       );
     }
   }
-  ((be = Ae),
-    (me = [le, ge]),
-    (Array.isArray(me) ? me : [me]).forEach(e => {
+  ((fe = Ee),
+    (ke = [ce, ve]),
+    (Array.isArray(ke) ? ke : [ke]).forEach(e => {
       Object.getOwnPropertyNames(e.prototype).forEach(n => {
         var t;
-        ("object" == typeof be.prototype && be.prototype && n in be.prototype) ||
+        ("object" == typeof fe.prototype && fe.prototype && n in fe.prototype) ||
           Object.defineProperty(
-            be.prototype,
+            fe.prototype,
             n,
             null !== (t = Object.getOwnPropertyDescriptor(e.prototype, n)) && void 0 !== t ? t : Object.create(null),
           );
       });
     }));
-  var Te = Object.freeze({ __proto__: null, WebviewWindow: Ae, getAllWebviewWindows: ke, getCurrentWebviewWindow: fe });
+  var Re = Object.freeze({ __proto__: null, WebviewWindow: Ee, getAllWebviewWindows: Ie, getCurrentWebviewWindow: Te });
   return (
-    (e.app = v),
-    (e.core = _),
-    (e.dpi = D),
-    (e.event = O),
-    (e.image = m),
-    (e.menu = J),
-    (e.mocks = K),
-    (e.path = Y),
-    (e.tray = te),
-    (e.webview = ve),
-    (e.webviewWindow = Te),
-    (e.window = he),
+    (e.app = k),
+    (e.core = g),
+    (e.dpi = N),
+    (e.event = F),
+    (e.image = f),
+    (e.menu = K),
+    (e.mocks = ee),
+    (e.path = ne),
+    (e.tray = se),
+    (e.webview = Ae),
+    (e.webviewWindow = Re),
+    (e.window = ye),
     e
   );
 })({});

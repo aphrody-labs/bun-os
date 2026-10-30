@@ -3,11 +3,11 @@ import { gunzipSync } from "node:zlib";
 import { existsSync, readFileSync } from "node:fs";
 import { createInagleSql, type Insertable } from "@rosegriffon/db/inagle-sql";
 import type { Database } from "@rosegriffon/db/schema";
-import { iecodePath, rgWebsitePath } from "../src/core/roots.ts";
+import { iecodePath, webAppPath } from "../src/core/roots.ts";
 
 const sourceCandidates = [
   process.env.CROSS_CATALOG_PATH,
-  rgWebsitePath("data", "cross", "catalog-index.ndjson.gz"),
+  webAppPath("data", "cross", "catalog-index.ndjson.gz"),
   iecodePath("packages", "inagle-cross", "data", "catalog-index.ndjson.gz"),
 ].filter((value): value is string => Boolean(value));
 const source = sourceCandidates.find(value => existsSync(value));

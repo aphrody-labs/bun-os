@@ -29,11 +29,11 @@ use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
-use tauri_plugin_aphrody::autostart::ManagerExt as _;
-use tauri_plugin_aphrody::fs::FsExt as _;
-use tauri_plugin_aphrody::notification::NotificationExt as _;
-use tauri_plugin_aphrody::store::StoreExt as _;
-use tauri_plugin_aphrody::updater::UpdaterExt as _;
+use tauri_plugin_autostart::ManagerExt as _;
+use tauri_plugin_fs::FsExt as _;
+use tauri_plugin_notification::NotificationExt as _;
+use tauri_plugin_store::StoreExt as _;
+use tauri_plugin_updater::UpdaterExt as _;
 
 use crate::parking;
 
@@ -787,7 +787,7 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
     // Installers register the scheme; dev runs and AppImages register it at runtime.
     #[cfg(any(target_os = "linux", all(windows, debug_assertions)))]
     {
-        use tauri_plugin_aphrody::deep_link::DeepLinkExt as _;
+        use tauri_plugin_deep_link::DeepLinkExt as _;
         if let Err(error) = app.deep_link().register_all() {
             log::error!("deep-link registration: {error}");
         }
@@ -796,7 +796,7 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
     // callback); macOS delivers them through the plugin event.
     #[cfg(target_os = "macos")]
     {
-        use tauri_plugin_aphrody::deep_link::DeepLinkExt as _;
+        use tauri_plugin_deep_link::DeepLinkExt as _;
         let handle = app.clone();
         app.deep_link().on_open_url(move |event| {
             let urls = event

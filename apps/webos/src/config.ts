@@ -80,7 +80,7 @@ export function serviceOrigin(role: string): string | undefined {
   return host ? `https://${host}` : undefined;
 }
 
-/** Public browse URL of a repository path such as apps/play. */
+/** Public browse URL of a repository path such as apps/webos. */
 export const sourceUrl = (path: string) =>
   `${ROUTES.source}/${path.split("/").map(encodeURIComponent).join("/")}`;
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Desktop and OS targets: tauri (@aphrody/web-to-tauri, @aphrody/scaffold), webos (Bun.WebView,
-// @aphrody/bun-webview-page), windows (icon through m3-svg-to-ico, bun:windows inspection), os-themes.
+// @aphrody/bun-webview-page), windows (icon through m3-svg-to-ico, registry inspection), os-themes.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -18,11 +18,7 @@ import { cleanup, FIXTURE, tmp } from "./helpers.ts";
 
 afterAll(cleanup);
 
-// `bun:windows` exists only in the aphrody-labs fork (run with C:/bun/build/debug/bun-debug.exe).
-const bunWindows = await import("bun:windows" as string).then(
-  (m: { default?: { isSupported?: boolean } }) => m.default?.isSupported === true,
-  () => false,
-);
+const onWindows = process.platform === "win32";
 
 let ctx: TargetContext;
 let out = "";
@@ -150,7 +146,7 @@ describe("windows", () => {
     60_000,
   );
 
-  test.skipIf(!bunWindows)(
+  test.skipIf(!onWindows)(
     "inspectWindows reads shortcuts, the uninstall entry and the service without writing",
     async () => {
       const report = await inspectWindows({
@@ -167,8 +163,8 @@ describe("windows", () => {
       expect(report.shortcuts.startMenu.path).toEndWith(join("Programs", `m3-bun-absent-${process.pid}.lnk`));
     },
   );
-  test.skipIf(bunWindows)("inspectWindows names the runtime it needs", async () => {
-    await expect(inspectWindows({ name: "x", version: "1" })).rejects.toThrow(/bun:windows|Windows only/);
+  test.skipIf(onWindows)("inspectWindows runs on Windows only", async () => {
+    await expect(inspectWindows({ name: "x", version: "1" })).rejects.toThrow(/Windows only/);
   });
 });
 

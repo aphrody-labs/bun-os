@@ -6,6 +6,7 @@ import { readLock } from "../src/distribution.ts";
 import { abi } from "../packages/package-converter/src/abi.ts";
 import { runProcess } from "@aphrody/bun-workspace/process";
 import { hashFile } from "@aphrody/bun-workspace/hash";
+import { findVisualStudio } from "@aphrody/buncc/msvc";
 
 interface Step {
   cmd?: string[];
@@ -205,23 +206,9 @@ async function prerequisites(plan: NativePlan, flags: Record<string, string>) {
   if (target.id === "wsl-windows") {
     if (await Bun.file(join(source, "UserConfig.cmake")).exists())
       throw new Error("UserConfig.cmake may enable automatic deployment; select a clean build source without it");
-    await run(
-      [
-        process.execPath,
-        "msvc",
-        "--instance",
-        "2022",
-        "--toolset",
-        "v143",
-        "--sdk",
-        "10.0.26100.0",
-        "--arch",
-        "x64",
-        "doctor",
-      ],
-      source,
-      30_000,
-    );
+    // Upstream Bun has no MSVC command: buncc's msvc provider asks vswhere for a Visual Studio with the x64 C++ tools.
+    if (!(await findVisualStudio()))
+      throw new Error("WSL requires Visual Studio with the MSVC v143 x64 tools (vswhere found none)");
     const version = await run(["cmake", "--version"], source, 15_000);
     const match = /cmake version (\d+)\.(\d+)/.exec(version);
     if (!match || Number(match[1]) < 3 || (Number(match[1]) === 3 && Number(match[2]) < 25))

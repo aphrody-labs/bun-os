@@ -140,16 +140,16 @@ Serveur exécuté sur `http://127.0.0.1:1421` (ou configuré via `PORT`/`HOST`) 
 
 ### 3.2 `/api/tauri/invoke`
 - **Méthode** : `POST`
-- **Description** : Dispatcher universel de commandes natives Tauri pour exécution transparente en mode web standalone (`aphrody_meta`, `aphrody_hardware_telemetry`, `aphrody_model_*`, `aphrody_fs_*`, `aphrody_shenron_chat`, `koharu_rpc`, `aphrody_rpc`).
+- **Description** : Dispatcher universel de commandes natives Tauri pour exécution transparente en mode web standalone (`aphrody_meta`, `aphrody_hardware_telemetry`, `aphrody_model_*`, `aphrody_fs_*`, `koharu_rpc`, `aphrody_rpc`).
 - **Corps de requête** : `{ "cmd": "nom_commande", "args": { ... } }`
 
 ### 3.3 `/api/apps`
 - **Méthode** : `GET`
-- **Description** : Retourne l'inventaire structuré de tout l'écosystème unifié (`aphrody-app`, `koharu-editor`, `rg-website`, `shenron-site`, `cli`, `m3-framework`).
+- **Description** : Retourne l'inventaire structuré de tout l'écosystème unifié (`aphrody-app`, `koharu-editor`, `cli`, `m3-framework`).
 
 ### 3.4 `/api/capabilities`
 - **Méthode** : `GET`
-- **Description** : Reflète l'état réel et dynamique des 8 sous-systèmes du backend natif Aphrody (`ffi`, `appServer`, `kernel`, `drive`, `koharu`, `shenron`, `shell`, `cli`).
+- **Description** : Reflète l'état réel et dynamique des 7 sous-systèmes du backend natif Aphrody (`ffi`, `appServer`, `kernel`, `drive`, `koharu`, `shell`, `cli`).
 
 ### 3.5 `/api/i18n` et `/api/i18n/:lang`
 - **Méthode** : `GET`

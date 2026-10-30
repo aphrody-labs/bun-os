@@ -20,7 +20,7 @@
     "test:dom": "bun test --preload @aphrody/m3-config/test/dom ./test-dom"
   },
   "dependencies": {
-    "@aphrody/ag-ui": "workspace:*",
+    "@aphrody/app-ui": "workspace:*",
     "@aphrody/assets": "workspace:*",
     "@aphrody/canvas": "workspace:*",
     "@aphrody/eslint-plugin-m3": "workspace:*",
@@ -54,12 +54,12 @@
     "react-hook-form": "catalog:"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "catalog:",
+    "bun-types": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "playwright-core": "catalog:"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

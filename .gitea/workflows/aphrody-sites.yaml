@@ -1,3 +1,5 @@
+# Self-hosted: runs only on the Gitea runner label aphrody-bun-linux (VPS), which provides BUN_EXECUTABLE (pinned upstream Bun),
+# the git-ssh transport under /run/aphrody/git-ssh and the /cache volume. GitHub-hosted CI is .github/workflows/ci.yml.
 name: Aphrody Sites
 
 on:
@@ -59,11 +61,10 @@ jobs:
           # ones already present in the workspace are refreshed on a best-effort basis (vendor/qemu and the
           # like pin commits their upstreams no longer serve).
           git submodule update --init --jobs 4
-          git submodule update --init --recursive --jobs 4 toolchains/bun || echo "nested submodules of toolchains/bun left as they are"
-      - name: Select pinned Aphrody Bun runtime
+      - name: Select pinned upstream Bun runtime
         run: |
           test -x "$BUN_EXECUTABLE"
-          "$BUN_EXECUTABLE" --revision
+          "$BUN_EXECUTABLE" scripts/assert-runtime-pin.ts
           printf '%s\n' "${BUN_EXECUTABLE%/*}" >> "$GITHUB_PATH"
       - name: Install workspace
         run: |

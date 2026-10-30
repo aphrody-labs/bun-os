@@ -1,6 +1,6 @@
 /**
  * @file index.ts
- * @description Master entry point for @rosegriffon/inagle/docs.
+ * @description Master entry point for @aphrody/inagle/docs.
  * Exports OpenAPI 3.1 specifications, VFS architecture catalog, nie.exe reverse-engineering maps,
  * Answer.AI llms.txt models, and static documentation exporters.
  */
@@ -13,9 +13,6 @@ export * from "./vfs-catalog.js";
 export * from "./nie-re-map.js";
 export * from "./openapi.js";
 export * from "./llm-docs.js";
-export * from "./fork-capabilities.js";
-
-import { generateForkCapabilityArtifacts, type ForkDocumentation } from "./fork-capabilities.js";
 
 import { generateOpenApiJson, generateOpenApiYaml } from "./openapi.js";
 import { generateLlmsFullTxt, generateLlmsTxt } from "./llm-docs.js";
@@ -213,7 +210,7 @@ export function generateCrossLanguageArchitectureMarkdown(): string {
 +---------------------------------------------------------------------------------+
 |                       USER INTERFACES & WORKSPACE CONSUMERS                     |
 |  - CLI: \`inagle <command>\`                                                      |
-|  - Web Application: \`apps/azalee-web\` in aphrody-labs/rosegriffon                 |
+|  - Web Application: external web consumers (separate repositories)                 |
 |  - Shared Components: \`packages/ieverse\`                                       |
 +---------------------------------------+-----------------------------------------+
                                         |
@@ -258,9 +255,9 @@ export function generateCrossLanguageArchitectureMarkdown(): string {
 ## 3. High-Performance TypeScript Usage
 
 \`\`\`typescript
-import { Inagle } from "@rosegriffon/inagle";
-import { nieCrc32, nieDecompressCrilayla, nieProbeHeader } from "@rosegriffon/inagle/ffi";
-import { IecodeDotnet } from "@rosegriffon/inagle/dotnet";
+import { Inagle } from "@aphrody/inagle";
+import { nieCrc32, nieDecompressCrilayla, nieProbeHeader } from "@aphrody/inagle/ffi";
+import { IecodeDotnet } from "@aphrody/inagle/dotnet";
 
 // 1. Instant header probe
 const probe = nieProbeHeader(rawBuffer);
@@ -279,7 +276,7 @@ await IecodeDotnet.extractCpk("data/packs/common.cpk", "dist/common");
  * Generates the README.md content for packages/inagle/docs.
  */
 export function generateDocsReadmeMarkdown(): string {
-  return `# @rosegriffon/inagle/docs
+  return `# @aphrody/inagle/docs
 
 Universal technical documentation, OpenAPI 3.1 specifications, VFS architecture catalog,
 and \`nie.exe\` reverse-engineering reference for **Inazuma Eleven: Victory Road**.
@@ -313,7 +310,7 @@ import {
   getNieReMap,
   VFS_FORMATS,
   NIE_CRITICAL_OFFSETS
-} from "@rosegriffon/inagle/docs";
+} from "@aphrody/inagle/docs";
 
 // Query VFS formats
 const formats = VFS_FORMATS;
@@ -328,7 +325,7 @@ const spec = generateOpenApiSpec();
 /**
  * Writes all static documentation artifacts to a target directory.
  */
-export async function exportDocsToDirectory(outDir: string, fork?: ForkDocumentation): Promise<string[]> {
+export async function exportDocsToDirectory(outDir: string): Promise<string[]> {
   await fs.mkdir(outDir, { recursive: true });
 
   const files: Record<string, string> = {
@@ -340,7 +337,6 @@ export async function exportDocsToDirectory(outDir: string, fork?: ForkDocumenta
     "CROSS-LANGUAGE-ARCHITECTURE.md": generateCrossLanguageArchitectureMarkdown(),
     "llms.txt": generateLlmsTxt(),
     "llms-full.txt": generateLlmsFullTxt(),
-    ...(fork ? generateForkCapabilityArtifacts(fork) : {}),
   };
 
   const writtenFiles: string[] = [];

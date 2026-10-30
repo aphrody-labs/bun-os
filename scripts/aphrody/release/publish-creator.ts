@@ -15,7 +15,7 @@
  *   --compile-executable-path <bun-windows-x64.exe>
  *                            Windows runtime matching the running Bun, when --target cannot download one
  *
- * Runbook: docs/aphrody/operations/infra/CREATOR.md. Remote commands go through OpenSSH in batch mode.
+ * Remote commands go through OpenSSH in batch mode.
  */
 import { createHash } from "node:crypto";
 import { cp, mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
@@ -41,7 +41,7 @@ const HOST = (() => {
   return host;
 })();
 /**
- * A Windows x64 Bun of the same build as the compiling Bun (a release pair of aphrody-labs/bun) when the target
+ * A Windows x64 Bun of the same build as the compiling Bun (a release pair of the former Bun fork) when the target
  * runtime cannot be downloaded for this version, as for canary builds of the fork.
  */
 const WINDOWS_RUNTIME = (() => {

@@ -71,7 +71,7 @@ linked inline. The implementations live in the owners named in each section.
 
 - **Bevy:** Bevy 0.20.0 (2026-10-08) depends on wgpu ^30, the workspace GPU backend. Bevy is
   absorbed into this repository and becomes the Bun Engine runtime.
-- **NGINX:** `bun:nginx` drives the pinned NGINX (`vendor/nginx` 1.31.6 + `ngx-rust` Rust
+- **NGINX:** (fork-only, not available on upstream Bun) `bun:nginx` drives the pinned NGINX (`vendor/nginx` 1.31.6 + `ngx-rust` Rust
   module). The distro nginx on the VPS has no `stream` module, so play.aphrody.app terminates
   TLS in the distro nginx and proxies to the Bun-owned engine on loopback.
 - **Mesa:** Mesa refuses LTO builds ("Building Mesa with LTO is not supported").

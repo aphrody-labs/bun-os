@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Explorer backend: indexed search and volume tree on top of `aphrody-fsindex`.
 //!
-//! The file explorer UI is owned by `aphrody-drive` (FSL, hosted as a plugin in `lib.rs`). This
+//! The file explorer UI is owned by `packages/app-ui` and the Spacedrive file service (`vendor/spacedrive`). This
 //! module only adds host-side commands that consume the Apache-2.0 `aphrody-fsindex` crate, so the
 //! unified explorer surface gets a fast search/tree backend without any source crossing the
 //! licence boundary. Everything here is metadata only (path, name, kind, hidden flag, size, mtime):

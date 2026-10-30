@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://rosegriffon.fr/schemas/vfs/cpk.schema.json",
+  "$id": "https://aphrody.com/schemas/vfs/cpk.schema.json",
   "title": "CpkArchiveSchema",
   "description": "Validation schema for CRI Middleware CPK package file structure and @UTF directory listing.",
   "type": "object",

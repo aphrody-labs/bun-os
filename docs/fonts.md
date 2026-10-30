@@ -3,7 +3,7 @@
 Bun OS now owns the distribution workspace integration of the shared Craft font
 crates and assets. The crates are members of the root Cargo workspace:
 `crates/craft-fonts` owns the manifest, runtime lookup and optional embedding;
-`crates/craft-fonts-tests` verifies font bytes, licenses, names and coverage.
+`crates/craft-fonts/tests` verifies font bytes, licenses, names and coverage.
 Assets and their individual licenses live under `fonts/`; source pins, hashes and
 attribution are recorded in `fonts/manifest.txt` and `ATTRIBUTION.md`.
 

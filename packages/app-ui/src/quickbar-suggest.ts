@@ -74,7 +74,7 @@ export const CANONICAL_NAVIGATION_TARGETS: NavigationSuggestion[] = [
     kind: "navigation",
     id: "nav-files",
     label: "Aller aux fichiers",
-    description: "Explorateur de fichiers Spacedrive VDFS",
+    description: "Explorateur de fichiers (service Spacedrive)",
     route: desktopRoutes.files,
     icon: "folder_open",
     keywords: ["fichiers", "files", "explorer", "dossier", "spacedrive", "documents"],

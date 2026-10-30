@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.0-alpha.4]
+
+### Dependencies
+
+- Upgraded to `tauri-utils@3.0.0-alpha.4`
+
 ## [3.0.0-alpha.3]
 
 ### Dependencies
@@ -51,6 +57,18 @@
 ### Dependencies
 
 - Upgraded to `tauri-utils@3.0.0-alpha.0`
+
+## [2.7.3]
+
+### Dependencies
+
+- Upgraded to `tauri-utils@2.10.2`
+
+## [2.7.2]
+
+### Dependencies
+
+- [`fd319dd43`](https://www.github.com/tauri-apps/tauri/commit/fd319dd432e36748483ae93e6cdea1c44a66fe79) Update `base64` to 0.23.
 
 ## [2.7.1]
 

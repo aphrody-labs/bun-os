@@ -10,7 +10,7 @@
 use tauri::{AppHandle, Manager, PhysicalPosition, Runtime, WebviewWindow};
 
 use crate::parking;
-use tauri_plugin_aphrody::global_shortcut::{GlobalShortcutExt, ShortcutState};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
 /// Label of the quick ask window in `tauri.conf.json`.
 pub const LABEL: &str = "quickbar";

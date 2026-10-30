@@ -860,9 +860,7 @@ export function renderPlan(s: Status, majors: string[]): string[] {
   out.push(
     "6 verify    bun:check, monorepo:layout, workspace tests, typecheck of every package whose resolved deps changed",
   );
-  out.push(
-    "7 fork      the runtime pin follows the aphrody-labs/bun releases (tools/config/update/pins.json); fork drift: `yolo update sources forks`",
-  );
+  out.push("7 fork      the runtime pin follows the oven-sh/bun releases (tools/config/update/pins.json)");
   return out;
 }
 

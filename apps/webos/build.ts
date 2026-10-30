@@ -223,6 +223,8 @@ const result = await Bun.build({
     join(import.meta.dir, "src/main.ts"),
     join(import.meta.dir, "src/sw.ts"),
     join(import.meta.dir, "src/boot.ts"),
+    // Worker of the Terminal's Alpine guest (/guest-worker.js), see packages/webos-wasm/src/guest.ts
+    join(root, "packages/webos-wasm/src/guest-worker.ts"),
   ],
   outdir: dist,
   target: "browser",
@@ -246,6 +248,8 @@ await cp(
   join(wasmDir, "aphrody_webos_wasm_bg.wasm"),
   join(dist, "wasm/aphrody_webos_wasm_bg.wasm"),
 );
+// fend (MIT): the Calculator engine, instantiated by apps/calculator via apps/fend.ts.
+await cp(join(root, "node_modules/fend-wasm/fend_wasm_bg.wasm"), join(dist, "wasm/fend_wasm_bg.wasm"));
 await cp(join(root, "LICENSE-APACHE"), join(dist, "wasm/LICENSE-APACHE"));
 // @aphrody/m3-fonts: Google Sans Flex / Code, Roboto Flex / Mono (Settings > Font) and the full Material Symbols
 // Rounded font (catalog apps name any icon, so not the default subset of fonts-symbols.css).
@@ -283,7 +287,7 @@ await Bun.write(
     .replaceAll("../fonts/web/", "/fonts/")
     .replaceAll("../fonts/upstream/material-symbols/", "/fonts/"),
 );
-// Brand: the Aphrody logo of apps/aphrody-app; file and device icons: packages/assets (SpaceUI/Spacedrive set).
+// Brand: the Aphrody logo of apps/aphrody-app; file and device icons: packages/assets (SpaceUI set).
 await mkdir(join(dist, "brand"), { recursive: true });
 await mkdir(join(dist, "icons"), { recursive: true });
 for (const [from, to] of [

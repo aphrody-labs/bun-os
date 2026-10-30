@@ -4,7 +4,9 @@
   "identifier": "dev.aphrody.desktop",
   "build": {
     "devUrl": "http://localhost:1421",
-    "frontendDist": "ui-dist"
+    "frontendDist": "ui-dist",
+    "beforeDevCommand": "bun run --cwd ../../packages/app-ui dev",
+    "beforeBuildCommand": "bun ../../packages/app-ui/build.ts --out ui-dist"
   },
   "app": {
     "withGlobalTauri": true,
@@ -21,8 +23,8 @@
         "fullscreen": false,
         "center": true,
         "decorations": false,
-        "visible": true,
-        "backgroundColor": "#111318"
+        "transparent": true,
+        "visible": true
       },
       {
         "label": "splash",

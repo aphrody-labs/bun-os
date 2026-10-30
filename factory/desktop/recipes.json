@@ -1,0 +1,530 @@
+{
+  "schemaVersion": 1,
+  "kind": "buncc-desktop-recipes",
+  "verified": "2026-10-29",
+  "note": "Pinned recipes for `buncc desktop`. `track` says how `buncc desktop plan --pin` resolves the newest stable upstream tag; `pin` is the resolved tag and commit that `fetch` verifies. Decisions: docs/BUNCC-DESKTOP.md.",
+  "targets": {
+    "x86_64-pc-windows-msvc": {
+      "kind": "msvc",
+      "arch": "x64",
+      "cross": false
+    },
+    "aarch64-pc-windows-msvc": {
+      "kind": "msvc",
+      "arch": "arm64",
+      "cross": true,
+      "needs": "MSVC ARM64 libraries (VC.Tools.ARM64) or cargo-xwin splat"
+    },
+    "x86_64-pc-windows-gnullvm": {
+      "kind": "llvm-mingw",
+      "triple": "x86_64-w64-mingw32",
+      "cross": true
+    },
+    "aarch64-pc-windows-gnullvm": {
+      "kind": "llvm-mingw",
+      "triple": "aarch64-w64-mingw32",
+      "cross": true
+    }
+  },
+  "tools": {
+    "meson": {
+      "source": "pypi",
+      "name": "meson",
+      "version": "1.12.1",
+      "why": "GNOME build system; WrapDB and project wraps resolve through it"
+    },
+    "ninja": {
+      "source": "pypi",
+      "name": "ninja",
+      "version": "1.13.0",
+      "why": "Kitware-compatible ninja wheel, one DAG for the whole stack"
+    },
+    "pkgconf": {
+      "source": "git",
+      "repo": "https://github.com/pkgconf/pkgconf",
+      "tag": "pkgconf-3.0.10",
+      "sha": "511e6e6b8c82367e75d02edb56ad98da766e06b6",
+      "build": "meson"
+    },
+    "win-flex-bison": {
+      "source": "zip",
+      "url": "https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip",
+      "sha256": "8d324b62be33604b2c45ad1dd34ab93d722534448f55a16ca7292de32b6ac135"
+    },
+    "gettext": {
+      "source": "zip",
+      "url": "https://github.com/mlocati/gettext-iconv-windows/releases/download/v1.0-v1.19/gettext1.0-iconv1.19-static-64.zip",
+      "sha256": "2b999bc37b56fa052ff98578e9cb188152009f634e3a66aa8ff263a016e9c466",
+      "why": "msgfmt/xgettext for KI18n and ECM translations"
+    }
+  },
+  "packages": [
+    {
+      "id": "glib",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/GNOME/glib",
+      "track": {
+        "pattern": "^(\\d+)\\.(\\d*[02468])\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "2.90.1",
+        "sha": "e05063ccc6c8f222465a1080927f4c14349f3de6"
+      },
+      "deps": [],
+      "options": [
+        "-Dtests=false",
+        "-Dnls=disabled",
+        "-Dintrospection=disabled",
+        "-Dglib_debug=disabled",
+        "-Dman-pages=disabled",
+        "-Dsysprof=disabled",
+        "-Dlibelf=disabled"
+      ],
+      "wraps": "its own subprojects/*.wrap (libffi, pcre2, zlib, proxy-libintl, gvdb)"
+    },
+    {
+      "id": "fribidi",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/fribidi/fribidi",
+      "track": {
+        "pattern": "^v(\\d+)\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v1.0.17",
+        "sha": "b93119f5fdc7ea47672cc304c1455ffa6dfe7536"
+      },
+      "deps": [],
+      "options": ["-Ddocs=false", "-Dbin=false", "-Dtests=false"]
+    },
+    {
+      "id": "harfbuzz",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/harfbuzz/harfbuzz",
+      "track": {
+        "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "15.0.0",
+        "sha": "35f656a1a2bab548ea7f54a6dd3fba2b09680d14"
+      },
+      "deps": ["glib"],
+      "options": [
+        "-Dtests=disabled",
+        "-Ddocs=disabled",
+        "-Dglib=enabled",
+        "-Dgobject=enabled",
+        "-Dfreetype=enabled",
+        "-Dcairo=disabled",
+        "-Dicu=disabled",
+        "-Dintrospection=disabled",
+        "-Dutilities=disabled",
+        "-Ddirectwrite=disabled"
+      ]
+    },
+    {
+      "id": "cairo",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://gitlab.freedesktop.org/cairo/cairo.git",
+      "track": {
+        "pattern": "^(\\d+)\\.(\\d*[02468])\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "1.18.6",
+        "sha": "018b3424a10ecd37450360f21454ecf0f3007e17"
+      },
+      "deps": ["glib"],
+      "options": [
+        "-Dtests=disabled",
+        "-Dfontconfig=disabled",
+        "-Dfreetype=enabled",
+        "-Dpng=enabled",
+        "-Dzlib=enabled",
+        "-Dglib=enabled",
+        "-Dspectre=disabled",
+        "-Dgtk_doc=false",
+        "-Dxlib=disabled",
+        "-Dxcb=disabled",
+        "-Dsymbol-lookup=disabled"
+      ],
+      "wraps": "cairo subprojects: pixman, freetype2, libpng, zlib"
+    },
+    {
+      "id": "pango",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/GNOME/pango",
+      "track": {
+        "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "1.58.2",
+        "sha": "d360f14004e4a4824f2352f6e2722016f9a51dd6"
+      },
+      "deps": ["glib", "fribidi", "harfbuzz", "cairo"],
+      "options": [
+        "-Dintrospection=disabled",
+        "-Dfontconfig=disabled",
+        "-Dbuild-testsuite=false",
+        "-Dbuild-examples=false",
+        "-Ddocumentation=false",
+        "-Dlibthai=disabled",
+        "-Dxft=disabled",
+        "-Dcairo=enabled"
+      ]
+    },
+    {
+      "id": "gdk-pixbuf",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/GNOME/gdk-pixbuf",
+      "track": {
+        "pattern": "^(2)\\.(44)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "2.44.8",
+        "sha": "0bd66153abb6bd548febb82337db79cbefe694b0"
+      },
+      "deps": ["glib"],
+      "options": [
+        "-Dtests=false",
+        "-Dinstalled_tests=false",
+        "-Dintrospection=disabled",
+        "-Ddocumentation=false",
+        "-Dman=false",
+        "-Dthumbnailer=disabled",
+        "-Dothers=disabled",
+        "-Dgio_sniffing=false",
+        "-Dpng=enabled",
+        "-Djpeg=disabled",
+        "-Dtiff=disabled",
+        "-Dglycin=disabled"
+      ]
+    },
+    {
+      "id": "graphene",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/ebassi/graphene",
+      "track": {
+        "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "1.10.8",
+        "sha": "4e2578450809c2099400cf85caf18eafcd7100aa"
+      },
+      "deps": ["glib"],
+      "options": [
+        "-Dtests=false",
+        "-Dinstalled_tests=false",
+        "-Dgobject_types=true",
+        "-Dintrospection=disabled",
+        "-Dgtk_doc=false"
+      ]
+    },
+    {
+      "id": "libepoxy",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/anholt/libepoxy",
+      "track": {
+        "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "1.5.10",
+        "sha": "c84bc9459357a40e46e2fec0408d04fbdde2c973"
+      },
+      "deps": [],
+      "options": ["-Dtests=false", "-Degl=no", "-Dglx=no", "-Dx11=false"]
+    },
+    {
+      "id": "gtk4",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/GNOME/gtk",
+      "track": {
+        "pattern": "^4\\.(\\d*[02468])\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "4.24.1",
+        "sha": "2ea935e3ec680fb122f245b28e18c3495df8c344"
+      },
+      "deps": ["glib", "pango", "cairo", "gdk-pixbuf", "graphene", "libepoxy", "harfbuzz", "fribidi"],
+      "options": [
+        "-Dbuild-demos=false",
+        "-Dbuild-tests=false",
+        "-Dbuild-testsuite=false",
+        "-Dbuild-examples=false",
+        "-Dmedia-gstreamer=disabled",
+        "-Dvulkan=disabled",
+        "-Dintrospection=disabled",
+        "-Ddocumentation=false",
+        "-Dman-pages=false",
+        "-Dprint-cups=disabled",
+        "-Dwin32-backend=true",
+        "-Daccesskit=disabled"
+      ]
+    },
+    {
+      "id": "libadwaita",
+      "group": "gtk4",
+      "build": "meson",
+      "repo": "https://github.com/GNOME/libadwaita",
+      "track": {
+        "pattern": "^1\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "1.10.0",
+        "sha": "c9ab118612eee92324143783c4641c98eaded3f0"
+      },
+      "deps": ["gtk4"],
+      "options": [
+        "-Dintrospection=disabled",
+        "-Dvapi=false",
+        "-Dtests=false",
+        "-Dexamples=false",
+        "-Ddocumentation=false",
+        "-Dappstream=disabled"
+      ]
+    },
+    {
+      "id": "qtbase",
+      "group": "qt6",
+      "build": "cmake",
+      "repo": "https://github.com/qt/qtbase",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$",
+        "lts": "^v6\\.8\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.12.0",
+        "sha": "025bdad181de241e81bf853c8a2d7bf3d19261a9"
+      },
+      "lts": {
+        "tag": "v6.8.3",
+        "sha": "c07c2d5a527a644d36e7853d55132ae38921682f"
+      },
+      "deps": [],
+      "options": [
+        "-DQT_BUILD_EXAMPLES=OFF",
+        "-DQT_BUILD_TESTS=OFF",
+        "-DQT_BUILD_BENCHMARKS=OFF",
+        "-DBUILD_SHARED_LIBS=ON",
+        "-DFEATURE_sql=OFF",
+        "-DFEATURE_dbus=OFF",
+        "-DFEATURE_testlib=OFF",
+        "-DFEATURE_printsupport=OFF",
+        "-DFEATURE_system_pcre2=OFF",
+        "-DFEATURE_system_zlib=OFF",
+        "-DFEATURE_system_freetype=OFF",
+        "-DFEATURE_system_harfbuzz=OFF",
+        "-DFEATURE_system_png=OFF",
+        "-DFEATURE_system_jpeg=OFF",
+        "-DFEATURE_system_doubleconversion=OFF",
+        "-DFEATURE_system_sqlite=OFF"
+      ],
+      "note": "qtbase vendors zlib/harfbuzz/freetype/pcre2/libpng; system_* features are forced OFF so GLib/GTK headers in the shared prefix are never picked up"
+    },
+    {
+      "id": "qtshadertools",
+      "group": "qt6",
+      "build": "cmake",
+      "repo": "https://github.com/qt/qtshadertools",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.12.0",
+        "sha": "bccd516b990a6396900051470ac86cc27a7042ea"
+      },
+      "deps": ["qtbase"],
+      "options": ["-DQT_BUILD_EXAMPLES=OFF", "-DQT_BUILD_TESTS=OFF"]
+    },
+    {
+      "id": "qttools",
+      "group": "qt6",
+      "build": "cmake",
+      "repo": "https://github.com/qt/qttools",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.12.0",
+        "sha": "613a6fbf0a7998010ab2fda260b64066d66a021d"
+      },
+      "deps": ["qtbase"],
+      "options": [
+        "-DQT_BUILD_EXAMPLES=OFF",
+        "-DQT_BUILD_TESTS=OFF",
+        "-DFEATURE_assistant=OFF",
+        "-DFEATURE_designer=OFF",
+        "-DFEATURE_qdoc=OFF",
+        "-DFEATURE_pixeltool=OFF",
+        "-DFEATURE_qtdiag=OFF",
+        "-DFEATURE_qtplugininfo=OFF",
+        "-DFEATURE_distancefieldgenerator=OFF",
+        "-DFEATURE_kmap2qmap=OFF",
+        "-DFEATURE_qtattributionsscanner=OFF",
+        "-DFEATURE_linguist=ON"
+      ],
+      "note": "LinguistTools (lrelease/lupdate) is what ECMPoQmTools needs"
+    },
+    {
+      "id": "qtdeclarative",
+      "group": "qt6",
+      "build": "cmake",
+      "repo": "https://github.com/qt/qtdeclarative",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.12.0",
+        "sha": "4332fbbb4c340463dc8cee36dda0c85d932122d8"
+      },
+      "deps": ["qtbase", "qtshadertools"],
+      "options": [
+        "-DQT_BUILD_EXAMPLES=OFF",
+        "-DQT_BUILD_TESTS=OFF",
+        "-DFEATURE_qml_network=OFF",
+        "-DFEATURE_quick_designer=OFF",
+        "-DFEATURE_quick_shadereffect=OFF",
+        "-DFEATURE_quickcontrols2_imagine=OFF",
+        "-DFEATURE_quickcontrols2_material=OFF",
+        "-DFEATURE_quickcontrols2_universal=OFF",
+        "-DFEATURE_quickcontrols2_fusion=OFF",
+        "-DFEATURE_quickcontrols2_fluentwinui3=OFF",
+        "-DFEATURE_quickcontrols2_windows=OFF"
+      ]
+    },
+    {
+      "id": "ecm",
+      "group": "kf6",
+      "build": "cmake",
+      "repo": "https://github.com/KDE/extra-cmake-modules",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.31.0",
+        "sha": "2958379fb49c71129f119ec17f88df0b5ea21550"
+      },
+      "deps": [],
+      "options": ["-DBUILD_HTML_DOCS=OFF", "-DBUILD_MAN_DOCS=OFF", "-DBUILD_QTHELP_DOCS=OFF", "-DBUILD_TESTING=OFF"]
+    },
+    {
+      "id": "kcoreaddons",
+      "group": "kf6",
+      "build": "cmake",
+      "repo": "https://github.com/KDE/kcoreaddons",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.31.0",
+        "sha": "911a815687a14389895df3e658235de2450bc294"
+      },
+      "deps": ["ecm", "qtbase", "qttools", "qtdeclarative"],
+      "options": [
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_QCH=OFF",
+        "-DBUILD_PYTHON_BINDINGS=OFF",
+        "-DUSE_DBUS=OFF",
+        "-DKCOREADDONS_USE_QML=OFF"
+      ]
+    },
+    {
+      "id": "ki18n",
+      "group": "kf6",
+      "build": "cmake",
+      "repo": "https://github.com/KDE/ki18n",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.31.0",
+        "sha": "df98b98f001721f83ebf3e36b73e346f6d29670a"
+      },
+      "deps": ["ecm", "qtbase", "qttools", "qtdeclarative"],
+      "options": ["-DBUILD_TESTING=OFF", "-DBUILD_QCH=OFF", "-DBUILD_PYTHON_BINDINGS=OFF"],
+      "needsTools": ["gettext"],
+      "note": "needs msgfmt/xgettext (mlocati gettext-iconv-windows) and Qt6 Qml/Core5Compat only when QML is on"
+    },
+    {
+      "id": "plasma-workspace",
+      "group": "plasma-libs",
+      "build": "cmake",
+      "repo": "https://github.com/KDE/plasma-workspace",
+      "track": {
+        "pattern": "^v6\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v6.8.2",
+        "sha": "30beb0095873364c6b34ebcfd292ecafd4db7f61"
+      },
+      "deps": ["ecm", "qtbase", "qttools", "kcoreaddons", "ki18n"],
+      "options": ["-DBUILD_TESTING=OFF"],
+      "status": "plan-only",
+      "note": "Linux-centric (KWin, Wayland, systemd); only libs that ship Windows support are buildable. Verified only as a plan node."
+    },
+    {
+      "id": "kate",
+      "group": "apps",
+      "build": "cmake",
+      "repo": "https://github.com/KDE/kate",
+      "track": {
+        "pattern": "^v(\\d+)\\.(\\d+)\\.(\\d+)$"
+      },
+      "pin": {
+        "tag": "v26.08.2",
+        "sha": "2b6465a886b9d3bfc6eab25065c14ffe025e6ac3"
+      },
+      "deps": ["ecm", "qtbase", "qttools", "kcoreaddons", "ki18n"],
+      "options": ["-DBUILD_TESTING=OFF"],
+      "status": "plan-only",
+      "note": "KDE Gear app; example for `build app:kate`. KDE ships Windows builds of it through Craft, so the dependency closure is known to exist."
+    },
+    {
+      "id": "hello-gtk4",
+      "group": "samples",
+      "build": "meson",
+      "local": "factory/desktop/hello/gtk4",
+      "deps": ["gtk4"],
+      "options": []
+    },
+    {
+      "id": "hello-qt",
+      "group": "samples",
+      "build": "cmake",
+      "local": "factory/desktop/hello/qt",
+      "deps": ["qtbase"],
+      "options": []
+    },
+    {
+      "id": "hello-qml",
+      "group": "samples",
+      "build": "cmake",
+      "local": "factory/desktop/hello/qml",
+      "deps": ["qtdeclarative"],
+      "options": []
+    },
+    {
+      "id": "hello-kcoreaddons",
+      "group": "samples",
+      "build": "cmake",
+      "local": "factory/desktop/hello/kcoreaddons",
+      "deps": ["kcoreaddons"],
+      "options": []
+    }
+  ],
+  "groups": {
+    "gtk4": ["glib", "fribidi", "harfbuzz", "cairo", "pango", "gdk-pixbuf", "graphene", "libepoxy", "gtk4"],
+    "libadwaita": ["gtk4", "libadwaita"],
+    "qt6": ["qtbase", "qtshadertools", "qttools", "qtdeclarative"],
+    "kf6": ["qtbase", "qtshadertools", "qttools", "qtdeclarative", "ecm", "kcoreaddons", "ki18n"],
+    "plasma-libs": ["kf6", "plasma-workspace"],
+    "samples": ["hello-gtk4", "hello-qt", "hello-qml", "hello-kcoreaddons"]
+  }
+}

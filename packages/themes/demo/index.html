@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@aphrody/themes demo</title>
+    <script src="./boot.js"></script>
+    <link rel="stylesheet" href="./themes.css" />
+    <style>
+      html, body { margin: 0; height: 100%; }
+      html[data-still] *, html[data-still] *::after { transition: none !important; }
+      body { font: 400 var(--t-text-body-size) / var(--t-text-body-line) var(--t-font-ui); color: var(--t-fg); background: var(--t-bg); }
+      .stage { min-height: 100%; padding: 28px; box-sizing: border-box; background:
+        radial-gradient(60% 70% at 15% 10%, color-mix(in srgb, var(--t-accent) 45%, transparent), transparent 70%),
+        radial-gradient(50% 60% at 90% 90%, color-mix(in srgb, var(--t-success) 35%, transparent), transparent 70%), var(--t-bg-alt); }
+      .win { max-width: 760px; margin: 0 auto; overflow: hidden; }
+      .titlebar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--t-divider); }
+      .titlebar .title { font-weight: 600; }
+      .body { padding: 18px; display: grid; gap: 14px; }
+      .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+      h1 { margin: 0; font: 600 var(--t-text-title-size) / var(--t-text-title-line) var(--t-font-display); }
+      .muted { color: var(--t-fg-muted); }
+      .chips { display: flex; gap: 6px; }
+      .swatch { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--t-border-strong); cursor: pointer; padding: 0; }
+      .tabs button[aria-pressed="true"] { background: var(--t-accent-container); color: var(--t-on-accent-container); }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="t-glass win" id="win">
+        <div class="titlebar">
+          <div class="t-window-controls"><button data-role="close" aria-label="Close">✕</button><button data-role="minimize" aria-label="Minimize">–</button><button data-role="maximize" aria-label="Maximize">▢</button></div>
+          <span class="title" id="name">Theme</span>
+        </div>
+        <div class="body">
+          <h1 id="h">Settings</h1>
+          <div class="muted">One token source drives this page, the Tauri windows and the egui apps.</div>
+          <div class="row tabs" id="themes"></div>
+          <div class="row" id="schemes"></div>
+          <div class="row"><span class="muted">Accent</span><div class="chips" id="accents"></div></div>
+          <div class="row"><span class="muted">Glass</span><input type="range" id="glass" min="0" max="100" value="55" /></div>
+          <div class="t-card">
+            <div class="row"><button class="t-button">Default</button><button class="t-button" data-variant="accent">Accent</button><input class="t-input" value="Text field" /><label class="row"><input type="checkbox" class="t-switch" checked /> Switch</label></div>
+            <p class="muted" style="margin-bottom:0">Secondary text on the card surface.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

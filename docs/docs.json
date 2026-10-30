@@ -69,12 +69,9 @@
             "pages": [
               "/NATIVE-TARGETS",
               "/SOURCE-EXPORT",
-              "/builds",
               "/APP-BUILDS",
               "/artifacts",
-              "/qualification",
-              "/NATIVE-QUALIFICATION",
-              "/coreutils-inventory"
+              "/NATIVE-QUALIFICATION"
             ]
           },
           {
@@ -82,7 +79,6 @@
             "icon": "server",
             "pages": [
               "/control-plane",
-              "/DEPLOYMENT-CONTROL",
               "/PRODUCT-SERVER",
               "/APP-DOMAINS",
               "/source-private-network",
@@ -138,8 +134,7 @@
               "/bun-engine/EMULATION",
               "/bun-engine/GPU",
               "/bun-engine/PACKAGE-MANAGER",
-              "/bun-engine/STEAM-PLATFORM",
-              "/bun-engine-absorption"
+              "/bun-engine/STEAM-PLATFORM"
             ]
           },
           {

@@ -1,0 +1,16 @@
+{
+  "name": "@aphrody/fluent",
+  "version": "1.4.7",
+  "private": true,
+  "description": "Fluent 2 for Bun OS: tokens generated from @fluentui/react-theme, a WinUI 3 app (Windows App SDK) and a @fluentui/web-components shell",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "tokens": "bun src/gen-tokens.ts",
+    "web": "bun src/build-web.ts",
+    "test": "bun test"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

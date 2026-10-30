@@ -1,5 +1,0 @@
-{
-  "extends": "@aphrody/m3-config/tsconfig.json",
-  "compilerOptions": { "types": ["bun", "node"] },
-  "include": ["src/**/*", "test/**/*", "m3.config.ts"]
-}

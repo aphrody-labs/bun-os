@@ -1,0 +1,140 @@
+---
+title: Volumes and Drives
+description: Storage identity, mount evidence, and the filesystem read arena
+sidebarTitle: Volumes
+---
+
+Spacedrive separates a physical drive, a formatted volume, a current mount, and
+a retained source. They often look like one thing in a file manager, but they
+have different identities and failure behavior.
+
+| Object | Meaning |
+| --- | --- |
+| Physical drive | Hardware that can fail, move, or contain several volumes |
+| Volume | A formatted storage identity observed on that hardware |
+| Mount | A current operating-system path to a volume |
+| Source | A retained scope with an ingest and portable store |
+
+A mount path is never durable identity.
+
+## Runtime discovery
+
+Each daemon observes mounted local and network filesystems. It records:
+
+- filesystem identity and type;
+- capacity and free space;
+- mount path and options;
+- read and write capability;
+- physical topology when the platform exposes it;
+- connection and observation time.
+
+The observation updates current reachability. It does not overwrite historical
+evidence about the hardware.
+
+## Volumes on paired devices
+
+A paired device publishes the volumes it has mounted, along with its hardware.
+Peers keep the latest copy with the time they received it and list those
+volumes under the device that owns them. While the owner is offline its volumes
+still appear, unmounted, as they were last seen. A replica of one of the
+owner's sources appears on the volume its anchor names.
+
+## The volume arena
+
+Mounted filesystems enter a machine-level in-memory arena. The arena provides a
+fast read map for ordinary browsing and assigns stable identities to observed
+objects.
+
+Filesystem sources retain selected scopes from that arena in their own stores.
+Two overlapping source roots reuse the arena identity instead of inventing
+unrelated IDs for one mounted object.
+
+## Resolving source roots
+
+A filesystem source stores a stable volume anchor and a path relative to it.
+When the drive reconnects:
+
+1. Spacedrive identifies the volume from current evidence.
+2. It records the new attachment.
+3. It resolves the relative source root.
+4. It checks that the result still represents the expected origin.
+5. It resumes queries, watching, and jobs.
+
+This works when macOS, Windows, or Linux chooses a different mount path.
+
+## Physical-drive identity
+
+Hardware identity is a conclusion from evidence, not a label copied from one
+command. Spacedrive prefers stronger signals in this order:
+
+1. Worldwide hardware name such as WWN
+2. GPT disk GUID or equivalent media identity
+3. High-quality device serial
+4. Weaker bridge or enclosure serial
+5. Capacity, model, topology, and filesystem evidence
+6. Human adjudication with recorded provenance
+
+No weak fingerprint silently merges two drives. Conflicting evidence remains
+visible until a stronger observation or person resolves it.
+
+Observations form an append-only biography: when the drive appeared, how it was
+connected, which volumes it presented, its reported health, and where it moved.
+A drive can be marked retired, lost, destroyed, or replaced without deleting
+its record.
+
+## Failure domains
+
+Protection policy reasons about physical placement. Two paths on one disk are
+one failure domain. Two volumes in the same pool may still share power,
+controller, chassis, or site risk.
+
+Spacedrive records enough topology to explain:
+
+- how many confirmed instances exist;
+- which hardware contains them;
+- whether those instances are independently protected;
+- which source or drive is unavailable;
+- which copy should be created before cleanup.
+
+RAID improves availability. It does not automatically satisfy an off-device or
+off-site backup policy.
+
+## Cloud storage
+
+Cloud accounts and buckets are sources, not physical volumes. Their adapters
+can expose provider regions, storage classes, versions, and account boundaries
+as facets. The common source model still lets them participate in search,
+content identity, operations, and protection policy.
+
+See [Cloud Integration](/core/cloud-integration).
+
+## Safe operations
+
+Before a file mutation, Spacedrive resolves the current mount and validates the
+record against the origin. A stored mount path or old capacity reading is not
+enough.
+
+Eject, format, pool export, and other device-wide operations require an exact
+hardware target and an explicit preview. The preview names the drive identity,
+mounted volumes, affected sources, active jobs, and protection consequences.
+
+## Platform behavior
+
+The evidence available differs by platform and connection:
+
+- macOS exposes APFS containers, volume UUIDs, and Disk Arbitration state.
+- Windows exposes volume GUIDs, drive letters, and storage-device properties.
+- Linux exposes mount information, filesystem UUIDs, udev data, and block
+  topology.
+- USB and Thunderbolt bridges may hide or rewrite hardware serials.
+- Network mounts expose a remote filesystem identity but not necessarily the
+  physical disks behind it.
+
+Missing evidence lowers confidence. It does not justify inventing a stronger
+identity.
+
+## Related systems
+
+- [Indexing](/core/indexing) explains the arena and source ingest.
+- [Data Model](/core/data-model) describes identity and source records.
+- [File Sync](/core/file-sync) uses failure domains during verified placement.

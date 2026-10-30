@@ -1,0 +1,31 @@
+[package]
+name = "bun_git"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "Apache-2.0"
+repository.workspace = true
+description = "Native Git (gix) and GitHub (octocrab) integration: repository inspection, history, ingest, search and upstream tracking."
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+base64 = { workspace = true }
+gix = { workspace = true }
+globset = { workspace = true }
+ignore = { workspace = true }
+octocrab = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true, features = ["std"] }
+url = { workspace = true }
+
+[dev-dependencies]
+rustls = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[lints]
+workspace = true

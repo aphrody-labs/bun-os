@@ -171,29 +171,6 @@ export function cargoAndroidEnv(ndk: string, triple: AndroidTriple): Record<stri
 }
 
 /**
- * On Windows, host build scripts link with MSVC: import Bun's native
- * `bun msvc env` environment when absent, pinned to the first toolset (default
- * first, then newest) that ships the x64 CRT import libraries.
- */
-export async function msvcEnv(): Promise<Record<string, string>> {
-  if (!windows || process.env.VCINSTALLDIR) return {};
-  const listing = JSON.parse(await capture([process.execPath, "msvc", "list", "--json"])) as {
-    instances?: {
-      toolsets?: { version: string; dir: string; default?: boolean }[];
-    }[];
-  };
-  const toolset = (listing.instances ?? [])
-    .flatMap(instance => instance.toolsets ?? [])
-    .sort(
-      (a, b) =>
-        Number(!!b.default) - Number(!!a.default) || b.version.localeCompare(a.version, undefined, { numeric: true }),
-    )
-    .find(candidate => existsSync(join(candidate.dir, "lib", "x64", "msvcrt.lib")));
-  const output = await capture([process.execPath, "msvc", "env", ...(toolset ? ["--toolset", toolset.version] : [])]);
-  return JSON.parse(output) as Record<string, string>;
-}
-
-/**
  * Build a cdylib crate for each ABI and copy `lib*.so` into `jniLibs/<abi>`.
  * Cargo runs through the workspace native admission owner (Windows mutex or
  * flock), which serializes native builds across agents and pins the target
@@ -212,7 +189,6 @@ export async function buildNative(options: {
   const profile = options.profile ?? "release";
   const { loadConfig, runNative } = await import("@aphrody/bun-workspace");
   const config = await loadConfig(options.workspace);
-  const host = await msvcEnv();
   for (const abi of options.abis) {
     const triple = TRIPLES[abi];
     const code = await runNative(
@@ -232,7 +208,7 @@ export async function buildNative(options: {
         cwd: options.workspace,
         timeoutMs: 1_800_000,
         runtimePolicy: "development",
-        env: { ...host, ...cargoAndroidEnv(ndk, triple) },
+        env: cargoAndroidEnv(ndk, triple),
       },
     );
     if (code !== 0) throw new Error(`cargo build ${options.crate} for ${triple} failed (${code})`);

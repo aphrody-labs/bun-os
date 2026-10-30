@@ -14,11 +14,11 @@ import {
 } from "../src/index";
 
 test("canonical Bun OS array workspace admits only a declared flat app", () => {
-  expect(() => assertPrivateOwnerWorkspace(join(PRIVATE_OWNER_ROOT, "apps/m3-web"))).not.toThrow();
+  expect(() => assertPrivateOwnerWorkspace(join(PRIVATE_OWNER_ROOT, "apps/m3-showcase"))).not.toThrow();
   for (const destination of [
     PRIVATE_OWNER_ROOT,
     join(PRIVATE_OWNER_ROOT, "packages/m3"),
-    join(PRIVATE_OWNER_ROOT, "apps/m3-web/nested"),
+    join(PRIVATE_OWNER_ROOT, "apps/m3-showcase/nested"),
     join(PRIVATE_OWNER_ROOT, "apps/not-a-declared-scaffold-owner"),
     join(PRIVATE_OWNER_ROOT, "../outside"),
   ]) {

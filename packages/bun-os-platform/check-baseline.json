@@ -2,14 +2,7 @@
   "$comment": "Ratchet of bun-os-platform check: counts may only go down. Regenerate with `bun-os-platform check --update-baseline` after migrating.",
   "counts": {
     "hardcoded-string": {
-      "crates/bun-engine-core/src/runtime/mod.rs": 1,
-      "apps/play/src/client/index.html": 1
-    },
-    "raw-size": {
-      "apps/play/src/client/styles.css": 33
-    },
-    "raw-duration": {
-      "apps/play/src/client/styles.css": 2
+      "crates/bun-engine-core/src/runtime/mod.rs": 1
     },
     "raw-color": {
       "crates/bun-os-shell/src/screens.rs": 4

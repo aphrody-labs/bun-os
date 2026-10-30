@@ -1,1 +1,0 @@
-{ "enums": { "Architecture": { "t": "i32", "v": { "None": 0, "X86": 1, "X64": 2, "Arm64": 4, "All": 7 } } } }

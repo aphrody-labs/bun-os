@@ -59,13 +59,8 @@ export function checkoutRoot(
     case "material":
       return root;
     case "bun":
-      return join(root, "toolchains/bun");
+      return join(root, "sources/bun");
   }
-}
-
-/** Root of the Rose Griffon website integrated in the Bun OS checkout. */
-export function rgWebsiteRoot(): string {
-  return workspacePath("apps", "rg-website");
 }
 
 /** Root of the Inazuma sources integrated in this checkout. */

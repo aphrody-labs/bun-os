@@ -752,7 +752,7 @@ mod tests {
     fn config_parses_the_three_backends_and_rejects_duplicates() {
         let config: RouterConfig = serde_json::from_str(
             r#"{"models":[
-              {"backend":"llama","id":"shenron-chat-v2","model":"qwen3-4b-instruct-2507-q4km",
+              {"backend":"llama","id":"product-chat-v2","model":"qwen3-4b-instruct-2507-q4km",
                "lora":[{"spec":"file:/a.gguf","sha256":"ab"}],"ctx":8192},
               {"backend":"llama","id":"gemma-4-e2b","model":"gemma-4-e2b-it-q4km"},
               {"backend":"gemini-web","id":"gemini-web/flash"},

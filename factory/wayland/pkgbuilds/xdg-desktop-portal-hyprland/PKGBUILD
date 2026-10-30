@@ -1,0 +1,25 @@
+# STUB, UNVERIFIED (never built): xdg-desktop-portal-hyprland v1.5.0 pinned to the exact commit of factory/wayland/closure.json.
+# Replaces Arch 1.4.1 for the opt-in Hyprland composition; same package name, so the local repository must precede core/extra.
+pkgname=xdg-desktop-portal-hyprland
+pkgver=1.5.0
+pkgrel=1
+_commit=d1467fea8d1895cb7835829c2fbb271a0d37760a
+pkgdesc='xdg-desktop-portal-hyprland pinned by the Bun OS Wayland closure'
+arch=(x86_64)
+url='https://github.com/hyprwm/xdg-desktop-portal-hyprland'
+license=(custom)
+depends=('glibc' 'hyprland-protocols' 'hyprlang' 'hyprtoolkit' 'hyprutils' 'libdrm' 'libgcc' 'libinih' 'libstdc++' 'mesa' 'pipewire' 'qt6-base' 'sdbus-cpp' 'util-linux-libs' 'xdg-desktop-portal')
+makedepends=('cmake' 'hyprwayland-scanner' 'wayland' 'wayland-protocols' 'meson' 'ninja' 'git')
+source=("$pkgname::git+https://github.com/hyprwm/xdg-desktop-portal-hyprland.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  _src="$srcdir/$pkgname"
+  arch-meson build "$_src"
+  meson compile -C build
+}
+
+package() {
+  _src="$srcdir/$pkgname"
+  meson install -C build --destdir "$pkgdir"
+}

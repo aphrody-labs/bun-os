@@ -16,7 +16,7 @@ import {
   auditSpearmanCorrelation as spearmanCorrelation,
   auditZukanGameToSeries as zukanGameToSeries,
 } from "../../src/zukan/audit.ts";
-import { iecodeDataRoot, rgWebsitePath } from "../../src/core/roots.ts";
+import { iecodeDataRoot, webAppPath } from "../../src/core/roots.ts";
 
 const DATA_DIR = iecodeDataRoot();
 const PARAM_EN = process.env.ZUKAN_PARAM_EN || join(DATA_DIR, "zukan/param_en.json");
@@ -24,7 +24,7 @@ const AUDIT_OUT = process.env.AUDIT_OUT || join(DATA_DIR, "zukan-audit-mirror.js
 
 function mirrorPath(): string {
   const fs = require("node:fs");
-  const dir = process.env.MIRROR_DIR || rgWebsitePath("data", "backups");
+  const dir = process.env.MIRROR_DIR || webAppPath("data", "backups");
   if (!fs.existsSync(dir)) return "";
   const files = fs
     .readdirSync(dir)

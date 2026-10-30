@@ -1,6 +1,6 @@
 # Bun Engine on Bevy
 
-Bevy 0.20 (wgpu 30, absorbed in `crates/bevy*`) is the runtime of Bun Engine: one `App`, one
+Bevy 0.20 (wgpu 30, crates.io `bevy` 0.20.1) is the runtime of Bun Engine: one `App`, one
 window (`bevy_winit`), one input layer (`bevy_input`, gamepads through `bevy_gilrs`), audio
 (`bevy_audio`), UI (`bevy_ui`), assets (`bevy_asset`) and the render schedules on the shared
 wgpu 30 device. The engine owns no winit loop and no wgpu surface; `window.rs` only keeps the

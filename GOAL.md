@@ -4,12 +4,30 @@ This file describes the desired end state, not a statement that consolidation
 has already been completed. Current implementation and migration evidence is
 tracked in `PLAN.md` and the repository manifests.
 
+## Architecture (2026-10-29)
+
+- Runtime: the unmodified upstream Bun canary, npm `bun@1.4.4-canary.20261028.1`, pinned by its
+  npm `gitHead` `11c367163a4b` (oven-sh/bun). `bun --revision` must print
+  `1.4.4-canary.1+11c367163`. The `aphrody-labs/bun` fork is abandoned; fork-only
+  commands and APIs (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`,
+  `bun:windows`, `bun:linux`, `bun:nginx`, `Bun.Video`) do not exist on upstream.
+  Quality gates are the upstream `bun check`, `bun lint` and `bun fmt`.
+- Bun OS is an Arch-inspired Linux distribution (pacman/libalpm; Server, COSMIC
+  Desktop and Gamescope Gaming compositions).
+- Final goal: Bun integrated into the Linux kernel the way Rust was. A phased
+  roadmap is in [`docs/KERNEL-ROADMAP.md`](docs/KERNEL-ROADMAP.md), summarized
+  from the 2026-10-29 research report. In short: copy Rust's process, not its
+  scope. Bun is a userspace runtime and the research does not pursue an in-kernel
+  JavaScript engine; the tracks are an owned `linux-bun` kernel package, small
+  Rust kernel features submitted upstream, Bun as `/init`, and Bun driving
+  BPF/sched_ext from userspace. Items the report marks UNVERIFIED stay labelled so.
+
 Deliver one Bun OS product workspace from `C:\\src`, unifying Bun OS and Bun
 Libraries package/setup/build/install ownership while preserving source
 histories, active concurrent work, and all applicable license notices.
 
 Unify the product capabilities in Bun OS, following the current owner direction
-recorded in PLAN.md. Existing Bun runtime,
+recorded in PLAN.md. The pinned upstream Bun runtime,
 Material and compatibility distribution dependencies retain their pinned contracts.
 The root catalog and source graph own discovery/export; physical relocation
 and nested workspace migration remain separate gates.
@@ -45,13 +63,13 @@ first-party category roots or workspace patterns are migration violations.
 Independent upstream/toolchain sources keep their provenance boundaries and
 must not be presented as migrated product members.
 
-Keep the Bun runtime fork's active checkout and processes intact. Integrate it
-through the selected workspace without resetting or relocating concurrent
-work. Preserve imported license files and notices; the root license applies
+The runtime is consumed as the pinned upstream npm package, not as a fork
+checkout. Do not reintroduce a Bun fork; a runtime change belongs upstream, or
+becomes an optional module, plugin or package of this workspace. Preserve imported license files and notices; the root license applies
 only to first-party material.
 
 Finish by qualifying the integrated setup and workspace, committing precise
-owned paths on branch `os`, and pushing after verifying remote ancestry.
+owned paths on branch `main` (`os` is a fast-forward mirror of `main`), and pushing after verifying remote ancestry.
 
 ## Target crate and infrastructure contract
 

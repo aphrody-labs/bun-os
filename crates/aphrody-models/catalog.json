@@ -384,7 +384,7 @@
       "title": "Multilingual E5 Small (ONNX)",
       "task": "text-embedding",
       "backend": "onnx-runtime",
-      "summary": "Lightweight 384-dimensional dense text embedding model supporting 100 languages. Standard embedder for shenron and aphrody RAG vector retrieval.",
+      "summary": "Lightweight 384-dimensional dense text embedding model supporting 100 languages. Standard embedder for aphrody RAG vector retrieval.",
       "files": [
         {
           "role": "weights",
@@ -592,6 +592,32 @@
       "license": {
         "spdx": "Apache-2.0",
         "url": "https://ai.google.dev/gemma/docs/gemma_4_license",
+        "commercial_use": "permitted"
+      }
+    },
+    {
+      "id": "qwen3.8-27b-uncensored-q4km",
+      "title": "Qwen3.8 27B Uncensored (GGUF Q4_K_M, MTP head, desktop-large)",
+      "task": "text-generation",
+      "backend": "llama-cpp",
+      "summary": "Desktop-large profile (12 GB GPU plus 32 GB RAM, partial offload). Heretic refusal removal of Qwen/Qwen3.8-27B by JonathanColetti, imatrix quant, MTP head kept (--spec-type draft-mtp). An uncensored model is the user's choice and use is the user's responsibility. Base model Apache-2.0.",
+      "files": [
+        {
+          "role": "weights",
+          "ref": "hf:JonathanColetti/Qwen3.8-27B-Uncensored-GGUF/Qwen3.8-27B-Uncensored-Q4_K_M.gguf@45d0fc0ad6cfcf9eeee6008ddaea925536409b18",
+          "bytes": 16810714528,
+          "sha256": "4c5e2db039e9325ac7724c8846c71356a24ad1cdfa28002d73ecb6be645f9675"
+        }
+      ],
+      "accel": [
+        "cpu",
+        "cuda"
+      ],
+      "vram_min_bytes": 0,
+      "speed": "quality",
+      "license": {
+        "spdx": "Apache-2.0",
+        "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
         "commercial_use": "permitted"
       }
     }

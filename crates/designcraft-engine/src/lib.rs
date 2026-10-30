@@ -14,10 +14,12 @@
 )]
 #![forbid(unsafe_code)]
 
-#[cfg(not(target_arch = "wasm32"))]
 pub mod atomic;
 pub mod cmd;
 pub mod dtd;
+pub mod epub;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod format;
 pub mod guard;
 pub mod links;
 pub mod math;

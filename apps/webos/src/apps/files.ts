@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Files: the explorer of the Web OS. File data comes from the Rust VFS (`os.fs`); libraries, locations,
 // volumes, devices, name search and rename go through the explorer wire protocol (`os.rpc`, served by
-// crates/aphrody-webos-wasm/src/rpc.rs), the same envelopes as @aphrody/drive-client.
+// crates/aphrody-webos-wasm/src/rpc.rs).
 import { ask, h, icon } from "../dom";
 import { HOME, webos } from "../os";
 import { defaultAppFor } from "../prefs";

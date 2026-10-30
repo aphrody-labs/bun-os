@@ -6,7 +6,7 @@ edition = "2024"
 rust-version = "1.97"
 authors = ["aphrody-code"]
 homepage = "https://github.com/aphrody-labs/aphrody"
-repository = "https://github.com/aphrody-labs/bun"
+repository = "https://github.com/aphrody-labs/bun-os"
 license = "Apache-2.0"
 description = "Google Boq batchexecute codec shared by the Gemini web and NotebookLM clients: f.req encoder, anti-XSSI strip, length-prefixed chunk parser, wrb.fr envelope extraction."
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Docker: a multi-stage Dockerfile that compiles the app on Aphrody Alpine (musl) and runs the executable on
 // ghcr.io/aphrody-labs/alpine:3.24-runtime (musl, libstdc++, CA certificates, tzdata, user agent 1000; built by
-// scripts/aphrody/alpine/runtime.Dockerfile of aphrody-labs/bun). Plus a Dockerfile for a rootfs prepared by
+// scripts/aphrody/alpine/runtime.Dockerfile of the former Bun fork). Plus a Dockerfile for a rootfs prepared by
 // `m3-bun package --rootfs` (the smallest image: scratch plus the executable's libraries), a compose file and a
 // .dockerignore.
 import { GENERATED_NOTE, type GeneratedFile } from "../util.ts";

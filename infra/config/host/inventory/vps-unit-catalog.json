@@ -1,28 +1,14 @@
 {
   "captured_at": "2026-09-24",
   "target_alias": "vps",
-  "scope": "unit files matching shenron* and aphrody-* only; other applications not re-captured",
+  "scope": "unit files matching aphrody-* only; other applications not re-captured",
   "supersededBy": "tools/config/host/inventory/vps-source.json#last_retirement_observation (2026-09-25T18:06:18Z)",
-  "supersededNote": "This snapshot predates the 2026-09-25 retirement of the Aphrody six-service stack and shenron-mcp from vps (see tools/config/service-catalog.json status:retired entries and tools/config/host/inventory/vps-source.json). unit_file_state.enabled below reflects the pre-retirement host, not current state.",
+  "supersededNote": "This snapshot predates the 2026-09-25 retirement of the Aphrody six-service stack from vps (see tools/config/service-catalog.json status:retired entries and tools/config/host/inventory/vps-source.json). unit_file_state.enabled below reflects the pre-retirement host, not current state.",
   "unit_file_state": {
-    "enabled": [
-      "aphrody-a2a.service",
-      "aphrody-ai-http.service",
-      "aphrody-shenron-embed.service",
-      "aphrody-site.service",
-      "aphrody-web-api.service",
-      "shenron-backup.timer",
-      "shenron-bot.service",
-      "shenron-mcp.service",
-      "shenron-pg-tunnel.service",
-      "shenron-site.service"
-    ],
-    "static": ["shenron-backup.service"],
-    "absent": ["shenron.target", "shenron-runtime.service", "shenron-api.service", "shenron-zswap.service"]
+    "enabled": ["aphrody-a2a.service", "aphrody-ai-http.service", "aphrody-site.service", "aphrody-web-api.service"]
   },
-  "source_parity": "installed Shenron units and aphrody-ai-http/aphrody-shenron-embed are byte-identical to systemd/ sources; /etc/nginx/conf.d/shenron.conf equals the concatenation of the four Shenron nginx examples and mcp.dragonballfr.com.conf equals its example",
+  "source_parity": "installed units and aphrody-ai-http are byte-identical to systemd/ sources",
   "active_release": {
-    "shenron": "/srv/shenron/releases/63426cfb",
     "aphrody": "/srv/aphrody/releases/20260924T154215Z-62d6deff-bf76b6af"
   },
   "mutation_status": "observed-read-only"

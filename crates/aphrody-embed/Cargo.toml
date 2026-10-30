@@ -43,7 +43,7 @@ native      = [
 # candle-transformers BERT as a reference backend for parity tests.
 candle      = ["native", "dep:candle-core", "dep:candle-nn", "dep:candle-transformers"]
 # `cli_main` (the former `aphrody-embed` binary): `worker` (framed stdio) and `serve`
-# (OpenAI-compatible `/v1/embeddings`, the former shenron-embed contract).
+# (OpenAI-compatible `/v1/embeddings`).
 server      = ["native", "dep:axum", "dep:tokio", "dep:aphrody-http-error"]
 
 [dependencies]

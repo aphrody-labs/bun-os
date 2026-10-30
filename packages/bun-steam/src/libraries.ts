@@ -3,7 +3,7 @@
  * Steam library folders (`libraryfolders.vdf`): listing with free space, installed apps from
  * `appmanifest_*.acf`, candidate disks, and moving a library to a faster disk.
  */
-import { storage as winStorage } from "bun:windows";
+import { storage as winStorage } from "./win";
 import { cpSync, existsSync, readdirSync, readFileSync, renameSync, rmSync, statfsSync, statSync } from "node:fs";
 import { join, parse, resolve } from "node:path";
 import { isSteamRunning, readVdf, type ChangePlan, writeVdf } from "./config.js";

@@ -1,0 +1,100 @@
+name: buncc-desktop
+
+# Heavy desktop-stack builds (GTK4, Qt6, KDE Frameworks) with `buncc desktop` on windows-latest.
+# Local runs only cover what fits a workstation; see docs/BUNCC-DESKTOP.md for what ran where.
+
+on:
+  workflow_dispatch:
+    inputs:
+      what:
+        description: Stack to build
+        type: choice
+        options: [gtk4, qt6, kf6, all]
+        default: all
+  pull_request:
+    paths:
+      - packages/buncc/src/desktop/**
+      - factory/desktop/**
+      - .github/workflows/buncc-desktop.yml
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: buncc-desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUNCC_DESKTOP_DIR: C:\bd
+  SCCACHE_DIR: C:\sccache
+  SCCACHE_CACHE_SIZE: 10G
+
+jobs:
+  plan:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/actions/setup-bun
+            package.json
+            packages/buncc
+            factory/desktop
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - run: bun packages/buncc/src/cli.ts desktop doctor
+      - run: bun packages/buncc/src/cli.ts desktop plan
+
+  build:
+    needs: plan
+    runs-on: windows-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: gtk4, what: "hello-gtk4", cc: cl }
+          - { name: qt6, what: "hello-qt hello-qml", cc: cl }
+          - { name: kf6, what: "hello-kcoreaddons ki18n", cc: cl }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/actions/setup-bun
+            package.json
+            packages/buncc
+            factory/desktop
+          sparse-checkout-cone-mode: false
+      - uses: ./.github/actions/setup-bun
+      - name: Cache sources, packagecache, sccache
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\bd\src
+            C:\bd\packagecache
+            C:\sccache
+          key: buncc-desktop-${{ matrix.name }}-${{ hashFiles('factory/desktop/recipes.json') }}
+          restore-keys: buncc-desktop-${{ matrix.name }}-
+      - uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Build
+        shell: pwsh
+        run: bun packages/buncc/src/cli.ts desktop build ${{ matrix.what }} --cc ${{ matrix.cc }}
+      - name: Bench
+        shell: pwsh
+        run: |
+          foreach ($app in "${{ matrix.what }}".Split(" ")) {
+            if ($app -like "hello-*") { bun packages/buncc/src/cli.ts desktop bench $app --runs 5 | Tee-Object -Append bench.json }
+          }
+        continue-on-error: true
+      - name: Pack runtime
+        shell: pwsh
+        run: bun packages/buncc/src/cli.ts desktop pack ${{ matrix.name }} --runtime --out ${{ github.workspace }}\${{ matrix.name }}-runtime.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.name }}
+          path: |
+            ${{ matrix.name }}-runtime.zip
+            bench.json
+          if-no-files-found: warn

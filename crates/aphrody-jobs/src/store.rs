@@ -912,7 +912,7 @@ mod tests {
             serde_json::json!({"args":["crawl-index","https://aphrody.com"]}),
         )
         .with_host_affinity(HostAffinity::Hosts(vec!["vps".into()]))
-        .with_idempotency_key("shenron:intent:42");
+        .with_idempotency_key("worker:intent:42");
         let store = JobStore::open(&path).unwrap();
         let submitted = store.submit(&spec).unwrap();
         let first = store.get(&submitted.id).unwrap();

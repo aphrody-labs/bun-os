@@ -180,13 +180,7 @@ pub fn merge_entries(services: &[CatalogService], explicit: Vec<BootEntry>) -> V
             (None, Some(u)) => BootKind::Systemd { unit: u.clone() },
             _ => continue,
         };
-        let hold = match &kind {
-            BootKind::Docker { container } if container.starts_with("shenron-") => Some(
-                "conteneur Shenron : géré par le déploiement atomique, jamais corrigé ici"
-                    .to_string(),
-            ),
-            _ => None,
-        };
+        let hold = None;
         let entry = BootEntry { host, kind, hold };
         if !out
             .iter()

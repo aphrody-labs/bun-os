@@ -34,25 +34,7 @@
           "disk": "ai-agent-and-rag-state",
           "status": "retired",
           "retiredAt": "2026-09-25",
-          "note": "aphrody-ai-http/aphrody-shenron-embed/aphrody-a2a/shenron-mcp removed from vps; allocation reserved for redeploy under the Aphrody convergence plan"
-        },
-        "rg": {
-          "priority": 95,
-          "cpu": "high",
-          "memory": "high",
-          "disk": "versioned-releases",
-          "status": "shutdown-requested",
-          "requestedAt": "2026-10-03",
-          "note": "Owner requests complete RG shutdown; preserve releases, data and rollback. Live completion recorded separately."
-        },
-        "shenron": {
-          "priority": 90,
-          "cpu": "medium",
-          "memory": "medium",
-          "disk": "shared-media-and-release",
-          "status": "migration-requested",
-          "target": "dbfr",
-          "note": "Owner directive 2026-10-07: all Shenron runtime, data, media, CDN and ingress move to DBFR; VPS is reserved for Aphrody. Verify protected copies before retiring the source."
+          "note": "aphrody-ai-http/aphrody-a2a removed from vps; allocation reserved for redeploy under the Aphrody convergence plan"
         },
         "nginx": {
           "priority": 100,
@@ -114,15 +96,6 @@
           "cpu": "low",
           "memory": "low",
           "disk": "one-rollback-slot"
-        },
-        "shenron": {
-          "priority": 95,
-          "cpu": "bounded",
-          "memory": "bounded",
-          "disk": "versioned-releases-and-shared-state",
-          "status": "migration-requested",
-          "source": "vps",
-          "note": "Owner directive 2026-10-07: sole Shenron production host, including bot, site, MCP, PostgreSQL, Redis, chat, media, CDN and ingress."
         }
       },
       "network": {

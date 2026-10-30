@@ -415,26 +415,17 @@ enum DeployStack {
     App,
     /// Five-service Aphrody stack (site, Web API, A2A, AI HTTP, E5).
     Aphrody,
-    /// Internal Shenron compute only (AI HTTP, E5, managed llama companion).
+    /// Internal compute only (AI HTTP, E5, managed llama companion).
     AphrodyCompute,
-    /// Shenron site and bot release plane.
-    Shenron,
-    /// RG release plane.
-    Rg,
-    /// All-in-one bundle: aphrody, then shenron, then rg, with rollback.
-    Bundle,
 }
 
 impl DeployStack {
-    /// Directory below which qualified hosts keep stack releases or bundles.
+    /// Directory below which qualified hosts keep stack releases.
     fn release_root(self) -> String {
         let layout = &*crate::layout::HOST_LAYOUT;
         match self {
             Self::App => format!("{}/releases/", layout.app("bun-os")),
             Self::Aphrody | Self::AphrodyCompute => format!("{}/releases/", layout.app("aphrody")),
-            Self::Shenron => format!("{}/releases/", layout.app("shenron")),
-            Self::Rg => format!("{}/releases/", layout.app("rg")),
-            Self::Bundle => format!("{}/bundles/", layout.app("infra")),
         }
     }
 
@@ -443,9 +434,6 @@ impl DeployStack {
         match self {
             Self::App => "",
             Self::Aphrody | Self::AphrodyCompute => "/usr/local/sbin/aphrody-infra-deploy-aphrody",
-            Self::Shenron => "/usr/local/sbin/aphrody-infra-deploy-shenron",
-            Self::Rg => "/usr/local/sbin/aphrody-infra-deploy-rg",
-            Self::Bundle => "/usr/local/sbin/aphrody-infra-deploy-bundle",
         }
     }
 
@@ -454,9 +442,6 @@ impl DeployStack {
         match self {
             Self::App => "",
             Self::Aphrody | Self::AphrodyCompute => "APHRODY_REMOTE_DEPLOY_ADAPTER",
-            Self::Shenron => "SHENRON_REMOTE_DEPLOY_ADAPTER",
-            Self::Rg => "RG_REMOTE_DEPLOY_ADAPTER",
-            Self::Bundle => "BUNDLE_REMOTE_DEPLOY_ADAPTER",
         }
     }
 
@@ -479,27 +464,10 @@ impl DeployStack {
             Self::AphrodyCompute => &[
                 "explicit --apply",
                 "aphrody-compute-smoke/v1 attestation bound to RELEASE_ID and SHA256SUMS",
-                "complete real Dragon Ball corpus, fresh E5 vectors, Recall@5 >= 0.8, zero retrieval errors",
+                "fresh E5 vectors, Recall@5 >= 0.8, zero retrieval errors",
                 "0600 /etc/aphrody/aphrody-ai-http.env, real managed model and readable LoRA",
-                "only aphrody-ai-http and aphrody-shenron-embed; site, Web and A2A inactive",
+                "only aphrody-ai-http and the E5 embedding service; site, Web and A2A inactive",
                 "live private API, embedding and LLM proof; rollback of the selected services",
-            ],
-            Self::Shenron => &[
-                "explicit --apply",
-                "release assembled by aphrody-infra-deploy-shenron assemble",
-                "0600 /etc env files with the secrets-contract keys",
-                "live health proof, rollback to the previous current",
-            ],
-            Self::Rg => &[
-                "explicit --apply",
-                "release assembled by scripts/rg/assemble-vps-release.sh",
-                "live health proof, rollback to the previous current",
-            ],
-            Self::Bundle => &[
-                "explicit --apply",
-                "adapters installed from the pinned aphrody-infra commit (ADAPTER.json)",
-                "every component preflight above",
-                "BUNDLE.previous.json recorded; completed steps restored on failure",
             ],
         }
     }
@@ -650,7 +618,7 @@ fn live_status(target: &Target) -> Option<Value> {
             "ssh",
             vec![
                 "dbfr",
-                "systemctl list-units --type=service --state=running --no-legend | grep -Ei 'nier|nie|shenron|web' || true",
+                "systemctl list-units --type=service --state=running --no-legend | grep -Ei 'nier|nie|web' || true",
             ],
         ),
         "linux-container-26.04" => (
@@ -1513,8 +1481,7 @@ fn release_path_is_valid(release: &str, stack: DeployStack) -> bool {
 }
 
 fn deploy_target_is_supported(target: &str, stack: DeployStack) -> bool {
-    stack != DeployStack::App
-        && (target == "vps" || (target == "dbfr" && stack == DeployStack::Shenron))
+    stack != DeployStack::App && target == "vps"
 }
 
 /// `ssh` arguments running the selected host's adapter as root, never prompting.
@@ -2919,61 +2886,39 @@ mod tests {
             "/home/ubuntu/apps/aphrody/releases/20260923-abc",
             DeployStack::Aphrody
         ));
-        assert!(release_path_is_valid(
-            "/home/ubuntu/apps/rg/releases/20260923-abc",
-            DeployStack::Rg
-        ));
         assert!(!release_path_is_valid(
             "/home/ubuntu/apps/aphrody/releases/",
             DeployStack::Aphrody
         ));
         assert!(!release_path_is_valid(
-            "/home/ubuntu/apps/rg/releases/../etc",
-            DeployStack::Rg
+            "/home/ubuntu/apps/aphrody/releases/../etc",
+            DeployStack::Aphrody
         ));
         assert!(!release_path_is_valid(
-            "/home/ubuntu/apps/rg/releases/a/./b",
-            DeployStack::Rg
+            "/home/ubuntu/apps/aphrody/releases/a/./b",
+            DeployStack::Aphrody
         ));
         assert!(!release_path_is_valid(
             "/home/ubuntu/apps/aphrody/current",
             DeployStack::Aphrody
         ));
         assert!(!release_path_is_valid(
-            "/home/ubuntu/apps/aphrody/releases/a",
-            DeployStack::Rg
-        ));
-        assert!(release_path_is_valid(
-            "/home/ubuntu/apps/shenron/releases/1111111111111111111111111111111111111111",
-            DeployStack::Shenron
-        ));
-        assert!(release_path_is_valid(
-            "/home/ubuntu/apps/infra/bundles/20260926T120000Z-0123abcd",
-            DeployStack::Bundle
+            "/home/ubuntu/apps/other/releases/a",
+            DeployStack::Aphrody
         ));
         assert!(!release_path_is_valid(
-            "/home/ubuntu/apps/aphrody/releases/20260926T120000Z-0123abcd",
-            DeployStack::Bundle
+            "/home/ubuntu/apps/aphrody/releases/x;reboot",
+            DeployStack::Aphrody
         ));
         assert!(!release_path_is_valid(
-            "/home/ubuntu/apps/rg/releases/x;reboot",
-            DeployStack::Rg
-        ));
-        assert!(!release_path_is_valid(
-            "/home/ubuntu/apps/shenron/releases/a b",
-            DeployStack::Shenron
+            "/home/ubuntu/apps/aphrody/releases/a b",
+            DeployStack::Aphrody
         ));
     }
 
     #[test]
     fn every_stack_has_its_own_adapter_root_and_override() {
-        let stacks = [
-            DeployStack::Aphrody,
-            DeployStack::Shenron,
-            DeployStack::Rg,
-            DeployStack::Bundle,
-        ];
-        for (index, stack) in stacks.iter().enumerate() {
+        for stack in [DeployStack::Aphrody, DeployStack::AphrodyCompute] {
             assert!(
                 stack
                     .adapter()
@@ -2981,11 +2926,6 @@ mod tests {
             );
             assert!(stack.release_root().ends_with('/'));
             assert!(!stack.requires().is_empty());
-            for other in &stacks[index + 1..] {
-                assert_ne!(stack.adapter(), other.adapter());
-                assert_ne!(stack.release_root(), other.release_root());
-                assert_ne!(stack.adapter_env(), other.adapter_env());
-            }
         }
         // The Aphrody stack is the multi-service adapter, never the retired site-only one.
         assert_eq!(
@@ -3002,7 +2942,7 @@ mod tests {
             remote_adapter_args(
                 "vps",
                 "/usr/local/sbin/x",
-                "/home/ubuntu/apps/rg/releases/a"
+                "/home/ubuntu/apps/aphrody/releases/a"
             ),
             [
                 "-o",
@@ -3011,29 +2951,13 @@ mod tests {
                 "sudo",
                 "-n",
                 "/usr/local/sbin/x",
-                "/home/ubuntu/apps/rg/releases/a"
+                "/home/ubuntu/apps/aphrody/releases/a"
             ]
         );
     }
 
     #[test]
-    fn deploy_cli_routes_rg_explicitly_and_preserves_aphrody_default() {
-        let rg = Cli::try_parse_from([
-            "aphrody-infra",
-            "deploy",
-            "--target",
-            "vps",
-            "--stack",
-            "rg",
-        ])
-        .unwrap();
-        assert_matches!(
-            rg.command,
-            CommandKind::Deploy {
-                stack: DeployStack::Rg,
-                ..
-            }
-        );
+    fn deploy_cli_preserves_aphrody_default_and_routes_explicit_stacks() {
         let default = Cli::try_parse_from(["aphrody-infra", "deploy", "--target", "vps"]).unwrap();
         assert_matches!(
             default.command,
@@ -3043,9 +2967,8 @@ mod tests {
             }
         );
         for (name, expected) in [
-            ("shenron", DeployStack::Shenron),
-            ("bundle", DeployStack::Bundle),
             ("aphrody-compute", DeployStack::AphrodyCompute),
+            ("app", DeployStack::App),
         ] {
             let parsed = Cli::try_parse_from([
                 "aphrody-infra",
@@ -3060,6 +2983,17 @@ mod tests {
                 matches!(parsed.command, CommandKind::Deploy { stack, .. } if stack == expected)
             );
         }
+        assert!(
+            Cli::try_parse_from([
+                "aphrody-infra",
+                "deploy",
+                "--target",
+                "vps",
+                "--stack",
+                "unknown-stack",
+            ])
+            .is_err()
+        );
     }
 
     #[test]
@@ -3071,7 +3005,7 @@ mod tests {
         assert_eq!(compute.adapter_env(), DeployStack::Aphrody.adapter_env());
         assert!(release_path_is_valid(release, compute));
         assert!(!release_path_is_valid(
-            "/home/ubuntu/apps/shenron/releases/a",
+            "/home/ubuntu/apps/other/releases/a",
             compute
         ));
         assert_eq!(
@@ -3087,89 +3021,28 @@ mod tests {
                 release,
             ]
         );
-        for stack in [
-            DeployStack::Aphrody,
-            DeployStack::Shenron,
-            DeployStack::Rg,
-            DeployStack::Bundle,
-        ] {
-            assert_eq!(
-                remote_stack_adapter_args("vps", stack, stack.adapter(), release),
-                remote_adapter_args("vps", stack.adapter(), release)
-            );
-        }
+        let stack = DeployStack::Aphrody;
+        assert_eq!(
+            remote_stack_adapter_args("vps", stack, stack.adapter(), release),
+            remote_adapter_args("vps", stack.adapter(), release)
+        );
     }
 
     #[test]
-    fn deploy_targets_preserve_vps_stacks_and_isolate_dbfr_shenron() {
-        let stacks = [
+    fn deploy_targets_are_limited_to_the_vps() {
+        for stack in [
             DeployStack::App,
             DeployStack::Aphrody,
             DeployStack::AphrodyCompute,
-            DeployStack::Shenron,
-            DeployStack::Rg,
-            DeployStack::Bundle,
-        ];
-        for stack in stacks {
+        ] {
             assert_eq!(
                 deploy_target_is_supported("vps", stack),
                 stack != DeployStack::App
             );
-            assert_eq!(
-                deploy_target_is_supported("dbfr", stack),
-                stack == DeployStack::Shenron
-            );
-            for target in ["", "omar", "aphro-pc", "unknown", "dbfr;reboot"] {
+            for target in ["", "omar", "aphro-pc", "unknown", "dbfr", "dbfr;reboot"] {
                 assert!(!deploy_target_is_supported(target, stack));
             }
         }
-
-        let release = "/home/ubuntu/apps/shenron/releases/docker-qualified";
-        assert!(release_path_is_valid(release, DeployStack::Shenron));
-        assert!(!release_path_is_valid(
-            "/srv/shenron/releases/docker-qualified",
-            DeployStack::Shenron
-        ));
-        assert!(!release_path_is_valid(
-            "/home/ubuntu/apps/shenron/releases/../current",
-            DeployStack::Shenron
-        ));
-        let adapter = DeployStack::Shenron.adapter();
-        let dbfr = remote_stack_adapter_args("dbfr", DeployStack::Shenron, adapter, release);
-        assert_eq!(
-            dbfr,
-            [
-                "-o",
-                "BatchMode=yes",
-                "dbfr",
-                "sudo",
-                "-n",
-                adapter,
-                release
-            ]
-        );
-        let vps = remote_stack_adapter_args("vps", DeployStack::Shenron, adapter, release);
-        assert_eq!(
-            vps,
-            ["-o", "BatchMode=yes", "vps", "sudo", "-n", adapter, release]
-        );
-        assert_eq!(&dbfr[3..], &vps[3..]);
-        assert!(!dbfr.contains(&"vps"));
-        assert!(!vps.contains(&"dbfr"));
-
-        let parsed = Cli::try_parse_from([
-            "aphrody-infra",
-            "deploy",
-            "--target",
-            "dbfr",
-            "--stack",
-            "shenron",
-        ])
-        .unwrap();
-        assert!(matches!(
-            parsed.command,
-            CommandKind::Deploy { target, stack: DeployStack::Shenron, .. } if target == "dbfr"
-        ));
     }
 
     #[test]
@@ -3184,7 +3057,6 @@ mod tests {
         .unwrap();
         let mut run = Run::start(root, "deploy fixture").unwrap();
         assert!(deploy("dbfr", DeployStack::Aphrody, None, false, &mut run).is_ok());
-        assert!(deploy("dbfr", DeployStack::Shenron, None, false, &mut run).is_ok());
         let error = deploy(
             "dbfr",
             DeployStack::Aphrody,

@@ -1,0 +1,204 @@
+---
+title: Architecture Overview
+description: How Spacedrive connects clients, sources, stores, and devices
+sidebarTitle: Overview
+---
+
+Spacedrive is a local-first filesystem runtime. A daemon owns durable state and
+file operations. Thin clients connect to that daemon through one typed operation
+surface.
+
+The architecture keeps three concerns separate:
+
+1. The **origin** owns file bytes.
+2. The **source store** preserves what Spacedrive knows about those bytes.
+3. The **library** connects sources, devices, policy, and user organization.
+
+This separation lets a drive go offline without erasing its history. It also
+lets a remote or cloud source use the same query and operation model as a local
+folder.
+
+## Runtime layers
+
+| Layer | Responsibility |
+| --- | --- |
+| Clients | Desktop, web, CLI, MCP, and generated applications |
+| Operations | Typed queries, actions, capabilities, and errors |
+| Daemon | Libraries, durable jobs, file operations, and peer connections |
+| Sources | Origin discovery, provider ingest, availability, and policy |
+| Stores | Common records, content evidence, search, and assertions |
+| Byte providers | Local files, remote ranges, cloud objects, and caches |
+
+## The daemon
+
+The daemon is the authority on one machine. It opens libraries, tracks mounted
+volumes, runs jobs, manages source stores, watches filesystems, and maintains
+peer connections. It continues working when no graphical client is open.
+
+Local clients connect over platform IPC. Browser clients use the daemon's web
+transport. Paired devices use encrypted peer-to-peer connections. A relay helps
+establish reachability when a direct connection is unavailable, but it does not
+become the owner of library state or file content.
+
+## One operation surface
+
+Spacedrive exposes reads as queries and mutations as actions. Operations are
+registered once in the Rust core and consumed by every client.
+
+- The desktop and web interfaces call generated TypeScript bindings.
+- The CLI provides named commands and a generic operation passthrough.
+- The MCP server exposes the same bounded capabilities to agent clients.
+- Extensions call explicit host functions from a WASM sandbox.
+
+Clients do not reimplement storage rules. A copy, tag, source query, or
+permission check has the same semantics no matter which interface requested it.
+Destructive workflows can preview intent, commit work as a durable job, and
+verify the result against the source store.
+
+## Libraries are the control plane
+
+A library is a small durable registry. It knows:
+
+- which devices participate;
+- which sources are attached;
+- how those sources can be reached;
+- spaces, pins, tags, permissions, and other user assertions;
+- sync watermarks and policy.
+
+A library does not contain one giant replicated file tree. Large filesystem
+generations remain in their source stores. That keeps pairing and library sync
+bounded as sources grow.
+
+## Sources are the data boundary
+
+A source is one retained scope over an origin:
+
+~~~text
+source = origin + ingest + store
+~~~
+
+An origin may be a local subtree, an entire volume, a NAS dataset, a remote
+Spacedrive node, or a provider API. The ingest differs by provider. The stored
+record shape does not.
+
+Each source has an availability state:
+
+- **Live** means the origin currently answers.
+- **Degraded** means the store is usable but the origin cannot answer every
+  request.
+- **Lost** means the origin no longer answers and the retained store is the
+  remaining evidence.
+
+No code path may assume that a source store can always be recreated.
+
+## The volume arena
+
+Local filesystems first enter a machine-level volume arena. The arena is a fast
+read map over what is mounted now. It assigns stable filesystem identities and
+supports immediate browsing.
+
+A filesystem source retains a selected scope from that arena. Nested sources
+reuse the same identity namespace. They do not create competing file IDs for
+the same mounted object.
+
+## Source stores
+
+Every source store is a self-contained database with two ownership classes.
+
+### Generation
+
+Generation tables describe what the origin reported:
+
+- records and hierarchy;
+- filesystem or provider facets;
+- content identity;
+- relations between records;
+- search projection;
+- ingest schema and watermarks.
+
+One ingest authority writes a generation. A new scan may replace generation
+rows transactionally when the origin still answers.
+
+### Assertions
+
+Assertion tables preserve knowledge that a scan cannot recover:
+
+- tags and notes;
+- decisions and review state;
+- provenance;
+- policy;
+- extension data attached by stable identity.
+
+Assertions survive a generation rebuild. When several devices can edit them,
+they merge through explicit logical ordering rather than filesystem timestamps.
+
+## Indexing and live changes
+
+A filesystem ingest follows one capture contract:
+
+1. Resolve the source root through the current volume attachment.
+2. Walk names and metadata into the volume arena.
+3. Persist source records in bounded batches.
+4. Identify content according to the source capture policy.
+5. Sweep stale generation rows only after a complete walk.
+6. Apply watcher changes through the same capture policy.
+
+Unreadable content remains represented with a reason. One malformed path cannot
+erase the rest of a batch. The daemon's own data directory is always excluded
+so a source cannot index its live SQLite journals or frozen copies.
+
+See [Indexing](/core/indexing) for the safety rules.
+
+## Remote serving, caching, and sync
+
+Pairing does not copy every source generation into every library database.
+When a source-owning device is online, another device can query its store and
+request byte ranges. The client may retain a cache or a subscribed copy
+according to policy.
+
+Source generations flow from their ingest authority. User assertions may merge
+in both directions. File sync is an explicit data movement relationship, not an
+automatic consequence of pairing or browsing.
+
+This boundary keeps three operations distinct:
+
+- **Remote browsing** reads an online peer.
+- **Caching** retains selected remote data locally.
+- **File sync** creates or updates file bytes at another origin.
+
+## Mounts and byte providers
+
+The explorer, preview system, remote protocol, file operations, and filesystem
+mounts all request bytes through a common provider boundary. A caller can read a
+local file, remote record, cloud object, or cache without replacing the product
+model.
+
+Mounts expose a scoped Spacedrive view to the host operating system. Permission
+checks and availability still apply at the daemon boundary.
+
+## Extensions
+
+Extensions run as sandboxed WASM modules. They can register file kinds,
+metadata extraction, previews, jobs, actions, models, and views. Capabilities
+are explicit. An extension cannot gain arbitrary filesystem or network access
+through the runtime.
+
+Provider adapters use the same source contract. Adding a provider changes how
+data is ingested and written, not how a record is represented.
+
+## Code map
+
+| Area | Path |
+| --- | --- |
+| Domain and operations | core/src/domain, core/src/ops |
+| Runtime services | core/src/service |
+| Source-store schema and queries | crates/store |
+| Rust client | crates/sd-client |
+| Generated TypeScript client | packages/ts-client |
+| CLI | apps/cli |
+| Desktop client | apps/tauri |
+| Extension SDK | crates/sdk |
+
+The [Data Model](/core/data-model) describes the durable nouns. [Product
+Direction](/core/product-direction) defines which capabilities belong in the
+core.

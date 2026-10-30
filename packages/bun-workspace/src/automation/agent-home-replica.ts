@@ -10,7 +10,7 @@ export interface ReplicaConfig {
   homeDocuments?: string[];
   directory: string;
   stateRoot: string;
-  shenronRoot: string;
+  extraStateRoot?: string;
   intervalSeconds: number;
 }
 type Run = (argv: string[], environment?: Record<string, string>) => Promise<string>;
@@ -144,7 +144,7 @@ export async function replicateHome(
   }
   const args = [
     ["--state", config.stateRoot, "--profile", "dbfr"],
-    ["--state", config.shenronRoot],
+    ...(config.extraStateRoot ? [["--state", config.extraStateRoot]] : []),
   ];
   let indexed = 0;
   for (const flags of args) {

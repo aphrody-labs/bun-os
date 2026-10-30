@@ -1,0 +1,39 @@
+{
+  "name": "@aphrody/wasm",
+  "version": "1.4.7",
+  "description": "Rust to WebAssembly on upstream Bun: cargo, wasm-bindgen, wasm-opt, validate, inspect, run. Replaces the fork-only bun:wasm.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/wasm"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./buncc": "./src/buncc.ts",
+    "./plugin": "./src/plugin.ts"
+  },
+  "bin": {
+    "aphrody-wasm": "./src/cli.ts"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "bun check --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:"
+  },
+  "homepage": "https://github.com/aphrody-labs/bun-os/tree/os/packages/wasm",
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

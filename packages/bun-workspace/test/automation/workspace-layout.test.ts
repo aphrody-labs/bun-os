@@ -29,15 +29,8 @@ test("physical applications and packages absent from admission are both reported
   }
 });
 
-test("product members are flat and pinned runtime packages keep their source boundary", () => {
-  for (const path of [
-    "packages/bun-workspace",
-    "apps/m3-next-example",
-    "packages/canvas",
-    "toolchains/bun/packages/web/rust",
-    "toolchains/bun/packages/web/rust/packages/agent-browser",
-    "toolchains/bun/packages/bun-google/aphrody/packages/google",
-  ])
+test("product members are flat and no toolchain checkout supplies workspace members", () => {
+  for (const path of ["packages/bun-workspace", "apps/m3-next-example", "packages/canvas"])
     expect(allowedWorkspace(root, path)).toBe(true);
   for (const path of [
     "m3/templates/base",
@@ -59,7 +52,8 @@ test("product members are flat and pinned runtime packages keep their source bou
     "packages/../../outside",
     "packages/./x",
     "packages\\member",
-    "toolchains/bun/packages/x/../../outside",
+    "vendor/example/packages/bun-types",
+    "vendor/example/packages/x/../../outside",
   ])
     expect(allowedWorkspace(root, path)).toBe(false);
 });

@@ -234,7 +234,7 @@ describe("AgUiEventStream: A2A Fleet Envelope Bidirectional Bridge", () => {
       v: 1,
       ts: "2026-10-03T01:00:00.000Z",
       id: "env-err-99",
-      from: "shenron",
+      from: "rag-agent",
       to: "agy",
       kind: "error",
       topic: "rag-timeout",
@@ -245,7 +245,7 @@ describe("AgUiEventStream: A2A Fleet Envelope Bidirectional Bridge", () => {
     expect(event.type).toBe(EventType.RUN_ERROR);
     expect((event as any).message).toBe("Vector index lock timed out after 30s");
 
-    const backToEnv = agUiEventToCoordEnvelope(event, "shenron", "agy");
+    const backToEnv = agUiEventToCoordEnvelope(event, "rag-agent", "agy");
     expect(backToEnv.kind).toBe("error");
     expect(backToEnv.body).toBe("Vector index lock timed out after 30s");
   });

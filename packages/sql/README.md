@@ -4,12 +4,12 @@
 
 Shared Bun database mechanics for Aphrody. The package implements decisions
 D6, D7, D9 and D10 of
-[ADR sql-convergence](../../docs/aphrody/decisions/infra/sql-convergence.md). The
+ADR sql-convergence. The
 Rust counterpart is the `aphrody-sql` crate (`crates/infra/sql`), which applies
 the same SQLite policy.
 
 The package exports TypeScript sources. It has no ORM: consumers keep theirs
-(Drizzle in Shenron's `@shenron/db`, Kysely in `@rosegriffon/db`).
+(Drizzle, Kysely or none).
 
 ## Modules
 
@@ -87,7 +87,7 @@ const redis = createRedisClient(); // REDIS_URL, VALKEY_URL, then redis://127.0.
   10 000 ms, `autoReconnect`, `maxRetries` 20, offline queue and
   auto-pipelining. Caller options override them.
 - Once `maxRetries` is exhausted, a Bun client stays closed. Long-lived services
-  should rebuild it (as `createResilientRedis` of Shenron's `@shenron/db/redis` does).
+  should rebuild it.
 - Redis is a cache or session store only (D1).
 
 ## SQLite (`bun:sqlite`)
@@ -112,28 +112,10 @@ applies the same pragmas as the Rust crate:
   This is the nightly SQLite backup path (D12). SQLite refuses to write over an
   existing, non-empty target.
 
-## Consumers
-
-- `@rosegriffon/db` (`iecode/packages/rg/db`):
-  - `bun-sql` builds its pool with `createSql` and `resolvePoolSize`, using
-    `tls`/`prepare: "inherit"`.
-  - `redis` builds its client with `createRedisClient` and logs through
-    `redactUrl`.
-  - `env` uses `isUsableEnvValue`.
-  - The Next site lists `@aphrody/sql` in `transpilePackages`.
-- `@shenron/db` (`packages/db` of [aphrody-labs/shenron](https://github.com/aphrody-labs/shenron)):
-  - `bun-sql` builds its pool with `createSql`, using `tls: "inherit"` with
-    every other option explicit.
-  - `env` re-exports `lastAssignment`.
-  - `redis` builds its default client with `createRedisClient`.
-
-Both packages keep their exported names, signatures and behaviour; their
-existing tests cover these contracts.
-
 ## Checks
 
 ```sh
 bun test                              # in packages/infra/sql (no network)
 bun check -p tsconfig.json --noEmit
-bun lint -c ../../docs/aphrody/.oxlintrc.json src test
+bun lint -c ../../.oxlintrc.json src test
 ```

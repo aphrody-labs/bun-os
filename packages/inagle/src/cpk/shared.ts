@@ -8,7 +8,7 @@
  * `cpk/index.ts` (sous-chemin serveur de la lib).
  *
  * `cpkAssetUrl()` mappe un `(path, ext)` de l'index vers l'URL CDN qui sert le
- * CONTENU décodé du fichier — le CDN `cdn.rosegriffon.fr` décode déjà tout
+ * CONTENU décodé du fichier — le CDN `cdn.example.com` décode déjà tout
  * fichier CPK live. Mapping validé par probe HTTP (vérité terrain) :
  *   - g4tx (100 % sous `data/dx11/`) → `/dx11/<path-après-data/dx11/>.png`
  *     (décodage g4tx→png live ; 200 image/png mesuré).

@@ -24,7 +24,7 @@
       "name": "msw",
       "maxMajor": 2,
       "since": "2026-10-02",
-      "reason": "msw 3.0.x does not intercept Bun's native fetch: setupServer + listen leaves fetch un-patched (getaddrinfo ENOTFOUND on a mocked host; packages/rg/patreon-bun goes from 174 passing to 8 failing, requests reach the real API). The renamed option onUnhandledFrame is the only documented source change, so this is a runtime incompatibility, not a migration step. Re-test on each 3.x release."
+      "reason": "msw 3.0.x does not intercept Bun's native fetch: setupServer + listen leaves fetch un-patched (getaddrinfo ENOTFOUND on a mocked host; a Patreon client test suite goes from 174 passing to 8 failing, requests reach the real API). The renamed option onUnhandledFrame is the only documented source change, so this is a runtime incompatibility, not a migration step. Re-test on each 3.x release."
     }
   ]
 }

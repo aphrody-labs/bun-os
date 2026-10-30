@@ -110,7 +110,7 @@ class MockOvhClient extends OvhClient {
     _body?: unknown,
   ): Promise<T> {
     if (method === "GET" && path === "/domain/zone") {
-      return ["aphrody.com", "rosegriffon.fr"] as T;
+      return ["aphrody.com", "example.org"] as T;
     }
     if (method === "GET" && path === "/domain/zone/aphrody.com") {
       return {
@@ -143,7 +143,7 @@ describe("OvhDns Engine", () => {
     const mock = new MockOvhClient();
     const dns = new OvhDns(mock);
     const zones = await dns.listZones();
-    expect(zones).toEqual(["aphrody.com", "rosegriffon.fr"]);
+    expect(zones).toEqual(["aphrody.com", "example.org"]);
   });
 
   it("lists and sorts all records in a zone", async () => {

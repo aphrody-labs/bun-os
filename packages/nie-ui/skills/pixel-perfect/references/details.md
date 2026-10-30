@@ -214,6 +214,6 @@ les textures.
 
 - `bibliotheques.md` — les bibliothèques réellement utilisables (Rust et Bun),
   mesurées, avec leur licence et ce qu'on a rejeté.
-- `crates/ui/identity/docs/pipeline-svg.md` (monorepo Aphrody) — la chaîne SVG rapatriée de shenron, dont
+- `crates/ui/identity/docs/pipeline-svg.md` (monorepo Aphrody) — la chaîne SVG rapatriée d'un ancien projet, dont
   la doctrine « une seule source de géométrie » vient.
 - `iecode:docs/nie/RE.md`, `iecode:AGENTS.md` — cadre du dépôt IECODE.

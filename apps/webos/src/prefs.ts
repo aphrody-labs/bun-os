@@ -145,7 +145,15 @@ export interface PrefMap {
   "workspaces.count": number;
   "windows.gap": number;
   "windows.border": number;
-  "windows.tiling": "dwindle" | "scrolling" | "floating";
+  "windows.tiling": "dwindle" | "master" | "scrolling" | "floating";
+  /** Pointer-shake assistant (assistant/overlay.ts). */
+  "assistant.enabled": boolean;
+  "assistant.backend": "llama" | "hosted";
+  /** OpenAI-compatible API root: the local llama-server, or a hosted API. */
+  "assistant.baseUrl": string;
+  "assistant.model": string;
+  /** The user's own key for a hosted API; kept in this browser only. */
+  "assistant.apiKey": string;
   /** Launch id per file kind. */
   "files.openWith": Record<FileTypeId, string>;
   /** Chords per action id (shortcuts.ts); missing actions use their defaults. */
@@ -382,7 +390,12 @@ export const SCHEMA: { [K in PrefKey]: Spec<PrefMap[K]> } = {
   "workspaces.count": num(5, 1, 10),
   "windows.gap": num(10, 0, 32),
   "windows.border": num(2, 0, 6),
-  "windows.tiling": oneOf("dwindle", ["dwindle", "scrolling", "floating"]),
+  "windows.tiling": oneOf("dwindle", ["dwindle", "master", "scrolling", "floating"]),
+  "assistant.enabled": bool(true),
+  "assistant.backend": oneOf("llama", ["llama", "hosted"]),
+  "assistant.baseUrl": text("http://127.0.0.1:8080/v1", 300),
+  "assistant.model": text("local", 100),
+  "assistant.apiKey": text("", 400),
   "files.openWith": {
     default: {
       text: "editor",
@@ -679,6 +692,17 @@ class PrefStore {
       exported: new Date().toISOString(),
       prefs: Object.fromEntries(this.values) as Partial<PrefMap>,
     };
+  }
+
+  /** Apply only the keys present (a hand-written config file); unknown or invalid keys are skipped. */
+  applyPartial(data: unknown): { applied: number; skipped: string[] } {
+    const incoming =
+      isObject(data) && isObject(data.prefs) ? (data.prefs as Record<string, unknown>) : isObject(data) ? data : undefined;
+    if (!incoming) throw new TypeError("The settings file must be a JSON object.");
+    const entries = Object.entries(incoming).filter(([k]) => k !== "format" && k !== "version" && k !== "exported");
+    const skipped = entries.filter(([k, v]) => !isKey(k) || SCHEMA[k].parse(v) === undefined).map(([k]) => k);
+    const applied = this.setMany(entries.filter(([k]) => !skipped.includes(k)) as [PrefKey, unknown][]);
+    return { applied, skipped };
   }
 
   /** Replace every preference from an exported document; unknown or invalid keys are skipped. */

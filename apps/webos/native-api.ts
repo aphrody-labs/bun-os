@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Reuse the public source API with native PostgreSQL; credentials stay on the VPS.
-import { publicSiteAPI } from "../../toolchains/bun/packages/web/site/site-api";
+import { publicSiteAPI } from "./site/site-api";
 import {
   PUBLIC_BUN_TOOLS,
   publicBunToolRequest,
-} from "../../toolchains/bun/packages/web/site/public-tools";
+} from "./site/public-tools";
 
 let database: Bun.SQL | undefined;
 async function siteRead(request: Request) {

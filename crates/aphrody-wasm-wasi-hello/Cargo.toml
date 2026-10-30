@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "aphrody-wasm-wasi-hello"
+version.workspace      = true
+edition.workspace      = true
+rust-version.workspace = true
+authors.workspace      = true
+homepage.workspace     = true
+repository.workspace   = true
+license                = "MIT"
+description            = "WASI command fixture of @aphrody/wasm: built for wasm32-wasip1 and wasm32-wasip2, run with bun."
+publish                = false
+
+[[bin]]
+name = "aphrody-wasm-wasi-hello"
+path = "src/main.rs"
+
+[lints]
+workspace = true

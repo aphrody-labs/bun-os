@@ -232,7 +232,7 @@ mod tests {
 
     fn repo_inventory() -> Inventory {
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../../docs/aphrody/crates")
+            .join("../..")
             .join(INVENTORY_PATH);
         Inventory::load(&path).unwrap()
     }

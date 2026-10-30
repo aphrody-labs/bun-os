@@ -1,7 +1,7 @@
 # Bun frontend library
 
 This workspace adapts the upstream open source frontend library to Bun 1.4.4
-from `aphrody-labs/bun`. Internal names, source history and licences remain upstream.
+from the former Bun fork. Internal names, source history and licences remain upstream.
 
 From this `frontend/` directory:
 

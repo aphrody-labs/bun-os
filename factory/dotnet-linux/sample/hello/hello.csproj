@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Same project for the JIT build and for NativeAOT (-p:PublishAot=true). `-f net11.0` (a global property) overrides the default TargetFramework for the SDK 11 line. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <BunosTfm Condition="'$(BunosTfm)'==''">net10.0</BunosTfm>
+    <TargetFramework>$(BunosTfm)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TieredPGO>false</TieredPGO>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <AssemblyName>hello</AssemblyName>
+  </PropertyGroup>
+</Project>

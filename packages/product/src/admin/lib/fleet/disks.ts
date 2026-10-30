@@ -47,9 +47,9 @@ export async function diskMain(argv: string[]) {
   const peer = flag("--peer");
   if (!peer) throw new Error("disk requires --peer omar|aphro-pc");
   const letter = flag("--letter") ?? (peer === "omar" ? "O:" : "P:");
-  const w = await import("bun:windows");
+  const { knownFolder } = await import("./windows.ts");
   if (existsSync(letter + "/")) throw new Error("drive already mounted; inspect before replacing it");
-  const command = diskCommand(peer, letter, flag("--home") ?? homedir(), w.knownFolder("ProgramFiles"));
+  const command = diskCommand(peer, letter, flag("--home") ?? homedir(), knownFolder("ProgramFiles"));
   if (!existsSync(command[0]!)) throw new Error("declared WinFsp/SSHFS installation required");
   // Foreground owner: the existing mesh/psmux session owns persistence and exit.
   const child = Bun.spawn(command, {

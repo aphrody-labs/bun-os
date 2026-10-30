@@ -30,7 +30,7 @@ use crate::{OcrError, Result};
 /// (`aphrody`'s CLI, `aphrody-mcp`'s tools) so the literal is never repeated.
 pub const DEFAULT_MODEL: &str = LocalRole::Ocr.default_model();
 
-/// Catalog id used by the Shenron databooks preset (dense Japanese reference
+/// Catalog id used by the databooks preset (dense Japanese reference
 /// sheets): the trained dots.ocr extraction prompt reads pictures literally,
 /// where the [`DEFAULT_MODEL`] docling family would caption them instead.
 pub const DEFAULT_DATABOOKS_MODEL: &str = "dots-ocr";

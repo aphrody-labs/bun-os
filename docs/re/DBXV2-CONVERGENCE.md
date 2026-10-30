@@ -6,23 +6,15 @@ readers and the browser execution targets. It does not declare a completed game 
 | Owner | Responsibility | Qualified boundary |
 | --- | --- | --- |
 | `crates/re/src/game` | Format identification, CPK access, conversions | Real CPK reads through Rust FFI and WASM |
-| `crates/shenron-dbxv2`, `packages/shenron-dbxv2` | One Rust implementation, C ABI and WASM bindings | ABI checked by loader; extracted bytes and PNG compared |
 | `apps/play` | Authenticated Steam target and launch request | `/stream?appId=454650`; explicit launch, no automatic execution |
 | `packages/bun-steam` | Installed library and existing Steam client | Native launch URI; acceptance is not readiness |
 | `packages/bun-gamestream` | Signalling, client and input protocol | Existing WebRTC sender reused |
 | `infra/config/host/apps/vps/gaming/stream` | Headless or authorized existing X11 capture | X11 mode preserves the host Steam store; audio initially disabled |
-| Shenron | Product pages, editorial records and data explorer | Links to the same Play target; no session or game bytes copied |
-| `bun:nginx` and host NGINX | Play frontend and private assets origin | Keep established authentication, range and private-origin boundaries |
+| `bun:nginx` (fork-only, not available on upstream Bun) and host NGINX | Play frontend and private assets origin | Keep established authentication, range and private-origin boundaries |
 
 ## Real-data gate
 
-From this workspace, with existing qualified artifacts:
-
-```sh
-SHENRON_DBXV2_LIB=<native-library> bun packages/shenron-dbxv2/scripts/wasm-proof.ts <authorized-cpk> <wasm-directory>
-```
-
-The gate now fails on missing FFI, extracted-size mismatch, byte mismatch,
+The WASM proof gate (an FFI loader plus a WASM module run on an authorized CPK) now fails on missing FFI, extracted-size mismatch, byte mismatch,
 invalid PNG, PNG mismatch or image decoding failure. It always closes its CPK
 descriptor and loaded library after the proof. It does not execute a PC binary.
 
@@ -39,8 +31,8 @@ The current RE recompilation pipeline supports console machine targets; it does
 not provide a Windows x86-64 API/runtime or a DBXV2 executable-to-WASM conversion.
 The Windows hypervisor engine is host-specific, not a browser runtime.
 
-No existing Axum DBXV2 game server was found in these owners. Replacing the mature
-Shenron CPK service requires parity for authentication, ranges, CRILAYLA, bounded
+No existing Axum DBXV2 game server was found in these owners. Replacing a mature
+CPK service requires parity for authentication, ranges, CRILAYLA, bounded
 workers, caching and every conversion route before retiring its current owner.
 An Axum wrapper, static assets or a healthy signalling endpoint alone would not
 prove game execution. Verify actual negotiated frames, input, audio and gameplay

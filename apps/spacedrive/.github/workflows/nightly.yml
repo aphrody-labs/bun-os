@@ -1,0 +1,254 @@
+# Nightly CLI and daemon builds.
+#
+# Every push to the branch below builds sd-cli and sd-daemon in release mode
+# and republishes them on the rolling `nightly` prerelease, whose tag moves to
+# the built commit. The release is edited in place rather than recreated, so
+# people watching the repository for releases are not notified on every push.
+# `sd update` on the nightly channel reads the commit the tag points at (with
+# the `nightly.sha` asset as a fallback) and installs the binaries when it
+# differs from the one the installed CLI was built from (see
+# docs/core/releases.mdx).
+#
+# These binaries are not signed with a Developer ID and are not notarized. The
+# macOS linker adds an ad-hoc signature, which is enough to run a file the CLI
+# downloaded itself; a copy fetched through a browser carries the quarantine
+# attribute and Gatekeeper refuses it until that attribute is removed. The
+# Windows binaries carry no Authenticode signature, so SmartScreen warns on the
+# first run of a browser download; `sd update` replaces binaries in place and
+# is not affected.
+#
+# The binaries are built with sd-core's default features: no bundled FFmpeg,
+# libheif or Pdfium, so they do not depend on apps/.deps at runtime. macOS
+# reaches the same formats through its system codecs. Because `-p sd-cli -p
+# sd-core` without the `ffmpeg` feature never compiles crates/ffmpeg, the Linux
+# job can use ubuntu-22.04, whose FFmpeg 4.4 is too old for sd-ffmpeg and
+# breaks the full-workspace clippy job in ci.yml.
+name: Nightly
+
+on:
+  push:
+    branches:
+      # The branch the nightly channel tracks.
+      - main
+  workflow_dispatch:
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  RUSTUP_MAX_RETRIES: 10
+  NIGHTLY_TAG: nightly
+
+# A second push while a build is running makes the first result stale.
+concurrency:
+  group: nightly
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-15
+            target: aarch64-apple-darwin
+            platform: macos-aarch64
+          - host: blacksmith-4vcpu-ubuntu-2204
+            target: x86_64-unknown-linux-gnu
+            platform: linux-x86_64
+          # GitHub-hosted: Blacksmith has no Windows runners. Unsigned like
+          # the others; SmartScreen warns on first run of a browser download.
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: windows-x86_64
+    name: Build ${{ matrix.settings.platform }}
+    runs-on: ${{ matrix.settings.host }}
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # setup-system is not used here: its `cargo xtask setup` builds a release
+      # sd-daemon for Tauri's bundler check, which the real build below redoes
+      # with sd-cli's feature set, and the generated .cargo/config.toml only
+      # matters with the codec bundle. Static OpenSSL is set below instead so
+      # the Linux binary does not depend on the runner's libssl.
+      - name: Setup Rust
+        uses: ./.github/actions/setup-rust
+        with:
+          target: ${{ matrix.settings.target }}
+          # Save the cargo cache so a warm build does not pay the cold
+          # dependency compile on every push.
+          save-cache: 'true'
+
+      # Same workaround as setup-system: the runner's preinstalled libunwind
+      # blocks libgstreamer1.0-dev, which setup.sh installs.
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get remove libunwind-* || true
+          ./scripts/setup.sh
+
+      - name: Build sd-cli and sd-daemon
+        shell: bash
+        env:
+          SD_GIT_SHA: ${{ github.sha }}
+          OPENSSL_STATIC: '1'
+          OPENSSL_NO_VENDOR: '0'
+        run: |
+          cargo build --release --locked \
+            -p sd-cli -p sd-core --bin sd-cli --bin sd-daemon \
+            --target ${{ matrix.settings.target }}
+
+      # Names are <binary>-<platform>, plus .exe on Windows; the updater
+      # strips both and expects exactly `sd` and `sd-daemon`.
+      - name: Prepare binaries and checksums
+        shell: bash
+        run: |
+          set -eux
+          mkdir -p dist
+          platform=${{ matrix.settings.platform }}
+          exe=""
+          if [ "${{ runner.os }}" = "Windows" ]; then exe=".exe"; fi
+          cp "target/${{ matrix.settings.target }}/release/sd-cli$exe" "dist/sd-$platform$exe"
+          cp "target/${{ matrix.settings.target }}/release/sd-daemon$exe" "dist/sd-daemon-$platform$exe"
+          chmod +x dist/*
+          cd dist
+          for f in "sd-$platform$exe" "sd-daemon-$platform$exe"; do
+            if command -v sha256sum >/dev/null; then
+              sha256sum "$f" > "$f.sha256"
+            else
+              shasum -a 256 "$f" > "$f.sha256"
+            fi
+          done
+          cat ./*.sha256
+          "./sd-$platform$exe" --version
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-${{ matrix.settings.platform }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish nightly prerelease
+    needs: build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      # The tag is moved with git so the release itself is never deleted:
+      # `gh release create` notifies everyone watching the repository for
+      # releases, while editing a release and replacing its assets does not.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nightly-*
+          merge-multiple: true
+          path: dist
+
+      - name: Move the nightly release to this commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -eux
+          sha=${{ github.sha }}
+          short=$(echo "$sha" | cut -c1-12)
+          # The updater reads this asset when the git ref API is rate limited.
+          echo "$sha" > dist/nightly.sha
+          ls -l dist
+          # Also the probe below for a release the old scheme created.
+          marker="This release is edited in place"
+          cat > notes.md <<EOF
+          Rolling nightly build of the CLI and daemon from \`${{ github.ref_name }}\` at $sha.
+
+          Unsigned, may break, replaced on every push. $marker: its tag moves to the commit above and the assets are replaced, so watching the repository for releases does not notify on nightly builds. Opt in with \`sd config set update.channel nightly\` and run \`sd update\`; see docs/core/releases.mdx.
+          EOF
+
+          # Writes the release's notes to body.txt and its asset names to
+          # assets.txt; false only when the release does not exist, so a
+          # transient API error cannot send the script down the create branch.
+          release_exists() {
+            if gh release view "$NIGHTLY_TAG" --json body,assets > view.json 2> view.err; then
+              jq -r .body view.json > body.txt
+              jq -r '.assets[].name' view.json > assets.txt
+              return 0
+            fi
+            grep -q "release not found" view.err || { cat view.err; exit 1; }
+            return 1
+          }
+
+          # A release created by the old delete-and-recreate scheme does not
+          # carry the marker sentence in its notes. Updaters built before the switch
+          # compare the release's target_commitish, which is frozen at
+          # creation, so such a release is recreated once with this commit as
+          # target; every later run edits it in place and those updaters have
+          # been replaced by then. The notes are the marker because both the
+          # create and the edit below write them before any asset upload, so
+          # a run cancelled mid-upload cannot re-arm this branch. The tag
+          # moves here as well, because GitHub keeps an existing tag's commit
+          # over --target; with the release gone there are no assets for it
+          # to mismatch.
+          if release_exists && ! grep -qF "$marker" body.txt; then
+            echo "release predates in-place updates; recreating it once"
+            gh release delete "$NIGHTLY_TAG" --yes
+            git push --force origin "$sha:refs/tags/$NIGHTLY_TAG"
+          fi
+
+          if release_exists; then
+            gh release edit "$NIGHTLY_TAG" \
+              --prerelease \
+              --title "Nightly $short" \
+              --notes-file notes.md
+            # Assets whose platform no longer builds would otherwise stay on
+            # the release forever at an old commit.
+            while read -r name; do
+              if [ ! -e "dist/$name" ]; then
+                echo "removing stale asset $name"
+                gh release delete-asset "$NIGHTLY_TAG" "$name" --yes < /dev/null
+              fi
+            done < assets.txt
+          else
+            # GitHub occasionally answers a create with HTTP 403 right after
+            # the tag was deleted; a short retry rides it out.
+            for attempt in 1 2 3 4 5; do
+              if gh release create "$NIGHTLY_TAG" \
+                --target "$sha" \
+                --prerelease \
+                --title "Nightly $short" \
+                --notes-file notes.md; then
+                break
+              fi
+              if [ "$attempt" = 5 ]; then exit 1; fi
+              echo "release create failed (attempt $attempt), retrying in 15s"
+              sleep 15
+            done
+          fi
+          # The sha marker is the updater's fallback for the tag, so like the
+          # tag it is written only after the binaries it names.
+          gh release upload "$NIGHTLY_TAG" --clobber dist/sd-*
+          gh release upload "$NIGHTLY_TAG" --clobber dist/nightly.sha
+
+          # The tag moves last. The updater keys on it, so a tag that already
+          # named this commit while the release still served the previous
+          # build would install the wrong binaries under this commit's name;
+          # the other way round, an updater only learns about the new build a
+          # little later.
+          git push --force origin "$sha:refs/tags/$NIGHTLY_TAG"
+
+          # A tag that did not move must fail the job rather than leave the
+          # binaries published under the wrong commit.
+          actual=$(gh api "repos/$GH_REPO/git/ref/tags/$NIGHTLY_TAG" --jq .object.sha)
+          if [ "$actual" != "$sha" ]; then
+            echo "nightly tag points at $actual, expected $sha"
+            exit 1
+          fi

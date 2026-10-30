@@ -1,0 +1,33 @@
+# Bun OS unified server: the one Bun binary behind the product API (catalog, downloads, shell API).
+pkgname=bun-os-server
+pkgver=0.1.0
+pkgrel=1
+_commit=cb7a394bcc6fc6b76be14f655f9bbd70fc6579d3
+pkgdesc='Bun OS unified server (single compiled Bun binary) with its systemd unit'
+arch=('x86_64' 'aarch64')
+url='https://github.com/aphrody-labs/bun-distribution'
+license=('Apache-2.0' 'MIT')
+depends=('glibc')
+makedepends=('bun-canary' 'git')
+backup=('etc/bun-os/server.env')
+options=('!strip' '!debug')
+source=("bun-os::git+https://github.com/aphrody-labs/bun-distribution.git#commit=${_commit}"
+        'bun-os-server.service'
+        'server.env')
+sha256sums=('SKIP' 'SKIP' 'SKIP')
+
+build() {
+  cd bun-os
+  bun install --frozen-lockfile --ignore-scripts \
+    --filter '@aphrody/bun-app-host' --filter '@aphrody/bun-artifacts' --filter '@aphrody/bun-workspace'
+  bun packages/bun-app-host/src/build.ts build
+}
+
+package() {
+  cd bun-os
+  install -Dm755 build/apps/bun-os-server "$pkgdir/usr/bin/bun-os-server"
+  install -Dm644 "$srcdir/bun-os-server.service" "$pkgdir/usr/lib/systemd/system/bun-os-server.service"
+  install -Dm600 "$srcdir/server.env" "$pkgdir/etc/bun-os/server.env"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 LICENSE-APACHE "$pkgdir/usr/share/licenses/$pkgname/LICENSE-APACHE"
+}

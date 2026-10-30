@@ -1,0 +1,15 @@
+# Maintainer: aphrody-dev <contact@aphrody.com>
+pkgname=bunos-dotnet
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="dotnet 10 SDK and runtime (musl) from Alpine"
+url="https://github.com/aphrody-labs/bun-os"
+arch="noarch"
+license="Apache-2.0"
+depends="dotnet10-sdk dotnet10-runtime"
+options="!check"
+
+builddir="$srcdir"
+package() {
+	mkdir -p "$pkgdir"
+}

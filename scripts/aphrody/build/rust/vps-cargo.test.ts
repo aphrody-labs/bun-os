@@ -433,7 +433,7 @@ describe("desktop-library routing", () => {
   });
 });
 
-test("dbfr is a bounded secondary factory; every Shenron build stays on the VPS factory", async () => {
+test("dbfr is a bounded secondary factory; external repository builds stay on the VPS factory", async () => {
   const primary = await loadConfig();
   const dbfr = await loadConfig(undefined, "dbfr");
   expect(dbfr.host).toBe("dbfr");
@@ -441,14 +441,10 @@ test("dbfr is a bounded secondary factory; every Shenron build stays on the VPS 
   expect(dbfr.desktopLibraries).toBe(false);
   expect(dbfr.remoteEnv["SCCACHE_CACHE_SIZE"]).toBe("8G");
   expect(dbfr.remoteHeavyLock).toContain("/home/ubuntu/build/");
-  expect(() => repositoryConfig(dbfr, "shenron")).toThrow("primary host only");
-  for (const name of ["shenron", "shenron-release", "shenron-omar"]) {
-    const { config } = repositoryConfig(primary, name);
-    expect(config.host).toBe("vps");
-    expect(config.remoteHeavyLock).toContain("/home/ubuntu/build/");
-    expect(config.cargoSerial).toContain("/home/ubuntu/build/");
-    expect(remoteRunScript(config, SHA, "shenron-routing", ["check"], 2)).toContain(
-      "cd /home/ubuntu/build/wsl/shenron",
-    );
-  }
+  expect(() => repositoryConfig(dbfr, "vu")).toThrow("primary host only");
+  const { config } = repositoryConfig(primary, "vu");
+  expect(config.host).toBe("vps");
+  expect(config.remoteHeavyLock).toContain("/home/ubuntu/build/");
+  expect(config.cargoSerial).toContain("/home/ubuntu/build/");
+  expect(remoteRunScript(config, SHA, "vu-routing", ["check"], 2)).toContain("cd /home/ubuntu/build/wsl/vu");
 });

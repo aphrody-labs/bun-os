@@ -177,35 +177,10 @@
       "scope": "host",
       "reason": "Runtime-only host adapter; Bun is absent there, system CPython is the available interpreter."
     },
-    "scripts/release/atomic-deploy-bundle.sh": {
-      "count": 7,
-      "scope": "host",
-      "reason": "Runtime-only host adapter; Bun is absent there, system CPython is the available interpreter."
-    },
-    "scripts/release/atomic-deploy-rg.sh": {
-      "count": 2,
-      "scope": "host",
-      "reason": "Runtime-only host adapter; Bun is absent there, system CPython is the available interpreter."
-    },
-    "scripts/release/atomic-deploy-shenron.sh": {
-      "count": 9,
-      "scope": "host",
-      "reason": "Runtime-only host adapter; Bun is absent there, system CPython is the available interpreter."
-    },
     "scripts/release/install-linux-host-bridge.sh": {
       "count": 2,
       "scope": "host",
       "reason": "Runtime-only host adapter; Bun is absent there, system CPython is the available interpreter."
-    },
-    "scripts/release/test-atomic-deploy-bundle.sh": {
-      "count": 2,
-      "scope": "test",
-      "reason": "Exercises a host or Python owner exactly as shipped."
-    },
-    "scripts/release/test-atomic-deploy-shenron.sh": {
-      "count": 2,
-      "scope": "test",
-      "reason": "Exercises a host or Python owner exactly as shipped."
     },
     "scripts/tools/ai/py/aphrody/scripts/autopilot.sh": {
       "count": 1,
@@ -216,11 +191,6 @@
       "count": 1,
       "scope": "host",
       "reason": "Runtime-only host adapter; Bun is absent there, system CPython is the available interpreter."
-    },
-    "scripts/tools/infra/provision-shenron-ai-access.sh": {
-      "count": 1,
-      "scope": "host",
-      "reason": "Calls the Bun binary under the VPS home, removed by the 2026-10-03 VPS runtime-only cleanup; broken until moved to a Workspace owner or a yolo single-executable deployable."
     },
     "scripts/tools/install-vps-adapter.sh": {
       "count": 4,

@@ -51,4 +51,12 @@ The parallel Bun session owns native codec internalization. The installed
 `1.4.4` runtime at `2ae8fc65fba1d05c423a2433b1195835109942b6` currently has no
 Bun.Video API. The adapter reports this and does not substitute an unqualified
 provider. Native availability alone does not qualify codecs, video encoding or
-frame accuracy. See [qualification](qualification.md).
+frame accuracy. See [qualification](NATIVE-QUALIFICATION.md).
+
+## Bun Video package
+
+`vendor/bun-video` mounts [aphrody-labs/bun-video](https://github.com/aphrody-labs/bun-video). It runs on the
+unmodified npm `bun` canary with documented APIs only: `Video` from `@aphrody/bun-video/native-video` spawns the
+caller's FFmpeg/FFprobe and uses `Bun.Image`; there is no `Bun.Video` or `bun:video`. Composition (Remotion 4.0.539,
+HyperFrames 0.8.214), HLS/DASH, mediabunny 1.63.0, yt-dlp 2026.10.26 and WebGPU compute are TypeScript on top.
+The fork-only scripts and the FilmCraft-backed native layer are legacy; see `vendor/bun-video/docs/upstream-bun.md`.

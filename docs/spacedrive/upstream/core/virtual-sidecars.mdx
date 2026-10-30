@@ -1,0 +1,131 @@
+---
+title: Virtual Sidecars
+description: Persistent derivatives for previews, search, and analysis
+sidebarTitle: Virtual Sidecars
+---
+
+Sidecars are data derived from a file or supplied beside it. They let Spacedrive
+add thumbnails, previews, transcripts, proxies, embeddings, and other useful
+representations without modifying the original bytes.
+
+## What exists today
+
+Thumbnail tiles are the first managed sidecar kind in the source world, and the
+only one so far. They are record-scoped: every file has a record from its first
+walk, while a content id arrives later and is re-derived when a full hash
+lands. They are retained as persistent sidecars of their source, and peers
+replicate them by reading everything a source has written after their cursor.
+[Thumbnail Generation](./thumbnail-generation.mdx) describes how they are made
+and used. The rest of this page is the model the remaining kinds follow.
+
+## Sidecar classes
+
+### Managed sidecars
+
+Spacedrive or an extension generates and stores these derivatives:
+
+- image thumbnails and preview tiles;
+- video proxies and scrub thumbstrips;
+- OCR text and document structure;
+- audio or video transcripts;
+- embeddings and feature vectors;
+- extracted metadata too large for a record field.
+
+### Referenced sidecars
+
+These are existing source records related to another record, such as:
+
+- a Live Photo video beside its image;
+- a RAW file and rendered JPEG;
+- subtitles delivered with a video;
+- a project manifest and its media.
+
+Referenced sidecars remain ordinary source records. Typed edges describe their
+relationship.
+
+## Identity
+
+A managed sidecar key includes:
+
+- owning extension or core generator;
+- record or confirmed content identity;
+- kind;
+- variant;
+- format;
+- generator version.
+
+The key is deterministic. Two requests for the same valid derivative reuse one
+artifact. A generator version change creates a new key instead of silently
+relabeling old output.
+
+## Record or content scope
+
+Use content scope when the derivative follows identical confirmed bytes. A
+thumbnail or transcript can then serve several records.
+
+Use record scope when source context matters, such as a provider edit, local
+color profile, orientation override, or access-controlled annotation.
+
+Candidate sampled identity is not enough to merge irreversible or sensitive
+sidecars across records.
+
+## Storage and retention
+
+Sidecars declare a retention class:
+
+| Class | Behavior |
+| --- | --- |
+| Cache | Reclaimable and reproducible from an available origin |
+| Persistent | Retained with the source or content policy |
+| Imported | Supplied by an origin and preserved as source evidence |
+
+Calling a sidecar “rebuildable” does not make it safe to delete when its origin
+or generator is unavailable. The policy engine checks both before reclaiming
+it.
+
+## Generation jobs
+
+Sidecar generation runs as a durable job:
+
+1. Resolve the permitted input record and current generation.
+2. Confirm required content evidence.
+3. Reserve the deterministic output key.
+4. Stream input through the byte-provider boundary.
+5. Write a temporary artifact.
+6. Validate output and checksum.
+7. Commit the artifact and publish its metadata.
+
+Retries reuse completed output when its checksum and generator version match.
+Partial files never appear as valid sidecars.
+
+## Remote use
+
+A client can request a sidecar before requesting original bytes. The serving
+node checks the same subtree and content grants used for the source record.
+
+Persistent sidecars can replicate with source policy. Cache sidecars can be
+generated near the consumer. Range-capable proxies support remote media
+scrubbing without downloading an original file first.
+
+## Extensions
+
+Extensions register sidecar kinds, generators, formats, and preview capabilities
+through the SDK. The UI asks the registry for a supported representation instead
+of hard-coding every media type.
+
+If an extension is absent, Spacedrive keeps the sidecar metadata and degrades to
+another preview or the original file. Uninstalling an extension does not delete
+persistent sidecars without an explicit cleanup preview.
+
+## Safety rules
+
+- Never modify an original file to create a derivative.
+- Verify output before publishing it.
+- Keep generator and provenance identity with every artifact.
+- Respect source, subtree, and content permissions for reads.
+- Do not merge record-scoped data through a candidate content hash.
+- Explain why a requested preview is missing or stale.
+- Reclaim only data whose policy and reproducibility permit it.
+
+See [Extension Data Storage](/extensions/data-storage) for model ownership and
+[Architecture](/core/architecture) for the common byte-provider path.

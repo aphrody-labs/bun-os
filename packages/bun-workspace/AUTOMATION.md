@@ -16,7 +16,6 @@ bun src/cli.ts ops monorepo-audit --root . --only imports --json
 bun src/cli.ts ops bun-workspace --root . --json
 bun src/cli.ts ops monorepo-gate --root . --no-build --plan --json
 bun src/cli.ts infra --help
-bun n2b --help
 ```
 
 `workspace` dispatches workspace commands; `ops` loads only the selected
@@ -41,8 +40,8 @@ bun scripts/cargo.ts exec -- run --quiet --locked -p aphrody-infra --bin bunos-i
 
 `BUN_OS_NO_BUILD=1` disables that opt-in. The bridge never starts WSL or selects
 a shell build backend. Type checking, lint, formatting and migration use
-`bun check`, `bun lint`, `bun fmt` and `bun n2b` directly. The compatibility
-`ops n2b` route invokes this runtime's native `n2b` command; it does not discover
+`bun check`, `bun lint` and `bun fmt` directly. The compatibility
+`ops n2b` route loads the native n2b addon (N-API); it does not discover
 an external executable or read `N2B_BIN`.
 
 Infra catalogs live in `infra/config`. The `./automation/client` export is the

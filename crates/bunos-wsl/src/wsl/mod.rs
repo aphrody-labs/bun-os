@@ -1,0 +1,48 @@
+//! WSL management module
+//!
+//! This module provides functionality for managing Windows Subsystem for Linux
+//! (WSL) distributions, including:
+//! - Core operations: list, start, stop, delete, restart, update
+//! - Terminal and IDE integration
+//! - Import/export operations
+//! - Distribution installation
+//! - Disk and OS information
+//! - Resource monitoring
+//! - Version information
+
+mod core;
+pub(crate) use core::list_running_distribution_names;
+pub mod distro_sources;
+pub mod executor;
+mod import_export;
+mod info;
+mod install;
+pub(crate) use install::unique_temp_tag;
+pub mod resources;
+mod service;
+mod terminal;
+mod types;
+
+// Re-export types
+pub use types::{
+    CompactResult, Distribution, DistroState, MountDiskOptions, MountedDisk, PhysicalDisk,
+    WslError, WslPreflightStatus,
+};
+
+// Re-export resource types
+pub use resources::{DistroResourceUsage, WslResourceUsage};
+
+// Re-export version and system info types
+pub use info::{parse_wsl_version_output, SystemDistroInfo, VhdSizeInfo, WslVersionInfo};
+
+// Re-export terminal types
+pub use executor::terminal::InstalledTerminal;
+
+// Re-export service for backward compatibility
+pub use service::WslService;
+
+// Re-export mock functions for E2E testing (from executor module)
+pub use executor::{
+    clear_mock_errors, reset_mock_state, set_mock_error, set_mock_update_result,
+    set_stubborn_shutdown, was_force_shutdown_used, MockErrorType, MockUpdateResult,
+};

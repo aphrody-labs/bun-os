@@ -1,0 +1,144 @@
+---
+title: Back Up Photos from iPhone
+description: Transfer your photo library directly to storage you control
+sidebarTitle: Back Up Photos
+---
+
+Spacedrive backs up iPhone photos to a Mac, Windows PC, Linux server, or NAS
+without making a hosted photo service the permanent authority.
+
+The iPhone photo library is a source. Your chosen folder or dataset is the
+backup destination. Transfers use encrypted peer connections and record content
+verification, album context, edits, dates, places, and other permitted Photos
+metadata.
+
+## Before you begin
+
+You need:
+
+- Spacedrive 2.0 on the iPhone and destination device;
+- Photos permission on iOS;
+- enough destination capacity;
+- a paired connection between the devices;
+- a destination source with write permission.
+
+The initial pairing can happen on the same local network or through the
+internet. Large first backups are faster on a local wired or Wi-Fi connection.
+
+## Add the Photos source
+
+<Steps>
+<Step>
+### Open Sources on iPhone
+
+Choose **Add source**, then select **Apple Photos**.
+</Step>
+<Step>
+### Review access
+
+Choose the full library or selected photos. Spacedrive shows which metadata the
+adapter can import.
+</Step>
+<Step>
+### Confirm in-place import
+
+Importing the source does not move or edit items in Apple Photos. It records
+assets and library metadata in a portable source store.
+</Step>
+</Steps>
+
+The Photos extension adds People, Places, Albums, and media views without
+creating a second core file model.
+
+## Choose a backup destination
+
+On the destination device, track the folder or dataset that will own the copied
+bytes:
+
+~~~bash
+sd-cli sources track /srv/photos
+~~~
+
+Create a photo-backup relationship from the iPhone source to that destination.
+Choose:
+
+- originals or selected formats;
+- whether edits and paired Live Photo assets are preserved;
+- cellular transfer policy;
+- minimum battery and network conditions;
+- destination folder pattern;
+- copy retention and verification.
+
+## First backup
+
+The first run:
+
+1. reads the current Photos generation;
+2. plans missing destination files;
+3. transfers originals and related assets;
+4. verifies committed destination content;
+5. records provenance and album relationships;
+6. reports any asset that iOS did not make readable.
+
+The original remains in Apple Photos. Removing it is a separate action and is
+never implied by backup completion.
+
+<Callout type="warn">
+  A backup is protected only when the destination is an independent failure
+  domain. A folder on the same physical device is another copy, but it does not
+  protect against losing that device.
+</Callout>
+
+## Background operation
+
+iOS grants limited background time. Spacedrive checkpoints verified transfers
+and resumes when the operating system permits it. The interface distinguishes:
+
+- waiting for iOS;
+- waiting for network;
+- waiting for the destination;
+- transferring;
+- verifying;
+- complete with errors;
+- complete.
+
+A notification can report important failures without exposing file names on the
+lock screen.
+
+## Deletions and edits
+
+Backup does not propagate deletions by default. If an item disappears from the
+iPhone, the destination copy remains and the source history records the change.
+
+Edited photos retain their relationship to the original. You can preserve both
+or export the current render according to policy.
+
+## Verify protection
+
+Review:
+
+- assets pending transfer;
+- content verification failures;
+- unreadable iCloud-optimized originals;
+- Live Photo pairs missing one component;
+- destination availability and free space;
+- copies across independent devices.
+
+The Duplicates and Protection views use confirmed content identity, not
+filenames, to explain what is safe to reclaim.
+
+## Privacy
+
+Face, place, album, and search processing runs on infrastructure you control
+unless you explicitly enable an external processor. The interface names the
+recipient before any photo or derived metadata leaves your devices.
+
+Paired clients receive only the source, subtree, metadata, and byte grants you
+approve.
+
+## Next steps
+
+- [Manage Your Libraries](/overview/manage-libraries)
+- [Add Sources and Pins](/overview/add-sources-and-pins)
+- [File Sync](/core/file-sync)
+- [Extensions](/extensions/introduction)

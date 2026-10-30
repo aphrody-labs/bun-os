@@ -28,7 +28,7 @@ export async function createZukanWebService(): Promise<ZukanWebService> {
     module = await import(specifier);
   } catch (error) {
     throw new Error(
-      `No Web service: install @rosegriffon/inagle inside the Aphrody workspace (optional peer ${APHRODY_WEB_MODULE}) or call setZukanWebServiceFactory().`,
+      `No Web service: install @aphrody/inagle inside the Aphrody workspace (optional peer ${APHRODY_WEB_MODULE}) or call setZukanWebServiceFactory().`,
       { cause: error },
     );
   }

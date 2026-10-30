@@ -52,19 +52,20 @@ pub fn assemble_glb(parts: &[(&EmdFile, Option<&[u8]>)]) -> Vec<u8> {
 
     // Append `data` to the binary buffer as a 4-byte-aligned bufferView; `target` 0 means none
     // (required for image bufferViews). Returns the bufferView index.
-    let mut push_view = |bin: &mut Vec<u8>, buffer_views: &mut Vec<Value>, data: &[u8], target: u32| -> usize {
-        while bin.len() % 4 != 0 {
-            bin.push(0);
-        }
-        let offset = bin.len();
-        bin.extend_from_slice(data);
-        let mut view = json!({ "buffer": 0, "byteOffset": offset, "byteLength": data.len() });
-        if target != 0 {
-            view["target"] = json!(target);
-        }
-        buffer_views.push(view);
-        buffer_views.len() - 1
-    };
+    let mut push_view =
+        |bin: &mut Vec<u8>, buffer_views: &mut Vec<Value>, data: &[u8], target: u32| -> usize {
+            while bin.len() % 4 != 0 {
+                bin.push(0);
+            }
+            let offset = bin.len();
+            bin.extend_from_slice(data);
+            let mut view = json!({ "buffer": 0, "byteOffset": offset, "byteLength": data.len() });
+            if target != 0 {
+                view["target"] = json!(target);
+            }
+            buffer_views.push(view);
+            buffer_views.len() - 1
+        };
 
     for (emd, texture_png) in parts {
         // One material per textured part (bound to that part's meshes below).
@@ -126,7 +127,8 @@ pub fn assemble_glb(parts: &[(&EmdFile, Option<&[u8]>)]) -> Vec<u8> {
                         "bufferView": uv_view, "componentType": FLOAT, "count": count, "type": "VEC2",
                     }));
                     let uv_acc = accessors.len() - 1;
-                    let idx_view = push_view(&mut bin, &mut buffer_views, &indices, ELEMENT_ARRAY_BUFFER);
+                    let idx_view =
+                        push_view(&mut bin, &mut buffer_views, &indices, ELEMENT_ARRAY_BUFFER);
                     accessors.push(json!({
                         "bufferView": idx_view, "componentType": UNSIGNED_INT,
                         "count": submesh.indices.len(), "type": "SCALAR",

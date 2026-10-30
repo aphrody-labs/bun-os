@@ -19,7 +19,7 @@ Lit/material-web and Next.js remain separate package hosts, not extra product sh
 | Capability | Owner | Webview contract |
 | --- | --- | --- |
 | Chat and agent sessions | `aphrody app-server` through the app broker | Typed request/event projection; AI stays out of the UI dependency graph. |
-| Files and Drive | `aphrody-drive` and `sd-daemon` | Real file actions through the Drive boundary; retain FSL provenance. |
+| Files and Drive | Spacedrive `sd-daemon` | Real file actions through the daemon boundary; Apache-2.0, see docs/spacedrive/PROVENANCE.md. |
 | Models | AI/model owners through typed adapters | Show truthful install, availability and job state. |
 | Settings and desktop integration | `aphrody-app` | Allow-listed commands and explicit window/platform capabilities. |
 | Web retrieval | `aphrody-web` | Backend capability only; no embedded browsing or crawler administration UI. |

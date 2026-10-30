@@ -1,0 +1,119 @@
+---
+title: Library
+description: The control plane that connects sources, devices, and policy
+sidebarTitle: Library
+---
+
+A library is a durable control plane for a person's sources. It connects
+devices, organization, permissions, jobs, and sync without absorbing every
+filesystem record into one shared database.
+
+## What the library owns
+
+- source registrations and attachment hints;
+- paired device membership and grants;
+- navigation pins, saved views, and policy;
+- staged tag definitions awaiting first use, and the assertion outbox;
+- durable job state and operation history;
+- assertion sync watermarks;
+- cross-source catalog projections.
+
+Large source generations remain in their source stores. Original file bytes
+remain at their origins or in copies created by explicit policy.
+
+## On-disk state
+
+A library has a stable UUID and a directory under the daemon data root. Its
+databases and configuration are private runtime state. Use the daemon API for
+live access rather than opening SQLite files from another process.
+
+Source stores can live with the library, next to portable storage, or at another
+configured path. Their registry entries make that placement explicit.
+
+## Open and close
+
+The daemon owns library lifecycle. Opening a library:
+
+1. validates its configuration and schema;
+2. opens the library databases;
+3. attaches registered source stores;
+4. reconciles interrupted jobs;
+5. starts permitted watchers and network services;
+6. publishes current availability.
+
+Closing drains active work according to each job contract and releases database
+handles. A forced process exit is recovered from durable state on the next open.
+
+## Several libraries
+
+Use separate libraries for a true administrative or security boundary. Use
+sources, pins, tags, and views for ordinary organization inside one
+library.
+
+The CLI can create and select libraries:
+
+~~~bash
+sd-cli library create Personal
+sd-cli library list
+sd-cli library switch --library-id <LIBRARY_ID>
+sd-cli library info
+~~~
+
+## Backup and restore
+
+A backup is the library's state plus every source store this device holds
+for it, written while the daemon runs. Each SQLite file is copied with
+`VACUUM INTO`, so the copy is one consistent transaction and the daemon's
+writers are never held longer than that copy's read. The copy carries no
+original file bytes; those stay at their origins.
+
+~~~bash
+sd-cli library backup --to ~/backups/library-2026-10-07
+sd-cli library backup --to ~/backups/library-2026-10-07.tar.zst
+sd-cli library backup verify --from ~/backups/library-2026-10-07
+sd-cli library restore --from ~/backups/library-2026-10-07 --as-new
+sd-cli library restore --from ~/backups/library-2026-10-07.tar.zst --replace
+~~~
+
+The backup holds `library/` (`library.json`, `library.db`, `sync.db`),
+`sources/<id>/data.db` and `sources/<id>/sidecars.db` for every registered
+source with a store on this device, and `manifest.json`: the device and build
+that wrote it, the library's applied migrations, each source with its store
+id, revision and schema hash, and the byte length and blake3 hash of every
+file. `--no-sidecars` leaves thumbnails out; `--include-replicas` adds this
+device's copies of other devices' sources from `mounts-remote/`.
+
+`verify` hashes every file against the manifest without touching the data
+directory and exits non-zero on a mismatch. `restore` runs the same check
+first, refuses a backup whose library applied a migration this build does
+not know, stages the files under the data directory, and renames them into
+place. `--as-new` creates the library and refuses to overwrite anything;
+`--replace` closes the open library, moves its current state and the
+displaced store files to `restore-trash/<library>-<time>/`, swaps the backup
+in, and reopens it. Pass `--library-id` to restore under a different id.
+
+Once the restored library is open, the restore prunes `restore-trash/` down
+to the newest `backup.restore_trash_keep` entries for that library (default
+2) and prints what it removed. The entry it just parked is always kept, so
+even `sd config set backup.restore_trash_keep 0` leaves one way back from
+the restore that just ran. Other libraries' entries are not touched, and a
+restore that fails prunes nothing.
+
+A library that other devices are members of is not replaced without
+`--force`. Their device rows and the sync watermarks recording what each
+peer was sent live in the library; an older copy rewinds both, so peers
+would hold changes the library no longer remembers sending and would never
+be offered what changed since the backup. After a forced restore, expect to
+re-run sync setup with those devices.
+
+Restoring from the release candidate is a required gate; see
+[Releases](/core/releases).
+
+## Sync
+
+Library sync shares small state and assertions between paired devices. Source
+generations remain authority-owned and are served or replicated separately.
+This keeps sync cost proportional to chosen subscriptions instead of total
+library size.
+
+See [Library Sync](/core/library-sync) and [Data Model](/core/data-model).

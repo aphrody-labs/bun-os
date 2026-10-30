@@ -32,11 +32,9 @@ lightcraft-raw = { path = "../lightcraft-raw", version = "0.7.1" }
 lightcraft-denoise-core = { path = "../lightcraft-denoise-core", version = "0.7.1" }
 lightcraft-denoise = { path = "../lightcraft-denoise", version = "0.7.1", default-features = false, optional = true }
 lightcraft-meta = { path = "../lightcraft-meta", version = "0.7.1" }
-lightcraft-lensdb = { path = "../lightcraft-lensdb", version = "0.7.1" }
 lightcraft-faces = { path = "../lightcraft-faces", version = "0.7.1" }
 miniz_oxide = "0.8"
 lightcraft-merge = { path = "../lightcraft-merge", version = "0.7.1" }
-lightcraft-geocode = { path = "../lightcraft-geocode", version = "0.7.1" }
 rayon = "1"
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = { version = "1", features = ["float_roundtrip"] }

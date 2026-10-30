@@ -1,0 +1,92 @@
+name: Alpine (Bun OS line)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, os]
+    paths:
+      - factory/alpine/**
+      - packages/bunos-run/**
+      - docs/ALPINE.md
+      - .github/workflows/alpine.yml
+
+permissions:
+  contents: read
+
+env:
+  BUN_VERSION: 1.4.4-canary.20261028.1
+
+jobs:
+  suite:
+    name: Compose suite (signed repo, Rust, Bun, wasm, Wine, .NET)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory/alpine
+            packages/bunos-run
+          sparse-checkout-cone-mode: true
+      - run: npm install -g bun@${BUN_VERSION} && bun -e 'console.log(Bun.version, Bun.revision)'
+      - name: Dispatcher unit tests
+        working-directory: packages/bunos-run
+        run: bun test
+      - name: Build all images
+        working-directory: factory/alpine
+        run: |
+          docker compose build
+      - name: Run every capability suite
+        working-directory: factory/alpine
+        run: sh tests/run-all.sh base rust wasm wine dotnet android
+
+  android:
+    name: Android APK on redroid (binder from the runner kernel)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory/alpine
+            packages/bunos-run
+          sparse-checkout-cone-mode: true
+      - name: binder_linux
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q "linux-modules-extra-$(uname -r)" || true
+          sudo modprobe binder_linux devices="binder,hwbinder,vndbinder" || echo "binder_linux unavailable"
+          ls /dev/binder* /dev/binderfs 2>&1 || true
+          grep binder /proc/filesystems || true
+      - name: Build, start redroid, install the APK through bunos run
+        working-directory: factory/alpine
+        run: |
+          docker compose build android fixtures
+          docker compose --profile android up -d redroid repo-server
+          sleep 5; docker compose ps
+          REDROID_HOST=redroid sh tests/run-all.sh android
+      - if: failure()
+        working-directory: factory/alpine
+        run: docker compose logs redroid | tail -40
+
+  wasm-guest:
+    name: Bun OS Alpine core as a container2wasm guest (Bun boot)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory/alpine
+            factory/wasmos
+            packages/bunos-run
+            packages/wasmos
+          sparse-checkout-cone-mode: true
+      - run: npm install -g bun@${BUN_VERSION} && bun -e 'console.log(Bun.version, Bun.revision)'
+      - name: Build the core image and convert it
+        run: |
+          cd factory/alpine && docker compose build base fixtures && cd ../..
+          bun factory/wasmos/build-alpine.ts --image bunos/base:local --artifact bunos-core-x86_64.wasm | tee build-receipt.txt
+      - name: Boot under Bun and run commands
+        env:
+          WASMOS_BUNOS_WASM: ${{ github.workspace }}/build/wasmos/bunos-core-x86_64.wasm
+        run: cd packages/wasmos && bun test test/bunos.test.ts

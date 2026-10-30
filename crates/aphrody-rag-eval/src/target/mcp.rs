@@ -111,23 +111,13 @@ impl EvalTarget for McpTarget {
     }
 
     async fn query(&self, query_str: &str, limit: usize) -> Result<TargetResponse> {
-        if !matches!(
-            self.tool_name.as_str(),
-            "rag_search" | "shenron_rag_search" | "aphrody_shenron_rag_search"
-        ) {
+        if !matches!(self.tool_name.as_str(), "rag_search") {
             return Err(EvalError::Other(
                 "MCP evaluation permits only read-only rag_search tools".to_owned(),
             ));
         }
-        let endpoint = reqwest::Url::parse(&self.endpoint_url)
+        let _endpoint = reqwest::Url::parse(&self.endpoint_url)
             .map_err(|error| EvalError::Other(format!("invalid MCP endpoint: {error}")))?;
-        if endpoint.host_str().is_some_and(|host| {
-            host.ends_with("dragonballfr.com") && host != "mcp.dragonballfr.com"
-        }) {
-            return Err(EvalError::Other(
-                "MCP POST is forbidden on the dbfr public GET-only host".to_owned(),
-            ));
-        }
         // Serialize the whole exchange, not only the initial delay.
         let mut last_request_at = self.last_request_at.lock().await;
         let start = Instant::now();
@@ -138,7 +128,7 @@ impl EvalTarget for McpTarget {
             method: "tools/call",
             params: McpCallParams {
                 name: &self.tool_name,
-                arguments: search_arguments(&self.tool_name, query_str, limit),
+                arguments: search_arguments(query_str, limit),
                 _meta: None,
             },
         };
@@ -239,12 +229,8 @@ fn parse_search_payload(payload: JsonValue) -> Result<(Vec<RetrievedHit>, String
     Ok((hits, mode.to_owned()))
 }
 
-fn search_arguments(tool_name: &str, query: &str, limit: usize) -> JsonValue {
-    if tool_name.contains("shenron_rag_search") {
-        serde_json::json!({ "q": query, "limit": limit })
-    } else {
-        serde_json::json!({ "query": query, "limit": limit })
-    }
+fn search_arguments(query: &str, limit: usize) -> JsonValue {
+    serde_json::json!({ "query": query, "limit": limit })
 }
 
 #[cfg(test)]
@@ -268,16 +254,6 @@ mod tests {
                 .expect("valid empty result");
         assert!(hits.is_empty());
         assert_eq!(mode, "lexical");
-    }
-
-    #[test]
-    fn shenron_search_uses_the_q_argument_from_its_tool_schema() {
-        let arguments = search_arguments("aphrody_shenron_rag_search", "Goku", 5);
-        assert_eq!(arguments, serde_json::json!({"q":"Goku","limit":5}));
-        assert_eq!(
-            search_arguments("rag_search", "Goku", 5),
-            serde_json::json!({"query":"Goku","limit":5})
-        );
     }
 
     #[tokio::test]
@@ -308,12 +284,9 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn mcp_target_blocks_non_search_tools_and_public_get_only_host() {
-        let wrong_tool =
-            McpTarget::new("https://mcp.dragonballfr.com/mcp").with_tool_name("shenron_rag_ingest");
+    async fn mcp_target_blocks_non_search_tools() {
+        let wrong_tool = McpTarget::new("http://127.0.0.1:9/mcp").with_tool_name("rag_ingest");
         assert!(wrong_tool.query("query", 5).await.is_err());
-        let wrong_host = McpTarget::new("https://bot.dragonballfr.com/api/public/rag/search");
-        assert!(wrong_host.query("query", 5).await.is_err());
     }
 
     #[tokio::test]

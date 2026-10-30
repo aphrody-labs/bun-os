@@ -2,11 +2,7 @@
 
 Play's public browser gaming entry point belongs to the same WebOS build,
 M3 application store, qualified Bun Engine packages and offline package manager.
-The Worker redirects `play.aphrody.app/` to
-`https://aphrody.com/workspace/games`. Other Play paths retain their
-pathname and query on the canonical host. The checked-in Worker route is
-deployment intent; installing it and replacing the existing VPS NGINX route
-require Infra deployment and public HTTPS qualification.
+The retired `play.aphrody.app` host is no longer routed.
 
 `GET /api/emulation` and `/emulation/index.json` enumerate only the games in
 the qualified product registry. Existing `/emulation/<core>/<file>` URLs read

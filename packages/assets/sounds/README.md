@@ -1,6 +1,6 @@
 # Sounds
 
-UI sound effects for Spacedrive.
+UI sound effects (derived from the Apache-2.0 Spacedrive set, see ATTRIBUTION notes in packages/assets/README.md).
 
 ## Adding New Sounds
 

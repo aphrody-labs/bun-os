@@ -13,16 +13,6 @@ Atelier d'avatar avec nom, six choix de race, coiffure et couleurs de peau, chev
 le choix est conservé dans le stockage local du navigateur.
 L’éditeur ajoute une silhouette (fine, athlétique ou robuste) et une taille de 85 à 115 %;
 ces paramètres sont rendus par Canvas, WebGPU et Bevy, puis transmis aux joueurs distants.
-Les archives Shenron permettent de chercher tout le RAG, les passages OCR des
-deux mangas ensemble, ou séparément Dragon Ball (42 tomes) et Dragon Ball Super.
-Les vues séparées interrogent le corpus manga partagé, puis filtrent les titres de
-série parmi les 25 premiers résultats récupérés; elles ne garantissent pas une
-couverture exhaustive des pages OCR.
-Le panneau de couverture expose les compteurs globaux du RAG Shenron; ils ne sont
-pas ventilés par série et ne certifient pas une transcription page par page.
-Le catalogue séparé liste les 42 volumes Dragon Ball et les chapitres DBS annoncés
-par Shenron, avec leurs compteurs de pages OCR déclarés; ces métadonnées ne
-certifient pas la complétude des transcriptions.
 
 Le prototype s'inspire de conventions générales de jeux d'arène et reste entièrement
 original. Aucun graphisme, personnage ou code de jeux commerciaux n'est copié.
@@ -88,4 +78,4 @@ oxfmt --check examples/crystal-universe
 ```
 
 Téléchargements Android, preuves et limites :
-[rapport d'exécution](../../../docs/aphrody/operations/omar-crystal-universe.md).
+rapport d'exécution.

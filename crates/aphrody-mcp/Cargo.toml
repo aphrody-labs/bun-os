@@ -17,12 +17,7 @@ path = "src/lib.rs"
 # The Obscura browser (HTTP + DOM + V8, plus the layout/paint engine for
 # screenshots and PDF) served natively. On by default: V8 ships prebuilt for
 # Linux and Windows MSVC (the only Windows toolchain aphrody uses).
-default = ["native-browser", "managed-llama", "gateway-cache"]
-# Redis cache of the Shenron HTTP gateway search (`/api/v1/shenron/rag/search`), built on
-# `aphrody-rag::redis_cache`. On by default, as it was under the former `dragonball` feature.
-gateway-cache = ["dep:aphrody-rag"]
-# Managed llama.cpp daemon as the Shenron LLM backend when no chat base URL is configured.
-managed-llama = ["dep:aphrody-llama-server"]
+default = ["native-browser"]
 native-browser = ["aphrody-web-service/render"]
 # Obscura stealth (fingerprint + tracker blocking, wreq TLS impersonation).
 browser-stealth = ["native-browser", "aphrody-web-service/stealth"]
@@ -89,16 +84,16 @@ aphrody-models = { path = "../aphrody-models", version = "1.4.7", features = [] 
 aphrody-config = { path = "../aphrody-config", version = "1.4.7", features = [] }
 aphrody-agent-home = { path = "../aphrody-agent-home", version = "1.4.7", features = [] }
 aphrody-kernel = { path = "../aphrody-kernel", version = "1.4.7", default-features = false, features = ["builtins"] }
-aphrody-web-extract = { path = "../../toolchains/bun/src/browser/crates/extract", package = "bun_browser_extract" }
-aphrody-web-detect = { path = "../../toolchains/bun/src/browser/crates/detect", package = "bun_browser_detect", features = ["fetch"] }
-aphrody-web-crawl = { path = "../../toolchains/bun/src/browser/crates/crawl", package = "bun_browser_crawl" }
-aphrody-x = { path = "../../toolchains/bun/src/x", package = "bun_x", features = [] }
+aphrody-web-extract = { package = "bun_browser_extract", version = "1.4.7" }
+aphrody-web-detect = { package = "bun_browser_detect", version = "1.4.7", features = ["fetch"] }
+aphrody-web-crawl = { package = "bun_browser_crawl", version = "1.4.7" }
+aphrody-x = { package = "bun_x", version = "1.4.7", features = [] }
 rmcp = { version = "3.5.0", features = ["server", "transport-io", "transport-streamable-http-server", "macros", "schemars"] }
 tokio-postgres = { version = "0.7.18", features = ["with-serde_json-1"] }
 aphrody-sql = { path = "../aphrody-sql", version = "1.4.7", default-features = false, features = ["postgres"] }
 aphrody-a2a = { path = "../aphrody-a2a", version = "1.4.7", features = [] }
 aphrody-a2a-server = { path = "../aphrody-a2a-server", version = "1.4.7", default-features = false, features = [] }
-aphrody-git = { package = "bun_git", path = "../../toolchains/bun/src/bun-os/git" }
+aphrody-git = { package = "bun_git", path = "../bun-os-git" }
 anyhow = "1.0.104"
 clap = { version = "4.6.6", features = ["derive", "env", "color"] }
 tokio = { version = "1.53.1", features = ["process", "rt-multi-thread", "macros", "time", "signal", "sync", "fs", "io-util", "full"] }
@@ -141,8 +136,7 @@ base64 = { version = "0.23.1" }
 aphrody-re = { package = "bun-re", version = "1.4.7", features = [] }
 dirs = { version = "7.0.0" }
 aphrody-gemini-web = { path = "../aphrody-gemini-web", version = "1.4.7", features = [] }
-aphrody-llama-server = { path = "../aphrody-llama-server", version = "1.4.7", features = [], optional = true }
-aphrody-web-service = { path = "../../toolchains/bun/src/browser/crates/service", package = "bun_browser_service", features = [] }
+aphrody-web-service = { package = "bun_browser_service", version = "1.4.7", features = [] }
 regex = { version = "1.11", features = [] }
 aphrody-session = { path = "../aphrody-session", version = "1.4.7", features = ["memory"] }
 aphrody-memory = { path = "../aphrody-memory", version = "1.4.7", features = [] }

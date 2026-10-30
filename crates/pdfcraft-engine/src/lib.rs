@@ -20,6 +20,7 @@
 )]
 
 pub mod actions;
+pub mod audit;
 pub mod autotag;
 pub mod build_info;
 pub mod camera;
@@ -28,13 +29,17 @@ pub mod camera_edges;
 pub mod catalog;
 pub mod commands;
 pub mod compare;
+pub mod compare_core;
 mod copy_image;
 pub mod dates;
 pub mod export;
 pub mod js;
 pub mod links;
 pub mod ocr;
+pub mod ocr_core;
 pub mod optimizer;
+pub mod perspective;
+pub mod preflight;
 pub mod printcheck;
 mod scan_colours;
 pub mod signature_image;
@@ -148,6 +153,7 @@ pub fn typed_signature_graphic(text: &str) -> Option<pdfcraft_sign::Graphic> {
         .then_some(pdfcraft_sign::Graphic::Outlines(o.contours))
 }
 
+pub use crate::preflight as pdfa;
 pub use links::{
     MAX_REMOTE_DOCUMENT_BYTES, RemoteDocumentPathError, read_remote_document,
     remote_document_path_is_absolute, resolve_remote_document_path,
@@ -162,7 +168,6 @@ pub use pdfcraft_annot::{
 };
 pub use pdfcraft_forms::detect;
 pub use pdfcraft_optimize as optimize;
-pub use pdfcraft_preflight as pdfa;
 pub use pdfcraft_print as print;
 pub use pdfcraft_redact::codes::{CODE_SETS as REDACTION_CODE_SETS, CodeSet as RedactionCodeSet};
 pub use pdfcraft_redact::patterns::{
@@ -907,9 +912,9 @@ impl Document {
     /// Verification: faux redactions (opaque covers over extractable text) and redaction
     /// marks that were never applied. Fails closed: any read error is returned, never an
     /// empty list.
-    pub fn audit_redactions(&self) -> Result<Vec<pdfcraft_audit::AuditFinding>, String> {
+    pub fn audit_redactions(&self) -> Result<Vec<crate::audit::AuditFinding>, String> {
         let editor = self.editor.as_ref().ok_or("the document can't be read")?;
-        pdfcraft_audit::audit_redactions(&editor.cos).map_err(|e| e.to_string())
+        crate::audit::audit_redactions(&editor.cos).map_err(|e| e.to_string())
     }
 
     /// Every page's media, crop, bleed, trim and art boxes (user space), for Set Page Boxes.
@@ -1678,7 +1683,7 @@ pub enum Edit {
     /// Standards ▸ Save as PDF/A: fix what can be fixed for `level` (metadata, output intent,
     /// forbidden actions, annotation flags, …).
     ConvertPdfA {
-        level: pdfcraft_preflight::Level,
+        level: crate::preflight::Level,
     },
     /// What a script (button or console) changed in form fields: values, read-only, required
     /// and visibility.
@@ -1695,7 +1700,7 @@ pub enum Edit {
     /// image (from [`ocr::OcrJob::run`]).
     AddOcrText {
         page: usize,
-        words: Vec<pdfcraft_ocr::PlacedWord>,
+        words: Vec<crate::ocr_core::PlacedWord>,
     },
     /// Edit a PDF ▸ Edit text: replace the text of line `line` (from `Document::text_lines`) on
     /// `page`, in its own font when it can show it, else in Helvetica.
@@ -2904,14 +2909,14 @@ fn run_edit(
             };
         }
         Edit::ConvertPdfA { level } => {
-            pdfcraft_preflight::convert(doc, *level)
+            crate::preflight::convert(doc, *level)
                 .map_err(|e| EditError::Invalid(e.to_string()))?;
         }
         Edit::SetDocumentScript { name, script } => {
             pdfcraft_forms::set_document_script(doc, name, script.as_deref())?
         }
         Edit::AddOcrText { page, words } => {
-            pdfcraft_edit::stamp(doc, *page, "OCR", pdfcraft_ocr::text_layer(words))?;
+            pdfcraft_edit::stamp(doc, *page, "OCR", crate::ocr_core::text_layer(words))?;
         }
         Edit::EditPageImage {
             page,

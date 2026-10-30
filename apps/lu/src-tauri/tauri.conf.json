@@ -1,0 +1,110 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/schema.json",
+  "productName": "LU",
+  "version": "3.0.8",
+  "identifier": "com.purpledoubled.locally-uncensored",
+  "build": {
+    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5273",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "title": "LU",
+        "width": 1280,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' http://ipc.localhost; connect-src 'self' blob: http://ipc.localhost http://tauri.localhost http://localhost:* http://127.0.0.1:* https://civitai.com https://*.civitai.com https://huggingface.co https://*.huggingface.co https://ollama.com https://openrouter.ai https://api.openai.com https://api.groq.com https://api.together.xyz https://api.deepseek.com https://api.mistral.ai https://api.anthropic.com ws://localhost:* ws://127.0.0.1:*; img-src 'self' data: blob: http://localhost:* http://127.0.0.1:* https://*.civitai.com https://*.githubusercontent.com; media-src 'self' blob: http://localhost:* http://127.0.0.1:*; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'"
+    }
+  },
+  "plugins": {},
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "PurpleDoubleD",
+    "copyright": "Copyright (c) 2026 PurpleDoubleD. Licensed under AGPL-3.0.",
+    "category": "DeveloperTool",
+    "shortDescription": "LU by LU Labs: local AI tools with optional cloud inference",
+    "longDescription": "LU by LU Labs is an open-source desktop app for AI chat, document retrieval, coding tools, and image and video workflows. Local inference requires compatible hardware and downloaded models. Chat and code run on the processor with at least 8 GB of system memory, while image and video generation need an NVIDIA card with 6 GB of VRAM or more. Some workflows require additional backends or runtime components. Optional cloud inference sends requests to hosted services and has separate usage limits, billing and content restrictions. Downloads, connected tools, remote access and other network features can communicate outside your device. Review the selected backend, tool permissions and data destination before sharing sensitive information.",
+    "homepage": "https://github.com/aphrody-labs/locally-uncensored",
+    "license": "AGPL-3.0-only",
+    "resources": [
+      "resources/whisper_server.py",
+      "resources/voice_loop/lu_voice_loop/*.py",
+      "resources/voice_loop/requirements.txt",
+      "resources/voice_loop/models.json",
+      "resources/voice_loop/python.json",
+      "resources/abliterate/lu_abliterate.py",
+      "resources/abliterate/requirements.txt",
+      "resources/abliterate/constraints.txt"
+    ],
+    "externalBin": [
+      "bin/lu-llama-server"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "macOS": {
+      "entitlements": "./Entitlements.plist",
+      "signingIdentity": "-"
+    },
+    "windows": {
+      "wix": {
+        "upgradeCode": "a32db5c6-2c3c-5e92-a20a-2464954554f9"
+      },
+      "nsis": {
+        "installMode": "both",
+        "displayLanguageSelector": true,
+        "installerIcon": "icons/icon.ico",
+        "headerImage": "icons/nsis-header.bmp",
+        "sidebarImage": "icons/nsis-sidebar.bmp",
+        "installerHooks": "./windows/installer-hooks.nsh"
+      }
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": true
+      },
+      "deb": {
+        "depends": [
+          "libwebkit2gtk-4.1-0",
+          "libgtk-3-0",
+          "libayatana-appindicator3-1",
+          "libvulkan1",
+          "libgomp1"
+        ],
+        "recommends": [
+          "git"
+        ]
+      },
+      "rpm": {
+        "depends": [
+          "webkit2gtk4.1",
+          "gtk3",
+          "libappindicator-gtk3",
+          "libvulkan.so.1()(64bit)",
+          "libgomp.so.1()(64bit)"
+        ],
+        "recommends": [
+          "git"
+        ]
+      }
+    }
+  }
+}

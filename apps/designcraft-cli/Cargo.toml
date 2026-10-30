@@ -25,7 +25,6 @@ designcraft-doc = { path = "../../crates/designcraft-doc" }
 designcraft-geom = { path = "../../crates/designcraft-geom" }
 designcraft-color = { path = "../../crates/designcraft-color" }
 designcraft-compose = { path = "../../crates/designcraft-compose" }
-designcraft-format = { path = "../../crates/designcraft-format" }
 designcraft-pdf = { path = "../../crates/designcraft-pdf" }
 designcraft-mcp = { path = "../../crates/designcraft-mcp" }
 serde_json = { version = "1", features = ["float_roundtrip"] }

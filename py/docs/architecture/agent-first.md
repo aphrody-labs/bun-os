@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Architecture Agent-First
 
-Décision propriétaire reçue le 2026-10-03. Le [plan Aphrody](../../../docs/aphrody/PLAN.md)
+Décision propriétaire reçue le 2026-10-03. Le plan Aphrody
 reste l'autorité commune. Workspace/Infra possède les workflows inter-dépôts ;
 le [superviseur](../../../packages/workspace/src/python-workspace.ts) (`yolo py`) décrit les gates Python à consommer
 depuis ces propriétaires, sans installation dépendant d'un checkout voisin.

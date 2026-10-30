@@ -41,7 +41,7 @@
     "checkedFiles": 57,
     "runtime": {
       "version": "1.4.4",
-      "repository": "aphrody-labs/bun",
+      "repository": "oven-sh/bun",
       "revision": "dfde053a3045d6076ad315b6f63160c4ced71513",
       "executable": "/usr/local/bin/bun"
     },

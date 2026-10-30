@@ -1,0 +1,55 @@
+{
+  "wan-2.2-720p": [
+    5,
+    8
+  ],
+  "wan-2.2-fast": [
+    5
+  ],
+  "ltx-2": [
+    5,
+    8
+  ],
+  "hunyuan-video": [
+    5,
+    8
+  ],
+  "ltx-2.3": [
+    5,
+    8
+  ],
+  "wan-2.2-spicy": [
+    5
+  ],
+  "ltx-2.3-spicy": [
+    5
+  ],
+  "wan-2.6-spicy": [
+    5,
+    10,
+    15
+  ],
+  "wan-2.7-spicy": [
+    5,
+    10,
+    15
+  ],
+  "minimax-h3-spicy": [
+    5
+  ],
+  "seedance-1.5-pro-spicy": [
+    5
+  ],
+  "seedance-2.5-spicy": [
+    5
+  ],
+  "seedance-2.0-spicy": [
+    5
+  ],
+  "seedance-2.0-fast-spicy": [
+    5
+  ],
+  "vidu-q3-spicy": [
+    5
+  ]
+}

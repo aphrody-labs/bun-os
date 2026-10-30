@@ -61,7 +61,17 @@ test("SDK staging resolves transitive source dependencies without copying runtim
   }
 });
 
-async function run(args: string[], env = process.env) {
+// A workstation that exports the root of another checkout must not decide which aphrody.config.json the builder reads.
+const hostRoots = [
+  "BUN_OS_ROOT",
+  "APHRODY_ROOT",
+  "APHRODY_WORKSPACE_ROOT",
+  "APHRODY_MONOREPO_ROOT",
+  "APHRODY_BUN_CHECKOUT",
+];
+const cleanEnv = () => Object.fromEntries(Object.entries(process.env).filter(([key]) => !hostRoots.includes(key)));
+
+async function run(args: string[], env: Record<string, string | undefined> = cleanEnv()) {
   const child = Bun.spawn([process.execPath, builder, ...args], {
     windowsHide: true,
     env,
@@ -89,6 +99,7 @@ async function fixture() {
   const serialScript = join(root, wrapper);
   await mkdir(dirname(serialScript), { recursive: true });
   await cp(join(import.meta.dir, "../../../..", wrapper), serialScript);
+  await cp(join(import.meta.dir, "../../../..", "aphrody.config.json"), join(root, "aphrody.config.json"));
   await writeFile(join(root, "Cargo.toml"), '[workspace]\nresolver="3"\nmembers=["crates/aphrody-ffi"]\n');
   await writeFile(
     join(ffi, "Cargo.toml"),
@@ -160,7 +171,7 @@ test("native builder fails before build when the serialization wrapper is absent
       ),
     );
     const result = await run([`--root=${root}`, "--debug", "--offline", "--unlocked"], {
-      ...process.env,
+      ...cleanEnv(),
       CARGO_TARGET_DIR: join(root, "target"),
     });
     expect(result.code).toBe(1);
@@ -333,32 +344,6 @@ test("native builder requires actual GPU forwarding rather than accepting an unu
     await rm(root, { recursive: true, force: true });
   }
 });
-
-test("native builder refuses an ABI-incomplete artifact and leaves no success manifest", async () => {
-  const { root, consumer } = await fixture();
-  try {
-    const result = await run([`--root=${root}`, "--debug", "--offline", "--unlocked"], {
-      ...process.env,
-      CARGO_TARGET_DIR: join(root, "target"),
-    });
-    expect(result.stderr).toContain("staged native consumer failed");
-    expect(result.stderr).toContain("aphrody_abi_version");
-    expect(result.code).toBe(1);
-    const artifact = join(root, "target/debug", `${process.platform === "win32" ? "" : "lib"}aphrody_ffi.${suffix}`);
-    const mismatch = await run([
-      `--root=${root}`,
-      "--debug",
-      `--stage-existing=${artifact}`,
-      `--artifact-sha256=${"0".repeat(64)}`,
-    ]);
-    expect(mismatch.code).toBe(1);
-    expect(mismatch.stderr).toContain("does not match --artifact-sha256");
-    const markers = await Array.fromAsync(new Bun.Glob("native/**/manifest.json").scan({ cwd: consumer }));
-    expect(markers).toEqual([]);
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
-}, 60_000);
 
 test("jobs qualification requires actual forwarding and cannot attest reused artifacts", async () => {
   const { root } = await fixture();

@@ -1,0 +1,312 @@
+---
+title: Releases
+description: The 2.0 beta commitment, versioning, build artifacts, and release gates
+sidebarTitle: Releases
+---
+
+<Callout>
+  **Spacedrive 2.0 Beta is planned for November 1, 2026.**
+
+  Release artifacts remain drafts until the cross-platform and destructive
+  operation gates on this page pass.
+</Callout>
+
+Spacedrive uses semantic versions and signed GitHub release artifacts.
+
+~~~text
+2.0.0-beta.1   first beta
+2.0.0-beta.2   subsequent beta
+2.0.0          stable
+~~~
+
+## What beta means
+
+Spacedrive 2.0 Beta is the next public milestone. It marks a commitment to the
+source and library data model after the alpha period established the product's
+direction. Supported beta data must survive later upgrades through tested
+migrations. The schema can evolve while preserving the libraries people build.
+The current alpha transition remains a breaking release; beta does not require
+backwards compatibility with retired location models.
+
+The launch post must explain this commitment and the version history. See the
+[beta launch brief](../plans/2026-09-17-beta-launch.md) for the agreed narrative
+and proposed announcement text. Passing the gates below earns the beta label;
+the target date alone does not.
+
+## Release principle
+
+A release tag is a claim about data safety. Builds are published only after the
+same source, operation, and recovery contracts pass on every advertised
+platform.
+
+## Version bump
+
+The repository task updates package versions, creates the version commit, and
+tags it:
+
+~~~bash
+cargo xtask bump 2.0.0-beta.1
+~~~
+
+Inspect the resulting diff and tag before pushing:
+
+~~~bash
+git show --stat v2.0.0-beta.1
+git push origin main
+git push origin v2.0.0-beta.1
+~~~
+
+Pushing the tag starts release builds. It does not by itself publish a stable
+release.
+
+## Artifacts
+
+The release pipeline builds:
+
+| Product | Platforms |
+| --- | --- |
+| Desktop | macOS ARM64 and x86-64, Windows x86-64, Linux x86-64 and ARM64 |
+| Headless server | Linux x86-64 and ARM64 |
+| CLI and daemon | Every supported desktop and server platform |
+| Mobile | iOS and Android |
+| Container | Linux amd64 and arm64 |
+
+Each downloadable archive includes a checksum. Executable packages and update
+metadata are signed with the platform or Spacedrive release key.
+
+Stable container releases update the **latest** tag. Prereleases keep their
+explicit version tag.
+
+## Nightly channel
+
+The nightly channel is a rolling build of the CLI and daemon for people who
+want to track `main` without compiling. Every push to `main` runs
+`.github/workflows/nightly.yml`, which builds `sd` and `sd-daemon`
+in release mode for macOS ARM64, Linux x86-64 and Windows x86-64 and
+republishes them on the GitHub prerelease tagged `nightly`. There is one nightly release and the
+workflow edits it in place: it rewrites the title and notes, replaces every
+asset with `gh release upload --clobber`, removes assets for platforms that no
+longer build, and only then moves the `nightly` tag to the built commit, so
+the tag never names a commit whose binaries are not yet published. The
+release is created only when it does not exist. Asset URLs are stable because they are
+built from the tag and the asset name, for example
+`https://github.com/spacedriveapp/spacedrive/releases/download/nightly/sd-macos-aarch64`.
+Windows assets carry the `.exe` suffix (`sd-windows-x86_64.exe`,
+`sd-daemon-windows-x86_64.exe`), which the updater strips when it matches an
+asset to a binary.
+
+The release notes name the commit the build came from. Because GitHub freezes
+a release's `target_commitish` at creation, that field does not move with the
+tag; use the tag ref or the `nightly.sha` asset instead. Earlier versions of
+the workflow deleted and recreated the release on every push, which sent a
+release notification to every watcher. A release whose notes do not say it is
+edited in place was made that way and is recreated one last time, so an updater built
+before the switch, which compares `target_commitish`, still sees a newer build
+and installs the current updater.
+
+Nightly builds are not a release:
+
+- They are not signed with a Developer ID and are not notarized. The macOS
+  linker adds an ad-hoc signature, which is enough to run a binary the CLI
+  downloaded itself. A copy downloaded in a browser carries the quarantine
+  attribute and Gatekeeper refuses it until you remove that attribute. The
+  Windows binaries have no Authenticode signature, so SmartScreen warns the
+  first time you run one you downloaded in a browser.
+- They can break, lose data, or change schemas without migrations. Keep
+  backups of any library you point a nightly build at.
+- They carry sd-core's default features only: no bundled FFmpeg, libheif, or
+  Pdfium. macOS reaches those formats through its system codecs.
+
+Each binary ships with a `.sha256` file, which `sd update` verifies before it
+writes anything.
+
+### Notifications
+
+GitHub notifies people who watch the repository for releases only when a
+release is published. Editing the nightly release, moving its tag, and
+replacing its assets publish nothing, so the nightly channel no longer sends a
+notification on every push to `main`. To follow stable releases only, choose
+**Watch**, **Custom**, and tick **Releases** on the repository page: that
+subscription fires for each new tagged release and stays quiet for nightly
+builds.
+
+### Opting in
+
+~~~bash
+sd config set update.repo spacedriveapp/spacedrive
+sd config set update.channel nightly
+sd update
+~~~
+
+The repository line matters on installs whose `cli.json` was written before
+the default pointed at this repository. On the nightly channel, `sd update`
+fetches the `nightly` release by tag, reads the commit the `nightly` tag
+points at from the git ref API (`GET
+/repos/spacedriveapp/spacedrive/git/ref/tags/nightly`, dereferencing an
+annotated tag through `/git/tags/{sha}`), and compares it with the commit the
+installed binary was built from. Both requests are unauthenticated and share
+GitHub's 60 per hour limit; when the ref lookup fails, the updater reads the
+`nightly.sha` asset the workflow uploads with the binaries, which is served
+from the release download host and is not rate limited. `sd --version` prints
+both the package version and the installed commit, for example
+`2.0.0-alpha.2 (46a54caf3be5...)`. Builds from a tree without git report
+`unknown` and always see an update.
+
+`sd update --yes` skips the confirmation prompt and does nothing when the
+installed commit already matches. `sd update --force` reinstalls the current
+nightly even when it matches. Both replace the running `sd` binary and the
+`sd-daemon` next to it through a `.bak` copy and a rename of the downloaded
+file into place, stop the daemon first, and start it again afterwards. Windows
+cannot replace or delete a running executable, so there the current binary is
+moved to `.bak` first and `sd.exe.bak` stays beside the binaries until the
+next update removes it. When `sd daemon install` has launchd
+managing the daemon, the restart goes through `launchctl kickstart` so launchd
+keeps owning the process. After an install the build's commit (or the release
+tag on the stable channel) is written to `sd-version.txt` beside the binaries.
+
+Downloads go to `updates/<asset>.<build>.part` in the data directory and
+resume from the part's length on the next attempt, so a link that drops
+mid-transfer keeps what it received. A download that moves no bytes for 60
+seconds is abandoned for that run and resumed on the next one; a part from a
+different build is discarded. The checksum is verified on the complete part
+before anything is replaced. Every run, manual or from the timer, appends one
+line to `logs/update.log` in the data directory with the channel, installed
+and available builds and the result, and records the same in
+`update-state.json`.
+
+~~~bash
+sd update status
+~~~
+
+prints the running build, the `sd-version.txt` marker, the last attempt with
+its result, any part waiting to resume, and the timer state.
+
+### Updating on a schedule
+
+~~~bash
+sd update install-timer              # every hour
+sd update install-timer --interval 21600
+sd update timer-status
+sd update uninstall-timer
+~~~
+
+On macOS this writes `~/Library/LaunchAgents/com.spacedrive.update.plist` with
+a `StartInterval` and `RunAtLoad`, running the installed `sd` with
+`--data-dir` and, when set, `--instance`, followed by `update --yes`. launchd
+runs a missed interval when the Mac wakes, and `RunAtLoad` runs a check at
+login. Output goes to `logs/update.log` in the data directory. On Linux it writes a systemd user timer and oneshot service
+named `spacedrive-update`. The service runs the binary at the absolute path of
+the `sd` that installed it, so move the binary and reinstall the timer
+together.
+
+### Going back to stable
+
+~~~bash
+sd config set update.channel stable
+sd update
+~~~
+
+The stable channel follows the repository's latest release and installs it
+only when its tag is a newer semantic version than the installed package
+version. The repository's latest release is still a v1 desktop build, so a
+2.0 nightly on the stable channel reports that it is up to date until the
+first 2.0 release ships standalone `sd` and `sd-daemon` assets.
+
+## Required gates
+
+### Repository
+
+- Formatting, linting, and tests pass. Enforced by `ci.yml` jobs Rust
+  Formatting, Clippy, and TypeScript, and by `core_tests.yml`.
+- Generated TypeScript and platform schemas match Rust types. Enforced by
+  `ci.yml` job Generated types.
+- Fumadocs type-checks and builds. Enforced by `ci.yml` job Docs.
+- No retired product route or accidental secret ships. Secrets enforced by
+  `ci.yml` job Secrets scan (gitleaks, allowlist in `.gitleaks.toml`); retired
+  routes remain a review check.
+- License and third-party notices are current. Enforced by `ci.yml` job
+  License and notices.
+
+### Data safety
+
+- Index interruption cannot perform an incomplete sweep.
+- Batch failure salvages valid records and names invalid ones.
+- Final job writes commit before completion.
+- Candidate content does not authorize deletion.
+- Copy, move, archive, and duplicate cleanup verify required outcomes.
+- Source reindex preserves assertions.
+- Database backup and restore pass from release candidates.
+
+### Cross-platform
+
+- Filesystem metadata is checked on supported macOS, Windows, and Linux
+  filesystems.
+- Non-UTF-8 or otherwise unrepresentable names fail visibly.
+- Birth time and symlink behavior match platform claims.
+- Mount, watcher, permission, removable-drive, and network-loss tests pass.
+- Static server builds run on the supported deployment targets.
+
+### Product
+
+- A new user can create a library and include content through Add to Library.
+- Two devices can pair without a hosted account.
+- A client can query, stream, mount, and operate an authorized remote source.
+- Source and library state remain understandable while an origin is offline.
+- Extensions can add one real file kind and preview without core changes.
+- Desktop, web, CLI, and MCP exercise the same operation semantics.
+
+## Candidate validation
+
+Before publishing:
+
+1. Install clean artifacts on every platform.
+2. Exercise each supported upgrade path on copies of real prior-version state.
+3. Index and verify a real large source.
+4. Interrupt jobs and daemons during writes.
+5. Pair devices across local and relayed paths. CI covers both on every
+   pull request: `device_pairing_test` pairs over mDNS, and
+   `relay_only_pairing_test` pairs through an iroh relay the suite runs
+   in-process with mDNS off (`SD_RELAY_URL`, `SD_DISABLE_MDNS`) and checks
+   the relay's own counters saw the handshake. The mDNS suites still need
+   a public n0 relay reachable, since the initiator waits for the endpoint
+   to come online, but no pairing bytes cross it and pkarr discovery over
+   `dns.iroh.link` is not exercised in CI; pair one real device pair across
+   networks before publishing.
+6. Exercise remote queries, ranges, mounts, and mutations.
+7. Restore the library and source stores from backup: `sd-cli library backup
+   --to <dir>`, `sd-cli library backup verify --from <dir>`, then `sd-cli
+   library restore --from <dir> --as-new` on a fresh data directory and
+   `--replace` over the original, comparing counts against `library info`.
+8. Verify update signatures and rollback.
+9. Review the generated release notes and checksums.
+
+Never run destructive release tests against the only copy of user data.
+
+## Publishing
+
+The workflow creates a draft GitHub release. A maintainer verifies artifacts,
+checksums, signatures, and gate evidence before publishing it.
+
+Release notes state:
+
+- supported platforms and filesystems;
+- schema and migration changes;
+- known limits;
+- security changes;
+- behavior that can affect file bytes;
+- backup steps required before upgrade.
+
+## Hotfixes
+
+A hotfix branches from the affected stable tag, contains the smallest safe
+change, and passes the relevant full gate. Data-integrity fixes include a
+regression test and explain whether existing stores need verification or
+repair.
+
+## Rollback
+
+Binary rollback is allowed only when the older version understands the current
+schema. Otherwise restore the pre-upgrade library and source-store backup
+together.
+
+The release notes identify the last rollback-compatible version.

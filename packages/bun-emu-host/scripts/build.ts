@@ -6,6 +6,7 @@
 // build/emu-host/bin. Native builds are bounded to 4 jobs by default.
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { captureVcvars, findVisualStudio } from "@aphrody/buncc/msvc";
 
 const root = resolve(import.meta.dir, "../../..");
 const pkg = resolve(import.meta.dir, "..");
@@ -110,35 +111,17 @@ async function run(cmd: string[], env: Record<string, string> = {}) {
   if (code !== 0) throw new Error(`${cmd[0]} exited with ${code}`);
 }
 
-const msvc = ["bun", "msvc", "--toolset", "14.44"];
-
-await run(
-  [
-    ...msvc,
-    "vcpkg",
-    "install",
-    `--x-manifest-root=${join(root, "packages/iecode-cpp")}`,
-    "--x-feature=emu-host",
-    `--triplet=${triplet}`,
-    `--host-triplet=${triplet}`,
-    `--x-install-root=${installRoot}`,
-  ],
-  { VCPKG_MAX_CONCURRENCY: String(jobs) },
-);
-
-// The MSVC developer environment of a toolset. When that toolset was installed
-// without its C++ standard library and CRT (an unfinished Visual Studio
-// install), the headers and import libraries of the default toolset are used
-// with its compiler, so objects still link against msvcp140/vcruntime140.
+// The MSVC developer environment of a toolset, entered by buncc (one vswhere/vcvarsall implementation, cached). When that
+// toolset was installed without its C++ standard library and CRT (an unfinished Visual Studio install), the headers and
+// import libraries of the default toolset are used with its compiler, so objects still link against msvcp140/vcruntime140.
 async function msvcEnv(toolset: string): Promise<Record<string, string>> {
+  const studio = await findVisualStudio();
+  if (!studio) throw new Error("Visual Studio with the C++ toolset was not found (buncc msvc provider)");
   const read = async (t: string) =>
-    JSON.parse(
-      await new Response(
-        Bun.spawn(["bun", "msvc", "--toolset", t, "env", "--format", "json"], {
-          stdout: "pipe",
-        }).stdout,
-      ).text(),
-    ) as Record<string, string>;
+    ({
+      ...(process.env as Record<string, string>),
+      ...(await captureVcvars(studio, { arch: "x64", toolset: t })).env,
+    }) as Record<string, string>;
   const env = await read(toolset);
   const first = (list: string) => list.split(";")[0]!;
   if (toolset !== "14.44" && !existsSync(join(first(env.INCLUDE!), "vector"))) {
@@ -151,6 +134,19 @@ async function msvcEnv(toolset: string): Promise<Record<string, string>> {
   }
   return env;
 }
+
+await run(
+  [
+    "vcpkg",
+    "install",
+    `--x-manifest-root=${join(root, "packages/iecode-cpp")}`,
+    "--x-feature=emu-host",
+    `--triplet=${triplet}`,
+    `--host-triplet=${triplet}`,
+    `--x-install-root=${installRoot}`,
+  ],
+  { VCPKG_MAX_CONCURRENCY: String(jobs), ...(await msvcEnv("14.44")) },
+);
 
 for (const core of selected) {
   const { cc, cxx, source, project, toolset, defines = [] } = cores[core]!;

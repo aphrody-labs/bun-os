@@ -1,0 +1,148 @@
+name: Bun OS C
+
+# Smoke matrix of the Bun OS C environment (factory/c/c-env.json, docs/BUNOS-C.md). Wine, qemu and the cross compilers are
+# installed on the runner only. No Microsoft-licensed sysroot (xwin) is downloaded here: the MSVC ABI targets are built on
+# the Windows runner with the Visual Studio that ships on it.
+
+on:
+  push:
+    branches: [main, os]
+    paths:
+      - "factory/c/**"
+      - "packages/buncc/src/c/**"
+      - ".github/workflows/bunos-c.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bunos-c-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: ubuntu (Linux ELF, mingw PE via Wine, ReactOS-flavoured PE)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory/c
+            packages/buncc
+            .github
+      - uses: ./.github/actions/setup-bun
+      - name: Cache llvm-mingw (sha256 pinned in c-env.json)
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bunos-c/llvm-mingw
+          key: llvm-mingw-linux-${{ hashFiles('factory/c/c-env.json') }}
+      - name: Install llvm-mingw (verified against the pinned sha256)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          asset=$(bun -e 'console.log(JSON.parse(await Bun.file("factory/c/c-env.json").text()).tools["llvm-mingw"]["linux-x64"].asset)')
+          sha=$(bun -e 'console.log(JSON.parse(await Bun.file("factory/c/c-env.json").text()).tools["llvm-mingw"]["linux-x64"].sha256)')
+          tag=$(bun -e 'console.log(JSON.parse(await Bun.file("factory/c/c-env.json").text()).tools["llvm-mingw"].pin)')
+          mkdir -p ~/.cache/bunos-c/llvm-mingw
+          curl -fsSL -o /tmp/lm.tar.xz "https://github.com/mstorsjo/llvm-mingw/releases/download/${tag}/${asset}"
+          echo "${sha}  /tmp/lm.tar.xz" | sha256sum -c -
+          tar -xJf /tmp/lm.tar.xz -C ~/.cache/bunos-c/llvm-mingw
+      - name: Install runners and cross libs (runner only)
+        run: |
+          set -euo pipefail
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang lld gcc gcc-mingw-w64-x86-64 gcc-aarch64-linux-gnu libc6-dev-arm64-cross qemu-user wine wine64 wine32:i386 musl-tools binutils
+      - name: buncc c doctor
+        run: bun packages/buncc/src/cli.ts c doctor
+      - name: Smoke matrix
+        env:
+          BUNOS_C_SYSROOT_ARCH_GLIBC_AARCH64: /
+          BUNOS_C_QEMU_PREFIX: /usr/aarch64-linux-gnu
+          WINEDEBUG: -all
+          WINEPREFIX: ${{ runner.temp }}/wine
+        run: |
+          set -o pipefail
+          bun packages/buncc/src/cli.ts c test --out build-c | tee build-c.jsonl
+          ! grep -E '"(build|run)":"FAIL|MISMATCH' build-c.jsonl
+      - name: Verify with readelf
+        run: |
+          for f in build-c/hello-*linux*; do echo "== $f"; readelf -h "$f" | grep -E 'Class|Machine'; done
+      - name: Benchmark (gcc, clang, mingw gcc, llvm-mingw)
+        env:
+          BUNOS_C_LLVM_MINGW: ""
+        run: |
+          export BUNOS_C_LLVM_MINGW=$(ls -d ~/.cache/bunos-c/llvm-mingw/llvm-mingw-*)
+          bun factory/c/bench/bench.ts --files 120 --runs 3 | tee bench-linux.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bunos-c-linux
+          path: |
+            build-c/hello-*
+            build-c.jsonl
+            bench-linux.jsonl
+          if-no-files-found: error
+
+  musl:
+    name: alpine (musl ELF)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container: alpine:latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: factory/c
+      - run: apk add --no-cache clang lld musl-dev binutils file gcc
+      - name: Build, inspect and run
+        run: |
+          clang --target=x86_64-alpine-linux-musl -fuse-ld=lld -O2 -static factory/c/smoke/hello.c -o hello-musl
+          readelf -h hello-musl | grep -E 'Class|Machine'
+          ./hello-musl | grep 'bunos-c hello 64-bit'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bunos-c-musl
+          path: hello-musl
+
+  windows:
+    name: windows (MSVC ABI with the runner's Visual Studio, llvm-mingw, ReactOS-flavoured PE)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory/c
+            packages/buncc
+            .github
+      - uses: ./.github/actions/setup-bun
+      - name: Cache portable bundle
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/bunos-c
+          key: bunos-c-win-${{ hashFiles('factory/c/windows/bundle.json') }}
+      - name: Portable bundle (sha256 verified, no PATH change)
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: bun factory/c/windows/bundle.ts --root "$RUNNER_TEMP/bunos-c" --run
+      - name: Smoke matrix and benchmark
+        shell: bash
+        run: |
+          export BUNOS_C_LLVM_MINGW="$RUNNER_TEMP/bunos-c/llvm-mingw/llvm-mingw-20261020-ucrt-x86_64"
+          export PATH="$RUNNER_TEMP/bunos-c/clang/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin:$PATH"
+          clang --version | head -1
+          bun packages/buncc/src/cli.ts c doctor
+          bun packages/buncc/src/cli.ts c test --out build-c | tee build-c.jsonl
+          ! grep -E '"(build|run)":"FAIL|MISMATCH' build-c.jsonl
+          bun factory/c/bench/bench.ts --files 120 --runs 3 | tee bench-windows.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bunos-c-windows
+          path: |
+            build-c/hello-*
+            build-c.jsonl
+            bench-windows.jsonl
+          if-no-files-found: error

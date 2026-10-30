@@ -104,7 +104,7 @@ Fidélité des glyphes (`tests/loader.rs`) : six glyphes rendus depuis la police
 Google (`crates/ui/bun/tests/fixtures/icons`), écart maximal de 1/255 par canal à 256 px et aucun
 pixel différent en RGBA 48 px. Côté web, `loadIcon()` de `@aphrody/identity/load` applique les
 mêmes règles avec les décodeurs du navigateur ; côté Bun, `@aphrody/bun-icons` (dépôt
-aphrody-labs/bun) importe `symbol:home` et les `.ico`.
+the former Bun fork) importe `symbol:home` et les `.ico`.
 
 ## Tests
 

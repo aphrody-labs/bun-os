@@ -9,7 +9,8 @@
  * carries `sensitive = 1`. `localconfig.vdf` is parsed only for per-app playtime keys.
  */
 import type { Database } from "bun:sqlite";
-import { pe as winPe, processes as winProcesses, registry as winRegistry } from "bun:windows";
+import { parsePe } from "./pe";
+import { processes as winProcesses, registry as winRegistry } from "./win";
 import { readFileSync, statSync } from "node:fs";
 import { hostname } from "node:os";
 import { basename, dirname, extname, join, resolve } from "node:path";
@@ -572,13 +573,13 @@ function dirBytes(path: string): number {
 }
 
 // ---------------------------------------------------------------------------------------------
-// PE metadata via bun:windows
+// PE metadata (src/pe.ts)
 
 function recordPe(db: Database, fileId: number, path: string): boolean {
   let info: Record<string, unknown>;
   try {
     if (statSync(path).size > 256 * 1024 * 1024) return false;
-    const parsed = winPe.parse(readFileSync(path)) as unknown as Record<string, unknown> | null;
+    const parsed = parsePe(readFileSync(path)) as unknown as Record<string, unknown> | null;
     if (!parsed) return false;
     info = parsed;
   } catch {
@@ -1053,7 +1054,7 @@ function readLibraryCache(db: Database, steamRoot: string): void {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Registry and processes (bun:windows)
+// Registry and processes (src/win.ts)
 
 function readRegistry(db: Database): void {
   const insV = db.query("INSERT OR REPLACE INTO reg_value(hive, key, name, type, value) VALUES (?,?,?,?,?)");
@@ -1102,7 +1103,7 @@ function readRegistry(db: Database): void {
 function readProcesses(db: Database): void {
   let list: { pid: number; ppid?: number; name?: string; path?: string }[];
   try {
-    list = winProcesses.list() as typeof list;
+    list = winProcesses.list({ detail: true }) as typeof list;
   } catch {
     return;
   }

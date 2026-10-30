@@ -23,11 +23,12 @@ tauri-build = { workspace = true }
 
 [features]
 # Debug bridge for aphrody-web / aphrody-tauri-mcp (loopback, token, debug builds only).
-debug-bridge = ["aphrody-tauri-wrap/debug-bridge"]
+debug-bridge = ["tauri-plugin-aphrody/wrap-debug-bridge"]
 
 [dependencies]
 aphrody-tauri-3d = { workspace = true }
-aphrody-tauri-wrap = { workspace = true, default-features = false }
+tauri-plugin-aphrody = { workspace = true, features = ["wrap"] }
 log = { workspace = true }
-tauri = { workspace = true }
+tauri = { workspace = true, features = ["compression", "dynamic-acl"] }
 tauri-runtime-wry = { workspace = true }
+serde_json = { workspace = true }

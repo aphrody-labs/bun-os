@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "aphrody-wasm-bindgen-hello"
+version.workspace      = true
+edition.workspace      = true
+rust-version.workspace = true
+authors.workspace      = true
+homepage.workspace     = true
+repository.workspace   = true
+license                = "MIT"
+description            = "wasm-bindgen fixture of @aphrody/wasm: greet and add through the generated web module."
+publish                = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = { workspace = true, features = ["std"] }
+
+[lints]
+workspace = true

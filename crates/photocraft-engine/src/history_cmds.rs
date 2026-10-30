@@ -1,7 +1,7 @@
 //! History panel actions beyond stepping (#1117): Delete (the trash button) and New Document (the
 //! "Create new document from current state" button). Stepping to a state is Edit › Undo / Redo.
 //!
-//! States are indexed like [`photocraft_ops::History::entries`]: 0 is the oldest state still
+//! States are indexed like [`crate::ops::History::entries`]: 0 is the oldest state still
 //! held, the last index is the current document.
 //!
 //! Snapshots (#2966, the camera button) are named copies of the document that outlive the
@@ -13,8 +13,8 @@
 
 use std::sync::Arc;
 
+use crate::ops::LayerTarget;
 use photocraft_doc::{Document, Layer, LayerContent};
-use photocraft_ops::LayerTarget;
 use serde_json::{Value, json};
 
 use crate::commands::{CommandSpec, int};

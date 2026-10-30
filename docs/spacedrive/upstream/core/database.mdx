@@ -1,0 +1,110 @@
+---
+title: Database Architecture
+description: SQLite ownership and transaction boundaries in Spacedrive
+sidebarTitle: Database
+---
+
+Spacedrive uses embedded SQLite databases so users can run the complete system
+without a database server. Database boundaries follow data authority and
+lifetime.
+
+## Database roles
+
+| Database | Owns |
+| --- | --- |
+| Core state | Known libraries, daemon configuration, and local identity |
+| Library state | Source registry, devices, policy, organization, and assertions |
+| Source store | One source generation and its irreplaceable assertion layer |
+| Jobs | Durable execution state, progress, output, and failure |
+| Catalog | Rebuildable cross-source content and availability projection |
+
+One giant library file does not own every source record.
+
+## Source-store schema
+
+A source store is self-contained. Its generation includes records, provider
+facets, content evidence, edges, search projection, and ingest state. Its
+assertion layer includes durable overlays and extension knowledge that must
+survive a scan.
+
+Generation replacement and assertion retention are separate transaction
+concerns. A reindex can publish a complete new generation without deleting
+human decisions.
+
+## SQLite behavior
+
+The daemon is the writer. Clients use registered operations instead of opening
+database files directly.
+
+WAL mode supports concurrent daemon reads while bounded write transactions
+commit. A job advances its durable watermark only after the corresponding
+transaction succeeds.
+
+Database pragmas, connection limits, and checkpoint policy are selected per
+role. A write-heavy source ingest does not need the same pool behavior as a
+small library registry.
+
+## Migrations
+
+Each database records its schema version. Migrations:
+
+1. verify the current version;
+2. run inside a transaction where SQLite permits it;
+3. preserve unknown or extension-owned data;
+4. update the version only after success;
+5. leave a clear recovery error on failure.
+
+A migration that changes public types also regenerates client bindings.
+
+## Backup
+
+Copying a live database file without its WAL can lose committed state. Use
+the library backup, which snapshots every database with `VACUUM INTO` and
+records a blake3 hash per file, or a source freeze for one store.
+
+~~~bash
+sd-cli library backup --to <DIR|FILE.tar.zst>
+sd-cli library backup verify --from <DIR|FILE.tar.zst>
+sd-cli library restore --from <DIR|FILE.tar.zst> [--as-new | --replace]
+sd-cli sources freeze <SOURCE_ID>
+~~~
+
+The library can be small while still containing permissions, tags, and
+provenance that no origin can reproduce, so a backup always takes the
+library and its source stores together. See [Library](/core/library).
+
+## Corruption and recovery
+
+Recovery follows ownership:
+
+- Rebuild a catalog projection from attached source stores.
+- Reingest generation data only if the origin still answers.
+- Restore assertions and library state from a verified backup.
+- Preserve a damaged store for investigation before attempting repair.
+
+Never solve source-store corruption by deleting the store and hoping the origin
+still exists.
+
+## Extension data
+
+Extensions use declared model storage and host operations. They do not receive
+an unrestricted SQLite connection.
+
+Source-derived extension facts follow the source generation. User or software
+assertions survive reindexing. Standalone extension models retain their own
+identity and provenance.
+
+## Testing
+
+Database tests cover:
+
+- migration from every supported schema;
+- transaction rollback and process interruption;
+- batch salvage after one invalid row;
+- WAL-safe backup and restore;
+- generation replacement with assertion survival;
+- concurrent reads during ingest;
+- large-source query plans.
+
+See [Data Model](/core/data-model) for ownership and [Indexing](/core/indexing)
+for batch and sweep safety.

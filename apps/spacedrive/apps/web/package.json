@@ -1,0 +1,31 @@
+{
+	"name": "@sd/web",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@sd/interface": "workspace:*",
+		"@spacedrive/tokens": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:"
+	},
+	"devDependencies": {
+		"@headlessui/tailwindcss": "^0.2.0",
+		"@tailwindcss/forms": "^0.5.7",
+		"@tailwindcss/typography": "catalog:",
+		"@tailwindcss/vite": "^4.1.0",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"@vitejs/plugin-react": "catalog:",
+		"tailwindcss": "catalog:",
+		"tailwindcss-animate": "catalog:",
+		"tailwindcss-radix": "^2.8.0",
+		"typescript": "catalog:",
+		"vite": "^6.0.0"
+	}
+}

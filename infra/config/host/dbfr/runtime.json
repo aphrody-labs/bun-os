@@ -7,30 +7,22 @@
   "docker": {
     "compose": "/home/ubuntu/apps/compose.yaml",
     "containers": {
-      "aphrody-gateway-1": "nginx 80/443 of every public vhost (dragonballfr.com, aphrody.com, rosegriffon.fr); TLS from /etc/aphrody/shenron-tls",
-      "aphrody-site-1": "shenron-server 5011 + shenron-mcp",
-      "aphrody-bot-1": "shenron-bot 5006",
-      "aphrody-chat-1": "llama-server 8799 (shenron-chat-v2)",
-      "shenron-postgres": "PostgreSQL 18, 127.0.0.1:5432, data ~/apps/shenron/shared/state/postgres",
-      "shenron-redis": "Redis, 127.0.0.1:6379, data ~/apps/shenron/shared/state/redis",
-      "aphrody-bun-prod-1": "Bun fork probe 47660 (ghcr.io/aphrody-labs/bun), the only Bun probe outside k8s",
+      "aphrody-gateway-1": "nginx 80/443 of every public vhost (aphrody.com)",
+      "aphrody-bun-prod-1": "Legacy Bun fork probe 47660 (image of the abandoned fork), the only Bun probe outside k8s",
       "aphrody-prod": "aphrody:runtime, aphrody-mcp http 127.0.0.1:8999 (compose profile prod)",
       "aphrody-control-plane": "kind (Kubernetes)",
       "docker-model-runner": "Docker Model Runner 12434",
       "aphrody-mcp-http-1": "aphrody:toolbox, aphrody-mcp http 127.0.0.1:8793 for the wg clients (341 tools)",
-      "aphrody-shenron-compute-1": "aphrody:toolbox, aphrody-mcp http 127.0.0.1:8789 for shenron-bot",
-      "aphrody-shenron-embed-1": "aphrody:toolbox, aphrody-embed 127.0.0.1:8085",
       "aphrody-jobs-worker-1": "aphrody:toolbox, aphrody job run (jobs.db in ~/.aphrody)",
       "aphrody-discord-1": "Bun image, bot.aphrody.com 127.0.0.1:4010 (atomic-deploy-aphrody-discord.sh recreates it)",
       "aphrody-downloads-1": "Bun image, aphrody.com and downloads.aphrody.com 127.0.0.1:8797 (publish-downloads.ts)",
-      "aphrody-fonts-proxy-1": "Bun image, cdn.aphrody.com 127.0.0.1:8796 (source ~/apps/cdn/src at REVISION)",
-      "aphrody-shenron-timeline-api-1": "Bun image, timeline projections 127.0.0.1:8813"
+      "aphrody-fonts-proxy-1": "Bun image, cdn.aphrody.com 127.0.0.1:8796 (source ~/apps/cdn/src at REVISION)"
     }
   },
   "native": {
     "packages": {
       "docker.io containerd docker-buildx docker-compose-v2 docker-model-plugin": "Docker engine",
-      "certbot python3-certbot python3-certbot-dns-ovh": "renews /etc/letsencrypt (webroot /var/www/letsencrypt served by the gateway, dns-ovh); deploy hook shenron-container copies to /etc/aphrody/shenron-tls and reloads aphrody-gateway-1 with docker exec",
+      "certbot python3-certbot python3-certbot-dns-ovh": "renews /etc/letsencrypt (webroot /var/www/letsencrypt served by the gateway, dns-ovh)",
       "xvfb openbox": "virtual desktop :99 of aphrody-remote",
       "wireguard wireguard-tools": "private tunnel wg1"
     },
@@ -38,11 +30,9 @@
       "aphrody-desktop-xvfb.service aphrody-desktop-wm.service aphrody-remote.service": "virtual desktop and VNC on wg1 (host X11)",
       "aphrody-web-browser-dbfr.service": "Obscura CDP 127.0.0.1:9222",
       "aphrody-wg-proxy@.socket aphrody-wg-proxy@.service": "wg1 forwarder 10.200.77.3:8793 to loopback",
-      "shenron-container-backup.timer": "03:00 UTC docker exec pg_dump / redis BGSAVE / SQLite of the containers, newest snapshot only; pulled off-host by vps shenron-offsite-backup.timer",
       "aphrody-selfheal.timer certbot.timer": "self-heal pass, certificate renewal",
       "aphrody-discord-ai-lab.service aphrody-discord-debate.service": "disabled lab units (Bun)",
-      "nginx.service redis-server.service": "kept masked (/dev/null) as a guard: a reinstalled host nginx or redis cannot take 80/443/6379 from the containers",
-      "shenron-timeline-refresh.timer": "hourly refresh of the timeline tree read by aphrody-shenron-timeline-api-1 (host bun; candidate for docker compose run)"
+      "nginx.service redis-server.service": "kept masked (/dev/null) as a guard: a reinstalled host nginx or redis cannot take 80/443/6379 from the containers"
     },
     "bin": {
       "/usr/local/bin/rclone /usr/local/bin/rsync": "transfer tools",
@@ -51,22 +41,12 @@
     }
   },
   "purge": {
-    "backup": [
-      "/etc/nginx",
-      "/var/www/cdn",
-      "/var/www/files-brand",
-      "/var/www/html",
-      "/usr/local/sbin/shenron-pg-backup"
-    ],
+    "backup": ["/etc/nginx", "/var/www/cdn", "/var/www/files-brand", "/var/www/html"],
     "units": [
       "aphrody-container.service",
       "aphrody-container.service.pre-layout",
       "aphrody-bun-probe.service",
       "nginx.service.d",
-      "shenron-bot-docker.service.d",
-      "shenron-site-docker.service.d",
-      "shenron-pg-backup.service",
-      "shenron-pg-backup.timer",
       "privoxy.service",
       "privoxy.service.d",
       "privoxy-cleanup.service",
@@ -85,8 +65,7 @@
       "/var/lib/nginx",
       "/var/www/cdn",
       "/var/www/files-brand",
-      "/var/www/html",
-      "/usr/local/sbin/shenron-pg-backup"
+      "/var/www/html"
     ],
     "bin": {
       "/usr/local/bin": ["aphrody-mcp", "bxc-mcp"]
@@ -98,7 +77,7 @@
   "remaining": {
     "$comment": "state 2026-10-09 17:40 UTC, session stopped (quota)",
     "items": [
-      "vps aphrody-deploy: user timer stopped since 16:03 (last cycle 12fd6f9 activate-failed/rollback-failed). bun-prod on dbfr runs with stale env APP_ROOT=/srv/app, APP_BIN empty: recreate it (sudo docker compose --project-directory ~/apps up -d --force-recreate bun-prod) then on vps: systemctl --user start aphrody-deploy.timer; aphrody-deploy --status. Moving the queue into bun-build needs openssh-client + rsync in the image (absent from ghcr.io/aphrody-labs/bun:1.4.3-aphrody.3) and ~/src/bun mounted rw; not done.",
+      "vps aphrody-deploy: user timer stopped since 16:03 (last cycle 12fd6f9 activate-failed/rollback-failed). bun-prod on dbfr runs with stale env APP_ROOT=/srv/app, APP_BIN empty: recreate it (sudo docker compose --project-directory ~/apps up -d --force-recreate bun-prod) then on vps: systemctl --user start aphrody-deploy.timer; aphrody-deploy --status. Moving the queue into bun-build needs openssh-client + rsync in the image (absent from the abandoned fork image ghcr.io/aphrody-labs/bun:1.4.3-aphrody.3) and ~/src/bun mounted rw; not done.",
       "dbfr duplicate ~/.local/bin/rclone (same v1.75.1 as /usr/local/bin/rclone): rm.",
       "final evidence: systemctl --failed on both hosts; from C:\bun bun scripts/aphrody/docker-doctor.ts (7/7 x 3 hosts)."
     ]

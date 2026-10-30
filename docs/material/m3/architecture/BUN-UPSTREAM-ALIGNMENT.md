@@ -18,11 +18,11 @@ L'écosystème Aphrody unifie ses surfaces d'interface utilisateur (Desktop Taur
    - Moteur App-Server JSON-RPC 2.0 (`crates/ai/app-server`)
    - Noyau OS & sous-systèmes IPC (`crates/os/kernel`)
    - Système de stockage VDFS et daemon supervisé (`crates/ui/drive`, `crates/os/drive`, `sd-daemon`)
-   - Moteurs spécialisés Koharu (Vision/OCR in-process) et Shenron (RAG ancré `dragonballfr.com`)
+   - Moteur spécialisé Koharu (Vision/OCR in-process)
    - Shell NuShell interactif avec PTY (`crates/shell`)
 
 2. **Parité Bilingue Symétrique Stricte (EN / FR)** :  
-   Toutes les clés de traduction sont organisées en namespaces sémantiques dérivés des piliers d'architecture (`common`, `nav`, `chat`, `files`, `models`, `settings`, `kernel`, `subsystems`, `drive`, `koharu`, `shenron`, `shell`, `ffi`, `errors`). Aucun texte n'est injecté sans passer par le générateur automatique et l'audit de parité stricte 1:1.
+   Toutes les clés de traduction sont organisées en namespaces sémantiques dérivés des piliers d'architecture (`common`, `nav`, `chat`, `files`, `models`, `settings`, `kernel`, `subsystems`, `drive`, `koharu`, `shell`, `ffi`, `errors`). Aucun texte n'est injecté sans passer par le générateur automatique et l'audit de parité stricte 1:1.
 
 3. **Exploitation Intégrale des Primitives Bun Upstream** :  
    Élimination progressive des wrappers Node.js redondants au profit des primitives natives C++/Zig/Rust de Bun :
@@ -43,13 +43,11 @@ aphrody/
 ├── apps/                         # Applications exécutables
 │   ├── cli/                      # CLI unifiée Aphrody (9 piliers)
 │   ├── koharu/editor/            # Éditeur de documents Koharu (Tauri / CEF)
-│   └── shenron/                  # Applications web & chat Shenron
 ├── crates/                       # Crates Rust de premier ordre
 │   ├── ai/app-server/            # Serveur d'orchestration agentique
 │   ├── os/kernel/                # Noyau IPC et sous-systèmes OS
 │   └── ui/                       # Composants et applications graphiques natifs
 │       ├── app/                  # Application Desktop principale aphrody-app (Tauri 3)
-│       ├── drive/                # Plugin Tauri aphrody-drive
 │       ├── m3/                   # Implémentation Rust du design system Material 3
 │       └── tauri-wrap/           # Abstraction d'exécution webview Wry / CEF
 ├── packages/                     # Packages TypeScript / Bun de premier ordre
@@ -118,7 +116,6 @@ flowchart TD
     subgraph Rust_Crates["Crates Rust Backend & Native UI"]
         CR_M3["crates/ui/m3<br/>(aphrody-m3)"]
         CR_APP["crates/ui/app<br/>(aphrody-app Tauri v3)"]
-        CR_DRIVE["crates/ui/drive<br/>(aphrody-drive)"]
         CR_KERN["crates/os/kernel<br/>(Kernel IPC)"]
     end
 
@@ -156,14 +153,14 @@ Le module `M3UiCache` (`@aphrody/m3-config/cache-db`) fournit une couche de pers
 
 Le serveur persistant [`scripts/dev/ui/serve-desktop-ui.ts`](https://github.com/aphrody-labs/aphrody/blob/main/scripts/dev/ui/serve-desktop-ui.ts) écoute sur le port officiel Tauri `1421` :
 - **Pont IPC Tauri Transparent** : injection automatique dans `index.html` de `window.__TAURI_INTERNALS__` et `window.__TAURI__` (core `invoke`, event `listen`/`emit`), permettant à l'application web d'exécuter nativement toutes les commandes Tauri de bureau sans runtime Wry externe.
-- **Dispatching de Commandes Natives (`/api/tauri/invoke`)** : prise en charge complète de `aphrody_meta`, `aphrody_hardware_telemetry`, `aphrody_model_*`, `aphrody_fs_*`, `aphrody_shenron_chat`, `koharu_rpc`, `aphrody_rpc`.
+- **Dispatching de Commandes Natives (`/api/tauri/invoke`)** : prise en charge complète de `aphrody_meta`, `aphrody_hardware_telemetry`, `aphrody_model_*`, `aphrody_fs_*`, `koharu_rpc`, `aphrody_rpc`.
 - **Routage SPA** : redirection transparente de toutes les routes de vues (`/chat`, `/files`, `/models`, `/settings`, `/splash`, `/pet`, etc.) vers `crates/ui/app/ui-dist/index.html`.
 - **ETags wyhash** : calcul d'empreinte ultra-rapide via `Bun.hash.wyhash` et réponses instantanées `304 Not Modified`.
 - **Compression transparente** : compression à la volée via `Bun.gzipSync` pour les assets supérieurs à 1 Ko.
 - **Canal WebSocket Duplex (`/ws`)** : synchronisation en temps réel de l'état des sous-systèmes, télémétrie matérielle et diffusion d'événements.
 - **APIs dynamiques** :
   - `/health` : statut, uptime, révision Bun et capacités actives
-  - `/api/apps` : registre unifié de toutes les applications du monorepo (`aphrody-app`, `koharu`, `rg-website`, `shenron-site`, `cli`, `m3-framework`)
+  - `/api/apps` : registre unifié de toutes les applications du monorepo (`aphrody-app`, `koharu`, `cli`, `m3-framework`)
   - `/api/capabilities` : inventaire exhaustif et dynamique des piliers natifs
   - `/api/i18n` et `/api/i18n/:lang` : catalogues bilingues synchronisés
   - `/api/tokens` : variables et métadonnées du système de design Material 3

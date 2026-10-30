@@ -18,8 +18,8 @@ recipe is not evidence of a built package, root filesystem, image or release.
 ## Read-only planning
 
 ```sh
-bun src/cli.ts factory --action plan --composition server --snapshot YYYY-MM-DD
-bun src/cli.ts graph --composition server
+bun src/cli.ts factory arch --action plan --composition server --snapshot YYYY-MM-DD
+bun src/cli.ts workspace graph --profile full --target linux-x64
 ```
 
 Planning reports inputs for the selected composition and snapshot. It does not
@@ -41,4 +41,4 @@ receipt is evidence only for the exact revisions, target and gates it records.
 The root `distribution.json` currently labels qualification as `development`.
 
 See [the root README](../README.md), [repository architecture](../docs/architecture.md)
-and [qualification guide](../docs/qualification.md).
+and [qualification guide](../docs/NATIVE-QUALIFICATION.md).

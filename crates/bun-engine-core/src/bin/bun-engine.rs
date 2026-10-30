@@ -6,7 +6,7 @@ use bun_engine::cartridge::dust::rom::raw;
 use bun_engine::machine::{Machine, Step, arm::ArmFirmware};
 use serde_json::json;
 
-const USAGE: &str = "usage: bun-engine info <rom.nds> [--json] | bun-engine shell [--session|status|install-session] | bun-engine steam <command> (feature steam) | bun-engine stream <host>|--loopback [options] | bun-engine home [--library DB|mock|mock:empty|mock:error|mock:loading] [kiosk options] | bun-engine run <nds|3ds|switch|gba|nes|psx|wii|gc|arm|x86|linux|melonds|dolphin|azahar|kyty> <image> [--headless] [--bios FILE] [--frames N] [--out DIR] [--cmdline ARGS] [--input key@first[-last],...] [--trace FILE.jsonl] [--fsr [--sharpness STOPS]] [--filter off|plain|scanlines|crt|lcd|sharp] [--integer-scale] [--steam [--steam-*]] [kiosk options]
+const USAGE: &str = "usage: bun-engine info <rom.nds> [--json] | bun-engine shell [--session|status|install-session] | bun-engine steam <command> (feature steam) | bun-engine stream <host>|--loopback [options] | bun-engine home [--library DB|mock|mock:empty|mock:error|mock:loading] [kiosk options] | bun-engine run <nds|3ds|switch|gba|nes|psx|wii|gc|arm|x86|linux|libretro|melonds|dolphin|azahar|kyty> <image> [--headless] [--bios FILE] [--core LIBRETRO_CORE] [--system-dir DIR] [--frames N] [--out DIR] [--cmdline ARGS] [--input key@first[-last],...] [--trace FILE.jsonl] [--fsr [--sharpness STOPS]] [--filter off|plain|scanlines|crt|lcd|sharp] [--integer-scale] [--steam [--steam-*]] [kiosk options]
 kiosk options: [--kiosk] [--fullscreen] [--hide-cursor] [--size WxH] [--state-dir DIR] [--remote[=PORT]] (BRP on 127.0.0.1, feature remote)";
 
 fn main() -> ExitCode {
@@ -71,6 +71,8 @@ fn main() -> ExitCode {
     };
     let (mut frames, mut out, mut headless) = (u64::MAX, None::<PathBuf>, false);
     let mut bios = None::<PathBuf>;
+    // libretro: the core library to load and the directory its BIOS files are looked up in.
+    let (mut core, mut system_dir) = (None::<PathBuf>, None::<PathBuf>);
     // Headless replay: scripted pad input and a per-frame screen digest trace (`re replica`).
     let (mut script, mut trace) = (Vec::<(u32, u64, u64)>::new(), None::<PathBuf>);
     let (mut fsr, mut sharpness) = (false, 0.25_f32);
@@ -86,6 +88,8 @@ fn main() -> ExitCode {
             "--frames" => frames = args.next().and_then(|v| v.parse().ok()).unwrap_or(frames),
             "--headless" => headless = true,
             "--bios" => bios = args.next().map(PathBuf::from),
+            "--core" => core = args.next().map(PathBuf::from),
+            "--system-dir" => system_dir = args.next().map(PathBuf::from),
             "--out" => out = args.next().map(PathBuf::from),
             "--cmdline" => cmdline = args.next().unwrap_or(cmdline),
             "--input" => match bun_engine::recomp::parse_input(&args.next().unwrap_or_default()) {
@@ -177,6 +181,21 @@ fn main() -> ExitCode {
             Ok(m) => Box::new(m),
             Err(e) => return fail(e),
         },
+        #[cfg(feature = "libretro")]
+        "libretro" => {
+            let Some(core) = core.as_ref() else {
+                return fail("libretro needs --core <name_libretro.so|.dll|.dylib>".into());
+            };
+            let system_dir = system_dir.unwrap_or_else(|| PathBuf::from("system"));
+            match bun_engine::machine::libretro::Libretro::open(
+                core,
+                std::path::Path::new(&path),
+                &system_dir,
+            ) {
+                Ok(m) => Box::new(m),
+                Err(e) => return fail(e),
+            }
+        }
         #[cfg(feature = "cpp-host")]
         core @ ("melonds" | "dolphin" | "azahar" | "kyty") => {
             match bun_engine::machine::cpp_host::CppHost::open(

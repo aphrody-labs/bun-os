@@ -5,6 +5,10 @@ inputs:
   token:
     description: Token with read access to the aphrody-labs submodules.
     required: true
+  profile:
+    description: Sparse-checkout and submodule profile from packages/bun-workspace/config/git-profiles.json ("all" keeps the full checkout).
+    default: all
+    required: false
   rust:
     description: Also install the nightly Rust toolchain from rust-toolchain.toml.
     default: "false"
@@ -15,20 +19,41 @@ runs:
   steps:
     - uses: ./.github/actions/setup-bun
     - name: Authenticate submodules
-      shell: bash
+      shell: bun packages/buncc/src/cli.ts sh {0}
       env:
         TOKEN: ${{ inputs.token }}
       run: git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
     - name: Skip submodules Windows cannot or need not check out
       if: runner.os == 'Windows'
-      shell: bash
+      shell: bun packages/buncc/src/cli.ts sh {0}
       run: |
         git config --global core.longpaths true
         git config submodule.packages/re/third_party/unblob.update none
         # Kernel, LLVM and Wine forks are Linux-only distribution sources: their checkout alone outlasts the setup deadline on NTFS.
-        for path in vendor/cachyos-linux vendor/ogc-linux vendor/linux-cachyos vendor/kernel-patches vendor/ogc-kernel-packages vendor/nvidia-kernels vendor/open-gpu-kernel-modules vendor/llvm vendor/proton vendor/proton-cachyos vendor/wine-cachyos; do
-          git config "submodule.$path.update" none
-        done
+        git config submodule.vendor/cachyos-linux.update none
+        git config submodule.vendor/ogc-linux.update none
+        git config submodule.vendor/linux-cachyos.update none
+        git config submodule.vendor/kernel-patches.update none
+        git config submodule.vendor/ogc-kernel-packages.update none
+        git config submodule.vendor/nvidia-kernels.update none
+        git config submodule.vendor/open-gpu-kernel-modules.update none
+        git config submodule.vendor/llvm.update none
+        git config submodule.vendor/proton.update none
+        git config submodule.vendor/proton-cachyos.update none
+        git config submodule.vendor/wine-cachyos.update none
+    - name: Sparse checkout and submodule profile
+      if: inputs.profile != 'all'
+      shell: bun packages/buncc/src/cli.ts sh {0}
+      env:
+        PROFILE: ${{ inputs.profile }}
+      # Expands the cone to the profile and marks every submodule outside it update=none, so `bun run setup` fetches only the profile.
+      run: bun packages/bun-workspace/src/git-cli.ts ci-prepare "$PROFILE"
+    - name: Cache submodule objects
+      uses: actions/cache@v4
+      with:
+        path: .git/modules
+        key: git-modules-${{ runner.os }}-${{ inputs.profile }}-${{ hashFiles('.gitmodules', 'sources.lock.json') }}
+        restore-keys: git-modules-${{ runner.os }}-${{ inputs.profile }}-
     - name: Cache Bun packages
       uses: actions/cache@v4
       with:
@@ -36,14 +61,21 @@ runs:
         key: bun-install-${{ runner.os }}-${{ hashFiles('bun.lock') }}
         restore-keys: bun-install-${{ runner.os }}-
     - name: Setup
-      shell: bash
+      shell: bun packages/buncc/src/cli.ts sh {0}
+      env:
+        # rea-agents runs its `prepare` script (`bun scripts/prepare.mjs`) through node_modules/.bin/bun, the npm `bun` shim,
+        # before that package's own postinstall has linked the real binary ("Bun's postinstall script was not run").
+        # The prepare script only installs git hooks, so skip lifecycle scripts and finish the bun package by hand below.
+        NPM_CONFIG_IGNORE_SCRIPTS: "true"
       run: bun run setup
+    - name: Finish the npm bun package
+      shell: bun packages/buncc/src/cli.ts sh {0}
+      run: cd node_modules/bun && node install.js
     - name: Rust toolchain
       if: inputs.rust == 'true'
-      shell: bash
-      run: |
-        rustup show active-toolchain || rustup toolchain install
-        rustup component add rustfmt clippy
+      shell: bun packages/buncc/src/cli.ts sh {0}
+      # One line: Bun Shell does not stop at the first failing line the way `bash -e` did.
+      run: rustup show active-toolchain || rustup toolchain install && rustup component add rustfmt clippy
     - name: Cache Cargo
       if: inputs.rust == 'true'
       uses: actions/cache@v4

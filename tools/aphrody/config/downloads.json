@@ -215,14 +215,6 @@
       "git": { "path": "plugins/yolo", "ref": "HEAD", "subdir": "" },
       "manifest": "plugin.json",
       "repository": "aphrody-labs/plugin-yolo"
-    },
-    {
-      "id": "plugin-shenron",
-      "kind": "plugin",
-      "description": "Shenron Claude Code plugin (plugin/ of aphrody-labs/shenron)",
-      "git": { "path": "~/src/shenron", "ref": "HEAD", "subdir": "plugin" },
-      "manifest": ".claude-plugin/plugin.json",
-      "repository": "aphrody-labs/shenron"
     }
   ],
   "github": {
@@ -238,7 +230,7 @@
       { "repository": "aphrody-labs/plugin-yolo", "artifacts": ["plugin-yolo"], "extra": [] },
       {
         "repository": "aphrody-labs/plugins",
-        "artifacts": ["plugin-aphrody", "plugin-yolo", "plugin-shenron"],
+        "artifacts": ["plugin-aphrody", "plugin-yolo"],
         "extra": ["SHA256SUMS"]
       }
     ]

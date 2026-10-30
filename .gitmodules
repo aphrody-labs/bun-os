@@ -1,7 +1,3 @@
-[submodule "toolchains/bun"]
-	path = toolchains/bun
-	url = https://github.com/aphrody-labs/bun.git
-	shallow = true
 [submodule "vendor/cachyos-pkgbuilds"]
 	path = vendor/cachyos-pkgbuilds
 	url = https://github.com/aphrody-labs/cachyos-pkgbuilds.git
@@ -10,14 +6,17 @@
 	path = vendor/linux-cachyos
 	url = https://github.com/aphrody-labs/linux-cachyos.git
 	shallow = true
+	update = none
 [submodule "vendor/cachyos-linux"]
 	path = vendor/cachyos-linux
 	url = https://github.com/aphrody-labs/cachyos-linux.git
 	shallow = true
+	update = none
 [submodule "vendor/kernel-patches"]
 	path = vendor/kernel-patches
 	url = https://github.com/aphrody-labs/kernel-patches.git
 	shallow = true
+	update = none
 [submodule "vendor/cachyos-devtools"]
 	path = vendor/cachyos-devtools
 	url = https://github.com/aphrody-labs/cachyos-devtools.git
@@ -74,6 +73,7 @@
 	path = vendor/ogc-kernel-packages
 	url = https://github.com/aphrody-labs/ogc-kernel-packages.git
 	shallow = true
+	update = none
 [submodule "vendor/inputplumber"]
 	path = vendor/inputplumber
 	url = https://github.com/aphrody-labs/inputplumber.git
@@ -90,6 +90,7 @@
 	path = vendor/ogc-linux
 	url = https://github.com/aphrody-labs/ogc-linux.git
 	shallow = true
+	update = none
 [submodule "vendor/omarchy"]
 	path = vendor/omarchy
 	url = https://github.com/aphrody-labs/omarchy.git
@@ -170,6 +171,7 @@
 	path = vendor/nvidia-kernels
 	url = https://github.com/aphrody-labs/nvidia-kernels.git
 	shallow = true
+	update = none
 [submodule "vendor/pacman"]
 	path = vendor/pacman
 	url = https://github.com/aphrody-labs/pacman.git
@@ -178,90 +180,111 @@
 [submodule "vendor/bash"]
 	path = vendor/bash
 	url = https://github.com/aphrody-labs/bash.git
-
-[submodule "vendor/bevy"]
-	path = vendor/bevy
-	url = https://github.com/aphrody-labs/bevy.git
+	shallow = true
 
 [submodule "vendor/chwd"]
 	path = vendor/chwd
 	url = https://github.com/aphrody-labs/chwd.git
+	shallow = true
 
 [submodule "vendor/ctru-rs"]
 	path = vendor/ctru-rs
 	url = https://github.com/aphrody-labs/ctru-rs.git
+	shallow = true
 
 [submodule "vendor/dust"]
 	path = vendor/dust
 	url = https://github.com/aphrody-labs/dust.git
+	shallow = true
 
 [submodule "vendor/dxvk"]
 	path = vendor/dxvk
 	url = https://github.com/aphrody-labs/dxvk.git
+	shallow = true
 
 [submodule "vendor/libctru"]
 	path = vendor/libctru
 	url = https://github.com/aphrody-labs/libctru.git
+	shallow = true
 
 [submodule "vendor/mingw-packages"]
 	path = vendor/mingw-packages
 	url = https://github.com/aphrody-labs/MINGW-packages.git
+	shallow = true
 
 [submodule "vendor/msys2-installer"]
 	path = vendor/msys2-installer
 	url = https://github.com/aphrody-labs/msys2-installer.git
+	shallow = true
 
 [submodule "vendor/msys2-packages"]
 	path = vendor/msys2-packages
 	url = https://github.com/aphrody-labs/MSYS2-packages.git
+	shallow = true
 
 [submodule "vendor/msys2-runtime"]
 	path = vendor/msys2-runtime
 	url = https://github.com/aphrody-labs/msys2-runtime.git
+	shallow = true
 
 [submodule "vendor/newlib-cygwin"]
 	path = vendor/newlib-cygwin
 	url = https://sourceware.org/git/newlib-cygwin.git
+	shallow = true
 
 [submodule "vendor/open-gpu-kernel-modules"]
 	path = vendor/open-gpu-kernel-modules
 	url = https://github.com/aphrody-labs/open-gpu-kernel-modules.git
+	shallow = true
+	update = none
 
 [submodule "vendor/powershell"]
 	path = vendor/powershell
 	url = https://github.com/aphrody-labs/PowerShell.git
+	shallow = true
 
 [submodule "vendor/proton"]
 	path = vendor/proton
 	url = https://github.com/aphrody-labs/Proton.git
+	shallow = true
+	update = none
 
 [submodule "vendor/proton-cachyos"]
 	path = vendor/proton-cachyos
 	url = https://github.com/aphrody-labs/proton-cachyos.git
+	shallow = true
+	update = none
 
 [submodule "vendor/steam-runtime"]
 	path = vendor/steam-runtime
 	url = https://github.com/aphrody-labs/steam-runtime.git
+	shallow = true
 
 [submodule "vendor/vkd3d-proton"]
 	path = vendor/vkd3d-proton
 	url = https://github.com/aphrody-labs/vkd3d-proton.git
+	shallow = true
 
 [submodule "vendor/wgpu"]
 	path = vendor/wgpu
 	url = https://github.com/aphrody-labs/wgpu.git
+	shallow = true
 
 [submodule "vendor/wiki"]
 	path = vendor/wiki
 	url = https://github.com/aphrody-labs/wiki.git
+	shallow = true
 
 [submodule "vendor/wine-cachyos"]
 	path = vendor/wine-cachyos
 	url = https://github.com/aphrody-labs/wine-cachyos.git
+	shallow = true
+	update = none
 
 [submodule "vendor/winit"]
 	path = vendor/winit
 	url = https://github.com/aphrody-labs/winit.git
+	shallow = true
 [submodule "vendor/material-web"]
 	path = vendor/material-web
 	url = https://github.com/aphrody-labs/material-web.git
@@ -278,132 +301,173 @@
 	path = vendor/cosmic-epoch
 	url = https://github.com/aphrody-labs/cosmic-epoch.git
 	branch = master
+	shallow = true
 [submodule "vendor/brave-core"]
 	path = vendor/brave-core
 	url = https://github.com/aphrody-labs/brave-core.git
 	branch = master
+	shallow = true
 [submodule "vendor/tauri"]
 	path = vendor/tauri
 	url = https://github.com/aphrody-labs/tauri.git
 	branch = dev
+	shallow = true
 [submodule "vendor/obscura"]
 	path = vendor/obscura
 	url = https://github.com/aphrody-labs/obscura.git
 	branch = main
+	shallow = true
 [submodule "vendor/nushell"]
 	path = vendor/nushell
 	url = https://github.com/aphrody-labs/nushell.git
 	branch = main
+	shallow = true
 [submodule "vendor/eza"]
 	path = vendor/eza
 	url = https://github.com/aphrody-labs/eza.git
 	branch = main
+	shallow = true
 [submodule "vendor/sudo-rs"]
 	path = vendor/sudo-rs
 	url = https://github.com/aphrody-labs/sudo-rs.git
 	branch = main
+	shallow = true
 [submodule "vendor/ares"]
 	path = vendor/ares
 	url = https://github.com/ares-emulator/ares.git
+	shallow = true
 [submodule "vendor/calico"]
 	path = vendor/calico
 	url = https://github.com/aphrody-labs/calico.git
+	shallow = true
 [submodule "vendor/citro2d"]
 	path = vendor/citro2d
 	url = https://github.com/aphrody-labs/citro2d.git
+	shallow = true
 [submodule "vendor/citro3d"]
 	path = vendor/citro3d
 	url = https://github.com/aphrody-labs/citro3d.git
+	shallow = true
 [submodule "vendor/cuda-cccl"]
 	path = vendor/cuda-cccl
 	url = https://github.com/NVIDIA/cccl.git
+	shallow = true
 [submodule "vendor/cuda-samples"]
 	path = vendor/cuda-samples
 	url = https://github.com/NVIDIA/cuda-samples.git
+	shallow = true
 [submodule "vendor/directx-compiler"]
 	path = vendor/directx-compiler
 	url = https://github.com/microsoft/DirectXShaderCompiler.git
+	shallow = true
 [submodule "vendor/directx-headers"]
 	path = vendor/directx-headers
 	url = https://github.com/microsoft/DirectX-Headers.git
+	shallow = true
 [submodule "vendor/directx-samples"]
 	path = vendor/directx-samples
 	url = https://github.com/microsoft/DirectX-Graphics-Samples.git
+	shallow = true
 [submodule "vendor/ghidra"]
 	path = vendor/ghidra
 	url = https://github.com/aphrody-labs/ghidra.git
+	shallow = true
 [submodule "vendor/gopher64"]
 	path = vendor/gopher64
 	url = https://github.com/aphrody-labs/gopher64.git
+	shallow = true
 [submodule "vendor/jgenesis"]
 	path = vendor/jgenesis
 	url = https://github.com/aphrody-labs/jgenesis.git
 	branch = bun-os
+	shallow = true
 [submodule "vendor/libnds"]
 	path = vendor/libnds
 	url = https://github.com/devkitPro/libnds.git
+	shallow = true
 [submodule "vendor/libogc"]
 	path = vendor/libogc
 	url = https://github.com/devkitPro/libogc.git
+	shallow = true
 [submodule "vendor/magika"]
 	path = vendor/magika
 	url = https://github.com/aphrody-labs/magika.git
+	shallow = true
 [submodule "vendor/mame"]
 	path = vendor/mame
 	url = https://github.com/mamedev/mame.git
+	shallow = true
 [submodule "vendor/ntr-ghidra"]
 	path = vendor/ntr-ghidra
 	url = https://github.com/aphrody-labs/NTRGhidra.git
+	shallow = true
 [submodule "vendor/omarchy-windows"]
 	path = vendor/omarchy-windows
 	url = https://github.com/aphrody-labs/try-omarchy-windows.git
+	shallow = true
 [submodule "vendor/open-agb-firm"]
 	path = vendor/open-agb-firm
 	url = https://github.com/profi200/open_agb_firm.git
+	shallow = true
 [submodule "vendor/retroarch"]
 	path = vendor/retroarch
 	url = https://github.com/aphrody-labs/retroarch.git
+	shallow = true
 [submodule "vendor/retroboy"]
 	path = vendor/retroboy
 	url = https://github.com/aphrody-labs/retroboy.git
+	shallow = true
 [submodule "vendor/rustboyadvance-ng"]
 	path = vendor/rustboyadvance-ng
 	url = https://github.com/aphrody-labs/rustboyadvance-ng.git
+	shallow = true
 [submodule "vendor/starpsx"]
 	path = vendor/starpsx
 	url = https://github.com/aphrody-labs/starpsx.git
 	branch = bun-os
+	shallow = true
 [submodule "vendor/steamcmd"]
 	path = vendor/steamcmd
 	url = https://github.com/aphrody-labs/steamcmd.git
+	shallow = true
 [submodule "vendor/steamcmd-api"]
 	path = vendor/steamcmd-api
 	url = https://github.com/aphrody-labs/steamcmd-api.git
+	shallow = true
 [submodule "vendor/steamos-nvidia-installer"]
 	path = vendor/steamos-nvidia-installer
 	url = https://github.com/aphrody-labs/steamos-nvidia-installer.git
+	shallow = true
 [submodule "vendor/tetanes"]
 	path = vendor/tetanes
 	url = https://github.com/aphrody-labs/tetanes.git
+	shallow = true
 [submodule "vendor/zakuro"]
 	path = vendor/zakuro
 	url = https://github.com/aphrody-labs/zakuro.git
 	branch = bun-os
+	shallow = true
 [submodule "vendor/cmake"]
 	path = vendor/cmake
 	url = https://github.com/Kitware/CMake.git
+	shallow = true
 [submodule "vendor/llvm"]
 	path = vendor/llvm
 	url = https://github.com/llvm/llvm-project.git
+	shallow = true
+	update = none
 [submodule "vendor/make"]
 	path = vendor/make
 	url = https://github.com/mirror/make.git
+	shallow = true
 [submodule "vendor/qemu"]
 	path = vendor/qemu
 	url = https://gitlab.com/qemu-project/qemu.git
+	shallow = true
 [submodule "vendor/vcpkg"]
 	path = vendor/vcpkg
 	url = https://github.com/microsoft/vcpkg.git
+	shallow = true
 [submodule "vendor/uutils/findutils"]
 	path = vendor/uutils/findutils
 	url = https://github.com/aphrody-labs/uutils-findutils.git
@@ -428,148 +492,188 @@
 	path = vendor/uutils/coreutils
 	url = https://github.com/aphrody-labs/uutils-coreutils.git
 	branch = aphrody
+	shallow = true
 [submodule "vendor/steam/steamkit"]
 	path = vendor/steam/steamkit
 	url = https://github.com/SteamRE/SteamKit.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/depotdownloader"]
 	path = vendor/steam/depotdownloader
 	url = https://github.com/SteamRE/DepotDownloader.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/protobufs"]
 	path = vendor/steam/protobufs
 	url = https://github.com/SteamTracking/Protobufs.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/valvekeyvalue"]
 	path = vendor/steam/valvekeyvalue
 	url = https://github.com/ValveResourceFormat/ValveKeyValue.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/steamappinfo"]
 	path = vendor/steam/steamappinfo
 	url = https://github.com/xPaw/SteamAppInfo.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/steamwebapidocumentation"]
 	path = vendor/steam/steamwebapidocumentation
 	url = https://github.com/xPaw/SteamWebAPIDocumentation.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/python-steam"]
 	path = vendor/steam/python-steam
 	url = https://github.com/ValvePython/steam.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/steamctl"]
 	path = vendor/steam/steamctl
 	url = https://github.com/ValvePython/steamctl.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/internalsteamwebapi"]
 	path = vendor/steam/internalsteamwebapi
 	url = https://github.com/Revadike/InternalSteamWebAPI.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/facepunch-steamworks"]
 	path = vendor/steam/facepunch-steamworks
 	url = https://github.com/Facepunch/Facepunch.Steamworks.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/steamworks-net"]
 	path = vendor/steam/steamworks-net
 	url = https://github.com/rlabrecque/Steamworks.NET.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/archisteamfarm"]
 	path = vendor/steam/archisteamfarm
 	url = https://github.com/JustArchiNET/ArchiSteamFarm.git
 	branch = main
+	shallow = true
 [submodule "vendor/steam/steamtools"]
 	path = vendor/steam/steamtools
 	url = https://github.com/BeyondDimension/SteamTools.git
 	branch = develop
+	shallow = true
 [submodule "vendor/steam/steamachievementmanager"]
 	path = vendor/steam/steamachievementmanager
 	url = https://github.com/gibbed/SteamAchievementManager.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/steamworks-js"]
 	path = vendor/steam/steamworks-js
 	url = https://github.com/ceifa/steamworks.js.git
 	branch = main
+	shallow = true
 [submodule "vendor/steam/node-steam-user"]
 	path = vendor/steam/node-steam-user
 	url = https://github.com/DoctorMcKay/node-steam-user.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/steamlocate-rs"]
 	path = vendor/steam/steamlocate-rs
 	url = https://github.com/CosmicHorrorDev/steamlocate-rs.git
 	branch = master
+	shallow = true
 [submodule "vendor/steam/steamos-claude-skill"]
 	path = vendor/steam/steamos-claude-skill
 	url = https://github.com/28allday/steamos-claude-skill.git
+	shallow = true
 [submodule "vendor/steam/steam-claude-skills"]
 	path = vendor/steam/steam-claude-skills
 	url = https://github.com/tugteam/steam-claude-skills.git
+	shallow = true
 [submodule "vendor/re/ida-pro-mcp"]
 	path = vendor/re/ida-pro-mcp
 	url = https://github.com/mrexodia/ida-pro-mcp.git
+	shallow = true
 [submodule "apps/iecode-dotnet"]
 	path = apps/iecode-dotnet
 	url = https://github.com/aphrody-labs/iecode-dotnet.git
 	branch = os
+	shallow = true
 [submodule "packages/iecode-cpp"]
 	path = packages/iecode-cpp
 	url = https://github.com/aphrody-labs/iecode-cpp.git
 	branch = os
+	shallow = true
 [submodule "packages/niepy"]
 	path = packages/niepy
 	url = https://github.com/aphrody-labs/niepy.git
 	branch = os
+	shallow = true
 [submodule "packages/nie-blender"]
 	path = packages/nie-blender
 	url = https://github.com/aphrody-labs/nie-blender.git
 	branch = os
+	shallow = true
 [submodule "crates/capture_harness"]
 	path = crates/capture_harness
 	url = https://github.com/aphrody-labs/capture-harness.git
 	branch = os
+	shallow = true
 [submodule "packages/dbxv2"]
 	path = vendor/dbxv2
 	url = https://github.com/aphrody-labs/dbxv2.git
 	branch = master
+	shallow = true
 [submodule "packages/iecode-scripts"]
 	path = packages/iecode-scripts
 	url = https://github.com/aphrody-labs/iecode-scripts.git
 	branch = os
+	shallow = true
 [submodule "packages/iecode-docs"]
 	path = packages/iecode-docs
 	url = https://github.com/aphrody-labs/iecode-docs.git
 	branch = os
+	shallow = true
 [submodule "crates/apkeep"]
 	path = crates/apkeep
 	url = https://github.com/aphrody-labs/apkeep.git
+	shallow = true
 [submodule "vendor/dolphin"]
 	path = vendor/dolphin
 	url = https://github.com/aphrody-labs/dolphin.git
+	shallow = true
 [submodule "vendor/oboromi"]
 	path = vendor/oboromi
 	url = https://github.com/aphrody-labs/oboromi.git
+	shallow = true
 [submodule "vendor/pcsx2"]
 	path = vendor/pcsx2
 	url = https://github.com/aphrody-labs/pcsx2.git
+	shallow = true
 [submodule "vendor/nexium"]
 	path = vendor/nexium
 	url = https://github.com/aphrody-labs/nexium.git
+	shallow = true
 [submodule "vendor/melonds"]
 	path = vendor/melonds
 	url = https://github.com/aphrody-labs/melonds.git
+	shallow = true
 [submodule "vendor/azahar"]
 	path = vendor/azahar
 	url = https://github.com/aphrody-labs/azahar.git
+	shallow = true
 [submodule "vendor/gecko"]
 	path = vendor/gecko
 	url = https://github.com/aphrody-labs/gecko.git
+	shallow = true
 [submodule "vendor/chipi-spec"]
 	path = vendor/chipi-spec
 	url = https://github.com/aphrody-labs/chipi-spec.git
+	shallow = true
 [submodule "vendor/libretro-core-info"]
 	path = vendor/libretro-core-info
 	url = https://github.com/aphrody-labs/libretro-core-info.git
+	shallow = true
 [submodule "vendor/libretro-database"]
 	path = vendor/libretro-database
 	url = https://github.com/aphrody-labs/libretro-database.git
+	shallow = true
 [submodule "vendor/recalbox"]
 	path = vendor/recalbox
 	url = https://gitlab.com/recalbox/recalbox.git
@@ -581,49 +685,63 @@
 [submodule "vendor/cargo-3ds"]
 	path = vendor/cargo-3ds
 	url = https://github.com/rust3ds/cargo-3ds.git
+	shallow = true
 [submodule "vendor/citro3d-rs"]
 	path = vendor/citro3d-rs
 	url = https://github.com/rust3ds/citro3d-rs.git
+	shallow = true
 [submodule "vendor/kuriimu2"]
 	path = vendor/kuriimu2
 	url = https://github.com/FanTranslatorsInternational/Kuriimu2.git
+	shallow = true
 [submodule "vendor/spica"]
 	path = vendor/spica
 	url = https://github.com/gdkchan/SPICA.git
+	shallow = true
 [submodule "vendor/pk3ds"]
 	path = vendor/pk3ds
 	url = https://github.com/kwsch/pk3DS.git
+	shallow = true
 [submodule "vendor/tinke"]
 	path = vendor/tinke
 	url = https://github.com/pleonex/tinke.git
+	shallow = true
 [submodule "vendor/3ds-hbmenu"]
 	path = vendor/3ds-hbmenu
 	url = https://github.com/aphrody-labs/3ds-hbmenu.git
+	shallow = true
 [submodule "vendor/checkpoint"]
 	path = vendor/checkpoint
 	url = https://github.com/aphrody-labs/checkpoint.git
+	shallow = true
 [submodule "vendor/fbi"]
 	path = vendor/fbi
 	url = https://github.com/aphrody-labs/fbi.git
+	shallow = true
 [submodule "vendor/rea"]
 	path = vendor/rea
 	url = https://github.com/aphrody-labs/rea.git
 	branch = main
+	shallow = true
 [submodule "vendor/cubeb-rs"]
 	path = vendor/cubeb-rs
 	url = https://github.com/aphrody-labs/cubeb-rs.git
+	shallow = true
 [submodule "vendor/vkwebgpu-icd"]
 	path = vendor/vkwebgpu-icd
 	url = https://github.com/Dankular/VkWebGPU-ICD.git
 	branch = main
+	shallow = true
 [submodule "vendor/webx"]
 	path = vendor/webx
 	url = https://github.com/Dankular/WebX.git
 	branch = main
+	shallow = true
 [submodule "vendor/cef-rs"]
 	path = vendor/cef-rs
 	url = https://github.com/aphrody-labs/cef-rs.git
 	branch = dev
+	shallow = true
 [submodule "vendor/bun-uv"]
 	path = vendor/bun-uv
 	url = https://github.com/aphrody-labs/bun-uv.git
@@ -684,3 +802,482 @@
 	url = https://github.com/aphrody-labs/bun-ui.git
 	branch = main
 	shallow = true
+[submodule "vendor/mediabunny"]
+	path = vendor/mediabunny
+	url = https://github.com/Vanilagy/mediabunny.git
+	shallow = true
+[submodule "vendor/ui-ux-pro-max-skill"]
+	path = vendor/ui-ux-pro-max-skill
+	url = https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+	shallow = true
+[submodule "vendor/microsoft/microsoft-ui-xaml"]
+	path = vendor/microsoft/microsoft-ui-xaml
+	url = https://github.com/microsoft/microsoft-ui-xaml.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/WindowsAppSDK"]
+	path = vendor/microsoft/WindowsAppSDK
+	url = https://github.com/microsoft/WindowsAppSDK.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/WindowsAppSDK-Samples"]
+	path = vendor/microsoft/WindowsAppSDK-Samples
+	url = https://github.com/microsoft/WindowsAppSDK-Samples.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/WinUI-Gallery"]
+	path = vendor/microsoft/WinUI-Gallery
+	url = https://github.com/microsoft/WinUI-Gallery.git
+	shallow = true
+[submodule "vendor/microsoft/DirectX-Graphics-Samples"]
+	path = vendor/microsoft/DirectX-Graphics-Samples
+	url = https://github.com/microsoft/DirectX-Graphics-Samples.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/DirectXTK12"]
+	path = vendor/microsoft/DirectXTK12
+	url = https://github.com/microsoft/DirectXTK12.git
+	shallow = true
+[submodule "vendor/microsoft/DirectX-Specs"]
+	path = vendor/microsoft/DirectX-Specs
+	url = https://github.com/microsoft/DirectX-Specs.git
+	shallow = true
+[submodule "vendor/microsoft/DirectXShaderCompiler"]
+	path = vendor/microsoft/DirectXShaderCompiler
+	url = https://github.com/microsoft/DirectXShaderCompiler.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/Windows-universal-samples"]
+	path = vendor/microsoft/Windows-universal-samples
+	url = https://github.com/microsoft/Windows-universal-samples.git
+	shallow = true
+[submodule "vendor/microsoft/Windows-classic-samples"]
+	path = vendor/microsoft/Windows-classic-samples
+	url = https://github.com/microsoft/Windows-classic-samples.git
+	shallow = true
+[submodule "vendor/microsoft/dotnet-samples"]
+	path = vendor/microsoft/dotnet-samples
+	url = https://github.com/dotnet/samples.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/windows-rs"]
+	path = vendor/microsoft/windows-rs
+	url = https://github.com/microsoft/windows-rs.git
+	shallow = true
+	update = none
+[submodule "vendor/microsoft/cppwinrt"]
+	path = vendor/microsoft/cppwinrt
+	url = https://github.com/microsoft/cppwinrt.git
+	shallow = true
+[submodule "vendor/microsoft/CsWinRT"]
+	path = vendor/microsoft/CsWinRT
+	url = https://github.com/microsoft/CsWinRT.git
+	shallow = true
+[submodule "vendor/hyprland/aquamarine"]
+	path = vendor/hyprland/aquamarine
+	url = https://github.com/hyprwm/aquamarine.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/cairo"]
+	path = vendor/wayland/cairo
+	url = https://gitlab.freedesktop.org/cairo/cairo.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/directx-headers"]
+	path = vendor/wayland/directx-headers
+	url = https://github.com/microsoft/DirectX-Headers.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/freerdp"]
+	path = vendor/wayland/freerdp
+	url = https://github.com/FreeRDP/FreeRDP.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/glaze"]
+	path = vendor/wayland/glaze
+	url = https://github.com/stephenberry/glaze.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprcursor"]
+	path = vendor/hyprland/hyprcursor
+	url = https://github.com/hyprwm/hyprcursor.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprgraphics"]
+	path = vendor/hyprland/hyprgraphics
+	url = https://github.com/hyprwm/hyprgraphics.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland"]
+	path = vendor/hyprland/hyprland
+	url = https://github.com/hyprwm/Hyprland.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland-guiutils"]
+	path = vendor/hyprland/hyprland-guiutils
+	url = https://github.com/hyprwm/hyprland-guiutils.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland-preview-share-picker"]
+	path = vendor/hyprland/hyprland-preview-share-picker
+	url = https://github.com/aphrody-labs/hyprland-preview-share-picker.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland-protocols"]
+	path = vendor/hyprland/hyprland-protocols
+	url = https://github.com/hyprwm/hyprland-protocols.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprland-qtutils"]
+	path = vendor/hyprland/hyprland-qtutils
+	url = https://github.com/hyprwm/hyprland-qtutils.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprlang"]
+	path = vendor/hyprland/hyprlang
+	url = https://github.com/hyprwm/hyprlang.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprtoolkit"]
+	path = vendor/hyprland/hyprtoolkit
+	url = https://github.com/hyprwm/hyprtoolkit.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprutils"]
+	path = vendor/hyprland/hyprutils
+	url = https://github.com/hyprwm/hyprutils.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprwayland-scanner"]
+	path = vendor/hyprland/hyprwayland-scanner
+	url = https://github.com/hyprwm/hyprwayland-scanner.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/hyprwire"]
+	path = vendor/hyprland/hyprwire
+	url = https://github.com/hyprwm/hyprwire.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/lcms2"]
+	path = vendor/wayland/lcms2
+	url = https://github.com/mm2/Little-CMS.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libdecor"]
+	path = vendor/wayland/libdecor
+	url = https://gitlab.freedesktop.org/libdecor/libdecor.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libdisplay-info"]
+	path = vendor/wayland/libdisplay-info
+	url = https://gitlab.freedesktop.org/emersion/libdisplay-info.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libdrm"]
+	path = vendor/wayland/libdrm
+	url = https://gitlab.freedesktop.org/mesa/drm.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libei"]
+	path = vendor/wayland/libei
+	url = https://gitlab.freedesktop.org/libinput/libei.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libepoxy"]
+	path = vendor/wayland/libepoxy
+	url = https://github.com/anholt/libepoxy.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libevdev"]
+	path = vendor/wayland/libevdev
+	url = https://gitlab.freedesktop.org/libevdev/libevdev.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libfontenc"]
+	path = vendor/wayland/libfontenc
+	url = https://gitlab.freedesktop.org/xorg/lib/libfontenc.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libglvnd"]
+	path = vendor/wayland/libglvnd
+	url = https://gitlab.freedesktop.org/glvnd/libglvnd.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libinput"]
+	path = vendor/wayland/libinput
+	url = https://gitlab.freedesktop.org/libinput/libinput.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libliftoff"]
+	path = vendor/wayland/libliftoff
+	url = https://gitlab.freedesktop.org/emersion/libliftoff.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libpciaccess"]
+	path = vendor/wayland/libpciaccess
+	url = https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libx11"]
+	path = vendor/wayland/libx11
+	url = https://gitlab.freedesktop.org/xorg/lib/libx11.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxau"]
+	path = vendor/wayland/libxau
+	url = https://gitlab.freedesktop.org/xorg/lib/libxau.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxcb"]
+	path = vendor/wayland/libxcb
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxcomposite"]
+	path = vendor/wayland/libxcomposite
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcomposite.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxcursor"]
+	path = vendor/wayland/libxcursor
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcursor.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxcvt"]
+	path = vendor/wayland/libxcvt
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcvt.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxdamage"]
+	path = vendor/wayland/libxdamage
+	url = https://gitlab.freedesktop.org/xorg/lib/libxdamage.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxdmcp"]
+	path = vendor/wayland/libxdmcp
+	url = https://gitlab.freedesktop.org/xorg/lib/libxdmcp.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxext"]
+	path = vendor/wayland/libxext
+	url = https://gitlab.freedesktop.org/xorg/lib/libxext.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxfixes"]
+	path = vendor/wayland/libxfixes
+	url = https://gitlab.freedesktop.org/xorg/lib/libxfixes.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxfont2"]
+	path = vendor/wayland/libxfont2
+	url = https://gitlab.freedesktop.org/xorg/lib/libxfont.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxi"]
+	path = vendor/wayland/libxi
+	url = https://gitlab.freedesktop.org/xorg/lib/libxi.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxkbcommon"]
+	path = vendor/wayland/libxkbcommon
+	url = https://github.com/xkbcommon/libxkbcommon.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxkbfile"]
+	path = vendor/wayland/libxkbfile
+	url = https://gitlab.freedesktop.org/xorg/lib/libxkbfile.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxrandr"]
+	path = vendor/wayland/libxrandr
+	url = https://gitlab.freedesktop.org/xorg/lib/libxrandr.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxrender"]
+	path = vendor/wayland/libxrender
+	url = https://gitlab.freedesktop.org/xorg/lib/libxrender.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxshmfence"]
+	path = vendor/wayland/libxshmfence
+	url = https://gitlab.freedesktop.org/xorg/lib/libxshmfence.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxtst"]
+	path = vendor/wayland/libxtst
+	url = https://gitlab.freedesktop.org/xorg/lib/libxtst.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/libxxf86vm"]
+	path = vendor/wayland/libxxf86vm
+	url = https://gitlab.freedesktop.org/xorg/lib/libxxf86vm.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/mesa"]
+	path = vendor/wayland/mesa
+	url = https://gitlab.freedesktop.org/mesa/mesa.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/mtdev"]
+	path = vendor/wayland/mtdev
+	url = https://bitmath.org/git/mtdev.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/muparser"]
+	path = vendor/wayland/muparser
+	url = https://github.com/beltoforion/muparser.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/pango"]
+	path = vendor/wayland/pango
+	url = https://gitlab.gnome.org/GNOME/pango.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/pipewire"]
+	path = vendor/wayland/pipewire
+	url = https://gitlab.freedesktop.org/pipewire/pipewire.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/pixman"]
+	path = vendor/wayland/pixman
+	url = https://gitlab.freedesktop.org/pixman/pixman.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/polkit"]
+	path = vendor/wayland/polkit
+	url = https://github.com/polkit-org/polkit.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/re2"]
+	path = vendor/wayland/re2
+	url = https://github.com/google/re2.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/sdbus-cpp"]
+	path = vendor/wayland/sdbus-cpp
+	url = https://github.com/Kistler-Group/sdbus-cpp.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/seatd"]
+	path = vendor/wayland/seatd
+	url = https://git.sr.ht/~kennylevinsen/seatd
+	shallow = true
+	update = none
+[submodule "vendor/wayland/tomlplusplus"]
+	path = vendor/wayland/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/wayland"]
+	path = vendor/wayland/wayland
+	url = https://gitlab.freedesktop.org/wayland/wayland.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/wayland-protocols"]
+	path = vendor/wayland/wayland-protocols
+	url = https://gitlab.freedesktop.org/wayland/wayland-protocols.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/weston"]
+	path = vendor/wayland/weston
+	url = https://gitlab.freedesktop.org/wayland/weston.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-proto"]
+	path = vendor/wayland/xcb-proto
+	url = https://gitlab.freedesktop.org/xorg/proto/xcbproto.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util"]
+	path = vendor/wayland/xcb-util
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-util.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-cursor"]
+	path = vendor/wayland/xcb-util-cursor
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-cursor.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-errors"]
+	path = vendor/wayland/xcb-util-errors
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-errors.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-image"]
+	path = vendor/wayland/xcb-util-image
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-image.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-keysyms"]
+	path = vendor/wayland/xcb-util-keysyms
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-keysyms.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-renderutil"]
+	path = vendor/wayland/xcb-util-renderutil
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-render-util.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xcb-util-wm"]
+	path = vendor/wayland/xcb-util-wm
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-wm.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xdg-desktop-portal"]
+	path = vendor/wayland/xdg-desktop-portal
+	url = https://github.com/flatpak/xdg-desktop-portal.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xdg-desktop-portal-gtk"]
+	path = vendor/wayland/xdg-desktop-portal-gtk
+	url = https://github.com/flatpak/xdg-desktop-portal-gtk.git
+	shallow = true
+	update = none
+[submodule "vendor/hyprland/xdg-desktop-portal-hyprland"]
+	path = vendor/hyprland/xdg-desktop-portal-hyprland
+	url = https://github.com/hyprwm/xdg-desktop-portal-hyprland.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xkbcomp"]
+	path = vendor/wayland/xkbcomp
+	url = https://gitlab.freedesktop.org/xorg/app/xkbcomp.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xkeyboard-config"]
+	path = vendor/wayland/xkeyboard-config
+	url = https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xorg-util-macros"]
+	path = vendor/wayland/xorg-util-macros
+	url = https://gitlab.freedesktop.org/xorg/util/macros.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xorgproto"]
+	path = vendor/wayland/xorgproto
+	url = https://gitlab.freedesktop.org/xorg/proto/xorgproto.git
+	shallow = true
+	update = none
+[submodule "vendor/wayland/xwayland"]
+	path = vendor/wayland/xwayland
+	url = https://gitlab.freedesktop.org/xorg/xserver.git
+	shallow = true
+	update = none
+[submodule "vendor/reactos"]
+	path = vendor/reactos
+	url = https://github.com/aphrody-labs/reactos.git
+	branch = master
+	shallow = true
+	update = none
+[submodule "vendor/wslg"]
+	path = vendor/wslg
+	url = https://github.com/aphrody-labs/wslg.git
+	branch = main
+	shallow = true
+	update = none
+[submodule "vendor/waydroid"]
+	path = vendor/waydroid
+	url = https://github.com/aphrody-labs/waydroid.git
+[submodule "vendor/pop-os"]
+	path = vendor/pop-os
+	url = https://github.com/aphrody-labs/pop.git

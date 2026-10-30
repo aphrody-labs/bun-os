@@ -30,7 +30,7 @@ WORKDIR /workspace
 RUN curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs \
       | sh -s -- -y --profile minimal --no-modify-path --default-toolchain "${RUST_VERSION}" \
  && rustup component add clippy rustfmt rust-src \
- && curl -fsSL https://raw.githubusercontent.com/aphrody-labs/bun/main/scripts/aphrody/install.sh | bash -s "${BUN_VERSION}"
+ && curl -fsSL https://bun.com/install | bash -s "bun-v${BUN_VERSION}"
 CMD ["bash"]
 
 # Runtime libraries for the CEF/GTK4 app. No browser system WebView is installed.

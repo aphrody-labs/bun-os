@@ -9,7 +9,7 @@ test("selected product inputs point to the existing desktop and public asset own
   const inputs = productBuildContext({
     NODE_ENV: "test",
     APHRODY_WORKSPACE_ROOT: root,
-    APHRODY_BUN_CHECKOUT: join(root, "toolchains/bun"),
+    APHRODY_BUN_CHECKOUT: join(root, "sources/bun"),
   });
   expect(inputs.workspaceRoot).toBe(root);
   expect(inputs.uiDist).toBe(join(root, "apps/aphrody-app/ui-dist"));
@@ -21,7 +21,7 @@ test("selected product inputs point to the existing desktop and public asset own
     import.meta.dir,
   );
   expect(sourceInputs.workspaceRoot).toBe(root);
-  expect(sourceInputs.bunCheckout).toBe(join(root, "toolchains/bun"));
+  expect(sourceInputs.bunCheckout).toBe(join(root, "sources/bun"));
   expect(sourceInputs.uiDist).toBe(inputs.uiDist);
 });
 

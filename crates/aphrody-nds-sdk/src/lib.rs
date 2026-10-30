@@ -23,14 +23,14 @@ pub mod plugin;
 
 use std::path::{Path, PathBuf};
 
+#[cfg(feature = "nds-gpu")]
+pub use aphrody_dust_wgpu::wgpu;
 pub use format::{Format, Platform};
+#[cfg(feature = "nds-gpu")]
+pub use handheld::GpuFrame;
 pub use handheld::{
     Error, Handheld, Image, Input, Result, ScreenId, ScreenSpec, Step, button, frame_hash,
 };
-#[cfg(feature = "nds-gpu")]
-pub use handheld::GpuFrame;
-#[cfg(feature = "nds-gpu")]
-pub use aphrody_dust_wgpu::wgpu;
 #[cfg(feature = "bevy")]
 pub use plugin::{HandheldPlugin, HandheldScreens};
 

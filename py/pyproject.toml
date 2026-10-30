@@ -16,7 +16,7 @@ default-groups = ["dev"]
 members = ["packages/aphrody", "packages/aphrody-train", "packages/embedding-fixtures", "packages/model-tools", "packages/cli", "apps/meetings"]
 
 [tool.pytest.ini_options]
-testpaths = ["packages/aphrody/tests", "packages/aphrody-train/tests", "packages/embedding-fixtures/tests", "packages/model-tools/tests", "tools/packaging", "packages/cli/tests", "apps/meetings/tests", "tools/infra/scripts/rg"]
+testpaths = ["packages/aphrody/tests", "packages/aphrody-train/tests", "packages/embedding-fixtures/tests", "packages/model-tools/tests", "tools/packaging", "packages/cli/tests", "apps/meetings/tests"]
 pythonpath = ["packages/aphrody/src", "packages/aphrody-train/src", "packages/model-tools/src", "packages/embedding-fixtures/src", "packages/cli/src", "apps/meetings/src"]
 addopts = "-q --strict-markers --import-mode=importlib"
 markers = ["integration: opt-in tests requiring runtimes, models or services", "live_api: opt-in authenticated provider requests"]

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "kind": "bunos-multikernel-layout",
+  "constraint": "owner: ONE disk, ONE partition holding Linux 7.3 (Bun OS / Arch), Wine/Proton (absorbed) and ReactOS",
+  "primary": {
+    "id": "bios-btrfs-single",
+    "firmware": "BIOS/CSM",
+    "partitionTable": "MBR (msdos), one primary partition at 1 MiB; GRUB core.img lives in the 1 MiB gap before it",
+    "partitions": [{ "n": 1, "label": "bunos-root", "fs": "btrfs", "start": "1MiB", "size": "rest", "type": "0x83" }],
+    "btrfsLayout": {
+      "topLevel(FS_TREE id 5)": [
+        "boot/ (GRUB, vmlinuz-linux-bun, initramfs-linux-bun.img) plain directory",
+        "freeldr.sys, freeldr.ini, reactos/ (ReactOS tree) plain files and directories, NOT in a subvolume",
+        "ReactOS payload directories carry `btrfs property set compression none`"
+      ],
+      "subvolumes": {
+        "@bunos": "Linux root (mounted subvol=@bunos)",
+        "@data": "shared data, mounted in Linux at /srv/shared, exported to ReactOS over SMB",
+        "@compat": "Wine/Proton prefixes, mounted at /var/lib/bunos/compat"
+      }
+    },
+    "why": "FreeLoader reads only the top-level subvolume (BTRFS_FS_TREE_OBJECTID) and no compression (boot/freeldr/freeldr/lib/fs/btrfs.c), so ReactOS lives in the top level, Linux in @bunos."
+  },
+  "secondary": {
+    "id": "uefi-esp-single",
+    "firmware": "UEFI",
+    "partitionTable": "GPT, one partition = the ESP (FAT32, type C12A7328-F81F-11D2-BA4B-00A0C93EC93B)",
+    "partitions": [{ "n": 1, "label": "BUNOS", "fs": "vfat FAT32", "start": "1MiB", "size": "rest" }],
+    "layout": [
+      "EFI/BOOT/BOOTX64.EFI (Limine)",
+      "limine.conf",
+      "vmlinuz-linux-bun, initramfs-linux-bun.img",
+      "bunos.img (loopback ext4/btrfs root, mounted by the initramfs)",
+      "reactos/ (FAT32 tree, 4 GiB per-file limit)"
+    ],
+    "reactos": "only through FreeLoader's UEFI port (boot/freeldr/freeldr/uefi.cmake), experimental and not in the 0.4.16 release ISO: unverified"
+  },
+  "discarded": {
+    "uki-efistub-no-bootloader": "still needs an ESP FAT partition (UEFI spec 2.10 section 13.3: firmware loads from FAT); no way to start ReactOS, so it cannot be the multikernel path."
+  }
+}

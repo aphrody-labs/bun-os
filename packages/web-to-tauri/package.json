@@ -38,13 +38,13 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@aphrody/bun-web": "workspace:*",
+    "@aphrody/bun-web": "1.4.7",
     "@aphrody/scaffold": "workspace:*"
   },
   "devDependencies": {
     "@aphrody/m3-config": "workspace:*"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

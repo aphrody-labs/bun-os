@@ -183,7 +183,8 @@ fn audit(args: &[String]) -> Result<(), CliError> {
     let bytes = read(path)?;
     let doc = pdfcraft_cos::Document::open_with_password(bytes, flag(args, "--password"))
         .map_err(|e| format!("{path}: {e}"))?;
-    let findings = pdfcraft_audit::audit_redactions(&doc).map_err(|e| format!("{path}: {e}"))?;
+    let findings =
+        pdfcraft_engine::audit::audit_redactions(&doc).map_err(|e| format!("{path}: {e}"))?;
     let items: Vec<serde_json::Value> = findings
         .into_iter()
         .map(|f| {

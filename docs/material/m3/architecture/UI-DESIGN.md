@@ -24,7 +24,7 @@ Do not add product areas beyond these four. Host and capability exclusions are d
 ## 2. Base and references
 
 The visual references are indexed in [`assets/ui/manifest.json`](https://github.com/aphrody-labs/aphrody/blob/main/assets/ui/manifest.json).
-Spacedrive informs the file navigation and explorer; Codex informs Chat and its composer;
+The file navigation and explorer follow the Files conventions of the shell; Codex informs Chat and its composer;
 Material 3 owns roles, states and accessibility. These are visual references, not runtime
 requirements or permissions to copy source. Preserve per-file upstream provenance.
 

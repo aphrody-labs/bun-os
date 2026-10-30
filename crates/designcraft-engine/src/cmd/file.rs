@@ -118,11 +118,11 @@ pub fn specs() -> Vec<CommandSpec> {
 }
 
 pub fn to_bytes(d: &Document) -> Vec<u8> {
-    designcraft_format::save(d).unwrap_or_default()
+    crate::format::save(d).unwrap_or_default()
 }
 
 pub fn from_bytes(b: &[u8]) -> Result<Document> {
-    designcraft_format::load(b).map_err(|e| EngineError::Other(e.to_string()))
+    crate::format::load(b).map_err(|e| EngineError::Other(e.to_string()))
 }
 
 fn file_new(s: &mut Session, p: &Value) -> Result<Value> {

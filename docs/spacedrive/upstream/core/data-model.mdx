@@ -1,0 +1,192 @@
+---
+title: Data Model
+description: The durable objects behind libraries, sources, records, and content
+sidebarTitle: Data Model
+---
+
+Spacedrive models files without pretending that one database owns every byte.
+Origins keep ownership of file content. Source stores preserve observations and
+assertions. Libraries connect those stores into one user experience.
+
+## Ownership map
+
+| Object | Scope | Purpose |
+| --- | --- | --- |
+| Library | User-defined collection | Devices, source registry, policy, and organization |
+| Device | One Spacedrive instance | Runtime identity, capabilities, and availability |
+| Volume | One observed storage identity | Mount evidence and the machine-level read arena |
+| Source | One retained origin scope | Ingest authority, store location, and availability |
+| Record | One observed object in a source | Stable identity, name, parent, kind, and timestamps |
+| Facet | Provider-specific facts | Filesystem metadata or adapter fields |
+| Content | Evidence about bytes | Candidate or confirmed content identity |
+| Edge | Relationship between records | Hierarchy and other typed links |
+| Overlay | Durable assertion | Tags, notes, policy, review state, and provenance |
+| Pin | Space item for a path | Name and path |
+
+These objects have different lifetimes. Keeping those lifetimes explicit is the
+main defense against accidental data loss.
+
+## Library
+
+A library is the control plane for a set of sources and devices. It stores
+small durable state that users expect to follow them:
+
+- source registrations and attachment hints;
+- paired device membership;
+- spaces, pins, and presentation policy;
+- tags, permissions, and other assertions;
+- sync and operation state.
+
+The library database does not absorb every record from every source. Source
+generations can contain millions of rows and have different authorities.
+
+## Device and volume
+
+A device represents one Spacedrive runtime. Its identity is not a filesystem
+identity.
+
+A volume represents storage observed by that runtime. Spacedrive identifies a
+physical drive through evidence such as worldwide names, disk GUIDs, serial
+quality, topology, and historical observations. A mount path is only a current
+attachment. It must never become the identity of the drive.
+
+The volume arena is an in-memory read map for mounted filesystems. Filesystem
+sources adopt identities from this arena, including when source roots overlap.
+
+## Source
+
+A source is the primary durable boundary:
+
+~~~text
+source = origin + ingest + store
+~~~
+
+The source registry records how a library names and reaches the source. The
+source store contains the indexed generation and irreplaceable assertions.
+
+A source has one ingest authority for each generation. Local filesystem and
+adapter sources differ in the way they read an origin, but both produce the
+same records, content identities, and edges.
+
+Source availability is explicit. A detached drive or offline peer does not
+cause its source to disappear. Queries can continue against the retained store
+and report that byte access is unavailable.
+
+## Record
+
+A record is one observed object inside one source. Its stable identifier is
+separate from its path, because names and parents can change.
+
+Common record fields include:
+
+- stable UUID;
+- name and kind;
+- parent relationship;
+- size and timestamps;
+- content reference when applicable;
+- ingest provenance and error state.
+
+Records do not contain all provider-specific data. Facets keep those facts
+separate while preserving one query shape.
+
+### Filesystem facet
+
+Filesystem records may include:
+
+- inode or platform file identifier;
+- mode, uid, and gid;
+- creation, modification, and change times;
+- symlink target;
+- readability or content error;
+- volume identity evidence.
+
+Equivalent facets can represent object-store versions, photo-library assets, or
+other provider details without changing the record table.
+
+## Hierarchy and edges
+
+Typed edges connect records. The parent edge forms the browsable hierarchy.
+Other edges can describe a derived asset, a membership, a reference, or an
+extension-defined relationship.
+
+Paths are projections of identity and parent edges. A path is useful for display
+and byte access, but it is not a durable record ID.
+
+## Content identity
+
+Content identity connects records that appear to contain the same bytes.
+Spacedrive records the strength of that claim.
+
+| State | Evidence | Safe use |
+| --- | --- | --- |
+| Unknown | Metadata only | Browse and search metadata |
+| Candidate | Sampled content hash | Find likely duplicates and schedule verification |
+| Confirmed | Full-byte integrity hash | Deduplication and destructive decisions |
+
+Content IDs are derived from hash evidence so separate sources converge on the
+same identity without coordination. A sampled match remains a candidate. It
+does not authorize deletion.
+
+One content value can have several physical instances. Spacedrive keeps every
+record, path, source, and failure domain visible so “duplicate” does not become
+“safe to remove.”
+
+## Generation and assertions
+
+A source store has two halves.
+
+### Generation data
+
+Generation data can be re-derived only while the origin answers. It includes
+records, facets, edges, content evidence, and search projection. A successful
+full ingest may replace it transactionally.
+
+### Assertion data
+
+Assertions cannot be reconstructed from a filesystem walk. They include user
+organization, decisions, policies, and extension knowledge. They survive
+reindexing and carry provenance.
+
+This split means “rebuild the index” never means “discard everything in the
+store.”
+
+## Pins
+
+A pin is a Space item that keeps a path in the sidebar. It answers where the
+user wants quick access. It does not own records, content identity, another
+index, or watcher state.
+
+Removing a pin deletes the Space item. It does not delete source records, stop
+source indexing, or change file bytes.
+
+## Cross-source catalog
+
+Each source store can answer questions about its own records. The library
+catalog projects content and availability across stores so it can answer
+questions such as:
+
+- Which sources contain this confirmed content?
+- How many independent failure domains hold it?
+- Which copy is online now?
+- Is a required replica missing?
+
+The catalog is a projection, not the owner of source truth. It can be rebuilt
+from attached source stores.
+
+## Snapshots and history
+
+A freeze is a dated, self-contained copy of a source store. It preserves both
+the indexed generation and its assertions at that point in time. Live history
+can compare generations and explain changes. A snapshot does not copy the
+underlying file bytes unless a separate backup or sync policy does so.
+
+## Core invariants
+
+- A path, mount point, or provider account name is not durable identity.
+- A source store may be the last evidence of an unavailable origin.
+- Reindexing may replace generation rows but must preserve assertions.
+- Separate sources use the same record shape.
+- Candidate content identity never authorizes destructive cleanup.
+- Pins never create a second record namespace.
+- File bytes move only through an explicit file operation, cache, or sync
+  policy.

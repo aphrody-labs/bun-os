@@ -131,7 +131,7 @@ function npmVersions(name: string): Promise<string[]> {
 async function heldBack(pkgs: NpmPackage[]): Promise<Map<string, string>> {
   const catalog: Record<string, string> = (await Bun.file(join(ROOT, "package.json")).json()).catalog ?? {};
   const byName = new Map(pkgs.map(pkg => [pkg.name, pkg]));
-  // Workspace members outside packages/ and apps/ (the toolchains/bun submodule): `bun publish` pins their exact version.
+  // Workspace members outside packages/ and apps/: `bun publish` pins their exact version.
   const lock = Bun.JSONC.parse(await Bun.file(join(ROOT, "bun.lock")).text()) as {
     workspaces: Record<string, { name?: string; version?: string }>;
   };

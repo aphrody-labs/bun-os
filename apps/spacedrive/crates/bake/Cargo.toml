@@ -1,0 +1,35 @@
+[package]
+name = "sd-bake"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+image = { version = "0.25.5" }
+sd-images = { path = "../images" }
+sd-media-metadata = { path = "../media-metadata" }
+thiserror = { version = "2.0.8" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.5"
+objc2-foundation = { version = "0.2", features = [
+	"NSDictionary",
+	"NSObject",
+	"NSString",
+	"NSAttributedString",
+	"NSGeometry",
+] }
+objc2-app-kit = { version = "0.2", features = [
+	"NSWorkspace",
+	"NSImage",
+	"NSImageRep",
+	"NSBitmapImageRep",
+	"NSGraphicsContext",
+	"NSGraphics",
+	"NSAttributedString",
+	"NSColor",
+	"NSFont",
+	"NSStringDrawing",
+] }
+
+[dev-dependencies]
+tempfile = { version = "3.14.0" }

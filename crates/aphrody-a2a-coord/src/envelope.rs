@@ -27,7 +27,7 @@ pub struct Envelope {
     pub re: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub channel_hint: Option<Vec<String>>,
-    /// Preserve domain extensions such as Shenron's `taskId`, `verdict` and `artifacts`.
+    /// Preserve domain extensions such as `taskId`, `verdict` and `artifacts`.
     #[serde(flatten)]
     pub extensions: BTreeMap<String, Value>,
 }

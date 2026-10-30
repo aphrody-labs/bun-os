@@ -12,7 +12,7 @@ RUN sed -i '/^\[options\]/a NoExtract = usr/share/doc/* usr/share/man/* usr/shar
   && grep -q '^NoExtract = usr/share/doc' /etc/pacman.conf
 COPY install-packages.sh /usr/local/sbin/bunos-install-packages
 COPY usr.packages gaming.packages emulation.packages /usr/share/bun-os/
-# Local [bunos] repository (bun-aphrody, bunos-filesystem, aphrody, ...) built by `bun factory usr build --composition gaming --no-boot`.
+# Local [bunos] repository (bun-canary, bunos-filesystem, aphrody, ...) built by `bun factory usr build --composition gaming --no-boot`.
 COPY bunos-repo/ /var/lib/bun-os/repo/
 RUN set -e; repo-add -q /var/lib/bun-os/repo/bunos.db.tar.zst /var/lib/bun-os/repo/*.pkg.tar.zst \
   && pacman-key --init && pacman-key --populate archlinux \

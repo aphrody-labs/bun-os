@@ -5,20 +5,6 @@ import { runProcess } from "@aphrody/bun-workspace/process";
 import { productIdentity, sameProductIdentity, verifyProductPayload } from "../container/product-payload.ts";
 import { verifyQualifiedProduct, type ProductQualification } from "../container/verify-product.ts";
 
-const productSkills = [
-  "replica-architect",
-  "replica-backend",
-  "replica-brand",
-  "replica-build",
-  "replica-deploy",
-  "replica-design",
-  "replica-diff",
-  "replica-entrepreneur",
-  "replica-launch",
-  "replica-recon",
-  "replica-test",
-];
-
 /** Qualify CLI discovery, route targets and the frozen CLI-WASM runtime path. */
 export async function qualifyProductPayload(
   workspace: string,
@@ -65,9 +51,7 @@ export async function qualifyProductPayload(
     });
   }
   if (
-    !["mcp", "agent-plugin", "wasm", "design", "engine", "re", "rea"].every(name =>
-      commands.some(entry => entry.group === "" && entry.name === name),
-    )
+    !["design", "engine", "re", "rea"].every(name => commands.some(entry => entry.group === "" && entry.name === name))
   )
     throw new Error("Product CLI is missing a required native or first-party capability route");
   if (
@@ -175,154 +159,6 @@ export async function qualifyProductPayload(
     stdoutSHA256: new Bun.CryptoHasher("sha256").update(ffiResult.stdout).digest("hex"),
     ffiAbi,
   });
-  const isolatedHome = join(resolve(Bun.env.TMPDIR ?? "/tmp"), `bun-os-plugin-qualification-${crypto.randomUUID()}`);
-  const pluginArgs = ["--no-env-file", "agent-plugin", "install", "all", "--home", isolatedHome, "--dry-run", "--json"];
-  const pluginResult = await runProcess([resolve(executable), ...pluginArgs], workspace, {
-    timeoutMs: 60_000,
-    maxOutputBytes: 16 * 1024 * 1024,
-    env: {
-      ...Bun.env,
-      HOME: isolatedHome,
-      BUN_INSTALL: undefined,
-      CODEX_HOME: undefined,
-      CLAUDE_CONFIG_DIR: undefined,
-      OPENCODE_CONFIG_DIR: undefined,
-      OPENCODE_CONFIG: undefined,
-      XDG_CONFIG_HOME: undefined,
-      BUN_BE_BUN: undefined,
-    },
-  });
-  if (pluginResult.code !== 0)
-    throw new Error(`Product agent-plugin qualification failed: ${pluginResult.stderr.slice(-3000)}`);
-  const pluginReport = JSON.parse(pluginResult.stdout) as { targets?: unknown[]; actions?: unknown[] };
-  const pluginTargets = pluginReport.targets ?? [];
-  const pluginActions = pluginReport.actions ?? [];
-  const requiredPluginTargets = ["claude", "codex", "gemini", "opencode", "local", "agy"];
-  if (!requiredPluginTargets.every(target => pluginTargets.includes(target)) || !pluginActions.length)
-    throw new Error("Product agent-plugin archive did not produce plans for every provider adapter");
-  evidence.push({
-    args: pluginArgs,
-    exitCode: pluginResult.code,
-    stdoutSHA256: new Bun.CryptoHasher("sha256").update(pluginResult.stdout).digest("hex"),
-    pluginTargets,
-    actionCount: pluginActions.length,
-    dryRun: true,
-  });
-
-  const mcpArgs = ["--no-env-file", "mcp", "--profile", "codex", "--page-size", "1000", "--cwd", workspace];
-  const mcpMessages = [
-    {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "initialize",
-      params: {
-        protocolVersion: "2025-06-18",
-        capabilities: {},
-        clientInfo: { name: "bun-os-product-qualification", version: "1" },
-      },
-    },
-    { jsonrpc: "2.0", method: "notifications/initialized", params: {} },
-    { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} },
-    { jsonrpc: "2.0", id: 3, method: "resources/list", params: {} },
-    { jsonrpc: "2.0", id: 4, method: "resources/read", params: { uri: "bun://skills/bun-native" } },
-    { jsonrpc: "2.0", id: 5, method: "prompts/list", params: {} },
-    { jsonrpc: "2.0", id: 6, method: "resources/read", params: { uri: "bun://skills/ui-ux-pro-max" } },
-    { jsonrpc: "2.0", id: 7, method: "resources/read", params: { uri: "bun://skills/replica-architect" } },
-  ];
-  const mcpInput = new TextEncoder().encode(mcpMessages.map(message => JSON.stringify(message)).join("\n") + "\n");
-  const mcpResult = await runProcess([resolve(executable), ...mcpArgs], workspace, {
-    timeoutMs: 60_000,
-    maxOutputBytes: 16 * 1024 * 1024,
-    input: mcpInput,
-    env: {
-      ...Bun.env,
-      HOME: isolatedHome,
-      BUN_MCP_PROFILE: "codex",
-      BUN_MCP_SKILLS_PATH: [
-        join(workspace, "vendor/rea/plugin/skills"),
-        join(workspace, "packages/m3-design/intelligence"),
-        join(workspace, "packages/replica-skills/skills"),
-      ].join(":"),
-      BUN_MCP_MEMORY_DB: undefined,
-      REDIS_URL: undefined,
-      VALKEY_URL: undefined,
-      CODEX_HOME: undefined,
-      BUN_BE_BUN: undefined,
-    },
-  });
-  if (mcpResult.code !== 0) throw new Error(`Product MCP qualification failed: ${mcpResult.stderr.slice(-3000)}`);
-  const mcpReplies = mcpResult.stdout
-    .split("\n")
-    .filter(Boolean)
-    .map(
-      line =>
-        JSON.parse(line) as {
-          id?: number;
-          result?: {
-            protocolVersion?: string;
-            serverInfo?: { name?: string };
-            capabilities?: { tools?: unknown };
-            tools?: { name?: string }[];
-            resources?: { uri?: string }[];
-            contents?: { uri?: string; text?: string }[];
-            prompts?: { name?: string }[];
-          };
-          error?: { message?: string };
-        },
-    );
-  const response = (id: number) => {
-    const reply = mcpReplies.find(item => item.id === id);
-    if (!reply || reply.error || !reply.result)
-      throw new Error(`Product MCP request ${id} failed: ${reply?.error?.message ?? "missing JSON-RPC response"}`);
-    return reply.result;
-  };
-  const initialized = response(1);
-  const tools = response(2).tools ?? [];
-  const resources = response(3).resources ?? [];
-  const skill = response(4).contents?.[0];
-  const prompts = response(5).prompts ?? [];
-  const uiUxSkill = response(6).contents?.[0];
-  const replicaSkill = response(7).contents?.[0];
-  const toolNames = tools.map(tool => tool.name);
-  if (
-    initialized.protocolVersion !== "2025-06-18" ||
-    initialized.serverInfo?.name !== "bun" ||
-    !initialized.capabilities?.tools ||
-    !["docs_search", "skills_list", "skill_read", "graph_query"].every(name => toolNames.includes(name)) ||
-    !resources.some(resource => resource.uri === "bun://docs/llms.txt") ||
-    skill?.uri !== "bun://skills/bun-native" ||
-    typeof skill.text !== "string" ||
-    !skill.text.trim() ||
-    uiUxSkill?.uri !== "bun://skills/ui-ux-pro-max" ||
-    typeof uiUxSkill.text !== "string" ||
-    !uiUxSkill.text.includes("Material 3 contract") ||
-    replicaSkill?.uri !== "bun://skills/replica-architect" ||
-    typeof replicaSkill.text !== "string" ||
-    !replicaSkill.text.includes("# replica-architect") ||
-    !productSkills.every(
-      name =>
-        resources.some(resource => resource.uri === `bun://skills/${name}`) &&
-        prompts.some(prompt => prompt.name === name),
-    ) ||
-    !prompts.some(prompt => prompt.name === "bun-native") ||
-    !prompts.some(prompt => prompt.name === "ui-ux-pro-max")
-  )
-    throw new Error("Product MCP protocol, tools, docs, Bun, M3 design or Replica skills and prompts are incomplete");
-  evidence.push({
-    args: mcpArgs,
-    exitCode: mcpResult.code,
-    stdoutSHA256: new Bun.CryptoHasher("sha256").update(mcpResult.stdout).digest("hex"),
-    protocolVersion: initialized.protocolVersion,
-    toolCount: tools.length,
-    resourceCount: resources.length,
-    embeddedSkill: skill.uri,
-    skillBytes: new TextEncoder().encode(skill.text).length,
-    productDesignSkill: uiUxSkill.uri,
-    productDesignSkillBytes: new TextEncoder().encode(uiUxSkill.text).length,
-    replicaSkills: productSkills,
-    replicaArchitectSkillBytes: new TextEncoder().encode(replicaSkill.text).length,
-    promptCount: prompts.length,
-  });
   await verifyProductPayload(workspace, receiptPath, expected);
   if (!sameProductIdentity(await productIdentity(executable), receipt.runtime))
     throw new Error("Product runtime changed during CLI qualification");
@@ -335,7 +171,7 @@ export async function qualifyProductPayload(
     installedTreeSHA256: receipt.installedTreeSHA256,
     runtimeSHA256: receipt.runtime.sha256,
     installedModesSHA256: receipt.installedModesSHA256,
-    gates: ["product-cli", "cli-wasm", "ffi", "agent-plugin", "mcp"],
+    gates: ["product-cli", "cli-wasm", "ffi"],
   };
   await mkdir(dirname(output), { recursive: true });
   const parent = await realpath(dirname(output));
@@ -352,7 +188,7 @@ export async function qualifyProductPayload(
         {
           ...qualification,
           scope:
-            "CLI discovery, route targets, CLI-WASM, native FFI ABI, agent-plugin dry-run and MCP protocol/tools/resources/prompts",
+            "CLI discovery, route targets, CLI-WASM and native FFI ABI; the fork-only agent-plugin and MCP gates were removed with the fork",
           evidence,
           commandCount: commands.length,
           nativeCommandsQualified: false,

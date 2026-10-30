@@ -11,7 +11,7 @@ description = "Native Aphrody Discord engine: Ed25519 interaction verification, 
 [dependencies]
 aphrody-proc = { path = "../aphrody-proc", version = "1.4.7", features = ["tokio"] }
 anyhow = "1.0.104"
-aphrody-web-extract = { path = "../../toolchains/bun/src/browser/crates/extract", package = "bun_browser_extract", optional = true }
+aphrody-web-extract = { package = "bun_browser_extract", version = "1.4.7", optional = true }
 chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "4.6.6", features = ["derive", "env", "color"], optional = true }
 hex = { version = "0.4", features = [] }

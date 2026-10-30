@@ -4,7 +4,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import { homedir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
-import type { PythonAsync } from "bun:python";
+import type { PythonAsync } from "@aphrody/runtime-sdk/python";
+import { hostname, userInfo, freemem, totalmem, availableParallelism, release } from "node:os";
+import * as windows from "./windows.ts";
 
 export async function tunnelKey(home: string, owner: string) {
   if (!isAbsolute(home)) throw new Error("configured protected home must be absolute");
@@ -36,8 +38,7 @@ export async function tunnelKey(home: string, owner: string) {
   const token = join(directory, "api.token");
   if (!existsSync(token)) writeFileSync(token, randomBytes(32).toString("hex"), { mode: 0o600 });
   if (process.platform === "win32") {
-    const w = await import("bun:windows");
-    const identity = w.systemInfo();
+    const identity = { computerName: hostname(), userName: userInfo().username };
     const child = Bun.spawn(
       [
         "icacls",
@@ -73,8 +74,7 @@ export async function tunnelKey(home: string, owner: string) {
 }
 
 export async function nativeInventory(member: "aphro-pc" | "omar", root: string) {
-  const w = await import("bun:windows");
-  if (!w.isSupported) throw new Error("Windows inventory requires the qualified Windows fork");
+  if (process.platform !== "win32") throw new Error("Windows inventory requires Windows");
   const child = Bun.spawn(
     ["nvidia-smi", "--query-gpu=name,memory.total,memory.free,driver_version", "--format=csv,noheader,nounits"],
     { stdin: "ignore", stdout: "pipe", stderr: "ignore", windowsHide: true },
@@ -91,12 +91,7 @@ export async function nativeInventory(member: "aphro-pc" | "omar", root: string)
   const rows = output.split(/\r?\n/);
   if (rows.length !== 1) throw new Error("fleet requires an explicit GPU selection on multi-GPU hosts");
   const [gpu, total, free, driver] = rows[0]!.split(",").map(s => s.trim());
-  const memory = w.memory.status();
-  const toolchain =
-    "toolchain" in w && typeof w.toolchain === "function"
-      ? (w.toolchain() as { arch: string; msvc: { version: string } | null })
-      : null;
-  const disk = w.storage.drives().find(d => resolve(root).toLowerCase().startsWith(d.root.toLowerCase()));
+  const disk = windows.drives().find(d => resolve(root).toLowerCase().startsWith(d.root.toLowerCase()));
   if (!disk) throw new Error("configured storage drive unavailable");
   return {
     node: {
@@ -105,8 +100,8 @@ export async function nativeInventory(member: "aphro-pc" | "omar", root: string)
       gpu,
       vram_mib: Number(total),
       free_vram_mib: Number(free),
-      ram_bytes: memory.totalPhysical,
-      available_ram_bytes: memory.availablePhysical,
+      ram_bytes: totalmem(),
+      available_ram_bytes: freemem(),
       disk_bytes: disk.totalBytes,
       available_disk_bytes: disk.availableBytes,
       // A driver query cannot qualify CUDA arithmetic in the intended container.
@@ -114,20 +109,17 @@ export async function nativeInventory(member: "aphro-pc" | "omar", root: string)
     },
     native: {
       pid: process.pid,
-      executable: w.processes.path(process.pid),
+      executable: process.execPath,
       driver,
-      windows: w.version().version,
-      elevated: w.isElevated(),
-      windows11: w.isWindows11(),
-      processors: w.systemInfo().processors,
-      localAppData: w.knownFolder("LocalAppData"),
-      services: w.services.list().filter(s => /^(sshd|WireGuard|com\.docker)/i.test(s.name)),
-      toolchain: {
-        arch: toolchain?.arch ?? null,
-        msvc: toolchain?.msvc?.version ?? null,
-      },
+      windows: release(),
+      elevated: windows.isElevated(),
+      windows11: windows.isWindows11(),
+      processors: availableParallelism(),
+      localAppData: windows.knownFolder("LocalAppData"),
+      services: await windows.services(/^(sshd|WireGuard|com\.docker)/i),
+      toolchain: { arch: process.arch },
       // Registry-only enumeration does not start WSL.
-      wslRegistrations: w.wsl.distributions().map(d => ({ name: d.name, version: d.version })),
+      wslRegistrations: await windows.wslDistributions(),
     },
   };
 }
@@ -135,7 +127,7 @@ export async function nativeInventory(member: "aphro-pc" | "omar", root: string)
 export async function openPlanner(source: string): Promise<PythonAsync> {
   if (!isAbsolute(source) || !existsSync(join(source, "aphrody", "inference", "fleet.py")))
     throw new Error("configured Aphrody Python source missing");
-  const { Python } = await import("bun:python");
+  const { Python } = await import("@aphrody/runtime-sdk/python");
   const py = await Python.async();
   try {
     await py.exec(`import sys, os\nsys.path.insert(0, ${JSON.stringify(source)})`);

@@ -226,10 +226,10 @@ Runtime Memory Structures & Layouts:
 Using Inagle in Bun TypeScript:
 --------------------------------------------------------------------------------
 ```typescript
-import { Inagle } from "@rosegriffon/inagle";
-import { nieCrc32, nieDecompressCrilayla } from "@rosegriffon/inagle/ffi";
-import { IecodeDotnet } from "@rosegriffon/inagle/dotnet";
-import { getVfsCatalog, resolveFormat } from "@rosegriffon/inagle/docs";
+import { Inagle } from "@aphrody/inagle";
+import { nieCrc32, nieDecompressCrilayla } from "@aphrody/inagle/ffi";
+import { IecodeDotnet } from "@aphrody/inagle/dotnet";
+import { getVfsCatalog, resolveFormat } from "@aphrody/inagle/docs";
 
 // 1. Inspect format magic
 const fmt = resolveFormat("G4TX");

@@ -1,0 +1,41 @@
+{
+  "name": "@aphrody/buncc",
+  "version": "1.4.7",
+  "description": "Bun C Compiler: cc/c++/ar/link driver, toolchain providers and workspace build orchestrator for Bun OS",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "buncc": "./src/cli.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./cargo": "./src/cargo.ts",
+    "./env": "./src/env.ts",
+    "./flags": "./src/flags.ts",
+    "./driver": "./src/driver.ts",
+    "./plan": "./src/plan.ts",
+    "./providers": "./src/providers/index.ts",
+    "./msvc": "./src/providers/msvc.ts",
+    "./rust": "./src/providers/rust.ts"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  },
+  "files": [
+    "src",
+    "LICENSE-MIT",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/buncc"
+  },
+  "homepage": "https://github.com/aphrody-labs/bun-os/tree/os/packages/buncc",
+  "publishConfig": {
+    "access": "public"
+  }
+}

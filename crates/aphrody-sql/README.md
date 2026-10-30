@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # aphrody-sql
 
-Shared SQL owner of Aphrody (ADR [`docs/decisions/infra/sql-convergence.md`](../../docs/aphrody/decisions/infra/sql-convergence.md),
+Shared SQL owner of Aphrody (ADR `docs/decisions/infra/sql-convergence.md`,
 D4/D5/D8/D9). One crate for the PostgreSQL pool, the SQLite open policy, the
 migration runner and database URL resolution. Consumers: `aphrody-rag`,
 `aphrody-mcp`, `aphrody-memory`, `aphrody-train` (feature `registry`).
@@ -153,7 +153,7 @@ Contract (ADR D8):
   unnamed typed statements, so it also works behind a pooler, but run it on the
   direct URL.
 * One owner per database or schema: the tracking table is keyed by version.
-  Shenron (drizzle-kit) and RG (its SQL migrations) keep their own tools.
+  Other products keep their own migration tools.
 
 ```rust
 let mut client = pool.get().await?;

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Rose Griffon
+ * Copyright 2026 Aphrody Code
  * SPDX-License-Identifier: Apache-2.0
  */
 

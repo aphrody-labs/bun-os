@@ -33,7 +33,7 @@
   },
   "rustToolchain": {
     "components": ["rustfmt", "clippy", "rust-src", "rust-analyzer"],
-    "targets": ["x86_64-pc-windows-msvc", "wasm32-unknown-unknown", "wasm32-wasip1"]
+    "targets": ["x86_64-pc-windows-msvc", "wasm32-unknown-unknown", "wasm32-wasip1", "wasm32-wasip2"]
   },
   "binstall": [
     "nu@0.116.0",
@@ -147,7 +147,7 @@
     "vps": "~/src/aphrody",
     "dbfr": "~/src/aphrody",
     "remote": "workspace (git@github.com:aphrody-labs/aphrody.git, blobless clone via forwarded agent)",
-    "links": ["~/.local/bin/bun (release aphrody-labs/bun, also linked as ~/.bun/bin/bun)"]
+    "links": ["~/.local/bin/bun (upstream oven-sh/bun canary 1.4.4-canary.20261028.1, also linked as ~/.bun/bin/bun)"]
   },
   "uvTools": [],
   "codeIntel": {
@@ -180,7 +180,7 @@
   },
   "hostTools": {
     "vps": {
-      "purpose": "lossless CDN optimizer scripts/release/cdn-optimize.ts (shenron-cdn-sync.service)",
+      "purpose": "lossless CDN optimizer scripts/release/cdn-optimize.ts",
       "apt": ["libjpeg-turbo-progs", "gifsicle", "webp", "ffmpeg", "zopfli", "imagemagick"],
       "binstall": ["oxipng"]
     }

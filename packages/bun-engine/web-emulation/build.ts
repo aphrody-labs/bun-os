@@ -215,9 +215,7 @@ async function buildRust(id: string, core: RustCore, threads: boolean) {
     );
   }
   log(`cargo ${id} (${variant}): ${features.join(",")}`);
-  // Windows needs the MSVC environment for build scripts; Linux runs the wrapper directly.
-  const msvc = process.platform === "win32" ? ["bun", "msvc", "exec", "--toolset", "14.44", "--"] : [];
-  const cargoSeconds = await run([...msvc, process.execPath, "scripts/cargo.ts", "exec", "--", ...cargo], {
+  const cargoSeconds = await run([process.execPath, "scripts/cargo.ts", "exec", "--", ...cargo], {
     env: {
       CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS: rustflags.join(" "),
       CARGO_BUILD_BUILD_DIR: join(root, "build", "rust"),

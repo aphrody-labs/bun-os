@@ -1,17 +1,37 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { createWorkspaceServer } from "../src/workspace";
 
-const obscuraModuleName = "bun:obscura";
-const obscura = (await import(obscuraModuleName)) as {
-  findExecutable(): string | null;
-  launch(options: { headless: boolean; timeout: number; workers: number }): Promise<{
-    connection: {
-      send<T>(method: string, params?: unknown, sessionId?: string): Promise<T>;
-      on(method: string, callback: (params: unknown, sessionId?: string) => void): () => void;
-    };
-    close(): Promise<void>;
-  }>;
-};
+/** A Chrome-family executable Bun.WebView can spawn: BUN_CHROME_PATH, PATH, or a standard install location. */
+function chromeAvailable(): boolean {
+  if (process.env.BUN_CHROME_PATH) return true;
+  const names = [
+    "google-chrome-stable",
+    "google-chrome",
+    "chromium-browser",
+    "chromium",
+    "brave-browser",
+    "microsoft-edge",
+    "chrome",
+    "brave",
+    "msedge",
+  ];
+  if (names.some(name => Bun.which(name))) return true;
+  const roots = [process.env.ProgramFiles, process.env["ProgramFiles(x86)"], process.env.LOCALAPPDATA].filter(
+    Boolean,
+  ) as string[];
+  const relative = [
+    "Google/Chrome/Application/chrome.exe",
+    "Microsoft/Edge/Application/msedge.exe",
+    "BraveSoftware/Brave-Browser/Application/brave.exe",
+  ];
+  return (
+    roots.some(root => relative.some(path => existsSync(join(root, path)))) ||
+    existsSync("/usr/bin/google-chrome") ||
+    existsSync("/Applications/Google Chrome.app")
+  );
+}
 
 let server: ReturnType<typeof createWorkspaceServer>;
 
@@ -46,53 +66,18 @@ describe("Bun Engine web", () => {
     expect(() => createWorkspaceServer({ port: 65_536 })).toThrow(/invalid Bun Engine web port/);
   });
 
-  test.skipIf(!obscura.findExecutable())(
-    "loads the workspace API through real Chrome targets concurrently",
+  test.skipIf(!chromeAvailable())(
+    "loads the workspace API through real Chrome tabs concurrently",
     async () => {
-      const browser = await obscura.launch({
-        headless: true,
-        timeout: 10_000,
-        workers: 1,
-      });
-      try {
-        const readSchema = async () => {
-          const { targetId } = await browser.connection.send<{
-            targetId: string;
-          }>("Target.createTarget", { url: "about:blank" });
-          const { sessionId } = await browser.connection.send<{
-            sessionId: string;
-          }>("Target.attachToTarget", { targetId, flatten: true });
-          await browser.connection.send("Page.enable", {}, sessionId);
-          const loaded = new Promise<void>(resolve => {
-            const unsubscribe = browser.connection.on("Page.loadEventFired", (_params, eventSessionId) => {
-              if (eventSessionId !== sessionId) return;
-              unsubscribe();
-              resolve();
-            });
-          });
-          await browser.connection.send("Page.navigate", { url: server.url.href }, sessionId);
-          await loaded;
-          const response = await browser.connection.send<{
-            result: { value: number };
-            exceptionDetails?: unknown;
-          }>(
-            "Runtime.evaluate",
-            {
-              expression: "fetch('/api/workspace').then(response => response.json()).then(value => value.schema)",
-              awaitPromise: true,
-              returnByValue: true,
-            },
-            sessionId,
-          );
-          expect(response.exceptionDetails).toBeUndefined();
-          return response.result.value;
-        };
-
-        expect(await Promise.all([readSchema(), readSchema()])).toEqual([1, 1]);
-      } finally {
-        await browser.close();
-      }
+      const readSchema = async () => {
+        await using view = new Bun.WebView({ width: 800, height: 600, backend: "chrome" });
+        await view.navigate(server.url.href);
+        return await view.evaluate(
+          "fetch('/api/workspace').then(response => response.json()).then(value => value.schema)",
+        );
+      };
+      expect(await Promise.all([readSchema(), readSchema()])).toEqual([1, 1]);
     },
-    15_000,
+    30_000,
   );
 });

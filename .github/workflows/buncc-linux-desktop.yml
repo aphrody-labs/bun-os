@@ -1,0 +1,151 @@
+name: buncc linux desktop (GNOME, Plasma, Qt 6)
+
+# Pure-logic tests, a Windows host cross-compiling GLib/GTK4/libadwaita to x86_64-linux-gnu with LLVM, and
+# native builds of the pinned desktop components in an Arch container (closures: factory/linux-desktop).
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: Space-separated targets for the Arch container job (empty = default set)
+        default: ""
+      deep:
+        description: Also build the source dependencies of each target (slow)
+        type: boolean
+        default: false
+  push:
+    branches: [main, os]
+    paths:
+      - packages/buncc/src/linux-target/**
+      - packages/buncc/test/linux-target.test.ts
+      - factory/linux-desktop/**
+      - .github/workflows/buncc-linux-desktop.yml
+
+permissions:
+  contents: read
+
+env:
+  BUN_VERSION: 1.4.4-canary.20261028.1
+
+concurrency:
+  group: buncc-linux-desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory
+            packages/buncc
+          sparse-checkout-cone-mode: true
+      - run: npm install -g --unsafe-perm bun@${{ env.BUN_VERSION }}
+      - name: Closure files are valid and pinned
+        run: bun packages/buncc/src/cli.ts linux pins
+      - name: Tests
+        run: bun test packages/buncc/test/linux-target.test.ts
+
+  windows-cross:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory
+            packages/buncc
+          sparse-checkout-cone-mode: true
+      - run: npm install -g --unsafe-perm bun@${{ env.BUN_VERSION }}
+      - run: pip install meson ninja
+      - name: Toolchain versions
+        shell: pwsh
+        run: |
+          clang --version
+          ld.lld --version
+          meson --version
+      - name: Sysroot for GLib, GTK4 and libadwaita (Arch packages, extracted on Windows)
+        shell: pwsh
+        run: |
+          $sw = [Diagnostics.Stopwatch]::StartNew()
+          bun packages/buncc/src/cli.ts linux sysroot --roots "libadwaita,gtk4,glib2-devel" --arch x86_64 --dir $env:RUNNER_TEMP/ld --run
+          "sysroot seconds: $($sw.Elapsed.TotalSeconds)" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+      - name: Cross-compile smoke programs with clang and lld
+        shell: pwsh
+        run: |
+          foreach ($h in 'glib','gtk4','libadwaita') {
+            $sw = [Diagnostics.Stopwatch]::StartNew()
+            bun packages/buncc/src/cli.ts linux hello $h --sysroot $env:RUNNER_TEMP/ld/sysroot-custom-x86_64 --dir $env:RUNNER_TEMP/ld
+            if ($LASTEXITCODE) { exit $LASTEXITCODE }
+            "$h cross-compile seconds: $($sw.Elapsed.TotalSeconds)" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+            llvm-readobj --needed-libs "$env:RUNNER_TEMP/ld/hello/$h-hello-x86_64" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+          }
+      - name: Meson cross file and CMake toolchain file drive clang + lld
+        shell: bash
+        run: |
+          mkdir -p t && cd t
+          printf "project('t','c')\nexecutable('t','t.c')\n" > meson.build
+          printf 'cmake_minimum_required(VERSION 3.20)\nproject(t C)\nadd_executable(t t.c)\n' > CMakeLists.txt
+          printf '#include <stdio.h>\nint main(void){puts("hi");return 0;}\n' > t.c
+          bun -e '
+            import { mesonCrossFile, mesonNativeFile, cmakeToolchain, parseTriple } from "../packages/buncc/src/linux-target/crossfile.ts";
+            import { findGccInstallDir } from "../packages/buncc/src/linux-target/sysroot.ts";
+            import { writeFileSync } from "node:fs";
+            const sysroot = process.env.RUNNER_TEMP.replaceAll("\\", "/") + "/ld/sysroot-custom-x86_64";
+            const o = { triple: parseTriple("x86_64"), sysroot, gccInstallDir: findGccInstallDir(sysroot) };
+            writeFileSync("cross.ini", mesonCrossFile(o)); writeFileSync("native.ini", mesonNativeFile(o)); writeFileSync("tc.cmake", cmakeToolchain(o));'
+          meson setup bm . --cross-file cross.ini --native-file native.ini && meson compile -C bm
+          cmake -S . -B bc -G Ninja -DCMAKE_TOOLCHAIN_FILE="$PWD/tc.cmake" && cmake --build bc
+          llvm-objdump -f bm/t bc/t
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-cross-hello
+          path: ${{ runner.temp }}/ld/hello/
+
+  arch-build:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [gtk4, libadwaita, gjs, mutter, gnome-shell, gnome-session, gnome-settings-daemon, libplasma, kwin, plasma-workspace]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory
+            packages/buncc
+          sparse-checkout-cone-mode: true
+      - name: Selected?
+        id: sel
+        run: |
+          want="${{ inputs.targets }}"
+          if [ -z "$want" ] || echo " $want " | grep -q " ${{ matrix.target }} "; then echo run=true >>"$GITHUB_OUTPUT"; else echo run=false >>"$GITHUB_OUTPUT"; fi
+      - name: Free disk space (the GNOME and Plasma closures are 3 to 4 GiB installed)
+        if: steps.sel.outputs.run == 'true'
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache/CodeQL
+          df -h /
+      - run: npm install -g --unsafe-perm bun@${{ env.BUN_VERSION }}
+        if: steps.sel.outputs.run == 'true'
+      - name: Build ${{ matrix.target }} in an Arch container
+        if: steps.sel.outputs.run == 'true'
+        run: |
+          start=$(date +%s)
+          if [ "${{ inputs.deep }}" = "true" ]; then deep=--deep; else deep=; fi
+          bun packages/buncc/src/cli.ts linux container ${{ matrix.target }} --engine docker $deep --run
+          echo "### ${{ matrix.target }}: $(( $(date +%s) - start )) s wall (image pull, pacman closure, clone, build, smoke)" >>"$GITHUB_STEP_SUMMARY"
+      - name: Pack the stage
+        if: steps.sel.outputs.run == 'true' && always()
+        run: |
+          d=.buncc/linux-desktop/stage/${{ matrix.target }}
+          if [ -d "$d" ]; then tar -C "$d" -c . | zstd -T0 -10 -o "${{ matrix.target }}-stage.tar.zst"; ls -l "${{ matrix.target }}-stage.tar.zst"; fi
+      - uses: actions/upload-artifact@v4
+        if: steps.sel.outputs.run == 'true' && always()
+        with:
+          name: stage-${{ matrix.target }}
+          path: ${{ matrix.target }}-stage.tar.zst
+          if-no-files-found: warn
+          retention-days: 7

@@ -604,7 +604,7 @@ export async function inspectStorage(env: Environment = process.env) {
       [
         process.execPath,
         "-e",
-        'import {locateGameSource} from "@rosegriffon/inagle/ffi";const source=locateGameSource(process.env.NIE_GAME_DIR);if(!source.source)process.exit(1);',
+        'import {locateGameSource} from "@aphrody/inagle/ffi";const source=locateGameSource(process.env.NIE_GAME_DIR);if(!source.source)process.exit(1);',
       ],
       { cwd: repositoryRoot, env: childEnv, stdout: "pipe", stderr: "pipe", timeout: 10_000 },
     );

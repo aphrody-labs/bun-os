@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 use std::{
-    collections::HashMap,
     sync::{
         Arc, Mutex,
         mpsc::{self, Receiver, Sender},
@@ -15,13 +14,12 @@ use cef::ImplBrowserHost;
 use raw_window_handle::HasWindowHandle;
 use tauri_runtime::{
     Error, Icon, ProgressBarState, Result, UserAttentionType, UserEvent, WindowDispatch,
-    WindowEventId,
     dpi::{PhysicalPosition, PhysicalSize, Position, Size},
     monitor::Monitor,
     webview::{DetachedWebview, PendingWebview},
     window::{
-        CursorIcon, DetachedWindow, DetachedWindowWebview, PendingWindow, RawWindow, WindowEvent,
-        WindowId, WindowSizeConstraints,
+        CursorIcon, DetachedWindow, DetachedWindowWebview, PendingWindow, RawWindow, WindowId,
+        WindowSizeConstraints,
     },
 };
 use tauri_utils::{Theme, config::Color};
@@ -55,13 +53,10 @@ use crate::{
         AfterWindowCreationCallback, CefRuntime, Message, RuntimeContext, WinitCefApp,
         WinitDragDropState,
     },
-    webview::{AppWebview, CefWebviewDispatcher, create_webview_detached},
+    webview::{AppWebview, CefWebviewDispatcher, PageFullscreen, create_webview_detached},
     window_builder::WindowBuilderWrapper,
     window_handle::SendRawWindowHandle,
 };
-
-type WindowEventListener = Box<dyn Fn(&WindowEvent) + Send>;
-type WindowEventListeners = Arc<Mutex<HashMap<WindowEventId, WindowEventListener>>>;
 
 #[cfg(any(
     target_os = "linux",
@@ -322,7 +317,6 @@ pub(crate) enum FullscreenTarget {
 }
 
 pub(crate) enum WindowMessage {
-    AddEventListener(WindowEventId, WindowEventListener),
     Close,
     Destroy,
     ScaleFactor(Sender<Result<f64>>),
@@ -392,6 +386,8 @@ pub(crate) enum WindowMessage {
     SetPosition(Position),
     SetFullscreen(bool),
     SetFullscreenOnMonitor(PhysicalPosition<f64>),
+    /// F11 (`IDC_FULLSCREEN`) outside page fullscreen.
+    ToggleFullscreen,
     /// Applies the fullscreen request held back during a transition, now that it ended. See
     /// [`AppWindow::request_fullscreen`].
     #[cfg(target_os = "macos")]
@@ -478,10 +474,9 @@ pub(crate) struct AppWindow {
     pub(crate) label: String,
     #[cfg(windows)]
     pub(crate) background_surface: Option<SoftbufferSurface>,
-    pub(crate) window: Box<dyn WinitWindow>,
+    pub(crate) window: Arc<dyn WinitWindow>,
     pub(crate) attrs: AppWindowAttrs,
     pub(crate) children: Vec<AppWebview>,
-    pub(crate) listeners: WindowEventListeners,
     pub(crate) native_drag_drop: Option<WinitDragDropState>,
     #[cfg(any(
         target_os = "linux",
@@ -627,6 +622,93 @@ impl AppWindow {
         self.window.set_fullscreen(fullscreen);
     }
 
+    /// A fullscreen request from the app or the user rather than a page: the window's
+    /// fullscreen state is theirs from now on. Leaving fullscreen also takes every page out of
+    /// HTML fullscreen, which would otherwise keep its fullscreen layout in a normal window.
+    pub(crate) fn request_window_fullscreen(&mut self, target: Option<FullscreenTarget>) {
+        for webview in &mut self.children {
+            if webview.page_fullscreen == PageFullscreen::Off {
+                continue;
+            }
+            if target.is_some() {
+                webview.page_fullscreen = PageFullscreen::On { owns_window: false };
+            } else {
+                webview.page_fullscreen = PageFullscreen::Off;
+                webview.host.exit_fullscreen(1);
+            }
+        }
+        self.request_fullscreen(target);
+    }
+
+    /// F11: leaves fullscreen when the window is fullscreen (or about to be) or a page shows an
+    /// element in HTML fullscreen, and enters it otherwise.
+    pub(crate) fn toggle_fullscreen(&mut self) {
+        let fullscreen = self.fullscreen_requested()
+            || self
+                .children
+                .iter()
+                .any(|webview| webview.page_fullscreen != PageFullscreen::Off);
+        self.request_window_fullscreen((!fullscreen).then_some(FullscreenTarget::CurrentMonitor));
+    }
+
+    /// Whether the window is in fullscreen once the requests made so far are applied.
+    ///
+    /// On macOS a request made during a transition is held rather than handed to winit, so
+    /// `Window::fullscreen` does not reflect it yet.
+    fn fullscreen_requested(&self) -> bool {
+        #[cfg(target_os = "macos")]
+        if self.fullscreen_transition.in_progress()
+            && let Some(pending) = self.fullscreen_transition.pending()
+        {
+            return pending.is_some();
+        }
+        self.window.fullscreen().is_some()
+    }
+
+    /// A page of `webview_id` entered or left HTML fullscreen.
+    ///
+    /// The window enters fullscreen with the first page that needs it and leaves once no page
+    /// that put it there is still fullscreen; a window the app or the user made fullscreen
+    /// stays that way.
+    pub(crate) fn set_page_fullscreen(&mut self, webview_id: u32, fullscreen: bool) {
+        let window_fullscreen = self.fullscreen_requested();
+        let Some(webview) = self
+            .children
+            .iter_mut()
+            .find(|webview| webview.webview_id == webview_id)
+        else {
+            return;
+        };
+
+        if fullscreen {
+            if webview.page_fullscreen != PageFullscreen::Off {
+                return;
+            }
+            webview.page_fullscreen = PageFullscreen::On {
+                owns_window: !window_fullscreen,
+            };
+            if !window_fullscreen {
+                self.request_fullscreen(Some(FullscreenTarget::CurrentMonitor));
+            }
+            return;
+        }
+
+        let previous = std::mem::take(&mut webview.page_fullscreen);
+        if previous != (PageFullscreen::On { owns_window: true }) {
+            return;
+        }
+        // Another page still in fullscreen keeps the window there, and restores it when it leaves.
+        if let Some(other) = self
+            .children
+            .iter_mut()
+            .find(|webview| webview.page_fullscreen != PageFullscreen::Off)
+        {
+            other.page_fullscreen = PageFullscreen::On { owns_window: true };
+        } else {
+            self.request_fullscreen(None);
+        }
+    }
+
     pub(crate) fn preferred_theme(&self) -> Option<Theme> {
         self.attrs
             .inner
@@ -733,10 +815,9 @@ impl<T: UserEvent> WinitCefApp<T> {
             label: pending.label.clone(),
             #[cfg(windows)]
             background_surface: None,
-            window,
+            window: Arc::from(window),
             attrs,
             children: Vec::new(),
-            listeners: Default::default(),
             native_drag_drop: None,
             #[cfg(any(
                 target_os = "linux",
@@ -753,6 +834,7 @@ impl<T: UserEvent> WinitCefApp<T> {
 
         #[cfg(target_os = "macos")]
         {
+            appwindow.apply_movability();
             appwindow.set_visible_on_all_workspaces(appwindow.attrs.visible_on_all_workspaces);
             if let Some(position) = &appwindow.attrs.traffic_light_position {
                 appwindow.set_traffic_light_position(position);
@@ -920,9 +1002,6 @@ impl<T: UserEvent> WinitCefApp<T> {
         let window = &appwindow.window;
 
         match message {
-            WindowMessage::AddEventListener(id, listener) => {
-                appwindow.listeners.lock().unwrap().insert(id, listener);
-            }
             WindowMessage::Close | WindowMessage::Destroy => {
                 unreachable!("handled before borrowing")
             }
@@ -1066,15 +1145,19 @@ impl<T: UserEvent> WinitCefApp<T> {
             WindowMessage::Unminimize => window.set_minimized(false),
             WindowMessage::Show => window.set_visible(true),
             WindowMessage::Hide => window.set_visible(false),
-            WindowMessage::SetDecorations(value) => window.set_decorations(value),
+            WindowMessage::SetDecorations(value) => {
+                window.set_decorations(value);
+                #[cfg(target_os = "macos")]
+                appwindow.apply_movability();
+            }
             WindowMessage::SetSize(size) => _ = window.request_surface_size(size),
             WindowMessage::SetPosition(position) => window.set_outer_position(position),
-            WindowMessage::SetFullscreen(value) => {
-                appwindow.request_fullscreen(value.then_some(FullscreenTarget::CurrentMonitor))
-            }
+            WindowMessage::SetFullscreen(value) => appwindow
+                .request_window_fullscreen(value.then_some(FullscreenTarget::CurrentMonitor)),
             WindowMessage::SetFullscreenOnMonitor(position) => {
-                appwindow.request_fullscreen(Some(FullscreenTarget::MonitorAt(position)))
+                appwindow.request_window_fullscreen(Some(FullscreenTarget::MonitorAt(position)))
             }
+            WindowMessage::ToggleFullscreen => appwindow.toggle_fullscreen(),
             #[cfg(target_os = "macos")]
             WindowMessage::ApplyPendingFullscreen => {
                 if let Some(target) = appwindow.fullscreen_transition.take_pending() {
@@ -1083,7 +1166,10 @@ impl<T: UserEvent> WinitCefApp<T> {
             }
             #[cfg(target_os = "macos")]
             WindowMessage::SetSimpleFullscreen(value) => {
-                window.set_simple_fullscreen(value);
+                let changed = window.set_simple_fullscreen(value);
+                if changed && !value {
+                    appwindow.apply_movability();
+                }
             }
             WindowMessage::SetFocus => appwindow.activate(),
             WindowMessage::SetMinSize(min_size) => window.set_min_surface_size(min_size),
@@ -1259,15 +1345,6 @@ impl<T: UserEvent> WindowDispatch<T> for CefWindowDispatcher<T> {
 
     fn run_on_main_thread<F: FnOnce() + Send + 'static>(&self, f: F) -> Result<()> {
         self.context.run_on_main_thread(f)
-    }
-
-    fn on_window_event<F: Fn(&WindowEvent) + Send + 'static>(&self, f: F) -> WindowEventId {
-        let id = self.context.next_window_event_id();
-        let _ = self.context.send_message(Message::Window {
-            window_id: self.window_id,
-            message: WindowMessage::AddEventListener(id, Box::new(f)),
-        });
-        id
     }
 
     fn scale_factor(&self) -> Result<f64> {
@@ -1792,11 +1869,9 @@ where
         after_window_creation: after_window_creation.map(|f| Box::new(f) as _),
         result_tx,
     })?;
-    // Block until the event loop has created the window so a creation failure is
+    // Wait until the event loop has created the window so a creation failure is
     // surfaced to the caller instead of leaving a detached, dead window.
-    result_rx
-        .recv()
-        .map_err(|_| Error::FailedToReceiveMessage)??;
+    context.wait_for_creation(result_rx)?;
 
     let webview = webview_id.map(|webview_id| DetachedWindowWebview {
         webview: DetachedWebview {

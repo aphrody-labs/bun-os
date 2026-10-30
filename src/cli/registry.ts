@@ -79,7 +79,7 @@ export function script(target: string, ...fixed: string[]): Pick<Command, "targe
   return { target, run: args => spawn([process.execPath, abs(target), ...fixed, ...args]) };
 }
 
-/** Run a native Bun command (`bun check`, `bun lint`, `bun fmt`, `bun n2b`) with centrally defined flags. */
+/** Run a native Bun command (`bun check`, `bun lint`, `bun fmt`) with centrally defined flags. */
 export function native(verb: string, ...fixed: string[]): Pick<Command, "run"> {
   return { run: args => spawn([process.execPath, verb, ...fixed, ...args]) };
 }

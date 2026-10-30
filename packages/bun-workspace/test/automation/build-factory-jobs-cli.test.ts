@@ -48,6 +48,7 @@ afterEach(async () => {
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "aphrody-factory-job-cli-"));
   roots.push(root);
+  for (const marker of ["rust-toolchain.toml", "Cargo.toml", "package.json"]) await writeFile(join(root, marker), "");
   await mkdir(join(root, "tools", "aphrody", "config"), { recursive: true });
   await writeFile(join(root, "tools/aphrody/config/build-factory.json"), JSON.stringify(config));
   const marker = join(root, "invocation.json");

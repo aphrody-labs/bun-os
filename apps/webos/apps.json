@@ -41,11 +41,6 @@
       "related": "aphrody-workspace",
       "artifact": "aphrody-desktop"
     },
-    "aphrody-drive": {
-      "kind": "server",
-      "desc": "Drive backend (Spacedrive-derived core, adapters and xtask), FSL-1.1-ALv2",
-      "related": "drive"
-    },
     "aphrody-model-view": {
       "kind": "native",
       "related": "files"
@@ -84,19 +79,10 @@
       "artifact": "iecode-dotnet"
     },
     "m3-showcase": { "kind": "server", "related": "showcase" },
-    "m3-web": { "kind": "example", "related": "showcase" },
     "m3-next-example": { "kind": "example", "related": "showcase" },
     "m3-next-tauri-example": { "kind": "example", "related": "showcase" },
-    "m3-example-tauri": {
-      "kind": "example",
-      "desc": "Tauri examples: commands, multiwindow, multiwebview, streaming, isolation"
-    },
     "m3-published-consumer": { "kind": "example", "related": "showcase" },
     "play": { "kind": "server", "related": "play" },
-    "rg-website": {
-      "kind": "server",
-      "desc": "RG website (Next.js) and its static assets"
-    },
     "designcraft": {
       "desc": "DesignCraft desktop app"
     },

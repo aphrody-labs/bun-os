@@ -52,7 +52,7 @@ Completed output directories are refused. Each successful export adds a private
 `training-manifest.json` with base config, dataset, untouched gold and adapter
 SHA-256, quantization mode and step count. `promoted` remains false; training
 does not change the active model. Compare the candidate against the current
-Shenron adapter on untouched gold before promotion.
+adapter on untouched gold before promotion.
 
 Implementation follows the [Transformers bitsandbytes guide](https://huggingface.co/docs/transformers/main/quantization/bitsandbytes)
 and [PEFT quantization guide](https://huggingface.co/docs/peft/developer_guides/quantization).

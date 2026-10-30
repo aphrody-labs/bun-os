@@ -283,7 +283,10 @@ pub async fn fetch<R: Runtime>(
                 }
 
                 if !headers.contains_key(header::USER_AGENT) {
-                    headers.append(header::USER_AGENT, HeaderValue::from_static(artcraft_default_user_agent(&url)));
+                    headers.append(
+                        header::USER_AGENT,
+                        HeaderValue::from_static(artcraft_default_user_agent(&url)),
+                    );
                 }
 
                 // ensure we have an Origin header set

@@ -165,7 +165,7 @@ pub(crate) enum OcrAction {
         skip_done: bool,
         /// Emit the shared aphrody.ocr.result/v2 JSONL contract for VLM runs.
         /// PP-OCR emits v2 already. Legacy VLM output remains the default for
-        /// Shenron's existing transcription cleanup and deposit tools.
+        /// existing transcription cleanup tools.
         #[arg(long)]
         result_v2: bool,
         /// Which backend reads the pages.
@@ -219,14 +219,14 @@ pub(crate) enum OcrAction {
         #[command(subcommand)]
         action: DbAction,
     },
-    /// Transcribe a Shenron Dragon Ball databook lot with the safe preset.
+    /// Transcribe a lot of Japanese reference-book scans with the safe preset.
     ///
     /// This is deliberately separate from generic `batch`: granite-docling is
     /// useful for general layout, but reads Japanese databook text as pictures.
-    /// Shenron databooks require dots.ocr and raw output so cleanup can be
+    /// Such scans require dots.ocr and raw output so cleanup can be
     /// replayed without spending GPU time on the same scans again.
     Databooks {
-        /// Directory containing one exported Shenron lot's images.
+        /// Directory containing one exported lot's images.
         dir: PathBuf,
         /// JSONL file to append results to. Without it, results go to stdout.
         #[arg(long)]
@@ -238,7 +238,7 @@ pub(crate) enum OcrAction {
         #[arg(long)]
         skip_done: bool,
         /// Emit the shared aphrody.ocr.result/v2 JSONL contract for review
-        /// candidates; the existing Shenron depositor still uses legacy lines.
+        /// candidates; legacy lines remain the default.
         #[arg(long)]
         result_v2: bool,
         /// Token budget per page. Dense Japanese reference sheets need room.
@@ -405,7 +405,7 @@ fn run_blocking(action: OcrAction) -> miette::Result<()> {
             server_port,
             deposit,
         } => {
-            // Same PageResult JSONL as `batch`, accepted directly by Shenron.
+            // Same PageResult JSONL as `batch`, accepted directly by downstream tools.
             // Raw output is forced: later deterministic cleanup must not require
             // re-reading a long GPU batch.
             batch(

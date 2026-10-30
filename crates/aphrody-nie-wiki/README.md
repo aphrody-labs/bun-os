@@ -17,3 +17,10 @@ Older mirrors without `inagle_special_tactics`, `inagle_awakenings`, or the
 passive rule tables remain readable; the corresponding result is empty rather
 than a fabricated row. The mirror itself must have been produced from the game
 VFS, `nie.exe`-read formats, or the verified `inagle`/`zukan` corpus.
+
+## Configuration
+
+| Variable | Default | Effect |
+| --- | --- | --- |
+| `NIE_CDN_BASE` | `https://cdn.rosegriffon.fr` | Origin of the asset CDN used for menu images, emblems, faces and texture URIs (`aphrody-nie-wiki`, `aphrody-nie-formats`). No trailing slash. |
+| `NIE_WIKI_BASE` | `https://azalee.rosegriffon.fr` | Origin of the NIE wiki whose `chara/<id>` links `aphrody-nie-data` accepts as avatar references. |

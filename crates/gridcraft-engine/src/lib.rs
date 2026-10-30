@@ -23,6 +23,7 @@ pub mod io;
 pub mod links;
 pub mod outline;
 pub mod paper;
+pub mod pdf_export;
 pub mod pivot;
 pub mod pivot_calc;
 pub mod sample;

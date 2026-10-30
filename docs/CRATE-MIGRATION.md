@@ -418,7 +418,7 @@ Measured on `origin/os` at `15d3c89088` (`bun src/cli.ts workspace check`, `carg
 - **`crates/sqlite_tasks`** stays excluded: it uses SQLx 0.7, whose `libsqlite3-sys 0.27` clashes with the
   `links = "sqlite3"` of the root's `libsqlite3-sys 0.38`. Decision pending (rusqlite rewrite onto
   `aphrody-sql`, or a shared SQLx).
-- **Pending `migrate` entries.** `apps/aphrody-drive`, `apps/desktop/src-tauri`, `apps/figcraft/plugins`,
+- **Pending `migrate` entries.** `apps/desktop/src-tauri`, `apps/figcraft/plugins`,
   `apps/m3-published-consumer` and `packages/bun-tauri` still own nested workspaces and locks.
 
 The earlier batch sections above stay the record of each split; "batches 1 to 5" are not numbered in this

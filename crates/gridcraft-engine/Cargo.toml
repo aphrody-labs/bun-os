@@ -27,7 +27,6 @@ thiserror = "2"
 log = "0.4"
 gridcraft-xlsx = { path = "../gridcraft-xlsx", version = "0.6.1" }
 gridcraft-chart = { path = "../gridcraft-chart", version = "0.6.1" }
-gridcraft-pdf = { path = "../gridcraft-pdf", version = "1.4.7" }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
 
 [dev-dependencies]

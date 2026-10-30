@@ -1,9 +1,0 @@
-{
-  "family": "dwrite",
-  "dll": "dwrite.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Graphics.DirectWrite"],
-  "functions": {
-    "DWriteCreateFactory": ["hr", ["i32", "*s16:Foundation.GUID", "p"], ["factoryType", "iid", "factory"], 0]
-  }
-}

@@ -1,0 +1,24 @@
+WSL2 patchset port to mainline v7.3: fuse/virtio_fs changes
+Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3 (gregkh/linux tag v7.3).
+Build/boot: NOT verified (no Linux host). SPDX of the touched files is preserved.
+
+diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
+index f15e516ebcb5c74d2d8d31629be2926b1a560c43..cb7f821e91ed30911f55ebeb53e131aa9a177514 100644
+--- a/fs/fuse/virtio_fs.c
++++ b/fs/fuse/virtio_fs.c
+@@ -1730,6 +1730,15 @@ static int virtio_fs_get_tree(struct fs_context *fsc)
+ 	fc->max_pages_limit = min_t(unsigned int, fc->max_pages_limit,
+ 				    virtqueue_size - FUSE_HEADER_OVERHEAD);
+ 
++	/*
++	 * Also bound requests by the transport's maximum single DMA mapping
++	 * size (e.g. swiotlb's 256 KiB cap) so the guest never builds a
++	 * request whose buffer cannot be DMA-mapped.
++	 */
++	fc->max_pages_limit = min_t(unsigned int, fc->max_pages_limit,
++				    virtio_max_dma_size(fs->vqs[VQ_REQUEST].vq->vdev)
++					>> PAGE_SHIFT);
++
+ 	fsc->s_fs_info = fm;
+ 	sb = sget_fc(fsc, virtio_fs_test_super, set_anon_super_fc);
+ 	if (fsc->s_fs_info)

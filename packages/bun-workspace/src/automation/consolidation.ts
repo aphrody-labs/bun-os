@@ -956,7 +956,6 @@ export async function runConsolidation(args: string[]): Promise<number> {
       ["nie", "nie", "extract"],
       ["fut", "fut", "extract"],
       ["rg", "rg", "deferred"],
-      ["shenron", "shenron", "extract"],
       ["bun", "bun", "upstream-pinned"],
       ["oxc", "oxc", "upstream-pinned"],
       ["bevy", "bevy", "classify"],

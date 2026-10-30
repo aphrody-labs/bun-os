@@ -49,3 +49,8 @@ winresource = "0.1"
 [target.'cfg(target_os = "linux")'.dependencies]
 wayland-client = "0.31"
 wayland-protocols = "0.32"
+
+[target.'cfg(windows)'.dependencies]
+uds_windows = "1"
+windows = { workspace = true, features = ["UI_ViewManagement"] }
+winsafe = { workspace = true, features = ["user"] }

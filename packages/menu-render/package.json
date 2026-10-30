@@ -1,5 +1,5 @@
 {
-  "name": "@rosegriffon/menu-render",
+  "name": "@aphrody/menu-render",
   "version": "1.4.7",
   "private": false,
   "description": "React menu renderer with a caller-supplied Lua runtime and game-host adapter.",
@@ -48,6 +48,6 @@
     "react-dom": "catalog:"
   },
   "engines": {
-    "bun": "=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

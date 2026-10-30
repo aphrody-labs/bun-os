@@ -38,7 +38,7 @@ tracing = "0.1.44"
 reqwest = { version = "0.13.5", features = ["rustls-no-provider", "json", "stream", "form", "query", "charset", "http2", "system-proxy", "blocking", "cookies", "gzip", "brotli", "deflate", "socks", "multipart"], default-features = false }
 rusqlite = { version = "0.40", features = ["bundled"] }
 aphrody-sql = { path = "../aphrody-sql", version = "1.4.7", default-features = false, features = ["sqlite"] }
-aphrody-web-index = { path = "../../toolchains/bun/src/browser/crates/index", package = "bun_browser_index" }
+aphrody-web-index = { package = "bun_browser_index", version = "1.4.7" }
 aphrody-agent-home = { path = "../aphrody-agent-home", version = "1.4.7", features = [] }
 aphrody-models = { path = "../aphrody-models", version = "1.4.7", features = [] }
 

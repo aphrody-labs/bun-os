@@ -40,9 +40,9 @@ configuration. No machine-specific installation or Home path belongs in the
 committed defaults. The root CLI is the public orchestration owner.
 
 ```sh
-bun src/cli.ts msys2 plan --msys-root /path/to/installed/msys2
-bun src/cli.ts msys2 doctor --config /path/to/local-config.json
-bun src/cli.ts msys2 lock --msys-root /path/to/installed/msys2 --out /path/to/metadata-lock.json
+bun src/cli.ts factory msys2 plan --msys-root /path/to/installed/msys2
+bun src/cli.ts factory msys2 doctor --config /path/to/local-config.json
+bun src/cli.ts factory msys2 lock --msys-root /path/to/installed/msys2 --out /path/to/metadata-lock.json
 ```
 
 The optional config has an `msys2` object with `sourceRoot`, `installationRoot`,

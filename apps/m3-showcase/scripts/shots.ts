@@ -5,7 +5,7 @@ import { mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { chromium, type Browser } from "playwright-core";
 import { pool } from "../../../scripts/m3/build.ts";
-import { PAGES } from "../src/pages/index.ts";
+import { PAGES } from "@aphrody/app-ui/material/pages/index.ts";
 export type Layout = "mobile" | "desktop" | "tv";
 export const VIEWPORTS: Record<Layout, { width: number; height: number }> = {
   mobile: { width: 390, height: 844 },

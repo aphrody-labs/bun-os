@@ -75,7 +75,7 @@
     "@aphrody/m3-tokens": "workspace:*"
   },
   "devDependencies": {
-    "@aphrody/bun": "^3.3.0",
+    "@aphrody/bun": "workspace:*",
     "@aphrody/m3-config": "workspace:*",
     "@material/material-color-utilities": "catalog:"
   },
@@ -83,6 +83,6 @@
     "react": ">=18.0.0"
   },
   "engines": {
-    "bun": ">=1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }

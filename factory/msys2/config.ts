@@ -6,7 +6,7 @@ export const msys2DesktopConfig = {
   sourceRoot: "vendor",
   sourceRegistry: "vendor/sources.json",
   owner: "Existing cym Bun CLI + root factory/process/Cargo/artifact owners",
-  runtime: "aphrody-labs/bun",
+  runtime: "oven-sh/bun",
   defaultABI: "msvc-x64" as Msys2DesktopABI,
   cymSource: "msys2-packages/cachyos-msys2/cym.ts",
   protectedHomeImport: false,

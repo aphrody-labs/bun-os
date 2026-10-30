@@ -1,0 +1,102 @@
+---
+title: UI Integration
+description: Add views, previews, inspector sections, and commands
+sidebarTitle: UI Integration
+---
+
+Extensions contribute interface elements through a declarative manifest. The
+host renders canonical Spacedrive components and keeps navigation, permissions,
+loading, errors, and accessibility consistent.
+
+## Contributions
+
+An extension can add:
+
+- a top-level or grouped view;
+- an inspector section;
+- a context-menu command;
+- file-kind badges and metadata rows;
+- preview renderers and controls;
+- settings for its own package.
+
+Use a location pin for a path. Use an extension view for a query or workflow.
+
+## Example manifest
+
+~~~json
+{
+  "views": [
+    {
+      "id": "people",
+      "label": "People",
+      "icon": "person",
+      "query": "photos.people.list",
+      "render": "collection"
+    }
+  ],
+  "inspectors": [
+    {
+      "id": "photo-details",
+      "when": { "file_kind": ["image/heic", "image/jpeg"] },
+      "query": "photos.asset.info"
+    }
+  ],
+  "commands": [
+    {
+      "id": "photos.find-similar",
+      "label": "Find Similar",
+      "action": "photos.find_similar"
+    }
+  ]
+}
+~~~
+
+Operation names refer to handlers registered by the extension. The manifest
+cannot embed arbitrary SQL or shell commands.
+
+## Views
+
+A view receives typed query results and renders a supported layout. It reports:
+
+- loading and empty state;
+- partial results from offline sources;
+- permission denial;
+- stale model generation;
+- the extension required to interpret its data.
+
+An extension can group its secondary views under one section. It should request
+a top-level home only for a distinct, repeated user activity.
+
+## Previews
+
+File-kind registration connects a record to a preview capability. The preview
+can request byte ranges or a declared sidecar variant.
+
+The host controls the frame, loading state, fallback, and dangerous actions.
+The extension controls the file-specific rendering and commands.
+
+## Inspector sections
+
+Inspector sections add typed facts without replacing core identity,
+availability, path, provenance, and protection fields.
+
+Every displayed value should identify whether it came from the source,
+Spacedrive core, a person, or the extension.
+
+## Commands
+
+Context commands receive the selected stable record or content IDs and call a
+registered action. The host can preview capability scope before execution.
+
+Commands declare whether they are read-only, mutating, destructive, or external
+data transfer. The interface presents the corresponding confirmation.
+
+## Design rules
+
+- Use canonical components.
+- Keep extension navigation removable.
+- Never hide source availability or partial results.
+- Do not copy file metadata into a private UI cache.
+- Preserve keyboard and screen-reader behavior.
+- Provide a useful fallback when the extension is disabled.
+- Keep mutations behind registered actions.

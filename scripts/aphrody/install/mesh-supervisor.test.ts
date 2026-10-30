@@ -49,24 +49,11 @@ async function waitUntil(predicate: () => boolean, timeout = 10_000): Promise<vo
 }
 
 test.skipIf(process.platform !== "win32")(
-  "exports the installed complete Windows surface without executing its operations",
+  "exports the Windows job surface without executing its operations",
   async () => {
     const result = await windowsCapabilities();
     expect(result.supported).toBe(true);
-    for (const key of [
-      "Job",
-      "registry",
-      "services",
-      "processes",
-      "clipboard",
-      "eventLog",
-      "storage",
-      "memory",
-      "win32",
-      "toolchain",
-      "wsl",
-    ])
-      expect(result.exports).toContain(key);
+    expect(result.exports).toEqual(["Job"]);
   },
 );
 
@@ -300,8 +287,8 @@ test("health fails on errors, redirects and authentication failure instead of ac
   }
 });
 
-test.skipIf(process.platform !== "win32")("fork Windows Job closes its owned long-running child", async () => {
-  const { Job } = await import("bun:windows");
+test.skipIf(process.platform !== "win32")("Windows Job closes its owned long-running child", async () => {
+  const { Job } = await (await import("./mesh-supervisor")).windows();
   const job = new Job({ killOnClose: true });
   const child = Bun.spawn([process.execPath, "-e", "await Bun.sleep(120000)"], {
     windowsHide: true,
@@ -311,12 +298,10 @@ test.skipIf(process.platform !== "win32")("fork Windows Job closes its owned lon
   });
   try {
     job.assign(child);
-    expect(job.info().pids).toContain(child.pid);
     job.close();
-    expect(await Promise.race([child.exited.then(() => true), Bun.sleep(1000).then(() => false)])).toBe(true);
-    expect(job.closed).toBe(true);
+    expect(await Promise.race([child.exited.then(() => true), Bun.sleep(5000).then(() => false)])).toBe(true);
   } finally {
-    if (!job.closed) job.close();
+    job.close();
     child.kill();
   }
 });

@@ -1,7 +1,9 @@
+> **Legacy fork notice (2026-10-29).** This document describes the fork's `bun n2b` migration tool and its `packages/bun-n2b` owner. The Bun OS runtime is now the unmodified upstream `bun` npm package pinned at `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`, `bun --revision` prints `1.4.4-canary.1+11c367163`). Fork-only commands, APIs and modules named here (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`, `bun:nginx`, ...) are not available on upstream Bun. Read it as history, not as current instructions.
+
 # Native Bun migration
 
 Quality commands are native `bun check`, `bun lint` and `bun fmt`. Root tooling
-uses the pinned fork and bun-format.json. The native checker covers 59 authored
+uses the pinned upstream Bun and bun-format.json. The native checker covers 59 authored
 files; the imported frontend covers 1,479 files.
 
 Aggressive n2b ran across the 16 library inputs and the SDK with two workers.

@@ -8,18 +8,18 @@ Both read and write the same VDF dialects byte for byte.
 
 `bun-steam` (also `re steam`) is the one command surface; every command accepts `--json`.
 
-| Area          | Commands                                                                                                    | Module                                                                                       |
-| ------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Client config | `client`, `client users`, `client autologin <account>`                                                      | `config.ts` (Windows registry through `bun:windows`, Linux `registry.vdf`, `loginusers.vdf`) |
-| steamcmd      | `steamcmd status`, `steamcmd update <appid>`, `steamcmd run +cmd ...`                                       | `steamcmd.ts`                                                                                |
-| Libraries     | `libraries`, `libraries games`, `libraries disks`, `libraries move <from> <to>`                             | `libraries.ts`                                                                               |
-| Proton        | `proton list`, `catalog`, `latest`, `install`/`update <ge\|cachyos>`, `valve`, `runtimes`, `mapping`, `set` | `proton.ts`, `config.ts`                                                                     |
-| Launch        | `launch env`, `launch options <appid>`, `launch run <appid>`                                                | `launch.ts`                                                                                  |
-| Remote Play   | `remoteplay`                                                                                                | `remoteplay.ts`                                                                              |
-| VDF           | `vdf <file>`, `vdf write` (text, binary KV, `shortcuts.vdf`, `appinfo.vdf`, `packageinfo.vdf`)              | `vdf.ts`, `appinfo.ts`                                                                       |
-| Depots        | `depot list\|download\|sync\|audit` (runs `bun-steam-depot`)                                                | `crates/bun-steam`                                                                           |
-| API index     | `api sync`, `api search`, `api show`, `api diff`, `api sources`                                             | `apiindex.ts`                                                                                |
-| Index         | `scan`, `stats`, `sql`, `store`, `openid`, `classify`, `remote-download`                                    | `scan.ts`, `db.ts`, `webapi.ts`, ...                                                         |
+| Area          | Commands                                                                                                    | Module                                                                                   |
+| ------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Client config | `client`, `client users`, `client autologin <account>`                                                      | `config.ts` (Windows registry through `reg.exe`, Linux `registry.vdf`, `loginusers.vdf`) |
+| steamcmd      | `steamcmd status`, `steamcmd update <appid>`, `steamcmd run +cmd ...`                                       | `steamcmd.ts`                                                                            |
+| Libraries     | `libraries`, `libraries games`, `libraries disks`, `libraries move <from> <to>`                             | `libraries.ts`                                                                           |
+| Proton        | `proton list`, `catalog`, `latest`, `install`/`update <ge\|cachyos>`, `valve`, `runtimes`, `mapping`, `set` | `proton.ts`, `config.ts`                                                                 |
+| Launch        | `launch env`, `launch options <appid>`, `launch run <appid>`                                                | `launch.ts`                                                                              |
+| Remote Play   | `remoteplay`                                                                                                | `remoteplay.ts`                                                                          |
+| VDF           | `vdf <file>`, `vdf write` (text, binary KV, `shortcuts.vdf`, `appinfo.vdf`, `packageinfo.vdf`)              | `vdf.ts`, `appinfo.ts`                                                                   |
+| Depots        | `depot list\|download\|sync\|audit` (runs `bun-steam-depot`)                                                | `crates/bun-steam`                                                                       |
+| API index     | `api sync`, `api search`, `api show`, `api diff`, `api sources`                                             | `apiindex.ts`                                                                            |
+| Index         | `scan`, `stats`, `sql`, `store`, `openid`, `classify`, `remote-download`                                    | `scan.ts`, `db.ts`, `webapi.ts`, ...                                                     |
 
 Credentials: steamcmd reuses the session the owner opened once interactively (`ConnectCache` key
 `crc32(lowercase account)` in hex followed by `1`; only its presence is checked). Runs use

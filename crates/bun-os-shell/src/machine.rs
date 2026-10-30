@@ -42,7 +42,9 @@ pub fn factory(
                 let bios = std::fs::read(bios).map_err(|e| e.to_string())?;
                 Box::new(bun_engine::machine::psx::Psx::new(&bios, &rom)?)
             }
-            "nds" => Box::new(bun_engine::machine::handheld::HandheldMachine::from_path(&image)?),
+            "nds" => Box::new(bun_engine::machine::handheld::HandheldMachine::from_path(
+                &image,
+            )?),
             other => return Err(format!("no in-process machine for `{other}`")),
         };
         if let Some(state) = state.as_deref()

@@ -3,9 +3,9 @@ import { gunzipSync } from "node:zlib";
 import { existsSync, readFileSync } from "node:fs";
 import { createInagleSql, type Insertable } from "@rosegriffon/db/inagle-sql";
 import type { Database } from "@rosegriffon/db/schema";
-import { rgWebsitePath } from "../src/core/roots.ts";
+import { webAppPath } from "../src/core/roots.ts";
 
-const roots = [process.env.GAME_TEXT_DATA_DIR, rgWebsitePath("data")].filter((v): v is string => Boolean(v));
+const roots = [process.env.GAME_TEXT_DATA_DIR, webAppPath("data")].filter((v): v is string => Boolean(v));
 const files = roots
   .flatMap(root => ["game-text-names.ndjson.gz", "game-text-dialogue.ndjson.gz"].map(name => `${root}/${name}`))
   .filter(existsSync);

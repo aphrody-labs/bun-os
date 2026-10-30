@@ -4,7 +4,7 @@
  *
  *   yolo create my-app [--with web|react,desktop] [--framework hono|elysia] [--yolo-path <checkout>]
  *
- * The composition is Bun's: `bun create aphrody/<template>[+<template>...] <dir>` (aphrody-labs/bun,
+ * The composition is Bun's: `bun create aphrody/<template>[+<template>...] <dir>` (the former Bun fork,
  * src/js/eval/toolchain.ts) applies the layers in order, substitutes `__NAME__`, `__IDENT__` and
  * `__YOLO__`, renames `gitignore` and refuses two templates of one `exclusive` group. The templates
  * remain with their Material and Bun owners.

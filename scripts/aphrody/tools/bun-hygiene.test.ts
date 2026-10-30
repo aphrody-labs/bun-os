@@ -34,26 +34,23 @@ const release = (tag_name: string, days: number, extra: Partial<{ prerelease: bo
   ...extra,
 });
 
-test("the newest runtime release older than the minimum age is selected", () => {
+test("the newest stable Bun release older than the minimum age is selected", () => {
   const releases = [
-    release("n2b-v0.7.1", 10),
-    release("aphrody-v1.4.3-aphrody.3", 1),
-    release("aphrody-tools-1", 9),
-    release("aphrody-v1.4.3-aphrody.2", 4, { prerelease: true }),
-    release("aphrody-v1.4.3-aphrody.1", 5),
-    release("aphrody-v1.4.2-aphrody.9", 20),
+    release("canary", 0, { prerelease: true }),
+    release("bun-v1.4.4", 1),
+    release("bun-v1.4.3", 5),
+    release("bun-v1.4.2", 20),
+    release("bun-v1.5.0", 2, { prerelease: true }),
   ];
-  expect(eligibleTag(releases, now, 3)).toBe("aphrody-v1.4.3-aphrody.1");
-  expect(eligibleTag(releases, now, 0)).toBe("aphrody-v1.4.3-aphrody.3");
+  expect(eligibleTag(releases, now, 3)).toBe("bun-v1.4.3");
+  expect(eligibleTag(releases, now, 0)).toBe("bun-v1.4.4");
   expect(eligibleTag(releases, now, 30)).toBeUndefined();
-  expect(tagOf("1.4.3-aphrody.3\n")).toBe("aphrody-v1.4.3-aphrody.3");
-  expect(isNewer("aphrody-v1.4.3-aphrody.10", "aphrody-v1.4.3-aphrody.9")).toBe(true);
-  expect(isNewer("aphrody-v1.4.4-aphrody.1", "aphrody-v1.4.3-aphrody.9")).toBe(true);
-  expect(isNewer("aphrody-v1.4.3-aphrody.1", "aphrody-v1.4.3-aphrody.3")).toBe(false);
-  expect(isNewer("aphrody-v1.4.3-aphrody.3", "aphrody-v1.4.3-aphrody.3")).toBe(false);
-  expect(isNewer("aphrody-v1.4.3-aphrody.1", "aphrody-v1.4.3")).toBe(true);
-  expect(isNewer("aphrody-v1.4.3-aphrody.4", "aphrody-v1.4.4")).toBe(false);
-  expect(isNewer("aphrody-v1.4.4-aphrody.1", "aphrody-v1.4.4")).toBe(true);
+  expect(tagOf("1.4.4\n")).toBe("bun-v1.4.4");
+  expect(tagOf("1.4.4-canary.1+11c367163")).toBe("bun-v1.4.4");
+  expect(isNewer("bun-v1.4.10", "bun-v1.4.9")).toBe(true);
+  expect(isNewer("bun-v1.5.0", "bun-v1.4.9")).toBe(true);
+  expect(isNewer("bun-v1.4.3", "bun-v1.4.4")).toBe(false);
+  expect(isNewer("bun-v1.4.4", "bun-v1.4.4")).toBe(false);
 });
 
 test("checksums are matched on the exact asset name", () => {

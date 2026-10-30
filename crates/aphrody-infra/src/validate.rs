@@ -1769,14 +1769,9 @@ mod tests {
         ]
         .into();
         assert_eq!(names, v1);
-        let index = &contract.indexes["shenron-rag"];
-        assert_eq!(
-            (
-                index.served_model.as_str(),
-                index.dimensions,
-                index.service.as_str()
-            ),
-            ("Xenova/multilingual-e5-small", 384, "aphrody-shenron-embed")
+        assert!(
+            contract.indexes.is_empty(),
+            "the repository contract declares no embedding index"
         );
     }
 
@@ -1807,10 +1802,10 @@ mod tests {
                                             "discovery": "aphrody ai env", "hosts": ["windows-local"] } },
             "binaries": { "aphrody": { "sourceRepo": "aphrody-ai", "package": "aphrody",
                                        "env": [{ "canonical": "APHRODY_BIN", "kind": "path" }] } },
-            "gateways": { "ai-http": { "protocol": "aphrody-rest", "service": "ai-http", "basePath": "/api/v1/shenron",
+            "gateways": { "ai-http": { "protocol": "aphrody-rest", "service": "ai-http", "basePath": "/api/v1",
                 "env": [
-                    { "canonical": "APHRODY_AI_HTTP_URL", "kind": "url", "form": "origin", "aliases": ["APHRODY_SHENRON_API_URL"] },
-                    { "canonical": "APHRODY_AI_HTTP_TOKEN", "kind": "secret", "aliases": ["APHRODY_SHENRON_API_TOKEN"] }
+                    { "canonical": "APHRODY_AI_HTTP_URL", "kind": "url", "form": "origin", "aliases": ["APHRODY_LEGACY_API_URL"] },
+                    { "canonical": "APHRODY_AI_HTTP_TOKEN", "kind": "secret", "aliases": ["APHRODY_LEGACY_API_TOKEN"] }
                 ] } },
             "capabilities": {
                 "chat": { "protocol": "openai-compatible", "service": "llama", "basePath": "/v1", "defaultModel": "chat-model",
@@ -1831,7 +1826,7 @@ mod tests {
                         { "canonical": "APHRODY_AI_EMBED_DIMENSIONS", "kind": "dimensions" }
                     ] }
             },
-            "indexes": { "rag": { "owner": "shenron", "store": "postgresql", "model": "e5", "servedModel": "Xenova/e5",
+            "indexes": { "rag": { "owner": "aphrody-app", "store": "postgresql", "model": "e5", "servedModel": "Xenova/e5",
                                   "dimensions": 384, "service": "embed-svc", "rule": "never-mix-spaces",
                                   "onMismatch": "lexical-fallback" } },
             "targets": {
@@ -1847,8 +1842,8 @@ mod tests {
                 "windows-local": { "resolution": "runtime", "topologyHost": "windows-local",
                                    "resolver": "aphrody ai env", "services": ["llama"] }
             },
-            "consumers": { "shenron": { "uses": ["ai-http", "embed"], "indexes": ["rag"],
-                                        "readsToday": ["APHRODY_SHENRON_API_URL", "EMBED_URL"], "migration": "canonical first" } },
+            "consumers": { "aphrody-app": { "uses": ["ai-http", "embed"], "indexes": ["rag"],
+                                        "readsToday": ["APHRODY_LEGACY_API_URL", "EMBED_URL"], "migration": "canonical first" } },
             "forbidden": ENFORCED_RULES
         })
     }
@@ -2039,7 +2034,7 @@ mod tests {
             .remove("stt");
         let contract = set(
             contract,
-            "/consumers/shenron",
+            "/consumers/aphrody-app",
             "readsToday",
             json!(["OPENAI_API_KEY"]),
         );
@@ -2244,7 +2239,7 @@ mod tests {
 
     fn training() -> Value {
         json!({
-            "repositories": [{ "id": "aphrody-ai" }, { "id": "aphrody-web" }, { "id": "shenron" }, { "id": "rg" }],
+            "repositories": [{ "id": "aphrody-ai" }, { "id": "aphrody-web" }, { "id": "aphrody-app" }, { "id": "aphrody-site" }],
             "retiredRepositories": [{ "id": "aphrody", "replacedBy": ["aphrody-ai", "aphrody-web"] }]
         })
     }
@@ -2266,13 +2261,13 @@ mod tests {
     fn live_repositories_are_accepted() {
         let catalog = json!({
             "services": [{ "id": "site", "sourceRepo": "aphrody-web" }, { "id": "a2a", "sourceRepo": "aphrody-ai" }],
-            "policies": { "applicationRoots": { "aphrody-web": "/home/ubuntu/apps/aphrody/current", "rg": "/home/ubuntu/apps/rg/current" } }
+            "policies": { "applicationRoots": { "aphrody-web": "/home/ubuntu/apps/aphrody/current", "aphrody-site": "/home/ubuntu/apps/aphrody-site/current" } }
         });
         let report = check_repositories(
             &training(),
             &catalog,
             &contract(),
-            &pipeline(&["rg", "aphrody-ai"]),
+            &pipeline(&["aphrody-site", "aphrody-ai"]),
         );
         assert_eq!(report.errors, Vec::<String>::new());
     }

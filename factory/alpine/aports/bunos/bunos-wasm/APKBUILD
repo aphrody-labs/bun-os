@@ -1,0 +1,15 @@
+# Maintainer: aphrody-dev <contact@aphrody.com>
+pkgname=bunos-wasm
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="WebAssembly toolchain for Bun OS: wasmtime, wasm-tools, binaryen, wasi-sdk, clang, lld"
+url="https://github.com/aphrody-labs/bun-os"
+arch="noarch"
+license="Apache-2.0"
+depends="wasmtime wasm-tools binaryen wasi-sdk wasi-libc clang lld"
+options="!check"
+
+builddir="$srcdir"
+package() {
+	mkdir -p "$pkgdir"
+}

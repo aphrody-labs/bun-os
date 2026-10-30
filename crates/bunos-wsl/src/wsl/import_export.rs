@@ -1,0 +1,456 @@
+//! Import and export operations for WSL distributions
+//!
+//! Functions for exporting distributions to tar files, importing from tar files,
+//! and cloning distributions.
+
+use super::executor::wsl_command::{CommandOutput, WslCommandExecutor};
+use super::executor::{resource_monitor, wsl_executor};
+use super::types::WslError;
+use crate::metadata::{self, DistroMetadata};
+use crate::temp_file_guard::TempFileGuard;
+use log::{info, warn};
+
+fn clone_temp_file_path() -> std::path::PathBuf {
+    std::env::temp_dir().join(format!("wsl-clone-{}.tar", super::unique_temp_tag()))
+}
+
+/// Create the install location directory (and any missing parents) before
+/// invoking `wsl --import`. Without this, importing into a fresh path under
+/// e.g. `%LOCALAPPDATA%\wsl\...` fails with `Wsl/ERROR_PATH_NOT_FOUND`
+/// because WSL does not create parent directories itself.
+fn ensure_install_location_exists(install_location: &str) -> Result<(), WslError> {
+    if crate::utils::is_mock_mode() {
+        return Ok(());
+    }
+    create_install_dir(install_location)
+}
+
+/// Mock-agnostic directory creator. Extracted so it can be unit-tested without
+/// touching the `WSL_MOCK` env var (which is process-global and would race with
+/// other parallel tests).
+fn create_install_dir(install_location: &str) -> Result<(), WslError> {
+    std::fs::create_dir_all(install_location).map_err(|e| {
+        WslError::CommandFailed(format!(
+            "Failed to create install directory '{}': {}",
+            install_location, e
+        ))
+    })
+}
+
+/// Export a distribution to a tar file
+pub fn export_distribution(name: &str, path: &str) -> Result<(), WslError> {
+    let output = wsl_executor().export(name, path, None)?;
+
+    if !output.success {
+        // WSL often writes errors to stdout instead of stderr
+        let error_msg = if !output.stderr.trim().is_empty() {
+            output.stderr
+        } else if !output.stdout.trim().is_empty() {
+            output.stdout
+        } else {
+            "Export failed with no error message".to_string()
+        };
+        return Err(WslError::CommandFailed(error_msg));
+    }
+
+    Ok(())
+}
+
+/// Import a distribution from a tar file
+pub fn import_distribution(
+    name: &str,
+    install_location: &str,
+    tar_path: &str,
+) -> Result<(), WslError> {
+    ensure_install_location_exists(install_location)?;
+    let output = wsl_executor().import(name, install_location, tar_path, None)?;
+
+    if !output.success {
+        // WSL often writes errors to stdout instead of stderr
+        let error_msg = if !output.stderr.trim().is_empty() {
+            output.stderr
+        } else if !output.stdout.trim().is_empty() {
+            output.stdout
+        } else {
+            "Import failed with no error message".to_string()
+        };
+        return Err(WslError::CommandFailed(error_msg));
+    }
+
+    Ok(())
+}
+
+/// Import a distribution with optional WSL version
+pub fn import_distribution_with_version(
+    name: &str,
+    install_location: &str,
+    tar_path: &str,
+    wsl_version: Option<u8>,
+) -> Result<(), WslError> {
+    ensure_install_location_exists(install_location)?;
+    let output = wsl_executor().import(name, install_location, tar_path, wsl_version)?;
+
+    if !output.success {
+        // WSL often writes errors to stdout instead of stderr
+        let error_msg = if !output.stderr.trim().is_empty() {
+            output.stderr
+        } else if !output.stdout.trim().is_empty() {
+            output.stdout
+        } else {
+            "Import failed with no error message".to_string()
+        };
+        return Err(WslError::CommandFailed(error_msg));
+    }
+
+    Ok(())
+}
+
+fn import_cloned_distribution(
+    executor: &dyn WslCommandExecutor,
+    source: &str,
+    new_name: &str,
+    location: &str,
+    archive: &str,
+) -> Result<CommandOutput, WslError> {
+    let listed = executor.list_verbose()?;
+    if !listed.success {
+        return Err(WslError::CommandFailed(extract_error_message(
+            &listed,
+            "Failed to determine source WSL version",
+        )));
+    }
+    let version = bunos_wsl_core::parse_wsl_list_output(&listed.stdout)
+        .into_iter()
+        .find(|distro| distro.name.eq_ignore_ascii_case(source))
+        .ok_or_else(|| WslError::DistroNotFound(source.to_string()))?
+        .version;
+    executor.import(new_name, location, archive, Some(version))
+}
+
+/// Clone a distribution (export + import with new name)
+///
+/// If `install_location` is None, uses the default from settings.
+/// Creates metadata for the cloned distribution automatically.
+pub fn clone_distribution(
+    source: &str,
+    new_name: &str,
+    install_location: Option<&str>,
+) -> Result<(), WslError> {
+    use crate::settings::get_default_distro_path;
+    use crate::utils::is_mock_mode;
+
+    info!("Cloning distribution '{}' to '{}'", source, new_name);
+
+    // In mock mode, just call the mock import/export without filesystem operations
+    if is_mock_mode() {
+        // Mock export (just validates source exists)
+        let export_output = wsl_executor().export(source, "/tmp/mock-clone.tar", None)?;
+        if !export_output.success {
+            return Err(WslError::CommandFailed(export_output.stderr));
+        }
+
+        // Mock import (adds to mock state)
+        let import_output = import_cloned_distribution(
+            wsl_executor(),
+            source,
+            new_name,
+            "/tmp/mock-location",
+            "/tmp/mock-clone.tar",
+        )?;
+        if !import_output.success {
+            return Err(WslError::CommandFailed(import_output.stderr));
+        }
+
+        info!("Mock: Cloned distribution '{}' to '{}'", source, new_name);
+        return Ok(());
+    }
+
+    // Get source distro's GUID before cloning (for metadata lineage)
+    let registry_info = resource_monitor().get_all_distro_registry_info();
+    let source_id = registry_info.get(source).map(|info| info.id.clone());
+
+    // Create temp file path
+    let temp_file = clone_temp_file_path();
+    let _temp_guard = TempFileGuard::new(&temp_file);
+    let temp_path = temp_file.to_string_lossy().to_string();
+
+    // Export to temp file
+    export_distribution(source, &temp_path)?;
+
+    // Use provided location or default from settings
+    let final_location = match install_location {
+        Some(loc) if !loc.trim().is_empty() => loc.to_string(),
+        _ => get_default_distro_path(new_name),
+    };
+
+    ensure_install_location_exists(&final_location)?;
+    let result = import_cloned_distribution(
+        wsl_executor(),
+        source,
+        new_name,
+        &final_location,
+        &temp_path,
+    )
+    .and_then(|output| {
+        if output.success {
+            Ok(())
+        } else {
+            Err(WslError::CommandFailed(extract_error_message(
+                &output,
+                "Import failed with no error message",
+            )))
+        }
+    });
+
+    // Only create metadata if import succeeded
+    if result.is_ok() {
+        // Get the new distro's GUID from registry
+        let new_registry_info = resource_monitor().get_all_distro_registry_info();
+        if let Some(new_info) = new_registry_info.get(new_name) {
+            let metadata = DistroMetadata::new_clone(
+                new_info.id.clone(),
+                new_name.to_string(),
+                source_id.unwrap_or_else(|| "unknown".to_string()),
+            );
+            if let Err(e) = metadata::save_metadata(metadata) {
+                warn!("Failed to save clone metadata: {}", e);
+            } else {
+                info!("Created metadata for cloned distribution '{}'", new_name);
+            }
+        } else {
+            warn!(
+                "Could not find GUID for cloned distribution '{}' - metadata not created",
+                new_name
+            );
+        }
+    }
+
+    result
+}
+
+/// Helper to extract error message from WSL command output
+/// WSL often writes errors to stdout instead of stderr
+fn extract_error_message(
+    output: &super::executor::wsl_command::CommandOutput,
+    default_msg: &str,
+) -> String {
+    if !output.stderr.trim().is_empty() {
+        output.stderr.clone()
+    } else if !output.stdout.trim().is_empty() {
+        output.stdout.clone()
+    } else {
+        default_msg.to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::wsl::executor::wsl_command::CommandOutput;
+
+    #[test]
+    fn test_clone_import_preserves_source_wsl_version() {
+        use crate::wsl::executor::wsl_command::MockWslExecutor;
+        for version in [1, 2] {
+            let executor = MockWslExecutor::new();
+            executor.set_version("Ubuntu", version).unwrap();
+            let output = import_cloned_distribution(
+                &executor,
+                "ubuntu",
+                "Cloned",
+                "/mock/location",
+                "/mock/archive.tar",
+            )
+            .unwrap();
+            assert!(output.success);
+            let distributions =
+                bunos_wsl_core::parse_wsl_list_output(&executor.list_verbose().unwrap().stdout);
+            assert_eq!(
+                distributions
+                    .iter()
+                    .find(|distro| distro.name == "Cloned")
+                    .unwrap()
+                    .version,
+                version
+            );
+        }
+    }
+
+    #[test]
+    fn test_clone_import_rejects_missing_source_before_creating_clone() {
+        let executor = crate::wsl::executor::wsl_command::MockWslExecutor::new();
+        assert!(import_cloned_distribution(
+            &executor,
+            "Missing",
+            "Cloned",
+            "/mock/location",
+            "/mock/archive.tar"
+        )
+        .is_err());
+        assert!(!executor.distro_exists("Cloned"));
+    }
+
+    #[test]
+    fn test_extract_error_message_prefers_stderr() {
+        let output = CommandOutput {
+            success: false,
+            stdout: "stdout message".to_string(),
+            stderr: "stderr message".to_string(),
+        };
+        assert_eq!(extract_error_message(&output, "default"), "stderr message");
+    }
+
+    #[test]
+    fn test_extract_error_message_falls_back_to_stdout() {
+        let output = CommandOutput {
+            success: false,
+            stdout: "stdout message".to_string(),
+            stderr: "".to_string(),
+        };
+        assert_eq!(extract_error_message(&output, "default"), "stdout message");
+    }
+
+    #[test]
+    fn test_extract_error_message_falls_back_to_stdout_whitespace() {
+        let output = CommandOutput {
+            success: false,
+            stdout: "stdout message".to_string(),
+            stderr: "   \n\t  ".to_string(),
+        };
+        assert_eq!(extract_error_message(&output, "default"), "stdout message");
+    }
+
+    #[test]
+    fn test_extract_error_message_uses_default_when_empty() {
+        let output = CommandOutput {
+            success: false,
+            stdout: "".to_string(),
+            stderr: "".to_string(),
+        };
+        assert_eq!(
+            extract_error_message(&output, "default message"),
+            "default message"
+        );
+    }
+
+    #[test]
+    fn test_extract_error_message_uses_default_when_whitespace() {
+        let output = CommandOutput {
+            success: false,
+            stdout: "   ".to_string(),
+            stderr: "  \n".to_string(),
+        };
+        assert_eq!(extract_error_message(&output, "fallback"), "fallback");
+    }
+
+    #[test]
+    fn test_location_selection_uses_provided_path() {
+        let provided = Some("C:\\WSL\\MyDistro");
+        let final_location = match provided {
+            Some(loc) if !loc.trim().is_empty() => loc.to_string(),
+            _ => "default_path".to_string(),
+        };
+        assert_eq!(final_location, "C:\\WSL\\MyDistro");
+    }
+
+    #[test]
+    fn test_location_selection_ignores_empty_string() {
+        let provided: Option<&str> = Some("");
+        let final_location = match provided {
+            Some(loc) if !loc.trim().is_empty() => loc.to_string(),
+            _ => "default_path".to_string(),
+        };
+        assert_eq!(final_location, "default_path");
+    }
+
+    #[test]
+    fn test_location_selection_ignores_whitespace() {
+        let provided = Some("   ");
+        let final_location = match provided {
+            Some(loc) if !loc.trim().is_empty() => loc.to_string(),
+            _ => "default_path".to_string(),
+        };
+        assert_eq!(final_location, "default_path");
+    }
+
+    #[test]
+    fn test_location_selection_uses_default_for_none() {
+        let provided: Option<&str> = None;
+        let final_location = match provided {
+            Some(loc) if !loc.trim().is_empty() => loc.to_string(),
+            _ => "default_path".to_string(),
+        };
+        assert_eq!(final_location, "default_path");
+    }
+
+    #[test]
+    fn test_clone_temp_file_path_format() {
+        let temp_file = clone_temp_file_path();
+
+        // Verify the path ends with expected pattern
+        let path_str = temp_file.to_string_lossy();
+        assert!(path_str.contains("wsl-clone-"));
+        assert!(path_str.ends_with(".tar"));
+    }
+
+    /// Regression test for OCT-799 / GitHub #86: importing into a nested
+    /// path whose parent directory does not yet exist must succeed. Before
+    /// the fix, `wsl --import` failed with `Wsl/ERROR_PATH_NOT_FOUND`
+    /// because WSL does not create intermediate directories.
+    #[test]
+    fn test_create_install_dir_creates_missing_parents() {
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        let root = std::env::temp_dir().join(format!("oct799-{}-{}", std::process::id(), unique));
+        let nested = root.join("wsl").join("arch-linux-current");
+
+        assert!(!root.exists(), "precondition: root must not exist");
+        assert!(
+            !nested.parent().unwrap().exists(),
+            "precondition: parent must not exist"
+        );
+
+        let result = create_install_dir(nested.to_str().unwrap());
+        assert!(
+            result.is_ok(),
+            "create_install_dir returned error: {:?}",
+            result
+        );
+        assert!(
+            nested.exists(),
+            "nested install path should exist after call"
+        );
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    /// Calling on an existing path is a no-op (idempotent).
+    #[test]
+    fn test_create_install_dir_is_idempotent() {
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        let dir =
+            std::env::temp_dir().join(format!("oct799-idem-{}-{}", std::process::id(), unique));
+        std::fs::create_dir_all(&dir).unwrap();
+
+        let result = create_install_dir(dir.to_str().unwrap());
+        assert!(result.is_ok());
+        assert!(dir.exists());
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_clone_temp_file_is_unique_per_operation() {
+        let temp_file1 = clone_temp_file_path();
+        let temp_file2 = clone_temp_file_path();
+
+        assert_ne!(temp_file1, temp_file2);
+    }
+}

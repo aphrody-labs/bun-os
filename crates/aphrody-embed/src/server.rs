@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2026 aphrody contributors
 //
-// OpenAI-compatible embedding service, wire-compatible with the retired
-// `apps/shenron-embed` Bun service:
+// OpenAI-compatible embedding service:
 //
 //   GET  /health         -> 200 {"status":"ready",...} once the model is loaded,
 //                           503 {"status":"loading"|"unavailable",...} otherwise
@@ -30,7 +29,7 @@ use serde_json::{Value, json};
 use crate::native::{EmbedOptions, Embedder, ModelFiles, TextKind, find_model, require_installed};
 
 /// Model name callers send and receive. It names the `vec_chunks` embedding
-/// space of the Shenron index, so existing clients and stored vectors keep
+/// space of existing indexes, so existing clients and stored vectors keep
 /// working unchanged.
 pub const SERVED_MODEL: &str = "Xenova/multilingual-e5-small";
 /// Native manifest entry that produces [`SERVED_MODEL`]'s space.

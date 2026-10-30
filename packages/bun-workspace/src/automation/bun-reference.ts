@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-/** Bun docs pages of the aphrody-labs/bun fork, read from the corpus chosen by `resolveBunDocs` (no copy in Aphrody). */
+/** Bun docs pages of upstream oven-sh/bun, read from the corpus chosen by `resolveBunDocs` (no copy in Aphrody). */
 import { join } from "node:path";
 import { resolveBunDocs, type ResolveBunDocsOptions } from "./bun-upstream-docs.ts";
 

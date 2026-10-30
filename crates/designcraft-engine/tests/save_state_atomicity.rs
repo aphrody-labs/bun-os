@@ -78,7 +78,7 @@ fn save_a_copy_rebases_its_data_source_without_changing_the_open_document() {
         .execute("file.saveACopy", &json!({"path": destination}))
         .unwrap();
 
-    let copy = designcraft_format::load(&std::fs::read(destination).unwrap()).unwrap();
+    let copy = designcraft_engine::format::load(&std::fs::read(destination).unwrap()).unwrap();
     assert_eq!(
         copy.data_merge.sources[0].relative_path.as_deref(),
         Some("../../source/contacts.csv")

@@ -112,7 +112,7 @@ impl DomainContext {
     }
 
     fn validated(name: String, workspace: PathBuf, canonical: PathBuf) -> Result<Self, PeerError> {
-        if !matches!(name.as_str(), "aphrody" | "dbfr" | "ie") {
+        if !matches!(name.as_str(), "aphrody" | "ie") {
             return Err(PeerError::InvalidDomain(name));
         }
         if workspace.canonicalize()? != canonical.canonicalize()?
@@ -444,7 +444,7 @@ mod domain_tests {
     fn selected_domain_excludes_shared_and_other_domain_context() {
         let root = tempfile::tempdir().unwrap();
         let repo = root.path().join("repo");
-        let profile = root.path().join("dbfr");
+        let profile = root.path().join("ie");
         std::fs::create_dir_all(repo.join(".coord/shared")).unwrap();
         std::fs::create_dir_all(&profile).unwrap();
         std::fs::write(repo.join("AGENTS.md"), "repository rules").unwrap();
@@ -453,16 +453,16 @@ mod domain_tests {
             "aphrody private memory",
         )
         .unwrap();
-        std::fs::write(profile.join("AGENTS.md"), "dbfr rules").unwrap();
-        std::fs::write(profile.join("MEMORY.md"), "dbfr private memory").unwrap();
+        std::fs::write(profile.join("AGENTS.md"), "ie rules").unwrap();
+        std::fs::write(profile.join("MEMORY.md"), "ie private memory").unwrap();
         let context =
-            DomainContext::validated("dbfr".into(), profile.clone(), profile.clone()).unwrap();
+            DomainContext::validated("ie".into(), profile.clone(), profile.clone()).unwrap();
         let prompt = PeerInvoker::new(&repo).shared_prompt("task", Some(&context));
-        assert!(prompt.starts_with("[APHRODY_AGENT_DOMAIN=dbfr]"));
-        assert!(prompt.starts_with("[APHRODY_AGENT_DOMAIN=dbfr]\ntask\n"));
+        assert!(prompt.starts_with("[APHRODY_AGENT_DOMAIN=ie]"));
+        assert!(prompt.starts_with("[APHRODY_AGENT_DOMAIN=ie]\ntask\n"));
         assert!(prompt.find("task").unwrap() < prompt.find("repository rules").unwrap());
-        assert!(prompt.contains("repository rules") && prompt.contains("dbfr rules"));
-        assert!(prompt.contains("dbfr private memory"));
+        assert!(prompt.contains("repository rules") && prompt.contains("ie rules"));
+        assert!(prompt.contains("ie private memory"));
         assert!(!prompt.contains("aphrody private memory"));
         assert!(DomainContext::validated("ie".into(), repo, profile).is_err());
     }

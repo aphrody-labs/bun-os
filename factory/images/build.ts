@@ -91,6 +91,8 @@ function buildArgs(name: string): Record<string, string> {
       ...common,
       BUN_URL: bun.url!,
       BUN_SHA256_AMD64: bun.sha256!,
+      BUN_LICENSE_URL: bun.licenseUrl as string,
+      BUN_LICENSE_SHA256: bun.licenseSha256 as string,
       UBUNTU_VERSION: pins.ubuntu.version,
       UBUNTU_BASE_SHA256: pins.ubuntu.sha256!,
       COSMIC_APT_SERVER: (pins.cosmic.apt as Record<string, string>).server!,

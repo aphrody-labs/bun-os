@@ -27,8 +27,8 @@ export type Language =
   | "unknown";
 
 export interface ChunkOptions {
-  /** `default` (aphrody) or `shenron_parity` (bit-for-bit with shenron's chunker). */
-  profile?: "default" | "shenron_parity";
+  /** `default` (aphrody) or `ts_parity` (legacy chunker parity). */
+  profile?: "default" | "ts_parity";
   max_chars?: number;
   overlap_pct?: number;
   min_chars?: number;

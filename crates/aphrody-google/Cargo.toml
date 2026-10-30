@@ -8,17 +8,17 @@ authors.workspace = true
 homepage.workspace = true
 repository.workspace = true
 license = "Apache-2.0"
-description = "Aphrody OS Google facade: the Bun Google SDK (bun_google) with the Gemini, Antigravity and model-client integrations, the google CLI, routes, detection and translation."
+description = "Aphrody OS Google facade: the Google SDK (bun-os-google) with the Gemini, Antigravity and model-client integrations, the google CLI, routes, detection and translation."
 
 [dependencies]
-bun_google = { path = "../../toolchains/bun/src/google" }
+bun_google = { package = "bun-os-google", path = "../bun-os-google", version = "1.4.7" }
 aphrody-antigravity = { path = "../aphrody-antigravity", version = "1.4.7" }
 aphrody-gemini-web = { path = "../aphrody-gemini-web", version = "1.4.7" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-bun_google = { path = "../../toolchains/bun/src/google", features = ["search", "search-cache", "browser-search"] }
+bun_google = { package = "bun-os-google", path = "../bun-os-google", version = "1.4.7", features = ["search", "search-cache"] }
 aphrody-gemini-runtime = { path = "../aphrody-gemini-runtime", version = "1.4.7" }
 aphrody-model-client = { workspace = true }
 clap = { workspace = true }

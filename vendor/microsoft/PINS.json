@@ -1,0 +1,175 @@
+{
+  "observedAt": "2026-10-29",
+  "pins": {
+    "microsoft-ui-xaml": {
+      "repo": "microsoft/microsoft-ui-xaml",
+      "ref": "winui3/release/2.5.1",
+      "sha": "ba3a8d59e6de4e2b86ca4f61c78bc26ccf129afd",
+      "commitDate": "2026-09-19T00:04:27Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "a2b44831fda8147f53b92921fc23d79b9cf948e8",
+      "sizeKB": 494811,
+      "prerelease": {
+        "tag": "winui3/release/2.5.4-experimental",
+        "sha": "7b12709347527238494ca28cb9fed326d513e779"
+      },
+      "big": true,
+      "why": "WinUI 3 controls, XAML framework source"
+    },
+    "WindowsAppSDK": {
+      "repo": "microsoft/WindowsAppSDK",
+      "ref": "v2.6.4",
+      "sha": "5e215b73121e0fefad2da5b3d534321bd63bcce0",
+      "commitDate": "2026-10-16T16:46:38Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "5808da54b0ce8fcb2d3ca7b5bead9488ac4b06cf",
+      "sizeKB": 241120,
+      "prerelease": {
+        "tag": "v2.5.4-exp",
+        "sha": "28e5c76e3e91a2c31495c26dcb690fe35558cb46"
+      },
+      "big": true,
+      "why": "Windows App SDK specs, API surface and docs"
+    },
+    "WindowsAppSDK-Samples": {
+      "repo": "microsoft/WindowsAppSDK-Samples",
+      "ref": "main",
+      "sha": "f1be017f26a0feae4c8dc805748eab0a1f7b4fc6",
+      "commitDate": "2026-10-12T09:15:19Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "f1be017f26a0feae4c8dc805748eab0a1f7b4fc6",
+      "sizeKB": 325694,
+      "big": true,
+      "why": "Windows App SDK feature samples (C++, C#)"
+    },
+    "WinUI-Gallery": {
+      "repo": "microsoft/WinUI-Gallery",
+      "ref": "v3.0.4",
+      "sha": "7360ac322414e118eadfb0c7c2f4ecc31a218f59",
+      "commitDate": "2026-10-12T15:58:41Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "7360ac322414e118eadfb0c7c2f4ecc31a218f59",
+      "sizeKB": 70239,
+      "big": false,
+      "why": "WinUI Gallery: one page per control"
+    },
+    "DirectX-Graphics-Samples": {
+      "repo": "microsoft/DirectX-Graphics-Samples",
+      "ref": "master",
+      "sha": "68a2b1e97f71642924e74c7757ca21756ad221b5",
+      "commitDate": "2026-10-28T19:05:33Z",
+      "defaultBranch": "master",
+      "defaultBranchTip": "68a2b1e97f71642924e74c7757ca21756ad221b5",
+      "sizeKB": 837376,
+      "big": true,
+      "why": "Direct3D 12 samples"
+    },
+    "DirectXTK12": {
+      "repo": "microsoft/DirectXTK12",
+      "ref": "may2026",
+      "sha": "f5b928460d91984b27029d064ee5a7dd4301513c",
+      "commitDate": "2026-05-08T17:29:14Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "f5b928460d91984b27029d064ee5a7dd4301513c",
+      "sizeKB": 8246,
+      "big": false,
+      "why": "DirectX Tool Kit for D3D12"
+    },
+    "DirectX-Specs": {
+      "repo": "microsoft/DirectX-Specs",
+      "ref": "master",
+      "sha": "e758a9e6ab7ac97e968f7fbdeb37cc05a6ed8488",
+      "commitDate": "2026-10-28T19:35:38Z",
+      "defaultBranch": "master",
+      "defaultBranchTip": "e758a9e6ab7ac97e968f7fbdeb37cc05a6ed8488",
+      "sizeKB": 22027,
+      "big": false,
+      "why": "D3D12 functional specifications"
+    },
+    "DirectXShaderCompiler": {
+      "repo": "microsoft/DirectXShaderCompiler",
+      "ref": "v1.9.2609",
+      "sha": "01b62ad47db7dee3dd33f90e7339cf9e860b3f93",
+      "commitDate": "2026-09-16T18:57:13Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "0d6c746365d1baf45cadc0b4cd8ab9cf79dc84bf",
+      "sizeKB": 80705,
+      "prerelease": {
+        "tag": "v1.10.2605.37",
+        "sha": "c4d8f4f99aa221da58cd540bf2099a2889632ab6"
+      },
+      "big": true,
+      "why": "DXC HLSL compiler (D3D12 shaders)"
+    },
+    "Windows-universal-samples": {
+      "repo": "microsoft/Windows-universal-samples",
+      "ref": "v19.0.2",
+      "sha": "4eb2fcb499c5bc549e918920cfd2b64396a650d9",
+      "commitDate": "2026-05-14T00:00:19Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "4eb2fcb499c5bc549e918920cfd2b64396a650d9",
+      "sizeKB": 50991,
+      "big": false,
+      "why": "UWP/WinRT API samples"
+    },
+    "Windows-classic-samples": {
+      "repo": "microsoft/Windows-classic-samples",
+      "ref": "main",
+      "sha": "434f6002bdf9cf9829406c3ff2b33387982d6168",
+      "commitDate": "2026-09-03T00:00:00Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "434f6002bdf9cf9829406c3ff2b33387982d6168",
+      "sizeKB": 39077,
+      "big": false,
+      "why": "Win32/COM classic samples"
+    },
+    "dotnet-samples": {
+      "repo": "dotnet/samples",
+      "ref": "main",
+      "sha": "ab42c8a4251cb90787aa5d3c94b78d28d85bc46b",
+      "commitDate": "2026-10-15T15:29:50Z",
+      "defaultBranch": "main",
+      "defaultBranchTip": "ab42c8a4251cb90787aa5d3c94b78d28d85bc46b",
+      "sizeKB": 287124,
+      "big": true,
+      "why": "Official .NET samples"
+    },
+    "windows-rs": {
+      "repo": "microsoft/windows-rs",
+      "ref": "74",
+      "sha": "a57cc321bfdbac6bb98c488ba49f399da8fcb98a",
+      "commitDate": "2026-09-03T16:33:51Z",
+      "defaultBranch": "master",
+      "defaultBranchTip": "58217a690d6256ee229044a174de67d72d28bc35",
+      "sizeKB": 1406816,
+      "big": true,
+      "why": "Rust for Windows projections and samples"
+    },
+    "cppwinrt": {
+      "repo": "microsoft/cppwinrt",
+      "ref": "3.0.260818.1",
+      "sha": "30ac599beedc03d0f38f5fc84c390ee2f8551204",
+      "commitDate": "2026-07-28T01:15:40Z",
+      "defaultBranch": "master",
+      "defaultBranchTip": "30ac599beedc03d0f38f5fc84c390ee2f8551204",
+      "sizeKB": 27918,
+      "big": false,
+      "why": "C++/WinRT"
+    },
+    "CsWinRT": {
+      "repo": "microsoft/CsWinRT",
+      "ref": "2.3.1.260716.1",
+      "sha": "c28d756c4f042cf573d269c6ac39de05087e86c8",
+      "commitDate": "2026-07-15T18:37:44Z",
+      "defaultBranch": "master",
+      "defaultBranchTip": "c28d756c4f042cf573d269c6ac39de05087e86c8",
+      "sizeKB": 51709,
+      "prerelease": {
+        "tag": "3.0.0-preview.260319.2",
+        "sha": "f929ed2fb6211ad1b6bc0fe02db8188f1c60b261"
+      },
+      "big": false,
+      "why": "C#/WinRT"
+    }
+  }
+}

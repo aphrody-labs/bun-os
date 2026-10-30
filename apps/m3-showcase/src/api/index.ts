@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Local showcase computations. Providers, credentials and OS writes stay with their native owners.
 import { defineM3Api } from "@aphrody/m3-bun/api";
-import { EventEncoder, EventType, type BaseEvent } from "@aphrody/ag-ui";
+import { EventEncoder, EventType, type BaseEvent } from "@aphrody/m3-ai/ag-ui";
 import { DesignCompiler } from "@aphrody/m3-design";
 import { generate, TARGETS, type Target, type ThemeInput } from "@aphrody/m3-os-themes";
 import {
@@ -19,7 +19,7 @@ import { transformSource, type MigrationKind } from "@aphrody/m3-codemods";
 import lintPlugin from "@aphrody/eslint-plugin-m3";
 import googleSansCode from "@aphrody/m3-fonts/fonts/web/GoogleSansCode-latin.woff2" with { type: "file" };
 import robotoMono from "@aphrody/m3-fonts/fonts/web/RobotoMono-latin.woff2" with { type: "file" };
-import { PACKAGES } from "../inventory.ts";
+import { PACKAGES } from "@aphrody/app-ui/material/inventory.ts";
 
 class InputError extends Error {}
 const json = (data: unknown, status = 200) =>

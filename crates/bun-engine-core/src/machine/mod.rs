@@ -8,6 +8,8 @@ pub mod cpp_host;
 pub mod gba;
 #[cfg(any(feature = "nds", feature = "ctr"))]
 pub mod handheld;
+#[cfg(feature = "libretro")]
+pub mod libretro;
 #[cfg(feature = "nes")]
 pub mod nes;
 #[cfg(feature = "psx")]

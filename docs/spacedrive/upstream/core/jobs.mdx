@@ -1,0 +1,124 @@
+---
+title: Job System
+description: Durable work with explicit progress, interruption, and recovery
+sidebarTitle: Jobs
+---
+
+Jobs run work that can outlive one API request: indexing, hashing, verification,
+file transfer, source replication, and sidecar generation.
+
+Durability does not mean every job can resume. Each job kind declares what an
+interruption means and which checkpoint evidence makes replay safe.
+
+## Lifecycle
+
+| State | Meaning |
+| --- | --- |
+| Queued | Persisted and waiting for an executor |
+| Running | Claimed by this process |
+| Paused | Stopped at a safe interruption point |
+| Completed | Final writes and output committed |
+| Failed | Stopped with a durable reason |
+| Cancelled | User cancellation was acknowledged |
+
+Startup reconciliation classifies every queued or running row. Registered,
+resumable jobs return to the queue. Jobs that cannot recover are marked failed
+with a reason instead of remaining zombies.
+
+## Job contract
+
+A job kind defines:
+
+- typed input and output;
+- library and resource scope;
+- deduplication key;
+- persistent state;
+- progress units;
+- interruption points;
+- resumability;
+- verification and completion conditions.
+
+Dispatch writes the job row before execution. Completion is recorded only after
+the job's final data writes commit.
+
+## Deduplication
+
+Dispatch deduplicates by job kind and a stable key, such as source UUID or
+transfer plan ID. Repeated watcher events can therefore request content work
+without stacking identical jobs.
+
+Deduplication prevents redundant active work. It does not hide a new request
+after an earlier job completed or failed.
+
+## Checkpoints
+
+A checkpoint records enough state to prove where replay can continue. Useful
+examples include verified transfer ranges, committed page watermarks, or a list
+of completed deterministic sidecars.
+
+A filesystem index walk does not resume after process loss. Its deletion sweep
+depends on a complete process-local visitor set, so recovery starts a fresh
+walk.
+
+## Progress
+
+Jobs report measurable units and a short current phase. Progress is monotonic
+within one attempt. When a replan changes the total, the job records the new
+attempt rather than moving the percentage backward without explanation.
+
+Clients can subscribe to events or query the job later:
+
+~~~bash
+sd-cli job list
+sd-cli job info <JOB_ID>
+sd-cli job monitor --job-id <JOB_ID>
+sd-cli logs show --job-id <JOB_ID>
+~~~
+
+## Pause and cancellation
+
+Pause and cancellation are cooperative. The executor checks for interruption at
+safe boundaries, commits or rolls back current work, persists state, and then
+acknowledges the request.
+
+A cancel request does not imply rollback of already committed external effects.
+The job output reports what completed and what remains.
+
+## Failure
+
+Failures retain:
+
+- typed error category;
+- human-readable reason;
+- attempt and retry state;
+- source, record, or transfer context;
+- last committed checkpoint;
+- correlated logs.
+
+Retries are bounded and respect provider rate limits. Permanent permission,
+identity, or verification failures wait for a person or changed environment.
+
+## Resource control
+
+The executor budgets CPU, memory, file descriptors, disk bandwidth, and network
+work. Interactive reads remain responsive while background jobs process large
+sources.
+
+Priority affects scheduling, not correctness. A low-priority job still commits
+each batch before claiming more work.
+
+## Testing
+
+Every job kind is tested for:
+
+- normal completion;
+- duplicate dispatch;
+- interruption at each checkpoint;
+- process restart;
+- final-write ordering;
+- cancellation;
+- partial provider failure;
+- truthful status and output.
+
+Real datasets remain part of validation because queue timing, filesystem
+permissions, and database volume expose failures that small fixtures miss.

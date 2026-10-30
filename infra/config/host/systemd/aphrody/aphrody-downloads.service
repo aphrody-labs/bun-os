@@ -3,7 +3,7 @@
 # release tree. Source: packages/product/src/downloads/server.ts (installed as /home/ubuntu/apps/downloads/app/server.ts).
 # Release tree: /home/ubuntu/apps/downloads/releases/<id>, `current` is flipped by scripts/aphrody/release/publish-downloads.ts.
 # aphrody.com and www.aphrody.com serve the Bun fork site from /home/ubuntu/apps/downloads/site/current (SITE_ROOT, SITE_HOSTS
-# defaults; published by packages/web/site/publish.ts in aphrody-labs/bun), falling back to the download routes.
+# defaults; published by packages/web/site/publish.ts in the abandoned the former Bun fork fork, legacy), falling back to the download routes.
 # Port 8797 is loopback only; nginx (nginx/aphrody/downloads.aphrody.com.conf) is the single public entry.
 [Unit]
 Description=Aphrody download server (downloads.aphrody.com)

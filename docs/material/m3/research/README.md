@@ -13,4 +13,3 @@ Dated evidence: parity tables and audits. They are kept as written and indexed h
 | [Audit des exports Form](reports/M3-FORM-EXPORT-AUDIT.md) | Ne pas fusionner ni supprimer les exports Form de @aphrody/m3-primitives et @aphrody/m3-forms sur la seule base de leur nom. | imported | 2026-09-29 |
 <!-- docs-hub:end -->
 
-Imported Spacedrive security notes live under [`drive/`](./drive/SECURITY.md).

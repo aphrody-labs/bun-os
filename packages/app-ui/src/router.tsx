@@ -5,7 +5,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { appBasePath } from "./app-base";
 import { legacyRouteRedirects } from "./desktop-navigation";
-import { JobsScreen } from "./components/JobManager";
 import { CodexChatRoute } from "./codex-chat";
 import { ModelsHub } from "./models-hub";
 import { GamesRoute } from "./routes/games";
@@ -13,15 +12,8 @@ import { StudioRoute } from "./routes/studio";
 import { TerminalRoute } from "./routes/terminal/TerminalRoute";
 import { AdminRoute } from "./routes/admin";
 import { CreatorRoute } from "./routes/creator";
-import { ExplorerView } from "./routes/explorer";
-import { RecentsView } from "./routes/explorer/views/RecentsView";
-import { FileKindsView, FileKindResultsView } from "./routes/file-kinds";
-import { AtRiskFiles, CompareVolumes, RedundancyDashboard } from "./routes/redundancy";
+import { FilesRoute } from "./routes/files";
 import { Settings } from "./routes/settings";
-import { SourcesHome } from "./routes/sources";
-import { SourceDetail } from "./routes/sources/SourceDetail";
-import { AdaptersScreen } from "./routes/sources/Adapters";
-import { TagView } from "./routes/tag";
 import { ShellLayout } from "./ShellLayout";
 import {
   AppearanceRedirect,
@@ -34,10 +26,10 @@ import {
 } from "./routes/product";
 
 /**
- * Unified application routes for the Spacedrive M3 Shell:
+ * Unified application routes for the Aphrody Shell:
  * - "/": the public Aphrody product home
  * - "/os": the shared desktop/browser file explorer surface
- * - "/explorer": Spacedrive VDFS Native File Explorer
+ * - "/explorer": Files surface (Spacedrive file service, mounted by the host)
  * - "/chat": Codex Chat (pixel-perfect Codex parity timeline + composer)
  * - "/models": Local Models Lifecycle & Hardware Telemetry
  * - "/settings": Desktop Preferences & Environment
@@ -77,11 +69,11 @@ export const explorerRoutes = [
       },
       {
         path: "os",
-        element: <ExplorerView />,
+        element: <FilesRoute />,
       },
       {
         path: "explorer",
-        element: <ExplorerView />,
+        element: <FilesRoute />,
       },
       {
         path: "models",
@@ -112,52 +104,16 @@ export const explorerRoutes = [
         element: <Navigate to={legacyRouteRedirects.favorites} replace />,
       },
       {
+        path: "files/*",
+        element: <FilesRoute />,
+      },
+      {
         path: "recents",
-        element: <RecentsView />,
-      },
-      {
-        path: "file-kinds",
-        element: <FileKindsView />,
-      },
-      {
-        path: "file-kinds/:kind",
-        element: <FileKindResultsView />,
-      },
-      {
-        path: "redundancy",
-        element: <RedundancyDashboard />,
-      },
-      {
-        path: "redundancy/at-risk",
-        element: <AtRiskFiles />,
-      },
-      {
-        path: "redundancy/compare",
-        element: <CompareVolumes />,
-      },
-      {
-        path: "tag/:tagId",
-        element: <TagView />,
-      },
-      {
-        path: "sources",
-        element: <SourcesHome />,
-      },
-      {
-        path: "sources/adapters",
-        element: <AdaptersScreen />,
-      },
-      {
-        path: "sources/:sourceId",
-        element: <SourceDetail />,
+        element: <Navigate to={legacyRouteRedirects.files} replace />,
       },
       {
         path: "search",
         element: <Navigate to={legacyRouteRedirects.search} replace />,
-      },
-      {
-        path: "jobs",
-        element: <JobsScreen />,
       },
       {
         path: "tasks",

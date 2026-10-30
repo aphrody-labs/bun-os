@@ -1,9 +1,0 @@
-{
-  "family": "api-ms-win-core-comm-l1-1-1",
-  "dll": "api-ms-win-core-comm-l1-1-1.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["Devices.Communication"],
-  "functions": {
-    "OpenCommPort": ["p", ["u32", "u32", "u32"], ["uPortNumber", "dwDesiredAccess", "dwFlagsAndAttributes"], 0]
-  }
-}

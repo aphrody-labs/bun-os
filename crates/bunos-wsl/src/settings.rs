@@ -1,0 +1,1667 @@
+use crate::constants::CONFIG_FILE_SETTINGS;
+use crate::utils::{get_config_file, get_user_profile, is_mock_mode};
+use crate::wsl::executor::wsl_executor;
+use configparser::ini::Ini;
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::PathBuf;
+use std::sync::Mutex;
+
+/// Default settings JSON embedded at compile time from resources/default-settings.json
+const DEFAULT_SETTINGS_JSON: &str = include_str!("../resources/default-settings.json");
+
+/// Polling interval settings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PollingIntervals {
+    pub distros: u64,
+    pub resources: u64,
+    pub health: u64,
+}
+
+/// WSL command timeout configuration (in seconds)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WslTimeoutConfig {
+    /// Quick operations: list, version, status
+    pub quick_secs: u64,
+    /// Default operations: most commands
+    pub default_secs: u64,
+    /// Long operations: install, import, export, move, update
+    pub long_secs: u64,
+    /// Shell command execution
+    pub shell_secs: u64,
+    /// Shell commands with sudo
+    pub sudo_shell_secs: u64,
+}
+
+/// Executable paths configuration
+/// Allows users to override default paths for system commands
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExecutablePaths {
+    /// WSL CLI executable
+    pub wsl: String,
+    /// PowerShell executable
+    pub powershell: String,
+    /// Command Prompt executable
+    pub cmd: String,
+    /// Windows Explorer executable
+    pub explorer: String,
+    /// Windows Terminal executable
+    pub windows_terminal: String,
+    /// WSL UNC path prefix for accessing distro filesystems
+    pub wsl_unc_prefix: String,
+}
+
+/// Distribution source settings (LXC catalog)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DistributionSourceSettings {
+    /// Enable community catalog (LXC Images)
+    pub lxc_enabled: bool,
+    /// LXC server base URL
+    pub lxc_base_url: String,
+    /// Cache duration in hours
+    pub cache_duration_hours: u32,
+    /// Show experimental/unstable releases
+    pub show_unstable_releases: bool,
+}
+
+/// Container runtime options for pulling images
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ContainerRuntime {
+    /// Built-in OCI implementation (no external dependencies)
+    Builtin,
+    /// Use Docker CLI
+    Docker,
+    /// Use Podman CLI
+    Podman,
+    /// Custom command (user-specified)
+    Custom(String),
+}
+
+/// Close action preference for window close button
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum CloseAction {
+    /// Show dialog to choose between minimize and quit
+    #[default]
+    Ask,
+    /// Always minimize to system tray
+    Minimize,
+    /// Always quit the application
+    Quit,
+}
+
+/// Review prompt state for tracking Microsoft Store review requests
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum ReviewPromptState {
+    /// User hasn't been prompted yet (will show after first install)
+    #[default]
+    Pending,
+    /// User clicked "Maybe Later", will show again after 3 launches
+    Reminded,
+    /// User clicked "Leave a Review"
+    Completed,
+    /// User clicked "No Thanks" or dismissed twice
+    Declined,
+}
+
+fn default_locale() -> String {
+    "auto".to_string()
+}
+
+/// Application settings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppSettings {
+    pub ide_command: String,
+    pub terminal_command: String,
+    /// Display language: "auto" for system detection, or a language code like "en", "zh-CN", etc.
+    #[serde(default = "default_locale")]
+    pub locale: String,
+    /// What to do when the user clicks the window close button
+    #[serde(default)]
+    pub close_action: CloseAction,
+    /// Whether anonymous usage telemetry is enabled
+    #[serde(default)]
+    pub telemetry_enabled: bool,
+    /// Whether the user has seen the telemetry opt-in prompt
+    #[serde(default)]
+    pub telemetry_prompt_seen: bool,
+    /// Saved custom IDE command (persisted even when a preset is active)
+    #[serde(default)]
+    pub saved_custom_ide_command: String,
+    /// Saved custom terminal command (persisted even when a preset is active)
+    #[serde(default)]
+    pub saved_custom_terminal_command: String,
+    pub use_pre_release_updates: bool,
+    pub polling_enabled: bool,
+    pub polling_intervals: PollingIntervals,
+    pub wsl_timeouts: WslTimeoutConfig,
+    pub executable_paths: ExecutablePaths,
+    pub distribution_sources: DistributionSourceSettings,
+    /// Container runtime for pulling OCI images
+    pub container_runtime: ContainerRuntime,
+    /// Default base path for new WSL installations (unexpanded, e.g. "%LOCALAPPDATA%\\wsl")
+    /// None = use default "%LOCALAPPDATA%\\wsl"
+    pub default_install_base_path: Option<String>,
+    /// Enable debug logging (more verbose logs for troubleshooting)
+    pub debug_logging: bool,
+    /// Current state of the review prompt workflow
+    #[serde(default)]
+    pub review_prompt_state: ReviewPromptState,
+    /// Number of app launches since user clicked "Maybe Later"
+    #[serde(default)]
+    pub review_prompt_launch_count: u32,
+    /// Whether user has completed at least one distro installation
+    #[serde(default)]
+    pub has_completed_first_install: bool,
+}
+
+/// WSL2 Global Configuration (.wslconfig)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WslConfig {
+    pub memory: Option<String>,
+    pub processors: Option<u32>,
+    pub swap: Option<String>,
+    pub swap_file: Option<String>,
+    pub localhost_forwarding: Option<bool>,
+    pub kernel_command_line: Option<String>,
+    pub nested_virtualization: Option<bool>,
+    // Signed: `-1` is the documented WSL "never idle-shutdown" sentinel
+    // (used by the RDP keep-alive feature), so this must not be unsigned.
+    pub vm_idle_timeout: Option<i64>,
+    pub gui_applications: Option<bool>,
+    pub debug_console: Option<bool>,
+    pub page_reporting: Option<bool>,
+    pub safe_mode: Option<bool>,
+    pub auto_memory_reclaim: Option<String>,
+    pub networking_mode: Option<String>,
+    pub dns_tunneling: Option<bool>,
+    pub firewall: Option<bool>,
+}
+
+/// Per-distribution configuration (wsl.conf)
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WslConf {
+    // [automount]
+    pub automount_enabled: Option<bool>,
+    pub automount_mount_fs_tab: Option<bool>,
+    pub automount_root: Option<String>,
+    pub automount_options: Option<String>,
+
+    // [network]
+    pub network_generate_hosts: Option<bool>,
+    pub network_generate_resolv_conf: Option<bool>,
+    pub network_hostname: Option<String>,
+
+    // [interop]
+    pub interop_enabled: Option<bool>,
+    pub interop_append_windows_path: Option<bool>,
+
+    // [user]
+    pub user_default: Option<String>,
+
+    // [boot]
+    pub boot_systemd: Option<bool>,
+    pub boot_command: Option<String>,
+}
+
+lazy_static::lazy_static! {
+    static ref SETTINGS: Mutex<AppSettings> = Mutex::new(load_or_create_settings());
+}
+
+/// Get default settings from embedded JSON
+fn get_default_settings() -> AppSettings {
+    serde_json::from_str(DEFAULT_SETTINGS_JSON)
+        .expect("Failed to parse embedded default-settings.json - this is a bug")
+}
+
+/// Load settings from file, or create from defaults if not exists
+fn load_or_create_settings() -> AppSettings {
+    let path = get_config_file(CONFIG_FILE_SETTINGS);
+
+    if path.exists() {
+        // Try to load existing settings
+        match fs::read_to_string(&path) {
+            Ok(content) => match serde_json::from_str(&content) {
+                Ok(settings) => return settings,
+                Err(e) => {
+                    eprintln!(
+                        "Warning: Failed to parse settings.json: {}. Using defaults.",
+                        e
+                    );
+                }
+            },
+            Err(e) => {
+                eprintln!(
+                    "Warning: Failed to read settings.json: {}. Using defaults.",
+                    e
+                );
+            }
+        }
+    }
+
+    // Create settings file from defaults
+    let defaults = get_default_settings();
+    if let Err(e) = save_settings_to_file(&defaults) {
+        eprintln!("Warning: Failed to create settings.json: {}", e);
+    }
+    defaults
+}
+
+/// Save settings to file
+fn save_settings_to_file(settings: &AppSettings) -> Result<(), String> {
+    let path = get_config_file(CONFIG_FILE_SETTINGS);
+    let content = serde_json::to_string_pretty(settings)
+        .map_err(|e| format!("Failed to serialize settings: {}", e))?;
+
+    fs::write(&path, content).map_err(|e| format!("Failed to write settings file: {}", e))
+}
+
+/// Get current settings
+pub fn get_settings() -> AppSettings {
+    SETTINGS
+        .lock()
+        .map(|guard| guard.clone())
+        .unwrap_or_else(|poisoned| {
+            // If mutex is poisoned, log warning and return settings from the poisoned lock
+            eprintln!("Warning: Settings mutex was poisoned, recovering");
+            poisoned.into_inner().clone()
+        })
+}
+
+/// Get current WSL timeout configuration
+/// This reads from settings on each call to allow runtime mutability
+pub fn get_timeout_config() -> WslTimeoutConfig {
+    get_settings().wsl_timeouts
+}
+
+/// Get current executable paths configuration
+/// This reads from settings on each call to allow runtime mutability
+pub fn get_executable_paths() -> ExecutablePaths {
+    get_settings().executable_paths
+}
+
+/// Default base path for WSL installations (unexpanded)
+const DEFAULT_INSTALL_BASE_PATH: &str = r"%LOCALAPPDATA%\wsl";
+
+/// Expand environment variables in a path string (Windows-style %VAR%)
+fn expand_env_vars(path: &str) -> String {
+    expand_env_vars_with(path, |name| std::env::var(name).ok())
+}
+
+fn expand_env_vars_with(path: &str, mut lookup: impl FnMut(&str) -> Option<String>) -> String {
+    let mut result = String::with_capacity(path.len());
+    let mut remaining = path;
+
+    // Scan the original path once; replacement values may contain literal '%' characters.
+    while let Some(start) = remaining.find('%') {
+        result.push_str(&remaining[..start]);
+        remaining = &remaining[start + 1..];
+        if let Some(end) = remaining.find('%') {
+            let name = &remaining[..end];
+            let mut chars = name.chars();
+            let valid_name = chars
+                .next()
+                .is_some_and(|c| c.is_ascii_alphabetic() || c == '_')
+                && chars.all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '(' | ')'));
+            if valid_name {
+                match lookup(name) {
+                    Some(value) => result.push_str(&value),
+                    None => {
+                        result.push('%');
+                        result.push_str(&remaining[..=end]);
+                    }
+                }
+                remaining = &remaining[end + 1..];
+                continue;
+            }
+        }
+        // A stray '%' must not consume the opening '%' of a later valid variable.
+        result.push('%');
+    }
+    result.push_str(remaining);
+    result
+}
+
+/// Get the default install base path (expanded)
+/// Returns the configured path from settings, or falls back to %LOCALAPPDATA%\wsl
+pub fn get_default_install_base_path() -> String {
+    let settings = get_settings();
+    let path = settings
+        .default_install_base_path
+        .as_deref()
+        .filter(|s| !s.trim().is_empty())
+        .unwrap_or(DEFAULT_INSTALL_BASE_PATH);
+
+    expand_env_vars(path)
+}
+
+/// Get the full default path for a distribution (base path + name)
+pub fn get_default_distro_path(name: &str) -> String {
+    let base = get_default_install_base_path();
+    format!(r"{}\{}", base, name)
+}
+
+/// Save settings
+pub fn save_settings(settings: AppSettings) -> Result<(), String> {
+    save_settings_to_file(&settings)?;
+    match SETTINGS.lock() {
+        Ok(mut guard) => {
+            *guard = settings;
+            Ok(())
+        }
+        Err(poisoned) => {
+            // Recover from poisoned mutex by replacing the value
+            eprintln!("Warning: Settings mutex was poisoned, recovering");
+            *poisoned.into_inner() = settings;
+            Ok(())
+        }
+    }
+}
+
+/// Get the .wslconfig file path
+fn get_wslconfig_path() -> PathBuf {
+    get_user_profile().join(".wslconfig")
+}
+
+/// Read .wslconfig file
+pub fn read_wsl_config() -> Result<WslConfig, String> {
+    if is_mock_mode() {
+        return Ok(WslConfig {
+            memory: Some("8GB".to_string()),
+            processors: Some(4),
+            swap: Some("4GB".to_string()),
+            localhost_forwarding: Some(true),
+            gui_applications: Some(true),
+            nested_virtualization: Some(false),
+            ..Default::default()
+        });
+    }
+
+    let path = get_wslconfig_path();
+
+    if !path.exists() {
+        return Ok(WslConfig::default());
+    }
+
+    let content =
+        fs::read_to_string(&path).map_err(|e| format!("Failed to read .wslconfig: {}", e))?;
+
+    parse_wsl_config(&content)
+}
+
+/// Parse .wslconfig INI content using configparser library
+fn parse_wsl_config(content: &str) -> Result<WslConfig, String> {
+    let mut ini = Ini::new_cs(); // case-sensitive for preserving key casing
+    ini.set_comment_symbols(&['#', ';']);
+
+    ini.read(content.to_string())
+        .map_err(|e| format!("Failed to parse .wslconfig: {}", e))?;
+
+    Ok(WslConfig {
+        memory: ini.get("wsl2", "memory"),
+        processors: ini
+            .getuint("wsl2", "processors")
+            .ok()
+            .flatten()
+            .map(|v| v as u32),
+        swap: ini.get("wsl2", "swap"),
+        swap_file: ini
+            .get("wsl2", "swapFile")
+            .or_else(|| ini.get("wsl2", "swapfile")),
+        localhost_forwarding: ini
+            .getbool("wsl2", "localhostForwarding")
+            .ok()
+            .flatten()
+            .or_else(|| ini.getbool("wsl2", "localhostforwarding").ok().flatten()),
+        kernel_command_line: ini
+            .get("wsl2", "kernelCommandLine")
+            .or_else(|| ini.get("wsl2", "kernelcommandline")),
+        nested_virtualization: ini
+            .getbool("wsl2", "nestedVirtualization")
+            .ok()
+            .flatten()
+            .or_else(|| ini.getbool("wsl2", "nestedvirtualization").ok().flatten()),
+        // Signed parse so the documented `-1` sentinel survives (getuint drops it).
+        vm_idle_timeout: ini
+            .getint("wsl2", "vmIdleTimeout")
+            .ok()
+            .flatten()
+            .or_else(|| ini.getint("wsl2", "vmidletimeout").ok().flatten()),
+        gui_applications: ini
+            .getbool("wsl2", "guiApplications")
+            .ok()
+            .flatten()
+            .or_else(|| ini.getbool("wsl2", "guiapplications").ok().flatten()),
+        debug_console: ini
+            .getbool("wsl2", "debugConsole")
+            .ok()
+            .flatten()
+            .or_else(|| ini.getbool("wsl2", "debugconsole").ok().flatten()),
+        page_reporting: ini
+            .getbool("wsl2", "pageReporting")
+            .ok()
+            .flatten()
+            .or_else(|| ini.getbool("wsl2", "pagereporting").ok().flatten()),
+        safe_mode: ini
+            .getbool("wsl2", "safeMode")
+            .ok()
+            .flatten()
+            .or_else(|| ini.getbool("wsl2", "safemode").ok().flatten()),
+        auto_memory_reclaim: ini
+            .get("experimental", "autoMemoryReclaim")
+            .or_else(|| ini.get("experimental", "automemoryreclaim"))
+            // Migrate values written by older Bun-OS-WSL versions on the next save.
+            .or_else(|| ini.get("wsl2", "autoMemoryReclaim"))
+            .or_else(|| ini.get("wsl2", "automemoryreclaim")),
+        networking_mode: ini
+            .get("wsl2", "networkingMode")
+            .or_else(|| ini.get("wsl2", "networkingmode")),
+        dns_tunneling: ini
+            .getbool("wsl2", "dnsTunneling")
+            .ok()
+            .flatten()
+            .or_else(|| ini.getbool("wsl2", "dnstunneling").ok().flatten()),
+        firewall: ini.getbool("wsl2", "firewall").ok().flatten(),
+    })
+}
+
+/// Write .wslconfig file
+pub fn write_wsl_config(config: WslConfig) -> Result<(), String> {
+    if is_mock_mode() {
+        return Ok(());
+    }
+
+    let path = get_wslconfig_path();
+    write_wsl_config_to_path(&path, &config)
+}
+
+fn write_wsl_config_to_path(path: &std::path::Path, config: &WslConfig) -> Result<(), String> {
+    let existing = match fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => String::new(),
+        Err(error) => {
+            return Err(format!(
+                "Failed to read .wslconfig before saving: {}",
+                error
+            ))
+        }
+    };
+    let content = merge_ini_settings(
+        &existing,
+        &serialize_wsl_config(config),
+        &[
+            (
+                "wsl2",
+                &[
+                    "memory",
+                    "processors",
+                    "swap",
+                    "swapfile",
+                    "localhostforwarding",
+                    "kernelcommandline",
+                    "nestedvirtualization",
+                    "vmidletimeout",
+                    "guiapplications",
+                    "debugconsole",
+                    "pagereporting",
+                    "safemode",
+                    "automemoryreclaim",
+                    "networkingmode",
+                    "dnstunneling",
+                    "firewall",
+                ],
+            ),
+            ("experimental", &["automemoryreclaim"]),
+        ],
+    )?;
+    fs::write(path, content).map_err(|e| format!("Failed to write .wslconfig: {}", e))
+}
+
+/// Serialize WslConfig to INI format
+fn serialize_wsl_config(config: &WslConfig) -> String {
+    let mut lines = vec!["[wsl2]".to_string()];
+
+    if let Some(ref v) = config.memory {
+        lines.push(format!("memory={}", v));
+    }
+    if let Some(v) = config.processors {
+        lines.push(format!("processors={}", v));
+    }
+    if let Some(ref v) = config.swap {
+        lines.push(format!("swap={}", v));
+    }
+    if let Some(ref v) = config.swap_file {
+        lines.push(format!("swapFile={}", v));
+    }
+    if let Some(v) = config.localhost_forwarding {
+        lines.push(format!("localhostForwarding={}", v));
+    }
+    if let Some(ref v) = config.kernel_command_line {
+        lines.push(format!("kernelCommandLine={}", v));
+    }
+    if let Some(v) = config.nested_virtualization {
+        lines.push(format!("nestedVirtualization={}", v));
+    }
+    if let Some(v) = config.vm_idle_timeout {
+        lines.push(format!("vmIdleTimeout={}", v));
+    }
+    if let Some(v) = config.gui_applications {
+        lines.push(format!("guiApplications={}", v));
+    }
+    if let Some(v) = config.debug_console {
+        lines.push(format!("debugConsole={}", v));
+    }
+    if let Some(v) = config.page_reporting {
+        lines.push(format!("pageReporting={}", v));
+    }
+    if let Some(v) = config.safe_mode {
+        lines.push(format!("safeMode={}", v));
+    }
+    if let Some(ref v) = config.networking_mode {
+        lines.push(format!("networkingMode={}", v));
+    }
+    if let Some(v) = config.dns_tunneling {
+        lines.push(format!("dnsTunneling={}", v));
+    }
+    if let Some(v) = config.firewall {
+        lines.push(format!("firewall={}", v));
+    }
+    if let Some(ref v) = config.auto_memory_reclaim {
+        lines.push("\n[experimental]".to_string());
+        lines.push(format!("autoMemoryReclaim={}", v));
+    }
+
+    lines.join("\n") + "\n"
+}
+
+/// Read wsl.conf from a distribution
+/// If `id` is provided, uses `--distribution-id` for more reliable identification
+fn ensure_wsl_conf_accessible(
+    distro_name: &str,
+    running_names: &[String],
+    operation: &str,
+) -> Result<(), String> {
+    if running_names
+        .iter()
+        .any(|running| running.eq_ignore_ascii_case(distro_name))
+    {
+        Ok(())
+    } else {
+        Err(format!(
+            "Distribution '{}' is stopped. Start it before {} /etc/wsl.conf.",
+            distro_name, operation
+        ))
+    }
+}
+
+fn ensure_wsl_conf_readable(distro_name: &str, running_names: &[String]) -> Result<(), String> {
+    ensure_wsl_conf_accessible(distro_name, running_names, "reading")
+}
+
+fn ensure_wsl_conf_writable(distro_name: &str, running_names: &[String]) -> Result<(), String> {
+    ensure_wsl_conf_accessible(distro_name, running_names, "saving")
+}
+
+fn running_distribution_names_for_wsl_conf() -> Result<Vec<String>, String> {
+    crate::wsl::list_running_distribution_names()
+        .map_err(|e| format!("Failed to check distribution state: {}", e))
+}
+
+pub fn read_wsl_conf(distro_name: &str, id: Option<&str>) -> Result<WslConf, String> {
+    if is_mock_mode() {
+        return Ok(WslConf {
+            automount_enabled: Some(true),
+            automount_root: Some("/mnt/".to_string()),
+            network_generate_hosts: Some(true),
+            network_generate_resolv_conf: Some(true),
+            interop_enabled: Some(true),
+            interop_append_windows_path: Some(true),
+            boot_systemd: Some(true),
+            ..Default::default()
+        });
+    }
+
+    let running = running_distribution_names_for_wsl_conf()?;
+    ensure_wsl_conf_readable(distro_name, &running)?;
+
+    let output = wsl_executor()
+        .exec(distro_name, id, "cat /etc/wsl.conf")
+        .map_err(|e| format!("Failed to read wsl.conf: {}", e))?;
+
+    if !output.success {
+        // File might not exist, return defaults
+        return Ok(WslConf::default());
+    }
+
+    parse_wsl_conf(&output.stdout)
+}
+
+/// Read raw wsl.conf content from a distribution
+/// Returns the file content as-is, or None if the file doesn't exist
+pub fn read_wsl_conf_raw(distro_name: &str, id: Option<&str>) -> Result<Option<String>, String> {
+    if is_mock_mode() {
+        return Ok(Some(
+            r#"[automount]
+enabled=true
+root=/mnt/
+
+[network]
+generateHosts=true
+generateResolvConf=true
+
+[interop]
+enabled=true
+appendWindowsPath=true
+
+[boot]
+systemd=true
+"#
+            .to_string(),
+        ));
+    }
+
+    let running = running_distribution_names_for_wsl_conf()?;
+    ensure_wsl_conf_readable(distro_name, &running)?;
+
+    let output = wsl_executor()
+        .exec(distro_name, id, "cat /etc/wsl.conf")
+        .map_err(|e| format!("Failed to read wsl.conf: {}", e))?;
+
+    if !output.success {
+        // File doesn't exist
+        return Ok(None);
+    }
+
+    let content = output.stdout.trim();
+    if content.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(content.to_string()))
+    }
+}
+
+/// Parse wsl.conf INI content
+/// Parse wsl.conf INI content using configparser library
+fn parse_wsl_conf(content: &str) -> Result<WslConf, String> {
+    let mut ini = Ini::new_cs();
+    ini.set_comment_symbols(&['#', ';']);
+
+    ini.read(content.to_string())
+        .map_err(|e| format!("Failed to parse wsl.conf: {}", e))?;
+
+    // Helper to get bool with case-insensitive key fallback
+    let get_bool = |section: &str, key: &str, alt_key: &str| -> Option<bool> {
+        ini.getbool(section, key)
+            .ok()
+            .flatten()
+            .or_else(|| ini.getbool(section, alt_key).ok().flatten())
+    };
+
+    let get_str = |section: &str, key: &str, alt_key: &str| -> Option<String> {
+        ini.get(section, key).or_else(|| ini.get(section, alt_key))
+    };
+
+    Ok(WslConf {
+        automount_enabled: get_bool("automount", "enabled", "enabled"),
+        automount_mount_fs_tab: get_bool("automount", "mountFsTab", "mountfstab"),
+        automount_root: get_str("automount", "root", "root"),
+        automount_options: get_str("automount", "options", "options")
+            .map(|value| normalize_automount_options(&value).to_string()),
+        network_generate_hosts: get_bool("network", "generateHosts", "generatehosts"),
+        network_generate_resolv_conf: get_bool(
+            "network",
+            "generateResolvConf",
+            "generateresolvconf",
+        ),
+        network_hostname: get_str("network", "hostname", "hostname"),
+        interop_enabled: get_bool("interop", "enabled", "enabled"),
+        interop_append_windows_path: get_bool("interop", "appendWindowsPath", "appendwindowspath"),
+        user_default: get_str("user", "default", "default"),
+        boot_systemd: get_bool("boot", "systemd", "systemd"),
+        boot_command: get_str("boot", "command", "command"),
+    })
+}
+
+/// Write wsl.conf to a distribution
+/// Uses wsl -u root to write with root privileges since /etc/wsl.conf is typically owned by root
+pub fn write_wsl_conf(distro_name: &str, config: WslConf) -> Result<(), String> {
+    // Reject any value that could inject INI keys or sections (embedded newlines /
+    // control chars). This is the single chokepoint every wsl.conf write flows through,
+    // so validating here protects all callers regardless of the Tauri boundary check.
+    validate_wsl_conf(&config).map_err(|e| e.to_string())?;
+
+    if is_mock_mode() {
+        return Ok(());
+    }
+
+    // Re-check immediately before the write. The distro may have stopped
+    // after the settings page loaded; invoking wsl.exe in that state would
+    // start it merely by saving the form.
+    let running = running_distribution_names_for_wsl_conf()?;
+    ensure_wsl_conf_writable(distro_name, &running)?;
+
+    // Distinguish a missing file from a read failure, so an unreadable file is never overwritten.
+    let existing = wsl_executor()
+        .exec_as_root(
+            distro_name,
+            None,
+            "if [ -e /etc/wsl.conf ]; then cat /etc/wsl.conf; fi",
+        )
+        .map_err(|e| format!("Failed to read wsl.conf before saving: {}", e))?;
+    if !existing.success {
+        return Err(format!(
+            "Failed to read wsl.conf before saving: {}",
+            existing.stderr.trim()
+        ));
+    }
+    let content = merge_wsl_conf(&existing.stdout, &config)?;
+
+    // Quote the complete merged file, including arbitrary preserved content.
+    let command = wsl_conf_write_command(&content);
+
+    let output = wsl_executor()
+        .exec_as_root(distro_name, None, &command)
+        .map_err(|e| format!("Failed to write wsl.conf: {}", e))?;
+
+    if !output.success {
+        return Err(format!(
+            "Failed to write wsl.conf: {}",
+            output.stderr.trim()
+        ));
+    }
+
+    Ok(())
+}
+
+fn wsl_conf_write_command(content: &str) -> String {
+    format!(
+        "printf '%s' {} > /etc/wsl.conf",
+        shell_escape::unix::escape(content.into())
+    )
+}
+
+/// Validate every user-supplied string value in a [`WslConf`] before it is written.
+///
+/// `write_wsl_conf` serializes these values into an INI file that is written to the
+/// distro as **root**. Embedded newlines can inject extra INI lines/sections.
+/// See [`crate::validation::validate_wsl_conf_value`].
+pub fn validate_wsl_conf(config: &WslConf) -> Result<(), crate::validation::ValidationError> {
+    use crate::validation::validate_wsl_conf_value;
+
+    let string_fields: [(&str, &Option<String>); 5] = [
+        ("automount.root", &config.automount_root),
+        ("automount.options", &config.automount_options),
+        ("network.hostname", &config.network_hostname),
+        ("user.default", &config.user_default),
+        ("boot.command", &config.boot_command),
+    ];
+
+    for (field, value) in string_fields {
+        if let Some(value) = value {
+            validate_wsl_conf_value(field, value)?;
+        }
+    }
+
+    Ok(())
+}
+
+/// Serialize WslConf to INI format
+fn serialize_wsl_conf(config: &WslConf) -> String {
+    let mut sections: Vec<String> = vec![];
+
+    // [automount]
+    let mut automount = vec![];
+    if let Some(v) = config.automount_enabled {
+        automount.push(format!("enabled={}", v));
+    }
+    if let Some(v) = config.automount_mount_fs_tab {
+        automount.push(format!("mountFsTab={}", v));
+    }
+    if let Some(ref v) = config.automount_root {
+        automount.push(format!("root={}", v));
+    }
+    if let Some(ref v) = config.automount_options {
+        automount.push(format!("options=\"{}\"", normalize_automount_options(v)));
+    }
+    if !automount.is_empty() {
+        sections.push(format!("[automount]\n{}", automount.join("\n")));
+    }
+
+    // [network]
+    let mut network = vec![];
+    if let Some(v) = config.network_generate_hosts {
+        network.push(format!("generateHosts={}", v));
+    }
+    if let Some(v) = config.network_generate_resolv_conf {
+        network.push(format!("generateResolvConf={}", v));
+    }
+    if let Some(ref v) = config.network_hostname {
+        network.push(format!("hostname={}", v));
+    }
+    if !network.is_empty() {
+        sections.push(format!("[network]\n{}", network.join("\n")));
+    }
+
+    // [interop]
+    let mut interop = vec![];
+    if let Some(v) = config.interop_enabled {
+        interop.push(format!("enabled={}", v));
+    }
+    if let Some(v) = config.interop_append_windows_path {
+        interop.push(format!("appendWindowsPath={}", v));
+    }
+    if !interop.is_empty() {
+        sections.push(format!("[interop]\n{}", interop.join("\n")));
+    }
+
+    // [user]
+    let mut user = vec![];
+    if let Some(ref v) = config.user_default {
+        user.push(format!("default={}", v));
+    }
+    if !user.is_empty() {
+        sections.push(format!("[user]\n{}", user.join("\n")));
+    }
+
+    // [boot]
+    let mut boot = vec![];
+    if let Some(v) = config.boot_systemd {
+        boot.push(format!("systemd={}", v));
+    }
+    if let Some(ref v) = config.boot_command {
+        boot.push(format!("command={}", v));
+    }
+    if !boot.is_empty() {
+        sections.push(format!("[boot]\n{}", boot.join("\n")));
+    }
+
+    sections.join("\n\n") + "\n"
+}
+
+fn normalize_automount_options(mut value: &str) -> &str {
+    value = value.trim();
+    while let Some(inner) = value
+        .strip_prefix('"')
+        .and_then(|rest| rest.strip_suffix('"'))
+    {
+        value = inner.trim();
+    }
+    value
+}
+
+fn merge_wsl_conf(existing: &str, config: &WslConf) -> Result<String, String> {
+    merge_ini_settings(
+        existing,
+        &serialize_wsl_conf(config),
+        &[
+            ("automount", &["enabled", "mountfstab", "root", "options"]),
+            (
+                "network",
+                &["generatehosts", "generateresolvconf", "hostname"],
+            ),
+            ("interop", &["enabled", "appendwindowspath"]),
+            ("user", &["default"]),
+            ("boot", &["systemd", "command"]),
+        ],
+    )
+}
+
+/// Replace only managed keys, keeping unrelated lines, comments and section ordering.
+/// A managed key omitted from `updates` is removed (reset to the WSL default).
+/// Its inline comment is retained as a standalone comment.
+fn merge_ini_settings(
+    existing: &str,
+    updates: &str,
+    managed: &[(&str, &[&str])],
+) -> Result<String, String> {
+    let mut ini = Ini::new_cs();
+    ini.set_comment_symbols(&['#', ';']);
+    ini.read(existing.to_string())
+        .map_err(|error| format!("Cannot save invalid existing WSL configuration: {}", error))?;
+
+    // Keep the serializer's stable key/section order when adding missing settings.
+    let mut pending: Vec<(String, Vec<(String, String)>)> = Vec::new();
+    for line in updates.lines() {
+        let line = line.trim();
+        if let Some(section) = line
+            .strip_prefix('[')
+            .and_then(|line| line.strip_suffix(']'))
+        {
+            pending.push((section.to_lowercase(), Vec::new()));
+        } else if let Some((key, _)) = line.split_once('=') {
+            if let Some((_, entries)) = pending.last_mut() {
+                entries.push((key.trim().to_lowercase(), line.to_string()));
+            }
+        }
+    }
+
+    let mut output = Vec::new();
+    let mut section = String::new();
+    for line in existing.lines() {
+        // Match configparser's default inline-comment rules: the first symbol
+        // starts a comment, including inside quoted values or without a space.
+        let comment_start = line.find(['#', ';']);
+        let content = &line[..comment_start.unwrap_or(line.len())];
+        let meaningful = content.trim();
+        if let Some(next_section) = meaningful
+            .strip_prefix('[')
+            .and_then(|line| line.strip_suffix(']'))
+        {
+            if let Some((_, entries)) = pending.iter_mut().find(|(name, _)| name == &section) {
+                output.extend(entries.drain(..).map(|(_, line)| line));
+            }
+            section = next_section.trim().to_lowercase();
+        } else if !meaningful.is_empty() {
+            let key = meaningful
+                .split_once(['=', ':'])
+                .map_or(meaningful, |(key, _)| key)
+                .trim()
+                .to_lowercase();
+            let is_managed = managed
+                .iter()
+                .any(|(name, keys)| *name == section && keys.contains(&key.as_str()));
+            if is_managed {
+                let replacement = pending
+                    .iter_mut()
+                    .find(|(name, _)| name == &section)
+                    .and_then(|(_, entries)| {
+                        entries
+                            .iter()
+                            .position(|(name, _)| name == &key)
+                            .map(|index| entries.remove(index).1)
+                    });
+                if let Some(mut replacement) = replacement {
+                    if comment_start.is_some() {
+                        // Keep the comment and its original separating whitespace.
+                        replacement.push_str(&line[content.trim_end().len()..]);
+                    }
+                    output.push(replacement);
+                } else if let Some(start) = comment_start {
+                    // Reset keys and duplicate aliases no longer have an active
+                    // value, but their annotations still belong in the file.
+                    let indentation = &line[..line.len() - line.trim_start().len()];
+                    output.push(format!("{}{}", indentation, &line[start..]));
+                }
+                continue;
+            }
+        }
+        output.push(line.to_string());
+    }
+    if let Some((_, entries)) = pending.iter_mut().find(|(name, _)| name == &section) {
+        output.extend(entries.drain(..).map(|(_, line)| line));
+    }
+    for (name, entries) in pending {
+        if !entries.is_empty() {
+            if !output.is_empty() {
+                output.push(String::new());
+            }
+            output.push(format!("[{}]", name));
+            output.extend(entries.into_iter().map(|(_, line)| line));
+        }
+    }
+    let newline = if existing.contains("\r\n") {
+        "\r\n"
+    } else {
+        "\n"
+    };
+    Ok(output.join(newline) + newline)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_path_expansion_preserves_undefined_variables() {
+        assert_eq!(
+            expand_env_vars_with(r"%MISSING%\distros", |_| None),
+            r"%MISSING%\distros"
+        );
+    }
+
+    #[test]
+    fn test_path_expansion_skips_literal_percent_and_expands_later_variable() {
+        let result = expand_env_vars_with(r"D:\90%done\%BunOSWSL_HOME%\wsl", |name| {
+            (name == "BunOSWSL_HOME").then(|| "images".to_string())
+        });
+        assert_eq!(result, r"D:\90%done\images\wsl");
+    }
+
+    #[test]
+    fn test_path_expansion_does_not_reexpand_variable_values() {
+        let result = expand_env_vars_with(r"%FIRST%\%SECOND%", |name| match name {
+            "FIRST" => Some("%SECOND%".into()),
+            "SECOND" => Some("images".into()),
+            _ => None,
+        });
+        assert_eq!(result, r"%SECOND%\images");
+    }
+
+    #[test]
+    fn test_path_expansion_keeps_literal_percent_and_supports_windows_names() {
+        for (input, expected) in [
+            ("", ""),
+            (r"D:\100%", r"D:\100%"),
+            (r"D:\%%\images", r"D:\%%\images"),
+            (
+                r"%ProgramFiles(x86)%\images",
+                r"C:\Program Files (x86)\images",
+            ),
+            (r"%SELF%\images", r"%SELF%\images"),
+        ] {
+            let result = expand_env_vars_with(input, |name| match name {
+                "ProgramFiles(x86)" => Some(r"C:\Program Files (x86)".into()),
+                "SELF" => Some("%SELF%".into()),
+                _ => None,
+            });
+            assert_eq!(result, expected);
+        }
+    }
+
+    #[test]
+    fn test_wsl_conf_write_command_uses_posix_quoting_on_windows() {
+        let command = wsl_conf_write_command("[custom]\nvalue=$(touch /tmp/should-not-run)\n");
+        assert_eq!(
+            command,
+            "printf '%s' '[custom]\nvalue=$(touch /tmp/should-not-run)\n' > /etc/wsl.conf"
+        );
+    }
+
+    #[test]
+    fn test_saving_wsl_config_preserves_custom_settings_and_comments() {
+        let path =
+            std::env::temp_dir().join(format!("wslui_config_merge_{}.ini", std::process::id()));
+        let existing = "# custom kernel\r\n[wsl2]\r\nmemory=4GB\r\nprocessors=2\r\nkernel=C:\\custom\\bzImage\r\nkernelModules=C:\\custom\\modules.vhdx\r\ndefaultVhdSize=1099511627776\r\n\r\n[experimental]\r\nsparseVhd=true\r\n[custom]\r\nsetting=keep ; important\r\n";
+        fs::write(&path, existing).unwrap();
+        let config = WslConfig {
+            memory: Some("8GB".into()),
+            ..Default::default()
+        };
+        let result = write_wsl_config_to_path(&path, &config);
+        let saved = fs::read_to_string(&path).unwrap();
+        fs::remove_file(&path).unwrap();
+        result.unwrap();
+        assert!(saved.contains("kernel=C:\\custom\\bzImage"));
+        assert!(saved.contains("kernelModules=C:\\custom\\modules.vhdx"));
+        assert!(saved.contains("defaultVhdSize=1099511627776"));
+        assert!(saved.contains("# custom kernel\r\n"));
+        assert!(saved.contains("[experimental]\r\nsparseVhd=true"));
+        assert!(saved.contains("[custom]\r\nsetting=keep ; important"));
+        let parsed = parse_wsl_config(&saved).unwrap();
+        assert_eq!(parsed.memory.as_deref(), Some("8GB"));
+        assert_eq!(parsed.processors, None);
+    }
+
+    #[test]
+    fn test_merging_wsl_conf_preserves_unmodeled_keys_and_sections() {
+        let existing = "# distro config\n[automount]\noptions=\"metadata\"\nextra=keep\n[boot]\nsystemd=false\nprotectBinfmt=true\n[custom]\nvalue=unchanged\n";
+        let config = WslConf {
+            boot_systemd: Some(true),
+            ..Default::default()
+        };
+        let saved = merge_wsl_conf(existing, &config).unwrap();
+        assert!(saved.contains("# distro config"));
+        assert!(saved.contains("extra=keep"));
+        assert!(saved.contains("protectBinfmt=true"));
+        assert!(saved.contains("[custom]\nvalue=unchanged"));
+        let parsed = parse_wsl_conf(&saved).unwrap();
+        assert_eq!(parsed.boot_systemd, Some(true));
+        assert_eq!(parsed.automount_options, None);
+    }
+
+    #[test]
+    fn test_config_merge_updates_aliases_once_and_adds_missing_sections() {
+        let existing =
+            "[automount]\nmountfstab=false\nmountFsTab=false\n[custom]\nmountfstab=untouched\n";
+        let config = WslConf {
+            automount_mount_fs_tab: Some(true),
+            boot_systemd: Some(true),
+            ..Default::default()
+        };
+        let saved = merge_wsl_conf(existing, &config).unwrap();
+        let parsed = parse_wsl_conf(&saved).unwrap();
+        assert_eq!(parsed.automount_mount_fs_tab, Some(true));
+        assert_eq!(parsed.boot_systemd, Some(true));
+        assert_eq!(saved.matches("mountFsTab=true").count(), 1);
+        assert!(!saved.contains("mountfstab=false"));
+        assert!(saved.contains("[custom]\nmountfstab=untouched"));
+        assert_eq!(merge_wsl_conf(&saved, &config).unwrap(), saved);
+    }
+
+    #[test]
+    fn test_config_merge_preserves_managed_inline_comments() {
+        for (original, expected) in [
+            ("memory=4GB ; workload limit", "memory=8GB ; workload limit"),
+            (
+                "memory:4GB\t# workload limit; keep both",
+                "memory=8GB\t# workload limit; keep both",
+            ),
+            ("memory=4GB#limit", "memory=8GB#limit"),
+            // configparser treats the first comment symbol as a comment even
+            // inside quotes; INI values do not have shell-style quoting rules.
+            (
+                "memory=\"4GB; workload limit\"",
+                "memory=8GB; workload limit\"",
+            ),
+        ] {
+            let existing = format!("[wsl2]\r\n{original}\r\n");
+            let updates = "[wsl2]\nmemory=8GB\n";
+            let managed: &[(&str, &[&str])] = &[("wsl2", &["memory"])];
+            let saved = merge_ini_settings(&existing, updates, managed).unwrap();
+            assert_eq!(saved, format!("[wsl2]\r\n{expected}\r\n"));
+            assert_eq!(
+                parse_wsl_config(&saved).unwrap().memory.as_deref(),
+                Some("8GB")
+            );
+            assert_eq!(merge_ini_settings(&saved, updates, managed).unwrap(), saved);
+        }
+    }
+
+    #[test]
+    fn test_config_merge_keeps_reset_inline_comments_as_standalone_comments() {
+        let existing = "[network]\n  hostname: old-name ; local host\n# surrounding comment\nhostname=duplicate# legacy host\ncustom=keep\n";
+        let saved = merge_wsl_conf(existing, &WslConf::default()).unwrap();
+        assert_eq!(
+            saved,
+            "[network]\n  ; local host\n# surrounding comment\n# legacy host\ncustom=keep\n"
+        );
+        assert_eq!(parse_wsl_conf(&saved).unwrap().network_hostname, None);
+        assert_eq!(merge_wsl_conf(&saved, &WslConf::default()).unwrap(), saved);
+    }
+
+    #[test]
+    fn test_config_merge_preserves_inline_comments_on_duplicate_managed_keys() {
+        let existing = "[boot]\nsystemd=false ; first note\nsystemd=false # second note\n";
+        let config = WslConf {
+            boot_systemd: Some(true),
+            ..Default::default()
+        };
+        let saved = merge_wsl_conf(existing, &config).unwrap();
+        assert_eq!(saved, "[boot]\nsystemd=true ; first note\n# second note\n");
+        assert_eq!(parse_wsl_conf(&saved).unwrap().boot_systemd, Some(true));
+        assert_eq!(merge_wsl_conf(&saved, &config).unwrap(), saved);
+    }
+
+    #[test]
+    fn test_config_merge_clears_keys_using_the_parsers_colon_delimiter() {
+        let saved = merge_wsl_conf(
+            "[network]\nhostname: old-name\ncustom: keep\n",
+            &WslConf::default(),
+        )
+        .unwrap();
+        assert_eq!(parse_wsl_conf(&saved).unwrap().network_hostname, None);
+        assert!(saved.contains("custom: keep"));
+    }
+
+    #[test]
+    fn test_saving_wsl_config_migrates_legacy_memory_reclaim() {
+        let path =
+            std::env::temp_dir().join(format!("wslui_config_migrate_{}.ini", std::process::id()));
+        let existing = "[wsl2]\nautoMemoryReclaim=gradual\n[experimental]\nsparseVhd=true\n";
+        fs::write(&path, existing).unwrap();
+        let config = parse_wsl_config(existing).unwrap();
+        let result = write_wsl_config_to_path(&path, &config);
+        let saved = fs::read_to_string(&path).unwrap();
+        fs::remove_file(&path).unwrap();
+        result.unwrap();
+        let mut ini = Ini::new_cs();
+        ini.read(saved).unwrap();
+        assert_eq!(ini.get("wsl2", "autoMemoryReclaim"), None);
+        assert_eq!(
+            ini.get("experimental", "autoMemoryReclaim").as_deref(),
+            Some("gradual")
+        );
+        assert_eq!(
+            ini.getbool("experimental", "sparseVhd").unwrap(),
+            Some(true)
+        );
+    }
+
+    #[test]
+    fn test_saving_invalid_wsl_config_leaves_original_file_untouched() {
+        let path =
+            std::env::temp_dir().join(format!("wslui_invalid_config_{}.ini", std::process::id()));
+        let existing = "[broken section\ncustom=value\n";
+        fs::write(&path, existing).unwrap();
+        let result = write_wsl_config_to_path(&path, &WslConfig::default());
+        let saved = fs::read_to_string(&path).unwrap();
+        fs::remove_file(&path).unwrap();
+        assert!(result.is_err());
+        assert_eq!(saved, existing);
+    }
+
+    #[test]
+    fn test_merging_invalid_wsl_conf_refuses_to_replace_original() {
+        assert!(merge_wsl_conf("[broken section\ncustom=value", &WslConf::default()).is_err());
+    }
+
+    #[test]
+    fn test_memory_reclaim_reads_and_writes_experimental_section() {
+        let config = parse_wsl_config("[experimental]\nautoMemoryReclaim=gradual\n").unwrap();
+        assert_eq!(config.auto_memory_reclaim.as_deref(), Some("gradual"));
+        let serialized = serialize_wsl_config(&config);
+        let mut ini = Ini::new_cs();
+        ini.read(serialized).unwrap();
+        assert_eq!(
+            ini.get("experimental", "autoMemoryReclaim").as_deref(),
+            Some("gradual")
+        );
+        assert_eq!(ini.get("wsl2", "autoMemoryReclaim"), None);
+    }
+
+    #[test]
+    fn test_automount_options_stay_unquoted_across_repeated_saves() {
+        for options in [
+            "metadata,uid=1000",
+            "\"metadata,uid=1000\"",
+            "\"\"metadata,uid=1000\"\"",
+        ] {
+            let mut content = format!("[automount]\noptions={options}\n");
+            for _ in 0..3 {
+                let config = parse_wsl_conf(&content).unwrap();
+                assert_eq!(
+                    config.automount_options.as_deref(),
+                    Some("metadata,uid=1000")
+                );
+                content = serialize_wsl_conf(&config);
+                assert!(content.contains("options=\"metadata,uid=1000\""));
+            }
+        }
+    }
+
+    #[test]
+    fn wsl_conf_reads_reject_a_stopped_distribution() {
+        let running = vec!["Ubuntu".to_string()];
+
+        let error = ensure_wsl_conf_readable("Debian", &running).unwrap_err();
+
+        assert!(error.contains("stopped"));
+    }
+
+    #[test]
+    fn wsl_conf_reads_allow_a_running_distribution_case_insensitively() {
+        let running = vec!["Ubuntu".to_string()];
+
+        assert!(ensure_wsl_conf_readable("ubuntu", &running).is_ok());
+    }
+
+    #[test]
+    fn wsl_conf_writes_reject_a_stopped_distribution() {
+        let running = vec!["Ubuntu".to_string()];
+
+        let error = ensure_wsl_conf_writable("Debian", &running).unwrap_err();
+
+        assert!(error.contains("stopped"));
+        assert!(error.contains("saving"));
+    }
+
+    // ==================== WSL Config Parsing Tests ====================
+
+    #[test]
+    fn test_parse_wsl_config_basic() {
+        let content = r#"
+[wsl2]
+memory=8GB
+processors=4
+swap=4GB
+"#;
+        let config = parse_wsl_config(content).unwrap();
+
+        assert_eq!(config.memory, Some("8GB".to_string()));
+        assert_eq!(config.processors, Some(4));
+        assert_eq!(config.swap, Some("4GB".to_string()));
+    }
+
+    #[test]
+    fn test_parse_wsl_config_all_fields() {
+        let content = r#"
+[wsl2]
+memory=16GB
+processors=8
+swap=8GB
+swapFile=C:\swap.vhdx
+localhostForwarding=true
+nestedVirtualization=false
+vmIdleTimeout=60000
+guiApplications=true
+debugConsole=false
+pageReporting=true
+safeMode=false
+autoMemoryReclaim=gradual
+networkingMode=mirrored
+dnsTunneling=true
+firewall=false
+"#;
+        let config = parse_wsl_config(content).unwrap();
+
+        assert_eq!(config.memory, Some("16GB".to_string()));
+        assert_eq!(config.processors, Some(8));
+        assert_eq!(config.swap, Some("8GB".to_string()));
+        assert_eq!(config.swap_file, Some("C:\\swap.vhdx".to_string()));
+        assert_eq!(config.localhost_forwarding, Some(true));
+        assert_eq!(config.nested_virtualization, Some(false));
+        assert_eq!(config.vm_idle_timeout, Some(60000));
+        assert_eq!(config.gui_applications, Some(true));
+        assert_eq!(config.debug_console, Some(false));
+        assert_eq!(config.page_reporting, Some(true));
+        assert_eq!(config.safe_mode, Some(false));
+        assert_eq!(config.auto_memory_reclaim, Some("gradual".to_string()));
+        assert_eq!(config.networking_mode, Some("mirrored".to_string()));
+        assert_eq!(config.dns_tunneling, Some(true));
+        assert_eq!(config.firewall, Some(false));
+    }
+
+    #[test]
+    fn test_wsl_config_dns_tunneling_firewall_roundtrip() {
+        let original = WslConfig {
+            networking_mode: Some("mirrored".to_string()),
+            dns_tunneling: Some(true),
+            firewall: Some(false),
+            ..Default::default()
+        };
+
+        let serialized = serialize_wsl_config(&original);
+        assert!(serialized.contains("dnsTunneling=true"));
+        assert!(serialized.contains("firewall=false"));
+
+        let parsed = parse_wsl_config(&serialized).unwrap();
+        assert_eq!(parsed.dns_tunneling, Some(true));
+        assert_eq!(parsed.firewall, Some(false));
+        assert_eq!(parsed.networking_mode, Some("mirrored".to_string()));
+    }
+
+    #[test]
+    fn test_wsl_config_vm_idle_timeout_negative_one_roundtrip() {
+        // Regression for OCT-1258 / GH #129: `-1` is the documented WSL
+        // "never idle-shutdown" sentinel and the app's RDP keep-alive relies on
+        // it. It must survive a parse -> serialize round-trip (previously the
+        // Option<u32> field + unsigned parse dropped it silently on save).
+        let content = "[wsl2]\nvmIdleTimeout=-1\n";
+        let config = parse_wsl_config(content).unwrap();
+
+        assert_eq!(config.vm_idle_timeout, Some(-1));
+
+        let serialized = serialize_wsl_config(&config);
+        assert!(
+            serialized.contains("vmIdleTimeout=-1"),
+            "vmIdleTimeout=-1 must be preserved on save, got:\n{}",
+            serialized
+        );
+    }
+
+    #[test]
+    fn test_parse_wsl_config_with_comments() {
+        let content = r#"
+# This is a comment
+[wsl2]
+; This is also a comment
+memory=8GB
+# Another comment
+processors=4
+"#;
+        let config = parse_wsl_config(content).unwrap();
+
+        assert_eq!(config.memory, Some("8GB".to_string()));
+        assert_eq!(config.processors, Some(4));
+    }
+
+    #[test]
+    fn test_parse_wsl_config_ignores_other_sections() {
+        let content = r#"
+[other]
+memory=16GB
+
+[wsl2]
+memory=8GB
+
+[another]
+memory=4GB
+"#;
+        let config = parse_wsl_config(content).unwrap();
+
+        // Should only parse the [wsl2] section
+        assert_eq!(config.memory, Some("8GB".to_string()));
+    }
+
+    #[test]
+    fn test_parse_wsl_config_empty() {
+        let config = parse_wsl_config("").unwrap();
+
+        assert!(config.memory.is_none());
+        assert!(config.processors.is_none());
+    }
+
+    #[test]
+    fn test_networking_mode_roundtrip_all_values() {
+        // Ensure every documented networkingMode value round-trips through
+        // parse -> serialize without alteration. Mirrors the dropdown options
+        // exposed in the UI.
+        for mode in ["NAT", "mirrored", "virtioproxy", "none", "bridged"] {
+            let input = format!("[wsl2]\nnetworkingMode={}\n", mode);
+            let parsed = parse_wsl_config(&input).unwrap();
+            assert_eq!(parsed.networking_mode.as_deref(), Some(mode));
+
+            let serialized = serialize_wsl_config(&parsed);
+            assert!(
+                serialized.contains(&format!("networkingMode={}", mode)),
+                "serialized output missing networkingMode={}: {}",
+                mode,
+                serialized
+            );
+        }
+    }
+
+    // ==================== WSL Conf Parsing Tests ====================
+
+    #[test]
+    fn test_parse_wsl_conf_basic() {
+        let content = r#"
+[automount]
+enabled=true
+root=/mnt/
+
+[boot]
+systemd=true
+"#;
+        let config = parse_wsl_conf(content).unwrap();
+
+        assert_eq!(config.automount_enabled, Some(true));
+        assert_eq!(config.automount_root, Some("/mnt/".to_string()));
+        assert_eq!(config.boot_systemd, Some(true));
+    }
+
+    #[test]
+    fn test_parse_wsl_conf_all_sections() {
+        let content = r#"
+[automount]
+enabled=true
+mountFsTab=true
+root=/mnt/
+options=metadata,uid=1000
+
+[network]
+generateHosts=true
+generateResolvConf=false
+hostname=myhost
+
+[interop]
+enabled=true
+appendWindowsPath=false
+
+[user]
+default=myuser
+
+[boot]
+systemd=true
+command=/etc/init.d/start.sh
+"#;
+        let config = parse_wsl_conf(content).unwrap();
+
+        assert_eq!(config.automount_enabled, Some(true));
+        assert_eq!(config.automount_mount_fs_tab, Some(true));
+        assert_eq!(config.automount_root, Some("/mnt/".to_string()));
+        assert_eq!(
+            config.automount_options,
+            Some("metadata,uid=1000".to_string())
+        );
+        assert_eq!(config.network_generate_hosts, Some(true));
+        assert_eq!(config.network_generate_resolv_conf, Some(false));
+        assert_eq!(config.network_hostname, Some("myhost".to_string()));
+        assert_eq!(config.interop_enabled, Some(true));
+        assert_eq!(config.interop_append_windows_path, Some(false));
+        assert_eq!(config.user_default, Some("myuser".to_string()));
+        assert_eq!(config.boot_systemd, Some(true));
+        assert_eq!(
+            config.boot_command,
+            Some("/etc/init.d/start.sh".to_string())
+        );
+    }
+
+    // ==================== Serialization Tests ====================
+
+    #[test]
+    fn test_serialize_wsl_config() {
+        let config = WslConfig {
+            memory: Some("8GB".to_string()),
+            processors: Some(4),
+            swap: Some("4GB".to_string()),
+            ..Default::default()
+        };
+
+        let serialized = serialize_wsl_config(&config);
+
+        assert!(serialized.contains("[wsl2]"));
+        assert!(serialized.contains("memory=8GB"));
+        assert!(serialized.contains("processors=4"));
+        assert!(serialized.contains("swap=4GB"));
+    }
+
+    #[test]
+    fn test_serialize_wsl_config_skips_none() {
+        let config = WslConfig {
+            memory: Some("8GB".to_string()),
+            processors: None,
+            ..Default::default()
+        };
+
+        let serialized = serialize_wsl_config(&config);
+
+        assert!(serialized.contains("memory=8GB"));
+        assert!(!serialized.contains("processors"));
+    }
+
+    #[test]
+    fn test_serialize_wsl_conf() {
+        let config = WslConf {
+            automount_enabled: Some(true),
+            automount_root: Some("/mnt/".to_string()),
+            boot_systemd: Some(true),
+            ..Default::default()
+        };
+
+        let serialized = serialize_wsl_conf(&config);
+
+        assert!(serialized.contains("[automount]"));
+        assert!(serialized.contains("enabled=true"));
+        assert!(serialized.contains("root=/mnt/"));
+        assert!(serialized.contains("[boot]"));
+        assert!(serialized.contains("systemd=true"));
+    }
+
+    // ==================== wsl.conf Injection Validation Tests ====================
+
+    #[test]
+    fn test_validate_wsl_conf_accepts_clean_config() {
+        let config = WslConf {
+            automount_root: Some("/mnt/".to_string()),
+            automount_options: Some("metadata,uid=1000".to_string()),
+            network_hostname: Some("my-host".to_string()),
+            user_default: Some("ian".to_string()),
+            boot_command: Some("service docker start; echo ready".to_string()),
+            ..Default::default()
+        };
+        assert!(validate_wsl_conf(&config).is_ok());
+    }
+
+    #[test]
+    fn test_validate_wsl_conf_default_is_ok() {
+        assert!(validate_wsl_conf(&WslConf::default()).is_ok());
+    }
+
+    #[test]
+    fn test_validate_wsl_conf_rejects_newline_in_boot_command() {
+        // The classic root-command-execution carrier: a newline lets the value break out
+        // of the heredoc / inject a new INI line.
+        let config = WslConf {
+            boot_command: Some("echo hi\nWSLCONFEOF\ntouch /tmp/pwned".to_string()),
+            ..Default::default()
+        };
+        assert!(validate_wsl_conf(&config).is_err());
+    }
+
+    #[test]
+    fn test_validate_wsl_conf_rejects_newline_in_hostname() {
+        let config = WslConf {
+            network_hostname: Some("host\n[boot]\ncommand=malicious".to_string()),
+            ..Default::default()
+        };
+        assert!(validate_wsl_conf(&config).is_err());
+    }
+
+    #[test]
+    fn test_validate_wsl_conf_rejects_newline_in_automount_options() {
+        let config = WslConf {
+            automount_options: Some("metadata\nuid=0".to_string()),
+            ..Default::default()
+        };
+        assert!(validate_wsl_conf(&config).is_err());
+    }
+
+    #[test]
+    fn test_validate_wsl_conf_rejects_newline_in_automount_root() {
+        let config = WslConf {
+            automount_root: Some("/mnt/\ninjected".to_string()),
+            ..Default::default()
+        };
+        assert!(validate_wsl_conf(&config).is_err());
+    }
+
+    #[test]
+    fn test_validate_wsl_conf_rejects_newline_in_user_default() {
+        let config = WslConf {
+            user_default: Some("root\ninjected".to_string()),
+            ..Default::default()
+        };
+        assert!(validate_wsl_conf(&config).is_err());
+    }
+
+    // ==================== Round-trip Tests ====================
+
+    #[test]
+    fn test_wsl_config_roundtrip() {
+        let original = WslConfig {
+            memory: Some("8GB".to_string()),
+            processors: Some(4),
+            localhost_forwarding: Some(true),
+            gui_applications: Some(true),
+            ..Default::default()
+        };
+
+        let serialized = serialize_wsl_config(&original);
+        let parsed = parse_wsl_config(&serialized).unwrap();
+
+        assert_eq!(parsed.memory, original.memory);
+        assert_eq!(parsed.processors, original.processors);
+        assert_eq!(parsed.localhost_forwarding, original.localhost_forwarding);
+        assert_eq!(parsed.gui_applications, original.gui_applications);
+    }
+}

@@ -1,0 +1,271 @@
+---
+title: Operations
+description: Define one typed action or query for every client
+sidebarTitle: Operations
+---
+
+Operations are the public behavior of Spacedrive core. Define an operation once
+in Rust, register it, and consume the same input and output from local IPC, web,
+CLI, peer networking, generated clients, skills, and MCP.
+
+## Queries and actions
+
+- A **query** reads state without hidden mutation.
+- An **action** requests a state change.
+
+Both can be core-scoped or library-scoped. Core operations handle daemon and
+library lifecycle. Library operations handle sources, records, organization,
+jobs, and policy.
+
+## Module shape
+
+Keep each feature under its domain:
+
+~~~text
+core/src/ops/files/share/
+├── mod.rs
+├── input.rs
+├── output.rs
+├── action.rs
+└── job.rs
+~~~
+
+Small features can use fewer files. The boundary matters more than the exact
+layout: inputs and outputs are public types, while filesystem and database
+details remain behind the handler.
+
+## Registration
+
+Use registration macros. Never implement the wire trait manually.
+
+~~~rust
+pub struct FileShareAction;
+
+crate::register_library_action!(FileShareAction, "files.share");
+
+impl Action for FileShareAction {
+    type Input = ShareFileInput;
+    type Output = ShareFileOutput;
+
+    async fn run(
+        input: Self::Input,
+        ctx: &ActionContext,
+    ) -> Result<Self::Output, ActionError> {
+        // Validate scope, commit state, and return structured output.
+    }
+}
+~~~
+
+Available macros register core or library queries and actions into the compile
+time inventory.
+
+## Input and output
+
+Public types:
+
+- derive serialization and Specta type metadata;
+- use stable IDs instead of database row numbers;
+- represent unavailable and partial state explicitly;
+- avoid leaking provider-specific secrets;
+- remain backward-compatible within a protocol version.
+
+After changing a public Rust type, regenerate TypeScript:
+
+~~~bash
+cargo run --bin generate_typescript_types
+~~~
+
+Frontend code imports those generated types. It does not redefine or cast them
+away.
+
+## Action lifecycle
+
+An action performs only enough synchronous work to validate the request and
+commit a bounded state change. Long work dispatches a durable job.
+
+Risky mutations follow:
+
+1. **Preview** exact targets, conflicts, cost, and protection consequences.
+2. **Commit** an immutable plan or bounded state change.
+3. **Execute** durable work with progress and cancellation.
+4. **Verify** effects against the origin and content evidence.
+5. **Report** structured output and durable logs.
+
+Not every action needs a preview. Creating a tag can commit directly. Deleting
+the last verified copy cannot.
+
+## Validate and preview
+
+Two opt-in preflight methods answer the questions before an execution, both over the
+action's exact input, so a client validates, previews, and dispatches one
+payload. Validation says whether and how the action would run, as findings
+with stable codes and the facts of the execution; it reads registries and
+rollups, so a dialog re-asks as options change. Preview says what would exist
+afterward, projected from the index; it costs what the action touches and is
+advisory, since the filesystem is live.
+
+~~~rust
+impl ValidatedAction for FileMergeAction {
+    async fn validate(
+        input: &Self::Input,
+        ctx: &PreviewContext,
+    ) -> Result<Validation, ActionError> {
+        // Findings with stable codes, and facts: strategy, estimated bytes.
+    }
+}
+
+impl PreviewableAction for FileMergeAction {
+    type Plan = FsPlan;
+
+    async fn preview(input: Self::Input, ctx: &PreviewContext) -> Result<FsPlan, ActionError> {
+        // The projected changes, read from the index.
+    }
+}
+
+crate::register_validate!(FileMergeAction, "files.merge");
+crate::register_preview!(FileMergeAction, "files.merge");
+~~~
+
+Registration puts `validate:files.merge` and `preview:files.merge` on the wire
+beside `action:files.merge.input`. `PreviewContext` hands out the index, the
+stores, the volume registry, the library, and the plan handles, and nothing
+that writes. Errors refuse and warnings inform: the daemon runs a registered
+validator again when the action is dispatched and refuses on an error
+finding, answering with the findings as JSON behind a `refused:` prefix. A
+warning never blocks, since dispatching anyway is the confirmation. Clients
+get `useLibraryValidate` and `useLibraryPreview`, `CoreClient::validate` and
+`preview`, and `RefusedError`. This is the only validation path: an action
+with a cheap structural check does it in `from_input`, and everything that
+needs the index or the filesystem is a finding.
+
+Every filesystem-mutating action answers both methods: `files.copy`,
+`files.merge`, `files.delete`, `files.rename`, `files.rename_batch`,
+`files.undo`, `files.organize`, `files.flatten`, `files.archive`,
+`files.extract`, `files.set_attributes`, and `files.link`. Their
+plans share one shape, `FsPlan` in `core/src/ops/files/plan.rs`: a summary
+of counts and bytes per kind of change, the changes themselves up to a cap
+that conflicts always survive, the roots the plan pairs, and the store
+revisions it read. Copy and merge build theirs through one planner,
+`core/src/ops/files/planner.rs`, which streams a source folder against its
+destination through the compare engine.
+
+`files.delete` takes three kinds of target, and the job derives the last two
+from the index as it runs: paths named one by one, folder A's files in one set
+of its comparison with folder B, and the surplus copies of duplicated content,
+keeping either the first copy in walk order beneath a folder or the copies the
+caller names. A copy and the copy that stands for it are read in full before
+it goes, and what the reads learn is written back to the stores.
+
+`files.rename` and `files.rename_batch` resolve their new names the way their
+job does (`core/src/ops/files/rename/resolve.rs`): against the live
+directory, read once per parent, and the target volume's filesystem, whose
+name rules live in `rename/naming.rs`. Whether a directory matches names
+without regard to case is probed rather than assumed from the filesystem's
+name. Batch rename applies an ordered list of rules to each name
+(`rename/rules.rs`): replace, case, affix, sequence, and template, with
+tokens for the stem, the extension, a counter, the parent, and dates. The
+plan is one `Move` per changed name and a `Conflict` where two targets want
+one, and the job renames in an order that never overwrites.
+
+## The journal and undo
+
+Every job that changes the filesystem records what it did as effects
+(`core/src/infra/job/journal.rs`), in order, against its own id, in the
+`job_journal` table of the library's job database: `Created`, `Moved`,
+`Trashed` with where the item went, `Replaced` with where the previous
+bytes went, `Removed`, and `Attributes` before and after. Each carries the
+state of its result, size and modification time, so undo can tell whether
+the subject changed since. A job records through `JobContext::record`, and
+a failure to write the journal is logged rather than failing the operation
+that already happened.
+
+The trash reports locations (`core/src/ops/files/trash.rs`): `NSFileManager`
+on macOS, the `trash` crate's listing on Windows and Linux, and on a volume
+with no trash of its own a Spacedrive trash directory at the volume's
+root, `.spacedrive/trash/<job>/`, reached by a rename. An overwrite goes
+through the same door, so a replacement is undoable until the trash is
+emptied. `files.undo` (`core/src/ops/files/undo/`) previews the reverse as
+an `FsPlan` whose basis is the journal, refuses a job still running or with
+nothing to reverse, warns of each subject changed or place taken, and its
+job applies the reverse newest effect first, writing its own journal.
+`jobs.list` carries each job's journal summary and `jobs.journal` the
+effects; `files.trash_list` lists the trashed effects with a location and
+`files.trash_empty` purges them.
+
+The other operations follow the same two rules, one plan shape and one
+journal. Mirror is `remove_extras` on `files.merge`: the planner keeps the
+files only the destination holds across every pair and adds a flagged
+`Delete` for each, and the job trashes them after the merge.
+`files.organize` and `files.flatten` (`core/src/ops/files/organize/`) plan
+moves into new folders from the index and rename in place. `files.archive`
+and `files.extract` (`core/src/ops/files/archive/`) write zip or tar.zst to
+a temporary name and rename it into place, and plan an extract from the
+archive's own directory, refusing an entry that would escape.
+`files.set_attributes` and `files.link` plan one row per file and journal
+enough to reverse.
+
+A plan is browsable. Every preview whose plan is an `FsPlan` is retained in
+memory under a handle for a while after its last use, and
+`files.directory_listing` takes that handle as `overlay`: the listing then
+comes back as the directory would look after the operation, with what the
+plan creates added as rows, and an `overlay` list naming the change at each
+row it touches. Beneath a source the plan consumes, what the operation
+settles is marked as removed. A lapsed handle is an `InvalidInput` error and the
+client previews again. Execution never takes a handle, only the action's
+input.
+
+## Context and authorization
+
+Handlers receive a context that identifies:
+
+- authenticated session or peer;
+- selected library;
+- granted sources and subtrees;
+- allowed query and mutation classes;
+- request and trace IDs;
+- access to approved services.
+
+Operations check capabilities before resolving sensitive data. A handler must
+not infer permission from the fact that a path exists.
+
+## Errors
+
+Return typed errors for invalid input, missing identity, offline origins,
+permission denial, conflicts, provider failure, and verification failure.
+
+Logs explain diagnostics. They are not the API response.
+
+## Events
+
+Publish change events after the durable transaction commits. Clients that react
+to an event must be able to query the new state immediately.
+
+Large operations emit scoped invalidation or batch events instead of one event
+per record.
+
+## Generic clients
+
+The CLI can invoke a registered operation by name:
+
+~~~bash
+sd-cli op sources.list --json '{}'
+~~~
+
+Skills and MCP use the same names and schemas. They do not translate arbitrary
+text into an unregistered shell command.
+
+## Tests
+
+Operation tests cover:
+
+- input validation;
+- authorization at every scope;
+- typed error shape;
+- idempotency or deduplication;
+- transaction rollback;
+- job dispatch and final output;
+- generated client compatibility;
+- event ordering.
+
+See [API](/core/api) for transports and [Jobs](/core/jobs) for durable
+execution.

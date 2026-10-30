@@ -18,7 +18,7 @@
     "@aphrody/runtime-sdk": "npm:@aphrody/bun-runtime-sdk@1.4.4"
   },
   "devDependencies": {
-    "@types/bun": "npm:@aphrody/bun-types@1.4.4"
+    "@types/bun": "1.4.4"
   },
   "engines": {
     "bun": ">=1.4.4"

@@ -34,19 +34,6 @@
       "note": "backing service aphrody-a2a and the aphrody.com vhost are status:retired in tools/config/service-catalog.json / yolo/tools/config/host/nginx/routes.json pending the Aphrody convergence redeploy; this peer record stays as the redeploy shape, not a live endpoint"
     },
     {
-      "id": "shenron",
-      "role": "dragon-ball-knowledge-agent",
-      "application": "shenron",
-      "service": "shenron-mcp",
-      "transport": "https-jsonrpc",
-      "endpoint": "https://mcp.dragonballfr.com/a2a",
-      "agentCard": "https://mcp.dragonballfr.com/.well-known/agent-card.json",
-      "authEnv": "SHENRON_A2A_TOKEN",
-      "status": "retired",
-      "retiredAt": "2026-09-25",
-      "supersededBy": "shenron-mcp dragonball.a2a_* tools over the Shenron site /api/a2a registry (aphrody-labs/shenron)"
-    },
-    {
       "id": "codex",
       "role": "coding-agent",
       "transport": "coord-file",
@@ -84,8 +71,7 @@
     }
   ],
   "policy": {
-    "secrets": "authEnv names an operator-managed environment variable; values never live in Git",
-    "publicSurface": "Shenron (aphrody-labs/shenron) publishes MCP, OAuth and A2A on mcp.dragonballfr.com from the Infra-managed host; admin MCP tools require Bearer authorization"
+    "secrets": "authEnv names an operator-managed environment variable; values never live in Git"
   },
   "codingAgents": {
     "workspace": "repository-root",

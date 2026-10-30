@@ -62,13 +62,6 @@ Use `resultLimit` to request fewer pages. These limits bound the MCP response;
 `maxRequests` controls crawl work. Persistent SQLite frontier paths should be
 provided only when the caller intends to retain crawl state.
 
-### Dragon Ball tools
-
-The `dragonball.*` tools left with the Shenron product: they are served by
-`shenron-mcp` (`shenron:crates/shenron-mcp` in
-[aphrody-labs/shenron](https://github.com/aphrody-labs/shenron)). This server keeps
-only the Aphrody AI gateway Shenron calls (`/api/v1/shenron/*`, below).
-
 ## Transports
 
 `stdio` is the default (line-delimited JSON-RPC over `stdin`/`stdout`). To run
@@ -86,7 +79,7 @@ must forward the MCP session and protocol headers and stream response bodies.
 ### Authentication of `/mcp`
 
 `/mcp` exposes every tool, so it answers only to `Authorization: Bearer <token>`. The token is read once at start from
-`APHRODY_MCP_HTTP_TOKEN`, else from the AI HTTP token (`APHRODY_AI_HTTP_TOKEN`, alias `APHRODY_SHENRON_API_TOKEN`), so a
+`APHRODY_MCP_HTTP_TOKEN`, else from the AI HTTP token (`APHRODY_AI_HTTP_TOKEN`), so a
 gateway that already injects that bearer keeps working; the dedicated name scopes `/mcp` apart from the REST bridge. It
 must be at least 32 bytes (`openssl rand -hex 32`) and belongs in a host `EnvironmentFile`, never in a repository or a
 command line. Without a usable token `/mcp` answers 503 (fail-closed); a missing or wrong header is 401; the comparison is
@@ -100,67 +93,27 @@ example in a `.mcp.json`:
 
 `bun scripts/tools/infra/mcp-tools-count.ts <url> --token-env APHRODY_MCP_HTTP_TOKEN` counts the tools of a running server.
 
-### Shenron AI REST bridge
+### AI REST gateway
 
-The same loopback listener serves `/api/v1/shenron/*`. Set a non-empty
-`APHRODY_SHENRON_API_TOKEN` and send it as `Authorization: Bearer <token>` on
-every request. An unset token returns HTTP 503; a missing or incorrect header
-returns 401. Keep this listener private and apply authentication on any gateway.
+The same loopback listener serves the REST routes below. `/healthz`, the model
+lists, `/api/v1/aphrody/status` and the RAG routes answer without a token.
+`POST /v1/chat/completions` requires `Authorization: Bearer <token>` matching
+`APHRODY_AI_HTTP_TOKEN` whenever the chat upstream has its own credential
+(`APHRODY_AI_CHAT_API_KEY`); an unset gateway token returns HTTP 503 in that
+case, a missing or incorrect header returns 401. Keep this listener private and
+apply authentication on any gateway.
 
-| Route | Request | Response |
-| --- | --- | --- |
-| `GET /api/v1/shenron/health` | None | `{status, capabilities:{rag,llm,ocr}}` |
-| `GET /api/v1/shenron/rag/search?q=...&limit=5` | Optional `lang`, `kind`, `sourceId`, `entity`; `limit` capped at 20 | `{mode:"lexical",results:[{sourceId,originSourceId,title,url,snippet,content,contentTruncated,score,kind,lang,entity}]}` |
-| `GET /api/v1/shenron/rag/document?sourceId=shenron:<rowid>` | Original SQLite chunk identifier | `{document:{sourceId,title,url,kind,snippet,entity,originSourceId}}` or 404 |
-| `GET /api/v1/shenron/rag/stats` | None | `{chunks,vectors:0,sources:[{sourceId,kind,count}]}`; active documents only |
-| `POST /api/v1/shenron/rag/ingest` | `{sourceId,title,url,content,kind?,lang?,originSourceId?,entity?,syncGeneration?}` | `{id,sourceId,indexed:true,retrieval:"lexical"}` |
-| `POST /api/v1/shenron/rag/sync/finish` | `{originSourceId,syncGeneration,expectedCount}` | `{status:"complete",active,retired}` after count verification and logical retirement |
-| `POST /api/v1/shenron/embed` | `{texts:[...],kind:"query"|"passage"}` | `{vectors,model}` from a configured embedding backend |
-| `POST /api/v1/shenron/llm/chat` | `{messages:[{role,content}],model?}` | `{answer,model}` |
-| `POST /api/v1/shenron/ocr` | `{image_base64,language?,engine?,model?,include_geometry?}` | `{text,language,languageApplied:false,textless,suspect,findings,model,elapsed_ms,blocks?,quality?}` |
-| `POST /api/v1/shenron/vision/structured` | `{image_base64,image_mime,prompt,model?,reasoning_effort?}` | `{result,model}`; `result` is parsed JSON from the vision backend |
+| Route | Response |
+| --- | --- |
+| `GET /healthz` | `{status:"ok",service}` |
+| `GET /api/v1/models` | Registered local models |
+| `GET /v1/models` | OpenAI-format model list |
+| `POST /v1/chat/completions` | Relay (JSON or SSE) to the chat upstream at `APHRODY_AI_CHAT_BASE_URL`; 503 when unconfigured |
+| `GET /api/v1/aphrody/status` | Subsystem status and chat upstream reachability |
+| `GET /api/v1/rag/query?q=...&limit=5` | Keyword hits over `aphrody_rag_documents` (`limit` capped at 20) |
+| `GET /api/v1/rag/stats` | Document and chunk counts, `unavailable` without the database |
 
-RAG uses `APHRODY_MCP_DATABASE_URL` and writes `corpus='shenron'` in
-`aphrody_rag_documents`. Search also reads the existing `dragonball_shenron`
-corpus. A Shenron SQLite chunk can use `sourceId:"shenron:<rowid>"` for stable,
-idempotent export. Its original `rag_chunks.source_id` goes in `originSourceId`.
-`kind`, `lang`, `originSourceId` and `entity` are stored in document metadata.
-Search filters use exact metadata equality; older records without these keys
-cannot match the corresponding filter. Retrieval is lexical, with title, URL,
-content and document type contributing to the score. Returned URLs are
-deduplicated while distinct manga pages remain separate. `content` carries at
-most 8192 characters per hit, enough for Shenron's default 6000-character
-citation context. Scores are not vector similarity. Ingestion does not generate
-vector chunks. A completed source generation marks its older documents
-`metadata.visible=false`; they remain stored and are excluded from search and
-statistics. The embedding route requires `APHRODY_SHENRON_EMBED_MODEL` and an
-OpenAI-compatible `/embeddings` backend at `APHRODY_SHENRON_EMBED_BASE_URL`
-(defaulting to the LLM backend URL). The LLM route uses an
-OpenAI-compatible server at `APHRODY_SHENRON_LLM_BASE_URL` (default
-`http://127.0.0.1:8080/v1`); `APHRODY_SHENRON_LLM_MODEL` defaults to `local`.
-OCR needs a binary built with `--features ocr`; `image_base64` is raw padded
-base64, without a data URL prefix. The `language` field is returned to the
-caller but is not applied to the Aphrody OCR engine. OCR preserves textless and
-suspect results so a caller can hold back an uncertain transcription.
-The OCR route accepts a 24 MiB JSON request body and the OCR engine accepts at
-most 16 MiB decoded image bytes. Set `engine:"ppocr"` and
-`include_geometry:true` to receive original-pixel polygons and confidence
-scores; this is the geometry contract used by Shenron's manga batches.
-The Aphrody CLI `ocr audit` reads both v2 OCR records and historical JSONL;
-it refuses malformed records and pages marked unreadable or needing review.
-The vision route sends the image and prompt to the OpenAI-compatible backend
-at `APHRODY_SHENRON_VISION_BASE_URL` (defaults to the Shenron LLM backend URL).
-Set `APHRODY_SHENRON_VISION_MODEL` to a model that accepts images and returns
-JSON. Shenron's manga reviewer requests `gpt-5.6-luna` and `low` reasoning;
-the backend must return that model identifier. The caller validates the
-structured review and independent coverage audit before editorial deposit.
-
-The same implementation is available to trusted local MCP clients as
-`aphrody_shenron_rag_search`, `aphrody_shenron_rag_ingest`, and
-`aphrody_shenron_llm_chat`; `aphrody_shenron_ocr` is present only with the
-`ocr` feature. MCP calls use the local process authority and do not need the
-REST Bearer token. These tools operate the Aphrody AI backend; editorial DBFR
-commands remain in Shenron.
+RAG routes use `APHRODY_MCP_DATABASE_URL`.
 
 ## Cross-platform
 

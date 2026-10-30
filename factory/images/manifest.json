@@ -8,18 +8,21 @@
   "sources": "~/.local/share/bun-os/sources",
   "pins": {
     "bun": {
+      "repository": "oven-sh/bun",
       "version": "1.4.4",
-      "revision": "b2bcad9e46d80efba97fb60ef454abc1ebba9290",
-      "note": "Same aphrody-labs/bun build as factory/usr/pkgs/bun-aphrody; glibc x86_64 only.",
-      "file": "bun-aphrody-1.4.4-linux-x64.tar.gz",
-      "url": "https://github.com/aphrody-labs/bun/releases/download/native-candidate-20261014-b2bcad9e46/bun-linux-x64.tar.gz",
-      "sha256": "f3b26a658539d7ee33ab049d6c357355b46a492492012c9d1a1db9d59d192b93"
+      "revision": "11c367163a4baa77d3627d14764c376c856a630a",
+      "note": "Official upstream canary bun@1.4.4-canary.20261028.1 (npm @oven/bun-linux-x64, dist.integrity sha512-TZGwV33dDiiHJuszDGUB1QIyB6kTL6WTF0EyZfbNcvAq9kN3wFkhqa6nSyu4SrJtwz6T81+/pgNm4FHzVYIBOw==); same build as factory/usr/pkgs/bun-canary; glibc x86_64 only.",
+      "file": "bun-linux-x64-1.4.4-canary.20261028.1.tgz",
+      "url": "https://registry.npmjs.org/@oven/bun-linux-x64/-/bun-linux-x64-1.4.4-canary.20261028.1.tgz",
+      "sha256": "a9b0e5d28fa06e6ff548da99de85e6e7cfe95a536603b0ad1a9252a906f6796c",
+      "licenseUrl": "https://raw.githubusercontent.com/oven-sh/bun/11c367163a4baa77d3627d14764c376c856a630a/LICENSE.md",
+      "licenseSha256": "5f555cf60a9004284bd44f769953995386c0fc628133f49ea52a2e69b95af3a6"
     },
     "bun-musl": {
-      "repository": "aphrody-labs/bun",
-      "version": "1.4.6",
-      "revision": "4bece04a9928383aacf36fc66620b8ef0a79e6b2",
-      "note": "Source candidate only. Build requires local fork musl binaries and native target qualification receipts; no upstream runtime substitution."
+      "repository": "oven-sh/bun",
+      "version": "1.4.4",
+      "revision": "11c367163a4baa77d3627d14764c376c856a630a",
+      "note": "Official @oven/bun-linux-x64-musl and @oven/bun-linux-aarch64-musl packages of bun@1.4.4-canary.20261028.1. The Alpine build still requires native target qualification receipts for the exact binaries."
     },
     "ubuntu": {
       "version": "26.10",

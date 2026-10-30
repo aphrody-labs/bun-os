@@ -1,0 +1,35 @@
+# Maintainer: aphrody-dev <contact@aphrody.com>
+# Upstream Bun canary, unmodified: the musl binary that oven-sh publishes on npm.
+# No musl package exists in Alpine (verified on v3.24 and edge, 2026-10-29).
+pkgname=bun
+_npmver=1.4.4-canary.20261028.1
+pkgver=1.4.4_git20261028
+pkgrel=0
+pkgdesc="Bun JavaScript runtime and toolkit (upstream canary, musl build)"
+url="https://bun.com"
+arch="x86_64 aarch64"
+license="MIT"
+depends="libgcc libstdc++"
+options="!check !strip !tracedeps"
+source="
+	bun-linux-x64-musl-$_npmver.tgz::https://registry.npmjs.org/@oven/bun-linux-x64-musl/-/bun-linux-x64-musl-$_npmver.tgz
+	bun-linux-aarch64-musl-$_npmver.tgz::https://registry.npmjs.org/@oven/bun-linux-aarch64-musl/-/bun-linux-aarch64-musl-$_npmver.tgz
+	"
+builddir="$srcdir"
+
+package() {
+	local a
+	case "$CARCH" in
+		x86_64) a=x64 ;;
+		aarch64) a=aarch64 ;;
+	esac
+	mkdir -p "$srcdir/x"
+	tar -xzf "$srcdir/bun-linux-$a-musl-$_npmver.tgz" -C "$srcdir/x"
+	install -Dm755 "$srcdir/x/package/bin/bun" "$pkgdir/usr/bin/bun"
+	ln -s bun "$pkgdir/usr/bin/bunx"
+}
+
+sha512sums="
+0832b56d0cdbc7f14b79164456bd8f84ae6388e9c14db56ac143727728b3ffde475f4b8b3e3cee608dce4c139ef7e176510c9b54ccb66b1c7300333d10e3b480  bun-linux-x64-musl-1.4.4-canary.20261028.1.tgz
+a5968e8df5d7c49604c38733f38dcefb32d4086a475f3c9b96b7e3f6bb15dfed479ed29ccfb480d23ae0ce37126a83714c76b92db02b51f251c4d6b79b81401e  bun-linux-aarch64-musl-1.4.4-canary.20261028.1.tgz
+"

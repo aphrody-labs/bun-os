@@ -466,7 +466,7 @@ mod launch_tests {
             let result = Rc::clone(&observed);
             app.connect_command_line(move |_, command_line| {
                 *result.borrow_mut() = Some(launch_options(command_line));
-                0
+                0.into()
             });
             assert_eq!(app.run_with_args(&arguments), glib::ExitCode::SUCCESS);
             let (actual_game, actual_fullscreen) = observed.borrow_mut().take().unwrap();

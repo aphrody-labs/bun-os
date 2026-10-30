@@ -19,11 +19,7 @@ pub(crate) fn profile_state_root(config: &Config) -> miette::Result<PathBuf> {
 }
 
 fn profile_state_root_at(base: &Path, workspace: &Path, active_profile: Option<&str>) -> PathBuf {
-    if let Some(profile) = active_profile {
-        let profile = aphrody_agent_home::paths::sanitize_profile(profile);
-        if profile == "dbfr" && workspace == base.join("workspaces").join("dbfr") {
-            return base.join("profiles").join(profile);
-        }
+    if active_profile.is_some() {
         return workspace.to_path_buf();
     }
     base.to_path_buf()

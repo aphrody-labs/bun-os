@@ -1,0 +1,118 @@
+name: WSL kernel (7.3 + Rust)
+
+on:
+  workflow_dispatch:
+    inputs:
+      kver:
+        description: Mainline version
+        default: "7.3"
+  push:
+    branches: [main, os]
+    paths:
+      - factory/wsl/kernel/**
+      - .github/workflows/wsl-kernel.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wsl-kernel-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            factory/wsl
+            factory/kernel/linux-bun/keys
+          sparse-checkout-cone-mode: true
+      - name: Toolchain (rustc >= 1.85, bindgen >= 0.71.1, LLVM)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clang lld llvm libclang-dev flex bison bc libssl-dev libelf-dev dwarves zstd gnupg xz-utils cpio e2fsprogs qemu-utils
+          rustup toolchain install stable --profile minimal --component rust-src
+          rustup default stable
+          cargo install bindgen-cli --version 0.71.1 --locked
+          rustc --version
+          bindgen --version
+      - name: Build
+        env:
+          KVER: ${{ inputs.kver || '7.3' }}
+        run: factory/wsl/kernel/build-wsl-kernel.sh "$PWD" "$RUNNER_TEMP/k" "$PWD/out"
+      - name: Size and time report
+        if: always()
+        run: |
+          {
+            echo '### WSL kernel build'
+            echo '```json'
+            cat out/report.json 2>/dev/null || echo 'not built'
+            echo '```'
+            echo '```'
+            cat out/rustavailable.txt 2>/dev/null
+            echo '```'
+          } >>"$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wsl-kernel-${{ inputs.kver || '7.3' }}
+          path: |
+            out/perf-build.log
+            out/bzImage
+            out/modules.vhdx
+            out/config
+            out/report.json
+            out/rustavailable.txt
+            out/tools.txt
+          if-no-files-found: warn
+
+  nvidia-open-build-check:
+    name: nvidia-open 615.78.08 against kernel ${{ matrix.kver }} headers (bare-metal linux-bun, not WSL)
+    runs-on: ubuntu-latest
+    # Advisory: 615.78.08 is the newest driver NVIDIA has published (also the newest tag of our fork) and it is not ready for kernels 7.2/7.3.
+    # The out-of-tree driver follows NVIDIA upstream, not this repository, and each CI run finds another removed kernel API. The compile
+    # check stays as the regression probe: the day a newer driver tag exists, bump the pinned tag and SHA below and drop continue-on-error.
+    # The kernel job above remains blocking.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        kver: ["7.2.11", "7.3"]
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: factory/kernel/linux-bun/nvidia
+          sparse-checkout-cone-mode: true
+      - name: Build kernel-open against v7.3 headers
+        env:
+          IGNORE_MISSING_MODULE_SYMVERS: "1"  # modules_prepare does not produce Module.symvers; this is a compile check only
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential flex bison bc libssl-dev libelf-dev xz-utils curl clang lld llvm dwarves
+          curl -fsSLO https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-${{ matrix.kver }}.tar.xz
+          tar xf linux-${{ matrix.kver }}.tar.xz
+          git clone --depth 1 --branch 615.78.08 https://github.com/aphrody-labs/open-gpu-kernel-modules.git nv
+          test "$(git -C nv rev-parse HEAD)" = 1a82fbfda8f321b056eb3568850f9316c5e465c5
+          # CachyOS 7.3 patches (0001, 0002, 0004; 0003 is already in 615.78.08), then:
+          # 615.78.08 uses del_timer_sync(), gone from the kernel; timer_delete_sync() is the replacement (first CI run: implicit declaration error on 7.2.11 and 7.3)
+          for p in factory/kernel/linux-bun/nvidia/patches/*.patch; do git -C nv apply "$GITHUB_WORKSPACE/$p"; done
+          grep -rl 'del_timer_sync' nv/kernel-open | xargs sed -i 's/del_timer_sync/timer_delete_sync/g'
+          # The compile check has no Module.symvers, so the driver's conftest cannot see that hrtimer_setup() is exported and falls back to
+          # hrtimer_init(), which kernels since 6.15 no longer have. Both kernels under test are newer than that.
+          sed -i 's/^#if NV_IS_EXPORT_SYMBOL_PRESENT_hrtimer_setup/#if 1/' nv/kernel-open/nvidia/nv-nano-timer.c
+          # sys_close() is gone from kernels 6.x+; close_fd() is the in-kernel replacement.
+          sed -i 's/sys_close(fd)/close_fd(fd)/' nv/kernel-open/nvidia/nv-caps.c
+          # iowrite64() needs the 64-bit MMIO helpers include since linux/io.h stopped pulling them in.
+          sed -i '0,/^#include/s//#include <linux\/io-64-nonatomic-lo-hi.h>\n#include/' nv/kernel-open/nvidia-uvm/uvm_ats_sva.c
+          make -C linux-${{ matrix.kver }} defconfig modules_prepare -j"$(nproc)"
+          make -C nv modules -j"$(nproc)" SYSSRC="$PWD/linux-${{ matrix.kver }}" SYSOUT="$PWD/linux-${{ matrix.kver }}" 2>&1 | tee nv-build.log | tail -n 60
+          ls -l nv/kernel-open/*.ko
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nvidia-open-615.78.08-vs-${{ matrix.kver }}
+          path: nv-build.log

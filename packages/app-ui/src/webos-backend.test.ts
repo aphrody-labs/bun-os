@@ -5,7 +5,6 @@ import { afterAll, afterEach, beforeEach, expect, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { fileURLToPath } from "node:url";
 import { memoryImageStore, openWebOs } from "@aphrody/webos-wasm";
-import { SpacedriveClient } from "@aphrody/drive-client";
 import {
   setWebOsForTesting,
   wantsHttpBackend,
@@ -63,36 +62,36 @@ test("RAG search and stats come from the Rust module", async () => {
   expect(await webOsRagStats()).toEqual({ documents: 2, chunks: 2 });
 });
 
-test("the explorer client lists, creates through the terminal, renames and deletes", async () => {
-  const client = new SpacedriveClient(webOsTransport());
-  const libraries = await client.execute<unknown, { id: string; name: string }[]>("query:libraries.list", {});
-  client.setCurrentLibrary(libraries[0]!.id);
+test("the explorer wire protocol lists, renames and deletes through the Rust VFS", async () => {
+  const transport = webOsTransport();
+  const call = async (kind: "Query" | "Action", method: string, payload: unknown) => {
+    const reply = (await transport.sendRequest({ [kind]: { method, library_id: null, payload } })) as {
+      json?: unknown;
+      error?: string;
+    };
+    if (reply.error) throw new Error(reply.error);
+    return reply.json;
+  };
   const os = await (await import("./webos-backend")).getWebOs();
-  const terminal = os.terminal(80, 24);
-  terminal.type("mkdir photos\recho hi > photos/note.txt\r");
-  const listing = await client.execute<unknown, { files: { name: string; kind: string }[] }>(
-    "query:files.directory_listing",
-    {
-      path: sd("/home/user"),
-      limit: null,
-      include_hidden: null,
-      sort_by: "name",
-      folders_first: true,
-    },
-  );
+  os.fs.mkdir("/home/user/photos");
+  os.fs.write("/home/user/photos/note.txt", new TextEncoder().encode("hi\n"));
+  const listing = (await call("Query", "query:files.directory_listing", {
+    path: sd("/home/user"),
+    limit: null,
+    include_hidden: null,
+    sort_by: "name",
+    folders_first: true,
+  })) as { files: { name: string; kind: string }[] };
   expect(listing.files.map(f => [f.name, f.kind])).toEqual([["photos", "Directory"]]);
-  await client.execute("action:files.rename", {
-    target: sd("/home/user/photos/note.txt"),
-    new_name: "renamed.txt",
-  });
+  await call("Action", "action:files.rename", { target: sd("/home/user/photos/note.txt"), new_name: "renamed.txt" });
   expect(new TextDecoder().decode(os.fs.read("/home/user/photos/renamed.txt"))).toBe("hi\n");
-  await client.execute("action:files.delete", {
+  await call("Action", "action:files.delete", {
     targets: { paths: [sd("/home/user/photos")] },
     permanent: true,
     recursive: true,
   });
   await expect(
-    client.execute("query:files.directory_listing", {
+    call("Query", "query:files.directory_listing", {
       path: sd("/home/user/photos"),
       limit: null,
       include_hidden: null,

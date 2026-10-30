@@ -9,7 +9,7 @@ use aphrody_m3_tokens::{color_math::hex_from_argb, scheme::Role};
 use std::path::PathBuf;
 
 fn repo_root() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../docs/aphrody/crates")
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
 fn snapshot(theme: &TerminalTheme) -> String {

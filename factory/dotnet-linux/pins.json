@@ -1,0 +1,145 @@
+{
+  "note": "Pinned upstream inputs of factory/dotnet-linux. Every archive is verified against the hash below before extraction; nothing is fetched unpinned. Regenerate with `bun factory/dotnet-linux/refresh.ts`.",
+  "observedAt": "2026-10-29",
+  "dotnet": {
+    "10.0": {
+      "channel": "10.0",
+      "supportPhase": "active",
+      "releaseType": "lts",
+      "release": "10.0.14",
+      "releaseDate": "2026-10-25",
+      "sdk": "10.0.403",
+      "runtime": "10.0.14",
+      "aspnetcore": "10.0.14",
+      "metadata": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json",
+      "assets": {
+        "linux-x64": {
+          "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.403/dotnet-sdk-10.0.403-linux-x64.tar.gz",
+          "sha512": "b7b3d8461cf98b07d2552ce9199702fa3ad010ac2671a5f8cd5136f7534e50f6855ba7bbb02b11494563f1d04156276a31cda1103b900e5eecd0d9473dc7b9c5"
+        },
+        "linux-arm64": {
+          "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.403/dotnet-sdk-10.0.403-linux-arm64.tar.gz",
+          "sha512": "0966aa2b70f4677b8319be9df447a78a0dcd6164836425b55a68fd714f4023feb87b4cac21b9a996b79472ad54487cd0adcd2a9dfd570e2b2a1d26423a2baa9b"
+        },
+        "linux-musl-x64": {
+          "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.403/dotnet-sdk-10.0.403-linux-musl-x64.tar.gz",
+          "sha512": "7c85806aeb15b5c02e282234532ac599f69409e45ba4ef09c13e848441d3a092c4e030efaaecbd271896c4137429c90daf3f44ca9805fa27468cc2323c670ac8"
+        },
+        "linux-musl-arm64": {
+          "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.403/dotnet-sdk-10.0.403-linux-musl-arm64.tar.gz",
+          "sha512": "a5a881429e879f0ff01e84a768dbc022e7fed0f4c2fe4936c0bec134fa184d16b42f98e1e43bc1c0fea5e9ce442fe57efc87bdc04023e337f9b0013c849bc2b1"
+        }
+      }
+    },
+    "11.0": {
+      "channel": "11.0",
+      "supportPhase": "go-live",
+      "releaseType": "sts",
+      "release": "11.0.0-rc.3",
+      "releaseDate": "2026-10-25",
+      "sdk": "11.0.100-rc.3.26522.148",
+      "runtime": "11.0.0-rc.3.26522.148",
+      "aspnetcore": "11.0.0-rc.3.26522.148",
+      "metadata": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/11.0/releases.json",
+      "assets": {
+        "linux-x64": {
+          "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/11.0.100-rc.3.26522.148/dotnet-sdk-11.0.100-rc.3.26522.148-linux-x64.tar.gz",
+          "sha512": "77ef603622f0632ce59fc631871c9d0ec0c7402399837c659ead5b6fc7ea898f7f64a2632ecdc8d3330e608307416a36bff90a4d10179210489676167b9b80da"
+        },
+        "linux-arm64": {
+          "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/11.0.100-rc.3.26522.148/dotnet-sdk-11.0.100-rc.3.26522.148-linux-arm64.tar.gz",
+          "sha512": "e8788cba187792a64bdc5493da4c29066070f3996b0d7899d4f4ace2f76f7f101217e88834522394aa00e306f1c9506faf74f5cd2379fbee314b00ac8f34bb5b"
+        },
+        "linux-musl-x64": {
+          "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/11.0.100-rc.3.26522.148/dotnet-sdk-11.0.100-rc.3.26522.148-linux-musl-x64.tar.gz",
+          "sha512": "9dbe557101abd45a141396c7029398451c33414edd899410c38848c40ac268b613eef973b0102af82c376ec7b9f5d89c63b01c9bc15abc59cc395980fb0c50c2"
+        },
+        "linux-musl-arm64": {
+          "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/11.0.100-rc.3.26522.148/dotnet-sdk-11.0.100-rc.3.26522.148-linux-musl-arm64.tar.gz",
+          "sha512": "f4df5332e05941eca167ad3c0cb795fa2f1335ff6d46f3b757b5616481e70cfab08a0b718902eef7232b082f70a54c6846e1a08b7167330fdd9acdb767615735"
+        }
+      }
+    }
+  },
+  "powershell": {
+    "stable": {
+      "tag": "v7.6.9",
+      "version": "7.6.9",
+      "publishedAt": "2026-10-25T17:26:05Z",
+      "release": "https://github.com/PowerShell/PowerShell/releases/tag/v7.6.9",
+      "assets": {
+        "linux-x64": {
+          "url": "https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz",
+          "sha256": "1da6d6d6035d651f20e70ddee7c4c15ac6ab8b9fb40ee92240d91263f28a884b",
+          "size": 73399520
+        },
+        "linux-arm64": {
+          "url": "https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-arm64.tar.gz",
+          "sha256": "02eb9991af447c7e7fe881acde195961afd397c40b8eb1c2b3856b84ec2d85f2",
+          "size": 69453981
+        },
+        "linux-musl-x64": {
+          "url": "https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-musl-x64.tar.gz",
+          "sha256": "f83df6705edaae07db970dcc6c34ad6583d33a2f6199f1b55cdc5354fbb9001c",
+          "size": 73376883
+        }
+      }
+    },
+    "preview": {
+      "tag": "v7.7.0-preview.5",
+      "version": "7.7.0-preview.5",
+      "publishedAt": "2026-09-23T18:36:43Z",
+      "release": "https://github.com/PowerShell/PowerShell/releases/tag/v7.7.0-preview.5",
+      "assets": {
+        "linux-x64": {
+          "url": "https://github.com/PowerShell/PowerShell/releases/download/v7.7.0-preview.5/powershell-7.7.0-preview.5-linux-x64.tar.gz",
+          "sha256": "8f7af867391fdc90b526c28a427f0babf643f489d76bd407907ce9e236a4d5cf",
+          "size": 78007957
+        },
+        "linux-arm64": {
+          "url": "https://github.com/PowerShell/PowerShell/releases/download/v7.7.0-preview.5/powershell-7.7.0-preview.5-linux-arm64.tar.gz",
+          "sha256": "8351d5da4a6442fc941c6bcb62000989cacc812a47ccf26ea98af663ed51891f",
+          "size": 73924364
+        },
+        "linux-musl-x64": {
+          "url": "https://github.com/PowerShell/PowerShell/releases/download/v7.7.0-preview.5/powershell-7.7.0-preview.5-linux-musl-x64.tar.gz",
+          "sha256": "32a274d5a9f03d946a2bca7ccc2f28947b3a9ee87261949edfcb919c36e48ceb",
+          "size": 77961889
+        }
+      }
+    }
+  },
+  "distro": {
+    "arch": {
+      "repo": {
+        "dotnet-sdk": "extra/10.0.13.sdk113-1",
+        "dotnet-runtime": "extra/10.0.13.sdk113-1",
+        "aspnet-runtime": "extra/10.0.13.sdk113-1"
+      },
+      "aur": {
+        "dotnet-sdk-bin": "10.0.14.sdk403-1",
+        "dotnet-sdk-preview-bin": "1:11.0.0.sdk100rc2.26504.105-1",
+        "powershell-bin": "7.6.9-1",
+        "powershell-preview-bin": "7.7.0preview5-1"
+      }
+    },
+    "alpine": {
+      "branch": "v3.24",
+      "packages": {
+        "aspnetcore10-runtime": "community/10.0.13-r0",
+        "aspnetcore8-runtime": "community/8.0.32-r0",
+        "aspnetcore9-runtime": "community/9.0.21-r0",
+        "dotnet10-runtime": "community/10.0.13-r0",
+        "dotnet10-sdk": "community/10.0.303-r1",
+        "dotnet10-sdk-aot": "community/10.0.303-r1",
+        "dotnet8-runtime": "community/8.0.32-r0",
+        "dotnet8-sdk": "community/8.0.132-r0",
+        "dotnet9-runtime": "community/9.0.21-r0",
+        "dotnet9-sdk": "community/9.0.122-r0",
+        "dotnet9-sdk-aot": "community/9.0.122-r0",
+        "powershell": "community/7.6.1-r0"
+      },
+      "powershellPackaged": true
+    }
+  }
+}

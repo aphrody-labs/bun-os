@@ -76,19 +76,19 @@
       "steps": [
         {
           "repo": "iecode",
-          "command": ["run", "--filter", "@rosegriffon/inagle", "lint"]
+          "command": ["run", "--filter", "@aphrody/inagle", "lint"]
         },
         {
           "repo": "iecode",
-          "command": ["run", "--filter", "@rosegriffon/inagle", "typecheck"]
+          "command": ["run", "--filter", "@aphrody/inagle", "typecheck"]
         },
         {
           "repo": "iecode",
-          "command": ["run", "--filter", "@rosegriffon/inagle", "test"]
+          "command": ["run", "--filter", "@aphrody/inagle", "test"]
         },
         {
           "repo": "iecode",
-          "command": ["run", "--filter", "@rosegriffon/inagle", "build"]
+          "command": ["run", "--filter", "@aphrody/inagle", "build"]
         }
       ]
     },
@@ -98,11 +98,11 @@
       "steps": [
         {
           "repo": "iecode",
-          "command": ["run", "--filter", "@rosegriffon/inagle-cross", "lint"]
+          "command": ["run", "--filter", "@aphrody/inagle-cross", "lint"]
         },
         {
           "repo": "iecode",
-          "command": ["run", "--filter", "@rosegriffon/inagle-cross", "typecheck"]
+          "command": ["run", "--filter", "@aphrody/inagle-cross", "typecheck"]
         }
       ]
     }

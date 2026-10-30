@@ -127,6 +127,7 @@ pub fn dump_compressor_command(payload: &CompressorPayload, dump: &mut String) {
     let _ = writeln!(dump);
 }
 
+#[allow(clippy::approx_constant)] // hardware-exact coefficients (log2(10), ln(2)) from the audio renderer
 pub fn set_compressor_effect_parameter(
     params: &compressor::ParameterVersion2,
     state: &mut CompressorState,
@@ -161,6 +162,7 @@ pub fn initialize_compressor_effect(
     set_compressor_effect_parameter(params, state);
 }
 
+#[allow(clippy::approx_constant)] // hardware-exact coefficients (log2(10), ln(2)) from the audio renderer
 pub fn apply_compressor_effect(
     payload: &CompressorPayload,
     state: &mut CompressorState,

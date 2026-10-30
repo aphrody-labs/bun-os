@@ -1,9 +1,0 @@
-{
-  "family": "rometadata",
-  "dll": "rometadata.dll",
-  "metadata": "Microsoft.Windows.SDK.Win32Metadata 71.0.30-preview",
-  "namespaces": ["System.WinRT.Metadata"],
-  "functions": {
-    "MetaDataGetDispenser": ["hr", ["*s16:Foundation.GUID", "*s16:Foundation.GUID", "p"], ["rclsid", "riid", "ppv"], 0]
-  }
-}

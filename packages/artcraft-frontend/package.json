@@ -34,7 +34,7 @@
     "@react-oauth/google": "^0.13.4",
     "@react-spring/web": "^10.0.1",
     "@sparkjsdev/spark": "^0.1.10",
-    "@tauri-apps/plugin-http": "catalog:",
+    "@artcraft/plugin-http": "workspace:*",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "culori": "^4.0.1",
@@ -70,7 +70,7 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
-    "@aphrody/bun-types": "catalog:",
+    "bun-types": "catalog:",
     "@playwright/test": "catalog:",
     "@remix-run/node": "catalog:",
     "@tailwindcss/postcss": "catalog:",
@@ -90,6 +90,6 @@
     "tslib": "^2.3.0"
   },
   "engines": {
-    "bun": "1.4.4"
+    "bun": "1.4.4-canary.20261028.1"
   }
 }
