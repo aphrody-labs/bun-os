@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aphrody-webos-protocol"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license = "Apache-2.0"
+description = "Wire contract of aphrody.com shared by the Rust server and the Rust wasm client: OS catalog, sessions, signalling, input, health."
+publish = false
+
+[dependencies]
+serde = { workspace = true }
+
+[lints]
+workspace = true
