@@ -1296,3 +1296,35 @@
 [submodule "vendor/pop-upgrade"]
 	path = vendor/pop-upgrade
 	url = https://github.com/aphrody-labs/pop-upgrade.git
+[submodule "vendor/cemu"]
+	path = vendor/cemu
+	url = https://github.com/aphrody-labs/Cemu.git
+	shallow = true
+[submodule "vendor/rpcs3"]
+	path = vendor/rpcs3
+	url = https://github.com/aphrody-labs/rpcs3.git
+	shallow = true
+[submodule "vendor/xemu"]
+	path = vendor/xemu
+	url = https://github.com/aphrody-labs/xemu.git
+	shallow = true
+[submodule "vendor/flycast"]
+	path = vendor/flycast
+	url = https://github.com/aphrody-labs/flycast.git
+	shallow = true
+[submodule "vendor/vita3k"]
+	path = vendor/vita3k
+	url = https://github.com/aphrody-labs/Vita3K.git
+	shallow = true
+[submodule "vendor/shadps4"]
+	path = vendor/shadps4
+	url = https://github.com/aphrody-labs/shadPS4.git
+	shallow = true
+[submodule "vendor/umu-launcher"]
+	path = vendor/umu-launcher
+	url = https://github.com/aphrody-labs/umu-launcher.git
+	shallow = true
+[submodule "vendor/proton-ge-custom"]
+	path = vendor/proton-ge-custom
+	url = https://github.com/aphrody-labs/proton-ge-custom.git
+	shallow = true
