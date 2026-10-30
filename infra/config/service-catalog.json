@@ -125,17 +125,6 @@
       "host": "vps"
     },
     {
-      "id": "aphrody-reserved",
-      "application": "aphrody",
-      "kind": "nginx-static",
-      "runtime": "none",
-      "sourceRepo": "aphrody",
-      "publicProxy": "nginx",
-      "note": "reserved hosts bot, mcp, nie and admin on aphrody.com: valid HTTPS answering 410 JSON from nginx (vhost nginx/aphrody/reserved.aphrody.com.conf) until a backend is declared; no application origin and no unit.",
-      "public": true,
-      "host": "vps"
-    },
-    {
       "id": "aphrody-ai-gateway-omar",
       "application": "aphrody",
       "kind": "openai-compatible-gateway",

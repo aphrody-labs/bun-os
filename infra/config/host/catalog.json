@@ -406,12 +406,6 @@
       "site": "os.aphrody.com"
     },
     {
-      "file": "nginx/aphrody/reserved.aphrody.com.conf",
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "site": "reserved.aphrody.com"
-    },
-    {
       "file": "nginx/aphrody/downloads.aphrody.com.conf",
       "ownerRepo": "aphrody",
       "targetHost": "vps",

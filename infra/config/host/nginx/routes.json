@@ -28,42 +28,6 @@
       "vhost": "nginx/aphrody/os.aphrody.com.conf"
     },
     {
-      "host": "bot.aphrody.com",
-      "service": "aphrody-reserved",
-      "upstream": "static:410",
-      "probePath": "/",
-      "response": 410,
-      "reservedAt": "2026-10-10",
-      "vhost": "nginx/aphrody/reserved.aphrody.com.conf"
-    },
-    {
-      "host": "mcp.aphrody.com",
-      "service": "aphrody-reserved",
-      "upstream": "static:410",
-      "probePath": "/",
-      "response": 410,
-      "reservedAt": "2026-10-10",
-      "vhost": "nginx/aphrody/reserved.aphrody.com.conf"
-    },
-    {
-      "host": "nie.aphrody.com",
-      "service": "aphrody-reserved",
-      "upstream": "static:410",
-      "probePath": "/",
-      "response": 410,
-      "reservedAt": "2026-10-10",
-      "vhost": "nginx/aphrody/reserved.aphrody.com.conf"
-    },
-    {
-      "host": "admin.aphrody.com",
-      "service": "aphrody-reserved",
-      "upstream": "static:410",
-      "probePath": "/",
-      "response": 410,
-      "reservedAt": "2026-10-10",
-      "vhost": "nginx/aphrody/reserved.aphrody.com.conf"
-    },
-    {
       "host": "downloads.aphrody.com",
       "service": "aphrody-downloads",
       "upstream": "127.0.0.1:8797",
@@ -103,11 +67,11 @@
   ],
   "internal": [
     {
-      "service": "aphrody-downloads",
-      "upstream": "127.0.0.1:8797",
+      "service": "aphrody-webos",
+      "upstream": "127.0.0.1:8790",
       "via": "nginx",
       "publicHost": "aphrody.com",
-      "paths": ["/api/search", "/api/index/search"]
+      "paths": ["/api/search"]
     },
     {
       "service": "aphrody-ai-http",
