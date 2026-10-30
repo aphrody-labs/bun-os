@@ -140,6 +140,8 @@ const result = await Bun.build({
     join(import.meta.dir, "src/boot.ts"),
     // Worker of the Terminal's Alpine guest (/guest-worker.js), see packages/webos-wasm/src/guest.ts
     join(root, "packages/webos-wasm/src/guest-worker.ts"),
+    // Thin client of the native Hyprland desktop (ADR-002), served at /client.html until it replaces the shell.
+    join(import.meta.dir, "client/client.ts"),
   ],
   naming: "[name].js",
   splitting: false,
@@ -148,6 +150,10 @@ if (!result.success) {
   for (const log of result.logs) console.error(log);
   process.exit(1);
 }
+await Bun.write(
+  join(dist, "client.html"),
+  Bun.file(join(import.meta.dir, "client/index.html")),
+);
 
 const wasmDir = join(root, "packages/webos-wasm/wasm");
 await cp(

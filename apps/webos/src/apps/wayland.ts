@@ -28,7 +28,7 @@ export async function waylandApp(root: HTMLElement, app: string, name: string): 
           : (body.error ?? `host answered ${res.status}`),
       );
     status.remove();
-    const { mountHyprland } = await import("./hyprland");
+    const { mountHyprland } = await import("../../client/hyprland");
     mountHyprland(root, { window: body.address });
   } catch (error) {
     status.textContent = `${name} could not start: ${error instanceof Error ? error.message : String(error)}`;
