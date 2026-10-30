@@ -101,7 +101,9 @@ infra/config/host/systemd/slices/apply.sh  # interactive.slice / build.slice pri
 | HTTP/2, 50 connections × 10 streams, 5000 requests | 1050 req/s | 1514 req/s |
 | HTTP/2, a new connection per request (100 clients, 2000 requests) | 1141 req/s | 1634 req/s |
 | styles.css bytes (identity / gzip / br / zstd) | 106676 / 20491 / – / – | 106676 / 20491 / 19311 / 23301 |
-| WebOS gateway 127.0.0.1:8790, p50 / p95 / max | 1.9 / 6.4 / 525 ms | 1.9 / 6.2 / 18 ms |
+| WebOS gateway 127.0.0.1:8790, p50 / p95 / max (with slices) | 1.9 / 6.4 / 525 ms | 0.8 / 1.8 / 5.1 ms |
+| Wayland gateway 127.0.0.1:8793, p50 / p95 / max (with slices) | 0.9 / 3.7 / 4.3 ms | 0.5 / 2.0 / 3.4 ms |
+| https://aphrody.com/ full request, p50 / p95 | 27.1 / 43.8 ms | 13.6 / 38.4 ms |
 
 The h3 throughput was not measured: Ubuntu's h2load and curl and Alpine's curl are built without QUIC. The QUIC
 sockets are bound by every worker, and Alt-Svc is advertised.
