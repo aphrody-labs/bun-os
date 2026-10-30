@@ -1531,10 +1531,10 @@ fn collection_members(out: &mut Vec<Member>) {
                     .filter(|m| m.path.as_deref().is_some_and(|p| ANDROID.contains(&p)))
                     .map(Member::key)
                     .collect::<Vec<_>>(),
-                by(out, "packages", &|m| {
+                by(&out[..], "packages", &|m| {
                     m.id.contains("waydroid") || m.id.contains("android")
                 }),
-                by(out, "factory", &|m| {
+                by(&out[..], "factory", &|m| {
                     m.id.contains("aosp") || m.id.contains("google")
                 }),
             ]
@@ -1545,14 +1545,14 @@ fn collection_members(out: &mut Vec<Member>) {
             "Material 3",
             "The Material 3 design system: tokens, components, icons and themes.",
             [
-                by(out, "packages", &|m| {
+                by(&out[..], "packages", &|m| {
                     m.id.split('-').any(|p| p == "m3")
                         || m.id.starts_with("libm3")
                         || m.id.contains("material")
                         || m.id == "themes"
                 }),
-                by(out, "apps", &|m| m.id.contains("m3")),
-                by(out, "workspace", &|m| m.id == "design-system"),
+                by(&out[..], "apps", &|m| m.id.contains("m3")),
+                by(&out[..], "workspace", &|m| m.id == "design-system"),
             ]
             .concat(),
         ),
@@ -1561,9 +1561,9 @@ fn collection_members(out: &mut Vec<Member>) {
             "Engines and emulators",
             "Bun Engine cores, consoles, emulator hosts, game streaming and loaders.",
             [
-                by(out, "engines", &|_| true),
-                by(out, "games", &|_| true),
-                by(out, "packages", &|m| {
+                by(&out[..], "engines", &|_| true),
+                by(&out[..], "games", &|_| true),
+                by(&out[..], "packages", &|m| {
                     [
                         "bun-engine",
                         "bun-emu-host",
@@ -1580,7 +1580,7 @@ fn collection_members(out: &mut Vec<Member>) {
             "compositions",
             "Compositions: Server, COSMIC Desktop, Gaming",
             "The separate distribution compositions and the images and catalogs they are assembled from.",
-            by(out, "factory", &|m| {
+            by(&out[..], "factory", &|m| {
                 m.id.starts_with("composition/")
                     || m.id.starts_with("image/")
                     || [
@@ -1596,9 +1596,9 @@ fn collection_members(out: &mut Vec<Member>) {
             "Craft apps",
             "The Craft creative suite: every craft app, library, CLI and web build.",
             [
-                by(out, "apps", &|m| m.id.contains("craft")),
-                by(out, "packages", &|m| m.id.contains("craft")),
-                by(out, "crates", &|m| m.id.contains("craft")),
+                by(&out[..], "apps", &|m| m.id.contains("craft")),
+                by(&out[..], "packages", &|m| m.id.contains("craft")),
+                by(&out[..], "crates", &|m| m.id.contains("craft")),
             ]
             .concat(),
         ),
