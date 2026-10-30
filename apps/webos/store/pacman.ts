@@ -52,12 +52,18 @@ interface Prebuild {
 }
 
 const HOURS = 3_600_000;
+/** The shared factory lease gives up after 30 minutes; a busy factory is waited for, up to eight times. */
+async function serialized(cmd: string[], cwd: string, timeout: number, env: Record<string, string> = {}) {
+  let r = { code: 1, out: "" };
+  for (let attempt = 0; attempt < 8; attempt++) {
+    r = await run(cmd, { cwd, timeout, env: { APHRODY_BUILD_HOST: "vps", APHRODY_CARGO_JOBS: "4", APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800", MAKEFLAGS: "-j4", ...env } });
+    if (r.code === 0 || !/lease was not acquired|Timed out waiting|failed to get lock/i.test(r.out)) return r;
+    console.log(`pacman: factory busy, waiting again (${attempt + 1}/8)`);
+  }
+  return r;
+}
 const cargoSerial = (ctx: Ctx, args: string[], timeout = 4 * HOURS) =>
-  run(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), ...args], {
-    cwd: ctx.root,
-    timeout,
-    env: { APHRODY_BUILD_HOST: "vps", APHRODY_CARGO_JOBS: "4", APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800", MAKEFLAGS: "-j4" },
-  });
+  serialized(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), ...args], ctx.root, timeout);
 async function must(label: string, r: Promise<{ code: number; out: string }>) {
   const x = await r;
   if (x.code !== 0) throw new Error(`${label}: ${tail(x.out, 6)}`);
@@ -150,11 +156,12 @@ const PREBUILD: Record<string, Prebuild> = {
       await must("spacedrive web build", run(["bun", "run", "build"], { cwd: join(dir, "apps/web"), timeout: HOURS }));
       await must(
         "cargo build spacedrive",
-        run(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), "build", "--release", "--locked", "-p", "sd-server", "-p", "sd-cli", "-p", "sd-core", "--bin", "sd-server", "--bin", "sd-daemon", "--bin", "sd"], {
-          cwd: dir,
-          timeout: 6 * HOURS,
-          env: { APHRODY_BUILD_HOST: "vps", APHRODY_CARGO_JOBS: "4", APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800", CARGO_TARGET_DIR: join(dir, "target") },
-        }),
+        serialized(
+          ["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), "build", "--release", "--locked", "-p", "sd-server", "-p", "sd-cli", "-p", "sd-core", "--bin", "sd-server", "--bin", "sd-daemon", "--bin", "sd"],
+          dir,
+          6 * HOURS,
+          { CARGO_TARGET_DIR: join(dir, "target") },
+        ),
       );
     },
     tree: {
