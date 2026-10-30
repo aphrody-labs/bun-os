@@ -1328,3 +1328,8 @@
 	path = vendor/proton-ge-custom
 	url = https://github.com/aphrody-labs/proton-ge-custom.git
 	shallow = true
+[submodule "vendor/helium-linux"]
+	path = vendor/helium-linux
+	url = https://github.com/aphrody-labs/helium-linux.git
+	branch = main
+	shallow = true
