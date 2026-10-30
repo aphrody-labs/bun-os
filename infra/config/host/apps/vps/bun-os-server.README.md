@@ -1,13 +1,10 @@
 # Bun OS product API service
 
 Aphrody Infra owns this one staged service through the existing service catalog,
-systemd supervisor and source forge ingress. Gitea remains the only forge.
+systemd supervisor and ingress.
 
 Qualified on 2026-10-13: the canonical Git checkout `~/src/bun-os` is root
-revision `1eedaa8ca51c06790eaae7c4bfee8e35cfce25a5`, bootstrapped from the
-public GitHub source while its canonical Gitea mirror resynchronized. The latest source was fetched from GitHub with ancestor verification and
-a fast-forward update. The canonical mirror is temporarily private while it
-resynchronizes this revision; public equivalence remains to be verified. No archive,
+revision `1eedaa8ca51c06790eaae7c4bfee8e35cfce25a5`, fetched from GitHub with ancestor verification and a fast-forward update. No archive,
 Rust build or recursive submodule setup was used. Filtered frozen Bun installation
 selects only the server SDK graph; the unrelated Tauri checkout remains lazy.
 
@@ -27,11 +24,9 @@ its single unit binds loopback29030. Inject `APHRODY_APP_TOKEN` only from
 belongs in Git or command arguments). A persistent bearer was generated idempotently in this protected store. Infra
 secret validation reports SECURE (1/1); directory0700 and file0600 are verified. The catalog remains staged and not required at boot.
 
-Integrate `nginx/snippets/bun-os-product-api.inc` into the existing source
+Integrate `nginx/snippets/bun-os-product-api.inc` into the existing source.aphrody.app
 TLS server only after service and proxy probes pass. Its external prefix is
-`/api/product/v1/`; it rewrites to the server's `/api/v1/`. Gitea retains
-`/api/v1/`, repository paths and homepage. No new vhost or forge stack is
-introduced. The bearer header is preserved. Public proxy/TLS origin policy
+`/api/product/v1/`; it rewrites to the server's `/api/v1/`. No new vhost is introduced. The bearer header is preserved. Public proxy/TLS origin policy
 must be qualified against the app-host transport before activation.
 
 The typed Infra catalog, repository registry and internal-only port policy all
