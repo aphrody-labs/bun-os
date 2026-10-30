@@ -16,9 +16,8 @@ export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; asse
   const [page, setPage] = useState<GoogleSearchPage | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
-  // Web search runs through the native Google search owner behind /api/search; the in-browser
-  // backend has no such server, so the home offers the pages it can open instead.
-  const searchable = !usesBrowserBackend();
+  // /api/search answers on every host: the Google owner where one is configured, otherwise the local index.
+  const searchable = true;
   async function run() {
     if (busy || !query.trim()) return;
     setBusy(true);

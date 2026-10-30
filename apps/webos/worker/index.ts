@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
-// aphrody.com edge: static Bun OS shell + /api/health + /api/browse (script-free reader proxy for the Bun Browser).
+// Shared WebOS handler: static Bun OS shell + /api/health + /api/browse (script-free reader proxy for the Bun Browser).
 import { workspaceResponse } from "./workspace";
 import { gameContentResponse } from "./game-content";
 import { ISOLATION, isolated } from "./isolation";
 import { playResponse } from "./play";
 import { downloadsResponse } from "./downloads";
+import { searchResponse } from "./search";
 import { APP_SERVER_PATHS, appServerResponse } from "./app-server";
 import { ROUTES } from "../src/config";
 import { ORIGIN, pathMeta } from "../paths";
@@ -357,6 +358,7 @@ export default {
       );
     }
     if (url.pathname === "/api/downloads") return downloadsResponse(request);
+    if (url.pathname === "/api/search") return searchResponse(request, env.ASSETS);
     if (url.pathname === "/api/browse") {
       if (request.method !== "GET")
         return new Response("Method not allowed", { status: 405 });

@@ -3,7 +3,9 @@
 // Zero AI slop, zero dead routes, zero mock data.
 
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import type { ReactElement } from "react";
 import { appBasePath } from "./app-base";
+import { usesBrowserBackend } from "./tauri-bridge";
 import { legacyRouteRedirects } from "./desktop-navigation";
 import { CodexChatRoute } from "./codex-chat";
 import { ModelsHub } from "./models-hub";
@@ -24,6 +26,11 @@ import {
   ProductNotFound,
   TemplatesRoute,
 } from "./routes/product";
+
+/** Chat, Models, Studio, Creator and Admin need the native agent service; the browser desktop has none. */
+function DesktopOnly({ children }: { children: ReactElement }) {
+  return usesBrowserBackend() ? <Navigate to="/" replace /> : children;
+}
 
 /**
  * Unified application routes for the Aphrody Shell:
@@ -61,7 +68,7 @@ export const explorerRoutes = [
       },
       {
         path: "chat",
-        element: <CodexChatRoute />,
+        element: <DesktopOnly><CodexChatRoute /></DesktopOnly>,
       },
       {
         path: "codex",
@@ -77,7 +84,7 @@ export const explorerRoutes = [
       },
       {
         path: "models",
-        element: <ModelsHub />,
+        element: <DesktopOnly><ModelsHub /></DesktopOnly>,
       },
       {
         path: "games/:core?",
@@ -89,15 +96,15 @@ export const explorerRoutes = [
       },
       {
         path: "studio",
-        element: <StudioRoute />,
+        element: <DesktopOnly><StudioRoute /></DesktopOnly>,
       },
       {
         path: "creator",
-        element: <CreatorRoute />,
+        element: <DesktopOnly><CreatorRoute /></DesktopOnly>,
       },
       {
         path: "admin",
-        element: <AdminRoute />,
+        element: <DesktopOnly><AdminRoute /></DesktopOnly>,
       },
       {
         path: "favorites",

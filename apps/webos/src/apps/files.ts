@@ -379,15 +379,16 @@ export async function filesApp(
       side.append(h("div", { class: "fx-head" }, "Locations"));
       for (const p of extra) side.append(item("HDD", p.name, p.path, `${p.files} files · ${fmtSize(p.size)}`));
     }
-    side.append(h("div", { class: "fx-head" }, "Library"));
+    // The Drive library sections exist only where the Drive explorer wire is served; the browser desktop omits them.
     if (ctx?.served) {
       side.append(
+        h("div", { class: "fx-head" }, "Library"),
         h("div", { class: "fx-meta" }, img("Collection", 18), h("span", {}, ctx.library ?? "Library")),
         ...(ctx.spaces.length ? [h("div", { class: "fx-meta" }, img("Scrapbook", 18), h("span", {}, `Space: ${ctx.spaces.join(", ")}`))] : []),
         ...(ctx.device ? [h("div", { class: "fx-meta" }, img("Laptop", 18), h("span", {}, `${ctx.device.name}${ctx.device.arch ? ` · ${ctx.device.arch}` : ""}`))] : []),
         ...(ctx.volume ? [h("div", { class: "fx-meta" }, img("HDD", 18), h("span", {}, ctx.volume.name))] : []),
       );
-    } else side.append(h("div", { class: "fx-meta dim" }, "Explorer wire not served"));
+    }
     side.append(quota);
   }
 
