@@ -259,6 +259,8 @@ export interface SessionLaunch {
   app: string;
   rom?: string;
   blocker?: string;
+  /** The test program makes no sound (Wine notepad): the PipeWire output stream is not required. */
+  silent?: boolean;
 }
 export const SESSION: Record<string, SessionLaunch> = {
   retroarch: {
@@ -290,7 +292,7 @@ export const SESSION: Record<string, SessionLaunch> = {
   ppsspp: { package: "ppsspp", app: "PPSSPPSDL", rom: "pspsdk-cube/EBOOT.PBP" },
   gopher64: { package: "gopher64", app: "gopher64", rom: "peterlemon-n64/Mandelbrot32BPP320X240.N64" },
   mame: { package: "mame", app: "mame -rompath /roms/mamedev-gridlee -skip_gameinfo -video bgfx gridlee" },
-  wine: { package: "wine", app: "wine notepad" },
+  wine: { package: "wine", app: "wine notepad", silent: true },
   proton: {
     package: "proton-bunos",
     app: "env PROTONPATH=/usr/share/steam/compatibilitytools.d/proton-bunos GAMEID=0 umu-run winecfg",

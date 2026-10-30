@@ -18,3 +18,7 @@ wireplumber
 xorg-xwayland
 umu-launcher
 proton-bunos
+qt5-wayland
+pipewire-alsa
+lib32-libpulse
+lib32-pipewire

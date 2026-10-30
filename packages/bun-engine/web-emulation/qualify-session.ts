@@ -164,7 +164,7 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
     if (crashed) problems.push(`session exited: ${(logs.out + logs.err).trim().split("\n").slice(-3).join(" | ")}`);
     if (!shots.length) problems.push("no gamescope screenshot");
     else if (!lit) problems.push("the screen stayed black");
-    if (!stream) problems.push("no PipeWire output stream");
+    if (!stream && !launch.silent) problems.push("no PipeWire output stream");
     if (launch.blocker) {
       entry.status = problems.length ? "fail" : "untested";
       entry.detail = `${problems.length ? problems.join("; ") : `UI renders${moving ? " and animates" : ""} in the session`}; ROM boot blocked: ${launch.blocker}`;
