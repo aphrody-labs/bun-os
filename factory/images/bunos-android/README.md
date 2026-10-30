@@ -2,11 +2,11 @@
 
 Container image of the Android session that the WebOS session manager streams to the browser.
 
-| Layer  | Content                                                                                                                                                                                                                                                                             | License                                                  |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Base   | redroid `16.0.0_64only-250627` (amd64 digest pinned in `apps.json`): AOSP Android 16 userdebug built from android.googlesource.com, with its AOSP apps (Contacts, Calendar, Clock, Gallery, Search, AOSP Keyboard, DocumentsUI, Package Installer, Print, WebView shell, providers) | Apache-2.0 (AOSP), per-project NOTICE files in the image |
-| microG | GmsCore 0.3.17.252432, FakeStore (`com.android.vending`), GsfProxy: open-source Google Play services replacement                                                                                                                                                                    | Apache-2.0                                               |
-| Stores | F-Droid 1.23.2 + F-Droid Privileged Extension 0.2.14 (unattended installs), Aurora Store 4.8.4                                                                                                                                                                                      | GPL-3.0 / Apache-2.0                                     |
+| Layer | Content | License |
+|---|---|---|
+| Base | redroid `13.0.0-240527` (amd64 digest pinned in `apps.json`): AOSP Android 13 userdebug built from android.googlesource.com, with its AOSP apps (Contacts, Calendar, Clock, Gallery, Search, AOSP Keyboard, DocumentsUI, Package Installer, Print, WebView shell, providers) | Apache-2.0 (AOSP), per-project NOTICE files in the image |
+| microG | GmsCore 0.3.17.252432, FakeStore (`com.android.vending`), GsfProxy: open-source Google Play services replacement | Apache-2.0 |
+| Stores | F-Droid 1.23.2 + F-Droid Privileged Extension 0.2.14 (unattended installs), Aurora Store 4.8.4 | GPL-3.0 / Apache-2.0 |
 
 ## Build and run (VPS)
 
@@ -44,5 +44,7 @@ must not be mirrored or redistributed by Bun OS (repositories, site or image). I
 
 - `privapp-permissions-bunos.xml` allowlists the privileged extension's two permissions; the other apps are
   plain system apps (`/system/app`) and need no allowlist.
-- Android 17 (`android-17.0.0_r1`, see `factory/aosp/projects.json`) has no redroid build yet; move the base when one
-  is published.
+- Android 17 (`android-17.0.0_r1`, see `factory/aosp/projects.json`) and 16 have no bootable redroid build on this host (kernel 7.3 is not LTS).
+- Why Android 13: Android 15+ (V) images refuse non-LTS kernels in `NetBpfLoad` and reboot-loop on the VPS kernel
+  7.3 (`Android V+ only supports LTS kernels`); redroid 13 boots there with binderfs (`aphrody-binderfs.service`).
+  Move to a newer base only on an LTS host kernel.

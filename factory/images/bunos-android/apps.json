@@ -1,10 +1,10 @@
 {
   "$comment": "Pinned open-source Android apps added to the Bun OS Android session (redroid AOSP base). fetch.sh downloads and verifies them; the Containerfile installs them. 'publish' marks the APKs the Store mirrors unmodified (upstream signatures kept) in the Bun OS F-Droid repository.",
   "base": {
-    "image": "docker.io/redroid/redroid:16.0.0_64only-250627",
-    "digest": "sha256:18eaf7058f1fbe17378106daa9c02936a7d293e71325db432462086854d9e9f0",
+    "image": "docker.io/redroid/redroid:13.0.0-240527",
+    "digest": "sha256:524987f1fc489f6018e2c9d0dd622e5eccea13eb896417cb4bfb26bc3fea9afd",
     "platform": "linux/amd64",
-    "aosp": "Android 16 (android16-release), AOSP userdebug built by the redroid project from android.googlesource.com",
+    "aosp": "Android 13 (android13-release), AOSP userdebug built by the redroid project from android.googlesource.com",
     "source": "https://github.com/remote-android/redroid-doc",
     "license": "Apache-2.0"
   },

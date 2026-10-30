@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.7
 # SPDX-License-Identifier: Apache-2.0
-# Bun OS Android session: AOSP 16 (redroid, built from android.googlesource.com) with all of its AOSP apps,
+# Bun OS Android session: AOSP 13 (redroid, built from android.googlesource.com) with all of its AOSP apps,
 # plus microG, F-Droid (with its privileged extension) and Aurora Store as system apps.
 # Inputs: run fetch.sh first (apk/<id>.apk, sha256-verified from apps.json). No proprietary Google binary is added.
 # Host: binder_linux loaded with binder,hwbinder,vndbinder devices; run.sh starts the container for the session manager.
-ARG BASE=docker.io/redroid/redroid:16.0.0_64only-250627@sha256:18eaf7058f1fbe17378106daa9c02936a7d293e71325db432462086854d9e9f0
+ARG BASE=docker.io/redroid/redroid:13.0.0-240527@sha256:524987f1fc489f6018e2c9d0dd622e5eccea13eb896417cb4bfb26bc3fea9afd
 FROM ${BASE}
 # Non-privileged system apps: no privapp allowlist needed; updates from F-Droid keep working.
 COPY --chmod=0644 apk/com.google.android.gms.apk /system/app/GmsCore/GmsCore.apk
@@ -18,6 +18,6 @@ COPY --chmod=0644 privapp-permissions-bunos.xml /system/etc/permissions/privapp-
 COPY --chmod=0644 apps.json /system/etc/bunos/android-apps.json
 COPY --chmod=0644 NOTICES.md /system/etc/bunos/NOTICES.md
 LABEL org.opencontainers.image.title="bunos-android" \
-      org.opencontainers.image.description="Bun OS Android session: AOSP 16 (redroid) + microG + F-Droid + Aurora Store" \
+      org.opencontainers.image.description="Bun OS Android session: AOSP 13 (redroid) + microG + F-Droid + Aurora Store" \
       org.opencontainers.image.source="https://github.com/aphrody-labs/bun-os" \
       org.opencontainers.image.licenses="Apache-2.0 AND GPL-3.0-or-later"

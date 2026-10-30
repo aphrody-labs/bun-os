@@ -1,6 +1,6 @@
 # Notices: Bun OS Android session image
 
-- AOSP (Android Open Source Project), Android 16, via redroid (https://github.com/remote-android/redroid-doc):
+- AOSP (Android Open Source Project), Android 13, via redroid (https://github.com/remote-android/redroid-doc):
   Apache License 2.0; individual AOSP projects keep their NOTICE files inside the image (`/system/etc/NOTICE.xml.gz`).
 - microG GmsCore, FakeStore and GsfProxy (https://github.com/microg): Apache License 2.0. "Google" and
   "Google Play" are trademarks of Google LLC; microG is not affiliated with Google.
