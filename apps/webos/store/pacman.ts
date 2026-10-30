@@ -97,7 +97,16 @@ const PREBUILD: Record<string, Prebuild> = {
   "bunos-utils": {
     async compile(ctx) {
       const m = (await Bun.file(join(ctx.root, "factory/usr/manifest.json")).json()) as { multicall: { features: string[]; target: string } };
-      await must("cargo build bunos-utils", cargoSerial(ctx, ["build", "--release", "--locked", "-p", "bunos-utils", "--target", m.multicall.target, "--features", m.multicall.features.join(",")]));
+      // The /usr factory's standalone staging: the crate with its own [workspace] and a copy of Cargo.lock, so the
+      // multicall feature set resolves without rewriting the shared checkout's lock file.
+      const { stageMulticall } = (await import(join(ctx.root, "factory/usr/build.ts"))) as { stageMulticall(manifest: unknown, dir: string): Promise<void> };
+      const stage = join(ctx.store, ".work/bunos-utils-src");
+      await rm(stage, { recursive: true, force: true });
+      await stageMulticall(await Bun.file(join(ctx.root, "factory/usr/manifest.json")).json(), stage);
+      await must(
+        "cargo build bunos-utils",
+        serialized(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), "build", "--release", "--target", m.multicall.target, "--features", m.multicall.features.join(",")], join(stage, "crates/bunos-utils"), 4 * HOURS),
+      );
     },
     // package() installs $srcdir/target/x86_64-unknown-linux-gnu/release/bunos-utils and the uutils licences.
     // The tree is $srcdir/target itself, so files are placed relative to it (not to the checkout root).
@@ -106,7 +115,7 @@ const PREBUILD: Record<string, Prebuild> = {
       files: () => [],
       async extra(ctx, dir) {
         await mkdir(join(dir, "x86_64-unknown-linux-gnu/release"), { recursive: true });
-        await cp(join(ctx.root, "target/x86_64-unknown-linux-gnu/release/bunos-utils"), join(dir, "x86_64-unknown-linux-gnu/release/bunos-utils"));
+        await cp(join(LANE_TARGET, "x86_64-unknown-linux-gnu/release/bunos-utils"), join(dir, "x86_64-unknown-linux-gnu/release/bunos-utils"));
         for (const suite of ["coreutils", "findutils", "diffutils", "procps", "util-linux"]) {
           for (const f of (await readdir(join(ctx.root, "vendor/uutils", suite))).filter((n) => n.startsWith("LICENSE"))) {
             await mkdir(join(dir, "vendor/uutils", suite), { recursive: true });
@@ -129,13 +138,21 @@ const PREBUILD: Record<string, Prebuild> = {
     },
   },
   "bun-os-server": {
-    compile: (ctx) => must("bun-app-host build", run(["bun", "packages/bun-app-host/src/build.ts", "build"], { cwd: ctx.root, timeout: HOURS })),
+    async compile(ctx) {
+      // The builder refuses to overwrite a previous binary and receipt.
+      await rm(join(ctx.root, "build/apps/bun-os-server"), { force: true });
+      await rm(join(ctx.root, "build/apps/bun-os-server.json"), { force: true });
+      await must("bun-app-host build", run(["bun", "packages/bun-app-host/src/build.ts", "build"], { cwd: ctx.root, timeout: HOURS }));
+    },
     tree: { name: "bun-os", files: () => ["build/apps/bun-os-server", ...LICENSES] },
   },
   "bun-os-webapps": {
     async compile(ctx) {
       const { apps } = (await Bun.file(join(ctx.root, "factory/bunos/webapps.json")).json()) as { apps: { id: string; path: string; build: string }[] };
-      for (const app of apps) await must(`${app.id} build`, run(["bun", "run", app.build], { cwd: join(ctx.root, app.path), timeout: HOURS }));
+      // ArtCraft's build loads aphrody-ffi through @aphrody/bun: build the library in the lane target, use it as a dev artifact.
+      await must("cargo build aphrody-ffi", cargoSerial(ctx, ["build", "--release", "--locked", "-p", "aphrody-ffi"]));
+      for (const app of apps)
+        await must(`${app.id} build`, run(["bun", "run", app.build], { cwd: join(ctx.root, app.path), timeout: HOURS, env: { APHRODY_FFI_DEV: "1", CARGO_TARGET_DIR: LANE_TARGET } }));
     },
     tree: {
       name: "bun-os",
