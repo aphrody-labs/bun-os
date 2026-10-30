@@ -7,6 +7,10 @@ use cosmic::app::{Core, Settings, Task};
 use cosmic::iced::{Alignment, Length, Size};
 use cosmic::widget::{self, scrollable};
 use cosmic::{Element, executor};
+use std::sync::LazyLock;
+
+/// The input field takes the keyboard focus when the window opens.
+static INPUT: LazyLock<widget::Id> = LazyLock::new(|| widget::Id::new("input"));
 use serde::Deserialize;
 
 const DEFAULT_ENDPOINT: &str = "https://aphrody.com/api/search";
@@ -80,7 +84,8 @@ impl cosmic::Application for App {
             answer: None,
             error: None,
         };
-        let task = if app.query.is_empty() { Task::none() } else { Task::done(cosmic::Action::App(Message::Search)) };
+        let focus = widget::text_input::focus(INPUT.clone());
+        let task = if app.query.is_empty() { focus } else { Task::batch([focus, Task::done(cosmic::Action::App(Message::Search))]) };
         (app, task)
     }
 
@@ -121,6 +126,7 @@ impl cosmic::Application for App {
 
     fn view(&self) -> Element<'_, Message> {
         let field = widget::search_input("Search apps, packages, crates, docs and tools", &self.query)
+            .id(INPUT.clone())
             .on_input(Message::Query)
             .on_submit(|_| Message::Search)
             .width(Length::Fill);

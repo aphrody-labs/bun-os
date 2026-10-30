@@ -8,6 +8,10 @@ use cosmic::iced::futures::{SinkExt, StreamExt};
 use cosmic::iced::{Alignment, Length, Size};
 use cosmic::widget::{self, scrollable};
 use cosmic::{Element, executor};
+use std::sync::LazyLock;
+
+/// The input field takes the keyboard focus when the window opens.
+static INPUT: LazyLock<widget::Id> = LazyLock::new(|| widget::Id::new("input"));
 use serde::{Deserialize, Serialize};
 
 const DEFAULT_ENDPOINT: &str = "https://aphrody.com/api/chat/v1";
@@ -139,7 +143,7 @@ impl cosmic::Application for App {
             busy: false,
             error: None,
         };
-        (app, Task::none())
+        (app, widget::text_input::focus(INPUT.clone()))
     }
 
     fn header_end(&self) -> Vec<Element<'_, Message>> {
@@ -214,6 +218,7 @@ impl cosmic::Application for App {
             log = log.push(widget::text::body(error.clone()).class(cosmic::theme::Text::Accent));
         }
         let input = widget::text_input("Message Aphrody Chat", &self.draft)
+            .id(INPUT.clone())
             .on_input(Message::Draft)
             .on_submit(|_| Message::Send)
             .width(Length::Fill);

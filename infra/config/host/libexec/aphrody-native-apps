@@ -39,8 +39,10 @@ deps() {
 }
 
 # deb <name> <version> <stage dir> <description> : package a staged /usr tree, Depends from dpkg-shlibdeps
-deb() {
-  name=$1 version=$2 stage=$3 desc=$4
+# Libraries winit/wgpu load at run time with dlopen (invisible to dpkg-shlibdeps).
+GUI_DEPS="libxkbcommon0, libwayland-client0, libwayland-egl1, libegl1, libvulkan1, libfontconfig1"
+deb() { # deb <name> <version> <stage> <description> [extra Depends]
+  name=$1 version=$2 stage=$3 desc=$4 extra=${5:-}
   elfs=$(find "$stage" -type f -perm -u+x -exec sh -c 'head -c4 "$1" | grep -q ELF && echo "$1"' _ {} \;)
   depends=""
   if [ -n "$elfs" ]; then
@@ -78,7 +80,7 @@ rio() {
   install -Dm644 "$ROOT/factory/native-apps/icons/rio/icon.svg" "$s/usr/share/icons/hicolor/scalable/apps/rio.svg"
   [ -f "$d/misc/rio.terminfo" ] && install -Dm644 "$d/misc/rio.terminfo" "$s/usr/share/rio/rio.terminfo"
   install -Dm644 "$d/LICENSE" "$s/usr/share/doc/rio/copyright"
-  deb rio "$(version_of "$d/frontends/rioterm/Cargo.toml")+bunos$(git -C "$d" rev-parse --short HEAD)" "$s" "Rio terminal: GPU-accelerated Rust terminal emulator"
+  deb rio "$(version_of "$d/frontends/rioterm/Cargo.toml")+bunos$(git -C "$d" rev-parse --short HEAD)" "$s" "Rio terminal: GPU-accelerated Rust terminal emulator" "$GUI_DEPS"
 }
 
 EPOCH_DIR=$WORK/src/cosmic-epoch
@@ -183,7 +185,7 @@ lto = "thin"
   install -Dm644 "$c/res/com.aphrody.$N.desktop" "$s/usr/share/applications/com.aphrody.$N.desktop"
   install -Dm644 "$c/res/com.aphrody.$N.metainfo.xml" "$s/usr/share/metainfo/com.aphrody.$N.metainfo.xml"
   install -Dm644 "$c/res/com.aphrody.$N.svg" "$s/usr/share/icons/hicolor/scalable/apps/com.aphrody.$N.svg"
-  deb "aphrody-$n" "$v+bunos$(printf %.10s "${BUNOS_REV:-$(git -C "$ROOT" rev-parse HEAD)}")" "$s" "Aphrody $N (native COSMIC app)"
+  deb "aphrody-$n" "$v+bunos$(printf %.10s "${BUNOS_REV:-$(git -C "$ROOT" rev-parse HEAD)}")" "$s" "Aphrody $N (native COSMIC app)" "$GUI_DEPS"
 }
 
 container() {
