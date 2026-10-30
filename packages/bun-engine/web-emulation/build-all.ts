@@ -2,7 +2,7 @@
 // Build every emulator WebAssembly recipe of recipes.json on the VPS, then index and smoke-qualify them.
 //   bun packages/bun-engine/web-emulation/build-all.ts [--tmux] [--only id,id] [--no-smoke] [--qualify]
 // --tmux relaunches this script in a detached tmux session (web-emulation) so the long builds survive the SSH session.
-// Builds wait until the 1-minute load average leaves room for four compiler jobs on top of the other factory lanes.
+// Builds queue on the shared buncc slot (cargo --jobs 4) and wait only while the host is saturated (load > 3x cores).
 import { cpus, loadavg } from "node:os";
 import { join, resolve } from "node:path";
 import { rustCores } from "./build";
@@ -45,7 +45,8 @@ for (const id of Object.keys(rustCores))
   if (!file.recipes.some(r => r.id === id)) throw new Error(`rust core ${id} has no recipe in recipes.json`);
 
 async function waitForCapacity() {
-  const limit = cpus().length - 4;
+  // cargo already queues on the buncc build slot; this only avoids piling a Docker/Qt build onto a saturated host.
+  const limit = cpus().length * 3;
   for (let waited = 0; loadavg()[0] > limit; waited += 30) {
     if (waited > 3600) throw new Error(`load stayed above ${limit} for an hour; not starting a build`);
     console.log(`load ${loadavg()[0].toFixed(1)} > ${limit}; waiting`);
