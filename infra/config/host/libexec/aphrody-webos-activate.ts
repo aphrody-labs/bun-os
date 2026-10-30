@@ -41,10 +41,10 @@ function publishedCommit() {
   return result.stdout.toString().trim();
 }
 const published = publishedCommit();
-const current =
+const isPublished =
   published === receipt.sourceCommit ||
   Bun.spawnSync(["git", "-c", `safe.directory=${sourceRepository}`, "--git-dir", sourceRepository, "merge-base", "--is-ancestor", receipt.sourceCommit, published]).exitCode === 0;
-if (!current) {
+if (!isPublished) {
   await rename(pending, join(handoff, `superseded-${name}`));
   console.log(`Ignored superseded release ${receipt.sourceCommit}`);
   process.exit(0);
@@ -80,7 +80,7 @@ for (const path of [
 ])
   if (!receipt.files.some((file) => file.path === path))
     throw new Error(`Unreceipted ${path}`);
-const current = join(app, "current");
+const isPublished = join(app, "current");
 const previous = await readlink(current).catch(() => undefined);
 if (previous === release) {
   await rename(pending, join(handoff, "activated"));
