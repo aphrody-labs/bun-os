@@ -262,6 +262,55 @@ export async function memberPage(
           : "This crate can target WebAssembly; the factory has not published a module for it in this deployment, so this page offers its metadata, README and API instead.",
       ),
     );
+  if (s.type === "wasm" && s.module) {
+    const info = h("pre", { class: "atlas-pre" }, "");
+    body.append(
+      h(
+        "button",
+        {
+          class: "btn tonal",
+          onclick: async () => {
+            info.textContent = "Loading the module…";
+            try {
+              const response = await fetch(s.module!);
+              const module = await WebAssembly.compile(await response.arrayBuffer());
+              const exports = WebAssembly.Module.exports(module);
+              const imports = WebAssembly.Module.imports(module);
+              info.textContent = `${s.module}
+exports (${exports.length}): ${exports.map((e) => `${e.name}:${e.kind}`).slice(0, 60).join(", ")}
+imports (${imports.length}): ${[...new Set(imports.map((i) => i.module))].join(", ") || "none"}`;
+            } catch (error) {
+              info.textContent = `The module could not be compiled: ${String((error as Error).message ?? error)}`;
+            }
+          },
+        },
+        "Inspect module",
+      ),
+      info,
+    );
+  }
+  if (s.type === "api" || s.type === "wasm") {
+    const method = detail.kind === "crates" ? "crate.dependencies" : "inventory.get";
+    const call = JSON.stringify({ jsonrpc: "2.0", id: 1, method, params: { kind: detail.kind, id: detail.id } });
+    const reply = h("pre", { class: "atlas-pre" }, "");
+    body.append(
+      h("h3", {}, "API"),
+      h("p", { class: "muted mono" }, `POST /api/rpc ${call}`),
+      h(
+        "button",
+        {
+          class: "btn tonal",
+          onclick: async () => {
+            reply.textContent = "…";
+            const response = await fetch("/api/rpc", { method: "POST", body: call });
+            reply.textContent = JSON.stringify(await response.json(), null, 2).slice(0, 8000);
+          },
+        },
+        "Call",
+      ),
+      reply,
+    );
+  }
   if (detail.kind === "crates" || detail.kind === "packages") {
     const m = detail.meta ?? {};
     const rows: [string, string][] = [

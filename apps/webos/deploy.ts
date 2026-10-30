@@ -4,6 +4,7 @@ import { cp, mkdir, rename } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { stageIso } from "./vm";
 import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
+import { readWasmModules } from "./wasm-modules";
 import { buildInventory, checkInventory, printCounts } from "./inventory";
 
 if (process.platform !== "linux")
@@ -54,7 +55,7 @@ for (const required of [
   const inventory = await buildInventory({
     versions: true,
     games: registry.packages.filter((p) => p.category === "games"),
-    wasmModules: new Set(["aphrody-webos-wasm"]),
+    wasmModules: await readWasmModules(join(release, "dist")),
   });
   const gate = await checkInventory(inventory, join(release, "dist"));
   printCounts(inventory);

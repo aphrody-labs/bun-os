@@ -374,7 +374,7 @@ async function packageMembers(out: Detail[]) {
   }
 }
 
-async function crateMembers(out: Detail[], wasmModules: Set<string>) {
+async function crateMembers(out: Detail[], wasmModules: Map<string, string>) {
   const rootCargo = Bun.TOML.parse((await readText("Cargo.toml", 1e6)) ?? "") as any;
   const inherited = rootCargo?.workspace?.package ?? {};
   for (const child of children("crates")) {
@@ -397,10 +397,12 @@ async function crateMembers(out: Detail[], wasmModules: Set<string>) {
     const types: string[] = manifest?.lib?.["crate-type"] ?? [];
     const wasmDeps = ["wasm-bindgen", "js-sys", "web-sys", "wasm-bindgen-futures", "gloo", "trunk"].some((d) => d in deps);
     const wasmTarget = Object.keys(manifest?.target ?? {}).some((t) => t.includes("wasm32"));
-    const wasm = (types.includes("cdylib") && wasmDeps) || wasmTarget || wasmDeps || /(^|[-_])wasm($|[-_])/.test(child.name);
+    const capable = wasmTarget || wasmDeps || /(^|[-_])wasm($|[-_])/.test(child.name);
+    /** A wasm-bindgen cdylib: the factory builds it into a WebAssembly module (build-wasm.ts). */
+    const wasm = types.includes("cdylib") && "wasm-bindgen" in deps;
     const readmeFile = typeof pk.readme === "string" ? `${path}/${pk.readme}` : undefined;
     const readme = readmeFile && has(readmeFile) ? await readText(readmeFile, MAX_DOC) : await readmeOf(path, child.files);
-    const module = wasmModules.has(child.name) ? `/wasm/${child.name}.wasm` : undefined;
+    const module = wasmModules.get(child.name);
     out.push({
       kind: "crates",
       id: child.name,
@@ -410,7 +412,7 @@ async function crateMembers(out: Detail[], wasmModules: Set<string>) {
       version,
       license,
       run: wasm ? "wasm" : "library",
-      tags: [wasm ? "wasm" : "native", ...(publish && text ? ["crates.io"] : ["unpublished"]), ...(text ? [] : ["no-manifest"])],
+      tags: [wasm ? "wasm" : capable ? "wasm-capable" : "native", ...(publish && text ? ["crates.io"] : ["unpublished"]), ...(text ? [] : ["no-manifest"])],
       links: [
         sourceLink(path),
         ...(publish && text
@@ -421,18 +423,25 @@ async function crateMembers(out: Detail[], wasmModules: Set<string>) {
           : []),
       ],
       surface: wasm
-        ? surface("crates", child.name, "wasm", module ? "Ships as a WebAssembly module served by this deployment." : "WebAssembly-capable: its page shows build target, metadata and README; a module is served once the factory publishes one.", module ? { module } : {})
-        : surface("crates", child.name, "api", "Native crate: metadata, README and versions through its page and /api/inventory/crates/<id> (RPC over HTTP JSON)."),
+        ? surface("crates", child.name, "wasm", module ? "Built into a WebAssembly module by the VPS factory and served by this deployment." : "A wasm-bindgen crate: the factory builds it into a module (build-wasm.ts); until that build succeeds its page shows metadata, README and the API.", module ? { module } : {})
+        : surface("crates", child.name, "api", `${capable ? "A library that compiles for WebAssembly but exports no module of its own; reachable through the API." : "Native crate reachable through the API"}: metadata, dependencies, README and versions on its page, /api/inventory/crates/<id> and the /api/rpc methods.`),
       hasDoc: Boolean(readme),
       meta: {
         crateName: name,
         publish: publish && Boolean(text),
         crateType: types,
         wasm,
+        wasmCapable: capable,
         wasmModule: Boolean(module),
         edition: pick(pk.edition, "edition"),
         dependencies: Object.keys(manifest?.dependencies ?? {}).length,
         files: child.files.length,
+      },
+      data: {
+        dependencies: Object.fromEntries(Object.entries(manifest?.dependencies ?? {}).map(([k, v]) => [k, typeof v === "string" ? v : ((v as any)?.version ?? ((v as any)?.path ? "path" : (v as any)?.workspace ? "workspace" : "git"))])),
+        features: Object.keys(manifest?.features ?? {}),
+        bins: (manifest?.bin ?? []).map((b: any) => b.name),
+        libCrateTypes: types,
       },
       ...(readme ? { readme } : {}),
       ...(!readme ? { files: child.files.slice(0, 200) } : {}),
@@ -977,7 +986,7 @@ export interface BuildOptions {
   /** WebOS registry packages with category games (build-time), as {id,name,description}. */
   games?: { id: string; name: string; description: string; version?: string; license?: string }[];
   /** Crates for which this deployment ships a WebAssembly module under /wasm/<crate>.wasm. */
-  wasmModules?: Set<string>;
+  wasmModules?: Map<string, string>;
 }
 
 export async function buildInventory(options: BuildOptions = {}): Promise<Inventory> {
@@ -985,7 +994,7 @@ export async function buildInventory(options: BuildOptions = {}): Promise<Invent
   const members: Detail[] = [];
   await appMembers(members, apps);
   await packageMembers(members);
-  await crateMembers(members, options.wasmModules ?? new Set());
+  await crateMembers(members, options.wasmModules ?? new Map());
   await docMembers(members);
   await directoryKind(members, "factory", [{ dir: "factory", tags: ["factory"] }]);
   await compositionMembers(members);
@@ -1092,6 +1101,9 @@ export async function checkInventory(inv: Inventory, dist?: string): Promise<{ e
   if (dist) {
     for (const file of ["api/inventory.json", ...KIND_IDS.map((k) => `api/inventory/${k}.json`)])
       if (!(await Bun.file(join(dist, file)).exists())) errors.push(`${file}: not built`);
+    for (const m of inv.members)
+      if (m.surface.module && !(await Bun.file(join(dist, m.surface.module)).exists()))
+        errors.push(`${m.kind}/${m.id}: declared module ${m.surface.module} is not in the release`);
     const missing: string[] = [];
     for (const m of inv.members) if (!(await Bun.file(join(dist, `api/inventory/${m.kind}/${m.id}.json`)).exists())) missing.push(`${m.kind}/${m.id}`);
     if (missing.length) errors.push(`${missing.length} members have no built API file, first ${missing.slice(0, 5).join(", ")}`);

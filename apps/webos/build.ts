@@ -11,6 +11,7 @@ import { stageWorkspace, stageWorkspaceCatalogs } from "./workspace";
 import { stageGamesContent } from "./games-content";
 import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
 import { ROUTES, appPath } from "./src/config";
+import { stageWasmModules } from "./wasm-modules";
 import { buildInventory, checkInventory, catalogMembers, printCounts, writeInventory } from "./inventory";
 
 const root = resolve(import.meta.dir, "../..");
@@ -326,13 +327,14 @@ console.log(
 );
 const built = await buildPackages(dist);
 await stageGamesContent(dist);
+const wasmModules = await stageWasmModules(dist, root);
 // The full inventory: every member of the repository with the WebOS surface that serves it (inventory.ts).
 const inventory = await buildInventory({
   apps,
   versions: true,
   games: built.filter((p) => p.category === "games"),
   // The crates whose WebAssembly module this deployment ships (copied to dist/wasm below).
-  wasmModules: new Set(["aphrody-webos-wasm"]),
+  wasmModules,
 });
 await writeInventory(dist, inventory);
 printCounts(inventory);

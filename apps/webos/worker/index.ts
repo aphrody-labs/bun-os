@@ -10,6 +10,7 @@ import { APP_SERVER_PATHS, appServerResponse } from "./app-server";
 import { ROUTES } from "../src/config";
 import { ORIGIN, pathMeta, type PathMeta } from "../paths";
 import { inventoryResponse, inventoryMeta } from "./inventory";
+import { rpcResponse } from "./rpc";
 import vmLock from "../vm.lock.json";
 
 interface R2ObjectBodyLike {
@@ -322,6 +323,7 @@ export default {
       );
       return env.LEGACY.fetch(target);
     }
+    if (url.pathname === "/api/rpc") return rpcResponse(request, env.ASSETS);
     const inventory = await inventoryResponse(request, env.ASSETS);
     if (inventory) return inventory;
     if (url.pathname === "/api/catalog") {
