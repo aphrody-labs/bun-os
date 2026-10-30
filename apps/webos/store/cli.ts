@@ -14,7 +14,7 @@ if (process.platform !== "linux") throw new Error("The Store repositories are bu
 const [command, target = "all"] = Bun.argv.slice(2);
 const ctx = context();
 const dist = Bun.env.WEBOS_DIST ?? join(Bun.env.HOME ?? "/root", "apps/webos/current/dist");
-const load = (format: Format) => import(`./${format}`) as Promise<{ build(ctx: typeof ctx): Promise<void>; qualify(ctx: typeof ctx): Promise<QualResult> }>;
+const load = (format: Format) => import(`./${format}`) as Promise<{ build(ctx: ReturnType<typeof context>): Promise<void>; qualify(ctx: ReturnType<typeof context>): Promise<QualResult> }>;
 const formats = (target === "all" || target === "catalog" ? [...FORMATS] : [target as Format]).filter((f) => FORMATS.includes(f));
 if (target !== "all" && target !== "catalog" && !formats.length) throw new Error(`Unknown target ${target}`);
 
