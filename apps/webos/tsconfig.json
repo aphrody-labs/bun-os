@@ -5,5 +5,5 @@
     "types": ["bun-types"],
     "noEmit": true
   },
-  "include": ["src", "worker", "*.ts"]
+  "include": ["src", "services", "contracts", "store", "*.ts"]
 }

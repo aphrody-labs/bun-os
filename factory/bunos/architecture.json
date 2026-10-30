@@ -323,11 +323,11 @@
       "title": "Web sites (webos)",
       "owner": "apps/webos",
       "module": null,
-      "entry": ["just build-js"],
-      "docs": [],
-      "ci": ["aphrody-sites.yml#webos"],
+      "entry": ["bun apps/webos/deploy.ts"],
+      "docs": ["docs/webos/ARCHITECTURE.md"],
+      "ci": [],
       "pins": [],
-      "status": "ci-verified"
+      "status": "built"
     },
     {
       "id": "c",

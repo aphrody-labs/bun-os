@@ -9,6 +9,7 @@ export const ISOLATION = {
 
 export function isolated(response: Response): Response {
   const out = new Response(response.body, response);
-  for (const [key, value] of Object.entries(ISOLATION)) out.headers.set(key, value);
+  for (const [key, value] of Object.entries(ISOLATION))
+    out.headers.set(key, value);
   return out;
 }

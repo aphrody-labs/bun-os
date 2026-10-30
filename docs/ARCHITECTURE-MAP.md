@@ -68,7 +68,7 @@ Images              | images, release, sites
 | factory | **dotnet-linux**: factory/dotnet-linux (upstream .NET SDK and PowerShell on Linux: pinned tarballs, Arch packages, buncc dotnet) (provider code: packages/buncc/src/dotnet-linux (buncc dotnet, buncc pwsh); the existing Windows-centric dotnet provider stays in packages/buncc/src/providers/dotnet.ts) | `factory/dotnet-linux` | `bun factory/dotnet-linux/refresh.ts --check`<br>`bun packages/buncc/src/cli.ts dotnet pins` | `docs/DOTNET-LINUX.md` | `dotnet-linux.yml#pins`<br>`dotnet-linux.yml#ubuntu`<br>`dotnet-linux.yml#alpine`<br>`dotnet-linux.yml#cross-arm64`<br>`dotnet-linux.yml#arch`<br>`dotnet-linux.yml#wsl-layer`<br>`dotnet-linux.yml#wasm-guest` | `factory/dotnet-linux/pins.json` | unverified |
 | images | **images**: Images (factory/images, factory/arch, factory/usr) (images build on a Linux host; no image has been produced by CI) | `factory/images` | `just iso` | `docs/UNIFIED-INSTALL.md` | - | `factory/arch/sources.json` | unverified |
 | images | **release**: Release (npm, crates, binaries) | `scripts/release.ts` | `just release` | - | `release.yml#verify`<br>`ci.yml#release-plan` | - | unverified |
-| images | **sites**: Web sites (webos) | `apps/webos` | `just build-js` | - | `aphrody-sites.yml#webos` | - | ci-verified |
+| images | **sites**: Web sites (webos) | `apps/webos` | `bun apps/webos/deploy.ts` | `docs/webos/ARCHITECTURE.md` | - | - | built |
 
 ## Pins
 
@@ -91,7 +91,6 @@ Microsoft references (`vendor/microsoft/PINS.json`, 14 pins): microsoft-ui-xaml 
 | Workflow | Trigger | Jobs | Proves (entries) | Bun setup |
 | --- | --- | --- | --- | --- |
 | `alpine.yml` (Alpine (Bun OS line)) | workflow_dispatch, push (main; paths 4: factory/alpine/**, packages/bunos-run/**, ...) | `suite`, `android`, `wasm-guest` | - | none |
-| `aphrody-sites.yml` (Aphrody Sites) | push (main; paths 6: apps/webos/**, apps/craft*/**, ...), workflow_dispatch | `webos` | sites | setup-workspace |
 | `buncc-desktop.yml` (buncc-desktop) | workflow_dispatch, pull_request (paths 3: packages/buncc/src/desktop/**, factory/desktop/**, ...), schedule | `plan`, `build` | buncc-desktop | setup-workspace |
 | `buncc-linux-desktop.yml` (buncc linux desktop (GNOME, Plasma, Qt 6)) | workflow_dispatch, push (main; paths 4: packages/buncc/src/linux-target/**, packages/buncc/test/linux-target.test.ts, ...) | `unit`, `windows-cross`, `arch-build` | linux-desktop | jobs install the pinned Bun with npm install -g bun@BUN_VERSION on ubuntu and windows runners and build in an Arch container; owner: linux-desktop, to move to the setup action |
 | `bunos-c.yml` (Bun OS C) | push (main; paths 3: factory/c/**, packages/buncc/src/c/**, ...), workflow_dispatch | `linux`, `musl`, `windows` | c | setup-workspace |

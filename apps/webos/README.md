@@ -94,7 +94,7 @@ certificate no longer require Cloudflare in their serving path.
 
 Every page of the shell (and the Browser app's `/api/browse` frames) is served with
 `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: credentialless`
-(`worker/isolation.ts`). That makes `SharedArrayBuffer` available for the threaded emulators and the
+(`services/isolation.ts`). That makes `SharedArrayBuffer` available for the threaded emulators and the
 interactive Alpine guest, while third-party images and styles keep loading without credentials.
 A document embedded in the shell must carry the same headers or Chromium blocks it; `test/isolation.test.ts`
 checks all three behaviours in a real Chrome.

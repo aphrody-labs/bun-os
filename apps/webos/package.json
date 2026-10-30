@@ -1,19 +1,20 @@
 {
   "name": "@aphrody/webos",
   "version": "1.4.7",
-  "description": "aphrody.com: the Bun OS in the browser. One Cloudflare Worker serves the desktop shell (windows, launcher, file explorer, terminal, browser, Bun Engine) and the catalog of every app, package and crate of the workspace.",
+  "description": "aphrody.com: the Bun OS web client and the WebOS Bun service (APIs, catalog, inventory), served natively from the VPS.",
   "license": "Apache-2.0",
   "author": "aphrody-dev <contact@aphrody.com>",
   "type": "module",
   "scripts": {
     "build": "bun build-product.ts",
     "build:shell": "bun build.ts",
-    "dev": "bun build-product.ts && wrangler dev",
+    "dev": "bun build-product.ts && bun services/serve.ts",
     "deploy": "bun deploy.ts",
     "inventory": "bun inventory.ts",
     "check:coverage": "bun inventory.ts --check",
     "qualify:emulators": "bun ../../packages/bun-engine/web-emulation/qualify-webos.ts",
-    "typecheck": "bun check -p tsconfig.json --noEmit"
+    "typecheck": "bun check -p tsconfig.json --noEmit",
+    "serve": "bun services/serve.ts"
   },
   "dependencies": {
     "@aphrody/app-ui": "workspace:*",

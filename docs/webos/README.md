@@ -2,7 +2,8 @@
 # Bun OS Web OS (aphrody.com)
 
 One site for the whole product: a desktop that runs in the browser. Owner: `apps/webos`
-(Cloudflare Worker plus a vanilla TypeScript shell). Build and run it with `bunos webos <build|craft|serve|deploy>`.
+(the WebOS Bun service in `services/` plus a vanilla TypeScript shell, being replaced by a thin client
+for the native Hyprland desktop; see [ARCHITECTURE.md](ARCHITECTURE.md)). Build and run it with `bunos webos <build|craft|serve|deploy>`.
 
 ## What runs where
 
@@ -11,12 +12,12 @@ One site for the whole product: a desktop that runs in the browser. Owner: `apps
 | Window manager, ten workspaces, dwindle/scrolling/floating layouts, scratchpad, directional focus | `src/wm.ts`, `src/keys.ts`; keyboard model of the Omarchy manual (04-navigation), Alt plays Super | local browser, tiling and workspace switch |
 | Files | Rust VFS (`aphrody-shell-vfs`) compiled to wasm, persisted in OPFS (`packages/webos-wasm`) | local browser |
 | Terminal | Rust shell (`aphrody-shell-session`/`aphrody-shell-web`, Rio VT state) on the same VFS | typed `echo`, `cat`, `ls` |
-| Browser | tabs; pages fetched by the Worker (`/api/browse`), scripts removed, sandboxed | production |
+| Browser | tabs; pages fetched by the service (`/api/browse`), scripts removed, sandboxed | production |
 | Inspector | `aphrody-re` triage compiled to wasm | wired, not exercised in a browser |
 | App Store / package manager | `src/pkg.ts`: registry, sha256-verified installs into Cache Storage, offline use through the service worker, update and removal | install, launch, cache |
 | Games | Dust and melonDS builds from `packages/bun-engine/web-emulation`, packaged by `packages.ts` | GodMode9i homebrew booted in Dust |
 | Craft apps | egui/eframe wasm builds of `apps/*-web` via `build-craft.ts` | PdfCraft opens in the browser |
-| Alpine Linux | v86 (x86 JIT to wasm) booting Alpine 3.24.2 x86; ISO in R2, served with Range by the Worker | booted to login, `uname -a` |
+| Alpine Linux | v86 (x86 JIT to wasm) booting Alpine 3.24.2 x86; ISO in R2, served with Range by the service | booted to login, `uname -a` |
 | Calculator, Media, Disk Usage, Activity, Web Apps | `src/apps/*` | typecheck |
 | Materials | `@aphrody/m3-tokens`, `@aphrody/m3-fonts`, `@aphrody/material-web` elements, file icons from `packages/assets` | local browser |
 
@@ -32,7 +33,7 @@ One site for the whole product: a desktop that runs in the browser. Owner: `apps
 
 ## Merged routes
 
-The Worker serves `aphrody.com`. Old product
+The WebOS Bun service (`apps/webos/services/serve.ts`) serves `aphrody.com`. Old product
 hosts (`app-*.aphrody.app`, `*craft.aphrody.app`, `aphrody.app`, `www`) answer with a 301 to the Web OS.
 `/api/health`, `/api/catalog` (every app, package and crate), `/api/browse` and `/vm/alpine.iso` are native.
 

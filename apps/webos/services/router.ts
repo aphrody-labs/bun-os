@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-// Shared WebOS handler: static Bun OS shell + /api/health + /api/browse (script-free reader proxy for the Bun Browser).
+// WebOS HTTP routes of the Bun service (ADR-002): the shell document and static assets, host redirects, the API routes
+// (rpc, inventory, search, downloads, browse) and object streaming. services/serve.ts mounts them on Bun.serve.
 import { workspaceResponse } from "./workspace";
 import { gameContentResponse } from "./game-content";
 import { ISOLATION, isolated } from "./isolation";
@@ -14,25 +15,24 @@ import { inventoryResponse, inventoryMeta } from "./inventory";
 import { rpcResponse } from "./rpc";
 import vmLock from "../vm.lock.json";
 
-interface R2ObjectBodyLike {
+export interface ObjectBody {
   body: ReadableStream;
   size: number;
   httpEtag: string;
   range?: { offset: number; length: number };
 }
-interface Env {
-  SOURCE_COMMIT?: string;
-  BROWSE_FETCH?: (url: string, init: RequestInit) => Promise<Response>;
-  ASSETS: { fetch(request: Request): Promise<Response> };
-  /** The former aphrody-app Worker, kept as the private backend of the merged API routes (service binding). */
-  /** R2 bucket aphrody-assets; large VM images live under webos/vm/. */
-  VM: {
+/** Everything a route needs from the host: static assets of the release, the object store and the outbound fetch. */
+export interface ServiceContext {
+  assets: { fetch(request: Request): Promise<Response> };
+  /** Object store (release objects/ then the shared build/webos-objects); large VM images live under webos/vm/. */
+  objects: {
     get(
       key: string,
       options?: { range?: { offset: number; length?: number } },
-    ): Promise<R2ObjectBodyLike | null>;
+    ): Promise<ObjectBody | null>;
     head(key: string): Promise<{ size: number; httpEtag: string } | null>;
   };
+  browseFetch?: (url: string, init: RequestInit) => Promise<Response>;
 }
 
 const ISO_KEY = `webos/vm/${vmLock.alpine.iso.name}`;
@@ -41,12 +41,12 @@ const GUEST_KEY = `webos/vm/${vmLock.alpine.guest64.name}`;
 /** Serve an object of the VM bucket with Range support (v86 reads the ISO in chunks; the guest image is cached in OPFS). */
 async function vmObject(
   request: Request,
-  env: Env,
+  ctx: ServiceContext,
   key: string,
   type = "application/octet-stream",
   cache = "no-store",
 ): Promise<Response> {
-  const head = await env.VM.head(key);
+  const head = await ctx.objects.head(key);
   if (!head) return new Response("Disk image not published.", { status: 404 });
   const headers = new Headers({
     "accept-ranges": "bytes",
@@ -63,7 +63,7 @@ async function vmObject(
     return new Response(null, { headers });
   }
   if (!m) {
-    const full = await env.VM.get(key);
+    const full = await ctx.objects.get(key);
     headers.set("content-length", String(head.size));
     return new Response(full?.body ?? null, { headers });
   }
@@ -79,7 +79,7 @@ async function vmObject(
       headers: { "content-range": `bytes */${head.size}` },
     });
   start = Math.max(0, start);
-  const part = await env.VM.get(key, {
+  const part = await ctx.objects.get(key, {
     range: { offset: start, length: end - start + 1 },
   });
   headers.set("content-range", `bytes ${start}-${end}/${head.size}`);
@@ -240,7 +240,11 @@ async function browse(
 }
 
 /** Per-path search metadata on the shell document, streamed through HTMLRewriter (no buffering). */
-function withPathMeta(res: Response, pathname: string, override?: PathMeta): Response {
+function withPathMeta(
+  res: Response,
+  pathname: string,
+  override?: PathMeta,
+): Response {
   const meta = override ?? pathMeta(pathname);
   if (!meta || !(res.headers.get("content-type") ?? "").includes("text/html"))
     return res;
@@ -289,123 +293,109 @@ function redirectFor(url: URL): string | undefined {
   return undefined;
 }
 
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-    const game = await gameContentResponse(request, env.ASSETS, env.VM);
-    if (game) return game;
-    if (APP_SERVER_PATHS.has(url.pathname)) return appServerResponse(request);
-    const moved = redirectFor(url);
-    if (moved) return Response.redirect(moved, 301);
-    const emulators = await emulatorsResponse(request, env.VM);
-    if (emulators) return emulators;
-    const gaming = await playResponse(request, env.ASSETS);
-    if (gaming) {
-      const out = new Response(gaming.body, gaming);
-      for (const [key, value] of Object.entries(ISOLATION))
-        out.headers.set(key, value);
-      out.headers.set("x-content-type-options", "nosniff");
-      return out;
-    }
-    if (url.pathname === "/api/rpc") return rpcResponse(request, env.ASSETS);
-    const inventory = await inventoryResponse(request, env.ASSETS);
-    if (inventory) return inventory;
-    if (url.pathname === "/api/catalog") {
-      return env.ASSETS.fetch(
-        new Request(new URL("/catalog.json", url).href, request),
-      );
-    }
-    if (
-      url.pathname === "/api/health" ||
-      url.pathname === "/health" ||
-      url.pathname === "/healthz"
-    ) {
-      const cf = (request as Request & { cf?: { colo?: string } }).cf;
-      const counts = await env.ASSETS.fetch(
-        new Request(new URL("/api/inventory.json", url).href),
-      )
-        .then(async (r) =>
-          r.ok
-            ? ((await r.json()) as { counts: Record<string, number>; total: number })
-            : undefined,
-        )
-        .catch(() => undefined);
-      return Response.json(
-        {
-          ok: true,
-          service: "aphrody-webos",
-          sourceCommit: env.SOURCE_COMMIT ?? null,
-          inventory: counts ? { total: counts.total, counts: counts.counts } : null,
-          colo: cf?.colo ?? null,
-          time: new Date().toISOString(),
-        },
-        { headers: { "cache-control": "no-store" } },
-      );
-    }
-    if (url.pathname === "/api/downloads") return downloadsResponse(request);
-    if (url.pathname === "/api/search") return searchResponse(request, env.ASSETS);
-    if (url.pathname === "/api/browse") {
-      if (request.method !== "GET")
-        return new Response("Method not allowed", { status: 405 });
-      return isolated(await browse(request, env.BROWSE_FETCH));
-    }
-    if (
-      url.pathname === "/vm/alpine.iso" &&
-      (request.method === "GET" || request.method === "HEAD")
-    )
-      return vmObject(request, env, ISO_KEY);
-    if (
-      url.pathname === `/vm/${vmLock.alpine.guest64.name}` &&
-      (request.method === "GET" || request.method === "HEAD")
-    )
-      return isolated(await vmObject(request, env, GUEST_KEY, "application/wasm", "no-cache"));
-    if (url.pathname.startsWith("/api/"))
-      return new Response("Not found", { status: 404 });
-    const workspace =
-      url.pathname === "/workspace" || url.pathname.startsWith("/workspace/");
-    // Inventory pages are desktop deep links (/inventory/<kind>/<id>, ids may contain dots): the shell opens them.
-    const inventoryPage =
-      url.pathname === "/inventory" || url.pathname.startsWith("/inventory/");
-    const res = workspace
-      ? await workspaceResponse(request, env.ASSETS)
-      : inventoryPage
-        ? withPathMeta(
-            await env.ASSETS.fetch(new Request(new URL("/", url).href, request)),
-            url.pathname,
-            (await inventoryMeta(url.pathname, env.ASSETS)) ??
-              pathMeta("/inventory"),
-          )
-        : withPathMeta(await env.ASSETS.fetch(request), url.pathname);
-    const out = new Response(res.body, res);
-    out.headers.set(
-      "content-security-policy",
-      workspace
-        ? PAGE_CSP.replace("base-uri 'none'", "base-uri 'self'")
-        : url.pathname.startsWith("/apps/")
-          ? APP_CSP
-          : PAGE_CSP,
-    );
-    for (const [k, v] of Object.entries(ISOLATION)) out.headers.set(k, v);
+/** Exact API paths, mounted as Bun.serve routes; everything else goes through handle(). */
+export function apiRoutes(
+  ctx: ServiceContext,
+): Record<string, (request: Request) => Response | Promise<Response>> {
+  return {
+    "/api/rpc": (request) => rpcResponse(request, ctx.assets),
+    "/api/downloads": (request) => downloadsResponse(request),
+    "/api/search": (request) => searchResponse(request, ctx.assets),
+    "/api/catalog": (request) =>
+      ctx.assets.fetch(
+        new Request(new URL("/catalog.json", request.url).href, request),
+      ),
+    "/api/browse": async (request) =>
+      request.method === "GET"
+        ? isolated(await browse(request, ctx.browseFetch))
+        : new Response("Method not allowed", {
+            status: 405,
+            headers: { allow: "GET" },
+          }),
+  };
+}
+
+/** Fallback handler: redirects, games, emulators, inventory, VM objects, the shell and static assets. */
+export async function handle(
+  request: Request,
+  ctx: ServiceContext,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const game = await gameContentResponse(request, ctx.assets, ctx.objects);
+  if (game) return game;
+  if (APP_SERVER_PATHS.has(url.pathname)) return appServerResponse(request);
+  const moved = redirectFor(url);
+  if (moved) return Response.redirect(moved, 301);
+  const emulators = await emulatorsResponse(request, ctx.objects);
+  if (emulators) return emulators;
+  const gaming = await playResponse(request, ctx.assets);
+  if (gaming) {
+    const out = new Response(gaming.body, gaming);
+    for (const [key, value] of Object.entries(ISOLATION))
+      out.headers.set(key, value);
     out.headers.set("x-content-type-options", "nosniff");
-    out.headers.set("referrer-policy", "strict-origin-when-cross-origin");
-    out.headers.set(
-      "strict-transport-security",
-      "max-age=31536000; includeSubDomains",
-    );
-    if (
-      workspace ||
-      url.pathname === "/catalog.json" ||
-      url.pathname === "/registry.json" ||
-      url.pathname.endsWith("/app.json") ||
-      url.pathname.endsWith("/manifest.json") ||
-      url.pathname.endsWith(".html") ||
-      url.pathname === "/"
-    )
-      out.headers.set("cache-control", "no-cache");
-    else if (res.ok && /\/[a-f0-9]{12,64}\//.test(url.pathname))
-      out.headers.set("cache-control", "public, max-age=31536000, immutable");
-    else if (!out.headers.has("cache-control"))
-      out.headers.set("cache-control", "no-cache");
     return out;
-  },
-};
+  }
+  const inventory = await inventoryResponse(request, ctx.assets);
+  if (inventory) return inventory;
+  if (
+    url.pathname === "/vm/alpine.iso" &&
+    (request.method === "GET" || request.method === "HEAD")
+  )
+    return vmObject(request, ctx, ISO_KEY);
+  if (
+    url.pathname === `/vm/${vmLock.alpine.guest64.name}` &&
+    (request.method === "GET" || request.method === "HEAD")
+  )
+    return isolated(
+      await vmObject(request, ctx, GUEST_KEY, "application/wasm", "no-cache"),
+    );
+  if (url.pathname.startsWith("/api/"))
+    return new Response("Not found", { status: 404 });
+  const workspace =
+    url.pathname === "/workspace" || url.pathname.startsWith("/workspace/");
+  // Inventory pages are desktop deep links (/inventory/<kind>/<id>, ids may contain dots): the shell opens them.
+  const inventoryPage =
+    url.pathname === "/inventory" || url.pathname.startsWith("/inventory/");
+  const res = workspace
+    ? await workspaceResponse(request, ctx.assets)
+    : inventoryPage
+      ? withPathMeta(
+          await ctx.assets.fetch(new Request(new URL("/", url).href, request)),
+          url.pathname,
+          (await inventoryMeta(url.pathname, ctx.assets)) ??
+            pathMeta("/inventory"),
+        )
+      : withPathMeta(await ctx.assets.fetch(request), url.pathname);
+  const out = new Response(res.body, res);
+  out.headers.set(
+    "content-security-policy",
+    workspace
+      ? PAGE_CSP.replace("base-uri 'none'", "base-uri 'self'")
+      : url.pathname.startsWith("/apps/")
+        ? APP_CSP
+        : PAGE_CSP,
+  );
+  for (const [k, v] of Object.entries(ISOLATION)) out.headers.set(k, v);
+  out.headers.set("x-content-type-options", "nosniff");
+  out.headers.set("referrer-policy", "strict-origin-when-cross-origin");
+  out.headers.set(
+    "strict-transport-security",
+    "max-age=31536000; includeSubDomains",
+  );
+  if (
+    workspace ||
+    url.pathname === "/catalog.json" ||
+    url.pathname === "/registry.json" ||
+    url.pathname.endsWith("/app.json") ||
+    url.pathname.endsWith("/manifest.json") ||
+    url.pathname.endsWith(".html") ||
+    url.pathname === "/"
+  )
+    out.headers.set("cache-control", "no-cache");
+  else if (res.ok && /\/[a-f0-9]{12,64}\//.test(url.pathname))
+    out.headers.set("cache-control", "public, max-age=31536000, immutable");
+  else if (!out.headers.has("cache-control"))
+    out.headers.set("cache-control", "no-cache");
+  return out;
+}

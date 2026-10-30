@@ -28,11 +28,18 @@ const words = (value: string) =>
     .filter(Boolean);
 
 function clip(text: string, length = 200) {
-  const flat = text.replace(/[#*`>_|-]+/g, " ").replace(/\s+/g, " ").trim();
+  const flat = text
+    .replace(/[#*`>_|-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   return flat.length > length ? `${flat.slice(0, length - 1)}…` : flat;
 }
 
-async function json<T>(assets: Assets, base: URL, path: string): Promise<T | undefined> {
+async function json<T>(
+  assets: Assets,
+  base: URL,
+  path: string,
+): Promise<T | undefined> {
   try {
     const res = await assets.fetch(new Request(new URL(path, base).href));
     return res.ok ? ((await res.json()) as T) : undefined;
@@ -43,18 +50,24 @@ async function json<T>(assets: Assets, base: URL, path: string): Promise<T | und
 
 async function load(assets: Assets, base: URL): Promise<Entry[]> {
   const key = base.origin;
-  if (cache && cache.key === key && Date.now() - cache.at < TTL_MS) return cache.entries;
+  if (cache && cache.key === key && Date.now() - cache.at < TTL_MS)
+    return cache.entries;
   const entries: Entry[] = [];
   const [catalog, inventory] = await Promise.all([
     json<{
       apps?: { id: string; d?: string }[];
       packages?: { id: string; d?: string }[];
     }>(assets, base, "/catalog.json"),
-    json<{ members: { kind: string; id: string; name: string; desc: string; tags?: string[]; path?: string }[] }>(
-      assets,
-      base,
-      "/api/inventory.json",
-    ),
+    json<{
+      members: {
+        kind: string;
+        id: string;
+        name: string;
+        desc: string;
+        tags?: string[];
+        path?: string;
+      }[];
+    }>(assets, base, "/api/inventory.json"),
   ]);
   // Every inventory member (apps, packages, crates, factory, engines, tools, infra, ...) is searchable.
   for (const member of inventory?.members ?? [])
@@ -71,9 +84,15 @@ async function load(assets: Assets, base: URL): Promise<Entry[]> {
         [member.path ?? "", 1],
       ],
     });
-  const pathById = new Map(Object.entries(ROUTES.apps).map(([path, id]) => [id, path]));
-  for (const app of inventory ? [] : [...(catalog?.apps ?? []), ...(catalog?.packages ?? [])]) {
-    const path = pathById.get(app.id) ?? `${ROUTES.memberPath}${encodeURIComponent(app.id)}`;
+  const pathById = new Map(
+    Object.entries(ROUTES.apps).map(([path, id]) => [id, path]),
+  );
+  for (const app of inventory
+    ? []
+    : [...(catalog?.apps ?? []), ...(catalog?.packages ?? [])]) {
+    const path =
+      pathById.get(app.id) ??
+      `${ROUTES.memberPath}${encodeURIComponent(app.id)}`;
     entries.push({
       title: app.id,
       url: `${ORIGIN}${path}`,
@@ -114,12 +133,25 @@ function rank(entries: Entry[], query: string): Hit[] {
 }
 
 /** Same request contract as the Google-backed owner (query, vertical, hl, safe, start, num). */
-export async function searchResponse(request: Request, assets: Assets): Promise<Response> {
-  const headers = { "cache-control": "no-store", "x-content-type-options": "nosniff" };
+export async function searchResponse(
+  request: Request,
+  assets: Assets,
+): Promise<Response> {
+  const headers = {
+    "cache-control": "no-store",
+    "x-content-type-options": "nosniff",
+  };
   if (request.method !== "GET" && request.method !== "HEAD")
-    return Response.json({ error: "Method not allowed" }, { status: 405, headers: { ...headers, allow: "GET, HEAD" } });
+    return Response.json(
+      { error: "Method not allowed" },
+      { status: 405, headers: { ...headers, allow: "GET, HEAD" } },
+    );
   const url = new URL(request.url);
-  const query = (url.searchParams.get("query") ?? url.searchParams.get("q") ?? "").trim();
+  const query = (
+    url.searchParams.get("query") ??
+    url.searchParams.get("q") ??
+    ""
+  ).trim();
   const start = Number(url.searchParams.get("start") || 0);
   const num = Number(url.searchParams.get("num") || 10);
   if (
@@ -133,7 +165,13 @@ export async function searchResponse(request: Request, assets: Assets): Promise<
     num > 20 ||
     (url.searchParams.get("vertical") ?? "web") !== "web"
   )
-    return Response.json({ error: "Invalid search request" }, { status: 400, headers });
+    return Response.json(
+      { error: "Invalid search request" },
+      { status: 400, headers },
+    );
   const hits = rank(await load(assets, url), query);
-  return Response.json({ query, organic: hits.slice(start, start + num), total: hits.length }, { headers });
+  return Response.json(
+    { query, organic: hits.slice(start, start + num), total: hits.length },
+    { headers },
+  );
 }

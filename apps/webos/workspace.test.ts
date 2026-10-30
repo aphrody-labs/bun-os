@@ -4,7 +4,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stageWorkspace } from "./workspace";
-import { workspaceResponse } from "./worker/workspace";
+import { workspaceResponse } from "./services/workspace";
 
 const temporary: string[] = [];
 afterEach(async () => {

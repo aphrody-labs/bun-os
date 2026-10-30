@@ -18,7 +18,9 @@ function git(...args: string[]) {
 }
 const commit = git("rev-parse", "HEAD");
 if (commit !== git("rev-parse", "refs/remotes/origin/main"))
-  throw new Error("Deploy the published main tip (git fetch origin && git merge --ff-only origin/main)");
+  throw new Error(
+    "Deploy the published main tip (git fetch origin && git merge --ff-only origin/main)",
+  );
 if (git("diff", "HEAD", "--", "apps/webos", "infra/config/routes.catalog.json"))
   throw new Error("WebOS source must be committed before deployment");
 const handoff = resolve(
@@ -49,8 +51,17 @@ for (const required of [
     throw new Error(`Missing ${required}`);
 // Coverage gate: every member of the repository has a WebOS surface and an API record in the release.
 {
-  const registry = (await Bun.file(join(release, "dist/registry.json")).json()) as {
-    packages: { id: string; name: string; description: string; category: string; version?: string; license?: string }[];
+  const registry = (await Bun.file(
+    join(release, "dist/registry.json"),
+  ).json()) as {
+    packages: {
+      id: string;
+      name: string;
+      description: string;
+      category: string;
+      version?: string;
+      license?: string;
+    }[];
   };
   const inventory = await buildInventory({
     versions: true,
@@ -85,7 +96,7 @@ if (!imported) {
   }
 }
 const result = await Bun.build({
-  entrypoints: [join(import.meta.dir, "serve.ts")],
+  entrypoints: [join(import.meta.dir, "services/serve.ts")],
   outdir: release,
   naming: "server.js",
   target: "bun",
@@ -130,10 +141,15 @@ await Bun.write(
 // Keep the newest four releases and the active one; older ones are about 500 MB each.
 {
   const releases = join(handoff, "releases");
-  const active = await readlink(join(Bun.env.HOME ?? "", "apps/webos/current")).catch(() => "");
-  const names = (await readdir(releases)).sort((x, y) => Number(y.split("-")[1]) - Number(x.split("-")[1]));
+  const active = await readlink(
+    join(Bun.env.HOME ?? "", "apps/webos/current"),
+  ).catch(() => "");
+  const names = (await readdir(releases)).sort(
+    (x, y) => Number(y.split("-")[1]) - Number(x.split("-")[1]),
+  );
   for (const name of names.slice(4))
-    if (!active.endsWith(name)) await rm(join(releases, name), { recursive: true, force: true });
+    if (!active.endsWith(name))
+      await rm(join(releases, name), { recursive: true, force: true });
 }
 await Bun.write(join(handoff, "ready.tmp"), release.split("/").pop()! + "\n");
 await rename(join(handoff, "ready.tmp"), join(handoff, "ready"));

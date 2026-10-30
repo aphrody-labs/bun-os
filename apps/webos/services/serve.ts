@@ -1,14 +1,19 @@
 // SPDX-License-Identifier: Apache-2.0
-// Native Bun host for the shared HTTP handler; production uses an immutable release.
+// The WebOS Bun service (ADR-002): Bun.serve with the API routes, the store API, health and the static release.
+// Production runs the bundled server.js at the root of an immutable release (deploy.ts); development runs this file.
 import { join, relative, resolve, isAbsolute } from "node:path";
-import worker from "./worker/index";
+import { apiRoutes, handle, type ServiceContext } from "./router";
 import { publicFetch } from "./public-fetch";
-import { storeApi } from "./store/api";
-import type { HealthResponse, RequestLog } from "./contracts/api";
+import { storeApi } from "../store/api";
+import type { HealthResponse, RequestLog } from "../contracts/api";
 
-const dist = resolve(Bun.env.WEBOS_DIST ?? join(import.meta.dir, "dist"));
+/** apps/webos in development, the release directory when bundled. */
+const home = import.meta.dir.replaceAll("\\", "/").endsWith("/services")
+  ? resolve(import.meta.dir, "..")
+  : import.meta.dir;
+const dist = resolve(Bun.env.WEBOS_DIST ?? join(home, "dist"));
 const objects = resolve(
-  Bun.env.WEBOS_OBJECTS ?? join(import.meta.dir, "../../build/webos-objects"),
+  Bun.env.WEBOS_OBJECTS ?? join(home, "../../build/webos-objects"),
 );
 async function objectFile(key: string) {
   if (
@@ -24,7 +29,7 @@ async function objectFile(key: string) {
   const shared = Bun.file(join(objects, key));
   return (await shared.exists())
     ? shared
-    : Bun.file(join(import.meta.dir, "objects", key));
+    : Bun.file(join(home, "objects", key));
 }
 const vm = {
   async head(key: string) {
@@ -142,27 +147,12 @@ async function health(): Promise<Response> {
   });
 }
 
-async function route(request: Request): Promise<Response> {
-  const { pathname } = new URL(request.url);
-  if (pathname === "/api/health" || pathname === "/healthz") return health();
-  const store = await storeApi(request);
-  if (store) return store;
-  return worker.fetch(request, {
-    BROWSE_FETCH: publicFetch,
-    ASSETS: assets,
-    VM: vm,
-    SOURCE_COMMIT: Bun.env.SOURCE_COMMIT,
-  });
-}
+const ctx: ServiceContext = { assets, objects: vm, browseFetch: publicFetch };
 
-const server = Bun.serve({
-  port: Number(Bun.env.PORT ?? Bun.argv[2] ?? 8790),
-  hostname: "127.0.0.1",
-  maxRequestBodySize: 1024 * 1024,
-  idleTimeout: 30,
-  fetch: async (request) => {
+function logged(handler: (request: Request) => Response | Promise<Response>) {
+  return async (request: Request): Promise<Response> => {
     const t0 = performance.now();
-    const response = await route(request);
+    const response = await handler(request);
     const entry: RequestLog = {
       ts: new Date().toISOString(),
       id: request.headers.get("x-request-id") ?? crypto.randomUUID(),
@@ -174,7 +164,24 @@ const server = Bun.serve({
     if (entry.path.startsWith("/api/") || entry.status >= 400)
       console.log(JSON.stringify(entry));
     return response;
-  },
+  };
+}
+
+const routes: Record<string, (request: Request) => Promise<Response>> = {};
+for (const path of ["/api/health", "/health", "/healthz"])
+  routes[path] = logged(health);
+for (const [path, handler] of Object.entries(apiRoutes(ctx)))
+  routes[path] = logged(handler);
+
+const server = Bun.serve({
+  port: Number(Bun.env.PORT ?? Bun.argv[2] ?? 8790),
+  hostname: "127.0.0.1",
+  maxRequestBodySize: 1024 * 1024,
+  idleTimeout: 30,
+  routes,
+  fetch: logged(
+    async (request) => (await storeApi(request)) ?? handle(request, ctx),
+  ),
 });
 console.log(
   JSON.stringify({

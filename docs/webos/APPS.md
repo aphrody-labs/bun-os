@@ -17,9 +17,9 @@ in-browser counterpart, published builds from the downloads service, README and 
 | Monorepo members (every tracked `apps/*` directory), descriptions, READMEs                         | `apps/webos/build.ts`, written to `dist/catalog.json` and `dist/readme/<member>.md`                                                                   |
 | Craft family of a member, package id, file bridges                                                 | `@aphrody/bun-workspace/capabilities`                                                                                                                 |
 | Installable packages (Craft, Bun Engine emulators), sha256 per file                                | `apps/webos/packages.ts`, written to `dist/registry.json`                                                                                             |
-| Published native builds                                                                            | `GET /api/downloads` (Worker, `apps/webos/worker/downloads.ts`) reads `latest.json` of the downloads service                                          |
+| Published native builds                                                                            | `GET /api/downloads` (service, `apps/webos/services/downloads.ts`) reads `latest.json` of the downloads service                                          |
 | Inventory of every repository member, with its real `backing` (desktop-app, wasm-module, api, download, repository) | `/api/inventory`, built by `apps/webos/inventory.ts`; its gate fails a member or desktop app without a backing |
-| Workspace agent service transport (`/rpc`, `/events`, `/notifications`)                            | Answered by the Worker (`apps/webos/worker/app-server.ts`): the service is the private native `aphrody app-server`                                    |
+| Workspace agent service transport (`/rpc`, `/events`, `/notifications`)                            | Answered by the service (`apps/webos/services/app-server.ts`): the service is the private native `aphrody app-server`                                    |
 | Shell code that reads them                                                                         | `apps/webos/src/config.ts` (the one config module)                                                                                                    |
 
 Opening a package that is not installed installs it in its own window (every file sha256-verified and
@@ -72,7 +72,7 @@ and Terminal over the Rust WebAssembly backend. What needs a native owner is not
   open in the Aphrody desktop app. The Workspace sidebar lists them only where those run.
 - The session chip, the home web search (`/api/search`, native Google search owner), Drive jobs and
   sync, Ask Aphrody, media jobs and tags in the inspector are hidden on the in-browser backend.
-- The Worker still answers the agent service transport (`/rpc`, `/events`, `/notifications`) with a
+- The service still answers the agent service transport (`/rpc`, `/events`, `/notifications`) with a
   JSON-RPC "method not found" carrying that reason, for clients that call it anyway.
 
 ## Packages (registry)

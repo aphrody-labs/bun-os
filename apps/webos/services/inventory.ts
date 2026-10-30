@@ -19,12 +19,16 @@ function assetFor(pathname: string): string | undefined {
   if (parts[1] === "inventory") rest = parts.slice(2);
   else if (ALIASES.has(parts[1]!)) rest = parts.slice(1);
   else return undefined;
-  if (rest.some((part) => part === "." || part === ".." || /[\\0]/.test(part))) return "";
+  if (rest.some((part) => part === "." || part === ".." || /[\\0]/.test(part)))
+    return "";
   if (!rest.length) return "/api/inventory.json";
   return `/api/inventory/${rest.join("/")}.json`;
 }
 
-export async function inventoryResponse(request: Request, assets: Assets): Promise<Response | undefined> {
+export async function inventoryResponse(
+  request: Request,
+  assets: Assets,
+): Promise<Response | undefined> {
   const url = new URL(request.url);
   let asset: string | undefined;
   try {
@@ -33,20 +37,38 @@ export async function inventoryResponse(request: Request, assets: Assets): Promi
     return undefined;
   }
   if (asset === undefined) return undefined;
-  const headers = { "cache-control": "no-cache", "x-content-type-options": "nosniff" };
+  const headers = {
+    "cache-control": "no-cache",
+    "x-content-type-options": "nosniff",
+  };
   if (request.method !== "GET" && request.method !== "HEAD")
-    return Response.json({ error: "Method not allowed" }, { status: 405, headers: { ...headers, allow: "GET, HEAD" } });
-  const res = asset ? await assets.fetch(new Request(new URL(asset, url).href, { method: request.method })) : undefined;
-  if (!res?.ok) return Response.json({ error: "No such inventory member" }, { status: 404, headers });
+    return Response.json(
+      { error: "Method not allowed" },
+      { status: 405, headers: { ...headers, allow: "GET, HEAD" } },
+    );
+  const res = asset
+    ? await assets.fetch(
+        new Request(new URL(asset, url).href, { method: request.method }),
+      )
+    : undefined;
+  if (!res?.ok)
+    return Response.json(
+      { error: "No such inventory member" },
+      { status: 404, headers },
+    );
   const out = new Response(res.body, res);
-  for (const [key, value] of Object.entries(headers)) out.headers.set(key, value);
+  for (const [key, value] of Object.entries(headers))
+    out.headers.set(key, value);
   out.headers.set("content-type", "application/json; charset=utf-8");
   out.headers.set("access-control-allow-origin", "*");
   return out;
 }
 
 /** Title and description of an /inventory page for the document head. */
-export async function inventoryMeta(pathname: string, assets: Assets): Promise<PathMeta | undefined> {
+export async function inventoryMeta(
+  pathname: string,
+  assets: Assets,
+): Promise<PathMeta | undefined> {
   let parts: string[];
   try {
     parts = decodeURIComponent(pathname).split("/").filter(Boolean).slice(1);
@@ -57,11 +79,21 @@ export async function inventoryMeta(pathname: string, assets: Assets): Promise<P
   if (!kind || !(kind in KINDS)) return undefined;
   const site = "Aphrody Bun OS";
   if (parts.length === 1)
-    return { title: `${KINDS[kind].label} · Bun OS inventory · ${site}`, description: KINDS[kind].desc };
+    return {
+      title: `${KINDS[kind].label} · Bun OS inventory · ${site}`,
+      description: KINDS[kind].desc,
+    };
   const res = await assets
-    .fetch(new Request(`https://assets.invalid/api/inventory/${parts.join("/")}.json`))
+    .fetch(
+      new Request(
+        `https://assets.invalid/api/inventory/${parts.join("/")}.json`,
+      ),
+    )
     .catch(() => undefined);
-  const member = res?.ok ? ((await res.json().catch(() => undefined)) as { name?: string; desc?: string } | undefined) : undefined;
+  const member = res?.ok
+    ? ((await res.json().catch(() => undefined)) as
+        { name?: string; desc?: string } | undefined)
+    : undefined;
   if (!member?.name) return undefined;
   return {
     title: `${member.name} · ${KINDS[kind].label} · ${site}`,

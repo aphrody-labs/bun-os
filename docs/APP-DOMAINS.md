@@ -20,9 +20,9 @@ preserving the sub-path and query string. The apex is served by the native Bun
 WebOS service on the VPS; Cloudflare DNS is authoritative but does not proxy the
 apex or `www`. The declarative source is
 `infra/config/routes.catalog.json` (host to `{kind, path, keep}`, plus the
-path to WebOS package map). The shared WebOS request handler
-(`apps/webos/worker/index.ts`), hosted natively on the apex and by the Worker on
-app aliases, derives `redirectFor` from it. The shell opens the package of a
+path to WebOS package map). The WebOS Bun service
+(`apps/webos/services/router.ts`, mounted by `services/serve.ts`) on the apex
+derives `redirectFor` from it. The shell opens the package of a
 catalog path, and the legacy `/?app=<package>` link redirects to that path.
 `bun.aphrody.com` and `bun.aphrody.app` are the Bun site (Worker `aphrody-app`, owned by the bun repo) and are not routed by this catalog.
 
@@ -159,6 +159,13 @@ checks and must not be reported as a qualified browser generation backend.
   `apps/webos/deploy.ts` now creates a native release handoff; it does not
   publish the apex Worker. The existing Worker remains deployed for application
   aliases and product hosts under `aphrody.app`.
+- 2026-10-30 (ADR-002, docs/webos/ARCHITECTURE.md): the Worker source (`apps/webos/worker/`, `wrangler.jsonc`)
+  and the `aphrody-sites.yml` workflow that pretended to publish it were removed; the handler code lives on as
+  plain Bun routes in `apps/webos/services/`. The deployed `aphrody-webos` Worker is frozen at its last upload and
+  only answers the `aphrody.app` alias redirects (it still emits the legacy `/?app=<package>` form, which the apex
+  turns into the catalog path). Replacement: a Cloudflare dynamic redirect ruleset on zone `aphrody.app` generated
+  from `infra/config/routes.catalog.json`, applied with the Cloudflare MCP, after which the Worker routes, custom
+  domains and script are deleted.
 - Zone `aphrody.app`, ruleset `4189be37cb1b498390a81986470650a7` (phase `http_request_dynamic_redirect`), rule
   `8d637dcb359446369ad4d93fdf21b8d2`: on host `aphrody.app`, `/install`, `/install.sh`, `/install.ps1`,
   `/llms.txt`, `/llms-full.txt`, `/docs/*` and `/api/bun/*` answer a 301 to the same path on

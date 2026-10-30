@@ -78,9 +78,9 @@ graph ([NATIVE-QUALIFICATION](NATIVE-QUALIFICATION.md)), and the Aphrody/Bun uni
 
 ## Products
 
-- **WebOS** at https://aphrody.com: `apps/webos` (Cloudflare Worker plus shell), Craft studios, Drive.
-  See [webos/README](webos/README.md). The Worker deploys from `.github/workflows/aphrody-sites.yml` on every
-  `main` push, and needs the protected `CLOUDFLARE_API_TOKEN` of that environment.
+- **WebOS** at https://aphrody.com: `apps/webos` (WebOS Bun service plus shell), Craft studios, Drive.
+  See [webos/README](webos/README.md) and [webos/ARCHITECTURE](webos/ARCHITECTURE.md). It deploys from the VPS with
+  `bun scripts/aphrody/release/deploy-sites.ts` (build, release handoff, root activator with health gate).
 - **Bun Engine** (`packages/bun-engine`, `crates/bun-engine-core`, [docs](bun-engine/README.md)): emulation and
   console runtime, with the console-style library UI (covers, profiles, gamescope session) and
   libretroarch embedded through `bun:ffi`. [Homebrew showcase](bun-engine/HOMEBREW.md).
@@ -159,8 +159,8 @@ workflow environment (not checked), and non-current GitHub mirrors, on which `re
    `crates/bevy/{benches,errors,examples/*}`). Options: split each into a `crates/<name>` submodule (needs
    history splits and collision-free names), or keep them nested inside the pinned `crates/bevy` owner and
    record the exception. No name is chosen here.
-3. **WebOS Worker deploy** runs only from `.github/workflows/aphrody-sites.yml`; the first run proving the
-   protected token is configured is still pending, and GitHub `release.yml` does not deploy it.
+3. **WebOS deploy** runs only on the VPS (`deploy-sites.ts`); the Cloudflare Worker source and its workflow were
+   retired on 2026-10-30, and the frozen `aphrody-webos` Worker awaits replacement by redirect rules (APP-DOMAINS.md).
 4. **GitHub mirror**: `aphrody-labs/bun-os` has no `os` branch (see Release state); decide whether it is a
    mirror of `os` or a separate repository, because the `github` remote of this checkout is
    `aphrody-labs/bun-distribution`. Resolved 2026-10-25: `aphrody-labs/bun-distribution` was renamed
