@@ -146,7 +146,6 @@ export async function build(ctx: Ctx): Promise<void> {
   <developer id="com.aphrody"><name>Aphrody</name></developer>
   <description><p>${esc(a.summary)} Opens the app on ${esc(new URL(a.url).host)}, which installs it into your browser and keeps it available offline.</p></description>
   <launchable type="desktop-id">${a.id}.desktop</launchable>
-  <icon type="stock">${a.id}</icon>
   <url type="homepage">${ctx.origin}/apps</url>
 ${screenshots}  <releases><release version="${esc(a.version)}" date="${new Date().toISOString().slice(0, 10)}"/></releases>
   <content_rating type="oars-1.1"/>
@@ -163,7 +162,7 @@ ${screenshots}  <releases><release version="${esc(a.version)}" date="${new Date(
 pacman -Sy --noconfirm --needed appstream >/dev/null 2>&1
 for d in /w/*/; do
   id=$(basename "$d")
-  appstreamcli compose --no-net --origin=flatpak --prefix=/ --components="$id" --result-root="$d/files" \
+  appstreamcli compose --no-net --image-format=png --origin=flatpak --prefix=/ --components="$id" --result-root="$d/files" \
     --data-dir="$d/files/share/app-info/xmls" --icons-dir="$d/files/share/app-info/icons/flatpak" "$d/files" >/tmp/c.log 2>&1 || { echo "COMPOSE FAILED $id"; tail -n 8 /tmp/c.log; continue; }
   mv "$d/files/share/app-info/xmls/flatpak.xml.gz" "$d/files/share/app-info/xmls/$id.xml.gz"
   echo "composed $id: $(ls "$d/files/share/app-info/icons/flatpak" | tr '\n' ' ')"
