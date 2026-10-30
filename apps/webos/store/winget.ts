@@ -53,7 +53,8 @@ async function crateInfo(root: string, crate: string) {
 }
 
 export async function build(ctx: Ctx) {
-  const artifacts = Bun.env.WINGET_ARTIFACTS ?? join(Bun.env.HOME ?? "/root", "bunos/target/x86_64-pc-windows-msvc/release");
+  // Cross build outputs, newest lane first: the shared factory target, then the canonical checkout target.
+  const dirs = (Bun.env.WINGET_ARTIFACTS ?? `/var/cache/aphrody-target/x86_64-pc-windows-msvc/release:${join(Bun.env.HOME ?? "/root", "bunos/target/x86_64-pc-windows-msvc/release")}`).split(":");
   const repo = join(ctx.store, "repo/winget");
   const data = join(ctx.store, "winget");
   await rm(repo, { recursive: true, force: true });
@@ -63,9 +64,11 @@ export async function build(ctx: Ctx) {
   const skipped: { name: string; reason: string }[] = [];
   const packages: RestPackage[] = [];
   for (const bin of BINARIES) {
+    let artifacts = dirs[0]!;
+    for (const d of dirs) if (await Bun.file(join(d, bin.file)).exists()) { artifacts = d; break; }
     const source = Bun.file(join(artifacts, bin.file));
     if (!(await source.exists())) {
-      skipped.push({ name: bin.id, reason: `${bin.file} is not built in ${artifacts}` });
+      skipped.push({ name: bin.id, reason: `${bin.file} is not built in ${dirs.join(", ")}` });
       continue;
     }
     const pe = await run(["file", "-b", join(artifacts, bin.file)]);
