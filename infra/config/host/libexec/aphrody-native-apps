@@ -1,107 +1,138 @@
 #!/bin/sh
 # SPDX-License-Identifier: Apache-2.0
-# Installs the real native apps of the Aphrody desktop session (headless Hyprland) with their upstream identity:
-#   base            Rio (upstream release deb, replaces Ubuntu's unrelated "rio" MP3 CLI), GNOME Web (WebKitGTK), fuzzel,
-#                   icon themes (Papirus, Adwaita, COSMIC), Aphrody Browser/Chat/Search launchers, upstream icons.
-#   cosmic <name>.. COSMIC apps from the checksum-pinned Pop!_OS archive debs (container/cosmic-packages.json)
-#   fork <n> <repo> <pkg> <bin>  build an aphrody-labs fork and install it to /usr/local/bin (Rio: fork rio rio rioterm rio)
-#   spacedrive      Spacedrive (apps/spacedrive of this repository) via its Tauri build
-# Builds are serialised and capped at 4 compiler jobs (shared factory slots). Run inside tmux; log in ~/native-apps/log.
+# Builds the native apps of the Bun OS desktop session (Pop!_OS + COSMIC) from our pinned aphrody-labs forks and
+# packages each as a real Ubuntu .deb for the apt feed (apps/webos/store/apt.ts ingests ~/native-apps/debs).
+# No upstream binaries: Ubuntu's apt "rio" (a Diamond Rio MP3 CLI) and the upstream rioterm deb are removed.
+#   deps                          build dependencies (libraries and tools only)
+#   rio                           aphrody-labs/rio -> rio_<ver>+bunos_amd64.deb
+#   cosmic-src                    aphrody-labs/cosmic-epoch at the gitlink pinned by this repository, app submodules
+#   cosmic [app...]               build + package COSMIC apps (default: the session set, dependencies first)
+#   calculator                    aphrody-labs/cosmic-calculator (fork of cosmic-utils/cosmic-ext-calculator)
+#   spacedrive                    apps/spacedrive of this repository: sd-daemon, sd-server, desktop (Tauri)
+#   all                           everything above in order, one lane
+# Cargo runs through scripts/aphrody/build/rust/cargo-serial.sh (factory lock), 4 jobs. Run in tmux.
 set -eu
 ROOT=${BUNOS_NATIVE_ROOT:-$HOME/src/bun-os}
 WORK=$HOME/native-apps
-PREFIX=$HOME/.local
-EPOCH=${COSMIC_EPOCH:-epoch-1.11.0}
-RIO=${RIO_VERSION:-0.5.28}
-export CARGO_BUILD_JOBS=4 PATH="$PREFIX/bin:$HOME/.cargo/bin:$PATH"
-mkdir -p "$WORK" "$PREFIX/share/applications" "$PREFIX/share/icons/hicolor/scalable/apps"
+DEBS=$WORK/debs
+export APHRODY_BUILD_HOST=vps CARGO_BUILD_JOBS=4 PATH="$HOME/.cargo/bin:$PATH"
+CARGO="$ROOT/scripts/aphrody/build/rust/cargo-serial.sh"
+mkdir -p "$WORK/src" "$WORK/stage" "$DEBS"
 
-icon() { # icon <desktop-icon-name> <webos asset id> [ext]
-  ext=${3:-svg}
-  case $ext in
-  svg) install -D "$ROOT/factory/native-apps/icons/$2/icon.svg" "$PREFIX/share/icons/hicolor/scalable/apps/$1.svg" ;;
-  png) install -D "$ROOT/factory/native-apps/icons/$2/icon.png" "$PREFIX/share/icons/hicolor/256x256/apps/$1.png" ;;
-  esac
+log() { printf '%s %s\n' "$(date -u +%FT%TZ)" "$*"; }
+
+deps() {
+  sudo apt-get install -y --no-install-recommends just dpkg-dev pkg-config cmake clang mold nasm \
+    libxkbcommon-dev libwayland-dev libinput-dev libseat-dev libudev-dev libdisplay-info-dev libgbm-dev libegl-dev \
+    libpipewire-0.3-dev libpulse-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libflatpak-dev \
+    libfontconfig-dev libfreetype-dev libdbus-1-dev libpam0g-dev libsystemd-dev libexpat1-dev libssl-dev \
+    libglvnd-dev libxcb1-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libappstream-dev libgtk-3-dev \
+    libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev librsvg2-dev libheif-dev libavcodec-dev \
+    libavformat-dev libavutil-dev libswscale-dev libavfilter-dev libavdevice-dev
 }
 
-desktop() { # desktop <file-id> <Name> <Comment> <Exec> <Icon> <StartupWMClass> [Categories]
-  cat >"$PREFIX/share/applications/$1.desktop" <<D
-[Desktop Entry]
-Type=Application
-Name=$2
-Comment=$3
-Exec=$4
-Icon=$5
-StartupWMClass=$6
-Categories=${7:-Utility;}
-Terminal=false
-D
+# deb <name> <version> <stage dir> <description> : package a staged /usr tree, Depends from dpkg-shlibdeps
+deb() {
+  name=$1 version=$2 stage=$3 desc=$4
+  elfs=$(find "$stage" -type f -perm -u+x -exec sh -c 'head -c4 "$1" | grep -q ELF && echo "$1"' _ {} \;)
+  depends=""
+  if [ -n "$elfs" ]; then
+    tmp=$(mktemp -d); mkdir -p "$tmp/debian"; printf 'Source: %s\n\nPackage: %s\nArchitecture: amd64\n' "$name" "$name" >"$tmp/debian/control"
+    # shellcheck disable=SC2086
+    depends=$(cd "$tmp" && dpkg-shlibdeps -O --ignore-missing-info -l"$stage/usr/lib" $elfs 2>/dev/null | sed -n 's/^shlibs:Depends=//p')
+    rm -rf "$tmp"
+  fi
+  mkdir -p "$stage/DEBIAN"
+  {
+    printf 'Package: %s\nVersion: %s\nArchitecture: amd64\nMaintainer: aphrody-dev <contact@aphrody.com>\n' "$name" "$version"
+    [ -n "$depends" ] && printf 'Depends: %s\n' "$depends"
+    printf 'Section: x11\nPriority: optional\nHomepage: https://aphrody.com\nDescription: %s\n Built for Bun OS from the aphrody-labs fork.\n' "$desc"
+  } >"$stage/DEBIAN/control"
+  out="$DEBS/${name}_${version}_amd64.deb"
+  dpkg-deb --root-owner-group -Zxz --build "$stage" "$out" >/dev/null
+  printf '%s\t%s\t%s\t%s\n' "$name" "$version" "$(basename "$out")" "$(sha256sum "$out" | cut -d' ' -f1)" >>"$DEBS/index.tsv"
+  log "packaged $out"
 }
 
-base() {
-  sudo apt-get remove -y rio >/dev/null 2>&1 || true # Ubuntu "rio" is a Diamond Rio MP3 CLI, never the terminal
-  # Rio itself is built from the aphrody-labs/rio fork: aphrody-native-apps fork rio
-  sudo apt-get install -y epiphany-browser fuzzel papirus-icon-theme adwaita-icon-theme libglib2.0-bin
-  # COSMIC icon theme (pop-os/cosmic-icons, CC-BY-SA-4.0)
-  [ -d "$WORK/cosmic-icons" ] || git clone --depth 1 https://github.com/pop-os/cosmic-icons "$WORK/cosmic-icons"
-  (cd "$WORK/cosmic-icons" && just rootdir= prefix="$PREFIX" install 2>/dev/null || { mkdir -p "$PREFIX/share/icons" && cp -r freedesktop "$PREFIX/share/icons/Cosmic" 2>/dev/null; })
-  icon aphrody-browser aphrody; icon aphrody-chat aphrody; icon aphrody-search aphrody
-  icon spacedrive spacedrive png
-  for i in rio cosmic-files cosmic-term cosmic-edit cosmic-store cosmic-settings cosmic-player; do :; done # packages ship their own icons
-  # Aphrody apps are real GNOME Web (WebKitGTK) application-mode windows with their own profile and identity.
-  web() { epi="epiphany --application-mode --profile=$HOME/.local/share/aphrody-$1"; echo "$epi $2"; }
-  desktop aphrody-browser "Aphrody Browser" "Browse the web (WebKitGTK)" "epiphany --new-window https://aphrody.com" aphrody-browser org.gnome.Epiphany "Network;WebBrowser;"
-  desktop aphrody-chat "Aphrody Chat" "Chat with the Bun OS model backend" "$(web chat https://aphrody.com/workspace/os)" aphrody-chat org.gnome.Epiphany "Network;Chat;"
-  desktop aphrody-search "Aphrody Search" "Search apps, packages, crates and docs of Bun OS" "$(web search 'https://aphrody.com/?app=search')" aphrody-search org.gnome.Epiphany "Utility;"
-  update-desktop-database "$PREFIX/share/applications" 2>/dev/null || true
-  gtk-update-icon-cache -f -t "$PREFIX/share/icons/hicolor" 2>/dev/null || true
+clone() { # clone <dir> <aphrody-labs repo> [rev]
+  [ -d "$1/.git" ] || git clone --filter=blob:none "https://github.com/aphrody-labs/$2" "$1"
+  [ -z "${3:-}" ] || git -C "$1" checkout -q "$3"
 }
 
-cosmic() { # cosmic [names...] (default: the whole pinned set, the apps depend on the session libraries)
-  [ $# -gt 0 ] || set -- $(ROOT=$ROOT bun -e 'console.log((await Bun.file(`${process.env.ROOT}/container/cosmic-packages.json`).json()).packages.map((p) => p.name).join(" "))')
-  # cosmic-files ... : the checksum-pinned Pop!_OS archive debs of container/cosmic-packages.json
-  d=$WORK/cosmic-debs; mkdir -p "$d"
-  ROOT=$ROOT D=$d bun -e '
-    // The archive rotates old builds out, so the pin is used when it still resolves and the newest build otherwise.
-    const lock = await Bun.file(`${process.env.ROOT}/container/cosmic-packages.json`).json();
-    const links = async (u) => [...(await (await fetch(u)).text()).matchAll(/href="([^"?][^"]*)"/g)].map((m) => m[1]).filter((x) => x !== "../");
-    for (const n of process.argv.slice(1)) {
-      const e = lock.packages.find((p) => p.name === n);
-      if (!e) throw new Error(`${n} is not in the pinned COSMIC set`);
-      let r = await fetch(`${lock.repository}/${e.path}`);
-      let buf;
-      if (r.ok) {
-        buf = await r.arrayBuffer();
-        if (new Bun.CryptoHasher("sha256").update(buf).digest("hex") !== e.sha256) throw new Error(`${n}: checksum mismatch`);
-      } else {
-        const base = `${lock.repository}/pool/${lock.suite}/${n}/`;
-        const dirs = await links(base);
-        const dir = dirs[dirs.length - 1];
-        const deb = (await links(base + dir)).find((f) => f.endsWith("_amd64.deb"));
-        if (!deb) throw new Error(`${n}: no amd64 deb in ${base}${dir}`);
-        buf = await (await fetch(base + dir + deb)).arrayBuffer();
-        console.log(`${n}: pin gone, installed ${deb} sha256=${new Bun.CryptoHasher("sha256").update(buf).digest("hex")}`);
-      }
-      await Bun.write(`${process.env.D}/${n}.deb`, buf);
-    }' "$@"
-  sudo apt-get install -y --no-install-recommends $(for n in "$@"; do echo "$d/$n.deb"; done)
+version_of() { sed -n 's/^version *= *"\(.*\)"/\1/p' "$1" | head -1; }
+
+rio() {
+  d=$WORK/src/rio; clone "$d" rio
+  (cd "$d" && nice -n 10 "$CARGO" build --release --locked -p rioterm -j 4)
+  s=$WORK/stage/rio; rm -rf "$s"
+  install -Dm755 "$d/target/release/rio" "$s/usr/bin/rio"
+  install -Dm644 "$d/misc/rio.desktop" "$s/usr/share/applications/rio.desktop"
+  install -Dm644 "$ROOT/factory/native-apps/icons/rio/icon.svg" "$s/usr/share/icons/hicolor/scalable/apps/rio.svg"
+  [ -f "$d/misc/rio.terminfo" ] && install -Dm644 "$d/misc/rio.terminfo" "$s/usr/share/rio/rio.terminfo"
+  install -Dm644 "$d/LICENSE" "$s/usr/share/doc/rio/copyright"
+  deb rio "$(version_of "$d/frontends/rioterm/Cargo.toml")+bunos$(git -C "$d" rev-parse --short HEAD)" "$s" "Rio terminal: GPU-accelerated Rust terminal emulator"
 }
 
-fork() { # fork <name> <repo> <cargo package> <bin> : build a pinned aphrody-labs fork (serialised, 4 jobs) and install the binary
-  n=$1; d=$WORK/src/$n
-  [ -d "$d" ] || git clone --depth 1 "https://github.com/aphrody-labs/$2" "$d"
-  (cd "$d" && nice -n 10 cargo build --release --locked -p "$3" -j 4)
-  sudo install -D "$d/target/release/$4" "/usr/local/bin/$4"
-  echo "$n: $(git -C "$d" rev-parse HEAD) installed as /usr/local/bin/$4"
+EPOCH_DIR=$WORK/src/cosmic-epoch
+cosmic_src() {
+  pin=$(git -C "$ROOT" rev-parse HEAD:vendor/cosmic-epoch)
+  clone "$EPOCH_DIR" cosmic-epoch "$pin"
+  git -C "$EPOCH_DIR" submodule update --init --filter=blob:none $COSMIC_SET
+  log "cosmic-epoch $pin"
+}
+
+# Session set, dependencies before dependants. cosmic-randr is a cosmic-settings dependency.
+COSMIC_SET="cosmic-icons cosmic-randr cosmic-comp cosmic-panel cosmic-launcher pop-launcher cosmic-settings-daemon cosmic-settings cosmic-files cosmic-term cosmic-edit cosmic-store cosmic-player"
+
+cosmic_one() {
+  app=$1; d=$EPOCH_DIR/$app; s=$WORK/stage/$app; rm -rf "$s"
+  [ -d "$d" ] || { log "missing $app in cosmic-epoch"; return 1; }
+  log "build $app"
+  if [ -f "$d/Cargo.toml" ]; then (cd "$d" && nice -n 10 "$CARGO" build --release -j 4); fi
+  # The justfile install recipes only copy the release outputs and data files into rootdir/prefix.
+  (cd "$d" && just rootdir="$s" prefix=/usr install)
+  v=$( [ -f "$d/Cargo.toml" ] && version_of "$d/Cargo.toml" || echo 1.0.0)
+  deb "$app" "${v}+bunos$(git -C "$d" rev-parse --short HEAD)" "$s" "COSMIC $app (Bun OS build)"
+}
+
+cosmic() {
+  [ -d "$EPOCH_DIR" ] || cosmic_src
+  [ $# -gt 0 ] || set -- $COSMIC_SET
+  failed=""
+  for a in "$@"; do cosmic_one "$a" || failed="$failed $a"; done
+  [ -z "$failed" ] || { log "failed:$failed"; return 1; }
+}
+
+calculator() {
+  d=$WORK/src/cosmic-calculator; clone "$d" cosmic-calculator
+  (cd "$d" && nice -n 10 "$CARGO" build --release -j 4)
+  s=$WORK/stage/cosmic-calculator; rm -rf "$s"
+  (cd "$d" && just rootdir="$s" prefix=/usr install)
+  deb cosmic-calculator "$(version_of "$d/Cargo.toml")+bunos$(git -C "$d" rev-parse --short HEAD)" "$s" "COSMIC Calculator"
 }
 
 spacedrive() {
-  cd "$ROOT/apps/spacedrive/apps/tauri"
-  bun install --frozen-lockfile 2>/dev/null || bun install
-  bun run daemon:sidecar && bun x tauri build --no-bundle
-  install -D "$ROOT/apps/spacedrive/target/release/Spacedrive" "$PREFIX/bin/spacedrive"
-  desktop spacedrive Spacedrive "Spacedrive: the virtual distributed file manager" "$PREFIX/bin/spacedrive" spacedrive Spacedrive "System;FileManager;"
+  sd=$ROOT/apps/spacedrive; s=$WORK/stage/spacedrive; rm -rf "$s"
+  (cd "$sd" && nice -n 10 "$CARGO" build --release -j 4 --bin sd-daemon --bin sd-server)
+  install -Dm755 "$sd/target/release/sd-daemon" "$s/usr/bin/sd-daemon"
+  install -Dm755 "$sd/target/release/sd-server" "$s/usr/bin/sd-server"
+  (cd "$sd/apps/tauri" && bun install && bun run build && nice -n 10 "$CARGO" build --release -j 4 --manifest-path src-tauri/Cargo.toml)
+  install -Dm755 "$sd/target/release/Spacedrive" "$s/usr/bin/spacedrive"
+  install -Dm644 "$ROOT/factory/native-apps/icons/spacedrive/icon.png" "$s/usr/share/icons/hicolor/256x256/apps/spacedrive.png"
+  mkdir -p "$s/usr/share/applications"
+  printf '[Desktop Entry]\nType=Application\nName=Spacedrive\nComment=The virtual distributed file manager\nExec=spacedrive\nIcon=spacedrive\nStartupWMClass=Spacedrive\nCategories=System;FileManager;\n' >"$s/usr/share/applications/spacedrive.desktop"
+  install -Dm644 "$sd/LICENSE" "$s/usr/share/doc/spacedrive/copyright"
+  deb spacedrive "$(version_of "$sd/apps/tauri/src-tauri/Cargo.toml")+bunos$(git -C "$ROOT" rev-parse --short HEAD)" "$s" "Spacedrive file manager (core daemon, headless server, desktop)"
 }
 
-cmd=${1:-base}; shift || true
-case $cmd in base) base ;; fork) fork "$@" ;; cosmic) cosmic "$@" ;; spacedrive) spacedrive ;; *) echo "usage: $0 base|cosmic <repo>...|spacedrive" >&2; exit 2 ;; esac
+cmd=${1:-all}; shift || true
+case $cmd in
+deps) deps ;;
+rio) rio ;;
+cosmic-src) cosmic_src ;;
+cosmic) cosmic "$@" ;;
+calculator) calculator ;;
+spacedrive) spacedrive ;;
+all) deps; rio; cosmic_src; cosmic || true; calculator || true; spacedrive ;;
+*) echo "usage: $0 deps|rio|cosmic-src|cosmic [app...]|calculator|spacedrive|all" >&2; exit 2 ;;
+esac
