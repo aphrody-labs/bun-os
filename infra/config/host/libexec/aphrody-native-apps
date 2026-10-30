@@ -70,7 +70,8 @@ version_of() { sed -n 's/^version *= *"\(.*\)"/\1/p' "$1" | head -1; }
 
 rio() {
   d=$WORK/src/rio; clone "$d" rio
-  (cd "$d" && nice -n 10 "$CARGO" build --release --locked -p rioterm -j 4)
+  # Thin LTO: Rio's fat LTO + one codegen unit needs more memory than a shared factory slot has (earlyoom kills it).
+  (cd "$d" && CARGO_PROFILE_RELEASE_LTO=thin CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 nice -n 10 "$CARGO" build --release --locked -p rioterm -j 4)
   s=$WORK/stage/rio; rm -rf "$s"
   install -Dm755 "$d/target/release/rio" "$s/usr/bin/rio"
   install -Dm644 "$d/misc/rio.desktop" "$s/usr/share/applications/rio.desktop"
