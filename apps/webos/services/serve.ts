@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // The WebOS Bun service (ADR-002): Bun.serve with the API routes, the store API, health and the static release.
 // Production runs the bundled server.js at the root of an immutable release (deploy.ts); development runs this file.
+import { stat } from "node:fs/promises";
 import { join, relative, resolve, isAbsolute } from "node:path";
 import { apiRoutes, handle, type ServiceContext } from "./router";
 import { publicFetch } from "./public-fetch";
@@ -108,6 +109,8 @@ const assets = {
 };
 
 const started = Date.now();
+const SESSION_HEALTH =
+  Bun.env.WEBOS_SESSION_HEALTH ?? "http://127.0.0.1:8793/api/wayland/health";
 async function health(): Promise<Response> {
   const inventory = await assets
     .fetch(new Request("http://local/api/inventory.json"))
@@ -124,12 +127,36 @@ async function health(): Promise<Response> {
     assets: (await Bun.file(join(dist, "index.html")).exists())
       ? { ok: true }
       : { ok: false, detail: "dist/index.html missing" },
-    objects: { ok: true },
+    objects: (await stat(objects).then(
+      (st) => st.isDirectory(),
+      () => false,
+    ))
+      ? { ok: true, optional: true }
+      : {
+          ok: false,
+          optional: true,
+          detail: `object store ${objects} missing`,
+        },
     inventory: inventory
       ? { ok: true }
       : { ok: false, detail: "inventory.json unavailable" },
+    session: await fetch(SESSION_HEALTH, { signal: AbortSignal.timeout(1500) })
+      .then(async (r) =>
+        ((await r.json()) as { session?: boolean }).session === true
+          ? { ok: true, optional: true }
+          : {
+              ok: false,
+              optional: true,
+              detail: "Hyprland session not running",
+            },
+      )
+      .catch(() => ({
+        ok: false,
+        optional: true,
+        detail: "session gateway unreachable",
+      })),
   };
-  const ok = Object.values(checks).every((c) => c.ok);
+  const ok = Object.values(checks).every((c) => c.ok || c.optional);
   const body: HealthResponse = {
     ok,
     service: "aphrody-webos",

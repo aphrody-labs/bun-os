@@ -4,6 +4,8 @@
 
 export interface HealthCheck {
   ok: boolean;
+  /** Optional checks are reported but do not turn the service unhealthy (the deploy gate ignores them). */
+  optional?: boolean;
   detail?: string;
 }
 
@@ -15,7 +17,7 @@ export interface HealthResponse {
   uptimeSeconds: number;
   time: string;
   inventory: { total: number; counts: Record<string, number> } | null;
-  checks: Record<"assets" | "objects" | "inventory", HealthCheck>;
+  checks: Record<"assets" | "objects" | "inventory" | "session", HealthCheck>;
 }
 
 /** One JSON line per request on stdout (journald): the structured log record. */
