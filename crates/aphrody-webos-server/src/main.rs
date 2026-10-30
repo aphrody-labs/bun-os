@@ -6,13 +6,13 @@
 mod emulators;
 mod health;
 mod page;
+mod sessions;
 
 use std::net::SocketAddr;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Instant;
 
-use aphrody_webos_protocol::{OsEntry, OsId};
 use axum::{
     Json, Router,
     extract::{Request, State},
@@ -36,28 +36,14 @@ pub struct AppState {
     pub source_commit: Option<String>,
     /// Inventory of every Bun OS member (crates/aphrody-inventory), when the release carries one.
     pub inventory: Result<aphrody_inventory::InventoryState, String>,
+    /// Sessions of the host and the stream bridge (`sessions.rs`).
+    pub sessions: sessions::Sessions,
 }
 
 fn env_path(name: &str, default: &str) -> PathBuf {
     std::env::var_os(name)
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(default))
-}
-
-/// `GET /api/os`: the catalog of operating systems. None is startable until the session manager is mounted.
-async fn os_catalog() -> Json<Vec<OsEntry>> {
-    Json(
-        OsId::ALL
-            .iter()
-            .map(|&id| OsEntry {
-                id,
-                name: id.name().into(),
-                summary: id.summary().into(),
-                available: false,
-                reason: Some("The session manager is not deployed on this host yet.".into()),
-            })
-            .collect(),
-    )
 }
 
 async fn root(State(state): State<Arc<AppState>>) -> Response {
@@ -120,6 +106,7 @@ async fn caching(request: Request, next: Next) -> Response {
 fn app(state: Arc<AppState>) -> Router {
     // release.sh writes .br and .gz next to the client files; content-hashed names are cached immutably.
     let assets = ServeDir::new(&state.client).precompressed_br().precompressed_gzip();
+    let state_sessions = state.sessions.clone();
     let inventory = match &state.inventory {
         Ok(inventory) => aphrody_inventory::router(inventory.clone()),
         Err(_) => Router::new(),
@@ -128,9 +115,9 @@ fn app(state: Arc<AppState>) -> Router {
         .route("/", get(root))
         .route("/api/health", get(health::health))
         .route("/healthz", get(health::health))
-        .route("/api/os", get(os_catalog))
         .with_state(state)
         .merge(inventory)
+        .merge(sessions::router(state_sessions))
         .merge(emulators::router(
             env_path("WEBOS_OBJECTS", "objects"),
             env_path("WEBOS_EMULATOR_PAGE", "emulator"),
@@ -186,6 +173,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .ok()
             .filter(|s| !s.is_empty()),
         inventory: aphrody_inventory::InventoryState::from_env().map_err(|e| e.to_string()),
+        sessions: sessions::Sessions::from_env(),
     });
     let listener = tokio::net::TcpListener::bind(addr).await?;
     println!(

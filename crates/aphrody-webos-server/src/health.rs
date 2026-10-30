@@ -56,6 +56,11 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
         "session-gateway".to_owned(),
         check(gateway, true, "127.0.0.1:8793 is not listening".into()),
     );
+    let sessions = state.sessions.configured();
+    checks.insert(
+        "sessions".to_owned(),
+        check(sessions > 0, true, "no OS session is declared on this host (WEBOS_SESSION_<OS>)".into()),
+    );
     let ok = checks.values().all(|c| c.ok || c.optional);
     let body = Health {
         ok,
