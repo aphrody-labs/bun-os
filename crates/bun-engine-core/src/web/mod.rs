@@ -205,6 +205,10 @@ struct Shared {
     gpu_submitted_frames: u64,
     gpu2d_submitted_frames: u64,
     gpu3d_submitted_frames: u64,
+    want_save: bool,
+    want_load: Option<Vec<u8>>,
+    saved: Option<Vec<u8>>,
+    state_result: Option<Result<(), String>>,
 }
 
 #[derive(Resource, Clone)]
@@ -304,6 +308,21 @@ fn page_status(
         shared.hash = fnv1a(&screens);
         shared.lit = screens.iter().any(|s| s.rgb.iter().any(|&b| b > 16));
         shared.hashed_at = status.frames;
+    }
+    if shared.want_save {
+        shared.want_save = false;
+        match slot.0.save_state() {
+            Some(state) => {
+                shared.saved = Some(state);
+                shared.state_result = Some(Ok(()));
+            }
+            None => {
+                shared.state_result = Some(Err(format!("{} has no save states", slot.0.name())));
+            }
+        }
+    }
+    if let Some(state) = shared.want_load.take() {
+        shared.state_result = Some(slot.0.load_state(&state));
     }
     if status.stopped && shared.stopped.is_none() {
         shared.stopped = Some(
@@ -461,6 +480,42 @@ impl Emulator {
     pub fn set_touch(&self, x: f64, y: f64, down: bool) {
         self.shared.lock().unwrap().touch =
             down.then(|| (x.clamp(0.0, 1023.0) as u16, y.clamp(0.0, 1023.0) as u16));
+    }
+
+    /// Ask the machine to serialize its state at the end of the current frame; poll
+    /// [`Emulator::state_result`] then read it with [`Emulator::take_state`].
+    pub fn request_save(&self) {
+        let mut shared = self.shared.lock().unwrap();
+        shared.state_result = None;
+        shared.want_save = true;
+    }
+
+    /// Ask the machine to restore `state` (from `take_state` of the same image and core).
+    pub fn request_load(&self, state: &[u8]) {
+        let mut shared = self.shared.lock().unwrap();
+        shared.state_result = None;
+        shared.want_load = Some(state.to_vec());
+    }
+
+    /// `undefined` while a save or load is pending, `"ok"`, or the error text.
+    #[wasm_bindgen(getter)]
+    pub fn state_result(&self) -> Option<String> {
+        self.shared
+            .lock()
+            .unwrap()
+            .state_result
+            .as_ref()
+            .map(|r| r.clone().err().unwrap_or_else(|| "ok".into()))
+    }
+
+    /// The state produced by the last successful `request_save`, once.
+    pub fn take_state(&self) -> Option<Uint8Array> {
+        self.shared
+            .lock()
+            .unwrap()
+            .saved
+            .take()
+            .map(|state| Uint8Array::from(state.as_slice()))
     }
 
     /// Ask the app to exit at the end of the current frame.
