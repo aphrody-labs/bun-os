@@ -291,7 +291,7 @@ export const SESSION: Record<string, SessionLaunch> = {
   shadps4: { package: "shadps4", app: "shadps4", blocker: "no free PlayStation 4 homebrew fixture pinned yet" },
   ppsspp: { package: "ppsspp", app: "PPSSPPSDL", rom: "pspsdk-cube/EBOOT.PBP" },
   gopher64: { package: "gopher64", app: "gopher64", rom: "peterlemon-n64/Mandelbrot32BPP320X240.N64" },
-  mame: { package: "mame", app: "mame -rompath /roms/mamedev-gridlee -skip_gameinfo -video bgfx gridlee" },
+  mame: { package: "mame", app: "mame -rompath /roms/mamedev-gridlee -skip_gameinfo -video bgfx -sound pipewire gridlee" },
   wine: { package: "wine", app: "wine notepad", silent: true },
   proton: {
     package: "proton-bunos",
