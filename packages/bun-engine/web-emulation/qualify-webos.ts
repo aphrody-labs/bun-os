@@ -151,7 +151,17 @@ async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Pr
       if (result) break;
     }
     if (!result) {
-      entry.detail = "timeout: the emulator window never reported a result";
+      const { result: probe } = await cdp.send(
+        "Runtime.evaluate",
+        {
+          expression:
+            "JSON.stringify({phase: window.__emulator?.phase ?? 'no emulator page', frames: window.__emulator?.frames, errors: window.__emulator?.errors, title: document.title})",
+          returnByValue: true,
+        },
+        sessionId,
+      );
+      entry.errors = logs;
+      entry.detail = `timeout: the emulator window never reported a result (${probe.value})`;
       return entry;
     }
     const { result: box } = await cdp.send(
