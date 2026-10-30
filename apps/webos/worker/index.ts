@@ -399,8 +399,9 @@ export default {
       : inventoryPage
         ? withPathMeta(
             await env.ASSETS.fetch(new Request(new URL("/", url).href, request)),
-            "/inventory",
-            await inventoryMeta(url.pathname, env.ASSETS),
+            url.pathname,
+            (await inventoryMeta(url.pathname, env.ASSETS)) ??
+              pathMeta("/inventory"),
           )
         : withPathMeta(await env.ASSETS.fetch(request), url.pathname);
     const out = new Response(res.body, res);
