@@ -21,10 +21,10 @@ import { stageFixtures } from "./fixtures.ts";
 const root = resolve(import.meta.dir, "../../..");
 const dist = join(root, "dist/web-emulation");
 const args = Bun.argv.slice(2);
-const flag = (name: string) => args.find((a) => a === name || a.startsWith(`${name}=`))?.split("=")[1];
+const flag = (name: string) => args.includes(name);
 const value = (name: string) => {
   const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : flag(name);
+  return i >= 0 ? args[i + 1] : args.find((a) => a.startsWith(`${name}=`))?.slice(name.length + 1);
 };
 const base = (value("--base") ?? Bun.env.WEBOS_URL ?? "http://127.0.0.1:8790").replace(/\/$/, "");
 const objects = resolve(Bun.env.WEBOS_OBJECTS ?? join(Bun.env.HOME ?? root, "apps/webos/objects"));
