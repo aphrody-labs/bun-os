@@ -22,3 +22,7 @@ qt5-wayland
 pipewire-alsa
 lib32-libpulse
 lib32-pipewire
+# Rust base from the aphrody repo: uutils (coreutils/findutils/diffutils), sudo-rs and ntpd-rs.
+bunos-utils
+bunos-sudo-rs
+bunos-ntpd-rs
