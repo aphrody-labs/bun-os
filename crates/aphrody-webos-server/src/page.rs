@@ -41,7 +41,7 @@ pub fn placeholder(commit: Option<&str>) -> Html<String> {
         "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n\
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
 <meta name=\"color-scheme\" content=\"dark light\">\n<title>Aphrody Bun OS</title>\n\
-<meta name=\"description\" content=\"Arch Linux, Alpine, Android, Wine and Proton in your browser, streamed from Bun OS.\">\n\
+<meta name=\"description\" content=\"Pop!_OS with COSMIC, Redox OS, Android, Wine and Proton in your browser, streamed from Bun OS.\">\n\
 <link rel=\"canonical\" href=\"https://aphrody.com/\">\n<style>{STYLE}</style>\n</head>\n<body>\n<main>\n\
 <h1>Bun OS in your browser</h1>\n\
 <p>Real operating systems, streamed from Bun OS: pick one and use it in this tab. The streaming client is being deployed.</p>\n\
