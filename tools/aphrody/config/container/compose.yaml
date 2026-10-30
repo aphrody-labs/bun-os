@@ -106,28 +106,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # Discord gateway and HTTP interactions of bot.aphrody.com (127.0.0.1:4010); releases activated by
-  # scripts/release/atomic-deploy-aphrody-discord.sh, which restarts this service.
-  discord:
-    <<: *bun
-    command: ["/home/ubuntu/apps/discord/current/server.js"]
-    working_dir: /home/ubuntu/apps/discord/current
-    env_file: [/etc/aphrody-discord.env]
-    environment:
-      NODE_ENV: production
-      HOME: /home/ubuntu/apps/discord/shared
-    volumes:
-      - /home/ubuntu/apps/discord:/home/ubuntu/apps/discord:ro
-      - /home/ubuntu/apps/discord/shared:/home/ubuntu/apps/discord/shared
-    mem_limit: 512m
-    stop_signal: SIGINT
-    stop_grace_period: 20s
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:4010/healthz"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
   # Google Fonts edge proxy and static CDN of cdn.aphrody.com (127.0.0.1:8796); scripts/tools/infra/cdn.ts publishes
   # the trees it serves.
   fonts-proxy:
