@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libglvnd-dev libxcb1-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev libappstream-dev libgtk-3-dev \
       libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev librsvg2-dev libheif-dev libavcodec-dev \
       libavformat-dev libavutil-dev libswscale-dev libavfilter-dev libavdevice-dev libclang-dev \
+      glslang-tools glslc libvulkan-dev \
  && rm -rf /var/lib/apt/lists/*
 RUN curl -fsSL https://sh.rustup.rs -o /tmp/rustup.sh \
  && CARGO_HOME=/opt/cargo sh /tmp/rustup.sh -y --no-modify-path --profile minimal --default-toolchain 1.99.1 \
