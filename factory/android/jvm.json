@@ -1,0 +1,73 @@
+{
+  "$comment": "JVM, Kotlin and Gradle side of the shared Android toolchain (factory/android/sdk.json owns the SDK/NDK). Consumed by factory/android/jvm.ts, packages/bun-android (gradle.ts, jvm.ts) and the Gradle projects under apps/. Versions verified against Google Maven, Maven Central and services.gradle.org on 2026-10-30.",
+  "jdk": {
+    "agp": {
+      "major": 21,
+      "home": "/usr/lib/jvm/java-21-openjdk-amd64",
+      "package": "openjdk-21-jdk-headless",
+      "why": "AGP 9.5 needs JDK 17+; 21 runs the Gradle daemon and the Android toolchain"
+    },
+    "lts": {
+      "major": 25,
+      "home": "/usr/lib/jvm/java-25-openjdk-amd64",
+      "package": "openjdk-25-jdk-headless",
+      "why": "latest LTS; hosts the Bun JNI invocation bridge (libjvm) and JVM tools"
+    }
+  },
+  "gradle": {
+    "version": "9.8.2",
+    "distributionSha256": "21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607",
+    "userHome": "~/.cache/bunos-android/gradle",
+    "properties": {
+      "org.gradle.jvmargs": "-Xmx6g -XX:MaxMetaspaceSize=1536m -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8",
+      "org.gradle.daemon": "true",
+      "org.gradle.daemon.idletimeout": "1800000",
+      "org.gradle.parallel": "true",
+      "org.gradle.workers.max": "4",
+      "org.gradle.caching": "true",
+      "org.gradle.configuration-cache": "true",
+      "org.gradle.configuration-cache.parallel": "true",
+      "org.gradle.vfs.watch": "false",
+      "org.gradle.java.installations.auto-detect": "true",
+      "org.gradle.java.installations.auto-download": "false",
+      "org.gradle.java.installations.paths": "/usr/lib/jvm/java-21-openjdk-amd64,/usr/lib/jvm/java-25-openjdk-amd64",
+      "kotlin.daemon.jvmargs": "-Xmx3g -XX:+UseParallelGC",
+      "kotlin.incremental": "true",
+      "android.builder.sdkDownload": "false",
+      "systemProp.java.net.preferIPv4Stack": "true"
+    },
+    "why": "45 GB host shared by runtime, OS and web lanes: one 6 GB daemon plus a 3 GB Kotlin daemon per lane, four workers (owner limit of four compiler jobs per lane), build cache under the shared Gradle user home"
+  },
+  "kotlin": {
+    "version": "2.4.21",
+    "compiler": "K2",
+    "url": "https://github.com/JetBrains/kotlin/releases/download/v2.4.21/kotlin-compiler-2.4.21.zip",
+    "native": {
+      "url": "https://download.jetbrains.com/kotlin/native/builds/releases/2.4.21/linux-x86_64/kotlin-native-prebuilt-2.4.21-linux-x86_64.tar.gz",
+      "why": "optional: Kotlin/Native for KMP targets; Gradle fetches it on demand into ~/.konan, this pin is for offline images"
+    }
+  },
+  "android": {
+    "agp": "9.5.0",
+    "composeBom": "2026.09.00",
+    "material3": "1.4.0",
+    "adaptive": "1.3.0",
+    "compileSdk": 37,
+    "abis": ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"]
+  },
+  "rust": {
+    "cargoNdk": "4.1.2",
+    "uniffi": "0.32.2",
+    "flutterRustBridge": "2.13.0",
+    "jni": "0.22.4"
+  },
+  "flutter": {
+    "fork": "https://github.com/aphrody-labs/flutter.git",
+    "branch": "stable",
+    "version": "3.47.9",
+    "dart": "3.13.7",
+    "revision": "c197ca5199e9ee5661e865596c9c07294dfab51c",
+    "path": "vendor/flutter",
+    "pubCache": "~/.cache/bunos-android/pub"
+  }
+}

@@ -7,6 +7,7 @@
 import { mkdirSync, writeFileSync, chmodSync, lstatSync, readFileSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { nativeThemeVariant, parseNativeThemeExport } from "@aphrody/m3-tokens/native-theme";
+import { APP_TARGETS, BUNOS_THEME, generateApps, type AppTarget } from "./apps.ts";
 import { generate } from "./generate.ts";
 import { TARGETS, type ActiveMode, type GeneratedFile, type Target } from "./types.ts";
 
@@ -20,7 +21,48 @@ export interface CliResult {
 const USAGE = `m3-os-themes <install|generate|uninstall> --target windows|gnome|cosmic|chromium|all --seed <hex> --mode light|dark|auto
   [--name <name>] [--variant tonalSpot|content|fidelity|expressive|vibrant|neutral|monochrome] [--contrast <-1..1>] [--out <dir>]
   [--native-theme <Rust-theme.json>] [--icons <freedesktop theme dir>] [--dry-run] [--apply]
-install/uninstall only print the plan unless --apply is given. generate writes into --out (default ./m3-os-themes-out).`;
+install/uninstall only print the plan unless --apply is given. generate writes into --out (default ./m3-os-themes-out).
+m3-os-themes apps [--target css|compose|flutter|cosmic|all] [--seed <hex>] [--root <checkout>] [--check]
+  writes the web CSS, Jetpack Compose, Flutter and COSMIC themes from one token source into their consumers.`;
+
+/** `apps`: regenerate (or --check) the app themes in the checkout. */
+function appsCommand(flags: Record<string, string | boolean>): CliResult {
+  const root = resolve(String(flags["root"] ?? join(import.meta.dir, "..", "..", "..")));
+  const t = String(flags["target"] ?? "all");
+  if (t !== "all" && !(APP_TARGETS as readonly string[]).includes(t))
+    return { code: 2, out: [`unknown app target ${t}`, USAGE] };
+  const input = {
+    ...BUNOS_THEME,
+    ...(typeof flags["seed"] === "string" ? { seed: flags["seed"] } : {}),
+    ...(typeof flags["variant"] === "string" ? { variant: flags["variant"] as never } : {}),
+    ...(flags["contrast"] !== undefined ? { contrastLevel: Number(flags["contrast"]) } : {}),
+  };
+  const files = generateApps(input, t === "all" ? APP_TARGETS : [t as AppTarget]);
+  const out: string[] = [];
+  let code = 0;
+  for (const f of files) {
+    const p = join(root, f.path);
+    let current: string | undefined;
+    try {
+      current = readFileSync(p, "utf8");
+    } catch {}
+    if (flags["check"] === true) {
+      if (current !== f.content) {
+        code = 1;
+        out.push(`stale ${f.path}`);
+      } else out.push(`ok    ${f.path}`);
+      continue;
+    }
+    if (current === f.content) {
+      out.push(`same  ${f.path}`);
+      continue;
+    }
+    mkdirSync(dirname(p), { recursive: true });
+    writeFileSync(p, f.content);
+    out.push(`wrote ${f.path}`);
+  }
+  return { code, out };
+}
 
 const defaultExec: Exec = cmd =>
   Bun.spawnSync(cmd, {
@@ -38,7 +80,7 @@ function parse(argv: string[]): {
     const a = rest[i]!;
     if (!a.startsWith("--")) throw new Error(`unexpected argument ${a}`);
     const key = a.slice(2);
-    if (key === "dry-run" || key === "apply" || key === "help") flags[key] = true;
+    if (key === "dry-run" || key === "apply" || key === "help" || key === "check") flags[key] = true;
     else {
       const v = rest[++i];
       if (v === undefined || v.startsWith("--")) throw new Error(`--${key} needs a value`);
@@ -140,6 +182,7 @@ export function run(argv: string[], exec: Exec = defaultExec): CliResult {
     return { code: 2, out: [(e as Error).message, USAGE] };
   }
   const { cmd, flags } = parsed;
+  if (cmd === "apps") return appsCommand(flags);
   if (!["install", "generate", "uninstall"].includes(cmd) || flags["help"]) return { code: cmd ? 2 : 0, out: [USAGE] };
   const targetFlag = String(flags["target"] ?? "all");
   if (targetFlag !== "all" && !(TARGETS as readonly string[]).includes(targetFlag))
