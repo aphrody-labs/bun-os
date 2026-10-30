@@ -1,6 +1,6 @@
 {
   "name": "@aphrody/gemma-web",
-  "version": "0.1.0",
+  "version": "1.4.7",
   "description": "Gemma 4 E2B in the browser: ONNX Runtime Web (WebGPU decoder, wasm per-layer embeddings), OPFS shard cache, OpenAI-style streaming client.",
   "license": "Apache-2.0",
   "type": "module",

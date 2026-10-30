@@ -1,6 +1,6 @@
 {
   "name": "@aphrody/waydroid",
-  "version": "0.1.0",
+  "version": "1.4.7",
   "description": "Bun gateway and <android-screen> web component that deliver an Android container (Waydroid, redroid, emulator) to the browser through the scrcpy protocol.",
   "license": "MIT",
   "type": "module",
