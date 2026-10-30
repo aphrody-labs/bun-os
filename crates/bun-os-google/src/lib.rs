@@ -10,6 +10,8 @@
 )]
 
 pub mod atlas;
+#[cfg(all(not(target_arch = "wasm32"), feature = "cloud"))]
+pub mod cloud;
 pub mod language_detect;
 pub mod languages;
 #[cfg(all(not(target_arch = "wasm32"), feature = "search"))]

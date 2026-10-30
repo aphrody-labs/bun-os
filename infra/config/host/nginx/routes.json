@@ -6,7 +6,7 @@
   "routes": [
     {
       "host": "omar.aphrody.com",
-      "service": "aphrody-public-webos",
+      "service": "aphrody-omar-deny",
       "upstream": "static:403",
       "probePath": "/",
       "response": 403,
@@ -14,9 +14,9 @@
     },
     {
       "host": "aphrody.com",
-      "service": "aphrody-dbfr-site",
-      "upstream": "10.200.77.3:18803",
-      "probePath": "/docs",
+      "service": "aphrody-webos",
+      "upstream": "127.0.0.1:8790",
+      "probePath": "/api/health",
       "vhost": "nginx/aphrody/aphrody.com.conf"
     },
     {
@@ -90,6 +90,14 @@
       "paths": ["/api/v1/web/"],
       "status": "retired",
       "retiredAt": "2026-09-25"
+    },
+    {
+      "service": "aphrody-bun-os-server",
+      "upstream": "127.0.0.1:29030",
+      "via": "nginx",
+      "publicHost": "source.aphrody.app",
+      "paths": ["/api/product/healthz", "/api/product/v1/"],
+      "note": "Authenticated product namespace on the source.aphrody.app TLS vhost."
     }
   ],
   "policy": "one-nginx-instance-one-route-per-public-service"

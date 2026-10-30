@@ -5,9 +5,5 @@
     "sessionUrl": false
   },
   "includeCoAuthoredBy": false,
-  "enabledPlugins": {
-    "supabase@anthropic-plugin-directory": false,
-    "vercel@anthropic-plugin-directory": false,
-    "neon@anthropic-plugin-directory": true
-  }
+  "enabledPlugins": {}
 }

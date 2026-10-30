@@ -21,6 +21,9 @@ WORK=${BUNOS_NATIVE_WORK:-$HOME/native-apps}
 DEBS=$WORK/debs
 export APHRODY_BUILD_HOST=vps CARGO_BUILD_JOBS=4 PATH="${CARGO_HOME:-$HOME/.cargo}/bin:$PATH"
 CARGO="$ROOT/scripts/aphrody/build/rust/cargo-serial.sh"
+# Inside the builder container the container itself is the serialised lane (--cpus 4, one container at a time):
+# cargo-serial routes containers to local Cargo anyway and needs the whole workspace, so plain cargo -j 4 is used.
+[ -f /.dockerenv ] && CARGO=cargo
 mkdir -p "$WORK/src" "$WORK/stage" "$DEBS"
 
 log() { printf '%s %s\n' "$(date -u +%FT%TZ)" "$*"; }
