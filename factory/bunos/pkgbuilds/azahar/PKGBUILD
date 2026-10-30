@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# Azahar (Nintendo 3DS) from the Bun OS fork (vendor/azahar, aphrody-labs/azahar). The built-in key blob stays
+# disabled: no console keys are shipped. cmake installs the desktop entry, icons and AppStream metainfo.
+pkgname=azahar
+pkgver=2125.ra5fc1f8
+pkgrel=1
+_commit=a5fc1f8b49caceef79802ebad3b733f130985234
+pkgdesc='Nintendo 3DS emulator (Bun OS fork of Azahar)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/azahar'
+license=('GPL-2.0-or-later')
+depends=('ffmpeg' 'libgl' 'libusb' 'openal' 'qt6-base' 'qt6-multimedia' 'qt6-wayland' 'sdl2' 'vulkan-icd-loader' 'zstd')
+makedepends=('cmake' 'git' 'glslang' 'ninja' 'python' 'qt6-tools' 'vulkan-headers')
+options=('!debug' '!lto')
+source=("azahar::git+https://github.com/aphrody-labs/azahar.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd azahar
+  git submodule update --init --recursive --depth 1
+}
+
+build() {
+  cmake -S azahar -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+    -DENABLE_TESTS=OFF -DENABLE_ROOM=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_BUILTIN_KEYBLOB=OFF \
+    -DENABLE_QT_UPDATER=OFF
+  cmake --build build -j 4
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+  install -d "$pkgdir/usr/share/licenses/$pkgname"
+  find azahar -maxdepth 1 -iname 'license*' -exec install -m644 {} "$pkgdir/usr/share/licenses/$pkgname/" \;
+}

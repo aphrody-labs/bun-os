@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.aphrody.bunos.vita3k-bin</id>
+  <name>Vita3K</name>
+  <summary>Vita3K emulator</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <launchable type="desktop-id">vita3k-bin.desktop</launchable>
+  <url type="homepage">https://github.com/Vita3K/Vita3K</url>
+  <categories><category>Game</category><category>Emulator</category></categories>
+  <releases><release version="0"/></releases>
+  <content_rating type="oars-1.1"/>
+</component>

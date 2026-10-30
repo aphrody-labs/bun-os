@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Cemu
+Comment=Cemu emulator (Bun OS package of cemu-project/Cemu v2.6)
+Exec=Cemu %f
+Icon=cemu
+Terminal=false
+Categories=Game;Emulator;
+StartupWMClass=Cemu

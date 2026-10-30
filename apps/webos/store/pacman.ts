@@ -25,6 +25,23 @@ const BUILD = [
   "factory/bunos/pkgbuilds/aphrody",
   "factory/bunos/pkgbuilds/bun-engine",
   "factory/bunos/pkgbuilds/bun-os-spacedrive",
+  // Emulators and the gaming session stack (factory/arch/emulators renders the upstream-binary ones; forks build from aphrody-labs).
+  "factory/bunos/pkgbuilds/cemu",
+  "factory/bunos/pkgbuilds/rpcs3",
+  "factory/bunos/pkgbuilds/xemu",
+  "factory/bunos/pkgbuilds/flycast",
+  "factory/bunos/pkgbuilds/vita3k-bin",
+  "factory/bunos/pkgbuilds/shadps4",
+  "factory/bunos/pkgbuilds/melonds",
+  "factory/bunos/pkgbuilds/azahar",
+  "factory/bunos/pkgbuilds/bunos-retroarch",
+  "factory/bunos/pkgbuilds/bunos-dolphin-emu",
+  "factory/bunos/pkgbuilds/pcsx2",
+  "factory/bunos/pkgbuilds/bunos-gamescope",
+  "factory/bunos/pkgbuilds/gopher64",
+  "factory/bunos/pkgbuilds/tetanes",
+  "factory/bunos/pkgbuilds/bunos-dxvk",
+  "factory/bunos/pkgbuilds/bunos-vkd3d-proton",
 ];
 
 interface Prebuild {

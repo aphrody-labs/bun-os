@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.aphrody.bunos.xemu</id>
+  <name>xemu</name>
+  <summary>xemu emulator</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <launchable type="desktop-id">xemu.desktop</launchable>
+  <url type="homepage">https://github.com/xemu-project/xemu</url>
+  <categories><category>Game</category><category>Emulator</category></categories>
+  <releases><release version="0.8.139"/></releases>
+  <content_rating type="oars-1.1"/>
+</component>

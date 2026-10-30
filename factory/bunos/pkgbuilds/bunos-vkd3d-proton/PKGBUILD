@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# vkd3d-proton (Direct3D 12 on Vulkan for Wine/Proton) from the Bun OS fork (vendor/vkd3d-proton,
+# aphrody-labs/vkd3d-proton), cross-built with mingw-w64 through the upstream package-release.sh.
+pkgname=bunos-vkd3d-proton
+pkgver=2.14.r0bb64c5
+pkgrel=1
+_commit=0bb64c56c8f0dcc11ecc0f6c56e00e4f7bd8d506
+pkgdesc='Direct3D 12 implementation on Vulkan for Wine (Bun OS fork of vkd3d-proton)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/vkd3d-proton'
+license=('LGPL-2.1-or-later')
+depends=('vulkan-icd-loader' 'lib32-vulkan-icd-loader')
+makedepends=('git' 'glslang' 'meson' 'mingw-w64-gcc' 'ninja' 'wine')
+provides=('vkd3d-proton')
+conflicts=('vkd3d-proton' 'vkd3d-proton-bin')
+options=('!strip' '!debug' '!lto' 'staticlibs')
+source=("vkd3d-proton::git+https://github.com/aphrody-labs/vkd3d-proton.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd vkd3d-proton
+  git submodule update --init --recursive --depth 1
+}
+
+build() {
+  cd vkd3d-proton
+  ./package-release.sh bunos "$srcdir/out" --no-package
+}
+
+package() {
+  install -d "$pkgdir/usr/share/vkd3d-proton"
+  cp -a "$srcdir/out/vkd3d-proton-bunos/x64" "$srcdir/out/vkd3d-proton-bunos/x86" "$pkgdir/usr/share/vkd3d-proton/"
+  install -Dm644 vkd3d-proton/LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
+}

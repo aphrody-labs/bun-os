@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: Apache-2.0
+# Gopher64 (Nintendo 64) from the Bun OS fork (vendor/gopher64, aphrody-labs/gopher64), built with cargo.
+pkgname=gopher64
+pkgver=1.1.r9b312ea
+pkgrel=1
+_commit=9b312ea60d1db87e85964c2a4c6fe5dae1540609
+pkgdesc='Nintendo 64 emulator (Bun OS fork of Gopher64)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/gopher64'
+license=('GPL-3.0-only')
+depends=('gcc-libs' 'glibc' 'hicolor-icon-theme' 'libx11' 'libxkbcommon' 'vulkan-icd-loader' 'wayland')
+makedepends=('cargo' 'clang' 'cmake' 'git' 'ninja' 'python')
+options=('!debug' '!lto')
+source=("gopher64::git+https://github.com/aphrody-labs/gopher64.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd gopher64
+  git submodule update --init --recursive --depth 1
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd gopher64
+  CARGO_PROFILE_RELEASE_DEBUG=false cargo build --frozen --release --jobs 4
+}
+
+package() {
+  cd gopher64
+  install -Dm755 target/release/gopher64 "$pkgdir/usr/bin/gopher64"
+  for size in 128 256 512; do
+    install -Dm644 "data/icon/gopher64_${size}x${size}.png" "$pkgdir/usr/share/icons/hicolor/${size}x${size}/apps/io.github.gopher64.gopher64.png"
+  done
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/io.github.gopher64.gopher64.desktop" <<'DESKTOP'
+[Desktop Entry]
+Type=Application
+Name=Gopher64
+Comment=Nintendo 64 emulator
+Exec=gopher64 %f
+Icon=io.github.gopher64.gopher64
+Terminal=false
+Categories=Game;Emulator;
+MimeType=application/x-n64-rom;
+DESKTOP
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/metainfo/io.github.gopher64.gopher64.metainfo.xml" <<'META'
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.gopher64.gopher64</id>
+  <name>Gopher64</name>
+  <summary>Nintendo 64 emulator</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <launchable type="desktop-id">io.github.gopher64.gopher64.desktop</launchable>
+  <url type="homepage">https://github.com/gopher64/gopher64</url>
+  <categories><category>Game</category><category>Emulator</category></categories>
+  <content_rating type="oars-1.1"/>
+</component>
+META
+  install -Dm644 LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
+}

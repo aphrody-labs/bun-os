@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.aphrody.bunos.rpcs3</id>
+  <name>RPCS3</name>
+  <summary>RPCS3 emulator</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-only</project_license>
+  <launchable type="desktop-id">rpcs3.desktop</launchable>
+  <url type="homepage">https://github.com/RPCS3/rpcs3-binaries-linux</url>
+  <categories><category>Game</category><category>Emulator</category></categories>
+  <releases><release version="9508444d31338e89a4f4cee1d0cee1800c96d2c1"/></releases>
+  <content_rating type="oars-1.1"/>
+</component>

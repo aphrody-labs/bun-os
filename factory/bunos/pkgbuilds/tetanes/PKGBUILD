@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: Apache-2.0
+# TetaNES (NES) from the Bun OS fork (vendor/tetanes, aphrody-labs/tetanes), built with cargo.
+pkgname=tetanes
+pkgver=0.17.0.ree25913
+pkgrel=1
+_commit=ee25913b2cca3133f22340ac0f789a19892b1456
+pkgdesc='NES emulator (Bun OS fork of TetaNES)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/tetanes'
+license=('MIT' 'Apache-2.0')
+depends=('alsa-lib' 'gcc-libs' 'glibc' 'hicolor-icon-theme' 'libxkbcommon' 'vulkan-icd-loader' 'wayland')
+makedepends=('cargo' 'git')
+options=('!debug' '!lto')
+source=("tetanes::git+https://github.com/aphrody-labs/tetanes.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd tetanes
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd tetanes
+  cargo build --frozen --release --jobs 4 -p tetanes
+}
+
+package() {
+  cd tetanes
+  install -Dm755 target/release/tetanes "$pkgdir/usr/bin/tetanes"
+  install -Dm644 assets/linux/icon.png "$pkgdir/usr/share/icons/hicolor/256x256/apps/tetanes.png"
+  sed 's/^Icon=icon$/Icon=tetanes/; s/^Categories=Game;$/Categories=Game;Emulator;/' assets/linux/tetanes.desktop \
+    | install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/tetanes.desktop"
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/metainfo/tetanes.metainfo.xml" <<'META'
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>tetanes</id>
+  <name>TetaNES</name>
+  <summary>NES emulator written in Rust</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT OR Apache-2.0</project_license>
+  <launchable type="desktop-id">tetanes.desktop</launchable>
+  <url type="homepage">https://github.com/lukexor/tetanes</url>
+  <categories><category>Game</category><category>Emulator</category></categories>
+  <content_rating type="oars-1.1"/>
+</component>
+META
+  install -Dm644 LICENSE-MIT LICENSE-APACHE -t "$pkgdir/usr/share/licenses/$pkgname/"
+}

@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: Apache-2.0
+# DXVK (Direct3D 8/9/10/11 on Vulkan for Wine) from the Bun OS fork (vendor/dxvk, aphrody-labs/dxvk), cross-built
+# with mingw-w64 through the upstream package-release.sh. Installs the 32- and 64-bit DLLs under /usr/share/dxvk and
+# the setup script used by the Wine session image.
+pkgname=bunos-dxvk
+pkgver=2.7.ra78a467
+pkgrel=1
+_commit=a78a467cadb22bee928904290cf8e7921b121851
+pkgdesc='Vulkan-based implementation of D3D8, D3D9, D3D10 and D3D11 for Wine (Bun OS fork)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/dxvk'
+license=('Zlib')
+depends=('vulkan-icd-loader' 'lib32-vulkan-icd-loader' 'bash')
+makedepends=('git' 'glslang' 'meson' 'mingw-w64-gcc' 'ninja')
+provides=('dxvk')
+conflicts=('dxvk' 'dxvk-bin')
+options=('!strip' '!debug' '!lto' 'staticlibs')
+source=("dxvk::git+https://github.com/aphrody-labs/dxvk.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd dxvk
+  git submodule update --init --recursive --depth 1
+}
+
+build() {
+  cd dxvk
+  ./package-release.sh bunos "$srcdir/out" --no-package
+}
+
+package() {
+  install -d "$pkgdir/usr/share/dxvk"
+  cp -a "$srcdir/out/dxvk-bunos/x64" "$srcdir/out/dxvk-bunos/x32" "$pkgdir/usr/share/dxvk/"
+  install -Dm644 dxvk/LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
+}

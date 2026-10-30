@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: Apache-2.0
+# Dolphin (GameCube and Wii) from the Bun OS fork (vendor/dolphin, aphrody-labs/dolphin). Recipe follows Arch's
+# extra/dolphin-emu; cmake installs the desktop entry, icons and AppStream metainfo.
+pkgname=bunos-dolphin-emu
+pkgver=2509.r2282f5f
+pkgrel=1
+_commit=2282f5f94f011d33b3b431e252d9613d92f6c87c
+pkgdesc='GameCube and Wii emulator (Bun OS fork)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/dolphin'
+license=('GPL-2.0-or-later')
+depends=('alsa-lib' 'bluez-libs' 'enet' 'ffmpeg' 'hidapi' 'libevdev' 'libgl' 'libpulse' 'libspng' 'libusb'
+         'libx11' 'libxi' 'libxrandr' 'lz4' 'lzo' 'miniupnpc' 'pugixml' 'qt6-base' 'qt6-svg' 'sdl3'
+         'sfml' 'speexdsp' 'systemd-libs' 'vulkan-icd-loader' 'xxhash' 'zstd')
+makedepends=('cmake' 'git' 'ninja' 'python' 'vulkan-headers' 'qt6-tools')
+provides=('dolphin-emu')
+conflicts=('dolphin-emu')
+options=('!debug' '!lto')
+source=("dolphin::git+https://github.com/aphrody-labs/dolphin.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd dolphin
+  git submodule update --init --recursive --depth 1
+}
+
+build() {
+  cmake -S dolphin -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+    -DDISTRIBUTOR=bun-os -DENABLE_TESTS=OFF -DENABLE_AUTOUPDATE=OFF
+  cmake --build build -j 4
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+  install -Dm644 dolphin/COPYING -t "$pkgdir/usr/share/licenses/$pkgname/"
+}

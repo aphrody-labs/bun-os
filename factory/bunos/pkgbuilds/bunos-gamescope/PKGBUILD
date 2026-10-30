@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: Apache-2.0
+# gamescope from the Bun OS fork (vendor/gamescope, aphrody-labs/gamescope). Headless sessions on software Vulkan
+# (lavapipe) need the fork's allocation-failure handling. Recipe follows Arch's extra/gamescope.
+pkgname=bunos-gamescope
+pkgver=3.16.24.r2b5cf19
+pkgrel=1
+_commit=2b5cf191d1047d6895516a834de8a72ac1c342f3
+pkgdesc='SteamOS session compositing window manager (Bun OS fork)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/gamescope'
+license=('BSD-2-Clause')
+depends=('gcc-libs' 'glibc' 'glm' 'hwdata' 'lcms2' 'libavif' 'libcap' 'libdecor' 'libdrm' 'libei' 'libinput'
+         'libpipewire' 'libx11' 'libxcb' 'libxcomposite' 'libxdamage' 'libxext' 'libxfixes' 'libxkbcommon'
+         'libxmu' 'libxrender' 'libxres' 'libxtst' 'libxxf86vm' 'luajit' 'pixman' 'sdl2' 'seatd'
+         'vulkan-icd-loader' 'wayland' 'xcb-util-errors' 'xcb-util-wm' 'xorg-xwayland')
+makedepends=('benchmark' 'cmake' 'git' 'glslang' 'meson' 'ninja' 'vulkan-headers' 'wayland-protocols')
+provides=('gamescope')
+conflicts=('gamescope')
+options=('!debug')
+source=("gamescope::git+https://github.com/aphrody-labs/gamescope.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd gamescope
+  git submodule update --init --recursive
+}
+
+build() {
+  arch-meson gamescope build \
+    -Dforce_fallback_for=stb,libliftoff,vkroots,wlroots \
+    -Dpipewire=enabled \
+    -Denable_openvr_support=false
+  meson compile -C build -j 4
+}
+
+package() {
+  meson install -C build --skip-subprojects --destdir="$pkgdir"
+  install -Dm644 gamescope/LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
+}

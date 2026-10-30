@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# melonDS (Nintendo DS) from the Bun OS fork (vendor/melonds, aphrody-labs/melonds). cmake installs the desktop
+# entry, icons and AppStream metainfo.
+pkgname=melonds
+pkgver=1.1.r906e9eb
+pkgrel=1
+_commit=906e9ebb27da8c6a715cd7abab4abfe8a8d29427
+pkgdesc='Nintendo DS emulator (Bun OS fork of melonDS)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/melonds'
+license=('GPL-3.0-or-later')
+depends=('enet' 'faad2' 'libarchive' 'libgl' 'libslirp' 'qt6-base' 'qt6-multimedia' 'qt6-svg' 'qt6-wayland' 'sdl2'
+         'wayland' 'zstd')
+makedepends=('cmake' 'extra-cmake-modules' 'git' 'ninja')
+options=('!debug')
+source=("melonds::git+https://github.com/aphrody-labs/melonds.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  cmake -S melonds -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6=ON
+  cmake --build build -j 4
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+  install -Dm644 melonds/LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
+}

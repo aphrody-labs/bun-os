@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: Apache-2.0
+# PCSX2 (PlayStation 2) from the Bun OS fork (vendor/pcsx2, aphrody-labs/pcsx2). The PS2 BIOS is never shipped.
+pkgname=pcsx2
+pkgver=2.8.r091ab68
+pkgrel=1
+_commit=091ab68708a555198d80a7216965481c7ddd0d98
+pkgdesc='PlayStation 2 emulator (Bun OS fork of PCSX2)'
+arch=('x86_64')
+url='https://github.com/aphrody-labs/pcsx2'
+license=('GPL-3.0-or-later')
+depends=('alsa-lib' 'ffmpeg' 'libaio' 'libgl' 'libpcap' 'libpng' 'libwebp' 'libxrandr' 'libzip' 'lz4' 'plutosvg'
+         'qt6-base' 'qt6-svg' 'qt6-wayland' 'sdl3' 'shaderc' 'soundtouch' 'vulkan-icd-loader' 'wayland' 'zstd')
+makedepends=('clang' 'cmake' 'extra-cmake-modules' 'git' 'lld' 'llvm' 'ninja' 'qt6-tools' 'vulkan-headers')
+options=('!debug' '!lto')
+source=("pcsx2::git+https://github.com/aphrody-labs/pcsx2.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+prepare() {
+  cd pcsx2
+  git submodule update --init --recursive --depth 1
+}
+
+build() {
+  cmake -S pcsx2 -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DPACKAGE_MODE=ON -DWAYLAND_API=ON -DX11_API=ON
+  cmake --build build -j 4
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+  install -d "$pkgdir/usr/share/licenses/$pkgname"
+  find pcsx2 -maxdepth 1 -iname 'COPYING*' -exec install -m644 {} "$pkgdir/usr/share/licenses/$pkgname/" \;
+}

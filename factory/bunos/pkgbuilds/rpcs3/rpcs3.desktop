@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=RPCS3
+Comment=RPCS3 emulator (Bun OS package of RPCS3/rpcs3-binaries-linux build-9508444d31338e89a4f4cee1d0cee1800c96d2c1)
+Exec=rpcs3 %f
+Icon=rpcs3
+Terminal=false
+Categories=Game;Emulator;
+StartupWMClass=RPCS3
