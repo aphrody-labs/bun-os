@@ -53,7 +53,7 @@ async function readJson<T>(path: string): Promise<T | undefined> {
 /** "pdfcraft-web" becomes "PDFCraft": the product name of a craft member. */
 function productName(id: string): string {
   const base = id.replace(/-web$/, "").replace(/craft$/, "");
-  return (base.length <= 3 ? base.toUpperCase() : base[0]!.toUpperCase() + base.slice(1)) + "Craft";
+  return (["pdf", "cad"].includes(base) ? base.toUpperCase() : base[0]!.toUpperCase() + base.slice(1)) + "Craft";
 }
 
 export async function buildCatalog(ctx: Ctx, dist: string): Promise<StoreCatalog> {
@@ -189,6 +189,16 @@ export async function buildCatalog(ctx: Ctx, dist: string): Promise<StoreCatalog
   fromIndex("android", "android", "android", (e) => ({
     download: e.file ? { url: `${origin}${e.file}`, size: e.size, sha256: e.sha256, name: e.file.split("/").pop() } : undefined,
   }));
+  fromIndex("winget", "winget", "tools", (e) => ({
+    command: `winget install --source aphrody --id ${e.name} --exact`,
+    removeCommand: `winget uninstall --id ${e.name} --exact`,
+    download: e.file ? { url: `${origin}${e.file}`, size: e.size, sha256: e.sha256, name: e.file.split("/").pop() } : undefined,
+  }));
+  fromIndex("apt", "apt", "system", (e) => ({
+    command: `sudo apt-get install ${e.name}`,
+    removeCommand: `sudo apt-get remove ${e.name}`,
+    download: e.file ? { url: `${origin}${e.file}`, size: e.size, sha256: e.sha256, name: e.file.split("/").pop() } : undefined,
+  }));
 
   // 3. Inventory members that are not in a served repository, under the source that would carry them.
   const unpublished = (format: Format, kind: string, source: SourceId, install: (name: string) => string) => {
@@ -298,6 +308,22 @@ export async function buildCatalog(ctx: Ctx, dist: string): Promise<StoreCatalog
       desc: "APK catalog built from apps/bun-android and the Android owners.",
       repo: `${origin}/repo/android/index.json`,
       count: counts.get("android") ?? 0,
+    },
+    {
+      id: "winget",
+      label: "Bun OS winget",
+      desc: "winget REST source of the Windows binaries cross-compiled by the Bun OS factory.",
+      repo: `${origin}/api/store/winget`,
+      setup: `winget source add -n aphrody -a ${origin}/api/store/winget -t "Microsoft.Rest"`,
+      count: counts.get("winget") ?? 0,
+    },
+    {
+      id: "apt",
+      label: "Bun OS apt",
+      desc: "Signed apt repository: Bun OS packages repackaged for Debian and Ubuntu.",
+      repo: `${origin}/repo/apt`,
+      setup: `sudo curl -fsSo /usr/share/keyrings/aphrody-apt.gpg ${origin}/repo/apt/aphrody-apt.gpg && echo "deb [signed-by=/usr/share/keyrings/aphrody-apt.gpg] ${origin}/repo/apt stable main" | sudo tee /etc/apt/sources.list.d/aphrody.list && sudo apt-get update`,
+      count: counts.get("apt") ?? 0,
     },
   ];
   const cats = new Map<string, number>();

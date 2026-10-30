@@ -11,7 +11,9 @@ export type SourceId =
   | "flatpak" //   Bun OS Flatpak (OSTree) repository
   | "npm" //       Bun OS npm registry (@aphrody/*)
   | "cargo" //     Bun OS cargo sparse registry
-  | "android"; //  Android APK catalog
+  | "android" //   Android APK catalog
+  | "winget" //    winget REST source (Windows binaries)
+  | "apt"; //      Bun OS apt repository (Debian)
 
 export interface StoreSource {
   id: SourceId;

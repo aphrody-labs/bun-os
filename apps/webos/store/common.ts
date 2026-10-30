@@ -4,7 +4,7 @@
 import { mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
-export const FORMATS = ["pacman", "apk", "flatpak", "npm", "cargo", "android"] as const;
+export const FORMATS = ["pacman", "apk", "flatpak", "npm", "cargo", "android", "winget", "apt", "appstream"] as const;
 export type Format = (typeof FORMATS)[number];
 
 export interface Ctx {

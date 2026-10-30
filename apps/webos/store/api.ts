@@ -3,12 +3,17 @@
 import { join } from "node:path";
 
 const root = () => Bun.env.WEBOS_STORE ?? join(Bun.env.HOME ?? "/root", "apps/webos/store");
-const FORMAT = /^(pacman|apk|flatpak|npm|cargo|android)$/;
+const FORMAT = /^(pacman|apk|flatpak|npm|cargo|android|winget|apt|appstream)$/;
 
 export async function storeApi(request: Request): Promise<Response | undefined> {
   const url = new URL(request.url);
   if (!url.pathname.startsWith("/api/store/")) return undefined;
   const headers = { "cache-control": "no-cache", "x-content-type-options": "nosniff", "access-control-allow-origin": "*" };
+  // winget REST source (manifestSearch is a POST in the winget-cli-restsource protocol).
+  if (url.pathname.startsWith("/api/store/winget/")) {
+    const { wingetApi } = await import("./winget");
+    return wingetApi(request, root(), url.pathname.slice("/api/store/winget/".length).replace(/\/$/, ""));
+  }
   if (request.method !== "GET" && request.method !== "HEAD")
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { ...headers, allow: "GET, HEAD" } });
   const rest = url.pathname.slice("/api/store/".length).replace(/\/$/, "");
