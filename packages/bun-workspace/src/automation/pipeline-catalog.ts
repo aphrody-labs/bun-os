@@ -2,20 +2,7 @@
 /** Derive validation stages from the active manifests, bottom to top. */
 import { basename, join, resolve } from "node:path";
 import { firstPartyManifests } from "@aphrody/update/manifests";
-const DOMAIN_ORDER = [
-  "bun",
-  "compat",
-  "os",
-  "shell",
-  "interop",
-  "infra",
-  "ui",
-  "web",
-  "google",
-  "ai",
-  "fut",
-  "rg",
-];
+const DOMAIN_ORDER = ["bun", "compat", "os", "shell", "interop", "infra", "ui", "web", "google", "ai", "fut", "rg"];
 export async function pipelineCatalog(root: string) {
   root = resolve(root);
   const rootManifest = await Bun.file(join(root, "package.json")).json();
