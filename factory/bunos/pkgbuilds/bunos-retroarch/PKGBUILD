@@ -26,8 +26,9 @@ sha256sums=('SKIP')
 
 build() {
   cd retroarch
-  ./configure --prefix=/usr --sysconfdir=/etc --disable-builtinflac --disable-builtinmbedtls --disable-builtinzlib \
-    --disable-cg --disable-jack --disable-oss --enable-dbus --enable-pipewire --enable-vulkan --enable-wayland
+  # Vulkan, Wayland and PipeWire are autodetected; the options follow Arch's extra/retroarch.
+  ./configure --prefix=/usr --sysconfdir=/etc --disable-builtinmbedtls --disable-builtinzlib --disable-cg \
+    --disable-jack --disable-oss --enable-dbus
   make -j4
   make -C libretro-common/audio/dsp_filters
   make -C gfx/video_filters

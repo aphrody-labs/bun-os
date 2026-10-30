@@ -26,7 +26,8 @@ prepare() {
 }
 
 build() {
-  arch-meson gamescope build \
+  # The fork pins its subprojects as meson wraps: let meson fetch the ones the submodules do not provide.
+  arch-meson gamescope build --wrap-mode=default \
     -Dforce_fallback_for=stb,libliftoff,vkroots,wlroots \
     -Dpipewire=enabled \
     -Denable_openvr_support=false
