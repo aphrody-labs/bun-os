@@ -90,7 +90,9 @@ fn error_lines(output: &std::process::Output) -> String {
 
 fn build_one(root: &Path, out: &Path, id: &str, krate: &str) -> Result<u64, String> {
     let name = krate.replace('-', "_");
-    let target_dir = std::env::var_os("CARGO_TARGET_DIR")
+    // The factory lane's target directory (APHRODY_CARGO_TARGET_DIR, as set for the webos lane), then Cargo's own.
+    let target_dir = std::env::var_os("APHRODY_CARGO_TARGET_DIR")
+        .or_else(|| std::env::var_os("CARGO_TARGET_DIR"))
         .map(PathBuf::from)
         .unwrap_or_else(|| root.join("target"));
     let home = std::env::var("HOME").unwrap_or_default();
