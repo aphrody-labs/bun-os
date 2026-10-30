@@ -8,18 +8,9 @@ import {
   ownHost,
   type WorkspaceRoute,
 } from "./config";
-import { appStore } from "./apps/appstore";
 import { calculatorApp } from "./apps/calculator";
-import { mediaApp } from "./apps/media";
-import { storageApp } from "./apps/storage";
 import { openWebApp, webApps, webAppsApp } from "./apps/webapps";
 import { browserApp } from "./apps/browser";
-import { editorApp } from "./apps/editor";
-import { engineApp } from "./apps/engine";
-import { emulatorsApp } from "./apps/emulators";
-import { filesApp } from "./apps/files";
-import { linuxApp } from "./apps/linux";
-import { inspectorApp } from "./apps/inspector";
 import {
   atlasApp,
   inventory,
@@ -30,7 +21,6 @@ import {
   type InvMember,
 } from "./apps/atlas";
 import type { Kind } from "./inventory-kinds";
-import { terminalApp } from "./apps/terminal";
 import {
   attachCraftHost,
   craftHostForPackage,
@@ -69,6 +59,28 @@ import {
 import { announce, installNotifications } from "./notify";
 import { chordCaps } from "./shortcuts";
 import { isSection, settingsApp, type SectionId } from "./apps/settings";
+
+// App code loads on first open: each import() is its own chunk (build.ts, ADR-001), so the shell chunk stays small.
+const appStore = async (...args: Parameters<typeof import("./apps/appstore").appStore>) =>
+  (await import("./apps/appstore")).appStore(...args);
+const mediaApp = async (...args: Parameters<typeof import("./apps/media").mediaApp>) =>
+  (await import("./apps/media")).mediaApp(...args);
+const storageApp = async (...args: Parameters<typeof import("./apps/storage").storageApp>) =>
+  (await import("./apps/storage")).storageApp(...args);
+const editorApp = async (...args: Parameters<typeof import("./apps/editor").editorApp>) =>
+  (await import("./apps/editor")).editorApp(...args);
+const engineApp = async (...args: Parameters<typeof import("./apps/engine").engineApp>) =>
+  (await import("./apps/engine")).engineApp(...args);
+const emulatorsApp = async (...args: Parameters<typeof import("./apps/emulators").emulatorsApp>) =>
+  (await import("./apps/emulators")).emulatorsApp(...args);
+const filesApp = async (...args: Parameters<typeof import("./apps/files").filesApp>) =>
+  (await import("./apps/files")).filesApp(...args);
+const linuxApp = async (...args: Parameters<typeof import("./apps/linux").linuxApp>) =>
+  (await import("./apps/linux")).linuxApp(...args);
+const inspectorApp = async (...args: Parameters<typeof import("./apps/inspector").inspectorApp>) =>
+  (await import("./apps/inspector")).inspectorApp(...args);
+const terminalApp = async (...args: Parameters<typeof import("./apps/terminal").terminalApp>) =>
+  (await import("./apps/terminal")).terminalApp(...args);
 
 // Preferences load from IndexedDB before the desktop is built; boot.ts already painted their snapshot.
 await prefs.ready;
