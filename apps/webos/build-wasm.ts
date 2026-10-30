@@ -22,12 +22,13 @@ const inventory = await buildInventory();
 // aphrody-webos-wasm has its own package (packages/webos-wasm); every other module crate is built here.
 const crates = inventory.members
   .filter((m) => m.kind === "crates" && m.meta?.wasm && m.id !== "aphrody-webos-wasm" && (!only.length || only.includes(m.id)))
-  .map((m) => String(m.meta?.crateName ?? m.id));
-console.log(`wasm modules to build: ${crates.join(", ")}`);
-for (const crate of crates) {
-  const dir = join(out, crate);
-  if (!force && status[crate]?.ok && (await Bun.file(join(dir, `${crate.replaceAll("-", "_")}_bg.wasm`)).exists())) {
-    console.log(`${crate}: up to date`);
+  .map((m) => ({ id: m.id, crate: String(m.meta?.crateName ?? m.id) }));
+console.log(`wasm modules to build: ${crates.map((c) => c.id).join(", ")}`);
+for (const { id, crate } of crates) {
+  // The output directory carries the member id (its directory under crates/), the cargo package may be named differently.
+  const dir = join(out, id);
+  if (!force && status[id]?.ok && (await Bun.file(join(dir, `${crate.replaceAll("-", "_")}_bg.wasm`)).exists())) {
+    console.log(`${id}: up to date`);
     continue;
   }
   const started = Date.now();
@@ -41,12 +42,12 @@ for (const crate of crates) {
   const files = await Array.fromAsync(new Bun.Glob("*.wasm").scan({ cwd: dir })).catch(() => [] as string[]);
   const wasm = files.find((f) => f.endsWith("_bg.wasm")) ?? files[0];
   if (code === 0 && wasm) {
-    status[crate] = { ok: true, bytes: Bun.file(join(dir, wasm)).size, at: new Date().toISOString() };
-    console.log(`${crate}: ok ${status[crate]!.bytes} bytes in ${Math.round((Date.now() - started) / 1000)}s`);
+    status[id] = { ok: true, bytes: Bun.file(join(dir, wasm)).size, at: new Date().toISOString() };
+    console.log(`${id}: ok ${status[id]!.bytes} bytes in ${Math.round((Date.now() - started) / 1000)}s`);
   } else {
     const error = (stderr || stdout).trim().split("\n").slice(-6).join(" | ").slice(0, 600);
-    status[crate] = { ok: false, error, at: new Date().toISOString() };
-    console.log(`${crate}: failed: ${error}`);
+    status[id] = { ok: false, error, at: new Date().toISOString() };
+    console.log(`${id}: failed: ${error}`);
   }
   await Bun.write(statusFile, JSON.stringify(status, null, 2));
 }
