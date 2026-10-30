@@ -7,8 +7,7 @@ import { prepareGameCandidate } from "./shenron-game-ingress";
 
 const temporary: string[] = [];
 afterEach(() => {
-  for (const root of temporary.splice(0))
-    rmSync(root, { recursive: true, force: true });
+  for (const root of temporary.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
 async function fixture() {
@@ -32,10 +31,7 @@ async function fixture() {
     "services:\n  game:\n    network_mode: host\n    environment:\n      SHENRON_SITE_SURFACE: game\n",
   );
   const ingress = join(root, "ingress.conf");
-  await Bun.write(
-    ingress,
-    "server { listen 443 ssl; server_name play.dragonballfr.com; }\n",
-  );
+  await Bun.write(ingress, "server { listen 443 ssl; server_name play.dragonballfr.com; }\n");
   return { release, releasesRoot: root, image, overlay, ingress };
 }
 
@@ -45,9 +41,7 @@ test("bootstrap publishes only bounded ACME ingress, preserving the application"
   const compose = await Bun.file(join(f.release, "compose.yaml")).json();
   expect(Object.keys(compose.services)).toEqual(["site", "gateway"]);
   expect(compose.services.site.env_file).toEqual(["/etc/site.env"]);
-  const conf = await Bun.file(
-    join(f.release, "nginx/zz-dragonballfr-game.conf"),
-  ).text();
+  const conf = await Bun.file(join(f.release, "nginx/zz-dragonballfr-game.conf")).text();
   expect(conf).toContain("try_files $uri =404");
   expect(conf).toContain("X-Robots-Tag noindex always");
   expect(conf).not.toContain("proxy_pass");
@@ -65,19 +59,11 @@ test("game phase reuses the exact sealed application image and preserves site po
 
 test("sealed candidates, escaping roots, mutable images and symlinked configurations are refused", async () => {
   const f = await fixture();
-  await expect(
-    prepareGameCandidate({ ...f, image: "latest", phase: "game" }),
-  ).rejects.toThrow("Immutable");
-  await expect(
-    prepareGameCandidate({ ...f, releasesRoot: f.release, phase: "game" }),
-  ).rejects.toThrow("direct child");
+  await expect(prepareGameCandidate({ ...f, image: "latest", phase: "game" })).rejects.toThrow("Immutable");
+  await expect(prepareGameCandidate({ ...f, releasesRoot: f.release, phase: "game" })).rejects.toThrow("direct child");
   await Bun.write(join(f.release, "release.json"), "{}");
-  await expect(prepareGameCandidate({ ...f, phase: "game" })).rejects.toThrow(
-    "sealed release",
-  );
+  await expect(prepareGameCandidate({ ...f, phase: "game" })).rejects.toThrow("sealed release");
   const g = await fixture();
   symlinkSync(g.ingress, join(g.release, "nginx/zz-dragonballfr-game.conf"));
-  await expect(prepareGameCandidate({ ...g, phase: "game" })).rejects.toThrow(
-    "symlinks",
-  );
+  await expect(prepareGameCandidate({ ...g, phase: "game" })).rejects.toThrow("symlinks");
 });

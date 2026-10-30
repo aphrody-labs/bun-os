@@ -13,13 +13,8 @@ export async function prepareGameCandidate(options: {
 }) {
   const root = realpathSync(options.releasesRoot);
   const candidate = realpathSync(options.release);
-  if (
-    !candidate.startsWith(root + "/") ||
-    candidate.slice(root.length + 1).includes("/")
-  ) {
-    throw new Error(
-      "Candidate must be a direct child of the declared releases root",
-    );
+  if (!candidate.startsWith(root + "/") || candidate.slice(root.length + 1).includes("/")) {
+    throw new Error("Candidate must be a direct child of the declared releases root");
   }
   if (await Bun.file(resolve(candidate, "release.json")).exists()) {
     throw new Error("A sealed release must never be modified");
@@ -34,19 +29,10 @@ export async function prepareGameCandidate(options: {
   ) {
     throw new Error("Candidate configuration must not contain symlinks");
   }
-  if (!/^sha256:[a-f0-9]{64}$/.test(options.image))
-    throw new Error("Immutable image ID required");
-  const compose = JSON.parse(
-    await Bun.file(resolve(candidate, "compose.yaml")).text(),
-  );
-  if (
-    !compose.services?.site ||
-    !compose.services?.gateway ||
-    compose.services.site.image !== options.image
-  ) {
-    throw new Error(
-      "Candidate must contain the qualified site image and gateway",
-    );
+  if (!/^sha256:[a-f0-9]{64}$/.test(options.image)) throw new Error("Immutable image ID required");
+  const compose = JSON.parse(await Bun.file(resolve(candidate, "compose.yaml")).text());
+  if (!compose.services?.site || !compose.services?.gateway || compose.services.site.image !== options.image) {
+    throw new Error("Candidate must contain the qualified site image and gateway");
   }
   const fullIngress = await Bun.file(options.ingress).text();
   const bootstrap = `# SPDX-License-Identifier: Apache-2.0
@@ -69,16 +55,12 @@ server {
       services: { game: Record<string, unknown> };
     };
     const game = overlay.services?.game;
-    if (!game || game.network_mode !== "host")
-      throw new Error("Public game declaration required");
+    if (!game || game.network_mode !== "host") throw new Error("Public game declaration required");
     compose.services.game = { ...game, image: options.image };
   } else if (compose.services.game) {
     throw new Error("Bootstrap cannot remove an already declared game service");
   }
-  await Bun.write(
-    ingressPath,
-    options.phase === "game" ? fullIngress : bootstrap,
-  );
+  await Bun.write(ingressPath, options.phase === "game" ? fullIngress : bootstrap);
   await Bun.write(composePath, JSON.stringify(compose, null, 2) + "\n");
   return {
     candidate,
@@ -88,20 +70,9 @@ server {
 }
 
 if (import.meta.main) {
-  const [release, releasesRoot, image, overlay, ingress, phase] =
-    Bun.argv.slice(2);
-  if (
-    !release ||
-    !releasesRoot ||
-    !image ||
-    !overlay ||
-    !ingress ||
-    !phase ||
-    !["bootstrap", "game"].includes(phase)
-  ) {
-    throw new Error(
-      "Usage: shenron-game-ingress.ts RELEASE RELEASES_ROOT IMAGE OVERLAY INGRESS bootstrap|game",
-    );
+  const [release, releasesRoot, image, overlay, ingress, phase] = Bun.argv.slice(2);
+  if (!release || !releasesRoot || !image || !overlay || !ingress || !phase || !["bootstrap", "game"].includes(phase)) {
+    throw new Error("Usage: shenron-game-ingress.ts RELEASE RELEASES_ROOT IMAGE OVERLAY INGRESS bootstrap|game");
   }
   console.log(
     JSON.stringify(

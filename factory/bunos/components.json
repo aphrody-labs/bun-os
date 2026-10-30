@@ -1225,7 +1225,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/cosmic-epoch.git",
-        "pin": "cfa498958dc8aeac73aa911cbd318c01e47ac957"
+        "pin": "764ef227bb4a26a385d7c7c94ce3b54dd28e9888"
       },
       "registration": ["none"],
       "aot": true,
@@ -1935,7 +1935,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/nushell.git",
-        "pin": "818d4ac0644a03e857062b024c136c5d27ba0ea5"
+        "pin": "956c04a5ce7e89aba32e60dffae6cde8dc756d8b"
       },
       "registration": ["none"],
       "aot": true,
@@ -2851,7 +2851,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/uutils-coreutils.git",
-        "pin": "12d526de6dda957d6faebb0224d1d38cdd64ba15"
+        "pin": "60727910c935c4b890f0a0c0733cefebac171243"
       },
       "registration": ["none"],
       "aot": true,
@@ -2864,7 +2864,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/uutils-diffutils.git",
-        "pin": "5269d73e2e241114f48d08ff15b8c3fc3ac5bb54"
+        "pin": "f743074b786171e0148d116f55cfdaa76d575d1d"
       },
       "registration": ["none"],
       "aot": true,
@@ -2877,7 +2877,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/uutils-findutils.git",
-        "pin": "eef2c9718230f04666a91ccaf0a346f16b89c088"
+        "pin": "d71f3242b0bc3b21bb311f04b23ae62e5f3fed67"
       },
       "registration": ["none"],
       "aot": true,
@@ -2890,7 +2890,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/uutils-procps.git",
-        "pin": "b536810e8746385e1862aa8e344821854e2fea79"
+        "pin": "e697667b3f758803e38d8ab4c8f912171beca602"
       },
       "registration": ["none"],
       "aot": true,
@@ -2903,7 +2903,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/uutils-util-linux.git",
-        "pin": "09959d43054c2af206c4fb9c725224d629e47e7f"
+        "pin": "413b20967dcf8cd41f095dabf4858d4f02c17401"
       },
       "registration": ["none"],
       "aot": true,
@@ -13126,7 +13126,7 @@
         "name": "libc",
         "key": "libc",
         "requirement": "0.2.190",
-        "locked": ["0.2.190"]
+        "locked": ["0.2.191"]
       },
       "registration": ["none"],
       "aot": true,
