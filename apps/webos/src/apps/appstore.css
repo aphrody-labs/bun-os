@@ -106,3 +106,8 @@
 .st-metric { font-variant-numeric: tabular-nums; color: var(--md-sys-color-on-surface-variant); white-space: nowrap; }
 @container st (max-width: 640px) { .st-slide { flex-direction: column; align-items: flex-start; padding: 20px; gap: 12px; } .st-slide .st-icon.big { width: 64px; height: 64px; } .st-slide-text h2 { font-size: 1.4em; } }
 @media (prefers-reduced-motion: reduce) { .st-slides { transition: none; } }
+
+/* S03 collection */
+.st-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 12px; flex-wrap: wrap; }
+.st-select { min-height: 40px; padding: 0 12px; border-radius: var(--md-sys-shape-corner-small); border: 1px solid var(--md-sys-color-outline); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+.st-more { display: grid; justify-items: center; padding: 16px; }
