@@ -670,7 +670,7 @@ async function gameMembers(out: Detail[], games: { id: string; name: string; des
       name: "Nintendo 3DS (ctr)",
       desc: "The aphrody-ctr 3DS emulator crates and their desktop host.",
       tags: ["emulator"],
-      test: (m) => m.kind === "crates" && /^aphrody-ctr/.test(m.id),
+      test: (m) => m.kind === "crates" && m.id.startsWith("aphrody-ctr"),
     },
     {
       id: "steam",
@@ -851,8 +851,7 @@ function collectionMembers(out: Detail[]) {
 const isPlaceholder = (desc: string) =>
   !desc ||
   /^(Directory|File) \S+( \(\d+ files\))?\.$/.test(desc) ||
-  /^Bun OS (package|crate|\w+ app) at /.test(desc) ||
-  /^Documentation page /.test(desc);
+  /^Bun OS (package|crate|\w+ app) at /.test(desc);
 
 /** descriptions.ts entry, a well-known file name, or the top-level keys of a JSON file. */
 function curatedDescription(m: Detail): string {
@@ -1005,7 +1004,7 @@ export async function buildInventory(options: BuildOptions = {}): Promise<Invent
 }
 
 /** Lightweight member for list endpoints: no README, text or data. */
-export const summary = ({ readme, text, files, members, data, lang, ...rest }: Detail): Member => ({
+export const summary = ({ readme: _readme, text: _text, files: _files, members: _members, data: _data, lang: _lang, ...rest }: Detail): Member => ({
   ...rest,
   ...(members ? { meta: { ...rest.meta, members: members.length } } : {}),
 });

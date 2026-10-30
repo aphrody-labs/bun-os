@@ -213,7 +213,6 @@ async function autorunV86() {
   $("stage").replaceChildren(screen);
   let serial = "";
   const strip = (text) => text.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "").replace(/\r/g, "");
-/g, "");
   const vm = new V86({
     wasm_path: "/vm/v86.wasm",
     memory_size: 256 * 1024 * 1024,

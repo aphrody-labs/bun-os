@@ -23,7 +23,6 @@ import { inspectorApp } from "./apps/inspector";
 import {
   atlasApp,
   inventory,
-  inventoryPath,
   inventoryWindowId,
   memberPage,
   parseInventoryId,

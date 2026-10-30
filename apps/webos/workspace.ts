@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-import { cp, lstat, mkdir } from "node:fs/promises";
-import { basename, extname, join, resolve } from "node:path";
+import { cp, mkdir } from "node:fs/promises";
+import { join, resolve } from "node:path";
 
 /** Assemble the existing App UI artifact; compilation remains owned by packages/app-ui. */
 export async function stageWorkspace(
