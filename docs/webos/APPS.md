@@ -18,7 +18,7 @@ in-browser counterpart, published builds from the downloads service, README and 
 | Craft family of a member, package id, file bridges                                                 | `@aphrody/bun-workspace/capabilities`                                                                                                                 |
 | Installable packages (Craft, Bun Engine emulators), sha256 per file                                | `apps/webos/packages.ts`, written to `dist/registry.json`                                                                                             |
 | Published native builds                                                                            | `GET /api/downloads` (Worker, `apps/webos/worker/downloads.ts`) reads `latest.json` of the downloads service                                          |
-| Workspace Documentation and Templates catalogs                                                     | `GET /api/docs`, `GET /api/templates` (Worker): `crates/aphrody-site/data/docs.json` and `packages/m3-templates`, staged by `apps/webos/workspace.ts` |
+| Inventory of every repository member, with its real `backing` (desktop-app, wasm-module, api, download, repository) | `/api/inventory`, built by `apps/webos/inventory.ts`; its gate fails a member or desktop app without a backing |
 | Workspace agent service transport (`/rpc`, `/events`, `/notifications`)                            | Answered by the Worker (`apps/webos/worker/app-server.ts`): the service is the private native `aphrody app-server`                                    |
 | Shell code that reads them                                                                         | `apps/webos/src/config.ts` (the one config module)                                                                                                    |
 
@@ -40,20 +40,14 @@ window of its owner with that reason.
 | App                   | Path             | Source owner                                            | Runs as                                                            | Status                                          |
 | --------------------- | ---------------- | ------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------- |
 | Files                 | `/files`         | `src/apps/files.ts`, `packages/webos-wasm`              | Desktop app, Rust VFS in OPFS                                      | Runs                                            |
-| Aphrody Drive         | `/drive`         | `src/apps/files.ts` on `~/Projects`                     | Desktop app, same VFS as Files                                     | Runs                                            |
 | Browser               | `/browser`       | `src/apps/browser.ts`, `/api/browse`                    | Desktop app; pages through the script-free edge reader             | Runs; Aphrody addresses open as desktop windows |
 | Apps (App Store)      | `/apps`          | `src/apps/appstore.ts`, `src/pkg.ts`                    | Desktop app over `registry.json`                                   | Runs                                            |
-| Aphrody Creative      | `/art`           | `src/apps/creative.ts`                                  | Desktop app: Craft packages and native studios                     | Runs                                            |
 | Terminal              | `/terminal`      | `src/apps/terminal.ts`                                  | Desktop app, Rust shell in wasm                                    | Runs                                            |
-| Docs                  | `/docs`          | `src/apps/docs.ts`, `apps/webos/docs.ts`                | Desktop app over `dist/docs`                                       | Runs                                            |
 | Alpine Linux          | `/linux`         | `src/apps/linux.ts`, `apps/webos/vm.ts`                 | Desktop app, v86 with the Alpine ISO from R2                       | Runs                                            |
 | Media                 | `/media`         | `src/apps/media.ts`                                     | Desktop app                                                        | Runs                                            |
-| Video Studio          | `/video`         | `src/apps/video.ts`                                     | Desktop app (canvas compositor, WebM export); hands media to Video | Runs                                            |
 | TypeScript playground | `/playground`    | `src/apps/engine.ts`, esbuild-wasm                      | Desktop app, module worker                                         | Runs; Bun-only APIs listed as unavailable       |
 | Inspector             | `/inspector`     | `src/apps/inspector.ts`                                 | Desktop app                                                        | Runs                                            |
-| Source catalog        | `/source`        | `src/apps/store.ts` over `catalog.json`                 | Desktop app; every app opens from here                             | Runs                                            |
-| Material 3 components | `/components`    | `src/apps/showcase.ts`, `@aphrody/material-web`         | Desktop app                                                        | Runs                                            |
-| Theme builder         | `/theme-builder` | `src/apps/themebuilder.ts`, `@aphrody/m3-tokens`        | Desktop app                                                        | Runs                                            |
+| Atlas                 | `/source`        | `src/apps/atlas.ts` over `/api/inventory`               | Desktop app; every member opens from here                          | Runs                                            |
 | Web apps              | `/web-apps`      | `src/apps/webapps.ts`, defaults in `apps.json`          | Desktop app; sites open in their own window                        | Runs                                            |
 | Calculator            | `/calculator`    | `src/apps/calculator.ts`                                | Desktop app                                                        | Runs                                            |
 | Disk Usage            | `/storage`       | `src/apps/storage.ts`                                   | Desktop app                                                        | Runs                                            |
@@ -68,11 +62,9 @@ window of its owner with that reason.
 | App        | Path         | Route                   | Status                                                                          |
 | ---------- | ------------ | ----------------------- | ------------------------------------------------------------------------------- |
 | Play       | `/play`      | `/workspace/games`      | Runs; lists the qualified emulator packages                                     |
-| Templates  | `/templates` | `/workspace/templates`  | Runs; the `packages/m3-templates` templates with their files (`/api/templates`) |
-| Material 3 | `/material`  | `/workspace/material-3` | Runs; the pages this host can run (see below)                                   |
 
-The Workspace serves its Documentation from `/api/docs` and opens its in-browser Files and Terminal
-over the Rust WebAssembly backend. What needs a native owner is not offered in the browser:
+WebOS serves no documentation, templates, showcases or examples; the Workspace opens its in-browser Files
+and Terminal over the Rust WebAssembly backend. What needs a native owner is not offered in the browser:
 
 - Chat, Models, Studio, Creator tools, Administration and Jobs are not WebOS windows. They drive the
   agent service (`crates/aphrody-app-server`, private per `infra/config/application-contracts.json`,
@@ -80,9 +72,6 @@ over the Rust WebAssembly backend. What needs a native owner is not offered in t
   open in the Aphrody desktop app. The Workspace sidebar lists them only where those run.
 - The session chip, the home web search (`/api/search`, native Google search owner), Drive jobs and
   sync, Ask Aphrody, media jobs and tags in the inspector are hidden on the in-browser backend.
-- Material 3 drops Design, Next and System (standalone Bun host API) on every native host, and the
-  live Theme page (Rust scheme route `/api/m3/css`) in the browser; the desktop Theme builder
-  (`/theme-builder`) builds schemes in the browser.
 - The Worker still answers the agent service transport (`/rpc`, `/events`, `/notifications`) with a
   JSON-RPC "method not found" carrying that reason, for clients that call it anyway.
 
@@ -140,8 +129,6 @@ Android app installs on a device; a library has no window; an example is read an
 | iecode-web-wasm                                                                         | Web                                                      | Nintendo DS (Dust)            | itself                 |
 | iecode-web-wii-wasm                                                                     | Library                                                  | `/source/iecode-web-wii-wasm` | IECODE Web member      |
 | java-ffi                                                                                | Library                                                  | `/source/java-ffi`            | bun-android member     |
-| m3-next-example, m3-next-tauri-example, m3-published-consumer | Example                                                  | `/source/<member>`            | Material 3 components  |
-| m3-showcase                                                                             | Server                                                   | `/source/m3-showcase`         | Material 3 components  |
 | play                                                                                    | Server (Bun.serve + NGINX: Steam, LAN cache, gamestream) | `/source/play`                | Play                   |
 | webos                                                                                   | Web                                                      | About                         | itself                 |
 | webos-server                                                                            | Server                                                   | `/source/webos-server`        | About                  |

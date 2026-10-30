@@ -6,7 +6,7 @@ import { renderMarkdown } from "../src/markdown";
 
 const root = join(import.meta.dir, "../../..");
 
-describe("docs renderer", () => {
+describe("markdown renderer", () => {
   test("renders a real repository document: headings and substantial content", async () => {
     const html = renderMarkdown(await Bun.file(join(root, "docs/GOAL.md")).text());
     expect(html).toMatch(/<h2>/);
