@@ -3819,7 +3819,7 @@ dependencies = [
  "aphrody-webos-protocol",
  "image",
  "js-sys",
- "libcosmic 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "libcosmic 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "serde",
  "serde_json",
  "wasm-bindgen",
@@ -7788,7 +7788,7 @@ dependencies = [
 [[package]]
 name = "build_helpers"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "cfg_aliases",
 ]
@@ -10415,14 +10415,14 @@ dependencies = [
 [[package]]
 name = "cosmic-config"
 version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "atomicwrites 0.4.2",
- "cosmic-config-derive 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "cosmic-config-derive 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "cosmic-settings-daemon",
  "dirs 6.0.0",
  "futures-util",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "known-folders",
  "notify",
  "ron",
@@ -10444,7 +10444,7 @@ dependencies = [
 [[package]]
 name = "cosmic-config-derive"
 version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "quote 1.0.47",
  "syn 2.0.119",
@@ -10531,11 +10531,11 @@ dependencies = [
 [[package]]
 name = "cosmic-theme"
 version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "almost",
  "configparser",
- "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "csscolorparser 0.8.4",
  "dirs 6.0.0",
  "hex_color",
@@ -20906,19 +20906,19 @@ dependencies = [
 [[package]]
 name = "iced"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "dnd",
- "iced_accessibility 0.1.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_program 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_widget 0.14.2 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_winit 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_accessibility 0.1.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_program 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_widget 0.14.2 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_winit 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "image",
  "mime 0.1.0",
  "thiserror 2.0.21",
@@ -20946,7 +20946,7 @@ dependencies = [
 [[package]]
 name = "iced_accessibility"
 version = "0.1.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "accesskit 0.22.0",
  "accesskit_winit 0.30.0",
@@ -20982,10 +20982,10 @@ dependencies = [
 [[package]]
 name = "iced_core"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "bitflags 2.13.2",
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "bytes",
  "dnd",
  "glam 0.25.0",
@@ -21017,10 +21017,10 @@ dependencies = [
 [[package]]
 name = "iced_debug"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "log",
 ]
 
@@ -21041,10 +21041,10 @@ dependencies = [
 [[package]]
 name = "iced_futures"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "futures",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "log",
  "rustc-hash 2.1.3",
  "wasm-bindgen-futures",
@@ -21075,14 +21075,14 @@ dependencies = [
 [[package]]
 name = "iced_graphics"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "bitflags 2.13.2",
  "bytemuck",
  "cosmic-text",
  "half",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "image",
  "kamadak-exif",
  "log",
@@ -21105,10 +21105,10 @@ dependencies = [
 [[package]]
 name = "iced_program"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
 ]
 
 [[package]]
@@ -21126,11 +21126,11 @@ dependencies = [
 [[package]]
 name = "iced_renderer"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_tiny_skia 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_wgpu 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_tiny_skia 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_wgpu 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "log",
  "thiserror 2.0.21",
 ]
@@ -21155,13 +21155,13 @@ dependencies = [
 [[package]]
 name = "iced_runtime"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "bytes",
  "dnd",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "raw-window-handle",
  "thiserror 2.0.21",
  "window_clipboard",
@@ -21187,12 +21187,12 @@ dependencies = [
 [[package]]
 name = "iced_tiny_skia"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "bytemuck",
  "cosmic-text",
- "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "kurbo 0.10.4",
  "log",
  "resvg 0.45.1",
@@ -21236,18 +21236,18 @@ dependencies = [
 [[package]]
 name = "iced_wgpu"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "as-raw-xcb-connection",
  "bitflags 2.13.2",
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "bytemuck",
  "cryoglyph",
  "futures",
  "glam 0.25.0",
  "guillotiere 0.6.2",
- "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "log",
  "lyon",
  "raw-window-handle",
@@ -21287,12 +21287,12 @@ dependencies = [
 [[package]]
 name = "iced_widget"
 version = "0.14.2"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "dnd",
- "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "log",
  "num-traits",
  "ouroboros",
@@ -21339,16 +21339,16 @@ dependencies = [
 [[package]]
 name = "iced_winit"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "cursor-icon",
  "dnd",
- "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_program 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_program 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "log",
  "rustc-hash 2.1.3",
  "rustix 0.38.44",
@@ -23533,15 +23533,15 @@ dependencies = [
 [[package]]
 name = "libcosmic"
 version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4#dbc62f2d899cdbfbe43d170689ddc0290db663f4"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803#8fee30aa5079b0aed9318091c99c271c4b587803"
 dependencies = [
  "apply",
  "auto_enums",
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "cosmic-freedesktop-icons",
  "cosmic-settings-daemon",
- "cosmic-theme 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "cosmic-theme 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "css-color",
  "derive_setters",
  "enumflags2",
@@ -23549,15 +23549,15 @@ dependencies = [
  "futures",
  "i18n-embed",
  "i18n-embed-fl",
- "iced 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_tiny_skia 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_wgpu 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_widget 0.14.2 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
- "iced_winit 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=dbc62f2d899cdbfbe43d170689ddc0290db663f4)",
+ "iced 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_tiny_skia 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_wgpu 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_widget 0.14.2 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
+ "iced_winit 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=8fee30aa5079b0aed9318091c99c271c4b587803)",
  "image",
  "jiff",
  "log",

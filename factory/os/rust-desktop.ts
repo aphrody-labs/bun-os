@@ -68,7 +68,7 @@ function check(): boolean {
   const problems: string[] = [];
   const patch = readFileSync(patchFile, "utf8");
   const lc = forks.shared.libcosmic.rev!;
-  for (const line of patch.split("\n").filter(l => l.includes("git = \"https://github.com/aphrody-labs/libcosmic\"")))
+  for (const line of patch.split("\n").filter(l => l.includes('git = "https://github.com/aphrody-labs/libcosmic"')))
     if (!line.includes(lc)) problems.push(`cargo-patch.toml libcosmic entry is not ${lc}: ${line}`);
   for (const crate of ["aphrody-chat", "aphrody-search", "aphrody-webos-client"]) {
     const toml = readFileSync(join(root, "crates", crate, "Cargo.toml"), "utf8");
