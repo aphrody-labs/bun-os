@@ -1,6 +1,6 @@
-# WebOS architecture (ADR-001)
+# WebOS architecture (ADR-001, amended by ADR-002)
 
-Status: accepted 2026-10-30. Scope: `apps/webos`, served at https://aphrody.com. Repository docs only: WebOS does not serve documentation.
+Status: accepted 2026-10-30; section 2 onward superseded the same day by ADR-002 (native desktop, thin client). Scope: `apps/webos`, served at https://aphrody.com. Repository docs only: WebOS does not serve documentation.
 
 ## 1. Audit (2026-10-30, commit 7624729916 deployed)
 
@@ -20,71 +20,68 @@ Status: accepted 2026-10-30. Scope: `apps/webos`, served at https://aphrody.com.
 | Type safety | `strict` through `tsconfig.base.json`; 27 `any`, 0 `ts-ignore`. Client and server share no API types: `/api/*` responses are cast on both sides. |
 | Dead or duplicated | Cloudflare Worker deploy path (still wired in `package.json` `dev` script and `wrangler.jsonc`), two `Builtin`/`CatalogApp`/`MemberConfig` app models, three inventory kind tables, `win11/` is an in-flight import (zstd/format helpers, unreferenced). |
 
-## 2. Decisions
+## 2. ADR-002: native desktop, thin browser client (supersedes the first draft)
 
-1. **One runtime.** Bun and TypeScript strict, Bun APIs only (`bun build`, `Bun.serve`, `bun test`, `bun check`, `bun lint`, `bun fmt`). No tsc, eslint, prettier, bunx, no Node-only dependencies.
-2. **One backend: the Bun service.** `services/` owns API, RPC, object store, WASM hosting, Wayland/stream session brokering and the store catalogs, started by `serve.ts` as a plain `Bun.serve` fetch handler with no Cloudflare binding shims. Rust is not a second HTTP service: Rust is compiled to WASM (client and server) or runs as host-side native programs the service starts (Hyprland session, native apps). The Cloudflare Worker has no unique role (aphrody.com and the app host aliases are served natively and redirected by nginx per `infra/config/routes.catalog.json`), so `wrangler.jsonc`, the `ASSETS`/`VM` shims and `wrangler dev` are retired in stage 5.
-3. **UI framework by evidence.** The shell and light apps stay vanilla TypeScript with Web Components: that is what keeps boot under budget (the shell is the critical path; a framework runtime would add 40 to 150 KB before first paint). Rich apps, in particular the Store, are React islands built from `packages/app-ui` (React 19 plus M3), each in a sandboxed iframe or worker with a `postMessage` contract. This is also what lets the Store reuse flathub-infra/website parts, which are React and TypeScript. The boundary is the manifest backing `app-ui`, so the choice is per app, not global.
-4. **One design system.** `packages/m3-tokens` is the only token source (CSS custom properties `--md-sys-*`); `themes.ts` only emits values for it; apps never define colors, radii or type. Components: Material Web for the shell, `app-ui` M3 primitives for islands.
-5. **One window manager and shell.** `wm.ts` plus `tile.ts` in `shell/`; every app opens through `shell.open(manifest)`; native streams, WebViews and Wayland clients get the same window chrome.
-6. **One app model** (section 3).
-7. **Typed API contract.** `contracts/` holds the TypeScript types and a runtime validator for every route (`/api/health`, `/api/inventory`, `/api/rpc`, `/api/store`, `/api/browse`, `/api/wayland/*`); server handlers return `Contract[K]['response']` and the client calls through one typed `api()` function. No second schema language.
-8. **One state pattern.** Preferences, installed packages and window layout live in the existing IndexedDB-backed `prefs` store with typed keys, and cross-app state is a small typed event bus (`core/events.ts`); apps keep local state in closures. No global singletons besides `prefs`, `wm`, `bus`.
-9. **One routing scheme.** Path routing from `infra/config/routes.catalog.json`: `/` desktop, `/<app-path>` opens that app's window, `/workspace/*` the App UI island, `/api/*` the service. The manifest id is the deep-link key.
-10. **Plugin boundary.** Emulators, Store, Craft apps, native apps and WebViews are all manifests; nothing in `shell/` imports an app, and apps import only `core/`, `ui/` and `contracts/`. Enforced by the layer gate (section 6).
-11. **One build graph with caching.** A single `bun webos` entry (`build/index.ts`) runs a task graph (tokens, wasm, shell, apps, catalog, seo, inventory) where each task hashes its inputs and skips when the hash matches under `build/webos-cache/`; independent tasks run concurrently within the four-job VPS lane limit. `build-product.ts` becomes `bun webos build`.
-12. **Tests.** Unit (`bun test`), browser end-to-end qualification on the VPS (opens every manifest app, asserts no console errors, boot time), and a coverage gate: every manifest has a real backing artifact and every member in the inventory has a surface (the existing gate, extended).
-13. **Performance budgets.** Critical path JS (boot.js + main shell chunk) at most 250 KB gzip; each app chunk at most 200 KB gzip, loaded on first open; warm boot DOMContentLoaded under 400 ms, cold under 1.5 s on 4G profile; total first-load transfer under 400 KB; no app code in the shell chunk.
-14. **Observability.** `/api/health` returns `{ok, service, sourceCommit, uptime, inventory, checks}` where checks cover assets, object store, wayland session and store catalogs; the service logs one JSON line per request (`ts, id, method, path, status, ms`) to stdout (journald); the shell reports uncaught errors to `/api/log` (rate limited).
-15. **Security.** CSP on every document (no `unsafe-eval` outside the v86 and WASM iframes, which get their own origin-isolated document with COOP/COEP); app iframes and WebViews are sandboxed (`allow-scripts allow-forms`, never `allow-same-origin` for third-party content); each manifest declares permissions and the shell grants only those; releases are signed (sha256 `receipt.json` plus a detached signature verified by the activator before the symlink flip).
-16. **Deploy.** Atomic: build release, verify receipt, start the new release on a staging port, health gate (`/api/health` and a smoke list of manifest apps), flip `current`, probe again, and auto-rollback to the previous release if the probe fails. Kept as `bun webos deploy`; the root-owned activator remains the only privileged step.
+Owner decision 2026-10-30: the desktop is a real Hyprland and Omarchy session running COSMIC and other native apps on the Bun OS host, streamed to the browser. The JavaScript desktop (shell, window manager, dock, 17 JS apps) is retired after the cutover is verified. The audit in section 1 is the baseline for what is removed and what is kept.
 
-## 3. App model
+### Layers
 
-Every app is a directory `apps/<id>/` with `manifest.ts` exporting an `AppManifest` (`contracts/app-manifest.ts`) and its entry module. The shell, dock, launcher, Store, inventory gate and server read manifests only.
+| # | Layer | Owner | Technology |
+| --- | --- | --- | --- |
+| 1 | Native session layer | Hyprland session agent | Hyprland (headless Wayland) with the Omarchy configuration, COSMIC apps (Files, Terminal, Edit, Store, Settings, Player, Calculator), Rio, Spacedrive, Craft; one session per user as a systemd user unit inside a cgroup slice (CPU, memory, pids limits), per-user home and runtime dir. |
+| 2 | Streaming gateway | Hyprland session agent | Rust service: auth (session cookie to user mapping), capture of each Wayland toplevel, H.264 or AV1 encode, WebRTC (WebCodecs fallback over WebSocket), input, clipboard and audio channels, per-window surfaces. Exposed at `/api/session/*`. |
+| 3 | Thin browser client | WebOS | Minimal TypeScript built by `bun build`: login, session connect, one video or canvas per Wayland window placed in a window frame, input capture, clipboard, audio, reconnect. No framework, no app code. |
+| 4 | Server APIs | WebOS services | Bun HTTP service kept: `/api/health`, `/api/inventory`, `/api/rpc`, repositories and store catalogs (`/api/store`), objects. Consumed by native apps over loopback and by the client; typed in `contracts/`. |
+| 5 | Deploy, rollback, observability | WebOS | Atomic releases with health gate and automatic rollback, JSON request logs, `/api/health` checks for session layer, gateway and APIs, signed receipts. |
+
+### Decisions
+
+1. Runtime: Bun and TypeScript strict for the client and the APIs (Bun APIs only; no tsc, eslint, prettier or bunx); Rust for the gateway and any native service. One native backend per concern: the gateway owns media and input, the Bun service owns catalogs and RPC. No Cloudflare Worker (no unique role; retired with `wrangler.jsonc`).
+2. UI framework: none. The thin client is plain TypeScript. Evidence: every pixel of the desktop and the apps is produced by native apps, so a framework has nothing to render. Store, Files and the rest are COSMIC Store and COSMIC Files plus the flathub-style catalog served by `/api/store`.
+3. Design system: native apps use the Omarchy and COSMIC themes, generated from `packages/m3-tokens` where an M3 palette is needed (one source); the thin client chrome uses only the token CSS (`m3.css`).
+4. App model: `contracts/app-manifest.ts` stays the single description of an app (real name, real upstream icon, backing). Backing `wayland` is the default for the desktop; `wasm`, `webview`, `stream`, `app-ui`, `api`, `browser` stay valid for apps that must run in the page (WebView windows, offline wasm tools). The session layer reads manifests to build launcher entries and desktop files; the client reads them only for window titles and icons.
+5. Typed API contract in `contracts/`, shared by the client, the Bun service and (through Rust types generated from the same definitions) the gateway. Routing: `/` client, `/api/*` services, `/api/session/*` gateway, one deep-link key per manifest id. State: all user state lives in the user's session home on the host; the client keeps only a connection token. Plugin boundary: apps are manifests, never code in the client.
+6. Build graph: one `bun webos` entry with cached tasks (client bundle, tokens, catalog, seo, inventory, wasm modules, gateway cargo build through the serialized wrapper on the VPS). Tests: unit (`bun test`), browser end-to-end qualification (connect, open each manifest app, first frame, no console errors, input round trip), coverage gate on `backing` (every manifest resolves to a real artifact or desktop entry).
+7. Budgets: client at most 60 KB gzip; connect to first frame under 1.5 s cold on 4G; input to photon under 80 ms in region; per-session memory limit from the cgroup slice; gateway at most one core per 4 concurrent software encodes.
+8. Observability and security: `/api/health` with `checks` (assets, objects, session layer, gateway, store); JSON line logs per request and per session event to journald. CSP on the client document; per-user sessions isolated by cgroup, namespace and file permissions; the gateway authenticates every WebSocket and WebRTC offer; WebView windows sandboxed, never `allow-same-origin` for third-party content; signed release receipts verified by the activator.
+9. Deploy: build release, verify receipt, run the new service on a staging port, health gate (APIs and a gateway handshake), flip `current`, probe, automatic rollback on failure. Session processes belong to systemd and survive a web release flip.
+
+### App model reference
 
 ```
-{ id, name, icon{src,origin,license}, backing, entry, wasm?, stream?, wayland?, webview?,
-  permissions[], capabilities[], desc, group, window? }
+{ id, name, icon{src,origin,license}, backing, entry, wasm?, stream?, wayland?{command,appId,perWindow?},
+  webview?, permissions[], capabilities[], desc, group, window? }
 ```
 
-Backing kinds:
+Backings: `wayland` (real Wayland client in the Hyprland session, own WebOS window per toplevel), `wasm`, `stream`, `webview` (real WebOS window with chrome, sandbox and navigation; never a tab or Chrome window), `app-ui`, `api`, `browser`. Real product names and license-compliant upstream icons are enforced by `validateManifest`.
 
-| backing | meaning |
-| --- | --- |
-| `wasm` | native code compiled to WebAssembly (Rust crates, native app cores), in page or worker |
-| `wayland` | real Wayland client in the headless Hyprland session on the host; every toplevel is surfaced as its own WebOS window and streamed to the browser |
-| `stream` | other host-side native program streamed into a window |
-| `webview` | real web content in a WebOS window with its own chrome, sandbox and history/navigation; never a browser tab or Chrome window |
-| `app-ui` | React island from `packages/app-ui` in a sandboxed iframe |
-| `api` | UI over a typed API of the service |
-| `browser` | web-platform feature only |
-
-Rules: real product name and real, license-compliant upstream icon with recorded origin (generic labels fail `validateManifest`); native-first (Rio, Spacedrive, COSMIC apps, Craft, Aphrody chat and search are `wasm`, `wayland` or `stream`, not JavaScript reimplementations); a manifest with no real backing artifact fails the gate.
-
-## 4. Target layout
+### Target layout of apps/webos
 
 ```
 apps/webos/
-  contracts/   typed API + AppManifest (shared by client and server)
-  core/        dom, prefs, events, pkg, config, appearance, notify, keys   (no app or shell imports)
-  ui/          M3 components, themes, wallpaper, sounds                     (imports core)
-  shell/       main, wm, tile, dock, launcher, boot, sw                     (imports core, ui, contracts)
-  apps/<id>/   manifest.ts + index.ts + css                                 (imports core, ui, contracts)
-  services/    serve, http, inventory, rpc, store, browse, emulators, wayland, health   (imports contracts)
-  build/       one task graph, deploy, activator hooks
-  public/      static assets
+  contracts/   typed API and AppManifest (shared)
+  client/      thin client (connect, window frames, input, clipboard, audio)
+  services/    Bun service: health, inventory, rpc, store, objects, logging
+  build/       one task graph, deploy, rollback, receipts
+  public/      static assets for the client
 ```
 
-Dependency rule: `contracts` <- `core` <- `ui` <- `shell`/`apps`; `services` imports only `contracts` and `core/config`. Checked by `build/layers.ts` in `bun check`.
+The Rust gateway lives in `crates/` (owner: session agent) and is referenced, not copied.
 
-## 5. Migration stages (each deployable)
+### Retirement plan (after cutover is verified)
 
-1. contracts/ and the manifest (landed), ADR.
-2. Code-split the build: shell chunk plus per-app dynamic imports; budgets asserted in the build.
-3. Manifest registry replaces the `builtins[]` table in `main.ts`; the 17 apps move to `apps/<id>/` one commit each.
-4. `services/` extraction, typed `api()` client, health v2, JSON request logs.
-5. Retire the Cloudflare Worker path; one `bun webos` build graph with cache; deploy health gate and rollback.
-6. Layer gate, browser e2e qualification, signed receipts.
+Cutover gate, set with the session owner: the client connects to a live Hyprland session on aphrody.com, every manifest app opens as its own window with first frame, input and clipboard work, the health gate is green, and the previous release stays available for rollback for one week. Then, one commit per step, with `bun check`, lint and format on the VPS after each:
 
-Other agents own: Store UI, emulators, inventory/WASM, native apps and identity, Wayland session. They work against `contracts/` and manifests.
+1. Remove the JS apps and shell from `src/` (wm, tile, dock, launcher, settings, files, terminal, atlas, store UI, engine, linux, calculator, media, storage, activity, keys, wallpaper, themes, sounds, prefs, assistant); keep boot and the connection client.
+2. Remove `worker/` (the Cloudflare handler) and `wrangler.jsonc`; move the surviving routes (health, inventory, rpc, store, objects) into `services/`.
+3. Delete `build-craft.ts`, `packages.ts`, `workspace.ts`, `games-content.ts`, `vm.ts`, the 14 MB `public/engine`, and `build-wasm.ts` unless wasm modules are still served.
+4. One build entry; layer and manifest gates in `bun check`.
+
+Until the gate passes, the current JS desktop stays deployed and gets no new features. Landed so far (kept because small and reversible): the manifest contract, shell code splitting with hashed chunks, service worker chunk precache.
+
+### Stages and owners
+
+1. Done: audit, manifest contract (with `wayland`), this ADR, shell code splitting.
+2. Session owner: Hyprland session, gateway, per-user cgroups, manifest-driven launcher. WebOS: thin client, `/api/session/*` types in `contracts/`.
+3. WebOS: `services/` extraction, health v2, JSON logs, deploy health gate and rollback, signed receipts, one build entry.
+4. Cutover verification in the browser, then the retirement list.
