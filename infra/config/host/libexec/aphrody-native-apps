@@ -11,6 +11,7 @@
 #   spacedrive                    aphrody-labs/spacedrive at the apps/spacedrive import: sd-daemon, sd-server, desktop
 #   aphrody                       crates/aphrody-chat and crates/aphrody-search (libcosmic), with desktop/metainfo/icon
 #   all                           everything above in order, one lane
+#   publish                       rebuild and sign the apt feed (suite resolute) with the debs built so far
 #   container <cmd...>            run <cmd> inside the ubuntu:26.04 builder (factory/native-apps/builder.Dockerfile):
 #                                 the debs must link against the session image's glibc, not the 26.10 host's
 # Cargo runs through scripts/aphrody/build/rust/cargo-serial.sh (factory lock), 4 jobs. Run in tmux.
@@ -189,6 +190,16 @@ lto = "thin"
   deb "aphrody-$n" "$v+bunos$(printf %.10s "${BUNOS_REV:-$(git -C "$ROOT" rev-parse HEAD)}")" "$s" "Aphrody $N (native COSMIC app)" "$GUI_DEPS"
 }
 
+# publish: rebuild and sign the apt feed (apps/webos/store, suites stable + resolute) from an export of origin/main.
+publish() {
+  git -C "$ROOT" fetch -q origin main
+  exp=$WORK/store-$$; rm -rf "$exp"; mkdir -p "$exp"
+  git -C "$ROOT" archive origin/main apps/webos/store | tar -x -C "$exp"
+  rc=0; (cd "$exp/apps/webos/store" && APHRODY_NATIVE_DEBS="$DEBS" bun cli.ts build apt) || rc=$?
+  rm -rf "$exp"
+  return $rc
+}
+
 container() {
   img=bunos-native-builder:26.04
   # The builder sees an export of origin/main, never the shared working tree (its uncommitted state stays untouched).
@@ -222,6 +233,7 @@ calculator) calculator ;;
 spacedrive) spacedrive ;;
 aphrody) aphrody_app chat Chat; aphrody_app search Search ;;
 container) container "$@" ;;
+publish) publish ;;
 all) rio; aphrody_app chat Chat || true; aphrody_app search Search || true; cosmic_src; cosmic || true; calculator || true; spacedrive ;;
 *) echo "usage: $0 deps|rio|cosmic-src|cosmic [app...]|calculator|spacedrive|aphrody|all|container <cmd>" >&2; exit 2 ;;
 esac
