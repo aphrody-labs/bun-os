@@ -136,7 +136,7 @@ export const explorerRoutes = [
       },
       {
         path: "recents",
-        element: <Navigate to={legacyRouteRedirects.files} replace />,
+        element: <Navigate to="/files" replace />,
       },
       {
         path: "search",

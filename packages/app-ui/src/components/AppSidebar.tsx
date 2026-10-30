@@ -22,6 +22,10 @@ const SETTINGS_SECTIONS = [
   { id: "keyboard", label: "Clavier", icon: "keyboard" },
 ];
 
+interface AppSidebarProps {
+  isPreviewActive?: boolean;
+}
+
 export function AppSidebar({ isPreviewActive = false }: AppSidebarProps) {
   const platform = usePlatform();
   const navigate = useNavigate();

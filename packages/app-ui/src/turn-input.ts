@@ -19,26 +19,6 @@ export const AUDIO_VIDEO_EXTENSIONS = new Set([
 ]);
 
 /**
- * Returns true if a file is eligible for OCR text extraction (images and PDFs).
- */
-export function isOcrEligible(file: File): boolean {
-  const kind = getContentKind(file);
-  if (kind === "image") return true;
-  const ext = (file.extension || "").toLowerCase();
-  return OCR_EXTENSIONS.has(ext);
-}
-
-/**
- * Returns true if a file is eligible for audio or video speech transcription.
- */
-export function isAudioVideoEligible(file: File): boolean {
-  const kind = getContentKind(file);
-  if (kind === "audio" || kind === "video") return true;
-  const ext = (file.extension || "").toLowerCase();
-  return AUDIO_VIDEO_EXTENSIONS.has(ext);
-}
-
-/**
  * Classifies an attachment into image, text/code, audio/video, or link.
  */
 export type AttachmentKind = "image" | "audio_video" | "link" | "file";
