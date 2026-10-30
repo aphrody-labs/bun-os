@@ -14,7 +14,7 @@ the pages that own the details. Generated data is not copied here: see
 
 | Path | Holds |
 | --- | --- |
-| `apps/` | Applications: WebOS (`apps/webos`, `apps/webos-server`), the Craft studios and their `-cli`/`-web` pairs, Drive, desktop, Android hosts |
+| `apps/` | Applications: WebOS data (`apps/webos`; the server and client are `crates/aphrody-webos-*`), the Craft studios and their `-cli`/`-web` pairs, Drive, desktop, Android hosts |
 | `packages/` | Bun and TypeScript packages, one direct child per member (Bun Engine in `packages/bun-engine`) |
 | `crates/` | Rust crates, one direct child per member, most of them flat Git submodules |
 | `vendor/` | External pinned owners and third-party sources (Bazzite, Omarchy, CachyOS, ChimeraOS, RetroArch, emulators); not Cargo members |
