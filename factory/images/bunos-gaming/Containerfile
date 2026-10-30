@@ -11,7 +11,6 @@ COPY pacman.conf /etc/pacman.conf
 # Runtime image: skip docs, man pages and non-English translations (licenses stay).
 RUN sed -i '/^\[options\]/a NoExtract = usr/share/doc/* usr/share/man/* usr/share/info/* usr/share/gtk-doc/* usr/share/help/*\nNoExtract = usr/share/locale/* !usr/share/locale/locale.alias !usr/share/locale/en*' /etc/pacman.conf \
   && grep -q '^NoExtract = usr/share/doc' /etc/pacman.conf
-COPY install-packages.sh /usr/local/sbin/bunos-install-packages
 COPY usr.packages gaming.packages emulation.packages /usr/share/bun-os/
 # Local [bunos] repository (bun-canary, bunos-filesystem, aphrody, ...) built by `bun factory usr build --composition gaming --no-boot`.
 COPY bunos-repo/ /var/lib/bun-os/repo/
@@ -36,15 +35,28 @@ FROM gaming AS bootable
 # Direct Containerfile builds are gated too; select and qualify a kernel composition before enabling this target.
 RUN echo "Bun OS bootable image is blocked until a kernel source and artifact receipt are selected and qualified" >&2; exit 1
 
-FROM emulation AS session
-# Headless Gamescope Gaming session for the WebOS session manager (factory/images/bunos-gaming/session): one
-# full-screen client under gamescope (launcher, wine, proton or app), frames on gamescope's PipeWire node, audio on the
-# session PipeWire graph, gamepads from host uinput devices through /dev/input. Run with --device /dev/udmabuf
-# (software Vulkan buffer export), -v <runtime dir>:/run/user/1000 and --device-cgroup-rule 'c 13:* rmw' -v /dev/input:/dev/input.
-COPY session.packages /usr/share/bun-os/
+FROM ${ARCH_BOOTSTRAP_IMAGE} AS session
+# Headless Gamescope Gaming session for the WebOS session manager (factory/images/bunos-gaming/session): one full-screen
+# client under gamescope (launcher, wine, proton or app), frames on gamescope's PipeWire node, audio on the session
+# PipeWire graph, gamepads from host uinput devices through /dev/input. Standalone: Arch core/extra/multilib plus the
+# signed Bun OS repository `aphrody` (https://aphrody.com/repo/os), where the forked emulators, gamescope, RetroArch,
+# DXVK/vkd3d-proton, Proton and umu-launcher are published; it does not wait for the /usr composition lock.
+# Build: docker buildx build --target session -t bunos-gaming:session factory/images/bunos-gaming
+# Run with --device /dev/udmabuf (lavapipe buffer export), -v <runtime dir>:/run/user/1000 and
+# --device-cgroup-rule 'c 13:* rmw' -v /dev/input:/dev/input (host uinput pads).
+COPY session/pacman.conf /etc/pacman.conf
+COPY session.packages session-emulators.packages /usr/share/bun-os/
+COPY install-packages.sh /usr/local/sbin/bunos-install-packages
 COPY session/bunos-gaming-session session/bunos-wine-dxvk /usr/bin/
 COPY session/retroarch-vulkan.cfg /usr/share/bun-os/
-RUN bunos-install-packages /usr/share/bun-os/session.packages && rm -rf /var/cache/pacman/pkg/*   && chmod 755 /usr/bin/bunos-gaming-session /usr/bin/bunos-wine-dxvk   && useradd -m -u 1000 -G input player
+ADD https://aphrody.com/repo/os/aphrody.gpg /tmp/aphrody.gpg
+RUN set -e; pacman-key --init && pacman-key --populate archlinux \
+  && pacman-key --add /tmp/aphrody.gpg && pacman-key --lsign-key "$(gpg --with-colons --show-keys /tmp/aphrody.gpg | awk -F: '/^fpr/{print $10; exit}')" \
+  && pacman -Syu --noconfirm \
+  && bash /usr/local/sbin/bunos-install-packages /usr/share/bun-os/session.packages /usr/share/bun-os/session-emulators.packages \
+  && rm -rf /var/cache/pacman/pkg/* \
+  && chmod 755 /usr/bin/bunos-gaming-session /usr/bin/bunos-wine-dxvk \
+  && useradd -m -u 1000 -G input player
 USER player
 ENV XDG_RUNTIME_DIR=/run/user/1000
 ENTRYPOINT ["/usr/bin/bunos-gaming-session"]

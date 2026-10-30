@@ -1,0 +1,22 @@
+# Emulators installed in the session image and qualified by packages/bun-engine/web-emulation/qualify-session.ts
+# (SESSION in emulators.ts): forks from the aphrody repo, the rest from Arch.
+melonds
+azahar
+bunos-dolphin-emu
+pcsx2
+cemu
+rpcs3
+xemu
+flycast
+vita3k
+shadps4
+gopher64
+tetanes
+mgba-qt
+ares-emu
+ppsspp
+mame
+libretro-nestopia
+libretro-mgba
+ttf-dejavu
+noto-fonts
