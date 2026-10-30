@@ -90,29 +90,81 @@ export interface AppManifest {
   capabilities: string[];
   desc: string;
   group: "core" | "advanced";
-  window?: { width?: number; height?: number; float?: boolean; singleton?: boolean };
+  window?: {
+    width?: number;
+    height?: number;
+    float?: boolean;
+    singleton?: boolean;
+  };
   version?: string;
   license?: string;
 }
 
 const KEBAB = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
-const GENERIC = new Set(["app", "apps", "pdf", "documents", "files", "terminal", "browser", "editor", "viewer", "media", "tool", "tools", "web app", "native app"]);
+const GENERIC = new Set([
+  "app",
+  "apps",
+  "pdf",
+  "documents",
+  "files",
+  "terminal",
+  "browser",
+  "editor",
+  "viewer",
+  "media",
+  "tool",
+  "tools",
+  "web app",
+  "native app",
+]);
 
 /** Returns a list of problems; empty means valid. `genericOk` is for the legacy built-ins until they are renamed. */
-export function validateManifest(m: AppManifest, options: { genericOk?: boolean } = {}): string[] {
+export function validateManifest(
+  m: AppManifest,
+  options: { genericOk?: boolean } = {},
+): string[] {
   const e: string[] = [];
-  const need = (ok: unknown, msg: string) => ok || e.push(`${m.id || "?"}: ${msg}`);
+  const need = (ok: unknown, msg: string) =>
+    ok || e.push(`${m.id || "?"}: ${msg}`);
   need(KEBAB.test(m.id ?? ""), "id must be kebab-case");
   need(m.name?.trim(), "name is required");
-  need(options.genericOk || !GENERIC.has(m.name?.trim().toLowerCase()), `name "${m.name}" is a generic label; use the real product name`);
-  need(m.icon?.src && m.icon.origin && m.icon.license, "icon needs src, origin and license");
-  need((BACKINGS as readonly string[]).includes(m.backing), `backing must be one of ${BACKINGS.join(", ")}`);
+  need(
+    options.genericOk || !GENERIC.has(m.name?.trim().toLowerCase()),
+    `name "${m.name}" is a generic label; use the real product name`,
+  );
+  need(
+    m.icon?.src && m.icon.origin && m.icon.license,
+    "icon needs src, origin and license",
+  );
+  need(
+    (BACKINGS as readonly string[]).includes(m.backing),
+    `backing must be one of ${BACKINGS.join(", ")}`,
+  );
   need(m.entry, "entry is required");
-  need(m.backing !== "wasm" || m.wasm?.module, "backing wasm needs wasm.module");
-  need(m.backing !== "stream" || m.stream?.program, "backing stream needs stream.program");
-  need(m.backing !== "webview" || m.webview?.url, "backing webview needs webview.url");
-  need(m.permissions?.every((p) => (PERMISSIONS as readonly string[]).includes(p)), "unknown permission");
-  need(m.backing !== "wayland" || (m.wayland?.command?.length && m.wayland.appId), "backing wayland needs wayland.command and wayland.appId");
-  need(!["stream", "wayland"].includes(m.backing) || m.permissions?.includes("stream"), "backing stream/wayland needs permission stream");
+  need(
+    m.backing !== "wasm" || m.wasm?.module,
+    "backing wasm needs wasm.module",
+  );
+  need(
+    m.backing !== "stream" || m.stream?.program,
+    "backing stream needs stream.program",
+  );
+  need(
+    m.backing !== "webview" || m.webview?.url,
+    "backing webview needs webview.url",
+  );
+  need(
+    m.permissions?.every((p) => (PERMISSIONS as readonly string[]).includes(p)),
+    "unknown permission",
+  );
+  need(
+    m.backing !== "wayland" || (m.wayland?.command?.length && m.wayland.appId),
+    "backing wayland needs wayland.command and wayland.appId",
+  );
+  need(
+    !["stream", "wayland"].includes(m.backing) ||
+      m.permissions?.includes("stream"),
+    "backing stream/wayland needs permission stream",
+  );
   return e;
 }

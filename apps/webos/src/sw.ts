@@ -7,7 +7,8 @@ declare const self: ServiceWorkerGlobalScope;
 
 declare const __SHELL_CHUNKS__: string | undefined;
 /** Hashed app chunks of the shell build (build.ts), precached so every app opens offline. */
-const CHUNKS: string[] = typeof __SHELL_CHUNKS__ === "string" ? JSON.parse(__SHELL_CHUNKS__) : [];
+const CHUNKS: string[] =
+  typeof __SHELL_CHUNKS__ === "string" ? JSON.parse(__SHELL_CHUNKS__) : [];
 
 const SHELL = "shell-v3";
 const SHELL_FILES = [

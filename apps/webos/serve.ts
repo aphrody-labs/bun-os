@@ -106,14 +106,23 @@ const started = Date.now();
 async function health(): Promise<Response> {
   const inventory = await assets
     .fetch(new Request("http://local/api/inventory.json"))
-    .then(async (r) => (r.ok ? ((await r.json()) as { counts: Record<string, number>; total: number }) : undefined))
+    .then(async (r) =>
+      r.ok
+        ? ((await r.json()) as {
+            counts: Record<string, number>;
+            total: number;
+          })
+        : undefined,
+    )
     .catch(() => undefined);
   const checks: HealthResponse["checks"] = {
     assets: (await Bun.file(join(dist, "index.html")).exists())
       ? { ok: true }
       : { ok: false, detail: "dist/index.html missing" },
     objects: { ok: true },
-    inventory: inventory ? { ok: true } : { ok: false, detail: "inventory.json unavailable" },
+    inventory: inventory
+      ? { ok: true }
+      : { ok: false, detail: "inventory.json unavailable" },
   };
   const ok = Object.values(checks).every((c) => c.ok);
   const body: HealthResponse = {
@@ -122,10 +131,15 @@ async function health(): Promise<Response> {
     sourceCommit: Bun.env.SOURCE_COMMIT ?? null,
     uptimeSeconds: Math.round((Date.now() - started) / 1000),
     time: new Date().toISOString(),
-    inventory: inventory ? { total: inventory.total, counts: inventory.counts } : null,
+    inventory: inventory
+      ? { total: inventory.total, counts: inventory.counts }
+      : null,
     checks,
   };
-  return Response.json(body, { status: ok ? 200 : 503, headers: { "cache-control": "no-store" } });
+  return Response.json(body, {
+    status: ok ? 200 : 503,
+    headers: { "cache-control": "no-store" },
+  });
 }
 
 async function route(request: Request): Promise<Response> {
@@ -157,8 +171,15 @@ const server = Bun.serve({
       status: response.status,
       ms: Math.round(performance.now() - t0),
     };
-    if (entry.path.startsWith("/api/") || entry.status >= 400) console.log(JSON.stringify(entry));
+    if (entry.path.startsWith("/api/") || entry.status >= 400)
+      console.log(JSON.stringify(entry));
     return response;
   },
 });
-console.log(JSON.stringify({ ts: new Date().toISOString(), event: "listening", url: String(server.url) }));
+console.log(
+  JSON.stringify({
+    ts: new Date().toISOString(),
+    event: "listening",
+    url: String(server.url),
+  }),
+);

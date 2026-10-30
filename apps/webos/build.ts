@@ -11,7 +11,13 @@ import { stageGamesContent } from "./games-content";
 import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
 import { ROUTES, appPath } from "./src/config";
 import { stageWasmModules } from "./wasm-modules";
-import { buildInventory, checkInventory, catalogMembers, printCounts, writeInventory } from "./inventory";
+import {
+  buildInventory,
+  checkInventory,
+  catalogMembers,
+  printCounts,
+  writeInventory,
+} from "./inventory";
 
 const root = resolve(import.meta.dir, "../..");
 const dist = join(import.meta.dir, "dist");
@@ -108,7 +114,11 @@ const common = {
 const shellBuild = await Bun.build({
   ...common,
   entrypoints: [join(import.meta.dir, "src/main.ts")],
-  naming: { entry: "[name].js", chunk: "chunks/[name]-[hash].js", asset: "assets/[name]-[hash].[ext]" },
+  naming: {
+    entry: "[name].js",
+    chunk: "chunks/[name]-[hash].js",
+    asset: "assets/[name]-[hash].[ext]",
+  },
   splitting: true,
 });
 if (!shellBuild.success) {
@@ -121,7 +131,10 @@ const shellChunks = shellBuild.outputs
 // The service worker and the guest worker are classic scripts: no splitting. The service worker precaches the chunks.
 const result = await Bun.build({
   ...common,
-  define: { ...common.define, __SHELL_CHUNKS__: JSON.stringify(JSON.stringify(shellChunks)) },
+  define: {
+    ...common.define,
+    __SHELL_CHUNKS__: JSON.stringify(JSON.stringify(shellChunks)),
+  },
   entrypoints: [
     join(import.meta.dir, "src/sw.ts"),
     join(import.meta.dir, "src/boot.ts"),
@@ -142,7 +155,10 @@ await cp(
   join(dist, "wasm/aphrody_webos_wasm_bg.wasm"),
 );
 // fend (MIT): the Calculator engine, instantiated by apps/calculator via apps/fend.ts.
-await cp(join(root, "node_modules/fend-wasm/fend_wasm_bg.wasm"), join(dist, "wasm/fend_wasm_bg.wasm"));
+await cp(
+  join(root, "node_modules/fend-wasm/fend_wasm_bg.wasm"),
+  join(dist, "wasm/fend_wasm_bg.wasm"),
+);
 await cp(join(root, "LICENSE-APACHE"), join(dist, "wasm/LICENSE-APACHE"));
 // @aphrody/m3-fonts: Google Sans Flex / Code, Roboto Flex / Mono (Settings > Font) and the full Material Symbols
 // Rounded font (catalog apps name any icon, so not the default subset of fonts-symbols.css).
@@ -168,7 +184,9 @@ const faces = (
     /Google Sans (Flex|Code)|Roboto (Flex|Mono)/.test(f.split("}")[0]!),
   );
 const symbols = (
-  await Bun.file(join(root, "packages/m3-fonts/src/fonts-symbols-full.css")).text()
+  await Bun.file(
+    join(root, "packages/m3-fonts/src/fonts-symbols-full.css"),
+  ).text()
 )
   .split("@font-face")
   .filter((f) => f.includes("Rounded"));
