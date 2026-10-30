@@ -45,7 +45,7 @@ async function load(assets: Assets, base: URL): Promise<Entry[]> {
   const key = base.origin;
   if (cache && cache.key === key && Date.now() - cache.at < TTL_MS) return cache.entries;
   const entries: Entry[] = [];
-  const [docs, templates, catalog] = await Promise.all([
+  const [docs, templates, catalog, inventory] = await Promise.all([
     json<
       { id: string; title: string; summary?: string; category?: string; tags?: string[]; content?: string }[]
     >(assets, base, "/api/docs.json"),
@@ -58,6 +58,11 @@ async function load(assets: Assets, base: URL): Promise<Entry[]> {
       apps?: { id: string; d?: string }[];
       packages?: { id: string; d?: string }[];
     }>(assets, base, "/catalog.json"),
+    json<{ members: { kind: string; id: string; name: string; desc: string; tags?: string[]; path?: string }[] }>(
+      assets,
+      base,
+      "/api/inventory.json",
+    ),
   ]);
   for (const doc of docs ?? [])
     entries.push({
@@ -84,8 +89,23 @@ async function load(assets: Assets, base: URL): Promise<Entry[]> {
         [template.description ?? "", 1],
       ],
     });
+  // Every inventory member (apps, packages, crates, docs pages, factory, engines, tools, infra, ...) is searchable.
+  for (const member of inventory?.members ?? [])
+    entries.push({
+      title: member.name,
+      url: `${ORIGIN}/inventory/${member.kind}/${member.id.split("/").map(encodeURIComponent).join("/")}`,
+      snippet: clip(member.desc),
+      fields: [
+        [member.name, 6],
+        [member.id, 4],
+        [(member.tags ?? []).join(" "), 3],
+        [member.kind, 2],
+        [member.desc, 2],
+        [member.path ?? "", 1],
+      ],
+    });
   const pathById = new Map(Object.entries(ROUTES.apps).map(([path, id]) => [id, path]));
-  for (const app of [...(catalog?.apps ?? []), ...(catalog?.packages ?? [])]) {
+  for (const app of inventory ? [] : [...(catalog?.apps ?? []), ...(catalog?.packages ?? [])]) {
     const path = pathById.get(app.id) ?? `${ROUTES.memberPath}${encodeURIComponent(app.id)}`;
     entries.push({
       title: app.id,

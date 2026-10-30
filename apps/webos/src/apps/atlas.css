@@ -1,0 +1,18 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.atlas .docs-main { min-height: 0; }
+.atlas-kinds { width: 190px; overflow: auto; padding: 8px; border-right: 1px solid var(--md-sys-color-outline-variant); flex: none; }
+.atlas-list { width: 300px; overflow: auto; padding: 8px; border-right: 1px solid var(--md-sys-color-outline-variant); flex: none; display: flex; flex-direction: column; gap: 2px; }
+.atlas-row { display: flex; flex-direction: column; gap: 1px; }
+.atlas-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.atlas-sub { font-size: 11px; }
+.atlas-view { flex: 1; overflow: auto; min-width: 0; padding: 4px 20px 20px; }
+.atlas-intro { padding: 16px 0; max-width: 640px; }
+.atlas-detail { max-width: 920px; }
+.atlas-body h3 { margin-top: 18px; }
+.atlas-members { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow: auto; }
+.atlas-pre { background: var(--md-sys-color-surface-container-high); padding: 12px 14px; border-radius: var(--md-sys-shape-corner-medium); overflow: auto; max-height: 480px; font-size: 12px; line-height: 1.5; }
+.pad { padding: 16px; }
+@media (max-width: 760px) {
+  .atlas .docs-main { flex-direction: column; }
+  .atlas-kinds, .atlas-list { width: auto; max-height: 30vh; border-right: 0; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+}

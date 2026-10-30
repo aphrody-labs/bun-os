@@ -24,7 +24,17 @@ import { filesApp } from "./apps/files";
 import { docsApp } from "./apps/docs";
 import { linuxApp } from "./apps/linux";
 import { inspectorApp } from "./apps/inspector";
-import { storeApp } from "./apps/store";
+import {
+  atlasApp,
+  inventory,
+  inventoryPath,
+  inventoryWindowId,
+  memberPage,
+  parseInventoryId,
+  type AtlasHost,
+  type InvMember,
+} from "./apps/atlas";
+import type { Kind } from "./inventory-kinds";
 import { terminalApp } from "./apps/terminal";
 import {
   attachCraftHost,
@@ -283,20 +293,13 @@ const builtins: Builtin[] = [
   },
   {
     id: "workspace",
-    name: "Source catalog",
+    name: "Atlas",
     icon: "code",
-    desc: "Every Bun OS app, package and crate",
+    desc: "Every Bun OS member: apps, packages, crates, docs, factory, engines, tools and more",
     group: "advanced",
     width: 920,
     height: 600,
-    mount: (root) =>
-      loading(
-        root,
-        storeApp(root, (kind, target) => {
-          if (kind === "app") openApp(target);
-          else void window.open(target, "_blank", "noopener");
-        }),
-      ),
+    mount: (root) => loading(root, atlasApp(root, atlasHost)),
   },
   {
     id: "media",
@@ -562,6 +565,54 @@ const MEMBER_ICON: Record<CatalogApp["run"], string> = {
   library: "code",
   example: "code",
 };
+/** Atlas pages open desktop apps, member windows and links through the shell. */
+const atlasHost: AtlasHost = {
+  open: (id) => openApp(id),
+  openMember: (kind, id) => launchInventory(kind, id),
+  openUrl: (url) => void window.open(url, "_blank", "noopener"),
+};
+const INVENTORY_ICON: Record<Kind, string> = {
+  apps: "app",
+  packages: "code",
+  crates: "code",
+  docs: "doc",
+  factory: "folder",
+  ospackages: "app",
+  engines: "game",
+  games: "game",
+  tools: "terminal",
+  infra: "globe",
+  releases: "folder",
+  sources: "code",
+  workspace: "folder",
+  collections: "folder",
+};
+/** One inventory member (or, without an id, one kind of the Atlas) in its own window. */
+function launchInventory(kind: Kind, id?: string) {
+  const windowId = inventoryWindowId(kind, id);
+  const existing = wm.windows.get(windowId);
+  if (existing) {
+    wm.restore(existing);
+    return;
+  }
+  const content = h("div", { class: "fill" });
+  wm.open({
+    id: windowId,
+    title: id ?? "Atlas",
+    icon: INVENTORY_ICON[kind],
+    width: id ? 860 : 1000,
+    height: 640,
+    content,
+  });
+  if (!content.hasChildNodes())
+    loading(
+      content,
+      id
+        ? memberPage(content, kind, id, atlasHost)
+        : atlasApp(content, atlasHost, { kind }),
+    );
+}
+
 function launchMember(member: CatalogApp, missing?: string) {
   const windowId = `src:${member.id}`;
   const existing = wm.windows.get(windowId);
@@ -605,6 +656,11 @@ function openApp(id: string): boolean {
   const route = WORKSPACE_ROUTES.find((r) => r.id === id);
   if (route) {
     launchWorkspace(route);
+    return true;
+  }
+  const inv = parseInventoryId(id);
+  if (inv) {
+    launchInventory(inv.kind, inv.id);
     return true;
   }
   if (id.startsWith("src:")) {
@@ -1024,6 +1080,30 @@ function fuzzy(query: string, text: string): number {
   return score;
 }
 
+/** Every inventory member is a launcher entry while searching (loaded once, not shown in the idle grid). */
+let inventoryMembers: InvMember[] = [];
+void inventory().then(
+  (index) => {
+    inventoryMembers = index.members;
+    if (launcher.open) renderLauncher();
+  },
+  () => {},
+);
+function inventoryItems(): LaunchItem[] {
+  return inventoryMembers.map((m) => ({
+    id: `inv:${m.kind}/${m.id}`,
+    name: m.name,
+    icon: INVENTORY_ICON[m.kind],
+    desc: `${m.kind} · ${m.desc}`,
+    keys: [m.id, m.path ?? ""],
+    section: "Inventory",
+    run: () => {
+      if (m.surface.opens && openApp(m.surface.opens)) return;
+      launchInventory(m.kind, m.id);
+    },
+  }));
+}
+
 function launchTile(item: LaunchItem) {
   return h(
     "button",
@@ -1058,7 +1138,7 @@ function renderLauncher() {
     );
     return;
   }
-  const ranked = items
+  const ranked = [...items, ...inventoryItems()]
     .map((item) => ({
       item,
       score: Math.max(
@@ -1069,6 +1149,7 @@ function renderLauncher() {
     }))
     .filter((r) => r.score >= 0)
     .sort((a, b) => b.score - a.score)
+    .slice(0, 80)
     .map((r) => launchTile(r.item));
   const web = h(
     "button",

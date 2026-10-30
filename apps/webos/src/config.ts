@@ -92,6 +92,8 @@ export const memberAppId = (member: string) => `src:${member}`;
 
 /** Deep-link path of a desktop app, App UI route, package or monorepo member. */
 export function appPath(id: string): string | undefined {
+  if (id.startsWith("inv:"))
+    return `/inventory/${id.slice(4).split("/").map(encodeURIComponent).join("/")}`;
   if (id.startsWith("src:"))
     return `${ROUTES.memberPath}${encodeURIComponent(id.slice(4))}`;
   return PATH_BY_APP.get(id);
@@ -102,6 +104,15 @@ export function appForPath(pathname: string): string | undefined {
   const path = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");
   const direct = ROUTES.apps[path];
   if (direct) return direct;
+  // /inventory opens the Atlas; /inventory/<kind>[/<id>] opens that kind or member (window id inv:<kind>[/<id>]).
+  if (path === "/inventory") return "workspace";
+  if (path.startsWith("/inventory/")) {
+    try {
+      return `inv:${decodeURIComponent(path.slice("/inventory/".length))}`;
+    } catch {
+      return undefined;
+    }
+  }
   if (path.startsWith(ROUTES.memberPath)) {
     const member = decodeURIComponent(path.slice(ROUTES.memberPath.length));
     if (/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(member)) return memberAppId(member);

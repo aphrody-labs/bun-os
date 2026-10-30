@@ -111,8 +111,12 @@ Object.assign(PATHS, {
     "Analyse any file: format, sections and hashes.",
   ),
   "/source": tool(
-    "Source catalog",
+    "Atlas",
     "Every Bun OS app, package and crate, with how each one runs and its source.",
+  ),
+  "/inventory": tool(
+    "Bun OS inventory",
+    "Every member of Bun OS (apps, packages, crates, docs, factory, engines, games, tools, infra, releases, sources) with its page, README and API.",
   ),
   "/components": tool(
     "Material 3 components",

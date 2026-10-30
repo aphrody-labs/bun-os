@@ -8,7 +8,8 @@ import { downloadsResponse } from "./downloads";
 import { searchResponse } from "./search";
 import { APP_SERVER_PATHS, appServerResponse } from "./app-server";
 import { ROUTES } from "../src/config";
-import { ORIGIN, pathMeta } from "../paths";
+import { ORIGIN, pathMeta, type PathMeta } from "../paths";
+import { inventoryResponse, inventoryMeta } from "./inventory";
 import vmLock from "../vm.lock.json";
 
 interface R2ObjectBodyLike {
@@ -238,8 +239,8 @@ async function browse(
 }
 
 /** Per-path search metadata on the shell document, streamed through HTMLRewriter (no buffering). */
-function withPathMeta(res: Response, pathname: string): Response {
-  const meta = pathMeta(pathname);
+function withPathMeta(res: Response, pathname: string, override?: PathMeta): Response {
+  const meta = override ?? pathMeta(pathname);
   if (!meta || !(res.headers.get("content-type") ?? "").includes("text/html"))
     return res;
   const url = `${ORIGIN}${pathname === "/" ? "/" : pathname.replace(/\/+$/, "")}`;
@@ -321,6 +322,8 @@ export default {
       );
       return env.LEGACY.fetch(target);
     }
+    const inventory = await inventoryResponse(request, env.ASSETS);
+    if (inventory) return inventory;
     if (url.pathname === "/api/catalog") {
       return env.ASSETS.fetch(
         new Request(new URL("/catalog.json", url).href, request),
@@ -346,11 +349,21 @@ export default {
       url.pathname === "/healthz"
     ) {
       const cf = (request as Request & { cf?: { colo?: string } }).cf;
+      const counts = await env.ASSETS.fetch(
+        new Request(new URL("/api/inventory.json", url).href),
+      )
+        .then(async (r) =>
+          r.ok
+            ? ((await r.json()) as { counts: Record<string, number>; total: number })
+            : undefined,
+        )
+        .catch(() => undefined);
       return Response.json(
         {
           ok: true,
           service: "aphrody-webos",
           sourceCommit: env.SOURCE_COMMIT ?? null,
+          inventory: counts ? { total: counts.total, counts: counts.counts } : null,
           colo: cf?.colo ?? null,
           time: new Date().toISOString(),
         },
@@ -378,9 +391,18 @@ export default {
       return new Response("Not found", { status: 404 });
     const workspace =
       url.pathname === "/workspace" || url.pathname.startsWith("/workspace/");
+    // Inventory pages are desktop deep links (/inventory/<kind>/<id>, ids may contain dots): the shell opens them.
+    const inventoryPage =
+      url.pathname === "/inventory" || url.pathname.startsWith("/inventory/");
     const res = workspace
       ? await workspaceResponse(request, env.ASSETS)
-      : withPathMeta(await env.ASSETS.fetch(request), url.pathname);
+      : inventoryPage
+        ? withPathMeta(
+            await env.ASSETS.fetch(new Request(new URL("/", url).href, request)),
+            "/inventory",
+            await inventoryMeta(url.pathname, env.ASSETS),
+          )
+        : withPathMeta(await env.ASSETS.fetch(request), url.pathname);
     const out = new Response(res.body, res);
     out.headers.set(
       "content-security-policy",
