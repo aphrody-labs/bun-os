@@ -24,7 +24,10 @@ cargo_serial() {
   CARGO_BUILD_JOBS=4 APHRODY_BUILD_HOST='' APHRODY_LOCAL_CARGO=1 scripts/aphrody/build/rust/cargo-serial.sh "$@"
 }
 cargo_serial build --release -p aphrody-webos-server -p aphrody-inventory
-cargo_serial build --release -p aphrody-webos-client --target wasm32-unknown-unknown
+# WebAssembly at full feature level (owner order): SIMD, relaxed SIMD, bulk memory, saturating float conversion, sign
+# extension, reference types. Threads (atomics + build-std) follow when the toolchain owner enables them.
+CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS="-C target-feature=+simd128,+relaxed-simd,+bulk-memory,+nontrapping-fptoint,+sign-ext,+reference-types" \
+  cargo_serial build --release -p aphrody-webos-client --target wasm32-unknown-unknown
 
 handoff="${WEBOS_DEPLOY_ROOT:-$root/build/webos-deploy}"
 release="$handoff/releases/$commit-$(date +%s%3N)"
@@ -32,12 +35,28 @@ mkdir -p "$release/client"
 install -m 0755 target/release/aphrody-webos "$release/aphrody-webos"
 wasm-bindgen --target web --no-typescript --out-dir "$release/client" \
   target/wasm32-unknown-unknown/release/aphrody_webos_client.wasm
-wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext \
+wasm-opt -Oz --all-features \
   "$release/client/aphrody_webos_client_bg.wasm" -o "$release/client/aphrody_webos_client_bg.wasm"
 # Browser emulator test page (packages/bun-engine/web-emulation), served until the iced client hosts the emulators.
 mkdir -p "$release/emulator"
 install -m 0644 packages/bun-engine/web-emulation/qualify-page/* "$release/emulator/"
 install -m 0644 crates/aphrody-webos-client/web/index.html crates/aphrody-webos-client/web/boot.js "$release/client/"
+# Content-hashed names (cached immutably by the server), then brotli and gzip copies served precompressed.
+(
+  cd "$release/client"
+  wasm_hash="$(sha256sum aphrody_webos_client_bg.wasm | cut -c1-16)"
+  mv aphrody_webos_client_bg.wasm "aphrody_webos_client_bg-$wasm_hash.wasm"
+  js_hash="$(sha256sum aphrody_webos_client.js | cut -c1-16)"
+  mv aphrody_webos_client.js "aphrody_webos_client-$js_hash.js"
+  sed -i "s#/aphrody_webos_client_bg.wasm#/aphrody_webos_client_bg-$wasm_hash.wasm#; s#/aphrody_webos_client.js#/aphrody_webos_client-$js_hash.js#" boot.js index.html
+  boot_hash="$(sha256sum boot.js | cut -c1-16)"
+  mv boot.js "boot-$boot_hash.js"
+  sed -i "s#/boot.js#/boot-$boot_hash.js#" index.html
+  for file in *.wasm *.js; do
+    brotli -q 11 -k -f "$file"
+    gzip -9 -k -f "$file"
+  done
+)
 # Inventory of every member plus the built wasm modules, with the coverage gate (exits non-zero on failure).
 target/release/aphrody-inventory write "$release/inventory" --versions
 printf 'SOURCE_COMMIT=%s\n' "$commit" > "$release/release.env"
@@ -61,4 +80,4 @@ done
 
 printf '%s\n' "$(basename "$release")" > "$handoff/ready.tmp"
 mv "$handoff/ready.tmp" "$handoff/ready"
-echo "aphrody.com release staged: $release ($(du -sh "$release" | cut -f1)); client wasm $(gzip -9c "$release/client/aphrody_webos_client_bg.wasm" | wc -c) bytes gzip"
+echo "aphrody.com release staged: $release ($(du -sh "$release" | cut -f1)); client wasm $(gzip -9c "$release"/client/aphrody_webos_client_bg-*.wasm | wc -c) bytes gzip"
