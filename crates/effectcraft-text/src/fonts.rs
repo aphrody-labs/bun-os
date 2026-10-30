@@ -24,7 +24,8 @@ pub static INTER_MEDIUM: &[u8] =
     include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Medium.ttf");
 pub static INTER_SEMIBOLD: &[u8] =
     include_bytes!("../embedded/assets/effectcraft/fonts/Inter-SemiBold.ttf");
-pub static INTER_BOLD: &[u8] = include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Bold.ttf");
+pub static INTER_BOLD: &[u8] =
+    include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Bold.ttf");
 pub static INTER_ITALIC: &[u8] =
     include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Italic.ttf");
 pub static JETBRAINS_MONO_REGULAR: &[u8] =

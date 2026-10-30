@@ -364,8 +364,10 @@ fn default_labels() -> [Color32; 17] {
     })
 }
 
-static INTER_REGULAR: &[u8] = include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Regular.ttf");
-static INTER_MEDIUM: &[u8] = include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Medium.ttf");
+static INTER_REGULAR: &[u8] =
+    include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Regular.ttf");
+static INTER_MEDIUM: &[u8] =
+    include_bytes!("../embedded/assets/effectcraft/fonts/Inter-Medium.ttf");
 static INTER_SEMIBOLD: &[u8] =
     include_bytes!("../embedded/assets/effectcraft/fonts/Inter-SemiBold.ttf");
 static JETBRAINS_MONO: &[u8] =
