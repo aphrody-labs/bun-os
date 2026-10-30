@@ -9,9 +9,8 @@
   },
   "status": "staged",
   "source": {
-    "repository": "aphrody-labs/bun-distribution",
-    "branch": "os",
-    "mirror": "http://127.0.0.1:29020/aphrody-dev/bun-distribution.git",
+    "repository": "aphrody-labs/bun-os",
+    "branch": "main",
     "checkout": "/home/ubuntu/src/bun-os",
     "recursiveSubmodules": false,
     "bootstrapBackend": "https://github.com/aphrody-labs/bun-os.git",

@@ -83,7 +83,7 @@ export async function gitCommand(args: string[]): Promise<number> {
     case "clone": {
       const [url, dir] = rest.filter(a => !a.startsWith("--") && a !== opt("--profile"));
       if (!url || !dir) throw new Error(usage);
-      const branch = ["--branch", opt("--branch") ?? "os", "--single-branch"];
+      const branch = ["--branch", opt("--branch") ?? "main", "--single-branch"];
       const scalar = Bun.which("scalar");
       const r = scalar
         ? await Bun.spawn(["scalar", "clone", ...branch, url, dir], { stdout: "inherit", stderr: "inherit" }).exited
@@ -133,7 +133,7 @@ export async function gitCommand(args: string[]): Promise<number> {
       return 0;
     }
     case "affected": {
-      const base = opt("--base") ?? "origin/os";
+      const base = opt("--base") ?? "origin/main";
       const diff = await git(root, ["diff", "--name-only", `${base}...HEAD`]);
       if (diff.code) throw new Error(diff.err);
       const areas = classify(diff.out.split("\n").filter(Boolean));

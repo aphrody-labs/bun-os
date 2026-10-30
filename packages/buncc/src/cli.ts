@@ -105,7 +105,7 @@ async function selectCrates(root: string): Promise<{ packages: string[]; note: s
   const affected = flag("affected");
   if (explicit.length) return { packages: explicit, note: "explicit -p" };
   if (!affected) return { packages: [], note: "whole workspace" };
-  const base = affected === "true" ? "origin/os" : affected;
+  const base = affected === "true" ? "origin/main" : affected;
   const graph = await loadGraph(root);
   const result = affectedCrates(graph, await changedFiles(root, base));
   if (result.all) return { packages: [], note: `whole workspace (${result.reason})` };
