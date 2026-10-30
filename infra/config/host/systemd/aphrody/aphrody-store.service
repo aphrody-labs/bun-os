@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+# Store data APIs (/api/store/*) of aphrody.com; repositories themselves are served as static files by nginx.
+[Unit]
+Description=Aphrody Bun OS Store API (catalog, qualification, winget REST source)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/src/bun-os/apps/webos/store
+Environment=STORE_PORT=8791
+Environment=WEBOS_STORE=/home/ubuntu/apps/webos/store
+ExecStart=/home/ubuntu/.local/bin/bun /home/ubuntu/src/bun-os/apps/webos/store/serve.ts
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+MemoryMax=256M
+CPUQuota=50%
+TasksMax=32
+
+[Install]
+WantedBy=multi-user.target

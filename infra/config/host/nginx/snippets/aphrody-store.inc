@@ -7,6 +7,11 @@
 #   /repo/android/        APK catalog
 #   /npm/                 npm registry protocol (packuments are <scope>/<name>.json, tarballs under <name>/-/)
 #   /cargo/               cargo sparse registry (index/, dl/<crate>/<version>/download)
+#   /api/store/           catalog, qualification, indexes and the winget REST source (aphrody-store.service)
+location ^~ /api/store/ {
+    limit_req zone=aphrody_webos_api burst=40 nodelay;
+    proxy_pass http://127.0.0.1:8791;
+}
 location ^~ /repo/ {
     alias /home/ubuntu/apps/webos/store/repo/;
     autoindex off;
