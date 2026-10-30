@@ -54,6 +54,7 @@ deb() { # deb <name> <version> <stage> <description> [extra Depends]
   mkdir -p "$stage/DEBIAN"
   {
     printf 'Package: %s\nVersion: %s\nArchitecture: amd64\nMaintainer: aphrody-dev <contact@aphrody.com>\n' "$name" "$version"
+    [ -n "$extra" ] && depends="${depends:+$depends, }$extra"
     [ -n "$depends" ] && printf 'Depends: %s\n' "$depends"
     printf 'Section: x11\nPriority: optional\nHomepage: https://aphrody.com\nDescription: %s\n Built for Bun OS from the aphrody-labs fork.\n' "$desc"
   } >"$stage/DEBIAN/control"
