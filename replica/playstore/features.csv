@@ -1,0 +1,21 @@
+id,feature,screen,priority,store,real_data_source_in_bun_os,notes
+PS01,Hero carousel of featured apps with install button,P01,must,playstore,catalog.featured (real flagship members),no generic category tiles
+PS02,Target chips (browser / Arch / Alpine / Flatpak / npm / cargo / Android),P01,should,playstore,catalog.sources,replaces device chips with source chips
+PS03,Horizontal shelves with tiles,P01,must,playstore,catalog.apps grouped by category and source,tile = icon name source version size
+PS04,Shelf heading leads to a full collection page,P05,must,playstore,catalog.categories,
+PS05,Top-level tabs,P01,must,playstore,catalog.sources and categories,Home / Apps / Games / Libraries / Linux
+PS06,Search with suggestions,P03,must,playstore,catalog.apps name summary pkg,client-side instant
+PS07,Detail header with stat strip,P04,must,playstore,StoreApp version size license source,rating cell says none yet
+PS08,Install on target button group,P04,must,playstore,StoreApp.install,pwa / command / download / agent
+PS09,Screenshots carousel,P04,could,playstore,StoreApp.screenshots,hidden when absent
+PS10,About with expandable text,P04,must,playstore,StoreApp.description and summary,
+PS11,Data safety summary,P04,should,playstore,StoreApp.permissions,real capabilities only
+PS12,Ratings and reviews,P04,must,playstore,none (rating is null),shows No ratings yet
+PS13,What is new / versions,P04,should,playstore,StoreApp.versions,
+PS14,More by publisher / similar,P04,should,playstore,same member kind or category,derived from the catalog
+PS15,Wishlist,P04,could,playstore,localStorage,user local data
+PS16,Share,P04,could,playstore,navigator.share or copy deep link,
+PS17,Library of installed apps,P06,must,playstore,pkg.installed and aph.store.installed,
+PS18,Updates list,P07,must,playstore,pkg.needsUpdate,
+PS19,Skeleton loading,P01,must,playstore,n/a,
+PS20,Empty and error states with retry,P03,must,playstore,n/a,

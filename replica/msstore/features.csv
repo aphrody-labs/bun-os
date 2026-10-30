@@ -1,0 +1,17 @@
+id,feature,screen,priority,store,real_data_source_in_bun_os,notes
+MS01,Full-width hero carousel with dots,M01,must,msstore,catalog.featured,
+MS02,Two-column ranked lists,M01,should,msstore,real metrics only (recently built / qualified / size),no invented popularity
+MS03,Top charts,M02,should,msstore,catalog sorted by size or version or qualification,labelled with the real metric
+MS04,Tabs Home Apps Games Themes,M01,must,msstore,categories,Themes only if inventory has desktop themes
+MS05,Search suggestions with icons,M03,must,msstore,catalog.apps,
+MS06,Product header with primary and secondary action,M04,must,msstore,StoreApp.install,
+MS07,Sticky install bar on scroll,M04,must,msstore,n/a,keeps the action reachable
+MS08,Expandable description,M04,must,msstore,StoreApp.description,
+MS09,Rating summary and review cards,M04,must,msstore,none (rating is null),empty state only
+MS10,System requirements table,M04,should,msstore,arch / dependencies / size / license from repo index,real package facts
+MS11,Age and content info,M04,could,msstore,n/a,omitted: no data
+MS12,Publisher and related products,M04,should,msstore,member owner and same category,
+MS13,Not found page with search,M05,must,msstore,n/a,
+MS14,Locale and cookie prompts,M01,could,msstore,n/a,not needed: no tracking
+MS15,Library and updates,M06,must,msstore,installed state,
+MS16,Download button variants,M04,must,msstore,"pwa Install / Download / Copy command / Install via agent",
