@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
-// Installed root-owned under /usr/local/libexec; consumes the runner handoff.
+// Installed root-owned under /usr/local/libexec; consumes the deploy handoff (written by apps/webos/deploy.ts).
 import { lstat, readlink, rename, symlink, mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 const home = "/home/ubuntu";
-const handoff = join(home, "build/cache/gitea-runner/webos-deploy");
+const handoff = Bun.env.WEBOS_DEPLOY_ROOT ?? join(home, "src/bun-os/build/webos-deploy");
 const app = join(home, "apps/webos");
 const readyPath = join(handoff, "ready");
 if (!(await Bun.file(readyPath).exists())) process.exit(0);
@@ -22,7 +22,7 @@ const receipt = (await Bun.file(join(release, "receipt.json")).json()) as {
 };
 if (!name.startsWith(receipt.sourceCommit + "-") || !receipt.files.length)
   throw new Error("Invalid receipt");
-// The forge is retired: verify against the VPS checkout of GitHub main (kept in sync by bunos-sync).
+// Verify against the VPS checkout of GitHub main (kept in sync by bunos-sync).
 const sourceRepository =
   Bun.env.WEBOS_SOURCE_REPOSITORY ??
   join(home, "src/bun-os/.git");

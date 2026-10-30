@@ -31,7 +31,7 @@ timeout. No provider secret enters a bundle or release receipt.
 
 ## VPS deployment
 
-`bun apps/webos/deploy.ts` runs on the VPS from a checkout of `main` (fetched and fast-forwarded to `origin/main`). It writes complete releases below `~/build/webos-deploy/releases`,
+`bun apps/webos/deploy.ts` runs on the VPS from a checkout of `main` (fetched and fast-forwarded to `origin/main`). It writes complete releases below `~/src/bun-os/build/webos-deploy/releases`,
 then atomically publishes `ready`. The host's `aphrody-webos-deploy.timer` checks
 the handoff every 30 seconds. Its root-owned activator verifies artifact hashes,
 switches `~/apps/webos/current`, restarts `aphrody-webos.service` and checks the
