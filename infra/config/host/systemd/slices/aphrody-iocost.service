@@ -1,6 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # IOWeight only takes effect with BFQ or blk-iocost; the virtual disks use the none scheduler, so enable
-# iocost (auto QoS) on every sd/vd disk at boot.
+# iocost on every sd/vd disk at boot. OVH's Ceph-backed extra disks (sdb, sdc) report rotational=1, and
+# iocost's auto model then assumes a hard disk (~370 random IOPS) and throttles small-file copies in
+# ioc_rqos_throttle. Those disks get an explicit SSD-class linear model instead, and every disk keeps a
+# vrate between 50 and 150 % of the model (p95 latency targets 50/100 ms) so weights shape contention without starving any cgroup.
 [Unit]
 Description=Enable blk-iocost so cgroup IOWeight applies
 After=systemd-udev-settle.service local-fs.target
@@ -8,7 +11,13 @@ After=systemd-udev-settle.service local-fs.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/sh -c 'for d in /sys/block/sd? /sys/block/vd?; do [ -e "$d/dev" ] && echo "$(cat $d/dev) enable=1 ctrl=auto" > /sys/fs/cgroup/io.cost.qos; done; true'
+ExecStart=/bin/sh -c 'for d in /sys/block/sd? /sys/block/vd?; do \
+  [ -e "$d/dev" ] || continue; dev=$(cat $d/dev); \
+  if [ "$(cat $d/queue/rotational)" = 1 ]; then \
+    echo "$dev ctrl=user model=linear rbps=500000000 rseqiops=60000 rrandiops=20000 wbps=400000000 wseqiops=50000 wrandiops=15000" > /sys/fs/cgroup/io.cost.model; \
+  fi; \
+  echo "$dev enable=1 ctrl=user rpct=95 rlat=50000 wpct=95 wlat=100000 min=50 max=150" > /sys/fs/cgroup/io.cost.qos; \
+done; true'
 
 [Install]
 WantedBy=multi-user.target
