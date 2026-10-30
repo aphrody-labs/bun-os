@@ -52,7 +52,7 @@ prints `1.4.4-canary.1+11c367163`) and Bun APIs for JavaScript and TypeScript. T
 `aphrody-labs/bun` fork is abandoned: do not call fork-only commands or APIs
 (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`,
 `bun:nginx`, `Bun.Video`). Use the quality commands directly: `bun check`,
-`bun lint` and `bun fmt`. Do not route these commands through subprocess backends,
+`bun lint` and `bun format` (the repo wrapper around `bun fmt` with `bun-format.json` and its ignore list; bare `bun fmt` scans vendored trees and fails). Do not route these commands through subprocess backends,
 `bunx`, standalone OXC tools, `tsgo`/`tsc`, ESLint or Prettier. Fix native Bun
 failures in place instead of adding a fallback. Use Rust's serialized wrapper
 for Cargo.
