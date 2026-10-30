@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<component type="desktop-application">
+  <id>com.aphrody.Chat</id>
+  <name>Aphrody Chat</name>
+  <summary>Chat with the Bun OS assistant</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+  <developer id="com.aphrody"><name>Aphrody</name></developer>
+  <url type="homepage">https://aphrody.com</url>
+  <launchable type="desktop-id">com.aphrody.Chat.desktop</launchable>
+  <description><p>A native COSMIC app that streams answers from the Bun OS inference gateway (Vertex AI Gemini).</p></description>
+  <provides><binary>aphrody-chat</binary></provides>
+</component>

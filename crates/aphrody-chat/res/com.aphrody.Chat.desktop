@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Aphrody Chat
+Comment=Chat with the Bun OS assistant
+Exec=aphrody-chat
+Icon=com.aphrody.Chat
+StartupWMClass=com.aphrody.Chat
+Categories=Network;Chat;COSMIC;
+Keywords=AI;assistant;chat;Gemini;
+Terminal=false

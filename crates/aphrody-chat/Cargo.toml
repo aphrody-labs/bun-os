@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aphrody-chat"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license = "Apache-2.0"
+description = "Aphrody Chat: native COSMIC (libcosmic/iced) chat client of the Bun OS inference gateway (OpenAI-compatible, Vertex AI Gemini)."
+publish = false
+
+[[bin]]
+name = "aphrody-chat"
+path = "src/main.rs"
+
+[dependencies]
+# Our pinned libcosmic fork (aphrody-labs/libcosmic, its iced submodule is our iced fork); same rev as aphrody-webos-client.
+libcosmic = { git = "https://github.com/aphrody-labs/libcosmic", rev = "dbc62f2d899cdbfbe43d170689ddc0290db663f4", default-features = false, features = ["winit", "wgpu", "tokio"] }
+futures = { workspace = true }
+reqwest = { workspace = true, features = ["rustls-no-provider", "json", "stream", "query"] }
+rustls = { workspace = true, features = ["ring", "std"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

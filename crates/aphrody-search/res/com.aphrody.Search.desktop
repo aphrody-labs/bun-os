@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Aphrody Search
+Comment=Search apps, packages, crates, docs and tools of Bun OS
+Exec=aphrody-search
+Icon=com.aphrody.Search
+StartupWMClass=com.aphrody.Search
+Categories=Utility;COSMIC;
+Keywords=search;find;packages;docs;
+Terminal=false

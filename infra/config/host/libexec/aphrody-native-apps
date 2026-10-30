@@ -79,7 +79,7 @@ rio() {
 
 EPOCH_DIR=$WORK/src/cosmic-epoch
 cosmic_src() {
-  pin=$(git -C "$ROOT" rev-parse HEAD:vendor/cosmic-epoch)
+  pin=${COSMIC_EPOCH_PIN:-$(git -C "$ROOT" rev-parse HEAD:vendor/cosmic-epoch)}
   clone "$EPOCH_DIR" cosmic-epoch "$pin"
   git -C "$EPOCH_DIR" submodule update --init --filter=blob:none $COSMIC_SET
   log "cosmic-epoch $pin"
@@ -172,16 +172,24 @@ lto = "thin"
   install -Dm644 "$c/res/com.aphrody.$N.desktop" "$s/usr/share/applications/com.aphrody.$N.desktop"
   install -Dm644 "$c/res/com.aphrody.$N.metainfo.xml" "$s/usr/share/metainfo/com.aphrody.$N.metainfo.xml"
   install -Dm644 "$c/res/com.aphrody.$N.svg" "$s/usr/share/icons/hicolor/scalable/apps/com.aphrody.$N.svg"
-  deb "aphrody-$n" "$v+bunos$(git -C "$ROOT" rev-parse --short HEAD)" "$s" "Aphrody $N (native COSMIC app)"
+  deb "aphrody-$n" "$v+bunos$(printf %.10s "${BUNOS_REV:-$(git -C "$ROOT" rev-parse HEAD)}")" "$s" "Aphrody $N (native COSMIC app)"
 }
 
 container() {
   img=bunos-native-builder:26.04
-  docker build -q -t "$img" -f "$ROOT/factory/native-apps/builder.Dockerfile" "$ROOT/factory/native-apps" >/dev/null
+  # The builder sees an export of origin/main, never the shared working tree (its uncommitted state stays untouched).
+  git -C "$ROOT" fetch -q origin main
+  rev=$(git -C "$ROOT" rev-parse origin/main)
+  pin=$(git -C "$ROOT" rev-parse "$rev:vendor/cosmic-epoch")
+  exp=$WORK/root; rm -rf "$exp"; mkdir -p "$exp"
+  git -C "$ROOT" archive "$rev" Cargo.toml scripts/aphrody/build/rust factory/native-apps crates/aphrody-chat \
+    crates/aphrody-search infra/config/host/libexec/aphrody-native-apps container/cosmic-packages.json \
+    tools/aphrody/config/build-factory.json | tar -x -C "$exp"
+  docker build -q -t "$img" -f "$exp/factory/native-apps/builder.Dockerfile" "$exp/factory/native-apps" >/dev/null
   exec docker run --rm --cpus 4 --memory 16g --name "bunos-native-$(date +%s)" \
-    -v "$WORK:/work" -v "$ROOT:/src/bun-os:ro" -v "$HOME/.local/bin/bun:/usr/local/bin/bun:ro" \
+    -v "$WORK:/work" -v "$exp:/src/bun-os:ro" -v "$HOME/.local/bin/bun:/usr/local/bin/bun:ro" \
     -v bunos-native-rustup:/opt/rustup -v bunos-native-cargo:/cache/cargo -v bunos-native-bun:/root/.bun \
-    -e CARGO_HOME=/cache/cargo -e BUNOS_NATIVE_ROOT=/src/bun-os -e BUNOS_NATIVE_WORK=/work \
+    -e CARGO_HOME=/cache/cargo -e BUNOS_NATIVE_ROOT=/src/bun-os -e BUNOS_NATIVE_WORK=/work -e BUNOS_REV="$rev" -e COSMIC_EPOCH_PIN="$pin" \
     -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0='*' \
     "$img" sh /src/bun-os/infra/config/host/libexec/aphrody-native-apps "$@"
 }

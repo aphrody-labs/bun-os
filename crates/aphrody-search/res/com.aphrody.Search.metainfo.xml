@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<component type="desktop-application">
+  <id>com.aphrody.Search</id>
+  <name>Aphrody Search</name>
+  <summary>Search everything Bun OS serves</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+  <developer id="com.aphrody"><name>Aphrody</name></developer>
+  <url type="homepage">https://aphrody.com</url>
+  <launchable type="desktop-id">com.aphrody.Search.desktop</launchable>
+  <description><p>A native COSMIC app over the Bun OS search index: apps, packages, crates, documentation, factory, engines and tools.</p></description>
+  <provides><binary>aphrody-search</binary></provides>
+</component>
