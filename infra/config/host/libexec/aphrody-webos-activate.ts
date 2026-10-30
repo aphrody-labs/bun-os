@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Installed root-owned under /usr/local/libexec; consumes the deploy handoff (written by apps/webos/deploy.ts).
+import { existsSync, renameSync } from "node:fs";
 import { lstat, readlink, rename, symlink, mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
@@ -11,6 +12,17 @@ if (!(await Bun.file(readyPath).exists())) process.exit(0);
 // Claim this request before activation; a newly published ready pointer stays queued.
 const pending = join(handoff, `activating-${process.pid}`);
 await rename(readyPath, pending);
+// A failed activation must not leave its claim behind as an orphan: it becomes failed-<release> (the journal has the
+// reason) and the next published ready pointer, the latest release, is picked up by the following timer run.
+process.on("exit", code => {
+  if (code !== 0 && existsSync(pending)) {
+    try {
+      renameSync(pending, join(handoff, `failed-${Date.now()}`));
+    } catch {
+      // The claim stays visible when it cannot be renamed.
+    }
+  }
+});
 const ready = Bun.file(pending);
 const name = (await ready.text()).trim();
 if (!/^[a-f0-9]{40}-[0-9]+$/.test(name)) throw new Error("Invalid release name");
