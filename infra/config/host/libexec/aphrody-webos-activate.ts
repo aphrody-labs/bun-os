@@ -40,11 +40,14 @@ function publishedCommit() {
     throw new Error("Cannot verify the published production branch");
   return result.stdout.toString().trim();
 }
-const published = publishedCommit();
-const isPublished =
-  published === receipt.sourceCommit ||
-  Bun.spawnSync(["git", "-c", `safe.directory=${sourceRepository}`, "--git-dir", sourceRepository, "merge-base", "--is-ancestor", receipt.sourceCommit, published]).exitCode === 0;
-if (!isPublished) {
+function isPublished() {
+  const published = publishedCommit();
+  return (
+    published === receipt.sourceCommit ||
+    Bun.spawnSync(["git", "-c", `safe.directory=${sourceRepository}`, "--git-dir", sourceRepository, "merge-base", "--is-ancestor", receipt.sourceCommit, published]).exitCode === 0
+  );
+}
+if (!isPublished()) {
   await rename(pending, join(handoff, `superseded-${name}`));
   console.log(`Ignored superseded release ${receipt.sourceCommit}`);
   process.exit(0);
@@ -99,7 +102,7 @@ async function restart() {
   });
   if (await child.exited) throw new Error("Service restart failed");
 }
-if (publishedCommit() !== receipt.sourceCommit)
+if (!isPublished())
   throw new Error("Production source advanced during activation");
 await point(release);
 try {
