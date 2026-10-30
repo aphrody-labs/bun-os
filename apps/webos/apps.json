@@ -11,11 +11,6 @@
   ],
   "members": {
     "webos": { "kind": "web", "opens": "about" },
-    "webos-server": {
-      "kind": "server",
-      "related": "about",
-      "artifact": "webos-server"
-    },
     "aphrody-app": {
       "kind": "native",
       "related": "aphrody-workspace",
