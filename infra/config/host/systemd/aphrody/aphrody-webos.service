@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 [Unit]
-Description=Aphrody WebOS native VPS HTTP service
+Description=aphrody.com server (Rust aphrody-webos, ADR-003)
 After=network-online.target docker.service
 Wants=network-online.target
 
@@ -8,12 +8,10 @@ Wants=network-online.target
 Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu/apps/webos/current
-Environment=PORT=8790
-Environment=WEBOS_DIST=/home/ubuntu/apps/webos/current/dist
-Environment=WEBOS_OBJECTS=/home/ubuntu/apps/webos/objects
-Environment=WEBOS_DATABASE_URL_FILE=/home/ubuntu/apps/webos/secrets/database.url
+Environment=WEBOS_ADDR=127.0.0.1:8790
+Environment=WEBOS_CLIENT_DIR=/home/ubuntu/apps/webos/current/client
 EnvironmentFile=/home/ubuntu/apps/webos/current/release.env
-ExecStart=/home/ubuntu/.local/bin/bun /home/ubuntu/apps/webos/current/server.js
+ExecStart=/home/ubuntu/apps/webos/current/aphrody-webos
 Restart=always
 RestartSec=3
 TimeoutStopSec=30
@@ -21,7 +19,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=read-only
-MemoryMax=1G
+MemoryMax=512M
 CPUQuota=200%
 TasksMax=128
 

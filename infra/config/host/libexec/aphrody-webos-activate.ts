@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-// Installed root-owned under /usr/local/libexec; consumes the deploy handoff (written by apps/webos/deploy.ts).
+// Installed root-owned under /usr/local/libexec; consumes the deploy handoff written by
+// crates/aphrody-webos-server/release.sh (ADR-003: the Rust aphrody-webos binary plus the wasm client).
 import { existsSync, renameSync } from "node:fs";
 import { lstat, readlink, rename, symlink, mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
@@ -81,7 +82,7 @@ for (const entry of receipt.files) {
   )
     throw new Error(`Artifact differs from receipt: ${entry.path}`);
 }
-for (const path of ["server.js", "release.env", "dist/index.html", "dist/main.js", "dist/workspace/index.html"])
+for (const path of ["aphrody-webos", "release.env", "client/index.html", "client/aphrody_webos_client_bg.wasm"])
   if (!receipt.files.some(file => file.path === path)) throw new Error(`Unreceipted ${path}`);
 const current = join(app, "current");
 const previous = await readlink(current).catch(() => undefined);
@@ -127,7 +128,7 @@ try {
     ((await publicHealth.json()) as { sourceCommit?: string }).sourceCommit !== receipt.sourceCommit
   )
     throw new Error("Public ingress did not confirm the activated source");
-  for (const path of ["/", "/workspace/", "/api/inventory"]) {
+  for (const path of ["/", "/api/os"]) {
     const response = await fetch(`https://aphrody.com${path}`, {
       signal: AbortSignal.timeout(8000),
     });
