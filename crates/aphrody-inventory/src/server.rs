@@ -186,7 +186,7 @@ async fn wasm_module(
     res.headers_mut()
         .insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
     res.headers_mut().insert(
-        header::CROSS_ORIGIN_RESOURCE_POLICY,
+        header::HeaderName::from_static("cross-origin-resource-policy"),
         HeaderValue::from_static("same-origin"),
     );
     res
