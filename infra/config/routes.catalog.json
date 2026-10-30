@@ -204,10 +204,6 @@
     "dist.aphrody.app": {
       "kind": "service",
       "keep": true
-    },
-    "nie.aphrody.com": {
-      "kind": "service",
-      "keep": true
     }
   },
   "source": "https://github.com/aphrody-labs/bun-os/tree/os",

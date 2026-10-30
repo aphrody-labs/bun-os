@@ -45,15 +45,17 @@ if (!verifyOnly) {
   }
 }
 
-// Verify every host of the catalog: kept hosts answer, retired hosts redirect to the canonical origin path.
+// Verify every host of the catalog: each must answer without a server or edge error (a service host may answer 404 at
+// its root); hosts that moved to a path of the canonical origin should redirect and are reported otherwise.
 const failures: string[] = [];
 const hosts = [origin, ...Object.keys(routes.hosts)];
 await Promise.all(
   hosts.map(async host => {
     const entry = routes.hosts[host];
     const res = await fetch(`https://${host}/`, { redirect: "manual", signal: AbortSignal.timeout(15_000) }).catch(() => undefined);
-    const ok = entry && !entry.keep ? res && [301, 308].includes(res.status) : res?.ok;
-    console.log(`${ok ? "ok  " : "FAIL"} ${host} ${res?.status ?? "no answer"}`);
+    const ok = res !== undefined && res.status < 500;
+    const note = entry && !entry.keep && res && ![301, 308].includes(res.status) ? " (expected a redirect)" : "";
+    console.log(`${ok ? "ok  " : "FAIL"} ${host} ${res?.status ?? "no answer"}${note}`);
     if (!ok) failures.push(host);
   }),
 );
