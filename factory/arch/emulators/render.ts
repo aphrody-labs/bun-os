@@ -32,9 +32,27 @@ export const SPECS: Record<string, Spec> = {
   cemu: { name: "Cemu", exe: "Cemu", license: ["MPL-2.0"], categories: "Game;Emulator;", kind: "appimage" },
   rpcs3: { name: "RPCS3", exe: "rpcs3", license: ["GPL-2.0-only"], categories: "Game;Emulator;", kind: "appimage" },
   xemu: { name: "xemu", exe: "xemu", license: ["GPL-2.0-or-later"], categories: "Game;Emulator;", kind: "appimage" },
-  flycast: { name: "Flycast", exe: "flycast", license: ["GPL-2.0-only"], categories: "Game;Emulator;", kind: "appimage" },
-  "vita3k-bin": { name: "Vita3K", exe: "Vita3K", license: ["GPL-2.0-or-later"], categories: "Game;Emulator;", kind: "appimage" },
-  shadps4: { name: "shadPS4", exe: "shadps4", license: ["GPL-2.0-or-later"], categories: "Game;Emulator;", kind: "appimage" },
+  flycast: {
+    name: "Flycast",
+    exe: "flycast",
+    license: ["GPL-2.0-only"],
+    categories: "Game;Emulator;",
+    kind: "appimage",
+  },
+  "vita3k-bin": {
+    name: "Vita3K",
+    exe: "Vita3K",
+    license: ["GPL-2.0-or-later"],
+    categories: "Game;Emulator;",
+    kind: "appimage",
+  },
+  shadps4: {
+    name: "shadPS4",
+    exe: "shadps4",
+    license: ["GPL-2.0-or-later"],
+    categories: "Game;Emulator;",
+    kind: "appimage",
+  },
 };
 
 const icon = (label: string) =>
@@ -45,7 +63,11 @@ for (const [id, spec] of Object.entries(SPECS)) {
   const pin = pins[id.replace(/-bin$/, "")];
   if (!pin) throw new Error(`${id}: no pin (run pin.ts)`);
   const pkgname = id;
-  const pkgver = pin.tag.replace(/^[^0-9]*/, "").replace(/[^A-Za-z0-9.]+/g, ".").replace(/^\.|\.$/g, "") || "0";
+  const pkgver =
+    pin.tag
+      .replace(/^[^0-9]*/, "")
+      .replace(/[^A-Za-z0-9.]+/g, ".")
+      .replace(/^\.|\.$/g, "") || "0";
   const dir = join(out, pkgname);
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
@@ -87,8 +109,8 @@ pkgrel=1
 pkgdesc="${spec.name} emulator, upstream ${pin.repo} ${pin.tag} release binary packaged for Bun OS"
 arch=(x86_64)
 url="https://github.com/${pin.repo}"
-license=(${spec.license.map((l) => `'${l}'`).join(" ")})
-depends=(${["glibc", "hicolor-icon-theme", ...(spec.depends ?? [])].map((d) => `'${d}'`).join(" ")})
+license=(${spec.license.map(l => `'${l}'`).join(" ")})
+depends=(${["glibc", "hicolor-icon-theme", ...(spec.depends ?? [])].map(d => `'${d}'`).join(" ")})
 options=('!strip' '!debug')
 source=("${pin.asset}::${pin.url}" "${pkgname}.desktop" "${pkgname}.svg" "${pkgname}.metainfo.xml")
 sha256sums=('${pin.sha256}' 'SKIP' 'SKIP' 'SKIP')

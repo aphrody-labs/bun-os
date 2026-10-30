@@ -11,7 +11,9 @@ mod web;
 
 use aphrody_webos_protocol::{Input, OsEntry, OsId, ServerEvent, SessionInfo, StartSession};
 use cosmic::app::{Core, Settings, Task};
-use cosmic::iced::{Alignment, Length, Size, Subscription, futures::channel::mpsc::UnboundedSender};
+use cosmic::iced::{
+    Alignment, Length, Size, Subscription, futures::channel::mpsc::UnboundedSender,
+};
 use cosmic::widget::{self, image};
 use cosmic::{Element, executor};
 
@@ -63,7 +65,9 @@ impl App {
     }
 
     fn picker(&self) -> Element<'_, Message> {
-        let mut grid = widget::flex_row(Vec::new()).row_spacing(12).column_spacing(12);
+        let mut grid = widget::flex_row(Vec::new())
+            .row_spacing(12)
+            .column_spacing(12);
         for entry in &self.catalog {
             let mut card = widget::column::with_capacity(3)
                 .spacing(4)
@@ -71,11 +75,18 @@ impl App {
                 .push(widget::text::body(entry.summary.clone()));
             if !entry.available {
                 card = card.push(widget::text::caption(
-                    entry.reason.clone().unwrap_or_else(|| "Not available on this host.".into()),
+                    entry
+                        .reason
+                        .clone()
+                        .unwrap_or_else(|| "Not available on this host.".into()),
                 ));
             }
-            let mut button = widget::button::custom(widget::container(card).padding(16).width(Length::Fixed(260.0)))
-                .class(cosmic::theme::Button::Standard);
+            let mut button = widget::button::custom(
+                widget::container(card)
+                    .padding(16)
+                    .width(Length::Fixed(260.0)),
+            )
+            .class(cosmic::theme::Button::Standard);
             if entry.available {
                 button = button.on_press(Message::Pick(entry.id));
             }
@@ -86,7 +97,9 @@ impl App {
                 .spacing(20)
                 .max_width(1100)
                 .push(widget::text::title1("Bun OS in your browser"))
-                .push(widget::text::body("Pick an operating system. It runs on Bun OS and streams to this tab."))
+                .push(widget::text::body(
+                    "Pick an operating system. It runs on Bun OS and streams to this tab.",
+                ))
                 .push(grid),
         )
         .padding(32)
@@ -96,11 +109,18 @@ impl App {
     }
 
     fn message_screen(&self, text: String, back: bool) -> Element<'_, Message> {
-        let mut column = widget::column::with_capacity(2).spacing(16).align_x(Alignment::Center).push(widget::text::body(text));
+        let mut column = widget::column::with_capacity(2)
+            .spacing(16)
+            .align_x(Alignment::Center)
+            .push(widget::text::body(text));
         if back {
-            column = column.push(widget::button::standard("Choose another system").on_press(Message::Back));
+            column = column
+                .push(widget::button::standard("Choose another system").on_press(Message::Back));
         }
-        widget::container(column).center_x(Length::Fill).center_y(Length::Fill).into()
+        widget::container(column)
+            .center_x(Length::Fill)
+            .center_y(Length::Fill)
+            .into()
     }
 }
 
@@ -142,17 +162,27 @@ impl cosmic::Application for App {
                 self.catalog = catalog;
                 self.screen = Screen::Picker;
             }
-            Message::Catalog(Err(error)) => self.screen = Screen::Failed(format!("The OS catalog is unavailable: {error}")),
+            Message::Catalog(Err(error)) => {
+                self.screen = Screen::Failed(format!("The OS catalog is unavailable: {error}"))
+            }
             Message::Pick(os) => {
                 self.screen = Screen::Starting(os);
-                let request = StartSession { os, width: self.window.width as u32, height: self.window.height as u32 };
+                let request = StartSession {
+                    os,
+                    width: self.window.width as u32,
+                    height: self.window.height as u32,
+                };
                 #[cfg(target_arch = "wasm32")]
-                return Task::perform(web::start(request), |r| cosmic::Action::App(Message::Started(r)));
+                return Task::perform(web::start(request), |r| {
+                    cosmic::Action::App(Message::Started(r))
+                });
                 #[cfg(not(target_arch = "wasm32"))]
                 drop(request);
             }
             Message::Started(Ok(session)) => self.screen = Screen::Streaming(session),
-            Message::Started(Err(error)) => self.screen = Screen::Failed(format!("The session could not start: {error}")),
+            Message::Started(Err(error)) => {
+                self.screen = Screen::Failed(format!("The session could not start: {error}"))
+            }
             Message::Stream(StreamEvent::Ready(sender)) => {
                 let _ = sender.unbounded_send(Input::Resize {
                     width: self.window.width as u32,
@@ -160,7 +190,9 @@ impl cosmic::Application for App {
                 });
                 self.sender = Some(sender);
             }
-            Message::Stream(StreamEvent::Frame(handle, width, height)) => self.frame = Some((handle, width, height)),
+            Message::Stream(StreamEvent::Frame(handle, width, height)) => {
+                self.frame = Some((handle, width, height))
+            }
             Message::Stream(StreamEvent::Server(ServerEvent::Error { message })) => {
                 self.screen = Screen::Failed(format!("Session error: {message}"));
             }
@@ -179,7 +211,12 @@ impl cosmic::Application for App {
             Message::Input(input) => {
                 let input = match input {
                     Input::Pointer { x, y, buttons } => {
-                        let (x, y) = self.pointer.to_stream(x, y, self.window, self.frame.as_ref().map(|f| (f.1, f.2)));
+                        let (x, y) = self.pointer.to_stream(
+                            x,
+                            y,
+                            self.window,
+                            self.frame.as_ref().map(|f| (f.1, f.2)),
+                        );
                         Input::Pointer { x, y, buttons }
                     }
                     other => other,
@@ -190,12 +227,19 @@ impl cosmic::Application for App {
             }
             Message::WindowResized(size) => {
                 self.window = size;
-                self.send(Input::Resize { width: size.width as u32, height: size.height as u32 });
+                self.send(Input::Resize {
+                    width: size.width as u32,
+                    height: size.height as u32,
+                });
             }
             Message::Back => {
                 self.sender = None;
                 self.frame = None;
-                self.screen = if self.catalog.is_empty() { Screen::Loading } else { Screen::Picker };
+                self.screen = if self.catalog.is_empty() {
+                    Screen::Loading
+                } else {
+                    Screen::Picker
+                };
             }
         }
         Task::none()
@@ -215,16 +259,23 @@ impl cosmic::Application for App {
         match &self.screen {
             Screen::Loading => self.message_screen("Loading Bun OS...".into(), false),
             Screen::Picker => self.picker(),
-            Screen::Starting(os) => self.message_screen(format!("Starting {}...", os.name()), false),
+            Screen::Starting(os) => {
+                self.message_screen(format!("Starting {}...", os.name()), false)
+            }
             Screen::Failed(text) => self.message_screen(text.clone(), true),
             Screen::Streaming(session) => match &self.frame {
                 Some((handle, _, _)) => widget::container(
-                    image(handle.clone()).content_fit(cosmic::iced::ContentFit::Contain).width(Length::Fill).height(Length::Fill),
+                    image(handle.clone())
+                        .content_fit(cosmic::iced::ContentFit::Contain)
+                        .width(Length::Fill)
+                        .height(Length::Fill),
                 )
                 .center_x(Length::Fill)
                 .center_y(Length::Fill)
                 .into(),
-                None => self.message_screen(format!("Connecting to {}...", session.os.name()), false),
+                None => {
+                    self.message_screen(format!("Connecting to {}...", session.os.name()), false)
+                }
             },
         }
     }

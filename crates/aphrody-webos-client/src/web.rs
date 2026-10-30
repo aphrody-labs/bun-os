@@ -5,7 +5,9 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use aphrody_webos_protocol::{ApiError, GamepadState, Input, OsEntry, ServerEvent, SessionInfo, StartSession};
+use aphrody_webos_protocol::{
+    ApiError, GamepadState, Input, OsEntry, ServerEvent, SessionInfo, StartSession,
+};
 use cosmic::iced::Subscription;
 use cosmic::iced::futures::{SinkExt, StreamExt, channel::mpsc};
 use cosmic::widget::image;
@@ -35,19 +37,28 @@ async fn fetch(method: &str, path: &str, body: Option<String>) -> Result<(u16, S
     }
     let request = Request::new_with_str_and_init(path, &init).map_err(js_error)?;
     if body.is_some() {
-        request.headers().set("content-type", "application/json").map_err(js_error)?;
+        request
+            .headers()
+            .set("content-type", "application/json")
+            .map_err(js_error)?;
     }
     let response: Response = JsFuture::from(window().fetch_with_request(&request))
         .await
         .map_err(js_error)?
         .dyn_into()
         .map_err(js_error)?;
-    let text = JsFuture::from(response.text().map_err(js_error)?).await.map_err(js_error)?.as_string().unwrap_or_default();
+    let text = JsFuture::from(response.text().map_err(js_error)?)
+        .await
+        .map_err(js_error)?
+        .as_string()
+        .unwrap_or_default();
     Ok((response.status(), text))
 }
 
 fn api_error(code: u16, body: &str) -> String {
-    serde_json::from_str::<ApiError>(body).map(|e| e.error).unwrap_or_else(|_| format!("HTTP {code}"))
+    serde_json::from_str::<ApiError>(body)
+        .map(|e| e.error)
+        .unwrap_or_else(|_| format!("HTTP {code}"))
 }
 
 pub async fn catalog() -> Result<Vec<OsEntry>, String> {
@@ -74,7 +85,11 @@ pub fn write_clipboard(text: &str) {
 fn decode(bytes: &[u8]) -> Option<StreamEvent> {
     let frame = ::image::load_from_memory(bytes).ok()?.into_rgba8();
     let (width, height) = frame.dimensions();
-    Some(StreamEvent::Frame(image::Handle::from_rgba(width, height, frame.into_raw()), width, height))
+    Some(StreamEvent::Frame(
+        image::Handle::from_rgba(width, height, frame.into_raw()),
+        width,
+        height,
+    ))
 }
 
 /// The session stream: binary messages are encoded frames, text messages are [`ServerEvent`]s, and [`Input`] sent
@@ -84,7 +99,11 @@ pub fn stream(session: SessionInfo) -> Subscription<StreamEvent> {
         let (path, token) = (path.clone(), token.clone());
         cosmic::iced::stream::channel(64, async move |mut out: mpsc::Sender<StreamEvent>| {
             let location = window().location();
-            let scheme = if location.protocol().as_deref() == Ok("https:") { "wss" } else { "ws" };
+            let scheme = if location.protocol().as_deref() == Ok("https:") {
+                "wss"
+            } else {
+                "ws"
+            };
             let url = format!("{scheme}://{}{}", location.host().unwrap_or_default(), path);
             let protocols = js_sys::Array::of1(&JsValue::from_str(&format!("bearer.{token}")));
             let ws = match WebSocket::new_with_str_sequence(&url, &protocols) {
@@ -101,7 +120,9 @@ pub fn stream(session: SessionInfo) -> Subscription<StreamEvent> {
                 Closure::<dyn FnMut(MessageEvent)>::new(move |event: MessageEvent| {
                     let data = event.data();
                     let item = if let Some(text) = data.as_string() {
-                        serde_json::from_str::<ServerEvent>(&text).ok().map(StreamEvent::Server)
+                        serde_json::from_str::<ServerEvent>(&text)
+                            .ok()
+                            .map(StreamEvent::Server)
                     } else if let Ok(buffer) = data.dyn_into::<js_sys::ArrayBuffer>() {
                         decode(&js_sys::Uint8Array::new(&buffer).to_vec())
                     } else {
@@ -124,7 +145,8 @@ pub fn stream(session: SessionInfo) -> Subscription<StreamEvent> {
             let on_close = {
                 let incoming = incoming.clone();
                 Closure::<dyn FnMut()>::new(move || {
-                    let _ = incoming.unbounded_send(StreamEvent::Closed("connection closed".into()));
+                    let _ =
+                        incoming.unbounded_send(StreamEvent::Closed("connection closed".into()));
                 })
             };
             ws.set_onclose(Some(on_close.as_ref().unchecked_ref()));
@@ -164,31 +186,46 @@ async fn next_frame() {
 pub fn gamepads() -> Subscription<Input> {
     Subscription::run(|| {
         cosmic::iced::stream::channel(16, async move |mut out: mpsc::Sender<Input>| {
-            let last: Rc<RefCell<[Option<GamepadState>; 4]>> = Rc::new(RefCell::new([None, None, None, None]));
+            let last: Rc<RefCell<[Option<GamepadState>; 4]>> =
+                Rc::new(RefCell::new([None, None, None, None]));
             loop {
                 next_frame().await;
-                let Ok(pads) = window().navigator().get_gamepads() else { continue };
+                let Ok(pads) = window().navigator().get_gamepads() else {
+                    continue;
+                };
                 for slot in 0..4u32 {
-                    let state = pads.get(slot).dyn_into::<web_sys::Gamepad>().ok().map(|pad| {
-                        let mut buttons = [0.0f32; 17];
-                        for (i, b) in pad.buttons().iter().take(17).enumerate() {
-                            if let Ok(b) = b.dyn_into::<web_sys::GamepadButton>() {
-                                buttons[i] = b.value() as f32;
+                    let state = pads
+                        .get(slot)
+                        .dyn_into::<web_sys::Gamepad>()
+                        .ok()
+                        .map(|pad| {
+                            let mut buttons = [0.0f32; 17];
+                            for (i, b) in pad.buttons().iter().take(17).enumerate() {
+                                if let Ok(b) = b.dyn_into::<web_sys::GamepadButton>() {
+                                    buttons[i] = b.value() as f32;
+                                }
                             }
-                        }
-                        let mut axes = [0.0f32; 4];
-                        for (i, a) in pad.axes().iter().take(4).enumerate() {
-                            axes[i] = a.as_f64().unwrap_or(0.0) as f32;
-                        }
-                        GamepadState { pad: slot as u8, connected: pad.connected(), buttons, axes }
-                    });
+                            let mut axes = [0.0f32; 4];
+                            for (i, a) in pad.axes().iter().take(4).enumerate() {
+                                axes[i] = a.as_f64().unwrap_or(0.0) as f32;
+                            }
+                            GamepadState {
+                                pad: slot as u8,
+                                connected: pad.connected(),
+                                buttons,
+                                axes,
+                            }
+                        });
                     let send = {
                         let mut last = last.borrow_mut();
                         let previous = &mut last[slot as usize];
                         let send = match (&state, previous.as_ref()) {
                             (Some(now), Some(before)) if now == before => None,
                             (Some(now), _) => Some(now.clone()),
-                            (None, Some(before)) => Some(GamepadState { connected: false, ..before.clone() }),
+                            (None, Some(before)) => Some(GamepadState {
+                                connected: false,
+                                ..before.clone()
+                            }),
                             (None, None) => None,
                         };
                         *previous = state;

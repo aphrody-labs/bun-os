@@ -36,7 +36,11 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     let inventory = match &state.inventory {
         Ok(inventory) => {
             let summary = aphrody_inventory::health(inventory);
-            check(summary.ok, false, format!("inventory incomplete: {} members", summary.total))
+            check(
+                summary.ok,
+                false,
+                format!("inventory incomplete: {} members", summary.total),
+            )
         }
         Err(error) => check(false, false, format!("no inventory: {error}")),
     };

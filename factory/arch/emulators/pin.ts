@@ -21,7 +21,8 @@ const pins: Record<string, unknown> = (await Bun.file(pinsPath).exists()) ? awai
 const token = Bun.env.GITHUB_TOKEN ?? Bun.env.GH_TOKEN;
 for (const [id, pkg] of Object.entries(releases.packages)) {
   if (ids.length && !ids.includes(id)) continue;
-  const linux = LINUX_OVERRIDES[id] ?? (pkg.asset?.["linux-x64"] ? { repo: pkg.repo, asset: pkg.asset["linux-x64"] } : undefined);
+  const linux =
+    LINUX_OVERRIDES[id] ?? (pkg.asset?.["linux-x64"] ? { repo: pkg.repo, asset: pkg.asset["linux-x64"] } : undefined);
   if (!linux) continue;
   const response = await fetch(`https://api.github.com/repos/${linux.repo}/releases/latest`, {
     headers: { accept: "application/vnd.github+json", ...(token ? { authorization: `Bearer ${token}` } : {}) },
@@ -34,7 +35,7 @@ for (const [id, pkg] of Object.entries(releases.packages)) {
     tag_name: string;
     assets: { name: string; size: number; browser_download_url: string; digest?: string }[];
   };
-  const asset = release.assets.find((a) => new RegExp(linux.asset).test(a.name));
+  const asset = release.assets.find(a => new RegExp(linux.asset).test(a.name));
   if (!asset?.digest?.startsWith("sha256:")) {
     console.warn(`${id}: no matching asset with a sha256 digest in ${release.tag_name}`);
     continue;

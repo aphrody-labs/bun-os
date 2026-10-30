@@ -31,24 +31,36 @@ fn bit(button: mouse::Button) -> u8 {
 }
 
 fn pointer() -> Input {
-    let (x, y) = *LAST.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    Input::Pointer { x, y, buttons: BUTTONS.load(Ordering::Relaxed) }
+    let (x, y) = *LAST
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    Input::Pointer {
+        x,
+        y,
+        buttons: BUTTONS.load(Ordering::Relaxed),
+    }
 }
 
 fn map(event: Event, _status: event::Status, _window: window::Id) -> Option<Message> {
     match event {
-        Event::Keyboard(keyboard::Event::KeyPressed { key, physical_key, .. }) => Some(Message::Input(Input::Key {
+        Event::Keyboard(keyboard::Event::KeyPressed {
+            key, physical_key, ..
+        }) => Some(Message::Input(Input::Key {
             code: code(&physical_key),
             key: logical(&key),
             down: true,
         })),
-        Event::Keyboard(keyboard::Event::KeyReleased { key, physical_key, .. }) => Some(Message::Input(Input::Key {
+        Event::Keyboard(keyboard::Event::KeyReleased {
+            key, physical_key, ..
+        }) => Some(Message::Input(Input::Key {
             code: code(&physical_key),
             key: logical(&key),
             down: false,
         })),
         Event::Mouse(mouse::Event::CursorMoved { position }) => {
-            *LAST.lock().unwrap_or_else(std::sync::PoisonError::into_inner) = (position.x, position.y);
+            *LAST
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner) = (position.x, position.y);
             Some(Message::Input(pointer()))
         }
         Event::Mouse(mouse::Event::ButtonPressed(button)) => {
@@ -106,6 +118,9 @@ impl Pointer {
         let scale = (window.width / fw).min(window.height / fh);
         let ox = (window.width - fw * scale) / 2.0;
         let oy = (window.height - fh * scale) / 2.0;
-        (((x - ox) / scale).clamp(0.0, fw - 1.0), ((y - oy) / scale).clamp(0.0, fh - 1.0))
+        (
+            ((x - ox) / scale).clamp(0.0, fw - 1.0),
+            ((y - oy) / scale).clamp(0.0, fh - 1.0),
+        )
     }
 }

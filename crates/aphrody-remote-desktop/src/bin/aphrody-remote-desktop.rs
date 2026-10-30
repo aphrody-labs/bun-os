@@ -27,8 +27,12 @@ async fn main() -> Result<()> {
     opts.token = match std::env::var("APHRODY_REMOTE_TOKEN") {
         Ok(t) if !t.is_empty() => t,
         _ => {
-            let path = std::env::var("APHRODY_REMOTE_TOKEN_FILE").context("set APHRODY_REMOTE_TOKEN or APHRODY_REMOTE_TOKEN_FILE")?;
-            std::fs::read_to_string(&path).with_context(|| format!("cannot read {path}"))?.trim().to_owned()
+            let path = std::env::var("APHRODY_REMOTE_TOKEN_FILE")
+                .context("set APHRODY_REMOTE_TOKEN or APHRODY_REMOTE_TOKEN_FILE")?;
+            std::fs::read_to_string(&path)
+                .with_context(|| format!("cannot read {path}"))?
+                .trim()
+                .to_owned()
         }
     };
     eprintln!("aphrody-remote-desktop: http://{}/", opts.bind);

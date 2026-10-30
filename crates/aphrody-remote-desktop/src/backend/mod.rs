@@ -4,10 +4,10 @@
 use anyhow::Result;
 pub use aphrody_capture::RawFrame;
 
-#[cfg(windows)]
-mod win32;
 #[cfg(all(target_os = "linux", feature = "wayland"))]
 pub mod wayland;
+#[cfg(windows)]
+mod win32;
 #[cfg(target_os = "linux")]
 mod x11;
 

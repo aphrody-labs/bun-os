@@ -23,7 +23,9 @@ use wayland_client::protocol::wl_shm_pool::WlShmPool;
 use wayland_client::{Connection, Dispatch, EventQueue, Proxy, QueueHandle, WEnum, delegate_noop};
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_manager_v1::ZwpVirtualKeyboardManagerV1;
 use wayland_protocols_misc::zwp_virtual_keyboard_v1::client::zwp_virtual_keyboard_v1::ZwpVirtualKeyboardV1;
-use wayland_protocols_wlr::screencopy::v1::client::zwlr_screencopy_frame_v1::{self, ZwlrScreencopyFrameV1};
+use wayland_protocols_wlr::screencopy::v1::client::zwlr_screencopy_frame_v1::{
+    self, ZwlrScreencopyFrameV1,
+};
 use wayland_protocols_wlr::screencopy::v1::client::zwlr_screencopy_manager_v1::ZwlrScreencopyManagerV1;
 use wayland_protocols_wlr::virtual_pointer::v1::client::zwlr_virtual_pointer_manager_v1::ZwlrVirtualPointerManagerV1;
 use wayland_protocols_wlr::virtual_pointer::v1::client::zwlr_virtual_pointer_v1::ZwlrVirtualPointerV1;
@@ -98,11 +100,22 @@ pub struct WaylandBackend {
 
 /// Anonymous file in `XDG_RUNTIME_DIR` (unlinked at once) for shared-memory buffers and the keymap.
 fn anon_file(size: u64) -> Result<File> {
-    let dir = std::env::var_os("XDG_RUNTIME_DIR").map(PathBuf::from).unwrap_or_else(std::env::temp_dir);
+    let dir = std::env::var_os("XDG_RUNTIME_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(std::env::temp_dir);
     let mut n = [0u8; 8];
     getrandom::fill(&mut n).map_err(|e| anyhow!("random: {e}"))?;
-    let path = dir.join(format!("aphrody-rd-{}-{:016x}", std::process::id(), u64::from_le_bytes(n)));
-    let file = OpenOptions::new().read(true).write(true).create_new(true).open(&path).with_context(|| format!("cannot create {}", path.display()))?;
+    let path = dir.join(format!(
+        "aphrody-rd-{}-{:016x}",
+        std::process::id(),
+        u64::from_le_bytes(n)
+    ));
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create_new(true)
+        .open(&path)
+        .with_context(|| format!("cannot create {}", path.display()))?;
     let _ = std::fs::remove_file(&path);
     file.set_len(size)?;
     Ok(file)
@@ -110,31 +123,64 @@ fn anon_file(size: u64) -> Result<File> {
 
 impl WaylandBackend {
     pub fn connect() -> Result<Self> {
-        let conn = Connection::connect_to_env().context("cannot connect to the Wayland display (WAYLAND_DISPLAY/XDG_RUNTIME_DIR)")?;
-        let (globals, mut queue) = registry_queue_init::<State>(&conn).context("Wayland registry")?;
+        let conn = Connection::connect_to_env()
+            .context("cannot connect to the Wayland display (WAYLAND_DISPLAY/XDG_RUNTIME_DIR)")?;
+        let (globals, mut queue) =
+            registry_queue_init::<State>(&conn).context("Wayland registry")?;
         let qh = queue.handle();
         let mut state = State::default();
         let shm: WlShm = globals.bind(&qh, 1..=1, ()).context("wl_shm missing")?;
-        let screencopy = globals.bind::<ZwlrScreencopyManagerV1, _, _>(&qh, 1..=3, ()).ok();
+        let screencopy = globals
+            .bind::<ZwlrScreencopyManagerV1, _, _>(&qh, 1..=3, ())
+            .ok();
         let seat = globals.bind::<WlSeat, _, _>(&qh, 1..=7, ()).ok();
-        let outputs: Vec<(u32, u32)> = globals.contents().with_list(|l| l.iter().filter(|g| g.interface == WlOutput::interface().name).map(|g| (g.name, g.version)).collect());
+        let outputs: Vec<(u32, u32)> = globals.contents().with_list(|l| {
+            l.iter()
+                .filter(|g| g.interface == WlOutput::interface().name)
+                .map(|g| (g.name, g.version))
+                .collect()
+        });
         let mut proxies = Vec::new();
         for (i, (name, version)) in outputs.into_iter().enumerate() {
             state.outputs.push(OutputInfo::default());
-            proxies.push(globals.registry().bind::<WlOutput, _, _>(name, version.min(4), &qh, i));
+            proxies.push(
+                globals
+                    .registry()
+                    .bind::<WlOutput, _, _>(name, version.min(4), &qh, i),
+            );
         }
         if proxies.is_empty() {
             bail!("the Wayland compositor has no output");
         }
         queue.roundtrip(&mut state)?;
         queue.roundtrip(&mut state)?;
-        let wanted = std::env::var("APHRODY_WAYLAND_OUTPUT").ok().filter(|s| !s.is_empty());
+        let wanted = std::env::var("APHRODY_WAYLAND_OUTPUT")
+            .ok()
+            .filter(|s| !s.is_empty());
         let out_idx = match &wanted {
-            Some(w) => state.outputs.iter().position(|o| o.name.as_deref() == Some(w.as_str())).with_context(|| format!("no Wayland output named {w}"))?,
+            Some(w) => state
+                .outputs
+                .iter()
+                .position(|o| o.name.as_deref() == Some(w.as_str()))
+                .with_context(|| format!("no Wayland output named {w}"))?,
             None => state.outputs.iter().position(|o| o.width > 0).unwrap_or(0),
         };
         let output = proxies[out_idx].clone();
-        Ok(Self { conn, queue, qh, state, globals, output, out_idx, shm, screencopy, seat, buffer: None, input: None, started: Instant::now() })
+        Ok(Self {
+            conn,
+            queue,
+            qh,
+            state,
+            globals,
+            output,
+            out_idx,
+            shm,
+            screencopy,
+            seat,
+            buffer: None,
+            input: None,
+            started: Instant::now(),
+        })
     }
 
     fn now(&self) -> u32 {
@@ -143,7 +189,9 @@ impl WaylandBackend {
 
     fn dispatch_until(&mut self, done: impl Fn(&FrameState) -> bool) -> Result<()> {
         while !done(&self.state.frame) {
-            self.queue.blocking_dispatch(&mut self.state).context("Wayland dispatch")?;
+            self.queue
+                .blocking_dispatch(&mut self.state)
+                .context("Wayland dispatch")?;
         }
         Ok(())
     }
@@ -159,21 +207,48 @@ impl WaylandBackend {
         let (format, w, h, stride) = key;
         let size = u64::from(stride) * u64::from(h);
         let file = anon_file(size)?;
-        let pool = self.shm.create_pool(file.as_fd(), i32::try_from(size)?, &self.qh, ());
-        let buffer = pool.create_buffer(0, i32::try_from(w)?, i32::try_from(h)?, i32::try_from(stride)?, format, &self.qh, ());
-        self.buffer = Some(Shm { file, pool, buffer, key });
+        let pool = self
+            .shm
+            .create_pool(file.as_fd(), i32::try_from(size)?, &self.qh, ());
+        let buffer = pool.create_buffer(
+            0,
+            i32::try_from(w)?,
+            i32::try_from(h)?,
+            i32::try_from(stride)?,
+            format,
+            &self.qh,
+            (),
+        );
+        self.buffer = Some(Shm {
+            file,
+            pool,
+            buffer,
+            key,
+        });
         Ok(())
     }
 
     fn input(&mut self) -> Result<&mut Input> {
         if self.input.is_none() {
-            let vpm: ZwlrVirtualPointerManagerV1 = self.globals.bind(&self.qh, 1..=2, ()).context("compositor lacks zwlr_virtual_pointer_manager_v1")?;
+            let vpm: ZwlrVirtualPointerManagerV1 = self
+                .globals
+                .bind(&self.qh, 1..=2, ())
+                .context("compositor lacks zwlr_virtual_pointer_manager_v1")?;
             let pointer = if vpm.version() >= 2 {
-                vpm.create_virtual_pointer_with_output(self.seat.as_ref(), Some(&self.output), &self.qh, ())
+                vpm.create_virtual_pointer_with_output(
+                    self.seat.as_ref(),
+                    Some(&self.output),
+                    &self.qh,
+                    (),
+                )
             } else {
                 vpm.create_virtual_pointer(self.seat.as_ref(), &self.qh, ())
             };
-            let keyboard = match (&self.seat, self.globals.bind::<ZwpVirtualKeyboardManagerV1, _, _>(&self.qh, 1..=1, ())) {
+            let keyboard = match (
+                &self.seat,
+                self.globals
+                    .bind::<ZwpVirtualKeyboardManagerV1, _, _>(&self.qh, 1..=1, ()),
+            ) {
                 (Some(seat), Ok(vkm)) => {
                     let kb = vkm.create_virtual_keyboard(seat, &self.qh, ());
                     let mut file = anon_file(0)?;
@@ -184,7 +259,11 @@ impl WaylandBackend {
                 }
                 _ => None,
             };
-            self.input = Some(Input { pointer, keyboard, mods: 0 });
+            self.input = Some(Input {
+                pointer,
+                keyboard,
+                mods: 0,
+            });
         }
         self.input.as_mut().context("input")
     }
@@ -196,7 +275,10 @@ impl WaylandBackend {
     fn evdev_key(&mut self, code: u32, down: bool) -> Result<()> {
         let time = self.now();
         let input = self.input()?;
-        let kb = input.keyboard.as_ref().context("compositor lacks zwp_virtual_keyboard_manager_v1 or a seat")?;
+        let kb = input
+            .keyboard
+            .as_ref()
+            .context("compositor lacks zwp_virtual_keyboard_manager_v1 or a seat")?;
         let bit = match code {
             42 | 54 => MOD_SHIFT,
             29 | 97 => MOD_CTRL,
@@ -207,7 +289,11 @@ impl WaylandBackend {
         };
         kb.key(time, code, u32::from(down));
         if bit != 0 {
-            if down { input.mods |= bit } else { input.mods &= !bit }
+            if down {
+                input.mods |= bit
+            } else {
+                input.mods &= !bit
+            }
             kb.modifiers(input.mods, 0, if code == 58 { MOD_CAPS } else { 0 }, 0);
         }
         self.flush()
@@ -216,7 +302,10 @@ impl WaylandBackend {
 
 /// Linux evdev key code of a `KeyboardEvent.code`.
 pub fn code_to_evdev(code: &str) -> Option<u32> {
-    const LETTERS: [u32; 26] = [30, 48, 46, 32, 18, 33, 34, 35, 23, 36, 37, 38, 50, 49, 24, 25, 16, 19, 31, 20, 22, 47, 17, 45, 21, 44];
+    const LETTERS: [u32; 26] = [
+        30, 48, 46, 32, 18, 33, 34, 35, 23, 36, 37, 38, 50, 49, 24, 25, 16, 19, 31, 20, 22, 47, 17,
+        45, 21, 44,
+    ];
     if let Some(l) = code.strip_prefix("Key") {
         let b = l.as_bytes();
         if b.len() == 1 && b[0].is_ascii_uppercase() {
@@ -226,7 +315,11 @@ pub fn code_to_evdev(code: &str) -> Option<u32> {
     if let Some(d) = code.strip_prefix("Digit") {
         let b = d.as_bytes();
         if b.len() == 1 && b[0].is_ascii_digit() {
-            return Some(if b[0] == b'0' { 11 } else { u32::from(b[0] - b'1') + 2 });
+            return Some(if b[0] == b'0' {
+                11
+            } else {
+                u32::from(b[0] - b'1') + 2
+            });
         }
     }
     if let Some(n) = code.strip_prefix('F').and_then(|n| n.parse::<u32>().ok()) {
@@ -314,7 +407,10 @@ fn char_to_evdev(c: char) -> Option<(u32, bool)> {
         '\t' => Some((15, false)),
         '\u{8}' => Some((14, false)),
         c => {
-            let (i, shift) = PLAIN.find(c).map(|i| (i, false)).or_else(|| SHIFTED.find(c).map(|i| (i, true)))?;
+            let (i, shift) = PLAIN
+                .find(c)
+                .map(|i| (i, false))
+                .or_else(|| SHIFTED.find(c).map(|i| (i, true)))?;
             let base = PLAIN.as_bytes()[i] as char;
             let name = match base {
                 '`' => "Backquote".to_owned(),
@@ -341,7 +437,10 @@ impl ScreenBackend for WaylandBackend {
     }
 
     fn capture(&mut self) -> Result<RawFrame> {
-        let mgr = self.screencopy.clone().context("compositor lacks zwlr_screencopy_manager_v1")?;
+        let mgr = self
+            .screencopy
+            .clone()
+            .context("compositor lacks zwlr_screencopy_manager_v1")?;
         self.state.frame = FrameState::default();
         let frame = mgr.capture_output(1, &self.output, &self.qh, ());
         let v3 = frame.version() >= 3;
@@ -360,12 +459,20 @@ impl ScreenBackend for WaylandBackend {
         }
         let (format, w, h, stride) = key;
         let mut raw = vec![0u8; stride as usize * h as usize];
-        self.buffer.as_ref().context("buffer")?.file.read_exact_at(&mut raw, 0)?;
+        self.buffer
+            .as_ref()
+            .context("buffer")?
+            .file
+            .read_exact_at(&mut raw, 0)?;
         let swap = matches!(format, wl_shm::Format::Xbgr8888 | wl_shm::Format::Abgr8888);
         let row = w as usize * 4;
         let mut bgra = vec![0u8; row * h as usize];
         for y in 0..h as usize {
-            let src_y = if self.state.frame.y_invert { h as usize - 1 - y } else { y };
+            let src_y = if self.state.frame.y_invert {
+                h as usize - 1 - y
+            } else {
+                y
+            };
             let src = &raw[src_y * stride as usize..src_y * stride as usize + row];
             let dst = &mut bgra[y * row..(y + 1) * row];
             dst.copy_from_slice(src);
@@ -376,7 +483,13 @@ impl ScreenBackend for WaylandBackend {
             }
         }
         let o = &self.state.outputs[self.out_idx];
-        Ok(RawFrame { origin_x: o.x, origin_y: o.y, width: w, height: h, bgra })
+        Ok(RawFrame {
+            origin_x: o.x,
+            origin_y: o.y,
+            width: w,
+            height: h,
+            bgra,
+        })
     }
 
     fn mouse_move(&mut self, x: i32, y: i32) -> Result<()> {
@@ -386,7 +499,9 @@ impl ScreenBackend for WaylandBackend {
         let input = self.input()?;
         let px = (x - ox).clamp(0, w - 1);
         let py = (y - oy).clamp(0, h - 1);
-        input.pointer.motion_absolute(time, px as u32, py as u32, w as u32, h as u32);
+        input
+            .pointer
+            .motion_absolute(time, px as u32, py as u32, w as u32, h as u32);
         input.pointer.frame();
         self.flush()
     }
@@ -399,7 +514,15 @@ impl ScreenBackend for WaylandBackend {
             MouseButton::Middle => BTN_MIDDLE,
         };
         let input = self.input()?;
-        input.pointer.button(time, code, if down { ButtonState::Pressed } else { ButtonState::Released });
+        input.pointer.button(
+            time,
+            code,
+            if down {
+                ButtonState::Pressed
+            } else {
+                ButtonState::Released
+            },
+        );
         input.pointer.frame();
         self.flush()
     }
@@ -410,10 +533,20 @@ impl ScreenBackend for WaylandBackend {
         input.pointer.axis_source(AxisSource::Wheel);
         // Trait convention: positive dy scrolls up; Wayland axis values grow downwards (15 per notch).
         if dy != 0 {
-            input.pointer.axis_discrete(time, Axis::VerticalScroll, -f64::from(dy) / 8.0, -dy / 120);
+            input.pointer.axis_discrete(
+                time,
+                Axis::VerticalScroll,
+                -f64::from(dy) / 8.0,
+                -dy / 120,
+            );
         }
         if dx != 0 {
-            input.pointer.axis_discrete(time, Axis::HorizontalScroll, f64::from(dx) / 8.0, dx / 120);
+            input.pointer.axis_discrete(
+                time,
+                Axis::HorizontalScroll,
+                f64::from(dx) / 8.0,
+                dx / 120,
+            );
         }
         input.pointer.frame();
         self.flush()
@@ -443,18 +576,40 @@ impl ScreenBackend for WaylandBackend {
 }
 
 impl Dispatch<WlRegistry, GlobalListContents> for State {
-    fn event(_: &mut Self, _: &WlRegistry, _: <WlRegistry as Proxy>::Event, _: &GlobalListContents, _: &Connection, _: &QueueHandle<Self>) {}
+    fn event(
+        _: &mut Self,
+        _: &WlRegistry,
+        _: <WlRegistry as Proxy>::Event,
+        _: &GlobalListContents,
+        _: &Connection,
+        _: &QueueHandle<Self>,
+    ) {
+    }
 }
 
 impl Dispatch<WlOutput, usize> for State {
-    fn event(state: &mut Self, _: &WlOutput, event: wl_output::Event, idx: &usize, _: &Connection, _: &QueueHandle<Self>) {
-        let Some(o) = state.outputs.get_mut(*idx) else { return };
+    fn event(
+        state: &mut Self,
+        _: &WlOutput,
+        event: wl_output::Event,
+        idx: &usize,
+        _: &Connection,
+        _: &QueueHandle<Self>,
+    ) {
+        let Some(o) = state.outputs.get_mut(*idx) else {
+            return;
+        };
         match event {
             wl_output::Event::Geometry { x, y, .. } => {
                 o.x = x;
                 o.y = y;
             }
-            wl_output::Event::Mode { flags, width, height, .. } => {
+            wl_output::Event::Mode {
+                flags,
+                width,
+                height,
+                ..
+            } => {
                 if matches!(flags, WEnum::Value(f) if f.contains(wl_output::Mode::Current)) {
                     o.width = width;
                     o.height = height;
@@ -467,15 +622,36 @@ impl Dispatch<WlOutput, usize> for State {
 }
 
 impl Dispatch<ZwlrScreencopyFrameV1, ()> for State {
-    fn event(state: &mut Self, _: &ZwlrScreencopyFrameV1, event: zwlr_screencopy_frame_v1::Event, _: &(), _: &Connection, _: &QueueHandle<Self>) {
+    fn event(
+        state: &mut Self,
+        _: &ZwlrScreencopyFrameV1,
+        event: zwlr_screencopy_frame_v1::Event,
+        _: &(),
+        _: &Connection,
+        _: &QueueHandle<Self>,
+    ) {
         let f = &mut state.frame;
         match event {
-            zwlr_screencopy_frame_v1::Event::Buffer { format: WEnum::Value(format), width, height, stride } => {
-                if matches!(format, wl_shm::Format::Xrgb8888 | wl_shm::Format::Argb8888 | wl_shm::Format::Xbgr8888 | wl_shm::Format::Abgr8888) && f.info.is_none() {
+            zwlr_screencopy_frame_v1::Event::Buffer {
+                format: WEnum::Value(format),
+                width,
+                height,
+                stride,
+            } => {
+                if matches!(
+                    format,
+                    wl_shm::Format::Xrgb8888
+                        | wl_shm::Format::Argb8888
+                        | wl_shm::Format::Xbgr8888
+                        | wl_shm::Format::Abgr8888
+                ) && f.info.is_none()
+                {
                     f.info = Some((format, width, height, stride));
                 }
             }
-            zwlr_screencopy_frame_v1::Event::Flags { flags: WEnum::Value(flags) } => {
+            zwlr_screencopy_frame_v1::Event::Flags {
+                flags: WEnum::Value(flags),
+            } => {
                 f.y_invert = flags.contains(zwlr_screencopy_frame_v1::Flags::YInvert);
             }
             zwlr_screencopy_frame_v1::Event::BufferDone => f.buffer_done = true,
@@ -495,4 +671,3 @@ delegate_noop!(State: ZwlrVirtualPointerManagerV1);
 delegate_noop!(State: ZwlrVirtualPointerV1);
 delegate_noop!(State: ZwpVirtualKeyboardManagerV1);
 delegate_noop!(State: ZwpVirtualKeyboardV1);
-
