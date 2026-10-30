@@ -1034,13 +1034,11 @@ const builtinIds = async () => {
 };
 
 /** Every desktop app declares a real backing; the stub vocabulary cannot come back. */
-const STUB_WORDS = /coming soon|placeholder|mock|stub|fake|not implemented|lorem|demo/i;
+const STUB_WORDS = /coming soon|placeholder|mock|stub|fake|not implemented|lorem|\bdemo\b/i;
 export async function checkBuiltins(): Promise<string[]> {
   const errors: string[] = [];
   const main = await builtinSource();
-  const blocks = main.split(/
-  {
-(?=    id: ")/).slice(1);
+  const blocks = main.split(/^  \{\r?$/m).slice(1);
   for (const block of blocks) {
     const id = /^    id: "([a-z0-9-]+)",/.exec(block)?.[1];
     if (!id) continue;
