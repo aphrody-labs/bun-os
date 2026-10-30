@@ -54,6 +54,8 @@ export function resolveToolchain(project?: string): AndroidToolchain {
       local && join(local, "Android", "Sdk"),
       join(homedir(), "Android", "Sdk"),
       join(homedir(), "Library", "Android", "sdk"),
+      // Shared Bun OS install (factory/android/sdk.ts) on Linux hosts and build containers.
+      "/opt/android-sdk",
     ]) ??
     process.env.ANDROID_HOME ??
     join(homedir(), "Android", "Sdk");
