@@ -6,7 +6,7 @@ files aside and runs schema migrations. Each application keeps its own settings 
 defaults. The suite-wide policy (what belongs where) is in
 [docs/settings-storage.md](docs/settings-storage.md).
 
-Atomic writes come from [`craft-atomic`](https://source.aphrody.app/aphrody-dev/bun-crate-craft-atomic).
+Atomic writes come from [`craft-atomic`](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-atomic).
 
 ## Boundaries
 

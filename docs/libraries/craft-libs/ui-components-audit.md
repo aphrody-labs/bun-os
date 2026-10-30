@@ -61,7 +61,7 @@ PhotoCraft embeds 118 SVGs, VectorCraft 259, and PdfCraft 184 through their `ico
 
 `SvgIconSet` owns prepared bytes and returns egui image sources. Each app supplies its embedded catalog, literal SVG substitutions, URI prefix and fallback. Tool aliases, tint, size, labels and tool cursors remain in the app; the button component accepts the app's hover/selected/pressed style policy. SVG parsing and rasterization stay with `egui_extras`.
 
-The pilot retains all three consumers' cache keys and exact SVG bytes. Its characterization tests cover all 561 catalog entries, tool aliases and missing-name fallbacks. Shared-crate tests cover both style policies, repeated shared-byte lookups, an absent fallback, duplicate names, lossy UTF-8 compatibility and actual SVG rasterization at 16, 24 and 48 pixels. See the [crate guide](https://source.aphrody.app/aphrody-dev/bun-crate-craft-ui) for the API and limits.
+The pilot retains all three consumers' cache keys and exact SVG bytes. Its characterization tests cover all 561 catalog entries, tool aliases and missing-name fallbacks. Shared-crate tests cover both style policies, repeated shared-byte lookups, an absent fallback, duplicate names, lossy UTF-8 compatibility and actual SVG rasterization at 16, 24 and 48 pixels. See the [crate guide](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-ui) for the API and limits.
 
 The SVG substitution is deliberately narrow: it preserves the existing literal replacements rather than becoming a general SVG/CSS processor. The catalog is trusted compiled-in data. A new set in the same egui context must use a distinct URI prefix, because egui caches by URI. The existing app prefixes remain appropriate when each app owns its context.
 

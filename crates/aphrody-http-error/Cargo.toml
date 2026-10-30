@@ -6,7 +6,7 @@ version.workspace      = true
 edition.workspace      = true
 rust-version.workspace = true
 authors = ["aphrody-code"]
-repository = "https://source.aphrody.app/aphrody-dev/bun-crate-aphrody-http-error"
+repository = "https://github.com/aphrody-labs/bun-os/tree/main/crates/aphrody-http-error"
 license = "Apache-2.0"
 description            = "One JSON error envelope ({\"error\":{\"code\",\"message\",\"data\"}}) shared by Aphrody's own HTTP surfaces."
 

@@ -6,7 +6,7 @@ version.workspace      = true
 edition.workspace      = true
 rust-version.workspace = true
 authors = ["aphrody-code"]
-repository = "https://source.aphrody.app/aphrody-dev/bun-crate-aphrody-config"
+repository = "https://github.com/aphrody-labs/bun-os/tree/main/crates/aphrody-config"
 license = "Apache-2.0"
 description            = "Codex-compatible config.toml model for aphrody: ConfigToml, model providers (managed llama-server, Ollama, LM Studio, vLLM, Antigravity, OpenAI, Anthropic, ChatGPT), layered merge (built-ins < Codex-compat < user < project < profile < -c overrides < CLI flags), dotted -c override parsing, and the No-Human-In-The-Loop policy defaults. Pure, no filesystem access in the core, wasm32-safe."
 

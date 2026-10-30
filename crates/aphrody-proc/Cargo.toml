@@ -6,7 +6,7 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 authors = ["aphrody-code"]
-repository = "https://source.aphrody.app/aphrody-dev/bun-crate-aphrody-proc"
+repository = "https://github.com/aphrody-labs/bun-os/tree/main/crates/aphrody-proc"
 license = "Apache-2.0"
 description = "Process supervision primitives shared by the llama-server supervisor, the command sandbox and the training runner: process groups that die with their owner (Linux session + killpg, Windows Job Object with KILL_ON_JOB_CLOSE), detached daemons, liveness probes, elevated execution without a new console window (Sudo for Windows inline, UAC, sudo-rs), free-port allocation, advisory file locks and the single-GPU lease (shared for inference, exclusive for training)."
 

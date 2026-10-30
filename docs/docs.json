@@ -80,8 +80,7 @@
             "pages": [
               "/control-plane",
               "/PRODUCT-SERVER",
-              "/APP-DOMAINS",
-              "/source-private-network"
+              "/APP-DOMAINS"
             ]
           }
         ]

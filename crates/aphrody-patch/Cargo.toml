@@ -6,7 +6,7 @@ version.workspace      = true
 edition.workspace      = true
 rust-version.workspace = true
 authors = ["aphrody-code"]
-repository = "https://source.aphrody.app/aphrody-dev/bun-crate-aphrody-patch"
+repository = "https://github.com/aphrody-labs/bun-os/tree/main/crates/aphrody-patch"
 license = "Apache-2.0"
 description            = "LLM-native file-edit patch format (*** Begin Patch / Add|Update|Delete File / @@ context) with a parser, Unicode-tolerant fuzzy line seeking, a streaming parser, and application over a pluggable filesystem trait. Inspired by OpenAI Codex apply-patch (Apache-2.0)."
 

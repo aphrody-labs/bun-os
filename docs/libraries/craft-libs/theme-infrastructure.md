@@ -72,7 +72,7 @@ impl WidgetPalette {
 }
 ```
 
-The implementation lives in [`crates/ui/src/theme`](https://source.aphrody.app/aphrody-dev/bun-crate-craft-ui/src/branch/os/src/theme/mod.rs). It changes only
+The implementation lives in [`crates/ui/src/theme`](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-ui/src/branch/os/src/theme/mod.rs). It changes only
 those four properties. Borders, expansion, selection, shadows and the rest of egui's visuals
 stay untouched. Apps apply their state-specific exceptions afterward. `noninteractive` names
 egui's state, not a new disabled-control policy.

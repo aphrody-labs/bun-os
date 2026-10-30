@@ -6,7 +6,7 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license = "MIT OR Apache-2.0"
-repository = "https://source.aphrody.app/aphrody-dev/bun-crate-cadcraft-fonts"
+repository = "https://github.com/aphrody-labs/bun-os/tree/main/crates/cadcraft-fonts"
 
 [lints.rust]
 unsafe_code = "forbid"

@@ -202,7 +202,7 @@ the previous 24 owners. The recorded receipt has `compiled:true`,
 This does not qualify a full Rust build, native application deployment, or
 replacement of the installed product binary. The previous installation and
 service-activation review rejections remain in effect; neither action was
-retried. The public forge and Gitea API remain accessible; the prepared product
+retried. The prepared product
 route still returns 404 until its activation gate is resolved.
 
 ## Previous public-source candidate, 2026-10-14

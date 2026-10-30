@@ -2,7 +2,7 @@
 # Bun OS monorepo
 
 Entry page for the canonical Bun OS workspace (`aphrody-labs/bun-os` (renamed from `aphrody-labs/bun-distribution` on 2026-10-25), branch `main` (`os` is a fast-forward mirror); forge
-`bun-forge:aphrody-dev/bun-os`). It states the rules, the measured state and the open decisions, and links to
+`github.com/aphrody-labs/bun-os`). It states the rules, the measured state and the open decisions, and links to
 the pages that own the details. Generated data is not copied here: see
 [`generated/component-inventory.json`](generated/component-inventory.json) (regenerate with
 `bun run workspace:source --out docs/generated/component-inventory.json`) and
@@ -79,8 +79,8 @@ graph ([NATIVE-QUALIFICATION](NATIVE-QUALIFICATION.md)), and the Aphrody/Bun uni
 ## Products
 
 - **WebOS** at https://aphrody.com: `apps/webos` (Cloudflare Worker plus shell), Craft studios, Drive.
-  See [webos/README](webos/README.md). The Worker deploys from `.gitea/workflows/aphrody-sites.yaml` on every
-  `os` push and hourly, and needs the protected `CLOUDFLARE_API_TOKEN` of that environment.
+  See [webos/README](webos/README.md). The Worker deploys from `.github/workflows/aphrody-sites.yml` on every
+  `main` push, and needs the protected `CLOUDFLARE_API_TOKEN` of that environment.
 - **Bun Engine** (`packages/bun-engine`, `crates/bun-engine-core`, [docs](bun-engine/README.md)): emulation and
   console runtime, with the console-style library UI (covers, profiles, gamescope session) and
   libretroarch embedded through `bun:ffi`. [Homebrew showcase](bun-engine/HOMEBREW.md).
@@ -159,7 +159,7 @@ workflow environment (not checked), and non-current GitHub mirrors, on which `re
    `crates/bevy/{benches,errors,examples/*}`). Options: split each into a `crates/<name>` submodule (needs
    history splits and collision-free names), or keep them nested inside the pinned `crates/bevy` owner and
    record the exception. No name is chosen here.
-3. **WebOS Worker deploy** runs only from `.gitea/workflows/aphrody-sites.yaml`; the first run proving the
+3. **WebOS Worker deploy** runs only from `.github/workflows/aphrody-sites.yml`; the first run proving the
    protected token is configured is still pending, and GitHub `release.yml` does not deploy it.
 4. **GitHub mirror**: `aphrody-labs/bun-os` has no `os` branch (see Release state); decide whether it is a
    mirror of `os` or a separate repository, because the `github` remote of this checkout is

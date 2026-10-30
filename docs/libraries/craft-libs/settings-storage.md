@@ -1,7 +1,7 @@
 # Settings storage across the Craft apps
 
 How every Craft app stores its settings, and what goes where. The shared code is
-[`craft-settings`](https://source.aphrody.app/aphrody-dev/bun-crate-craft-settings); this page is the policy it implements.
+[`craft-settings`](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-settings); this page is the policy it implements.
 Discussion: [storytold/craft-libs#12](https://github.com/storytold/craft-libs/issues/12).
 
 ## What goes where

@@ -6,7 +6,7 @@ version.workspace      = true
 edition.workspace      = true
 rust-version.workspace = true
 authors = ["aphrody-code"]
-repository = "https://source.aphrody.app/aphrody-dev/bun-crate-aphrody-toolcall-repair"
+repository = "https://github.com/aphrody-labs/bun-os/tree/main/crates/aphrody-toolcall-repair"
 license = "Apache-2.0"
 description            = "Weak open-source model tool-calling robustness layer: a tolerant JSON repairer (markdown fences, trailing commas, single-quoted strings, unquoted keys, Python literals, truncation, double-encoding), inline tool-call extraction for Hermes / Qwen3-Coder XML / Mistral / bare-JSON dialects, a JSON-Schema-subset argument validator + coercer with corrective retry messages, apply_patch normalisation (unified diff / SEARCH-REPLACE / whole-file -> Codex patch), and per-model PromptProfile selection."
 

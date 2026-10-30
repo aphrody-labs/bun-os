@@ -6,12 +6,12 @@ provenance, shared documentation, attribution and license notices.
 
 | Library          | Canonical owner                                                                        |
 | ---------------- | -------------------------------------------------------------------------------------- |
-| `craft-atomic`   | [Atomic file writes](https://source.aphrody.app/aphrody-dev/bun-crate-craft-atomic)    |
-| `craft-cms`      | [ICC color management](https://source.aphrody.app/aphrody-dev/bun-crate-craft-cms)     |
-| `craft-print`    | [System PDF printing](https://source.aphrody.app/aphrody-dev/bun-crate-craft-print)    |
-| `craft-quit`     | [Native application quit](https://source.aphrody.app/aphrody-dev/bun-crate-craft-quit) |
-| `craft-settings` | [Settings storage](https://source.aphrody.app/aphrody-dev/bun-crate-craft-settings)    |
-| `craft-ui`       | [Shared egui controls](https://source.aphrody.app/aphrody-dev/bun-crate-craft-ui)      |
+| `craft-atomic`   | [Atomic file writes](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-atomic)    |
+| `craft-cms`      | [ICC color management](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-cms)     |
+| `craft-print`    | [System PDF printing](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-print)    |
+| `craft-quit`     | [Native application quit](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-quit) |
+| `craft-settings` | [Settings storage](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-settings)    |
+| `craft-ui`       | [Shared egui controls](https://github.com/aphrody-labs/bun-os/tree/main/crates/craft-ui)      |
 
 Bun OS owns each `crates/<package-name>` manifest, version, dependency table,
 toolchain, build output and qualification command. Use its root workspace

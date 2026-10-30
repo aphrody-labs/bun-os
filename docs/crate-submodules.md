@@ -20,6 +20,5 @@ resolves its migrated edges to these root owners in version 1.4.4; 3 other
 members remain to migrate. Source histories, licenses and notices remain with
 each component. Licensed font assets remain in `fonts/`.
 
-Forge access uses `bun-forge` through the private VPS transport. Aphrody Infra
-owns provisioned repositories and machine identities; private credentials
+Source is plain git over GitHub. Private credentials
 remain in protected workstation or host secret stores, outside Git.
