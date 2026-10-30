@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# Headless Gamescope Gaming session in the bunos-gaming:session container (factory/images/bunos-gaming, target
+# session). Instance = session kind: launcher (RetroArch Ozone), wine or proton. The gateway reads the session's
+# PipeWire graph (gamescope capture node and audio) from /run/user/1000/gamescope-%i/pipewire-0 and injects pads it
+# creates with uinput on the host; the container sees them through /dev/input.
+#   systemctl start aphrody-gamescope@launcher
+[Unit]
+Description=Aphrody Gamescope Gaming session (%i)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+SupplementaryGroups=docker
+Environment=SIZE=1280x720
+ExecStartPre=/bin/sh -c 'install -d -m 700 /run/user/1000/gamescope-%i; docker rm -f aphrody-gamescope-%i >/dev/null 2>&1 || true'
+ExecStart=/usr/bin/docker run --rm --name aphrody-gamescope-%i --cpus 4 --memory 8g \
+  --device /dev/udmabuf --device-cgroup-rule 'c 13:* rmw' -v /dev/input:/dev/input:ro -v /run/udev:/run/udev:ro \
+  -v /run/user/1000/gamescope-%i:/run/user/1000 -v aphrody-gamescope-%i-home:/home/player \
+  -e BUNOS_SESSION=%i -e BUNOS_SESSION_SIZE=${SIZE} bunos-gaming:session
+ExecStop=/usr/bin/docker stop -t 10 aphrody-gamescope-%i
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
