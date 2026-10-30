@@ -53,7 +53,7 @@ async function hostScreenshots(ctx: Ctx, id: string, shots: { file: string; capt
 
 async function apps(ctx: Ctx): Promise<App[]> {
   const dist = Bun.env.WEBOS_DIST ?? join(ctx.store, "../current/dist");
-  const fallback = join(ctx.root, "apps/webos/public/brand/512.png");
+  const fallback = join(ctx.root, "crates/aphrody-identity/assets/brand/icon-512.png");
   const registry = (await Bun.file(join(dist, "registry.json")).json()) as {
     packages: { id: string; name: string; description: string; license: string; version: string; category: string }[];
   };
@@ -68,8 +68,8 @@ async function apps(ctx: Ctx): Promise<App[]> {
       url: `${ctx.origin}/os`,
       icon: fallback,
       screenshots: await hostScreenshots(ctx, "com.aphrody.WebOS", [
-        { file: join(ctx.root, "apps/webos/public/screens/wide.webp"), caption: "The Bun OS desktop with its welcome window, launcher and dock" },
-        { file: join(ctx.root, "apps/webos/public/screens/narrow.webp"), caption: "The Bun OS desktop on a narrow screen" },
+        { file: join(dist, "screens/wide.webp"), caption: "The Bun OS desktop with its welcome window, launcher and dock" },
+        { file: join(dist, "screens/narrow.webp"), caption: "The Bun OS desktop on a narrow screen" },
       ]),
     },
   ];
