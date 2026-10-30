@@ -20,7 +20,8 @@ force-push.
 
 - `cargo check -p bunos-utils` on the VPS (nightly-2026-09-15) passed against
   the merged uutils pins.
-- nushell, cosmic-epoch and the Pop crates have not been built through the
+- `cargo check --locked -p nu` (nushell 0.116.2) passed on the VPS in 6m03s.
+- cosmic-epoch and the Pop crates have not been built through the
   root graph yet.
 
 ## Remaining migration
