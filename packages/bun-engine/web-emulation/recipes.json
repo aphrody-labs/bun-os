@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "note": "Every emulator WebAssembly recipe of the web emulation pipeline, in build order. build-all.ts runs them on the VPS one lane at a time (cargo --jobs 4 inside build.ts) after checking the load, then regenerates the index and runs the smoke qualification. A recipe is publishable only when its smoke receipt passes (see README, Qualified installable packages).",
+  "lanes": 1,
+  "recipes": [
+    { "id": "dust-nds", "kind": "rust", "build": ["rust", "dust-nds"], "smoke": true },
+    { "id": "zakuro-3ds", "kind": "rust", "build": ["rust", "zakuro-3ds"], "smoke": true },
+    { "id": "tetanes-nes", "kind": "rust", "build": ["rust", "tetanes-nes"], "smoke": true },
+    { "id": "rustboyadvance-gba", "kind": "rust", "build": ["rust", "rustboyadvance-gba"], "smoke": true },
+    { "id": "starpsx-psx", "kind": "rust", "build": ["rust", "starpsx-psx"], "smoke": true },
+    {
+      "id": "melonds",
+      "kind": "qt-emscripten",
+      "image": "bun-os/qt-wasm:6.12.0-emsdk5.0.5",
+      "prepare": ["docker", "build", "-f", "packages/bun-engine/web-emulation/qt/Containerfile", "-t", "bun-os/qt-wasm:6.12.0-emsdk5.0.5", "packages/bun-engine/web-emulation/qt"],
+      "build": ["qt", "melonds"],
+      "smoke": true
+    },
+    { "id": "azahar", "kind": "qt-emscripten", "build": ["qt", "azahar"], "smoke": false, "note": "attempt; blockers are recorded in report.json" }
+  ]
+}

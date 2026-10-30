@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+# Staged: the Spacedrive daemon behind Drive (apps/spacedrive, sd-cli). Activate only after the VPS build of sd-cli
+# qualifies (`bun scripts/aphrody/drive/sd-daemon.ts probe`). Loopback only: the daemon speaks a local socket.
+[Unit]
+Description=Aphrody Drive (Spacedrive daemon)
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/src/bun-os
+Environment=SD_DATA_DIR=/home/ubuntu/.aphrody/drive
+ExecStart=/home/ubuntu/.local/bin/bun scripts/aphrody/drive/sd-daemon.ts foreground
+ExecStop=/home/ubuntu/.local/bin/bun scripts/aphrody/drive/sd-daemon.ts stop
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/ubuntu/.aphrody/drive
+ProtectHome=read-only
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
