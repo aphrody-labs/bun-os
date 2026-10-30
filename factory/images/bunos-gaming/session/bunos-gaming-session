@@ -30,7 +30,7 @@ case "${BUNOS_SESSION:-launcher}" in
   launcher)
     # RetroArch (Bun OS fork) is the controller-first launcher: Ozone menu, cores, playlists and the standalone
     # emulators registered as RetroArch "external" entries through their desktop files.
-    set -- retroarch --fullscreen --menu
+    set -- retroarch --appendconfig=/usr/share/bun-os/retroarch-vulkan.cfg --fullscreen --menu
     ;;
   wine)
     export WINEPREFIX="${WINEPREFIX:-$HOME/.wine}" WINEDEBUG="${WINEDEBUG:--all}"

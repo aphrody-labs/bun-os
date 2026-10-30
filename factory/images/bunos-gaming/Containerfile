@@ -43,6 +43,7 @@ FROM emulation AS session
 # (software Vulkan buffer export), -v <runtime dir>:/run/user/1000 and --device-cgroup-rule 'c 13:* rmw' -v /dev/input:/dev/input.
 COPY session.packages /usr/share/bun-os/
 COPY session/bunos-gaming-session session/bunos-wine-dxvk /usr/bin/
+COPY session/retroarch-vulkan.cfg /usr/share/bun-os/
 RUN bunos-install-packages /usr/share/bun-os/session.packages && rm -rf /var/cache/pacman/pkg/*   && chmod 755 /usr/bin/bunos-gaming-session /usr/bin/bunos-wine-dxvk   && useradd -m -u 1000 -G input player
 USER player
 ENV XDG_RUNTIME_DIR=/run/user/1000

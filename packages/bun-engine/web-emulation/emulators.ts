@@ -10,8 +10,10 @@
  * wasm: runs in the browser from /emulation/<core>/ and is qualified by booting a free ROM.
  * v86: the x86 machine of the Alpine Linux app, qualified through its serial console.
  * native: no WebAssembly build exists; the entry is a real status surface with the blocker.
+ * session: a native pacman package run in the headless Gamescope Gaming session container (bunos-gaming:session),
+ *   qualified by qualify-session.ts (gamescope screenshot and PipeWire output stream).
  */
-export type EmulatorMode = "wasm" | "v86" | "native";
+export type EmulatorMode = "wasm" | "v86" | "native" | "session";
 
 export interface EmulatorFixture {
   /** Fixture pack id (roms.json id or a generated pack). */
@@ -245,6 +247,54 @@ export const EMULATORS: Emulator[] = [
     reason: noWasm(why),
   })),
 ];
+
+/**
+ * Native packages qualified inside the Gamescope Gaming session (factory/images/bunos-gaming, target session).
+ * `app` is the command run under gamescope; `rom` is a fixture path under /roms (the staged fixtures directory).
+ * Without `rom` the emulator has no free boot path and only its own UI is checked; `blocker` says why.
+ */
+export interface SessionLaunch {
+  package: string;
+  app: string;
+  rom?: string;
+  blocker?: string;
+}
+export const SESSION: Record<string, SessionLaunch> = {
+  retroarch: { package: "bunos-retroarch", app: "retroarch --appendconfig=/usr/share/bun-os/retroarch-vulkan.cfg -L /usr/lib/libretro/nestopia_libretro.so", rom: "tetanes-test-roms/spritecans.nes" },
+  "melonds-native": { package: "melonds", app: "melonDS", rom: "godmode9i/GodMode9i.nds" },
+  "azahar-native": { package: "azahar", app: "azahar", rom: "fbi/FBI.3dsx" },
+  "tetanes-native": { package: "tetanes", app: "tetanes", rom: "tetanes-test-roms/spritecans.nes" },
+  mgba: { package: "mgba-qt", app: "mgba-qt", rom: "gba-tests/hello.gba" },
+  ares: { package: "ares-emu", app: "ares", rom: "tetanes-test-roms/spritecans.nes" },
+  dolphin: { package: "bunos-dolphin-emu", app: "dolphin-emu", blocker: "no free GameCube/Wii homebrew fixture pinned yet" },
+  pcsx2: { package: "pcsx2", app: "pcsx2-qt", blocker: "PlayStation 2 needs the user's own BIOS; no open replacement exists" },
+  cemu: { package: "cemu", app: "Cemu", blocker: "Wii U titles need the user's keys" },
+  rpcs3: { package: "rpcs3", app: "rpcs3", blocker: "PlayStation 3 needs the user's firmware (PS3UPDAT.PUP)" },
+  xemu: { package: "xemu", app: "xemu", blocker: "Xbox needs the user's MCPX boot ROM and BIOS" },
+  flycast: { package: "flycast", app: "flycast", blocker: "no free Dreamcast homebrew fixture pinned yet" },
+  vita3k: { package: "vita3k-bin", app: "Vita3K", blocker: "PlayStation Vita needs the user's firmware" },
+  shadps4: { package: "shadps4", app: "shadps4", blocker: "no free PlayStation 4 homebrew fixture pinned yet" },
+  ppsspp: { package: "ppsspp", app: "PPSSPPSDL", blocker: "no free PSP homebrew fixture pinned yet" },
+  gopher64: { package: "gopher64", app: "gopher64", blocker: "no free Nintendo 64 homebrew fixture pinned yet" },
+  mame: { package: "mame", app: "mame", blocker: "no free arcade ROM pinned yet" },
+  wine: { package: "wine", app: "wine notepad" },
+  proton: { package: "proton-bunos", app: "umu-run winecfg", blocker: "aphrody-labs/Proton and umu-launcher are not packaged yet" },
+};
+for (const [id, name, systems, owner] of [
+  ["melonds-native", "melonDS (native, Gamescope session)", ["nds"], "vendor/melonds"],
+  ["azahar-native", "Azahar (native, Gamescope session)", ["3ds"], "vendor/azahar"],
+  ["tetanes-native", "TetaNES (native, Gamescope session)", ["nes"], "vendor/tetanes"],
+  ["wine", "Wine (Windows applications, Gamescope session)", ["windows"], "factory/images/bunos-gaming/session"],
+  ["proton", "Proton (Windows games, Gamescope session)", ["windows"], "vendor/proton"],
+] as [string, string, string[], string][])
+  EMULATORS.push({ id, name, systems, mode: "session", owner });
+for (const emulator of EMULATORS)
+  if (SESSION[emulator.id] && emulator.mode === "native") {
+    emulator.mode = "session";
+    emulator.reason = SESSION[emulator.id]!.blocker
+      ? `Runs in the Gamescope Gaming session; boot test blocked: ${SESSION[emulator.id]!.blocker}.`
+      : "Runs in the Gamescope Gaming session.";
+  }
 
 export type QualificationStatus = "pass" | "fail" | "untested" | "unsupported";
 

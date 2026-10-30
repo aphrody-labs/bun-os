@@ -13,11 +13,11 @@
  */
 import { cp, mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { inflateSync } from "node:zlib";
 import { join, resolve } from "node:path";
 import { EMULATORS, type QualificationEntry, type QualificationReport } from "./emulators";
 import { Cdp, chromePath } from "./smoke.ts";
 import { stageFixtures } from "./fixtures.ts";
+import { pngHasLitPixel } from "./png.ts";
 
 const root = resolve(import.meta.dir, "../../..");
 const dist = join(root, "dist/web-emulation");
@@ -32,66 +32,6 @@ const objects = resolve(Bun.env.WEBOS_OBJECTS ?? join(Bun.env.HOME ?? root, "app
 const frames = Number(value("--frames") ?? 120);
 const timeoutMs = Number(value("--timeout-ms") ?? 600_000);
 const only = value("--only")?.split(",");
-
-/** Decodes a non-interlaced 8-bit PNG (Chrome screenshots) and reports whether any pixel channel exceeds 16. */
-function pngHasLitPixel(png: Uint8Array): boolean {
-  const view = new DataView(png.buffer, png.byteOffset, png.byteLength);
-  let offset = 8;
-  let width = 0;
-  let height = 0;
-  let channels = 4;
-  const data: Uint8Array[] = [];
-  while (offset < png.length) {
-    const length = view.getUint32(offset);
-    const type = String.fromCharCode(...png.subarray(offset + 4, offset + 8));
-    const body = png.subarray(offset + 8, offset + 8 + length);
-    if (type === "IHDR") {
-      width = view.getUint32(offset + 8);
-      height = view.getUint32(offset + 12);
-      if (body[8] !== 8 || body[12] !== 0) throw new Error("unsupported PNG (need 8-bit, non-interlaced)");
-      channels = body[9] === 6 ? 4 : body[9] === 2 ? 3 : body[9] === 0 ? 1 : 0;
-      if (!channels) throw new Error("unsupported PNG color type");
-    } else if (type === "IDAT") data.push(body);
-    offset += 12 + length;
-  }
-  const raw = inflateSync(Buffer.concat(data));
-  const stride = width * channels;
-  let previous = new Uint8Array(stride);
-  for (let y = 0; y < height; y++) {
-    const filter = raw[y * (stride + 1)]!;
-    const line = Uint8Array.from(raw.subarray(y * (stride + 1) + 1, (y + 1) * (stride + 1)));
-    for (let x = 0; x < stride; x++) {
-      const left = x >= channels ? line[x - channels]! : 0;
-      const up = previous[x]!;
-      const upLeft = x >= channels ? previous[x - channels]! : 0;
-      const predictor =
-        filter === 1
-          ? left
-          : filter === 2
-            ? up
-            : filter === 3
-              ? (left + up) >> 1
-              : filter === 4
-                ? paeth(left, up, upLeft)
-                : 0;
-      line[x] = (line[x]! + predictor) & 255;
-    }
-    for (let x = 0; x < width; x++) {
-      const p = x * channels;
-      if (line[p]! > 16 || line[p + (channels > 2 ? 1 : 0)]! > 16 || line[p + (channels > 2 ? 2 : 0)]! > 16)
-        return true;
-    }
-    previous = line;
-  }
-  return false;
-}
-function paeth(a: number, b: number, c: number) {
-  const p = a + b - c;
-  const pa = Math.abs(p - a);
-  const pb = Math.abs(p - b);
-  const pc = Math.abs(p - c);
-  return pa <= pb && pa <= pc ? a : pb <= pc ? b : c;
-}
 
 function git(...a: string[]) {
   const r = Bun.spawnSync(["git", ...a], { cwd: root });
@@ -338,6 +278,17 @@ const pageServer = Bun.serve({
     if (local)
       return new Response(Bun.file(join(pageDir, local)), { headers: { ...isolation, "cache-control": "no-store" } });
     if (url.pathname === "/favicon.ico") return new Response(null, { status: 204 });
+    // The catalog and the published cores come from this checkout and the objects directory directly: the WebOS
+    // server no longer hosts the browser emulators (ADR-003), only the report written below.
+    if (url.pathname === "/api/emulators") return Response.json({ emulators: EMULATORS }, { headers: isolation });
+    const published = /^\/emulation\/(.+)$/.exec(url.pathname)?.[1];
+    if (published) {
+      if (published.split("/").some((part) => !part || part === "." || part === "..")) return new Response("bad path", { status: 400 });
+      const file = Bun.file(join(objects, "emulation", published));
+      if (!(await file.exists())) return new Response("not found", { status: 404, headers: isolation });
+      const type = published.endsWith(".wasm") ? "application/wasm" : published.endsWith(".js") ? "text/javascript" : file.type;
+      return new Response(file, { headers: { ...isolation, "content-type": type } });
+    }
     const upstream = await fetch(`${base}${url.pathname}${url.search}`, { headers: request.headers });
     const headers = new Headers(upstream.headers);
     for (const [k, v] of Object.entries(isolation)) headers.set(k, v);
@@ -352,7 +303,10 @@ try {
   for (const emulator of EMULATORS) {
     if (only && !only.includes(emulator.id)) continue;
     let entry: QualificationEntry;
-    if (emulator.mode === "native") {
+    if (emulator.mode === "session") {
+      // Qualified by qualify-session.ts inside the Gamescope Gaming session; keep its last result.
+      entry = previous?.entries[emulator.id] ?? { id: emulator.id, status: "untested", errors: [], detail: emulator.reason };
+    } else if (emulator.mode === "native") {
       entry = {
         id: emulator.id,
         status: "unsupported",
