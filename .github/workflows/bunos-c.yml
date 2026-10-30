@@ -6,7 +6,7 @@ name: Bun OS C
 
 on:
   push:
-    branches: [main, os]
+    branches: [main]
     paths:
       - "factory/c/**"
       - "packages/buncc/src/c/**"

@@ -6,7 +6,7 @@
  *   bun factory/sync/bunos-sync.ts --loop     repeat every BUNOS_SYNC_INTERVAL seconds (tmux fallback, default 600)
  *   bun factory/sync/bunos-sync.ts --dry-run  print the decision, change nothing
  *
- * One pass:
+ * One pass (any checked-out branch or detached HEAD: only a safe fast-forward or a normal push of HEAD:main is ever done):
  *   1. fetch origin/main (https, credentials from `gh auth git-credential`; no token is ever stored or printed here).
  *   2. Behind only: fast-forward (`git merge --ff-only`). Submodule pointers are NOT updated (the build does that).
  *   3. Ahead only (local commits on main): `git push origin HEAD:main` (normal push).
@@ -27,7 +27,7 @@ const push = process.env.BUNOS_SYNC_PUSH !== "0";
 const dryRun = process.argv.includes("--dry-run");
 const loop = process.argv.includes("--loop");
 
-type Outcome = "current" | "fast-forwarded" | "pushed" | "diverged" | "dirty" | "wrong-branch" | "error";
+type Outcome = "current" | "fast-forwarded" | "pushed" | "diverged" | "dirty" | "error";
 
 async function git(...args: string[]): Promise<{ code: number; out: string }> {
   const proc = Bun.spawn(["git", "-C", repo, ...args], {
@@ -54,7 +54,6 @@ function record(outcome: Outcome, detail: string, extra: Record<string, unknown>
 async function pass(): Promise<Outcome> {
   const branch = await git("rev-parse", "--abbrev-ref", "HEAD");
   if (branch.code !== 0) return record("error", `not a git checkout: ${branch.out}`);
-  if (branch.out !== "main") return record("wrong-branch", `checked out ${branch.out}, expected main; nothing changed`);
 
   const fetch = await git("fetch", "--no-recurse-submodules", "origin", "main");
   if (fetch.code !== 0) return record("error", `fetch failed: ${fetch.out.split("\n").at(-1)}`);
@@ -85,14 +84,14 @@ async function pass(): Promise<Outcome> {
       ? record("pushed", `${remote.out.slice(0, 10)}..${local.out.slice(0, 10)}`, sha)
       : record("error", `push rejected: ${pushed.out.split("\n").at(-1)}`, sha);
   }
-  return record("diverged", "local main and origin/main both have commits; needs a manual merge (never forced)", sha);
+  return record("diverged", "local HEAD and origin/main both have commits; needs a manual merge (never forced)", sha);
 }
 
 async function main() {
   if (!loop) {
     const outcome = await pass();
     process.exit(
-      outcome === "diverged" || outcome === "dirty" || outcome === "wrong-branch" ? 2 : outcome === "error" ? 1 : 0,
+      outcome === "diverged" || outcome === "dirty" ? 2 : outcome === "error" ? 1 : 0,
     );
   }
   for (;;) {
