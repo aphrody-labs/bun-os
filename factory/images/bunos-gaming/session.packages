@@ -1,6 +1,6 @@
 # Headless Gamescope Gaming session (target "session"): gamescope and RetroArch from the Bun OS forks, Wine with the
 # forked DXVK/vkd3d-proton, software Vulkan/GL for GPU-less hosts and the PipeWire graph the gateway captures.
-# Proton (aphrody-labs/Proton) and umu-launcher are not packaged yet; the proton session needs both.
+# Proton is proton-bunos (aphrody-labs/proton-ge-custom) launched through umu-launcher.
 bunos-gamescope
 bunos-retroarch
 retroarch-assets-ozone
@@ -16,3 +16,5 @@ pipewire
 pipewire-pulse
 wireplumber
 xorg-xwayland
+umu-launcher
+proton-bunos

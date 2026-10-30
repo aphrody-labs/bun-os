@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=xemu
-Comment=xemu emulator (Bun OS package of xemu-project/xemu v0.8.139)
-Exec=xemu %f
-Icon=xemu
-Terminal=false
-Categories=Game;Emulator;
-StartupWMClass=xemu

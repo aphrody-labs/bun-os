@@ -16,7 +16,7 @@ import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { EMULATORS, type QualificationEntry, type QualificationReport } from "./emulators";
 import { Cdp, chromePath } from "./smoke.ts";
-import { stageFixtures } from "./fixtures.ts";
+import { stageFixtures, writeCatalog } from "./fixtures.ts";
 import { pngHasLitPixel } from "./png.ts";
 
 const root = resolve(import.meta.dir, "../../..");
@@ -252,6 +252,7 @@ if (!flag("--no-publish")) {
   await publish();
 }
 const staged = await stageFixtures(objects);
+await writeCatalog(objects);
 if (flag("--no-run")) process.exit(0);
 
 const reportPath = join(objects, "emulators/qualification.json");

@@ -17,6 +17,9 @@ export XDG_RUNTIME_DIR
 mkdir -p -m 700 "$XDG_RUNTIME_DIR"
 export XDG_SESSION_TYPE=wayland XDG_CURRENT_DESKTOP=gamescope
 export SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS=0 ENABLE_GAMESCOPE_WSI=1 vk_xwayland_wait_ready=false
+# GL clients run as native Wayland clients of gamescope (--expose-wayland): on software rendering the GL path through
+# Xwayland presents black frames (verified: eglgears_wayland renders, glxgears through Xwayland stays black).
+export SDL_VIDEODRIVER=wayland QT_QPA_PLATFORM=wayland GDK_BACKEND=wayland MOZ_ENABLE_WAYLAND=1 ELECTRON_OZONE_PLATFORM_HINT=wayland
 size=${BUNOS_SESSION_SIZE:-1280x720}
 fps=${BUNOS_SESSION_FPS:-60}
 

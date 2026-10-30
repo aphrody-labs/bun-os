@@ -15,7 +15,7 @@ import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { EMULATORS, SESSION, type QualificationEntry, type QualificationReport } from "./emulators";
-import { stageFixtures } from "./fixtures.ts";
+import { stageFixtures, stageSessionFixtures, writeCatalog } from "./fixtures.ts";
 import { pngHasLitPixel } from "./png.ts";
 
 const root = resolve(import.meta.dir, "../../..");
@@ -51,7 +51,8 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
   const name = `bunos-q-${id}-${process.pid}`;
   const runtime = await mkdtemp(join(tmpdir(), "bunos-session-"));
   const entry: QualificationEntry = { id, status: "fail", errors: [], testedAt: new Date().toISOString() };
-  const command = `${launch.app}${launch.rom ? ` /roms/${launch.rom}` : ""}`;
+  const rom = launch.rom ? `/roms/${launch.rom}` : "";
+  const command = launch.app.includes("{rom}") ? launch.app.replace("{rom}", rom) : `${launch.app}${rom ? ` ${rom}` : ""}`;
   try {
     const started = await sh([
       "docker",
@@ -175,6 +176,8 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
 if ((await sh(["docker", "image", "inspect", image])).code)
   throw new Error(`session image ${image} is not built (bun factory image build bunos-gaming --target session)`);
 await stageFixtures(objects);
+await stageSessionFixtures(objects);
+await writeCatalog(objects);
 const fixtures = join(objects, "emulation/fixtures");
 const reportPath = join(objects, "emulators/qualification.json");
 const previous: QualificationReport | undefined = (await Bun.file(reportPath).exists())
