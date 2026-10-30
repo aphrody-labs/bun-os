@@ -456,39 +456,6 @@ define(
     ...script("factory/ubuntu.ts"),
   },
 
-  // source ------------------------------------------------------------------------------------
-  {
-    group: "source",
-    name: "plan",
-    summary: "Plan the source portal mirrors",
-    ...script("scripts/source-portal.ts", "plan"),
-  },
-  {
-    group: "source",
-    name: "refresh",
-    summary: "Refresh the source portal inventory and format it",
-    target: "scripts/source-portal.ts",
-    ...sequence(
-      () => spawn([process.execPath, abs("scripts/source-portal.ts"), "refresh"]),
-      () =>
-        spawn([
-          process.execPath,
-          "fmt",
-          "--no-script",
-          "--write",
-          "--config",
-          "bun-format.json",
-          "infra/source-portal.json",
-        ]),
-    ),
-  },
-  {
-    group: "source",
-    name: "verify",
-    summary: "Verify the live source portal",
-    ...script("scripts/source-portal.ts", "verify", "--live"),
-  },
-
   // docs --------------------------------------------------------------------------------------
   {
     group: "docs",

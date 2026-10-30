@@ -145,10 +145,7 @@ Required status checks for `os`: `ci.yml#plan`, `ci.yml#quality`, `ci.yml#rust`,
 | `just install-plan` | - |
 | `just packages-plan` | - |
 | `just packages-build` | - |
-| `just source-plan` | - |
 | `just source-workspace` | - |
-| `just source-refresh` | - |
-| `just source-verify` | - |
 | `just server-serve` | - |
 | `just server-build` | - |
 | `just server-verify` | - |

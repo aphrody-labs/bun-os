@@ -181,20 +181,8 @@ packages-build selection:
     bun run packages:build --package "{{ selection }}"
 
 [group('plans')]
-source-plan:
-    bun run source:plan
-
-[group('plans')]
 source-workspace:
     bun run workspace:source
-
-[group('plans')]
-source-refresh:
-    bun run source:refresh
-
-[group('plans')]
-source-verify:
-    bun run source:verify
 
 # Run the product through its canonical app-host owner.
 [group('product')]

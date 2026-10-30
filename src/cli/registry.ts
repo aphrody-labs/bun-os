@@ -31,7 +31,6 @@ export const GROUPS: Group[] = [
   { name: "workspace", summary: "Catalog, assets, manifests and inventories of the Bun OS workspace" },
   { name: "build", summary: "Build apps, packages, images, WebAssembly and releases" },
   { name: "factory", summary: "Distribution factory: plans, graphs, Arch rootfs, images, MSYS2, usr" },
-  { name: "source", summary: "Source portal: plan, refresh and verify the mirrored repositories" },
   { name: "docs", summary: "Documentation gates" },
   { name: "desktop", summary: "Bun desktop app" },
   { name: "webos", summary: "aphrody.com: the Bun OS in the browser (build, craft apps, serve, deploy)" },

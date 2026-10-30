@@ -465,12 +465,6 @@
       "ownerRepo": "aphrody",
       "targetHost": "vps",
       "site": "00-default"
-    },
-    {
-      "file": "nginx/shared/source-tunnel-auth.conf",
-      "ownerRepo": "aphrody",
-      "targetHost": "vps",
-      "site": "source-tunnel-auth"
     }
   ]
 }
