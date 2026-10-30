@@ -20,8 +20,14 @@ git merge-base --is-ancestor "$commit" refs/remotes/origin/main ||
 git diff --quiet HEAD -- crates/aphrody-webos-server crates/aphrody-webos-client crates/aphrody-webos-protocol crates/aphrody-inventory ||
   { echo "Commit the WebOS crates before releasing" >&2; exit 1; }
 
+# The web lane of the shared factory (AGENTS.md: at most four compiler jobs per concurrent lane): its own serialized
+# lock and target directory, so a long workspace job in another lane does not block a site release.
+lane="${WEBOS_CARGO_LANE:-$HOME/.cache/aphrody/lanes/webos}"
+target="${WEBOS_CARGO_TARGET:-$HOME/build/storage/targets/webos}"
+mkdir -p "$lane" "$target"
 cargo_serial() {
-  CARGO_BUILD_JOBS=4 APHRODY_BUILD_HOST='' APHRODY_LOCAL_CARGO=1 scripts/aphrody/build/rust/cargo-serial.sh "$@"
+  CARGO_BUILD_JOBS=4 APHRODY_BUILD_HOST='' APHRODY_LOCAL_CARGO=1 APHRODY_CARGO_LOCK_DIR="$lane" \
+    APHRODY_CARGO_TARGET_DIR="$target" scripts/aphrody/build/rust/cargo-serial.sh "$@"
 }
 cargo_serial build --release -p aphrody-webos-server -p aphrody-inventory
 # WebAssembly at full feature level (owner order): SIMD, relaxed SIMD, bulk memory, saturating float conversion, sign
@@ -32,9 +38,9 @@ CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS="-C target-feature=+simd128,+relax
 handoff="${WEBOS_DEPLOY_ROOT:-$root/build/webos-deploy}"
 release="$handoff/releases/$commit-$(date +%s%3N)"
 mkdir -p "$release/client"
-install -m 0755 target/release/aphrody-webos "$release/aphrody-webos"
+install -m 0755 "$target/release/aphrody-webos" "$release/aphrody-webos"
 wasm-bindgen --target web --no-typescript --out-dir "$release/client" \
-  target/wasm32-unknown-unknown/release/aphrody_webos_client.wasm
+  "$target/wasm32-unknown-unknown/release/aphrody_webos_client.wasm"
 wasm-opt -Oz --all-features \
   "$release/client/aphrody_webos_client_bg.wasm" -o "$release/client/aphrody_webos_client_bg.wasm"
 # Browser emulator test page (packages/bun-engine/web-emulation), served until the iced client hosts the emulators.
@@ -58,7 +64,7 @@ install -m 0644 crates/aphrody-webos-client/web/index.html crates/aphrody-webos-
   done
 )
 # Inventory of every member plus the built wasm modules, with the coverage gate (exits non-zero on failure).
-target/release/aphrody-inventory write "$release/inventory" --versions
+"$target/release/aphrody-inventory" write "$release/inventory" --versions
 printf 'SOURCE_COMMIT=%s\n' "$commit" > "$release/release.env"
 
 (
