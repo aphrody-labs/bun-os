@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# Android binder for the redroid session container (aphrody-redroid): loads binder_linux and mounts binderfs at /dev/binderfs.
+# Android 14+ redroid images refuse non-LTS kernels (NetBpfLoad) on this host; the session runs redroid 13.
+[Unit]
+Description=Aphrody Android binderfs (redroid sessions)
+Before=docker.service
+DefaultDependencies=yes
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/modprobe binder_linux
+ExecStart=/usr/bin/mkdir -p /dev/binderfs
+ExecStart=/bin/sh -c 'mountpoint -q /dev/binderfs || mount -t binder binder /dev/binderfs'
+
+[Install]
+WantedBy=multi-user.target
