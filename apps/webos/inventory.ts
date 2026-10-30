@@ -360,7 +360,7 @@ async function packageMembers(out: Detail[]) {
       version: pkg?.version,
       license: pkg?.license,
       run: bin.length ? "cli" : "library",
-      tags: [bin.length ? "cli" : "library", ...(publishable ? ["npm"] : ["private"]), ...(child.dir && !pkg ? ["no-manifest"] : [])],
+      tags: [bin.length ? "cli" : "library", ...(publishable ? ["npm"] : ["unpublished"]), ...(child.dir && !pkg ? ["no-manifest"] : [])],
       links: [
         sourceLink(path),
         ...(publishable ? [{ label: "npm", url: `https://www.npmjs.com/package/${name}` }] : []),
