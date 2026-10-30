@@ -4,6 +4,7 @@ import { h } from "../../dom";
 import type { Store, View } from "./core";
 import { grid } from "./parts";
 import { emptyState } from "./states";
+import { viewHome } from "./home";
 
 type ViewFn = (s: Store) => HTMLElement;
 /** Plain catalog grid; screens replace their entry as they are built. */
@@ -14,7 +15,7 @@ const basic: ViewFn = (s) => {
 };
 
 export const views: Record<View, ViewFn> = {
-  home: basic,
+  home: viewHome,
   collection: basic,
   search: basic,
   library: basic,

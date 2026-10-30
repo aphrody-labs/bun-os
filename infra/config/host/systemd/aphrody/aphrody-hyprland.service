@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+# Real Hyprland (Wayland) compositor, headless, software rendering. systemd USER unit of ubuntu (needs linger).
+# Dedicated runtime dir: /run/user/1000/aphrody-hypr (socket wayland-aphrody, hyprctl instance dir).
+[Unit]
+Description=Aphrody Hyprland headless Wayland session
+After=pipewire.service
+
+[Service]
+Type=simple
+Environment=XDG_RUNTIME_DIR=%t/aphrody-hypr
+Environment=AQ_BACKENDS=headless
+Environment=WLR_BACKENDS=headless
+Environment=WLR_RENDERER_ALLOW_SOFTWARE=1
+Environment=LIBGL_ALWAYS_SOFTWARE=1
+Environment=XDG_SESSION_TYPE=wayland
+Environment=XDG_CURRENT_DESKTOP=Hyprland
+Environment=HYPRLAND_NO_SD_NOTIFY=1
+ExecStartPre=/usr/bin/install -d -m 0700 %t/aphrody-hypr
+ExecStartPre=-/usr/bin/ln -sfn %t/pipewire-0 %t/aphrody-hypr/pipewire-0
+ExecStart=/usr/bin/Hyprland -c %h/.config/hypr/hyprland.conf
+Restart=always
+RestartSec=3
+Nice=5
+
+[Install]
+WantedBy=default.target
