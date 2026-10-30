@@ -1,0 +1,87 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# Installs the real native apps of the Aphrody desktop session (headless Hyprland) with their upstream identity:
+#   base            Rio (upstream release deb, replaces Ubuntu's unrelated "rio" MP3 CLI), GNOME Web (WebKitGTK), fuzzel,
+#                   icon themes (Papirus, Adwaita, COSMIC), Aphrody Browser/Chat/Search launchers, upstream icons.
+#   cosmic <name>.. COSMIC apps from the checksum-pinned Pop!_OS archive debs (container/cosmic-packages.json)
+#   spacedrive      Spacedrive (apps/spacedrive of this repository) via its Tauri build
+# Builds are serialised and capped at 4 compiler jobs (shared factory slots). Run inside tmux; log in ~/native-apps/log.
+set -eu
+ROOT=${APHRODY_ROOT:-$HOME/src/bun-os}
+WORK=$HOME/native-apps
+PREFIX=$HOME/.local
+EPOCH=${COSMIC_EPOCH:-epoch-1.11.0}
+RIO=${RIO_VERSION:-0.5.28}
+export CARGO_BUILD_JOBS=4 PATH="$PREFIX/bin:$HOME/.cargo/bin:$PATH"
+mkdir -p "$WORK" "$PREFIX/share/applications" "$PREFIX/share/icons/hicolor/scalable/apps"
+
+icon() { # icon <desktop-icon-name> <webos asset id> [ext]
+  ext=${3:-svg}
+  case $ext in
+  svg) install -D "$ROOT/apps/webos/public/apps/$2/icon.svg" "$PREFIX/share/icons/hicolor/scalable/apps/$1.svg" ;;
+  png) install -D "$ROOT/apps/webos/public/apps/$2/icon.png" "$PREFIX/share/icons/hicolor/256x256/apps/$1.png" ;;
+  esac
+}
+
+desktop() { # desktop <file-id> <Name> <Comment> <Exec> <Icon> <StartupWMClass> [Categories]
+  cat >"$PREFIX/share/applications/$1.desktop" <<D
+[Desktop Entry]
+Type=Application
+Name=$2
+Comment=$3
+Exec=$4
+Icon=$5
+StartupWMClass=$6
+Categories=${7:-Utility;}
+Terminal=false
+D
+}
+
+base() {
+  sudo apt-get remove -y rio >/dev/null 2>&1 || true # Diamond Rio MP3 CLI, not the terminal
+  if ! rio --version 2>/dev/null | grep -q rioterm; then
+    d=$WORK/rio; mkdir -p "$d"
+    curl -fsSL -o "$d/rioterm.deb" "https://github.com/raphamorim/rio/releases/download/v$RIO/rioterm_${RIO}_amd64_wayland.deb"
+    sudo apt-get install -y "$d/rioterm.deb"
+  fi
+  sudo apt-get install -y epiphany-browser fuzzel papirus-icon-theme adwaita-icon-theme libglib2.0-bin
+  # COSMIC icon theme (pop-os/cosmic-icons, CC-BY-SA-4.0)
+  [ -d "$WORK/cosmic-icons" ] || git clone --depth 1 https://github.com/pop-os/cosmic-icons "$WORK/cosmic-icons"
+  (cd "$WORK/cosmic-icons" && just rootdir= prefix="$PREFIX" install 2>/dev/null || { mkdir -p "$PREFIX/share/icons" && cp -r freedesktop "$PREFIX/share/icons/Cosmic" 2>/dev/null; })
+  icon aphrody-browser aphrody; icon aphrody-chat aphrody-workspace; icon aphrody-search aphrody
+  icon spacedrive spacedrive png
+  # Aphrody apps are real GNOME Web (WebKitGTK) application-mode windows with their own profile and identity.
+  web() { epi="epiphany --application-mode --profile=$HOME/.local/share/aphrody-$1"; echo "$epi $2"; }
+  desktop aphrody-browser "Aphrody Browser" "Browse the web (WebKitGTK)" "epiphany --new-window https://aphrody.com" aphrody-browser org.gnome.Epiphany "Network;WebBrowser;"
+  desktop aphrody-chat "Aphrody Chat" "Chat with the Bun OS model backend" "$(web chat https://aphrody.com/workspace/os)" aphrody-chat org.gnome.Epiphany "Network;Chat;"
+  desktop aphrody-search "Aphrody Search" "Search apps, packages, crates and docs of Bun OS" "$(web search 'https://aphrody.com/?app=search')" aphrody-search org.gnome.Epiphany "Utility;"
+  update-desktop-database "$PREFIX/share/applications" 2>/dev/null || true
+  gtk-update-icon-cache -f -t "$PREFIX/share/icons/hicolor" 2>/dev/null || true
+}
+
+cosmic() { # cosmic cosmic-files ... : the checksum-pinned Pop!_OS archive debs of container/cosmic-packages.json
+  d=$WORK/cosmic-debs; mkdir -p "$d"
+  ROOT=$ROOT D=$d bun -e '
+    const lock = await Bun.file(`${process.env.ROOT}/container/cosmic-packages.json`).json();
+    for (const n of process.argv.slice(1)) {
+      const e = lock.packages.find((p) => p.name === n);
+      if (!e) throw new Error(`${n} is not in the pinned COSMIC set`);
+      const r = await fetch(`${lock.repository}/${e.path}`);
+      if (!r.ok) throw new Error(`${n}: ${r.status}`);
+      const buf = await r.arrayBuffer();
+      if (new Bun.CryptoHasher("sha256").update(buf).digest("hex") !== e.sha256) throw new Error(`${n}: checksum mismatch`);
+      await Bun.write(`${process.env.D}/${n}.deb`, buf);
+    }' "$@"
+  sudo apt-get install -y --no-install-recommends $(for n in "$@"; do echo "$d/$n.deb"; done)
+}
+
+spacedrive() {
+  cd "$ROOT/apps/spacedrive/apps/tauri"
+  bun install --frozen-lockfile 2>/dev/null || bun install
+  bun run daemon:sidecar && bun x tauri build --no-bundle
+  install -D "$ROOT/apps/spacedrive/target/release/Spacedrive" "$PREFIX/bin/spacedrive"
+  desktop spacedrive Spacedrive "Spacedrive: the virtual distributed file manager" "$PREFIX/bin/spacedrive" spacedrive Spacedrive "System;FileManager;"
+}
+
+cmd=${1:-base}; shift || true
+case $cmd in base) base ;; cosmic) cosmic "$@" ;; spacedrive) spacedrive ;; *) echo "usage: $0 base|cosmic <repo>...|spacedrive" >&2; exit 2 ;; esac
