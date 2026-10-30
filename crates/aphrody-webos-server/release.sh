@@ -14,8 +14,9 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$root"
 git fetch --quiet origin
 commit="$(git rev-parse HEAD)"
-[[ "$commit" == "$(git rev-parse refs/remotes/origin/main)" ]] ||
-  { echo "Release the published main tip (git fetch origin && git merge --ff-only origin/main)" >&2; exit 1; }
+# A published commit (on origin/main); main moves fast with concurrent agents, the activator re-checks ancestry.
+git merge-base --is-ancestor "$commit" refs/remotes/origin/main ||
+  { echo "Release a published commit of main (git fetch origin && git merge --ff-only origin/main)" >&2; exit 1; }
 git diff --quiet HEAD -- crates/aphrody-webos-server crates/aphrody-webos-client crates/aphrody-webos-protocol crates/aphrody-inventory ||
   { echo "Commit the WebOS crates before releasing" >&2; exit 1; }
 
