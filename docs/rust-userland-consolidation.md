@@ -27,5 +27,5 @@ force-push.
 ## Remaining migration
 
 Nested workspaces stay until their manifests migrate in controlled batches.
-`vendor/uutils` is still in the root `exclude` list. COSMIC builds on stable
+All of these mounts are in the root `exclude` list (cargo otherwise claims their crates as root members). COSMIC builds on stable
 Rust, so it remains a separate composition from the nightly root toolchain.
