@@ -139,8 +139,17 @@
     },
     "rio": {
       "upstream": "https://github.com/raphamorim/rio",
-      "role": "default terminal (Linux session; Redox recipe wip/term/rioterm when it builds)",
-      "recipe": "wip/term/rioterm"
+      "branch": "main",
+      "rev": "59203ccd5fa1e6b760a738c1ad653bb29f2f3465",
+      "submodule": "vendor/rio",
+      "role": "default terminal (Linux session; Redox recipe wip/term/rioterm when it builds); pin owned by factory/rustbase/forks.json"
+    },
+    "smithay": {
+      "upstream": "https://github.com/Smithay/smithay",
+      "branch": "aphrody",
+      "rev": "f581531d479cf2e3307bafb913c5d2bb12860bb3",
+      "submodule": "vendor/smithay",
+      "role": "cosmic-comp compositor library; pin owned by factory/rustbase/forks.json"
     }
   },
   "apps": {
