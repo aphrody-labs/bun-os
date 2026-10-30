@@ -1,15 +1,17 @@
 # Synchronisation: local, GitHub, VPS
 
-Owner decision of 2026-10-29: Bun OS is not a production project, everything lives on `main` and the three copies converge
-automatically. Nothing is ever forced.
+Owner decision of 2026-10-30: plain git and GitHub (`aphrody-labs/bun-os`, branch `main`) only. There is no self-hosted forge,
+no Gitea runner and no `os` branch ceremony. Nothing is ever forced.
 
 | Copy | Mechanism | Direction |
 | --- | --- | --- |
-| GitHub `aphrody-labs/bun-os`, branch `main` | source of truth, default branch | - |
-| GitHub branch `os` | `.github/workflows/sync-os-mirror.yml` fast-forwards it on every push to `main` | main -> os |
+| GitHub `aphrody-labs/bun-os`, branch `main` | source of truth, default and only branch | - |
 | Locks and generated docs | `.github/workflows/regen-locks.yml` (Cargo.lock, bun.lock, component pins, architecture map) commits to `main` | runner -> main |
 | Workstation `C:\bun-os` | Scheduled Task `BunOS-Sync` (every 10 min) runs `git pull --ff-only origin main` | main -> local |
 | VPS `~/src/bun-os` | `factory/sync/bunos-sync.ts` via a systemd user timer or tmux loop | main <-> VPS (ff, push if ahead) |
+
+Flow for any change: `git fetch origin`, fast-forward or merge `origin/main`, `git push origin HEAD:main` (normal push only).
+Builds and qualification run on the VPS checkout; the workstation edits and synchronises sources.
 
 ## Workstation
 
@@ -27,18 +29,14 @@ a dirty or diverged clone makes `git pull --ff-only` refuse, and the refusal is 
 
 ## GitHub
 
-- `main` is the default branch. Workflows trigger on `branches: [main, os]`; the `os` mirror is fast-forward only.
-- If `os` ever holds commits that `main` lacks, the mirror job opens (or updates) the issue "os mirror out of sync with main"
-  instead of forcing. Merge `origin/os` into `main` to clear it.
-- A fast-forward that changes `.github/workflows/*` is rejected for `GITHUB_TOKEN`. Create the repository secret `MIRROR_TOKEN`
-  (a PAT of the owner with `repo` and `workflow` scopes) to let the mirror carry those changes; without it the mirror job raises
-  the same issue with state `push-failed`.
-- Pushes made by `GITHUB_TOKEN` (the lock regeneration commit, the mirror) do not start new workflow runs, so they cannot loop.
+- `main` is the default and only branch. Workflows trigger on `branches: [main]`.
+- The GitHub `os` ref is a stale leftover. It is not maintained or deleted by this tooling; ignore it.
+- Pushes made by `GITHUB_TOKEN` (the lock regeneration commit) do not start new workflow runs, so they cannot loop.
 
 ## VPS
 
-See [VPS-BUILD.md](VPS-BUILD.md) (installer, status file, build recipe, btrfs recovery). Nothing is installed there until the
-owner restores access.
+See [VPS-BUILD.md](VPS-BUILD.md) (installer, status file, build recipe, btrfs recovery). `bunos-sync.ts` fast-forwards
+whatever branch is checked out when that is safe, and never touches a dirty or diverged tree.
 
 ## Branches
 

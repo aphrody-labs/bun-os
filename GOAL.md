@@ -69,7 +69,7 @@ becomes an optional module, plugin or package of this workspace. Preserve import
 only to first-party material.
 
 Finish by qualifying the integrated setup and workspace, committing precise
-owned paths on branch `main` (`os` is a fast-forward mirror of `main`), and pushing after verifying remote ancestry.
+owned paths on branch `main` (the only branch), and pushing after verifying remote ancestry.
 
 ## Target crate and infrastructure contract
 
@@ -77,14 +77,11 @@ This is the target architecture; nested workspaces and crates not yet migrated
 remain incomplete work. Each product Rust crate is to become a pinned Git
 submodule directly under `crates/<package-name>`, sharing the root Cargo
 workspace, version, dependency table and nightly toolchain. The root owns
-`build`, `target`, `node_modules` and `install`. Bun OS Infra provisions
-declared forge repositories and machine identities idempotently; credentials
+`build`, `target`, `node_modules` and `install`. Credentials
 remain in protected secret stores.
 
-Self-host every Aphrody Labs source repository through the existing Infra and
-forge owners. Preserve upstream histories, branch identities, public/private
-visibility, and protected stores. The canonical source portal is
-`https://source.aphrody.app`, backed by the existing forge server and API.
+Source is plain git plus GitHub (`aphrody-labs/bun-os`); the self-hosted forge was retired on 2026-10-30. Preserve upstream histories, branch identities, public/private
+visibility, and protected stores.
 Qualify standalone product binaries, server routes, and one orchestration
 owner separately from source mirror and configuration delivery. Mirror jobs
 must be resumable and admitted against actual host capacity.

@@ -2,7 +2,7 @@
 
 ## Branches — 2026-10-29
 
-- main is the default and only integration branch. os is a fast-forward mirror kept by .github/workflows/sync-os-mirror.yml; do not push to it.
+- main is the only branch. Source is plain git plus GitHub `aphrody-labs/bun-os`; there is no self-hosted forge (retired 2026-10-30). The GitHub `os` ref is stale and no longer maintained: never push to it.
 - Push with a normal git push origin HEAD:main, never forced. Synchronisation of the workstation, GitHub and the VPS: [docs/SYNC.md](docs/SYNC.md); VPS build and recovery: [docs/VPS-BUILD.md](docs/VPS-BUILD.md).
 
 ## Owner workflow update — 2026-10-18
@@ -70,8 +70,7 @@ boundaries. Keep upstream license notices intact.
 The owner's target contract is flat Git submodules for product Rust crates in
 `crates/<package-name>`, inherited from one root Cargo workspace and nightly
 toolchain. This target is not complete: root Cargo exclusions and nested
-workspace boundaries remain. Provision declared forge repositories and access
-through the Bun OS Infra owner, with credentials in protected secret stores.
+workspace boundaries remain. Credentials stay in protected secret stores.
 Verify each crate's current owner and migration state from the source inventory.
 
 Preserve protected `.local` stores, credentials, sessions, databases, model
