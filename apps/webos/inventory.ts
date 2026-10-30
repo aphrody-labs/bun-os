@@ -182,7 +182,7 @@ function headerText(text: string, length = 240): string {
     } else if (line.startsWith("/*")) {
       block = !line.includes("*/");
       body = line.replace(/^\/\*+!?\s*/, "").replace(/\*\/.*$/, "");
-    } else if (/^(\/\/[/!]?|#(?![!\[]))/.test(line)) body = line.replace(/^(\/\/[/!]?|#)\s?/, "");
+    } else if (/^(\/\/[/!]?|#(?![![]))/.test(line)) body = line.replace(/^(\/\/[/!]?|#)\s?/, "");
     else if (out.length || /^(#!|"use |import |export |use |mod |pub |const |let |\{)/.test(line)) break;
     else continue;
     body = body.trim();
