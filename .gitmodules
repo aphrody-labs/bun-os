@@ -1588,3 +1588,7 @@
 	url = https://github.com/oven-sh/bun.git
 	branch = main
 	shallow = true
+[submodule "vendor/flutter"]
+	path = vendor/flutter
+	url = https://github.com/aphrody-labs/flutter.git
+	branch = stable
