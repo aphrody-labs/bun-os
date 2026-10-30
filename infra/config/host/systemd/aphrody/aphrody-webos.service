@@ -10,6 +10,7 @@ User=ubuntu
 WorkingDirectory=/home/ubuntu/apps/webos/current
 Environment=WEBOS_ADDR=127.0.0.1:8790
 Environment=WEBOS_CLIENT_DIR=/home/ubuntu/apps/webos/current/client
+Environment=WEBOS_OBJECTS=/home/ubuntu/apps/webos/objects
 EnvironmentFile=/home/ubuntu/apps/webos/current/release.env
 ExecStart=/home/ubuntu/apps/webos/current/aphrody-webos
 Restart=always

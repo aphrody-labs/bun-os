@@ -3,6 +3,7 @@
 //! client, `/api/health` and `/api/os`, and merges the routers of the session, stream, repository and inventory crates
 //! as they land. Until the client is built into the release, `/` is a page rendered here.
 
+mod emulators;
 mod health;
 mod page;
 
@@ -110,6 +111,10 @@ fn app(state: Arc<AppState>) -> Router {
         .route("/api/os", get(os_catalog))
         .with_state(state)
         .merge(inventory)
+        .merge(emulators::router(
+            env_path("WEBOS_OBJECTS", "objects"),
+            env_path("WEBOS_EMULATOR_PAGE", "emulator"),
+        ))
         .fallback_service(assets)
         .layer(middleware::from_fn(log))
         .layer(CompressionLayer::new())

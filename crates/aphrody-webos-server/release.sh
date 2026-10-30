@@ -33,6 +33,9 @@ wasm-bindgen --target web --no-typescript --out-dir "$release/client" \
   target/wasm32-unknown-unknown/release/aphrody_webos_client.wasm
 wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext \
   "$release/client/aphrody_webos_client_bg.wasm" -o "$release/client/aphrody_webos_client_bg.wasm"
+# Browser emulator test page (packages/bun-engine/web-emulation), served until the iced client hosts the emulators.
+mkdir -p "$release/emulator"
+install -m 0644 packages/bun-engine/web-emulation/qualify-page/* "$release/emulator/"
 install -m 0644 crates/aphrody-webos-client/web/index.html crates/aphrody-webos-client/web/boot.js "$release/client/"
 # Inventory of every member plus the built wasm modules, with the coverage gate (exits non-zero on failure).
 target/release/aphrody-inventory write "$release/inventory" --versions
