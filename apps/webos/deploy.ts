@@ -31,7 +31,7 @@ await mkdir(release, { recursive: true });
 const imported = Bun.env.WEBOS_PREBUILT_DIST;
 if (!imported) {
   const build = Bun.spawn(
-    [process.execPath, join(import.meta.dir, "build-product.ts")],
+    [process.execPath, join(import.meta.dir, "make.ts"), "build"],
     { cwd: root, stdout: "inherit", stderr: "inherit" },
   );
   if (await build.exited) throw new Error("WebOS product assembly failed");

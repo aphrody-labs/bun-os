@@ -6,15 +6,17 @@
   "author": "aphrody-dev <contact@aphrody.com>",
   "type": "module",
   "scripts": {
-    "build": "bun build-product.ts",
-    "build:shell": "bun build.ts",
-    "dev": "bun build-product.ts && bun services/serve.ts",
-    "deploy": "bun deploy.ts",
+    "build": "bun make.ts build",
+    "build:shell": "bun make.ts shell",
+    "dev": "bun make.ts build && bun make.ts serve",
+    "deploy": "bun make.ts deploy",
     "inventory": "bun inventory.ts",
     "check:coverage": "bun inventory.ts --check",
     "qualify:emulators": "bun ../../packages/bun-engine/web-emulation/qualify-webos.ts",
     "typecheck": "bun check -p tsconfig.json --noEmit",
-    "serve": "bun services/serve.ts"
+    "serve": "bun make.ts serve",
+    "wasm": "bun make.ts wasm",
+    "craft": "bun make.ts craft"
   },
   "dependencies": {
     "@aphrody/app-ui": "workspace:*",
