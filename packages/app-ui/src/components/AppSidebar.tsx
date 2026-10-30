@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
+import { GearSix } from "@phosphor-icons/react";
 import { CircleButton } from "@aphrody/m3-primitives";
 import { clsx } from "clsx";
 import { useMemo, useState } from "react";
