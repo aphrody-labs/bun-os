@@ -18,5 +18,3 @@ Source configuration lives in this repository under `infra/config`:
 - `infra/config/host/nginx/aphrody/control.aphrody.app.json`: typed ingress.
 
 See [control plane](../../docs/control-plane.md) for qualification and limits.
-The [qualification receipt](qualification.json) contains sanitized live CI and
-mirror evidence; it declares no host policy or credentials.

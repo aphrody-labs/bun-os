@@ -2,7 +2,7 @@
 
 The root owns the Cargo workspace, nightly, shared dependency versions and
 outputs. Each migrated product crate lives at `crates/<package-name>` as a
-pinned forge Git submodule, retaining its source history and license notices.
+pinned Git submodule, retaining its source history and license notices.
 
 Inspect immutable manifests before choosing a migration batch:
 
@@ -35,7 +35,7 @@ The geometry, drawing database and constraint solver histories were split from
 CADCraft revision `00c7613f1af3c73f7157fa91d9fe2635c6f23c06` without changing
 the source branch. Their projected trees exactly match the original prefixes.
 
-| Root crate             | Source prefix        | Projected history                          | Forge integration                          |
+| Root crate             | Source prefix        | Projected history                          | Integration                                |
 | ---------------------- | -------------------- | ------------------------------------------ | ------------------------------------------ |
 | `cadcraft-geom`        | `crates/geom`        | `e2e29710996f30623fbccad1b07daccaf8c53d2f` | `18271b67f9745c9502c0921fd5ebd735845e9396` |
 | `cadcraft-doc`         | `crates/doc`         | `639f93c82f1eeec3c1db67dfd7170ab31cb74537` | `fdc2a37b7f98482c951cf674d57cf87b0e2307fb` |
@@ -61,7 +61,7 @@ application build and tests were not run.
 `cadcraft-dxf` is split from CADCraft source revision
 `421652b27081ef984ebb1c86c80b4e0d34f6211a`, prefix `crates/dxf`. The split
 commit is `92817364e6ee09aea7560925cbe039353182a450`; its tree exactly matches
-the source prefix. The private forge `os` branch is at
+the source prefix. The split `os` branch is at
 `2fb064dc24dd17ee08850ee339a3fcb966edbadc`; it retains the source-license
 import commit `0b16386136b048fde06b6bab4b9cd73bdedbdde9` and the Bun OS
 workspace integration. The CADCraft consumer branch `os` is at
@@ -80,7 +80,7 @@ after formatting the imported files. Tests were not run.
 `cadcraft-dwg` is split from CADCraft source revision
 `d9f215e852e193fe2c4d1c8702e36abc410468c4`, prefix `crates/dwg`. The split
 commit is `4bd80fdfcded4cc1d063607515053e53f789e731`; its tree matches the
-source prefix. The private forge `os` branch is at
+source prefix. The split `os` branch is at
 `8c7012f1b2d3d54d6907b32296e2bab43ee99520`, preserving the source licenses,
 NOTICE and attribution. The CADCraft consumer branch `os` is at
 `88e15b5b11e3b844b6dfff97a0210daa3ae73051`; it redirects the dependency and
@@ -95,7 +95,7 @@ passes, and the complete root Rust format check passes. Tests were not run.
 `cadcraft-fonts` is split from CADCraft source revision
 `88e15b5b11e3b844b6dfff97a0210daa3ae73051`, prefix `crates/fonts`. The split
 commit is `ddb2e5b0db66a8fc6e5be24331a905b7f758d233`; its tree matches the
-source prefix. The private forge `os` branch is at
+source prefix. The split `os` branch is at
 `ae107d5ba70f0b2ac10dadbdb7d5ba1a18acb4c1`, retaining the source license
 import at `680006dcda26f88fb84cd6ec15250c5176801ddf` and workspace integration
 at `c00471e3872302529d57f698de386044ce10da5f`. CADCraft consumer branch `os` is at
@@ -113,7 +113,7 @@ the root Rust format check passes. Tests were not run.
 `cadcraft-render` is split from CADCraft revision
 `533857d44f193c709fe66a650605e53d5d0f8ed0`, prefix `crates/render`, at
 `21f71a0d7fbff82a6f6dae1885f09037b6a93433`; the split tree matches the source
-prefix. Its private forge `os` branch is `3bc0d98ea0ff384d8ab46f76ed7da2dc6cef39d7`, with exact MIT, Apache,
+prefix. Its split `os` branch is `3bc0d98ea0ff384d8ab46f76ed7da2dc6cef39d7`, with exact MIT, Apache,
 NOTICE and attribution files. CADCraft consumer branch `os` redirects the
 dependency and removes the original 37 tracked files. Root locked offline
 metadata resolves 579 packages and `cargo check --locked --offline
@@ -124,7 +124,7 @@ metadata resolves 579 packages and `cargo check --locked --offline
 `cadcraft-io` is split from CADCraft revision
 `79eba098b8754170835ff3538203cf8294e2e1ac`, prefix `crates/io`, at
 `e31d3f3aced049dd4c5a7a59f34e2b8714376ea8`; its tree matches the source
-prefix. The private forge `os` branch is `7d9497ecc8775b4c597ec2fe8ffa1b7fee9e1c9b`, with exact MIT, Apache,
+prefix. The split `os` branch is `7d9497ecc8775b4c597ec2fe8ffa1b7fee9e1c9b`, with exact MIT, Apache,
 NOTICE and attribution files. CADCraft consumer branch `os` at
 `9b4966200834de9810e76f134596712eb3b70a72` redirects to the root owner and removes the original 65 tracked
 files. The IO owner uses the root `miniz_oxide` 0.9.1 and `quick-xml` 0.41.0
@@ -137,7 +137,7 @@ Tests were not run.
 `cadcraft-cli` is split from CADCraft revision
 `7966d9d6758f805985092ec8f68c53bbe35b727d`, prefix `apps/cadcraft-cli`, with
 history-preserving split `97e1f5ccfd1e558c6a8a2a2d602580c94ff5a8b4` and tree
-`e7949e5f317ad078ad2199649c763932b80e57bb`. Its private forge `os` branch is
+`e7949e5f317ad078ad2199649c763932b80e57bb`. Its split `os` branch is
 `559b99d8c2d6012d8f62b68b15d5fbdca9cee7b0`; CADCraft consumer branch `os` is
 `837073bb37aacc8c6b143c7e5886961b7335998f`. The consumer removes the original
 five tracked CLI files, updates its lockfile, and routes the parity command to
@@ -154,7 +154,7 @@ format check pass; tests were not run.
 `cadcraft-engine` is split from CADCraft revision
 `9b4966200834de9810e76f134596712eb3b70a72`, prefix `crates/engine`, at
 `c757465de70d1ff6fe17ead04e07340ea97efa59`; the split tree matches its source
-prefix. Its private forge `os` branch is
+prefix. Its split `os` branch is
 `f90b4f5b0a237a2614fa0ca1969c7e7d8684fcb9`, with exact MIT, Apache, NOTICE and
 attribution files. CADCraft consumer branch `os` at
 `e9842fac1cf85e8205d036de9f1eb8c873e06786` redirects the engine dependency
@@ -168,7 +168,7 @@ complete root Rust format check pass. Tests were not run.
 `cadcraft-mcp` is split from CADCraft revision
 `e9842fac1cf85e8205d036de9f1eb8c873e06786`, prefix `crates/mcp`, at
 `315641f5c83a0bec16fb5c383ed3a75e44abf6fb`; the split tree matches its source
-prefix. Its private forge `os` branch is
+prefix. Its split `os` branch is
 `f270867625e262cab5872bed061e0e007dbb113b`, with exact MIT, Apache, NOTICE and
 attribution files. CADCraft consumer branch `os` at
 `1451a5592bb581fddeb332091cd2136e8a32515a` redirects to the root owner and
@@ -181,7 +181,7 @@ resolves 585, the MCP crate check and complete root Rust format check pass.
 `cadcraft-ui-egui` is split from CADCraft revision
 `1451a5592bb581fddeb332091cd2136e8a32515a`, prefix `crates/ui-egui`, with
 history-preserving split `a1f85460e2dea27021c90d7f129c4d4c048a76ce`. Its tree
-matches the pinned source prefix. The private forge owner is at
+matches the pinned source prefix. The split owner is at
 `e069e194f6a0adce7e5fcdd968ef0cf8f5973656`; CADCraft `os` redirects the
 consumer at `7966d9d6758f805985092ec8f68c53bbe35b727d`. The consumer workspace
 removes the old nested crate and narrows its member glob to apps and `xtask`.
@@ -252,7 +252,7 @@ is on the same release.
 
 ## Independent Craft library batch
 
-Four self-contained product crates were split from their immutable source pins into dedicated private Gitea repositories. The split commit tree was checked against the source crate-prefix tree. Root Cargo membership and shared dependency declarations are centralized separately; this batch does not edit root manifests or locks.
+Four self-contained product crates were split from their immutable source pins into dedicated private repositories. The split commit tree was checked against the source crate-prefix tree. Root Cargo membership and shared dependency declarations are centralized separately; this batch does not edit root manifests or locks.
 
 | Crate                | Source pin and prefix                                                   | Split commit                               | Root dependency |
 | -------------------- | ----------------------------------------------------------------------- | ------------------------------------------ | --------------- |
@@ -270,7 +270,7 @@ root formatting pass on native Windows. The full offline feature graph resolves
 526 package identities against the unchanged 514-package vendor source snapshot.
 Compilation, Clippy and tests remain pending the release owner's native window.
 
-| Crate                | Pinned forge `os` revision after root formatting |
+| Crate                | Pinned `os` revision after root formatting |
 | -------------------- | ------------------------------------------------ |
 | `deckcraft-matroska` | `0b81b6f11085ad571f6705bfbb940b48e1a2eeae`       |
 | `pdfcraft-compare`   | `28ab78b38b9062f5cd47d6289a19b1262eb0ed74`       |
@@ -287,7 +287,7 @@ Eight crates were extracted from Aphrody source commit
 splits. Each split tree was checked against the corresponding source prefix.
 The child manifests inherit version, edition and Rust version from the Bun OS
 workspace, keep the source `Apache-2.0` license locally, point repository
-metadata at the private Gitea source, and reproduce the effective source Rust
+metadata at the split source, and reproduce the effective source Rust
 and Clippy lints locally because the distribution root does not define those
 workspace lint tables. Each child contains a byte-identical copy of the
 Apache license from the pinned Aphrody tree.
@@ -316,7 +316,7 @@ manifest intent only; it does not claim native compile, Clippy, or test gates.
 
 The integrated 20-member root passes locked offline metadata with all features
 (559 identities: 20 product crates and 539 remote source packages), root Rust
-formatting, TypeScript checking of 111 files, lint and formatting. Child forge
+formatting, TypeScript checking of 111 files, lint and formatting. Child
 refs match the formatted local heads; Apache notices and fixture trees remain
 unchanged. Native compilation, Clippy and tests for this batch remain pending.
 
@@ -372,7 +372,7 @@ features by default so consumers enable `client` only where needed.
 The response contract preserves `usage: null` when token accounting is
 unavailable; an explicit zero remains a reported measurement. Existing
 Aphrody `agent-tools` and MCP adapters remain protected consumer paths and are
-not duplicated in this root batch. The forge `os` pin is
+not duplicated in this root batch. The `os` pin is
 `be4a36bd503c79d98619ad39c8b2d0fbc36632eb`. Cargo formatting and complete
 locked metadata with all features pass: 25 root members and 568 identities,
 including 543 remote sources. No pre-existing locked version changed.

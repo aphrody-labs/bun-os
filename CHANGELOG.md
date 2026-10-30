@@ -40,8 +40,8 @@ Nothing listed here has been published to npm or crates.io yet (see
 - Product hosts redirect to paths of https://aphrody.com from one catalog (`dcb3436c24`); see
   [APP-DOMAINS](docs/APP-DOMAINS.md).
 - The WebOS shell is bundled with `NODE_ENV=production` so Lit leaves dev mode (`15d3c89088`).
-- Craft studios integrated into the WebOS workspace (`4ceeaed72b`); hourly site reconciliation
-  (`085b4d37ea`, `.gitea/workflows/aphrody-sites.yaml`).
+- Craft studios integrated into the WebOS workspace
+  (`4ceeaed72b`; site deploy now `.github/workflows/aphrody-sites.yml`).
 
 ### Domains
 

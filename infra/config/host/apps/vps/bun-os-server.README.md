@@ -24,10 +24,8 @@ its single unit binds loopback29030. Inject `APHRODY_APP_TOKEN` only from
 belongs in Git or command arguments). A persistent bearer was generated idempotently in this protected store. Infra
 secret validation reports SECURE (1/1); directory0700 and file0600 are verified. The catalog remains staged and not required at boot.
 
-Integrate `nginx/snippets/bun-os-product-api.inc` into the existing source.aphrody.app
-TLS server only after service and proxy probes pass. Its external prefix is
-`/api/product/v1/`; it rewrites to the server's `/api/v1/`. No new vhost is introduced. The bearer header is preserved. Public proxy/TLS origin policy
-must be qualified against the app-host transport before activation.
+The product API has no public ingress; add a route in `nginx/routes.json` only after
+service qualification.
 
 The typed Infra catalog, repository registry and internal-only port policy all
 carry this source/service owner. Systemd candidate verification and Nginx candidate syntax checks pass. Automatic

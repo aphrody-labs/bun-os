@@ -41,15 +41,6 @@
     },
     "bytes": 154165944
   },
-  "ingress": {
-    "owner": "existing-source-forge-vhost",
-    "origin": "https://source.aphrody.app",
-    "prefix": "/api/product/v1/",
-    "upstreamPrefix": "/api/v1/",
-    "snippet": "tools/config/host/nginx/snippets/bun-os-product-api.inc",
-    "authentication": "bearer from protected Infra secret store",
-    "existingForgePrefix": "/api/v1/"
-  },
   "qualification": {
     "linuxCompiled": true,
     "linuxExecuted": true,

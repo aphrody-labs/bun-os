@@ -477,20 +477,11 @@ function assertProductOrigin(origin: string): void {
     "https://github.com/aphrody-labs/bun-distribution.git",
     "git@github.com:aphrody-labs/bun-distribution",
     "git@github.com:aphrody-labs/bun-distribution.git",
-    "bun-forge:aphrody-dev/bun-distribution.git",
-    "https://source.aphrody.app/aphrody-dev/bun-distribution.git",
-    "ssh://git@source.aphrody.app/aphrody-dev/bun-distribution.git",
-    "git@source.aphrody.app:aphrody-dev/bun-distribution.git",
     // aphrody-labs/bun-distribution was renamed aphrody-labs/bun-os on 2026-10-25.
     "https://github.com/aphrody-labs/bun-os",
     "https://github.com/aphrody-labs/bun-os.git",
     "git@github.com:aphrody-labs/bun-os",
     "git@github.com:aphrody-labs/bun-os.git",
-    "bun-forge:aphrody-dev/bun-os.git",
-    "git@bun-forge:aphrody-dev/bun-os.git",
-    "https://source.aphrody.app/aphrody-dev/bun-os.git",
-    "ssh://git@source.aphrody.app/aphrody-dev/bun-os.git",
-    "git@source.aphrody.app:aphrody-dev/bun-os.git",
   ]);
   if (!knownOrigins.has(origin)) throw new Error("Bun OS workspace is outside its product owner");
 }

@@ -14,7 +14,6 @@ WorkingDirectory=/home/ubuntu/src/bun-os/install/bin
 ExecStart=/home/ubuntu/src/bun-os/install/bin/bun-os-server
 Environment=HOST=127.0.0.1
 Environment=PORT=29030
-Environment=APHRODY_APP_ORIGIN=https://source.aphrody.app
 EnvironmentFile=/home/ubuntu/.aphrody/secrets/bun-os/server.env
 Restart=on-failure
 RestartSec=5

@@ -26,7 +26,7 @@ app aliases, derives `redirectFor` from it. The shell opens the package of a
 catalog path, and the legacy `/?app=<package>` link redirects to that path.
 `bun.aphrody.com` and `bun.aphrody.app` are the Bun site (Worker `aphrody-app`, owned by the bun repo) and are not routed by this catalog.
 
-Hosts that stay separate (`keep: true`): `git.aphrody.app`, `source.aphrody.app`, `deploy.aphrody.app`, `downloads.aphrody.com`, `cdn.aphrody.com`, `assets.aphrody.app`, `dist.aphrody.app`, `nie.aphrody.com`.
+Hosts that stay separate (`keep: true`): `deploy.aphrody.app`, `downloads.aphrody.com`, `cdn.aphrody.com`, `assets.aphrody.app`, `dist.aphrody.app`, `nie.aphrody.com`.
 
 | Host | Kind | Redirects to |
 | --- | --- | --- |

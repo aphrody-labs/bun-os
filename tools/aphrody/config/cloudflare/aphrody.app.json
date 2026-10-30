@@ -36,13 +36,11 @@
       { "type": "AAAA", "name": "effectcraft.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "figcraft.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "filmcraft.aphrody.app", "proxied": true, "ttl": 1 },
-      { "type": "A", "name": "git.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "gridcraft.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "lightcraft.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "pdfcraft.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "photocraft.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "soundcraft.aphrody.app", "proxied": true, "ttl": 1 },
-      { "type": "A", "name": "source.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "vectorcraft.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "wordcraft.aphrody.app", "proxied": true, "ttl": 1 },
       { "type": "AAAA", "name": "www.aphrody.app", "proxied": true, "ttl": 1 }
@@ -87,8 +85,6 @@
   "productDomains": [
     { "id": "apt", "hostname": "apt.aphrody.app", "owner": "bun-os" },
     { "id": "desktop", "hostname": "desktop.aphrody.app", "owner": "bun-os" },
-    { "id": "source", "hostname": "source.aphrody.app", "owner": "aphrody-infra" },
-    { "id": "git", "hostname": "git.aphrody.app", "owner": "aphrody-infra" },
     { "id": "deploy", "hostname": "deploy.aphrody.app", "owner": "aphrody-infra" }
   ],
   "worker": {
