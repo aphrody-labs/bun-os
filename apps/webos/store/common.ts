@@ -112,9 +112,11 @@ export async function step(steps: QualStep[], name: string, fn: () => Promise<{ 
 }
 
 /** docker run helper for throw-away containers on the host network (no privileges unless asked). */
-export const docker = (image: string, script: string, opts: { privileged?: boolean; mounts?: string[]; user?: string; timeout?: number; env?: Record<string, string> } = {}) =>
+/** docker run helper for throw-away containers on the host network; `lock` serializes runs that write one repository (flock, six hours). */
+export const docker = (image: string, script: string, opts: { privileged?: boolean; mounts?: string[]; user?: string; timeout?: number; env?: Record<string, string>; lock?: string } = {}) =>
   run(
     [
+      ...(opts.lock ? ["flock", "-w", "21600", opts.lock] : []),
       "docker", "run", "--rm", "--network", "host",
       ...(opts.privileged ? ["--privileged"] : []),
       ...(opts.user ? ["--user", opts.user] : []),

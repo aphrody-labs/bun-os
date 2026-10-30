@@ -222,7 +222,8 @@ export async function build(ctx: Ctx): Promise<void> {
   await mkdir(keyDir(ctx), { recursive: true, mode: 0o700 });
   const only = Bun.env.PACMAN_ONLY?.split(",").filter(Boolean);
   const dirs = BUILD.filter((d) => !only || only.includes(d.split("/").pop()!));
-  const work = join(ctx.store, ".work/pacman");
+  // One work directory per run: concurrent runs (compiles of one, packaging of another) must not share it.
+  const work = join(ctx.store, `.work/pacman-${process.pid}`);
   await rm(work, { recursive: true, force: true });
   await mkdir(join(work, "src"), { recursive: true });
   const failures = new Map<string, string>();
@@ -298,7 +299,9 @@ chmod -R a+rX /os
 `;
   const r = await docker(IMAGE, script, {
     mounts: [`${work}:/work`, `${join(ctx.store, "repo/os")}:/os`, `${keyDir(ctx)}:/gnupg`, `${bun}:/usr/local/bin/bun:ro`],
-    timeout: Math.min(12, 1 + 2 * names.length) * HOURS,
+    timeout: Math.min(12, 1 + 2 * names.length) * HOURS + 6 * HOURS,
+    // One writer of the repository database at a time; host compiles of other runs continue meanwhile.
+    lock: join(ctx.store, ".pacman.lock"),
   });
   console.log(tail(r.out, 40));
   if (r.code) throw new Error("pacman build failed");
