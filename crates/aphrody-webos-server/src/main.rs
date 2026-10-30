@@ -14,7 +14,7 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use axum::{
-    Json, Router,
+    Router,
     extract::{Request, State},
     http::{HeaderValue, header},
     middleware::{self, Next},
