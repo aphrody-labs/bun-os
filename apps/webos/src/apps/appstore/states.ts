@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // S09 States: loading skeleton, empty, error with retry.
 import { h } from "../../dom";
-import { mi } from "./core";
+import { mi, type Store } from "./core";
 
 /** Skeleton placeholders shaped like the screen that is loading (no animation under prefers-reduced-motion). */
 export function skeleton(kind: "home" | "list" | "detail") {
@@ -36,4 +36,13 @@ export function errorState(title: string, detail: string, retry: () => void) {
     h("p", { class: "st-note" }, detail),
     h("button", { class: "btn", type: "button", onclick: retry }, "Try again"),
   );
+}
+
+/** Unknown ?store= deep link: say so and offer search and Home. */
+export function viewNotFound(s: Store): HTMLElement {
+  const id = s.state.query;
+  const guess = id.split(/[:/]/).pop() ?? "";
+  const out = emptyState(`"${id}" is not in the catalog`, "The link may be old, or the app moved to another source.", { label: "Back to Home", run: () => s.go("home", { tab: "home", query: "" }) });
+  if (guess) out.append(h("button", { class: "st-link", type: "button", onclick: () => s.go("search", { query: guess, source: "" }) }, `Search for "${guess}"`));
+  return out;
 }
