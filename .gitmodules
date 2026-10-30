@@ -1477,4 +1477,19 @@
 	path = vendor/redox/redox
 	url = https://github.com/aphrody-labs/redox.git
 	branch = bunos
+[submodule "vendor/microsoft/edit"]
+	path = vendor/microsoft/edit
+	url = https://github.com/microsoft/edit.git
+	shallow = true
+[submodule "vendor/microsoft/cascadia-code"]
+	path = vendor/microsoft/cascadia-code
+	url = https://github.com/microsoft/cascadia-code.git
+	shallow = true
+[submodule "vendor/microsoft/terminal"]
+	path = vendor/microsoft/terminal
+	url = https://github.com/microsoft/terminal.git
+	shallow = true
+[submodule "vendor/microsoft/vscode"]
+	path = vendor/microsoft/vscode
+	url = https://github.com/microsoft/vscode.git
 	shallow = true
