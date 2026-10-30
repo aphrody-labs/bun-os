@@ -68,7 +68,11 @@ export const explorerRoutes = [
       },
       {
         path: "chat",
-        element: <DesktopOnly><CodexChatRoute /></DesktopOnly>,
+        element: (
+          <DesktopOnly>
+            <CodexChatRoute />
+          </DesktopOnly>
+        ),
       },
       {
         path: "codex",
@@ -84,7 +88,11 @@ export const explorerRoutes = [
       },
       {
         path: "models",
-        element: <DesktopOnly><ModelsHub /></DesktopOnly>,
+        element: (
+          <DesktopOnly>
+            <ModelsHub />
+          </DesktopOnly>
+        ),
       },
       {
         path: "games/:core?",
@@ -96,15 +104,27 @@ export const explorerRoutes = [
       },
       {
         path: "studio",
-        element: <DesktopOnly><StudioRoute /></DesktopOnly>,
+        element: (
+          <DesktopOnly>
+            <StudioRoute />
+          </DesktopOnly>
+        ),
       },
       {
         path: "creator",
-        element: <DesktopOnly><CreatorRoute /></DesktopOnly>,
+        element: (
+          <DesktopOnly>
+            <CreatorRoute />
+          </DesktopOnly>
+        ),
       },
       {
         path: "admin",
-        element: <DesktopOnly><AdminRoute /></DesktopOnly>,
+        element: (
+          <DesktopOnly>
+            <AdminRoute />
+          </DesktopOnly>
+        ),
       },
       {
         path: "favorites",
