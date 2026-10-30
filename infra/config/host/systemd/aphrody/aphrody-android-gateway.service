@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Rust gateway of the Android session (crates/aphrody-remote-desktop, features wayland,android): scrcpy 5.0.1 H.264
-# from the aphrody-redroid container (adb 127.0.0.1:5555) to WebCodecs, on 127.0.0.1:8799 behind nginx /api/android/.
+# from the Android 17 Waydroid session (aphrody-android17.service, adb 192.168.240.112:5555; the aphrody-redroid 13 container on 127.0.0.1:5555 is the fallback serial) to WebCodecs, on 127.0.0.1:8799 behind nginx /api/android/.
 # /etc/aphrody/android.token (root:ubuntu 0640): bearer token (secret, never in the repository).
 [Unit]
 Description=Aphrody Android session gateway (scrcpy -> WebCodecs)
-After=docker.service aphrody-binderfs.service network-online.target
+After=docker.service aphrody-binderfs.service aphrody-android17.service network-online.target
 Wants=docker.service
 
 [Service]
@@ -13,7 +13,7 @@ User=ubuntu
 WorkingDirectory=/home/ubuntu/apps/remote-desktop
 Environment=HOME=/home/ubuntu
 Environment=APHRODY_REMOTE_TOKEN_FILE=/etc/aphrody/android.token
-ExecStart=/home/ubuntu/apps/remote-desktop/aphrody-remote-desktop --android 127.0.0.1:5555 --scrcpy-server /home/ubuntu/apps/remote-desktop/scrcpy-server-v5.0.1 --bind 127.0.0.1:8799 --max-size 1920 --max-fps 60 --bit-rate 8000000 --adb /usr/bin/adb
+ExecStart=/home/ubuntu/apps/remote-desktop/aphrody-remote-desktop --android 192.168.240.112:5555 --scrcpy-server /home/ubuntu/apps/remote-desktop/scrcpy-server-v5.0.1 --bind 127.0.0.1:8799 --max-size 2560 --max-fps 60 --bit-rate 8000000 --adb /usr/bin/adb
 Restart=always
 RestartSec=3
 NoNewPrivileges=true
