@@ -9,6 +9,8 @@
 //! [`target`] is the single remote-target model (local, MCP HTTP, VNC, WebSocket, shell)
 //! resolved from the declared WireGuard tunnel; [`tokens`] is the single credential source.
 
+#[cfg(feature = "android")]
+pub mod android;
 pub mod backend;
 pub mod encode;
 pub mod keymap;

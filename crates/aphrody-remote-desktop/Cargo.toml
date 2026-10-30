@@ -20,6 +20,8 @@ required-features = ["wayland"]
 default = []
 # Pure-Rust Wayland capture/input backend (wlr-screencopy, virtual pointer/keyboard).
 wayland = ["dep:wayland-client", "dep:wayland-protocols-misc", "dep:wayland-protocols-wlr"]
+# Android sessions: scrcpy H.264 passthrough to WebCodecs, aphrody-webos-protocol input (`/api/android/*`).
+android = ["dep:aphrody-webos-protocol"]
 # RFB server fed by the capture backend (`aphrody infra remote serve --vnc`).
 vnc-server = ["dep:rustvncserver"]
 # RFB client (`aphrody infra remote connect vnc://`, VNC computer-use backend).
@@ -29,6 +31,7 @@ vnc = ["vnc-server", "vnc-client"]
 [dependencies]
 anyhow = "1.0.104"
 aphrody-capture = { path = "../aphrody-capture", version = "1.4.7", features = [] }
+aphrody-webos-protocol = { path = "../aphrody-webos-protocol", version = "1.4.7", optional = true }
 aphrody-secrets = { path = "../aphrody-secrets", version = "1.4.7", features = [] }
 aphrody-wireguard = { path = "../aphrody-wireguard", version = "1.4.7", features = [] }
 axum = { version = "0.8", default-features = false, features = ["json", "query", "tokio", "http1", "http2", "ws"] }
