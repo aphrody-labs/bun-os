@@ -52,6 +52,7 @@ for (const required of [
     packages: { id: string; name: string; description: string; category: string; version?: string; license?: string }[];
   };
   const inventory = await buildInventory({
+    versions: true,
     games: registry.packages.filter((p) => p.category === "games"),
     wasmModules: new Set(["aphrody-webos-wasm"]),
   });

@@ -281,6 +281,21 @@ export async function memberPage(
       h("dl", { class: "kv" }, ...rows.flatMap(([k, v]) => [h("dt", {}, k), h("dd", {}, v)])),
     );
   }
+  const history = detail.meta?.history as
+    | { versions: string[]; latest?: string; total: number; published: boolean; checked: string }
+    | undefined;
+  if (history)
+    body.append(
+      h("h3", {}, "Published versions"),
+      h(
+        "p",
+        {},
+        history.published
+          ? `Latest ${history.latest} of ${history.total} versions: ${history.versions.join(", ")}`
+          : "Not published on the registry yet.",
+        h("span", { class: "muted" }, ` (registry checked ${history.checked.slice(0, 10)})`),
+      ),
+    );
   if (detail.members?.length) {
     body.append(h("h3", {}, `Members (${detail.members.length})`));
     const list = h("div", { class: "atlas-members" });
@@ -345,9 +360,10 @@ export async function atlasApp(
   const words = (s: string) =>
     s.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
   function rows(): InvMember[] {
-    const pool =
-      kind === "all" ? index.members : index.members.filter((m) => m.kind === kind);
     const terms = words(query);
+    // Typing searches every kind; the kind list narrows the browsing view only.
+    const pool =
+      kind === "all" || terms.length ? index.members : index.members.filter((m) => m.kind === kind);
     if (!terms.length) return pool;
     return pool
       .map((m) => {
@@ -404,7 +420,7 @@ export async function atlasApp(
           h(
             "span",
             { class: "muted atlas-sub" },
-            `${kind === "all" ? `${KINDS[m.kind].label} · ` : ""}${SURFACE_LABEL[m.surface.type]}`,
+            `${kind === "all" || query ? `${KINDS[m.kind].label} · ` : ""}${SURFACE_LABEL[m.surface.type]}`,
           ),
         ),
       ),

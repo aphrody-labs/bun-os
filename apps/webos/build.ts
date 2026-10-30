@@ -329,6 +329,7 @@ await stageGamesContent(dist);
 // The full inventory: every member of the repository with the WebOS surface that serves it (inventory.ts).
 const inventory = await buildInventory({
   apps,
+  versions: true,
   games: built.filter((p) => p.category === "games"),
   // The crates whose WebAssembly module this deployment ships (copied to dist/wasm below).
   wasmModules: new Set(["aphrody-webos-wasm"]),

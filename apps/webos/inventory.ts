@@ -17,6 +17,7 @@ import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
 import { APPS, ROUTES, type MemberKind } from "./src/config";
 import { KIND_IDS, KINDS, type Kind, type SurfaceType } from "./src/inventory-kinds";
 import { frontmatter, plain } from "./docs";
+import { FILE_DESCRIPTIONS, MEMBER_DESCRIPTIONS } from "./descriptions";
 
 const root = resolve(import.meta.dir, "../..");
 
@@ -157,6 +158,53 @@ function commentLine(text: string): string {
   }
   return "";
 }
+/** Leading comment block of a source file: `//!`, `//`, `#` or a block comment, without license and tooling lines. */
+function headerText(text: string, length = 240): string {
+  const out: string[] = [];
+  let block = false;
+  for (const raw of text.split("\n").slice(0, 40)) {
+    const line = raw.trim();
+    if (!line) {
+      if (out.length) break;
+      continue;
+    }
+    let body: string | undefined;
+    if (block) {
+      body = line.replace(/^\*+\s?/, "");
+      if (line.includes("*/")) block = false;
+      body = body.replace(/\*\/.*$/, "");
+    } else if (line.startsWith("/*")) {
+      block = !line.includes("*/");
+      body = line.replace(/^\/\*+!?\s*/, "").replace(/\*\/.*$/, "");
+    } else if (/^(\/\/[/!]?|#(?![!\[]))/.test(line)) body = line.replace(/^(\/\/[/!]?|#)\s?/, "");
+    else if (out.length || /^(#!|"use |import |export |use |mod |pub |const |let |\{)/.test(line)) break;
+    else continue;
+    body = body.trim();
+    if (!body || /^(SPDX|Copyright|eslint|@ts-|prettier|biome|-\*-|vim:)/i.test(body)) continue;
+    out.push(body);
+    if (out.join(" ").length >= length) break;
+  }
+  const flat = out.join(" ").replace(/`|\*\*/g, "").replace(/\s+/g, " ").trim();
+  return flat.length > length ? `${flat.slice(0, length - 1)}…` : flat;
+}
+/** Description from the entry files of a directory (lib.rs, main.rs, index.ts, mod.ts, ...) or its first source file. */
+async function sourceDescription(dir: string, files: string[]): Promise<string> {
+  const rank = (f: string) => {
+    const rel = f.slice(dir.length + 1);
+    const i = ["src/lib.rs", "src/main.rs", "src/index.ts", "src/mod.ts", "src/main.ts", "index.ts", "mod.ts", "main.ts", "index.js", "build.ts", "index.mjs", "src/index.tsx", "lib.rs", "main.rs", "src/lib.ts"].indexOf(rel);
+    return i < 0 ? 100 + rel.split("/").length : i;
+  };
+  const candidates = files
+    .filter((f) => /\.(rs|ts|tsx|js|mjs|py|sh|ps1|just)$/.test(f) && !/\.(test|spec|d)\.ts$|node_modules|\/tests?\//.test(f))
+    .sort((a, b) => rank(a) - rank(b) || a.localeCompare(b))
+    .slice(0, 6);
+  for (const file of candidates) {
+    const text = await readText(file, 6000);
+    const header = text ? headerText(text) : "";
+    if (header.length >= 12) return header;
+  }
+  return "";
+}
 const tomlDesc = (text: string) => {
   const line = text.split("\n").find((l) => l.startsWith("description"));
   const start = line?.indexOf('"') ?? -1;
@@ -280,7 +328,7 @@ async function appMembers(out: Detail[], apps: AppEntry[]) {
       kind: "apps",
       id: app.id,
       name: app.id,
-      desc: app.d || (readme ? firstParagraph(readme) : "") || `Bun OS ${app.run} app at ${path}.`,
+      desc: app.d || (readme ? firstParagraph(readme) : "") || (await sourceDescription(path, child.files)) || `Bun OS ${app.run} app at ${path}.`,
       path,
       version: pkg?.version,
       license: pkg?.license,
@@ -307,7 +355,7 @@ async function packageMembers(out: Detail[]) {
       kind: "packages",
       id: child.name,
       name,
-      desc: pkg?.description || (readme ? firstParagraph(readme) : "") || `Bun OS package at ${path}.`,
+      desc: pkg?.description || (readme ? firstParagraph(readme) : "") || (await sourceDescription(path, child.files)) || `Bun OS package at ${path}.`,
       path,
       version: pkg?.version,
       license: pkg?.license,
@@ -357,7 +405,7 @@ async function crateMembers(out: Detail[], wasmModules: Set<string>) {
       kind: "crates",
       id: child.name,
       name,
-      desc: pk.description || (readme ? firstParagraph(readme) : "") || `Bun OS crate at ${path}.`,
+      desc: pk.description || (readme ? firstParagraph(readme) : "") || (await sourceDescription(path, child.files)) || `Bun OS crate at ${path}.`,
       path,
       version,
       license,
@@ -412,7 +460,7 @@ async function docMembers(out: Detail[]) {
       kind: "docs",
       id: page.id,
       name: title.slice(0, 160),
-      desc: meta.description || firstParagraph(text) || `Documentation page ${page.path}.`,
+      desc: meta.description || firstParagraph(text) || `${title}: ${page.id.includes("/") ? page.id.split("/")[0] : "overview"} documentation (${page.path}).`,
       path: page.path,
       run: "doc",
       tags: [page.id.includes("/") ? page.id.split("/")[0]! : "overview"],
@@ -443,6 +491,7 @@ async function entryMember(kind: Kind, idPrefix: string, dir: string, entry: Ret
     desc = pkg?.description || (readme ? firstParagraph(readme) : "");
     version = pkg?.version;
     license = pkg?.license;
+    if (!desc) desc = await sourceDescription(path, entry.files);
     if (!readme) files = entry.files.slice(0, 400);
   } else if (TEXT_EXT.has(ext) || /^(justfile|Dockerfile|LICENSE|NOTICE)/i.test(entry.name)) {
     text = await readText(path);
@@ -603,8 +652,79 @@ async function gameMembers(out: Detail[], games: { id: string; name: string; des
       run: "web",
       tags: ["game", "installable"],
       links: [],
-      surface: surface("games", game.id, "app", `Installs and runs in the desktop as package ${game.id}.`, { opens: game.id }),
+      surface: surface("games", game.id, game.id === "ds" || game.id === "play" ? "app" : "app", `Installs and runs in the desktop as package ${game.id}.`, { opens: game.id }),
     });
+  // Game owners of the repository: launcher and status pages that list the members behind each game. Game files are never hosted;
+  // private owners (DBXV2, iecode-docs) list their owners only, their content is stripped by privatize().
+  const owners = (test: (m: Detail) => boolean) => out.filter((m) => m.kind !== "games" && m.kind !== "collections" && test(m)).map((m) => `${m.kind}/${m.id}`);
+  const owned: { id: string; name: string; desc: string; tags: string[]; test: (m: Detail) => boolean }[] = [
+    {
+      id: "ievr",
+      name: "Inazuma Eleven: Victory Road (IEVR)",
+      desc: "IEVR tooling: the IECODE web, .NET and C++ owners, the ieverse and inagle libraries and the aphrody-nie engine crates. The game is read from your own install; no game files are hosted.",
+      tags: ["launcher", "level5"],
+      test: (m) => /^(iecode-(web|dotnet|cpp|homebrew|scripts)|ieverse|inagle|aphrody-nie-)/.test(m.id) && m.kind !== "docs" && m.kind !== "ospackages",
+    },
+    {
+      id: "dbxv2",
+      name: "Dragon Ball Xenoverse 2 (DBXV2)",
+      desc: "DBXV2 tooling: the unified streamed asset layer and the reverse engineering crates shared with IEVR. Private owner material: only the owners are listed, no game content or corpus is published.",
+      tags: ["launcher", "private"],
+      test: (m) => m.kind === "crates" && (m.id === "re" || m.id === "aphrody-re" || /^re($|-)/.test(m.id)),
+    },
+    {
+      id: "ctr",
+      name: "Nintendo 3DS (ctr)",
+      desc: "The aphrody-ctr 3DS emulator crates and their desktop host.",
+      tags: ["emulator"],
+      test: (m) => m.kind === "crates" && /^aphrody-ctr/.test(m.id),
+    },
+    {
+      id: "steam",
+      name: "Steam and game streaming",
+      desc: "Steam client integration and game streaming owners: bun-steam, bun-gamestream and the emulator host.",
+      tags: ["launcher", "steam"],
+      test: (m) => m.kind === "packages" && /^(bun-steam|bun-gamestream|bun-emu-host)$/.test(m.id),
+    },
+    {
+      id: "nie-play",
+      name: "NIE play",
+      desc: "The aphrody-nie game and play crates: the Inazuma Eleven engine runtime and match simulation.",
+      tags: ["engine"],
+      test: (m) => m.kind === "crates" && /^aphrody-nie-(game|play|runtime)/.test(m.id),
+    },
+  ];
+  for (const o of owned) {
+    const members = owners(o.test);
+    out.push({
+      kind: "games",
+      id: o.id,
+      name: o.name,
+      desc: o.desc,
+      run: "data",
+      tags: ["game", ...o.tags],
+      links: [],
+      surface: surface("games", o.id, "info", o.tags.includes("private") ? "Private-aware info page: owners and status only, no game content." : "Launcher page: owners, status and how to run it from your own install."),
+      members,
+      meta: { owners: members.length },
+    });
+  }
+}
+
+/** Private owner material (DBXV2, iecode-docs) is listed for completeness but its content never leaves the repository. */
+const PRIVATE = /dbxv2|^packages\/iecode-docs(\/|$)/i;
+function privatize(m: Detail) {
+  if (!PRIVATE.test(`${m.path ?? ""} ${m.id}`) || m.kind === "games" || m.kind === "collections") return;
+  m.desc = MEMBER_DESCRIPTIONS[`${m.kind}/${m.id}`] ?? `Private owner material (${m.kind}): listed for completeness, content is not published.`;
+  delete m.readme;
+  delete m.text;
+  delete m.files;
+  delete m.data;
+  m.hasDoc = false;
+  m.links = [];
+  m.meta = {};
+  m.tags = [...new Set([...m.tags, "private"])];
+  m.surface = surface(m.kind, m.id, "info", "Private owner material: the member is listed, its content is not published.");
 }
 
 async function sourceMembers(out: Detail[]) {
@@ -737,7 +857,122 @@ function collectionMembers(out: Detail[]) {
 // ---------------------------------------------------------------------------------------------------------
 // assembly
 
+/** Generated fallback text that says nothing about the member. */
+const isPlaceholder = (desc: string) =>
+  !desc ||
+  /^(Directory|File) \S+( \(\d+ files\))?\.$/.test(desc) ||
+  /^Bun OS (package|crate|\w+ app) at /.test(desc) ||
+  /^Documentation page /.test(desc);
+
+/** descriptions.ts entry, a well-known file name, or the top-level keys of a JSON file. */
+function curatedDescription(m: Detail): string {
+  const own = MEMBER_DESCRIPTIONS[`${m.kind}/${m.id}`] ?? FILE_DESCRIPTIONS[basename(m.path ?? m.id)];
+  if (own) return own;
+  if (m.text && m.path?.endsWith(".json")) {
+    const keys = [...m.text.matchAll(/^ {2}"([^"]+)":/gm)].map((k) => k[1]!).slice(0, 8);
+    if (keys.length) return `JSON file ${m.path} with the sections ${keys.join(", ")}.`;
+  }
+  return "";
+}
+
+export interface VersionInfo {
+  /** Newest first, at most 30. */
+  versions: string[];
+  latest?: string;
+  total: number;
+  published: boolean;
+  checked: string;
+}
+const DAY = 86_400_000;
+
+/** crates.io sparse index path of a crate name. */
+export function sparsePath(name: string): string {
+  const n = name.toLowerCase();
+  if (n.length <= 2) return `${n.length}/${n}`;
+  if (n.length === 3) return `3/${n[0]}/${n}`;
+  return `${n.slice(0, 2)}/${n.slice(2, 4)}/${n}`;
+}
+
+async function lookup(url: string, headers: Record<string, string>): Promise<Response | undefined> {
+  try {
+    return await fetch(url, { headers, signal: AbortSignal.timeout(8000) });
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Version history of every crates.io crate (sparse index) and npm package of the inventory, cached in a file outside the
+ * repository (default build/webos-versions.json, refreshed after a day). Offline-safe: a failed lookup keeps the cached
+ * entry, and without any entry the member simply has no history.
+ */
+export async function attachVersions(members: Detail[], cachePath = Bun.env.WEBOS_VERSIONS_CACHE ?? join(root, "build/webos-versions.json")) {
+  const cache: Record<string, VersionInfo> = (await Bun.file(cachePath).json().catch(() => ({}))) as Record<string, VersionInfo>;
+  const jobs: { key: string; member: Detail; fetchInfo: () => Promise<VersionInfo | undefined> }[] = [];
+  for (const m of members) {
+    if (m.kind === "crates" && m.tags.includes("crates.io")) {
+      const name = String(m.meta?.crateName ?? m.name);
+      jobs.push({
+        key: `crate:${name}`,
+        member: m,
+        fetchInfo: async () => {
+          const res = await lookup(`https://index.crates.io/${sparsePath(name)}`, { "user-agent": "aphrody-webos-inventory (contact@aphrody.com)" });
+          if (!res) return undefined;
+          if (res.status === 404) return { versions: [], total: 0, published: false, checked: new Date().toISOString() };
+          if (!res.ok) return undefined;
+          const all = (await res.text())
+            .split("\n")
+            .filter(Boolean)
+            .map((line) => JSON.parse(line) as { vers: string; yanked?: boolean })
+            .filter((v) => !v.yanked)
+            .map((v) => v.vers)
+            .reverse();
+          return { versions: all.slice(0, 30), latest: all[0], total: all.length, published: all.length > 0, checked: new Date().toISOString() };
+        },
+      });
+    } else if (m.kind === "packages" && typeof m.meta?.npm === "string") {
+      const name = m.meta.npm;
+      jobs.push({
+        key: `npm:${name}`,
+        member: m,
+        fetchInfo: async () => {
+          const res = await lookup(`https://registry.npmjs.org/${name.replace("/", "%2f")}`, { accept: "application/vnd.npm.install-v1+json" });
+          if (!res) return undefined;
+          if (res.status === 404) return { versions: [], total: 0, published: false, checked: new Date().toISOString() };
+          if (!res.ok) return undefined;
+          const doc = (await res.json()) as { versions?: Record<string, unknown>; "dist-tags"?: { latest?: string } };
+          const all = Object.keys(doc.versions ?? {}).reverse();
+          return { versions: all.slice(0, 30), latest: doc["dist-tags"]?.latest ?? all[0], total: all.length, published: all.length > 0, checked: new Date().toISOString() };
+        },
+      });
+    }
+  }
+  let next = 0;
+  let fetched = 0;
+  const worker = async () => {
+    while (next < jobs.length) {
+      const job = jobs[next++]!;
+      const hit = cache[job.key];
+      if (!hit || Date.now() - Date.parse(hit.checked) > DAY) {
+        const fresh = await job.fetchInfo().catch(() => undefined);
+        if (fresh) {
+          cache[job.key] = fresh;
+          fetched++;
+        }
+      }
+      const info = cache[job.key];
+      if (info) job.member.meta = { ...job.member.meta, history: info };
+    }
+  };
+  await Promise.all(Array.from({ length: 12 }, worker));
+  await mkdir(dirname(cachePath), { recursive: true });
+  await Bun.write(cachePath, JSON.stringify(cache));
+  return { jobs: jobs.length, fetched, cached: jobs.filter((j) => cache[j.key]).length };
+}
+
 export interface BuildOptions {
+  /** Fetch crates.io and npm version history (cached); build.ts turns it on, the offline gate leaves it off. */
+  versions?: boolean;
   apps?: AppEntry[];
   /** WebOS registry packages with category games (build-time), as {id,name,description}. */
   games?: { id: string; name: string; description: string; version?: string; license?: string }[];
@@ -772,6 +1007,9 @@ export async function buildInventory(options: BuildOptions = {}): Promise<Invent
   await sourceMembers(members);
   await directoryKind(members, "workspace", [{ dir: "" }]);
   collectionMembers(members);
+  if (options.versions) console.log("versions:", JSON.stringify(await attachVersions(members)));
+  members.forEach(privatize);
+  for (const m of members) if (isPlaceholder(m.desc)) m.desc = curatedDescription(m) || m.desc;
   const counts = Object.fromEntries(KIND_IDS.map((k) => [k, members.filter((m) => m.kind === k).length])) as Record<Kind, number>;
   const commit = Bun.env.WEBOS_COMMIT ?? git("rev-parse", "HEAD").trim();
   return { schemaVersion: 1, generated: new Date().toISOString(), commit, counts, total: members.length, members };
@@ -839,7 +1077,7 @@ export async function checkInventory(inv: Inventory, dist?: string): Promise<{ e
         flags.push(`${key}: opens ${s.opens}, which this deployment's registry does not contain (the page explains it)`);
     }
     if (!m.desc) errors.push(`${key}: empty description`);
-    if (m.desc.startsWith("Directory ") || m.desc.startsWith("File ") || /^Bun OS (package|crate|\w+ app) at /.test(m.desc)) flags.push(`${key}: no description or README of its own`);
+    if (isPlaceholder(m.desc)) errors.push(`${key}: no description (add a manifest description, a README, a header comment or an entry in descriptions.ts)`);
   }
   // Independent enumeration: the tracked children of each owner directory must all be members.
   for (const [kind, dir] of [["apps", "apps"], ["packages", "packages"], ["crates", "crates"]] as const)
