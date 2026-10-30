@@ -103,7 +103,8 @@ define(
   {
     group: "",
     name: "check",
-    summary: "Type check the workspace (upstream bun check), then the WebOS coverage gate (every member needs a surface)",
+    summary:
+      "Type check the workspace (upstream bun check), then the WebOS coverage gate (every member needs a surface)",
     run: async args => {
       const code = await native("check", "--no-script", "-p", "tsconfig.json", "--threads=2", "--no-pretty").run(args);
       if (code !== 0) return code;

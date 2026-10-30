@@ -81,7 +81,8 @@ export async function stageFixtures(objects: string): Promise<Record<string, { s
       const bytes = await sourceOf(fixture);
       const sha256 = hex(bytes);
       const pin = lock.testContent?.[fixture.pack]?.sha256;
-      if (pin && pin !== sha256) throw new Error(`${fixture.pack}: digest ${sha256} does not match the lock pin ${pin}`);
+      if (pin && pin !== sha256)
+        throw new Error(`${fixture.pack}: digest ${sha256} does not match the lock pin ${pin}`);
       await Bun.write(join(objects, "emulation/fixtures", fixture.pack, fixture.file), bytes);
       out[emulator.id] = { sha256 };
     } catch (error) {

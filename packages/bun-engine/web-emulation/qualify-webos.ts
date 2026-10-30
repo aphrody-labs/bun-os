@@ -24,7 +24,7 @@ const args = Bun.argv.slice(2);
 const flag = (name: string) => args.includes(name);
 const value = (name: string) => {
   const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : args.find((a) => a.startsWith(`${name}=`))?.slice(name.length + 1);
+  return i >= 0 ? args[i + 1] : args.find(a => a.startsWith(`${name}=`))?.slice(name.length + 1);
 };
 const base = (value("--base") ?? Bun.env.WEBOS_URL ?? "http://127.0.0.1:8790").replace(/\/$/, "");
 const objects = resolve(Bun.env.WEBOS_OBJECTS ?? join(Bun.env.HOME ?? root, "apps/webos/objects"));
@@ -111,7 +111,7 @@ async function launch() {
 }
 
 async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Promise<QualificationEntry> {
-  const emulator = EMULATORS.find((e) => e.id === id)!;
+  const emulator = EMULATORS.find(e => e.id === id)!;
   const url = `${base}/emulator.html?core=${id}&autotest=1&frames=${frames}&timeout=${timeoutMs}`;
   const entry: QualificationEntry = { id, status: "fail", errors: [], url, testedAt: new Date().toISOString() };
   if (emulator.fixture)
@@ -239,8 +239,17 @@ try {
     if (only && !only.includes(emulator.id)) continue;
     let entry: QualificationEntry;
     if (emulator.mode === "native") {
-      entry = { id: emulator.id, status: "unsupported", errors: [], detail: emulator.reason, testedAt: new Date().toISOString() };
-    } else if (emulator.mode === "wasm" && !(await Bun.file(join(objects, "emulation", emulator.core!, "manifest.json")).exists())) {
+      entry = {
+        id: emulator.id,
+        status: "unsupported",
+        errors: [],
+        detail: emulator.reason,
+        testedAt: new Date().toISOString(),
+      };
+    } else if (
+      emulator.mode === "wasm" &&
+      !(await Bun.file(join(objects, "emulation", emulator.core!, "manifest.json")).exists())
+    ) {
       entry = {
         id: emulator.id,
         status: "untested",
@@ -249,7 +258,13 @@ try {
         detail: "No WebAssembly build is published yet (web-emulation build-all pipeline).",
       };
     } else if (staged[emulator.id]?.error) {
-      entry = { id: emulator.id, status: "fail", errors: [], detail: staged[emulator.id]!.error, testedAt: new Date().toISOString() };
+      entry = {
+        id: emulator.id,
+        status: "fail",
+        errors: [],
+        detail: staged[emulator.id]!.error,
+        testedAt: new Date().toISOString(),
+      };
     } else {
       entry = await qualify(browser.cdp, emulator.id, staged[emulator.id]?.sha256).catch(
         (error): QualificationEntry => ({
@@ -269,12 +284,8 @@ try {
   await browser.close();
 }
 await Bun.write(join(root, "build/web-emulation/webos-qualification.json"), `${JSON.stringify(report, null, 2)}\n`);
-const failing = Object.values(report.entries).filter((e) => e.status === "fail");
+const failing = Object.values(report.entries).filter(e => e.status === "fail");
 console.log(
-  JSON.stringify(
-    Object.fromEntries(Object.entries(report.entries).map(([id, e]) => [id, e.status])),
-    null,
-    2,
-  ),
+  JSON.stringify(Object.fromEntries(Object.entries(report.entries).map(([id, e]) => [id, e.status])), null, 2),
 );
 if (failing.length) process.exitCode = 1;
