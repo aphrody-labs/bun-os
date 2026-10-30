@@ -22,7 +22,19 @@
       "web": ["https://aphrody.com/api/microsoft/callback"],
       "publicClient": ["http://localhost"]
     },
-    "delegatedPermissions": ["openid", "email", "profile", "offline_access", "User.Read", "Files.ReadWrite", "Mail.ReadWrite", "Mail.Send", "Calendars.ReadWrite", "Contacts.ReadWrite", "Tasks.ReadWrite"],
+    "delegatedPermissions": [
+      "openid",
+      "email",
+      "profile",
+      "offline_access",
+      "User.Read",
+      "Files.ReadWrite",
+      "Mail.ReadWrite",
+      "Mail.Send",
+      "Calendars.ReadWrite",
+      "Contacts.ReadWrite",
+      "Tasks.ReadWrite"
+    ],
     "secrets": {
       "store": "GCP Secret Manager (project aphrody) and /etc/aphrody/microsoft.env (root:ubuntu 0640)",
       "names": ["MICROSOFT_GRAPH_CLIENT_ID", "MICROSOFT_GRAPH_CLIENT_SECRET", "MICROSOFT_GRAPH_TENANT"]

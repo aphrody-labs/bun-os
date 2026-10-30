@@ -84,7 +84,7 @@ Images              | images, release, sites
 | ninja | min 1.13.0 | `buncc.toolchain.json` |
 | MSVC toolset | 14.51 | `buncc.toolchain.json` |
 
-Microsoft references (`vendor/microsoft/PINS.json`, 14 pins): microsoft-ui-xaml winui3/release/2.5.1, WindowsAppSDK v2.6.4, WindowsAppSDK-Samples main, WinUI-Gallery v3.0.4, DirectX-Graphics-Samples master, DirectXTK12 may2026, DirectX-Specs master, DirectXShaderCompiler v1.9.2609, Windows-universal-samples v19.0.2, Windows-classic-samples main, dotnet-samples main, windows-rs 74, cppwinrt 3.0.260818.1, CsWinRT 2.3.1.260716.1.
+Microsoft references (`vendor/microsoft/PINS.json`, 18 pins): microsoft-ui-xaml winui3/release/2.5.1, WindowsAppSDK v2.6.4, WindowsAppSDK-Samples main, WinUI-Gallery v3.0.4, DirectX-Graphics-Samples master, DirectXTK12 may2026, DirectX-Specs master, DirectXShaderCompiler v1.9.2609, Windows-universal-samples v19.0.2, Windows-classic-samples main, dotnet-samples main, windows-rs 74, cppwinrt 3.0.260818.1, CsWinRT 2.3.1.260716.1, edit v2.0.0, cascadia-code v2407.24, terminal v1.25.2733.0, vscode 1.144.0.
 
 ## CI
 
