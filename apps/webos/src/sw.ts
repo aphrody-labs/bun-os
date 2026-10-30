@@ -5,7 +5,11 @@
 // - Installed app packages are served from their own Cache Storage entries (see pkg.ts).
 declare const self: ServiceWorkerGlobalScope;
 
-const SHELL = "shell-v2";
+declare const __SHELL_CHUNKS__: string | undefined;
+/** Hashed app chunks of the shell build (build.ts), precached so every app opens offline. */
+const CHUNKS: string[] = typeof __SHELL_CHUNKS__ === "string" ? JSON.parse(__SHELL_CHUNKS__) : [];
+
+const SHELL = "shell-v3";
 const SHELL_FILES = [
   "/",
   "/main.js",
@@ -22,6 +26,7 @@ const SHELL_FILES = [
   "/wasm/aphrody_webos_wasm_bg.wasm",
 ];
 const SHELL_PATHS = new Set(SHELL_FILES);
+const PRECACHE = [...SHELL_FILES, ...CHUNKS];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -29,7 +34,7 @@ self.addEventListener("install", (event) => {
       const cache = await caches.open(SHELL);
       // One missing file must not block installation of the rest.
       await Promise.all(
-        SHELL_FILES.map((path) =>
+        PRECACHE.map((path) =>
           cache.add(new Request(path, { cache: "reload" })).catch(() => {}),
         ),
       );
@@ -77,6 +82,20 @@ self.addEventListener("fetch", (event) => {
     !url.pathname.startsWith("/play")
   ) {
     event.respondWith(shell(request, "/"));
+    return;
+  }
+  // Chunk names carry a content hash: cache first, they never change.
+  if (url.pathname.startsWith("/chunks/")) {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(SHELL);
+        const hit = await cache.match(url.pathname);
+        if (hit) return hit;
+        const response = await fetch(request);
+        if (response.ok) await cache.put(url.pathname, response.clone());
+        return response;
+      })(),
+    );
     return;
   }
   if (SHELL_PATHS.has(url.pathname)) {

@@ -93,23 +93,41 @@ const buildInfo = {
   webosWasm: await versionOf("packages/webos-wasm"),
 };
 
-const result = await Bun.build({
-  entrypoints: [
-    join(import.meta.dir, "src/main.ts"),
-    join(import.meta.dir, "src/sw.ts"),
-    join(import.meta.dir, "src/boot.ts"),
-    // Worker of the Terminal's Alpine guest (/guest-worker.js), see packages/webos-wasm/src/guest.ts
-    join(root, "packages/webos-wasm/src/guest-worker.ts"),
-  ],
+const common = {
   outdir: dist,
-  target: "browser",
+  target: "browser" as const,
   minify: true,
   // Lit and other packages ship a dev build unless NODE_ENV is production at bundle time
   define: {
     "process.env.NODE_ENV": '"production"',
     __WEBOS_BUILD__: JSON.stringify(JSON.stringify(buildInfo)),
   },
-  sourcemap: "none",
+  sourcemap: "none" as const,
+};
+// The shell is the critical path: one entry chunk, every app a lazily imported chunk under /chunks/ (ADR-001).
+const shellBuild = await Bun.build({
+  ...common,
+  entrypoints: [join(import.meta.dir, "src/main.ts")],
+  naming: { entry: "[name].js", chunk: "chunks/[name]-[hash].js", asset: "assets/[name]-[hash].[ext]" },
+  splitting: true,
+});
+if (!shellBuild.success) {
+  for (const log of shellBuild.logs) console.error(log);
+  process.exit(1);
+}
+const shellChunks = shellBuild.outputs
+  .map((o) => "/" + o.path.slice(dist.length + 1).replaceAll("\\", "/"))
+  .filter((p) => p.startsWith("/chunks/"));
+// The service worker and the guest worker are classic scripts: no splitting. The service worker precaches the chunks.
+const result = await Bun.build({
+  ...common,
+  define: { ...common.define, __SHELL_CHUNKS__: JSON.stringify(JSON.stringify(shellChunks)) },
+  entrypoints: [
+    join(import.meta.dir, "src/sw.ts"),
+    join(import.meta.dir, "src/boot.ts"),
+    // Worker of the Terminal's Alpine guest (/guest-worker.js), see packages/webos-wasm/src/guest.ts
+    join(root, "packages/webos-wasm/src/guest-worker.ts"),
+  ],
   naming: "[name].js",
   splitting: false,
 });
