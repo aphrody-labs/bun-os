@@ -461,8 +461,7 @@ mod tests {
         assert_eq!(user.address_as.as_deref(), Some("Sam"));
         let memory = std::fs::read_to_string(new.join("MEMORY.md")).unwrap();
         assert!(
-            memory.contains("agent_id: user:42")
-                && memory.contains(&format!("See {ns}/memory."))
+            memory.contains("agent_id: user:42") && memory.contains(&format!("See {ns}/memory."))
         );
         let note = std::fs::read_to_string(new.join("memory/2026-10-06.md")).unwrap();
         assert!(note.contains("agent_id: user:42") && note.contains("fact"));

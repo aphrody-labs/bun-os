@@ -65,12 +65,21 @@ function pngHasLitPixel(png: Uint8Array): boolean {
       const up = previous[x]!;
       const upLeft = x >= channels ? previous[x - channels]! : 0;
       const predictor =
-        filter === 1 ? left : filter === 2 ? up : filter === 3 ? (left + up) >> 1 : filter === 4 ? paeth(left, up, upLeft) : 0;
+        filter === 1
+          ? left
+          : filter === 2
+            ? up
+            : filter === 3
+              ? (left + up) >> 1
+              : filter === 4
+                ? paeth(left, up, upLeft)
+                : 0;
       line[x] = (line[x]! + predictor) & 255;
     }
     for (let x = 0; x < width; x++) {
       const p = x * channels;
-      if (line[p]! > 16 || line[p + (channels > 2 ? 1 : 0)]! > 16 || line[p + (channels > 2 ? 2 : 0)]! > 16) return true;
+      if (line[p]! > 16 || line[p + (channels > 2 ? 1 : 0)]! > 16 || line[p + (channels > 2 ? 2 : 0)]! > 16)
+        return true;
     }
     previous = line;
   }

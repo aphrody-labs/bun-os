@@ -293,10 +293,7 @@ mod tests {
         assert_eq!(u.template_revision.as_deref(), Some("sha256-v1:ab"));
         // Metadata is not prompt material.
         let d = u.render_directives();
-        assert!(
-            !d.contains("img/me.png") && !d.contains("user:42"),
-            "{d}"
-        );
+        assert!(!d.contains("img/me.png") && !d.contains("user:42"), "{d}");
     }
 
     #[test]
