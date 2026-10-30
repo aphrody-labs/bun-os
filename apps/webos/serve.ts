@@ -4,6 +4,7 @@ import { join, relative, resolve, isAbsolute } from "node:path";
 import worker from "./worker/index";
 import { nativeAPI } from "./native-api";
 import { publicFetch } from "./public-fetch";
+import { storeApi } from "./store/api";
 
 const dist = resolve(Bun.env.WEBOS_DIST ?? join(import.meta.dir, "dist"));
 const objects = resolve(
@@ -132,6 +133,8 @@ const server = Bun.serve({
   maxRequestBodySize: 1024 * 1024,
   idleTimeout: 30,
   fetch: async (request) => {
+    const store = await storeApi(request);
+    if (store) return store;
     return worker.fetch(request, {
       BROWSE_FETCH: publicFetch,
       ASSETS: assets,
