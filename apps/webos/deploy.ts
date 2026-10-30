@@ -58,9 +58,9 @@ for (const required of [
   const gate = await checkInventory(inventory, join(release, "dist"));
   printCounts(inventory);
   if (gate.errors.length)
-    throw new Error(`WebOS inventory gate failed:
-${gate.errors.slice(0, 30).join("
-")}`);
+    throw new Error(
+      `WebOS inventory gate failed: ${gate.errors.slice(0, 30).join("; ")}`,
+    );
 }
 if (!imported) {
   const registry = (await Bun.file(

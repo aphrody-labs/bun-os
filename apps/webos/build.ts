@@ -338,9 +338,9 @@ printCounts(inventory);
 const gate = await checkInventory(inventory, dist);
 if (gate.flags.length) console.warn(`inventory flags: ${gate.flags.length}`);
 if (gate.errors.length)
-  throw new Error(`WebOS inventory gate failed:
-${gate.errors.slice(0, 30).join("
-")}`);
+  throw new Error(
+    `WebOS inventory gate failed: ${gate.errors.slice(0, 30).join("; ")}`,
+  );
 await buildSeo(dist, catalog);
 console.log(`packages: ${built.map((p) => p.id).join(", ") || "none"}`);
 console.log(
