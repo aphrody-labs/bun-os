@@ -15,8 +15,8 @@ function git(...args: string[]) {
   return result.stdout.toString().trim();
 }
 const commit = git("rev-parse", "HEAD");
-if (commit !== git("rev-parse", "refs/remotes/origin/os"))
-  throw new Error("Deploy the published os tip");
+if (commit !== git("rev-parse", "refs/remotes/origin/main"))
+  throw new Error("Deploy the published main tip");
 if (git("diff", "HEAD", "--", "apps/webos", "infra/config/routes.catalog.json"))
   throw new Error("WebOS source must be committed before deployment");
 const handoff = resolve(
