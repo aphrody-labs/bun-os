@@ -46,7 +46,8 @@ command -v gh >/dev/null || { echo "gh is required (authenticate once with: gh a
 gh auth status >/dev/null 2>&1 || { echo "gh is not authenticated: run 'gh auth login' (token stays in the gh keyring/config, never in this repo)" >&2; exit 1; }
 
 # https pushes use the gh credential helper; no token is written anywhere by this script.
-git config --global credential.https://github.com.helper ''
+git config --global --unset-all credential.https://github.com.helper || true
+git config --global --add credential.https://github.com.helper ''
 git config --global --add credential.https://github.com.helper '!gh auth git-credential'
 
 if [ ! -d "$REPO/.git" ]; then
