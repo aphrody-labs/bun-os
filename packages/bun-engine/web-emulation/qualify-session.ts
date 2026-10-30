@@ -54,6 +54,9 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
   const rom = launch.rom ? `/roms/${launch.rom}` : "";
   const command = launch.app.includes("{rom}") ? launch.app.replace("{rom}", rom) : `${launch.app}${rom ? ` ${rom}` : ""}`;
   try {
+    // A writable copy of the fixtures: emulators write saves and configs next to the ROM (melonDS refuses to boot
+    // when it cannot create GodMode9i.sav).
+    await sh(["cp", "-r", fixtures, join(runtime, "roms")]);
     const started = await sh([
       "docker",
       "run",
@@ -72,7 +75,7 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
       "-v",
       `${runtime}:/run/user/1000`,
       "-v",
-      `${fixtures}:/roms:ro`,
+      `${join(runtime, "roms")}:/roms`,
       "-e",
       "BUNOS_SESSION=app",
       "-e",
