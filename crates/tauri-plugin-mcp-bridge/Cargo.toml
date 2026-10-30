@@ -1,5 +1,6 @@
 [package]
 name = "tauri-plugin-mcp-bridge"
+publish = false
 version = "1.4.7"
 description = "MCP bridge for Tauri 3 apps: IPC monitor, window/backend inspection, script execution and screenshots over a local WebSocket (CEF runtime)."
 edition.workspace = true

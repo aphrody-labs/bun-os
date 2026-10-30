@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 [package]
 name = "libm3"
+publish = false
 description = "Material 3 tokens, components and application patterns for Bun OS and COSMIC"
 version = "1.4.7"
 edition = "2024"

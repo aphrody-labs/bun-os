@@ -5,7 +5,6 @@ edition.workspace = true
 rust-version.workspace = true
 license = "Apache-2.0"
 repository.workspace = true
-publish = false
 description = "Package contracts and metadata parsers (npm, Cargo sparse, NuGet, vcpkg, PyPI), verified blob store, bounded HTTP ingestion and the store command line"
 
 [lints]

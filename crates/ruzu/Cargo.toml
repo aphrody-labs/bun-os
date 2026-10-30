@@ -5,6 +5,7 @@
 # equivalent `ruzu` executable, using GTK4 instead of Qt.
 [package]
 name = "ruzu"
+publish = false
 version.workspace = true
 edition = "2021"
 rust-version.workspace = true

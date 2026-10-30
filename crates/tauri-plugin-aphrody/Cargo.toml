@@ -1,5 +1,6 @@
 [package]
 name = "tauri-plugin-aphrody"
+publish = false
 version = "1.4.7"
 description = "Upstream Bun as a first-class backend runtime for Tauri 3 apps (sidecar, IPC bridge), plus the wrap and MCP debug bridge modules. Official plugins come from tauri-plugin-* crates."
 edition.workspace = true

@@ -4,7 +4,7 @@ license-file = "../../docs/licenses/iecode/licenses/dust/LICENSE"
 name = "aphrody-dust-soft-2d"
 version = "0.0.1"
 edition = "2021"
-publish = true
+publish = false
 [features]
 threaded = ["crossbeam-channel"]
 

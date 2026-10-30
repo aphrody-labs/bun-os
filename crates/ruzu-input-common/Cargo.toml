@@ -1,5 +1,6 @@
 [package]
 name = "input_common"
+publish = false
 version.workspace = true
 edition = "2021"
 

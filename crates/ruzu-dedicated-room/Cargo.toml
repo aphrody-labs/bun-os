@@ -1,5 +1,6 @@
 [package]
 name = "dedicated_room"
+publish = false
 version.workspace = true
 edition = "2021"
 rust-version.workspace = true

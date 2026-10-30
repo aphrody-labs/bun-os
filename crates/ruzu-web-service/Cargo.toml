@@ -1,5 +1,6 @@
 [package]
 name = "web_service"
+publish = false
 version.workspace = true
 edition = "2021"
 

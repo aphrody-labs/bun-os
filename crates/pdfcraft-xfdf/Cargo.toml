@@ -21,7 +21,7 @@ todo = "warn"
 [dependencies]
 pdfcraft-cos = { path = "../pdfcraft-cos", version = "0.7.1" }
 pdfcraft-annot = { path = "../pdfcraft-annot", version = "0.7.1" }
-pdfcraft-forms = { path = "../pdfcraft-forms", version = "0.7.1" }
+pdfcraft-forms = { package = "aphrody-pdfcraft-forms", path = "../pdfcraft-forms", version = "0.7.1" }
 pdfcraft-model = { path = "../pdfcraft-model", version = "0.7.1" }
 roxmltree = "0.20"
 thiserror = "2"

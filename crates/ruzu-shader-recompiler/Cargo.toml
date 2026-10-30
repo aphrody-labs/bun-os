@@ -1,5 +1,6 @@
 [package]
 name = "shader_recompiler"
+publish = false
 version.workspace = true
 edition = "2021"
 

@@ -4,7 +4,7 @@ description = "Frontière FFI C-ABI: expose la logique nie (CRC32 RDBN, PRNG CRa
 version.workspace = true
 edition.workspace = true
 license-file = "../../docs/licenses/iecode/nie/LICENSE"
-publish = true
+publish = false
 repository.workspace = true
 rust-version.workspace = true
 

@@ -1,5 +1,6 @@
 [package]
 name = "libm3-wasm"
+publish = false
 version = "1.4.7"
 edition = "2024"
 rust-version = "1.97"

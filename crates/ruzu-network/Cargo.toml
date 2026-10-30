@@ -1,5 +1,6 @@
 [package]
 name = "network"
+publish = false
 version.workspace = true
 edition = "2021"
 

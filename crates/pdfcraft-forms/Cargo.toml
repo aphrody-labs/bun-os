@@ -1,9 +1,12 @@
 [package]
-name = "pdfcraft-forms"
+name = "aphrody-pdfcraft-forms"
 description = "Interactive forms (AcroForm): field model, filling, appearances, reset (ISO 32000-2 §12.7)"
 version = "0.7.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+
+[lib]
+name = "pdfcraft_forms"
 
 [lints.rust]
 unsafe_code = "forbid"

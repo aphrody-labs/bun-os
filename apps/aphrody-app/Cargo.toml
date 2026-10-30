@@ -11,6 +11,7 @@
 
 [package]
 name = "aphrody-app"
+publish = false
 description = "Aphrody OS desktop (Tauri 3): the GUI and window manager; drives the aphrody agent over its app-server protocol."
 version = "1.4.7"
 edition = "2024"

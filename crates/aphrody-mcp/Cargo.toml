@@ -93,7 +93,7 @@ tokio-postgres = { version = "0.7.18", features = ["with-serde_json-1"] }
 aphrody-sql = { path = "../aphrody-sql", version = "1.4.7", default-features = false, features = ["postgres"] }
 aphrody-a2a = { path = "../aphrody-a2a", version = "1.4.7", features = [] }
 aphrody-a2a-server = { path = "../aphrody-a2a-server", version = "1.4.7", default-features = false, features = [] }
-aphrody-git = { package = "bun_git", path = "../bun-os-git" }
+aphrody-git = { package = "bun_git", path = "../bun-os-git", version = "1.4.7" }
 anyhow = "1.0.104"
 clap = { version = "4.6.6", features = ["derive", "env", "color"] }
 tokio = { version = "1.53.1", features = ["process", "rt-multi-thread", "macros", "time", "signal", "sync", "fs", "io-util", "full"] }

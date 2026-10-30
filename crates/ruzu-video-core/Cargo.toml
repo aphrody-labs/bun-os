@@ -1,5 +1,6 @@
 [package]
 name = "video_core"
+publish = false
 version.workspace = true
 edition = "2021"
 

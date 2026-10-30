@@ -23,7 +23,7 @@ pdfcraft-cos = { path = "../pdfcraft-cos", version = "0.7.1" }
 pdfcraft-content = { path = "../pdfcraft-content", version = "0.7.1" }
 pdfcraft-fonts = { path = "../pdfcraft-fonts", version = "0.7.1" }
 pdfcraft-model = { path = "../pdfcraft-model", version = "0.7.1" }
-pdfcraft-forms = { path = "../pdfcraft-forms", version = "0.7.1" }
+pdfcraft-forms = { package = "aphrody-pdfcraft-forms", path = "../pdfcraft-forms", version = "0.7.1" }
 pdfcraft-edit = { path = "../pdfcraft-edit", version = "0.7.1" }
 pdfcraft-annot = { path = "../pdfcraft-annot", version = "0.7.1" }
 thiserror = "2"

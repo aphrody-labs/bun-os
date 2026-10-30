@@ -5,7 +5,6 @@ edition.workspace = true
 rust-version.workspace = true
 license = "Apache-2.0"
 repository.workspace = true
-publish = false
 description = "Host hardware topology (CPU, RAM, CUDA) and monotonic clock probes."
 
 [lints]

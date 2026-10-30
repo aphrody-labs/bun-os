@@ -3,6 +3,7 @@
 
 [package]
 name = "artcraft-tauri-plugin-http"
+publish = false
 version = "3.0.0-alpha.3"
 description = "Access an HTTP client written in Rust."
 #edition = { workspace = true }

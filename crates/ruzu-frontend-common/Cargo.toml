@@ -1,5 +1,6 @@
 [package]
 name = "frontend_common"
+publish = false
 version.workspace = true
 edition = "2021"
 
