@@ -3797,6 +3797,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "aphrody-webos-protocol"
+version = "1.4.7"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "aphrody-webos-server"
+version = "1.4.7"
+dependencies = [
+ "aphrody-webos-protocol",
+ "axum",
+ "serde_json",
+ "tokio",
+ "tower-http 0.7.1",
+]
+
+[[package]]
 name = "aphrody-webos-wasm"
 version = "1.4.7"
 dependencies = [
@@ -43175,16 +43193,6 @@ dependencies = [
  "pkg-config",
  "soup3-sys",
  "system-deps 6.2.2",
-]
-
-[[package]]
-name = "webos-server"
-version = "1.4.7"
-dependencies = [
- "axum",
- "serde_json",
- "tokio",
- "tower-http 0.7.1",
 ]
 
 [[package]]

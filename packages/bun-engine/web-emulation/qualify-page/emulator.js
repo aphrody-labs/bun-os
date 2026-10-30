@@ -3,21 +3,21 @@
 // Loads the core from /emulation/<core>/, boots a ROM from the user's file (never uploaded) or the free
 // test ROM, offers save states (IndexedDB) and a touch pad, and publishes window.__emulator for the
 // qualification runner.
-const $ = (id) => document.getElementById(id);
+const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const core = params.get("core") ?? "";
 const autotest = params.get("autotest") === "1";
 const wantFrames = Number(params.get("frames") ?? 120);
 const errors = [];
 const state = (window.__emulator = { core, phase: "loading", errors, frames: 0, result: undefined, handle: undefined });
-const setStatus = (text) => ($("status").textContent = text);
-const fail = (message) => {
+const setStatus = text => ($("status").textContent = text);
+const fail = message => {
   errors.push(message);
   state.phase = "failed";
   setStatus(message);
 };
-addEventListener("error", (e) => errors.push(`error: ${e.message}`));
-addEventListener("unhandledrejection", (e) => errors.push(`rejection: ${e.reason?.message ?? e.reason}`));
+addEventListener("error", e => errors.push(`error: ${e.message}`));
+addEventListener("unhandledrejection", e => errors.push(`rejection: ${e.reason?.message ?? e.reason}`));
 const consoleError = console.error.bind(console);
 console.error = (...args) => {
   errors.push(args.map(String).join(" "));
@@ -42,8 +42,8 @@ async function idb(store, mode, run) {
     tx.onerror = () => reject(tx.error);
   });
 }
-const sha256 = async (bytes) =>
-  [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))].map((b) => b.toString(16).padStart(2, "0")).join("");
+const sha256 = async bytes =>
+  [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))].map(b => b.toString(16).padStart(2, "0")).join("");
 
 let manifest, variant, mod, handle, emulator, romKey, lastState;
 
@@ -55,7 +55,7 @@ async function json(path) {
 
 async function prepare() {
   const list = await json("/api/emulators");
-  emulator = list.emulators.find((e) => e.id === core);
+  emulator = list.emulators.find(e => e.id === core);
   if (!emulator) throw new Error(`Unknown emulator: ${core}`);
   $("title").textContent = emulator.name;
   document.title = emulator.name;
@@ -67,7 +67,8 @@ async function prepare() {
   if (emulator.mode !== "wasm") throw new Error(emulator.reason ?? "This emulator has no browser build.");
   manifest = await json(`/emulation/${emulator.core}/manifest.json`);
   variant = manifest;
-  if (variant.threads && !globalThis.crossOriginIsolated) throw new Error("This emulator needs a cross-origin isolated page.");
+  if (variant.threads && !globalThis.crossOriginIsolated)
+    throw new Error("This emulator needs a cross-origin isolated page.");
   $("file").accept = (manifest.extensions ?? []).join(",");
   mod = await import(`/emulation/${emulator.core}/${variant.module}`);
   await mod.default({ module_or_path: `/emulation/${emulator.core}/${variant.wasm}` });
@@ -104,7 +105,7 @@ async function boot(bytes, name) {
   $("save").disabled = !canSave;
   $("save").title = canSave ? "" : "This core has no save-state support";
   $("load").disabled = true;
-  idb("states", "readonly", (s) => s.get(romKey)).then((saved) => {
+  idb("states", "readonly", s => s.get(romKey)).then(saved => {
     if (saved && canSave) {
       lastState = saved;
       $("load").disabled = false;
@@ -115,7 +116,8 @@ async function boot(bytes, name) {
   setStatus(`running ${name}`);
   const tick = () => {
     state.frames = handle.frames ?? 0;
-    if (state.phase === "running") setStatus(`running ${name}: ${state.frames} frames${handle.stopped ? `, stopped: ${handle.stopped}` : ""}`);
+    if (state.phase === "running")
+      setStatus(`running ${name}: ${state.frames} frames${handle.stopped ? `, stopped: ${handle.stopped}` : ""}`);
     requestAnimationFrame(tick);
   };
   tick();
@@ -127,7 +129,7 @@ async function waitFor(fn, ms) {
     const value = fn();
     if (value !== undefined && value !== null && value !== false) return value;
     if (performance.now() > end) return undefined;
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise(r => setTimeout(r, 50));
   }
 }
 
@@ -138,7 +140,7 @@ async function saveState() {
   const bytes = handle.take_state();
   if (!bytes) throw new Error("save state produced no data");
   lastState = bytes;
-  await idb("states", "readwrite", (s) => s.put(bytes, romKey));
+  await idb("states", "readwrite", s => s.put(bytes, romKey));
   $("load").disabled = false;
   $("export").disabled = false;
   return bytes.length;
@@ -151,13 +153,13 @@ async function loadState() {
 
 $("save").onclick = () =>
   saveState().then(
-    (n) => setStatus(`state saved (${n} bytes)`),
-    (e) => setStatus(String(e.message ?? e)),
+    n => setStatus(`state saved (${n} bytes)`),
+    e => setStatus(String(e.message ?? e)),
   );
 $("load").onclick = () =>
   loadState().then(
     () => setStatus("state restored"),
-    (e) => setStatus(String(e.message ?? e)),
+    e => setStatus(String(e.message ?? e)),
   );
 $("export").onclick = () => {
   const a = document.createElement("a");
@@ -166,14 +168,14 @@ $("export").onclick = () => {
   a.click();
 };
 $("fs").onclick = () => document.documentElement.requestFullscreen?.();
-$("test").onclick = () => bootFixture().catch((e) => fail(String(e.message ?? e)));
+$("test").onclick = () => bootFixture().catch(e => fail(String(e.message ?? e)));
 $("file").onchange = async () => {
   const file = $("file").files?.[0];
   if (!file) return;
   const bytes = new Uint8Array(await file.arrayBuffer());
   if (handle) {
     // One machine per module instance: restart the page with the new image.
-    await idb("pending", "readwrite", (s) => s.put({ name: file.name, bytes }, "rom"));
+    await idb("pending", "readwrite", s => s.put({ name: file.name, bytes }, "rom"));
     location.search = `?core=${core}&pending=1`;
     return;
   }
@@ -191,12 +193,12 @@ async function bootFixture() {
 let mask = 0;
 for (const button of document.querySelectorAll("#pad button")) {
   const bit = Number(button.dataset.k);
-  const set = (down) => {
+  const set = down => {
     mask = down ? mask | bit : mask & ~bit;
     button.classList.toggle("on", down);
     handle?.set_input(mask);
   };
-  button.addEventListener("pointerdown", (e) => {
+  button.addEventListener("pointerdown", e => {
     button.setPointerCapture(e.pointerId);
     set(true);
   });
@@ -212,7 +214,8 @@ async function autorunV86() {
   screen.append(document.createElement("div"), document.createElement("canvas"));
   $("stage").replaceChildren(screen);
   let serial = "";
-  const strip = (text) => text.replace(new RegExp(String.fromCharCode(27) + "\\[[0-9;?]*[A-Za-z]", "g"), "").replace(/\r/g, "");
+  const strip = text =>
+    text.replace(new RegExp(String.fromCharCode(27) + "\\[[0-9;?]*[A-Za-z]", "g"), "").replace(/\r/g, "");
   const vm = new V86({
     wasm_path: "/vm/v86.wasm",
     memory_size: 256 * 1024 * 1024,
@@ -225,17 +228,22 @@ async function autorunV86() {
     autostart: true,
     disable_speaker: true,
   });
-  vm.add_listener("serial0-output-byte", (code) => (serial += String.fromCharCode(code)));
-  state.handle = { canvas: screen, get frames() { return serial.length; } };
+  vm.add_listener("serial0-output-byte", code => (serial += String.fromCharCode(code)));
+  state.handle = {
+    canvas: screen,
+    get frames() {
+      return serial.length;
+    },
+  };
   state.phase = "running";
   const deadline = performance.now() + Number(params.get("timeout") ?? 300000);
-  const seen = (needle) => waitFor(() => strip(serial).includes(needle), Math.max(1000, deadline - performance.now()));
+  const seen = needle => waitFor(() => strip(serial).includes(needle), Math.max(1000, deadline - performance.now()));
   let loginPrompt = false;
   let commandOutput = false;
   loginPrompt = Boolean(await seen("login: "));
   if (loginPrompt) {
     vm.serial0_send("root\n");
-    await new Promise((r) => setTimeout(r, 3000));
+    await new Promise(r => setTimeout(r, 3000));
     vm.serial0_send("echo bun-os-$((40+2))\n");
     commandOutput = Boolean(await seen("bun-os-42"));
   }
@@ -251,7 +259,10 @@ async function autorunV86() {
     stopped: null,
     saveState: "unsupported",
     v86: { loginPrompt, commandOutput, serialBytes: bytes },
-    error: loginPrompt && commandOutput ? undefined : `serial console: login prompt ${loginPrompt}, command output ${commandOutput}`,
+    error:
+      loginPrompt && commandOutput
+        ? undefined
+        : `serial console: login prompt ${loginPrompt}, command output ${commandOutput}`,
     errors,
   };
   state.phase = "done";
@@ -263,7 +274,7 @@ async function autorun() {
     await bootFixture();
     const deadline = performance.now() + Number(params.get("timeout") ?? 300000);
     while (performance.now() < deadline && handle.frames < wantFrames && !handle.stopped)
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 200));
     const reached = handle.frames;
     let saveStateResult = "unsupported";
     if (typeof handle.request_save === "function") {
@@ -299,9 +310,9 @@ try {
   await prepare();
   if (autotest) await autorun();
   else if (params.get("pending") === "1") {
-    const pending = await idb("pending", "readonly", (s) => s.get("rom"));
+    const pending = await idb("pending", "readonly", s => s.get("rom"));
     if (pending) {
-      await idb("pending", "readwrite", (s) => s.delete("rom"));
+      await idb("pending", "readwrite", s => s.delete("rom"));
       await boot(pending.bytes, pending.name);
     }
   }

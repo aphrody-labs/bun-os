@@ -21,7 +21,13 @@ pub enum OsId {
 }
 
 impl OsId {
-    pub const ALL: [OsId; 5] = [OsId::PopOs, OsId::Redox, OsId::Android, OsId::Wine, OsId::Proton];
+    pub const ALL: [OsId; 5] = [
+        OsId::PopOs,
+        OsId::Redox,
+        OsId::Android,
+        OsId::Wine,
+        OsId::Proton,
+    ];
 
     pub fn name(self) -> &'static str {
         match self {
@@ -90,9 +96,17 @@ pub struct SessionInfo {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "t", rename_all = "kebab-case")]
 pub enum Signal {
-    Offer { sdp: String },
-    Answer { sdp: String },
-    Ice { candidate: String, mid: Option<String>, index: Option<u16> },
+    Offer {
+        sdp: String,
+    },
+    Answer {
+        sdp: String,
+    },
+    Ice {
+        candidate: String,
+        mid: Option<String>,
+        index: Option<u16>,
+    },
 }
 
 /// Full gamepad snapshot in the W3C standard mapping, sent whole (not deltas) so a lost message heals itself.
@@ -113,12 +127,28 @@ pub struct GamepadState {
 #[serde(tag = "t", rename_all = "kebab-case")]
 pub enum Input {
     /// Absolute position in stream pixels; `buttons` is the DOM `buttons` bit mask.
-    Pointer { x: f32, y: f32, buttons: u8 },
-    Wheel { dx: f32, dy: f32 },
+    Pointer {
+        x: f32,
+        y: f32,
+        buttons: u8,
+    },
+    Wheel {
+        dx: f32,
+        dy: f32,
+    },
     /// DOM `code` (physical key) plus the produced `key`, so the server can map layouts.
-    Key { code: String, key: String, down: bool },
-    Clipboard { text: String },
-    Resize { width: u32, height: u32 },
+    Key {
+        code: String,
+        key: String,
+        down: bool,
+    },
+    Clipboard {
+        text: String,
+    },
+    Resize {
+        width: u32,
+        height: u32,
+    },
     Gamepad(GamepadState),
 }
 
@@ -161,4 +191,3 @@ pub struct Health {
 pub struct ApiError {
     pub error: String,
 }
-

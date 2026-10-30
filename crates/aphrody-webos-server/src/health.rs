@@ -10,15 +10,28 @@ use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use crate::AppState;
 
 fn check(ok: bool, optional: bool, detail: String) -> HealthCheck {
-    HealthCheck { ok, optional, detail: if ok { None } else { Some(detail) } }
+    HealthCheck {
+        ok,
+        optional,
+        detail: if ok { None } else { Some(detail) },
+    }
 }
 
 pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     let mut checks = BTreeMap::new();
-    let client = tokio::fs::try_exists(state.client.join("index.html")).await.unwrap_or(false);
+    let client = tokio::fs::try_exists(state.client.join("index.html"))
+        .await
+        .unwrap_or(false);
     checks.insert(
         "client".to_owned(),
-        check(client, true, format!("no wasm client in {}; the placeholder page is served", state.client.display())),
+        check(
+            client,
+            true,
+            format!(
+                "no wasm client in {}; the placeholder page is served",
+                state.client.display()
+            ),
+        ),
     );
     // The Hyprland session gateway that runs beside this service until the Rust gateway replaces it.
     let gateway = tokio::time::timeout(
@@ -27,7 +40,10 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     )
     .await
     .is_ok_and(|r| r.is_ok());
-    checks.insert("session-gateway".to_owned(), check(gateway, true, "127.0.0.1:8793 is not listening".into()));
+    checks.insert(
+        "session-gateway".to_owned(),
+        check(gateway, true, "127.0.0.1:8793 is not listening".into()),
+    );
     let ok = checks.values().all(|c| c.ok || c.optional);
     let body = Health {
         ok,
@@ -38,6 +54,14 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
         uptime_seconds: state.started.elapsed().as_secs(),
         checks,
     };
-    let status = if ok { StatusCode::OK } else { StatusCode::SERVICE_UNAVAILABLE };
-    (status, [(axum::http::header::CACHE_CONTROL, "no-store")], Json(body))
+    let status = if ok {
+        StatusCode::OK
+    } else {
+        StatusCode::SERVICE_UNAVAILABLE
+    };
+    (
+        status,
+        [(axum::http::header::CACHE_CONTROL, "no-store")],
+        Json(body),
+    )
 }

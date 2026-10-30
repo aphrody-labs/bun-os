@@ -335,7 +335,8 @@ const pageServer = Bun.serve({
   async fetch(request) {
     const url = new URL(request.url);
     const local = /^\/(emulator(?:-probe)?\.(?:html|js|css))$/.exec(url.pathname)?.[1];
-    if (local) return new Response(Bun.file(join(pageDir, local)), { headers: { ...isolation, "cache-control": "no-store" } });
+    if (local)
+      return new Response(Bun.file(join(pageDir, local)), { headers: { ...isolation, "cache-control": "no-store" } });
     if (url.pathname === "/favicon.ico") return new Response(null, { status: 204 });
     const upstream = await fetch(`${base}${url.pathname}${url.search}`, { headers: request.headers });
     const headers = new Headers(upstream.headers);

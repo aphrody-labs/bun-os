@@ -20,7 +20,9 @@ use axum::{
     response::{IntoResponse, Response},
     routing::get,
 };
-use tower_http::{compression::CompressionLayer, services::ServeDir, set_header::SetResponseHeaderLayer};
+use tower_http::{
+    compression::CompressionLayer, services::ServeDir, set_header::SetResponseHeaderLayer,
+};
 
 const CSP: &str = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; \
 img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; \
@@ -34,7 +36,9 @@ pub struct AppState {
 }
 
 fn env_path(name: &str, default: &str) -> PathBuf {
-    std::env::var_os(name).map(PathBuf::from).unwrap_or_else(|| PathBuf::from(default))
+    std::env::var_os(name)
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(default))
 }
 
 /// `GET /api/os`: the catalog of operating systems. None is startable until the session manager is mounted.
@@ -55,10 +59,14 @@ async fn os_catalog() -> Json<Vec<OsEntry>> {
 
 async fn root(State(state): State<Arc<AppState>>) -> Response {
     match tokio::fs::read(state.client.join("index.html")).await {
-        Ok(bytes) => {
-            ([(header::CONTENT_TYPE, "text/html; charset=utf-8"), (header::CACHE_CONTROL, "no-cache")], bytes)
-                .into_response()
-        }
+        Ok(bytes) => (
+            [
+                (header::CONTENT_TYPE, "text/html; charset=utf-8"),
+                (header::CACHE_CONTROL, "no-cache"),
+            ],
+            bytes,
+        )
+            .into_response(),
         Err(_) => page::placeholder(state.source_commit.as_deref()).into_response(),
     }
 }
@@ -98,8 +106,14 @@ fn app(state: Arc<AppState>) -> Router {
         .with_state(state)
         .layer(middleware::from_fn(log))
         .layer(CompressionLayer::new())
-        .layer(SetResponseHeaderLayer::overriding(header::CONTENT_SECURITY_POLICY, HeaderValue::from_static(CSP)))
-        .layer(SetResponseHeaderLayer::overriding(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff")))
+        .layer(SetResponseHeaderLayer::overriding(
+            header::CONTENT_SECURITY_POLICY,
+            HeaderValue::from_static(CSP),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            header::X_CONTENT_TYPE_OPTIONS,
+            HeaderValue::from_static("nosniff"),
+        ))
         .layer(SetResponseHeaderLayer::overriding(
             header::REFERRER_POLICY,
             HeaderValue::from_static("strict-origin-when-cross-origin"),
@@ -112,11 +126,15 @@ fn app(state: Arc<AppState>) -> Router {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr: SocketAddr = std::env::var("WEBOS_ADDR").unwrap_or_else(|_| "127.0.0.1:8790".into()).parse()?;
+    let addr: SocketAddr = std::env::var("WEBOS_ADDR")
+        .unwrap_or_else(|_| "127.0.0.1:8790".into())
+        .parse()?;
     let state = Arc::new(AppState {
         started: Instant::now(),
         client: env_path("WEBOS_CLIENT_DIR", "client"),
-        source_commit: std::env::var("SOURCE_COMMIT").ok().filter(|s| !s.is_empty()),
+        source_commit: std::env::var("SOURCE_COMMIT")
+            .ok()
+            .filter(|s| !s.is_empty()),
     });
     let listener = tokio::net::TcpListener::bind(addr).await?;
     println!(
