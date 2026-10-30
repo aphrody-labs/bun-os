@@ -155,3 +155,6 @@ export function sourceById(catalog: StoreCatalog, id: string): StoreSource | und
 }
 
 export { installed, needsUpdate };
+
+/** Release version without build metadata: "0.7.1+web.abc" shows as "0.7.1". */
+export const ver = (v: string) => v.split("+")[0] ?? v;

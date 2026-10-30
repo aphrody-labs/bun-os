@@ -3,7 +3,7 @@
 // from real metrics (size, qualification). No popularity or rating ranking exists, so none is shown.
 import { h } from "../../dom";
 import type { StoreApp } from "../../../store/types";
-import { fmt, mi, type Store, type Tab } from "./core";
+import { fmt, mi, ver, type Store, type Tab } from "./core";
 import { badge, chips, iconTile, shelf } from "./parts";
 import { emptyState } from "./states";
 
@@ -26,7 +26,7 @@ function hero(s: Store, slides: StoreApp[]) {
           h("div", { class: "st-meta" }, badge(s.sourceLabel(a.source)), badge(s.categoryLabel(a.category)), s.qualified(a) ? badge("Install-tested", "ok") : null),
           h("h2", {}, a.name),
           h("p", {}, a.summary),
-          h("p", { class: "st-meta" }, [a.version, a.size ? fmt(a.size) : "", a.license].filter(Boolean).join(" · ")),
+          h("p", { class: "st-meta" }, [ver(a.version), a.size ? fmt(a.size) : "", a.license].filter(Boolean).join(" · ")),
           h("button", { class: "btn", type: "button", onclick: () => s.open(a) }, "View details"),
         ),
       ),
@@ -120,7 +120,9 @@ export function viewHome(s: Store): HTMLElement {
     ),
   );
   const installable = catalog.apps.filter((a) => !a.unavailable);
-  for (const c of catalog.categories)
+  const ORDER = ["games", "create", "tools", "system", "android", "libraries", "linux"];
+  const cats = [...catalog.categories].sort((x, y) => (ORDER.indexOf(x.id) + 1 || 99) - (ORDER.indexOf(y.id) + 1 || 99));
+  for (const c of cats)
     parts.push(
       shelf(
         s,

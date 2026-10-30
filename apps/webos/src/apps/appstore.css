@@ -5,7 +5,7 @@
 .st button, .st input { font: inherit; }
 .st :focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
 .st-skip { position: absolute; inset-inline-start: 8px; top: -48px; z-index: 5; padding: 8px 16px; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
-.st-skip:focus { top: 8px; }
+.st-skip:focus-visible { top: 8px; }
 
 /* S01 shell */
 .st-bar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--md-sys-color-outline-variant); flex-wrap: wrap; }
@@ -120,7 +120,7 @@
 .st-suggest li.all { color: var(--md-sys-color-primary); }
 
 /* S05 detail */
-.st-detail { display: grid; gap: 4px; max-width: 1200px; margin-inline: auto; }
+.st-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; max-width: 1200px; margin-inline: auto; }
 .st-back { display: inline-flex; align-items: center; gap: 4px; justify-self: start; }
 .st-detail-head { display: flex; gap: 20px; align-items: center; margin: 8px 0; }
 .st-detail-title h1 { margin: 0 0 6px; }
@@ -138,8 +138,8 @@
 .st-links { display: grid; gap: 6px; } .st-links a { color: var(--md-sys-color-primary); }
 .st-shots { display: flex; gap: 8px; overflow-x: auto; margin: 12px 0; } .st-shots img { height: 240px; border-radius: var(--md-sys-shape-corner-medium); }
 .st-table { border-collapse: collapse; width: 100%; font-size: 13px; } .st-table th, .st-table td { text-align: start; padding: 6px 8px; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
-.st-install { display: grid; gap: 12px; margin: 4px 0 12px; }
-.st-cmds { display: grid; gap: 6px; }
+.st-install { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin: 4px 0 12px; }
+.st-cmds { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
 .st-cmd { display: flex; gap: 8px; align-items: center; padding: 6px 6px 6px 12px; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-highest); min-width: 0; }
 .st-cmd code { flex: 1; overflow-x: auto; white-space: nowrap; font-size: 13px; }
 .st-cmd-id { font-size: 11px; text-transform: uppercase; color: var(--md-sys-color-on-surface-variant); }
@@ -166,3 +166,4 @@
 .st-qual summary { cursor: pointer; color: var(--md-sys-color-primary); padding: 4px 0; }
 .st-qual pre { margin: 4px 0 8px; padding: 8px; max-height: 200px; overflow: auto; font-size: 12px; background: var(--md-sys-color-surface-container-highest); border-radius: var(--md-sys-shape-corner-small); white-space: pre-wrap; }
 .st-step.err strong { color: var(--md-sys-color-error); }
+.st-detail-main, .st-detail-side { min-width: 0; }

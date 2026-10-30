@@ -2,7 +2,7 @@
 // Shared pieces: icon tile, badge, app tile, grid, shelf, chips.
 import { h } from "../../dom";
 import type { StoreApp } from "../../../store/types";
-import { fmt, mi, type Store } from "./core";
+import { fmt, mi, ver, type Store } from "./core";
 
 export const badge = (text: string, cls = "") => h("span", { class: `st-badge ${cls}` }, text);
 
@@ -12,7 +12,7 @@ export function iconTile(a: StoreApp, big = false) {
 }
 
 export function tile(s: Store, a: StoreApp) {
-  const meta = [a.version, a.size ? fmt(a.size) : ""].filter(Boolean).join(" · ");
+  const meta = [ver(a.version), a.size ? fmt(a.size) : ""].filter(Boolean).join(" · ");
   return h(
     "button",
     { class: "st-tile", type: "button", onclick: () => s.open(a), "aria-label": `${a.name}, ${s.sourceLabel(a.source)}` },
