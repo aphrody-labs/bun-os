@@ -22,6 +22,7 @@ members = [
   "crates/aphrody-webos-wasm",
   "crates/aphrody-webos-server",
   "crates/aphrody-webos-protocol",
+  "crates/aphrody-webos-sessions",
   "crates/aphrody-webos-client",
   "crates/bun-ui-web",
   "crates/aphrody-wasm-raw",
