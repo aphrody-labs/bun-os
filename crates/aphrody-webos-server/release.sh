@@ -21,13 +21,14 @@ git diff --quiet HEAD -- crates/aphrody-webos-server crates/aphrody-webos-client
   { echo "Commit the WebOS crates before releasing" >&2; exit 1; }
 
 # The web lane of the shared factory (AGENTS.md: at most four compiler jobs per concurrent lane): its own serialized
-# lock and target directory, so a long workspace job in another lane does not block a site release.
+# lock, target and build directories (.cargo/config.toml sets a shared build-dir), so a long workspace job in
+# another lane does not block a site release.
 lane="${WEBOS_CARGO_LANE:-$HOME/.cache/aphrody/lanes/webos}"
 target="${WEBOS_CARGO_TARGET:-$HOME/build/storage/targets/webos}"
 mkdir -p "$lane" "$target"
 cargo_serial() {
   CARGO_BUILD_JOBS=4 APHRODY_BUILD_HOST='' APHRODY_LOCAL_CARGO=1 APHRODY_CARGO_LOCK_DIR="$lane" \
-    APHRODY_CARGO_TARGET_DIR="$target" scripts/aphrody/build/rust/cargo-serial.sh "$@"
+    APHRODY_CARGO_TARGET_DIR="$target" CARGO_BUILD_BUILD_DIR="$target/build" scripts/aphrody/build/rust/cargo-serial.sh "$@"
 }
 cargo_serial build --release -p aphrody-webos-server -p aphrody-inventory
 # WebAssembly at full feature level (owner order): SIMD, relaxed SIMD, bulk memory, saturating float conversion, sign
