@@ -13,6 +13,7 @@
  */
 import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { EMULATORS, SESSION, type QualificationEntry, type QualificationReport } from "./emulators";
 import { stageBuiltFixtures, stageFixtures, stageSessionFixtures, writeCatalog } from "./fixtures.ts";
@@ -72,6 +73,8 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
       "none",
       "--device",
       "/dev/udmabuf",
+      "--group-add",
+      String(statSync("/dev/udmabuf").gid),
       "-v",
       `${runtime}:/run/user/1000`,
       "-v",
