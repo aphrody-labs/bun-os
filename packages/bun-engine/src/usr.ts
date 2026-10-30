@@ -12,7 +12,7 @@ import { cp, mkdir, rm, symlink } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
 
 export const repoRoot = resolve(import.meta.dir, "..", "..", "..");
-const sevenZip = ["7z", "C:\\Program Files\\7-Zip\\7z.exe"];
+const sevenZip = ["7z", ...(Bun.env.ProgramFiles ? [join(Bun.env.ProgramFiles, "7-Zip", "7z.exe")] : [])];
 
 /** The 7-Zip executable bep unpacks 7z/rar/xz archives with, when one is installed. */
 export function sevenZipTool(): string | undefined {

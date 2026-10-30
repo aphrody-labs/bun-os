@@ -1419,8 +1419,10 @@ aim_eligible: true
 
     #[test]
     fn live_google_wga_exe_if_available() {
-        let path =
-            std::path::Path::new(r"C:\Users\aphro\AppData\Local\Google\Google\latest\google.exe");
+        let Some(local) = std::env::var_os("LOCALAPPDATA") else {
+            return;
+        };
+        let path = std::path::Path::new(&local).join("Google/Google/latest/google.exe");
         if path.exists() {
             let bytes = std::fs::read(path).expect("read google.exe");
             let r = analyze_google_bounded(&bytes, 2048);

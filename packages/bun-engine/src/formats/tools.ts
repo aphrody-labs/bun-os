@@ -67,7 +67,7 @@ export function mameTool(name: "unidasm" | "chdman"): string | undefined {
 export function llvmObjdump(): string | undefined {
   return (
     Bun.which("llvm-objdump") ??
-    firstFile([process.platform === "win32" ? "C:\\Program Files\\LLVM\\bin\\llvm-objdump.exe" : undefined])
+    firstFile([Bun.env.ProgramFiles ? join(Bun.env.ProgramFiles, "LLVM", "bin", "llvm-objdump.exe") : undefined])
   );
 }
 
