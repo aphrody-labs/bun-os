@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aphrody-webos-client"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license = "Apache-2.0"
+description = "aphrody.com thin client in Rust/WebAssembly (ADR-003): OS picker, fullscreen session stream, keyboard, pointer, clipboard and gamepad input."
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+aphrody-webos-protocol = { path = "../aphrody-webos-protocol" }
+js-sys = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+wasm-bindgen = { workspace = true, features = ["std"] }
+wasm-bindgen-futures = { workspace = true }
+web-sys = { workspace = true, features = [
+  "std",
+  "Blob",
+  "BinaryType",
+  "CanvasRenderingContext2d",
+  "Clipboard",
+  "ClipboardEvent",
+  "DataTransfer",
+  "Document",
+  "DomRect",
+  "Element",
+  "Event",
+  "EventTarget",
+  "Gamepad",
+  "GamepadButton",
+  "Headers",
+  "HtmlButtonElement",
+  "HtmlCanvasElement",
+  "HtmlElement",
+  "ImageBitmap",
+  "KeyboardEvent",
+  "Location",
+  "MessageEvent",
+  "Navigator",
+  "Node",
+  "PointerEvent",
+  "Request",
+  "RequestInit",
+  "Response",
+  "WebSocket",
+  "WheelEvent",
+  "Window",
+] }
+
+[lints]
+workspace = true
