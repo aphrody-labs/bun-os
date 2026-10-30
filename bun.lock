@@ -2345,7 +2345,7 @@
 
     "@aphrody/material-design-icons": ["@aphrody/material-design-icons@workspace:packages/material-design-icons"],
 
-    "@aphrody/material-web": ["@aphrody/material-web@build/packages/material-web.tgz", { "dependencies": { "@aphrody/bun": "3.3.0", "@aphrody/canvas": "1.0.9-aphrody.2", "@lit/context": "^1.1.6", "lit": "^3.3.3", "three": "^0.186.1", "tslib": "^2.8.1" }, "hasInstallScript": true }, "sha512-RivFwX5uBiP0R3u1iCOZok/JsHbcIm+uKUeLESwEy1pNKquMNNMicBwe4jLHNHQK0wbn2IoQbzBKDQmVQAaxZQ=="],
+    "@aphrody/material-web": ["@aphrody/material-web@build/packages/material-web.tgz", { "dependencies": { "@aphrody/bun": "3.3.0", "@aphrody/canvas": "1.0.9-aphrody.2", "@lit/context": "^1.1.6", "lit": "^3.3.3", "three": "^0.186.1", "tslib": "^2.8.1" }, "hasInstallScript": true }, "sha512-tRql95bprm0Cukky2KXeUX8joMswIfQX3MS+wcxeYAIQpHDPwLM3hlHn3UFpDVoYj+BmwhguOWQeEJzds1imbA=="],
 
     "@aphrody/mcp-ui": ["@aphrody/mcp-ui@7.1.1-aphrody.1", "", { "dependencies": { "@modelcontextprotocol/client": "^2.2.0", "@modelcontextprotocol/core": "^2.2.0", "@modelcontextprotocol/ext-apps": "^2.0.3", "@modelcontextprotocol/sdk": "^1.32.0", "zod": "^3.25.76 || ^4.0.0" }, "peerDependencies": { "react": ">=18.0.0", "react-dom": ">=18.0.0" } }, "sha512-nvi/YuU8lSKjc0bPCZzOfpNU/w3NrgmygN2VaI3ptd2eN4yydFUmpNQivgUp01cApjjndGN3kgGa4YZYM1MDXw=="],
 
