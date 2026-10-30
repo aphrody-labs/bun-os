@@ -1,0 +1,40 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Android 17 (LineageOS 24.0 GAPPS, WayDroid-ATV) preparation and first-boot provisioning for Waydroid.
+#   waydroid-android17 prepare [userdata-dir]   before `waydroid session start` (as the session user)
+#   waydroid-android17 provision                 as root once sys.boot_completed=1 (idempotent)
+# The Android 17 frameworks have no gralloc 2/3 mapper, so the software path ("default" gralloc) aborts
+# surfaceflinger with "gralloc-mapper is missing". Without a GPU, minigbm's gralloc 4 runs on the vgem
+# render node (host module vgem, passed to the container as /dev/dri/renderD128). waydroid-init reads
+# the override from /data/misc/waydroid_settings.
+set -eu
+cmd=${1:-}
+case "$cmd" in
+  prepare)
+    data=${2:-${XDG_DATA_HOME:-$HOME/.local/share}/waydroid/data}
+    mkdir -p "$data/misc"
+    render=$(ls /dev/dri/renderD* 2>/dev/null | head -n 1 || true)
+    if [ -n "$render" ] && [ ! -f "$data/misc/waydroid_settings" ]; then
+      printf 'ro.hardware.gralloc=minigbm\ngralloc.gbm.device=%s\n' "$render" > "$data/misc/waydroid_settings"
+    fi
+    ;;
+  provision)
+    android() { waydroid shell -- "$@"; }
+    [ "$(android getprop sys.boot_completed | tr -d '\r')" = 1 ] || { echo "Android has not finished booting" >&2; exit 1; }
+    [ "$(android settings get global bunos_provisioned | tr -d '\r')" = 1 ] && exit 0
+    # Large-screen windowing (Googlebook desktop windowing globals).
+    android settings put global enable_freeform_support 1
+    android settings put global force_resizable_activities 1
+    android settings put global enable_non_resizable_multi_window 1
+    # Account sign-in happens in the Play Store window; the full-screen setup wizards do not fit windows.
+    android settings put global device_provisioned 1
+    android settings put secure user_setup_complete 1
+    android pm disable-user --user 0 org.lineageos.setupwizard >/dev/null 2>&1 || true
+    android pm disable-user --user 0 com.google.android.setupwizard >/dev/null 2>&1 || true
+    android settings put global bunos_provisioned 1
+    ;;
+  *)
+    echo "usage: waydroid-android17 prepare [userdata-dir] | provision" >&2
+    exit 2
+    ;;
+esac

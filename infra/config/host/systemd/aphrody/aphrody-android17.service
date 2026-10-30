@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+# Android 17 (LineageOS 24.0 GAPPS waydroid_x86_64) Waydroid session on the VPS host, headless.
+# Needs waydroid-container.service (vendor/waydroid installed with USE_NFTABLES=1), the modules in
+# modules-load.d/aphrody-vps.conf (binder_linux, vgem, erofs, nft_masq) and ufw allowing waydroid0.
+# Images: /home/ubuntu/.cache/bunos-waydroid/a17/images (private, never published).
+[Unit]
+Description=Aphrody Android 17 Waydroid session (headless)
+After=waydroid-container.service network-online.target
+Requires=waydroid-container.service
+
+[Service]
+Type=simple
+User=ubuntu
+Environment=HOME=/home/ubuntu
+ExecStart=/usr/local/libexec/aphrody-android17-session
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
