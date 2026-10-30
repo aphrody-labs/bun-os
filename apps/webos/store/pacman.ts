@@ -248,10 +248,7 @@ export async function build(ctx: Ctx): Promise<void> {
   const bun = Bun.which("bun") ?? join(Bun.env.HOME ?? "", ".local/bin/bun");
   const script = `set -eu
 # [multilib]: lib32 and mingw dependencies of DXVK, vkd3d-proton and Proton.
-grep -qx '.multilib.' /etc/pacman.conf || printf '
-[multilib]
-Include = /etc/pacman.d/mirrorlist
-' >> /etc/pacman.conf
+grep -qx '.multilib.' /etc/pacman.conf || printf '%s\n' '' '[multilib]' 'Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
 pacman -Syu --noconfirm --needed base-devel git gnupg rsync >/dev/null
 export GNUPGHOME=/gnupg
 if ! gpg --list-secret-keys aphrody-store >/dev/null 2>&1; then
