@@ -90,7 +90,7 @@ export async function buildFiche(root: string, envFile: string, runner: Run = ru
 
 /** Pousse la fiche sur l'hôte hub puis récupère la version fusionnée avec la partie d'Omar. */
 export async function syncFicheWith(host: string, fiche: string): Promise<string | undefined> {
-  const dir = "/var/lib/aphrody-sync";
+  const dir = "~/.local/state/aphrody-sync";
   const proc = Bun.spawn(
     [
       "ssh",
@@ -99,7 +99,7 @@ export async function syncFicheWith(host: string, fiche: string): Promise<string
       "-o",
       "ConnectTimeout=8",
       host,
-      `cat > ${dir}/fiche-owner.md.tmp && mv ${dir}/fiche-owner.md.tmp ${dir}/fiche-owner.md`,
+      `mkdir -p ${dir} && cat > ${dir}/fiche-owner.md.tmp && mv ${dir}/fiche-owner.md.tmp ${dir}/fiche-owner.md`,
     ],
     { stdin: "pipe", stdout: "ignore", stderr: "ignore", timeout: 20_000 },
   );
