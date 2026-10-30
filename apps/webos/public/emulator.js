@@ -281,6 +281,7 @@ async function autorun() {
       lit: handle.lit,
       hash: handle.frame_hash,
       renderer: handle.renderer,
+      gpu2d: handle.gpu2d_submitted_frames ?? 0,
       audio: handle.audio,
       audioProbe: globalThis.__audioProbe?.(),
       stopped: handle.stopped ?? null,

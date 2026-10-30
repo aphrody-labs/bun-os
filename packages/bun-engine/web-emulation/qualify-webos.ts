@@ -226,15 +226,19 @@ async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Pr
       sessionId,
     );
     const clip = JSON.parse(box.value);
-    let lit = false;
+    let screenshotLit = false;
     if (clip.width > 0 && clip.height > 0) {
       const shot = await cdp.send("Page.captureScreenshot", { format: "png", clip }, sessionId);
       const png = Buffer.from(shot.data, "base64");
       await Bun.write(join(objects, "emulators/shots", `${id}.png`), png);
       entry.screenshot = `/api/emulators/qualification/${id}.png`;
-      lit = pngHasLitPixel(png);
+      screenshotLit = pngHasLitPixel(png);
     }
     entry.frames = result.frames;
+    // Bevy presents through WebGPU, and a headless screenshot of a WebGPU canvas can come back transparent: the
+    // core's own framebuffer (software renderers) or its GPU submission counter (Dust on wgpu) is the evidence then.
+    const gpuSubmitted = result.renderer === "wgpu30-dust" && (result.gpu2d ?? 0) > 0;
+    const lit = screenshotLit || result.lit === true || gpuSubmitted;
     entry.lit = lit;
     entry.hash = result.hash;
     entry.audio = result.audio;
