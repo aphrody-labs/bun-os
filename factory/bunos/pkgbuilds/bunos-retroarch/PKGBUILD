@@ -27,8 +27,8 @@ sha256sums=('SKIP')
 build() {
   cd retroarch
   # Vulkan, Wayland and PipeWire are autodetected; the options follow Arch's extra/retroarch.
-  ./configure --prefix=/usr --sysconfdir=/etc --disable-builtinmbedtls --disable-builtinzlib --disable-cg \
-    --disable-jack --disable-oss --enable-dbus
+  # The fork no longer carries the builtin mbedtls/zlib/flac switches.
+  ./configure --prefix=/usr --sysconfdir=/etc --disable-cg --disable-jack --disable-oss --enable-dbus
   make -j4
   make -C libretro-common/audio/dsp_filters
   make -C gfx/video_filters
