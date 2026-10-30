@@ -86,7 +86,6 @@ for (const path of [
   "aphrody-webos",
   "release.env",
   "client/index.html",
-  "client/aphrody_webos_client_bg.wasm",
   "inventory/inventory.json",
 ])
   if (!receipt.files.some(file => file.path === path)) throw new Error(`Unreceipted ${path}`);

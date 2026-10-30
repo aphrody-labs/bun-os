@@ -170,48 +170,6 @@
       },
       "big": false,
       "why": "C#/WinRT"
-    },
-    "edit": {
-      "repo": "microsoft/edit",
-      "ref": "v2.0.0",
-      "sha": "d3f86975dc3c1298bf7300dbdf409a1df8d8b2b7",
-      "defaultBranch": "main",
-      "sizeKB": 2675,
-      "license": "MIT",
-      "big": false,
-      "why": "Microsoft Edit (Rust TUI editor): built for the Arch/Alpine sessions (msedit) and as edit.exe for the Wine session"
-    },
-    "cascadia-code": {
-      "repo": "microsoft/cascadia-code",
-      "ref": "v2407.24",
-      "sha": "56bcca3f2c1e4cb19458954f0e2bb4635960df91",
-      "defaultBranch": "main",
-      "sizeKB": 28913,
-      "license": "OFL-1.1",
-      "big": false,
-      "why": "Cascadia Code/Mono fonts for session terminals and Code-OSS"
-    },
-    "terminal": {
-      "repo": "microsoft/terminal",
-      "ref": "v1.25.2733.0",
-      "sha": "dc8ae365847d41f62d1ebca93815bb00959bc12f",
-      "defaultBranch": "main",
-      "sizeKB": 181760,
-      "license": "MIT",
-      "big": true,
-      "shallow": true,
-      "why": "Windows Terminal and ConPTY sources: reference for the Rust terminal backend and the Windows session; the WinUI app itself does not run under Wine"
-    },
-    "vscode": {
-      "repo": "microsoft/vscode",
-      "ref": "1.144.0",
-      "sha": "2c33b50b16c472efe58357d1d2a8a5414bc23fbf",
-      "defaultBranch": "main",
-      "sizeKB": 1657703,
-      "license": "MIT",
-      "big": true,
-      "shallow": true,
-      "why": "Code-OSS: the MIT build of VS Code (Arch session: pacman `code` built from this tag; Open VSX marketplace, no Microsoft branding or Marketplace)"
     }
   }
 }
