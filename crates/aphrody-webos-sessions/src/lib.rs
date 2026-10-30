@@ -9,7 +9,7 @@
 //! entrypoint `/usr/bin/bunos-unified-session` reads `BUNOS_SESSION_SIZE=WxH` and
 //! `APHRODY_REMOTE_TOKEN_FILE=/run/secrets/session.token`, runs cage headless with cosmic-comp nested and the
 //! gateway on `0.0.0.0:8794`, home `/home/aphrody` on volume `aphrody-home-<user>`, Waydroid images read-only
-//! at `/var/lib/waydroid/images`. Hardening: read-only rootfs plus tmpfs mounts, every capability dropped but
+//! at `/usr/share/bunos/waydroid/images`. Hardening: read-only rootfs plus tmpfs mounts, every capability dropped but
 //! the set LXC needs for the inner Android container, no-new-privileges, private cgroup namespace, pids and
 //! CPU/memory limits, a dedicated bridge network without inter-container traffic.
 
@@ -21,8 +21,8 @@ use std::time::{Duration, Instant};
 use anyhow::{Context, Result, bail};
 use bollard::Docker;
 use bollard::container::{
-    Config, CreateContainerOptions, InspectContainerOptions, ListContainersOptions,
-    RemoveContainerOptions, StartContainerOptions,
+    Config, CreateContainerOptions, InspectContainerOptions, ListContainersOptions, RemoveContainerOptions,
+    StartContainerOptions,
 };
 use bollard::models::{HostConfig, HostConfigCgroupnsModeEnum};
 use bollard::network::{CreateNetworkOptions, InspectNetworkOptions};
@@ -61,13 +61,9 @@ impl SessionConfig {
         SessionConfig {
             image: var("WEBOS_SESSIONS_IMAGE").unwrap_or_else(|| "bunos-unified:latest".into()),
             network: var("WEBOS_SESSIONS_NETWORK").unwrap_or_else(|| "aphrody-sessions".into()),
-            token_dir: var("WEBOS_SESSIONS_TOKEN_DIR")
-                .unwrap_or_else(|| "/run/aphrody/sessions".into())
-                .into(),
+            token_dir: var("WEBOS_SESSIONS_TOKEN_DIR").unwrap_or_else(|| "/run/aphrody/sessions".into()).into(),
             waydroid_images: Some(
-                var("WEBOS_SESSIONS_WAYDROID_IMAGES")
-                    .unwrap_or_else(|| format!("{home}/.cache/bunos-waydroid/a17"))
-                    .into(),
+                var("WEBOS_SESSIONS_WAYDROID_IMAGES").unwrap_or_else(|| format!("{home}/.cache/bunos-waydroid/a17/images")).into(),
             )
             .filter(|p: &PathBuf| p.is_dir()),
             cpus: num("WEBOS_SESSIONS_CPUS", 6.0),
@@ -121,13 +117,7 @@ fn random_hex(bytes: usize) -> String {
 pub fn user_slug(user: &str) -> Option<String> {
     let s: String = user
         .chars()
-        .map(|c| {
-            if c.is_ascii_alphanumeric() {
-                c.to_ascii_lowercase()
-            } else {
-                '-'
-            }
-        })
+        .map(|c| if c.is_ascii_alphanumeric() { c.to_ascii_lowercase() } else { '-' })
         .collect::<String>()
         .trim_matches('-')
         .chars()
@@ -139,18 +129,11 @@ pub fn user_slug(user: &str) -> Option<String> {
 impl Sessions {
     /// Connect to the local Docker Engine, prepare the network and adopt running session containers.
     pub async fn connect(cfg: SessionConfig) -> Result<Self> {
-        let docker =
-            Docker::connect_with_local_defaults().context("cannot reach the Docker Engine")?;
+        let docker = Docker::connect_with_local_defaults().context("cannot reach the Docker Engine")?;
         docker.ping().await.context("Docker Engine ping")?;
-        tokio::fs::create_dir_all(&cfg.token_dir)
-            .await
-            .with_context(|| format!("cannot create {}", cfg.token_dir.display()))?;
+        tokio::fs::create_dir_all(&cfg.token_dir).await.with_context(|| format!("cannot create {}", cfg.token_dir.display()))?;
         set_mode(&cfg.token_dir, 0o700).await?;
-        let me = Sessions {
-            docker,
-            cfg: Arc::new(cfg),
-            live: Arc::new(Mutex::new(HashMap::new())),
-        };
+        let me = Sessions { docker, cfg: Arc::new(cfg), live: Arc::new(Mutex::new(HashMap::new())) };
         me.ensure_network().await?;
         me.adopt().await?;
         let reaper = me.clone();
@@ -167,10 +150,7 @@ impl Sessions {
     /// Whether sessions can start: the image exists locally.
     pub async fn availability(&self) -> SessionAvailability {
         match self.docker.inspect_image(&self.cfg.image).await {
-            Ok(_) => SessionAvailability {
-                available: true,
-                reason: None,
-            },
+            Ok(_) => SessionAvailability { available: true, reason: None },
             Err(_) => SessionAvailability {
                 available: false,
                 reason: Some("The Bun OS session image is not built on this host yet.".into()),
@@ -179,23 +159,12 @@ impl Sessions {
     }
 
     async fn ensure_network(&self) -> Result<()> {
-        if self
-            .docker
-            .inspect_network(&self.cfg.network, None::<InspectNetworkOptions<String>>)
-            .await
-            .is_ok()
-        {
+        if self.docker.inspect_network(&self.cfg.network, None::<InspectNetworkOptions<String>>).await.is_ok() {
             return Ok(());
         }
         let mut options = HashMap::new();
-        options.insert(
-            "com.docker.network.bridge.enable_icc".to_owned(),
-            "false".to_owned(),
-        );
-        options.insert(
-            "com.docker.network.bridge.name".to_owned(),
-            "aphrody-sess0".to_owned(),
-        );
+        options.insert("com.docker.network.bridge.enable_icc".to_owned(), "false".to_owned());
+        options.insert("com.docker.network.bridge.name".to_owned(), "aphrody-sess0".to_owned());
         self.docker
             .create_network(CreateNetworkOptions {
                 name: self.cfg.network.clone(),
@@ -214,42 +183,20 @@ impl Sessions {
         filters.insert("label".to_owned(), vec![format!("{LABEL}=1")]);
         let list = self
             .docker
-            .list_containers(Some(ListContainersOptions::<String> {
-                all: false,
-                filters,
-                ..Default::default()
-            }))
+            .list_containers(Some(ListContainersOptions::<String> { all: false, filters, ..Default::default() }))
             .await?;
         for c in list {
-            let Some(user) = c.labels.as_ref().and_then(|l| l.get(LABEL_USER)).cloned() else {
-                continue;
-            };
-            let Some(name) = c
-                .names
-                .and_then(|n| n.first().map(|s| s.trim_start_matches('/').to_owned()))
-            else {
-                continue;
-            };
-            let Ok(token) = tokio::fs::read_to_string(self.token_path(&name)).await else {
-                continue;
-            };
+            let Some(user) = c.labels.as_ref().and_then(|l| l.get(LABEL_USER)).cloned() else { continue };
+            let Some(name) = c.names.and_then(|n| n.first().map(|s| s.trim_start_matches('/').to_owned())) else { continue };
+            let Ok(token) = tokio::fs::read_to_string(self.token_path(&name)).await else { continue };
             if let Ok(url) = self.gateway_url(&name).await {
                 let session = Session {
                     id: name.clone(),
                     user,
                     state: SessionState::Running,
-                    backend: Some(Backend {
-                        url,
-                        token: token.trim().to_owned(),
-                    }),
+                    backend: Some(Backend { url, token: token.trim().to_owned() }),
                 };
-                self.live.lock().await.insert(
-                    name,
-                    Entry {
-                        session,
-                        last_seen: Instant::now(),
-                    },
-                );
+                self.live.lock().await.insert(name, Entry { session, last_seen: Instant::now() });
             }
         }
         Ok(())
@@ -260,10 +207,7 @@ impl Sessions {
     }
 
     async fn gateway_url(&self, name: &str) -> Result<String> {
-        let info = self
-            .docker
-            .inspect_container(name, None::<InspectContainerOptions>)
-            .await?;
+        let info = self.docker.inspect_container(name, None::<InspectContainerOptions>).await?;
         let ip = info
             .network_settings
             .and_then(|n| n.networks)
@@ -285,13 +229,7 @@ impl Sessions {
         }
         let _ = self
             .docker
-            .remove_container(
-                &name,
-                Some(RemoveContainerOptions {
-                    force: true,
-                    ..Default::default()
-                }),
-            )
+            .remove_container(&name, Some(RemoveContainerOptions { force: true, ..Default::default() }))
             .await;
         let token = random_hex(32);
         let token_file = self.token_path(&name);
@@ -305,7 +243,7 @@ impl Sessions {
             format!("{}:/run/secrets/session.token:ro", token_file.display()),
         ];
         if let Some(images) = &self.cfg.waydroid_images {
-            binds.push(format!("{}:/var/lib/waydroid/images:ro", images.display()));
+            binds.push(format!("{}:/usr/share/bunos/waydroid/images:ro", images.display()));
         }
         let tmpfs: HashMap<String, String> = [
             ("/run", "rw,exec,nosuid,size=512m"),
@@ -318,19 +256,8 @@ impl Sessions {
         .map(|(k, v)| (k.to_owned(), v.to_owned()))
         .collect();
         let caps = [
-            "SYS_ADMIN",
-            "NET_ADMIN",
-            "NET_RAW",
-            "SETUID",
-            "SETGID",
-            "CHOWN",
-            "DAC_OVERRIDE",
-            "FOWNER",
-            "KILL",
-            "MKNOD",
-            "SYS_CHROOT",
-            "SETPCAP",
-            "AUDIT_WRITE",
+            "SYS_ADMIN", "NET_ADMIN", "NET_RAW", "SETUID", "SETGID", "CHOWN", "DAC_OVERRIDE", "FOWNER", "KILL", "MKNOD",
+            "SYS_CHROOT", "SETPCAP", "AUDIT_WRITE",
         ];
         let host = HostConfig {
             binds: Some(binds),
@@ -366,32 +293,12 @@ impl Sessions {
             ..Default::default()
         };
         self.docker
-            .create_container(
-                Some(CreateContainerOptions {
-                    name: name.clone(),
-                    platform: None,
-                }),
-                config,
-            )
+            .create_container(Some(CreateContainerOptions { name: name.clone(), platform: None }), config)
             .await
             .with_context(|| format!("cannot create {name}"))?;
-        let starting = Session {
-            id: name.clone(),
-            user: user.to_owned(),
-            state: SessionState::Starting,
-            backend: None,
-        };
-        self.live.lock().await.insert(
-            name.clone(),
-            Entry {
-                session: starting,
-                last_seen: Instant::now(),
-            },
-        );
-        self.docker
-            .start_container(&name, None::<StartContainerOptions<String>>)
-            .await
-            .with_context(|| format!("cannot start {name}"))?;
+        let starting = Session { id: name.clone(), user: user.to_owned(), state: SessionState::Starting, backend: None };
+        self.live.lock().await.insert(name.clone(), Entry { session: starting, last_seen: Instant::now() });
+        self.docker.start_container(&name, None::<StartContainerOptions<String>>).await.with_context(|| format!("cannot start {name}"))?;
 
         let url = self.gateway_url(&name).await?;
         let health = url.replace("ws://", "").replace("/ws", "");
@@ -402,10 +309,7 @@ impl Sessions {
             }
             if Instant::now() > deadline {
                 let _ = self.stop(&name).await;
-                bail!(
-                    "the session did not become ready in {:?}",
-                    self.cfg.ready_timeout
-                );
+                bail!("the session did not become ready in {:?}", self.cfg.ready_timeout);
             }
             tokio::time::sleep(Duration::from_millis(500)).await;
         }
@@ -415,13 +319,7 @@ impl Sessions {
             state: SessionState::Running,
             backend: Some(Backend { url, token }),
         };
-        self.live.lock().await.insert(
-            name,
-            Entry {
-                session: session.clone(),
-                last_seen: Instant::now(),
-            },
-        );
+        self.live.lock().await.insert(name, Entry { session: session.clone(), last_seen: Instant::now() });
         Ok(session)
     }
 
@@ -448,13 +346,7 @@ impl Sessions {
         self.live.lock().await.remove(id);
         let _ = tokio::fs::remove_file(self.token_path(id)).await;
         self.docker
-            .remove_container(
-                id,
-                Some(RemoveContainerOptions {
-                    force: true,
-                    ..Default::default()
-                }),
-            )
+            .remove_container(id, Some(RemoveContainerOptions { force: true, ..Default::default() }))
             .await
             .with_context(|| format!("cannot remove {id}"))?;
         Ok(())
