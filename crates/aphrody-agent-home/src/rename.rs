@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Rename an Agent Home (for example `local` to `discord:<id>`), migrating its
+//! Rename an Agent Home (for example `local` to `user:<id>`), migrating its
 //! memories and the references that point at it.
 //!
 //! The new identifier is kept verbatim as the home `agent_id`; the directory
@@ -430,13 +430,13 @@ mod tests {
         let r = rename_home(&RenameOptions {
             root,
             from: "local".into(),
-            to: "discord:42".into(),
+            to: "user:42".into(),
             apply: false,
         })
         .unwrap();
         assert!(!r.applied);
         assert!(home.is_dir());
-        assert_eq!(r.to_path, state.path().join("workspaces/discord-42"));
+        assert_eq!(r.to_path, state.path().join("workspaces/user-42"));
         assert_eq!(r.from_id, "local");
         assert_eq!(r.home_rewrites.len(), 3);
         assert_eq!(r.reference_rewrites.len(), 2);
@@ -449,7 +449,7 @@ mod tests {
         let r = rename_home(&RenameOptions {
             root,
             from: "local".into(),
-            to: "discord:42".into(),
+            to: "user:42".into(),
             apply: true,
         })
         .unwrap();
@@ -457,15 +457,15 @@ mod tests {
         let new = r.to_path.clone();
         let ns = new.display().to_string();
         let user = UserProfile::load(&new).unwrap();
-        assert_eq!(user.agent_id.as_deref(), Some("discord:42"));
+        assert_eq!(user.agent_id.as_deref(), Some("user:42"));
         assert_eq!(user.address_as.as_deref(), Some("Sam"));
         let memory = std::fs::read_to_string(new.join("MEMORY.md")).unwrap();
         assert!(
-            memory.contains("agent_id: discord:42")
+            memory.contains("agent_id: user:42")
                 && memory.contains(&format!("See {ns}/memory."))
         );
         let note = std::fs::read_to_string(new.join("memory/2026-10-06.md")).unwrap();
-        assert!(note.contains("agent_id: discord:42") && note.contains("fact"));
+        assert!(note.contains("agent_id: user:42") && note.contains("fact"));
         let other = std::fs::read_to_string(new.join("memory/other.md")).unwrap();
         assert!(other.contains("agent_id: someone-else"));
         assert_eq!(

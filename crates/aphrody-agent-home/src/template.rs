@@ -287,17 +287,17 @@ mod tests {
         let tpl = tempfile::tempdir().unwrap();
         template(tpl.path());
         let homes = tempfile::tempdir().unwrap();
-        let dest = homes.path().join("discord-42");
+        let dest = homes.path().join("user-42");
         let report = instantiate_template(&TemplateOptions {
             template: tpl.path().to_path_buf(),
             destination: dest.clone(),
-            agent_id: Some("discord:42".into()),
+            agent_id: Some("user:42".into()),
             user_fields: vec![("address_as".into(), "Sam".into())],
             ..TemplateOptions::default()
         })
         .unwrap();
         let soul = std::fs::read_to_string(dest.join(SOUL_FILENAME)).unwrap();
-        assert!(soul.contains("Tu es discord:42 pour Sam."), "{soul}");
+        assert!(soul.contains("Tu es user:42 pour Sam."), "{soul}");
         // Binary files are copied verbatim.
         assert_eq!(
             std::fs::read(dest.join("avatar.png")).unwrap(),
@@ -313,13 +313,13 @@ mod tests {
         assert_eq!(user.address_as.as_deref(), Some("Sam"));
         assert_eq!(user.language.as_deref(), Some("fr"));
         assert_eq!(user.avatar.as_deref(), Some("avatar.png"));
-        assert_eq!(user.agent_id.as_deref(), Some("discord:42"));
+        assert_eq!(user.agent_id.as_deref(), Some("user:42"));
         assert_eq!(
             user.template_revision.as_deref(),
             Some(report.template_revision.as_str())
         );
         assert!(user.updated_at.is_some());
-        assert!(user.body.contains("Notes discord-42."));
+        assert!(user.body.contains("Notes user-42."));
         // No staging directory left behind.
         let leftovers: Vec<_> = std::fs::read_dir(homes.path()).unwrap().collect();
         assert_eq!(leftovers.len(), 1);

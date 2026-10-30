@@ -303,8 +303,8 @@ mod tests {
         std::fs::create_dir_all(state.path().join("workspace-x")).unwrap();
         assert_eq!(root.home("x"), state.path().join("users/x"));
         assert_eq!(
-            root.agent_home("discord:42").unwrap(),
-            state.path().join("users/discord-42")
+            root.agent_home("user:42").unwrap(),
+            state.path().join("users/user-42")
         );
         assert!(root.agent_home("::").is_none());
     }

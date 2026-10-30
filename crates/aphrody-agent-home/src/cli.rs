@@ -138,7 +138,7 @@ enum Command {
     Rename {
         /// Current home name or identifier.
         from: String,
-        /// New identifier (for example `discord:123`).
+        /// New identifier (for example `user:123`).
         to: String,
         /// Write.
         #[arg(long)]
@@ -444,12 +444,12 @@ mod tests {
             "users",
             "rename",
             "local",
-            "discord:7",
+            "user:7",
             "--apply",
         ])
         .unwrap();
         assert_eq!(renamed["applied"], true);
-        assert!(state.path().join("users/discord-7/USER.md").is_file());
+        assert!(state.path().join("users/user-7/USER.md").is_file());
         assert!(run_args(&["--state", s, "--homes-dir", "users", "revision", "local"]).is_err());
     }
 

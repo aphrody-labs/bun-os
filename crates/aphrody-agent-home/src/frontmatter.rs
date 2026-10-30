@@ -230,7 +230,7 @@ mod tests {
         let out = upsert_scalars(
             "Plain body\n",
             &[
-                ("agent_id", Some("discord:123")),
+                ("agent_id", Some("user:123")),
                 ("note", Some("a: b # c")),
                 ("q", Some("say \"hi\"")),
             ],
@@ -238,7 +238,7 @@ mod tests {
         assert!(out.starts_with("---\n"));
         assert!(out.ends_with("\nPlain body\n"));
         let pairs = parse(split(&out).0.unwrap());
-        assert_eq!(pairs[0].1, FmValue::Scalar("discord:123".into()));
+        assert_eq!(pairs[0].1, FmValue::Scalar("user:123".into()));
         assert_eq!(pairs[1].1, FmValue::Scalar("a: b # c".into()));
         assert_eq!(pairs[2].1, FmValue::Scalar("say \"hi\"".into()));
     }

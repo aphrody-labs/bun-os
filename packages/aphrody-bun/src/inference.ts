@@ -69,7 +69,7 @@ async function request(value: Record<string, unknown>, options: { signal?: Abort
       if (performance.now() >= deadline) throw new DOMException("Native inference deadline exceeded", "TimeoutError");
       const result = read(native.aphrody_inference_poll(job));
       if (result.pending !== true) return result;
-      // oxlint-disable-next-line no-await-in-loop -- poll native work without blocking Bun/Discord heartbeats
+      // oxlint-disable-next-line no-await-in-loop -- poll native work without blocking Bun heartbeats
       await Bun.sleep(10);
     }
   } finally {

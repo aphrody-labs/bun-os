@@ -45,7 +45,7 @@ pub struct UserProfile {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub avatar: Option<String>,
     /// Stable identifier of the agent bound to this home (for example
-    /// `local` or `discord:<id>`). Kept verbatim; the directory name is its
+    /// `local` or `user:<id>`). Kept verbatim; the directory name is its
     /// sanitised form ([`crate::paths::sanitize_profile`]).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub agent_id: Option<String>,
@@ -284,17 +284,17 @@ mod tests {
 
     #[test]
     fn parses_profile_metadata_without_injecting_it() {
-        let src = "---\nname: Sam\navatar: img/me.png\nagent_id: discord:42\nupdated_at: \
+        let src = "---\nname: Sam\navatar: img/me.png\nagent_id: user:42\nupdated_at: \
                    2026-10-06T10:00:00Z\ntemplate_revision: sha256-v1:ab\n---\n";
         let u = UserProfile::parse(src);
         assert_eq!(u.avatar.as_deref(), Some("img/me.png"));
-        assert_eq!(u.agent_id.as_deref(), Some("discord:42"));
+        assert_eq!(u.agent_id.as_deref(), Some("user:42"));
         assert_eq!(u.updated_at.as_deref(), Some("2026-10-06T10:00:00Z"));
         assert_eq!(u.template_revision.as_deref(), Some("sha256-v1:ab"));
         // Metadata is not prompt material.
         let d = u.render_directives();
         assert!(
-            !d.contains("img/me.png") && !d.contains("discord:42"),
+            !d.contains("img/me.png") && !d.contains("user:42"),
             "{d}"
         );
     }
