@@ -4,7 +4,7 @@ Status: accepted 2026-10-30. Supersedes ADR-001 and ADR-002 of the same day. Sco
 
 ## Decision
 
-The aphrody.com WebOS site (a JavaScript desktop with 17 JS apps, a Cloudflare-Worker-shaped Bun service and TypeScript build scripts) was never the owner's choice. It is demolished without compatibility preservation. What replaces it: real operating systems in the browser (Arch Linux, Alpine, Android, Wine and Proton), streamed from containers on the Bun OS host, with everything in Rust.
+The aphrody.com WebOS site (a JavaScript desktop with 17 JS apps, a Cloudflare-Worker-shaped Bun service and TypeScript build scripts) was never the owner's choice. It is demolished without compatibility preservation. What replaces it: real operating systems in the browser, streamed from containers on the Bun OS host, with everything in Rust. Sessions (owner update, same day): Pop!_OS with the full COSMIC desktop (cosmic-comp), Redox OS (the pure-Rust OS, QEMU inside its container), Android, Wine and Proton. Arch/Omarchy/Hyprland and Alpine are dropped for now.
 
 ## What is removed
 
@@ -25,12 +25,20 @@ Server modules and owners:
 | Module | Owner | Content |
 | --- | --- | --- |
 | `assets`, `health`, `auth`, `log` | WebOS architect | Static client files with immutable caching and CSP; `/api/health` with checks; session tokens (scheme of `crates/aphrody-remote-desktop` tokens); one JSON log line per request. |
-| `sessions` | session agent | Session manager over the Docker Engine API (bollard): one container per user session from the OS images (Arch, Alpine, Android via Waydroid/redroid, Wine, Proton), cgroup limits, lifecycle, idle reaping. |
+| `sessions` | session agent | Session manager over the Docker Engine API (bollard): one container per user session from the OS images (Pop!_OS COSMIC, Redox under QEMU, Android via redroid, Wine, Proton as a gamescope session), cgroup limits, lifecycle, idle reaping. |
 | `gateway` | session agent | Streaming: WebRTC (webrtc-rs) with H.264/Opus from the container (GStreamer pipeline of `packages/bun-gamestream` ported with gstreamer-rs), WebSocket with WebCodecs-decodable frames as fallback; input, clipboard, audio and gamepad channels. Based on `crates/aphrody-remote-desktop` (axum, protocol, tokens). |
 | `repos` | store agent | Package repositories API (`/api/store`, pacman, flatpak, npm, cargo, apk) ported from `apps/webos/store`. |
 | `inventory` | inventory agent | `/api/inventory` and `/api/rpc` ported from `apps/webos/inventory.ts`. |
 
 Wine and Proton images and gaming input belong to the emulators agent; native app packaging in the images belongs to the native-apps agent.
+
+## Client UI decision
+
+The client uses web-sys directly, not iced with libcosmic. Evidence: the client is one OS picker and one fullscreen stream surface; the stream needs browser objects (WebSocket, RTCPeerConnection, video/WebCodecs, Gamepad API) that iced cannot host inside its canvas; an iced wasm build pulls wgpu, winit and text shaping and lands in the megabytes against the 300 KB budget, and libcosmic does not target wasm32. COSMIC identity comes from the COSMIC dark palette (cosmic-theme) in the bootstrap page, and the desktop itself is real COSMIC in the Pop!_OS session.
+
+## Capture and input
+
+Inside each Linux session a per-session `aphrody-remote-desktop` process (session agent) captures the compositor with wlr-screencopy over shm and injects input with wlr-virtual-pointer and zwp-virtual-keyboard (pure Rust, wayland-client); Redox is reached through QEMU VNC with the crate's vnc-client feature. Whether cosmic-comp exposes wlr-screencopy or only ext-image-copy-capture is to be verified; the second capture path is added if needed.
 
 ## Rules
 
