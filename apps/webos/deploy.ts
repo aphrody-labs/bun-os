@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// VPS runner -> immutable release -> host activation, without cloud credentials.
+// VPS checkout (main) -> immutable release -> host activation, without cloud credentials.
 import { cp, mkdir, rename } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { stageIso } from "./vm";
@@ -15,8 +15,8 @@ function git(...args: string[]) {
   return result.stdout.toString().trim();
 }
 const commit = git("rev-parse", "HEAD");
-if (commit !== git("rev-parse", "refs/remotes/origin/os"))
-  throw new Error("Deploy the published os tip");
+if (commit !== git("rev-parse", "refs/remotes/origin/main"))
+  throw new Error("Deploy the published main tip (git fetch origin && git merge --ff-only origin/main)");
 if (git("diff", "HEAD", "--", "apps/webos", "infra/config/routes.catalog.json"))
   throw new Error("WebOS source must be committed before deployment");
 const handoff = resolve(

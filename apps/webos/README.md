@@ -31,13 +31,13 @@ timeout. No provider secret enters a bundle or release receipt.
 
 ## VPS deployment
 
-The Sites runner writes complete releases below `/cache/webos-deploy/releases`,
+`bun apps/webos/deploy.ts` runs on the VPS from a checkout of `main` (fetched and fast-forwarded to `origin/main`). It writes complete releases below `~/build/webos-deploy/releases`,
 then atomically publishes `ready`. The host's `aphrody-webos-deploy.timer` checks
 the handoff every 30 seconds. Its root-owned activator verifies artifact hashes,
 switches `~/apps/webos/current`, restarts `aphrody-webos.service` and checks the
 served source commit. A failed activation restores the previous release. The
 queue does not give build jobs host SSH credentials or the Docker socket.
-The activator reads the published `os` tip from the existing local forge and
+The activator reads `origin/main` of the VPS checkout (`~/src/bun-os`) and
 ignores a superseded queued release, preventing an older build from rolling
 back a newer deployment.
 

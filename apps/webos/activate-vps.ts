@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
-// Installed root-owned under /usr/local/libexec; consumes the runner handoff.
+// Installed root-owned under /usr/local/libexec; consumes the deploy handoff.
 import { lstat, readlink, rename, symlink, mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 const home = "/home/ubuntu";
-const handoff = join(home, "build/cache/gitea-runner/webos-deploy");
+const handoff = Bun.env.WEBOS_DEPLOY_ROOT ?? join(home, "build/webos-deploy");
 const app = join(home, "apps/webos");
 const readyPath = join(handoff, "ready");
 if (!(await Bun.file(readyPath).exists())) process.exit(0);
@@ -22,10 +22,10 @@ const receipt = (await Bun.file(join(release, "receipt.json")).json()) as {
 };
 if (!name.startsWith(receipt.sourceCommit + "-") || !receipt.files.length)
   throw new Error("Invalid receipt");
-// Read the existing local forge's published branch without network credentials.
+// Read the published main branch of the VPS checkout without network credentials.
 const sourceRepository =
   Bun.env.WEBOS_SOURCE_REPOSITORY ??
-  join(home, "apps/gitea/data/git/repositories/aphrody-dev/bun-os.git");
+  join(home, "src/bun-os/.git");
 function publishedCommit() {
   const result = Bun.spawnSync([
     "git",
@@ -34,7 +34,7 @@ function publishedCommit() {
     "--git-dir",
     sourceRepository,
     "rev-parse",
-    "refs/heads/os",
+    "refs/remotes/origin/main",
   ]);
   if (result.exitCode !== 0)
     throw new Error("Cannot verify the published production branch");
