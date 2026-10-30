@@ -13,19 +13,15 @@ const pending = join(handoff, `activating-${process.pid}`);
 await rename(readyPath, pending);
 const ready = Bun.file(pending);
 const name = (await ready.text()).trim();
-if (!/^[a-f0-9]{40}-[0-9]+$/.test(name))
-  throw new Error("Invalid release name");
+if (!/^[a-f0-9]{40}-[0-9]+$/.test(name)) throw new Error("Invalid release name");
 const release = join(handoff, "releases", name);
 const receipt = (await Bun.file(join(release, "receipt.json")).json()) as {
   sourceCommit: string;
   files: { path: string; bytes: number; sha256: string }[];
 };
-if (!name.startsWith(receipt.sourceCommit + "-") || !receipt.files.length)
-  throw new Error("Invalid receipt");
+if (!name.startsWith(receipt.sourceCommit + "-") || !receipt.files.length) throw new Error("Invalid receipt");
 // Verify against the VPS checkout of GitHub main (kept in sync by bunos-sync).
-const sourceRepository =
-  Bun.env.WEBOS_SOURCE_REPOSITORY ??
-  join(home, "src/bun-os/.git");
+const sourceRepository = Bun.env.WEBOS_SOURCE_REPOSITORY ?? join(home, "src/bun-os/.git");
 function publishedCommit() {
   const result = Bun.spawnSync([
     "git",
@@ -36,15 +32,24 @@ function publishedCommit() {
     "rev-parse",
     "refs/heads/main",
   ]);
-  if (result.exitCode !== 0)
-    throw new Error("Cannot verify the published production branch");
+  if (result.exitCode !== 0) throw new Error("Cannot verify the published production branch");
   return result.stdout.toString().trim();
 }
 function isPublished() {
   const published = publishedCommit();
   return (
     published === receipt.sourceCommit ||
-    Bun.spawnSync(["git", "-c", `safe.directory=${sourceRepository}`, "--git-dir", sourceRepository, "merge-base", "--is-ancestor", receipt.sourceCommit, published]).exitCode === 0
+    Bun.spawnSync([
+      "git",
+      "-c",
+      `safe.directory=${sourceRepository}`,
+      "--git-dir",
+      sourceRepository,
+      "merge-base",
+      "--is-ancestor",
+      receipt.sourceCommit,
+      published,
+    ]).exitCode === 0
   );
 }
 if (!isPublished()) {
@@ -53,36 +58,19 @@ if (!isPublished()) {
   process.exit(0);
 }
 for (const entry of receipt.files) {
-  if (
-    !entry.path ||
-    entry.path
-      .split("/")
-      .some(
-        (part) =>
-          !part || part === "." || part === ".." || /[\\:\0]/.test(part),
-      )
-  )
+  if (!entry.path || entry.path.split("/").some(part => !part || part === "." || part === ".." || /[\\:\0]/.test(part)))
     throw new Error("Unsafe release path");
   const path = resolve(release, entry.path);
-  if (!(await lstat(path)).isFile())
-    throw new Error("Release symlink or missing artifact");
+  if (!(await lstat(path)).isFile()) throw new Error("Release symlink or missing artifact");
   const file = Bun.file(path);
   if (
     file.size !== entry.bytes ||
-    new Bun.CryptoHasher("sha256").update(await file.bytes()).digest("hex") !==
-      entry.sha256
+    new Bun.CryptoHasher("sha256").update(await file.bytes()).digest("hex") !== entry.sha256
   )
     throw new Error(`Artifact differs from receipt: ${entry.path}`);
 }
-for (const path of [
-  "server.js",
-  "release.env",
-  "dist/index.html",
-  "dist/main.js",
-  "dist/workspace/index.html",
-])
-  if (!receipt.files.some((file) => file.path === path))
-    throw new Error(`Unreceipted ${path}`);
+for (const path of ["server.js", "release.env", "dist/index.html", "dist/main.js", "dist/workspace/index.html"])
+  if (!receipt.files.some(file => file.path === path)) throw new Error(`Unreceipted ${path}`);
 const current = join(app, "current");
 const previous = await readlink(current).catch(() => undefined);
 if (previous === release) {
@@ -102,8 +90,7 @@ async function restart() {
   });
   if (await child.exited) throw new Error("Service restart failed");
 }
-if (!isPublished())
-  throw new Error("Production source advanced during activation");
+if (!isPublished()) throw new Error("Production source advanced during activation");
 await point(release);
 try {
   await restart();
@@ -112,11 +99,7 @@ try {
     const response = await fetch("http://127.0.0.1:8790/api/health", {
       signal: AbortSignal.timeout(2000),
     }).catch(() => undefined);
-    if (
-      response?.ok &&
-      ((await response.json()) as { sourceCommit?: string }).sourceCommit ===
-        receipt.sourceCommit
-    ) {
+    if (response?.ok && ((await response.json()) as { sourceCommit?: string }).sourceCommit === receipt.sourceCommit) {
       healthy = true;
       break;
     }
@@ -129,8 +112,7 @@ try {
   });
   if (
     !publicHealth.ok ||
-    ((await publicHealth.json()) as { sourceCommit?: string }).sourceCommit !==
-      receipt.sourceCommit
+    ((await publicHealth.json()) as { sourceCommit?: string }).sourceCommit !== receipt.sourceCommit
   )
     throw new Error("Public ingress did not confirm the activated source");
   for (const path of ["/", "/workspace/", "/api/site/snapshot"]) {
