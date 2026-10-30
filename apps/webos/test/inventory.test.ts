@@ -9,5 +9,5 @@ test("every member of apps, packages, crates, docs, factory, tools, infra, sourc
   const inventory = await buildInventory();
   const { errors } = await checkInventory(inventory);
   expect(errors).toEqual([]);
-  for (const kind of KIND_IDS) if (kind !== "games") expect(inventory.counts[kind]).toBeGreaterThan(0);
+  for (const kind of KIND_IDS) expect(inventory.counts[kind]).toBeGreaterThan(0);
 });

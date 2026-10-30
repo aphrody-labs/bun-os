@@ -586,8 +586,13 @@ async function engineMembers(out: Detail[]) {
     out.push(await entryMember("engines", "web/", "packages/bun-engine/web-emulation", entry, ["web-emulation"]));
 }
 
+/** The game library and the emulators that always ship in the shell, plus every game package of the registry. */
 async function gameMembers(out: Detail[], games: { id: string; name: string; description: string; version?: string; license?: string }[]) {
-  for (const game of games)
+  const fixed = [
+    { id: "play", name: "Play", description: APPS.workspace.find((w) => w.id === "play")?.desc ?? "Bun Engine game library and the qualified emulators." },
+    { id: "ds", name: "Nintendo DS", description: "The qualified Dust Nintendo DS emulator of Bun Engine, with open-source test content." },
+  ];
+  for (const game of [...fixed, ...games.filter((g) => !fixed.some((f) => f.id === g.id))])
     out.push({
       kind: "games",
       id: game.id,
@@ -845,7 +850,7 @@ export async function checkInventory(inv: Inventory, dist?: string): Promise<{ e
   for (const child of children("factory"))
     if (!seen.has(`factory/${child.name}`)) errors.push(`factory/${child.name}: missing from the inventory`);
   for (const kind of KIND_IDS)
-    if (kind !== "games" && !inv.counts[kind]) errors.push(`${kind}: kind has no members`);
+    if (!inv.counts[kind]) errors.push(`${kind}: kind has no members`);
   if (dist) {
     for (const file of ["api/inventory.json", ...KIND_IDS.map((k) => `api/inventory/${k}.json`)])
       if (!(await Bun.file(join(dist, file)).exists())) errors.push(`${file}: not built`);
