@@ -18,8 +18,8 @@ mkdir -p "$WORK" "$PREFIX/share/applications" "$PREFIX/share/icons/hicolor/scala
 icon() { # icon <desktop-icon-name> <webos asset id> [ext]
   ext=${3:-svg}
   case $ext in
-  svg) install -D "$ROOT/apps/webos/public/apps/$2/icon.svg" "$PREFIX/share/icons/hicolor/scalable/apps/$1.svg" ;;
-  png) install -D "$ROOT/apps/webos/public/apps/$2/icon.png" "$PREFIX/share/icons/hicolor/256x256/apps/$1.png" ;;
+  svg) install -D "$ROOT/factory/native-apps/icons/$2/icon.svg" "$PREFIX/share/icons/hicolor/scalable/apps/$1.svg" ;;
+  png) install -D "$ROOT/factory/native-apps/icons/$2/icon.png" "$PREFIX/share/icons/hicolor/256x256/apps/$1.png" ;;
   esac
 }
 
@@ -50,6 +50,7 @@ base() {
   (cd "$WORK/cosmic-icons" && just rootdir= prefix="$PREFIX" install 2>/dev/null || { mkdir -p "$PREFIX/share/icons" && cp -r freedesktop "$PREFIX/share/icons/Cosmic" 2>/dev/null; })
   icon aphrody-browser aphrody; icon aphrody-chat aphrody; icon aphrody-search aphrody
   icon spacedrive spacedrive png
+  for i in rio cosmic-files cosmic-term cosmic-edit cosmic-store cosmic-settings cosmic-player; do :; done # packages ship their own icons
   # Aphrody apps are real GNOME Web (WebKitGTK) application-mode windows with their own profile and identity.
   web() { epi="epiphany --application-mode --profile=$HOME/.local/share/aphrody-$1"; echo "$epi $2"; }
   desktop aphrody-browser "Aphrody Browser" "Browse the web (WebKitGTK)" "epiphany --new-window https://aphrody.com" aphrody-browser org.gnome.Epiphany "Network;WebBrowser;"
@@ -59,7 +60,9 @@ base() {
   gtk-update-icon-cache -f -t "$PREFIX/share/icons/hicolor" 2>/dev/null || true
 }
 
-cosmic() { # cosmic cosmic-files ... : the checksum-pinned Pop!_OS archive debs of container/cosmic-packages.json
+cosmic() { # cosmic [names...] (default: the whole pinned set, the apps depend on the session libraries)
+  [ $# -gt 0 ] || set -- $(ROOT=$ROOT bun -e 'console.log((await Bun.file(`${process.env.ROOT}/container/cosmic-packages.json`).json()).packages.map((p) => p.name).join(" "))')
+  # cosmic-files ... : the checksum-pinned Pop!_OS archive debs of container/cosmic-packages.json
   d=$WORK/cosmic-debs; mkdir -p "$d"
   ROOT=$ROOT D=$d bun -e '
     // The archive rotates old builds out, so the pin is used when it still resolves and the newest build otherwise.
