@@ -3841,8 +3841,11 @@ dependencies = [
  "aphrody-webos-protocol",
  "axum",
  "bun-ui-web",
+ "futures-util",
+ "getrandom 0.4.3",
  "serde_json",
  "tokio",
+ "tokio-tungstenite 0.29.0",
  "tower-http 0.7.1",
 ]
 
