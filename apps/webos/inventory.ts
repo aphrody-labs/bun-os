@@ -799,6 +799,9 @@ const builtinIds = async () => {
   return new Set([...main.matchAll(/^ {4}id: "([a-z0-9-]+)",$/gm)].map((m) => m[1]!));
 };
 
+/** Characters the release activator and URLs cannot carry in a member id (backslash, colon, NUL, ?, #, %). */
+const UNSAFE = new RegExp("[" + String.fromCharCode(92, 92) + ":" + String.fromCharCode(0) + "?#%]");
+
 /** Every member needs a surface; every kind a label; every source directory must be enumerated. */
 export async function checkInventory(inv: Inventory, dist?: string): Promise<{ errors: string[]; flags: string[] }> {
   const errors: string[] = [];
@@ -817,7 +820,7 @@ export async function checkInventory(inv: Inventory, dist?: string): Promise<{ e
     if (!(m.kind in KINDS)) errors.push(`${key}: unknown kind`);
     if (!m.id) errors.push(`${key}: empty id`);
     // The id is a URL path and a file name of the release: the activator rejects backslash, colon, NUL and dot segments.
-    if (m.id.split("/").some((part) => !part || part === "." || part === ".." || /[\: ?#%]/.test(part)))
+    if (m.id.split("/").some((part) => !part || part === "." || part === ".." || UNSAFE.test(part)))
       errors.push(`${key}: id is not a safe path`);
     if (seen.has(key)) errors.push(`${key}: duplicate member`);
     seen.add(key);
