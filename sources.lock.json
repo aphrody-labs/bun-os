@@ -1567,7 +1567,7 @@
     {
       "id": "vendor/wasm/jco",
       "repository": "aphrody-labs/jco",
-      "revision": "1e218e9bf8366328c5a6ee891e944ac95804a025",
+      "revision": "4fefc446056b1ef79146bc5051f027831ca7602b",
       "mount": "vendor/wasm/jco",
       "branch": "main",
       "gitlinks": []
