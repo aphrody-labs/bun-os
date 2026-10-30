@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# systemd --user unit: the streamed Bun OS COSMIC session (see start-cosmic-headless). Needs linger for the user.
+[Unit]
+Description=Bun OS COSMIC session (headless, streamed)
+After=pipewire.service wireplumber.service
+Conflicts=aphrody-hyprland.service
+
+[Service]
+Type=simple
+Environment=XDG_RUNTIME_DIR=%t
+ExecStart=/usr/libexec/bunos/start-cosmic-headless
+Restart=on-failure
+RestartSec=3
+Nice=5
+
+[Install]
+WantedBy=default.target

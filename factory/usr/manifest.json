@@ -5,7 +5,7 @@
   "architecture": "x86_64",
   "packageManager": "pacman/libalpm",
   "host": "vps",
-  "builderImage": "archlinux:base-devel",
+  "builderImage": "archlinux@sha256:061679925e5d5028f2df9395d441ce6c4b9accf0157ff3486c06b6962e014ef1",
   "builderImageObservedId": "061679925e5d",
   "builderPackages": [
     "git",

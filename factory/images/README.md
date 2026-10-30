@@ -14,9 +14,14 @@ Images are tagged on that host only and never pushed.
 | `bunos-alpine` | `runtime` (Bun.serve), `edge` (compiled cache/CDN proxy)               | Alpine + musl Bun, tini, non-root UID 10001, healthcheck, no package manager, amd64/arm64                                                                                                                                                                                                                                          |
 | `bunos-ubuntu` | `desktop` (image), `bootable` (image + rootfs tar)                     | Ubuntu 26.10 base, GNOME, COSMIC (packages available in the archive), Bun, mainline 7.3 kernel in `bootable`                                                                                                                                                                                                                       |
 
-`bunos-gaming` reuses the `/usr` factory (`factory/usr/manifest.json`, gaming composition): its generated
-`pacman.conf` and package set, plus the Omarchy stable repository and key. Packages missing from the
-repositories are built from the AUR; any remaining gaps are listed in `/usr/share/bun-os/missing-packages.txt`.
+`bunos-gaming` uses the same digest-pinned Arch bootstrap image as the root factory and reuses the `/usr`
+factory (`factory/usr/manifest.json`, gaming composition): its generated
+`pacman.conf` and package set. Image installation accepts only packages available from configured
+Pacman repositories or the staged Bun OS repository. Missing packages are listed in
+`/usr/share/bun-os/missing-packages.txt` and fail the image build; no unpinned AUR checkout or
+`--skippgpcheck` fallback is permitted. Admit additional packages through the root's pinned source,
+signature, build and artifact-receipt owners before they enter this image. Local Bun OS package signing
+and exact package receipts remain required before treating this image as a release artifact.
 
 ## Kernel and drivers
 

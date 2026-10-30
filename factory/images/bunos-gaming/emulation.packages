@@ -1,4 +1,4 @@
-# Emulation stack (CachyOS, Arch core/extra/multilib, AUR fallback). Firmware, BIOS and games are
+# Emulation stack from configured repositories. Firmware, BIOS and games are
 # never packaged: users import their own dumps with `bep add firmware|rom`.
 # Bun Engine: one CLI (`bun-engine`, `bep`), one window, the in-tree cores (DS, ARM, x86).
 bun-engine

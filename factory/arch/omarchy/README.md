@@ -24,6 +24,18 @@ recipe's selected source, never silently substitute the reference checkout.
 Former `basecamp/omarchy` and `omacom-io/omarchy-pkgs` URLs occur upstream; the
 catalogue preserves their expressions and records current canonical repositories.
 
+[`repositories.json`](repositories.json) inventories the 70 public repositories
+returned by the Omacom organization search on 2026-10-21. It records each URL,
+default branch, observed branch-tip commit, GitHub SPDX license field, archive
+status, source role and the existing Bun OS consumer or candidate relationship.
+These observed branch tips are discovery evidence only: they do not replace
+the selected revisions above or pins in `upstreams.json` and
+`guest-inputs.json`. A missing SPDX value means GitHub exposed no recognized
+license field; it is not a license grant. Archived repositories remain legacy
+evidence unless an exact recipe/source relationship and redistribution rights
+are established. The inventory is declarative source provenance, not a package
+registry or installer.
+
 ## Catalogue coverage
 
 - `packages.json`: all eight upstream package lists, 236 distinct listed names,
@@ -77,11 +89,21 @@ applications, firmware and marks require their own redistribution decisions.
 
 ## Qualification
 
-Only source identities, blob hashes and declarative parsing were verified.
-No repository forks, Git submodules, package installation, builds, tests, boot,
-desktop session, deployment or release was performed. Required source/archive,
-signed repository, target, build, boot and release receipts are enumerated in
-`integration.json`; the component remains disabled and unqualified until then.
+Source identities, inspected blob hashes and declarative parsing were verified.
+Separately, the image owner completed a real Docker build of
+`bunos-omarchy:imported-rootfs` from the digest-verified `try-omarchy-windows`
+`v0.12.0` guest rootfs on the VPS; the job's `build-resume2.log` records the
+Docker build and the imported image is present there. A native Hyprland version
+check also passed. These are narrow artifact and binary checks, not a desktop
+session qualification: the import receipt is explicitly `unqualified`, records
+that repository signatures were not rechecked during import, and sets
+`desktopQualified` and `browserQualified` to false. No GUI session, WSL boot,
+input, portals, audio, GPU, or release qualification is established by those
+checks. No repository forks, Git submodules, upstream installer execution,
+package closure build, desktop boot, deployment or release was performed here.
+Required source/archive, signed repository, target, build, boot and release
+receipts are enumerated in `integration.json`; the component remains disabled
+and unqualified until those gates pass.
 
 The upstream MIT notices are retained in `LICENSE` and `LICENSE-PACKAGING`.
 Those notices do not replace the licenses of packages described by the recipes.

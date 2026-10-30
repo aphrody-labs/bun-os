@@ -1,0 +1,11 @@
+{
+  "name": "rose-pine",
+  "mode": "light",
+  "icons": "Yaru-blue",
+  "backgrounds": [
+    "1-funky-shapes.webp",
+    "2-dot-map.webp",
+    "3-omarchy-plants.webp",
+    "omarchy.webp"
+  ]
+}

@@ -1,0 +1,17 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# Streamed COSMIC session for a GPU-less host (the VPS). cosmic-comp has only kms, x11 and winit backends
+# (pop-os/cosmic-comp src/backend/mod.rs) and no headless one, so it runs nested: cage (wlroots kiosk) on the
+# wlroots headless backend hosts cosmic-comp's winit window full screen, and the stream (wayvnc or the WebOS
+# capture) reads cage's output through wlr-screencopy. Software rendering: Mesa llvmpipe for the nested EGL,
+# pixman for cage. Resize from the client side with: wlr-randr --output HEADLESS-1 --custom-mode WxH
+set -eu
+export WLR_BACKENDS=headless
+export WLR_RENDERER=pixman
+export WLR_LIBINPUT_NO_DEVICES=1
+export WLR_HEADLESS_OUTPUTS=1
+export LIBGL_ALWAYS_SOFTWARE=1
+export XDG_SESSION_TYPE=wayland
+# cosmic-comp: nested backend; start-cosmic (cosmic-session) sets XDG_CURRENT_DESKTOP=COSMIC and starts the
+# panel, launcher, app library, notifications, OSD, settings daemon, idle and workspaces components.
+exec cage -d -- env COSMIC_BACKEND=winit start-cosmic

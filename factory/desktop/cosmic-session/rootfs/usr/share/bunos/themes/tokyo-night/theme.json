@@ -1,0 +1,16 @@
+{
+  "name": "tokyo-night",
+  "mode": "dark",
+  "icons": "Yaru-magenta",
+  "backgrounds": [
+    "0-liftoff.webp",
+    "1-winding-road.webp",
+    "2-quattro.webp",
+    "3-swirl-buck.webp",
+    "4-sunset-lake.webp",
+    "5-omakub.webp",
+    "6-oma-cityscape.jpg",
+    "7-oma.webp",
+    "omarchy.webp"
+  ]
+}

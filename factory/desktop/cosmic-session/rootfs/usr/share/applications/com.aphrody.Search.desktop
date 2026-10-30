@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Aphrody Search
+Comment=Search the web and your files with Aphrody
+Exec=bunos-launch-webapp https://aphrody.com/search com.aphrody.Search
+Icon=com.aphrody.Search
+StartupWMClass=com.aphrody.Search
+Categories=Network;WebBrowser;
+Terminal=false

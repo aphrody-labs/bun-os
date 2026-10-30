@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: MIT
+# Orbital (redox-os/orbital src/config.rs) with the Aphrody palette, replacing orbdata's usr/share/ui/orbital.toml.
+# Colours are orbclient ARGB u32 ({ data = 0xAARRGGBB }). Image paths are orbdata's (MIT).
+cursor = "/usr/share/ui/left_ptr.png"
+bottom_left_corner = "/usr/share/ui/bottom_left_corner.png"
+bottom_right_corner = "/usr/share/ui/bottom_right_corner.png"
+bottom_side = "/usr/share/ui/bottom_side.png"
+left_side = "/usr/share/ui/left_side.png"
+right_side = "/usr/share/ui/right_side.png"
+window_max = "/usr/share/ui/window_max.png"
+window_max_unfocused = "/usr/share/ui/window_max_unfocused.png"
+window_close = "/usr/share/ui/window_close.png"
+window_close_unfocused = "/usr/share/ui/window_close_unfocused.png"
+
+# surface-container-lowest
+background_color = { data = 0xFF0C0E17 }
+# surface at 224/255, Orbital's default bar alpha
+bar_color = { data = 0xE011131D }
+# primary-container
+bar_highlight_color = { data = 0xE02E3F95 }
+# on-surface
+text_color = { data = 0xFFE1E3F2 }
+# primary
+text_highlight_color = { data = 0xFFA9B8FF }
