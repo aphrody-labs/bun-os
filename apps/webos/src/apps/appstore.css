@@ -156,3 +156,13 @@
 .st-install h3 { margin: 4px 0 0; font-size: 1em; }
 .st-sticky { position: sticky; bottom: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; margin: 16px -24px -32px; background: var(--md-sys-color-surface-container-high); border-top: 1px solid var(--md-sys-color-outline-variant); }
 .st-sticky[hidden] { display: none; }
+
+/* S08 sources */
+.st-sources { max-width: 960px; margin-inline: auto; display: grid; gap: 4px; }
+.st-source { display: grid; gap: 8px; padding: 14px 16px; margin: 6px 0; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container); }
+.st-source h2 { margin: 0; }
+.st-agent { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.st-field { flex: 1 1 260px; min-height: 44px; padding: 0 16px; border-radius: var(--md-sys-shape-corner-full); border: 1px solid var(--md-sys-color-outline); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+.st-qual summary { cursor: pointer; color: var(--md-sys-color-primary); padding: 4px 0; }
+.st-qual pre { margin: 4px 0 8px; padding: 8px; max-height: 200px; overflow: auto; font-size: 12px; background: var(--md-sys-color-surface-container-highest); border-radius: var(--md-sys-shape-corner-small); white-space: pre-wrap; }
+.st-step.err strong { color: var(--md-sys-color-error); }
