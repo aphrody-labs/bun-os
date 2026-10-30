@@ -54,11 +54,23 @@ interface Prebuild {
 }
 
 const HOURS = 3_600_000;
-/** The shared factory lease gives up after 30 minutes; a busy factory is waited for, up to eight times. */
+/** OS packaging is its own factory lane: Cargo stays serialized on the lane lock with four jobs, beside the runtime and web
+ * lanes, instead of queueing behind the shared heavy lease (a workspace test can hold it for hours). */
+/** The lane builds in its own target directory: cargo locks a target directory for the whole build. */
+const LANE_TARGET = join(Bun.env.HOME ?? "/root", "build/cache/target-os");
+const OS_LANE = {
+  APHRODY_CARGO_TARGET_DIR: LANE_TARGET,
+  APHRODY_BUILD_HOST: "",
+  APHRODY_LOCAL_CARGO: "1",
+  APHRODY_CARGO_JOBS: "4",
+  APHRODY_CARGO_LOCK_DIR: join(Bun.env.HOME ?? "/root", ".cache/aphrody/lanes/os"),
+  APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800",
+};
+/** A busy lane is waited for again, up to eight times. */
 async function serialized(cmd: string[], cwd: string, timeout: number, env: Record<string, string> = {}) {
   let r = { code: 1, out: "" };
   for (let attempt = 0; attempt < 8; attempt++) {
-    r = await run(cmd, { cwd, timeout, env: { APHRODY_BUILD_HOST: "vps", APHRODY_CARGO_JOBS: "4", APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800", MAKEFLAGS: "-j4", ...env } });
+    r = await run(cmd, { cwd, timeout, env: { ...OS_LANE, MAKEFLAGS: "-j4", ...env } });
     if (r.code === 0 || !/lease was not acquired|Timed out waiting|failed to get lock/i.test(r.out)) return r;
     console.log(`pacman: factory busy, waiting again (${attempt + 1}/8)`);
   }
@@ -162,7 +174,7 @@ const PREBUILD: Record<string, Prebuild> = {
           ["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), "build", "--release", "--locked", "-p", "sd-server", "-p", "sd-cli", "-p", "sd-core", "--bin", "sd-server", "--bin", "sd-daemon", "--bin", "sd"],
           dir,
           6 * HOURS,
-          { CARGO_TARGET_DIR: join(dir, "target") },
+          { APHRODY_CARGO_TARGET_DIR: join(dir, "target") },
         ),
       );
     },
@@ -230,7 +242,8 @@ export async function build(ctx: Ctx): Promise<void> {
         await mkdir(tree, { recursive: true });
         for (const f of await pre.tree.files(ctx)) {
           await mkdir(dirname(join(tree, f)), { recursive: true });
-          await cp(join(ctx.root, f), join(tree, f), { recursive: true, dereference: true });
+          // target/ of the PKGBUILD layout is the OS lane target directory.
+          await cp(f.startsWith("target/") ? join(LANE_TARGET, f.slice(7)) : join(ctx.root, f), join(tree, f), { recursive: true, dereference: true });
         }
         await pre.tree.extra?.(ctx, tree);
         await Bun.write(join(dest, "PKGBUILD"), (await Bun.file(join(dest, "PKGBUILD")).text()) + OVERRIDE);
