@@ -104,11 +104,11 @@ define(
     group: "",
     name: "check",
     summary:
-      "Type check the workspace (upstream bun check), then the WebOS coverage gate (every member needs a surface)",
+      "Type check the workspace (upstream bun check), then the inventory coverage gate (aphrody-inventory check: every member needs a surface and a description)",
     run: async args => {
       const code = await native("check", "--no-script", "-p", "tsconfig.json", "--threads=2", "--no-pretty").run(args);
       if (code !== 0) return code;
-      return script("apps/webos/inventory.ts", "--check").run([]);
+      return script("scripts/cargo.ts", "exec", "--", "run", "--locked", "--release", "-q", "-p", "aphrody-inventory", "--bin", "aphrody-inventory", "--", "check").run([]);
     },
   },
   {
