@@ -861,6 +861,18 @@ function curatedDescription(m: Detail): string {
     const keys = [...m.text.matchAll(/^ {2}"([^"]+)":/gm)].map((k) => k[1]!).slice(0, 8);
     if (keys.length) return `JSON file ${m.path} with the sections ${keys.join(", ")}.`;
   }
+  // Facts read from the member itself: exported names of a module, or the entries of a directory.
+  if (m.text && /\.(ts|tsx|js|mjs)$/.test(m.path ?? "")) {
+    const names = [...m.text.matchAll(/^export (?:async )?(?:function\*?|const|class|interface|type|enum) ([A-Za-z0-9_]+)/gm)].map((k) => k[1]!);
+    if (names.length) return `Module ${basename(m.path!)} exporting ${[...new Set(names)].slice(0, 8).join(", ")}.`;
+    return `Script ${basename(m.path!)} (${m.text.split("\n").length} lines).`;
+  }
+  if (m.text) return `File ${basename(m.path ?? m.id)} (${m.text.split("\n").length} lines).`;
+  if (m.files?.length && m.path) {
+    const prefix = `${m.path}/`;
+    const names = [...new Set(m.files.map((f) => f.slice(prefix.length).split("/")[0]!))].filter(Boolean);
+    return `Directory ${m.path} containing ${names.slice(0, 10).join(", ")}${names.length > 10 ? ` and ${names.length - 10} more` : ""}.`;
+  }
   return "";
 }
 
@@ -1004,9 +1016,9 @@ export async function buildInventory(options: BuildOptions = {}): Promise<Invent
 }
 
 /** Lightweight member for list endpoints: no README, text or data. */
-export const summary = ({ readme: _readme, text: _text, files: _files, members: _members, data: _data, lang: _lang, ...rest }: Detail): Member => ({
+export const summary = ({ readme: _readme, text: _text, files: _files, members: listed, data: _data, lang: _lang, ...rest }: Detail): Member => ({
   ...rest,
-  ...(members ? { meta: { ...rest.meta, members: members.length } } : {}),
+  ...(listed ? { meta: { ...rest.meta, members: listed.length } } : {}),
 });
 
 /** dist/api/inventory.json (index), dist/api/inventory/<kind>.json (lists) and one JSON file per member. */
