@@ -6,7 +6,8 @@
 /** What actually runs the app. There is no placeholder backing; the inventory gate fails a manifest without one. */
 export const BACKINGS = [
   "wasm", // native code compiled to WebAssembly, run in the page or a worker (Rust crates, Spacedrive core, Rio core...)
-  "stream", // native app running on the Bun OS host, its display/audio/input streamed into the window (COSMIC apps, Rio, Craft)
+  "wayland", // real Wayland client in the headless Hyprland session on the host, surfaced per window as its own WebOS window (Rio, Spacedrive, COSMIC apps, Craft)
+  "stream", // other host-side native program (non-Wayland) whose display/audio/input is streamed into the window
   "webview", // real web content hosted in a WebOS window: own chrome, sandboxed, history/navigation (never a browser tab)
   "app-ui", // React App UI island (packages/app-ui) in a sandboxed iframe
   "api", // UI over a typed HTTP/RPC API of this deployment (chat, search, Store, Atlas)
@@ -54,6 +55,15 @@ export interface StreamSpec {
   protocol: "wayland-webrtc" | "vnc-ws" | "rdp-ws";
 }
 
+export interface WaylandSpec {
+  /** Command the services layer launches inside the Hyprland session (resolved server-side, never by the client). */
+  command: string[];
+  /** Wayland app_id / window class Hyprland reports, used to bind the client surface to this WebOS window. */
+  appId: string;
+  /** true: every toplevel becomes its own WebOS window; false: one shared surface. */
+  perWindow?: boolean;
+}
+
 export interface WebViewSpec {
   url: string;
   /** Hosts the window may navigate to; everything else opens in the system handler after a prompt. */
@@ -73,6 +83,7 @@ export interface AppManifest {
   entry: string;
   wasm?: WasmSpec;
   stream?: StreamSpec;
+  wayland?: WaylandSpec;
   webview?: WebViewSpec;
   permissions: Permission[];
   /** Capability ids from @aphrody/bun-workspace/capabilities this app serves (file types, protocols, share targets). */
@@ -101,6 +112,7 @@ export function validateManifest(m: AppManifest, options: { genericOk?: boolean 
   need(m.backing !== "stream" || m.stream?.program, "backing stream needs stream.program");
   need(m.backing !== "webview" || m.webview?.url, "backing webview needs webview.url");
   need(m.permissions?.every((p) => (PERMISSIONS as readonly string[]).includes(p)), "unknown permission");
-  need(m.backing !== "stream" || m.permissions?.includes("stream"), "backing stream needs permission stream");
+  need(m.backing !== "wayland" || (m.wayland?.command?.length && m.wayland.appId), "backing wayland needs wayland.command and wayland.appId");
+  need(!["stream", "wayland"].includes(m.backing) || m.permissions?.includes("stream"), "backing stream/wayland needs permission stream");
   return e;
 }
