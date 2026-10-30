@@ -215,6 +215,7 @@ export async function build(ctx: Ctx): Promise<void> {
   await mkdir(join(work, "src"), { recursive: true });
   const failures = new Map<string, string>();
   const names: string[] = [];
+  const prebuilt: string[] = [];
   for (const dir of dirs) {
     const name = dir.split("/").pop()!;
     const dest = join(work, "src", name);
@@ -233,6 +234,7 @@ export async function build(ctx: Ctx): Promise<void> {
         }
         await pre.tree.extra?.(ctx, tree);
         await Bun.write(join(dest, "PKGBUILD"), (await Bun.file(join(dest, "PKGBUILD")).text()) + OVERRIDE);
+        prebuilt.push(name);
         console.log(`pacman: ${name} compiled in ${Math.round((Date.now() - t) / 1000)} s`);
       } catch (error) {
         failures.set(name, String((error as Error).message ?? error).slice(0, 400));
@@ -253,11 +255,14 @@ fi
 FPR=$(gpg --list-secret-keys --with-colons aphrody-store | awk -F: '/^fpr/{print $10; exit}')
 gpg --export "$FPR" > /os/aphrody.gpg
 useradd -m builder 2>/dev/null || true
+# makedepends of source PKGBUILDs install through makepkg --syncdeps; prebuilt ones only package.
+echo "builder ALL=(ALL) NOPASSWD: /usr/bin/pacman" > /etc/sudoers.d/builder
 cp -r /work/src /home/builder/src && chown -R builder /home/builder/src
 mkdir -p /home/builder/pkgs && chown builder /home/builder/pkgs
 for p in ${names.join(" ")}; do
   echo "== $p"
-  if su builder -c "cd /home/builder/src/$p && PKGDEST=/home/builder/pkgs MAKEFLAGS=-j4 makepkg --nodeps --noconfirm --clean -f" >/tmp/$p.log 2>&1; then echo "BUILT $p"; else echo "FAILED $p"; tail -n 5 /tmp/$p.log; fi
+  case " ${prebuilt.join(" ")} " in *" $p "*) deps=--nodeps ;; *) deps=--syncdeps ;; esac
+  if timeout 7200 su builder -c "cd /home/builder/src/$p && PKGDEST=/home/builder/pkgs MAKEFLAGS=-j4 makepkg $deps --noconfirm --clean -f" >/tmp/$p.log 2>&1; then echo "BUILT $p"; else echo "FAILED $p"; tail -n 5 /tmp/$p.log; fi
 done
 cd /os/x86_64
 # Replace the older files of every rebuilt package, keep the packages this run did not build.
@@ -278,7 +283,7 @@ chmod -R a+rX /os
 `;
   const r = await docker(IMAGE, script, {
     mounts: [`${work}:/work`, `${join(ctx.store, "repo/os")}:/os`, `${keyDir(ctx)}:/gnupg`, `${bun}:/usr/local/bin/bun:ro`],
-    timeout: 3 * HOURS,
+    timeout: Math.min(12, 1 + 2 * names.length) * HOURS,
   });
   console.log(tail(r.out, 40));
   if (r.code) throw new Error("pacman build failed");
