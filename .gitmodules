@@ -1278,3 +1278,6 @@
 [submodule "vendor/waydroid"]
 	path = vendor/waydroid
 	url = https://github.com/aphrody-labs/waydroid.git
+[submodule "vendor/pop-os"]
+	path = vendor/pop-os
+	url = https://github.com/aphrody-labs/pop.git
