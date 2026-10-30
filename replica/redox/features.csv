@@ -1,0 +1,13 @@
+feature,area,priority,original,clone,notes
+Orbital display server window manager compositor,session,must,yes,no,"Redox target not yet built by the Bun OS factory"
+Login (orblogin),session,must,yes,no,""
+Launcher bar with categorised start menu,shell,must,yes,no,"orbutils launcher; colours are compile-time constants (patch in a fork)"
+Aphrody colours for Orbital decorations,theme,must,no,yes,"factory/desktop/redox/usr/share/ui/orbital.toml"
+Aphrody colours for the launcher bar,theme,should,no,no,"needs orbutils launcher/src/theme.rs patch"
+COSMIC Files Edit Term on Orbital,apps,must,yes,partial,"Redox recipes build them from pop-os; switch the source to aphrody-labs forks for the Aphrody default theme"
+COSMIC Store with pkgar backend,store,should,yes,no,"recipe uses --features desktop,pkgar"
+COSMIC Settings Monitor Reader on Orbital,apps,could,yes,no,"recipes exist"
+Window tiling halves and maximize,windows,must,yes,no,"Super+Shift+arrows, Super+M"
+Shortcut overlay on Super hold,input,should,yes,no,""
+Bun OS keymap on Orbital,input,could,no,no,"Orbital core.rs patch; Super+Enter conflicts"
+cosmic-comp nested in Orbital (winit),session,could,yes,no,"Redox wayland.toml orbital-wayland; same technique as the Bun OS streamed session"
