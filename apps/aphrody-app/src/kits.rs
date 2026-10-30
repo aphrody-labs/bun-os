@@ -26,7 +26,7 @@ use crate::integration::MAIN;
 const MAX_LINE: u64 = 64 * 1024;
 /// Longest argument (the action input JSON included).
 const MAX_ARG: usize = 32 * 1024;
-/// Kit processes running at once (a Discord bot can run for hours).
+/// Kit processes running at once (a bot can run for hours).
 const MAX_SESSIONS: usize = 4;
 
 struct Session {

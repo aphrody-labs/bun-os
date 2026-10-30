@@ -31,7 +31,6 @@
   <url type="homepage">https://getartcraft.com/apps/figcraft</url>
   <url type="bugtracker">https://github.com/storytold/figcraft/issues</url>
   <url type="help">https://github.com/storytold/figcraft</url>
-  <url type="contact">https://discord.gg/artcraft</url>
   <categories>
     <!-- Freedesktop registered categories only ("Design" isn't one; the .desktop file says X-Design). -->
     <category>Graphics</category>

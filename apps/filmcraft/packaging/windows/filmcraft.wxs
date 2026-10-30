@@ -26,7 +26,6 @@
     <Property Id="ARPPRODUCTICON" Value="FilmcraftIcon.ico" />
     <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/filmcraft" />
     <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/filmcraft" />
-    <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
 
     <StandardDirectory Id="ProgramFiles6432Folder">
       <Directory Id="INSTALLFOLDER" Name="FilmCraft" />

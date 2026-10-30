@@ -149,7 +149,7 @@ export function captureSshConfig(envText: string, file = join(homedir(), ".ssh",
   return re.test(envText) ? envText.replace(re, () => line) : `${envText.trimEnd()}\n${line}\n`;
 }
 
-/** Send only the NET_LIVE_* lines (no secret) to `host` over SSH, atomically, for the Discord synchronisation of the hub. */
+/** Send only the NET_LIVE_* lines (no secret) to `host` over SSH, atomically, for the hub synchronisation. */
 export async function pushLive(lines: string[], host: string, path: string): Promise<boolean> {
   const proc = Bun.spawn(
     ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, `cat > ${path}.tmp && mv ${path}.tmp ${path}`],
@@ -184,7 +184,7 @@ export async function netEnvMain(t: Tunnel, args: string[]): Promise<void> {
     const ok = await pushLive(
       renderFacts(collected),
       pushHost,
-      value("push-path") ?? "/var/lib/aphrody-discord-sync/net-live.env",
+      value("push-path") ?? "/var/lib/aphrody-sync/net-live.env",
     );
     console.log(`push: ${pushHost} ${ok ? "ok" : "failed"}`);
   }

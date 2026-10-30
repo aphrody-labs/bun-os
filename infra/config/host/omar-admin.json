@@ -7,15 +7,6 @@
     "hosts": ["dbfr"],
     "sudo": "ALL"
   },
-  "discord": {
-    "primaryUserId": "1527405876695142620",
-    "alternateUserIds": ["1323725494184841256"],
-    "roleName": "DBFR Administrator",
-    "permissions": "8",
-    "credentialFile": "/etc/aphrody-discord.env",
-    "scope": "dbfr",
-    "activation": "Existing permissions are historical; this declaration does not grant organization-wide authority."
-  },
   "github": {
     "organization": "aphrody-labs",
     "login": "KyrioFox",
@@ -24,7 +15,6 @@
     "scope": "Identity reference only; no organization-wide administrator grant"
   },
   "verification": {
-    "discordIdentity": "Discord user lookup and successful DM 1557349160041324594",
     "githubIdentity": "KyrioFox confirmed as Omar by the owner on 2026-10-08 (session directive: third member of aphrody-labs)"
   },
   "authority": {

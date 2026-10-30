@@ -6,8 +6,6 @@
 //! This crate provides:
 //! - [`VoiceProvider`] — the core async trait for TTS providers (native only).
 //! - [`ElevenLabsProvider`] — production adapter for the ElevenLabs v1 REST API (native only).
-//! - [`DiscordVoiceShim`] — thin HTTP forwarder that delegates synthesised audio to the openclaw
-//!   Gateway endpoint (`OPENCLAW_GATEWAY_URL`) (native only).
 //! - [`web::WebSpeechSynth`] — browser-native TTS via `window.speechSynthesis` (wasm32 only).
 //! - [`stt`] — speech-to-text (STT) module: [`stt::SttProvider`] trait, OpenAI Whisper, ElevenLabs
 //!   STT, optional local Whisper backend, and browser-native `SpeechRecognition`.
@@ -21,7 +19,6 @@
 
 // Native-only modules: reqwest + tokio do not compile for wasm32.
 #[cfg(not(target_arch = "wasm32"))]
-pub mod discord_shim;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod elevenlabs;
 

@@ -7,7 +7,7 @@ rust-version = "1.97"
 authors = ["aphrody-code"]
 repository = "https://github.com/aphrody-labs/aphrody"
 license = "Apache-2.0"
-description            = "Voice I/O (TTS + STT) provider traits + ElevenLabs/Whisper adapters + Discord shim."
+description            = "Voice I/O (TTS + STT) provider traits + ElevenLabs/Whisper adapters."
 
 [features]
 # Run Whisper *in-process* through whisper-rs instead of driving the upstream

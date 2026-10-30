@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Fiche factuelle propriétaire <-> Omar (source du salon Discord #sync-fiche) : réseau en direct, inventaire WireGuard
+// Fiche factuelle propriétaire <-> Omar (source de la synchronisation) : réseau en direct, inventaire WireGuard
 // (clés publiques), variables d'Omar, alias SSH, tâches de boot, tâches planifiées de ce PC et liste de ce qu'Omar doit
 // compléter. Aucun secret : clés privées, jetons et mots de passe ne sont jamais lus.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -90,7 +90,7 @@ export async function buildFiche(root: string, envFile: string, runner: Run = ru
 
 /** Pousse la fiche sur l'hôte hub puis récupère la version fusionnée avec la partie d'Omar. */
 export async function syncFicheWith(host: string, fiche: string): Promise<string | undefined> {
-  const dir = "/var/lib/aphrody-discord-sync";
+  const dir = "/var/lib/aphrody-sync";
   const proc = Bun.spawn(
     [
       "ssh",

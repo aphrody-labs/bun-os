@@ -39,7 +39,6 @@
     <Property Id="ARPPRODUCTICON" Value="FigcraftIcon.exe" />
     <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/figcraft" />
     <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/figcraft" />
-    <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
 
     <StandardDirectory Id="ProgramFiles6432Folder">
       <Directory Id="INSTALLFOLDER" Name="FigCraft" />

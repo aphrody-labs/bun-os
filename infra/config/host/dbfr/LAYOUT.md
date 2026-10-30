@@ -7,7 +7,7 @@ Consigne du propriétaire : tout fusionner dans UN SEUL home par hôte. Plus de 
 | Chemin                | Contenu                                                                                                                                                                     | Remplace                                                                                                                                      |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `~/src/<repo>`        | UNE seule copie git par dépôt : `aphrody`, `bun`, `forks/<nom>`                                                                                                             | release/aphrody, aphrody-root, bun-src, yolo/src/_, /srv/aphrody-build/workspaces/_, /srv/aphrody/shared/agent-workspaces/_, /home/omar/src/_ |
-| `~/apps/<app>/`       | runtime d'un service : `compose.yaml`, `.env`, `data/` (bind mounts), `releases/` (la courante seulement, aucun lien `previous`, aucune copie `.bak`/`.prev`/`.pre-layout`) | /srv/aphrody*, /srv/app, /etc/aphrody/container, /opt/aphrody-discord-sync                                                                    |
+| `~/apps/<app>/`       | runtime d'un service : `compose.yaml`, `.env`, `data/` (bind mounts), `releases/` (la courante seulement, aucun lien `previous`, aucune copie `.bak`/`.prev`/`.pre-layout`) | /srv/aphrody*, /srv/app, /etc/aphrody/container                                                                    |
 | `~/apps/compose.yaml` | UN seul projet compose par hôte (nom `aphrody`) qui fait `include:` de chaque `~/apps/<app>/compose.yaml`                                                                   | les projets `aphrody` et `aphrody-bun`                                                                                                        |
 | `~/build/`            | espace de build, caches et artefacts (vps seulement)                                                                                                                        | /srv/aphrody-build                                                                                                                            |
 | `~/archive/`          | données froides (vps seulement, dont les archives venues de dbfr)                                                                                                           | /srv/archive, sauvegardes froides de dbfr                                                                                                     |
@@ -55,12 +55,10 @@ Sur dbfr, inventaire fait, suppressions à exécuter :
 
 - CDN : `rm -rf ~/apps/cdn/releases/946758212b4e ~/apps/cdn/src.prev` (en service : `7a1d7777796f`).
 - Site : dans `~/apps/downloads/site/releases`, tout sauf la cible de `current`.
-- Discord : dans `~/apps/discord/releases`, tout sauf `4cf6332cdc66b3ec9c0f2b0c288f0a3024acf808`.
 - aphrody-bun : le lien `current` pointe vers `releases/6cdb9e9` qui n'existe pas (la release est sous `releases/releases/6cdb9e9`). La dernière activation est `12fd6f9` : `ln -sfn /home/ubuntu/apps/aphrody-bun/releases/12fd6f9 ~/apps/aphrody-bun/current`, puis `rm -f ~/apps/aphrody-bun/previous` et suppression des autres releases et de `releases/releases`.
 - Infra : `~/apps/infra/adapter-backups`, `~/apps/infra/migrations/*`, et dans `~/apps/infra/adapters` tout sauf `f69b9eab…` (celui installé dans `/usr/local/sbin` à 12:10).
 - Copies : `~/apps/{aphrody,aphrody-bun}/compose.yaml.pre-layout`, `~/apps/downloads/app/server.ts.bak-20261009`, `~/archive/host-purge-2026-10-09`, `~/archive/units-2026-10-09`, `/var/backups/*.bak-D-20261009`, `/var/backups/aphrody-sysctl`, `/var/tmp/aphrody-pc-mcp-forward.service.bak-D`, `/etc/{environment,fstab}.bak`, `/etc/ssh/sshd_config.bak-20260811`. Les fichiers vivants d'Omar (`/etc/ssh/sshd_config.d/60-omar.conf`, `/etc/ssh/authorized_keys.d/omar`) restent ; vérifier `sudo sshd -t` avant de retirer leurs `.bak`.
 - Doublon rclone : `~/.local/bin/rclone` (1.75.1) masque `/usr/local/bin/rclone` (1.76.0-DEV, celui que déclare `runtime.json`) ; supprimer celui de `~/.local/bin`.
-- Unités : `aphrody-discord-ai-lab.service` et `aphrody-discord-debate.service` sont désactivées, et leur `ExecStart` vise `/srv/aphrody-lab`. Les retirer quand `/srv` disparaît.
 - Docker : rien à purger (cache de build vide, aucun conteneur arrêté).
 
 Sur le vps, l'inventaire reste à faire (`du` lancé dans `~/build/tmp/purge/du.txt`). Cibles :
@@ -79,16 +77,14 @@ Sur le vps, l'inventaire reste à faire (`du` lancé dans `~/build/tmp/purge/du.
 - api.aphrody.com : retiré (bloc nginx, DNS OVH, docs).
 - dbfr : rien n'a été modifié par l'agent code. Le marqueur `~/.aphrody/layout-migrated` était absent à 17:40.
   - Les liens `/srv/*` et le vrai dossier `/srv/aphrody` (16K) existent encore.
-  - Encore en `/srv` : `aphrody-discord-ai-lab.service` et `aphrody-discord-debate.service`.
   - `~/src/bun` signale « dubious ownership » (propriétaire root).
 
 Étapes suivantes sur dbfr, une fois le marqueur écrit :
 
 1. `sudo chown -R ubuntu:aphrody ~/src/bun`, puis `git -C ~/src/aphrody pull --ff-only` et `git -C ~/src/bun pull --ff-only`.
 2. Dans ~/src/aphrody : `bun scripts/tools/infra/host-apps.ts --host dbfr`, puis la même commande avec `--apply`.
-3. Pour chaque unité du dépôt : `bun packages/engine/core/src/host/cli.ts compose-unit <unité>`, installation dans /etc/systemd/system, puis `daemon-reload` et `restart` (aphrody-fonts-proxy, aphrody-discord-dev, aphrody-downloads). Vérifier ensuite que les unités répondent.
-4. `systemctl disable --now aphrody-discord-ai-lab aphrody-discord-debate`, puis `rm` des deux unités (sans copie).
-5. Dans ~/src/bun : `sudo -n bun scripts/aphrody/deploy/install-host.ts --role prod --root /home/ubuntu/apps/aphrody-bun`. Corriger `current`, voir la purge ci-dessus.
+3. Pour chaque unité du dépôt : `bun packages/engine/core/src/host/cli.ts compose-unit <unité>`, installation dans /etc/systemd/system, puis `daemon-reload` et `restart` (aphrody-fonts-proxy, aphrody-downloads). Vérifier ensuite que les unités répondent.
+4. Dans ~/src/bun : `sudo -n bun scripts/aphrody/deploy/install-host.ts --role prod --root /home/ubuntu/apps/aphrody-bun`. Corriger `current`, voir la purge ci-dessus.
 6. Pour `/srv/aphrody` : `lsof +D`, puis `mv` du contenu vers `~/apps/<app>` s'il est unique.
 7. Contrôles qui doivent rester vides : `sudo lsof +D /srv` et `grep -r /srv /etc/systemd /etc/nginx ~/apps`. Ensuite `sudo rm /srv/*` (liens seulement), puis `sudo rmdir /srv`.
 8. Preuves : `ls /srv`, `docker compose ls` (1 projet), `systemctl --failed`, `bun scripts/aphrody/docker-doctor.ts dbfr vps` (7/7), `curl -sI https://aphrody.com/` (200).
