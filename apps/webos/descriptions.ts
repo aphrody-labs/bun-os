@@ -84,6 +84,8 @@ export const MEMBER_DESCRIPTIONS: Record<string, string> = {
   "engines/web/build.ts": "Builds the web emulation bundle served to the browser.",
   "engines/web/notices": "License notices of the third-party emulation components shipped to the web.",
   "engines/web/qt": "Qt front end of the web emulation host.",
+  "engines/web/qualify-webos.ts": "Qualifies every emulator inside WebOS: boots a free test ROM per core in headless Chrome and writes the /api/emulators/qualification report.",
+  "engines/web/fixtures.ts": "Free test ROMs of the WebOS emulator qualification, including the generated PlayStation PS-EXE.",
   "engines/web/qualification.ts": "Qualification of web emulation: ROM suite results that decide which cores are listed as working.",
   "engines/web/recipes.json": "Build recipes of the web emulation components.",
   "engines/web/serve.ts": "Local server for the web emulation bundle with the required isolation headers.",
