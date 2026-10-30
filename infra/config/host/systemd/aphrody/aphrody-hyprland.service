@@ -1,26 +1,34 @@
 # SPDX-License-Identifier: Apache-2.0
-# Real Hyprland (Wayland) compositor, headless, software rendering. systemd USER unit of ubuntu (needs linger).
-# Dedicated runtime dir: /run/user/1000/aphrody-hypr (socket wayland-aphrody, hyprctl instance dir).
+# Real Hyprland (Wayland) compositor, headless (Aquamarine headless backend), software rendering (llvmpipe).
+# System unit running as ubuntu with the video group (Aquamarine needs /dev/dri/card0 even when headless; the VPS GPU is a Cirrus VGA).
+# Dedicated short runtime dir /run/user/1000/ah (Hyprland IPC socket paths are limited to 107 bytes).
 [Unit]
 Description=Aphrody Hyprland headless Wayland session
-After=pipewire.service
+After=user@1000.service
+Wants=user@1000.service
 
 [Service]
 Type=simple
-Environment=XDG_RUNTIME_DIR=%t/aphrody-hypr
+User=ubuntu
+Group=ubuntu
+SupplementaryGroups=video render
+Environment=HOME=/home/ubuntu
+Environment=XDG_RUNTIME_DIR=/run/user/1000/ah
 Environment=AQ_BACKENDS=headless
-Environment=WLR_BACKENDS=headless
-Environment=WLR_RENDERER_ALLOW_SOFTWARE=1
 Environment=LIBGL_ALWAYS_SOFTWARE=1
 Environment=XDG_SESSION_TYPE=wayland
 Environment=XDG_CURRENT_DESKTOP=Hyprland
-Environment=HYPRLAND_NO_SD_NOTIFY=1
-ExecStartPre=/usr/bin/install -d -m 0700 %t/aphrody-hypr
-ExecStartPre=-/usr/bin/ln -sfn %t/pipewire-0 %t/aphrody-hypr/pipewire-0
-ExecStart=/usr/bin/Hyprland -c %h/.config/hypr/hyprland.conf
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+ExecStartPre=/usr/bin/install -d -m 0700 /run/user/1000/ah
+ExecStartPre=-/usr/bin/ln -sfn /run/user/1000/pipewire-0 /run/user/1000/ah/pipewire-0
+ExecStart=/usr/bin/Hyprland -c /home/ubuntu/.config/hypr/hyprland.conf
 Restart=always
 RestartSec=3
+TimeoutStopSec=10
+KillMode=control-group
 Nice=5
+MemoryMax=8G
+NoNewPrivileges=true
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
