@@ -1,0 +1,102 @@
+# syntax=docker/dockerfile:1.7
+# SPDX-License-Identifier: MIT
+# bunos-unified: the single Bun OS image (docs/UNIFIED-IMAGE.md). One rootfs, one kernel, one UI:
+#   Pop!_OS 26.04 (resolute) userland + COSMIC (our aphrody-labs fork debs win over Pop's) as the only UI,
+#   Android 17 as a Waydroid system container sharing the kernel (multi-window: each app is a COSMIC window),
+#   Helium (Chromium) for the browser and installed web apps, Bun and the Bun OS services.
+# No emulator, no VM. Targets:
+#   session  - the WebOS per-user container: cage (headless) > nested cosmic-comp > apps, streamed by
+#              aphrody-remote-desktop on :8794 inside the container network (entrypoint bunos-unified-session)
+#   unified  - the same rootfs plus kernel, systemd boot and the COSMIC greeter; exported as a rootfs tar and
+#              assembled into a UEFI disk image by assemble-disk.sh
+# Host inputs staged by the factory (manifest.json hostInputs): bin/aphrody-remote-desktop, waydroid/ (our fork
+# vendor/waydroid), debs/ (fork builds of the native-apps lane), extra-bin/ (bun-obscura, google CLI, ...).
+ARG UBUNTU_IMAGE
+
+FROM ${UBUNTU_IMAGE} AS base
+ARG POP_APT_SERVER
+ARG POP_APT_SUITE
+ARG POP_APT_KEY
+ARG WAYDROID_APT_KEY
+ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8
+RUN printf '%s\n' 'path-exclude=/usr/share/doc/*' 'path-include=/usr/share/doc/*/copyright' 'path-exclude=/usr/share/man/*' \
+       'path-exclude=/usr/share/info/*' 'path-exclude=/usr/share/locale/*' 'path-include=/usr/share/locale/locale.alias' \
+       'path-include=/usr/share/locale/en*' 'path-include=/usr/share/locale/fr*' >/etc/dpkg/dpkg.cfg.d/01-bun-os-nodoc \
+  && printf 'Acquire::Languages "none";\nAPT::Keep-Downloaded-Packages "false";\nAPT::Install-Recommends "false";\n' >/etc/apt/apt.conf.d/01-bun-os \
+  && apt-get update && apt-get install -y ca-certificates curl gnupg \
+  && curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${POP_APT_KEY}" | gpg --dearmor >/usr/share/keyrings/pop-os.gpg \
+  && gpg --show-keys --with-colons /usr/share/keyrings/pop-os.gpg | grep -q "^fpr:::::::::${POP_APT_KEY}:" \
+  && curl -fsSL https://repo.waydro.id/waydroid.gpg -o /usr/share/keyrings/waydroid.gpg \
+  && gpg --show-keys --with-colons /usr/share/keyrings/waydroid.gpg | grep -q "^fpr:::::::::${WAYDROID_APT_KEY}:" \
+  && install -d /etc/crypto-policies/back-ends \
+  && sed 's/^sha1.second_preimage_resistance = .*/sha1.second_preimage_resistance = 2027-02-01  # Pop!_OS key binding is SHA-1/' \
+       /usr/share/apt/default-sequoia.config >/etc/crypto-policies/back-ends/apt-sequoia.config \
+  # Pop!_OS at the default priority: the newest version wins, so Ubuntu's security updates (systemd, mesa) are not
+  # pinned back to Pop's older rebuilds; Pop supplies what Ubuntu lacks (COSMIC, pop-launcher, greeter).
+  && echo "deb [signed-by=/usr/share/keyrings/pop-os.gpg] ${POP_APT_SERVER} ${POP_APT_SUITE} main" >/etc/apt/sources.list.d/pop-os.list \
+  && echo "deb [signed-by=/usr/share/keyrings/waydroid.gpg] https://repo.waydro.id/ ${POP_APT_SUITE} main" >/etc/apt/sources.list.d/waydroid.list \
+  && printf 'Package: *\nPin: origin repo.waydro.id\nPin-Priority: 100\n\nPackage: waydroid\nPin: origin repo.waydro.id\nPin-Priority: -1\n' >/etc/apt/preferences.d/bunos \
+  && apt-get update \
+  && apt-get install -y systemd systemd-sysv dbus dbus-user-session sudo tini iproute2 iptables nftables kmod util-linux \
+       cosmic-session cosmic-comp cosmic-panel cosmic-launcher cosmic-app-library cosmic-applets cosmic-notifications \
+       cosmic-osd cosmic-settings cosmic-settings-daemon cosmic-files cosmic-term cosmic-edit cosmic-store \
+       cosmic-workspaces cosmic-bg cosmic-icons cosmic-wallpapers cosmic-screenshot cosmic-idle cosmic-randr \
+       cosmic-greeter xdg-desktop-portal-cosmic pop-launcher \
+       cage wlr-randr xwayland mesa-vulkan-drivers libgl1-mesa-dri libegl1 pipewire pipewire-pulse wireplumber \
+       fonts-noto-core fonts-noto-color-emoji xdg-utils \
+       lxc dnsmasq-base python3 python3-gi python3-dbus gir1.2-glib-2.0 python3-gbinder libgbinder libglibutil \
+       libnss3 libatk-bridge2.0-0t64 libcups2t64 libxkbcommon0 libgbm1 libasound2t64 libxdamage1 libxrandr2 libxcomposite1 \
+       socat zstd xz-utils grim rclone fuse3 \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /var/log/apt/* /var/log/dpkg.log
+
+FROM base AS session
+ARG BUN_URL
+ARG BUN_SHA256_AMD64
+ARG BUN_LICENSE_URL
+ARG BUN_LICENSE_SHA256
+ARG HELIUM_URL
+ARG HELIUM_SHA256
+# Bun: the official upstream canary pinned by the factory (AGENTS.md).
+ADD --checksum=sha256:${BUN_SHA256_AMD64} ${BUN_URL} /tmp/bun.tgz
+ADD --checksum=sha256:${BUN_LICENSE_SHA256} ${BUN_LICENSE_URL} /usr/share/licenses/bun-canary/LICENSE.md
+# Helium (imputnet/helium-linux, the source of our vendor/helium-linux fork); replaced by the fork build when the
+# Chromium lane publishes it. Ozone/Wayland, the browser and the PWA host of every web app.
+ADD --checksum=sha256:${HELIUM_SHA256} ${HELIUM_URL} /tmp/helium.tar.xz
+RUN tar -xzf /tmp/bun.tgz -C /tmp && install -m755 /tmp/package/bin/bun /usr/bin/bun && ln -sf bun /usr/bin/bunx \
+  && install -d /opt/helium && tar -xJf /tmp/helium.tar.xz -C /opt/helium --strip-components=1 \
+  && ln -sf /opt/helium/helium /usr/bin/helium \
+  && rm -rf /tmp/bun.tgz /tmp/package /tmp/helium.tar.xz
+# Fork builds (native-apps lane: COSMIC set, Rio, Spacedrive, Aphrody Chat/Search) override Pop's packages.
+COPY debs/ /tmp/debs/
+RUN set -e; if ls /tmp/debs/*.deb >/dev/null 2>&1; then apt-get update && apt-get install -y --allow-downgrades /tmp/debs/*.deb \
+      && apt-get clean && rm -rf /var/lib/apt/lists/*; fi; \
+    install -d /usr/share/bun-os; (ls /tmp/debs/*.deb 2>/dev/null | xargs -r -n1 basename) >/usr/share/bun-os/fork-debs.txt; rm -rf /tmp/debs
+# Android: Waydroid from our fork (vendor/waydroid), installed with its own Makefile.
+COPY waydroid/ /tmp/waydroid/
+RUN make -C /tmp/waydroid install DESTDIR= USE_SYSTEMD=1 USE_NFTABLES=1 && rm -rf /tmp/waydroid
+COPY bin/aphrody-remote-desktop /usr/bin/aphrody-remote-desktop
+COPY extra-bin/ /usr/bin/
+# Bun OS COSMIC session layer (themes, launcher scripts, web app launcher) and the unified-image layer.
+COPY cosmic-session/rootfs/ /
+COPY cosmic-session/headless/start-cosmic-headless /usr/libexec/bunos/start-cosmic-headless
+COPY rootfs/ /
+RUN chmod 0755 /usr/bin/aphrody-remote-desktop /usr/bin/bunos-* /usr/libexec/bunos/* \
+       /usr/lib/pop-launcher/scripts/bunos/*.sh 2>/dev/null; \
+    useradd -m -u 1000 -G video,render,audio,input -s /bin/bash aphrody \
+ && cat /usr/share/bun-os/os-release.fragment >>/usr/lib/os-release \
+ && install -d -m 0755 /var/lib/waydroid /usr/share/bunos/waydroid/images
+EXPOSE 8794
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/bin/bunos-unified-session"]
+
+FROM session AS unified
+# Bootable: Ubuntu's generic kernel (binder_linux, binderfs, memfd, vkms, KVM modules) until linux-bun is packaged
+# as a deb; systemd as init, cosmic-greeter on greetd, Waydroid's container service.
+RUN apt-get update && apt-get install -y linux-image-generic linux-modules-extra-generic initramfs-tools \
+       systemd-boot-efi linux-firmware network-manager greetd \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /var/log/apt/* /var/log/dpkg.log \
+  && systemctl enable NetworkManager.service waydroid-container.service bunos-binderfs.service \
+  && (systemctl enable cosmic-greeter.service || systemctl enable greetd.service) \
+  && systemctl set-default graphical.target \
+  && echo bunos >/etc/hostname \
+  && printf 'LABEL=bunos-root / ext4 defaults,noatime 0 1\nLABEL=BUNOS-ESP /boot/efi vfat umask=0077 0 2\n' >/etc/fstab \
+  && echo 'aphrody:bunos' | chpasswd && usermod -aG sudo aphrody

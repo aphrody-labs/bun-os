@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Helium
+GenericName=Web Browser
+Comment=Chromium-based browser (Helium), Wayland native
+Exec=helium --ozone-platform=wayland %U
+Icon=helium
+Categories=Network;WebBrowser;
+MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;
+StartupWMClass=helium

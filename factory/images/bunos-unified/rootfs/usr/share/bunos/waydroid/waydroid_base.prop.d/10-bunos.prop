@@ -1,0 +1,7 @@
+persist.waydroid.multi_windows=true
+persist.waydroid.cursor_on_subsurface=true
+persist.waydroid.suspend=false
+ro.sf.lcd_density=200
+persist.wm.debug.desktop_mode_enabled=true
+ro.product.brand=Aphrody
+ro.product.model=Bun OS

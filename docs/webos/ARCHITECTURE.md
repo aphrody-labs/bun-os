@@ -6,7 +6,7 @@ Status: accepted 2026-10-30. Supersedes ADR-001 and ADR-002 of the same day. Sco
 
 The aphrody.com WebOS site (a JavaScript desktop with 17 JS apps, a Cloudflare-Worker-shaped Bun service and TypeScript build scripts) was never the owner's choice. It is demolished without compatibility preservation. What replaces it: the Bun OS desktop in the browser, streamed from the Bun OS host, with everything in Rust.
 
-Sessions (owner pivot, final): one session type. Bun OS is a single unified image (Android 17 as a native container, ChromiumOS components, COSMIC and Bun OS, one UI, no OS emulators or VMs). A WebOS session is a per-user container of that unified rootfs, COSMIC running in cage with Android inside it, streamed by the Rust gateway. The per-OS session types of the first drafts (Pop!_OS, Redox under QEMU, Android emulator, Googlebook, ChromiumOS VM, separate Wine and Proton sessions) are retired from `aphrody-webos-protocol` (version 2) and the server. The integrator of the unified image is agent a019290b090a70df3. Until the unified desktop streams, the session upstream is the Android gateway, the fallback path that sends H.264 for WebCodecs (`ServerEvent::Video`).
+Sessions (owner pivot, final): one session type. Bun OS is a single unified image (Android 17 as a native container, ChromiumOS components, COSMIC and Bun OS, one UI, no OS emulators or VMs). A WebOS session is a per-user container of that unified rootfs, COSMIC running in cage with Android inside it, streamed by the Rust gateway. The per-OS session types of the first drafts (Pop!_OS, Redox under QEMU, Android emulator, Googlebook, ChromiumOS VM, separate Wine and Proton sessions) are retired from `aphrody-webos-protocol` (version 2) and the server. The image is `factory/images/bunos-unified` (target `session` for WebOS, `unified` for the bootable disk); its layout and the session container contract (entrypoint `bunos-unified-session`, cage on `wayland-0`, nested cosmic-comp on `wayland-1`, gateway on 8794 inside the container network, private binderfs per session, signed-in users only) are in [`docs/UNIFIED-IMAGE.md`](../UNIFIED-IMAGE.md). Until the unified desktop streams, the session upstream is the Android gateway, the fallback path that sends H.264 for WebCodecs (`ServerEvent::Video`).
 
 ## What is removed
 
@@ -16,21 +16,21 @@ Audit baseline of what was removed (2026-10-30): 14.5k lines of shell TypeScript
 
 ## Crates
 
-| Crate | Kind | Owns |
-| --- | --- | --- |
-| `crates/aphrody-webos-protocol` | lib (std and wasm32) | The typed contract shared by server and client: OS catalog ids, session state, signalling, input, clipboard, audio and gamepad messages, health, API error shape. serde types, versioned. Replaces `contracts/`. |
-| `crates/aphrody-webos-server` | bin `aphrody-webos` | One axum/tokio binary on 127.0.0.1:8790 behind nginx: static client assets, `/api/health`, auth, and the modules below. |
-| `crates/aphrody-webos-client` | cdylib wasm32 + native | iced/libcosmic client (wasm32 with wgpu; native for in-session tools): OS picker, fullscreen stream, keyboard, pointer, gamepad, clipboard, session state. Only the wasm-bindgen glue and a one-line boot module are JavaScript. |
+| Crate                           | Kind                   | Owns                                                                                                                                                                                                                             |
+| ------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `crates/aphrody-webos-protocol` | lib (std and wasm32)   | The typed contract shared by server and client: OS catalog ids, session state, signalling, input, clipboard, audio and gamepad messages, health, API error shape. serde types, versioned. Replaces `contracts/`.                 |
+| `crates/aphrody-webos-server`   | bin `aphrody-webos`    | One axum/tokio binary on 127.0.0.1:8790 behind nginx: static client assets, `/api/health`, auth, and the modules below.                                                                                                          |
+| `crates/aphrody-webos-client`   | cdylib wasm32 + native | iced/libcosmic client (wasm32 with wgpu; native for in-session tools): OS picker, fullscreen stream, keyboard, pointer, gamepad, clipboard, session state. Only the wasm-bindgen glue and a one-line boot module are JavaScript. |
 
 Server modules and owners:
 
-| Module | Owner | Content |
-| --- | --- | --- |
-| `assets`, `health`, `auth`, `log` | WebOS architect | Static client files with immutable caching and CSP; `/api/health` with checks; session tokens (scheme of `crates/aphrody-remote-desktop` tokens); one JSON log line per request. |
-| `sessions` | session agent | Session manager over the Docker Engine API (bollard): one container of the unified Bun OS rootfs per user (COSMIC in cage, Android inside it), cgroup limits, lifecycle, idle reaping. Until it lands the server bridges one declared stream (`WEBOS_SESSION`, `_MODE=native` for protocol-native upstreams, `_TOKEN_FILE`); `GET /api/session`, `POST /api/sessions`, `GET /api/sessions/{id}/stream`. |
-| `gateway` | session agent | Streaming: WebRTC (webrtc-rs) with H.264/Opus from the container (GStreamer pipeline of `packages/bun-gamestream` ported with gstreamer-rs), WebSocket with WebCodecs-decodable frames as fallback; input, clipboard, audio and gamepad channels. Based on `crates/aphrody-remote-desktop` (axum, protocol, tokens). |
-| `repos` | store agent | Package repositories API (`/api/store`, pacman, flatpak, npm, cargo, apk) ported from `apps/webos/store`. |
-| `inventory` | inventory agent | `/api/inventory` and `/api/rpc` ported from `apps/webos/inventory.ts`. |
+| Module                            | Owner           | Content                                                                                                                                                                                                                                                                                                                                                                                                 |
+| --------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `assets`, `health`, `auth`, `log` | WebOS architect | Static client files with immutable caching and CSP; `/api/health` with checks; session tokens (scheme of `crates/aphrody-remote-desktop` tokens); one JSON log line per request.                                                                                                                                                                                                                        |
+| `sessions`                        | session agent   | Session manager over the Docker Engine API (bollard): one container of the unified Bun OS rootfs per user (COSMIC in cage, Android inside it), cgroup limits, lifecycle, idle reaping. Until it lands the server bridges one declared stream (`WEBOS_SESSION`, `_MODE=native` for protocol-native upstreams, `_TOKEN_FILE`); `GET /api/session`, `POST /api/sessions`, `GET /api/sessions/{id}/stream`. |
+| `gateway`                         | session agent   | Streaming: WebRTC (webrtc-rs) with H.264/Opus from the container (GStreamer pipeline of `packages/bun-gamestream` ported with gstreamer-rs), WebSocket with WebCodecs-decodable frames as fallback; input, clipboard, audio and gamepad channels. Based on `crates/aphrody-remote-desktop` (axum, protocol, tokens).                                                                                    |
+| `repos`                           | store agent     | Package repositories API (`/api/store`, pacman, flatpak, npm, cargo, apk) ported from `apps/webos/store`.                                                                                                                                                                                                                                                                                               |
+| `inventory`                       | inventory agent | `/api/inventory` and `/api/rpc` ported from `apps/webos/inventory.ts`.                                                                                                                                                                                                                                                                                                                                  |
 
 Wine, Proton and gaming input live inside the unified image (emulators agent); native app packaging in the image belongs to the native-apps agent.
 
@@ -40,12 +40,12 @@ Owner decision (overrides the first web-sys draft): the client is an iced applic
 
 ## Web content engines
 
-| Engine | What it is | Role in Bun OS |
-| --- | --- | --- |
-| Servo (fork `aphrody-labs/servo`, 0.7+) | Embeddable browser engine in pure Rust; lighter, compatibility gaps | Primary embedded engine: an iced/libcosmic widget rendering offscreen into a wgpu texture. |
-| cef-rs (`vendor/cef-rs`, CEF 156) | Embeddable full Chromium from Rust, offscreen rendering | Compatibility fallback widget for sites Servo cannot render. |
-| Tauri v3 (`vendor/tauri`, fork on the v3 branch, `tauri-v3.0.0-alpha.5`) | App framework for web frontends, alpha, CEF runtime | Apps with web frontends, including `apps/aphrody-app` migrated to v3; a Servo runtime is pushed where possible. |
-| Helium (fork) | Full Chromium browser product, not embeddable | The user-facing browser inside sessions. |
+| Engine                                                                   | What it is                                                          | Role in Bun OS                                                                                                  |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Servo (fork `aphrody-labs/servo`, 0.7+)                                  | Embeddable browser engine in pure Rust; lighter, compatibility gaps | Primary embedded engine: an iced/libcosmic widget rendering offscreen into a wgpu texture.                      |
+| cef-rs (`vendor/cef-rs`, CEF 156)                                        | Embeddable full Chromium from Rust, offscreen rendering             | Compatibility fallback widget for sites Servo cannot render.                                                    |
+| Tauri v3 (`vendor/tauri`, fork on the v3 branch, `tauri-v3.0.0-alpha.5`) | App framework for web frontends, alpha, CEF runtime                 | Apps with web frontends, including `apps/aphrody-app` migrated to v3; a Servo runtime is pushed where possible. |
+| Helium (fork)                                                            | Full Chromium browser product, not embeddable                       | The user-facing browser inside sessions.                                                                        |
 
 ## Source rule
 
@@ -63,7 +63,7 @@ Inside each session container a per-session `aphrody-remote-desktop` process (se
 - Deploy: an atomic release directory (`aphrody-webos` binary, `client/` assets, `receipt.json` with sha256), a systemd unit `aphrody-webos.service` running the Rust binary, the root activator flips `current`, gates on `/api/health` (matching `sourceCommit`) and rolls back on failure. nginx keeps `aphrody.com` on 8790.
 - Until the client and gateway are complete, the server serves a minimal Rust-rendered page at `/` (no JavaScript desktop).
 - Budgets: client wasm at most 3 MB gzip (iced, wgpu); first frame under 2 s after picking an OS on a warm host; input to photon under 80 ms in region.
-- Security: CSP `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'`, per-session bearer tokens, containers without host privileges, signed release receipts.
+- Security: CSP `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'`, per-session bearer tokens, signed release receipts. Session containers get only the capabilities Android needs (listed in `docs/UNIFIED-IMAGE.md`), a read-only rootfs, no host network and no-new-privileges, and are created only for signed-in users.
 
 ## Stages
 

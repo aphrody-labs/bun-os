@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT
+# Bootable Bun OS: binder + binderfs for the Android 17 Waydroid container (same kernel, no emulator).
+[Unit]
+Description=Bun OS binderfs for Android
+DefaultDependencies=no
+Before=waydroid-container.service
+ConditionPathIsMountPoint=!/dev/binderfs
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-/usr/sbin/modprobe binder_linux devices=binder,hwbinder,vndbinder
+ExecStart=/usr/bin/mkdir -p /dev/binderfs
+ExecStart=/usr/bin/mount -t binder binder /dev/binderfs
+
+[Install]
+WantedBy=multi-user.target

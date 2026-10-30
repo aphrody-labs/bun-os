@@ -6,7 +6,7 @@
 set -eu
 url="${1:?usage: bunos-launch-webapp URL APP_ID}"
 app_id="${2:?usage: bunos-launch-webapp URL APP_ID}"
-for b in chromium chromium-browser google-chrome-stable google-chrome brave-browser microsoft-edge-stable; do
+for b in helium chromium chromium-browser google-chrome-stable google-chrome brave-browser microsoft-edge-stable; do
   if command -v "$b" >/dev/null 2>&1; then
     exec "$b" --app="$url" --class="$app_id" --ozone-platform-hint=auto \
       --user-data-dir="${XDG_DATA_HOME:-$HOME/.local/share}/bunos/webapps/$app_id"

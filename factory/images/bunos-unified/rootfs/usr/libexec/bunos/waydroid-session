@@ -1,0 +1,11 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Waydroid user session inside COSMIC (autostart). Inherits WAYLAND_DISPLAY from cosmic-session, so Android
+# windows are COSMIC toplevels. Waydroid's user manager writes ~/.local/share/applications/waydroid.*.desktop
+# for every Android app, which the COSMIC launcher and app library list next to the Linux and web apps.
+set -u
+i=0
+while ! waydroid status 2>/dev/null | grep -q 'Container:.*RUNNING\|Container:.*FROZEN\|Container:.*STOPPED'; do
+  i=$((i + 1)); [ $i -gt 60 ] && exit 0; sleep 2
+done
+exec waydroid session start
