@@ -91,7 +91,7 @@ cosmic_src() {
 
 # Session set, dependencies before dependants. cosmic-randr is a cosmic-settings dependency.
 # Desktop first (the streamed COSMIC session needs comp, session, panel and settings-daemon), then the apps.
-COSMIC_SET="cosmic-comp cosmic-session cosmic-panel cosmic-settings-daemon cosmic-icons cosmic-randr cosmic-applets cosmic-launcher pop-launcher cosmic-app-library cosmic-bg cosmic-notifications cosmic-osd cosmic-workspaces-epoch xdg-desktop-portal-cosmic cosmic-settings cosmic-files cosmic-term cosmic-edit cosmic-store cosmic-player"
+COSMIC_SET="cosmic-comp cosmic-session cosmic-panel cosmic-settings-daemon cosmic-icons cosmic-randr cosmic-applets cosmic-launcher pop-launcher cosmic-app-library cosmic-bg cosmic-notifications cosmic-osd cosmic-workspaces-epoch xdg-desktop-portal-cosmic cosmic-settings cosmic-greeter cosmic-files cosmic-term cosmic-edit cosmic-store cosmic-player"
 # Shared Linux/Redox fork pins (libcosmic, iced, winit, softbuffer, cosmic-protocols, cosmic-settings-daemon).
 PATCH=$ROOT/factory/os/rust-desktop/cargo-patch.toml
 
@@ -192,17 +192,21 @@ container() {
   git -C "$ROOT" fetch -q origin main
   rev=$(git -C "$ROOT" rev-parse origin/main)
   pin=$(git -C "$ROOT" rev-parse "$rev:vendor/cosmic-epoch")
-  exp=$WORK/root; rm -rf "$exp"; mkdir -p "$exp"
+  # One export tree and container name per invocation: lanes may run side by side.
+  exp=$WORK/root-$$; rm -rf "$exp"; mkdir -p "$exp"
   git -C "$ROOT" archive "$rev" Cargo.toml scripts/aphrody/build/rust factory/native-apps crates/aphrody-chat \
     crates/aphrody-search infra/config/host/libexec/aphrody-native-apps container/cosmic-packages.json \
     tools/aphrody/config/build-factory.json $(git -C "$ROOT" ls-tree --name-only "$rev" factory/os/rust-desktop/cargo-patch.toml)     | tar -x -C "$exp"
   docker build -q -t "$img" -f "$exp/factory/native-apps/builder.Dockerfile" "$exp/factory/native-apps" >/dev/null
-  exec docker run --rm --cpus 4 --memory 16g --name "bunos-native-$(date +%s)" \
+  rc=0
+  docker run --rm --cpus 4 --memory 16g --name "bunos-native-$$-$(date +%s)" \
     -v "$WORK:/work" -v "$exp:/src/bun-os:ro" -v "$HOME/.local/bin/bun:/usr/local/bin/bun:ro" \
     -v bunos-native-rustup:/opt/rustup -v bunos-native-cargo:/cache/cargo -v bunos-native-bun:/root/.bun \
     -e CARGO_HOME=/cache/cargo -e BUNOS_NATIVE_ROOT=/src/bun-os -e BUNOS_NATIVE_WORK=/work -e BUNOS_REV="$rev" -e COSMIC_EPOCH_PIN="$pin" \
     -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0='*' \
-    "$img" sh /src/bun-os/infra/config/host/libexec/aphrody-native-apps "$@"
+    "$img" sh /src/bun-os/infra/config/host/libexec/aphrody-native-apps "$@" || rc=$?
+  rm -rf "$exp"
+  return $rc
 }
 
 cmd=${1:-all}; shift || true
