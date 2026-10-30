@@ -65,10 +65,23 @@ const SYMBOLS: Record<string, string> = {
   pen: "edit",
   android: "android",
   game: "sports_esports",
+  chat: "chat",
 };
 
 export function icon(name: string): HTMLSpanElement {
   const s = document.createElement("span");
+  // "img:<path>" is a real upstream icon asset (see app-icons.ts); anything else is a shell glyph.
+  if (name.startsWith("img:")) {
+    s.className = "mi-img";
+    s.setAttribute("aria-hidden", "true");
+    const img = document.createElement("img");
+    img.src = name.slice(4);
+    img.alt = "";
+    img.decoding = "async";
+    img.draggable = false;
+    s.append(img);
+    return s;
+  }
   s.className = "mi material-symbols-rounded";
   s.setAttribute("aria-hidden", "true");
   s.textContent = SYMBOLS[name] ?? "apps";

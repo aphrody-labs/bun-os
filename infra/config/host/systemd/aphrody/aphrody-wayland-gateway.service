@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# WebOS gateway of the real Hyprland session (apps/webos/services/wayland.ts): 127.0.0.1:8793 behind nginx /api/wayland/.
+# /etc/aphrody/wayland.env (root, 0600): WAYLAND_TOKEN (secret, never in the repository).
+[Unit]
+Description=Aphrody WebOS Wayland gateway (Hyprland stream, input, launch)
+Requires=aphrody-hyprland.service
+After=aphrody-hyprland.service aphrody-wayvnc.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/apps/wayland
+Environment=PORT=8793
+EnvironmentFile=/etc/aphrody/wayland.env
+ExecStart=/home/ubuntu/.local/bin/bun /home/ubuntu/apps/wayland/wayland.ts
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+MemoryMax=1G
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target

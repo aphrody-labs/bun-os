@@ -29,6 +29,11 @@ import {
   type CraftHostId,
 } from "./apps/craft-host";
 import { h, icon } from "./dom";
+import { installWebViews } from "./webview";
+import { chatApp } from "./apps/chat";
+import { searchApp } from "./apps/search";
+import { iconFor } from "./app-icons";
+import { waylandApp } from "./apps/wayland";
 import { catalog, HOME, webos, type CatalogApp } from "./os";
 import { searchContents } from "./apps/files-wire";
 import { openAiCompatible } from "./assistant/backend";
@@ -89,7 +94,7 @@ installAppearance();
 interface Builtin {
   id: string;
   /** What runs the app: WebAssembly, the App UI build, an HTTP API of this deployment, or a web-platform feature. No other backing exists. */
-  backing: "wasm" | "app-ui" | "api" | "browser";
+  backing: "wasm" | "wayland" | "app-ui" | "api" | "browser";
   name: string;
   icon: string;
   desc: string;
@@ -160,10 +165,42 @@ const builtins: Builtin[] = [
       ),
   },
   {
+    id: "chat",
+    backing: "api",
+    tone: "primary",
+    name: "Aphrody Chat",
+    icon: "chat",
+    desc: "Chat with the Bun OS model backend (llama.cpp or a hosted OpenAI-compatible API)",
+    group: "core",
+    width: 640,
+    height: 560,
+    mount: (root) =>
+      chatApp(root, () =>
+        openAiCompatible({
+          kind: prefs.get("assistant.backend"),
+          baseUrl: prefs.get("assistant.baseUrl"),
+          model: prefs.get("assistant.model"),
+          apiKey: prefs.get("assistant.apiKey"),
+        }),
+      ),
+  },
+  {
+    id: "search",
+    backing: "api",
+    tone: "secondary",
+    name: "Aphrody Search",
+    icon: "search",
+    desc: "Search every app, package, crate, document and tool served by Bun OS",
+    group: "core",
+    width: 720,
+    height: 560,
+    mount: (root) => searchApp(root, openWebView),
+  },
+  {
     id: "files",
     backing: "wasm",
     tone: "primary",
-    name: "Files",
+    name: "Aphrody Files",
     icon: "folder",
     desc: "Your files, saved in this browser",
     group: "core",
@@ -180,7 +217,7 @@ const builtins: Builtin[] = [
     id: "browser",
     backing: "api",
     tone: "secondary",
-    name: "Browser",
+    name: "Aphrody Browser",
     icon: "globe",
     desc: "Browse the web in tabs",
     group: "core",
@@ -192,7 +229,7 @@ const builtins: Builtin[] = [
     id: "apps",
     backing: "api",
     tone: "tertiary",
-    name: "Apps",
+    name: "Aphrody Store",
     icon: "store",
     desc: "Install games and creative apps",
     group: "core",
@@ -203,7 +240,7 @@ const builtins: Builtin[] = [
   {
     id: "settings",
     backing: "browser",
-    name: "Settings",
+    name: "Aphrody Settings",
     icon: "gear",
     desc: "Appearance, wallpaper, desktop, keyboard, region and privacy",
     group: "core",
@@ -226,7 +263,7 @@ const builtins: Builtin[] = [
   {
     id: "emulators",
     backing: "wasm",
-    name: "Emulators",
+    name: "Bun Engine Emulators",
     icon: "game",
     desc: "Every emulator: play, save states, qualification status",
     group: "core",
@@ -237,7 +274,7 @@ const builtins: Builtin[] = [
   {
     id: "terminal",
     backing: "wasm",
-    name: "Terminal",
+    name: "Aphrody Shell",
     icon: "terminal",
     desc: "Command line (Rust shell in WebAssembly)",
     group: "advanced",
@@ -248,7 +285,7 @@ const builtins: Builtin[] = [
   {
     id: "inspector",
     backing: "wasm",
-    name: "Inspector",
+    name: "Aphrody Inspector",
     icon: "cube",
     desc: "Analyse any file: format, sections, hashes",
     group: "advanced",
@@ -259,7 +296,7 @@ const builtins: Builtin[] = [
   {
     id: "engine",
     backing: "wasm",
-    name: "TypeScript playground",
+    name: "Bun Playground",
     icon: "bolt",
     desc: "Bundle a TypeScript project with esbuild-wasm and run it in an isolated worker",
     group: "advanced",
@@ -270,7 +307,7 @@ const builtins: Builtin[] = [
   {
     id: "workspace",
     backing: "api",
-    name: "Atlas",
+    name: "Bun OS Atlas",
     icon: "code",
     desc: "Every Bun OS member: apps, packages, crates, docs, factory, engines, tools and more",
     group: "advanced",
@@ -282,7 +319,7 @@ const builtins: Builtin[] = [
     id: "media",
     backing: "browser",
     tone: "tertiary",
-    name: "Media",
+    name: "Aphrody Media",
     icon: "film",
     desc: "Play videos, music and pictures",
     group: "core",
@@ -294,7 +331,7 @@ const builtins: Builtin[] = [
     id: "webapps",
     backing: "browser",
     tone: "secondary",
-    name: "Web Apps",
+    name: "Aphrody Web Apps",
     icon: "globe",
     desc: "Sites pinned as apps",
     group: "core",
@@ -305,7 +342,7 @@ const builtins: Builtin[] = [
   {
     id: "calculator",
     backing: "wasm",
-    name: "Calculator",
+    name: "fend Calculator",
     icon: "table",
     desc: "Calculator",
     group: "core",
@@ -318,7 +355,7 @@ const builtins: Builtin[] = [
     id: "storage",
     backing: "browser",
     tone: "primary",
-    name: "Disk Usage",
+    name: "Aphrody Disk Usage",
     icon: "folder",
     desc: "What takes space in your files",
     group: "core",
@@ -329,7 +366,7 @@ const builtins: Builtin[] = [
   {
     id: "activity",
     backing: "browser",
-    name: "Activity",
+    name: "Aphrody Activity",
     icon: "bolt",
     desc: "Windows, memory and storage in use",
     group: "advanced",
@@ -340,7 +377,7 @@ const builtins: Builtin[] = [
   {
     id: "keys",
     backing: "browser",
-    name: "Keyboard",
+    name: "Aphrody Keyboard",
     icon: "gear",
     desc: "Keyboard shortcuts and navigation",
     group: "core",
@@ -352,7 +389,7 @@ const builtins: Builtin[] = [
   {
     id: "about",
     backing: "api",
-    name: "About",
+    name: "About Bun OS",
     icon: "info",
     desc: "About this system",
     group: "core",
@@ -362,6 +399,56 @@ const builtins: Builtin[] = [
     mount: (root) => loading(root, aboutApp(root)),
   },
 ];
+
+/** Real native programs run as Wayland clients of the Hyprland session on the host, one WebOS window each. */
+const WAYLAND_APPS: { id: string; app: string; name: string; desc: string; group?: "core" | "advanced" }[] = [
+  { id: "rio", app: "rio", name: "Rio", desc: "Rio terminal: the GPU-accelerated Rust terminal emulator" },
+  { id: "spacedrive", app: "spacedrive", name: "Spacedrive", desc: "Spacedrive: the virtual distributed file manager" },
+  { id: "cosmic-files", app: "cosmic-files", name: "COSMIC Files", desc: "COSMIC Files: the COSMIC desktop file manager" },
+  { id: "cosmic-term", app: "cosmic-term", name: "COSMIC Terminal", desc: "COSMIC Terminal: the COSMIC desktop terminal" },
+  { id: "cosmic-edit", app: "cosmic-edit", name: "COSMIC Text Editor", desc: "COSMIC Text Editor: the COSMIC desktop code editor" },
+  { id: "cosmic-store", app: "cosmic-store", name: "COSMIC Store", desc: "COSMIC Store: the COSMIC desktop app store (flatpak, apt)" },
+  { id: "cosmic-settings", app: "cosmic-settings", name: "COSMIC Settings", desc: "COSMIC Settings: the COSMIC desktop settings" },
+  { id: "cosmic-player", app: "cosmic-player", name: "COSMIC Media Player", desc: "COSMIC Media Player: the COSMIC desktop video and audio player" },
+  { id: "cosmic-calculator", app: "cosmic-calculator", name: "COSMIC Calculator", desc: "COSMIC Calculator: the COSMIC desktop calculator" },
+];
+const FALLBACK_GLYPH: Record<string, string> = { rio: "terminal", "cosmic-term": "terminal", spacedrive: "folder", "cosmic-files": "folder", "cosmic-edit": "code", "cosmic-store": "store", "cosmic-settings": "gear", "cosmic-player": "film", "cosmic-calculator": "table" };
+for (const w of WAYLAND_APPS)
+  builtins.push({
+    id: w.id,
+    backing: "wayland",
+    name: w.name,
+    icon: FALLBACK_GLYPH[w.id] ?? "app",
+    desc: w.desc,
+    group: w.group ?? "core",
+    width: 1000,
+    height: 640,
+    mount: (root) => void waylandApp(root, w.app, w.name),
+  });
+for (const b of builtins) b.icon = iconFor(b.id, b.icon);
+
+let webViewCount = 0;
+/** WebView: web content in its own WebOS window with browser chrome (tabs, address bar, history), never a browser tab. */
+function openWebView(url: string) {
+  const content = h("div", { class: "fill" });
+  if (url.startsWith("blob:")) {
+    content.append(
+      h("iframe", { class: "appframe", src: url, title: "Document", sandbox: "allow-scripts allow-same-origin" }),
+    );
+    wm.open({ id: `webview:${++webViewCount}`, title: "Document", icon: "doc", width: 900, height: 680, content });
+    return;
+  }
+  wm.open({
+    id: `webview:${++webViewCount}`,
+    title: "Aphrody Browser",
+    icon: "globe",
+    width: 1000,
+    height: 640,
+    content,
+  });
+  browserApp(content, url, openOwnUrl);
+}
+installWebViews(openWebView);
 
 function launchBuiltin(b: Builtin) {
   const existing = wm.windows.get(b.id);
@@ -1110,7 +1197,7 @@ function renderLauncher() {
         launcher.close();
         const content = h("div", { class: "fill" });
         wm.open({
-          title: "Browser",
+          title: "Aphrody Browser",
           icon: "globe",
           width: 1000,
           height: 640,

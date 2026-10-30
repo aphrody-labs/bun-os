@@ -86,8 +86,7 @@ export function browserApp(root: HTMLElement, start?: string, openOwn?: (url: UR
     // Aphrody hosts refuse framing: an address that is an app of this desktop opens in its own window.
     if (url !== HOME_URL && ownHost(new URL(url).hostname)) {
       if (openOwn?.(new URL(url))) return;
-      window.open(url, "_blank", "noopener");
-      status.textContent = "Aphrody apps cannot be framed; opened in a new browser tab.";
+      status.textContent = "This address is an Aphrody app that cannot be framed; open it from the launcher.";
       return;
     }
     if (record && tab.url) {
