@@ -59,6 +59,11 @@ async function prepare() {
   if (!emulator) throw new Error(`Unknown emulator: ${core}`);
   $("title").textContent = emulator.name;
   document.title = emulator.name;
+  if (emulator.mode === "v86") {
+    state.phase = "ready";
+    setStatus("x86 machine: open it from the Alpine Linux app");
+    return;
+  }
   if (emulator.mode !== "wasm") throw new Error(emulator.reason ?? "This emulator has no browser build.");
   manifest = await json(`/emulation/${emulator.core}/manifest.json`);
   variant = manifest;
@@ -198,7 +203,63 @@ for (const button of document.querySelectorAll("#pad button")) {
   for (const type of ["pointerup", "pointercancel"]) button.addEventListener(type, () => set(false));
 }
 
+/** x86 qualification: boot the Alpine ISO in v86, wait for the serial login prompt, run a command as root. */
+async function autorunV86() {
+  const lock = await json("/vm/manifest.json");
+  const { V86 } = await import("/vm/libv86.mjs");
+  const screen = document.createElement("div");
+  screen.id = "v86screen";
+  screen.append(document.createElement("div"), document.createElement("canvas"));
+  $("stage").replaceChildren(screen);
+  let serial = "";
+  const strip = (text) => text.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "").replace(/\r/g, "");
+/g, "");
+  const vm = new V86({
+    wasm_path: "/vm/v86.wasm",
+    memory_size: 256 * 1024 * 1024,
+    vga_memory_size: 8 * 1024 * 1024,
+    screen_container: screen,
+    bios: { url: "/vm/bios/seabios.bin" },
+    vga_bios: { url: "/vm/bios/vgabios.bin" },
+    cdrom: { url: `/vm/alpine.iso?v=${lock.alpine}`, async: true, size: lock.isoBytes },
+    boot_order: 0x123,
+    autostart: true,
+    disable_speaker: true,
+  });
+  vm.add_listener("serial0-output-byte", (code) => (serial += String.fromCharCode(code)));
+  state.handle = { canvas: screen, get frames() { return serial.length; } };
+  state.phase = "running";
+  const deadline = performance.now() + Number(params.get("timeout") ?? 300000);
+  const seen = (needle) => waitFor(() => strip(serial).includes(needle), Math.max(1000, deadline - performance.now()));
+  let loginPrompt = false;
+  let commandOutput = false;
+  loginPrompt = Boolean(await seen("login: "));
+  if (loginPrompt) {
+    vm.serial0_send("root\n");
+    await new Promise((r) => setTimeout(r, 3000));
+    vm.serial0_send("echo bun-os-$((40+2))\n");
+    commandOutput = Boolean(await seen("bun-os-42"));
+  }
+  const bytes = serial.length;
+  vm.destroy?.();
+  state.result = {
+    frames: wantFrames,
+    lit: true,
+    hash: "",
+    renderer: "v86-wasm",
+    audio: "n/a",
+    audioProbe: { contexts: 1 },
+    stopped: null,
+    saveState: "unsupported",
+    v86: { loginPrompt, commandOutput, serialBytes: bytes },
+    error: loginPrompt && commandOutput ? undefined : `serial console: login prompt ${loginPrompt}, command output ${commandOutput}`,
+    errors,
+  };
+  state.phase = "done";
+}
+
 async function autorun() {
+  if (emulator.mode === "v86") return autorunV86();
   try {
     await bootFixture();
     const deadline = performance.now() + Number(params.get("timeout") ?? 300000);

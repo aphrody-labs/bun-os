@@ -193,7 +193,11 @@ async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Pr
     if (result.stopped) problems.push(`machine stopped: ${result.stopped}`);
     if (entry.errors.length) problems.push(`${entry.errors.length} console error(s)`);
     entry.status = problems.length ? "fail" : "pass";
-    entry.detail = problems.length ? problems.join("; ") : `booted ${emulator.fixture?.file}, ${result.frames} frames`;
+    entry.detail = problems.length
+      ? problems.join("; ")
+      : result.v86
+        ? `Alpine booted to the serial login prompt and ran a command as root (${result.v86.serialBytes} serial bytes)`
+        : `booted ${emulator.fixture?.file}, ${result.frames} frames`;
     return entry;
   } finally {
     cdp.listeners.splice(cdp.listeners.indexOf(listener), 1);
@@ -226,14 +230,7 @@ try {
     let entry: QualificationEntry;
     if (emulator.mode === "native") {
       entry = { id: emulator.id, status: "unsupported", errors: [], detail: emulator.reason, testedAt: new Date().toISOString() };
-    } else if (emulator.mode === "v86") {
-      entry = {
-        id: emulator.id,
-        status: "untested",
-        errors: [],
-        detail: "Alpine boot qualification is driven through the desktop shell and is not part of this runner yet.",
-      };
-    } else if (!(await Bun.file(join(objects, "emulation", emulator.core!, "manifest.json")).exists())) {
+    } else if (emulator.mode === "wasm" && !(await Bun.file(join(objects, "emulation", emulator.core!, "manifest.json")).exists())) {
       entry = {
         id: emulator.id,
         status: "untested",
