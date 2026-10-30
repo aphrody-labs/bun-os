@@ -4,7 +4,9 @@ Status: accepted 2026-10-30. Supersedes ADR-001 and ADR-002 of the same day. Sco
 
 ## Decision
 
-The aphrody.com WebOS site (a JavaScript desktop with 17 JS apps, a Cloudflare-Worker-shaped Bun service and TypeScript build scripts) was never the owner's choice. It is demolished without compatibility preservation. What replaces it: real operating systems in the browser, streamed from containers on the Bun OS host, with everything in Rust. Sessions (owner update, same day): Pop!_OS with the full COSMIC desktop (cosmic-comp), Redox OS (the pure-Rust OS, QEMU inside its container), Android, Wine and Proton. Arch/Omarchy/Hyprland and Alpine are dropped for now.
+The aphrody.com WebOS site (a JavaScript desktop with 17 JS apps, a Cloudflare-Worker-shaped Bun service and TypeScript build scripts) was never the owner's choice. It is demolished without compatibility preservation. What replaces it: the Bun OS desktop in the browser, streamed from the Bun OS host, with everything in Rust.
+
+Sessions (owner pivot, final): one session type. Bun OS is a single unified image (Android 17 as a native container, ChromiumOS components, COSMIC and Bun OS, one UI, no OS emulators or VMs). A WebOS session is a per-user container of that unified rootfs, COSMIC running in cage with Android inside it, streamed by the Rust gateway. The per-OS session types of the first drafts (Pop!_OS, Redox under QEMU, Android emulator, Googlebook, ChromiumOS VM, separate Wine and Proton sessions) are retired from `aphrody-webos-protocol` (version 2) and the server. The integrator of the unified image is agent a019290b090a70df3. Until the unified desktop streams, the session upstream is the Android gateway, the fallback path that sends H.264 for WebCodecs (`ServerEvent::Video`).
 
 ## What is removed
 
@@ -25,12 +27,12 @@ Server modules and owners:
 | Module | Owner | Content |
 | --- | --- | --- |
 | `assets`, `health`, `auth`, `log` | WebOS architect | Static client files with immutable caching and CSP; `/api/health` with checks; session tokens (scheme of `crates/aphrody-remote-desktop` tokens); one JSON log line per request. |
-| `sessions` | session agent | Session manager over the Docker Engine API (bollard): one container per user session from the OS images (Pop!_OS COSMIC, Redox under QEMU, Android via redroid, Wine, Proton as a gamescope session), cgroup limits, lifecycle, idle reaping. |
+| `sessions` | session agent | Session manager over the Docker Engine API (bollard): one container of the unified Bun OS rootfs per user (COSMIC in cage, Android inside it), cgroup limits, lifecycle, idle reaping. Until it lands the server bridges one declared stream (`WEBOS_SESSION`, `_MODE=native` for protocol-native upstreams, `_TOKEN_FILE`); `GET /api/session`, `POST /api/sessions`, `GET /api/sessions/{id}/stream`. |
 | `gateway` | session agent | Streaming: WebRTC (webrtc-rs) with H.264/Opus from the container (GStreamer pipeline of `packages/bun-gamestream` ported with gstreamer-rs), WebSocket with WebCodecs-decodable frames as fallback; input, clipboard, audio and gamepad channels. Based on `crates/aphrody-remote-desktop` (axum, protocol, tokens). |
 | `repos` | store agent | Package repositories API (`/api/store`, pacman, flatpak, npm, cargo, apk) ported from `apps/webos/store`. |
 | `inventory` | inventory agent | `/api/inventory` and `/api/rpc` ported from `apps/webos/inventory.ts`. |
 
-Wine and Proton images and gaming input belong to the emulators agent; native app packaging in the images belongs to the native-apps agent.
+Wine, Proton and gaming input live inside the unified image (emulators agent); native app packaging in the image belongs to the native-apps agent.
 
 ## Client UI decision
 
@@ -51,7 +53,7 @@ COSMIC, Redox, Rio, nushell, Obscura and every product component are pinned, pat
 
 ## Capture and input
 
-Inside each Linux session a per-session `aphrody-remote-desktop` process (session agent) captures the compositor with wlr-screencopy over shm and injects input with wlr-virtual-pointer and zwp-virtual-keyboard (pure Rust, wayland-client); Redox is reached through QEMU VNC with the crate's vnc-client feature. Whether cosmic-comp exposes wlr-screencopy or only ext-image-copy-capture is to be verified; the second capture path is added if needed.
+Inside each session container a per-session `aphrody-remote-desktop` process (session agent) captures the compositor with wlr-screencopy over shm and injects input with wlr-virtual-pointer and zwp-virtual-keyboard (pure Rust, wayland-client); the Android path (feature `android`) streams scrcpy H.264 framed as `[kind u8][pts u64 BE][Annex B]` and speaks the client protocol natively. Whether cosmic-comp exposes wlr-screencopy or only ext-image-copy-capture is to be verified; the second capture path is added if needed.
 
 ## Rules
 

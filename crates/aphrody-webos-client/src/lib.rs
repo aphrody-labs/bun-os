@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 //! aphrody.com client (docs/webos/ARCHITECTURE.md, ADR-003): an iced application themed with our libcosmic fork,
-//! compiled to wasm32 with the wgpu backend (WebGPU, WebGL2 fallback). It lists the operating systems of
-//! `GET /api/os`, starts a session with `POST /api/sessions`, shows the session stream full window and sends keyboard,
-//! pointer, wheel, clipboard, resize and gamepad input back. Every message is a type of `aphrody-webos-protocol`.
-//! The browser is used only as transport (`web.rs`: fetch, WebSocket, Gamepad API); all UI is iced/libcosmic.
+//! compiled to wasm32 with the wgpu backend (WebGPU, WebGL2 fallback). It shows the one Bun OS desktop (ADR-003): it
+//! checks `GET /api/session`, starts the session with `POST /api/sessions`, shows its stream full window and sends
+//! keyboard, pointer, wheel, clipboard, resize and gamepad input back. Every message is a type of
+//! `aphrody-webos-protocol`. The browser is used only as transport (`web.rs`: fetch, WebSocket, Gamepad API); all UI is iced/libcosmic.
 
 mod input;
 #[cfg(target_arch = "wasm32")]
 mod web;
 
-use aphrody_webos_protocol::{Input, OsEntry, OsId, ServerEvent, SessionInfo, StartSession};
+use aphrody_webos_protocol::{Input, ServerEvent, SessionAvailability, SessionInfo, StartSession};
 use cosmic::app::{Core, Settings, Task};
 use cosmic::iced::{
     Alignment, Length, Size, Subscription, futures::channel::mpsc::UnboundedSender,
@@ -30,8 +30,8 @@ pub enum StreamEvent {
 
 #[derive(Clone, Debug)]
 pub enum Message {
-    Catalog(Result<Vec<OsEntry>, String>),
-    Pick(OsId),
+    Availability(Result<SessionAvailability, String>),
+    Start,
     Started(Result<SessionInfo, String>),
     Stream(StreamEvent),
     Input(Input),
@@ -41,8 +41,7 @@ pub enum Message {
 
 enum Screen {
     Loading,
-    Picker,
-    Starting(OsId),
+    Starting,
     Streaming(SessionInfo),
     Failed(String),
 }
@@ -50,7 +49,6 @@ enum Screen {
 pub struct App {
     core: Core,
     screen: Screen,
-    catalog: Vec<OsEntry>,
     window: Size,
     frame: Option<(image::Handle, u32, u32)>,
     sender: Option<UnboundedSender<Input>>,
@@ -64,50 +62,6 @@ impl App {
         }
     }
 
-    fn picker(&self) -> Element<'_, Message> {
-        let mut grid = widget::flex_row(Vec::new())
-            .row_spacing(12)
-            .column_spacing(12);
-        for entry in &self.catalog {
-            let mut card = widget::column::with_capacity(3)
-                .spacing(4)
-                .push(widget::text::title4(entry.name.clone()))
-                .push(widget::text::body(entry.summary.clone()));
-            if !entry.available {
-                card = card.push(widget::text::caption(
-                    entry
-                        .reason
-                        .clone()
-                        .unwrap_or_else(|| "Not available on this host.".into()),
-                ));
-            }
-            let mut button = widget::button::custom(
-                widget::container(card)
-                    .padding(16)
-                    .width(Length::Fixed(260.0)),
-            )
-            .class(cosmic::theme::Button::Standard);
-            if entry.available {
-                button = button.on_press(Message::Pick(entry.id));
-            }
-            grid = grid.push(button);
-        }
-        widget::container(
-            widget::column::with_capacity(3)
-                .spacing(20)
-                .max_width(1100)
-                .push(widget::text::title1("Bun OS in your browser"))
-                .push(widget::text::body(
-                    "Pick an operating system. It runs on Bun OS and streams to this tab.",
-                ))
-                .push(grid),
-        )
-        .padding(32)
-        .center_x(Length::Fill)
-        .center_y(Length::Fill)
-        .into()
-    }
-
     fn message_screen(&self, text: String, back: bool) -> Element<'_, Message> {
         let mut column = widget::column::with_capacity(2)
             .spacing(16)
@@ -115,7 +69,7 @@ impl App {
             .push(widget::text::body(text));
         if back {
             column = column
-                .push(widget::button::standard("Choose another system").on_press(Message::Back));
+                .push(widget::button::standard("Reconnect").on_press(Message::Back));
         }
         widget::container(column)
             .center_x(Length::Fill)
@@ -143,14 +97,13 @@ impl cosmic::Application for App {
         let app = App {
             core,
             screen: Screen::Loading,
-            catalog: Vec::new(),
             window: Size::new(1280.0, 720.0),
             frame: None,
             sender: None,
             pointer: input::Pointer::default(),
         };
         #[cfg(target_arch = "wasm32")]
-        let task = Task::perform(web::catalog(), |r| cosmic::Action::App(Message::Catalog(r)));
+        let task = Task::perform(web::availability(), |r| cosmic::Action::App(Message::Availability(r)));
         #[cfg(not(target_arch = "wasm32"))]
         let task = Task::none();
         (app, task)
@@ -158,17 +111,18 @@ impl cosmic::Application for App {
 
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
-            Message::Catalog(Ok(catalog)) => {
-                self.catalog = catalog;
-                self.screen = Screen::Picker;
+            Message::Availability(Ok(availability)) if availability.available => return cosmic::Application::update(self, Message::Start),
+            Message::Availability(Ok(availability)) => {
+                self.screen = Screen::Failed(
+                    availability.reason.unwrap_or_else(|| "The Bun OS desktop is not available.".into()),
+                );
             }
-            Message::Catalog(Err(error)) => {
-                self.screen = Screen::Failed(format!("The OS catalog is unavailable: {error}"))
+            Message::Availability(Err(error)) => {
+                self.screen = Screen::Failed(format!("aphrody.com is unreachable: {error}"));
             }
-            Message::Pick(os) => {
-                self.screen = Screen::Starting(os);
+            Message::Start => {
+                self.screen = Screen::Starting;
                 let request = StartSession {
-                    os,
                     width: self.window.width as u32,
                     height: self.window.height as u32,
                 };
@@ -235,11 +189,9 @@ impl cosmic::Application for App {
             Message::Back => {
                 self.sender = None;
                 self.frame = None;
-                self.screen = if self.catalog.is_empty() {
-                    Screen::Loading
-                } else {
-                    Screen::Picker
-                };
+                self.screen = Screen::Loading;
+                #[cfg(target_arch = "wasm32")]
+                return Task::perform(web::availability(), |r| cosmic::Action::App(Message::Availability(r)));
             }
         }
         Task::none()
@@ -258,12 +210,9 @@ impl cosmic::Application for App {
     fn view(&self) -> Element<'_, Message> {
         match &self.screen {
             Screen::Loading => self.message_screen("Loading Bun OS...".into(), false),
-            Screen::Picker => self.picker(),
-            Screen::Starting(os) => {
-                self.message_screen(format!("Starting {}...", os.name()), false)
-            }
+            Screen::Starting => self.message_screen("Starting your Bun OS desktop...".into(), false),
             Screen::Failed(text) => self.message_screen(text.clone(), true),
-            Screen::Streaming(session) => match &self.frame {
+            Screen::Streaming(_) => match &self.frame {
                 Some((handle, _, _)) => widget::container(
                     image(handle.clone())
                         .content_fit(cosmic::iced::ContentFit::Contain)
@@ -274,14 +223,14 @@ impl cosmic::Application for App {
                 .center_y(Length::Fill)
                 .into(),
                 None => {
-                    self.message_screen(format!("Connecting to {}...", session.os.name()), false)
+                    self.message_screen("Connecting to your Bun OS desktop...".into(), false)
                 }
             },
         }
     }
 }
 
-/// Runs the client (wasm entry point and native in-session picker share it).
+/// Runs the client (the wasm entry point and the native in-session build share it).
 pub fn run() -> cosmic::iced::Result {
     let settings = Settings::default()
         .theme(cosmic::Theme::dark())

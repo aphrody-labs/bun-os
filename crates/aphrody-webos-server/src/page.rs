@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //! The page served at `/` while the wasm client is not part of the release: rendered here, no JavaScript.
 
-use aphrody_webos_protocol::OsId;
 use axum::response::Html;
 
 fn escape(text: &str) -> String {
@@ -19,16 +18,6 @@ li{display:grid;gap:4px;padding:16px;border-radius:16px;background:#1b1f23}li sp
 .build{font-size:12px;color:#6f757b}";
 
 pub fn placeholder(commit: Option<&str>) -> Html<String> {
-    let items: String = OsId::ALL
-        .iter()
-        .map(|os| {
-            format!(
-                "<li><strong>{}</strong><span>{}</span></li>",
-                escape(os.name()),
-                escape(os.summary())
-            )
-        })
-        .collect();
     let build = commit
         .map(|c| {
             format!(
@@ -41,10 +30,10 @@ pub fn placeholder(commit: Option<&str>) -> Html<String> {
         "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n\
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
 <meta name=\"color-scheme\" content=\"dark light\">\n<title>Aphrody Bun OS</title>\n\
-<meta name=\"description\" content=\"Pop!_OS with COSMIC, Redox OS, Android, Wine and Proton in your browser, streamed from Bun OS.\">\n\
+<meta name=\"description\" content=\"Bun OS in your browser: the COSMIC desktop with Android apps, streamed from Bun OS.\">\n\
 <link rel=\"canonical\" href=\"https://aphrody.com/\">\n<style>{STYLE}</style>\n</head>\n<body>\n<main>\n\
 <h1>Bun OS in your browser</h1>\n\
-<p>Real operating systems, streamed from Bun OS: pick one and use it in this tab. The streaming client is being deployed.</p>\n\
-<ul>{items}</ul>\n{build}\n</main>\n</body>\n</html>\n"
+<p>One desktop, COSMIC with Android apps inside it, streamed from Bun OS to this tab. The client is being deployed.</p>\n\
+{build}\n</main>\n</body>\n</html>\n"
     ))
 }

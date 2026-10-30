@@ -5,59 +5,15 @@
 
 use serde::{Deserialize, Serialize};
 
-pub const PROTOCOL_VERSION: u32 = 1;
+pub const PROTOCOL_VERSION: u32 = 2;
 
-/// Operating systems a session can run (ADR-003, owner update 2026-10-30).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum OsId {
-    /// Pop!_OS with the full COSMIC desktop (cosmic-comp).
-    PopOs,
-    /// Redox OS, the pure-Rust operating system, under QEMU in its container.
-    Redox,
-    Android,
-    Wine,
-    Proton,
-}
-
-impl OsId {
-    pub const ALL: [OsId; 5] = [
-        OsId::PopOs,
-        OsId::Redox,
-        OsId::Android,
-        OsId::Wine,
-        OsId::Proton,
-    ];
-
-    pub fn name(self) -> &'static str {
-        match self {
-            OsId::PopOs => "Pop!_OS",
-            OsId::Redox => "Redox OS",
-            OsId::Android => "Android",
-            OsId::Wine => "Wine",
-            OsId::Proton => "Proton",
-        }
-    }
-
-    pub fn summary(self) -> &'static str {
-        match self {
-            OsId::PopOs => "Pop!_OS with the COSMIC desktop, written in Rust by System76.",
-            OsId::Redox => "Redox OS, a Unix-like operating system written entirely in Rust.",
-            OsId::Android => "Android in a container, with the Bun OS app catalog.",
-            OsId::Wine => "Windows applications on Wine.",
-            OsId::Proton => "Windows games on Proton, with gamepad support.",
-        }
-    }
-}
-
-/// One entry of `GET /api/os`: whether the host can start that OS now.
+/// `GET /api/session`: whether this host can start a Bun OS desktop now. There is one session type (ADR-003): a
+/// per-user container of the unified Bun OS image (COSMIC with Android inside it), streamed by the gateway. The
+/// per-OS session types of the first draft (Pop!_OS, Redox, Android emulator, Wine, Proton) are retired.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct OsEntry {
-    pub id: OsId,
-    pub name: String,
-    pub summary: String,
+pub struct SessionAvailability {
     pub available: bool,
-    /// Why it is not available (image not built, host capacity), shown to the user.
+    /// Why not, shown to the user.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 }
@@ -75,7 +31,6 @@ pub enum SessionState {
 /// `POST /api/sessions` body.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct StartSession {
-    pub os: OsId,
     pub width: u32,
     pub height: u32,
 }
@@ -84,7 +39,6 @@ pub struct StartSession {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SessionInfo {
     pub id: String,
-    pub os: OsId,
     pub state: SessionState,
     /// Bearer token for the stream endpoints of this session only.
     pub token: String,

@@ -11,10 +11,11 @@ WorkingDirectory=/home/ubuntu/apps/webos/current
 Environment=WEBOS_ADDR=127.0.0.1:8790
 Environment=WEBOS_CLIENT_DIR=/home/ubuntu/apps/webos/current/client
 Environment=WEBOS_OBJECTS=/home/ubuntu/apps/webos/objects
-# Android session: the aphrody-android-gateway speaks aphrody-webos-protocol natively (H.264 over WebCodecs).
-Environment=WEBOS_SESSION_ANDROID=ws://127.0.0.1:8799/api/android/stream
-Environment=WEBOS_SESSION_ANDROID_MODE=native
-Environment=WEBOS_SESSION_ANDROID_TOKEN_FILE=/etc/aphrody/android.token
+# The Bun OS desktop stream (ADR-003, one session type). Until the unified image streams COSMIC, the Android
+# gateway is the fallback path; it speaks aphrody-webos-protocol natively (H.264 over WebCodecs).
+Environment=WEBOS_SESSION=ws://127.0.0.1:8799/api/android/stream
+Environment=WEBOS_SESSION_MODE=native
+Environment=WEBOS_SESSION_TOKEN_FILE=/etc/aphrody/android.token
 EnvironmentFile=/home/ubuntu/apps/webos/current/release.env
 ExecStart=/home/ubuntu/apps/webos/current/aphrody-webos
 Restart=always

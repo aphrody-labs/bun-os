@@ -45,24 +45,13 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
         Err(error) => check(false, false, format!("no inventory: {error}")),
     };
     checks.insert("inventory".to_owned(), inventory);
-    // The Hyprland session gateway that runs beside this service until the Rust gateway replaces it.
-    let gateway = tokio::time::timeout(
-        std::time::Duration::from_millis(500),
-        tokio::net::TcpStream::connect(("127.0.0.1", 8793)),
-    )
-    .await
-    .is_ok_and(|r| r.is_ok());
+    let session = state.sessions.configured();
     checks.insert(
-        "session-gateway".to_owned(),
-        check(gateway, true, "127.0.0.1:8793 is not listening".into()),
-    );
-    let sessions = state.sessions.configured();
-    checks.insert(
-        "sessions".to_owned(),
+        "session".to_owned(),
         check(
-            sessions > 0,
+            session,
             true,
-            "no OS session is declared on this host (WEBOS_SESSION_<OS>)".into(),
+            "no Bun OS desktop stream is declared on this host (WEBOS_SESSION)".into(),
         ),
     );
     let ok = checks.values().all(|c| c.ok || c.optional);

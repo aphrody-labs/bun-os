@@ -1,23 +1,22 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Sessions and the stream bridge (ADR-003). Until the container session manager (session agent, bollard) lands,
-//! the sessions are the running desktops the host declares, one per OS:
+//! The Bun OS session and the stream bridge (ADR-003). One session type: the unified Bun OS desktop. Until the
+//! container session manager (bollard, one container of the unified image per user) lands, the session is the
+//! desktop stream the host declares:
 //!
-//!   WEBOS_SESSION_<OS>=ws://127.0.0.1:<port>/ws          stream endpoint of an `aphrody-remote-desktop` process
-//!   WEBOS_SESSION_<OS>_TOKEN_FILE=/path/to/token         its access token (query `?token=`)
+//!   WEBOS_SESSION=ws://127.0.0.1:<port>/<path>     stream endpoint
+//!   WEBOS_SESSION_TOKEN_FILE=/path/to/token         its access token
+//!   WEBOS_SESSION_MODE=native                       the upstream speaks aphrody-webos-protocol (Input JSON in,
+//!                                                   ServerEvent JSON and frames out); otherwise the
+//!                                                   aphrody-remote-desktop wire is translated
 //!
-//!   WEBOS_SESSION_<OS>_MODE=native                        the upstream already speaks aphrody-webos-protocol
-//!                                                          (Input JSON in, ServerEvent JSON and frames out)
-//!
-//! with `<OS>` one of POP_OS, REDOX, ANDROID, WINE, PROTON. `POST /api/sessions` hands out a session id and a
-//! per-session bearer token; `GET /api/sessions/{id}/stream` (WebSocket, subprotocol `bearer.<token>`) bridges the
-//! client to the upstream desktop and translates `aphrody-webos-protocol` [`Input`] into the remote-desktop wire
-//! (`{type: mouse_move|mouse_down|mouse_up|wheel|key|text}`); binary frames pass through unchanged.
+//! `POST /api/sessions` hands out a session id and a per-session bearer token; `GET /api/sessions/{id}/stream`
+//! (WebSocket, subprotocol `bearer.<token>`) bridges the client to the upstream; binary frames pass through.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 use aphrody_webos_protocol::{
-    ApiError, Input, OsEntry, OsId, ServerEvent, SessionInfo, SessionState, StartSession,
+    ApiError, Input, ServerEvent, SessionAvailability, SessionInfo, SessionState, StartSession,
 };
 use axum::{
     Json, Router,
@@ -42,24 +41,13 @@ struct Upstream {
 }
 
 struct Session {
-    os: OsId,
     token: String,
 }
 
 #[derive(Clone)]
 pub struct Sessions {
-    upstreams: Arc<HashMap<OsId, Upstream>>,
+    upstream: Option<Upstream>,
     live: Arc<Mutex<HashMap<String, Session>>>,
-}
-
-fn env_key(os: OsId) -> &'static str {
-    match os {
-        OsId::PopOs => "POP_OS",
-        OsId::Redox => "REDOX",
-        OsId::Android => "ANDROID",
-        OsId::Wine => "WINE",
-        OsId::Proton => "PROTON",
-    }
 }
 
 fn random_hex(bytes: usize) -> String {
@@ -70,45 +58,27 @@ fn random_hex(bytes: usize) -> String {
 
 impl Sessions {
     pub fn from_env() -> Sessions {
-        let mut upstreams = HashMap::new();
-        for os in OsId::ALL {
-            let key = env_key(os);
-            if let Ok(url) = std::env::var(format!("WEBOS_SESSION_{key}")) {
-                let token = std::env::var(format!("WEBOS_SESSION_{key}_TOKEN_FILE"))
-                    .ok()
-                    .and_then(|path| std::fs::read_to_string(path).ok())
-                    .map(|t| t.trim().to_owned())
-                    .filter(|t| !t.is_empty());
-                let native =
-                    std::env::var(format!("WEBOS_SESSION_{key}_MODE")).is_ok_and(|m| m == "native");
-                upstreams.insert(os, Upstream { url, token, native });
-            }
-        }
-        Sessions {
-            upstreams: Arc::new(upstreams),
-            live: Arc::new(Mutex::new(HashMap::new())),
+        let upstream = std::env::var("WEBOS_SESSION").ok().filter(|u| !u.is_empty()).map(|url| Upstream {
+            url,
+            token: std::env::var("WEBOS_SESSION_TOKEN_FILE")
+                .ok()
+                .and_then(|path| std::fs::read_to_string(path).ok())
+                .map(|t| t.trim().to_owned())
+                .filter(|t| !t.is_empty()),
+            native: std::env::var("WEBOS_SESSION_MODE").is_ok_and(|m| m == "native"),
+        });
+        Sessions { upstream, live: Arc::new(Mutex::new(HashMap::new())) }
+    }
+
+    pub fn availability(&self) -> SessionAvailability {
+        SessionAvailability {
+            available: self.upstream.is_some(),
+            reason: self.upstream.is_none().then(|| "The Bun OS desktop is not running on this host yet.".into()),
         }
     }
 
-    pub fn catalog(&self) -> Vec<OsEntry> {
-        OsId::ALL
-            .iter()
-            .map(|&id| {
-                let available = self.upstreams.contains_key(&id);
-                OsEntry {
-                    id,
-                    name: id.name().into(),
-                    summary: id.summary().into(),
-                    available,
-                    reason: (!available)
-                        .then(|| "No session of this system runs on this host yet.".into()),
-                }
-            })
-            .collect()
-    }
-
-    pub fn configured(&self) -> usize {
-        self.upstreams.len()
+    pub fn configured(&self) -> bool {
+        self.upstream.is_some()
     }
 }
 
@@ -122,16 +92,13 @@ fn error(status: StatusCode, message: &str) -> Response {
         .into_response()
 }
 
-async fn catalog(State(sessions): State<Sessions>) -> Json<Vec<OsEntry>> {
-    Json(sessions.catalog())
+async fn availability(State(sessions): State<Sessions>) -> Json<SessionAvailability> {
+    Json(sessions.availability())
 }
 
-async fn start(State(sessions): State<Sessions>, Json(request): Json<StartSession>) -> Response {
-    if !sessions.upstreams.contains_key(&request.os) {
-        return error(
-            StatusCode::SERVICE_UNAVAILABLE,
-            &format!("No {} session runs on this host yet.", request.os.name()),
-        );
+async fn start(State(sessions): State<Sessions>, Json(_request): Json<StartSession>) -> Response {
+    if sessions.upstream.is_none() {
+        return error(StatusCode::SERVICE_UNAVAILABLE, "The Bun OS desktop is not running on this host yet.");
     }
     let id = random_hex(8);
     let token = random_hex(24);
@@ -142,14 +109,12 @@ async fn start(State(sessions): State<Sessions>, Json(request): Json<StartSessio
         .insert(
             id.clone(),
             Session {
-                os: request.os,
                 token: token.clone(),
             },
         );
     let info = SessionInfo {
         stream: format!("/api/sessions/{id}/stream"),
         id,
-        os: request.os,
         state: SessionState::Running,
         token,
     };
@@ -188,9 +153,7 @@ async fn stream(
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         match (live.get(&id), offered.as_deref()) {
-            (Some(session), Some(token)) if session.token == token => {
-                sessions.upstreams.get(&session.os).cloned()
-            }
+            (Some(session), Some(token)) if session.token == token => sessions.upstream.clone(),
             (Some(_), _) => {
                 return error(
                     StatusCode::UNAUTHORIZED,
@@ -349,7 +312,7 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
 
 pub fn router(sessions: Sessions) -> Router {
     Router::new()
-        .route("/api/os", get(catalog))
+        .route("/api/session", get(availability))
         .route("/api/sessions", post(start))
         .route("/api/sessions/{id}", axum::routing::delete(stop))
         .route("/api/sessions/{id}/stream", get(stream))

@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use aphrody_webos_protocol::{
-    ApiError, GamepadState, Input, OsEntry, ServerEvent, SessionInfo, StartSession,
+    ApiError, GamepadState, Input, SessionAvailability, ServerEvent, SessionInfo, StartSession,
 };
 use cosmic::iced::Subscription;
 use cosmic::iced::futures::{SinkExt, StreamExt, channel::mpsc};
@@ -61,8 +61,8 @@ fn api_error(code: u16, body: &str) -> String {
         .unwrap_or_else(|_| format!("HTTP {code}"))
 }
 
-pub async fn catalog() -> Result<Vec<OsEntry>, String> {
-    let (code, body) = fetch("GET", "/api/os", None).await?;
+pub async fn availability() -> Result<SessionAvailability, String> {
+    let (code, body) = fetch("GET", "/api/session", None).await?;
     if code != 200 {
         return Err(api_error(code, &body));
     }
