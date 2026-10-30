@@ -3,7 +3,7 @@
 # Bun Engine: one CLI (`bun-engine`, `bep`), one window, the in-tree cores (DS, ARM, x86).
 bun-engine
 # Multi-system frontends and cores
-retroarch
+bunos-retroarch
 retroarch-assets-xmb
 retroarch-assets-ozone
 libretro-core-info
@@ -14,7 +14,7 @@ mednafen
 # Nintendo
 melonds
 desmume
-dolphin-emu
+bunos-dolphin-emu
 azahar
 cemu
 mgba-qt
@@ -27,7 +27,7 @@ nestopia
 fceux
 # Sony
 pcsx2
-duckstation
+# duckstation: CC BY-NC-ND 4.0, no derivative builds; not packaged
 rpcs3
 ppsspp
 vita3k-bin

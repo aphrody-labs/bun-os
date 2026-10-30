@@ -24,7 +24,7 @@ lib32-vulkan-radeon
 vulkan-intel
 lib32-vulkan-intel
 vulkan-tools
-gamescope
+bunos-gamescope
 lib32-gamescope
 gamemode
 lib32-gamemode
