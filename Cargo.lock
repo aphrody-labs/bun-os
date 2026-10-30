@@ -7986,7 +7986,7 @@ dependencies = [
 [[package]]
 name = "bun_browser"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "anyhow",
  "bun_browser_browser",
@@ -8001,7 +8001,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_browser"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "anyhow",
  "base64 0.23.1",
@@ -8021,7 +8021,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_cdp"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "anyhow",
  "base64 0.23.1",
@@ -8047,7 +8047,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_crawl"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "blake3",
  "bun_browser_dom",
@@ -8072,7 +8072,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_detect"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "reqwest 0.13.5",
  "rustls",
@@ -8085,7 +8085,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_dom"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "cssparser 0.37.0",
  "html5ever 0.40.1",
@@ -8096,7 +8096,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_engine"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "anyhow",
  "bun_browser_browser",
@@ -8120,7 +8120,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_extract"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -8135,7 +8135,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_frames"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "base64 0.23.1",
  "bun_browser_process",
@@ -8150,7 +8150,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_index"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "memmap2 0.9.11",
  "parking_lot",
@@ -8162,7 +8162,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_js"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "aes 0.9.3",
  "aes-gcm 0.11.1",
@@ -8196,7 +8196,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_layout"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "arrayvec",
  "grid",
@@ -8207,7 +8207,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_mcp"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "anyhow",
  "base64 0.23.1",
@@ -8225,7 +8225,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_net"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8251,12 +8251,12 @@ dependencies = [
 [[package]]
 name = "bun_browser_process"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 
 [[package]]
 name = "bun_browser_render"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "ab_glyph",
  "athena-text",
@@ -8278,7 +8278,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_service"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 dependencies = [
  "bun_browser",
  "bun_browser_dom",
@@ -8296,7 +8296,7 @@ dependencies = [
 [[package]]
 name = "bun_browser_ssrf"
 version = "1.4.8"
-source = "git+https://github.com/aphrody-labs/bun-obscura?rev=897dcbbe13d80fbc47b2aa760fc9b8c7296fae91#897dcbbe13d80fbc47b2aa760fc9b8c7296fae91"
+source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 
 [[package]]
 name = "bun_git"
