@@ -17,6 +17,7 @@ members = [
   "crates/aphrody-mcp",
   "crates/aphrody-mcp-client",
   "crates/aphrody-site",
+  "crates/aphrody-inventory",
   "crates/aphrody-webos-wasm",
   "crates/aphrody-webos-server",
   "crates/aphrody-webos-protocol",
@@ -698,6 +699,7 @@ aphrody-web-extract = { package = "bun_browser_extract", version = "1.4.7" }
 aphrody-web-index = { package = "bun_browser_index", version = "1.4.7" }
 aphrody-gemini-web = { path = "crates/aphrody-gemini-web", version = "1.4.7" }
 aphrody-site = { path = "crates/aphrody-site", version = "1.4.7" }
+aphrody-inventory = { path = "crates/aphrody-inventory", version = "1.4.7" }
 aphrody-webos-wasm = { path = "crates/aphrody-webos-wasm", version = "1.4.7" }
 aphrody-shell-session = { path = "crates/aphrody-shell-session", version = "1.4.7" }
 aphrody-shell-vfs = { path = "crates/aphrody-shell-vfs", version = "1.4.7" }

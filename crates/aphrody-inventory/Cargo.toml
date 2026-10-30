@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aphrody-inventory"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license.workspace = true
+description = "Bun OS inventory: every repository member with its WebOS surface, the coverage gate, JSON-RPC, crates.io/npm version history and the WebAssembly module builder."
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "aphrody-inventory"
+path = "src/main.rs"
+
+[features]
+default = []
+# The axum routes mounted by crates/aphrody-webos-server: /api/inventory, the kind aliases, /api/rpc and /wasm/modules.
+server = ["dep:axum", "dep:tokio"]
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true, features = ["parse", "serde"] }
+ureq = { version = "3", default-features = false, features = ["rustls"] }
+axum = { workspace = true, optional = true, features = ["json", "query", "tokio", "http1"] }
+tokio = { workspace = true, optional = true, features = ["fs", "rt-multi-thread", "macros", "net"] }
+
+[lints]
+workspace = true
