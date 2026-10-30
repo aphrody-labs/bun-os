@@ -15,7 +15,7 @@ import { cp, mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { inflateSync } from "node:zlib";
 import { join, resolve } from "node:path";
-import { EMULATORS, type QualificationEntry, type QualificationReport } from "../../../apps/webos/emulators";
+import { EMULATORS, type QualificationEntry, type QualificationReport } from "./emulators";
 import { Cdp, chromePath } from "./smoke.ts";
 import { stageFixtures } from "./fixtures.ts";
 

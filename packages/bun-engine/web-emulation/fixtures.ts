@@ -4,7 +4,7 @@
 // web-emulation.lock.json); the NES and GBA ones are the MIT/zlib test ROMs bundled by the pinned emulator
 // sources; the PlayStation one is a PS-EXE generated here (it draws two filled rectangles through GP0).
 import { join, resolve } from "node:path";
-import { EMULATORS, type EmulatorFixture } from "../../../apps/webos/emulators";
+import { EMULATORS, type EmulatorFixture } from "./emulators";
 
 const root = resolve(import.meta.dir, "../../..");
 

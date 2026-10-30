@@ -9,7 +9,7 @@ import {
   EMULATORS,
   type QualificationEntry,
   type QualificationReport,
-} from "../emulators";
+} from "../../../packages/bun-engine/web-emulation/emulators";
 import { ISOLATION } from "./isolation";
 
 interface Objects {
