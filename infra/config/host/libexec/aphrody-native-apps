@@ -89,17 +89,24 @@ cosmic_src() {
 }
 
 # Session set, dependencies before dependants. cosmic-randr is a cosmic-settings dependency.
-COSMIC_SET="cosmic-icons cosmic-randr cosmic-comp cosmic-panel cosmic-launcher pop-launcher cosmic-settings-daemon cosmic-settings cosmic-files cosmic-term cosmic-edit cosmic-store cosmic-player"
+# Desktop first (the streamed COSMIC session needs comp, session, panel and settings-daemon), then the apps.
+COSMIC_SET="cosmic-comp cosmic-session cosmic-panel cosmic-settings-daemon cosmic-icons cosmic-randr cosmic-applets cosmic-launcher pop-launcher cosmic-app-library cosmic-bg cosmic-notifications cosmic-osd cosmic-workspaces-epoch xdg-desktop-portal-cosmic cosmic-settings cosmic-files cosmic-term cosmic-edit cosmic-store cosmic-player"
+# Shared Linux/Redox fork pins (libcosmic, iced, winit, softbuffer, cosmic-protocols, cosmic-settings-daemon).
+PATCH=$ROOT/factory/os/rust-desktop/cargo-patch.toml
 
 cosmic_one() {
   app=$1; d=$EPOCH_DIR/$app; s=$WORK/stage/$app; rm -rf "$s"
   [ -d "$d" ] || { log "missing $app in cosmic-epoch"; return 1; }
   log "build $app"
-  if [ -f "$d/Cargo.toml" ]; then (cd "$d" && nice -n 10 "$CARGO" build --release -j 4); fi
+  if [ -f "$d/Cargo.toml" ]; then
+    if [ -f "$PATCH" ]; then (cd "$d" && nice -n 10 "$CARGO" build --release -j 4 --config "$PATCH")
+    else (cd "$d" && nice -n 10 "$CARGO" build --release -j 4); fi
+  fi
   # The justfile install recipes only copy the release outputs and data files into rootdir/prefix.
   (cd "$d" && just rootdir="$s" prefix=/usr install)
   v=$( [ -f "$d/Cargo.toml" ] && version_of "$d/Cargo.toml" || echo 1.0.0)
-  deb "$app" "${v}+bunos$(git -C "$d" rev-parse --short HEAD)" "$s" "COSMIC $app (Bun OS build)"
+  pkg=$app; [ "$app" = cosmic-workspaces-epoch ] && pkg=cosmic-workspaces
+  deb "$pkg" "${v}+bunos$(git -C "$d" rev-parse --short HEAD)" "$s" "COSMIC $app (Bun OS build)"
 }
 
 cosmic() {
@@ -187,7 +194,7 @@ container() {
   exp=$WORK/root; rm -rf "$exp"; mkdir -p "$exp"
   git -C "$ROOT" archive "$rev" Cargo.toml scripts/aphrody/build/rust factory/native-apps crates/aphrody-chat \
     crates/aphrody-search infra/config/host/libexec/aphrody-native-apps container/cosmic-packages.json \
-    tools/aphrody/config/build-factory.json | tar -x -C "$exp"
+    tools/aphrody/config/build-factory.json $(git -C "$ROOT" ls-tree --name-only "$rev" factory/os/rust-desktop/cargo-patch.toml)     | tar -x -C "$exp"
   docker build -q -t "$img" -f "$exp/factory/native-apps/builder.Dockerfile" "$exp/factory/native-apps" >/dev/null
   exec docker run --rm --cpus 4 --memory 16g --name "bunos-native-$(date +%s)" \
     -v "$WORK:/work" -v "$exp:/src/bun-os:ro" -v "$HOME/.local/bin/bun:/usr/local/bin/bun:ro" \
