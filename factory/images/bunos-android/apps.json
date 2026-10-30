@@ -1,0 +1,87 @@
+{
+  "$comment": "Pinned open-source Android apps added to the Bun OS Android session (redroid AOSP base). fetch.sh downloads and verifies them; the Containerfile installs them. 'publish' marks the APKs the Store mirrors unmodified (upstream signatures kept) in the Bun OS F-Droid repository.",
+  "base": {
+    "image": "docker.io/redroid/redroid:16.0.0_64only-250627",
+    "digest": "sha256:18eaf7058f1fbe17378106daa9c02936a7d293e71325db432462086854d9e9f0",
+    "platform": "linux/amd64",
+    "aosp": "Android 16 (android16-release), AOSP userdebug built by the redroid project from android.googlesource.com",
+    "source": "https://github.com/remote-android/redroid-doc",
+    "license": "Apache-2.0"
+  },
+  "apps": [
+    {
+      "id": "com.google.android.gms",
+      "name": "microG Services",
+      "version": "0.3.17.252432",
+      "versionCode": 252432034,
+      "url": "https://github.com/microg/GmsCore/releases/download/v0.3.17.252432/com.google.android.gms-252432034.apk",
+      "sha256": "e5e6cba078bdec812b5450599350e5c1a12c8b7438da5bf77123af170f8c1a35",
+      "license": "Apache-2.0",
+      "source": "https://github.com/microg/GmsCore",
+      "install": "system/app/GmsCore",
+      "publish": true
+    },
+    {
+      "id": "com.android.vending",
+      "name": "microG Companion (FakeStore)",
+      "version": "0.3.17.252432",
+      "versionCode": 84022634,
+      "url": "https://github.com/microg/GmsCore/releases/download/v0.3.17.252432/com.android.vending-84022634.apk",
+      "sha256": "9b8616011cc8f026bcbbe094df850794abb9d6d9f23214d7a8f8c4d1033ea012",
+      "license": "Apache-2.0",
+      "source": "https://github.com/microg/GmsCore",
+      "install": "system/app/FakeStore",
+      "publish": true,
+      "note": "Occupies com.android.vending; the official Play Store cannot be installed beside it (user-side path in README.md)."
+    },
+    {
+      "id": "com.google.android.gsf",
+      "name": "microG GsfProxy",
+      "version": "0.1.0",
+      "url": "https://github.com/microg/GsfProxy/releases/download/v0.1.0/GsfProxy.apk",
+      "sha256": "86891b174301f06a1c84187b545a0a2a57044c6b768f3e84e865908743349692",
+      "license": "Apache-2.0",
+      "source": "https://github.com/microg/GsfProxy",
+      "install": "system/app/GsfProxy",
+      "publish": true
+    },
+    {
+      "id": "org.fdroid.fdroid",
+      "name": "F-Droid",
+      "version": "1.23.2",
+      "versionCode": 1023052,
+      "url": "https://f-droid.org/repo/org.fdroid.fdroid_1023052.apk",
+      "sha256": "985f5181d48bb6bafd54083a048b391271e0ab28385881cc41294fb01a222762",
+      "license": "GPL-3.0-or-later",
+      "source": "https://gitlab.com/fdroid/fdroidclient",
+      "install": "system/app/FDroid",
+      "publish": true
+    },
+    {
+      "id": "org.fdroid.fdroid.privileged",
+      "name": "F-Droid Privileged Extension",
+      "version": "0.2.14",
+      "versionCode": 2140,
+      "url": "https://f-droid.org/repo/org.fdroid.fdroid.privileged_2140.apk",
+      "sha256": "6261445e671bea58fd8d5b7c10140845a44a01940cc2e1ad8c52e3aa4a264e94",
+      "license": "Apache-2.0",
+      "source": "https://gitlab.com/fdroid/privileged-extension",
+      "install": "system/priv-app/FDroidPrivilegedExtension",
+      "publish": false,
+      "note": "System-only component (unattended installs for F-Droid); useless outside a system image."
+    },
+    {
+      "id": "com.aurora.store",
+      "name": "Aurora Store",
+      "version": "4.8.4",
+      "versionCode": 76,
+      "url": "https://f-droid.org/repo/com.aurora.store_76.apk",
+      "sha256": "fd9c75d90d0f4a7c132b9b4a5a2cf1992a45e03b8d8ff988b7dcfbc0db2c4d11",
+      "license": "GPL-3.0-only",
+      "source": "https://gitlab.com/AuroraOSS/AuroraStore",
+      "install": "system/app/AuroraStore",
+      "publish": true,
+      "note": "Downloads Play apps from Google's servers into the user's own session (anonymous or the user's account); nothing is mirrored by Bun OS."
+    }
+  ]
+}
