@@ -1473,3 +1473,8 @@
 	url = https://github.com/aphrody-labs/onnxruntime.git
 	branch = main
 	shallow = true
+[submodule "vendor/redox/redox"]
+	path = vendor/redox/redox
+	url = https://github.com/aphrody-labs/redox.git
+	branch = bunos
+	shallow = true

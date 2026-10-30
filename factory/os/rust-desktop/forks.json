@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "kind": "bunos-rust-desktop-forks",
+  "verified": "2026-10-30",
+  "note": "One aphrody-labs fork per Redox or COSMIC Rust project. Consumers: the Linux COSMIC session (vendor/cosmic-epoch, infra/config/host/libexec/aphrody-native-apps), Redox (vendor/redox/redox, aphrody-labs/redox branch bunos, recipes pinned to these commits) and the root workspace web client (crates/aphrody-webos-client, aphrody-chat, aphrody-search). Shared crates reach every consumer through cargo-patch.toml. Redox branches of shared crates live in the same fork under redox-upstream/*, pop-os branches under pop-os/*. Upstream licences and notices stay in each fork.",
+  "redox": {
+    "redox": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/redox",
+      "branch": "bunos",
+      "rev": "ab1298fb99f200a3a7eadb5c93359b6065a0c0a7",
+      "role": "build system and cookbook (recipes/, src/cook)",
+      "submodule": "vendor/redox/redox"
+    },
+    "redox-cookbook": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/cookbook",
+      "branch": "master",
+      "rev": "889332811917ca94e5256376bbd70b3a61ebb83a",
+      "role": "legacy cookbook, merged into redox upstream; kept for history"
+    },
+    "redox-kernel": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/kernel",
+      "branch": "master",
+      "rev": "7b1f8e0166a470252f1bcbd299fc7efc6ccc48f4",
+      "recipe": "core/kernel"
+    },
+    "relibc": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/relibc",
+      "branch": "master",
+      "rev": "ad0c4794e522e35533d6e177fd5d1825e6491078",
+      "recipe": "core/relibc"
+    },
+    "orbital": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/orbital",
+      "branch": "bunos",
+      "rev": "6231a7d67ac5d206d5d6903c8d0e6731ae8630ab",
+      "recipe": "gui/orbital",
+      "patch": "Aphrody palette as compiled-in defaults"
+    },
+    "orbclient": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/orbclient",
+      "branch": "master",
+      "rev": "e9573da7e4cce13898094aba9923f69547461c19",
+      "role": "client library (crates.io dependency of Orbital, winit-orbital)"
+    },
+    "orbutils": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/orbutils",
+      "branch": "bunos",
+      "rev": "b1fe594838873852c49d14f0b50f5902c6ed72f0",
+      "recipe": "gui/orbutils",
+      "patch": "Aphrody launcher palette; Super+Return/Super+T open Rio, COSMIC Terminal when Rio is absent"
+    },
+    "orbdata": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/orbdata",
+      "branch": "master",
+      "rev": "58d1140176430f222ac0749c8b83349f2c4da916",
+      "recipe": "gui/orbdata"
+    },
+    "redoxfs": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/redoxfs",
+      "branch": "master",
+      "rev": "db847d87c68052618d1427537c7277293a626a18",
+      "recipe": "core/redoxfs"
+    },
+    "pkgar": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/pkgar",
+      "branch": "master",
+      "rev": "d10d42b143b03b141f9792a48cfd3ef059867051",
+      "recipe": "core/pkgar"
+    },
+    "redox-pkgutils": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/pkgutils",
+      "branch": "master",
+      "rev": "fe21bfd95d869cafd356bcdec4d1a81739ede5ee",
+      "recipe": "core/pkgutils"
+    },
+    "redox-ion": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/ion",
+      "branch": "master",
+      "rev": "e9b3ca48b7ab6444498d5c3aa902d471ce29f759",
+      "recipe": "core/ion"
+    },
+    "redox-installer": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/installer",
+      "branch": "master",
+      "rev": "2d2416c151e880bd68799b5c6cf46d019d964675",
+      "recipe": "core/installer"
+    },
+    "redox-base": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/base",
+      "branch": "main",
+      "rev": "2ec1b19dfe819fc7b9f033206fedcd1da58e1fe3",
+      "recipe": "core/base"
+    },
+    "redox-bootloader": {
+      "upstream": "https://gitlab.redox-os.org/redox-os/bootloader",
+      "branch": "master",
+      "rev": "11b85164383c1dfc0415a36b389f6eb999b9b2f5",
+      "recipe": "core/bootloader"
+    }
+  },
+  "shared": {
+    "libcosmic": {
+      "upstream": "https://github.com/pop-os/libcosmic",
+      "rev": "8fee30aa5079b0aed9318091c99c271c4b587803",
+      "patch": "Aphrody built-in dark theme, Omarchy geometry, iced/cosmic-icons submodules on aphrody-labs",
+      "redoxBranches": "redox-upstream/*"
+    },
+    "iced": {
+      "upstream": "https://github.com/pop-os/iced",
+      "rev": "a31e6c6f837e4c4d0cdb790df50883bee01ea558",
+      "role": "libcosmic submodule",
+      "redoxBranches": "redox-upstream/*"
+    },
+    "winit": {
+      "upstream": "https://github.com/pop-os/winit",
+      "rev": "9567503d34130113e36b0167a2b8829c3756e429",
+      "role": "pop-os iced-0.14-rebase (branch pop-os/iced-0.14-rebase); Orbital backend winit-orbital",
+      "redoxBranches": "redox-upstream/*"
+    },
+    "softbuffer": {
+      "upstream": "https://github.com/pop-os/softbuffer",
+      "rev": "c2b2c19ddb38ff17495643699f97cb1f2064a1be",
+      "role": "tag cosmic-4.0; Orbital backend",
+      "redoxBranches": "redox-upstream/*"
+    },
+    "cosmic-protocols": {
+      "upstream": "https://github.com/pop-os/cosmic-protocols",
+      "rev": "c0cff4db14c37ed954983158e4055aa94c7741d9"
+    },
+    "cosmic-settings-daemon": {
+      "upstream": "https://github.com/pop-os/cosmic-settings-daemon",
+      "rev": "af9f503d242ff608e5e116eb450ade3f460771ce",
+      "patch": "system action Terminal = rio"
+    },
+    "cosmic-text": {
+      "upstream": "https://github.com/pop-os/cosmic-text",
+      "rev": "f1a3461f3e8df67d2bbcfafb8bc61dc7aee5b2a6",
+      "recipe": "cosmic/cosmic-text"
+    },
+    "rio": {
+      "upstream": "https://github.com/raphamorim/rio",
+      "role": "default terminal (Linux session; Redox recipe wip/term/rioterm when it builds)",
+      "recipe": "wip/term/rioterm"
+    }
+  },
+  "apps": {
+    "cosmic-edit": { "rev": "fb850179fb0b5597f043ae1891761c5b639fc270", "recipe": "cosmic/cosmic-edit" },
+    "cosmic-files": { "rev": "ac5cef76fa60b5a329bfda3d30825489ec28af53", "recipe": "cosmic/cosmic-files" },
+    "cosmic-term": { "rev": "c3457869b1a05487412a1c0a7dd44371888d93f3", "recipe": "cosmic/cosmic-term" },
+    "cosmic-store": { "rev": "c7b36a2fdccf1ce88944793af67c3664413ee560", "recipe": "cosmic/cosmic-store" },
+    "cosmic-settings": { "rev": "58aeb65244b8830880e8b6ced89dcd25663f20b1", "recipe": "cosmic/cosmic-settings" },
+    "cosmic-monitor": { "rev": "a79ce9e7d2259a82150d56978fb7a094bd4ec2f0", "recipe": "cosmic/cosmic-monitor" }
+  }
+}

@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: MIT
+# Bun OS shared Rust desktop crates: the ONE [patch] table read by every consumer.
+#   - Linux COSMIC session builds:  cargo build --config factory/os/rust-desktop/cargo-patch.toml
+#   - Redox cookbook (aphrody-labs/redox branch bunos): `bun factory/os/rust-desktop.ts redox` copies this file to
+#     <redox>/bunos/cargo-patch.toml and cookbook_cargo passes it with --config.
+#   - Root workspace (aphrody-chat, aphrody-search, aphrody-webos-client) depends on aphrody-labs/libcosmic at the same rev;
+#     `bun factory/os/rust-desktop.ts check` fails when a root pin drifts from this table.
+# Every entry redirects an upstream pop-os git source to the single aphrody-labs fork at a pinned commit.
+# Upstream licences (MPL-2.0 libcosmic, MIT/Apache-2.0 iced/winit/softbuffer, GPL-3.0 COSMIC apps) stay in the forks.
+
+[patch."https://github.com/pop-os/libcosmic"]
+libcosmic = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+cosmic-config = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+cosmic-config-derive = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+cosmic-theme = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+build_helpers = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_accessibility = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_core = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_debug = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_futures = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_graphics = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_program = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_renderer = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_runtime = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_tiny_skia = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_wgpu = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_widget = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+iced_winit = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+
+[patch."https://github.com/pop-os/winit"]
+winit = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-core = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-common = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-wayland = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-x11 = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-orbital = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-web = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-win32 = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-appkit = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-uikit = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+winit-android = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+dpi = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }
+
+[patch."https://github.com/pop-os/softbuffer"]
+softbuffer = { git = "https://github.com/aphrody-labs/softbuffer", rev = "c2b2c19ddb38ff17495643699f97cb1f2064a1be" }
+
+[patch."https://github.com/pop-os/cosmic-protocols"]
+cosmic-protocols = { git = "https://github.com/aphrody-labs/cosmic-protocols", rev = "c0cff4db14c37ed954983158e4055aa94c7741d9" }
+cosmic-client-toolkit = { git = "https://github.com/aphrody-labs/cosmic-protocols", rev = "c0cff4db14c37ed954983158e4055aa94c7741d9" }
+
+[patch."https://github.com/pop-os/cosmic-settings-daemon"]
+cosmic-settings-config = { git = "https://github.com/aphrody-labs/cosmic-settings-daemon", rev = "af9f503d242ff608e5e116eb450ade3f460771ce" }

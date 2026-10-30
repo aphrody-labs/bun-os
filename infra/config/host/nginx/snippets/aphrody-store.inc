@@ -5,6 +5,8 @@
 #   /repo/apk/            apk repo (APKINDEX.tar.gz signed) and keys/
 #   /repo/flatpak/        OSTree repo, aphrody.flatpakrepo, .flatpakref
 #   /repo/android/        APK catalog
+#   /repo/redox/          Redox pkgar repo (pkg source https://aphrody.com/repo/redox; x86_64-unknown-redox/ plus the x86_64/ alias)
+#   /downloads/os/        OS images (Bun OS Redox desktop); both built by factory/os/rust-desktop.ts
 #   /npm/                 npm registry protocol (packuments are <scope>/<name>.json, tarballs under <name>/-/)
 #   /cargo/               cargo sparse registry (index/, dl/<crate>/<version>/download)
 location ^~ /repo/ {
@@ -21,6 +23,15 @@ location ^~ /repo/ {
         image/webp webp;
         application/xml xml;
     }
+    add_header Cache-Control "no-cache" always;
+    add_header Access-Control-Allow-Origin "*" always;
+    add_header X-Content-Type-Options nosniff always;
+}
+location ^~ /downloads/os/ {
+    alias /home/ubuntu/apps/webos/store/downloads/os/;
+    autoindex off;
+    default_type application/octet-stream;
+    types { application/json json; }
     add_header Cache-Control "no-cache" always;
     add_header Access-Control-Allow-Origin "*" always;
     add_header X-Content-Type-Options nosniff always;

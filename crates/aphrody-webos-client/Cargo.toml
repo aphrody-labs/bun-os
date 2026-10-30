@@ -17,7 +17,7 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 aphrody-webos-protocol = { path = "../aphrody-webos-protocol" }
 # Our pinned libcosmic fork (aphrody-labs/libcosmic, its iced submodule is our iced fork).
-libcosmic = { git = "https://github.com/aphrody-labs/libcosmic", rev = "dbc62f2d899cdbfbe43d170689ddc0290db663f4", default-features = false, features = ["winit", "wgpu"] }
+libcosmic = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803", default-features = false, features = ["winit", "wgpu"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 
