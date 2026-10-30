@@ -4,6 +4,8 @@
 // the protected store. Only packages that run on Debian unchanged are carried: architecture-independent data
 // (fonts, icons) and the statically usable Bun canary binary.
 //   deb [signed-by=/usr/share/keyrings/aphrody-apt.gpg] https://aphrody.com/repo/apt stable main
+// Suite `resolute` carries the native session apps built from our forks for the Pop!_OS/Ubuntu 26.04 image:
+//   deb [signed-by=/usr/share/keyrings/aphrody-apt.gpg] https://aphrody.com/repo/apt resolute main
 import { chmod, mkdir, readdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { docker, run, sha256, step, tail, writeIndex, type Ctx, type IndexEntry, type QualResult, type QualStep } from "./common";
@@ -25,6 +27,49 @@ async function gpgKey(ctx: Ctx): Promise<{ home: string; fpr: string }> {
   const fpr = /^fpr:+([0-9A-F]+):/m.exec(await list())?.[1];
   if (!fpr) throw new Error("apt signing key not found");
   return { home, fpr };
+}
+
+/**
+ * Native session apps built from our forks inside the ubuntu:26.04 builder (infra/config/host/libexec/aphrody-native-apps:
+ * Rio, COSMIC, Spacedrive, Aphrody Chat/Search). They link against the session image's libraries, so they get their
+ * own suite `resolute` (Pop!_OS/Ubuntu 26.04) in pool/resolute; index.tsv lists name, version, file, sha256 and the
+ * newest line of each package wins.
+ */
+async function nativeDebs(repo: string, entries: IndexEntry[], skipped: { name: string; reason: string }[]) {
+  const dir = Bun.env.APHRODY_NATIVE_DEBS ?? join(Bun.env.HOME ?? "/home/ubuntu", "native-apps/debs");
+  const index = Bun.file(join(dir, "index.tsv"));
+  if (!(await index.exists())) return;
+  const latest = new Map<string, [string, string, string]>();
+  for (const line of (await index.text()).split("\n")) {
+    const [name, version, file, sum] = line.split("\t");
+    if (name && version && file && sum) latest.set(name, [version, file, sum]);
+  }
+  const pool = join(repo, "pool/resolute");
+  await mkdir(pool, { recursive: true });
+  await mkdir(join(repo, "dists/resolute/main/binary-amd64"), { recursive: true });
+  for (const [name, [version, file, sum]] of latest) {
+    const source = join(dir, file);
+    if (!(await Bun.file(source).exists()) || (await sha256(source)) !== sum) {
+      skipped.push({ name, reason: `native deb ${file} missing or checksum mismatch` });
+      continue;
+    }
+    await Bun.write(join(pool, file), Bun.file(source));
+    const fields = (await run(["dpkg-deb", "-f", source, "Description", "Homepage"])).out;
+    entries.push({
+      name,
+      version,
+      desc: /^Description: (.*)$/m.exec(fields)?.[1] ?? name,
+      size: Bun.file(source).size,
+      sha256: sum,
+      file: `/repo/apt/pool/resolute/${file}`,
+      homepage: /^Homepage: (.*)$/m.exec(fields)?.[1],
+      meta: { arch: "amd64", suite: "resolute", from: "aphrody-native-apps" },
+    });
+  }
+  const packages = await run(["apt-ftparchive", "packages", "pool/resolute"], { cwd: repo });
+  if (packages.code !== 0) throw new Error(`apt-ftparchive packages (resolute) failed: ${tail(packages.out, 3)}`);
+  await Bun.write(join(repo, "dists/resolute/main/binary-amd64/Packages"), packages.out);
+  await run(["sh", "-c", "gzip -9kf Packages"], { cwd: join(repo, "dists/resolute/main/binary-amd64") });
 }
 
 export async function build(ctx: Ctx) {
@@ -97,31 +142,35 @@ export async function build(ctx: Ctx) {
     });
   }
   await rm(work, { recursive: true, force: true });
+  await nativeDebs(repo, entries, skipped);
   // Index and release, signed.
-  const packages = await run(["apt-ftparchive", "packages", "pool"], { cwd: repo });
+  const packages = await run(["apt-ftparchive", "packages", "pool/main"], { cwd: repo });
   if (packages.code !== 0) throw new Error(`apt-ftparchive packages failed: ${tail(packages.out, 3)}`);
   await Bun.write(join(repo, "dists/stable/main/binary-amd64/Packages"), packages.out);
   await run(["sh", "-c", "gzip -9kf Packages"], { cwd: join(repo, "dists/stable/main/binary-amd64") });
-  const release = await run(
-    [
-      "apt-ftparchive",
-      "-o", "APT::FTPArchive::Release::Origin=Aphrody",
-      "-o", "APT::FTPArchive::Release::Label=Bun OS",
-      "-o", "APT::FTPArchive::Release::Suite=stable",
-      "-o", "APT::FTPArchive::Release::Codename=stable",
-      "-o", "APT::FTPArchive::Release::Architectures=amd64 all",
-      "-o", "APT::FTPArchive::Release::Components=main",
-      "release", "dists/stable",
-    ],
-    { cwd: repo },
-  );
-  if (release.code !== 0) throw new Error("apt-ftparchive release failed");
-  await Bun.write(join(repo, "dists/stable/Release"), release.out);
   const key = await gpgKey(ctx);
   const gpg = ["gpg", "--homedir", key.home, "--batch", "--yes", "--pinentry-mode", "loopback", "--passphrase", "", "--local-user", key.fpr];
-  const s1 = await run([...gpg, "--clearsign", "-o", "InRelease", "Release"], { cwd: join(repo, "dists/stable") });
-  const s2 = await run([...gpg, "-abs", "-o", "Release.gpg", "Release"], { cwd: join(repo, "dists/stable") });
-  if (s1.code || s2.code) throw new Error("apt release signing failed");
+  const suites = (await Bun.file(join(repo, "dists/resolute/main/binary-amd64/Packages")).exists()) ? ["stable", "resolute"] : ["stable"];
+  for (const suite of suites) {
+    const release = await run(
+      [
+        "apt-ftparchive",
+        "-o", "APT::FTPArchive::Release::Origin=Aphrody",
+        "-o", "APT::FTPArchive::Release::Label=Bun OS",
+        "-o", `APT::FTPArchive::Release::Suite=${suite}`,
+        "-o", `APT::FTPArchive::Release::Codename=${suite}`,
+        "-o", `APT::FTPArchive::Release::Architectures=${suite === "stable" ? "amd64 all" : "amd64"}`,
+        "-o", "APT::FTPArchive::Release::Components=main",
+        "release", `dists/${suite}`,
+      ],
+      { cwd: repo },
+    );
+    if (release.code !== 0) throw new Error(`apt-ftparchive release (${suite}) failed`);
+    await Bun.write(join(repo, `dists/${suite}/Release`), release.out);
+    const s1 = await run([...gpg, "--clearsign", "-o", "InRelease", "Release"], { cwd: join(repo, `dists/${suite}`) });
+    const s2 = await run([...gpg, "-abs", "-o", "Release.gpg", "Release"], { cwd: join(repo, `dists/${suite}`) });
+    if (s1.code || s2.code) throw new Error(`apt release signing (${suite}) failed`);
+  }
   await run(["sh", "-c", `gpg --homedir "$1" --batch --export "$2" > "$3"`, "_", key.home, key.fpr, join(repo, "aphrody-apt.gpg")]);
   await writeIndex(ctx, { format: "apt", generated: new Date().toISOString(), url: `${ctx.origin}/repo/apt`, entries, skipped });
   console.log(`apt: ${entries.length} packages, ${skipped.length} skipped`);
