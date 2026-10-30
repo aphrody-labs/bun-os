@@ -18,7 +18,7 @@ Audit baseline of what was removed (2026-10-30): 14.5k lines of shell TypeScript
 | --- | --- | --- |
 | `crates/aphrody-webos-protocol` | lib (std and wasm32) | The typed contract shared by server and client: OS catalog ids, session state, signalling, input, clipboard, audio and gamepad messages, health, API error shape. serde types, versioned. Replaces `contracts/`. |
 | `crates/aphrody-webos-server` | bin `aphrody-webos` | One axum/tokio binary on 127.0.0.1:8790 behind nginx: static client assets, `/api/health`, auth, and the modules below. |
-| `crates/aphrody-webos-client` | cdylib wasm32 | The thin client in Rust (wasm-bindgen, web-sys; no JS framework, only the glue wasm-bindgen emits and a minimal bootstrap HTML): OS picker, fullscreen stream, keyboard, pointer, gamepad, clipboard, audio, session state and reconnect. |
+| `crates/aphrody-webos-client` | cdylib wasm32 + native | iced/libcosmic client (wasm32 with wgpu; native for in-session tools): OS picker, fullscreen stream, keyboard, pointer, gamepad, clipboard, session state. Only the wasm-bindgen glue and a one-line boot module are JavaScript. |
 
 Server modules and owners:
 
@@ -34,7 +34,20 @@ Wine and Proton images and gaming input belong to the emulators agent; native ap
 
 ## Client UI decision
 
-The client uses web-sys directly, not iced with libcosmic. Evidence: the client is one OS picker and one fullscreen stream surface; the stream needs browser objects (WebSocket, RTCPeerConnection, video/WebCodecs, Gamepad API) that iced cannot host inside its canvas; an iced wasm build pulls wgpu, winit and text shaping and lands in the megabytes against the 300 KB budget, and libcosmic does not target wasm32. COSMIC identity comes from the COSMIC dark palette (cosmic-theme) in the bootstrap page, and the desktop itself is real COSMIC in the Pop!_OS session.
+Owner decision (overrides the first web-sys draft): the client is an iced application themed with our libcosmic fork (`aphrody-labs/libcosmic`, pinned by revision; its `iced` submodule is our iced fork), compiled to wasm32 with the wgpu backend (WebGPU, WebGL2 fallback). The same codebase compiles natively for the in-session tools (OS picker, session switcher, settings panes, store front extensions). The browser is used only as transport (fetch, WebSocket, Gamepad API, clipboard) in `web.rs`; no hand-built DOM UI and no JavaScript UI. Known costs and the patches they call for in our forks: the wasm bundle is several megabytes (the 300 KB budget becomes 3 MB gzip for the client), frames of the fallback path are decoded in Rust until a custom wgpu video widget fed by WebCodecs frames lands, and wasm clipboard, fullscreen and gamepad integration are patched into the iced winit shell as needed.
+
+## Web content engines
+
+| Engine | What it is | Role in Bun OS |
+| --- | --- | --- |
+| Servo (fork `aphrody-labs/servo`, 0.7+) | Embeddable browser engine in pure Rust; lighter, compatibility gaps | Primary embedded engine: an iced/libcosmic widget rendering offscreen into a wgpu texture. |
+| cef-rs (`vendor/cef-rs`, CEF 156) | Embeddable full Chromium from Rust, offscreen rendering | Compatibility fallback widget for sites Servo cannot render. |
+| Tauri v3 (`vendor/tauri`, fork on the v3 branch, `tauri-v3.0.0-alpha.5`) | App framework for web frontends, alpha, CEF runtime | Apps with web frontends, including `apps/aphrody-app` migrated to v3; a Servo runtime is pushed where possible. |
+| Helium (fork) | Full Chromium browser product, not embeddable | The user-facing browser inside sessions. |
+
+## Source rule
+
+COSMIC, Redox, Rio, nushell, Obscura and every product component are pinned, patched forks built from source on the VPS (serialized Cargo wrapper) and shipped through the Bun OS repositories; nothing is installed from distribution or upstream binaries. Build graph: fork (pinned revision) -> patch -> build -> package (pacman/apt/flatpak/apk repositories of `crates/aphrody-webos-repos`) -> session image (`factory/images/*`) -> session container.
 
 ## Capture and input
 
@@ -47,7 +60,7 @@ Inside each Linux session a per-session `aphrody-remote-desktop` process (sessio
 - Builds run on the VPS through the serialized Cargo wrapper (`scripts/aphrody/build/rust/cargo-serial.sh`, at most four jobs); the client is built for `wasm32-unknown-unknown`, then `wasm-bindgen --target web` and `wasm-opt -Oz`.
 - Deploy: an atomic release directory (`aphrody-webos` binary, `client/` assets, `receipt.json` with sha256), a systemd unit `aphrody-webos.service` running the Rust binary, the root activator flips `current`, gates on `/api/health` (matching `sourceCommit`) and rolls back on failure. nginx keeps `aphrody.com` on 8790.
 - Until the client and gateway are complete, the server serves a minimal Rust-rendered page at `/` (no JavaScript desktop).
-- Budgets: client wasm at most 300 KB gzip; first frame under 2 s after picking an OS on a warm host; input to photon under 80 ms in region.
+- Budgets: client wasm at most 3 MB gzip (iced, wgpu); first frame under 2 s after picking an OS on a warm host; input to photon under 80 ms in region.
 - Security: CSP `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'`, per-session bearer tokens, containers without host privileges, signed release receipts.
 
 ## Stages
