@@ -20,6 +20,8 @@ export async function build(ctx: Ctx): Promise<void> {
   await rm(work, { recursive: true, force: true });
   await mkdir(work, { recursive: true });
   await cp(join(ctx.root, "factory/alpine/aports/bunos"), join(work, "bunos"), { recursive: true });
+  // bunos-run packages the runner source of packages/bunos-run; the aport carries only the APKBUILD.
+  await cp(join(ctx.root, "packages/bunos-run/src/bunos.ts"), join(work, "bunos/bunos-run/bunos.ts"));
   const names = (await readdir(join(work, "bunos"), { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name).sort();
   const script = `set -u
 apk add --no-cache alpine-sdk >/dev/null
@@ -34,7 +36,7 @@ echo "PACKAGER_PRIVKEY=/home/builder/.abuild/${KEY}" > /home/builder/.abuild/abu
 cp /keys/${KEY}.pub /etc/apk/keys/
 cp -r /work/bunos /home/builder/aports && chown -R builder /home/builder
 for p in ${names.join(" ")}; do
-  if su builder -c "cd /home/builder/aports/$p && abuild checksum >/dev/null 2>&1; abuild -F -r" >/tmp/$p.log 2>&1; then echo "BUILT $p"; else echo "FAILED $p"; tail -n 4 /tmp/$p.log; fi
+  if su builder -c "cd /home/builder/aports/$p && abuild checksum >/dev/null 2>&1; abuild -F -d -r" >/tmp/$p.log 2>&1; then echo "BUILT $p"; else echo "FAILED $p"; tail -n 4 /tmp/$p.log; fi
 done
 rm -f /out/*.apk /out/APKINDEX.tar.gz
 cp /home/builder/packages/aports/*/*.apk /home/builder/packages/aports/*/APKINDEX.tar.gz /out/ 2>/dev/null || cp /home/builder/packages/*/*/*.apk /home/builder/packages/*/*/APKINDEX.tar.gz /out/

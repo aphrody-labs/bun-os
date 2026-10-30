@@ -18,7 +18,7 @@ noextract=("filesystem-${_upstream}-any.pkg.tar.zst")
 source=("filesystem-${_upstream}-any.pkg.tar.zst::https://archive.archlinux.org/packages/f/filesystem/filesystem-${_upstream}-any.pkg.tar.zst"
   os-release)
 sha256sums=('6b6c3fee7432204840d3b6afc9bc1a68c28f591a47fb220071715c40cca956df'
-  '24f31cd127793dd642b6a2cb507357dd4e99f5b296f02a17a9d93786a44956da')
+  'f4ccf4751e19235bd818d026c2698708ea979b58bf21fd6f9f2a6b712c9753f8')
 
 package() {
   # Extract under fakeroot so numeric owners and modes match the upstream archive.
