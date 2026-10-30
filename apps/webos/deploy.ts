@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // VPS checkout (main) -> immutable release -> host activation, without cloud credentials.
-import { cp, mkdir, rename } from "node:fs/promises";
+import { cp, mkdir, readdir, readlink, rename, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { stageIso } from "./vm";
 import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
@@ -127,6 +127,14 @@ await Bun.write(
     2,
   ),
 );
+// Keep the newest four releases and the active one; older ones are about 500 MB each.
+{
+  const releases = join(handoff, "releases");
+  const active = await readlink(join(Bun.env.HOME ?? "", "apps/webos/current")).catch(() => "");
+  const names = (await readdir(releases)).sort((x, y) => Number(y.split("-")[1]) - Number(x.split("-")[1]));
+  for (const name of names.slice(4))
+    if (!active.endsWith(name)) await rm(join(releases, name), { recursive: true, force: true });
+}
 await Bun.write(join(handoff, "ready.tmp"), release.split("/").pop()! + "\n");
 await rename(join(handoff, "ready.tmp"), join(handoff, "ready"));
 console.log(`WebOS staged: ${release}; host activation is a separate gate.`);
