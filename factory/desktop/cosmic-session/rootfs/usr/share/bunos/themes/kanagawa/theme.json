@@ -2,8 +2,5 @@
   "name": "kanagawa",
   "mode": "dark",
   "icons": "Yaru-blue",
-  "backgrounds": [
-    "1-kanagawa.jpg",
-    "omarchy.webp"
-  ]
+  "backgrounds": ["1-kanagawa.jpg", "omarchy.webp"]
 }

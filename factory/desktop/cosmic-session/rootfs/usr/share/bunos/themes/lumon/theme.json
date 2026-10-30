@@ -2,9 +2,5 @@
   "name": "lumon",
   "mode": "dark",
   "icons": "Yaru-blue",
-  "backgrounds": [
-    "01-united-in-severance.webp",
-    "02-opinions-equally.webp",
-    "omarchy.webp"
-  ]
+  "backgrounds": ["01-united-in-severance.webp", "02-opinions-equally.webp", "omarchy.webp"]
 }

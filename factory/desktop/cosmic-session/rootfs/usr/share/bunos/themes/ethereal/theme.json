@@ -2,9 +2,5 @@
   "name": "ethereal",
   "mode": "dark",
   "icons": "Yaru-blue",
-  "backgrounds": [
-    "1-cosmic.webp",
-    "2-meadow.webp",
-    "omarchy.webp"
-  ]
+  "backgrounds": ["1-cosmic.webp", "2-meadow.webp", "omarchy.webp"]
 }

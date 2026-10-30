@@ -10,7 +10,9 @@ use std::rc::Rc;
 
 use wasm_bindgen::{JsCast, JsValue, prelude::*};
 use wasm_bindgen_futures::{JsFuture, spawn_local};
-use web_sys::{Document, Element, HtmlElement, HtmlIFrameElement, MessageEvent, MouseEvent, Window};
+use web_sys::{
+    Document, Element, HtmlElement, HtmlIFrameElement, MessageEvent, MouseEvent, Window,
+};
 
 use crate::bridge::{Reply, Request};
 use crate::{Bundle, Catalog};
@@ -91,8 +93,13 @@ pub fn start() -> Result<(), JsValue> {
 }
 
 async fn fetch_catalog(window: &Window) -> Result<Catalog, JsValue> {
-    let response: web_sys::Response = JsFuture::from(window.fetch_with_str("/ui/apps.json")).await?.dyn_into()?;
-    let text = JsFuture::from(response.text()?).await?.as_string().unwrap_or_default();
+    let response: web_sys::Response = JsFuture::from(window.fetch_with_str("/ui/apps.json"))
+        .await?
+        .dyn_into()?;
+    let text = JsFuture::from(response.text()?)
+        .await?
+        .as_string()
+        .unwrap_or_default();
     serde_json::from_str(&text).map_err(|e| JsValue::from_str(&e.to_string()))
 }
 
@@ -100,7 +107,11 @@ impl Host {
     fn launcher(self: &Rc<Self>, dock: &Element, app: Bundle) -> Result<(), JsValue> {
         let button = self.document.create_element("button")?;
         button.set_class_name("bunui-launch");
-        button.set_inner_html(&format!("{}<small>{}</small>", escape(&app.title), app.toolkit.as_str()));
+        button.set_inner_html(&format!(
+            "{}<small>{}</small>",
+            escape(&app.title),
+            app.toolkit.as_str()
+        ));
         let host = self.clone();
         let open = Closure::<dyn FnMut()>::new(move || {
             let _ = host.open(app.clone());
@@ -137,8 +148,19 @@ impl Host {
         bar.append_child(&close)?;
 
         let frame: HtmlIFrameElement = self.document.create_element("iframe")?.dyn_into()?;
-        frame.set_src(&format!("{}{}", app.base(), if app.entry == "index.html" { "" } else { &app.entry }));
-        frame.set_attribute("allow", "clipboard-read; clipboard-write; fullscreen; gamepad; cross-origin-isolated")?;
+        frame.set_src(&format!(
+            "{}{}",
+            app.base(),
+            if app.entry == "index.html" {
+                ""
+            } else {
+                &app.entry
+            }
+        ));
+        frame.set_attribute(
+            "allow",
+            "clipboard-read; clipboard-write; fullscreen; gamepad; cross-origin-isolated",
+        )?;
         frame.set_title(&app.title);
         let shield = self.document.create_element("div")?;
         shield.set_class_name("bunui-shield");
@@ -161,7 +183,9 @@ impl Host {
         {
             let host = self.clone();
             let target = win.clone();
-            let drag = Closure::<dyn FnMut(MouseEvent)>::new(move |event: MouseEvent| host.drag(&target, event));
+            let drag = Closure::<dyn FnMut(MouseEvent)>::new(move |event: MouseEvent| {
+                host.drag(&target, event)
+            });
             bar.add_event_listener_with_callback("mousedown", drag.as_ref().unchecked_ref())?;
             drag.forget();
         }
@@ -188,7 +212,9 @@ impl Host {
         }
         let _ = win.class_list().add_1("focused");
         self.z.set(self.z.get() + 1);
-        let _ = win.style().set_property("z-index", &self.z.get().to_string());
+        let _ = win
+            .style()
+            .set_property("z-index", &self.z.get().to_string());
     }
 
     fn drag(self: &Rc<Self>, win: &HtmlElement, start: MouseEvent) {
@@ -200,23 +226,31 @@ impl Host {
             Closure::<dyn FnMut(MouseEvent)>::new(move |e: MouseEvent| {
                 let style = win.style();
                 let _ = style.set_property("left", &format!("{}px", left + e.client_x() - x0));
-                let _ = style.set_property("top", &format!("{}px", (top + e.client_y() - y0).max(0)));
+                let _ =
+                    style.set_property("top", &format!("{}px", (top + e.client_y() - y0).max(0)));
             })
         };
         let up: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
         let doc = self.document.clone();
         let desk = self.desk.clone();
         let moved = Rc::new(moved);
-        let _ = doc.add_event_listener_with_callback("mousemove", (*moved).as_ref().unchecked_ref());
+        let _ =
+            doc.add_event_listener_with_callback("mousemove", (*moved).as_ref().unchecked_ref());
         let release = {
             let up = up.clone();
             let doc = doc.clone();
             let moved = moved.clone();
             Closure::<dyn FnMut()>::new(move || {
                 let _ = desk.class_list().remove_1("dragging");
-                let _ = doc.remove_event_listener_with_callback("mousemove", (*moved).as_ref().unchecked_ref());
+                let _ = doc.remove_event_listener_with_callback(
+                    "mousemove",
+                    (*moved).as_ref().unchecked_ref(),
+                );
                 if let Some(cb) = up.borrow_mut().take() {
-                    let _ = doc.remove_event_listener_with_callback("mouseup", cb.as_ref().unchecked_ref());
+                    let _ = doc.remove_event_listener_with_callback(
+                        "mouseup",
+                        cb.as_ref().unchecked_ref(),
+                    );
                 }
             })
         };
@@ -229,15 +263,31 @@ impl Host {
         if event.origin() != self.window.location().origin().unwrap_or_default() {
             return;
         }
-        let Some(text) = js_sys::JSON::stringify(&event.data()).ok().and_then(|s| s.as_string()) else { return };
-        let Ok(request) = serde_json::from_str::<Request>(&text) else { return };
+        let Some(text) = js_sys::JSON::stringify(&event.data())
+            .ok()
+            .and_then(|s| s.as_string())
+        else {
+            return;
+        };
+        let Ok(request) = serde_json::from_str::<Request>(&text) else {
+            return;
+        };
         let source = event.source();
-        let found = self.windows.borrow().iter().find_map(|(_, (frame, app, title))| {
-            let content = frame.content_window()?;
-            let same = source.as_ref().map(|s| JsValue::from(content.clone()) == JsValue::from(s.clone())).unwrap_or(false);
-            same.then(|| (content, app.clone(), title.clone()))
-        });
-        let Some((target, app, title)) = found else { return };
+        let found = self
+            .windows
+            .borrow()
+            .iter()
+            .find_map(|(_, (frame, app, title))| {
+                let content = frame.content_window()?;
+                let same = source
+                    .as_ref()
+                    .map(|s| JsValue::from(content.clone()) == JsValue::from(s.clone()))
+                    .unwrap_or(false);
+                same.then(|| (content, app.clone(), title.clone()))
+            });
+        let Some((target, app, title)) = found else {
+            return;
+        };
         let namespace = format!("{}-{}", app.toolkit.as_str(), app.id);
         let navigator = self.window.navigator();
         spawn_local(async move {
@@ -250,24 +300,47 @@ impl Host {
                     let _ = JsFuture::from(navigator.clipboard().write_text(&text)).await;
                     None
                 }
-                Request::ClipboardRead { id } => Some(match JsFuture::from(navigator.clipboard().read_text()).await {
-                    Ok(v) => Reply::Ok { id, text: v.as_string() },
-                    Err(e) => Reply::Error { id, message: format!("{e:?}") },
-                }),
-                Request::FsRead { id, path } => Some(match opfs_read(&navigator, &namespace, &path).await {
-                    Ok(text) => Reply::Ok { id, text: Some(text) },
-                    Err(e) => Reply::Error { id, message: format!("{e:?}") },
-                }),
-                Request::FsWrite { id, path, text } => Some(match opfs_write(&navigator, &namespace, &path, &text).await {
-                    Ok(()) => Reply::Ok { id, text: None },
-                    Err(e) => Reply::Error { id, message: format!("{e:?}") },
-                }),
+                Request::ClipboardRead { id } => Some(
+                    match JsFuture::from(navigator.clipboard().read_text()).await {
+                        Ok(v) => Reply::Ok {
+                            id,
+                            text: v.as_string(),
+                        },
+                        Err(e) => Reply::Error {
+                            id,
+                            message: format!("{e:?}"),
+                        },
+                    },
+                ),
+                Request::FsRead { id, path } => {
+                    Some(match opfs_read(&navigator, &namespace, &path).await {
+                        Ok(text) => Reply::Ok {
+                            id,
+                            text: Some(text),
+                        },
+                        Err(e) => Reply::Error {
+                            id,
+                            message: format!("{e:?}"),
+                        },
+                    })
+                }
+                Request::FsWrite { id, path, text } => Some(
+                    match opfs_write(&navigator, &namespace, &path, &text).await {
+                        Ok(()) => Reply::Ok { id, text: None },
+                        Err(e) => Reply::Error {
+                            id,
+                            message: format!("{e:?}"),
+                        },
+                    },
+                ),
             };
             if let Some(reply) = reply
                 && let Ok(json) = serde_json::to_string(&reply)
                 && let Ok(value) = js_sys::JSON::parse(&json)
             {
-                let origin = web_sys::window().and_then(|w| w.location().origin().ok()).unwrap_or_default();
+                let origin = web_sys::window()
+                    .and_then(|w| w.location().origin().ok())
+                    .unwrap_or_default();
                 let _ = target.post_message(&value, &origin);
             }
         });
@@ -281,8 +354,13 @@ async fn opfs_file(
     path: &str,
     create: bool,
 ) -> Result<web_sys::FileSystemFileHandle, JsValue> {
-    let mut dir: web_sys::FileSystemDirectoryHandle = JsFuture::from(navigator.storage().get_directory()).await?.dyn_into()?;
-    let segments: Vec<&str> = std::iter::once(namespace).chain(path.split('/').filter(|s| !s.is_empty())).collect();
+    let mut dir: web_sys::FileSystemDirectoryHandle =
+        JsFuture::from(navigator.storage().get_directory())
+            .await?
+            .dyn_into()?;
+    let segments: Vec<&str> = std::iter::once(namespace)
+        .chain(path.split('/').filter(|s| !s.is_empty()))
+        .collect();
     let (file, dirs) = segments.split_last().ok_or("empty path")?;
     if segments.iter().any(|s| *s == "." || *s == "..") || dirs.is_empty() {
         return Err("invalid path".into());
@@ -290,27 +368,46 @@ async fn opfs_file(
     for segment in dirs {
         let options = web_sys::FileSystemGetDirectoryOptions::new();
         options.set_create(create);
-        dir = JsFuture::from(dir.get_directory_handle_with_options(segment, &options)).await?.dyn_into()?;
+        dir = JsFuture::from(dir.get_directory_handle_with_options(segment, &options))
+            .await?
+            .dyn_into()?;
     }
     let options = web_sys::FileSystemGetFileOptions::new();
     options.set_create(create);
-    JsFuture::from(dir.get_file_handle_with_options(file, &options)).await?.dyn_into()
+    JsFuture::from(dir.get_file_handle_with_options(file, &options))
+        .await?
+        .dyn_into()
 }
 
-async fn opfs_read(navigator: &web_sys::Navigator, namespace: &str, path: &str) -> Result<String, JsValue> {
+async fn opfs_read(
+    navigator: &web_sys::Navigator,
+    namespace: &str,
+    path: &str,
+) -> Result<String, JsValue> {
     let handle = opfs_file(navigator, namespace, path, false).await?;
     let file: web_sys::Blob = JsFuture::from(handle.get_file()).await?.dyn_into()?;
-    Ok(JsFuture::from(file.text()).await?.as_string().unwrap_or_default())
+    Ok(JsFuture::from(file.text())
+        .await?
+        .as_string()
+        .unwrap_or_default())
 }
 
-async fn opfs_write(navigator: &web_sys::Navigator, namespace: &str, path: &str, text: &str) -> Result<(), JsValue> {
+async fn opfs_write(
+    navigator: &web_sys::Navigator,
+    namespace: &str,
+    path: &str,
+    text: &str,
+) -> Result<(), JsValue> {
     let handle = opfs_file(navigator, namespace, path, true).await?;
-    let stream: web_sys::FileSystemWritableFileStream = JsFuture::from(handle.create_writable()).await?.dyn_into()?;
+    let stream: web_sys::FileSystemWritableFileStream =
+        JsFuture::from(handle.create_writable()).await?.dyn_into()?;
     JsFuture::from(stream.write_with_str(text)?).await?;
     JsFuture::from(stream.close()).await?;
     Ok(())
 }
 
 fn escape(s: &str) -> String {
-    s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
 }

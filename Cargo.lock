@@ -3294,6 +3294,7 @@ dependencies = [
  "anyhow",
  "aphrody-capture",
  "aphrody-secrets",
+ "aphrody-webos-protocol",
  "aphrody-wireguard",
  "axum",
  "getrandom 0.4.3",

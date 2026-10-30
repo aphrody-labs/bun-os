@@ -82,12 +82,7 @@ for (const entry of receipt.files) {
   )
     throw new Error(`Artifact differs from receipt: ${entry.path}`);
 }
-for (const path of [
-  "aphrody-webos",
-  "release.env",
-  "client/index.html",
-  "inventory/inventory.json",
-])
+for (const path of ["aphrody-webos", "release.env", "client/index.html", "inventory/inventory.json"])
   if (!receipt.files.some(file => file.path === path)) throw new Error(`Unreceipted ${path}`);
 const current = join(app, "current");
 const previous = await readlink(current).catch(() => undefined);

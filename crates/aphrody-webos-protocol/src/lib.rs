@@ -156,13 +156,23 @@ pub enum Input {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "t", rename_all = "kebab-case")]
 pub enum ServerEvent {
-    State { state: SessionState },
-    Clipboard { text: String },
+    State {
+        state: SessionState,
+    },
+    Clipboard {
+        text: String,
+    },
     Signal(Signal),
-    Error { message: String },
+    Error {
+        message: String,
+    },
     /// The binary frames that follow are H.264 Annex B chunks framed as `[kind u8][pts u64 BE, µs][payload]`
     /// (kind 1 SPS/PPS config, 2 key frame, 3 delta) for a WebCodecs `VideoDecoder` configured with `codec`.
-    Video { codec: String, width: u32, height: u32 },
+    Video {
+        codec: String,
+        width: u32,
+        height: u32,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

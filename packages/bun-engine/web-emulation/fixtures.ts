@@ -96,7 +96,11 @@ export async function stageFixtures(objects: string): Promise<Record<string, { s
 export async function writeCatalog(objects: string) {
   await Bun.write(
     join(objects, "emulators/emulators.json"),
-    `${JSON.stringify(EMULATORS.map((e) => ({ ...e, ...(SESSION[e.id] ? { session: SESSION[e.id] } : {}) })), null, 2)}
+    `${JSON.stringify(
+      EMULATORS.map(e => ({ ...e, ...(SESSION[e.id] ? { session: SESSION[e.id] } : {}) })),
+      null,
+      2,
+    )}
 `,
   );
 }
@@ -106,7 +110,10 @@ export async function writeCatalog(objects: string) {
  * ROM cache and verified by sha256: GPL-2.0 Swiss (GameCube homebrew DOL), a public-domain (Unlicense) N64 demo by
  * Peter Lemon, and a MAME ROM released by its rights holders for free non-commercial use (mamedev.org/roms).
  */
-export const SESSION_FIXTURES: Record<string, { file: string; url: string; sha256: string; license: string; member?: string; memberSha256?: string }> = {
+export const SESSION_FIXTURES: Record<
+  string,
+  { file: string; url: string; sha256: string; license: string; member?: string; memberSha256?: string }
+> = {
   "swiss-gc": {
     file: "swiss_r2119.dol",
     url: "https://github.com/emukidid/swiss-gc/releases/download/v0.6r2119/swiss_r2119.tar.xz",
@@ -134,7 +141,10 @@ export async function stageSessionFixtures(objects: string) {
   for (const [pack, f] of Object.entries(SESSION_FIXTURES)) {
     const cache = join(root, "usr/var/cache/bep/roms", pack);
     const archive = join(cache, f.url.split("/").pop()!);
-    if (!(await Bun.file(archive).exists()) || hex(new Uint8Array(await Bun.file(archive).arrayBuffer())) !== f.sha256) {
+    if (
+      !(await Bun.file(archive).exists()) ||
+      hex(new Uint8Array(await Bun.file(archive).arrayBuffer())) !== f.sha256
+    ) {
       const response = await fetch(f.url);
       if (!response.ok) throw new Error(`${pack}: ${f.url} ${response.status}`);
       const bytes = new Uint8Array(await response.arrayBuffer());
@@ -157,18 +167,23 @@ export async function stageSessionFixtures(objects: string) {
  * the KallistiOS 2ndmix demo (BSD-like KOS License, kallistios/dc-kos-toolchain) for Dreamcast. The build output is not
  * bit-reproducible across SDK images, so the image digest is the pin and the produced sha256 is recorded in the report.
  */
-export const BUILT_FIXTURES: Record<string, { file: string; image: string; script: string; license: string; notice: string }> = {
+export const BUILT_FIXTURES: Record<
+  string,
+  { file: string; image: string; script: string; license: string; notice: string }
+> = {
   "pspsdk-cube": {
     file: "EBOOT.PBP",
     image: "pspdev/pspdev@sha256:54895e6f5afb71b8f4f6915ee6d5023e1e087ca7afdf2dcb1d7a694a5233e45f",
-    script: 'cp -r "$PSPDEV/psp/sdk/samples/gu" /tmp/gu && make -C /tmp/gu/cube >/dev/null && cp /tmp/gu/cube/EBOOT.PBP /out/ && cp "$PSPDEV/psp/sdk/LICENSE" /out/LICENSE 2>/dev/null || true',
+    script:
+      'cp -r "$PSPDEV/psp/sdk/samples/gu" /tmp/gu && make -C /tmp/gu/cube >/dev/null && cp /tmp/gu/cube/EBOOT.PBP /out/ && cp "$PSPDEV/psp/sdk/LICENSE" /out/LICENSE 2>/dev/null || true',
     license: "BSD-3-Clause (PSPSDK samples, pspdev)",
     notice: "LICENSE",
   },
   "kos-2ndmix": {
     file: "2ndmix.elf",
     image: "kallistios/dc-kos-toolchain@sha256:759066b3bc0d162d7e1fec4f20107446f5df255f57a8c6b80d10b44723107b56",
-    script: 'cp -r "$KOS_BASE/examples/dreamcast/2ndmix" /tmp/m && make -C /tmp/m >/dev/null && cp /tmp/m/2ndmix.elf /out/ && cp "$KOS_BASE/doc/license/LICENSE.KOS" /out/LICENSE.KOS 2>/dev/null || cp "$KOS_BASE/doc/LICENSE.md" /out/LICENSE.md',
+    script:
+      'cp -r "$KOS_BASE/examples/dreamcast/2ndmix" /tmp/m && make -C /tmp/m >/dev/null && cp /tmp/m/2ndmix.elf /out/ && cp "$KOS_BASE/doc/license/LICENSE.KOS" /out/LICENSE.KOS 2>/dev/null || cp "$KOS_BASE/doc/LICENSE.md" /out/LICENSE.md',
     license: "KOS License (BSD-like, KallistiOS); attribution: KallistiOS developers",
     notice: "LICENSE.KOS",
   },
@@ -181,7 +196,19 @@ export async function stageBuiltFixtures(objects: string): Promise<Record<string
     const cache = join(root, "usr/var/cache/bep/roms", pack);
     if (!(await Bun.file(join(cache, f.file)).exists())) {
       Bun.spawnSync(["mkdir", "-p", cache]);
-      const run = Bun.spawnSync(["docker", "run", "--rm", "--network", "none", "-v", `${cache}:/out`, f.image, "bash", "-c", f.script]);
+      const run = Bun.spawnSync([
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "-v",
+        `${cache}:/out`,
+        f.image,
+        "bash",
+        "-c",
+        f.script,
+      ]);
       if (run.exitCode || !(await Bun.file(join(cache, f.file)).exists()))
         throw new Error(`${pack}: build failed: ${run.stderr.toString().slice(-300)}`);
     }

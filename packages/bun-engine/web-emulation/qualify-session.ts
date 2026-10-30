@@ -53,7 +53,9 @@ async function qualify(id: string, fixtures: string): Promise<QualificationEntry
   const runtime = await mkdtemp(join(tmpdir(), "bunos-session-"));
   const entry: QualificationEntry = { id, status: "fail", errors: [], testedAt: new Date().toISOString() };
   const rom = launch.rom ? `/roms/${launch.rom}` : "";
-  const command = launch.app.includes("{rom}") ? launch.app.replace("{rom}", rom) : `${launch.app}${rom ? ` ${rom}` : ""}`;
+  const command = launch.app.includes("{rom}")
+    ? launch.app.replace("{rom}", rom)
+    : `${launch.app}${rom ? ` ${rom}` : ""}`;
   try {
     // A writable copy of the fixtures: emulators write saves and configs next to the ROM (melonDS refuses to boot
     // when it cannot create GodMode9i.sav).

@@ -59,7 +59,11 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     let sessions = state.sessions.configured();
     checks.insert(
         "sessions".to_owned(),
-        check(sessions > 0, true, "no OS session is declared on this host (WEBOS_SESSION_<OS>)".into()),
+        check(
+            sessions > 0,
+            true,
+            "no OS session is declared on this host (WEBOS_SESSION_<OS>)".into(),
+        ),
     );
     let ok = checks.values().all(|c| c.ok || c.optional);
     let body = Health {

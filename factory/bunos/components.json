@@ -1225,7 +1225,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/cosmic-epoch.git",
-        "pin": "764ef227bb4a26a385d7c7c94ce3b54dd28e9888"
+        "pin": "a19510c7aa304f0c2a339cb1aa9c1a892511693f"
       },
       "registration": ["none"],
       "aot": true,

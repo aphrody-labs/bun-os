@@ -2,10 +2,5 @@
   "name": "white",
   "mode": "light",
   "icons": "Yaru-grey",
-  "backgrounds": [
-    "1-white.webp",
-    "2-white.webp",
-    "3-white.webp",
-    "omarchy.webp"
-  ]
+  "backgrounds": ["1-white.webp", "2-white.webp", "3-white.webp", "omarchy.webp"]
 }

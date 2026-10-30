@@ -97,7 +97,10 @@ async fn caching(request: Request, next: Next) -> Response {
     let success = response.status().is_success();
     let headers = response.headers_mut();
     if hashed && success {
-        headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("public, max-age=31536000, immutable"));
+        headers.insert(
+            header::CACHE_CONTROL,
+            HeaderValue::from_static("public, max-age=31536000, immutable"),
+        );
     } else if !headers.contains_key(header::CACHE_CONTROL) {
         headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
     }
@@ -106,7 +109,9 @@ async fn caching(request: Request, next: Next) -> Response {
 
 fn app(state: Arc<AppState>) -> Router {
     // release.sh writes .br and .gz next to the client files; content-hashed names are cached immutably.
-    let assets = ServeDir::new(&state.client).precompressed_br().precompressed_gzip();
+    let assets = ServeDir::new(&state.client)
+        .precompressed_br()
+        .precompressed_gzip();
     let state_sessions = state.sessions.clone();
     let inventory = match &state.inventory {
         Ok(inventory) => aphrody_inventory::router(inventory.clone()),

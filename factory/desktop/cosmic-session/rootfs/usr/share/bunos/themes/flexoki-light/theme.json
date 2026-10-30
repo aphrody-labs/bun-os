@@ -2,8 +2,5 @@
   "name": "flexoki-light",
   "mode": "light",
   "icons": "Yaru-blue",
-  "backgrounds": [
-    "1-orb.webp",
-    "2-omarchy.webp"
-  ]
+  "backgrounds": ["1-orb.webp", "2-omarchy.webp"]
 }

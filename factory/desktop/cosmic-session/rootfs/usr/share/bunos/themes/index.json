@@ -3,49 +3,31 @@
     "name": "catppuccin",
     "mode": "dark",
     "icons": "Yaru-purple",
-    "backgrounds": [
-      "1-totoro.webp",
-      "2-waves.webp",
-      "3-blue-eye.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-totoro.webp", "2-waves.webp", "3-blue-eye.webp", "omarchy.webp"]
   },
   {
     "name": "catppuccin-latte",
     "mode": "light",
     "icons": "Yaru-blue",
-    "backgrounds": [
-      "1-color-fade.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-color-fade.webp", "omarchy.webp"]
   },
   {
     "name": "ethereal",
     "mode": "dark",
     "icons": "Yaru-blue",
-    "backgrounds": [
-      "1-cosmic.webp",
-      "2-meadow.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-cosmic.webp", "2-meadow.webp", "omarchy.webp"]
   },
   {
     "name": "everforest",
     "mode": "dark",
     "icons": "Yaru-sage",
-    "backgrounds": [
-      "1-tree-tops.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-tree-tops.webp", "omarchy.webp"]
   },
   {
     "name": "flexoki-light",
     "mode": "light",
     "icons": "Yaru-blue",
-    "backgrounds": [
-      "1-orb.webp",
-      "2-omarchy.webp"
-    ]
+    "backgrounds": ["1-orb.webp", "2-omarchy.webp"]
   },
   {
     "name": "gruvbox",
@@ -64,41 +46,25 @@
     "name": "hackerman",
     "mode": "dark",
     "icons": "Yaru-blue",
-    "backgrounds": [
-      "1-synth-scape.jpg",
-      "2-geometric.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-synth-scape.jpg", "2-geometric.webp", "omarchy.webp"]
   },
   {
     "name": "kanagawa",
     "mode": "dark",
     "icons": "Yaru-blue",
-    "backgrounds": [
-      "1-kanagawa.jpg",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-kanagawa.jpg", "omarchy.webp"]
   },
   {
     "name": "last-horizon",
     "mode": "dark",
     "icons": "Yaru-purple",
-    "backgrounds": [
-      "1-eyes-wide.webp",
-      "2-blink.webp",
-      "3-bokeh.webp",
-      "4-new-horizons.jpg"
-    ]
+    "backgrounds": ["1-eyes-wide.webp", "2-blink.webp", "3-bokeh.webp", "4-new-horizons.jpg"]
   },
   {
     "name": "lumon",
     "mode": "dark",
     "icons": "Yaru-blue",
-    "backgrounds": [
-      "01-united-in-severance.webp",
-      "02-opinions-equally.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["01-united-in-severance.webp", "02-opinions-equally.webp", "omarchy.webp"]
   },
   {
     "name": "lupine",
@@ -117,44 +83,25 @@
     "name": "matte-black",
     "mode": "dark",
     "icons": "Yaru-red",
-    "backgrounds": [
-      "0-ship-at-sea.jpg",
-      "1-dark-waters.webp",
-      "2-dot-hands.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["0-ship-at-sea.jpg", "1-dark-waters.webp", "2-dot-hands.webp", "omarchy.webp"]
   },
   {
     "name": "miasma",
     "mode": "dark",
     "icons": "Yaru-wartybrown",
-    "backgrounds": [
-      "01-nature-of-fear.webp",
-      "02-crowned.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["01-nature-of-fear.webp", "02-crowned.webp", "omarchy.webp"]
   },
   {
     "name": "nord",
     "mode": "dark",
     "icons": "Yaru-blue",
-    "backgrounds": [
-      "0-black-moon.jpg",
-      "1-city-view.webp",
-      "2-night-hawks.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["0-black-moon.jpg", "1-city-view.webp", "2-night-hawks.webp", "omarchy.webp"]
   },
   {
     "name": "osaka-jade",
     "mode": "dark",
     "icons": "Yaru-sage",
-    "backgrounds": [
-      "1-glowing-city.webp",
-      "2-shaded-entrance.webp",
-      "3-mountain-moon.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-glowing-city.webp", "2-shaded-entrance.webp", "3-mountain-moon.webp", "omarchy.webp"]
   },
   {
     "name": "retro-82",
@@ -188,35 +135,19 @@
     "name": "rose-pine",
     "mode": "light",
     "icons": "Yaru-blue",
-    "backgrounds": [
-      "1-funky-shapes.webp",
-      "2-dot-map.webp",
-      "3-omarchy-plants.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-funky-shapes.webp", "2-dot-map.webp", "3-omarchy-plants.webp", "omarchy.webp"]
   },
   {
     "name": "solitude",
     "mode": "dark",
     "icons": "Yaru-sage-dark",
-    "backgrounds": [
-      "1-on-pole.webp",
-      "2-wreakage.webp",
-      "3-climb.jpg",
-      "4-ether.webp",
-      "5-eyed.jpg"
-    ]
+    "backgrounds": ["1-on-pole.webp", "2-wreakage.webp", "3-climb.jpg", "4-ether.webp", "5-eyed.jpg"]
   },
   {
     "name": "starship",
     "mode": "dark",
     "icons": "Cosmic",
-    "backgrounds": [
-      "1-starbase.webp",
-      "2-flight14-dawn.webp",
-      "3-engine-cluster.webp",
-      "4-morning-pad.webp"
-    ]
+    "backgrounds": ["1-starbase.webp", "2-flight14-dawn.webp", "3-engine-cluster.webp", "4-morning-pad.webp"]
   },
   {
     "name": "tokyo-night",
@@ -250,12 +181,7 @@
     "name": "white",
     "mode": "light",
     "icons": "Yaru-grey",
-    "backgrounds": [
-      "1-white.webp",
-      "2-white.webp",
-      "3-white.webp",
-      "omarchy.webp"
-    ]
+    "backgrounds": ["1-white.webp", "2-white.webp", "3-white.webp", "omarchy.webp"]
   },
   {
     "name": "aphrody",

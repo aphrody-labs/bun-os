@@ -291,7 +291,10 @@ export const SESSION: Record<string, SessionLaunch> = {
   gopher64: { package: "gopher64", app: "gopher64", rom: "peterlemon-n64/Mandelbrot32BPP320X240.N64" },
   mame: { package: "mame", app: "mame -rompath /roms/mamedev-gridlee -skip_gameinfo -video bgfx gridlee" },
   wine: { package: "wine", app: "wine notepad" },
-  proton: { package: "proton-bunos", app: "env PROTONPATH=/usr/share/steam/compatibilitytools.d/proton-bunos GAMEID=0 umu-run winecfg" },
+  proton: {
+    package: "proton-bunos",
+    app: "env PROTONPATH=/usr/share/steam/compatibilitytools.d/proton-bunos GAMEID=0 umu-run winecfg",
+  },
 };
 for (const [id, name, systems, owner] of [
   ["melonds-native", "melonDS (native, Gamescope session)", ["nds"], "vendor/melonds"],

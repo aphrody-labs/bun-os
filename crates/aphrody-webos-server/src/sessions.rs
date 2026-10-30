@@ -16,7 +16,9 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use aphrody_webos_protocol::{ApiError, Input, OsEntry, OsId, ServerEvent, SessionInfo, SessionState, StartSession};
+use aphrody_webos_protocol::{
+    ApiError, Input, OsEntry, OsId, ServerEvent, SessionInfo, SessionState, StartSession,
+};
 use axum::{
     Json, Router,
     extract::{
@@ -77,11 +79,15 @@ impl Sessions {
                     .and_then(|path| std::fs::read_to_string(path).ok())
                     .map(|t| t.trim().to_owned())
                     .filter(|t| !t.is_empty());
-                let native = std::env::var(format!("WEBOS_SESSION_{key}_MODE")).is_ok_and(|m| m == "native");
+                let native =
+                    std::env::var(format!("WEBOS_SESSION_{key}_MODE")).is_ok_and(|m| m == "native");
                 upstreams.insert(os, Upstream { url, token, native });
             }
         }
-        Sessions { upstreams: Arc::new(upstreams), live: Arc::new(Mutex::new(HashMap::new())) }
+        Sessions {
+            upstreams: Arc::new(upstreams),
+            live: Arc::new(Mutex::new(HashMap::new())),
+        }
     }
 
     pub fn catalog(&self) -> Vec<OsEntry> {
@@ -94,7 +100,8 @@ impl Sessions {
                     name: id.name().into(),
                     summary: id.summary().into(),
                     available,
-                    reason: (!available).then(|| "No session of this system runs on this host yet.".into()),
+                    reason: (!available)
+                        .then(|| "No session of this system runs on this host yet.".into()),
                 }
             })
             .collect()
@@ -106,7 +113,13 @@ impl Sessions {
 }
 
 fn error(status: StatusCode, message: &str) -> Response {
-    (status, Json(ApiError { error: message.into() })).into_response()
+    (
+        status,
+        Json(ApiError {
+            error: message.into(),
+        }),
+    )
+        .into_response()
 }
 
 async fn catalog(State(sessions): State<Sessions>) -> Json<Vec<OsEntry>> {
@@ -115,7 +128,10 @@ async fn catalog(State(sessions): State<Sessions>) -> Json<Vec<OsEntry>> {
 
 async fn start(State(sessions): State<Sessions>, Json(request): Json<StartSession>) -> Response {
     if !sessions.upstreams.contains_key(&request.os) {
-        return error(StatusCode::SERVICE_UNAVAILABLE, &format!("No {} session runs on this host yet.", request.os.name()));
+        return error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            &format!("No {} session runs on this host yet.", request.os.name()),
+        );
     }
     let id = random_hex(8);
     let token = random_hex(24);
@@ -123,7 +139,13 @@ async fn start(State(sessions): State<Sessions>, Json(request): Json<StartSessio
         .live
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
-        .insert(id.clone(), Session { os: request.os, token: token.clone() });
+        .insert(
+            id.clone(),
+            Session {
+                os: request.os,
+                token: token.clone(),
+            },
+        );
     let info = SessionInfo {
         stream: format!("/api/sessions/{id}/stream"),
         id,
@@ -135,7 +157,12 @@ async fn start(State(sessions): State<Sessions>, Json(request): Json<StartSessio
 }
 
 async fn stop(State(sessions): State<Sessions>, Path(id): Path<String>) -> StatusCode {
-    match sessions.live.lock().unwrap_or_else(std::sync::PoisonError::into_inner).remove(&id) {
+    match sessions
+        .live
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .remove(&id)
+    {
         Some(_) => StatusCode::NO_CONTENT,
         None => StatusCode::NOT_FOUND,
     }
@@ -156,18 +183,33 @@ async fn stream(
         .find_map(|p| p.strip_prefix("bearer."))
         .map(str::to_owned);
     let upstream = {
-        let live = sessions.live.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let live = sessions
+            .live
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         match (live.get(&id), offered.as_deref()) {
-            (Some(session), Some(token)) if session.token == token => sessions.upstreams.get(&session.os).cloned(),
-            (Some(_), _) => return error(StatusCode::UNAUTHORIZED, "This session token was not accepted."),
+            (Some(session), Some(token)) if session.token == token => {
+                sessions.upstreams.get(&session.os).cloned()
+            }
+            (Some(_), _) => {
+                return error(
+                    StatusCode::UNAUTHORIZED,
+                    "This session token was not accepted.",
+                );
+            }
             (None, _) => return error(StatusCode::NOT_FOUND, "No such session."),
         }
     };
     let Some(upstream) = upstream else {
-        return error(StatusCode::SERVICE_UNAVAILABLE, "The session is no longer available.");
+        return error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "The session is no longer available.",
+        );
     };
     let protocol = format!("bearer.{}", offered.unwrap_or_default());
-    upgrade.protocols([protocol]).on_upgrade(move |socket| bridge(socket, upstream))
+    upgrade
+        .protocols([protocol])
+        .on_upgrade(move |socket| bridge(socket, upstream))
 }
 
 /// Remote-desktop wire messages for one protocol input; `buttons` keeps the last DOM button mask.
@@ -198,7 +240,11 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
     use tokio_tungstenite::tungstenite::client::IntoClientRequest;
     let url = match (&upstream.token, upstream.native) {
         (Some(token), false) => {
-            format!("{}{}token={token}", upstream.url, if upstream.url.contains('?') { '&' } else { '?' })
+            format!(
+                "{}{}token={token}",
+                upstream.url,
+                if upstream.url.contains('?') { '&' } else { '?' }
+            )
         }
         _ => upstream.url.clone(),
     };
@@ -206,8 +252,14 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
     let mut request = match url.as_str().into_client_request() {
         Ok(request) => request,
         Err(e) => {
-            let event = ServerEvent::Error { message: format!("bad desktop stream address: {e}") };
-            let _ = client_tx.send(WsMessage::Text(serde_json::to_string(&event).unwrap_or_default().into())).await;
+            let event = ServerEvent::Error {
+                message: format!("bad desktop stream address: {e}"),
+            };
+            let _ = client_tx
+                .send(WsMessage::Text(
+                    serde_json::to_string(&event).unwrap_or_default().into(),
+                ))
+                .await;
             return;
         }
     };
@@ -220,14 +272,26 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
     let remote = match tokio_tungstenite::connect_async(request).await {
         Ok((remote, _)) => remote,
         Err(e) => {
-            let event = ServerEvent::Error { message: format!("the desktop stream is unreachable: {e}") };
-            let _ = client_tx.send(WsMessage::Text(serde_json::to_string(&event).unwrap_or_default().into())).await;
+            let event = ServerEvent::Error {
+                message: format!("the desktop stream is unreachable: {e}"),
+            };
+            let _ = client_tx
+                .send(WsMessage::Text(
+                    serde_json::to_string(&event).unwrap_or_default().into(),
+                ))
+                .await;
             return;
         }
     };
     if !native {
-        let state = ServerEvent::State { state: SessionState::Running };
-        let _ = client_tx.send(WsMessage::Text(serde_json::to_string(&state).unwrap_or_default().into())).await;
+        let state = ServerEvent::State {
+            state: SessionState::Running,
+        };
+        let _ = client_tx
+            .send(WsMessage::Text(
+                serde_json::to_string(&state).unwrap_or_default().into(),
+            ))
+            .await;
     }
     let (mut remote_tx, mut remote_rx) = remote.split();
     let down = async {
@@ -254,14 +318,24 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
                 continue;
             };
             if native {
-                if remote_tx.send(UpMessage::Text(text.as_str().into())).await.is_err() {
+                if remote_tx
+                    .send(UpMessage::Text(text.as_str().into()))
+                    .await
+                    .is_err()
+                {
                     return;
                 }
                 continue;
             }
-            let Ok(input) = serde_json::from_str::<Input>(&text) else { continue };
+            let Ok(input) = serde_json::from_str::<Input>(&text) else {
+                continue;
+            };
             for wire in translate(input, &mut buttons) {
-                if remote_tx.send(UpMessage::Text(wire.to_string().into())).await.is_err() {
+                if remote_tx
+                    .send(UpMessage::Text(wire.to_string().into()))
+                    .await
+                    .is_err()
+                {
                     return;
                 }
             }

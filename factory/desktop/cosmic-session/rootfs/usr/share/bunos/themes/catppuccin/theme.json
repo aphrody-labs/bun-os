@@ -2,10 +2,5 @@
   "name": "catppuccin",
   "mode": "dark",
   "icons": "Yaru-purple",
-  "backgrounds": [
-    "1-totoro.webp",
-    "2-waves.webp",
-    "3-blue-eye.webp",
-    "omarchy.webp"
-  ]
+  "backgrounds": ["1-totoro.webp", "2-waves.webp", "3-blue-eye.webp", "omarchy.webp"]
 }

@@ -133,13 +133,21 @@ async function main() {
       await mkdir(out, { recursive: true });
       const shipped = join(dir, "cosmic.ron");
       if (existsSync(shipped)) await copyFile(shipped, join(out, "cosmic.ron"));
-      else if (!existsSync(join(out, "cosmic.ron")) || !(await readFile(join(out, "cosmic.ron"), "utf8")).includes("Aphrody"))
+      else if (
+        !existsSync(join(out, "cosmic.ron")) ||
+        !(await readFile(join(out, "cosmic.ron"), "utf8")).includes("Aphrody")
+      )
         await writeFile(join(out, "cosmic.ron"), cosmicRon(name, colors));
       await writeFile(join(out, "rio.toml"), rioTheme(name, colors));
-      const icons = iconTheme(existsSync(join(dir, "icons.theme")) ? await readFile(join(dir, "icons.theme"), "utf8") : undefined);
+      const icons = iconTheme(
+        existsSync(join(dir, "icons.theme")) ? await readFile(join(dir, "icons.theme"), "utf8") : undefined,
+      );
       const bgDir = join(dir, "backgrounds");
       const backgrounds = existsSync(bgDir)
-        ? (await readdir(bgDir, { withFileTypes: true })).filter(e => e.isFile()).map(e => e.name).sort()
+        ? (await readdir(bgDir, { withFileTypes: true }))
+            .filter(e => e.isFile())
+            .map(e => e.name)
+            .sort()
         : [];
       if (values.backgrounds && backgrounds.length) {
         await mkdir(join(out, "backgrounds"), { recursive: true });

@@ -65,7 +65,10 @@ async fn main() -> Result<()> {
                 max_fps,
                 bit_rate,
             };
-            eprintln!("aphrody-remote-desktop android {}: http://{}/api/android/", o.serial, o.bind);
+            eprintln!(
+                "aphrody-remote-desktop android {}: http://{}/api/android/",
+                o.serial, o.bind
+            );
             return aphrody_remote_desktop::android::serve_android(o).await;
         }
         #[cfg(not(feature = "android"))]

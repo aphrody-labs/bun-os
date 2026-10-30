@@ -2,10 +2,5 @@
   "name": "starship",
   "mode": "dark",
   "icons": "Cosmic",
-  "backgrounds": [
-    "1-starbase.webp",
-    "2-flight14-dawn.webp",
-    "3-engine-cluster.webp",
-    "4-morning-pad.webp"
-  ]
+  "backgrounds": ["1-starbase.webp", "2-flight14-dawn.webp", "3-engine-cluster.webp", "4-morning-pad.webp"]
 }
