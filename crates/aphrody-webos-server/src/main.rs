@@ -94,8 +94,9 @@ async fn caching(request: Request, next: Next) -> Response {
         .and_then(|file| file.split('.').next())
         .and_then(|stem| stem.rsplit('-').next())
         .is_some_and(|tail| tail.len() >= 12 && tail.bytes().all(|b| b.is_ascii_hexdigit()));
+    let success = response.status().is_success();
     let headers = response.headers_mut();
-    if hashed && response.status().is_success() {
+    if hashed && success {
         headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("public, max-age=31536000, immutable"));
     } else if !headers.contains_key(header::CACHE_CONTROL) {
         headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
