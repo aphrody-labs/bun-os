@@ -1,7 +1,7 @@
 {
   "$comment": "Sparse-checkout (cone mode) profiles for `aphrody-bun git profile <name>`. paths are directories (cone mode accepts directories only; top-level files are always checked out). submodules are gitlink paths initialised shallow (--depth 1) after the cone is set; entries ending in /* match every gitlink below that directory. optionalSubmodules get `update = none` in .gitmodules and are only fetched by a profile that lists them.",
   "schemaVersion": 1,
-  "alwaysPaths": [".cargo", ".github", ".claude", ".gitea", "factory", "scripts", "src"],
+  "alwaysPaths": [".cargo", ".github", ".claude", "factory", "scripts", "src"],
   "optionalSubmodules": [
     "packages/re/third_party/unblob",
     "vendor/cachyos-linux",

@@ -342,21 +342,6 @@
       "note": "Bun 1.4.4 SSH-only browser bridge on Omar PC; upstream Obscura Bearer auth retained."
     },
     {
-      "id": "aphrody-forge",
-      "application": "aphrody",
-      "kind": "docker",
-      "runtime": "go",
-      "host": "vps",
-      "port": 29020,
-      "health": "http://127.0.0.1:29020/api/healthz",
-      "container": "aphrody-gitea",
-      "public": true,
-      "publicProxy": "nginx",
-      "additionalUpstreams": ["127.0.0.1:29022"],
-      "capabilities": ["git-forge"],
-      "note": "Gitea28.1.0; private installation, signup disabled, protected admin credential. GitHub histories/origins remain unchanged."
-    },
-    {
       "id": "aphrody-deploy",
       "application": "aphrody",
       "kind": "docker",
@@ -369,17 +354,6 @@
       "publicProxy": "nginx",
       "capabilities": ["deploy-control"],
       "note": "Komodo2.3.3; authenticated Core, private Mongo and PKI Periphery. Canonical Infra catalogs remain the desired-state owner."
-    },
-    {
-      "id": "aphrody-ci-runner",
-      "application": "aphrody",
-      "kind": "docker",
-      "runtime": "go",
-      "host": "vps",
-      "container": "aphrody-gitea-runner",
-      "public": false,
-      "capabilities": ["ci-runner"],
-      "note": "GiteaRunner5.0.0; one trusted Bun/Rust job, builtin checkout, no Node actions. Native Linux Bun fork revision differs from Windows."
     },
     {
       "id": "aphrody-bun-os-server",

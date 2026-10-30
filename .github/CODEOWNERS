@@ -4,7 +4,6 @@
 * @aphrody-dev
 /.cargo/                                         @aphrody-dev
 /.claude/                                        @aphrody-dev
-/.gitea/                                         @aphrody-dev
 /.github/                                        @aphrody-dev
 /apps/                                           @aphrody-dev
 /assets/                                         @aphrody-dev

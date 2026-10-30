@@ -184,14 +184,6 @@
       "keep": false,
       "passthrough": true
     },
-    "git.aphrody.app": {
-      "kind": "service",
-      "keep": true
-    },
-    "source.aphrody.app": {
-      "kind": "service",
-      "keep": true
-    },
     "deploy.aphrody.app": {
       "kind": "service",
       "keep": true

@@ -94,20 +94,6 @@
       "vhost": "nginx/aphrody/cdn.aphrody.com.conf"
     },
     {
-      "host": "git.aphrody.app",
-      "service": "aphrody-forge",
-      "upstream": "127.0.0.1:29020",
-      "probePath": "/user/login",
-      "vhost": "nginx/aphrody/control.aphrody.app.conf"
-    },
-    {
-      "host": "source.aphrody.app",
-      "service": "aphrody-forge",
-      "upstream": "127.0.0.1:29020",
-      "probePath": "/user/login",
-      "vhost": "nginx/aphrody/control.aphrody.app.conf"
-    },
-    {
       "host": "deploy.aphrody.app",
       "service": "aphrody-deploy",
       "upstream": "127.0.0.1:29021",
@@ -147,7 +133,7 @@
       "via": "nginx",
       "publicHost": "source.aphrody.app",
       "paths": ["/api/product/healthz", "/api/product/v1/"],
-      "note": "Authenticated product namespace on the existing forge TLS vhost. Gitea keeps its primary public route and /api/v1/."
+      "note": "Authenticated product namespace on the source.aphrody.app TLS vhost."
     }
   ],
   "policy": "one-nginx-instance-one-route-per-public-service"
