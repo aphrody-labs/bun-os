@@ -16,9 +16,13 @@ function args(...rest: string[]) {
   return ["--data-dir", dataDir, ...(instance ? ["--instance", instance] : []), ...rest];
 }
 function run(rest: string[], inherit = true) {
-  if (!existsSync(binary)) throw new Error(`sd-cli is not built (${binary}); build it on the VPS with the serialized cargo wrapper`);
+  if (!existsSync(binary))
+    throw new Error(`sd-cli is not built (${binary}); build it on the VPS with the serialized cargo wrapper`);
   mkdirSync(dataDir, { recursive: true, mode: 0o700 });
-  return Bun.spawnSync([binary, ...args(...rest)], { stdout: inherit ? "inherit" : "pipe", stderr: inherit ? "inherit" : "pipe" });
+  return Bun.spawnSync([binary, ...args(...rest)], {
+    stdout: inherit ? "inherit" : "pipe",
+    stderr: inherit ? "inherit" : "pipe",
+  });
 }
 
 const [command = "probe"] = Bun.argv.slice(2);

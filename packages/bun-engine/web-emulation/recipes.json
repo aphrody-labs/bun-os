@@ -12,10 +12,24 @@
       "id": "melonds",
       "kind": "qt-emscripten",
       "image": "bun-os/qt-wasm:6.12.0-emsdk5.0.5",
-      "prepare": ["docker", "build", "-f", "packages/bun-engine/web-emulation/qt/Containerfile", "-t", "bun-os/qt-wasm:6.12.0-emsdk5.0.5", "packages/bun-engine/web-emulation/qt"],
+      "prepare": [
+        "docker",
+        "build",
+        "-f",
+        "packages/bun-engine/web-emulation/qt/Containerfile",
+        "-t",
+        "bun-os/qt-wasm:6.12.0-emsdk5.0.5",
+        "packages/bun-engine/web-emulation/qt"
+      ],
       "build": ["qt", "melonds"],
       "smoke": true
     },
-    { "id": "azahar", "kind": "qt-emscripten", "build": ["qt", "azahar"], "smoke": false, "note": "attempt; blockers are recorded in report.json" }
+    {
+      "id": "azahar",
+      "kind": "qt-emscripten",
+      "build": ["qt", "azahar"],
+      "smoke": false,
+      "note": "attempt; blockers are recorded in report.json"
+    }
   ]
 }

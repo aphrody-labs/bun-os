@@ -14,7 +14,10 @@ const argv = Bun.argv.slice(2);
 if (process.platform !== "linux") throw new Error("Run the emulator WebAssembly builds on the VPS (Linux)");
 
 if (argv.includes("--tmux")) {
-  const rest = argv.filter(a => a !== "--tmux").map(a => `'${a}'`).join(" ");
+  const rest = argv
+    .filter(a => a !== "--tmux")
+    .map(a => `'${a}'`)
+    .join(" ");
   const log = join(root, "build/web-emulation/build-all.log");
   const cmd = `mkdir -p '${join(root, "build/web-emulation")}' && cd '${root}' && '${process.execPath}' '${join(here, "build-all.ts")}' ${rest} 2>&1 | tee '${log}'`;
   const result = Bun.spawnSync(["tmux", "new-session", "-d", "-s", "web-emulation", cmd]);

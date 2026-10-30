@@ -36,7 +36,9 @@ if (!verifyOnly) {
   // The root activator (aphrody-webos-deploy.timer) consumes the handoff; wait for the live commit to match.
   const deadline = Date.now() + 10 * 60_000;
   for (;;) {
-    const live = (await fetch(`https://${origin}/api/health`).then(r => r.json()).catch(() => ({}))) as {
+    const live = (await fetch(`https://${origin}/api/health`)
+      .then(r => r.json())
+      .catch(() => ({}))) as {
       sourceCommit?: string;
     };
     if (live.sourceCommit === commit) break;
@@ -52,7 +54,9 @@ const hosts = [origin, ...Object.keys(routes.hosts)];
 await Promise.all(
   hosts.map(async host => {
     const entry = routes.hosts[host];
-    const res = await fetch(`https://${host}/`, { redirect: "manual", signal: AbortSignal.timeout(15_000) }).catch(() => undefined);
+    const res = await fetch(`https://${host}/`, { redirect: "manual", signal: AbortSignal.timeout(15_000) }).catch(
+      () => undefined,
+    );
     const ok = res !== undefined && res.status < 500;
     const note = entry && !entry.keep && res && ![301, 308].includes(res.status) ? " (expected a redirect)" : "";
     console.log(`${ok ? "ok  " : "FAIL"} ${host} ${res?.status ?? "no answer"}${note}`);
