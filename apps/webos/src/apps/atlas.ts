@@ -519,7 +519,7 @@ export async function atlasApp(
       h(
         "p",
         { class: "muted" },
-        "Machine-readable: /api/inventory, /api/apps, /api/packages, /api/crates, /api/docs/<page>, /api/factory, /api/engines, /api/sources.",
+        "Machine-readable: /api/inventory, /api/apps, /api/packages, /api/crates, /api/factory, /api/engines, /api/sources.",
       ),
     ),
   );

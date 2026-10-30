@@ -16,7 +16,6 @@ import { basename, dirname, extname, join, resolve } from "node:path";
 import { allAppCapabilities } from "@aphrody/bun-workspace/capabilities";
 import { APPS, ROUTES, type MemberKind } from "./src/config";
 import { KIND_IDS, KINDS, type Kind, type SurfaceType } from "./src/inventory-kinds";
-import { frontmatter, plain } from "./docs";
 import { FILE_DESCRIPTIONS, MEMBER_DESCRIPTIONS } from "./descriptions";
 
 const root = resolve(import.meta.dir, "../..");
@@ -87,6 +86,11 @@ const tracked = listing.map((l) => l.path);
 const gitlinks = new Set(listing.filter((l) => l.mode === "160000").map((l) => l.path));
 
 /** Direct children of a tracked directory: name, whether it is a directory, and every tracked file below. */
+/**
+ * WebOS serves real apps, not documentation, templates, showcases or examples: those entries are not members.
+ * Applies to every directory listing, so the generator and the coverage gate agree.
+ */
+export const EXCLUDED = /^(docs|examples?)$|(^|[-_])(examples?|showcases?|templates?)($|[-_])/;
 function children(dir: string) {
   const prefix = dir ? `${dir}/` : "";
   const out = new Map<string, { name: string; dir: boolean; files: string[] }>();
@@ -101,7 +105,7 @@ function children(dir: string) {
     out.set(name, entry);
   }
   return [...out.values()]
-    .filter((e) => !e.name.startsWith("."))
+    .filter((e) => !e.name.startsWith(".") && !EXCLUDED.test(e.name))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 const has = (path: string) => tracked.includes(path);
@@ -289,7 +293,7 @@ export async function catalogMembers() {
     };
   });
   for (const id of Object.keys(APPS.members))
-    if (!apps.some((entry) => entry.id === id))
+    if (!apps.some((entry) => entry.id === id) && !EXCLUDED.test(id))
       throw new Error(`apps.json declares ${id}, which is not a tracked apps/ member`);
   const packages: CatalogEntry[] = [];
   for (const child of children("packages")) {
@@ -446,37 +450,6 @@ async function crateMembers(out: Detail[], wasmModules: Map<string, string>) {
       ...(readme ? { readme } : {}),
       ...(!readme ? { files: child.files.slice(0, 200) } : {}),
     });
-  }
-}
-
-// ---------------------------------------------------------------------------------------------------------
-// docs
-
-async function docMembers(out: Detail[]) {
-  const pages: { id: string; path: string }[] = [];
-  for (const file of tracked) {
-    if (!/\.(md|mdx)$/i.test(file)) continue;
-    if (file.startsWith("docs/")) pages.push({ id: file.slice(5).replace(/\.(mdx|md)$/i, ""), path: file });
-    else if (!file.includes("/")) pages.push({ id: `root/${file.replace(/\.(mdx|md)$/i, "")}`, path: file });
-  }
-  for (const page of pages) {
-    const raw = await readText(page.path, 400_000);
-    if (raw === undefined) continue;
-    const { meta, body } = frontmatter(raw);
-    const text = plain(body).slice(0, MAX_DOC);
-    const title = meta.title || /^#\s+(.+)$/m.exec(text)?.[1] || basename(page.id);
-    out.push({
-      kind: "docs",
-      id: page.id,
-      name: title.slice(0, 160),
-      desc: meta.description || firstParagraph(text) || `${title}: ${page.id.includes("/") ? page.id.split("/")[0] : "overview"} documentation (${page.path}).`,
-      path: page.path,
-      run: "doc",
-      tags: [page.id.includes("/") ? page.id.split("/")[0]! : "overview"],
-      links: [sourceLink(page.path)],
-      surface: surface("docs", page.id, "viewer", "Rendered Markdown in the Docs viewer and the Atlas."),
-      readme: `# ${title}\n\n${text}`,
-    } as unknown as Detail);
   }
 }
 
@@ -810,7 +783,6 @@ function collectionMembers(out: Detail[]) {
         ...out.filter((m) => m.path && androidOwners.includes(m.path)).map((m) => `${m.kind}/${m.id}`),
         ...byKind("packages", (m) => /waydroid|android/.test(m.id)),
         ...byKind("factory", (m) => /aosp|google/.test(m.id)),
-        ...byKind("docs", (m) => /android|aosp/i.test(m.id)),
       ],
     },
     {
@@ -820,7 +792,6 @@ function collectionMembers(out: Detail[]) {
       members: [
         ...byKind("packages", (m) => /(^|-)m3(-|$)|^libm3|material|eslint-plugin-m3|^themes$/.test(m.id)),
         ...byKind("apps", (m) => /m3/.test(m.id)),
-        ...byKind("docs", (m) => /^material\/|m3|CRAFT-M3|THEMES|themes\//i.test(m.id)),
         ...byKind("workspace", (m) => m.id === "design-system"),
       ],
     },
@@ -832,7 +803,6 @@ function collectionMembers(out: Detail[]) {
         ...byKind("engines", () => true),
         ...byKind("games", () => true),
         ...byKind("packages", (m) => /^bun-(engine|emu-host|gamestream|loaders|steam)$/.test(m.id)),
-        ...byKind("docs", (m) => /^bun-engine\/|EMULATION/i.test(m.id)),
       ],
     },
     {
@@ -995,7 +965,6 @@ export async function buildInventory(options: BuildOptions = {}): Promise<Invent
   await appMembers(members, apps);
   await packageMembers(members);
   await crateMembers(members, options.wasmModules ?? new Map());
-  await docMembers(members);
   await directoryKind(members, "factory", [{ dir: "factory", tags: ["factory"] }]);
   await compositionMembers(members);
   await osPackageMembers(members);

@@ -105,7 +105,7 @@ checks all three behaviours in a real Chrome.
 
 ## Inventory and coverage gate
 
-`inventory.ts` enumerates every member of the repository (apps, packages, crates, docs pages, factory images,
+`inventory.ts` enumerates every member of the repository (apps, packages, crates, factory images,
 compositions and pacman catalogs, engines and consoles, games, tools, infra, releases, pinned sources, root
 entries and collections such as Android, Material 3 and the Server/COSMIC/Gaming compositions). `build.ts`
 writes it into `dist/api/` and the shared handler serves it:
@@ -113,7 +113,7 @@ writes it into `dist/api/` and the shared handler serves it:
 - `/api/inventory` (index and counts), `/api/inventory/<kind>` and `/api/inventory/<kind>/<id>`
 - aliases `/api/apps`, `/api/packages`, `/api/crates`, `/api/factory`, `/api/ospackages`, `/api/engines`,
   `/api/games`, `/api/tools`, `/api/infra`, `/api/releases`, `/api/sources`, `/api/workspace`,
-  `/api/collections`; `/api/docs/<page>` for one docs page (`/api/docs` keeps the Workspace contract)
+  `/api/collections`
 - `/api/health` reports the source commit and the inventory counts; `/api/search` indexes every member
 
 The Atlas window (`src/apps/atlas.ts`, `/inventory/<kind>/<id>`) renders each member, and the launcher finds

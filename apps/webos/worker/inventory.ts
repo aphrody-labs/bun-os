@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // /api/inventory[/<kind>[/<id>]] and the kind aliases (/api/apps, /api/packages, /api/crates, ...): the machine-readable
 // inventory of every Bun OS member, built by apps/webos/inventory.ts into dist/api/inventory*. Read-only, same
-// answer on every host. /api/docs keeps the Workspace documentation contract; /api/docs/<page> serves one docs member.
+// answer on every host. Documentation, templates, showcases and examples are not served.
 import { KIND_IDS, KINDS } from "../src/inventory-kinds";
 import type { PathMeta } from "../paths";
 
@@ -9,7 +9,7 @@ interface Assets {
   fetch(request: Request): Promise<Response>;
 }
 
-const ALIASES = new Set<string>(KIND_IDS.filter((kind) => kind !== "docs"));
+const ALIASES = new Set<string>(KIND_IDS);
 
 /** Asset path of an API path, or undefined when the path is not an inventory route. */
 function assetFor(pathname: string): string | undefined {
@@ -18,7 +18,6 @@ function assetFor(pathname: string): string | undefined {
   let rest: string[];
   if (parts[1] === "inventory") rest = parts.slice(2);
   else if (ALIASES.has(parts[1]!)) rest = parts.slice(1);
-  else if (parts[1] === "docs" && parts.length > 2) rest = ["docs", ...parts.slice(2)];
   else return undefined;
   if (rest.some((part) => part === "." || part === ".." || /[\\0]/.test(part))) return "";
   if (!rest.length) return "/api/inventory.json";

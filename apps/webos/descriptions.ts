@@ -141,6 +141,7 @@ export const MEMBER_DESCRIPTIONS: Record<string, string> = {
   "infra/host/tmux": "tmux configuration of the production hosts.",
   "infra/host/toolchain.json": "Toolchain versions installed on the production hosts.",
   "infra/host/user": "Per-user SSH client configuration for the WireGuard links to the VPS and the Dragon Ball French wiki host.",
+  "tools/scripts/cargo-serial.ps1": "PowerShell wrapper that serializes cargo runs on Windows through the shared build lock.",
   "infra/host/wireguard": "WireGuard tunnel configuration between the hosts.",
   "releases/manifest/generation-linux-x64.json": "Release manifest of the generation app for Linux x64: source and runtime revisions, size and SHA-256.",
   "releases/manifest/video-linux-x64.json": "Release manifest of the video app for Linux x64: source and runtime revisions, size and SHA-256.",

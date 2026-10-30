@@ -5,7 +5,6 @@ export const KINDS = {
   apps: { label: "Apps", desc: "Every apps/ member: browser apps run in a window, the others get downloads, status and source." },
   packages: { label: "Packages", desc: "Every packages/ member with README, version and npm link." },
   crates: { label: "Crates", desc: "Every crates/ member with README, version, crates.io link and WebAssembly capability." },
-  docs: { label: "Documentation", desc: "Every Markdown page of docs/ and the root goal documents." },
   factory: { label: "Factory", desc: "Images, compositions (Server, COSMIC, Gaming), pacman catalogs and build catalogs." },
   ospackages: { label: "OS packages", desc: "Pacman packages and recipes of the Omarchy, CachyOS and ChimeraOS catalogs." },
   engines: { label: "Engines", desc: "Bun Engine cores, consoles and emulators." },
