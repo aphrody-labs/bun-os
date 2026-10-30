@@ -7,7 +7,7 @@ import { readdirSync, statSync } from "node:fs";
 import { timingSafeEqual } from "node:crypto";
 
 const RUNTIME = Bun.env.WAYLAND_XDG_RUNTIME_DIR ?? "/run/user/1000/ah";
-const VNC_PORT = Number(Bun.env.WAYLAND_VNC_PORT ?? 5901);
+const VNC_PORT = Number(Bun.env.WAYLAND_VNC_PORT ?? 5951);
 const OUTPUT = Bun.env.WAYLAND_OUTPUT ?? "HEADLESS-1";
 const TOKEN = Bun.env.WAYLAND_TOKEN ?? "";
 const MAX_STREAMS = 6;
@@ -193,10 +193,11 @@ let streams = 0;
 function frames(geometry: string | null, fps: number, onFrame: (jpeg: Uint8Array) => void) {
   const argv = [
     "wf-recorder", "-o", OUTPUT, "-c", "mjpeg", "-x", "yuvj420p", "-m", "mpjpeg",
-    "-r", String(fps), "-f", "/dev/stdout", ...(geometry ? ["-g", geometry] : []),
+    "-D", "-r", String(fps), "-f", "pipe:1", ...(geometry ? ["-g", geometry] : []),
   ];
   const p = Bun.spawn(argv, { env: sessionEnv(), stdout: "pipe", stderr: "ignore" });
   let buf = Buffer.alloc(0);
+  let last: number | bigint = 0;
   void (async () => {
     for await (const chunk of p.stdout) {
       buf = Buffer.concat([buf, chunk]);
@@ -210,7 +211,10 @@ function frames(geometry: string | null, fps: number, onFrame: (jpeg: Uint8Array
         if (eol < 0) break;
         const len = Number(buf.subarray(m + 16, buf.indexOf("\r\n", m)).toString());
         if (buf.length < eol + 4 + len) break;
-        onFrame(new Uint8Array(buf.subarray(eol + 4, eol + 4 + len)));
+        const jpeg = new Uint8Array(buf.subarray(eol + 4, eol + 4 + len));
+        const h = Bun.hash(jpeg);
+        if (h !== last) onFrame(jpeg);
+        last = h;
         buf = buf.subarray(eol + 4 + len);
       }
     }
