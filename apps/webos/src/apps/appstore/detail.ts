@@ -112,6 +112,7 @@ export function viewDetail(s: Store): HTMLElement {
     .sort((x, y) => Number(y.source === a.source) - Number(x.source === a.source))
     .slice(0, 10);
   page.append(shelf(s, `More in ${cap(s.categoryLabel(a.category))}`, similar) ?? "");
-  page.append(stickyBar(s, a));
+  const bar = stickyBar(s, a);
+  if (bar) page.append(bar);
   return page;
 }
