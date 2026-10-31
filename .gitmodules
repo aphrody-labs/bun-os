@@ -1498,3 +1498,8 @@
 	url = https://github.com/aphrody-labs/redox.git
 	branch = bunos
 	shallow = true
+[submodule "vendor/bevy"]
+	path = vendor/bevy
+	url = https://github.com/aphrody-labs/bevy.git
+	shallow = true
+	update = none
