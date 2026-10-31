@@ -208,7 +208,7 @@
           "to": "bin/aphrody-remote-desktop",
           "checksum": "sibling-sha256"
         },
-        { "from": "/home/ubuntu/build/storage/artifacts/bunos-unified/waydroid-src", "to": "waydroid" },
+        { "from": "/home/ubuntu/src/bun-os/vendor/waydroid", "to": "waydroid" },
         { "from": "/home/ubuntu/native-apps/debs", "to": "debs", "optional": true },
         { "from": "/home/ubuntu/build/storage/artifacts/bunos-unified/bin", "to": "extra-bin", "optional": true }
       ]

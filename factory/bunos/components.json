@@ -3135,7 +3135,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/jco.git",
-        "pin": "1e218e9bf8366328c5a6ee891e944ac95804a025"
+        "pin": "4fefc446056b1ef79146bc5051f027831ca7602b"
       },
       "registration": ["bun-spawn"],
       "aot": true,

@@ -13,7 +13,7 @@ U=aphrody
 RUN_USER=/run/user/1000
 log() { printf '%s bunos-unified: %s\n' "$(date -u +%FT%TZ)" "$*"; }
 as_user() { setpriv --reuid=1000 --regid=1000 --init-groups --inh-caps=-all -- env -i HOME=/home/$U USER=$U LOGNAME=$U \
-  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin XDG_RUNTIME_DIR=$RUN_USER LANG=${LANG:-C.UTF-8} "$@"; }
+  PATH=/usr/local/bin:/usr/bin:/bin XDG_RUNTIME_DIR=$RUN_USER LANG=${LANG:-C.UTF-8} "$@"; }
 
 mkdir -p /run/bunos /run/dbus "$RUN_USER" /var/lib/waydroid /var/lib/misc /var/log
 chown 1000:1000 "$RUN_USER" && chmod 0700 "$RUN_USER"
@@ -23,29 +23,17 @@ chown 1000:1000 /home/$U
 # Private binderfs: Android's binder, hwbinder and vndbinder for this session only.
 mkdir -p /dev/binderfs
 mountpoint -q /dev/binderfs || mount -t binder binder /dev/binderfs || log "binderfs mount failed: Android disabled"
-# LXC configures the Android veth through /proc/sys/net. Docker mounts /proc/sys read-only; make only the net
-# subtree writable (net.* sysctls are per network namespace, so this cannot touch the host's settings).
-if ! touch /proc/sys/net/ipv4/ip_forward 2>/dev/null; then
-  mount --bind /proc/sys/net /proc/sys/net && mount -o remount,bind,rw /proc/sys/net || log "/proc/sys/net stays read-only"
-fi
-# Loop devices for the read-only Android images (loop-control is passed in; block major 7 allowed by the cgroup).
-if [ -e /dev/loop-control ]; then
-  for n in $(seq 0 63); do [ -e /dev/loop$n ] || mknod -m 0660 /dev/loop$n b 7 $n 2>/dev/null || true; done
-fi
 dbus-uuidgen --ensure
 dbus-daemon --system --fork
 
-# Waydroid: the images are bind-mounted read-only at /usr/share/bunos/waydroid/images by the session manager;
-# /etc/waydroid-extra/images points there (Waydroid's preinstalled-images path, never downloaded over).
-if [ -e /dev/binderfs/binder-control ] && [ -f /usr/share/bunos/waydroid/images/system.img ]; then
+# Waydroid: the images are bind-mounted read-only at /usr/share/bunos/waydroid/images by the session manager.
+if [ -e /dev/binderfs/binder ] && [ -f /usr/share/bunos/waydroid/images/system.img ]; then
   if [ ! -f /var/lib/waydroid/waydroid.cfg ]; then
-    waydroid init -f >/var/log/waydroid-init.log 2>&1 || log "waydroid init failed"
+    waydroid init -f -i /usr/share/bunos/waydroid/images >/var/log/waydroid-init.log 2>&1 || log "waydroid init failed"
     cat /usr/share/bunos/waydroid/waydroid_base.prop.d/*.prop >>/var/lib/waydroid/waydroid_base.prop 2>/dev/null || true
     waydroid upgrade -o >>/var/log/waydroid-init.log 2>&1 || true
   fi
-  waydroid container start >/var/log/waydroid-container.log 2>&1 &
-  # First-boot provisioning (desktop windowing, setup wizards off) once Android has booted.
-  (for _ in $(seq 180); do /usr/libexec/bunos/waydroid-android17 provision >>/var/log/waydroid-init.log 2>&1 && break; sleep 5; done) &
+  waydroid -w container start >/var/log/waydroid-container.log 2>&1 &
 else
   log "Android images or binder missing: Waydroid not started"
 fi
@@ -56,10 +44,9 @@ as_user sh -c '
   export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
   dbus-daemon --session --fork --address="$DBUS_SESSION_BUS_ADDRESS"
   (pipewire & sleep 1; wireplumber & pipewire-pulse &) >/dev/null 2>&1
-  WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1 WLR_HEADLESS_OUTPUTS=1 \
-    cage -d -- /usr/libexec/bunos/cosmic-container-session >"$XDG_RUNTIME_DIR/cosmic.log" 2>&1 &
+  /usr/libexec/bunos/start-cosmic-headless >"$XDG_RUNTIME_DIR/cosmic.log" 2>&1 &
 '
-i=0; while [ ! -S "$RUN_USER/wayland-0" ] && [ $i -lt 240 ]; do sleep 0.5; i=$((i + 1)); done
+i=0; while [ ! -S "$RUN_USER/wayland-0" ] && [ $i -lt 60 ]; do sleep 0.5; i=$((i + 1)); done
 [ -S "$RUN_USER/wayland-0" ] || { log "cage did not start"; cat "$RUN_USER/cosmic.log" >&2; exit 1; }
 as_user env WAYLAND_DISPLAY=wayland-0 wlr-randr --output HEADLESS-1 --custom-mode "$SIZE" || true
 

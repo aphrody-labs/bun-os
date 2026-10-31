@@ -346,7 +346,7 @@ export const FLUTTER_ROLES: readonly (readonly [string, string])[] = [
 export function generateFlutter(input: ThemeInput, tokens = staticTokens()): string {
   const [light, dark] = allModes(input);
   const scheme = (mode: Mode, roles: Roles) =>
-    `ColorScheme(\n  brightness: Brightness.${mode},\n${FLUTTER_ROLES.map(([dart, r]) => `  ${dart}: Color(${argbHex(role(roles, r))}),`).join("\n")}\n)`;
+    `const ColorScheme(\n  brightness: Brightness.${mode},\n${FLUTTER_ROLES.map(([dart, r]) => `  ${dart}: Color(${argbHex(role(roles, r))}),`).join("\n")}\n)`;
   const dartStyle = (s: TypeStyle) => {
     const t = tokens.type[s];
     const height = Math.round((t.lineHeight / t.size) * 10000) / 10000;

@@ -58,22 +58,31 @@ fn random_hex(bytes: usize) -> String {
 
 impl Sessions {
     pub fn from_env() -> Sessions {
-        let upstream = std::env::var("WEBOS_SESSION").ok().filter(|u| !u.is_empty()).map(|url| Upstream {
-            url,
-            token: std::env::var("WEBOS_SESSION_TOKEN_FILE")
-                .ok()
-                .and_then(|path| std::fs::read_to_string(path).ok())
-                .map(|t| t.trim().to_owned())
-                .filter(|t| !t.is_empty()),
-            native: std::env::var("WEBOS_SESSION_MODE").is_ok_and(|m| m == "native"),
-        });
-        Sessions { upstream, live: Arc::new(Mutex::new(HashMap::new())) }
+        let upstream = std::env::var("WEBOS_SESSION")
+            .ok()
+            .filter(|u| !u.is_empty())
+            .map(|url| Upstream {
+                url,
+                token: std::env::var("WEBOS_SESSION_TOKEN_FILE")
+                    .ok()
+                    .and_then(|path| std::fs::read_to_string(path).ok())
+                    .map(|t| t.trim().to_owned())
+                    .filter(|t| !t.is_empty()),
+                native: std::env::var("WEBOS_SESSION_MODE").is_ok_and(|m| m == "native"),
+            });
+        Sessions {
+            upstream,
+            live: Arc::new(Mutex::new(HashMap::new())),
+        }
     }
 
     pub fn availability(&self) -> SessionAvailability {
         SessionAvailability {
             available: self.upstream.is_some(),
-            reason: self.upstream.is_none().then(|| "The Bun OS desktop is not running on this host yet.".into()),
+            reason: self
+                .upstream
+                .is_none()
+                .then(|| "The Bun OS desktop is not running on this host yet.".into()),
         }
     }
 
@@ -98,7 +107,10 @@ async fn availability(State(sessions): State<Sessions>) -> Json<SessionAvailabil
 
 async fn start(State(sessions): State<Sessions>, Json(_request): Json<StartSession>) -> Response {
     if sessions.upstream.is_none() {
-        return error(StatusCode::SERVICE_UNAVAILABLE, "The Bun OS desktop is not running on this host yet.");
+        return error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "The Bun OS desktop is not running on this host yet.",
+        );
     }
     let id = random_hex(8);
     let token = random_hex(24);

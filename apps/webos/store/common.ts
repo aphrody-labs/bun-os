@@ -57,7 +57,8 @@ export interface QualResult {
 }
 
 export function context(): Ctx {
-  const root = resolve(import.meta.dir, "../../..");
+  // WEBOS_STORE_REPO runs the store tools of one revision against another checkout (e.g. a busy shared one).
+  const root = resolve(Bun.env.WEBOS_STORE_REPO ?? resolve(import.meta.dir, "../../.."));
   const home = Bun.env.HOME ?? "/root";
   return {
     root,
@@ -111,10 +112,11 @@ export async function step(steps: QualStep[], name: string, fn: () => Promise<{ 
   return r.code === 0;
 }
 
-/** docker run helper for throw-away containers on the host network (no privileges unless asked). */
-export const docker = (image: string, script: string, opts: { privileged?: boolean; mounts?: string[]; user?: string; timeout?: number; env?: Record<string, string> } = {}) =>
+/** docker run helper for throw-away containers on the host network; `lock` serializes runs that write one repository (flock, six hours). */
+export const docker = (image: string, script: string, opts: { privileged?: boolean; mounts?: string[]; user?: string; timeout?: number; env?: Record<string, string>; lock?: string } = {}) =>
   run(
     [
+      ...(opts.lock ? ["flock", "-w", "21600", opts.lock] : []),
       "docker", "run", "--rm", "--network", "host",
       ...(opts.privileged ? ["--privileged"] : []),
       ...(opts.user ? ["--user", opts.user] : []),

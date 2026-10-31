@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use aphrody_webos_protocol::{
-    ApiError, GamepadState, Input, SessionAvailability, ServerEvent, SessionInfo, StartSession,
+    ApiError, GamepadState, Input, ServerEvent, SessionAvailability, SessionInfo, StartSession,
 };
 use cosmic::iced::Subscription;
 use cosmic::iced::futures::{SinkExt, StreamExt, channel::mpsc};

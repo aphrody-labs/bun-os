@@ -105,9 +105,10 @@ fn build_one(root: &Path, out: &Path, id: &str, krate: &str) -> Result<u64, Stri
         _ => remap,
     };
     let mut command = Command::new(root.join("scripts/aphrody/build/rust/cargo-serial.sh"));
+    // Like the webos lane release (release.sh), the build resolves against Cargo.lock without --locked, so a lockfile
+    // the regenerate job has not caught up with yet does not block the module builds.
     command.current_dir(root).args([
         "build",
-        "--locked",
         "-p",
         krate,
         "--target",

@@ -68,8 +68,7 @@ impl App {
             .align_x(Alignment::Center)
             .push(widget::text::body(text));
         if back {
-            column = column
-                .push(widget::button::standard("Reconnect").on_press(Message::Back));
+            column = column.push(widget::button::standard("Reconnect").on_press(Message::Back));
         }
         widget::container(column)
             .center_x(Length::Fill)
@@ -103,7 +102,9 @@ impl cosmic::Application for App {
             pointer: input::Pointer::default(),
         };
         #[cfg(target_arch = "wasm32")]
-        let task = Task::perform(web::availability(), |r| cosmic::Action::App(Message::Availability(r)));
+        let task = Task::perform(web::availability(), |r| {
+            cosmic::Action::App(Message::Availability(r))
+        });
         #[cfg(not(target_arch = "wasm32"))]
         let task = Task::none();
         (app, task)
@@ -111,10 +112,14 @@ impl cosmic::Application for App {
 
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
-            Message::Availability(Ok(availability)) if availability.available => return cosmic::Application::update(self, Message::Start),
+            Message::Availability(Ok(availability)) if availability.available => {
+                return cosmic::Application::update(self, Message::Start);
+            }
             Message::Availability(Ok(availability)) => {
                 self.screen = Screen::Failed(
-                    availability.reason.unwrap_or_else(|| "The Bun OS desktop is not available.".into()),
+                    availability
+                        .reason
+                        .unwrap_or_else(|| "The Bun OS desktop is not available.".into()),
                 );
             }
             Message::Availability(Err(error)) => {
@@ -191,7 +196,9 @@ impl cosmic::Application for App {
                 self.frame = None;
                 self.screen = Screen::Loading;
                 #[cfg(target_arch = "wasm32")]
-                return Task::perform(web::availability(), |r| cosmic::Action::App(Message::Availability(r)));
+                return Task::perform(web::availability(), |r| {
+                    cosmic::Action::App(Message::Availability(r))
+                });
             }
         }
         Task::none()
@@ -210,7 +217,9 @@ impl cosmic::Application for App {
     fn view(&self) -> Element<'_, Message> {
         match &self.screen {
             Screen::Loading => self.message_screen("Loading Bun OS...".into(), false),
-            Screen::Starting => self.message_screen("Starting your Bun OS desktop...".into(), false),
+            Screen::Starting => {
+                self.message_screen("Starting your Bun OS desktop...".into(), false)
+            }
             Screen::Failed(text) => self.message_screen(text.clone(), true),
             Screen::Streaming(_) => match &self.frame {
                 Some((handle, _, _)) => widget::container(
@@ -222,9 +231,7 @@ impl cosmic::Application for App {
                 .center_x(Length::Fill)
                 .center_y(Length::Fill)
                 .into(),
-                None => {
-                    self.message_screen("Connecting to your Bun OS desktop...".into(), false)
-                }
+                None => self.message_screen("Connecting to your Bun OS desktop...".into(), false),
             },
         }
     }

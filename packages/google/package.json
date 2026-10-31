@@ -27,17 +27,7 @@
     "./drive-model-sync": "./src/drive-model-sync.ts",
     "./services": "./src/services.ts",
     "./edge-proxy": "./src/edge-proxy.ts",
-    "./fonts-proxy": "./src/fonts-proxy.ts",
-    "./bun-google": "./src/bun-google.ts",
-    "./bun-plugin": "./src/bun-plugin.ts",
-    "./cli": "./src/bun-google-cli.ts",
-    "./search": "./src/search.ts",
-    "./mirror": "./src/mirror.ts",
-    "./oauth": "./src/oauth.ts",
-    "./password-store": "./src/password-store.ts",
-    "./public-index": "./src/public-index.ts",
-    "./public-index-cli": "./src/public-index-cli.ts",
-    "./types": "./types/google.d.ts"
+    "./fonts-proxy": "./src/fonts-proxy.ts"
   },
   "publishConfig": {
     "access": "public"

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * Google services facade (Drive, Docs, Gemini) on upstream Bun `fetch`, ported from aphrody-labs/bun-google. The
- * fork builtin `bun:google` is served on upstream Bun by this package's Bun OS plugin (./bun-plugin). Bearer tokens come from `token()`: the Bun OS backend broker
+ * Google services facade (Drive, Docs, Gemini) on upstream Bun `fetch`, ported from aphrody-labs/bun-google, which
+ * depended on the abandoned fork builtin `bun:google`. Bearer tokens come from `token()`: the Bun OS backend broker
  * (`GET /api/google/token?account=owner|service`, crates/bun-os-google) or any Google Auth Library client.
  */
 
@@ -36,12 +36,7 @@ export interface ServiceOptions {
 }
 
 /** Token provider over the Bun OS backend broker (`/api/google/token`), cached until 60 s before expiry. */
-export function backendToken(options: {
-  base?: string;
-  adminToken: string;
-  account?: "owner" | "service";
-  scope?: string;
-}) {
+export function backendToken(options: { base?: string; adminToken: string; account?: "owner" | "service"; scope?: string }) {
   let cached: { token: string; until: number } | undefined;
   return async (): Promise<string> => {
     if (cached && cached.until > Date.now()) return cached.token;
@@ -121,20 +116,10 @@ export function createGoogleServices(options: ServiceOptions) {
   return {
     drive: {
       async listFiles(
-        params: {
-          q?: string;
-          fields?: string;
-          pageSize?: number;
-          pageToken?: string;
-          supportsAllDrives?: boolean;
-          includeItemsFromAllDrives?: boolean;
-        } = {},
+        params: { q?: string; fields?: string; pageSize?: number; pageToken?: string; supportsAllDrives?: boolean; includeItemsFromAllDrives?: boolean } = {},
         signal?: AbortSignal,
       ): Promise<DrivePage> {
-        if (
-          params.pageSize !== undefined &&
-          (!Number.isInteger(params.pageSize) || params.pageSize < 1 || params.pageSize > 1000)
-        )
+        if (params.pageSize !== undefined && (!Number.isInteger(params.pageSize) || params.pageSize < 1 || params.pageSize > 1000))
           throw new RangeError("Drive pageSize must be an integer from 1 through 1000");
         return drivePage(await drive.request(`files${query(params)}`, { signal }));
       },
@@ -150,8 +135,7 @@ export function createGoogleServices(options: ServiceOptions) {
         opts: { maxPages?: number; signal?: AbortSignal } = {},
       ): AsyncGenerator<DriveFile> {
         const maxPages = opts.maxPages ?? 100;
-        if (!Number.isSafeInteger(maxPages) || maxPages < 1)
-          throw new RangeError("Drive maxPages must be a positive integer");
+        if (!Number.isSafeInteger(maxPages) || maxPages < 1) throw new RangeError("Drive maxPages must be a positive integer");
         if (params.fields && !params.fields.includes("nextPageToken"))
           throw new TypeError("Drive pagination fields must include nextPageToken");
         const seen = new Set<string>();
@@ -169,17 +153,9 @@ export function createGoogleServices(options: ServiceOptions) {
     },
     docs: {
       async get(documentId: string, signal?: AbortSignal): Promise<GoogleDocument> {
-        return record(
-          await (await docs.request(`documents/${id(documentId)}`, { signal })).json(),
-          "Docs document",
-        ) as GoogleDocument;
+        return record(await (await docs.request(`documents/${id(documentId)}`, { signal })).json(), "Docs document") as GoogleDocument;
       },
-      async batchUpdate(
-        documentId: string,
-        requests: readonly Record<string, unknown>[],
-        requiredRevisionId: string,
-        signal?: AbortSignal,
-      ): Promise<unknown> {
+      async batchUpdate(documentId: string, requests: readonly Record<string, unknown>[], requiredRevisionId: string, signal?: AbortSignal): Promise<unknown> {
         if (!requiredRevisionId?.trim()) throw new TypeError("Docs batchUpdate requires the reviewed revision ID");
         const res = await docs.request(`documents/${id(documentId)}:batchUpdate`, {
           method: "POST",
