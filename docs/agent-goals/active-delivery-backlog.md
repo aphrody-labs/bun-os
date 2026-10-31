@@ -1,3 +1,5 @@
+> **Product status lives in [`docs/PRODUCT.md`](../PRODUCT.md)** (owner order 2026-10-31: one product, the unified Bun OS image). This file is background only; where it disagrees with PRODUCT.md, PRODUCT.md wins.
+
 # Active owner delivery backlog
 
 Status: active, updated 2026-10-20. This ledger supplements the canonical

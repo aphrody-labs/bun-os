@@ -1,3 +1,5 @@
+> **Product status lives in [`docs/PRODUCT.md`](PRODUCT.md)** (owner order 2026-10-31: one product, the unified Bun OS image). This file is background only; where it disagrees with PRODUCT.md, PRODUCT.md wins.
+
 # Bun OS unified image
 
 Owner order (2026-10-30): one Google-style OS made of Android, ChromiumOS, COSMIC and Bun OS, in one image with one UI, and no OS emulators. This page describes how that image is built.
@@ -54,7 +56,19 @@ This contract is shared with the session and gateway agent and with `docs/webos/
   - AppArmor and seccomp unconfined; private cgroupns; no-new-privileges; pids limit of at least 4096.
   - Read-only rootfs, with tmpfs at `/run`, `/tmp`, `/var/lib/waydroid`, `/var/lib/misc` and `/var/log`.
   - `/dev/shm` of 1 GiB; no host network.
-  - Waydroid images mounted read-only at `/usr/share/bunos/waydroid/images`.
+  - Waydroid images mounted read-only at `/usr/share/bunos/waydroid/images` (`/etc/waydroid-extra/images` points there, so Waydroid never downloads over them).
+  - Devices: `/dev/dri/renderD128` (vgem, for minigbm gralloc), `/dev/loop-control` with the device-cgroup rule `b 7:* rwm`, and `c <binder major>:* rwm` (the major is dynamic: read it from `/proc/devices`).
+  - Sysctl `net.ipv4.ip_forward=1`. The entrypoint makes only `/proc/sys/net` (per network namespace) and the container's own cgroup subtree writable.
+  - Reference run: `factory/images/bunos-unified/qualify.sh session`.
+
+## Gemini slots
+
+Gemini is the default assistant and the centre of the image. These slots are reserved for agent a51eaa3f99faff2dc:
+
+- `/usr/share/bunos/android/apks/*.apk`: preinstalled in the Android 17 first boot (Gemini APK).
+- `extra-bin`: the forked gemini-cli and the native Aphrody Gemini client; a deb in `~/native-apps/debs` also works.
+- `.desktop` web apps for gemini.google.com (`com.aphrody.webapp.Gemini`, present), AI Studio and NotebookLM, each opening as a Helium window with a real icon.
+- Default assistant wiring: a pop-launcher plugin, a COSMIC Files action and a Rio keybinding.
 
 ## Components reused (no rewrites)
 
@@ -92,12 +106,4 @@ Product session types replaced by the unified image:
 
 ## Open items
 
-- Kernel: build `factory/kernel/linux-bun` (binder, binderfs, memfd, vkms, KVM) as a deb and swap it for Ubuntu's generic kernel.
-- The Rust userland (uutils, sudo-rs) from the Rust base lane.
-- The COSMIC fork debs for the whole set. Until then, Pop's packages fill the gaps (`/usr/share/bun-os/fork-debs.txt` lists what the image actually took from the forks).
-- The M3 theme generator output as the default COSMIC theme.
-- The Helium fork build.
-- bun-obscura and the Google binaries in `extra-bin`.
-- The phone-hub applet in the default panel.
-- An ISO (the current deliverable is a raw UEFI disk image).
-- Signed publication at aphrody.com/downloads/.
+Tracked with owners and states in [`docs/PRODUCT.md`](PRODUCT.md).

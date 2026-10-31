@@ -1,3 +1,5 @@
+> **Product status lives in [`docs/PRODUCT.md`](../PRODUCT.md)** (owner order 2026-10-31: one product, the unified Bun OS image). This file is background only; where it disagrees with PRODUCT.md, PRODUCT.md wins.
+
 > **Legacy fork notice (2026-10-29).** This document describes a plan written while the runtime was the `aphrody-labs/bun` fork. The Bun OS runtime is now the unmodified upstream `bun` npm package pinned at `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`, `bun --revision` prints `1.4.4-canary.1+11c367163`). Fork-only commands, APIs and modules named here (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`, `bun:nginx`, ...) are not available on upstream Bun. Read it as history, not as current instructions.
 
 # Bun OS canonical workspace consolidation
