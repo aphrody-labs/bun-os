@@ -401,10 +401,10 @@ fn check_peer_heartbeat() -> CheckResult {
 
     let path = match candidates.iter().find(|p| p.exists()) {
         Some(p) => p.clone(),
+        // The file-mailbox peer is optional: agents coordinate through the A2A hub
+        // (APHRODY_A2A_HUB_URL, docs/A2A-AGENTS.md), so an absent winclean coord is not a fault.
         None => {
-            return CheckResult::Warn(format!(
-                "absent at {WINCLEAN_HEARTBEAT_PATH} — peer offline"
-            ));
+            return CheckResult::Ok("winclean file peer not configured (A2A hub in use)".to_owned());
         }
     };
 
@@ -453,7 +453,7 @@ fn check_inbox() -> CheckResult {
         .clone();
 
     if !path.exists() {
-        return CheckResult::Warn(format!("absent at {WINCLEAN_INBOX_PATH}"));
+        return CheckResult::Ok("winclean file inbox not configured (A2A hub in use)".to_owned());
     }
     let text = match std::fs::read_to_string(&path) {
         Ok(t) => t,
@@ -472,7 +472,13 @@ fn check_inbox() -> CheckResult {
 }
 
 async fn check_http_listener() -> CheckResult {
-    let url = "http://localhost:8788/ping";
+    // The hub this host talks to: the VPS listener directly, or the workstation's loopback tunnel to it.
+    let base = std::env::var("APHRODY_A2A_HUB_URL")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| "http://127.0.0.1:8788".to_owned());
+    let base = base.trim_end_matches('/');
+    let url = format!("{base}/ping");
     // Build a reqwest client with a short timeout so we don't block the
     // user for multi-second hangs when the peer listener is down.
     let client = match reqwest::Client::builder()
@@ -483,18 +489,13 @@ async fn check_http_listener() -> CheckResult {
         Err(e) => return CheckResult::Warn(format!("could not build HTTP client: {e}")),
     };
 
-    match client.get(url).send().await {
+    match client.get(&url).send().await {
         Ok(resp) if resp.status().is_success() => CheckResult::Ok(format!(
-            "localhost:8788 (alive, /ping -> {})",
+            "{base} (alive, /ping -> {})",
             resp.status().as_u16()
         )),
-        Ok(resp) => CheckResult::Warn(format!(
-            "localhost:8788 (non-200: {})",
-            resp.status().as_u16()
-        )),
-        Err(_) => {
-            CheckResult::Warn("localhost:8788 (no response — listener not running)".to_string())
-        }
+        Ok(resp) => CheckResult::Warn(format!("{base} (non-200: {})", resp.status().as_u16())),
+        Err(_) => CheckResult::Warn(format!("{base} (no response — hub or tunnel not running)")),
     }
 }
 

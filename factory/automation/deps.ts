@@ -93,18 +93,7 @@ async function refreshFork(name: string, fork: Fork) {
   const branch =
     (await run(["gh", "api", `repos/${fork.upstream}`, "--jq", ".default_branch"], { timeoutMs: 60_000 })).out.trim() ||
     "main";
-  const pinned = (await git("ls-tree", "refs/remotes/origin/main", "--", fork.path)).out.split(/\s+/)[2];
-  if (!pinned || !/^[0-9a-f]{40}$/.test(pinned))
-    return { ok: true, detail: `${fork.path} is not a gitlink on main: skipped` };
-  let fetched = await g("fetch", "-q", "origin", fork.ref);
-  if (fetched.code && /couldn't find remote ref/.test(fetched.out)) {
-    // The catalog names a branch the fork does not have yet: create it at the commit main pins (a new branch, no force).
-    await g("fetch", "-q", "origin", pinned);
-    const created = await g("push", "-q", "origin", `${pinned}:refs/heads/${fork.ref}`);
-    if (created.code !== 0) return { ok: false, detail: `create ${fork.fork} ${fork.ref}: ${created.out.slice(-200)}` };
-    event("deps", "fork-branch-created", `${fork.fork} ${fork.ref} at the pinned ${pinned.slice(0, 10)}`);
-    fetched = await g("fetch", "-q", "origin", fork.ref);
-  }
+  const fetched = await g("fetch", "-q", "origin", fork.ref);
   const fetchedUp = await g("fetch", "-q", "upstream", branch);
   if (fetched.code || fetchedUp.code)
     return { ok: false, detail: `fetch: ${(fetched.out + fetchedUp.out).slice(-200)}` };
@@ -130,6 +119,7 @@ async function refreshFork(name: string, fork: Fork) {
     }
   }
   const head = (await g("rev-parse", "HEAD")).out.trim();
+  const pinned = (await git("ls-tree", "refs/remotes/origin/main", "--", fork.path)).out.split(/\s+/)[2];
   if (behind === 0 && head === pinned) return { ok: true, detail: `current (${head.slice(0, 10)}, upstream merged)` };
   // Qualify: the fork's own workspace compiles (through the serialized lane wrapper on the build host).
   if (existsSync(join(dir, "Cargo.toml"))) {
