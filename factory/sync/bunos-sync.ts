@@ -319,6 +319,32 @@ async function newestChange(paths: string[]): Promise<number> {
   return newest;
 }
 
+/**
+ * Fetch origin/main without racing other fetchers in the same checkout. Many agents fetch here; git's ref update
+ * checks the old value and fails with "unable to update local ref" when another fetch moved it first. So fetch with
+ * an empty refmap (FETCH_HEAD only), read the main line of FETCH_HEAD, then move refs/remotes/origin/main forward.
+ */
+async function fetchMain(): Promise<string | Result> {
+  let last: Result | undefined;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (attempt) await Bun.sleep(3000);
+    last = await git(["fetch", "--no-recurse-submodules", "--refmap=", "origin", "refs/heads/main"], { timeoutMs: 300_000 });
+    if (last.code !== 0) continue;
+    const gitDir = await gitOk(["rev-parse", "--absolute-git-dir"]);
+    const line = readFileSync(join(gitDir, "FETCH_HEAD"), "utf8")
+      .split("\n")
+      .find(entry => /\tbranch 'main' of /.test(entry));
+    const sha = line?.split("\t")[0];
+    if (!sha || !/^[0-9a-f]{40}$/.test(sha)) continue;
+    const current = (await git(["rev-parse", "--verify", "--quiet", "refs/remotes/origin/main"])).out;
+    // Only move forward: a concurrent fetcher may already have recorded a newer main.
+    if (!current || (current !== sha && (await git(["merge-base", "--is-ancestor", current, sha])).code === 0))
+      await git(["update-ref", "refs/remotes/origin/main", sha]);
+    return sha;
+  }
+  return last!;
+}
+
 async function pushMain(): Promise<Result> {
   return git(["push", "origin", "HEAD:main"], { timeoutMs: 300_000 });
 }
@@ -369,7 +395,7 @@ async function syncCargoLock(head: string): Promise<string> {
   const pushed = await pushMain();
   if (pushed.code !== 0) {
     // The lock commit is derived data: drop it and regenerate on the next pass instead of diverging.
-    await git(["fetch", "--no-recurse-submodules", "origin", "main"]);
+    await fetchMain();
     await git(["reset", "--hard", "origin/main"]);
     return `lock: push rejected (${lastLine(pushed)}); regenerated next pass`;
   }
@@ -388,13 +414,8 @@ async function pass(): Promise<Outcome> {
     const repaired = repairIndexLock(gitDir);
     if (repaired === "busy" || repaired?.startsWith("held")) return record("busy", `index.lock ${repaired}`);
 
-    // A concurrent fetch in the same checkout makes the ref update race ("unable to update local ref"): retry.
-    let fetch = await git(["fetch", "--no-recurse-submodules", "origin", "main"], { timeoutMs: 300_000 });
-    for (let attempt = 0; fetch.code !== 0 && attempt < 3; attempt++) {
-      await Bun.sleep(5000);
-      fetch = await git(["fetch", "--no-recurse-submodules", "origin", "main"], { timeoutMs: 300_000 });
-    }
-    if (fetch.code !== 0) return record("error", `fetch failed: ${lastLine(fetch)}`);
+    const fetched = await fetchMain();
+    if (typeof fetched !== "string") return record("error", `fetch failed: ${lastLine(fetched)}`);
 
     const branch = (await git(["symbolic-ref", "--quiet", "--short", "HEAD"])).out || "(detached)";
     const local = await gitOk(["rev-parse", "HEAD"]);
@@ -489,7 +510,7 @@ async function pass(): Promise<Outcome> {
  */
 async function salvage(): Promise<number> {
   const gitDir = await gitOk(["rev-parse", "--absolute-git-dir"]);
-  await git(["fetch", "--no-recurse-submodules", "origin", "main"], { timeoutMs: 300_000 });
+  await fetchMain();
   const head = await gitOk(["rev-parse", "HEAD"]);
   const branches = (await gitOk(["for-each-ref", "--format=%(objectname)", "refs/heads"])).split("\n").filter(Boolean);
   const parents: string[] = [];
