@@ -6,9 +6,9 @@
 #   bash factory/rustbase/crosvm-boot.sh <crosvm binary> [bunos-utils binary]
 set -euo pipefail
 crosvm=${1:?crosvm binary}
-root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
-utils=${2:-$root/target/x86_64-unknown-linux-gnu/release/bunos-utils}
-work=${RUST_BASE_WORK:-$HOME/build/rust-base}/guest
+base=${RUST_BASE_WORK:-$HOME/build/rust-base}
+utils=${2:-$base/out/bunos-utils/target/release/bunos-utils}
+work=$base/guest
 [ -x "$crosvm" ] || { echo "no crosvm at $crosvm"; exit 1; }
 [ -x "$utils" ] || { echo "no bunos-utils at $utils"; exit 1; }
 [ -w /dev/kvm ] || { echo "/dev/kvm is not writable"; exit 1; }

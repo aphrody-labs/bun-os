@@ -87,6 +87,11 @@ bindings, unpublished) and stay in their own nested workspace.
 - **Android:** keystore2 and the AOSP binder crates live in AOSP (Soong, AIDL) and are not usable outside Android
   without the AIDL toolchain. rsbinder is the Linux-host binder.
 - **Compositors:** COSMIC and niri still link libinput, libseat, Mesa and xkbcommon (C).
+- **Redox:** the uutils and sudo-rs cookbook recipes are not added, because the Redox image is low priority
+  (owner, 2026-10-30). pkgar, ion, relibc and the other Redox mirrors are aphrody-labs forks pinned by recipe rev in
+  `factory/os/rust-desktop/forks.json`.
+- **Alpine (apk):** `bunos-base` still depends on Alpine's own `uutils-coreutils` and `sudo-rs` packages, not our
+  forks. Static musl builds of the multicall and ntpd-rs are the next step.
 
 ## Qualification
 
