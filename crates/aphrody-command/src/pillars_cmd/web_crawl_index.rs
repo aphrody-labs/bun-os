@@ -9,13 +9,15 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+use super::CrawlBrowser;
 use aphrody_rag::home::{HomeLayout, HomeScope};
 use aphrody_web_crawl::{
     AddRequest, BunBrowserTransport, CrawlOptions, CrawlTransport, Frontier, FrontierOptions,
 };
 use clap::Args;
 use miette::{IntoDiagnostic, miette};
-use serde::Serialize;
+use reqwest::Url;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 #[derive(Debug, Args)]
@@ -47,6 +49,9 @@ pub(crate) struct CrawlIndexArgs {
     /// Delay between requests to one host, in milliseconds
     #[arg(long, default_value_t = 1000, value_parser = clap::value_parser!(u32).range(0..=60000))]
     per_host_delay_ms: u32,
+    /// Browser transport: native Obscura, or Playwright connected to the local Obscura CDP service
+    #[arg(long, value_enum, default_value_t = CrawlBrowser::Native)]
+    browser: CrawlBrowser,
 }
 
 #[derive(Debug, Serialize)]
@@ -162,11 +167,158 @@ pub(super) fn job_lock(root: &Path) -> miette::Result<File> {
 
 pub(super) async fn run(args: CrawlIndexArgs) -> miette::Result<CrawlIndexReport> {
     obscura_net::ensure_rustls_crypto_provider();
-    let transport =
-        BunBrowserTransport::scoped(obscura_net::BunBrowserHttpClient::new(), &validate(&args)?)
+    let domains = validate(&args)?;
+    match args.browser {
+        CrawlBrowser::Native => {
+            let transport = BunBrowserTransport::scoped(
+                obscura_net::BunBrowserHttpClient::new(),
+                &domains,
+            )
             .await
             .map_err(|error| miette!("crawl transport scope: {error}"))?;
-    run_with_transport(args, &transport).await
+            run_with_transport(args, &transport).await
+        }
+        CrawlBrowser::Playwright => {
+            let transport = PlaywrightTransport::new(domains).await?;
+            transport.health().await?;
+            run_with_transport(args, &transport).await
+        }
+    }
+}
+
+/// Playwright renders each requested page through the loopback bridge attached to
+/// the Obscura CDP service. Rust keeps ownership of crawl policy, recursion,
+/// persistence, extraction and indexing.
+pub(super) struct PlaywrightTransport {
+    client: reqwest::Client,
+    endpoint: Url,
+    allowed_domains: Vec<String>,
+    static_transport: BunBrowserTransport,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct PlaywrightRenderRequest<'a> {
+    url: &'a str,
+    allowed_domains: &'a [String],
+    timeout_ms: u32,
+    settle_ms: u32,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PlaywrightRenderResponse {
+    url: String,
+    status: u16,
+    content_type: Option<String>,
+    html: String,
+}
+
+impl PlaywrightTransport {
+    pub(super) async fn new(allowed_domains: Vec<String>) -> miette::Result<Self> {
+        let raw = std::env::var("APHRODY_WEB_PLAYWRIGHT_URL")
+            .unwrap_or_else(|_| "http://127.0.0.1:9230/render".to_owned());
+        let endpoint = Url::parse(&raw)
+            .map_err(|error| miette!("invalid Playwright bridge URL: {error}"))?;
+        let loopback = endpoint.host_str().is_some_and(|host| {
+            host.eq_ignore_ascii_case("localhost")
+                || host
+                    .parse::<std::net::IpAddr>()
+                    .is_ok_and(|address| address.is_loopback())
+        });
+        if endpoint.scheme() != "http"
+            || !loopback
+            || !endpoint.username().is_empty()
+            || endpoint.password().is_some()
+            || endpoint.query().is_some()
+            || endpoint.fragment().is_some()
+        {
+            return Err(miette!(
+                "APHRODY_WEB_PLAYWRIGHT_URL must be an unauthenticated HTTP loopback URL"
+            ));
+        }
+        let client = reqwest::Client::builder()
+            .redirect(reqwest::redirect::Policy::none())
+            .timeout(Duration::from_secs(65))
+            .build()
+            .into_diagnostic()?;
+        let static_transport = BunBrowserTransport::scoped(
+            obscura_net::BunBrowserHttpClient::new(),
+            &allowed_domains,
+        )
+        .await
+        .map_err(|error| miette!("crawl transport scope: {error}"))?;
+        Ok(Self {
+            client,
+            endpoint,
+            allowed_domains,
+            static_transport,
+        })
+    }
+
+    pub(super) async fn health(&self) -> miette::Result<()> {
+        let endpoint = self.endpoint.join("/health").into_diagnostic()?;
+        let response = self.client.get(endpoint).send().await.map_err(|error| {
+            miette!("Playwright bridge is unavailable at {}: {error}", self.endpoint)
+        })?;
+        if !response.status().is_success() {
+            return Err(miette!(
+                "Playwright bridge health check returned HTTP {}",
+                response.status()
+            ));
+        }
+        Ok(())
+    }
+}
+
+impl CrawlTransport for PlaywrightTransport {
+    async fn fetch(&self, url: &Url) -> Result<aphrody_web_crawl::FetchResult, String> {
+        let request = PlaywrightRenderRequest {
+            url: url.as_str(),
+            allowed_domains: &self.allowed_domains,
+            timeout_ms: 30_000,
+            settle_ms: 250,
+        };
+        let response = self
+            .client
+            .post(self.endpoint.clone())
+            .json(&request)
+            .send()
+            .await
+            .map_err(|error| format!("Playwright bridge request failed: {error}"))?;
+        if !response.status().is_success() {
+            return Err(format!(
+                "Playwright bridge returned HTTP {}",
+                response.status()
+            ));
+        }
+        let rendered: PlaywrightRenderResponse = response
+            .json()
+            .await
+            .map_err(|error| format!("invalid Playwright bridge response: {error}"))?;
+        let final_url = Url::parse(&rendered.url)
+            .map_err(|error| format!("Playwright returned an invalid final URL: {error}"))?;
+        let scope =
+            obscura_net::interceptor::DomainAllowlistInterceptor::new(&self.allowed_domains)
+                .map_err(str::to_owned)?;
+        if !scope.allows(&final_url) {
+            return Err("Playwright final URL is outside the crawl scope".into());
+        }
+        Ok(aphrody_web_crawl::FetchResult {
+            url: final_url,
+            status: rendered.status,
+            content_type: rendered.content_type,
+            body: rendered.html,
+        })
+    }
+
+    async fn fetch_sitemap(&self, url: &Url) -> Result<aphrody_web_crawl::FetchResult, String> {
+        self.static_transport.fetch_sitemap(url).await
+    }
+
+    async fn fetch_archive(&self, url: &Url) -> Result<aphrody_web_crawl::FetchResult, String> {
+        self.static_transport.fetch_archive(url).await
+    }
 }
 
 fn document_name(url: &str) -> miette::Result<String> {

@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0
+[Unit]
+Description=Aphrody Playwright adapter for the local Obscura CDP browser
+After=network-online.target aphrody-web-browser-vps.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/src/bun-os
+Environment=HOME=/home/ubuntu
+Environment=APHRODY_WEB_CDP_URL=http://127.0.0.1:9222
+Environment=APHRODY_WEB_PLAYWRIGHT_BIND=127.0.0.1:9230
+ExecStart=/home/ubuntu/.bun/bin/bun run scripts/aphrody/web/playwright-bridge.ts
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+KillMode=control-group
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=tmpfs
+BindReadOnlyPaths=/home/ubuntu/.bun/bin/bun /home/ubuntu/src/bun-os
+PrivateTmp=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryAccounting=true
+MemoryHigh=512M
+MemoryMax=1G
+CPUWeight=20
+Nice=10
+TasksMax=256
+LimitNOFILE=16384
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

@@ -209,6 +209,7 @@ const LIVE_UNITS = [
   "aphrody-fonts-proxy",
   "aphrody-remote",
   "aphrody-web-browser-vps",
+  "aphrody-web-playwright-vps",
   "aphrody-desktop-xvfb",
   "aphrody-desktop-wm",
   "aphrody-a2a",

@@ -95,6 +95,7 @@ export const UNITS = [
   "aphrody-desktop-xvfb.service",
   "aphrody-desktop-wm.service",
   "aphrody-web-browser-vps.service",
+  "aphrody-web-playwright-vps.service",
   "aphrody-fonts-proxy.service",
   "waydroid-container.service",
   "aphrody-webos-deploy.timer",

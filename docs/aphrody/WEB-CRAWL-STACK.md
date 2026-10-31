@@ -9,7 +9,7 @@ status checklist.
 | Job | Selected owner | Reason |
 | --- | --- | --- |
 | Rust crawling and extraction | `bun_browser_crawl` from the pinned `aphrody-labs/bun-obscura` revision | Already owns the durable SQLite frontier, bounded traversal, per-host pacing, retry/lease recovery, domain scope, robots policy, sitemap discovery, and resumable jobs used by Aphrody Web. |
-| Headless rendering | Aphrody Obscura CDP engine | The same pinned browser runtime is used by the Rust web transport. The VPS daemon is loopback-only on port 9222; the unified image still needs its own per-user package and unit. |
+| Headless browser | Aphrody Obscura CDP engine, controlled by [Microsoft Playwright](https://github.com/microsoft/playwright) | Playwright connects to Obscura over loopback CDP, creates isolated contexts, renders JavaScript pages, and returns bounded HTML. Aphrody's Rust crawler still owns recursion, scope, robots, durable SQLite frontier, extraction and indexing. CDP is Chromium-only and has lower fidelity than Playwright's native protocol; see [connectOverCDP](https://playwright.dev/docs/api/class-browsertype#browser-type-connect-over-cdp). |
 | Aphrody retrieval index | `aphrody-rag` SQLite | SQLite FTS5 and vectors are the durable search index; crawl pages are indexed into the selected Aphrody home. |
 | Aphrody query cache | Redis 8.10.3, ephemeral and loopback-only | Search results are derived data. The cache has a 512 MiB LRU budget and a 60-second result TTL; Redis is not the source of truth. |
 | Shenron Dragon Ball web pipeline | Shenron's existing source-aware pipeline and admin web queue | It owns source allowlists, crawl placement, SQLite ledgers, source records, provenance handling, and its Redis indexer. Keep its jobs and keys separate from Aphrody's search cache. |
@@ -41,6 +41,14 @@ status checklist.
 
 ## VPS service
 
+On the VPS, `aphrody-web-browser-vps.service` exposes Obscura CDP only at
+`127.0.0.1:9222`; `aphrody-web-playwright-vps.service` exposes a bounded render
+bridge only at `127.0.0.1:9230`. The Rust recursive crawler selects that
+transport with `--browser playwright`. The bridge creates a fresh browser
+context for every page and blocks navigations and subresources outside the
+crawler's explicit host allowlist. `--browser native` keeps the in-process
+Obscura HTTP transport.
+
 The VPS host Compose project includes `redis/compose.yaml`. Redis uses the host
 network namespace and binds to loopback only, disables persistence,
 evicts with `allkeys-lru`, and has a container memory ceiling. A missing Redis
@@ -61,14 +69,16 @@ Useful entry points:
 ```sh
 aphrody web status --json
 aphrody web capabilities --json
-aphrody web crawl-index https://aphrody.com --label aphrody-site --max-requests 200 --max-depth 4
+aphrody web crawl https://aphrody.com --browser playwright --allowed-domains aphrody.com --obey-robots --sqlite ~/.aphrody/private/web/crawl/frontier.sqlite --max-requests 3 --max-depth 1 --json
+aphrody web crawl-index https://aphrody.com --label aphrody-site --browser playwright --max-requests 200 --max-depth 4
 aphrody rag search "Aphrody Web crawler"
 ```
 
 For Dragon Ball source collection, use the configured Shenron admin web queue
-and its source-specific crawler jobs. `aphrody web crawl-index` is useful for
-an Aphrody home index of authorized public pages; it does not replace Shenron's
-curated crawl/import pipeline or its source/provenance records.
+and its source-specific crawler jobs. Shenron's `aphrodyWebCrawl` client accepts
+`browser: "playwright"`; its source policy, export format and provenance
+registry remain the owners of Dragon Ball ingestion. `crawl-index` remains
+Aphrody Search's SQLite/RAG index path.
 
 The generic Aphrody `web-pipeline` job accepts `crawl-index` only. Dragon Ball
 submissions are rejected at the MCP boundary until they go through Shenron's

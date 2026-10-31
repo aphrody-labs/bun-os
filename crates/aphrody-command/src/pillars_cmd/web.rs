@@ -230,6 +230,9 @@ pub(crate) enum WebAction {
         /// Emit a structured report
         #[arg(long)]
         json: bool,
+        /// Browser transport: native Obscura, or Playwright connected to the local Obscura CDP service
+        #[arg(long, value_enum, default_value_t = CrawlBrowser::Native)]
+        browser: CrawlBrowser,
     },
     /// Crawl into a private persistent frontier and index the selected home in process
     CrawlIndex(crawl_index::CrawlIndexArgs),
@@ -335,6 +338,13 @@ pub(crate) enum WebAction {
         #[command(subcommand)]
         action: WebFramesAction,
     },
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, ValueEnum)]
+pub(crate) enum CrawlBrowser {
+    #[default]
+    Native,
+    Playwright,
 }
 
 #[derive(Debug, Subcommand)]
@@ -877,6 +887,7 @@ pub(crate) async fn handle_web(action: WebAction) -> miette::Result<()> {
             revisit,
             daemon,
             json,
+            browser,
         } => {
             handle_web_crawl(WebCrawlRequest {
                 urls,
@@ -897,6 +908,7 @@ pub(crate) async fn handle_web(action: WebAction) -> miette::Result<()> {
                 revisit,
                 daemon,
                 json,
+                browser,
             })
             .await?;
         }
@@ -1528,6 +1540,7 @@ struct WebCrawlRequest {
     revisit: bool,
     daemon: bool,
     json: bool,
+    browser: CrawlBrowser,
 }
 
 async fn handle_web_crawl(request: WebCrawlRequest) -> miette::Result<()> {
@@ -1614,26 +1627,22 @@ async fn handle_web_crawl(request: WebCrawlRequest) -> miette::Result<()> {
         ..CrawlOptions::default()
     };
     obscura_net::ensure_rustls_crypto_provider();
-    let transport = BunBrowserTransport::scoped(
-        obscura_net::BunBrowserHttpClient::new(),
-        &options.allowed_domains,
-    )
-    .await
-    .map_err(|error| miette!("crawl transport scope: {error}"))?;
-    let report = if request.daemon {
-        let daemon_opts = aphrody_web_crawl::CrawlDaemonOptions {
-            base: options,
-            idle_poll_ms: 1_000,
-            maintenance_interval_ms: 10_000,
-            max_iterations: None,
-        };
-        aphrody_web_crawl::crawl_daemon(&mut frontier, &transport, &daemon_opts, None)
+    let report = match request.browser {
+        CrawlBrowser::Native => {
+            let transport = BunBrowserTransport::scoped(
+                obscura_net::BunBrowserHttpClient::new(),
+                &options.allowed_domains,
+            )
             .await
-            .into_diagnostic()?
-    } else {
-        aphrody_web_crawl::crawl_bounded(&mut frontier, &transport, &options)
-            .await
-            .into_diagnostic()?
+            .map_err(|error| miette!("crawl transport scope: {error}"))?;
+            crawl_with_transport(&mut frontier, &transport, &options, request.daemon).await?
+        }
+        CrawlBrowser::Playwright => {
+            let transport = crawl_index::PlaywrightTransport::new(options.allowed_domains.clone())
+                .await?;
+            transport.health().await?;
+            crawl_with_transport(&mut frontier, &transport, &options, request.daemon).await?
+        }
     };
     if request.json {
         let pages = report
@@ -1696,6 +1705,29 @@ async fn handle_web_crawl(request: WebCrawlRequest) -> miette::Result<()> {
         return Err(miette!("crawl fetched no successful pages"));
     }
     Ok(())
+}
+
+async fn crawl_with_transport<T: aphrody_web_crawl::CrawlTransport>(
+    frontier: &mut aphrody_web_crawl::Frontier,
+    transport: &T,
+    options: &aphrody_web_crawl::CrawlOptions,
+    daemon: bool,
+) -> miette::Result<aphrody_web_crawl::CrawlReport> {
+    if daemon {
+        let daemon_opts = aphrody_web_crawl::CrawlDaemonOptions {
+            base: options.clone(),
+            idle_poll_ms: 1_000,
+            maintenance_interval_ms: 10_000,
+            max_iterations: None,
+        };
+        aphrody_web_crawl::crawl_daemon(frontier, transport, &daemon_opts, None)
+            .await
+            .into_diagnostic()
+    } else {
+        aphrody_web_crawl::crawl_bounded(frontier, transport, options)
+            .await
+            .into_diagnostic()
+    }
 }
 
 #[cfg(test)]

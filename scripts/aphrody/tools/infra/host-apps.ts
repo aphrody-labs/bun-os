@@ -94,5 +94,48 @@ if (import.meta.main) {
     });
     if (check.exitCode !== 0) process.exit(1);
     console.log(`${layout.compose}: valid (docker compose -f ${layout.compose} up -d applies it)`);
+    if (host === "vps") {
+      const unitSource = join(
+        REPO,
+        "infra/config/host/systemd/aphrody/aphrody-web-playwright-vps.service",
+      );
+      const unitTarget = "/etc/systemd/system/aphrody-web-playwright-vps.service";
+      const unitName = "aphrody-web-playwright-vps.service";
+      const comparison = Bun.spawnSync([
+        "sudo",
+        "cmp",
+        "-s",
+        unitSource,
+        unitTarget,
+      ]);
+      const unitChanged = comparison.exitCode !== 0;
+      const install = Bun.spawnSync(
+        ["sudo", "install", "-m", "0644", unitSource, unitTarget],
+        {
+          stdout: "inherit",
+          stderr: "inherit",
+        },
+      );
+      if (install.exitCode !== 0) process.exit(1);
+      const reload = Bun.spawnSync(["sudo", "systemctl", "daemon-reload"], {
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      if (reload.exitCode !== 0) process.exit(1);
+      const enable = Bun.spawnSync(["sudo", "systemctl", "enable", unitName], {
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      if (enable.exitCode !== 0) process.exit(1);
+      const active = Bun.spawnSync(["systemctl", "is-active", "--quiet", unitName]);
+      const operation =
+        active.exitCode === 0 ? (unitChanged ? "restart" : "start") : "start";
+      const start = Bun.spawnSync(["sudo", "systemctl", operation, unitName], {
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      if (start.exitCode !== 0) process.exit(1);
+      console.log(`${unitTarget}: enabled and started`);
+    }
   }
 }
