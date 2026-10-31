@@ -36,8 +36,10 @@ export function inventory(): InventoryRow[] {
   const rows: InventoryRow[] = [];
   for (const { spec } of plugins) {
     const replaces = spec.replaces ?? [];
-    for (const name of Object.keys(spec.modules ?? {})) rows.push({ plugin: spec.name, kind: "module", name, replaces });
-    for (const name of Object.keys(spec.globals ?? {})) rows.push({ plugin: spec.name, kind: "global", name, replaces });
+    for (const name of Object.keys(spec.modules ?? {}))
+      rows.push({ plugin: spec.name, kind: "module", name, replaces });
+    for (const name of Object.keys(spec.globals ?? {}))
+      rows.push({ plugin: spec.name, kind: "global", name, replaces });
     for (const name of Object.keys(spec.bins ?? {})) rows.push({ plugin: spec.name, kind: "bin", name, replaces });
   }
   return rows;

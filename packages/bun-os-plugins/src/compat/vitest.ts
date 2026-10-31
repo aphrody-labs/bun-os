@@ -27,7 +27,8 @@ function wrapCallback(name: string, fn: Fn | undefined): Fn | undefined {
 }
 
 function wrapTest<T extends Fn>(base: T): T {
-  const wrapped = ((name: string, fn?: Fn, options?: unknown) => base(name, wrapCallback(name, fn), options)) as unknown as T;
+  const wrapped = ((name: string, fn?: Fn, options?: unknown) =>
+    base(name, wrapCallback(name, fn), options)) as unknown as T;
   for (const key of ["skip", "only", "todo", "failing", "concurrent", "serial"] as const) {
     const variant = (base as unknown as Record<string, Fn | undefined>)[key];
     if (typeof variant === "function")
