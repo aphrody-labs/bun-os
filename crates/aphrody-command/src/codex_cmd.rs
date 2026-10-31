@@ -2,8 +2,9 @@
 //! CLI implementation for `aphrody codex …` and the multi-call `codex` command.
 //!
 //! Compatibility parser backed by Aphrody's native capability owners.
-//! App-server transport and configuration inspection are implemented;
-//! agent execution and session operations reject unsupported requests.
+//! `exec`, `resume` and `fork` dispatch to the real Codex binary (CODEX_BIN, then the standalone install under
+//! `~/.codex`, then PATH) so they use `~/.codex/config.toml` and its login; `agent` runs the Codex Luna sub-agent
+//! dispatcher (factory/codex-agent). App-server transport and configuration inspection are implemented natively.
 //! - App-server protocol v2 JSON-RPC daemon (`crates/ai/app-server`)
 //! - Inspection of Windows elevation and configured model
 //! - Read-only MCP, plugins, marketplaces and feature configuration
@@ -28,9 +29,14 @@ pub struct CodexArgs {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum CodexSubcommand {
-    /// Run Codex non-interactively.
+    /// Run Codex non-interactively (dispatches to the real Codex binary and ~/.codex/config.toml).
     #[command(alias = "e")]
     Exec(ExecArgs),
+    /// Codex Luna sub-agents: `agent run|queue|status|roles|daemon|lint-sweep|doc-sync|gate-triage`.
+    Agent {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
     /// Run the local app-server daemon (stdio JSON-RPC v2 or loopback HTTP).
     AppServer(AppServerArgs),
     /// Run a code review non-interactively on the current repository or diff.
@@ -60,9 +66,9 @@ pub enum CodexSubcommand {
 
 #[derive(Args, Debug, Clone)]
 pub struct ExecArgs {
-    /// Compatibility prompt argument; execution currently returns an unsupported error.
+    /// Prompt; when omitted the prompt is read from stdin.
     pub prompt: Option<String>,
-    /// Model identifier to use (default from config: gpt-6-sol / gpt-6.1-sol).
+    /// Model identifier to use (default: the model of ~/.codex/config.toml).
     #[arg(short = 'm', long)]
     pub model: Option<String>,
     /// Override a configuration key=value from config.toml.
@@ -233,6 +239,7 @@ pub async fn run(args: CodexArgs) -> Result<()> {
         Some(CodexSubcommand::AppServer(app_args)) => run_app_server(app_args).await,
         Some(CodexSubcommand::Doctor(doc_args)) => run_doctor(doc_args).await,
         Some(CodexSubcommand::Exec(exec_args)) => run_exec(exec_args).await,
+        Some(CodexSubcommand::Agent { args }) => run_agent(args),
         Some(CodexSubcommand::Review(review_args)) => run_review(review_args).await,
         Some(CodexSubcommand::Resume(session_args)) => run_resume(session_args).await,
         Some(CodexSubcommand::Fork(session_args)) => run_fork(session_args).await,
@@ -301,6 +308,7 @@ async fn run_doctor(args: DoctorArgs) -> Result<()> {
     let config_path = codex_config_path();
 
     let mut model_found: Option<String> = None;
+    let mut effort_found: Option<String> = None;
     let mut plugins_count = 0;
     let mut mcp_count = 0;
 
@@ -311,6 +319,9 @@ async fn run_doctor(args: DoctorArgs) -> Result<()> {
         if let Some(m) = doc.get("model").and_then(|v| v.as_str()) {
             model_found = Some(m.to_string());
         }
+        if let Some(e) = doc.get("model_reasoning_effort").and_then(|v| v.as_str()) {
+            effort_found = Some(e.to_string());
+        }
         if let Some(plugins) = doc.get("plugins").and_then(|v| v.as_table()) {
             plugins_count = plugins.len();
         }
@@ -318,6 +329,18 @@ async fn run_doctor(args: DoctorArgs) -> Result<()> {
             mcp_count = mcp.len();
         }
     }
+
+    let bin = codex_bin();
+    let version = bin.as_ref().and_then(|b| first_line(b, &["--version"]));
+    let login = bin
+        .as_ref()
+        .and_then(|b| first_line(b, &["login", "status"]));
+    let (ws_addr, ws_ready) = app_server_probe();
+    let execution = if bin.is_some() {
+        "codex_binary"
+    } else {
+        "not_wired"
+    };
 
     if args.json {
         let report = json!({
@@ -328,13 +351,25 @@ async fn run_doctor(args: DoctorArgs) -> Result<()> {
             "configured_plugins_count": plugins_count,
             "configured_mcp_count": mcp_count,
             "app_server": "Pure v2 JSON-RPC (crates/contracts/app-protocol)",
-            "agent_execution": "not_wired",
-            "status": "configuration_inspected"
+            "reasoning_effort": effort_found,
+            "codex_bin": bin.as_ref().map(|p| p.display().to_string()),
+            "codex_version": version,
+            "login": login,
+            "app_server_ws": { "addr": ws_addr, "ready": ws_ready },
+            "agent_execution": execution,
+            "status": if bin.is_some() { "ready" } else { "codex_binary_missing" }
         });
         println!("{report}");
     } else {
         println!("=== Aphrody Local Agent Doctor ===");
-        println!("Status               : Configuration inspected; model execution not checked");
+        println!(
+            "Status               : {}",
+            if bin.is_some() {
+                "ready (exec dispatches to the Codex binary)"
+            } else {
+                "Codex binary not found"
+            }
+        );
         println!(
             "Windows Elevated     : {}",
             if elevated {
@@ -356,15 +391,162 @@ async fn run_doctor(args: DoctorArgs) -> Result<()> {
         println!("Configured Plugins   : {} enabled", plugins_count);
         println!("Configured MCP       : {} servers", mcp_count);
         println!("App-Server Protocol  : Pure v2 JSON-RPC (crates/contracts/app-protocol)");
-        println!("Execution Runtime    : Agent execution is not wired by this command");
+        println!(
+            "Reasoning Effort     : {}",
+            effort_found.as_deref().unwrap_or("not configured")
+        );
+        println!(
+            "Codex Binary         : {} ({})",
+            bin.as_deref()
+                .map_or("not found", |p| p.to_str().unwrap_or("")),
+            version.as_deref().unwrap_or("unknown version")
+        );
+        println!(
+            "Login                : {}",
+            login.as_deref().unwrap_or("unknown")
+        );
+        println!(
+            "Codex App-Server     : ws://{ws_addr} ({})",
+            if ws_ready { "ready" } else { "not reachable" }
+        );
+        println!("Execution Runtime    : {execution}");
     }
     Ok(())
 }
 
-async fn run_exec(_args: ExecArgs) -> Result<()> {
-    Err(miette::miette!(
-        "Agent execution is not wired to a model/tool runtime by this command; no turn was executed."
-    ))
+/// The real Codex binary: CODEX_BIN, the standalone install under CODEX_HOME (default ~/.codex), then PATH. Never this
+/// executable itself (the multi-call `codex` name would loop).
+pub fn codex_bin() -> Option<PathBuf> {
+    let me = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.canonicalize().ok());
+    let exe = if cfg!(windows) { "codex.exe" } else { "codex" };
+    let mut candidates: Vec<PathBuf> = Vec::new();
+    if let Some(p) = std::env::var_os("CODEX_BIN") {
+        candidates.push(PathBuf::from(p));
+    }
+    let home = std::env::var_os("CODEX_HOME")
+        .map(PathBuf::from)
+        .or_else(|| {
+            let user = if cfg!(windows) { "USERPROFILE" } else { "HOME" };
+            std::env::var_os(user).map(|h| PathBuf::from(h).join(".codex"))
+        });
+    if let Some(h) = home {
+        candidates.push(h.join("packages/standalone/current/bin").join(exe));
+    }
+    if let Some(path) = std::env::var_os("PATH") {
+        candidates.extend(std::env::split_paths(&path).map(|d| d.join(exe)));
+    }
+    candidates
+        .into_iter()
+        .find(|p| p.is_file() && p.canonicalize().ok() != me)
+}
+
+fn first_line(bin: &std::path::Path, args: &[&str]) -> Option<String> {
+    let out = Command::new(bin).no_window().args(args).output().ok()?;
+    let text = String::from_utf8_lossy(if out.stdout.is_empty() {
+        &out.stderr
+    } else {
+        &out.stdout
+    })
+    .to_string();
+    text.lines()
+        .map(str::trim)
+        .find(|l| !l.is_empty())
+        .map(str::to_string)
+}
+
+/// Probe the Codex app-server service (aphrody-codex-app-server.service) on loopback; `CODEX_APP_SERVER_ADDR` overrides it.
+fn app_server_probe() -> (String, bool) {
+    use std::io::{Read, Write};
+    let addr =
+        std::env::var("CODEX_APP_SERVER_ADDR").unwrap_or_else(|_| "127.0.0.1:4500".to_string());
+    let ready = addr
+        .parse::<SocketAddr>()
+        .ok()
+        .and_then(|a| {
+            std::net::TcpStream::connect_timeout(&a, std::time::Duration::from_millis(500)).ok()
+        })
+        .map(|mut s| {
+            let _ = s.set_read_timeout(Some(std::time::Duration::from_millis(1500)));
+            let _ = s
+                .write_all(b"GET /readyz HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n");
+            let mut buf = String::new();
+            let _ = s.read_to_string(&mut buf);
+            buf.starts_with("HTTP/1.1 200")
+        })
+        .unwrap_or(false);
+    (addr, ready)
+}
+
+fn dispatch_codex(mut cmd: Command) -> Result<()> {
+    let status = cmd
+        .status()
+        .map_err(|e| miette::miette!("failed to run the Codex binary: {e}"))?;
+    if !status.success() {
+        std::process::exit(status.code().unwrap_or(1));
+    }
+    Ok(())
+}
+
+fn require_codex() -> Result<Command> {
+    let bin = codex_bin().ok_or_else(|| {
+        miette::miette!(
+            "Codex binary not found (set CODEX_BIN or install it under ~/.codex/packages/standalone/current/bin)"
+        )
+    })?;
+    Ok(Command::new(bin).no_window())
+}
+
+async fn run_exec(args: ExecArgs) -> Result<()> {
+    let mut cmd = require_codex()?;
+    cmd.arg("exec");
+    if let Some(m) = &args.model {
+        cmd.args(["-m", m]);
+    }
+    if let Some(e) = &args.reasoning_effort {
+        cmd.arg("-c").arg(format!("model_reasoning_effort=\"{e}\""));
+    }
+    for c in &args.config {
+        cmd.args(["-c", c]);
+    }
+    if let Some(s) = &args.sandbox {
+        cmd.args(["-s", s]);
+    }
+    if args.oss {
+        cmd.arg("--oss");
+    }
+    if let Some(d) = &args.cd {
+        cmd.arg("-C").arg(d);
+    }
+    if args.json {
+        cmd.arg("--json");
+    }
+    cmd.arg(args.prompt.as_deref().unwrap_or("-"));
+    dispatch_codex(cmd)
+}
+
+/// `aphrody codex agent …`: the Codex Luna sub-agent dispatcher (factory/codex-agent/dispatch.ts) on Bun.
+fn run_agent(args: Vec<String>) -> Result<()> {
+    let script = std::env::var_os("BUNOS_REPO")
+        .map(PathBuf::from)
+        .into_iter()
+        .chain(
+            std::env::current_dir()
+                .ok()
+                .into_iter()
+                .flat_map(|d| d.ancestors().map(PathBuf::from).collect::<Vec<_>>()),
+        )
+        .chain(std::env::var_os("HOME").map(|h| PathBuf::from(h).join("src/bun-os")))
+        .map(|r| r.join("factory/codex-agent/dispatch.ts"))
+        .find(|p| p.is_file())
+        .ok_or_else(|| {
+            miette::miette!("factory/codex-agent/dispatch.ts not found; set BUNOS_REPO")
+        })?;
+    let bun = std::env::var_os("BUN").unwrap_or_else(|| "bun".into());
+    let mut cmd = Command::new(bun).no_window();
+    cmd.arg(script).args(args);
+    dispatch_codex(cmd)
 }
 
 async fn run_review(args: ReviewArgs) -> Result<()> {
@@ -392,16 +574,28 @@ async fn run_review(args: ReviewArgs) -> Result<()> {
     Ok(())
 }
 
-async fn run_resume(_args: SessionArgs) -> Result<()> {
-    Err(miette::miette!(
-        "Session resume is not wired by this command; no session was resumed."
-    ))
+async fn run_resume(args: SessionArgs) -> Result<()> {
+    let mut cmd = require_codex()?;
+    cmd.arg("resume");
+    if let Some(id) = &args.session_id {
+        cmd.arg(id);
+    }
+    if args.last {
+        cmd.arg("--last");
+    }
+    dispatch_codex(cmd)
 }
 
-async fn run_fork(_args: SessionArgs) -> Result<()> {
-    Err(miette::miette!(
-        "Session fork is not wired by this command; no session was forked."
-    ))
+async fn run_fork(args: SessionArgs) -> Result<()> {
+    let mut cmd = require_codex()?;
+    cmd.arg("fork");
+    if let Some(id) = &args.session_id {
+        cmd.arg(id);
+    }
+    if args.last {
+        cmd.arg("--last");
+    }
+    dispatch_codex(cmd)
 }
 
 async fn run_apply(args: ApplyArgs) -> Result<()> {
@@ -660,9 +854,6 @@ mod tests {
     #[tokio::test]
     async fn unsupported_execution_and_mutations_do_not_report_success() {
         for argv in [
-            vec!["test", "codex", "exec", "hello", "--json"],
-            vec!["test", "codex", "resume", "--last"],
-            vec!["test", "codex", "fork", "--last"],
             vec!["test", "codex", "apply"],
             vec!["test", "codex", "mcp", "add", "audit-test"],
             vec!["test", "codex", "mcp", "remove", "audit-test"],
