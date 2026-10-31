@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Web app icons
+Comment=Fetch the icons of the installed web apps
+Exec=bunos-webapp-icons
+NoDisplay=true
+X-GNOME-Autostart-Phase=Initialization

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=NotebookLM
+Comment=Google NotebookLM as an installed web app (Helium app window)
+Exec=bunos-launch-webapp https://notebooklm.google.com/ com.aphrody.webapp.NotebookLM
+Icon=com.aphrody.webapp.NotebookLM
+Categories=Office;Education;
+StartupWMClass=com.aphrody.webapp.NotebookLM
+X-Bunos-AppKind=web
+X-Bunos-IconDomain=notebooklm.google.com
