@@ -12,12 +12,12 @@ case "$MODE" in
 session)
   # QUALIFY_NAME: the nightly run (factory/automation) uses its own container, so a manual qualification is untouched.
   name=${QUALIFY_NAME:-bunos-unified-manual-$(date -u +%Y%m%dT%H%M%S)}; docker rm -f "$name" >/dev/null 2>&1 || true
-  # Android services need Waydroid's lxc.cap.keep set; SYS_TIME and SYSLOG are left out (host clock, host kernel log).
+  # Android services need Waydroid's lxc.cap.keep set; Android 17 netbpfload needs SYSLOG and write access to /dev/kmsg inside this nested Waydroid session.
   # The binder major is dynamic: allow it in the device cgroup so the private binderfs devices can be opened.
   binder_major=$(rg -o -r '$1' '^\s*(\d+) binder$' /proc/devices)
   install -d -m 0700 "$OUT/secrets"; head -c 32 /dev/urandom | base64 >"$OUT/secrets/session.token"
   docker run -d --name $name --hostname bunos \
-    --cap-drop ALL --cap-add SYS_ADMIN --cap-add BPF --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SETUID --cap-add SETGID \
+    --cap-drop ALL --cap-add SYS_ADMIN --cap-add SYSLOG --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SETUID --cap-add SETGID \
     --cap-add CHOWN --cap-add DAC_OVERRIDE --cap-add FOWNER --cap-add KILL --cap-add MKNOD --cap-add SYS_CHROOT \
     --cap-add SETPCAP --cap-add AUDIT_WRITE --cap-add AUDIT_CONTROL --cap-add SYS_NICE --cap-add WAKE_ALARM \
     --cap-add BLOCK_SUSPEND --cap-add SYS_PTRACE --cap-add NET_BIND_SERVICE --cap-add DAC_READ_SEARCH \
@@ -55,7 +55,7 @@ session)
     echo "Android did not finish booting (sys.boot_completed=$android_booted)" >&2
     exit 1
   fi
-  docker exec $name sh -c 'set -e; waydroid status; waydroid shell -- pm list packages org.fdroid.fdroid | grep -Fqx package:org.fdroid.fdroid; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -60' | tee "$OUT/android.txt"
+  docker exec $name timeout 30s sh -c 'set -e; waydroid status; for _ in $(seq 60); do waydroid shell -- pm list packages org.fdroid.fdroid 2>/dev/null | grep -Fqx package:org.fdroid.fdroid && break; sleep 5; done; waydroid shell -- pm list packages org.fdroid.fdroid | grep -Fqx package:org.fdroid.fdroid; waydroid shell -- pm list packages com.android.vending | grep -Fqx package:com.android.vending; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -60' | tee "$OUT/android.txt"
   u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch com.android.vending
   sleep 40; shot 03-android-window
   u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch org.fdroid.fdroid
