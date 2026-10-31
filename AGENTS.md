@@ -12,6 +12,8 @@ Gemini at the centre), shipped as a bootable image and as the WebOS session on a
   leftover dirty state to `refs/wip/*` and fast-forwards. Details: [docs/SYNC.md](docs/SYNC.md).
 - Commit as `aphrody-dev <contact@aphrody.com>`, without co-authors.
 - Agents coordinate and help each other through `aphrody a2a` ([docs/A2A-AGENTS.md](docs/A2A-AGENTS.md)).
+- Every recurring step (delivery, health, dependencies, the agent loop, nightly qualification) is automated:
+  [docs/AUTOMATION.md](docs/AUTOMATION.md). Status: [aphrody.com/status](https://aphrody.com/status).
 
 ## Build
 

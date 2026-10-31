@@ -96,7 +96,7 @@ function printSteps(
   steps: { title: string; command?: string[]; writes?: { path: string }[]; needsApproval?: boolean }[],
 ) {
   for (const step of steps) {
-    console.log(`- ${step.title}${step.needsApproval ? "  [needs explicit owner approval]" : ""}`);
+    console.log(`- ${step.title}${step.needsApproval ? "  [runs once the owner credential consent exists]" : ""}`);
     if (step.command) console.log(`    ${step.command.join(" ")}`);
     for (const write of step.writes ?? []) console.log(`    write ${write.path}`);
   }
@@ -387,12 +387,33 @@ async function main(): Promise<number> {
         "  signtool sign /v /fd SHA256 /tr http://timestamp.acs.microsoft.com /td SHA256 /dlib <Azure.CodeSigning.Dlib.dll> /dmdf <metadata.json> <file>",
       );
       return 0;
-    case "store":
-      printSteps(storePlan(rest[0] ?? "out/app.msix"));
+    case "store": {
+      const plan = storePlan(rest[0] ?? "out/app.msix", process.env.MSSTORE_APP_ID);
+      printSteps(plan);
       console.log(
-        "The Store re-signs an MSIX only: submit an MSIX unsigned, but MSI and EXE installers must already be signed. Publishing always needs your explicit approval.",
+        "The Store re-signs an MSIX only: submit an MSIX unsigned, but MSI and EXE installers must already be signed. `--run` submits once the Partner Center consent exists (MSSTORE_TENANT_ID, MSSTORE_CLIENT_ID, MSSTORE_CLIENT_SECRET, MSSTORE_APP_ID from the secret store).",
       );
+      if (!has("run")) return 0;
+      // The owner consent is the credential itself: present, the submission proceeds; absent, it waits (exit 3).
+      const consent: Record<string, string | undefined> = {
+        "<TENANT_ID>": process.env.MSSTORE_TENANT_ID,
+        "<CLIENT_ID>": process.env.MSSTORE_CLIENT_ID,
+        "<CLIENT_SECRET>": process.env.MSSTORE_CLIENT_SECRET,
+        "<STORE_APP_ID>": process.env.MSSTORE_APP_ID,
+      };
+      const missing = Object.entries(consent)
+        .filter(([, value]) => !value)
+        .map(([key]) => `MSSTORE_${key.slice(1, -1).replace("STORE_", "")}`);
+      if (missing.length) {
+        console.error(`buncc store: waiting for the Partner Center consent (${missing.join(", ")} not set)`);
+        return 3;
+      }
+      for (const step of plan) {
+        const command = step.command?.map(arg => consent[arg] ?? arg);
+        if (command && (await run(command, { output: "inherit" })).code !== 0 && !step.optional) return 1;
+      }
       return 0;
+    }
     case "profile": {
       const [sub = "list", id] = rest;
       if (sub === "list") {

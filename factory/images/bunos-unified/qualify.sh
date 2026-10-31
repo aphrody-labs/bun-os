@@ -10,7 +10,8 @@ MODE=${1:?session|disk}; OUT=${2:-/home/ubuntu/bun-os-disk/qualify-$(date -u +%Y
 A17=${BUNOS_WAYDROID_IMAGES:-/home/ubuntu/.cache/bunos-waydroid/a17/images}
 case "$MODE" in
 session)
-  name=bunos-unified-qualify; docker rm -f $name >/dev/null 2>&1 || true
+  # QUALIFY_NAME: the nightly run (factory/automation) uses its own container, so a manual qualification is untouched.
+  name=${QUALIFY_NAME:-bunos-unified-qualify}; docker rm -f "$name" >/dev/null 2>&1 || true
   # The binder major is dynamic: allow it in the device cgroup so the private binderfs devices can be opened.
   binder_major=$(rg -o -r '$1' '^\s*(\d+) binder$' /proc/devices)
   install -d -m 0700 "$OUT/secrets"; head -c 32 /dev/urandom | base64 >"$OUT/secrets/session.token"
@@ -22,7 +23,7 @@ session)
     --device /dev/loop-control --device-cgroup-rule "b 7:* rwm" --sysctl net.ipv4.ip_forward=1 --cgroupns private --pids-limit 8192 --shm-size 1g --memory 8g --cpus 4 \
     --tmpfs /run:exec --tmpfs /tmp --tmpfs /var/lib/waydroid --tmpfs /var/lib/misc --tmpfs /var/log \
     -v "$A17:/usr/share/bunos/waydroid/images:ro" -v "$OUT/secrets:/run/secrets:ro" \
-    -v bunos-unified-qualify-home:/home/aphrody \
+    -v "$name-home:/home/aphrody" \
     -e BUNOS_SESSION_SIZE=1600x900 -e APHRODY_REMOTE_TOKEN_FILE=/run/secrets/session.token \
     "${TAG:-bunos-unified:session}" >/dev/null
   for _ in $(seq 120); do docker exec $name test -f /run/bunos/ready && break; sleep 2; done

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // One entry that builds, deploys and verifies every Aphrody site from the published main tip, on the VPS:
 //   bun scripts/aphrody/release/deploy-sites.ts [--verify-only]
-// WebOS (aphrody.com and its redirect/alias hosts) is built and staged by apps/webos/deploy.ts; the root activator
+// WebOS (aphrody.com and its redirect/alias hosts) is built and staged by crates/aphrody-webos-server/release.sh; the root activator
 // swaps the release. Independent site owners (downloads, cdn, creator) run as their own services and are only verified.
 import { join, resolve } from "node:path";
 
@@ -22,7 +22,8 @@ async function run(label: string, ...cmd: string[]) {
 
 git("fetch", "--quiet", "origin");
 const commit = git("rev-parse", "HEAD");
-if (commit !== git("rev-parse", "refs/remotes/origin/main"))
+// Verification reads the live hosts only; a deploy must build the published tip.
+if (!verifyOnly && commit !== git("rev-parse", "refs/remotes/origin/main"))
   throw new Error("Deploy the published main tip (git fetch origin && git merge --ff-only origin/main)");
 
 const routes = (await Bun.file(join(root, "infra/config/routes.catalog.json")).json()) as {
@@ -32,7 +33,7 @@ const routes = (await Bun.file(join(root, "infra/config/routes.catalog.json")).j
 const origin = new URL(routes.origin).hostname;
 
 if (!verifyOnly) {
-  await run("WebOS build and staging", process.execPath, join(root, "apps/webos/deploy.ts"));
+  await run("WebOS build and staging", "bash", join(root, "crates/aphrody-webos-server/release.sh"));
   // The root activator (aphrody-webos-deploy.timer) consumes the handoff; wait for the live commit to match.
   const deadline = Date.now() + 10 * 60_000;
   for (;;) {

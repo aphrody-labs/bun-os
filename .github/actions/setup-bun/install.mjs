@@ -2,7 +2,16 @@
 // Usage: node install.mjs <version> <install-dir>
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -49,7 +58,8 @@ if (exe === "bun") {
   if (!existsSync(alias)) symlinkSync("bun", alias);
 } else copyFileSync(target, alias);
 
-const revision = spawnSync(target, ["-p", "Bun.revision"], { encoding: "utf8" });
+// Outside the checkout: the root bunfig preloads workspace plugins that are not installed yet.
+const revision = spawnSync(target, ["-p", "Bun.revision"], { encoding: "utf8", cwd: work });
 if (revision.status !== 0 || revision.stdout.trim() !== gitHead)
   throw new Error(`installed Bun reports revision ${revision.stdout.trim()}, expected ${gitHead}`);
 console.log(`bun ${version} (${gitHead}) from ${name}`);

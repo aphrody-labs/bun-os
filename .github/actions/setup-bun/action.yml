@@ -37,7 +37,8 @@ runs:
         case "${RUNNER_OS}" in Windows) exe=bun.exe;; *) exe=bun;; esac
         # The cached binary is trusted only if it still reports the pinned revision.
         expected="$(node -e 'fetch("https://registry.npmjs.org/bun/"+process.argv[1]).then(r=>r.json()).then(m=>console.log(m.gitHead))' "$BUN_VERSION")"
-        if ! [ "$("$HOME/.bun/bin/$exe" -p Bun.revision 2>/dev/null || true)" = "$expected" ]; then
+        # From the runner temp directory: the root bunfig preloads workspace plugins that are not installed yet.
+        if ! [ "$(cd "${RUNNER_TEMP:-/tmp}" && "$HOME/.bun/bin/$exe" -p Bun.revision 2>/dev/null || true)" = "$expected" ]; then
           node "$GITHUB_ACTION_PATH/install.mjs" "$BUN_VERSION" "$HOME/.bun/bin"
         fi
         # Native tools see Windows paths: a /c/Users/... entry is not one, and the workspace scripts that spawn a
