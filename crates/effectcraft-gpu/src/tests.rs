@@ -48,12 +48,27 @@ pub(crate) fn hold_gpu_lock() {
     });
 }
 
+/// Software rasterizers (Mesa llvmpipe/lavapipe, SwiftShader: `DeviceType::Cpu`) run the GPU suite for hours on a
+/// headless build host, which looks like a hang. They are skipped unless EFFECTCRAFT_SOFTWARE_GPU=1 (the FreeBSD
+/// llvmpipe job) or EFFECTCRAFT_REQUIRE_GPU=1 asks for them.
+pub(crate) fn software_adapter_skipped(device_type: wgpu::DeviceType, name: &str) -> bool {
+    let allowed = ["EFFECTCRAFT_SOFTWARE_GPU", "EFFECTCRAFT_REQUIRE_GPU"]
+        .iter()
+        .any(|key| std::env::var(key).is_ok_and(|value| value == "1"));
+    if device_type == wgpu::DeviceType::Cpu && !allowed {
+        eprintln!("effectcraft-gpu tests: software adapter {name}, skipping (EFFECTCRAFT_SOFTWARE_GPU=1 runs them)");
+        return true;
+    }
+    false
+}
+
 /// The shared test device (the calling test holds [`hold_gpu_lock`]).
 pub(crate) fn gpu() -> Option<&'static Gpu> {
     static G: OnceLock<Option<Gpu>> = OnceLock::new();
     hold_gpu_lock();
     G.get_or_init(|| {
-        let g = Gpu::headless();
+        let g = Gpu::headless()
+            .filter(|g| !software_adapter_skipped(g.ctx.device_type, &g.ctx.name));
         if g.is_none() {
             eprintln!("effectcraft-gpu tests: no GPU adapter, skipping GPU comparisons");
         } else if let Some(g) = &g {
@@ -1228,6 +1243,10 @@ fn devices_with_webgl2_limits_are_declined() {
     let Ok(adapter) = pollster::block_on(instance.request_adapter(&Default::default())) else {
         return;
     };
+    let info = adapter.get_info();
+    if software_adapter_skipped(info.device_type, &info.name) {
+        return;
+    }
     let desc = wgpu::DeviceDescriptor {
         required_limits: wgpu::Limits::downlevel_webgl2_defaults(),
         ..Default::default()
@@ -1265,6 +1284,10 @@ fn a_failed_buffer_allocation_is_an_error_not_a_panic() {
     let Ok(adapter) = pollster::block_on(instance.request_adapter(&Default::default())) else {
         return;
     };
+    let info = adapter.get_info();
+    if software_adapter_skipped(info.device_type, &info.name) {
+        return;
+    }
     let required_limits = wgpu::Limits {
         max_buffer_size: 4096,
         max_storage_buffer_binding_size: 4096,

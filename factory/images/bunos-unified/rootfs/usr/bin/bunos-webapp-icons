@@ -1,0 +1,25 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# bunos-webapp-icons: give every web app launcher (X-Bunos-AppKind=web) the service's own icon. The icon is fetched
+# at session start from Google's public favicon service for the launcher's X-Bunos-IconDomain and cached per user
+# (~/.local/share/icons/hicolor/256x256/apps/<app id>.png); nothing of the vendors is shipped in the image.
+set -u
+dest="${XDG_DATA_HOME:-$HOME/.local/share}/icons/hicolor/256x256/apps"
+mkdir -p "$dest"
+changed=0
+for f in /usr/share/applications/*.desktop "${XDG_DATA_HOME:-$HOME/.local/share}"/applications/*.desktop; do
+  [ -f "$f" ] || continue
+  grep -q '^X-Bunos-AppKind=web' "$f" || continue
+  icon=$(sed -n 's/^Icon=//p' "$f" | head -1)
+  domain=$(sed -n 's/^X-Bunos-IconDomain=//p' "$f" | head -1)
+  [ -n "$icon" ] && [ -n "$domain" ] || continue
+  out="$dest/$icon.png"
+  [ -s "$out" ] && [ -z "$(find "$out" -mtime +30 2>/dev/null)" ] && continue
+  if curl -fsSL --max-time 20 -o "$out.part" "https://www.google.com/s2/favicons?domain=$domain&sz=256"; then
+    mv "$out.part" "$out" && changed=1
+  else
+    rm -f "$out.part"
+  fi
+done
+[ "$changed" = 1 ] && command -v gtk-update-icon-cache >/dev/null 2>&1 && gtk-update-icon-cache -q -t "${dest%/256x256/apps}" 2>/dev/null
+exit 0

@@ -263,6 +263,8 @@ pub struct GpuContext {
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub(crate) name: String,
+    /// Adapter class: tests skip software rasterizers (llvmpipe, lavapipe, SwiftShader) by default.
+    pub(crate) device_type: wgpu::DeviceType,
     pub(crate) max_dim: u32,
     bgl: wgpu::BindGroupLayout,
     bgl_ext: wgpu::BindGroupLayout,
@@ -713,6 +715,7 @@ impl GpuContext {
             device,
             queue,
             name,
+            device_type: info.device_type,
             max_dim,
             bgl,
             bgl_ext,

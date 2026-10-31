@@ -66,6 +66,21 @@ export async function pin(name: string): Promise<string> {
   return sha;
 }
 
+/** cargo-serial with four jobs. The shared factory lease gives up after 30 minutes; a busy factory is waited for again. */
+async function cargoSerial(label: string, args: string[], cwd: string, env: Record<string, string> = {}) {
+  let r = { code: 1, out: "" };
+  for (let attempt = 0; attempt < 24; attempt++) {
+    r = await sh(["bash", join(ROOT, "scripts/aphrody/build/rust/cargo-serial.sh"), ...args], {
+      cwd,
+      timeout: 6 * HOURS,
+      env: { APHRODY_BUILD_HOST: "vps", APHRODY_CARGO_JOBS: "4", CARGO_BUILD_JOBS: "4", APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800", MAKEFLAGS: "-j4", ...env },
+    });
+    if (r.code === 0 || !/lease was not acquired|Timed out waiting|failed to get lock|flock|timeout/i.test(r.out.split("\n").slice(-5).join("\n"))) break;
+    console.log(`rust-base: ${label}: factory busy, waiting again (${attempt + 1}/24)`);
+  }
+  if (r.code !== 0) throw new Error(`cargo ${label}: ${r.out.trim().split("\n").slice(-15).join("\n")}`);
+}
+
 /** Fetch, build with cargo-serial (4 jobs) and stage target/release/<bin> plus licences under WORK/out/<name>. */
 export async function buildComponent(name: string): Promise<string> {
   if (process.platform !== "linux") throw new Error("The Rust base builds on the VPS");
@@ -80,25 +95,7 @@ ${c.submodules?.length ? `git submodule update -q --init --recursive --depth 1 $
   await must(`fetch ${name}`, ["bash", "-c", fetch, "_", src, c.fork, sha], { timeout: 2 * HOURS });
   const target = join(WORK, "target", name);
   const t = Date.now();
-  let r = { code: 1, out: "" };
-  // The shared factory lease gives up after 30 minutes; a busy factory is waited for again.
-  for (let attempt = 0; attempt < 8; attempt++) {
-    r = await sh(["bash", join(ROOT, "scripts/aphrody/build/rust/cargo-serial.sh"), ...c.build.cargo], {
-      cwd: src,
-      timeout: 6 * HOURS,
-      env: {
-        APHRODY_BUILD_HOST: "vps",
-        APHRODY_CARGO_JOBS: "4",
-        CARGO_BUILD_JOBS: "4",
-        APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800",
-        MAKEFLAGS: "-j4",
-        CARGO_TARGET_DIR: target,
-      },
-    });
-    if (r.code === 0 || !/lease was not acquired|Timed out waiting|failed to get lock/i.test(r.out)) break;
-    console.log(`rust-base: factory busy, waiting again (${attempt + 1}/8)`);
-  }
-  if (r.code !== 0) throw new Error(`cargo build ${name}: ${r.out.trim().split("\n").slice(-15).join("\n")}`);
+  await cargoSerial(name, c.build.cargo, src, { CARGO_TARGET_DIR: target });
   const out = join(WORK, "out", name);
   await rm(out, { recursive: true, force: true });
   for (const bin of c.build.bins) {
@@ -138,38 +135,14 @@ export async function buildUtils(): Promise<string> {
     multicall: { features: string[]; target: string };
   };
   const t = Date.now();
-  const r = await sh(
-    [
-      "bash",
-      join(ROOT, "scripts/aphrody/build/rust/cargo-serial.sh"),
-      "build",
-      "--release",
-      "--locked",
-      "-p",
-      "bunos-utils",
-      "--target",
-      m.multicall.target,
-      "--features",
-      m.multicall.features.join(","),
-    ],
-    {
-      timeout: 6 * HOURS,
-      env: {
-        APHRODY_BUILD_HOST: "vps",
-        APHRODY_CARGO_JOBS: "4",
-        CARGO_BUILD_JOBS: "4",
-        APHRODY_CARGO_LOCK_TIMEOUT_SECS: "10800",
-      },
-    },
-  );
-  if (r.code !== 0) throw new Error(`cargo build bunos-utils: ${r.out.trim().split("\n").slice(-15).join("\n")}`);
+  await cargoSerial("bunos-utils", ["build", "--release", "--locked", "-p", "bunos-utils", "--target", m.multicall.target, "--features", m.multicall.features.join(",")], ROOT);
   const out = join(WORK, "out", "bunos-utils");
   await rm(out, { recursive: true, force: true });
   await mkdir(join(out, "target/release"), { recursive: true });
   await mkdir(join(out, "licenses"), { recursive: true });
   await cp(join(ROOT, "target", m.multicall.target, "release/bunos-utils"), join(out, "target/release/bunos-utils"));
   for (const suite of ["coreutils", "findutils", "diffutils", "procps", "util-linux"])
-    for (const f of [...new Bun.Glob("LICENSE*").scanSync(join(ROOT, "vendor/uutils", suite))])
+    for (const f of new Bun.Glob("LICENSE*").scanSync(join(ROOT, "vendor/uutils", suite)))
       await cp(join(ROOT, "vendor/uutils", suite, f), join(out, "licenses", `${suite}-${f}`));
   const version =
     /^version\s*=\s*"([^"]+)"/m.exec(await Bun.file(join(ROOT, "vendor/uutils/coreutils/Cargo.toml")).text())?.[1] ??
@@ -291,7 +264,7 @@ apt-get update -qq >/dev/null
 apt-get install -y -qq rust-coreutils rust-findutils rust-diffutils sudo-rs ntpd-rs bunos-crosvm >/dev/null
 dpkg-query -W rust-coreutils rust-findutils rust-diffutils sudo-rs ntpd-rs bunos-crosvm
 ln -sf /usr/lib/cargo/bin/sudo /usr/local/bin/sudo
-for c in "ls --version" "coreutils --list" "sudo --version" "ntp-ctl --version" "crosvm version"; do echo "\$ $c"; $c 2>&1 | head -2; done
+for c in "ls --version" "coreutils --list" "sudo --version" "ntp-ctl --version" "crosvm version"; do echo "$ $c"; $c 2>&1 | head -2; done
 readlink -f /usr/bin/ls
 ls --version | grep -q "uutils coreutils"
 sudo --version | grep -q sudo-rs`;

@@ -1,3 +1,5 @@
+> **Product status lives in [`docs/PRODUCT.md`](docs/PRODUCT.md)** (owner order 2026-10-31: one product, the unified Bun OS image). This file is background only; where it disagrees with PRODUCT.md, PRODUCT.md wins.
+
 # Goal
 
 This file describes the desired end state, not a statement that consolidation

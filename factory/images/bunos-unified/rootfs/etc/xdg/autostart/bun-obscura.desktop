@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=bun-obscura headless engine
+Comment=Headless browser engine and CDP server (127.0.0.1:9222) for agents, search and automation
+Exec=/usr/libexec/bunos/bun-obscura-session
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+OnlyShowIn=COSMIC;

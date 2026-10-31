@@ -79,7 +79,7 @@ pub struct DoctorReport {
     pub allocator: &'static str,
     pub tokio_runtime: &'static str,
     pub ai_json: CheckResult,
-    pub well_known_ai_json: CheckResult,
+    pub agent_card: CheckResult,
     pub peer_heartbeat: CheckResult,
     pub inbox: CheckResult,
     pub http_listener: CheckResult,
@@ -92,7 +92,7 @@ impl DoctorReport {
     #[must_use]
     pub fn verdict(&self) -> &'static str {
         let has_error = self.ai_json.is_critical_failure() || self.cargo_vet.is_critical_failure();
-        let has_warn = matches!(self.well_known_ai_json, CheckResult::Warn(_))
+        let has_warn = matches!(self.agent_card, CheckResult::Warn(_))
             || matches!(self.peer_heartbeat, CheckResult::Warn(_))
             || matches!(self.inbox, CheckResult::Warn(_))
             || matches!(self.http_listener, CheckResult::Warn(_))
@@ -138,7 +138,7 @@ impl DoctorReport {
                 "allocator": r.allocator,
                 "tokio_runtime": r.tokio_runtime,
                 "ai_json": r.ai_json.value(),
-                "well_known_ai_json": r.well_known_ai_json.value(),
+                "agent_card": r.agent_card.value(),
             },
             "peer_a2a": {
                 "heartbeat_age_s": heartbeat_age_s,
@@ -193,7 +193,7 @@ pub async fn collect_diagnostics(binary_version: String) -> DoctorReport {
         allocator: "active (native)",
         tokio_runtime: "multi-thread, full",
         ai_json: check_ai_json(),
-        well_known_ai_json: check_well_known_ai_json(),
+        agent_card: check_agent_card().await,
         peer_heartbeat: check_peer_heartbeat(),
         inbox: check_inbox(),
         http_listener: check_http_listener().await,
@@ -356,8 +356,16 @@ fn check_ai_json() -> CheckResult {
             } else {
                 "schema unknown"
             };
-            let a2a_ver = if text.contains("a2a/v0.4") || text.contains("a2a_protocol_version") {
-                "A2A v0.4"
+            let protocol_version = serde_json::from_str::<Value>(&text)
+                .ok()
+                .and_then(|manifest| {
+                    manifest
+                        .get("a2a_protocol_version")
+                        .and_then(Value::as_str)
+                        .map(str::to_owned)
+                });
+            let a2a_ver = if protocol_version.as_deref() == Some("1.0") {
+                "A2A 1.0 local coordination config"
             } else {
                 "A2A unknown"
             };
@@ -368,27 +376,44 @@ fn check_ai_json() -> CheckResult {
     CheckResult::Ok(format!("present at {} ({schema_v})", path.display()))
 }
 
-fn check_well_known_ai_json() -> CheckResult {
-    let root = match repo_root() {
-        Some(r) => r,
-        None => return CheckResult::Warn("repo root not found — skip".to_string()),
+async fn check_agent_card() -> CheckResult {
+    let base = std::env::var("APHRODY_A2A_HUB_URL")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| "http://127.0.0.1:8788".to_owned());
+    let url = format!("{}/.well-known/agent-card.json", base.trim_end_matches('/'));
+    let client = match reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(3))
+        .build()
+    {
+        Ok(client) => client,
+        Err(_) => return CheckResult::Warn("A2A Agent Card client unavailable".to_owned()),
     };
-    let path = root.join(".well-known").join("ai.json");
-    if !path.exists() {
-        return CheckResult::Warn("absent (non-critical for local dev)".to_string());
+    let response = match client.get(url).send().await {
+        Ok(response) => response,
+        Err(_) => return CheckResult::Warn("A2A Agent Card endpoint unreachable".to_owned()),
+    };
+    if !response.status().is_success() {
+        return CheckResult::Warn(format!("A2A Agent Card returned HTTP {}", response.status()));
     }
-    // Look for canonical_manifest field.
-    let detail = match std::fs::read_to_string(&path) {
-        Ok(text) => {
-            if text.contains("canonical_manifest") || text.contains("../ai.json") {
-                "present (canonical_manifest -> ../ai.json)".to_string()
-            } else {
-                "present".to_string()
-            }
-        }
-        Err(e) => return CheckResult::Warn(format!("unreadable ({e})")),
+    let card: Value = match response.json().await {
+        Ok(card) => card,
+        Err(_) => return CheckResult::Warn("A2A Agent Card is not valid JSON".to_owned()),
     };
-    CheckResult::Ok(detail)
+    let name = card.get("name").and_then(Value::as_str);
+    let interfaces = card.get("supportedInterfaces").and_then(Value::as_array);
+    if name.is_none() || interfaces.is_none() {
+        return CheckResult::Warn("A2A Agent Card is missing required 1.0 fields".to_owned());
+    }
+    if interfaces.is_some_and(|items| {
+        items.iter().any(|item| {
+            item.get("protocolVersion").and_then(Value::as_str) == Some("1.0")
+        })
+    }) {
+        CheckResult::Ok(format!("A2A 1.0 Agent Card available for {}", name.unwrap_or("agent")))
+    } else {
+        CheckResult::Warn("A2A Agent Card has no A2A 1.0 interface".to_owned())
+    }
 }
 
 fn check_peer_heartbeat() -> CheckResult {
@@ -401,10 +426,10 @@ fn check_peer_heartbeat() -> CheckResult {
 
     let path = match candidates.iter().find(|p| p.exists()) {
         Some(p) => p.clone(),
+        // The file-mailbox peer is optional: agents coordinate through the A2A hub
+        // (APHRODY_A2A_HUB_URL, docs/A2A-AGENTS.md), so an absent winclean coord is not a fault.
         None => {
-            return CheckResult::Warn(format!(
-                "absent at {WINCLEAN_HEARTBEAT_PATH} — peer offline"
-            ));
+            return CheckResult::Ok("winclean file peer not configured (A2A hub in use)".to_owned());
         }
     };
 
@@ -453,7 +478,7 @@ fn check_inbox() -> CheckResult {
         .clone();
 
     if !path.exists() {
-        return CheckResult::Warn(format!("absent at {WINCLEAN_INBOX_PATH}"));
+        return CheckResult::Ok("winclean file inbox not configured (A2A hub in use)".to_owned());
     }
     let text = match std::fs::read_to_string(&path) {
         Ok(t) => t,
@@ -472,7 +497,13 @@ fn check_inbox() -> CheckResult {
 }
 
 async fn check_http_listener() -> CheckResult {
-    let url = "http://localhost:8788/ping";
+    // The hub this host talks to: the VPS listener directly, or the workstation's loopback tunnel to it.
+    let base = std::env::var("APHRODY_A2A_HUB_URL")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| "http://127.0.0.1:8788".to_owned());
+    let base = base.trim_end_matches('/');
+    let url = format!("{base}/ping");
     // Build a reqwest client with a short timeout so we don't block the
     // user for multi-second hangs when the peer listener is down.
     let client = match reqwest::Client::builder()
@@ -483,18 +514,13 @@ async fn check_http_listener() -> CheckResult {
         Err(e) => return CheckResult::Warn(format!("could not build HTTP client: {e}")),
     };
 
-    match client.get(url).send().await {
+    match client.get(&url).send().await {
         Ok(resp) if resp.status().is_success() => CheckResult::Ok(format!(
-            "localhost:8788 (alive, /ping -> {})",
+            "{base} (alive, /ping -> {})",
             resp.status().as_u16()
         )),
-        Ok(resp) => CheckResult::Warn(format!(
-            "localhost:8788 (non-200: {})",
-            resp.status().as_u16()
-        )),
-        Err(_) => {
-            CheckResult::Warn("localhost:8788 (no response — listener not running)".to_string())
-        }
+        Ok(resp) => CheckResult::Warn(format!("{base} (non-200: {})", resp.status().as_u16())),
+        Err(_) => CheckResult::Warn(format!("{base} (no response — hub or tunnel not running)")),
     }
 }
 

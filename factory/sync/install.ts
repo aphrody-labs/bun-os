@@ -13,7 +13,7 @@
  * trees that were not edited during the grace period.
  * Environment: BUNOS_REPO (default: this checkout), BUNOS_SYNC_INTERVAL (seconds).
  */
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -53,6 +53,39 @@ function bunOsClones(root: string, remote: string): string[] {
     .map(name => join(root, name))
     .filter(dir => existsSync(join(dir, ".git")))
     .filter(dir => normalizeRemote(run(["git", "-C", dir, "remote", "get-url", "origin"], true)) === remote);
+}
+
+const BUILD_ENV_MARK = "# >>> bunos build host (factory/sync/install.ts)";
+
+/**
+ * Build-host wiring: `cargo` resolves to the lane shim (every compile goes through a buncc lane on the fast disk),
+ * sccache lives on the fast disk, and the shell environment carries it. Hot directories stay off the slow /home disks.
+ */
+function installBuildHost() {
+  const laneRoot = "/var/cache/aphrody-target";
+  const sccacheDir = "/var/cache/sccache";
+  for (const dir of [laneRoot, sccacheDir]) {
+    if (!existsSync(dir)) run(["sudo", "-n", "install", "-d", "-o", process.env.USER ?? "ubuntu", "-g", process.env.USER ?? "ubuntu", dir], true);
+  }
+  const bin = join(home, ".local", "bin");
+  mkdirSync(bin, { recursive: true });
+  const shim = join(bin, "cargo");
+  rmSync(shim, { force: true });
+  symlinkSync(join(repo, "scripts", "aphrody", "build", "rust", "cargo-lane-shim.ts"), shim);
+  const env = { SCCACHE_DIR: sccacheDir, SCCACHE_CACHE_SIZE: "20G", BUNCC_LANE_ROOT: laneRoot };
+  const envDir = join(home, ".config", "environment.d");
+  mkdirSync(envDir, { recursive: true });
+  writeFileSync(join(envDir, "60-bunos-build.conf"), Object.entries(env).map(([k, v]) => `${k}=${v}`).join("\n") + "\n");
+  const shellFile = join(home, ".config", "bunos", "build-env.sh");
+  mkdirSync(join(home, ".config", "bunos"), { recursive: true });
+  writeFileSync(shellFile, Object.entries(env).map(([k, v]) => `export ${k}=${v}`).join("\n") + "\n");
+  for (const rc of [join(home, ".bashrc"), join(home, ".profile")]) {
+    const text = existsSync(rc) ? readFileSync(rc, "utf8") : "";
+    if (text.includes(BUILD_ENV_MARK)) continue;
+    // Before the interactive guard, so non-interactive ssh commands and agents get it too.
+    writeFileSync(rc, `${BUILD_ENV_MARK}\n[ -f "${shellFile}" ] && . "${shellFile}"\n# <<< bunos build host\n${text}`);
+  }
+  console.log(`build host: cargo -> lane shim (${shim}), lanes in ${laneRoot}, sccache in ${sccacheDir}`);
 }
 
 function installLinux() {
@@ -108,6 +141,7 @@ WantedBy=timers.target
   run(["systemctl", "--user", "restart", "bunos-sync.timer"]);
   run(["loginctl", "enable-linger", process.env.USER ?? ""], true);
   for (const clone of [repo, ...bunOsClones(join(home, "work"), canonicalRemote)]) setHooks(clone);
+  installBuildHost();
   console.log(run(["systemctl", "--user", "list-timers", "bunos-sync.timer", "--no-pager"]));
 }
 

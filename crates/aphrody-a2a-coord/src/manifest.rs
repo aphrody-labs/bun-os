@@ -201,7 +201,7 @@ mod tests {
         assert!(manifest.supported_interfaces.is_empty());
         assert!(
             manifest.peers.is_empty(),
-            "peer list belongs to tools/config/a2a-peers.json"
+            "peer list belongs to tools/aphrody/config/a2a-peers.json"
         );
     }
 }

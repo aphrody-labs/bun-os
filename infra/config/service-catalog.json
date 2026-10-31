@@ -228,7 +228,7 @@
       "sourceRepo": "aphrody",
       "workingDirectory": "/home/ubuntu/apps/aphrody/shared/agent-workspaces/aphrody",
       "a2a": {
-        "registry": "tools/config/a2a-peers.json",
+        "registry": "tools/aphrody/config/a2a-peers.json",
         "peer": "aphrody",
         "rpcPath": "/",
         "agentCardPath": "/.well-known/agent-card.json"

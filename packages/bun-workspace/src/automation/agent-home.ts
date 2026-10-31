@@ -438,7 +438,7 @@ export function renderTools(generatedAt: string, home: string, root: string): st
     "- Git : `github_status` reçoit repo_path ; sa liste de modifications ne prouve pas leur auteur.",
     "- Agent Home : crates/ai/agent-home ; génération : packages/bun-workspace/src/automation/agent-home.ts.",
     "- Sessions externes : crates/ai/session/src/external ; mémoire : crates/ai/memory.",
-    "- A2A : tools/config/a2a-peers.json ; transport : crates/os/kernel/comps/a2a-coord ; contrat : crates/contracts/a2a.",
+    "- A2A : tools/aphrody/config/a2a-peers.json ; transport : crates/aphrody-a2a-coord ; contrat : crates/aphrody-a2a.",
     "- Modèles locaux : crates/ai/llama-server et crates/ai/models ; ne pas déplacer les poids.",
     "- Rust: scoped cargo check/clippy/test; Bun: bun check/lint/fmt/test according to manifests. Declaration emission retains the locked TypeScript SDK.",
     "",

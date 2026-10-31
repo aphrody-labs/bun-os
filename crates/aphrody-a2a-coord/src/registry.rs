@@ -3,7 +3,7 @@
 //!
 //! Resolution order per peer (first hit wins):
 //! 1. env `APHRODY_A2A_PEER_<ID>_URL` (upper-case id, `-` -> `_`);
-//! 2. `tools/config/a2a-peers.json` (or `APHRODY_A2A_PEERS_FILE`),
+//! 2. `tools/aphrody/config/a2a-peers.json` (or `APHRODY_A2A_PEERS_FILE`),
 //!    shape `{"peers":[{"id":"claude","transport":"https-jsonrpc","endpoint":"https://..."}]}`
 //!    (the legacy `url` field is still accepted; `coord-file` endpoints are paths,
 //!    not URLs, and keep the peer on the file channel);
@@ -50,7 +50,7 @@ struct PeersFile {
     peers: Vec<CatalogPeer>,
 }
 
-/// One entry of the monorepo `tools/config/a2a-peers.json`.
+/// One entry of the monorepo `tools/aphrody/config/a2a-peers.json`.
 #[derive(Debug, Deserialize)]
 struct CatalogPeer {
     id: String,
@@ -138,7 +138,7 @@ impl PeerRegistry {
     pub fn from_env(repo_root: &Path) -> Self {
         let catalog = std::env::var_os("APHRODY_A2A_PEERS_FILE")
             .map(PathBuf::from)
-            .unwrap_or_else(|| repo_root.join("tools/config/a2a-peers.json"));
+            .unwrap_or_else(|| repo_root.join("tools/aphrody/config/a2a-peers.json"));
         Self::resolve(Some(&catalog), |k| std::env::var(k).ok())
     }
 

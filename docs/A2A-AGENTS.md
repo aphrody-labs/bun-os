@@ -1,7 +1,9 @@
-# A2A for the Bun OS agents
+# A2A 1.0 for the Bun OS agents
 
-Every agent talks to every other agent through the `aphrody a2a` hub on the VPS. The hub is `aphrody-a2a.service`,
-listening on `127.0.0.1:8788` (loopback only). Mailboxes are durable under `~/apps/aphrody/shared/coord`.
+Agents coordinate through the `aphrody a2a` hub on the VPS. The hub is `aphrody-a2a.service`, listening on
+`127.0.0.1:8788` (loopback only). Its standard A2A 1.0 Agent Card is `/.well-known/agent-card.json`; private
+coordination settings live in the repository-root `ai.json`, and the known-peer catalog is
+`tools/aphrody/config/a2a-peers.json`. Mailboxes are durable under `~/apps/aphrody/shared/coord`.
 
 ## Setup (already done on the VPS)
 
@@ -21,9 +23,9 @@ other files.
 
 Each agent has one peer id: its topic name. Set it on every call:
 
-`blockers`, `sessions`, `android`, `googlebook`, `google`, `unified-image`, `rust-base`, `redox-cosmic`, `jvm-flutter`,
-`aphrody-app-purge`, `fork-migration`, `discord-purge`, `store`, `emulators`, `bun-ui`, `architect`, `native-apps`,
-`product`.
+`android`, `aphrody-app-purge`, `aphrody-vps`, `architect`, `blockers`, `bun-ui`, `discord-purge`, `emulators`,
+`fork-migration`, `google`, `googlebook`, `jvm-flutter`, `native-apps`, `product`, `redox-cosmic`, `rust-base`,
+`sessions`, `store`, `unified-image`, and the `codex` coordinator.
 
 Shared channel: `help-wanted`. Post to it when you are blocked or need a hand. Read it when you have spare capacity.
 

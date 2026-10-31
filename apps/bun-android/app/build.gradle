@@ -1,5 +1,15 @@
 import javax.inject.Inject
 
+// Canonical CARGO_HOME: ~/.cargo/registry is a symlink on the factory, and askama (uniffi_bindgen) cannot find its
+// templates when the registry path is not canonical.
+static String canonicalCargoHome() {
+    String env = System.getenv('CARGO_HOME')
+    if (env) return env
+    def home = new File(System.getProperty('user.home'), '.cargo')
+    def registry = new File(home, 'registry').toPath()
+    return java.nio.file.Files.isSymbolicLink(registry) ? registry.toRealPath().parent.toString() : home.path
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
@@ -39,6 +49,7 @@ abstract class CargoNdkTask extends DefaultTask {
             environment('APHRODY_CARGO_TARGET_DIR', new File(root, 'target/android-native').absolutePath)
             environment('CARGO_BUILD_BUILD_DIR', new File(root, 'target/android-native/build').absolutePath)
             // Factory runtime lane (four jobs, own flock) shared by Android, JVM and Flutter builds (as apps/webos/store/pacman.ts).
+            environment('CARGO_HOME', canonicalCargoHome())
             environment('APHRODY_BUILD_HOST', '')
             environment('APHRODY_LOCAL_CARGO', '1')
             environment('APHRODY_CARGO_JOBS', '4')
@@ -70,6 +81,7 @@ abstract class UniffiKotlinTask extends DefaultTask {
             environment('APHRODY_CARGO_TARGET_DIR', target.absolutePath)
             environment('CARGO_BUILD_BUILD_DIR', new File(target, 'build').absolutePath)
             // Factory runtime lane (four jobs, own flock) shared by Android, JVM and Flutter builds (as apps/webos/store/pacman.ts).
+            environment('CARGO_HOME', canonicalCargoHome())
             environment('APHRODY_BUILD_HOST', '')
             environment('APHRODY_LOCAL_CARGO', '1')
             environment('APHRODY_CARGO_JOBS', '4')

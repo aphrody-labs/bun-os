@@ -14,59 +14,188 @@
     "format": "jsonl",
     "inbox": ".coord/inbox-from-<peer>.jsonl",
     "outbox": ".coord/outbox-to-<peer>.jsonl",
-    "envelope": ["v", "ts", "id", "from", "to", "kind", "topic", "body", "re", "channel_hint"],
+    "envelope": [
+      "v",
+      "ts",
+      "id",
+      "from",
+      "to",
+      "kind",
+      "topic",
+      "body",
+      "re",
+      "channel_hint"
+    ],
     "gitPolicy": "untracked-runtime-state",
     "retention": "operator-rotated; never contains secrets"
   },
   "peers": [
     {
-      "id": "aphrody",
-      "role": "ai-agent",
-      "application": "aphrody",
-      "service": "aphrody-a2a",
-      "transport": "https-jsonrpc",
-      "rpcPath": "/api/v1/a2a",
-      "endpoint": "https://aphrody.com/api/v1/a2a",
-      "agentCard": "https://aphrody.com/.well-known/agent-card.json",
-      "authEnv": null,
-      "status": "retired",
-      "retiredAt": "2026-09-25",
-      "note": "backing service aphrody-a2a and the aphrody.com vhost are status:retired in tools/config/service-catalog.json / yolo/tools/config/host/nginx/routes.json pending the Aphrody convergence redeploy; this peer record stays as the redeploy shape, not a live endpoint"
+      "id": "android",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-android.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "aphrody-app-purge",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-aphrody-app-purge.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "aphrody-vps",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-aphrody-vps.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "architect",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-architect.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "blockers",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-blockers.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "bun-ui",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-bun-ui.jsonl",
+      "authEnv": null
     },
     {
       "id": "codex",
       "role": "coding-agent",
+      "application": "bun-os",
       "transport": "coord-file",
       "endpoint": ".coord/inbox-from-codex.jsonl",
       "authEnv": null
     },
     {
-      "id": "agycli",
-      "role": "antigravity-gemini-agent",
-      "transport": "coord-file",
-      "endpoint": ".coord/inbox-from-agycli.jsonl",
-      "authEnv": null
-    },
-    {
-      "id": "claude",
+      "id": "discord-purge",
       "role": "coding-agent",
+      "application": "bun-os",
       "transport": "coord-file",
-      "endpoint": ".coord/inbox-from-claude.jsonl",
+      "endpoint": ".coord/inbox-from-discord-purge.jsonl",
       "authEnv": null
     },
     {
-      "id": "ocr",
-      "role": "ocr-worker",
+      "id": "emulators",
+      "role": "coding-agent",
+      "application": "bun-os",
       "transport": "coord-file",
-      "endpoint": ".coord/inbox-from-ocr.jsonl",
+      "endpoint": ".coord/inbox-from-emulators.jsonl",
       "authEnv": null
     },
     {
-      "id": "rag",
-      "role": "retrieval-agent",
-      "application": "aphrody",
+      "id": "fork-migration",
+      "role": "coding-agent",
+      "application": "bun-os",
       "transport": "coord-file",
-      "endpoint": ".coord/inbox-from-rag.jsonl",
+      "endpoint": ".coord/inbox-from-fork-migration.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "google",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-google.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "googlebook",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-googlebook.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "help-wanted",
+      "role": "coordination-channel",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-help-wanted.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "jvm-flutter",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-jvm-flutter.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "native-apps",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-native-apps.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "product",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-product.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "redox-cosmic",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-redox-cosmic.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "rust-base",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-rust-base.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "sessions",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-sessions.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "store",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-store.jsonl",
+      "authEnv": null
+    },
+    {
+      "id": "unified-image",
+      "role": "coding-agent",
+      "application": "bun-os",
+      "transport": "coord-file",
+      "endpoint": ".coord/inbox-from-unified-image.jsonl",
       "authEnv": null
     }
   ],

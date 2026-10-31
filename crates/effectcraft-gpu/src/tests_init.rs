@@ -39,6 +39,9 @@ fn native_device(
         }
     };
     let info = adapter.get_info();
+    if !required && crate::tests::software_adapter_skipped(info.device_type, &info.name) {
+        return None;
+    }
     eprintln!(
         "initialization tests: adapter {} ({:?})",
         brief(&info.name),

@@ -52,9 +52,20 @@ need for one has appeared).
   deleted checkout and four WinLibs include paths.
 - sccache: only used when `RUSTC_WRAPPER` already names it or `BUNCC_SCCACHE=on`. Before use, `sccache --show-stats` must succeed;
   otherwise the wrapper is removed from the environment for this run (`BUNCC_SCCACHE=off` forces that).
-- Cargo locking: one global slot by default (`BUNCC_SLOTS=N` for N parallel builds; slot N builds into `target/slot-N`), plus a
-  lock file per target directory under `%LOCALAPPDATA%\buncc\locks`. A dead holder or a lock older than 4 hours is broken. The
-  deadline (default 30 minutes) covers waiting plus the build, and kills the whole process tree (`taskkill /T /F` on Windows).
+- Cargo lanes: one lane per four CPUs (12 cores give 3 lanes; `BUNCC_SLOTS=N` overrides), at most four compiler jobs per lane
+  (`CARGO_BUILD_JOBS` is capped at 4). When `/var/cache/aphrody-target` exists (or `BUNCC_LANE_ROOT` is set), lane N builds into
+  `<root>/lane-N` (target and build directory, line-table debug info), so lanes never share a build directory; sccache stays
+  shared. Elsewhere lane N uses `target/slot-N` when there is more than one lane. Lock files live under the buncc cache
+  (`%LOCALAPPDATA%\buncc\locks`, `~/.cache/buncc/locks`); a lane is freed only when its holder process is gone.
+- Waiting for a lane is not a failure (`BUNCC_LANE_WAIT_MS`, default 12 hours). A running build is killed only when its process
+  tree burns no CPU for the stall window (`timeoutMs`, default 30 minutes: a hung GPU test, a deadlocked build script).
+  `BUNCC_CARGO_DEADLINE_MS` adds a hard deadline for callers that need one. The kill covers the whole tree (`taskkill /T /F` on
+  Windows, every /proc descendant on Linux).
+- Before each run, a truncated prebuilt download left by a killed build (rusty_v8's `librusty_v8.a`, checked as an ar archive,
+  or its `.tmp`) is removed so the build script fetches it again. When the lane disk has less than `BUNCC_LANE_MIN_FREE_GB`
+  (default 25) free, the lane's own build directory is cleared first.
+- `scripts/aphrody/build/rust/cargo-serial.sh` and `cargo-serial.ts` route heavy Cargo through these lanes; the global factory
+  lease (`build/locks/heavy.lock`) is no longer taken for Cargo.
 
 ## The cc driver
 

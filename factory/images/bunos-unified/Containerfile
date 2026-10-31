@@ -74,14 +74,8 @@ RUN set -e; if ls /tmp/debs/*.deb >/dev/null 2>&1; then apt-get update && apt-ge
     install -d /usr/share/bun-os; (ls /tmp/debs/*.deb 2>/dev/null | xargs -r -n1 basename) >/usr/share/bun-os/fork-debs.txt; rm -rf /tmp/debs
 # Android: Waydroid from our fork (vendor/waydroid), installed with its own Makefile.
 COPY waydroid/ /tmp/waydroid/
-# In a session container /proc/sys is read-only; ip_forward is set per container (--sysctl), so only write it when
-# it is not already on.
-RUN make -C /tmp/waydroid install DESTDIR= USE_SYSTEMD=1 USE_NFTABLES=1 && rm -rf /tmp/waydroid \
- && sed -i 's|^\(\s*\)echo 1 > /proc/sys/net/ipv4/ip_forward$|\1[ "$(cat /proc/sys/net/ipv4/ip_forward)" = 1 ] \|\| echo 1 > /proc/sys/net/ipv4/ip_forward|' \
-      /usr/lib/waydroid/data/scripts/waydroid-net.sh \
- && grep -q 'cat /proc/sys/net/ipv4/ip_forward' /usr/lib/waydroid/data/scripts/waydroid-net.sh \
- && sed -i 's|^Exec=/usr/bin/waydroid|Exec=/usr/bin/env PATH=/usr/sbin:/usr/bin:/sbin:/bin /usr/bin/waydroid|' \
-      /usr/share/dbus-1/system-services/id.waydro.Container.service
+# The fork (4e4316c+) leaves ip_forward alone when it is already on and gives the D-Bus service a PATH with sbin.
+RUN make -C /tmp/waydroid install DESTDIR= USE_SYSTEMD=1 USE_NFTABLES=1 && rm -rf /tmp/waydroid
 COPY bin/aphrody-remote-desktop /usr/bin/aphrody-remote-desktop
 COPY extra-bin/ /usr/bin/
 # Bun OS COSMIC session layer (themes, launcher scripts, web app launcher) and the unified-image layer.
@@ -99,9 +93,9 @@ EXPOSE 8794
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/bin/bunos-unified-session"]
 
 FROM session AS unified
-# Bootable: Ubuntu's generic kernel (binder_linux, binderfs, memfd, vkms, KVM modules) until linux-bun is packaged
+# Bootable: Ubuntu's generic kernel (linux-image-generic pulls the matching modules and modules-extra: binder_linux, binderfs, memfd, vkms, KVM) until linux-bun is packaged
 # as a deb; systemd as init, cosmic-greeter on greetd, Waydroid's container service.
-RUN apt-get update && apt-get install -y linux-image-generic linux-modules-extra-generic initramfs-tools \
+RUN apt-get update && apt-get install -y linux-image-generic initramfs-tools \
        systemd-boot-efi linux-firmware network-manager greetd \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /var/log/apt/* /var/log/dpkg.log \
   && systemctl enable NetworkManager.service waydroid-container.service bunos-binderfs.service \

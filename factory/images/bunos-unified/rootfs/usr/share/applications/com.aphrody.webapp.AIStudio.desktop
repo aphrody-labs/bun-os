@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Google AI Studio
+Comment=Google AI Studio as an installed web app (Helium app window)
+Exec=bunos-launch-webapp https://aistudio.google.com/ com.aphrody.webapp.AIStudio
+Icon=com.aphrody.webapp.AIStudio
+Categories=Development;Utility;
+StartupWMClass=com.aphrody.webapp.AIStudio
+X-Bunos-AppKind=web
+X-Bunos-IconDomain=aistudio.google.com

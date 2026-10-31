@@ -31,6 +31,13 @@ fi
 # LXC (and Android's init) create cgroups for the Android container. With a private cgroup namespace the mount only
 # shows this container's own subtree, so making it writable cannot reach other cgroups.
 grep -q ' /sys/fs/cgroup .*\bro\b' /proc/self/mounts && { mount -o remount,rw /sys/fs/cgroup || log "/sys/fs/cgroup stays read-only"; }
+# cgroup v2 "no internal processes": move every process into /init so the root can delegate all controllers
+# to the Android container's cgroups (the same step docker-in-docker takes).
+if [ -w /sys/fs/cgroup/cgroup.subtree_control ]; then
+  mkdir -p /sys/fs/cgroup/init
+  for p in $(cat /sys/fs/cgroup/cgroup.procs); do echo "$p" >/sys/fs/cgroup/init/cgroup.procs 2>/dev/null || true; done
+  sed -e 's/ / +/g' -e 's/^/+/' </sys/fs/cgroup/cgroup.controllers >/sys/fs/cgroup/cgroup.subtree_control 2>/dev/null || log "cgroup controllers not delegated"
+fi
 # Loop devices for the read-only Android images (loop-control is passed in; block major 7 allowed by the cgroup).
 if [ -e /dev/loop-control ]; then
   for n in $(seq 0 63); do [ -e /dev/loop$n ] || mknod -m 0660 /dev/loop$n b 7 $n 2>/dev/null || true; done
@@ -43,10 +50,23 @@ dbus-daemon --system --fork
 if [ -e /dev/binderfs/binder-control ] && [ -f /usr/share/bunos/waydroid/images/system.img ]; then
   if [ ! -f /var/lib/waydroid/waydroid.cfg ]; then
     waydroid init -f >/var/log/waydroid-init.log 2>&1 || log "waydroid init failed"
-    cat /usr/share/bunos/waydroid/waydroid_base.prop.d/*.prop >>/var/lib/waydroid/waydroid_base.prop 2>/dev/null || true
+    # `waydroid upgrade` regenerates waydroid_base.prop from waydroid.cfg, so the fragments go into its
+    # [properties] section (later fragments win), not into the generated file.
+    /usr/bin/python3 -I - /var/lib/waydroid/waydroid.cfg /usr/share/bunos/waydroid/waydroid_base.prop.d/*.prop <<'PY' || log "waydroid props merge failed"
+import configparser, sys
+cfg = configparser.ConfigParser(); cfg.optionxform = str; cfg.read(sys.argv[1])
+if not cfg.has_section("properties"): cfg.add_section("properties")
+for frag in sys.argv[2:]:
+    for line in open(frag, encoding="utf-8"):
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1); cfg["properties"][k.strip()] = v.strip()
+with open(sys.argv[1], "w") as f: cfg.write(f)
+PY
     waydroid upgrade -o >>/var/log/waydroid-init.log 2>&1 || true
   fi
   waydroid container start >/var/log/waydroid-container.log 2>&1 &
+  WAYDROID=1
   # First-boot provisioning (desktop windowing, setup wizards off) once Android has booted.
   (for _ in $(seq 180); do /usr/libexec/bunos/waydroid-android17 provision >>/var/log/waydroid-init.log 2>&1 && break; sleep 5; done) &
 else
@@ -76,6 +96,20 @@ fi
 i=0; while [ ! -S "$RUN_USER/wayland-1" ] && [ $i -lt 120 ]; do sleep 0.5; i=$((i + 1)); done
 printf 'size=%s\ncage=wayland-0\ncosmic=%s\n' "$SIZE" "$([ -S "$RUN_USER/wayland-1" ] && echo wayland-1 || echo missing)" >/run/bunos/ready
 log "ready ($SIZE)"
+# cosmic-session does not run XDG autostart entries in this container, so run the COSMIC ones here on COSMIC's
+# display: the Android user session (waydroid-session waits for the container manager), first-login theme,
+# web app icons, bun-obscura. The bootable image leaves this to the session.
+if [ -S "$RUN_USER/wayland-1" ]; then
+  for entry in /etc/xdg/autostart/*.desktop; do
+    if grep -q '^OnlyShowIn=' "$entry"; then grep -q '^OnlyShowIn=.*COSMIC' "$entry" || continue; fi
+    cmd=$(sed -n 's/^Exec=//p' "$entry" | head -n1); [ -n "$cmd" ] || continue
+    name=$(basename "$entry" .desktop)
+    case "$name" in bunos-waydroid-session) [ "${WAYDROID:-0}" = 1 ] || continue ;; esac
+    as_user env WAYLAND_DISPLAY=wayland-1 DBUS_SESSION_BUS_ADDRESS="unix:path=$RUN_USER/bus" XDG_CURRENT_DESKTOP=COSMIC \
+      PATH=/usr/libexec/bunos/container-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+      sh -c "$cmd" >"/var/log/autostart-$name.log" 2>&1 &
+  done
+fi
 # Stay alive as long as cage runs.
 while [ -S "$RUN_USER/wayland-0" ] && pgrep -x cage >/dev/null; do sleep 5; done
 log "cage exited"

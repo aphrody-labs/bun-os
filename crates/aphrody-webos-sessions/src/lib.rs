@@ -24,7 +24,7 @@ use bollard::container::{
     Config, CreateContainerOptions, InspectContainerOptions, ListContainersOptions, RemoveContainerOptions,
     StartContainerOptions,
 };
-use bollard::models::{HostConfig, HostConfigCgroupnsModeEnum};
+use bollard::models::{DeviceMapping, HostConfig, HostConfigCgroupnsModeEnum};
 use bollard::network::{CreateNetworkOptions, InspectNetworkOptions};
 use tokio::sync::Mutex;
 
@@ -257,7 +257,8 @@ impl Sessions {
         .collect();
         let caps = [
             "SYS_ADMIN", "NET_ADMIN", "NET_RAW", "SETUID", "SETGID", "CHOWN", "DAC_OVERRIDE", "FOWNER", "KILL", "MKNOD",
-            "SYS_CHROOT", "SETPCAP", "AUDIT_WRITE",
+            "SYS_CHROOT", "SETPCAP", "AUDIT_WRITE", "AUDIT_CONTROL", "SYS_NICE", "WAKE_ALARM", "BLOCK_SUSPEND", "SYS_PTRACE",
+            "NET_BIND_SERVICE", "DAC_READ_SEARCH", "FSETID", "SYS_RESOURCE", "IPC_LOCK",
         ];
         let host = HostConfig {
             binds: Some(binds),
@@ -276,6 +277,9 @@ impl Sessions {
             memory: Some(self.cfg.memory_bytes),
             pids_limit: Some(self.cfg.pids),
             network_mode: Some(self.cfg.network.clone()),
+            devices: Some(host_devices()),
+            device_cgroup_rules: Some(device_rules().await),
+            sysctls: Some([("net.ipv4.ip_forward".to_owned(), "1".to_owned())].into_iter().collect()),
             ..Default::default()
         };
         let mut labels = HashMap::new();
@@ -365,6 +369,35 @@ impl Sessions {
             let _ = self.stop(&id).await;
         }
     }
+}
+
+/// The whole DRI directory (minigbm falls back to the vkms card node, and host card numbers are dynamic) and loop
+/// control (Waydroid image mounts), when the host has them.
+fn host_devices() -> Vec<DeviceMapping> {
+    ["/dev/dri", "/dev/loop-control"]
+        .into_iter()
+        .filter(|p| std::path::Path::new(p).exists())
+        .map(|p| DeviceMapping {
+            path_on_host: Some(p.to_owned()),
+            path_in_container: Some(p.to_owned()),
+            cgroup_permissions: Some("rwm".to_owned()),
+        })
+        .collect()
+}
+
+/// Loop block devices and the binder character major (read from /proc/devices) for the private binderfs.
+async fn device_rules() -> Vec<String> {
+    let mut rules = vec!["b 7:* rwm".to_owned()];
+    if let Ok(devices) = tokio::fs::read_to_string("/proc/devices").await
+        && let Some(major) = devices
+            .lines()
+            .filter_map(|l| l.trim().split_once(' '))
+            .find(|(_, name)| *name == "binder")
+            .map(|(major, _)| major.to_owned())
+    {
+        rules.push(format!("c {major}:* rwm"));
+    }
+    rules
 }
 
 #[cfg(unix)]

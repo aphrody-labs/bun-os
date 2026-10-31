@@ -1,3 +1,5 @@
+> **Product status lives in [`docs/PRODUCT.md`](../PRODUCT.md)** (owner order 2026-10-31: one product, the unified Bun OS image). This file is background only; where it disagrees with PRODUCT.md, PRODUCT.md wins.
+
 # WebOS architecture (ADR-003)
 
 Status: accepted 2026-10-30. Supersedes ADR-001 and ADR-002 of the same day. Scope: https://aphrody.com.
@@ -40,12 +42,12 @@ Owner decision (overrides the first web-sys draft): the client is an iced applic
 
 ## Web content engines
 
-| Engine                                                                   | What it is                                                          | Role in Bun OS                                                                                                  |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Servo (fork `aphrody-labs/servo`, 0.7+)                                  | Embeddable browser engine in pure Rust; lighter, compatibility gaps | Primary embedded engine: an iced/libcosmic widget rendering offscreen into a wgpu texture.                      |
-| cef-rs (`vendor/cef-rs`, CEF 156)                                        | Embeddable full Chromium from Rust, offscreen rendering             | Compatibility fallback widget for sites Servo cannot render.                                                    |
-| Tauri v3 (`vendor/tauri`, fork on the v3 branch, `tauri-v3.0.0-alpha.5`) | App framework for web frontends, alpha, CEF runtime                 | Apps with web frontends; a Servo runtime is pushed where possible                                             . |
-| Helium (fork)                                                            | Full Chromium browser product, not embeddable                       | The user-facing browser inside sessions.                                                                        |
+| Engine                                                                   | What it is                                                          | Role in Bun OS                                                                             |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Servo (fork `aphrody-labs/servo`, 0.7+)                                  | Embeddable browser engine in pure Rust; lighter, compatibility gaps | Primary embedded engine: an iced/libcosmic widget rendering offscreen into a wgpu texture. |
+| cef-rs (`vendor/cef-rs`, CEF 156)                                        | Embeddable full Chromium from Rust, offscreen rendering             | Compatibility fallback widget for sites Servo cannot render.                               |
+| Tauri v3 (`vendor/tauri`, fork on the v3 branch, `tauri-v3.0.0-alpha.5`) | App framework for web frontends, alpha, CEF runtime                 | Apps with web frontends; a Servo runtime is pushed where possible .                        |
+| Helium (fork)                                                            | Full Chromium browser product, not embeddable                       | The user-facing browser inside sessions.                                                   |
 
 ## Source rule
 

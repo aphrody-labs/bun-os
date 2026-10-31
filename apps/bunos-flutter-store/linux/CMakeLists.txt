@@ -110,9 +110,16 @@ endforeach(bundled_library)
 # Cargo wrapper and shipped next to libflutter_linux_gtk.so in the bundle's lib/ (on the runner's RUNPATH).
 get_filename_component(BUNOS_WORKSPACE "${CMAKE_CURRENT_SOURCE_DIR}/../../.." ABSOLUTE)
 set(BUNOS_RUST_TARGET_DIR "${BUNOS_WORKSPACE}/target/flutter-bridge")
+# Canonical CARGO_HOME (the factory symlinks ~/.cargo/registry; askama needs canonical registry paths).
+if(DEFINED ENV{CARGO_HOME})
+  set(BUNOS_CARGO_HOME "$ENV{CARGO_HOME}")
+else()
+  get_filename_component(BUNOS_CARGO_REGISTRY "$ENV{HOME}/.cargo/registry" REALPATH)
+  get_filename_component(BUNOS_CARGO_HOME "${BUNOS_CARGO_REGISTRY}" DIRECTORY)
+endif()
 set(BUNOS_RUST_LIB "${BUNOS_RUST_TARGET_DIR}/release/libbunos_flutter_bridge.so")
 add_custom_target(bunos_rust_core ALL
-  COMMAND ${CMAKE_COMMAND} -E env APHRODY_CARGO_TARGET_DIR=${BUNOS_RUST_TARGET_DIR} CARGO_BUILD_BUILD_DIR=${BUNOS_RUST_TARGET_DIR}/build APHRODY_BUILD_HOST= APHRODY_LOCAL_CARGO=1 APHRODY_CARGO_JOBS=4
+  COMMAND ${CMAKE_COMMAND} -E env APHRODY_CARGO_TARGET_DIR=${BUNOS_RUST_TARGET_DIR} CARGO_BUILD_BUILD_DIR=${BUNOS_RUST_TARGET_DIR}/build CARGO_HOME=${BUNOS_CARGO_HOME} APHRODY_BUILD_HOST= APHRODY_LOCAL_CARGO=1 APHRODY_CARGO_JOBS=4
     APHRODY_CARGO_LOCK_DIR=$ENV{HOME}/.cache/aphrody/lanes/runtime APHRODY_CARGO_LOCK_TIMEOUT_SECS=10800
     "${BUNOS_WORKSPACE}/scripts/aphrody/build/rust/cargo-serial.sh" build --locked --release -p bunos-flutter-bridge --lib
   WORKING_DIRECTORY "${BUNOS_WORKSPACE}"

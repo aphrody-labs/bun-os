@@ -1,6 +1,6 @@
 # Synchronisation: workstation, GitHub, VPS
 
-GitHub `aphrody-labs/bun-os` on `main` is the source of truth. The workstation edits and pushes; the VPS synchronizes, builds, qualifies, and writes Cargo.lock when a manifest change requires it. Both automated sync modes use the same Bun implementation in `factory/sync/bunos-sync.ts`.
+GitHub `aphrody-labs/bun-os` on `main` is the source of truth. The workstation edits and pushes; the VPS synchronizes, builds, qualifies, and writes Cargo.lock when a manifest change requires it. Both automated sync modes use the same Bun implementation in `factory/sync/bunos-sync.ts`. Host environment variables, the Bun runtime, the MCP servers and the A2A client settings are documented in [ENVIRONMENT.md](ENVIRONMENT.md).
 
 Install from the checkout to configure that checkout. `BUNOS_REPO` overrides the detected repository root; `BUNOS_SYNC_INTERVAL` sets the interval in seconds.
 

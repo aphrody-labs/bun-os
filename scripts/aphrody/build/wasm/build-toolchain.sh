@@ -39,7 +39,9 @@ source_of() {
 cargo_bin() { # mount package bins...
   local dir name=$1 pkg=$2; shift 2
   dir=$(source_of "$name") || return 1
-  (cd "$dir" && nice -n 15 cargo build --release --locked -j "$JOBS" -p "$pkg") || return 1
+  local locked=()
+  [ -f "$dir/Cargo.lock" ] && locked=(--locked) # wasm-bindgen ships no lockfile
+  (cd "$dir" && nice -n 15 cargo build --release "${locked[@]}" -j "$JOBS" -p "$pkg") || return 1
   for b in "$@"; do install -m755 "$TGT/release/$b" "$PREFIX/bin/$b" || return 1; done
 }
 

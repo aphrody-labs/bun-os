@@ -43,7 +43,7 @@ impl TerminalCommand for VersionCommand {
                 "profile": env!("APHRODY_BUILD_PROFILE"),
                 "repo": "https://github.com/aphrody-labs/aphrody",
                 "license": "Apache-2.0",
-                "a2a": "ai.json v1 (AGNTCY a2a/v0.4) @ /ai.json + /.well-known/ai.json"
+                "a2a": "A2A v1.0 @ /.well-known/agent-card.json (coordination settings: ai.json)"
             });
             println!("{}", serde_json::to_string_pretty(&info).unwrap());
             return Ok(());
@@ -59,7 +59,7 @@ impl TerminalCommand for VersionCommand {
         println!();
         println!("repo:      https://github.com/aphrody-labs/aphrody");
         println!("license:   Apache-2.0");
-        println!("a2a:       ai.json v1 (AGNTCY a2a/v0.4) @ /ai.json + /.well-known/ai.json");
+        println!("a2a:       v1.0 Agent Card @ /.well-known/agent-card.json (coordination settings: ai.json)");
         Ok(())
     }
 }
@@ -1145,7 +1145,7 @@ fn print_text(r: &DoctorReport) {
     println!("  mimalloc allocator: {}", r.allocator);
     println!("  tokio runtime: {}", r.tokio_runtime);
     println!("{}", r.ai_json.line("ai.json"));
-    println!("{}", r.well_known_ai_json.line(".well-known/ai.json"));
+    println!("{}", r.agent_card.line("/.well-known/agent-card.json"));
 
     println!();
     println!("[peer A2A coord]");

@@ -273,11 +273,8 @@ if [[ "${APHRODY_STACK_EXPECT_EMPTY_RANKINGS:-}" = yes ]]; then
   }
 fi
 card="$(curl --noproxy '*' --fail --silent --show-error --max-time 5 \
-  --resolve aphrody.com:443:127.0.0.1 https://aphrody.com/.well-known/agent-card.json)"
-printf '%s' "$card" | jq -e 'any(.supportedInterfaces[]; .url == "https://aphrody.com/api/v1/a2a" and .protocolVersion == "1.0")' >/dev/null
-public_manifest="$(curl --noproxy '*' -fsS --resolve aphrody.com:443:127.0.0.1 https://aphrody.com/ai.json | sha256sum | cut -d' ' -f1)"
-expected_manifest="$(sha256sum "$release/ai.json" | cut -d' ' -f1)"
-[[ "$public_manifest" = "$expected_manifest" ]] || { echo 'public ai.json differs from pinned manifest' >&2; exit 1; }
+  http://127.0.0.1:8788/.well-known/agent-card.json)"
+printf '%s' "$card" | jq -e 'any(.supportedInterfaces[]; .url == "http://127.0.0.1:8788" and .protocolVersion == "1.0")' >/dev/null
 public_token="$(sed -n 's/^APHRODY_SITE_WEB_API_TOKEN=//p' "$env_dir/aphrody-site.env" | tail -n 1)"
 [[ "$public_token" =~ ^[0-9a-f]{64}$ ]] || { echo 'public Web token must be a 64-character hex value' >&2; exit 1; }
 unauth_status="$(curl --noproxy '*' --silent --show-error --max-time 5 -o /dev/null -w '%{http_code}' \

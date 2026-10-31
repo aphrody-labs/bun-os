@@ -1,9 +1,14 @@
-# ~/.bashrc des hôtes Linux Aphrody (vps, dbfr), versionné : tools/config/host/shell/bashrc.
-# Spécifique à l'hôte (non versionné) : ~/.config/aphrody/host.sh. Secrets : ~/.aphrody/private/env/dev.env.
+# >>> aphrody a2a hub (Bun OS agents; docs/A2A-AGENTS.md). The token stays in the protected file, never in env output.
+export APHRODY_A2A_HUB_URL=http://127.0.0.1:8788
+export APHRODY_A2A_TOKEN_FILE="$HOME/.aphrody/private/a2a/bearer"
+export APHRODY_HOST_ID=vps
+# <<< aphrody a2a hub
+# ~/.bashrc of the Bun OS Linux hosts (vps), versioned as infra/config/host/shell/bashrc (docs/ENVIRONMENT.md).
+# Host-specific (unversioned): ~/.config/aphrody/host.sh. Secrets: ~/.aphrody/private/env/dev.env.
 
 # >>> aphrody-infra toolchain >>>
-# Avant le garde interactif : les commandes ssh non interactives reçoivent aussi ce PATH.
-export BUN_INSTALL="$HOME/.bun" APHRODY_HOME="$HOME/.aphrody" APHRODY_ROOT="$HOME/src/aphrody"
+# Before the interactive guard, so non-interactive ssh commands get this PATH too.
+export BUN_INSTALL="$HOME/.bun" APHRODY_HOME="$HOME/.aphrody" BUN_OS_ROOT="$HOME/src/bun-os"
 for _d in /usr/local/bin "$HOME/.cargo/bin" "$HOME/.bun/bin" "$HOME/.local/bin"; do
     case ":$PATH:" in *":$_d:"*) ;; *) PATH="$_d:$PATH" ;; esac
 done
@@ -11,7 +16,6 @@ unset _d
 export PATH
 # <<< aphrody-infra toolchain <<<
 
-export APHRODY_WORKTREE_FLEET_HOSTS=local,vps,dbfr WORKTRUNK_MAX_CONCURRENT_COMMANDS=8
 [ -r "$HOME/.config/aphrody/host.sh" ] && . "$HOME/.config/aphrody/host.sh"
 
 case $- in *i*) ;; *) return ;; esac

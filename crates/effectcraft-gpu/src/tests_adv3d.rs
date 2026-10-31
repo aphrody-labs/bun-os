@@ -19,7 +19,8 @@ use crate::Gpu;
 /// A device of the test's own (the test holds [`crate::tests::hold_gpu_lock`]).
 fn gpu() -> Option<Gpu> {
     crate::tests::hold_gpu_lock();
-    let g = Gpu::headless();
+    let g = Gpu::headless()
+        .filter(|g| !crate::tests::software_adapter_skipped(g.ctx.device_type, &g.ctx.name));
     if g.is_none() {
         eprintln!("effectcraft-gpu adv3d tests: no GPU adapter, skipping");
     }

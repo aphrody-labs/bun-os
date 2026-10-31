@@ -38,6 +38,8 @@ const COSMIC_SET = [
   "cosmic-notifications", "cosmic-osd", "cosmic-workspaces-epoch", "xdg-desktop-portal-cosmic", "cosmic-files",
   "cosmic-term", "cosmic-edit", "cosmic-store", "cosmic-player",
 ];
+/** Run-time tools a COSMIC package calls (Phone Hub applet: adb and scrcpy; /opt/android-sdk/platform-tools/adb fallback). */
+const PACKAGE_RECOMMENDS: Record<string, string> = { "cosmic-applets": "adb, scrcpy" };
 /** Repository directory -> Pop package name, where they differ (the debs replace Pop's packages). */
 const PACKAGE_NAME: Record<string, string> = { "cosmic-workspaces-epoch": "cosmic-workspaces" };
 /** Shared Linux/Redox fork pins (libcosmic, iced, winit, softbuffer, cosmic-protocols, cosmic-settings-daemon). */
@@ -78,7 +80,7 @@ async function isElf(path: string) {
 }
 
 /** Package a staged /usr tree; Depends from dpkg-shlibdeps plus the given run-time libraries. */
-async function deb(name: string, version: string, stage: string, description: string, extra = "") {
+async function deb(name: string, version: string, stage: string, description: string, extra = "", recommends = "") {
   const elfs: string[] = [];
   for (const file of await walk(stage)) if ((await stat(file)).mode & 0o100 && (await isElf(file))) elfs.push(file);
   let depends = "";
@@ -100,6 +102,7 @@ async function deb(name: string, version: string, stage: string, description: st
       "Architecture: amd64",
       "Maintainer: aphrody-dev <contact@aphrody.com>",
       ...(depends ? [`Depends: ${depends}`] : []),
+      ...(recommends ? [`Recommends: ${recommends}`] : []),
       "Section: x11",
       "Priority: optional",
       "Homepage: https://aphrody.com",
@@ -119,8 +122,14 @@ async function deb(name: string, version: string, stage: string, description: st
 }
 
 async function clone(dir: string, repo: string, rev?: string) {
+  // A builder killed mid-checkout leaves index.lock behind; each source tree has a single lane, so it is stale.
+  await rm(join(dir, ".git/index.lock"), { force: true });
   if (!existsSync(join(dir, ".git"))) await $`git clone --filter=blob:none https://github.com/aphrody-labs/${repo} ${dir}`;
-  if (rev) await $`git -C ${dir} checkout -q ${rev}`;
+  if (rev) {
+    const known = await $`git -C ${dir} cat-file -e ${rev}^{commit}`.quiet().nothrow();
+    if (known.exitCode !== 0) await $`git -C ${dir} fetch -q origin`;
+    await $`git -C ${dir} checkout -q ${rev}`;
+  }
 }
 
 const shortRev = async (dir: string) => (await $`git -C ${dir} rev-parse --short HEAD`.text()).trim();
@@ -145,10 +154,12 @@ async function stageDir(name: string) {
 async function rio() {
   const d = join(WORK, "src/rio");
   await clone(d, "rio");
-  // Thin LTO: Rio's fat LTO with one codegen unit needs more memory than a factory slot has (earlyoom kills it).
+  // No LTO and no debug info: Rio's release profile (fat LTO, one codegen unit, full debuginfo) links in more memory
+  // than a shared factory slot has, and earlyoom kills rustc (thin LTO was still killed at the final link).
   await cargo(d, ["build", "--release", "--locked", "-p", "rioterm"], {
-    CARGO_PROFILE_RELEASE_LTO: "thin",
+    CARGO_PROFILE_RELEASE_LTO: "false",
     CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16",
+    CARGO_PROFILE_RELEASE_DEBUG: "0",
   });
   const s = await stageDir("rio");
   await install(join(d, "target/release/rio"), join(s, "usr/bin/rio"), 0o755);
@@ -163,6 +174,7 @@ async function rio() {
 async function cosmicSrc() {
   const pin = Bun.env.COSMIC_EPOCH_PIN ?? (await $`git -C ${ROOT} rev-parse HEAD:vendor/cosmic-epoch`.text()).trim();
   await clone(EPOCH_DIR, "cosmic-epoch", pin);
+  for (const repo of COSMIC_SET) await rm(join(EPOCH_DIR, ".git/modules", repo, "index.lock"), { force: true });
   await $`git -C ${EPOCH_DIR} submodule update --init --filter=blob:none ${COSMIC_SET}`;
   log(`cosmic-epoch ${pin}`);
 }
@@ -177,11 +189,11 @@ async function cosmicOne(repo: string) {
   // The justfile install recipes copy the release outputs and data files into rootdir/prefix.
   await $`just rootdir=${s} prefix=/usr install`.cwd(d);
   const version = `${existsSync(manifest) ? await versionOf(manifest) : "1.0.0"}+bunos${await shortRev(d)}`;
-  await deb(PACKAGE_NAME[repo] ?? repo, version, s, `COSMIC ${repo} (Bun OS build)`);
+  await deb(PACKAGE_NAME[repo] ?? repo, version, s, `COSMIC ${repo} (Bun OS build)`, GUI_DEPS, PACKAGE_RECOMMENDS[repo]);
 }
 
 async function cosmic(repos: string[]) {
-  if (!existsSync(EPOCH_DIR)) await cosmicSrc();
+  if (!existsSync(join(EPOCH_DIR, "cosmic-comp/Cargo.toml"))) await cosmicSrc();
   const failed: string[] = [];
   for (const repo of repos.length ? repos : COSMIC_SET) {
     try {

@@ -17,6 +17,10 @@ The Rust import path is `aphrody_a2a_coord`.
 
 ## What it provides
 
+The interoperable protocol is A2A 1.0. The listener serves the standard Agent Card at
+`/.well-known/agent-card.json`. The root `ai.json` is private local coordination configuration; it is not a public
+Agent Card and must not be exposed by the web server. The peer catalog is `tools/aphrody/config/a2a-peers.json`.
+
 | Item | Role |
 | --- | --- |
 | `AiManifest`, `CoordConfig`, `PeerDef`, `find_repo_root` | Parse the `ai.json` agent manifest and locate the repository that holds it. |
