@@ -46,7 +46,7 @@ RUN printf '%s\n' 'path-exclude=/usr/share/doc/*' 'path-include=/usr/share/doc/*
        fonts-noto-core fonts-noto-color-emoji xdg-utils \
        lxc dnsmasq-base python3 python3-gi python3-dbus gir1.2-glib-2.0 python3-gbinder libgbinder libglibutil \
        libnss3 libatk-bridge2.0-0t64 libcups2t64 libxkbcommon0 libgbm1 libasound2t64 libxdamage1 libxrandr2 libxcomposite1 \
-       socat zstd xz-utils grim rclone fuse3 \
+       socat zstd xz-utils grim rclone fuse3 make \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /var/log/apt/* /var/log/dpkg.log
 
 FROM base AS session
@@ -64,7 +64,8 @@ ADD --checksum=sha256:${BUN_LICENSE_SHA256} ${BUN_LICENSE_URL} /usr/share/licens
 ADD --checksum=sha256:${HELIUM_SHA256} ${HELIUM_URL} /tmp/helium.tar.xz
 RUN tar -xzf /tmp/bun.tgz -C /tmp && install -m755 /tmp/package/bin/bun /usr/bin/bun && ln -sf bun /usr/bin/bunx \
   && install -d /opt/helium && tar -xJf /tmp/helium.tar.xz -C /opt/helium --strip-components=1 \
-  && ln -sf /opt/helium/helium /usr/bin/helium \
+  && ln -sf /opt/helium/helium-wrapper /usr/bin/helium \
+  && install -Dm644 /opt/helium/product_logo_256.png /usr/share/icons/hicolor/256x256/apps/helium.png \
   && rm -rf /tmp/bun.tgz /tmp/package /tmp/helium.tar.xz
 # Fork builds (native-apps lane: COSMIC set, Rio, Spacedrive, Aphrody Chat/Search) override Pop's packages.
 COPY debs/ /tmp/debs/
@@ -73,18 +74,27 @@ RUN set -e; if ls /tmp/debs/*.deb >/dev/null 2>&1; then apt-get update && apt-ge
     install -d /usr/share/bun-os; (ls /tmp/debs/*.deb 2>/dev/null | xargs -r -n1 basename) >/usr/share/bun-os/fork-debs.txt; rm -rf /tmp/debs
 # Android: Waydroid from our fork (vendor/waydroid), installed with its own Makefile.
 COPY waydroid/ /tmp/waydroid/
-RUN make -C /tmp/waydroid install DESTDIR= USE_SYSTEMD=1 USE_NFTABLES=1 && rm -rf /tmp/waydroid
+# In a session container /proc/sys is read-only; ip_forward is set per container (--sysctl), so only write it when
+# it is not already on.
+RUN make -C /tmp/waydroid install DESTDIR= USE_SYSTEMD=1 USE_NFTABLES=1 && rm -rf /tmp/waydroid \
+ && sed -i 's|^\(\s*\)echo 1 > /proc/sys/net/ipv4/ip_forward$|\1[ "$(cat /proc/sys/net/ipv4/ip_forward)" = 1 ] \|\| echo 1 > /proc/sys/net/ipv4/ip_forward|' \
+      /usr/lib/waydroid/data/scripts/waydroid-net.sh \
+ && grep -q 'cat /proc/sys/net/ipv4/ip_forward' /usr/lib/waydroid/data/scripts/waydroid-net.sh \
+ && sed -i 's|^Exec=/usr/bin/waydroid|Exec=/usr/bin/env PATH=/usr/sbin:/usr/bin:/sbin:/bin /usr/bin/waydroid|' \
+      /usr/share/dbus-1/system-services/id.waydro.Container.service
 COPY bin/aphrody-remote-desktop /usr/bin/aphrody-remote-desktop
 COPY extra-bin/ /usr/bin/
 # Bun OS COSMIC session layer (themes, launcher scripts, web app launcher) and the unified-image layer.
 COPY cosmic-session/rootfs/ /
 COPY cosmic-session/headless/start-cosmic-headless /usr/libexec/bunos/start-cosmic-headless
 COPY rootfs/ /
-RUN chmod 0755 /usr/bin/aphrody-remote-desktop /usr/bin/bunos-* /usr/libexec/bunos/* \
+RUN chmod 0755 /usr/bin/aphrody-remote-desktop /usr/bin/bunos-* /usr/libexec/bunos/* /usr/libexec/bunos/container-bin/* \
        /usr/lib/pop-launcher/scripts/bunos/*.sh 2>/dev/null; \
-    useradd -m -u 1000 -G video,render,audio,input -s /bin/bash aphrody \
+    (userdel -r ubuntu 2>/dev/null || true) \
+ && useradd -m -u 1000 -G video,render,audio,input -s /bin/bash aphrody \
  && cat /usr/share/bun-os/os-release.fragment >>/usr/lib/os-release \
- && install -d -m 0755 /var/lib/waydroid /usr/share/bunos/waydroid/images
+ && install -d -m 0755 /var/lib/waydroid /usr/share/bunos/waydroid/images /etc/waydroid-extra \
+ && ln -sfn /usr/share/bunos/waydroid/images /etc/waydroid-extra/images
 EXPOSE 8794
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/bin/bunos-unified-session"]
 

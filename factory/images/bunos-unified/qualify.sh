@@ -11,12 +11,15 @@ A17=${BUNOS_WAYDROID_IMAGES:-/home/ubuntu/.cache/bunos-waydroid/a17/images}
 case "$MODE" in
 session)
   name=bunos-unified-qualify; docker rm -f $name >/dev/null 2>&1 || true
+  # The binder major is dynamic: allow it in the device cgroup so the private binderfs devices can be opened.
+  binder_major=$(rg -o -r '$1' '^\s*(\d+) binder$' /proc/devices)
   install -d -m 0700 "$OUT/secrets"; head -c 32 /dev/urandom | base64 >"$OUT/secrets/session.token"
   docker run -d --name $name --hostname bunos \
     --cap-drop ALL --cap-add SYS_ADMIN --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SETUID --cap-add SETGID \
     --cap-add CHOWN --cap-add DAC_OVERRIDE --cap-add FOWNER --cap-add KILL --cap-add MKNOD --cap-add SYS_CHROOT \
     --cap-add SETPCAP --cap-add AUDIT_WRITE --security-opt apparmor=unconfined --security-opt seccomp=unconfined \
-    --cgroupns private --pids-limit 8192 --shm-size 1g --memory 8g --cpus 4 \
+    --device /dev/dri/renderD128 --device-cgroup-rule "c $binder_major:* rwm" \
+    --device /dev/loop-control --device-cgroup-rule "b 7:* rwm" --sysctl net.ipv4.ip_forward=1 --cgroupns private --pids-limit 8192 --shm-size 1g --memory 8g --cpus 4 \
     --tmpfs /run:exec --tmpfs /tmp --tmpfs /var/lib/waydroid --tmpfs /var/lib/misc --tmpfs /var/log \
     -v "$A17:/usr/share/bunos/waydroid/images:ro" -v "$OUT/secrets:/run/secrets:ro" \
     -v bunos-unified-qualify-home:/home/aphrody \
@@ -24,18 +27,21 @@ session)
     "${TAG:-bunos-unified:session}" >/dev/null
   for _ in $(seq 120); do docker exec $name test -f /run/bunos/ready && break; sleep 2; done
   docker exec $name cat /run/bunos/ready | tee "$OUT/ready.txt"
-  u() { docker exec -u 1000 -e XDG_RUNTIME_DIR=/run/user/1000 -e DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus "$@"; }
-  shot() { u -e WAYLAND_DISPLAY=wayland-0 $name grim "/tmp/$1.png" && docker cp "$name:/tmp/$1.png" "$OUT/$1.png"; }
+  # Same environment as apps started from the COSMIC launcher (cosmic-container-session).
+  u() { docker exec -u 1000 -e HOME=/home/aphrody -e PATH=/usr/libexec/bunos/container-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    -e XDG_CURRENT_DESKTOP=COSMIC -e XDG_RUNTIME_DIR=/run/user/1000 -e DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus "$@"; }
+  # docker cp cannot read tmpfs mounts: stream the screenshot out.
+  shot() { u -e WAYLAND_DISPLAY=wayland-0 $name grim - >"$OUT/$1.png"; }
   docker exec $name sh -c 'command -v grim >/dev/null || { apt-get update -qq && apt-get install -y -qq grim; } >/dev/null 2>&1'
   sleep 20; shot 01-desktop
   u -d -e WAYLAND_DISPLAY=wayland-1 $name rio 2>/dev/null || u -d -e WAYLAND_DISPLAY=wayland-1 $name cosmic-term
   u -d -e WAYLAND_DISPLAY=wayland-1 $name helium --ozone-platform=wayland --no-first-run https://aphrody.com/
   u -d -e WAYLAND_DISPLAY=wayland-1 $name bunos-launch-webapp https://gemini.google.com/ com.aphrody.webapp.Gemini
   sleep 25; shot 02-linux-and-web
-  docker exec $name sh -c 'waydroid status; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -40' | tee "$OUT/android.txt" || true
-  pkg=$(docker exec $name sh -c "ls /home/aphrody/.local/share/applications/ 2>/dev/null | sed -n 's/^waydroid\.\(.*\)\.desktop$/\1/p' | grep -E 'vending|fdroid|settings' | head -1" || true)
-  [ -n "$pkg" ] && u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch "$pkg"
-  sleep 30; shot 03-android-window
+  for _ in $(seq 60); do docker exec $name sh -c 'waydroid shell -- getprop sys.boot_completed 2>/dev/null' | rg -q 1 && break; sleep 5; done
+  docker exec $name sh -c 'waydroid status; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -60' | tee "$OUT/android.txt" || true
+  u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch com.android.vending
+  sleep 40; shot 03-android-window
   docker exec $name sh -c 'for d in /usr/share/applications/*.desktop /home/aphrody/.local/share/applications/*.desktop; do
       [ -f "$d" ] || continue; n=$(basename "$d"); case "$n" in waydroid.*) k=android;; com.aphrody.webapp.*) k=web;; *) k=linux;; esac
       echo "$k $n"; done' | sort >"$OUT/launcher-entries.txt"
