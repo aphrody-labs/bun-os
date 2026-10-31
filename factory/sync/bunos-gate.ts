@@ -364,6 +364,12 @@ async function prePush(repo: string): Promise<number> {
     console.error("[gate] not the build host: the VPS gate (vps-gate/* commit statuses) judges this push.");
     return 0;
   }
+  // Automation jobs (factory/automation) commit with a temporary index, so the shared working tree is not what they
+  // push; they qualify their change themselves and the post-push VPS gate judges main like any other commit.
+  if (process.env.BUNOS_GATE_PREPUSH === "0") {
+    console.error("[gate] pre-push: change qualified by its automation job; the VPS gate judges main.");
+    return 0;
+  }
   const lines = (await Bun.stdin.text()).split("\n").filter(Boolean);
   const changed = new Set<string>();
   let base = "origin/main";
