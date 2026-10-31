@@ -142,7 +142,7 @@ export async function buildUtils(): Promise<string> {
   await mkdir(join(out, "licenses"), { recursive: true });
   await cp(join(ROOT, "target", m.multicall.target, "release/bunos-utils"), join(out, "target/release/bunos-utils"));
   for (const suite of ["coreutils", "findutils", "diffutils", "procps", "util-linux"])
-    for (const f of [...new Bun.Glob("LICENSE*").scanSync(join(ROOT, "vendor/uutils", suite))])
+    for (const f of new Bun.Glob("LICENSE*").scanSync(join(ROOT, "vendor/uutils", suite)))
       await cp(join(ROOT, "vendor/uutils", suite, f), join(out, "licenses", `${suite}-${f}`));
   const version =
     /^version\s*=\s*"([^"]+)"/m.exec(await Bun.file(join(ROOT, "vendor/uutils/coreutils/Cargo.toml")).text())?.[1] ??
@@ -264,7 +264,7 @@ apt-get update -qq >/dev/null
 apt-get install -y -qq rust-coreutils rust-findutils rust-diffutils sudo-rs ntpd-rs bunos-crosvm >/dev/null
 dpkg-query -W rust-coreutils rust-findutils rust-diffutils sudo-rs ntpd-rs bunos-crosvm
 ln -sf /usr/lib/cargo/bin/sudo /usr/local/bin/sudo
-for c in "ls --version" "coreutils --list" "sudo --version" "ntp-ctl --version" "crosvm version"; do echo "\$ $c"; $c 2>&1 | head -2; done
+for c in "ls --version" "coreutils --list" "sudo --version" "ntp-ctl --version" "crosvm version"; do echo "$ $c"; $c 2>&1 | head -2; done
 readlink -f /usr/bin/ls
 ls --version | grep -q "uutils coreutils"
 sudo --version | grep -q sudo-rs`;
