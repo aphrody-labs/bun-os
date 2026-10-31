@@ -20,6 +20,11 @@ case "$cmd" in
     ;;
   provision)
     android() { timeout 30s waydroid shell -- "$@"; }
+    install_apk() {
+      runuser -u aphrody -- env HOME=/home/aphrody XDG_RUNTIME_DIR=/run/user/1000 \
+        DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus WAYLAND_DISPLAY=wayland-1 \
+        timeout 120s waydroid app install "$1"
+    }
     [ "$(android getprop sys.boot_completed | tr -d '\r')" = 1 ] || { echo "Android has not finished booting" >&2; exit 1; }
     apk_dir=/usr/share/bunos/android/apks
     apk_files=$(find "$apk_dir" -maxdepth 1 -type f -name '*.apk' -print 2>/dev/null | LC_ALL=C sort)
@@ -29,8 +34,12 @@ case "$cmd" in
       if [ "$installed_fingerprint" != "$apk_fingerprint" ]; then
         for apk in "$apk_dir"/*.apk; do
           [ -f "$apk" ] || continue
-          waydroid app install "$apk"
+          install_apk "$apk"
         done
+        android pm path org.fdroid.fdroid | grep -q '^package:' || {
+          echo "F-Droid APK installation was not visible to PackageManager" >&2
+          exit 1
+        }
         android settings put global bunos_apk_fingerprint "$apk_fingerprint"
       fi
     fi
