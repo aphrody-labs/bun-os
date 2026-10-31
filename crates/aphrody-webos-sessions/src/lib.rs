@@ -257,7 +257,8 @@ impl Sessions {
         .collect();
         let caps = [
             "SYS_ADMIN", "NET_ADMIN", "NET_RAW", "SETUID", "SETGID", "CHOWN", "DAC_OVERRIDE", "FOWNER", "KILL", "MKNOD",
-            "SYS_CHROOT", "SETPCAP", "AUDIT_WRITE",
+            "SYS_CHROOT", "SETPCAP", "AUDIT_WRITE", "AUDIT_CONTROL", "SYS_NICE", "WAKE_ALARM", "BLOCK_SUSPEND", "SYS_PTRACE",
+            "NET_BIND_SERVICE", "DAC_READ_SEARCH", "FSETID", "SYS_RESOURCE", "IPC_LOCK",
         ];
         let host = HostConfig {
             binds: Some(binds),
@@ -370,9 +371,10 @@ impl Sessions {
     }
 }
 
-/// Render node (Mesa in the session) and loop control (Waydroid image mounts), when the host has them.
+/// The whole DRI directory (minigbm falls back to the vkms card node, and host card numbers are dynamic) and loop
+/// control (Waydroid image mounts), when the host has them.
 fn host_devices() -> Vec<DeviceMapping> {
-    ["/dev/dri/renderD128", "/dev/loop-control"]
+    ["/dev/dri", "/dev/loop-control"]
         .into_iter()
         .filter(|p| std::path::Path::new(p).exists())
         .map(|p| DeviceMapping {
