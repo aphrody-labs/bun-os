@@ -97,7 +97,7 @@ export function firstError(text: string): { error?: string; file?: string } {
   const errorLine =
     lines.find(line => /\berror\b|✗|FAIL|not a tracked|cannot|failed/i.test(line) && !/^\s*warning/i.test(line)) ??
     lines.at(-1);
-  const pathPattern = /((?:[\w@.\-]+\/)+[\w@.\-]+\.(?:ts|tsx|mts|js|mjs|json|jsonc|rs|toml|md|css))/;
+  const pathPattern = /((?:[\w@.-]+\/)+[\w@.-]+\.(?:ts|tsx|mts|js|mjs|json|jsonc|rs|toml|md|css))/;
   const start = errorLine ? lines.indexOf(errorLine) : 0;
   let file: string | undefined;
   for (const line of lines.slice(Math.max(0, start), start + 12)) {
@@ -242,7 +242,10 @@ async function notifyA2a(head: string, results: StepResult[]) {
  */
 export async function staleOverwrites(repo: string, base: string, head: string): Promise<string[]> {
   const found: string[] = [];
-  const changed = (await git(repo, "diff", "--name-only", "--diff-filter=M", base, head)).split("\n").filter(Boolean);
+  // Three-dot: only what head changed since its merge base with base; a head that is merely behind reverts nothing.
+  const changed = (await git(repo, "diff", "--name-only", "--diff-filter=M", `${base}...${head}`))
+    .split("\n")
+    .filter(Boolean);
   for (const path of changed.slice(0, 2000)) {
     const blob = (await git(repo, "rev-parse", "--verify", "--quiet", `${head}:${path}`)).trim();
     if (!blob) continue;
@@ -363,14 +366,18 @@ async function prePush(repo: string): Promise<number> {
   }
   const lines = (await Bun.stdin.text()).split("\n").filter(Boolean);
   const changed = new Set<string>();
+  let base = "origin/main";
+  let head = (await git(repo, "rev-parse", "HEAD")).trim();
   for (const line of lines) {
     const [, localSha, , remoteSha] = line.split(" ");
     if (!localSha || /^0+$/.test(localSha)) continue;
-    const base = remoteSha && !/^0+$/.test(remoteSha) ? remoteSha : "origin/main";
-    for (const path of (await git(repo, "diff", "--name-only", base, localSha)).split("\n")) if (path) changed.add(path);
+    // Judge exactly what this push adds on top of the remote tip (three-dot: changes since the merge base).
+    base = remoteSha && !/^0+$/.test(remoteSha) ? remoteSha : "origin/main";
+    head = localSha;
+    for (const path of (await git(repo, "diff", "--name-only", `${base}...${localSha}`)).split("\n"))
+      if (path) changed.add(path);
   }
-  const head = (await git(repo, "rev-parse", "HEAD")).trim();
-  const results = await runSteps(repo, [...changed], "origin/main", head);
+  const results = await runSteps(repo, [...changed], base, head);
   for (const result of results)
     console.error(
       `[gate] ${result.ok ? "ok  " : "FAIL"} ${result.name}${result.skipped ? ` (skipped: ${result.skipped})` : ""}${
