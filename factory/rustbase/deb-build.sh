@@ -67,8 +67,7 @@ d=$(repack ntpd-rs_*.deb)
 for b in ntp-daemon ntp-ctl; do [ -e "$d/usr/bin/$b" ] && install -m755 /out/ntpd-rs/target/release/$b "$d/usr/bin/$b"; done
 finish "$d" "$(cat /out/ntpd-rs/version)+bunos1" "aphrody-labs/ntpd-rs $(cat /out/ntpd-rs/sha)"
 
-# bunos-crosvm: new package, optional (guest VMs only; not in the default image).
-[ -x /out/crosvm/target/release/crosvm ] || { echo "bunos-crosvm skipped: crosvm not built"; exit 0; }
+# bunos-crosvm: new package.
 d=$work/bunos-crosvm; mkdir -p "$d/DEBIAN" "$d/usr/bin" "$d/usr/share/doc/bunos-crosvm"
 install -m755 /out/crosvm/target/release/crosvm "$d/usr/bin/crosvm"
 install -m644 /out/crosvm/crosvm/LICENSE "$d/usr/share/doc/bunos-crosvm/copyright"
