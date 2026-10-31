@@ -129,9 +129,22 @@ async function restart(unit: string, reason: string, state: HealthState) {
   event("health", "restart", `${unit} (${reason})${r.code ? `: restart failed ${r.out.slice(0, 200)}` : ""}`);
 }
 
+/** A unit retired from the host (its file removed) is no longer part of the live surface. */
+export async function installed(unit: string) {
+  return (await run(["systemctl", "show", "-p", "LoadState", "--value", unit])).out.trim() === "loaded";
+}
+
 export async function health() {
   const state = loadState<HealthState>("health", { probes: {}, restarts: {} });
-  const results = await Promise.all(PROBES.map(async probe => ({ probe, ...(await probe.check()) })));
+  // Probes and units of retired services are dropped from the state and never restarted.
+  const live = new Map<string, boolean>();
+  for (const unit of new Set([...PROBES.map(p => p.unit), ...UNITS])) live.set(unit, await installed(unit));
+  for (const key of Object.keys(state.probes)) {
+    const unit = PROBES.find(p => p.name === key)?.unit ?? key.replace(/^unit /, "");
+    if (live.get(unit) === false) delete state.probes[key];
+  }
+  const probes = PROBES.filter(probe => live.get(probe.unit));
+  const results = await Promise.all(probes.map(async probe => ({ probe, ...(await probe.check()) })));
   const toRestart = new Map<string, string>();
   for (const { probe, ok, detail } of results) {
     const previous = state.probes[probe.name];
@@ -154,7 +167,7 @@ export async function health() {
     // Two failed probes in a row (about 4 minutes) before a restart: one slow answer is not an outage.
     if (failures >= 2) toRestart.set(probe.unit, `${probe.name}: ${detail}`);
   }
-  for (const unit of UNITS) {
+  for (const unit of UNITS.filter(u => live.get(u))) {
     const active = (await run(["systemctl", "is-active", unit])).out.trim();
     state.probes[`unit ${unit}`] = {
       ok: active === "active",

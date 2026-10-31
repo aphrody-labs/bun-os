@@ -230,6 +230,13 @@ export async function install() {
   for (const unit of LIVE_UNITS) {
     if (NEVER_TOUCH.test(unit)) continue;
     const dir = `/etc/systemd/system/${unit}.service.d`;
+    // A unit retired from the host keeps no drop-in of ours (a lone drop-in would resurrect a stub unit).
+    const fragment = (await run(["systemctl", "show", "-p", "FragmentPath", "--value", `${unit}.service`])).out.trim();
+    if (!fragment) {
+      await sudo(["rm", "-f", `${dir}/90-bunos-auto.conf`]);
+      await sudo(["rmdir", "--ignore-fail-on-non-empty", dir]);
+      continue;
+    }
     const restart = unit === "waydroid-container" || unit === "aphrody-android17" ? "on-failure" : "always";
     const text = `# Installed by factory/automation/install.ts (docs/AUTOMATION.md): restart on any exit, never parked by the
 # start limit; the health loop (bunos-auto-health.timer) is the HTTP watchdog on top.
