@@ -80,7 +80,9 @@ function check(): boolean {
     const m = toml.match(/libcosmic\s*=\s*\{[^}]*rev\s*=\s*"([0-9a-f]+)"/);
     if (m && m[1] !== lc) problems.push(`crates/${crate} libcosmic rev ${m[1]} != shared ${lc}`);
   }
-  const epoch = capture(["git", "ls-tree", "HEAD"], join(root, "vendor/cosmic-epoch"));
+  // The commit this repository pins (the gitlink), not whatever the shared submodule checkout happens to be on.
+  const epochPin = capture(["git", "rev-parse", "HEAD:vendor/cosmic-epoch"]);
+  const epoch = epochPin ? capture(["git", "ls-tree", epochPin], join(root, "vendor/cosmic-epoch")) : "";
   if (epoch) {
     for (const [app, { rev }] of Object.entries(forks.apps)) {
       const line = epoch.split("\n").find(l => l.endsWith(`\t${app}`));
