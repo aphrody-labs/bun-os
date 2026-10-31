@@ -1,0 +1,10 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Starts the bun-obscura CDP server for the COSMIC session (autostart). Uses the systemd user unit when a user
+# manager runs (disk image); the streamed session container has none, so it runs the server directly there.
+set -u
+[ -x /usr/bin/bun-obscura ] || exit 0
+if systemctl --user show-environment >/dev/null 2>&1; then
+  exec systemctl --user start bun-obscura.service
+fi
+exec /usr/bin/bun-obscura serve --host 127.0.0.1 --port 9222

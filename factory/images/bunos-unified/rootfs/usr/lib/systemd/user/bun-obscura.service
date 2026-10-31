@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT
+# bun-obscura (aphrody-labs/bun-obscura, pinned 3ed4a76): the image's headless engine and Chrome DevTools Protocol
+# server for agents, search and automation, next to Helium. Loopback only: ws://127.0.0.1:9222/devtools/browser.
+[Unit]
+Description=bun-obscura headless engine (CDP on 127.0.0.1:9222)
+Documentation=https://github.com/aphrody-labs/bun-obscura
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bun-obscura serve --host 127.0.0.1 --port 9222
+Restart=on-failure
+RestartSec=3
+Nice=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target
