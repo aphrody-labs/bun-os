@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 /// Bun OS light scheme.
-const ColorScheme bunOsLightScheme = const ColorScheme(
+const ColorScheme bunOsLightScheme = ColorScheme(
   brightness: Brightness.light,
   primary: Color(0xFF65558F),
   onPrimary: Color(0xFFFFFFFF),
@@ -55,7 +55,7 @@ const ColorScheme bunOsLightScheme = const ColorScheme(
 );
 
 /// Bun OS dark scheme.
-const ColorScheme bunOsDarkScheme = const ColorScheme(
+const ColorScheme bunOsDarkScheme = ColorScheme(
   brightness: Brightness.dark,
   primary: Color(0xFFCFBDFE),
   onPrimary: Color(0xFF36275D),
