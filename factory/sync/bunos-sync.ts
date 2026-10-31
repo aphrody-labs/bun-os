@@ -208,7 +208,9 @@ async function snapshot(gitDir: string, reason: string, parents: string[], track
   const ref = `refs/wip/${host}/${stamp}`;
   if ((await git(["rev-parse", "--verify", "--quiet", ref])).code === 0) throw new Error(`${ref} already exists`);
   const index = join(gitDir, "bunos-wip.index");
+  // The pass lock is held: a leftover lock of the private index comes from a killed pass.
   rmSync(index, { force: true });
+  rmSync(`${index}.lock`, { force: true });
   // Start from the real index: staged work is kept and stat data avoids rehashing the whole tree.
   if (existsSync(join(gitDir, "index"))) copyFileSync(join(gitDir, "index"), index);
   const env = { GIT_INDEX_FILE: index };
