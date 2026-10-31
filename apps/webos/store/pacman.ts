@@ -85,8 +85,14 @@ async function serialized(cmd: string[], cwd: string, timeout: number, env: Reco
   }
   return r;
 }
-const cargoSerial = (ctx: Ctx, args: string[], timeout = 4 * HOURS) =>
-  serialized(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), ...args], ctx.root, timeout);
+/** Workspace builds resolve against a private copy of the checkout's Cargo.lock (cargo resolver.lockfile-path): when main's
+ * lock trails newly added crates, cargo completes it in the copy instead of rewriting the shared checkout's file. */
+async function cargoSerial(ctx: Ctx, args: string[], timeout = 4 * HOURS) {
+  const lock = join(LANE_TARGET, "Cargo.lock");
+  await mkdir(LANE_TARGET, { recursive: true });
+  await Bun.write(lock, Bun.file(join(ctx.root, "Cargo.lock")));
+  return serialized(["bash", join(ctx.root, "scripts/aphrody/build/rust/cargo-serial.sh"), ...args.filter((a) => a !== "--locked")], ctx.root, timeout, { CARGO_RESOLVER_LOCKFILE_PATH: lock });
+}
 async function must(label: string, r: Promise<{ code: number; out: string }>) {
   const x = await r;
   if (x.code !== 0) throw new Error(`${label}: ${tail(x.out, 6)}`);
