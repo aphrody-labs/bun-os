@@ -1588,3 +1588,8 @@
 	path = vendor/flutter
 	url = https://github.com/aphrody-labs/flutter.git
 	branch = stable
+[submodule "vendor/bevy"]
+	path = vendor/bevy
+	url = https://github.com/aphrody-labs/bevy.git
+	shallow = true
+	update = none
