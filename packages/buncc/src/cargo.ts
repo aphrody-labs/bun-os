@@ -256,6 +256,8 @@ export async function runCargo(args: string[], options: CargoOptions): Promise<R
     for (const note of prepared.notes) log(`buncc: ${note}`);
     const env = prepared.env;
     env.BUNCC_SLOT = String(slot);
+    // The VPS `cargo` shim (scripts/aphrody/build/rust/cargo-lane-shim.ts) runs the real cargo inside a lane.
+    env.BUNCC_IN_LANE = "1";
     env.CARGO_BUILD_JOBS = String(plan.jobs);
     // A build directory under the lane root (the host default for direct cargo) is not a caller's own choice.
     const inheritedBuildDir = env.CARGO_BUILD_BUILD_DIR && !(plan.root && env.CARGO_BUILD_BUILD_DIR.startsWith(plan.root));
@@ -268,6 +270,9 @@ export async function runCargo(args: string[], options: CargoOptions): Promise<R
       // Full DWARF made the old shared build directory 250 GB; line tables keep backtraces and fit the fast disk.
       env.CARGO_PROFILE_DEV_DEBUG ??= "line-tables-only";
       env.CARGO_PROFILE_TEST_DEBUG ??= "line-tables-only";
+    } else if (plan.root && env.CARGO_TARGET_DIR && !inheritedBuildDir) {
+      // A caller-chosen artifact directory keeps its layout; intermediates still go to the lane on the fast disk.
+      env.CARGO_BUILD_BUILD_DIR = join(plan.root, `lane-${slot}`, "build");
     } else if (plan.lanes > 1 && !env.CARGO_TARGET_DIR) {
       env.CARGO_TARGET_DIR = join(options.root, "target", `slot-${slot}`);
     }
