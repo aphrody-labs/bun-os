@@ -41,7 +41,7 @@ the pages that own the details. Generated data is not copied here: see
 
 ## Build and check
 
-Native Bun commands only; never `bunx`, `tsc`, ESLint or Prettier:
+Quality commands:
 
 ```sh
 bun check          # type check (native)
