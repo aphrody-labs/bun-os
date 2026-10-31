@@ -1593,3 +1593,6 @@
 	url = https://github.com/aphrody-labs/bevy.git
 	shallow = true
 	update = none
+[submodule "vendor/codex"]
+	path = vendor/codex
+	url = https://github.com/aphrody-labs/codex.git
