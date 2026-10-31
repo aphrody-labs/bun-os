@@ -50,10 +50,23 @@ dbus-daemon --system --fork
 if [ -e /dev/binderfs/binder-control ] && [ -f /usr/share/bunos/waydroid/images/system.img ]; then
   if [ ! -f /var/lib/waydroid/waydroid.cfg ]; then
     waydroid init -f >/var/log/waydroid-init.log 2>&1 || log "waydroid init failed"
-    cat /usr/share/bunos/waydroid/waydroid_base.prop.d/*.prop >>/var/lib/waydroid/waydroid_base.prop 2>/dev/null || true
+    # `waydroid upgrade` regenerates waydroid_base.prop from waydroid.cfg, so the fragments go into its
+    # [properties] section (later fragments win), not into the generated file.
+    /usr/bin/python3 -I - /var/lib/waydroid/waydroid.cfg /usr/share/bunos/waydroid/waydroid_base.prop.d/*.prop <<'PY' || log "waydroid props merge failed"
+import configparser, sys
+cfg = configparser.ConfigParser(); cfg.optionxform = str; cfg.read(sys.argv[1])
+if not cfg.has_section("properties"): cfg.add_section("properties")
+for frag in sys.argv[2:]:
+    for line in open(frag, encoding="utf-8"):
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1); cfg["properties"][k.strip()] = v.strip()
+with open(sys.argv[1], "w") as f: cfg.write(f)
+PY
     waydroid upgrade -o >>/var/log/waydroid-init.log 2>&1 || true
   fi
   waydroid container start >/var/log/waydroid-container.log 2>&1 &
+  WAYDROID=1
   # First-boot provisioning (desktop windowing, setup wizards off) once Android has booted.
   (for _ in $(seq 180); do /usr/libexec/bunos/waydroid-android17 provision >>/var/log/waydroid-init.log 2>&1 && break; sleep 5; done) &
 else
@@ -83,6 +96,12 @@ fi
 i=0; while [ ! -S "$RUN_USER/wayland-1" ] && [ $i -lt 120 ]; do sleep 0.5; i=$((i + 1)); done
 printf 'size=%s\ncage=wayland-0\ncosmic=%s\n' "$SIZE" "$([ -S "$RUN_USER/wayland-1" ] && echo wayland-1 || echo missing)" >/run/bunos/ready
 log "ready ($SIZE)"
+# Android user session on COSMIC's display. cosmic-session does not run XDG autostart entries in this
+# container, so start it here; waydroid-session waits for the container manager and is a no-op when a
+# session already runs.
+if [ "${WAYDROID:-0}" = 1 ] && [ -S "$RUN_USER/wayland-1" ]; then
+  as_user env WAYLAND_DISPLAY=wayland-1 DBUS_SESSION_BUS_ADDRESS="unix:path=$RUN_USER/bus"     /usr/libexec/bunos/waydroid-session >/var/log/waydroid-session.log 2>&1 &
+fi
 # Stay alive as long as cage runs.
 while [ -S "$RUN_USER/wayland-0" ] && pgrep -x cage >/dev/null; do sleep 5; done
 log "cage exited"
