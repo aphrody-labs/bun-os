@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: Apache-2.0
+# Codex Luna sub-agent dispatcher (`aphrody codex agent daemon`, factory/codex-agent/dispatch.ts): runs `codex exec -m gpt-6-luna
+# -c model_reasoning_effort=medium` workers in the single checkout (roles reviewer, fixer, doc-writer, test-runner, triage),
+# polls the a2a inboxes codex-luna and codex-luna-<role>, reports back to the sender, and commits worker edits to main as aphrody-dev.
+# Limits (factory/codex-agent/dispatch.ts, state/config.json): 3 concurrent workers, 20 min per task, token budget per day and total.
+# State and logs: ~/apps/aphrody/shared/coord/codex-agent. Low priority in build.slice, like the app-server.
+[Unit]
+Description=Codex Luna sub-agent dispatcher (aphrody codex agent daemon)
+After=network-online.target aphrody-a2a.service
+Wants=network-online.target aphrody-a2a.service
+StartLimitBurst=20
+StartLimitIntervalSec=600
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+Slice=build.slice
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+WorkingDirectory=/home/ubuntu/src/bun-os
+Environment=HOME=/home/ubuntu
+Environment=BUNOS_REPO=/home/ubuntu/src/bun-os
+Environment=CODEX_HOME=/home/ubuntu/.codex
+Environment=PATH=/home/ubuntu/.local/bin:/home/ubuntu/.bun/bin:/home/ubuntu/.cargo/bin:/usr/local/bin:/usr/bin:/bin
+Environment=APHRODY_A2A_HUB_URL=http://127.0.0.1:8788
+Environment=APHRODY_A2A_TOKEN_FILE=/home/ubuntu/.aphrody/private/a2a/bearer
+Environment=APHRODY_HOST_ID=vps
+ExecStart=/home/ubuntu/.bun/bin/bun /home/ubuntu/src/bun-os/factory/codex-agent/dispatch.ts daemon
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
+KillMode=control-group
+MemoryHigh=8G
+MemoryMax=14G
+TasksMax=4096
+LimitNOFILE=65536
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aphrody-codex-agent
+
+[Install]
+WantedBy=multi-user.target

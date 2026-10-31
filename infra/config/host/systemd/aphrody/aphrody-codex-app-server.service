@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: Apache-2.0
+# Codex app-server (JSON-RPC v2 over WebSocket) on loopback, for the Codex Luna sub-agents (docs/AUTOMATION.md, docs/A2A-AGENTS.md).
+# The real Codex binary reads ~/.codex/config.toml (model gpt-6-luna, model_reasoning_effort medium) and the ChatGPT login in
+# ~/.codex; nothing is copied. Loopback only: ws://127.0.0.1:4500 (GET /readyz, /healthz), never proxied.
+# Low priority: build.slice (CPUWeight 20) plus Nice, so it never starves WebOS and the interactive services; the
+# aphrody-priority helper keeps interactive units at weight 1000 above it.
+[Unit]
+Description=Codex app-server (gpt-6-luna medium, ws://127.0.0.1:4500, loopback only)
+After=network-online.target
+Wants=network-online.target
+StartLimitBurst=20
+StartLimitIntervalSec=600
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+Slice=build.slice
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+WorkingDirectory=/home/ubuntu/src/bun-os
+Environment=HOME=/home/ubuntu
+Environment=CODEX_HOME=/home/ubuntu/.codex
+Environment=PATH=/home/ubuntu/.local/bin:/home/ubuntu/.bun/bin:/home/ubuntu/.cargo/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/ubuntu/.codex/packages/standalone/current/bin/codex app-server --listen ws://127.0.0.1:4500
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+MemoryHigh=6G
+MemoryMax=10G
+TasksMax=2048
+LimitNOFILE=65536
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aphrody-codex-app-server
+
+[Install]
+WantedBy=multi-user.target
