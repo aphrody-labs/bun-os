@@ -61,12 +61,6 @@ export const PROBES: Probe[] = [
     check: http("https://aphrody.com/api/android/", alive),
   },
   { name: "android gateway", unit: "aphrody-android-gateway.service", check: tcp(8799) },
-  {
-    name: "/api/wayland",
-    unit: "aphrody-wayland-gateway.service",
-    check: http("https://aphrody.com/api/wayland/", alive),
-  },
-  { name: "wayland gateway", unit: "aphrody-wayland-gateway.service", check: tcp(8793) },
   { name: "store API", unit: "aphrody-store.service", check: http("http://127.0.0.1:8791/", alive) },
   {
     name: "store apt repo",
@@ -97,8 +91,6 @@ export const PROBES: Probe[] = [
 
 /** Units that must be active even without an HTTP surface (the stream session stack). */
 export const UNITS = [
-  "aphrody-hyprland.service",
-  "aphrody-wayvnc.service",
   "aphrody-remote.service",
   "aphrody-desktop-xvfb.service",
   "aphrody-desktop-wm.service",

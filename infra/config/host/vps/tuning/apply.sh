@@ -69,7 +69,7 @@ put "$NGX/shared/01-tuning.conf" /etc/nginx/conf.d/01-tuning.conf
 put "$NGX/shared/02-compression.conf" /etc/nginx/conf.d/02-compression.conf
 put "$NGX/shared/03-zstd.conf" /etc/nginx/aphrody/03-zstd.conf
 put "$NGX/aphrody/aphrody.com.conf" /etc/nginx/sites-available/aphrody.com
-for s in aphrody-google.inc aphrody-wayland.inc aphrody-security.inc; do put "$NGX/snippets/$s" "/etc/nginx/snippets/$s"; done
+for s in aphrody-google.inc aphrody-android.inc aphrody-security.inc; do put "$NGX/snippets/$s" "/etc/nginx/snippets/$s"; done
 if sudo nginx -t -q; then
   sudo systemctl reload nginx
   sudo /usr/local/libexec/aphrody-nginx-zstd build || echo "zstd module unavailable; brotli/gzip active" >&2

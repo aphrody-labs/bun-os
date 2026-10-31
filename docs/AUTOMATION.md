@@ -54,7 +54,7 @@ overwritten.
 
 `auto.ts install` gives every live Bun OS unit a `90-bunos-auto.conf` drop-in: `Restart=always` (Android:
 `on-failure`), `RestartSec=5`, a start limit of 30 per 10 minutes, so a crash loop is never parked. None of these
-binaries speak `sd_notify`, so the HTTP prober is the watchdog: `/api/health`, `/api/android`, `/api/wayland`, the store
+binaries speak `sd_notify`, so the HTTP prober is the watchdog: `/api/health`, `/api/android`, the store
 API and apt repo, the site, the chat gateway, downloads, the a2a hub, the Android 17 container (`waydroid status`), the
 stream gateways and the session units. The host `aphrody-selfheal.timer` also restarts failed `aphrody-*` units
 (Shenron excluded).

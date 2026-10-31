@@ -3,7 +3,6 @@
 [Unit]
 Description=Bun OS COSMIC session (headless, streamed)
 After=pipewire.service wireplumber.service
-Conflicts=aphrody-hyprland.service
 
 [Service]
 Type=simple
