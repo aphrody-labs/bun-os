@@ -1,4 +1,18 @@
-import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  closeSync,
+  existsSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  readSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  statfsSync,
+  writeFileSync,
+} from "node:fs";
+import { availableParallelism } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { overlayEnv, sanitizeEnv, type Env } from "./env.ts";
 import { acquireSlot, cacheDir, lockPathFor, withLock } from "./lock.ts";
@@ -96,45 +110,188 @@ export interface CargoOptions {
   log?: (line: string) => void;
 }
 
-export const DEFAULT_CARGO_DEADLINE = 30 * 60_000;
+/** Default no-progress window: a build that burns no CPU for this long is hung and is killed. */
+export const DEFAULT_CARGO_STALL = 30 * 60_000;
+/** Compiler jobs per lane: the owner's limit, never exceeded. */
+export const MAX_LANE_JOBS = 4;
+/** Fast local disk holding one build directory per lane on the VPS. */
+export const DEFAULT_LANE_ROOT = "/var/cache/aphrody-target";
+
+export interface LanePlan {
+  lanes: number;
+  jobs: number;
+  root: string | undefined;
+}
 
 /**
- * Run cargo under a global build slot (BUNCC_SLOTS, default 1) and a lock on its target directory. The deadline covers
- * waiting for the lock and the build together. With more than one slot, slot N builds into target/slot-N so builds do not block.
+ * Lanes sized to the host: one lane per four CPUs (12 cores -> 3 lanes of 4 jobs), BUNCC_SLOTS overrides the count,
+ * BUNCC_LANE_ROOT (default /var/cache/aphrody-target when it exists) holds lane-N build and target directories.
+ */
+export function planLanes(env: Env, cpus = availableParallelism(), laneRootExists = existsSync): LanePlan {
+  const configured = Number.parseInt(env.BUNCC_SLOTS ?? "", 10);
+  const derived = process.platform === "win32" ? 1 : Math.max(1, Math.floor(cpus / MAX_LANE_JOBS));
+  const lanes = Math.max(1, Math.min(16, Number.isFinite(configured) && configured > 0 ? configured : derived));
+  const requested = Number.parseInt(env.CARGO_BUILD_JOBS ?? "", 10);
+  const share = Math.max(1, Math.floor(cpus / lanes));
+  const jobs = Math.max(1, Math.min(MAX_LANE_JOBS, requested > 0 ? requested : share));
+  const root = env.BUNCC_LANE_ROOT || (process.platform === "linux" && laneRootExists(DEFAULT_LANE_ROOT) ? DEFAULT_LANE_ROOT : undefined);
+  return { lanes, jobs, root };
+}
+
+/** CPU ticks used by `pid` and its live descendants plus reaped children (Linux /proc), or undefined elsewhere. */
+export function treeCpuTicks(pid: number): number | undefined {
+  if (process.platform !== "linux") return undefined;
+  const children = new Map<number, number[]>();
+  const ticks = new Map<number, number>();
+  for (const entry of readdirSync("/proc")) {
+    if (!/^\d+$/.test(entry)) continue;
+    try {
+      const stat = readFileSync(`/proc/${entry}/stat`, "utf8");
+      const fields = stat.slice(stat.lastIndexOf(")") + 2).split(" ");
+      const ppid = Number(fields[1]);
+      // utime, stime, cutime, cstime are fields 14-17 (index 11-14 after the comm field).
+      ticks.set(Number(entry), Number(fields[11]) + Number(fields[12]) + Number(fields[13]) + Number(fields[14]));
+      children.set(ppid, [...(children.get(ppid) ?? []), Number(entry)]);
+    } catch {}
+  }
+  let total = 0;
+  const stack = [pid];
+  while (stack.length) {
+    const next = stack.pop()!;
+    total += ticks.get(next) ?? 0;
+    stack.push(...(children.get(next) ?? []));
+  }
+  return total;
+}
+
+/** True when `path` is a complete ar archive (every member fits inside the file). */
+export function completeArchive(path: string): boolean {
+  try {
+    const size = statSync(path).size;
+    const fd = openSync(path, "r");
+    try {
+      const magic = Buffer.alloc(8);
+      readSync(fd, magic, 0, 8, 0);
+      if (magic.toString("latin1") !== "!<arch>\n") return false;
+      let offset = 8;
+      const header = Buffer.alloc(60);
+      while (offset < size) {
+        if (readSync(fd, header, 0, 60, offset) !== 60) return false;
+        const memberSize = Number.parseInt(header.toString("latin1", 48, 58).trim(), 10);
+        if (!Number.isFinite(memberSize) || memberSize < 0) return false;
+        offset += 60 + memberSize + (memberSize % 2);
+        if (offset > size + 1) return false;
+      }
+      return true;
+    } finally {
+      closeSync(fd);
+    }
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A killed build can leave a truncated prebuilt download (rusty_v8's librusty_v8.a, with a .tmp beside it) that every
+ * later build trusts. Under the lane lock nothing else writes this directory, so drop such artifacts and let the build
+ * script fetch them again.
+ */
+export function repairTruncatedArtifacts(buildDir: string, log: (line: string) => void): void {
+  if (!existsSync(buildDir)) return;
+  const candidates: string[] = [];
+  for (const profile of readdirSync(buildDir)) {
+    for (const nested of ["", ...(existsSync(join(buildDir, profile)) ? safeList(join(buildDir, profile)) : [])]) {
+      const obj = join(buildDir, profile, nested, "build", "gn_out", "obj");
+      if (existsSync(obj)) candidates.push(obj);
+    }
+  }
+  for (const obj of candidates) {
+    const archive = join(obj, "librusty_v8.a");
+    const partial = existsSync(join(obj, "librusty_v8.tmp"));
+    if (!partial && (!existsSync(archive) || completeArchive(archive))) continue;
+    for (const name of ["librusty_v8.a", "librusty_v8.tmp", "librusty_v8.sum"]) rmSync(join(obj, name), { force: true });
+    log(`buncc: removed a truncated rusty_v8 download in ${obj}; the build fetches it again`);
+  }
+}
+
+/** Minimum free space kept on the lane disk (BUNCC_LANE_MIN_FREE_GB, default 25). */
+function reclaimLaneSpace(root: string, lane: string, log: (line: string) => void): void {
+  const minimum = (Number(Bun.env.BUNCC_LANE_MIN_FREE_GB) > 0 ? Number(Bun.env.BUNCC_LANE_MIN_FREE_GB) : 25) * 2 ** 30;
+  try {
+    const fs = statfsSync(root);
+    if (fs.bavail * fs.bsize >= minimum) return;
+    // Only this lane is provably idle (we hold its lock): start it cold rather than fill the disk.
+    rmSync(join(lane, "build"), { recursive: true, force: true });
+    log(`buncc: lane disk below ${minimum / 2 ** 30} GiB free; cleared ${lane}/build`);
+  } catch {}
+}
+
+function safeList(dir: string): string[] {
+  try {
+    return readdirSync(dir);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Run cargo in one of N lanes. Each lane has its own build and target directory on the fast disk
+ * (BUNCC_LANE_ROOT/lane-N), at most four compiler jobs, and the shared sccache when it is enabled.
+ * Waiting for a lane is not a failure (BUNCC_LANE_WAIT_MS, default 12 h). A running build is only killed when it makes
+ * no progress: `options.timeoutMs` (default 30 min) is the window in which the cargo process tree must burn CPU.
+ * BUNCC_CARGO_DEADLINE_MS adds an explicit hard deadline for callers that need one.
  */
 export async function runCargo(args: string[], options: CargoOptions): Promise<RunResult> {
   const log = options.log ?? ((line: string) => process.stderr.write(line + "\n"));
-  // BUNCC_CARGO_DEADLINE_MS lifts the default for whole-workspace runs (clippy --all-targets on CI outlasts 30 minutes).
-  const configured = Number(Bun.env.BUNCC_CARGO_DEADLINE_MS);
-  const total = options.timeoutMs ?? (configured > 0 ? configured : DEFAULT_CARGO_DEADLINE);
-  const started = Date.now();
-  const slots = Math.max(
-    1,
-    Math.min(16, Number.parseInt(options.env?.BUNCC_SLOTS ?? Bun.env.BUNCC_SLOTS ?? "1", 10) || 1),
-  );
-  const { slot, release } = await acquireSlot(slots, total, () =>
-    log(`buncc: waiting for one of ${slots} build slot(s)...`),
+  const baseEnv = options.env ?? Bun.env;
+  const plan = planLanes(baseEnv);
+  const stallMs = options.timeoutMs ?? DEFAULT_CARGO_STALL;
+  const hardDeadline = Number(Bun.env.BUNCC_CARGO_DEADLINE_MS) > 0 ? Number(Bun.env.BUNCC_CARGO_DEADLINE_MS) : undefined;
+  const laneWait = Number(Bun.env.BUNCC_LANE_WAIT_MS) > 0 ? Number(Bun.env.BUNCC_LANE_WAIT_MS) : 12 * 60 * 60_000;
+  const { slot, release } = await acquireSlot(plan.lanes, laneWait, () =>
+    log(`buncc: waiting for one of ${plan.lanes} cargo lane(s)...`),
   );
   try {
-    const prepared = await prepareEnv(options.env ?? Bun.env, { driver: options.driver });
+    const prepared = await prepareEnv(baseEnv, { driver: options.driver });
     for (const note of prepared.notes) log(`buncc: ${note}`);
     const env = prepared.env;
     env.BUNCC_SLOT = String(slot);
-    if (slots > 1 && !env.CARGO_TARGET_DIR) env.CARGO_TARGET_DIR = join(options.root, "target", `slot-${slot}`);
+    env.CARGO_BUILD_JOBS = String(plan.jobs);
+    // A build directory under the lane root (the host default for direct cargo) is not a caller's own choice.
+    const inheritedBuildDir = env.CARGO_BUILD_BUILD_DIR && !(plan.root && env.CARGO_BUILD_BUILD_DIR.startsWith(plan.root));
+    if (plan.root && !env.CARGO_TARGET_DIR && !inheritedBuildDir) {
+      const lane = join(plan.root, `lane-${slot}`);
+      mkdirSync(lane, { recursive: true });
+      reclaimLaneSpace(plan.root, lane, log);
+      env.CARGO_TARGET_DIR = lane;
+      env.CARGO_BUILD_BUILD_DIR = join(lane, "build");
+      // Full DWARF made the old shared build directory 250 GB; line tables keep backtraces and fit the fast disk.
+      env.CARGO_PROFILE_DEV_DEBUG ??= "line-tables-only";
+      env.CARGO_PROFILE_TEST_DEBUG ??= "line-tables-only";
+    } else if (plan.lanes > 1 && !env.CARGO_TARGET_DIR) {
+      env.CARGO_TARGET_DIR = join(options.root, "target", `slot-${slot}`);
+    }
     const targetDir = resolve(options.root, env.CARGO_TARGET_DIR ?? "target");
+    const buildDir = resolve(options.root, env.CARGO_BUILD_BUILD_DIR ?? env.CARGO_TARGET_DIR ?? "build/rust");
+    log(`buncc: lane ${slot}/${plan.lanes}, ${plan.jobs} jobs, target ${targetDir}`);
     return await withLock(
       lockPathFor("cargo", targetDir),
       {
-        deadlineMs: Math.max(1000, total - (Date.now() - started)),
+        deadlineMs: laneWait,
+        staleMs: Number.POSITIVE_INFINITY,
         onWait: () => log(`buncc: waiting for the cargo lock on ${targetDir}...`),
       },
-      () =>
-        run(["cargo", ...args], {
+      () => {
+        repairTruncatedArtifacts(buildDir, log);
+        return run(["cargo", ...args], {
           cwd: options.cwd ?? options.root,
           env,
-          timeoutMs: Math.max(1000, total - (Date.now() - started)),
+          timeoutMs: hardDeadline,
+          stallMs,
+          progress: treeCpuTicks,
           output: options.capture ? "capture" : "inherit",
-        }),
+        });
+      },
     );
   } finally {
     release();

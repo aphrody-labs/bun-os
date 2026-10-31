@@ -112,7 +112,8 @@ export async function acquireSlot(
   let notified = false;
   for (;;) {
     for (let slot = 0; slot < slots; slot++) {
-      const release = tryAcquire(lockPathFor("slot", String(slot)));
+      // A lane is only free when its holder is gone: long builds keep their lane however long they run.
+      const release = tryAcquire(lockPathFor("slot", String(slot)), Number.POSITIVE_INFINITY);
       if (release) return { slot, release };
     }
     if (Date.now() >= deadline) throw new Error(`All ${slots} buncc build slots stayed busy until the deadline.`);
