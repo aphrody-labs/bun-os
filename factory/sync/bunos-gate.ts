@@ -1,6 +1,9 @@
 #!/usr/bin/env bun
 /**
- * Main gate: `bun check`, `bun lint`, `bun format --check` and `cargo check --workspace --locked`, run on the VPS.
+ * Main gate, run on the VPS: stale-overwrite detection (a change that writes back a replaced version of a file),
+ * `sh -n` of the unified image scripts and `bun factory/images/build.ts plan bunos-unified` (when factory/images
+ * changed), `bun check`, `bun lint`, `bun format --check` and `cargo check --workspace --locked` (when Rust changed).
+ * A red gate is also posted to the a2a `help-wanted` channel.
  *
  *   bun factory/sync/bunos-gate.ts                 gate the checkout's HEAD (also run by bunos-sync after a pull)
  *   bun factory/sync/bunos-gate.ts --pre-push      the pre-push hook: same steps on the working tree being pushed
@@ -14,7 +17,7 @@
  * Environment: BUNOS_GATE_STEPS (comma list to restrict), BUNOS_GATE_REPO for the GitHub status (default
  * aphrody-labs/bun-os).
  */
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { homedir, hostname } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -38,8 +41,22 @@ export interface StepResult {
 
 const RUST = /(^|\/)(Cargo\.(toml|lock)|rust-toolchain\.toml|\.cargo\/config\.toml)$|\.rs$/;
 
-export function gateSteps(): Step[] {
+const IMAGE = /^factory\/images\//;
+const SELF = "factory/sync/bunos-gate.ts";
+
+export function gateSteps(range: { since?: string; head: string } = { head: "HEAD" }): Step[] {
   const all: Step[] = [
+    // A commit that puts back an older version of a file someone changed since (stale copy, checkpoint, bad merge).
+    ...(range.since
+      ? [{ name: "stale-overwrite", argv: ["bun", SELF, "--stale", range.since, range.head], timeoutMs: 300_000 }]
+      : []),
+    { name: "shell-syntax", argv: ["bun", SELF, "--shell-syntax"], when: IMAGE, timeoutMs: 300_000 },
+    {
+      name: "image-plan",
+      argv: ["bun", "factory/images/build.ts", "plan", "bunos-unified"],
+      when: IMAGE,
+      timeoutMs: 600_000,
+    },
     { name: "check", argv: ["bun", "run", "check"], timeoutMs: 900_000 },
     { name: "lint", argv: ["bun", "run", "lint"], timeoutMs: 900_000 },
     { name: "format", argv: ["bun", "run", "format:check"], timeoutMs: 900_000 },
@@ -106,7 +123,7 @@ export async function culprit(repo: string, since: string | undefined, head: str
 async function runSteps(repo: string, changed: string[] | undefined, since: string | undefined, head: string) {
   const results: StepResult[] = [];
   await ensureInstall(repo);
-  for (const step of gateSteps()) {
+  for (const step of gateSteps({ since, head })) {
     if (step.when && changed && !changed.some(path => step.when!.test(path))) {
       results.push({ name: step.name, ok: true, skipped: "no matching change", seconds: 0 });
       continue;
@@ -187,12 +204,93 @@ export async function runGate(repo: string, stateDir: string): Promise<string> {
   writeFileSync(gateFile, JSON.stringify(entry, null, 2) + "\n");
   appendFileSync(join(stateDir, "gate.jsonl"), JSON.stringify(entry) + "\n");
   for (const result of results) await postStatus(head, result);
+  if (!green) await notifyA2a(head, results);
   const failed = results.filter(result => !result.ok);
   return green
     ? `gate: ${head.slice(0, 10)} green`
     : `gate: ${head.slice(0, 10)} red: ${failed
         .map(f => `${f.name} (${f.file ?? "?"}, ${f.culprit?.sha.slice(0, 10)} ${f.culprit?.author})`)
         .join("; ")}`;
+}
+
+/** Red gates are posted to the a2a `help-wanted` channel so the owning agent sees them (docs/A2A-AGENTS.md). */
+async function notifyA2a(head: string, results: StepResult[]) {
+  if (!Bun.which("aphrody") || !process.env.APHRODY_A2A_HUB_URL) return;
+  const lines = results
+    .filter(result => !result.ok)
+    .map(f => `${f.name}: ${f.file ?? ""} ${f.error ?? ""} (commit ${f.culprit?.sha.slice(0, 10)} "${f.culprit?.subject}")`);
+  await capture(
+    ["aphrody", "a2a", "send", "--source", "vps-gate", "--target", "help-wanted", `main ${head.slice(0, 10)} is red: ${lines.join(" | ")}`.slice(0, 3500)],
+    process.cwd(),
+    60_000,
+  );
+}
+
+/**
+ * Paths whose new content in base..head equals an older version of that path that was since replaced on base:
+ * a stale copy written back over newer work (an old checkpoint, a copied tree, a bad merge resolution).
+ */
+export async function staleOverwrites(repo: string, base: string, head: string): Promise<string[]> {
+  const found: string[] = [];
+  const changed = (await git(repo, "diff", "--name-only", "--diff-filter=M", base, head)).split("\n").filter(Boolean);
+  for (const path of changed.slice(0, 2000)) {
+    const blob = (await git(repo, "rev-parse", "--verify", "--quiet", `${head}:${path}`)).trim();
+    if (!blob) continue;
+    // Each change on base replaced a version (`<commit>^:<path>`); writing one of those back is a stale overwrite.
+    // Merges are judged below by what they dropped, so a fix after a bad merge is not reported as a revert.
+    const history = (await git(repo, "log", "--no-merges", "-n", "25", "--format=%H", base, "--", path))
+      .split("\n")
+      .filter(Boolean);
+    for (const commit of history) {
+      const older = (await git(repo, "rev-parse", "--verify", "--quiet", `${commit}^:${path}`)).trim();
+      if (older && older === blob) {
+        found.push(`${path} reverts to its version before ${commit.slice(0, 10)}`);
+        break;
+      }
+    }
+  }
+  // A merge whose result is exactly one side for a path both sides changed dropped the other side's work.
+  const merges = (await git(repo, "rev-list", "--merges", `${base}..${head}`)).split("\n").filter(Boolean);
+  for (const merge of merges) {
+    const [first, second] = (await git(repo, "rev-parse", `${merge}^1`, `${merge}^2`)).split("\n").map(s => s.trim());
+    if (!first || !second) continue;
+    const mergeBase = (await git(repo, "merge-base", first, second)).trim();
+    const side = async (tip: string) =>
+      new Set((await git(repo, "diff", "--name-only", mergeBase, tip)).split("\n").filter(Boolean));
+    const [ours, theirs] = [await side(first), await side(second)];
+    for (const path of ours) {
+      if (!theirs.has(path)) continue;
+      const blob = async (rev: string) => (await git(repo, "rev-parse", "--verify", "--quiet", `${rev}:${path}`)).trim();
+      const [result, a, b] = [await blob(merge), await blob(first), await blob(second)];
+      if (a !== b && (result === a || result === b))
+        found.push(`${path}: merge ${merge.slice(0, 10)} kept one side and dropped the other side's changes`);
+    }
+  }
+  return found;
+}
+
+/** `sh -n` (or `bash -n`) of every shell script of the unified image. */
+function shellSyntax(repo: string): string[] {
+  const root = join(repo, "factory/images/bunos-unified");
+  const failures: string[] = [];
+  const walk = (dir: string) => {
+    for (const name of existsSync(dir) ? readdirSync(dir) : []) {
+      const path = join(dir, name);
+      const info = statSync(path, { throwIfNoEntry: false });
+      if (!info) continue;
+      if (info.isDirectory()) walk(path);
+      else if (info.isFile() && info.size < 2_000_000) {
+        const rel = path.slice(repo.length + 1).replaceAll("\\", "/");
+        const head = readFileSync(path, "utf8").slice(0, 120).split("\n")[0] ?? "";
+        const shell = /^#!.*\bbash\b/.test(head) ? "bash" : /^#!.*\b(sh|dash)\b/.test(head) || rel.endsWith(".sh") ? "sh" : "";
+        if (!shell) continue;
+        const result = Bun.spawnSync([shell, "-n", path], { stdout: "pipe", stderr: "pipe" });
+        if (result.exitCode !== 0) failures.push(`${rel}: ${result.stderr.toString().trim().split("\n")[0]}`);
+      }
+    }
+  };
+  walk(root);
+  return failures;
 }
 
 function buildHost(): boolean {
@@ -227,6 +325,17 @@ async function prePush(repo: string): Promise<number> {
 if (import.meta.main) {
   const repo = resolve(process.env.BUNOS_REPO ?? process.cwd());
   if (process.argv.includes("--pre-push")) process.exit(await prePush(repo));
+  const staleIndex = process.argv.indexOf("--stale");
+  if (staleIndex >= 0) {
+    const found = await staleOverwrites(repo, process.argv[staleIndex + 1]!, process.argv[staleIndex + 2] ?? "HEAD");
+    for (const line of found) console.error(`error: stale overwrite: ${line}`);
+    process.exit(found.length ? 1 : 0);
+  }
+  if (process.argv.includes("--shell-syntax")) {
+    const failures = shellSyntax(repo);
+    for (const line of failures) console.error(`error: shell syntax: ${line}`);
+    process.exit(failures.length ? 1 : 0);
+  }
   const stateDir = process.env.BUNOS_SYNC_STATE ?? join(homedir(), ".local", "state", "bunos-sync");
   const summary = await runGate(repo, stateDir);
   console.log(summary);
