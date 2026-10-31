@@ -24,7 +24,7 @@ session)
     --cap-add FSETID --cap-add SYS_RESOURCE --cap-add IPC_LOCK --security-opt apparmor=unconfined --security-opt seccomp=unconfined \
     --device /dev/dri --device-cgroup-rule "c $binder_major:* rwm" \
     --device /dev/loop-control --device-cgroup-rule "b 7:* rwm" --sysctl net.ipv4.ip_forward=1 --cgroupns private --pids-limit 8192 --shm-size 1g --memory 8g --cpus 4 \
-    --tmpfs /run:exec --tmpfs /tmp --tmpfs /var/lib/misc --tmpfs /var/log \
+    --network host --tmpfs /run:exec --tmpfs /tmp --tmpfs /var/lib/misc --tmpfs /var/log \
     -v "$A17:/usr/share/bunos/waydroid/images:ro" -v "$OUT/secrets:/run/secrets:ro" \
     -v "$name-home:/home/aphrody" \
     -e BUNOS_SESSION_SIZE=1600x900 -e APHRODY_REMOTE_TOKEN_FILE=/run/secrets/session.token \
