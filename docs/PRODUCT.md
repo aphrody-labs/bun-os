@@ -102,3 +102,13 @@ States: **done** (with evidence), **building** (work in flight), **missing** (no
 | Android Emulator / Cuttlefish / Googlebook AVD / ChromiumOS VM / separate redroid sessions | —                 |
 | Hyprland streamed session, once line 12 serves COSMIC                                      | —                 |
 | Per-OS WebOS sessions                                                                      | —                 |
+
+## Automation dispatch
+
+Written by the coordinator (`bunos-auto-coordinator.service`, docs/AUTOMATION.md); do not edit by hand.
+
+| #   | Status     | Dispatched to   | At (UTC)         | Dispatches |
+| --- | ---------- | --------------- | ---------------- | ---------- |
+| 3   | dispatched | a2a:native-apps | 2026-10-31 01:40 | 1          |
+| 9   | dispatched | a2a:android     | 2026-10-31 01:40 | 1          |
+| 14  | dispatched | a2a:sessions    | 2026-10-31 01:40 | 1          |
