@@ -55,9 +55,11 @@ session)
     echo "Android did not finish booting (sys.boot_completed=$android_booted)" >&2
     exit 1
   fi
-  docker exec $name sh -c 'waydroid status; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -60' | tee "$OUT/android.txt" || true
+  docker exec $name sh -c 'set -e; waydroid status; waydroid shell -- pm list packages org.fdroid.fdroid | grep -Fqx package:org.fdroid.fdroid; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -60' | tee "$OUT/android.txt"
   u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch com.android.vending
   sleep 40; shot 03-android-window
+  u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch org.fdroid.fdroid
+  sleep 30; shot 04-fdroid-window
   docker exec $name sh -c 'for d in /usr/share/applications/*.desktop /home/aphrody/.local/share/applications/*.desktop; do
       [ -f "$d" ] || continue; n=$(basename "$d"); case "$n" in waydroid.*) k=android;; com.aphrody.webapp.*) k=web;; *) k=linux;; esac
       echo "$k $n"; done' | sort >"$OUT/launcher-entries.txt"
