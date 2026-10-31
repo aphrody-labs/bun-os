@@ -35,7 +35,7 @@ session)
   u() { docker exec -u 1000 -e HOME=/home/aphrody -e PATH=/usr/libexec/bunos/container-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     -e XDG_CURRENT_DESKTOP=COSMIC -e XDG_RUNTIME_DIR=/run/user/1000 -e DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus "$@"; }
   # docker cp cannot read tmpfs mounts: stream the screenshot out.
-  shot() { u -e WAYLAND_DISPLAY=wayland-0 $name grim - >"$OUT/$1.png"; }
+  shot() { u -e WAYLAND_DISPLAY=wayland-0 "$name" grim - >"$OUT/$1.png"; }
   docker exec $name sh -c 'command -v grim >/dev/null || { apt-get update -qq && apt-get install -y -qq grim; } >/dev/null 2>&1'
   sleep 20; shot 01-desktop
   u -d -e WAYLAND_DISPLAY=wayland-1 $name rio 2>/dev/null || u -d -e WAYLAND_DISPLAY=wayland-1 $name cosmic-term
@@ -43,7 +43,7 @@ session)
   u -d -e WAYLAND_DISPLAY=wayland-1 $name bunos-launch-webapp https://gemini.google.com/ com.aphrody.webapp.Gemini
   sleep 25; shot 02-linux-and-web
   android_booted=
-  for _ in $(seq 60); do
+  for _ in $(seq 180); do
     android_booted=$(timeout 12s docker exec "$name" sh -c 'waydroid shell -- getprop sys.boot_completed 2>/dev/null' | tr -d '\r' || true)
     [ "$android_booted" = 1 ] && break
     sleep 5
@@ -55,7 +55,7 @@ session)
     echo "Android did not finish booting (sys.boot_completed=$android_booted)" >&2
     exit 1
   fi
-  docker exec $name timeout 30s sh -c 'set -e; waydroid status; for _ in $(seq 60); do waydroid shell -- pm list packages org.fdroid.fdroid 2>/dev/null | grep -Fqx package:org.fdroid.fdroid && break; sleep 5; done; waydroid shell -- pm list packages org.fdroid.fdroid | grep -Fqx package:org.fdroid.fdroid; waydroid shell -- pm list packages com.android.vending | grep -Fqx package:com.android.vending; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -60' | tee "$OUT/android.txt"
+  docker exec $name timeout 1020s sh -c 'set -e; waydroid status; for _ in $(seq 180); do [ "$(waydroid shell -- settings get global bunos_provisioned 2>/dev/null | tr -d "\r")" = 1 ] && break; sleep 5; done; [ "$(waydroid shell -- settings get global bunos_provisioned | tr -d "\r")" = 1 ]; waydroid shell -- pm path org.fdroid.fdroid | grep -Fq package:; waydroid shell -- pm path com.android.vending | grep -Fq package:; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -60' | tee "$OUT/android.txt"
   u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch com.android.vending
   sleep 40; shot 03-android-window
   u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch org.fdroid.fdroid
