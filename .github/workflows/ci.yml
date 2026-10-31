@@ -31,6 +31,7 @@ jobs:
             .github
             packages/bun-workspace
             packages/buncc
+            packages/bun-os-plugins
       - uses: ./.github/actions/setup-bun
       - id: areas
         env:
@@ -56,6 +57,7 @@ jobs:
             .github
             packages/bun-workspace
             packages/buncc
+            packages/bun-os-plugins
       - id: setup
         uses: ./.github/actions/setup-workspace
         with:
@@ -108,6 +110,7 @@ jobs:
             .github
             packages/bun-workspace
             packages/buncc
+            packages/bun-os-plugins
       - name: System libraries for the native crates (alsa-sys, bevy, tauri)
         if: runner.os == 'Linux'
         run: |
@@ -175,6 +178,7 @@ jobs:
             .github
             packages/bun-workspace
             packages/buncc
+            packages/bun-os-plugins
       - id: setup
         uses: ./.github/actions/setup-workspace
         with:

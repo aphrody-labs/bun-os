@@ -40,6 +40,7 @@ jobs:
           sparse-checkout: |
             factory
             packages/buncc
+            packages/bun-os-plugins
           sparse-checkout-cone-mode: true
       - run: npm install -g --unsafe-perm bun@${{ env.BUN_VERSION }}
       - name: Closure files are valid and pinned
@@ -56,6 +57,7 @@ jobs:
           sparse-checkout: |
             factory
             packages/buncc
+            packages/bun-os-plugins
           sparse-checkout-cone-mode: true
       - run: npm install -g --unsafe-perm bun@${{ env.BUN_VERSION }}
       - run: pip install meson ninja
@@ -117,6 +119,7 @@ jobs:
           sparse-checkout: |
             factory
             packages/buncc
+            packages/bun-os-plugins
           sparse-checkout-cone-mode: true
       - name: Selected?
         id: sel
