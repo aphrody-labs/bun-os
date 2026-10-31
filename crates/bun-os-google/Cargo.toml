@@ -8,7 +8,7 @@ authors.workspace = true
 homepage.workspace = true
 repository.workspace = true
 license = "Apache-2.0"
-description = "Google SDK for Bun OS: public search (SERP, discovery, cache), language detection atlas and the Google project contract."
+description = "Google SDK for Bun OS: public search (SERP, discovery, cache), language detection atlas, the Google project contract, and (cloud/server features) keyless service-account tokens, the owner's OAuth flow and Google API clients for the Bun OS backend."
 
 [lib]
 name = "bun_google"
@@ -18,20 +18,37 @@ path = "src/lib.rs"
 default = []
 search = ["dep:tokio", "dep:rustls", "dep:bun_browser_dom", "dep:regex", "dep:reqwest", "dep:url", "dep:chrono"]
 search-cache = ["search", "dep:rusqlite"]
+# Google Cloud and owner-account access for the Bun OS backend: keyless service-account tokens (ADC with
+# impersonation), the owner's OAuth 2.0 authorization code + PKCE flow with the refresh token encrypted at rest,
+# and REST clients (Drive, Gmail, Calendar, YouTube, People, Cloud Storage).
+cloud = ["dep:tokio", "dep:rustls", "dep:reqwest", "dep:url", "dep:jsonwebtoken", "dep:aes-gcm", "dep:sha2", "dep:base64", "dep:getrandom"]
+# axum routes (/api/google/*) and the standalone loopback service binary.
+server = ["cloud", "dep:axum"]
+
+[[bin]]
+name = "bun-os-google"
+path = "src/bin/bun-os-google.rs"
+required-features = ["server"]
 
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tokio = { workspace = true, optional = true, features = ["macros", "rt-multi-thread", "time"] }
-rustls = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true, features = ["macros", "rt-multi-thread", "time", "sync", "net", "fs", "signal"] }
+rustls = { workspace = true, optional = true, features = ["ring", "std", "tls12"] }
 bun_browser_dom = { version = "1.4.7", optional = true }
 regex = { workspace = true, optional = true }
-reqwest = { workspace = true, optional = true }
+reqwest = { workspace = true, optional = true, features = ["rustls-no-provider", "http2", "json", "form", "query"] }
 url = { workspace = true, optional = true }
 rusqlite = { workspace = true, optional = true }
 chrono = { workspace = true, optional = true }
+jsonwebtoken = { workspace = true, optional = true }
+aes-gcm = { workspace = true, optional = true }
+sha2 = { workspace = true, optional = true, features = ["std"] }
+base64 = { workspace = true, optional = true, features = ["std"] }
+getrandom = { workspace = true, optional = true, features = ["std"] }
+axum = { workspace = true, optional = true, features = ["json", "query", "tokio", "http1"] }
 
 [lints]
 workspace = true

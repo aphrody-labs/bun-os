@@ -171,7 +171,13 @@ impl Builder {
         } else {
             image.to_vec()
         };
-        let system = loader::load_bytes(name, bytes, self.config()).map_err(|e| err("3DS", e))?;
+        let ext = Path::new(name).extension().and_then(|e| e.to_str()).unwrap_or("cxi");
+        let ext = if image.get(..4) == Some(b"3DSX") { "cxi" } else { ext };
+        let tmp = std::env::temp_dir().join(format!("aphrody-ctr-{}-{}.{ext}", std::process::id(), name.len()));
+        std::fs::write(&tmp, &bytes).map_err(|e| err("3DS", e))?;
+        let loaded = loader::load(&tmp, self.config());
+        let _ = std::fs::remove_file(&tmp);
+        let system = loaded.map_err(|e| err("3DS", e))?;
         Ok(Emu::from_system(system))
     }
 

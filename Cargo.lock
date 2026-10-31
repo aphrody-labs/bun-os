@@ -21659,6 +21659,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0242819d153cba4b4b05a5a8f2a7e9bbf97b6055b2a002b395c96b5ff3c0222"
 dependencies = [
  "cfg-if 1.0.5",
+ "js-sys",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
@@ -32783,6 +32786,7 @@ name = "rustboyadvance-utils"
 version = "0.1.0"
 dependencies = [
  "goblin",
+ "instant",
  "log",
  "ringbuf",
 ]
@@ -46392,7 +46396,6 @@ dependencies = [
  "symphonia-codec-aac 0.6.1",
  "symphonia-core 0.6.1",
  "thiserror 2.0.21",
- "web-time",
  "zakuro-common",
  "zakuro-cpu",
  "zakuro-fs",
@@ -46440,7 +46443,6 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.21",
- "web-time",
  "wide 1.7.1",
  "zakuro-common",
 ]
