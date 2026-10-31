@@ -26,16 +26,10 @@ struct Ui {
 pub fn load_catalog(dir: &Path) -> Catalog {
     let mut apps = Vec::new();
     for toolkit in Toolkit::ALL {
-        let Ok(entries) = std::fs::read_dir(dir.join(toolkit.as_str())) else {
-            continue;
-        };
+        let Ok(entries) = std::fs::read_dir(dir.join(toolkit.as_str())) else { continue };
         for entry in entries.flatten() {
-            let Ok(text) = std::fs::read_to_string(entry.path().join(MANIFEST)) else {
-                continue;
-            };
-            let Ok(bundle) = serde_json::from_str::<Bundle>(&text) else {
-                continue;
-            };
+            let Ok(text) = std::fs::read_to_string(entry.path().join(MANIFEST)) else { continue };
+            let Ok(bundle) = serde_json::from_str::<Bundle>(&text) else { continue };
             if bundle.schema_version == SCHEMA_VERSION
                 && bundle.toolkit == toolkit
                 && Bundle::valid_id(&bundle.id)
@@ -54,18 +48,14 @@ fn bundle(ui: &Ui, toolkit: &str, id: &str) -> Option<Bundle> {
     if !Bundle::valid_id(id) {
         return None;
     }
-    let text =
-        std::fs::read_to_string(ui.dir.join(toolkit.as_str()).join(id).join(MANIFEST)).ok()?;
+    let text = std::fs::read_to_string(ui.dir.join(toolkit.as_str()).join(id).join(MANIFEST)).ok()?;
     let bundle: Bundle = serde_json::from_str(&text).ok()?;
-    (bundle.toolkit == toolkit && bundle.id == id && bundle.schema_version == SCHEMA_VERSION)
-        .then_some(bundle)
+    (bundle.toolkit == toolkit && bundle.id == id && bundle.schema_version == SCHEMA_VERSION).then_some(bundle)
 }
 
 fn with_csp(mut response: Response, csp: &str) -> Response {
     if let Ok(value) = HeaderValue::from_str(csp) {
-        response
-            .headers_mut()
-            .insert(header::CONTENT_SECURITY_POLICY, value);
+        response.headers_mut().insert(header::CONTENT_SECURITY_POLICY, value);
     }
     response
 }
@@ -78,12 +68,9 @@ pub fn router(dir: PathBuf) -> Router {
         .route("/ui/", get(host_page))
         .route("/ui/apps.json", get(catalog))
         .route("/ui/host/{*rest}", get(host_asset))
-        .route(
-            "/ui/{toolkit}/{id}",
-            get(|UrlPath((t, i)): UrlPath<(String, String)>| async move {
-                Redirect::permanent(&format!("/ui/{t}/{i}/"))
-            }),
-        )
+        .route("/ui/{toolkit}/{id}", get(|UrlPath((t, i)): UrlPath<(String, String)>| async move {
+            Redirect::permanent(&format!("/ui/{t}/{i}/"))
+        }))
         .route("/ui/{toolkit}/{id}/", get(app_root))
         .route("/ui/{toolkit}/{id}/{*rest}", get(app_asset))
         .with_state(state)
@@ -91,13 +78,9 @@ pub fn router(dir: PathBuf) -> Router {
 
 async fn catalog(State(ui): State<Arc<Ui>>) -> Response {
     let dir = ui.dir.clone();
-    let catalog = tokio::task::spawn_blocking(move || load_catalog(&dir))
-        .await
-        .unwrap_or_default();
+    let catalog = tokio::task::spawn_blocking(move || load_catalog(&dir)).await.unwrap_or_default();
     let mut response = Json(catalog).into_response();
-    response
-        .headers_mut()
-        .insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
+    response.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
     response
 }
 
@@ -105,10 +88,7 @@ async fn host_page(State(ui): State<Arc<Ui>>) -> Response {
     let csp = csp_with(std::iter::empty());
     if let Ok(bytes) = tokio::fs::read(ui.dir.join("host").join("index.html")).await {
         let response = (
-            [
-                (header::CONTENT_TYPE, "text/html; charset=utf-8"),
-                (header::CACHE_CONTROL, "no-cache"),
-            ],
+            [(header::CONTENT_TYPE, "text/html; charset=utf-8"), (header::CACHE_CONTROL, "no-cache")],
             bytes,
         )
             .into_response();
@@ -116,9 +96,7 @@ async fn host_page(State(ui): State<Arc<Ui>>) -> Response {
     }
     // No host build in this release: a plain list of the bundles.
     let dir = ui.dir.clone();
-    let catalog = tokio::task::spawn_blocking(move || load_catalog(&dir))
-        .await
-        .unwrap_or_default();
+    let catalog = tokio::task::spawn_blocking(move || load_catalog(&dir)).await.unwrap_or_default();
     let mut items = String::new();
     for app in &catalog.apps {
         items.push_str(&format!(
@@ -138,19 +116,12 @@ async fn host_page(State(ui): State<Arc<Ui>>) -> Response {
 }
 
 fn escape(s: &str) -> String {
-    s.replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
+    s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;")
 }
 
 async fn serve_file(dir: PathBuf, rest: &str, request: Request) -> Response {
     let (mut parts, body) = request.into_parts();
-    let query = parts
-        .uri
-        .query()
-        .map(|q| format!("?{q}"))
-        .unwrap_or_default();
+    let query = parts.uri.query().map(|q| format!("?{q}")).unwrap_or_default();
     parts.uri = match format!("/{rest}{query}").parse() {
         Ok(uri) => uri,
         Err(_) => return StatusCode::BAD_REQUEST.into_response(),
@@ -160,17 +131,11 @@ async fn serve_file(dir: PathBuf, rest: &str, request: Request) -> Response {
         Ok(response) => response.map(Body::new),
         Err(never) => match never {},
     };
-    response
-        .headers_mut()
-        .insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
+    response.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
     response
 }
 
-async fn host_asset(
-    State(ui): State<Arc<Ui>>,
-    UrlPath(rest): UrlPath<String>,
-    request: Request,
-) -> Response {
+async fn host_asset(State(ui): State<Arc<Ui>>, UrlPath(rest): UrlPath<String>, request: Request) -> Response {
     let response = serve_file(ui.dir.join("host"), &rest, request).await;
     with_csp(response, &csp_with(std::iter::empty()))
 }
@@ -198,64 +163,36 @@ async fn app(ui: Arc<Ui>, toolkit: String, id: String, rest: String, request: Re
     let csp = bundle.csp();
     let response = match bundle.kind {
         BundleKind::Broadway => match bundle.upstream.as_deref() {
-            Some(upstream) if upstream.starts_with("127.0.0.1:") => proxy(upstream, &rest, request)
-                .await
-                .unwrap_or_else(|error| {
-                    (
-                        StatusCode::BAD_GATEWAY,
-                        format!("{} is not running: {error}", bundle.title),
-                    )
-                        .into_response()
-                }),
+            Some(upstream) if upstream.starts_with("127.0.0.1:") => {
+                proxy(upstream, &rest, request).await.unwrap_or_else(|error| {
+                    (StatusCode::BAD_GATEWAY, format!("{} is not running: {error}", bundle.title)).into_response()
+                })
+            }
             _ => StatusCode::BAD_GATEWAY.into_response(),
         },
         BundleKind::WasmBindgen | BundleKind::Emscripten => {
-            let rest = if rest.is_empty() {
-                bundle.entry.clone()
-            } else {
-                rest
-            };
-            serve_file(
-                ui.dir.join(bundle.toolkit.as_str()).join(&bundle.id),
-                &rest,
-                request,
-            )
-            .await
+            let rest = if rest.is_empty() { bundle.entry.clone() } else { rest };
+            serve_file(ui.dir.join(bundle.toolkit.as_str()).join(&bundle.id), &rest, request).await
         }
     };
     with_csp(response, &csp)
 }
 
-const HOP_BY_HOP: [HeaderName; 4] = [
-    header::HOST,
-    header::CONTENT_LENGTH,
-    header::TRANSFER_ENCODING,
-    header::PROXY_AUTHORIZATION,
-];
+const HOP_BY_HOP: [HeaderName; 4] =
+    [header::HOST, header::CONTENT_LENGTH, header::TRANSFER_ENCODING, header::PROXY_AUTHORIZATION];
 
 /// Forward one request to `upstream` (loopback only). A `101 Switching Protocols` answer (Broadway's WebSocket) is
 /// relayed and both upgraded connections are spliced.
-async fn proxy(
-    upstream: &str,
-    rest: &str,
-    mut request: Request,
-) -> Result<Response, Box<dyn std::error::Error + Send + Sync>> {
+async fn proxy(upstream: &str, rest: &str, mut request: Request) -> Result<Response, Box<dyn std::error::Error + Send + Sync>> {
     let stream = tokio::net::TcpStream::connect(upstream).await?;
-    let (mut sender, connection) =
-        hyper::client::conn::http1::handshake(TokioIo::new(stream)).await?;
+    let (mut sender, connection) = hyper::client::conn::http1::handshake(TokioIo::new(stream)).await?;
     tokio::spawn(connection.with_upgrades());
 
     let wants_upgrade = request.headers().contains_key(header::UPGRADE);
     let client_upgrade = wants_upgrade.then(|| hyper::upgrade::on(&mut request));
     let (parts, body) = request.into_parts();
-    let query = parts
-        .uri
-        .query()
-        .map(|q| format!("?{q}"))
-        .unwrap_or_default();
-    let mut builder = hyper::Request::builder()
-        .method(parts.method)
-        .uri(format!("/{rest}{query}"));
+    let query = parts.uri.query().map(|q| format!("?{q}")).unwrap_or_default();
+    let mut builder = hyper::Request::builder().method(parts.method).uri(format!("/{rest}{query}"));
     for (name, value) in &parts.headers {
         if !HOP_BY_HOP.contains(name) && name != header::COOKIE && name != header::AUTHORIZATION {
             builder = builder.header(name, value);
@@ -270,11 +207,7 @@ async fn proxy(
         if let Some(client_upgrade) = client_upgrade {
             tokio::spawn(async move {
                 if let (Ok(client), Ok(server)) = (client_upgrade.await, server_upgrade.await) {
-                    let _ = tokio::io::copy_bidirectional(
-                        &mut TokioIo::new(client),
-                        &mut TokioIo::new(server),
-                    )
-                    .await;
+                    let _ = tokio::io::copy_bidirectional(&mut TokioIo::new(client), &mut TokioIo::new(server)).await;
                 }
             });
         }

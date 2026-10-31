@@ -30,14 +30,7 @@ pub enum Toolkit {
 }
 
 impl Toolkit {
-    pub const ALL: [Self; 6] = [
-        Self::Iced,
-        Self::Libcosmic,
-        Self::Gtk,
-        Self::Qt,
-        Self::Servo,
-        Self::Cef,
-    ];
+    pub const ALL: [Self; 6] = [Self::Iced, Self::Libcosmic, Self::Gtk, Self::Qt, Self::Servo, Self::Cef];
 
     pub fn as_str(self) -> &'static str {
         match self {
@@ -141,9 +134,7 @@ impl Bundle {
     pub fn valid_id(id: &str) -> bool {
         !id.is_empty()
             && id.len() <= 64
-            && id
-                .bytes()
-                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+            && id.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
     }
 }
 
@@ -175,26 +166,13 @@ pub mod bridge {
     #[serde(tag = "bunui", rename_all = "kebab-case")]
     pub enum Request {
         /// Write text to the system clipboard (needs a user gesture in the host page).
-        ClipboardWrite {
-            text: String,
-        },
-        ClipboardRead {
-            id: u32,
-        },
+        ClipboardWrite { text: String },
+        ClipboardRead { id: u32 },
         /// Origin-private file system, namespaced per app: `/<toolkit>-<app id>/<path>`.
-        FsRead {
-            id: u32,
-            path: String,
-        },
-        FsWrite {
-            id: u32,
-            path: String,
-            text: String,
-        },
+        FsRead { id: u32, path: String },
+        FsWrite { id: u32, path: String, text: String },
         /// Retitle the window.
-        Title {
-            text: String,
-        },
+        Title { text: String },
     }
 
     #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

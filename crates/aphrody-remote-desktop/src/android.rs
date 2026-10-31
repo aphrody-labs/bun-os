@@ -31,8 +31,7 @@ use tokio::process::{Child, Command};
 use tokio::sync::mpsc;
 
 pub const SCRCPY_VERSION: &str = "5.0.1";
-pub const SCRCPY_SERVER_SHA256: &str =
-    "764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536";
+pub const SCRCPY_SERVER_SHA256: &str = "764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536";
 const REMOTE_JAR: &str = "/data/local/tmp/scrcpy-server.jar";
 const VIEWER_HTML: &str = include_str!("android-viewer.html");
 
@@ -64,9 +63,7 @@ pub async fn serve_android(opts: AndroidOptions) -> Result<()> {
     }
     verify_jar(&opts.server_jar)?;
     let bind = opts.bind;
-    let listener = tokio::net::TcpListener::bind(bind)
-        .await
-        .with_context(|| format!("cannot bind {bind}"))?;
+    let listener = tokio::net::TcpListener::bind(bind).await.with_context(|| format!("cannot bind {bind}"))?;
     axum::serve(listener, router(opts))
         .with_graceful_shutdown(async {
             let _ = tokio::signal::ctrl_c().await;
@@ -78,25 +75,16 @@ pub async fn serve_android(opts: AndroidOptions) -> Result<()> {
 fn verify_jar(path: &PathBuf) -> Result<()> {
     use sha2::Digest as _;
     let bytes = std::fs::read(path).with_context(|| format!("cannot read {}", path.display()))?;
-    let sum: String = sha2::Sha256::digest(&bytes)
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect();
+    let sum: String = sha2::Sha256::digest(&bytes).iter().map(|b| format!("{b:02x}")).collect();
     if sum != SCRCPY_SERVER_SHA256 {
-        bail!(
-            "{} is not scrcpy-server v{SCRCPY_VERSION} (sha256 {sum})",
-            path.display()
-        );
+        bail!("{} is not scrcpy-server v{SCRCPY_VERSION} (sha256 {sum})", path.display());
     }
     Ok(())
 }
 
 /// Routes under `/api/android/`: viewer page, health and the stream WebSocket.
 pub fn router(opts: AndroidOptions) -> Router {
-    let st = Arc::new(AppState {
-        opts,
-        generation: AtomicU64::new(0),
-    });
+    let st = Arc::new(AppState { opts, generation: AtomicU64::new(0) });
     Router::new()
         .route("/api/android/", get(viewer))
         .route("/api/android/health", get(health))
@@ -105,25 +93,13 @@ pub fn router(opts: AndroidOptions) -> Router {
 }
 
 async fn viewer() -> impl IntoResponse {
-    (
-        [
-            (header::CACHE_CONTROL, "no-store"),
-            (header::REFERRER_POLICY, "no-referrer"),
-        ],
-        Html(VIEWER_HTML),
-    )
+    ([(header::CACHE_CONTROL, "no-store"), (header::REFERRER_POLICY, "no-referrer")], Html(VIEWER_HTML))
 }
 
 async fn health(State(st): State<Arc<AppState>>) -> Response {
-    let out = Command::new(&st.opts.adb)
-        .args(["-s", &st.opts.serial, "get-state"])
-        .output()
-        .await;
+    let out = Command::new(&st.opts.adb).args(["-s", &st.opts.serial, "get-state"]).output().await;
     let device = matches!(&out, Ok(o) if String::from_utf8_lossy(&o.stdout).trim() == "device");
-    axum::Json(
-        serde_json::json!({"ok": device, "serial": st.opts.serial, "scrcpy": SCRCPY_VERSION}),
-    )
-    .into_response()
+    axum::Json(serde_json::json!({"ok": device, "serial": st.opts.serial, "scrcpy": SCRCPY_VERSION})).into_response()
 }
 
 /// Bearer token from `Authorization` or the `bearer.<token>` WebSocket subprotocol.
@@ -131,37 +107,18 @@ fn bearer(headers: &HeaderMap) -> (Option<String>, Option<String>) {
     let auth = headers
         .get(header::AUTHORIZATION)
         .and_then(|v| v.to_str().ok())
-        .and_then(|v| {
-            v.strip_prefix("Bearer ")
-                .or_else(|| v.strip_prefix("bearer "))
-        })
+        .and_then(|v| v.strip_prefix("Bearer ").or_else(|| v.strip_prefix("bearer ")))
         .map(|s| s.trim().to_owned());
     let proto = headers
         .get(header::SEC_WEBSOCKET_PROTOCOL)
         .and_then(|v| v.to_str().ok())
-        .and_then(|v| {
-            v.split(',')
-                .map(str::trim)
-                .find(|p| p.starts_with("bearer."))
-                .map(str::to_owned)
-        });
+        .and_then(|v| v.split(',').map(str::trim).find(|p| p.starts_with("bearer.")).map(str::to_owned));
     (auth, proto)
 }
 
-async fn stream(
-    State(st): State<Arc<AppState>>,
-    headers: HeaderMap,
-    ws: WebSocketUpgrade,
-) -> Response {
+async fn stream(State(st): State<Arc<AppState>>, headers: HeaderMap, ws: WebSocketUpgrade) -> Response {
     let (auth, proto) = bearer(&headers);
-    let given = auth
-        .or_else(|| {
-            proto
-                .as_deref()
-                .and_then(|p| p.strip_prefix("bearer."))
-                .map(str::to_owned)
-        })
-        .unwrap_or_default();
+    let given = auth.or_else(|| proto.as_deref().and_then(|p| p.strip_prefix("bearer.")).map(str::to_owned)).unwrap_or_default();
     if !aphrody_secrets::constant_time_eq(given.as_bytes(), st.opts.token.as_bytes()) {
         return StatusCode::UNAUTHORIZED.into_response();
     }
@@ -189,48 +146,23 @@ struct Device {
 impl Drop for Device {
     fn drop(&mut self) {
         let _ = self.child.start_kill();
-        let _ = std::process::Command::new(&self.adb)
-            .args([
-                "-s",
-                &self.serial,
-                "forward",
-                "--remove",
-                &format!("tcp:{}", self.port),
-            ])
-            .output();
+        let _ = std::process::Command::new(&self.adb).args(["-s", &self.serial, "forward", "--remove", &format!("tcp:{}", self.port)]).output();
     }
 }
 
 async fn adb(opts: &AndroidOptions, args: &[&str]) -> Result<String> {
-    let out = Command::new(&opts.adb)
-        .arg("-s")
-        .arg(&opts.serial)
-        .args(args)
-        .output()
-        .await
-        .context("adb")?;
+    let out = Command::new(&opts.adb).arg("-s").arg(&opts.serial).args(args).output().await.context("adb")?;
     if !out.status.success() {
-        bail!(
-            "adb {}: {}",
-            args.join(" "),
-            String::from_utf8_lossy(&out.stderr).trim()
-        );
+        bail!("adb {}: {}", args.join(" "), String::from_utf8_lossy(&out.stderr).trim());
     }
     Ok(String::from_utf8_lossy(&out.stdout).trim().to_owned())
 }
 
 async fn start_device(opts: &AndroidOptions) -> Result<(Device, TcpStream, TcpStream)> {
     if opts.serial.contains(':') {
-        let _ = Command::new(&opts.adb)
-            .args(["connect", &opts.serial])
-            .output()
-            .await;
+        let _ = Command::new(&opts.adb).args(["connect", &opts.serial]).output().await;
     }
-    adb(
-        opts,
-        &["push", &opts.server_jar.to_string_lossy(), REMOTE_JAR],
-    )
-    .await?;
+    adb(opts, &["push", &opts.server_jar.to_string_lossy(), REMOTE_JAR]).await?;
     let mut r = [0u8; 4];
     getrandom::fill(&mut r).map_err(|e| anyhow::anyhow!("random: {e}"))?;
     let scid = u32::from_le_bytes(r) & 0x7fff_ffff;
@@ -268,31 +200,14 @@ async fn start_device(opts: &AndroidOptions) -> Result<(Device, TcpStream, TcpSt
         .kill_on_drop(true)
         .spawn()
         .context("cannot start the scrcpy server")?;
-    let port: u16 = adb(
-        opts,
-        &[
-            "forward",
-            "tcp:0",
-            &format!("localabstract:scrcpy_{scid_hex}"),
-        ],
-    )
-    .await?
-    .parse()
-    .context("adb forward port")?;
-    let device = Device {
-        child,
-        port,
-        adb: opts.adb.clone(),
-        serial: opts.serial.clone(),
-    };
+    let port: u16 = adb(opts, &["forward", "tcp:0", &format!("localabstract:scrcpy_{scid_hex}")]).await?.parse().context("adb forward port")?;
+    let device = Device { child, port, adb: opts.adb.clone(), serial: opts.serial.clone() };
     // adb accepts at once; the server is up when the first socket yields its dummy byte.
     let mut video = None;
     for _ in 0..100 {
         if let Ok(s) = TcpStream::connect(("127.0.0.1", port)).await {
             let mut b = [0u8; 1];
-            if let Ok(Ok(1)) =
-                tokio::time::timeout(Duration::from_millis(1500), s.peek(&mut b)).await
-            {
+            if let Ok(Ok(1)) = tokio::time::timeout(Duration::from_millis(1500), s.peek(&mut b)).await {
                 video = Some(s);
                 break;
             }
@@ -300,9 +215,7 @@ async fn start_device(opts: &AndroidOptions) -> Result<(Device, TcpStream, TcpSt
         tokio::time::sleep(Duration::from_millis(100)).await;
     }
     let video = video.context("the scrcpy server did not accept a connection")?;
-    let control = TcpStream::connect(("127.0.0.1", port))
-        .await
-        .context("scrcpy control socket")?;
+    let control = TcpStream::connect(("127.0.0.1", port)).await.context("scrcpy control socket")?;
     video.set_nodelay(true)?;
     control.set_nodelay(true)?;
     Ok((device, video, control))
@@ -315,12 +228,7 @@ fn avc_codec(annexb: &[u8]) -> Option<String> {
         if annexb[i] == 0 && annexb[i + 1] == 0 && annexb[i + 2] == 1 {
             let n = i + 3;
             if annexb[n] & 0x1f == 7 && n + 3 < annexb.len() {
-                return Some(format!(
-                    "avc1.{:02x}{:02x}{:02x}",
-                    annexb[n + 1],
-                    annexb[n + 2],
-                    annexb[n + 3]
-                ));
+                return Some(format!("avc1.{:02x}{:02x}{:02x}", annexb[n + 1], annexb[n + 2], annexb[n + 3]));
             }
         }
         i += 1;
@@ -333,11 +241,7 @@ enum Out {
     Binary(Vec<u8>),
 }
 
-async fn video_loop(
-    mut video: TcpStream,
-    tx: mpsc::Sender<Out>,
-    size: Arc<(AtomicU64, AtomicU64)>,
-) -> Result<()> {
+async fn video_loop(mut video: TcpStream, tx: mpsc::Sender<Out>, size: Arc<(AtomicU64, AtomicU64)>) -> Result<()> {
     let mut b = [0u8; 1];
     video.read_exact(&mut b).await?; // dummy byte
     let mut name = [0u8; 64];
@@ -356,8 +260,7 @@ async fn video_loop(
         if hi & 0x8000_0000 != 0 {
             size.0.store(u64::from(lo), Ordering::Relaxed);
             size.1.store(u64::from(third), Ordering::Relaxed);
-            let msg =
-                serde_json::json!({"t": "video", "codec": codec, "width": lo, "height": third});
+            let msg = serde_json::json!({"t": "video", "codec": codec, "width": lo, "height": third});
             if tx.send(Out::Text(msg.to_string())).await.is_err() {
                 return Ok(());
             }
@@ -368,20 +271,11 @@ async fn video_loop(
         let pts = (u64::from(hi & 0x1fff_ffff) << 32) | u64::from(lo);
         let mut data = vec![0u8; third as usize + 9];
         video.read_exact(&mut data[9..]).await?;
-        data[0] = if config {
-            1
-        } else if key {
-            2
-        } else {
-            3
-        };
+        data[0] = if config { 1 } else if key { 2 } else { 3 };
         data[1..9].copy_from_slice(&pts.to_be_bytes());
         if config && let Some(c) = avc_codec(&data[9..]) {
             codec = c;
-            let (w, h) = (
-                size.0.load(Ordering::Relaxed),
-                size.1.load(Ordering::Relaxed),
-            );
+            let (w, h) = (size.0.load(Ordering::Relaxed), size.1.load(Ordering::Relaxed));
             let msg = serde_json::json!({"t": "video", "codec": codec, "width": w, "height": h});
             if tx.send(Out::Text(msg.to_string())).await.is_err() {
                 return Ok(());
@@ -401,14 +295,8 @@ async fn device_messages(mut control: OwnedReadHalf, tx: mpsc::Sender<Out>) -> R
                 let len = control.read_u32().await? as usize;
                 let mut text = vec![0u8; len.min(1 << 22)];
                 control.read_exact(&mut text).await?;
-                let ev = ServerEvent::Clipboard {
-                    text: String::from_utf8_lossy(&text).into_owned(),
-                };
-                if tx
-                    .send(Out::Text(serde_json::to_string(&ev)?))
-                    .await
-                    .is_err()
-                {
+                let ev = ServerEvent::Clipboard { text: String::from_utf8_lossy(&text).into_owned() };
+                if tx.send(Out::Text(serde_json::to_string(&ev)?)).await.is_err() {
                     return Ok(());
                 }
             }
@@ -586,15 +474,9 @@ fn translate(input: Input, s: &mut InputState, size: &(AtomicU64, AtomicU64)) ->
             }
             let chorded = s.meta & (AMETA_CTRL | AMETA_ALT | AMETA_META) != 0;
             if !chorded && bit == 0 && key.chars().count() == 1 {
-                return if down {
-                    vec![with_text(1, &[], &key)]
-                } else {
-                    Vec::new()
-                };
+                return if down { vec![with_text(1, &[], &key)] } else { Vec::new() };
             }
-            android_keycode(&code)
-                .map(|k| vec![keycode(down, k, s.meta)])
-                .unwrap_or_default()
+            android_keycode(&code).map(|k| vec![keycode(down, k, s.meta)]).unwrap_or_default()
         }
         Input::Clipboard { text } => {
             s.clip_seq += 1;
@@ -610,12 +492,8 @@ async fn session(mut socket: WebSocket, st: Arc<AppState>, generation: u64) -> R
     let (device, video, control) = match start_device(&st.opts).await {
         Ok(v) => v,
         Err(e) => {
-            let ev = ServerEvent::Error {
-                message: format!("{e:#}"),
-            };
-            let _ = socket
-                .send(Message::Text(serde_json::to_string(&ev)?.into()))
-                .await;
+            let ev = ServerEvent::Error { message: format!("{e:#}") };
+            let _ = socket.send(Message::Text(serde_json::to_string(&ev)?.into())).await;
             return Err(e);
         }
     };
@@ -624,9 +502,7 @@ async fn session(mut socket: WebSocket, st: Arc<AppState>, generation: u64) -> R
     let (tx, mut rx) = mpsc::channel::<Out>(8);
     let video_task = tokio::spawn(video_loop(video, tx.clone(), Arc::clone(&size)));
     let msg_task = tokio::spawn(device_messages(ctl_read, tx));
-    let running = serde_json::to_string(&ServerEvent::State {
-        state: aphrody_webos_protocol::SessionState::Running,
-    })?;
+    let running = serde_json::to_string(&ServerEvent::State { state: aphrody_webos_protocol::SessionState::Running })?;
     socket.send(Message::Text(running.into())).await?;
     let mut input = InputState::default();
     let mut tick = tokio::time::interval(Duration::from_millis(500));
