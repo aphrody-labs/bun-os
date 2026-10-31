@@ -22,8 +22,8 @@ session)
     --cap-add SETPCAP --cap-add AUDIT_WRITE --cap-add AUDIT_CONTROL --cap-add SYS_NICE --cap-add WAKE_ALARM \
     --cap-add BLOCK_SUSPEND --cap-add SYS_PTRACE --cap-add NET_BIND_SERVICE --cap-add DAC_READ_SEARCH \
     --cap-add FSETID --cap-add SYS_RESOURCE --cap-add IPC_LOCK --security-opt apparmor=unconfined --security-opt seccomp=unconfined \
-    --device /dev/dri --device-cgroup-rule "c $binder_major:* rwm" \
-    --device /dev/loop-control --device-cgroup-rule "b 7:* rwm" --sysctl net.ipv4.ip_forward=1 --cgroupns private --pids-limit 8192 --shm-size 1g --memory 8g --cpus 4 \
+    --device /dev/dri --device /dev/kmsg --device-cgroup-rule "c $binder_major:* rwm" \
+    --device /dev/loop-control --device-cgroup-rule "b 7:* rwm" --cap-add BPF --sysctl net.ipv4.ip_forward=1 --cgroupns private --pids-limit 8192 --shm-size 1g --memory 8g --cpus 4 \
     --tmpfs /run:exec --tmpfs /tmp --tmpfs /var/lib/misc --tmpfs /var/log \
     -v "$A17:/usr/share/bunos/waydroid/images:ro" -v "$OUT/secrets:/run/secrets:ro" \
     -v "$name-home:/home/aphrody" \

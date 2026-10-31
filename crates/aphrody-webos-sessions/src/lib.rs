@@ -256,7 +256,7 @@ impl Sessions {
         .map(|(k, v)| (k.to_owned(), v.to_owned()))
         .collect();
         let caps = [
-            "SYS_ADMIN", "SYSLOG", "NET_ADMIN", "NET_RAW", "SETUID", "SETGID", "CHOWN", "DAC_OVERRIDE", "FOWNER", "KILL", "MKNOD",
+            "SYS_ADMIN", "SYSLOG", "BPF", "NET_ADMIN", "NET_RAW", "SETUID", "SETGID", "CHOWN", "DAC_OVERRIDE", "FOWNER", "KILL", "MKNOD",
             "SYS_CHROOT", "SETPCAP", "AUDIT_WRITE", "AUDIT_CONTROL", "SYS_NICE", "WAKE_ALARM", "BLOCK_SUSPEND", "SYS_PTRACE",
             "NET_BIND_SERVICE", "DAC_READ_SEARCH", "FSETID", "SYS_RESOURCE", "IPC_LOCK",
         ];
