@@ -1,5 +1,13 @@
 import javax.inject.Inject
 
+// Canonical CARGO_HOME: ~/.cargo/registry is a symlink on the factory (see apps/bun-android/app/build.gradle).
+fun canonicalCargoHome(): String {
+    System.getenv("CARGO_HOME")?.let { return it }
+    val home = java.io.File(System.getProperty("user.home"), ".cargo")
+    val registry = home.resolve("registry").toPath()
+    return if (java.nio.file.Files.isSymbolicLink(registry)) registry.toRealPath().parent.toString() else home.path
+}
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -36,6 +44,7 @@ abstract class CargoNdkTask : DefaultTask() {
             environment("APHRODY_CARGO_TARGET_DIR", root.resolve("target/flutter-bridge").absolutePath)
             environment("CARGO_BUILD_BUILD_DIR", root.resolve("target/flutter-bridge/build").absolutePath)
             // Factory runtime lane (four jobs, own flock) shared by Android, JVM and Flutter builds.
+            environment("CARGO_HOME", canonicalCargoHome())
             environment("APHRODY_BUILD_HOST", "")
             environment("APHRODY_LOCAL_CARGO", "1")
             environment("APHRODY_CARGO_JOBS", "4")
