@@ -44,7 +44,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir, hostname } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 const argv = process.argv.slice(2);
 const option = (name: string) => {
@@ -148,10 +148,15 @@ function liveGitProcesses(): number[] {
   for (const entry of readdirSync("/proc")) {
     if (!/^\d+$/.test(entry) || Number(entry) === process.pid) continue;
     try {
-      const cmd = readFileSync(`/proc/${entry}/cmdline`, "utf8").split("\0");
-      if (!basename(cmd[0] ?? "").startsWith("git")) continue;
+      // `comm` never blocks; `cmdline` waits on the target's memory lock and hangs on a process stuck in D state.
+      if (!readFileSync(`/proc/${entry}/comm`, "utf8").startsWith("git")) continue;
       const cwd = readlinkSync(`/proc/${entry}/cwd`);
-      if (cwd === repo || cwd.startsWith(repo + "/") || cmd.some(arg => arg === repo)) found.push(Number(entry));
+      if (cwd === repo || cwd.startsWith(repo + "/")) {
+        found.push(Number(entry));
+        continue;
+      }
+      const cmd = readFileSync(`/proc/${entry}/cmdline`, "utf8").split("\0");
+      if (cmd.some(arg => arg === repo)) found.push(Number(entry));
     } catch {}
   }
   return found;
