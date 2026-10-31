@@ -65,4 +65,3 @@ impl<I: FbHashKey, Keys: FbIndex<I>> HashSetView<I, Keys> {
         self.view.capacity()
     }
 }
-

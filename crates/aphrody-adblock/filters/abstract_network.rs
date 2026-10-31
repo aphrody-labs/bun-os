@@ -313,4 +313,3 @@ fn parse_filter_options<'a>(
     }
     Ok(result)
 }
-

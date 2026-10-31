@@ -598,4 +598,3 @@ fn detect_filter_type(filter: &str) -> FilterType {
     // Everything else is a network filter
     FilterType::Network
 }
-

@@ -528,4 +528,3 @@ impl Blocker {
         regex_manager.get_debug_info()
     }
 }
-

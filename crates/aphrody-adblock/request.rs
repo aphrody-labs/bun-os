@@ -262,4 +262,3 @@ fn calculate_tokens(url_lower_cased: &str) -> Vec<utils::Hash> {
     tokens.push(0);
     tokens.into_iter().collect()
 }
-

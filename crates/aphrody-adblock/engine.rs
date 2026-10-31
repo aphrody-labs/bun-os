@@ -488,4 +488,3 @@ fn _assertions() {
     _assert_send::<Engine>();
     _assert_sync::<Engine>();
 }
-

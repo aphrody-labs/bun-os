@@ -688,4 +688,3 @@ impl TryFrom<CosmeticFilter> for CbRule {
         }
     }
 }
-

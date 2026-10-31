@@ -205,4 +205,3 @@ impl Optimization for UnionDomainGroup {
     }
 }
 */
-

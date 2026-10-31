@@ -131,4 +131,3 @@ impl TokenSelector {
         *self.usage.entry(to_short_hash(token)).or_insert(0) += 1;
     }
 }
-

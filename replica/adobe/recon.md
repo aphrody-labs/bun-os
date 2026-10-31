@@ -105,4 +105,3 @@ See `features.csv`. Adobe exposes a unified catalog organized by creative domain
 ## Size
 
 10 reference/target screens, 4 flows. Hard parts: shared artifact format/import-export, Drive save/conflict semantics, cross-window state, app capability/entitlement availability, and large WASM/media performance. Size: XL for the full workspace; L for a first reliable release of all currently owned Craft apps integrated with Drive.
-

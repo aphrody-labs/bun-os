@@ -295,4 +295,3 @@ pub fn assemble_scriptlet_resources(scriptlets_path: &Path) -> Vec<Resource> {
     let scriptlets_data = std::fs::read_to_string(scriptlets_path).expect("read scriptlets path");
     read_template_resources(&scriptlets_data)
 }
-

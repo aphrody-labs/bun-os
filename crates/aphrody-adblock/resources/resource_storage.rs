@@ -669,4 +669,3 @@ pub(crate) fn parse_scriptlet_args(mut args: &str) -> Option<Vec<String>> {
 
     Some(args_vec)
 }
-

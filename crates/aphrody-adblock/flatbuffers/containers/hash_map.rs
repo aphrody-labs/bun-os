@@ -96,4 +96,3 @@ pub type HashMapStringView<'a, V> = HashMapView<
     flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<&'a str>>,
     flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<<V as flatbuffers::Follow<'a>>::Inner>>,
 >;
-

@@ -137,4 +137,3 @@ impl<I: Ord + std::hash::Hash, V> FlatMultiMapBuilder<I, V> {
         }
     }
 }
-
