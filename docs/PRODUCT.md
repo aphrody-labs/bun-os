@@ -107,8 +107,10 @@ States: **done** (with evidence), **building** (work in flight), **missing** (no
 
 Written by the coordinator (`bunos-auto-coordinator.service`, docs/AUTOMATION.md); do not edit by hand.
 
-| #   | Status     | Dispatched to   | At (UTC)         | Dispatches |
-| --- | ---------- | --------------- | ---------------- | ---------- |
-| 3   | dispatched | a2a:native-apps | 2026-10-31 01:40 | 1          |
-| 9   | dispatched | a2a:android     | 2026-10-31 01:40 | 1          |
-| 14  | dispatched | a2a:sessions    | 2026-10-31 01:40 | 1          |
+| #   | Status     | Dispatched to | At (UTC)         | Dispatches |
+| --- | ---------- | ------------- | ---------------- | ---------- |
+| 3   | dispatched | invoke:claude | 2026-10-31 13:48 | 2          |
+| 9   | stalled    | a2a:android   | 2026-10-31 01:40 | 1          |
+| 14  | stalled    | a2a:sessions  | 2026-10-31 01:40 | 1          |
+| 15  | dispatched | a2a:sessions  | 2026-10-31 13:48 | 1          |
+| 17  | dispatched | a2a:google    | 2026-10-31 13:49 | 1          |
