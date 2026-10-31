@@ -49,7 +49,7 @@ const option = (name: string) => {
   return index >= 0 ? argv[index + 1] : undefined;
 };
 const home = homedir();
-const repo = resolve(option("--repo") ?? process.env.BUNOS_REPO ?? join(home, "src", "bun-os"));
+const repo = resolve(option("--repo") ?? process.env.BUNOS_REPO ?? resolve(import.meta.dir, "../.."));
 const host = (option("--host") ?? process.env.BUNOS_SYNC_HOST ?? hostname().split(".")[0] ?? "host")
   .toLowerCase()
   .replace(/[^a-z0-9-]/g, "-");
@@ -57,7 +57,8 @@ const stateDir = process.env.BUNOS_SYNC_STATE ?? join(home, ".local", "state", "
 const statusFile = process.env.BUNOS_SYNC_STATUS ?? join(stateDir, "status.json");
 const stateFile = join(stateDir, "state.json");
 const wipLog = join(stateDir, "wip.jsonl");
-const interval = Number(process.env.BUNOS_SYNC_INTERVAL ?? 600);
+const configuredInterval = Number(process.env.BUNOS_SYNC_INTERVAL ?? 600);
+const interval = Number.isFinite(configuredInterval) && configuredInterval > 0 ? configuredInterval : 600;
 const push = process.env.BUNOS_SYNC_PUSH !== "0" && !argv.includes("--no-push");
 /** Workstation mode: a tree edited within the grace period is never healed, even when it blocks a fast-forward. */
 const graceAlways = process.env.BUNOS_SYNC_GRACE_ALWAYS === "1" || argv.includes("--grace-always");

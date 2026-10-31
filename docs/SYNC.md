@@ -1,45 +1,36 @@
-# Synchronisation: local, GitHub, VPS
+# Synchronisation: workstation, GitHub, VPS
 
-Owner decision of 2026-10-30: plain git and GitHub (`aphrody-labs/bun-os`, branch `main`) only. There is no self-hosted forge,
-no Gitea runner and no `os` branch ceremony. Nothing is ever forced.
+GitHub `aphrody-labs/bun-os` on `main` is the source of truth. The workstation edits and pushes; the VPS synchronizes, builds, qualifies, and writes Cargo.lock when a manifest change requires it. Both automated sync modes use the same Bun implementation in `factory/sync/bunos-sync.ts`.
 
-| Copy | Mechanism | Direction |
-| --- | --- | --- |
-| GitHub `aphrody-labs/bun-os`, branch `main` | source of truth, default and only branch | - |
-| Locks and generated docs | Cargo.lock and bun.lock are updated on the VPS checkout together with the manifest change; `.github/workflows/regen-locks.yml` is a manual fallback (`workflow_dispatch`) | VPS -> main |
-| Workstation `C:\bun-os` | Scheduled Task `BunOS-Sync` (every 10 min) runs `git pull --ff-only origin main` | main -> local |
-| VPS `~/src/bun-os` | `factory/sync/bunos-sync.ts` via a systemd user timer or tmux loop | main <-> VPS (ff, push if ahead) |
-
-Flow for any change: `git fetch origin`, fast-forward or merge `origin/main`, `git push origin HEAD:main` (normal push only).
-Builds and qualification run on the VPS checkout; the workstation edits and synchronises sources.
+Install from the checkout to configure that checkout. `BUNOS_REPO` overrides the detected repository root; `BUNOS_SYNC_INTERVAL` sets the interval in seconds.
 
 ## Workstation
 
 ```powershell
-pwsh -File scripts/sync/install-local.ps1            # clone (blobless, sparse), register the task
-pwsh -File scripts/sync/install-local.ps1 -Uninstall # remove the task, keep the clone
-Get-ScheduledTask BunOS-Sync | Get-ScheduledTaskInfo # last run and result
-Get-Content C:\bun-os\.git\bunos-sync.log -Tail 20   # why a pull was refused, if it was
+bun factory/sync/install.ts
+bun factory/sync/install.ts --uninstall
+Get-ScheduledTask BunOS-Sync | Get-ScheduledTaskInfo
+Get-Content "$HOME\.local\state\bunos-sync\status.json"
 ```
 
-The clone is light: no blobs until read, a sparse cone (docs, `.github`, `factory/bunos`, the sync scripts, manifests), no
-submodules. Add paths with `git -C C:\bun-os sparse-checkout add <path>`. The task never commits, resets, stashes or pushes:
-a dirty or diverged clone makes `git pull --ff-only` refuse, and the refusal is logged. Commit and push from the clone yourself
-(`git push origin HEAD:main`, normal push only).
-
-## GitHub
-
-- `main` is the default and only branch. Workflows trigger on `branches: [main]`.
-- The GitHub `os` ref is a stale leftover. It is not maintained or deleted by this tooling; ignore it.
-- Pushes made by `GITHUB_TOKEN` (the lock regeneration commit) do not start new workflow runs, so they cannot loop.
+The installer registers a hidden Scheduled Task. It fetches `origin/main`, never pushes, and gives recently edited files a grace period. If the checkout is dirty or diverged beyond that period, sync saves a recoverable snapshot under `refs/wip/workstation/<timestamp>` before moving the checkout to `main`. Files larger than 64 MiB are left on disk and listed in the snapshot record. The snapshot location and outcome are recorded under the user's `.local/state/bunos-sync` directory.
 
 ## VPS
 
-See [VPS-BUILD.md](VPS-BUILD.md) (installer, status file, build recipe, btrfs recovery). `bunos-sync.ts` fast-forwards
-whatever branch is checked out when that is safe, and never touches a dirty or diverged tree.
+```sh
+bun factory/sync/install.ts
+bun factory/sync/install.ts --uninstall
+systemctl --user status bunos-sync.timer bunos-sync.service
+cat ~/.local/state/bunos-sync/status.json
+```
 
-## Branches
+The installer registers a persistent systemd user timer and configures the VPS role: synchronization, the single Cargo.lock writer, and the main gate. A clean checkout fast-forwards when behind and uses a normal push when ahead. Dirty, diverged, detached, or non-main states are snapshotted before recovery; no force push is used. The shared checkout is for synchronization and builds; source work belongs in a separate clone and is pushed to GitHub before the VPS syncs it.
 
-Long-lived `claude/wip-*` and `codex/*` branches were merged into `main` on 2026-10-29. They are not deleted by this tooling;
-`git branch -r --merged origin/main` lists the ones that can be removed. `claude/wip-local-multikernel-stash` is an autostash
-of an old state and was deliberately not merged.
+## Recovery and safeguards
+
+- Run `bun factory/sync/bunos-sync.ts --dry-run` to inspect the next decision without changing the checkout.
+- Set `BUNOS_SYNC_HEAL=0` to report a dirty or divergent checkout without healing it.
+- Recover a snapshot with `git switch -c recovery <refs/wip/<host>/<timestamp>>`, then review and cherry-pick or restore paths deliberately.
+- The installer configures `.githooks` for matching clones under `~/work`; the pre-push hook runs the main gate. GitHub remains the only source of truth, and pushes are fast-forward only.
+
+The status file contains the last result, source revisions, and any recovery ref. Do not infer deployment or release qualification from a successful synchronization pass.

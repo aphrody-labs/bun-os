@@ -11,7 +11,7 @@
  * VPS roles: self-healing, Cargo.lock writer and main gate. Every bun-os clone under ~/work gets the pre-push hook.
  * Windows (workstation): Scheduled Task BunOS-Sync every 10 minutes, hidden (conhost --headless), no push, healing only
  * trees that were not edited during the grace period.
- * Environment: BUNOS_REPO (default ~/src/bun-os on Linux, C:\src\bun-os on Windows), BUNOS_SYNC_INTERVAL (seconds).
+ * Environment: BUNOS_REPO (default: this checkout), BUNOS_SYNC_INTERVAL (seconds).
  */
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -20,9 +20,20 @@ import { join, resolve } from "node:path";
 const argv = process.argv.slice(2);
 const home = homedir();
 const windows = process.platform === "win32";
-const repo = resolve(process.env.BUNOS_REPO ?? (windows ? "C:\\src\\bun-os" : join(home, "src", "bun-os")));
-const intervalMinutes = Math.max(1, Math.round(Number(process.env.BUNOS_SYNC_INTERVAL ?? 600) / 60));
-const REMOTE = "https://github.com/aphrody-labs/bun-os.git";
+const repo = resolve(process.env.BUNOS_REPO ?? resolve(import.meta.dir, "../.."));
+const intervalSeconds = Number(process.env.BUNOS_SYNC_INTERVAL ?? 600);
+const intervalMinutes = Number.isFinite(intervalSeconds) && intervalSeconds > 0 ? Math.max(1, Math.round(intervalSeconds / 60)) : 10;
+
+function normalizeRemote(remote: string): string {
+  return remote
+    .trim()
+    .replace(/^git@github\.com:/i, "https://github.com/")
+    .replace(/^ssh:\/\/git@github\.com\//i, "https://github.com/")
+    .replace(/\.git$/i, "")
+    .toLowerCase();
+}
+
+const canonicalRemote = normalizeRemote(run(["git", "-C", repo, "remote", "get-url", "origin"], true));
 
 function run(cmd: string[], allowFailure = false): string {
   const result = Bun.spawnSync(cmd, { stdout: "pipe", stderr: "pipe", windowsHide: true });
@@ -36,19 +47,19 @@ function setHooks(clone: string) {
   console.log(`pre-push gate enabled in ${clone}`);
 }
 
-function bunOsClones(root: string): string[] {
-  if (!existsSync(root)) return [];
+function bunOsClones(root: string, remote: string): string[] {
+  if (!remote || !existsSync(root)) return [];
   return readdirSync(root)
     .map(name => join(root, name))
     .filter(dir => existsSync(join(dir, ".git")))
-    .filter(dir => run(["git", "-C", dir, "remote", "get-url", "origin"], true).includes("aphrody-labs/bun-os"));
+    .filter(dir => normalizeRemote(run(["git", "-C", dir, "remote", "get-url", "origin"], true)) === remote);
 }
 
 function installLinux() {
   const unitDir = join(home, ".config", "systemd", "user");
   const bun = process.execPath;
   const script = join(repo, "factory", "sync", "bunos-sync.ts");
-  if (!existsSync(script)) throw new Error(`${script} missing: clone ${REMOTE} to ${repo} first`);
+  if (!existsSync(script)) throw new Error(`${script} missing: point BUNOS_REPO at an initialized checkout`);
   run(["git", "-C", repo, "config", "submodule.recurse", "false"]);
   run(["git", "-C", repo, "config", "fetch.recurseSubmodules", "false"]);
   run(["git", "-C", repo, "config", "user.name", "aphrody-dev"]);
@@ -96,7 +107,7 @@ WantedBy=timers.target
   run(["systemctl", "--user", "enable", "--now", "bunos-sync.timer"]);
   run(["systemctl", "--user", "restart", "bunos-sync.timer"]);
   run(["loginctl", "enable-linger", process.env.USER ?? ""], true);
-  for (const clone of [repo, ...bunOsClones(join(home, "work"))]) setHooks(clone);
+  for (const clone of [repo, ...bunOsClones(join(home, "work"), canonicalRemote)]) setHooks(clone);
   console.log(run(["systemctl", "--user", "list-timers", "bunos-sync.timer", "--no-pager"]));
 }
 
