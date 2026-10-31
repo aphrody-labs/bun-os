@@ -65,13 +65,17 @@ ADD --checksum=sha256:${HELIUM_SHA256} ${HELIUM_URL} /tmp/helium.tar.xz
 # Waydroid's optional host clipboard service imports pyclip; the Wayland backend requires wl-clipboard.
 ADD --checksum=sha256:a7b7ea2cfad2dd61e86a529af588d006070d3eb0bd32981afaee5215f4604fec \
   https://files.pythonhosted.org/packages/7d/4f/4b02e2c232ddf694bca0baea3049b886eeb80ee3d89c415067f5191596c1/pyclip-0.7.0-py3-none-any.whl /tmp/pyclip.whl
+# F-Droid is installed once after Android first boot; the same release and digest are used by waydroid/scripts/e2e.ts.
+ADD --checksum=sha256:19d51fad482239f6df6a99120e34513667e9a86d136dafdc4a211a68c3327b52 \
+  https://f-droid.org/repo/org.fdroid.fdroid_2000052.apk /tmp/fdroid.apk
 RUN tar -xzf /tmp/bun.tgz -C /tmp && install -m755 /tmp/package/bin/bun /usr/bin/bun && ln -sf bun /usr/bin/bunx \
   && install -d /opt/helium && tar -xJf /tmp/helium.tar.xz -C /opt/helium --strip-components=1 \
   && ln -sf /opt/helium/helium-wrapper /usr/bin/helium \
   && install -Dm644 /opt/helium/product_logo_256.png /usr/share/icons/hicolor/256x256/apps/helium.png \
   && install -d /usr/lib/python3/dist-packages \
   && unzip -q /tmp/pyclip.whl -d /usr/lib/python3/dist-packages \
-  && rm -rf /tmp/bun.tgz /tmp/package /tmp/helium.tar.xz /tmp/pyclip.whl
+  && install -D -m0644 /tmp/fdroid.apk /usr/share/bunos/android/apks/fdroid.apk \
+  && rm -rf /tmp/bun.tgz /tmp/package /tmp/helium.tar.xz /tmp/pyclip.whl /tmp/fdroid.apk
 # Fork builds (native-apps lane: COSMIC set, Rio, Spacedrive, Aphrody Chat/Search) override Pop's packages.
 COPY debs/ /tmp/debs/
 RUN set -e; if ls /tmp/debs/*.deb >/dev/null 2>&1; then apt-get update && apt-get install -y --allow-downgrades /tmp/debs/*.deb \

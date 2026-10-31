@@ -21,6 +21,14 @@ case "$cmd" in
   provision)
     android() { waydroid shell -- "$@"; }
     [ "$(android getprop sys.boot_completed | tr -d '\r')" = 1 ] || { echo "Android has not finished booting" >&2; exit 1; }
+    fdroid=/usr/share/bunos/android/apks/fdroid.apk
+    if [ -s "$fdroid" ] && ! android pm list packages org.fdroid.fdroid | grep -Fqx 'package:org.fdroid.fdroid'; then
+      waydroid app install "$fdroid"
+      android pm list packages org.fdroid.fdroid | grep -Fqx 'package:org.fdroid.fdroid' || {
+        echo "F-Droid did not appear in Android after installation" >&2
+        exit 1
+      }
+    fi
     [ "$(android settings get global bunos_provisioned | tr -d '\r')" = 1 ] && exit 0
     # Large-screen windowing (Googlebook desktop windowing globals).
     android settings put global enable_freeform_support 1
