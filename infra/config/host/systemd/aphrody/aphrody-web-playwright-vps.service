@@ -12,7 +12,7 @@ WorkingDirectory=/home/ubuntu/src/bun-os
 Environment=HOME=/home/ubuntu
 Environment=APHRODY_WEB_CDP_URL=http://127.0.0.1:9222
 Environment=APHRODY_WEB_PLAYWRIGHT_BIND=127.0.0.1:9230
-ExecStart=/home/ubuntu/.bun/bin/bun run scripts/aphrody/web/playwright-bridge.ts
+ExecStart=/home/ubuntu/.local/share/bun-upstream-canary/bun-linux-x64/bun run scripts/aphrody/web/playwright-bridge.ts
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=20
@@ -20,7 +20,7 @@ KillMode=control-group
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=tmpfs
-BindReadOnlyPaths=/home/ubuntu/.bun/bin/bun /home/ubuntu/src/bun-os
+BindReadOnlyPaths=/home/ubuntu/.local/share/bun-upstream-canary/bun-linux-x64/bun /home/ubuntu/src/bun-os
 PrivateTmp=true
 PrivateDevices=true
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
