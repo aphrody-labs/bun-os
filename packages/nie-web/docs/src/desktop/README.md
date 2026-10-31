@@ -21,4 +21,4 @@ the resource source and the platform work.
 
 `apps/nie-web/tsconfig.json` (not in repo) is the single TypeScript project: one `include`, one `@/*` alias.
 The native backend `apps/inacord/src-tauri` (not in repo) was removed on 2026-09-26 (the desktop is aphrody-ui
-`aphrody-app`; IEVR stays in nie web).
+the COSMIC session of Bun OS; IEVR stays in nie web).

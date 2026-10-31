@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// The Tauri global API injected by apps/aphrody-app (withGlobalTauri); absent in a plain browser.
+// The Tauri global API injected by a Tauri host (withGlobalTauri); absent in a plain browser.
 interface TauriGlobalEvent<T> {
   payload: T;
 }

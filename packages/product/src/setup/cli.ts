@@ -10,7 +10,6 @@
  */
 import { UsageError, parse } from "../shared/args.ts";
 import { logCrash } from "../shared/crash.ts";
-import { openInDesktop } from "../shared/desktop-launch.ts";
 import type { AppIdentity } from "../shared/update.ts";
 import { join } from "node:path";
 
@@ -19,7 +18,7 @@ import { createLogger } from "../admin/lib/log.ts";
 import { runInstall, type InstallReport } from "../admin/lib/steps.ts";
 import { autoUpdateInBackground, updateKit } from "../admin/lib/update.ts";
 import pkg from "../../package.json";
-import { ARTIFACTS, desktopApp, stepsFor, type Role } from "./steps.ts";
+import { ARTIFACTS, stepsFor, type Role } from "./steps.ts";
 
 export const VERSION: string = pkg.version;
 
@@ -53,7 +52,7 @@ export function parseRoles(text: string | undefined): Set<Role> {
 const HELP = `aphrody-setup [--oui] [--roles admin,createur] [--simuler]
 aphrody-setup mise-a-jour [--check]
 
-Installe ou répare : aphrody (outils et MCP), l'application Aphrody, les plugins Claude
+Installe ou répare : aphrody (outils et MCP), les plugins Claude
 (aphrody, yolo) et le MCP aphrody dans Claude Desktop et Claude Code (sauvegarde avant).
 Rôles en option : admin (tunnel privé, SSH, entraînement, outils intégrés), createur (outils créateur).
 Sans argument : l'assistant pas à pas.`;
@@ -80,7 +79,6 @@ export async function wizard(ctx: Context): Promise<number> {
   ctx.ui.say("");
   ctx.ui.say("Je vais installer ou réparer, sans rien te demander de technique :");
   ctx.ui.say("  - aphrody (outils et serveur MCP)");
-  ctx.ui.say("  - l'application Aphrody");
   ctx.ui.say("  - les plugins Claude aphrody et yolo");
   ctx.ui.say("  - le MCP aphrody dans Claude Desktop et Claude Code (ta configuration est sauvegardée avant)");
   ctx.ui.say("");
@@ -95,12 +93,6 @@ export async function wizard(ctx: Context): Promise<number> {
   ctx.ui.say("");
   const report = await install(ctx, roles, false);
   summary(ctx, report);
-  const app = desktopApp(ctx);
-  if (app && ctx.ui.confirm("Ouvrir Aphrody maintenant ?", true))
-    openInDesktop(roles.has("admin") ? "admin" : roles.has("createur") ? "creator" : "chat", {
-      ...ctx.sys.env,
-      APHRODY_DESKTOP_BIN: app,
-    });
   ctx.ui.pause("Appuie sur Entrée pour fermer...");
   return report.failed > 0 ? 1 : 0;
 }

@@ -47,9 +47,6 @@ rust-fmt-check:
 rust-fmt-upstream-check:
     "{{cargo_owner}}" fmt --all --check
 
-rust-fmt-desktop-check:
-    "{{cargo_owner}}" fmt --check -p aphrody-app
-
 rust-fmt-python-check:
     bun -e 'if (!process.env.APHRODY_BUN_CHECKOUT) throw new Error("Set APHRODY_BUN_CHECKOUT for Bun-owned Python sources")'
     "{{cargo_owner}}" fmt --manifest-path "{{bun_python_manifest}}" --check -p yolo-pyo3
@@ -103,23 +100,6 @@ web-build:
 web-dev:
     cd m3/packages/app-ui && bun run dev
 
-# The desktop host is aphrody-app (--host-info, --runtime-host); the artifact reads target/runtime/aphrody-app.
-desktop-build:
-    "{{cargo_owner}}" build --locked --profile runtime -p aphrody-app --bin aphrody-app
-
-desktop-dev: web-dev
-
-desktop-tauri-check:
-    "{{cargo_owner}}" check --locked -p aphrody-app --all-targets
-
-clippy-desktop:
-    "{{cargo_owner}}" clippy --locked -p aphrody-app --all-targets -- -D warnings
-
-test-desktop:
-    "{{cargo_owner}}" nextest run --locked -p aphrody-app --lib --bins --tests --no-fail-fast
-
-qualify-desktop: rust-fmt-desktop-check desktop-tauri-check clippy-desktop test-desktop
-
 # Requires a producer revision containing the optional browser feature. This selection
 # does not assert that the feature or its installed artifact is already qualified.
 check-browser:
@@ -166,8 +146,8 @@ factory profile revision:
     case "$1" in
       core) recipe=ci ;;
       bun) recipe=qualify-bun ;;
-      desktop|browser|python|tooling|upstream) recipe="qualify-$1" ;;
-      *) echo 'Unknown profile: expected core, bun, desktop, browser, python, tooling or upstream.' >&2; exit 64 ;;
+      browser|python|tooling|upstream) recipe="qualify-$1" ;;
+      *) echo 'Unknown profile: expected core, bun, browser, python, tooling or upstream.' >&2; exit 64 ;;
     esac
     [[ "$2" =~ ^[0-9a-f]{40}$ ]] || { echo 'Factory revision must be a full Git SHA.' >&2; exit 64; }
     exec ./scripts/dev/cli/aphrody ops build-factory run --repo yolo --revision "$2" "${source_scope[@]}" -- just "$recipe"

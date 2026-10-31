@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 import { afterEach, describe, expect, test } from "bun:test";
-import { KIT_PROTOCOL as KIT_SOURCE_PROTOCOL } from "../../product/src/shared/desktop";
 import {
   clearKitCatalogsForTesting,
   idleRun,
@@ -39,10 +38,6 @@ const catalog: KitCatalog = {
 };
 
 describe("kit bridge (aphrody.kit/1)", () => {
-  test("the UI speaks the protocol of the kits", () => {
-    expect(KIT_PROTOCOL).toBe(KIT_SOURCE_PROTOCOL);
-  });
-
   test("a run folds its events: lines, a question, the answer, the end", () => {
     const events: KitEvent[] = [
       { type: "say", text: "début" },

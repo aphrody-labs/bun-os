@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { canonicalBunInputs, productBuildContext } from "./build-inputs";
 
-test("selected product inputs point to the existing desktop and public asset owners", async () => {
+test("selected product inputs point to the App UI build and public asset owners", async () => {
   const root = resolve(import.meta.dir, "../../..");
   const inputs = productBuildContext({
     NODE_ENV: "test",
@@ -12,8 +12,7 @@ test("selected product inputs point to the existing desktop and public asset own
     APHRODY_BUN_CHECKOUT: join(root, "sources/bun"),
   });
   expect(inputs.workspaceRoot).toBe(root);
-  expect(inputs.uiDist).toBe(join(root, "apps/aphrody-app/ui-dist"));
-  expect(await Bun.file(join(inputs.uiDist, "index.html")).exists()).toBe(true);
+  expect(inputs.uiDist).toBe(join(root, "packages/app-ui/dist"));
   expect(inputs.publicAssets).toBe(join(root, "tools/aphrody/config/public-assets.json"));
   expect((await Bun.file(inputs.publicAssets).json()).schemaVersion).toBe(1);
   const sourceInputs = productBuildContext(

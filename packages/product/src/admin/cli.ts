@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { UsageError } from "../shared/args.ts";
 import { logCrash, splitArgs } from "../shared/crash.ts";
-import { consoleForced, openInDesktop } from "../shared/desktop-launch.ts";
 import { aliases, registry, summaries } from "./commands/index.ts";
 import { defaultContext, VERSION, type Context } from "./lib/context.ts";
 import { autoUpdateInBackground, omarApp } from "./lib/update.ts";
@@ -24,8 +23,6 @@ export async function main(argv: string[], ctx: Context = defaultContext()): Pro
     ctx.ui.say(help());
     return 0;
   }
-  // Kit bridge of the desktop app (route `admin`), not listed in the help.
-  if (first === "desktop") return (await import("./desktop.ts")).desktopMain(rest);
   const name = aliases[first] ?? first;
   const load = registry[name];
   if (!load) {
@@ -93,12 +90,8 @@ if (import.meta.main) {
     (args.length === 0 || (args.length === 1 && args[0] === "--console")) &&
     process.stdin.isTTY &&
     process.stdout.isTTY;
-  // Double click: the admin route of the desktop app when it is installed, else the console menu.
-  const code = !doubleClick
-    ? await guarded(args)
-    : !consoleForced(args, process.env) && openInDesktop("admin")
-      ? 0
-      : await interactive();
+  // Double click: the console menu.
+  const code = doubleClick ? await interactive() : await guarded(args);
   process.exit(code);
 }
 

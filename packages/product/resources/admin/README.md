@@ -9,14 +9,9 @@ copie le dépôt par Git (connexion GitHub par le gestionnaire d'identifiants), 
 est prêt, lance un entraînement simplifié sur un serveur (`aphrody train run` par SSH, simulation par défaut, confirmation OUI) et expose
 `aphrody winclean`, `doctor`, `model`, `infra ssh`, `yolo` derrière des boutons (menu « Mon PC »).
 
-## Dans l'application Aphrody
+## Double clic
 
-La route `admin` de l'app desktop (`m3/packages/app-ui/src/routes/admin`) affiche les menus (`MAIN_MENU`, `TRAIN_MENU`,
-`PC_MENU`) en panneaux M3 : l'app lance `Aphrody-Omar.exe desktop catalog|run <action>` (pont `crates/ui/app/src/kits.rs`,
-protocole `aphrody.kit/1` de `../creator-kit/src/lib/desktop.ts`, code `src/desktop.ts`), chaque question du kit devient un
-dialogue M3 (« tape OUI » compris), les sorties d'outils sont capturées. La navigation montre « Administration » quand le
-fichier d'accès est importé ; `aphrody://admin` l'ouvre toujours. Le double-clic sur l'exe ouvre cette route si l'app est
-installée, sinon le menu console (`--console` ou `APHRODY_KIT_CONSOLE=1` force le menu). `Aphrody-Setup.exe`
+Le double-clic sur l'exe ouvre le menu console. `Aphrody-Setup.exe`
 (`../setup`, rôle administrateur) installe le kit dans `%LOCALAPPDATA%\Aphrody\Omar`.
 
 ## Côté équipe

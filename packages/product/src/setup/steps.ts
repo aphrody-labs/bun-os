@@ -3,16 +3,14 @@
 /**
  * Steps of the one-click installer. The engine is omar-kit's (repeatable steps, simulation, downloads verified against
  * SHA256SUMS, MCP declaration with a backup); this file only adds what everyone gets beyond it: the installer itself and
- * its shortcut, the desktop app, the Claude plugins, and the two optional roles (administrator: omar-kit's access steps
+ * its shortcut, the Claude plugins, and the two optional roles (administrator: omar-kit's access steps
  * and the kit; creator: creator-kit).
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { copyFile, mkdir, mkdtemp, rename, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 
-import { formatBytes } from "../shared/format.ts";
-import { compareVersions, downloadVerified, extractTarGz, isCompiled, type ReleaseArtifact } from "../shared/update.ts";
-import { desktopCandidates } from "../shared/desktop-launch.ts";
+import { downloadVerified, extractTarGz, isCompiled, type ReleaseArtifact } from "../shared/update.ts";
 import type { Context } from "../admin/lib/context.ts";
 import {
   checkArtifact,
@@ -39,7 +37,6 @@ export const SETUP_EXE = "Aphrody-Setup.exe";
 /** Artifact names in latest.json of downloads.aphrody.com. */
 export const ARTIFACTS = {
   setup: "aphrody-setup",
-  desktop: "aphrody-app",
 } as const;
 export const PLUGINS = ["plugin-aphrody", "plugin-yolo"] as const;
 /** Local Claude Code marketplace written next to the plugins (`claude plugin marketplace add <dir>`). */
@@ -47,7 +44,7 @@ export const MARKETPLACE = "aphrody-local";
 
 export type Role = "admin" | "createur";
 
-/** Install folders under `%LOCALAPPDATA%\Aphrody` (Omar's stays where omar-kit and the desktop look for it). */
+/** Install folders under `%LOCALAPPDATA%\Aphrody` (Omar's stays where omar-kit looks for it). */
 export function setupDirs(ctx: Context) {
   const root = join(ctx.paths.localAppData, "Aphrody");
   return {
@@ -57,11 +54,6 @@ export function setupDirs(ctx: Context) {
     plugins: join(ctx.paths.home, ".local", "share", "aphrody", "plugins"),
     tmp: join(root, "Setup", "tmp"),
   };
-}
-
-/** The installed desktop app, if any. */
-export function desktopApp(ctx: Context): string | undefined {
-  return desktopCandidates(ctx.sys.env, ctx.sys.platform).find(path => existsSync(path));
 }
 
 type Verified = { artifact: ManifestArtifact; base: string } | StepResult;
@@ -136,50 +128,6 @@ export const stepSetup: Step = {
     await mkdir(dir, { recursive: true });
     await copyFile(ctx.exePath, join(dir, SETUP_EXE));
     return { state: "fait", detail: `copié dans ${dir}` };
-  },
-};
-
-export const stepDesktop: Step = {
-  id: "desktop",
-  titre: "Application Aphrody",
-  async run(ctx, mode) {
-    const skip = windowsOnly(ctx);
-    if (skip) return skip;
-    const found = await verifiedArtifact(ctx, ARTIFACTS.desktop, ".exe", "L'application Aphrody");
-    const installed = desktopApp(ctx);
-    if (isResult(found))
-      return installed && found.state === "attente" ? { state: "deja", detail: `installée (${installed})` } : found;
-    const { artifact } = found;
-    const stamp = join(setupDirs(ctx).setup, "aphrody-app.version");
-    const current = existsSync(stamp) ? readFileSync(stamp, "utf8").trim() : undefined;
-    if (installed && current && compareVersions(current, artifact.version) >= 0)
-      return { state: "deja", detail: `version ${current}` };
-    if (mode === "simuler")
-      return {
-        state: "a-faire",
-        detail: `installer l'application ${artifact.version} (${formatBytes(artifact.size)}, empreinte SHA-256 vérifiée)`,
-      };
-    const file = join(setupDirs(ctx).tmp, artifact.file ?? basename(artifact.url));
-    await downloadVerified(asRelease(artifact), file, ctx.fetchImpl);
-    ctx.ui.say(
-      `  Installation de l'application ${artifact.version} (une fenêtre peut demander l'autorisation : clique « Oui »)...`,
-    );
-    // Tauri NSIS installer, per-user: `/S` is its silent mode; it creates the Start menu and Desktop shortcuts.
-    const run = await ctx.sys.run([file, "/S"], { timeoutMs: 1_200_000 });
-    await rm(file, { force: true }).catch(() => undefined);
-    ctx.log(`aphrody-app installer -> ${run.code}`);
-    if (run.code !== 0 || !desktopApp(ctx))
-      return {
-        state: "echec",
-        detail: `l'installation de l'application a échoué (code ${run.code})`,
-        action: "Relance ce programme ; si ça recommence, préviens l'équipe.",
-      };
-    await mkdir(dirname(stamp), { recursive: true });
-    await writeFile(stamp, `${artifact.version}\n`);
-    return {
-      state: "fait",
-      detail: `application ${artifact.version} installée`,
-    };
   },
 };
 
@@ -310,8 +258,7 @@ export const stepShortcut: Step = {
   async run(ctx, mode) {
     const skip = windowsOnly(ctx);
     if (skip) return skip;
-    // The desktop app's installer makes its own shortcuts; without the app, the shortcut reopens this installer.
-    if (desktopApp(ctx)) return { state: "deja", detail: "créé par l'application Aphrody" };
+    // The shortcut reopens this installer (repair and update).
     const target = join(setupDirs(ctx).setup, SETUP_EXE);
     const lnk = join(ctx.paths.desktopDir, "Aphrody.lnk");
     if (existsSync(lnk)) return { state: "deja", detail: "« Aphrody » est sur le Bureau" };
@@ -363,7 +310,6 @@ export function stepsFor(roles: ReadonlySet<Role>): Step[] {
   return [
     stepSetup,
     stepNativeRuntime,
-    stepDesktop,
     stepPlugins,
     stepMcp,
     stepShortcut,

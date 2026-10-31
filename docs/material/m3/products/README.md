@@ -14,7 +14,6 @@ system applications over rebuilding them in this workspace.
 | Location | Responsibility |
 | --- | --- |
 | `packages/app-ui` | One public webview: Chat, Files, Models and Settings |
-| `crates/aphrody-app` | Current Tauri host and resident app-server broker |
 | `crates/aphrody-render*`, `aphrody-m3*` | Rendering and canonical design tokens |
 | `packages/m3-*`, `material-web`, `react` | Shared web components and adapters |
 | `drive/`, `crates/ui/drive` | Drive runtime/plugin and source lineage |
@@ -49,7 +48,7 @@ deliverable. [AGENTS.md](../reference/AGENTS.md) owns validation gates.
 - [Index](./_source/README.md), [GUI contract](../reference/GUI.md), [design](../architecture/UI-DESIGN.md), [UX](../architecture/UX-DESIGN.md)
 - [M3 framework and host plan](../plans/design/M3-MULTI-HOST-PLAN.md): portable design contract,
   customization, mobile qualification and optional native GUI packaging.
-- [Shared delivery plan](https://github.com/aphrody-labs/aphrody/blob/main/docs/plans/ai/PLAN.md), [desktop packaging](../reference/DESKTOP-INTEGRATION.md)
+- [Shared delivery plan](https://github.com/aphrody-labs/aphrody/blob/main/docs/plans/ai/PLAN.md)
 - [Upstream forks](../reference/UPSTREAM-FORKS.md), [package publication](../reference/PUBLISHING.md)
 
 Apache-2.0 except component-specific licenses, including Drive FSL-1.1-ALv2 and

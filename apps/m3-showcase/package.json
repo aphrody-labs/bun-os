@@ -15,8 +15,6 @@
     "smoke": "bun ../../packages/m3-bun/bin/m3-bun.ts smoke",
     "typecheck": "bun check -p tsconfig.json --noEmit",
     "test": "bun test ./test && bun run test:dom",
-    "icons": "bun scripts/icons.ts",
-    "tauri": "bun scripts/tauri.ts",
     "test:dom": "bun test --preload @aphrody/m3-config/test/dom ./test-dom"
   },
   "dependencies": {

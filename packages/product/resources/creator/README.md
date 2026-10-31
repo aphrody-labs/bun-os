@@ -26,15 +26,9 @@ Pas fait : la partie « ADOBE POUR TOI » (GenP, wiki dbzer0, invitation Stoat).
 licence Adobe : il n'est ni installé, ni documenté, ni automatisé ici. Les points Adobe couverts sont légitimes :
 `adobe-clean` vide les caches et libère la RAM de ton Adobe, quelle que soit sa licence.
 
-## Dans l'application Aphrody
+## Double clic
 
-La route `creator` de l'app desktop (`m3/packages/app-ui/src/routes/creator`) présente les commandes sous forme de
-formulaires M3 (tournois, images, nettoyage, vidéo, mise à jour, rapport de plantage) : l'app lance
-`creator-kit desktop catalog|run <action> <json>` (pont `crates/ui/app/src/kits.rs`, protocole `aphrody.kit/1` de
-`src/lib/desktop.ts`, catalogue `src/desktop.ts`) ; le formulaire devient exactement la ligne de commande du terminal et
-les actions qui modifient le PC (`--apply`) passent par un dialogue de confirmation. Le double-clic sur `creator-kit.exe`
-ouvre cette route quand l'app est installée, sinon le menu console (`--console` ou `APHRODY_KIT_CONSOLE=1` force le
-menu). `Aphrody-Setup.exe` (rôle créateur) installe le kit dans `%LOCALAPPDATA%\Aphrody\Creator`.
+Le double-clic sur `creator-kit.exe` ouvre le menu console. `Aphrody-Setup.exe` (rôle créateur) installe le kit dans `%LOCALAPPDATA%\Aphrody\Creator`.
 
 ## Installer
 

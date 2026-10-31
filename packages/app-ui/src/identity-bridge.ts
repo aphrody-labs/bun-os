@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * Typed client for the Aphrody pet and pixel-perfect commands of `aphrody-app`
+ * Typed client for the Aphrody pet and pixel-perfect commands of the retired `aphrody-app` desktop (engine: `crates/aphrody-identity`)
  * (`crates/ui/app/src/identity.rs`, moved from the retired Inacord host).
  *
  * Argument and field names are the wire contract of those commands; Tauri maps the

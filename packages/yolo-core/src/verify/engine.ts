@@ -141,7 +141,7 @@ export const NOT_RUN_HEAVY: readonly NotRun[] = [
   },
   {
     id: "clippy",
-    title: "strict clippy on yolo-core and aphrody-app",
+    title: "strict clippy on yolo-core",
     reason: "heavy: compiles Tauri; runs through yolo ship",
   },
   {

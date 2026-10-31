@@ -16,8 +16,6 @@ comes from m3.material.io (or Context7), not from copies in this repository.
 - [`UI-DESIGN.md`](../../architecture/UI-DESIGN.md): visual rules for the public Chat, Files, Models and Settings webview.
 - [`UX-DESIGN.md`](../../architecture/UX-DESIGN.md): public webview flows, keyboard, focus and recovery behavior.
 - [`UI-RULES.md`](../../reference/UI-RULES.md): binding product rules (no placeholders, no debug text, short copy).
-- [`DESKTOP-INTEGRATION.md`](../../reference/DESKTOP-INTEGRATION.md): tray, deep links, installers, updater, runtime pitfalls.
-- [`tauri/aphrody-integration.md`](../../reference/tauri/aphrody-integration.md): process boundaries, frontend build, runtime layout.
 - [`tauri/plugins.md`](../../reference/tauri/plugins.md): plugin selection and capability rules.
 - [`ACCESSIBILITY.md`](../../reference/ACCESSIBILITY.md): low-vision profile defaults.
 

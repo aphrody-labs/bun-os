@@ -119,6 +119,10 @@ pub mod fetch;
 /// Official Hugging Face Hub metadata and protected-store authentication.
 #[cfg(not(target_arch = "wasm32"))]
 pub mod hub;
+/// Toolkit-free model hub for the local-AI GUIs (catalog, installed, recommend, verify,
+/// remove, cancellable pull) returning the CLI's JSON documents. Host-only.
+#[cfg(not(target_arch = "wasm32"))]
+pub mod local_hub;
 /// Read-only, in-process view of an Ollama model store (manifest -> GGUF blob).
 /// Host-only.
 #[cfg(not(target_arch = "wasm32"))]
@@ -137,6 +141,8 @@ pub use error::{ModelError, Result};
 pub use fetch::{Downloader, Progress, PullOptions, PullOutcome};
 pub use id::{DEFAULT_REVISION, ModelRef};
 pub use inspect::{ArtifactFormat, Details, Inspection, inspect_prefix};
+#[cfg(not(target_arch = "wasm32"))]
+pub use local_hub::{HubError, ModelHub, PullProgress};
 pub use render::{Format, Report};
 pub use roles::LocalRole;
 #[cfg(not(target_arch = "wasm32"))]

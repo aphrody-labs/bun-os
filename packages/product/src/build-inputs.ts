@@ -10,7 +10,7 @@ export function productBuildContext(env: NodeJS.ProcessEnv = process.env, from?:
   return {
     workspaceRoot,
     bunCheckout: resolveCheckoutRoot("bun", { ...env, APHRODY_WORKSPACE_ROOT: workspaceRoot }),
-    uiDist: join(workspaceRoot, "apps/aphrody-app/ui-dist"),
+    uiDist: join(workspaceRoot, "packages/app-ui/dist"),
     publicAssets: join(workspaceRoot, "tools/aphrody/config/public-assets.json"),
   };
 }

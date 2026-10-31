@@ -15,7 +15,7 @@ Derived from [octasoft-ltd/wsl-ui](https://github.com/octasoft-ltd/wsl-ui), fork
 | --- | --- |
 | `crates/wsl-core` | `crates/bunos-wsl-core` |
 | `src-tauri/src/*` except `main.rs`, `commands.rs` | `crates/bunos-wsl/src` (no Tauri dependency; `download.rs` emits through `ProgressEmitter`) |
-| `src-tauri/{main.rs,commands.rs,tauri.conf.json,capabilities,icons,resources}` | `apps/bunos-wsl/src-tauri` (excluded from the root workspace, like `apps/aphrody-app`) |
+| `src-tauri/{main.rs,commands.rs,tauri.conf.json,capabilities,icons,resources}` | `apps/bunos-wsl/src-tauri` (excluded from the root workspace) |
 | `src/`, `public/`, `index.html`, `popup.html`, vite/tsconfig, wdio | `apps/bunos-wsl/` |
 | `docs/*.md` (not screenshots, videos, plans) | `docs/wsl/` |
 | `scripts/` | `apps/bunos-wsl/scripts/` |

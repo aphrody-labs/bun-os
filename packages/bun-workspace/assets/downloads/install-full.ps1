@@ -4,12 +4,12 @@
 #
 # The command-line twin of Aphrody-Setup.exe (the « Download Aphrody » button, one double click). By default
 # (`all`) it installs the single `aphrody` multi-call binary (MCP server included, linked as aphrody-mcp.exe by
-# `aphrody self install-path`), the desktop app, the Claude plugins, and declares the aphrody MCP server and
+# `aphrody self install-path`), the Claude plugins, and declares the aphrody MCP server and
 # the plugins in Claude Code. With `all`, a component not published for Windows is skipped with a note; a component
 # named explicitly must install. Environment:
 #   APHRODY_DOWNLOAD_URL  base URL (default https://downloads.aphrody.com)
 #   APHRODY_RELEASE       immutable release ID (default: select latest.json once)
-#   APHRODY_COMPONENTS    `all` (default) or space separated: aphrody desktop plugin-aphrody plugin-yolo mcp
+#   APHRODY_COMPONENTS    `all` (default) or space separated: aphrody plugin-aphrody plugin-yolo mcp
 #   APHRODY_PREFIX        install prefix (default %USERPROFILE%\.local)
 #   APHRODY_NO_LINKS=1    do not run `aphrody self install-path`
 # Every download is verified against SHA256SUMS of the same release.
@@ -20,7 +20,7 @@ $ProgressPreference = "SilentlyContinue"
 $Base = if ($env:APHRODY_DOWNLOAD_URL) { $env:APHRODY_DOWNLOAD_URL.TrimEnd("/") } else { "https://downloads.aphrody.com" }
 $Requested = if ($env:APHRODY_COMPONENTS) { $env:APHRODY_COMPONENTS.Trim() } else { "all" }
 $All = $Requested -eq "all"
-$Components = if ($All) { @("aphrody", "desktop", "plugin-aphrody", "plugin-yolo", "mcp") } else { $Requested -split "\s+" | Where-Object { $_ } }
+$Components = if ($All) { @("aphrody", "plugin-aphrody", "plugin-yolo", "mcp") } else { $Requested -split "\s+" | Where-Object { $_ } }
 $Prefix = if ($env:APHRODY_PREFIX) { $env:APHRODY_PREFIX } else { Join-Path $env:USERPROFILE ".local" }
 $Target = "x86_64-pc-windows-msvc"
 if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne "X64") { throw "unsupported architecture (x86_64 only)" }
@@ -112,15 +112,6 @@ try {
         }
         $AphrodyExe = $Exe
         Write-Host "aphrody installed in $Dest"
-      }
-      "desktop" {
-        $Name = Find-File "aphrody-app" "-$Target.exe"
-        if (-not $Name) { Skip "the desktop app is not published for $Target yet"; continue }
-        $Installer = Get-Verified $Name
-        # Tauri NSIS installer, per user: /S is its silent mode; it creates its own shortcuts.
-        $Process = Start-Process -FilePath $Installer -ArgumentList "/S" -Wait -PassThru
-        if ($Process.ExitCode -ne 0) { throw "the desktop installer failed ($($Process.ExitCode))" }
-        Write-Host "Aphrody desktop app installed"
       }
       "mcp" {
         $Bin = (Get-Command aphrody-mcp -ErrorAction SilentlyContinue).Source

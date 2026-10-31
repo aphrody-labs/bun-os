@@ -1,13 +1,13 @@
 # @aphrody/app-ui
 
-The desktop front end of Bun OS: the Tauri webview of `apps/aphrody-app`
+The App UI web front end of Bun OS (its Tauri host `apps/aphrody-app` was retired on 2026-10-31)
 (shell, top bar, command palette, chat and Codex surfaces, explorer, models hub, settings,
 onboarding, pet). Built on the M3 packages of this repository (`@aphrody/m3-*`, `@aphrody/assets`,
 `@aphrody/identity`).
 
 The root Bun OS workspace installs and links this package and its canonical
 dependencies. Native execution remains host-bound: the desktop and identity
-owners are `apps/aphrody-app` and `crates/aphrody-identity`. Workspace membership
+owner is `crates/aphrody-identity`. Workspace membership
 does not prove that a native desktop artifact has been built or launched.
 
 The browser shell includes `/games/:core?` (`/workspace/games` in WebOS).
@@ -20,7 +20,7 @@ qualification of emulator packages remain with Bun Engine and WebOS assembly.
 | Script              | Does                                                                         |
 | ------------------- | ---------------------------------------------------------------------------- |
 | `bun run dev`       | Native M3 development server on port 1421 (`tauri.conf.json` `build.devUrl`) |
-| `bun run build`     | `build.ts`: native M3 build into `apps/aphrody-app/ui-dist`                  |
+| `bun run build`     | `build.ts`: native M3 build into `dist`                                      |
 | `bun run test`      | `bun test src` (layout parity, chat, history, brand theme, ...)              |
 | `bun run typecheck` | Native `bun check -p tsconfig.json --noEmit`                                 |
 | `bun run brand`     | regenerates the brand theme (`scripts/brand-theme.ts`)                       |

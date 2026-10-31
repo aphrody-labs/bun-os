@@ -14,7 +14,7 @@ Contracts, policies and integration references for the Aphrody UI. Parent map:
 | [Aphrody UI accessibility](ACCESSIBILITY.md) | The M3 LOW_VISION profile from aphrody-m3-tokens is the default desktop accessibility contract: | imported | 2026-09-29 |
 | [aphrody-ui: agent rules](AGENTS.md) | M3 framework, desktop hosts, rendering, Drive presentation and editor components. | imported | 2026-09-29 |
 | [AI and desktop UI boundary](AI-UI-INTEGRATION.md) | This page replaces the former feature inventory, which described routes and adapters that no longer exist. | historical | 2026-09-29 |
-| [Desktop GUI contract](GUI.md) | packages/app-ui is the single public-facing desktop webview, hosted by the current Tauri v2 app in crates/aphrody-app. | legacy | 2026-09-29 |
+| [Desktop GUI contract](GUI.md) | packages/app-ui is the single public-facing desktop webview (its Tauri host aphrody-app was retired on 2026-10-31). | legacy | 2026-09-29 |
 | [UI rules](UI-RULES.md) | Binding product rules for every view of the desktop app (packages/app-ui, Drive, examples). | imported | 2026-09-29 |
 <!-- docs-hub:end -->
 
@@ -23,14 +23,11 @@ Contracts, policies and integration references for the Aphrody UI. Parent map:
 See the [Tauri hub](./tauri/README.md). The workspace is on Tauri 3 alpha; Tauri 2 pages are marked
 historical.
 
-<!-- docs-hub:begin include="DESKTOP-INTEGRATION.md;NATIVE-DESKTOP.md;tauri/*.md;!tauri/README.md;integrations/tauri-mcp.md" -->
+<!-- docs-hub:begin include="NATIVE-DESKTOP.md;tauri/*.md;!tauri/README.md;integrations/tauri-mcp.md" -->
 | Document | Contenu | Statut | Mis à jour |
 | --- | --- | --- | --- |
-| [Desktop integration (aphrody-app)](DESKTOP-INTEGRATION.md) | How the Tauri v2 desktop integrates with Windows and Linux: installers, updates, "Open with Aphrody", deep links, tray, loading screen, desktop pet a… | legacy | 2026-09-29 |
 | [Native desktop and distribution boundary](NATIVE-DESKTOP.md) | Tauri v2 is the current host for Aphrody's public Chat, Files, Models and Settings webview. | legacy | 2026-09-29 |
-| [Tauri MCP integration](integrations/tauri-mcp.md) | The desktop (aphrody-app) owns Tauri webview inspection and interaction. | historical | 2026-09-29 |
-| [Tauri v2 integration](tauri/aphrody-integration.md) | How crates/aphrody-app hosts the UI and reaches the rest of Aphrody. | legacy | 2026-09-29 |
-| [Tauri v2 plugins and capabilities](tauri/plugins.md) | The plugins in use and what each one does are listed in ../DESKTOP-INTEGRATION.md. | legacy | 2026-09-29 |
+| [Tauri v2 plugins and capabilities](tauri/plugins.md) | The plugin selection rules. | legacy | 2026-09-29 |
 <!-- docs-hub:end -->
 
 ## wgpu and WASM

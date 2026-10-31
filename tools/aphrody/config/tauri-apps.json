@@ -4,18 +4,6 @@
   "scanSkip": ["target", "node_modules", ".git", ".turbo", ".coord"],
   "projects": [
     {
-      "id": "aphrody-app",
-      "kind": "app",
-      "path": "crates/ui/app",
-      "package": "aphrody-app",
-      "runtime": "cef",
-      "workspace": "member",
-      "confs": ["tauri.conf.json", "tauri.drive.conf.json"],
-      "gate": true,
-      "generated": ["crates/ui/app/gen"],
-      "note": "Desktop agent console, the only desktop application. Embeds the prebuilt ui-dist bundle until @aphrody/app-ui joins the workspace. Also the Yolo desktop SDK host (--host-info, --runtime-host: former yolo-desktop), opens the M3 showcase window with --showcase (former m3-showcase; the Bun sidecar of m3/packages/app-ui/showcase serves UI and API) and hosts the real-webview shell e2e as the shell_e2e example (former aphrody-shell-tauri-e2e)."
-    },
-    {
       "id": "scaffold",
       "kind": "generator",
       "path": "m3/packages/scaffold",
@@ -49,21 +37,11 @@
       "note": "buildM3 / M3App Tauri webview layout; no Tauri dependency."
     },
     {
-      "id": "aphrody-shell-tauri",
-      "kind": "plugin",
-      "path": "crates/shell/tauri",
-      "package": "aphrody-shell-tauri",
-      "runtime": "cef",
-      "workspace": "member",
-      "gate": true,
-      "note": "Tauri 3 plugin exposing native PTY shell sessions to the aphrody-shell-web webview client."
-    },
-    {
       "id": "aphrody-tauri-fork",
       "kind": "upstream",
       "path": "crates/tauri",
       "subtree": true,
-      "note": "Vendored Tauri 3 fork (aphrody-tauri*, the 15 plugins aphrody-app registers, tauri-runtime-cef, CLI); upstream line and patches in tools/config/tauri-upstream.json. Its fixtures and templates are covered by this entry."
+      "note": "Vendored Tauri 3 fork (aphrody-tauri*, the Tauri plugins, tauri-runtime-cef, CLI); upstream line and patches in tools/config/tauri-upstream.json. Its fixtures and templates are covered by this entry."
     },
     {
       "id": "aphrody-command",

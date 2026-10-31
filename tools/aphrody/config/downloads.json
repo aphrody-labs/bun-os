@@ -188,19 +188,6 @@
       "platforms": [{ "platform": "wasm", "target": "wasm32-unknown-unknown", "enabled": true }]
     },
     {
-      "id": "aphrody-app",
-      "kind": "desktop-app",
-      "description": "Tauri NSIS installer of the single desktop app (crates/ui/app); Aphrody-Setup installs it silently (/S) once it is published",
-      "platforms": [
-        {
-          "platform": "windows-x86_64",
-          "target": "x86_64-pc-windows-msvc",
-          "enabled": false,
-          "reason": "no Windows build of the desktop app (CEF and Tauri bundle) is produced by the factory yet"
-        }
-      ]
-    },
-    {
       "id": "plugin-aphrody",
       "kind": "plugin",
       "description": "Aphrody Claude Code plugin (repository aphrody-labs/plugin-aphrody)",

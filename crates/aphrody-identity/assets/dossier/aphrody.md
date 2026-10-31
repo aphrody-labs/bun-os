@@ -75,7 +75,7 @@ The following consumers use the same Rust-owned result:
 - `nie-site` serves the embedded JSON;
 - `nie-cli wiki` exposes the mirror-backed wiki operations;
 - `nie-ffi` exposes the typed JSON boundary to Bun;
-- `aphrody-app` exposes the pet and pixel pipeline to the desktop (`src/identity.rs`); IEVR queries stay in nie web;
+- the pet and pixel pipeline is this crate's API (the Tauri facade of the retired `aphrody-app` is gone); IEVR queries stay in nie web;
 - MCP tools call the native package rather than querying SQLite from TypeScript;
 - the Blender bridge invokes the Rust CLI for local VFS searches.
 

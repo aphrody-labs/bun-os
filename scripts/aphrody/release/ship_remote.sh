@@ -39,7 +39,6 @@ step "toolchain bootstrap" bash scripts/release/bootstrap_remote.sh
 command -v sccache >/dev/null && export RUSTC_WRAPPER=sccache
 step "bun install" bun install --frozen-lockfile
 step "check: types, lint, format, rustfmt, clippy" just yolo::check
-step "desktop provider: format, check, clippy and tests" just yolo::qualify-desktop
 step "imported providers: format, workspace check and tests" just yolo::qualify-upstream
 step "Python adapter native tests" just yolo::test-python-crate
 step "licenses and sources (cargo deny)" just yolo::deny-ci

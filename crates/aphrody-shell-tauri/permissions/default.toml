@@ -1,9 +1,0 @@
-[default]
-description = "Open, write to, resize and close native shell sessions."
-permissions = [
-  "allow-aphrody-shell-open",
-  "allow-aphrody-shell-open-channel",
-  "allow-aphrody-shell-write",
-  "allow-aphrody-shell-resize",
-  "allow-aphrody-shell-close",
-]

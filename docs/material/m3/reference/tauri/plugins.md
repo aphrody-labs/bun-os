@@ -1,8 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Tauri 3 plugins and capabilities
 
-The plugins in use and what each one does are listed in
-[`../DESKTOP-INTEGRATION.md`](../DESKTOP-INTEGRATION.md). This page holds the selection rules.
+This page holds the plugin selection rules.
 
 ## Rules
 

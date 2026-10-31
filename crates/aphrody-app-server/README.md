@@ -72,7 +72,7 @@ delivery. New clients should use array input and asynchronous turns.
 
 A host that links this crate runs the same stdio loop over two
 `tokio::io::duplex` pipes instead of spawning `aphrody app-server`
-(`aphrody-app`'s broker does exactly that). `serve_stdio_with(reader, writer,
+(the retired `aphrody-app` desktop broker did exactly that). `serve_stdio_with(reader, writer,
 server)` takes a configured `AppServer`; `AppServer::with_models_dir(path)`
 selects the model store root for managed local models, so the host never
 exports `APHRODY_MODELS_DIR` (mutating the environment of a threaded process is

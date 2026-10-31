@@ -11,11 +11,6 @@
   ],
   "members": {
     "webos": { "kind": "web", "opens": "about" },
-    "aphrody-app": {
-      "kind": "native",
-      "related": "aphrody-workspace",
-      "artifact": "aphrody-app"
-    },
     "desktop": {
       "kind": "native",
       "desc": "Aphrody desktop: the native library capabilities in a Tauri v3 window, built by Bun",

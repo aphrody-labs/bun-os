@@ -231,7 +231,7 @@
       "uses": ["aphrody"],
       "indexes": [],
       "readsToday": ["APHRODY_BIN"],
-      "surfaces": ["crates/aphrody-app/src/broker.rs"],
+      "surfaces": ["crates/aphrody-app-server"],
       "migration": "Process boundary only (aphrody app-server stdio JSON-RPC); already reads the canonical name."
     },
     "aphrody-web": {

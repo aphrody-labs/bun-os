@@ -7,15 +7,7 @@ import { dirname, join } from "node:path";
 import { testContext } from "../admin/helpers.ts";
 import { main, parseRoles } from "../../src/setup/cli.ts";
 import { R2_DIST } from "../../src/setup/r2.ts";
-import {
-  DEFAULT_BASE,
-  MARKETPLACE,
-  marketplaceJson,
-  setupDirs,
-  stepDesktop,
-  stepPlugins,
-  stepsFor,
-} from "../../src/setup/steps.ts";
+import { DEFAULT_BASE, MARKETPLACE, marketplaceJson, setupDirs, stepPlugins, stepsFor } from "../../src/setup/steps.ts";
 
 const BASE = DEFAULT_BASE;
 const touch = (path: string, text = "x") => {
@@ -118,7 +110,7 @@ test("roles parse in French and English, unknown roles are refused", () => {
   expect([...parseRoles("creator")]).toEqual(["createur"]);
   expect(() => parseRoles("root")).toThrow("rôle inconnu");
   const base = stepsFor(new Set()).map(step => step.id);
-  expect(base).toEqual(["setup", "aphrody", "desktop", "plugins", "mcp", "raccourci"]);
+  expect(base).toEqual(["setup", "aphrody", "plugins", "mcp", "raccourci"]);
   expect(stepsFor(new Set(["admin"])).map(s => s.id)).toContain("admin-tools");
   expect(stepsFor(new Set(["admin"])).map(s => s.id)).toContain("acces");
   expect(
@@ -126,45 +118,6 @@ test("roles parse in French and English, unknown roles are refused", () => {
       .map(s => s.id)
       .at(-1),
   ).toBe("creator-tools");
-});
-
-test("the desktop app waits until it is published, then installs silently after the hash check", async () => {
-  const waiting = testContext({ fetchImpl: site({}) });
-  expect((await stepDesktop.run(waiting.ctx, "executer", { repoReady: false })).state).toBe("attente");
-  const bytes = new TextEncoder().encode("nsis installer");
-  const file = "aphrody-app-1.2.0-abc-x86_64-pc-windows-msvc.exe";
-  const { ctx, sys } = testContext({
-    fetchImpl: site({
-      [file]: { name: "aphrody-app", bytes, version: "1.2.0" },
-    }),
-  });
-  expect((await stepDesktop.run(ctx, "simuler", { repoReady: false })).state).toBe("a-faire");
-  const installed = join(ctx.paths.localAppData, "aphrody", "aphrody-app.exe");
-  sys.handlers.push({
-    match: /\/S$/,
-    result: argv => {
-      expect(readFileSync(argv[0]!, "utf8")).toBe("nsis installer");
-      touch(installed);
-      return {};
-    },
-  });
-  const done = await stepDesktop.run(ctx, "executer", { repoReady: false });
-  expect(done.state).toBe("fait");
-  expect(sys.calls.at(-1)?.argv.at(-1)).toBe("/S");
-  expect((await stepDesktop.run(ctx, "executer", { repoReady: false })).state).toBe("deja");
-});
-
-test("a tampered desktop installer is refused before anything runs", async () => {
-  const bytes = new TextEncoder().encode("nsis installer");
-  const file = "aphrody-app-1.2.0-abc-x86_64-pc-windows-msvc.exe";
-  const good = site({ [file]: { name: "aphrody-app", bytes } });
-  const { ctx, sys } = testContext({
-    fetchImpl: async input =>
-      String(input).endsWith("/SHA256SUMS") ? new Response(`${"0".repeat(64)}  ${file}`) : good(input),
-  });
-  const result = await stepDesktop.run(ctx, "executer", { repoReady: false });
-  expect(result.state).toBe("echec");
-  expect(sys.calls).toEqual([]);
 });
 
 test("plugins land in a local Claude Code marketplace and are installed through the claude CLI", async () => {

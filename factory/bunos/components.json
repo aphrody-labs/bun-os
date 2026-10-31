@@ -487,7 +487,6 @@
     "note": "Every Cargo package and every named package.json must be a member of the root workspace or covered here by a path prefix with a reason; checked by factory/bunos/check-components.ts. Members: root Cargo.toml [workspace].members (plus their path dependencies) and root package.json workspaces.",
     "cargo": {
       "excluded": {
-        "apps/aphrody-app": "cef-dll-sys needs the native CEF CMake toolchain (CMake project() fails in the Rust-only gates); re-add once the CEF toolchain is part of the gate image",
         "packages/wasmos/compositor": "own [workspace] root (separate lockfile and resolver); wasm32-unknown-unknown cdylib built by packages/wasmos (bun src/cli.ts build-compositor), never by the root workspace",
         "apps/aphrody-examples/runtime-rust-extension": "standalone example of a Rust extension; own [workspace] root (separate lockfile and resolver); built by its own flow, never by the root workspace",
         "apps/aphrody-model-view": "needs aphrody-tauri-wrap, which is neither in [workspace.dependencies] nor in the repository",
@@ -517,7 +516,7 @@
         "packages/bun-tauri": "Tauri fork; virtual [workspace] of its own, consumed by path through the aphrody-tauri* entries of [workspace.dependencies]",
         "packages/m3-templates/desktop/src-tauri": "scaffold template (name placeholder __NAME__), copied by the M3 templates CLI",
         "vendor/cargo-3ds": "upstream submodule with its own workspace; build tool, not a dependency",
-        "vendor/cef-rs": "upstream submodule with its own workspace; waits on the CEF CMake toolchain like apps/aphrody-app",
+        "vendor/cef-rs": "upstream submodule with its own workspace; waits on the CEF CMake toolchain",
         "vendor/citro3d-rs": "upstream submodule with its own workspace; consumed by path from the 3DS crates",
         "vendor/ctru-rs": "upstream submodule; virtual [workspace] of its own, consumed by path",
         "vendor/magika": "upstream submodule with its own workspace; consumed by path",
@@ -7430,19 +7429,6 @@
       "source": {
         "type": "path-crate",
         "name": "aphrody-shell-session",
-        "version": "1.4.7"
-      },
-      "registration": ["none"],
-      "aot": true,
-      "status": "present"
-    },
-    {
-      "id": "crate:crates/aphrody-shell-tauri",
-      "kind": "crate",
-      "path": "crates/aphrody-shell-tauri",
-      "source": {
-        "type": "path-crate",
-        "name": "aphrody-shell-tauri",
         "version": "1.4.7"
       },
       "registration": ["none"],

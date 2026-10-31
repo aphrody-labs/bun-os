@@ -1,7 +1,7 @@
 # Desktop and site capability bindings
 
 > **Historical (2026-09-26):** the Inacord Tauri host (`apps/inacord`) described below was removed.
-> The desktop is aphrody-ui `aphrody-app`; IEVR stays in nie web; see `PLAN.md`, Decisions 2026-09-26.
+> The Bun OS desktop is the COSMIC session (the Tauri `aphrody-app` was retired on 2026-10-31); IEVR stays in nie web; see `PLAN.md`, Decisions 2026-09-26.
 
 Source inventory, 2026-09-08. Implementation status below is source inspection, not a
 record of passing build, browser, or deployment gates. The active gate ledger is `PLAN.md`.

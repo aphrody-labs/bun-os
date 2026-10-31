@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Toolkit-free model hub for Aphrody's local-AI GUIs.
 //!
-//! Every GUI (Tauri today, COSMIC / egui / web tomorrow) needs the same operations: browse the
+//! Every GUI (the iced/libcosmic clients, the WebOS server) needs the same operations: browse the
 //! curated catalog, list what is installed, rank models for this machine, verify, remove and
-//! pull with progress. [`ModelHub`] is that one implementation. It calls `aphrody-models`
-//! in process (no `aphrody model` child process, no output scraping) and returns the same JSON
-//! documents the CLI's `--json` mode prints, so webviews keep one schema.
+//! pull with progress. [`ModelHub`] is that one implementation. It calls this crate in process
+//! (no `aphrody model` child process, no output scraping) and returns the same JSON documents
+//! the CLI's `--json` mode prints, so every client keeps one schema.
 //!
-//! The crate has no windowing-toolkit, IPC or async-runtime types in its API: progress is a plain
-//! callback and cancellation is any `Future<Output = ()>`.
+//! The API carries no windowing-toolkit, IPC or async-runtime types: progress is a plain
+//! callback and cancellation is any `Future<Output = ()>`. Extracted from the retired
+//! `apps/aphrody-app` desktop (`src/local_ai.rs`).
 
 use std::{future::Future, path::PathBuf, pin::pin};
 
-use aphrody_models::{
+use crate::{
     Catalog, Downloader, HardwareProfile, ModelRef, ModelStore, ModelTask, PullOutcome, SpeedTier,
     accel, rank_for,
 };
@@ -29,7 +30,7 @@ pub enum HubError {
         context: String,
         /// The underlying error.
         #[source]
-        source: aphrody_models::ModelError,
+        source: crate::ModelError,
     },
     /// The request itself was invalid (unknown task, nothing fits).
     #[error("{0}")]
@@ -40,7 +41,7 @@ pub enum HubError {
 }
 
 impl HubError {
-    fn model(context: impl Into<String>) -> impl FnOnce(aphrody_models::ModelError) -> Self {
+    fn model(context: impl Into<String>) -> impl FnOnce(crate::ModelError) -> Self {
         let context = context.into();
         move |source| Self::Model { context, source }
     }
@@ -199,7 +200,7 @@ impl ModelHub {
                     .map_err(HubError::model(format!("verify `{reference}`")))?,
             );
         }
-        let intact = reports.iter().all(aphrody_models::VerifyReport::is_intact);
+        let intact = reports.iter().all(crate::VerifyReport::is_intact);
         Ok(json!({ "spec": spec, "intact": intact, "artifacts": reports }))
     }
 
@@ -244,7 +245,7 @@ impl ModelHub {
     ) -> Result<Value, HubError> {
         let store = self.store()?;
         let downloader = Downloader::new().map_err(HubError::model("build HTTP client"))?;
-        let transfer = aphrody_models::pull_spec(&store, &downloader, spec, force, |role, p| {
+        let transfer = crate::pull_spec(&store, &downloader, spec, force, |role, p| {
             on_progress(PullProgress {
                 spec: spec.to_owned(),
                 role: role.to_owned(),

@@ -215,17 +215,11 @@ export async function runOps(argv: readonly string[]): Promise<number> {
   if (operation === "spaceui-to-m3") {
     return await (await import("./spaceui-to-m3.ts")).runSpaceUiToM3(rest);
   }
-  if (operation === "desktop-smoke") {
-    return await (await import("./desktop-smoke.ts")).runDesktopSmoke(rest);
-  }
   if (operation === "spaceui-icons") {
     return await (await import("./spaceui-icons.ts")).runSpaceUiIcons(rest);
   }
   if (operation === "bun-native") {
     return await (await import("./bun-native.ts")).runBunNative(rest);
-  }
-  if (operation === "tauri") {
-    return await (await import("./tauri.ts")).runTauri(rest);
   }
   if (operation === "tauri-apps") {
     return await (await import("@aphrody/update/src/tauri/apps.ts")).runTauriApps(rest);

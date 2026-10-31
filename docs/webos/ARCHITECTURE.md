@@ -44,7 +44,7 @@ Owner decision (overrides the first web-sys draft): the client is an iced applic
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Servo (fork `aphrody-labs/servo`, 0.7+)                                  | Embeddable browser engine in pure Rust; lighter, compatibility gaps | Primary embedded engine: an iced/libcosmic widget rendering offscreen into a wgpu texture.                      |
 | cef-rs (`vendor/cef-rs`, CEF 156)                                        | Embeddable full Chromium from Rust, offscreen rendering             | Compatibility fallback widget for sites Servo cannot render.                                                    |
-| Tauri v3 (`vendor/tauri`, fork on the v3 branch, `tauri-v3.0.0-alpha.5`) | App framework for web frontends, alpha, CEF runtime                 | Apps with web frontends, including `apps/aphrody-app` migrated to v3; a Servo runtime is pushed where possible. |
+| Tauri v3 (`vendor/tauri`, fork on the v3 branch, `tauri-v3.0.0-alpha.5`) | App framework for web frontends, alpha, CEF runtime                 | Apps with web frontends; a Servo runtime is pushed where possible                                             . |
 | Helium (fork)                                                            | Full Chromium browser product, not embeddable                       | The user-facing browser inside sessions.                                                                        |
 
 ## Source rule

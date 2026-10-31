@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-/** Host-agnostic shell session: browser WebSocket, Tauri IPC, or the in-WASM local shell. */
+/** Host-agnostic shell session: browser WebSocket or the in-WASM local shell. */
 
 const noop = (): void => {};
 
@@ -33,7 +33,7 @@ export interface Snapshot {
   cursor: { row: number; col: number; visible: boolean };
 }
 
-/** Bytes in/out of a shell. Implementations: WebSocket, Tauri, worker, local. */
+/** Bytes in/out of a shell. Implementations: WebSocket, worker, local. */
 export interface Transport {
   send(bytes: Uint8Array): void;
   resize(cols: number, rows: number): void;
@@ -133,59 +133,6 @@ export function sandboxTransport(
       closed = true;
       if (timer) clearTimeout(timer);
       ws.close();
-    },
-  };
-}
-
-/** Tauri bridge; `invoke`/`listen` come from `@tauri-apps/api` so this package stays dependency-free. */
-export interface TauriBridge {
-  invoke(cmd: string, args?: Record<string, unknown>): Promise<unknown>;
-  /** Supply a `Channel` from `@aphrody/api/core` for streaming output. */
-  createChannel?(): { onmessage: (payload: TauriOutput) => void };
-  listen(event: string, cb: (e: { payload: TauriOutput }) => void): Promise<() => void>;
-}
-
-export interface TauriOutput {
-  session: string;
-  bytes: number[];
-  exit: number | null | undefined;
-}
-
-const cmd = (name: string) => `plugin:aphrody-shell-tauri|${name}`;
-
-/** Talks to the `aphrody-shell-tauri` plugin (plugin commands are namespaced `plugin:aphrody-shell-tauri|`). */
-export function tauriTransport(bridge: TauriBridge, session = "default", cols = 80, rows = 24): Transport {
-  let out: (b: Uint8Array) => void = noop;
-  let unlisten: (() => void) | undefined;
-  let closed = false;
-  const receive = (payload: TauriOutput) => {
-    if (!closed && payload.session === session && payload.bytes.length) out(Uint8Array.from(payload.bytes));
-  };
-  const ready = bridge.createChannel
-    ? (() => {
-        const onOutput = bridge.createChannel!();
-        // oxlint-disable-next-line unicorn/prefer-add-event-listener -- un Channel Tauri n'est pas un EventTarget : son contrat est la propriété onmessage (TauriBridge.createChannel)
-        onOutput.onmessage = receive;
-        return bridge.invoke(cmd("aphrody_shell_open_channel"), { session, cols, rows, onOutput });
-      })()
-    : bridge
-        .listen("aphrody-shell-output", ({ payload }) => receive(payload))
-        .then(u => {
-          unlisten = u;
-          return closed ? undefined : bridge.invoke(cmd("aphrody_shell_open"), { session, cols, rows });
-        });
-  const after = (name: string, args: Record<string, unknown>) =>
-    void ready.then(() =>
-      !closed || name === "aphrody_shell_close" ? bridge.invoke(cmd(name), { session, ...args }) : undefined,
-    );
-  return {
-    send: b => after("aphrody_shell_write", { bytes: Array.from(b) }),
-    resize: (c, r) => after("aphrody_shell_resize", { cols: c, rows: r }),
-    onOutput: cb => (out = cb),
-    close: () => {
-      closed = true;
-      unlisten?.();
-      after("aphrody_shell_close", {});
     },
   };
 }

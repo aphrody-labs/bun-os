@@ -7,7 +7,7 @@
       "website": { "runtime": "rust-http", "package": "nie-site", "unit": "nie-site.service", "port": 8085 },
       "api": { "runtime": "rust-http", "package": "nie-model-serve", "unit": "nie-model-serve.service", "port": 8792 },
       "mcp": "optional aphrody-mcp nie.* (disabled by default until NIE source crates join this monorepo; process boundary runs nie-mcp as a child; the IECODE agent plugin is stored in ~/plugins/iecode and restricted to IECODE)",
-      "desktop": "none: IEVR features are web-only (nie-site + apps/nie-web). The Inacord Tauri app was removed on 2026-09-26; its generic pet/pixel commands moved to aphrody-app, which can reach game features through the opt-in aphrody-mcp nie.* capability",
+      "desktop": "none: IEVR features are web-only (nie-site + apps/nie-web). The Inacord Tauri app was removed on 2026-09-26; its generic pet/pixel pipeline lives in crates/aphrody-identity; game features stay behind the opt-in aphrody-mcp nie.* capability",
       "data": {
         "primary": "none",
         "storage": "local-ievr-3d-assets",
@@ -68,27 +68,8 @@
         "isolation": ["provider-authentication", "raw-provider-sessions", "cookies", "protected-data"],
         "deployment": "cloudflare-with-qualified-private-native-execution-for-host-capabilities"
       },
-      "desktop": {
-        "runtime": "tauri-runtime-cef",
-        "package": "aphrody-app",
-        "sourceRepo": "aphrody",
-        "sourcePath": "crates/ui/app",
-        "ui": "@aphrody/app-ui",
-        "sidecars": ["sd-daemon", "aphrody"],
-        "modules": [
-          "agent (aphrody app-server over stdio)",
-          "drive (Spacedrive sd-daemon sidecar)",
-          "models",
-          "identity (pet and pixel pipeline, ex-Inacord)",
-          "browser",
-          "terminal",
-          "systemd",
-          "infra",
-          "windows",
-          "settings"
-        ]
-      },
-      "gameFeatures": "opt-in aphrody-mcp nie.* only; disabled in the root build until NIE is integrated; Aphrody desktop never imports IECODE sources through sibling paths"
+      "desktop": "the COSMIC session and the iced/libcosmic clients of the unified Bun OS image; the Tauri desktop apps/aphrody-app was retired on 2026-10-31",
+      "gameFeatures": "opt-in aphrody-mcp nie.* only; disabled in the root build until NIE is integrated; Bun OS clients never import IECODE sources through sibling paths"
     }
   },
   "deduplication": {

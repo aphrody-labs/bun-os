@@ -77,7 +77,7 @@ let cachedRoot: string | undefined;
 /** The yolo home, resolved on first use (it walks parent directories, which `version` and `help` do not need). */
 const rootDir = (): string => (cachedRoot ??= yoloHome());
 
-/** `yolo web|desktop|tauri`: the web frontend of the single desktop app (packages/app-ui, embedded by apps/aphrody-app). */
+/** `yolo web`: the App UI web frontend (packages/app-ui). */
 export const WEB_APP_DIR = "packages/app-ui";
 /** The checkout enclosing the working directory, else the working directory (ai, mcp, api). */
 const workspaceRoot = (): string => findCheckout() ?? process.cwd();
@@ -118,12 +118,11 @@ ${header}
   \x1b[32mai list|call <tool> <json>\x1b[0m Shared AI capabilities (same schemas and owner as MCP/API)
   \x1b[32mtool list|call\x1b[0m      Tool host of the single MCP server (aphrody mcp) for the yolo_* tools
   \x1b[32mapi [--port N]\x1b[0m      Serve local HTTP / REST / OpenAPI micro-server (Bun.serve)
-  \x1b[32mweb [build|dev]\x1b[0m     Manage and build the Web & Desktop frontend
+  \x1b[32mweb [build|dev]\x1b[0m     Manage and build the web frontend
   \x1b[32mgenerate [--json]\x1b[0m   Autonomously scan upstream Bun and generate code & capability catalogs
   \x1b[32mdocs [query] [--json|--md]\x1b[0m Search or inspect the Bun docs of the fork checkout (docs/, or --dir / $BUN_DOCS_DIR)
   \x1b[32mversion [--json] | doctor [--json|--md]\x1b[0m Installed version, target; check the installation
   \x1b[32mruntime install|list|verify|rollback|info\x1b[0m  Manage installed runtime artifacts
-  \x1b[32mdesktop-runtime package|install|verify|rollback|info\x1b[0m  Manage native CEF desktop artifacts
   \x1b[32mupgrade [--check|--release-dir DIR]\x1b[0m Install a verified release; \x1b[32muninstall [--yes]\x1b[0m removes ~/.yolo
   \x1b[32mcreate <dir> [--with web,desktop]\x1b[0m Scaffold an Aphrody stack project (Bun + runtime SDK + Tauri) from templates/
   \x1b[32mawesome [stats|list|search|github|check]\x1b[0m Browse oven-sh/awesome-bun (README cached, no clone)
@@ -168,19 +167,7 @@ async function main(): Promise<void> {
 
   // These commands need repository data. Their implementation is bundled, so a checkout never requires
   // another Bun installation or a subprocess that loads potentially different CLI sources.
-  const CHECKOUT_ONLY = new Set([
-    "status",
-    "generate",
-    "web",
-    "desktop",
-    "tauri",
-    "docs",
-    "import",
-    "py",
-    "python",
-    "ship",
-    "hooks",
-  ]);
+  const CHECKOUT_ONLY = new Set(["status", "generate", "web", "docs", "import", "py", "python", "ship", "hooks"]);
   if (isCompiled() && CHECKOUT_ONLY.has(command)) {
     const checkout = findCheckout(process.env.BUN_OS_ROOT ?? process.cwd());
     if (checkout === null) {
@@ -280,11 +267,8 @@ async function main(): Promise<void> {
       break;
     }
 
-    case "web":
-    case "desktop":
-    case "tauri": {
+    case "web": {
       const sub = args[1] || "build";
-      // The web frontend of the single desktop app (apps/aphrody-app embeds its build).
       const webDir = resolve(rootDir(), WEB_APP_DIR);
       if (!existsSync(webDir)) {
         console.error(`\x1b[31mError:\x1b[0m web app not found at ${webDir}`);
@@ -370,12 +354,6 @@ async function main(): Promise<void> {
     case "serve": {
       const { runApiCommand } = await import("./api");
       process.exitCode = await runApiCommand(args.slice(1), workspaceRoot());
-      break;
-    }
-
-    case "desktop-runtime": {
-      const { runDesktopRelease } = await import("@aphrody/yolo-core/src/distribution/desktop-release.ts");
-      process.exitCode = runDesktopRelease(args.slice(1));
       break;
     }
 

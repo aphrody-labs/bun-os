@@ -181,7 +181,7 @@
       ],
       [
         "Desktop",
-        "`aphrody-app` on `tauri-runtime-cef` (CEF + `tauri-winit` + GTK 4); routes `admin`, `creator`"
+        "COSMIC session and iced/libcosmic clients of the unified Bun OS image (the Tauri `aphrody-app` was retired on 2026-10-31)"
       ],
       [
         "Python",
@@ -248,7 +248,7 @@
       ],
       [
         "Desktop",
-        "Windows installer for `aphrody-app`; real Windows run; rendering in the real CEF app"
+        "COSMIC session qualification in the unified image"
       ],
       [
         "MCP HTTP auth",

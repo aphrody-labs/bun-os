@@ -77,7 +77,7 @@
   "consumers": {
     "note": "Rust packages and Bun workspaces re-checked when one of these libraries changes.",
     "tauri": {
-      "cargo": ["aphrody-shell-tauri", "aphrody-app", "aphrody-tauri-wrap"],
+      "cargo": ["aphrody-tauri-wrap"],
       "bun": []
     },
     "xterm": {
