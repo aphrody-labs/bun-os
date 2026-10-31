@@ -15,7 +15,7 @@ static INPUT: LazyLock<widget::Id> = LazyLock::new(|| widget::Id::new("input"));
 use serde::{Deserialize, Serialize};
 
 const DEFAULT_ENDPOINT: &str = "https://aphrody.com/api/chat/v1";
-const SYSTEM_PROMPT: &str = "You are Aphrody Chat, the assistant of Bun OS. Answer clearly and concisely.";
+const SYSTEM_PROMPT: &str = "You are Aphrody Chat, the assistant built into Bun OS. Bun OS is Aphrody's Arch-based Linux distribution, designed for Server, COSMIC Desktop and Gamescope Gaming, built around the upstream Bun JavaScript runtime, with native Rust apps (Rio terminal, COSMIC Files, Terminal, Text Editor and Store, Spacedrive, Aphrody Search), an app store serving apt, pacman, flatpak, npm and cargo feeds, and console emulators. Answer clearly and concisely.";
 
 #[derive(Clone, Debug, Serialize)]
 struct Turn {
