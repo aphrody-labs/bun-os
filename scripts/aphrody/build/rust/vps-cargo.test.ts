@@ -36,13 +36,16 @@ const config = await loadConfig();
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 
 describe("vps-cargo", () => {
-  test("explicit auto job selection reaches every CPU on the remote host", () => {
-    expect(cargoJobsSetting(undefined, config)).toBe(12);
+  test("explicit jobs respect the configured remote host limit", () => {
+    const maximum = config.maxJobs ?? config.jobs;
+    expect(cargoJobsSetting(undefined, config)).toBe(maximum);
     expect(cargoJobsSetting("3", config)).toBe(3);
     expect(cargoJobsSetting("auto", config)).toBe("auto");
-    expect(cargoJobsSetting("12", config)).toBe(12);
-    expect(() => cargoJobsSetting("13", config)).toThrow("--jobs must be 1..12, or auto");
-    expect(() => cargoJobsSetting("1.5", config)).toThrow("--jobs must be 1..12, or auto");
+    expect(cargoJobsSetting(String(maximum), config)).toBe(maximum);
+    expect(() => cargoJobsSetting(String(maximum + 1), config)).toThrow(
+      `--jobs must be 1..${maximum}, or auto`,
+    );
+    expect(() => cargoJobsSetting("1.5", config)).toThrow(`--jobs must be 1..${maximum}, or auto`);
 
     const script = remoteRunScript(config, SHA, "all-cpus", ["check", "-p", "aphrody"], "auto");
     expect(script).toContain("APHRODY_CARGO_JOBS=auto");
@@ -51,6 +54,10 @@ describe("vps-cargo", () => {
     expect(script).toContain("MemAvailable:");
     expect(script).toContain("policy.jobs=Math.min(policy.jobs,cpus)");
     expect(script).toContain("CARGO_BUILD_JOBS=");
+    const tmuxCommand = script.match(/tmux new-window [^\n]+/)?.[0];
+    expect(tmuxCommand).toBeDefined();
+    expect(tmuxCommand!.length).toBeLessThan(256);
+    expect(script).toContain("cat > /home/ubuntu/build/storage/artifacts/wsl/all-cpus.log.sh");
   });
 
   test("quotes only what needs quoting", () => {
@@ -78,11 +85,17 @@ describe("vps-cargo", () => {
     expect(command.startsWith("& '")).toBe(true);
     expect(command).toContain("Bun.spawn(");
     expect(command).toContain("build host''s alias");
-    expect(sshBase(c, "win32")).toEqual(["ssh", "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=4"]);
+    expect(sshBase(c, "win32")).toEqual([
+      "ssh",
+      "-o",
+      "ServerAliveInterval=15",
+      "-o",
+      "ServerAliveCountMax=4",
+    ]);
     expect(localQuote("C:/User's home", "win32")).toBe("'C:/User''s home'");
-    expect(gitDaemonCommand({ ...config, gitDaemon: { ...config.gitDaemon, basePath: "C:/" } }, "win32")).toContain(
-      "--base-path='C:'",
-    );
+    expect(
+      gitDaemonCommand({ ...config, gitDaemon: { ...config.gitDaemon, basePath: "C:/" } }, "win32"),
+    ).toContain("--base-path='C:'");
     expect(
       gitDaemonCommand(
         {
@@ -99,11 +112,20 @@ describe("vps-cargo", () => {
     expect(push).toContain(`git checkout --quiet --detach --force ${SHA}`);
     expect(push).not.toContain("git fetch");
     const pull = remoteCheckoutScript(config, SHA, true);
-    expect(pull).toContain("git fetch --quiet git://127.0.0.1:19418/aphrody refs/workspace/snapshot");
+    const port = config.forwards.remote[0]!.bind.split(":").at(-1);
+    expect(pull).toContain(
+      `git fetch --quiet git://127.0.0.1:${port}/${config.gitDaemon.repository} refs/workspace/snapshot`,
+    );
   });
 
   test("run script holds the factory lock and never runs outside the snapshot", () => {
-    const script = remoteRunScript(config, SHA, "job-1", ["clippy", "-p", "aphrody", "--", "-D", "warnings"], 4);
+    const script = remoteRunScript(
+      config,
+      SHA,
+      "job-1",
+      ["clippy", "-p", "aphrody", "--", "-D", "warnings"],
+      4,
+    );
     expect(script).toContain("tmux new-window -d -t vps-cargo -n job-1");
     expect(script).toContain("APHRODY_CARGO_JOBS=4");
     expect(script).toContain("APHRODY_BUILD_HOST=vps");
@@ -141,13 +163,21 @@ describe("vps-cargo", () => {
       ["src/lib.rs", ".env", "config/.env.local", "keys/id_ed25519", "a/secrets.json", "x.pem"],
       config.refuseSnapshotPaths,
     );
-    expect(refused).toEqual([".env", "config/.env.local", "keys/id_ed25519", "a/secrets.json", "x.pem"]);
+    expect(refused).toEqual([
+      ".env",
+      "config/.env.local",
+      "keys/id_ed25519",
+      "a/secrets.json",
+      "x.pem",
+    ]);
   });
 
   test("snapshot captures tracked and untracked changes without touching HEAD or the index", async () => {
     const repo = await mkdtemp(join(tmpdir(), "vps-cargo-"));
     try {
-      await $`git init -q && git -c user.name=t -c user.email=t@t commit -q --allow-empty -m init`.cwd(repo);
+      await $`git init -q && git -c user.name=t -c user.email=t@t commit -q --allow-empty -m init`.cwd(
+        repo,
+      );
       await Bun.write(join(repo, ".gitignore"), "ignored.txt\n");
       await Bun.write(join(repo, "new.txt"), "hello\n");
       await Bun.write(join(repo, "ignored.txt"), "nope\n");
@@ -191,7 +221,8 @@ describe("snapshot collisions", () => {
     expect(
       isSnapshotCollision({
         exitCode: 1,
-        stderr: " ! [remote rejected] sha -> refs/workspace/snapshot (incorrect old value provided)",
+        stderr:
+          " ! [remote rejected] sha -> refs/workspace/snapshot (incorrect old value provided)",
       }),
     ).toBe(true);
     expect(
@@ -215,7 +246,7 @@ describe("snapshot collisions", () => {
       {
         baseMs: 100,
         random: () => 0,
-        sleep: async ms => void delays.push(ms),
+        sleep: async (ms) => void delays.push(ms),
       },
     );
     expect(result).toBe("sha");
@@ -230,7 +261,8 @@ describe("snapshot collisions", () => {
         if (++calls === 1)
           throw Object.assign(new Error("push failed"), {
             exitCode: 1,
-            stderr: " ! [remote rejected] sha -> refs/workspace/snapshot (incorrect old value provided)",
+            stderr:
+              " ! [remote rejected] sha -> refs/workspace/snapshot (incorrect old value provided)",
           });
         return "pinned-sha";
       },
@@ -252,7 +284,7 @@ describe("snapshot collisions", () => {
         attempts: 3,
         baseMs: 100,
         random: () => 0.5,
-        sleep: async ms => void delays.push(ms),
+        sleep: async (ms) => void delays.push(ms),
       },
     );
     await expect(run).rejects.toBe(lockError);
@@ -276,14 +308,20 @@ describe("snapshot collisions", () => {
   test("concurrent snapshots of one worktree both succeed and leave no scratch index", async () => {
     const repo = await mkdtemp(join(tmpdir(), "vps-cargo-race-"));
     try {
-      await $`git init -q && git -c user.name=t -c user.email=t@t commit -q --allow-empty -m init`.cwd(repo);
+      await $`git init -q && git -c user.name=t -c user.email=t@t commit -q --allow-empty -m init`.cwd(
+        repo,
+      );
       await Bun.write(join(repo, "a.txt"), "a\n");
       const shas = await Promise.all(Array.from({ length: 6 }, () => snapshot(config, repo)));
       expect(new Set(shas).size).toBeGreaterThanOrEqual(1);
       for (const sha of shas) {
-        expect((await $`git ls-tree --name-only ${sha}`.cwd(repo).text()).trim()).toContain("a.txt");
+        expect((await $`git ls-tree --name-only ${sha}`.cwd(repo).text()).trim()).toContain(
+          "a.txt",
+        );
       }
-      const leftovers = (await $`ls .git`.cwd(repo).text()).split("\n").filter(n => n.startsWith("vps-cargo."));
+      const leftovers = (await $`ls .git`.cwd(repo).text())
+        .split("\n")
+        .filter((n) => n.startsWith("vps-cargo."));
       expect(leftovers).toEqual([]);
     } finally {
       await rm(repo, { recursive: true, force: true });
@@ -309,7 +347,9 @@ describe("snapshot pins and verification", () => {
     const script = remoteForgetScript(config);
     expect(script).toContain("refs/workspace/snapshot");
     expect(script).toContain("refs/workspace/pin");
-    expect(script).toContain('git rev-list --objects --quiet "$ref" 2>/dev/null || git update-ref -d "$ref"');
+    expect(script).toContain(
+      'git rev-list --objects --quiet "$ref" 2>/dev/null || git update-ref -d "$ref"',
+    );
   });
 
   test("the checkout script prunes old pins and keeps the recent ones", () => {
@@ -328,18 +368,22 @@ describe("snapshot pins and verification", () => {
       await $`git -c user.name=t -c user.email=t@t commit -q --allow-empty -m init`.cwd(work);
       await Bun.write(join(work, "a.txt"), "payload\n");
       const sha = await snapshot(config, work);
-      const push = (refs: string[]) => $`git push -q --force --no-thin ${remote} ${refs}`.cwd(work).quiet();
+      const push = (refs: string[]) =>
+        $`git push -q --force --no-thin ${remote} ${refs}`.cwd(work).quiet();
       await push([`${sha}:refs/workspace/snapshot`]);
       // Collect the blob on the remote while the ref still advertises it: the damage seen in production.
       const blob = (await $`git rev-parse ${sha}:a.txt`.cwd(work).text()).trim();
       await rm(join(remote, ".git/objects", blob.slice(0, 2), blob.slice(2)), {
         force: true,
       });
-      const integrity = () => $`git -C ${remote} rev-list --objects --quiet ${sha}`.nothrow().quiet();
+      const integrity = () =>
+        $`git -C ${remote} rev-list --objects --quiet ${sha}`.nothrow().quiet();
       expect((await integrity()).exitCode).not.toBe(0);
       // A plain push resends nothing: the remote ref says it has the object.
       await push([`${sha}:refs/workspace/snapshot`, `${sha}:${pinRef(config, sha)}`]);
-      expect((await $`git -C ${remote} rev-list --objects --quiet ${sha}`.nothrow().quiet()).exitCode).not.toBe(0);
+      expect(
+        (await $`git -C ${remote} rev-list --objects --quiet ${sha}`.nothrow().quiet()).exitCode,
+      ).not.toBe(0);
       // Forget the broken refs, push again: the object is resent.
       const refs = (
         await $`git -C ${remote} for-each-ref ${"--format=%(refname)"} ${config.snapshotRef} ${pinRef(config, sha).slice(0, -12)}`.text()
@@ -347,12 +391,17 @@ describe("snapshot pins and verification", () => {
         .trim()
         .split("\n");
       for (const ref of refs.filter(Boolean)) {
-        if ((await $`git -C ${remote} rev-list --objects --quiet ${ref}`.nothrow().quiet()).exitCode !== 0) {
+        if (
+          (await $`git -C ${remote} rev-list --objects --quiet ${ref}`.nothrow().quiet())
+            .exitCode !== 0
+        ) {
           await $`git -C ${remote} update-ref -d ${ref}`.quiet();
         }
       }
       await push([`${sha}:refs/workspace/snapshot`, `${sha}:${pinRef(config, sha)}`]);
-      expect((await $`git -C ${remote} rev-list --objects --quiet ${sha}`.nothrow().quiet()).exitCode).toBe(0);
+      expect(
+        (await $`git -C ${remote} rev-list --objects --quiet ${sha}`.nothrow().quiet()).exitCode,
+      ).toBe(0);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -400,7 +449,15 @@ describe("desktop-library routing", () => {
       devTargets: false,
     });
     expect(
-      cargoSelection(["+nightly", "clippy", "--workspace", "--all-targets", "--", "-D", "warnings"]),
+      cargoSelection([
+        "+nightly",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings",
+      ]),
     ).toMatchObject({
       subcommand: "clippy",
       workspace: true,
@@ -422,14 +479,18 @@ describe("desktop-library routing", () => {
     expect(desktopOffenders(["check", "-p", "lib"], requirements)).toEqual([]);
     // cli only needs them through its dev dependencies.
     expect(desktopOffenders(["check", "-p", "cli"], requirements)).toEqual([]);
-    expect(desktopOffenders(["check", "-p", "cli", "--all-targets"], requirements)).toEqual(["cli"]);
+    expect(desktopOffenders(["check", "-p", "cli", "--all-targets"], requirements)).toEqual([
+      "cli",
+    ]);
     expect(desktopOffenders(["test", "-p", "cli"], requirements)).toEqual(["cli"]);
   });
 
   test("workspace-wide runs are offenders unless every desktop package is excluded", () => {
     expect(desktopOffenders(["check", "--workspace"], requirements)).toEqual(["app"]);
     expect(desktopOffenders(["check"], requirements)).toEqual(["app"]);
-    expect(desktopOffenders(["check", "--workspace", "--exclude", "app"], requirements)).toEqual([]);
+    expect(desktopOffenders(["check", "--workspace", "--exclude", "app"], requirements)).toEqual(
+      [],
+    );
   });
 });
 
@@ -446,5 +507,7 @@ test("dbfr is a bounded secondary factory; external repository builds stay on th
   expect(config.host).toBe("vps");
   expect(config.remoteHeavyLock).toContain("/home/ubuntu/build/");
   expect(config.cargoSerial).toContain("/home/ubuntu/build/");
-  expect(remoteRunScript(config, SHA, "vu-routing", ["check"], 2)).toContain("cd /home/ubuntu/build/wsl/vu");
+  expect(remoteRunScript(config, SHA, "vu-routing", ["check"], 2)).toContain(
+    "cd /home/ubuntu/build/wsl/vu",
+  );
 });
