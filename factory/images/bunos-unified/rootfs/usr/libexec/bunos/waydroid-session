@@ -4,8 +4,11 @@
 # windows are COSMIC toplevels. Waydroid's user manager writes ~/.local/share/applications/waydroid.*.desktop
 # for every Android app, which the COSMIC launcher and app library list next to the Linux and web apps.
 set -u
+# `waydroid status` reports `Container:` only after this session has asked the root D-Bus manager to start
+# LXC. Waiting for that line here deadlocks the first session: this autostart is the caller that starts it.
 i=0
-until waydroid status 2>/dev/null | grep -q '^Container:'; do
+until dbus-send --system --print-reply --dest=org.freedesktop.DBus \
+  /org/freedesktop/DBus org.freedesktop.DBus.NameHasOwner string:id.waydro.Container 2>/dev/null | grep -q 'boolean true'; do
   i=$((i + 1)); [ $i -gt 90 ] && exit 0; sleep 2
 done
 # Android 17 needs minigbm gralloc on the render node before the first boot (waydroid-android17).
