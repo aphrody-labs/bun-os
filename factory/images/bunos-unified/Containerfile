@@ -46,7 +46,7 @@ RUN printf '%s\n' 'path-exclude=/usr/share/doc/*' 'path-include=/usr/share/doc/*
        fonts-noto-core fonts-noto-color-emoji xdg-utils \
        lxc dnsmasq-base python3 python3-gi python3-dbus gir1.2-glib-2.0 python3-gbinder libgbinder libglibutil \
        libnss3 libatk-bridge2.0-0t64 libcups2t64 libxkbcommon0 libgbm1 libasound2t64 libxdamage1 libxrandr2 libxcomposite1 \
-       socat zstd xz-utils grim rclone fuse3 make \
+       socat zstd xz-utils grim rclone fuse3 make unzip wl-clipboard \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /var/log/apt/* /var/log/dpkg.log
 
 FROM base AS session
@@ -62,11 +62,16 @@ ADD --checksum=sha256:${BUN_LICENSE_SHA256} ${BUN_LICENSE_URL} /usr/share/licens
 # Helium (imputnet/helium-linux, the source of our vendor/helium-linux fork); replaced by the fork build when the
 # Chromium lane publishes it. Ozone/Wayland, the browser and the PWA host of every web app.
 ADD --checksum=sha256:${HELIUM_SHA256} ${HELIUM_URL} /tmp/helium.tar.xz
+# Waydroid's optional host clipboard service imports pyclip; the Wayland backend requires wl-clipboard.
+ADD --checksum=sha256:a7b7ea2cfad2dd61e86a529af588d006070d3eb0bd32981afaee5215f4604fec \
+  https://files.pythonhosted.org/packages/7d/4f/4b02e2c232ddf694bca0baea3049b886eeb80ee3d89c415067f5191596c1/pyclip-0.7.0-py3-none-any.whl /tmp/pyclip.whl
 RUN tar -xzf /tmp/bun.tgz -C /tmp && install -m755 /tmp/package/bin/bun /usr/bin/bun && ln -sf bun /usr/bin/bunx \
   && install -d /opt/helium && tar -xJf /tmp/helium.tar.xz -C /opt/helium --strip-components=1 \
   && ln -sf /opt/helium/helium-wrapper /usr/bin/helium \
   && install -Dm644 /opt/helium/product_logo_256.png /usr/share/icons/hicolor/256x256/apps/helium.png \
-  && rm -rf /tmp/bun.tgz /tmp/package /tmp/helium.tar.xz
+  && install -d /usr/lib/python3/dist-packages \
+  && unzip -q /tmp/pyclip.whl -d /usr/lib/python3/dist-packages \
+  && rm -rf /tmp/bun.tgz /tmp/package /tmp/helium.tar.xz /tmp/pyclip.whl
 # Fork builds (native-apps lane: COSMIC set, Rio, Spacedrive, Aphrody Chat/Search) override Pop's packages.
 COPY debs/ /tmp/debs/
 RUN set -e; if ls /tmp/debs/*.deb >/dev/null 2>&1; then apt-get update && apt-get install -y --allow-downgrades /tmp/debs/*.deb \
