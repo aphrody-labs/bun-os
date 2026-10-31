@@ -28,7 +28,7 @@ pub async fn run_web_pipeline(args: Vec<String>) -> miette::Result<serde_json::V
         }
         WebAction::DesignSync(args) => design_sync::run(args).await,
         _ => Err(miette!(
-            "Web pipeline accepts crawl-index and design-sync actions"
+            "Web pipeline accepts crawl-index only; Dragon Ball ingestion is owned by Shenron"
         )),
     }
 }

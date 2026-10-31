@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: Apache-2.0
+# Local-only, ephemeral result cache for Aphrody RAG. SQLite remains the durable index/frontier.
+services:
+  redis:
+    image: redis:8.10.3-alpine
+    pull_policy: missing
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --bind
+      - 0.0.0.0
+      - --protected-mode
+      - "yes"
+      - --maxmemory
+      - 512mb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    ports:
+      - "127.0.0.1:6379:6379"
+    mem_limit: 768m
+    pids_limit: 128
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: [CMD, redis-cli, -h, 127.0.0.1, ping]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      start_period: 5s
+    networks:
+      - aphrody-redis
+
+networks:
+  aphrody-redis:
+    name: aphrody-redis
+    internal: true

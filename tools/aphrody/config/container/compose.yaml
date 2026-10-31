@@ -73,6 +73,7 @@ services:
     env_file: [/etc/aphrody/aphrody-mcp-http.env, /etc/aphrody/discord-debate-rag.env]
     environment:
       HOME: /home/ubuntu
+      APHRODY_REDIS_URL: redis://127.0.0.1:6379
       XDG_CACHE_HOME: /home/ubuntu/.aphrody/xdg/cache
       XDG_CONFIG_HOME: /home/ubuntu/.aphrody/xdg/config
       XDG_DATA_HOME: /home/ubuntu/.aphrody/xdg/data

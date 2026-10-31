@@ -21,12 +21,17 @@
 
 #![cfg(not(target_arch = "wasm32"))]
 
-use std::{path::PathBuf, sync::Arc};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+    time::{Instant, UNIX_EPOCH},
+};
 
 use aphrody_config::{EmbedBackend, RagConfig};
 use aphrody_rag::{
     LlamaServerEmbedder, LlamaServerReranker, OpenAiCompatEmbedder, RagSearcher, RagStore,
-    SearchMode, SearchOptions, rerank_available, resolve_embed, resolve_rerank,
+    RedisRagCache, SearchMode, SearchOptions, SearchResult, rerank_available, resolve_embed,
+    resolve_rerank,
 };
 use rmcp::schemars::{self, JsonSchema};
 use serde::Deserialize;
@@ -45,8 +50,7 @@ fn db_path() -> Option<PathBuf> {
 
 /// Open the store without creating one: an absent index is reported, never
 /// silently replaced by an empty database.
-fn open_store() -> Result<Arc<RagStore>, String> {
-    let path = db_path().ok_or("no home directory and $APHRODY_RAG_DB unset")?;
+fn open_store(path: &Path) -> Result<Arc<RagStore>, String> {
     if !path.is_file() {
         return Err(format!(
             "RAG index not found at {} (build it with `aphrody rag index <dir>` or set \
@@ -54,9 +58,75 @@ fn open_store() -> Result<Arc<RagStore>, String> {
             path.display()
         ));
     }
-    RagStore::open(&path)
+    RagStore::open(path)
         .map(Arc::new)
         .map_err(|error| format!("{}: {error}", path.display()))
+}
+
+fn hash_field(hasher: &mut blake3::Hasher, field: &[u8]) {
+    hasher.update(&field.len().to_le_bytes());
+    hasher.update(field);
+}
+
+/// A short-lived cache key that separates profiles and changes when SQLite or its WAL changes.
+/// Provider settings are hashed into the key; credentials never become Redis key text.
+fn search_cache_key(path: &Path, req: &RagSearchRequest) -> String {
+    let mut hasher = blake3::Hasher::new();
+    hash_field(&mut hasher, b"aphrody-mcp-rag-search-v1");
+    hash_field(&mut hasher, path.as_os_str().to_string_lossy().as_bytes());
+    hash_field(&mut hasher, req.query.as_bytes());
+    hash_field(
+        &mut hasher,
+        &req.limit.unwrap_or(8).clamp(1, 50).to_le_bytes(),
+    );
+    if let Some(prefix) = &req.path_prefix {
+        hash_field(&mut hasher, prefix.as_bytes());
+    } else {
+        hash_field(&mut hasher, b"");
+    }
+
+    for suffix in ["", "-wal"] {
+        let candidate = PathBuf::from(format!("{}{suffix}", path.display()));
+        hash_field(
+            &mut hasher,
+            candidate.as_os_str().to_string_lossy().as_bytes(),
+        );
+        if let Ok(metadata) = std::fs::metadata(&candidate) {
+            hash_field(&mut hasher, &metadata.len().to_le_bytes());
+            let modified = metadata
+                .modified()
+                .ok()
+                .and_then(|value| value.duration_since(UNIX_EPOCH).ok())
+                .map_or(0, |value| value.as_nanos());
+            hash_field(&mut hasher, &modified.to_le_bytes());
+        } else {
+            hash_field(&mut hasher, b"missing");
+        }
+    }
+
+    let mut provider_settings: Vec<_> = std::env::vars()
+        .filter(|(name, _)| {
+            name == "APHRODY_RAG_API_KEY"
+                || name.starts_with("APHRODY_AI_EMBED_")
+                || name.starts_with("APHRODY_AI_RERANK_")
+                || name.starts_with("APHRODY_RAG_EMBED_")
+                || name.starts_with("APHRODY_RAG_RERANK_")
+        })
+        .collect();
+    provider_settings.sort_unstable_by(|left, right| left.0.cmp(&right.0));
+    for (name, value) in provider_settings {
+        hash_field(&mut hasher, name.as_bytes());
+        hash_field(&mut hasher, value.as_bytes());
+    }
+
+    format!("aphrody:mcp:rag:search:{}", hasher.finalize().to_hex())
+}
+
+fn search_cache() -> RedisRagCache {
+    let url = std::env::var("APHRODY_REDIS_URL")
+        .or_else(|_| std::env::var("REDIS_URL"))
+        .ok();
+    RedisRagCache::from_url(url.as_deref(), Some("aphrody:mcp:rag:"))
 }
 
 /// Resolve and construct the query embedder, honouring
@@ -153,7 +223,19 @@ async fn run(req: &RagSearchRequest) -> Result<aphrody_rag::SearchResult, String
     if req.query.trim().is_empty() {
         return Err("query is empty".into());
     }
-    let mut searcher = RagSearcher::new(open_store()?);
+    let path = db_path().ok_or("no home directory and $APHRODY_RAG_DB unset")?;
+    let store = open_store(&path)?;
+    let started = Instant::now();
+    let cache = search_cache();
+    let cache_key = search_cache_key(&path, req);
+    if let Some(cached) = cache.get(&cache_key).await
+        && let Ok(mut result) = serde_json::from_str::<SearchResult>(&cached)
+    {
+        result.elapsed_ms = u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX);
+        return Ok(result);
+    }
+
+    let mut searcher = RagSearcher::new(store);
     if let Some(embedder) = embedder_from_env().await? {
         searcher = searcher.with_embedder(embedder);
     }
@@ -168,10 +250,16 @@ async fn run(req: &RagSearchRequest) -> Result<aphrody_rag::SearchResult, String
         path_prefix: req.path_prefix.clone(),
         ..SearchOptions::default()
     };
-    searcher
+    let result = searcher
         .search(&req.query, &opts)
         .await
-        .map_err(|error| error.to_string())
+        .map_err(|error| error.to_string())?;
+    if let Ok(encoded) = serde_json::to_string(&result) {
+        // Search results are derived data. Keep this TTL short so an index update is visible
+        // promptly even when the SQLite file metadata has coarse timestamp resolution.
+        let _ = cache.set_ex(&cache_key, &encoded, 60).await;
+    }
+    Ok(result)
 }
 
 /// Ranked hits as JSON.

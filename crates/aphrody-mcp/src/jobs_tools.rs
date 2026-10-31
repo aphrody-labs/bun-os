@@ -206,10 +206,10 @@ fn build_spec(req: &JobSubmitRequest) -> Result<JobSpec, String> {
         if args.iter().any(|arg| !arg.is_string())
             || !matches!(
                 args.first().and_then(serde_json::Value::as_str),
-                Some("crawl-index" | "dragon-ball")
+                Some("crawl-index")
             )
         {
-            return Err("web-pipeline args must start with crawl-index or dragon-ball".into());
+            return Err("web-pipeline args must start with crawl-index".into());
         }
     }
     let mut spec = JobSpec::new(kind, payload);

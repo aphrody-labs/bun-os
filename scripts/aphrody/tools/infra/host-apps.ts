@@ -19,7 +19,7 @@ export function hostAppFiles(host: (typeof HOSTS)[number], layout: HostLayout, r
     [join(repo, "tools/aphrody/config/container/compose.yaml"), join(layout.apps, "aphrody", "compose.yaml")],
   ];
   if (host === "vps") {
-    for (const app of ["komodo"]) {
+    for (const app of ["komodo", "redis"]) {
       files.push([
         join(repo, "infra/config/host/apps/vps", app, "compose.yaml"),
         join(layout.apps, app, "compose.yaml"),

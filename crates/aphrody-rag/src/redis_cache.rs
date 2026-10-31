@@ -29,8 +29,10 @@ pub struct RedisRagCache {
 }
 
 impl RedisRagCache {
-    /// Create a cache instance from an optional `REDIS_URL` (e.g. `redis://127.0.0.1:6379/1`).
-    /// If `url` is None, empty, or unparseable, caching operations will gracefully no-op.
+    /// Create a cache instance from an optional unauthenticated loopback `REDIS_URL`
+    /// (e.g. `redis://127.0.0.1:6379/1`). This RESP client does not implement Redis AUTH or TLS;
+    /// credentials, TLS, and non-loopback hosts are disabled instead of being used as plaintext.
+    /// If `url` is None, empty, unsupported, or unparseable, caching operations gracefully no-op.
     pub fn from_url(url: Option<&str>, prefix: Option<&str>) -> Self {
         let prefix = prefix.unwrap_or("aphrody:rag:").to_string();
         let Some(raw) = url.map(str::trim).filter(|s| !s.is_empty()) else {
@@ -56,7 +58,35 @@ impl RedisRagCache {
             }
         };
 
+        // This client speaks plaintext RESP without AUTH. Never silently ignore credentials or
+        // the `rediss` scheme: callers should use an explicitly supported local cache endpoint.
+        if parsed.scheme() != "redis"
+            || !parsed.username().is_empty()
+            || parsed.password().is_some()
+        {
+            return Self {
+                host: "127.0.0.1".to_string(),
+                port: 6379,
+                db: 0,
+                prefix,
+                enabled: false,
+            };
+        }
+
         let host = parsed.host_str().unwrap_or("127.0.0.1").to_string();
+        if host != "localhost"
+            && !host
+                .parse::<std::net::IpAddr>()
+                .is_ok_and(|address| address.is_loopback())
+        {
+            return Self {
+                host: "127.0.0.1".to_string(),
+                port: 6379,
+                db: 0,
+                prefix,
+                enabled: false,
+            };
+        }
         let port = parsed.port().unwrap_or(6379);
         let db = parsed
             .path()

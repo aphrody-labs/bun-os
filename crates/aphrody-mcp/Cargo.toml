@@ -95,6 +95,7 @@ aphrody-a2a = { path = "../aphrody-a2a", version = "1.4.7", features = [] }
 aphrody-a2a-server = { path = "../aphrody-a2a-server", version = "1.4.7", default-features = false, features = [] }
 aphrody-git = { package = "bun_git", path = "../bun-os-git", version = "1.4.7" }
 anyhow = "1.0.104"
+blake3 = "1.8.7"
 clap = { version = "4.6.6", features = ["derive", "env", "color"] }
 tokio = { version = "1.53.1", features = ["process", "rt-multi-thread", "macros", "time", "signal", "sync", "fs", "io-util", "full"] }
 serde = { version = "1.0.228", features = ["derive", "std"], default-features = false }

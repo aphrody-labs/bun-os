@@ -7,4 +7,5 @@ include:
   # tools/config/container/compose.yaml: the idle aphrody-build container (profile build).
   - aphrody/compose.yaml
   - komodo/compose.yaml
+  - redis/compose.yaml
   - webos/compose.yaml
