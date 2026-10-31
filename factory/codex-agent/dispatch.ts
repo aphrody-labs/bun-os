@@ -271,8 +271,8 @@ function commitAndPush(task: Task, before: Map<string, string>, report: string):
     changed.push(p);
   }
   if (!changed.length) return { left };
-  const first = (report.split("\n").find(l => l.trim()) ?? task.prompt).replace(/^[#*\s-]+/, "");
-  const msg = `${first.length > 72 ? first.slice(0, 72) : first}\n\nCodex Luna ${task.role} task ${task.id} (from ${task.from}).`;
+  const subject = task.prompt.split("\n").find(l => l.trim())?.trim().replace(/\s+/g, " ") ?? task.id;
+  const msg = `${task.role}: ${subject.slice(0, 64)}\n\nCodex Luna ${task.role} task ${task.id} (from ${task.from}).`;
   sh("git", ["add", "--", ...changed], { env: GIT_ID });
   const cm = sh("git", ["commit", "-q", "-m", msg, "--", ...changed], { env: GIT_ID });
   if (cm.code !== 0) return { left: [...left, `commit failed: ${cm.out.slice(0, 200)}`] };
