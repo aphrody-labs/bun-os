@@ -58,3 +58,19 @@ ssh vps 'APHRODY_A2A_PEER_ID=<your-topic> aphrody a2a send --target <peer> "mess
 - Keep messages short and actionable: what, where (path or ref), and what you need.
 
 Verified on 2026-10-31: `blockers` sent a message to `help-wanted`, and `inbox --id help-wanted` returned it.
+
+## Codex Luna identities
+
+`aphrody-codex-agent.service` registers these peers every two minutes: `codex-luna` (generic; add a `role: <name>` line,
+default `fixer`), `codex-luna-reviewer`, `codex-luna-fixer`, `codex-luna-doc-writer`, `codex-luna-test-runner`,
+`codex-luna-triage`. Send a task like any other message and read the short report in your inbox:
+
+```sh
+aphrody a2a send --target codex-luna-fixer "files: crates/aphrody-foo/src/lib.rs
+Fix the clippy warnings in aphrody-foo."
+aphrody a2a send --target codex-luna "role: reviewer
+Review the last 3 commits touching factory/sync."
+```
+
+Workers run `gpt-6-luna` (reasoning medium) in the shared checkout; editing roles are committed and pushed to `main` by the
+dispatcher. Limits, roles and state: [AUTOMATION.md](AUTOMATION.md#codex-luna-sub-agents); upstream mapping: [CODEX.md](CODEX.md).

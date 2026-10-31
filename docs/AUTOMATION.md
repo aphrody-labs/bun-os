@@ -102,6 +102,35 @@ The nightly run:
 4. runs `qualify-gemini.ts --json` across the layers;
 5. publishes the screenshots and results on the status page and posts the daily digest to the a2a `product` topic.
 
+## Codex Luna sub-agents
+
+Cheap, bounded routine work goes to Codex (`gpt-6-luna`, reasoning `medium`) workers that act like Claude sub-agents.
+Source: `factory/codex-agent/` (`roles.ts`, `dispatch.ts`); CLI: `aphrody codex agent …` (or `bun factory/codex-agent/dispatch.ts …`).
+Background and crate map: [CODEX.md](CODEX.md).
+
+- **Services**: `aphrody-codex-app-server.service` (real `codex app-server`, `ws://127.0.0.1:4500`, loopback) and
+  `aphrody-codex-agent.service` (the dispatcher). Both run in `build.slice` (CPUWeight 20, nice 10), `Restart=always`, so
+  WebOS and the interactive units keep priority. Unit sources: `infra/config/host/systemd/aphrody/`.
+- **Workers**: `codex exec -m gpt-6-luna -c model_reasoning_effort="medium" -s <sandbox> -C ~/src/bun-os --json --ephemeral -o <result>`
+  in the single checkout. Editing roles use `workspace-write`; the dispatcher (not the sandboxed worker) then commits the
+  files the worker changed, as `aphrody-dev`, pulls with rebase and pushes to `main` (never forced). Files that were
+  already dirty before the task, or lie outside a declared file set, are left alone and reported.
+- **Roles**: `reviewer` (read-only review), `fixer` (lint/format/small defects, commits), `doc-writer` (docs only, commits),
+  `test-runner` (runs the VPS gate or a named check, no commits), `triage` (read-only failure triage). `aphrody codex agent roles` lists them.
+- **Limits** (`~/apps/aphrody/shared/coord/codex-agent/config.json` or `CODEX_AGENT_*` env): 3 concurrent workers, 20 minutes
+  per task, 30M tokens per day and 600M in total (the ChatGPT login has no per-call price, so the cap counts tokens; at the
+  cap tasks end as `capped`). Committing tasks with overlapping file sets run one after the other; a committing task
+  without a file set is exclusive. The push uses `BUNOS_GATE_STEPS=stale-overwrite,shell-syntax` so another agent's red
+  `check`/`lint`/`format` step does not block a worker's own change; the nightly gate still judges main.
+- **State and logs**: `~/apps/aphrody/shared/coord/codex-agent/{queue,running,done,results,logs}`, `ledger.jsonl` (tokens per task).
+  `aphrody codex agent status` prints queue, running tasks, recent results and the budget.
+- **Delegating**: `aphrody codex agent run --role fixer --files path1,path2 "task"` (waits), `… queue …` (returns an id),
+  `--product-line N|text` adds a `docs/PRODUCT.md` line to the prompt, or send an a2a message to `codex-luna-<role>`
+  (or `codex-luna` with a `role: <name>` line; optional `files: a,b` line). The short report comes back to the sender's inbox.
+- **Automation hooks**: the dispatcher queues one `triage` task per red gate commit (reads `~/.local/state/bunos-sync/gate.json`,
+  every 5 minutes); the coordinator can call `agent lint-sweep`, `agent doc-sync` and `agent gate-triage` for routine work
+  before it spends a Codex/Claude peer run (`aphrody a2a invoke`) on it.
+
 ## Human gates removed
 
 - `buncc store --run` submits as soon as the Partner Center credentials exist (exit 3 while it waits).

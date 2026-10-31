@@ -3,6 +3,15 @@
   "description": "Bun OS Rust base: one aphrody-labs fork per project, pinned as a gitlink submodule (branch `aphrody` = upstream point + Bun OS patches). factory/rustbase/rust-base.ts builds, packages and qualifies the `build` entries on the VPS; docs/RUST-BASE.md renders this file.",
   "observedAt": "2026-10-30",
   "components": {
+    "codex": {
+      "path": "vendor/codex",
+      "fork": "aphrody-labs/codex",
+      "upstream": "openai/codex",
+      "ref": "main",
+      "replaces": "none: the real Codex binary, app-server and exec workers (docs/CODEX.md)",
+      "consumers": ["aphrody codex exec/doctor/agent", "aphrody-codex-app-server.service", "aphrody-codex-agent.service", "aphrody a2a invoke codex"],
+      "licenses": ["LICENSE", "NOTICE"]
+    },
     "uutils-coreutils": {
       "path": "vendor/uutils/coreutils",
       "fork": "aphrody-labs/uutils-coreutils",
