@@ -31,7 +31,7 @@ toolchain gap is closed), **native** (no upstream owner).
 | `aphrody-app-server` | `app-server`, `app-server-transport` | reimplemented: Codex-shaped subset (threads, turns, streaming lifecycle) driving `aphrody-agent-runtime`; the real server runs in the service above |
 | `aphrody-app-protocol` | `app-server-protocol` | reimplemented, wasm32-safe v2 JSON-RPC types; reusable for the Tier-1 pairs when `codex-app-server-protocol` builds for wasm32 |
 | `aphrody-agent-proto` | `protocol` (Submission/Event queues, `Op`, `EventMsg`) | inspired subset, NDJSON, wasm |
-| `aphrody-guard` | `process-hardening`, `shell-command` | inspired (pre-main hardening, safe-command classification); reusable: `codex-process-hardening` |
+| `aphrody-guard` | `process-hardening`, `shell-command` | inspired (pre-main hardening and safe-command classification) |
 | `aphrody-engine` | `core` (turn loop), `thread-manager-sample` | inspired: unified turn loop over `ModelClient` streams mapped to SQ/EQ events |
 | `aphrody-config` | `config`, `config-schema`, `model-provider-info` | reimplemented shape of `ConfigToml`; reads `~/.codex/config.toml` through `load_codex_compat_layer` |
 | `aphrody-patch` | `apply-patch` | inspired: same `*** Begin Patch` format; reusable: `codex-apply-patch` |
