@@ -36,7 +36,7 @@ class GalleryTest {
         compose.onNodeWithText("Bonjour Yoyo").assertIsDisplayed()
         compose.onNodeWithTag("nav-SETTINGS").performClick()
         compose.onNodeWithTag("theme-DARK").performClick().assertIsSelected()
-        compose.onNodeWithTag("dynamic-color").assertIsOn().performClick().assertIsOff()
+        compose.onNodeWithTag("dynamic-color").assertIsOff().performClick().assertIsOn()
         compose.onNodeWithTag("nav-COMPONENTS").performClick()
         compose.onNodeWithText("Yoyo").assertIsDisplayed()
         compose.activityRule.scenario.recreate()

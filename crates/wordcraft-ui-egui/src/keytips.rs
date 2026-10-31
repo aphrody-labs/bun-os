@@ -371,7 +371,6 @@ fn controls(tab: &str) -> Vec<Control> {
         ],
         "Help" => vec![
             d("Help", "about"),
-            c("Community Discord", "ui.discord"),
             d("Commands", "commands"),
         ],
         "Table Design" => {

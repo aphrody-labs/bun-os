@@ -34,8 +34,10 @@
     "files": [
       "2026-09-30-bun-transfer.json",
       "2026-09-30-oxc-transfer.json",
+      "aphrody-discord-dev-2026-09-29.md",
       "build-factory-2026-10-03.json",
       "private-tunnel-2026-10-06.json",
+      "discord-ai-lab-2026-10-07.json",
       "pc-connectivity-2026-10-07.json",
       "ssh-mesh-2026-10-08.json",
       "targets.json",
@@ -77,6 +79,15 @@
   ],
   "units": [
     {
+      "service": "aphrody-webos",
+      "unit": "aphrody-webos.service",
+      "path": "systemd/aphrody/aphrody-webos.service",
+      "dropIns": [],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps",
+      "site": "aphrody.com"
+    },
+    {
       "service": "aphrody-web-browser-vps",
       "unit": "aphrody-web-browser-vps.service",
       "path": "systemd/aphrody/aphrody-web-browser-vps.service",
@@ -99,6 +110,15 @@
       "dropIns": ["sandbox-base", "sandbox-home-ro"],
       "ownerRepo": "aphrody",
       "targetHost": "vps"
+    },
+    {
+      "service": "aphrody-discord-dev",
+      "unit": "aphrody-discord-dev.service",
+      "path": "systemd/aphrody/aphrody-discord-dev.service",
+      "dropIns": ["run-as-ubuntu", "sandbox-base", "sandbox-home-ro", "sandbox-kernel"],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps",
+      "site": "bot.aphrody.com"
     },
     {
       "service": "aphrody-privileged-kernel",
@@ -183,6 +203,23 @@
       "ownerRepo": "aphrody",
       "targetHost": "vps",
       "pairs": "aphrody-selfheal.service"
+    },
+    {
+      "service": "aphrody-discord-sync",
+      "unit": "aphrody-discord-sync.service",
+      "path": "systemd/aphrody/aphrody-discord-sync.service",
+      "dropIns": [],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps"
+    },
+    {
+      "service": "aphrody-discord-sync-timer",
+      "unit": "aphrody-discord-sync.timer",
+      "path": "systemd/aphrody/aphrody-discord-sync.timer",
+      "dropIns": [],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps",
+      "pairs": "aphrody-discord-sync.service"
     },
     {
       "service": "aphrody-self-update",
@@ -431,6 +468,12 @@
       "ownerRepo": "aphrody",
       "targetHost": "vps",
       "site": "00-default"
+    },
+    {
+      "file": "nginx/shared/source-tunnel-auth.conf",
+      "ownerRepo": "aphrody",
+      "targetHost": "vps",
+      "site": "source-tunnel-auth"
     }
   ]
 }

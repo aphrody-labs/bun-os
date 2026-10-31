@@ -426,13 +426,7 @@ fn about_main(
     ui.add_space(12.0);
     ui.label(tr("A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps."));
     ui.add_space(14.0);
-    let links: [(Icon, &str, &str, &'static str); 4] = [
-        (
-            Icon::Chat,
-            "Join the ArtCraft Discord",
-            effectcraft_engine::links::DISCORD,
-            "help.discord",
-        ),
+    let links: [(Icon, &str, &str, &'static str); 3] = [
         (
             Icon::Globe,
             "ArtCraft website",
@@ -455,19 +449,16 @@ fn about_main(
     for (icon, label, url, c) in links {
         let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 30.0), Sense::click());
         let p = ui.painter();
-        let discord = c == "help.discord";
         p.rect_filled(
             r,
             6.0,
-            if discord {
-                Color32::from_rgb(0x58, 0x65, 0xf2)
-            } else if resp.hovered() {
+            if resp.hovered() {
                 t.hover
             } else {
                 t.field_bg
             },
         );
-        let foreground = if discord { Color32::WHITE } else { t.text };
+        let foreground = t.text;
         icons::paint(
             p,
             Rect::from_center_size(pos2(r.min.x + 18.0, r.center().y), vec2(15.0, 15.0)),
@@ -486,11 +477,7 @@ fn about_main(
             Align2::RIGHT_CENTER,
             url,
             Tokens::ui(11.0),
-            if discord {
-                Color32::from_white_alpha(200)
-            } else {
-                t.text_dim
-            },
+            t.text_dim,
         );
         app.auto.add(&format!("about.{c}"), r, label);
         if resp.clicked() {

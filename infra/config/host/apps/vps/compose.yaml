@@ -6,7 +6,5 @@ name: aphrody
 include:
   # tools/config/container/compose.yaml: the idle aphrody-build container (profile build).
   - aphrody/compose.yaml
-  - gitea/compose.yaml
   - komodo/compose.yaml
-  - gitea-runner/compose.yaml
   - webos/compose.yaml

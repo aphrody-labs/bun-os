@@ -41,12 +41,6 @@ impl NativeMenu {
         let mut counter = 0usize;
         let app_menu = Submenu::new("CADCraft", true);
         let about = MenuItem::with_id("cc-about", i18n::tr(language, "About CADCraft"), true, None);
-        let discord = MenuItem::with_id(
-            "cc-discord",
-            i18n::tr(language, "Join the ArtCraft Discord…"),
-            true,
-            None,
-        );
         let predefined = vec![
             (
                 "Services",
@@ -78,7 +72,6 @@ impl NativeMenu {
         );
         let _ = app_menu.append_items(&[
             &about,
-            &discord,
             &PredefinedMenuItem::separator(),
             &settings,
             &PredefinedMenuItem::separator(),
@@ -92,14 +85,6 @@ impl NativeMenu {
         items.insert(
             "cc-about".into(),
             ("ui.dialog.about".into(), "About CADCraft".into(), about),
-        );
-        items.insert(
-            "cc-discord".into(),
-            (
-                "ui.discord".into(),
-                "Join the ArtCraft Discord…".into(),
-                discord,
-            ),
         );
         items.insert(
             "cc-settings".into(),
@@ -133,11 +118,7 @@ impl NativeMenu {
     pub fn poll(&mut self, app: &mut CadApp, ctx: &egui::Context) {
         while let Ok(ev) = MenuEvent::receiver().try_recv() {
             if let Some((cmd, _, _)) = self.items.get(ev.id.as_ref()) {
-                if cmd == "ui.discord" {
-                    ctx.open_url(egui::OpenUrl::new_tab("https://discord.gg/artcraft"));
-                } else {
-                    menus::activate(app, &cmd.clone());
-                }
+                menus::activate(app, &cmd.clone());
                 ctx.request_repaint();
             }
         }

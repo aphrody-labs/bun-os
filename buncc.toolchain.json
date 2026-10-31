@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "observedAt": "2026-10-29",
-  "note": "min is the oldest version this repository was built with (observed on the dev machine); latest was read from the official release feed on observedAt. buncc doctor warns when an installed tool is older than min.",
+  "observedAt": "2026-10-30",
+  "note": "min is the oldest version this repository was built with (observed on the dev machine); latest was read from the official release feed on observedAt. buncc doctor warns when an installed tool is older than min. The wasm section pins the toolchains of `buncc build` for bun-ui bundles (packages/buncc/src/ui); `buncc toolchain install <id> --run` installs them under BUNCC_TOOLCHAINS (default ~/build/toolchains).",
   "tools": {
     "cmake": { "min": "4.4.4", "latest": "4.4.5", "source": "gh api repos/Kitware/CMake/releases/latest" },
     "clang": { "min": "23.1.4", "latest": "23.1.4", "source": "gh api repos/llvm/llvm-project/releases/latest (llvmorg-23.1.4)" },
@@ -10,5 +10,44 @@
     "dotnet": { "min": "10.0.401", "latest10": "10.0.13 runtime", "latest11": "11.0.0-rc.3.26522.148", "source": "gh api repos/dotnet/runtime tags" },
     "ninja": { "min": "1.13.0", "source": "ninja 1.13.2 on the dev machine" }
   },
-  "msvc": { "toolset": "14.51", "source": "Visual Studio Build Tools 2026 (18.x) found by vswhere" }
+  "msvc": { "toolset": "14.51", "source": "Visual Studio Build Tools 2026 (18.x) found by vswhere" },
+  "wasm": {
+    "emsdk": {
+      "version": "4.0.7",
+      "latest": "5.0.5",
+      "repo": "https://github.com/emscripten-core/emsdk.git",
+      "note": "4.0.7 is the Emscripten Qt 6.11 supports (doc.qt.io/qt-6.11/wasm.html); 5.0.5 is the one of Qt 6.12. Plain C/C++ and GTK builds may use latest."
+    },
+    "wasi-sdk": {
+      "version": "34",
+      "repo": "https://github.com/WebAssembly/wasi-sdk",
+      "asset": "wasi-sdk-{version}.0-{arch}-linux.tar.gz"
+    },
+    "qt-wasm": {
+      "qtbase": "v6.11.2",
+      "repo": "https://github.com/qt/qtbase.git",
+      "emsdk": "4.0.7",
+      "hostQt": "/usr (system Qt 6.11.2 host tools: moc, rcc, uic)",
+      "configure": ["-platform", "wasm-emscripten", "-release", "-static", "-nomake", "examples", "-nomake", "tests"],
+      "prefix": "qt-wasm/6.11.2/wasm_singlethread"
+    },
+    "rust": {
+      "triples": ["wasm32-unknown-unknown", "wasm32-wasip1", "wasm32-wasip2", "wasm32-unknown-emscripten"],
+      "profiles": {
+        "max": "+simd128,+relaxed-simd,+bulk-memory,+nontrapping-fptoint,+sign-ext,+reference-types,+multivalue,+tail-call,+mutable-globals",
+        "baseline": "+bulk-memory,+nontrapping-fptoint,+sign-ext,+mutable-globals",
+        "threads": "+atomics,+bulk-memory,+mutable-globals,+simd128 (needs -Z build-std=std,panic_abort and COOP/COEP)"
+      },
+      "wasmOpt": "-O4 --all-features"
+    },
+    "servo": {
+      "repo": "https://github.com/aphrody-labs/servo",
+      "upstream": "https://github.com/servo/servo",
+      "build": "./mach build --release (offscreen rendering through the servo crate's embedding API)"
+    },
+    "cef": {
+      "path": "vendor/cef-rs",
+      "build": "cargo run -p export-cef-dir -- --force <dir>, then CEF_PATH=<dir> for cef-rs (CEF off-screen rendering)"
+    }
+  }
 }

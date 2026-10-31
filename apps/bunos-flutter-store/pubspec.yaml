@@ -1,0 +1,22 @@
+name: bunos_store
+description: "Bun OS Store and settings: the Flutter Material 3 front of the WebOS store and server APIs."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Material You wallpaper colours on Android 12+ and desktop accents; Bun OS tokens otherwise.
+  dynamic_color: ^1.8.1
+  # Bun OS Rust core (crates/bunos-flutter-bridge): M3 dynamic colour from crates/aphrody-m3-tokens.
+  flutter_rust_bridge: 2.13.0
+  http: ^1.5.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

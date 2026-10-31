@@ -1,0 +1,25 @@
+{
+  "run_id": "1792518450-10488",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu && APHRODY_INFRA_ROOT=/home/ubuntu aphrody infra --root /home/ubuntu/src/aphrody ssh exec --host vps --json -c 'set -e; mkdir -p /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020; tmux new-session -d -s bun-video-package-qual-20261020 \\\\\"), command: [\"cd\", \"/home/ubuntu/src/bun\"] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu && APHRODY_INFRA_ROOT=/home/ubuntu aphrody infra --root /home/ubuntu/src/aphrody ssh exec --host vps --json -c 'set -e; mkdir -p /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020; tmux new-session -d -s bun-video-package-qual-20261020 \\\\\"), command: [\"cd\", \"/home/ubuntu/src/bun\"] }"
+      }
+    },
+    {
+      "name": "error",
+      "status": "failed",
+      "detail": {
+        "message": "remote command failed with exit code Some(2): bash: -c: line 1: unexpected EOF while looking for matching `''"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "failed",
+  "evidence": []
+}

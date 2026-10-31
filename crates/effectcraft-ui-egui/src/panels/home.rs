@@ -354,7 +354,6 @@ fn rail_ui(
     }
     // Community links at the foot (below the pages when the window is short).
     let links = [
-        (Icon::Chat, "Join the ArtCraft Discord", "help.discord"),
         (Icon::Globe, "getartcraft.com", "help.website"),
         (Icon::Globe, "EffectCraft home page", "help.appPage"),
         (Icon::Code, "EffectCraft on GitHub", "help.github"),
@@ -378,13 +377,10 @@ fn rail_ui(
     for (icon, label, cmd) in links {
         let r = Rect::from_min_size(pos2(x0, cy), vec2(w, 26.0));
         let resp = ui.interact(r, egui::Id::new(("home-link", cmd)), Sense::click());
-        let discord = cmd == "help.discord";
-        if discord {
-            p.rect_filled(r, 13.0, Color32::from_rgb(0x58, 0x65, 0xf2));
-        } else if resp.hovered() {
+        if resp.hovered() {
             p.rect_filled(r, 13.0, t.hover);
         }
-        let col = if discord { Color32::WHITE } else { t.text };
+        let col = t.text;
         icons::paint(
             p,
             Rect::from_center_size(pos2(r.min.x + 16.0, r.center().y), vec2(13.0, 13.0)),
@@ -860,7 +856,6 @@ mod tests {
             "home.file.open",
             "home.app.newComp",
             "home.file.openDemoProject",
-            "home.help.discord",
             "home.help.github",
             "home.recent.0",
             "home.filter",

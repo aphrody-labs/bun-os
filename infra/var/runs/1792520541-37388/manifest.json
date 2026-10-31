@@ -1,0 +1,18 @@
+{
+  "run_id": "1792520541-37388",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"ls -lh /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2; rg -n -C 2 'whisper-webgpu|video-matting|error:' /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/library-build.stderr.log | head -35\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"ls -lh /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2; rg -n -C 2 'whisper-webgpu|video-matting|error:' /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/library-build.stderr.log | head -35\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

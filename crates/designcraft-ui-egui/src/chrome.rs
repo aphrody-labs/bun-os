@@ -123,11 +123,6 @@ pub fn app_bar(app: &mut DesignApp, ui: &mut egui::Ui) {
                         if icons::button(ui, "share", 22.0, false, crate::i18n::tr(&app.ui.language, "Share")).clicked() {
                             app.status("Export a PDF, IDML or package to share — no cloud account needed.");
                         }
-                        ui.add_space(8.0);
-                        // Always one click away: the ArtCraft community Discord.
-                        if crate::about::discord_button(ui, "Discord", vec2(78.0, 22.0)) {
-                            let _ = app.run("help.discord", json!({}));
-                        }
                         tools_start = ui.min_rect().min.x;
                         ui.min_rect().width()
                     });
@@ -1108,7 +1103,7 @@ pub fn start_screen(app: &mut DesignApp, ui: &mut egui::Ui) {
     let _ = Content::Unassigned;
 }
 
-/// Start screen: the ArtCraft community (Discord first) and project links.
+/// Start screen: the ArtCraft community and project links.
 fn community_card(app: &mut DesignApp, ui: &mut egui::Ui) {
     let t = Tokens::get(ui.ctx());
     egui::Frame::NONE
@@ -1166,15 +1161,6 @@ fn community_card(app: &mut DesignApp, ui: &mut egui::Ui) {
                             ui.add_space(8.0);
                         }
                     });
-                });
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if crate::about::discord_button(
-                        ui,
-                        crate::i18n::tr(&app.ui.language, "Join our Discord"),
-                        vec2(190.0, 38.0),
-                    ) {
-                        let _ = app.run("help.discord", json!({}));
-                    }
                 });
             });
         });

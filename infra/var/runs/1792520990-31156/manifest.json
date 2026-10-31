@@ -1,0 +1,18 @@
+{
+  "run_id": "1792520990-31156",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"hostname; cd /home/ubuntu/src/bun && bun factory slots\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"hostname; cd /home/ubuntu/src/bun && bun factory slots\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

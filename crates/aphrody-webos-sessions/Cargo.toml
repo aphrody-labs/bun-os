@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aphrody-webos-sessions"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license = "Apache-2.0"
+description = "Per-user Bun OS session containers of aphrody.com (ADR-003): one hardened container of the unified image per signed-in user over the Docker Engine API, idle reaping, stream backend lookup."
+publish = false
+
+[dependencies]
+anyhow = { workspace = true, features = ["std"] }
+aphrody-webos-protocol = { path = "../aphrody-webos-protocol", version = "1.4.7" }
+axum = { workspace = true, features = ["json", "tokio", "http1"] }
+bollard = "0.18"
+getrandom = { workspace = true, features = ["std"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "net", "time", "sync", "fs"] }
+
+[lints]
+workspace = true

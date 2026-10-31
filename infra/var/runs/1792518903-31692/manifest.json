@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518903-31692",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"tail -n 30 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final/run.log; bun run /home/ubuntu/src/bun/scripts/factory/factory.ts slots\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"tail -n 30 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final/run.log; bun run /home/ubuntu/src/bun/scripts/factory/factory.ts slots\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

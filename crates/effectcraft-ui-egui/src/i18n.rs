@@ -1441,11 +1441,6 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
         "Reveal Logging File",
         "显示日志记录文件",
     ),
-    (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "加入 ArtCraft 的 Discord 社区...",
-    ),
     ("help.reportIssue", "Provide Feedback...", "提供反馈..."),
     ("help.website", "ArtCraft Website", "ArtCraft 网站"),
     ("help.appPage", "EffectCraft Home Page", "EffectCraft 主页"),
@@ -2587,11 +2582,6 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
     ),
     ("help.enableLogging", "Enable Logging", "啟用日誌記錄"),
     ("help.revealLogFile", "Reveal Logging File", "顯示日誌檔案"),
-    (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "加入 ArtCraft 的 Discord 社群...",
-    ),
     ("help.reportIssue", "Provide Feedback...", "提供意見..."),
     ("help.website", "ArtCraft Website", "ArtCraft 網站"),
     ("help.appPage", "EffectCraft Home Page", "EffectCraft 首頁"),
@@ -4077,11 +4067,6 @@ const JAPANESE: &[(&str, &str, &str)] = &[
         "help.revealLogFile",
         "Reveal Logging File",
         "ログファイルを表示",
-    ),
-    (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "ArtCraft Discordに参加...",
     ),
     (
         "help.reportIssue",
@@ -5635,11 +5620,6 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
         "help.revealLogFile",
         "Reveal Logging File",
         "Показати файл журналу",
-    ),
-    (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "Приєднатися до Discord ArtCraft...",
     ),
     (
         "help.reportIssue",
@@ -7230,11 +7210,6 @@ const SPANISH: &[(&str, &str, &str)] = &[
         "help.revealLogFile",
         "Reveal Logging File",
         "Mostrar archivo de registro",
-    ),
-    (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "Unirse al Discord de ArtCraft...",
     ),
     (
         "help.reportIssue",
@@ -8841,11 +8816,6 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
         "Revelar arquivo de log",
     ),
     (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "Entrar no Discord do ArtCraft...",
-    ),
-    (
         "help.reportIssue",
         "Provide Feedback...",
         "Enviar comentários...",
@@ -10390,11 +10360,6 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
         "help.revealLogFile",
         "Reveal Logging File",
         "Показать файл журнала",
-    ),
-    (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "Присоединяйтесь к Discord ArtCraft...",
     ),
     (
         "help.reportIssue",
@@ -12001,11 +11966,6 @@ const FRENCH: &[(&str, &str, &str)] = &[
         "Révéler le fichier journal",
     ),
     (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "Rejoindre le Discord ArtCraft...",
-    ),
-    (
         "help.reportIssue",
         "Provide Feedback...",
         "Envoyer des commentaires...",
@@ -13542,11 +13502,6 @@ const GERMAN: &[(&str, &str, &str)] = &[
         "Protokolldatei anzeigen",
     ),
     (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "ArtCraft-Discord beitreten...",
-    ),
-    (
         "help.reportIssue",
         "Provide Feedback...",
         "Feedback senden...",
@@ -15062,11 +15017,6 @@ const CZECH: &[(&str, &str, &str)] = &[
         "help.revealLogFile",
         "Reveal Logging File",
         "Zobrazit soubor protokolu",
-    ),
-    (
-        "help.discord",
-        "Join the ArtCraft Discord...",
-        "Připojit se na Discord ArtCraft...",
     ),
     (
         "help.reportIssue",

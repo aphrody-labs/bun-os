@@ -1,0 +1,18 @@
+{
+  "run_id": "1792519163-38992",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cat /home/ubuntu/src/bun/build/media/video-package-qualification/library-build.stdout.log; cat /home/ubuntu/src/bun/build/media/video-package-qualification/library-build.stderr.log; find /home/ubuntu/src/bun/packages/bun-video/dist -maxdepth 2 -type f 2>/dev/null | head\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cat /home/ubuntu/src/bun/build/media/video-package-qualification/library-build.stdout.log; cat /home/ubuntu/src/bun/build/media/video-package-qualification/library-build.stderr.log; find /home/ubuntu/src/bun/packages/bun-video/dist -maxdepth 2 -type f 2>/dev/null | head\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

@@ -4462,15 +4462,6 @@ fn help(app: &mut WordApp, ui: &mut Ui) {
             json!({"name": "about"}),
             false,
         );
-        big(
-            ui,
-            app,
-            "discord",
-            "Community\nDiscord",
-            "ui.discord",
-            json!({}),
-            false,
-        );
     });
     group(ui, "Agents", None, app, |ui, app| {
         big(

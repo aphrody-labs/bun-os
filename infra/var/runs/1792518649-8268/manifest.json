@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518649-8268",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"ps -p 710124,710133 -o pid,etime,%cpu,rss,cmd; bun run /home/ubuntu/src/bun/scripts/factory/factory.ts slots\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"ps -p 710124,710133 -o pid,etime,%cpu,rss,cmd; bun run /home/ubuntu/src/bun/scripts/factory/factory.ts slots\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

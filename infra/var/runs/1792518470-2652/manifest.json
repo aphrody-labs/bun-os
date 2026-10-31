@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518470-2652",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu && APHRODY_INFRA_ROOT=/home/ubuntu aphrody infra --root /home/ubuntu/src/aphrody ssh exec --host vps --json -c 'set -e; mkdir -p /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020; printf '%s' 'IyEvdXNyL2Jpbi9lbnYgYmFzaApjZCAvaG9tZS91YnVudHUvc3JjL2J1bgpleHBvcnQgVE1QRElSPS9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwCmV4cG9ydCBCVU5fVklERU9fVFlQRVNfVkVSU0lPTj0xLjQuNi1hcGhyb2R5LjMKc2V0ICtlCmJ1biBydW4gc2NyaXB0cy9mYWN0b3J5L2ZhY3RvcnkudHMgcnVuIC0tbWF4LXNsb3RzIDEgLS0gYnVuIHBhY2thZ2VzL2J1bi12aWRlby9zY3JpcHRzL3J1bi1wYWNrYWdlLXF1YWxpZmljYXRpb24udHMgLS10eXBlcy12ZXJzaW9uIDEuNC42LWFwaHJvZHkuMyA+IC9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwL3J1bi5sb2cgMj4mMQpjb2RlPSQ/CnByaW50ZiAnXG5FWElUX0NPREU9JXNcbicgIiRjb2RlIiA+PiAvaG9tZS91YnVudHUvYnVpbGQvc3RvcmFnZS90cmFuc2llbnQvYnVuLXZpZGVvLXBhY2thZ2UtcXVhbC0yMDI2MTAyMC9ydW4ubG9nCmV4aXQgIiRjb2RlIg==' | base64 -d > /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/run.sh; chmod 700 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/run.sh; tmux new-session -d -s bun-video-package-qual-20261020 'bash /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/run.sh'; tmux list-sessions | grep bun-video-package-qual-20261020'\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu && APHRODY_INFRA_ROOT=/home/ubuntu aphrody infra --root /home/ubuntu/src/aphrody ssh exec --host vps --json -c 'set -e; mkdir -p /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020; printf '%s' 'IyEvdXNyL2Jpbi9lbnYgYmFzaApjZCAvaG9tZS91YnVudHUvc3JjL2J1bgpleHBvcnQgVE1QRElSPS9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwCmV4cG9ydCBCVU5fVklERU9fVFlQRVNfVkVSU0lPTj0xLjQuNi1hcGhyb2R5LjMKc2V0ICtlCmJ1biBydW4gc2NyaXB0cy9mYWN0b3J5L2ZhY3RvcnkudHMgcnVuIC0tbWF4LXNsb3RzIDEgLS0gYnVuIHBhY2thZ2VzL2J1bi12aWRlby9zY3JpcHRzL3J1bi1wYWNrYWdlLXF1YWxpZmljYXRpb24udHMgLS10eXBlcy12ZXJzaW9uIDEuNC42LWFwaHJvZHkuMyA+IC9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwL3J1bi5sb2cgMj4mMQpjb2RlPSQ/CnByaW50ZiAnXG5FWElUX0NPREU9JXNcbicgIiRjb2RlIiA+PiAvaG9tZS91YnVudHUvYnVpbGQvc3RvcmFnZS90cmFuc2llbnQvYnVuLXZpZGVvLXBhY2thZ2UtcXVhbC0yMDI2MTAyMC9ydW4ubG9nCmV4aXQgIiRjb2RlIg==' | base64 -d > /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/run.sh; chmod 700 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/run.sh; tmux new-session -d -s bun-video-package-qual-20261020 'bash /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/run.sh'; tmux list-sessions | grep bun-video-package-qual-20261020'\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

@@ -1,0 +1,25 @@
+{
+  "run_id": "1792520900-37376",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && bun factory run --slots 1 -- bun bd test ./packages/bun-video/test/media-workflow.test.ts\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && bun factory run --slots 1 -- bun bd test ./packages/bun-video/test/media-workflow.test.ts\"), command: [] }"
+      }
+    },
+    {
+      "name": "error",
+      "status": "failed",
+      "detail": {
+        "message": "SSH command exceeded its configured timeout"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "failed",
+  "evidence": []
+}

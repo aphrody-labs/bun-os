@@ -683,10 +683,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
     ("Insert Variable", "Вставити змінну"),
     ("Inspect Document", "Перевірити документ"),
     ("Interface Color Theme", "Колірна тема інтерфейсу"),
-    (
-        "Join the ArtCraft Discord…",
-        "Приєднатися до Discord ArtCraft…",
-    ),
     ("Last Object Below", "Останній об’єкт нижче"),
     ("Library Contents", "Вміст бібліотеки"),
     ("Library Items", "Елементи бібліотеки"),
@@ -1221,10 +1217,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
         "[Немає] — виберіть колір на шкалі.",
     ),
     (
-        "discord.gg/artcraft — help, feedback and show-and-tell",
-        "discord.gg/artcraft — допомога, відгуки та обмін роботами",
-    ),
-    (
         "⌥-click clears overrides",
         "⌥-клацання скидає перевизначення",
     ),
@@ -1705,7 +1697,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
     ("H&J Violations", "Порушення переносів і вирівнювання"),
     ("Include Bleed", "Включати виліт"),
     ("Include Stroke Weight", "Враховувати товщину обведення"),
-    ("Join our Discord", "Приєднуйтесь до нашого Discord"),
     ("Keep Violations", "Порушення правил утримання рядків"),
     (
         "Overprint [Black] Swatch at 100%",

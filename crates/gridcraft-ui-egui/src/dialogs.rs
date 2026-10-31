@@ -1691,7 +1691,6 @@ fn about(ui: &mut egui::Ui, d: &mut Dialog) {
                 "getartcraft.com/apps/gridcraft",
                 "https://getartcraft.com/apps/gridcraft",
             );
-            ui.hyperlink_to("Join the ArtCraft Discord", "https://discord.gg/artcraft");
         }
     }
 }

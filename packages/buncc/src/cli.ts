@@ -32,6 +32,8 @@ Driver (use as CC / CXX / AR):  buncc cc|c++|ar|link <compiler arguments>
 Toolchains:   doctor [--repo (repository checks only)] [--all] | install <provider> [--run] | env <provider|all> [--shims] | which <tool> | pin
 Workspace:    plan [--affected[=base]] [-p crate] | check|build|test|clippy|fmt [-p crate ...] [--affected[=base]] [--jobs N] [--release] [-- extra]
 C LSP:        lsp [--out dir]          merge the driver's compile log into compile_commands.json and write .clangd
+bun-ui:       build <recipe|ui|ui:<toolkit>> [--max-only|--baseline-only]   iced, libcosmic, Qt, GTK apps -> bun-ui bundles (wasm + glue + bun-ui.json)
+              build servo|cef   native webview engines | toolchain list|install <emsdk|wasi-sdk|qt-wasm> [--run]
 Build:        bundle <entry...> [--minify] [--splitting] | compile <entry> --outfile f [--aot] [--target bun-linux-x64] | aot <entry> --outfile f | wasm ...
 Package:      package <msix|appx|msi|exe|zip> --dir d --out o --name N --publisher P ... | sign ... | store <package>
 Profiles:     profile list|show|apply <id> [--run] | bench aot-bun <entry>
@@ -263,8 +265,21 @@ async function main(): Promise<number> {
       );
       return layers.cycle.length ? 1 : 0;
     }
+    case "toolchain":
+      return (await import("./ui/index.ts")).toolchainCommand(root, rest);
+    case "build": {
+      const target = positional()[0];
+      if (target) {
+        const code = await (await import("./ui/index.ts")).uiBuild(root, target, rest);
+        if (code !== undefined) return code;
+        console.error(
+          `buncc: unknown build target ${target}; bun-ui targets: ui, ui:<toolkit>, ${(await import("./ui/index.ts")).uiTargets()}`,
+        );
+        return 2;
+      }
+    }
+    // falls through: no target is the cargo workspace build
     case "check":
-    case "build":
     case "test":
     case "clippy":
     case "fmt": {

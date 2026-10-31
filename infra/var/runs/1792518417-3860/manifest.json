@@ -1,0 +1,25 @@
+{
+  "run_id": "1792518417-3860",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu && APHRODY_INFRA_ROOT=/home/ubuntu aphrody infra --root /home/ubuntu/src/aphrody ssh exec --host vps --json -c 'git -C /home/ubuntu/src/bun rev-parse HEAD && git -C /home/ubuntu/src/bun status --short --branch && bun factory slots'\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu && APHRODY_INFRA_ROOT=/home/ubuntu aphrody infra --root /home/ubuntu/src/aphrody ssh exec --host vps --json -c 'git -C /home/ubuntu/src/bun rev-parse HEAD && git -C /home/ubuntu/src/bun status --short --branch && bun factory slots'\"), command: [] }"
+      }
+    },
+    {
+      "name": "error",
+      "status": "failed",
+      "detail": {
+        "message": "remote command failed with exit code Some(1): Error: remote command failed with exit code Some(1): fb3039f5db0345e171f2434f0f353d03068febee\n## main...origin/main\nerror: Script not found \"factory\""
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "failed",
+  "evidence": []
+}

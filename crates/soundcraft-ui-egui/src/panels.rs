@@ -777,7 +777,6 @@ fn about(app: &mut SoundApp, ctx: &egui::Context) {
                         "getartcraft.com/apps/soundcraft",
                         "https://getartcraft.com/apps/soundcraft",
                     );
-                    ui.hyperlink_to("Join us on Discord", "https://discord.gg/artcraft");
                 }
             }
         });

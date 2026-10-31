@@ -4,7 +4,7 @@
 # metainfo. It is also the controller-first launcher of the gaming session (Ozone/XMB).
 pkgname=bunos-retroarch
 pkgver=1.22.2.r5f2f529
-pkgrel=1
+pkgrel=2
 _commit=5f2f529b476fbaa165241c19518b76d4bbd98b04
 pkgdesc='Reference frontend for the libretro API (Bun OS fork)'
 arch=('x86_64')
@@ -26,8 +26,9 @@ sha256sums=('SKIP')
 
 build() {
   cd retroarch
-  ./configure --prefix=/usr --sysconfdir=/etc --disable-builtinflac --disable-builtinmbedtls --disable-builtinzlib \
-    --disable-cg --disable-jack --disable-oss --enable-dbus --enable-pipewire --enable-vulkan --enable-wayland
+  # Vulkan, Wayland and PipeWire are autodetected; the options follow Arch's extra/retroarch.
+  # The fork no longer carries the builtin mbedtls/zlib/flac switches.
+  ./configure --prefix=/usr --sysconfdir=/etc --disable-cg --disable-jack --disable-oss --enable-dbus
   make -j4
   make -C libretro-common/audio/dsp_filters
   make -C gfx/video_filters

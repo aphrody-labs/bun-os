@@ -1,0 +1,18 @@
+{
+  "run_id": "1792519022-17976",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"set -e; mkdir -p /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2; printf '%s' 'IyEvdXNyL2Jpbi9lbnYgYmFzaApjZCAvaG9tZS91YnVudHUvc3JjL2J1bgpleHBvcnQgVE1QRElSPS9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwLWZpbmFsMgpleHBvcnQgQlVOX1ZJREVPX1RZUEVTX1ZFUlNJT049MS40LjYtYXBocm9keS4zCnNldCArZQpidW4gcnVuIHNjcmlwdHMvZmFjdG9yeS9mYWN0b3J5LnRzIHJ1biAtLW1heC1zbG90cyAxIC0tIGJ1biBwYWNrYWdlcy9idW4tdmlkZW8vc2NyaXB0cy9ydW4tcGFja2FnZS1xdWFsaWZpY2F0aW9uLnRzIC0tdHlwZXMtdmVyc2lvbiAxLjQuNi1hcGhyb2R5LjMgPiAvaG9tZS91YnVudHUvYnVpbGQvc3RvcmFnZS90cmFuc2llbnQvYnVuLXZpZGVvLXBhY2thZ2UtcXVhbC0yMDI2MTAyMC1maW5hbDIvcnVuLmxvZyAyPiYxCmNvZGU9JD8KcHJpbnRmICdcbkVYSVRfQ09ERT0lc1xuJyAiJGNvZGUiID4+IC9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwLWZpbmFsMi9ydW4ubG9nCmV4aXQgIiRjb2RlIg==' | base64 -d > /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/run.sh; chmod 700 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/run.sh; tmux new-session -d -s bun-video-qual-final2; tmux send-keys -t bun-video-qual-final2 'bash /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/run.sh' C-m; sleep 1; tmux list-sessions | grep bun-video-qual-final2; git -C /home/ubuntu/src/bun rev-parse HEAD\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"set -e; mkdir -p /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2; printf '%s' 'IyEvdXNyL2Jpbi9lbnYgYmFzaApjZCAvaG9tZS91YnVudHUvc3JjL2J1bgpleHBvcnQgVE1QRElSPS9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwLWZpbmFsMgpleHBvcnQgQlVOX1ZJREVPX1RZUEVTX1ZFUlNJT049MS40LjYtYXBocm9keS4zCnNldCArZQpidW4gcnVuIHNjcmlwdHMvZmFjdG9yeS9mYWN0b3J5LnRzIHJ1biAtLW1heC1zbG90cyAxIC0tIGJ1biBwYWNrYWdlcy9idW4tdmlkZW8vc2NyaXB0cy9ydW4tcGFja2FnZS1xdWFsaWZpY2F0aW9uLnRzIC0tdHlwZXMtdmVyc2lvbiAxLjQuNi1hcGhyb2R5LjMgPiAvaG9tZS91YnVudHUvYnVpbGQvc3RvcmFnZS90cmFuc2llbnQvYnVuLXZpZGVvLXBhY2thZ2UtcXVhbC0yMDI2MTAyMC1maW5hbDIvcnVuLmxvZyAyPiYxCmNvZGU9JD8KcHJpbnRmICdcbkVYSVRfQ09ERT0lc1xuJyAiJGNvZGUiID4+IC9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwLWZpbmFsMi9ydW4ubG9nCmV4aXQgIiRjb2RlIg==' | base64 -d > /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/run.sh; chmod 700 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/run.sh; tmux new-session -d -s bun-video-qual-final2; tmux send-keys -t bun-video-qual-final2 'bash /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/run.sh' C-m; sleep 1; tmux list-sessions | grep bun-video-qual-final2; git -C /home/ubuntu/src/bun rev-parse HEAD\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

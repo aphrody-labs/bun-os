@@ -1,0 +1,16 @@
+#!/bin/sh
+# Prints the facts the qualification gates check (run over the serial console by qualify.sh).
+echo "qual-kernel $(uname -r) $(uname -m)"
+echo "qual-cmdline $(cat /proc/cmdline)"
+[ -c /dev/bun_accel ] && echo "qual-bun-accel present" || echo "qual-bun-accel missing"
+echo "qual-bun $(bun --revision 2>&1)"
+echo "qual-nu $(nu --version 2>&1)"
+echo "qual-sudo $(sudo -n id -un 2>&1) $(sudo -V 2>&1 | head -n1)"
+echo "qual-uutils $(coreutils --version 2>&1 | head -n1)"
+echo "qual-root $(findmnt -no SOURCE,FSTYPE /) esp $(findmnt -no SOURCE,FSTYPE /efi)"
+echo "qual-drm $(ls /dev/dri 2>&1 | tr '\n' ' ')$(cat /sys/class/drm/card*/device/uevent 2>/dev/null | grep DRIVER | sort -u | tr '\n' ' ')"
+echo "qual-net $(ip -4 -o addr show scope global 2>&1 | awk '{print $2, $4}' | tr '\n' ' ')"
+echo "qual-9p $(grep -c 9p /proc/filesystems) virtiofs $(grep -c virtiofs /proc/filesystems)"
+echo "qual-session $(cat /etc/aphrody/session) $(pgrep -a -u aphrody 'cosmic-comp|cosmic-panel|cosmic-files|cage|explorer.exe|wineserver|Xwayland' 2>/dev/null | awk '{print $2}' | sort -u | tr '\n' ' ')"
+command -v wine >/dev/null && echo "qual-wine $(wine --version 2>&1)"
+echo "qual-done"

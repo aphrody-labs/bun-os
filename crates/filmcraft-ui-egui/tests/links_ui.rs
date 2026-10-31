@@ -1,4 +1,4 @@
-//! Headless UI test of the community links: Help menu commands, the header Discord button, the
+//! Headless UI test of the community links: Help menu commands, the
 //! About dialog and the Home (Import) screen.
 //!
 //! Set `FILMCRAFT_UI_SNAPSHOT_DIR=<dir>` to also render the window offscreen with wgpu and write
@@ -107,10 +107,9 @@ fn community_links_everywhere() {
             "Help menu lists {id}"
         );
     }
-    // Header: the Discord button is always there.
-    assert_eq!(d.ids("header.discord"), vec!["header.discord".to_string()]);
+    // Header.
     d.snapshot("header");
-    // About dialog: Discord first, then website, app page, GitHub, issues.
+    // About dialog: website, app page, GitHub, issues.
     d.ok(
         "engine.execute",
         json!({"command": "app.about", "params": {}}),
@@ -118,7 +117,6 @@ fn community_links_everywhere() {
     d.frames(3);
     let about = d.ids("about.");
     for id in [
-        "about.discord",
         "about.website",
         "about.appPage",
         "about.github",
@@ -138,7 +136,6 @@ fn community_links_everywhere() {
     d.frames(3);
     let home = d.ids("import.link.");
     for id in [
-        "import.link.discord",
         "import.link.website",
         "import.link.appPage",
         "import.link.github",

@@ -13,7 +13,7 @@
 //! designcraft-cli perf [--pages N] [--frames N] [--chars N] [--images N] [--runs N] [--strict]  # budgets on a synthetic stress document
 //! designcraft-cli bench FILE [--runs N]  # the same measurements on one document
 //! designcraft-cli validate-pdf FILE.pdf    # run the built-in PDF/X-4 conformance checks
-//! designcraft-cli links                   # Discord, website, app page and GitHub links
+//! designcraft-cli links                   # Website, app page and GitHub links
 //! designcraft-cli --version               # print the version
 //! ```
 #![deny(
@@ -80,7 +80,7 @@ non-zero exit when a step fails."#;
 fn usage_footer() -> String {
     format!(
         "\nCommunity: {}  ·  {}  ·  {}",
-        designcraft_engine::links::DISCORD,
+        designcraft_engine::links::WEBSITE,
         designcraft_engine::links::APP_PAGE,
         designcraft_engine::links::GITHUB
     )
@@ -134,7 +134,7 @@ fn main() -> ExitCode {
         Some("links") => {
             use designcraft_engine::links::*;
             outln!(
-                "Discord   {DISCORD}\nWebsite   {WEBSITE}\nApp page  {APP_PAGE}\nGitHub    {GITHUB}\nIssues    {ISSUES}"
+                "Website   {WEBSITE}\nApp page  {APP_PAGE}\nGitHub    {GITHUB}\nIssues    {ISSUES}"
             );
             ExitCode::SUCCESS
         }

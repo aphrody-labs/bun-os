@@ -1,0 +1,3 @@
+#!/bin/sh
+# Wayland sessions need an XDG runtime directory; no logind creates one on this image.
+install -d -m 0700 -o aphrody -g aphrody /run/user/1000

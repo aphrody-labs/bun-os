@@ -19,7 +19,7 @@ const MARK: f32 = 18.0;
 /// Height of the workspace switcher.
 const WIDGET_H: f32 = 22.0;
 
-/// The application bar: brand mark, Home, menus, then Discord, search and the workspace switcher
+/// The application bar: brand mark, Home, menus, then search and the workspace switcher
 /// at the right. With [`VectorcraftApp::custom_titlebar`] it is also the window's title bar
 /// ([`titlebar`]): the caption buttons take the right end and the rest of the bar drags the window.
 /// With the system title bar (Windows and Linux, `system_title_bar`) the OS draws its own icon and
@@ -63,7 +63,7 @@ pub fn app_bar(app: &mut VectorcraftApp, ui: &mut Ui) {
                     menus::menu_bar(app, ui)
                 };
                 // The right-side group fills the space after the menus from the right; when it runs
-                // short, Discord goes first (it is also under Help), then the search icon (the palette
+                // short, the search icon goes first (the palette
                 // stays under its shortcut), then the workspace switcher narrows.
                 let full = ui.max_rect();
                 let right_edge = if custom {
@@ -93,15 +93,6 @@ pub fn app_bar(app: &mut VectorcraftApp, ui: &mut Ui) {
                 let ws_w = ws_w
                     .min(room - 8.0 - gap - if search { icon } else { 0.0 })
                     .max(64.0);
-                let discord = search
-                    && room
-                        >= ws_w
-                            + 8.0
-                            + gap
-                            + icon
-                            + 10.0
-                            + gap
-                            + crate::community::discord_width(ui, false);
                 let mut rui = ui.new_child(
                     egui::UiBuilder::new()
                         .max_rect(right)
@@ -149,10 +140,6 @@ pub fn app_bar(app: &mut VectorcraftApp, ui: &mut Ui) {
                         app.ui.palette_open = !app.ui.palette_open;
                         app.ui.palette_query.clear();
                     }
-                }
-                if discord {
-                    ui.add_space(10.0);
-                    crate::community::discord_button(app, ui, false);
                 }
                 if app.services.native_menu.is_some() {
                     let title = ui.painter().layout_no_wrap(

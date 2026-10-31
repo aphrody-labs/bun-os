@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518640-6296",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"ps -eo pid,etime,%cpu,rss,cmd | grep -E 'bun-1.4.6-debug check|factory.ts run' | grep -v grep; bun run /home/ubuntu/src/bun/scripts/factory/factory.ts slots\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"ps -eo pid,etime,%cpu,rss,cmd | grep -E 'bun-1.4.6-debug check|factory.ts run' | grep -v grep; bun run /home/ubuntu/src/bun/scripts/factory/factory.ts slots\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

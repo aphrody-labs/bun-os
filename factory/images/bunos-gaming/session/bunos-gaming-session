@@ -20,6 +20,8 @@ export SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS=0 ENABLE_GAMESCOPE_WSI=1 vk_xwayland_wai
 # GL clients run as native Wayland clients of gamescope (--expose-wayland): on software rendering the GL path through
 # Xwayland presents black frames (verified: eglgears_wayland renders, glxgears through Xwayland stays black).
 export SDL_VIDEODRIVER=wayland QT_QPA_PLATFORM=wayland GDK_BACKEND=wayland MOZ_ENABLE_WAYLAND=1 ELECTRON_OZONE_PLATFORM_HINT=wayland
+# Audio clients talk to the session PipeWire graph (SDL directly, ALSA through pipewire-alsa, Pulse through pipewire-pulse).
+export SDL_AUDIODRIVER=pipewire,pulseaudio
 size=${BUNOS_SESSION_SIZE:-1280x720}
 fps=${BUNOS_SESSION_FPS:-60}
 
@@ -28,6 +30,10 @@ pipewire >/tmp/pipewire.log 2>&1 &
 sleep 1
 wireplumber >/tmp/wireplumber.log 2>&1 &
 pipewire-pulse >/tmp/pipewire-pulse.log 2>&1 &
+# A real default sink (a container has no sound card; wireplumber's auto_null is a placeholder some clients refuse).
+# The gateway records its monitor port as the session audio.
+sleep 1
+pw-cli create-node adapter '{ factory.name=support.null-audio-sink node.name=bunos-session media.class=Audio/Sink object.linger=true audio.position=[FL FR] priority.session=2000 priority.driver=2000 }' >/dev/null 2>&1 || true
 
 case "${BUNOS_SESSION:-launcher}" in
   launcher)
@@ -53,4 +59,6 @@ case "${BUNOS_SESSION:-launcher}" in
   *) echo "unknown BUNOS_SESSION ${BUNOS_SESSION}" >&2; exit 2 ;;
 esac
 
-exec gamescope --backend headless -W "${size%x*}" -H "${size#*x}" -r "$fps" -e --expose-wayland -- "$@"
+# No -e (Steam integration): there is no Steam client in the session, and with it gamescope ignores
+# gamescopectl screenshot requests (verified with gamescope 3.17 headless).
+exec gamescope --backend headless -W "${size%x*}" -H "${size#*x}" -r "$fps" --expose-wayland -- "$@"

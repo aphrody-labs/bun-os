@@ -38,6 +38,10 @@ interface ImageSpec {
   platforms: string[];
   targets: Record<string, Kind>;
   blockedTargets?: Record<string, string>;
+  /** Repository paths copied into the build context (relative to the workspace root). */
+  repoInputs?: { from: string; to: string }[];
+  /** Files or directories on the Docker host copied into the context before the build. */
+  hostInputs?: { from: string; to: string; optional?: boolean; checksum?: "sibling-sha256" }[];
 }
 interface Pin {
   version: string;
@@ -103,6 +107,23 @@ function buildArgs(name: string): Record<string, string> {
       KERNEL_IMAGE_SHA256: kernel.image.sha256,
       KERNEL_MODULES_DEB: kernel.modules.file,
       KERNEL_MODULES_SHA256: kernel.modules.sha256,
+    };
+  }
+  if (name === "bunos-unified") {
+    const pop = pins.cosmic.apt as Record<string, string>;
+    return {
+      ...common,
+      UBUNTU_IMAGE: String(pins["ubuntu-lts"]!.image),
+      BUN_URL: bun.url!,
+      BUN_SHA256_AMD64: bun.sha256!,
+      BUN_LICENSE_URL: bun.licenseUrl as string,
+      BUN_LICENSE_SHA256: bun.licenseSha256 as string,
+      HELIUM_URL: pins.helium!.url!,
+      HELIUM_SHA256: pins.helium!.sha256!,
+      POP_APT_SERVER: pop.server!,
+      POP_APT_SUITE: pop.suite!,
+      POP_APT_KEY: pop.key!,
+      WAYDROID_APT_KEY: String(pins["waydroid-apt"]!.key),
     };
   }
   return common;
@@ -335,13 +356,31 @@ function remoteScript(name: string, image: ImageSpec, targets: string[], args: R
     "#!/usr/bin/env bash",
     "set -uo pipefail",
     'cd "$(dirname "$0")"',
-    `exec 9>'${factoryConfig.lockPath}'`,
-    "flock 9",
+    // Any free factory slot (heavy.lock, heavy.1.lock, heavy.2.lock), else wait for the primary one.
+    `slot=; for f in '${factoryConfig.lockPath}' '${factoryConfig.lockPath.replace(/\.lock$/, ".1.lock")}' '${factoryConfig.lockPath.replace(/\.lock$/, ".2.lock")}'; do exec 9>"$f"; if flock -n 9; then slot=$f; break; fi; exec 9>&-; done`,
+    `[ -n "$slot" ] || { exec 9>'${factoryConfig.lockPath}'; flock 9; }`,
     "mkdir -p out",
     ": >status",
   ];
   if (image.prepare === "omarchy-rootfs")
     lines.push(`bun context/import.ts prepare "$PWD" '${manifest.remoteRoot}' || exit $?`);
+  for (const input of image.hostInputs ?? []) {
+    if (!/^\/[A-Za-z0-9/_.-]+$/.test(input.from) || !/^[A-Za-z0-9/_.-]+$/.test(input.to) || input.to.includes(".."))
+      throw new Error(`Invalid host input ${input.from} -> ${input.to}`);
+    const dest = `context/${input.to}`;
+    const missing = input.optional
+      ? `mkdir -p '${dest}'`
+      : `{ echo "missing host input ${input.from}" >>status; echo done >>status; exit 1; }`;
+    lines.push(
+      `if [ -e '${input.from}' ]; then mkdir -p "$(dirname '${dest}')"; ` +
+        `if [ -d '${input.from}' ]; then mkdir -p '${dest}' && tar -C '${input.from}' --exclude=.git -cf - . | tar -C '${dest}' -xf -; ` +
+        `else cp -L '${input.from}' '${dest}'; fi; else ${missing}; fi`,
+    );
+    if (input.checksum === "sibling-sha256")
+      lines.push(
+        `real=$(realpath '${input.from}'); [ "$(sha256sum '${dest}' | cut -d' ' -f1)" = "$(cut -d' ' -f1 "$real.sha256")" ] || { echo "checksum mismatch ${input.from}" >>status; echo done >>status; exit 1; }`,
+      );
+  }
   const containerfile = image.prepare === "omarchy-rootfs" ? "context/import.Containerfile" : "context/Containerfile";
   for (const target of targets) {
     const tag = `${name}:${target}`;
@@ -389,6 +428,8 @@ async function build(
   const stage = await mkdtemp(join(tmpdir(), "bun-os-image-"));
   try {
     await cp(join(here, name), join(stage, "context"), { recursive: true });
+    for (const input of image.repoInputs ?? [])
+      await cp(join(workspace, input.from), join(stage, "context", input.to), { recursive: true });
     if (name === "bunos-alpine") {
       const runtimeFile = resolve(runtimes!);
       const inputs = (await Bun.file(runtimeFile).json()) as {

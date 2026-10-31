@@ -44,15 +44,6 @@ pub fn specs() -> Vec<CommandSpec> {
             docs
         ),
         cmd!(
-            "help.discord",
-            "Join the ArtCraft Discord...",
-            ["Help"],
-            None,
-            "{}",
-            always,
-            |s, _| open(s, links::DISCORD.into())
-        ),
-        cmd!(
             "help.website",
             "ArtCraft Website",
             ["Help"],

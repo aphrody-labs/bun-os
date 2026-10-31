@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "experimental-container2wasm-browser-terminal",
+  "status": "prepared-not-run",
+  "sourceImage": "bunos-omarchy:imported-rootfs",
+  "container2wasm": {
+    "version": "v0.8.4",
+    "releaseTagCommit": "6ed3d98882a2b22eafc1334f574c364a5b2b8c47",
+    "releaseTarSha256": "1142ab95212578c0c7f666de830de6945f2abbea1713d1e07a7cb04072e00f31",
+    "installedBinary": "$HOME/build/tools/container2wasm-v0.8.4/c2w",
+    "installedBinarySha256": "ca6a504db86eff9d0ab28dc04b8710c0f7f9aecc1a8c398d20bc9e82784a82b3",
+    "embeddedDockerfileSha256": "cff6ff206edf808d903913892fe1fa71c51efebc5d0ef76608c26e5b7f17e275",
+    "boundedDockerfileSha256": "256a29d4ce1ecfcbf9bb91aca8ba23335e8938e95d1a5f027bb06b359a7cc633",
+    "nprocOccurrencesReplaced": 25,
+    "flags": ["--to-js", "--external-bundle", "--dockerfile"],
+    "buildArgs": {
+      "MAKEFLAGS": "-j4",
+      "VM_MEMORY_SIZE_MB": "2048",
+      "VM_CORE_NUMS": "2"
+    }
+  },
+  "externalRootfs": {
+    "format": "OCI Image Layout",
+    "source": "local Docker image bunos-omarchy:imported-rootfs",
+    "expectedApproximateSize": "5.8 GiB",
+    "browserServePath": "web/htdocs/omarchy/",
+    "accessRequirements": ["HTTP static hosting", "CORS for browser fetch"]
+  },
+  "buildLimits": {
+    "sharedFactoryLockRequired": true,
+    "maxParallelCompilerJobs": 4,
+    "buildkitMaxParallelSteps": 1,
+    "c2wBuildTimeoutSeconds": 14400,
+    "ociExportTimeoutSeconds": 3600,
+    "minimumFreeBytes": 32212254720
+  },
+  "qualification": {
+    "terminalOnly": true,
+    "desktopQualified": false,
+    "guiClaim": "unsupported-unqualified",
+    "browserUiPackaged": true,
+    "browserUiQualified": false,
+    "requiresRuntimeBrowserQualification": true
+  }
+}

@@ -1621,14 +1621,6 @@ pub const COMMANDS: &[CommandSpec] = &[
         "circle-help",
     ),
     c(
-        "help.discord",
-        "Join the ArtCraft Discord",
-        HELP,
-        None,
-        Nothing,
-        "messages-square",
-    ),
-    c(
         "help.app_page",
         "PdfCraft web page",
         HELP,

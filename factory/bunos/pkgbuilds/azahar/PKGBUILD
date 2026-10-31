@@ -9,7 +9,7 @@ pkgdesc='Nintendo 3DS emulator (Bun OS fork of Azahar)'
 arch=('x86_64')
 url='https://github.com/aphrody-labs/azahar'
 license=('GPL-2.0-or-later')
-depends=('ffmpeg' 'libgl' 'libusb' 'openal' 'qt6-base' 'qt6-multimedia' 'qt6-wayland' 'sdl2' 'vulkan-icd-loader' 'zstd')
+depends=('libgl' 'libusb' 'openal' 'qt6-base' 'qt6-multimedia' 'qt6-wayland' 'sdl2' 'vulkan-icd-loader' 'zstd')
 makedepends=('cmake' 'git' 'glslang' 'ninja' 'python' 'qt6-tools' 'vulkan-headers')
 options=('!debug' '!lto')
 source=("azahar::git+https://github.com/aphrody-labs/azahar.git#commit=${_commit}")
@@ -23,7 +23,9 @@ prepare() {
 build() {
   cmake -S azahar -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
     -DENABLE_TESTS=OFF -DENABLE_ROOM=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_BUILTIN_KEYBLOB=OFF \
-    -DENABLE_QT_UPDATER=OFF
+    -DENABLE_QT_UPDATER=OFF -DENABLE_FFMPEG=OFF
+  # ENABLE_FFMPEG=OFF: Azahar requires FFmpeg 7 exactly (libavutil 59) and Arch ships FFmpeg 8; it only drives the
+  # AAC decoder fallback and the video dumper.
   cmake --build build -j 4
 }
 

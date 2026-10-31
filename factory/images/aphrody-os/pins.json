@@ -1,0 +1,21 @@
+{
+  "alpine": {
+    "image": "alpine:3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6",
+    "branch": "v3.24"
+  },
+  "bun": {
+    "release": "aphrody-v1.4.3-aphrody.2",
+    "asset": "bun-linux-x64-musl-baseline",
+    "url": "https://github.com/aphrody-labs/bun/releases/download/aphrody-v1.4.3-aphrody.2/bun-linux-x64-musl-baseline.zip",
+    "sha256": "b04540328710f00011b1603d8beb913c9aed801c3167ed129bd2ad3bb6abf7f8",
+    "note": "Baseline (no AVX2) so the same binary runs under QEMU TCG and the browser engines. Newest fork release with a musl asset."
+  },
+  "windows": {
+    "bun-windows-x64.exe": {
+      "url": "https://github.com/aphrody-labs/bun/releases/download/main-runtime-633fd8a28f47/bun-windows-x64.exe",
+      "sha256": "2a2562f51008e055e71bfe1a23e2ebf3103b97fe5a2279639022fd477c9c6785",
+      "license": "MIT (Aphrody Bun fork, MSVC build)",
+      "installTo": "C:\\Program Files\\Aphrody\\Bun\\bun.exe"
+    }
+  }
+}

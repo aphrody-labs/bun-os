@@ -86,16 +86,14 @@ fn main() -> ExitCode {
         Some("mcp") => report(mcp(rest)),
         Some("links") => {
             use deckcraft_engine::links::*;
-            outln!(
-                "Discord   {DISCORD}\nWebsite   {WEBSITE}\nApp page  {APP_PAGE}\nGitHub    {GITHUB}"
-            );
+            outln!("Website   {WEBSITE}\nApp page  {APP_PAGE}\nGitHub    {GITHUB}");
             ExitCode::SUCCESS
         }
         _ => {
             eprintln!("{USAGE}");
             eprintln!(
                 "\nCommunity: {}  ·  {}",
-                deckcraft_engine::links::DISCORD,
+                deckcraft_engine::links::WEBSITE,
                 deckcraft_engine::links::APP_PAGE
             );
             ExitCode::FAILURE

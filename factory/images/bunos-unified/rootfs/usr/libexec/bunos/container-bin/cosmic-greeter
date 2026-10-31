@@ -1,0 +1,6 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Streamed session only (first on PATH in cosmic-container-session): cosmic-session starts cosmic-greeter as its
+# screen locker, and without logind in the container it locks at once. The stream is already authenticated by the
+# per-session gateway token, so the locker idles here; the bootable image keeps the real greeter and locker.
+exec sleep infinity

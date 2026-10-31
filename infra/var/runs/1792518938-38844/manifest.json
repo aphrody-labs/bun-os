@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518938-38844",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cat /home/ubuntu/src/bun/build/media/video-package-qualification/source-format.stdout.log /home/ubuntu/src/bun/build/media/video-package-qualification/source-format.stderr.log\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cat /home/ubuntu/src/bun/build/media/video-package-qualification/source-format.stdout.log /home/ubuntu/src/bun/build/media/video-package-qualification/source-format.stderr.log\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

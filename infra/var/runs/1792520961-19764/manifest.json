@@ -1,0 +1,18 @@
+{
+  "run_id": "1792520961-19764",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"ls -la /home/ubuntu/var/runs/1792518502-707626; cat /home/ubuntu/var/runs/1792518502-707626/manifest.json\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"ls -la /home/ubuntu/var/runs/1792518502-707626; cat /home/ubuntu/var/runs/1792518502-707626/manifest.json\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

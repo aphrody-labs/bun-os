@@ -107,13 +107,8 @@ pub fn show(app: &mut FilmcraftApp, ui: &mut egui::Ui, rect: Rect) {
         t.text,
     );
     let mut x = rect.min.x + 24.0;
-    for (i, (id, label, url)) in crate::links::ALL.iter().take(4).enumerate() {
-        let primary = i == 0;
-        let label = if primary {
-            tl!("Join us on Discord")
-        } else {
-            crate::i18n::t(label)
-        };
+    for (i, (id, label, url)) in crate::links::ALL.iter().take(3).enumerate() {
+        let label = crate::i18n::t(label);
         let g = ui
             .painter()
             .layout_no_wrap(label.to_string(), Tokens::ui(13.0), t.text);
@@ -129,28 +124,16 @@ pub fn show(app: &mut FilmcraftApp, ui: &mut egui::Ui, rect: Rect) {
             r,
             label,
         );
-        let (bg, fg) = if primary {
-            (
-                if resp.hovered() {
-                    t.accent_hover
-                } else {
-                    t.accent
-                },
-                Color32::WHITE,
-            )
-        } else {
-            (
-                if resp.hovered() {
-                    t.hover
-                } else {
-                    t.tl_header_bg
-                },
-                t.text,
-            )
-        };
+        let (bg, fg) = (
+            if resp.hovered() {
+                t.hover
+            } else {
+                t.tl_header_bg
+            },
+            t.text,
+        );
         ui.painter().rect_filled(r, 8.0, bg);
         let icon = [
-            crate::icons::Icon::Chat,
             crate::icons::Icon::Globe,
             crate::icons::Icon::Globe,
             crate::icons::Icon::Code,

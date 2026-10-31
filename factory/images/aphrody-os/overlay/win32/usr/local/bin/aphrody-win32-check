@@ -1,0 +1,25 @@
+#!/bin/sh
+# Runs real Win32 programs in the session's Wine prefix and prints one win32-ok/win32-fail line each.
+# GUI programs open on the running explorer.exe desktop (DISPLAY of cage's Xwayland).
+export WINEPREFIX=/home/aphrody/.wine WINEDEBUG=-all
+export DISPLAY=${DISPLAY:-$(ls /tmp/.X11-unix 2>/dev/null | sed -n 's/^X/:/p' | head -n1)}
+run() { # label command...
+  label=$1; shift
+  if out=$(timeout 300 su aphrody -s /bin/sh -c "$*" 2>&1 | tr -d '\r' | tail -n 3 | tr '\n' ' '); then
+    echo "win32-ok $label $out"
+  else
+    echo "win32-fail $label $out"
+  fi
+}
+run cmd "wine cmd.exe /c ver"
+run reg "wine reg.exe query 'HKLM\Software\Microsoft\Windows NT\CurrentVersion' /v CurrentBuild"
+run bun.exe "wine 'C:\Program Files\Aphrody\Bun\bun.exe' --revision"
+run bun.exe-eval "wine 'C:\Program Files\Aphrody\Bun\bun.exe' -e 'console.log(process.platform, process.arch, require(\"os\").release())'"
+for gui in notepad.exe winefile.exe; do
+  su aphrody -s /bin/sh -c "DISPLAY=$DISPLAY setsid wine $gui >/dev/null 2>&1 &"
+done
+sleep 30
+for gui in notepad.exe winefile.exe; do
+  pgrep -u aphrody -f "$gui" >/dev/null && echo "win32-ok $gui running" || echo "win32-fail $gui not running"
+done
+echo win32-check-done

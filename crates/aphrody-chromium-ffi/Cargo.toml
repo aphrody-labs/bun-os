@@ -1,0 +1,21 @@
+[package]
+name = "aphrody-chromium-ffi"
+version.workspace = true
+edition.workspace = true
+publish = false
+description = "C ABI for the native parts of @aphrody/chromium (bun:adblock, bun:privacy), loaded with bun:ffi on upstream Bun"
+license = "MIT AND MPL-2.0"
+
+[lib]
+name = "aphrody_chromium_ffi"
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
+[dependencies]
+adblock = { package = "aphrody-adblock", path = "../aphrody-adblock" }
+aphrody-privacy = { path = "../aphrody-privacy" }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.151"
+
+[lints]
+workspace = true

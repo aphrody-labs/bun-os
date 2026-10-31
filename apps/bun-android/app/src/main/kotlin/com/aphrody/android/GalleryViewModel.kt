@@ -15,7 +15,8 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 data class GalleryState(
     val destination: Destination = Destination.COMPONENTS,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val dynamicColor: Boolean = true,
+    // Bun OS tokens by default; Material You wallpaper colours are opt-in (Réglages).
+    val dynamicColor: Boolean = false,
     val name: String = "Aphrody",
     val notifications: Boolean = true,
     val intensity: Float = 0.6f,
@@ -27,7 +28,7 @@ class GalleryViewModel(private val savedState: SavedStateHandle) : ViewModel() {
         GalleryState(
             destination = Destination.valueOf(savedState["destination"] ?: Destination.COMPONENTS.name),
             themeMode = ThemeMode.valueOf(savedState["theme"] ?: ThemeMode.SYSTEM.name),
-            dynamicColor = savedState["dynamic"] ?: true,
+            dynamicColor = savedState["dynamic"] ?: false,
             name = savedState["name"] ?: "Aphrody",
             notifications = savedState["notifications"] ?: true,
             intensity = savedState["intensity"] ?: 0.6f,

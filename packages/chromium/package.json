@@ -1,0 +1,45 @@
+{
+  "name": "@aphrody/chromium",
+  "version": "1.4.7",
+  "description": "Chromium CDP client and launcher, Obscura alias, Brave adblock-rust and privacy cryptography for upstream Bun: the owner of the aphrody-labs/bun fork's bun:chromium, bun:chrome, bun:obscura, bun:adblock, bun:privacy and bun:fetch, served as a Bun OS plugin.",
+  "license": "Apache-2.0 AND MIT AND MPL-2.0",
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/chromium"
+  },
+  "bin": {
+    "bun-chromium": "./src/cli.ts"
+  },
+  "files": [
+    "src",
+    "types",
+    "README.md",
+    "AGENTS.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "types": "./types/chromium.d.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./bun-plugin": "./src/bun-plugin.ts",
+    "./cli": "./src/cli.ts",
+    "./passwords": "./src/passwords.ts",
+    "./chromium": "./src/modules/chromium.ts",
+    "./obscura": "./src/modules/obscura.ts",
+    "./adblock": "./src/modules/adblock.ts",
+    "./privacy": "./src/modules/privacy.ts",
+    "./fetch": "./src/modules/fetch.ts",
+    "./manifests": "./src/modules/chrome-manifests.ts",
+    "./types": "./types/chromium.d.ts",
+    "./types/*": "./types/*"
+  },
+  "scripts": {
+    "status": "bun src/cli.ts status",
+    "build:native": "cargo-serial build -p aphrody-chromium-ffi --release -j4"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "aphrody-wasm-host"
+version = "1.4.7"
+edition = "2024"
+rust-version = "1.97"
+authors = ["aphrody-dev <contact@aphrody.com>"]
+homepage = "https://aphrody.com"
+repository = "https://github.com/aphrody-labs/bun-os"
+license = "MIT"
+description = "Server-side WebAssembly plugin host of Bun OS: runs WASI 0.2 command components (wasi:cli/run) in Wasmtime with fuel, timeout, memory and directory limits."
+publish = false
+
+# Standalone root: it pins Wasmtime from the aphrody-labs fork at the vendor/wasm/wasmtime submodule revision
+# (51.0.0-dev), which the root lock (yara-x on wasmtime 38) does not carry. Built by scripts/aphrody/build/wasm/build-toolchain.sh.
+[workspace]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "aphrody-wasm-host"
+path = "src/main.rs"
+
+[dependencies]
+wasmtime = { git = "https://github.com/aphrody-labs/wasmtime", rev = "c57fe5644237b90edda3132a14e1ca25b4e0cf72", default-features = false, features = ["cranelift", "component-model", "runtime", "parallel-compilation", "std"] }
+wasmtime-wasi = { git = "https://github.com/aphrody-labs/wasmtime", rev = "c57fe5644237b90edda3132a14e1ca25b4e0cf72", default-features = false, features = ["p2"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 16
+strip = "symbols"

@@ -1,0 +1,28 @@
+{
+  "name": "@aphrody/bun-os-plugins",
+  "version": "1.4.7",
+  "description": "Bun OS plugin registry: every Bun OS capability and every addition migrated from the aphrody-labs/bun fork as a Bun plugin (build.module virtual modules, lazy globals, bins), preloaded once from the root bunfig.toml on upstream Bun canary.",
+  "license": "MIT",
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/bun-os-plugins"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./define": "./src/define.ts",
+    "./preload": "./src/preload.ts"
+  },
+  "bin": {
+    "bun-os-plugins": "./src/cli.ts"
+  },
+  "files": [
+    "src",
+    "LICENSE"
+  ],
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

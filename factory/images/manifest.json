@@ -58,6 +58,24 @@
         "note": "Ubuntu 26.10 archive ships no COSMIC; System76 resolute (26.04) archive provides epoch 1.10.0."
       }
     },
+    "ubuntu-lts": {
+      "version": "26.04",
+      "image": "ubuntu:26.04@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c",
+      "note": "Base of bunos-unified: Pop!_OS resolute (26.04) is the COSMIC package source and the native-apps lane builds against 26.04 glibc."
+    },
+    "helium": {
+      "version": "0.20.3.1",
+      "repository": "imputnet/helium-linux",
+      "url": "https://github.com/imputnet/helium-linux/releases/download/0.20.3.1/helium-0.20.3.1-x86_64_linux.tar.xz",
+      "sha256": "3759ea4e95bf4ef4a0a6477e3d73576b0f03906f2e80357275bfc6cacafb5fac",
+      "note": "Upstream release of the source our vendor/helium-linux fork tracks; replaced by the fork build of the Chromium lane once published."
+    },
+    "waydroid-apt": {
+      "version": "resolute",
+      "server": "https://repo.waydro.id/",
+      "key": "7CE0331F71E0A238BB1002D70E406D181DCEE19C",
+      "note": "Only libgbinder, libglibutil and python3-gbinder come from here; Waydroid itself is our vendor/waydroid fork."
+    },
     "gnome": {
       "version": "51.1",
       "file": "gnome-shell-51.1.tar.xz",
@@ -176,6 +194,24 @@
         "desktop": "image",
         "bootable": "rootfs"
       }
+    },
+    "bunos-unified": {
+      "platforms": ["linux/amd64"],
+      "targets": {
+        "session": "image",
+        "unified": "image"
+      },
+      "repoInputs": [{ "from": "factory/desktop/cosmic-session", "to": "cosmic-session" }],
+      "hostInputs": [
+        {
+          "from": "/home/ubuntu/apps/remote-desktop/dist/aphrody-remote-desktop-linux-x64",
+          "to": "bin/aphrody-remote-desktop",
+          "checksum": "sibling-sha256"
+        },
+        { "from": "/home/ubuntu/build/storage/artifacts/bunos-unified/waydroid-src", "to": "waydroid" },
+        { "from": "/home/ubuntu/native-apps/debs", "to": "debs", "optional": true },
+        { "from": "/home/ubuntu/build/storage/artifacts/bunos-unified/bin", "to": "extra-bin", "optional": true }
+      ]
     }
   }
 }

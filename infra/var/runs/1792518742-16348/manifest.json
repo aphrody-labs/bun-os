@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518742-16348",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && bun install --filter @aphrody/bun-video --frozen-lockfile --dry-run --no-progress\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && bun install --filter @aphrody/bun-video --frozen-lockfile --dry-run --no-progress\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

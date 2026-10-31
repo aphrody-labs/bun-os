@@ -252,7 +252,7 @@ agent-generated maintainer replies:
   list of Mac issues, so people are trying it on real work.
 - **Open issues (136):** ≈ 95 are core-path bugs (masks, keyframes, timeline, preview, audio,
   text, render, crashes; this includes 15 community `fix(...)` proposals), ≈ 40 are feature
-  requests or niche (plug-in hosting, OpenFX, ffmpeg export, Discord presence, Store listing,
+  requests or niche (plug-in hosting, OpenFX, ffmpeg export, Store listing,
   rigging tools). Mostly core-path bugs, which matches the discounts above.
 
 ## Out of scope by design

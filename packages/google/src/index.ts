@@ -18,3 +18,24 @@ export {
   type GoogleModel,
   type GoogleProfile,
 } from "./auth.ts";
+
+/** The fork's `bun:google` surface (also served as the `bun:google` specifier by ./bun-plugin). */
+export { createClient, adcCredentialProvider, chromium, obscura, dns } from "./bun-google.ts";
+export type { GoogleClient, GoogleClientOptions } from "./client.ts";
+export * from "./services.ts";
+export { createGooglePublicSearch } from "./search.ts";
+export { createPublicIndexSearch } from "./public-index.ts";
+export type {
+  PublicIndexInput,
+  PublicIndexBody,
+  PublicIndexCollection,
+  PublicIndexSdkOptions,
+  PublicIndexResult,
+  PublicIndexSearch,
+} from "./public-index.ts";
+export {
+  createAntigravityCredentialProvider,
+  type AntigravityCredentialOptions,
+  type AntigravityCredentialProvider,
+} from "./credentials.ts";
+export { createAntigravityServices, type AntigravityServicesOptions, type AntigravityModel } from "./antigravity.ts";

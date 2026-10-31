@@ -1,0 +1,13 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# COSMIC inside the session container, nested in cage. start-cosmic (cosmic-session's launcher) requires a
+# systemd user manager, which a container does not run; this sets the same environment and starts
+# cosmic-session directly, which then spawns the compositor, panel, launcher, app library, notifications,
+# settings daemon and the XDG autostart entries itself.
+set -eu
+export XDG_CURRENT_DESKTOP=COSMIC XDG_SESSION_DESKTOP=COSMIC XDG_SESSION_TYPE=wayland
+export COSMIC_BACKEND=winit LIBGL_ALWAYS_SOFTWARE=1
+export _JAVA_AWT_WM_NONREPARENTING=1 GDK_BACKEND=wayland,x11 MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM="wayland;xcb"
+export DCONF_PROFILE=/usr/share/dconf/profile/cosmic
+export PATH=/usr/libexec/bunos/container-bin:$PATH
+exec cosmic-session

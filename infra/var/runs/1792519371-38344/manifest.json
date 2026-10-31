@@ -1,0 +1,18 @@
+{
+  "run_id": "1792519371-38344",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"hostname\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"hostname\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

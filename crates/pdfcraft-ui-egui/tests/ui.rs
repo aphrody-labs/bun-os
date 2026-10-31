@@ -440,10 +440,10 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
         }
     });
     let open = h.get_by_label("Open").rect();
-    let discord = h.get_by_label("Discord").rect();
+    let help = h.get_by_label("Keyboard shortcuts").rect();
     assert!(
-        open.right() <= discord.left(),
-        "Open {open:?} must not run under Discord {discord:?}"
+        open.right() <= help.left(),
+        "Open {open:?} must not run under Keyboard shortcuts {help:?}"
     );
     let mut previous_right = f32::MIN;
     for i in 0..5 {
@@ -498,9 +498,9 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
     let right = h.get_by_label("Scroll tabs right").rect();
     assert!(
         right.right() <= open.left() + 0.5
-            && open.right() <= h.get_by_label("Discord").rect().left()
+            && open.right() <= h.get_by_label("Keyboard shortcuts").rect().left()
     );
-    // Twenty: Open stays in sight left of Discord.
+    // Twenty: Open stays in sight left of the right-hand controls.
     for i in 0..13 {
         h.state_mut()
             .open_bytes(&format!("more-{i:02}.pdf"), None, FIXTURE.to_vec())
@@ -508,10 +508,10 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
     }
     h.run_steps(4);
     let open = h.get_by_label("Open").rect();
-    let discord = h.get_by_label("Discord").rect();
+    let help = h.get_by_label("Keyboard shortcuts").rect();
     assert!(
-        open.left() > 0.0 && open.right() <= discord.left(),
-        "Open {open:?} stays in sight left of Discord {discord:?}"
+        open.left() > 0.0 && open.right() <= help.left(),
+        "Open {open:?} stays in sight left of Keyboard shortcuts {help:?}"
     );
 }
 
@@ -525,7 +525,7 @@ fn the_integrated_title_bar_is_the_traffic_light_band() {
         app.open_bytes("band.pdf", None, FIXTURE.to_vec()).unwrap();
     });
     let band = 28.0;
-    for label in ["Home", "band.pdf", "Open", "Discord", "Keyboard shortcuts"] {
+    for label in ["Home", "band.pdf", "Open", "Keyboard shortcuts"] {
         let r = h.get_by_label(label).rect();
         assert!(
             r.top() >= 0.0 && r.bottom() <= band,

@@ -1,0 +1,18 @@
+{
+  "run_id": "1792519378-38776",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Dbfr, cmd: Some(\"hostname; df -h / /home; free -h\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Dbfr, cmd: Some(\"hostname; df -h / /home; free -h\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

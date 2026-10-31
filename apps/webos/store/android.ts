@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Android APK catalog (/repo/android) and F-Droid repository (/repo/fdroid/repo) of the Bun OS Store.
-// build(): Gradle release build of apps/bun-android with the VPS Android SDK (~/android-sdk), zipalign + apksigner with
+// build(): release builds of apps/bun-android (Gradle wrapper, Compose M3 + Rust core for every ABI) and apps/bunos-flutter-store
+// (flutter build apk) with the shared factory toolchain (/opt/android-sdk, factory/android/jvm.json), zipalign + apksigner with
 // a release keystore kept in the protected store, then fdroidserver (`fdroid update`) publishes a signed F-Droid repo
 // (index-v1/v2, entry.jar, icons). The fdroid work tree (config.yml, keystore paths) stays outside the served store;
 // only its repo/ is copied below STORE_ROOT/repo/fdroid/repo.
@@ -10,15 +11,41 @@ import { join } from "node:path";
 import { run, sha256, step, tail, writeIndex, type Ctx, type IndexEntry, type QualResult, type QualStep } from "./common";
 
 const HOME = Bun.env.HOME ?? "/home/ubuntu";
-const SDK = Bun.env.ANDROID_HOME ?? join(HOME, "android-sdk");
+const SDK = Bun.env.ANDROID_HOME ?? ((await Bun.file("/opt/android-sdk/build-tools/37.0.0/apksigner").exists()) ? "/opt/android-sdk" : join(HOME, "android-sdk"));
 const BUILD_TOOLS = "37.0.0";
-const GRADLE = Bun.env.GRADLE ?? join(HOME, ".local/share/gradle/gradle-9.8.1/bin/gradle");
 const FDROID = Bun.env.FDROID ?? join(HOME, ".local/share/fdroidserver-venv/bin/fdroid");
 const JAVA_HOME = Bun.env.ANDROID_JAVA_HOME ?? "/usr/lib/jvm/java-21-openjdk-amd64";
-const OWNERS = ["apps/bun-android", "apps/java-ffi", "packages/bun-android", "packages/android-pipeline", "packages/android-web", "crates/android-native"];
+const OWNERS = ["apps/bun-android", "apps/bunos-flutter-store", "apps/java-ffi", "packages/bun-android", "packages/android-pipeline", "packages/android-web", "crates/android-native", "crates/bunos-flutter-bridge"];
+const APPS = new Set(["apps/bun-android", "apps/bunos-flutter-store"]);
+const SUMMARY: Record<string, string> = {
+  "apps/bun-android": "Bun OS companion for Android",
+  "apps/bunos-flutter-store": "Bun OS Store in Flutter",
+};
+const DESC: Record<string, string> = {
+  "apps/bun-android": "the Bun OS Android companion: Jetpack Compose Material 3 with the Bun OS tokens, the Rust core through JNI and uniffi, the Bun runtime and web assets.",
+  "apps/bunos-flutter-store": "the Bun OS Store and WebOS status in Flutter Material 3, themed by the Bun OS tokens or any seed computed by the Rust core.",
+};
 const bt = (tool: string) => join(SDK, "build-tools", BUILD_TOOLS, tool);
 // dl.google.com answers 404 over IPv6 from the VPS; the JVM tools go over IPv4.
-const env = { JAVA_HOME, ANDROID_HOME: SDK, ANDROID_SDK_ROOT: SDK, JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true", PATH: `${JAVA_HOME}/bin:${process.env.PATH}` };
+const GRADLE_USER_HOME = Bun.env.GRADLE_USER_HOME ?? join(HOME, ".cache/bunos-android/gradle");
+const env = { JAVA_HOME, ANDROID_HOME: SDK, ANDROID_SDK_ROOT: SDK, GRADLE_USER_HOME, APHRODY_BUILD_HOST: "", APHRODY_LOCAL_CARGO: "1", APHRODY_CARGO_JOBS: "4", APHRODY_CARGO_LOCK_DIR: join(HOME, ".cache/aphrody/lanes/runtime"), JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true", PATH: `${JAVA_HOME}/bin:${join(HOME, ".cargo/bin")}:${process.env.PATH}` };
+
+/** Release build of one app; returns the APK to align and sign (unsigned, or debug-signed for Flutter). */
+async function buildApp(ctx: Ctx, owner: string): Promise<{ apk?: string; reason?: string }> {
+  const project = join(ctx.root, owner);
+  if (owner === "apps/bun-android") {
+    const r = await run([join(project, "gradlew"), "--max-workers=4", "-q", ":app:assembleRelease"], { cwd: project, env, timeout: 3_600_000 });
+    const apk = join(project, "app/build/outputs/apk/release/app-release-unsigned.apk");
+    return r.code === 0 && (await Bun.file(apk).exists()) ? { apk } : { reason: `Gradle release build failed: ${tail(r.out, 3)}` };
+  }
+  const flutterRoot = join(ctx.root, "vendor/flutter");
+  const flutter = join(flutterRoot, "bin/flutter");
+  if (!(await Bun.file(flutter).exists())) return { reason: "vendor/flutter missing (bun factory/android/jvm.ts flutter)" };
+  const fenv = { ...env, FLUTTER_ROOT: flutterRoot, FLUTTER_GIT_URL: "https://github.com/aphrody-labs/flutter.git", PUB_CACHE: join(HOME, ".cache/bunos-android/pub"), FLUTTER_SUPPRESS_ANALYTICS: "true" };
+  const r = await run([flutter, "build", "apk", "--release"], { cwd: project, env: fenv, timeout: 3_600_000 });
+  const apk = join(project, "build/app/outputs/flutter-apk/app-release.apk");
+  return r.code === 0 && (await Bun.file(apk).exists()) ? { apk } : { reason: `flutter build apk failed: ${tail(r.out, 3)}` };
+}
 
 /** Random secret stored once in the protected store (mode 600); never printed. */
 async function secret(path: string): Promise<string> {
@@ -47,29 +74,30 @@ export async function build(ctx: Ctx): Promise<void> {
   const out = join(ctx.store, "repo/android");
   const skipped: { name: string; reason: string }[] = [];
   const entries: IndexEntry[] = [];
-  const project = join(ctx.root, "apps/bun-android");
   const signedApks: { owner: string; path: string }[] = [];
-  if (!(await Bun.file(bt("apksigner")).exists())) skipped.push({ name: "apps/bun-android", reason: `Android SDK build-tools ${BUILD_TOOLS} missing at ${SDK}` });
+  if (!(await Bun.file(bt("apksigner")).exists())) for (const owner of APPS) skipped.push({ name: owner, reason: `Android SDK build-tools ${BUILD_TOOLS} missing at ${SDK}` });
   else {
-    await Bun.write(join(project, "local.properties"), `sdk.dir=${SDK}\n`); // ignored by git
-    const gradle = await run([GRADLE, "--no-daemon", "--max-workers=4", "-q", ":app:assembleRelease"], { cwd: project, env, timeout: 2_400_000 });
-    const unsigned = join(project, "app/build/outputs/apk/release/app-release-unsigned.apk");
-    if (gradle.code !== 0 || !(await Bun.file(unsigned).exists())) skipped.push({ name: "apps/bun-android", reason: `Gradle release build failed: ${tail(gradle.out, 3)}` });
-    else {
-      const ks = await keystore(join(ctx.secrets, "android"), "release", "bunos", "CN=Bun OS, O=Aphrody, C=FR");
-      const work = join(ctx.store, ".android-staging");
-      await rm(work, { recursive: true, force: true });
-      await mkdir(work, { recursive: true });
-      const aligned = join(work, "aligned.apk");
-      const signed = join(work, "bun-android.apk");
-      const za = await run([bt("zipalign"), "-p", "-f", "4", unsigned, aligned], { env });
+    const ks = await keystore(join(ctx.secrets, "android"), "release", "bunos", "CN=Bun OS, O=Aphrody, C=FR");
+    const work = join(ctx.store, ".android-staging");
+    await rm(work, { recursive: true, force: true });
+    await mkdir(work, { recursive: true });
+    for (const owner of APPS) {
+      const built = await buildApp(ctx, owner);
+      if (!built.apk) {
+        skipped.push({ name: owner, reason: built.reason ?? "build failed" });
+        continue;
+      }
+      const base = owner.split("/").pop()!;
+      const aligned = join(work, `${base}-aligned.apk`);
+      const signed = join(work, `${base}.apk`);
+      const za = await run([bt("zipalign"), "-p", "-f", "4", built.apk, aligned], { env });
       const sg = za.code === 0 ? await run([bt("apksigner"), "sign", "--ks", ks.path, "--ks-key-alias", ks.alias, "--ks-pass", "env:KS_PASS", "--key-pass", "env:KS_PASS", "--out", signed, aligned], { env: { ...env, KS_PASS: ks.pass } }) : za;
-      if (sg.code !== 0) skipped.push({ name: "apps/bun-android", reason: `signing failed: ${tail(sg.out, 2).replaceAll(ks.pass, "***")}` });
-      else signedApks.push({ owner: "apps/bun-android", path: signed });
+      if (sg.code !== 0) skipped.push({ name: owner, reason: `signing failed: ${tail(sg.out, 2).replaceAll(ks.pass, "***")}` });
+      else signedApks.push({ owner, path: signed });
     }
   }
-  for (const owner of OWNERS.slice(1))
-    skipped.push({ name: owner, reason: owner === "crates/android-native" ? "JNI library linked into the APK, not an app" : "library or tooling owner of the Android build, not an installable app" });
+  for (const owner of OWNERS.filter(o => !APPS.has(o)))
+    skipped.push({ name: owner, reason: owner.startsWith("crates/") ? "native library linked into an APK, not an app" : "library or tooling owner of the Android build, not an installable app" });
 
   // F-Droid repository: the work tree holds config.yml and lives outside the served store.
   const fdroidWork = join(HOME, "apps/webos/fdroid");
@@ -86,12 +114,12 @@ export async function build(ctx: Ctx): Promise<void> {
     entries.push({
       name: id,
       version: m?.[3] ?? "unknown",
-      desc: (/application-label:'([^']*)'/.exec(badging.out)?.[1] ?? "Bun Android") + ": the Bun OS Android companion (Bun runtime, gallery and web assets).",
+      desc: (/application-label:'([^']*)'/.exec(badging.out)?.[1] ?? "Bun Android") + ": " + DESC[a.owner],
       license: "Apache-2.0",
       size: Bun.file(a.path).size,
       sha256: await sha256(a.path),
       file: `/repo/android/${fileName}`,
-      homepage: "https://github.com/aphrody-labs/bun-os/tree/main/apps/bun-android",
+      homepage: `https://github.com/aphrody-labs/bun-os/tree/main/${a.owner}`,
       member: a.owner,
       meta: { versionCode: Number(m?.[2] ?? 1), minSdk: /sdkVersion:'(\d+)'/.exec(badging.out)?.[1], targetSdk: /targetSdkVersion:'(\d+)'/.exec(badging.out)?.[1], display: /application-label:'([^']*)'/.exec(badging.out)?.[1], fdroid: `${ctx.origin}/repo/fdroid/repo` },
     });
@@ -123,7 +151,7 @@ export async function build(ctx: Ctx): Promise<void> {
     for (const e of entries)
       await Bun.write(
         join(fdroidWork, "metadata", `${e.name}.yml`),
-        [`Categories:`, `  - System`, `License: Apache-2.0`, `AuthorName: Aphrody`, `WebSite: https://aphrody.com`, `SourceCode: ${e.homepage}`, `Name: ${String(e.meta?.display ?? "Bun Android")}`, `Summary: Bun OS companion for Android`, `Description: |-`, `  ${e.desc}`, ``].join("\n"),
+        [`Categories:`, `  - System`, `License: Apache-2.0`, `AuthorName: Aphrody`, `WebSite: https://aphrody.com`, `SourceCode: ${e.homepage}`, `Name: ${String(e.meta?.display ?? "Bun Android")}`, `Summary: ${SUMMARY[String(e.member)] ?? "Bun OS app for Android"}`, `Description: |-`, `  ${e.desc}`, ``].join("\n"),
       );
     const fd = await run([FDROID, "update", "--create-metadata", "--pretty"], { cwd: fdroidWork, env: { ...env, FDROID_KS_PASS: rks.pass }, timeout: 900_000 });
     if (fd.code !== 0) skipped.push({ name: "fdroid", reason: `fdroid update failed: ${tail(fd.out, 4).replaceAll(rks.pass, "***")}` });

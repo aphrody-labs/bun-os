@@ -646,7 +646,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
     ("Insert Variable", "変数を挿入"),
     ("Inspect Document", "ドキュメントを調査"),
     ("Interface Color Theme", "インターフェイスのカラーテーマ"),
-    ("Join the ArtCraft Discord…", "ArtCraft の Discord に参加…"),
     ("Last Object Below", "最背面のオブジェクト"),
     ("Library Contents", "ライブラリの内容"),
     ("Library Items", "ライブラリの項目"),
@@ -1139,10 +1138,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
         "[なし] — カラーバーでカラーを選択してください。",
     ),
     (
-        "discord.gg/artcraft — help, feedback and show-and-tell",
-        "discord.gg/artcraft — サポート・ご意見・作品紹介",
-    ),
-    (
         "⌥-click clears overrides",
         "⌥ を押しながらクリックするとオーバーライドを消去します",
     ),
@@ -1605,7 +1600,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
     ("H&J Violations", "H&J の制約違反"),
     ("Include Bleed", "裁ち落としを含める"),
     ("Include Stroke Weight", "線の太さを含める"),
-    ("Join our Discord", "Discord に参加"),
     ("Keep Violations", "段落保持の制約違反"),
     (
         "Overprint [Black] Swatch at 100%",
@@ -1793,7 +1787,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
     ("Insert Cross-Reference", "相互参照を挿入"),
     ("Insert Math Expression", "数式を挿入"),
     ("Insert Pages", "ページを挿入"),
-    ("Join the ArtCraft Discord", "ArtCraft の Discord に参加"),
     ("Load DTD", "DTD を読み込み"),
     ("Load Swatches", "スウォッチを読み込み"),
     ("Margins and Columns", "マージン・段組"),

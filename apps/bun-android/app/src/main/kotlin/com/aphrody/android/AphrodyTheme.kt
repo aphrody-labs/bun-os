@@ -1,16 +1,13 @@
 package com.aphrody.android
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import com.aphrody.android.theme.BunOsTheme
 
+/**
+ * App theme: the generated Bun OS Material 3 theme (theme/BunOsTokens.kt, written by
+ * `bun packages/m3-os-themes/src/cli.ts apps` from the same tokens as the web, Flutter and COSMIC themes).
+ */
 @Composable
 fun AphrodyTheme(
     mode: ThemeMode = ThemeMode.SYSTEM,
@@ -22,12 +19,5 @@ fun AphrodyTheme(
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
     }
-    val context = LocalContext.current
-    val colors = when {
-        dynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
-            if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        dark -> darkColorScheme(primary = Color(0xFFCCBEFF))
-        else -> lightColorScheme(primary = Color(0xFF6750A4))
-    }
-    MaterialTheme(colorScheme = colors, content = content)
+    BunOsTheme(dark = dark, dynamic = dynamic, content = content)
 }

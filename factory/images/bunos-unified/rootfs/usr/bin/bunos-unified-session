@@ -1,0 +1,78 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Entrypoint of the bunos-unified session container (one per signed-in WebOS user). Starts as root, then drops to
+# aphrody (uid 1000) for everything graphical. Contract with the gateway owner (docs/UNIFIED-IMAGE.md):
+#   in:  BUNOS_SESSION_SIZE=WxH, APHRODY_REMOTE_TOKEN_FILE=/run/secrets/session.token
+#   out: cage on wayland-0 (output HEADLESS-1), cosmic-comp nested on wayland-1, aphrody-remote-desktop on
+#        0.0.0.0:8794 (container network only), ready marker /run/bunos/ready
+# Android 17: a private binderfs instance per session, Waydroid's container manager as root, the Waydroid user
+# session from COSMIC autostart (multi-window: each Android app is its own COSMIC window).
+set -eu
+SIZE=${BUNOS_SESSION_SIZE:-1600x900}
+U=aphrody
+RUN_USER=/run/user/1000
+log() { printf '%s bunos-unified: %s\n' "$(date -u +%FT%TZ)" "$*"; }
+as_user() { setpriv --reuid=1000 --regid=1000 --init-groups --inh-caps=-all -- env -i HOME=/home/$U USER=$U LOGNAME=$U \
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin XDG_RUNTIME_DIR=$RUN_USER LANG=${LANG:-C.UTF-8} "$@"; }
+
+mkdir -p /run/bunos /run/dbus "$RUN_USER" /var/lib/waydroid /var/lib/misc /var/log
+chown 1000:1000 "$RUN_USER" && chmod 0700 "$RUN_USER"
+[ -d /home/$U ] || install -d -o 1000 -g 1000 /home/$U
+chown 1000:1000 /home/$U
+
+# Private binderfs: Android's binder, hwbinder and vndbinder for this session only.
+mkdir -p /dev/binderfs
+mountpoint -q /dev/binderfs || mount -t binder binder /dev/binderfs || log "binderfs mount failed: Android disabled"
+# LXC configures the Android veth through /proc/sys/net. Docker mounts /proc/sys read-only; make only the net
+# subtree writable (net.* sysctls are per network namespace, so this cannot touch the host's settings).
+if ! touch /proc/sys/net/ipv4/ip_forward 2>/dev/null; then
+  mount --bind /proc/sys/net /proc/sys/net && mount -o remount,bind,rw /proc/sys/net || log "/proc/sys/net stays read-only"
+fi
+# Loop devices for the read-only Android images (loop-control is passed in; block major 7 allowed by the cgroup).
+if [ -e /dev/loop-control ]; then
+  for n in $(seq 0 63); do [ -e /dev/loop$n ] || mknod -m 0660 /dev/loop$n b 7 $n 2>/dev/null || true; done
+fi
+dbus-uuidgen --ensure
+dbus-daemon --system --fork
+
+# Waydroid: the images are bind-mounted read-only at /usr/share/bunos/waydroid/images by the session manager;
+# /etc/waydroid-extra/images points there (Waydroid's preinstalled-images path, never downloaded over).
+if [ -e /dev/binderfs/binder-control ] && [ -f /usr/share/bunos/waydroid/images/system.img ]; then
+  if [ ! -f /var/lib/waydroid/waydroid.cfg ]; then
+    waydroid init -f >/var/log/waydroid-init.log 2>&1 || log "waydroid init failed"
+    cat /usr/share/bunos/waydroid/waydroid_base.prop.d/*.prop >>/var/lib/waydroid/waydroid_base.prop 2>/dev/null || true
+    waydroid upgrade -o >>/var/log/waydroid-init.log 2>&1 || true
+  fi
+  waydroid container start >/var/log/waydroid-container.log 2>&1 &
+  # First-boot provisioning (desktop windowing, setup wizards off) once Android has booted.
+  (for _ in $(seq 180); do /usr/libexec/bunos/waydroid-android17 provision >>/var/log/waydroid-init.log 2>&1 && break; sleep 5; done) &
+else
+  log "Android images or binder missing: Waydroid not started"
+fi
+
+# Graphical session as the user: dbus session bus, PipeWire, cage > cosmic, then the stream gateway.
+as_user sh -c '
+  set -eu
+  export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+  dbus-daemon --session --fork --address="$DBUS_SESSION_BUS_ADDRESS"
+  (pipewire & sleep 1; wireplumber & pipewire-pulse &) >/dev/null 2>&1
+  WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1 WLR_HEADLESS_OUTPUTS=1 \
+    cage -d -- /usr/libexec/bunos/cosmic-container-session >"$XDG_RUNTIME_DIR/cosmic.log" 2>&1 &
+'
+i=0; while [ ! -S "$RUN_USER/wayland-0" ] && [ $i -lt 240 ]; do sleep 0.5; i=$((i + 1)); done
+[ -S "$RUN_USER/wayland-0" ] || { log "cage did not start"; cat "$RUN_USER/cosmic.log" >&2; exit 1; }
+as_user env WAYLAND_DISPLAY=wayland-0 wlr-randr --output HEADLESS-1 --custom-mode "$SIZE" || true
+
+TOKEN_FILE=${APHRODY_REMOTE_TOKEN_FILE:-/run/secrets/session.token}
+if [ -r "$TOKEN_FILE" ]; then
+  as_user env WAYLAND_DISPLAY=wayland-0 APHRODY_WAYLAND_OUTPUT=HEADLESS-1 APHRODY_REMOTE_TOKEN_FILE="$TOKEN_FILE" \
+    aphrody-remote-desktop --bind 0.0.0.0:8794 >/var/log/aphrody-remote-desktop.log 2>&1 &
+else
+  log "no token file at $TOKEN_FILE: stream gateway not started"
+fi
+i=0; while [ ! -S "$RUN_USER/wayland-1" ] && [ $i -lt 120 ]; do sleep 0.5; i=$((i + 1)); done
+printf 'size=%s\ncage=wayland-0\ncosmic=%s\n' "$SIZE" "$([ -S "$RUN_USER/wayland-1" ] && echo wayland-1 || echo missing)" >/run/bunos/ready
+log "ready ($SIZE)"
+# Stay alive as long as cage runs.
+while [ -S "$RUN_USER/wayland-0" ] && pgrep -x cage >/dev/null; do sleep 5; done
+log "cage exited"

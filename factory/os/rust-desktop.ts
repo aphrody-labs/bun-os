@@ -118,7 +118,8 @@ function redox() {
   const keys = join(store, "../secrets/store/redox");
   mkdirSync(join(tree, "build"), { recursive: true });
   for (const k of ["id_ed25519.toml", "id_ed25519.pub.toml"])
-    if (existsSync(join(keys, k)) && !existsSync(join(tree, "build", k))) copyFileSync(join(keys, k), join(tree, "build", k));
+    if (existsSync(join(keys, k)) && !existsSync(join(tree, "build", k)))
+      copyFileSync(join(keys, k), join(tree, "build", k));
   const make = [
     "make",
     "all",

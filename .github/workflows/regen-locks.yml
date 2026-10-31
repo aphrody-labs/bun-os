@@ -1,21 +1,12 @@
 name: Regenerate locks and generated docs
 
-# Cargo.lock, bun.lock, factory/bunos/components.json pins and docs/ARCHITECTURE-MAP.md are derived files. Merges of long-lived
-# branches leave them stale; this job rebuilds them on a runner (the workstation and the VPS never regenerate them) and commits the
-# result to main as aphrody-dev. A normal push only, never a force push. Pushes made with GITHUB_TOKEN do not start new runs, so
-# this cannot loop; the path filter below also excludes the generated files themselves.
+# Cargo.lock, bun.lock, factory/bunos/components.json pins and docs/ARCHITECTURE-MAP.md are derived files. The VPS checkout, where
+# every build runs with the full tree and the pinned toolchain, keeps Cargo.lock and bun.lock current with the manifest change that
+# needs them. This job is a manual fallback only: run on push it resolved from a sparse runner tree and kept reverting the
+# VPS-resolved Cargo.lock (2026-10-30). A normal push only, never a force push.
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "Cargo.toml"
-      - "**/Cargo.toml"
-      - "package.json"
-      - "**/package.json"
-      - "rust-toolchain.toml"
-      - ".gitmodules"
 
 permissions:
   contents: write

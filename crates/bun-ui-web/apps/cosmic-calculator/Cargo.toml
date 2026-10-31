@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: Apache-2.0
+# A COSMIC calculator on our libcosmic fork, built for the browser by `buncc build libcosmic-calculator`
+# (wasm32-unknown-unknown, wgpu on WebGPU with the WebGL2 fallback) and natively for the desktop.
+# Own workspace: it builds against the checked-out fork in vendor/cosmic-epoch/libcosmic, patched there for wasm32.
+[workspace]
+
+[package]
+name = "bun-ui-cosmic-calculator"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "bun-ui-cosmic-calculator"
+path = "src/main.rs"
+
+[dependencies]
+libcosmic = { path = "../../../../vendor/cosmic-epoch/libcosmic", default-features = false, features = ["winit", "wgpu"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.129"
+getrandom = { version = "0.3", features = ["wasm_js"] }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"

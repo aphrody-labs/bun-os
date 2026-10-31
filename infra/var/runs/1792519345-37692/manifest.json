@@ -1,0 +1,18 @@
+{
+  "run_id": "1792519345-37692",
+  "requested_scope": "Status { target: None, json: false }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "error",
+      "status": "failed",
+      "detail": {
+        "message": "manifest absent: C:\\Users\\aphro\\aphrody\\tools/config/host\\inventory/targets.json"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "failed",
+  "evidence": []
+}

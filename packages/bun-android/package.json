@@ -9,6 +9,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./plugin": "./src/plugin.ts",
+    "./gradle": "./src/gradle.ts",
+    "./jvm": "./src/jvm.ts",
     "./types": "./src/types.ts"
   },
   "scripts": {

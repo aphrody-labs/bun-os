@@ -16,6 +16,12 @@
 - Share the existing VPS factory slots between runtime, OS and web builds,
   with at most four compiler jobs per concurrent lane and shared owner caches.
 
+## Development tools — 2026-10-30
+
+- Develop Bun OS with its own stack: Bun scripts, the Bun OS plugins and CLIs, and Rust tools (`rg`, `fd`, `sd`, `nu`, `bat`, `eza`,
+  `dust`, `procs`, `hyperfine`, `just`, `tokei`; uutils coreutils and sudo-rs on the VPS). Do not use PowerShell or GNU tools;
+  PowerShell only where a Windows-only API leaves no other way.
+
 ## Bun OS consolidation goal
 
 Before workspace, Cargo/Bun ownership, build-factory, packaging, cache, target,

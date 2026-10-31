@@ -6,7 +6,7 @@ no Gitea runner and no `os` branch ceremony. Nothing is ever forced.
 | Copy | Mechanism | Direction |
 | --- | --- | --- |
 | GitHub `aphrody-labs/bun-os`, branch `main` | source of truth, default and only branch | - |
-| Locks and generated docs | `.github/workflows/regen-locks.yml` (Cargo.lock, bun.lock, component pins, architecture map) commits to `main` | runner -> main |
+| Locks and generated docs | Cargo.lock and bun.lock are updated on the VPS checkout together with the manifest change; `.github/workflows/regen-locks.yml` is a manual fallback (`workflow_dispatch`) | VPS -> main |
 | Workstation `C:\bun-os` | Scheduled Task `BunOS-Sync` (every 10 min) runs `git pull --ff-only origin main` | main -> local |
 | VPS `~/src/bun-os` | `factory/sync/bunos-sync.ts` via a systemd user timer or tmux loop | main <-> VPS (ff, push if ahead) |
 

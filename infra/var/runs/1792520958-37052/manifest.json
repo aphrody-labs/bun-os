@@ -1,0 +1,18 @@
+{
+  "run_id": "1792520958-37052",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"ls -1td /home/ubuntu/var/runs/* | head -8\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"ls -1td /home/ubuntu/var/runs/* | head -8\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

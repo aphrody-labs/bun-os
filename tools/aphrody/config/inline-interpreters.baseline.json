@@ -167,11 +167,6 @@
       "scope": "test",
       "reason": "Root-only fixture suite of build-wsl-distro.sh with the same root interpreter; bootstrap, chroot and mounts are intercepted."
     },
-    "scripts/release/atomic-deploy-aphrody-discord.sh": {
-      "count": 3,
-      "scope": "host",
-      "reason": "Runtime-only host adapter; Bun is absent there, system CPython is the available interpreter."
-    },
     "scripts/release/atomic-deploy-aphrody-stack.sh": {
       "count": 3,
       "scope": "host",

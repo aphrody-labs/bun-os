@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518739-5596",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"bun install --help | head -80\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"bun install --help | head -80\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

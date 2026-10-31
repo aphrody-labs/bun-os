@@ -1,0 +1,18 @@
+{
+  "run_id": "1792519577-6156",
+  "requested_scope": "Service { action: Catalog, id: None, target: \"dbfr\", json: true }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "error",
+      "status": "failed",
+      "detail": {
+        "message": "lecture \\\\?\\C:\\src\\bun-os\\infra\\tools\\config\\service-catalog.json"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "failed",
+  "evidence": []
+}

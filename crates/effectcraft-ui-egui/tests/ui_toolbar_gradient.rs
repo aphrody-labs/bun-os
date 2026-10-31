@@ -1,4 +1,4 @@
-//! The toolbar's Fill / Stroke swatch with Linear or Radial Gradient (#612, reported on Discord):
+//! The toolbar's Fill / Stroke swatch with Linear or Radial Gradient (#612):
 //! it opens the Gradient Editor on the selected shape layer's Gradient Fill / Gradient Stroke
 //! Colors, as in After Effects, instead of Fill / Stroke Options. The words still open the
 //! options, a Solid Color swatch the colour picker, Alt-click still steps through the kinds, and

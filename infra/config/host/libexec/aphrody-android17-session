@@ -1,0 +1,28 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# Android 17 Waydroid session of the VPS host (qualification bench and scrcpy source for
+# aphrody-android-gateway until the unified Bun OS session carries Android): a headless Weston
+# output at the tablet size, then `waydroid session start` on it. adb: 192.168.240.112:5555.
+# Installed as /usr/local/libexec/aphrody-android17-session, next to
+# /usr/local/libexec/waydroid-android17 (factory/images/bunos-unified/rootfs/usr/libexec/bunos/).
+set -eu
+helper=${APHRODY_WAYDROID_HELPER:-/usr/local/libexec/waydroid-android17}
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}
+export WAYLAND_DISPLAY=wayland-android
+width=${APHRODY_ANDROID_WIDTH:-2560}
+height=${APHRODY_ANDROID_HEIGHT:-1600}
+weston --backend=headless --renderer=pixman --width="$width" --height="$height" \
+  --socket="$WAYLAND_DISPLAY" --idle-time=0 &
+weston_pid=$!
+trap 'kill "$weston_pid" 2>/dev/null; /usr/bin/python3 /usr/bin/waydroid session stop >/dev/null 2>&1 || true' EXIT INT TERM
+i=0
+while [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; do
+  i=$((i + 1)); [ "$i" -gt 50 ] && { echo "weston did not start" >&2; exit 1; }
+  sleep 0.2
+done
+"$helper" prepare
+# First-boot provisioning (root, idempotent) once Android reports sys.boot_completed.
+(for _ in $(seq 1 120); do sleep 5; sudo -n "$helper" provision >/dev/null 2>&1 && exit 0; done) &
+# The Debian python3-gbinder module is built for /usr/bin/python3; never resolve python3 from PATH.
+/usr/bin/python3 /usr/bin/waydroid session start

@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518909-27228",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"tmux list-panes -t bun-video-qual-final -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current_command} #{pane_current_path}'; ls -l /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final; tmux capture-pane -t bun-video-qual-final -S -12\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"tmux list-panes -t bun-video-qual-final -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current_command} #{pane_current_path}'; ls -l /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final; tmux capture-pane -t bun-video-qual-final -S -12\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

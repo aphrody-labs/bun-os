@@ -669,7 +669,7 @@ impl SlideApp {
             "app.links" => {
                 use deckcraft_engine::links::*;
                 return Ok(
-                    json!({"discord": DISCORD, "website": WEBSITE, "apps": APPS, "appPage": APP_PAGE, "github": GITHUB}),
+                    json!({"website": WEBSITE, "apps": APPS, "appPage": APP_PAGE, "github": GITHUB}),
                 );
             }
             _ => return Err(format!("unknown UI command `{id}`")),

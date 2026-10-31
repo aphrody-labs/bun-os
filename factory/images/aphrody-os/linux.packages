@@ -1,0 +1,17 @@
+# linux.aphrody.com: COSMIC compositor, shell surfaces and file explorer.
+cosmic-comp
+cosmic-session
+cosmic-panel
+cosmic-bg
+cosmic-applets
+cosmic-launcher
+cosmic-app-library
+cosmic-notifications
+cosmic-osd
+cosmic-settings-daemon
+cosmic-settings
+cosmic-icons
+cosmic-files
+cosmic-term
+cosmic-edit
+xdg-desktop-portal-cosmic

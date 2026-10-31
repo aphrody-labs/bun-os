@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518569-16920",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && ls -l build/release/bun build/debug/bun 2>/dev/null || true; bun agent-plugin doctor --json 2>/dev/null | head -c 1000; bun -v; git status --short --branch\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && ls -l build/release/bun build/debug/bun 2>/dev/null || true; bun agent-plugin doctor --json 2>/dev/null | head -c 1000; bun -v; git status --short --branch\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

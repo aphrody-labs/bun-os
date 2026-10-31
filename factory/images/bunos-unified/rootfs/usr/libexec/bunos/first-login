@@ -1,0 +1,11 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Once per user (COSMIC autostart): apply the default theme, generated from the M3 tokens (bunos-m3), falling
+# back to the Aphrody theme while bunos-m3 is not in the image yet.
+set -u
+stamp="${XDG_STATE_HOME:-$HOME/.local/state}/bunos/first-login"
+[ -e "$stamp" ] && exit 0
+for t in bunos-m3 aphrody; do
+  if [ -f "/usr/share/bunos/themes/$t/cosmic.ron" ]; then bunos-theme-set "$t" && break; fi
+done
+mkdir -p "$(dirname "$stamp")" && : >"$stamp"

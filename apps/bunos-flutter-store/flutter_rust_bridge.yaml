@@ -1,0 +1,5 @@
+# flutter_rust_bridge_codegen generate (run from this directory).
+rust_input: crate::api
+rust_root: ../../crates/bunos-flutter-bridge/
+dart_output: lib/src/rust
+web: false

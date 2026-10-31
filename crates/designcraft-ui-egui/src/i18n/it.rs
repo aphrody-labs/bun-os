@@ -704,10 +704,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
     ("Insert Variable", "Inserisci variabile"),
     ("Inspect Document", "Ispeziona documento"),
     ("Interface Color Theme", "Tema colore dell'interfaccia"),
-    (
-        "Join the ArtCraft Discord…",
-        "Unisciti al Discord di ArtCraft…",
-    ),
     ("Last Object Below", "Ultimo oggetto sotto"),
     ("Library Contents", "Contenuto libreria"),
     ("Library Items", "Elementi libreria"),
@@ -1230,10 +1226,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
         "[Nessuno] — scegli un colore sulla barra dei colori.",
     ),
     (
-        "discord.gg/artcraft — help, feedback and show-and-tell",
-        "discord.gg/artcraft — aiuto, feedback e condivisione dei lavori",
-    ),
-    (
         "⌥-click clears overrides",
         "⌥-clic cancella le modifiche locali",
     ),
@@ -1726,7 +1718,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
     ),
     ("Include Bleed", "Includi pagina al vivo"),
     ("Include Stroke Weight", "Includi spessore traccia"),
-    ("Join our Discord", "Unisciti al nostro Discord"),
     ("Keep Violations", "Violazioni opzioni di mantenimento"),
     (
         "Overprint [Black] Swatch at 100%",

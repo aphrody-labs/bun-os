@@ -119,7 +119,6 @@ fn about_body(ui: &mut egui::Ui, t: &Tokens) {
         "getartcraft.com/apps/figcraft",
         "https://getartcraft.com/apps/figcraft",
     );
-    ui.hyperlink_to(tr("Join us on Discord"), "https://discord.gg/artcraft");
     ui.add_space(8.0);
     ui.label(
         RichText::new(tr(

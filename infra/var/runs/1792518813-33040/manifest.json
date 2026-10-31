@@ -1,0 +1,25 @@
+{
+  "run_id": "1792518813-33040",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && bun run scripts/factory/factory.ts run --max-slots 1 -- bash -lc 'cd packages/bun-video && bun run scripts/check-types.ts'\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && bun run scripts/factory/factory.ts run --max-slots 1 -- bash -lc 'cd packages/bun-video && bun run scripts/check-types.ts'\"), command: [] }"
+      }
+    },
+    {
+      "name": "error",
+      "status": "failed",
+      "detail": {
+        "message": "remote command failed with exit code Some(1): $ (cd /home/ubuntu/src/bun && bash -lc cd packages/bun-video && bun run scripts/check-types.ts)\ntsconfig.check.json: 1 owned error(s), 48 vendored diagnostic(s) ignored\ntsconfig.scripts.check.json: 3 owned error(s), 0 vendored diagnostic(s) ignored\ntest/showcase-worker.test.ts(44,123): error TS2345: Argument of type '{ SHOWCASE_PREFIX: string; SHOWCASE: { head(): Promise<null>; get(): Promise<{ httpEtag: string; writeHttpMetadata(): void; }>; }; }' is not assignable to parameter of type 'ShowcaseEnvironment'.\nscripts/build-showcase.ts(443,11): error TS2353: Object literal may only specify known properties, and 'poster' does not exist in type 'ShowcaseWork'.\nscripts/build-showcase.ts(463,14): error TS2339: Property 'evidence' does not exist on type 'ShowcaseWork'.\nscripts/build-showcase.ts(464,29): error TS2345: Argument of type 'ShowcaseWork' is not assignable to parameter of type 'ShowcaseWork & { poster?: string | undefined; frames?: string[] | undefined; evidence: string[]; }'.\n339 |         console.log(`factory: too few free slots, waiting for ${held.map(i => slotLocks()[i]).join(\", \")}`);\n340 |         code = spawn(step.cwd, wrap(withJobs(step.argv, held.length), held, true), held.length);\n341 |       }\n342 |     }\n343 |   }\n344 |   if (code !== 0) throw new Error(`exit ${code}: ${step.argv.join(\" \")}`);\n                                  ^\nerror: exit 1: bash -lc cd packages/bun-video && bun run scripts/check-types.ts\n      at run (/home/ubuntu/src/bun/scripts/factory/factory.ts:344:29)\n\nBun v1.4.5 (Linux x64)"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "failed",
+  "evidence": []
+}

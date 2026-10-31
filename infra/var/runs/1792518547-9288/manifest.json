@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518547-9288",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"set -e; printf '%s' 'IyEvdXNyL2Jpbi9lbnYgYmFzaApjZCAvaG9tZS91YnVudHUvc3JjL2J1bi9wYWNrYWdlcy9idW4tdmlkZW8Kc2V0ICtlCmJ1biBjaGVjayAtLXRocmVhZHM9MSAtLXByb2plY3QgdHNjb25maWcuY2hlY2suanNvbiAtLW5vRW1pdCA+IC9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwL3NvdXJjZS10eXBlcy5sb2cgMj4mMQpjb2RlPSQ/CnByaW50ZiAnXG5FWElUX0NPREU9JXNcbicgIiRjb2RlIiA+PiAvaG9tZS91YnVudHUvYnVpbGQvc3RvcmFnZS90cmFuc2llbnQvYnVuLXZpZGVvLXBhY2thZ2UtcXVhbC0yMDI2MTAyMC9zb3VyY2UtdHlwZXMubG9nCmV4aXQgIiRjb2RlIg==' | base64 -d > /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/source-types.sh; chmod 700 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/source-types.sh; tmux new-session -d -s bun-video-source-types-20261020 'bash /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/source-types.sh'; tmux list-sessions | grep bun-video-source-types\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"set -e; printf '%s' 'IyEvdXNyL2Jpbi9lbnYgYmFzaApjZCAvaG9tZS91YnVudHUvc3JjL2J1bi9wYWNrYWdlcy9idW4tdmlkZW8Kc2V0ICtlCmJ1biBjaGVjayAtLXRocmVhZHM9MSAtLXByb2plY3QgdHNjb25maWcuY2hlY2suanNvbiAtLW5vRW1pdCA+IC9ob21lL3VidW50dS9idWlsZC9zdG9yYWdlL3RyYW5zaWVudC9idW4tdmlkZW8tcGFja2FnZS1xdWFsLTIwMjYxMDIwL3NvdXJjZS10eXBlcy5sb2cgMj4mMQpjb2RlPSQ/CnByaW50ZiAnXG5FWElUX0NPREU9JXNcbicgIiRjb2RlIiA+PiAvaG9tZS91YnVudHUvYnVpbGQvc3RvcmFnZS90cmFuc2llbnQvYnVuLXZpZGVvLXBhY2thZ2UtcXVhbC0yMDI2MTAyMC9zb3VyY2UtdHlwZXMubG9nCmV4aXQgIiRjb2RlIg==' | base64 -d > /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/source-types.sh; chmod 700 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/source-types.sh; tmux new-session -d -s bun-video-source-types-20261020 'bash /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/source-types.sh'; tmux list-sessions | grep bun-video-source-types\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

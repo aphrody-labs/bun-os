@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518492-14508",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"tmux list-sessions; tmux list-windows -t bun-video-package-qual-20261020; tmux list-panes -t bun-video-package-qual-20261020 -F '#{pane_current_command}:#{pane_current_path}'; tail -n 30 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/run.log 2>/dev/null; bun run /home/ubuntu/src/bun/scripts/factory/factory.ts slots\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"tmux list-sessions; tmux list-windows -t bun-video-package-qual-20261020; tmux list-panes -t bun-video-package-qual-20261020 -F '#{pane_current_command}:#{pane_current_path}'; tail -n 30 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020/run.log 2>/dev/null; bun run /home/ubuntu/src/bun/scripts/factory/factory.ts slots\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

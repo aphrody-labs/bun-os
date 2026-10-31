@@ -1,0 +1,5 @@
+#!/bin/sh
+# Wine desktop shell (explorer.exe /desktop=shell: desktop, taskbar and Start menu) inside cage via Xwayland.
+export WINEPREFIX=$HOME/.wine WINEDEBUG=${WINEDEBUG:--all} WINEDLLOVERRIDES=${WINEDLLOVERRIDES:-winemenubuilder.exe=d}
+size=$(wlr-randr 2>/dev/null | awk '/current/ {print $1; exit}')
+exec wine explorer.exe /desktop=shell,${size:-1280x800}

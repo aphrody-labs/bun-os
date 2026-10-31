@@ -259,6 +259,8 @@ export interface SessionLaunch {
   app: string;
   rom?: string;
   blocker?: string;
+  /** The test program makes no sound (Wine notepad): the PipeWire output stream is not required. */
+  silent?: boolean;
 }
 export const SESSION: Record<string, SessionLaunch> = {
   retroarch: {
@@ -266,7 +268,8 @@ export const SESSION: Record<string, SessionLaunch> = {
     app: "retroarch --appendconfig=/usr/share/bun-os/retroarch-vulkan.cfg -L /usr/lib/libretro/nestopia_libretro.so",
     rom: "tetanes-test-roms/spritecans.nes",
   },
-  "melonds-native": { package: "melonds", app: "melonDS", rom: "godmode9i/GodMode9i.nds" },
+  // GodMode9i is a file manager without sound: melonDS opens no PipeWire stream for it.
+  "melonds-native": { package: "melonds", app: "melonDS", rom: "godmode9i/GodMode9i.nds", silent: true },
   "azahar-native": { package: "azahar", app: "azahar", rom: "fbi/FBI.3dsx" },
   "tetanes-native": { package: "tetanes", app: "tetanes", rom: "tetanes-test-roms/spritecans.nes" },
   mgba: { package: "mgba-qt", app: "mgba-qt", rom: "gba-tests/hello.gba" },
@@ -289,8 +292,8 @@ export const SESSION: Record<string, SessionLaunch> = {
   shadps4: { package: "shadps4", app: "shadps4", blocker: "no free PlayStation 4 homebrew fixture pinned yet" },
   ppsspp: { package: "ppsspp", app: "PPSSPPSDL", rom: "pspsdk-cube/EBOOT.PBP" },
   gopher64: { package: "gopher64", app: "gopher64", rom: "peterlemon-n64/Mandelbrot32BPP320X240.N64" },
-  mame: { package: "mame", app: "mame -rompath /roms/mamedev-gridlee -skip_gameinfo -video bgfx gridlee" },
-  wine: { package: "wine", app: "wine notepad" },
+  mame: { package: "mame", app: "mame -rompath /roms/mamedev-gridlee -skip_gameinfo -video bgfx -sound pipewire gridlee" },
+  wine: { package: "wine", app: "wine notepad", silent: true },
   proton: {
     package: "proton-bunos",
     app: "env PROTONPATH=/usr/share/steam/compatibilitytools.d/proton-bunos GAMEID=0 umu-run winecfg",

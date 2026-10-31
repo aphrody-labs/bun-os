@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518771-20584",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && bun run scripts/factory/factory.ts run --max-slots 1 -- bun install --cwd packages/bun-video --frozen-lockfile --network-concurrency=4 --concurrent-scripts=2\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu/src/bun && bun run scripts/factory/factory.ts run --max-slots 1 -- bun install --cwd packages/bun-video --frozen-lockfile --network-concurrency=4 --concurrent-scripts=2\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

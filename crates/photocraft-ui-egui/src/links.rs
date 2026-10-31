@@ -6,7 +6,6 @@ use serde_json::{Value, json};
 
 use crate::PhotocraftApp;
 
-pub const DISCORD: &str = "https://discord.gg/artcraft";
 pub const ARTCRAFT_WEBSITE: &str = "https://getartcraft.com";
 pub const APP_PAGE: &str = "https://getartcraft.com/apps/photocraft";
 pub const GITHUB: &str = "https://github.com/storytold/photocraft";
@@ -14,7 +13,6 @@ pub const ISSUES: &str = "https://github.com/storytold/photocraft/issues";
 
 /// Help-menu link commands: (id, url). Labels live in `menus::UI_COMMANDS`.
 pub const COMMANDS: &[(&str, &str)] = &[
-    ("help.discord", DISCORD),
     ("help.website", APP_PAGE),
     ("help.artcraftWebsite", ARTCRAFT_WEBSITE),
     ("help.github", GITHUB),
@@ -40,20 +38,6 @@ pub fn open(app: &mut PhotocraftApp, ctx: &egui::Context, url: &str) -> Value {
     let template = "Opened {url}";
     app.ui.status = crate::i18n::fmt(tl!(template), &[("url", url)]);
     json!({"url": url})
-}
-
-/// The prominent "Join us on Discord" button.
-pub fn discord_button(
-    app: &mut PhotocraftApp,
-    ui: &mut egui::Ui,
-    min_width: f32,
-) -> egui::Response {
-    let r = crate::widgets::primary_button(ui, tl!("Join us on Discord"), min_width)
-        .on_hover_text(DISCORD);
-    if r.clicked() {
-        open(app, ui.ctx(), DISCORD);
-    }
-    r
 }
 
 /// "PhotoCraft website · GitHub · ArtCraft" as links, centred. Clicks route through [`open`] (the
@@ -117,7 +101,7 @@ mod tests {
 
     #[test]
     fn links_open_through_the_platform_service() {
-        // Issue #14: links (Help menu, Discord button, start-page links) must open in the browser.
+        // Issue #14: links (Help menu, start-page links) must open in the browser.
         // They route through the `open_url` service rather than the unreliable `ctx.open_url`.
         use std::sync::{Arc, Mutex};
         let opened: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
@@ -140,11 +124,11 @@ mod tests {
                 "{id}"
             );
         }
-        // The direct open() helper (Discord button / start-page links) also uses it.
-        open(&mut app, &ctx, DISCORD);
+        // The direct open() helper (start-page links) also uses it.
+        open(&mut app, &ctx, GITHUB);
         assert_eq!(
             opened.lock().unwrap().last().map(String::as_str),
-            Some(DISCORD)
+            Some(GITHUB)
         );
     }
 
@@ -159,7 +143,6 @@ mod tests {
         assert_eq!(
             help,
             [
-                "help.discord",
                 "help.website",
                 "help.artcraftWebsite",
                 "help.github",
@@ -182,7 +165,6 @@ mod tests {
         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
         let ctx = egui::Context::default();
         for (id, url) in [
-            ("help.discord", "https://discord.gg/artcraft"),
             ("help.website", "https://getartcraft.com/apps/photocraft"),
             ("help.github", "https://github.com/storytold/photocraft"),
         ] {

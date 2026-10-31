@@ -549,12 +549,6 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
         "{} — the Contextual Task Bar follows the selection again, under it",
     ),
     (
-        "help.discord",
-        "Join the ArtCraft Discord…",
-        None,
-        "{} — opens https://discord.gg/artcraft in the browser",
-    ),
-    (
         "help.appPage",
         "DesignCraft Website…",
         None,
@@ -1162,8 +1156,6 @@ pub const MENUS: &[(&str, &[&str])] = &[
     (
         "Help",
         &[
-            "ui:help.discord",
-            "-",
             "ui:help.appPage",
             "ui:help.github",
             "ui:help.issues",

@@ -158,6 +158,12 @@ async function main() {
       index.push(entry);
     }
   }
+  // Themes generated elsewhere into --out (bunos-m3: `m3-os-themes apps`) have no Omarchy colors.toml; keep their entry.
+  for (const name of (await readdir(values.out)).sort()) {
+    const meta = join(values.out, name, "theme.json");
+    if (index.some(e => e.name === name) || !existsSync(meta)) continue;
+    index.push(JSON.parse(await readFile(meta, "utf8")));
+  }
   await writeFile(join(values.out, "index.json"), JSON.stringify(index, null, 2) + "\n");
   console.log(`${index.length} themes -> ${values.out}`);
 }

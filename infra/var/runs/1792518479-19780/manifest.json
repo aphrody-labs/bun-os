@@ -1,0 +1,18 @@
+{
+  "run_id": "1792518479-19780",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"cd /home/ubuntu && APHRODY_INFRA_ROOT=/home/ubuntu aphrody infra --root /home/ubuntu/src/aphrody ssh exec --host vps --json -c 'tmux capture-pane -pt bun-video-package-qual-20261020:0.0 -S -30 2>&1; ls -l /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020'\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"cd /home/ubuntu && APHRODY_INFRA_ROOT=/home/ubuntu aphrody infra --root /home/ubuntu/src/aphrody ssh exec --host vps --json -c 'tmux capture-pane -pt bun-video-package-qual-20261020:0.0 -S -30 2>&1; ls -l /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020'\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

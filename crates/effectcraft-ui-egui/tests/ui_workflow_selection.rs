@@ -754,7 +754,7 @@ fn timeline_selected_effect_row_highlights() {
 
 /// Right-clicking a layer in the Timeline keeps the selection when the layer is part of it,
 /// so the context menu's commands act on every selected layer; right-clicking an unselected
-/// layer selects only it (After Effects). Reported on Discord: Pre-compose and Delete from the
+/// layer selects only it (After Effects). Reported: Pre-compose and Delete from the
 /// menu acted on the right-clicked layer only (#878).
 #[test]
 fn timeline_context_menu_acts_on_the_whole_selection() {

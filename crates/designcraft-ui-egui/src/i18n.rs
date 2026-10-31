@@ -4544,16 +4544,6 @@ const TABLE: &[(&str, [&str; 5])] = &[
         ],
     ),
     (
-        "Join the ArtCraft Discord…",
-        [
-            "Join the ArtCraft Discord…",
-            "Join the ArtCraft Discord…",
-            "Join the ArtCraft Discord…",
-            "Join the ArtCraft Discord…",
-            "加入 ArtCraft Discord…",
-        ],
-    ),
-    (
         "Last Object Below",
         [
             "Last Object Below",
@@ -7934,16 +7924,6 @@ const TABLE: &[(&str, [&str; 5])] = &[
         ],
     ),
     (
-        "discord.gg/artcraft — help, feedback and show-and-tell",
-        [
-            "discord.gg/artcraft — help, feedback and show-and-tell",
-            "discord.gg/artcraft — help, feedback and show-and-tell",
-            "discord.gg/artcraft — help, feedback and show-and-tell",
-            "discord.gg/artcraft — help, feedback and show-and-tell",
-            "discord.gg/artcraft — 帮助、反馈和展示",
-        ],
-    ),
-    (
         "⌥-click clears overrides",
         [
             "⌥-click clears overrides",
@@ -10838,16 +10818,6 @@ const TABLE: &[(&str, [&str; 5])] = &[
             "Include Stroke Weight",
             "Include Stroke Weight",
             "包含描边粗细",
-        ],
-    ),
-    (
-        "Join our Discord",
-        [
-            "Join our Discord",
-            "Join our Discord",
-            "Join our Discord",
-            "Join our Discord",
-            "加入我们的 Discord 社区",
         ],
     ),
     (

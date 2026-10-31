@@ -104,14 +104,6 @@
       "note": "Domain of the aphrody monorepo since 2026-10-01; the former split repository was deleted after a verified backup (~/.aphrody/private/backups/github/aphrody-labs-2026-10-01)."
     },
     {
-      "id": "aphrody-discord",
-      "role": "Development-only Bun Discord bot, interactions endpoint and OAuth test app",
-      "source": "https://github.com/aphrody-labs/aphrody",
-      "production": false,
-      "monorepoPaths": "crates/discord, packages/discord",
-      "note": "Domain of the aphrody monorepo since 2026-10-01; the former split repository was deleted after a verified backup (~/.aphrody/private/backups/github/aphrody-labs-2026-10-01)."
-    },
-    {
       "id": "nie",
       "role": "IEVR data and model runtime; desktop/source-first",
       "source": "https://github.com/aphrody-labs/iecode",

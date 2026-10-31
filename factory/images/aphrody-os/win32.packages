@@ -1,0 +1,4 @@
+# win32.aphrody.com: Wine (WoW64, PE builtins) under the cage kiosk compositor with Xwayland.
+wine
+wine_gecko
+cage

@@ -121,6 +121,21 @@ private fun ComponentGallery(
                 supportingContent = { Text("Bibliothèque native chargée sur Android") },
             )
         }
+        val core = remember { runCatching { com.aphrody.android.core.coreInfo() } }
+        Card(Modifier.fillMaxWidth()) {
+            ListItem(
+                headlineContent = {
+                    Text(
+                        core.fold(
+                            { "Rust core ${it.version} · ${it.arch}/${it.os} · ${it.pointerBits}-bit" },
+                            { "Rust core indisponible : ${it.message}" },
+                        ),
+                        Modifier.testTag("uniffi-result"),
+                    )
+                },
+                supportingContent = { Text("Liaisons Kotlin générées par uniffi") },
+            )
+        }
         OutlinedTextField(
             value = state.name,
             onValueChange = { value -> update { it.copy(name = value) } },

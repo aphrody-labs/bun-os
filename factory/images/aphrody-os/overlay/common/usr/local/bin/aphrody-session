@@ -1,0 +1,14 @@
+#!/bin/sh
+# Graphical session of the image, started by the tty1 login (see ~/.config/nushell/login.nu).
+export XDG_RUNTIME_DIR=/run/user/$(id -u) XDG_SESSION_TYPE=wayland LIBSEAT_BACKEND=seatd
+mkdir -p "$HOME/.local/state"
+log=$HOME/.local/state/aphrody-session.log
+exec >"$log" 2>&1
+echo "aphrody-session: $(cat /etc/aphrody/session) $(date -u +%FT%TZ)"
+case $(cat /etc/aphrody/session) in
+cosmic)
+  export XDG_CURRENT_DESKTOP=COSMIC XDG_SESSION_DESKTOP=COSMIC
+  exec dbus-run-session -- cosmic-session ;;
+wine)
+  exec dbus-run-session -- cage -d -- /usr/local/bin/aphrody-win32-desktop ;;
+esac

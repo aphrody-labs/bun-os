@@ -1,0 +1,18 @@
+{
+  "run_id": "1792519457-14016",
+  "requested_scope": "Ssh { json: true, command: Exec { host: Vps, cmd: Some(\"find /home/ubuntu/build/storage/transient -maxdepth 2 -path '*bun-video-package-qual-20261020-final2*' -type f -print 2>/dev/null | head -20; tail -60 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/run.log 2>/dev/null\"), command: [] } }",
+  "tool_versions": {},
+  "inputs": [],
+  "actions": [
+    {
+      "name": "ssh",
+      "status": "dispatched",
+      "detail": {
+        "command": "Exec { host: Vps, cmd: Some(\"find /home/ubuntu/build/storage/transient -maxdepth 2 -path '*bun-video-package-qual-20261020-final2*' -type f -print 2>/dev/null | head -20; tail -60 /home/ubuntu/build/storage/transient/bun-video-package-qual-20261020-final2/run.log 2>/dev/null\"), command: [] }"
+      }
+    }
+  ],
+  "outputs": [],
+  "status": "success",
+  "evidence": []
+}

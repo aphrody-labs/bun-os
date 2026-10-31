@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: MIT
+# Android 17 (LineageOS 24.0 GAPPS waydroid_x86_64, WayDroid-ATV build) on the shared host kernel.
+# The image reports the Pixel Tablet build fingerprint (google/tangorpro) that Play recognises;
+# the large-screen profile below matches it. Density stays with 10-bunos.prop (window-size driven).
+ro.build.characteristics=tablet
+persist.waydroid.suspend=false
