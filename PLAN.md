@@ -7,6 +7,22 @@ Component index (owners, entry commands, CI jobs, pins, status, announced-but-pe
 
 ## Verified architecture
 
+## Current owner direction (2026-10-31)
+
+- Target Linux userland is System76's Pop!_OS/Ubuntu, with native systemd units
+  and COSMIC as the primary desktop. Keep server, desktop and gaming
+  compositions separately assembled, and follow the systemd version shipped
+  by the selected Pop!_OS release.
+- Redox remains a distinct Rust microkernel target. Reuse portable crates only
+  where their target APIs, dependencies and licenses support it; systemd,
+  Linux drivers and Linux packaging do not become Redox contracts.
+- Use itch.io Butler's channel and delta-update model for suitable app and
+  artifact delivery; retain Bun OS-controlled signing, repository metadata and
+  rollback for operating-system releases.
+- The earlier Arch/pacman primary-base goal is superseded. Existing Arch
+  package tooling remains until its consumers are migrated or explicitly
+  retired; it is not evidence of the chosen Linux base.
+
 - This repository owns Bun OS distribution assembly, its root Bun workspace,
   package catalog, factory and release coordination. These are repository
   ownership boundaries, not claims that all declared compositions or release
@@ -19,8 +35,8 @@ Component index (owners, entry commands, CI jobs, pins, status, announced-but-pe
   `bun n2b`, `bun agent-plugin`, `bun wasm`, `bun:windows`, `bun:linux`,
   `bun:nginx`, `Bun.Video`) must be migrated or removed; the `bunos` CLI now
   answers the first four with an error.
-- Bun OS is an Arch-inspired Linux distribution. The final goal is Bun
-  integrated into the Linux kernel the way Rust was; see
+- The old Arch-inspired Linux description is superseded by the current owner
+  direction above. The final Bun/kernel research goal remains documented in
   [`docs/KERNEL-ROADMAP.md`](docs/KERNEL-ROADMAP.md).
 - Product source is organized under `apps/`, `crates/` and `packages/`.
   Upstream projects and independently owned code retain their source boundaries
@@ -28,10 +44,10 @@ Component index (owners, entry commands, CI jobs, pins, status, announced-but-pe
 - The root Cargo workspace is not yet the sole Rust workspace. For example,
   `packages/bun-tauri` declares a nested workspace, and
   the root manifest excludes it. Do not report Cargo consolidation complete.
-- The product direction is Arch Linux with pacman/libalpm. Server, COSMIC
-  Desktop and Gamescope Gaming remain distinct compositions; Alpine and Ubuntu
-  are compatibility targets in the checked-in product configuration. The
-  distribution manifest currently labels qualification as `development`.
+- The checked-in distribution manifest still says Arch/pacman; this is a known
+  mismatch with the current Pop!_OS/Ubuntu direction, not a verified product
+  choice. Server, desktop and gaming stay separate compositions. The manifest
+  labels qualification `development`.
 - Desktop session selection is separate from OS composition. Desktop defaults
   to COSMIC, whose exact closure and boot/display qualification remain pending;
   Omarchy Hyprland is explicitly blocked until its package subset and signed

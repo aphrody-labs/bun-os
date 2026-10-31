@@ -49,11 +49,10 @@ and `packages/android-web`. Merge product members into one root `crates/`,
 are not completed flattening. Reuse canonical implementations and preserve
 history, licenses and consumers before retiring source duplicates.
 
-Expanded OS direction (2026-10-16): integrate CachyOS, ChimeraOS and Omarchy
-catalogs through the root factory. Pacman/libalpm is the primary Linux package
-manager. Keep Server, COSMIC Desktop and Gamescope Gaming compositions separate;
-preserve upstream kernel/Rust histories and licenses. Imported source projects
-remain external pinned owners until deliberate Cargo/member migration.
+Historical OS direction (2026-10-16): CachyOS, ChimeraOS and Omarchy catalogs
+were explored through an Arch/pacman factory. The owner superseded that primary
+base direction on 2026-10-31; keep still-used imports as migration inputs, not
+as the current Linux product contract.
 
 Use the upstream Bun canary `1.4.4-canary.20261028.1` (gitHead `11c367163a4b`; `bun --revision`
 prints `1.4.4-canary.1+11c367163`) and Bun APIs for JavaScript and TypeScript. The
@@ -74,6 +73,16 @@ workspace and shared install/build/cache locations. Do not claim a single Cargo
 workspace while imported crates still belong to nested workspaces; migrate
 their manifests and references in controlled batches before removing those
 boundaries. Keep upstream license notices intact.
+
+Current OS direction (owner update, 2026-10-31): make Pop!_OS/Ubuntu the Linux
+base and COSMIC the primary desktop; keep systemd-native service management.
+Treat Redox as a separate OS target, reusing portable Rust components where
+their APIs and licenses permit rather than pretending Linux systemd units or
+kernel interfaces run on Redox. Use itch.io's Butler/channel model for
+versioned, resumable delta delivery where it fits; it does not replace the OS
+package manager. The prior Arch/pacman primary-base direction is superseded.
+Existing Arch factory code and packages remain migration inputs until consumers
+move and qualify; do not describe them as the selected base.
 
 The owner's target contract is flat Git submodules for product Rust crates in
 `crates/<package-name>`, inherited from one root Cargo workspace and nightly

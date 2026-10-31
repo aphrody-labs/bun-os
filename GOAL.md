@@ -4,7 +4,7 @@ This file describes the desired end state, not a statement that consolidation
 has already been completed. Current implementation and migration evidence is
 tracked in `PLAN.md` and the repository manifests.
 
-## Architecture (2026-10-29)
+## Architecture (owner update, 2026-10-31)
 
 - Runtime: the unmodified upstream Bun canary, npm `bun@1.4.4-canary.20261028.1`, pinned by its
   npm `gitHead` `11c367163a4b` (oven-sh/bun). `bun --revision` must print
@@ -12,8 +12,20 @@ tracked in `PLAN.md` and the repository manifests.
   commands and APIs (`bun mcp`, `bun n2b`, `bun agent-plugin`, `bun wasm`,
   `bun:windows`, `bun:linux`, `bun:nginx`, `Bun.Video`) do not exist on upstream.
   Quality gates are the upstream `bun check`, `bun lint` and `bun fmt`.
-- Bun OS is an Arch-inspired Linux distribution (pacman/libalpm; Server, COSMIC
-  Desktop and Gamescope Gaming compositions).
+- Linux product: System76's Pop!_OS/Ubuntu base, systemd-native service lifecycle, and
+  COSMIC as the primary desktop. Keep server, desktop, and gaming profiles
+  distinct. Follow the supported systemd version shipped by the selected
+  Pop!_OS release.
+- Redox is a separate Rust microkernel OS target, not a Linux base. Share
+  portable Rust libraries and application logic where their APIs and licenses
+  permit it; keep kernel, service, IPC, packaging, and boot integrations
+  target-specific.
+- Apply itch.io Butler's channel-based, resumable delta delivery to suitable
+  application/artifact releases. It does not replace OS package management or
+  signed system updates.
+- The 2026-10-16 Arch/pacman primary-base direction is superseded. Existing
+  Arch factory and package work is migration input until consumers move and
+  qualify, not the selected product base.
 - Final goal: Bun integrated into the Linux kernel the way Rust was. A phased
   roadmap is in [`docs/KERNEL-ROADMAP.md`](docs/KERNEL-ROADMAP.md), summarized
   from the 2026-10-29 research report. In short: copy Rust's process, not its
@@ -32,14 +44,12 @@ Material and compatibility distribution dependencies retain their pinned contrac
 The root catalog and source graph own discovery/export; physical relocation
 and nested workspace migration remain separate gates.
 
-The owner's expanded OS direction (2026-10-16) integrates the complete CachyOS,
-ChimeraOS and Omarchy package/source catalogs, build tools, SDKs and libraries.
-Pacman/libalpm replaces APT as the primary Linux distribution package manager.
-Use one Arch factory and separate Server, COSMIC Desktop and Gamescope Gaming
-compositions. Keep the optional Hyprland/Omarchy session distinct from COSMIC.
-Fork upstream kernels and Rust source projects with their history, pins,
-licenses and locks; imported projects are not automatically root Cargo members.
-APT remains an explicitly separate portability qualification target.
+The superseded 2026-10-16 Arch direction requested CachyOS, ChimeraOS and
+Omarchy catalogs and pacman/libalpm. Preserve useful source and package work,
+but do not extend it as the default product path. Migrate toward Pop!_OS/Ubuntu
+package sources and systemd service integration, with COSMIC as the first-class
+session. Keep each imported project's history, pins, licenses and ownership.
+Redox packaging and boot remain a distinct target contract.
 
 Owner update (2026-10-16): absorb Aphrody Infra and Workspace into Bun OS Infra
 and Workspace, including their implementations, catalogs, commands and consumers.

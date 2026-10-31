@@ -20,10 +20,12 @@ have been built, deployed or qualified.
 
 `distribution.json` declares the `full` and `perf` profiles; targets
 `linux-x64`, `linux-arm64`, `windows-x64`, `macos-arm64` and `wasm`; and the
-`server`, `desktop` and `gaming` compositions. It selects `pacman/libalpm` and
-the Arch Linux family for the Linux distribution configuration. The file labels
-qualification as `development`. These values define configuration; they are
-not build or release receipts.
+`server`, `desktop` and `gaming` compositions. The checked-in manifest currently
+selects `pacman/libalpm` and the Arch Linux family, while the current owner
+direction is Pop!_OS/Ubuntu with systemd and COSMIC. That is a configuration
+mismatch still to migrate; do not treat the manifest's old values as the selected
+target or claim the migration is complete. The manifest labels qualification as
+`development`, not a release receipt.
 
 ## Migration boundaries
 

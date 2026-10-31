@@ -114,45 +114,45 @@ Follow the current owner direction recorded in PLAN.md. External distribution
 dependencies keep their existing pinned contracts. Preserve active sibling checkouts until their consumers and
 canonical source owners qualify.
 
-## Distribution product direction
+## Distribution product direction — current owner update (2026-10-31)
 
-Treat Bun OS as a real Linux distribution assembled by `bun-distribution`, not
-as a renamed Arch installation and not as a Bun application layered onto an
-unowned host image.
+Treat Bun OS as a real Linux distribution assembled by `bun-distribution` and
+as a separate Redox OS target. Do not reduce either to a renamed upstream image
+or a Bun application layered on an unowned host.
 
-The current owner direction is to use the **Arch Linux family/model as the
-primary distribution reference**. This direction is established by the owner;
-implementation and qualification still require repository evidence. The reason
-is the fit with a fast-moving Rust,
-kernel, Mesa/Vulkan, LLVM/Clang, WebKit/JSC and gaming stack. Preserve Bun OS
-identity, its own package/build/qualification policy and its own release cadence.
+The current Linux direction is **System76's Pop!_OS/Ubuntu**, with native systemd service
+management and COSMIC as the primary desktop. Preserve Bun OS identity, its own
+package/build/qualification policy and release cadence. Follow the systemd
+version shipped by the selected Pop!_OS release.
 
-Produce at least two compositions from the same source/build graph:
+Produce three Linux compositions from the shared source/build graph:
 
-- **Bun OS Server** — minimal, headless, fast and hardened, with an operational
-  philosophy similar to Alpine/Debian minimal systems. Keep glibc as a supported
-  primary option where compatibility requires it and retain Alpine/musl as a
-  distinct qualification target rather than pretending libc differences are
-  transparent.
-- **Bun OS Desktop/Gaming** — glibc-oriented desktop/gaming composition with a
-  modern graphics stack. Research and integrate only qualified components needed
-  for Mesa/Vulkan, GPU drivers, Steam/Proton, Gamescope and the selected Bun OS
-  desktop/session. Keep gaming dependencies out of the server composition.
+- **Bun OS Server** — minimal, headless and hardened. Prefer native systemd
+  units, dedicated service identities, explicit writable state and credentials,
+  and supported sandboxing for long-running services.
+- **Bun OS Desktop** — Pop!_OS/Ubuntu userland and a complete COSMIC session,
+  including portals, settings, accessibility and first-party apps.
+- **Bun OS Gaming** — separate GPU, Gamescope, Steam/Proton and game-library
+  composition; keep gaming dependencies out of the server profile.
 
-Before finalizing implementation choices, use **GitHub MCP and Context7 rather
-than generic web search** to deeply study current primary sources for:
+Redox is an independently booted and packaged target. Reuse portable Rust
+libraries and application logic only when the target APIs, dependencies and
+licenses support it. Keep kernel, Scheme/IPC, service, packaging and boot
+integration target-specific; Linux systemd units are not Redox contracts.
 
-- **CachyOS** — kernel/toolchain/package optimization, CPU targeting, scheduler
-  choices, performance build infrastructure and server/desktop differentiation;
-- **ChimeraOS** — reproducible distribution/image construction, immutable or
-  image-based system design, update/rollback strategy, package composition and
-  gaming appliance architecture;
-- **SteamOS** — Arch-family gaming composition, Steam/Proton/Gamescope session,
-  graphics/driver integration, system/update boundaries and recovery model;
-- **Arch Linux** — package/build conventions, pacman/libalpm, repository
-  metadata, bootstrap/rootfs construction and rolling-release implications;
-- **COSMIC/System76** where useful — Rust component ownership, workspace/build
-  organization and desktop integration patterns.
+Use itch.io Butler's channel, resumable publish and delta-update model for
+appropriate app artifacts. It does not replace system repositories, signatures,
+OS update policy or rollback.
+
+The 2026-10-16 Arch/pacman primary-base direction is superseded. Preserve
+CachyOS, ChimeraOS, Omarchy and Arch source/package work as migration inputs;
+do not extend those as the default product path. Retire their tooling only after
+consumers migrate or are explicitly removed.
+
+Study primary sources for Pop!_OS/System76 package and release practices,
+systemd service security, COSMIC session integration, itch.io Butler delivery,
+Redox's microkernel/IPC boundaries, and transferable gaming/update patterns
+from SteamOS and ChimeraOS.
 
 Do not copy these distributions wholesale. Produce a comparison matrix of
 relevant mechanisms, licenses, update models, build systems, package managers,
@@ -169,9 +169,9 @@ The final distribution pipeline should converge on:
 
 Discover and reuse existing Bun OS package conversion, APT/APK/ALPM metadata,
 container, factory, source-integrity and receipt implementations before adding
-new owners. If Arch becomes the selected primary base, make pacman/libalpm and
-Arch package/repository handling first-class without deleting Debian/Alpine
-qualification paths that provide useful portability evidence.
+new owners. Make Pop!_OS/Ubuntu package and systemd integration first-class.
+Keep pacman/libalpm as compatibility tooling only while real consumers remain;
+do not let it define the primary Linux product contract.
 
 ## Git submodules
 

@@ -15,10 +15,15 @@ rolling status narrative.
 - Product members belong under the root `apps/`, `crates/` and `packages/`
   directories. Imported projects retain their upstream history, licenses and
   ownership until a deliberate migration is completed.
-- The distribution direction is Arch Linux with pacman/libalpm. Server, COSMIC
-  Desktop and Gamescope Gaming are separate compositions. Alpine and Ubuntu
-  remain compatibility targets. The final goal is Bun integrated into the Linux
-  kernel the way Rust was; the phased plan is `docs/KERNEL-ROADMAP.md`.
+- Current owner direction (2026-10-31): Pop!_OS/Ubuntu Linux base, systemd-native
+  services, COSMIC desktop, plus Redox as a separate Rust OS target. Reuse
+  portable Rust crates only where their APIs support it. Apply itch.io Butler's
+  channel/delta model to suitable app artifacts, not as the OS package manager.
+  The older Arch/pacman primary-base goal is superseded; its existing code is
+  migration input, not the selected base. See `GOAL.md` and `PLAN.md`.
+- Server, desktop and gaming remain separate compositions. The final goal is
+  Bun integrated into the Linux kernel the way Rust was; see
+  `docs/KERNEL-ROADMAP.md`.
 
 ## Current structural caveats
 

@@ -5,7 +5,9 @@
 # for every Android app, which the COSMIC launcher and app library list next to the Linux and web apps.
 set -u
 i=0
-while ! waydroid status 2>/dev/null | grep -q 'Container:.*RUNNING\|Container:.*FROZEN\|Container:.*STOPPED'; do
-  i=$((i + 1)); [ $i -gt 60 ] && exit 0; sleep 2
+until waydroid status 2>/dev/null | grep -q '^Container:'; do
+  i=$((i + 1)); [ $i -gt 90 ] && exit 0; sleep 2
 done
+# Android 17 needs minigbm gralloc on the render node before the first boot (waydroid-android17).
+/usr/libexec/bunos/waydroid-android17 prepare
 exec waydroid session start
