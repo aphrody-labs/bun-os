@@ -27,7 +27,8 @@
     "./drive-model-sync": "./src/drive-model-sync.ts",
     "./services": "./src/services.ts",
     "./edge-proxy": "./src/edge-proxy.ts",
-    "./fonts-proxy": "./src/fonts-proxy.ts"
+    "./fonts-proxy": "./src/fonts-proxy.ts",
+    "./bun-plugin": "./src/bun-plugin.ts"
   },
   "publishConfig": {
     "access": "public"
