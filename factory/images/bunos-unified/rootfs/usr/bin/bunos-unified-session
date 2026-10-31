@@ -96,11 +96,19 @@ fi
 i=0; while [ ! -S "$RUN_USER/wayland-1" ] && [ $i -lt 120 ]; do sleep 0.5; i=$((i + 1)); done
 printf 'size=%s\ncage=wayland-0\ncosmic=%s\n' "$SIZE" "$([ -S "$RUN_USER/wayland-1" ] && echo wayland-1 || echo missing)" >/run/bunos/ready
 log "ready ($SIZE)"
-# Android user session on COSMIC's display. cosmic-session does not run XDG autostart entries in this
-# container, so start it here; waydroid-session waits for the container manager and is a no-op when a
-# session already runs.
-if [ "${WAYDROID:-0}" = 1 ] && [ -S "$RUN_USER/wayland-1" ]; then
-  as_user env WAYLAND_DISPLAY=wayland-1 DBUS_SESSION_BUS_ADDRESS="unix:path=$RUN_USER/bus"     /usr/libexec/bunos/waydroid-session >/var/log/waydroid-session.log 2>&1 &
+# cosmic-session does not run XDG autostart entries in this container, so run the COSMIC ones here on COSMIC's
+# display: the Android user session (waydroid-session waits for the container manager), first-login theme,
+# web app icons, bun-obscura. The bootable image leaves this to the session.
+if [ -S "$RUN_USER/wayland-1" ]; then
+  for entry in /etc/xdg/autostart/*.desktop; do
+    if grep -q '^OnlyShowIn=' "$entry"; then grep -q '^OnlyShowIn=.*COSMIC' "$entry" || continue; fi
+    cmd=$(sed -n 's/^Exec=//p' "$entry" | head -n1); [ -n "$cmd" ] || continue
+    name=$(basename "$entry" .desktop)
+    case "$name" in bunos-waydroid-session) [ "${WAYDROID:-0}" = 1 ] || continue ;; esac
+    as_user env WAYLAND_DISPLAY=wayland-1 DBUS_SESSION_BUS_ADDRESS="unix:path=$RUN_USER/bus" XDG_CURRENT_DESKTOP=COSMIC \
+      PATH=/usr/libexec/bunos/container-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+      sh -c "$cmd" >"/var/log/autostart-$name.log" 2>&1 &
+  done
 fi
 # Stay alive as long as cage runs.
 while [ -S "$RUN_USER/wayland-0" ] && pgrep -x cage >/dev/null; do sleep 5; done
