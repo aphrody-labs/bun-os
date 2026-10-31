@@ -73,7 +73,11 @@ const fixedStamp = option("--stamp");
 const IDENTITY = { name: "aphrody-dev", email: "contact@aphrody.com" };
 /** Untracked files above this size stay on disk but are not copied into the snapshot (listed in its message). */
 const SNAPSHOT_FILE_LIMIT = 64 * 1024 * 1024;
-const MANIFESTS = ["Cargo.lock", ":(glob)**/Cargo.toml", ".cargo/config.toml", "rust-toolchain.toml"];
+const SECRET_PATH =
+  /(^|\/)(\.env(\..*)?|.*\.(pem|key|p12|pfx|keystore|jks|kdbx)|id_(rsa|ed25519|ecdsa)(\.pub)?|credentials(\.json)?|.*\.(token|secret)|token|secrets?\.(json|ya?ml|env|toml)|\.netrc|\.npmrc|\.pypirc|\.git-credentials)$/i;
+/** Snapshots are also pushed to GitHub (refs/wip/...) so other hosts and agents can pick them up. */
+const pushWip = process.env.BUNOS_SYNC_PUSH_WIP !== "0";
+const MANIFESTS =["Cargo.lock", ":(glob)**/Cargo.toml", ".cargo/config.toml", "rust-toolchain.toml"];
 
 export type Outcome = "current" | "fast-forwarded" | "pushed" | "healed" | "diverged" | "dirty" | "busy" | "error";
 
@@ -216,6 +220,11 @@ async function snapshot(gitDir: string, reason: string, parents: string[], track
     const skipped: string[] = [];
     const include: string[] = [];
     for (const path of listed) {
+      // Credentials never enter a snapshot (snapshots are pushed to GitHub); they stay on disk untouched.
+      if (SECRET_PATH.test(path)) {
+        skipped.push(`${path} (credential-like name)`);
+        continue;
+      }
       try {
         const info = statSync(join(repo, path));
         if (info.isFile() && info.size > SNAPSHOT_FILE_LIMIT) skipped.push(path);
@@ -237,7 +246,9 @@ async function snapshot(gitDir: string, reason: string, parents: string[], track
       `Reason: ${reason}`,
       `Parents: ${parents.join(" ")}`,
       `Tracked changes: ${tracked.length}; untracked paths: ${include.length}`,
-      ...(skipped.length ? ["Left on disk, not copied (over 64 MiB):", ...skipped.map(path => `  ${path}`)] : []),
+      ...(skipped.length
+        ? ["Left on disk, not copied (over 64 MiB or credential-like):", ...skipped.map(path => `  ${path}`)]
+        : []),
       "",
       "Recover: git switch -c <name> " + ref + "   (or cherry-pick / checkout <ref> -- <path>)",
     ].join("\n");
@@ -252,6 +263,10 @@ async function snapshot(gitDir: string, reason: string, parents: string[], track
     });
     await gitOk(["update-ref", "-m", "bunos-sync snapshot", ref, commit, ""]);
     if ((await gitOk(["rev-parse", "--verify", ref])) !== commit) throw new Error(`${ref} did not record ${commit}`);
+    if (pushWip) {
+      const pushed = await git(["push", "origin", `${ref}:${ref}`], { timeoutMs: 600_000 });
+      console.log(`[bunos-sync] ${pushed.code === 0 ? "pushed" : "could not push"} ${ref} to origin${pushed.code ? `: ${lastLine(pushed)}` : ""}`);
+    }
     return { ref, commit, tracked: tracked.length, untracked: include.length, skipped, displaced: [] };
   } finally {
     rmSync(index, { force: true });
@@ -366,7 +381,12 @@ async function pass(): Promise<Outcome> {
     const repaired = repairIndexLock(gitDir);
     if (repaired === "busy" || repaired?.startsWith("held")) return record("busy", `index.lock ${repaired}`);
 
-    const fetch = await git(["fetch", "--no-recurse-submodules", "origin", "main"], { timeoutMs: 300_000 });
+    // A concurrent fetch in the same checkout makes the ref update race ("unable to update local ref"): retry.
+    let fetch = await git(["fetch", "--no-recurse-submodules", "origin", "main"], { timeoutMs: 300_000 });
+    for (let attempt = 0; fetch.code !== 0 && attempt < 3; attempt++) {
+      await Bun.sleep(5000);
+      fetch = await git(["fetch", "--no-recurse-submodules", "origin", "main"], { timeoutMs: 300_000 });
+    }
     if (fetch.code !== 0) return record("error", `fetch failed: ${lastLine(fetch)}`);
 
     const branch = (await git(["symbolic-ref", "--quiet", "--short", "HEAD"])).out || "(detached)";
