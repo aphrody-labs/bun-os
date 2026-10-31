@@ -12,14 +12,16 @@
  *   1. Repair: a stale `.git/index.lock` (old, and no live git process in this checkout) is removed.
  *   2. fetch origin/main (credentials come from the git credential helper; nothing is stored or printed here).
  *   3. Clean and behind: fast-forward. Clean and ahead: normal `git push origin HEAD:main`.
- *   4. Dirty, diverged, on another branch or detached: self-heal. Everything (tracked changes, staged changes, untracked
+ *   4. Behind with local edits: fast-forward keeping the edits when they do not overlap. Diverged: replay the local
+ *      commits on origin/main (edits auto-stashed around the rebase) and push them.
+ *   5. When git refuses either, or on another branch, detached, or with edits untouched for the grace period: self-heal. Everything (tracked changes, staged changes, untracked
  *      files, divergent local commits through the snapshot's parents) is committed to `refs/wip/<host>/<stamp>`, the
  *      ref is verified, untracked paths that origin/main now tracks are moved aside, and the checkout is reset to
  *      origin/main on branch main. Untracked files are never deleted. The ref is logged to the status file and
  *      appended to wip.jsonl in the state directory.
- *   5. Lock writer (BUNOS_SYNC_LOCK_WRITER=1, the VPS only): when manifests changed and Cargo.lock no longer matches,
+ *   6. Lock writer (BUNOS_SYNC_LOCK_WRITER=1, the VPS only): when manifests changed and Cargo.lock no longer matches,
  *      `cargo metadata` updates it and the VPS commits and pushes the lock. This is the only lock writer.
- *   6. Gate (BUNOS_SYNC_GATE=1, the VPS only): factory/sync/bunos-gate.ts runs the main gate on the new HEAD.
+ *   7. Gate (BUNOS_SYNC_GATE=1, the VPS only): factory/sync/bunos-gate.ts runs the main gate on the new HEAD.
  *
  * Environment: BUNOS_REPO, BUNOS_SYNC_HOST, BUNOS_SYNC_INTERVAL, BUNOS_SYNC_STATE (state directory),
  * BUNOS_SYNC_PUSH=0 or --no-push (no push), BUNOS_SYNC_HEAL=0 (report instead of healing), BUNOS_SYNC_DIRTY_GRACE
@@ -64,7 +66,8 @@ const push = process.env.BUNOS_SYNC_PUSH !== "0" && !argv.includes("--no-push");
 /** Workstation mode: a tree edited within the grace period is never healed, even when it blocks a fast-forward. */
 const graceAlways = process.env.BUNOS_SYNC_GRACE_ALWAYS === "1" || argv.includes("--grace-always");
 const heal = process.env.BUNOS_SYNC_HEAL !== "0";
-const dirtyGraceMs = Number(process.env.BUNOS_SYNC_DIRTY_GRACE ?? 1800) * 1000;
+/** Uncommitted edits untouched this long are leftovers (default 2 h); younger ones belong to an agent at work. */
+const dirtyGraceMs = Number(process.env.BUNOS_SYNC_DIRTY_GRACE ?? 7200) * 1000;
 const lockWriter = process.env.BUNOS_SYNC_LOCK_WRITER === "1";
 const gateEnabled = process.env.BUNOS_SYNC_GATE === "1";
 const dryRun = argv.includes("--dry-run");
@@ -438,12 +441,46 @@ async function pass(): Promise<Outcome> {
 
     if (graceAlways && !healNow && dirty.length && Date.now() - (await newestChange(dirty)) < dirtyGraceMs)
       return record("dirty", `${dirty.length} tracked change(s) edited within the grace period; not healing yet`, sha);
+
+    // Gentle integration first: agents commit and edit in this checkout. Dirt that does not overlap the incoming
+    // changes survives a fast-forward, and local commits are replayed on origin/main (dirt auto-stashed around it).
+    // Only when git refuses does the snapshot-and-reset fallback run.
+    let integrated = "";
+    if (!offMain && !healNow && !dryRun && behind && dirty.length) {
+      const ff = await git(["merge", "--ff-only", "origin/main"], { timeoutMs: 1_800_000 });
+      if (ff.code === 0) integrated = `fast-forwarded ${local.slice(0, 10)}..${remote.slice(0, 10)} keeping ${dirty.length} local change(s)`;
+    }
+    if (!offMain && !healNow && !dryRun && diverged) {
+      const rebased = await git(["-c", "rebase.autoStash=true", "rebase", "origin/main"], { timeoutMs: 1_800_000 });
+      if (rebased.code === 0) integrated = `rebased local commits onto ${remote.slice(0, 10)}`;
+      else await git(["rebase", "--abort"], { timeoutMs: 600_000 });
+    }
+    if (integrated) {
+      const now = await gitOk(["rev-parse", "HEAD"]);
+      let detail = integrated;
+      let outcome: Outcome = "fast-forwarded";
+      if (now !== remote && push) {
+        // Normal push; the pre-push gate (core.hooksPath=.githooks) may refuse a red change, which then stays local.
+        const pushed = await pushMain();
+        outcome = pushed.code === 0 ? "pushed" : "error";
+        detail += pushed.code === 0 ? `; pushed ${remote.slice(0, 10)}..${now.slice(0, 10)}` : `; push refused: ${lastLine(pushed)}`;
+      }
+      const extra: Record<string, unknown> = { ...sha };
+      if (lockWriter && outcome !== "error") extra.lock = await syncCargoLock(await gitOk(["rev-parse", "HEAD"]));
+      if (gateEnabled && outcome !== "error") {
+        const { runGate, startCargoGate } = await import("./bunos-gate.ts");
+        extra.gate = await runGate(repo, stateDir);
+        extra.cargoGate = startCargoGate(repo);
+      }
+      return record(outcome, detail, extra);
+    }
+
     let healReason = "";
     if (offMain) healReason = `checkout is on ${branch}, not main`;
-    else if (diverged) healReason = "local main and origin/main both have commits";
-    else if (dirty.length && (behind || healNow)) healReason = `${dirty.length} uncommitted tracked change(s) block the fast-forward`;
+    else if (diverged) healReason = "local commits do not rebase cleanly onto origin/main";
+    else if (dirty.length && (behind || healNow)) healReason = `${dirty.length} uncommitted tracked change(s) conflict with the fast-forward`;
     else if (dirty.length && Date.now() - (await newestChange(dirty)) > dirtyGraceMs)
-      healReason = `${dirty.length} uncommitted tracked change(s) older than ${dirtyGraceMs / 60_000} min`;
+      healReason = `${dirty.length} uncommitted tracked change(s) left untouched for ${dirtyGraceMs / 60_000} min`;
 
     let healed: Snapshot | undefined;
     if (healReason) {
