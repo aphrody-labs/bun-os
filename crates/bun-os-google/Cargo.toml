@@ -45,7 +45,7 @@ rusqlite = { workspace = true, optional = true }
 chrono = { workspace = true, optional = true }
 jsonwebtoken = { workspace = true, optional = true }
 aes-gcm = { workspace = true, optional = true }
-sha2 = { workspace = true, optional = true, features = ["std"] }
+sha2 = { workspace = true, optional = true, features = ["alloc"] }
 base64 = { workspace = true, optional = true, features = ["std"] }
 getrandom = { workspace = true, optional = true, features = ["std"] }
 axum = { workspace = true, optional = true, features = ["json", "query", "tokio", "http1"] }
