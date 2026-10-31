@@ -42,7 +42,19 @@ session)
   u -d -e WAYLAND_DISPLAY=wayland-1 $name helium --ozone-platform=wayland --no-first-run https://aphrody.com/
   u -d -e WAYLAND_DISPLAY=wayland-1 $name bunos-launch-webapp https://gemini.google.com/ com.aphrody.webapp.Gemini
   sleep 25; shot 02-linux-and-web
-  for _ in $(seq 60); do docker exec $name sh -c 'waydroid shell -- getprop sys.boot_completed 2>/dev/null' | rg -q 1 && break; sleep 5; done
+  android_booted=
+  for _ in $(seq 60); do
+    android_booted=$(docker exec "$name" sh -c 'waydroid shell -- getprop sys.boot_completed 2>/dev/null' | tr -d '\r' || true)
+    [ "$android_booted" = 1 ] && break
+    sleep 5
+  done
+  if [ "$android_booted" != 1 ]; then
+    docker exec "$name" sh -c 'waydroid status; tail -120 /var/lib/waydroid/waydroid.log; cat /sys/fs/cgroup/cgroup.controllers; cat /sys/fs/cgroup/cgroup.subtree_control; cat /sys/fs/cgroup/cgroup.events' \
+      >"$OUT/android-failure.txt" 2>&1 || true
+    cat "$OUT/android-failure.txt" >&2
+    echo "Android did not finish booting (sys.boot_completed=$android_booted)" >&2
+    exit 1
+  fi
   docker exec $name sh -c 'waydroid status; ls /home/aphrody/.local/share/applications/ 2>/dev/null | head -60' | tee "$OUT/android.txt" || true
   u -d -e WAYLAND_DISPLAY=wayland-1 $name waydroid app launch com.android.vending
   sleep 40; shot 03-android-window

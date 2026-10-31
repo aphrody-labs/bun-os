@@ -31,11 +31,11 @@ fi
 # LXC (and Android's init) create cgroups for the Android container. With a private cgroup namespace the mount only
 # shows this container's own subtree, so making it writable cannot reach other cgroups.
 grep -q ' /sys/fs/cgroup .*\bro\b' /proc/self/mounts && { mount -o remount,rw /sys/fs/cgroup || log "/sys/fs/cgroup stays read-only"; }
-# cgroup v2 "no internal processes": move every process into /init so the root can delegate all controllers
-# to the Android container's cgroups (the same step docker-in-docker takes).
+# The Docker container's cgroup namespace root is a delegated cgroup and is exempt from cgroup v2's
+# no-internal-process rule. Keep this supervisor in that root so LXC can enable controllers there and
+# create its child cgroups. Moving PID 1 to /init makes /init LXC's delegation root; because PID 1 then
+# lives inside it, LXC gets EBUSY while enabling controllers and Android never starts.
 if [ -w /sys/fs/cgroup/cgroup.subtree_control ]; then
-  mkdir -p /sys/fs/cgroup/init
-  for p in $(cat /sys/fs/cgroup/cgroup.procs); do echo "$p" >/sys/fs/cgroup/init/cgroup.procs 2>/dev/null || true; done
   sed -e 's/ / +/g' -e 's/^/+/' </sys/fs/cgroup/cgroup.controllers >/sys/fs/cgroup/cgroup.subtree_control 2>/dev/null || log "cgroup controllers not delegated"
 fi
 # Loop devices for the read-only Android images (loop-control is passed in; block major 7 allowed by the cgroup).
