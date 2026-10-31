@@ -1,0 +1,4 @@
+persist.waydroid.multi_windows=true
+persist.waydroid.cursor_on_subsurface=true
+ro.sf.lcd_density=200
+persist.wm.debug.desktop_mode_enabled=true

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Android (Waydroid session)
+Comment=Starts the Android 17 user session inside COSMIC: every Android app becomes a COSMIC window and a launcher entry
+Exec=/usr/libexec/bunos/waydroid-session
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+OnlyShowIn=COSMIC;

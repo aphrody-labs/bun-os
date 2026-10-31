@@ -1,0 +1,15 @@
+cmdline-tools;latest
+platform-tools
+build-tools;37.0.0
+platforms;android-37.0
+platforms;android-37.1
+platforms;android-37.2
+sources;android-37.0
+sources;android-37.1
+sources;android-37.2
+ndk;30.0.16248370
+ndk;29.0.14206865
+cmake;4.1.2
+cmake;3.22.1
+extras;google;google_play_services
+extras;android;m2repository

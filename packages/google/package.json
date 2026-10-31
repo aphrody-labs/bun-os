@@ -1,23 +1,43 @@
 {
   "name": "@aphrody/google",
   "version": "1.4.7",
-  "description": "Canonical Bun facade for Aphrody Google Cloud and Gemini.",
+  "description": "Canonical Bun facade for Aphrody Google Cloud and Gemini, and the owner of the aphrody-labs/bun fork bun:google (Bun OS plugin) on upstream Bun.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aphrody-labs/bun-distribution.git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
     "directory": "packages/google"
   },
+  "bin": {
+    "bun-google": "./src/bun-google-cli.ts",
+    "bun-google-index-public": "./src/public-index-cli.ts"
+  },
   "files": [
-    "src"
+    "src",
+    "types",
+    "README.md"
   ],
   "type": "module",
+  "types": "./types/google.d.ts",
   "exports": {
     ".": "./src/index.ts",
     "./runtime": "./src/runtime.ts",
     "./api": "./src/api.ts",
     "./drive-sync": "./src/drive-sync.ts",
-    "./drive-model-sync": "./src/drive-model-sync.ts"
+    "./drive-model-sync": "./src/drive-model-sync.ts",
+    "./services": "./src/services.ts",
+    "./edge-proxy": "./src/edge-proxy.ts",
+    "./fonts-proxy": "./src/fonts-proxy.ts",
+    "./bun-google": "./src/bun-google.ts",
+    "./bun-plugin": "./src/bun-plugin.ts",
+    "./cli": "./src/bun-google-cli.ts",
+    "./search": "./src/search.ts",
+    "./mirror": "./src/mirror.ts",
+    "./oauth": "./src/oauth.ts",
+    "./password-store": "./src/password-store.ts",
+    "./public-index": "./src/public-index.ts",
+    "./public-index-cli": "./src/public-index-cli.ts",
+    "./types": "./types/google.d.ts"
   },
   "publishConfig": {
     "access": "public"
@@ -30,8 +50,9 @@
     "verify": "bun run test && bun run build"
   },
   "dependencies": {
+    "@aphrody/bun-os-plugins": "workspace:*",
+    "@aphrody/chromium": "workspace:*",
     "@ai-sdk/google-vertex": "catalog:",
-    "@aphrody/bun-google": "1.4.7",
     "@googleapis/docs": "catalog:",
     "@googleapis/drive": "catalog:",
     "ai": "catalog:",

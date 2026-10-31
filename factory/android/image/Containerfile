@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: Apache-2.0
+# bunos-android-sdk: private build image with the pinned Android toolchain (factory/android/sdk.json,
+# "build" profile: no emulator or system images), JDK 21, Gradle, Kotlin, Rust Android targets and
+# cargo-ndk. Build with `bun factory/android/sdk.ts image`, which writes packages.txt from sdk.json.
+# SDK components are downloaded from Google under the Android SDK licence. Keep the image on the VPS
+# or in the private Artifact Registry us-central1-docker.pkg.dev/aphrody/bunos; never a public registry.
+FROM ubuntu:24.04
+
+ARG CMDLINE_TOOLS
+ARG GRADLE_VERSION
+ARG KOTLIN_URL
+ARG RUST_TARGETS
+ARG CARGO_NDK
+ARG RUST_TOOLCHAIN=nightly-2026-09-15
+ENV ANDROID_HOME=/opt/android-sdk \
+    ANDROID_SDK_ROOT=/opt/android-sdk \
+    ANDROID_NDK_HOME=/opt/android-sdk/ndk/30.0.16248370 \
+    ANDROID_NDK_ROOT=/opt/android-sdk/ndk/30.0.16248370 \
+    JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 \
+    GRADLE_HOME=/opt/android-tools/gradle \
+    RUSTUP_HOME=/opt/rustup \
+    CARGO_HOME=/opt/cargo \
+    DEBIAN_FRONTEND=noninteractive
+ENV PATH=/opt/cargo/bin:/opt/android-tools/gradle/bin:/opt/android-tools/kotlinc/bin:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:$PATH
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl unzip git openjdk-21-jdk-headless build-essential pkg-config python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY packages.txt /tmp/packages.txt
+RUN mkdir -p "$ANDROID_HOME/cmdline-tools" \
+    && curl -4 -fsSL "$CMDLINE_TOOLS" -o /tmp/clt.zip \
+    && unzip -q /tmp/clt.zip -d /tmp/clt && mv /tmp/clt/cmdline-tools "$ANDROID_HOME/cmdline-tools/bootstrap" \
+    && yes | "$ANDROID_HOME/cmdline-tools/bootstrap/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses >/dev/null \
+    && xargs -a /tmp/packages.txt "$ANDROID_HOME/cmdline-tools/bootstrap/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --install >/dev/null \
+    && rm -rf "$ANDROID_HOME/cmdline-tools/bootstrap" /tmp/clt /tmp/clt.zip /root/.android/cache \
+    && "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --list_installed
+
+RUN curl -4 -fsSL "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -o /tmp/g.zip \
+    && mkdir -p /opt/android-tools && unzip -q /tmp/g.zip -d /opt/android-tools \
+    && ln -s "/opt/android-tools/gradle-${GRADLE_VERSION}" /opt/android-tools/gradle \
+    && curl -4 -fsSL "$KOTLIN_URL" -o /tmp/k.zip && unzip -q /tmp/k.zip -d /opt/android-tools \
+    && rm /tmp/g.zip /tmp/k.zip
+
+RUN curl -4 -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain "$RUST_TOOLCHAIN" \
+    && rustup target add $RUST_TARGETS \
+    && cargo install --locked cargo-ndk --version "$CARGO_NDK" \
+    && rm -rf "$CARGO_HOME/registry" "$CARGO_HOME/git" \
+    && chmod -R a+rwX "$CARGO_HOME" "$RUSTUP_HOME"
+
+WORKDIR /src

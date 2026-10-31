@@ -9,7 +9,7 @@
  */
 import { stat } from "node:fs/promises";
 import { extname, join } from "node:path";
-import { type EdgeRoute, createEdgeProxy } from "@aphrody/bun-google/edge-proxy";
+import { type EdgeRoute, createEdgeProxy } from "./edge-proxy.ts";
 
 export const M3_FONT_FAMILIES = [
   "Google Sans Flex",

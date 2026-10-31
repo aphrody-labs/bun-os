@@ -1,0 +1,7 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Streamed session only (first on PATH in cosmic-container-session). The VPS host restricts unprivileged user
+# namespaces through AppArmor and the container runs with no-new-privileges, so neither Chromium sandbox (userns or
+# setuid) is available; the per-user session container is the isolation boundary there. The bootable image runs
+# /usr/bin/helium with the full sandbox.
+exec /opt/helium/helium-wrapper --no-sandbox --ozone-platform=wayland "$@"

@@ -1,0 +1,38 @@
+{
+  "$comment": "Pinned Android toolchain at Googlebook-equivalent levels (Android 17 = API 37; the Googlebook desktop image is API 37.1). Consumed by factory/android/sdk.ts and the bunos-android-sdk image. Revisions are what `sdkmanager --list_installed` must report.",
+  "root": "/opt/android-sdk",
+  "tools": "/opt/android-tools",
+  "cmdlineToolsBootstrap": "https://dl.google.com/android/repository/commandlinetools-linux-16111833_latest.zip",
+  "jdk": { "package": "openjdk-21-jdk-headless", "major": 21, "why": "AGP 9.4 requires JDK 17+; 21 is the Ubuntu LTS JDK" },
+  "gradle": { "version": "9.8.2", "why": "latest stable; apps/bun-android wrapper moves to it" },
+  "kotlin": { "version": "2.4.21", "url": "https://github.com/JetBrains/kotlin/releases/download/v2.4.21/kotlin-compiler-2.4.21.zip" },
+  "rust": {
+    "targets": ["aarch64-linux-android", "x86_64-linux-android", "armv7-linux-androideabi", "i686-linux-android"],
+    "cargoNdk": "4.1.2"
+  },
+  "packages": {
+    "build": [
+      { "id": "cmdline-tools;latest", "revision": "23.0" },
+      { "id": "platform-tools", "revision": "37.0.1" },
+      { "id": "build-tools;37.0.0", "revision": "37.0.0" },
+      { "id": "platforms;android-37.0", "revision": "2" },
+      { "id": "platforms;android-37.1", "revision": "1" },
+      { "id": "platforms;android-37.2", "revision": "2" },
+      { "id": "sources;android-37.0", "revision": "2" },
+      { "id": "sources;android-37.1", "revision": "1" },
+      { "id": "sources;android-37.2", "revision": "1" },
+      { "id": "ndk;30.0.16248370", "revision": "30.0.16248370" },
+      { "id": "ndk;29.0.14206865", "revision": "29.0.14206865" },
+      { "id": "cmake;4.1.2", "revision": "4.1.2" },
+      { "id": "cmake;3.22.1", "revision": "3.22.1" },
+      { "id": "extras;google;google_play_services", "revision": "49" },
+      { "id": "extras;android;m2repository", "revision": "47.0.0" }
+    ],
+    "emulator": [
+      { "id": "emulator", "revision": "37.2.13", "why": "stable channel; 37.3.x is canary" },
+      { "id": "system-images;android-37.1;android-desktop;x86_64", "revision": "1", "channel": 3, "why": "Google APIs Desktop (Preview): the Googlebook-equivalent image" },
+      { "id": "system-images;android-37.0;android-desktop;x86_64", "revision": "1", "channel": 3, "why": "AOSP Desktop (Preview), no GMS" },
+      { "id": "system-images;android-37.0;google_apis_playstore;x86_64", "revision": "8", "why": "phone and tablet (pixel_tablet profile) with Play" }
+    ]
+  }
+}

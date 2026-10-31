@@ -1,0 +1,42 @@
+[package]
+name = "aphrody-adblock"
+version.workspace = true
+edition.workspace = true
+publish = false
+# Absorbed from Brave adblock-rust 0.13.3 (aphrody-labs/adblock-rust 6028a6d5735f), MPL-2.0: see LICENSE.
+license = "MPL-2.0"
+
+[lib]
+name = "adblock"
+path = "lib.rs"
+test = false
+doctest = false
+
+[dependencies]
+addr = { version = "0.15", default-features = false, features = ["psl"], optional = true }
+percent-encoding = "2.1"
+regex = "1.12.3"
+bitflags = { workspace = true, features = ["serde"] }
+itertools = "0.14"
+idna = "1.0.3"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.151"
+seahash = "4.1.0"
+rustc-hash = { version = "2.1", default-features = false }
+memchr = "2.8"
+base64 = "0.22"
+arrayvec = "0.7"
+thiserror = { workspace = true }
+flatbuffers = { version = "25.12.19", default-features = false }
+
+[features]
+default = ["embedded-domain-resolver", "full-regex-handling", "single-thread"]
+full-regex-handling = []
+single-thread = []
+debug-info = []
+content-blocking = []
+embedded-domain-resolver = ["addr"]
+resource-assembler = []
+
+[lints]
+workspace = true

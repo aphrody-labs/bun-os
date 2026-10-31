@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Bun OS first login
+Exec=/usr/libexec/bunos/first-login
+NoDisplay=true
+OnlyShowIn=COSMIC;
