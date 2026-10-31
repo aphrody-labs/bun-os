@@ -6,6 +6,7 @@
  *
  *   bun factory/os/rust-desktop.ts check              pins agree: forks.json, cargo-patch.toml, root crates, cosmic-epoch, Redox recipes
  *   bun factory/os/rust-desktop.ts redox              cookbook build of config bunos-desktop (podman, REPO_BINARY=1, patched recipes from source)
+ *   bun factory/os/rust-desktop.ts compile [app...]   cargo check of cosmic-epoch apps (default cosmic-edit) against cargo-patch.toml
  *   bun factory/os/rust-desktop.ts cosmic [app...]    Linux COSMIC apps through aphrody-native-apps (container lane), then the apt index
  *   bun factory/os/rust-desktop.ts publish            Redox pkgar repo -> /repo/redox/, image -> /downloads/os/redox/, apt/pacman via the Store
  *   bun factory/os/rust-desktop.ts qualify            boot the Redox image in QEMU (KVM when /dev/kvm is usable), screendump Orbital,
@@ -16,7 +17,7 @@
  * shared [patch] table stay); `redox` and `qualify` build and boot its image on demand only and are not part of `all`.
  *
  * Environment: BUNOS_REDOX_TREE (default vendor/redox/redox), STORE_ROOT (default ~/apps/webos/store),
- * BUNOS_RUST_DESKTOP_OUT (default ~/work/rust-desktop).
+ * BUNOS_RUST_DESKTOP_OUT (default target/rust-desktop in this checkout).
  */
 import {
   chmodSync,
@@ -46,7 +47,7 @@ const forks = JSON.parse(readFileSync(join(here, "forks.json"), "utf8")) as {
 const patchFile = join(here, "cargo-patch.toml");
 const tree = resolve(root, Bun.env.BUNOS_REDOX_TREE ?? "vendor/redox/redox");
 const store = Bun.env.STORE_ROOT ?? join(homedir(), "apps/webos/store");
-const out = Bun.env.BUNOS_RUST_DESKTOP_OUT ?? join(homedir(), "work/rust-desktop");
+const out = Bun.env.BUNOS_RUST_DESKTOP_OUT ?? join(root, "target/rust-desktop");
 const CONFIG = "bunos-desktop";
 const ARCH = "x86_64";
 const TARGET = `${ARCH}-unknown-redox`;
@@ -149,6 +150,24 @@ function cosmic(apps: string[]) {
   if (missing.length)
     run([join(root, "infra/config/host/libexec/aphrody-native-apps"), "container", "cosmic", ...missing]);
   else log("COSMIC debs already built by the native-apps lane:", COSMIC_APPS.join(", "));
+}
+
+// ------------------------------------------------------------------------------------------------ compile
+/** Proves the shared table resolves and compiles: cargo check of a cosmic-epoch app against cargo-patch.toml (lockfile restored). */
+function compile(apps: string[]) {
+  for (const app of apps.length ? apps : ["cosmic-edit"]) {
+    const dir = join(root, "vendor/cosmic-epoch", app);
+    if (!existsSync(join(dir, "Cargo.toml"))) run(["git", "-C", join(root, "vendor/cosmic-epoch"), "submodule", "update", "--init", app]);
+    try {
+      run(["nice", "-n", "10", "cargo", "check", "--release", "-j", "4", "--config", patchFile], {
+        cwd: dir,
+        env: { CARGO_TARGET_DIR: join(out, "target") },
+      });
+    } finally {
+      run(["git", "-C", dir, "checkout", "--", "Cargo.lock"], { allowFail: true });
+    }
+    log(`compile: ${app} checks against the shared table (libcosmic ${forks.shared.libcosmic.rev!.slice(0, 10)})`);
+  }
 }
 
 // ------------------------------------------------------------------------------------------------ publish
@@ -352,6 +371,9 @@ switch (cmd) {
   case "redox":
     redox();
     break;
+  case "compile":
+    compile(rest);
+    break;
   case "cosmic":
     cosmic(rest);
     break;
@@ -366,6 +388,6 @@ switch (cmd) {
     publish();
     break;
   default:
-    console.error("usage: rust-desktop.ts check|redox|cosmic [app...]|publish|qualify|all");
+    console.error("usage: rust-desktop.ts check|compile [app...]|redox|cosmic [app...]|publish|qualify|all");
     process.exit(2);
 }
