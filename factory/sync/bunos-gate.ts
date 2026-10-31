@@ -120,10 +120,16 @@ export async function culprit(repo: string, since: string | undefined, head: str
   return { sha, author, subject };
 }
 
-async function runSteps(repo: string, changed: string[] | undefined, since: string | undefined, head: string) {
+async function runSteps(
+  repo: string,
+  changed: string[] | undefined,
+  since: string | undefined,
+  head: string,
+  select: (name: string) => boolean = () => true,
+) {
   const results: StepResult[] = [];
   await ensureInstall(repo);
-  for (const step of gateSteps({ since, head })) {
+  for (const step of gateSteps({ since, head }).filter(step => select(step.name))) {
     if (step.when && changed && !changed.some(path => step.when!.test(path))) {
       results.push({ name: step.name, ok: true, skipped: "no matching change", seconds: 0 });
       continue;
@@ -182,6 +188,10 @@ async function postStatus(head: string, result: StepResult) {
 }
 
 /** Gate the checkout's HEAD once; called by bunos-sync while it holds the checkout. */
+/** Steps that take minutes run outside the sync pass (see runCargoGate), so the checkout keeps syncing. */
+export const SLOW_STEPS = new Set(["cargo-check"]);
+
+/** Gate the checkout's HEAD once; called by bunos-sync while it holds the checkout (fast steps only). */
 export async function runGate(repo: string, stateDir: string): Promise<string> {
   const head = (await git(repo, "rev-parse", "HEAD")).trim();
   const gateFile = join(stateDir, "gate.json");
@@ -197,7 +207,7 @@ export async function runGate(repo: string, stateDir: string): Promise<string> {
   const changed = since
     ? (await git(repo, "diff", "--name-only", since, head)).split("\n").filter(Boolean)
     : undefined;
-  const results = await runSteps(repo, changed, since, head);
+  const results = await runSteps(repo, changed, since, head, name => !SLOW_STEPS.has(name));
   const green = results.every(result => result.ok);
   const entry = { at: new Date().toISOString(), sha: head, lastGreen: green ? head : since, green, results };
   mkdirSync(stateDir, { recursive: true });
@@ -293,6 +303,54 @@ function shellSyntax(repo: string): string[] {
   return failures;
 }
 
+/**
+ * The slow steps for the checkout's HEAD, run detached from the sync pass (systemd-run --user, unit bunos-gate-cargo).
+ * The result is posted only when HEAD did not move meanwhile; a moved HEAD is gated again by the next run.
+ */
+export async function runCargoGate(repo: string, stateDir: string): Promise<string> {
+  const head = (await git(repo, "rev-parse", "HEAD")).trim();
+  const file = join(stateDir, "gate-cargo.json");
+  const previous = (() => {
+    try {
+      return JSON.parse(readFileSync(file, "utf8")) as { sha?: string; lastGreen?: string };
+    } catch {
+      return {};
+    }
+  })();
+  if (previous.sha === head) return `cargo gate: ${head.slice(0, 10)} already gated`;
+  const since = previous.lastGreen;
+  const changed = since ? (await git(repo, "diff", "--name-only", since, head)).split("\n").filter(Boolean) : undefined;
+  const results = await runSteps(repo, changed, since, head, name => SLOW_STEPS.has(name));
+  const after = (await git(repo, "rev-parse", "HEAD")).trim();
+  if (after !== head) return `cargo gate: HEAD moved from ${head.slice(0, 10)} to ${after.slice(0, 10)}; result dropped`;
+  const green = results.every(result => result.ok);
+  const entry = { at: new Date().toISOString(), sha: head, lastGreen: green ? head : since, green, results };
+  mkdirSync(stateDir, { recursive: true });
+  writeFileSync(file, JSON.stringify(entry, null, 2) + "\n");
+  appendFileSync(join(stateDir, "gate.jsonl"), JSON.stringify(entry) + "\n");
+  for (const result of results) await postStatus(head, result);
+  if (!green) await notifyA2a(head, results);
+  return `cargo gate: ${head.slice(0, 10)} ${green ? "green" : "red"}`;
+}
+
+/** Start the detached slow gate unless one is already running. */
+export function startCargoGate(repo: string): string {
+  if (process.platform !== "linux" || !Bun.which("systemd-run")) return "cargo gate: no systemd-run";
+  const active = Bun.spawnSync(["systemctl", "--user", "is-active", "bunos-gate-cargo.service"], { stdout: "pipe" });
+  if (active.stdout.toString().trim() === "active") return "cargo gate: already running";
+  Bun.spawnSync(["systemctl", "--user", "reset-failed", "bunos-gate-cargo.service"], { stdout: "ignore", stderr: "ignore" });
+  const started = Bun.spawnSync(
+    [
+      "systemd-run", "--user", "--unit", "bunos-gate-cargo", "--collect", "--no-block",
+      "--property=Nice=15", "--property=IOSchedulingClass=idle",
+      `--setenv=PATH=${process.env.PATH ?? ""}`, "--setenv=APHRODY_BUILD_HOST=vps",
+      `--working-directory=${repo}`, process.execPath, join(repo, SELF), "--cargo",
+    ],
+    { stdout: "pipe", stderr: "pipe" },
+  );
+  return started.exitCode === 0 ? "cargo gate: started" : `cargo gate: start failed: ${started.stderr.toString().trim()}`;
+}
+
 function buildHost(): boolean {
   return process.env.APHRODY_BUILD_HOST === "vps" || hostname().toLowerCase().startsWith("vps");
 }
@@ -325,6 +383,12 @@ async function prePush(repo: string): Promise<number> {
 if (import.meta.main) {
   const repo = resolve(process.env.BUNOS_REPO ?? process.cwd());
   if (process.argv.includes("--pre-push")) process.exit(await prePush(repo));
+  if (process.argv.includes("--cargo")) {
+    const stateDir = process.env.BUNOS_SYNC_STATE ?? join(homedir(), ".local", "state", "bunos-sync");
+    const summary = await runCargoGate(repo, stateDir);
+    console.log(summary);
+    process.exit(summary.endsWith(" red") ? 1 : 0);
+  }
   const staleIndex = process.argv.indexOf("--stale");
   if (staleIndex >= 0) {
     const found = await staleOverwrites(repo, process.argv[staleIndex + 1]!, process.argv[staleIndex + 2] ?? "HEAD");

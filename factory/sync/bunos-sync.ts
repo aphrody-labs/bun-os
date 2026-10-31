@@ -492,8 +492,9 @@ async function pass(): Promise<Outcome> {
     const extra: Record<string, unknown> = { ...sha, ...(healed ? { wip: healed } : {}) };
     if (lockWriter) extra.lock = await syncCargoLock(await gitOk(["rev-parse", "HEAD"]));
     if (gateEnabled && !dryRun) {
-      const { runGate } = await import("./bunos-gate.ts");
+      const { runGate, startCargoGate } = await import("./bunos-gate.ts");
       extra.gate = await runGate(repo, stateDir);
+      extra.cargoGate = startCargoGate(repo);
     }
     return record(outcome, detail, extra);
   } catch (error) {
