@@ -99,9 +99,9 @@ EXPOSE 8794
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/bin/bunos-unified-session"]
 
 FROM session AS unified
-# Bootable: Ubuntu's generic kernel (binder_linux, binderfs, memfd, vkms, KVM modules) until linux-bun is packaged
+# Bootable: Ubuntu's generic kernel (linux-image-generic pulls the matching modules and modules-extra: binder_linux, binderfs, memfd, vkms, KVM) until linux-bun is packaged
 # as a deb; systemd as init, cosmic-greeter on greetd, Waydroid's container service.
-RUN apt-get update && apt-get install -y linux-image-generic linux-modules-extra-generic initramfs-tools \
+RUN apt-get update && apt-get install -y linux-image-generic initramfs-tools \
        systemd-boot-efi linux-firmware network-manager greetd \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /var/log/apt/* /var/log/dpkg.log \
   && systemctl enable NetworkManager.service waydroid-container.service bunos-binderfs.service \
