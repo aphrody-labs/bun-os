@@ -97,89 +97,97 @@ fn decode(bytes: &[u8]) -> Option<StreamEvent> {
 /// Decoded `VideoFrame`s are drawn on an `OffscreenCanvas` and handed to iced as RGBA (the zero-copy wgpu external
 /// texture path replaces this copy when our iced fork exposes it).
 struct H264 {
-    decoder: web_sys::VideoDecoder,
+    decoder: JsValue,
     config: Vec<u8>,
 }
 
+fn set(object: &js_sys::Object, key: &str, value: &JsValue) {
+    let _ = js_sys::Reflect::set(object, &JsValue::from_str(key), value);
+}
+
+fn call(target: &JsValue, method: &str, args: &js_sys::Array) -> Result<JsValue, JsValue> {
+    let function: js_sys::Function = js_sys::Reflect::get(target, &JsValue::from_str(method))?.dyn_into()?;
+    function.apply(target, args)
+}
+
+/// `new <name>(arg)` on a WebCodecs constructor of the global scope. WebCodecs is reached through js-sys reflection:
+/// web-sys gates it behind `web_sys_unstable_apis`, which changes stable 2D canvas signatures that softbuffer uses.
+fn construct(name: &str, arg: &JsValue) -> Result<JsValue, JsValue> {
+    let constructor: js_sys::Function = js_sys::Reflect::get(&js_sys::global(), &JsValue::from_str(name))?
+        .dyn_into()
+        .map_err(|_| JsValue::from_str(&format!("{name} is not supported by this browser")))?;
+    js_sys::Reflect::construct(&constructor, &js_sys::Array::of1(arg))
+}
+
 impl H264 {
-    fn new(
-        codec: &str,
-        width: u32,
-        height: u32,
-        out: mpsc::UnboundedSender<StreamEvent>,
-    ) -> Result<H264, String> {
-        let canvas =
-            web_sys::OffscreenCanvas::new(width.max(1), height.max(1)).map_err(js_error)?;
+    fn new(codec: &str, width: u32, height: u32, out: mpsc::UnboundedSender<StreamEvent>) -> Result<H264, String> {
+        let canvas = web_sys::OffscreenCanvas::new(width.max(1), height.max(1)).map_err(js_error)?;
         let context: web_sys::OffscreenCanvasRenderingContext2d = canvas
             .get_context("2d")
             .map_err(js_error)?
             .ok_or("no 2d context")?
             .dyn_into()
             .map_err(js_error)?;
-        let output =
-            Closure::<dyn FnMut(web_sys::VideoFrame)>::new(move |frame: web_sys::VideoFrame| {
-                let (w, h) = (frame.display_width(), frame.display_height());
+        let output = Closure::<dyn FnMut(JsValue)>::new(move |frame: JsValue| {
+            let dimension = |key: &str| {
+                js_sys::Reflect::get(&frame, &JsValue::from_str(key)).ok().and_then(|v| v.as_f64()).unwrap_or(0.0) as u32
+            };
+            let (w, h) = (dimension("displayWidth"), dimension("displayHeight"));
+            if w > 0 && h > 0 {
                 if canvas.width() != w || canvas.height() != h {
                     canvas.set_width(w);
                     canvas.set_height(h);
                 }
-                let drawn = context.draw_image_with_video_frame(&frame, 0.0, 0.0);
-                frame.close();
-                if drawn.is_err() {
-                    return;
+                let drawn = call(
+                    &context,
+                    "drawImage",
+                    &js_sys::Array::of3(&frame, &JsValue::from_f64(0.0), &JsValue::from_f64(0.0)),
+                );
+                if drawn.is_ok()
+                    && let Ok(pixels) = context.get_image_data(0.0, 0.0, f64::from(w), f64::from(h))
+                {
+                    let _ = out.unbounded_send(StreamEvent::Frame(image::Handle::from_rgba(w, h, pixels.data().0), w, h));
                 }
-                if let Ok(pixels) = context.get_image_data(0.0, 0.0, f64::from(w), f64::from(h)) {
-                    let rgba = pixels.data().0;
-                    let _ = out.unbounded_send(StreamEvent::Frame(
-                        image::Handle::from_rgba(w, h, rgba),
-                        w,
-                        h,
-                    ));
-                }
-            });
-        let error = Closure::<dyn FnMut(JsValue)>::new(|e: JsValue| {
-            log_error(&format!("video decoder: {}", js_error(e)))
+            }
+            let _ = call(&frame, "close", &js_sys::Array::new());
         });
-        let init = web_sys::VideoDecoderInit::new(
-            error.as_ref().unchecked_ref(),
-            output.as_ref().unchecked_ref(),
-        );
-        let decoder = web_sys::VideoDecoder::new(&init).map_err(js_error)?;
+        let error = Closure::<dyn FnMut(JsValue)>::new(|e: JsValue| log_error(&format!("video decoder: {}", js_error(e))));
+        let init = js_sys::Object::new();
+        set(&init, "output", output.as_ref());
+        set(&init, "error", error.as_ref());
+        let decoder = construct("VideoDecoder", &init).map_err(js_error)?;
         output.forget();
         error.forget();
-        let config = web_sys::VideoDecoderConfig::new(codec);
-        config.set_coded_width(width);
-        config.set_coded_height(height);
-        config.set_optimize_for_latency(true);
-        decoder.configure(&config).map_err(js_error)?;
-        Ok(H264 {
-            decoder,
-            config: Vec::new(),
-        })
+        let config = js_sys::Object::new();
+        set(&config, "codec", &JsValue::from_str(codec));
+        set(&config, "codedWidth", &JsValue::from_f64(f64::from(width)));
+        set(&config, "codedHeight", &JsValue::from_f64(f64::from(height)));
+        set(&config, "optimizeForLatency", &JsValue::TRUE);
+        set(&config, "hardwareAcceleration", &JsValue::from_str("prefer-hardware"));
+        call(&decoder, "configure", &js_sys::Array::of1(&config)).map_err(js_error)?;
+        Ok(H264 { decoder, config: Vec::new() })
     }
 
     fn chunk(&mut self, bytes: &[u8]) {
         if bytes.len() < 9 {
             return;
         }
-        let kind = bytes[0];
         let pts = u64::from_be_bytes(bytes[1..9].try_into().unwrap_or([0; 8]));
         let payload = &bytes[9..];
-        let (data, kind) = match kind {
+        let (data, kind) = match bytes[0] {
             1 => {
                 self.config = payload.to_vec();
                 return;
             }
-            2 => (
-                [self.config.as_slice(), payload].concat(),
-                web_sys::EncodedVideoChunkType::Key,
-            ),
-            _ => (payload.to_vec(), web_sys::EncodedVideoChunkType::Delta),
+            2 => ([self.config.as_slice(), payload].concat(), "key"),
+            _ => (payload.to_vec(), "delta"),
         };
-        let buffer = js_sys::Uint8Array::from(data.as_slice());
-        let init = web_sys::EncodedVideoChunkInit::new(&buffer, pts as f64, kind);
-        if let Ok(chunk) = web_sys::EncodedVideoChunk::new(&init) {
-            let _ = self.decoder.decode(&chunk);
+        let init = js_sys::Object::new();
+        set(&init, "type", &JsValue::from_str(kind));
+        set(&init, "timestamp", &JsValue::from_f64(pts as f64));
+        set(&init, "data", &js_sys::Uint8Array::from(data.as_slice()));
+        if let Ok(chunk) = construct("EncodedVideoChunk", &init) {
+            let _ = call(&self.decoder, "decode", &js_sys::Array::of1(&chunk));
         }
     }
 }
