@@ -25,6 +25,8 @@ prepare() {
 
 build() {
   cd dxvk
+  # makepkg host flags (-z relro, -fstack-clash-protection...) break the mingw-w64 link checks.
+  unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS RUSTFLAGS
   ./package-release.sh bunos "$srcdir/out" --no-package
 }
 
