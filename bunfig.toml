@@ -1,6 +1,14 @@
+# Bun OS plugins (packages/bun-os-plugins): the fork additions (bun:google, bun:chromium, ...) and
+# Bun OS capabilities as Bun plugins on upstream Bun canary.
+preload = ["./packages/bun-os-plugins/src/preload.ts"]
+
+
 [install]
 exact = true
 linker = "hoisted"
 
 [run]
 shell = "bun"
+
+[test]
+preload = ["./packages/bun-os-plugins/src/preload.ts"]
