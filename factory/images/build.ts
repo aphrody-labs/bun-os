@@ -349,6 +349,9 @@ async function run(argv: string[], timeoutMs: number, capture = false, cwd?: str
 }
 
 function remoteScript(name: string, image: ImageSpec, targets: string[], args: Record<string, string>) {
+  const compressionLevel = process.env.BUNOS_IMAGE_COMPRESSION_LEVEL ?? "19";
+  if (!/^(?:[0-9]|1[0-9])$/.test(compressionLevel))
+    throw new Error(`Invalid BUNOS_IMAGE_COMPRESSION_LEVEL: ${compressionLevel}`);
   const flags = Object.entries(args)
     .map(([key, value]) => `--build-arg ${key}='${value.replaceAll("'", "")}'`)
     .join(" ");
@@ -391,7 +394,7 @@ function remoteScript(name: string, image: ImageSpec, targets: string[], args: R
         ? ` && { ${base} --output type=tar,dest=out/${name}-${target}-rootfs.tar && zstd -T4 -19 --long --rm -f out/${name}-${target}-rootfs.tar && echo "${name}-${target}-rootfs.tar.zst ok" >>status || echo "${name}-${target}-rootfs failed" >>status; }`
         : "";
     lines.push(
-      `${base} --output type=image,name=docker.io/library/${tag},compression=zstd,compression-level=19,force-compression=true,oci-mediatypes=true && echo "${tag} ok" >>status${rootfs} || echo "${tag} failed" >>status`,
+      `${base} --output type=image,name=docker.io/library/${tag},compression=zstd,compression-level=${compressionLevel},force-compression=true,oci-mediatypes=true && echo "${tag} ok" >>status${rootfs} || echo "${tag} failed" >>status`,
     );
   }
   lines.push(
