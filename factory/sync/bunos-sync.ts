@@ -22,8 +22,10 @@
  *   6. Gate (BUNOS_SYNC_GATE=1, the VPS only): factory/sync/bunos-gate.ts runs the main gate on the new HEAD.
  *
  * Environment: BUNOS_REPO, BUNOS_SYNC_HOST, BUNOS_SYNC_INTERVAL, BUNOS_SYNC_STATE (state directory),
- * BUNOS_SYNC_PUSH=0 (no push), BUNOS_SYNC_HEAL=0 (report instead of healing), BUNOS_SYNC_DIRTY_GRACE (seconds a dirty
- * tree that blocks nothing may stay dirty, default 1800), BUNOS_SYNC_LOCK_WRITER=1, BUNOS_SYNC_GATE=1.
+ * BUNOS_SYNC_PUSH=0 or --no-push (no push), BUNOS_SYNC_HEAL=0 (report instead of healing), BUNOS_SYNC_DIRTY_GRACE
+ * (seconds a dirty tree that blocks nothing may stay dirty, default 1800), BUNOS_SYNC_GRACE_ALWAYS=1 or --grace-always
+ * (workstation: never heal a tree edited within the grace period), BUNOS_SYNC_LOCK_WRITER=1, BUNOS_SYNC_GATE=1.
+ * Install: bun factory/sync/install.ts (systemd user timer on Linux, Scheduled Task BunOS-Sync on Windows).
  */
 import {
   appendFileSync,
@@ -56,7 +58,9 @@ const statusFile = process.env.BUNOS_SYNC_STATUS ?? join(stateDir, "status.json"
 const stateFile = join(stateDir, "state.json");
 const wipLog = join(stateDir, "wip.jsonl");
 const interval = Number(process.env.BUNOS_SYNC_INTERVAL ?? 600);
-const push = process.env.BUNOS_SYNC_PUSH !== "0";
+const push = process.env.BUNOS_SYNC_PUSH !== "0" && !argv.includes("--no-push");
+/** Workstation mode: a tree edited within the grace period is never healed, even when it blocks a fast-forward. */
+const graceAlways = process.env.BUNOS_SYNC_GRACE_ALWAYS === "1" || argv.includes("--grace-always");
 const heal = process.env.BUNOS_SYNC_HEAL !== "0";
 const dirtyGraceMs = Number(process.env.BUNOS_SYNC_DIRTY_GRACE ?? 1800) * 1000;
 const lockWriter = process.env.BUNOS_SYNC_LOCK_WRITER === "1";
@@ -381,6 +385,8 @@ async function pass(): Promise<Outcome> {
     const diverged = base !== local && base !== remote;
     const offMain = branch !== "main";
 
+    if (graceAlways && !healNow && dirty.length && Date.now() - (await newestChange(dirty)) < dirtyGraceMs)
+      return record("dirty", `${dirty.length} tracked change(s) edited within the grace period; not healing yet`, sha);
     let healReason = "";
     if (offMain) healReason = `checkout is on ${branch}, not main`;
     else if (diverged) healReason = "local main and origin/main both have commits";

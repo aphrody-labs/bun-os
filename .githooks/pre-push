@@ -1,0 +1,10 @@
+#!/usr/bin/env bun
+// Pre-push gate (core.hooksPath=.githooks, set by factory/sync/install.ts): bun check, bun lint, bun format --check and,
+// when Rust changed, cargo check --workspace --locked. Heavy steps run on the VPS build host only.
+const gate = new URL("../factory/sync/bunos-gate.ts", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
+const proc = Bun.spawn([process.execPath, gate, "--pre-push"], {
+  stdin: new Response(await Bun.stdin.text()),
+  stdout: "inherit",
+  stderr: "inherit",
+});
+process.exit(await proc.exited);
