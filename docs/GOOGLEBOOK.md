@@ -28,11 +28,11 @@ container, ChromiumOS contributes components, and COSMIC hosts the ChromeOS-styl
 | Googlebook piece | Bun OS owner | State |
 | --- | --- | --- |
 | Android 17 SDK, NDK, JDK at API 37.x | `factory/android/sdk.json`, `/opt/android-sdk`, image `bunos-android-sdk:37` | installed on the VPS; see [ANDROID.md](ANDROID.md) |
-| Android 17 runtime | native Android 17 container (`factory/images/bunos-android-17`) | owned by the Android 17 agent |
-| Desktop windowing in that container | settings below | globals: Android 17 container owner; `persist.wm.debug.desktop_mode_enabled`: unified image |
+| Android 17 runtime | Waydroid Android 17 container in `factory/images/bunos-unified` | owned by the Android 17 agent |
+| Desktop windowing in that container | settings below | applied by `waydroid-android17 provision` (globals) and the unified image (`persist.wm.debug.desktop_mode_enabled`) |
 | ChromeOS sandboxing | `aphrody-labs/minijail`, `factory/chromiumos/minijail-deb.ts` | `bunos-minijail` deb built against ubuntu:26.04 into `~/native-apps/debs`, smoke-tested |
 | Other ChromeOS system pieces | forks `aphrody-labs/platform2`, `aphrody-labs/crosvm` | forked; not in the default image |
-| Phone Hub | `cosmic-applet-phone-hub` in `aphrody-labs/cosmic-applets` | applet written, see below |
+| Phone Hub | `cosmic-applet-phone-hub` in `aphrody-labs/cosmic-applets` | `aphrody-labs/cosmic-applets` fcf8d6ae, `cargo check --locked` passes; on the default top bar via `aphrody-labs/cosmic-panel` be1bf7b3; pinned by `aphrody-labs/cosmic-epoch` 55646124 |
 | Files integration | Phone Hub "Recent photos in Files" | copies camera photos and opens COSMIC Files |
 
 Desktop windowing settings for the Android 17 container (adb shell, persistent in `/data`):
@@ -74,8 +74,8 @@ Do Not Disturb, lock the phone, connect the container. adb is taken from `ADB`, 
 
 ## Remaining
 
-- Ship Phone Hub in the `cosmic-applets` deb of the native-apps lane and add it to the default panel.
-- Apply the desktop windowing globals in the Android 17 container and expose its `/sdcard` in Files.
+- Rebuild the `cosmic-applets` and `cosmic-panel` debs in the native-apps lane from the new pins.
+- Expose the Android container `/sdcard` in Files.
 - ChromeOS-style Smart Lock, tethering and notification mirroring in Phone Hub.
 - NDK canary builds are not in the SDK repository (ci.android.com only); the pinned NDKs are r30 stable
   and r29 side by side.

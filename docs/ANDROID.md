@@ -61,6 +61,11 @@ to `/opt/android-sdk`. Why API 37: see [GOOGLEBOOK.md](GOOGLEBOOK.md).
   through rustup, plus `cargo-ndk` 4.1.2.
 - Build containers: `bun factory/android/sdk.ts image` builds the private `bunos-android-sdk:37` image (build
   profile, no emulator). Never push it to a public registry.
+- Qualified 2026-10-31: NDK r30 clang built a C sample for the four ABIs at API 37 and it ran on the
+  redroid Android 13 target (`hello from NDK r30, device API 33`); `cargo ndk -P 37` built
+  `crates/android-native` for arm64-v8a, x86_64, armeabi-v7a and x86 (exports `android_add`,
+  `Java_com_aphrody_android_NativeBridge_add`); `bunos-android-sdk:37` (3.66 GB) lists the same SDK pins,
+  JDK 21, Kotlin 2.4.21 and cargo-ndk 4.1.2.
 - Pitfalls: `dl.google.com` returns 404 over IPv6 from the VPS, so downloads use IPv4. cmdline-tools 23
   makes `sdkmanager` a shim over the Android CLI, which the recipe prefetches into `~/.android/bin`. The
   desktop images exist only on channel 3.
