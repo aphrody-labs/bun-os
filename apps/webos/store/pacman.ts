@@ -207,7 +207,8 @@ const PREBUILD: Record<string, Prebuild> = {
         "fetch spacedrive",
         run(["bash", "-c", 'set -e; mkdir -p "$1"; cd "$1"; [ -d .git ] || git init -q; git remote add origin https://github.com/aphrody-labs/spacedrive.git 2>/dev/null || true; git fetch -q --depth 1 origin "$2"; git checkout -q --force FETCH_HEAD', "_", dir, commit], { timeout: HOURS }),
       );
-      await must("spacedrive bun install", run(["bun", "install", "--frozen-lockfile", "--ignore-scripts"], { cwd: dir, timeout: HOURS }));
+      // The fork's bun.lock trails its package.json at the pinned commit; resolve it in the private clone.
+      await must("spacedrive bun install", run(["bun", "install", "--ignore-scripts"], { cwd: dir, timeout: HOURS }));
       await must("spacedrive web build", run(["bun", "run", "build"], { cwd: join(dir, "apps/web"), timeout: HOURS }));
       await must(
         "cargo build spacedrive",
