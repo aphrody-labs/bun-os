@@ -8,7 +8,7 @@ services:
     command:
       - redis-server
       - --bind
-      - 0.0.0.0
+      - 127.0.0.1
       - --protected-mode
       - "yes"
       - --maxmemory
@@ -19,8 +19,7 @@ services:
       - ""
       - --appendonly
       - "no"
-    ports:
-      - "127.0.0.1:6379:6379"
+    network_mode: host
     mem_limit: 768m
     pids_limit: 128
     read_only: true
@@ -36,10 +35,3 @@ services:
       timeout: 2s
       retries: 5
       start_period: 5s
-    networks:
-      - aphrody-redis
-
-networks:
-  aphrody-redis:
-    name: aphrody-redis
-    internal: true

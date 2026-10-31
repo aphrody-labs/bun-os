@@ -41,8 +41,8 @@ status checklist.
 
 ## VPS service
 
-The VPS host Compose project includes `redis/compose.yaml`. Redis binds to the
-host loopback only, uses an internal Compose network, disables persistence,
+The VPS host Compose project includes `redis/compose.yaml`. Redis uses the host
+network namespace and binds to loopback only, disables persistence,
 evicts with `allkeys-lru`, and has a container memory ceiling. A missing Redis
 connection degrades search to SQLite without changing the index.
 The MCP HTTP container uses host networking, so its protected Compose
