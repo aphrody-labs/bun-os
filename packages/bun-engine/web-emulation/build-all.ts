@@ -46,7 +46,7 @@ for (const id of Object.keys(rustCores))
 
 async function waitForCapacity() {
   // cargo already queues on the buncc build slot; this only avoids piling a Docker/Qt build onto a saturated host.
-  const limit = cpus().length * 3;
+  const limit = cpus().length * 12;
   for (let waited = 0; loadavg()[0] > limit; waited += 30) {
     if (waited > 3600) throw new Error(`load stayed above ${limit} for an hour; not starting a build`);
     console.log(`load ${loadavg()[0].toFixed(1)} > ${limit}; waiting`);

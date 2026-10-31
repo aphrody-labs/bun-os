@@ -16,11 +16,14 @@ sha256sums=('SKIP')
 
 prepare() {
   cd tetanes
+  # The workspace .cargo/config.toml carries nightly-only options; Arch cargo is stable.
+  export RUSTC_BOOTSTRAP=1
   cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
 }
 
 build() {
   cd tetanes
+  export RUSTC_BOOTSTRAP=1
   cargo build --frozen --release --jobs 4 -p tetanes
 }
 

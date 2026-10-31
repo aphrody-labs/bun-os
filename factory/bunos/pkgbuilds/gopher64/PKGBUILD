@@ -16,12 +16,14 @@ sha256sums=('SKIP')
 
 prepare() {
   cd gopher64
+  export RUSTC_BOOTSTRAP=1
   git submodule update --init --recursive --depth 1
   cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
 }
 
 build() {
   cd gopher64
+  export RUSTC_BOOTSTRAP=1
   CARGO_PROFILE_RELEASE_DEBUG=false cargo build --frozen --release --jobs 4
 }
 
