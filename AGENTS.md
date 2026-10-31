@@ -13,8 +13,8 @@
   hooks. The Windows workstation edits and synchronizes sources.
 - Commit source checkpoints and synchronize PC/VPS at delivery boundaries;
   fetch before normal pushes and never force-push.
-- The shared VPS checkout `~/src/bun-os` is for synchronisation and builds only: never leave uncommitted work there. Concurrent
-  agents edit in their own clone (`~/work/<topic>`, origin GitHub) and push; the sync timer fast-forwards the shared checkout.
+- One checkout on the VPS, `~/src/bun-os`, no extra clones. Commit and push each coherent change as soon as it compiles; never leave
+  uncommitted work behind. The sync timer saves any leftover dirty state to `refs/wip/*` and fast-forwards the checkout.
 - Share the existing VPS factory slots between runtime, OS and web builds,
   with at most four compiler jobs per concurrent lane and shared owner caches.
 
