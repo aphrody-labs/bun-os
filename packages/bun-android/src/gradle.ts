@@ -94,8 +94,8 @@ export function parseGradleOutput(output: string, code = 0): Omit<GradleReport, 
       continue;
     }
     if ((m = /^BUILD (?:SUCCESSFUL|FAILED) in (.+)$/.exec(line))) gradleDuration = m[1];
-    if (/^Reusing configuration cache\./.test(line)) configurationCache = "reused";
-    else if (/^Configuration cache entry stored\./.test(line)) configurationCache = "stored";
+    if (line.startsWith("Reusing configuration cache.")) configurationCache = "reused";
+    else if (line.startsWith("Configuration cache entry stored.")) configurationCache = "stored";
     else if (/^Calculating task graph as (?:no cached configuration|configuration cache cannot be reused)/.test(line))
       configurationCache ??= "miss";
   }
