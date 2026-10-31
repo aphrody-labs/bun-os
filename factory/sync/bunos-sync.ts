@@ -25,6 +25,7 @@
  * BUNOS_SYNC_PUSH=0 or --no-push (no push), BUNOS_SYNC_HEAL=0 (report instead of healing), BUNOS_SYNC_DIRTY_GRACE
  * (seconds a dirty tree that blocks nothing may stay dirty, default 1800), BUNOS_SYNC_GRACE_ALWAYS=1 or --grace-always
  * (workstation: never heal a tree edited within the grace period), BUNOS_SYNC_LOCK_WRITER=1, BUNOS_SYNC_GATE=1.
+ * Retire a clone or copy: bun factory/sync/bunos-sync.ts --salvage --repo <clone> --host <name> (snapshot + push only).
  * Install: bun factory/sync/install.ts (systemd user timer on Linux, Scheduled Task BunOS-Sync on Windows).
  */
 import {
@@ -213,7 +214,13 @@ async function snapshot(gitDir: string, reason: string, parents: string[], track
   const env = { GIT_INDEX_FILE: index };
   try {
     if (!existsSync(index)) await gitOk(["read-tree", "HEAD"], { env });
-    await gitOk(["add", "-u"], { env, timeoutMs: 1_800_000 });
+    // A file rewritten while git reads it fails the update ("updating files failed"): retry a few times.
+    for (let attempt = 0; ; attempt++) {
+      const added = await git(["add", "-u"], { env, timeoutMs: 1_800_000 });
+      if (added.code === 0) break;
+      if (attempt >= 3) throw new Error(`git add -u: ${lastLine(added)}`);
+      await Bun.sleep(3000);
+    }
     const listed = (await gitOk(["ls-files", "-z", "-o", "--exclude-standard"], { timeoutMs: 1_800_000 }))
       .split("\0")
       .filter(Boolean);
@@ -475,7 +482,36 @@ async function pass(): Promise<Outcome> {
   }
 }
 
+/**
+ * `--salvage`: retire a clone or copy. Snapshot everything it holds that main does not (working tree, staged and
+ * untracked files, every local branch with commits outside origin/main as a parent) to refs/wip/<host>/<stamp>, push
+ * the ref, and change nothing in the clone. Exit 0 with the ref on stdout, or "nothing to salvage".
+ */
+async function salvage(): Promise<number> {
+  const gitDir = await gitOk(["rev-parse", "--absolute-git-dir"]);
+  await git(["fetch", "--no-recurse-submodules", "origin", "main"], { timeoutMs: 300_000 });
+  const head = await gitOk(["rev-parse", "HEAD"]);
+  const branches = (await gitOk(["for-each-ref", "--format=%(objectname)", "refs/heads"])).split("\n").filter(Boolean);
+  const parents: string[] = [];
+  for (const commit of [head, ...branches]) {
+    if (parents.includes(commit)) continue;
+    if ((await git(["merge-base", "--is-ancestor", commit, "origin/main"])).code !== 0) parents.push(commit);
+  }
+  const tracked = (await gitOk(["diff", "--name-only", "HEAD", "--ignore-submodules=all"], { timeoutMs: 1_800_000 }))
+    .split("\n")
+    .filter(Boolean);
+  const untracked = (await gitOk(["ls-files", "-o", "--exclude-standard", "--directory"])).split("\n").filter(Boolean);
+  if (!parents.length && !tracked.length && !untracked.length) {
+    console.log("nothing to salvage: every commit is in origin/main and the tree is clean");
+    return 0;
+  }
+  const saved = await snapshot(gitDir, `salvage of ${repo}`, parents.length ? parents : [head], tracked);
+  console.log(saved.ref);
+  return 0;
+}
+
 async function main() {
+  if (argv.includes("--salvage")) process.exit(await salvage());
   if (!loop) {
     const outcome = await pass();
     process.exit(outcome === "diverged" || outcome === "dirty" ? 2 : outcome === "error" ? 1 : 0);
