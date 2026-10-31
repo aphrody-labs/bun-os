@@ -11,13 +11,13 @@ A17=${BUNOS_WAYDROID_IMAGES:-/home/ubuntu/.cache/bunos-waydroid/a17/images}
 case "$MODE" in
 session)
   # QUALIFY_NAME: the nightly run (factory/automation) uses its own container, so a manual qualification is untouched.
-  name=${QUALIFY_NAME:-bunos-unified-qualify}; docker rm -f "$name" >/dev/null 2>&1 || true
+  name=${QUALIFY_NAME:-bunos-unified-manual-$(date -u +%Y%m%dT%H%M%S)}; docker rm -f "$name" >/dev/null 2>&1 || true
   # Android services need Waydroid's lxc.cap.keep set; SYS_TIME and SYSLOG are left out (host clock, host kernel log).
   # The binder major is dynamic: allow it in the device cgroup so the private binderfs devices can be opened.
   binder_major=$(rg -o -r '$1' '^\s*(\d+) binder$' /proc/devices)
   install -d -m 0700 "$OUT/secrets"; head -c 32 /dev/urandom | base64 >"$OUT/secrets/session.token"
   docker run -d --name $name --hostname bunos \
-    --cap-drop ALL --cap-add SYS_ADMIN --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SETUID --cap-add SETGID \
+    --cap-drop ALL --cap-add SYS_ADMIN --cap-add BPF --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SETUID --cap-add SETGID \
     --cap-add CHOWN --cap-add DAC_OVERRIDE --cap-add FOWNER --cap-add KILL --cap-add MKNOD --cap-add SYS_CHROOT \
     --cap-add SETPCAP --cap-add AUDIT_WRITE --cap-add AUDIT_CONTROL --cap-add SYS_NICE --cap-add WAKE_ALARM \
     --cap-add BLOCK_SUSPEND --cap-add SYS_PTRACE --cap-add NET_BIND_SERVICE --cap-add DAC_READ_SEARCH \
@@ -44,7 +44,7 @@ session)
   sleep 25; shot 02-linux-and-web
   android_booted=
   for _ in $(seq 60); do
-    android_booted=$(docker exec "$name" sh -c 'waydroid shell -- getprop sys.boot_completed 2>/dev/null' | tr -d '\r' || true)
+    android_booted=$(timeout 12s docker exec "$name" sh -c 'waydroid shell -- getprop sys.boot_completed 2>/dev/null' | tr -d '\r' || true)
     [ "$android_booted" = 1 ] && break
     sleep 5
   done
