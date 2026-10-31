@@ -65,7 +65,11 @@ with open(sys.argv[1], "w") as f: cfg.write(f)
 PY
     waydroid upgrade -o >>/var/log/waydroid-init.log 2>&1 || true
   fi
-  waydroid container start >/var/log/waydroid-container.log 2>&1 &
+  # Let Waydroid's user session manager run the full container setup: network, image mounts, LXC config,
+  # and Android init. Starting only `waydroid container start` skips that session lifecycle.
+  as_user env WAYLAND_DISPLAY=wayland-1 XDG_RUNTIME_DIR=$RUN_USER \
+    DBUS_SESSION_BUS_ADDRESS=unix:path=$RUN_USER/bus \
+    waydroid session start >/var/log/waydroid-container.log 2>&1 &
   WAYDROID=1
   # First-boot provisioning (desktop windowing, setup wizards off) once Android has booted.
   (for _ in $(seq 180); do /usr/libexec/bunos/waydroid-android17 provision >>/var/log/waydroid-init.log 2>&1 && break; sleep 5; done) &
