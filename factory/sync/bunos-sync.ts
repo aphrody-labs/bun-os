@@ -219,11 +219,16 @@ async function snapshot(gitDir: string, reason: string, parents: string[], track
   const env = { GIT_INDEX_FILE: index };
   try {
     if (!existsSync(index)) await gitOk(["read-tree", "HEAD"], { env });
+    // Stage exactly the known changed paths (a whole-tree `add -u` takes tens of minutes on this tree under IO load).
     // A file rewritten while git reads it fails the update ("updating files failed"): retry a few times.
-    for (let attempt = 0; ; attempt++) {
-      const added = await git(["add", "-u"], { env, timeoutMs: 1_800_000 });
+    for (let attempt = 0; tracked.length; attempt++) {
+      const added = await git(["add", "-A", "--pathspec-from-file=-", "--pathspec-file-nul"], {
+        env,
+        stdin: new TextEncoder().encode(tracked.join("\0") + "\0"),
+        timeoutMs: 1_800_000,
+      });
       if (added.code === 0) break;
-      if (attempt >= 3) throw new Error(`git add -u: ${lastLine(added)}`);
+      if (attempt >= 3) throw new Error(`git add: ${lastLine(added)}`);
       await Bun.sleep(3000);
     }
     const listed = (await gitOk(["ls-files", "-z", "-o", "--exclude-standard"], { timeoutMs: 1_800_000 }))
