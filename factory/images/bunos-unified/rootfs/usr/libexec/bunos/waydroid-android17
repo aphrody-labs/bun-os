@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # Android 17 (LineageOS 24.0 GAPPS, WayDroid-ATV) preparation and first-boot provisioning for Waydroid.
 #   waydroid-android17 prepare [userdata-dir]   before `waydroid session start` (as the session user)
-#   waydroid-android17 provision                 as root once sys.boot_completed=1 (idempotent)
+#   waydroid-android17 provision                 as root after sys.boot_completed=1 (idempotent APK-set install)
 # The Android 17 frameworks have no gralloc 2/3 mapper, so the software path ("default" gralloc) aborts
 # surfaceflinger with "gralloc-mapper is missing". Without a GPU, minigbm's gralloc 4 runs on the vgem
 # render node (host module vgem, passed to the container as /dev/dri/renderD128). waydroid-init reads
@@ -21,13 +21,18 @@ case "$cmd" in
   provision)
     android() { waydroid shell -- "$@"; }
     [ "$(android getprop sys.boot_completed | tr -d '\r')" = 1 ] || { echo "Android has not finished booting" >&2; exit 1; }
-    fdroid=/usr/share/bunos/android/apks/fdroid.apk
-    if [ -s "$fdroid" ] && ! android pm list packages org.fdroid.fdroid | grep -Fqx 'package:org.fdroid.fdroid'; then
-      waydroid app install "$fdroid"
-      android pm list packages org.fdroid.fdroid | grep -Fqx 'package:org.fdroid.fdroid' || {
-        echo "F-Droid did not appear in Android after installation" >&2
-        exit 1
-      }
+    apk_dir=/usr/share/bunos/android/apks
+    apk_files=$(find "$apk_dir" -maxdepth 1 -type f -name '*.apk' -print 2>/dev/null | LC_ALL=C sort)
+    if [ -n "$apk_files" ]; then
+      apk_fingerprint=$(printf '%s\n' "$apk_files" | xargs -r sha256sum | sha256sum | cut -d' ' -f1)
+      installed_fingerprint=$(android settings get global bunos_apk_fingerprint | tr -d '\r')
+      if [ "$installed_fingerprint" != "$apk_fingerprint" ]; then
+        for apk in "$apk_dir"/*.apk; do
+          [ -f "$apk" ] || continue
+          waydroid app install "$apk"
+        done
+        android settings put global bunos_apk_fingerprint "$apk_fingerprint"
+      fi
     fi
     [ "$(android settings get global bunos_provisioned | tr -d '\r')" = 1 ] && exit 0
     # Large-screen windowing (Googlebook desktop windowing globals).
