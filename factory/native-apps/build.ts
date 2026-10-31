@@ -38,6 +38,8 @@ const COSMIC_SET = [
   "cosmic-notifications", "cosmic-osd", "cosmic-workspaces-epoch", "xdg-desktop-portal-cosmic", "cosmic-files",
   "cosmic-term", "cosmic-edit", "cosmic-store", "cosmic-player",
 ];
+/** Run-time tools a COSMIC package calls (Phone Hub applet: adb and scrcpy; /opt/android-sdk/platform-tools/adb fallback). */
+const PACKAGE_RECOMMENDS: Record<string, string> = { "cosmic-applets": "adb, scrcpy" };
 /** Repository directory -> Pop package name, where they differ (the debs replace Pop's packages). */
 const PACKAGE_NAME: Record<string, string> = { "cosmic-workspaces-epoch": "cosmic-workspaces" };
 /** Shared Linux/Redox fork pins (libcosmic, iced, winit, softbuffer, cosmic-protocols, cosmic-settings-daemon). */
@@ -78,7 +80,7 @@ async function isElf(path: string) {
 }
 
 /** Package a staged /usr tree; Depends from dpkg-shlibdeps plus the given run-time libraries. */
-async function deb(name: string, version: string, stage: string, description: string, extra = "") {
+async function deb(name: string, version: string, stage: string, description: string, extra = "", recommends = "") {
   const elfs: string[] = [];
   for (const file of await walk(stage)) if ((await stat(file)).mode & 0o100 && (await isElf(file))) elfs.push(file);
   let depends = "";
@@ -100,6 +102,7 @@ async function deb(name: string, version: string, stage: string, description: st
       "Architecture: amd64",
       "Maintainer: aphrody-dev <contact@aphrody.com>",
       ...(depends ? [`Depends: ${depends}`] : []),
+      ...(recommends ? [`Recommends: ${recommends}`] : []),
       "Section: x11",
       "Priority: optional",
       "Homepage: https://aphrody.com",
@@ -182,7 +185,7 @@ async function cosmicOne(repo: string) {
   // The justfile install recipes copy the release outputs and data files into rootdir/prefix.
   await $`just rootdir=${s} prefix=/usr install`.cwd(d);
   const version = `${existsSync(manifest) ? await versionOf(manifest) : "1.0.0"}+bunos${await shortRev(d)}`;
-  await deb(PACKAGE_NAME[repo] ?? repo, version, s, `COSMIC ${repo} (Bun OS build)`);
+  await deb(PACKAGE_NAME[repo] ?? repo, version, s, `COSMIC ${repo} (Bun OS build)`, GUI_DEPS, PACKAGE_RECOMMENDS[repo]);
 }
 
 async function cosmic(repos: string[]) {
