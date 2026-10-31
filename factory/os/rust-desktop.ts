@@ -30,7 +30,6 @@ import {
   statSync,
   symlinkSync,
   writeFileSync,
-  lstatSync,
   accessSync,
   constants,
 } from "node:fs";
@@ -324,7 +323,7 @@ async function qualify(): Promise<boolean> {
 
 /** Colour statistics of a binary PPM (P6): distinct colours over a sample grid and a coarse histogram for diffs. */
 function ppmStats(file: string) {
-  const empty = { distinct: 0, aphrodyBar: false, hist: new Map<number, number>(), diffFrom: (_: any) => 0 };
+  const empty = { distinct: 0, aphrodyBar: false, hist: new Map<number, number>(), diffFrom: () => 0 };
   if (!existsSync(file)) return empty;
   const buf = readFileSync(file);
   const header = buf.subarray(0, 64).toString("latin1").split(/\s+/);

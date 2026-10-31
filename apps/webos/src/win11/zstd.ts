@@ -87,7 +87,7 @@ function buildFse(norm: number[], log: number): FseTable {
   const symbol = new Uint8Array(size);
   const bits = new Uint8Array(size);
   const base = new Uint16Array(size);
-  const next = new Array<number>(norm.length);
+  const next = Array.from<number>({ length: norm.length });
   let high = size - 1;
   for (let s = 0; s < norm.length; s++) {
     if (norm[s] === -1) {
@@ -225,8 +225,8 @@ function readHuffman(src: Uint8Array, at: number, end: number): [Huffman, number
   const size = 1 << maxBits;
   const symbol = new Uint8Array(size);
   const bits = new Uint8Array(size);
-  const rankStart = new Array<number>(maxBits + 2).fill(0);
-  const rankCount = new Array<number>(maxBits + 2).fill(0);
+  const rankStart = Array.from<number>({ length: maxBits + 2 }).fill(0);
+  const rankCount = Array.from<number>({ length: maxBits + 2 }).fill(0);
   for (const w of weights) rankCount[w]!++;
   let next = 0;
   for (let w = 1; w <= maxBits; w++) {

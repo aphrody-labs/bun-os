@@ -63,7 +63,7 @@ export class StringTable {
     private readonly offsets: Uint32Array,
     private readonly bytes: Uint8Array,
   ) {
-    this.cache = new Array(Math.max(0, offsets.length - 1));
+    this.cache = Array.from<string | undefined>({ length: Math.max(0, offsets.length - 1) });
   }
   get length(): number {
     return this.cache.length;
@@ -74,7 +74,7 @@ export class StringTable {
   }
   /** Every string (decodes the whole table). */
   all(): string[] {
-    const out = new Array<string>(this.cache.length);
+    const out = Array.from<string>({ length: this.cache.length });
     for (let i = 0; i < out.length; i++) out[i] = this.get(i);
     return out;
   }

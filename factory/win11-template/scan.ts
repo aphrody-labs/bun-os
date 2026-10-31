@@ -453,7 +453,8 @@ async function build() {
     : {};
   const jobs: Job[] = [];
   const jobRel: string[] = [];
-  for (const n of nodes.values()) {
+  // A snapshot: the loop deletes entries from the map.
+  for (const n of Array.from(nodes.values())) {
     if (n.dir || n.flags & FLAG_SKELETON) continue;
     const ext = extOf(n.rel);
     const pe = PE_EXTENSIONS.has(ext);
@@ -482,7 +483,7 @@ async function build() {
   let thirdParty = 0;
   let peCount = 0;
   let configFiles = 0;
-  for (const n of [...nodes.values()]) {
+  for (const n of nodes.values()) {
     if (n.dir) continue;
     const c = cache[n.rel];
     if (CONFIG_EXTENSIONS.has(extOf(n.rel)) && n.rel.startsWith("Windows/")) configFiles++;
@@ -504,7 +505,7 @@ async function build() {
   }
   // Folders left empty by the filter keep their name: they are part of the real Windows layout.
   for (const n of nodes.values()) if (!safePath(n.rel, n.dir)) throw new Error(`refusing to publish ${n.rel}`);
-  await Bun.write(nodesPath, JSON.stringify([...nodes.values()].map(({ pe, ...rest }) => rest)));
+  await Bun.write(nodesPath, JSON.stringify([...nodes.values()].map(({ pe: _pe, ...rest }) => rest)));
   log(
     `publish: ${nodes.size} entries, ${peCount} Microsoft PE files, ${thirdParty} third-party or unlisted files withheld`,
   );
@@ -653,7 +654,7 @@ async function writeTemplate(
       rawFactsBrotliBytes: brotliFacts,
       indexBytes: rawIndexBytes,
       packZstdBytes: pack.length,
-      ...(mftState?.stats ?? {}),
+      ...mftState?.stats,
     },
     wine: coverage.wine,
     privacy: [
