@@ -117,7 +117,8 @@ export async function loadConfig(path = CONFIG_PATH, host?: string): Promise<Vps
   }
   if (host === undefined || host === base.host) return base;
   const override = base.hosts?.[host];
-  if (!override) throw new Error(`unknown build host "${host}" (infra/config/host/vps-cargo.json hosts)`);
+  if (!override)
+    throw new Error(`unknown build host "${host}" (infra/config/host/vps-cargo.json hosts)`);
   return {
     ...base,
     ...override,
@@ -130,9 +131,13 @@ export async function loadConfig(path = CONFIG_PATH, host?: string): Promise<Vps
  * The configuration of one external repository: its checkout, ref, target directory and wrapper replace the
  * Aphrody ones, everything else (host, locks, tunnel) is shared. Returns the local worktree root with it.
  */
-export function repositoryConfig(config: VpsCargoConfig, name: string): { config: VpsCargoConfig; root: string } {
+export function repositoryConfig(
+  config: VpsCargoConfig,
+  name: string,
+): { config: VpsCargoConfig; root: string } {
   const repository = config.repositories?.[name];
-  if (!repository) throw new Error(`unknown repository "${name}" (infra/config/host/vps-cargo.json repositories)`);
+  if (!repository)
+    throw new Error(`unknown repository "${name}" (infra/config/host/vps-cargo.json repositories)`);
   if (repository.host && repository.host !== config.host) {
     const host = config.hosts?.[repository.host];
     if (!host) throw new Error(`repository "${name}" requires unknown host "${repository.host}"`);
@@ -145,7 +150,9 @@ export function repositoryConfig(config: VpsCargoConfig, name: string): { config
   }
   const secondaries = Object.keys(config.hosts ?? {});
   if (!repository.host && secondaries.includes(config.host)) {
-    throw new Error(`repository "${name}" is configured for the primary host only, not ${config.host}`);
+    throw new Error(
+      `repository "${name}" is configured for the primary host only, not ${config.host}`,
+    );
   }
   return {
     root: expandHome(repository.root),
@@ -189,19 +196,26 @@ type CargoMetadata = {
  * target): `build` follows normal and build dependencies (check, build, clippy), `all` also dev dependencies
  * (test, `--all-targets`).
  */
-export function desktopRequirements(metadata: CargoMetadata, sysCrates: readonly string[]): DesktopRequirements {
-  const name = new Map(metadata.packages.map(p => [p.id, p.name] as const));
+export function desktopRequirements(
+  metadata: CargoMetadata,
+  sysCrates: readonly string[],
+): DesktopRequirements {
+  const name = new Map(metadata.packages.map((p) => [p.id, p.name] as const));
   const reaching = (kinds: ReadonlySet<string>) => {
     const parents = new Map<string, string[]>();
     for (const node of metadata.resolve.nodes) {
       for (const dep of node.deps) {
-        if (!(dep.dep_kinds ?? []).some(k => kinds.has(k.kind ?? "normal"))) continue;
+        if (!(dep.dep_kinds ?? []).some((k) => kinds.has(k.kind ?? "normal"))) continue;
         const list = parents.get(dep.pkg) ?? [];
         list.push(node.id);
         parents.set(dep.pkg, list);
       }
     }
-    const seen = new Set(metadata.resolve.nodes.filter(n => sysCrates.includes(name.get(n.id) ?? "")).map(n => n.id));
+    const seen = new Set(
+      metadata.resolve.nodes
+        .filter((n) => sysCrates.includes(name.get(n.id) ?? ""))
+        .map((n) => n.id),
+    );
     const stack = [...seen];
     for (let id = stack.pop(); id !== undefined; id = stack.pop()) {
       for (const parent of parents.get(id) ?? []) {
@@ -211,7 +225,9 @@ export function desktopRequirements(metadata: CargoMetadata, sysCrates: readonly
         }
       }
     }
-    return new Set(metadata.workspace_members.filter(id => seen.has(id)).map(id => name.get(id) ?? id));
+    return new Set(
+      metadata.workspace_members.filter((id) => seen.has(id)).map((id) => name.get(id) ?? id),
+    );
   };
   return {
     build: reaching(new Set(["normal", "build"])),
@@ -269,15 +285,18 @@ export function matchesPackageSpec(spec: string, name: string): boolean {
 }
 
 /** The packages of this cargo command line that need the desktop libraries (empty: any host can build it). */
-export function desktopOffenders(cargoArgs: readonly string[], requirements: DesktopRequirements): string[] {
+export function desktopOffenders(
+  cargoArgs: readonly string[],
+  requirements: DesktopRequirements,
+): string[] {
   const selection = cargoSelection(cargoArgs);
   const needed = selection.devTargets ? requirements.all : requirements.build;
   const scoped = selection.packages.length > 0 && !selection.workspace;
   return [...needed]
-    .filter(pkg =>
+    .filter((pkg) =>
       scoped
-        ? selection.packages.some(spec => matchesPackageSpec(spec, pkg))
-        : !selection.excluded.some(spec => matchesPackageSpec(spec, pkg)),
+        ? selection.packages.some((spec) => matchesPackageSpec(spec, pkg))
+        : !selection.excluded.some((spec) => matchesPackageSpec(spec, pkg)),
     )
     .sort();
 }
@@ -289,19 +308,26 @@ function cargoArgsOf(options: readonly string[]): string[] {
 }
 
 /** Desktop requirements of the worktree, from `cargo metadata` (light, offline), cached by Cargo.lock hash. */
-async function worktreeDesktopRequirements(sysCrates: readonly string[]): Promise<DesktopRequirements> {
+async function worktreeDesktopRequirements(
+  sysCrates: readonly string[],
+): Promise<DesktopRequirements> {
   const lock = await Bun.file(join(ROOT, "Cargo.lock")).text();
-  const key = new Bun.CryptoHasher("sha256").update(lock).update(sysCrates.join(",")).digest("hex").slice(0, 16);
+  const key = new Bun.CryptoHasher("sha256")
+    .update(lock)
+    .update(sysCrates.join(","))
+    .digest("hex")
+    .slice(0, 16);
   const cache = join(tmpdir(), `vps-cargo-desktop-${key}.json`);
   const cached = Bun.file(cache);
   if (await cached.exists()) {
     const saved = (await cached.json()) as { build: string[]; all: string[] };
     return { build: new Set(saved.build), all: new Set(saved.all) };
   }
-  const json = await $`cargo metadata --offline --format-version 1 --filter-platform x86_64-unknown-linux-gnu`
-    .cwd(ROOT)
-    .quiet()
-    .text();
+  const json =
+    await $`cargo metadata --offline --format-version 1 --filter-platform x86_64-unknown-linux-gnu`
+      .cwd(ROOT)
+      .quiet()
+      .text();
   const requirements = desktopRequirements(JSON.parse(json) as CargoMetadata, sysCrates);
   await Bun.write(
     cache,
@@ -330,7 +356,9 @@ async function ensureHostCanBuild(
   if (offenders.length === 0) return candidate;
   const sample = `${offenders.slice(0, 3).join(", ")}${offenders.length > 3 ? `, … (${offenders.length})` : ""}`;
   if (requested === "auto") {
-    console.log(`${candidate.host} has no desktop libraries (needed by ${sample}): staying on ${primary.host}`);
+    console.log(
+      `${candidate.host} has no desktop libraries (needed by ${sample}): staying on ${primary.host}`,
+    );
     return primary;
   }
   throw new Error(
@@ -350,7 +378,12 @@ export async function selectConfig(options: readonly string[]): Promise<VpsCargo
   if (!heavyLockBusy(primary)) return primary;
   const fallback = Object.keys(primary.hosts ?? {})[0];
   if (!fallback) return primary;
-  const candidate = await ensureHostCanBuild(await loadConfig(configPath, fallback), primary, options, requested);
+  const candidate = await ensureHostCanBuild(
+    await loadConfig(configPath, fallback),
+    primary,
+    options,
+    requested,
+  );
   if (candidate.host !== fallback) return candidate;
   console.log(`${primary.host} is busy, building on ${fallback}`);
   return candidate;
@@ -358,8 +391,8 @@ export async function selectConfig(options: readonly string[]): Promise<VpsCargo
 
 /** Snapshot paths that look like secrets: the snapshot leaves the machine, so it fails closed. */
 export function secretLikePaths(paths: readonly string[], patterns: readonly string[]): string[] {
-  const regexes = patterns.map(pattern => new RegExp(pattern, "i"));
-  return paths.filter(path => regexes.some(regex => regex.test(path)));
+  const regexes = patterns.map((pattern) => new RegExp(pattern, "i"));
+  return paths.filter((path) => regexes.some((regex) => regex.test(path)));
 }
 
 export function sshBase(config: VpsCargoConfig, platform = process.platform): string[] {
@@ -367,7 +400,14 @@ export function sshBase(config: VpsCargoConfig, platform = process.platform): st
     "ssh",
     ...(platform === "win32"
       ? []
-      : ["-o", `ControlPath=${expandHome(config.controlPath)}`, "-o", "ControlMaster=auto", "-o", "ControlPersist=8h"]),
+      : [
+          "-o",
+          `ControlPath=${expandHome(config.controlPath)}`,
+          "-o",
+          "ControlMaster=auto",
+          "-o",
+          "ControlPersist=8h",
+        ]),
     "-o",
     "ServerAliveInterval=15",
     "-o",
@@ -387,16 +427,16 @@ export function tunnelCommand(config: VpsCargoConfig, platform = process.platfor
       "-o",
       "ExitOnForwardFailure=yes",
       "-N",
-      ...config.forwards.remote.flatMap(f => ["-R", `${f.bind}:${f.to}`]),
-      ...config.forwards.local.flatMap(f => ["-L", `${f.bind}:${f.to}`]),
+      ...config.forwards.remote.flatMap((f) => ["-R", `${f.bind}:${f.to}`]),
+      ...config.forwards.local.flatMap((f) => ["-L", `${f.bind}:${f.to}`]),
       config.host,
     ];
     const code = `while(true){const p=Bun.spawn(${JSON.stringify(args)},{stdin:"ignore",stdout:"inherit",stderr:"inherit"});await p.exited;console.error("tunnel lost, reconnecting in 5s");await Bun.sleep(5000)}`;
     return `& ${localQuote(process.execPath, platform)} -e ${localQuote(code, platform)}`;
   }
   const forwards = [
-    ...config.forwards.remote.map(forward => `-R ${forward.bind}:${forward.to}`),
-    ...config.forwards.local.map(forward => `-L ${forward.bind}:${forward.to}`),
+    ...config.forwards.remote.map((forward) => `-R ${forward.bind}:${forward.to}`),
+    ...config.forwards.local.map((forward) => `-L ${forward.bind}:${forward.to}`),
   ];
   const ssh = [
     ...sshBase(config, platform).map(shellQuote),
@@ -418,7 +458,9 @@ export function gitDaemonCommand(config: VpsCargoConfig, platform = process.plat
   // Git daemon appends /<repository>. A drive root ending in / produces C://repo,
   // which fails its repository allowlist even though Windows accepts that path.
   const daemonBase =
-    platform === "win32" && /^[A-Za-z]:\/$/.test(normalizedBase) ? normalizedBase.slice(0, -1) : normalizedBase;
+    platform === "win32" && /^[A-Za-z]:\/$/.test(normalizedBase)
+      ? normalizedBase.slice(0, -1)
+      : normalizedBase;
   return [
     "git daemon --reuseaddr --export-all --informative-errors",
     `--listen=${config.gitDaemon.listen}`,
@@ -538,14 +580,27 @@ export function remoteRunScript(
     // have synced its own snapshot while this job waited, and building then would compile the wrong tree.
     `exec env ${env.join(" ")} flock --close ${shellQuote(config.remoteHeavyLock)} flock --close ${shellQuote(posix.join(config.remoteLockDir, `${posix.basename(config.remoteWorkspace)}.source.lock`))} bash -c ${shellQuote(`set -euo pipefail; git checkout -q -f ${sha} || { echo "checkout moved away from ${sha}" >&2; exit 2; }; mkdir -p -- ${shellQuote(config.remoteTargetDir)}; ${factoryTransientShell(config.remoteTransientRoot ?? posix.resolve(posix.dirname(config.remoteHeavyLock), "../transient"), "docker", config.remoteHeavyLock).join("; ")}; factory_jobs=$(bun --no-env-file -e ${shellQuote(admission)}); export APHRODY_CARGO_JOBS="$factory_jobs" CARGO_BUILD_JOBS="$factory_jobs"; "$@"`)} bash ${shellQuote(config.cargoSerial ?? "scripts/aphrody/build/rust/cargo-serial.sh")} ${cargoArgs.map(shellQuote).join(" ")}`,
   ].join("; ");
-  const window = `bash -c ${shellQuote(`(${body}) > ${log} 2>&1; echo $? > ${exit}`)}`;
+  const scriptFile = `${log}.sh`;
+  const heredoc = `APHRODY_CARGO_${job.replaceAll(/[^A-Za-z0-9_]/g, "_")}`;
+  const window = [
+    "#!/usr/bin/env bash",
+    "set +e",
+    `(${body}) > ${shellQuote(log)} 2>&1`,
+    "status=$?",
+    `printf '%s\\n' "$status" > ${shellQuote(exit)}`,
+    'exit "$status"',
+  ].join("\n");
   const session = shellQuote(config.remoteSession);
   return [
     "set -euo pipefail",
     `mkdir -p ${shellQuote(config.remoteLogDir)}`,
     `rm -f ${shellQuote(exit)}; : > ${shellQuote(log)}`,
+    `cat > ${shellQuote(scriptFile)} <<'${heredoc}'`,
+    window,
+    heredoc,
+    `chmod 700 ${shellQuote(scriptFile)}`,
     `tmux has-session -t ${session} 2>/dev/null || tmux new-session -d -s ${session} -n idle`,
-    `tmux new-window -d -t ${session} -n ${shellQuote(job)} ${shellQuote(window)}`,
+    `tmux new-window -d -t ${session} -n ${shellQuote(job)} bash ${shellQuote(scriptFile)}`,
     `tail -n +1 -F ${shellQuote(log)} 2>/dev/null & tailer=$!`,
     `while [ ! -f ${shellQuote(exit)} ]; do sleep 1; done`,
     "sleep 1; kill $tailer 2>/dev/null || true",
@@ -588,7 +643,10 @@ export function isSnapshotCollision(error: unknown): boolean {
     message?: unknown;
   };
   const text = `${stderr ?? ""} ${message ?? ""}`;
-  if (exitCode === 1) return /\[remote rejected\].*\((incorrect old value provided|cannot lock ref[^)]*)\)/i.test(text);
+  if (exitCode === 1)
+    return /\[remote rejected\].*\((incorrect old value provided|cannot lock ref[^)]*)\)/i.test(
+      text,
+    );
   if (exitCode !== 128) return false;
   // Exit 128 is also git's generic fatal error: only lock and ref races are worth retrying.
   return text.trim() === "" || COLLISION_PATTERN.test(text);
@@ -605,7 +663,10 @@ export type BackoffOptions = {
 };
 
 /** Retry `operation` with exponential backoff and jitter while it fails with a snapshot collision. */
-export async function withSnapshotBackoff<T>(operation: () => Promise<T>, options: BackoffOptions = {}): Promise<T> {
+export async function withSnapshotBackoff<T>(
+  operation: () => Promise<T>,
+  options: BackoffOptions = {},
+): Promise<T> {
   const attempts = options.attempts ?? 6;
   const baseMs = options.baseMs ?? 250;
   const sleep = options.sleep ?? Bun.sleep;
@@ -616,7 +677,9 @@ export async function withSnapshotBackoff<T>(operation: () => Promise<T>, option
     } catch (error) {
       if (attempt >= attempts || !isSnapshotCollision(error)) throw error;
       const delay = baseMs * 2 ** (attempt - 1) * (1 + random());
-      console.error(`vps-cargo: snapshot collision, retry ${attempt}/${attempts - 1} in ${Math.round(delay)} ms`);
+      console.error(
+        `vps-cargo: snapshot collision, retry ${attempt}/${attempts - 1} in ${Math.round(delay)} ms`,
+      );
       await sleep(delay);
     }
   }
@@ -636,7 +699,9 @@ async function snapshotOnce(config: VpsCargoConfig, cwd: string): Promise<string
     await Bun.write(index, Bun.file(join(gitDir, "index")));
     const env = { ...process.env, GIT_INDEX_FILE: index };
     await $`git add -A`.cwd(cwd).env(env).quiet();
-    const changed = (await $`git diff --cached --name-only HEAD`.cwd(cwd).env(env).text()).split("\n").filter(Boolean);
+    const changed = (await $`git diff --cached --name-only HEAD`.cwd(cwd).env(env).text())
+      .split("\n")
+      .filter(Boolean);
     const refused = secretLikePaths(changed, config.refuseSnapshotPaths);
     if (refused.length > 0) {
       throw new Error(`refusing to snapshot secret-like paths: ${refused.join(", ")}`);
@@ -669,7 +734,8 @@ async function snapshotOnce(config: VpsCargoConfig, cwd: string): Promise<string
 }
 
 async function sync(config: VpsCargoConfig, pull: boolean, root = ROOT): Promise<string> {
-  if (pull && root !== ROOT) throw new Error("--pull reads the Aphrody git daemon: not available with --repo");
+  if (pull && root !== ROOT)
+    throw new Error("--pull reads the Aphrody git daemon: not available with --repo");
   const sha = await snapshot(config, root);
   if (!pull) {
     // Seed the dedicated checkout first so the push has a repository to land in.
@@ -750,7 +816,15 @@ async function tunnel(config: VpsCargoConfig, action: string | undefined): Promi
       mode: 0o700,
     });
     await tmuxLocal(["new-session", "-d", "-s", session, "-n", "ssh", tunnelCommand(config)]);
-    await tmuxLocal(["new-window", "-d", "-t", session, "-n", "git-daemon", gitDaemonCommand(config)]);
+    await tmuxLocal([
+      "new-window",
+      "-d",
+      "-t",
+      session,
+      "-n",
+      "git-daemon",
+      gitDaemonCommand(config),
+    ]);
     console.log(`tunnel up: tmux attach -t ${session}`);
     return 0;
   }
@@ -772,7 +846,9 @@ async function tunnel(config: VpsCargoConfig, action: string | undefined): Promi
     { windowsHide: true, stderr: "ignore" },
   );
   const master = (await check.exited) === 0;
-  console.log(`tmux session ${session}: ${alive ? "up" : "down"}; ssh connection: ${master ? "up" : "down"}`);
+  console.log(
+    `tmux session ${session}: ${alive ? "up" : "down"}; ssh connection: ${master ? "up" : "down"}`,
+  );
   return alive && master ? 0 : 1;
 }
 
@@ -781,13 +857,19 @@ function flag(args: readonly string[], name: string): string | undefined {
   return index >= 0 ? args[index + 1] : undefined;
 }
 
-async function fetchArtifact(config: VpsCargoConfig, args: readonly string[], root = ROOT): Promise<number> {
+async function fetchArtifact(
+  config: VpsCargoConfig,
+  args: readonly string[],
+  root = ROOT,
+): Promise<number> {
   const bin = flag(args, "--bin");
   if (!bin || !/^[A-Za-z0-9_.+-]+$/.test(bin)) throw new Error("fetch needs --bin <name>");
   const profile = flag(args, "--profile") ?? "release";
-  if (!/^[A-Za-z0-9_-]+$/.test(profile)) throw new Error("fetch --profile must be a Cargo profile name");
+  if (!/^[A-Za-z0-9_-]+$/.test(profile))
+    throw new Error("fetch --profile must be a Cargo profile name");
   const target = flag(args, "--target");
-  if (target && !/^[A-Za-z0-9_.-]+$/.test(target)) throw new Error("fetch --target must be a target triple");
+  if (target && !/^[A-Za-z0-9_.-]+$/.test(target))
+    throw new Error("fetch --target must be a target triple");
   const sha = (await $`git rev-parse ${config.snapshotRef}`.cwd(root).text()).trim();
   const defaultDest =
     process.platform === "win32"
@@ -803,7 +885,12 @@ async function fetchArtifact(config: VpsCargoConfig, args: readonly string[], ro
   await mkdir(dest, { recursive: true });
   const control = `ControlPath=${expandHome(config.controlPath)}`;
   const copy = Bun.spawn(
-    ["scp", ...(process.platform === "win32" ? [] : ["-o", control]), `${config.host}:${remote}`, dest],
+    [
+      "scp",
+      ...(process.platform === "win32" ? [] : ["-o", control]),
+      `${config.host}:${remote}`,
+      dest,
+    ],
     { windowsHide: true, stdout: "inherit", stderr: "inherit" },
   );
   if ((await copy.exited) !== 0) return 1;
@@ -811,20 +898,30 @@ async function fetchArtifact(config: VpsCargoConfig, args: readonly string[], ro
   const hasher = new Bun.CryptoHasher("sha256");
   hasher.update(await Bun.file(local).arrayBuffer());
   const digest = hasher.digest("hex");
-  const remoteSum = Bun.spawn([...sshBase(config), config.host, `sha256sum ${shellQuote(remote)}`], {
-    windowsHide: true,
-    stdout: "pipe",
-  });
+  const remoteSum = Bun.spawn(
+    [...sshBase(config), config.host, `sha256sum ${shellQuote(remote)}`],
+    {
+      windowsHide: true,
+      stdout: "pipe",
+    },
+  );
   const remoteDigest = (await new Response(remoteSum.stdout).text()).split(/\s+/)[0];
   if (digest !== remoteDigest) throw new Error(`sha256 mismatch for ${bin}`);
   // Non-executable artifacts and target-qualified binaries are copies, not local programs to execute.
   // In particular, a Linux ELF fetched by the Windows workstation must be qualified on the VPS/container.
   const targetParts = target?.split("-") ?? [];
-  const targetOS = ["android", "windows", "darwin", "freebsd", "linux"].find(part => targetParts.includes(part));
+  const targetOS = ["android", "windows", "darwin", "freebsd", "linux"].find((part) =>
+    targetParts.includes(part),
+  );
   const localOS =
-    process.platform === "win32" ? "windows" : process.platform === "darwin" ? "darwin" : process.platform;
+    process.platform === "win32"
+      ? "windows"
+      : process.platform === "darwin"
+        ? "darwin"
+        : process.platform;
   const targetArch = targetParts[0];
-  const localArch = process.arch === "x64" ? "x86_64" : process.arch === "arm64" ? "aarch64" : process.arch;
+  const localArch =
+    process.arch === "x64" ? "x86_64" : process.arch === "arm64" ? "aarch64" : process.arch;
   if (
     /\.(wasm|so|dll|dylib)$/.test(bin) ||
     (target && (targetOS !== localOS || targetArch !== localArch)) ||
@@ -863,7 +960,9 @@ export async function main(argv: readonly string[]): Promise<number> {
   const [command, ...rest] = argv;
   const selected = await selectConfig(rest);
   const repo = flag(rest, "--repo");
-  const { config, root } = repo ? repositoryConfig(selected, repo) : { config: selected, root: ROOT };
+  const { config, root } = repo
+    ? repositoryConfig(selected, repo)
+    : { config: selected, root: ROOT };
   switch (command) {
     case "tunnel":
       return tunnel(config, rest[0]);
@@ -886,12 +985,15 @@ export async function main(argv: readonly string[]): Promise<number> {
     case "fetch":
       return fetchArtifact(config, rest, root);
     case "attach":
-      return Bun.spawn([...sshBase(config), "-t", config.host, "tmux", "attach", "-t", config.remoteSession], {
-        windowsHide: true,
-        stdin: "inherit",
-        stdout: "inherit",
-        stderr: "inherit",
-      }).exited;
+      return Bun.spawn(
+        [...sshBase(config), "-t", config.host, "tmux", "attach", "-t", config.remoteSession],
+        {
+          windowsHide: true,
+          stdin: "inherit",
+          stdout: "inherit",
+          stderr: "inherit",
+        },
+      ).exited;
     default:
       console.error(USAGE);
       return 64;
