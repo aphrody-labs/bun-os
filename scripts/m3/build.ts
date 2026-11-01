@@ -182,9 +182,13 @@ async function buildPackage(pkg: WorkspacePackage, config: M3PackageConfig): Pro
     manifest.types,
     ...Object.values(manifest.exports ?? {}).flatMap(value => (typeof value === "string" ? [] : [value.types])),
   ].filter((path): path is string => typeof path === "string");
-  const typesComeFromSource =
-    declaredTypes.length > 0 && declaredTypes.every(path => path.startsWith("./src/") || path.startsWith("src/"));
-  if (existsSync(join(pkg.dir, "tsconfig.build.json")) && !typesComeFromSource) {
+  const typesUseShippedSources =
+    declaredTypes.length > 0 &&
+    declaredTypes.every(path => {
+      const relativePath = path.replaceAll("\\", "/").replace(/^\.\//, "");
+      return !relativePath.startsWith("dist/") && existsSync(join(pkg.dir, relativePath));
+    });
+  if (existsSync(join(pkg.dir, "tsconfig.build.json")) && !typesUseShippedSources) {
     const t = performance.now();
     const declarationConfig = Bun.JSONC.parse(readFileSync(join(pkg.dir, "tsconfig.build.json"), "utf8")) as {
       compilerOptions?: { rootDir?: string; outDir?: string };
