@@ -100,3 +100,38 @@ not the public web.
 
 The CLI, typed Bun package, and MCP tool are documented in
 [`docs/aphrody/WEB-CRAWL-STACK.md`](../../docs/aphrody/WEB-CRAWL-STACK.md).
+
+### Search over the Aphrody HTTP API
+
+Enable `http-search` for a typed Rust client that calls the shared Aphrody MCP
+search service. This feature uses the response wire types without enabling
+SQLite or the local retrieval engine:
+
+```toml
+[dependencies]
+aphrody-web = { version = "1.4.7", features = ["http-search"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+```
+
+```rust,no_run
+use aphrody_web::http_search::HttpSearchClient;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = HttpSearchClient::new(
+        "https://search.example",
+        None,
+        None,
+    )?;
+    let result = client.search("Obscura headless browser", Some(8), None).await?;
+    for hit in result.hits {
+        println!("{}: {}", hit.chunk.path, hit.chunk.content);
+    }
+    Ok(())
+}
+```
+
+This client uses the same typed `SearchResult` as in-process retrieval. The
+service owner must keep the MCP listener private or put an authenticated,
+same-origin gateway in front of it. A bearer token is appropriate only for
+trusted server-side Rust applications; never embed it in browser code.

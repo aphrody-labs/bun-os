@@ -113,6 +113,12 @@ consumers:
 aphrody-web = { version = "1.4.7", features = ["rag-search"] }
 ```
 
+For a remote index, enable `aphrody-web/http-search` and use
+`aphrody_web::http_search::HttpSearchClient`. It calls the canonical MCP
+`/api/v1/rag/search` route and returns typed wire models without enabling the
+local SQLite engine. Reuse one client per service origin. Its optional bearer
+token requires HTTPS, except when connecting to loopback for development.
+
 ```rust,no_run
 use aphrody_web::{
     AddRequest, CrawlOptions, Frontier, FrontierOptions, PlaywrightTransport,

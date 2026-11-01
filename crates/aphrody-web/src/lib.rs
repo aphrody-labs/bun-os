@@ -27,6 +27,308 @@ pub mod search {
     };
 }
 
+/// Typed HTTP client for the Aphrody MCP `/api/v1/rag/search` endpoint.
+///
+/// This feature has a small wire DTO and does not enable the SQLite RAG engine.
+/// Keep bearer tokens in trusted server-side applications; browser clients
+/// should use same-origin routing or a gateway.
+#[cfg(feature = "http-search")]
+pub mod http_search {
+    use std::{error::Error, fmt};
+    use std::{net::IpAddr, time::Duration};
+
+    use reqwest::{StatusCode, Url};
+    use serde::{Deserialize, Serialize};
+
+    const DEFAULT_TIMEOUT: Duration = Duration::from_secs(30);
+
+    /// Retrieval mode that the service actually used.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+    #[serde(rename_all = "snake_case")]
+    pub enum SearchMode {
+        /// SQLite FTS text retrieval.
+        Lexical,
+        /// Dense-vector retrieval.
+        Vector,
+        /// Fused lexical and vector retrieval.
+        Hybrid,
+    }
+
+    /// One local indexed text passage returned by search.
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct SearchChunk {
+        /// Stable row identifier within this index.
+        pub id: i64,
+        /// Parent document identifier within this index.
+        pub doc_id: i64,
+        /// Local source path.
+        pub path: String,
+        /// Zero-based position in the source document.
+        pub chunk_index: usize,
+        /// Heading context, when available.
+        pub heading: Option<String>,
+        /// Code symbol context, when available.
+        pub symbol: Option<String>,
+        /// Retrieved text.
+        pub content: String,
+        /// One-based start line.
+        pub start_line: usize,
+        /// One-based end line.
+        pub end_line: usize,
+        /// Approximate token count.
+        pub token_count: usize,
+    }
+
+    /// Ranked passage and the retrieval channel that produced it.
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct SearchHit {
+        /// Retrieved passage and local provenance.
+        pub chunk: SearchChunk,
+        /// Relevance score from the serving pipeline.
+        pub score: f64,
+        /// Retrieval channel, such as `lexical`, `vector`, `rrf`, or `rerank`.
+        pub channel: String,
+    }
+
+    /// Typed wire result returned by Aphrody's REST and MCP search pipeline.
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct SearchResult {
+        /// Query text.
+        pub query: String,
+        /// Ranked local passages.
+        pub hits: Vec<SearchHit>,
+        /// Effective retrieval mode after fallback.
+        pub mode_served: SearchMode,
+        /// Explanation when the requested retrieval path degraded.
+        pub fallback_reason: Option<String>,
+        /// End-to-end search duration in milliseconds.
+        pub elapsed_ms: u64,
+        /// Candidate count before final truncation.
+        pub total_candidates: usize,
+    }
+
+    /// Options for calling the canonical HTTP search endpoint.
+    #[derive(Debug, Clone)]
+    pub struct HttpSearchOptions {
+        /// Aphrody MCP base URL, such as `https://search.example`.
+        pub base_url: Url,
+        /// Search text.
+        pub query: String,
+        /// Maximum number of hits (1-50, defaults to 8).
+        pub limit: Option<usize>,
+        /// Restrict hits to document paths beginning with this prefix.
+        pub path_prefix: Option<String>,
+        /// Optional bearer credential for a trusted server-side gateway.
+        pub bearer_token: Option<String>,
+        /// Request timeout. Defaults to 30 seconds.
+        pub timeout: Option<Duration>,
+    }
+
+    /// Reusable HTTP client for repeated search requests.
+    ///
+    /// Reuse one client per service origin so reqwest can reuse its connection
+    /// pool across requests.
+    #[derive(Clone)]
+    pub struct HttpSearchClient {
+        client: reqwest::Client,
+        endpoint: Url,
+        bearer_token: Option<String>,
+    }
+
+    #[cfg(feature = "rag-search")]
+    impl From<crate::search::SearchResult> for SearchResult {
+        fn from(result: crate::search::SearchResult) -> Self {
+            Self {
+                query: result.query,
+                hits: result
+                    .hits
+                    .into_iter()
+                    .map(|hit| SearchHit {
+                        chunk: SearchChunk {
+                            id: hit.chunk.id,
+                            doc_id: hit.chunk.doc_id,
+                            path: hit.chunk.path,
+                            chunk_index: hit.chunk.chunk_index,
+                            heading: hit.chunk.heading,
+                            symbol: hit.chunk.symbol,
+                            content: hit.chunk.content,
+                            start_line: hit.chunk.start_line,
+                            end_line: hit.chunk.end_line,
+                            token_count: hit.chunk.token_count,
+                        },
+                        score: hit.score,
+                        channel: hit.channel,
+                    })
+                    .collect(),
+                mode_served: match result.mode_served {
+                    crate::search::SearchMode::Lexical => SearchMode::Lexical,
+                    crate::search::SearchMode::Vector => SearchMode::Vector,
+                    crate::search::SearchMode::Hybrid => SearchMode::Hybrid,
+                },
+                fallback_reason: result.fallback_reason,
+                elapsed_ms: result.elapsed_ms,
+                total_candidates: result.total_candidates,
+            }
+        }
+    }
+
+    /// Failure returned by the HTTP search client.
+    #[derive(Debug)]
+    pub enum HttpSearchError {
+        /// The query or options are invalid.
+        InvalidRequest(&'static str),
+        /// The request could not be built or sent.
+        Transport(reqwest::Error),
+        /// The API returned a non-success HTTP status.
+        Api { status: StatusCode, message: String },
+    }
+
+    impl fmt::Display for HttpSearchError {
+        fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            match self {
+                Self::InvalidRequest(message) => {
+                    write!(formatter, "invalid search request: {message}")
+                }
+                Self::Transport(error) => write!(formatter, "search request failed: {error}"),
+                Self::Api { status, message } => {
+                    write!(
+                        formatter,
+                        "Aphrody search returned HTTP {status}: {message}"
+                    )
+                }
+            }
+        }
+    }
+
+    impl Error for HttpSearchError {
+        fn source(&self) -> Option<&(dyn Error + 'static)> {
+            match self {
+                Self::Transport(error) => Some(error),
+                Self::InvalidRequest(_) | Self::Api { .. } => None,
+            }
+        }
+    }
+
+    impl From<reqwest::Error> for HttpSearchError {
+        fn from(error: reqwest::Error) -> Self {
+            Self::Transport(error)
+        }
+    }
+
+    #[derive(Deserialize)]
+    struct ErrorBody {
+        error: Option<String>,
+    }
+
+    impl HttpSearchClient {
+        /// Create a client for an Aphrody MCP origin.
+        pub fn new(
+            base_url: impl AsRef<str>,
+            bearer_token: Option<String>,
+            timeout: Option<Duration>,
+        ) -> Result<Self, HttpSearchError> {
+            let base_url = Url::parse(base_url.as_ref())
+                .map_err(|_| HttpSearchError::InvalidRequest("base_url is invalid"))?;
+            if !matches!(base_url.scheme(), "http" | "https")
+                || !base_url.username().is_empty()
+                || base_url.password().is_some()
+            {
+                return Err(HttpSearchError::InvalidRequest(
+                    "base_url must be HTTP(S) and contain no credentials",
+                ));
+            }
+            if bearer_token.is_some() && base_url.scheme() != "https" {
+                let loopback = base_url.host_str().is_some_and(|host| {
+                    host.eq_ignore_ascii_case("localhost")
+                        || host
+                            .parse::<IpAddr>()
+                            .is_ok_and(|address| address.is_loopback())
+                });
+                if !loopback {
+                    return Err(HttpSearchError::InvalidRequest(
+                        "bearer tokens require HTTPS except for loopback services",
+                    ));
+                }
+            }
+            let endpoint = base_url
+                .join("/api/v1/rag/search")
+                .map_err(|_| HttpSearchError::InvalidRequest("base_url is invalid"))?;
+            let client = reqwest::Client::builder()
+                .timeout(timeout.unwrap_or(DEFAULT_TIMEOUT))
+                .redirect(reqwest::redirect::Policy::none())
+                .build()?;
+            Ok(Self {
+                client,
+                endpoint,
+                bearer_token,
+            })
+        }
+
+        /// Search through the shared local RAG pipeline.
+        pub async fn search(
+            &self,
+            query: &str,
+            limit: Option<usize>,
+            path_prefix: Option<&str>,
+        ) -> Result<SearchResult, HttpSearchError> {
+            let query = query.trim();
+            if query.is_empty() {
+                return Err(HttpSearchError::InvalidRequest("query must not be empty"));
+            }
+            let limit = limit.unwrap_or(8);
+            if !(1..=50).contains(&limit) {
+                return Err(HttpSearchError::InvalidRequest(
+                    "limit must be from 1 to 50",
+                ));
+            }
+            let mut endpoint = self.endpoint.clone();
+            endpoint
+                .query_pairs_mut()
+                .append_pair("q", query)
+                .append_pair("limit", &limit.to_string());
+            if let Some(prefix) = path_prefix {
+                endpoint
+                    .query_pairs_mut()
+                    .append_pair("path_prefix", prefix);
+            }
+            let mut request = self
+                .client
+                .get(endpoint)
+                .header(reqwest::header::ACCEPT, "application/json");
+            if let Some(token) = self
+                .bearer_token
+                .as_deref()
+                .filter(|token| !token.is_empty())
+            {
+                request = request.bearer_auth(token);
+            }
+            let response = request.send().await?;
+            let status = response.status();
+            if !status.is_success() {
+                let message = response
+                    .json::<ErrorBody>()
+                    .await
+                    .ok()
+                    .and_then(|body| body.error)
+                    .unwrap_or_else(|| "search service returned an error".to_owned());
+                return Err(HttpSearchError::Api { status, message });
+            }
+            Ok(response.json::<SearchResult>().await?)
+        }
+    }
+
+    /// Query Aphrody's shared local RAG search endpoint with typed results.
+    pub async fn search(options: HttpSearchOptions) -> Result<SearchResult, HttpSearchError> {
+        HttpSearchClient::new(options.base_url, options.bearer_token, options.timeout)?
+            .search(
+                &options.query,
+                options.limit,
+                options.path_prefix.as_deref(),
+            )
+            .await
+    }
+}
+
 /// Create an Obscura HTTP transport with the requested outbound host scope.
 pub async fn scoped_native_transport(domains: &[String]) -> Result<BunBrowserTransport, String> {
     obscura_net::ensure_rustls_crypto_provider();

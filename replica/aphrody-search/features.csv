@@ -1,9 +1,24 @@
 feature,area,priority,original,clone,notes
-Search public web,search,must,yes,yes,Existing Aphrody web search path
-Search Aphrody indexed corpus,search,must,yes,partial,Typed HTTP RAG excerpts; requires configured service/gateway
-Ranked local excerpts with provenance,results,must,yes,yes,Shows indexed path and heading
-Retrieval mode and fallback metadata,results,should,yes,yes,Displays honest retrieval mode and fallback reason
-Loading empty and retry states,states,must,yes,yes,Accessible status and error surfaces
-Generated cited answer,agents,should,yes,no,Requires a dedicated answer synthesis pipeline
-Conversation history and projects,workspace,could,yes,no,Outside this single search vertical slice
-Automations and browser actions,agents,could,yes,no,Outside Aphrody Search core query flow
+Public web search query composer,search,must,yes,yes,Aphrody home submits to its existing public web search adapter
+Search local indexed knowledge,search,must,yes,partial,Typed HTTP RAG client and local excerpts; service/gateway must be configured
+Generated answer grounded in web sources,answer,must,yes,no,Needs answer synthesis pipeline and citation-to-source mapping
+Inline citations in generated answer,evidence,must,yes,no,Current Aphrody results do not render generated answer citations
+Ranked web results with URLs and snippets,results,must,yes,partial,Aphrody public results exist; normalize stable source records across providers
+Source list and openable source links,evidence,must,yes,partial,Public web results link out; indexed results show local file paths
+"Response, Links, Images result views",results,should,yes,no,Observed response session tabs; alternate views not implemented on Aphrody home
+Follow-up question with session context,sessions,must,yes,no,Needs persisted conversation/response context
+Model selection,agents,should,yes,no,Reference model picker; Aphrody backend routing is separate from search UI
+Deep Research mode,research,should,yes,no,Public help documents a longer multi-source report; implementation is a separate large slice
+Focused sources such as Academic Finance and Files,filters,should,yes,no,Help describes source focuses; exact options vary by plan and rollout
+Search API multi-query request,agents,should,yes,no,Official endpoint accepts up to five independent queries in one request
+Domain include/exclude and path filtering,filters,should,yes,no,Public Search API `search_domain_filter` supports allowlist/denylist and paths
+Regional country filtering,filters,could,yes,no,Search API accepts country codes for regional relevance
+Language filtering,filters,could,yes,no,Search API documents language filtering
+Fast Search option,performance,could,yes,no,Public Search API exposes lower-latency search type
+Agent API web search tool,agents,must,yes,partial,Aphrody MCP exposes tools, but lacks unified typed web-grounded answer API contract
+Agent API URL fetch tool,agents,should,yes,no,Public docs show fetch_url as an Agent tool; Aphrody has separate fetch/crawl tools
+Search API MCP integration,agents,should,yes,partial,Aphrody itself has MCP search tools; published external integration/docs need qualification
+Command-line JSON search,integrations,should,yes,partial,Aphrody CLI emits JSON; unified public-web and local-search UX is incomplete
+Typed JavaScript and Rust clients,integrations,must,yes,partial,JS Bun/browser and Rust local/HTTP façades are in progress; packaging and release qualification remain
+Loading empty and retry states,states,must,yes,yes,Accessible indexed-search states are implemented in the home UI
+Retrieval mode and fallback metadata,results,should,yes,yes,Indexed mode shows served mode, latency and fallback details

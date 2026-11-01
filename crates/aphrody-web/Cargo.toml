@@ -18,6 +18,7 @@ serde = { workspace = true }
 
 [features]
 default = []
+http-search = []
 rag-search = ["dep:aphrody-rag"]
 
 [package.metadata.docs.rs]
