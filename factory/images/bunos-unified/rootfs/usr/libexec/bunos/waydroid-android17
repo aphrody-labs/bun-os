@@ -19,7 +19,11 @@ case "$cmd" in
     fi
     ;;
   provision)
-    android() { timeout 30s waydroid shell -- "$@"; }
+    android() {
+      command=$1
+      shift
+      timeout 30s lxc-attach -P /var/lib/waydroid/lxc -n waydroid -- "/system/bin/$command" "$@"
+    }
     install_apk() {
       runuser -u aphrody -- env HOME=/home/aphrody XDG_RUNTIME_DIR=/run/user/1000 \
         DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus WAYLAND_DISPLAY=wayland-1 \
