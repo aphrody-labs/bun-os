@@ -54,6 +54,27 @@ pub mod http_search {
         Hybrid,
     }
 
+    /// Retrieval strategy requested from the remote index.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum SearchStrategy {
+        /// Use SQLite FTS text retrieval only.
+        Lexical,
+        /// Use dense-vector retrieval only.
+        Vector,
+        /// Fuse lexical and vector retrieval (the server default).
+        Hybrid,
+    }
+
+    impl SearchStrategy {
+        fn as_query_value(self) -> &'static str {
+            match self {
+                Self::Lexical => "lexical",
+                Self::Vector => "vector",
+                Self::Hybrid => "hybrid",
+            }
+        }
+    }
+
     /// One local indexed text passage returned by search.
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct SearchChunk {
@@ -116,6 +137,8 @@ pub mod http_search {
         pub query: String,
         /// Maximum number of hits (1-50, defaults to 8).
         pub limit: Option<usize>,
+        /// Retrieval strategy; defaults to hybrid in the convenience function.
+        pub mode: Option<SearchStrategy>,
         /// Restrict hits to document paths beginning with this prefix.
         pub path_prefix: Option<String>,
         /// Optional bearer credential for a trusted server-side gateway.
@@ -271,6 +294,18 @@ pub mod http_search {
             limit: Option<usize>,
             path_prefix: Option<&str>,
         ) -> Result<SearchResult, HttpSearchError> {
+            self.search_with_mode(query, limit, path_prefix, SearchStrategy::Hybrid)
+                .await
+        }
+
+        /// Search with an explicit retrieval strategy.
+        pub async fn search_with_mode(
+            &self,
+            query: &str,
+            limit: Option<usize>,
+            path_prefix: Option<&str>,
+            mode: SearchStrategy,
+        ) -> Result<SearchResult, HttpSearchError> {
             let query = query.trim();
             if query.is_empty() {
                 return Err(HttpSearchError::InvalidRequest("query must not be empty"));
@@ -285,7 +320,8 @@ pub mod http_search {
             endpoint
                 .query_pairs_mut()
                 .append_pair("q", query)
-                .append_pair("limit", &limit.to_string());
+                .append_pair("limit", &limit.to_string())
+                .append_pair("mode", mode.as_query_value());
             if let Some(prefix) = path_prefix {
                 endpoint
                     .query_pairs_mut()
@@ -320,10 +356,11 @@ pub mod http_search {
     /// Query Aphrody's shared local RAG search endpoint with typed results.
     pub async fn search(options: HttpSearchOptions) -> Result<SearchResult, HttpSearchError> {
         HttpSearchClient::new(options.base_url, options.bearer_token, options.timeout)?
-            .search(
+            .search_with_mode(
                 &options.query,
                 options.limit,
                 options.path_prefix.as_deref(),
+                options.mode.unwrap_or(SearchStrategy::Hybrid),
             )
             .await
     }

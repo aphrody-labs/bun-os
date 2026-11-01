@@ -79,6 +79,14 @@ fn search_cache_key(path: &Path, req: &RagSearchRequest) -> String {
         &mut hasher,
         &req.limit.unwrap_or(8).clamp(1, 50).to_le_bytes(),
     );
+    hash_field(
+        &mut hasher,
+        match req.mode.unwrap_or(RagSearchMode::Hybrid) {
+            RagSearchMode::Lexical => b"lexical",
+            RagSearchMode::Vector => b"vector",
+            RagSearchMode::Hybrid => b"hybrid",
+        },
+    );
     if let Some(prefix) = &req.path_prefix {
         hash_field(&mut hasher, prefix.as_bytes());
     } else {
@@ -207,6 +215,24 @@ fn reranker_from_env(enabled: bool) -> Result<Option<Arc<dyn aphrody_rag::Rerank
     Ok(Some(Arc::new(reranker)))
 }
 
+#[derive(Debug, Clone, Copy, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum RagSearchMode {
+    Lexical,
+    Vector,
+    Hybrid,
+}
+
+impl From<RagSearchMode> for SearchMode {
+    fn from(mode: RagSearchMode) -> Self {
+        match mode {
+            RagSearchMode::Lexical => Self::Lexical,
+            RagSearchMode::Vector => Self::Vector,
+            RagSearchMode::Hybrid => Self::Hybrid,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, JsonSchema)]
 pub(crate) struct RagSearchRequest {
     /// Natural-language or keyword query.
@@ -217,6 +243,9 @@ pub(crate) struct RagSearchRequest {
     /// Restrict to documents whose path starts with this prefix.
     #[serde(default)]
     pub(crate) path_prefix: Option<String>,
+    /// Retrieval strategy (lexical, vector, or hybrid; defaults to hybrid).
+    #[serde(default)]
+    pub(crate) mode: Option<RagSearchMode>,
 }
 
 pub(crate) async fn run(req: &RagSearchRequest) -> Result<aphrody_rag::SearchResult, String> {
@@ -245,7 +274,7 @@ pub(crate) async fn run(req: &RagSearchRequest) -> Result<aphrody_rag::SearchRes
     }
     let opts = SearchOptions {
         limit: req.limit.unwrap_or(8).clamp(1, 50),
-        mode: SearchMode::Hybrid,
+        mode: req.mode.map(SearchMode::from).unwrap_or(SearchMode::Hybrid),
         rerank: rerank_requested,
         path_prefix: req.path_prefix.clone(),
         ..SearchOptions::default()
@@ -322,6 +351,7 @@ mod tests {
             query: "goku".into(),
             limit: None,
             path_prefix: None,
+            mode: None,
         })
         .await;
         assert!(out.contains("RAG index not found"), "{out}");
@@ -348,9 +378,29 @@ Son Goku apprend le Kaméhaméha auprès de Kamé Sennin.
             query: "Kaméhaméha".into(),
             limit: Some(3),
             path_prefix: None,
+            mode: None,
         })
         .await;
         assert!(ctx.starts_with("[1] wiki/goku.md:"), "{ctx}");
         assert!(ctx.contains("Kamé Sennin"), "{ctx}");
+    }
+
+    #[test]
+    fn cache_key_separates_retrieval_modes() {
+        let path = Path::new("index.db");
+        let request = |mode| RagSearchRequest {
+            query: "headless search".into(),
+            limit: Some(8),
+            path_prefix: None,
+            mode,
+        };
+        assert_ne!(
+            search_cache_key(path, &request(Some(RagSearchMode::Lexical))),
+            search_cache_key(path, &request(Some(RagSearchMode::Vector))),
+        );
+        assert_eq!(
+            search_cache_key(path, &request(None)),
+            search_cache_key(path, &request(Some(RagSearchMode::Hybrid))),
+        );
     }
 }

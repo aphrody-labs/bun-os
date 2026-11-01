@@ -5,6 +5,7 @@ export interface HttpSearchOptions {
   query: string;
   limit?: number;
   pathPrefix?: string;
+  mode?: "lexical" | "vector" | "hybrid";
   signal?: AbortSignal;
 }
 
@@ -69,14 +70,16 @@ export function createHttpSearchClient(options: HttpSearchClientOptions) {
     async search(request: HttpSearchOptions): Promise<HttpSearchReport> {
       const query = request.query.trim();
       if (!query) throw new TypeError("query must not be empty");
-      const limit = request.limit ?? 5;
-      if (!Number.isInteger(limit) || limit < 1 || limit > 20) {
-        throw new RangeError("limit must be an integer from 1 to 20");
+      const limit = request.limit ?? 8;
+      if (!Number.isInteger(limit) || limit < 1 || limit > 50) {
+        throw new RangeError("limit must be an integer from 1 to 50");
       }
+      const mode = request.mode ?? "hybrid";
 
       const url = new URL(endpoint);
       url.searchParams.set("q", query);
       url.searchParams.set("limit", String(limit));
+      url.searchParams.set("mode", mode);
       if (request.pathPrefix !== undefined) url.searchParams.set("path_prefix", request.pathPrefix);
       const response = await fetcher(url, {
         method: "GET",

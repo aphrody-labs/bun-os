@@ -2986,7 +2986,8 @@ impl GoogleMcpServer {
     #[tool(
         description = "Search the local aphrody RAG index (SQLite FTS5, built by `aphrody rag \
                           index`; $APHRODY_RAG_DB or ~/.aphrody/rag/index.db). Returns ranked \
-                          chunks with path, lines and score as JSON."
+                          chunks with path, lines and score as JSON. Optional mode selects \
+                          lexical, vector or hybrid retrieval (hybrid is the default)."
     )]
     async fn aphrody_rag_search(
         &self,

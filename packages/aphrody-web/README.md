@@ -95,8 +95,13 @@ const web = createHttpSearchClient({ baseUrl: "https://search.example" });
 const result = await web.search({
   query: "Obscura headless browser",
   limit: 5,
+  mode: "hybrid",
 });
 ```
+
+The same endpoint supports `lexical`, `vector`, and `hybrid` retrieval. Omit
+`mode` to use the server's `hybrid` default. Limits follow the server contract
+of 1 through 50 results.
 
 The endpoint returns ranked local RAG results and honest mode/fallback
 metadata. It does not perform public web SERP. The gateway is private by

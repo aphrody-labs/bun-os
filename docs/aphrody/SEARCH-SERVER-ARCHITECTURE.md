@@ -22,13 +22,14 @@ Do not point a public browser directly at the MCP listener.
 | --- | --- | --- |
 | `GET /healthz` | Basic process liveness | Loopback listener; no token |
 | `POST /mcp` and Streamable HTTP methods | MCP tool server | Bearer middleware |
-| `GET /api/v1/rag/search?q=...&limit=8&path_prefix=...` | Canonical local SQLite search; compiled only with feature `rag` | REST router, no route-level auth; loopback and authenticated proxy are required |
+| `GET /api/v1/rag/search?q=...&limit=8&path_prefix=...&mode=hybrid` | Canonical local SQLite search; mode is lexical, vector, or hybrid | REST router, compiled only with feature `rag`; no route-level auth, so loopback and authenticated proxy are required |
 | `GET /api/v1/rag/query` | Legacy keyword search against `aphrody_rag_documents` in PostgreSQL | REST router; same proxy boundary |
 | `GET /api/v1/rag/stats` | Legacy PostgreSQL corpus counts | REST router; same proxy boundary |
 | `GET /api/v1/aphrody/status`, `/api/v1/models`, `/v1/models` | Status and model inventory | REST router; same proxy boundary |
 
 The canonical browser endpoint and MCP `aphrody_rag_search` tool call the same
-`rag_tools::run` function. The legacy `/rag/query` route is a separate
+`rag_tools::run` function. Both expose lexical, vector, and hybrid modes, with
+hybrid as the default. The legacy `/rag/query` route is a separate
 PostgreSQL compatibility path and does not invoke the hybrid SQLite pipeline.
 
 ## Search request path
@@ -47,8 +48,9 @@ flowchart LR
   I --> J[Typed SearchResult JSON]
 ```
 
-The route accepts a non-empty `q`, `limit` from 1 through 50 (default 8), and
-an optional path prefix. The RAG tool resolves the database in this order:
+The route accepts a non-empty `q`, `limit` from 1 through 50 (default 8), an
+optional path prefix, and `mode=lexical|vector|hybrid` (default `hybrid`). The
+mode participates in the Redis cache key. The RAG tool resolves the database in this order:
 `APHRODY_RAG_DB`, an existing Aphrody agent-home database, then
 `~/.aphrody/rag/index.db`. It refuses to silently create an empty index.
 

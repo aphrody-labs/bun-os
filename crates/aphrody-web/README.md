@@ -114,7 +114,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
 ```rust,no_run
-use aphrody_web::http_search::HttpSearchClient;
+use aphrody_web::http_search::{HttpSearchClient, SearchStrategy};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -123,13 +123,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         None,
         None,
     )?;
-    let result = client.search("Obscura headless browser", Some(8), None).await?;
+    let result = client
+        .search_with_mode(
+            "Obscura headless browser",
+            Some(8),
+            None,
+            SearchStrategy::Hybrid,
+        )
+        .await?;
     for hit in result.hits {
         println!("{}: {}", hit.chunk.path, hit.chunk.content);
     }
     Ok(())
 }
 ```
+
+The one-shot `http_search::search(HttpSearchOptions { .. })` API accepts the
+same optional `mode` field. The server defaults to `Hybrid` when it is omitted.
 
 This client uses the same typed `SearchResult` as in-process retrieval. The
 service owner must keep the MCP listener private or put an authenticated,

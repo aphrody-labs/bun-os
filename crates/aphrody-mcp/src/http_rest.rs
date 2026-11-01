@@ -58,6 +58,7 @@ struct RagSearchQuery {
     q: Option<String>,
     limit: Option<usize>,
     path_prefix: Option<String>,
+    mode: Option<crate::rag_tools::RagSearchMode>,
 }
 
 /// The browser HTTP endpoint delegates to the exact SQLite search pipeline
@@ -81,6 +82,7 @@ async fn rag_search_handler(Query(params): Query<RagSearchQuery>) -> Response {
         query,
         limit: Some(limit),
         path_prefix: params.path_prefix,
+        mode: params.mode,
     };
     match crate::rag_tools::run(&request).await {
         Ok(result) => response(
