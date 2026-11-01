@@ -264,6 +264,11 @@ impl WaylandBackend {
                 keyboard,
                 mods: 0,
             });
+            // Let the compositor register the new devices and keymap before
+            // sending the first input event on this connection.
+            self.queue
+                .roundtrip(&mut self.state)
+                .context("Wayland input initialization")?;
         }
         self.input.as_mut().context("input")
     }
