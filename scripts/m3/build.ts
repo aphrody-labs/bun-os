@@ -186,7 +186,9 @@ async function buildPackage(pkg: WorkspacePackage, config: M3PackageConfig): Pro
     declaredTypes.length > 0 &&
     declaredTypes.every(path => {
       const relativePath = path.replaceAll("\\", "/").replace(/^\.\//, "");
-      return !relativePath.startsWith("dist/") && existsSync(join(pkg.dir, relativePath));
+      if (relativePath.startsWith("dist/")) return false;
+      if (!relativePath.includes("*")) return existsSync(join(pkg.dir, relativePath));
+      return new Bun.Glob(relativePath).scanSync({ cwd: pkg.dir, onlyFiles: true }).next().value !== undefined;
     });
   if (existsSync(join(pkg.dir, "tsconfig.build.json")) && !typesUseShippedSources) {
     const t = performance.now();
