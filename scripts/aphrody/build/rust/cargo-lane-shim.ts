@@ -3,7 +3,7 @@
 /**
  * `cargo` on the VPS build host (installed as ~/.local/bin/cargo by factory/sync/install.ts, ahead of rustup's proxy).
  * Compilation subcommands (build, check, test, clippy, doc, bench, rustc, nextest) go through a buncc lane: per-lane
- * build directory on the fast disk, at most four jobs, no-progress watchdog (packages/buncc/src/cargo.ts). Everything
+ * build directory on the fast disk, host-sized worker count, no-progress watchdog (packages/buncc/src/cargo.ts). Everything
  * else (metadata, fmt, update, run, install, ...) and every call made from inside a lane runs the real cargo directly.
  */
 import { delimiter, dirname, join, resolve } from "node:path";

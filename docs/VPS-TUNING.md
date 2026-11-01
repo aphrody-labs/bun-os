@@ -62,10 +62,10 @@ infra/config/host/systemd/slices/apply.sh  # interactive.slice / build.slice pri
   now. Session containers (redroid, bunos-android, gamescope, auto-*, webos-db) get cpu.weight 1000 through
   `docker update --cpu-shares 17620`, which persists with the container. gamescope starts with
   `--cgroup-parent interactive.slice`.
-- `build.slice` (CPU weight 20, IO weight 50): every 30 s, `aphrody-priority.timer` adopts build commands started from user sessions,
-  with their descendants, into a transient scope of the slice. It also renices them to 10 and sets ionice best-effort 7.
-  Build containers (buildx, bunos-native, helium) get cpu.weight 20 (`--cpu-shares 126`). These are weights, not caps:
-  builds use every idle core.
+- `build.slice` (CPU/IO weight 1000): every 30 s, `aphrody-priority.timer` adopts build commands started from user sessions,
+  with their descendants, into a transient scope of the slice. It sets build workers to normal CPU nice and highest
+  best-effort I/O priority. Builds get full CPU and I/O priority while production services are stopped. The scheduler
+  uses all available cores; no CPU quota or fixed per-lane worker cap is imposed.
 - `aphrody-iocost.service` turns on blk-iocost on every disk. Without it, IOWeight does nothing under the `none`
   scheduler. The Ceph-backed sdb and sdc report rotational=1, so the auto model assumed a hard disk (370 random IOPS)
   and builds crawled in `ioc_rqos_throttle`. They now get an explicit SSD-class linear model. Every disk keeps vrate
@@ -98,14 +98,14 @@ infra/config/host/systemd/slices/apply.sh  # interactive.slice / build.slice pri
 
 ### Benchmark (2026-10-30, h2load on the VPS against https://aphrody.com/, load average 55–70)
 
-| Run | Before | After |
-| --- | --- | --- |
-| HTTP/2, 50 connections × 10 streams, 5000 requests | 1050 req/s | 1514 req/s |
-| HTTP/2, a new connection per request (100 clients, 2000 requests) | 1141 req/s | 1634 req/s |
-| styles.css bytes (identity / gzip / br / zstd) | 106676 / 20491 / – / – | 106676 / 20491 / 19311 / 23301 |
-| WebOS gateway 127.0.0.1:8790, p50 / p95 / max (with slices) | 1.9 / 6.4 / 525 ms | 0.8 / 1.8 / 5.1 ms |
-| Wayland gateway 127.0.0.1:8793, p50 / p95 / max (with slices) | 0.9 / 3.7 / 4.3 ms | 0.5 / 2.0 / 3.4 ms |
-| https://aphrody.com/ full request, p50 / p95 | 27.1 / 43.8 ms | 13.6 / 38.4 ms |
+| Run                                                               | Before                 | After                          |
+| ----------------------------------------------------------------- | ---------------------- | ------------------------------ |
+| HTTP/2, 50 connections × 10 streams, 5000 requests                | 1050 req/s             | 1514 req/s                     |
+| HTTP/2, a new connection per request (100 clients, 2000 requests) | 1141 req/s             | 1634 req/s                     |
+| styles.css bytes (identity / gzip / br / zstd)                    | 106676 / 20491 / – / – | 106676 / 20491 / 19311 / 23301 |
+| WebOS gateway 127.0.0.1:8790, p50 / p95 / max (with slices)       | 1.9 / 6.4 / 525 ms     | 0.8 / 1.8 / 5.1 ms             |
+| Wayland gateway 127.0.0.1:8793, p50 / p95 / max (with slices)     | 0.9 / 3.7 / 4.3 ms     | 0.5 / 2.0 / 3.4 ms             |
+| https://aphrody.com/ full request, p50 / p95                      | 27.1 / 43.8 ms         | 13.6 / 38.4 ms                 |
 
 The h3 throughput was not measured: Ubuntu's h2load and curl and Alpine's curl are built without QUIC. The QUIC
 sockets are bound by every worker, and Alt-Svc is advertised.

@@ -1,11 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
-# Bulk builds (cargo-serial, makepkg/Store, AOSP, Helium, BuildKit, tmux build sessions): CPU weight 20, IO weight 50,
-# so small-file copies of image builds stay usable. Weights, not caps:
-# builds use every core and the whole disk when the interactive services are idle.
+# Bun OS release builds: high CPU and I/O priority with no quotas. When production is stopped,
+# build workers can use every core and all available storage.
 [Unit]
 Description=Bun OS builds
 Before=slices.target
 
 [Slice]
-CPUWeight=20
-IOWeight=50
+CPUWeight=1000
+IOWeight=1000

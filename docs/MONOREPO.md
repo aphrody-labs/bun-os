@@ -54,9 +54,10 @@ bun scripts/cargo.ts metadata        # members-contract workspace report
 bun scripts/cargo.ts check           # serialized `cargo check --locked --workspace`
 ```
 
-Use the serialized wrapper `scripts/cargo.ts` for Cargo, with at most four compiler jobs per lane
-(`CARGO_BUILD_JOBS=4`). `bun scripts/cargo.ts exec -- <cargo args>` forwards arguments. Run builds and
+Use the wrapper `scripts/cargo.ts` for Cargo, with lanes sized to the host and no fixed per-lane worker ceiling
+(`BUNCC_SLOTS` and `CARGO_BUILD_JOBS` are operator controls). `bun scripts/cargo.ts exec -- <cargo args>` forwards arguments. Run builds and
 qualification on the VPS (`ssh vps`, checkout `~/src/bun-os`); do not start WSL on the workstation.
+The primary Unix VPS `cargo-serial.ts` route uses independent BunCC lane targets; Windows MSVC and secondary `dbfr` remain serialized.
 On a fresh checkout `bun run setup` prepares the submodules and `build/packages/material-web.tgz` that the
 root `bun.lock` expects, then `bun install --frozen-lockfile`.
 

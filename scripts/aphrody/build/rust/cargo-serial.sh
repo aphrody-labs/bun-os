@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Serialize Aphrody Cargo work across agents and terminals, and bound rustc fan-out.
+# Coordinate Cargo output ownership across agents and terminals; worker count follows the operator's release policy.
 set -euo pipefail
 
 if (($# == 0)); then
@@ -51,33 +51,27 @@ if [[ ! "$available_cpus" =~ ^[1-9][0-9]*$ ]]; then
     echo "Cannot determine the executing host's available CPUs" >&2
     exit 64
 fi
-default_jobs=4
-if ((available_cpus < default_jobs)); then default_jobs="$available_cpus"; fi
+default_jobs="$available_cpus"
 jobs="${APHRODY_CARGO_JOBS:-$default_jobs}"
 if [[ "$jobs" == auto ]]; then
-    # Respect the host affinity and the owner's four-compiler limit per factory lane.
+    # Use the full worker pool selected for this host.
     # Keep the factory lease and shared Cargo lock; concurrent owners retain them.
     jobs="$default_jobs"
-elif [[ ! "$jobs" =~ ^[1-4]$ ]]; then
-    echo "APHRODY_CARGO_JOBS must be an integer from 1 through 4, or auto (at most four available CPUs)" >&2
+elif [[ ! "$jobs" =~ ^[1-9][0-9]*$ ]]; then
+    echo "APHRODY_CARGO_JOBS must be a positive integer, or auto" >&2
     exit 64
 fi
-if ((jobs > available_cpus)); then
-    echo "Cargo jobs exceed the executing host's available CPUs" >&2
-    exit 64
-fi
-
 for arg in "$@"; do
     case "$arg" in
         -j*|--jobs|--jobs=*)
-            echo "Do not override Cargo job count; set APHRODY_CARGO_JOBS=1..4 or auto instead" >&2
+            echo "Do not override Cargo job count; set APHRODY_CARGO_JOBS or auto instead" >&2
             exit 64
             ;;
     esac
 done
 
-# Heavy Cargo runs in a buncc lane (packages/buncc/src/cargo.ts): about one lane per four CPUs, at most four jobs per
-# lane, one build/target directory per lane on the fast disk, shared sccache, a lane wait instead of a failure, and a
+# Heavy Cargo runs in a buncc lane (packages/buncc/src/cargo.ts): host-sized lanes and worker counts, one build/target
+# directory per lane on the fast disk, shared sccache, a lane wait instead of a failure, and a
 # no-progress watchdog instead of a hard 30-minute kill. The global factory lease is not taken for Cargo any more.
 if [[ -n "${APHRODY_CARGO_TARGET_DIR:-}" ]]; then
     if [[ "$APHRODY_CARGO_TARGET_DIR" != /* ]]; then

@@ -11,33 +11,33 @@ need for one has appeared).
 
 ## Commands
 
-| Command | What it does |
-| --- | --- |
-| `buncc cc \| c++ \| ar \| link ...` | `cc`-compatible driver, usable as `CC`, `CXX`, `AR` |
-| `buncc doctor` | toolchain report with fix hints, sccache health, stale environment variables, AOT-incompatible components |
-| `buncc install <provider> [--run]` | prints the unattended install command; runs it only with `--run` |
-| `buncc env <provider\|all> [--shims]` | environment overlay as JSON; `--shims` writes `cc`/`c++`/`ar`/`link` launchers and sets `CC`/`CXX`/`AR` |
-| `buncc which <tool>`, `buncc pin` | locate a tool, show pinned minimums (`buncc.toolchain.json`, `rust-toolchain.toml`) |
-| `buncc plan [-p crate] [--affected[=base]]` | workspace layers in dependency order, job budget |
-| `buncc check \| build \| test \| clippy \| fmt [-p crate] [--affected[=base]] [--jobs N] [--release] [-- extra]` | cargo through the lock, slot and environment logic |
-| `buncc exec -- <cargo args>` | any cargo command through the same logic (what `scripts/cargo.ts exec` uses) |
-| `buncc lsp [--out dir]` | writes `compile_commands.json` from the driver's log, and `.clangd` |
-| `buncc bundle`, `compile`, `aot`, `wasm` | `bun build` presets, `bun build --compile [--aot]`, wasm (delegates to `packages/wasm/src/buncc.ts` when present) |
-| `buncc package <msix\|appx\|msi\|exe\|zip>`, `sign`, `store` | Windows packaging plans (dry run unless `--run`) |
-| `buncc profile list\|show\|apply <id>`, `buncc bench aot-bun <entry>` | named build profiles and the measured Bun AOT benchmark |
+| Command                                                                                                          | What it does                                                                                                      |
+| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `buncc cc \| c++ \| ar \| link ...`                                                                              | `cc`-compatible driver, usable as `CC`, `CXX`, `AR`                                                               |
+| `buncc doctor`                                                                                                   | toolchain report with fix hints, sccache health, stale environment variables, AOT-incompatible components         |
+| `buncc install <provider> [--run]`                                                                               | prints the unattended install command; runs it only with `--run`                                                  |
+| `buncc env <provider\|all> [--shims]`                                                                            | environment overlay as JSON; `--shims` writes `cc`/`c++`/`ar`/`link` launchers and sets `CC`/`CXX`/`AR`           |
+| `buncc which <tool>`, `buncc pin`                                                                                | locate a tool, show pinned minimums (`buncc.toolchain.json`, `rust-toolchain.toml`)                               |
+| `buncc plan [-p crate] [--affected[=base]]`                                                                      | workspace layers in dependency order, job budget                                                                  |
+| `buncc check \| build \| test \| clippy \| fmt [-p crate] [--affected[=base]] [--jobs N] [--release] [-- extra]` | cargo through the lock, slot and environment logic                                                                |
+| `buncc exec -- <cargo args>`                                                                                     | any cargo command through the same logic (what `scripts/cargo.ts exec` uses)                                      |
+| `buncc lsp [--out dir]`                                                                                          | writes `compile_commands.json` from the driver's log, and `.clangd`                                               |
+| `buncc bundle`, `compile`, `aot`, `wasm`                                                                         | `bun build` presets, `bun build --compile [--aot]`, wasm (delegates to `packages/wasm/src/buncc.ts` when present) |
+| `buncc package <msix\|appx\|msi\|exe\|zip>`, `sign`, `store`                                                     | Windows packaging plans (dry run unless `--run`)                                                                  |
+| `buncc profile list\|show\|apply <id>`, `buncc bench aot-bun <entry>`                                            | named build profiles and the measured Bun AOT benchmark                                                           |
 
 ## Adopt, extend or write
 
-| Need | Decision | Why |
-| --- | --- | --- |
-| Cargo run, deadline, process-tree kill | **migrated** from `packages/bun-workspace` `serializedCargo` (`bun-workspace` now calls `buncc/cargo`) | one owner; the PowerShell mutex wrapper is replaced by lock files |
-| Rust workspace graph for `plan` | **write** (small): `cargo metadata --no-deps` | it is the only source that knows build/dev dependency kinds; `factory/bunos/workspace-graph.ts` reads tracked files for component integration checks and stays the owner of that job |
-| Cross-compile to windows-msvc | **adopt** `cargo-xwin` / `xwin` (provider by the toolchains agent) | not recoded |
-| Compiler cache | **adopt** sccache; buncc only probes its health and bypasses it | not recoded |
-| C dependencies | **adopt** vcpkg (provider), CMake presets are left to CMake | not recoded |
-| .NET NativeAOT, winget, CMake, clang, make, ninja, gn, wix, MSIX | **adopt** the providers in `providers/toolchains.ts` (they replace the detect-only core ones of the same id) | verified downloads and argument builders |
-| JS task cache / affected | **not done**: turborepo is not wired; `--affected` only covers Cargo crates | no measurement yet |
-| `crates/bun-os-git`, `crates/aphrody-infra`, `infra/` | **not reviewed or reused yet**: buncc shells out to `git diff --name-only` for affected selection | listed so it is not mistaken for done |
+| Need                                                             | Decision                                                                                                     | Why                                                                                                                                                                                  |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Cargo run, deadline, process-tree kill                           | **migrated** from `packages/bun-workspace` `serializedCargo` (`bun-workspace` now calls `buncc/cargo`)       | one owner; the PowerShell mutex wrapper is replaced by lock files                                                                                                                    |
+| Rust workspace graph for `plan`                                  | **write** (small): `cargo metadata --no-deps`                                                                | it is the only source that knows build/dev dependency kinds; `factory/bunos/workspace-graph.ts` reads tracked files for component integration checks and stays the owner of that job |
+| Cross-compile to windows-msvc                                    | **adopt** `cargo-xwin` / `xwin` (provider by the toolchains agent)                                           | not recoded                                                                                                                                                                          |
+| Compiler cache                                                   | **adopt** sccache; buncc only probes its health and bypasses it                                              | not recoded                                                                                                                                                                          |
+| C dependencies                                                   | **adopt** vcpkg (provider), CMake presets are left to CMake                                                  | not recoded                                                                                                                                                                          |
+| .NET NativeAOT, winget, CMake, clang, make, ninja, gn, wix, MSIX | **adopt** the providers in `providers/toolchains.ts` (they replace the detect-only core ones of the same id) | verified downloads and argument builders                                                                                                                                             |
+| JS task cache / affected                                         | **not done**: turborepo is not wired; `--affected` only covers Cargo crates                                  | no measurement yet                                                                                                                                                                   |
+| `crates/bun-os-git`, `crates/aphrody-infra`, `infra/`            | **not reviewed or reused yet**: buncc shells out to `git diff --name-only` for affected selection            | listed so it is not mistaken for done                                                                                                                                                |
 
 ## Environment (MSVC, sccache, stale paths)
 
@@ -52,11 +52,14 @@ need for one has appeared).
   deleted checkout and four WinLibs include paths.
 - sccache: only used when `RUSTC_WRAPPER` already names it or `BUNCC_SCCACHE=on`. Before use, `sccache --show-stats` must succeed;
   otherwise the wrapper is removed from the environment for this run (`BUNCC_SCCACHE=off` forces that).
-- Cargo lanes: one lane per four CPUs (12 cores give 3 lanes; `BUNCC_SLOTS=N` overrides), at most four compiler jobs per lane
-  (`CARGO_BUILD_JOBS` is capped at 4). When `/var/cache/aphrody-target` exists (or `BUNCC_LANE_ROOT` is set), lane N builds into
+- Cargo lanes: one lane per four CPUs by default (12 cores give 3 lanes; `BUNCC_SLOTS=N` overrides). The worker count
+  per lane follows the CPU share and `CARGO_BUILD_JOBS` can raise it without a hard-coded ceiling. When
+  `/var/cache/aphrody-target` exists (or `BUNCC_LANE_ROOT` is set), lane N builds into
   `<root>/lane-N` (target and build directory, line-table debug info), so lanes never share a build directory; sccache stays
   shared. Elsewhere lane N uses `target/slot-N` when there is more than one lane. Lock files live under the buncc cache
   (`%LOCALAPPDATA%\buncc\locks`, `~/.cache/buncc/locks`); a lane is freed only when its holder process is gone.
+- Heavy Cargo from the primary Unix VPS `cargo-serial.ts` path enters these lanes directly, bypassing the single native-owner
+  target lock. Windows MSVC and the secondary `dbfr` factory retain their serialized owner path.
 - Waiting for a lane is not a failure (`BUNCC_LANE_WAIT_MS`, default 12 hours). A running build is killed only when its process
   tree burns no CPU for the stall window (`timeoutMs`, default 30 minutes: a hung GPU test, a deadlocked build script).
   `BUNCC_CARGO_DEADLINE_MS` adds a hard deadline for callers that need one. The kill covers the whole tree (`taskkill /T /F` on
@@ -89,17 +92,19 @@ used by buncc for workspace builds. buncc only drives real compilers.
 One source per pin; this table is generated by `factory/bunos/generate-map.ts` (`just map`) and checked by `buncc doctor --repo`. Edit `buncc.toolchain.json`, `rust-toolchain.toml` or `package.json`, never this table.
 
 <!-- generated:pins begin (factory/bunos/generate-map.ts) -->
-| Pin | Value | Source of truth |
-| --- | --- | --- |
-| Bun runtime | 1.4.4-canary.20261028.1 | `package.json` packageManager, `factory/bunos/components.json` runtime |
-| Rust | nightly-2026-09-15 | `rust-toolchain.toml` |
-| cmake | min 4.4.4, latest 4.4.5 | `buncc.toolchain.json` |
-| clang | min 23.1.4, latest 23.1.4 | `buncc.toolchain.json` |
-| sccache | min 0.18.0, latest 0.19.0 | `buncc.toolchain.json` |
-| protoc | min 36.0 | `buncc.toolchain.json` |
-| dotnet | min 10.0.401, latest10 10.0.13 runtime, latest11 11.0.0-rc.3.26522.148 | `buncc.toolchain.json` |
-| ninja | min 1.13.0 | `buncc.toolchain.json` |
-| MSVC toolset | 14.51 | `buncc.toolchain.json` |
+
+| Pin          | Value                                                                  | Source of truth                                                        |
+| ------------ | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Bun runtime  | 1.4.4-canary.20261028.1                                                | `package.json` packageManager, `factory/bunos/components.json` runtime |
+| Rust         | nightly-2026-09-15                                                     | `rust-toolchain.toml`                                                  |
+| cmake        | min 4.4.4, latest 4.4.5                                                | `buncc.toolchain.json`                                                 |
+| clang        | min 23.1.4, latest 23.1.4                                              | `buncc.toolchain.json`                                                 |
+| sccache      | min 0.18.0, latest 0.19.0                                              | `buncc.toolchain.json`                                                 |
+| protoc       | min 36.0                                                               | `buncc.toolchain.json`                                                 |
+| dotnet       | min 10.0.401, latest10 10.0.13 runtime, latest11 11.0.0-rc.3.26522.148 | `buncc.toolchain.json`                                                 |
+| ninja        | min 1.13.0                                                             | `buncc.toolchain.json`                                                 |
+| MSVC toolset | 14.51                                                                  | `buncc.toolchain.json`                                                 |
+
 <!-- generated:pins end -->
 
 ### bun:ffi limits (upstream, checked in the Bun clone)
@@ -129,11 +134,11 @@ xwin releases have no macOS asset (only Linux musl x86_64/aarch64 and Windows x8
 Measured on the dev machine (Windows 11, Bun 1.4.4-canary, 24 cores), `buncc bench aot-bun` on a one-line `console.log` program,
 one build each, start-up median of 7 runs:
 
-| | build ms | size MiB | start median ms |
-| --- | ---: | ---: | ---: |
-| `bun build --compile` | 937 | 142.1 | 17.1 |
-| `... --aot` | 628 | 80.2 | 15.6 |
-| `... --aot --minify` | 1595 | 80.2 | 13.6 |
+|                       | build ms | size MiB | start median ms |
+| --------------------- | -------: | -------: | --------------: |
+| `bun build --compile` |      937 |    142.1 |            17.1 |
+| `... --aot`           |      628 |     80.2 |            15.6 |
+| `... --aot --minify`  |     1595 |     80.2 |            13.6 |
 
 A trivial program, one build per row: build times are noisy. Re-run on your own entry point before relying on it. Not measured: .NET 10/11 NativeAOT, Win32 `/LTCG` vs clang-cl,
 glibc profiles (no Linux host here), so those profiles make no size or speed claim.

@@ -943,12 +943,12 @@ export function cargoJobsSetting(
   config: Pick<VpsCargoConfig, "jobs" | "maxJobs" | "host">,
 ): number | "auto" {
   const limit = config.maxJobs ?? config.jobs;
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1024)
-    throw new Error("Host maxJobs must be an integer from 1 through 1024");
+  if (!Number.isSafeInteger(limit) || limit < 1)
+    throw new Error("Host maxJobs must be a positive safe integer");
   if (requested === "auto") return "auto";
   const jobs = Number(requested ?? Math.min(config.jobs, limit));
   if (!Number.isSafeInteger(jobs) || jobs < 1 || jobs > limit)
-    throw new Error(`--jobs must be 1..${limit}, or auto, on ${config.host}`);
+    throw new Error(`--jobs must be a positive integer no greater than the configured ${limit} workers, or auto, on ${config.host}`);
   return jobs;
 }
 

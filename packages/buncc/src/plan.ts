@@ -112,16 +112,14 @@ export function affectedCrates(graph: CrateNode[], changed: string[]): Affected 
   return { all: false, crates, reason: `${direct.size} crate(s) changed, ${crates.length - direct.size} dependent(s)` };
 }
 
-/** Parallel job count bounded by cores and by free memory (rustc peaks near 2 GiB per job on this workspace). */
+/** Parallel job count follows every available core; explicit requested counts are not memory-capped. */
 export function jobLimit(
   cores = availableParallelism(),
-  freeBytes = freemem(),
-  perJobBytes = 2 * 1024 ** 3,
+  _freeBytes = freemem(),
+  _perJobBytes = 2 * 1024 ** 3,
   requested?: number,
 ): number {
-  const byMemory = Math.max(1, Math.floor(freeBytes / perJobBytes));
-  const limit = Math.max(1, Math.min(cores, byMemory));
-  return requested ? Math.max(1, Math.min(requested, limit)) : limit;
+  return requested ? Math.max(1, requested) : Math.max(1, cores);
 }
 
 export function systemBudget() {

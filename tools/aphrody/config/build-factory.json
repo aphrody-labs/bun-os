@@ -7,20 +7,12 @@
     "host": "omar-pc",
     "target": "windows-x64",
     "enabled": false,
-    "nativeArchitectures": [
-      "x64"
-    ],
-    "crossArchitectures": [
-      "arm64"
-    ],
+    "nativeArchitectures": ["x64"],
+    "crossArchitectures": ["arm64"],
     "maxJobs": 1,
     "reserveMemoryGiB": 6,
     "reserveDiskGiB": 20,
-    "scope": [
-      "windows-native-builds",
-      "windows-packaging",
-      "windows-smoke-tests"
-    ],
+    "scope": ["windows-native-builds", "windows-packaging", "windows-smoke-tests"],
     "execution": "local-windows"
   },
   "executionOnlyTargets": [],
@@ -33,7 +25,7 @@
     "value": "vps"
   },
   "rust": {
-    "maxJobs": 4,
+    "maxJobs": 12,
     "serialized": true,
     "wrapper": "scripts/cargo.ts",
     "incremental": false,
@@ -44,13 +36,7 @@
     "frozenLockfile": true
   },
   "local": {
-    "allowed": [
-      "help",
-      "plan",
-      "inventory",
-      "source-edit",
-      "scoped-static-check"
-    ],
+    "allowed": ["help", "plan", "inventory", "source-edit", "scoped-static-check"],
     "heavyExecution": "remote"
   },
   "transport": {
@@ -92,8 +78,8 @@
     "retiredOutputs": []
   },
   "resources": {
-    "reserveMemoryGiB": 8,
-    "reserveDiskGiB": 32,
-    "memoryPerJobGiB": 1
+    "reserveMemoryGiB": 0,
+    "reserveDiskGiB": 0,
+    "memoryPerJobGiB": 0
   }
 }

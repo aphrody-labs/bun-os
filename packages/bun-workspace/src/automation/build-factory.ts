@@ -68,10 +68,10 @@ export function factoryResourcePolicy(config: Pick<BuildFactoryConfig, "rust" | 
     reserveDiskGiB: config.resources?.reserveDiskGiB ?? 20,
     memoryPerJobGiB: config.resources?.memoryPerJobGiB ?? 1,
   };
-  if (!Number.isSafeInteger(policy.jobs) || policy.jobs < 1 || policy.jobs > 1024)
-    throw new Error("Build factory rust.maxJobs must be between 1 and 1024");
+  if (!Number.isSafeInteger(policy.jobs) || policy.jobs < 1)
+    throw new Error("Build factory rust.maxJobs must be a positive safe integer");
   for (const value of [policy.reserveMemoryGiB, policy.reserveDiskGiB, policy.memoryPerJobGiB])
-    if (!Number.isFinite(value) || value < 1 || value > 1024) throw new Error("Invalid build factory resource reserve");
+    if (!Number.isFinite(value) || value < 0 || value > 1024) throw new Error("Invalid build factory resource reserve");
   return policy;
 }
 

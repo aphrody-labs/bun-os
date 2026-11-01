@@ -3,11 +3,12 @@
 /**
  * Cargo adapter for the canonical Bun OS build owner.
  *
- * Heavy compilation uses the root Workspace admission, process lifetime, toolchain and output policy.
- * Fetch, metadata and lockfile commands rely on Cargo's own package-cache lock.
+ * Heavy compilation on the primary Unix VPS uses BunCC's independent lane locks and isolated targets. The Windows
+ * MSVC and secondary factory hosts keep the serialized native-owner path. Fetch, metadata and lockfile commands rely
+ * on Cargo's own package-cache lock.
  * `--msvc` selects the native Windows build context: the newest Visual Studio MSVC x64 developer environment
  * (vswhere + VsDevCmd, captured without a console), build output off the checkout, native sccache and the private
- * Git SSH alias mapped to HTTPS. Qualified Unix hosts use the same owner with native flock admission.
+ * Git SSH alias mapped to HTTPS. The primary VPS Unix path uses BunCC lane admission; secondary hosts retain native flock.
  *
  * Usage: bun scripts/aphrody/build/rust/cargo-serial.ts [--msvc] <cargo arguments...>
  */
@@ -99,10 +100,10 @@ export function planCargo(args: readonly string[], msvc: boolean, env: Env): Car
   const heavy = command !== undefined && HEAVY.has(command);
   const helpOnly = args.includes("--help") || args.includes("-h");
   if (args.some(arg => /^(-j\d*|--jobs(=.*)?)$/.test(arg)))
-    throw new UsageError("Do not override Cargo job count; set APHRODY_CARGO_JOBS=1..1024 instead");
-  const jobsText = env.APHRODY_CARGO_JOBS ?? "1";
-  if (!/^[1-9][0-9]{0,3}$/.test(jobsText) || Number(jobsText) > 1024)
-    throw new UsageError("APHRODY_CARGO_JOBS must be an integer from 1 through 1024");
+    throw new UsageError("Set Cargo worker count with APHRODY_CARGO_JOBS instead");
+  const jobsText = env.APHRODY_CARGO_JOBS ?? String(availableParallelism());
+  if (!/^[1-9][0-9]*$/.test(jobsText) || !Number.isSafeInteger(Number(jobsText)))
+    throw new UsageError("APHRODY_CARGO_JOBS must be a positive safe integer");
   const waitText = env.APHRODY_CARGO_LOCK_TIMEOUT_SECS ?? "1800";
   if (!/^\d+$/.test(waitText)) throw new UsageError("APHRODY_CARGO_LOCK_TIMEOUT_SECS must be an integer");
   const next: Env = { ...env };
@@ -299,7 +300,30 @@ export async function main(argv: readonly string[], baseEnv: Env = process.env):
     console.error("APHRODY_LOCAL_CARGO=1 is only for an explicitly selected scoped diagnostic.");
     return 64;
   }
-  const { loadConfig, runNativeResult } = await import("@aphrody/bun-workspace");
+  const { loadConfig, runNativeResult, runCargo } = await import("@aphrody/bun-workspace");
+  // The primary VPS has independent BunCC lanes with isolated targets. Bypass the generic native-owner flock,
+  // which otherwise serializes every Cargo invocation around one shared target directory. Keep the Windows/MSVC
+  // and secondary-host paths below on their existing serialized owners.
+  if (
+    process.platform !== "win32" &&
+    !msvc &&
+    env.APHRODY_BUILD_HOST === "vps" &&
+    plan.heavy &&
+    !plan.helpOnly
+  ) {
+    const laneEnv = { ...plan.env };
+    const requestedTarget = laneEnv.APHRODY_CARGO_TARGET_DIR ?? laneEnv.CARGO_TARGET_DIR;
+    if (!laneEnv.BUNCC_LANE_ROOT && requestedTarget) laneEnv.BUNCC_LANE_ROOT = requestedTarget;
+    delete laneEnv.APHRODY_CARGO_TARGET_DIR;
+    delete laneEnv.CARGO_TARGET_DIR;
+    const result = await runCargo(args, {
+      root: sourceRoot,
+      cwd: process.cwd(),
+      env: laneEnv,
+      timeoutMs: plan.waitSeconds * 1000,
+    });
+    return result.code;
+  }
   const cargo = Bun.which("cargo", { PATH: environmentPath(plan.env) });
   if (!cargo) throw new UsageError("Native Cargo is missing from the selected build context.");
   const result = await runNativeResult(await loadConfig(sourceRoot), [cargo, ...args], {

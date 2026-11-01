@@ -5,8 +5,8 @@
  *
  * Rust (cargo-wasm) builds two variants by default: `max` (SIMD, relaxed SIMD, tail calls, multivalue, reference types)
  * and `baseline`; the generated boot script picks one with WebAssembly.validate. wasm-opt runs at -O4 --all-features.
- * Cargo goes through scripts/aphrody/build/rust/cargo-serial.sh (factory lock, four jobs, sccache) unless
- * BUNCC_UI_DIRECT=1 (scoped diagnostics: plain cargo, nice, four jobs). C/C++ builds use four jobs and sccache.
+ * Cargo goes through scripts/aphrody/build/rust/cargo-serial.sh (factory lock, host-sized jobs, sccache) unless
+ * BUNCC_UI_DIRECT=1 (scoped diagnostics: plain cargo, nice, host-sized jobs). C/C++ builds use the same worker pool.
  */
 import { createHash } from "node:crypto";
 import {
@@ -19,7 +19,7 @@ import {
   writeFileSync,
   copyFileSync,
 } from "node:fs";
-import { homedir } from "node:os";
+import { availableParallelism, homedir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { run } from "../process.ts";
 import { findRecipe, recipes, type Recipe, type CargoWasmRecipe } from "./recipes.ts";
@@ -33,7 +33,7 @@ interface WasmPins {
   rust: { profiles: Record<string, string>; wasmOpt: string };
 }
 
-const JOBS = String(Math.min(4, Number(Bun.env.BUNCC_UI_JOBS ?? 4) || 4));
+const JOBS = String(Math.max(1, Number(Bun.env.BUNCC_UI_JOBS ?? availableParallelism()) || availableParallelism()));
 
 function pins(root: string): WasmPins {
   return JSON.parse(readFileSync(join(root, "buncc.toolchain.json"), "utf8")).wasm as WasmPins;

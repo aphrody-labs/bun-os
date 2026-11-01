@@ -46,21 +46,22 @@ with less than 5 GiB free. See [SYNC.md](SYNC.md) for the whole loop (workstatio
 
 ## Full build in tmux (session `bunos`)
 
-One session, six windows, a summary writer. Heavy work goes through the factory slots so two builds never collide
-(`bun factory run -- <command>` takes a free slot; `bun factory slots` lists them). CPU budget: 12 cores; keep
-`CARGO_BUILD_JOBS=8` for the Rust windows and leave 4 cores for bun, wasm and docker.
+One session, six windows, a summary writer. Heavy work goes through independent BunCC lanes so Rust, Bun, WASM and
+Docker builds can run concurrently. The default allocation is host-sized (12 cores gives three lanes of four jobs);
+set `BUNCC_SLOTS` and `CARGO_BUILD_JOBS` to use the full worker pool. There is no repository-imposed per-lane cap.
 
 Priority: within 30 s, `aphrody-priority.timer` moves build processes started from tmux or ssh (cargo, rustc, clang,
-make, ninja, makepkg, soong...) into `build.slice` (CPU/IO weight 20, nice 10, ionice best-effort 7). They still use
-every idle core, but they yield to nginx, the gateways and the session containers. To start a build there directly, use
-`systemd-run --user --scope -p CPUWeight=20 ...` or `sudo systemd-run --scope --slice=build.slice --uid=ubuntu ...`.
+make, ninja, makepkg, soong...) into `build.slice`. In release mode, stop the product services and give builds the
+available CPU and I/O priority; no CPU quota is imposed. To start a build there directly, use
+`systemd-run --user --scope -p CPUWeight=1000 -p IOWeight=1000 ...` or
+`sudo systemd-run --scope --slice=build.slice --uid=ubuntu ...`.
 For Docker builds, use `--cgroup-parent build.slice` (buildx: `--driver-opt cgroup-parent=build.slice`). See
 [VPS-TUNING.md](VPS-TUNING.md).
 
 ```bash
 SRC=~/src/bun-os; OUT=~/build/out/bun-os; mkdir -p "$OUT"
 cd "$SRC" && git pull --ff-only origin main && git submodule update --init --depth 1 --recommend-shallow   # profile "ci" is enough for the Rust gates
-export CARGO_BUILD_JOBS=8 CARGO_TERM_COLOR=never
+export BUNCC_SLOTS=3 CARGO_BUILD_JOBS=4 CARGO_TERM_COLOR=never
 
 tmux new-session -d -s bunos -n build-rust -c "$SRC" \
   "bun packages/buncc/src/cli.ts exec -- build --workspace --locked --keep-going 2>&1 | tee $OUT/build-rust.log; echo exit=\${PIPESTATUS[0]} > $OUT/build-rust.exit"
@@ -92,5 +93,5 @@ Summary writer (run in any pane, or from cron after the windows end):
 } | tee $OUT/summary.md
 ```
 
-Rules: never delete `$OUT` while a window runs; free `~/build` trees after each lot (the disk is btrfs: keep more than 20 % free);
-do not start the Docker window when `df -h /home` shows less than 30 GB free.
+Rules: never delete `$OUT` while a window runs. Put build outputs on the factory volumes and let the active lane
+workers use the available storage; do not make unrelated cleanup part of a release build.

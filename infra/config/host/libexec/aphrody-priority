@@ -4,9 +4,9 @@
 # infra/config/host/systemd/slices/aphrody-priority.json). Run as root by aphrody-priority.timer every 30 s:
 #  1. interactive units get CPUWeight/IOWeight 1000 live (their drop-in moves them to interactive.slice at
 #     their next restart; nothing is restarted here);
-#  2. session containers get cpu.weight 1000, build containers cpu.weight 20 (docker update persists it);
+#  2. session and build containers get cpu.weight 1000 (docker update persists it);
 #  3. build processes started from user sessions (tmux, ssh) are adopted, with all their descendants, into a
-#     transient scope of build.slice, reniced to 10 and set to ionice best-effort 7.
+#     transient scope of build.slice, with no CPU or I/O demotion.
 # Processes in containers or system services are never moved (docker/systemd own those cgroups).
 set -uo pipefail
 
@@ -18,7 +18,7 @@ bc_re=$(jq -r .buildContainers "$POLICY")
 # runc >= 1.2 maps cpu-shares to cgroup v2 cpu.weight non-linearly (1024 -> 100):
 #   weight = ceil(10^((log2(s)^2 + 125*log2(s)) / 612 - 7/34))
 SHARES_INTERACTIVE=17620   # cpu.weight 1000
-SHARES_BUILD=126           # cpu.weight 20
+SHARES_BUILD=17620         # cpu.weight 1000
 
 # 1. Interactive units.
 while read -r u; do
@@ -31,7 +31,7 @@ done < <(jq -r '.interactiveUnits[]' "$POLICY")
 if command -v docker >/dev/null; then
   docker ps --format '{{.Names}}' | while read -r n; do
     if [[ $n =~ $ic_re ]]; then want=$SHARES_INTERACTIVE; bw=1000
-    elif [[ $n =~ $bc_re ]]; then want=$SHARES_BUILD; bw=50
+    elif [[ $n =~ $bc_re ]]; then want=$SHARES_BUILD; bw=1000
     else continue; fi
     [ "$(docker inspect -f "{{.HostConfig.CpuShares}}" "$n" 2>/dev/null </dev/null)" = "$want" ] && continue
     docker update --cpu-shares "$want" --blkio-weight "$bw" "$n" >/dev/null 2>&1 </dev/null ||
@@ -70,8 +70,8 @@ for pid in "${pids[@]}"; do
   for t in /proc/"$pid"/task/*; do
     t=${t##*/}
     ni=$(sed 's/.*) //' "/proc/$pid/task/$t/stat" 2>/dev/null | awk '{print $17}')
-    [[ $ni =~ ^-?[0-9]+$ ]] && ((ni < 10)) && renice -n 10 -p "$t" >/dev/null 2>&1
-    ionice -c 2 -n 7 -p "$t" >/dev/null 2>&1
+    [[ $ni =~ ^-?[0-9]+$ ]] && ((ni > 0)) && renice -n 0 -p "$t" >/dev/null 2>&1
+    ionice -c 2 -n 0 -p "$t" >/dev/null 2>&1
   done
 done
 echo "adopted ${#pids[@]} build processes into build.slice"

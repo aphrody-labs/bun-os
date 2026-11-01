@@ -112,8 +112,8 @@ export interface CargoOptions {
 
 /** Default no-progress window: a build that burns no CPU for this long is hung and is killed. */
 export const DEFAULT_CARGO_STALL = 30 * 60_000;
-/** Compiler jobs per lane: the owner's limit, never exceeded. */
-export const MAX_LANE_JOBS = 4;
+/** Default worker share per lane; explicit CARGO_BUILD_JOBS values are not capped here. */
+export const DEFAULT_CPUS_PER_LANE = 4;
 /** Fast local disk holding one build directory per lane on the VPS. */
 export const DEFAULT_LANE_ROOT = "/var/cache/aphrody-target";
 
@@ -124,17 +124,20 @@ export interface LanePlan {
 }
 
 /**
- * Lanes sized to the host: one lane per four CPUs (12 cores -> 3 lanes of 4 jobs), BUNCC_SLOTS overrides the count,
+ * Lanes sized to the host: one lane per four CPUs by default (12 cores -> 3 lanes of 4 jobs). BUNCC_SLOTS and
+ * CARGO_BUILD_JOBS can raise concurrency without a hard-coded lane or per-lane ceiling,
  * BUNCC_LANE_ROOT (default /var/cache/aphrody-target when it exists) holds lane-N build and target directories.
  */
 export function planLanes(env: Env, cpus = availableParallelism(), laneRootExists = existsSync): LanePlan {
   const configured = Number.parseInt(env.BUNCC_SLOTS ?? "", 10);
-  const derived = process.platform === "win32" ? 1 : Math.max(1, Math.floor(cpus / MAX_LANE_JOBS));
-  const lanes = Math.max(1, Math.min(16, Number.isFinite(configured) && configured > 0 ? configured : derived));
+  const derived = process.platform === "win32" ? 1 : Math.max(1, Math.floor(cpus / DEFAULT_CPUS_PER_LANE));
+  const lanes = Math.max(1, Number.isFinite(configured) && configured > 0 ? configured : derived);
   const requested = Number.parseInt(env.CARGO_BUILD_JOBS ?? "", 10);
   const share = Math.max(1, Math.floor(cpus / lanes));
-  const jobs = Math.max(1, Math.min(MAX_LANE_JOBS, requested > 0 ? requested : share));
-  const root = env.BUNCC_LANE_ROOT || (process.platform === "linux" && laneRootExists(DEFAULT_LANE_ROOT) ? DEFAULT_LANE_ROOT : undefined);
+  const jobs = Math.max(1, requested > 0 ? requested : share);
+  const root =
+    env.BUNCC_LANE_ROOT ||
+    (process.platform === "linux" && laneRootExists(DEFAULT_LANE_ROOT) ? DEFAULT_LANE_ROOT : undefined);
   return { lanes, jobs, root };
 }
 
@@ -209,7 +212,8 @@ export function repairTruncatedArtifacts(buildDir: string, log: (line: string) =
     const archive = join(obj, "librusty_v8.a");
     const partial = existsSync(join(obj, "librusty_v8.tmp"));
     if (!partial && (!existsSync(archive) || completeArchive(archive))) continue;
-    for (const name of ["librusty_v8.a", "librusty_v8.tmp", "librusty_v8.sum"]) rmSync(join(obj, name), { force: true });
+    for (const name of ["librusty_v8.a", "librusty_v8.tmp", "librusty_v8.sum"])
+      rmSync(join(obj, name), { force: true });
     log(`buncc: removed a truncated rusty_v8 download in ${obj}; the build fetches it again`);
   }
 }
@@ -236,7 +240,7 @@ function safeList(dir: string): string[] {
 
 /**
  * Run cargo in one of N lanes. Each lane has its own build and target directory on the fast disk
- * (BUNCC_LANE_ROOT/lane-N), at most four compiler jobs, and the shared sccache when it is enabled.
+ * (BUNCC_LANE_ROOT/lane-N), host-sized compiler workers, and the shared sccache when it is enabled.
  * Waiting for a lane is not a failure (BUNCC_LANE_WAIT_MS, default 12 h). A running build is only killed when it makes
  * no progress: `options.timeoutMs` (default 30 min) is the window in which the cargo process tree must burn CPU.
  * BUNCC_CARGO_DEADLINE_MS adds an explicit hard deadline for callers that need one.
@@ -246,7 +250,8 @@ export async function runCargo(args: string[], options: CargoOptions): Promise<R
   const baseEnv = options.env ?? Bun.env;
   const plan = planLanes(baseEnv);
   const stallMs = options.timeoutMs ?? DEFAULT_CARGO_STALL;
-  const hardDeadline = Number(Bun.env.BUNCC_CARGO_DEADLINE_MS) > 0 ? Number(Bun.env.BUNCC_CARGO_DEADLINE_MS) : undefined;
+  const hardDeadline =
+    Number(Bun.env.BUNCC_CARGO_DEADLINE_MS) > 0 ? Number(Bun.env.BUNCC_CARGO_DEADLINE_MS) : undefined;
   const laneWait = Number(Bun.env.BUNCC_LANE_WAIT_MS) > 0 ? Number(Bun.env.BUNCC_LANE_WAIT_MS) : 12 * 60 * 60_000;
   const { slot, release } = await acquireSlot(plan.lanes, laneWait, () =>
     log(`buncc: waiting for one of ${plan.lanes} cargo lane(s)...`),
@@ -260,7 +265,8 @@ export async function runCargo(args: string[], options: CargoOptions): Promise<R
     env.BUNCC_IN_LANE = "1";
     env.CARGO_BUILD_JOBS = String(plan.jobs);
     // A build directory under the lane root (the host default for direct cargo) is not a caller's own choice.
-    const inheritedBuildDir = env.CARGO_BUILD_BUILD_DIR && !(plan.root && env.CARGO_BUILD_BUILD_DIR.startsWith(plan.root));
+    const inheritedBuildDir =
+      env.CARGO_BUILD_BUILD_DIR && !(plan.root && env.CARGO_BUILD_BUILD_DIR.startsWith(plan.root));
     if (plan.root && !env.CARGO_TARGET_DIR && !inheritedBuildDir) {
       const lane = join(plan.root, `lane-${slot}`);
       mkdirSync(lane, { recursive: true });

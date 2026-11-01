@@ -18,7 +18,8 @@ Gemini at the centre), shipped as a bootable image and as the WebOS session on a
 ## Build
 
 - Builds and qualification run on the VPS ([docs/VPS-BUILD.md](docs/VPS-BUILD.md)); the workstation edits and syncs.
-  Cargo goes through the build-lane wrapper, at most four compiler jobs per lane, shared caches.
+  Cargo goes through the build-lane wrapper and shared caches. Size lanes and compiler workers to use all available
+  host CPUs; `BUNCC_SLOTS` and `CARGO_BUILD_JOBS` are operator controls, not repository ceilings.
 - Runtime: upstream Bun canary `1.4.4-canary.20261028.1`. The `aphrody-labs/bun` fork is migrated: its additions
   live on as Bun OS plugins (`packages/bun-os-plugins`) running on upstream Bun.
 - Quality: `bun check`, `bun lint`, `bun format` (repo wrapper with `bun-format.json`), `cargo check --workspace --locked`.

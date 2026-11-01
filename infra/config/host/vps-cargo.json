@@ -19,7 +19,7 @@
     "BUN_INSTALL_CACHE_DIR": "/home/ubuntu/build/storage/cache/bun",
     "CEF_PATH": "/home/ubuntu/build/storage/cache/cef"
   },
-  "jobs": 4,
+  "jobs": 12,
   "desktopSysCrates": ["gdk4-sys", "gtk4-sys"],
   "forwards": {
     "remote": [
@@ -84,11 +84,11 @@
       }
     }
   },
-  "maxJobs": 4,
+  "maxJobs": 12,
   "resources": {
-    "reserveMemoryGiB": 8,
-    "reserveDiskGiB": 32,
-    "memoryPerJobGiB": 1
+    "reserveMemoryGiB": 0,
+    "reserveDiskGiB": 0,
+    "memoryPerJobGiB": 0
   },
   "remoteTransientRoot": "/home/ubuntu/build/storage/transient"
 }
