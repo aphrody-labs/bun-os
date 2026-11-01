@@ -6,10 +6,10 @@ services:
       context: ../../vendor/searxng
       dockerfile: container/Dockerfile
       args:
-        VERSION: aphrody-${APHRODY_SEARXNG_REVISION:-ffa88e3ba3ade64185d5754c839cdf5a80708c4a}
+        VERSION: aphrody-${APHRODY_SEARXNG_REVISION:-ad95808424dbf0f36369c77a5fc883af74270891}
         VCS_URL: https://github.com/aphrody-labs/searxng
-        VCS_REVISION: ${APHRODY_SEARXNG_REVISION:-ffa88e3ba3ade64185d5754c839cdf5a80708c4a}
-    image: aphrody/searxng:${APHRODY_SEARXNG_REVISION:-ffa88e3ba3ade64185d5754c839cdf5a80708c4a}
+        VCS_REVISION: ${APHRODY_SEARXNG_REVISION:-ad95808424dbf0f36369c77a5fc883af74270891}
+    image: aphrody/searxng:${APHRODY_SEARXNG_REVISION:-ad95808424dbf0f36369c77a5fc883af74270891}
     restart: unless-stopped
     environment:
       SEARXNG_SECRET: ${SEARXNG_SECRET:?create infra/searxng/.env first}
@@ -27,7 +27,13 @@ services:
       valkey:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8080/healthz\", timeout=3)'"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=3)",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3

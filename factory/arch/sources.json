@@ -13,7 +13,7 @@
   },
   "sources": [
     {
-      "revision": "ffa88e3ba3ade64185d5754c839cdf5a80708c4a",
+      "revision": "ad95808424dbf0f36369c77a5fc883af74270891",
       "pinVerified": true,
       "action": "forked",
       "forkParent": "searxng/searxng",
@@ -24,9 +24,9 @@
       "forkSource": "searxng/searxng",
       "repository": "aphrody-labs/searxng",
       "mount": "vendor/searxng",
-      "checkoutRevision": "ffa88e3ba3ade64185d5754c839cdf5a80708c4a",
+      "checkoutRevision": "ad95808424dbf0f36369c77a5fc883af74270891",
       "sourceExportReady": false,
-      "referenceRevision": "ffa88e3ba3ade64185d5754c839cdf5a80708c4a",
+      "referenceRevision": "ad95808424dbf0f36369c77a5fc883af74270891",
       "checkoutMatchesReference": true,
       "nonWindowsCheckoutExcludes": [
         "utils/templates/etc/httpd/sites-available/searxng.conf:socket",
