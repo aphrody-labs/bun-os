@@ -62,6 +62,26 @@ Use `resultLimit` to request fewer pages. These limits bound the MCP response;
 `maxRequests` controls crawl work. Persistent SQLite frontier paths should be
 provided only when the caller intends to retain crawl state.
 
+Pass `browser: "playwright"` to render pages through the local Aphrody Obscura
+CDP service and the loopback render bridge. The Rust crawler still owns the
+frontier, robots policy, domain scope, sitemap fetches, and result extraction.
+The bridge URL defaults to `http://127.0.0.1:9230/render` and can be changed
+with `APHRODY_WEB_PLAYWRIGHT_URL`; it must remain an unauthenticated HTTP
+loopback URL. `browser` defaults to `native`, which needs no bridge service.
+
+Example MCP call arguments:
+
+```json
+{
+  "urls": ["https://example.com"],
+  "allowedDomains": ["example.com"],
+  "maxDepth": 1,
+  "maxRequests": 10,
+  "obeyRobots": true,
+  "browser": "playwright"
+}
+```
+
 ## Transports
 
 `stdio` is the default (line-delimited JSON-RPC over `stdin`/`stdout`). To run

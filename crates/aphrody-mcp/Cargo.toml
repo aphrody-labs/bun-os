@@ -87,6 +87,7 @@ aphrody-kernel = { path = "../aphrody-kernel", version = "1.4.7", default-featur
 aphrody-web-extract = { package = "bun_browser_extract", version = "1.4.7" }
 aphrody-web-detect = { package = "bun_browser_detect", version = "1.4.7", features = ["fetch"] }
 aphrody-web-crawl = { package = "bun_browser_crawl", version = "1.4.7" }
+aphrody-web = { path = "../aphrody-web", version = "1.4.7" }
 aphrody-x = { package = "bun_x", version = "1.4.7", features = [] }
 rmcp = { version = "3.5.0", features = ["server", "transport-io", "transport-streamable-http-server", "macros", "schemars"] }
 tokio-postgres = { version = "0.7.18", features = ["with-serde_json-1"] }

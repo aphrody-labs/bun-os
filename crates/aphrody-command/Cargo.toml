@@ -119,6 +119,7 @@ colored = { version = "3", features = [] }
 mimalloc = { version = "0.1", default-features = false, features = [] }
 aphrody-web-service = { package = "bun_browser_service", version = "1.4.7", features = ["render"] }
 aphrody-web-crawl = { package = "bun_browser_crawl", version = "1.4.7", features = [] }
+aphrody-web = { path = "../aphrody-web", version = "1.4.7" }
 aphrody-web-detect = { package = "bun_browser_detect", version = "1.4.7", features = ["fetch"] }
 aphrody-web-extract = { package = "bun_browser_extract", version = "1.4.7", features = [] }
 aphrody-web-frames = { package = "bun_browser_frames", version = "1.4.7", features = [] }

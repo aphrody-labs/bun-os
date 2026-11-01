@@ -1,4 +1,5 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Bun OS monorepo
 
 Entry page for the canonical Bun OS workspace (`aphrody-labs/bun-os` (renamed from `aphrody-labs/bun-distribution` on 2026-10-25), branch `main` (`os` is a fast-forward mirror); forge
@@ -12,18 +13,18 @@ the pages that own the details. Generated data is not copied here: see
 
 ## Layout
 
-| Path | Holds |
-| --- | --- |
-| `apps/` | Applications: WebOS data (`apps/webos`; the server and client are `crates/aphrody-webos-*`), the Craft studios and their `-cli`/`-web` pairs, Drive, desktop, Android hosts |
-| `packages/` | Bun and TypeScript packages, one direct child per member (Bun Engine in `packages/bun-engine`) |
-| `crates/` | Rust crates, one direct child per member, most of them flat Git submodules |
-| `vendor/` | External pinned owners and third-party sources (Bazzite, Omarchy, CachyOS, ChimeraOS, RetroArch, emulators); not Cargo members |
-| `toolchains/` | Legacy: held the abandoned Bun runtime fork (`toolchains/bun`, removed). The runtime is now unmodified upstream Bun, pinned by `packageManager` in `package.json` (`bun@1.4.4-canary.20261028.1`) |
-| `factory/` | OS composition: Arch package profile, `/usr` composition, container images (`factory/images/*`), qualification |
-| `infra/` | Routes, hosts, runtime pins, shared assets and deployment control |
-| `docs/` | Documentation; this page, [architecture](architecture.md), [builds](APP-BUILDS.md), [qualification](NATIVE-QUALIFICATION.md) |
-| `replica/` | Recon, screens and feature matrices for reference products (study only) |
-| `scripts/`, `src/` | Root CLI (`bun src/cli.ts`), release and workspace tooling |
+| Path               | Holds                                                                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/`            | Applications: WebOS data (`apps/webos`; the server and client are `crates/aphrody-webos-*`), the Craft studios and their `-cli`/`-web` pairs, Drive, desktop, Android hosts                       |
+| `packages/`        | Bun and TypeScript packages, one direct child per member (Bun Engine in `packages/bun-engine`)                                                                                                    |
+| `crates/`          | Rust crates, one direct child per member, most of them flat Git submodules                                                                                                                        |
+| `vendor/`          | External pinned owners and third-party sources (Bazzite, Omarchy, CachyOS, ChimeraOS, RetroArch, emulators); not Cargo members                                                                    |
+| `toolchains/`      | Legacy: held the abandoned Bun runtime fork (`toolchains/bun`, removed). The runtime is now unmodified upstream Bun, pinned by `packageManager` in `package.json` (`bun@1.4.4-canary.20261028.1`) |
+| `factory/`         | OS composition: Arch package profile, `/usr` composition, container images (`factory/images/*`), qualification                                                                                    |
+| `infra/`           | Routes, hosts, runtime pins, shared assets and deployment control                                                                                                                                 |
+| `docs/`            | Documentation; this page, [architecture](architecture.md), [builds](APP-BUILDS.md), [qualification](NATIVE-QUALIFICATION.md)                                                                      |
+| `replica/`         | Recon, screens and feature matrices for reference products (study only)                                                                                                                           |
+| `scripts/`, `src/` | Root CLI (`bun src/cli.ts`), release and workspace tooling                                                                                                                                        |
 
 ## Ownership rules
 
@@ -62,14 +63,14 @@ root `bun.lock` expects, then `bun install --frozen-lockfile`.
 
 Measured on `origin/os` at `15d3c89088` (`bun src/cli.ts workspace check`: 0 violations).
 
-| Item | Target | Now |
-| --- | --- | --- |
-| Cargo workspace members | one root workspace | 682 declared, 693 resolved by `cargo metadata --locked` (11 path dependencies join automatically); 36 excluded paths |
-| Nested `[workspace]` manifests | 0 | 24 tracked: 22 outside `vendor/`/`toolchains/` (ledger: 5 `migrate`, 6 `example`, 3 `fixture`, 8 `fuzz`) and 2 inside |
-| Nested `Cargo.lock` | 0 | 21 ledgered outside `vendor/`/`toolchains/` (8 `migrate`); 447 tracked in all, mostly vendored |
-| Bun lockfiles | one `bun.lock` | one |
-| Git submodules | pinned, initialised on demand | 168 declared at the root; 155 initialised on the VPS checkout, 65 on the workstation |
-| Flat members | every member `crates/<name>`, `apps/<name>`, `packages/<name>` | 19 formerly non-flat: 6 `tools/bevy/*` are flat now; `tools/bevy/ci` and 12 `crates/bevy*` members remain |
+| Item                           | Target                                                         | Now                                                                                                                   |
+| ------------------------------ | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Cargo workspace members        | one root workspace                                             | 682 declared, 693 resolved by `cargo metadata --locked` (11 path dependencies join automatically); 36 excluded paths  |
+| Nested `[workspace]` manifests | 0                                                              | 24 tracked: 22 outside `vendor/`/`toolchains/` (ledger: 5 `migrate`, 6 `example`, 3 `fixture`, 8 `fuzz`) and 2 inside |
+| Nested `Cargo.lock`            | 0                                                              | 21 ledgered outside `vendor/`/`toolchains/` (8 `migrate`); 447 tracked in all, mostly vendored                        |
+| Bun lockfiles                  | one `bun.lock`                                                 | one                                                                                                                   |
+| Git submodules                 | pinned, initialised on demand                                  | 168 declared at the root; 155 initialised on the VPS checkout, 65 on the workstation                                  |
+| Flat members                   | every member `crates/<name>`, `apps/<name>`, `packages/<name>` | 19 formerly non-flat: 6 `tools/bevy/*` are flat now; `tools/bevy/ci` and 12 `crates/bevy*` members remain             |
 
 Still open: the four `migrate` workspaces (`apps/desktop/src-tauri`,
 `apps/figcraft/plugins`, `apps/m3-published-consumer`, `packages/bun-tauri`), `crates/sqlite_tasks`,
@@ -79,7 +80,7 @@ graph ([NATIVE-QUALIFICATION](NATIVE-QUALIFICATION.md)), and the Aphrody/Bun uni
 ## Products
 
 - **WebOS** at https://aphrody.com: `apps/webos` (WebOS Bun service plus shell), Craft studios, Drive.
-  See [webos/README](webos/README.md) and [webos/ARCHITECTURE](webos/ARCHITECTURE.md). It deploys from the VPS with
+  See the [WebOS README](../apps/webos/README.md) and the [workspace architecture](architecture.md). It deploys from the VPS with
   `bun scripts/aphrody/release/deploy-sites.ts` (build, release handoff, root activator with health gate).
 - **Bun Engine** (`packages/bun-engine`, `crates/bun-engine-core`, [docs](bun-engine/README.md)): emulation and
   console runtime, with the console-style library UI (covers, profiles, gamescope session) and
@@ -114,13 +115,13 @@ workflow triggered, no tag). Tree: `origin/os` at `56018b4aa7`, plus the `bun.lo
 
 **`bun scripts/release.ts verify`** (Bun 1.4.5 on the VPS; the repo pins 1.4.4):
 
-| Gate | Result |
-| --- | --- |
-| `check` | pass, 464 files, no type errors (the commits before `4c89f254ec` failed on a missing `cover` in `frontend/cli.ts`) |
-| `lint` | pass, 5923 files |
-| `format:check` | fails: 141 files differ (85 `packages/`, 19 `factory/`, 17 `scripts/`, 7 `src/`). `verify` stops here. Not reformatted: `bun fmt` would rewrite whole files, so it needs its own reviewed commit |
-| `docs:check` | pass, 53 pages (54 with this page), links resolve |
-| manifests | `scripts/workspace-manifests.ts` is a generator, not a check: it exits 0 and rewrites the root `package.json`, `tsconfig.json` and about twenty member manifests (adds a package to the workspaces, which then breaks `check`). The rewrite was reverted; the gate proves nothing and needs a `--check` mode |
+| Gate           | Result                                                                                                                                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `check`        | pass, 464 files, no type errors (the commits before `4c89f254ec` failed on a missing `cover` in `frontend/cli.ts`)                                                                                                                                                                                           |
+| `lint`         | pass, 5923 files                                                                                                                                                                                                                                                                                             |
+| `format:check` | fails: 141 files differ (85 `packages/`, 19 `factory/`, 17 `scripts/`, 7 `src/`). `verify` stops here. Not reformatted: `bun fmt` would rewrite whole files, so it needs its own reviewed commit                                                                                                             |
+| `docs:check`   | pass, 53 pages (54 with this page), links resolve                                                                                                                                                                                                                                                            |
+| manifests      | `scripts/workspace-manifests.ts` is a generator, not a check: it exits 0 and rewrites the root `package.json`, `tsconfig.json` and about twenty member manifests (adds a package to the workspaces, which then breaks `check`). The rewrite was reverted; the gate proves nothing and needs a `--check` mode |
 
 Other findings: `bun install --frozen-lockfile` failed because `bun.lock` lacked the `@aphrody/identity` and
 `@aphrody/m3` links of `packages/artcraft-frontend` and `apps/artcraft-web-app`; fixed (4 lines). A fresh
@@ -129,10 +130,10 @@ exec -- metadata ...` exits 1 without output; plain `cargo metadata --no-deps --
 
 **`plan`** (same logic as `release.ts plan`, plus the missing set by dependency layer; one request at a time):
 
-| Registry | Local | Unpublished | Notes |
-| --- | --- | --- | --- |
-| npm | 434 public packages in `@aphrody` (`packages/*`, `apps/*`) | 2 | `@aphrody/paths`, `@aphrody/canvas`; both have no unpublished dependency. Other scopes (for example `@storyteller`) are skipped by design |
-| crates.io | 574 publishable crates (693 members, the rest `publish = false`) | 486 | 12 dependency layers of 130, 76, 66, 65, 52, 32, 22, 16, 13, 8, 4 and 2 crates. Layer 0 includes `aphrody-patch`, `aphrody-a2a`, `aphrody-config`, `aphrody-secrets`, `aphrody-guard`, `aphrody-agent-proto`, `aphrody-sql`, `aphrody-http-error`, `aphrody-app-protocol`, `aphrody-subsystem`; layer 1 starts with `aphrody-toolcall-repair`, `aphrody-a2a-pb`, `aphrody-models`, `aphrody-mcp-client`, `aphrody-nie-core` |
+| Registry  | Local                                                            | Unpublished | Notes                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------- | ---------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| npm       | 434 public packages in `@aphrody` (`packages/*`, `apps/*`)       | 2           | `@aphrody/paths`, `@aphrody/canvas`; both have no unpublished dependency. Other scopes (for example `@storyteller`) are skipped by design                                                                                                                                                                                                                                                                                   |
+| crates.io | 574 publishable crates (693 members, the rest `publish = false`) | 486         | 12 dependency layers of 130, 76, 66, 65, 52, 32, 22, 16, 13, 8, 4 and 2 crates. Layer 0 includes `aphrody-patch`, `aphrody-a2a`, `aphrody-config`, `aphrody-secrets`, `aphrody-guard`, `aphrody-agent-proto`, `aphrody-sql`, `aphrody-http-error`, `aphrody-app-protocol`, `aphrody-subsystem`; layer 1 starts with `aphrody-toolcall-repair`, `aphrody-a2a-pb`, `aphrody-models`, `aphrody-mcp-client`, `aphrody-nie-core` |
 
 At the workflow default (`--limit 5 --pause 600`) the crates stage publishes five crates per run, so 486 crates
 need about 100 runs and, with crates.io's new-crate rate limit, days of wall time. `release.yml` also rebuilds

@@ -6,8 +6,9 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use aphrody_web_crawl::{
-    AddRequest, BunBrowserTransport, CrawlOptions, Frontier, FrontierOptions, crawl_bounded,
+use aphrody_web::{
+    AddRequest, BunBrowserTransport, CrawlOptions, Frontier, FrontierOptions, PlaywrightTransport,
+    crawl_bounded,
 };
 use rmcp::model::{CallToolRequestParams, CallToolResult, ContentBlock, Tool};
 use serde_json::{Value, json};
@@ -30,6 +31,7 @@ static TOOL: LazyLock<Tool> = LazyLock::new(|| {
             "maxRequests": { "type": "integer", "minimum": 1, "maximum": 1000, "default": 25 },
             "concurrency": { "type": "integer", "minimum": 1, "maximum": 32, "default": 4 },
             "resultLimit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 },
+            "browser": { "type": "string", "enum": ["native", "playwright"], "default": "native", "description": "Use native Obscura or Playwright through the local Obscura CDP bridge." },
             "obeyRobots": { "type": "boolean", "default": true },
             "sitemaps": { "type": "boolean", "default": false }
         },
@@ -156,18 +158,31 @@ async fn run(args: &Value) -> Result<Value, String> {
         ..CrawlOptions::default()
     };
     let result_limit = count(args, "resultLimit", 50, 1, MAX_PAGE_RESULTS)? as usize;
-    let report = tokio::time::timeout(
-        CRAWL_TIMEOUT,
-        crawl_bounded(&mut frontier, &BunBrowserTransport::default(), &options),
-    )
-    .await
-    .map_err(|_| {
-        format!(
-            "crawl exceeded the {} second tool budget",
-            CRAWL_TIMEOUT.as_secs()
-        )
-    })?
-    .map_err(|error| error.to_string())?;
+    let browser = args.get("browser").map_or(Ok("native"), |value| {
+        value.as_str().ok_or("browser must be a string")
+    })?;
+    let crawl = async {
+        match browser {
+            "native" => {
+                crawl_bounded(&mut frontier, &BunBrowserTransport::default(), &options).await
+            }
+            "playwright" => {
+                let transport =
+                    PlaywrightTransport::connect(options.allowed_domains.clone()).await?;
+                crawl_bounded(&mut frontier, &transport, &options).await
+            }
+            _ => Err("browser must be native or playwright".into()),
+        }
+    };
+    let report = tokio::time::timeout(CRAWL_TIMEOUT, crawl)
+        .await
+        .map_err(|_| {
+            format!(
+                "crawl exceeded the {} second tool budget",
+                CRAWL_TIMEOUT.as_secs()
+            )
+        })?
+        .map_err(|error| error.to_string())?;
     let page_count = report.pages.len();
     let error_count = report.errors.len();
     Ok(json!({

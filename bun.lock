@@ -315,6 +315,16 @@
         "@aphrody/update": "workspace:*",
       },
     },
+    "packages/aphrody-web": {
+      "name": "@aphrody/web-crawl",
+      "version": "1.4.7",
+      "bin": {
+        "aphrody-web": "./src/cli.ts",
+      },
+      "devDependencies": {
+        "bun-types": "catalog:",
+      },
+    },
     "packages/app-ui": {
       "name": "@aphrody/app-ui",
       "version": "1.4.7",
@@ -2409,6 +2419,8 @@
     "@aphrody/waydroid": ["@aphrody/waydroid@workspace:packages/waydroid"],
 
     "@aphrody/web": ["@aphrody/web@1.4.7", "", { "dependencies": { "@aphrody/bun-sql": "1.4.7", "@aphrody/typesafe-sdk": "0.6.2" } }, "sha512-uHPvmdvAAhwfMUs/CSYgGR+Pu+GIbJSsr4jNQb7JXO/8EZ0R/QqIcKDNZ/UTVTcVdMtnWnEGmEGIuGYflpIjeQ=="],
+
+    "@aphrody/web-crawl": ["@aphrody/web-crawl@workspace:packages/aphrody-web"],
 
     "@aphrody/web-inspector-bun": ["@aphrody/web-inspector-bun@1.4.3-aphrody.1", "", {}, "sha512-xrtagKt6CSP5Y2cS1C7lj1utcSw15RjUnmF7iE2gnjMBBIv4U+vB0feH9EaZfoj/++SuHBavYu+FW0ZdsyKrWA=="],
 

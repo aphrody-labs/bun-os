@@ -1638,9 +1638,10 @@ async fn handle_web_crawl(request: WebCrawlRequest) -> miette::Result<()> {
             crawl_with_transport(&mut frontier, &transport, &options, request.daemon).await?
         }
         CrawlBrowser::Playwright => {
-            let transport = crawl_index::PlaywrightTransport::new(options.allowed_domains.clone())
-                .await?;
-            transport.health().await?;
+            let transport =
+                aphrody_web::PlaywrightTransport::connect(options.allowed_domains.clone())
+                    .await
+                    .map_err(|error| miette!("{error}"))?;
             crawl_with_transport(&mut frontier, &transport, &options, request.daemon).await?
         }
     };

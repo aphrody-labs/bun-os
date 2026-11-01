@@ -19,6 +19,7 @@ members = [
   "crates/aphrody-mcp-client",
   "crates/aphrody-site",
   "crates/aphrody-inventory",
+  "crates/aphrody-web",
   "crates/aphrody-webos-wasm",
   "crates/aphrody-webos-server",
   "crates/aphrody-webos-protocol",
