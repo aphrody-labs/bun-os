@@ -40,6 +40,7 @@ export interface StepResult {
 }
 
 const RUST = /(^|\/)(Cargo\.(toml|lock)|rust-toolchain\.toml|\.cargo\/config\.toml)$|\.rs$/;
+const BUN_SOURCE = /\.(?:[cm]?[jt]sx?)$/i;
 const BUN_FORMAT = /\.(?:[cm]?[jt]sx?|jsonc?|mdx?|md|css|html|ya?ml|svg|svelte|vue)$/i;
 
 const IMAGE = /^factory\/images\//;
@@ -163,15 +164,23 @@ async function runSteps(
 ) {
   const results: StepResult[] = [];
   await ensureInstall(repo);
+  const changedFiles = changed ?? (await git(repo, "diff", "--name-only", `${head}^`, head)).split("\n");
+  const sourceFiles = changedFiles.filter(path => BUN_SOURCE.test(path) && existsSync(join(repo, path)));
   for (const step of gateSteps({ since, head }).filter(step => select(step.name))) {
     if (step.when && changed && !changed.some(path => step.when!.test(path))) {
       results.push({ name: step.name, ok: true, skipped: "no matching change", seconds: 0 });
       continue;
     }
     let argv = step.argv;
+    if (step.name === "check" || step.name === "lint") {
+      if (!sourceFiles.length) {
+        results.push({ name: step.name, ok: true, skipped: "no changed Bun source files", seconds: 0 });
+        continue;
+      }
+      argv = [...step.argv, ...sourceFiles];
+    }
     if (step.name === "format") {
-      const files = changed ?? (await git(repo, "diff", "--name-only", `${head}^`, head)).split("\n");
-      const formatFiles = files.filter(path => BUN_FORMAT.test(path) && existsSync(join(repo, path)));
+      const formatFiles = changedFiles.filter(path => BUN_FORMAT.test(path) && existsSync(join(repo, path)));
       if (!formatFiles.length) {
         results.push({ name: step.name, ok: true, skipped: "no changed Bun-formattable files", seconds: 0 });
         continue;

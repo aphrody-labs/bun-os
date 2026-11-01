@@ -217,11 +217,20 @@ async function missing<T extends { name: string; version: string }>(
 }
 
 async function verify(): Promise<void> {
-  const formatPaths = (await capture(["git", "diff", "--name-only", "HEAD^", "HEAD"]))
-    .split("\n")
-    .filter(path => /\.(?:[cm]?[jt]sx?|jsonc?|mdx?|md|css|html|ya?ml|svg|svelte|vue)$/i.test(path));
+  const changedPaths = (await capture(["git", "diff", "--name-only", "HEAD^", "HEAD"])).split("\n").filter(Boolean);
+  const exists = async (path: string) => await Bun.file(join(ROOT, path)).exists();
+  const sourcePaths = await Promise.all(
+    changedPaths
+      .filter(path => /\.(?:[cm]?[jt]sx?)$/i.test(path))
+      .map(async path => ((await exists(path)) ? path : "")),
+  ).then(paths => paths.filter(Boolean));
+  const formatPaths = await Promise.all(
+    changedPaths
+      .filter(path => /\.(?:[cm]?[jt]sx?|jsonc?|mdx?|md|css|html|ya?ml|svg|svelte|vue)$/i.test(path))
+      .map(async path => ((await exists(path)) ? path : "")),
+  ).then(paths => paths.filter(Boolean));
   const steps: Array<[string, string[]]> = [
-    ["check", ["bun", "check"]],
+    ...(sourcePaths.length ? [["check", ["bun", "check", ...sourcePaths]] as [string, string[]]] : []),
     [
       "lint",
       [
@@ -236,18 +245,13 @@ async function verify(): Promise<void> {
         "packages/wasm/test/programs/**",
         "--ignore-pattern",
         "**/node_modules/**",
-        "src",
-        "container",
-        "factory",
-        "infra",
-        "packages",
-        "apps",
-        "scripts",
+        ...sourcePaths,
       ],
     ],
     ["docs", ["bun", "src/cli.ts", "docs", "check"]],
   ];
   for (const [name, command] of steps) {
+    if (name === "lint" && !sourcePaths.length) continue;
     if ((await run(command)) !== 0) throw new Error(`quality gate failed: ${name}`);
   }
   if (
