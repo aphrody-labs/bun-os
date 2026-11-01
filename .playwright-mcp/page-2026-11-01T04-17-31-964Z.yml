@@ -1,0 +1,255 @@
+- generic:
+  - link:
+    - /url: "#desk"
+    - text: Skip to desktop
+  - banner:
+    - generic:
+      - button: All apps (Alt+Space)
+      - navigation:
+        - button:
+          - generic: "1"
+          - text: Workspace 1
+        - button: Workspace 2
+        - button: Workspace 3
+        - button: Workspace 4
+        - button: Workspace 5
+      - generic: Desktop
+    - generic:
+      - button:
+        - time: 5:17
+        - generic: dim. 1 nov.
+    - generic:
+      - button:
+        - generic [aria-hidden]: view_column
+        - text: Scrolling columns (Alt+L)
+      - button:
+        - generic [aria-hidden]: search
+        - text: Search
+      - button:
+        - generic [aria-hidden]: wifi
+        - generic [aria-hidden]: volume_up
+        - generic [aria-hidden]: battery_charging_full
+        - text: Quick settings
+      - button:
+        - generic [aria-hidden]: settings
+        - text: Settings
+  - main
+  - navigation:
+    - button:
+      - generic:
+        - generic [aria-hidden]: apps
+      - text: All apps
+    - button:
+      - generic [aria-hidden]:
+        - generic [aria-hidden]: folder
+      - text: Aphrody Files
+    - button:
+      - generic [aria-hidden]:
+        - generic [aria-hidden]: language
+      - text: Aphrody Browser
+    - button:
+      - generic [aria-hidden]:
+        - generic [aria-hidden]: terminal
+      - text: Aphrody Shell
+    - button:
+      - generic [aria-hidden]:
+        - generic [aria-hidden]: storefront
+      - text: Aphrody Store
+    - button:
+      - generic [aria-hidden]:
+        - generic [aria-hidden]: settings
+      - text: Aphrody Settings
+  - dialog "Applications" [ref=e57]:
+    - generic [ref=e58]:
+      - generic [ref=e59]:
+        - generic [aria-hidden] [ref=e60]: search
+        - searchbox "Search apps" [active] [ref=e61]
+        - generic [ref=e62]: Esc
+      - generic [ref=e63]:
+        - heading "Apps" [level=3] [ref=e64]
+        - generic [ref=e65]:
+          - button "Aphrody Workspace" [ref=e66] [cursor=pointer]
+          - button "Aphrody Chat" [ref=e70] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e72]: chat
+          - button "Aphrody Search" [ref=e74] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e76]: search
+          - button "Aphrody Files" [ref=e78] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e80]: folder
+          - button "Aphrody Browser" [ref=e82] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e84]: language
+          - button "Aphrody Store" [ref=e86] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e88]: storefront
+          - button "Aphrody Settings" [ref=e90] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e92]: settings
+          - button "Alpine Linux" [ref=e94] [cursor=pointer]
+          - button "Bun Engine Emulators" [ref=e98] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e100]: sports_esports
+          - button "Aphrody Media" [ref=e102] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e104]: movie
+          - button "Aphrody Web Apps" [ref=e106] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e108]: language
+          - button "fend Calculator" [ref=e110] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e112]: table_chart
+          - button "Aphrody Disk Usage" [ref=e114] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e116]: folder
+          - button "Aphrody Keyboard" [ref=e118] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e120]: settings
+          - button "About Bun OS" [ref=e122] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e124]: info
+          - button "Rio" [ref=e126] [cursor=pointer]
+          - button "Spacedrive" [ref=e130] [cursor=pointer]
+          - button "COSMIC Files" [ref=e134] [cursor=pointer]
+          - button "COSMIC Terminal" [ref=e138] [cursor=pointer]
+          - button "COSMIC Text Editor" [ref=e142] [cursor=pointer]
+          - button "COSMIC Store" [ref=e146] [cursor=pointer]
+          - button "COSMIC Settings" [ref=e150] [cursor=pointer]
+          - button "COSMIC Media Player" [ref=e154] [cursor=pointer]
+          - button "COSMIC Calculator" [ref=e158] [cursor=pointer]
+        - heading "Create" [level=3] [ref=e162]
+        - generic [ref=e163]:
+          - button "PDF" [ref=e164] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e166]: apps
+          - button "Documents" [ref=e168] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e170]: apps
+          - button "Tables" [ref=e172] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e174]: apps
+          - button "Slides" [ref=e176] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e178]: apps
+          - button "Images" [ref=e180] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e182]: apps
+          - button "Vectors" [ref=e184] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e186]: apps
+          - button "Layout" [ref=e188] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e190]: apps
+          - button "Interface layouts" [ref=e192] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e194]: apps
+          - button "Audio" [ref=e196] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e198]: apps
+          - button "CAD" [ref=e200] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e202]: apps
+          - button "Video" [ref=e204] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e206]: apps
+          - button "Compositing" [ref=e208] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e210]: apps
+          - button "Photo processing" [ref=e212] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e214]: apps
+        - heading "Workspace" [level=3] [ref=e216]
+        - button "Play" [ref=e218] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e220]: sports_esports
+        - heading "Web apps" [level=3] [ref=e222]
+        - generic [ref=e223]:
+          - button "ChatGPT" [ref=e224] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e226]: language
+          - button "YouTube" [ref=e228] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e230]: language
+          - button "X" [ref=e232] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e234]: language
+          - button "Google Photos" [ref=e236] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e238]: language
+          - button "Google Maps" [ref=e240] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e242]: language
+          - button "WhatsApp" [ref=e244] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e246]: language
+          - button "Outlook" [ref=e248] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e250]: language
+          - button "Word" [ref=e252] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e254]: language
+          - button "Teams" [ref=e256] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e258]: language
+        - heading "Tools" [level=3] [ref=e260]
+        - generic [ref=e261]:
+          - button "Aphrody Shell" [ref=e262] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e264]: terminal
+          - button "Aphrody Inspector" [ref=e266] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e268]: deployed_code
+          - button "Bun Playground" [ref=e270] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e272]: bolt
+          - button "Bun OS Atlas" [ref=e274] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e276]: code
+          - button "Aphrody Activity" [ref=e278] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e280]: bolt
+        - heading "Desktop and command line" [level=3] [ref=e282]
+        - generic [ref=e283]:
+          - button "aphrody-app" [ref=e284] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e286]: apps
+          - button "aphrody-model-view" [ref=e288] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e290]: apps
+          - button "artcraft" [ref=e292] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e294]: apps
+          - button "artcraft_native" [ref=e296] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e298]: apps
+          - button "artcraft-web-app" [ref=e300] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e302]: language
+          - button "bun-android" [ref=e304] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e306]: android
+          - button "bunos-wsl" [ref=e308] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e310]: apps
+          - button "deckcraft" [ref=e312] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e314]: apps
+          - button "deckcraft-cli" [ref=e316] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e318]: terminal
+          - button "designcraft" [ref=e320] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e322]: apps
+          - button "designcraft-cli" [ref=e324] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e326]: terminal
+          - button "desktop" [ref=e328] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e330]: apps
+          - button "effectcraft" [ref=e332] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e334]: apps
+          - button "effectcraft-cli" [ref=e336] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e338]: terminal
+          - button "figcraft" [ref=e340] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e342]: apps
+          - button "figcraft-cli" [ref=e344] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e346]: terminal
+          - button "figcraft-server" [ref=e348] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e350]: language
+          - button "filmcraft" [ref=e352] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e354]: apps
+          - button "filmcraft-cli" [ref=e356] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e358]: terminal
+          - button "gridcraft" [ref=e360] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e362]: apps
+          - button "gridcraft-cli" [ref=e364] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e366]: terminal
+          - button "iecode-dotnet" [ref=e368] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e370]: apps
+          - button "iecode-web" [ref=e372] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e374]: language
+          - button "iecode-web-wii-wasm" [ref=e376] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e378]: code
+          - button "java-ffi" [ref=e380] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e382]: code
+          - button "lightcraft" [ref=e384] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e386]: apps
+          - button "lightcraft-cli" [ref=e388] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e390]: terminal
+          - button "lu" [ref=e392] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e394]: apps
+          - button "m3-published-consumer" [ref=e396] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e398]: apps
+          - button "pdfcraft" [ref=e400] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e402]: apps
+          - button "pdfcraft-cli" [ref=e404] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e406]: terminal
+          - button "photocraft" [ref=e408] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e410]: apps
+          - button "photocraft-cli" [ref=e412] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e414]: terminal
+          - button "soundcraft" [ref=e416] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e418]: apps
+          - button "soundcraft-cli" [ref=e420] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e422]: terminal
+          - button "spacedrive" [ref=e424] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e426]: apps
+          - button "vectorcraft" [ref=e428] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e430]: apps
+          - button "vectorcraft-cli" [ref=e432] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e434]: terminal
+          - button "webos-server" [ref=e436] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e438]: language
+          - button "wordcraft" [ref=e440] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e442]: apps
+          - button "wordcraft-cli" [ref=e444] [cursor=pointer]:
+            - generic [aria-hidden] [ref=e446]: terminal
+  - status
