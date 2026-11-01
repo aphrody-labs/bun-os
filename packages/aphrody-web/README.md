@@ -75,7 +75,29 @@ bunx @aphrody/web-crawl https://example.com \
   --browser playwright --obey-robots true
 ```
 
-The package targets Bun because its adapter uses `Bun.spawn` to call the Rust
-CLI. It cannot run in a browser or generic JavaScript runtime yet. The
-`playwright` transport requires the local Aphrody Obscura browser and Playwright
-bridge services. Use `native` when no bridge is installed.
+The default package entry targets Bun because its crawler and local-index
+adapters use `Bun.spawn` to call the Rust CLI. The `playwright` transport
+requires the local Aphrody Obscura browser and Playwright bridge services. Use
+`native` when no bridge is installed.
+
+### Browser and generic JavaScript search
+
+The `@aphrody/web-crawl/browser` entry point uses only the Fetch API and talks
+to Aphrody's existing REST RAG endpoint. It can run in browsers and other JS
+runtimes that provide `fetch`:
+
+```ts
+import { createHttpSearchClient } from "@aphrody/web-crawl/browser";
+
+const web = createHttpSearchClient({ baseUrl: "https://search.example" });
+const result = await web.search({
+  query: "Obscura headless browser",
+  limit: 5,
+});
+```
+
+This endpoint currently provides keyword RAG lookup, not public web SERP or
+hybrid/vector retrieval. The gateway is private by default: browser callers
+need same-origin hosting or an operator-configured CORS gateway. Do not put a
+server bearer secret in public browser code. The normal package entry remains
+Bun-only and supplies recursive crawl plus local index search.
