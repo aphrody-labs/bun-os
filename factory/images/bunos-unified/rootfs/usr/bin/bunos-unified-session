@@ -31,13 +31,11 @@ fi
 # LXC (and Android's init) create cgroups for the Android container. With a private cgroup namespace the mount only
 # shows this container's own subtree, so making it writable cannot reach other cgroups.
 grep -q ' /sys/fs/cgroup .*\bro\b' /proc/self/mounts && { mount -o remount,rw /sys/fs/cgroup || log "/sys/fs/cgroup stays read-only"; }
-# The Docker container's cgroup namespace root is a delegated cgroup and is exempt from cgroup v2's
-# no-internal-process rule. Keep this supervisor in that root so LXC can enable controllers there and
-# create its child cgroups. Moving PID 1 to /init makes /init LXC's delegation root; because PID 1 then
-# lives inside it, LXC gets EBUSY while enabling controllers and Android never starts.
-if [ -w /sys/fs/cgroup/cgroup.subtree_control ]; then
-  sed -e 's/ / +/g' -e 's/^/+/' </sys/fs/cgroup/cgroup.controllers >/sys/fs/cgroup/cgroup.subtree_control 2>/dev/null || log "cgroup controllers not delegated"
-fi
+# Waydroid generates this config during `waydroid init`. LXC must stay inside the cgroup delegated to this
+# Docker session instead of walking up to the host's cgroup root. With cgroup v2 and a private Docker cgroup
+# namespace, directly writing cgroup.subtree_control here is invalid: PID 1 is in this cgroup, so the kernel
+# rejects enabling domain controllers with EBUSY (the cgroup no-internal-process rule).
+WAYDROID_LXC_CONFIG=/var/lib/waydroid/lxc/waydroid/config
 # Loop devices for the read-only Android images (loop-control is passed in; block major 7 allowed by the cgroup).
 if [ -e /dev/loop-control ]; then
   for n in $(seq 0 63); do [ -e /dev/loop$n ] || mknod -m 0660 /dev/loop$n b 7 $n 2>/dev/null || true; done
@@ -64,6 +62,14 @@ for frag in sys.argv[2:]:
 with open(sys.argv[1], "w") as f: cfg.write(f)
 PY
     waydroid upgrade -o >>/var/log/waydroid-init.log 2>&1 || true
+  fi
+  if [ -f "$WAYDROID_LXC_CONFIG" ]; then
+    if ! grep -q '^lxc\.cgroup\.relative[[:space:]]*=' "$WAYDROID_LXC_CONFIG"; then
+      printf '\nlxc.cgroup.relative = 1\n' >>"$WAYDROID_LXC_CONFIG"
+    fi
+    log "LXC cgroup delegation is restricted to this session"
+  else
+    log "Waydroid LXC config is missing; Android cgroup delegation may fail"
   fi
   # Start the root D-Bus manager. COSMIC autostart starts `waydroid session start` after Wayland is ready;
   # that call asks this manager to mount images, prepare LXC and boot Android.

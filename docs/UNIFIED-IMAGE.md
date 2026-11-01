@@ -51,6 +51,7 @@ This contract is shared with the session and gateway agent and with `docs/webos/
   - Waydroid's container manager runs as root.
   - The user session starts from COSMIC autostart (`bunos-waydroid-session.desktop`), so Android windows are COSMIC toplevels.
   - Waydroid writes `~/.local/share/applications/waydroid.*.desktop` for every Android app. The COSMIC launcher and app library list them next to the Linux and web apps.
+  - The entrypoint adds `lxc.cgroup.relative = 1` to Waydroid's generated LXC config so the inner Android container stays inside the per-session cgroup delegation.
 - **Docker settings:** this is the privileged form, so only signed-in users get a session.
   - Capabilities: `SYS_ADMIN NET_ADMIN NET_RAW SETUID SETGID CHOWN DAC_OVERRIDE FOWNER KILL MKNOD SYS_CHROOT SETPCAP AUDIT_WRITE`.
   - AppArmor and seccomp unconfined; private cgroupns; no-new-privileges; pids limit of at least 4096.
@@ -58,7 +59,7 @@ This contract is shared with the session and gateway agent and with `docs/webos/
   - `/dev/shm` of 1 GiB; no host network.
   - Waydroid images mounted read-only at `/usr/share/bunos/waydroid/images` (`/etc/waydroid-extra/images` points there, so Waydroid never downloads over them).
   - Devices: `/dev/dri/renderD128` (vgem, for minigbm gralloc), `/dev/loop-control` with the device-cgroup rule `b 7:* rwm`, and `c <binder major>:* rwm` (the major is dynamic: read it from `/proc/devices`).
-  - Sysctl `net.ipv4.ip_forward=1`. The entrypoint makes only `/proc/sys/net` (per network namespace) and the container's own cgroup subtree writable.
+  - Sysctl `net.ipv4.ip_forward=1`. The entrypoint makes only `/proc/sys/net` writable; LXC uses a relative cgroup path instead of trying to enable controllers on a process-populated Docker cgroup root.
   - Reference run: `factory/images/bunos-unified/qualify.sh session`.
 
 ## Gemini slots

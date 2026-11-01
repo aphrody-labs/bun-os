@@ -23,10 +23,11 @@ type Source =
   | { type: "service_account"; client_email: string; private_key: string; token_uri?: string }
   | { type: "authorized_user"; client_id: string; client_secret: string; refresh_token: string };
 interface AdcFile {
-  type: string;
-  service_account_impersonation_url?: string;
-  source_credentials?: Source;
+  type: "impersonated_service_account";
+  service_account_impersonation_url: string;
+  source_credentials: Source;
 }
+type DirectAdcFile = Source;
 
 const b64url = (data: ArrayBuffer | Uint8Array | string) =>
   Buffer.from(typeof data === "string" ? data : new Uint8Array(data as ArrayBuffer)).toString("base64url");
@@ -60,9 +61,8 @@ async function sourceToken(source: Source): Promise<Token> {
 let cached: Token | undefined;
 async function accessToken(): Promise<string> {
   if (cached && cached.expires - Date.now() > 120_000) return cached.value;
-  const adc = (await Bun.file(ADC).json()) as AdcFile & Source;
+  const adc = (await Bun.file(ADC).json()) as AdcFile | DirectAdcFile;
   if (adc.type === "impersonated_service_account") {
-    if (!adc.source_credentials || !adc.service_account_impersonation_url) throw new Error("ADC lacks impersonation data");
     const source = await sourceToken(adc.source_credentials);
     const res = await fetch(adc.service_account_impersonation_url, {
       method: "POST",
