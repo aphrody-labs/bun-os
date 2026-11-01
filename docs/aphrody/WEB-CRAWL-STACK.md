@@ -1,5 +1,8 @@
 # Aphrody and Shenron web crawl stack
 
+> Repository navigation and vendor inventory: [`docs/REPOSITORY-MAP.md`](../REPOSITORY-MAP.md).
+> This guide covers the crawl/search subsystem, not every Bun OS module.
+
 This is the implementation map for the recursive crawl, indexing, search, and
 headless-browser work that feeds Bun OS. `docs/PRODUCT.md` remains the product
 status checklist.

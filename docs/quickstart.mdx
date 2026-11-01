@@ -5,9 +5,11 @@ description: Inspect the declared Bun OS plan and source preflight.
 
 ## Requirements declared by the repository
 
-The root package manifest declares Bun `1.4.4`; `rust-toolchain.toml` declares
-the Rust toolchain used by the root Cargo workspace. Git is required by source
-and submodule commands. Other native tools depend on the selected build target.
+Use the Aphrody runtime selected by the repository guidance in `AGENTS.md`;
+`bun agent-plugin doctor --json` checks its runtime provenance. The runtime
+installer and upgrade command are documented there. `rust-toolchain.toml`
+declares the Rust toolchain for the root Cargo workspace. Git is required by
+source and submodule commands. Other native tools depend on the build target.
 
 ## Inspect setup inputs
 
@@ -29,6 +31,7 @@ These commands request a plan and graph for a declared composition. The
 snapshot date is an input; it does not identify a built image. The checked-in
 `distribution.json` currently labels qualification as `development`.
 
-For setup behavior, see [the root README](https://github.com/aphrody-labs/bun-os/blob/os/README.md).
-For factory inputs and qualification boundaries, see
-[the Arch distribution architecture](/architecture/arch-distribution).
+For setup behavior, see [the root README](../README.md). For the product and
+source map, see [the Bun OS repository map](REPOSITORY-MAP.md) and
+[`docs/PRODUCT.md`](PRODUCT.md). For factory inputs and qualification
+boundaries, see [the distribution architecture](/architecture/arch-distribution).

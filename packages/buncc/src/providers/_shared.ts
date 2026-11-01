@@ -17,7 +17,9 @@ export function parseVersion(text: string): string | undefined {
 
 /** Locate an executable on the context PATH (falls back to the process PATH). */
 export function which(name: string, ctx?: Context): string | null {
-  return Bun.which(name, { PATH: ctx?.env.PATH ?? ctx?.env.Path ?? Bun.env.PATH ?? "" } as never) ?? Bun.which(name);
+  const path = ctx?.env.PATH ?? ctx?.env.Path;
+  if (ctx && path !== undefined) return Bun.which(name, { PATH: path } as never);
+  return Bun.which(name, { PATH: Bun.env.PATH ?? "" } as never);
 }
 
 /** Run `program args` and return the version it prints; undefined when it cannot run. */

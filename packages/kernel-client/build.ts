@@ -1,13 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 import { resolve } from "node:path";
-import { runProcess } from "@aphrody/bun-workspace/process";
 
 const root = resolve(import.meta.dir, "../..");
-const result = await runProcess(
+const child = Bun.spawn(
   [process.execPath, resolve(root, "scripts/build-packages.ts"), "build", "--package", "kernel-client"],
-  root,
-  { timeoutMs: 30000, maxOutputBytes: 2 * 1024 * 1024 },
+  { cwd: root, stdin: "ignore", stdout: "inherit", stderr: "inherit", windowsHide: true },
 );
-if (result.stdout) console.log(result.stdout.trimEnd());
-if (result.stderr) console.error(result.stderr.trimEnd());
-if (result.code !== 0) throw new Error("Root package build failed");
+if ((await child.exited) !== 0) throw new Error("Root package build failed");

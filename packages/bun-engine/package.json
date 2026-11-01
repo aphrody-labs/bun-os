@@ -32,10 +32,10 @@
   },
   "dependencies": {
     "@aphrody/bun-workspace": "workspace:*",
+    "@aphrody/paths": "workspace:*",
     "@aphrody/bun-steam": "workspace:*",
     "@aphrody/typesafe-sdk": "0.6.2",
-    "@bun-os/ds-dotnet": "workspace:*",
-    "@bun-os/re": "workspace:*"
+    "@bun-os/ds-dotnet": "workspace:*"
   },
   "engines": {
     "bun": "1.4.4-canary.20261028.1"

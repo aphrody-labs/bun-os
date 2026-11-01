@@ -58,7 +58,7 @@ Owner decision (overrides the first web-sys draft): the client is an iced applic
 
 ## Source rule
 
-COSMIC, Redox, Rio, nushell, Obscura and every product component are pinned, patched forks built from source on the VPS (serialized Cargo wrapper) and shipped through the Bun OS repositories; nothing is installed from distribution or upstream binaries. Build graph: fork (pinned revision) -> patch -> build -> package (pacman/apt/flatpak/apk repositories of `crates/aphrody-webos-repos`) -> session image (`factory/images/*`) -> session container.
+COSMIC, Redox, Rio, nushell, Obscura and every product component are pinned, patched sources built from source on the VPS through the configured Cargo lanes and shipped through the Bun OS repositories. Build graph: source (pinned revision) -> patch -> build -> package (pacman/apt/flatpak/apk repositories of `crates/aphrody-webos-repos`) -> session image (`factory/images/*`) -> session container. See [`docs/REPOSITORY-MAP.md`](../REPOSITORY-MAP.md) for source/workspace boundaries.
 
 ## Capture and input
 
@@ -68,7 +68,7 @@ Inside each session container a per-session `aphrody-remote-desktop` process (se
 
 - Rust only for product code. The client has no hand-written JavaScript beyond the wasm-bindgen bootstrap. No Bun service, no Cloudflare Worker.
 - One contract: every message crossing the wire is a type in `aphrody-webos-protocol`; server and client both depend on it.
-- Builds run on the VPS through the serialized Cargo wrapper (`scripts/aphrody/build/rust/cargo-serial.sh`, at most four jobs); the client is built for `wasm32-unknown-unknown`, then `wasm-bindgen --target web` and `wasm-opt -Oz`.
+- Builds run on the VPS through the Cargo lane wrapper and isolated targets described in [`docs/VPS-BUILD.md`](../VPS-BUILD.md); the client is built for `wasm32-unknown-unknown`, then `wasm-bindgen --target web` and `wasm-opt -Oz`.
 - Deploy: an atomic release directory (`aphrody-webos` binary, `client/` assets, `receipt.json` with sha256), a systemd unit `aphrody-webos.service` running the Rust binary, the root activator flips `current`, gates on `/api/health` (matching `sourceCommit`) and rolls back on failure. nginx keeps `aphrody.com` on 8790.
 - Until the client and gateway are complete, the server serves a minimal Rust-rendered page at `/` (no JavaScript desktop).
 - Budgets: client wasm at most 3 MB gzip (iced, wgpu); first frame under 2 s after picking an OS on a warm host; input to photon under 80 ms in region.

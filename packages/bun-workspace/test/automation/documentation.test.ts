@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, symlinkSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { yoloCliPath } from "../yolo-cli-path.ts";
 import {
   buildDocumentationManifest,
   documentationPath,
@@ -119,14 +120,7 @@ describe("unified documentation", () => {
       ["docs", "check", "-h"],
     ]) {
       const result = Bun.spawnSync(
-        [
-          process.execPath,
-          Bun.resolveSync("@aphrody/yolo-cli/cli", import.meta.dir),
-          "ops",
-          ...args,
-          "--root",
-          join(tmpdir(), "nonexistent-docs-help-root"),
-        ],
+        [process.execPath, yoloCliPath, "ops", ...args, "--root", join(tmpdir(), "nonexistent-docs-help-root")],
         { windowsHide: true },
       );
       expect(result.exitCode).toBe(0);

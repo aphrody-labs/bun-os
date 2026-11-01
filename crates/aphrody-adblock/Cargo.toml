@@ -29,6 +29,10 @@ arrayvec = "0.7"
 thiserror = { workspace = true }
 flatbuffers = { version = "25.12.19", default-features = false }
 
+[dev-dependencies]
+mock_instant = "0.6.1"
+sha2 = { workspace = true }
+
 [features]
 default = ["embedded-domain-resolver", "full-regex-handling", "single-thread"]
 full-regex-handling = []

@@ -6,15 +6,15 @@ have been built, deployed or qualified.
 
 ## Owners and entry points
 
-| Area | Repository evidence | What that evidence establishes |
-| --- | --- | --- |
-| Distribution CLI | `src/cli.ts`, `src/cli/` | Command routing and CLI implementation are present. |
-| Bun workspace | Root `package.json`, `bun.lock`, `bunfig.toml` | A root Bun workspace and dependency lock are declared. |
-| Cargo workspace | Root `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml` | A root Cargo workspace and toolchain are declared; exclusions and nested workspaces mean it is not the sole Rust workspace. |
-| Runtime | `package.json` `packageManager`, `sources.lock.json`, `distribution.json` | The runtime is unmodified upstream oven-sh/bun, pinned to npm `bun@1.4.4-canary.20261028.1` (gitHead `11c367163a4b`); runtime implementation ownership stays with upstream. The former `toolchains/bun` fork submodule was removed. |
-| Factory | `factory/`, `src/distribution.ts`, `distribution.json` | Factory code and configuration are present. A manifest entry alone does not prove an image was produced. |
-| Product sources | `apps/`, `crates/`, `packages/` | Source directories exist. Membership and ownership must be checked from manifests and source inventory. |
-| Imported sources | `vendor/`, `sources.lock.json`, `.gitmodules` | Some external sources and pins are declared. Inspect each source's provenance and status independently. |
+| Area             | Repository evidence                                                | What that evidence establishes                                                                                                                                                                                                             |
+| ---------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Distribution CLI | `src/cli.ts`, `src/cli/`                                           | Command routing and CLI implementation are present.                                                                                                                                                                                        |
+| Bun workspace    | Root `package.json`, `bun.lock`, `bunfig.toml`                     | A root Bun workspace and dependency lock are declared.                                                                                                                                                                                     |
+| Cargo workspace  | Root `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`             | A root Cargo workspace and toolchain are declared; exclusions and nested workspaces mean it is not the sole Rust workspace.                                                                                                                |
+| Runtime          | `package.json`, `sources.lock.json`, `toolchains/bun` when present | The checked-in product guidance selects Aphrody Bun; verify the selected executable and source pin against current checkout state. A local `toolchains/bun` directory may be untracked and is not evidence of a parent-repository gitlink. |
+| Factory          | `factory/`, `src/distribution.ts`, `distribution.json`             | Factory code and configuration are present. A manifest entry alone does not prove an image was produced.                                                                                                                                   |
+| Product sources  | `apps/`, `crates/`, `packages/`                                    | Source directories exist. Membership and ownership must be checked from manifests and source inventory.                                                                                                                                    |
+| Imported sources | `vendor/`, `sources.lock.json`, `.gitmodules`                      | Some external sources and pins are declared. Inspect each source's provenance and status independently.                                                                                                                                    |
 
 ## Declared product configuration
 
@@ -48,3 +48,6 @@ image assembly, boot/hardware validation and release qualification distinct.
 Report a stage only when its current receipt or command output establishes it.
 `PLAN.md` tracks migration work; `factory/` and `docs/NATIVE-QUALIFICATION.md` describe
 factory and qualification interfaces.
+
+For the first-party/vendor navigation map, submodule inventory commands, and
+Aphrody Search API entry points, see [`docs/REPOSITORY-MAP.md`](REPOSITORY-MAP.md).

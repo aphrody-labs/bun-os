@@ -90,7 +90,7 @@
   },
   "devDependencies": {
     "@aphrody/m3-config": "workspace:*",
-    "@aphrody/product": "workspace:*",
+    "@aphrody/paths": "workspace:*",
     "@types/bun": "catalog:",
     "@types/d3": "catalog:",
     "@types/prismjs": "catalog:",

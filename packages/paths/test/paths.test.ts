@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { expect, test } from "bun:test";
-import { checkoutRoot, findWorkspaceRoot, moduleDirectory, portablePath } from "../src/index.ts";
+import { checkoutRoot, findWorkspaceRoot, moduleDirectory, portablePath, workspaceBuildContext } from "../src/index.ts";
 
 test("finds a workspace from a nested source file using all root markers", () => {
   const root = mkdtempSync(join(tmpdir(), "aphrody-paths-"));
@@ -34,6 +34,16 @@ test("integrated owners resolve inside the selected workspace", () => {
     expect(checkoutRoot("m3", env)).toBe(checkoutRoot("material", env));
     expect(checkoutRoot("iecode", env)).toBe(root);
     expect(checkoutRoot("rg", env)).toBe(root);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("build context keeps the workspace and Bun checkout under the selected root", () => {
+  const root = mkdtempSync(join(tmpdir(), "aphrody-build-context-"));
+  try {
+    const context = workspaceBuildContext({ APHRODY_WORKSPACE_ROOT: root });
+    expect(context).toEqual({ workspaceRoot: root, bunCheckout: join(root, "sources/bun") });
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

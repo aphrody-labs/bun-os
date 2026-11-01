@@ -27,9 +27,6 @@
     "test": "bun test test",
     "typecheck": "bun check -p ../../tsconfig.json --threads=2 --no-pretty"
   },
-  "devDependencies": {
-    "@aphrody/bun-workspace": "workspace:*"
-  },
   "engines": {
     "bun": "1.4.4-canary.20261028.1"
   }

@@ -50,6 +50,15 @@ function forwarder(path: string): string {
   return `export * from ${p};\nexport { default } from ${p};\n`;
 }
 
+function isRuntimeBuiltin(specifier: string): boolean {
+  try {
+    Bun.resolveSync(specifier, import.meta.dir);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function defineLazyGlobal(name: string, path: string): void {
   const [root, ...rest] = name.split(".");
   const key = rest.pop();
@@ -76,6 +85,9 @@ export function defineBunOsPlugin(spec: BunOsPluginSpec): BunOsPlugin {
     target: "bun",
     async setup(build) {
       for (const [specifier, target] of Object.entries(spec.modules ?? {})) {
+        // Aphrody builds can ship these modules natively. Bun rejects plugin aliases for builtins,
+        // while upstream Bun resolves unknown bun: specifiers only through this plugin registry.
+        if (specifier.startsWith("bun:") && isRuntimeBuiltin(specifier)) continue;
         const contents = forwarder(targetPath(target));
         build.module(specifier, () => ({ contents, loader: "js" }));
       }

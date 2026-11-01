@@ -4,6 +4,7 @@ import { chmod, mkdtemp, mkdir, readFile, rm, stat, writeFile } from "node:fs/pr
 import { existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { yoloCliPath } from "../yolo-cli-path.ts";
 import {
   acquireSourceSyncLock,
   loadSourceSyncConfig,
@@ -828,7 +829,7 @@ test("repo-sync status reads live receipts and pending metadata without exposing
       Object.entries(files).map(async ([path, data]) => (await readFile(join(state, path), "utf8")) === data),
     );
     expect(unchanged.every(Boolean)).toBe(true);
-    const yolo = Bun.resolveSync("@aphrody/yolo-cli/cli", import.meta.dir);
+    const yolo = yoloCliPath;
     const cli = Bun.spawn([process.execPath, yolo, "ops", "repo-sync", "status", "--json"], {
       windowsHide: true,
       stdout: "pipe",

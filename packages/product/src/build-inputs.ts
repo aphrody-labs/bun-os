@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 import { readFileSync, realpathSync } from "node:fs";
 import { join } from "node:path";
-import { checkoutRoot as resolveCheckoutRoot, findWorkspaceRoot } from "@aphrody/paths";
+import { workspaceBuildContext } from "@aphrody/paths";
 const sha = (bytes: Uint8Array) => new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
 
 /** Resolve product inputs from the selected execution context, independent of UI package location. */
 export function productBuildContext(env: NodeJS.ProcessEnv = process.env, from?: string) {
-  const workspaceRoot = findWorkspaceRoot(from, env);
+  const { workspaceRoot, bunCheckout } = workspaceBuildContext(env, from);
   return {
     workspaceRoot,
-    bunCheckout: resolveCheckoutRoot("bun", { ...env, APHRODY_WORKSPACE_ROOT: workspaceRoot }),
+    bunCheckout,
     uiDist: join(workspaceRoot, "packages/app-ui/dist"),
     publicAssets: join(workspaceRoot, "tools/aphrody/config/public-assets.json"),
   };

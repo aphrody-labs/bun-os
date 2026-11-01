@@ -70,7 +70,11 @@ async function sh(
     stderr: "pipe",
     stdin: "ignore",
   });
-  const [out, err, code] = await Promise.all([proc.stdout.text(), proc.stderr.text(), proc.exited]);
+  const [out, err, code] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    proc.exited,
+  ]);
   if (code !== 0 && !opts.allowFail)
     throw new Error(`${cmd.join(" ")} failed (${code}): ${(err || out).trim().split("\n").slice(-5).join("\n")}`);
   return { code, out: `${out}${err}` };

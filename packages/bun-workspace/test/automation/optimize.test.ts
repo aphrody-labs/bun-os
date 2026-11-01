@@ -3,11 +3,12 @@ import { expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { yoloCliPath } from "../yolo-cli-path.ts";
 import { optimizationPrompt } from "../../src/automation/optimize.ts";
 import { withoutPath, writeBunCommand } from "./fixtures/bun-command.ts";
 
 // `yolo optimize` is the only command line of this module.
-const yolo = Bun.resolveSync("@aphrody/yolo-cli/cli", import.meta.dir);
+const yolo = yoloCliPath;
 
 test("requires a bounded task", () => {
   expect(() => optimizationPrompt("  ")).toThrow("bounded");

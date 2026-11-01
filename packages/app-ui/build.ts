@@ -11,16 +11,16 @@ import { MemoryRouter } from "react-router-dom";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
+import { findWorkspaceRoot } from "@aphrody/paths";
 import { publicFontUrl, renderPublicStylesheet } from "@aphrody/m3-fonts";
 import { prunePublicFontCopies } from "./public-assets-package";
-import { productBuildContext } from "@aphrody/product/build-inputs";
 import { normalizeAppBase } from "./src/app-base";
 import { stageWebOsNotices } from "../webos-wasm/stage-notices";
 const WEBOS_WASM_NAME = "aphrody_webos_wasm_bg.wasm";
 const escape = (value: string) => value.replace(/[&<>"']/g, character => `&#${character.charCodeAt(0)};`);
 
 if (import.meta.main) {
-  const context = productBuildContext(process.env, import.meta.dir);
+  const workspaceRoot = findWorkspaceRoot(import.meta.dir, process.env);
   const config = await loadM3Config(import.meta.dir);
   const dev = process.argv.includes("--dev");
   const { values } = parseArgs({
@@ -37,7 +37,7 @@ if (import.meta.main) {
   if (values["public-assets"] && !values.out)
     throw new Error("--public-assets requires an isolated --out artifact directory");
   const assets = values["public-assets"]
-    ? ((await Bun.file(context.publicAssets).json()) as {
+    ? ((await Bun.file(join(workspaceRoot, "tools/aphrody/config/public-assets.json")).json()) as {
         schemaVersion: number;
         baseUrl: string;
         localFontFallbacks: string[];

@@ -3,6 +3,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { yoloCliPath } from "../yolo-cli-path.ts";
 import { runPathAudit } from "../../src/automation/path-audit.ts";
 
 test("path audit is read-only by default and rewrites only safe code paths on apply", async () => {
@@ -32,10 +33,7 @@ test("path audit is read-only by default and rewrites only safe code paths on ap
 });
 
 test("the Workspace operation advertises the path-audit command", () => {
-  const output = Bun.spawnSync(
-    [process.execPath, Bun.resolveSync("@aphrody/yolo-cli/cli", import.meta.dir), "ops", "path-audit", "--help"],
-    { windowsHide: true },
-  );
+  const output = Bun.spawnSync([process.execPath, yoloCliPath, "ops", "path-audit", "--help"], { windowsHide: true });
   expect(output.exitCode).toBe(0);
   expect(output.stdout.toString()).toContain("yolo ops path-audit");
 });

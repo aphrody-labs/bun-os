@@ -1,11 +1,13 @@
 #!/usr/bin/env bun
 import { basename, join } from "node:path";
+import { existsSync } from "node:fs";
 import { policyFor } from "./catalog";
 import { loadConsoleReferences, validateConsoleReferences } from "./console/references";
 import { runFormats } from "./formats/cli";
 import { runFrontend, runLibrary } from "./frontend/cli";
 import { launch, trace } from "./launcher";
 import { runNative } from "./nds/cli";
+import { engineWorkspaceRoot } from "./nds/engine-path";
 import { probeHost } from "./probe";
 import { runShell } from "./shell";
 import { buildWorkspace, compileWorkspace, isCompileTarget, serveWorkspace, testWorkspace } from "./workspace";
@@ -42,7 +44,11 @@ async function serveRetroArchCli(args: string[]): Promise<void> {
       JSON.stringify({
         frames,
         status: ra.status(),
-        frame: frame && { ...frame, data: undefined, serial: String(frame.serial) },
+        frame: frame && {
+          ...frame,
+          data: undefined,
+          serial: String(frame.serial),
+        },
       }),
     );
     process.exitCode = frames ? 0 : 1;
@@ -90,9 +96,26 @@ async function main(): Promise<void> {
     process.exitCode = await runNative(["info", appId, ...(target ? [target] : [])]);
   else if (command === "run" && appId) process.exitCode = await runNative(process.argv.slice(2));
   else if (command === "recompile") {
-    // One owner: static recompilation lives in `re` (bun-re pipeline over these engine cores).
-    const { recompileMain } = await import("@bun-os/re/pipeline");
-    process.exitCode = await recompileMain(process.argv.slice(3));
+    // Static recompilation belongs to REA. Dispatch to its CLI so Bun Engine does not depend on
+    // REA's source package (REA itself uses Bun Engine to execute generated programs).
+    const re = Bun.which("re");
+    const root = engineWorkspaceRoot();
+    const sourceCli = join(root, "packages", "re", "scripts", "rea.mjs");
+    if (!re && !existsSync(sourceCli))
+      throw new Error("`recompile` is provided by the REA CLI. Install `re` or run from a Bun OS checkout.");
+    const child = re
+      ? Bun.spawn([re, "recompile", ...process.argv.slice(3)], {
+          stdin: "inherit",
+          stdout: "inherit",
+          stderr: "inherit",
+        })
+      : Bun.spawn([process.execPath, sourceCli, "recompile", ...process.argv.slice(3)], {
+          cwd: root,
+          stdin: "inherit",
+          stdout: "inherit",
+          stderr: "inherit",
+        });
+    process.exitCode = await child.exited;
   } else if (command === "compile") {
     const compileTarget = isCompileTarget(appId) ? appId : undefined;
     if (appId && !compileTarget && appId.startsWith("bun-"))

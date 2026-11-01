@@ -472,6 +472,7 @@ mod tests {
             max_depth: 1,
             timeout: 5,
             per_host_delay_ms: 0,
+            browser: CrawlBrowser::Native,
         }
     }
     #[test]

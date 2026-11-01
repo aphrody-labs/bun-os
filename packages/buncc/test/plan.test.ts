@@ -86,13 +86,13 @@ test("the graph ignores dev-dependencies, self and outside crates", () => {
   ]);
 });
 
-test("jobs are bounded by cores and by free memory", () => {
+test("jobs use every available core unless an explicit job count is requested", () => {
   const gib = 1024 ** 3;
   expect(jobLimit(24, 100 * gib)).toBe(24);
-  expect(jobLimit(24, 13 * gib)).toBe(6);
-  expect(jobLimit(24, 0.5 * gib)).toBe(1);
+  expect(jobLimit(24, 13 * gib)).toBe(24);
+  expect(jobLimit(24, 0.5 * gib)).toBe(24);
   expect(jobLimit(24, 100 * gib, 2 * gib, 4)).toBe(4);
-  expect(jobLimit(2, 100 * gib, 2 * gib, 8)).toBe(2);
+  expect(jobLimit(2, 100 * gib, 2 * gib, 8)).toBe(8);
 });
 
 test("cargo argument lists per task", () => {

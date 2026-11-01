@@ -1,6 +1,6 @@
 {
   "name": "@aphrody/themes",
-  "version": "0.1.0",
+  "version": "1.4.7",
   "private": true,
   "description": "Single source of truth for the Bun OS themes: Material 3 (Google Book OS), Windows 11 Fluent, Apple Liquid Glass. W3C design tokens in, CSS variables, Tailwind v4 theme, TypeScript types, Rust consts and Tauri window effects out.",
   "license": "Apache-2.0",
@@ -19,8 +19,8 @@
     "test": "bun test test/"
   },
   "devDependencies": {
-    "@material/material-color-utilities": "0.4.0",
-    "happy-dom": "^20.14.5"
+    "@material/material-color-utilities": "catalog:",
+    "happy-dom": "catalog:"
   },
   "engines": {
     "bun": ">=1.4.4"

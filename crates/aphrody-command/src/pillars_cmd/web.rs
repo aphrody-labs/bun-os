@@ -2,6 +2,7 @@
 //! Canonical Rust Web commands behind `aphrody web`.
 
 use clap::{Parser, Subcommand, ValueEnum};
+use colored::Colorize;
 use miette::{IntoDiagnostic, miette};
 use std::time::Duration;
 

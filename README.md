@@ -2,12 +2,13 @@
 
 # Bun OS
 
-**An Arch-based Linux distribution and product workspace built on the unmodified upstream Bun runtime.**
+**A unified Bun OS image and WebOS session powered by Aphrody Bun.**
 
 [Docs](docs/index.mdx) ·
 [Quickstart](docs/quickstart.mdx) ·
 [Factory](factory/README.md) ·
 [Architecture](docs/architecture.md) ·
+[Repository map](docs/REPOSITORY-MAP.md) ·
 [Plan](PLAN.md)
 
 [![CI](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aphrody-labs/bun-os/actions/workflows/ci.yml)
@@ -17,21 +18,23 @@
 
 </div>
 
-Bun OS is the distribution workspace for an Arch-based system using the
-[upstream Bun runtime](https://github.com/oven-sh/bun), pinned to the canary `bun@1.4.4-canary.20261028.1`. This repository
-owns assembly and the root Bun workspace. Product sources live under `apps/`,
-`crates/` and `packages/`, while Cargo ownership is still split by nested
-workspace boundaries and excluded sources. The image factory uses
-pacman/libalpm and runs from TypeScript. The planned compositions are COSMIC
-Desktop and Gamescope Gaming, alongside Server.
+Bun OS is a unified product image combining the Bun OS Rust base, Aphrody Bun,
+COSMIC, ChromiumOS components, Android 17 and Gemini. It ships as a bootable
+disk image and as the streamed WebOS session. This repository owns product
+assembly and shared application sources under `apps/`, `crates/` and
+`packages/`; Rust and Bun workspace membership still has nested boundaries and
+exclusions. [`docs/PRODUCT.md`](docs/PRODUCT.md) is the product checklist and
+[`docs/REPOSITORY-MAP.md`](docs/REPOSITORY-MAP.md) maps source owners, vendor,
+submodules and Aphrody Search. The runtime and each image input are pinned in
+the corresponding source lock and factory manifest.
 
 ## Editions
 
-| Declared composition | Session value in `distribution.json` |
-| -------------------- | ------------------------------------ |
-| `server`             | `null`                               |
-| `desktop`            | `cosmic-session`                     |
-| `gaming`             | `gamescope`                           |
+| Factory composition | Session value in `distribution.json` |
+| ------------------- | ------------------------------------ |
+| `server`            | `null`                               |
+| `desktop`           | `cosmic-session`                     |
+| `gaming`            | `gamescope`                          |
 
 The manifest also declares `full` and `perf` profiles and five targets:
 `linux-x64`, `linux-arm64`, `windows-x64`, `macos-arm64` and `wasm`. These are
@@ -42,8 +45,10 @@ separate compatibility path. See [`distribution.json`](distribution.json),
 
 ## Quickstart
 
-Requires the upstream Bun canary `1.4.4-canary.20261028.1` (`npm install -g bun@1.4.4-canary.20261028.1`; `bun --revision` prints `1.4.4-canary.1+11c367163`), Git, the nightly Rust toolchain from [`rust-toolchain.toml`](rust-toolchain.toml),
-and the native toolchain of each target you build.
+Requires the repository-selected Aphrody Bun runtime (see `AGENTS.md` for its
+provenance check and installer), Git, the nightly Rust toolchain from
+[`rust-toolchain.toml`](rust-toolchain.toml), and the native toolchain of each
+target you build. A setup/plan command does not qualify a product image.
 
 ```bash
 git clone https://github.com/aphrody-labs/bun-os.git bun-os
@@ -69,29 +74,29 @@ qualification will succeed.
 
 ## Repository
 
-| Path                | Contents                                                                   |
-| ------------------- | -------------------------------------------------------------------------- |
-| `src/`              | Factory CLI: plan, sources, stage, rootfs, image, msys2, graph, infra, ops |
-| `factory/`          | Arch factory, compositions, `/usr` images, Ubuntu and MSYS2 compatibility  |
-| `crates/`            | Rust source; root Cargo membership and nested workspace boundaries are tracked separately |
-| `packages/`          | Bun packages; the root Bun manifest declares the workspace members         |
-| `apps/`              | Desktop, web, CLI and Android application sources                          |
-| `vendor/`            | Imported sources; inspect `sources.lock.json` and `.gitmodules` for declared pins |
-| `package.json`      | Pins the upstream Bun runtime (`bun@1.4.4-canary.20261028.1`, oven-sh/bun `11c367163a4b`) |
-| `infra/`            | Host, nginx, systemd and DNS desired state                                 |
-| `fonts/`, `assets/` | Shared fonts and app assets with their licenses                            |
-| `docs/`             | Documentation site ([`docs/docs.json`](docs/docs.json))                    |
+| Path                | Contents                                                                                                                           |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `src/`              | Factory CLI: plan, sources, stage, rootfs, image, msys2, graph, infra, ops                                                         |
+| `factory/`          | Arch factory, compositions, `/usr` images, Ubuntu and MSYS2 compatibility                                                          |
+| `crates/`           | Rust source; root Cargo membership and nested workspace boundaries are tracked separately                                          |
+| `packages/`         | Bun packages; the root Bun manifest declares the workspace members                                                                 |
+| `apps/`             | Desktop, web, CLI and Android application sources                                                                                  |
+| `vendor/`           | Imported sources; inspect `sources.lock.json` and `.gitmodules` for declared pins                                                  |
+| `package.json`      | Root Bun package metadata and workspace declarations; runtime provenance is checked against the selected executable and source pin |
+| `infra/`            | Host, nginx, systemd and DNS desired state                                                                                         |
+| `fonts/`, `assets/` | Shared fonts and app assets with their licenses                                                                                    |
+| `docs/`             | Documentation site ([`docs/docs.json`](docs/docs.json))                                                                            |
 
 ## Products
 
-| Product                       | Where                                                                                              |
-| ----------------------------- | -------------------------------------------------------------------------------------------------- |
-| COSMIC desktop and Material 3 | `apps/desktop`, `packages/m3*`, `packages/app-ui`                                                  |
+| Product                       | Where                                                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| COSMIC desktop and Material 3 | `apps/desktop`, `packages/m3*`, `packages/app-ui`                                                      |
 | Craft suite                   | `apps/*craft*`: PDF, CAD web, film, photo, vector, sound, word, deck, design, grid, light, effect, fig |
-| Reverse engineering (`re`)    | `packages/re`, `crates/re` (`bunre`)                                                               |
-| IECODE and nie game tooling   | `crates/aphrody-nie-*`, `packages/inagle`, `apps/iecode-*`                                         |
-| Aphrody agents, MCP and A2A   | `crates/aphrody-*`, `packages/a2a`, `packages/m3-mcp`                                              |
-| Android                       | `apps/bun-android`, `packages/bun-android`, `crates/android-native`                                |
+| Reverse engineering (`re`)    | `packages/re`, `crates/re` (`bunre`)                                                                   |
+| IECODE and nie game tooling   | `crates/aphrody-nie-*`, `packages/inagle`, `apps/iecode-*`                                             |
+| Aphrody agents, MCP and A2A   | `crates/aphrody-*`, `packages/a2a`, `packages/m3-mcp`                                                  |
+| Android                       | `apps/bun-android`, `packages/bun-android`, `crates/android-native`                                    |
 
 ## Development
 
@@ -111,8 +116,9 @@ bun fmt --check
 bun scripts/cargo.ts check
 ```
 
-Type checking, lint and format use the upstream `bun check`, `bun lint` and
-`bun fmt` (the fork-only n2b command no longer exists). Cargo runs through the serialized wrapper `scripts/cargo.ts`. Build
+Type checking, lint, format and migration use the Aphrody runtime's native
+`bun check`, `bun lint`, `bun fmt` and `bun n2b`. Cargo runs through the
+repository's supported lane wrapper. Build
 outputs go to `build/` and `target/`, and installed binaries to `install/`.
 The [contributor guide](AGENTS.md) and [CI](.github/workflows) define the gates.
 

@@ -16,7 +16,7 @@ crate-type = ["cdylib"]
 [dependencies]
 # The kernels need no JS/TS chunker: the oxc parser stays out of the wheel.
 aphrody-rag-core = { path = "../aphrody-rag-core", version = "1.4.7", default-features = false }
-pyo3 = { workspace = true, features = ["abi3-py311"] }
+pyo3 = { workspace = true, features = ["abi3-py311", "extension-module"] }
 
 [lints]
 workspace = true

@@ -39,6 +39,18 @@ export function workspacePath(...parts: string[]): string {
   return resolve(findWorkspaceRoot(), ...parts);
 }
 
+/** Resolve the selected workspace and its canonical Bun source checkout for build tooling. */
+export function workspaceBuildContext(
+  env: Record<string, string | undefined> = process.env,
+  from?: string,
+): { workspaceRoot: string; bunCheckout: string } {
+  const workspaceRoot = findWorkspaceRoot(from, env);
+  return {
+    workspaceRoot,
+    bunCheckout: checkoutRoot("bun", { ...env, APHRODY_WORKSPACE_ROOT: workspaceRoot }),
+  };
+}
+
 /** Resolve integrated owners from the selected workspace's source layout. */
 export function checkoutRoot(
   checkout: ExternalCheckout,

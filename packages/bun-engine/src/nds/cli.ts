@@ -1,7 +1,7 @@
 import { join } from "node:path";
-import { findEngine, findRoot } from "@bun-os/re/pipeline";
+import { engineWorkspaceRoot, findEngine } from "./engine-path";
 
-const root = findRoot(import.meta.dir) ?? join(import.meta.dir, "..", "..", "..", "..");
+const root = engineWorkspaceRoot(import.meta.dir);
 const cargoSerial = join(root, "scripts", "aphrody", "build", "rust", "cargo-serial.ts");
 
 /** Runs the native `bun-engine` CLI (cartridge inspection, machines); builds it through Bun's
