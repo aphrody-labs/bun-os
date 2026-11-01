@@ -86,7 +86,7 @@ disk)
     if [ -f "$candidate" ]; then CODE=$candidate; break; fi
   done
   [ -n "$CODE" ] || { echo "No OVMF_CODE firmware found in $FW" >&2; exit 1; }
-  timeout ${SECS:-600} qemu-system-x86_64 -machine q35,accel=kvm -cpu host -smp 4 -m 6144 \
+  timeout ${SECS:-600} qemu-system-x86_64 -machine "q35,accel=${QEMU_ACCEL:-kvm}" -cpu "${QEMU_CPU:-host}" -smp 4 -m 6144 \
     -drive if=pflash,format=raw,readonly=on,file="$CODE" -drive if=pflash,format=raw,file="$OUT/vars.fd" \
     -drive file="$IMG",format=raw,if=virtio,snapshot=on -netdev user,id=n0 -device virtio-net-pci,netdev=n0 \
     -device virtio-vga -display none -serial file:"$OUT/serial.log" -monitor unix:"$OUT/monitor.sock",server,nowait &
