@@ -1143,7 +1143,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/chipi-spec.git",
-        "pin": "23505ec85e213c7fbe005d65882f507e5ac35679"
+        "pin": "faaf9f1293b3a858264f51906838c2d12492c50e"
       },
       "registration": ["none"],
       "aot": true,
@@ -1224,7 +1224,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/cosmic-epoch.git",
-        "pin": "a19510c7aa304f0c2a339cb1aa9c1a892511693f"
+        "pin": "3f446e10b4916777bbbf9009cf610cb1eb681cc6"
       },
       "registration": ["none"],
       "aot": true,
@@ -1347,7 +1347,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/dolphin.git",
-        "pin": "2282f5f94f011d33b3b431e252d9613d92f6c87c"
+        "pin": "8d2ad1a662472955497e5bb79d7b9ec6999e1f0d"
       },
       "registration": ["none"],
       "aot": true,
@@ -1578,7 +1578,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/jgenesis.git",
-        "pin": "9fcfd9c9495ae6a65c3a9354599665d3bf62a047"
+        "pin": "be19d563ce07e4d8a2bcc80d24c07bf6b77cd31c"
       },
       "registration": ["none"],
       "aot": true,
@@ -1892,7 +1892,7 @@
       "source": {
         "type": "submodule",
         "url": "https://sourceware.org/git/newlib-cygwin.git",
-        "pin": "351d222373e629ec85194538cd9a8ae32f67ae34"
+        "pin": "80df0a2b5d6b5faf5c382807810c86e06915e03e"
       },
       "registration": ["none"],
       "aot": true,
@@ -2280,7 +2280,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/rea.git",
-        "pin": "32748ddfe5b0a0a5ff7d4994343d2444de15afec"
+        "pin": "d8691f2693759440a4837e9e2ad42e4882a32c29"
       },
       "registration": ["none"],
       "aot": true,
@@ -2343,7 +2343,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/retroarch.git",
-        "pin": "5f2f529b476fbaa165241c19518b76d4bbd98b04"
+        "pin": "d7aeaae55f7e340241d9ce6494a2caa3e4e55023"
       },
       "registration": ["none"],
       "aot": true,
@@ -2396,7 +2396,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/gdkchan/SPICA.git",
-        "pin": "82acbd63695e4ef8b95a92ce884f25ec1044788f"
+        "pin": "bd29a7828595d7839cda2ac61c76bb63f9071250"
       },
       "registration": ["none"],
       "aot": true,
@@ -2437,7 +2437,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/JustArchiNET/ArchiSteamFarm.git",
-        "pin": "64f3bec7570fdb3693a0518940936180f0f87269"
+        "pin": "a044ad607c6d55dcdea4a373cdd5afd804f5b217"
       },
       "registration": ["none"],
       "aot": true,
@@ -2451,7 +2451,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/SteamRE/DepotDownloader.git",
-        "pin": "49717a7aeb68f3762744b44dbb6d8a01a9ac88da"
+        "pin": "6396afe2e34a6c40459bcb6bdafa43c83c9db8cc"
       },
       "registration": ["none"],
       "aot": true,
@@ -2479,7 +2479,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/Revadike/InternalSteamWebAPI.git",
-        "pin": "adff14ff3f1e7337c29b01cd265b1c521c8f12c9"
+        "pin": "ebe75a861a374c7c95b59a8906a8c19cad6c1ca5"
       },
       "registration": ["none"],
       "aot": true,
@@ -2507,7 +2507,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/SteamTracking/Protobufs.git",
-        "pin": "c0c1e745cdc042dbde122ed31f40ecde28ca534e"
+        "pin": "f7a8414fee565b2b92a68520a70024c5ccb0c12d"
       },
       "registration": ["none"],
       "aot": true,
@@ -2591,7 +2591,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/SteamRE/SteamKit.git",
-        "pin": "24131c045655ddaa1e0e60880b2b1af28f69e89c"
+        "pin": "b05e5ff7bc117b62840202df2f96499ad4ae9052"
       },
       "registration": ["none"],
       "aot": true,
@@ -2633,7 +2633,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/BeyondDimension/SteamTools.git",
-        "pin": "71257f5caca1ab88b7198e932623dd8ff801a057"
+        "pin": "d04213147e77a8d73277fa8b86eeecfa444df071"
       },
       "registration": ["none"],
       "aot": true,
@@ -2647,7 +2647,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/xPaw/SteamWebAPIDocumentation.git",
-        "pin": "4a97a465f0055baf2372511856e2cd489a4eb35b"
+        "pin": "249bdff382f8fc8c97028c885c808b4b840d3f39"
       },
       "registration": ["none"],
       "aot": true,
@@ -2675,7 +2675,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/rlabrecque/Steamworks.NET.git",
-        "pin": "ea51b029a5dbcb47a99d3c1fac930b811672ed32"
+        "pin": "ba71581f1ed7349e8d0f17ddc6f135dd3bc8a6a3"
       },
       "registration": ["none"],
       "aot": true,
@@ -2689,7 +2689,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/ValveResourceFormat/ValveKeyValue.git",
-        "pin": "ef5901ec277faf2349c65aa45d779b4c58ba07ea"
+        "pin": "1253961d9220a98b400c918a16a348a75fc2cbb1"
       },
       "registration": ["none"],
       "aot": true,
@@ -2876,7 +2876,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/aphrody-labs/uutils-findutils.git",
-        "pin": "d71f3242b0bc3b21bb311f04b23ae62e5f3fed67"
+        "pin": "3b14698a0312924bd68ca2ab13ad7db9c4ce17f3"
       },
       "registration": ["none"],
       "aot": true,
@@ -2915,7 +2915,7 @@
       "source": {
         "type": "submodule",
         "url": "https://github.com/microsoft/vcpkg.git",
-        "pin": "d4c0a46cb8f63e5c9fa007d13baf1cb3e43bf7e3"
+        "pin": "44ccfd88b3eca6929d6d16398c7b19945c29a5f6"
       },
       "registration": ["none"],
       "aot": true,
@@ -15437,7 +15437,7 @@
         "name": "goblin",
         "key": "goblin",
         "requirement": "0.10",
-        "locked": ["0.10.7"]
+        "locked": ["0.8.2", "0.10.7"]
       },
       "registration": ["none"],
       "aot": true,
