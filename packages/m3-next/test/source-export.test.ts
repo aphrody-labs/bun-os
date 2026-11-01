@@ -7,7 +7,8 @@ test("the source contract ships its real typed implementation without replacing 
   expect(manifest.files).toContain("src");
   expect(manifest.exports["./source"]).toEqual({ types: "./src/index.ts", default: "./src/index.ts" });
   expect(await Bun.file(new URL(`../${manifest.exports["./source"].types}`, import.meta.url)).exists()).toBe(true);
-  expect(manifest.exports["."].types).toBe("./dist/index.d.ts");
+  expect(manifest.types).toBe("./src/index.ts");
+  expect(manifest.exports["."].types).toBe("./src/index.ts");
   expect(manifest.exports["."].default).toBe("./dist/index.js");
   expect(typeof withM3).toBe("function");
   expect(typeof generateM3Metadata).toBe("function");
