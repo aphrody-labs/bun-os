@@ -52,7 +52,11 @@ impl Provider {
             token_uri: "https://oauth2.googleapis.com/token".into(),
             revoke_uri: Some("https://oauth2.googleapis.com/revoke".into()),
             scopes: owner_scopes(),
-            extra: vec![("access_type", "offline"), ("prompt", "consent"), ("include_granted_scopes", "true")],
+            extra: vec![
+                ("access_type", "offline"),
+                ("prompt", "consent"),
+                ("include_granted_scopes", "true"),
+            ],
         }
     }
     /// Microsoft identity platform v2 (`tenant`: `common`, `consumers`, `organizations` or a tenant id),
@@ -65,8 +69,17 @@ impl Provider {
             token_uri: format!("{base}/token"),
             revoke_uri: None,
             scopes: [
-                "openid", "email", "profile", "offline_access", "User.Read", "Files.ReadWrite", "Mail.ReadWrite",
-                "Mail.Send", "Calendars.ReadWrite", "Contacts.ReadWrite", "Tasks.ReadWrite",
+                "openid",
+                "email",
+                "profile",
+                "offline_access",
+                "User.Read",
+                "Files.ReadWrite",
+                "Mail.ReadWrite",
+                "Mail.Send",
+                "Calendars.ReadWrite",
+                "Contacts.ReadWrite",
+                "Tasks.ReadWrite",
             ]
             .iter()
             .map(|s| (*s).to_owned())
@@ -115,7 +128,10 @@ impl std::fmt::Debug for ClientConfig {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ClientConfig")
             .field("client_id", &self.client_id)
-            .field("client_secret", &self.client_secret.as_ref().map(|_| "<redacted>"))
+            .field(
+                "client_secret",
+                &self.client_secret.as_ref().map(|_| "<redacted>"),
+            )
             .field("redirect_uri", &self.redirect_uri)
             .finish()
     }
@@ -131,7 +147,8 @@ impl ClientConfig {
         Some(Self {
             client_id: env(&format!("{prefix}_CLIENT_ID"))?,
             client_secret: env(&format!("{prefix}_CLIENT_SECRET")),
-            redirect_uri: env(&format!("{prefix}_REDIRECT")).unwrap_or_else(|| default_redirect.to_owned()),
+            redirect_uri: env(&format!("{prefix}_REDIRECT"))
+                .unwrap_or_else(|| default_redirect.to_owned()),
         })
     }
 }
@@ -244,7 +261,10 @@ impl OwnerOAuth {
         Self::new(
             Provider::microsoft(&tenant),
             ClientConfig::from_env_prefix("APHRODY_MICROSOFT_OAUTH", DEFAULT_MICROSOFT_REDIRECT),
-            SealedFile::new(dir.join("microsoft-owner-token.sealed"), dir.join("owner-token.key")),
+            SealedFile::new(
+                dir.join("microsoft-owner-token.sealed"),
+                dir.join("owner-token.key"),
+            ),
             env("APHRODY_MICROSOFT_OWNER_EMAIL").map(|e| e.to_lowercase()),
         )
     }
@@ -252,8 +272,18 @@ impl OwnerOAuth {
     pub fn provider(&self) -> &Provider {
         &self.provider
     }
+
+    /// Configured owner identity. This is used only after `complete` validates the provider ID token.
+    pub fn configured_owner_email(&self) -> Option<&str> {
+        self.owner_email.as_deref()
+    }
     /// Explicit construction.
-    pub fn new(provider: Provider, client: Option<ClientConfig>, store: SealedFile, owner_email: Option<String>) -> Self {
+    pub fn new(
+        provider: Provider,
+        client: Option<ClientConfig>,
+        store: SealedFile,
+        owner_email: Option<String>,
+    ) -> Self {
         Self {
             provider,
             client,
@@ -265,7 +295,10 @@ impl OwnerOAuth {
     }
     fn client(&self) -> Result<&ClientConfig> {
         self.client.as_ref().ok_or_else(|| {
-            Error::Config(format!("OAuth client for {} is not configured", self.provider.name))
+            Error::Config(format!(
+                "OAuth client for {} is not configured",
+                self.provider.name
+            ))
         })
     }
 
@@ -285,7 +318,8 @@ impl OwnerOAuth {
                 created: now(),
             },
         );
-        let mut url = url::Url::parse(&self.provider.auth_uri).map_err(|e| Error::OAuth(e.to_string()))?;
+        let mut url =
+            url::Url::parse(&self.provider.auth_uri).map_err(|e| Error::OAuth(e.to_string()))?;
         {
             let mut q = url.query_pairs_mut();
             q.append_pair("client_id", &c.client_id)
@@ -325,7 +359,11 @@ impl OwnerOAuth {
         if let Some(s) = &c.client_secret {
             form.push(("client_secret", s.as_str()));
         }
-        let resp = HTTP.post(&self.provider.token_uri).form(&form).send().await?;
+        let resp = HTTP
+            .post(&self.provider.token_uri)
+            .form(&form)
+            .send()
+            .await?;
         let t: TokenResponse = check(resp).await?.json().await?;
         let email = t.id_token.as_deref().and_then(id_token_email);
         if let Some(owner) = &self.owner_email {
@@ -338,11 +376,16 @@ impl OwnerOAuth {
                         .send()
                         .await;
                 }
-                return Err(Error::OAuth("signed-in account is not the configured owner".into()));
+                return Err(Error::OAuth(
+                    "signed-in account is not the configured owner".into(),
+                ));
             }
         }
         let refresh_token = t.refresh_token.ok_or_else(|| {
-            Error::OAuth(format!("{} returned no refresh token (consent was not offline)", self.provider.name))
+            Error::OAuth(format!(
+                "{} returned no refresh token (consent was not offline)",
+                self.provider.name
+            ))
         })?;
         let stored = Stored {
             refresh_token,
@@ -398,7 +441,11 @@ impl OwnerOAuth {
         if let Some(s) = &c.client_secret {
             form.push(("client_secret", s.as_str()));
         }
-        let resp = HTTP.post(&self.provider.token_uri).form(&form).send().await?;
+        let resp = HTTP
+            .post(&self.provider.token_uri)
+            .form(&form)
+            .send()
+            .await?;
         let t: TokenResponse = check(resp).await?.json().await?;
         if let Some(rotated) = t.refresh_token.filter(|r| *r != stored.refresh_token) {
             self.store.save(&Stored {
@@ -414,7 +461,9 @@ impl OwnerOAuth {
 
     /// Revoke at the provider (when it has a revocation endpoint) and forget the sealed token.
     pub async fn unlink(&self) -> Result<()> {
-        if let (Some(stored), Some(revoke)) = (self.store.load::<Stored>()?, &self.provider.revoke_uri) {
+        if let (Some(stored), Some(revoke)) =
+            (self.store.load::<Stored>()?, &self.provider.revoke_uri)
+        {
             let _ = HTTP
                 .post(revoke)
                 .form(&[("token", stored.refresh_token.as_str())])
@@ -440,7 +489,11 @@ impl OwnerOAuth {
             "refresh_token": stored.refresh_token,
             "expiry": "2000-01-01T00:00:00Z",
         });
-        let kind = if self.provider.name == "microsoft" { "onedrive" } else { "drive" };
+        let kind = if self.provider.name == "microsoft" {
+            "onedrive"
+        } else {
+            "drive"
+        };
         let mut s = format!("[{name}]\ntype = {kind}\nclient_id = {}\n", c.client_id);
         if let Some(sec) = &c.client_secret {
             s.push_str(&format!("client_secret = {sec}\n"));
@@ -472,7 +525,10 @@ impl OwnerOAuth {
             redirect_uri: self.client.as_ref().map(|c| c.redirect_uri.clone()),
             linked: stored.is_some(),
             email: stored.as_ref().and_then(|s| s.email.clone()),
-            scopes: stored.as_ref().map(|s| s.scopes.clone()).unwrap_or_default(),
+            scopes: stored
+                .as_ref()
+                .map(|s| s.scopes.clone())
+                .unwrap_or_default(),
             linked_at: stored.as_ref().map(|s| s.created),
         })
     }

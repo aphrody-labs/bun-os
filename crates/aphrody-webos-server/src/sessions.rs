@@ -29,8 +29,53 @@ use axum::{
     routing::{get, post},
 };
 use futures_util::{SinkExt, StreamExt};
+use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
+use serde::Deserialize;
 use serde_json::json;
 use tokio_tungstenite::tungstenite::Message as UpMessage;
+
+const SESSION_COOKIE: &str = "aphrody_session";
+const SESSION_ISSUER: &str = "aphrody.com";
+const SESSION_AUDIENCE: &str = "bunos-webos";
+
+#[derive(Deserialize)]
+struct OwnerClaims {
+    sub: String,
+}
+
+fn owner_authenticated(headers: &HeaderMap) -> bool {
+    if !headers
+        .get(axum::http::header::ORIGIN)
+        .and_then(|origin| origin.to_str().ok())
+        .is_some_and(|origin| origin == "https://aphrody.com")
+    {
+        return false;
+    }
+    let Some(secret) = std::env::var("APHRODY_WEBOS_SESSION_KEY")
+        .ok()
+        .filter(|s| s.len() >= 32)
+    else {
+        return false;
+    };
+    let token = headers
+        .get(axum::http::header::COOKIE)
+        .and_then(|h| h.to_str().ok())
+        .into_iter()
+        .flat_map(|cookies| cookies.split(';'))
+        .filter_map(|cookie| cookie.trim().split_once('='))
+        .find_map(|(name, value)| (name == SESSION_COOKIE).then_some(value));
+    let Some(token) = token else { return false };
+    let mut validation = Validation::new(Algorithm::HS256);
+    validation.set_issuer(&[SESSION_ISSUER]);
+    validation.set_audience(&[SESSION_AUDIENCE]);
+    validation.set_required_spec_claims(&["exp", "iss", "aud", "sub"]);
+    decode::<OwnerClaims>(
+        token,
+        &DecodingKey::from_secret(secret.as_bytes()),
+        &validation,
+    )
+    .is_ok_and(|data| !data.claims.sub.is_empty())
+}
 
 #[derive(Clone)]
 struct Upstream {
@@ -105,7 +150,17 @@ async fn availability(State(sessions): State<Sessions>) -> Json<SessionAvailabil
     Json(sessions.availability())
 }
 
-async fn start(State(sessions): State<Sessions>, Json(_request): Json<StartSession>) -> Response {
+async fn start(
+    State(sessions): State<Sessions>,
+    headers: HeaderMap,
+    Json(_request): Json<StartSession>,
+) -> Response {
+    if !owner_authenticated(&headers) {
+        return error(
+            StatusCode::UNAUTHORIZED,
+            "Sign in with the Bun OS owner Google account first.",
+        );
+    }
     if sessions.upstream.is_none() {
         return error(
             StatusCode::SERVICE_UNAVAILABLE,
@@ -133,7 +188,14 @@ async fn start(State(sessions): State<Sessions>, Json(_request): Json<StartSessi
     (StatusCode::CREATED, Json(info)).into_response()
 }
 
-async fn stop(State(sessions): State<Sessions>, Path(id): Path<String>) -> StatusCode {
+async fn stop(
+    State(sessions): State<Sessions>,
+    headers: HeaderMap,
+    Path(id): Path<String>,
+) -> StatusCode {
+    if !owner_authenticated(&headers) {
+        return StatusCode::UNAUTHORIZED;
+    }
     match sessions
         .live
         .lock()
@@ -151,6 +213,12 @@ async fn stream(
     headers: HeaderMap,
     upgrade: WebSocketUpgrade,
 ) -> Response {
+    if !owner_authenticated(&headers) {
+        return error(
+            StatusCode::UNAUTHORIZED,
+            "Sign in with the Bun OS owner Google account first.",
+        );
+    }
     let offered = headers
         .get("sec-websocket-protocol")
         .and_then(|v| v.to_str().ok())

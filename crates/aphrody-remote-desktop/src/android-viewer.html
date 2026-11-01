@@ -4,38 +4,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090b10">
 <title>Android</title>
 <style>
-html,body{margin:0;height:100%;background:#000;color:#ddd;font:14px system-ui,sans-serif;overflow:hidden}
-#c{display:block;margin:auto;max-width:100vw;max-height:100vh;touch-action:none;outline:none}
-#bar{position:fixed;left:8px;bottom:8px;opacity:.7;font-size:12px;pointer-events:none}
-#connect{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;gap:8px}
-#tools{position:fixed;right:8px;bottom:8px;display:flex;gap:6px;align-items:center}
-#tools input{width:min(48vw,24em)}
-input,button{padding:7px;background:#111;color:#eee;border:1px solid #555;border-radius:4px}
+*{box-sizing:border-box}
+:root{color-scheme:dark;font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;background:#090b10;color:#f5f6fa}
+html,body{margin:0;width:100%;height:100%;height:100dvh;background:#090b10;overflow:hidden}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#c{display:block;margin:auto;max-width:100%;max-height:100%;touch-action:none;outline:none}
+#c:focus-visible{outline:2px solid #a5b4fc;outline-offset:-4px}
+#bar{position:fixed;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));max-width:min(78vw,42rem);padding:10px 14px;border:1px solid #343844;border-radius:999px;background:rgb(17 19 26 / 94%);color:#f5f6fa;font-size:13px;line-height:1.4;box-shadow:0 8px 28px rgb(0 0 0 / 35%);pointer-events:none}
+#tools{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center;padding:8px;border:1px solid #343844;border-radius:18px;background:rgb(17 19 26 / 96%);box-shadow:0 8px 28px rgb(0 0 0 / 40%);max-width:calc(100vw - 24px)}
+#tools input{width:min(48vw,24em);min-width:0;height:48px;padding:0 14px;background:#0c0e14;color:#f5f6fa;border:1px solid #555d70;border-radius:12px;font:inherit}
+#tools input::placeholder{color:#c2c7d2}
+input,button{font:inherit}
+button{min-width:48px;min-height:48px;padding:0 16px;background:#c7d2fe;color:#111827;border:1px solid #c7d2fe;border-radius:12px;font-weight:650;cursor:pointer;transition:background-color 140ms ease,border-color 140ms ease,transform 140ms ease}
+button:hover{background:#e0e7ff;border-color:#e0e7ff}
+button:active{transform:scale(.98)}
+button:focus-visible,input:focus-visible{outline:3px solid #a5b4fc;outline-offset:3px}
+@media(max-width:560px){#bar{top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));font-size:12px;padding:8px 12px;border-radius:14px}#tools{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));justify-content:flex-end}#tools input{flex:1;width:auto}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
+@media(forced-colors:active){#bar,#tools{border:1px solid CanvasText}button:focus-visible,input:focus-visible,#c:focus-visible{outline:2px solid CanvasText;outline-offset:3px}}
 </style>
 </head>
 <body>
 <canvas id="c" tabindex="0"></canvas>
-<div id="bar"></div>
-<div id="tools"><button id="text-toggle" type="button" aria-label="Open text keyboard">Text</button><input id="text-entry" type="text" placeholder="Type into Android…" autocomplete="off" enterkeyhint="send" hidden><button id="text-send" type="button" hidden>Send</button></div>
+<div id="bar" role="status" aria-live="polite">Connecting to Bun OS…</div>
+<div id="tools"><button id="text-toggle" type="button" aria-label="Open text keyboard" aria-expanded="false">Text keyboard</button><input id="text-entry" type="text" aria-label="Text to send to Android" placeholder="Type into Android…" autocomplete="off" enterkeyhint="send" hidden><button id="text-send" type="button" hidden>Send</button></div>
 <script>
 "use strict";
 const canvas = document.getElementById("c"), bar = document.getElementById("bar");
 const ctx = canvas.getContext("2d");
-const KEY = "aphrody.android.token";
-function token() {
-  const h = new URLSearchParams(location.hash.slice(1)).get("token");
-  if (h) { localStorage.setItem(KEY, h); history.replaceState(null, "", location.pathname); }
-  return localStorage.getItem(KEY);
-}
-function ask() {
-  const f = document.createElement("form");
-  f.id = "connect";
-  f.innerHTML = '<input type="password" placeholder="Session token" autocomplete="off"><button>Connect</button>';
-  f.onsubmit = (e) => { e.preventDefault(); localStorage.setItem(KEY, f.querySelector("input").value.trim()); f.remove(); start(); };
-  document.body.append(f);
-}
+try { localStorage.removeItem("aphrody.android.token"); } catch {}
 let ws, decoder, codec, frames = 0, fps = 0, lastInput = 0, latency = 0, buttons = 0;
 const gamepadBefore = Array(4).fill(null);
 let gamepadLabel = "no gamepad";
@@ -55,11 +55,17 @@ function configure(c) {
   decoder.configure({ codec: c, optimizeForLatency: true, hardwareAcceleration: "prefer-hardware" });
 }
 let pendingConfig = null;
-function start() {
-  const t = token();
-  if (!t) return ask();
+async function start() {
+  bar.textContent = "Checking Google owner session…";
+  let session;
+  try {
+    const response = await fetch("/api/sessions", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ width: screen.width, height: screen.height }) });
+    if (response.status === 401) { location.assign("/api/google/session/login"); return; }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    session = await response.json();
+  } catch (e) { bar.textContent = `Could not start Bun OS session: ${e.message}`; return; }
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
-  ws = new WebSocket(`${proto}//${location.host}${location.pathname.replace(/\/$/, "")}/stream`, ["bearer." + t]);
+  ws = new WebSocket(`${proto}//${location.host}${session.stream}`, ["bearer." + session.token]);
   ws.binaryType = "arraybuffer";
   ws.onmessage = (ev) => {
     if (typeof ev.data === "string") {
@@ -78,7 +84,11 @@ function start() {
     if (kind === 2 && pendingConfig) { chunk = new Uint8Array(pendingConfig.length + data.length); chunk.set(pendingConfig); chunk.set(data, pendingConfig.length); pendingConfig = null; }
     decoder.decode(new EncodedVideoChunk({ type: kind === 2 ? "key" : "delta", timestamp: pts, data: chunk }));
   };
-  ws.onclose = (e) => { if (e.code === 1006 || e.code === 1000) setTimeout(start, 1500); };
+  ws.onclose = (e) => {
+    if (e.code === 1006 || e.code === 1000) {
+      fetch(`/api/sessions/${session.id}`, { method: "DELETE", credentials: "same-origin", keepalive: true }).finally(() => setTimeout(() => location.reload(), 1500));
+    }
+  };
 }
 function pos(e) {
   const r = canvas.getBoundingClientRect();
@@ -97,6 +107,7 @@ document.addEventListener("paste", (e) => { const text = e.clipboardData?.getDat
 const textEntry = document.getElementById("text-entry"), textSend = document.getElementById("text-send");
 document.getElementById("text-toggle").onclick = () => {
   textEntry.hidden = !textEntry.hidden; textSend.hidden = textEntry.hidden;
+  document.getElementById("text-toggle").setAttribute("aria-expanded", String(!textEntry.hidden));
   if (!textEntry.hidden) textEntry.focus(); else canvas.focus();
 };
 function sendText() {

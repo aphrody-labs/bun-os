@@ -14,6 +14,7 @@ Wants=network-online.target
 Type=simple
 User=ubuntu
 EnvironmentFile=/etc/aphrody/google.env
+EnvironmentFile=/etc/aphrody/webos-session.env
 ExecStart=/home/ubuntu/.local/bin/bun-os-google serve --listen 127.0.0.1:8802
 Restart=always
 RestartSec=3

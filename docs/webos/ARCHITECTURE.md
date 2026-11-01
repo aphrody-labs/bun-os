@@ -10,6 +10,13 @@ The aphrody.com WebOS site (a JavaScript desktop with 17 JS apps, a Cloudflare-W
 
 Sessions (owner pivot, final): one session type. Bun OS is a single unified image (Android 17 as a native container, ChromiumOS components, COSMIC and Bun OS, one UI, no OS emulators or VMs). A WebOS session is a per-user container of that unified rootfs, COSMIC running in cage with Android inside it, streamed by the Rust gateway. The per-OS session types of the first drafts (Pop!_OS, Redox under QEMU, Android emulator, Googlebook, ChromiumOS VM, separate Wine and Proton sessions) are retired from `aphrody-webos-protocol` (version 2) and the server. The image is `factory/images/bunos-unified` (target `session` for WebOS, `unified` for the bootable disk); its layout and the session container contract (entrypoint `bunos-unified-session`, cage on `wayland-0`, nested cosmic-comp on `wayland-1`, gateway on 8794 inside the container network, private binderfs per session, signed-in users only) are in [`docs/UNIFIED-IMAGE.md`](../UNIFIED-IMAGE.md). Until the unified desktop streams, the session upstream is the Android gateway, the fallback path that sends H.264 for WebCodecs (`ServerEvent::Video`).
 
+The Android viewer uses the owner Google OAuth flow at `/api/google/session/login`. The callback issues a 12-hour
+`HttpOnly; Secure; SameSite=Lax` cookie only after the configured owner email has been verified. `/api/sessions` and
+the stream and stop endpoints validate that signed cookie; their stream subprotocol token is random and scoped to
+that session. The upstream Android bearer remains in `/etc/aphrody/android.token` on the server. The Google and WebOS
+services share a separate signing key from `/etc/aphrody/webos-session.env` (`APHRODY_WEBOS_SESSION_KEY`), owned by
+root and readable by the `ubuntu` service account. This is provisioned on the VPS and must not be committed.
+
 ## What is removed
 
 The JS shell, window manager and all JS apps (`apps/webos/src`), the Atlas, Store and Emulators JS UIs, `worker/` and `services/` (the Bun HTTP service), `wrangler.jsonc`, the TypeScript build and deploy scripts (`build*.ts`, `make.ts`, `deploy.ts`, `packages.ts`, `seo.ts`, `vm.ts`), `public/`, the tests of removed code, and the OPFS wasm of the shell (`crates/aphrody-webos-wasm`, `packages/webos-wasm`). Temporary exceptions, deleted by their owners as soon as the Rust ports land: `inventory.ts`, `store/`, `services/wayland.ts`, `contracts/` (type reference only).

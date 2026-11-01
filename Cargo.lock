@@ -3845,6 +3845,8 @@ dependencies = [
  "bun-ui-web",
  "futures-util",
  "getrandom 0.4.3",
+ "jsonwebtoken",
+ "serde",
  "serde_json",
  "tokio",
  "tokio-tungstenite 0.29.0",

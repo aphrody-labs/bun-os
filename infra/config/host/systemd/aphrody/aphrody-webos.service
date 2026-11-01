@@ -16,6 +16,7 @@ Environment=WEBOS_OBJECTS=/home/ubuntu/apps/webos/objects
 Environment=WEBOS_SESSION=ws://127.0.0.1:8799/api/android/stream
 Environment=WEBOS_SESSION_MODE=native
 Environment=WEBOS_SESSION_TOKEN_FILE=/etc/aphrody/android.token
+EnvironmentFile=/etc/aphrody/webos-session.env
 EnvironmentFile=/home/ubuntu/apps/webos/current/release.env
 ExecStart=/home/ubuntu/apps/webos/current/aphrody-webos
 Restart=always

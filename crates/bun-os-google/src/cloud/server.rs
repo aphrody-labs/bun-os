@@ -26,7 +26,9 @@ use axum::extract::{Query, State};
 use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{Html, IntoResponse, Redirect, Response};
 use axum::routing::{get, post};
+use jsonwebtoken::{Algorithm, EncodingKey, Header, encode};
 use serde::Deserialize;
+use serde::Serialize;
 use serde_json::json;
 use std::sync::Arc;
 
@@ -74,7 +76,10 @@ impl GoogleService {
     }
     fn is_admin(&self, headers: &HeaderMap, key: Option<&str>) -> Result<(), Response> {
         let Some(expected) = &self.admin_token else {
-            return Err(fail(StatusCode::SERVICE_UNAVAILABLE, "APHRODY_GOOGLE_ADMIN_TOKEN is not configured"));
+            return Err(fail(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "APHRODY_GOOGLE_ADMIN_TOKEN is not configured",
+            ));
         };
         let bearer = headers
             .get(header::AUTHORIZATION)
@@ -108,6 +113,7 @@ pub fn router(svc: Arc<GoogleService>) -> Router {
     Router::new()
         .route("/api/google/status", get(status))
         .route("/api/google/login", get(login))
+        .route("/api/google/session/login", get(session_login))
         .route("/api/google/callback", get(callback))
         .route("/api/google/token/refresh", post(refresh))
         .route("/api/google/token", get(token))
@@ -162,11 +168,33 @@ async fn login(State(s): Svc, headers: HeaderMap, Query(q): Query<KeyQuery>) -> 
     start(&s, &s.owner, &headers, q).await
 }
 
+async fn session_login(State(s): Svc) -> Response {
+    if s.owner.configured_owner_email().is_none()
+        || std::env::var("APHRODY_WEBOS_SESSION_KEY")
+            .ok()
+            .is_none_or(|key| key.len() < 32)
+    {
+        return fail(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "The Bun OS owner session is not configured.",
+        );
+    }
+    match s.owner.begin().await {
+        Ok(url) => Redirect::to(&url).into_response(),
+        Err(e) => from_error(&e),
+    }
+}
+
 async fn ms_login(State(s): Svc, headers: HeaderMap, Query(q): Query<KeyQuery>) -> Response {
     start(&s, &s.microsoft, &headers, q).await
 }
 
-async fn start(s: &GoogleService, broker: &OwnerOAuth, headers: &HeaderMap, q: KeyQuery) -> Response {
+async fn start(
+    s: &GoogleService,
+    broker: &OwnerOAuth,
+    headers: &HeaderMap,
+    q: KeyQuery,
+) -> Response {
     if let Err(r) = s.is_admin(headers, q.key.as_deref()) {
         return r;
     }
@@ -184,7 +212,92 @@ struct CallbackQuery {
 }
 
 async fn callback(State(s): Svc, Query(q): Query<CallbackQuery>) -> Response {
-    finish(&s.owner, "Google", q).await
+    finish_owner(&s, q).await
+}
+
+#[derive(Serialize)]
+struct WebSessionClaims<'a> {
+    iss: &'static str,
+    aud: &'static str,
+    sub: &'a str,
+    exp: u64,
+    iat: u64,
+}
+
+async fn finish_owner(s: &GoogleService, q: CallbackQuery) -> Response {
+    let page = |code: StatusCode, title: &str, body: &str| {
+        (code, Html(format!("<!doctype html><meta charset=utf-8><title>{title}</title><body style=\"font:16px system-ui;margin:3em\"><h1>{title}</h1><p>{body}</p>"))).into_response()
+    };
+    if let Some(err) = q.error {
+        let err: String = err
+            .chars()
+            .filter(|c| c.is_ascii_alphanumeric() || *c == '_')
+            .collect();
+        return page(StatusCode::BAD_REQUEST, "Google sign-in cancelled", &err);
+    }
+    let (Some(state), Some(code)) = (q.state, q.code) else {
+        return page(
+            StatusCode::BAD_REQUEST,
+            "Missing parameters",
+            "state and code are required",
+        );
+    };
+    match s.owner.complete(&state, &code).await {
+        Ok(status) => {
+            let (Some(email), Some(secret)) = (
+                status.email.as_deref(),
+                std::env::var("APHRODY_WEBOS_SESSION_KEY")
+                    .ok()
+                    .filter(|key| key.len() >= 32),
+            ) else {
+                return page(
+                    StatusCode::SERVICE_UNAVAILABLE,
+                    "Session sign-in unavailable",
+                    "The owner session is not configured.",
+                );
+            };
+            if s.owner.configured_owner_email() != Some(email) {
+                return page(
+                    StatusCode::FORBIDDEN,
+                    "Owner sign-in required",
+                    "This Google account is not the configured Bun OS owner.",
+                );
+            }
+            let now = jsonwebtoken::get_current_timestamp();
+            let claims = WebSessionClaims {
+                iss: "aphrody.com",
+                aud: "bunos-webos",
+                sub: email,
+                iat: now,
+                exp: now + 12 * 60 * 60,
+            };
+            let token = match encode(
+                &Header::new(Algorithm::HS256),
+                &claims,
+                &EncodingKey::from_secret(secret.as_bytes()),
+            ) {
+                Ok(token) => token,
+                Err(_) => {
+                    return page(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "Session sign-in failed",
+                        "Could not establish the owner session.",
+                    );
+                }
+            };
+            let mut response = Redirect::to("/api/android/").into_response();
+            response.headers_mut().insert(
+                header::SET_COOKIE,
+                format!(
+                    "aphrody_session={token}; Path=/; Max-Age=43200; HttpOnly; Secure; SameSite=Lax"
+                )
+                .parse()
+                .expect("valid cookie header"),
+            );
+            response
+        }
+        Err(e) => from_error(&e),
+    }
 }
 
 async fn ms_callback(State(s): Svc, Query(q): Query<CallbackQuery>) -> Response {
@@ -202,11 +315,22 @@ async fn finish(broker: &OwnerOAuth, label: &str, q: CallbackQuery) -> Response 
             .into_response()
     };
     if let Some(err) = q.error {
-        let err: String = err.chars().filter(|c| c.is_ascii_alphanumeric() || *c == '_').collect();
-        return page(StatusCode::BAD_REQUEST, &format!("{label} sign-in cancelled"), &err);
+        let err: String = err
+            .chars()
+            .filter(|c| c.is_ascii_alphanumeric() || *c == '_')
+            .collect();
+        return page(
+            StatusCode::BAD_REQUEST,
+            &format!("{label} sign-in cancelled"),
+            &err,
+        );
     }
     let (Some(state), Some(code)) = (q.state, q.code) else {
-        return page(StatusCode::BAD_REQUEST, "Missing parameters", "state and code are required");
+        return page(
+            StatusCode::BAD_REQUEST,
+            "Missing parameters",
+            "state and code are required",
+        );
     };
     match broker.complete(&state, &code).await {
         Ok(st) => page(
@@ -218,7 +342,11 @@ async fn finish(broker: &OwnerOAuth, label: &str, q: CallbackQuery) -> Response 
                 st.scopes.len()
             ),
         ),
-        Err(e) => page(StatusCode::BAD_REQUEST, &format!("{label} sign-in failed"), &e.to_string()),
+        Err(e) => page(
+            StatusCode::BAD_REQUEST,
+            &format!("{label} sign-in failed"),
+            &e.to_string(),
+        ),
     }
 }
 
@@ -256,7 +384,11 @@ async fn token(State(s): Svc, headers: HeaderMap, Query(q): Query<TokenQuery>) -
         "owner" => s.owner.access_token().await,
         "service" => match &s.adc {
             Some(a) => {
-                let scopes: Vec<&str> = q.scope.as_deref().map(|v| v.split_whitespace().collect()).unwrap_or_default();
+                let scopes: Vec<&str> = q
+                    .scope
+                    .as_deref()
+                    .map(|v| v.split_whitespace().collect())
+                    .unwrap_or_default();
                 a.token(&scopes).await
             }
             None => Err(Error::Config("no ADC".into())),
@@ -302,11 +434,21 @@ macro_rules! owner_route {
     };
 }
 
-owner_route!(drive_root, |t: String| async move { api::drive_root(&t, 50).await });
-owner_route!(gmail_labels, |t: String| async move { api::gmail_labels(&t).await });
-owner_route!(calendar_list, |t: String| async move { api::calendar_list(&t).await });
-owner_route!(youtube_channels, |t: String| async move { api::youtube_my_channels(&t).await });
-owner_route!(people_connections, |t: String| async move { api::people_connections(&t, 100).await });
+owner_route!(drive_root, |t: String| async move {
+    api::drive_root(&t, 50).await
+});
+owner_route!(gmail_labels, |t: String| async move {
+    api::gmail_labels(&t).await
+});
+owner_route!(calendar_list, |t: String| async move {
+    api::calendar_list(&t).await
+});
+owner_route!(youtube_channels, |t: String| async move {
+    api::youtube_my_channels(&t).await
+});
+owner_route!(people_connections, |t: String| async move {
+    api::people_connections(&t, 100).await
+});
 
 async fn gcs_buckets(State(s): Svc, headers: HeaderMap) -> Response {
     if let Err(r) = s.is_admin(&headers, None) {
@@ -371,11 +513,20 @@ fn rfc3339(secs: u64) -> String {
     let d = doy - (153 * mp + 2) / 5 + 1;
     let m = if mp < 10 { mp + 3 } else { mp - 9 };
     let y = yoe + era * 400 + i64::from(m <= 2);
-    format!("{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z", rem / 3600, rem % 3600 / 60, rem % 60)
+    format!(
+        "{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z",
+        rem / 3600,
+        rem % 3600 / 60,
+        rem % 60
+    )
 }
 
-ms_route!(ms_onedrive_root, |t: String| async move { api::onedrive_root(&t).await });
-ms_route!(ms_outlook_messages, |t: String| async move { api::outlook_messages(&t, 25).await });
+ms_route!(ms_onedrive_root, |t: String| async move {
+    api::onedrive_root(&t).await
+});
+ms_route!(ms_outlook_messages, |t: String| async move {
+    api::outlook_messages(&t, 25).await
+});
 ms_route!(ms_calendar_week, |t: String| async move {
     let now = super::now();
     api::graph_calendar_view(&t, &rfc3339(now), &rfc3339(now + 7 * 86_400)).await
