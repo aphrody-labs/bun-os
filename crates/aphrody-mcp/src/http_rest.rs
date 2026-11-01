@@ -36,7 +36,7 @@ struct RagQuery {
 }
 
 pub(crate) fn router() -> Router {
-    Router::new()
+    let router = Router::new()
         .route("/healthz", get(health_handler))
         .route("/api/v1/models", get(models_handler))
         .route("/v1/models", get(openai_models_handler))
@@ -46,7 +46,57 @@ pub(crate) fn router() -> Router {
         )
         .route("/api/v1/aphrody/status", get(aphrody_status_handler))
         .route("/api/v1/rag/query", get(rag_query_handler))
-        .route("/api/v1/rag/stats", get(rag_stats_handler))
+        .route("/api/v1/rag/stats", get(rag_stats_handler));
+    #[cfg(feature = "rag")]
+    let router = router.route("/api/v1/rag/search", get(rag_search_handler));
+    router
+}
+
+#[cfg(feature = "rag")]
+#[derive(Debug, Deserialize)]
+struct RagSearchQuery {
+    q: Option<String>,
+    limit: Option<usize>,
+    path_prefix: Option<String>,
+}
+
+/// The browser HTTP endpoint delegates to the exact SQLite search pipeline
+/// exposed by `aphrody_rag_search` over MCP. The older PostgreSQL `/query`
+/// route remains available as a lightweight compatibility endpoint.
+#[cfg(feature = "rag")]
+async fn rag_search_handler(Query(params): Query<RagSearchQuery>) -> Response {
+    let query = params.q.unwrap_or_default().trim().to_owned();
+    let limit = params.limit.unwrap_or(8);
+    if query.is_empty() || !(1..=50).contains(&limit) {
+        return (
+            StatusCode::BAD_REQUEST,
+            response(
+                json!({ "error": "q is required and limit must be from 1 to 50" }),
+                "no-store",
+            ),
+        )
+            .into_response();
+    }
+    let request = crate::rag_tools::RagSearchRequest {
+        query,
+        limit: Some(limit),
+        path_prefix: params.path_prefix,
+    };
+    match crate::rag_tools::run(&request).await {
+        Ok(result) => response(
+            serde_json::to_value(result)
+                .unwrap_or_else(|_| json!({ "error": "invalid search result" })),
+            "no-store",
+        ),
+        Err(_) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            response(
+                json!({ "error": "Aphrody RAG search is unavailable" }),
+                "no-store",
+            ),
+        )
+            .into_response(),
+    }
 }
 
 /// Build a chat-upstream request. Gateway/provider credentials are never used

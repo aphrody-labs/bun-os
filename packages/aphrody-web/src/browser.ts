@@ -4,25 +4,34 @@
 export interface HttpSearchOptions {
   query: string;
   limit?: number;
+  pathPrefix?: string;
   signal?: AbortSignal;
 }
 
 export interface HttpSearchHit {
-  title: string | null;
-  url: string | null;
-  corpus: string | null;
-  snippet: string;
-  match: string;
+  chunk: {
+    id: number;
+    doc_id: number;
+    path: string;
+    chunk_index: number;
+    heading: string | null;
+    symbol: string | null;
+    content: string;
+    start_line: number;
+    end_line: number;
+    token_count: number;
+  };
+  score: number;
+  channel: string;
 }
 
 export interface HttpSearchReport {
   query: string;
-  total_matches: number;
-  limit: number;
-  source: string;
-  status: "ok" | "unavailable" | "query_required";
-  reason?: string;
-  results: HttpSearchHit[];
+  hits: HttpSearchHit[];
+  mode_served: "lexical" | "vector" | "hybrid";
+  fallback_reason: string | null;
+  elapsed_ms: number;
+  total_candidates: number;
 }
 
 export interface HttpSearchClientOptions {
@@ -52,7 +61,7 @@ export function createHttpSearchClient(options: HttpSearchClientOptions) {
   if (!((base.protocol === "https:" || base.protocol === "http:") && !base.username && !base.password)) {
     throw new TypeError("baseUrl must be an HTTP(S) origin without credentials");
   }
-  const endpoint = new URL("/api/v1/rag/query", base.origin);
+  const endpoint = new URL("/api/v1/rag/search", base.origin);
   const fetcher = options.fetch ?? globalThis.fetch;
   if (typeof fetcher !== "function") throw new TypeError("a Fetch API implementation is required");
 
@@ -68,6 +77,7 @@ export function createHttpSearchClient(options: HttpSearchClientOptions) {
       const url = new URL(endpoint);
       url.searchParams.set("q", query);
       url.searchParams.set("limit", String(limit));
+      if (request.pathPrefix !== undefined) url.searchParams.set("path_prefix", request.pathPrefix);
       const response = await fetcher(url, {
         method: "GET",
         headers: { accept: "application/json" },
@@ -89,13 +99,12 @@ function isSearchReport(value: unknown): value is HttpSearchReport {
   const report = value as Partial<HttpSearchReport>;
   return (
     typeof report.query === "string" &&
-    Number.isInteger(report.total_matches) &&
-    Number.isInteger(report.limit) &&
-    typeof report.source === "string" &&
-    (report.status === "ok" || report.status === "unavailable" || report.status === "query_required") &&
-    (report.reason === undefined || typeof report.reason === "string") &&
-    Array.isArray(report.results) &&
-    report.results.every(isSearchHit)
+    Array.isArray(report.hits) &&
+    report.hits.every(isSearchHit) &&
+    (report.mode_served === "lexical" || report.mode_served === "vector" || report.mode_served === "hybrid") &&
+    (report.fallback_reason === null || typeof report.fallback_reason === "string") &&
+    Number.isFinite(report.elapsed_ms) &&
+    Number.isInteger(report.total_candidates)
   );
 }
 
@@ -103,10 +112,27 @@ function isSearchHit(value: unknown): value is HttpSearchHit {
   if (typeof value !== "object" || value === null) return false;
   const hit = value as Partial<HttpSearchHit>;
   return (
-    (hit.title === null || typeof hit.title === "string") &&
-    (hit.url === null || typeof hit.url === "string") &&
-    (hit.corpus === null || typeof hit.corpus === "string") &&
-    typeof hit.snippet === "string" &&
-    typeof hit.match === "string"
+    Number.isFinite(hit.score) &&
+    typeof hit.channel === "string" &&
+    typeof hit.chunk === "object" &&
+    hit.chunk !== null &&
+    isSearchChunk(hit.chunk)
+  );
+}
+
+function isSearchChunk(value: unknown): value is HttpSearchHit["chunk"] {
+  if (typeof value !== "object" || value === null) return false;
+  const chunk = value as Partial<HttpSearchHit["chunk"]>;
+  return (
+    Number.isInteger(chunk.id) &&
+    Number.isInteger(chunk.doc_id) &&
+    typeof chunk.path === "string" &&
+    Number.isInteger(chunk.chunk_index) &&
+    (chunk.heading === null || typeof chunk.heading === "string") &&
+    (chunk.symbol === null || typeof chunk.symbol === "string") &&
+    typeof chunk.content === "string" &&
+    Number.isInteger(chunk.start_line) &&
+    Number.isInteger(chunk.end_line) &&
+    Number.isInteger(chunk.token_count)
   );
 }

@@ -87,8 +87,10 @@ const results = await searchIndex({
 `searchIndex()` queries Aphrody's existing RAG index; it does not claim public
 Google SERP results. Ingest pages first with `web crawl-index` or
 `rag web-ingest`. The JS package currently targets Bun because it uses
-`Bun.spawn`; browser and generic JavaScript runtimes need a versioned HTTP
-service contract and a Fetch-based client, which are not implemented yet. The
+`Bun.spawn`; browser and generic JavaScript applications can use the separate
+`@aphrody/web-crawl/browser` entry and the versioned
+`/api/v1/rag/search` route. The service must include the MCP `rag` feature and
+be exposed through same-origin routing or an authenticated CORS gateway. The
 package does not download or launch a browser. Install the browser services
 separately when `browser: "playwright"` is used.
 

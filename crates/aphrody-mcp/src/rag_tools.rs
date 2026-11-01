@@ -219,7 +219,7 @@ pub(crate) struct RagSearchRequest {
     pub(crate) path_prefix: Option<String>,
 }
 
-async fn run(req: &RagSearchRequest) -> Result<aphrody_rag::SearchResult, String> {
+pub(crate) async fn run(req: &RagSearchRequest) -> Result<aphrody_rag::SearchResult, String> {
     if req.query.trim().is_empty() {
         return Err("query is empty".into());
     }

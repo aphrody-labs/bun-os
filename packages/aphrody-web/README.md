@@ -83,8 +83,10 @@ requires the local Aphrody Obscura browser and Playwright bridge services. Use
 ### Browser and generic JavaScript search
 
 The `@aphrody/web-crawl/browser` entry point uses only the Fetch API and talks
-to Aphrody's existing REST RAG endpoint. It can run in browsers and other JS
-runtimes that provide `fetch`:
+to `/api/v1/rag/search`, which delegates to the same SQLite retrieval pipeline
+as the `aphrody_rag_search` MCP tool. Build `aphrody-mcp` with its `rag`
+feature to enable this endpoint. It can run in browsers and other JS runtimes
+that provide `fetch`:
 
 ```ts
 import { createHttpSearchClient } from "@aphrody/web-crawl/browser";
@@ -96,8 +98,9 @@ const result = await web.search({
 });
 ```
 
-This endpoint currently provides keyword RAG lookup, not public web SERP or
-hybrid/vector retrieval. The gateway is private by default: browser callers
-need same-origin hosting or an operator-configured CORS gateway. Do not put a
-server bearer secret in public browser code. The normal package entry remains
-Bun-only and supplies recursive crawl plus local index search.
+The endpoint returns ranked local RAG results and honest mode/fallback
+metadata. It does not perform public web SERP. The gateway is private by
+default: browser callers need same-origin hosting or an operator-configured
+CORS/authenticated gateway. Do not put a server bearer secret in public
+browser code. The normal package entry remains Bun-only and supplies recursive
+crawl plus local index search.

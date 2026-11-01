@@ -130,17 +130,21 @@ lists, `/api/v1/aphrody/status` and the RAG routes answer without a token.
 case, a missing or incorrect header returns 401. Keep this listener private and
 apply authentication on any gateway.
 
-| Route                                 | Response                                                                                      |
-| ------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `GET /healthz`                        | `{status:"ok",service}`                                                                       |
-| `GET /api/v1/models`                  | Registered local models                                                                       |
-| `GET /v1/models`                      | OpenAI-format model list                                                                      |
-| `POST /v1/chat/completions`           | Relay (JSON or SSE) to the chat upstream at `APHRODY_AI_CHAT_BASE_URL`; 503 when unconfigured |
-| `GET /api/v1/aphrody/status`          | Subsystem status and chat upstream reachability                                               |
-| `GET /api/v1/rag/query?q=...&limit=5` | Keyword hits over `aphrody_rag_documents` (`limit` capped at 20)                              |
-| `GET /api/v1/rag/stats`               | Document and chunk counts, `unavailable` without the database                                 |
+| Route                                  | Response                                                                                      |
+| -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `GET /healthz`                         | `{status:"ok",service}`                                                                       |
+| `GET /api/v1/models`                   | Registered local models                                                                       |
+| `GET /v1/models`                       | OpenAI-format model list                                                                      |
+| `POST /v1/chat/completions`            | Relay (JSON or SSE) to the chat upstream at `APHRODY_AI_CHAT_BASE_URL`; 503 when unconfigured |
+| `GET /api/v1/aphrody/status`           | Subsystem status and chat upstream reachability                                               |
+| `GET /api/v1/rag/query?q=...&limit=5`  | Keyword hits over `aphrody_rag_documents` (`limit` capped at 20)                              |
+| `GET /api/v1/rag/search?q=...&limit=8` | Ranked local SQLite RAG search (FTS/vector/hybrid); requires the `rag` feature                |
+| `GET /api/v1/rag/stats`                | Document and chunk counts, `unavailable` without the database                                 |
 
-RAG routes use `APHRODY_MCP_DATABASE_URL`.
+`/api/v1/rag/query` and `/api/v1/rag/stats` use `APHRODY_MCP_DATABASE_URL`.
+`/api/v1/rag/search` uses the same local index, embedder, reranker and Redis
+cache as `aphrody_rag_search`. The listener stays private; public gateways
+must apply authentication and browser CORS policy before exposing REST routes.
 
 ## Cross-platform
 
