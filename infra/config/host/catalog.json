@@ -96,6 +96,14 @@
       "targetHost": "vps"
     },
     {
+      "service": "aphrody-web-playwright-vps",
+      "unit": "aphrody-web-playwright-vps.service",
+      "path": "systemd/aphrody/aphrody-web-playwright-vps.service",
+      "dropIns": [],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps"
+    },
+    {
       "service": "aphrody-web-browser-dbfr",
       "unit": "aphrody-web-browser-dbfr.service",
       "path": "systemd/aphrody/aphrody-web-browser-dbfr.service",
@@ -254,6 +262,30 @@
       "ownerRepo": "aphrody",
       "targetHost": "dbfr",
       "pairs": "aphrody-self-update-dbfr.service"
+    },
+    {
+      "service": "aphrody-mcp-http",
+      "unit": "aphrody-mcp-http.service",
+      "path": "systemd/aphrody/aphrody-mcp-http.service",
+      "dropIns": [],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps"
+    },
+    {
+      "service": "omar-browser-client-vps",
+      "unit": "aphrody-obscura-omar-client.service",
+      "path": "systemd/omar/aphrody-obscura-omar-client.service",
+      "dropIns": [],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps"
+    },
+    {
+      "service": "aphrody-jobs-worker-vps",
+      "unit": "aphrody-jobs-worker-vps.service",
+      "path": "systemd/aphrody/aphrody-jobs-worker-vps.service",
+      "dropIns": [],
+      "ownerRepo": "aphrody",
+      "targetHost": "vps"
     },
     {
       "service": "aphrody-jobs-worker-dbfr",

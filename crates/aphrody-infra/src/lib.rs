@@ -13,6 +13,8 @@ pub mod catalog;
 pub mod cli;
 pub mod devenv;
 pub mod drive;
+pub mod host_apply;
+pub mod host_pull;
 pub mod layout;
 pub mod lifecycle;
 pub mod local_ai;

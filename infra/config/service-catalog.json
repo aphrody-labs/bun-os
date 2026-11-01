@@ -212,9 +212,38 @@
       "workingDirectory": "/home/ubuntu/apps/aphrody/shared/agent-workspaces/aphrody",
       "public": false,
       "host": "vps",
-      "note": "Merged on 2026-10-09 into aphrody-mcp-http-dbfr (drop-in 50-migration-vps.conf: debate RAG database on local 5432, yolo/m3 tool hosts); the vps unit was removed. Runbook: docs/operations/infra/MCP-A2A.md",
-      "status": "retired",
-      "retiredAt": "2026-10-09"
+      "capabilities": ["jobs", "web-crawl", "obscura-browser"],
+      "note": "Private VPS MCP for local queue control and crawl/browser tools. Isolated queue under /home/ubuntu/.aphrody; no DBFR queue or public listener. Enable only after jobs+mcp-jobs binary, protected bearer and authenticated probes are qualified."
+    },
+    {
+      "id": "aphrody-web-browser-vps",
+      "application": "aphrody",
+      "kind": "rust-http",
+      "runtime": "rust",
+      "unit": "aphrody-web-browser-vps.service",
+      "health": "http://127.0.0.1:9222/json/version",
+      "port": 9222,
+      "sourceRepo": "aphrody",
+      "workingDirectory": "/home/ubuntu/.aphrody/private/web",
+      "public": false,
+      "host": "vps",
+      "capabilities": ["obscura-cdp"],
+      "note": "Loopback-only Obscura CDP engine used by the VPS Playwright rendering bridge."
+    },
+    {
+      "id": "aphrody-web-playwright-vps",
+      "application": "aphrody",
+      "kind": "bun-http",
+      "runtime": "bun",
+      "unit": "aphrody-web-playwright-vps.service",
+      "health": "http://127.0.0.1:9230/health",
+      "port": 9230,
+      "sourceRepo": "aphrody",
+      "workingDirectory": "/home/ubuntu/src/bun-os",
+      "public": false,
+      "host": "vps",
+      "capabilities": ["web-crawl-playwright"],
+      "note": "Loopback-only bounded Playwright renderer connected to the VPS Obscura CDP engine; the Rust crawler retains traversal and source policy."
     },
     {
       "id": "aphrody-a2a",
@@ -255,6 +284,18 @@
       "host": "dbfr"
     },
     {
+      "id": "aphrody-jobs-worker-vps",
+      "application": "aphrody",
+      "kind": "rust-worker",
+      "runtime": "rust",
+      "unit": "aphrody-jobs-worker-vps.service",
+      "sourceRepo": "aphrody",
+      "workingDirectory": "/home/ubuntu/.aphrody",
+      "public": false,
+      "host": "vps",
+      "note": "Persistent local SQLite queue worker, host affinity vps, concurrency 1. The VPS queue is independent of DBFR and is not synchronized or shared."
+    },
+    {
       "id": "aphrody-jobs-worker-dbfr",
       "application": "aphrody",
       "kind": "rust-worker",
@@ -290,6 +331,17 @@
       "target": "vps:127.0.0.1:9223",
       "public": false,
       "note": "Authenticated SSH loopback projection to Bun 1.4.4 browser bridge on Omar PC 127.0.0.1:9233; no engine or JS runtime installed remotely. Index origin http://omar.aphrody.com."
+    },
+    {
+      "id": "omar-playwright-mcp",
+      "application": "omar",
+      "kind": "browser-proxy",
+      "runtime": "bun",
+      "host": "omar-pc",
+      "health": "http://127.0.0.1:9235/health",
+      "target": "local:127.0.0.1:9234",
+      "public": false,
+      "note": "Owner-PC Playwright MCP projection through authenticated SSH only. Loopback 127.0.0.1:9234, health 9235; PC task is separately provisioned and must pass health/tools-list probes before use."
     },
     {
       "id": "omar-browser-client-dbfr",
@@ -384,6 +436,11 @@
       },
       {
         "host": "dbfr",
+        "kind": "systemd",
+        "unit": "aphrody-wg-proxy@8793.socket"
+      },
+      {
+        "host": "vps",
         "kind": "systemd",
         "unit": "aphrody-wg-proxy@8793.socket"
       },
@@ -566,6 +623,19 @@
         "arguments": "--no-env-file C:\\aphrody\\scripts\\tools\\infra\\ssh-reverse-task.ts C:\\Users\\omara\\.aphrody\\private\\state\\reverse-tunnel.json",
         "description": "Aphrody native reverse SSH tunnel for Omar PC services; no WSL forward.",
         "workingDirectory": "C:\\Users\\omara\\.ssh"
+      },
+      {
+        "host": "local",
+        "kind": "scheduledTask",
+        "name": "Omar Playwright MCP",
+        "path": "\\Aphrody\\",
+        "triggers": ["atLogon"],
+        "principal": "user",
+        "runLevel": "limited",
+        "execute": "C:\\Users\\omara\\.bun\\bin\\bun.exe",
+        "arguments": "--no-env-file C:\\SSH\\omar\\server\\playwright-mcp-supervisor.ts",
+        "workingDirectory": "C:\\SSH\\omar\\server",
+        "description": "Private local Playwright MCP supervisor; loopback only on 9234 with health 9235."
       },
       {
         "host": "local",

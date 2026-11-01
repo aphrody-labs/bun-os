@@ -3,7 +3,7 @@
 # @8788 for A2A). Binds the hub address of the private tunnel only (10.200.77.1, declared in
 # wireguard/aphrody-tunnel.json), never the public address; FreeBind lets it bind before wg1 is up. ufw admits only
 # the granted peers on wg1 (rules commented aphrody-wg-<peer>); the loopback service itself stays loopback.
-# Declared, not installed: the plan is `wg-plan`, the apply waits for the owner's written order.
+# Catalogued template installed through Aphrody Infra host-unit-apply; enabling and starting it remain a separate qualification gate.
 [Unit]
 Description=Private tunnel listener for loopback port %i (10.200.77.1:%i)
 After=network.target

@@ -167,9 +167,9 @@
       "upstream": "127.0.0.1:8793",
       "unit": "aphrody-mcp-http",
       "auth": "bearer-token",
-      "caveat": "Private WireGuard socket-proxyd reaches the canonical loopback MCP listener. /mcp requires APHRODY_MCP_HTTP_TOKEN from its protected host store; no public listener. Tool capabilities are verified from the deployed binary.",
+      "caveat": "Private WireGuard socket-proxyd reaches the VPS loopback MCP listener. /mcp requires APHRODY_MCP_HTTP_TOKEN in its root-only host store; no public listener. Keep this route pending until the catalogued binary, secret, authenticated tools/list, and listener are qualified.",
       "status": "pending",
-      "pendingReason": "vps reduced to the build machine on 2026-10-09 (docs/operations/infra/hosts-minimal-2026-10-09.md): the unit does not run there; the DBFR MCP (mcp-http-dbfr) serves the tunnel"
+      "pendingReason": "The VPS lane is newly declared but not installed or qualified. Do not activate the projection before host-apply, secret, and authenticated MCP probes pass."
     },
     {
       "id": "a2a",

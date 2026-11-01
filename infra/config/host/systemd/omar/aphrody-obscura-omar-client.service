@@ -11,7 +11,7 @@ Type=simple
 User=omar
 Group=omar
 WorkingDirectory=/home/omar/.config/aphrody/omar-browser
-ExecStart=/usr/bin/ssh -F /home/omar/.config/aphrody/omar-browser/ssh_config -NT -o BatchMode=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 127.0.0.1:9223:127.0.0.1:9233 omar-browser
+ExecStart=/usr/bin/ssh -F /home/omar/.config/aphrody/omar-browser/ssh_config -NT -o BatchMode=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 127.0.0.1:9223:127.0.0.1:9233 -L 127.0.0.1:9234:127.0.0.1:9234 -L 127.0.0.1:9235:127.0.0.1:9235 -R 127.0.0.1:9230:127.0.0.1:9230 omar-browser
 Restart=on-failure
 RestartSec=10
 TimeoutStopSec=15

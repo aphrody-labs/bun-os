@@ -32,6 +32,8 @@ train = ["aphrody-train/registry"]
 # (127 over `tools/list`); with it 137. Opt-in because each backend is a dependency the base server has no use for.
 # Build with: cargo build -p aphrody --features mcp-toolbox
 mcp-toolbox = ["aphrody-mcp/toolbox"]
+# Jobs-only MCP surface for private queue control without OCR/RAG inference backends.
+mcp-jobs = ["aphrody-mcp/jobs"]
 
 # Native Google Magika deep-learning file-type classification, exposed via
 # `aphrody re classify <path>`. Opt-in because it links the ONNX Runtime

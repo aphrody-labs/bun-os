@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: Apache-2.0
+# Private VPS MCP; loopback only. Requires a host-provisioned protected bearer env file.
+[Unit]
+Description=Aphrody private VPS MCP HTTP server (local jobs and browser tools)
+After=network-online.target
+Wants=network-online.target
+StartLimitBurst=10
+StartLimitIntervalSec=600
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/.aphrody
+Environment=HOME=/home/ubuntu
+Environment=APHRODY_HOME=/home/ubuntu/.aphrody
+EnvironmentFile=/etc/aphrody/aphrody-mcp-http.env
+ExecStart=/home/ubuntu/.local/bin/aphrody mcp-server http --bind 127.0.0.1:8793
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=tmpfs
+BindReadOnlyPaths=/home/ubuntu/.local/bin/aphrody
+BindPaths=/home/ubuntu/.aphrody
+ReadWritePaths=/home/ubuntu/.aphrody
+PrivateTmp=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryAccounting=true
+MemoryHigh=1536M
+MemoryMax=2G
+CPUWeight=30
+Nice=10
+TasksMax=512
+LimitNOFILE=65536
+UMask=0077
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aphrody-mcp-http
+
+[Install]
+WantedBy=multi-user.target

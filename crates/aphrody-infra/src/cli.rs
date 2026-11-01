@@ -107,6 +107,82 @@ enum CommandKind {
         #[arg(long)]
         apply: bool,
     },
+    /// Stage a catalogued VPS Aphrody binary and repository unit; does not start the service.
+    HostApply {
+        /// Explicit remote deployment target; only `vps` is currently supported.
+        #[arg(long)]
+        target: String,
+        /// Service id from the service and host catalogs.
+        #[arg(long)]
+        service: String,
+        /// Local compiled Aphrody binary artifact.
+        #[arg(long)]
+        binary_from: PathBuf,
+        /// SHA-256 from the pinned build receipt.
+        #[arg(long)]
+        binary_sha256: String,
+        /// Install the verified binary and unit after printing the plan.
+        #[arg(long)]
+        apply: bool,
+    },
+    /// Restore the preserved binary and systemd unit from a host-apply receipt.
+    HostRollback {
+        #[arg(long)]
+        target: String,
+        #[arg(long)]
+        service: String,
+        #[arg(long)]
+        rollback_id: String,
+        #[arg(long)]
+        binary_sha256: String,
+        #[arg(long)]
+        unit_sha256: String,
+        #[arg(long)]
+        apply: bool,
+    },
+    /// Stage one catalogued SSH forwarding unit on VPS; does not start it.
+    HostUnitApply {
+        #[arg(long)]
+        target: String,
+        /// Fixed allowlisted unit service: omar-browser-client-vps.
+        #[arg(long)]
+        service: String,
+        #[arg(long)]
+        apply: bool,
+    },
+    /// Restore the prior catalogued SSH forwarding unit from its receipt.
+    HostUnitRollback {
+        #[arg(long)]
+        target: String,
+        #[arg(long)]
+        service: String,
+        #[arg(long)]
+        rollback_id: String,
+        #[arg(long)]
+        unit_sha256: String,
+        #[arg(long)]
+        apply: bool,
+    },
+    /// Provision private crawl credentials only; does not enable the Shenron queue or start units.
+    HostProvision {
+        #[command(subcommand)]
+        command: HostProvisionCommand,
+    },
+    /// Prepare the Shenron crawl config with workerReady=false after live probes and a qualified job.
+    HostActivate {
+        #[command(subcommand)]
+        command: HostActivateCommand,
+    },
+    /// Mark the Shenron crawl worker ready after verifying the deployed bot release.
+    HostReady {
+        #[command(subcommand)]
+        command: HostReadyCommand,
+    },
+    /// Pull a closed native crawl artifact from VPS to DBFR private staging; never imports it.
+    HostPull {
+        #[command(subcommand)]
+        command: HostPullCommand,
+    },
     /// Check cross-catalog invariants (services, nginx routes, port policy).
     Validate {
         #[arg(long)]
@@ -317,6 +393,53 @@ enum NginxCommand {
         /// Container image for the check (`nginx:alpine` when the flag has no value).
         #[arg(long, num_args = 0..=1, default_missing_value = "nginx:alpine", value_name = "IMAGE")]
         docker: Option<String>,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum HostProvisionCommand {
+    /// Create one matching VPS/DBFR MCP bearer through SSH stdin; no secret is printed.
+    Crawl {
+        #[arg(long)]
+        apply: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum HostActivateCommand {
+    Crawl {
+        /// Existing bounded web-pipeline job id that completed successfully on the VPS.
+        #[arg(long)]
+        job_id: String,
+        /// Atomically install the prepared web config and set its DBFR env file entry.
+        #[arg(long)]
+        apply: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum HostReadyCommand {
+    Crawl {
+        /// Full 40-character revision label on the running DBFR bot image.
+        #[arg(long)]
+        revision: String,
+        /// Atomically set workerReady after the matching healthy bot is verified.
+        #[arg(long)]
+        apply: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum HostPullCommand {
+    /// Pull exactly one successful VPS crawl artifact into private DBFR staging.
+    Crawl {
+        #[arg(long)]
+        job_key: String,
+        #[arg(long)]
+        remote_id: String,
+        /// Transfer and atomically finalize after the plan passes all checks.
+        #[arg(long)]
+        apply: bool,
     },
 }
 
@@ -2575,6 +2698,153 @@ async fn run_cli(cli: Cli) -> Result<()> {
                 deploy(target, *stack, release.as_deref(), *apply, &mut run)
             }
         }
+        CommandKind::HostApply {
+            target,
+            service,
+            binary_from,
+            binary_sha256,
+            apply,
+        } => {
+            let mut plan =
+                crate::host_apply::plan(&root, target, service, binary_from, binary_sha256)?;
+            if *apply {
+                plan = crate::host_apply::apply(&root, &plan)?;
+            }
+            run.action(
+                "host-apply",
+                if plan.applied { "applied" } else { "planned" },
+                json!(&plan),
+            );
+            println!("{}", serde_json::to_string_pretty(&plan)?);
+            Ok(())
+        }
+        CommandKind::HostRollback {
+            target,
+            service,
+            rollback_id,
+            binary_sha256,
+            unit_sha256,
+            apply,
+        } => {
+            crate::host_apply::validate_rollback_request(
+                target,
+                service,
+                rollback_id,
+                binary_sha256,
+                unit_sha256,
+            )?;
+            if *apply {
+                crate::host_apply::rollback(
+                    &root,
+                    target,
+                    service,
+                    rollback_id,
+                    binary_sha256,
+                    unit_sha256,
+                )?;
+            }
+            let result = json!({ "target": target, "service": service, "rollbackId": rollback_id, "binarySha256": binary_sha256, "unitSha256": unit_sha256, "applied": apply });
+            run.action(
+                "host-rollback",
+                if *apply { "applied" } else { "planned" },
+                result.clone(),
+            );
+            println!("{}", serde_json::to_string_pretty(&result)?);
+            Ok(())
+        }
+        CommandKind::HostUnitApply {
+            target,
+            service,
+            apply,
+        } => {
+            let mut plan = crate::host_apply::unit_plan(&root, target, service)?;
+            if *apply {
+                plan = crate::host_apply::unit_apply(&root, &plan)?;
+            }
+            run.action(
+                "host-unit-apply",
+                if plan.applied { "applied" } else { "planned" },
+                json!(&plan),
+            );
+            println!("{}", serde_json::to_string_pretty(&plan)?);
+            Ok(())
+        }
+        CommandKind::HostUnitRollback {
+            target,
+            service,
+            rollback_id,
+            unit_sha256,
+            apply,
+        } => {
+            crate::host_apply::validate_unit_rollback(target, service, rollback_id, unit_sha256)?;
+            if *apply {
+                crate::host_apply::unit_rollback(&root, target, service, rollback_id, unit_sha256)?;
+            }
+            let result = json!({"target":target,"service":service,"rollbackId":rollback_id,"unitSha256":unit_sha256,"applied":apply});
+            run.action(
+                "host-unit-rollback",
+                if *apply { "applied" } else { "planned" },
+                result.clone(),
+            );
+            println!("{}", serde_json::to_string_pretty(&result)?);
+            Ok(())
+        }
+        CommandKind::HostProvision {
+            command: HostProvisionCommand::Crawl { apply },
+        } => {
+            let plan = crate::host_apply::provision_crawl(&root, *apply)?;
+            run.action(
+                "host-provision.crawl",
+                if plan.applied { "applied" } else { "planned" },
+                json!(&plan),
+            );
+            println!("{}", serde_json::to_string_pretty(&plan)?);
+            Ok(())
+        }
+        CommandKind::HostActivate {
+            command: HostActivateCommand::Crawl { job_id, apply },
+        } => {
+            let plan = crate::host_apply::activate_crawl(&root, job_id, *apply)?;
+            run.action(
+                "host-activate.crawl",
+                if plan.applied { "applied" } else { "planned" },
+                json!(&plan),
+            );
+            println!("{}", serde_json::to_string_pretty(&plan)?);
+            Ok(())
+        }
+        CommandKind::HostReady {
+            command: HostReadyCommand::Crawl { revision, apply },
+        } => {
+            let plan = crate::host_apply::ready_crawl(&root, revision, *apply)?;
+            run.action(
+                "host-ready.crawl",
+                if plan.applied { "applied" } else { "planned" },
+                json!(&plan),
+            );
+            println!("{}", serde_json::to_string_pretty(&plan)?);
+            Ok(())
+        }
+        CommandKind::HostPull {
+            command:
+                HostPullCommand::Crawl {
+                    job_key,
+                    remote_id,
+                    apply,
+                },
+        } => {
+            let mut plan = crate::host_pull::plan(&root, job_key, remote_id)?;
+            if *apply {
+                plan = crate::host_pull::apply(&root, &plan)?;
+            }
+            run.action(
+                "host-pull.crawl",
+                if plan.applied { "applied" } else { "planned" },
+                json!(&plan),
+            );
+            println!("{}", serde_json::to_string_pretty(&plan)?);
+            Ok(())
+        }
         CommandKind::Boot {
             action,
             host,
@@ -2923,6 +3193,198 @@ mod tests {
                 "unknown-stack",
             ])
             .is_err()
+        );
+    }
+
+    #[test]
+    fn host_apply_requires_explicit_target_and_artifact_pin() {
+        let parsed = Cli::try_parse_from([
+            "aphrody-infra",
+            "host-apply",
+            "--target",
+            "vps",
+            "--service",
+            "aphrody-mcp-http",
+            "--binary-from",
+            "./aphrody",
+            "--binary-sha256",
+            &"a".repeat(64),
+        ])
+        .unwrap();
+        assert_matches!(parsed.command, CommandKind::HostApply { target, service, apply: false, .. }
+            if target == "vps" && service == "aphrody-mcp-http");
+        assert!(
+            Cli::try_parse_from([
+                "aphrody-infra",
+                "host-apply",
+                "--service",
+                "aphrody-mcp-http",
+                "--binary-from",
+                "./aphrody",
+                "--binary-sha256",
+                &"a".repeat(64),
+            ])
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn host_rollback_requires_pinned_result_hashes() {
+        let parsed = Cli::try_parse_from([
+            "aphrody-infra",
+            "host-rollback",
+            "--target",
+            "vps",
+            "--service",
+            "aphrody-mcp-http",
+            "--rollback-id",
+            "123-0123456789ab",
+            "--binary-sha256",
+            &"a".repeat(64),
+            "--unit-sha256",
+            &"b".repeat(64),
+        ])
+        .unwrap();
+        assert_matches!(
+            parsed.command,
+            CommandKind::HostRollback { apply: false, .. }
+        );
+        assert!(
+            Cli::try_parse_from([
+                "aphrody-infra",
+                "host-rollback",
+                "--target",
+                "vps",
+                "--service",
+                "aphrody-mcp-http",
+                "--rollback-id",
+                "123-0123456789ab",
+            ])
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn host_unit_apply_is_plan_only_and_explicit() {
+        let parsed = Cli::try_parse_from([
+            "aphrody-infra",
+            "host-unit-apply",
+            "--target",
+            "vps",
+            "--service",
+            "omar-browser-client-vps",
+        ])
+        .unwrap();
+        assert_matches!(parsed.command, CommandKind::HostUnitApply { target, service, apply: false }
+            if target == "vps" && service == "omar-browser-client-vps");
+        assert!(
+            Cli::try_parse_from([
+                "aphrody-infra",
+                "host-unit-apply",
+                "--service",
+                "omar-browser-client-vps"
+            ])
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn host_unit_rollback_requires_unit_hash_and_is_plan_only() {
+        let parsed = Cli::try_parse_from([
+            "aphrody-infra",
+            "host-unit-rollback",
+            "--target",
+            "vps",
+            "--service",
+            "omar-browser-client-vps",
+            "--rollback-id",
+            "123-0123456789ab",
+            "--unit-sha256",
+            &"a".repeat(64),
+        ])
+        .unwrap();
+        assert_matches!(
+            parsed.command,
+            CommandKind::HostUnitRollback { apply: false, .. }
+        );
+    }
+
+    #[test]
+    fn host_provision_crawl_is_plan_only_by_default() {
+        let parsed = Cli::try_parse_from(["aphrody-infra", "host-provision", "crawl"]).unwrap();
+        assert_matches!(
+            parsed.command,
+            CommandKind::HostProvision {
+                command: HostProvisionCommand::Crawl { apply: false }
+            }
+        );
+        let applied =
+            Cli::try_parse_from(["aphrody-infra", "host-provision", "crawl", "--apply"]).unwrap();
+        assert_matches!(
+            applied.command,
+            CommandKind::HostProvision {
+                command: HostProvisionCommand::Crawl { apply: true }
+            }
+        );
+    }
+
+    #[test]
+    fn host_activate_crawl_requires_job_id_and_is_plan_only_by_default() {
+        let parsed = Cli::try_parse_from([
+            "aphrody-infra",
+            "host-activate",
+            "crawl",
+            "--job-id",
+            "crawl-123",
+        ])
+        .unwrap();
+        assert_matches!(
+            parsed.command,
+            CommandKind::HostActivate {
+                command: HostActivateCommand::Crawl { apply: false, job_id }
+            } if job_id == "crawl-123"
+        );
+        assert!(Cli::try_parse_from(["aphrody-infra", "host-activate", "crawl"]).is_err());
+    }
+
+    #[test]
+    fn host_ready_crawl_requires_revision_and_is_plan_only_by_default() {
+        let revision = "0123456789abcdef0123456789abcdef01234567";
+        let parsed = Cli::try_parse_from([
+            "aphrody-infra",
+            "host-ready",
+            "crawl",
+            "--revision",
+            revision,
+        ])
+        .unwrap();
+        assert_matches!(
+            parsed.command,
+            CommandKind::HostReady {
+                command: HostReadyCommand::Crawl { apply: false, revision: parsed_revision }
+            } if parsed_revision == revision
+        );
+        assert!(Cli::try_parse_from(["aphrody-infra", "host-ready", "crawl"]).is_err());
+    }
+
+    #[test]
+    fn host_pull_crawl_requires_job_binding_and_is_plan_only() {
+        let parsed = Cli::try_parse_from([
+            "aphrody-infra",
+            "host-pull",
+            "crawl",
+            "--job-key",
+            "job-1",
+            "--remote-id",
+            "remote-1",
+        ])
+        .unwrap();
+        assert_matches!(parsed.command, CommandKind::HostPull {
+            command: HostPullCommand::Crawl { apply: false, job_key, remote_id, .. }
+        } if job_key == "job-1" && remote_id == "remote-1");
+        assert!(
+            Cli::try_parse_from(["aphrody-infra", "host-pull", "crawl", "--job-key", "job-1"])
+                .is_err()
         );
     }
 

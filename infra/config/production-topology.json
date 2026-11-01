@@ -54,6 +54,7 @@
         "publicPorts": [80],
         "internalOnly": [
           3004, 3007, 3014, 4000, 4002, 4005, 5006, 5010, 5011, 8083, 8085, 8789, 8790, 8793, 8794, 8796, 8797, 8798,
+          9222, 9230,
           8800, 8801, 8810, 8812, 29020, 29021, 29022, 29030
         ],
         "reservedNoCurrentOwner": [3000, 3005, 3006]
@@ -141,7 +142,7 @@
         "redis": "omar-cache"
       },
       "network": {
-        "internalOnly": [6379, 8081],
+        "internalOnly": [6379, 8081, 9230, 9233, 9234, 9235],
         "publicPorts": []
       },
       "forbidden": ["production-database", "public-runtime"]

@@ -1,0 +1,17 @@
+{
+  "$comment": "DBFR-initiated, one-job raw JSONL pull. The source root is pinned to Shenron crawlJobOutputDirectory; the receipt is transport-only and never importable.",
+  "schemaVersion": 1,
+  "dbfr": {
+    "user": "ubuntu",
+    "stagingRoot": "/home/ubuntu/.aphrody/crawl-artifact-staging",
+    "sshConfig": "/home/ubuntu/.ssh/config",
+    "sshAlias": "vps-wg",
+    "vpsHostName": "10.200.77.1",
+    "vpsUser": "ubuntu",
+    "identityFile": "/home/ubuntu/.ssh/aphrody_fleet_vps",
+    "knownHostsFile": "/home/ubuntu/.ssh/known_hosts"
+  },
+  "sourceRoots": [
+    "/home/ubuntu/.aphrody/workspaces/dbfr/crawl/campaigns"
+  ]
+}

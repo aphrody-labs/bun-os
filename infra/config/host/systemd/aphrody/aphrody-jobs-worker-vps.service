@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: Apache-2.0
+[Unit]
+Description=Aphrody persistent local jobs worker on VPS
+After=network-online.target
+Wants=network-online.target
+StartLimitBurst=5
+StartLimitIntervalSec=600
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/.aphrody
+Environment=HOME=/home/ubuntu
+Environment=APHRODY_HOME=/home/ubuntu/.aphrody
+ExecStart=/home/ubuntu/.local/bin/aphrody job run --forever --host vps --worker vps-web --concurrency 1
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+KillMode=control-group
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=tmpfs
+BindReadOnlyPaths=/home/ubuntu/.local/bin/aphrody
+BindPaths=/home/ubuntu/.aphrody
+ReadWritePaths=/home/ubuntu/.aphrody
+PrivateTmp=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryAccounting=true
+MemoryHigh=1536M
+MemoryMax=2G
+CPUWeight=10
+Nice=15
+TasksMax=512
+LimitNOFILE=65536
+UMask=0077
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aphrody-jobs-worker-vps
+
+[Install]
+WantedBy=multi-user.target
