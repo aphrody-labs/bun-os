@@ -12,12 +12,7 @@ pub mod network;
 pub(crate) mod token_selector;
 
 #[allow(unknown_lints)]
-#[allow(
-    clippy::all,
-    unused_imports,
-    unsafe_code,
-    mismatched_lifetime_syntaxes
-)]
+#[allow(clippy::all, unused_imports, unsafe_code, mismatched_lifetime_syntaxes)]
 #[path = "../flatbuffers/fb_network_filter_generated.rs"]
 mod flat;
 

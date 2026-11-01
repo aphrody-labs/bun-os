@@ -106,22 +106,30 @@ fn set(object: &js_sys::Object, key: &str, value: &JsValue) {
 }
 
 fn call(target: &JsValue, method: &str, args: &js_sys::Array) -> Result<JsValue, JsValue> {
-    let function: js_sys::Function = js_sys::Reflect::get(target, &JsValue::from_str(method))?.dyn_into()?;
+    let function: js_sys::Function =
+        js_sys::Reflect::get(target, &JsValue::from_str(method))?.dyn_into()?;
     function.apply(target, args)
 }
 
 /// `new <name>(arg)` on a WebCodecs constructor of the global scope. WebCodecs is reached through js-sys reflection:
 /// web-sys gates it behind `web_sys_unstable_apis`, which changes stable 2D canvas signatures that softbuffer uses.
 fn construct(name: &str, arg: &JsValue) -> Result<JsValue, JsValue> {
-    let constructor: js_sys::Function = js_sys::Reflect::get(&js_sys::global(), &JsValue::from_str(name))?
-        .dyn_into()
-        .map_err(|_| JsValue::from_str(&format!("{name} is not supported by this browser")))?;
+    let constructor: js_sys::Function =
+        js_sys::Reflect::get(&js_sys::global(), &JsValue::from_str(name))?
+            .dyn_into()
+            .map_err(|_| JsValue::from_str(&format!("{name} is not supported by this browser")))?;
     js_sys::Reflect::construct(&constructor, &js_sys::Array::of1(arg))
 }
 
 impl H264 {
-    fn new(codec: &str, width: u32, height: u32, out: mpsc::UnboundedSender<StreamEvent>) -> Result<H264, String> {
-        let canvas = web_sys::OffscreenCanvas::new(width.max(1), height.max(1)).map_err(js_error)?;
+    fn new(
+        codec: &str,
+        width: u32,
+        height: u32,
+        out: mpsc::UnboundedSender<StreamEvent>,
+    ) -> Result<H264, String> {
+        let canvas =
+            web_sys::OffscreenCanvas::new(width.max(1), height.max(1)).map_err(js_error)?;
         let context: web_sys::OffscreenCanvasRenderingContext2d = canvas
             .get_context("2d")
             .map_err(js_error)?
@@ -130,7 +138,10 @@ impl H264 {
             .map_err(js_error)?;
         let output = Closure::<dyn FnMut(JsValue)>::new(move |frame: JsValue| {
             let dimension = |key: &str| {
-                js_sys::Reflect::get(&frame, &JsValue::from_str(key)).ok().and_then(|v| v.as_f64()).unwrap_or(0.0) as u32
+                js_sys::Reflect::get(&frame, &JsValue::from_str(key))
+                    .ok()
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0) as u32
             };
             let (w, h) = (dimension("displayWidth"), dimension("displayHeight"));
             if w > 0 && h > 0 {
@@ -146,12 +157,18 @@ impl H264 {
                 if drawn.is_ok()
                     && let Ok(pixels) = context.get_image_data(0.0, 0.0, f64::from(w), f64::from(h))
                 {
-                    let _ = out.unbounded_send(StreamEvent::Frame(image::Handle::from_rgba(w, h, pixels.data().0), w, h));
+                    let _ = out.unbounded_send(StreamEvent::Frame(
+                        image::Handle::from_rgba(w, h, pixels.data().0),
+                        w,
+                        h,
+                    ));
                 }
             }
             let _ = call(&frame, "close", &js_sys::Array::new());
         });
-        let error = Closure::<dyn FnMut(JsValue)>::new(|e: JsValue| log_error(&format!("video decoder: {}", js_error(e))));
+        let error = Closure::<dyn FnMut(JsValue)>::new(|e: JsValue| {
+            log_error(&format!("video decoder: {}", js_error(e)))
+        });
         let init = js_sys::Object::new();
         set(&init, "output", output.as_ref());
         set(&init, "error", error.as_ref());
@@ -161,11 +178,22 @@ impl H264 {
         let config = js_sys::Object::new();
         set(&config, "codec", &JsValue::from_str(codec));
         set(&config, "codedWidth", &JsValue::from_f64(f64::from(width)));
-        set(&config, "codedHeight", &JsValue::from_f64(f64::from(height)));
+        set(
+            &config,
+            "codedHeight",
+            &JsValue::from_f64(f64::from(height)),
+        );
         set(&config, "optimizeForLatency", &JsValue::TRUE);
-        set(&config, "hardwareAcceleration", &JsValue::from_str("prefer-hardware"));
+        set(
+            &config,
+            "hardwareAcceleration",
+            &JsValue::from_str("prefer-hardware"),
+        );
         call(&decoder, "configure", &js_sys::Array::of1(&config)).map_err(js_error)?;
-        Ok(H264 { decoder, config: Vec::new() })
+        Ok(H264 {
+            decoder,
+            config: Vec::new(),
+        })
     }
 
     fn chunk(&mut self, bytes: &[u8]) {

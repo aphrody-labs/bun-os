@@ -2903,9 +2903,7 @@ pub fn menu_tree_named(english_names: bool) -> Vec<(&'static str, Vec<Item>)> {
             // Quit from File, Language and Appearance synthesized). It stays first: `from_tree`
             // gives the first menu the App role.
             "VectorCraft",
-            vec![
-                c("About Vectors", "help.about"),
-            ],
+            vec![c("About Vectors", "help.about")],
         ),
         (
             "File",

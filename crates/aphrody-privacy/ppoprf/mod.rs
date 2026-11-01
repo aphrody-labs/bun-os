@@ -24,13 +24,18 @@ pub(crate) mod ppoprf;
 
 #[derive(Debug)]
 pub enum PPRFError {
-    BadTag { md: u8 },
+    BadTag {
+        md: u8,
+    },
     #[cfg(test)]
     NoPrefixFound,
     #[cfg(test)]
     AlreadyPunctured,
     #[cfg(test)]
-    BadInputLength { actual: usize, expected: usize },
+    BadInputLength {
+        actual: usize,
+        expected: usize,
+    },
     #[cfg(test)]
     UnexpectedEndOfBv,
     #[cfg(test)]

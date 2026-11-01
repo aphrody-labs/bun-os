@@ -73,11 +73,7 @@ mod tests {
             ..Default::default()
         };
         let mut app = VectorcraftApp::new(vectorcraft_engine::Session::new(), services);
-        for id in [
-            "help.website",
-            "help.appPage",
-            "help.github",
-        ] {
+        for id in ["help.website", "help.appPage", "help.github"] {
             crate::menus::invoke(&mut app, id, serde_json::json!({}));
         }
         assert_eq!(

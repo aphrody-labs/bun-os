@@ -404,7 +404,9 @@ fn check_peer_heartbeat() -> CheckResult {
         // The file-mailbox peer is optional: agents coordinate through the A2A hub
         // (APHRODY_A2A_HUB_URL, docs/A2A-AGENTS.md), so an absent winclean coord is not a fault.
         None => {
-            return CheckResult::Ok("winclean file peer not configured (A2A hub in use)".to_owned());
+            return CheckResult::Ok(
+                "winclean file peer not configured (A2A hub in use)".to_owned(),
+            );
         }
     };
 

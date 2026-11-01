@@ -115,7 +115,6 @@ impl DLEQProof {
             Err(TokenError(InternalError::VerifyError))
         }
     }
-
 }
 
 impl DLEQProof {

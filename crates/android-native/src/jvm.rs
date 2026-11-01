@@ -42,7 +42,8 @@ fn owned(text: String) -> *mut c_char {
 }
 
 fn vm() -> Result<&'static JavaVM, String> {
-    VM.get().ok_or_else(|| "JVM not started: call bunos_jvm_start first".to_owned())
+    VM.get()
+        .ok_or_else(|| "JVM not started: call bunos_jvm_start first".to_owned())
 }
 
 fn start(libjvm: Option<&str>, options: &str) -> Result<(), String> {
@@ -50,7 +51,11 @@ fn start(libjvm: Option<&str>, options: &str) -> Result<(), String> {
         return Ok(());
     }
     let mut builder = InitArgsBuilder::new().version(JNIVersion::V1_8);
-    for option in options.lines().map(str::trim).filter(|line| !line.is_empty()) {
+    for option in options
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+    {
         builder = builder.option(option.to_owned());
     }
     let args = builder.build().map_err(|error| error.to_string())?;
@@ -68,12 +73,18 @@ fn class_name(name: &str) -> JNIString {
 }
 
 fn call_string(class: &str, method: &str, input: &str) -> Result<String, String> {
-    let sig = RuntimeMethodSignature::from_str("(Ljava/lang/String;)Ljava/lang/String;").map_err(|e| e.to_string())?;
+    let sig = RuntimeMethodSignature::from_str("(Ljava/lang/String;)Ljava/lang/String;")
+        .map_err(|e| e.to_string())?;
     vm()?
         .attach_current_thread(|env| -> jni::errors::Result<String> {
             let value = env.new_string(input)?;
             let result = env
-                .call_static_method(class_name(class), JNIString::from(method), MethodSignature::from(&sig), &[JValue::Object(&value)])?
+                .call_static_method(
+                    class_name(class),
+                    JNIString::from(method),
+                    MethodSignature::from(&sig),
+                    &[JValue::Object(&value)],
+                )?
                 .l()?;
             if result.is_null() {
                 return Ok(String::new());
@@ -88,8 +99,13 @@ fn call_int2(class: &str, method: &str, left: i32, right: i32) -> Result<i32, St
     let sig = RuntimeMethodSignature::from_str("(II)I").map_err(|e| e.to_string())?;
     vm()?
         .attach_current_thread(|env| -> jni::errors::Result<i32> {
-            env.call_static_method(class_name(class), JNIString::from(method), MethodSignature::from(&sig), &[JValue::Int(left), JValue::Int(right)])?
-                .i()
+            env.call_static_method(
+                class_name(class),
+                JNIString::from(method),
+                MethodSignature::from(&sig),
+                &[JValue::Int(left), JValue::Int(right)],
+            )?
+            .i()
         })
         .map_err(|error| error.to_string())
 }
@@ -98,8 +114,13 @@ fn call_long0(class: &str, method: &str) -> Result<i64, String> {
     let sig = RuntimeMethodSignature::from_str("()J").map_err(|e| e.to_string())?;
     vm()?
         .attach_current_thread(|env| -> jni::errors::Result<i64> {
-            env.call_static_method(class_name(class), JNIString::from(method), MethodSignature::from(&sig), &[])?
-                .j()
+            env.call_static_method(
+                class_name(class),
+                JNIString::from(method),
+                MethodSignature::from(&sig),
+                &[],
+            )?
+            .j()
         })
         .map_err(|error| error.to_string())
 }
@@ -133,7 +154,11 @@ pub extern "C" fn bunos_jvm_started() -> i32 {
 /// # Safety
 /// All pointers are valid NUL-terminated strings (`input` may be null for the empty string).
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn bunos_jvm_call_static_string(class: *const c_char, method: *const c_char, input: *const c_char) -> *mut c_char {
+pub unsafe extern "C" fn bunos_jvm_call_static_string(
+    class: *const c_char,
+    method: *const c_char,
+    input: *const c_char,
+) -> *mut c_char {
     // SAFETY: forwarded caller contract.
     let (Some(class), Some(method)) = (unsafe { arg(class) }, unsafe { arg(method) }) else {
         fail("class and method are required");
@@ -155,7 +180,13 @@ pub unsafe extern "C" fn bunos_jvm_call_static_string(class: *const c_char, meth
 /// # Safety
 /// `class`/`method` are valid NUL-terminated strings; `out` is a valid, writable `int32_t` pointer.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn bunos_jvm_call_static_int2(class: *const c_char, method: *const c_char, left: i32, right: i32, out: *mut i32) -> i32 {
+pub unsafe extern "C" fn bunos_jvm_call_static_int2(
+    class: *const c_char,
+    method: *const c_char,
+    left: i32,
+    right: i32,
+    out: *mut i32,
+) -> i32 {
     // SAFETY: forwarded caller contract.
     let (Some(class), Some(method)) = (unsafe { arg(class) }, unsafe { arg(method) }) else {
         fail("class and method are required");
@@ -183,7 +214,11 @@ pub unsafe extern "C" fn bunos_jvm_call_static_int2(class: *const c_char, method
 /// # Safety
 /// `class`/`method` are valid NUL-terminated strings; `out` is a valid, writable `int64_t` pointer.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn bunos_jvm_call_static_long(class: *const c_char, method: *const c_char, out: *mut i64) -> i32 {
+pub unsafe extern "C" fn bunos_jvm_call_static_long(
+    class: *const c_char,
+    method: *const c_char,
+    out: *mut i64,
+) -> i32 {
     // SAFETY: forwarded caller contract.
     let (Some(class), Some(method)) = (unsafe { arg(class) }, unsafe { arg(method) }) else {
         fail("class and method are required");
@@ -209,7 +244,11 @@ pub unsafe extern "C" fn bunos_jvm_call_static_long(class: *const c_char, method
 /// Last failure of the calling thread as an owned string (null when none). Release with [`bunos_jvm_free`].
 #[unsafe(no_mangle)]
 pub extern "C" fn bunos_jvm_last_error() -> *mut c_char {
-    LAST_ERROR.with(|slot| slot.borrow().as_ref().map_or(std::ptr::null_mut(), |text| text.clone().into_raw()))
+    LAST_ERROR.with(|slot| {
+        slot.borrow()
+            .as_ref()
+            .map_or(std::ptr::null_mut(), |text| text.clone().into_raw())
+    })
 }
 
 /// Release a string returned by this library.

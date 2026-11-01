@@ -253,9 +253,7 @@ impl MimeType {
                 "png" => MimeType::ImagePng,
                 "txt" => MimeType::TextPlain,
                 "xml" => MimeType::TextXml,
-                _ => {
-                    MimeType::Unknown
-                }
+                _ => MimeType::Unknown,
             }
         } else {
             MimeType::Unknown

@@ -141,7 +141,6 @@ impl SingleMeasurement {
     pub fn as_slice(&self) -> &[u8] {
         self.0.as_slice()
     }
-
 }
 
 impl From<&str> for SingleMeasurement {
@@ -163,7 +162,6 @@ impl AssociatedData {
     pub fn as_slice(&self) -> &[u8] {
         self.0.as_slice()
     }
-
 }
 impl From<&str> for AssociatedData {
     fn from(s: &str) -> Self {

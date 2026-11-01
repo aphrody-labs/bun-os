@@ -12,7 +12,12 @@ async fn get(token: &str, url: &str, query: &[(&str, &str)]) -> Result<Value> {
 
 /// OpenID userinfo (email, name, picture).
 pub async fn userinfo(token: &str) -> Result<Value> {
-    get(token, "https://openidconnect.googleapis.com/v1/userinfo", &[]).await
+    get(
+        token,
+        "https://openidconnect.googleapis.com/v1/userinfo",
+        &[],
+    )
+    .await
 }
 
 /// Files directly under My Drive's root.
@@ -25,7 +30,10 @@ pub async fn drive_root(token: &str, page_size: u32) -> Result<Value> {
             ("q", "'root' in parents and trashed = false"),
             ("pageSize", size.as_str()),
             ("orderBy", "folder,name"),
-            ("fields", "nextPageToken,files(id,name,mimeType,size,modifiedTime,webViewLink)"),
+            (
+                "fields",
+                "nextPageToken,files(id,name,mimeType,size,modifiedTime,webViewLink)",
+            ),
         ],
     )
     .await
@@ -43,7 +51,12 @@ pub async fn drive_about(token: &str) -> Result<Value> {
 
 /// Gmail labels.
 pub async fn gmail_labels(token: &str) -> Result<Value> {
-    get(token, "https://gmail.googleapis.com/gmail/v1/users/me/labels", &[]).await
+    get(
+        token,
+        "https://gmail.googleapis.com/gmail/v1/users/me/labels",
+        &[],
+    )
+    .await
 }
 
 /// Gmail message ids of a search (`q` uses Gmail search syntax).
@@ -68,7 +81,12 @@ pub async fn calendar_list(token: &str) -> Result<Value> {
 }
 
 /// Upcoming events of one calendar (`primary` for the main one), from now.
-pub async fn calendar_events(token: &str, calendar: &str, time_min_rfc3339: &str, max: u32) -> Result<Value> {
+pub async fn calendar_events(
+    token: &str,
+    calendar: &str,
+    time_min_rfc3339: &str,
+    max: u32,
+) -> Result<Value> {
     let max = max.clamp(1, 2500).to_string();
     let url = format!(
         "https://www.googleapis.com/calendar/v3/calendars/{}/events",
@@ -92,7 +110,10 @@ pub async fn youtube_my_channels(token: &str) -> Result<Value> {
     get(
         token,
         "https://www.googleapis.com/youtube/v3/channels",
-        &[("part", "snippet,statistics,contentDetails"), ("mine", "true")],
+        &[
+            ("part", "snippet,statistics,contentDetails"),
+            ("mine", "true"),
+        ],
     )
     .await
 }
@@ -116,7 +137,10 @@ pub async fn gcs_buckets(token: &str, project: &str) -> Result<Value> {
     get(
         token,
         "https://storage.googleapis.com/storage/v1/b",
-        &[("project", project), ("fields", "items(name,location,storageClass,timeCreated)")],
+        &[
+            ("project", project),
+            ("fields", "items(name,location,storageClass,timeCreated)"),
+        ],
     )
     .await
 }
@@ -133,7 +157,12 @@ const GRAPH: &str = "https://graph.microsoft.com/v1.0";
 
 /// Microsoft Graph `/me`.
 pub async fn graph_me(token: &str) -> Result<Value> {
-    get(token, &format!("{GRAPH}/me"), &[("$select", "id,displayName,mail,userPrincipalName")]).await
+    get(
+        token,
+        &format!("{GRAPH}/me"),
+        &[("$select", "id,displayName,mail,userPrincipalName")],
+    )
+    .await
 }
 
 /// OneDrive root children.
@@ -141,7 +170,13 @@ pub async fn onedrive_root(token: &str) -> Result<Value> {
     get(
         token,
         &format!("{GRAPH}/me/drive/root/children"),
-        &[("$select", "id,name,size,folder,file,lastModifiedDateTime,webUrl"), ("$top", "100")],
+        &[
+            (
+                "$select",
+                "id,name,size,folder,file,lastModifiedDateTime,webUrl",
+            ),
+            ("$top", "100"),
+        ],
     )
     .await
 }

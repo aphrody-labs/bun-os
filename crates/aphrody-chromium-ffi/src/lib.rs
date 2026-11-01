@@ -65,7 +65,9 @@ pub unsafe extern "C" fn aphrody_chromium_buf_free(ptr: *mut u8) {
         let mut len = [0u8; 8];
         std::ptr::copy_nonoverlapping(ptr, len.as_mut_ptr(), 8);
         let total = HEADER + u64::from_le_bytes(len) as usize;
-        drop(Box::from_raw(std::ptr::slice_from_raw_parts_mut(ptr, total)));
+        drop(Box::from_raw(std::ptr::slice_from_raw_parts_mut(
+            ptr, total,
+        )));
     }
 }
 
@@ -99,9 +101,16 @@ fn build_engine(json: &[u8]) -> Result<Box<AdblockEngine>, String> {
     let format = match options.format.as_deref() {
         None | Some("standard") => FilterFormat::Standard,
         Some("hosts") => FilterFormat::Hosts,
-        Some(other) => return Err(format!("format must be \"standard\" or \"hosts\", got \"{other}\"")),
+        Some(other) => {
+            return Err(format!(
+                "format must be \"standard\" or \"hosts\", got \"{other}\""
+            ));
+        }
     };
-    let opts = ParseOptions { format, ..ParseOptions::default() };
+    let opts = ParseOptions {
+        format,
+        ..ParseOptions::default()
+    };
     let mut set = FilterSet::new(options.debug);
     match options.rules {
         Rules::Text(text) => set.add_filter_list(text, opts),
@@ -117,7 +126,11 @@ fn build_engine(json: &[u8]) -> Result<Box<AdblockEngine>, String> {
 /// Build an engine from JSON options `{ rules, format?, debug?, resources? }`. Writes an error
 /// buffer to `*error` and returns null on failure.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn aphrody_adblock_new(json: *const u8, len: usize, error: *mut *mut u8) -> *mut AdblockEngine {
+pub unsafe extern "C" fn aphrody_adblock_new(
+    json: *const u8,
+    len: usize,
+    error: *mut *mut u8,
+) -> *mut AdblockEngine {
     // SAFETY: caller contract of `bytes`.
     match build_engine(unsafe { bytes(json, len) }) {
         Ok(engine) => Box::into_raw(engine),
@@ -175,9 +188,15 @@ struct CheckArgs {
 /// `{ url, sourceUrl?, requestType?, method? }` to the check result JSON
 /// `{ matched, blocked, important, filter?, exception?, redirect?, rewrittenUrl? }`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn aphrody_adblock_check(engine: *const AdblockEngine, json: *const u8, len: usize) -> *mut u8 {
+pub unsafe extern "C" fn aphrody_adblock_check(
+    engine: *const AdblockEngine,
+    json: *const u8,
+    len: usize,
+) -> *mut u8 {
     // SAFETY: `engine` is a live engine from this library.
-    let Some(engine) = (unsafe { engine.as_ref() }) else { return err("engine is closed") };
+    let Some(engine) = (unsafe { engine.as_ref() }) else {
+        return err("engine is closed");
+    };
     // SAFETY: caller contract of `bytes`.
     let args: CheckArgs = match serde_json::from_slice(unsafe { bytes(json, len) }) {
         Ok(args) => args,
@@ -185,7 +204,10 @@ pub unsafe extern "C" fn aphrody_adblock_check(engine: *const AdblockEngine, jso
     };
     let source = args.source_url.unwrap_or_else(|| args.url.clone());
     let kind = args.request_type.unwrap_or_else(|| "other".into());
-    let method = args.method.unwrap_or_else(|| "get".into()).to_ascii_lowercase();
+    let method = args
+        .method
+        .unwrap_or_else(|| "get".into())
+        .to_ascii_lowercase();
     let request = match Request::new(&args.url, &source, &kind, &method) {
         Ok(request) => request,
         Err(e) => return err(format!("Invalid request URL: {e:?}")),
@@ -219,9 +241,13 @@ pub unsafe extern "C" fn aphrody_adblock_url_cosmetic_resources(
     len: usize,
 ) -> *mut u8 {
     // SAFETY: `engine` is a live engine from this library.
-    let Some(engine) = (unsafe { engine.as_ref() }) else { return err("engine is closed") };
+    let Some(engine) = (unsafe { engine.as_ref() }) else {
+        return err("engine is closed");
+    };
     // SAFETY: caller contract of `bytes`.
-    let Ok(url) = std::str::from_utf8(unsafe { bytes(url, len) }) else { return err("url must be UTF-8") };
+    let Ok(url) = std::str::from_utf8(unsafe { bytes(url, len) }) else {
+        return err("url must be UTF-8");
+    };
     let resources = engine.engine.url_cosmetic_resources(url);
     let sorted = |set: &HashSet<String>| {
         let mut values: Vec<String> = set.iter().cloned().collect();
@@ -255,14 +281,19 @@ pub unsafe extern "C" fn aphrody_adblock_hidden_class_id_selectors(
     len: usize,
 ) -> *mut u8 {
     // SAFETY: `engine` is a live engine from this library.
-    let Some(engine) = (unsafe { engine.as_ref() }) else { return err("engine is closed") };
+    let Some(engine) = (unsafe { engine.as_ref() }) else {
+        return err("engine is closed");
+    };
     // SAFETY: caller contract of `bytes`.
     let args: HiddenArgs = match serde_json::from_slice(unsafe { bytes(json, len) }) {
         Ok(args) => args,
         Err(e) => return err(format!("hiddenClassIdSelectors arguments: {e}")),
     };
     let exceptions: HashSet<String> = args.exceptions.into_iter().collect();
-    let mut selectors = engine.engine.hidden_class_id_selectors(&args.classes, &args.ids, &exceptions);
+    let mut selectors =
+        engine
+            .engine
+            .hidden_class_id_selectors(&args.classes, &args.ids, &exceptions);
     selectors.sort();
     ok_json(&json!(selectors))
 }
@@ -270,7 +301,9 @@ pub unsafe extern "C" fn aphrody_adblock_hidden_class_id_selectors(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn aphrody_adblock_serialize(engine: *const AdblockEngine) -> *mut u8 {
     // SAFETY: `engine` is a live engine from this library.
-    let Some(engine) = (unsafe { engine.as_ref() }) else { return err("engine is closed") };
+    let Some(engine) = (unsafe { engine.as_ref() }) else {
+        return err("engine is closed");
+    };
     ok(&engine.engine.serialize())
 }
 

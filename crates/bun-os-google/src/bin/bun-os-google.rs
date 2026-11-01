@@ -10,15 +10,20 @@
 //! `APHRODY_GOOGLE_ENV`) for keys that are not already set. Nothing secret is printed.
 
 // Standalone service binary: std I/O and env are intended here.
-#![allow(clippy::disallowed_methods, clippy::disallowed_types, clippy::disallowed_macros)]
+#![allow(
+    clippy::disallowed_methods,
+    clippy::disallowed_types,
+    clippy::disallowed_macros
+)]
 
-use bun_google::cloud::server::{GoogleService, router};
 use bun_google::cloud::api;
+use bun_google::cloud::server::{GoogleService, router};
 use std::process::ExitCode;
 use std::sync::Arc;
 
 fn load_env_file() {
-    let path = std::env::var("APHRODY_GOOGLE_ENV").unwrap_or_else(|_| "/etc/aphrody/google.env".into());
+    let path =
+        std::env::var("APHRODY_GOOGLE_ENV").unwrap_or_else(|_| "/etc/aphrody/google.env".into());
     let Ok(text) = std::fs::read_to_string(&path) else {
         return;
     };
@@ -40,7 +45,11 @@ fn load_env_file() {
 fn names(v: &serde_json::Value, list: &str, field: &str) -> Vec<String> {
     v[list]
         .as_array()
-        .map(|a| a.iter().filter_map(|i| i[field].as_str().map(str::to_owned)).collect())
+        .map(|a| {
+            a.iter()
+                .filter_map(|i| i[field].as_str().map(str::to_owned))
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -48,7 +57,11 @@ async fn check(svc: &GoogleService) -> bool {
     let mut ok = true;
     match &svc.adc {
         Some(a) => {
-            println!("service account: {} ({})", a.credentials().principal(), a.credentials().kind());
+            println!(
+                "service account: {} ({})",
+                a.credentials().principal(),
+                a.credentials().kind()
+            );
             match a.token(&[]).await {
                 Ok(t) => match api::gcs_buckets(&t, &svc.project).await {
                     Ok(v) => println!("  gcs buckets: {}", names(&v, "items", "name").join(", ")),
@@ -65,16 +78,25 @@ async fn check(svc: &GoogleService) -> bool {
         }
         None => {
             ok = false;
-            println!("service account: {}", svc.adc_error.as_deref().unwrap_or("not configured"));
+            println!(
+                "service account: {}",
+                svc.adc_error.as_deref().unwrap_or("not configured")
+            );
         }
     }
     match svc.owner.status() {
         Ok(st) if st.linked => {
-            println!("owner: {} ({} scopes)", st.email.as_deref().unwrap_or("?"), st.scopes.len());
+            println!(
+                "owner: {} ({} scopes)",
+                st.email.as_deref().unwrap_or("?"),
+                st.scopes.len()
+            );
             match svc.owner.access_token().await {
                 Ok(t) => {
                     match api::drive_root(&t, 20).await {
-                        Ok(v) => println!("  drive root: {} entries", names(&v, "files", "name").len()),
+                        Ok(v) => {
+                            println!("  drive root: {} entries", names(&v, "files", "name").len())
+                        }
                         Err(e) => println!("  drive root: {e}"),
                     }
                     match api::gmail_labels(&t).await {
@@ -106,7 +128,10 @@ fn main() -> ExitCode {
     load_env_file();
     let args: Vec<String> = std::env::args().skip(1).collect();
     let cmd = args.first().map_or("status", String::as_str);
-    let rt = match tokio::runtime::Builder::new_multi_thread().enable_all().build() {
+    let rt = match tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+    {
         Ok(rt) => rt,
         Err(e) => {
             eprintln!("runtime: {e}");

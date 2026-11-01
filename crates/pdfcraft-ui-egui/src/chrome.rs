@@ -93,9 +93,7 @@ pub fn tab_strip(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
                     app.combine_tab.focused = false;
                 }
                 // Keep the two icon buttons and the gaps outside the scrolling tabs.
-                let controls_width = 2.0 * button
-                    + 50.0
-                    + window_controls::width(&controls.right);
+                let controls_width = 2.0 * button + 50.0 + window_controls::width(&controls.right);
                 // Open stays in sight after the tabs: its icon, text and padding, and the gaps around it.
                 let open_width = ui.fonts_mut(|f| {
                     f.layout_no_wrap(tl!("Open").into(), theme::medium(13.0), t.text)

@@ -20,7 +20,8 @@ pub struct SealedFile {
 fn write_private(path: &Path, data: &[u8]) -> Result<()> {
     use std::io::Write;
     if let Some(dir) = path.parent() {
-        std::fs::create_dir_all(dir).map_err(|e| Error::Store(format!("{}: {e}", dir.display())))?;
+        std::fs::create_dir_all(dir)
+            .map_err(|e| Error::Store(format!("{}: {e}", dir.display())))?;
     }
     let tmp = path.with_extension("tmp");
     let mut opts = std::fs::OpenOptions::new();

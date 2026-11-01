@@ -410,7 +410,8 @@ pub fn check_options(mask: NetworkFilterMask, request: &request::Request) -> boo
         || (!mask.first_party() && !request.is_third_party)
         || (!mask.third_party() && request.is_third_party)
         || (request.is_https && !mask.for_https())
-        || (request.is_http && !mask.for_http()) || !NetworkFilterMask::check_method_allowed(mask, request.method.as_ref()))
+        || (request.is_http && !mask.for_http())
+        || !NetworkFilterMask::check_method_allowed(mask, request.method.as_ref()))
 }
 
 #[inline]

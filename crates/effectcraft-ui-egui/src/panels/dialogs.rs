@@ -449,15 +449,7 @@ fn about_main(
     for (icon, label, url, c) in links {
         let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 30.0), Sense::click());
         let p = ui.painter();
-        p.rect_filled(
-            r,
-            6.0,
-            if resp.hovered() {
-                t.hover
-            } else {
-                t.field_bg
-            },
-        );
+        p.rect_filled(r, 6.0, if resp.hovered() { t.hover } else { t.field_bg });
         let foreground = t.text;
         icons::paint(
             p,

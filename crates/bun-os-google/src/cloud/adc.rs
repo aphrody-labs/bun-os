@@ -166,14 +166,16 @@ impl Adc {
     /// Load from [`locate`].
     pub fn discover() -> Result<Self> {
         let path = locate().ok_or_else(|| {
-            Error::Config("no Application Default Credentials (GOOGLE_APPLICATION_CREDENTIALS)".into())
+            Error::Config(
+                "no Application Default Credentials (GOOGLE_APPLICATION_CREDENTIALS)".into(),
+            )
         })?;
         Self::from_file(&path)
     }
     /// Load a credential file.
     pub fn from_file(path: &Path) -> Result<Self> {
-        let raw = std::fs::read(path)
-            .map_err(|e| Error::Config(format!("{}: {e}", path.display())))?;
+        let raw =
+            std::fs::read(path).map_err(|e| Error::Config(format!("{}: {e}", path.display())))?;
         let creds: Credentials = serde_json::from_slice(&raw)
             .map_err(|e| Error::Config(format!("{}: {e}", path.display())))?;
         Ok(Self {
