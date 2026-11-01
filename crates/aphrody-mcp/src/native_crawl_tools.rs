@@ -163,13 +163,15 @@ async fn run(args: &Value) -> Result<Value, String> {
     })?;
     let crawl = async {
         match browser {
-            "native" => {
-                crawl_bounded(&mut frontier, &BunBrowserTransport::default(), &options).await
-            }
+            "native" => crawl_bounded(&mut frontier, &BunBrowserTransport::default(), &options)
+                .await
+                .map_err(|error| error.to_string()),
             "playwright" => {
                 let transport =
                     PlaywrightTransport::connect(options.allowed_domains.clone()).await?;
-                crawl_bounded(&mut frontier, &transport, &options).await
+                crawl_bounded(&mut frontier, &transport, &options)
+                    .await
+                    .map_err(|error| error.to_string())
             }
             _ => Err("browser must be native or playwright".into()),
         }

@@ -17,6 +17,7 @@ services:
       SEARXNG_VALKEY_URL: valkey://valkey:6379/0
       SEARXNG_PORT: "8080"
       SEARXNG_BIND_ADDRESS: "0.0.0.0"
+      GRANIAN_HOST: "0.0.0.0"
       SEARXNG_LIMITER: "false"
     ports:
       - 127.0.0.1:8888:8080
