@@ -32,8 +32,6 @@
   "use strict";
   const $ = (id) => document.getElementById(id);
   const canvas = $("screen"), ctx = canvas.getContext("2d"), status = $("status");
-  const raw = location.hash.replace(/^#/, "");
-  const token = raw.startsWith("token=") ? decodeURIComponent(raw.slice(6)) : decodeURIComponent(raw);
   let ws = null, pending = null, decoding = false, frames = 0, lastTick = performance.now();
   const pressed = new Set();
 
@@ -41,7 +39,7 @@
 
   function connect() {
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
-    ws = new WebSocket(`${proto}//${location.host}/ws?token=${encodeURIComponent(token)}`);
+    ws = new WebSocket(`${proto}//${location.host}/ws`);
     ws.binaryType = "arraybuffer";
     ws.onopen = () => { status.textContent = "connected"; sendConfig(); };
     ws.onclose = () => { status.textContent = "disconnected, retrying..."; setTimeout(connect, 2000); };

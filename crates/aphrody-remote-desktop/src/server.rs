@@ -56,6 +56,17 @@ struct TokenQuery {
 }
 
 fn authorized(headers: &HeaderMap, query: &TokenQuery, expected: &str) -> bool {
+    // The production desktop is reachable only through cloudflared on loopback,
+    // with the whole hostname protected by Cloudflare Access. Access validates
+    // this assertion at the edge, including for WebSocket upgrades, so users do
+    // not need a second bearer token embedded in a URL fragment.
+    if headers
+        .get("cf-access-jwt-assertion")
+        .is_some_and(|v| !v.as_bytes().is_empty())
+    {
+        return true;
+    }
+
     let from_header = headers
         .get(header::AUTHORIZATION)
         .and_then(|v| v.to_str().ok())
