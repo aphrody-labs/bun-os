@@ -187,6 +187,48 @@ and its source-specific crawler jobs. Shenron's `aphrodyWebCrawl` client accepts
 registry remain the owners of Dragon Ball ingestion. `crawl-index` remains
 Aphrody Search's SQLite/RAG index path.
 
+### Shenron VPS runtime snapshot (2026-11-01)
+
+The following is an observed operational snapshot, not a deployment promise.
+The Shenron user services `shenron-site-crawl.service` and
+`shenron-web-engine.service` were running, but both were disabled at boot.
+`shenron-crunchyroll.service` was running and enabled. Inspect and follow logs
+with:
+
+```sh
+systemctl --user status shenron-site-crawl.service shenron-web-engine.service shenron-crunchyroll.service
+journalctl --user -u shenron-site-crawl.service -f
+journalctl --user -u shenron-web-engine.service -f
+```
+
+The recursive site crawler stores its SQLite frontier under
+`~/apps/shenron/state/crawl/frontier.sqlite`. The web engine stores its own
+queue and index in `~/apps/shenron/state/web-engine/engine.sqlite`. They are
+separate from Aphrody Search's RAG database and Redis cache. The web-engine
+unit seeds `https://dragonballfr.com`, uses sitemap discovery and the fetch,
+Lightpanda and Obscura tiers, and does not pass `--publish`; therefore this
+service run does not publish crawl assets to Cloudflare/R2. Its observed
+runtime CPU and memory cgroup limits were 200% and 4 GiB, applied at runtime
+and not persisted across reboot.
+
+The site crawler treats Dragon Ball France as operator-owned input; its script
+does not consult that site's robots.txt. Third-party sources retain their
+robots checks. Review the source policy and crawler options before adding
+seeds. These workers were intentionally not enabled at boot in this snapshot.
+
+Obscura CDP (`127.0.0.1:9222`) and the Playwright bridge (`127.0.0.1:9230`)
+were healthy. Redis responded to `redis-cli ping` on loopback port 6379, but
+its keyspace was empty at observation time. The `aphrody-google` daemon was
+listening on `127.0.0.1:8802`; `/` and `/health` are not health routes. Google
+autocomplete through `aphrody_google_suggest` succeeded, while public Google
+SERP search returned a fetch error or anti-bot interstitial. Do not report
+public Google search as qualified or attempt to bypass that challenge. The
+Crunchyroll API was healthy on `127.0.0.1:9120`, but credentials were absent,
+so its catalog sync was partial.
+
+This snapshot records observed service state only. Aphrody Infra owns host
+service definitions, proxy configuration, secrets, backups and persistence.
+
 The generic Aphrody `web-pipeline` job accepts `crawl-index` only. Dragon Ball
 submissions are rejected at the MCP boundary until they go through Shenron's
 source-aware queue, avoiding a job that would be accepted then permanently fail.
