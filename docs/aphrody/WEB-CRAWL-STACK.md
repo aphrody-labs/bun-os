@@ -56,9 +56,9 @@ aphrody web crawl-index https://example.com --label example-site \
 
 ### JavaScript / TypeScript on Bun
 
-`@aphrody/web-crawl` provides typed `crawl()` and an `aphrody-web` executable. It
-starts the installed Rust CLI using an argument array, never a shell string.
-Set `APHRODY_BIN` if the binary is not on `PATH`:
+`@aphrody/web-crawl` provides typed `crawl()` and `searchIndex()` APIs plus an
+`aphrody-web` executable. Both call the installed Rust CLI using an argument
+array, never a shell string. Set `APHRODY_BIN` if the binary is not on `PATH`:
 
 ```sh
 bun add @aphrody/web-crawl
@@ -76,10 +76,21 @@ const report = await crawl({
   obeyRobots: true,
   browser: "playwright",
 });
+
+const results = await searchIndex({
+  query: "Obscura headless browser",
+  mode: "hybrid",
+  limit: 5,
+});
 ```
 
-The package requires the Aphrody CLI; it does not download or launch a browser.
-Install the browser services separately when `browser: "playwright"` is used.
+`searchIndex()` queries Aphrody's existing RAG index; it does not claim public
+Google SERP results. Ingest pages first with `web crawl-index` or
+`rag web-ingest`. The JS package currently targets Bun because it uses
+`Bun.spawn`; browser and generic JavaScript runtimes need a versioned HTTP
+service contract and a Fetch-based client, which are not implemented yet. The
+package does not download or launch a browser. Install the browser services
+separately when `browser: "playwright"` is used.
 
 ### Rust
 
@@ -90,6 +101,14 @@ The crawler and safe native/Playwright transports are packaged as the
 [dependencies]
 aphrody-web = "1.4.7"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+```
+
+The optional `rag-search` Cargo feature exposes the same Aphrody RAG search
+types used by CLI and MCP, without adding that storage stack to crawler-only
+consumers:
+
+```toml
+aphrody-web = { version = "1.4.7", features = ["rag-search"] }
 ```
 
 ```rust,no_run

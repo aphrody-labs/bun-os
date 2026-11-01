@@ -12,8 +12,13 @@ readme = "README.md"
 [dependencies]
 obscura-crawl = { workspace = true }
 obscura-net = { workspace = true }
+aphrody-rag = { path = "../aphrody-rag", version = "1.4.7", optional = true }
 reqwest = { workspace = true, features = ["rustls-no-provider", "json", "http2"] }
 serde = { workspace = true }
+
+[features]
+default = []
+rag-search = ["dep:aphrody-rag"]
 
 [package.metadata.docs.rs]
 all-features = true

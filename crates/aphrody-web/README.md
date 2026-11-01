@@ -66,5 +66,37 @@ The Rust crate never starts or downloads a browser. `PlaywrightTransport`
 requires `APHRODY_WEB_PLAYWRIGHT_URL` to be a loopback HTTP URL; it defaults to
 `http://127.0.0.1:9230/render` and checks bridge health before crawling.
 
+## Search an Aphrody RAG index
+
+Enable the optional `rag-search` feature to use the same lexical, vector and
+hybrid retrieval engine as the CLI and MCP agent tools:
+
+```toml
+[dependencies]
+aphrody-web = { version = "1.4.7", features = ["rag-search"] }
+```
+
+```rust,no_run
+use std::sync::Arc;
+use aphrody_web::search::{RagSearcher, RagStore, SearchMode, SearchOptions};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let store = Arc::new(RagStore::open("./aphrody-rag.sqlite")?);
+    let result = RagSearcher::new(store).search(
+        "Obscura headless browser",
+        &SearchOptions { mode: SearchMode::Lexical, ..Default::default() },
+    ).await?;
+    for hit in result.hits {
+        println!("{}: {}", hit.chunk.path, hit.chunk.content);
+    }
+    Ok(())
+}
+```
+
+The default crate stays crawler-only; `rag-search` is opt-in because it adds
+SQLite and retrieval dependencies. This API searches a local indexed corpus,
+not the public web.
+
 The CLI, typed Bun package, and MCP tool are documented in
 [`docs/aphrody/WEB-CRAWL-STACK.md`](../../docs/aphrody/WEB-CRAWL-STACK.md).

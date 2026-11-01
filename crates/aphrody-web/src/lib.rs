@@ -14,6 +14,19 @@ pub use obscura_crawl::{
 };
 pub use obscura_net::BunBrowserHttpClient;
 
+/// Local Aphrody RAG search API, enabled with the `rag-search` feature.
+///
+/// This exposes the same lexical, vector and hybrid index used by the CLI and
+/// MCP agent tools. It does not perform public web search; index documents with
+/// Aphrody RAG before querying them.
+#[cfg(feature = "rag-search")]
+pub mod search {
+    pub use aphrody_rag::{
+        ChunkRecord, RagSearcher, RagStats, RagStore, ScoredChunk, SearchMode, SearchOptions,
+        SearchResult,
+    };
+}
+
 /// Create an Obscura HTTP transport with the requested outbound host scope.
 pub async fn scoped_native_transport(domains: &[String]) -> Result<BunBrowserTransport, String> {
     obscura_net::ensure_rustls_crypto_provider();
