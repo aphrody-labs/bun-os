@@ -63,6 +63,7 @@
     "@aphrody/qr": "1.4.7",
     "@aphrody/scaffold": "workspace:*",
     "@aphrody/tauri": "workspace:*",
+    "@aphrody/web-crawl": "workspace:*",
     "@aphrody/webos-wasm": "workspace:*",
     "@dnd-kit/core": "catalog:",
     "@dnd-kit/sortable": "catalog:",

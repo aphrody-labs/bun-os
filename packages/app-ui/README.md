@@ -39,3 +39,14 @@ M3 forwards `/rpc`, `/events`, `/notifications`, `/health` and `/healthz`
 unchanged. Backend failures remain failures. Desktop-only commands use real
 Tauri IPC in the desktop host; the browser server does not impersonate Tauri.
 The frontend starts no backend process and owns no model, crawl or RAG store.
+
+## Aphrody Search
+
+The product search home offers public web search and a separate indexed
+knowledge mode. Indexed knowledge uses `@aphrody/web-crawl/browser` and calls
+the versioned `/api/v1/rag/search` endpoint. Set
+`VITE_APHRODY_SEARCH_API_URL` to the Aphrody MCP HTTP origin when it is not
+served through the app's own origin; otherwise the same-origin route is used.
+The browser client sends no bearer token, so cross-origin deployments must be
+configured by the operator with an authenticated gateway and appropriate
+CORS. Results are retrieval excerpts, not generated answers.

@@ -3,6 +3,7 @@ import { AphrodyAvatar, AphrodyPet, publicPetAtlas } from "@aphrody/identity";
 import { PET_ATLAS_URL } from "@aphrody/identity/atlas";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { createHttpSearchClient, type HttpSearchReport } from "@aphrody/web-crawl/browser";
 import { searchGoogle, type GoogleSearchPage } from "../../google-search";
 import { useI18n } from "../../i18n";
 import { usesBrowserBackend } from "../../tauri-bridge";
@@ -14,27 +15,41 @@ export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; asse
   const text = productSearchMessages[language];
   const [query, setQuery] = useState("");
   const [page, setPage] = useState<GoogleSearchPage | null>(null);
+  const [library, setLibrary] = useState<HttpSearchReport | null>(null);
+  const [source, setSource] = useState<"web" | "library">("web");
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
-  // /api/search answers on every host: the Google owner where one is configured, otherwise the local index.
+  const [errorMessage, setErrorMessage] = useState("");
+  // The public web source is available through the app's existing search route.
+  // The local index source uses the configured same-origin Aphrody gateway.
   const searchable = true;
   async function run() {
     if (busy || !query.trim()) return;
     setBusy(true);
     setFailed(false);
     setPage(null);
+    setLibrary(null);
     try {
-      setPage(
-        await searchGoogle({
-          query,
-          vertical: "web",
-          hl: language,
-          safe: "active",
-          start: 0,
-        }),
-      );
-    } catch {
+      if (source === "library") {
+        const env = import.meta.env as { VITE_APHRODY_SEARCH_API_URL?: string };
+        const client = createHttpSearchClient({
+          baseUrl: env.VITE_APHRODY_SEARCH_API_URL || window.location.origin,
+        });
+        setLibrary(await client.search({ query, limit: 8 }));
+      } else {
+        setPage(
+          await searchGoogle({
+            query,
+            vertical: "web",
+            hl: language,
+            safe: "active",
+            start: 0,
+          }),
+        );
+      }
+    } catch (error) {
       setFailed(true);
+      setErrorMessage(error instanceof Error ? error.message : "Search service unavailable.");
     } finally {
       setBusy(false);
     }
@@ -59,6 +74,29 @@ export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; asse
         <p className="mb-8 text-body-large text-on-surface-variant">{text.intro}</p>
         {searchable && (
           <>
+            <div className="mb-4 flex flex-wrap justify-center gap-2" role="group" aria-label={text.sourceLabel}>
+              {(["web", "library"] as const).map(option => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={source === option}
+                  disabled={busy}
+                  onClick={() => {
+                    setSource(option);
+                    setPage(null);
+                    setLibrary(null);
+                    setFailed(false);
+                  }}
+                  className={`min-h-12 rounded-full px-5 text-label-large ring-1 ring-outline-variant focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${
+                    source === option
+                      ? "bg-secondary-container text-on-secondary-container"
+                      : "bg-surface-container text-on-surface"
+                  }`}
+                >
+                  {option === "web" ? text.webSource : text.librarySource}
+                </button>
+              ))}
+            </div>
             <search aria-label={text.searchLabel} className="w-full">
               <form aria-label={text.searchLabel} onSubmit={submit} className="w-full">
                 <label htmlFor="aphrody-home-search" className="sr-only">
@@ -74,8 +112,12 @@ export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; asse
                     value={query}
                     onChange={event => setQuery(event.target.value)}
                     required
-                    placeholder={text.search}
+                    name="q"
+                    placeholder={source === "web" ? text.search : text.librarySearch}
                     autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
                     className="min-w-0 flex-1 bg-transparent py-4 text-body-large text-on-surface outline-none"
                   />
                   <button
@@ -91,7 +133,9 @@ export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; asse
                 </div>
               </form>
             </search>
-            <p className="mt-4 text-body-small text-on-surface-variant">{text.privacy}</p>
+            <p className="mt-4 max-w-xl text-body-small text-on-surface-variant">
+              {source === "web" ? text.privacy : text.libraryPrivacy}
+            </p>
           </>
         )}
         <label className="mt-4 flex items-center gap-2 text-body-small">
@@ -119,6 +163,7 @@ export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; asse
         {failed && (
           <div role="alert" className="mb-8 rounded-extra-large bg-error-container p-5 text-on-error-container">
             <p>{text.unavailable}</p>
+            {source === "library" && errorMessage && <p className="mt-2 text-body-small">{errorMessage}</p>}
             <button type="button" disabled={busy} onClick={() => void run()} className="mt-3 min-h-12 underline">
               {text.retry}
             </button>
@@ -154,6 +199,46 @@ export function ProductSearchHome({ assetBase }: { publicPreview?: boolean; asse
                 </li>
               ))}
             </ol>
+          </div>
+        )}
+        {busy && (
+          <p role="status" className="mb-8 rounded-large bg-surface-container p-5 text-body-medium">
+            {source === "library" ? text.libraryLoading : text.searching}
+          </p>
+        )}
+        {library && (
+          <div className="pb-10 text-left">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-title-large">
+                {text.libraryResults} {library.query}
+              </h2>
+              <p className="text-body-small text-on-surface-variant">
+                {text.mode}: {library.mode_served} · {library.elapsed_ms} ms
+              </p>
+            </div>
+            {library.fallback_reason && (
+              <p className="mt-3 rounded-medium bg-tertiary-container p-3 text-on-tertiary-container">
+                {text.fallback}: {library.fallback_reason}
+              </p>
+            )}
+            {library.hits.length === 0 ? (
+              <p className="mt-5 rounded-large bg-surface-container p-5">{text.libraryEmpty}</p>
+            ) : (
+              <ol className="mt-5 flex flex-col gap-4">
+                {library.hits.map(hit => (
+                  <li key={`${hit.chunk.id}:${hit.chunk.path}`} className="rounded-large bg-surface-container-low p-5">
+                    <p className="break-all text-body-small text-on-surface-variant">
+                      {hit.chunk.path}
+                      {hit.chunk.heading ? ` · ${hit.chunk.heading}` : ""}
+                    </p>
+                    <p className="mt-3 whitespace-pre-wrap text-body-medium">{hit.chunk.content}</p>
+                    <p className="mt-3 text-label-small text-on-surface-variant">
+                      {text.match}: {hit.channel} · {hit.score.toFixed(3)}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            )}
           </div>
         )}
       </section>

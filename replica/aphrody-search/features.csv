@@ -1,0 +1,9 @@
+feature,area,priority,original,clone,notes
+Search public web,search,must,yes,yes,Existing Aphrody web search path
+Search Aphrody indexed corpus,search,must,yes,partial,Typed HTTP RAG excerpts; requires configured service/gateway
+Ranked local excerpts with provenance,results,must,yes,yes,Shows indexed path and heading
+Retrieval mode and fallback metadata,results,should,yes,yes,Displays honest retrieval mode and fallback reason
+Loading empty and retry states,states,must,yes,yes,Accessible status and error surfaces
+Generated cited answer,agents,should,yes,no,Requires a dedicated answer synthesis pipeline
+Conversation history and projects,workspace,could,yes,no,Outside this single search vertical slice
+Automations and browser actions,agents,could,yes,no,Outside Aphrody Search core query flow
