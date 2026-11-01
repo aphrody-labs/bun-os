@@ -14,6 +14,370 @@ pub use obscura_crawl::{
 };
 pub use obscura_net::BunBrowserHttpClient;
 
+/// Typed HTTP integration for an operator-managed SearXNG instance.
+///
+/// Enable the `searxng` feature to expose a provider-neutral Aphrody web-search
+/// result contract. SearXNG must have JSON output enabled by its operator.
+#[cfg(feature = "searxng")]
+pub mod web_search {
+    use std::{error::Error, fmt, time::Duration};
+
+    use reqwest::{StatusCode, Url};
+    use serde::{Deserialize, Serialize};
+
+    const DEFAULT_TIMEOUT: Duration = Duration::from_secs(15);
+
+    /// Search categories supported by SearXNG; availability depends on instance configuration.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum SearchCategory {
+        General,
+        News,
+        Science,
+        It,
+        Images,
+        Videos,
+    }
+
+    impl SearchCategory {
+        fn as_str(self) -> &'static str {
+            match self {
+                Self::General => "general",
+                Self::News => "news",
+                Self::Science => "science",
+                Self::It => "it",
+                Self::Images => "images",
+                Self::Videos => "videos",
+            }
+        }
+    }
+
+    /// Time filter applied where an enabled upstream engine supports it.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum TimeRange {
+        Day,
+        Month,
+        Year,
+    }
+
+    impl TimeRange {
+        fn as_str(self) -> &'static str {
+            match self {
+                Self::Day => "day",
+                Self::Month => "month",
+                Self::Year => "year",
+            }
+        }
+    }
+
+    /// Normalized public web-search request.
+    #[derive(Debug, Clone)]
+    pub struct WebSearchRequest {
+        pub query: String,
+        pub limit: usize,
+        pub categories: Vec<SearchCategory>,
+        pub language: Option<String>,
+        pub page: u16,
+        pub time_range: Option<TimeRange>,
+        pub safe_search: Option<u8>,
+        pub engines: Vec<String>,
+        pub disabled_engines: Vec<String>,
+    }
+
+    impl WebSearchRequest {
+        pub fn new(query: impl Into<String>) -> Self {
+            Self {
+                query: query.into(),
+                limit: 10,
+                categories: Vec::new(),
+                language: None,
+                page: 1,
+                time_range: None,
+                safe_search: Some(1),
+                engines: Vec::new(),
+                disabled_engines: Vec::new(),
+            }
+        }
+    }
+
+    /// One normalized web result with source engine metadata when available.
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct WebSearchResultItem {
+        pub title: String,
+        pub url: String,
+        pub snippet: String,
+        pub engine: Option<String>,
+        pub category: Option<String>,
+        pub published_at: Option<String>,
+        pub engines: Vec<String>,
+        pub score: Option<f64>,
+        pub thumbnail: Option<String>,
+        pub template: Option<String>,
+        pub metadata: serde_json::Value,
+    }
+
+    /// Provider-neutral Aphrody result report for public web discovery.
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct WebSearchReport {
+        pub query: String,
+        pub results: Vec<WebSearchResultItem>,
+        pub provider: String,
+        pub page: u16,
+        pub total_results: usize,
+        pub requested_limit: usize,
+        pub answers: Vec<String>,
+        pub corrections: Vec<String>,
+        pub suggestions: Vec<String>,
+        pub unresponsive_engines: Vec<String>,
+        pub infoboxes: Vec<serde_json::Value>,
+    }
+
+    /// Search client configuration.
+    #[derive(Debug, Clone)]
+    pub struct SearxngClientOptions {
+        pub base_url: Url,
+        pub timeout: Duration,
+    }
+
+    impl SearxngClientOptions {
+        pub fn new(base_url: impl AsRef<str>) -> Result<Self, WebSearchError> {
+            let base_url = Url::parse(base_url.as_ref())
+                .map_err(|_| WebSearchError::InvalidRequest("base_url is invalid"))?;
+            if !matches!(base_url.scheme(), "http" | "https")
+                || !base_url.username().is_empty()
+                || base_url.password().is_some()
+                || base_url.query().is_some()
+                || base_url.fragment().is_some()
+            {
+                return Err(WebSearchError::InvalidRequest(
+                    "base_url must be HTTP(S) without credentials, query, or fragment",
+                ));
+            }
+            Ok(Self {
+                base_url,
+                timeout: DEFAULT_TIMEOUT,
+            })
+        }
+
+        pub fn timeout(mut self, timeout: Duration) -> Self {
+            self.timeout = timeout.clamp(Duration::from_millis(1), Duration::from_secs(120));
+            self
+        }
+    }
+
+    /// Error returned from Aphrody's web-search provider.
+    #[derive(Debug)]
+    pub enum WebSearchError {
+        InvalidRequest(&'static str),
+        Transport(reqwest::Error),
+        Provider { status: StatusCode, message: String },
+        InvalidResponse(&'static str),
+    }
+
+    impl fmt::Display for WebSearchError {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            match self {
+                Self::InvalidRequest(message) => write!(f, "invalid web-search request: {message}"),
+                Self::Transport(error) => write!(f, "web-search request failed: {error}"),
+                Self::Provider { status, message } => {
+                    write!(f, "SearXNG returned HTTP {status}: {message}")
+                }
+                Self::InvalidResponse(message) => write!(f, "invalid SearXNG response: {message}"),
+            }
+        }
+    }
+
+    impl Error for WebSearchError {
+        fn source(&self) -> Option<&(dyn Error + 'static)> {
+            match self {
+                Self::Transport(error) => Some(error),
+                Self::InvalidRequest(_) | Self::Provider { .. } | Self::InvalidResponse(_) => None,
+            }
+        }
+    }
+
+    impl From<reqwest::Error> for WebSearchError {
+        fn from(error: reqwest::Error) -> Self {
+            Self::Transport(error)
+        }
+    }
+
+    #[derive(Deserialize)]
+    struct SearxngResponse {
+        results: Option<Vec<SearxngResult>>,
+        #[serde(rename = "number_of_results")]
+        total_results: Option<usize>,
+        answers: Option<Vec<String>>,
+        corrections: Option<Vec<String>>,
+        suggestions: Option<Vec<String>>,
+        unresponsive_engines: Option<Vec<String>>,
+        infoboxes: Option<Vec<serde_json::Value>>,
+    }
+
+    #[derive(Deserialize)]
+    struct SearxngResult {
+        title: Option<String>,
+        url: Option<String>,
+        content: Option<String>,
+        engine: Option<String>,
+        category: Option<String>,
+        #[serde(rename = "publishedDate")]
+        published_date: Option<String>,
+        engines: Option<Vec<String>>,
+        score: Option<f64>,
+        thumbnail: Option<String>,
+        template: Option<String>,
+        #[serde(flatten)]
+        metadata: serde_json::Map<String, serde_json::Value>,
+    }
+
+    /// Reusable typed client for an operator-managed SearXNG HTTP API.
+    #[derive(Clone)]
+    pub struct SearxngSearchClient {
+        client: reqwest::Client,
+        endpoint: Url,
+    }
+
+    impl SearxngSearchClient {
+        pub fn new(options: SearxngClientOptions) -> Result<Self, WebSearchError> {
+            let mut endpoint = options.base_url;
+            let prefix = endpoint.path().trim_end_matches('/');
+            let path = if prefix.is_empty() {
+                "/search".to_owned()
+            } else {
+                format!("{prefix}/search")
+            };
+            endpoint.set_path(&path);
+            let client = reqwest::Client::builder()
+                .timeout(options.timeout)
+                .redirect(reqwest::redirect::Policy::none())
+                .build()?;
+            Ok(Self { client, endpoint })
+        }
+
+        pub async fn search(
+            &self,
+            request: &WebSearchRequest,
+        ) -> Result<WebSearchReport, WebSearchError> {
+            let query = request.query.trim();
+            if query.is_empty() || query.len() > 4096 {
+                return Err(WebSearchError::InvalidRequest(
+                    "query must contain 1 to 4096 bytes of non-empty text",
+                ));
+            }
+            if !(1..=50).contains(&request.limit) {
+                return Err(WebSearchError::InvalidRequest("limit must be from 1 to 50"));
+            }
+            if !(1..=100).contains(&request.page) {
+                return Err(WebSearchError::InvalidRequest("page must be from 1 to 100"));
+            }
+            if request.safe_search.is_some_and(|value| value > 2) {
+                return Err(WebSearchError::InvalidRequest(
+                    "safe_search must be 0, 1, or 2",
+                ));
+            }
+            let mut endpoint = self.endpoint.clone();
+            {
+                let mut pairs = endpoint.query_pairs_mut();
+                pairs
+                    .append_pair("q", query)
+                    .append_pair("format", "json")
+                    .append_pair("pageno", &request.page.to_string());
+                if !request.categories.is_empty() {
+                    let categories = request
+                        .categories
+                        .iter()
+                        .map(|category| category.as_str())
+                        .collect::<Vec<_>>()
+                        .join(",");
+                    pairs.append_pair("categories", &categories);
+                }
+                if let Some(language) = request.language.as_deref() {
+                    pairs.append_pair("language", language);
+                }
+                if let Some(time_range) = request.time_range {
+                    pairs.append_pair("time_range", time_range.as_str());
+                }
+                if let Some(safe_search) = request.safe_search {
+                    pairs.append_pair("safesearch", &safe_search.to_string());
+                }
+                if !request.engines.is_empty() {
+                    pairs.append_pair("engines", &request.engines.join(","));
+                }
+                if !request.disabled_engines.is_empty() {
+                    pairs.append_pair("disabled_engines", &request.disabled_engines.join(","));
+                }
+            }
+            let builder = self.client.get(endpoint);
+            let response = builder.send().await?;
+            let status = response.status();
+            if !status.is_success() {
+                let message = response
+                    .text()
+                    .await
+                    .unwrap_or_else(|_| "search provider returned an error".to_owned());
+                return Err(WebSearchError::Provider {
+                    status,
+                    message: message.chars().take(512).collect(),
+                });
+            }
+            let payload: SearxngResponse = response
+                .json()
+                .await
+                .map_err(|_| WebSearchError::InvalidResponse("response is not valid JSON"))?;
+            let raw_results = payload.results.ok_or(WebSearchError::InvalidResponse(
+                "JSON output is disabled or results is missing",
+            ))?;
+            let results = raw_results
+                .into_iter()
+                .filter_map(|item| {
+                    let title = item.title?;
+                    let raw_url = item.url?;
+                    let url = Url::parse(&raw_url).ok()?;
+                    if !matches!(url.scheme(), "http" | "https") {
+                        return None;
+                    }
+                    Some(WebSearchResultItem {
+                        title,
+                        url: url.to_string(),
+                        snippet: item.content.unwrap_or_default(),
+                        engine: item.engine,
+                        category: item.category,
+                        published_at: item.published_date,
+                        engines: item.engines.unwrap_or_default(),
+                        score: item.score,
+                        thumbnail: item.thumbnail.filter(|value| {
+                            Url::parse(value)
+                                .ok()
+                                .is_some_and(|url| matches!(url.scheme(), "http" | "https"))
+                        }),
+                        template: item.template,
+                        metadata: serde_json::Value::Object(item.metadata),
+                    })
+                })
+                .take(request.limit)
+                .collect::<Vec<_>>();
+            Ok(WebSearchReport {
+                query: query.to_owned(),
+                total_results: payload
+                    .total_results
+                    .unwrap_or(results.len())
+                    .max(results.len()),
+                results,
+                provider: "searxng".to_owned(),
+                page: request.page,
+                requested_limit: request.limit,
+                answers: payload.answers.unwrap_or_default(),
+                corrections: payload.corrections.unwrap_or_default(),
+                suggestions: payload.suggestions.unwrap_or_default(),
+                unresponsive_engines: payload.unresponsive_engines.unwrap_or_default(),
+                infoboxes: payload.infoboxes.unwrap_or_default(),
+            })
+        }
+    }
+}
+
 /// Local Aphrody RAG search API, enabled with the `rag-search` feature.
 ///
 /// This exposes the same lexical, vector and hybrid index used by the CLI and

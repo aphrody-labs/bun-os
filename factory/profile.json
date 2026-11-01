@@ -17,7 +17,7 @@
   "rootfsBuilder": "factory/arch/pacman.ts",
   "imageAssembler": "archiso/mkarchiso",
   "repositoryBuilder": "pacman/repo-add",
-  "sourceCatalogs": ["cachyos", "chimeraos", "omarchy"],
+  "sourceCatalogs": ["cachyos", "chimeraos", "omarchy", "searxng"],
   "toolchainPackages": [
     "base-devel",
     "devtools",

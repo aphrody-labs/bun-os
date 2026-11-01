@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "observedOn": "2026-10-16",
+  "observedOn": "2026-11-01",
   "owner": "Bun OS root source graph / Aphrody Infra forge",
   "forksVerified": true,
   "initialized": false,
@@ -12,6 +12,30 @@
     "importUpstreamInstallers": false
   },
   "sources": [
+    {
+      "revision": "ffa88e3ba3ade64185d5754c839cdf5a80708c4a",
+      "pinVerified": true,
+      "action": "forked",
+      "forkParent": "searxng/searxng",
+      "id": "searxng",
+      "role": "federated-web-search-service",
+      "upstream": "searxng/searxng",
+      "defaultBranch": "master",
+      "forkSource": "searxng/searxng",
+      "repository": "aphrody-labs/searxng",
+      "mount": "vendor/searxng",
+      "checkoutRevision": "ffa88e3ba3ade64185d5754c839cdf5a80708c4a",
+      "sourceExportReady": false,
+      "referenceRevision": "ffa88e3ba3ade64185d5754c839cdf5a80708c4a",
+      "checkoutMatchesReference": true,
+      "nonWindowsCheckoutExcludes": [
+        "utils/templates/etc/httpd/sites-available/searxng.conf:socket",
+        "utils/templates/etc/nginx/default.apps-available/searxng.conf:socket",
+        "utils/templates/etc/uwsgi/apps-archlinux/searxng.ini:socket",
+        "utils/templates/etc/uwsgi/apps-available/searxng.ini:socket"
+      ],
+      "license": "AGPL-3.0"
+    },
     {
       "revision": "a2e6c4392d397bed2df7134200dda558f2452af6",
       "pinVerified": true,

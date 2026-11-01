@@ -65,6 +65,23 @@ export interface SearchOptions {
   database?: string;
 }
 
+export type {
+  AphrodyWebSearchError,
+  AphrodyWebHttpError,
+  HttpSearchClientOptions,
+  HttpSearchHit,
+  HttpSearchOptions,
+  HttpSearchReport,
+  RetrievalMode,
+  SearxngSearchOptions,
+  WebSearchCategory,
+  WebSearchOptions,
+  WebSearchReport,
+  WebSearchResultItem,
+  WebSearchTimeRange,
+} from "./browser.ts";
+export { createHttpSearchClient, createSearxngSearchClient } from "./browser.ts";
+
 export interface SearchChunk {
   id: number;
   doc_id: number;

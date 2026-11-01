@@ -15,6 +15,7 @@ WorkingDirectory=/home/ubuntu/.aphrody
 Environment=HOME=/home/ubuntu
 Environment=APHRODY_HOME=/home/ubuntu/.aphrody
 EnvironmentFile=/etc/aphrody/aphrody-mcp-http.env
+Environment=APHRODY_SEARXNG_URL=http://127.0.0.1:8888
 ExecStart=/home/ubuntu/.local/bin/aphrody mcp-server http --bind 127.0.0.1:8793
 Restart=on-failure
 RestartSec=5

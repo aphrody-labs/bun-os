@@ -272,6 +272,14 @@
       "targetHost": "vps"
     },
     {
+      "service": "aphrody-searxng",
+      "unit": "aphrody-searxng.service",
+      "path": "systemd/aphrody/aphrody-searxng.service",
+      "dropIns": [],
+      "ownerRepo": "bun-os",
+      "targetHost": "vps"
+    },
+    {
       "service": "omar-browser-client-vps",
       "unit": "aphrody-obscura-omar-client.service",
       "path": "systemd/omar/aphrody-obscura-omar-client.service",

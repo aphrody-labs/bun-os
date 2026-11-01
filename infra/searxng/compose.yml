@@ -1,0 +1,50 @@
+name: aphrody-search
+
+services:
+  searxng:
+    build:
+      context: ../../vendor/searxng
+      dockerfile: container/Dockerfile
+      args:
+        VERSION: aphrody-${APHRODY_SEARXNG_REVISION:-ffa88e3ba3ade64185d5754c839cdf5a80708c4a}
+        VCS_URL: https://github.com/aphrody-labs/searxng
+        VCS_REVISION: ${APHRODY_SEARXNG_REVISION:-ffa88e3ba3ade64185d5754c839cdf5a80708c4a}
+    image: aphrody/searxng:${APHRODY_SEARXNG_REVISION:-ffa88e3ba3ade64185d5754c839cdf5a80708c4a}
+    restart: unless-stopped
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:?create infra/searxng/.env first}
+      SEARXNG_BASE_URL: http://127.0.0.1:8888/
+      SEARXNG_VALKEY_URL: valkey://valkey:6379/0
+      SEARXNG_PORT: "8080"
+      SEARXNG_BIND_ADDRESS: "0.0.0.0"
+      SEARXNG_LIMITER: "false"
+    ports:
+      - 127.0.0.1:8888:8080
+    volumes:
+      - ./settings.yml:/etc/searxng/settings.yml:ro
+      - searxng-cache:/var/cache/searxng
+    depends_on:
+      valkey:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8080/healthz\", timeout=3)'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+
+  valkey:
+    image: docker.io/valkey/valkey:9-alpine
+    restart: unless-stopped
+    command: ["valkey-server", "--save", "300", "1", "--save", "60", "1000", "--loglevel", "warning"]
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  searxng-cache:
+  valkey-data:

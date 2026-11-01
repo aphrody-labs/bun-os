@@ -46,10 +46,121 @@ pub(crate) fn router() -> Router {
         )
         .route("/api/v1/aphrody/status", get(aphrody_status_handler))
         .route("/api/v1/rag/query", get(rag_query_handler))
-        .route("/api/v1/rag/stats", get(rag_stats_handler));
+        .route("/api/v1/rag/stats", get(rag_stats_handler))
+        .route("/api/v1/web/search", get(web_search_handler));
     #[cfg(feature = "rag")]
     let router = router.route("/api/v1/rag/search", get(rag_search_handler));
     router
+}
+
+#[derive(Debug, Deserialize)]
+struct WebSearchQuery {
+    q: Option<String>,
+    limit: Option<usize>,
+    categories: Option<String>,
+    language: Option<String>,
+    page: Option<u16>,
+    time_range: Option<String>,
+    safesearch: Option<u8>,
+    engines: Option<String>,
+    disabled_engines: Option<String>,
+}
+
+/// Federated public web search via the configured self-hosted SearXNG service.
+async fn web_search_handler(headers: HeaderMap, Query(params): Query<WebSearchQuery>) -> Response {
+    use aphrody_web::web_search::{
+        SearchCategory, SearxngClientOptions, SearxngSearchClient, TimeRange, WebSearchRequest,
+    };
+
+    let gateway_token = aphrody_config::ai_env::HTTP_TOKEN.resolve();
+    if let Some(error) = gateway_auth(&headers, gateway_token.as_deref(), true) {
+        return error;
+    }
+
+    let Some(base_url) = std::env::var("APHRODY_SEARXNG_URL")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+    else {
+        return gateway_error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "SearXNG URL is not configured",
+        );
+    };
+    let mut request = WebSearchRequest::new(params.q.unwrap_or_default());
+    request.limit = params.limit.unwrap_or(10);
+    request.page = params.page.unwrap_or(1);
+    request.language = params.language;
+    request.safe_search = params.safesearch.or(Some(1));
+    request.engines = params
+        .engines
+        .map(|value| split_engine_names(&value))
+        .unwrap_or_default();
+    request.disabled_engines = params
+        .disabled_engines
+        .map(|value| split_engine_names(&value))
+        .unwrap_or_default();
+    request.time_range = match params.time_range.as_deref() {
+        None => None,
+        Some("day") => Some(TimeRange::Day),
+        Some("month") => Some(TimeRange::Month),
+        Some("year") => Some(TimeRange::Year),
+        Some(_) => {
+            return gateway_error(
+                StatusCode::BAD_REQUEST,
+                "time_range must be day, month, or year",
+            );
+        }
+    };
+    if let Some(categories) = params.categories {
+        for category in categories.split(',') {
+            let category = match category.trim() {
+                "general" => SearchCategory::General,
+                "news" => SearchCategory::News,
+                "science" => SearchCategory::Science,
+                "it" => SearchCategory::It,
+                "images" => SearchCategory::Images,
+                "videos" => SearchCategory::Videos,
+                _ => return gateway_error(StatusCode::BAD_REQUEST, "unsupported search category"),
+            };
+            request.categories.push(category);
+        }
+    }
+    let options = match SearxngClientOptions::new(base_url) {
+        Ok(options) => options,
+        Err(_) => return gateway_error(StatusCode::SERVICE_UNAVAILABLE, "SearXNG URL is invalid"),
+    };
+    let client = match SearxngSearchClient::new(options) {
+        Ok(client) => client,
+        Err(_) => {
+            return gateway_error(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "SearXNG client is unavailable",
+            );
+        }
+    };
+    match client.search(&request).await {
+        Ok(mut result) => {
+            result.requested_limit = request.limit;
+            response(
+                serde_json::to_value(result)
+                    .unwrap_or_else(|_| json!({"error":"invalid search result"})),
+                "no-store",
+            )
+        }
+        Err(aphrody_web::web_search::WebSearchError::InvalidRequest(message)) => {
+            gateway_error(StatusCode::BAD_REQUEST, message)
+        }
+        Err(_) => gateway_error(StatusCode::BAD_GATEWAY, "SearXNG search failed"),
+    }
+}
+
+fn split_engine_names(value: &str) -> Vec<String> {
+    value
+        .split(',')
+        .map(str::trim)
+        .filter(|name| !name.is_empty())
+        .map(str::to_owned)
+        .collect()
 }
 
 #[cfg(feature = "rag")]

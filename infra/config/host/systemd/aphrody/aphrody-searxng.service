@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# Source-built SearXNG API and UI; the container publishes loopback only.
+[Unit]
+Description=Aphrody SearXNG federated web-search backend
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=ubuntu
+Group=docker
+WorkingDirectory=/home/ubuntu/src/bun-os
+Environment=SEARXNG_SECRET_FILE=/etc/aphrody/searxng-secret
+ExecStartPre=/bin/sh -ec 'test -s "$SEARXNG_SECRET_FILE"'
+ExecStart=/bin/sh -ec 'export SEARXNG_SECRET="$(cat "$SEARXNG_SECRET_FILE")"; exec /usr/bin/docker compose --project-directory /home/ubuntu/src/bun-os/infra/searxng -f /home/ubuntu/src/bun-os/infra/searxng/compose.yml up -d --build --remove-orphans'
+ExecStop=/bin/sh -ec 'export SEARXNG_SECRET="$(cat "$SEARXNG_SECRET_FILE")"; exec /usr/bin/docker compose --project-directory /home/ubuntu/src/bun-os/infra/searxng -f /home/ubuntu/src/bun-os/infra/searxng/compose.yml down'
+TimeoutStartSec=3600
+TimeoutStopSec=120
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
