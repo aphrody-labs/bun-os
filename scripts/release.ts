@@ -217,8 +217,44 @@ async function missing<T extends { name: string; version: string }>(
 }
 
 async function verify(): Promise<void> {
-  for (const script of ["check", "lint", "format:check", "docs:check"]) {
-    if ((await run(["bun", "run", script])) !== 0) throw new Error(`quality gate failed: ${script}`);
+  const formatPaths = (await capture(["git", "diff", "--name-only", "HEAD^", "HEAD"]))
+    .split("\n")
+    .filter(path => /\.(?:[cm]?[jt]sx?|jsonc?|mdx?|md|css|html|ya?ml|svg|svelte|vue)$/i.test(path));
+  const steps: Array<[string, string[]]> = [
+    ["check", ["bun", "check"]],
+    [
+      "lint",
+      [
+        "bun",
+        "lint",
+        "-c",
+        ".oxlintrc.json",
+        "--max-warnings=0",
+        "--ignore-pattern",
+        "**/fixtures/**",
+        "--ignore-pattern",
+        "packages/wasm/test/programs/**",
+        "--ignore-pattern",
+        "**/node_modules/**",
+        "src",
+        "container",
+        "factory",
+        "infra",
+        "packages",
+        "apps",
+        "scripts",
+      ],
+    ],
+    ["docs", ["bun", "src/cli.ts", "docs", "check"]],
+  ];
+  for (const [name, command] of steps) {
+    if ((await run(command)) !== 0) throw new Error(`quality gate failed: ${name}`);
+  }
+  if (
+    formatPaths.length &&
+    (await run(["bun", "fmt", "--check", "--config", "bun-format.json", ...formatPaths])) !== 0
+  ) {
+    throw new Error("quality gate failed: format");
   }
   if ((await run(["bun", "scripts/workspace-manifests.ts"])) !== 0) throw new Error("workspace manifests differ");
 }

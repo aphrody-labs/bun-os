@@ -10,14 +10,10 @@ description = "Reusable Rust crawl and browser-rendering API for Aphrody Web."
 readme = "README.md"
 
 [dependencies]
-bun_browser_crawl = { version = "1.4.7" }
-bun_browser_net = { version = "1.4.7" }
-reqwest = { version = "0.13.5", default-features = false, features = [
-  "rustls-no-provider",
-  "json",
-  "http2",
-] }
-serde = { version = "1.0.228", features = ["derive"] }
+obscura-crawl = { workspace = true }
+obscura-net = { workspace = true }
+reqwest = { workspace = true, features = ["rustls-no-provider", "json", "http2"] }
+serde = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true

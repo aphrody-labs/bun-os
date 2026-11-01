@@ -40,6 +40,7 @@ export interface StepResult {
 }
 
 const RUST = /(^|\/)(Cargo\.(toml|lock)|rust-toolchain\.toml|\.cargo\/config\.toml)$|\.rs$/;
+const BUN_FORMAT = /\.(?:[cm]?[jt]sx?|jsonc?|mdx?|md|css|html|ya?ml|svg|svelte|vue)$/i;
 
 const IMAGE = /^factory\/images\//;
 const SELF = "factory/sync/bunos-gate.ts";
@@ -57,9 +58,37 @@ export function gateSteps(range: { since?: string; head: string } = { head: "HEA
       when: IMAGE,
       timeoutMs: 600_000,
     },
-    { name: "check", argv: ["bun", "run", "check"], timeoutMs: 900_000 },
-    { name: "lint", argv: ["bun", "run", "lint"], timeoutMs: 900_000 },
-    { name: "format", argv: ["bun", "run", "format:check"], timeoutMs: 900_000 },
+    { name: "check", argv: ["bun", "check"], timeoutMs: 900_000 },
+    {
+      name: "lint",
+      argv: [
+        "bun",
+        "lint",
+        "-c",
+        ".oxlintrc.json",
+        "--max-warnings=0",
+        "--ignore-pattern",
+        "**/fixtures/**",
+        "--ignore-pattern",
+        "packages/wasm/test/programs/**",
+        "--ignore-pattern",
+        "**/node_modules/**",
+        "src",
+        "container",
+        "factory",
+        "infra",
+        "packages",
+        "apps",
+        "scripts",
+      ],
+      timeoutMs: 900_000,
+    },
+    {
+      name: "format",
+      argv: ["bun", "fmt", "--check", "--config", "bun-format.json"],
+      when: BUN_FORMAT,
+      timeoutMs: 900_000,
+    },
     {
       name: "cargo-check",
       argv: ["bun", "scripts/cargo.ts", "exec", "--", "check", "--workspace", "--locked"],
@@ -78,7 +107,12 @@ async function capture(argv: string[], cwd: string, timeoutMs = 600_000) {
     stderr: "pipe",
     stdin: "ignore",
     timeout: timeoutMs,
-    env: { ...process.env, APHRODY_BUILD_HOST: process.env.APHRODY_BUILD_HOST ?? "vps", FORCE_COLOR: "0", NO_COLOR: "1" },
+    env: {
+      ...process.env,
+      APHRODY_BUILD_HOST: process.env.APHRODY_BUILD_HOST ?? "vps",
+      FORCE_COLOR: "0",
+      NO_COLOR: "1",
+    },
     windowsHide: true,
   });
   const [out, err, code] = await Promise.all([
@@ -134,8 +168,18 @@ async function runSteps(
       results.push({ name: step.name, ok: true, skipped: "no matching change", seconds: 0 });
       continue;
     }
+    let argv = step.argv;
+    if (step.name === "format") {
+      const files = changed ?? (await git(repo, "diff", "--name-only", `${head}^`, head)).split("\n");
+      const formatFiles = files.filter(path => BUN_FORMAT.test(path) && existsSync(join(repo, path)));
+      if (!formatFiles.length) {
+        results.push({ name: step.name, ok: true, skipped: "no changed Bun-formattable files", seconds: 0 });
+        continue;
+      }
+      argv = [...step.argv, ...formatFiles];
+    }
     const started = Date.now();
-    const run = await capture(step.argv, repo, step.timeoutMs);
+    const run = await capture(argv, repo, step.timeoutMs);
     const seconds = Math.round((Date.now() - started) / 1000);
     if (run.code === 0) {
       results.push({ name: step.name, ok: true, seconds });
@@ -152,7 +196,10 @@ async function ensureInstall(repo: string) {
   const archive = join(repo, "build/packages/material-web.tgz");
   if (!existsSync(archive)) {
     const { materialWebPreparationPlan } = await import(join(repo, "scripts/setup-submodules.ts"));
-    for (const command of materialWebPreparationPlan(repo, process.execPath).commands as { cwd: string; argv: string[] }[]) {
+    for (const command of materialWebPreparationPlan(repo, process.execPath).commands as {
+      cwd: string;
+      argv: string[];
+    }[]) {
       mkdirSync(join(repo, "build/packages"), { recursive: true });
       await capture(command.argv, command.cwd);
     }
@@ -204,9 +251,7 @@ export async function runGate(repo: string, stateDir: string): Promise<string> {
   })();
   if (previous.sha === head) return `gate: ${head.slice(0, 10)} already gated`;
   const since = previous.lastGreen;
-  const changed = since
-    ? (await git(repo, "diff", "--name-only", since, head)).split("\n").filter(Boolean)
-    : undefined;
+  const changed = since ? (await git(repo, "diff", "--name-only", since, head)).split("\n").filter(Boolean) : undefined;
   const results = await runSteps(repo, changed, since, head, name => !SLOW_STEPS.has(name));
   const green = results.every(result => result.ok);
   const entry = { at: new Date().toISOString(), sha: head, lastGreen: green ? head : since, green, results };
@@ -228,9 +273,21 @@ async function notifyA2a(head: string, results: StepResult[]) {
   if (!Bun.which("aphrody") || !process.env.APHRODY_A2A_HUB_URL) return;
   const lines = results
     .filter(result => !result.ok)
-    .map(f => `${f.name}: ${f.file ?? ""} ${f.error ?? ""} (commit ${f.culprit?.sha.slice(0, 10)} "${f.culprit?.subject}")`);
+    .map(
+      f =>
+        `${f.name}: ${f.file ?? ""} ${f.error ?? ""} (commit ${f.culprit?.sha.slice(0, 10)} "${f.culprit?.subject}")`,
+    );
   await capture(
-    ["aphrody", "a2a", "send", "--source", "vps-gate", "--target", "help-wanted", `main ${head.slice(0, 10)} is red: ${lines.join(" | ")}`.slice(0, 3500)],
+    [
+      "aphrody",
+      "a2a",
+      "send",
+      "--source",
+      "vps-gate",
+      "--target",
+      "help-wanted",
+      `main ${head.slice(0, 10)} is red: ${lines.join(" | ")}`.slice(0, 3500),
+    ],
     process.cwd(),
     60_000,
   );
@@ -273,7 +330,8 @@ export async function staleOverwrites(repo: string, base: string, head: string):
     const [ours, theirs] = [await side(first), await side(second)];
     for (const path of ours) {
       if (!theirs.has(path)) continue;
-      const blob = async (rev: string) => (await git(repo, "rev-parse", "--verify", "--quiet", `${rev}:${path}`)).trim();
+      const blob = async (rev: string) =>
+        (await git(repo, "rev-parse", "--verify", "--quiet", `${rev}:${path}`)).trim();
       const [result, a, b] = [await blob(merge), await blob(first), await blob(second)];
       if (a !== b && (result === a || result === b))
         found.push(`${path}: merge ${merge.slice(0, 10)} kept one side and dropped the other side's changes`);
@@ -295,7 +353,11 @@ function shellSyntax(repo: string): string[] {
       else if (info.isFile() && info.size < 2_000_000) {
         const rel = path.slice(repo.length + 1).replaceAll("\\", "/");
         const head = readFileSync(path, "utf8").slice(0, 120).split("\n")[0] ?? "";
-        const shell = /^#!.*\bbash\b/.test(head) ? "bash" : /^#!.*\b(sh|dash)\b/.test(head) || rel.endsWith(".sh") ? "sh" : "";
+        const shell = /^#!.*\bbash\b/.test(head)
+          ? "bash"
+          : /^#!.*\b(sh|dash)\b/.test(head) || rel.endsWith(".sh")
+            ? "sh"
+            : "";
         if (!shell) continue;
         const result = Bun.spawnSync([shell, "-n", path], { stdout: "pipe", stderr: "pipe" });
         if (result.exitCode !== 0) failures.push(`${rel}: ${result.stderr.toString().trim().split("\n")[0]}`);
@@ -325,7 +387,8 @@ export async function runCargoGate(repo: string, stateDir: string): Promise<stri
   const changed = since ? (await git(repo, "diff", "--name-only", since, head)).split("\n").filter(Boolean) : undefined;
   const results = await runSteps(repo, changed, since, head, name => SLOW_STEPS.has(name));
   const after = (await git(repo, "rev-parse", "HEAD")).trim();
-  if (after !== head) return `cargo gate: HEAD moved from ${head.slice(0, 10)} to ${after.slice(0, 10)}; result dropped`;
+  if (after !== head)
+    return `cargo gate: HEAD moved from ${head.slice(0, 10)} to ${after.slice(0, 10)}; result dropped`;
   const green = results.every(result => result.ok);
   const entry = { at: new Date().toISOString(), sha: head, lastGreen: green ? head : since, green, results };
   mkdirSync(stateDir, { recursive: true });
@@ -341,17 +404,32 @@ export function startCargoGate(repo: string): string {
   if (process.platform !== "linux" || !Bun.which("systemd-run")) return "cargo gate: no systemd-run";
   const active = Bun.spawnSync(["systemctl", "--user", "is-active", "bunos-gate-cargo.service"], { stdout: "pipe" });
   if (active.stdout.toString().trim() === "active") return "cargo gate: already running";
-  Bun.spawnSync(["systemctl", "--user", "reset-failed", "bunos-gate-cargo.service"], { stdout: "ignore", stderr: "ignore" });
+  Bun.spawnSync(["systemctl", "--user", "reset-failed", "bunos-gate-cargo.service"], {
+    stdout: "ignore",
+    stderr: "ignore",
+  });
   const started = Bun.spawnSync(
     [
-      "systemd-run", "--user", "--unit", "bunos-gate-cargo", "--collect", "--no-block",
-      "--property=Nice=15", "--property=IOSchedulingClass=idle",
-      `--setenv=PATH=${process.env.PATH ?? ""}`, "--setenv=APHRODY_BUILD_HOST=vps",
-      `--working-directory=${repo}`, process.execPath, join(repo, SELF), "--cargo",
+      "systemd-run",
+      "--user",
+      "--unit",
+      "bunos-gate-cargo",
+      "--collect",
+      "--no-block",
+      "--property=Nice=15",
+      "--property=IOSchedulingClass=idle",
+      `--setenv=PATH=${process.env.PATH ?? ""}`,
+      "--setenv=APHRODY_BUILD_HOST=vps",
+      `--working-directory=${repo}`,
+      process.execPath,
+      join(repo, SELF),
+      "--cargo",
     ],
     { stdout: "pipe", stderr: "pipe" },
   );
-  return started.exitCode === 0 ? "cargo gate: started" : `cargo gate: start failed: ${started.stderr.toString().trim()}`;
+  return started.exitCode === 0
+    ? "cargo gate: started"
+    : `cargo gate: start failed: ${started.stderr.toString().trim()}`;
 }
 
 function buildHost(): boolean {

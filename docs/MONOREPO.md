@@ -47,7 +47,8 @@ Quality commands:
 ```sh
 bun check          # type check (native)
 bun lint           # native lint
-bun fmt            # native format (use `bun run format:check` to only check)
+bun fmt            # native format
+bun fmt --check    # native formatting check
 bun src/cli.ts workspace check       # root invariants and the exceptions ledger
 bun scripts/cargo.ts metadata        # members-contract workspace report
 bun scripts/cargo.ts check           # serialized `cargo check --locked --workspace`

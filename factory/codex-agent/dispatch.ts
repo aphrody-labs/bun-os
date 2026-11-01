@@ -254,7 +254,7 @@ function runCodex(
   });
 }
 
-function commitAndPush(task: Task, before: Map<string, string>, report: string): { commit?: string; left: string[] } {
+function commitAndPush(task: Task, before: Map<string, string>): { commit?: string; left: string[] } {
   const after = dirtyMap();
   const changed: string[] = [];
   const left: string[] = [];
@@ -338,7 +338,7 @@ export async function execute(task: Task, c = config()): Promise<Result> {
   const status = run.timedOut ? "timeout" : run.code === 0 ? "done" : "failed";
   let commit: string | undefined;
   let left: string[] | undefined;
-  if (writes(task) && status !== "failed") ({ commit, left } = commitAndPush(task, before, report));
+  if (writes(task) && status !== "failed") ({ commit, left } = commitAndPush(task, before));
   return finish({ status, tokens: run.tokens, commit, left, report });
 }
 

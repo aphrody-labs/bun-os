@@ -107,8 +107,15 @@ constant time. `/healthz` and the REST routes are outside this layer. A client r
 example in a `.mcp.json`:
 
 ```json
-{ "mcpServers": { "aphrody-http": { "type": "http", "url": "http://127.0.0.1:8793/mcp",
-  "headers": { "Authorization": "Bearer ${APHRODY_MCP_HTTP_TOKEN}" } } } }
+{
+  "mcpServers": {
+    "aphrody-http": {
+      "type": "http",
+      "url": "http://127.0.0.1:8793/mcp",
+      "headers": { "Authorization": "Bearer ${APHRODY_MCP_HTTP_TOKEN}" }
+    }
+  }
+}
 ```
 
 `bun scripts/tools/infra/mcp-tools-count.ts <url> --token-env APHRODY_MCP_HTTP_TOKEN` counts the tools of a running server.
@@ -123,15 +130,15 @@ lists, `/api/v1/aphrody/status` and the RAG routes answer without a token.
 case, a missing or incorrect header returns 401. Keep this listener private and
 apply authentication on any gateway.
 
-| Route | Response |
-| --- | --- |
-| `GET /healthz` | `{status:"ok",service}` |
-| `GET /api/v1/models` | Registered local models |
-| `GET /v1/models` | OpenAI-format model list |
-| `POST /v1/chat/completions` | Relay (JSON or SSE) to the chat upstream at `APHRODY_AI_CHAT_BASE_URL`; 503 when unconfigured |
-| `GET /api/v1/aphrody/status` | Subsystem status and chat upstream reachability |
-| `GET /api/v1/rag/query?q=...&limit=5` | Keyword hits over `aphrody_rag_documents` (`limit` capped at 20) |
-| `GET /api/v1/rag/stats` | Document and chunk counts, `unavailable` without the database |
+| Route                                 | Response                                                                                      |
+| ------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `GET /healthz`                        | `{status:"ok",service}`                                                                       |
+| `GET /api/v1/models`                  | Registered local models                                                                       |
+| `GET /v1/models`                      | OpenAI-format model list                                                                      |
+| `POST /v1/chat/completions`           | Relay (JSON or SSE) to the chat upstream at `APHRODY_AI_CHAT_BASE_URL`; 503 when unconfigured |
+| `GET /api/v1/aphrody/status`          | Subsystem status and chat upstream reachability                                               |
+| `GET /api/v1/rag/query?q=...&limit=5` | Keyword hits over `aphrody_rag_documents` (`limit` capped at 20)                              |
+| `GET /api/v1/rag/stats`               | Document and chunk counts, `unavailable` without the database                                 |
 
 RAG routes use `APHRODY_MCP_DATABASE_URL`.
 

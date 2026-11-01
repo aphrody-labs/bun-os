@@ -28,6 +28,8 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/setup-workspace
         with:
           token: ${{ secrets.SUBMODULES_TOKEN || github.token }}

@@ -22,9 +22,7 @@ function parse(argv: string[]): CrawlOptions {
     switch (item) {
       case "--allowed-domain":
       case "--allowed-domains":
-        (options.allowedDomains ??= []).push(
-          ...value.split(",").filter(Boolean),
-        );
+        (options.allowedDomains ??= []).push(...value.split(",").filter(Boolean));
         break;
       case "--max-depth":
         options.maxDepth = Number(value);
@@ -48,8 +46,7 @@ function parse(argv: string[]): CrawlOptions {
         options.sqlite = value;
         break;
       case "--browser":
-        if (value !== "native" && value !== "playwright")
-          throw new Error("--browser must be native or playwright");
+        if (value !== "native" && value !== "playwright") throw new Error("--browser must be native or playwright");
         options.browser = value;
         break;
       default:

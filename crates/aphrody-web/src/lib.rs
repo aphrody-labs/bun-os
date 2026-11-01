@@ -8,15 +8,15 @@ use std::{net::IpAddr, time::Duration};
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-pub use bun_browser_crawl::{
+pub use obscura_crawl::{
     AddRequest, BunBrowserTransport, CrawlDaemonOptions, CrawlOptions, CrawlPage, CrawlReport,
     CrawlTransport, FetchResult, Frontier, FrontierOptions, crawl_bounded, crawl_daemon,
 };
-pub use bun_browser_net::BunBrowserHttpClient;
+pub use obscura_net::BunBrowserHttpClient;
 
 /// Create an Obscura HTTP transport with the requested outbound host scope.
 pub async fn scoped_native_transport(domains: &[String]) -> Result<BunBrowserTransport, String> {
-    bun_browser_net::ensure_rustls_crypto_provider();
+    obscura_net::ensure_rustls_crypto_provider();
     BunBrowserTransport::scoped(BunBrowserHttpClient::new(), domains).await
 }
 
@@ -108,7 +108,7 @@ impl PlaywrightTransport {
         if allowed_domains.is_empty() {
             return Err("Playwright transport requires at least one allowed domain".into());
         }
-        bun_browser_net::ensure_rustls_crypto_provider();
+        obscura_net::ensure_rustls_crypto_provider();
         let endpoint = Url::parse(raw_endpoint.as_ref())
             .map_err(|error| format!("invalid Playwright bridge URL: {error}"))?;
         let loopback = endpoint.host_str().is_some_and(|host| {

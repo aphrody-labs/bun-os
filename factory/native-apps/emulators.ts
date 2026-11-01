@@ -92,8 +92,6 @@ async function clone(dir: string, repo: string, rev?: string) {
   }
 }
 
-const shortRev = async (dir: string) => (await $`git -C ${dir} rev-parse --short HEAD`.text()).trim();
-
 async function stageDir(name: string) {
   const dir = join(WORK, "stage", name);
   await rm(dir, { recursive: true, force: true });

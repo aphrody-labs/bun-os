@@ -62,16 +62,8 @@ export class AphrodyWebError extends Error {
   }
 }
 
-function assertInteger(
-  name: string,
-  value: number | undefined,
-  min: number,
-  max: number,
-): void {
-  if (
-    value !== undefined &&
-    (!Number.isInteger(value) || value < min || value > max)
-  ) {
+function assertInteger(name: string, value: number | undefined, min: number, max: number): void {
+  if (value !== undefined && (!Number.isInteger(value) || value < min || value > max)) {
     throw new RangeError(`${name} must be an integer from ${min} to ${max}`);
   }
 }
@@ -85,8 +77,7 @@ function argumentsFor(options: CrawlOptions): string[] {
     if (url.protocol !== "http:" && url.protocol !== "https:") {
       throw new TypeError(`unsupported URL protocol: ${url.protocol}`);
     }
-    if (url.username || url.password)
-      throw new TypeError("seed URLs must not contain credentials");
+    if (url.username || url.password) throw new TypeError("seed URLs must not contain credentials");
   }
   assertInteger("maxDepth", options.maxDepth, 0, 20);
   assertInteger("maxRequests", options.maxRequests, 1, 100_000);
@@ -117,35 +108,20 @@ function argumentsFor(options: CrawlOptions): string[] {
 }
 
 /** Run Aphrody's bounded crawl CLI and parse its JSON report. No shell is used. */
-export async function crawl(
-  options: CrawlOptions,
-  client: ClientOptions = {},
-): Promise<CrawlReport> {
+export async function crawl(options: CrawlOptions, client: ClientOptions = {}): Promise<CrawlReport> {
   const binary = client.binary ?? Bun.env.APHRODY_BIN ?? "aphrody";
   const child = Bun.spawn([binary, ...argumentsFor(options)], {
     stdin: "ignore",
     stdout: "pipe",
     stderr: "pipe",
   });
-  const [stdout, stderr, exitCode] = await Promise.all([
-    child.stdout.text(),
-    child.stderr.text(),
-    child.exited,
-  ]);
+  const [stdout, stderr, exitCode] = await Promise.all([child.stdout.text(), child.stderr.text(), child.exited]);
   if (exitCode !== 0) {
-    throw new AphrodyWebError(
-      stderr.trim() || `aphrody exited with code ${exitCode}`,
-      exitCode,
-      stderr,
-    );
+    throw new AphrodyWebError(stderr.trim() || `aphrody exited with code ${exitCode}`, exitCode, stderr);
   }
   try {
     return JSON.parse(stdout) as CrawlReport;
   } catch {
-    throw new AphrodyWebError(
-      "aphrody returned invalid JSON",
-      exitCode,
-      stderr,
-    );
+    throw new AphrodyWebError("aphrody returned invalid JSON", exitCode, stderr);
   }
 }

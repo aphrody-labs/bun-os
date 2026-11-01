@@ -81,7 +81,7 @@ const SECRET_PATH =
   /(^|\/)(\.env(\..*)?|.*\.(pem|key|p12|pfx|keystore|jks|kdbx)|id_(rsa|ed25519|ecdsa)(\.pub)?|credentials(\.json)?|.*\.(token|secret)|token|secrets?\.(json|ya?ml|env|toml)|\.netrc|\.npmrc|\.pypirc|\.git-credentials)$/i;
 /** Snapshots are also pushed to GitHub (refs/wip/...) so other hosts and agents can pick them up. */
 const pushWip = process.env.BUNOS_SYNC_PUSH_WIP !== "0";
-const MANIFESTS =["Cargo.lock", ":(glob)**/Cargo.toml", ".cargo/config.toml", "rust-toolchain.toml"];
+const MANIFESTS = ["Cargo.lock", ":(glob)**/Cargo.toml", ".cargo/config.toml", "rust-toolchain.toml"];
 
 export type Outcome = "current" | "fast-forwarded" | "pushed" | "healed" | "diverged" | "dirty" | "busy" | "error";
 
@@ -91,7 +91,10 @@ interface Result {
   err: string;
 }
 
-async function git(args: string[], options: { env?: Record<string, string>; stdin?: Uint8Array; timeoutMs?: number } = {}) {
+async function git(
+  args: string[],
+  options: { env?: Record<string, string>; stdin?: Uint8Array; timeoutMs?: number } = {},
+) {
   const proc = Bun.spawn(["git", "-C", repo, "-c", "core.quotePath=false", ...args], {
     stdout: "pipe",
     stderr: "pipe",
@@ -138,7 +141,10 @@ function record(outcome: Outcome, detail: string, extra: Record<string, unknown>
 }
 
 function stampNow(): string {
-  return new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+  return new Date()
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d+Z$/, "Z");
 }
 
 /** Pids of live git processes working in this checkout (Linux /proc; elsewhere none can be proven). */
@@ -287,7 +293,9 @@ async function snapshot(gitDir: string, reason: string, parents: string[], track
     if ((await gitOk(["rev-parse", "--verify", ref])) !== commit) throw new Error(`${ref} did not record ${commit}`);
     if (pushWip) {
       const pushed = await git(["push", "origin", `${ref}:${ref}`], { timeoutMs: 600_000 });
-      console.log(`[bunos-sync] ${pushed.code === 0 ? "pushed" : "could not push"} ${ref} to origin${pushed.code ? `: ${lastLine(pushed)}` : ""}`);
+      console.log(
+        `[bunos-sync] ${pushed.code === 0 ? "pushed" : "could not push"} ${ref} to origin${pushed.code ? `: ${lastLine(pushed)}` : ""}`,
+      );
     }
     return { ref, commit, tracked: tracked.length, untracked: include.length, skipped, displaced: [] };
   } finally {
@@ -343,7 +351,9 @@ async function fetchMain(): Promise<string | Result> {
   let last: Result | undefined;
   for (let attempt = 0; attempt < 4; attempt++) {
     if (attempt) await Bun.sleep(3000);
-    last = await git(["fetch", "--no-recurse-submodules", "--refmap=", "origin", "refs/heads/main"], { timeoutMs: 300_000 });
+    last = await git(["fetch", "--no-recurse-submodules", "--refmap=", "origin", "refs/heads/main"], {
+      timeoutMs: 300_000,
+    });
     if (last.code !== 0) continue;
     const gitDir = await gitOk(["rev-parse", "--absolute-git-dir"]);
     const line = readFileSync(join(gitDir, "FETCH_HEAD"), "utf8")
@@ -367,10 +377,14 @@ async function pushMain(): Promise<Result> {
 /** The single Cargo.lock writer: keep the lock in step with the manifests on main. */
 async function syncCargoLock(head: string): Promise<string> {
   const state = readJson<{ lockVerified?: string }>(stateFile, {});
-  if (state.lockVerified === head) return "lock: verified";
+  const changed = () =>
+    gitOk(["diff", "--name-only", "HEAD", "--ignore-submodules=all"]).then(value => value.split("\n").filter(Boolean));
+  const workingChanges = await changed();
+  const lockDirty = workingChanges.includes("Cargo.lock");
+  if (state.lockVerified === head && !lockDirty) return "lock: verified";
   if (state.lockVerified) {
     const range = await git(["diff", "--name-only", state.lockVerified, head, "--", ...MANIFESTS]);
-    if (range.code === 0 && !range.out) {
+    if (range.code === 0 && !range.out && !lockDirty) {
       saveState({ lockVerified: head });
       return "lock: no manifest change";
     }
@@ -386,18 +400,22 @@ async function syncCargoLock(head: string): Promise<string> {
     });
   const locked = cargo(["--locked"]);
   const lockedErr = await new Response(locked.stderr).text();
-  if ((await locked.exited) === 0) {
-    saveState({ lockVerified: head });
-    return "lock: matches manifests";
-  }
-  if (!/cannot update the lock file/.test(lockedErr))
+  const lockedCode = await locked.exited;
+  if (lockedCode !== 0 && !/cannot update the lock file/.test(lockedErr))
     return `lock: cargo metadata failed: ${lockedErr.trim().split("\n").at(-1)}`;
-  if (dryRun) return "lock: dry-run: would update Cargo.lock";
-  const update = cargo([]);
-  const updateErr = await new Response(update.stderr).text();
-  if ((await update.exited) !== 0) return `lock: update failed: ${updateErr.trim().split("\n").at(-1)}`;
-  const changed = (await gitOk(["diff", "--name-only", "--ignore-submodules=all"])).split("\n").filter(Boolean);
-  if (changed.join() !== "Cargo.lock") return `lock: refusing to commit unexpected changes: ${changed.join(", ")}`;
+  if (lockedCode !== 0) {
+    if (dryRun) return "lock: dry-run: would update Cargo.lock";
+    const update = cargo([]);
+    const updateErr = await new Response(update.stderr).text();
+    if ((await update.exited) !== 0) return `lock: update failed: ${updateErr.trim().split("\n").at(-1)}`;
+  }
+  const paths = await changed();
+  if (!paths.includes("Cargo.lock")) {
+    saveState({ lockVerified: head });
+    return lockedCode === 0 ? "lock: matches manifests" : "lock: updated";
+  }
+  if (paths.length !== 1) return `lock: refusing to commit unexpected changes: ${paths.join(", ")}`;
+  if (dryRun) return "lock: dry-run: would commit Cargo.lock";
   await gitOk(["add", "Cargo.lock"]);
   await gitOk(["commit", "-m", "lock: sync Cargo.lock with the manifests (VPS lock writer)"], {
     env: {
@@ -442,7 +460,9 @@ async function pass(): Promise<Outcome> {
     const tracked = (await gitOk(["diff", "--name-only", "HEAD", "--ignore-submodules=all"], { timeoutMs: 1_800_000 }))
       .split("\n")
       .filter(Boolean);
-    const staged = (await gitOk(["diff", "--cached", "--name-only", "--ignore-submodules=all"])).split("\n").filter(Boolean);
+    const staged = (await gitOk(["diff", "--cached", "--name-only", "--ignore-submodules=all"]))
+      .split("\n")
+      .filter(Boolean);
     const dirty = [...new Set([...tracked, ...staged])];
     const behind = base === local && local !== remote;
     const ahead = base === remote && local !== remote;
@@ -458,7 +478,8 @@ async function pass(): Promise<Outcome> {
     let integrated = "";
     if (!offMain && !healNow && !dryRun && behind && dirty.length) {
       const ff = await git(["merge", "--ff-only", "origin/main"], { timeoutMs: 1_800_000 });
-      if (ff.code === 0) integrated = `fast-forwarded ${local.slice(0, 10)}..${remote.slice(0, 10)} keeping ${dirty.length} local change(s)`;
+      if (ff.code === 0)
+        integrated = `fast-forwarded ${local.slice(0, 10)}..${remote.slice(0, 10)} keeping ${dirty.length} local change(s)`;
     }
     if (!offMain && !healNow && !dryRun && diverged) {
       const rebased = await git(["-c", "rebase.autoStash=true", "rebase", "origin/main"], { timeoutMs: 1_800_000 });
@@ -473,7 +494,10 @@ async function pass(): Promise<Outcome> {
         // Normal push; the pre-push gate (core.hooksPath=.githooks) may refuse a red change, which then stays local.
         const pushed = await pushMain();
         outcome = pushed.code === 0 ? "pushed" : "error";
-        detail += pushed.code === 0 ? `; pushed ${remote.slice(0, 10)}..${now.slice(0, 10)}` : `; push refused: ${lastLine(pushed)}`;
+        detail +=
+          pushed.code === 0
+            ? `; pushed ${remote.slice(0, 10)}..${now.slice(0, 10)}`
+            : `; push refused: ${lastLine(pushed)}`;
       }
       const extra: Record<string, unknown> = { ...sha };
       if (lockWriter && outcome !== "error") extra.lock = await syncCargoLock(await gitOk(["rev-parse", "HEAD"]));
@@ -488,7 +512,8 @@ async function pass(): Promise<Outcome> {
     let healReason = "";
     if (offMain) healReason = `checkout is on ${branch}, not main`;
     else if (diverged) healReason = "local commits do not rebase cleanly onto origin/main";
-    else if (dirty.length && (behind || healNow)) healReason = `${dirty.length} uncommitted tracked change(s) conflict with the fast-forward`;
+    else if (dirty.length && (behind || healNow))
+      healReason = `${dirty.length} uncommitted tracked change(s) conflict with the fast-forward`;
     else if (dirty.length && Date.now() - (await newestChange(dirty)) > dirtyGraceMs)
       healReason = `${dirty.length} uncommitted tracked change(s) left untouched for ${dirtyGraceMs / 60_000} min`;
 
@@ -507,11 +532,22 @@ async function pass(): Promise<Outcome> {
       const stamp = healed.ref.split("/").at(-1)!;
       healed.displaced = await displaceCollisions(target, stamp);
       const reset = await git(["checkout", "-f", "-B", "main", target], { timeoutMs: 1_800_000 });
-      if (reset.code !== 0) return record("error", `snapshot ${healed.ref} saved; reset failed: ${lastLine(reset)}`, sha);
-      const entry = { at: new Date().toISOString(), repo, host, reason: healReason, ...healed, ...sha, resetTo: target };
+      if (reset.code !== 0)
+        return record("error", `snapshot ${healed.ref} saved; reset failed: ${lastLine(reset)}`, sha);
+      const entry = {
+        at: new Date().toISOString(),
+        repo,
+        host,
+        reason: healReason,
+        ...healed,
+        ...sha,
+        resetTo: target,
+      };
       mkdirSync(stateDir, { recursive: true });
       appendFileSync(wipLog, JSON.stringify(entry) + "\n");
-      console.log(`[bunos-sync] saved work in ${healed.ref} (${healed.commit.slice(0, 10)}); recover with: git -C ${repo} switch -c <name> ${healed.ref}`);
+      console.log(
+        `[bunos-sync] saved work in ${healed.ref} (${healed.commit.slice(0, 10)}); recover with: git -C ${repo} switch -c <name> ${healed.ref}`,
+      );
     }
 
     const head = await gitOk(["rev-parse", "HEAD"]);
