@@ -1,0 +1,176 @@
+- generic [ref=e1]:
+  - link "Skip to desktop" [ref=e3] [cursor=pointer]:
+    - /url: "#desk"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - button "Show all apps" [ref=e6] [cursor=pointer]: All apps (Alt+Space)
+      - navigation "Workspaces" [ref=e7]:
+        - button "Workspace 1, has windows" [ref=e590] [cursor=pointer]:
+          - generic [ref=e591]: "1"
+          - text: Workspace 1
+        - button "Workspace 2" [ref=e592] [cursor=pointer]
+        - button "Workspace 3" [ref=e594] [cursor=pointer]
+        - button "Workspace 4" [ref=e596] [cursor=pointer]
+        - button "Workspace 5" [ref=e598] [cursor=pointer]
+      - generic [ref=e18]:
+        - generic [aria-hidden] [ref=e600]: search
+        - generic [ref=e601]: Aphrody Search
+    - button "5:17 dim. 1 nov." [ref=e21] [cursor=pointer]:
+      - time [ref=e22]: 5:17
+      - generic [ref=e23]: dim. 1 nov.
+    - generic [ref=e24]:
+      - 'button "Layout: Scrolling columns. Change layout" [ref=e25] [cursor=pointer]':
+        - generic [aria-hidden] [ref=e602]: view_column
+        - text: Scrolling columns (Alt+L)
+      - button "Search" [ref=e27] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e28]: search
+        - text: Search
+      - button "Quick settings. Online, sounds on, battery 100%" [ref=e29] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e30]: wifi
+        - generic [aria-hidden] [ref=e31]: volume_up
+        - generic [aria-hidden] [ref=e32]: battery_charging_full
+        - text: Quick settings
+      - button "Open settings" [ref=e33] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e34]: settings
+        - text: Settings
+  - main [ref=e35]:
+    - dialog "Aphrody Search" [ref=e544]:
+      - generic [ref=e545]:
+        - generic [aria-hidden] [ref=e546]: search
+        - generic [ref=e547]: Aphrody Search
+        - button "Minimize" [ref=e548] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e549]: remove
+        - button "Maximize" [ref=e550] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e551]: crop_square
+        - button "Close" [ref=e552] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e553]: close
+      - generic [ref=e556]:
+        - generic [ref=e557]:
+          - searchbox "Search" [active] [ref=e558]: test
+          - button "Search" [ref=e561] [cursor=pointer]
+        - generic [ref=e564]: 35 results
+        - generic [ref=e565]:
+          - link "artcraft-test_data https://aphrody.com/inventory/crates/artcraft-test_data A library with test data for our test cases." [ref=e603] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/crates/artcraft-test_data
+            - strong [ref=e604]: artcraft-test_data
+            - generic [ref=e605]: https://aphrody.com/inventory/crates/artcraft-test_data
+            - generic [ref=e606]: A library with test data for our test cases.
+          - link "artcraft-test_utils https://aphrody.com/inventory/crates/artcraft-test_utils testing This crate collects some of our common code around test setup and execution. In the future we may have several such crates that deal with specific functions (http serving, mocks, database, et…" [ref=e607] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/crates/artcraft-test_utils
+            - strong [ref=e608]: artcraft-test_utils
+            - generic [ref=e609]: https://aphrody.com/inventory/crates/artcraft-test_utils
+            - generic [ref=e610]: testing This crate collects some of our common code around test setup and execution. In the future we may have several such crates that deal with specific functions (http serving, mocks, database, et…
+          - link "product-payload.test.ts https://aphrody.com/inventory/factory/product-payload.test.ts Script product payload.test.ts (236 lines)." [ref=e611] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/factory/product-payload.test.ts
+            - strong [ref=e612]: product-payload.test.ts
+            - generic [ref=e613]: https://aphrody.com/inventory/factory/product-payload.test.ts
+            - generic [ref=e614]: Script product payload.test.ts (236 lines).
+          - link "setup-re-vendors.test.ts https://aphrody.com/inventory/tools/scripts/setup-re-vendors.test.ts Script setup re vendors.test.ts (89 lines)." [ref=e615] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/tools/scripts/setup-re-vendors.test.ts
+            - strong [ref=e616]: setup-re-vendors.test.ts
+            - generic [ref=e617]: https://aphrody.com/inventory/tools/scripts/setup-re-vendors.test.ts
+            - generic [ref=e618]: Script setup re vendors.test.ts (89 lines).
+          - link "setup-submodules.test.ts https://aphrody.com/inventory/tools/scripts/setup-submodules.test.ts Script setup submodules.test.ts (84 lines)." [ref=e619] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/tools/scripts/setup-submodules.test.ts
+            - strong [ref=e620]: setup-submodules.test.ts
+            - generic [ref=e621]: https://aphrody.com/inventory/tools/scripts/setup-submodules.test.ts
+            - generic [ref=e622]: Script setup submodules.test.ts (84 lines).
+          - link "@aphrody/windows-samples-tests https://aphrody.com/inventory/packages/windows-samples-tests Test matrix of the official Microsoft Windows samples (WinUI, Windows App SDK, Direct3D 12, .NET 10/11 templates) across C++, C , Rust and Bun" [ref=e623] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/packages/windows-samples-tests
+            - strong [ref=e624]: "@aphrody/windows-samples-tests"
+            - generic [ref=e625]: https://aphrody.com/inventory/packages/windows-samples-tests
+            - generic [ref=e626]: Test matrix of the official Microsoft Windows samples (WinUI, Windows App SDK, Direct3D 12, .NET 10/11 templates) across C++, C , Rust and Bun
+          - 'link "filmcraft-testkit https://aphrody.com/inventory/crates/filmcraft-testkit Test only helpers: ffmpeg/ffprobe oracle discovery, fixture directories, golden image comparison" [ref=e627] [cursor=pointer]':
+            - /url: https://aphrody.com/inventory/crates/filmcraft-testkit
+            - strong [ref=e628]: filmcraft-testkit
+            - generic [ref=e629]: https://aphrody.com/inventory/crates/filmcraft-testkit
+            - generic [ref=e630]: "Test only helpers: ffmpeg/ffprobe oracle discovery, fixture directories, golden image comparison"
+          - 'link "vectorcraft-testkit https://aphrody.com/inventory/crates/vectorcraft-testkit VectorCraft test helpers: fixtures, generators, render comparison, geometry assertions" [ref=e631] [cursor=pointer]':
+            - /url: https://aphrody.com/inventory/crates/vectorcraft-testkit
+            - strong [ref=e632]: vectorcraft-testkit
+            - generic [ref=e633]: https://aphrody.com/inventory/crates/vectorcraft-testkit
+            - generic [ref=e634]: "VectorCraft test helpers: fixtures, generators, render comparison, geometry assertions"
+          - link "photocraft-testkit https://aphrody.com/inventory/crates/photocraft-testkit photocraft testkit" [ref=e635] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/crates/photocraft-testkit
+            - strong [ref=e636]: photocraft-testkit
+            - generic [ref=e637]: https://aphrody.com/inventory/crates/photocraft-testkit
+            - generic [ref=e638]: photocraft testkit
+          - link "@aphrody/bun-engine https://aphrody.com/inventory/packages/bun-engine Directory packages/bun engine containing LICENSE, config, package.json, plugins, src, test, web emulation, web, webgpu." [ref=e639] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/packages/bun-engine
+            - strong [ref=e640]: "@aphrody/bun-engine"
+            - generic [ref=e641]: https://aphrody.com/inventory/packages/bun-engine
+            - generic [ref=e642]: Directory packages/bun engine containing LICENSE, config, package.json, plugins, src, test, web emulation, web, webgpu.
+          - link "@aphrody/bun-workspace https://aphrody.com/inventory/packages/bun-workspace Directory packages/bun workspace containing AUTOMATION.md, LICENSE APACHE, LICENSE MIT, assets, config, package.json, src, test." [ref=e643] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/packages/bun-workspace
+            - strong [ref=e644]: "@aphrody/bun-workspace"
+            - generic [ref=e645]: https://aphrody.com/inventory/packages/bun-workspace
+            - generic [ref=e646]: Directory packages/bun workspace containing AUTOMATION.md, LICENSE APACHE, LICENSE MIT, assets, config, package.json, src, test.
+          - 'link "@aphrody/m3-config https://aphrody.com/inventory/packages/m3-config Shared build, typecheck and test presets for the @aphrody Material Design 3 packages: tsconfig, the Bun.build preset and the happy dom test preload." [ref=e647] [cursor=pointer]':
+            - /url: https://aphrody.com/inventory/packages/m3-config
+            - strong [ref=e648]: "@aphrody/m3-config"
+            - generic [ref=e649]: https://aphrody.com/inventory/packages/m3-config
+            - generic [ref=e650]: "Shared build, typecheck and test presets for the @aphrody Material Design 3 packages: tsconfig, the Bun.build preset and the happy dom test preload."
+          - link "arch https://aphrody.com/inventory/factory/arch Directory factory/arch containing cachyos, chimeraos, index.test.ts, index.ts, locks, msys2.ts, omarchy, pacman.ts, qualification, resolve.ts and 2 more." [ref=e651] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/factory/arch
+            - strong [ref=e652]: arch
+            - generic [ref=e653]: https://aphrody.com/inventory/factory/arch
+            - generic [ref=e654]: Directory factory/arch containing cachyos, chimeraos, index.test.ts, index.ts, locks, msys2.ts, omarchy, pacman.ts, qualification, resolve.ts and 2 more.
+          - 'link "artcraft-build_metadata https://aphrody.com/inventory/crates/artcraft-build_metadata Tell Cargo that if the given file changes, to rerun this build script. TODO: Use this to test the GIT SHA, etc. files that CI dumps into the working directory println!(\"cargo::rerun if changed=Cargo.…" [ref=e655] [cursor=pointer]':
+            - /url: https://aphrody.com/inventory/crates/artcraft-build_metadata
+            - strong [ref=e656]: artcraft-build_metadata
+            - generic [ref=e657]: https://aphrody.com/inventory/crates/artcraft-build_metadata
+            - generic [ref=e658]: "Tell Cargo that if the given file changes, to rerun this build script. TODO: Use this to test the GIT SHA, etc. files that CI dumps into the working directory println!(\"cargo::rerun if changed=Cargo.…"
+          - 'link "bunfig.toml https://aphrody.com/inventory/workspace/bunfig.toml Bun configuration of the workspace: install, test and runtime settings." [ref=e659] [cursor=pointer]':
+            - /url: https://aphrody.com/inventory/workspace/bunfig.toml
+            - strong [ref=e660]: bunfig.toml
+            - generic [ref=e661]: https://aphrody.com/inventory/workspace/bunfig.toml
+            - generic [ref=e662]: "Bun configuration of the workspace: install, test and runtime settings."
+          - 'link "emulation https://aphrody.com/inventory/tools/scripts/emulation Fetch the free test ROMs of the emulation suite into target/rom suite/downloads (sha256 verified). Usage: bun scripts/emulation/fetch roms.ts [downloadsDir]" [ref=e663] [cursor=pointer]':
+            - /url: https://aphrody.com/inventory/tools/scripts/emulation
+            - strong [ref=e664]: emulation
+            - generic [ref=e665]: https://aphrody.com/inventory/tools/scripts/emulation
+            - generic [ref=e666]: "Fetch the free test ROMs of the emulation suite into target/rom suite/downloads (sha256 verified). Usage: bun scripts/emulation/fetch roms.ts [downloadsDir]"
+          - link "filmcraft-golden https://aphrody.com/inventory/crates/filmcraft-golden Golden image tests for the CPU renderer/compositor and GPU vs CPU parity (test only crate)" [ref=e667] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/crates/filmcraft-golden
+            - strong [ref=e668]: filmcraft-golden
+            - generic [ref=e669]: https://aphrody.com/inventory/crates/filmcraft-golden
+            - generic [ref=e670]: Golden image tests for the CPU renderer/compositor and GPU vs CPU parity (test only crate)
+          - 'link "fixtures.ts https://aphrody.com/inventory/engines/web/fixtures.ts Free test content for the WebOS emulator qualification: source licensed homebrew and test ROMs only," [ref=e671] [cursor=pointer]':
+            - /url: https://aphrody.com/inventory/engines/web/fixtures.ts
+            - strong [ref=e672]: fixtures.ts
+            - generic [ref=e673]: https://aphrody.com/inventory/engines/web/fixtures.ts
+            - generic [ref=e674]: "Free test content for the WebOS emulator qualification: source licensed homebrew and test ROMs only,"
+          - link "m3 https://aphrody.com/inventory/tools/scripts/m3 Directory scripts/m3 containing bench, build.test.ts, build.ts, bundle size.ts, check assets.test.ts, check assets.ts, check exports.test.ts, check exports.ts, check links.test.ts, check links.ts and…" [ref=e675] [cursor=pointer]:
+            - /url: https://aphrody.com/inventory/tools/scripts/m3
+            - strong [ref=e676]: m3
+            - generic [ref=e677]: https://aphrody.com/inventory/tools/scripts/m3
+            - generic [ref=e678]: Directory scripts/m3 containing bench, build.test.ts, build.ts, bundle size.ts, check assets.test.ts, check assets.ts, check exports.test.ts, check exports.ts, check links.test.ts, check links.ts and…
+          - 'link "microsoft https://aphrody.com/inventory/packages/microsoft Microsoft app support probes for Bun OS: PE import analysis, Wine spec coverage, COM automation (Office), packaged apps, Windows 11 feature probes. Every claim is a test." [ref=e679] [cursor=pointer]':
+            - /url: https://aphrody.com/inventory/packages/microsoft
+            - strong [ref=e680]: microsoft
+            - generic [ref=e681]: https://aphrody.com/inventory/packages/microsoft
+            - generic [ref=e682]: "Microsoft app support probes for Bun OS: PE import analysis, Wine spec coverage, COM automation (Office), packaged apps, Windows 11 feature probes. Every claim is a test."
+  - navigation "Dock" [ref=e36]:
+    - button "Show all apps" [ref=e683] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e685]: apps
+      - text: All apps
+    - button "Aphrody Files" [ref=e687] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e689]: folder
+      - text: Aphrody Files
+    - button "Aphrody Browser" [ref=e690] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e692]: language
+      - text: Aphrody Browser
+    - button "Aphrody Shell" [ref=e693] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e695]: terminal
+      - text: Aphrody Shell
+    - button "Aphrody Store" [ref=e696] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e698]: storefront
+      - text: Aphrody Store
+    - button "Aphrody Settings" [ref=e699] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e701]: settings
+      - text: Aphrody Settings
+    - button "Aphrody Search, open" [ref=e703] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e705]: search
+      - text: Aphrody Search
+  - region "Notifications"
+  - status [ref=e56]

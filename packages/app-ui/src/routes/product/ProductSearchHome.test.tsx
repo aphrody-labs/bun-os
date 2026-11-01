@@ -91,6 +91,72 @@ test("public search redacts failure, stays in Aphrody and retries the real backe
   }
 });
 
+test("agent mode grounds its streamed answer in the public search results", async () => {
+  useI18n.getState().setLanguage("en");
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  const host = document.createElement("div");
+  document.body.append(host);
+  const root = createRoot(host);
+  const originalFetch = globalThis.fetch;
+  const originalAnimationFrame = globalThis.requestAnimationFrame;
+  const domWindow = window as unknown as { happyDOM: { setURL: (url: string) => void } };
+  const originalUrl = window.location.href;
+  domWindow.happyDOM.setURL("https://aphrody.com/");
+  globalThis.requestAnimationFrame = () => 0;
+  const requests: Array<{ url: string; body?: string }> = [];
+  globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+    const url = String(input);
+    requests.push({ url, body: typeof init?.body === "string" ? init.body : undefined });
+    if (url.startsWith("/api/search?"))
+      return Response.json({
+        query: "Wayland remote desktop",
+        organic: [
+          {
+            title: "Wayland documentation",
+            url: "https://wayland.freedesktop.org/",
+            snippet: "Wayland is a protocol for a compositor to talk to its clients.",
+          },
+        ],
+      });
+    return new Response(
+      'data: {"choices":[{"delta":{"content":"Wayland is a display protocol [1]."}}]}\n\ndata: [DONE]\n\n',
+      { headers: { "content-type": "text/event-stream" } },
+    );
+  }) as typeof fetch;
+  try {
+    await act(async () =>
+      root.render(
+        <MemoryRouter>
+          <ProductSearchHome />
+        </MemoryRouter>,
+      ),
+    );
+    const agent = host.querySelector('[role="group"][aria-label="Search mode"] button:nth-child(2)')!;
+    await act(async () => agent.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    const input = host.querySelector("input")!;
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, "Wayland remote desktop");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await act(async () =>
+      host.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })),
+    );
+    expect(requests).toHaveLength(2);
+    expect(requests[0]!.url).toStartWith("/api/search?");
+    expect(requests[1]!.url).toBe("https://aphrody.com/api/chat/v1/chat/completions");
+    expect(requests[1]!.body).toContain("Wayland is a protocol");
+    expect(host.textContent).toContain("Wayland is a display protocol [1].");
+    expect(host.querySelector('a[href="https://wayland.freedesktop.org/"]')).not.toBeNull();
+    expect(host.querySelector('[role="alert"]')).toBeNull();
+  } finally {
+    globalThis.fetch = originalFetch;
+    globalThis.requestAnimationFrame = originalAnimationFrame;
+    domWindow.happyDOM.setURL(originalUrl);
+    await act(async () => root.unmount());
+    host.remove();
+  }
+});
+
 test("every supported locale translates the complete public surface and preserves genuine routes", async () => {
   const host = document.createElement("div");
   const root = createRoot(host);

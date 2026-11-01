@@ -1596,3 +1596,8 @@
 [submodule "vendor/codex"]
 	path = vendor/codex
 	url = https://github.com/aphrody-labs/codex.git
+[submodule "vendor/searxng"]
+	path = vendor/searxng
+	url = https://github.com/aphrody-labs/searxng.git
+	branch = master
+	shallow = true

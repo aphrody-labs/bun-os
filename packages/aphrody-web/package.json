@@ -1,7 +1,7 @@
 {
   "name": "@aphrody/web-crawl",
   "version": "1.4.7",
-  "description": "Typed Bun client for Aphrody Web crawling and local RAG search",
+  "description": "Typed Aphrody web search, crawling, and local RAG clients for Bun and Fetch runtimes",
   "license": "Apache-2.0",
   "author": "aphrody-dev <contact@aphrody.com>",
   "repository": {

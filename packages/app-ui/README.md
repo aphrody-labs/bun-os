@@ -42,11 +42,19 @@ The frontend starts no backend process and owns no model, crawl or RAG store.
 
 ## Aphrody Search
 
-The product search home offers public web search and a separate indexed
-knowledge mode. Indexed knowledge uses `@aphrody/web-crawl/browser` and calls
-the versioned `/api/v1/rag/search` endpoint. Set
+The product search home offers Search and Agent task modes, each over public
+web results or the local indexed knowledge source. Indexed knowledge uses
+`@aphrody/web-crawl/browser` and calls the versioned `/api/v1/rag/search`
+endpoint. Set
 `VITE_APHRODY_SEARCH_API_URL` to the Aphrody MCP HTTP origin when it is not
 served through the app's own origin; otherwise the same-origin route is used.
 The browser client sends no bearer token, so cross-origin deployments must be
 configured by the operator with an authenticated gateway and appropriate
-CORS. Results are retrieval excerpts, not generated answers.
+CORS. Search displays ranked result or passage excerpts. Agent first runs that
+same search, then sends the question and up to eight excerpts to the
+OpenAI-compatible chat gateway and streams the answer beside its source list.
+By default, chat uses the same-origin `/api/chat/v1` gateway. Configure
+`VITE_APHRODY_CHAT_API_BASE_URL` only for an already protected public endpoint;
+never put a server bearer token in a `VITE_` variable or browser bundle.
+Generated citation markers are not verified citation metadata, and Agent does
+not yet persist multi-step runs or support schema-constrained output.

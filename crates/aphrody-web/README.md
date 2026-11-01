@@ -94,12 +94,49 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-The default crate stays crawler-only; `rag-search` is opt-in because it adds
-SQLite and retrieval dependencies. This API searches a local indexed corpus,
-not the public web.
+The `rag-search` feature is opt-in because it adds SQLite and retrieval
+dependencies. It searches a local indexed corpus, not the public web. The
+`searxng` HTTP client is enabled by default.
 
 The CLI, typed Bun package, and MCP tool are documented in
 [`docs/aphrody/WEB-CRAWL-STACK.md`](../../docs/aphrody/WEB-CRAWL-STACK.md).
+
+## Federated public web search with SearXNG
+
+The default `searxng` feature adds a typed Rust client for an operator-managed SearXNG
+instance. The external engines remain SearXNG's responsibility; Aphrody keeps
+its own crawler, extraction, storage and RAG index as the downstream pipeline.
+The instance must enable JSON output (`search.formats`) for its `/search` API.
+The Aphrody MCP gateway exposes this client as `aphrody_web_search` and
+`GET /api/v1/web/search`; set `APHRODY_SEARXNG_URL` to the private instance URL.
+
+```toml
+[dependencies]
+aphrody-web = { version = "1.4.7" }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+```
+
+```rust,no_run
+use aphrody_web::web_search::{
+    SearchCategory, SearxngClientOptions, SearxngSearchClient, WebSearchRequest,
+};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = SearxngSearchClient::new(
+        SearxngClientOptions::new("https://search.example.org/")?,
+    )?;
+    let mut request = WebSearchRequest::new("headless browser automation");
+    request.limit = 8;
+    request.categories = vec![SearchCategory::General, SearchCategory::It];
+    request.language = Some("en".into());
+    let report = client.search(&request).await?;
+    for result in report.results {
+        println!("{} — {}", result.title, result.url);
+    }
+    Ok(())
+}
+```
 
 ### Search over the Aphrody HTTP API
 

@@ -67,6 +67,26 @@ export async function planArchDistribution(options: ArchDistributionOptions) {
   if (!Array.isArray(profile.sourceCatalogs) || profile.sourceCatalogs.some(id => typeof id !== "string"))
     throw new Error("The root Arch profile must declare its source catalogs.");
   const loaders = {
+    searxng: async () => {
+      const catalog = (await Bun.file(join(import.meta.dir, "sources.json")).json()) as {
+        sources: Array<{
+          id: string;
+          repository: string;
+          mount: string;
+          checkoutRevision: string;
+          initialized: boolean;
+        }>;
+      };
+      const source = catalog.sources.find(entry => entry.id === "searxng");
+      if (!source) throw new Error("SearXNG source fork is missing from the source catalog.");
+      return {
+        path: source.mount,
+        repository: source.repository,
+        revision: source.checkoutRevision,
+        initialized: source.initialized,
+        license: "AGPL-3.0",
+      };
+    },
     cachyos: async () => ({
       path: "factory/arch/cachyos",
       recipes: "catalog.json",

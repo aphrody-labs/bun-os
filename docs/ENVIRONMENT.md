@@ -49,6 +49,11 @@ Backups taken before the change: Windows `C:\Users\aphro\.aphrody\backup\` (`hkc
 
 ## MCP
 
+The public web-search REST route `/api/v1/web/search` requires the existing
+`APHRODY_AI_HTTP_TOKEN` gateway bearer and reads its SearXNG base URL from
+`APHRODY_SEARXNG_URL`. Keep both values in the host's protected environment or
+systemd environment file, never in repository files or browser bundles.
+
 `aphrody mcp` with no arguments is the stdio MCP server.
 
 | Client | Server | Command |

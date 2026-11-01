@@ -15,10 +15,13 @@ obscura-net = { workspace = true }
 aphrody-rag = { path = "../aphrody-rag", version = "1.4.7", optional = true }
 reqwest = { workspace = true, features = ["rustls-no-provider", "json", "http2"] }
 serde = { workspace = true }
+serde_json = { workspace = true }
+url = { workspace = true }
 
 [features]
-default = []
+default = ["searxng"]
 http-search = []
+searxng = []
 rag-search = ["dep:aphrody-rag"]
 
 [package.metadata.docs.rs]

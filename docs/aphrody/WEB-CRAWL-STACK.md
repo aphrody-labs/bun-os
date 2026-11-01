@@ -4,11 +4,15 @@ This is the implementation map for the recursive crawl, indexing, search, and
 headless-browser work that feeds Bun OS. `docs/PRODUCT.md` remains the product
 status checklist.
 
+The browser Search/Agent interaction and its model-gateway contract are
+documented in [`SEARCH-AGENT.md`](SEARCH-AGENT.md).
+
 ## Selected components
 
 | Job                                | Selected owner                                                                                                  | Reason                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Public crawl API and Rust crawling | [`aphrody-web`](../../crates/aphrody-web), backed by `bun_browser_crawl` from pinned `aphrody-labs/bun-obscura` | The façade gives other Rust projects a stable entry point while Obscura owns durable SQLite frontier, bounded traversal, per-host pacing, retry/lease recovery, domain scope, robots policy, sitemap discovery, and resumable jobs. CLI and MCP use the same public Playwright transport.                                                                                                                                            |
+| Federated public web discovery     | SearXNG source fork (`vendor/searxng`), Aphrody Rust client, REST/MCP routes and Fetch JS adapter                 | The operator-configured HTTP JSON metasearch instance lets operators choose upstream engines while Aphrody owns normalization, crawling, extraction, provenance, local indexing, MCP, and agent workflows. `APHRODY_SEARXNG_URL` configures the server-side adapter. SearXNG's Python application remains a distinct process and is licensed AGPL-3.0. |
 | Headless browser                   | Aphrody Obscura CDP engine, controlled by [Microsoft Playwright](https://github.com/microsoft/playwright)       | Playwright connects to Obscura over loopback CDP, creates isolated contexts, renders JavaScript pages, and returns bounded HTML. Aphrody's Rust crawler still owns recursion, scope, robots, durable SQLite frontier, extraction and indexing. CDP is Chromium-only and has lower fidelity than Playwright's native protocol; see [connectOverCDP](https://playwright.dev/docs/api/class-browsertype#browser-type-connect-over-cdp). |
 | Aphrody retrieval index            | `aphrody-rag` SQLite                                                                                            | SQLite FTS5 and vectors are the durable search index; crawl pages are indexed into the selected Aphrody home.                                                                                                                                                                                                                                                                                                                        |
 | Aphrody query cache                | Redis 8.10.3, ephemeral and loopback-only                                                                       | Search results are derived data. The cache has a 512 MiB LRU budget and a 60-second result TTL; Redis is not the source of truth.                                                                                                                                                                                                                                                                                                    |
@@ -40,6 +44,24 @@ status checklist.
   material does not become a canon verdict automatically.
 
 ## Reuse from other projects
+
+### Search contracts and headless clients
+
+The existing native public-web engine is `aphrody-google`'s Rust search
+implementation. Its `aphrody_search` MCP tool accepts query, result count,
+locale, region, Google domain, vertical, SafeSearch, pagination, and optional
+rich SERP data. SearXNG is added as a second federated public-web provider;
+the local SQLite RAG route stays separate.
+
+SearXNG has typed `WebSearchRequest` and `WebSearchReport` contracts in
+Rust, Fetch-based JS, Aphrody REST and MCP. Configure the self-hosted SearXNG
+instance with `APHRODY_SEARXNG_URL` and enable JSON output. The native Google
+engine remains independently available through MCP/CLI. Keep provider
+selection explicit so app callers know whether a result came from SearXNG,
+Google or the local SQLite index.
+The REST adapter requires `APHRODY_AI_HTTP_TOKEN`; server-side JS can pass the
+token to its Fetch client, while browser apps use a same-origin authenticated
+gateway and keep credentials out of bundles.
 
 ### CLI
 

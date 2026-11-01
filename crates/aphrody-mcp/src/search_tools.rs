@@ -31,6 +31,30 @@ static TOOL: LazyLock<Tool> = LazyLock::new(|| {
     })).expect("static Google Search tool schema")
 });
 
+static WEB_TOOL: LazyLock<Tool> = LazyLock::new(|| {
+    serde_json::from_value(json!({
+        "name": "aphrody_web_search",
+        "description": "Federated public web search through Aphrody's configured self-hosted SearXNG instance. Returns normalized results and, when enabled, engine metadata. Configure APHRODY_SEARXNG_URL and enable JSON output in SearXNG.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "query": {"type":"string", "description":"Search query."},
+                "limit": {"type":"integer", "minimum":1, "maximum":50},
+                "categories": {"type":"array", "items":{"type":"string", "enum":["general","news","science","it","images","videos"]}},
+                "language": {"type":"string"},
+                "page": {"type":"integer", "minimum":1, "maximum":100},
+                "timeRange": {"type":"string", "enum":["day","month","year"]},
+                "safeSearch": {"type":"integer", "minimum":0, "maximum":2},
+                "engines": {"type":"array", "items":{"type":"string"}},
+                "disabledEngines": {"type":"array", "items":{"type":"string"}}
+            },
+            "required":["query"],
+            "additionalProperties":false
+        },
+        "annotations": {"readOnlyHint":true, "destructiveHint":false, "idempotentHint":true, "openWorldHint":true}
+    })).expect("static SearXNG web search tool schema")
+});
+
 static ROUTES_TOOL: LazyLock<Tool> = LazyLock::new(|| {
     serde_json::from_value(json!({
         "name": "aphrody_google_routes",
@@ -41,7 +65,7 @@ static ROUTES_TOOL: LazyLock<Tool> = LazyLock::new(|| {
 });
 
 pub(crate) fn list(taken: impl Fn(&str) -> bool) -> Vec<Tool> {
-    [&*TOOL, &*ROUTES_TOOL]
+    [&*TOOL, &*ROUTES_TOOL, &*WEB_TOOL]
         .into_iter()
         .filter(|tool| !taken(tool.name.as_ref()))
         .cloned()
@@ -49,14 +73,14 @@ pub(crate) fn list(taken: impl Fn(&str) -> bool) -> Vec<Tool> {
 }
 
 pub(crate) fn get(name: &str) -> Option<Tool> {
-    [&*TOOL, &*ROUTES_TOOL]
+    [&*TOOL, &*ROUTES_TOOL, &*WEB_TOOL]
         .into_iter()
         .find(|tool| tool.name == name)
         .cloned()
 }
 
 pub(crate) fn owns(name: &str) -> bool {
-    TOOL.name == name || ROUTES_TOOL.name == name
+    TOOL.name == name || ROUTES_TOOL.name == name || WEB_TOOL.name == name
 }
 
 pub(crate) async fn call(request: &CallToolRequestParams) -> CallToolResult {
@@ -64,7 +88,9 @@ pub(crate) async fn call(request: &CallToolRequestParams) -> CallToolResult {
         .arguments
         .as_ref()
         .map_or_else(|| json!({}), |map| Value::Object(map.clone()));
-    let result = if request.name == ROUTES_TOOL.name {
+    let result = if request.name == WEB_TOOL.name {
+        run_searxng(&args).await
+    } else if request.name == ROUTES_TOOL.name {
         if args.as_object().is_some_and(serde_json::Map::is_empty) {
             serde_json::to_value(aphrody_google::routes::catalog())
                 .map_err(|error| error.to_string())
@@ -85,6 +111,85 @@ pub(crate) async fn call(request: &CallToolRequestParams) -> CallToolResult {
     }
 }
 
+async fn run_searxng(args: &Value) -> Result<Value, String> {
+    use aphrody_web::web_search::{
+        SearchCategory, SearxngClientOptions, SearxngSearchClient, TimeRange, WebSearchRequest,
+    };
+
+    let query = args
+        .get("query")
+        .and_then(Value::as_str)
+        .ok_or("query is required")?;
+    let base_url = std::env::var("APHRODY_SEARXNG_URL")
+        .map_err(|_| "APHRODY_SEARXNG_URL is not configured")?;
+    let mut request = WebSearchRequest::new(query);
+    if let Some(value) = args.get("limit") {
+        request.limit = usize::try_from(value.as_u64().ok_or("limit must be an integer")?)
+            .map_err(|_| "limit is out of range")?;
+    }
+    if let Some(value) = args.get("page") {
+        request.page = u16::try_from(value.as_u64().ok_or("page must be an integer")?)
+            .map_err(|_| "page is out of range")?;
+    }
+    if let Some(value) = args.get("language").and_then(Value::as_str) {
+        request.language = Some(value.to_owned());
+    }
+    if let Some(value) = args.get("safeSearch") {
+        request.safe_search = Some(
+            u8::try_from(value.as_u64().ok_or("safeSearch must be an integer")?)
+                .map_err(|_| "safeSearch is out of range")?,
+        );
+    }
+    if let Some(value) = args.get("categories") {
+        let values = value.as_array().ok_or("categories must be an array")?;
+        for value in values.iter().filter_map(Value::as_str) {
+            request.categories.push(match value {
+                "general" => SearchCategory::General,
+                "news" => SearchCategory::News,
+                "science" => SearchCategory::Science,
+                "it" => SearchCategory::It,
+                "images" => SearchCategory::Images,
+                "videos" => SearchCategory::Videos,
+                _ => return Err(format!("unsupported category: {value}")),
+            });
+        }
+        if values.iter().any(|value| !value.is_string()) {
+            return Err("categories must contain strings".into());
+        }
+    }
+    request.engines = json_string_array(args.get("engines"))?;
+    request.disabled_engines = json_string_array(args.get("disabledEngines"))?;
+    request.time_range = match args.get("timeRange").and_then(Value::as_str) {
+        None => None,
+        Some("day") => Some(TimeRange::Day),
+        Some("month") => Some(TimeRange::Month),
+        Some("year") => Some(TimeRange::Year),
+        Some(_) => return Err("unsupported timeRange".into()),
+    };
+    let client =
+        SearxngSearchClient::new(SearxngClientOptions::new(base_url).map_err(|e| e.to_string())?)
+            .map_err(|e| e.to_string())?;
+    serde_json::to_value(client.search(&request).await.map_err(|e| e.to_string())?)
+        .map_err(|e| e.to_string())
+}
+
+fn json_string_array(value: Option<&Value>) -> Result<Vec<String>, String> {
+    let Some(value) = value else {
+        return Ok(Vec::new());
+    };
+    let values = value
+        .as_array()
+        .ok_or("engine filters must be arrays of strings")?;
+    values
+        .iter()
+        .map(|item| {
+            item.as_str()
+                .map(str::to_owned)
+                .ok_or("engine filters must contain strings".to_owned())
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -96,7 +201,8 @@ mod tests {
     #[test]
     fn schema_and_verticals_match_source_contract() {
         assert!(owns("aphrody_search"));
-        assert_eq!(list(|_| false).len(), 2);
+        assert_eq!(list(|_| false).len(), 3);
+        assert!(owns("aphrody_web_search"));
         let schema = serde_json::to_value(get("aphrody_search").unwrap()).unwrap();
         assert_eq!(schema["inputSchema"]["properties"]["num"]["maximum"], 20);
         assert_eq!(

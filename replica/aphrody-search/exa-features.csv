@@ -1,5 +1,5 @@
 feature,area,priority,original,clone,notes
-Public Search and Agent mode switch,search,must,yes,no,Observed on Exa public homepage
+Public Search and Agent mode switch,search,must,yes,yes,Aphrody home now switches between ranked search and a streaming answer workflow
 Search Lite Auto and Deep modes,performance,must,yes,no,Public docs define lite auto deep-lite and deep; separate from Aphrody local RAG modes
 Search category filters,filters,must,yes,no,Public homepage exposes web news company research people and financial categories
 Domain include and exclude filters,filters,must,yes,no,Public Search API supports hostnames paths and wildcard subdomains
@@ -8,16 +8,17 @@ Ranked web source records,results,must,yes,partial,Aphrody public search exists 
 Highlights for token-efficient context,content,must,yes,no,Per-result relevant excerpts are available from Search and Contents
 Full page text extraction,content,should,yes,partial,Aphrody has crawl/extract paths; unified hosted URL content endpoint needs API work
 PDF and rendered page extraction,content,should,yes,partial,Aphrody crawler/browser render supports pages; unified external contents contract is incomplete
-Search Answer and Structured output views,answer,must,yes,no,Observed on Exa demo; Aphrody has no cited-answer result pipeline yet
-Answer citations and source links,evidence,must,yes,no,Public Answer API returns citation records; Aphrody web answer synthesis is missing
+Search Answer and Structured output views,answer,must,yes,partial,Aphrody Agent mode renders streamed text and source records; separate structured output view is not implemented
+Answer citations and source links,evidence,must,yes,partial,Agent prompt asks for numbered evidence references but the gateway does not return verified citation metadata
 Server-sent event answer streaming,streaming,should,yes,no,Public Answer endpoint supports streaming responses
 Schema-constrained answer JSON,structured,should,yes,no,Answer supports outputSchema
-Agent asynchronous research runs,agents,must,yes,no,Create run then stream events or poll by returned id
+Agent asynchronous research runs,agents,must,yes,no,Create run then stream events or poll by returned id; Aphrody Agent mode is one synchronous chat stream
 Agent structured output and field grounding,agents,must,yes,no,Agent output can include validated structure and field-level citations
 Agent run lifecycle and continuation,sessions,should,yes,no,Public contract includes status polling previousRunId and event streaming
 Agent effort and spend budgets,cost,should,yes,partial,Aphrody services need explicit per-request budget accounting and caps
 Agent list-building and enrichment,agents,could,yes,no,Uses Exa research and optional data-source partners; broad XL scope
 Hosted MCP integration,integrations,should,yes,partial,Aphrody already exposes MCP tools; unified public-web search contract remains incomplete
-Official JavaScript SDK,integrations,must,yes,partial,Aphrody browser/Bun facade exists; provider-neutral public-web API package remains incomplete
+Provider-neutral typed JavaScript and Rust clients,integrations,must,yes,partial,Aphrody browser/Bun and Rust facades cover local and crawler use; provider-neutral public-web result contract remains incomplete
 Official Python SDK,integrations,should,yes,no,No supported Python client surfaced in the Aphrody package matrix
 API request cost and usage metadata,observability,should,yes,partial,Aphrody local index returns mode and latency; provider cost/source telemetry needs a common contract
+Exa Search provider adapter,integrations,must,yes,no,No EXA_API_KEY or adapter is configured; public Aphrody results still use the existing search adapter
