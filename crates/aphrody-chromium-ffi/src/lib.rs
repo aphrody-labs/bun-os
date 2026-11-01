@@ -104,8 +104,8 @@ fn build_engine(json: &[u8]) -> Result<Box<AdblockEngine>, String> {
     let opts = ParseOptions { format, ..ParseOptions::default() };
     let mut set = FilterSet::new(options.debug);
     match options.rules {
-        Rules::Text(text) => set.add_filter_list(&text, opts),
-        Rules::List(list) => set.add_filter_list(&list.join("\n"), opts),
+        Rules::Text(text) => set.add_filter_list(text, opts),
+        Rules::List(list) => set.add_filter_list(list.join("\n"), opts),
     };
     let mut engine = Engine::new_with_filter_set(set);
     if let Some(resources) = options.resources {
@@ -224,7 +224,7 @@ pub unsafe extern "C" fn aphrody_adblock_url_cosmetic_resources(
     let Ok(url) = std::str::from_utf8(unsafe { bytes(url, len) }) else { return err("url must be UTF-8") };
     let resources = engine.engine.url_cosmetic_resources(url);
     let sorted = |set: &HashSet<String>| {
-        let mut values: Vec<&String> = set.iter().collect();
+        let mut values: Vec<String> = set.iter().cloned().collect();
         values.sort();
         values
     };
