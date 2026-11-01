@@ -44,8 +44,7 @@ function parseCsv(text: string): string[][] {
 }
 
 const ps = async (script: string, stdin: string) => {
-  const r =
-    await Bun.$`pwsh -NoProfile -NonInteractive -Command ${script} < ${new Response(stdin)}`.quiet();
+  const r = await Bun.$`pwsh -NoProfile -NonInteractive -Command ${script} < ${new Response(stdin)}`.quiet();
   return r.text().trim();
 };
 const dpapi = (mode: "Protect" | "Unprotect", b64: string) =>
@@ -60,48 +59,27 @@ async function masterKey(): Promise<CryptoKey> {
   let raw: string;
   if (await f.exists()) raw = await dpapi("Unprotect", (await f.text()).trim());
   else {
-    raw = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString(
-      "base64",
-    );
+    raw = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("base64");
     mkdirSync(join(home, "keys"), { recursive: true });
     await Bun.write(path, await dpapi("Protect", raw));
   }
-  return crypto.subtle.importKey(
-    "raw",
-    Buffer.from(raw, "base64"),
-    "AES-GCM",
-    false,
-    ["encrypt", "decrypt"],
-  );
+  return crypto.subtle.importKey("raw", Buffer.from(raw, "base64"), "AES-GCM", false, ["encrypt", "decrypt"]);
 }
 
 const seal = async (key: CryptoKey, text: string) => {
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = new Uint8Array(
-    await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      key,
-      new TextEncoder().encode(text),
-    ),
-  );
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(text)));
   return Buffer.concat([iv, ct]);
 };
 const open = async (key: CryptoKey, blob: Uint8Array) =>
   new TextDecoder().decode(
-    await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: blob.slice(0, 12) },
-      key,
-      blob.slice(12),
-    ),
+    await crypto.subtle.decrypt({ name: "AES-GCM", iv: blob.slice(0, 12) }, key, blob.slice(12)),
   );
 
 const [header, ...rows] = parseCsv(await Bun.file(src).text());
 const col = (n: string) => header.indexOf(n);
-const idx = Object.fromEntries(
-  ["name", "url", "username", "password", "note"].map((n) => [n, col(n)]),
-);
-if (Object.values(idx).some((i) => i < 0))
-  throw new Error("unexpected CSV header");
+const idx = Object.fromEntries(["name", "url", "username", "password", "note"].map(n => [n, col(n)]));
+if (Object.values(idx).some(i => i < 0)) throw new Error("unexpected CSV header");
 
 mkdirSync(join(home, "db"), { recursive: true });
 const db = new Database(join(home, "db/vault.sqlite"), { create: true });
@@ -116,33 +94,22 @@ const insert = db.prepare(
 );
 const sealed: [string, string, string, Buffer, string][] = [];
 for (const r of rows)
-  sealed.push([
-    r[idx.name],
-    r[idx.url],
-    r[idx.username],
-    await seal(key, r[idx.password]),
-    r[idx.note],
-  ]);
-db.transaction(() => sealed.forEach((s) => insert.run(...s)))();
+  sealed.push([r[idx.name], r[idx.url], r[idx.username], await seal(key, r[idx.password]), r[idx.note]]);
+db.transaction(() => sealed.forEach(s => insert.run(...s)))();
 
 // Round trip: every distinct (url, username) must decrypt to the CSV password.
-const want = new Map(
-  rows.map((r) => [`${r[idx.url]}\0${r[idx.username]}`, r[idx.password]]),
-);
+const want = new Map(rows.map(r => [`${r[idx.url]}\0${r[idx.username]}`, r[idx.password]]));
 let bad = 0;
-for (const row of db
-  .query("SELECT url, username, password FROM credentials")
-  .all() as { url: string; username: string; password: Uint8Array }[]) {
+for (const row of db.query("SELECT url, username, password FROM credentials").all() as {
+  url: string;
+  username: string;
+  password: Uint8Array;
+}[]) {
   const expected = want.get(`${row.url}\0${row.username}`);
-  if (expected !== undefined && (await open(key, row.password)) !== expected)
-    bad++;
+  if (expected !== undefined && (await open(key, row.password)) !== expected) bad++;
 }
-const stored = (
-  db.query("SELECT count(*) AS n FROM credentials").get() as { n: number }
-).n;
-console.log(
-  `${rows.length} lignes CSV, ${want.size} identifiants distincts, ${stored} en base, ${bad} écarts`,
-);
+const stored = (db.query("SELECT count(*) AS n FROM credentials").get() as { n: number }).n;
+console.log(`${rows.length} lignes CSV, ${want.size} identifiants distincts, ${stored} en base, ${bad} écarts`);
 if (bad || stored < want.size) process.exit(1);
 if (!Bun.argv.includes("--keep")) {
   const { unlink } = await import("node:fs/promises");
