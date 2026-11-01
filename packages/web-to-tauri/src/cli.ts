@@ -26,7 +26,7 @@ OPTIONS
   --user-agent <text>      fixed user agent
   --backend <origin>       backend of a bundle: its API routes are proxied
   --port <n>               fixed sidecar port (keeps OAuth callbacks valid)
-  --wrap-crate <dir>       tauri-plugin-aphrody crate (default packages/bun-tauri/crates/tauri-plugin-aphrody)
+  --wrap-crate <dir>       tauri-plugin-aphrody crate (default crates/tauri-plugin-aphrody)
   --no-lock                do not copy the repository Cargo.lock
   --force                  write into a non-empty directory (never overwrites a file)
   --strict                 exit 2 when the plan needs review

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-import { applyNativeTheme, detectPlatform, type ThemeId } from "./index.ts";
+import { applyNativeTheme, detectPlatform, type ThemeId } from "./index";
 
 const ids: readonly ThemeId[] = ["material3", "fluent", "apple"];
 const isThemeId = (value: unknown): value is ThemeId => ids.includes(value as ThemeId);

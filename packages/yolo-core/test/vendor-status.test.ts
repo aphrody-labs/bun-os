@@ -9,8 +9,8 @@ import {
   readGitHead,
   readVendorStatus,
   renderStatusMarkdown,
-} from "../../core/src/vendor/status";
-import { readWorkspaceCargo } from "../../core/src/vendor/cargo";
+} from "../src/vendor/status";
+import { readWorkspaceCargo } from "../src/vendor/cargo";
 
 const roots: string[] = [];
 afterEach(() => roots.splice(0).forEach(root => rmSync(root, { recursive: true, force: true })));

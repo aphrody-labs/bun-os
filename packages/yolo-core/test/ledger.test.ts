@@ -13,8 +13,8 @@ import {
   summarizeLedger,
   recordAgentTelemetry,
   recordTrainingSample,
-} from "../../core/src/ledger/index";
-import { findRepoRoot } from "../../core/src/vfs/index";
+} from "../src/ledger/index";
+import { findRepoRoot } from "../src/vfs/index";
 
 describe("Native Bun SQLite Audit & Training Ledger", () => {
   const root = findRepoRoot();
@@ -96,7 +96,7 @@ describe("Native Bun SQLite Audit & Training Ledger", () => {
   });
 
   it("indexes codebase fingerprints cleanly", () => {
-    const count = indexCodebaseFingerprints(db, join(root, "packages", "engine", "runtime"));
+    const count = indexCodebaseFingerprints(db, join(root, "packages", "runtime-sdk"));
     expect(count).toBeGreaterThan(0);
     const summary = summarizeLedger(db);
     expect(summary.fingerprintCount).toBeGreaterThan(0);

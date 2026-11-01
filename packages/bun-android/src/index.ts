@@ -126,7 +126,7 @@ export async function run(
 
 async function capture(command: string[], env?: Record<string, string | undefined>): Promise<string> {
   const child = Bun.spawn(command, { env, stdout: "pipe", stderr: "inherit" });
-  const [text, code] = await Promise.all([child.stdout.text(), child.exited]);
+  const [text, code] = await Promise.all([new Response(child.stdout).text(), child.exited]);
   if (code !== 0) throw new Error(`${command[0]} exited with ${code}`);
   return text;
 }

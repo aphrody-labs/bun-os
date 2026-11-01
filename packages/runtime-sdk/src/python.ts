@@ -263,7 +263,7 @@ class Python implements Disposable {
     );
   }
 
-  /** Shares a contiguous writable Python buffer with JavaScript without copying it. */
+  /** Copies a contiguous writable Python buffer into JavaScript-owned memory. */
   buffer(expression: string): ArrayBuffer {
     this.#ensureOpen();
     if ((BigInt(this.#symbols.bun_py_capabilities()) & WRITABLE_BUFFER_CAPABILITY) === 0n) {
@@ -286,10 +286,11 @@ class Python implements Disposable {
       return new ArrayBuffer(0);
     }
     try {
-      return toArrayBuffer(address, 0, Number(length), lease, this.#symbols.bun_py_buffer_deallocator.ptr);
-    } catch (error) {
+      // Upstream Bun's toArrayBuffer accepts only pointer, offset, and length;
+      // it has no deallocator callback. Copy before releasing Python's lease.
+      return toArrayBuffer(address, 0, Number(length)).slice(0);
+    } finally {
       this.#symbols.bun_py_buffer_release(lease);
-      throw error;
     }
   }
 

@@ -3,9 +3,9 @@ import { describe, expect, it } from "bun:test";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { initLedgerDatabase } from "../../core/src/ledger/index";
-import { AgentWatcher } from "../../core/src/monitor/agent_watcher";
-import { AutoSyncEngine } from "../../core/src/monitor/auto_sync";
+import { initLedgerDatabase } from "../src/ledger/index";
+import { AgentWatcher } from "../src/monitor/agent_watcher";
+import { AutoSyncEngine } from "../src/monitor/auto_sync";
 
 async function until(check: () => boolean, timeout = 1500): Promise<void> {
   const deadline = Date.now() + timeout;

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, symlinkSync, unlinkSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { canonicalBunInputs, productBuildContext } from "./build-inputs";
@@ -24,11 +24,11 @@ test("selected product inputs point to the App UI build and public asset owners"
   expect(sourceInputs.uiDist).toBe(inputs.uiDist);
 });
 
-test("current committed build inputs retain immutable historical transfer provenance", () => {
+test("canonical build inputs match the exact Git revision and reject dirty or escaping files", () => {
   const root = mkdtempSync(join(tmpdir(), "bun-product-inputs-"));
   const outside = mkdtempSync(join(tmpdir(), "bun-product-outside-"));
-  const docs = "packages/web/rust/crates/site/data/docs.json";
-  const receipt = "packages/web/rust/transfer-receipt.json";
+  const docs = "packages/app-ui/package.json";
+  const search = "packages/google/package.json";
   const put = (path: string, text: string) => {
     mkdirSync(dirname(join(root, path)), { recursive: true });
     writeFileSync(join(root, path), text);
@@ -44,43 +44,33 @@ test("current committed build inputs retain immutable historical transfer proven
     return child.stdout.toString().trim();
   };
   try {
-    put(docs, '{"current":"committed documentation after transfer"}');
-    put("packages/bun-google/src/search.ts", "export const search = true;");
-    put(
-      receipt,
-      JSON.stringify({
-        schemaVersion: 1,
-        sourceCommit: "a".repeat(40),
-        files: [
-          {
-            source: "crates/web/site/data/docs.json",
-            destination: "packages/bun-aphrody-web/crates/site/data/docs.json",
-            sha256: "b".repeat(64),
-          },
-        ],
-      }),
-    );
+    const docsText = '{"name":"@aphrody/app-ui"}';
+    const searchText = '{"name":"@aphrody/google"}';
+    put(docs, docsText);
+    put(search, searchText);
     git("init", "--quiet");
     git("add", ".");
     git("-c", "user.name=Fixture", "-c", "user.email=fixture@localhost", "commit", "--quiet", "-m", "pinned inputs");
     const revision = git("rev-parse", "HEAD");
-    const receiptBefore = readFileSync(join(root, receipt), "utf8");
     const input = canonicalBunInputs(root, revision);
-    expect(input.transferDocs.sha256).toBe("b".repeat(64));
-    expect(input.docs.sha256).not.toBe(input.transferDocs.sha256);
+    const hash = (text: string) => new Bun.CryptoHasher("sha256").update(text).digest("hex");
+    expect(input.transferSourceCommit).toBe(revision);
     expect(input.docs.gitBlob).toBe(git("rev-parse", `${revision}:${docs}`));
+    expect(input.search.gitBlob).toBe(git("rev-parse", `${revision}:${search}`));
+    expect(input.transferDocs.sha256).toBe(hash(docsText));
+    expect(input.transferSha256).toBe(hash(docsText));
+    expect(input.docs.sha256).toBe(hash(docsText));
+    expect(input.search.sha256).toBe(hash(searchText));
     expect(input.docs.path).toBe(docs);
-    expect(readFileSync(join(root, receipt), "utf8")).toBe(receiptBefore);
+    expect(input.search.path).toBe(search);
     expect(() => canonicalBunInputs(root, "c".repeat(40))).toThrow("revision mismatch");
     put(docs, "uncommitted replacement");
     expect(() => canonicalBunInputs(root, revision)).toThrow("pinned Git blob");
-    put(docs, '{"current":"committed documentation after transfer"}');
-    put(receipt, "{}");
-    expect(() => canonicalBunInputs(root, revision)).toThrow("pinned Git blob");
-    put(receipt, receiptBefore);
+    put(docs, docsText);
     unlinkSync(join(root, docs));
-    writeFileSync(join(outside, "docs.json"), "private unrelated file");
-    symlinkSync(join(outside, "docs.json"), join(root, docs));
+    rmSync(join(root, "packages/app-ui"), { recursive: true, force: true });
+    writeFileSync(join(outside, "package.json"), docsText);
+    symlinkSync(outside, join(root, "packages/app-ui"), process.platform === "win32" ? "junction" : "dir");
     expect(() => canonicalBunInputs(root, revision)).toThrow("escapes the checkout");
   } finally {
     rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 /** Local HTTP fixtures qualify transport, never model weights or inference quality. */
 import { afterEach, describe, expect, it } from "bun:test";
-import { InferenceError, UnifiedInferenceEngine } from "../../core/src/gemma4/index";
+import { InferenceError, UnifiedInferenceEngine } from "../src/gemma4/index";
 
 const servers: Array<{ stop(closeActiveConnections?: boolean): void }> = [];
 afterEach(() => {

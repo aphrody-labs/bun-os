@@ -1,1 +1,1 @@
-export * from "./GetAppPreferences";
+export * from "./GetAppPreferences.js";

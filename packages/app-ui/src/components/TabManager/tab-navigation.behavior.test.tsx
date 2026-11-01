@@ -1,6 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-// oxlint-disable-next-line import/no-unassigned-import -- register the app's real DOM and shared React owner
-import "../../../test-preload";
 import { afterEach, expect, test } from "bun:test";
 import { act, useEffect } from "react";
 import { createRoot, type Root } from "react-dom/client";

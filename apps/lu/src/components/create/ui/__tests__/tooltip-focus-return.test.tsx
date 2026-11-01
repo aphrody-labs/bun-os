@@ -7,54 +7,74 @@
  *
  * Run: npx vitest run src/components/create/ui/__tests__/tooltip-focus-return.test.tsx
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, cleanup, screen, fireEvent, act } from '@testing-library/react'
-import { Tooltip } from '../Tooltip'
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, cleanup, screen, fireEvent, act } from "@testing-library/react";
+import { Tooltip } from "../Tooltip";
 
 // jsdom has no `:focus-visible` heuristic of its own; the browser's answer
 // after a key press is "yes", which is the case under test.
-const realMatches = Element.prototype.matches
+const realMatches = Element.prototype.matches;
+function focusVisibleMatches<K extends keyof HTMLElementTagNameMap>(
+  this: Element,
+  selectors: K,
+): this is HTMLElementTagNameMap[K];
+function focusVisibleMatches<K extends keyof SVGElementTagNameMap>(
+  this: Element,
+  selectors: K,
+): this is SVGElementTagNameMap[K];
+function focusVisibleMatches<K extends keyof MathMLElementTagNameMap>(
+  this: Element,
+  selectors: K,
+): this is MathMLElementTagNameMap[K];
+function focusVisibleMatches(this: Element, selectors: string): boolean {
+  return selectors === ":focus-visible" ? true : realMatches.call(this, selectors);
+}
 beforeEach(() => {
-  vi.useFakeTimers()
-  Element.prototype.matches = function (sel: string) {
-    return sel === ':focus-visible' ? true : realMatches.call(this, sel)
-  }
-})
+  vi.useFakeTimers();
+  Element.prototype.matches = focusVisibleMatches;
+});
 afterEach(() => {
-  Element.prototype.matches = realMatches
-  vi.useRealTimers()
-  cleanup()
-})
+  Element.prototype.matches = realMatches;
+  vi.useRealTimers();
+  cleanup();
+});
 
 function mount() {
-  render(<Tooltip content="All advanced settings."><button>open</button></Tooltip>)
-  return screen.getByText('open')
+  render(
+    <Tooltip content="All advanced settings.">
+      <button>open</button>
+    </Tooltip>,
+  );
+  return screen.getByText("open");
 }
-const wait = () => act(() => { vi.advanceTimersByTime(500) })
+const wait = () =>
+  act(() => {
+    vi.advanceTimersByTime(500);
+  });
 
-describe('the tooltip of a focused control', () => {
-  it('shows when the user walked there with Tab', () => {
-    const button = mount()
-    fireEvent.keyDown(window, { key: 'Tab' })
-    fireEvent.focus(button)
-    wait()
-    expect(screen.queryByRole('tooltip')).not.toBeNull()
-  })
+describe("the tooltip of a focused control", () => {
+  it("shows when the user walked there with Tab", () => {
+    const button = mount();
+    fireEvent.keyDown(window, { key: "Tab" });
+    fireEvent.focus(button);
+    wait();
+    expect(screen.queryByRole("tooltip")).not.toBeNull();
+  });
 
-  it('stays away when Escape closed something that hands the focus back', () => {
-    const button = mount()
-    fireEvent.keyDown(window, { key: 'Escape' })
-    fireEvent.focus(button)
-    wait()
-    expect(screen.queryByRole('tooltip')).toBeNull()
-  })
+  it("stays away when Escape closed something that hands the focus back", () => {
+    const button = mount();
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.focus(button);
+    wait();
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
 
-  it('stays away after a click, as before', () => {
-    const button = mount()
-    fireEvent.keyDown(window, { key: 'Tab' })
-    fireEvent.pointerDown(window)
-    fireEvent.focus(button)
-    wait()
-    expect(screen.queryByRole('tooltip')).toBeNull()
-  })
-})
+  it("stays away after a click, as before", () => {
+    const button = mount();
+    fireEvent.keyDown(window, { key: "Tab" });
+    fireEvent.pointerDown(window);
+    fireEvent.focus(button);
+    wait();
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+});

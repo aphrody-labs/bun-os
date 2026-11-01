@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { IsDesktopApp } from "./IsDesktopApp";
+import { IsDesktopApp } from "./IsDesktopApp.js";
 
 async function getCurrentWindowSafe() {
   const { getCurrentWindow } = await import("@tauri-apps/api/window");

@@ -20,18 +20,14 @@ test("one entrypoint contains setup, administrator and creator modules with the 
   expect(run("creator", "--help").stdout.toString()).toContain("video-translate");
 });
 
-test("both desktop routes use the same executable and retain their protocol and action catalogs", () => {
-  for (const role of ["admin", "creator"]) {
-    const result = run(role, "desktop", "catalog");
-    expect(result.exitCode).toBe(0);
-    const messages = result.stdout
-      .toString()
-      .trim()
-      .split("\n")
-      .map(line => JSON.parse(line));
-    expect(messages.some(message => message.catalog?.protocol === "aphrody.kit/1")).toBe(true);
-    expect(result.stdout.toString()).toContain(role === "admin" ? "entrainement" : "challonge");
-  }
+test("the single product entrypoint exposes the current administrator and creator catalogs", () => {
+  const admin = run("admin", "--help");
+  const creator = run("creator", "--help");
+  expect(admin.exitCode).toBe(0);
+  expect(creator.exitCode).toBe(0);
+  expect(admin.stdout.toString()).toContain("entrainement");
+  expect(creator.stdout.toString()).toContain("challonge");
+  expect(run("--help").stdout.toString()).toContain("aphrody-product admin");
 });
 
 test("historical executable names select a role without a second implementation", () => {

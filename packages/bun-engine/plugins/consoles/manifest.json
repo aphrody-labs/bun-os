@@ -101,7 +101,7 @@
       "license": "Zlib",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "adf4c782da8c55c8f17aca2047e128502e7eddc2",
+      "sourceRev": "959871c08ed80d1a63b258bc207218623ea1b0e5",
       "buildOwner": "packages/bun-engine/src/console/catalog.ts#libogc",
       "sources": [
         {
@@ -191,7 +191,7 @@
       "license": "Zlib",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "6b578230b3cd3cbc1eeb0dd71bbb8d7e3b12f21e",
+      "sourceRev": "ce1cb921dcb2d68e056a1f07c6c4004a2c6364e5",
       "buildOwner": "Cargo.toml#ctru-rs",
       "sources": [
         {
@@ -245,7 +245,7 @@
       "license": "GPL-2.0-or-later",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "c51cea1d8975d3918bfde7cfdd0ec9abcf3fe5a5",
+      "sourceRev": "a5016b3226561e9098b96ab9e6af6088ec79a1e6",
       "buildOwner": "docs/CONSOLE-PROVENANCE.md#mame",
       "sources": [
         {
@@ -263,7 +263,7 @@
       "license": "GPL-3.0-only",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "9ecdcecf6fe7b976bf3ccbc1baa6642c496eabac",
+      "sourceRev": "d7aeaae55f7e340241d9ce6494a2caa3e4e55023",
       "buildOwner": "docs/CONSOLE-PROVENANCE.md#retroarch",
       "sources": [
         {
@@ -281,7 +281,7 @@
       "license": "MIT-OR-Apache-2.0",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "a0a6b17f8ba9c5ee451453fb2409753fd06e5a31",
+      "sourceRev": "ee25913b2cca3133f22340ac0f789a19892b1456",
       "buildOwner": "docs/RUST-EMULATORS.md#tetanes",
       "sources": [
         {
@@ -317,7 +317,7 @@
       "license": "MIT",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "1d7ff23a6adb42d803ebd393c3d27d94e4fea15e",
+      "sourceRev": "b35b115dcdc150fcb7d06084c4709492922b559c",
       "buildOwner": "docs/RUST-EMULATORS.md#rustboyadvance-ng",
       "sources": [
         {
@@ -389,7 +389,7 @@
       "license": "GPL-3.0-only",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "32907922e01b12b0e6673347132480b92ed69f28",
+      "sourceRev": "1d83292da628a89b706b797138df666cf10f82c9",
       "buildOwner": "docs/RUST-EMULATORS.md#starpsx",
       "sources": [
         {
@@ -407,7 +407,7 @@
       "license": "MIT",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "0ce36eeb64adf8969c5d94bc907ccb68b9e73f35",
+      "sourceRev": "2f8b5f96c4a8dd418462e02214bcc4f70817e365",
       "buildOwner": "docs/RUST-EMULATORS.md#zakuro",
       "sources": [
         {
@@ -443,7 +443,7 @@
       "license": "GPL-2.0-or-later",
       "publicationGate": "deferred-review",
       "integration": "submodule",
-      "sourceRev": "73ed0e9106a5b69a8ef67d920f534150e82c6277",
+      "sourceRev": "a5fc1f8b49caceef79802ebad3b733f130985234",
       "buildOwner": "Cargo.toml#bun-engine",
       "sources": [
         {

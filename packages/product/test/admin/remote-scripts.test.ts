@@ -4,7 +4,7 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { delimiter, join } from "node:path";
 
 import { parseProbe, readTrainStatus } from "../../src/admin/lib/doctor.ts";
 import type { HostEntry } from "../../src/admin/lib/profile.ts";
@@ -41,8 +41,20 @@ case "$kind" in
 esac
 `;
 
-/** The launch script detaches jobs with util-linux `setsid`, present on every Linux host but absent from Windows/macOS shells. */
-const detached = test.skipIf(Bun.which("setsid") === null);
+/** Git for Windows supplies a POSIX shell for exercising the remote scripts on Windows. */
+const gitBashBins =
+  process.platform === "win32"
+    ? [
+        join(process.env.ProgramFiles ?? "C:\\Program Files", "Git", "bin"),
+        join(process.env.ProgramFiles ?? "C:\\Program Files", "Git", "usr", "bin"),
+      ]
+    : [];
+const testPath = [...gitBashBins, ...(process.env.PATH ?? "").split(delimiter)].join(delimiter);
+const shell = Bun.which("sh", { PATH: testPath });
+if (!shell) throw new Error("A POSIX shell is required to exercise the remote host scripts");
+
+/** The launch script detaches jobs with util-linux `setsid`, present on Linux but absent from Git for Windows. */
+const detached = test.skipIf(Bun.which("setsid", { PATH: testPath }) === null);
 
 let home = "";
 let repo = "";
@@ -57,9 +69,9 @@ function localRemote(userHome: string): System {
     ...real,
     async run(argv, options = {}) {
       if (argv[0] !== "ssh") return real.run(argv, options);
-      return real.run(["sh", "-c", argv.at(-1)!], {
+      return real.run([shell, "-c", argv.at(-1)!], {
         ...options,
-        env: { ...options.env, HOME: userHome },
+        env: { ...options.env, HOME: userHome, PATH: testPath },
       });
     },
   };

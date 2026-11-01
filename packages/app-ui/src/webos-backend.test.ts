@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 // oxlint-disable-next-line import/no-unassigned-import -- the source package bunfig preload: registers the DOM before UI imports
-import "../test/dom-preload.ts";
 import { afterAll, afterEach, beforeEach, expect, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { fileURLToPath } from "node:url";

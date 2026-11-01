@@ -3,9 +3,9 @@ import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { NativeRedisClient, RedisUnavailableError } from "../../core/src/redis/client";
-import { RedisTrainDb } from "../../core/src/redis/traindb";
-import { RedisVectorStore } from "../../core/src/redis/vector";
+import { NativeRedisClient, RedisUnavailableError } from "../src/redis/client";
+import { RedisTrainDb } from "../src/redis/traindb";
+import { RedisVectorStore } from "../src/redis/vector";
 
 describe("Redis offline invariants", () => {
   it("copies vectors/metadata and applies stable ties, own-property filters and pagination", async () => {

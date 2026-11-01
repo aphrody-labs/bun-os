@@ -160,7 +160,7 @@ test("--oui --simuler changes nothing and reports every step", async () => {
     }),
   ).toBe(0);
   const text = ui.lines.join("\n");
-  for (const title of ["aphrody", "Application Aphrody", "Plugins Claude", "Outils créateur"])
+  for (const title of ["aphrody", "Bun et Aphrody natifs", "Plugins Claude", "Outils créateur"])
     expect(text).toContain(title);
   expect(sys.calls.filter(call => call.argv[0] !== "powershell")).toEqual([]);
   expect(existsSync(setupDirs(ctx).plugins)).toBe(false);

@@ -2,11 +2,11 @@ import { describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { executeTool, ToolExecutionContext, TOOLS } from "../../core/src/tools/registry";
-import { callTool } from "../../core/src/tools/host";
-import { NativeRedisClient } from "../../core/src/redis/client";
-import { createApiServer } from "../../core/src/server/http";
-import { buildOpenApiSpec } from "../../core/src/server/openapi";
+import { executeTool, ToolExecutionContext, TOOLS } from "../src/tools/registry";
+import { callTool } from "../src/tools/host";
+import { NativeRedisClient } from "../src/redis/client";
+import { createApiServer } from "../src/server/http";
+import { buildOpenApiSpec } from "../src/server/openapi";
 
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), "yolo-core-transport-"));

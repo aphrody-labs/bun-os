@@ -1,4 +1,4 @@
-import { IsDesktopApp } from "./IsDesktopApp";
+import { IsDesktopApp } from "./IsDesktopApp.js";
 import { fetch as tauriFetch } from "@artcraft/plugin-http";
 
 // TODO: Match the function signature in typescript annotations:

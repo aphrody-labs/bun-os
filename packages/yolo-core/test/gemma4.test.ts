@@ -18,7 +18,7 @@ import {
   parseGemma4Response,
   validateGemma4Config,
   type Gemma4Message,
-} from "../../core/src/gemma4/index";
+} from "../src/gemma4/index";
 
 describe("Gemma repository profiles and text utilities", () => {
   it("marks profiles unverified and rejects unknown names rather than aliasing E2B", () => {

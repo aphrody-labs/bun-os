@@ -1,3 +1,9 @@
 vendor/
 node_modules/
 build/
+packages/themes/generated/
+packages/themes/src/generated.ts
+packages/m3-fonts/src/fonts.css
+packages/m3-fonts/src/fonts-jp.css
+packages/m3-fonts/src/fonts-symbols.css
+packages/m3-fonts/src/fonts-symbols-full.css

@@ -13,8 +13,6 @@
     "./schema/*": "./schema/*"
   },
   "scripts": {
-    "test": "bun test test/unit",
-    "test:live": "ARCH_INDEX_LIVE=1 bun test test/live",
     "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "engines": {

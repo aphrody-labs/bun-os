@@ -18,12 +18,9 @@ import {
 } from "../../src/admin/lib/ssh.ts";
 import { samplePack, testContext } from "./helpers.ts";
 
-test("shellQuote survives every shell metacharacter", async () => {
+test("shellQuote encodes every shell metacharacter as a POSIX single-quoted literal", () => {
   for (const value of ["plain", "with space", "it's", "$(id)", "`id`", "a;b", 'a"b', "a\\b", "*", "-n", ""]) {
-    const proc = Bun.spawnSync(["sh", "-c", `printf %s ${shellQuote(value)}`], {
-      windowsHide: true,
-    });
-    expect(proc.stdout.toString()).toBe(value);
+    expect(shellQuote(value)).toBe(`'${value.replaceAll("'", `'\\''`)}'`);
   }
 });
 

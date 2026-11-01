@@ -21,7 +21,7 @@ import {
 import type { ConversionPlan, IconRef, SiteProbe } from "./types.ts";
 
 export interface GenerateOptions {
-  /** Directory of the `tauri-plugin-aphrody` crate. Defaults to `packages/bun-tauri/crates/tauri-plugin-aphrody` of this checkout. */
+  /** Directory of the `tauri-plugin-aphrody` crate. Defaults to `crates/tauri-plugin-aphrody` of this checkout. */
   wrapCrate?: string;
   /** Copy the repository `Cargo.lock` next to the project so versions match and offline builds work. */
   copyLock?: boolean;
@@ -142,7 +142,7 @@ export async function generateProject(
   const { config } = plan;
   const notes: string[] = [];
   const doFetch = options.fetch ?? fetch;
-  const wrapCrate = resolve(options.wrapCrate ?? join(REPO_ROOT, "packages/bun-tauri/crates/tauri-plugin-aphrody"));
+  const wrapCrate = resolve(options.wrapCrate ?? join(REPO_ROOT, "crates/tauri-plugin-aphrody"));
   if (!existsSync(join(wrapCrate, "Cargo.toml"))) {
     throw new GenerateError(`tauri-plugin-aphrody crate not found at ${wrapCrate}`);
   }

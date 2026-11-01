@@ -71,7 +71,7 @@ describe("generateProject: remote", () => {
     expect(cargo).toContain(`tauri-runtime-wry = { version = "=${TAURI_3.runtimeWry}"`);
     // A remote app loads the deployed origin: no bundle server, so no HTTP stack in the build.
     expect(cargo).toMatch(
-      /tauri-plugin-aphrody = \{ path = "[^"]*packages\/bun-tauri\/crates\/tauri-plugin-aphrody", default-features = false, features = \["wrap"\] \}/,
+      /tauri-plugin-aphrody = \{ path = "[^"]*crates\/tauri-plugin-aphrody", default-features = false, features = \["wrap"\] \}/,
     );
     expect(cargo).toContain('debug-bridge = ["tauri-plugin-aphrody/wrap-debug-bridge"]');
     expect(cargo).not.toContain("aphrody-tauri-debug");
@@ -182,7 +182,7 @@ describe("generateProject: directories", () => {
     // The bundle mode keeps the crate's default features: the loopback server.
     const cargo = await read(out, "src-tauri/Cargo.toml");
     expect(cargo).toMatch(
-      /tauri-plugin-aphrody = \{ path = "[^"]*packages\/bun-tauri\/crates\/tauri-plugin-aphrody", default-features = false, features = \["wrap-bundle"\] \}/,
+      /tauri-plugin-aphrody = \{ path = "[^"]*crates\/tauri-plugin-aphrody", default-features = false, features = \["wrap-bundle"\] \}/,
     );
     expect(await read(out, "README.md")).not.toContain("without its `wrap-bundle` feature");
   });
@@ -202,7 +202,7 @@ describe("generateProject: directories", () => {
     expect((JSON.parse(await read(out, "src-tauri/wrap.json")) as WrapConfig).sidecar?.port).toBe(4317);
     // The sidecar is std only: no bundle server in the build.
     expect(await read(out, "src-tauri/Cargo.toml")).toMatch(
-      /tauri-plugin-aphrody = \{ path = "[^"]*packages\/bun-tauri\/crates\/tauri-plugin-aphrody", default-features = false, features = \["wrap"\] \}/,
+      /tauri-plugin-aphrody = \{ path = "[^"]*crates\/tauri-plugin-aphrody", default-features = false, features = \["wrap"\] \}/,
     );
   });
 

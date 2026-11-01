@@ -472,10 +472,10 @@ describe("burn and mux", () => {
   test.skipIf(!haveFfmpeg)(
     "burn renders the text whatever the paths contain (quotes, colons, commas, brackets, spaces)",
     async () => {
-      const dir = join(work, `we ird 'q' [1],a;b c:d`);
+      const dir = join(work, process.platform === "win32" ? `we ird 'q' [1],a;b c-d` : `we ird 'q' [1],a;b c:d`);
       await mkdir(dir, { recursive: true });
       const input = join(dir, "in put's [x].mp4");
-      const subs = join(dir, "sub: titles, v1.srt");
+      const subs = join(dir, process.platform === "win32" ? "sub titles, v1.srt" : "sub: titles, v1.srt");
       const output = join(dir, "out; (1).mp4");
       await Bun.write(input, Bun.file(clip));
       await writeFile(subs, SRT);

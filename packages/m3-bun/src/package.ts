@@ -209,21 +209,12 @@ function zip(entries: ArchiveEntry[]): Uint8Array {
 /** Who wrote an archive: `Bun.Archive`, or the writers above on a runtime whose `Bun.Archive` lacks modes and zip. */
 export type Archiver = "bun-archive" | "m3-bun";
 
-let archiveSupport: Promise<boolean> | undefined;
-
-/** `Bun.Archive` with per-entry modes, a fixed `mtime` and zip output (the aphrody-labs fork; 1.4.3-aphrody.2 lacks them). */
+/** Whether Bun.Archive can preserve this packager's ZIP and POSIX-mode contract. */
 export function bunArchiveSupported(): Promise<boolean> {
-  archiveSupport ??= (async () => {
-    if (typeof Bun.Archive !== "function") return false;
-    try {
-      const bytes = await new Bun.Archive({ x: { data: "x", mode: 0o755 } }, { format: "zip", mtime: 0 }).bytes();
-      const files = await new Bun.Archive(bytes).files();
-      return bytes[0] === 0x50 && bytes[1] === 0x4b && (await files.get("x")?.text()) === "x";
-    } catch {
-      return false;
-    }
-  })();
-  return archiveSupport;
+  // Upstream Bun.Archive accepts BlobPart contents and only exposes gzip
+  // compression. It cannot set entry modes, ZIP format, or a fixed mtime, so
+  // the deterministic writers below remain the compatible implementation.
+  return Promise.resolve(false);
 }
 
 /**
@@ -234,22 +225,6 @@ export async function archiveDir(staging: string, archive: string, format: Archi
   await mkdir(dirname(archive), { recursive: true });
   await rm(archive, { force: true });
   const entries = await archiveEntries(staging);
-  if (await bunArchiveSupported()) {
-    const files = Object.fromEntries(
-      entries
-        .filter(entry => !entry.name.endsWith("/"))
-        .map(entry => [entry.name, { data: entry.data, mode: entry.mode }]),
-    );
-    // `bytes()` applies `compress`; `Bun.write(path, archive)` writes the uncompressed tar store.
-    await Bun.write(
-      archive,
-      await new Bun.Archive(
-        files,
-        format === "zip" ? { format: "zip", mtime: 0 } : { compress: "gzip", level: 9, mtime: 0 },
-      ).bytes(),
-    );
-    return "bun-archive";
-  }
   await Bun.write(archive, format === "zip" ? zip(entries) : tarGz(entries));
   return "m3-bun";
 }

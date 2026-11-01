@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 import { describe, expect, it } from "bun:test";
-import { NativeRedisClient } from "../../core/src/redis/client";
-import { RedisTrainDb } from "../../core/src/redis/traindb";
-import { RedisVectorStore } from "../../core/src/redis/vector";
+import { NativeRedisClient } from "../src/redis/client";
+import { RedisTrainDb } from "../src/redis/traindb";
+import { RedisVectorStore } from "../src/redis/vector";
 
 describe("Native Bun Redis Vector & Train DB", () => {
   it("serializes and deserializes Float32 vectors without precision loss", () => {

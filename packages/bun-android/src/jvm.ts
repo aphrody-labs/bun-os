@@ -81,7 +81,7 @@ export class Jvm {
     return this.lib.bunos_jvm_started() === 1;
   }
 
-  private take(pointer: Pointer | null): string | null {
+  private take(pointer: Pointer | bigint | null): string | null {
     if (!pointer) return null;
     try {
       return new CString(pointer).toString();

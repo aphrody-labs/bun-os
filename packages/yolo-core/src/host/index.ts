@@ -60,16 +60,16 @@ export function sourceCheckout(from = import.meta.dir): string | null {
   return null;
 }
 
-/** `$YOLO_ROOT`, else the source checkout running this code, else `$HOME/src/aphrody` (`%USERPROFILE%\src\aphrody`). */
+/** Explicit workspace roots override the source checkout; otherwise use `$HOME/src/aphrody`. */
 export function yoloRoot(
   env: Record<string, string | undefined> = process.env,
   checkout: string | null = sourceCheckout(),
 ): string {
   return (
+    env.YOLO_ROOT ||
     env.BUN_OS_ROOT ||
     env.APHRODY_WORKSPACE_ROOT ||
     checkout ||
-    env.YOLO_ROOT ||
     join(env.HOME || env.USERPROFILE || homedir(), "src", "aphrody")
   );
 }

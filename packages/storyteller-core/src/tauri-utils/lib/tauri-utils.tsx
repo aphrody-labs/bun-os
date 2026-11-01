@@ -1,11 +1,11 @@
-export * from "./api";
-export { FetchProxy } from "./FetchProxy";
-export { IsDesktopApp } from "./IsDesktopApp";
+export * from "./api/index.js";
+export { FetchProxy } from "./FetchProxy.js";
+export { IsDesktopApp } from "./IsDesktopApp.js";
 export {
   useTauriWindowControls,
   minimizeCurrentWindow,
   toggleMaximizeCurrentWindow,
   closeCurrentWindow,
   isCurrentWindowMaximized,
-} from "./useWindowControls";
-export { useTauriPlatform } from "./usePlatform";
+} from "./useWindowControls.js";
+export { useTauriPlatform } from "./usePlatform.js";

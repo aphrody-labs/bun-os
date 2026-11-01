@@ -1,0 +1,55 @@
+- generic [active] [ref=e1]:
+  - link "Skip to desktop" [ref=e3] [cursor=pointer]:
+    - /url: "#desk"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - button "Show all apps" [ref=e6] [cursor=pointer]: All apps (Alt+Space)
+      - navigation "Workspaces" [ref=e7]:
+        - button "Workspace 1" [ref=e8] [cursor=pointer]:
+          - generic [ref=e9]: "1"
+          - text: Workspace 1
+        - button "Workspace 2" [ref=e10] [cursor=pointer]
+        - button "Workspace 3" [ref=e12] [cursor=pointer]
+        - button "Workspace 4" [ref=e14] [cursor=pointer]
+        - button "Workspace 5" [ref=e16] [cursor=pointer]
+      - generic [ref=e18]: Desktop
+    - button "5:17 dim. 1 nov." [ref=e21] [cursor=pointer]:
+      - time [ref=e22]: 5:17
+      - generic [ref=e23]: dim. 1 nov.
+    - generic [ref=e24]:
+      - 'button "Layout: Scrolling columns. Change layout" [ref=e25] [cursor=pointer]':
+        - generic [aria-hidden] [ref=e26]: view_column
+        - text: Scrolling columns (Alt+L)
+      - button "Search" [ref=e27] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e28]: search
+        - text: Search
+      - button "Quick settings. Online, sounds on, battery 100%" [ref=e29] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e30]: wifi
+        - generic [aria-hidden] [ref=e31]: volume_up
+        - generic [aria-hidden] [ref=e32]: battery_charging_full
+        - text: Quick settings
+      - button "Open settings" [ref=e33] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e34]: settings
+        - text: Settings
+  - main [ref=e35]
+  - navigation "Dock" [ref=e36]:
+    - button "Show all apps" [ref=e37] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e39]: apps
+      - text: All apps
+    - button "Aphrody Files" [ref=e41] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e43]: folder
+      - text: Aphrody Files
+    - button "Aphrody Browser" [ref=e44] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e46]: language
+      - text: Aphrody Browser
+    - button "Aphrody Shell" [ref=e47] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e49]: terminal
+      - text: Aphrody Shell
+    - button "Aphrody Store" [ref=e50] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e52]: storefront
+      - text: Aphrody Store
+    - button "Aphrody Settings" [ref=e53] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e55]: settings
+      - text: Aphrody Settings
+  - region "Notifications"
+  - status [ref=e56]

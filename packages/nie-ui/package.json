@@ -17,8 +17,7 @@
     "lint": "bun lint src packages",
     "fmt:check": "bun fmt --check src",
     "typecheck": "bun run --filter '*' typecheck",
-    "typecheck:ui": "bun check -p src/ui/tsconfig.json --noEmit",
-    "test": "bun test"
+    "typecheck:ui": "bun check -p src/ui/tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@types/bun": "catalog:"

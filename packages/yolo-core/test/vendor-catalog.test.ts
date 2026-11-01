@@ -3,14 +3,14 @@ import { afterEach, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { bunCheckout, generateBunCatalog } from "../../core/src/vendor/catalog";
+import { bunCheckout, generateBunCatalog } from "../src/vendor/catalog";
 
 const roots: string[] = [];
 test("Bun checkout discovery follows the relocated workspace and configured owner", () => {
   const parent = mkdtempSync(join(tmpdir(), "yolo-relocated-checkouts-"));
   roots.push(parent);
   const workspace = join(parent, "aphrody");
-  const bun = join(parent, "bun");
+  const bun = join(workspace, "sources", "bun");
   mkdirSync(workspace);
   mkdirSync(join(bun, "docs"), { recursive: true });
   expect(bunCheckout({ APHRODY_WORKSPACE_ROOT: workspace })).toBe(bun);
@@ -54,11 +54,11 @@ test("catalog produces a formatted artifact with source/runtime provenance and s
   expect(check.exitCode).toBe(0);
   await generateBunCatalog(root);
   expect(await Bun.file(report.targetCatalogPath).text()).toBe(first);
-  expect(readdirSync(join(root, "m3/packages/app-ui/src/generated"))).toEqual(["bun-catalog.ts"]);
+  expect(readdirSync(join(root, "packages/app-ui/src/generated"))).toEqual(["bun-catalog.ts"]);
 });
 test("missing checkout data fails before producing a misleading catalog", async () => {
   const root = fixture();
   rmSync(join(root, "vendor/bun/docs"), { recursive: true });
   await expect(generateBunCatalog(root)).rejects.toThrow("source data");
-  expect(existsSync(join(root, "m3/packages/app-ui/src/generated/bun-catalog.ts"))).toBe(false);
+  expect(existsSync(join(root, "packages/app-ui/src/generated/bun-catalog.ts"))).toBe(false);
 });

@@ -23,8 +23,13 @@ writeFileSync(
 writeFileSync(join(ui, "app.js"), "app script");
 writeFileSync(join(ui, "app.css"), "app style");
 writeFileSync(join(ui, "fonts", "pet.webp"), "pet image");
-const bunCheckout = Bun.env.APHRODY_BUN_CHECKOUT ?? join(import.meta.dir, "../../../../../../bun");
-const catalogue = await Bun.file(join(bunCheckout, "packages/web/rust/crates/site/data/docs.json")).json();
+const catalogue = [
+  { id: "runtime-architecture", title: "runtime architecture" },
+  { id: "bun-native-framework", title: "Bun native framework" },
+  { id: "material-3-design-tokens", title: "Material 3 design tokens" },
+  { id: "tauri-desktop-bridge", title: "Tauri desktop bridge" },
+  { id: "llms-txt-standard", title: "llms.txt standard" },
+];
 writeFileSync(join(ui, "public-docs.json"), JSON.stringify(catalogue));
 mkdirSync(join(ui, "public-docs"));
 for (const article of catalogue)

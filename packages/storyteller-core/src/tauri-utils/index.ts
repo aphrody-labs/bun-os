@@ -1,2 +1,2 @@
-export * from "./lib/tauri-utils";
-export { IsDesktopApp } from "./lib/IsDesktopApp";
+export * from "./lib/tauri-utils.js";
+export { IsDesktopApp } from "./lib/IsDesktopApp.js";

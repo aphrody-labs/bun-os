@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IsDesktopApp } from "./IsDesktopApp";
+import { IsDesktopApp } from "./IsDesktopApp.js";
 
 export type TauriPlatform = "windows" | "macos" | "linux";
 
