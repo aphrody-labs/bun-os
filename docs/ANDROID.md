@@ -42,6 +42,10 @@ with the complete Google Play stack. It is the Android of the unified Bun OS ses
 - Browser computer use: `/api/android/` streams scrcpy video and accepts touch/pointer gestures, physical keyboard input,
   text entry through the viewer's Text control, clipboard paste, and browser Gamepad API buttons. Gamepad face/shoulder
   buttons and the left stick's digital directions map to Android key events; scrcpy does not carry analog stick axes.
+- To open the installed Play Store for user-driven sign-in over the viewer, run
+  `aphrody-remote-desktop --android 192.168.240.112:5555 --adb /usr/bin/adb --open-play-store` on the VPS, then
+  complete sign-in in `/api/android/`. The command only verifies and launches `com.android.vending`; credentials are
+  entered directly in Android and are never passed through the CLI.
 - Dropped routes: the official emulator with the Android 17 Play image booted under KVM but is an OS
   emulator (owner pivot to one native session); redroid 17 needs our own AOSP build and has no x86_64 GApps.
 

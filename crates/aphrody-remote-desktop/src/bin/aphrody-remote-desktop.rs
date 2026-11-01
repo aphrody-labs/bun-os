@@ -28,6 +28,7 @@ async fn main() -> Result<()> {
     let mut opts = ServeOptions::default();
     let mut bind: Option<std::net::SocketAddr> = None;
     let mut android: Option<String> = None;
+    let mut open_play_store = false;
     let mut jar: Option<std::path::PathBuf> = None;
     let mut adb = std::path::PathBuf::from("adb");
     let (mut max_size, mut max_fps, mut bit_rate) = (1920u32, 60u32, 8_000_000u32);
@@ -40,6 +41,7 @@ async fn main() -> Result<()> {
             "--quality" => opts.quality = value()?.parse().context("--quality")?,
             "--scale" => opts.scale = value()?.parse().context("--scale")?,
             "--android" => android = Some(value()?),
+            "--open-play-store" => open_play_store = true,
             "--scrcpy-server" => jar = Some(value()?.into()),
             "--adb" => adb = value()?.into(),
             "--max-size" => max_size = value()?.parse().context("--max-size")?,
@@ -51,6 +53,43 @@ async fn main() -> Result<()> {
             }
             other => bail!("unknown argument {other}"),
         }
+    }
+    if open_play_store {
+        #[cfg(feature = "android")]
+        {
+            let serial = android.context("--open-play-store needs --android <serial>")?;
+            let output = std::process::Command::new(&adb)
+                .args(["-s", &serial, "shell", "pm", "path", "com.android.vending"])
+                .output()
+                .with_context(|| format!("cannot run {}", adb.display()))?;
+            if !output.status.success() || output.stdout.is_empty() {
+                bail!("Google Play Store (com.android.vending) is not installed on {serial}");
+            }
+            let output = std::process::Command::new(&adb)
+                .args([
+                    "-s",
+                    &serial,
+                    "shell",
+                    "monkey",
+                    "-p",
+                    "com.android.vending",
+                    "1",
+                ])
+                .output()
+                .with_context(|| format!("cannot launch Play Store on {serial}"))?;
+            if !output.status.success() {
+                bail!(
+                    "failed to launch Play Store on {serial}: {}",
+                    String::from_utf8_lossy(&output.stderr).trim()
+                );
+            }
+            println!(
+                "Opened Google Play Store on {serial}. Complete sign-in interactively in the Android viewer."
+            );
+            return Ok(());
+        }
+        #[cfg(not(feature = "android"))]
+        bail!("built without the `android` feature");
     }
     if let Some(serial) = android {
         #[cfg(feature = "android")]
