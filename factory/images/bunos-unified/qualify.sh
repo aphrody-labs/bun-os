@@ -81,7 +81,11 @@ disk)
   IMG=${IMG:-/home/ubuntu/bun-os-disk/unified/bunos-unified.img}
   FW=${OVMF:-/usr/share/OVMF}
   cp -f "$FW/OVMF_VARS_4M.fd" "$OUT/vars.fd" 2>/dev/null || cp -f "$FW/OVMF_VARS.fd" "$OUT/vars.fd"
-  CODE=$(ls "$FW"/OVMF_CODE_4M.fd "$FW"/OVMF_CODE.fd 2>/dev/null | head -1)
+  CODE=
+  for candidate in "$FW"/OVMF_CODE_4M.fd "$FW"/OVMF_CODE.fd; do
+    if [ -f "$candidate" ]; then CODE=$candidate; break; fi
+  done
+  [ -n "$CODE" ] || { echo "No OVMF_CODE firmware found in $FW" >&2; exit 1; }
   timeout ${SECS:-600} qemu-system-x86_64 -machine q35,accel=kvm -cpu host -smp 4 -m 6144 \
     -drive if=pflash,format=raw,readonly=on,file="$CODE" -drive if=pflash,format=raw,file="$OUT/vars.fd" \
     -drive file="$IMG",format=raw,if=virtio,snapshot=on -netdev user,id=n0 -device virtio-net-pci,netdev=n0 \
