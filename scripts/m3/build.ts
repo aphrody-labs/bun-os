@@ -174,7 +174,17 @@ async function buildPackage(pkg: WorkspacePackage, config: M3PackageConfig): Pro
   if (!js.success) return { ok: false, detail: js.logs.join("\n") };
   const jsMs = Math.round(performance.now() - started);
   let dtsMs = 0;
-  if (existsSync(join(pkg.dir, "tsconfig.build.json"))) {
+  const manifest = Bun.JSONC.parse(readFileSync(join(pkg.dir, "package.json"), "utf8")) as {
+    types?: string;
+    exports?: Record<string, string | { types?: string }>;
+  };
+  const declaredTypes = [
+    manifest.types,
+    ...Object.values(manifest.exports ?? {}).flatMap(value => (typeof value === "string" ? [] : [value.types])),
+  ].filter((path): path is string => typeof path === "string");
+  const typesComeFromSource =
+    declaredTypes.length > 0 && declaredTypes.every(path => path.startsWith("./src/") || path.startsWith("src/"));
+  if (existsSync(join(pkg.dir, "tsconfig.build.json")) && !typesComeFromSource) {
     const t = performance.now();
     const declarationConfig = Bun.JSONC.parse(readFileSync(join(pkg.dir, "tsconfig.build.json"), "utf8")) as {
       compilerOptions?: { rootDir?: string; outDir?: string };
