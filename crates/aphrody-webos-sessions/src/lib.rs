@@ -374,7 +374,7 @@ impl Sessions {
 /// The whole DRI directory (minigbm falls back to the vkms card node, and host card numbers are dynamic) and loop
 /// control (Waydroid image mounts), when the host has them.
 fn host_devices() -> Vec<DeviceMapping> {
-    ["/dev/dri", "/dev/loop-control"]
+    ["/dev/dri", "/dev/loop-control", "/dev/kmsg"]
         .into_iter()
         .filter(|p| std::path::Path::new(p).exists())
         .map(|p| DeviceMapping {
