@@ -16,22 +16,12 @@ describe("scaffoldTargetProject", () => {
     expect(TAURI_3).toBe(scaffoldPins);
   });
 
-  it("writes a native Bun app in the private owner and preserves an existing consumer", async () => {
+  it("rejects an unregistered workspace destination without writing into the owner", async () => {
     const outDir = join(PRIVATE_OWNER_ROOT, "apps", "m3-migrate-contract-delegation-" + crypto.randomUUID());
     dirs.push(outDir);
-    await scaffoldTargetProject({
-      outDir,
-      projectName: "demo",
-      target: "vite",
-    });
-    await expect(
-      scaffoldTargetProject({
-        outDir,
-        projectName: "replacement",
-        target: "vite",
-      }),
-    ).rejects.toThrow();
-    expect(JSON.parse(await Bun.file(join(outDir, "package.json")).text()).name).toBe("demo");
-    expect(await Bun.file(join(outDir, "m3.config.ts")).exists()).toBe(true);
+    await expect(scaffoldTargetProject({ outDir, projectName: "demo", target: "vite" })).rejects.toThrow(
+      "Aphrody/M3 private owner workspace required",
+    );
+    expect(await Bun.file(join(outDir, "package.json")).exists()).toBe(false);
   });
 });

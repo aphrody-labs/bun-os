@@ -28,7 +28,7 @@ export function qualifyDependencies(
 } {
   const owner = readManifest(resolve(PRIVATE_OWNER_ROOT, "package.json"));
   // The M3 owner is folded into the repository's single Bun workspace, which holds the members and the catalog.
-  const repositoryRoot = resolve(PRIVATE_OWNER_ROOT, "..");
+  const repositoryRoot = PRIVATE_OWNER_ROOT;
   const repository = readManifest(resolve(repositoryRoot, "package.json"));
   const workspaces = repository.workspaces ?? owner.workspaces;
   const sourceManifest = resolve(sourceDir, "package.json");

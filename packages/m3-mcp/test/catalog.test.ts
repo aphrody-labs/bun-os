@@ -23,8 +23,17 @@ test("token lookup and validation", () => {
 });
 test("docs, research and templates", () => {
   expect(searchDocs("Material", 3).length).toBeGreaterThan(0);
-  expect(researchLinks().links.length).toBeGreaterThan(0);
-  expect(listTemplates()).toContain("templates/react");
+  const root = mkdtempSync(join(tmpdir(), "m3-research-links-"));
+  try {
+    mkdirSync(join(root, "docs/research"), { recursive: true });
+    writeFileSync(join(root, "docs/research/GOOGLE-LINKS.md"), "| Material Design | https://m3.material.io/ |\n");
+    const research = researchLinks(root, "");
+    expect(research.files).toEqual([join("docs", "research", "GOOGLE-LINKS.md")]);
+    expect(research.links).toContain("Material Design  https://m3.material.io/");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+  expect(listTemplates()).toContain("packages/m3-templates/react");
 });
 
 test("native design corpus takes priority and exposes Markdown, JSON provenance and URL exports", () => {
