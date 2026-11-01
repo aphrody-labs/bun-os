@@ -60,18 +60,18 @@
       "default": "./dist/config.js"
     },
     "./react": {
-      "types": "./dist/react.d.ts",
+      "types": "./src/react.tsx",
       "default": "./dist/react.js"
     },
     "./lit": {
-      "types": "./dist/lit.d.ts",
+      "types": "./src/lit.ts",
       "default": "./dist/lit.js"
     },
     "./client": {
       "types": "./client.d.ts"
     },
     "./i18n": {
-      "types": "./dist/i18n.d.ts",
+      "types": "./src/i18n.ts",
       "bun": "./src/i18n.ts",
       "import": "./src/i18n.ts",
       "default": "./dist/i18n.js"

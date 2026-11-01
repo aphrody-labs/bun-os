@@ -37,10 +37,10 @@
   "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./dist/index.js"
     },
     "./source": {
@@ -48,59 +48,59 @@
       "default": "./src/index.ts"
     },
     "./cli": {
-      "types": "./dist/cli.d.ts",
+      "types": "./src/cli.ts",
       "default": "./dist/cli.js"
     },
     "./codemods": {
-      "types": "./dist/codemods/index.d.ts",
+      "types": "./src/codemods/index.ts",
       "default": "./dist/codemods/index.js"
     },
     "./shims/navigation": {
-      "types": "./dist/shims/navigation.d.ts",
+      "types": "./src/shims/navigation.tsx",
       "default": "./dist/shims/navigation.js"
     },
     "./shims/link": {
-      "types": "./dist/shims/link.d.ts",
+      "types": "./src/shims/link.tsx",
       "default": "./dist/shims/link.js"
     },
     "./shims/image": {
-      "types": "./dist/shims/image.d.ts",
+      "types": "./src/shims/image.tsx",
       "default": "./dist/shims/image.js"
     },
     "./shims/font": {
-      "types": "./dist/shims/font.d.ts",
+      "types": "./src/shims/font.ts",
       "default": "./dist/shims/font.js"
     },
     "./shims/dynamic": {
-      "types": "./dist/shims/dynamic.d.ts",
+      "types": "./src/shims/dynamic.tsx",
       "default": "./dist/shims/dynamic.js"
     },
     "./shims/headers": {
-      "types": "./dist/shims/headers.d.ts",
+      "types": "./src/shims/headers.ts",
       "default": "./dist/shims/headers.js"
     },
     "./shims/form": {
-      "types": "./dist/shims/form.d.ts",
+      "types": "./src/shims/form.tsx",
       "default": "./dist/shims/form.js"
     },
     "./shims/tauri-ipc": {
-      "types": "./dist/shims/tauri-ipc.d.ts",
+      "types": "./src/shims/tauri-ipc.ts",
       "default": "./dist/shims/tauri-ipc.js"
     },
     "./shims/provider": {
-      "types": "./dist/shims/provider.d.ts",
+      "types": "./src/shims/provider.tsx",
       "default": "./dist/shims/provider.js"
     },
     "./shims/metadata": {
-      "types": "./dist/shims/metadata.d.ts",
+      "types": "./src/shims/metadata.tsx",
       "default": "./dist/shims/metadata.js"
     },
     "./shims/server": {
-      "types": "./dist/shims/server.d.ts",
+      "types": "./src/shims/server.ts",
       "default": "./dist/shims/server.js"
     },
     "./layout": {
-      "types": "./dist/layout.d.ts",
+      "types": "./src/layout.ts",
       "default": "./dist/layout.js"
     },
     "./package.json": "./package.json"

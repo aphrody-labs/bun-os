@@ -20,6 +20,7 @@
         "rea-agents": "workspace:*",
       },
       "devDependencies": {
+        "@aphrody/bun-types": "1.4.7",
         "@types/node": "catalog:",
         "@typescript/typescript6": "catalog:",
         "bun": "1.4.4-canary.20261028.1",
@@ -177,6 +178,7 @@
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
+        "@typescript/typescript6": "catalog:",
         "@vitejs/plugin-react": "catalog:",
         "eslint": "^9.39.4",
         "eslint-plugin-react-hooks": "^7.0.1",
@@ -1747,7 +1749,7 @@
     "@ag-ui/core@1.0.1": "patches/ag-ui-core-1.0.1.patch",
   },
   "overrides": {
-    "@aphrody/bun-types": "npm:bun-types@1.4.4-canary.20261028T141247",
+    "@aphrody/bun-types": "npm:@aphrody/bun-types@1.4.7",
     "@aphrody/yolo-core": "file:packages/yolo-core",
     "@next/env": "catalog:",
     "@next/third-parties": "catalog:",
@@ -2275,7 +2277,7 @@
 
     "@aphrody/bun-steam": ["@aphrody/bun-steam@workspace:packages/bun-steam"],
 
-    "@aphrody/bun-types": ["bun-types@1.4.4-canary.20261028T141247", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-jBwAu45czk4SPNgr/lGLIqygdfvlplcvI4kT9G+c/NKb1pr63EIBv2UhWihY4m0EawveQ29dl+uv0OruxkQodA=="],
+    "@aphrody/bun-types": ["@aphrody/bun-types@1.4.7", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-5WlW+5Uof9BY1ukqn2B8O/txrOqk5pGG+lCaDRGupaRBsgTtv3DjITjNklRdyrt1Aq+Kn53YEH3sDN0Ga/xT0g=="],
 
     "@aphrody/bun-video-project": ["@aphrody/bun-video-project@workspace:packages/bun-video-project"],
 

@@ -19,31 +19,31 @@
   ],
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
       "bun": "./src/index.ts",
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./dist/index.js"
     },
     "./browser": {
       "bun": "./src/browser.tsx",
-      "types": "./dist/browser.d.ts",
+      "types": "./src/browser.tsx",
       "default": "./dist/browser.js"
     },
     "./browser/lit": {
       "bun": "./src/browser-lit.ts",
-      "types": "./dist/browser-lit.d.ts",
+      "types": "./src/browser-lit.ts",
       "default": "./dist/browser-lit.js"
     },
     "./plugin": {
       "bun": "./src/plugin.ts",
-      "types": "./dist/plugin.d.ts",
+      "types": "./src/plugin.ts",
       "default": "./dist/plugin.js"
     },
     "./codegen": {
       "bun": "./src/codegen.ts",
-      "types": "./dist/codegen.d.ts",
+      "types": "./src/codegen.ts",
       "default": "./dist/codegen.js"
     },
     "./package.json": "./package.json"

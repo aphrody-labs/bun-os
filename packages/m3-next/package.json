@@ -36,10 +36,10 @@
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./dist/index.js"
     },
     "./source": {
@@ -47,15 +47,15 @@
       "default": "./src/index.ts"
     },
     "./server": {
-      "types": "./dist/server.d.ts",
+      "types": "./src/server.tsx",
       "default": "./dist/server.js"
     },
     "./client": {
-      "types": "./dist/client.d.ts",
+      "types": "./src/client.tsx",
       "default": "./dist/client.js"
     },
     "./proxy": {
-      "types": "./dist/theme-proxy.d.ts",
+      "types": "./src/theme-proxy.ts",
       "default": "./dist/theme-proxy.js"
     },
     "./m3.css": "./m3.css",

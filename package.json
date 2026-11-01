@@ -8,7 +8,7 @@
     "vendor/rea": {
       "name": "rea-agents",
       "version": "6.5.0",
-      "revision": "32748ddfe5b0a0a5ff7d4994343d2444de15afec"
+      "revision": "d8691f2693759440a4837e9e2ad42e4882a32c29"
     }
   },
   "bin": {
@@ -166,10 +166,10 @@
     "wasm": "bun src/cli.ts build wasm",
     "image": "bun src/cli.ts build image",
     "typecheck": "bun src/cli.ts check",
-    "lint": "bun lint --no-script -c .oxlintrc.json --max-warnings=0 --ignore-pattern '**/fixtures/**' --ignore-pattern 'packages/wasm/test/programs/**' --ignore-pattern '**/node_modules/**' src container factory infra packages apps scripts",
+    "lint": "bun lint -c .oxlintrc.json --max-warnings=0 --ignore-pattern '**/fixtures/**' --ignore-pattern 'packages/wasm/test/programs/**' --ignore-pattern '**/node_modules/**' src container factory infra packages apps scripts",
     "format": "bun fmt --config bun-format.json",
     "format:check": "bun fmt --check --config bun-format.json",
-    "check": "bun check --no-script",
+    "check": "bun check",
     "components": "bun factory/bunos/generate-components.ts",
     "doctor": "bun src/cli.ts doctor",
     "catalog": "bun src/cli.ts workspace list",
@@ -233,6 +233,7 @@
     "@aphrody/webos": "workspace:*"
   },
   "devDependencies": {
+    "@aphrody/bun-types": "1.4.7",
     "bun": "1.4.4-canary.20261028.1",
     "bun-types": "catalog:",
     "@types/node": "catalog:",
@@ -242,7 +243,7 @@
   },
   "overrides": {
     "bun-types": "1.4.4-canary.20261028T141247",
-    "@aphrody/bun-types": "npm:bun-types@1.4.4-canary.20261028T141247",
+    "@aphrody/bun-types": "npm:@aphrody/bun-types@1.4.7",
     "@preact/signals-react": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
     "@remix-run/node": "catalog:",

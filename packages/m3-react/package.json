@@ -25,55 +25,55 @@
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
       "bun": "./src/index.ts",
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "import": "./src/index.ts",
       "default": "./dist/index.js"
     },
     "./transitions": {
       "bun": "./src/transitions/index.ts",
-      "types": "./dist/transitions/index.d.ts",
+      "types": "./src/transitions/index.ts",
       "import": "./src/transitions/index.ts",
       "default": "./dist/transitions/index.js"
     },
     "./adaptive": {
       "bun": "./src/adaptive/index.ts",
-      "types": "./dist/adaptive/index.d.ts",
+      "types": "./src/adaptive/index.ts",
       "import": "./src/adaptive/index.ts",
       "default": "./dist/adaptive/index.js"
     },
     "./video": {
       "bun": "./src/video/index.ts",
-      "types": "./dist/video/index.d.ts",
+      "types": "./src/video/index.ts",
       "import": "./src/video/index.ts",
       "default": "./dist/video/index.js"
     },
     "./video.css": "./src/video/video.css",
     "./state": {
       "bun": "./src/state/index.ts",
-      "types": "./dist/state/index.d.ts",
+      "types": "./src/state/index.ts",
       "import": "./src/state/index.ts",
       "default": "./dist/state/index.js"
     },
     "./adapters/tanstack": {
       "bun": "./src/adapters/tanstack.ts",
-      "types": "./dist/adapters/tanstack.d.ts",
+      "types": "./src/adapters/tanstack.ts",
       "import": "./src/adapters/tanstack.ts",
       "default": "./dist/adapters/tanstack.js"
     },
     "./data": {
       "bun": "./src/data/index.ts",
-      "types": "./dist/data/index.d.ts",
+      "types": "./src/data/index.ts",
       "import": "./src/data/index.ts",
       "default": "./dist/data/index.js"
     },
     "./package.json": "./package.json",
     "./*": {
       "bun": "./src/wrappers/*.ts",
-      "types": "./dist/wrappers/*.d.ts",
+      "types": "./src/wrappers/*.ts",
       "import": "./src/wrappers/*.ts",
       "default": "./dist/wrappers/*.js"
     }

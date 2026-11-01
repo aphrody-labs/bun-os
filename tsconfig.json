@@ -11,7 +11,7 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "types": ["bun"]
+    "types": ["bun", "@aphrody/bun-types"]
   },
   "include": [
     "src/**/*.ts",
