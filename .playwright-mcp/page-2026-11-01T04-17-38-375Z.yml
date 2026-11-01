@@ -1,0 +1,75 @@
+- generic [ref=e1]:
+  - link "Skip to desktop" [ref=e3] [cursor=pointer]:
+    - /url: "#desk"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - button "Show all apps" [ref=e6] [cursor=pointer]: All apps (Alt+Space)
+      - navigation "Workspaces" [ref=e7]:
+        - button "Workspace 1, has windows" [ref=e531] [cursor=pointer]:
+          - generic [ref=e532]: "1"
+          - text: Workspace 1
+        - button "Workspace 2" [ref=e533] [cursor=pointer]
+        - button "Workspace 3" [ref=e535] [cursor=pointer]
+        - button "Workspace 4" [ref=e537] [cursor=pointer]
+        - button "Workspace 5" [ref=e539] [cursor=pointer]
+      - generic [ref=e18]:
+        - generic [aria-hidden] [ref=e541]: search
+        - generic [ref=e542]: Aphrody Search
+    - button "5:17 dim. 1 nov." [ref=e21] [cursor=pointer]:
+      - time [ref=e22]: 5:17
+      - generic [ref=e23]: dim. 1 nov.
+    - generic [ref=e24]:
+      - 'button "Layout: Scrolling columns. Change layout" [ref=e25] [cursor=pointer]':
+        - generic [aria-hidden] [ref=e543]: view_column
+        - text: Scrolling columns (Alt+L)
+      - button "Search" [ref=e27] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e28]: search
+        - text: Search
+      - button "Quick settings. Online, sounds on, battery 100%" [ref=e29] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e30]: wifi
+        - generic [aria-hidden] [ref=e31]: volume_up
+        - generic [aria-hidden] [ref=e32]: battery_charging_full
+        - text: Quick settings
+      - button "Open settings" [ref=e33] [cursor=pointer]:
+        - generic [aria-hidden] [ref=e34]: settings
+        - text: Settings
+  - main [ref=e35]:
+    - dialog "Aphrody Search" [ref=e544]:
+      - generic [ref=e545]:
+        - generic [aria-hidden] [ref=e546]: search
+        - generic [ref=e547]: Aphrody Search
+        - button "Minimize" [ref=e548] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e549]: remove
+        - button "Maximize" [ref=e550] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e551]: crop_square
+        - button "Close" [ref=e552] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e553]: close
+      - generic [ref=e556]:
+        - generic [ref=e557]:
+          - searchbox "Search" [active] [ref=e558]
+          - button "Search" [ref=e561] [cursor=pointer]
+        - generic [ref=e564]: Search apps, packages, crates, docs and tools.
+  - navigation "Dock" [ref=e36]:
+    - button "Show all apps" [ref=e567] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e569]: apps
+      - text: All apps
+    - button "Aphrody Files" [ref=e571] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e573]: folder
+      - text: Aphrody Files
+    - button "Aphrody Browser" [ref=e574] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e576]: language
+      - text: Aphrody Browser
+    - button "Aphrody Shell" [ref=e577] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e579]: terminal
+      - text: Aphrody Shell
+    - button "Aphrody Store" [ref=e580] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e582]: storefront
+      - text: Aphrody Store
+    - button "Aphrody Settings" [ref=e583] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e585]: settings
+      - text: Aphrody Settings
+    - button "Aphrody Search, open" [ref=e587] [cursor=pointer]:
+      - generic [aria-hidden] [ref=e589]: search
+      - text: Aphrody Search
+  - region "Notifications"
+  - status [ref=e56]

@@ -1,0 +1,89 @@
+- generic [ref=e1]:
+  - generic [ref=e6]:
+    - navigation "Principal" [ref=e9]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - link [ref=e14] [cursor=pointer]:
+              - /url: /
+              - img "Perplexity" [ref=e17]
+            - button "Rechercher des sessions" [ref=e20] [cursor=pointer]
+          - button "Réduire la barre latérale" [ref=e24] [cursor=pointer]
+        - generic [ref=e30]:
+          - link "Nouveau" [ref=e31] [cursor=pointer]:
+            - /url: /
+          - generic:
+            - generic:
+              - generic:
+                - generic: Nouveau
+                - generic: ⌃I
+        - generic [ref=e36]:
+          - generic [ref=e39]:
+            - link "Computer" [ref=e40] [cursor=pointer]:
+              - /url: /computer/tasks
+            - generic: Computer
+          - generic [ref=e43]:
+            - link "Automatisations" [ref=e44] [cursor=pointer]:
+              - /url: /automations
+            - generic: Automatisations
+          - generic [ref=e47]:
+            - link "Artéfacts" [ref=e48] [cursor=pointer]:
+              - /url: /artifacts
+            - generic: Artéfacts
+          - generic [ref=e51]:
+            - link "Personnaliser" [ref=e52] [cursor=pointer]:
+              - /url: /computer/connectors
+            - generic: Personnaliser
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - link "Projets" [ref=e55] [cursor=pointer]:
+                - /url: /projects
+              - generic:
+                - generic:
+                  - generic: Projets
+                  - generic:
+                    - generic [ref=e56]:
+                      - button "Créer un projet" [ref=e57] [cursor=pointer]
+                      - button "Filtrer les projets" [ref=e61] [cursor=pointer]
+                    - button "Réduire les projets" [expanded] [ref=e65] [cursor=pointer]
+            - generic [ref=e69]: Aucun projet
+            - generic [ref=e72]:
+              - link "Récents" [ref=e73] [cursor=pointer]:
+                - /url: /library
+              - generic:
+                - generic:
+                  - generic: Récents
+                  - button "Réduire les éléments récents" [expanded] [ref=e75] [cursor=pointer]
+            - generic [ref=e79]: Aucune session récente
+      - separator "Redimensionner la barre latérale" [ref=e83]
+    - main [ref=e84]:
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - 'button "Utilisez la navigation privée : créez des sessions anonymes qui ne sont pas enregistrées dans votre historique et expirent au bout de 24 heures" [ref=e89] [cursor=pointer]'
+          - button "Applications et plus" [ref=e96] [cursor=pointer]
+        - generic [ref=e106]:
+          - heading "Que voulez-vous savoir ?" [level=1] [ref=e118]:
+            - generic [aria-hidden] [ref=e120]: Sur quoi allons-nous travailler ?
+            - generic [aria-hidden] [ref=e121]: Que voulez-vous savoir ?
+          - generic [ref=e130]:
+            - generic [ref=e132]:
+              - textbox "Demandez ce que vous voulez…" [active] [ref=e133]:
+                - paragraph [ref=e134]
+              - generic [aria-hidden]:
+                - generic: Demandez ce que vous voulez…
+            - generic [ref=e135]:
+              - button "Ajouter" [ref=e137] [cursor=pointer]
+              - generic [ref=e144]:
+                - button "Recherche" [pressed] [ref=e147] [cursor=pointer]
+                - button "Computer" [ref=e159] [cursor=pointer]
+            - generic [ref=e167]:
+              - button "Modèle" [ref=e168] [cursor=pointer]
+              - button "Dictée" [ref=e175] [cursor=pointer]
+              - button "Utiliser le mode vocal" [ref=e181] [cursor=pointer]
+        - generic [ref=e187]:
+          - link "Conditions d’utilisation" [ref=e188] [cursor=pointer]:
+            - /url: https://www.perplexity.ai/fr/hub/legal/terms-of-service
+          - generic [aria-hidden] [ref=e189]: ·
+          - link "Avis de confidentialité" [ref=e190] [cursor=pointer]:
+            - /url: https://www.perplexity.ai/fr/hub/legal/privacy-notice
+  - listbox "Typeahead menu"
