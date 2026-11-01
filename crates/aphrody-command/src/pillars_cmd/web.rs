@@ -60,12 +60,15 @@ pub(crate) enum WebAction {
         #[arg(long)]
         json: bool,
     },
-    /// Search the Google Web index with the shared Rust SERP client
+    /// Search the public web with Google or the configured SearXNG instance
     Search {
         /// Search terms
         #[arg(required = true, num_args = 1..)]
         query: Vec<String>,
-        /// Results per page (1..100)
+        /// Search provider
+        #[arg(long, value_enum, default_value_t = WebSearchProvider::Google)]
+        provider: WebSearchProvider,
+        /// Results per page (SearXNG accepts 1..50)
         #[arg(long)]
         num: Option<u8>,
         /// One-based results page
@@ -104,6 +107,18 @@ pub(crate) enum WebAction {
         /// Force anonymous search
         #[arg(long)]
         no_auth: bool,
+        /// SearXNG categories (repeat or comma-separate: general, news, science, it, images, videos)
+        #[arg(long, value_enum, value_delimiter = ',')]
+        categories: Vec<WebSearchCategoryArg>,
+        /// SearXNG time filter
+        #[arg(long, value_enum)]
+        time_range: Option<WebSearchTimeRangeArg>,
+        /// Restrict SearXNG to these engine IDs (repeat or comma-separate)
+        #[arg(long, value_delimiter = ',')]
+        engines: Vec<String>,
+        /// Exclude these SearXNG engine IDs (repeat or comma-separate)
+        #[arg(long = "disable-engine", value_delimiter = ',')]
+        disabled_engines: Vec<String>,
     },
     /// One-shot page reconnaissance with linked Rust HTTP and DOM engines
     Recon {
@@ -403,6 +418,30 @@ pub(crate) enum WebFramesAction {
     },
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, ValueEnum)]
+pub(crate) enum WebSearchProvider {
+    #[default]
+    Google,
+    Searxng,
+}
+
+#[derive(Clone, Copy, Debug, ValueEnum)]
+pub(crate) enum WebSearchCategoryArg {
+    General,
+    News,
+    Science,
+    It,
+    Images,
+    Videos,
+}
+
+#[derive(Clone, Copy, Debug, ValueEnum)]
+pub(crate) enum WebSearchTimeRangeArg {
+    Day,
+    Month,
+    Year,
+}
+
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub(crate) enum WebSearchTransport {
     Auto,
@@ -468,6 +507,119 @@ pub(crate) enum WebBrowserAction {
     },
 }
 
+#[allow(clippy::too_many_arguments)]
+async fn search_searxng(
+    query: String,
+    num: Option<u8>,
+    page: Option<u32>,
+    start: Option<u32>,
+    language: String,
+    safe: bool,
+    categories: Vec<WebSearchCategoryArg>,
+    time_range: Option<WebSearchTimeRangeArg>,
+    engines: Vec<String>,
+    disabled_engines: Vec<String>,
+    markdown: bool,
+    json: bool,
+) -> miette::Result<()> {
+    use aphrody_web::web_search::{
+        SearchCategory, SearxngClientOptions, SearxngSearchClient, TimeRange, WebSearchRequest,
+    };
+
+    let base_url = std::env::var("APHRODY_SEARXNG_URL").map_err(|_| {
+        miette!("APHRODY_SEARXNG_URL is not configured; point it to the SearXNG service")
+    })?;
+    let limit = usize::from(num.unwrap_or(10));
+    let page = match (page, start) {
+        (Some(0), _) => return Err(miette!("--page must be at least 1")),
+        (Some(page), _) => page,
+        (_, Some(start)) => (start / u32::try_from(limit).unwrap_or(10)).saturating_add(1),
+        _ => 1,
+    };
+    let page = u16::try_from(page).map_err(|_| miette!("--page is out of range"))?;
+    let mut request = WebSearchRequest::new(query.clone());
+    request.limit = limit;
+    request.page = page;
+    request.language = Some(language);
+    if safe {
+        request.safe_search = Some(2);
+    }
+    request.categories = categories
+        .into_iter()
+        .map(|category| match category {
+            WebSearchCategoryArg::General => SearchCategory::General,
+            WebSearchCategoryArg::News => SearchCategory::News,
+            WebSearchCategoryArg::Science => SearchCategory::Science,
+            WebSearchCategoryArg::It => SearchCategory::It,
+            WebSearchCategoryArg::Images => SearchCategory::Images,
+            WebSearchCategoryArg::Videos => SearchCategory::Videos,
+        })
+        .collect();
+    request.time_range = time_range.map(|range| match range {
+        WebSearchTimeRangeArg::Day => TimeRange::Day,
+        WebSearchTimeRangeArg::Month => TimeRange::Month,
+        WebSearchTimeRangeArg::Year => TimeRange::Year,
+    });
+    request.engines = engines;
+    request.disabled_engines = disabled_engines;
+
+    let client = SearxngSearchClient::new(
+        SearxngClientOptions::new(base_url).map_err(|error| miette!("SearXNG: {error}"))?,
+    )
+    .map_err(|error| miette!("SearXNG: {error}"))?;
+    let report = client
+        .search(&request)
+        .await
+        .map_err(|error| miette!("SearXNG: {error}"))?;
+
+    if json {
+        print_web_json(&serde_json::to_value(&report).into_diagnostic()?)?;
+        return Ok(());
+    }
+    if markdown {
+        println!(
+            "# Search: {}\n\n## Results ({})\n",
+            report.query,
+            report.results.len()
+        );
+        for answer in &report.answers {
+            println!("> {answer}\n");
+        }
+        for result in &report.results {
+            println!("- [{}]({})", result.title, result.url);
+            if !result.snippet.is_empty() {
+                println!("  {}", result.snippet);
+            }
+        }
+    } else {
+        for result in &report.results {
+            println!(
+                "\n{}\n{}",
+                result.title.bold().green(),
+                result.url.cyan().underline()
+            );
+            if !result.snippet.is_empty() {
+                println!("{}", result.snippet);
+            }
+            if !result.engines.is_empty() {
+                println!("engines: {}", result.engines.join(", ").dimmed());
+            }
+        }
+        for answer in &report.answers {
+            println!("\n{}", answer.bold());
+        }
+        for engine in &report.unresponsive_engines {
+            eprintln!("SearXNG engine unavailable: {engine}");
+        }
+        println!(
+            "\n[{} results · page {} · SearXNG]",
+            report.results.len(),
+            report.page
+        );
+    }
+    Ok(())
+}
+
 pub(crate) async fn handle_web(action: WebAction) -> miette::Result<()> {
     match action {
         WebAction::DesignSync(args) => print_web_json(&design_sync::run(args).await?)?,
@@ -505,6 +657,7 @@ pub(crate) async fn handle_web(action: WebAction) -> miette::Result<()> {
                 "markdown",
                 "dns",
                 "google-search",
+                "federated-searxng-search",
                 "recon",
                 "scrape",
                 "main-content-extract",
@@ -567,6 +720,7 @@ pub(crate) async fn handle_web(action: WebAction) -> miette::Result<()> {
         }
         WebAction::Search {
             query,
+            provider,
             num,
             page,
             start,
@@ -580,7 +734,37 @@ pub(crate) async fn handle_web(action: WebAction) -> miette::Result<()> {
             transport,
             cookies,
             no_auth,
+            categories,
+            time_range,
+            engines,
+            disabled_engines,
         } => {
+            if provider == WebSearchProvider::Searxng {
+                return search_searxng(
+                    query.join(" "),
+                    num,
+                    page,
+                    start,
+                    hl,
+                    safe,
+                    categories,
+                    time_range,
+                    engines,
+                    disabled_engines,
+                    markdown,
+                    json,
+                )
+                .await;
+            }
+            if !categories.is_empty()
+                || time_range.is_some()
+                || !engines.is_empty()
+                || !disabled_engines.is_empty()
+            {
+                return Err(miette!(
+                    "--categories, --time-range, --engine, and --disable-engine require --provider searxng"
+                ));
+            }
             use aphrody_google::search::{SearchOptions, SearchTransport};
             let query = query.join(" ");
             let start = match (page, start) {
