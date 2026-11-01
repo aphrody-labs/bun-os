@@ -9,13 +9,16 @@
 html,body{margin:0;height:100%;background:#000;color:#ddd;font:14px system-ui,sans-serif;overflow:hidden}
 #c{display:block;margin:auto;max-width:100vw;max-height:100vh;touch-action:none;outline:none}
 #bar{position:fixed;left:8px;bottom:8px;opacity:.7;font-size:12px;pointer-events:none}
-form{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;gap:8px}
-input{width:24em;padding:6px;background:#111;color:#eee;border:1px solid #444}
+#connect{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;gap:8px}
+#tools{position:fixed;right:8px;bottom:8px;display:flex;gap:6px;align-items:center}
+#tools input{width:min(48vw,24em)}
+input,button{padding:7px;background:#111;color:#eee;border:1px solid #555;border-radius:4px}
 </style>
 </head>
 <body>
 <canvas id="c" tabindex="0"></canvas>
 <div id="bar"></div>
+<div id="tools"><button id="text-toggle" type="button" aria-label="Open text keyboard">Text</button><input id="text-entry" type="text" placeholder="Type into Android…" autocomplete="off" enterkeyhint="send" hidden><button id="text-send" type="button" hidden>Send</button></div>
 <script>
 "use strict";
 const canvas = document.getElementById("c"), bar = document.getElementById("bar");
@@ -28,12 +31,15 @@ function token() {
 }
 function ask() {
   const f = document.createElement("form");
+  f.id = "connect";
   f.innerHTML = '<input type="password" placeholder="Session token" autocomplete="off"><button>Connect</button>';
   f.onsubmit = (e) => { e.preventDefault(); localStorage.setItem(KEY, f.querySelector("input").value.trim()); f.remove(); start(); };
   document.body.append(f);
 }
 let ws, decoder, codec, frames = 0, fps = 0, lastInput = 0, latency = 0, buttons = 0;
-setInterval(() => { fps = frames; frames = 0; bar.textContent = `${canvas.width}x${canvas.height} ${fps} fps, input-to-frame ${latency} ms`; }, 1000);
+const gamepadBefore = Array(4).fill(null);
+let gamepadLabel = "no gamepad";
+setInterval(() => { fps = frames; frames = 0; bar.textContent = `${canvas.width}x${canvas.height} ${fps} fps, input-to-frame ${latency} ms · ${gamepadLabel}`; }, 1000);
 const send = (m) => ws && ws.readyState === 1 && ws.send(JSON.stringify(m));
 function configure(c) {
   if (decoder) try { decoder.close(); } catch {}
@@ -88,6 +94,46 @@ const key = (down) => (e) => { if (e.key === "v" && (e.ctrlKey || e.metaKey)) re
 canvas.addEventListener("keydown", key(true));
 canvas.addEventListener("keyup", key(false));
 document.addEventListener("paste", (e) => { const text = e.clipboardData?.getData("text/plain"); if (text) send({ t: "clipboard", text }); });
+const textEntry = document.getElementById("text-entry"), textSend = document.getElementById("text-send");
+document.getElementById("text-toggle").onclick = () => {
+  textEntry.hidden = !textEntry.hidden; textSend.hidden = textEntry.hidden;
+  if (!textEntry.hidden) textEntry.focus(); else canvas.focus();
+};
+function sendText() {
+  if (textEntry.value) { send({ t: "clipboard", text: textEntry.value }); textEntry.value = ""; }
+  textEntry.focus();
+}
+textSend.onclick = sendText;
+textEntry.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendText(); } });
+// The browser receives USB/Bluetooth controllers locally; send bounded standard-mapping snapshots to
+// the authenticated Android stream. Android maps buttons and the left stick to KeyEvent/DPAD input.
+setInterval(() => {
+  if (!navigator.getGamepads) return;
+  let pads = [];
+  try { pads = navigator.getGamepads(); } catch { return; }
+  const names = [];
+  for (let pad = 0; pad < 4; pad++) {
+    const source = pads[pad];
+    if (!source || !source.connected) {
+      if (gamepadBefore[pad] !== null) {
+        send({ t: "gamepad", pad, connected: false, buttons: Array(17).fill(0), axes: [0, 0, 0, 0] });
+        gamepadBefore[pad] = null;
+      }
+      continue;
+    }
+    names.push(source.id || `controller ${pad + 1}`);
+    const state = {
+      t: "gamepad", pad, connected: true,
+      buttons: Array.from({ length: 17 }, (_, i) => source.buttons[i]?.value ?? 0),
+      axes: Array.from({ length: 4 }, (_, i) => source.axes[i] ?? 0),
+    };
+    const before = gamepadBefore[pad];
+    const changed = !before || state.buttons.some((v, i) => Math.abs(v - before.buttons[i]) > 0.03)
+      || state.axes.some((v, i) => Math.abs(v - before.axes[i]) > 0.03);
+    if (changed) { send(state); gamepadBefore[pad] = state; lastInput = performance.now(); }
+  }
+  gamepadLabel = names.length ? names.join(", ") : "no gamepad";
+}, 50);
 if (!("VideoDecoder" in window)) bar.textContent = "This browser has no WebCodecs VideoDecoder.";
 start();
 </script>

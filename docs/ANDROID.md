@@ -39,6 +39,9 @@ with the complete Google Play stack. It is the Android of the unified Bun OS ses
   `https://www.google.com/android/uncertified`; the owner signs in.
 - Unified image: `rootfs/usr/share/bunos/waydroid/waydroid_base.prop.d/20-android17.prop` and
   `rootfs/usr/libexec/bunos/waydroid-android17` in `factory/images/bunos-unified`.
+- Browser computer use: `/api/android/` streams scrcpy video and accepts touch/pointer gestures, physical keyboard input,
+  text entry through the viewer's Text control, clipboard paste, and browser Gamepad API buttons. Gamepad face/shoulder
+  buttons and the left stick's digital directions map to Android key events; scrcpy does not carry analog stick axes.
 - Dropped routes: the official emulator with the Android 17 Play image booted under KVM but is an OS
   emulator (owner pivot to one native session); redroid 17 needs our own AOSP build and has no x86_64 GApps.
 

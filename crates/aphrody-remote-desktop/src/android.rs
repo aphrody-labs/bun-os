@@ -547,6 +547,44 @@ struct InputState {
     y: i32,
     meta: i32,
     clip_seq: u64,
+    gamepads: [[bool; 17]; 4],
+    gamepad_keys: [bool; 17],
+}
+
+/// Scrcpy can inject Android KeyEvents and touch, but not a Linux joystick axis. Map the standard
+/// controller buttons and the left stick's digital directions to Android gamepad/DPAD keycodes.
+fn gamepad(input: aphrody_webos_protocol::GamepadState, state: &mut InputState) -> Vec<Vec<u8>> {
+    const KEYCODES: [i32; 17] = [
+        96, 97, 99, 100, 102, 103, 104, 105, 109, 108, 106, 107, 19, 20, 21, 22, 110,
+    ];
+    let Some(pad) = state.gamepads.get_mut(usize::from(input.pad)) else {
+        return Vec::new();
+    };
+    *pad = [false; 17];
+    if input.connected {
+        for (pressed, value) in pad.iter_mut().zip(input.buttons) {
+            *pressed = value.is_finite() && value >= 0.5;
+        }
+        let x = input.axes[0];
+        let y = input.axes[1];
+        if x.is_finite() {
+            pad[14] |= x < -0.5;
+            pad[15] |= x > 0.5;
+        }
+        if y.is_finite() {
+            pad[12] |= y < -0.5;
+            pad[13] |= y > 0.5;
+        }
+    }
+    let mut out = Vec::new();
+    for i in 0..KEYCODES.len() {
+        let down = state.gamepads.iter().any(|p| p[i]);
+        if down != state.gamepad_keys[i] {
+            out.push(keycode(down, KEYCODES[i], 0));
+            state.gamepad_keys[i] = down;
+        }
+    }
+    out
 }
 
 fn translate(input: Input, s: &mut InputState, size: &(AtomicU64, AtomicU64)) -> Vec<Vec<u8>> {
@@ -602,7 +640,8 @@ fn translate(input: Input, s: &mut InputState, size: &(AtomicU64, AtomicU64)) ->
             prefix.push(1); // paste: the browser only sends its clipboard on a paste gesture
             vec![with_text(9, &prefix, &text)]
         }
-        Input::Resize { .. } | Input::Gamepad(_) => Vec::new(),
+        Input::Gamepad(input) => gamepad(input, s),
+        Input::Resize { .. } => Vec::new(),
     }
 }
 
