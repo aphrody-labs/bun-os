@@ -431,6 +431,11 @@ async function build(
   const stage = await mkdtemp(join(tmpdir(), "bun-os-image-"));
   try {
     await cp(join(here, name), join(stage, "context"), { recursive: true });
+    if (name === "bunos-unified")
+      await cp(join(workspace, "vendor/waydroid"), join(stage, "context/waydroid"), {
+        recursive: true,
+        filter: source => !source.endsWith("/.git"),
+      });
     for (const input of image.repoInputs ?? [])
       await cp(join(workspace, input.from), join(stage, "context", input.to), { recursive: true });
     if (name === "bunos-alpine") {
