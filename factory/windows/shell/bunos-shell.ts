@@ -48,6 +48,26 @@ const artifacts = [
 ] as const;
 
 const bin = (file: string) => join(binDir, file);
+
+/** A userland command (nu, brush, hx): the userland bundle's System32 link / payload first, then ours. */
+function tool(file: string): string {
+  for (const candidate of [join(systemRoot, "System32", file), join(bunosRoot, "userland", "bin", file), bin(file)]) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return bin(file);
+}
+
+/**
+ * Bun OS Material icons (design agent: %SystemRoot%\BunOS\icons\bunos-icons.dll, ordinals from its
+ * icon-theme.json; light 100+, dark 1100+ following the user's app theme), else `fallback`.
+ */
+const ICON_ORDINALS = { terminal: 150, files: 151, linux: 170, script: 133, bunos: 173 } as const;
+function icon(id: keyof typeof ICON_ORDINALS, fallback: string): string {
+  const dll = join(bunosRoot, "icons", "bunos-icons.dll");
+  if (!existsSync(dll)) return fallback;
+  const light = regGet("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme")?.value === "1";
+  return `${dll},-${ICON_ORDINALS[id] + (light ? 0 : 1000)}`;
+}
 const sha256 = (path: string) => createHash("sha256").update(readFileSync(path)).digest("hex");
 
 // ---------------------------------------------------------------- process helpers
@@ -158,7 +178,7 @@ function install() {
       continue;
     }
     // nu.exe is shared with the userland bundle: never replace one another component installed.
-    if ("shared" in art && art.shared && existsSync(bin(art.file)) && !previous.files.some((f: any) => f.file === art.file)) continue;
+    if ("shared" in art && art.shared && (tool(art.file) !== bin(art.file) || (existsSync(bin(art.file)) && !previous.files.some((f: any) => f.file === art.file)))) continue;
     const target = join(stage, art.file);
     copyFileSync(source, target);
     staged.push({ file: art.file, staged: target, source, art });
@@ -262,18 +282,18 @@ function releaseFile(files: Files, id: string) {
 const components: Record<string, { enable(c: Changes, files: Files): void; disable?(files: Files): void; status(): unknown }> = {
   "nu-plugin": {
     enable() {
-      run([bin("nu.exe"), "-c", `plugin add '${bin("nu_plugin_windows.exe")}'`]);
+      run([tool("nu.exe"), "-c", `plugin add '${bin("nu_plugin_windows.exe")}'`]);
       // The module with cmd/pwsh-familiar wrappers, loaded from the user's autoload directory.
-      const autoload = run([bin("nu.exe"), "-c", "$nu.user-autoload-dirs | first"]).out.trim();
+      const autoload = run([tool("nu.exe"), "-c", "$nu.user-autoload-dirs | first"]).out.trim();
       const files = loadFiles();
       ownFile(files, "nu-autoload", join(autoload, "bunos-windows.nu"), readFileSync(join(shareDir, "nu", "bunos-windows.nu"), "utf8"));
       saveFiles(files);
     },
     disable(files) {
-      run([bin("nu.exe"), "-c", "plugin rm windows"], { allowFail: true });
+      run([tool("nu.exe"), "-c", "plugin rm windows"], { allowFail: true });
       releaseFile(files, "nu-autoload");
     },
-    status: () => run([bin("nu.exe"), "-c", "plugin list | where name == windows | length"], { allowFail: true }).out.trim() === "1",
+    status: () => run([tool("nu.exe"), "-c", "plugin list | where name == windows | length"], { allowFail: true }).out.trim() === "1",
   },
 
   terminal: {
@@ -282,7 +302,7 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
       // nushell becomes its default profile, and Rio is configured to start nushell.
       const fragment = {
         profiles: [
-          { guid: NU_PROFILE_GUID, name: "Bun OS nushell", commandline: quote(bin("nu.exe")), icon: join(shareDir, "glazewm", "icon.ico"), startingDirectory: "%USERPROFILE%" },
+          { guid: NU_PROFILE_GUID, name: "Bun OS nushell", commandline: quote(tool("nu.exe")), icon: icon("terminal", join(shareDir, "glazewm", "icon.ico")), startingDirectory: "%USERPROFILE%" },
         ],
       };
       ownFile(files, "wt-fragment", join(localAppData, "Microsoft", "Windows Terminal", "Fragments", "BunOS", "bunos.json"), JSON.stringify(fragment, null, 2) + "\n");
@@ -291,7 +311,7 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
         const previous = setWtDefault(settings, NU_PROFILE_GUID);
         files[id] ??= { path: settings, previous: null, restore: { file: settings, key: "defaultProfile", value: previous } };
       }
-      const rioConfig = `# Bun OS: Rio starts nushell (written by bunos-shell; removed on disable).\n[shell]\nprogram = '${bin("nu.exe")}'\nargs = []\n\n[window]\nmode = "Windowed"\n`;
+      const rioConfig = `# Bun OS: Rio starts nushell (written by bunos-shell; removed on disable).\n[shell]\nprogram = '${tool("nu.exe")}'\nargs = []\n\n[window]\nmode = "Windowed"\n`;
       ownFile(files, "rio-config", join(localAppData, "rio", "config.toml"), rioConfig);
       // Explorer's own "Open in Terminal" and the console delegation (HKCU\Console\%%Startup) keep
       // Windows Terminal, which now opens nushell: nothing to change there.
@@ -312,15 +332,15 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
   assoc: {
     enable(c) {
       const types = [
-        { ext: ".nu", progId: "BunOS.NuScript", label: "Nushell script", open: `${quote(bin("nu.exe"))} "%1" %*` },
-        { ext: ".sh", progId: "BunOS.ShScript", label: "Shell script", open: existsSync(bin("brush.exe")) ? `${quote(bin("brush.exe"))} "%1" %*` : `${quote(bin("nu.exe"))} -c "^bash '%1'"` },
+        { ext: ".nu", progId: "BunOS.NuScript", label: "Nushell script", open: `${quote(tool("nu.exe"))} "%1" %*` },
+        { ext: ".sh", progId: "BunOS.ShScript", label: "Shell script", open: existsSync(tool("brush.exe")) ? `${quote(tool("brush.exe"))} "%1" %*` : `${quote(tool("nu.exe"))} -c "^bash '%1'"` },
       ];
       for (const t of types) {
         c.key(`${HKCU_CLASSES}\\${t.progId}`);
         c.set(`${HKCU_CLASSES}\\${t.progId}`, "(default)", t.label);
-        c.set(`${HKCU_CLASSES}\\${t.progId}\\DefaultIcon`, "(default)", `${bin("nu.exe")},0`);
+        c.set(`${HKCU_CLASSES}\\${t.progId}\\DefaultIcon`, "(default)", icon("script", `${tool("nu.exe")},0`));
         c.set(`${HKCU_CLASSES}\\${t.progId}\\shell\\open\\command`, "(default)", t.open);
-        c.set(`${HKCU_CLASSES}\\${t.progId}\\shell\\edit\\command`, "(default)", existsSync(bin("hx.exe")) ? `${quote(bin("hx.exe"))} "%1"` : `notepad.exe "%1"`);
+        c.set(`${HKCU_CLASSES}\\${t.progId}\\shell\\edit\\command`, "(default)", existsSync(tool("hx.exe")) ? `${quote(tool("hx.exe"))} "%1"` : `notepad.exe "%1"`);
         c.set(`${HKCU_CLASSES}\\${t.ext}`, "(default)", t.progId);
         c.set(`${HKCU_CLASSES}\\${t.ext}\\OpenWithProgids`, t.progId, "", "REG_NONE");
       }
@@ -336,7 +356,7 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
         const key = `${HKCU_CLASSES}\\${base}\\shell\\BunOS.Rio`;
         c.key(key);
         c.set(key, "(default)", "Open in Rio (nushell)");
-        c.set(key, "Icon", bin("rio.exe"));
+        c.set(key, "Icon", icon("terminal", bin("rio.exe")));
         c.set(`${key}\\command`, "(default)", `${quote(bin("rio.exe"))} --working-dir "${target}"`);
       }
     },
@@ -349,7 +369,7 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
       const app = `${HKCU_CLASSES}\\Applications\\cosmic-files.exe`;
       c.key(app);
       c.set(app, "FriendlyAppName", "COSMIC Files");
-      c.set(`${app}\\DefaultIcon`, "(default)", `${bin("cosmic-files.exe")},0`);
+      c.set(`${app}\\DefaultIcon`, "(default)", icon("files", `${bin("cosmic-files.exe")},0`));
       c.set(`${app}\\shell\\open\\command`, "(default)", `${quote(bin("cosmic-files.exe"))} "%1"`);
       c.set(`${app}\\SupportedTypes`, "Folder", "", "REG_SZ");
       for (const base of ["Directory", "Directory\\Background", "Drive"]) {
@@ -357,7 +377,7 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
         const key = `${HKCU_CLASSES}\\${base}\\shell\\BunOS.CosmicFiles`;
         c.key(key);
         c.set(key, "(default)", "Open in COSMIC Files");
-        c.set(key, "Icon", bin("cosmic-files.exe"));
+        c.set(key, "Icon", icon("files", bin("cosmic-files.exe")));
         c.set(`${key}\\command`, "(default)", `${quote(bin("cosmic-files.exe"))} "${target}"`);
       }
       // Start menu entry.
@@ -390,7 +410,7 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
       c.set(k, "(default)", "Bun OS (Linux)");
       c.set(k, "System.IsPinnedToNameSpaceTree", "1", "REG_DWORD");
       c.set(k, "SortOrderIndex", "66", "REG_DWORD");
-      c.set(`${k}\\DefaultIcon`, "(default)", "%SystemRoot%\\system32\\imageres.dll,-1040", "REG_EXPAND_SZ");
+      c.set(`${k}\\DefaultIcon`, "(default)", icon("linux", "%SystemRoot%\\system32\\imageres.dll,-1040"), "REG_EXPAND_SZ");
       c.set(`${k}\\InProcServer32`, "(default)", "%SystemRoot%\\system32\\shell32.dll", "REG_EXPAND_SZ");
       c.set(`${k}\\Instance`, "CLSID", "{0E5AAE11-A475-4c5b-AB00-C66DE400274E}");
       c.set(`${k}\\Instance\\InitPropertyBag`, "Attributes", "17", "REG_DWORD");

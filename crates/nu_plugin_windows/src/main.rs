@@ -3,7 +3,7 @@
 //!
 //! ```nu
 //! plugin add ($env.SystemRoot | path join BunOS bin nu_plugin_windows.exe); plugin use windows
-//! win list-services | where status == Running
+//! win list-services | where Status == Running
 //! win wmi-query "SELECT Name, ProcessId FROM Win32_Process" | sort-by Name
 //! win shell-context-menu C:\Windows\notepad.exe
 //! ```

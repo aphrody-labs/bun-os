@@ -4,7 +4,7 @@
 //! `nu --stdin`, `from json`.
 //!
 //! ```sh
-//! win list-services | jq '.[] | select(.status=="Running") | .name'
+//! win list-services | jq '.[] | select(.Status=="Running") | .Name'
 //! win wmi-query 'SELECT Caption, Version FROM Win32_OperatingSystem'
 //! win shell-file-operation --op recycle --items '["C:\\tmp\\a.txt"]'
 //! win call com_invoke '{"progId":"WScript.Shell","steps":[{"name":"ExpandEnvironmentStrings","args":["%USERPROFILE%"]}]}'
