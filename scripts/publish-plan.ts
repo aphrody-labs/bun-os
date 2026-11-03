@@ -210,7 +210,10 @@ const plan = {
   npm: { total: npm.length, publishable: npm.filter(n => n.publishable).length, members: npm },
   topBlockers: [...blockers.entries()].sort((a, b) => b[1] - a[1]).slice(0, 25),
 };
-await Bun.write(join(root, "docs", "generated", "publish-plan.json"), `${JSON.stringify(plan, null, 2)}\n`);
+const planFile = join(root, "docs", "generated", "publish-plan.json");
+await Bun.write(planFile, `${JSON.stringify(plan, null, 2)}\n`);
+// Same layout as `bun format`, so a regenerated plan only differs where the plan changed.
+Bun.spawnSync([process.execPath, "fmt", "--config", join(root, "bun-format.json"), planFile], { cwd: root });
 console.log(
   `crates ${order.length}/${verdicts.size} publishable, npm ${plan.npm.publishable}/${npm.length}; top blockers:`,
 );
