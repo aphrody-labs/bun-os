@@ -72,7 +72,10 @@ build() {
     -D html-docs=disabled
   )
   arch-meson mesa build "${meson_options[@]}"
-  meson compile -C build
+  # meson ignores MAKEFLAGS: take the -j the build lane gave makepkg.
+  local _j
+  _j=$(sed -n 's/.*-j *\([0-9][0-9]*\).*/\1/p' <<<"${MAKEFLAGS:-}")
+  meson compile -C build ${_j:+-j "$_j"}
 }
 
 _pick() {
