@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-/* Dragon Ball reader skin: the generated M3 scheme of seed #e78220 (dark) plus the comic ink shapes. */
+/* Dragon Ball reader skin: the generated dark M3 scheme of the skin seed (scripts/generate-scheme.ts) plus the comic ink shapes. */
 @import "./dragon-ball.scheme.css";
 
 .m3-reader--dragon-ball.m3-reader,

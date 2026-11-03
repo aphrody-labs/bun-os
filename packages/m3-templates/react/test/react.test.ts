@@ -13,7 +13,8 @@ describe("react feature: bundling", () => {
         entrypoints: [join(import.meta.dir, "../src/web/index.html")],
         outdir,
       });
-      expect(result.logs.map(String)).toEqual([]);
+      // @aphrody/m3-theme/tokens.css also carries its Tailwind v4 `@theme inline` aliases, which plain CSS skips.
+      expect(result.logs.map(String).filter(log => !log.includes("'@theme'"))).toEqual([]);
       expect(result.success).toBe(true);
       expect(result.outputs.some(output => output.path.endsWith(".css"))).toBe(true);
       const scripts = result.outputs.filter(output => output.path.endsWith(".js"));

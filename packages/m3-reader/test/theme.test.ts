@@ -21,3 +21,11 @@ test("optional Dragon Ball stylesheet resolves and ships the generated seed sche
   expect(css).toContain("skewX(-12.3deg)");
   expect(css).toContain(".m3-reader--dragon-ball .m3-reader-scroll");
 });
+
+test("the Dragon Ball scheme sheet matches the canonical engine output", () => {
+  const run = Bun.spawnSync([process.execPath, "scripts/generate-scheme.ts", "--check"], {
+    cwd: resolve(import.meta.dir, ".."),
+  });
+  expect(run.stderr.toString()).toBe("");
+  expect(run.exitCode).toBe(0);
+});

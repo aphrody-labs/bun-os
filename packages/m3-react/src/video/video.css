@@ -1,9 +1,15 @@
 /* Material 3 video player. Colors, shape and motion come from the --md-sys-* roles of the page theme. */
+/* design:content - the letterbox is part of the picture and the control glyphs sit on a scrim over arbitrary
+   video pixels, so both stay fixed in every theme instead of following the light/dark roles. */
+.m3-video {
+  --m3-video-letterbox: #000;
+  --m3-video-overlay-content: #fff;
+}
 .m3-video {
   position: relative;
   display: grid;
-  background: #000;
-  color: #fff;
+  background: var(--m3-video-letterbox);
+  color: var(--m3-video-overlay-content);
   border-radius: var(--md-sys-shape-corner-large, 16px);
   overflow: hidden;
   aspect-ratio: 16 / 9;
@@ -16,24 +22,20 @@
   --md-icon-button-selected-icon-color: currentColor;
 }
 .m3-video:focus-visible {
-  outline: 3px solid var(--md-sys-color-primary);
-  outline-offset: -3px;
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: -2px;
 }
 .m3-video > video {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #000;
+  background: var(--m3-video-letterbox);
 }
 .m3-video-controls {
   position: absolute;
   inset: auto 0 0;
   padding: 8px 12px 4px;
-  background: linear-gradient(
-    to top,
-    color-mix(in srgb, var(--md-sys-color-scrim, #000) 80%, transparent),
-    transparent
-  );
+  background: linear-gradient(to top, color-mix(in oklab, var(--md-sys-color-scrim) 80%, transparent), transparent);
   transition: opacity var(--md-sys-motion-duration-short3, 150ms) var(--md-sys-motion-easing-standard, ease);
 }
 .m3-video-bar {
@@ -41,7 +43,7 @@
   align-items: center;
   gap: 4px;
   font: var(--md-sys-typescale-label-large-weight, 500) var(--md-sys-typescale-label-large-size, 14px) / 1
-    var(--md-ref-typeface-plain, system-ui);
+    var(--md-ref-typeface-plain);
 }
 .m3-video-bar md-icon-button span {
   font-size: 13px;
@@ -73,7 +75,7 @@
   width: 72px;
   height: 72px;
   border-radius: var(--md-sys-shape-corner-full, 999px);
-  background: color-mix(in srgb, var(--md-sys-color-scrim, #000) 55%, transparent);
+  background: color-mix(in oklab, var(--md-sys-color-scrim) 55%, transparent);
   --md-icon-button-icon-size: 40px;
 }
 .m3-video-toast {
@@ -85,15 +87,15 @@
   max-width: 90%;
   padding: 8px 16px;
   border-radius: var(--md-sys-shape-corner-full, 999px);
-  background: var(--md-sys-color-inverse-surface, #222);
-  color: var(--md-sys-color-inverse-on-surface, #fff);
+  background: var(--md-sys-color-inverse-surface);
+  color: var(--md-sys-color-inverse-on-surface);
 }
 .m3-video-end {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--md-sys-color-scrim, #000) 70%, transparent);
+  background: color-mix(in oklab, var(--md-sys-color-scrim) 70%, transparent);
 }
 .m3-video-loading {
   position: absolute;

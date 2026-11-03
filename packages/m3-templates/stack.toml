@@ -76,12 +76,13 @@ required = true
 path = "templates/web"
 description = "Bun HTML-bundle frontend served by the same server"
 exclusive = "frontend"
+dependencies = { "@aphrody/m3-theme" = "1.4.7", "@aphrody/m3-tokens" = "1.4.7" }
 
 [template.react]
 path = "templates/react"
 description = "React 19 + Material 3 web components on Bun's HTML bundler (replaces web)"
 exclusive = "frontend"
-dependencies = { "@aphrody/material-web" = "3.3.3", "@lit/react" = "1.0.8", lit = "3.3.3", react = "19.3.0", react-dom = "19.3.0" }
+dependencies = { "@aphrody/m3-theme" = "1.4.7", "@aphrody/m3-tokens" = "1.4.7", "@aphrody/material-web" = "3.3.3", "@lit/react" = "1.0.8", lit = "3.3.3", react = "19.3.0", react-dom = "19.3.0" }
 dev_dependencies = { "@types/react" = "19.3.0", "@types/react-dom" = "19.3.0" }
 
 [template.desktop]
