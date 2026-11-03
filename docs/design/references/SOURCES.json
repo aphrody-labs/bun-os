@@ -1,0 +1,167 @@
+[
+  {
+    "file": "android-17-desktop/desktop-windowing-compose.png",
+    "title": "Desktop windowing on a tablet: freeform Gmail and Chrome windows, PiP, taskbar",
+    "source_url": "https://developer.android.com/static/develop/ui/compose/images/layouts/adaptive/desktop-windowing/desktop-windowing.png",
+    "page_url": "https://developer.android.com/develop/adaptive-apps/guides/support-desktop-windowing",
+    "retrieved": "2026-11-03",
+    "credit": "Android Developers (Google)",
+    "license": "CC BY 4.0 (developer.android.com content; code samples Apache 2.0) per Google Developers Site Policies; third-party app UI and trademarks belong to their owners",
+    "subject": "android-desktop",
+    "notes": "Dark theme. Header bar: app icon + name + chevron (app menu) at left, maximize + close at right (minimize hidden on this build). Taskbar: centred, app-drawer button (4-dot + search glyph), vertical divider, pinned/running icons with running-indicator dash below."
+  },
+  {
+    "file": "android-17-desktop/header-bar.webp",
+    "title": "Window header bar (caption) with minimize, maximize, close",
+    "source_url": "https://developer.android.com/static/images/design/ui/desktop/guides/desktop_pattern_headerbar.webp",
+    "page_url": "https://developer.android.com/design/ui/desktop/guides/system/system-bars",
+    "retrieved": "2026-11-03",
+    "credit": "Android Developers (Google)",
+    "license": "CC BY 4.0 per Google Developers Site Policies",
+    "subject": "android-desktop",
+    "notes": "Design guide illustration from the Android 'Desktop experience' guidelines. Window with large rounded corners on all four sides, tinted header (surface-container tone derived from the app colour), icon+title left, '_ [] X' glyph buttons right, no button backgrounds."
+  },
+  {
+    "file": "android-17-desktop/header-bar-custom.webp",
+    "title": "Customizable header insets: Chrome draws tabs in the header bar",
+    "source_url": "https://developer.android.com/static/images/design/ui/desktop/guides/desktop_pattern_headerbar_custom.webp",
+    "page_url": "https://developer.android.com/design/ui/desktop/guides/system/system-bars",
+    "retrieved": "2026-11-03",
+    "credit": "Android Developers (Google)",
+    "license": "CC BY 4.0 per Google Developers Site Policies",
+    "subject": "android-desktop",
+    "notes": "App content (tab strip) in the middle of the header; system caption controls stay at the right and are drawn smaller/greyed."
+  },
+  {
+    "file": "android-17-desktop/taskbar.webp",
+    "title": "Desktop taskbar on a large screen",
+    "source_url": "https://developer.android.com/static/images/design/ui/desktop/guides/desktop_pattern_taskbar.webp",
+    "page_url": "https://developer.android.com/design/ui/desktop/guides/system/system-bars",
+    "retrieved": "2026-11-03",
+    "credit": "Android Developers (Google)",
+    "license": "CC BY 4.0 per Google Developers Site Policies",
+    "subject": "android-desktop",
+    "notes": "Full-width opaque taskbar (light surface tint), centred cluster: app-drawer button, divider, circular app icons; running app shown with a filled circular highlight."
+  },
+  {
+    "file": "android-17-desktop/taskbar-pin-app-menu.webp",
+    "title": "App drawer with long-press / right-click menu (app info, split, pin to taskbar, widgets, shortcuts)",
+    "source_url": "https://developer.android.com/static/images/design/ui/desktop/guides/desktop_pattern_pin-app.webp",
+    "page_url": "https://developer.android.com/design/ui/desktop/guides/system/system-bars",
+    "retrieved": "2026-11-03",
+    "credit": "Android Developers (Google)",
+    "license": "CC BY 4.0 per Google Developers Site Policies",
+    "subject": "android-desktop",
+    "notes": "Bottom-sheet style app drawer with drag handle and large top corner radius; popup menu as stacked rounded cards (icon row, Widgets, app shortcuts)."
+  },
+  {
+    "file": "android-17-desktop/multi-instance.webp",
+    "title": "App instance / window switcher row",
+    "source_url": "https://developer.android.com/static/images/design/ui/desktop/guides/desktop_pattern_multi-instance.webp",
+    "page_url": "https://developer.android.com/design/ui/desktop/guides/system/multi-task",
+    "retrieved": "2026-11-03",
+    "credit": "Android Developers (Google)",
+    "license": "CC BY 4.0 per Google Developers Site Policies",
+    "subject": "android-desktop",
+    "notes": "Rounded container of window thumbnails with app icon badges and an 'N more apps' pill."
+  },
+  {
+    "file": "android-17-desktop/desktop-header.webp",
+    "title": "Android desktop experience guidelines hero: composite of windowed, split, PiP and fullscreen app layouts",
+    "source_url": "https://developer.android.com/static/images/design/ui/desktop/desktop_header.webp",
+    "page_url": "https://developer.android.com/design/ui/desktop",
+    "retrieved": "2026-11-03",
+    "credit": "Android Developers (Google)",
+    "license": "CC BY 4.0 per Google Developers Site Policies",
+    "subject": "android-desktop",
+    "notes": "Design-guide composite (mock app content, real system chrome). Shows header bars in light and dark, split divider, taskbar, dense desktop layouts."
+  },
+  {
+    "file": "google-pc/googlebook-lineup.webp",
+    "title": "Googlebook lineup: Acer, ASUS, Dell, HP, Lenovo",
+    "source_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/30_Googlebook_lineup_video_ALT_N.width-1600.format-webp.webp",
+    "page_url": "https://blog.google/products-and-platforms/devices/googlebook/first-look-googlebook/",
+    "retrieved": "2026-11-03",
+    "credit": "Google (The Keyword blog)",
+    "license": "Google press imagery, all rights reserved; design reference only",
+    "subject": "google-pc",
+    "notes": "Hardware product image (official render). Each lid carries the multicolour glowbar."
+  },
+  {
+    "file": "google-pc/googlebook-glowbar.webp",
+    "title": "Googlebook glowbar on the lid",
+    "source_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Image_Glowbar.width-1600.format-webp.webp",
+    "page_url": "https://blog.google/products-and-platforms/platforms/android/meet-googlebook/",
+    "retrieved": "2026-11-03",
+    "credit": "Google (The Keyword blog, Alex Kuscher, 2026-05-12)",
+    "license": "Google press imagery, all rights reserved; design reference only",
+    "subject": "google-pc",
+    "notes": "Official render. Blue-green-yellow-red gradient light strip; Google's identifying design element for Googlebook."
+  },
+  {
+    "file": "google-pc/googlebook-capcut.webp",
+    "title": "CapCut on the Googlebook (Googlebook OS desktop with taskbar)",
+    "source_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/CapCut_from_Ram.width-1600.format-webp.webp",
+    "page_url": "https://blog.google/products-and-platforms/devices/googlebook/pre-order-googlebook/",
+    "retrieved": "2026-11-03",
+    "credit": "Google (The Keyword blog, John Solomon, 2026-09-21)",
+    "license": "Google press imagery, all rights reserved; design reference only",
+    "subject": "google-pc",
+    "notes": "Official marketing screenshot. Status bar: time+date top-left, icons top-right. Window header: icon+name+chevron left, minimize/maximize/close right. Floating rounded taskbar with 'G' launcher pill, divider, Gemini, Chrome, Gmail..."
+  },
+  {
+    "file": "google-pc/googlebook-os-desktop-widgets-9to5google.jpg",
+    "title": "Googlebook OS home screen with Android widgets and taskbar",
+    "source_url": "https://9to5google.com/wp-content/uploads/sites/4/2026/10/Googlebook-OS-review-6.jpg",
+    "page_url": "https://9to5google.com/2026/10/12/googlebook-os-review/",
+    "retrieved": "2026-11-03",
+    "credit": "9to5Google / Abner Li",
+    "license": "Copyright 9to5Google; press screenshot used as design reference only",
+    "subject": "google-pc",
+    "notes": "Real screenshot (some content redacted with green bars by the reviewer). Widgets with ~24dp-class corner radius, Dynamic Color tint; taskbar centred with 'G' pill, pinned apps, divider, running Gemini."
+  },
+  {
+    "file": "google-pc/googlebook-os-launcher-window-9to5google.jpg",
+    "title": "Googlebook OS floating app launcher (phone apps via Cast My Apps) next to a Messages window",
+    "source_url": "https://9to5google.com/wp-content/uploads/sites/4/2026/10/Googlebook-OS-review-8a.jpg",
+    "page_url": "https://9to5google.com/2026/10/12/googlebook-os-review/",
+    "retrieved": "2026-11-03",
+    "credit": "9to5Google / Abner Li",
+    "license": "Copyright 9to5Google; press screenshot used as design reference only",
+    "subject": "google-pc",
+    "notes": "Real screenshot. Launcher is a floating rounded panel anchored bottom-left above the taskbar, pill search field ('Search apps from Pixel 11 Pro') with a circular chevron button, 4-column icon grid."
+  },
+  {
+    "file": "google-pc/googlebook-os-multiwindow-9to5google.jpg",
+    "title": "Googlebook OS multiple freeform windows, media widget, taskbar",
+    "source_url": "https://9to5google.com/wp-content/uploads/sites/4/2026/10/Googlebook-OS-review-16.jpg",
+    "page_url": "https://9to5google.com/2026/10/12/googlebook-os-review/",
+    "retrieved": "2026-11-03",
+    "credit": "9to5Google / Abner Li",
+    "license": "Copyright 9to5Google; press screenshot used as design reference only",
+    "subject": "google-pc",
+    "notes": "Real screenshot. Header bars tinted per app, thin '_ [] X' glyphs, rounded window corners; running-app dash indicators under taskbar icons."
+  },
+  {
+    "file": "google-pc/googlebook-os-quick-settings-9to5google.jpg",
+    "title": "Googlebook OS Quick Settings panel",
+    "source_url": "https://9to5google.com/wp-content/uploads/sites/4/2026/10/Googlebook-OS-review-1.jpg",
+    "page_url": "https://9to5google.com/2026/10/12/googlebook-os-review/",
+    "retrieved": "2026-11-03",
+    "credit": "9to5Google / Abner Li",
+    "license": "Copyright 9to5Google; press screenshot used as design reference only",
+    "subject": "google-pc",
+    "notes": "Real screenshot. Pixel-style QS as a floating panel top-right: brightness + volume pill sliders, wide Wi-Fi/Bluetooth tiles, round-rect toggle tiles (on = filled primary). M3 Expressive cues: pill shapes, scalloped 'cookie' image mask in widget."
+  },
+  {
+    "file": "google-pc/googlebook-magic-pointer-androidauthority.jpg",
+    "title": "Magic Pointer prompt on an ASUS Googlebook 14",
+    "source_url": "https://www.androidauthority.com/wp-content/uploads/2026/09/ASUS-Googlebook-14-Magic-Pointer-scaled-1536w-864h.jpeg",
+    "page_url": "https://www.androidauthority.com/googlebooks-hands-on-impressions-3713390/",
+    "retrieved": "2026-11-03",
+    "credit": "Android Authority",
+    "license": "Copyright Android Authority; press photo used as design reference only",
+    "subject": "google-pc",
+    "notes": "Photo of the screen. Floating pill 'Point and select to ask Gemini' next to the cursor; translucent widgets over a gradient wallpaper."
+  }
+]

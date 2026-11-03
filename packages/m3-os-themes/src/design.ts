@@ -376,7 +376,7 @@ export function runDesign(o: DesignOptions): string[] {
     const winDir = join(out.dir, "icons/windows");
     writeFileSync(join(winDir, "bunos-icons.rc"), `${rc}\n`);
     sh(["llvm-rc", "/fo", join(work, "bunos-icons.res"), "bunos-icons.rc"], winDir);
-    sh(["lld-link", "/dll", "/noentry", "/machine:x64", "/nodefaultlib", "/release", `/out:${join(winDir, "bunos-icons.dll")}`, join(work, "bunos-icons.res")]);
+    sh(["lld-link", "/dll", "/noentry", "/machine:x64", "/nodefaultlib", "/release", "/Brepro", `/out:${join(winDir, "bunos-icons.dll")}`, join(work, "bunos-icons.res")]);
     log.push(`dll: ${winIcons.length * 2} icon groups`);
   }
 
