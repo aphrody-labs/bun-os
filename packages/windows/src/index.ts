@@ -4,6 +4,7 @@
 //   win32, registry, services, shell   bun:ffi (no build)
 //   winrt                              Node-API addon on windows-rs (native/napi)
 //   winui                              .NET host process on the Windows App SDK (native/winui-host)
+//   ntDriver                           bunos.sys client (BunOS device IOCTLs, bun:ffi)
 //   clean                              WinClean tool catalog: import "@aphrody/winclean" (re-exports the host below)
 //
 // @aphrody/winreg is now a re-export of ./registry; @aphrody/winclean keeps its public API.
@@ -13,5 +14,6 @@ export * as services from "./services";
 export * as shell from "./shell";
 export * as winrt from "./winrt";
 export * as winui from "./winui";
+export * as ntDriver from "./nt-driver";
 export * as provider from "./provider";
 export { WindowsError, type WindowsErrorCode } from "./errors";

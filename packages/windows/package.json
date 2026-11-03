@@ -24,6 +24,7 @@
     "./shell": "./src/shell.ts",
     "./winrt": "./src/winrt.ts",
     "./winui": "./src/winui.ts",
+    "./nt-driver": "./src/nt-driver.ts",
     "./provider": "./src/provider.ts",
     "./bun-plugin": "./src/bun-plugin.ts",
     "./fork/windows": "./src/fork/windows.ts",
