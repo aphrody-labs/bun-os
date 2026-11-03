@@ -398,15 +398,19 @@ class ThemeScreen extends StatelessWidget {
       if (settings.source == ThemeSource.seed) ...[
         Wrap(spacing: 12, runSpacing: 12, children: [
           for (final seed in seeds)
-            InkWell(
-              customBorder: const CircleBorder(),
-              onTap: () => settings.update((t) => t.seed = seed),
-              child: CircleAvatar(
-                radius: 22,
-                backgroundColor: Color(int.parse('ff${seed.substring(1)}', radix: 16)),
-                child: settings.seed == seed
-                    ? Icon(Symbols.check, color: rustScheme(seed, settings.variant, Theme.of(context).brightness)!.onPrimary)
-                    : null,
+            // 48 dp touch target (radius 24) with the seed as its accessible label.
+            Tooltip(
+              message: seed,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () => settings.update((t) => t.seed = seed),
+                child: CircleAvatar(
+                  radius: 24,
+                  backgroundColor: Color(int.parse('ff${seed.substring(1)}', radix: 16)),
+                  child: settings.seed == seed
+                      ? Icon(Symbols.check, color: rustScheme(seed, settings.variant, Theme.of(context).brightness)!.onPrimary)
+                      : null,
+                ),
               ),
             ),
         ]),

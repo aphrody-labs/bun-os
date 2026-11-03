@@ -41,6 +41,8 @@ export const APP_CONSUMERS = {
   flutter: "apps/bunos-flutter-store/lib/theme/bunos_tokens.g.dart",
   flutterManifest: "apps/bunos-flutter-store/web/manifest.json",
   flutterLinux: "apps/bunos-flutter-store/linux/runner/bunos_colors.g.h",
+  flutterAndroidLight: "apps/bunos-flutter-store/android/app/src/main/res/values/colors.xml",
+  flutterAndroidDark: "apps/bunos-flutter-store/android/app/src/main/res/values-night/colors.xml",
   cosmicLight: "packages/m3-os-themes/generated/cosmic/BunOS-light.ron",
   cosmicDark: "packages/m3-os-themes/generated/cosmic/BunOS-dark.ron",
   /** Desktop theme of the unified image (`bunos-theme-set bunos-m3`): COSMIC builder, Rio terminal, metadata. */
@@ -453,10 +455,15 @@ const snake = (name: string): string => name.replace(/[A-Z]/g, c => `_${c.toLowe
  * `res/values/colors.xml` (light, plus the launcher brand art colours) or `res/values-night/colors.xml` (dark): the
  * framework resource side of the same scheme, so the window, bars and splash follow DayNight before Compose draws.
  */
-export function generateAndroidColors(input: ThemeInput, mode: Mode): string {
+export function generateAndroidColors(
+  input: ThemeInput,
+  mode: Mode,
+  names: readonly string[] = ANDROID_ROLES,
+  launcher = true,
+): string {
   const roles = allModes(input)[mode === "dark" ? 1 : 0]!.roles;
-  const lines = ANDROID_ROLES.map(r => `    <color name="bunos_${snake(r)}">${role(roles, r).toUpperCase()}</color>`);
-  if (mode === "light")
+  const lines = names.map(r => `    <color name="bunos_${snake(r)}">${role(roles, r).toUpperCase()}</color>`);
+  if (launcher && mode === "light")
     lines.push(
       "    <!-- Launcher brand art: the product seed's primary / on-primary pair. -->",
       `    <color name="launcher_background">${role(roles, "primary").toUpperCase()}</color>`,
@@ -474,6 +481,9 @@ ${lines.join("\n")}
 }
 
 // -------------------------------------------------------------------------------------------- Flutter web and Linux
+
+/** Flutter Android LaunchTheme / NormalTheme window background before the first frame (values{,-night}/styles.xml). */
+export const FLUTTER_ANDROID_ROLES = ["surface"] as const;
 
 /** Flutter web manifest: `background_color` = light surface, `theme_color` = light primary of the product seed. */
 export function generateFlutterManifest(input: ThemeInput): string {
@@ -525,6 +535,12 @@ export function generateApps(input: ThemeInput, targets: readonly AppTarget[] = 
     out.push({ target: "flutter", path: APP_CONSUMERS.flutter, content: generateFlutter(input, tokens) });
     out.push({ target: "flutter", path: APP_CONSUMERS.flutterManifest, content: generateFlutterManifest(input) });
     out.push({ target: "flutter", path: APP_CONSUMERS.flutterLinux, content: generateFlutterLinux(input) });
+    for (const mode of ["light", "dark"] as const)
+      out.push({
+        target: "flutter",
+        path: mode === "light" ? APP_CONSUMERS.flutterAndroidLight : APP_CONSUMERS.flutterAndroidDark,
+        content: generateAndroidColors(input, mode, FLUTTER_ANDROID_ROLES, false),
+      });
   }
   if (targets.includes("cosmic")) {
     const [light, dark] = allModes(input);
