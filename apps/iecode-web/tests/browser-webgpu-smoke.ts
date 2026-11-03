@@ -14,7 +14,7 @@ type BrowserReport = {
   error?: string;
 };
 let resolveReport!: (value: BrowserReport) => void;
-const report = new Promise<BrowserReport>((resolve) => {
+const report = new Promise<BrowserReport>(resolve => {
   resolveReport = resolve;
 });
 // Original ARM homebrew configures red engine-A and blue engine-B backdrops.
@@ -61,8 +61,7 @@ program.push(0xe1c120b0);
 program.push(0xe3a00000, 0xe2800001, 0xeafffffd);
 for (const literal of literals) {
   const displacement = program.length * 4 - (literal.instruction * 4 + 8);
-  program[literal.instruction] =
-    0xe59f0000 | (literal.register << 12) | displacement;
+  program[literal.instruction] = 0xe59f0000 | (literal.register << 12) | displacement;
   program.push(literal.value);
 }
 words.setUint32(0x2c, program.length * 4, true);
@@ -108,10 +107,7 @@ const server = Bun.serve({
       return new Response(worker, {
         headers: { "Content-Type": "text/javascript" },
       });
-    if (
-      path === "/pkg/aphrody_dust_web.js" ||
-      path === "/pkg/aphrody_dust_web_bg.wasm"
-    ) {
+    if (path === "/pkg/aphrody_dust_web.js" || path === "/pkg/aphrody_dust_web_bg.wasm") {
       return new Response(Bun.file(new URL(path.slice(5), pkg)));
     }
     if (path !== "/") return new Response("Not found", { status: 404 });
@@ -151,17 +147,8 @@ const child = Bun.spawn(
     "--disable-dev-shm-usage",
     "--enable-unsafe-webgpu",
     ...(process.platform === "win32"
-      ? [
-          "--use-angle=d3d11",
-          "--use-webgpu-adapter=d3d12",
-          "--force-high-performance-gpu",
-        ]
-      : [
-          "--enable-features=Vulkan",
-          "--use-angle=vulkan",
-          "--use-vulkan=swiftshader",
-          "--disable-vulkan-surface",
-        ]),
+      ? ["--use-angle=d3d11", "--use-webgpu-adapter=d3d12", "--force-high-performance-gpu"]
+      : ["--enable-features=Vulkan", "--use-angle=vulkan", "--use-vulkan=swiftshader", "--disable-vulkan-surface"]),
     "--disable-background-networking",
     String(server.url),
   ],
@@ -176,24 +163,15 @@ try {
     })),
   ]);
   if (result.error) throw new Error(result.error);
-  if (result.frames !== "3")
-    throw new Error(`Expected 3 core frames: ${JSON.stringify(result)}`);
+  if (result.frames !== "3") throw new Error(`Expected 3 core frames: ${JSON.stringify(result)}`);
   // Independent native soft-renderer test verifies RGB6 62 for RGB5 maximum.
   // The WGPU shader normalizes by 63, producing RGBA8 round(62 / 63 * 255)=251.
-  if (
-    JSON.stringify(result.top) !== "[251,0,0,255]" ||
-    JSON.stringify(result.bottom) !== "[0,0,251,255]"
-  ) {
-    throw new Error(
-      `Guest-programmed DS backdrop mismatch: ${JSON.stringify(result)}`,
-    );
+  if (JSON.stringify(result.top) !== "[251,0,0,255]" || JSON.stringify(result.bottom) !== "[0,0,251,255]") {
+    throw new Error(`Guest-programmed DS backdrop mismatch: ${JSON.stringify(result)}`);
   }
   console.log(
     JSON.stringify({
-      backend:
-        process.platform === "win32"
-          ? "Chromium D3D12 WebGPU"
-          : "Chromium SwiftShader WebGPU",
+      backend: process.platform === "win32" ? "Chromium D3D12 WebGPU" : "Chromium SwiftShader WebGPU",
       ...result,
     }),
   );

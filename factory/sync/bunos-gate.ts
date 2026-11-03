@@ -41,10 +41,25 @@ export interface StepResult {
 
 const RUST = /(^|\/)(Cargo\.(toml|lock)|rust-toolchain\.toml|\.cargo\/config\.toml)$|\.rs$/;
 const BUN_SOURCE = /\.(?:[cm]?[jt]sx?)$/i;
+const BUN_TYPESCRIPT = /\.(?:[cm]?tsx?)$/i;
 const BUN_FORMAT = /\.(?:[cm]?[jt]sx?|jsonc?|mdx?|md|css|html|ya?ml|svg|svelte|vue)$/i;
 
 const IMAGE = /^factory\/images\//;
 const SELF = "factory/sync/bunos-gate.ts";
+
+/** Only current, tracked changes can be gate inputs; deletions still trigger `when` checks. */
+export function selectGateInputs(
+  changed: readonly string[],
+  presentTracked: ReadonlySet<string>,
+  exists: (path: string) => boolean,
+) {
+  const present = changed.filter(path => presentTracked.has(path) && exists(path));
+  return {
+    check: present.filter(path => BUN_TYPESCRIPT.test(path)),
+    lint: present.filter(path => BUN_SOURCE.test(path)),
+    format: present.filter(path => BUN_FORMAT.test(path)),
+  };
+}
 
 export function gateSteps(range: { since?: string; head: string } = { head: "HEAD" }): Step[] {
   const all: Step[] = [
@@ -165,7 +180,11 @@ async function runSteps(
   const results: StepResult[] = [];
   await ensureInstall(repo);
   const changedFiles = changed ?? (await git(repo, "diff", "--name-only", `${head}^`, head)).split("\n");
-  const sourceFiles = changedFiles.filter(path => BUN_SOURCE.test(path) && existsSync(join(repo, path)));
+  const base = since ?? `${head}^`;
+  const presentTracked = new Set(
+    (await git(repo, "diff", "--name-only", "--diff-filter=ACMRT", base, head)).split("\n").filter(Boolean),
+  );
+  const inputs = selectGateInputs(changedFiles, presentTracked, path => existsSync(join(repo, path)));
   for (const step of gateSteps({ since, head }).filter(step => select(step.name))) {
     if (step.when && changed && !changed.some(path => step.when!.test(path))) {
       results.push({ name: step.name, ok: true, skipped: "no matching change", seconds: 0 });
@@ -173,14 +192,20 @@ async function runSteps(
     }
     let argv = step.argv;
     if (step.name === "check" || step.name === "lint") {
-      if (!sourceFiles.length) {
-        results.push({ name: step.name, ok: true, skipped: "no changed Bun source files", seconds: 0 });
+      const files = step.name === "check" ? inputs.check : inputs.lint;
+      if (!files.length) {
+        results.push({
+          name: step.name,
+          ok: true,
+          skipped: step.name === "check" ? "no changed TypeScript files" : "no changed Bun source files",
+          seconds: 0,
+        });
         continue;
       }
-      argv = [...step.argv, ...sourceFiles];
+      argv = [...step.argv, ...files];
     }
     if (step.name === "format") {
-      const formatFiles = changedFiles.filter(path => BUN_FORMAT.test(path) && existsSync(join(repo, path)));
+      const formatFiles = inputs.format;
       if (!formatFiles.length) {
         results.push({ name: step.name, ok: true, skipped: "no changed Bun-formattable files", seconds: 0 });
         continue;

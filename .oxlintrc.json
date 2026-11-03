@@ -12,6 +12,8 @@
     "**/node_modules/**",
     "**/dist/**",
     "apps/aphrody-app/ui-dist/**",
+    "apps/iecode-web/pkg/**",
+    "apps/iecode-web/wii/pkg/**",
     "apps/webos/public/engine/esbuild/**",
     "apps/artcraft-web-app/app/public/jsm/libs/ammo.wasm.js",
     "packages/eslint-plugin-m3/test/fixtures/**",

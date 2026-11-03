@@ -2,4 +2,5 @@
 /package-lock.json
 /dist
 /pkg
+/wii/pkg
 /corresponding-source.tgz
