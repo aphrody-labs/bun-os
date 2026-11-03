@@ -130,7 +130,7 @@ export function DragDemo() {
 
 	return (
 		<div
-			className="p-8 space-y-6 bg-gray-900 text-white min-h-screen"
+			className="p-8 space-y-6 bg-app text-ink min-h-screen"
 			onMouseMove={handleMouseMove}
 			onMouseUp={handleMouseUp}
 			onMouseLeave={handleMouseUp}
@@ -144,12 +144,12 @@ export function DragDemo() {
 					{selectedFiles.map((file, idx) => (
 						<div
 							key={idx}
-							className={`bg-gray-800 p-4 rounded-lg border transition-colors cursor-move select-none ${
+							className={`bg-app-box p-4 rounded-lg border transition-colors cursor-move select-none ${
 								draggingFile === file
-									? "border-accent bg-blue-900/20"
+									? "border-accent bg-accent/10"
 									: selectedFile === file
-										? "border-green-500 bg-green-900/20"
-										: "border-gray-700 hover:border-accent"
+										? "border-success bg-success-container/40"
+										: "border-app-line hover:border-accent"
 							}`}
 							onMouseDown={(e) => {
 								e.preventDefault();
@@ -167,7 +167,7 @@ export function DragDemo() {
 									<div className="font-medium">
 										{file.split("/").pop()}
 									</div>
-									<div className="text-sm text-gray-400">
+									<div className="text-sm text-ink-dull">
 										{file}
 									</div>
 								</div>
@@ -175,7 +175,7 @@ export function DragDemo() {
 						</div>
 					))}
 				</div>
-				<p className="text-sm text-gray-400">
+				<p className="text-sm text-ink-dull">
 					Click and drag these files - move them out of the window to
 					start native drag!
 					<br />
@@ -190,14 +190,14 @@ export function DragDemo() {
 					{...dropZoneProps}
 					className={`
             border-2 border-dashed rounded-lg p-8 text-center transition-all
-            ${isHovered ? "border-accent bg-accent/10" : "border-gray-700 bg-gray-800/50"}
+            ${isHovered ? "border-accent bg-accent/10" : "border-app-line bg-app-box/50"}
           `}
 				>
 					<div className="text-4xl mb-2">{isHovered ? "" : ""}</div>
 					<div className="text-lg font-medium">
 						{isHovered ? "Drop files here" : "Drag files here"}
 					</div>
-					<div className="text-sm text-gray-400 mt-1">
+					<div className="text-sm text-ink-dull mt-1">
 						This drop zone accepts files from other Spacedrive
 						windows
 					</div>
@@ -207,24 +207,24 @@ export function DragDemo() {
 			{/* Status */}
 			<div className="space-y-2">
 				<h2 className="text-xl font-semibold">Status</h2>
-				<div className="bg-gray-800 p-4 rounded-lg space-y-2 font-mono text-sm">
+				<div className="bg-app-box p-4 rounded-lg space-y-2 font-mono text-sm">
 					<div>
-						<span className="text-gray-400">Dragging:</span>{" "}
+						<span className="text-ink-dull">Dragging:</span>{" "}
 						<span
 							className={
-								isDragging ? "text-green-400" : "text-gray-500"
+								isDragging ? "text-success" : "text-ink-faint"
 							}
 						>
 							{isDragging ? "Yes" : "No"}
 						</span>
 					</div>
 					<div>
-						<span className="text-gray-400">
+						<span className="text-ink-dull">
 							Drop zone hovered:
 						</span>{" "}
 						<span
 							className={
-								isHovered ? "text-blue-400" : "text-gray-500"
+								isHovered ? "text-accent" : "text-ink-faint"
 							}
 						>
 							{isHovered ? "Yes" : "No"}
@@ -232,8 +232,8 @@ export function DragDemo() {
 					</div>
 					{cursorPosition && (
 						<div>
-							<span className="text-gray-400">Cursor:</span>{" "}
-							<span className="text-gray-300">
+							<span className="text-ink-dull">Cursor:</span>{" "}
+							<span className="text-ink">
 								({Math.round(cursorPosition.x)},{" "}
 								{Math.round(cursorPosition.y)})
 							</span>
@@ -242,7 +242,7 @@ export function DragDemo() {
 				</div>
 			</div>
 
-			<div className="text-sm text-gray-500 border-t border-gray-800 pt-4">
+			<div className="text-sm text-ink-faint border-t border-app-line pt-4">
 				<p className="font-semibold mb-2">How it works:</p>
 				<ul className="list-disc list-inside space-y-1">
 					<li>

@@ -130,7 +130,7 @@ export function CopyJobDetails({ job, speedHistory }: CopyJobDetailsProps) {
                   ) : file.status === "copying" ? (
                     <Spinner size={14} className="text-accent animate-spin flex-shrink-0" />
                   ) : file.status === "failed" ? (
-                    <X size={14} weight="bold" className="text-red-500 flex-shrink-0" />
+                    <X size={14} weight="bold" className="text-error flex-shrink-0" />
                   ) : file.status === "skipped" ? (
                     <Circle size={14} weight="bold" className="text-ink-dull flex-shrink-0" />
                   ) : (
@@ -153,7 +153,7 @@ export function CopyJobDetails({ job, speedHistory }: CopyJobDetailsProps) {
                       "text-xs font-medium truncate",
                       file.status === "completed" && "text-ink-dull",
                       file.status === "copying" && "text-ink",
-                      file.status === "failed" && "text-red-400",
+                      file.status === "failed" && "text-error",
                       file.status === "skipped" && "text-ink-dull",
                       file.status === "pending" && "text-ink"
                     )}>

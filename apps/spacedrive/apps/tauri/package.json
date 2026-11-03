@@ -37,7 +37,9 @@
 	},
 	"devDependencies": {
 		"@headlessui/tailwindcss": "^0.2.0",
-		"@spacedrive/tokens": "catalog:",
+		"@aphrody/m3-fonts": "workspace:*",
+		"@aphrody/m3-theme": "workspace:*",
+		"@aphrody/m3-tokens": "workspace:*",
 		"@vitejs/plugin-react-swc": "^4.0.0",
 		"@tailwindcss/forms": "^0.5.7",
 		"@tailwindcss/typography": "catalog:",

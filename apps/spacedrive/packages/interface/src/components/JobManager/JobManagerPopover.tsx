@@ -46,7 +46,7 @@ export function JobManagerPopover({ className }: JobManagerPopoverProps) {
           </div>
           <span>Jobs</span>
           {activeJobCount > 0 && (
-            <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-accent rounded-full">
+            <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-on-primary bg-accent rounded-full">
               {activeJobCount}
             </span>
           )}

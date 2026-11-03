@@ -143,9 +143,9 @@ export function JobRow({ job, onPause, onResume, onCancel }: JobRowProps) {
 							job.status === "completed" &&
 								"bg-app-line/30 text-ink-dull",
 							job.status === "failed" &&
-								"bg-red-500/10 text-red-500",
+								"bg-error/10 text-error",
 							job.status === "paused" &&
-								"bg-yellow-500/10 text-yellow-500",
+								"bg-tertiary/10 text-tertiary",
 							job.status === "queued" &&
 								"bg-app-line/20 text-ink-dull",
 						)}
@@ -174,10 +174,10 @@ export function JobRow({ job, onPause, onResume, onCancel }: JobRowProps) {
 					{canCancel && (
 						<button
 							onClick={handleCancel}
-							className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-app-box hover:bg-red-500 transition-colors"
+							className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-app-box hover:bg-error transition-colors"
 							title="Cancel job"
 						>
-							<X size={12} weight="bold" className="text-ink hover:text-white" />
+							<X size={12} weight="bold" className="text-ink hover:text-on-error" />
 						</button>
 					)}
 				</div>

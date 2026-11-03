@@ -22,14 +22,14 @@ export function DragOverlay() {
 
   return (
     <div className="flex items-center justify-center w-full h-full bg-transparent select-none">
-      <div className="bg-blue-600 text-white px-4 py-3 rounded-lg shadow-2xl border-2 border-blue-400">
+      <div className="bg-primary text-on-primary px-4 py-3 rounded-lg shadow-2xl border-2 border-primary-container">
         <div className="flex items-center gap-3">
           <div className="text-2xl"></div>
           <div>
             <div className="font-semibold text-sm">
               {itemCount} {itemCount === 1 ? 'file' : 'files'}
             </div>
-            <div className="text-xs text-blue-100 opacity-80">
+            <div className="text-xs text-on-primary/80">
               {session.config.items[0]?.kind.type === 'file'
                 ? session.config.items[0].kind.path.split('/').pop()
                 : 'Dragging...'}

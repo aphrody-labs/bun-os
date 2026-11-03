@@ -229,10 +229,10 @@ function FileCopyCardContent({
 						{canCancel && (
 							<button
 								onClick={onCancel}
-								className="flex-shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-app-hover hover:bg-red-500 transition-colors"
+								className="flex-shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-app-hover hover:bg-error transition-colors"
 								title="Cancel job"
 							>
-								<X size={10} weight="bold" className="text-ink hover:text-white" />
+								<X size={10} weight="bold" className="text-ink hover:text-on-error" />
 							</button>
 						)}
 					</div>

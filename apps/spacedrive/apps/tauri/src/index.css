@@ -1,12 +1,11 @@
 @import "tailwindcss";
-@import "@spacedrive/tokens/theme";
-@import "@spacedrive/tokens/css";
-@import "@spacedrive/tokens/css/themes/light";
-@import "@spacedrive/tokens/css/themes/midnight";
-@import "@spacedrive/tokens/css/themes/noir";
-@import "@spacedrive/tokens/css/themes/slate";
-@import "@spacedrive/tokens/css/themes/nord";
-@import "@spacedrive/tokens/css/themes/mocha";
+/* Theme reset and type scale first, then the Bun OS token sheets: M3 static tokens, the SpaceUI themes as M3
+   schemes (with the SpaceUI aliases), the M3 role utilities, and the m3-fonts typefaces. */
+@import "@sd/interface/theme.css";
+@import "@aphrody/m3-fonts/fonts.css";
+@import "@aphrody/m3-tokens/m3-tokens.css";
+@import "@aphrody/m3-theme/spaceui.css";
+@import "@aphrody/m3-theme/tailwind.css";
 
 /* Tell Tailwind v4 where to scan for utility classes */
 @source "../../../packages/ui/src";
@@ -73,9 +72,7 @@
 
 body {
 	margin: 0;
-	font-family:
-		-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-		"Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+	font-family: var(--md-ref-typeface-plain);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }

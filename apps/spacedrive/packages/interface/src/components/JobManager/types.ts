@@ -4,13 +4,14 @@ import type { JsonValue, ExtendedJobListItem, GenericProgress } from "@sd/ts-cli
 export type JobListItem = ExtendedJobListItem;
 export type { GenericProgress };
 
+// Status colours are M3 roles (@aphrody/m3-theme/spaceui.css), so they follow the active scheme.
 export const JOB_STATUS_COLORS = {
-  running: "rgb(0, 122, 255)",
-  completed: "rgb(52, 199, 89)",
-  failed: "rgb(255, 59, 48)",
-  paused: "rgb(255, 149, 0)",
-  queued: "rgba(255, 255, 255, 0.5)",
-  cancelled: "rgb(255, 59, 48)",
+  running: "var(--md-sys-color-primary)",
+  completed: "var(--md-ext-color-success)",
+  failed: "var(--md-sys-color-error)",
+  paused: "var(--md-sys-color-tertiary)",
+  queued: "var(--md-sys-color-outline)",
+  cancelled: "var(--md-sys-color-error)",
 } as const;
 
 export const CARD_HEIGHT = 72; // px

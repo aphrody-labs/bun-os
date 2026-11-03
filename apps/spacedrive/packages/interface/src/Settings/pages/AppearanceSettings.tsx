@@ -17,21 +17,22 @@ import {useAppConfig} from '../useConfig';
 interface Theme {
 	id: string;
 	name: string;
-	/** Window fill used by the tile preview */
-	surface: string;
-	/** True for themes whose preview needs dark-on-light content bars */
-	light?: boolean;
+	/**
+	 * Scheme class from @aphrody/m3-theme/spaceui.css applied to the tile preview, so the tile renders
+	 * that theme's own surface and on-surface roles. Empty for System, which previews the active scheme.
+	 */
+	scheme: string;
 }
 
 const THEMES: Theme[] = [
-	{id: 'system', name: 'System', surface: 'bg-app'},
-	{id: 'light', name: 'Light', surface: 'bg-white', light: true},
-	{id: 'dark', name: 'Dark', surface: 'bg-[hsl(235,15%,13%)]'},
-	{id: 'midnight', name: 'Midnight', surface: 'bg-[hsl(240,30%,4%)]'},
-	{id: 'noir', name: 'Noir', surface: 'bg-[hsl(0,0%,3%)]'},
-	{id: 'slate', name: 'Slate', surface: 'bg-[hsl(220,8%,9%)]'},
-	{id: 'nord', name: 'Nord', surface: 'bg-[hsl(220,18%,12%)]'},
-	{id: 'mocha', name: 'Mocha', surface: 'bg-[hsl(25,18%,10%)]'}
+	{id: 'system', name: 'System', scheme: ''},
+	{id: 'light', name: 'Light', scheme: 'vanilla-theme'},
+	{id: 'dark', name: 'Dark', scheme: 'dark'},
+	{id: 'midnight', name: 'Midnight', scheme: 'midnight-theme'},
+	{id: 'noir', name: 'Noir', scheme: 'noir-theme'},
+	{id: 'slate', name: 'Slate', scheme: 'slate-theme'},
+	{id: 'nord', name: 'Nord', scheme: 'nord-theme'},
+	{id: 'mocha', name: 'Mocha', scheme: 'mocha-theme'}
 ];
 
 const LAYOUTS: {id: ShellLayoutMode; name: string; description: string}[] = [
@@ -192,25 +193,15 @@ export function AppearanceSettings() {
 									>
 										<div
 											className={clsx(
-												'flex h-full flex-col gap-1 p-2',
-												option.surface
+												'flex h-full flex-col gap-1 bg-app p-2',
+												option.scheme
 											)}
 										>
 											<div
-												className={clsx(
-													'h-1 w-3/4 rounded-full',
-													option.light
-														? 'bg-black/20'
-														: 'bg-white/25'
-												)}
+												className="bg-ink/25 h-1 w-3/4 rounded-full"
 											/>
 											<div
-												className={clsx(
-													'h-1 w-1/2 rounded-full',
-													option.light
-														? 'bg-black/10'
-														: 'bg-white/10'
-												)}
+												className="bg-ink/10 h-1 w-1/2 rounded-full"
 											/>
 										</div>
 									</div>

@@ -1,0 +1,34 @@
+/*
+ * Spacedrive Tailwind theme on the Bun OS design system.
+ *
+ * apps/tauri and apps/web import this right after `tailwindcss` and before the token sheets
+ * (@aphrody/m3-tokens/m3-tokens.css, @aphrody/m3-theme/spaceui.css, @aphrody/m3-theme/tailwind.css).
+ * The reset drops the Tailwind default palette, as upstream SpaceUI did, so the only colour utilities
+ * are the M3 roles (`bg-surface-container`, `text-on-primary`, `bg-scrim/50`, ...) and the SpaceUI
+ * aliases (`bg-app-box`, `text-ink-dull`, ...) that spaceui.css maps onto those roles.
+ */
+@theme {
+	--color-*: initial;
+
+	/*
+	 * design:content: ink and shade for controls drawn over arbitrary media pixels (video, audio
+	 * artwork, image and 3D previews, thumbnails). No scheme role keeps contrast over unknown
+	 * pixels, so these stay fixed in every theme; chrome never uses them.
+	 */
+	--color-media-ink: #ffffff;
+	--color-media-shade: #000000;
+
+	/* Spacedrive's tighter type scale (upstream SpaceUI). */
+	--text-tiny: 0.7rem;
+	--text-xs: 0.75rem;
+	--text-sm: 0.8rem;
+	--text-base: 1rem;
+	--text-lg: 1.125rem;
+	--text-xl: 1.25rem;
+	--text-2xl: 1.5rem;
+	--text-3xl: 1.875rem;
+	--text-4xl: 2.25rem;
+	--text-5xl: 3rem;
+	--text-6xl: 4rem;
+	--text-7xl: 5rem;
+}

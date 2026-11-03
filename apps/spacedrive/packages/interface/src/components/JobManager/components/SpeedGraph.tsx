@@ -120,8 +120,8 @@ function SpeedGraphVisualization({
         <defs>
         {/* Gradient fill for area under curve */}
         <linearGradient id={`speed-gradient-${jobId}`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="rgb(0, 122, 255)" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="rgb(0, 122, 255)" stopOpacity="0.05" />
+          <stop offset="0%" style={{ stopColor: "var(--md-sys-color-primary)" }} stopOpacity="0.3" />
+          <stop offset="100%" style={{ stopColor: "var(--md-sys-color-primary)" }} stopOpacity="0.05" />
         </linearGradient>
       </defs>
 
@@ -135,7 +135,8 @@ function SpeedGraphVisualization({
             y1={y}
             x2={width - padding.right}
             y2={y}
-            stroke="rgba(255, 255, 255, 0.05)"
+            className="stroke-outline-variant"
+            strokeOpacity="0.5"
             strokeWidth="1"
           />
         );
@@ -154,7 +155,7 @@ function SpeedGraphVisualization({
         <path
           d={linePath}
           fill="none"
-          stroke="rgb(0, 122, 255)"
+          className="stroke-primary"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -167,8 +168,8 @@ function SpeedGraphVisualization({
           cx={points[points.length - 1].x}
           cy={points[points.length - 1].y}
           r="3"
-          fill="rgb(0, 122, 255)"
-          stroke="rgba(0, 0, 0, 0.3)"
+          className="fill-primary stroke-shadow"
+          strokeOpacity="0.3"
           strokeWidth="1.5"
         />
       )}

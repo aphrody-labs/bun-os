@@ -10,7 +10,9 @@
 	},
 	"dependencies": {
 		"@sd/interface": "workspace:*",
-		"@spacedrive/tokens": "catalog:",
+		"@aphrody/m3-fonts": "workspace:*",
+		"@aphrody/m3-theme": "workspace:*",
+		"@aphrody/m3-tokens": "workspace:*",
 		"react": "catalog:",
 		"react-dom": "catalog:"
 	},
