@@ -487,6 +487,14 @@ footer > a:last-child {
   padding: 10px 18px;
   min-height: 44px;
 }
+.not-found {
+  min-height: calc(100dvh - 240px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-block: 80px;
+}
 .sr-only {
   position: absolute;
   width: 1px;

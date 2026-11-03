@@ -4,12 +4,35 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#151718">
-  <meta name="description" content="A considered workspace for your next idea. Explore Craft's creative and productivity studios, directly in your browser.">
-  <title>Craft — A space for your next idea.</title>
-  <link rel="icon" href="/aphrody-icon.png">
+  <meta name="theme-color" content="{{THEME_COLOR}}">
+  <title>Craft by Aphrody: creative and productivity studios in your browser</title>
+  <meta name="description" content="{{DESCRIPTION}}">
+  <link rel="canonical" href="{{BASE_URL}}/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Craft by Aphrody">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:url" content="{{BASE_URL}}/">
+  <meta property="og:title" content="Craft: a space for your next idea">
+  <meta property="og:description" content="{{DESCRIPTION}}">
+  <meta property="og:image" content="{{BASE_URL}}/og.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Craft by Aphrody, with previews of the PhotoCraft, FilmCraft and WordCraft studios">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Craft: a space for your next idea">
+  <meta name="twitter:description" content="{{DESCRIPTION}}">
+  <meta name="twitter:image" content="{{BASE_URL}}/og.png">
+  <meta name="twitter:image:alt" content="Craft by Aphrody, with previews of the PhotoCraft, FilmCraft and WordCraft studios">
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="describedby" type="text/markdown" href="/llms.txt">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="stylesheet" href="/craft.css">
   <script src="/craft.js" defer></script>
+  <script type="application/ld+json">{{JSON_LD}}</script>
 </head>
 <body>
   <a class="skip" href="#studios">Skip to studios</a>
@@ -35,15 +58,15 @@
     <section class="studios wrap" id="studios" aria-labelledby="studio-title">
       <div class="section-heading"><div><p class="eyebrow">YOUR TOOLKIT, REIMAGINED</p><h2 id="studio-title">One idea. Endless possibilities.</h2></div><p>Choose a craft.<br>Make it your own.</p></div>
       <div class="tools">
-        <div class="filters" role="group" aria-label="Filter studios"><button type="button" data-filter="all" aria-pressed="true">All studios <span>14</span></button><button type="button" data-filter="visual" aria-pressed="false">Design &amp; image</button><button type="button" data-filter="motion" aria-pressed="false">Video &amp; audio</button><button type="button" data-filter="work" aria-pressed="false">Documents &amp; data</button></div>
+        <div class="filters" role="group" aria-label="Filter studios"><button type="button" data-filter="all" aria-pressed="true">All studios <span>{{COUNT}}</span></button><button type="button" data-filter="visual" aria-pressed="false">Design &amp; image</button><button type="button" data-filter="motion" aria-pressed="false">Video &amp; audio</button><button type="button" data-filter="work" aria-pressed="false">Documents &amp; data</button></div>
         <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="sr-only">Search studios</span><input type="search" placeholder="Find a studio…" autocomplete="off" id="studio-search"></label>
       </div>
-      <p class="sr-only" id="result-count" role="status" aria-live="polite" aria-atomic="true">14 studios available</p>
+      <p class="sr-only" id="result-count" role="status" aria-live="polite" aria-atomic="true">{{COUNT}} studios available</p>
       <div class="grid">{{CARDS}}</div>
       <div class="empty" hidden><h3>No studios found</h3><p>Try another name or choose a different category.</p><button type="button" id="reset">Show all studios</button></div>
     </section>
     <section class="about wrap" id="about" aria-labelledby="about-title"><div><p class="eyebrow">MADE FOR MAKING</p><h2 id="about-title">Stay in your flow.</h2><p>Your tools should make space for your work.<br>Craft brings focused editors together, one studio at a time.</p></div><dl><div><dt>01 / A focused workspace</dt><dd>A dedicated studio for each kind of work. Nothing between you and your next step.</dd></div><div><dt>02 / Ready in your browser</dt><dd>Open the editor you need, without installing a desktop application.</dd></div><div><dt>03 / Room to explore</dt><dd>Move between image, motion, sound and documents as your ideas take shape.</dd></div></dl></section>
   </main>
-  <footer class="wrap"><a class="brand" href="/">craft<span class="brand-by">by Aphrody</span></a><p>A little space. A lot of possibility.</p><a href="#hero-title">Back to top ↑</a></footer>
+  <footer class="wrap"><a class="brand" href="/">craft<span class="brand-by">by Aphrody</span></a><p>A little space. A lot of possibility.</p><a href="#hero-title">Back to top <span aria-hidden="true">↑</span></a></footer>
 </body>
 </html>
