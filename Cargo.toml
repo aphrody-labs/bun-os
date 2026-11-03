@@ -44,6 +44,7 @@ members = [
   "crates/bunos-win11",
   "crates/bunos-win11-chrome",
   "crates/bunos-win11-wallpaper",
+  "crates/bunos-nt-proto",
   "crates/aphrody-shell-session",
   "crates/aphrody-shell-vfs",
   "crates/aphrody-terminal-core",

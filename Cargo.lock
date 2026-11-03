@@ -8616,6 +8616,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "bunos-nt-proto"
+version = "1.4.7"
+
+[[package]]
 name = "bunos-utils"
 version = "1.4.7"
 dependencies = [

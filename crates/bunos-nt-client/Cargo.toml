@@ -16,6 +16,9 @@ publish = false
 name = "bunos-nt"
 path = "src/main.rs"
 
+[dependencies]
+bunos-nt-proto = { path = "../bunos-nt-proto" }
+
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62.2", default-features = false, features = [
   "Win32_Foundation",

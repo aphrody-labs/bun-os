@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# The bunos.sys wire contract (control codes, fixed little-endian layouts, strict parsers), shared by the kernel driver
+# (crates/bunos-nt-driver, no_std), the windows-rs client (crates/bunos-nt-client), WinClean and the WSL bridge.
+# Dependency-free and no_std so the kernel and the host tests run the very same parsing code.
+[package]
+name = "bunos-nt-proto"
+version = "1.4.7"
+edition = "2024"
+license = "Apache-2.0"
+description = "Bun OS bunos.sys IOCTL contract: control codes, event records and strict, fuzz-tested parsers (no_std)."
+publish = false
+
+[lib]
+path = "src/lib.rs"
