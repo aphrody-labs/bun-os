@@ -197,6 +197,17 @@ export const TOOL_NAMES = [
   "nt_events_stop",
   "nt_handles",
   "nt_kernel_modules",
+  "wmi_query",
+  "com_invoke",
+  "shell_known_folders",
+  "shell_drives",
+  "shell_file_operation",
+  "shell_recycle_bin",
+  "shell_context_menu",
+  "shell_properties",
+  "shell_thumbnail",
+  "shell_open_with",
+  "shell_reveal",
 ] as const;
 export type ToolName = (typeof TOOL_NAMES)[number];
 
@@ -2727,6 +2738,180 @@ export interface NtKernelModulesArgs {
   limit?: number;
 }
 
+/** Arguments for `wmi_query`. */
+export interface WmiQueryArgs {
+  /**
+   * WQL, e.g. SELECT Name, ProcessId FROM Win32_Process
+   */
+  query: string;
+  /**
+   * Namespace, default ROOTCIMV2
+   */
+  namespace?: string;
+  /**
+   * Maximum rows.
+   */
+  limit?: number;
+}
+
+/** Arguments for `com_invoke`. */
+export interface ComInvokeArgs {
+  /**
+   * ProgID, e.g. Shell.Application, WScript.Shell, Excel.Application
+   */
+  progId?: string;
+  /**
+   * CLSID alternative to progId
+   */
+  clsid?: string;
+  /**
+   * Attach to a running instance (GetActiveObject) instead of creating one.
+   */
+  attach?: boolean;
+  /**
+   * [{name, op: auto|get|call|put, args: [...], value}]
+   */
+  steps?: Record<string, unknown>[];
+  /**
+   * {properties: [names], limit} to enumerate the final collection.
+   */
+  enumerate?: unknown;
+  /**
+   * Properties to read from the final object.
+   */
+  properties?: string[];
+}
+
+/** Arguments for `shell_known_folders`. */
+export interface ShellKnownFoldersArgs {}
+
+/** Arguments for `shell_drives`. */
+export interface ShellDrivesArgs {}
+
+/** Arguments for `shell_file_operation`. */
+export interface ShellFileOperationArgs {
+  /**
+   * copy | move | rename | delete | recycle | newFolder
+   */
+  op: string;
+  /**
+   * One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).
+   */
+  items?: string;
+  /**
+   * Destination folder for copy/move/newFolder.
+   */
+  destination?: string;
+  /**
+   * New name for rename/newFolder, or the target name for a single copy/move.
+   */
+  newName?: string;
+  /**
+   * Show Explorer's progress and conflict UI.
+   */
+  ui?: boolean;
+}
+
+/** Arguments for `shell_recycle_bin`. */
+export interface ShellRecycleBinArgs {
+  /**
+   * list | restore | empty
+   */
+  action?: string;
+  /**
+   * One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).
+   */
+  names?: string;
+  /**
+   * Required for empty.
+   */
+  confirm?: boolean;
+}
+
+/** Arguments for `shell_context_menu`. */
+export interface ShellContextMenuArgs {
+  /**
+   * One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).
+   */
+  path: string;
+  /**
+   * list | invoke
+   */
+  action?: string;
+  /**
+   * Canonical verb to invoke.
+   */
+  verb?: string;
+  /**
+   * Menu id from list.
+   */
+  id?: number;
+  /**
+   * Keep the process alive while dialogs opened by the verb are visible (default true).
+   */
+  wait?: boolean;
+}
+
+/** Arguments for `shell_properties`. */
+export interface ShellPropertiesArgs {
+  /**
+   * One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).
+   */
+  path: string;
+  /**
+   * read | dialog
+   */
+  action?: string;
+}
+
+/** Arguments for `shell_thumbnail`. */
+export interface ShellThumbnailArgs {
+  /**
+   * One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).
+   */
+  path: string;
+  /**
+   * Edge in pixels (default 256).
+   */
+  size?: number;
+  /**
+   * PNG output path.
+   */
+  output?: string;
+}
+
+/** Arguments for `shell_open_with`. */
+export interface ShellOpenWithArgs {
+  /**
+   * One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).
+   */
+  path?: string;
+  /**
+   * Extension (.txt) or URL protocol (https:).
+   */
+  extension?: string;
+  /**
+   * list | invoke | default
+   */
+  action?: string;
+  /**
+   * Handler for invoke.
+   */
+  handler?: string;
+  /**
+   * Only recommended handlers.
+   */
+  recommended?: boolean;
+}
+
+/** Arguments for `shell_reveal`. */
+export interface ShellRevealArgs {
+  /**
+   * One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).
+   */
+  path: string;
+}
+
 export type ToolArgsMap = {
   analyze_pe: AnalyzePeArgs;
   aob_scan: AobScanArgs;
@@ -2921,6 +3106,17 @@ export type ToolArgsMap = {
   nt_events_stop: NtEventsStopArgs;
   nt_handles: NtHandlesArgs;
   nt_kernel_modules: NtKernelModulesArgs;
+  wmi_query: WmiQueryArgs;
+  com_invoke: ComInvokeArgs;
+  shell_known_folders: ShellKnownFoldersArgs;
+  shell_drives: ShellDrivesArgs;
+  shell_file_operation: ShellFileOperationArgs;
+  shell_recycle_bin: ShellRecycleBinArgs;
+  shell_context_menu: ShellContextMenuArgs;
+  shell_properties: ShellPropertiesArgs;
+  shell_thumbnail: ShellThumbnailArgs;
+  shell_open_with: ShellOpenWithArgs;
+  shell_reveal: ShellRevealArgs;
 };
 
 /** One typed async method per WinClean tool. */
@@ -4291,5 +4487,82 @@ export abstract class GeneratedTools {
    */
   ntKernelModules(args?: NtKernelModulesArgs): Promise<ToolResult> {
     return this.call("nt_kernel_modules", args);
+  }
+
+  /**
+   * Runs a WQL query against any WMI/CIM namespace in-process (IWbemServices::ExecQuery), the equivalent of Get-CimInstance/wmic, and returns every non-system property of each instance as JSON. Read-only.
+   */
+  wmiQuery(args: WmiQueryArgs): Promise<ToolResult> {
+    return this.call("wmi_query", args);
+  }
+
+  /**
+   * Late-bound COM automation (IDispatch), the equivalent of New-Object -ComObject / CreateObject: creates or attaches to an object by progId or clsid, walks steps of property gets, method calls and property puts, and optionally enumerates the resulting collection (_NewEnum) reading chosen properties. Arguments {"$step":n} pass the object produced by step n (0 = root). Can change state, depending on the members called.
+   */
+  comInvoke(args?: ComInvokeArgs): Promise<ToolResult> {
+    return this.call("com_invoke", args);
+  }
+
+  /**
+   * Lists every registered Windows known folder (IKnownFolderManager): id, canonical name, category, current path (null for virtual folders) and parsing name. Read-only.
+   */
+  shellKnownFolders(args?: ShellKnownFoldersArgs): Promise<ToolResult> {
+    return this.call("shell_known_folders", args);
+  }
+
+  /**
+   * Lists logical drives with type, label, filesystem, serial and free/total bytes. Read-only.
+   */
+  shellDrives(args?: ShellDrivesArgs): Promise<ToolResult> {
+    return this.call("shell_drives", args);
+  }
+
+  /**
+   * Runs a file operation through IFileOperation, Explorer's engine (undo history, Recycle Bin, copy hooks; Explorer progress and conflict dialogs when ui=true): op copy|move|rename|delete|recycle|newFolder. delete is permanent; recycle sends to the Recycle Bin.
+   */
+  shellFileOperation(args: ShellFileOperationArgs): Promise<ToolResult> {
+    return this.call("shell_file_operation", args);
+  }
+
+  /**
+   * The Recycle Bin: action list (name, original folder, date deleted, parsing name), restore (names = display names, original paths or parsing names; uses the Restore verb) or empty (permanent; requires confirm=true).
+   */
+  shellRecycleBin(args?: ShellRecycleBinArgs): Promise<ToolResult> {
+    return this.call("shell_recycle_bin", args);
+  }
+
+  /**
+   * Explorer's context menu for an item via IContextMenu, including third-party shell extensions: action list returns {id,label,verb,enabled} flattened with 'Parent > Child' labels; action invoke runs one by verb (e.g. open, edit, properties, runas, undelete) or by id from list.
+   */
+  shellContextMenu(args: ShellContextMenuArgs): Promise<ToolResult> {
+    return this.call("shell_context_menu", args);
+  }
+
+  /**
+   * Property system of an item: action read returns every value by canonical name (System.Size, System.Media.Duration, ...); action dialog opens Explorer's Properties sheet and waits until it is closed.
+   */
+  shellProperties(args: ShellPropertiesArgs): Promise<ToolResult> {
+    return this.call("shell_properties", args);
+  }
+
+  /**
+   * Renders the thumbnail Explorer shows (registered IThumbnailProvider, else the icon) through IShellItemImageFactory as PNG, written to output or returned base64. Read-only.
+   */
+  shellThumbnail(args: ShellThumbnailArgs): Promise<ToolResult> {
+    return this.call("shell_thumbnail", args);
+  }
+
+  /**
+   * "Open with": action list returns the handlers for an extension or path (SHAssocEnumHandlers: name, UI name, recommended, icon) and the current default ProgID (IApplicationAssociationRegistration); action invoke opens path with a handler matched by name, executable or UI name; action default returns only the default for an extension or URL protocol.
+   */
+  shellOpenWith(args?: ShellOpenWithArgs): Promise<ToolResult> {
+    return this.call("shell_open_with", args);
+  }
+
+  /**
+   * Opens an Explorer window on the item's folder with the item selected (SHOpenFolderAndSelectItems).
+   */
+  shellReveal(args: ShellRevealArgs): Promise<ToolResult> {
+    return this.call("shell_reveal", args);
   }
 }

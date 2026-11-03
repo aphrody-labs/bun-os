@@ -1,8 +1,8 @@
 {
   "$schema": "https://aphrody.dev/schemas/tool-migration-v1.json",
   "catalog": "src/tools.json",
-  "catalog_sha256": "521b8226e704874a1c4f1a5db1db813466207328f4117152bcd958634221655c",
-  "catalog_tool_count": 193,
+  "catalog_sha256": "72af62ea9ca9d0aed6203782553731d7b05165bb9407b2ad3c69251ae66083b7",
+  "catalog_tool_count": 204,
   "state": "complete",
   "tools": [
     "analyze_pe",
@@ -197,7 +197,18 @@
     "nt_events_read",
     "nt_events_stop",
     "nt_handles",
-    "nt_kernel_modules"
+    "nt_kernel_modules",
+    "wmi_query",
+    "com_invoke",
+    "shell_known_folders",
+    "shell_drives",
+    "shell_file_operation",
+    "shell_recycle_bin",
+    "shell_context_menu",
+    "shell_properties",
+    "shell_thumbnail",
+    "shell_open_with",
+    "shell_reveal"
   ],
   "owner_rules": [
     {
@@ -452,7 +463,18 @@
     "nt_events_read": "rust",
     "nt_events_stop": "rust",
     "nt_handles": "rust",
-    "nt_kernel_modules": "rust"
+    "nt_kernel_modules": "rust",
+    "wmi_query": "rust",
+    "com_invoke": "rust",
+    "shell_known_folders": "rust",
+    "shell_drives": "rust",
+    "shell_file_operation": "rust",
+    "shell_recycle_bin": "rust",
+    "shell_context_menu": "rust",
+    "shell_properties": "rust",
+    "shell_thumbnail": "rust",
+    "shell_open_with": "rust",
+    "shell_reveal": "rust"
   },
   "native_rust_tools": [
     "winml_get_version",
@@ -460,5 +482,5 @@
     "winml_list_providers",
     "winml_run_float32"
   ],
-  "note": "The catalog is frozen for compatibility. Ownership is selected by the first matching rule; all 193 tools are implemented and dispatched by the Rust owner. dispatch_overrides and native_rust_tools remain as explicit migration evidence for compatibility tooling."
+  "note": "The catalog is frozen for compatibility. Ownership is selected by the first matching rule; all 204 tools are implemented and dispatched by the Rust owner. dispatch_overrides and native_rust_tools remain as explicit migration evidence for compatibility tooling."
 }

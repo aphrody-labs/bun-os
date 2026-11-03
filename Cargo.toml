@@ -43,6 +43,7 @@ members = [
   "packages/bun-windows-winclean",
   "crates/bunos-win11",
   "crates/bunos-win11-chrome",
+  "crates/bunos-design",
   "crates/bunos-win11-wallpaper",
   "crates/bunos-nt-proto",
   "crates/aphrody-shell-session",

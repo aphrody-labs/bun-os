@@ -7,7 +7,7 @@ use serde::Serialize;
 use crate::{Result, ToolResult, Winclean};
 
 /// Every tool name exposed by the Rust WinClean compatibility surface.
-pub const TOOL_NAMES: [&str; 193] = [
+pub const TOOL_NAMES: [&str; 204] = [
     "analyze_pe",
     "aob_scan",
     "asar_list",
@@ -201,6 +201,17 @@ pub const TOOL_NAMES: [&str; 193] = [
     "nt_events_stop",
     "nt_handles",
     "nt_kernel_modules",
+    "wmi_query",
+    "com_invoke",
+    "shell_known_folders",
+    "shell_drives",
+    "shell_file_operation",
+    "shell_recycle_bin",
+    "shell_context_menu",
+    "shell_properties",
+    "shell_thumbnail",
+    "shell_open_with",
+    "shell_reveal",
 ];
 
 /// Arguments for [`Winclean::analyze_pe`] (`analyze_pe`).
@@ -6794,6 +6805,468 @@ impl NtKernelModulesArgs {
     }
 }
 
+/// Arguments for [`Winclean::wmi_query`] (`wmi_query`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct WmiQueryArgs {
+    /// WQL, e.g. SELECT Name, ProcessId FROM Win32_Process
+    #[serde(rename = "query")]
+    pub query: String,
+    /// Namespace, default ROOTCIMV2
+    #[serde(rename = "namespace", skip_serializing_if = "Option::is_none")]
+    pub namespace: Option<String>,
+    /// Maximum rows.
+    #[serde(rename = "limit", skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+impl WmiQueryArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `query`.
+    #[must_use]
+    pub fn query(mut self, value: impl Into<String>) -> Self {
+        self.query = value.into();
+        self
+    }
+
+    /// Sets `namespace`.
+    #[must_use]
+    pub fn namespace(mut self, value: impl Into<String>) -> Self {
+        self.namespace = Some(value.into());
+        self
+    }
+
+    /// Sets `limit`.
+    #[must_use]
+    pub fn limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::com_invoke`] (`com_invoke`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ComInvokeArgs {
+    /// ProgID, e.g. Shell.Application, WScript.Shell, Excel.Application
+    #[serde(rename = "progId", skip_serializing_if = "Option::is_none")]
+    pub prog_id: Option<String>,
+    /// CLSID alternative to progId
+    #[serde(rename = "clsid", skip_serializing_if = "Option::is_none")]
+    pub clsid: Option<String>,
+    /// Attach to a running instance (GetActiveObject) instead of creating one.
+    #[serde(rename = "attach", skip_serializing_if = "Option::is_none")]
+    pub attach: Option<bool>,
+    /// [{name, op: auto|get|call|put, args: [...], value}]
+    #[serde(rename = "steps", skip_serializing_if = "Option::is_none")]
+    pub steps: Option<Vec<serde_json::Value>>,
+    /// {properties: [names], limit} to enumerate the final collection.
+    #[serde(rename = "enumerate", skip_serializing_if = "Option::is_none")]
+    pub enumerate: Option<serde_json::Value>,
+    /// Properties to read from the final object.
+    #[serde(rename = "properties", skip_serializing_if = "Option::is_none")]
+    pub properties: Option<Vec<String>>,
+}
+
+impl ComInvokeArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `progId`.
+    #[must_use]
+    pub fn prog_id(mut self, value: impl Into<String>) -> Self {
+        self.prog_id = Some(value.into());
+        self
+    }
+
+    /// Sets `clsid`.
+    #[must_use]
+    pub fn clsid(mut self, value: impl Into<String>) -> Self {
+        self.clsid = Some(value.into());
+        self
+    }
+
+    /// Sets `attach`.
+    #[must_use]
+    pub fn attach(mut self, value: bool) -> Self {
+        self.attach = Some(value);
+        self
+    }
+
+    /// Sets `steps`.
+    #[must_use]
+    pub fn steps(mut self, value: Vec<serde_json::Value>) -> Self {
+        self.steps = Some(value);
+        self
+    }
+
+    /// Sets `enumerate`.
+    #[must_use]
+    pub fn enumerate(mut self, value: serde_json::Value) -> Self {
+        self.enumerate = Some(value);
+        self
+    }
+
+    /// Sets `properties`.
+    #[must_use]
+    pub fn properties(mut self, value: Vec<String>) -> Self {
+        self.properties = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::shell_known_folders`] (`shell_known_folders`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellKnownFoldersArgs {}
+
+/// Arguments for [`Winclean::shell_drives`] (`shell_drives`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellDrivesArgs {}
+
+/// Arguments for [`Winclean::shell_file_operation`] (`shell_file_operation`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellFileOperationArgs {
+    /// copy | move | rename | delete | recycle | newFolder
+    #[serde(rename = "op")]
+    pub op: String,
+    /// One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} /
+    /// shell:RecycleBinFolder).
+    #[serde(rename = "items", skip_serializing_if = "Option::is_none")]
+    pub items: Option<String>,
+    /// Destination folder for copy/move/newFolder.
+    #[serde(rename = "destination", skip_serializing_if = "Option::is_none")]
+    pub destination: Option<String>,
+    /// New name for rename/newFolder, or the target name for a single copy/move.
+    #[serde(rename = "newName", skip_serializing_if = "Option::is_none")]
+    pub new_name: Option<String>,
+    /// Show Explorer's progress and conflict UI.
+    #[serde(rename = "ui", skip_serializing_if = "Option::is_none")]
+    pub ui: Option<bool>,
+}
+
+impl ShellFileOperationArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `op`.
+    #[must_use]
+    pub fn op(mut self, value: impl Into<String>) -> Self {
+        self.op = value.into();
+        self
+    }
+
+    /// Sets `items`.
+    #[must_use]
+    pub fn items(mut self, value: impl Into<String>) -> Self {
+        self.items = Some(value.into());
+        self
+    }
+
+    /// Sets `destination`.
+    #[must_use]
+    pub fn destination(mut self, value: impl Into<String>) -> Self {
+        self.destination = Some(value.into());
+        self
+    }
+
+    /// Sets `newName`.
+    #[must_use]
+    pub fn new_name(mut self, value: impl Into<String>) -> Self {
+        self.new_name = Some(value.into());
+        self
+    }
+
+    /// Sets `ui`.
+    #[must_use]
+    pub fn ui(mut self, value: bool) -> Self {
+        self.ui = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::shell_recycle_bin`] (`shell_recycle_bin`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellRecycleBinArgs {
+    /// list | restore | empty
+    #[serde(rename = "action", skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+    /// One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} /
+    /// shell:RecycleBinFolder).
+    #[serde(rename = "names", skip_serializing_if = "Option::is_none")]
+    pub names: Option<String>,
+    /// Required for empty.
+    #[serde(rename = "confirm", skip_serializing_if = "Option::is_none")]
+    pub confirm: Option<bool>,
+}
+
+impl ShellRecycleBinArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `action`.
+    #[must_use]
+    pub fn action(mut self, value: impl Into<String>) -> Self {
+        self.action = Some(value.into());
+        self
+    }
+
+    /// Sets `names`.
+    #[must_use]
+    pub fn names(mut self, value: impl Into<String>) -> Self {
+        self.names = Some(value.into());
+        self
+    }
+
+    /// Sets `confirm`.
+    #[must_use]
+    pub fn confirm(mut self, value: bool) -> Self {
+        self.confirm = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::shell_context_menu`] (`shell_context_menu`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellContextMenuArgs {
+    /// One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} /
+    /// shell:RecycleBinFolder).
+    #[serde(rename = "path")]
+    pub path: String,
+    /// list | invoke
+    #[serde(rename = "action", skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+    /// Canonical verb to invoke.
+    #[serde(rename = "verb", skip_serializing_if = "Option::is_none")]
+    pub verb: Option<String>,
+    /// Menu id from list.
+    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<i64>,
+    /// Keep the process alive while dialogs opened by the verb are visible (default true).
+    #[serde(rename = "wait", skip_serializing_if = "Option::is_none")]
+    pub wait: Option<bool>,
+}
+
+impl ShellContextMenuArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `path`.
+    #[must_use]
+    pub fn path(mut self, value: impl Into<String>) -> Self {
+        self.path = value.into();
+        self
+    }
+
+    /// Sets `action`.
+    #[must_use]
+    pub fn action(mut self, value: impl Into<String>) -> Self {
+        self.action = Some(value.into());
+        self
+    }
+
+    /// Sets `verb`.
+    #[must_use]
+    pub fn verb(mut self, value: impl Into<String>) -> Self {
+        self.verb = Some(value.into());
+        self
+    }
+
+    /// Sets `id`.
+    #[must_use]
+    pub fn id(mut self, value: i64) -> Self {
+        self.id = Some(value);
+        self
+    }
+
+    /// Sets `wait`.
+    #[must_use]
+    pub fn wait(mut self, value: bool) -> Self {
+        self.wait = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::shell_properties`] (`shell_properties`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellPropertiesArgs {
+    /// One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} /
+    /// shell:RecycleBinFolder).
+    #[serde(rename = "path")]
+    pub path: String,
+    /// read | dialog
+    #[serde(rename = "action", skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+}
+
+impl ShellPropertiesArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `path`.
+    #[must_use]
+    pub fn path(mut self, value: impl Into<String>) -> Self {
+        self.path = value.into();
+        self
+    }
+
+    /// Sets `action`.
+    #[must_use]
+    pub fn action(mut self, value: impl Into<String>) -> Self {
+        self.action = Some(value.into());
+        self
+    }
+}
+
+/// Arguments for [`Winclean::shell_thumbnail`] (`shell_thumbnail`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellThumbnailArgs {
+    /// One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} /
+    /// shell:RecycleBinFolder).
+    #[serde(rename = "path")]
+    pub path: String,
+    /// Edge in pixels (default 256).
+    #[serde(rename = "size", skip_serializing_if = "Option::is_none")]
+    pub size: Option<i64>,
+    /// PNG output path.
+    #[serde(rename = "output", skip_serializing_if = "Option::is_none")]
+    pub output: Option<String>,
+}
+
+impl ShellThumbnailArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `path`.
+    #[must_use]
+    pub fn path(mut self, value: impl Into<String>) -> Self {
+        self.path = value.into();
+        self
+    }
+
+    /// Sets `size`.
+    #[must_use]
+    pub fn size(mut self, value: i64) -> Self {
+        self.size = Some(value);
+        self
+    }
+
+    /// Sets `output`.
+    #[must_use]
+    pub fn output(mut self, value: impl Into<String>) -> Self {
+        self.output = Some(value.into());
+        self
+    }
+}
+
+/// Arguments for [`Winclean::shell_open_with`] (`shell_open_with`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellOpenWithArgs {
+    /// One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} /
+    /// shell:RecycleBinFolder).
+    #[serde(rename = "path", skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+    /// Extension (.txt) or URL protocol (https:).
+    #[serde(rename = "extension", skip_serializing_if = "Option::is_none")]
+    pub extension: Option<String>,
+    /// list | invoke | default
+    #[serde(rename = "action", skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+    /// Handler for invoke.
+    #[serde(rename = "handler", skip_serializing_if = "Option::is_none")]
+    pub handler: Option<String>,
+    /// Only recommended handlers.
+    #[serde(rename = "recommended", skip_serializing_if = "Option::is_none")]
+    pub recommended: Option<bool>,
+}
+
+impl ShellOpenWithArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `path`.
+    #[must_use]
+    pub fn path(mut self, value: impl Into<String>) -> Self {
+        self.path = Some(value.into());
+        self
+    }
+
+    /// Sets `extension`.
+    #[must_use]
+    pub fn extension(mut self, value: impl Into<String>) -> Self {
+        self.extension = Some(value.into());
+        self
+    }
+
+    /// Sets `action`.
+    #[must_use]
+    pub fn action(mut self, value: impl Into<String>) -> Self {
+        self.action = Some(value.into());
+        self
+    }
+
+    /// Sets `handler`.
+    #[must_use]
+    pub fn handler(mut self, value: impl Into<String>) -> Self {
+        self.handler = Some(value.into());
+        self
+    }
+
+    /// Sets `recommended`.
+    #[must_use]
+    pub fn recommended(mut self, value: bool) -> Self {
+        self.recommended = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::shell_reveal`] (`shell_reveal`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct ShellRevealArgs {
+    /// One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} /
+    /// shell:RecycleBinFolder).
+    #[serde(rename = "path")]
+    pub path: String,
+}
+
+impl ShellRevealArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `path`.
+    #[must_use]
+    pub fn path(mut self, value: impl Into<String>) -> Self {
+        self.path = value.into();
+        self
+    }
+}
+
 impl Winclean {
     /// Performs static analysis and symbol recovery on a target Windows PE binary (.exe or .dll).
     /// Recovers sections, imports, entry point disassembly, and maps symbols using heuristics (no
@@ -10418,5 +10891,213 @@ impl Winclean {
     /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
     pub async fn nt_kernel_modules_async(&self, args: &NtKernelModulesArgs) -> Result<ToolResult> {
         self.call_async("nt_kernel_modules", args).await
+    }
+
+    /// Runs a WQL query against any WMI/CIM namespace in-process (IWbemServices::ExecQuery), the
+    /// equivalent of Get-CimInstance/wmic, and returns every non-system property of each instance
+    /// as JSON. Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn wmi_query(&self, args: &WmiQueryArgs) -> Result<ToolResult> {
+        self.call("wmi_query", args)
+    }
+
+    /// Async variant of [`Winclean::wmi_query`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn wmi_query_async(&self, args: &WmiQueryArgs) -> Result<ToolResult> {
+        self.call_async("wmi_query", args).await
+    }
+
+    /// Late-bound COM automation (IDispatch), the equivalent of New-Object -ComObject /
+    /// CreateObject: creates or attaches to an object by progId or clsid, walks steps of property
+    /// gets, method calls and property puts, and optionally enumerates the resulting collection
+    /// (_NewEnum) reading chosen properties. Arguments {"$step":n} pass the object produced by step
+    /// n (0 = root). Can change state, depending on the members called.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn com_invoke(&self, args: &ComInvokeArgs) -> Result<ToolResult> {
+        self.call("com_invoke", args)
+    }
+
+    /// Async variant of [`Winclean::com_invoke`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn com_invoke_async(&self, args: &ComInvokeArgs) -> Result<ToolResult> {
+        self.call_async("com_invoke", args).await
+    }
+
+    /// Lists every registered Windows known folder (IKnownFolderManager): id, canonical name,
+    /// category, current path (null for virtual folders) and parsing name. Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_known_folders(&self, args: &ShellKnownFoldersArgs) -> Result<ToolResult> {
+        self.call("shell_known_folders", args)
+    }
+
+    /// Async variant of [`Winclean::shell_known_folders`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_known_folders_async(
+        &self,
+        args: &ShellKnownFoldersArgs,
+    ) -> Result<ToolResult> {
+        self.call_async("shell_known_folders", args).await
+    }
+
+    /// Lists logical drives with type, label, filesystem, serial and free/total bytes. Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_drives(&self, args: &ShellDrivesArgs) -> Result<ToolResult> {
+        self.call("shell_drives", args)
+    }
+
+    /// Async variant of [`Winclean::shell_drives`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_drives_async(&self, args: &ShellDrivesArgs) -> Result<ToolResult> {
+        self.call_async("shell_drives", args).await
+    }
+
+    /// Runs a file operation through IFileOperation, Explorer's engine (undo history, Recycle Bin,
+    /// copy hooks; Explorer progress and conflict dialogs when ui=true): op
+    /// copy|move|rename|delete|recycle|newFolder. delete is permanent; recycle sends to the Recycle
+    /// Bin.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_file_operation(&self, args: &ShellFileOperationArgs) -> Result<ToolResult> {
+        self.call("shell_file_operation", args)
+    }
+
+    /// Async variant of [`Winclean::shell_file_operation`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_file_operation_async(
+        &self,
+        args: &ShellFileOperationArgs,
+    ) -> Result<ToolResult> {
+        self.call_async("shell_file_operation", args).await
+    }
+
+    /// The Recycle Bin: action list (name, original folder, date deleted, parsing name), restore
+    /// (names = display names, original paths or parsing names; uses the Restore verb) or empty
+    /// (permanent; requires confirm=true).
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_recycle_bin(&self, args: &ShellRecycleBinArgs) -> Result<ToolResult> {
+        self.call("shell_recycle_bin", args)
+    }
+
+    /// Async variant of [`Winclean::shell_recycle_bin`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_recycle_bin_async(&self, args: &ShellRecycleBinArgs) -> Result<ToolResult> {
+        self.call_async("shell_recycle_bin", args).await
+    }
+
+    /// Explorer's context menu for an item via IContextMenu, including third-party shell
+    /// extensions: action list returns {id,label,verb,enabled} flattened with 'Parent > Child'
+    /// labels; action invoke runs one by verb (e.g. open, edit, properties, runas, undelete) or by
+    /// id from list.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_context_menu(&self, args: &ShellContextMenuArgs) -> Result<ToolResult> {
+        self.call("shell_context_menu", args)
+    }
+
+    /// Async variant of [`Winclean::shell_context_menu`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_context_menu_async(
+        &self,
+        args: &ShellContextMenuArgs,
+    ) -> Result<ToolResult> {
+        self.call_async("shell_context_menu", args).await
+    }
+
+    /// Property system of an item: action read returns every value by canonical name (System.Size,
+    /// System.Media.Duration, ...); action dialog opens Explorer's Properties sheet and waits until
+    /// it is closed.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_properties(&self, args: &ShellPropertiesArgs) -> Result<ToolResult> {
+        self.call("shell_properties", args)
+    }
+
+    /// Async variant of [`Winclean::shell_properties`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_properties_async(&self, args: &ShellPropertiesArgs) -> Result<ToolResult> {
+        self.call_async("shell_properties", args).await
+    }
+
+    /// Renders the thumbnail Explorer shows (registered IThumbnailProvider, else the icon) through
+    /// IShellItemImageFactory as PNG, written to output or returned base64. Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_thumbnail(&self, args: &ShellThumbnailArgs) -> Result<ToolResult> {
+        self.call("shell_thumbnail", args)
+    }
+
+    /// Async variant of [`Winclean::shell_thumbnail`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_thumbnail_async(&self, args: &ShellThumbnailArgs) -> Result<ToolResult> {
+        self.call_async("shell_thumbnail", args).await
+    }
+
+    /// "Open with": action list returns the handlers for an extension or path (SHAssocEnumHandlers:
+    /// name, UI name, recommended, icon) and the current default ProgID
+    /// (IApplicationAssociationRegistration); action invoke opens path with a handler matched by
+    /// name, executable or UI name; action default returns only the default for an extension or URL
+    /// protocol.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_open_with(&self, args: &ShellOpenWithArgs) -> Result<ToolResult> {
+        self.call("shell_open_with", args)
+    }
+
+    /// Async variant of [`Winclean::shell_open_with`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_open_with_async(&self, args: &ShellOpenWithArgs) -> Result<ToolResult> {
+        self.call_async("shell_open_with", args).await
+    }
+
+    /// Opens an Explorer window on the item's folder with the item selected
+    /// (SHOpenFolderAndSelectItems).
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn shell_reveal(&self, args: &ShellRevealArgs) -> Result<ToolResult> {
+        self.call("shell_reveal", args)
+    }
+
+    /// Async variant of [`Winclean::shell_reveal`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn shell_reveal_async(&self, args: &ShellRevealArgs) -> Result<ToolResult> {
+        self.call_async("shell_reveal", args).await
     }
 }

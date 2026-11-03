@@ -4132,6 +4132,301 @@
           }
         }
       }
+    },
+    {
+      "name": "wmi_query",
+      "description": "Runs a WQL query against any WMI/CIM namespace in-process (IWbemServices::ExecQuery), the equivalent of Get-CimInstance/wmic, and returns every non-system property of each instance as JSON. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "WQL, e.g. SELECT Name, ProcessId FROM Win32_Process"
+          },
+          "namespace": {
+            "type": "string",
+            "description": "Namespace, default ROOTCIMV2"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum rows."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "com_invoke",
+      "description": "Late-bound COM automation (IDispatch), the equivalent of New-Object -ComObject / CreateObject: creates or attaches to an object by progId or clsid, walks steps of property gets, method calls and property puts, and optionally enumerates the resulting collection (_NewEnum) reading chosen properties. Arguments {\"$step\":n} pass the object produced by step n (0 = root). Can change state, depending on the members called.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "progId": {
+            "type": "string",
+            "description": "ProgID, e.g. Shell.Application, WScript.Shell, Excel.Application"
+          },
+          "clsid": {
+            "type": "string",
+            "description": "CLSID alternative to progId"
+          },
+          "attach": {
+            "type": "boolean",
+            "description": "Attach to a running instance (GetActiveObject) instead of creating one."
+          },
+          "steps": {
+            "type": "array",
+            "description": "[{name, op: auto|get|call|put, args: [...], value}]",
+            "items": {
+              "type": "object"
+            }
+          },
+          "enumerate": {
+            "type": "object",
+            "description": "{properties: [names], limit} to enumerate the final collection."
+          },
+          "properties": {
+            "type": "array",
+            "description": "Properties to read from the final object.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "shell_known_folders",
+      "description": "Lists every registered Windows known folder (IKnownFolderManager): id, canonical name, category, current path (null for virtual folders) and parsing name. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "shell_drives",
+      "description": "Lists logical drives with type, label, filesystem, serial and free/total bytes. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "shell_file_operation",
+      "description": "Runs a file operation through IFileOperation, Explorer's engine (undo history, Recycle Bin, copy hooks; Explorer progress and conflict dialogs when ui=true): op copy|move|rename|delete|recycle|newFolder. delete is permanent; recycle sends to the Recycle Bin.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "op": {
+            "type": "string",
+            "description": "copy | move | rename | delete | recycle | newFolder"
+          },
+          "items": {
+            "description": "One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).",
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "destination": {
+            "type": "string",
+            "description": "Destination folder for copy/move/newFolder."
+          },
+          "newName": {
+            "type": "string",
+            "description": "New name for rename/newFolder, or the target name for a single copy/move."
+          },
+          "ui": {
+            "type": "boolean",
+            "description": "Show Explorer's progress and conflict UI."
+          }
+        },
+        "required": [
+          "op"
+        ]
+      }
+    },
+    {
+      "name": "shell_recycle_bin",
+      "description": "The Recycle Bin: action list (name, original folder, date deleted, parsing name), restore (names = display names, original paths or parsing names; uses the Restore verb) or empty (permanent; requires confirm=true).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "list | restore | empty"
+          },
+          "names": {
+            "description": "One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).",
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "confirm": {
+            "type": "boolean",
+            "description": "Required for empty."
+          }
+        }
+      }
+    },
+    {
+      "name": "shell_context_menu",
+      "description": "Explorer's context menu for an item via IContextMenu, including third-party shell extensions: action list returns {id,label,verb,enabled} flattened with 'Parent > Child' labels; action invoke runs one by verb (e.g. open, edit, properties, runas, undelete) or by id from list.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "description": "One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).",
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "action": {
+            "type": "string",
+            "description": "list | invoke"
+          },
+          "verb": {
+            "type": "string",
+            "description": "Canonical verb to invoke."
+          },
+          "id": {
+            "type": "integer",
+            "description": "Menu id from list."
+          },
+          "wait": {
+            "type": "boolean",
+            "description": "Keep the process alive while dialogs opened by the verb are visible (default true)."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "shell_properties",
+      "description": "Property system of an item: action read returns every value by canonical name (System.Size, System.Media.Duration, ...); action dialog opens Explorer's Properties sheet and waits until it is closed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "description": "One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).",
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "action": {
+            "type": "string",
+            "description": "read | dialog"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "shell_thumbnail",
+      "description": "Renders the thumbnail Explorer shows (registered IThumbnailProvider, else the icon) through IShellItemImageFactory as PNG, written to output or returned base64. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "description": "One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).",
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "size": {
+            "type": "integer",
+            "description": "Edge in pixels (default 256)."
+          },
+          "output": {
+            "type": "string",
+            "description": "PNG output path."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "shell_open_with",
+      "description": "\"Open with\": action list returns the handlers for an extension or path (SHAssocEnumHandlers: name, UI name, recommended, icon) and the current default ProgID (IApplicationAssociationRegistration); action invoke opens path with a handler matched by name, executable or UI name; action default returns only the default for an extension or URL protocol.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "description": "One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).",
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "extension": {
+            "type": "string",
+            "description": "Extension (.txt) or URL protocol (https:)."
+          },
+          "action": {
+            "type": "string",
+            "description": "list | invoke | default"
+          },
+          "handler": {
+            "type": "string",
+            "description": "Handler for invoke."
+          },
+          "recommended": {
+            "type": "boolean",
+            "description": "Only recommended handlers."
+          }
+        }
+      }
+    },
+    {
+      "name": "shell_reveal",
+      "description": "Opens an Explorer window on the item's folder with the item selected (SHOpenFolderAndSelectItems).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "description": "One path or an array of paths (filesystem paths or shell parsing names such as ::{CLSID} / shell:RecycleBinFolder).",
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
     }
   ]
 }

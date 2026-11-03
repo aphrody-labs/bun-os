@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+# Bun OS Linux-Windows bridge (docs/LINUX-WINDOWS-BRIDGE.md): `bunos-run`, the Windows launcher that runs a Linux
+# (ELF) program of the Bun OS WSL distro from cmd, a terminal or an Explorer double-click, as the invoking user,
+# through `wsl.exe --exec` (WSL's own access rules; no daemon). Path rules are platform independent and unit-tested.
+[workspace]
+
+[package]
+name = "bunos-bridge"
+version = "1.4.7"
+edition = "2024"
+license = "Apache-2.0"
+description = "Bun OS Linux-Windows bridge: run Linux programs from Windows like .exe files."
+publish = false
+
+[lib]
+name = "bunos_bridge"
+path = "src/lib.rs"
+
+[[bin]]
+name = "bunos-run"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

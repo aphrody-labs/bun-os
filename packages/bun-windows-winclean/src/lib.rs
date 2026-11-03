@@ -21,6 +21,7 @@ pub mod ocr;
 pub mod record;
 pub mod registry;
 mod services;
+pub mod shell;
 pub mod snapshot;
 pub mod speech;
 mod steam;
