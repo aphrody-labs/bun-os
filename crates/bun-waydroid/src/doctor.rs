@@ -71,12 +71,16 @@ pub fn run(i: &Inputs) -> Report {
     );
 
     if let Some(cfg) = &i.kernel_config {
+        // Up to v7.3 the C driver needs ANDROID_BINDERFS; from v7.4 the Rust driver is the only binder and its
+        // object always links rust_binderfs.c (drivers/android/binder/Makefile), so it carries binderfs itself.
         let b = config_state(cfg, "CONFIG_ANDROID_BINDER_IPC");
         let f = config_state(cfg, "CONFIG_ANDROID_BINDERFS");
+        let r = config_state(cfg, "CONFIG_ANDROID_BINDER_IPC_RUST");
+        let on = |s: Option<char>| matches!(s, Some('y' | 'm'));
         add(
             "kernel-config-binder",
-            matches!(b, Some('y' | 'm')) && matches!(f, Some('y' | 'm')),
-            format!("BINDER_IPC={:?} BINDERFS={:?}", b, f),
+            (on(b) && on(f)) || on(r),
+            format!("BINDER_IPC={:?} BINDERFS={:?} BINDER_IPC_RUST={:?}", b, f, r),
         );
         // ashmem was removed from mainline; memfd is the fallback Waydroid enables itself.
         let a = config_state(cfg, "CONFIG_ANDROID_ASHMEM");
@@ -167,6 +171,23 @@ mod tests {
         assert_eq!(config_state(c, "CONFIG_ANDROID_BINDER_IPC"), Some('m'));
         assert_eq!(config_state(c, "CONFIG_ANDROID_BINDER_IPC_RUST"), None);
         assert_eq!(config_state(c, "CONFIG_ANDROID_BINDERFS"), Some('y'));
+    }
+
+    #[test]
+    fn rust_binder_carries_binderfs() {
+        let i = Inputs {
+            kernel: "7.4.0-rc1-microsoft-standard-WSL2".into(),
+            proc_filesystems: "nodev	binder
+".into(),
+            dev_names: vec![],
+            kernel_config: Some("CONFIG_ANDROID_BINDER_IPC_RUST=y
+".into()),
+            lxc_version: None,
+            wayland_display: None,
+            is_linux: true,
+        };
+        let r = run(&i);
+        assert!(r.checks.iter().find(|c| c.id == "kernel-config-binder").unwrap().ok);
     }
 
     #[test]

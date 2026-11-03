@@ -1,11 +1,11 @@
-name: WSL kernel (7.3 + Rust)
+name: WSL kernel (newest mainline/stable + Rust)
 
 on:
   workflow_dispatch:
     inputs:
       kver:
-        description: Mainline version
-        default: "7.3"
+        description: Kernel version (latest = newest of kernel.org mainline and stable; or e.g. 7.4-rc1, 7.3.1)
+        default: latest
   push:
     branches: [main]
     paths:
@@ -30,6 +30,7 @@ jobs:
             factory/wsl
             factory/kernel/linux-bun/keys
           sparse-checkout-cone-mode: true
+      - uses: oven-sh/setup-bun@v2
       - name: Toolchain (rustc >= 1.85, bindgen >= 0.71.1, LLVM)
         run: |
           sudo apt-get update
@@ -41,7 +42,7 @@ jobs:
           bindgen --version
       - name: Build
         env:
-          KVER: ${{ inputs.kver || '7.3' }}
+          KVER: ${{ inputs.kver || 'latest' }}
         run: factory/wsl/kernel/build-wsl-kernel.sh "$PWD" "$RUNNER_TEMP/k" "$PWD/out"
       - name: Size and time report
         if: always()
@@ -58,7 +59,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: wsl-kernel-${{ inputs.kver || '7.3' }}
+          name: wsl-kernel-${{ inputs.kver || 'latest' }}
           path: |
             out/perf-build.log
             out/bzImage
@@ -67,6 +68,7 @@ jobs:
             out/report.json
             out/rustavailable.txt
             out/tools.txt
+            out/tag-verify.txt
           if-no-files-found: warn
 
   nvidia-open-build-check:
