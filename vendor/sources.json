@@ -634,6 +634,71 @@
       "origin": "https://github.com/aphrody-labs/glazewm.git",
       "upstream": "https://github.com/glzr-io/glazewm.git",
       "path": "glazewm"
+    },
+    "brush": {
+      "origin": "https://github.com/aphrody-labs/brush.git",
+      "upstream": "https://github.com/reubeno/brush.git",
+      "path": "brush"
+    },
+    "ripgrep": {
+      "origin": "https://github.com/aphrody-labs/ripgrep.git",
+      "upstream": "https://github.com/BurntSushi/ripgrep.git",
+      "path": "ripgrep"
+    },
+    "fd": {
+      "origin": "https://github.com/aphrody-labs/fd.git",
+      "upstream": "https://github.com/sharkdp/fd.git",
+      "path": "fd"
+    },
+    "sd": {
+      "origin": "https://github.com/aphrody-labs/sd.git",
+      "upstream": "https://github.com/chmln/sd.git",
+      "path": "sd"
+    },
+    "bat": {
+      "origin": "https://github.com/aphrody-labs/bat.git",
+      "upstream": "https://github.com/sharkdp/bat.git",
+      "path": "bat"
+    },
+    "procs": {
+      "origin": "https://github.com/aphrody-labs/procs.git",
+      "upstream": "https://github.com/dalance/procs.git",
+      "path": "procs"
+    },
+    "hyperfine": {
+      "origin": "https://github.com/aphrody-labs/hyperfine.git",
+      "upstream": "https://github.com/sharkdp/hyperfine.git",
+      "path": "hyperfine"
+    },
+    "tokei": {
+      "origin": "https://github.com/aphrody-labs/tokei.git",
+      "upstream": "https://github.com/XAMPPRocky/tokei.git",
+      "path": "tokei"
+    },
+    "zoxide": {
+      "origin": "https://github.com/aphrody-labs/zoxide.git",
+      "upstream": "https://github.com/ajeetdsouza/zoxide.git",
+      "path": "zoxide"
+    },
+    "helix": {
+      "origin": "https://github.com/aphrody-labs/helix.git",
+      "upstream": "https://github.com/helix-editor/helix.git",
+      "path": "helix"
+    },
+    "xh": {
+      "origin": "https://github.com/aphrody-labs/xh.git",
+      "upstream": "https://github.com/ducaale/xh.git",
+      "path": "xh"
+    },
+    "ouch": {
+      "origin": "https://github.com/aphrody-labs/ouch.git",
+      "upstream": "https://github.com/ouch-org/ouch.git",
+      "path": "ouch"
+    },
+    "starship": {
+      "origin": "https://github.com/aphrody-labs/starship.git",
+      "upstream": "https://github.com/starship/starship.git",
+      "path": "starship"
     }
   },
   "references": {
@@ -662,9 +727,21 @@
       "initialized": true
     },
     {
+      "path": "bat",
+      "revision": "979ba22628bc9d8171f2cffca2bd5c90c9fc0a9e",
+      "origin": "https://github.com/aphrody-labs/bat.git",
+      "initialized": true
+    },
+    {
       "path": "bevy",
       "revision": "c8d199b192a1b173746f7a160d259c4db8ab7789",
       "origin": "https://github.com/aphrody-labs/bevy.git",
+      "initialized": true
+    },
+    {
+      "path": "brush",
+      "revision": "18d616f3c3779ff77b0cbe0b6dfef72779e50da4",
+      "origin": "https://github.com/aphrody-labs/brush.git",
       "initialized": true
     },
     {
@@ -770,6 +847,12 @@
       "initialized": true
     },
     {
+      "path": "fd",
+      "revision": "4f81778774463bf414a184cbe6d5219ad2229646",
+      "origin": "https://github.com/aphrody-labs/fd.git",
+      "initialized": true
+    },
+    {
       "path": "flea",
       "revision": "1de9d97983602d36108bd1f1d734cbdef47ee4e1",
       "origin": "https://github.com/aphrody-labs/flea.git",
@@ -800,10 +883,22 @@
       "initialized": false
     },
     {
+      "path": "helix",
+      "revision": "a05c151bb6e8e9c65ec390b0ae2afe7a5efd619b",
+      "origin": "https://github.com/aphrody-labs/helix.git",
+      "initialized": true
+    },
+    {
       "path": "herdr",
       "revision": "065ef9d6a531c49fb8bee7e818ef837065b21ee9",
       "origin": "https://github.com/aphrody-labs/herdr.git",
       "initialized": false
+    },
+    {
+      "path": "hyperfine",
+      "revision": "b33755fe1fca8bcc1f182c773ca3ab040bfe517d",
+      "origin": "https://github.com/aphrody-labs/hyperfine.git",
+      "initialized": true
     },
     {
       "path": "hyprland-preview-share-picker",
@@ -944,6 +1039,12 @@
       "initialized": false
     },
     {
+      "path": "ouch",
+      "revision": "433c05d21ffd3a59a213930e256ce4b4ad863d79",
+      "origin": "https://github.com/aphrody-labs/ouch.git",
+      "initialized": true
+    },
+    {
       "path": "pacman",
       "revision": "4056cd687f6379e61e7decb9b66e9b57cb3949a9",
       "origin": "https://github.com/aphrody-labs/pacman.git",
@@ -968,6 +1069,12 @@
       "initialized": false
     },
     {
+      "path": "procs",
+      "revision": "8ad5da5ef0c33a7c9dbe30625548469f88e824d8",
+      "origin": "https://github.com/aphrody-labs/procs.git",
+      "initialized": true
+    },
+    {
       "path": "proton",
       "revision": "bc896217ffcd67f892f952b010f898fe7bd0f0a1",
       "origin": "https://github.com/aphrody-labs/Proton.git",
@@ -986,10 +1093,28 @@
       "initialized": false
     },
     {
+      "path": "ripgrep",
+      "revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+      "origin": "https://github.com/aphrody-labs/ripgrep.git",
+      "initialized": true
+    },
+    {
       "path": "rustdesk",
       "revision": "fada664df7a294d1d1a9ca3e7cd3637069122f17",
       "origin": "https://github.com/aphrody-labs/rustdesk.git",
       "initialized": false
+    },
+    {
+      "path": "sd",
+      "revision": "4a7b216552d64134c0fa17a59b9d557d89019f0f",
+      "origin": "https://github.com/aphrody-labs/sd.git",
+      "initialized": true
+    },
+    {
+      "path": "starship",
+      "revision": "f8e4e2155542cc84f49b342122d371f74e0ad253",
+      "origin": "https://github.com/aphrody-labs/starship.git",
+      "initialized": true
     },
     {
       "path": "steam-runtime",
@@ -1013,6 +1138,12 @@
       "path": "tiny11builder",
       "revision": "38f7ab6b1f177098c026a19b73ec84bca9c4b874",
       "origin": "https://github.com/aphrody-labs/tiny11builder.git",
+      "initialized": true
+    },
+    {
+      "path": "tokei",
+      "revision": "c14f744716272fadeb27a74443cdffa0af35f82f",
+      "origin": "https://github.com/aphrody-labs/tokei.git",
       "initialized": true
     },
     {
@@ -1061,6 +1192,18 @@
       "path": "winit",
       "revision": "f0a83481c233c714d061356305f89bace0106f39",
       "origin": "https://github.com/aphrody-labs/winit.git",
+      "initialized": true
+    },
+    {
+      "path": "xh",
+      "revision": "319d39c2561d2a8697acb3eb9800abcc33bbad98",
+      "origin": "https://github.com/aphrody-labs/xh.git",
+      "initialized": true
+    },
+    {
+      "path": "zoxide",
+      "revision": "f84f9a3e1d16fabf3e34b199ec7d552993b41f29",
+      "origin": "https://github.com/aphrody-labs/zoxide.git",
       "initialized": true
     }
   ]

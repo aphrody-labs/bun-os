@@ -1612,39 +1612,52 @@
 [submodule "vendor/zoxide"]
 	path = vendor/zoxide
 	url = https://github.com/aphrody-labs/zoxide.git
+	shallow = true
 [submodule "vendor/helix"]
 	path = vendor/helix
 	url = https://github.com/aphrody-labs/helix.git
+	shallow = true
 [submodule "vendor/brush"]
 	path = vendor/brush
 	url = https://github.com/aphrody-labs/brush.git
+	shallow = true
 [submodule "vendor/fd"]
 	path = vendor/fd
 	url = https://github.com/aphrody-labs/fd.git
+	shallow = true
 [submodule "vendor/xh"]
 	path = vendor/xh
 	url = https://github.com/aphrody-labs/xh.git
+	shallow = true
 [submodule "vendor/sd"]
 	path = vendor/sd
 	url = https://github.com/aphrody-labs/sd.git
+	shallow = true
 [submodule "vendor/ouch"]
 	path = vendor/ouch
 	url = https://github.com/aphrody-labs/ouch.git
+	shallow = true
 [submodule "vendor/procs"]
 	path = vendor/procs
 	url = https://github.com/aphrody-labs/procs.git
+	shallow = true
 [submodule "vendor/hyperfine"]
 	path = vendor/hyperfine
 	url = https://github.com/aphrody-labs/hyperfine.git
+	shallow = true
 [submodule "vendor/bat"]
 	path = vendor/bat
 	url = https://github.com/aphrody-labs/bat.git
+	shallow = true
 [submodule "vendor/ripgrep"]
 	path = vendor/ripgrep
 	url = https://github.com/aphrody-labs/ripgrep.git
+	shallow = true
 [submodule "vendor/starship"]
 	path = vendor/starship
 	url = https://github.com/aphrody-labs/starship.git
+	shallow = true
 [submodule "vendor/tokei"]
 	path = vendor/tokei
 	url = https://github.com/aphrody-labs/tokei.git
+	shallow = true
