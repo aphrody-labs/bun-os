@@ -3,6 +3,7 @@ name = "wordcraft-doc"
 version = "0.6.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"
 description = "WordCraft document model: stories, paragraphs, runs, tables, sections, styles, numbering, fields, notes, comments, revisions; edit primitives"
 
 [lints.rust]

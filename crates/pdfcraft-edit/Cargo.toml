@@ -4,6 +4,7 @@ description = "Page content editing: headers and footers, watermarks, background
 version = "0.7.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"
@@ -29,4 +30,4 @@ kurbo = "0.13"
 unicode-bidi = "0.3"
 
 [dev-dependencies]
-hayro-syntax = "0.7.2"
+hayro-syntax = { package = "aphrody-hayro-syntax", path = "../../apps/pdfcraft/vendor/hayro-syntax", version = "0.7.2" }

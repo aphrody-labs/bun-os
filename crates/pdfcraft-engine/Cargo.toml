@@ -24,6 +24,7 @@ image = { version = "0.25", default-features = false, features = ["png", "jpeg",
 pdfcraft-render = { path = "../pdfcraft-render", version = "0.7.1" }
 pdfcraft-cos = { path = "../pdfcraft-cos", version = "0.7.1" }
 pdfcraft-organize = { path = "../pdfcraft-organize", version = "0.7.1" }
+pdfcraft-preflight = { path = "../pdfcraft-preflight", version = "0.7.1" }
 pdfcraft-annot = { path = "../pdfcraft-annot", version = "0.7.1" }
 pdfcraft-forms = { package = "aphrody-pdfcraft-forms", path = "../pdfcraft-forms", version = "0.7.1" }
 pdfcraft-xfa = { path = "../pdfcraft-xfa", version = "0.7.1" }

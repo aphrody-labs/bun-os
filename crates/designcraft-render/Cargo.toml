@@ -23,7 +23,7 @@ designcraft-compose = { path = "../designcraft-compose", version = "0.7.1" }
 vello_cpu = "0.2"
 vello_common = { version = "0.2", default-features = false }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif", "tiff", "bmp"] }
-hayro = "0.7"
+hayro = { package = "aphrody-hayro", path = "../../apps/pdfcraft/vendor/hayro", version = "0.7.1" }
 designcraft-images = { path = "../designcraft-images", version = "0.7.1" }
 log = "0.4"
 serde = { version = "1", features = ["derive", "rc"] }

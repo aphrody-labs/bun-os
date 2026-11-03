@@ -26,10 +26,10 @@ designcraft-images = { path = "../designcraft-images", version = "0.7.1" }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif", "tiff", "bmp"] }
 thiserror = "2"
 log = "0.4"
-hayro-syntax = "0.7.2"
+hayro-syntax = { package = "aphrody-hayro-syntax", path = "../../apps/pdfcraft/vendor/hayro-syntax", version = "0.7.2" }
 
 [dev-dependencies]
-hayro-interpret = { version = "0.7.0", default-features = false, features = ["embed-fonts"] }
+hayro-interpret = { package = "aphrody-hayro-interpret", path = "../../apps/pdfcraft/vendor/hayro-interpret", version = "0.7.0", default-features = false, features = ["embed-fonts"] }
 hayro-cmap = "0.1"
 kurbo = { version = "0.13", features = ["serde"] }
 tiff = "0.11"

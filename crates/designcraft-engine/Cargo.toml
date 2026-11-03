@@ -39,8 +39,8 @@ zip = { workspace = true }
 
 [dev-dependencies]
 designcraft-fonts = { path = "../designcraft-fonts", features = ["testing"] }
-hayro-syntax = "0.7.2"
-hayro-interpret = { version = "0.7.0", default-features = false, features = ["embed-fonts"] }
+hayro-syntax = { package = "aphrody-hayro-syntax", path = "../../apps/pdfcraft/vendor/hayro-syntax", version = "0.7.2" }
+hayro-interpret = { package = "aphrody-hayro-interpret", path = "../../apps/pdfcraft/vendor/hayro-interpret", version = "0.7.0", default-features = false, features = ["embed-fonts"] }
 hayro-cmap = "0.1"
 kurbo = { version = "0.13", features = ["serde"] }
 

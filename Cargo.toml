@@ -408,6 +408,7 @@ members = [
     "crates/pdfcraft-model",
     "crates/pdfcraft-optimize",
     "crates/pdfcraft-organize",
+    "crates/pdfcraft-preflight",
     "crates/pdfcraft-platform",
     "crates/pdfcraft-print",
     "crates/pdfcraft-redact",
@@ -1393,11 +1394,6 @@ bun-re = { path = "crates/re" }
 simdutf = { path = "crates/simdutf" }
 rfb-encodings = { path = "crates/rfb-encodings" }
 aphrody-m3-tokens = { path = "crates/aphrody-m3-tokens" }
-hayro = { path = "apps/pdfcraft/vendor/hayro" }
-hayro-interpret = { path = "apps/pdfcraft/vendor/hayro-interpret" }
-hayro-syntax = { path = "apps/pdfcraft/vendor/hayro-syntax" }
-hayro-jbig2 = { path = "apps/pdfcraft/vendor/hayro-jbig2" }
-lopdf = { path = "apps/pdfcraft/vendor/lopdf" }
 winit = { path = "apps/pdfcraft/vendor/winit" }
 egui-wgpu = { path = "apps/pdfcraft/vendor/egui-wgpu" }
 # Rust base (docs/RUST-BASE.md, factory/rustbase/forks.json): one aphrody-labs fork per shared crate, same rev as the

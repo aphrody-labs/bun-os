@@ -4,6 +4,7 @@ description = "Annotations (comments): builders, appearance streams and edits, I
 version = "0.7.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"
@@ -25,4 +26,4 @@ pdfcraft-model = { path = "../pdfcraft-model", version = "0.7.1" }
 thiserror = "2"
 
 [dev-dependencies]
-hayro-syntax = "0.7.2"
+hayro-syntax = { package = "aphrody-hayro-syntax", path = "../../apps/pdfcraft/vendor/hayro-syntax", version = "0.7.2" }

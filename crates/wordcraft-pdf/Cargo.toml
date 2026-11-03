@@ -3,6 +3,7 @@ name = "wordcraft-pdf"
 version = "0.6.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"
 description = "WordCraft PDF export (krilla): embedded font subsets with selectable text, links, outline, tagging"
 
 [lints.rust]
@@ -27,8 +28,8 @@ thiserror = "2"
 log = "0.4"
 
 [dev-dependencies]
-hayro-syntax = "0.7.2"
-hayro-interpret = { version = "0.7.0", default-features = false, features = ["embed-fonts"] }
+hayro-syntax = { package = "aphrody-hayro-syntax", path = "../../apps/pdfcraft/vendor/hayro-syntax", version = "0.7.2" }
+hayro-interpret = { package = "aphrody-hayro-interpret", path = "../../apps/pdfcraft/vendor/hayro-interpret", version = "0.7.0", default-features = false, features = ["embed-fonts"] }
 hayro-cmap = "0.1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

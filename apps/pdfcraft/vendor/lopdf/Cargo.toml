@@ -12,7 +12,7 @@
 [package]
 edition = "2024"
 rust-version = "1.88"
-name = "lopdf"
+name = "aphrody-lopdf"
 version = "0.45.0"
 authors = [
     "Junfeng Liu <china.liujunfeng@gmail.com>",
@@ -25,14 +25,13 @@ autobins = false
 autoexamples = false
 autotests = false
 autobenches = false
-description = "A Rust library for PDF document manipulation."
-homepage = "https://github.com/J-F-Liu/lopdf"
-documentation = "https://docs.rs/crate/lopdf/"
+description = "A Rust library for PDF document manipulation. Aphrody fork of lopdf (https://github.com/J-F-Liu/lopdf) carrying the PdfCraft patches listed in apps/pdfcraft/vendor/README.md of aphrody-labs/bun-os."
 readme = "README.md"
 keywords = ["pdf", "editing", "manipulation", "merge"]
 categories = ["text-processing"]
 license = "MIT"
-repository = "https://github.com/J-F-Liu/lopdf.git"
+homepage = "https://github.com/J-F-Liu/lopdf"
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [badges.travis-ci]
 repository = "J-F-Liu/lopdf"

@@ -86,7 +86,7 @@ fn info(doc: &Document, key: &str) -> Option<String> {
 }
 
 /// The XMP packet for `doc` declaring `level`, from its document information.
-pub fn packet(doc: &Document, level: crate::preflight::Level) -> String {
+pub fn packet(doc: &Document, level: crate::Level) -> String {
     let mut props = String::new();
     if let Some(t) = info(doc, "Title") {
         props.push_str(&format!("   <dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">{}</rdf:li></rdf:Alt></dc:title>\n", esc(&t)));

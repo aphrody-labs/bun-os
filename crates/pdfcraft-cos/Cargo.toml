@@ -26,4 +26,4 @@ thiserror = "2"
 [dev-dependencies]
 serde_json = "1"
 proptest = "1"
-hayro-syntax = "0.7.2"
+hayro-syntax = { package = "aphrody-hayro-syntax", path = "../../apps/pdfcraft/vendor/hayro-syntax", version = "0.7.2" }

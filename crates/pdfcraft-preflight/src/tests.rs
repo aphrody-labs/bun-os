@@ -96,7 +96,7 @@ fn verify_reports_what_breaks_pdfa() {
 /// what this reads off the file; the sentences `convert` reports as fixed are not wordings.
 #[test]
 fn wordings_are_complete() {
-    let source = include_str!("mod.rs");
+    let source = include_str!("lib.rs");
     let mut said = Vec::new();
     let mut rest = source;
     // `issue("clause", "wording", ...)`, on one line or wrapped one argument per line by rustfmt.

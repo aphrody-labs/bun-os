@@ -3,6 +3,7 @@ name = "gridcraft-xlsx"
 version = "0.6.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"
 description = "GridCraft file formats: XLSX (SpreadsheetML) and CSV import/export"
 
 [lints.rust]

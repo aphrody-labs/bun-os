@@ -4,6 +4,7 @@ description = "Page rendering (bootstrap: hayro) and document inspection for Pdf
 version = "0.7.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"
@@ -21,9 +22,9 @@ todo = "warn"
 [dependencies]
 pdfcraft-cos = { path = "../pdfcraft-cos", version = "0.7.1" }
 pdfcraft-fonts = { path = "../pdfcraft-fonts", version = "0.7.1" }
-hayro = "0.7.1"
-hayro-syntax = "0.7.2"
-lopdf = "0.45"
+hayro = { package = "aphrody-hayro", path = "../../apps/pdfcraft/vendor/hayro", version = "0.7.1" }
+hayro-syntax = { package = "aphrody-hayro-syntax", path = "../../apps/pdfcraft/vendor/hayro-syntax", version = "0.7.2" }
+lopdf = { package = "aphrody-lopdf", path = "../../apps/pdfcraft/vendor/lopdf", version = "0.45.0" }
 kurbo = "0.13"
 thiserror = "2"
 log = "0.4"

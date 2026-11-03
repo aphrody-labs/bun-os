@@ -11284,6 +11284,19 @@
       "status": "present"
     },
     {
+      "id": "crate:crates/pdfcraft-preflight",
+      "kind": "crate",
+      "path": "crates/pdfcraft-preflight",
+      "source": {
+        "type": "path-crate",
+        "name": "pdfcraft-preflight",
+        "version": "0.7.1"
+      },
+      "registration": ["none"],
+      "aot": true,
+      "status": "present"
+    },
+    {
       "id": "crate:crates/pdfcraft-print",
       "kind": "crate",
       "path": "crates/pdfcraft-print",

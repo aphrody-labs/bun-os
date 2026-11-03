@@ -3,6 +3,7 @@ name = "wordcraft-geom"
 version = "0.6.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"
 description = "WordCraft geometry and units: points, twips, EMU, inches, centimetres; rectangles; measurement parsing"
 
 [lints.rust]

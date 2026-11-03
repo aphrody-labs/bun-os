@@ -12,7 +12,7 @@
 [package]
 edition = "2024"
 rust-version = "1.92"
-name = "hayro-interpret"
+name = "aphrody-hayro-interpret"
 version = "0.7.0"
 authors = ["Laurenz Stampfl <laurenz.stampfl@gmail.com>"]
 build = false
@@ -21,10 +21,11 @@ autobins = false
 autoexamples = false
 autotests = false
 autobenches = false
-description = "A crate for interpreting PDF files."
+description = "A crate for interpreting PDF files. Aphrody fork of hayro-interpret (https://github.com/LaurenzV/hayro) carrying the PdfCraft patches listed in apps/pdfcraft/vendor/README.md of aphrody-labs/bun-os."
 readme = "README.md"
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/LaurenzV/hayro"
+homepage = "https://github.com/LaurenzV/hayro"
+repository = "https://github.com/aphrody-labs/bun-os"
 resolver = "2"
 
 [features]
@@ -53,7 +54,9 @@ version = "0.1.0"
 default-features = false
 
 [dependencies.hayro-syntax]
-version = "0.7.0"
+package = "aphrody-hayro-syntax"
+path = "../hayro-syntax"
+version = "0.7.2"
 features = ["std", "images", "unsafe"]
 default-features = false
 

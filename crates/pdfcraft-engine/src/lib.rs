@@ -39,7 +39,7 @@ pub mod ocr;
 pub mod ocr_core;
 pub mod optimizer;
 pub mod perspective;
-pub mod preflight;
+pub use pdfcraft_preflight as preflight;
 pub mod printcheck;
 mod scan_colours;
 pub mod signature_image;

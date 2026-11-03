@@ -4,6 +4,7 @@ description = "Create PDFs: blank documents, from images (PNG, JPEG) and from pl
 version = "0.7.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"
@@ -31,4 +32,4 @@ encoding_rs = "0.8"
 
 [dev-dependencies]
 image = { version = "0.25", default-features = false, features = ["bmp", "gif", "jpeg"] }
-hayro-syntax = "0.7.2"
+hayro-syntax = { package = "aphrody-hayro-syntax", path = "../../apps/pdfcraft/vendor/hayro-syntax", version = "0.7.2" }
