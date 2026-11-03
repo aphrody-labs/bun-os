@@ -1,13 +1,13 @@
 {
-  "$comment": "Native window effect per skin and OS, owned by @aphrody/tauri-theme. Effect names are tauri-utils WindowEffect (camelCase) as of tauri 2.12.5. Window colours are never set here: the web content paints M3 roles from @aphrody/m3-tokens.",
+  "$comment": "Native window effect per skin and OS, owned by @aphrody/tauri-theme. Effect names are the tauri-utils WindowEffect values (camelCase) of the pinned tauri 3.0.0-alpha line; `transparent` tells the Tauri window config whether the webview must be transparent for the effect to show. Window colours are never set here: the web content paints M3 roles from @aphrody/m3-tokens.",
   "m3": {
     "windows": { "effects": [], "transparent": false },
-    "macos": { "effects": [], "radius": 16, "state": "followsWindowActiveState", "transparent": false },
+    "macos": { "effects": [], "transparent": false },
     "other": { "effects": [], "transparent": false }
   },
   "fluent": {
     "windows": { "effects": ["mica"], "transparent": true },
-    "macos": { "effects": [], "radius": 8, "state": "followsWindowActiveState", "transparent": false },
+    "macos": { "effects": [], "transparent": false },
     "other": { "effects": [], "transparent": false }
   },
   "apple": {

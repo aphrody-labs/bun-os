@@ -32,9 +32,9 @@ material from `src/window-effects.json` and applies a shape preset on the M3 cor
 | `fluent`       | `mica`  | opaque                                        | opaque          | 4px controls, 8px overlays and windows |
 | `apple`        | opaque  | `liquidGlassRegular`, `underWindowBackground` | opaque          | one step up the M3 Expressive scale    |
 
-Effect names are `tauri-utils::WindowEffect` (tauri 2.12.5). Under `prefers-reduced-transparency: reduce`,
-`prefers-contrast: more` or `forced-colors: active` every skin falls back to an opaque window, as DESIGN-SYSTEM.md
-requires for materials. The skin is chosen by `?skin=`, then localStorage `aphrody-skin`, then the platform.
+Effect names are `tauri-utils::WindowEffect` values of the pinned tauri 3.0.0-alpha line. Under
+`prefers-reduced-transparency: reduce`, `prefers-contrast: more` or `forced-colors: active` every skin falls back to an
+opaque window, as DESIGN-SYSTEM.md requires for materials. The skin is chosen by `?skin=`, then localStorage `aphrody-skin`, then the platform.
 
 ## Proof
 
