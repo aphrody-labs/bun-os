@@ -94,8 +94,13 @@ foreach ($name in $layout.Keys) {
   if ((Hash $src) -ne $expected[$name]) { throw "sha256 mismatch: $name" }
   $dst = Join-Path $Root $layout[$name]
   $sign = $name -like '*.exe' -or $name -like '*.sys' -or $name -like '*.cat'
+  # The %SystemRoot%\BunOS tree is written only by this script, so a file already there is ours to refresh (adopt),
+  # even if a prior run placed it before recording the manifest or re-signing changed its hash. A path outside $Root
+  # (only the System32 links are, handled below) is never overwritten.
+  $underRoot = ([IO.Path]::GetFullPath($dst)).StartsWith(([IO.Path]::GetFullPath($Root)), [StringComparison]::OrdinalIgnoreCase)
   $state = if (-not (Test-Path -LiteralPath $dst)) { 'new' }
     elseif (& $ours $dst) { if ($previous[$dst.ToLowerInvariant()].source -eq $expected[$name]) { 'same' } else { 'upgrade' } }
+    elseif ($underRoot) { 'upgrade' }
     else { throw "refusing to overwrite $dst (not installed by this script, or changed since)" }
   $items += [pscustomobject]@{ name = $name; src = $src; dst = $dst; source = $expected[$name]; state = $state; sign = $sign; link = ($name -like '*.exe') }
 }
@@ -138,16 +143,21 @@ foreach ($l in $links) { if (-not (Test-Path -LiteralPath $l.path)) { New-Item -
 
 # Token (create once, admin-only ACL).
 $tokenPath = Join-Path $Root 'bridge.token'
-if (-not (Test-Path -LiteralPath $tokenPath)) {
+$tokenNew = -not (Test-Path -LiteralPath $tokenPath) -or -not (Get-Content -Raw -LiteralPath $tokenPath).Trim()
+if ($tokenNew) {
   $bytes = [byte[]]::new(32); [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
   ($bytes | ForEach-Object { $_.ToString('x2') }) -join '' | Set-Content -NoNewline -LiteralPath $tokenPath
-  $acl = Get-Acl $tokenPath; $acl.SetAccessRuleProtection($true, $false)
-  foreach ($who in 'NT AUTHORITY\SYSTEM', 'BUILTIN\Administrators') {
-    $acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($who, 'FullControl', 'Allow'))
-  }
-  Set-Acl $tokenPath $acl
-  Write-Host "created $tokenPath (SYSTEM + Administrators only)"
 }
+# Always enforce the restrictive ACL (locale-independent well-known SIDs: LocalSystem + Administrators).
+$acl = Get-Acl $tokenPath; $acl.SetAccessRuleProtection($true, $false)
+foreach ($rule in @($acl.Access)) { [void]$acl.RemoveAccessRule($rule) }
+foreach ($sid in 'S-1-5-18', 'S-1-5-32-544') {
+  $id = [System.Security.Principal.SecurityIdentifier]::new($sid)
+  $acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new($id, 'FullControl', 'Allow'))
+}
+$acl.SetOwner([System.Security.Principal.SecurityIdentifier]::new('S-1-5-32-544'))
+Set-Acl $tokenPath $acl
+if ($tokenNew) { Write-Host "created $tokenPath (SYSTEM + Administrators only)" }
 
 # Service (demand start; the bridge reads the token store and serves hvsocket on the default port).
 $bridge = Join-Path $Root 'bin\bunos-winbridge.exe'
