@@ -13,7 +13,7 @@
 //   bun check-android.ts --aosp <configs/c/android-6.12> --src <kernel tree> --config <.config> [--json out.json]
 //
 // Exit 1 when anything is `missing` or when a waiver/absent note no longer applies (stale list).
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, lstatSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 // Requirements linux-bun does not meet on purpose: an Android device kernel wants them, a desktop/WSL/Waydroid
@@ -87,7 +87,8 @@ const walk = (dir: string) => {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     if (name === ".git") continue;
-    const st = statSync(p);
+    const st = lstatSync(p);
+    // lstat: the build leaves dangling symlinks (vmlinux-gdb.py) in the tree; they are not Kconfig sources.
     if (st.isDirectory()) walk(p);
     else if (name.startsWith("Kconfig"))
       for (const m of readFileSync(p, "utf8").matchAll(/^\s*(?:menu)?config\s+(\w+)/gm)) symbols.add(`CONFIG_${m[1]}`);
