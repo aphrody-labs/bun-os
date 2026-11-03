@@ -17,9 +17,17 @@ the owner (listed under "Owner-only").
 - [ ] Gate green on main: `bun check`, `bun lint`, `bun format`, `cargo check --workspace --locked` (format debt
       is the blocker: about 6700 files; fix with the repo wrapper once the design-system migration in the other
       session has landed). Auto-deliver then runs by itself.
-- [ ] Every public host answers (no 502, timeout or 404 at the root): nie.aphrody.app, omar.aphrody.com,
-      control.aphrody.app, api.aphrody.com/, cdn.aphrody.com/, aphrody.com/store, store.aphrody.com (DNS via the
-      Cloudflare MCP or drop it from the CORS map). `user@1001.service` on the VPS clean.
+- [ ] Every public host answers (no 502, timeout or 404 at the root). Diagnosed by the agy sub-agent
+      (read-only, 2026-11-03), repository decisions already taken:
+      - control.aphrody.app: decommissioned on purpose (eef485d3b8, no DNS record): not a target.
+      - store.aphrody.com: ghost CORS origin, removed from infra/fleet/api.toml and the generated gateway.conf.
+      - aphrody.com/store: not a promise anywhere in docs/apps; the Store is served at /repo/, /npm/, /cargo/,
+        /downloads/os/ and /api/store/: not a target.
+      - omar.aphrody.com: public A record points at the private mesh IP 10.200.77.10; the catalog says it must
+        resolve to the VPS and answer 403 (vhost exists, not enabled): fix DNS via the Cloudflare MCP and enable it.
+      - api.aphrody.com/ and cdn.aphrody.com/ return 404 at the root: add an index or redirect through the repo.
+      - nie.aphrody.app: owner decision (game depot missing on the VPS, RG_CORE_MODELES=0): decommission or restore.
+      - `user@1001.service` on the VPS clean (drop-in lists controllers this systemd rejects).
 - [ ] Komodo (deploy.aphrody.app): Mongo data directory backed up, repaired or recreated, service healthy.
       Needs the owner's decision on the 248 GB WiredTiger data (see Owner-only).
 
