@@ -43,7 +43,9 @@
     "bunos-plugin": "./src/bin/bunos-plugin.ts",
     "bunos-env": "./src/bin/bunos-env.ts",
     "bunos-cookie": "./src/bin/bunos-cookie.ts",
-    "bunos-host": "./src/bin/bunos-host.ts"
+    "bunos-host": "./src/bin/bunos-host.ts",
+    "bunos-python": "./src/bin/bunos-python.ts",
+    "bunos-dotnet": "./src/bin/bunos-dotnet.ts"
   },
   "files": [
     "src",

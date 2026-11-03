@@ -17,6 +17,8 @@
  * synchronous `require()` of the owner file on first read.
  */
 import type { BunPlugin, PluginBuilder } from "bun";
+import { existsSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export type ModuleTarget = string | URL;
@@ -26,6 +28,11 @@ export interface BunOsPluginSpec {
   name: string;
   /** Virtual module specifier to the owner file that implements it. */
   modules?: Record<string, ModuleTarget>;
+  /**
+   * Package-name modules the fork shipped as hardcoded builtins (`uuid`, `dotenv`). Registered only when the
+   * specifier does not resolve from the working directory, so an installed npm package keeps precedence.
+   */
+  fallbackModules?: Record<string, ModuleTarget>;
   /** Lazy globals: `"Bun.Video"` or `"globalThis.X"` to the owner file; the default export is the value. */
   globals?: Record<string, ModuleTarget>;
   /** CLI bins the owner package provides (documentation and `bun-os-plugins list`). */
@@ -59,6 +66,16 @@ function isRuntimeBuiltin(specifier: string): boolean {
   }
 }
 
+/** Whether the npm package of `specifier` is installed in a node_modules above `dir` (no resolver, no auto-install). */
+function resolvesFrom(specifier: string, dir: string): boolean {
+  const parts = specifier.split("/");
+  const name = specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0]!;
+  for (let current = resolve(dir); ; current = dirname(current)) {
+    if (existsSync(join(current, "node_modules", name, "package.json"))) return true;
+    if (dirname(current) === current) return false;
+  }
+}
+
 function defineLazyGlobal(name: string, path: string): void {
   const [root, ...rest] = name.split(".");
   const key = rest.pop();
@@ -88,6 +105,11 @@ export function defineBunOsPlugin(spec: BunOsPluginSpec): BunOsPlugin {
         // Aphrody builds can ship these modules natively. Bun rejects plugin aliases for builtins,
         // while upstream Bun resolves unknown bun: specifiers only through this plugin registry.
         if (specifier.startsWith("bun:") && isRuntimeBuiltin(specifier)) continue;
+        const contents = forwarder(targetPath(target));
+        build.module(specifier, () => ({ contents, loader: "js" }));
+      }
+      for (const [specifier, target] of Object.entries(spec.fallbackModules ?? {})) {
+        if (resolvesFrom(specifier, process.cwd())) continue;
         const contents = forwarder(targetPath(target));
         build.module(specifier, () => ({ contents, loader: "js" }));
       }

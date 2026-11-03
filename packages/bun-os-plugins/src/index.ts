@@ -8,14 +8,26 @@
  */
 import chromium from "@aphrody/chromium/bun-plugin";
 import google from "@aphrody/google/bun-plugin";
+import python from "@aphrody/runtime-sdk/bun-plugin";
 import windows from "@aphrody/windows/bun-plugin";
 import commands from "./commands/plugin.ts";
 import compat from "./compat/plugin.ts";
+import dotnet from "./dotnet/plugin.ts";
+import thirdparty from "./thirdparty/plugin.ts";
 import type { BunOsPlugin } from "./define.ts";
 
 export { defineBunOsPlugin, targetPath, type BunOsPlugin, type BunOsPluginSpec } from "./define.ts";
 
-export const plugins: readonly BunOsPlugin[] = [google, chromium, windows, compat, commands];
+export const plugins: readonly BunOsPlugin[] = [
+  google,
+  chromium,
+  windows,
+  python,
+  dotnet,
+  compat,
+  thirdparty,
+  commands,
+];
 
 let registered = false;
 
@@ -38,7 +50,7 @@ export function inventory(): InventoryRow[] {
   const rows: InventoryRow[] = [];
   for (const { spec } of plugins) {
     const replaces = spec.replaces ?? [];
-    for (const name of Object.keys(spec.modules ?? {}))
+    for (const name of [...Object.keys(spec.modules ?? {}), ...Object.keys(spec.fallbackModules ?? {})])
       rows.push({ plugin: spec.name, kind: "module", name, replaces });
     for (const name of Object.keys(spec.globals ?? {}))
       rows.push({ plugin: spec.name, kind: "global", name, replaces });

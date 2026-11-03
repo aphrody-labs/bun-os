@@ -177,6 +177,18 @@ export const FORK_COMMANDS: Record<string, ForkCommand> = {
     route: { kind: "exec", candidates: [["bun-os-host"]], build: "cargo build -p bun_host" },
     help: "host resource inventory and shared host registry",
   },
+  python: {
+    fork: "bun python (and running .py files)",
+    owner: "packages/yolo-cli (yolo python; bun:python in packages/runtime-sdk)",
+    route: { kind: "script", script: "packages/yolo-cli/src/index.ts", prefix: ["python"] },
+    help: "Python through the Bun OS Python owner",
+  },
+  dotnet: {
+    fork: "bun dotnet",
+    owner: ".NET SDK dotnet (bun:dotnet in-process host: packages/bun-os-plugins/src/dotnet)",
+    route: { kind: "exec", candidates: [["dotnet"]], build: "bun packages/buncc/src/cli.ts dotnet install" },
+    help: "the .NET SDK CLI",
+  },
 };
 
 /** The Bun OS checkout this package lives in. */
