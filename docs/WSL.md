@@ -408,6 +408,26 @@ one-time VM restart from their session when msrdc is found in session 0. Verifie
 start and no crash over 5 min, `xeyes`, `weston-terminal` and `glxgears` drawing as Win32 windows. The restart killed
 one Docker build of another agent (announced over `aphrody a2a`; it retried automatically).
 
+### Desktop sessions and `[bunos-testing]` (2026-11-03)
+
+- Repository: `factory/wsl/publish-testing.sh` (build host) publishes the `[bunos-testing]` packages that
+  `factory/desktop/build.sh` builds at `https://aphrody.com/repo/bunos-testing/x86_64/` (nginx `/repo/` of the Store),
+  every package and the database signed with the Store key `aphrody-store` (`A4B3EFE520B09C8184ACF571BFCB340002617BD7`,
+  public half `https://aphrody.com/repo/os/aphrody.gpg`); clients use `SigLevel = Required`. Only the files the
+  database names are published (81 packages). A URL fetched before it exists can stay 404 for up to 120 s
+  (`open_file_cache_errors on`, `open_file_cache_valid 120s`).
+- Distro: `bunos-wsl-native.sh repo|desktop`, `factory/wsl/packages.desktop`, `install.ts --desktop`, image profile
+  `desktop`; the bundle and `setup-elevated.ps1` ship the list. Installed live: bunos-cli, bunos-desktop 4,
+  bunos-design-m3, bunos-mesa, bunos-omarchy 2, cosmic-session, gnome-shell, mutter-devkit, wayvnc, wlvncc, aquamarine 2
+  (our fork) and the GStreamer elements; about 3 GB.
+- Kernel: `wsl-desktop.config` adds `CONFIG_DRM_VKMS=y` (Hyprland needs a KMS device). Rebuilt incrementally in the
+  7.3.1 tree (242 s), bundle rebuilt (`bzImage` `1f1c9791...`, `modules.vhdx` `5999da0c...`, zip `b2f119c5...`) and
+  installed with `setup-elevated.ps1` (upgrade of `bzImage`, `modules.vhdx`, scripts, `bunos.exe`; new
+  `packages.desktop`). The one VM restart this needed was announced on `aphrody a2a` (help-wanted, native-apps) 13 min
+  before and run with no container running. Since then `wsl.exe` warns that mirrored networking uses a smaller
+  ephemeral port range (2048 ports instead of 4096); nothing failed from it.
+- Sessions, times and screenshots: [DESKTOP-SESSIONS.md](DESKTOP-SESSIONS.md), "Run on the workstation".
+
 ### Undo
 
 ```sh

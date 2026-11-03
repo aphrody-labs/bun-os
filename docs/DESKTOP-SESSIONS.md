@@ -107,9 +107,12 @@ tokei, git-delta, gitui. All maintained on 2026-11-03 (release or push within th
 release slowly but their default branches are active). The picks match the native Windows userland
 (`factory/windows/userland/tools.json`) and add the Linux session tools.
 
-To install in the distro (owner of the package lists: `factory/wsl/`): add `[bunos-testing]` before `[core]` in
-`/etc/pacman.conf`, then `pacman -Syu bunos-cli bunos-desktop` and the desktops wanted, for example
-`pacman -S bunos-omarchy` or `pacman -S cosmic-session cosmic-comp`; then `bunos-session`.
+To install in the distro (owner of the package lists: `factory/wsl/`): `bunos-wsl-native.sh desktop` as root, or
+`install.ts --desktop`, or the image profile `BUNOS_PROFILE=desktop`. It adds `[bunos-testing]` before the first
+repository (`SigLevel = Required`, `Server = https://aphrody.com/repo/bunos-testing/$arch`), trusts the store key
+`A4B3EFE520B09C8184ACF571BFCB340002617BD7` from `https://aphrody.com/repo/os/aphrody.gpg`, installs
+`factory/wsl/packages.desktop` and adds the user to `video` and `render`; then `bunos-session`. The repository is
+published signed by `factory/wsl/publish-testing.sh` (packages and database; only the files the database names).
 
 ## Status (2026-11-03)
 
@@ -125,9 +128,47 @@ nushell, uutils, helix, zellij, atuin, yazi, bottom, delta, gitui, just 1.59.0, 
 / `--plan` and `bunos-theme --gtk` run against the committed manifest and Omarchy themes; `cargo test -p bunos-win11`
 locks the manifest to the profiles.
 
-Not verified yet: any session running under WSLg (that needs the WSL bundle with the vgem render node, run by the WSL
-track). Pins behind the newest release: rio (`v0.5.28`+2; `v0.5.29` is out), cosmic-comp/cosmic-session (epoch 1.11 base
+Sessions under WSLg and under bunos-wayland-win: see "Run on the workstation" below. Pins behind the newest release: rio (`v0.5.28`+2; `v0.5.29` is out), cosmic-comp/cosmic-session (epoch 1.11 base
 3 and 1 commits behind the tag, plus Bun OS defaults). Open: porting Omarchy's menus and commands from bash to
 Bun/nushell, a Walker package, Omarchy's WSL guest adaptations (animations off on CPU rendering, clipboard and time zone
 follow Windows), Lua forms of the design track's Hyprland chrome for Hyprland 0.57 / Omarchy quattro, rebuilding the
 COSMIC applications against the patched libcosmic.
+
+## Run on the workstation (2026-11-03)
+
+The `bunos` distro on our 7.3.1 kernel (vkms added, [WSL.md](WSL.md) section 8), WSLg with msrdc in the user's session,
+packages from the published `[bunos-testing]`. Times are from spawning the command on Windows to the session's window on
+the Windows desktop (`factory/wsl/windows/session-probe.ts`, `EnumWindows` every 20 ms); screenshots were read back.
+
+| Session | Path | Window | Time | What draws |
+| --- | --- | --- | --- | --- |
+| `cosmic` | WSLg, `bunos-session cosmic` | "Smithay (bunos)", 1280x800 | 0.75 s (1.3 s first start) | COSMIC panel (Workspaces, Applications), dock, background |
+| `cosmic-comp` | WSLg | "Smithay (bunos)" | 0.65 s | background (no shell, as intended) |
+| `gnome` | WSLg, `bunos-session gnome` | "Mutter Development Kit (bunos)" | 2.3 s (1.8 s without the chooser) | GNOME Shell overview, workspace thumbnails |
+| `hyprland` | WSLg, vkms -> wayvnc -> wlvncc | "WayVNC (bunos)", 960x540 | 1.1 s | Hyprland wallpaper |
+| `omarchy` | WSLg, same | "WayVNC (bunos)" | 1.6 s | Omarchy wallpaper and windows; no Quickshell bar |
+| `cosmic` | bunos-wayland-win (`--wsl bunos`) | "Smithay" | 0.87 s | panel with clock, dock; the output follows the window size |
+| `gnome` | bunos-wayland-win | "Mutter Development Kit" | 2.4 s | top bar with clock, wallpaper |
+| `omarchy` viewer | bunos-wayland-win running wlvncc | "WayVNC" | 1.2 s | the same Omarchy output |
+
+Fixes that this run needed (all committed):
+
+- GNOME: `gnome-shell --devkit` aborted ("Failed to start X Wayland: /tmp/.X11-unix is not writable": WSLg mounts it
+  read-only), so the profile adds `--no-x11`. It then took 27 s to show its window: the devkit viewer calls
+  `org.freedesktop.portal.Desktop`, whose GTK backend waits for a display that is not up yet (25 s D-Bus timeouts before
+  the virtual monitor). `XDG_DESKTOP_PORTAL_DIR=/var/empty` in the profile: 1.8 s. GNOME's screen-cast service also
+  needs `gst-plugin-pipewire gst-plugins-base gst-plugins-good` (in `factory/wsl/packages.desktop`).
+- Hyprland/Omarchy: the headless plan could not start. Aquamarine needs a KMS device and WSL has only vgem
+  (render-only): "no allocator available". The kernel now builds vkms (`factory/wsl/kernel/wsl-desktop.config`).
+  Then Aquamarine borrowed vgem as vkms's render node and every GBM allocation failed: `aquamarine` is now packaged
+  from our fork (`bunos/v0.16.0`, v0.16.0 + one patch that skips a vgem render node) and the vendor pin moved from the
+  stale v0.15.1 to that commit. Then no EGL device matched vkms: the profile sets `LIBGL_ALWAYS_SOFTWARE=1` (llvmpipe).
+- bunos-omarchy: its `foot.desktop`, `imv.desktop`, `mpv.desktop` are per-user overrides in Omarchy and conflicted with
+  those packages system-wide. They now go to `/etc/skel/.local/share/applications`, and `bunos-session omarchy` copies
+  them into an existing user's `~/.local/share/applications` (pkgrel 2).
+
+Open: Omarchy's Quickshell bar does not start in the headless session; cosmic-comp's own Xwayland fails for the same
+read-only `/tmp/.X11-unix` (our smithay fork in bunos-wlhost already serves the abstract socket; cosmic-comp's smithay
+pin does not); under WSLg, COSMIC keeps a 1280x800 output when the Windows window is resized (the native presenter
+reflows); Hyprland cannot nest in bunos-wlhost (GBM/dmabuf, [WAYLAND-WINDOWS.md](WAYLAND-WINDOWS.md)), only its viewer
+can; `gnome-shell-calendar-server` lacks `libecal` (evolution-data-server is not a dependency).

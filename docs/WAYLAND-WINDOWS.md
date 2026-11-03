@@ -268,8 +268,8 @@ path as Mesa d3d12 above, so it remains open.
 * No zero-copy GPU path (above). `zwp_linux_dmabuf_v1` exists (`--dmabuf`, pixman import of linear buffers), but on
   WSL2 nothing GPU-rendered can feed it: d3d12/Dozen cannot export dmabufs and vgem has no 3D driver. So Hyprland
   (GBM/EGL) does not start nested in the distro, while cosmic-comp does (winit/EGL over wl_shm, GPU-rendered).
-* The WSLg comparison is blocked by WSLg's Weston crash loop (above). That fix belongs to [WSL.md](WSL.md) /
-  `factory/wsl/`.
+* The WSLg crash loop above is fixed (msrdc ran in session 0 because the BunOSWsl service created the VM;
+  [WSL.md](WSL.md) section 8). The WSLg comparison with `bench/wlbench.py` is still to run.
 * bunos-wlhost is not packaged yet. In the distro it is built from the checkout and installed in
   `/usr/local/bin`. A PKGBUILD needs the crate and `vendor/smithay` from this repository as its source. That is for
   the desktop agent's `factory/desktop/pkgbuilds/` (`bunos-wayland-win`, makedepends `cargo`, depends
@@ -283,8 +283,8 @@ path as Mesa d3d12 above, so it remains open.
 * Not implemented: clipboard to and from Windows, text-input-v3 / Windows IME, primary selection, xdg-activation,
   window icons, multi-monitor output mapping (one output equals the primary monitor), KDE `org_kde_kwin_blur` (only
   `ext-background-effect-v1`), cursor bitmaps (named cursors only), touch and pen, audio.
-* Nested cosmic-comp and GNOME are not packaged on `vps`. They need the `bunos-testing` packages from
-  [DESKTOP-SESSIONS.md](DESKTOP-SESSIONS.md).
+* COSMIC and GNOME 51 from `[bunos-testing]` run nested under bunos-wlhost in the distro (COSMIC 0.87 s, GNOME devkit
+  2.4 s to the window; [DESKTOP-SESSIONS.md](DESKTOP-SESSIONS.md), "Run on the workstation").
 * Frame pacing uses acks only. There is no `wp_presentation` feedback from DWM (`DwmGetCompositionTimingInfo`) yet.
 * The Windows binary is test-signed (`factory/windows/signing/test-signing.ps1 sign`: `CN=Bun OS Test Signing`, SHA-256,
   DigiCert RFC 3161 timestamp, `Get-AuthenticodeSignature` Valid). Packaging and an installer are still to do.
