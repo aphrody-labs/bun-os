@@ -125,20 +125,62 @@ export const FORK_COMMANDS: Record<string, ForkCommand> = {
   },
   ssh: {
     fork: "bun ssh",
-    owner: "crates/aphrody-ssh (aphrody ssh)",
-    route: { kind: "exec", candidates: [["aphrody", "ssh"]], build: "cargo build -p aphrody" },
-    help: "operator SSH for configured hosts",
+    owner: "vendor/bun-ssh (bun-ssh, the fork's ssh plugin), else crates/aphrody-ssh (aphrody ssh)",
+    route: {
+      kind: "exec",
+      candidates: [["bun-ssh"], ["aphrody", "ssh"]],
+      build: "cargo build --release --manifest-path vendor/bun-ssh/Cargo.toml",
+    },
+    help: "SSH through the system OpenSSH or the in-process client",
+  },
+  docker: {
+    fork: "bun docker",
+    owner: "vendor/bun-docker (bun-docker, the fork's docker plugin)",
+    route: {
+      kind: "exec",
+      candidates: [["bun-docker"]],
+      build: "cargo build --release --manifest-path vendor/bun-docker/Cargo.toml",
+    },
+    help: "Docker Engine API client (local socket or over SSH)",
+  },
+  vpn: {
+    fork: "bun vpn",
+    owner: "vendor/bun-vpn (bun-vpn, Mullvad management client and embedded daemon)",
+    route: {
+      kind: "exec",
+      candidates: [["bun-vpn"]],
+      build: "cargo build --release --manifest-path vendor/bun-vpn/Cargo.toml",
+    },
+    help: "Mullvad VPN control",
+  },
+  winmd: {
+    fork: "bun winmd",
+    owner: "vendor/bun-winmd (bun-winmd: windows-bindgen with the embedded Windows metadata)",
+    route: {
+      kind: "exec",
+      candidates: [["bun-winmd"]],
+      build: "cargo build --release --manifest-path vendor/bun-winmd/Cargo.toml",
+    },
+    help: "Windows metadata bindings generator",
   },
   just: {
     fork: "bun just",
-    owner: "just (Rust, packages/buncc provider)",
-    route: { kind: "exec", candidates: [["just"]], build: "bun packages/buncc/src/cli.ts install just --run" },
+    owner: "vendor/bun-just (bun-just, the fork's just plugin), else just from packages/buncc",
+    route: {
+      kind: "exec",
+      candidates: [["bun-just"], ["just"]],
+      build: "cargo build --release --manifest-path vendor/bun-just/Cargo.toml",
+    },
     help: "the just command runner",
   },
   uv: {
     fork: "bun uv",
-    owner: "uv (Rust, packages/buncc provider, crates/aphrody-toolchains)",
-    route: { kind: "exec", candidates: [["uv"]], build: "bun packages/buncc/src/cli.ts install uv --run" },
+    owner: "vendor/bun-uv (bun-uv, the fork's uv plugin), else uv from packages/buncc",
+    route: {
+      kind: "exec",
+      candidates: [["bun-uv"], ["uv"]],
+      build: "cargo build --release --manifest-path vendor/bun-uv/Cargo.toml",
+    },
     help: "the uv Python package manager",
   },
   msvc: {
