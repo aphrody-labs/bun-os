@@ -76,29 +76,29 @@ const DEFAULT_PEERS: AgentPeer[] = [
 
 const KIND_COLORS: Record<EnvelopeKind, { bg: string; text: string; border: string }> = {
   ask: {
-    bg: "bg-[var(--md-sys-color-primary-container,#eaddff)]",
-    text: "text-[var(--md-sys-color-on-primary-container,#21005d)]",
-    border: "border-[var(--md-sys-color-primary,#6750a4)]",
+    bg: "bg-primary-container",
+    text: "text-on-primary-container",
+    border: "border-primary",
   },
   fact: {
-    bg: "bg-[var(--md-sys-color-tertiary-container,#ffd8e4)]",
-    text: "text-[var(--md-sys-color-on-tertiary-container,#31111d)]",
-    border: "border-[var(--md-sys-color-tertiary,#7d5260)]",
+    bg: "bg-tertiary-container",
+    text: "text-on-tertiary-container",
+    border: "border-tertiary",
   },
   ack: {
-    bg: "bg-[var(--md-sys-color-secondary-container,#e8def8)]",
-    text: "text-[var(--md-sys-color-on-secondary-container,#1d192b)]",
-    border: "border-[var(--md-sys-color-secondary,#625b71)]",
+    bg: "bg-secondary-container",
+    text: "text-on-secondary-container",
+    border: "border-secondary",
   },
   ping: {
-    bg: "bg-[var(--md-sys-color-surface-container-high,#ece6f0)]",
-    text: "text-[var(--md-sys-color-on-surface-variant,#49454f)]",
-    border: "border-[var(--md-sys-color-outline-variant,#cac4d0)]",
+    bg: "bg-surface-container-high",
+    text: "text-on-surface-variant",
+    border: "border-outline-variant",
   },
   error: {
-    bg: "bg-[var(--md-sys-color-error-container,#f9dedc)]",
-    text: "text-[var(--md-sys-color-on-error-container,#410e0b)]",
-    border: "border-[var(--md-sys-color-error,#b3261e)]",
+    bg: "bg-error-container",
+    text: "text-on-error-container",
+    border: "border-error",
   },
 };
 
@@ -149,9 +149,9 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
     <div
       className={clsx(
         "flex flex-col gap-4 rounded-3xl p-5 border",
-        "bg-[var(--md-sys-color-surface-container-lowest,#ffffff)]",
-        "border-[var(--md-sys-color-outline-variant,#cac4d0)]",
-        "text-[var(--md-sys-color-on-surface,#1d1b20)]",
+        "bg-surface-container-lowest",
+        "border-outline-variant",
+        "text-on-surface",
         className,
       )}
     >
@@ -159,13 +159,13 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-xl text-[var(--md-sys-color-primary,#6750a4)]">hub</span>
+            <span className="material-symbols-outlined text-xl text-primary">hub</span>
             <h2 className="text-base font-semibold tracking-tight">A2A Fleet Coordinator</h2>
-            <span className="rounded-full bg-[var(--md-sys-color-surface-container-high,#ece6f0)] px-2 py-0.5 text-xs font-mono text-[var(--md-sys-color-on-surface-variant,#49454f)]">
+            <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-xs font-mono text-on-surface-variant">
               v1.0 (JSONL + RPC)
             </span>
           </div>
-          <span className="text-xs text-[var(--md-sys-color-outline,#79747e)]">{peers.length} active peers</span>
+          <span className="text-xs text-outline">{peers.length} active peers</span>
         </div>
 
         {/* Peer selection chips */}
@@ -180,18 +180,18 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
                 className={clsx(
                   "flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors shrink-0",
                   isSelected
-                    ? "bg-[var(--md-sys-color-secondary-container,#e8def8)] text-[var(--md-sys-color-on-secondary-container,#1d192b)] shadow-sm"
-                    : "bg-[var(--md-sys-color-surface-container,#f3edf7)] text-[var(--md-sys-color-on-surface-variant,#49454f)] hover:bg-[var(--md-sys-color-surface-container-high,#ece6f0)]",
+                    ? "bg-secondary-container text-on-secondary-container shadow-sm"
+                    : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high",
                 )}
               >
                 <span
                   className={clsx(
                     "h-2 w-2 rounded-full",
                     peer.status === "busy"
-                      ? "bg-amber-500 animate-pulse"
+                      ? "bg-warning animate-pulse motion-reduce:animate-none"
                       : peer.status === "idle"
-                        ? "bg-emerald-500"
-                        : "bg-slate-400",
+                        ? "bg-success"
+                        : "bg-outline",
                   )}
                 />
                 <span>{peer.name}</span>
@@ -204,22 +204,20 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
 
       {/* Selected Peer Details Card */}
       {currentPeer && (
-        <div className="flex flex-col gap-2 rounded-2xl bg-[var(--md-sys-color-surface-container-low,#f7f2fa)] p-4 border border-[var(--md-sys-color-outline-variant,#cac4d0)]/50">
+        <div className="flex flex-col gap-2 rounded-2xl bg-surface-container-low p-4 border border-outline-variant/50">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-sm">{currentPeer.name}</span>
-                <span className="text-xs text-[var(--md-sys-color-on-surface-variant,#49454f)]">
-                  ({currentPeer.role})
-                </span>
+                <span className="text-xs text-on-surface-variant">({currentPeer.role})</span>
               </div>
-              <div className="text-xs text-[var(--md-sys-color-outline,#79747e)] mt-0.5">
+              <div className="text-xs text-outline mt-0.5">
                 Peer ID: <code className="font-mono text-xs">{currentPeer.id}</code> · Version:{" "}
                 {currentPeer.version || "1.0.0"}
               </div>
             </div>
             {currentPeer.activeClaim && (
-              <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-2 py-1 text-xs text-amber-700 dark:text-amber-400 border border-amber-500/20">
+              <div className="flex items-center gap-1.5 rounded-lg bg-warning-container px-2 py-1 text-xs text-on-warning-container border border-warning/20">
                 <span className="material-symbols-outlined text-sm">lock</span>
                 <span className="font-mono text-[11px]">{currentPeer.activeClaim}</span>
               </div>
@@ -231,7 +229,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
               {currentPeer.skills.map(skill => (
                 <span
                   key={skill}
-                  className="rounded-md bg-[var(--md-sys-color-surface-container-highest,#e6e0e9)] px-2 py-0.5 text-[11px] font-mono text-[var(--md-sys-color-on-surface-variant,#49454f)]"
+                  className="rounded-md bg-surface-container-highest px-2 py-0.5 text-[11px] font-mono text-on-surface-variant"
                 >
                   #{skill}
                 </span>
@@ -244,14 +242,14 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
       {/* Envelope Stream Section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--md-sys-color-on-surface-variant,#49454f)]">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
             Coordination Envelopes ({filteredEnvelopes.length})
           </h3>
-          <span className="text-[11px] text-[var(--md-sys-color-outline,#79747e)]">.coord/inbox & .coord/outbox</span>
+          <span className="text-[11px] text-outline">.coord/inbox & .coord/outbox</span>
         </div>
 
         {filteredEnvelopes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-[var(--md-sys-color-surface-container-lowest,#ffffff)] border border-dashed border-[var(--md-sys-color-outline-variant,#cac4d0)] text-xs text-[var(--md-sys-color-outline,#79747e)]">
+          <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-surface-container-lowest border border-dashed border-outline-variant text-xs text-outline">
             <span className="material-symbols-outlined text-2xl mb-1 opacity-50">mark_email_read</span>
             No pending envelopes for @{selectedPeerId}. Fleet mailbox is synchronized.
           </div>
@@ -266,7 +264,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
                   key={env.id}
                   className={clsx(
                     "flex flex-col gap-1.5 rounded-xl p-3 border text-xs transition-shadow",
-                    "bg-[var(--md-sys-color-surface-container-low,#f7f2fa)]",
+                    "bg-surface-container-low",
                     style.border,
                   )}
                 >
@@ -283,16 +281,16 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
                       </span>
                       <span className="font-semibold">{env.topic}</span>
                     </div>
-                    <span className="text-[10px] font-mono text-[var(--md-sys-color-outline,#79747e)]">
+                    <span className="text-[10px] font-mono text-outline">
                       {env.from} → {env.to || "all"}
                     </span>
                   </div>
 
-                  <p className="line-clamp-2 text-xs text-[var(--md-sys-color-on-surface-variant,#49454f)] font-mono whitespace-pre-wrap">
+                  <p className="line-clamp-2 text-xs text-on-surface-variant font-mono whitespace-pre-wrap">
                     {env.body}
                   </p>
 
-                  <div className="flex items-center justify-between pt-1 border-t border-[var(--md-sys-color-outline-variant,#cac4d0)]/30 text-[10px] text-[var(--md-sys-color-outline,#79747e)] font-mono">
+                  <div className="flex items-center justify-between pt-1 border-t border-outline-variant/30 text-[10px] text-outline font-mono">
                     <span>id: {env.id}</span>
                     {env.re && <span>re: {env.re}</span>}
                     <span>{new Date(env.ts).toLocaleTimeString()}</span>
@@ -305,15 +303,12 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
       </div>
 
       {/* Compose Form */}
-      <form
-        onSubmit={handleSend}
-        className="flex flex-col gap-2.5 pt-2 border-t border-[var(--md-sys-color-outline-variant,#cac4d0)]/50"
-      >
+      <form onSubmit={handleSend} className="flex flex-col gap-2.5 pt-2 border-t border-outline-variant/50">
         <div className="flex items-center gap-2">
           <select
             value={composeKind}
             onChange={e => setComposeKind(e.target.value as EnvelopeKind)}
-            className="rounded-xl border border-[var(--md-sys-color-outline-variant,#cac4d0)] bg-[var(--md-sys-color-surface-container-low,#f7f2fa)] px-2.5 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface,#1d1b20)] focus:outline-none focus:ring-1 focus:ring-[var(--md-sys-color-primary,#6750a4)]"
+            className="rounded-xl border border-outline-variant bg-surface-container-low px-2.5 py-1.5 text-xs font-medium text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="ask">ASK</option>
             <option value="fact">FACT</option>
@@ -327,7 +322,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
             placeholder="Topic (e.g. work, claim-check, verification)..."
             value={composeTopic}
             onChange={e => setComposeTopic(e.target.value)}
-            className="flex-1 rounded-xl border border-[var(--md-sys-color-outline-variant,#cac4d0)] bg-[var(--md-sys-color-surface-container-low,#f7f2fa)] px-3 py-1.5 text-xs text-[var(--md-sys-color-on-surface,#1d1b20)] placeholder-[var(--md-sys-color-outline,#79747e)] focus:outline-none focus:ring-1 focus:ring-[var(--md-sys-color-primary,#6750a4)]"
+            className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs text-on-surface placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
 
@@ -337,7 +332,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
             placeholder={`Message body to @${selectedPeerId}...`}
             value={composeBody}
             onChange={e => setComposeBody(e.target.value)}
-            className="flex-1 rounded-xl border border-[var(--md-sys-color-outline-variant,#cac4d0)] bg-[var(--md-sys-color-surface-container-low,#f7f2fa)] px-3 py-1.5 text-xs text-[var(--md-sys-color-on-surface,#1d1b20)] placeholder-[var(--md-sys-color-outline,#79747e)] focus:outline-none focus:ring-1 focus:ring-[var(--md-sys-color-primary,#6750a4)]"
+            className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs text-on-surface placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary"
           />
 
           <button
@@ -346,8 +341,8 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
             className={clsx(
               "flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-xs font-semibold transition-all",
               composeTopic.trim() && composeBody.trim()
-                ? "bg-[var(--md-sys-color-primary,#6750a4)] text-[var(--md-sys-color-on-primary,#ffffff)] hover:opacity-90 shadow-sm"
-                : "bg-[var(--md-sys-color-surface-container-high,#ece6f0)] text-[var(--md-sys-color-outline,#79747e)] cursor-not-allowed",
+                ? "bg-primary text-on-primary hover:opacity-90 shadow-sm"
+                : "bg-surface-container-high text-outline cursor-not-allowed",
             )}
           >
             <span>Dispatch</span>

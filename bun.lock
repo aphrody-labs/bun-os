@@ -947,6 +947,7 @@
         "@aphrody/m3-config": "workspace:*",
       },
       "peerDependencies": {
+        "@aphrody/m3-theme": "workspace:*",
         "react": ">=18.0.0",
         "react-dom": ">=18.0.0",
         "tailwindcss": ">=4.1.0",
@@ -1085,6 +1086,7 @@
       "version": "1.4.7",
       "dependencies": {
         "@aphrody/m3-primitives": "workspace:*",
+        "@aphrody/m3-theme": "workspace:*",
         "clsx": "catalog:",
       },
       "devDependencies": {
@@ -1291,12 +1293,14 @@
       "name": "@aphrody/m3-reader",
       "version": "1.4.7",
       "dependencies": {
+        "@aphrody/m3-theme": "workspace:*",
         "@tanstack/react-virtual": "catalog:",
         "lucide-react": "catalog:",
         "swiper": "catalog:",
       },
       "devDependencies": {
         "@aphrody/m3-config": "workspace:*",
+        "@aphrody/m3-tokens": "workspace:*",
       },
       "peerDependencies": {
         "react": ">=18.0.0",

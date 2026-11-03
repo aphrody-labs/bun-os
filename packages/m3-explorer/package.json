@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "@aphrody/m3-primitives": "workspace:*",
+    "@aphrody/m3-theme": "workspace:*",
     "clsx": "catalog:"
   },
   "devDependencies": {

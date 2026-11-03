@@ -5,6 +5,7 @@
 "use client";
 
 import { CircleButton, Icon } from "@aphrody/m3-primitives";
+import { APHRODY_BRAND_COLORS } from "@aphrody/m3-theme";
 import { clsx } from "clsx";
 
 export interface DriveItem {
@@ -45,16 +46,17 @@ export interface GoogleDriveListViewProps {
   className?: string;
 }
 
-const TYPE_ICONS: Record<DriveItem["type"], { icon: string; colorClass: string }> = {
-  folder: { icon: "folder", colorClass: "text-on-surface-variant fill-current" },
-  document: { icon: "description", colorClass: "text-[#4285F4]" },
-  spreadsheet: { icon: "table_chart", colorClass: "text-[#0EBC5F]" },
-  presentation: { icon: "slideshow", colorClass: "text-[#FFCC00]" },
-  image: { icon: "image", colorClass: "text-[#FF4641]" },
-  pdf: { icon: "picture_as_pdf", colorClass: "text-[#EA4335]" },
-  code: { icon: "code", colorClass: "text-[#9B72CB]" },
-  archive: { icon: "folder_zip", colorClass: "text-on-surface-variant" },
-  file: { icon: "draft", colorClass: "text-on-surface-variant" },
+// design:content - file-type badge colours come from the generated brand sheet; untyped entries follow the role.
+const TYPE_ICONS: Record<DriveItem["type"], { icon: string; color?: string }> = {
+  folder: { icon: "folder" },
+  document: { icon: "description", color: APHRODY_BRAND_COLORS.blue },
+  spreadsheet: { icon: "table_chart", color: APHRODY_BRAND_COLORS.green },
+  presentation: { icon: "slideshow", color: APHRODY_BRAND_COLORS.yellow },
+  image: { icon: "image", color: APHRODY_BRAND_COLORS.orange },
+  pdf: { icon: "picture_as_pdf", color: APHRODY_BRAND_COLORS.red },
+  code: { icon: "code", color: APHRODY_BRAND_COLORS.purple },
+  archive: { icon: "folder_zip" },
+  file: { icon: "draft" },
 };
 
 const DEFAULT_FILTERS = [
@@ -181,8 +183,13 @@ export function GoogleDriveListView({
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <Icon name={typeMeta.icon} size={28} className={clsx("shrink-0", typeMeta.colorClass)} />
-                  {item.starred && <Icon name="star" size={18} filled className="text-amber-500 fill-current" />}
+                  <Icon
+                    name={typeMeta.icon}
+                    size={28}
+                    className={clsx("shrink-0", !typeMeta.color && "text-on-surface-variant")}
+                    style={typeMeta.color ? { color: typeMeta.color } : undefined}
+                  />
+                  {item.starred && <Icon name="star" size={18} filled className="text-tertiary fill-current" />}
                 </div>
                 <div className="mt-3">
                   <div className="truncate text-body-medium font-medium text-on-surface">{item.name}</div>
@@ -236,14 +243,19 @@ export function GoogleDriveListView({
                     {/* Name + Icon + Star */}
                     <td className="py-2.5 px-4">
                       <div className="flex items-center gap-3">
-                        <Icon name={typeMeta.icon} size={22} className={clsx("shrink-0", typeMeta.colorClass)} />
+                        <Icon
+                          name={typeMeta.icon}
+                          size={22}
+                          className={clsx("shrink-0", !typeMeta.color && "text-on-surface-variant")}
+                          style={typeMeta.color ? { color: typeMeta.color } : undefined}
+                        />
                         <span className="truncate font-medium text-on-surface">{item.name}</span>
                         {item.starred && (
                           <Icon
                             name="star"
                             size={16}
                             filled
-                            className="shrink-0 text-amber-500 fill-current"
+                            className="shrink-0 text-tertiary fill-current"
                             aria-label="Starred"
                           />
                         )}

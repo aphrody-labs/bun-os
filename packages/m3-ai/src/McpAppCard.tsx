@@ -66,38 +66,34 @@ export const McpAppCard: React.FC<McpAppCardProps> = ({
       ref={containerRef}
       className={clsx(
         "flex flex-col rounded-3xl border transition-all duration-300 overflow-hidden",
-        "bg-[var(--md-sys-color-surface-container-low,#f7f2fa)]",
-        "border-[var(--md-sys-color-outline-variant,#cac4d0)]",
-        "text-[var(--md-sys-color-on-surface,#1d1b20)]",
+        "bg-surface-container-low",
+        "border-outline-variant",
+        "text-on-surface",
         isExpanded ? "fixed inset-4 z-50 shadow-2xl" : "relative w-full shadow-sm",
         className,
       )}
     >
       {/* App Card Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--md-sys-color-outline-variant,#cac4d0)]/40 bg-[var(--md-sys-color-surface-container,#f3edf7)]/60">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-outline-variant/40 bg-surface-container/60">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-[var(--md-sys-color-primary-container,#eaddff)] text-[var(--md-sys-color-on-primary-container,#21005d)]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-primary-container text-on-primary-container">
             <span className="material-symbols-outlined text-base">widgets</span>
           </div>
 
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold tracking-tight">{title || toolName}</span>
-              <span className="rounded-full bg-[var(--md-sys-color-surface-container-high,#ece6f0)] px-2 py-0.2 text-[10px] font-mono text-[var(--md-sys-color-on-surface-variant,#49454f)]">
+              <span className="rounded-full bg-surface-container-high px-2 py-0.2 text-[10px] font-mono text-on-surface-variant">
                 mcp-ui
               </span>
             </div>
-            {toolResourceUri && (
-              <span className="text-[10px] font-mono text-[var(--md-sys-color-outline,#79747e)]">
-                {toolResourceUri}
-              </span>
-            )}
+            {toolResourceUri && <span className="text-[10px] font-mono text-outline">{toolResourceUri}</span>}
           </div>
         </div>
 
         {/* Action icons */}
         <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
+          <div className="flex items-center gap-1 rounded-full bg-success-container px-2 py-0.5 text-[10px] font-medium text-on-success-container">
             <span className="material-symbols-outlined text-xs">verified_user</span>
             <span>Sandboxed</span>
           </div>
@@ -106,7 +102,7 @@ export const McpAppCard: React.FC<McpAppCardProps> = ({
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             title={isExpanded ? "Collapse" : "Expand Fullscreen"}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--md-sys-color-on-surface-variant,#49454f)] hover:bg-[var(--md-sys-color-surface-container-high,#ece6f0)] transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors"
           >
             <span className="material-symbols-outlined text-base">
               {isExpanded ? "close_fullscreen" : "open_in_full"}
@@ -120,7 +116,7 @@ export const McpAppCard: React.FC<McpAppCardProps> = ({
         className={clsx("relative w-full overflow-hidden transition-all", isExpanded ? "flex-1 min-h-[500px]" : "h-96")}
       >
         {hasError ? (
-          <div className="flex h-full flex-col items-center justify-center p-6 text-center text-xs text-[var(--md-sys-color-error,#b3261e)]">
+          <div className="flex h-full flex-col items-center justify-center p-6 text-center text-xs text-error">
             <span className="material-symbols-outlined text-3xl mb-1">error</span>
             <span className="font-semibold">MCP App Render Error</span>
             <p className="mt-1 font-mono text-[11px] opacity-80">{hasError}</p>
@@ -136,10 +132,8 @@ export const McpAppCard: React.FC<McpAppCardProps> = ({
             onError={err => setHasError(err.message)}
           />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center p-6 text-xs text-[var(--md-sys-color-outline,#79747e)]">
-            <span className="material-symbols-outlined text-2xl animate-spin mb-1 text-[var(--md-sys-color-primary,#6750a4)]">
-              progress_activity
-            </span>
+          <div className="flex h-full flex-col items-center justify-center p-6 text-xs text-outline">
+            <span className="material-symbols-outlined text-2xl animate-spin mb-1 text-primary">progress_activity</span>
             <span>Awaiting MCP UI Resource ({toolName})...</span>
           </div>
         )}
@@ -147,7 +141,7 @@ export const McpAppCard: React.FC<McpAppCardProps> = ({
 
       {/* Footer info */}
       {toolInput && (
-        <div className="flex items-center justify-between px-4 py-2 border-t border-[var(--md-sys-color-outline-variant,#cac4d0)]/30 bg-[var(--md-sys-color-surface-container-lowest,#ffffff)] text-[10px] text-[var(--md-sys-color-outline,#79747e)] font-mono">
+        <div className="flex items-center justify-between px-4 py-2 border-t border-outline-variant/30 bg-surface-container-lowest text-[10px] text-outline font-mono">
           <span className="truncate">input: {JSON.stringify(toolInput)}</span>
           <span className="shrink-0 ml-2">M3 UI Bridge</span>
         </div>

@@ -1,56 +1,47 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-/* The host site's live --dbz-* palette drives the reader, including its design overrides. */
+/* Dragon Ball reader skin: the generated M3 scheme of seed #e78220 (dark) plus the comic ink shapes. */
+@import "./dragon-ball.scheme.css";
+
 .m3-reader--dragon-ball.m3-reader,
 .m3-reader--dragon-ball .m3-reader {
-  --reader-surface: var(--dbz-bg, #0a0a0a);
-  --reader-on-surface: var(--dbz-blue-light, #cdcdcd);
-  --reader-accent: var(--dbz-orange, #e78220);
-  --reader-on-accent: #0a0a0a;
-  --reader-outline: var(--dbz-border, #2a2a26);
-  --reader-card: var(--dbz-card, #141410);
-  --reader-accent-pressed: var(--dbz-orange-dark, #c46f1b);
-  --reader-blue: var(--dbz-blue, #1e244d);
-  --reader-yellow: var(--dbz-yellow, #fefd03);
-  --reader-red: var(--dbz-red, #f10c3b);
-  --reader-ember: var(--dbz-ember, var(--reader-accent));
-  --reader-ki: var(--dbz-ki, #4ba8ff);
-  --reader-amber: var(--dbz-amber, #ffd23f);
-  color-scheme: dark;
-  font-family: var(--font-sans, system-ui, sans-serif);
+  font-family: var(--md-ref-typeface-plain);
 }
 .m3-reader--dragon-ball .m3-reader-container,
 .m3-reader--dragon-ball .m3-reader-collection {
-  border: 2px solid var(--reader-outline);
-  box-shadow: 4px 4px 0 #000;
+  border: 2px solid var(--md-sys-color-outline);
+  box-shadow: 4px 4px 0 var(--md-sys-color-shadow);
 }
 .m3-reader--dragon-ball .m3-reader-hud {
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  box-shadow: 0 2px 0 #000;
+  box-shadow: 0 2px 0 var(--md-sys-color-shadow);
 }
 .m3-reader--dragon-ball .m3-reader-btn,
 .m3-reader--dragon-ball .m3-reader-btn-active {
-  border-radius: var(--radius, 0.5rem);
-  box-shadow: 2px 2px 0 #000;
+  border-radius: var(--md-sys-shape-corner-small);
+  box-shadow: 2px 2px 0 var(--md-sys-color-shadow);
   text-transform: uppercase;
 }
 .m3-reader--dragon-ball .m3-reader-btn:active,
 .m3-reader--dragon-ball .m3-reader-btn-active:active {
   transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0 #000;
+  box-shadow: 1px 1px 0 var(--md-sys-color-shadow);
 }
 .m3-reader--dragon-ball .m3-reader-btn-active:hover {
-  background: var(--reader-accent-pressed);
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 8%, var(--md-sys-color-primary));
+}
+.m3-reader--dragon-ball .m3-reader-btn-active:active {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 10%, var(--md-sys-color-primary));
 }
 .m3-reader--dragon-ball .m3-reader-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transform: skewX(-12.3deg);
-  border: 2px solid #000;
-  border-radius: 0.25rem;
-  color: var(--reader-on-accent);
-  box-shadow: 2px 2px 0 #000;
+  border: 2px solid var(--md-sys-color-shadow);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: 2px 2px 0 var(--md-sys-color-shadow);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -60,17 +51,17 @@
 }
 .m3-reader--dragon-ball .m3-reader-scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--reader-accent) #050505;
+  scrollbar-color: var(--md-sys-color-primary) var(--md-sys-color-surface-container-lowest);
 }
 .m3-reader--dragon-ball .m3-reader-scroll::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 .m3-reader--dragon-ball .m3-reader-scroll::-webkit-scrollbar-thumb {
-  background: var(--reader-accent);
-  border: 1px solid #000;
+  background: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-shadow);
   border-radius: 2px;
 }
 .m3-reader--dragon-ball .m3-reader-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--reader-yellow);
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 8%, var(--md-sys-color-primary));
 }

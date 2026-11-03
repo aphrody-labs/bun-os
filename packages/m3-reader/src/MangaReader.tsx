@@ -211,7 +211,7 @@ export function MangaReader({
   return (
     <div
       ref={containerRef}
-      className="m3-reader m3-reader-container m3-reader-scroll flex h-[85vh] min-h-[460px] w-full min-w-0 max-w-full flex-col overflow-hidden rounded-xl bg-[var(--reader-surface)] [&:fullscreen]:h-screen [&:fullscreen]:min-h-screen [&:fullscreen]:rounded-none"
+      className="m3-reader m3-reader-container m3-reader-scroll flex h-[85vh] min-h-[460px] w-full min-w-0 max-w-full flex-col overflow-hidden rounded-xl bg-surface [&:fullscreen]:h-screen [&:fullscreen]:min-h-screen [&:fullscreen]:rounded-none"
       data-manga-reader
       data-m3-component="MangaReader"
       data-testid="manga-reader"
@@ -222,10 +222,10 @@ export function MangaReader({
       {/* Barre de contrôles (HUD) */}
       <div className="m3-reader-hud z-10 flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
-          <span className="min-w-0 max-w-[32ch] md:max-w-[45ch] truncate font-sans text-[18px] font-extrabold uppercase tracking-wide text-[var(--reader-on-surface)] drop-shadow-[1px_1px_0px_#000]">
+          <span className="min-w-0 max-w-[32ch] md:max-w-[45ch] truncate font-sans text-[18px] font-extrabold uppercase tracking-wide text-on-surface drop-shadow-[1px_1px_0px_var(--md-sys-color-shadow)]">
             {title}
           </span>
-          <span className="m3-reader-badge bg-[var(--reader-accent)] text-[var(--reader-on-accent)] px-2 py-0.5 text-[18px] font-black">
+          <span className="m3-reader-badge bg-primary text-on-primary px-2 py-0.5 text-[18px] font-black">
             <span>{counter}</span>
           </span>
           {/* L'adresse de LA planche affichée, en un clic : la même que celle
@@ -234,7 +234,7 @@ export function MangaReader({
           {apiPlanche && (
             <a
               href={apiPlanche}
-              className="hidden shrink-0 rounded border border-white/15 px-1.5 py-0.5 font-mono text-[18px] font-bold uppercase tracking-wider text-[var(--reader-on-surface)]/50 transition-colors hover:border-[var(--reader-accent)] hover:text-[var(--reader-accent)] sm:inline-block"
+              className="hidden shrink-0 rounded border border-outline-variant px-1.5 py-0.5 font-mono text-[18px] font-bold uppercase tracking-wider text-on-surface/50 transition-colors hover:border-primary hover:text-primary sm:inline-block"
               title="Cette planche en JSON (image + transcription)"
             >
               API
@@ -353,9 +353,9 @@ export function MangaReader({
       </div>
 
       {/* Zone de lecture */}
-      <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden bg-[var(--reader-surface)]">
+      <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden bg-surface">
         {total === 0 ? (
-          <div className="flex h-full items-center justify-center text-[18px] text-[var(--reader-on-surface)]">
+          <div className="flex h-full items-center justify-center text-[18px] text-on-surface">
             Aucune planche disponible.
           </div>
         ) : mode === "paged" ? (
@@ -398,7 +398,7 @@ export function MangaReader({
               type="button"
               aria-label="Page précédente"
               onClick={goPrevPage}
-              className="absolute top-1/2 left-3 z-10 -translate-y-1/2 rounded-lg border-2 border-[var(--reader-outline)] bg-[var(--reader-surface)]/85 p-2.5 text-[var(--reader-accent)] shadow-[3px_3px_0px_#000] transition-all hover:bg-[var(--reader-accent)] hover:text-[var(--reader-on-accent)] hover:scale-105 active:translate-y-[calc(-50%+1px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--reader-accent)]"
+              className="absolute top-1/2 left-3 z-10 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/85 p-2.5 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] transition-all hover:bg-primary hover:text-on-primary hover:scale-105 active:translate-y-[calc(-50%+1px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               {dir === "rtl" ? <ChevronRight size={22} aria-hidden /> : <ChevronLeft size={22} aria-hidden />}
             </button>
@@ -406,7 +406,7 @@ export function MangaReader({
               type="button"
               aria-label="Page suivante"
               onClick={goNextPage}
-              className="absolute top-1/2 right-3 z-10 -translate-y-1/2 rounded-lg border-2 border-[var(--reader-outline)] bg-[var(--reader-surface)]/85 p-2.5 text-[var(--reader-accent)] shadow-[3px_3px_0px_#000] transition-all hover:bg-[var(--reader-accent)] hover:text-[var(--reader-on-accent)] hover:scale-105 active:translate-y-[calc(-50%+1px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--reader-accent)]"
+              className="absolute top-1/2 right-3 z-10 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/85 p-2.5 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] transition-all hover:bg-primary hover:text-on-primary hover:scale-105 active:translate-y-[calc(-50%+1px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               {dir === "rtl" ? <ChevronLeft size={22} aria-hidden /> : <ChevronRight size={22} aria-hidden />}
             </button>
@@ -418,7 +418,7 @@ export function MangaReader({
             // (flèches/PgUp/PgDn) — sinon la lecture verticale est inatteignable.
             // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- zone de lecture défilable au clavier : aucun rôle interactif ne la décrit, retirer tabIndex rendrait le mode vertical inatteignable au clavier
             tabIndex={0}
-            className="h-full w-full overflow-y-auto overflow-x-hidden m3-reader-scroll focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--reader-accent)]"
+            className="h-full w-full overflow-y-auto overflow-x-hidden m3-reader-scroll focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
             aria-label={`${title} — lecture verticale`}
           >
             <div
@@ -441,7 +441,7 @@ export function MangaReader({
                     alt={`${title} — page ${vi.index + 1}`}
                     loading={Math.abs(vi.index - current) <= 1 ? "eager" : "lazy"}
                     draggable={false}
-                    className="h-auto w-full max-w-3xl object-contain border-y md:border-2 border-[var(--reader-outline)]/40 shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
+                    className="h-auto w-full max-w-3xl object-contain border-y md:border-2 border-outline/40 shadow-[0_4px_12px_color-mix(in_oklab,var(--md-sys-color-shadow)_80%,transparent)]"
                     onError={handleImageError}
                   />
                 </div>
@@ -453,7 +453,7 @@ export function MangaReader({
 
       {/* Bande de vignettes (chapitres courts uniquement — cf. SHOW_STRIP_MAX). */}
       {mode === "paged" && total > 0 && total <= SHOW_STRIP_MAX && (
-        <div className="z-10 w-full min-w-0 max-w-full bg-[var(--reader-surface)] border-t-2 border-[var(--reader-outline)] px-4 py-3 flex items-center overflow-x-auto m3-reader-scroll">
+        <div className="z-10 w-full min-w-0 max-w-full bg-surface border-t-2 border-outline px-4 py-3 flex items-center overflow-x-auto m3-reader-scroll">
           <div className="flex gap-2.5 min-w-max mx-auto px-2">
             {urls.map((url, idx) => (
               <button
@@ -466,8 +466,8 @@ export function MangaReader({
                 }}
                 className={`relative shrink-0 w-12 h-16 rounded-md overflow-hidden border-2 transition-all ${
                   current === idx
-                    ? "border-[var(--reader-accent)] scale-105 shadow-[0_0_12px_var(--reader-accent)]"
-                    : "border-[var(--reader-outline)] shadow-[2px_2px_0px_#000] hover:border-white/50"
+                    ? "border-primary scale-105 shadow-[0_0_12px_color-mix(in_oklab,var(--md-sys-color-primary)_40%,transparent)]"
+                    : "border-outline shadow-[2px_2px_0px_var(--md-sys-color-shadow)] hover:border-outline"
                 }`}
               >
                 <img
@@ -476,7 +476,7 @@ export function MangaReader({
                   className="w-full h-full object-cover select-none pointer-events-none"
                   loading="lazy"
                 />
-                <span className="absolute bottom-0 inset-x-0 bg-[var(--reader-surface)]/85 text-[18px] font-extrabold text-[var(--reader-on-surface)] text-center font-mono py-0.5 border-t border-[var(--reader-outline)]/60">
+                <span className="absolute bottom-0 inset-x-0 bg-surface/85 text-[18px] font-extrabold text-on-surface text-center font-mono py-0.5 border-t border-outline/60">
                   {idx + 1}
                 </span>
               </button>
@@ -489,7 +489,7 @@ export function MangaReader({
 			    → saut direct à une planche par saisie du numéro. */}
       {mode === "paged" && total > SHOW_STRIP_MAX && (
         <form
-          className="z-10 flex items-center justify-center gap-3 border-t-2 border-[var(--reader-outline)] bg-[var(--reader-surface)] px-4 py-3"
+          className="z-10 flex items-center justify-center gap-3 border-t-2 border-outline bg-surface px-4 py-3"
           onSubmit={e => {
             e.preventDefault();
             const field = e.currentTarget.elements.namedItem("goto") as HTMLInputElement | null;
@@ -500,10 +500,7 @@ export function MangaReader({
             swiperRef.current?.slideTo(i);
           }}
         >
-          <label
-            htmlFor={`${baseId}-goto`}
-            className="text-[18px] font-black uppercase tracking-wider text-[var(--reader-on-surface)]"
-          >
+          <label htmlFor={`${baseId}-goto`} className="text-[18px] font-black uppercase tracking-wider text-on-surface">
             Aller à la planche
           </label>
           <input
@@ -514,9 +511,9 @@ export function MangaReader({
             max={total}
             key={current}
             defaultValue={current + 1}
-            className="w-20 rounded-md border-2 border-[var(--reader-outline)] bg-[var(--reader-surface)] px-2.5 py-1 text-center text-[18px] font-extrabold tabular-nums text-[var(--reader-accent)] shadow-[2px_2px_0px_#000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--reader-accent)]"
+            className="w-20 rounded-md border-2 border-outline bg-surface px-2.5 py-1 text-center text-[18px] font-extrabold tabular-nums text-primary shadow-[2px_2px_0px_var(--md-sys-color-shadow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           />
-          <span className="text-[18px] font-bold tabular-nums text-[var(--reader-on-surface)]/70">/ {total}</span>
+          <span className="text-[18px] font-bold tabular-nums text-on-surface/70">/ {total}</span>
           <button type="submit" className="m3-reader-btn-active !py-1 !px-3.5">
             OK
           </button>

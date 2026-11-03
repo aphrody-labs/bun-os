@@ -68,23 +68,23 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
     <div
       className={clsx(
         "flex flex-col gap-3 rounded-3xl p-5 border",
-        "bg-[var(--md-sys-color-surface-container-lowest,#ffffff)]",
-        "border-[var(--md-sys-color-outline-variant,#cac4d0)]",
-        "text-[var(--md-sys-color-on-surface,#1d1b20)]",
+        "bg-surface-container-lowest",
+        "border-outline-variant",
+        "text-on-surface",
         className,
       )}
     >
-      <div className="flex items-center justify-between border-b border-[var(--md-sys-color-outline-variant,#cac4d0)]/40 pb-3">
+      <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-lg text-[var(--md-sys-color-primary,#6750a4)]">timeline</span>
+          <span className="material-symbols-outlined text-lg text-primary">timeline</span>
           <h3 className="text-sm font-semibold tracking-tight">A2A Task Delegation Timeline</h3>
         </div>
-        <span className="text-xs text-[var(--md-sys-color-outline,#79747e)]">{steps.length} delegation steps</span>
+        <span className="text-xs text-outline">{steps.length} delegation steps</span>
       </div>
 
       <div className="relative flex flex-col gap-4 pl-4 pt-1">
         {/* Continuous connector line */}
-        <div className="absolute left-[27px] top-4 bottom-4 w-0.5 bg-[var(--md-sys-color-outline-variant,#cac4d0)]/60" />
+        <div className="absolute left-[27px] top-4 bottom-4 w-0.5 bg-outline-variant/60" />
 
         {steps.map(step => {
           const isCurrent = step.id === currentStepId;
@@ -104,12 +104,12 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
 
           const statusColor =
             step.status === "completed"
-              ? "text-emerald-500"
+              ? "text-success"
               : step.status === "running"
-                ? "text-[var(--md-sys-color-primary,#6750a4)] animate-spin motion-reduce:animate-none"
+                ? "text-primary animate-spin motion-reduce:animate-none"
                 : step.status === "error"
-                  ? "text-rose-500"
-                  : "text-slate-400";
+                  ? "text-error"
+                  : "text-outline";
 
           return (
             <div
@@ -119,14 +119,14 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
               {/* Step indicator node */}
               <div
                 className={clsx(
-                  "relative z-10 flex h-7 w-7 items-center justify-center rounded-full border-2 bg-[var(--md-sys-color-surface-container-lowest,#ffffff)]",
+                  "relative z-10 flex h-7 w-7 items-center justify-center rounded-full border-2 bg-surface-container-lowest",
                   step.status === "completed"
-                    ? "border-emerald-500"
+                    ? "border-success"
                     : step.status === "running"
-                      ? "border-[var(--md-sys-color-primary,#6750a4)] ring-4 ring-[var(--md-sys-color-primary,#6750a4)]/20"
+                      ? "border-primary ring-4 ring-primary/20"
                       : step.status === "error"
-                        ? "border-rose-500"
-                        : "border-[var(--md-sys-color-outline-variant,#cac4d0)]",
+                        ? "border-error"
+                        : "border-outline-variant",
                 )}
               >
                 <span className={clsx("material-symbols-outlined text-sm", statusColor)}>{statusIcon}</span>
@@ -136,10 +136,8 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
               <div
                 className={clsx(
                   "flex-1 cursor-pointer rounded-2xl border p-3 text-xs transition-all",
-                  "bg-[var(--md-sys-color-surface-container-low,#f7f2fa)] hover:bg-[var(--md-sys-color-surface-container,#f3edf7)]",
-                  isCurrent
-                    ? "border-[var(--md-sys-color-primary,#6750a4)] shadow-sm"
-                    : "border-[var(--md-sys-color-outline-variant,#cac4d0)]/60",
+                  "bg-surface-container-low hover:bg-surface-container",
+                  isCurrent ? "border-primary shadow-sm" : "border-outline-variant/60",
                 )}
               >
                 <button
@@ -154,24 +152,20 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-1.5">
-                      <span className="font-semibold text-xs text-[var(--md-sys-color-on-surface,#1d1b20)]">
-                        {step.title}
-                      </span>
-                      <span className="rounded-md bg-[var(--md-sys-color-surface-container-highest,#e6e0e9)] px-1.5 py-0.2 text-[10px] font-mono text-[var(--md-sys-color-on-surface-variant,#49454f)]">
+                      <span className="font-semibold text-xs text-on-surface">{step.title}</span>
+                      <span className="rounded-md bg-surface-container-highest px-1.5 py-0.2 text-[10px] font-mono text-on-surface-variant">
                         @{step.from} → @{step.to}
                       </span>
                     </span>
-                    <span className="text-[10px] font-mono text-[var(--md-sys-color-outline,#79747e)]">{time}</span>
+                    <span className="text-[10px] font-mono text-outline">{time}</span>
                   </span>
 
                   {step.description && (
-                    <span className="mt-1 block text-xs text-[var(--md-sys-color-on-surface-variant,#49454f)]">
-                      {step.description}
-                    </span>
+                    <span className="mt-1 block text-xs text-on-surface-variant">{step.description}</span>
                   )}
 
                   {step.claim && (
-                    <span className="mt-2 flex items-center gap-1.5 text-[11px] font-mono text-amber-700 dark:text-amber-400">
+                    <span className="mt-2 flex items-center gap-1.5 text-[11px] font-mono text-warning">
                       <span className="material-symbols-outlined text-xs">lock</span>
                       <span>claim: {step.claim}</span>
                     </span>
@@ -183,7 +177,7 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
                   <div
                     id={detailsId}
                     hidden={!isExpanded}
-                    className="mt-2.5 pt-2 border-t border-[var(--md-sys-color-outline-variant,#cac4d0)]/40 font-mono text-[11px] text-[var(--md-sys-color-on-surface-variant,#49454f)]"
+                    className="mt-2.5 pt-2 border-t border-outline-variant/40 font-mono text-[11px] text-on-surface-variant"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold">Kind: {step.envelope.kind}</span>
@@ -191,7 +185,7 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
                       <span>Topic: {step.envelope.topic}</span>
                     </div>
                     {step.envelope.body && (
-                      <pre className="rounded-lg bg-[var(--md-sys-color-surface-container-highest,#e6e0e9)]/50 p-2 overflow-x-auto whitespace-pre-wrap">
+                      <pre className="rounded-lg bg-surface-container-highest/50 p-2 overflow-x-auto whitespace-pre-wrap">
                         {step.envelope.body}
                       </pre>
                     )}

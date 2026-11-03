@@ -17,6 +17,7 @@
     "src",
     "styles.css",
     "dragon-ball.css",
+    "dragon-ball.scheme.css",
     "!src/**/*.test.*"
   ],
   "type": "module",
@@ -45,6 +46,7 @@
     "access": "public"
   },
   "scripts": {
+    "generate": "bun scripts/generate-scheme.ts",
     "build": "bun build src/index.ts --target browser --packages external --outdir dist --banner '\"use client\";'",
     "typecheck": "bun check --noEmit",
     "test": "bun test",
@@ -52,12 +54,14 @@
     "prepack": "bun run build"
   },
   "dependencies": {
+    "@aphrody/m3-theme": "workspace:*",
     "@tanstack/react-virtual": "catalog:",
     "lucide-react": "catalog:",
     "swiper": "catalog:"
   },
   "devDependencies": {
-    "@aphrody/m3-config": "workspace:*"
+    "@aphrody/m3-config": "workspace:*",
+    "@aphrody/m3-tokens": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

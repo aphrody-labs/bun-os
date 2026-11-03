@@ -371,19 +371,19 @@ export function CaptionedReader({
 
   if (total === 0) {
     return (
-      <div className="m3-reader-frame flex min-h-[200px] items-center justify-center rounded-xl p-8 text-[18px] text-[var(--reader-on-surface)]/50">
+      <div className="m3-reader-frame flex min-h-[200px] items-center justify-center rounded-xl p-8 text-[18px] text-on-surface/50">
         Aucune page à afficher pour le moment.
       </div>
     );
   }
 
   const legendBlock = (
-    <div className="flex h-full min-h-0 flex-col p-4 bg-[var(--reader-surface)] border-t-2 lg:border-t-0 lg:border-l-2 border-[var(--reader-outline)]">
+    <div className="flex h-full min-h-0 flex-col p-4 bg-surface border-t-2 lg:border-t-0 lg:border-l-2 border-outline">
       <div className="mb-2 shrink-0 flex items-center justify-between">
-        <span className="m3-reader-badge bg-[var(--reader-accent)] text-[var(--reader-on-accent)] px-2 py-0.5 text-[18px] font-black">
+        <span className="m3-reader-badge bg-primary text-on-primary px-2 py-0.5 text-[18px] font-black">
           <span>PLANCHE {currentNum}</span>
         </span>
-        <span className="text-[18px] font-bold tabular-nums text-[var(--reader-on-surface)]/60">
+        <span className="text-[18px] font-bold tabular-nums text-on-surface/60">
           {current + 1} / {total}
         </span>
       </div>
@@ -397,9 +397,9 @@ export function CaptionedReader({
         ) : currentItem?.aDuTexte ? (
           // La planche PORTE une transcription : dire « aucune description »
           // pendant qu'elle arrive ferait croire à une lacune du corpus.
-          <p className="text-[18px] italic text-[var(--reader-on-surface)]/50">Chargement de la transcription…</p>
+          <p className="text-[18px] italic text-on-surface/50">Chargement de la transcription…</p>
         ) : (
-          <p className="text-[18px] italic text-[var(--reader-on-surface)]/50">Aucune description pour cette page.</p>
+          <p className="text-[18px] italic text-on-surface/50">Aucune description pour cette page.</p>
         )}
       </div>
     </div>
@@ -408,7 +408,7 @@ export function CaptionedReader({
   return (
     <section
       ref={containerRef}
-      className="m3-reader m3-reader-container m3-reader-scroll flex h-[84svh] min-h-[460px] w-full min-w-0 flex-col overflow-hidden rounded-xl bg-[var(--reader-surface)] [contain:inline-size] [&:fullscreen]:h-screen [&:fullscreen]:min-h-screen [&:fullscreen]:rounded-none"
+      className="m3-reader m3-reader-container m3-reader-scroll flex h-[84svh] min-h-[460px] w-full min-w-0 flex-col overflow-hidden rounded-xl bg-surface [contain:inline-size] [&:fullscreen]:h-screen [&:fullscreen]:min-h-screen [&:fullscreen]:rounded-none"
       data-captioned-reader
       data-m3-component="CaptionedReader"
       data-testid="captioned-reader"
@@ -416,10 +416,10 @@ export function CaptionedReader({
     >
       {/* Barre de contrôles (HUD) */}
       <div className="m3-reader-hud z-10 flex flex-nowrap items-center gap-2 px-3 py-2.5 sm:flex-wrap">
-        <span className="mr-1 hidden min-w-0 max-w-[40ch] truncate font-sans text-[18px] font-extrabold uppercase tracking-wide text-[var(--reader-on-surface)] drop-shadow-[1px_1px_0px_#000] sm:block">
+        <span className="mr-1 hidden min-w-0 max-w-[40ch] truncate font-sans text-[18px] font-extrabold uppercase tracking-wide text-on-surface drop-shadow-[1px_1px_0px_var(--md-sys-color-shadow)] sm:block">
           {title}
         </span>
-        <span className="m3-reader-badge bg-[var(--reader-accent)] text-[var(--reader-on-accent)] px-2 py-0.5 text-[18px] font-black sm:ml-auto">
+        <span className="m3-reader-badge bg-primary text-on-primary px-2 py-0.5 text-[18px] font-black sm:ml-auto">
           <span>{counter}</span>
         </span>
 
@@ -471,7 +471,7 @@ export function CaptionedReader({
       </div>
 
       {/* Zone de lecture */}
-      <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden bg-[var(--reader-surface)]">
+      <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden bg-surface">
         {mode === "paged" ? (
           /* Layout côte à côte ≥ lg : planche fixe à gauche, texte scrollable
 					   à droite — les légendes longues ne réduisent plus l'image. */
@@ -499,7 +499,7 @@ export function CaptionedReader({
                     zoom={Boolean(item.imageUrl)}
                     className="flex items-center justify-center"
                   >
-                    <div className="swiper-zoom-container flex h-full w-full items-center justify-center bg-[var(--reader-surface)]">
+                    <div className="swiper-zoom-container flex h-full w-full items-center justify-center bg-surface">
                       {item.imageUrl ? (
                         <button
                           type="button"
@@ -516,12 +516,12 @@ export function CaptionedReader({
                             draggable={false}
                             className="max-h-full max-w-full object-contain transition-opacity group-hover:opacity-95"
                           />
-                          <span className="pointer-events-none absolute right-3 bottom-3 rounded-md border border-white/15 bg-[var(--reader-surface)]/60 px-2 py-1 text-[18px] font-bold uppercase tracking-wider text-[var(--reader-on-surface)]/70 opacity-0 transition-opacity group-hover:opacity-100">
+                          <span className="pointer-events-none absolute right-3 bottom-3 rounded-md border border-outline-variant bg-surface/60 px-2 py-1 text-[18px] font-bold uppercase tracking-wider text-on-surface/70 opacity-0 transition-opacity group-hover:opacity-100">
                             Agrandir
                           </span>
                         </button>
                       ) : (
-                        <div className="px-6 text-center text-[18px] text-[var(--reader-on-surface)]/50">
+                        <div className="px-6 text-center text-[18px] text-on-surface/50">
                           Page {item.number} — pas d&apos;image
                         </div>
                       )}
@@ -535,7 +535,7 @@ export function CaptionedReader({
                 aria-label="Page précédente"
                 onClick={goPrevPage}
                 disabled={current <= 0}
-                className="absolute top-1/2 left-2 z-10 -translate-y-1/2 rounded-full border border-[var(--reader-outline)] bg-[var(--reader-surface)]/60 p-3 text-[var(--reader-on-surface)] transition-colors hover:border-[var(--reader-accent)] hover:text-[var(--reader-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--reader-accent)] disabled:opacity-30"
+                className="absolute top-1/2 left-2 z-10 -translate-y-1/2 rounded-full border border-outline bg-surface/60 p-3 text-on-surface transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-30"
               >
                 <ChevronLeft size={20} aria-hidden />
               </button>
@@ -544,14 +544,14 @@ export function CaptionedReader({
                 aria-label="Page suivante"
                 onClick={goNextPage}
                 disabled={current >= total - 1}
-                className="absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-full border border-[var(--reader-outline)] bg-[var(--reader-surface)]/60 p-3 text-[var(--reader-on-surface)] transition-colors hover:border-[var(--reader-accent)] hover:text-[var(--reader-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--reader-accent)] disabled:opacity-30"
+                className="absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-full border border-outline bg-surface/60 p-3 text-on-surface transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-30"
               >
                 <ChevronRight size={20} aria-hidden />
               </button>
             </div>
 
             {/* Légende — panneau scrollable indépendant (ne compresse plus l'image). */}
-            <div className="min-h-0 max-h-[38%] shrink-0 border-t border-[var(--reader-outline)] bg-[var(--reader-surface)]/90 px-3 py-2.5 sm:max-h-[48%] sm:px-5 sm:py-4 lg:max-h-none lg:w-[min(420px,38%)] lg:overflow-hidden lg:border-l lg:border-t-0">
+            <div className="min-h-0 max-h-[38%] shrink-0 border-t border-outline bg-surface/90 px-3 py-2.5 sm:max-h-[48%] sm:px-5 sm:py-4 lg:max-h-none lg:w-[min(420px,38%)] lg:overflow-hidden lg:border-l lg:border-t-0">
               {legendBlock}
             </div>
           </div>
@@ -576,7 +576,7 @@ export function CaptionedReader({
             // route, hauteurs mesurées après coup), et une accroche
             // obligatoire se bat avec ces remesures — elle produit des sauts au
             // moment où une planche entre dans la fenêtre.
-            className="h-full w-full snap-y snap-proximity overflow-y-auto overflow-x-hidden overscroll-y-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--reader-accent)]"
+            className="h-full w-full snap-y snap-proximity overflow-y-auto overflow-x-hidden overscroll-y-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
             aria-label={`${title} — lecture verticale`}
           >
             <div
@@ -595,10 +595,10 @@ export function CaptionedReader({
                     data-index={vi.index}
                     ref={virtualizer.measureElement}
                     style={virtualRowStyle(vi.start)}
-                    className="snap-start snap-always border-b border-white/5 px-2 py-4 sm:px-4 sm:py-6"
+                    className="snap-start snap-always border-b border-outline-variant/40 px-2 py-4 sm:px-4 sm:py-6"
                   >
                     <div className="group/planche mx-auto flex w-full max-w-3xl flex-col gap-3">
-                      <span className="text-[18px] font-bold uppercase tracking-[0.2em] text-[var(--reader-accent)]/70">
+                      <span className="text-[18px] font-bold uppercase tracking-[0.2em] text-primary/70">
                         Page {item.number}
                       </span>
                       {item.imageUrl ? (
@@ -622,21 +622,21 @@ export function CaptionedReader({
                             fetchPriority={vi.index === current ? "high" : "auto"}
                             decoding="async"
                             draggable={false}
-                            className="h-auto w-full rounded-sm bg-[var(--reader-surface)] object-contain shadow-[0_0_24px_rgba(0,0,0,0.45)] transition-[transform,box-shadow] duration-300 ease-out will-change-transform group-hover:scale-[1.015] group-hover:shadow-[0_0_60px_rgba(0,0,0,0.75)] group-focus-visible:scale-[1.015] motion-reduce:transform-none motion-reduce:transition-none"
+                            className="h-auto w-full rounded-sm bg-surface object-contain shadow-[0_0_24px_color-mix(in_oklab,var(--md-sys-color-shadow)_45%,transparent)] transition-[transform,box-shadow] duration-300 ease-out will-change-transform group-hover:scale-[1.015] group-hover:shadow-[0_0_60px_color-mix(in_oklab,var(--md-sys-color-shadow)_75%,transparent)] group-focus-visible:scale-[1.015] motion-reduce:transform-none motion-reduce:transition-none"
                           />
                           {/* Appel au plein écran, révélé au survol de la planche. */}
-                          <span className="pointer-events-none absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-[var(--reader-surface)]/70 px-2.5 py-1.5 text-[18px] font-bold uppercase tracking-wider text-[var(--reader-on-surface)]/80 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                          <span className="pointer-events-none absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-md border border-outline-variant bg-surface/70 px-2.5 py-1.5 text-[18px] font-bold uppercase tracking-wider text-on-surface/80 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
                             <ZoomIn size={12} aria-hidden />
                             Plein écran
                           </span>
                         </button>
                       ) : (
-                        <div className="flex min-h-[120px] items-center justify-center rounded border border-dashed border-white/10 bg-[var(--reader-surface)]/40 text-[18px] text-[var(--reader-on-surface)]/50">
+                        <div className="flex min-h-[120px] items-center justify-center rounded border border-dashed border-outline-variant/60 bg-surface/40 text-[18px] text-on-surface/50">
                           Pas d&apos;image pour cette page
                         </div>
                       )}
                       {texteDe(item) ? (
-                        <div className="rounded-md border border-[var(--reader-outline)]/40 bg-[var(--reader-surface)]/50 px-4 py-3">
+                        <div className="rounded-md border border-outline/40 bg-surface/50 px-4 py-3">
                           {renderTranscription?.({
                             text: texteDe(item) as string,
                             page: item.number,
@@ -655,7 +655,7 @@ export function CaptionedReader({
 
       {/* Bande de vignettes (recueils courts). */}
       {mode === "paged" && total > 0 && total <= SHOW_STRIP_MAX && (
-        <div className="z-10 flex items-center gap-4 overflow-x-auto border-t border-[var(--reader-outline)] bg-[var(--reader-surface)]/90 px-4 py-3 scrollbar-thin">
+        <div className="z-10 flex items-center gap-4 overflow-x-auto border-t border-outline bg-surface/90 px-4 py-3 scrollbar-thin">
           <div className="mx-auto flex gap-2">
             {items.map((item, idx) => (
               <button
@@ -665,8 +665,8 @@ export function CaptionedReader({
                 onClick={() => goTo(idx)}
                 className={`relative h-16 w-12 flex-shrink-0 overflow-hidden rounded border-2 transition-all ${
                   current === idx
-                    ? "scale-105 border-[var(--reader-accent)] shadow-[0_0_10px_rgba(255,178,0,0.4)]"
-                    : "border-white/10 hover:border-white/30"
+                    ? "scale-105 border-primary shadow-[0_0_10px_color-mix(in_oklab,var(--md-sys-color-primary)_40%,transparent)]"
+                    : "border-outline-variant/60 hover:border-outline"
                 }`}
                 title={`Page ${item.number}`}
                 aria-label={`Aller à la page ${item.number}`}
@@ -682,11 +682,11 @@ export function CaptionedReader({
                     loading="lazy"
                   />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center bg-zinc-900 text-[18px] text-[var(--reader-on-surface)]/50">
+                  <span className="flex h-full w-full items-center justify-center bg-surface-container-highest text-[18px] text-on-surface/50">
                     txt
                   </span>
                 )}
-                <span className="absolute inset-x-0 bottom-0 bg-[var(--reader-surface)]/70 text-center font-mono text-[18px] font-bold text-[var(--reader-on-surface)]">
+                <span className="absolute inset-x-0 bottom-0 bg-surface/70 text-center font-mono text-[18px] font-bold text-on-surface">
                   {item.number}
                 </span>
               </button>
@@ -698,7 +698,7 @@ export function CaptionedReader({
       {/* Saut direct pour les longs recueils. */}
       {mode === "paged" && total > SHOW_STRIP_MAX && (
         <form
-          className="z-10 flex items-center justify-center gap-3 border-t-2 border-[var(--reader-outline)] bg-[var(--reader-surface)] px-4 py-3"
+          className="z-10 flex items-center justify-center gap-3 border-t-2 border-outline bg-surface px-4 py-3"
           onSubmit={e => {
             e.preventDefault();
             const field = e.currentTarget.elements.namedItem("goto") as HTMLInputElement | null;
@@ -710,10 +710,7 @@ export function CaptionedReader({
             else goTo(Math.trunc(wanted) - 1);
           }}
         >
-          <label
-            htmlFor={`${baseId}-goto`}
-            className="text-[18px] font-black uppercase tracking-wider text-[var(--reader-on-surface)]"
-          >
+          <label htmlFor={`${baseId}-goto`} className="text-[18px] font-black uppercase tracking-wider text-on-surface">
             Aller à n°
           </label>
           <input
@@ -722,7 +719,7 @@ export function CaptionedReader({
             type="number"
             key={currentNum}
             defaultValue={currentNum}
-            className="w-20 rounded-md border-2 border-[var(--reader-outline)] bg-[var(--reader-surface)] px-2.5 py-1 text-center text-[18px] font-extrabold tabular-nums text-[var(--reader-accent)] shadow-[2px_2px_0px_#000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--reader-accent)]"
+            className="w-20 rounded-md border-2 border-outline bg-surface px-2.5 py-1 text-center text-[18px] font-extrabold tabular-nums text-primary shadow-[2px_2px_0px_var(--md-sys-color-shadow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           />
           <button type="submit" className="m3-reader-btn-active !py-1 !px-3.5">
             OK
@@ -744,14 +741,14 @@ export function CaptionedReader({
           role="dialog"
           aria-modal="true"
           aria-label={`${title} — page ${currentNum} agrandie`}
-          className="fixed inset-0 z-[100] flex flex-col bg-[var(--reader-surface)]/95"
+          className="fixed inset-0 z-[100] flex flex-col bg-surface/95"
           onClick={() => setLightbox(false)}
         >
-          <div className="flex items-center gap-3 border-b-2 border-[var(--reader-outline)] bg-[var(--reader-surface)] px-4 py-3">
-            <span className="min-w-0 flex-1 truncate font-sans text-[18px] font-extrabold uppercase tracking-wide text-[var(--reader-on-surface)]">
+          <div className="flex items-center gap-3 border-b-2 border-outline bg-surface px-4 py-3">
+            <span className="min-w-0 flex-1 truncate font-sans text-[18px] font-extrabold uppercase tracking-wide text-on-surface">
               {title}
             </span>
-            <span className="m3-reader-badge bg-[var(--reader-accent)] text-[var(--reader-on-accent)] px-2 py-0.5 text-[18px] font-black">
+            <span className="m3-reader-badge bg-primary text-on-primary px-2 py-0.5 text-[18px] font-black">
               <span>n°{currentNum}</span>
             </span>
             <button
@@ -784,7 +781,7 @@ export function CaptionedReader({
               aria-label="Page précédente"
               onClick={() => goTo(current - 1)}
               disabled={current <= 0}
-              className="absolute top-1/2 left-4 -translate-y-1/2 rounded-lg border-2 border-[var(--reader-outline)] bg-[var(--reader-surface)]/90 p-3 text-[var(--reader-accent)] shadow-[3px_3px_0px_#000] hover:bg-[var(--reader-accent)] hover:text-[var(--reader-on-accent)] transition-all disabled:opacity-30"
+              className="absolute top-1/2 left-4 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/90 p-3 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] hover:bg-primary hover:text-on-primary transition-all disabled:opacity-30"
             >
               <ChevronLeft size={22} aria-hidden />
             </button>
@@ -793,7 +790,7 @@ export function CaptionedReader({
               aria-label="Page suivante"
               onClick={() => goTo(current + 1)}
               disabled={current >= total - 1}
-              className="absolute top-1/2 right-4 -translate-y-1/2 rounded-lg border-2 border-[var(--reader-outline)] bg-[var(--reader-surface)]/90 p-3 text-[var(--reader-accent)] shadow-[3px_3px_0px_#000] hover:bg-[var(--reader-accent)] hover:text-[var(--reader-on-accent)] transition-all disabled:opacity-30"
+              className="absolute top-1/2 right-4 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/90 p-3 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] hover:bg-primary hover:text-on-primary transition-all disabled:opacity-30"
             >
               <ChevronRight size={22} aria-hidden />
             </button>

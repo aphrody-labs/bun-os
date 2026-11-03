@@ -68,6 +68,7 @@
     "@aphrody/m3-config": "workspace:*"
   },
   "peerDependencies": {
+    "@aphrody/m3-theme": "workspace:*",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
     "tailwindcss": ">=4.1.0"
