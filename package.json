@@ -127,7 +127,6 @@
     "packages/storyteller-ui-video-editor",
     "packages/storyteller-ui-viewer-3d",
     "packages/tauri-themes-bridge",
-    "packages/themes",
     "packages/update",
     "packages/wasm",
     "packages/waydroid",

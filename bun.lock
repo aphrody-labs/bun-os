@@ -1074,7 +1074,7 @@
       },
       "dependencies": {
         "@aphrody/bun": "workspace:*",
-        "@material/material-color-utilities": "catalog:",
+        "@aphrody/m3-tokens": "workspace:*",
       },
       "devDependencies": {
         "@aphrody/m3-config": "workspace:*",
@@ -1608,14 +1608,6 @@
       "devDependencies": {
         "@types/bun": "catalog:",
         "typescript": "catalog:",
-      },
-    },
-    "packages/themes": {
-      "name": "@aphrody/themes",
-      "version": "1.4.7",
-      "devDependencies": {
-        "@material/material-color-utilities": "catalog:",
-        "happy-dom": "catalog:",
       },
     },
     "packages/update": {
@@ -2458,8 +2450,6 @@
     "@aphrody/tauri": ["@aphrody/tauri@workspace:packages/bun-tauri"],
 
     "@aphrody/tauri-theme": ["@aphrody/tauri-theme@workspace:packages/tauri-themes-bridge"],
-
-    "@aphrody/themes": ["@aphrody/themes@workspace:packages/themes"],
 
     "@aphrody/timeline": ["@aphrody/timeline@1.4.7", "", { "dependencies": { "graphql": "17.0.2" } }, "sha512-O/WQppOo2U9EDvlu5mYYyXYYYZsoGrbgTOvYOw9eebPRCBynPHVKwVCjbnJjlTLILxBf9WK+jsLcl9iOCv9BGw=="],
 
