@@ -20,7 +20,11 @@ const exe = (name: string) => join(linkDir, `${name}.exe`);
 let failed = 0;
 
 function run(cmd: string[], opts: { cwd?: string; stdin?: string } = {}) {
-  const p = Bun.spawnSync(cmd, { cwd: opts.cwd, stdin: opts.stdin ? Buffer.from(opts.stdin) : "ignore", env: { ...process.env, PATH: `${linkDir};${process.env.PATH}` } });
+  const p = Bun.spawnSync(cmd, {
+    cwd: opts.cwd,
+    stdin: opts.stdin ? Buffer.from(opts.stdin) : "ignore",
+    env: { ...process.env, PATH: `${linkDir};${process.env.PATH}` },
+  });
   return { code: p.exitCode, out: p.stdout.toString(), err: p.stderr.toString() };
 }
 const check = (label: string, ok: boolean, detail = "") => {
@@ -36,7 +40,11 @@ for (const c of record.commands as { command: string; invoke: string }[]) {
   if (noVersion.has(c.command)) continue;
   let r = run([bin, ...rest, "--version"]);
   if (r.code !== 0) r = run([bin, ...rest, "--help"]);
-  check(`${c.invoke} --version`, r.code === 0, r.code === 0 ? (r.out.split("\n")[0] ?? "").trim().slice(0, 70) : r.err.trim().slice(0, 120));
+  check(
+    `${c.invoke} --version`,
+    r.code === 0,
+    r.code === 0 ? (r.out.split("\n")[0] ?? "").trim().slice(0, 70) : r.err.trim().slice(0, 120),
+  );
 }
 
 // 2. Real work in a scratch directory.
@@ -49,8 +57,22 @@ try {
   check("cp -r", r.code === 0 && readFileSync(join(t, "copy/b/c/x.txt"), "utf8").startsWith("hello"));
   r = run([exe("ls"), "-la", "copy/b/c"], { cwd: t });
   check("ls -la", r.code === 0 && r.out.includes("x.txt"));
-  r = run([join(linkDir, `${record.commands.find((c: any) => c.command === "find").invoke.split(".exe")[0]}.exe`), "copy", "-name", "*.txt", "-type", "f"], { cwd: t });
-  check("find -name -type f", r.code === 0 && r.out.includes("x.txt") && r.out.includes("y.txt"), r.out.trim().replace(/\s+/g, " "));
+  r = run(
+    [
+      join(linkDir, `${record.commands.find((c: any) => c.command === "find").invoke.split(".exe")[0]}.exe`),
+      "copy",
+      "-name",
+      "*.txt",
+      "-type",
+      "f",
+    ],
+    { cwd: t },
+  );
+  check(
+    "find -name -type f",
+    r.code === 0 && r.out.includes("x.txt") && r.out.includes("y.txt"),
+    r.out.trim().replace(/\s+/g, " "),
+  );
   r = run([exe("sed"), "-i", "s/world/bun-os/", "copy/b/c/x.txt"], { cwd: t });
   check("sed -i", r.code === 0 && readFileSync(join(t, "copy/b/c/x.txt"), "utf8").includes("hello bun-os"));
   r = run([exe("diff"), "-u", "a/b/c/x.txt", "copy/b/c/x.txt"], { cwd: t });
@@ -64,7 +86,11 @@ try {
   check("fd", r.code === 0 && r.out.split("\n").filter(Boolean).length === 2);
   r = run([exe("ouch"), "compress", "copy", "copy.tar.zst", "-y"], { cwd: t });
   const r2 = run([exe("ouch"), "decompress", "copy.tar.zst", "--dir", "out", "-y"], { cwd: t });
-  check("ouch tar.zst round trip", r.code === 0 && r2.code === 0 && run([exe("diff"), "-r", "copy", "out/copy"], { cwd: t }).code === 0, (r.err + r2.err).trim().slice(0, 120));
+  check(
+    "ouch tar.zst round trip",
+    r.code === 0 && r2.code === 0 && run([exe("diff"), "-r", "copy", "out/copy"], { cwd: t }).code === 0,
+    (r.err + r2.err).trim().slice(0, 120),
+  );
   r = run([exe("grep"), "-c", "a", "a/y.txt"], { cwd: t });
   check("grep -c", r.out.trim() === "3");
   r = run([exe("wc"), "-l"], { cwd: t, stdin: "1\n2\n3\n" });
@@ -79,7 +105,7 @@ try {
       "declare -a names=(zeta alpha mid)",
       "sorted=$(printf '%s\\n' \"${names[@]}\" | sort | tr '\\n' ' ')",
       "n=$(count_txt copy)",
-      "if [[ $n -eq 2 && $sorted == 'alpha mid zeta ' ]]; then echo \"ok n=$n ${#names[@]} items\"; else echo \"bad n=$n sorted=$sorted\"; exit 3; fi",
+      'if [[ $n -eq 2 && $sorted == \'alpha mid zeta \' ]]; then echo "ok n=$n ${#names[@]} items"; else echo "bad n=$n sorted=$sorted"; exit 3; fi',
       "for i in {1..3}; do echo line$i; done | grep -c line",
       "case $n in 2) echo two ;; *) echo other ;; esac",
     ].join("\n") + "\n",
@@ -87,13 +113,23 @@ try {
   // The script uses POSIX names; run it with the userland first on PATH, as a POSIX session would.
   const posix = join(t, "posix-bin");
   run([exe("mkdir"), posix]);
-  for (const [n, cmd] of [["find", "find"], ["sort", "sort"]] as const) {
+  for (const [n, cmd] of [
+    ["find", "find"],
+    ["sort", "sort"],
+  ] as const) {
     const c = record.commands.find((c: any) => c.command === cmd).invoke.split(".exe")[0];
     run([exe("cp"), exe(c), join(posix, `${n}.exe`)]);
   }
-  const p = Bun.spawnSync([exe("brush"), "script.sh"], { cwd: t, env: { ...process.env, PATH: `${posix};${linkDir};${process.env.PATH}` } });
+  const p = Bun.spawnSync([exe("brush"), "script.sh"], {
+    cwd: t,
+    env: { ...process.env, PATH: `${posix};${linkDir};${process.env.PATH}` },
+  });
   const out = p.stdout.toString();
-  check("brush: functions, arrays, pipes, [[ ]], brace expansion, case", p.exitCode === 0 && out.includes("ok n=2 3 items") && out.includes("\n3\n") && out.includes("two"), (out + p.stderr.toString()).trim().replace(/\s+/g, " ").slice(0, 160));
+  check(
+    "brush: functions, arrays, pipes, [[ ]], brace expansion, case",
+    p.exitCode === 0 && out.includes("ok n=2 3 items") && out.includes("\n3\n") && out.includes("two"),
+    (out + p.stderr.toString()).trim().replace(/\s+/g, " ").slice(0, 160),
+  );
 } finally {
   rmSync(t, { recursive: true, force: true });
 }

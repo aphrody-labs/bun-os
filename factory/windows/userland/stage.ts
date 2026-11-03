@@ -11,7 +11,7 @@
  */
 import { $ } from "bun";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 
 const args = Bun.argv.slice(2);
@@ -32,7 +32,8 @@ await $`scp -q ${`${host}:${remote}.sha256`} ${local + ".sha256"}`;
 const want = readFileSync(local + ".sha256", "utf8").split(/\s+/)[0];
 if (sha256(local) !== want) throw new Error(`tarball sha256 mismatch: ${local}`);
 const dir = join(staging, basename(remote, ".tar.gz"));
-if (!existsSync(dir)) await $`C:/Windows/System32/tar.exe -xzf ${local} -C ${staging}`;
+rmSync(dir, { recursive: true, force: true }); // a rebuilt (--into) tarball keeps its name
+await $`C:/Windows/System32/tar.exe -xzf ${local} -C ${staging}`;
 
 const manifestPath = join(dir, "manifest.json");
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -52,7 +53,9 @@ if (sign) {
   const ps1 = join(root, "factory/windows/signing/test-signing.ps1");
   const unsigned: string[] = [];
   for (const p of exes) {
-    const st = (await $`pwsh -NoProfile -Command ${`(Get-AuthenticodeSignature -LiteralPath '${p}').Status`}`.text()).trim();
+    const st = (
+      await $`pwsh -NoProfile -Command ${`(Get-AuthenticodeSignature -LiteralPath '${p}').Status`}`.text()
+    ).trim();
     if (st !== "Valid") unsigned.push(p);
   }
   if (unsigned.length) await $`C:/Windows/System32/sudo.exe pwsh -NoProfile -File ${ps1} sign ${unsigned}`;
@@ -64,7 +67,11 @@ if (sign) {
     const [status, thumb] = out.split(" ");
     if (status !== "Valid") throw new Error(`signature not valid on ${p}: ${out}`);
     thumbs.add(thumb);
-    manifest.signing = { subject: out.split(" ").slice(2).join(" "), thumbprint: thumb, tool: "factory/windows/signing/test-signing.ps1" };
+    manifest.signing = {
+      subject: out.split(" ").slice(2).join(" "),
+      thumbprint: thumb,
+      tool: "factory/windows/signing/test-signing.ps1",
+    };
   }
   if (thumbs.size !== 1) throw new Error(`expected one signer, got ${[...thumbs].join(", ")}`);
   manifest.signing.signed = new Date().toISOString();
@@ -72,4 +79,6 @@ if (sign) {
 }
 for (const tool of manifest.tools) for (const f of tool.files) f.sha256 = sha256(join(dir, f.path));
 writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
-console.log(`staged ${dir}\ninstall: C:\\Windows\\System32\\sudo.exe pwsh -NoProfile -File ${join(root, "factory/windows/userland/install-system.ps1")} -Source ${dir}`);
+console.log(
+  `staged ${dir}\ninstall: C:\\Windows\\System32\\sudo.exe pwsh -NoProfile -File ${join(root, "factory/windows/userland/install-system.ps1")} -Source ${dir}`,
+);

@@ -47,18 +47,26 @@ const cases: [string, string, string][] = [
   ["ls -laR tree", `${g("ls")} -laR ${q(tree)}`, `${u("ls")} -laR ${q(tree)}`],
   ["grep -r fn tree (ripgrep)", `${g("grep")} -r -c fn ${q(tree)}`, `${u("rg")} -uuu -c fn ${q(tree)}`],
   ["shell startup: -c true", `${g("bash")} -c true`, `${u("brush")} -c true`],
-  ["shell loop 20k iterations", `${g("bash")} -c "for ((i=0;i<20000;i++)); do x=$((i*2)); done"`, `${u("brush")} -c "for ((i=0;i<20000;i++)); do x=$((i*2)); done"`],
+  [
+    "shell loop 20k iterations",
+    `${g("bash")} -c "for ((i=0;i<20000;i++)); do x=$((i*2)); done"`,
+    `${u("brush")} -c "for ((i=0;i<20000;i++)); do x=$((i*2)); done"`,
+  ],
 ];
 const rows = ["| Case | GNU (Git for Windows) | Bun OS userland | GNU / ours |", "| --- | --- | --- | --- |"];
 for (const [label, a, b] of cases) {
   const out = join(work, "h.json");
-  const p = Bun.spawnSync([hyperfine, "-N", "--warmup", "2", "--min-runs", "5", "--output", "null", "--export-json", out, a, b], { stdout: "ignore", stderr: "pipe" });
+  const p = Bun.spawnSync(
+    [hyperfine, "-N", "--warmup", "2", "--min-runs", "5", "--output", "null", "--export-json", out, a, b],
+    { stdout: "ignore", stderr: "pipe" },
+  );
   if (p.exitCode !== 0) {
     rows.push(`| ${label} | failed | failed | ${p.stderr.toString().trim().split("\n").pop()} |`);
     continue;
   }
   const [ra, rb] = JSON.parse(readFileSync(out, "utf8")).results;
-  const ms = (r: { mean: number; stddev: number }) => `${(r.mean * 1000).toFixed(1)} ± ${(r.stddev * 1000).toFixed(1)} ms`;
+  const ms = (r: { mean: number; stddev: number }) =>
+    `${(r.mean * 1000).toFixed(1)} ± ${(r.stddev * 1000).toFixed(1)} ms`;
   rows.push(`| ${label} | ${ms(ra)} | ${ms(rb)} | ${(ra.mean / rb.mean).toFixed(2)}x |`);
   console.error(rows.at(-1));
 }
