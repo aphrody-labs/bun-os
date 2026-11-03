@@ -1754,3 +1754,7 @@
 	url = https://github.com/aphrody-labs/AltSnap.git
 	shallow = true
 	branch = bunos
+[submodule "vendor/3dviz-pro-max"]
+	path = vendor/3dviz-pro-max
+	url = https://github.com/aphrody-labs/3dviz-pro-max.git
+	shallow = true
