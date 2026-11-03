@@ -106,7 +106,7 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-scrim/40 backdrop-blur-xs"
+          className="absolute inset-0 bg-scrim/32"
           onClick={onClose}
         />
 
@@ -116,7 +116,7 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
           aria-modal="true"
           aria-labelledby="help-dialog-title"
           data-testid="help-dialog"
-          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-3xl w-full mx-4 max-h-[85vh] overflow-hidden flex flex-col"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-3xl w-full mx-4 max-h-[85vh] overflow-hidden flex flex-col"
         >
           {/* Header */}
           <div className="flex items-center gap-3 p-6 border-b border-outline-variant bg-surface-container-low">

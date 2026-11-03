@@ -238,7 +238,7 @@ function App() {
         {/* Startup action output dialog */}
         {startupActionOutput && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-scrim/50" onClick={clearStartupActionOutput} />
+            <div className="absolute inset-0 bg-scrim/32" onClick={clearStartupActionOutput} />
             <div className="relative bg-surface-container-low border border-outline-variant rounded-lg p-4 max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-semibold text-on-surface">{startupActionOutput.actionName} {t('common:output')}</h3>
@@ -361,7 +361,7 @@ function App() {
         {/* Startup action output dialog */}
         {startupActionOutput && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-scrim/50" onClick={clearStartupActionOutput} />
+            <div className="absolute inset-0 bg-scrim/32" onClick={clearStartupActionOutput} />
             <div className="relative bg-surface-container-low border border-outline-variant rounded-lg p-4 max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-semibold text-on-surface">{startupActionOutput.actionName} {t('common:output')}</h3>

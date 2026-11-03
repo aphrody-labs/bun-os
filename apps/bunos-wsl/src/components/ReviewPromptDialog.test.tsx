@@ -130,7 +130,7 @@ describe('ReviewPromptDialog', () => {
   describe('styling', () => {
     it('has backdrop blur effect', () => {
       render(<ReviewPromptDialog {...defaultProps} />);
-      const backdrop = document.querySelector('.backdrop-blur-xs');
+      const backdrop = document.querySelector('[class~="bg-scrim/32"]');
       expect(backdrop).toBeInTheDocument();
     });
 

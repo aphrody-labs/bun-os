@@ -2,7 +2,7 @@
  * Reusable Modal Components
  *
  * Consistent, accessible modal/dialog components.
- * Mission Control aesthetic with cyber styling.
+ * A surface-container dialog over the M3 scrim.
  */
 
 import { type ReactNode, useEffect, useRef, useId } from 'react';
@@ -115,7 +115,7 @@ export function Modal({
 
   const modalClasses = [
     'relative bg-surface-container-low border border-outline-variant',
-    'rounded-xl shadow-2xl shadow-shadow/70',
+    'rounded-xl shadow-md3-3',
     SIZE_CLASSES[size],
     'w-full mx-4',
     'animate-fade-slide-in',
@@ -127,7 +127,7 @@ export function Modal({
       <div className="fixed inset-0 z-[100] flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
         {/* Scrim */}
         <div
-          className="absolute inset-0 bg-scrim/40"
+          className="absolute inset-0 bg-scrim/32"
           onClick={handleBackdropClick}
         />
 
@@ -233,12 +233,12 @@ export function Dialog({
       <div className="fixed inset-0 z-[100] flex items-center justify-center" role="alertdialog" aria-modal="true" aria-labelledby={titleId}>
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-scrim/40 backdrop-blur-sm"
+          className="absolute inset-0 bg-scrim/32"
           onClick={onCancel}
         />
 
         {/* Dialog */}
-        <div ref={dialogRef} tabIndex={-1} className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/70 max-w-md w-full mx-4 p-6 animate-fade-slide-in">
+        <div ref={dialogRef} tabIndex={-1} className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-md w-full mx-4 p-6 animate-fade-slide-in">
 
           <div className="flex items-start gap-4 mb-6">
             <div

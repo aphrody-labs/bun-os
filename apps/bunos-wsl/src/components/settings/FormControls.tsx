@@ -77,7 +77,7 @@ export function SettingSelect({
         }}
         disabled={disabled}
         data-testid={testId}
-        className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -125,7 +125,7 @@ export function SettingInput({
         min={min}
         step={step}
         data-testid={testId ? `${testId}-input` : undefined}
-        className={`w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary ${className}`}
+        className={`w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:border-primary ${className}`}
       />
     </div>
   );
@@ -192,7 +192,7 @@ export function SettingPathInput({
           onChange={(e) => handleChange(e.target.value)}
           placeholder={placeholder}
           data-testid={testId ? `${testId}-input` : undefined}
-          className={`flex-1 px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary ${className}`}
+          className={`flex-1 px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:border-primary ${className}`}
         />
         <button
           type="button"

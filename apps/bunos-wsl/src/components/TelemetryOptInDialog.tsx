@@ -28,14 +28,14 @@ export function TelemetryOptInDialog({
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" />
+        <div className="absolute inset-0 bg-scrim/32" />
 
         {/* Dialog */}
         <div
           role="dialog"
           aria-modal="true"
           data-testid="telemetry-opt-in-dialog"
-          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-lg w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-lg w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-5">
             <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-primary/20 text-primary">
@@ -97,7 +97,7 @@ export function TelemetryOptInDialog({
             <button
               onClick={onAccept}
               data-testid="telemetry-accept-button"
-              className="px-4 py-2 text-sm font-medium text-on-primary bg-primary hover:opacity-90 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-on-primary bg-primary state-layer rounded-lg transition-colors"
             >
               {t('telemetry.accept')}
             </button>

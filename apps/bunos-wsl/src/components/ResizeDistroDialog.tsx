@@ -189,13 +189,13 @@ export function ResizeDistroDialog({ isOpen, distro, onClose }: ResizeDistroDial
                 min="1"
                 step="1"
                 disabled={isResizing}
-                className="flex-1 px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary disabled:opacity-50"
+                className="flex-1 px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:border-primary disabled:opacity-50"
               />
               <select
                 value={sizeUnit}
                 onChange={(e) => setSizeUnit(e.target.value as SizeUnit)}
                 disabled={isResizing}
-                className="px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-primary disabled:opacity-50"
+                className="px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface focus:border-primary disabled:opacity-50"
               >
                 <option value="GB">GB</option>
                 <option value="TB">TB</option>

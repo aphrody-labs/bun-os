@@ -85,7 +85,7 @@ export function Header({ onOpenSettings }: HeaderProps) {
                   Bun OS <span className="font-bold text-primary">WSL</span>
                 </h1>
                 {appVersion && (
-                  <span className="px-1.5 py-0.5 text-[10px] font-medium bg-secondary-container text-on-secondary-container rounded-full border border-outline-variant">
+                  <span className="px-1.5 py-0.5 text-xs font-medium bg-secondary-container text-on-secondary-container rounded-full border border-outline-variant">
                     v{appVersion}
                   </span>
                 )}
@@ -107,14 +107,14 @@ export function Header({ onOpenSettings }: HeaderProps) {
                 title={`WSL2 System Distribution\n${systemInfo.name}\nVersion: ${systemInfo.version}`}
               >
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] uppercase tracking-wider text-on-surface-variant font-mono">SYS</span>
-                  <span className="text-[10px] text-primary font-mono font-medium">
+                  <span className="text-xs uppercase tracking-wider text-on-surface-variant font-mono">SYS</span>
+                  <span className="text-xs text-primary font-mono font-medium">
                     {systemInfo.name}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] uppercase tracking-wider text-on-surface-variant font-mono">VER</span>
-                  <span className="text-[10px] text-on-surface-variant font-mono">
+                  <span className="text-xs uppercase tracking-wider text-on-surface-variant font-mono">VER</span>
+                  <span className="text-xs text-on-surface-variant font-mono">
                     {systemInfo.version}
                   </span>
                 </div>
@@ -129,7 +129,7 @@ export function Header({ onOpenSettings }: HeaderProps) {
           <Button
             variant="success"
             size="sm"
-            className="btn-cyber"
+            className="state-layer"
             icon={<PlusIcon size="sm" />}
             onClick={() => setShowNewDialog(true)}
             disabled={isLoading || !!actionInProgress}
@@ -142,7 +142,7 @@ export function Header({ onOpenSettings }: HeaderProps) {
           <Button
             variant="accent"
             size="sm"
-            className="btn-cyber"
+            className="state-layer"
             icon={<DownloadIcon size="sm" />}
             onClick={() => setShowImportDialog(true)}
             disabled={isLoading || !!actionInProgress}
@@ -154,7 +154,7 @@ export function Header({ onOpenSettings }: HeaderProps) {
           <Button
             variant="secondary"
             size="sm"
-            className="btn-cyber"
+            className="state-layer"
             icon={<RefreshIcon size="sm" className={isLoading ? "animate-spin" : ""} />}
             onClick={() => fetchDistros(false, true)}
             disabled={isLoading || !!actionInProgress}
@@ -167,7 +167,7 @@ export function Header({ onOpenSettings }: HeaderProps) {
           <Button
             variant="danger"
             size="sm"
-            className="btn-cyber"
+            className="state-layer"
             icon={<ShutdownIcon size="sm" />}
             onClick={() => setShowShutdownConfirm(true)}
             disabled={isLoading || !!actionInProgress}

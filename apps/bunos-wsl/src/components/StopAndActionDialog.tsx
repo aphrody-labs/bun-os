@@ -88,7 +88,7 @@ export function StopAndActionDialog({
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-scrim/40 backdrop-blur-xs"
+          className="absolute inset-0 bg-scrim/32"
           onClick={handleCancel}
         />
 
@@ -97,7 +97,7 @@ export function StopAndActionDialog({
           role="dialog"
           aria-modal="true"
           data-testid="stop-and-action-dialog"
-          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-md w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-4">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
@@ -175,8 +175,8 @@ export function StopAndActionDialog({
               onClick={handleStopAndContinue}
               disabled={isStopping}
               data-testid="stop-and-continue-button"
-              className={`px-4 py-2 text-sm font-medium hover:opacity-90 text-surface rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
-                requiresShutdown ? "bg-error" : "bg-warning"
+              className={`px-4 py-2 text-sm font-medium state-layer rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
+                requiresShutdown ? "bg-error text-on-error" : "bg-warning text-on-warning"
               }`}
             >
               {isStopping ? (

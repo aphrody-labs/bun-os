@@ -47,13 +47,13 @@ export function ConfirmDialog({
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" onClick={handleCancel} />
+        <div className="absolute inset-0 bg-scrim/32" onClick={handleCancel} />
 
         {/* Dialog */}
         <div
           role="dialog"
           data-testid="confirm-dialog"
-          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-md w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-4">
             <div
@@ -82,8 +82,8 @@ export function ConfirmDialog({
               data-testid="dialog-confirm-button"
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 danger
-                  ? "bg-error hover:opacity-90 text-on-error"
-                  : "bg-warning hover:opacity-90 text-on-warning"
+                  ? "bg-error state-layer text-on-error"
+                  : "bg-warning state-layer text-on-warning"
               }`}
             >
               {confirmLabel}

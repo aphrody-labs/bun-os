@@ -365,7 +365,7 @@ export function QuickActionsMenu({ distro, disabled }: QuickActionsMenuProps) {
         icon={<MenuIcon size="sm" />}
         label={t('quickActions.title')}
         variant="secondary"
-        className="btn-cyber"
+        className="state-layer"
         onClick={handleToggleMenu}
         disabled={isDisabled}
         aria-haspopup="menu"
@@ -470,8 +470,8 @@ export function QuickActionsMenu({ distro, disabled }: QuickActionsMenuProps) {
       {/* Output Dialog */}
       {showOutputDialog && (
         <Portal>
-          <div className="fixed inset-0 bg-scrim/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4" role="dialog" aria-modal="true">
-            <div className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/70 max-w-2xl w-full max-h-[80vh] overflow-hidden animate-fade-slide-in">
+          <div className="fixed inset-0 bg-scrim/32 flex items-center justify-center z-[100] p-4" role="dialog" aria-modal="true">
+            <div className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-2xl w-full max-h-[80vh] overflow-hidden animate-fade-slide-in">
 
               <div className="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
                 <h3 className="font-semibold text-on-surface">{showOutputDialog.title} {t('outputDialog.titleSuffix')}</h3>

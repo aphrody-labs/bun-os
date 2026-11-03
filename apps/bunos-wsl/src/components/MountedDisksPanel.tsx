@@ -71,7 +71,7 @@ export function MountedDisksPanel({ isOpen, onClose, onMountNew, anchorRef }: Mo
     <div
       ref={panelRef}
       data-testid="mounted-disks-panel"
-      className="absolute left-0 bottom-full mb-2 w-72 bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/70 z-50"
+      className="absolute left-0 bottom-full mb-2 w-72 bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 z-50"
     >
       {/* Header */}
       <div className="px-3 py-2.5 border-b border-outline-variant">
@@ -100,7 +100,7 @@ export function MountedDisksPanel({ isOpen, onClose, onMountNew, anchorRef }: Mo
             <button
               onClick={clearError}
               data-testid="mounted-disks-clear-error"
-              className="text-error hover:opacity-80"
+              className="text-error state-layer"
               aria-label={t("common:button.close")}
             >
               <Icon name="close" size={16} />

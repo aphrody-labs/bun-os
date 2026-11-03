@@ -116,7 +116,7 @@ export function SetDefaultUserDialog({ isOpen, distro, onClose }: SetDefaultUser
                 placeholder={t('setUser.usernamePlaceholder')}
                 disabled={isSaving}
                 maxLength={32}
-                className="w-full pl-10 pr-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary disabled:opacity-50"
+                className="w-full pl-10 pr-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:border-primary disabled:opacity-50"
               />
             </div>
             <p className="text-xs text-on-surface-variant mt-1">

@@ -56,7 +56,7 @@ describe("NoRdpDetectedDialog", () => {
     );
 
     // The backdrop is the first child div with the blur class
-    const backdrop = document.querySelector(".backdrop-blur-xs");
+    const backdrop = document.querySelector('[class~="bg-scrim/32"]');
     expect(backdrop).toBeInTheDocument();
     fireEvent.click(backdrop!);
     expect(onClose).toHaveBeenCalledTimes(1);

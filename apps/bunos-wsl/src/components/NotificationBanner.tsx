@@ -123,13 +123,13 @@ export function NotificationBanner({
       role={role}
       aria-live={ariaLive}
       aria-atomic="true"
-      className="grid transition-[grid-template-rows,margin] duration-300 ease-out"
+      className="grid transition-[grid-template-rows,margin] duration-300 ease-emphasized-decelerate"
       style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr", marginTop: isExpanded ? 24 : 0, marginBottom: isExpanded ? 20 : 0 }}
     >
       <div className="overflow-hidden">
         <div
           data-testid={testId}
-          className={`p-4 border rounded-xl shadow-lg transition-opacity duration-200 ${
+          className={`p-4 border rounded-xl shadow-md3-1 transition-opacity duration-200 ${
             isExpanded ? "opacity-100" : "opacity-0"
           } ${style.container}`}
         >

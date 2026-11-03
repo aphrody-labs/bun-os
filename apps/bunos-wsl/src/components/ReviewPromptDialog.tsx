@@ -30,14 +30,14 @@ export function ReviewPromptDialog({
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" />
+        <div className="absolute inset-0 bg-scrim/32" />
 
         {/* Dialog */}
         <div
           role="dialog"
           aria-modal="true"
           data-testid="review-prompt-dialog"
-          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-md w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-5">
             <div className="shrink-0">
@@ -72,7 +72,7 @@ export function ReviewPromptDialog({
             <button
               onClick={onReview}
               data-testid="review-leave-review-button"
-              className="px-4 py-2 text-sm font-medium text-on-primary bg-primary hover:opacity-90 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-on-primary bg-primary state-layer rounded-lg transition-colors"
             >
               {t('review.leaveReview')}
             </button>

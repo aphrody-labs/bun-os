@@ -88,7 +88,7 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
       onKeyDown={handleMenuKeyDown}
       role="menu"
     >
-      <div className="bg-surface-container-low rounded-xl shadow-xl shadow-shadow/70 py-1 h-full overflow-y-auto">
+      <div className="bg-surface-container-low rounded-xl shadow-md3-2 py-1 h-full overflow-y-auto">
 
       {/* Built-in actions */}
       {builtInActions.map((action) => (

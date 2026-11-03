@@ -66,7 +66,7 @@ describe('ConfirmDialog', () => {
     it('calls onCancel when backdrop clicked', () => {
       render(<ConfirmDialog {...defaultProps} />);
       // Find the backdrop by class - uses Portal so query document
-      const backdrop = document.querySelector('.backdrop-blur-xs');
+      const backdrop = document.querySelector('[class~="bg-scrim/32"]');
       fireEvent.click(backdrop!);
       expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
     });
@@ -122,10 +122,10 @@ describe('ConfirmDialog', () => {
   });
 
   describe('styling', () => {
-    it('has backdrop blur-sm effect', () => {
+    it('has the scrim backdrop', () => {
       render(<ConfirmDialog {...defaultProps} />);
       // Portal renders outside container, query document
-      const backdrop = document.querySelector('.backdrop-blur-xs');
+      const backdrop = document.querySelector('[class~="bg-scrim/32"]');
       expect(backdrop).toBeInTheDocument();
     });
 

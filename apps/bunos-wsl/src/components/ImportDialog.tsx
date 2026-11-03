@@ -107,10 +107,10 @@ export function ImportDialog({ isOpen, onClose }: ImportDialogProps) {
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" onClick={handleClose} />
+        <div className="absolute inset-0 bg-scrim/32" onClick={handleClose} />
 
         {/* Dialog */}
-        <div role="dialog" aria-modal="true" className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-lg w-full mx-4 p-6">
+        <div role="dialog" aria-modal="true" className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-lg w-full mx-4 p-6">
         <h2 className="text-xl font-semibold text-on-surface mb-4">{t('import.title')}</h2>
 
         {/* Error message - always reserve space to prevent layout shift */}
@@ -171,7 +171,7 @@ export function ImportDialog({ isOpen, onClose }: ImportDialogProps) {
           <button
             onClick={handleImport}
             disabled={isImporting || !name.trim() || nameExists || !tarPath || !installLocation}
-            className="px-4 py-2 text-sm font-medium bg-primary hover:opacity-90 text-on-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 text-sm font-medium bg-primary state-layer text-on-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isImporting ? (
               t('import.importing')
