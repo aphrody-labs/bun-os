@@ -8,7 +8,7 @@ import { mkdirSync, writeFileSync, chmodSync, lstatSync, readFileSync } from "no
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { nativeThemeVariant, parseNativeThemeExport } from "@aphrody/m3-tokens/native-theme";
 import { APP_TARGETS, BUNOS_THEME, generateApps, type AppTarget } from "./apps.ts";
-import { runDesign, verifyDesign } from "./design.ts";
+import { publishDesign, runDesign, verifyDesign } from "./design.ts";
 import { generate } from "./generate.ts";
 import { TARGETS, type ActiveMode, type GeneratedFile, type Target } from "./types.ts";
 
@@ -26,7 +26,7 @@ install/uninstall only print the plan unless --apply is given. generate writes i
 m3-os-themes apps [--target css|compose|flutter|cosmic|all] [--seed <hex>] [--root <checkout>] [--check]
   writes the web CSS, Jetpack Compose, Flutter and COSMIC themes from one token source into their consumers.
 m3-os-themes design --out <dir> [--wallpaper <svg|png>] [--seed <hex>] [--bin <bunos-design>] [--no-dll] [--no-catalogue]
-  the full design artifact (themes, window chrome, icons, fonts, receipt); m3-os-themes verify --dir <dir> checks its receipt.`;
+  the full design artifact (themes, window chrome, icons, fonts, receipt); m3-os-themes verify --dir <dir> checks its receipt; m3-os-themes publish --dir <dir> [--root ~/apps/cdn/design] serves it at cdn.aphrody.com/s/design/.`;
 
 /** `design`: the end-to-end design artifact (design.ts). */
 function designCommand(flags: Record<string, string | boolean>): CliResult {
@@ -204,6 +204,14 @@ export function run(argv: string[], exec: Exec = defaultExec): CliResult {
   const { cmd, flags } = parsed;
   if (cmd === "apps") return appsCommand(flags);
   if (cmd === "design") return designCommand(flags);
+  if (cmd === "publish") {
+    try {
+      const dir = resolve(String(flags["dir"] ?? "."));
+      return { code: 0, out: [publishDesign(dir, resolve(String(flags["root"] ?? join(process.env["HOME"] ?? "", "apps/cdn/design"))))] };
+    } catch (e) {
+      return { code: 1, out: [(e as Error).message] };
+    }
+  }
   if (cmd === "verify") {
     const dir = resolve(String(flags["dir"] ?? flags["out"] ?? "."));
     const bad = verifyDesign(dir);

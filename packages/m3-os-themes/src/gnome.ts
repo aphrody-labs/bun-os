@@ -135,6 +135,8 @@ scale trough, progressbar trough, levelbar trough { background-color: ${r["secon
 scale highlight, progressbar progress, levelbar block.filled { background-image: none; background-color: ${r["primary"]}; border-color: ${r["primary"]}; border-radius: 9999px; }
 scale slider { background-image: none; background-color: ${r["primary"]}; border-color: ${r["primary"]}; box-shadow: none; }
 notebook > header { background-color: ${r["surfaceContainer"]}; border-color: ${r["outlineVariant"]}; }
+notebook > header tab { color: ${r["onSurfaceVariant"]}; }
+notebook > stack:not(:only-child), notebook > stack { background-color: ${r["surfaceContainerLow"]}; }
 notebook > header tab:checked, stackswitcher button:checked { color: ${r["primary"]}; box-shadow: inset 0 -3px ${r["primary"]}; background-color: transparent; }
 notebook > header.left tab:checked, notebook > header.right tab:checked { box-shadow: inset -3px 0 ${r["primary"]}; }
 link, button.link, *:link { color: ${r["primary"]}; }

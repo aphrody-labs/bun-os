@@ -7,7 +7,9 @@
 # Installed as /etc/systemd/system/aphrody-fonts-proxy.service on the vps. The cache lives in /home/ubuntu/apps/cdn/google. `--static` serves the asset CDN release tree
 # (`scripts/aphrody/tools/infra/cdn.ts publish`, /home/ubuntu/apps/cdn/current) under /h/ and /s/<scope>/, then the
 # Material Symbols release (`bun run cdn publish` of vendor/material-design-icons, aphrody-labs/material-design-icons branch aphrody,
-# /home/ubuntu/apps/cdn/symbols/current, tools/aphrody/config/asset-catalog.json `releases`).
+# /home/ubuntu/apps/cdn/symbols/current, tools/aphrody/config/asset-catalog.json `releases`), then the Bun OS design artifact
+# (`m3-os-themes design`, docs/DESIGN-M3-WINDOWS.md): /home/ubuntu/apps/cdn/design/current/s/design -> the verified
+# ~/build/storage/artifacts/design/<commit>, served as https://cdn.aphrody.com/s/design/<path> (fonts, icons, themes).
 [Unit]
 Description=Aphrody Google Fonts edge proxy (cdn.aphrody.com)
 After=network-online.target
@@ -18,7 +20,7 @@ Type=simple
 User=ubuntu
 Group=ubuntu
 WorkingDirectory=/home/ubuntu/apps/cdn/src
-ExecStart=/home/ubuntu/.local/bin/bun /home/ubuntu/apps/cdn/src/fonts-serve.js --port 8796 --cache /home/ubuntu/apps/cdn/google --origin https://cdn.aphrody.com --static /home/ubuntu/apps/cdn/current --static /home/ubuntu/apps/cdn/symbols/current
+ExecStart=/home/ubuntu/.local/bin/bun /home/ubuntu/apps/cdn/src/fonts-serve.js --port 8796 --cache /home/ubuntu/apps/cdn/google --origin https://cdn.aphrody.com --static /home/ubuntu/apps/cdn/current --static /home/ubuntu/apps/cdn/symbols/current --static /home/ubuntu/apps/cdn/design/current
 Restart=always
 MemoryHigh=128M
 MemoryMax=256M

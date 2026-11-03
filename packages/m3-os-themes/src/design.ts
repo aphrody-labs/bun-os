@@ -437,3 +437,22 @@ export function verifyDesign(dir: string): string[] {
   const receipt = JSON.parse(readFileSync(join(dir, "receipt.json"), "utf8")) as { files: { path: string; sha256: string }[] };
   return receipt.files.filter(f => !existsSync(join(dir, f.path)) || sha256(join(dir, f.path)) !== f.sha256).map(f => f.path);
 }
+
+/**
+ * Serve a verified design artifact through the fonts/CDN proxy (`--static <root>/current`): creates
+ * `<root>/releases/<name>/s/design -> <artifact>` and switches `<root>/current` atomically. Refuses a receipt mismatch.
+ */
+export function publishDesign(dir: string, root: string): string {
+  const bad = verifyDesign(dir);
+  if (bad.length) throw new Error(`receipt mismatch (${bad.length} files), e.g. ${bad[0]}`);
+  const name = (JSON.parse(readFileSync(join(dir, "receipt.json"), "utf8")) as { commit: string }).commit.slice(0, 12);
+  const release = join(root, "releases", name);
+  mkdirSync(join(release, "s"), { recursive: true });
+  rmSync(join(release, "s", "design"), { force: true });
+  sh(["ln", "-s", resolve(dir), join(release, "s", "design")]);
+  const tmp = join(root, `.current-${process.pid}`);
+  rmSync(tmp, { force: true });
+  sh(["ln", "-s", release, tmp]);
+  sh(["mv", "-T", tmp, join(root, "current")]);
+  return `published ${name}: ${join(root, "current")} -> ${release}`;
+}
