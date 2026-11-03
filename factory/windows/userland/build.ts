@@ -153,6 +153,9 @@ for (const tool of config.tools) {
     continue;
   }
   await waitForMemory(tool.name);
+  // A fork pinning its toolchain (rust-toolchain.toml) needs the Windows target in that toolchain too.
+  if (["rust-toolchain.toml", "rust-toolchain"].some((f) => existsSync(join(dir, f))))
+    await $`rustup target add ${config.target}`.cwd(dir).quiet().nothrow();
   const profile = { ...config.profile, ...(tool.panic && { panic: tool.panic }), ...(tool.lto && { lto: tool.lto }) };
   const toolEnv: Record<string, string> = {
     ...(env as Record<string, string>),
