@@ -529,6 +529,9 @@ module = "look"
 title = "Accent colour from the Bun OS seed, shown on title bars and window borders"
 level = "standard"
 registry = [
+  # Manual accent: with AutoColorization on, Windows re-derives the accent from the wallpaper on every wallpaper change
+  # (measured 2026-11-03: it overwrote AccentColor/ColorizationColor within a second of the wallpaper apply).
+  { hive = "user", key = 'Control Panel\Desktop', name = "AutoColorization", type = "dword", value = 0 },
   { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "AccentColor", type = "dword", value = 4288824667 },
   { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorizationColor", type = "dword", value = 3294315938 },
   { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorizationAfterglow", type = "dword", value = 3294315938 },
