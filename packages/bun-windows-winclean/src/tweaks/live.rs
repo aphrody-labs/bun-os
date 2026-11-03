@@ -44,15 +44,33 @@ fn reg_delete(h: RegHive, key: &str, name: &str) -> io::Result<()> {
     }
 }
 
-/// Whether a scheduled task exists and is enabled (`None` when it does not exist).
+/// Whether a scheduled task exists and is enabled (`None` when it does not exist), read through the Task Scheduler
+/// COM API (`ITaskService` → `ITaskFolder::GetTask` → `IRegisteredTask::Enabled`): `schtasks` prints a localised
+/// status column ("Désactivé" on a French Windows), so parsing its output misreads disabled tasks.
 fn task_enabled(path: &str) -> io::Result<Option<bool>> {
-    let (folder, name) = path.rsplit_once('\\').unwrap_or(("\\", path));
+    use windows::Win32::Foundation::VARIANT_BOOL;
+    use windows::Win32::System::Com::{CLSCTX_INPROC_SERVER, COINIT_MULTITHREADED, CoCreateInstance, CoInitializeEx};
+    use windows::Win32::System::TaskScheduler::{ITaskService, TaskScheduler};
+    use windows::Win32::System::Variant::VARIANT;
+    use windows::core::BSTR;
+
+    use crate::win32::hresult_error;
+
+    let (folder, name) = path.rsplit_once('\\').unwrap_or(("", path));
     let folder = if folder.is_empty() { "\\" } else { folder };
-    let list = match system::list_scheduled_tasks(folder) {
-        Ok(list) => list,
-        Err(_) => return Ok(None),
-    };
-    Ok(list.tasks.iter().find(|t| t.name.eq_ignore_ascii_case(name)).map(|t| t.enabled))
+    // SAFETY: plain COM calls on interfaces owned by this function; COM is initialised for this thread first
+    // (an already-initialised thread returns S_FALSE or RPC_E_CHANGED_MODE, both fine for an in-process server).
+    unsafe {
+        let _ = CoInitializeEx(None, COINIT_MULTITHREADED);
+        let service: ITaskService =
+            CoCreateInstance(&TaskScheduler, None, CLSCTX_INPROC_SERVER).map_err(|e| hresult_error(&e, "TaskScheduler"))?;
+        let none = VARIANT::default();
+        service.Connect(&none, &none, &none, &none).map_err(|e| hresult_error(&e, "ITaskService::Connect"))?;
+        let Ok(folder) = service.GetFolder(&BSTR::from(folder)) else { return Ok(None) };
+        let Ok(task) = folder.GetTask(&BSTR::from(name)) else { return Ok(None) };
+        let enabled: VARIANT_BOOL = task.Enabled().map_err(|e| hresult_error(&e, "IRegisteredTask::Enabled"))?;
+        Ok(Some(enabled.as_bool()))
+    }
 }
 
 fn active_power() -> io::Result<String> {

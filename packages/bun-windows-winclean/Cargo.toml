@@ -79,6 +79,7 @@ windows = { version = "0.62.2", features = [
   "Win32_System_Restore",
   "Win32_System_SystemInformation",
   "Win32_System_Services",
+  "Win32_System_TaskScheduler",
   "Win32_System_Variant",
   "Win32_System_Wmi",
   "Win32_UI_Shell",
