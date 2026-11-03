@@ -1,0 +1,11 @@
+{
+  "name": "@aphrody/bunos-init",
+  "version": "1.4.7",
+  "description": "Bun as PID 1 for Bun OS: mounts the API filesystems, reaps orphans and powers off through bun:ffi system calls; built into the linux-bun initramfs.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "bunos-init": "./src/init.ts"
+  }
+}
