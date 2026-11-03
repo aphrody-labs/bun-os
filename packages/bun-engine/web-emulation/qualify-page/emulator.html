@@ -1,8 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
 <title>Emulator</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="/emulator.css">
@@ -24,7 +25,7 @@
 <main id="stage"><canvas id="screen" tabindex="0"></canvas></main>
 <footer id="pad" hidden>
   <div class="dpad">
-    <button data-k="64">&#9650;</button><button data-k="32">&#9664;</button><button data-k="16">&#9654;</button><button data-k="128">&#9660;</button>
+    <button data-k="64" aria-label="Up"><svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="m280-400 200-201 200 201H280Z"/></svg></button><button data-k="32" aria-label="Left"><svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M560-280 360-480l200-200v400Z"/></svg></button><button data-k="16" aria-label="Right"><svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M400-280v-400l200 200-200 200Z"/></svg></button><button data-k="128" aria-label="Down"><svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M480-360 280-559h400L480-360Z"/></svg></button>
   </div>
   <div class="face">
     <button data-k="4">Select</button><button data-k="8">Start</button><button data-k="2">B</button><button data-k="1">A</button>

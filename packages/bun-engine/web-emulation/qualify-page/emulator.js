@@ -4,6 +4,14 @@
 // test ROM, offers save states (IndexedDB) and a touch pad, and publishes window.__emulator for the
 // qualification runner.
 const $ = id => document.getElementById(id);
+// emulator.css scopes the generated brand roles to .dark and .light: follow the system scheme.
+const lightScheme = matchMedia("(prefers-color-scheme: light)");
+const applyScheme = () => {
+  document.documentElement.classList.toggle("light", lightScheme.matches);
+  document.documentElement.classList.toggle("dark", !lightScheme.matches);
+};
+applyScheme();
+lightScheme.addEventListener("change", applyScheme);
 const params = new URLSearchParams(location.search);
 const core = params.get("core") ?? "";
 const autotest = params.get("autotest") === "1";

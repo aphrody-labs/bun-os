@@ -1,0 +1,94 @@
+/* Source of emulator.css (build-css.ts prepends the generated brand roles). Every colour is a role of
+   packages/app-ui/src/brand.css; the canvas letterbox is content. */
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-surface);
+  font: 14px/1.4 "Google Sans Flex", "Roboto Flex", sans-serif;
+}
+body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+#bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--md-sys-color-surface-container);
+  flex-wrap: wrap;
+}
+#bar .grow {
+  flex: 1;
+}
+#status {
+  color: var(--md-sys-color-on-surface-variant);
+}
+#bar button,
+#bar .btn {
+  cursor: pointer;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font: inherit;
+  font-weight: 600;
+}
+#bar button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+#stage {
+  position: relative;
+  min-height: 0;
+  background: black; /* design:content - letterbox around the emulated frame */
+}
+#stage > canvas,
+#stage > div {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#pad {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--md-sys-color-surface-container);
+  touch-action: none;
+}
+#pad button {
+  min-width: 44px;
+  min-height: 44px;
+  margin: 2px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+  font: inherit;
+}
+#pad button.on {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+.dpad,
+.face {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  align-items: center;
+}
+#pad svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+#bar button:focus-visible,
+#bar .btn:focus-visible,
+#pad button:focus-visible {
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: 2px;
+}

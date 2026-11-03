@@ -1,35 +1,32 @@
-/* Bun Engine frontend: a 10-foot, gamepad-first surface. Roles come from the Aphrody M3 tokens
-   (--md-sys-color-*); the dark values here are only fallbacks. Interactions animate transform and
-   opacity only, and every duration goes through --dur so reduced motion (system or setting) zeroes it. */
-@font-face {
-  /* Roboto Flex, SIL OFL 1.1: the open typeface of packages/m3-fonts (licence next to the file) */
-  font-family: "Roboto Flex";
-  src: url("../../../m3-fonts/fonts/web/RobotoFlex-latin.woff2") format("woff2");
-  font-weight: 100 1000;
-  font-stretch: 25% 151%;
-  font-display: block;
-}
+/* Bun Engine frontend: a 10-foot, gamepad-first surface. Every colour is a role of the generated
+   Aphrody brand sheet (packages/app-ui/src/brand.css, product seed, light and dark from the same seed);
+   per-system identity colours are the primary role rotated to the system hue. Interactions animate
+   transform and opacity only, and every duration goes through --dur so reduced motion (system or
+   setting) zeroes it. Typefaces are the self-hosted packages/m3-fonts set (SIL OFL 1.1). */
+@import "../../../app-ui/src/brand.css";
+@import "../../../m3-fonts/src/fonts.css";
 
 :root {
-  color-scheme: dark;
-  --bg: var(--md-sys-color-background, #07090f);
-  --panel: var(--md-sys-color-surface-container, #0f131d);
-  --panel-2: var(--md-sys-color-surface-container-high, #151a27);
-  --line: var(--md-sys-color-outline-variant, #232a3c);
-  --field: var(--md-sys-color-outline, #6b7690);
-  --text: var(--md-sys-color-on-surface, #eef2fb);
-  --muted: var(--md-sys-color-on-surface-variant, #8d97b0);
-  --soft: color-mix(in srgb, var(--text) 78%, var(--bg));
-  --focus: var(--md-sys-color-tertiary, #ffd34d);
-  --on-focus: var(--md-sys-color-on-tertiary, #07090f);
-  --ok: var(--md-sys-color-primary, #34d399);
-  --bad: var(--md-sys-color-error, #f87171);
-  --warn: #fbbf24;
-  --native: #f5b300;
-  --bin: #60a5fa;
-  --libretro: #c084fc;
+  --bg: var(--md-sys-color-background);
+  --panel: var(--md-sys-color-surface-container);
+  --panel-2: var(--md-sys-color-surface-container-high);
+  --line: var(--md-sys-color-outline-variant);
+  --field: var(--md-sys-color-outline);
+  --text: var(--md-sys-color-on-surface);
+  --muted: var(--md-sys-color-on-surface-variant);
+  --soft: color-mix(in oklab, var(--text) 78%, var(--bg));
+  --focus: var(--md-sys-color-tertiary);
+  --on-focus: var(--md-sys-color-on-tertiary);
+  --ok: var(--md-sys-color-primary);
+  --bad: var(--md-sys-color-error);
+  --warn: var(--md-sys-color-tertiary);
+  --native: var(--md-sys-color-tertiary);
+  --bin: var(--md-sys-color-primary);
+  --libretro: var(--md-sys-color-secondary);
+  --shadow: color-mix(in oklab, var(--md-sys-color-shadow) 30%, transparent);
+  --chip-bg: color-mix(in oklab, var(--md-sys-color-surface-container-highest) 85%, transparent);
   --dur: 0.12s;
-  font-family: "Roboto Flex", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  font-family: "Google Sans Flex", "Roboto Flex", sans-serif;
   font-size: clamp(14px, 1.25vw, 24px);
   background: var(--bg);
   color: var(--text);
@@ -60,7 +57,6 @@ body {
   min-height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(90rem 40rem at 10% -10%, color-mix(in srgb, var(--focus) 7%, var(--bg)) 0%, transparent 60%),
     var(--bg);
 }
 button,
@@ -74,7 +70,7 @@ button {
 }
 code,
 .mono {
-  font-family: "Cascadia Code", Consolas, monospace;
+  font-family: "Google Sans Code", "Roboto Mono", monospace;
 }
 .small {
   font-size: 0.78rem;
@@ -381,7 +377,7 @@ button.big {
   padding: 2rem 2.5rem;
   border-radius: 1.5rem;
   overflow: hidden;
-  background: linear-gradient(135deg, hsl(var(--tint, 220) 45% 17%), var(--panel));
+  background: color-mix(in oklab, oklch(from var(--md-sys-color-primary-container) l c var(--tint, h)) 45%, var(--panel));
 }
 .hero.empty {
   grid-template-columns: 1fr;
@@ -443,7 +439,7 @@ button.big {
   width: 100%;
   aspect-ratio: 4 / 3;
   border-radius: 1rem;
-  box-shadow: 0 1.2rem 2.5rem #0009;
+  box-shadow: 0 1.2rem 2.5rem var(--shadow);
 }
 .hero.sk {
   background: var(--panel);
@@ -458,7 +454,7 @@ button.big {
   overflow: hidden;
   aspect-ratio: 4 / 3;
   border-radius: 0.9rem;
-  background: linear-gradient(135deg, hsl(var(--tint, 220) 35% 24%), hsl(var(--tint, 220) 30% 14%));
+  background: color-mix(in oklab, oklch(from var(--md-sys-color-primary-container) l c var(--tint, h)) 70%, var(--panel));
 }
 .art img {
   display: block;
@@ -562,7 +558,7 @@ button.big {
   border-radius: 1.1rem;
   overflow: hidden;
   scroll-snap-align: center;
-  background: linear-gradient(160deg, hsl(var(--tint, 220) 35% 17%) 0%, var(--panel) 60%);
+  background: color-mix(in oklab, oklch(from var(--md-sys-color-primary-container) l c var(--tint, h)) 30%, var(--panel));
   transition: transform var(--dur) ease;
 }
 .systems .system {
@@ -574,7 +570,7 @@ button.big {
   position: absolute;
   inset: auto 0 0 0;
   height: 4px;
-  background: hsl(var(--tint, 220) 60% 60%);
+  background: oklch(from var(--md-sys-color-primary) l c var(--tint, h));
 }
 .system:focus {
   transform: scale(1.04);
@@ -583,14 +579,14 @@ button.big {
   position: absolute;
   inset: 0 0 auto 0;
   height: 4.6rem;
-  background: hsl(var(--tint, 220) 30% 12%);
+  background: color-mix(in oklab, oklch(from var(--md-sys-color-primary-container) l c var(--tint, h)) 55%, var(--panel));
 }
 .system .banner img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: top;
-  mask-image: linear-gradient(#000 70%, transparent);
+  mask-image: linear-gradient(black 70%, transparent); /* design:content - alpha mask over cover art */
 }
 .system.dim {
   border-style: dashed;
@@ -627,22 +623,22 @@ button.big {
   padding: 0.12rem 0.5rem;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: #0006;
+  background: var(--chip-bg);
   margin: 0.1rem 0.15rem 0.1rem 0;
   white-space: nowrap;
 }
 .chip.native.on {
   color: var(--native);
-  border-color: #f5b30066;
+  border-color: color-mix(in oklab, var(--native) 40%, transparent);
 }
 .chip.bin.on {
   color: var(--bin);
-  border-color: #60a5fa66;
+  border-color: color-mix(in oklab, var(--bin) 40%, transparent);
 }
 .chip.libretro.on,
 .chip.embedded.on {
   color: var(--libretro);
-  border-color: #c084fc66;
+  border-color: color-mix(in oklab, var(--libretro) 40%, transparent);
 }
 .chip.off {
   color: var(--muted);
@@ -659,7 +655,7 @@ button.big {
   margin-left: -0.5rem;
 }
 .games-head h1 {
-  border-bottom: 4px solid hsl(var(--tint, 220) 60% 60%);
+  border-bottom: 4px solid oklch(from var(--md-sys-color-primary) l c var(--tint, h));
   padding-bottom: 0.1rem;
 }
 .games-head .sub {
@@ -812,7 +808,7 @@ dd {
 .log {
   margin-top: 1rem;
   padding: 0.8rem 1rem;
-  background: #05070b;
+  background: var(--md-sys-color-surface-container-lowest);
   border: 1px solid var(--line);
   border-radius: 0.7rem;
   font-size: 0.8rem;
@@ -1040,23 +1036,23 @@ td.buttons button {
   font-weight: 700;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  background: #0006;
+  background: var(--chip-bg);
   border: 1px solid var(--line);
   white-space: nowrap;
 }
 .badge.present {
   color: var(--ok);
-  border-color: #34d39955;
+  border-color: color-mix(in oklab, var(--ok) 33%, transparent);
 }
 .badge.missing {
   color: var(--bad);
-  border-color: #f8717155;
+  border-color: color-mix(in oklab, var(--bad) 33%, transparent);
 }
 .badge.missing.optional,
 .badge.optional,
 .badge.unverifiable {
   color: var(--warn);
-  border-color: #fbbf2455;
+  border-color: color-mix(in oklab, var(--warn) 33%, transparent);
 }
 .badge.running {
   color: var(--warn);
@@ -1117,7 +1113,7 @@ kbd {
   width: 100vw;
   height: 100vh;
   border: 0;
-  background: #000;
+  background: black; /* design:content - letterbox around the emulated frame */
   z-index: 100;
 }
 .overlay {
@@ -1126,7 +1122,7 @@ kbd {
   z-index: 200;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, #000 66%, transparent);
+  background: color-mix(in oklab, var(--md-sys-color-scrim) 66%, transparent);
   animation: fade var(--dur) ease-out;
 }
 .sheet {
@@ -1137,7 +1133,7 @@ kbd {
   border-radius: 1.4rem;
   background: var(--panel-2);
   border: 1px solid var(--field);
-  box-shadow: 0 2rem 4rem #000a;
+  box-shadow: 0 2rem 4rem var(--shadow);
   animation: rise var(--dur) ease-out;
 }
 .overlay.profile-add .sheet {
@@ -1229,7 +1225,7 @@ kbd {
   border-radius: 0.8rem;
   background: var(--panel-2);
   border: 1px solid var(--line);
-  box-shadow: 0 20px 40px #000a;
+  box-shadow: 0 20px 40px var(--shadow);
   opacity: 0;
   transform: translateY(10px);
   transition:
@@ -1257,7 +1253,7 @@ kbd {
   border-radius: 0.5rem;
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   border: 1px solid var(--line);
-  font-family: "Cascadia Code", Consolas, monospace;
+  font-family: "Google Sans Code", "Roboto Mono", monospace;
   font-size: 0.75rem;
   pointer-events: none;
 }
@@ -1329,7 +1325,7 @@ kbd {
   place-items: center;
 }
 .tile.app .app-icon .icon {
-  color: hsl(var(--tint, 220) 70% 82%);
+  color: oklch(from var(--md-sys-color-on-primary-container) l c var(--tint, h));
 }
 .tile.app.live .s {
   color: var(--ok);
@@ -1395,7 +1391,7 @@ kbd {
   z-index: 1000;
   display: grid;
   place-items: center;
-  background: #000;
+  background: black; /* design:content - letterbox around the emulated frame */
   color: var(--soft);
   outline: none;
 }

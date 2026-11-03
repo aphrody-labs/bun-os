@@ -36,6 +36,15 @@ import { icon, isIcon } from "./icons";
 import { configureSounds, play as sound, soundsOn } from "./sounds";
 
 const enc = encodeURIComponent;
+
+// The brand sheet scopes its generated roles to .dark and .light: follow the system scheme.
+const lightScheme = matchMedia("(prefers-color-scheme: light)");
+const applyScheme = () => {
+  document.documentElement.classList.toggle("light", lightScheme.matches);
+  document.documentElement.classList.toggle("dark", !lightScheme.matches);
+};
+applyScheme();
+lightScheme.addEventListener("change", applyScheme);
 const tintOf = (id: string) => [...id].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 360, 17);
 const nameOf = (game: Game) => game.title ?? game.name;
 const profileLabel = (name: string) => (name === "default" ? "Default" : name);
