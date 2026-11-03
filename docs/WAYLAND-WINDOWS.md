@@ -181,33 +181,45 @@ trip. glxgears prints its own FPS (`bench/ptyrun.py` keeps its stdout line-buffe
 | nested cosmic-comp + foot (GLES on d3d12, winit backend) | 274-354 fps of compositor output | ack 1.9-3.4 ms | 309-453 fps | 1.3-3.9 ms |
 | compositor only, `--sink` (no Windows): vkcube / weston-simple-egl / glmark2-es2 | 667 / 801 / 271 fps | 0.1-0.6 ms | - | - |
 
-The WSLg (msrdc) comparison is blocked because WSLg is broken in this bundle. `/mnt/wslg/stderr.log` shows its Weston
-(`--backend=rdp-backend.so --shell=rdprail-shell.so`, WSLg 1.0.79, weston-mirror `a7e35fda`) dying with SIGSEGV
-every ~100 s since boot: 43 crashes by 08:47 and 62 by 09:20. Each restart reconnects msrdc. In the gaps, the Wayland
-socket accepts connections but never answers `wl_display.get_registry`: `wayland-info` timed out on 40 consecutive
-probes, and `weston-simple-egl` and foot never got a registry. X clients on WSLg's `:0` (glxgears with d3d12 and with
-llvmpipe) never print a frame. Each crash cycle follows rdprail-shell's app-list icon lookup for the distro's Waydroid
-entries (`find_icon_file: icon (waydroid) search retry` 1..5, then a crash about 90 s later). The three
-`/usr/share/applications/*waydroid*.desktop` files are the prime suspect. This was reported to the WSL owner and not
-changed here, since `factory/wsl/` owns the bundle. Before the crash loop, vkcube's Wayland WSI on WSLg also failed
-("Compositor did not provide the standard protocol xdg-wm-base": Weston 9 offers `xdg_wm_base` v1). To compare once
-WSLg is fixed, run the same harness against WSLg:
-`XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir WAYLAND_DISPLAY=wayland-0 python3 bench/wlbench.py 14 4 weston-simple-egl`. Run
-the same app under `bunos-wayland-win --wsl bunos -- python3 bench/wlbench.py 14 4 <app>` for our side.
+### WSLg (msrdc) against bunos-wayland-win (2026-11-03, 14:15-14:22)
+
+Same harness, same apps, same distro, back to back on the shared workstation (other agents' builds running): WSLg
+through `XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir WAYLAND_DISPLAY=wayland-0 DISPLAY=:0`, ours through
+`bunos-wayland-win --wsl bunos --stats` (host binary built from the checkout). `wlbench.py 14 4 <app>`; glxgears with
+`vblank_mode=0` through `ptyrun.py 16`; foot runs `ls -la /usr/lib` in a loop. Turnaround is commit to
+`wl_callback.done`: how long the compositor makes the client wait before the next frame.
+
+| App | WSLg: frames/s, turnaround median / p95 | bunos-wayland-win: frames/s, turnaround median / p95 | Ours, Windows side (`--stats`) |
+| --- | --- | --- | --- |
+| weston-simple-egl (GLES, d3d12) | 62.0, 14.72 / 15.02 ms | 439.9, 0.66 / 0.78 ms | 390-437 fps, ack 0.6-0.9 ms |
+| vkcube (Vulkan, Dozen, `--wsi wayland`) | 61.7, 16.19 / 16.28 ms | 294.6, 3.35 / 3.71 ms | 227-294 fps, ack 3.4 ms |
+| foot, output loop | 61.7, 14.12 / 15.76 ms | 90.5, 1.49 / 2.08 ms | 89-93 fps, ack 1.9-2.2 ms |
+| glxgears (X11 through each side's Xwayland) | 121-138 FPS | 109-114 FPS | 86-115 fps, ack 1.6 ms |
+
+WSLg paces every Wayland client to 60 Hz: Weston's RDP repaint loop releases frame callbacks once per 16.7 ms, so a
+client always waits 14-16 ms, whatever it draws. Ours releases a callback when Windows has shown the frame (`Present(0)`;
+`--vsync` paces to the display instead), so the wait is the round trip itself: 0.7 ms for GLES, 3.4 ms for Dozen Vulkan
+(pixman composition of a 1 MB frame), 1.5 ms for foot. X11 is the one case where WSLg is ahead: its Xwayland is not
+throttled to the RDP repaint, while ours composes each glxgears frame through pixman and the presenter's ack (about
+110 FPS). Both stayed stable over the runs; WSLg no longer crashes since the session-0 fix ([WSL.md](WSL.md) section 8).
 
 Nested compositors in the distro:
 
 * **cosmic-comp 1.11** (Arch `cachyos-extra-v3` package) runs nested on its winit backend with hardware EGL on Mesa d3d12
   (`PLATFORM_WAYLAND_KHR`, `hardware_accelerated: true`). Its COSMIC session (gradient background, a COSMIC-decorated
   foot) appears in one native window. When resized it logs an `EGL_BAD_ALLOC` on surface re-creation and recovers.
-* **Hyprland 0.57** gets through protocol negotiation once bunos-wlhost offers `wl_compositor` v6 (now the default)
-  and `zwp_linux_dmabuf_v1` v4 with the render-node feedback (`--dmabuf`). The vgem node `/dev/dri/renderD128` exists
-  (kernel `CONFIG_DRM_VGEM=y`). It then stops at EGL on GBM. As user `bun`, `card0` is not readable
-  (`Permission denied`, the user is not in `video`). As root (`--i-am-really-stupid`), `kms_swrast` loads but
-  `eglInitialize` reports `DRI2: failed to create screen`, and the first `wl_surface.attach` references a dmabuf the host
-  could not import. Mesa d3d12 cannot export dmabufs and vgem has no 3D driver, so a GPU-rendered Hyprland needs the
-  dxgkrnl-to-dmabuf export path (see GPU below). `--dmabuf` stays opt-in: when it is advertised, Mesa's WSI prefers it
-  and Dozen vkcube hangs.
+* **Hyprland 0.57 and Omarchy** run nested since 2026-11-03, on the CPU. Started as
+  `bunos-wayland-win --wsl bunos --host-arg --dmabuf -- env LIBGL_ALWAYS_SOFTWARE=1 Hyprland` (Omarchy: the same with
+  Omarchy's `~/.config/hypr`, under `dbus-run-session`). Aquamarine's Wayland backend allocates its swapchain with GBM on
+  the node the host's dmabuf feedback names. That node used to be vgem, which has no GBM/EGL driver (`DRI2: failed to
+  create screen`). The host now names the kernel's vkms KMS node instead (`/dev/dri/card1`; order:
+  `BUNOS_WLHOST_DMABUF_NODE`, a render node whose driver is not vgem, a KMS node; Aquamarine opens the primary node when
+  the device has no render node). Mesa's kms_swrast allocates linear XR24 dumb buffers there, llvmpipe renders into
+  them, and the host maps them through pixman's dmabuf import. Measured: Hyprland with its wallpaper and a foot client
+  at 100-155 fps to the Windows window (ack 6-10 ms, host render 5-8 ms per 493x1350 frame); Omarchy with its
+  Quickshell bar, dock and notifications (layers `omarchy-bar`, `omarchy-dock`, `omarchy-background`), about 8-30 fps
+  when idle. `--dmabuf` stays opt-in: when it is advertised, Mesa's WSI prefers it and Dozen vkcube hangs.
+  GPU rendering for Hyprland is not possible on WSL2 (next section).
 
 ## GPU: what is and is not zero-copy
 
@@ -215,8 +227,7 @@ Nested compositors in the distro:
   GPU-to-GPU copy into the flip buffer. The DWM composes that buffer directly (flip model, no redirection bitmap), and
   in `--desktop` mode it can be promoted to independent flip. The presenter does no CPU compositing.
 * On the Linux side, the current renderer is pixman (CPU). It works on any Linux, GPU or not, and accepts shm buffers.
-  Linear dmabufs are mapped through `PixmanRenderer`'s dmabuf import, but `zwp_linux_dmabuf_v1` is not advertised
-  yet.
+  Linear dmabufs are mapped through `PixmanRenderer`'s dmabuf import when `--dmabuf` advertises `zwp_linux_dmabuf_v1`.
 * WSL2 zero-copy is possible in principle. Inside WSL2, Mesa's d3d12 Gallium driver (and dozen for Vulkan) renders into
   D3D12 resources that dxgkrnl (`/dev/dxg`) allocates on the host GPU. Those allocations are host-GPU memory. The
   dxgkrnl ioctl set has shared-handle export (`D3DKMTShareObjects` / NT handles via `dxgk_share_objects`), but no
@@ -226,6 +237,17 @@ Nested compositors in the distro:
   that keeps each toplevel in a D3D12 resource created shareable, (b) a host-side helper that turns the dxgkrnl share
   into an NT handle, and (c) `ID3D11Device1::OpenSharedResource1` in the presenter plus a keyed mutex or fence for
   synchronisation. This is not built. It is the largest open GPU item.
+* Why GPU dmabufs (and so a GPU-rendered Hyprland) cannot exist on WSL2 today, from the sources we build:
+  dxgkrnl (`factory/wsl/kernel/patches/0006-dxgkrnl.patch`, `drivers/hv/dxgkrnl/ioctl.c` `get_object_fd`) exports a
+  shared resource as an `anon_inode_getfile("dxgresource")` file and a sync object as `"dxgsyncobj"` or a `sync_file`;
+  it never calls `dma_buf_export`, so no `/dev/dxg` allocation is a dmabuf that DRM, GBM or another process's EGL can
+  import. Mesa's d3d12 driver has no DRM device to sit on (WSL exposes no DRM node for the GPU, only vgem and vkms), so
+  the GBM/DRI loader can never pick it, and the fd a d3d12 resource can be shared as is that dxgkrnl file, which only
+  D3D12 (`OpenSharedHandle`) understands. Aquamarine and Hyprland 0.57 render with GLES only (no pixman or Vulkan
+  renderer), so their only working path is the one above: llvmpipe into kms_swrast dumb buffers on vkms. Closing the gap
+  needs either dma-buf export in dxgkrnl (a kernel change: `dma_buf_export` over the guest mapping of the allocation)
+  plus a d3d12 GBM backend in Mesa, or a Hyprland renderer that draws through d3d12 and hands the host shared D3D12
+  resources (the zero-copy item above).
 * The fastest path available now in WSL2 is a GLES renderer on Mesa d3d12 (`/dev/dxg`) in the host for GPU clients,
   with readback into the same damage-rectangle stream. For a remote Linux, the stream is the only path.
 
@@ -265,11 +287,10 @@ path as Mesa d3d12 above, so it remains open.
 
 ## Not done yet
 
-* No zero-copy GPU path (above). `zwp_linux_dmabuf_v1` exists (`--dmabuf`, pixman import of linear buffers), but on
-  WSL2 nothing GPU-rendered can feed it: d3d12/Dozen cannot export dmabufs and vgem has no 3D driver. So Hyprland
-  (GBM/EGL) does not start nested in the distro, while cosmic-comp does (winit/EGL over wl_shm, GPU-rendered).
-* The WSLg crash loop above is fixed (msrdc ran in session 0 because the BunOSWsl service created the VM;
-  [WSL.md](WSL.md) section 8). The WSLg comparison with `bench/wlbench.py` is still to run.
+* No zero-copy GPU path (above). `zwp_linux_dmabuf_v1` (`--dmabuf`) carries CPU-rendered dmabufs only: Hyprland and
+  Omarchy nest on llvmpipe through vkms dumb buffers; nothing GPU-rendered can feed it on WSL2.
+* The WSLg crash loop (its Weston died with SIGSEGV every ~100 s) is fixed (msrdc ran in session 0 because the BunOSWsl service created the VM;
+  [WSL.md](WSL.md) section 8). The WSLg comparison is above.
 * bunos-wlhost is not packaged yet. In the distro it is built from the checkout and installed in
   `/usr/local/bin`. A PKGBUILD needs the crate and `vendor/smithay` from this repository as its source. That is for
   the desktop agent's `factory/desktop/pkgbuilds/` (`bunos-wayland-win`, makedepends `cargo`, depends
