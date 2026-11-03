@@ -39,12 +39,7 @@ const artifacts = [
   { file: "win.exe", from: ["nu-plugin-windows/release"], license: "crates/nu_plugin_windows", spdx: "Apache-2.0" },
   { file: "nu.exe", from: ["nushell-fork/release"], license: "vendor/nushell", spdx: "MIT", shared: true },
   { file: "rio.exe", from: ["shell-forks/release"], license: "vendor/rio", spdx: "MIT" },
-  { file: "glazewm.exe", from: ["shell-forks/release"], license: "vendor/glazewm", spdx: "GPL-3.0-only" },
-  { file: "glazewm-cli.exe", from: ["shell-forks/release"], license: "vendor/glazewm", spdx: "GPL-3.0-only" },
-  { file: "glazewm-watcher.exe", from: ["shell-forks/release"], license: "vendor/glazewm", spdx: "GPL-3.0-only" },
   { file: "cosmic-files.exe", from: ["shell-forks/release"], license: "vendor/cosmic-epoch/cosmic-files", spdx: "GPL-3.0-only" },
-  { file: "bunos-win11-chrome.exe", from: ["release"], license: "crates/bunos-win11-chrome", spdx: "Apache-2.0" },
-  { file: "bunos-win11-wallpaper.exe", from: ["release"], license: "crates/bunos-win11-wallpaper", spdx: "Apache-2.0" },
 ] as const;
 
 const bin = (file: string) => join(binDir, file);
@@ -169,7 +164,8 @@ function install() {
   mkdirSync(stage, { recursive: true });
   for (const d of [binDir, shareDir, licenseDir, dirname(manifestPath)]) mkdirSync(d, { recursive: true });
   const previous = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, "utf8")) : { files: [] };
-  const staged: { file: string; staged: string; source: string; art: (typeof artifacts)[number] }[] = [];
+  const staged: { file: string; staged: string; source: string; sourceSha256: string; art: (typeof artifacts)[number] }[] = [];
+  const kept: any[] = [];
   const missing: string[] = [];
   for (const art of artifacts) {
     const source = locate(art.from, art.file);
@@ -179,30 +175,39 @@ function install() {
     }
     // nu.exe is shared with the userland bundle: never replace one another component installed.
     if ("shared" in art && art.shared && (tool(art.file) !== bin(art.file) || (existsSync(bin(art.file)) && !previous.files.some((f: any) => f.file === art.file)))) continue;
+    // Idempotent: a signature carries a fresh timestamp, so "unchanged" means the same unsigned
+    // build and an installed file still matching what we recorded.
+    const sourceSha256 = sha256(source);
+    const prior = previous.files.find((f: any) => f.file === art.file);
+    if (prior && prior.sourceSha256 === sourceSha256 && existsSync(prior.path) && sha256(prior.path) === prior.sha256) {
+      kept.push(prior);
+      continue;
+    }
     const target = join(stage, art.file);
     copyFileSync(source, target);
-    staged.push({ file: art.file, staged: target, source, art });
+    staged.push({ file: art.file, staged: target, source, sourceSha256, art });
   }
   if (missing.length) throw new Error(`not built: ${missing.join(", ")} (see docs/WINDOWS-SHELL.md, Build)`);
   // Sign every binary with the machine-trusted Bun OS test certificate (factory/windows/signing).
-  run(["pwsh", "-NoProfile", "-File", join(repo, "factory/windows/signing/test-signing.ps1"), "sign", ...staged.map(s => s.staged)]);
-  const files: any[] = [];
+  if (staged.length) run(["pwsh", "-NoProfile", "-File", join(repo, "factory/windows/signing/test-signing.ps1"), "sign", ...staged.map(s => s.staged)]);
+  const files: any[] = [...kept];
   for (const s of staged) {
     const target = bin(s.file);
     const hash = sha256(s.staged);
     if (!existsSync(target) || sha256(target) !== hash) {
-      if (s.file === "glazewm.exe" || s.file === "glazewm-watcher.exe") run(["taskkill", "/IM", s.file, "/F"], { allowFail: true });
       copyFileSync(s.staged, target);
     }
-    files.push({ file: s.file, path: target, sha256: hash, size: statSync(target).size, spdx: s.art.spdx, source: s.source, thumbprint: signerThumbprint(target) });
+    files.push({ file: s.file, path: target, sha256: hash, sourceSha256: s.sourceSha256, size: statSync(target).size, spdx: s.art.spdx, source: s.source, thumbprint: signerThumbprint(target) });
     const lic = join(licenseDir, basename(s.art.license));
     mkdirSync(lic, { recursive: true });
     for (const name of readdirSync(join(repo, s.art.license))) if (/^(LICENSE|COPYING|NOTICE)/i.test(name)) copyFileSync(join(repo, s.art.license, name), join(lic, name));
   }
   // Shared data: GlazeWM sample config (our session config derives from it) and the nu module.
-  mkdirSync(join(shareDir, "glazewm"), { recursive: true });
-  copyFileSync(join(repo, "vendor/glazewm/resources/assets/sample-config.yaml"), join(shareDir, "glazewm", "sample-config.yaml"));
-  copyFileSync(join(repo, "vendor/glazewm/resources/assets/icon.ico"), join(shareDir, "glazewm", "icon.ico"));
+  // Files a previous install shipped that are no longer ours (unchanged ones only) are removed.
+  for (const old of previous.files) {
+    if (!files.some(f => f.file === old.file) && existsSync(old.path) && sha256(old.path) === old.sha256) rmSync(old.path, { force: true });
+  }
+  rmSync(join(shareDir, "glazewm"), { recursive: true, force: true });
   mkdirSync(join(shareDir, "nu"), { recursive: true });
   copyFileSync(join(repo, "factory/windows/shell/nu/bunos-windows.nu"), join(shareDir, "nu", "bunos-windows.nu"));
   copyFileSync(import.meta.path, join(shareDir, "bunos-shell.ts"));
@@ -210,7 +215,7 @@ function install() {
   const rev = run(["git", "-C", repo, "rev-parse", "HEAD"], { allowFail: true }).out.trim();
   const manifest = { schema: 1, component: "bunos-shell", installedAt: new Date().toISOString(), repoRev: rev, root: bunosRoot, files };
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
-  console.log(JSON.stringify({ installed: files.map(f => f.file), manifest: manifestPath, thumbprint: files[0]?.thumbprint }, null, 2));
+  console.log(JSON.stringify({ installed: staged.map(s => s.file), unchanged: kept.map(f => f.file), manifest: manifestPath, thumbprint: files[0]?.thumbprint }, null, 2));
 }
 
 function uninstall() {
@@ -220,7 +225,6 @@ function uninstall() {
   for (const f of manifest.files) {
     // Only remove what we installed and what is unchanged since.
     if (existsSync(f.path) && f.path.startsWith(binDir) && sha256(f.path) === f.sha256) {
-      if (/glazewm|cosmic-files|rio|bunos-win11/.test(f.file)) run(["taskkill", "/IM", f.file, "/F"], { allowFail: true });
       rmSync(f.path, { force: true });
     }
   }
@@ -232,6 +236,7 @@ function uninstall() {
 
 // ---------------------------------------------------------------- per-user components
 
+const desktopTool = join(repo, "factory", "windows", "desktop", "hyprland.ts");
 const HKCU_CLASSES = "HKCU\\Software\\Classes";
 const NU_PROFILE_GUID = "{7b0f5a3e-4b1d-4c2e-9a10-b05e05de1101}";
 const NAVPANE_CLSID = "{b05e05de-5a3e-4b1d-9a10-7b0f5a3e1102}";
@@ -250,6 +255,17 @@ function bunosDistro(): string {
 
 function wtSettings(): string[] {
   return WT_PACKAGES.map(p => join(localAppData, "Packages", p, "LocalState", "settings.json")).filter(existsSync);
+}
+
+/** Drop the stub Windows Terminal persists in profiles.list for a fragment profile we removed. */
+function removeWtStub(file: string, guid: string) {
+  const text = readFileSync(file, "utf8");
+  const id = guid.replace(/[{}]/g, m => `\\${m}`);
+  const object = `\\{[^{}]*"guid"\\s*:\\s*"${id}"[^{}]*\\}`;
+  // Followed by a comma (first or middle element), else preceded by one (last element).
+  let next = text.replace(new RegExp(`${object}\\s*,\\s*`), "");
+  if (next === text) next = text.replace(new RegExp(`,\\s*${object}`), "");
+  if (next !== text) writeFileSync(file, next);
 }
 
 function setWtDefault(file: string, guid: string): string | null {
@@ -302,7 +318,7 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
       // nushell becomes its default profile, and Rio is configured to start nushell.
       const fragment = {
         profiles: [
-          { guid: NU_PROFILE_GUID, name: "Bun OS nushell", commandline: quote(tool("nu.exe")), icon: icon("terminal", join(shareDir, "glazewm", "icon.ico")), startingDirectory: "%USERPROFILE%" },
+          { guid: NU_PROFILE_GUID, name: "Bun OS nushell", commandline: quote(tool("nu.exe")), startingDirectory: "%USERPROFILE%" },
         ],
       };
       ownFile(files, "wt-fragment", join(localAppData, "Microsoft", "Windows Terminal", "Fragments", "BunOS", "bunos.json"), JSON.stringify(fragment, null, 2) + "\n");
@@ -319,6 +335,7 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
     },
     disable(files) {
       releaseFile(files, "wt-fragment");
+      for (const settings of wtSettings()) removeWtStub(settings, NU_PROFILE_GUID);
       releaseFile(files, "rio-config");
       for (const [id, f] of Object.entries(files)) {
         if (!id.startsWith("wt-default:") || !f.restore) continue;
@@ -426,21 +443,31 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
   },
 
   wm: {
-    // GlazeWM as the per-user tiling WM (Explorer stays the shell), with our DWM chrome and the
-    // WorkerW wallpaper started/stopped with it; autostart at logon through the HKCU Run key.
+    // The window manager session is owned by factory/windows/desktop/hyprland.ts (GlazeWM fork, tacky-borders,
+    // Zebar, Flow Launcher, AltSnap, bunos-win11-chrome watch, bunos-win11-wallpaper; docs/WINDOWS-DESKTOP.md),
+    // which registers nothing. This component only adds logon autostart (HKCU Run) and the toggle.
     enable(c, files) {
-      ownFile(files, "glazewm-config", join(stateDir, "glazewm.yaml"), glazewmConfig());
-      c.set("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "BunOS.GlazeWM", `${quote(bin("glazewm.exe"))} start --config ${quote(join(stateDir, "glazewm.yaml"))}`);
-      Bun.spawn([bin("glazewm.exe"), "start", "--config", join(stateDir, "glazewm.yaml")], { stdout: "ignore", stderr: "ignore", stdin: "ignore" }).unref();
+      // Remember whether the session was already up, so disable restores exactly that state.
+      const wasRunning = desktopRunning();
+      files["wm-session"] ??= { path: desktopTool, previous: wasRunning ? "running" : null };
+      c.set("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "BunOS.Desktop", `${quote(process.execPath)} ${quote(desktopTool)} up`);
+      if (!wasRunning) run([process.execPath, desktopTool, "up"], { allowFail: true });
     },
     disable(files) {
-      run([bin("glazewm-cli.exe"), "command", "wm-exit"], { allowFail: true });
-      for (const exe of ["glazewm.exe", "glazewm-watcher.exe", "bunos-win11-wallpaper.exe", "bunos-win11-chrome.exe"]) run(["taskkill", "/IM", exe, "/F"], { allowFail: true });
-      releaseFile(files, "glazewm-config");
+      if (files["wm-session"]?.previous !== "running") run([process.execPath, desktopTool, "down"], { allowFail: true });
+      delete files["wm-session"];
     },
-    status: () => ({ autostart: regGet("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "BunOS.GlazeWM") !== null, running: run(["tasklist", "/FI", "IMAGENAME eq glazewm.exe"], { allowFail: true }).out.includes("glazewm.exe") }),
+    status: () => ({
+      autostart: regGet("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "BunOS.Desktop") !== null,
+      running: desktopRunning(),
+    }),
   },
 };
+
+/** The windows-hyprland session is up when its staged GlazeWM runs (its own `status`). */
+function desktopRunning(): boolean {
+  return existsSync(desktopTool) && /^running \d+ .*[\\/]glazewm\.exe\s*$/im.test(run([process.execPath, desktopTool, "status"], { allowFail: true }).out);
+}
 
 /** A Start menu shortcut through WScript.Shell (one COM chain: create, set, save). */
 function shortcut(lnk: string, target: string, workdir: string) {
@@ -456,14 +483,6 @@ function shortcut(lnk: string, target: string, workdir: string) {
   });
 }
 
-function glazewmConfig(): string {
-  let yaml = readFileSync(join(shareDir, "glazewm", "sample-config.yaml"), "utf8");
-  const sq = (s: string) => s.replaceAll("\\", "/");
-  yaml = yaml.replace(/startup_commands: \[.*\]/, `startup_commands: ["shell-exec ${sq(bin("bunos-win11-wallpaper.exe"))} run inf", "shell-exec ${sq(bin("bunos-win11-chrome.exe"))} watch"]`);
-  yaml = yaml.replace(/shutdown_commands: \[.*\]/, `shutdown_commands: ["shell-exec taskkill /IM bunos-win11-wallpaper.exe /F", "shell-exec taskkill /IM bunos-win11-chrome.exe /F"]`);
-  yaml = yaml.replace(/- commands: \["shell-exec cmd"\]/, `- commands: ["shell-exec ${sq(bin("rio.exe"))}"]`);
-  return `# Bun OS GlazeWM session (generated by bunos-shell from GlazeWM's sample config; GPL-3.0 upstream).\n${yaml}`;
-}
 
 const ALL = ["nu-plugin", "terminal", "assoc", "verbs", "files", "navpane", "wm"];
 

@@ -31,7 +31,7 @@ const checks = () => ({
   filesVerb: keyExists(`${C}\\Directory\\shell\\BunOS.CosmicFiles\\command`),
   filesApp: keyExists(`${C}\\Applications\\cosmic-files.exe`),
   navpane: keyExists("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Desktop\\NameSpace\\{b05e05de-5a3e-4b1d-9a10-7b0f5a3e1102}"),
-  wmAutostart: reg("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "BunOS.GlazeWM") !== null,
+  wmAutostart: reg("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "BunOS.Desktop") !== null,
   wtFragment: existsSync(join(process.env.LOCALAPPDATA ?? "", "Microsoft", "Windows Terminal", "Fragments", "BunOS", "bunos.json")),
   nuPlugin: sh([join(bin, "nu.exe"), "-c", "plugin list | where name == windows | length"]).out === "1",
   pluginCall: sh([join(bin, "nu.exe"), "-c", "plugin use windows; win shell-drives | length"]).out !== "",
