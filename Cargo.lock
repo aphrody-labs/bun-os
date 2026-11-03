@@ -8802,6 +8802,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "bunos-win11-chrome"
+version = "1.4.7"
+dependencies = [
+ "serde",
+ "serde_json",
+ "windows 0.62.2",
+]
+
+[[package]]
+name = "bunos-win11-wallpaper"
+version = "1.4.7"
+dependencies = [
+ "aphrody-gpu-backend",
+ "pollster 1.0.1",
+ "raw-window-handle",
+ "windows 0.62.2",
+]
+
+[[package]]
 name = "bunos-wsl-core"
 version = "1.4.7"
 dependencies = [
