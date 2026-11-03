@@ -6,6 +6,7 @@
  * Each owner package exports `./bun-plugin`, a `defineBunOsPlugin()` value whose `setup` only
  * registers lazy module forwarders, so loading the whole registry stays cheap.
  */
+import dotnetWindows from "@aphrody/bun-dotnet-windows/bun-plugin";
 import chromium from "@aphrody/chromium/bun-plugin";
 import google from "@aphrody/google/bun-plugin";
 import python from "@aphrody/runtime-sdk/bun-plugin";
@@ -27,6 +28,7 @@ export const plugins: readonly BunOsPlugin[] = [
   wasm,
   python,
   dotnet,
+  dotnetWindows,
   graph,
   compat,
   thirdparty,

@@ -39,6 +39,7 @@
     "packages/bun-arch-mcp",
     "packages/bun-artifacts",
     "packages/bun-blender",
+    "packages/bun-dotnet-windows",
     "packages/bun-emu-host",
     "packages/bun-engine",
     "packages/bun-gamestream",

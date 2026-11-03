@@ -1,0 +1,45 @@
+{
+  "name": "@aphrody/bun-dotnet-windows",
+  "version": "1.4.7",
+  "description": "Windows 11 for Bun OS from C# Native AOT (CsWin32, CsWinRT), C++ (DirectX-Headers, WIL, C++/WinRT) and in-process PowerShell 7: owner of bun:winget (Microsoft.Management.Deployment COM API), bun:pwsh (System.Management.Automation through bun:dotnet) and bun:d3d12 (DXGI/D3D12 and WinRT system profile).",
+  "license": "MIT",
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "private": true,
+  "type": "module",
+  "os": [
+    "win32"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/bun-dotnet-windows"
+  },
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./winget": "./src/winget.ts",
+    "./pwsh": "./src/pwsh.ts",
+    "./d3d12": "./src/d3d12.ts",
+    "./native": "./src/native.ts",
+    "./paths": "./src/paths.ts",
+    "./bun-plugin": "./src/bun-plugin.ts"
+  },
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "bench": "bun scripts/bench.ts",
+    "test": "bun test"
+  },
+  "files": [
+    "src",
+    "include",
+    "native",
+    "pwsh",
+    "cpp",
+    "scripts",
+    "install"
+  ],
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

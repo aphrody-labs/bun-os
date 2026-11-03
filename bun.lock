@@ -555,6 +555,10 @@
         "bun-blender-mcp": "./src/mcp.ts",
       },
     },
+    "packages/bun-dotnet-windows": {
+      "name": "@aphrody/bun-dotnet-windows",
+      "version": "1.4.7",
+    },
     "packages/bun-emu-host": {
       "name": "@aphrody/bun-emu-host",
       "version": "1.4.7",
@@ -628,6 +632,8 @@
         "bunos-host": "./src/bin/bunos-host.ts",
         "bunos-python": "./src/bin/bunos-python.ts",
         "bunos-dotnet": "./src/bin/bunos-dotnet.ts",
+        "bunos-winget": "./src/bin/bunos-winget.ts",
+        "bunos-pwsh": "./src/bin/bunos-pwsh.ts",
       },
     },
     "packages/bun-steam": {
@@ -2230,6 +2236,8 @@
     "@aphrody/bun-debug-adapter-protocol": ["@aphrody/bun-debug-adapter-protocol@0.0.1-aphrody.1", "", { "dependencies": { "@aphrody/bun-inspector-protocol": "0.0.2-aphrody.1", "semver": "^7.5.4", "source-map-js": "^1.0.2" } }, "sha512-SKX1W1qhGVSLqeADJEbBOmU3di1CQ5kzC94SqnlkL8K/AZ8iSoflKsoo9A0oKWWn04eTX2BEnd6pFIInLJK5bQ=="],
 
     "@aphrody/bun-desktop": ["@aphrody/bun-desktop@workspace:apps/desktop"],
+
+    "@aphrody/bun-dotnet-windows": ["@aphrody/bun-dotnet-windows@workspace:packages/bun-dotnet-windows"],
 
     "@aphrody/bun-emu-host": ["@aphrody/bun-emu-host@workspace:packages/bun-emu-host"],
 

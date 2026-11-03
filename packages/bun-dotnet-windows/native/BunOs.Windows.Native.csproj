@@ -1,0 +1,51 @@
+<!-- SPDX-License-Identifier: MIT -->
+<!-- bunos_windows.dll: Native AOT C ABI over Win32/COM/DirectX 12 (CsWin32) and WinRT (CsWinRT), winget included. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <BunOsTfm Condition="'$(BunOsTfm)' == ''">net10.0</BunOsTfm>
+    <TargetFramework>$(BunOsTfm)-windows10.0.26100.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <OutputType>Library</OutputType>
+    <AssemblyName>bunos_windows</AssemblyName>
+    <RootNamespace>BunOs.Windows.Native</RootNamespace>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Platforms>x64</Platforms>
+    <Version>1.4.7</Version>
+    <Authors>aphrody-dev</Authors>
+    <Company>Aphrody</Company>
+    <Product>Bun OS</Product>
+
+    <!-- Native AOT: one shared library, trimmed, speed-first codegen, x86-64-v3 (AVX2/BMI2/FMA). -->
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+    <NativeLib>Shared</NativeLib>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <IlcInstructionSet>x86-64-v3</IlcInstructionSet>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <EventSourceSupport>false</EventSourceSupport>
+    <DebuggerSupport>false</DebuggerSupport>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- CsWinRT: project the winget API (Microsoft.Management.Deployment.winmd, compiled from the
+         vendor/winget-cli IDL by scripts/build.ts) next to the Windows SDK projection. -->
+    <BunOsWinmd Condition="'$(BunOsWinmd)' == ''">$(MSBuildThisFileDirectory)..\..\..\target\bun-dotnet-windows\winmd\Microsoft.Management.Deployment.winmd</BunOsWinmd>
+    <CsWinRTIncludes>Microsoft.Management.Deployment</CsWinRTIncludes>
+    <CsWinRTAotOptimizerEnabled>true</CsWinRTAotOptimizerEnabled>
+    <CsWinRTAotWarningLevel>2</CsWinRTAotWarningLevel>
+    <NoWarn>$(NoWarn);CS1591;CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.367" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
+    <CsWinRTInputs Include="$(BunOsWinmd)" />
+  </ItemGroup>
+</Project>

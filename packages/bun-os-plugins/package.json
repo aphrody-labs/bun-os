@@ -50,7 +50,9 @@
     "bunos-cookie": "./src/bin/bunos-cookie.ts",
     "bunos-host": "./src/bin/bunos-host.ts",
     "bunos-python": "./src/bin/bunos-python.ts",
-    "bunos-dotnet": "./src/bin/bunos-dotnet.ts"
+    "bunos-dotnet": "./src/bin/bunos-dotnet.ts",
+    "bunos-winget": "./src/bin/bunos-winget.ts",
+    "bunos-pwsh": "./src/bin/bunos-pwsh.ts"
   },
   "files": [
     "src",

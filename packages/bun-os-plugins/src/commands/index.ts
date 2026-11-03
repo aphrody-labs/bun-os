@@ -231,6 +231,18 @@ export const FORK_COMMANDS: Record<string, ForkCommand> = {
     route: { kind: "exec", candidates: [["dotnet"]], build: "bun packages/buncc/src/cli.ts dotnet install" },
     help: "the .NET SDK CLI",
   },
+  winget: {
+    fork: "winget (Windows Package Manager)",
+    owner: "packages/bun-dotnet-windows (bun:winget, Microsoft.Management.Deployment COM API from C# Native AOT)",
+    route: { kind: "script", script: "packages/bun-dotnet-windows/src/cli/bunos-winget.ts" },
+    help: "winget search/list/show/install/upgrade/uninstall in process, structured output",
+  },
+  pwsh: {
+    fork: "pwsh (PowerShell 7)",
+    owner: "packages/bun-dotnet-windows (bun:pwsh, vendor/powershell hosted through bun:dotnet)",
+    route: { kind: "script", script: "packages/bun-dotnet-windows/src/cli/bunos-pwsh.ts" },
+    help: "PowerShell pipelines in process with JSON objects, or the source-built pwsh.exe",
+  },
 };
 
 /** The Bun OS checkout this package lives in. */

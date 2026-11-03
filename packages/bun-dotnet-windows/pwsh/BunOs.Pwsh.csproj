@@ -1,0 +1,41 @@
+<!-- SPDX-License-Identifier: MIT -->
+<!--
+  BunOs.Pwsh.dll: PowerShell hosted in-process (System.Management.Automation) behind [UnmanagedCallersOnly] exports,
+  loaded into the default AssemblyLoadContext by bun:dotnet (hostfxr). Not Native AOT: the PowerShell engine compiles
+  script blocks with System.Linq.Expressions/Reflection.Emit and loads binary modules at run time, which Native AOT
+  forbids (see docs/DOTNET-WINDOWS.md). It runs on the JIT runtime, ReadyToRun-compiled, against the PSHOME built from
+  vendor/powershell (scripts/build.ts pwsh), so $PSHOME, the built-in modules and the engine are the source build.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0-windows</TargetFramework>
+    <AssemblyName>BunOs.Pwsh</AssemblyName>
+    <RootNamespace>BunOs.Pwsh</RootNamespace>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredPGO>true</TieredPGO>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <RollForward>LatestMinor</RollForward>
+    <Version>1.4.7</Version>
+    <Authors>aphrody-dev</Authors>
+    <Company>Aphrody</Company>
+    <Product>Bun OS</Product>
+    <BunOsPsHome Condition="'$(BunOsPsHome)' == ''">$(MSBuildThisFileDirectory)..\..\..\target\bun-dotnet-windows\pwsh-fxdependent\</BunOsPsHome>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- PowerShell matches pwsh.runtimeconfig.json of the source build (Microsoft.WindowsDesktop.App for Out-GridView & co). -->
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+    <!-- Compile against the source-built engine; at run time it is resolved from PSHOME, never copied. -->
+    <Reference Include="System.Management.Automation">
+      <HintPath>$(BunOsPsHome)System.Management.Automation.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

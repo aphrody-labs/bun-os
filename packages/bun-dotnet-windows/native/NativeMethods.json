@@ -1,0 +1,10 @@
+{
+  "$schema": "https://aka.ms/CsWin32.schema.json",
+  "allowMarshaling": false,
+  "public": false,
+  "emitSingleFile": false,
+  "className": "PInvoke",
+  "comInterop": {
+    "preserveSigMethods": ["IDXGIFactory6", "IDXGIAdapter4", "ID3D12Device"]
+  }
+}

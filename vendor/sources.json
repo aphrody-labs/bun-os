@@ -861,6 +861,11 @@
       "origin": "https://github.com/aphrody-labs/AltSnap.git",
       "upstream": "https://github.com/RamonUnch/AltSnap.git",
       "path": "altsnap"
+    },
+    "detours": {
+      "origin": "https://github.com/aphrody-labs/Detours.git",
+      "upstream": "https://github.com/microsoft/Detours.git",
+      "path": "detours"
     }
   },
   "references": {
@@ -1000,6 +1005,12 @@
       "path": "ctru-rs",
       "revision": "6b578230b3cd3cbc1eeb0dd71bbb8d7e3b12f21e",
       "origin": "https://github.com/aphrody-labs/ctru-rs.git",
+      "initialized": true
+    },
+    {
+      "path": "detours",
+      "revision": "1dbd4ea281d73d478aa8d09a8b83fbd265f715f7",
+      "origin": "https://github.com/aphrody-labs/Detours.git",
       "initialized": true
     },
     {
