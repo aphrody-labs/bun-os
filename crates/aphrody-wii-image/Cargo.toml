@@ -13,8 +13,10 @@ path = "src/lib.rs"
 [features]
 default = []
 banner = []
+rvz = ["dep:zstd"]
 
 [dependencies]
 zerocopy = { workspace = true, features = ["derive"] }
 zip = { workspace = true, features = ["deflate"] }
 tracing.workspace = true
+zstd = { workspace = true, optional = true }

@@ -302,6 +302,25 @@ fn decompress_metadata(payload: &[u8], compression: Compression, expected: usize
     decompressed
 }
 
+#[cfg(test)]
+mod feature_tests {
+    use super::{Compression, decompress_metadata};
+
+    #[test]
+    fn metadata_decodes_uncompressed_and_zstd_payloads() {
+        let expected = b"RVZ metadata fixture";
+        assert_eq!(
+            decompress_metadata(expected, Compression::None, expected.len()),
+            expected
+        );
+        let compressed = zstd::encode_all(&expected[..], 1).expect("compress fixture");
+        assert_eq!(
+            decompress_metadata(&compressed, Compression::Zstd, expected.len()),
+            expected
+        );
+    }
+}
+
 fn read_into(
     file: &[u8],
     disc_header: &[u8; 0x80],
