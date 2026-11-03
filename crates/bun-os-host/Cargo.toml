@@ -1,0 +1,25 @@
+[package]
+name = "bun_host"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT"
+repository.workspace = true
+description = "bunos host: host resource inventory and the shared signed host registry, imported from the aphrody-labs/bun fork's `bun host`."
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "bun-os-host"
+path = "src/bin/bun-os-host.rs"
+
+# Leaf crate on std: reads /proc and spawns read-only probes.
+[dependencies]
+hmac = "0.12"
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
+sha2 = "0.10"
+
+[lints]
+workspace = true

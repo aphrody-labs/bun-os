@@ -8516,6 +8516,13 @@ version = "1.4.8"
 source = "git+https://github.com/aphrody-labs/bun-obscura?rev=3ed4a767cae9f93816a78b43e02995a79cd481a4#3ed4a767cae9f93816a78b43e02995a79cd481a4"
 
 [[package]]
+name = "bun_env_cookie"
+version = "1.4.7"
+dependencies = [
+ "serde_json",
+]
+
+[[package]]
 name = "bun_git"
 version = "1.4.7"
 dependencies = [
@@ -8532,6 +8539,16 @@ dependencies = [
  "tokio",
  "url",
  "yaml_serde",
+]
+
+[[package]]
+name = "bun_host"
+version = "1.4.7"
+dependencies = [
+ "hmac 0.12.1",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
 ]
 
 [[package]]

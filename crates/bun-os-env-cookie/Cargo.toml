@@ -1,0 +1,26 @@
+[package]
+name = "bun_env_cookie"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT"
+repository.workspace = true
+description = "bunos env (.env files) and bunos cookie (cookie jars on disk), imported from the aphrody-labs/bun fork's `bun env` and `bun cookie`."
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "bun-os-env"
+path = "src/bin/bun-os-env.rs"
+
+[[bin]]
+name = "bun-os-cookie"
+path = "src/bin/bun-os-cookie.rs"
+
+# Leaf crate on std and serde_json only.
+[dependencies]
+serde_json = { workspace = true, features = ["preserve_order"] }
+
+[lints]
+workspace = true
