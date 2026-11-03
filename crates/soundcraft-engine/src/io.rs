@@ -1258,6 +1258,10 @@ fn read_bundle(bytes: &[u8]) -> Result<(String, std::collections::HashMap<String
     if z.len() > MAX_BUNDLE_ENTRIES {
         return Err(EngineError::Io("bundle: too many files".into()));
     }
+    // Shared payloads would otherwise be copied once per archive entry.
+    if z.has_overlapping_files().map_err(zerr)? {
+        return Err(EngineError::Io("bundle: files share data".into()));
+    }
     let (mut text, mut files, mut total) = (None, std::collections::HashMap::new(), 0u64);
     for i in 0..z.len() {
         let mut f = z.by_index(i).map_err(zerr)?;
@@ -1820,6 +1824,26 @@ mod stem_tests {
 #[cfg(test)]
 mod bundle_tests {
     use super::*;
+
+    #[test]
+    fn entries_sharing_one_payload_are_refused() {
+        use std::io::Write as _;
+        let mut writer = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
+        let options = zip::write::SimpleFileOptions::default()
+            .compression_method(zip::CompressionMethod::Stored);
+        writer.start_file("Song.scraft", options).unwrap();
+        writer.write_all(b"{}").unwrap();
+        writer.start_file("Audio Files/a.wav", options).unwrap();
+        writer.write_all(&[7; 4096]).unwrap();
+        for i in 0..100 {
+            writer
+                .shallow_copy_file("Audio Files/a.wav", &format!("Audio Files/copy{i}.wav"))
+                .unwrap();
+        }
+        let bundle = writer.finish().unwrap().into_inner();
+        let error = read_bundle(&bundle).unwrap_err();
+        assert!(error.to_string().contains("share data"), "{error}");
+    }
 
     #[test]
     fn bundle_round_trips_session_and_audio() {
