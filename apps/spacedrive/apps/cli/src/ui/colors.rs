@@ -16,6 +16,14 @@ impl Colors {
 	pub const PROGRESS_COMPLETE: Color = Color::Green;
 	pub const PROGRESS_ACTIVE: Color = Color::Blue;
 	pub const PROGRESS_BACKGROUND: Color = Color::DarkGrey;
+	/// Primary text (job names).
+	pub const TEXT: Color = Color::White;
+	/// Secondary text (footers, hints).
+	pub const SUBTLE: Color = Color::Grey;
+	/// Frame and border chrome.
+	pub const FRAME: Color = Color::Blue;
+	/// Selected-row background.
+	pub const SELECTED: Color = Color::DarkGrey;
 }
 
 /// Get color for job status

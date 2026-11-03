@@ -8,7 +8,7 @@ use crossterm::{
 use ratatui::{
     backend::{Backend, CrosstermBackend},
     layout::{Alignment, Constraint, Direction, Layout, Margin, Rect},
-    style::{Color, Modifier, Style},
+    style::{Modifier, Style},
     symbols,
     text::{Line, Span, Text},
     widgets::{
@@ -23,7 +23,7 @@ use std::{
 };
 use uuid::Uuid;
 
-use super::colors::{job_status_color, job_status_icon};
+use super::colors::{job_status_color, job_status_icon, Colors};
 use sd_core::{infra::job::types::JobStatus, ops::jobs::list::output::JobListItem};
 
 /// Job monitor TUI state
@@ -184,12 +184,12 @@ fn render_header<B: Backend>(f: &mut Frame<B>, area: Rect, app: &JobMonitorTui) 
     );
 
     let header = Paragraph::new(title)
-        .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
+        .style(Style::default().fg(Colors::ACCENT.into()).add_modifier(Modifier::BOLD))
         .alignment(Alignment::Center)
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Blue))
+                .border_style(Style::default().fg(Colors::FRAME.into()))
         );
 
     f.render_widget(header, area);
@@ -210,11 +210,11 @@ fn render_job_list<B: Backend>(f: &mut Frame<B>, area: Rect, app: &mut JobMonito
             let line = Line::from(vec![
                 Span::styled(
                     format!("{} ", status_icon),
-                    Style::default().fg(status_color)
+                    Style::default().fg(status_color.into())
                 ),
                 Span::styled(
                     format!("{:<30}", job.name),
-                    Style::default().fg(Color::White)
+                    Style::default().fg(Colors::TEXT.into())
                 ),
                 Span::styled(
                     format!(" {} ", progress_bar),
@@ -222,11 +222,11 @@ fn render_job_list<B: Backend>(f: &mut Frame<B>, area: Rect, app: &mut JobMonito
                 ),
                 Span::styled(
                     format!("{:>6.1}%", job.progress * 100.0),
-                    Style::default().fg(Color::Yellow)
+                    Style::default().fg(Colors::WARNING.into())
                 ),
                 Span::styled(
                     format!(" [{}]", job.id.to_string()[..8].to_string()),
-                    Style::default().fg(Color::DarkGray)
+                    Style::default().fg(Colors::MUTED.into())
                 ),
             ]);
 
@@ -245,11 +245,11 @@ fn render_job_list<B: Backend>(f: &mut Frame<B>, area: Rect, app: &mut JobMonito
             Block::default()
                 .borders(Borders::ALL)
                 .title(format!("Jobs{}", filter_text))
-                .border_style(Style::default().fg(Color::Blue))
+                .border_style(Style::default().fg(Colors::FRAME.into()))
         )
         .highlight_style(
             Style::default()
-                .bg(Color::DarkGray)
+                .bg(Colors::SELECTED.into())
                 .add_modifier(Modifier::BOLD)
         )
         .highlight_symbol("► ");
@@ -281,7 +281,7 @@ fn render_job_details<B: Backend>(f: &mut Frame<B>, area: Rect, job: &JobListIte
             Span::styled("Status: ", Style::default().add_modifier(Modifier::BOLD)),
             Span::styled(
                 format!("{} {}", job_status_icon(job.status), job.status),
-                Style::default().fg(job_status_color(job.status))
+                Style::default().fg(job_status_color(job.status).into())
             ),
         ]),
         Line::from(vec![
@@ -295,7 +295,7 @@ fn render_job_details<B: Backend>(f: &mut Frame<B>, area: Rect, job: &JobListIte
             Block::default()
                 .title("Job Details")
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Yellow))
+                .border_style(Style::default().fg(Colors::WARNING.into()))
         )
         .wrap(Wrap { trim: true });
 
@@ -326,7 +326,7 @@ fn render_help<B: Backend>(f: &mut Frame<B>, area: Rect) {
             Block::default()
                 .title("Help")
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Green))
+                .border_style(Style::default().fg(Colors::SUCCESS.into()))
         )
         .alignment(Alignment::Left);
 
@@ -345,12 +345,12 @@ fn render_footer<B: Backend>(f: &mut Frame<B>, area: Rect, app: &JobMonitorTui) 
     );
 
     let footer = Paragraph::new(status_text)
-        .style(Style::default().fg(Color::Gray))
+        .style(Style::default().fg(Colors::SUBTLE.into()))
         .alignment(Alignment::Center)
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Blue))
+                .border_style(Style::default().fg(Colors::FRAME.into()))
         );
 
     f.render_widget(footer, area);
