@@ -3,6 +3,7 @@ import mui from "../transforms/orchestrator";
 import icons from "../transforms/icons";
 export * from "../lib/mapping";
 export * from "../lib/icon-names";
+export * from "../lib/theme";
 
 export type MigrationKind = "mui" | "icons";
 export interface MigrationResult {

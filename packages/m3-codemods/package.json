@@ -1,7 +1,7 @@
 {
   "name": "@aphrody/m3-codemods",
   "version": "1.4.7",
-  "description": "Codemods MUI React -> @aphrody/m3-react (Bun, sans dépendance runtime) + règles ast-grep",
+  "description": "MUI React -> @aphrody/m3-react codemods, ast-grep rules and the MUI theme -> M3 token migration",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -36,8 +36,12 @@
   },
   "scripts": {
     "codemod": "bun scripts/codemod.ts",
+    "theme": "bun scripts/theme.ts",
     "test": "bun test ./test",
     "typecheck": "bun check -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aphrody/m3-tokens": "workspace:*"
   },
   "devDependencies": {
     "@aphrody/m3-config": "workspace:*"

@@ -9,5 +9,11 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src/theme-to-tokens.ts", "src/dynamic-color.ts", "src/breakpoints.ts", "src/platform-contract.ts"]
+  "include": [
+    "src/dynamic-color.ts",
+    "src/wasm.ts",
+    "src/native-theme.ts",
+    "src/breakpoints.ts",
+    "src/platform-contract.ts"
+  ]
 }

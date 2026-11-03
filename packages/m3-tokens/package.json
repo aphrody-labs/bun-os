@@ -1,7 +1,7 @@
 {
   "name": "@aphrody/m3-tokens",
   "version": "1.4.7",
-  "description": "Material 3 design tokens (--md-sys-*) for the @aphrody/material-web fork: MUI-theme → M3 token CSS generation and runtime Material You dynamic colour via material-color-utilities.",
+  "description": "Material 3 design tokens (--md-sys-*) for web stacks: generated sheets from crates/aphrody-m3-tokens and runtime dynamic colour through its WebAssembly build (crates/libm3-wasm).",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aphrody-labs/bun-distribution.git",
@@ -18,12 +18,12 @@
     "dist/"
   ],
   "type": "module",
-  "main": "./src/theme-to-tokens.ts",
-  "types": "./src/theme-to-tokens.ts",
+  "main": "./src/dynamic-color.ts",
+  "types": "./src/dynamic-color.ts",
   "exports": {
-    ".": "./src/theme-to-tokens.ts",
-    "./theme-to-tokens": "./src/theme-to-tokens.ts",
+    ".": "./src/dynamic-color.ts",
     "./dynamic-color": "./src/dynamic-color.ts",
+    "./wasm": "./src/wasm.ts",
     "./native-theme": "./src/native-theme.ts",
     "./android": "./src/android.ts",
     "./breakpoints": "./src/breakpoints.ts",
@@ -41,13 +41,11 @@
     "typecheck": "bun check -p tsconfig.json --noEmit",
     "lint": "bun lint src test",
     "test": "bun test test/",
-    "demo": "bun run src/cli.ts",
-    "generate:expressive": "bun scripts/generate-expressive.ts"
-  },
-  "dependencies": {
-    "@material/material-color-utilities": "catalog:"
+    "generate": "bun scripts/generate.ts",
+    "check:generated": "bun scripts/generate.ts --check"
   },
   "devDependencies": {
+    "@aphrody/bun": "workspace:*",
     "@aphrody/m3-config": "workspace:*"
   },
   "engines": {

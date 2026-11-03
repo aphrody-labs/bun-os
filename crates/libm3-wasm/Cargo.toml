@@ -5,10 +5,13 @@ version = "1.4.7"
 edition = "2024"
 rust-version = "1.97"
 license = "Apache-2.0"
-description = "Bounded scalar WASM API for portable Bun OS Material contracts"
+description = "WebAssembly ABI over aphrody-m3-tokens: runtime dynamic colour for @aphrody/m3-tokens/wasm"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-libm3 = { path = "../libm3", version = "1.4.7", default-features = false, features = ["std"] }
+aphrody-m3-tokens = { workspace = true, default-features = false, features = ["std"] }
+
+[lints]
+workspace = true

@@ -893,10 +893,6 @@
       "name": "@aphrody/os",
       "version": "1.4.7",
     },
-    "packages/libm3": {
-      "name": "@aphrody/libm3",
-      "version": "1.4.7",
-    },
     "packages/m3": {
       "name": "@aphrody/m3",
       "version": "1.4.7",
@@ -1055,6 +1051,9 @@
     "packages/m3-codemods": {
       "name": "@aphrody/m3-codemods",
       "version": "1.4.7",
+      "dependencies": {
+        "@aphrody/m3-tokens": "workspace:*",
+      },
       "devDependencies": {
         "@aphrody/m3-config": "workspace:*",
       },
@@ -1339,10 +1338,8 @@
     "packages/m3-tokens": {
       "name": "@aphrody/m3-tokens",
       "version": "1.4.7",
-      "dependencies": {
-        "@material/material-color-utilities": "catalog:",
-      },
       "devDependencies": {
+        "@aphrody/bun": "workspace:*",
         "@aphrody/m3-config": "workspace:*",
       },
     },
@@ -2359,8 +2356,6 @@
     "@aphrody/inagle-cross": ["@aphrody/inagle-cross@workspace:packages/inagle-cross"],
 
     "@aphrody/inagle-ui": ["@aphrody/inagle-ui@workspace:packages/inagle-ui"],
-
-    "@aphrody/libm3": ["@aphrody/libm3@workspace:packages/libm3"],
 
     "@aphrody/lu": ["@aphrody/lu@workspace:apps/lu"],
 

@@ -2,7 +2,9 @@
 
 # @aphrody/m3-tokens
 
-Material 3 design tokens (`--md-sys-*`) as Bun-native TypeScript and CSS, with seed-based dynamic colour.
+Material 3 design tokens (`--md-sys-*`) for web stacks: CSS sheets generated from `crates/aphrody-m3-tokens` and
+runtime dynamic colour from the same engine compiled to WebAssembly (`crates/libm3-wasm`). The package computes no
+colour itself.
 
 ```sh
 bun add @aphrody/m3-tokens
@@ -23,14 +25,17 @@ License: Apache-2.0 (`LICENSE`). Install guide: [docs/material/m3/INSTALL.md](ht
 
 | Export                               | What                                                                                                                                                                                                             |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.` / `./theme-to-tokens`            | MUI theme to `--md-sys-*` CSS (`muiThemeToTokens`, `normalizeHex`)                                                                                                                                               |
-| `./dynamic-color`                    | Material You roles from a seed: `schemeFromSeed`, `cssFromSeed`, `applyDynamicColor` (7 variants, contrast level)                                                                                                |
+| `.` / `./dynamic-color`              | Roles from a seed or an image: `schemeFromSeed`, `cssFromSeed`, `applyDynamicColor`, `themeFromImage`, `Hct` (9 variants)                                                                                        |
+| `./wasm`                             | The engine module: `materialWasm()` (embedded, synchronous) or `loadMaterialWasm(bytes)`; ABI 3                                                                                                                  |
 | `./breakpoints`, `./breakpoints.css` | Window size classes: width 600/840/1200/1600, height compact <480, medium 480-899, expanded >=900; navigation kinds `bar`, `rail-collapsed`, `rail-expanded` (same names as `adaptive.rs`)                       |
 | `./expressive`, `./expressive.css`   | 15 emphasized type styles, Expressive spatial springs (`fast` 0.6/800, `default` 0.8/380, `slow` 0.8/200) and directional shapes (`extra-small-top`, `large-top`, `large-start`, `large-end`, `extra-large-top`) |
 | `./m3-tokens.css`                    | Static shape, typescale, motion, elevation and state-layer tokens (generated from `crates/aphrody-m3-tokens`)                                                                                                    |
 | `./platform-contract`                | `platformState(widthDp)`: size class, navigation, panes, margin                                                                                                                                                  |
 
-`expressive.css` is generated: `bun run generate:expressive` (a test fails when it drifts).
+Generated files (`src/libm3-wasm.ts`, `src/m3-tokens.css`, `src/expressive.css`): `bun run generate` rewrites them,
+`bun run check:generated` fails when one drifts. `m3-tokens.css` comes from the `@aphrody/bun` `m3Css` FFI and
+`libm3-wasm.ts` from a `wasm32-unknown-unknown` build through the Cargo owner. The MUI theme migration lives in
+`@aphrody/m3-codemods`.
 
 State layers: focus and pressed stay at `0.10` (Compose); Material Web v0_192 uses `0.12`. See
 `docs/architecture/DECISIONS.md`.

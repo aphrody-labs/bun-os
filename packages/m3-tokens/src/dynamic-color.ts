@@ -1,45 +1,29 @@
+// SPDX-License-Identifier: Apache-2.0
 // -----------------------------------------------------------------------------
 // @aphrody/m3-tokens — dynamic-color
 // -----------------------------------------------------------------------------
-// Runtime "Material You" dynamic colour: derive the full set of M3
-// `--md-sys-color-*` roles from ANY single seed colour, for light and dark, and
-// apply them live. This is the signature Material 3 capability — a host app can
-// re-theme every `<md-*>` element (and every `@aphrody/m3-react` wrapper) from
-// one colour, with no rebuild — that MUI has no native equivalent for.
+// Runtime "Material You" dynamic colour: derive every M3 `--md-sys-color-*`
+// role from one seed colour, for light and dark, and apply them live.
 //
-// Built on @material/material-color-utilities (7 scheme variants: tonalSpot,
-// content, fidelity, expressive, vibrant, neutral, monochrome).
-// Pure functions are environment-agnostic and unit-testable under bun;
-// only `applyDynamicColor` touches the DOM.
+// The colour maths runs in the canonical engine (crates/aphrody-m3-tokens),
+// compiled to WebAssembly by crates/libm3-wasm and loaded through ./wasm. This
+// module converts between CSS hex strings and the engine's ARGB words and owns
+// the stylesheet formatting; it computes no colour itself.
+// Pure functions are environment-agnostic; only `applyDynamicColor` and
+// `clearDynamicColor` touch the DOM.
 // -----------------------------------------------------------------------------
 
-import {
-  argbFromHex,
-  hexFromArgb,
-  Hct,
-  SchemeTonalSpot,
-  SchemeContent,
-  SchemeFidelity,
-  SchemeExpressive,
-  SchemeVibrant,
-  SchemeNeutral,
-  SchemeMonochrome,
-  MaterialDynamicColors,
-  type DynamicColor,
-  type DynamicScheme,
-} from "@material/material-color-utilities";
 import { ROLES } from "./native-theme";
+import { materialWasm } from "./wasm";
 
 export { ROLES };
-
-export { argbFromHex, hexFromArgb, Hct, MaterialDynamicColors, type DynamicColor, type DynamicScheme };
 
 // ---------------------------------------------------------------------------
 // Variant type
 // ---------------------------------------------------------------------------
 
 /**
- * MCU colour scheme variants, exposed as a string union for ergonomic use.
+ * Scheme variants provided by the canonical engine.
  *
  * | Variant        | Character                                                  |
  * |----------------|------------------------------------------------------------|
@@ -50,8 +34,11 @@ export { argbFromHex, hexFromArgb, Hct, MaterialDynamicColors, type DynamicColor
  * | `vibrant`      | Maximum chroma at every tonal position                     |
  * | `neutral`      | Near-greyscale, very low chroma                             |
  * | `monochrome`   | Pure greyscale — zero chroma                               |
+ * | `rainbow`      | Tonal spot with a stronger primary and grey neutrals        |
+ * | `fruitSalad`   | Primary and secondary rotated -50°                          |
  */
-export type SchemeVariant = "tonalSpot" | "content" | "fidelity" | "expressive" | "vibrant" | "neutral" | "monochrome";
+export type SchemeVariant =
+  "tonalSpot" | "content" | "fidelity" | "expressive" | "vibrant" | "neutral" | "monochrome" | "rainbow" | "fruitSalad";
 
 /** Options shared by every scheme-deriving function. */
 export interface SchemeOptions {
@@ -69,9 +56,8 @@ export interface SchemeOptions {
    */
   contrast?: number;
   /**
-   * MCU colour scheme variant (default: `"tonalSpot"`).
-   * All variants produce the same ~47 `--md-sys-color-*` roles; only the
-   * palette relationships and chroma differ.
+   * Scheme variant (default: `"tonalSpot"`). Every variant produces the same
+   * 49 `--md-sys-color-*` roles; only the palette relationships and chroma differ.
    */
   variant?: SchemeVariant;
 }
@@ -80,10 +66,48 @@ export interface SchemeOptions {
 export type ColorRoleMap = Record<string, string>;
 
 // ---------------------------------------------------------------------------
-// Internal helpers
+// ARGB <-> hex and HCT, backed by the engine
 // ---------------------------------------------------------------------------
 
-const dynamicColors = MaterialDynamicColors as unknown as Record<string, DynamicColor | undefined>;
+/** `#rrggbb` (or `rrggbb`) to opaque ARGB. */
+export function argbFromHex(hex: string): number {
+  return (0xff000000 | parseInt(normalizeSeedHex(hex).slice(1), 16)) >>> 0;
+}
+
+/** Opaque ARGB to lowercase `#rrggbb`. */
+export function hexFromArgb(argb: number): string {
+  return `#${(argb & 0xffffff).toString(16).padStart(6, "0")}`;
+}
+
+/** Hue, chroma and tone of a colour, resolved by the canonical engine (`Hct` of the M3 colour model). */
+export class Hct {
+  private constructor(
+    readonly hue: number,
+    readonly chroma: number,
+    readonly tone: number,
+    private readonly argb: number,
+  ) {}
+
+  /** The HCT of an ARGB colour. */
+  static fromInt(argb: number): Hct {
+    const { hue, chroma, tone } = materialWasm().hct(argb);
+    return new Hct(hue, chroma, tone, argb >>> 0);
+  }
+
+  /** The displayable colour closest to `hue`, `chroma` and `tone`. */
+  static from(hue: number, chroma: number, tone: number): Hct {
+    return Hct.fromInt(materialWasm().hctToArgb(hue, chroma, tone));
+  }
+
+  /** Opaque ARGB value of this colour. */
+  toInt(): number {
+    return this.argb;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
 
 /** `onPrimaryContainer` -> `on-primary-container`. */
 function kebab(role: string): string {
@@ -99,7 +123,14 @@ function resolveContrast(opts: SchemeOptions): number {
   return contrast;
 }
 
-/** Normalize a CSS hex seed, rejecting malformed colours before calling MCU. */
+/** Engine variant index for a camelCase variant name. */
+function variantIndex(variant: SchemeVariant): number {
+  const index = materialWasm().variantNames.indexOf(kebab(String(variant)));
+  if (index < 0) throw new TypeError(`Unknown M3 scheme variant: ${variant}`);
+  return index;
+}
+
+/** Normalize a CSS hex seed, rejecting malformed colours before they reach the engine. */
 export function normalizeSeedHex(seed: string): string {
   const match = /^#?([\da-f]{3}|[\da-f]{6})$/i.exec(seed.trim());
   if (!match) throw new TypeError(`Invalid M3 seed color: ${seed}`);
@@ -107,26 +138,15 @@ export function normalizeSeedHex(seed: string): string {
   return `#${(digits.length === 3 ? [...digits].map(digit => digit + digit).join("") : digits).toLowerCase()}`;
 }
 
-/** Build the MCU DynamicScheme for the requested variant. */
-function buildScheme(hct: Hct, isDark: boolean, contrastLevel: number, variant: SchemeVariant): DynamicScheme {
-  switch (variant) {
-    case "content":
-      return new SchemeContent(hct, isDark, contrastLevel);
-    case "fidelity":
-      return new SchemeFidelity(hct, isDark, contrastLevel);
-    case "expressive":
-      return new SchemeExpressive(hct, isDark, contrastLevel);
-    case "vibrant":
-      return new SchemeVibrant(hct, isDark, contrastLevel);
-    case "neutral":
-      return new SchemeNeutral(hct, isDark, contrastLevel);
-    case "monochrome":
-      return new SchemeMonochrome(hct, isDark, contrastLevel);
-    case "tonalSpot":
-      return new SchemeTonalSpot(hct, isDark, contrastLevel);
-    default:
-      throw new TypeError(`Unknown M3 scheme variant: ${variant}`);
-  }
+/** Validated engine arguments for one request. */
+function request(seedHex: string, opts: SchemeOptions) {
+  const contrast = resolveContrast(opts);
+  return {
+    seed: argbFromHex(seedHex),
+    variant: variantIndex(opts.variant ?? "tonalSpot"),
+    contrast,
+    mode: opts.dark ? ("dark" as const) : ("light" as const),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -136,28 +156,27 @@ function buildScheme(hct: Hct, isDark: boolean, contrastLevel: number, variant: 
 /**
  * Resolve every M3 colour role for one mode from a seed colour.
  *
- * Backwards-compatible: calling `schemeFromSeed(hex)` or
- * `schemeFromSeed(hex, { dark, contrast })` still works exactly as before.
- *
  * @param seedHex Source colour, e.g. `"#6750A4"`.
  * @param opts    Optional: `dark`, `contrastLevel` (or legacy `contrast`), `variant`.
- * @returns `{ "--md-sys-color-primary": "#…", … }` (~47 roles).
+ * @returns `{ "--md-sys-color-primary": "#…", … }` (49 roles).
  */
 export function schemeFromSeed(seedHex: string, opts: SchemeOptions = {}): ColorRoleMap {
-  const dark = opts.dark ?? false;
-  const contrastLevel = resolveContrast(opts);
-  const variant = opts.variant ?? "tonalSpot";
-
-  const hct = Hct.fromInt(argbFromHex(normalizeSeedHex(seedHex)));
-  const scheme = buildScheme(hct, dark, contrastLevel, variant);
-
+  const { seed, variant, contrast, mode } = request(seedHex, opts);
+  const wasm = materialWasm();
+  const words = wasm.schemeFromSeed(seed, variant, contrast, mode);
+  const byName = new Map(wasm.roleNames.map((name, index) => [name, words[index]!]));
   const out: ColorRoleMap = {};
   for (const role of ROLES) {
-    const dynamicColor = dynamicColors[role];
-    if (!dynamicColor) continue;
-    out[`--md-sys-color-${kebab(role)}`] = hexFromArgb(dynamicColor.getArgb(scheme));
+    const argb = byName.get(role);
+    if (argb === undefined) throw new Error(`Material WASM omitted the ${role} role`);
+    out[`--md-sys-color-${kebab(role)}`] = hexFromArgb(argb);
   }
   return out;
+}
+
+/** The seed best suited to a theme, from RGBA8 pixels (`ImageData.data`); alpha < 255 is ignored. */
+export function themeFromImage(rgba: Uint8Array | Uint8ClampedArray): string {
+  return hexFromArgb(materialWasm().themeFromImage(rgba));
 }
 
 /** Serialise a role map to CSS custom-property declarations. */
@@ -207,21 +226,38 @@ export interface ApplyOptions extends SchemeOptions {
 }
 
 /**
+ * Every custom property the engine's scheme sheet sets for one mode: the 49
+ * `--md-sys-color-*` roles plus the extended `--md-ext-color-*` success and
+ * warning roles.
+ */
+export function dynamicColorProperties(seedHex: string, opts: SchemeOptions = {}): ColorRoleMap {
+  const { seed, variant, contrast, mode } = request(seedHex, opts);
+  const sheet = materialWasm().applyDynamicColor(seed, variant, contrast, mode);
+  return Object.fromEntries(
+    [...sheet.matchAll(/^\s*(--md-(?:sys|ext)-color-[a-z-]+):\s*(#[\da-f]{6});$/gm)].map(match => [
+      match[1]!,
+      match[2]!,
+    ]),
+  );
+}
+
+/**
  * Apply a seed's roles for one mode directly onto an element's inline style
  * (overriding any stylesheet `:root` values). Browser-only; a no-op in SSR.
  */
 export function applyDynamicColor(seedHex: string, opts: ApplyOptions = {}): void {
   const target = opts.target ?? (typeof document !== "undefined" ? document.documentElement : null);
   if (!target) return;
-  const vars = schemeFromSeed(seedHex, opts);
+  const vars = dynamicColorProperties(seedHex, opts);
   for (const [k, v] of Object.entries(vars)) target.style.setProperty(k, v);
 }
 
-/** Remove every `--md-sys-color-*` role this module may have set inline. */
+/** Remove every `--md-sys-color-*` and `--md-ext-color-*` property this module may have set inline. */
 export function clearDynamicColor(target?: HTMLElement | null): void {
   const el = target ?? (typeof document !== "undefined" ? document.documentElement : null);
   if (!el) return;
-  for (const role of ROLES) el.style.removeProperty(`--md-sys-color-${kebab(role)}`);
+  const names = Array.from(el.style).filter(name => /^--md-(?:sys|ext)-color-/.test(name));
+  for (const name of names) el.style.removeProperty(name);
 }
 
 // ---------------------------------------------------------------------------

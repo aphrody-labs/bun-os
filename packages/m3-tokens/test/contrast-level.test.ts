@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, expect, test } from "bun:test";
-import { schemeFromSeed, type SchemeVariant } from "../src/dynamic-color.js";
+import { ROLES, schemeFromSeed, type SchemeVariant } from "../src/dynamic-color.ts";
+import { GOLDEN_PET, GOLDEN_SCHEMES, camelVariant, hex } from "./golden.ts";
 
 // ---------------------------------------------------------------------------
 // Contrast-level tests
@@ -41,6 +43,39 @@ const VARIANTS: SchemeVariant[] = [
   "neutral",
   "monochrome",
 ];
+
+// ---------------------------------------------------------------------------
+// 0. Every contrast level reproduces the Rust golden roles
+// ---------------------------------------------------------------------------
+
+const kebab = (role: string) => role.replace(/([A-Z])/g, "-$1").toLowerCase();
+
+describe("contrastLevel — Rust golden output", () => {
+  for (const level of [-1, 0, 0.5, 1]) {
+    test(`contrastLevel=${level}: every golden seed, variant and mode`, () => {
+      const goldens = GOLDEN_SCHEMES.filter(golden => golden.contrast === level);
+      expect(goldens.length).toBe(level === 0 ? 148 : 52);
+      for (const golden of goldens) {
+        const scheme = schemeFromSeed(hex(golden.seed), {
+          variant: camelVariant(golden.variant),
+          dark: golden.dark,
+          contrastLevel: level,
+        });
+        for (const role of ROLES)
+          expect(scheme[`--md-sys-color-${kebab(role)}`], `${golden.variant} ${role}`).toBe(hex(golden.roles[role]!));
+      }
+    });
+  }
+
+  test("identity seed ThemeExport at every contrast level", () => {
+    for (const golden of GOLDEN_PET.schemes)
+      for (const dark of [false, true]) {
+        const scheme = schemeFromSeed(GOLDEN_PET.seed, { dark, contrastLevel: golden.contrast_level });
+        const expected = dark ? golden.dark : golden.light;
+        for (const role of ROLES) expect(scheme[`--md-sys-color-${kebab(role)}`]).toBe(expected[role]!);
+      }
+  });
+});
 
 // ---------------------------------------------------------------------------
 // 1. contrastLevel elevates WCAG ratios on standard → high

@@ -68,7 +68,6 @@
     "packages/inagle-ui",
     "packages/inagle",
     "packages/kernel-client",
-    "packages/libm3",
     "packages/m3-ai",
     "packages/m3-baseui",
     "packages/m3-bun",

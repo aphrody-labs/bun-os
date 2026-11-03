@@ -20,7 +20,19 @@ console.log(diagnostics); // MIGRATION-TODO notes left for manual work
 
 License: Apache-2.0 (`LICENSE`). Install guide: [docs/material/m3/INSTALL.md](https://github.com/aphrody-labs/bun-distribution/blob/os/docs/material/m3/INSTALL.md).
 
-No runtime dependency: the engine runs on Bun alone. `m3-bun migrate` runs these transforms over a project.
+The source transforms run on Bun alone; `m3-bun migrate` runs them over a project. The theme migration below uses
+`@aphrody/m3-tokens` for the colour roles MUI lacks.
+
+## Theme migration
+
+`muiThemeToTokens(theme, { darkTheme })` turns a MUI `createTheme` object into `--md-sys-*` CSS: colour roles from the
+canonical engine seeded with `palette.primary.main`, the colours the theme spells out carried over, typography mapped
+onto the M3 typescale and the corner scale rescaled by `shape.borderRadius / 4`.
+
+```sh
+bun scripts/theme.ts theme.json --dark dark.json > m3-theme.css
+bun scripts/theme.ts --seed "#0b57d0"   # reference MUI themes with another primary
+```
 
 ## Two tools
 
