@@ -45,10 +45,13 @@ so a full first publication of a few hundred new crates takes days; leave it run
   publishable member, or a crate the registry has in a matching version. `cargo package` resolves everything against
   crates.io: a `[patch.crates-io]` entry, a git dependency or an out-of-tree path dependency counts only when crates.io
   has a matching version, and one without a version cannot be published at all.
-- Per crate the publisher checks the registry (version present: `exists`; name owned by someone else: `taken`), runs
-  `cargo publish --dry-run` (the full verification build, once its dependencies are up), then uploads with
-  `--no-verify`. A dry run packages the crate together with its unpublished workspace dependencies so cargo can resolve
-  them before anything is uploaded.
+- Per crate the publisher checks the registry (version present: `exists`; name owned by someone else: `taken`), then runs
+  one `cargo publish`: package, verification build against the crates.io dependencies (published just before it), and
+  upload; a retry after a 429 skips the verification. A failed verification uploads nothing and is recorded as
+  `failed`. A dry run packages the crate together with its unpublished workspace dependencies so cargo can resolve
+  them before anything is uploaded, without the verification build.
+- Every cargo invocation walks the checkout's git status (382 submodules): about four minutes per crate on `vps`, so
+  keep large untracked trees out of the checkout or in `.gitignore`. That cost sits inside the crates.io wait anyway.
 - A package must stay under the crates.io 10 MB limit: large assets are left out with `exclude` and loaded from the
   checkout or the system (as `bun_browser_render` does with its colour emoji face).
 - npm: a package is publishable when it is named, not `private` and licensed, with registry-only dependencies. The
