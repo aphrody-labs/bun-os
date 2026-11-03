@@ -135,7 +135,7 @@ td{padding:3px 6px;vertical-align:top;border-top:1px solid color-mix(in srgb,var
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.ok{background:var(--ok)}.bad{background:var(--bad)}.na{background:var(--na)}
 img{max-width:100%;border-radius:8px;margin-top:8px}code{font-size:12px}
 </style></head><body><main>
-<h1>Bun OS status</h1><div class="muted">Generated ${esc(status.generatedAt)} by the automation loops (docs/AUTOMATION.md). Refreshes every 5 minutes.</div>
+<h1>Bun OS status</h1><div class="muted">Generated ${esc(status.generatedAt)} by the automation loops (docs/ops/AUTOMATION.md). Refreshes every 5 minutes.</div>
 <div class="grid">
 <section><h2>${dot(gate.green)}Main gate</h2><div class="muted">${esc(gate.sha?.slice(0, 10))} at ${esc(gate.at)}</div><table>${(
     gate.results ?? []

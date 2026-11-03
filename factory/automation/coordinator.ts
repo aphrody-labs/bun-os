@@ -289,7 +289,7 @@ async function writeTable(state: CoordinatorState, lines: Line[], markdown: stri
   const table = [
     "## Automation dispatch",
     "",
-    "Written by the coordinator (`bunos-auto-coordinator.service`, docs/AUTOMATION.md); do not edit by hand.",
+    "Written by the coordinator (`bunos-auto-coordinator.service`, docs/ops/AUTOMATION.md); do not edit by hand.",
     "",
     "| #   | Status | Dispatched to | At (UTC) | Dispatches |",
     "| --- | ------ | ------------- | -------- | ---------- |",

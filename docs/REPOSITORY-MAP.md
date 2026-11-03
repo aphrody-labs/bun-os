@@ -18,8 +18,8 @@ every directory is a build target or that every source has been qualified.
    excluded target, a nested workspace, or an intentionally absent submodule.
    Directory presence alone is not membership or qualification evidence.
 5. Use the owning build gate on its supported host. Preserve unrelated
-   checkout changes. See [`docs/VPS-BUILD.md`](VPS-BUILD.md) and
-   [`docs/SYNC.md`](SYNC.md).
+   checkout changes. See [`docs/ops/BUILD.md`](ops/BUILD.md) and
+   [`docs/ops/SYNC.md`](ops/SYNC.md).
 
 ## First-party source
 
@@ -83,7 +83,7 @@ during an audit.
 | Reusable Bun and Fetch JS client                               | [`packages/aphrody-web/README.md`](../packages/aphrody-web/README.md)                                                                                  |
 | Aphrody Search agent interaction                               | [`docs/aphrody/SEARCH-AGENT.md`](aphrody/SEARCH-AGENT.md)                                                                                              |
 | Dragon Ball source ingestion                                   | Shenron's own repository and operational docs; Aphrody supplies generic crawl/search transports                                                        |
-| Host build and qualification                                   | [`docs/VPS-BUILD.md`](VPS-BUILD.md), [`docs/VPS-TUNING.md`](VPS-TUNING.md), [`docs/AUTOMATION.md`](AUTOMATION.md)                                      |
+| Host build and qualification                                   | [`docs/ops/BUILD.md`](ops/BUILD.md), [`docs/ops/FLEET.md`](ops/FLEET.md), [`docs/ops/AUTOMATION.md`](ops/AUTOMATION.md)                                      |
 
 For web work, keep owners clear: Google and SearXNG are discovery providers;
 Obscura is the pinned Chromium/CDP engine; Playwright controls its loopback

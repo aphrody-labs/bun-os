@@ -1,6 +1,6 @@
 # Host environment: workstation and VPS
 
-Environment, MCP and A2A client settings for the two Bun OS hosts. Repository sync is in [SYNC.md](SYNC.md), and the
+Environment, MCP and A2A client settings for the two Bun OS hosts. Repository sync is in [SYNC.md](ops/SYNC.md), and the
 A2A hub (server, identities, mailboxes) is in [A2A-AGENTS.md](A2A-AGENTS.md). Cleaned and verified on 2026-10-31.
 
 ## Runtime

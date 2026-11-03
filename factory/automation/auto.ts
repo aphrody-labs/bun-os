@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 // SPDX-License-Identifier: Apache-2.0
-// Bun OS automation (docs/AUTOMATION.md): one entry for every loop, run by the systemd user units on the VPS.
+// Bun OS automation (docs/ops/AUTOMATION.md): one entry for every loop, run by the systemd user units on the VPS.
 //   bun factory/automation/auto.ts install                 units, drop-ins, status snippet (idempotent)
 //   bun factory/automation/auto.ts deliver [--force]       loop 1: deploy the last green gate
 //   bun factory/automation/auto.ts health                  loop 2: probes, restarts, escalation

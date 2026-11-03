@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# Codex app-server (JSON-RPC v2 over WebSocket) on loopback, for the Codex Luna sub-agents (docs/AUTOMATION.md, docs/A2A-AGENTS.md).
+# Codex app-server (JSON-RPC v2 over WebSocket) on loopback, for the Codex Luna sub-agents (docs/ops/AUTOMATION.md, docs/A2A-AGENTS.md).
 # The real Codex binary reads ~/.codex/config.toml (model gpt-6-luna, model_reasoning_effort medium) and the ChatGPT login in
 # ~/.codex; nothing is copied. Loopback only: ws://127.0.0.1:4500 (GET /readyz, /healthz), never proxied.
 # Low priority: build.slice (CPUWeight 20) plus Nice, so it never starves WebOS and the interactive services; the

@@ -11,7 +11,7 @@ protocol natively. The fork `aphrody-labs/codex` (upstream `openai/codex`, branc
 | --- | --- | --- |
 | Codex binary | `~/.codex/packages/standalone/current/bin/codex` | login (ChatGPT) and `~/.codex/config.toml` are shared by every consumer: model `gpt-6-luna`, `model_reasoning_effort = "medium"` |
 | App-server | `aphrody-codex-app-server.service` | `codex app-server --listen ws://127.0.0.1:4500`, loopback, `build.slice` (CPUWeight 20, nice 10), `Restart=always`; probes `/readyz`, `/healthz` |
-| Sub-agent dispatcher | `aphrody-codex-agent.service` | `factory/codex-agent/dispatch.ts`, see [AUTOMATION.md](AUTOMATION.md#codex-luna-sub-agents) |
+| Sub-agent dispatcher | `aphrody-codex-agent.service` | `factory/codex-agent/dispatch.ts`, see [AUTOMATION.md](ops/AUTOMATION.md#codex-luna-sub-agents) |
 | `aphrody codex exec/resume/fork` | `crates/aphrody-command/src/codex_cmd.rs` | dispatch to the real binary (`CODEX_BIN`, then `$CODEX_HOME/packages/standalone/current/bin/codex`, then PATH; never itself) |
 | `aphrody codex agent …` | same file | runs the dispatcher on Bun |
 | `aphrody codex doctor` | same file | reads `~/.codex/config.toml`, probes binary version, login and the app-server |
@@ -50,7 +50,7 @@ binary, which carries all of them.
 ## Fork and binary
 
 - `vendor/codex` is a pinned gitlink; `factory/rustbase/forks.json` lists it (`codex`, ref `main`) so the daily fork
-  refresh in [AUTOMATION.md](AUTOMATION.md) merges `openai/codex` into the fork and bumps the pin (a merge, never a force push).
+  refresh in [AUTOMATION.md](ops/AUTOMATION.md) merges `openai/codex` into the fork and bumps the pin (a merge, never a force push).
 - Build on the VPS only, through the serialized wrapper:
   `RUSTUP_TOOLCHAIN=1.95.0 APHRODY_BUILD_HOST=vps APHRODY_CARGO_JOBS=4 APHRODY_CARGO_TARGET_DIR=~/build/target/codex bash scripts/aphrody/build/rust/cargo-serial.sh build --release --manifest-path vendor/codex/codex-rs/Cargo.toml -p codex-cli --bin codex`
   (log: `~/build/logs/codex-fork-build.log`). The standalone binary under `~/.codex` stays the one in use until the fork

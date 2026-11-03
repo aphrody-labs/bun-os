@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# aphrody.com/status: the Bun OS automation status page (docs/AUTOMATION.md), static files written by
+# aphrody.com/status: the Bun OS automation status page (docs/ops/AUTOMATION.md), static files written by
 # factory/automation/status.ts into ~/apps/bunos-status. Locations with add_header repeat the server-level headers.
 location = /status {
     alias /home/ubuntu/apps/bunos-status/index.html;

@@ -27,7 +27,7 @@ function oneshot(name: string, description: string, args: string, extra = "") {
   return [
     `${name}.service`,
     `[Unit]
-Description=${description} (docs/AUTOMATION.md)
+Description=${description} (docs/ops/AUTOMATION.md)
 [Service]
 Type=oneshot
 ${env}
@@ -98,7 +98,7 @@ WantedBy=default.target
   [
     "bunos-auto-deps@.service",
     `[Unit]
-Description=Bun OS dependency job %i (docs/AUTOMATION.md)
+Description=Bun OS dependency job %i (docs/ops/AUTOMATION.md)
 [Service]
 Type=oneshot
 ${env}
@@ -142,7 +142,7 @@ TimeoutStartSec=8h
   [
     "bunos-auto-coordinator.service",
     `[Unit]
-Description=Bun OS autonomous coordinator: PRODUCT.md lines and automation tasks to agents (docs/AUTOMATION.md)
+Description=Bun OS autonomous coordinator: PRODUCT.md lines and automation tasks to agents (docs/ops/AUTOMATION.md)
 StartLimitIntervalSec=0
 [Service]
 ${env}
@@ -239,7 +239,7 @@ export async function install() {
       continue;
     }
     const restart = unit === "waydroid-container" || unit === "aphrody-android17" ? "on-failure" : "always";
-    const text = `# Installed by factory/automation/install.ts (docs/AUTOMATION.md): restart on any exit, never parked by the
+    const text = `# Installed by factory/automation/install.ts (docs/ops/AUTOMATION.md): restart on any exit, never parked by the
 # start limit; the health loop (bunos-auto-health.timer) is the HTTP watchdog on top.
 [Unit]
 StartLimitIntervalSec=600

@@ -3,7 +3,7 @@
 Aphrody Infra owns hosts, services, routes and lifecycle. Komodo is the Rust
 deployment actuator. Source lives on GitHub (`aphrody-labs/bun-os`, branch
 `main`) and is used with plain `git`; there is no self-hosted forge and no
-self-hosted CI runner (retired 2026-10-30, see [SYNC.md](SYNC.md)). CI is
+self-hosted CI runner (retired 2026-10-30, see [SYNC.md](ops/SYNC.md)). CI is
 `.github/workflows/`; builds and qualification run on the VPS.
 The existing Infra catalogs remain the single desired-state source.
 

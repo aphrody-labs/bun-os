@@ -43,7 +43,6 @@ type Fleet = {
 
 const fleet = fleetToml as unknown as Fleet;
 const here = import.meta.dir;
-const repo = resolve(here, "..", "..");
 const generated = join(here, "generated");
 const managed = Object.entries(fleet.hosts).filter(([, h]) => h.managed !== false);
 
@@ -179,8 +178,27 @@ Before=network-pre.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+ExecStartPre=-/sbin/modprobe -a nf_conntrack nft_ct
 ExecStart=/usr/bin/nft -f /etc/fleet/firewall.nft
 ExecStop=/usr/bin/nft delete table inet fleet
+
+[Install]
+WantedBy=multi-user.target
+`;
+
+// The mesh hub routes peer-to-peer mesh traffic (wg1 -> wg1). Docker sets the iptables FORWARD policy to DROP, and an
+// nftables accept cannot override another base chain's drop, so the allowance goes into DOCKER-USER (Docker's
+// documented hook for host rules), once Docker has created it.
+const meshForwardUnit = (iface: string) => `[Unit]
+Description=Bun OS fleet mesh forwarding on the hub (${iface} -> ${iface})
+After=docker.service fleet-firewall.service
+Wants=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'iptables -C DOCKER-USER -i ${iface} -o ${iface} -j ACCEPT 2>/dev/null || iptables -I DOCKER-USER -i ${iface} -o ${iface} -j ACCEPT'
+ExecStop=-/bin/sh -c 'iptables -D DOCKER-USER -i ${iface} -o ${iface} -j ACCEPT'
 
 [Install]
 WantedBy=multi-user.target
@@ -192,7 +210,8 @@ async function ssh(
   opts: { quiet?: boolean } = {},
 ): Promise<{ code: number; out: string }> {
   const proc = Bun.spawn(["ssh", name, "bash -s"], { stdin: "pipe", stdout: "pipe", stderr: "pipe" });
-  proc.stdin.write(script);
+  // Parse the whole script before running it: commands such as sudo-rs read stdin and would swallow the rest.
+  proc.stdin.write(`fleet_main() {\n${script}\n}\nfleet_main </dev/null\n`);
   await proc.stdin.end();
   const [out, err] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text()]);
   const code = await proc.exited;
@@ -204,6 +223,7 @@ async function applyFirewall(name: string, h: Host): Promise<void> {
   const rules = firewall(name, h);
   const sudo = h.user === "root" ? "" : "sudo -n ";
   const guard = "fleet-firewall-rollback";
+  const hub = name === fleet.mesh.hub;
   // 1. Install and load the ruleset behind a dead-man switch that removes it after 180 s.
   const stage = await ssh(
     name,
@@ -213,12 +233,19 @@ ${sudo}tee /etc/fleet/firewall.nft >/dev/null <<'NFT'
 ${rules}NFT
 ${sudo}tee /etc/systemd/system/fleet-firewall.service >/dev/null <<'UNIT'
 ${firewallUnit}UNIT
-modprobe -a nf_conntrack nft_ct
-nft -c -f /etc/fleet/firewall.nft
+${sudo}modprobe -a nf_conntrack nft_ct
+${sudo}nft -c -f /etc/fleet/firewall.nft
 ${sudo}systemctl stop ${guard}.timer 2>/dev/null || true
-${sudo}systemd-run --unit=${guard} --on-active=180 /usr/bin/nft delete table inet fleet >/dev/null
+${sudo}sed -i "s#/usr/bin/nft#$(command -v nft)#g" /etc/systemd/system/fleet-firewall.service
+${sudo}systemd-run --unit=${guard} --on-active=180 "$(command -v nft)" delete table inet fleet >/dev/null
 ${sudo}nft -f /etc/fleet/firewall.nft
-echo staged
+${
+  hub
+    ? `${sudo}tee /etc/systemd/system/fleet-mesh-forward.service >/dev/null <<'UNIT'
+${meshForwardUnit(fleet.mesh.interface)}UNIT
+`
+    : ""
+}echo staged
 `,
   );
   if (stage.code !== 0 || !stage.out.includes("staged")) die(`staging the firewall on ${name} failed`);
@@ -237,7 +264,12 @@ ${sudo}systemctl stop ${guard}.timer
 ${sudo}systemctl daemon-reload
 ${sudo}systemctl enable fleet-firewall.service >/dev/null 2>&1
 ${sudo}systemctl start fleet-firewall.service
-echo committed`,
+${
+  hub
+    ? `${sudo}systemctl enable --now fleet-mesh-forward.service >/dev/null 2>&1
+`
+    : ""
+}echo committed`,
   );
   if (!commit.out.includes("committed")) die(`commit on ${name} failed`);
   console.log(`${name}: firewall applied and enabled`);

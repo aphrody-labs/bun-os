@@ -106,7 +106,7 @@ The nightly run:
 
 Cheap, bounded routine work goes to Codex (`gpt-6-luna`, reasoning `medium`) workers that act like Claude sub-agents.
 Source: `factory/codex-agent/` (`roles.ts`, `dispatch.ts`); CLI: `aphrody codex agent …` (or `bun factory/codex-agent/dispatch.ts …`).
-Background and crate map: [CODEX.md](CODEX.md).
+Background and crate map: [CODEX.md](../CODEX.md).
 
 - **Services**: `aphrody-codex-app-server.service` (real `codex app-server`, `ws://127.0.0.1:4500`, loopback) and
   `aphrody-codex-agent.service` (the dispatcher). Both run in `build.slice` (CPUWeight 20, nice 10), `Restart=always`, so

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Shared helpers of the Bun OS automation loops (docs/AUTOMATION.md): process runner, state files, the event log,
+// Shared helpers of the Bun OS automation loops (docs/ops/AUTOMATION.md): process runner, state files, the event log,
 // a2a messages and the queue of agent tasks, and the shared-checkout lock that bunos-sync also takes.
 import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";

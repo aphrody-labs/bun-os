@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
-# Applies the Bun OS VPS low-level tuning (docs/VPS-TUNING.md) from this checkout. Idempotent, no reboot,
+# Applies the Bun OS VPS low-level tuning (docs/ops/VPS-TUNING.md) from this checkout. Idempotent, no reboot,
 # no restart of other services: sysctl, modules, udev, tmpfiles (THP/KSM), systemd drop-ins, journald,
 # earlyoom, Docker (reload only), nginx (backup, `nginx -t`, reload, automatic rollback), firewall UDP 443.
 # Run as ubuntu from the VPS checkout: infra/config/host/vps/tuning/apply.sh

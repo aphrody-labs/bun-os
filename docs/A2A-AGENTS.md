@@ -51,7 +51,7 @@ ssh vps 'APHRODY_A2A_PEER_ID=<your-topic> aphrody a2a send --target <peer> "mess
 
 - Check in with `register` when you start, and read `inbox` between tasks.
 - Commit and push small, coherent changes directly to `main` as soon as they compile. The shared checkout's sync saves
-  any leftover changes to `refs/wip/<host>/<stamp>` (see [SYNC.md](SYNC.md)). If your work landed in a WIP ref, message
+  any leftover changes to `refs/wip/<host>/<stamp>` (see [SYNC.md](ops/SYNC.md)). If your work landed in a WIP ref, message
   its owner with the ref name.
 - When a gate fails (`vps-gate/*` commit statuses, `~/.local/state/bunos-sync/gate.json`), the report names the commit
   and author. Message that owner directly, or post to `help-wanted` when nobody owns it.
@@ -73,4 +73,4 @@ Review the last 3 commits touching factory/sync."
 ```
 
 Workers run `gpt-6-luna` (reasoning medium) in the shared checkout; editing roles are committed and pushed to `main` by the
-dispatcher. Limits, roles and state: [AUTOMATION.md](AUTOMATION.md#codex-luna-sub-agents); upstream mapping: [CODEX.md](CODEX.md).
+dispatcher. Limits, roles and state: [AUTOMATION.md](ops/AUTOMATION.md#codex-luna-sub-agents); upstream mapping: [CODEX.md](CODEX.md).
