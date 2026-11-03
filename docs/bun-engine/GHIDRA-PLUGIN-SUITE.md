@@ -18,17 +18,20 @@ submodule URL.
 
 ## Analysis engines
 
-Bun Engine ships one reverse-engineering pipeline backed by three pinned Aphrody forks:
+Bun Engine and REA use the following reverse-engineering sources. A pinned source
+does not establish that its binary or extension is installed or qualified:
 
 | Owner                                                                                 | Pinned revision                            | Role                                                      |
 | ------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------- |
 | [`aphrody-labs/ghidra`](https://github.com/aphrody-labs/ghidra)                       | `918acd744d17e3b95fbde44ec6ab3e59b6dbd45f` | Full interactive and headless Ghidra analysis platform.   |
-| [`aphrody-labs/ghidra-decompiler`](https://github.com/aphrody-labs/ghidra-decompiler) | `268c3a406d8d964bc00ae2ead4d3e1e1373aaa27` | Native Rust decompiler integrated into `bun-engine-core`. |
+| `ghidra-decompiler` Cargo dependency                                                   | `2.1.0`                                    | Rust decompiler dependency; see the workspace lockfile.  |
 | [`aphrody-labs/NTRGhidra`](https://github.com/aphrody-labs/NTRGhidra)                 | `9e0674c0b36ef9b816dbe7833a68b17327edc1b9` | Nintendo DS/DSi loader and overlay plugin.                |
 
 The AI plugin orchestrates these engines; it does not duplicate them. The submodules
-are shallow transport boundaries. Product ownership stays in the root Cargo/Bun
-workspaces and `src/pipeline/reverse.ts` defines the canonical engine sequence:
+are shallow transport boundaries. REA's Ghidra integration lives in
+`vendor/rea/src/ghidra`; the RE pipeline facade lives in `packages/re/src/pipeline`.
+These sources provide distinct capabilities, not a guarantee that every host has
+every engine or that a game can be ported automatically.
 
 1. inspect PE32/PE32+ metadata with `bun:windows.pe` (fork-only API, not available on upstream Bun);
 2. decompile PE, ELF or Mach-O through the Rust owner;
@@ -37,7 +40,8 @@ workspaces and `src/pipeline/reverse.ts` defines the canonical engine sequence:
 
 ## Windows 11 integration
 
-`packages/re/src/ghidra/windows.ts` uses the abandoned fork's `bun:windows` API directly (not available on upstream Bun). It discovers the
+`vendor/rea/src/ghidra/windows.ts` contains Windows integration. The fork-only
+`bun:windows` API is not available in upstream Bun. The historical integration discovers the
 Windows version, MSVC and Windows SDK without `vswhere`, parses PE metadata without
 loading the image, and contains Gradle/Java descendants in a Windows Job Object.
 Closing the owner terminates its entire process tree.
@@ -49,10 +53,11 @@ re pipeline adapters
 re ghidra-win build
 ```
 
-The current workstation qualification covers Windows 11 x64, MSVC 14.44, Windows
-SDK 10.0.26100.0, source discovery, NTRGhidra discovery, native PE inspection and
-the Rust workspace. A complete Ghidra Java build additionally requires JDK 25 on
-`PATH`; the command fails explicitly when it is absent.
+Historical workstation checks are not proof of current host readiness. The REA
+bridge currently marks Ghidra 12.1.4 as verified and accepts other 12.1.x builds
+as compatible but unverified; it rejects 12.2 and 12.3 until qualified and updated.
+The pinned Ghidra source tree declares JDK 25 as its minimum. Check the installation,
+JDK, native decompiler, extension compatibility and actual analysis on each host.
 
 ## Source policy
 
