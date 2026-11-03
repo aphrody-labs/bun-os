@@ -192,9 +192,12 @@ Open:
 
 - Under WSLg, COSMIC's output follows only resizes that reach cosmic-comp as `xdg_toplevel.configure`. An interactive
   resize from winit's own frame does (configure 1340x832, output 1332x800 under `WAYLAND_DEBUG=client`). A Windows-side
-  resize of the RAIL window (`MoveWindow`, as GlazeWM's `SetWindowPos` does) produced no configure from WSLg's Weston 9
-  in the three logged runs (one unlogged run did reflow, to 1600x1000), so cosmic-comp has nothing to follow;
-  winit's client-side frame also becomes separate "sub-surface (bunos)" RAIL windows that such a move leaves behind.
-  The native presenter configures on every Windows resize and has neither problem. The fix belongs in WSLg's
-  rdprail-shell (send a configure when the RDP client moves or sizes a window), in the WSLg fork.
+  `SetWindowPos` (as GlazeWM does) does not, for two reasons. Weston's rdprail-shell ignored the size of a Client Window
+  Move PDU (`shell_backend_request_window_move`, a TODO): fixed in `aphrody-labs/weston-mirror@fc5b69df`, built into
+  the fork's WSLg system distro and booted on the workstation. msrdc 1.2.7391 never sends that PDU for an external
+  resize, which the rdp-backend log showed on the stock and the patched image (details and evidence in
+  [WSLG.md](WSLG.md), "RAIL resize from the Windows side"), so the output still stays 1280x800. The remaining work is on
+  the Windows side: a helper that forwards `RAIL_WINDOW` size changes to the guest, or the native presenter, which
+  configures on every Windows resize. winit's client-side frame also becomes separate "sub-surface (bunos)" RAIL
+  windows that such a move leaves behind.
 - Omarchy calls `herdr` at start (`command not found: herdr` notification); not packaged yet.

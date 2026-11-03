@@ -32,8 +32,11 @@ is rejected. Full table, evidence and estimates follow (generated in the fork).
 | ci | `.github/workflows/bunos-wslg.yml` |
 | fix-ups | found by CI: package lists, hyprwire, udis86 submodule, hyprland-protocols is cmake, per-tag Xwayland options, probe honesty fixes |
 
-The vendored Weston/FreeRDP/PulseAudio/Mesa trees are not patched here (cloned at build time from
-Microsoft's `*-mirror` `working` branches), so the queue never conflicts with them.
+The vendored FreeRDP/PulseAudio/Mesa trees are not patched here (cloned at build time from
+Microsoft's `*-mirror` `working` branches), so the queue never conflicts with them. Weston comes from
+`aphrody-labs/weston-mirror` `working` (fork of `microsoft/weston-mirror`, pin `weston-mirror-bunos` in the fork's
+`bunos/sources.json`): Microsoft's `working` plus `fc5b69df`, "rdprail-shell: resize the window on a client window
+move" (see the RAIL resize section below).
 
 Rebase: `git fetch upstream main && git rebase upstream/main && bunos/check-versions.sh &&
 bunos/regen-patches.sh && git push origin main` (normal push, never force). `bunos/verify-patches.sh`
@@ -181,3 +184,29 @@ backup `*.bunos-backup`). Every key of `[system-distro-env]` is exported into th
 
 `.wslconfig` `[wsl2] guiApplications=true` keeps WSLg on. The values parse as `true`/`false`/`1`/`0` only. Not yet
 observed on a running WSLg session (WSL is not started on the workstation; the test VM has no WSL yet).
+
+## RAIL resize from the Windows side (2026-11-03)
+
+Symptom: a Windows-side `SetWindowPos`/`MoveWindow` on a WSLg window (GlazeWM tiling, scripts) changes the Windows
+rectangle, but the Linux client keeps its size (COSMIC's `WINIT-0` output stays 1280x800).
+
+Server half, fixed: `rdprail-shell/shell.c` `shell_backend_request_window_move()` handles the Client Window Move
+PDU (`libweston/backend-rdp/rdprail.c` `rail_client_WindowMove_callback`) but only repositioned the view; the size was
+a `//TODO: support window resize`. `aphrody-labs/weston-mirror@fc5b69df` sends the new size with
+`weston_desktop_surface_set_size()` in window-geometry coordinates, clamped to min/max size, as the snap path already
+does; maximized and fullscreen windows keep theirs (and a NULL shell surface no longer dereferences). The fork's CI
+(`aphrody-labs/wslg@f18dfb0`) now clones it. Built on the VPS with the fork's recipe (`Dockerfile` +
+tar2ext4 v0.13.0): `system_x64.vhd`, sha256 `3157468a525f4885d434b4c4288622e9fb26e7c7f6a95f653f39639ba8c8fbc5`,
+`/etc/versions.txt` `WSLg: 1.0.79-bunos`, `weston: fc5b69df`; it booted on the workstation through `.wslconfig`
+`[wsl2] systemDistro=` (WSL 3.0.4, WSLg 1.0.79) and ran `bunos-session cosmic`.
+
+Client half, open: msrdc (MSRDC 1.2.7391) never sends the PDU for such a resize. With the rdp-backend log scope (INFO
+logs every `Client: WindowMove`), on both the stock and the patched image, zero Window Move PDUs arrived for a plain
+`SetWindowPos` to 1600x1000 (the Windows rectangle changed, `cosmic-randr` stayed `1280x800`), for the same call
+wrapped in `WM_ENTERSIZEMOVE`/`WM_EXITSIZEMOVE`, for GlazeWM's own tiling (492x1350), or for a resize during a local
+move loop (`WESTON_RDPRAIL_SHELL_LOCAL_MOVE=true`, `StartWindowMove`/`EndWindowMove` logged, no client PDU). msrdc's
+windows are UIPI-protected from a medium-integrity caller (`SetWindowPos` fails with error 5); the tests ran elevated.
+Weston therefore never learns the size, and the patch only acts once a client reports it. The workstation was put back
+on the stock system distro and `.wslgconfig`, since the override pins WSLg and gains nothing until then. Next step
+belongs on the Windows side: a helper watching `EVENT_OBJECT_LOCATIONCHANGE` on `RAIL_WINDOW` windows that forwards
+the size to the guest, or the native presenter (bunos-wayland-win), which already configures on every Windows resize.
