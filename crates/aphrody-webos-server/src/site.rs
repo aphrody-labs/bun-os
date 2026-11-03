@@ -481,6 +481,7 @@ fn page(path: &str, title: &str, description: &str, body: &str) -> Html<String> 
 <link rel="canonical" href="{ORIGIN}{path}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
+<link rel="describedby" type="text/markdown" href="/llms.txt">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{NAME}">
 <meta property="og:title" content="{title}">
