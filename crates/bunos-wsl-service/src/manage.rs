@@ -12,8 +12,9 @@ use serde::Serialize;
 use std::{ffi::OsString, path::PathBuf, time::Duration};
 use windows_service::{
     service::{
-        ServiceAccess, ServiceAction, ServiceActionType, ServiceDependency, ServiceErrorControl, ServiceFailureActions,
-        ServiceFailureResetPeriod, ServiceInfo, ServiceStartType, ServiceState, ServiceType,
+        ServiceAccess, ServiceAction, ServiceActionType, ServiceDependency, ServiceErrorControl,
+        ServiceFailureActions, ServiceFailureResetPeriod, ServiceInfo, ServiceStartType,
+        ServiceState, ServiceType,
     },
     service_manager::{ServiceManager, ServiceManagerAccess},
 };
@@ -29,12 +30,19 @@ fn installed_exe() -> PathBuf {
 }
 
 fn scm_admin() -> Result<ServiceManager> {
-    ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT | ServiceManagerAccess::CREATE_SERVICE)
-        .context("opening the Service Control Manager (run elevated: sudo bunos-wsl-service ...)")
+    ServiceManager::local_computer(
+        None::<&str>,
+        ServiceManagerAccess::CONNECT | ServiceManagerAccess::CREATE_SERVICE,
+    )
+    .context("opening the Service Control Manager (run elevated: sudo bunos-wsl-service ...)")
 }
 
 fn upsert(scm: &ServiceManager, info: &ServiceInfo) -> Result<windows_service::service::Service> {
-    let access = ServiceAccess::QUERY_STATUS | ServiceAccess::CHANGE_CONFIG | ServiceAccess::START | ServiceAccess::STOP | ServiceAccess::DELETE;
+    let access = ServiceAccess::QUERY_STATUS
+        | ServiceAccess::CHANGE_CONFIG
+        | ServiceAccess::START
+        | ServiceAccess::STOP
+        | ServiceAccess::DELETE;
     match scm.open_service(&info.name, access) {
         Ok(s) => {
             s.change_config(info)?;
@@ -47,16 +55,28 @@ fn upsert(scm: &ServiceManager, info: &ServiceInfo) -> Result<windows_service::s
 fn current_user() -> String {
     let user = std::env::var("USERNAME").unwrap_or_default();
     let domain = std::env::var("USERDOMAIN").unwrap_or_default();
-    if domain.is_empty() { user } else { format!("{domain}\\{user}") }
+    if domain.is_empty() {
+        user
+    } else {
+        format!("{domain}\\{user}")
+    }
 }
 
-pub fn install(distro: String, user: Option<String>, terminate_on_stop: Option<bool>, start: bool) -> Result<()> {
+pub fn install(
+    distro: String,
+    user: Option<String>,
+    terminate_on_stop: Option<bool>,
+    start: bool,
+) -> Result<()> {
     let exe = installed_exe();
     std::fs::create_dir_all(install_dir())?;
     let me = std::env::current_exe()?;
     let was_running = ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT)
         .ok()
-        .and_then(|m| m.open_service(SERVICE_NAME, ServiceAccess::QUERY_STATUS).ok())
+        .and_then(|m| {
+            m.open_service(SERVICE_NAME, ServiceAccess::QUERY_STATUS)
+                .ok()
+        })
         .and_then(|s| s.query_status().ok())
         .is_some_and(|s| s.current_state != ServiceState::Stopped);
     if !me.eq(&exe) {
@@ -69,7 +89,8 @@ pub fn install(distro: String, user: Option<String>, terminate_on_stop: Option<b
     Config {
         distro: distro.clone(),
         user: user.clone(),
-        terminate_on_stop: terminate_on_stop.unwrap_or(prev.as_ref().is_none_or(|c| c.terminate_on_stop)),
+        terminate_on_stop: terminate_on_stop
+            .unwrap_or(prev.as_ref().is_none_or(|c| c.terminate_on_stop)),
         state_period: prev.as_ref().map(|c| c.state_period).unwrap_or(2),
     }
     .save()?;
@@ -98,9 +119,18 @@ pub fn install(distro: String, user: Option<String>, terminate_on_stop: Option<b
         reboot_msg: None,
         command: None,
         actions: Some(vec![
-            ServiceAction { action_type: ServiceActionType::Restart, delay: Duration::from_secs(5) },
-            ServiceAction { action_type: ServiceActionType::Restart, delay: Duration::from_secs(15) },
-            ServiceAction { action_type: ServiceActionType::Restart, delay: Duration::from_secs(60) },
+            ServiceAction {
+                action_type: ServiceActionType::Restart,
+                delay: Duration::from_secs(5),
+            },
+            ServiceAction {
+                action_type: ServiceActionType::Restart,
+                delay: Duration::from_secs(15),
+            },
+            ServiceAction {
+                action_type: ServiceActionType::Restart,
+                delay: Duration::from_secs(60),
+            },
         ]),
     })?;
     // Service-specific exit codes (logon failure, instance keeps dying) count as failures too.
@@ -111,7 +141,10 @@ pub fn install(distro: String, user: Option<String>, terminate_on_stop: Option<b
     for unit in config::units() {
         export_one(&scm, &exe, &unit, None)?;
     }
-    println!("installed {SERVICE_NAME}: {} instance (distro {distro}, user {user})", exe.display());
+    println!(
+        "installed {SERVICE_NAME}: {} instance (distro {distro}, user {user})",
+        exe.display()
+    );
     if start || was_running {
         start_service(&scm, SERVICE_NAME)?;
     }
@@ -139,12 +172,21 @@ fn stop_detached() {
 }
 
 fn stop_quiet(name: &str) {
-    let Ok(scm) = ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT) else { return };
-    let Ok(s) = scm.open_service(name, ServiceAccess::STOP | ServiceAccess::QUERY_STATUS) else { return };
-    if s.query_status().is_ok_and(|st| st.current_state != ServiceState::Stopped) {
+    let Ok(scm) = ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT)
+    else {
+        return;
+    };
+    let Ok(s) = scm.open_service(name, ServiceAccess::STOP | ServiceAccess::QUERY_STATUS) else {
+        return;
+    };
+    if s.query_status()
+        .is_ok_and(|st| st.current_state != ServiceState::Stopped)
+    {
         let _ = s.stop();
         for _ in 0..60 {
-            if s.query_status().is_ok_and(|st| st.current_state == ServiceState::Stopped) {
+            if s.query_status()
+                .is_ok_and(|st| st.current_state == ServiceState::Stopped)
+            {
                 break;
             }
             std::thread::sleep(Duration::from_millis(500));
@@ -171,7 +213,12 @@ pub fn uninstall() -> Result<()> {
     Ok(())
 }
 
-fn export_one(scm: &ServiceManager, exe: &std::path::Path, unit: &str, description: Option<&str>) -> Result<()> {
+fn export_one(
+    scm: &ServiceManager,
+    exe: &std::path::Path,
+    unit: &str,
+    description: Option<&str>,
+) -> Result<()> {
     let name = windows_name(unit);
     let svc = upsert(
         scm,
@@ -188,7 +235,9 @@ fn export_one(scm: &ServiceManager, exe: &std::path::Path, unit: &str, descripti
             account_password: None,
         },
     )?;
-    let d = description.filter(|d| !d.is_empty()).unwrap_or("systemd unit of the Bun OS WSL distro");
+    let d = description
+        .filter(|d| !d.is_empty())
+        .unwrap_or("systemd unit of the Bun OS WSL distro");
     svc.set_description(format!("{d} ({unit} in the Bun OS distro, through {SERVICE_NAME}). Start/stop = systemctl start/stop."))?;
     eventlog::register_source_at(&name, exe)?;
     config::add_unit(unit)?;
@@ -209,7 +258,10 @@ pub fn export(units: &[String]) -> Result<()> {
     let cfg = Config::load()?;
     let rows = list_rows(&Runner::Current, &cfg.distro).unwrap_or_default();
     for u in units {
-        let desc = rows.iter().find(|r| &r.unit == u).map(|r| r.description.as_str());
+        let desc = rows
+            .iter()
+            .find(|r| &r.unit == u)
+            .map(|r| r.description.as_str());
         export_one(&scm, &exe, u, desc)?;
         println!("exported {u} as {}", windows_name(u));
     }
@@ -233,8 +285,30 @@ pub fn unexport(units: &[String]) -> Result<()> {
 
 fn list_rows(runner: &Runner, distro: &str) -> Result<Vec<UnitRow>> {
     let t = Duration::from_secs(60);
-    let units = runner.exec_root(distro, &["systemctl", "list-units", "--type=service", "--all", "--no-legend", "--plain", "--no-pager"], t)?;
-    let files = runner.exec_root(distro, &["systemctl", "list-unit-files", "--type=service", "--no-legend", "--no-pager"], t)?;
+    let units = runner.exec_root(
+        distro,
+        &[
+            "systemctl",
+            "list-units",
+            "--type=service",
+            "--all",
+            "--no-legend",
+            "--plain",
+            "--no-pager",
+        ],
+        t,
+    )?;
+    let files = runner.exec_root(
+        distro,
+        &[
+            "systemctl",
+            "list-unit-files",
+            "--type=service",
+            "--no-legend",
+            "--no-pager",
+        ],
+        t,
+    )?;
     Ok(parse_list(&units, &files))
 }
 
@@ -254,7 +328,9 @@ fn windows_state(scm: Option<&ServiceManager>, name: &str) -> Option<String> {
 /// Read-only: every service unit of the distro, with its Windows mirror if it has one. Runs as the calling user, so it
 /// starts the distro like any wsl.exe call when it is not running.
 pub fn units(distro: Option<String>, json: bool, all: bool) -> Result<()> {
-    let distro = distro.or_else(|| Config::load().ok().map(|c| c.distro)).unwrap_or_else(|| "bunos".into());
+    let distro = distro
+        .or_else(|| Config::load().ok().map(|c| c.distro))
+        .unwrap_or_else(|| "bunos".into());
     let rows = list_rows(&Runner::Current, &distro)?;
     let scm = ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT).ok();
     let mirrored = config::units();
@@ -264,14 +340,21 @@ pub fn units(distro: Option<String>, json: bool, all: bool) -> Result<()> {
         .map(|r| {
             let name = windows_name(&r.unit);
             let state = windows_state(scm.as_ref(), &name);
-            Row { windows_service: state.as_ref().map(|_| name), windows_state: state, unit: r }
+            Row {
+                windows_service: state.as_ref().map(|_| name),
+                windows_state: state,
+                unit: r,
+            }
         })
         .collect();
     if json {
         println!("{}", serde_json::to_string_pretty(&out)?);
         return Ok(());
     }
-    println!("{:<44} {:<9} {:<10} {:<10} {:<16} {}", "UNIT", "ACTIVE", "SUB", "ENABLED", "WINDOWS", "DESCRIPTION");
+    println!(
+        "{:<44} {:<9} {:<10} {:<10} {:<16} DESCRIPTION",
+        "UNIT", "ACTIVE", "SUB", "ENABLED", "WINDOWS"
+    );
     for r in out {
         println!(
             "{:<44} {:<9} {:<10} {:<10} {:<16} {}",

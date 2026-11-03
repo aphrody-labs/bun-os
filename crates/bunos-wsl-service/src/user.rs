@@ -20,17 +20,24 @@ use std::{
     time::Duration,
 };
 use windows_sys::Win32::{
-    Foundation::{CloseHandle, GetLastError, HANDLE, HANDLE_FLAG_INHERIT, INVALID_HANDLE_VALUE, LUID, SetHandleInformation, WAIT_OBJECT_0},
-    Security::{
-        AllocateLocallyUniqueId, Authentication::Identity::*, QUOTA_LIMITS, SECURITY_ATTRIBUTES, TOKEN_SOURCE,
+    Foundation::{
+        CloseHandle, GetLastError, HANDLE, HANDLE_FLAG_INHERIT, INVALID_HANDLE_VALUE, LUID,
+        SetHandleInformation, WAIT_OBJECT_0,
     },
-    Storage::FileSystem::{CreateFileW, FILE_GENERIC_READ, FILE_SHARE_READ, FILE_SHARE_WRITE, OPEN_EXISTING},
+    Security::{
+        AllocateLocallyUniqueId, Authentication::Identity::*, QUOTA_LIMITS, SECURITY_ATTRIBUTES,
+        TOKEN_SOURCE,
+    },
+    Storage::FileSystem::{
+        CreateFileW, FILE_GENERIC_READ, FILE_SHARE_READ, FILE_SHARE_WRITE, OPEN_EXISTING,
+    },
     System::{
         Environment::{CreateEnvironmentBlock, DestroyEnvironmentBlock},
         Pipes::CreatePipe,
         Threading::{
-            CREATE_NO_WINDOW, CREATE_UNICODE_ENVIRONMENT, CreateProcessAsUserW, CreateProcessW, GetExitCodeProcess, INFINITE,
-            PROCESS_INFORMATION, STARTF_USESTDHANDLES, STARTUPINFOW, TerminateProcess, WaitForSingleObject,
+            CREATE_NO_WINDOW, CREATE_UNICODE_ENVIRONMENT, CreateProcessAsUserW, CreateProcessW,
+            GetExitCodeProcess, INFINITE, PROCESS_INFORMATION, STARTF_USESTDHANDLES, STARTUPINFOW,
+            TerminateProcess, WaitForSingleObject,
         },
     },
     UI::Shell::{GetUserProfileDirectoryW, LoadUserProfileW, PROFILEINFOW, UnloadUserProfile},
@@ -62,20 +69,36 @@ impl UserSession {
     pub fn s4u(account: &str) -> Result<Self> {
         let (domain, user) = match account.split_once('\\') {
             Some((d, u)) if d != "." => (d.to_string(), u.to_string()),
-            Some((_, u)) => (std::env::var("COMPUTERNAME").unwrap_or_default(), u.to_string()),
-            None => (std::env::var("COMPUTERNAME").unwrap_or_default(), account.to_string()),
+            Some((_, u)) => (
+                std::env::var("COMPUTERNAME").unwrap_or_default(),
+                u.to_string(),
+            ),
+            None => (
+                std::env::var("COMPUTERNAME").unwrap_or_default(),
+                account.to_string(),
+            ),
         };
         unsafe {
             let name = b"BunOSWsl";
-            let process_name = LSA_STRING { Length: name.len() as u16, MaximumLength: name.len() as u16, Buffer: name.as_ptr() as *mut u8 };
+            let process_name = LSA_STRING {
+                Length: name.len() as u16,
+                MaximumLength: name.len() as u16,
+                Buffer: name.as_ptr() as *mut u8,
+            };
             let mut lsa: HANDLE = null_mut();
             let mut mode = 0u32;
             let st = LsaRegisterLogonProcess(&process_name, &mut lsa, &mut mode);
             if st != 0 {
-                bail!("LsaRegisterLogonProcess: NTSTATUS {st:#x} (needs SeTcbPrivilege: run as LocalSystem)");
+                bail!(
+                    "LsaRegisterLogonProcess: NTSTATUS {st:#x} (needs SeTcbPrivilege: run as LocalSystem)"
+                );
             }
             let pkg_name = b"MICROSOFT_AUTHENTICATION_PACKAGE_V1_0";
-            let pkg_str = LSA_STRING { Length: pkg_name.len() as u16, MaximumLength: pkg_name.len() as u16, Buffer: pkg_name.as_ptr() as *mut u8 };
+            let pkg_str = LSA_STRING {
+                Length: pkg_name.len() as u16,
+                MaximumLength: pkg_name.len() as u16,
+                Buffer: pkg_name.as_ptr() as *mut u8,
+            };
             let mut pkg = 0u32;
             let st = LsaLookupAuthenticationPackage(lsa, &pkg_str, &mut pkg);
             if st != 0 {
@@ -96,17 +119,34 @@ impl UserSession {
             let logon = base as *mut MSV1_0_S4U_LOGON;
             (*logon).MessageType = MsV1_0S4ULogon;
             (*logon).Flags = 0;
-            (*logon).UserPrincipalName = LSA_UNICODE_STRING { Length: (u16user.len() * 2) as u16, MaximumLength: (u16user.len() * 2) as u16, Buffer: pu };
-            (*logon).DomainName = LSA_UNICODE_STRING { Length: (u16dom.len() * 2) as u16, MaximumLength: (u16dom.len() * 2) as u16, Buffer: pd };
+            (*logon).UserPrincipalName = LSA_UNICODE_STRING {
+                Length: (u16user.len() * 2) as u16,
+                MaximumLength: (u16user.len() * 2) as u16,
+                Buffer: pu,
+            };
+            (*logon).DomainName = LSA_UNICODE_STRING {
+                Length: (u16dom.len() * 2) as u16,
+                MaximumLength: (u16dom.len() * 2) as u16,
+                Buffer: pd,
+            };
 
-            let mut source = TOKEN_SOURCE { SourceName: [0; 8], SourceIdentifier: LUID { LowPart: 0, HighPart: 0 } };
+            let mut source = TOKEN_SOURCE {
+                SourceName: [0; 8],
+                SourceIdentifier: LUID {
+                    LowPart: 0,
+                    HighPart: 0,
+                },
+            };
             for (d, s) in source.SourceName.iter_mut().zip(b"BunOSWsl") {
                 *d = *s as i8;
             }
             AllocateLocallyUniqueId(&mut source.SourceIdentifier);
             let mut profile_buf: *mut c_void = null_mut();
             let mut profile_len = 0u32;
-            let mut luid = LUID { LowPart: 0, HighPart: 0 };
+            let mut luid = LUID {
+                LowPart: 0,
+                HighPart: 0,
+            };
             let mut token: HANDLE = null_mut();
             let mut quotas: QUOTA_LIMITS = std::mem::zeroed();
             let mut sub = 0i32;
@@ -114,8 +154,20 @@ impl UserSession {
             let mut st = 0;
             for kind in [SECURITY_LOGON_TYPE::Batch, SECURITY_LOGON_TYPE::Network] {
                 st = LsaLogonUser(
-                    lsa, &process_name, kind, pkg, base as *const c_void, total as u32, null(), &source, &mut profile_buf,
-                    &mut profile_len, &mut luid, &mut token, &mut quotas, &mut sub,
+                    lsa,
+                    &process_name,
+                    kind,
+                    pkg,
+                    base as *const c_void,
+                    total as u32,
+                    null(),
+                    &source,
+                    &mut profile_buf,
+                    &mut profile_len,
+                    &mut luid,
+                    &mut token,
+                    &mut quotas,
+                    &mut sub,
                 );
                 if !profile_buf.is_null() {
                     LsaFreeReturnBuffer(profile_buf);
@@ -134,7 +186,12 @@ impl UserSession {
             }
 
             let mut uname = wide(&user);
-            let mut pi = PROFILEINFOW { dwSize: size_of::<PROFILEINFOW>() as u32, dwFlags: 1 /* PI_NOUI */, lpUserName: uname.as_mut_ptr(), ..Default::default() };
+            let mut pi = PROFILEINFOW {
+                dwSize: size_of::<PROFILEINFOW>() as u32,
+                dwFlags: 1, /* PI_NOUI */
+                lpUserName: uname.as_mut_ptr(),
+                ..Default::default()
+            };
             if LoadUserProfileW(token, &mut pi) == 0 {
                 let e = GetLastError();
                 CloseHandle(token);
@@ -150,7 +207,13 @@ impl UserSession {
             if GetUserProfileDirectoryW(token, dir.as_mut_ptr(), &mut len) == 0 {
                 dir = wide("C:\\");
             }
-            Ok(Self { token, profile: pi.hProfile, env, profile_dir: dir, account: format!("{domain}\\{user}") })
+            Ok(Self {
+                token,
+                profile: pi.hProfile,
+                env,
+                profile_dir: dir,
+                account: format!("{domain}\\{user}"),
+            })
         }
     }
 }
@@ -180,7 +243,9 @@ unsafe impl Send for Proc {}
 impl Proc {
     /// Waits up to `timeout` (None = forever); returns the exit code, or None on timeout.
     pub fn wait(&self, timeout: Option<Duration>) -> Option<u32> {
-        let ms = timeout.map(|d| d.as_millis().min(u32::MAX as u128 - 1) as u32).unwrap_or(INFINITE);
+        let ms = timeout
+            .map(|d| d.as_millis().min(u32::MAX as u128 - 1) as u32)
+            .unwrap_or(INFINITE);
         unsafe {
             if WaitForSingleObject(self.process, ms) != WAIT_OBJECT_0 {
                 return None;
@@ -225,28 +290,67 @@ impl Runner {
         let exe_w = wide(&exe);
         let _guard = SPAWN.lock().unwrap_or_else(|e| e.into_inner());
         unsafe {
-            let sa = SECURITY_ATTRIBUTES { nLength: size_of::<SECURITY_ATTRIBUTES>() as u32, lpSecurityDescriptor: null_mut(), bInheritHandle: 1 };
-            let (mut out_r, mut out_w, mut err_r, mut err_w): (HANDLE, HANDLE, HANDLE, HANDLE) = (null_mut(), null_mut(), null_mut(), null_mut());
-            if CreatePipe(&mut out_r, &mut out_w, &sa, 0) == 0 || CreatePipe(&mut err_r, &mut err_w, &sa, 0) == 0 {
+            let sa = SECURITY_ATTRIBUTES {
+                nLength: size_of::<SECURITY_ATTRIBUTES>() as u32,
+                lpSecurityDescriptor: null_mut(),
+                bInheritHandle: 1,
+            };
+            let (mut out_r, mut out_w, mut err_r, mut err_w): (HANDLE, HANDLE, HANDLE, HANDLE) =
+                (null_mut(), null_mut(), null_mut(), null_mut());
+            if CreatePipe(&mut out_r, &mut out_w, &sa, 0) == 0
+                || CreatePipe(&mut err_r, &mut err_w, &sa, 0) == 0
+            {
                 bail!("CreatePipe: Win32 {}", GetLastError());
             }
             SetHandleInformation(out_r, HANDLE_FLAG_INHERIT, 0);
             SetHandleInformation(err_r, HANDLE_FLAG_INHERIT, 0);
-            let nul = CreateFileW(wide("NUL").as_ptr(), FILE_GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa, OPEN_EXISTING, 0, null_mut());
+            let nul = CreateFileW(
+                wide("NUL").as_ptr(),
+                FILE_GENERIC_READ,
+                FILE_SHARE_READ | FILE_SHARE_WRITE,
+                &sa,
+                OPEN_EXISTING,
+                0,
+                null_mut(),
+            );
             let si = STARTUPINFOW {
                 cb: size_of::<STARTUPINFOW>() as u32,
                 dwFlags: STARTF_USESTDHANDLES,
-                hStdInput: if nul == INVALID_HANDLE_VALUE { null_mut() } else { nul },
+                hStdInput: if nul == INVALID_HANDLE_VALUE {
+                    null_mut()
+                } else {
+                    nul
+                },
                 hStdOutput: out_w,
                 hStdError: err_w,
                 ..Default::default()
             };
             let mut pi: PROCESS_INFORMATION = std::mem::zeroed();
             let ok = match self {
-                Runner::Current => CreateProcessW(exe_w.as_ptr(), cmd.as_mut_ptr(), null(), null(), 1, CREATE_NO_WINDOW, null(), null(), &si, &mut pi),
+                Runner::Current => CreateProcessW(
+                    exe_w.as_ptr(),
+                    cmd.as_mut_ptr(),
+                    null(),
+                    null(),
+                    1,
+                    CREATE_NO_WINDOW,
+                    null(),
+                    null(),
+                    &si,
+                    &mut pi,
+                ),
                 Runner::As(s) => CreateProcessAsUserW(
-                    s.token, exe_w.as_ptr(), cmd.as_mut_ptr(), null(), null(), 1, CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT, s.env,
-                    s.profile_dir.as_ptr(), &si, &mut pi,
+                    s.token,
+                    exe_w.as_ptr(),
+                    cmd.as_mut_ptr(),
+                    null(),
+                    null(),
+                    1,
+                    CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT,
+                    s.env,
+                    s.profile_dir.as_ptr(),
+                    &si,
+                    &mut pi,
                 ),
             };
             let err = GetLastError();
@@ -296,11 +400,24 @@ impl Runner {
 
     /// `wsl.exe -d <distro> -u root --exec <argv>`; fails with stderr when the exit code is non-zero.
     pub fn exec_root(&self, distro: &str, argv: &[&str], timeout: Duration) -> Result<String> {
-        let mut args = vec!["-d".to_string(), distro.to_string(), "-u".into(), "root".into(), "--exec".into()];
+        let mut args = vec![
+            "-d".to_string(),
+            distro.to_string(),
+            "-u".into(),
+            "root".into(),
+            "--exec".into(),
+        ];
         args.extend(argv.iter().map(|s| s.to_string()));
-        let (code, out, err) = self.output(&args, timeout).with_context(|| format!("wsl.exe -d {distro} --exec {}", argv.join(" ")))?;
+        let (code, out, err) = self
+            .output(&args, timeout)
+            .with_context(|| format!("wsl.exe -d {distro} --exec {}", argv.join(" ")))?;
         if code != 0 {
-            bail!("{} exited {code}: {}{}", argv.join(" "), err.trim(), out.trim());
+            bail!(
+                "{} exited {code}: {}{}",
+                argv.join(" "),
+                err.trim(),
+                out.trim()
+            );
         }
         Ok(out)
     }

@@ -18,7 +18,10 @@ use std::{
 };
 use windows_service::{
     define_windows_service,
-    service::{ServiceControl, ServiceControlAccept, ServiceExitCode, ServiceState, ServiceStatus, ServiceType},
+    service::{
+        ServiceControl, ServiceControlAccept, ServiceExitCode, ServiceState, ServiceStatus,
+        ServiceType,
+    },
     service_control_handler::{self, ServiceControlHandlerResult, ServiceStatusHandle},
     service_dispatcher,
 };
@@ -37,8 +40,18 @@ const EXIT_FAILED: u32 = 1;
 const EXIT_START: u32 = 2;
 const EXIT_INSTANCE_GONE: u32 = 3;
 
-fn set(h: &ServiceStatusHandle, state: ServiceState, exit: ServiceExitCode, checkpoint: u32, wait: Duration) {
-    let controls = if state == ServiceState::Running { ServiceControlAccept::STOP | ServiceControlAccept::SHUTDOWN } else { ServiceControlAccept::empty() };
+fn set(
+    h: &ServiceStatusHandle,
+    state: ServiceState,
+    exit: ServiceExitCode,
+    checkpoint: u32,
+    wait: Duration,
+) {
+    let controls = if state == ServiceState::Running {
+        ServiceControlAccept::STOP | ServiceControlAccept::SHUTDOWN
+    } else {
+        ServiceControlAccept::empty()
+    };
     let _ = h.set_service_status(ServiceStatus {
         service_type: ServiceType::OWN_PROCESS,
         current_state: state,
@@ -91,8 +104,19 @@ fn runner(cfg: &Config, cache: &mut Option<Runner>) -> Result<Runner> {
     Ok(r)
 }
 
-fn run(h: &ServiceStatusHandle, log: &EventLog, unit: &str, rx: mpsc::Receiver<Msg>) -> ServiceExitCode {
-    set(h, ServiceState::StartPending, ServiceExitCode::NO_ERROR, 1, Duration::from_secs(120));
+fn run(
+    h: &ServiceStatusHandle,
+    log: &EventLog,
+    unit: &str,
+    rx: mpsc::Receiver<Msg>,
+) -> ServiceExitCode {
+    set(
+        h,
+        ServiceState::StartPending,
+        ServiceExitCode::NO_ERROR,
+        1,
+        Duration::from_secs(120),
+    );
     let cfg = match Config::load() {
         Ok(c) => c,
         Err(e) => {
@@ -102,7 +126,8 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, unit: &str, rx: mpsc::Receiver<M
     };
     let mut cache = None;
     let fresh = |age: u64| age < u64::from(cfg.state_period) * 1000 + 5000;
-    let already = config::read_unit_state(unit).is_some_and(|(s, age)| s.is_running() && fresh(age));
+    let already =
+        config::read_unit_state(unit).is_some_and(|(s, age)| s.is_running() && fresh(age));
     if !already {
         let r = match runner(&cfg, &mut cache) {
             Ok(r) => r,
@@ -111,21 +136,45 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, unit: &str, rx: mpsc::Receiver<M
                 return ServiceExitCode::ServiceSpecific(EXIT_START);
             }
         };
-        if let Err(e) = r.exec_root(&cfg.distro, &["systemctl", "start", "--", unit], Duration::from_secs(110)) {
+        if let Err(e) = r.exec_root(
+            &cfg.distro,
+            &["systemctl", "start", "--", unit],
+            Duration::from_secs(110),
+        ) {
             log.error(&format!("systemctl start {unit}: {e:#}"));
             return ServiceExitCode::ServiceSpecific(EXIT_START);
         }
     }
-    set(h, ServiceState::Running, ServiceExitCode::NO_ERROR, 0, Duration::ZERO);
+    set(
+        h,
+        ServiceState::Running,
+        ServiceExitCode::NO_ERROR,
+        0,
+        Duration::ZERO,
+    );
     let started = Instant::now();
     let mut down = 0;
     loop {
         match rx.recv_timeout(Duration::from_secs(1)) {
             // Install/uninstall stop the services to replace or remove the binary: leave the unit running.
-            Ok(Msg::Stop) if config::get_status("Detach").as_deref() == Some("1") => return ServiceExitCode::NO_ERROR,
+            Ok(Msg::Stop) if config::get_status("Detach").as_deref() == Some("1") => {
+                return ServiceExitCode::NO_ERROR;
+            }
             Ok(Msg::Stop) => {
-                set(h, ServiceState::StopPending, ServiceExitCode::NO_ERROR, 1, Duration::from_secs(100));
-                match runner(&cfg, &mut cache).and_then(|r| r.exec_root(&cfg.distro, &["systemctl", "stop", "--", unit], Duration::from_secs(95))) {
+                set(
+                    h,
+                    ServiceState::StopPending,
+                    ServiceExitCode::NO_ERROR,
+                    1,
+                    Duration::from_secs(100),
+                );
+                match runner(&cfg, &mut cache).and_then(|r| {
+                    r.exec_root(
+                        &cfg.distro,
+                        &["systemctl", "stop", "--", unit],
+                        Duration::from_secs(95),
+                    )
+                }) {
                     Ok(_) => return ServiceExitCode::NO_ERROR,
                     Err(e) => {
                         log.error(&format!("systemctl stop {unit}: {e:#}"));
@@ -155,7 +204,11 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, unit: &str, rx: mpsc::Receiver<M
                             crate::eventlog::ID_LIFECYCLE,
                             &format!("{unit} is {} ({}) in the distro; the Windows service stops with it.", s.active, s.result),
                         );
-                        return if failed { ServiceExitCode::ServiceSpecific(EXIT_FAILED) } else { ServiceExitCode::NO_ERROR };
+                        return if failed {
+                            ServiceExitCode::ServiceSpecific(EXIT_FAILED)
+                        } else {
+                            ServiceExitCode::NO_ERROR
+                        };
                     }
                 }
             }

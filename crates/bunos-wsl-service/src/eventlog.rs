@@ -6,7 +6,8 @@ use anyhow::Result;
 use windows_sys::Win32::{
     Foundation::HANDLE,
     System::EventLog::{
-        DeregisterEventSource, EVENTLOG_ERROR_TYPE, EVENTLOG_INFORMATION_TYPE, EVENTLOG_WARNING_TYPE, RegisterEventSourceW, ReportEventW,
+        DeregisterEventSource, EVENTLOG_ERROR_TYPE, EVENTLOG_INFORMATION_TYPE,
+        EVENTLOG_WARNING_TYPE, RegisterEventSourceW, ReportEventW,
     },
 };
 use winreg::{RegKey, enums::*};
@@ -77,7 +78,17 @@ impl EventLog {
             Level::Error => EVENTLOG_ERROR_TYPE,
         };
         unsafe {
-            ReportEventW(self.0, kind, 0, id, std::ptr::null_mut(), 1, 0, strings.as_ptr(), std::ptr::null());
+            ReportEventW(
+                self.0,
+                kind,
+                0,
+                id,
+                std::ptr::null_mut(),
+                1,
+                0,
+                strings.as_ptr(),
+                std::ptr::null(),
+            );
         }
     }
 

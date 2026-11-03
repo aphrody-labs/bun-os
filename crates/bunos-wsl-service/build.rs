@@ -23,7 +23,10 @@ fn main() {
     table.extend_from_slice(&16u32.to_le_bytes());
     for _ in 0..count {
         // MESSAGE_RESOURCE_ENTRY {Length, Flags = 1 (UTF-16), Text}, Length padded to a multiple of 4.
-        let text: Vec<u8> = "%1\r\n\0".encode_utf16().flat_map(u16::to_le_bytes).collect();
+        let text: Vec<u8> = "%1\r\n\0"
+            .encode_utf16()
+            .flat_map(u16::to_le_bytes)
+            .collect();
         let len = (4 + text.len()).next_multiple_of(4);
         table.extend_from_slice(&(len as u16).to_le_bytes());
         table.extend_from_slice(&1u16.to_le_bytes());
@@ -35,5 +38,7 @@ fn main() {
     let rc = out.join("messages.rc");
     let bin_path = bin.display().to_string().replace('\\', "\\\\");
     fs::write(&rc, format!("1 MESSAGETABLE \"{bin_path}\"\n")).unwrap();
-    embed_resource::compile(&rc, embed_resource::NONE).manifest_optional().unwrap();
+    embed_resource::compile(&rc, embed_resource::NONE)
+        .manifest_optional()
+        .unwrap();
 }

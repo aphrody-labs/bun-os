@@ -20,7 +20,9 @@ pub fn valid_unit(unit: &str) -> bool {
     !unit.is_empty()
         && unit.len() <= 255
         && unit.contains('.')
-        && unit.chars().all(|c| c.is_ascii_alphanumeric() || "@._-:".contains(c))
+        && unit
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || "@._-:".contains(c))
 }
 
 /// The script run as root in the distro by the instance service, through one long-lived `wsl.exe --exec`.
@@ -34,7 +36,10 @@ pub fn monitor_script(units: &[String], period: u32) -> String {
          echo READY $(systemctl is-system-running 2>/dev/null) $(cut -d' ' -f1 /proc/uptime); ",
     );
     if units.is_empty() {
-        s.push_str(&format!("while :; do echo END; sleep {}; done", period.max(1) * 15));
+        s.push_str(&format!(
+            "while :; do echo END; sleep {}; done",
+            period.max(1) * 15
+        ));
         return s;
     }
     let list = units.join(" ");
@@ -60,7 +65,10 @@ pub struct UnitState {
 
 impl UnitState {
     pub fn is_running(&self) -> bool {
-        matches!(self.active.as_str(), "active" | "reloading" | "activating" | "deactivating")
+        matches!(
+            self.active.as_str(),
+            "active" | "reloading" | "activating" | "deactivating"
+        )
     }
 }
 
@@ -78,7 +86,9 @@ pub fn parse_show(text: &str) -> Vec<UnitState> {
             }
             continue;
         }
-        let Some((k, v)) = line.split_once('=') else { continue };
+        let Some((k, v)) = line.split_once('=') else {
+            continue;
+        };
         any = true;
         match k {
             "Id" => cur.id = v.to_string(),
@@ -135,19 +145,32 @@ fn parse_journal(line: &str) -> Option<JournalEntry> {
         match v.get(k)? {
             serde_json::Value::String(s) => Some(s.clone()),
             // journalctl emits non-UTF-8 messages as byte arrays.
-            serde_json::Value::Array(a) => {
-                Some(String::from_utf8_lossy(&a.iter().filter_map(|b| b.as_u64().map(|b| b as u8)).collect::<Vec<_>>()).into_owned())
-            }
+            serde_json::Value::Array(a) => Some(
+                String::from_utf8_lossy(
+                    &a.iter()
+                        .filter_map(|b| b.as_u64().map(|b| b as u8))
+                        .collect::<Vec<_>>(),
+                )
+                .into_owned(),
+            ),
             other => Some(other.to_string()),
         }
     };
-    let units = [field("_SYSTEMD_UNIT"), field("UNIT")].into_iter().flatten().filter(|u| u != "init.scope").collect();
+    let units = [field("_SYSTEMD_UNIT"), field("UNIT")]
+        .into_iter()
+        .flatten()
+        .filter(|u| u != "init.scope")
+        .collect();
     let priority = field("PRIORITY").and_then(|p| p.parse().ok()).unwrap_or(6);
     let mut message = field("MESSAGE").unwrap_or_default();
     if let Some(id) = field("SYSLOG_IDENTIFIER") {
         message = format!("{id}: {message}");
     }
-    Some(JournalEntry { units, priority, message })
+    Some(JournalEntry {
+        units,
+        priority,
+        message,
+    })
 }
 
 /// A row of `systemctl list-units --all` joined with `list-unit-files`.
@@ -175,7 +198,9 @@ pub fn parse_list(units: &str, files: &str) -> Vec<UnitRow> {
     for l in units.lines() {
         let l = l.trim_start_matches(['●', '*', ' ']);
         let mut it = l.split_whitespace();
-        let (Some(unit), Some(load), Some(active), Some(sub)) = (it.next(), it.next(), it.next(), it.next()) else {
+        let (Some(unit), Some(load), Some(active), Some(sub)) =
+            (it.next(), it.next(), it.next(), it.next())
+        else {
             continue;
         };
         let description = it.collect::<Vec<_>>().join(" ");
@@ -246,10 +271,19 @@ pub fn command_line(program: &str, args: &[String]) -> String {
 
 /// Decodes wsl.exe's own messages, which are UTF-16LE (Linux output relayed by `--exec` is raw UTF-8).
 pub fn decode_wsl(bytes: &[u8]) -> String {
-    let utf16 = bytes.len() >= 2 && bytes.len() % 2 == 0 && bytes.iter().skip(1).step_by(2).filter(|b| **b == 0).count() * 2 >= bytes.len() / 2;
+    let utf16 = bytes.len() >= 2
+        && bytes.len().is_multiple_of(2)
+        && bytes.iter().skip(1).step_by(2).filter(|b| **b == 0).count() * 2 >= bytes.len() / 2;
     if utf16 {
-        let w: Vec<u16> = bytes.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect();
-        String::from_utf16_lossy(&w).trim_start_matches('\u{feff}').to_string()
+        let w: Vec<u16> = bytes
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|c| u16::from_le_bytes(*c))
+            .collect();
+        String::from_utf16_lossy(&w)
+            .trim_start_matches('\u{feff}')
+            .to_string()
     } else {
         String::from_utf8_lossy(bytes).into_owned()
     }
@@ -290,10 +324,24 @@ mod tests {
 
     #[test]
     fn lines() {
-        assert_eq!(classify("READY running 1.84\n"), Line::Ready { state: "running".into(), uptime_s: 1.84 });
-        assert_eq!(classify("READY degraded"), Line::Ready { state: "degraded".into(), uptime_s: 0.0 });
+        assert_eq!(
+            classify("READY running 1.84\n"),
+            Line::Ready {
+                state: "running".into(),
+                uptime_s: 1.84
+            }
+        );
+        assert_eq!(
+            classify("READY degraded"),
+            Line::Ready {
+                state: "degraded".into(),
+                uptime_s: 0.0
+            }
+        );
         assert_eq!(classify("END\r"), Line::End);
-        match classify(r#"{"MESSAGE":"hello","PRIORITY":"3","_SYSTEMD_UNIT":"docker.service","SYSLOG_IDENTIFIER":"dockerd"}"#) {
+        match classify(
+            r#"{"MESSAGE":"hello","PRIORITY":"3","_SYSTEMD_UNIT":"docker.service","SYSLOG_IDENTIFIER":"dockerd"}"#,
+        ) {
             Line::Journal(e) => {
                 assert_eq!(e.units, ["docker.service"]);
                 assert_eq!(e.priority, 3);
@@ -302,10 +350,15 @@ mod tests {
             other => panic!("{other:?}"),
         }
         match classify(r#"{"MESSAGE":[104,105],"UNIT":"a.service"}"#) {
-            Line::Journal(e) => assert_eq!((e.message.as_str(), e.priority, e.units.as_slice()), ("hi", 6, ["a.service".to_string()].as_slice())),
+            Line::Journal(e) => assert_eq!(
+                (e.message.as_str(), e.priority, e.units.as_slice()),
+                ("hi", 6, ["a.service".to_string()].as_slice())
+            ),
             other => panic!("{other:?}"),
         }
-        match classify(r#"{"MESSAGE":"Stopped Docker.","_SYSTEMD_UNIT":"init.scope","UNIT":"docker.service","SYSLOG_IDENTIFIER":"systemd"}"#) {
+        match classify(
+            r#"{"MESSAGE":"Stopped Docker.","_SYSTEMD_UNIT":"init.scope","UNIT":"docker.service","SYSLOG_IDENTIFIER":"systemd"}"#,
+        ) {
             Line::Journal(e) => assert_eq!(e.units, ["docker.service"]),
             other => panic!("{other:?}"),
         }
@@ -316,7 +369,10 @@ mod tests {
         let units = "  docker.service loaded active running Docker Application Container Engine\n● foo.service loaded failed failed Foo\n";
         let files = "docker.service enabled enabled\nfoo.service disabled enabled\nbar.service disabled enabled\ngetty@.service enabled enabled\n";
         let rows = parse_list(units, files);
-        assert_eq!(rows.iter().map(|r| r.unit.as_str()).collect::<Vec<_>>(), ["bar.service", "docker.service", "foo.service"]);
+        assert_eq!(
+            rows.iter().map(|r| r.unit.as_str()).collect::<Vec<_>>(),
+            ["bar.service", "docker.service", "foo.service"]
+        );
         assert_eq!(rows[1].description, "Docker Application Container Engine");
         assert_eq!(rows[0].load, "not-loaded");
         assert_eq!(rows[2].active, "failed");
@@ -324,7 +380,17 @@ mod tests {
 
     #[test]
     fn quoting() {
-        let c = command_line("wsl.exe", &["-d".into(), "bunos".into(), "sh -c 'a b'".into(), "x\"y".into(), "a\\".into(), "".into()]);
+        let c = command_line(
+            "wsl.exe",
+            &[
+                "-d".into(),
+                "bunos".into(),
+                "sh -c 'a b'".into(),
+                "x\"y".into(),
+                "a\\".into(),
+                "".into(),
+            ],
+        );
         assert_eq!(c, r#"wsl.exe -d bunos "sh -c 'a b'" "x\"y" a\ """#);
         let mut s = String::new();
         quote_arg("a b\\", &mut s);
@@ -333,7 +399,10 @@ mod tests {
 
     #[test]
     fn wsl_text() {
-        let b: Vec<u8> = "Erreur\r\n".encode_utf16().flat_map(u16::to_le_bytes).collect();
+        let b: Vec<u8> = "Erreur\r\n"
+            .encode_utf16()
+            .flat_map(u16::to_le_bytes)
+            .collect();
         assert_eq!(decode_wsl(&b), "Erreur\r\n");
         assert_eq!(decode_wsl(b"plain"), "plain");
     }

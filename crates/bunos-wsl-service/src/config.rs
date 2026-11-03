@@ -14,7 +14,10 @@ pub fn params_path() -> String {
 }
 
 pub fn now_ms() -> u64 {
-    SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0)
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
 }
 
 #[derive(Debug, Clone)]
@@ -29,12 +32,20 @@ impl Config {
     pub fn load() -> Result<Self> {
         let k = RegKey::predef(HKEY_LOCAL_MACHINE)
             .open_subkey(params_path())
-            .with_context(|| format!("HKLM\\{} missing: run `bunos-wsl-service install`", params_path()))?;
+            .with_context(|| {
+                format!(
+                    "HKLM\\{} missing: run `bunos-wsl-service install`",
+                    params_path()
+                )
+            })?;
         Ok(Self {
             distro: k.get_value("Distro").unwrap_or_else(|_| "bunos".into()),
             user: k.get_value("User").context("Parameters\\User is not set")?,
             terminate_on_stop: k.get_value::<u32, _>("TerminateOnStop").unwrap_or(1) != 0,
-            state_period: k.get_value::<u32, _>("StatePeriod").unwrap_or(2).clamp(1, 60),
+            state_period: k
+                .get_value::<u32, _>("StatePeriod")
+                .unwrap_or(2)
+                .clamp(1, 60),
         })
     }
 
@@ -57,12 +68,17 @@ pub fn set_status(name: &str, value: &str) {
 }
 
 pub fn get_status(name: &str) -> Option<String> {
-    RegKey::predef(HKEY_LOCAL_MACHINE).open_subkey(params_path()).ok()?.get_value(name).ok()
+    RegKey::predef(HKEY_LOCAL_MACHINE)
+        .open_subkey(params_path())
+        .ok()?
+        .get_value(name)
+        .ok()
 }
 
 /// Mirrored units, sorted.
 pub fn units() -> Vec<String> {
-    let Ok(k) = RegKey::predef(HKEY_LOCAL_MACHINE).open_subkey(format!(r"{}\Units", params_path())) else {
+    let Ok(k) = RegKey::predef(HKEY_LOCAL_MACHINE).open_subkey(format!(r"{}\Units", params_path()))
+    else {
         return Vec::new();
     };
     let mut v: Vec<String> = k.enum_keys().filter_map(|k| k.ok()).collect();
@@ -76,11 +92,14 @@ pub fn add_unit(unit: &str) -> Result<()> {
 }
 
 pub fn remove_unit(unit: &str) {
-    let _ = RegKey::predef(HKEY_LOCAL_MACHINE).delete_subkey_all(format!(r"{}\Units\{unit}", params_path()));
+    let _ = RegKey::predef(HKEY_LOCAL_MACHINE)
+        .delete_subkey_all(format!(r"{}\Units\{unit}", params_path()));
 }
 
 pub fn write_unit_state(s: &UnitState) {
-    if let Ok(k) = RegKey::predef(HKEY_LOCAL_MACHINE).open_subkey_with_flags(format!(r"{}\Units\{}", params_path(), s.id), KEY_SET_VALUE) {
+    if let Ok(k) = RegKey::predef(HKEY_LOCAL_MACHINE)
+        .open_subkey_with_flags(format!(r"{}\Units\{}", params_path(), s.id), KEY_SET_VALUE)
+    {
         let _ = k.set_value("ActiveState", &s.active);
         let _ = k.set_value("SubState", &s.sub);
         let _ = k.set_value("Result", &s.result);
@@ -91,7 +110,9 @@ pub fn write_unit_state(s: &UnitState) {
 
 /// The last published state of a unit and its age in milliseconds.
 pub fn read_unit_state(unit: &str) -> Option<(UnitState, u64)> {
-    let k = RegKey::predef(HKEY_LOCAL_MACHINE).open_subkey(format!(r"{}\Units\{unit}", params_path())).ok()?;
+    let k = RegKey::predef(HKEY_LOCAL_MACHINE)
+        .open_subkey(format!(r"{}\Units\{unit}", params_path()))
+        .ok()?;
     let updated: u64 = k.get_value("Updated").ok()?;
     Some((
         UnitState {

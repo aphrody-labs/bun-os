@@ -20,7 +20,11 @@ mod user;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "bunos-wsl-service", version, about = "Bun OS on WSL as a Windows service")]
+#[command(
+    name = "bunos-wsl-service",
+    version,
+    about = "Bun OS on WSL as a Windows service"
+)]
 struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
@@ -74,7 +78,12 @@ enum Cmd {
 #[cfg(windows)]
 fn main() -> anyhow::Result<()> {
     match Cli::parse().cmd {
-        Cmd::Install { distro, user, terminate_on_stop, start } => manage::install(distro, user, terminate_on_stop, start),
+        Cmd::Install {
+            distro,
+            user,
+            terminate_on_stop,
+            start,
+        } => manage::install(distro, user, terminate_on_stop, start),
         Cmd::Uninstall => manage::uninstall(),
         Cmd::Export { units } => manage::export(&units),
         Cmd::Unexport { units } => manage::unexport(&units),
