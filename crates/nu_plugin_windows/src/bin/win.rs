@@ -69,7 +69,19 @@ fn parse(tool: &Tool, argv: &[String]) -> Result<(Value, bool), String> {
                         let text = inline.or_else(|| argv.get(index).cloned().inspect(|_| index += 1)).ok_or_else(|| format!("--{flag} needs a value"))?;
                         loose(&text, param.kind)
                     };
-                    args.insert(param.key.clone(), value);
+                    // Repeating a list-like flag accumulates: --items a.txt --items b.txt.
+                    match (args.remove(&param.key), param.kind) {
+                        (Some(Value::Array(mut items)), Kind::List | Kind::Any) => {
+                            items.push(value);
+                            args.insert(param.key.clone(), Value::Array(items));
+                        }
+                        (Some(previous), Kind::List | Kind::Any) => {
+                            args.insert(param.key.clone(), Value::Array(vec![previous, value]));
+                        }
+                        _ => {
+                            args.insert(param.key.clone(), value);
+                        }
+                    }
                 }
             }
         } else {

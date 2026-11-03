@@ -123,10 +123,13 @@ fn invoke_id(
     }
 }
 
-fn argument(value: &Value, objects: &[IDispatch]) -> io::Result<OwnedVariant> {
+fn object_at(objects: &[Option<IDispatch>], index: u64) -> Option<&IDispatch> {
+    objects.get(index as usize).and_then(Option::as_ref)
+}
+
+fn argument(value: &Value, objects: &[Option<IDispatch>]) -> io::Result<OwnedVariant> {
     if let Some(index) = value.get("$step").and_then(Value::as_u64) {
-        let object = objects
-            .get(index as usize)
+        let object = object_at(objects, index)
             .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, format!("$step {index} is not an object")))?;
         return Ok(from_dispatch(object));
     }
@@ -194,7 +197,8 @@ pub fn invoke(args: &Value) -> io::Result<Value> {
     )?;
     let attach = args.get("attach").and_then(Value::as_bool).unwrap_or(false);
     let root = create(&id, attach)?;
-    let mut objects = vec![root.clone()];
+    // objects[0] is the root, objects[i + 1] the object step i returned (None for plain values).
+    let mut objects: Vec<Option<IDispatch>> = vec![Some(root.clone())];
     let mut current = root;
     let mut last = from_dispatch(&current);
     let steps = args.get("steps").and_then(Value::as_array).cloned().unwrap_or_default();
@@ -203,6 +207,11 @@ pub fn invoke(args: &Value) -> io::Result<Value> {
             .get("name")
             .and_then(Value::as_str)
             .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, format!("step {index} has no name")))?;
+        if let Some(on) = step.get("on").and_then(Value::as_u64) {
+            current = object_at(&objects, on)
+                .cloned()
+                .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, format!("step {index}: on={on} is not an object")))?;
+        }
         let op = step.get("op").and_then(Value::as_str).unwrap_or("auto");
         let mut call_args = Vec::new();
         for value in step.get("args").and_then(Value::as_array).into_iter().flatten() {
@@ -221,13 +230,16 @@ pub fn invoke(args: &Value) -> io::Result<Value> {
         let member = dispid(&current, name)?;
         last = invoke_id(&current, member, name, flags, call_args)?;
         if let Some(next) = last.dispatch() {
-            objects.push(next.clone());
+            objects.push(Some(next.clone()));
             current = next;
-        } else if index + 1 < steps.len() {
+        } else if steps.get(index + 1).is_some_and(|s| s.get("on").is_none()) {
+            objects.push(None);
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                format!("step {index} (`{name}`) returned a value, not an object"),
+                format!("step {index} (`{name}`) returned a value, not an object (use \"on\" to address an earlier object)"),
             ));
+        } else {
+            objects.push(None);
         }
     }
     let result = match args.get("enumerate") {

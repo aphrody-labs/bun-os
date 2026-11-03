@@ -2,9 +2,13 @@
 //! `bunos-win11-chrome`: apply the macOS-style chrome to a window, or print the default descriptors.
 //!
 //!   bunos-win11-chrome apply <hwnd>   apply the default chrome to a window handle (decimal or 0x-hex)
+//!   bunos-win11-chrome watch          apply it to every captioned top-level window, now and as they appear
 //!   bunos-win11-chrome describe       print the default chrome, traffic-light and dock descriptors as JSON
 
 use bunos_win11_chrome::{Chrome, Dock, Traffic};
+
+#[cfg(windows)]
+mod watch;
 
 fn main() -> std::process::ExitCode {
     let mut args = std::env::args().skip(1);
@@ -29,6 +33,8 @@ fn main() -> std::process::ExitCode {
                 }
             }
         }
+        #[cfg(windows)]
+        Some("watch") => watch::run(),
         Some("describe") | None => {
             let doc = serde_json::json!({
                 "chrome": Chrome::default(),
@@ -39,7 +45,7 @@ fn main() -> std::process::ExitCode {
             std::process::ExitCode::SUCCESS
         }
         Some(other) => {
-            eprintln!("unknown command '{other}'; use apply|describe");
+            eprintln!("unknown command '{other}'; use apply|watch|describe");
             std::process::ExitCode::from(2)
         }
     }

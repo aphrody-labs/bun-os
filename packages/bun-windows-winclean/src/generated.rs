@@ -6860,7 +6860,9 @@ pub struct ComInvokeArgs {
     /// Attach to a running instance (GetActiveObject) instead of creating one.
     #[serde(rename = "attach", skip_serializing_if = "Option::is_none")]
     pub attach: Option<bool>,
-    /// [{name, op: auto|get|call|put, args: [...], value}]
+    /// [{name, op: auto|get|call|put, args: [...], value, on}]: each step runs on the object the
+    /// previous step returned, or on the object of an earlier step with on=n (0 = root, n = step
+    /// n-1's result). Arguments {$step: n} pass that object.
     #[serde(rename = "steps", skip_serializing_if = "Option::is_none")]
     pub steps: Option<Vec<serde_json::Value>>,
     /// {properties: [names], limit} to enumerate the final collection.
@@ -7044,7 +7046,7 @@ pub struct ShellContextMenuArgs {
     /// shell:RecycleBinFolder).
     #[serde(rename = "path")]
     pub path: String,
-    /// list | invoke
+    /// list | invoke | popup
     #[serde(rename = "action", skip_serializing_if = "Option::is_none")]
     pub action: Option<String>,
     /// Canonical verb to invoke.
@@ -7056,6 +7058,12 @@ pub struct ShellContextMenuArgs {
     /// Keep the process alive while dialogs opened by the verb are visible (default true).
     #[serde(rename = "wait", skip_serializing_if = "Option::is_none")]
     pub wait: Option<bool>,
+    /// Popup screen x (default: cursor).
+    #[serde(rename = "x", skip_serializing_if = "Option::is_none")]
+    pub x: Option<i64>,
+    /// Popup screen y (default: cursor).
+    #[serde(rename = "y", skip_serializing_if = "Option::is_none")]
+    pub y: Option<i64>,
 }
 
 impl ShellContextMenuArgs {
@@ -7097,6 +7105,20 @@ impl ShellContextMenuArgs {
     #[must_use]
     pub fn wait(mut self, value: bool) -> Self {
         self.wait = Some(value);
+        self
+    }
+
+    /// Sets `x`.
+    #[must_use]
+    pub fn x(mut self, value: i64) -> Self {
+        self.x = Some(value);
+        self
+    }
+
+    /// Sets `y`.
+    #[must_use]
+    pub fn y(mut self, value: i64) -> Self {
+        self.y = Some(value);
         self
     }
 }
@@ -10914,8 +10936,9 @@ impl Winclean {
     /// Late-bound COM automation (IDispatch), the equivalent of New-Object -ComObject /
     /// CreateObject: creates or attaches to an object by progId or clsid, walks steps of property
     /// gets, method calls and property puts, and optionally enumerates the resulting collection
-    /// (_NewEnum) reading chosen properties. Arguments {"$step":n} pass the object produced by step
-    /// n (0 = root). Can change state, depending on the members called.
+    /// (_NewEnum) reading chosen properties. Objects are addressed by index (0 = root, n = the
+    /// object step n-1 returned) through on (target of a step) and {"$step":n} (as an argument).
+    /// Can change state, depending on the members called.
     ///
     /// # Errors
     /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
@@ -11007,10 +11030,11 @@ impl Winclean {
         self.call_async("shell_recycle_bin", args).await
     }
 
-    /// Explorer's context menu for an item via IContextMenu, including third-party shell
+    /// Explorer's context menu for one or more items via IContextMenu, including third-party shell
     /// extensions: action list returns {id,label,verb,enabled} flattened with 'Parent > Child'
-    /// labels; action invoke runs one by verb (e.g. open, edit, properties, runas, undelete) or by
-    /// id from list.
+    /// labels; action invoke runs one by verb (open, edit, properties, runas, undelete, openas) or
+    /// by id from list; action popup shows Explorer's own menu (multi-selection, dynamic Send
+    /// to/Open with/New submenus) at x,y or the cursor and runs the chosen command.
     ///
     /// # Errors
     /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.

@@ -376,9 +376,16 @@ pub fn recycle_bin(args: &Value) -> io::Result<Value> {
             for entry in recycle_items()? {
                 let display = name(&entry, SIGDN_NORMALDISPLAY).unwrap_or_default();
                 let parsing = name(&entry, SIGDN_DESKTOPABSOLUTEPARSING).unwrap_or_default();
-                let original = item_string(&entry, &PKEY_DELETED_FROM)
-                    .map(|dir| format!("{}\\{display}", dir.trim_end_matches('\\')))
-                    .unwrap_or_default();
+                // The bin's display name is the bare name, or the full original path when
+                // Explorer is set to show full paths; only join the former.
+                let absolute = display.contains(":\\") || display.starts_with("\\\\");
+                let original = if absolute {
+                    display.clone()
+                } else {
+                    item_string(&entry, &PKEY_DELETED_FROM)
+                        .map(|dir| format!("{}\\{display}", dir.trim_end_matches('\\')))
+                        .unwrap_or_default()
+                };
                 let hit = wanted.iter().any(|w| {
                     w.eq_ignore_ascii_case(&display) || w.eq_ignore_ascii_case(&parsing) || w.eq_ignore_ascii_case(&original)
                 });
@@ -417,6 +424,16 @@ fn context_menu(item: &IShellItem) -> io::Result<(IContextMenu, HMENU)> {
         return Err(hresult_error(&windows::core::Error::from(hr), "QueryContextMenu"));
     }
     Ok((menu, hmenu))
+}
+
+/// Canonical verb of a context-menu command id.
+pub(crate) fn verb_name(menu: &IContextMenu, id: u32) -> Option<String> {
+    verb_of(menu, id)
+}
+
+/// Keep dialogs opened in-process alive (see [`pump_while_windows`]).
+pub(crate) fn pump_dialogs(limit: Duration) {
+    pump_while_windows(limit);
 }
 
 fn verb_of(menu: &IContextMenu, id: u32) -> Option<String> {
@@ -528,6 +545,14 @@ pub fn context_menu_tool(args: &Value) -> io::Result<Value> {
             args.get("id").and_then(Value::as_u64).map(|n| n as u32),
             args.get("wait").and_then(Value::as_bool).unwrap_or(true),
         ),
+        "popup" => {
+            drop(target);
+            super::popup::show(
+                &strings(args, "path"),
+                args.get("x").and_then(Value::as_i64).map(|v| v as i32),
+                args.get("y").and_then(Value::as_i64).map(|v| v as i32),
+            )
+        }
         other => Err(invalid(format!("unknown action {other}"))),
     }
 }

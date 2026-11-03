@@ -4052,7 +4052,7 @@ export const TOOL_CATALOG: ReadonlyArray<{
   {
     name: "com_invoke",
     description:
-      'Late-bound COM automation (IDispatch), the equivalent of New-Object -ComObject / CreateObject: creates or attaches to an object by progId or clsid, walks steps of property gets, method calls and property puts, and optionally enumerates the resulting collection (_NewEnum) reading chosen properties. Arguments {"$step":n} pass the object produced by step n (0 = root). Can change state, depending on the members called.',
+      'Late-bound COM automation (IDispatch), the equivalent of New-Object -ComObject / CreateObject: creates or attaches to an object by progId or clsid, walks steps of property gets, method calls and property puts, and optionally enumerates the resulting collection (_NewEnum) reading chosen properties. Objects are addressed by index (0 = root, n = the object step n-1 returned) through on (target of a step) and {"$step":n} (as an argument). Can change state, depending on the members called.',
     inputSchema: {
       type: "object",
       properties: {
@@ -4072,7 +4072,8 @@ export const TOOL_CATALOG: ReadonlyArray<{
         },
         steps: {
           type: "array",
-          description: "[{name, op: auto|get|call|put, args: [...], value}]",
+          description:
+            "[{name, op: auto|get|call|put, args: [...], value, on}]: each step runs on the object the previous step returned, or on the object of an earlier step with on=n (0 = root, n = step n-1's result). Arguments {$step: n} pass that object.",
           items: {
             type: "object",
           },
@@ -4175,7 +4176,7 @@ export const TOOL_CATALOG: ReadonlyArray<{
   {
     name: "shell_context_menu",
     description:
-      "Explorer's context menu for an item via IContextMenu, including third-party shell extensions: action list returns {id,label,verb,enabled} flattened with 'Parent > Child' labels; action invoke runs one by verb (e.g. open, edit, properties, runas, undelete) or by id from list.",
+      "Explorer's context menu for one or more items via IContextMenu, including third-party shell extensions: action list returns {id,label,verb,enabled} flattened with 'Parent > Child' labels; action invoke runs one by verb (open, edit, properties, runas, undelete, openas) or by id from list; action popup shows Explorer's own menu (multi-selection, dynamic Send to/Open with/New submenus) at x,y or the cursor and runs the chosen command.",
     inputSchema: {
       type: "object",
       properties: {
@@ -4189,7 +4190,7 @@ export const TOOL_CATALOG: ReadonlyArray<{
         },
         action: {
           type: "string",
-          description: "list | invoke",
+          description: "list | invoke | popup",
         },
         verb: {
           type: "string",
@@ -4203,6 +4204,14 @@ export const TOOL_CATALOG: ReadonlyArray<{
           type: "boolean",
           description:
             "Keep the process alive while dialogs opened by the verb are visible (default true).",
+        },
+        x: {
+          type: "integer",
+          description: "Popup screen x (default: cursor).",
+        },
+        y: {
+          type: "integer",
+          description: "Popup screen y (default: cursor).",
         },
       },
       required: ["path"],

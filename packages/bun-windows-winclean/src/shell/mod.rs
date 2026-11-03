@@ -10,6 +10,8 @@ pub mod dispatch;
 #[cfg(windows)]
 pub mod namespace;
 #[cfg(windows)]
+pub mod popup;
+#[cfg(windows)]
 mod variant;
 #[cfg(windows)]
 pub mod wmi;

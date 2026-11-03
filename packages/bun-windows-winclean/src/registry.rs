@@ -357,9 +357,20 @@ fn utf16_bytes<'a>(items: impl IntoIterator<Item = &'a str>) -> Vec<u8> {
 }
 
 /// Encode a `set_registry_value` argument: `String`, `ExpandString`, `DWord`, `QWord` (decimal
-/// or `0x` hex) or `MultiString` (newline-separated). Returns the `REG_*` code and data bytes.
+/// or `0x` hex), `MultiString` (newline-separated), `Binary` (hex) or `None` (empty data). The
+/// `REG_*` names that `get_registry_value` reports are accepted too, so a read value can be
+/// written back unchanged. Returns the `REG_*` code and data bytes.
 pub fn encode_value(value: &str, value_type: &str) -> std::io::Result<(u32, Vec<u8>)> {
-    let lowered = value_type.trim().to_ascii_lowercase();
+    let lowered = match value_type.trim().to_ascii_lowercase().as_str() {
+        "reg_sz" => "string".to_owned(),
+        "reg_expand_sz" => "expandstring".to_owned(),
+        "reg_dword" => "dword".to_owned(),
+        "reg_qword" => "qword".to_owned(),
+        "reg_multi_sz" => "multistring".to_owned(),
+        "reg_binary" => "binary".to_owned(),
+        "reg_none" => "none".to_owned(),
+        other => other.to_owned(),
+    };
     if value.contains('\0') {
         return Err(invalid("registry value contains NUL"));
     }
@@ -395,6 +406,17 @@ pub fn encode_value(value: &str, value_type: &str) -> std::io::Result<(u32, Vec<
             let mut bytes = utf16_bytes(items);
             bytes.extend_from_slice(&0u16.to_le_bytes());
             Ok((kind::MULTI_SZ, bytes))
+        }
+        "none" => Ok((kind::NONE, Vec::new())),
+        "binary" => {
+            let hex: String = value.chars().filter(|c| !c.is_whitespace()).collect();
+            if hex.len() % 2 != 0 || !hex.chars().all(|c| c.is_ascii_hexdigit()) {
+                return Err(invalid("Binary value must be an even-length hex string"));
+            }
+            Ok((
+                kind::BINARY,
+                (0..hex.len()).step_by(2).map(|i| u8::from_str_radix(&hex[i..i + 2], 16).unwrap_or(0)).collect(),
+            ))
         }
         _ => Err(invalid("unsupported registry value type")),
     }

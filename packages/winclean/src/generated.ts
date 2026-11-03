@@ -2769,7 +2769,7 @@ export interface ComInvokeArgs {
    */
   attach?: boolean;
   /**
-   * [{name, op: auto|get|call|put, args: [...], value}]
+   * [{name, op: auto|get|call|put, args: [...], value, on}]: each step runs on the object the previous step returned, or on the object of an earlier step with on=n (0 = root, n = step n-1's result). Arguments {$step: n} pass that object.
    */
   steps?: Record<string, unknown>[];
   /**
@@ -2835,7 +2835,7 @@ export interface ShellContextMenuArgs {
    */
   path: string;
   /**
-   * list | invoke
+   * list | invoke | popup
    */
   action?: string;
   /**
@@ -2850,6 +2850,14 @@ export interface ShellContextMenuArgs {
    * Keep the process alive while dialogs opened by the verb are visible (default true).
    */
   wait?: boolean;
+  /**
+   * Popup screen x (default: cursor).
+   */
+  x?: number;
+  /**
+   * Popup screen y (default: cursor).
+   */
+  y?: number;
 }
 
 /** Arguments for `shell_properties`. */
@@ -4497,7 +4505,7 @@ export abstract class GeneratedTools {
   }
 
   /**
-   * Late-bound COM automation (IDispatch), the equivalent of New-Object -ComObject / CreateObject: creates or attaches to an object by progId or clsid, walks steps of property gets, method calls and property puts, and optionally enumerates the resulting collection (_NewEnum) reading chosen properties. Arguments {"$step":n} pass the object produced by step n (0 = root). Can change state, depending on the members called.
+   * Late-bound COM automation (IDispatch), the equivalent of New-Object -ComObject / CreateObject: creates or attaches to an object by progId or clsid, walks steps of property gets, method calls and property puts, and optionally enumerates the resulting collection (_NewEnum) reading chosen properties. Objects are addressed by index (0 = root, n = the object step n-1 returned) through on (target of a step) and {"$step":n} (as an argument). Can change state, depending on the members called.
    */
   comInvoke(args?: ComInvokeArgs): Promise<ToolResult> {
     return this.call("com_invoke", args);
@@ -4532,7 +4540,7 @@ export abstract class GeneratedTools {
   }
 
   /**
-   * Explorer's context menu for an item via IContextMenu, including third-party shell extensions: action list returns {id,label,verb,enabled} flattened with 'Parent > Child' labels; action invoke runs one by verb (e.g. open, edit, properties, runas, undelete) or by id from list.
+   * Explorer's context menu for one or more items via IContextMenu, including third-party shell extensions: action list returns {id,label,verb,enabled} flattened with 'Parent > Child' labels; action invoke runs one by verb (open, edit, properties, runas, undelete, openas) or by id from list; action popup shows Explorer's own menu (multi-selection, dynamic Send to/Open with/New submenus) at x,y or the cursor and runs the chosen command.
    */
   shellContextMenu(args: ShellContextMenuArgs): Promise<ToolResult> {
     return this.call("shell_context_menu", args);
