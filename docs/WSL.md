@@ -148,3 +148,38 @@ nvidia-open result (CI run 40819800811, the one run that finished that job): **`
 
 Follow-up (Context7/GitHub audit, 2026-10-29). CachyOS keeps four 7.3 patches for NVIDIA in `CachyOS/kernel-patches` `7.3/misc/nvidia` (commit `89bb22dec944`, 2026-10-22). Tested with `git apply --check` on a checkout of `615.78.08` (`1a82fbfda8f3`): `0001` (DSC RC tables), `0002` (Bigscreen Beyond DP workaround) and `0004` (open sysfs config from the userspace root on 7.3+) apply and are vendored unchanged in `factory/kernel/linux-bun/nvidia/patches/`; `0003` (`dmem_cgroup_register_region` takes a struct) **does not apply because `615.78.08` already has that change** (`os-interface.c` line 3055 uses `&init`), so it is skipped. None of the four touches `nv-timer.h`, so the `del_timer_sync` rewrite stays. **Compatibility of nvidia-open with 7.2.11 and 7.3 is NOT VERIFIED** until CI compiles it with these patches.
 Tag choice: GitHub release dates are not ordered by version: `595.112.07` 2026-10-22, `615.71.10` 2026-10-21, `615.78.08` 2026-10-07 (the highest 6xx version number, and what Arch `nvidia-open`/`nvidia-utils` ship). `615.78.08` is kept for userspace parity; it is **not verified to be the newest release by date**, and whether `615.71.10` is a later build of a different branch was not determined.
+
+## 7. Bun OS for Windows bundle (2026-11-03)
+
+Goal: Linux, systemd, Wayland and GLib apps running on Windows 11 like Win32 apps, with no sandbox between Bun OS and
+Windows: our WSL2 kernel, the `bunos-wsl` distro, WSLg tuned for native-looking windows, and the `bunos.sys` kernel
+driver (docs/NTCORE.md section 8). Built on the build host; WSL was not started on the workstation.
+
+| Piece | Path | Role |
+|---|---|---|
+| Kernel build | `factory/wsl/kernel/build-wsl-kernel.sh` | Linux 7.3.1 + the six WSL patches, Rust on, `DXGKRNL=y`; emits `bzImage`, `modules.vhdx`, `config`, `report.json` |
+| Distro build | `factory/wsl/build-rootfs.sh` | `bunos-wsl.tar.gz` and the same bytes as `bunos-wsl.wsl` |
+| `.wslconfig` template | `factory/wsl/windows/wslconfig.template` | `kernel=`, `kernelModules=`, `guiApplications=true`, `networkingMode=mirrored`, `dnsTunneling`, `autoProxy`, `nestedVirtualization`; `[experimental] autoMemoryReclaim=gradual`, `sparseVhd`, `hostAddressLoopback` |
+| `.wslgconfig` template | `factory/wsl/windows/wslgconfig.template` | WSLg native-window settings (docs/WSLG.md) |
+| Installer | `factory/wsl/windows/install.ts` (Bun; no PowerShell needed) | verifies `SHA256SUMS`, copies to `%LOCALAPPDATA%\BunOS\wsl`, merges `.wslconfig`/`.wslgconfig` (backups `*.bunos-backup`), `wsl --shutdown`, `wsl --install --from-file bunos-wsl.wsl --name bunos --location ... --no-launch` (fallback `wsl --import`), checks `uname -r` and the WSLg socket + `/dev/dxg`; `--driver` adds `pnputil /add-driver` + `sc start BunOS` (test VM only); `--dry-run` prints everything and writes nothing |
+| Bundle | `factory/wsl/windows/bundle.sh` | `bunos-windows/` + `bunos-windows.zip` with `SHA256SUMS` and `manifest.json` |
+
+Verified on 2026-11-03:
+
+- Kernel build fix: the first 7.3.1 run stopped with `fragment line dropped: CONFIG_RUST=y`. Cause: the build host had no
+  `rust-src` component, so `RUST_IS_AVAILABLE` was false and `CONFIG_RUST` invisible. `rustup component add rust-src`
+  on the host, and the script now runs `make rustavailable` before the config merge (fails with the real reason). The
+  second run printed `Rust is available!` (rustc 1.99.1, bindgen 0.73.2, clang 22.1.8). The host also lacked `qemu-img`
+  (needed by Microsoft's `gen_artifacts_vhdx.sh`); `qemu-utils` was installed.
+- Distro: `build-rootfs.sh` in `archlinux:base-devel --privileged` finished `exit=0` with all Learn checks passing:
+  `bunos-wsl.tar.gz` = `bunos-wsl.wsl` = 853,552,383 bytes, sha256
+  `7e64f85dd984b93b636e3aa1f17b8ff45f945629e6582a9b24e229a75b824ff6`
+  (`~/build/storage/artifacts/wsl/bunos-wsl/` on the build host). Contains `/usr/bin/bun`, `rustc`, `clang`, `Xwayland`,
+  `glxinfo`, Mesa `d3d12_dri.so`, `libvulkan_dzn.so`, `/etc/wsl.conf`, `/etc/wsl-distribution.conf`, `/usr/lib/wsl/bunos.ico`.
+  Some CachyOS v3 mirror files returned 404 (`cdn77.cachyos.org`) and pacman fell back to other mirrors.
+- Microsoft's validator `distributions/validate-modern.py --tar bunos-wsl.tar.gz` (microsoft/WSL master, 2026-11-03):
+  exit 0, all keys of both config files valid; two warnings, both deliberate: `user.default=bun` in `wsl.conf` is
+  discouraged, and `/etc/passwd` already has uid 1000 (the user is created at build time, see section 2).
+- Installer: `bun test factory/wsl/windows/install.test.ts` (INI merge keeps user keys/sections and comments, overrides
+  ours, escapes paths) 3 pass; `install.ts --dry-run` prints the merged files and the `wsl.exe` command lines and
+  writes nothing.
