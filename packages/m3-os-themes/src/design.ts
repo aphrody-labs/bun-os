@@ -380,7 +380,9 @@ export function runDesign(o: DesignOptions): string[] {
   out.write(`nushell/bunos-m3.nu`, nushellTheme(roles.dark, ansi));
 
   // 4. Icons.
-  const palette = (r: Roles): Palette => ({
+  const palette = (r: Roles, dark: boolean): Palette => ({
+    onSurface: r["onSurface"]!,
+    paper: dark ? r["onSurface"]! : r["surfaceContainerLowest"]!,
     primary: r["primary"]!,
     secondary: r["secondary"]!,
     tertiary: r["tertiary"]!,
@@ -393,7 +395,7 @@ export function runDesign(o: DesignOptions): string[] {
     const dark = mode === "dark";
     const theme = dark ? `${ICON_THEME}-Dark` : ICON_THEME;
     for (const def of ICONS) {
-      const c = compose(def, symbolSvg(def.symbol), palette(roles[mode]), dark);
+      const c = compose(def, symbolSvg(def.symbol), palette(roles[mode], dark), dark);
       const xdgPng = (def.xdg ?? []).flatMap(n =>
         XDG_SIZES.map(s => ({
           size: s,

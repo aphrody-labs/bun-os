@@ -355,6 +355,10 @@ export interface Palette {
   secondary: string;
   tertiary: string;
   neutral: string;
+  /** Glyph ink of monochrome status icons. */
+  onSurface: string;
+  /** Paper of file-type icons (the lightest surface of the mode's scheme, or on-surface in dark mode). */
+  paper: string;
 }
 /** Key colour of a hue family: theme roles for M3 families, fixed hues harmonised towards the primary. */
 export function keyColor(hue: Hue, p: Palette): string {
@@ -405,6 +409,8 @@ export function compose(def: IconDef, glyphSvg: string, p: Palette, dark: boolea
     'width="256" height="256" viewBox="0 0 256 256"',
     'width="16" height="16" viewBox="0 0 256 256"',
   );
+  // Highlight and shade over the icon artwork (white/black at low opacity), part of the badge art.
+  // design:content
   const shade = `<linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></linearGradient>`;
   switch (def.kind) {
     case "folder": {
@@ -416,11 +422,10 @@ export function compose(def: IconDef, glyphSvg: string, p: Palette, dark: boolea
       return { svg: doc(base + overlay), small: doc(base), symbolic };
     }
     case "file": {
-      const paper = dark ? "#e9e7ef" : "#fbfaff";
       const edge = at(p.neutral, 70, 6);
       const ink = at(key, 45);
       const band = at(key, 88, 30);
-      const base = `<path d="${PAGE}" fill="${paper}" stroke="${edge}" stroke-width="4"/><path d="${PAGE_FOLD}" fill="${band}" stroke="${edge}" stroke-width="4" stroke-linejoin="round"/>`;
+      const base = `<path d="${PAGE}" fill="${p.paper}" stroke="${edge}" stroke-width="4"/><path d="${PAGE_FOLD}" fill="${band}" stroke="${edge}" stroke-width="4" stroke-linejoin="round"/>`;
       return {
         svg: doc(base + place(g, 126, 150, 104, ink)),
         small: doc(
@@ -446,8 +451,11 @@ export function compose(def: IconDef, glyphSvg: string, p: Palette, dark: boolea
       };
     }
     case "glyph": {
-      const ink = dark ? "#e6e1e9" : "#1d1b20";
-      return { svg: doc(place(g, 128, 128, 256, ink)), small: doc(place(g, 128, 128, 256, ink)), symbolic };
+      return {
+        svg: doc(place(g, 128, 128, 256, p.onSurface)),
+        small: doc(place(g, 128, 128, 256, p.onSurface)),
+        symbolic,
+      };
     }
   }
 }

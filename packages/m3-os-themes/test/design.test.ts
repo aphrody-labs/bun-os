@@ -43,7 +43,14 @@ describe("icon theme", () => {
     const c = compose(
       ICONS.find(i => i.kind === "folder" && i.id === "folder-music")!,
       glyph,
-      { primary: "#cbbeff", secondary: "#c9c3dc", tertiary: "#edb8cd", neutral: "#938f99" },
+      {
+        primary: "#cbbeff",
+        secondary: "#c9c3dc",
+        tertiary: "#edb8cd",
+        neutral: "#938f99",
+        onSurface: "#e6e1e9",
+        paper: "#fbfaff",
+      },
       false,
     );
     expect(c.svg).toContain('viewBox="0 0 256 256"');
