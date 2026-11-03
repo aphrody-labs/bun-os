@@ -1,0 +1,5 @@
+# Kernel drivers link the C runtime statically (wdk-build: StaticCrtNotEnabled otherwise).
+[build]
+rustflags = ["-C", "target-feature=+crt-static"]
+target-dir = "target"
+build-dir = "target"

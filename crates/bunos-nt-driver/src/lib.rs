@@ -105,7 +105,7 @@ unsafe extern "C" fn driver_unload(driver: *mut DRIVER_OBJECT) {
     let mut link = unicode(LINK_NAME);
     // SAFETY: the link and the single device were created in DriverEntry.
     unsafe {
-        IoDeleteSymbolicLink(&mut link);
+        let _ = IoDeleteSymbolicLink(&mut link);
         IoDeleteDevice((*driver).DeviceObject);
     }
     println!("bunos: unloaded");
