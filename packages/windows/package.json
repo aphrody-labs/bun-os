@@ -1,7 +1,7 @@
 {
   "name": "@aphrody/windows",
   "version": "1.4.7",
-  "description": "One Windows layer for upstream Bun: Win32 (bun:ffi), registry, services, shell folders, WinRT (windows-rs N-API addon), WinUI 3 (.NET host) and WinClean.",
+  "description": "One Windows layer for upstream Bun: Win32 (bun:ffi), registry, services, shell folders, WinRT (windows-rs N-API addon and the bun:ffi metadata projection), WinUI 3 (.NET host and in-process XAML) and WinClean; owner of the fork modules bun:windows, bun:winrt and bun:winui.",
   "license": "Apache-2.0",
   "author": "aphrody-dev <contact@aphrody.com>",
   "files": [
@@ -24,7 +24,11 @@
     "./shell": "./src/shell.ts",
     "./winrt": "./src/winrt.ts",
     "./winui": "./src/winui.ts",
-    "./provider": "./src/provider.ts"
+    "./provider": "./src/provider.ts",
+    "./bun-plugin": "./src/bun-plugin.ts",
+    "./fork/windows": "./src/fork/windows.ts",
+    "./fork/winrt": "./src/fork/winrt.ts",
+    "./fork/winui": "./src/fork/winui.ts"
   },
   "scripts": {
     "build:napi": "bun src/provider.ts build",

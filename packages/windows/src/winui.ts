@@ -28,7 +28,8 @@ function versionAtLeast(v: string, min: number[]): boolean {
   const p = v.split(".").map(Number);
   for (let i = 0; i < min.length; i++) {
     const a = p[i] ?? 0;
-    if (a !== min[i]) return a > min[i];
+    const b = min[i] ?? 0;
+    if (a !== b) return a > b;
   }
   return true;
 }
@@ -59,7 +60,7 @@ export async function probe(): Promise<{ ok: boolean; reason?: string; packages:
   const [major, minor] = WINDOWS_APP_SDK_VERSION.split(".").map(Number);
   const ok = packages.some(line => {
     const [name, ver] = line.split(" ");
-    return name === WINDOWS_APP_RUNTIME_FRAMEWORK && !!ver && versionAtLeast(ver, [major, minor]);
+    return name === WINDOWS_APP_RUNTIME_FRAMEWORK && !!ver && versionAtLeast(ver, [major ?? 0, minor ?? 0]);
   });
   return ok
     ? { ok, packages }

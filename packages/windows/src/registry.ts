@@ -26,7 +26,22 @@ const HIVES: Record<string, bigint> = {
   HKEY_LOCAL_MACHINE: 0x80000002n,
   HKU: 0x80000003n,
   HKEY_USERS: 0x80000003n,
+  HKCC: 0x80000005n,
+  HKEY_CURRENT_CONFIG: 0x80000005n,
 };
+
+/** Registry view of a 64-bit Windows: `64` (KEY_WOW64_64KEY) or `32` (KEY_WOW64_32KEY); the process default otherwise. */
+export interface RegistryOptions {
+  view?: 32 | 64 | "32" | "64";
+}
+
+function viewBits(options?: RegistryOptions): number {
+  const view = options?.view;
+  if (view === undefined) return 0;
+  if (view == 64) return 0x100;
+  if (view == 32) return 0x200;
+  throw new TypeError(`registry view must be 32 or 64, got ${String(view)}`);
+}
 
 const KEY_READ = 0x20019;
 const KEY_WRITE = 0x20006;
@@ -112,7 +127,8 @@ export function splitKey(path: string): { hive: bigint; subkey: string } {
   return { hive, subkey: rest.filter(Boolean).join("\\") };
 }
 
-function open(path: string, access: number): bigint | null {
+function open(path: string, access: number, options?: RegistryOptions): bigint | null {
+  access |= viewBits(options);
   const { hive, subkey } = splitKey(path);
   return openAt(hive, subkey, access, path);
 }
@@ -171,8 +187,8 @@ function encode(type: number, value: RegistryData): Uint8Array {
 }
 
 /** Direct subkeys and values of a key; null when the key does not exist. */
-export function list(path: string): RegistryListing | null {
-  const handle = open(path, KEY_READ);
+export function list(path: string, options?: RegistryOptions): RegistryListing | null {
+  const handle = open(path, KEY_READ, options);
   if (handle === null) return null;
   try {
     const info = [0, 0, 0, 0, 0].map(() => new Uint32Array(1));
@@ -240,36 +256,53 @@ export function list(path: string): RegistryListing | null {
 }
 
 /** One value (`name` "" is the unnamed value); null when the key or value does not exist. */
-export function get(path: string, name = ""): { type: string; value: RegistryData } | null {
-  const found = list(path)?.values.find(entry => entry.name.toLowerCase() === name.toLowerCase());
+export function get(path: string, name = "", options?: RegistryOptions): { type: string; value: RegistryData } | null {
+  const found = list(path, options)?.values.find(entry => entry.name.toLowerCase() === name.toLowerCase());
   return found ? { type: found.type, value: found.value } : null;
 }
 
 /** Creates the key when needed and writes one value. */
-export function set(path: string, name: string, value: RegistryData, type = "REG_SZ"): void {
-  api ??= load();
+export function set(path: string, name: string, value: RegistryData, type = "REG_SZ", options?: RegistryOptions): void {
   const id = TYPE_IDS[type];
   if (id === undefined) throw new Error(`unsupported registry type: ${type}`);
-  const { hive, subkey } = splitKey(path);
-  let handle = hive;
-  if (subkey !== "") {
-    const out = new BigUint64Array(1);
-    const status = api.RegCreateKeyExW(hive, ptr(wide(subkey)), 0, null, 0, KEY_WRITE, null, ptr(out), null);
-    if (status !== ERROR_SUCCESS) throw new Error(`RegCreateKeyExW(${path}) failed: ${status}`);
-    handle = out[0]!;
-  }
+  const handle = create(path, KEY_WRITE, options);
   try {
     const bytes = encode(id, value);
-    const status = api.RegSetValueExW(handle, ptr(wide(name)), 0, id, ptr(bytes), bytes.length);
+    const status = api!.RegSetValueExW(handle, ptr(wide(name)), 0, id, ptr(bytes), bytes.length);
     if (status !== ERROR_SUCCESS) throw new Error(`RegSetValueExW(${path}, ${name}) failed: ${status}`);
   } finally {
     close(handle);
   }
 }
 
+function create(path: string, access: number, options?: RegistryOptions): bigint {
+  api ??= load();
+  const { hive, subkey } = splitKey(path);
+  if (subkey === "") return hive;
+  const out = new BigUint64Array(1);
+  const status = api.RegCreateKeyExW(
+    hive,
+    ptr(wide(subkey)),
+    0,
+    null,
+    0,
+    access | viewBits(options),
+    null,
+    ptr(out),
+    null,
+  );
+  if (status !== ERROR_SUCCESS) throw new Error(`RegCreateKeyExW(${path}) failed: ${status}`);
+  return out[0]!;
+}
+
+/** Creates a key (and its missing parents); succeeds when it already exists. */
+export function createKey(path: string, options?: RegistryOptions): void {
+  close(create(path, KEY_READ, options));
+}
+
 /** Deletes one value; false when it did not exist. */
-export function deleteValue(path: string, name: string): boolean {
-  const handle = open(path, KEY_WRITE);
+export function deleteValue(path: string, name: string, options?: RegistryOptions): boolean {
+  const handle = open(path, KEY_WRITE, options);
   if (handle === null) return false;
   try {
     return api!.RegDeleteValueW(handle, ptr(wide(name))) === ERROR_SUCCESS;
@@ -279,13 +312,13 @@ export function deleteValue(path: string, name: string): boolean {
 }
 
 /** Deletes a key with all its subkeys and values; false when it did not exist. */
-export function deleteKey(path: string): boolean {
+export function deleteKey(path: string, options?: RegistryOptions): boolean {
   api ??= load();
   const { hive, subkey } = splitKey(path);
   if (subkey === "") throw new Error("refusing to delete a registry hive");
   const parent = subkey.includes("\\") ? subkey.slice(0, subkey.lastIndexOf("\\")) : "";
   const leaf = subkey.slice(subkey.lastIndexOf("\\") + 1);
-  const handle = openAt(hive, parent, DELETE | KEY_WRITE | KEY_READ);
+  const handle = openAt(hive, parent, DELETE | KEY_WRITE | KEY_READ | viewBits(options));
   if (handle === null) return false;
   try {
     return api.RegDeleteTreeW(handle, ptr(wide(leaf))) === ERROR_SUCCESS;
