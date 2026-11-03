@@ -51,7 +51,7 @@ install -m 0644 crates/aphrody-webos-client/web/index.html crates/aphrody-webos-
 # bun-ui (crates/bun-ui-web): the wasm host, then the app bundles `buncc build` wrote to the shared artifact store
 # (iced, libcosmic, Qt wasm; GTK Broadway manifests from crates/bun-ui-web/broadway/install.sh). /ui does not gate deploys.
 mkdir -p "$release/ui/host"
-wasm-bindgen --target web --no-typescript --out-dir "$release/ui/host" target/wasm32-unknown-unknown/release/bun_ui_web.wasm
+wasm-bindgen --target web --no-typescript --out-dir "$release/ui/host" "$target/wasm32-unknown-unknown/release/bun_ui_web.wasm"
 wasm-opt -O4 --all-features "$release/ui/host/bun_ui_web_bg.wasm" -o "$release/ui/host/bun_ui_web_bg.wasm"
 install -m 0644 crates/bun-ui-web/web/index.html crates/bun-ui-web/web/boot.js "$release/ui/host/"
 ui_store="${BUN_UI_STORE:-$HOME/build/storage/artifacts/bun-ui/ui}"
