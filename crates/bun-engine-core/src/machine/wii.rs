@@ -26,12 +26,9 @@ impl WiiMachine {
     }
 
     pub fn gamecube_dol(bytes: &[u8]) -> Result<Self, String> {
-        if bytes.len() < 0x100 {
-            return Err("GameCube DOL: shorter than its 256-byte header".into());
-        }
-        let dol = image::dol::Dol::parse(bytes.to_vec());
+        let gamecube = GameCube::with_dol(bytes).map_err(|e| format!("GameCube DOL: {e:?}"))?;
         Ok(Self {
-            console: Console::GameCube(Box::new(GameCube::with_image(&dol))),
+            console: Console::GameCube(Box::new(gamecube)),
         })
     }
 }

@@ -1,5 +1,5 @@
 use aphrody_wii::dol::DolError;
-use aphrody_wii_runtime::Wii;
+use aphrody_wii_runtime::{GameCube, Wii};
 
 fn fixture() -> Vec<u8> {
     let mut bytes = vec![0; 0x108];
@@ -48,6 +48,33 @@ fn unmapped_section_and_entry_are_rejected() {
     bytes[0xe0..0xe4].copy_from_slice(&0x8000_5000_u32.to_be_bytes());
     assert!(matches!(
         Wii::with_dol(&bytes),
+        Err(DolError::OutsideMemory)
+    ));
+}
+
+#[test]
+fn gamecube_dol_validates_file_and_memory_before_boot() {
+    let mut gamecube = GameCube::with_dol(&fixture()).expect("fixture is valid on GameCube");
+    gamecube.gekko.gprs[3] = 0;
+    for _ in 0..20 {
+        gamecube.step();
+    }
+    assert_eq!(gamecube.gekko.gprs[3], 10);
+
+    assert!(matches!(
+        GameCube::with_dol(&[0; 16]),
+        Err(DolError::TruncatedHeader)
+    ));
+    let mut bytes = fixture();
+    bytes[0x90..0x94].copy_from_slice(&16_u32.to_be_bytes());
+    assert!(matches!(
+        GameCube::with_dol(&bytes),
+        Err(DolError::TruncatedSection)
+    ));
+    let mut bytes = fixture();
+    bytes[0x48..0x4c].copy_from_slice(&0x9000_0000_u32.to_be_bytes());
+    assert!(matches!(
+        GameCube::with_dol(&bytes),
         Err(DolError::OutsideMemory)
     ));
 }

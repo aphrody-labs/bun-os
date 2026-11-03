@@ -24,7 +24,6 @@ use gecko::flipper::vi::regs::RefreshRate;
 use gecko::gamecube::GameCube;
 use gecko::host::{DrawVertex, GxAction, RenderSink};
 use gecko::{System, SystemId, Wii};
-use image::Dol;
 use wasm_bindgen::prelude::*;
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
@@ -686,18 +685,23 @@ impl<const SYSTEM: SystemId> ApplicationHandler for App<SYSTEM> {
 }
 
 #[wasm_bindgen]
-pub fn start_emulator(rom_data: &[u8], filename: String, dsp_irom: Option<Vec<u8>>) {
+pub fn start_emulator(
+    rom_data: &[u8],
+    filename: String,
+    dsp_irom: Option<Vec<u8>>,
+) -> Result<(), JsValue> {
     console_error_panic_hook::set_once();
 
     let name = filename.to_lowercase();
     let emulator = if name.ends_with(".bin") || name.ends_with(".ipl") {
         GameCube::with_ipl(rom_data, false)
     } else {
-        let dol = Dol::parse(rom_data.to_vec());
-        GameCube::with_image(&dol)
+        GameCube::with_dol(rom_data)
+            .map_err(|error| JsValue::from_str(&format!("Invalid GameCube DOL: {error:?}")))?
     };
 
     launch(emulator, dsp_irom);
+    Ok(())
 }
 
 /// Start a Wii DOL through the retained Broadway interpreter and devices.
