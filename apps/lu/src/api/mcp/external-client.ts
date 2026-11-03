@@ -230,6 +230,9 @@ export class MCPExternalClient {
       if (!isStartableMcpCommand(this.config.command)) {
         throw new Error(notStartableMessage(this.config.name, this.config.command))
       }
+      if (this.config.command.trim().toLowerCase() === 'aphrody-mcp' && this.config.args.length !== 0) {
+        throw new Error('The Aphrody MCP server runs without arguments in this app.')
+      }
       const candidates = commandCandidatesForPlatform(this.config.command)
       let spawnError: unknown = null
       for (const program of candidates) {
@@ -288,11 +291,16 @@ export class MCPExternalClient {
         capabilities: {},
         clientInfo: { name: 'locally-uncensored', version: APP_VERSION },
       }, this.config.initializeTimeoutMs)
+      if (!this.child) throw new Error('Server exited during initialization')
+      await this.child.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }) + '\n')
 
       // Discover tools
-      const toolsResult = await this.sendRequest('tools/list', {})
       const tools: MCPToolDefinition[] = []
-      for (const t of asRecordArray(prop(toolsResult, 'tools'))) {
+      const seenCursors = new Set<string>()
+      let cursor: string | undefined
+      do {
+        const toolsResult = await this.sendRequest('tools/list', cursor ? { cursor } : {})
+        for (const t of asRecordArray(prop(toolsResult, 'tools'))) {
         const toolName = asString(t.name)
         // A tool with no name cannot be looked up, called or unregistered — it
         // used to land in the registry under the key `undefined`.
@@ -308,7 +316,12 @@ export class MCPExternalClient {
           source: 'external',
           serverId: this.config.id,
         })
-      }
+        }
+        const next = asString(prop(toolsResult, 'nextCursor'))
+        if (next && (seenCursors.has(next) || seenCursors.size >= 100)) throw new Error('MCP tool pagination did not terminate')
+        if (next) seenCursors.add(next)
+        cursor = next || undefined
+      } while (cursor)
 
       this.registered = true
       return tools
@@ -331,7 +344,7 @@ export class MCPExternalClient {
     // MCP returns a content array of `{ type, ... }` blocks.
     const content = prop(result, 'content')
     if (Array.isArray(content)) {
-      return content
+      const text = content
         .map((c: unknown) => {
           const type = prop(c, 'type')
           if (type === 'text') return asString(prop(c, 'text')) ?? ''
@@ -339,7 +352,9 @@ export class MCPExternalClient {
           return JSON.stringify(c)
         })
         .join('\n')
+      return prop(result, 'isError') === true ? `Error: ${text || 'MCP tool failed.'}` : text
     }
+    if (prop(result, 'isError') === true) return `Error: ${JSON.stringify(result)}`
     return JSON.stringify(result)
   }
 
@@ -528,14 +543,15 @@ export class MCPExternalClient {
  * (`__tests__/nur-zwei-starter.test.ts`), sonst waere es das teuerste Muster
  * im Haus.
  *
- * Warum nur diese zwei: bis 2.6.8 standen hier zwanzig Eintraege, darunter
+ * Allgemeine Interpreter bleiben ausgeschlossen: bis 2.6.8 standen hier zwanzig Eintraege, darunter
  * node, python, deno, bun und docker. Jedes davon nimmt einen Einzeiler
  * entgegen (`node -e`, `python -c`) oder haendigt gleich die ganze Platte aus
  * (`docker run -v /:/host`). Mit denen in der Liste war jeder Skriptfehler in
  * der WebView, auch einer in einer Abhaengigkeit, Codeausfuehrung auf dem
  * Rechner des Nutzers statt Unfug innerhalb der App.
+ * Aphrody MCP is a dedicated executable scoped to its no-argument server mode.
  */
-export const MCP_STARTER = ['npx', 'uvx'] as const
+export const MCP_STARTER = ['npx', 'uvx', 'aphrody-mcp'] as const
 
 /**
  * Kann dieses Fenster den Server mit diesem Befehl ueberhaupt starten.

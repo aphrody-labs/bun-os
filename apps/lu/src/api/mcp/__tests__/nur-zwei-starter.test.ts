@@ -61,11 +61,11 @@ function erlaubteBefehle(): string[] {
 }
 
 describe('was das Hauptfenster starten darf', () => {
-  it('genau zwei Programme, plus den Windows-Shim', () => {
+  it('only the approved MCP launchers and Windows shim', () => {
     // Der Shim gehoert dazu, nicht als dritter Starter: unter Windows gibt es
     // npx nur als npx.cmd, und Rusts spawn findet .exe vom blanken Namen, aber
     // nie .cmd.
-    expect(erlaubteBefehle().sort()).toEqual(['npx', 'npx.cmd', 'uvx'])
+    expect(erlaubteBefehle().sort()).toEqual(['aphrody-mcp', 'npx', 'npx.cmd', 'uvx'])
   })
 
   it('kein allgemeiner Interpreter und keine Containerlaufzeit', () => {
@@ -83,6 +83,12 @@ describe('was das Hauptfenster starten darf', () => {
     // dieser Fall ist die Klammer dazwischen.
     const ohneShim = [...new Set(erlaubteBefehle().map((c) => c.replace(/\.cmd$/, '')))].sort()
     expect([...MCP_STARTER].sort()).toEqual(ohneShim)
+  })
+
+  it('limits the native Aphrody MCP server to its default stdio mode', () => {
+    const scope = CAP.permissions.find((p): p is { identifier: string; allow: { cmd: string; args: unknown }[] } => typeof p === 'object' && p !== null && (p as { identifier?: string }).identifier === 'shell:allow-spawn')
+    expect(scope?.allow.find((entry) => entry.cmd === 'aphrody-mcp')?.args).toEqual([])
+    expect(isStartableMcpCommand('aphrody-mcp')).toBe(true)
   })
 })
 

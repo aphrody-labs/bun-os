@@ -116,7 +116,7 @@ export class ToolRegistry {
     return this.builtinNames.has(name)
   }
 
-  /** External registrations refused because they collided with a builtin. */
+  /** External registrations refused because another tool already owns the name. */
   getRejectedExternalTools(): readonly { serverId: string; toolName: string }[] {
     return this.rejectedExternal
   }
@@ -139,15 +139,16 @@ export class ToolRegistry {
     const isTwoArg = executor.length >= 2
     for (const tool of tools) {
       const name = tool.name
-      // Name collision with an app tool: refuse the registration and say so.
-      // The alternative (overwrite) hands the app's own file and terminal tools
-      // to a third-party process without a word to the user, and the eventual
-      // disconnect deletes the builtin for good. See `builtinNames`.
-      if (this.builtinNames.has(name)) {
-        this.rejectedExternal.push({ serverId, toolName: name })
+      // Refuse collisions with builtins and other servers. An overwrite changes
+      // the owner silently and a later disconnect can remove the original tool.
+      const existing = this.tools.get(name)
+      if (this.builtinNames.has(name) || (existing && existing.definition.serverId !== serverId)) {
+        if (!this.rejectedExternal.some((entry) => entry.serverId === serverId && entry.toolName === name)) {
+          this.rejectedExternal.push({ serverId, toolName: name })
+        }
         console.warn(
           `[ToolRegistry] MCP server "${serverId}" tried to register "${name}", `
-          + 'which is a built-in tool. Registration refused; the built-in stays in place.',
+          + 'which is already owned by another tool. Registration refused.',
         )
         continue
       }

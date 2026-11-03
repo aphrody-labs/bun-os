@@ -28,7 +28,7 @@ interface FakeRequest {
   jsonrpc?: string
   id?: number
   method?: string
-  params?: { arguments?: Record<string, unknown> }
+  params?: { arguments?: Record<string, unknown>; cursor?: string }
 }
 
 /** Server behaviour a single test wants: id/method → response line. */
@@ -189,10 +189,12 @@ describe('connecting to an external server', () => {
     const client = new MCPExternalClient(config)
     await client.connect()
 
-    expect(lastServer!.written).toHaveLength(2)
+    expect(lastServer!.written).toHaveLength(3)
     for (const msg of lastServer!.written) expect(msg.endsWith('\n')).toBe(true)
     expect(JSON.parse(lastServer!.written[0]).method).toBe('initialize')
-    expect(JSON.parse(lastServer!.written[1]).method).toBe('tools/list')
+    expect(JSON.parse(lastServer!.written[1]).method).toBe('notifications/initialized')
+    expect(JSON.parse(lastServer!.written[1]).id).toBeUndefined()
+    expect(JSON.parse(lastServer!.written[2]).method).toBe('tools/list')
   })
 
   it('calls a tool and flattens the content array', async () => {
@@ -200,6 +202,32 @@ describe('connecting to an external server', () => {
     await client.connect()
 
     expect(await client.callTool('get_forecast', { city: 'Berlin' })).toBe('sunny in Berlin')
+  })
+
+  it('discovers every page of tools', async () => {
+    responder = (req) => req.method === 'tools/list'
+      ? JSON.stringify({ jsonrpc: '2.0', id: req.id, result: req.params?.cursor
+        ? { tools: [{ name: 'second', inputSchema: { type: 'object' } }] }
+        : { tools: [{ name: 'first', inputSchema: { type: 'object' } }], nextCursor: 'page-2' } })
+      : goodServer(req)
+    const client = new MCPExternalClient(config)
+    expect((await client.connect()).map((tool) => tool.name)).toEqual(['first', 'second'])
+    await client.disconnect()
+  })
+
+  it('reports tool-level MCP errors to the model', async () => {
+    const client = new MCPExternalClient(config)
+    await client.connect()
+    responder = (req) => JSON.stringify({ jsonrpc: '2.0', id: req.id, result: { isError: true, content: [{ type: 'text', text: 'device unavailable' }] } })
+    expect(await client.callTool('get_forecast', {})).toBe('Error: device unavailable')
+    await client.disconnect()
+  })
+
+  it('rejects repeated pagination cursors instead of looping', async () => {
+    responder = (req) => req.method === 'tools/list'
+      ? JSON.stringify({ jsonrpc: '2.0', id: req.id, result: { tools: [], nextCursor: 'same' } })
+      : goodServer(req)
+    await expect(new MCPExternalClient(config).connect()).rejects.toThrow('pagination did not terminate')
   })
 
   it('surfaces a JSON-RPC error as a rejection', async () => {
@@ -284,7 +312,7 @@ describe('a server that misbehaves does not leave a process behind', () => {
     const client = new MCPExternalClient(config)
     const connecting = client.connect()
     // tools/list gets no answer; the process dies instead.
-    await wroteRequests(2)
+    await wroteRequests(3)
     lastServer!.emit('close')
 
     await expect(connecting).rejects.toThrow(/Server process exited/)
@@ -303,8 +331,8 @@ describe('response framing', () => {
     server.stdout.emit('data', `{"jsonrpc":"2.0","id":${id},"resu`)
     server.stdout.emit('data', 'lt":{"ok":true}}\n')
     // The handshake resolved; tools/list is now outstanding, so answer it too.
-    await wroteRequests(2)
-    const listId = JSON.parse(server.written[1]).id
+    await wroteRequests(3)
+    const listId = JSON.parse(server.written[2]).id
     server.stdout.emit('data', `{"jsonrpc":"2.0","id":${listId},"result":{"tools":[]}}\n`)
 
     await expect(connecting).resolves.toEqual([])

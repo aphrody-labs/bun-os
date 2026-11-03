@@ -92,7 +92,6 @@ export function MCPServerSettings() {
       const tools = await client.connect()
       clients.set(server.id, client)
       setConnected(server.id, true)
-      setServerTools(server.id, tools)
       // Register tools with the global registry. The two-arg executor
       // contract lets the registry bind each tool's name into its own
       // closure — previously a single-arg hack tried to smuggle the name
@@ -103,6 +102,9 @@ export function MCPServerSettings() {
         tools,
         async (toolName, args) => client.callTool(toolName, args)
       )
+      const rejected = new Set(toolRegistry.getRejectedExternalTools().filter((item) => item.serverId === server.id).map((item) => item.toolName))
+      setServerTools(server.id, tools.filter((tool) => !rejected.has(tool.name)))
+      if (rejected.size) setError(`Tools already registered by another owner were skipped: ${[...rejected].join(', ')}.`)
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -239,7 +241,7 @@ export function MCPServerSettings() {
           <input
             value={formCommand}
             onChange={(e) => setFormCommand(e.target.value)}
-            placeholder="Command (only npx or uvx)"
+            placeholder="Command (npx, uvx or aphrody-mcp)"
             className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[0.65rem] text-gray-300 placeholder-gray-600 font-mono focus:border-white/20 outline-none"
           />
           <input

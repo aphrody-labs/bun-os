@@ -19,6 +19,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { join, resolve, sep } from 'node:path'
 import { parse } from 'acorn'
 import {
@@ -192,9 +193,9 @@ describe("the app's own source", () => {
 })
 
 describe('pdf.js, the one dependency that reaches above the floor', () => {
-  const dir = 'node_modules/pdfjs-dist/legacy/build'
-  const page = read(`${dir}/pdf.mjs`)
-  const worker = read(`${dir}/pdf.worker.min.mjs`)
+  const requireFromTest = createRequire(import.meta.url)
+  const page = readFileSync(requireFromTest.resolve('pdfjs-dist/legacy/build/pdf.mjs'), 'utf8')
+  const worker = readFileSync(requireFromTest.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs'), 'utf8')
 
   it('uses above the floor only what is covered, and the list of exemptions has no dead entry', () => {
     const used = new Set<string>()

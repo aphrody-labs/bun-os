@@ -103,7 +103,8 @@ export const JS_FEATURES: Feature[] = [
   { id: 'Element.checkVisibility', pattern: /\.checkVisibility\(/g, chrome: 105, safari: 17.4 },
   { id: 'Element.moveBefore', pattern: /\.moveBefore\(/g, chrome: 133, safari: N },
   { id: 'CSS highlights', pattern: /\bCSS\.highlights\b/g, chrome: 105, safari: 17.2 },
-  { id: 'Symbol.dispose', pattern: /\bSymbol\.(?:dispose|asyncDispose)\b/g, chrome: 134, safari: N },
+  { id: 'Symbol.dispose', pattern: /\bSymbol\.dispose\b/g, chrome: 134, safari: N },
+  { id: 'Symbol.asyncDispose', pattern: /\bSymbol\.asyncDispose\b/g, chrome: 134, safari: N },
   { id: 'Error.isError', pattern: /\bError\.isError\(/g, chrome: 134, safari: 26.0 },
   { id: 'Array.with', pattern: /\.with\(-?\d+\s*,/g, chrome: 110, safari: 16.0 },
   { id: 'crypto.randomUUID', pattern: /\bcrypto\.randomUUID\(/g, chrome: 92, safari: 15.4 },
@@ -187,6 +188,9 @@ export interface Exemption {
   file: RegExp
   /** Why the find does not break an old web view. */
   why: string
+  /** Extra restrictions for bundled dependency calls whose safety is location-dependent. */
+  maxCount?: number
+  sample?: RegExp
 }
 
 /** The built files of pdf.js: its page half, its worker as it comes, and our worker around it. */
@@ -198,6 +202,8 @@ const OURS = 'installed where missing, on the page and in the worker (src/lib/we
 const DEGRADES = 'style only: without it the page looks slightly different and works the same'
 
 export const EXEMPTIONS: Exemption[] = [
+  { feature: 'Symbol.asyncDispose', file: /(?:^|\/)core-[\w-]+\.js$/, maxCount: 1, why: 'Tauri Resource uses the symbol; public/early-symbol.js defines it before any module loads' },
+  { feature: 'View Transitions', file: /(?:^|\/)index-[\w-]+\.js$/, maxCount: 1, sample: /try\{var\s+\w+=\w+\.startViewTransition\(/, why: 'React catches failure and runs mutation, layout and spawned work without a transition; checked against the installed React source' },
   pdfjs('Math.sumPrecise', BRINGS),
   pdfjs('Map.getOrInsert', BRINGS),
   pdfjs('Uint8Array hex and base64', BRINGS),
@@ -258,7 +264,7 @@ export function checkBundle(files: BuiltFile[], floor: WebViewFloor = WEBVIEW_FL
     if (!css && !/\.m?js$/.test(file.name)) continue
     for (const find of css ? scanCss(file.text) : scanJs(file.text)) {
       if (!aboveFloor(find.feature, floor)) continue
-      if (exemptions.some((e) => e.feature === find.feature.id && e.file.test(file.name))) continue
+      if (exemptions.some((e) => e.feature === find.feature.id && e.file.test(file.name) && (e.maxCount === undefined || find.count <= e.maxCount) && (!e.sample || e.sample.test(find.sample)))) continue
       out.push({ file: file.name, feature: find.feature.id, chrome: find.feature.chrome, safari: find.feature.safari, count: find.count, sample: find.sample })
     }
     if (css && floor.safari < 18 && backdropFilterWithoutPrefix(file.text)) {

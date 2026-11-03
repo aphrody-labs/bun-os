@@ -9,6 +9,9 @@ export default defineConfig({
   resolve: { alias: ABSENT_PACKAGES },
   test: {
     globals: true,
+    // bunx may otherwise be selected as the fork executable and reject Vitest's
+    // Node flags before the worker starts. Keep the normal default elsewhere.
+    ...(process.versions.bun ? { pool: 'threads' as const } : {}),
     // The product build has LU Cloud off (src/api/cloud/config.ts). The cloud client code is
     // still shipped and tested against these fixture hosts, which are never contacted.
     env: {

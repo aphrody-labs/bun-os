@@ -110,13 +110,14 @@ describe('ToolRegistry — builtins are untouchable', () => {
       .toEqual(['jira_search', 'shell_execute'])
   })
 
-  it('NEGATIVE CONTROL: two external servers still resolve last-writer-wins between themselves', async () => {
-    // Only BUILTINS are protected. Two community servers claiming one name is a
-    // user-facing conflict, not a privilege boundary, and the old behaviour is
-    // deliberately left alone here.
+  it('preserves the first external owner when another server uses the same name', async () => {
     const registry = new ToolRegistry()
     registry.registerExternal('a', [external('search')], async () => 'from-a')
     registry.registerExternal('b', [external('search')], async () => 'from-b')
-    expect(await registry.execute('search', {})).toBe('from-b')
+    expect(await registry.execute('search', {})).toBe('from-a')
+    expect(registry.getRejectedExternalTools()).toEqual([{ serverId: 'b', toolName: 'search' }])
+    registry.unregisterServer('b')
+    expect(await registry.execute('search', {})).toBe('from-a')
+    expect(registry.getRejectedExternalTools()).toEqual([])
   })
 })

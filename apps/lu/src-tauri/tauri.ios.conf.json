@@ -1,8 +1,8 @@
 {
   "version": "3.0.7",
   "build": {
-    "beforeBuildCommand": "VITE_LU_BUILD_TARGET=mobile npm run build",
-    "beforeDevCommand": "VITE_LU_BUILD_TARGET=mobile npm run dev"
+    "beforeBuildCommand": "bun run build:mobile",
+    "beforeDevCommand": "bun run dev:mobile"
   },
   "identifier": "com.purpledoubled.lu",
   "app": {
