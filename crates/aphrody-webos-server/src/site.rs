@@ -17,8 +17,8 @@ use serde::Deserialize;
 use crate::{API, AppState};
 
 pub const ORIGIN: &str = "https://aphrody.com";
-pub const NAME: &str = "Aphrody Bun OS";
-pub const SHORT_NAME: &str = "Bun OS";
+pub const NAME: &str = "Aphrody";
+pub const SHORT_NAME: &str = "Aphrody";
 pub const DESCRIPTION: &str = "Bun OS in your browser: the COSMIC desktop with Android apps, Redox, Wine and Proton, \
 streamed from Bun OS and drawn by a Rust WebAssembly client on WebGPU.";
 /// Subtitle of the site card: short enough for three lines.
@@ -35,32 +35,20 @@ const PAGES: &[(&str, &str, &str)] = &[
     ("/status", "hourly", "0.4"),
 ];
 
-/// The Bun OS mark: a rounded square with the bun, drawn once and rasterised to every icon size.
-fn mark(size: u32, padding: f32, rounded: bool) -> String {
-    let s = size as f32;
-    let inner = s - 2.0 * padding;
-    let radius = if rounded { s * 0.22 } else { 0.0 };
-    let (cx, cy, r) = (s / 2.0, s / 2.0 + inner * 0.04, inner * 0.34);
-    format!(
-        r##"<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {s} {s}">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd977"/><stop offset="1" stop-color="#e09a2d"/></linearGradient></defs>
-<rect width="{s}" height="{s}" rx="{radius}" fill="{THEME}"/>
-<ellipse cx="{cx}" cy="{cy}" rx="{r}" ry="{ry}" fill="url(#g)"/>
-<path d="M{x0} {y0} Q{cx} {y1} {x1} {y0}" stroke="#5a3a12" stroke-width="{sw}" fill="none" stroke-linecap="round"/>
-<circle cx="{ex0}" cy="{ey}" r="{er}" fill="#2a1a08"/><circle cx="{ex1}" cy="{ey}" r="{er}" fill="#2a1a08"/>
-</svg>"##,
-        ry = r * 0.82,
-        x0 = cx - r * 0.32,
-        x1 = cx + r * 0.32,
-        y0 = cy + r * 0.22,
-        y1 = cy + r * 0.48,
-        sw = (r * 0.09).max(1.0),
-        ex0 = cx - r * 0.36,
-        ex1 = cx + r * 0.36,
-        ey = cy - r * 0.08,
-        er = (r * 0.09).max(1.0),
-    )
-}
+/// The Aphrody identity (crates/aphrody-identity): the Byron Love portrait icon set and the pet's idle animation.
+const ICON_SVG: &[u8] = include_bytes!("../../aphrody-identity/assets/brand/icon.svg");
+const FAVICON_ICO: &[u8] = include_bytes!("../../aphrody-identity/assets/brand/favicon.ico");
+const ICONS: &[(&str, &[u8])] = &[
+    ("icon-192.png", include_bytes!("../../aphrody-identity/assets/brand/icon-192.png")),
+    ("icon-512.png", include_bytes!("../../aphrody-identity/assets/brand/icon-512.png")),
+    ("maskable-192.png", include_bytes!("../../aphrody-identity/assets/brand/maskable-192.png")),
+    ("maskable-512.png", include_bytes!("../../aphrody-identity/assets/brand/maskable-512.png")),
+    ("apple-touch-icon.png", include_bytes!("../../aphrody-identity/assets/brand/apple-touch-icon.png")),
+];
+/// Portrait drawn on the share card.
+const CARD_ICON: &[u8] = include_bytes!("../../aphrody-identity/assets/brand/icon-256.png");
+/// Idle track of the pet (atlas row 0: six 192x208 cells), extracted from assets/aphrody/sprites/spritesheet.png.
+const PET_IDLE: &[u8] = include_bytes!("../../aphrody-identity/assets/aphrody/sprites/idle.webp");
 
 fn escape(text: &str) -> String {
     text.replace('&', "&amp;")
@@ -70,7 +58,7 @@ fn escape(text: &str) -> String {
         .replace('\'', "&#39;")
 }
 
-/// Open Graph card (1200x630): the mark, a title and a subtitle, wrapped to the card width.
+/// Open Graph card (1200x630): the Aphrody portrait, a title and a subtitle, wrapped to the card width.
 fn card(title: &str, subtitle: &str) -> String {
     fn wrap(text: &str, max: usize, lines: usize) -> Vec<String> {
         let mut out: Vec<String> = Vec::new();
@@ -112,17 +100,14 @@ fn card(title: &str, subtitle: &str) -> String {
             escape(line)
         );
     }
-    let icon = mark(128, 8.0, true);
-    let icon = icon
-        .split_once('>')
-        .map_or("", |(_, body)| body)
-        .trim_end_matches("</svg>");
+    use base64::Engine as _;
+    let icon = base64::engine::general_purpose::STANDARD.encode(CARD_ICON);
     format!(
         r##"<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
 <defs><radialGradient id="bg" cx="0.85" cy="0.1" r="1"><stop offset="0" stop-color="#2b2416"/><stop offset="0.6" stop-color="{THEME}"/></radialGradient></defs>
 <rect width="1200" height="630" fill="url(#bg)"/>
 <rect x="0" y="618" width="1200" height="12" fill="{ACCENT}"/>
-<g transform="translate(80 80)">{icon}</g>
+<image x="80" y="80" width="128" height="128" href="data:image/png;base64,{icon}"/>
 <text x="232" y="160" font-family="Inter" font-weight="700" font-size="40" fill="{ACCENT}">aphrody.com</text>
 {text}
 </svg>"##
@@ -143,53 +128,10 @@ fn render_png(svg: &str, width: u32, height: u32) -> Option<Vec<u8>> {
     pixmap.encode_png().ok()
 }
 
-/// ICO with PNG entries (Windows Vista+ and every browser).
-fn ico(images: &[(u32, Vec<u8>)]) -> Vec<u8> {
-    let mut out = vec![0, 0, 1, 0];
-    out.extend((images.len() as u16).to_le_bytes());
-    let mut offset = 6 + 16 * images.len() as u32;
-    for (size, png) in images {
-        let dim = if *size >= 256 { 0 } else { *size as u8 };
-        out.extend([dim, dim, 0, 0, 1, 0, 32, 0]);
-        out.extend((png.len() as u32).to_le_bytes());
-        out.extend(offset.to_le_bytes());
-        offset += png.len() as u32;
-    }
-    for (_, png) in images {
-        out.extend(png);
-    }
-    out
-}
-
-/// Every raster asset is rendered once per process and then served from memory.
-struct Rendered {
-    og: Vec<u8>,
-    favicon_ico: Vec<u8>,
-    icons: Vec<(&'static str, Vec<u8>)>,
-}
-
-fn rendered() -> &'static Rendered {
-    static RENDERED: OnceLock<Rendered> = OnceLock::new();
-    RENDERED.get_or_init(|| {
-        let png = |size: u32, padding: f32, rounded: bool| {
-            render_png(&mark(size, padding, rounded), size, size).unwrap_or_default()
-        };
-        Rendered {
-            og: render_png(&card("Bun OS in your browser", TAGLINE), 1200, 630).unwrap_or_default(),
-            favicon_ico: ico(&[
-                (16, png(16, 0.0, true)),
-                (32, png(32, 0.0, true)),
-                (48, png(48, 0.0, true)),
-            ]),
-            icons: vec![
-                ("icon-192.png", png(192, 0.0, true)),
-                ("icon-512.png", png(512, 0.0, true)),
-                // Maskable: full-bleed background, the mark inside the 80% safe zone.
-                ("maskable-512.png", png(512, 52.0, false)),
-                ("apple-touch-icon.png", png(180, 10.0, false)),
-            ],
-        }
-    })
+/// The share card is rendered once per process and then served from memory.
+fn card_png() -> &'static [u8] {
+    static CARD: OnceLock<Vec<u8>> = OnceLock::new();
+    CARD.get_or_init(|| render_png(&card(NAME, TAGLINE), 1200, 630).unwrap_or_default())
 }
 
 fn bytes(content_type: &'static str, cache: &'static str, body: Vec<u8>) -> Response {
@@ -330,10 +272,11 @@ async fn manifest() -> Response {
             { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
             { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
             { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+            { "src": "/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
             { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
         ],
         "screenshots": [
-            { "src": "/og.png", "sizes": "1200x630", "type": "image/png", "form_factor": "wide", "label": "Bun OS in your browser" },
+            { "src": "/og.png", "sizes": "1200x630", "type": "image/png", "form_factor": "wide", "label": "Aphrody" },
         ],
         "shortcuts": [
             { "name": "Status", "url": "/status", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
@@ -348,18 +291,22 @@ async fn manifest() -> Response {
 }
 
 async fn favicon_svg() -> Response {
-    bytes("image/svg+xml", DAY, mark(64, 0.0, true).into_bytes())
+    bytes("image/svg+xml", DAY, ICON_SVG.to_vec())
 }
 
 async fn favicon_ico() -> Response {
-    bytes("image/x-icon", DAY, rendered().favicon_ico.clone())
+    bytes("image/x-icon", DAY, FAVICON_ICO.to_vec())
 }
 
 async fn icon(Path(name): Path<String>) -> Response {
-    match rendered().icons.iter().find(|(file, _)| *file == name) {
-        Some((_, png)) => bytes("image/png", DAY, png.clone()),
+    match ICONS.iter().find(|(file, _)| *file == name) {
+        Some((_, png)) => bytes("image/png", DAY, png.to_vec()),
         None => StatusCode::NOT_FOUND.into_response(),
     }
+}
+
+async fn pet_idle() -> Response {
+    bytes("image/webp", DAY, PET_IDLE.to_vec())
 }
 
 async fn apple_touch_icon() -> Response {
@@ -375,7 +322,7 @@ struct CardQuery {
 /// `/og.png` is the site card; `?title=&subtitle=` renders a card for any shared link (bounded text).
 async fn og(Query(query): Query<CardQuery>) -> Response {
     if query.title.is_none() && query.subtitle.is_none() {
-        return bytes("image/png", DAY, rendered().og.clone());
+        return bytes("image/png", DAY, card_png().to_vec());
     }
     let clip = |text: Option<String>, max: usize, default: &str| {
         text.unwrap_or_else(|| default.to_owned())
@@ -626,6 +573,7 @@ pub fn router(state: Arc<AppState>) -> Router {
         .route("/favicon.ico", get(favicon_ico))
         .route("/apple-touch-icon.png", get(apple_touch_icon))
         .route("/icons/{name}", get(icon))
+        .route("/pet-idle.webp", get(pet_idle))
         .route("/og.png", get(og))
         .route("/sw.js", get(service_worker))
         .route("/site.js", get(site_js))
@@ -639,7 +587,7 @@ pub fn router(state: Arc<AppState>) -> Router {
 /// Warm the raster cache off the request path.
 pub fn prerender() {
     std::thread::spawn(|| {
-        rendered();
+        card_png();
     });
 }
 
@@ -649,17 +597,17 @@ mod tests {
 
     #[test]
     fn share_images_render() {
-        let og = render_png(&card("Bun OS in your browser", DESCRIPTION), 1200, 630).expect("og");
-        assert_eq!(&og[1..4], b"PNG");
-        let r = rendered();
-        assert!(r.icons.iter().all(|(_, png)| png.len() > 100));
-        assert_eq!(&r.favicon_ico[..4], &[0, 0, 1, 0]);
+        assert_eq!(&card_png()[1..4], b"PNG");
+        assert!(ICONS.iter().all(|(_, png)| &png[1..4] == b"PNG"));
+        assert_eq!(&FAVICON_ICO[..4], &[0, 0, 1, 0]);
+        assert!(ICON_SVG.starts_with(b"<svg") || ICON_SVG.starts_with(b"<?xml"));
+        assert_eq!(&PET_IDLE[8..12], b"WEBP");
     }
 
     #[test]
     fn llms_lists_every_operation() {
         let full = llms_txt(true);
-        assert!(full.starts_with("# Aphrody Bun OS\n\n> "));
+        assert!(full.starts_with("# Aphrody\n\n> "));
         assert!(API.ops.iter().all(|op| full.contains(op.summary)));
     }
 

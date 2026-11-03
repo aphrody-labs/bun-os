@@ -23,6 +23,7 @@ aphrody-webos-protocol = { path = "../aphrody-webos-protocol" }
 aphrody-m3-tokens = { workspace = true }
 # Share images and icons rendered from SVG (site.rs).
 resvg = { workspace = true }
+base64 = { workspace = true, features = ["alloc"] }
 bun-ui-web = { path = "../bun-ui-web", features = ["server"] }
 axum = { workspace = true, features = ["json", "query", "tokio", "http1", "ws"] }
 futures-util = { workspace = true }

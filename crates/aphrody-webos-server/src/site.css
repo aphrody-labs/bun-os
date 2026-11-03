@@ -190,9 +190,43 @@ html.app body {
   display: none;
 }
 
-#landing .mark {
-  width: 56px;
-  height: 56px;
+/* Aphrody identity at the centre: the pet's idle track (crates/aphrody-identity, six 192x208 cells drawn at
+   half scale), then the name. Frame timings follow the identity's idle animation. */
+#landing .identity {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+#landing .pet {
+  width: 96px;
+  height: 104px;
+  background: url("/pet-idle.webp") 0 0 / 576px 104px no-repeat;
+  animation: aphrody-idle 1.1s step-end infinite;
+}
+
+@keyframes aphrody-idle {
+  0% { background-position: 0 0; }
+  25.45% { background-position: -96px 0; }
+  35.45% { background-position: -192px 0; }
+  45.45% { background-position: -288px 0; }
+  58.18% { background-position: -384px 0; }
+  70.91% { background-position: -480px 0; }
+}
+
+#landing .tagline {
+  font-size: var(--md-sys-typescale-title-medium-size, 1rem);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+#landing > p,
+#landing > ul,
+#landing > .row,
+#landing > nav {
+  justify-self: center;
+  text-align: center;
+  justify-content: center;
 }
 
 #landing ul {
@@ -364,4 +398,12 @@ output {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+#landing nav .row {
+  justify-content: center;
+}
+
+#landing nav .row {
+  justify-content: center;
 }
