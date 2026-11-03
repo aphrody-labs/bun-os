@@ -34,8 +34,8 @@ Le double-clic sur `creator-kit.exe` ouvre le menu console. `Aphrody-Setup.exe` 
 
 - **Windows** : télécharge le pack sur <https://creator.aphrody.com>, décompresse, lance `creator-kit.exe`. L'exe se met à
   jour tout seul en arrière-plan (`CREATOR_KIT_NO_UPDATE=1` pour couper, `creator-kit self-update` pour forcer).
-  Détails : [docs/operations/infra/CREATOR.md](../../../docs/operations/infra/CREATOR.md).
-- **Avec [Bun](https://bun.sh)** : `bun packages/infra/product/src/creator/cli.ts <commande>`.
+  Publication : `scripts/aphrody/release/publish-creator.ts`.
+- **Avec [Bun](https://bun.sh)** : `bun packages/product/src/cli.ts creator <commande>`.
 
 `creator-kit --help` liste les commandes ; `creator-kit <commande> --help` détaille les options.
 Toutes les commandes qui modifient quelque chose sont en simulation tant que tu n'ajoutes pas `--apply`
@@ -118,6 +118,6 @@ Voir [docs-video-translate.md](docs-video-translate.md).
 ## Contrôles
 
 ```
-bun test                                   # dans packages/infra/product
-bun check --noEmit -p packages/infra/product/tsconfig.json
+bun test                                   # dans packages/product
+bun check --noEmit -p packages/product/tsconfig.json
 ```

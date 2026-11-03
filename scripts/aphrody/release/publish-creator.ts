@@ -48,7 +48,7 @@ const WINDOWS_RUNTIME = (() => {
   const i = Bun.argv.indexOf("--compile-executable-path");
   return i >= 0 ? resolve(Bun.argv[i + 1] ?? "") : undefined;
 })();
-import { build as buildPage, SEED } from "@aphrody/product/creator/site";
+import { build as buildPage, PAGE_FILES, SEED } from "@aphrody/product/creator/site";
 import { brandExe } from "./windows-exe.ts";
 const TARGET = {
   platform: "windows-x64",
@@ -279,7 +279,8 @@ async function stage(): Promise<{
 async function plan(): Promise<void> {
   console.log(`creator-kit ${await version()} -> ${SITE.baseUrl}`);
   console.log(`- bun build --compile --target=${TARGET.bunTarget} (${TARGET.exe}), pack: ${PACK_PATHS.length} paths`);
-  console.log("- files: <pack>.zip (human), <pack>.update.tar.gz (self-update), latest.json, SHA256SUMS, index.html");
+  console.log("- files: <pack>.zip (human), <pack>.update.tar.gz (self-update), latest.json, SHA256SUMS");
+  console.log(`- page: ${PAGE_FILES.join(", ")}`);
   console.log(
     `- host ${HOST}: ${SITE.root}/releases/<id>, atomic symlink ${SITE.root}/current, keep ${SITE.keepReleases}`,
   );
@@ -336,11 +337,18 @@ async function verify(): Promise<void> {
     if (sha !== a.sha256) throw new Error(`${a.file}: SHA-256 mismatch`);
     console.log(`ok ${a.file}`);
   }
-  for (const path of ["/", "/download/windows"]) {
-    const page = await fetch(`${SITE.baseUrl}${path}`, { method: "HEAD" });
+  for (const path of ["/", "/download/windows", ...PAGE_FILES.filter(f => f !== "index.html" && f !== "404.html")]) {
+    const page = await fetch(`${SITE.baseUrl}/${path.replace(/^\//, "")}`, { method: "HEAD" });
     if (!page.ok) throw new Error(`${path}: HTTP ${page.status}`);
     console.log(`ok ${path}`);
   }
+  const missing = await fetch(`${SITE.baseUrl}/no-such-page-${Date.now()}`);
+  const body = await missing.text();
+  if (missing.status !== 404 || !body.includes("Page introuvable"))
+    throw new Error(
+      `unknown path: HTTP ${missing.status}, ${body.includes("Page introuvable") ? "" : "not "}the site 404 page`,
+    );
+  console.log("ok 404");
   console.log(`creator.aphrody.com serves ${latest.version}`);
 }
 

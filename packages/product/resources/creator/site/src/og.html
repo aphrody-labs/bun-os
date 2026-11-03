@@ -1,0 +1,74 @@
+<!doctype html>
+<!-- Open Graph card source (1200x630), rendered to assets/og.png by `bun build.ts og`; never served. -->
+<html lang="fr" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="theme.css" />
+    <style>
+      @font-face {
+        font-family: "Google Sans Flex";
+        src: url("fonts/GoogleSansFlex-latin.woff2") format("woff2");
+        font-weight: 1 1000;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        display: grid;
+        grid-template-columns: 440px 1fr;
+        align-items: center;
+        gap: 56px;
+        padding: 0 80px;
+        box-sizing: border-box;
+        background: var(--md-sys-color-surface-container-low);
+        color: var(--md-sys-color-on-surface);
+        font-family: "Google Sans Flex", sans-serif;
+      }
+      .logo {
+        display: grid;
+        place-items: center;
+        height: 440px;
+        border-radius: 48px;
+        background: var(--md-sys-color-surface-container-lowest);
+      }
+      .logo img {
+        width: 380px;
+        height: auto;
+      }
+      h1 {
+        margin: 0 0 20px;
+        font-size: 84px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -1px;
+        color: var(--md-sys-color-primary);
+      }
+      p {
+        margin: 0 0 28px;
+        font-size: 34px;
+        line-height: 1.3;
+        color: var(--md-sys-color-on-surface-variant);
+      }
+      .chip {
+        display: inline-block;
+        padding: 10px 24px;
+        border-radius: 999px;
+        font-size: 26px;
+        background: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo"><img src="logo.webp" alt="" /></div>
+    <div>
+      <h1>Creator Kit</h1>
+      <p>Outils locaux pour créateurs : jeux de combat, dessin et stream.</p>
+      <span class="chip">Windows · gratuit · open source</span>
+    </div>
+  </body>
+</html>

@@ -4,26 +4,141 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
-    <title>Creator Kit</title>
+    <title>Creator Kit : outils locaux pour créateurs sous Windows</title>
+    <meta
+      name="description"
+      content="Creator Kit rassemble de petits outils locaux pour créateurs (jeux de combat, dessin, stream) : tournois Challonge, images de wiki, compression d'images, sous-titres anglais naturels, nettoyage du disque et des caches Adobe. Gratuit, open source, pour Windows."
+    />
+    <link rel="canonical" href="{{BASE_URL}}/" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="{{THEME_LIGHT}}" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="{{THEME_DARK}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Creator Kit" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:url" content="{{BASE_URL}}/" />
+    <meta property="og:title" content="Creator Kit : outils locaux pour créateurs" />
+    <meta
+      property="og:description"
+      content="Tournois Challonge, images de wiki, compression d'images, sous-titres anglais naturels et nettoyage du PC. Tout tourne sur ton PC Windows."
+    />
+    <meta property="og:image" content="{{BASE_URL}}/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Logo MAKIT et nom Creator Kit" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Creator Kit : outils locaux pour créateurs" />
+    <meta
+      name="twitter:description"
+      content="Tournois Challonge, images de wiki, compression d'images, sous-titres anglais naturels et nettoyage du PC, en local sous Windows."
+    />
+    <meta name="twitter:image" content="{{BASE_URL}}/og.png" />
+    <meta name="twitter:image:alt" content="Logo MAKIT et nom Creator Kit" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="describedby" type="text/markdown" href="/llms.txt" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="preload" href="/fonts/GoogleSansFlex-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/theme.css" />
     <link rel="stylesheet" href="/page.css" />
+    <script type="application/ld+json">
+      {{JSON_LD}}
+    </script>
   </head>
   <body>
     <main>
-      <img src="/logo.webp" width="320" height="187" alt="MAKIT" />
-      <a id="download" class="button" href="/download/windows">
-        <svg viewBox="0 -960 960 960" aria-hidden="true">
-          <path
-            d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"
-          />
-        </svg>
-        <span>Télécharger</span>
-      </a>
-      <p id="meta">Windows</p>
+      <header class="hero">
+        <h1><img src="/logo.webp" width="320" height="187" alt="Creator Kit par MAKIT" /></h1>
+        <p class="lead">
+          Petits outils locaux pour créateurs : jeux de combat, dessin et stream. Tout tourne sur ton PC, rien n'est
+          envoyé ailleurs que vers les services que tu configures toi-même.
+        </p>
+        <a id="download" class="button" href="/download/windows">
+          <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false">
+            <path
+              d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"
+            />
+          </svg>
+          <span>Télécharger pour Windows</span>
+        </a>
+        <p id="meta" aria-live="polite">v{{VERSION}} · Windows x64 · .zip</p>
+      </header>
+
+      <section aria-labelledby="tools-title">
+        <h2 id="tools-title">Dans le pack</h2>
+        <ul class="tools">
+          <li>
+            <h3>Tournois Challonge</h3>
+            <p><code>creator-kit challonge</code> crée et pilote des tournois Challonge depuis la ligne de commande.</p>
+          </li>
+          <li>
+            <h3>Images de wiki</h3>
+            <p>
+              <code>creator-kit wiki-images</code> récupère une galerie complète via l'API MediaWiki (Fandom, Dustloop,
+              Wikipédia), avec reprise et manifeste.
+            </p>
+          </li>
+          <li>
+            <h3>Compression d'images</h3>
+            <p>
+              Une page hors ligne (WebP, JPEG, AVIF, PNG) et <code>creator-kit img-compress</code> pour les dossiers ; les
+              originaux ne sont jamais écrasés.
+            </p>
+          </li>
+          <li>
+            <h3>Sous-titres anglais naturels</h3>
+            <p>
+              <code>creator-kit video-translate</code> produit des sous-titres anglais idiomatiques avec reconnaissance
+              vocale et modèle de langage locaux, et des glossaires FGC.
+            </p>
+          </li>
+          <li>
+            <h3>Caches Adobe et RAM</h3>
+            <p>
+              <code>creator-kit adobe-clean</code> vide les caches régénérables et ferme les services Creative Cloud en
+              arrière-plan, sans toucher aux projets.
+            </p>
+          </li>
+          <li>
+            <h3>Stockage du PC</h3>
+            <p>
+              <code>creator-kit disk-clean</code> mesure l'espace, vide les caches reconstruits automatiquement et liste
+              les doublons exacts.
+            </p>
+          </li>
+          <li>
+            <h3>Scripts Windows</h3>
+            <p>
+              Zone morte d'écran, lancement de Playnite au démarrage, cookies de Stacher7 : simulation par défaut,
+              <code>-Apply</code> pour agir.
+            </p>
+          </li>
+          <li>
+            <h3>Abonnements YouTube</h3>
+            <p>Une extension de navigateur (Manifest V3) range les abonnements en groupes colorés et filtre le flux.</p>
+          </li>
+          <li>
+            <h3>PNGTuber-Plus</h3>
+            <p>Un correctif source permet les raccourcis en combinaison (Ctrl, Maj, Alt + touche) dans PNGTuber-Plus.</p>
+          </li>
+        </ul>
+        <p class="note">
+          Les commandes qui modifient quelque chose restent en simulation tant que tu n'ajoutes pas <code>--apply</code>.
+          L'exe se met à jour tout seul ; <code>CREATOR_KIT_NO_UPDATE=1</code> coupe la mise à jour.
+        </p>
+      </section>
     </main>
+    <footer>
+      <nav aria-label="Liens du projet">
+        <a href="/latest.json">latest.json</a>
+        <a href="/SHA256SUMS">SHA256SUMS</a>
+        <a href="https://github.com/aphrody-labs/bun-os/tree/main/packages/product/resources/creator">Code source</a>
+        <a href="/llms.txt">llms.txt</a>
+      </nav>
+      <p>Licence Apache-2.0 · MAKIT</p>
+    </footer>
     <script src="/app.js"></script>
   </body>
 </html>
