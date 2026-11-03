@@ -819,6 +819,16 @@
       "origin": "https://github.com/aphrody-labs/xdg-desktop-portal-hyprland.git",
       "upstream": "https://github.com/hyprwm/xdg-desktop-portal-hyprland.git",
       "path": "hyprland/xdg-desktop-portal-hyprland"
+    },
+    "winget-cli": {
+      "origin": "https://github.com/aphrody-labs/winget-cli.git",
+      "upstream": "https://github.com/microsoft/winget-cli.git",
+      "path": "winget-cli"
+    },
+    "wil": {
+      "origin": "https://github.com/aphrody-labs/wil.git",
+      "upstream": "https://github.com/microsoft/wil.git",
+      "path": "wil"
     }
   },
   "references": {
@@ -1309,9 +1319,21 @@
       "initialized": true
     },
     {
+      "path": "wil",
+      "revision": "cbf677fb0a942557d08fd129f4c106a76247b2ec",
+      "origin": "https://github.com/aphrody-labs/wil.git",
+      "initialized": true
+    },
+    {
       "path": "wine-cachyos",
       "revision": "f80ddae9e217f2bad68455891371fa0f524451e7",
       "origin": "https://github.com/aphrody-labs/wine-cachyos.git",
+      "initialized": true
+    },
+    {
+      "path": "winget-cli",
+      "revision": "000f6b55151cb0f1afd2933bb54c62a4724b9ca8",
+      "origin": "https://github.com/aphrody-labs/winget-cli.git",
       "initialized": true
     },
     {

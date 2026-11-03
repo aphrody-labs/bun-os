@@ -1710,3 +1710,11 @@
 	url = https://github.com/aphrody-labs/gnome-shell.git
 	shallow = true
 	update = none
+[submodule "vendor/winget-cli"]
+	path = vendor/winget-cli
+	url = https://github.com/aphrody-labs/winget-cli.git
+	shallow = true
+[submodule "vendor/wil"]
+	path = vendor/wil
+	url = https://github.com/aphrody-labs/wil.git
+	shallow = true
