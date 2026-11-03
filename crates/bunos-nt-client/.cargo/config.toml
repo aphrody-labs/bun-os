@@ -1,0 +1,3 @@
+# bunos-nt.exe runs in a clean Windows VM without the VC++ redistributable: link the CRT statically.
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
