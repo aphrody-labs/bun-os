@@ -275,10 +275,7 @@ export function appCapabilities(config: CapabilityConfig): AppCapability[] {
     .sort((a, b) => Number(priorities.includes(b.libraryId)) - Number(priorities.includes(a.libraryId)));
 }
 
-export function appHostname(
-  capabilityId: string,
-  config: CapabilityConfig,
-): string {
+export function appHostname(capabilityId: string, config: CapabilityConfig): string {
   if (!appCapabilities(config).some(entry => entry.id === capabilityId))
     throw new Error(`Unknown application: ${capabilityId}`);
   if (!config.deployment) throw new Error("Application deployment settings are required.");
@@ -289,10 +286,7 @@ export function appHostname(
 }
 
 /** Canonical app host plus the library-name DNS alias already used by clients. */
-export function appHostnamesForLibrary(
-  libraryId: string,
-  config: CapabilityConfig,
-): string[] {
+export function appHostnamesForLibrary(libraryId: string, config: CapabilityConfig): string[] {
   const capability = appCapabilityForLibrary(libraryId);
   if (!capability) throw new Error(`Unknown application library: ${libraryId}`);
   const primary = appHostname(capability.id, config);
