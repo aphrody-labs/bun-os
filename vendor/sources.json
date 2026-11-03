@@ -1,6 +1,12 @@
 {
   "schema": 1,
   "sources": {
+    "googleworkspace-cli": {
+      "origin": "https://github.com/aphrody-labs/googleworkspace-cli.git",
+      "upstream": "https://github.com/googleworkspace/cli.git",
+      "path": "googleworkspace-cli",
+      "description": "Official Google Workspace CLI (gws) in Rust: dynamic API discovery, structured JSON output, native MCP server, and Workspace command runner."
+    },
     "msys2-packages": {
       "origin": "https://github.com/aphrody-labs/MSYS2-packages.git",
       "upstream": "https://github.com/msys2/MSYS2-packages.git",

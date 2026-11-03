@@ -25,7 +25,8 @@ if (paths.length === 0) {
   process.exit(2);
 }
 
-const root = Bun.spawnSync(["git", "rev-parse", "--show-toplevel"]).stdout.toString().trim();
+const gitBin = Bun.which("git.exe") || "git";
+const root = Bun.spawnSync([gitBin, "rev-parse", "--show-toplevel"]).stdout.toString().trim();
 const dir = mkdtempSync(join(tmpdir(), "git-commit-paths-"));
 const env = {
   ...process.env,
@@ -36,7 +37,7 @@ const env = {
   GIT_COMMITTER_EMAIL: "contact@aphrody.com",
 };
 function git(argv: string[], input?: string) {
-  const r = Bun.spawnSync(["git", "-C", root, ...argv], { env, stdin: input === undefined ? "ignore" : Buffer.from(input) });
+  const r = Bun.spawnSync([gitBin, "-C", root, ...argv], { env, stdin: input === undefined ? "ignore" : Buffer.from(input) });
   return { code: r.exitCode, out: r.stdout.toString().trim(), err: r.stderr.toString().trim() };
 }
 function must(argv: string[], input?: string) {
@@ -55,7 +56,7 @@ try {
       if (!existsSync(abs)) {
         git(["update-index", "--force-remove", "--", p]);
       } else if (statSync(abs).isDirectory() && existsSync(join(abs, ".git"))) {
-        const sha = Bun.spawnSync(["git", "-C", abs, "rev-parse", "HEAD"]).stdout.toString().trim();
+        const sha = Bun.spawnSync([gitBin, "-C", abs, "rev-parse", "HEAD"]).stdout.toString().trim();
         must(["update-index", "--add", "--cacheinfo", `160000,${sha},${p.replaceAll("\\", "/")}`]);
       } else {
         // `git add` on the temporary index: honours .gitattributes (eol) and recurses into directories.
@@ -68,7 +69,7 @@ try {
       }
     }
     const tree = must(["write-tree"]);
-    if (tree === must(["rev-parse", `${base}^{tree}`])) {
+    if (tree === must(["rev-parse", `${base}:`])) {
       console.log("nothing to commit: origin/main already has these paths as they are");
       process.exit(0);
     }

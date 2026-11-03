@@ -10,7 +10,8 @@
   },
   "bin": {
     "bun-google": "./src/bun-google-cli.ts",
-    "bun-google-index-public": "./src/public-index-cli.ts"
+    "bun-google-index-public": "./src/public-index-cli.ts",
+    "gws": "./src/gws-cli.ts"
   },
   "files": [
     "src",
@@ -28,7 +29,8 @@
     "./services": "./src/services.ts",
     "./edge-proxy": "./src/edge-proxy.ts",
     "./fonts-proxy": "./src/fonts-proxy.ts",
-    "./bun-plugin": "./src/bun-plugin.ts"
+    "./bun-plugin": "./src/bun-plugin.ts",
+    "./gws": "./src/gws.ts"
   },
   "publishConfig": {
     "access": "public"
