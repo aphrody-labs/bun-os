@@ -13,10 +13,34 @@
   "exports": {
     ".": "./src/index.ts",
     "./define": "./src/define.ts",
-    "./preload": "./src/preload.ts"
+    "./preload": "./src/preload.ts",
+    "./commands": "./src/commands/index.ts",
+    "./devtools": "./src/devtools/devtools.ts"
   },
   "bin": {
-    "bun-os-plugins": "./src/cli.ts"
+    "bun-os-plugins": "./src/cli.ts",
+    "bunos-rename": "./src/bin/bunos-rename.ts",
+    "bunos-docs": "./src/bin/bunos-docs.ts",
+    "bunos-parse": "./src/bin/bunos-parse.ts",
+    "bunos-bench": "./src/bin/bunos-bench.ts",
+    "bunos-n2b": "./src/bin/bunos-n2b.ts",
+    "bunos-migrate": "./src/bin/bunos-migrate.ts",
+    "bunos-mcp": "./src/bin/bunos-mcp.ts",
+    "bunos-agent-plugin": "./src/bin/bunos-agent-plugin.ts",
+    "bunos-workspace": "./src/bin/bunos-workspace.ts",
+    "bunos-lsp": "./src/bin/bunos-lsp.ts",
+    "bunos-wasm": "./src/bin/bunos-wasm.ts",
+    "bunos-search": "./src/bin/bunos-search.ts",
+    "bunos-crawl": "./src/bin/bunos-crawl.ts",
+    "bunos-ssh": "./src/bin/bunos-ssh.ts",
+    "bunos-just": "./src/bin/bunos-just.ts",
+    "bunos-uv": "./src/bin/bunos-uv.ts",
+    "bunos-msvc": "./src/bin/bunos-msvc.ts",
+    "bunos-sh": "./src/bin/bunos-sh.ts",
+    "bunos-plugin": "./src/bin/bunos-plugin.ts",
+    "bunos-env": "./src/bin/bunos-env.ts",
+    "bunos-cookie": "./src/bin/bunos-cookie.ts",
+    "bunos-host": "./src/bin/bunos-host.ts"
   },
   "files": [
     "src",

@@ -9,3 +9,5 @@ try {
 } catch (error) {
   if (process.env.BUN_OS_PLUGINS_STRICT === "1") throw error;
 }
+
+export {};

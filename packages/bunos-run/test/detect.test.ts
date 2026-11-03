@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { detect, parsePe, plan } from "../src/bunos.ts";
+import { detect, parsePe, plan, pluginBin } from "../src/bunos.ts";
 
 const dir = mkdtempSync(join(tmpdir(), "bunos-"));
 const put = (name: string, bytes: number[] | string) => {
@@ -68,4 +68,11 @@ test("PE import table", () => {
   expect(r.gui).toBe(false);
   expect(r.imports).toEqual(["KERNEL32.dll"]);
   expect(r.missing).toEqual(["KERNEL32.dll"]); // not present in the (empty) search dirs
+});
+
+test("front door falls back to the plugin registry bins of the checkout", () => {
+  const repo = join(import.meta.dir, "..", "..", "..");
+  expect(pluginBin("parse", repo)).toBe(join(repo, "packages", "bun-os-plugins", "src", "bin", "bunos-parse.ts"));
+  expect(pluginBin("no-such-command", repo)).toBeNull();
+  expect(pluginBin("../escape", repo)).toBeNull();
 });

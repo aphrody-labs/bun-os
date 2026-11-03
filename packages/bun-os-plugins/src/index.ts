@@ -8,12 +8,13 @@
  */
 import chromium from "@aphrody/chromium/bun-plugin";
 import google from "@aphrody/google/bun-plugin";
+import commands from "./commands/plugin.ts";
 import compat from "./compat/plugin.ts";
 import type { BunOsPlugin } from "./define.ts";
 
 export { defineBunOsPlugin, targetPath, type BunOsPlugin, type BunOsPluginSpec } from "./define.ts";
 
-export const plugins: readonly BunOsPlugin[] = [google, chromium, compat];
+export const plugins: readonly BunOsPlugin[] = [google, chromium, compat, commands];
 
 let registered = false;
 

@@ -330,6 +330,9 @@ async function frontDoor(cmd: string | undefined, rest: string[]): Promise<numbe
     console.log(
       `  ${"run".padEnd(10)} run any ELF, apk, deb, exe, wasm or script\n  ${"detect".padEnd(10)} identify a file`,
     );
+    const fromPlugins = pluginCommands();
+    if (fromPlugins.length)
+      console.log(`\nplugin registry commands (packages/bun-os-plugins):\n  ${fromPlugins.join(" ")}`);
     console.log("\nany other command runs `bunos-<command>` from PATH.");
     return 0;
   }
@@ -362,8 +365,38 @@ async function frontDoor(cmd: string | undefined, rest: string[]): Promise<numbe
     const proc = Bun.spawn([external, ...rest], { stdio: ["inherit", "inherit", "inherit"] });
     return await proc.exited;
   }
+  const plugin = pluginBin(cmd);
+  if (plugin) {
+    const proc = Bun.spawn([process.execPath, plugin, ...rest], { stdio: ["inherit", "inherit", "inherit"] });
+    return await proc.exited;
+  }
   console.error(`bunos: unknown command '${cmd}' (no built-in and no bunos-${cmd} on PATH); see bunos help`);
   return 2;
+}
+
+/**
+ * `bunos-<cmd>` from the checkout's plugin registry (packages/bun-os-plugins `bin`) when it is not installed on
+ * PATH: the fork's CLI commands (docs/bun-engine/FORK-MIGRATION.md) and every other bin of that package.
+ */
+export function pluginBin(cmd: string, repo = checkout()): string | null {
+  if (!repo || !/^[a-z0-9][a-z0-9-]*$/.test(cmd)) return null;
+  const dir = join(repo, "packages", "bun-os-plugins");
+  const manifest = join(dir, "package.json");
+  if (!existsSync(manifest)) return null;
+  const bins = (JSON.parse(readFileSync(manifest, "utf8")) as { bin?: Record<string, string> }).bin ?? {};
+  const script = bins[`bunos-${cmd}`];
+  return script ? resolve(dir, script) : null;
+}
+
+/** The `bunos <name>` commands the checkout's plugin registry provides. */
+function pluginCommands(repo = checkout()): string[] {
+  if (!repo) return [];
+  const manifest = join(repo, "packages", "bun-os-plugins", "package.json");
+  if (!existsSync(manifest)) return [];
+  const bins = (JSON.parse(readFileSync(manifest, "utf8")) as { bin?: Record<string, string> }).bin ?? {};
+  return Object.keys(bins)
+    .filter(b => b.startsWith("bunos-"))
+    .map(b => b.slice("bunos-".length));
 }
 
 if (import.meta.main) {
