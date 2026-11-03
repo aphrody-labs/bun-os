@@ -38,13 +38,17 @@ $manifestPath = Join-Path $Root 'manifests\wsl.json'
 $signer = Join-Path $PSScriptRoot '..\..\windows\signing\test-signing.ps1'
 function Hash([string]$p) { (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant() }
 function Admin { ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) }
-function Bun { $b = Get-Command bun -ErrorAction SilentlyContinue; if ($b) { $b.Source } else { throw 'bun not found on PATH' } }
+function Bun { $b = Get-Command bun -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1; if ($b) { $b.Source } else { throw "bun not found on PATH" } }
 
 $previous = @{}
 if (Test-Path -LiteralPath $manifestPath) {
   foreach ($e in (Get-Content $manifestPath -Raw | ConvertFrom-Json).files) { $previous[$e.path.ToLowerInvariant()] = $e }
 }
 $ours = { param($p) $e = $previous[$p.ToLowerInvariant()]; $e -and (Test-Path -LiteralPath $p) -and ((Hash $p) -eq $e.sha256) }
+# After an interrupted run (files copied, no record yet) a file is still recognisably ours: same bytes as the bundle,
+# or an .exe signed with the Bun OS test-signing certificate (factory/windows/signing).
+$ourCert = Get-ChildItem Cert:\LocalMachine\My -ErrorAction SilentlyContinue | Where-Object Subject -like 'CN=Bun OS Test Signing*' | Select-Object -First 1 -ExpandProperty Thumbprint
+$adoptable = { param($p, $sha) (Test-Path -LiteralPath $p) -and (((Hash $p) -eq $sha) -or ($ourCert -and $p -like '*.exe' -and (Get-AuthenticodeSignature -LiteralPath $p).SignerCertificate.Thumbprint -eq $ourCert)) }
 
 if ($Uninstall) {
   if (-not $Plan -and -not (Admin)) { throw "Uninstall needs elevation: C:\Windows\System32\sudo.exe pwsh -NoProfile -File $PSCommandPath -Uninstall" }
@@ -96,6 +100,7 @@ foreach ($name in $layout.Keys) {
   $state = if (-not (Test-Path -LiteralPath $dst)) { 'new' }
     elseif ($previous[$dst.ToLowerInvariant()] -and $previous[$dst.ToLowerInvariant()].source -eq $expected[$name] -and (& $ours $dst)) { 'same' }
     elseif (& $ours $dst) { 'upgrade' }
+    elseif (& $adoptable $dst $expected[$name]) { if ((Hash $dst) -eq $expected[$name] -or $name -like '*.exe') { 'adopt' } }
     else { throw "refusing to overwrite $dst (not installed by this script, or changed since)" }
   $items += [pscustomobject]@{ name = $name; src = $src; dst = $dst; source = $expected[$name]; state = $state; sign = $name -like '*.exe' }
 }
@@ -107,7 +112,14 @@ $links = @()
 foreach ($i in $items | Where-Object sign) {
   $base = [IO.Path]::GetFileNameWithoutExtension($i.name)
   $hit = $null
-  foreach ($d in $windowsDirs) { foreach ($e in $pathext) { $p = Join-Path $d "$base$e"; if ((Test-Path -LiteralPath $p) -and -not (& $ours $p)) { $hit = $p } } }
+  foreach ($d in $windowsDirs) {
+    foreach ($e in $pathext) {
+      $p = Join-Path $d "$base$e"
+      # Our own earlier link (same bytes as the payload we just placed or are about to) is not a collision.
+      $mine = (& $ours $p) -or ($p -ieq (Join-Path $LinkDir $i.name) -and (Test-Path -LiteralPath $i.dst) -and (Test-Path -LiteralPath $p) -and (Hash $p) -eq (Hash $i.dst))
+      if ((Test-Path -LiteralPath $p) -and -not $mine) { $hit = $p }
+    }
+  }
   if ($hit) { Write-Warning "no System32 link for $($i.name): would shadow $hit (use $($i.dst))"; continue }
   $links += [pscustomobject]@{ path = Join-Path $LinkDir $i.name; target = $i.dst }
 }
@@ -118,12 +130,12 @@ if (-not (Admin)) { throw "Writing to $Root and $LinkDir needs elevation: C:\Win
 
 # 2. Apply. A running WSL VM holds bzImage/modules.vhdx open: stop it before replacing them.
 if ($items | Where-Object { $_.state -eq 'upgrade' -and $_.dst -like '*\wsl\*' }) { & "$env:SystemRoot\System32\wsl.exe" --shutdown }
-foreach ($l in $links) { if ((Test-Path -LiteralPath $l.path) -and ($items | Where-Object { $_.dst -eq $l.target -and $_.state -ne 'same' })) { Remove-Item -LiteralPath $l.path -Force } }
-foreach ($i in $items | Where-Object state -ne 'same') {
+foreach ($l in $links) { if ((Test-Path -LiteralPath $l.path) -and ($items | Where-Object { $_.dst -eq $l.target -and $_.state -in 'new', 'upgrade' })) { Remove-Item -LiteralPath $l.path -Force } }
+foreach ($i in $items | Where-Object { $_.state -in 'new', 'upgrade' }) {
   New-Item -ItemType Directory -Force (Split-Path $i.dst) | Out-Null
   Copy-Item -LiteralPath $i.src -Destination $i.dst -Force
 }
-$toSign = @($items | Where-Object { $_.sign -and $_.state -ne 'same' } | ForEach-Object dst)
+$toSign = @($items | Where-Object { $_.sign -and $_.state -in 'new', 'upgrade' } | ForEach-Object dst)
 if ($toSign.Count) { & pwsh -NoProfile -File $signer sign @toSign; if ($LASTEXITCODE) { throw "signing failed ($LASTEXITCODE)" } }
 foreach ($l in $links) { if (-not (Test-Path -LiteralPath $l.path)) { New-Item -ItemType HardLink -Path $l.path -Target $l.target | Out-Null } }
 
@@ -139,7 +151,7 @@ $meta = if (Test-Path $bundleManifest) { Get-Content $bundleManifest -Raw | Conv
 New-Item -ItemType Directory -Force (Split-Path $manifestPath) | Out-Null
 [ordered]@{
   kind = 'bunos-windows-wsl'; component = 'wsl'; installed = (Get-Date).ToUniversalTime().ToString('o')
-  bundle = $Bundle; commit = $meta?.commit; kernelrelease = $meta?.kernelrelease; files = $files
+  bundle = $Bundle; commit = ${meta}?.commit; kernelrelease = ${meta}?.kernelrelease; files = $files
 } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $manifestPath -Encoding utf8NoBOM
 Write-Host "manifest $manifestPath ($($files.Count) entries)"
 

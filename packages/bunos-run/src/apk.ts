@@ -53,17 +53,23 @@ export const ENSURE_SESSION = [
   "  ln -sf /mnt/wslg/runtime-dir/wayland-0 /run/user/1000/wayland-0 2>/dev/null || true",
   "  systemd-run --machine=$u@ --user --collect --unit=waydroid-session --setenv=WAYLAND_DISPLAY=wayland-0 --setenv=XDG_RUNTIME_DIR=/run/user/1000 waydroid session start >/dev/null",
   "fi",
-  'for i in $(seq 240); do [ "$(waydroid prop get sys.boot_completed 2>/dev/null)" = 1 ] && exit 0; sleep 0.5; done',
+  'for i in $(seq 240); do [ "$(waydroid shell -- getprop sys.boot_completed 2>/dev/null)" = 1 ] && exit 0; sleep 0.5; done',
   "echo 'waydroid: Android did not finish booting in 120 s' >&2; exit 1",
 ].join("\n");
 
 export function plan(info: ApkInfo): string[][] {
   const wsl = ["wsl.exe", "-d", DISTRO, "-u", "root", "--"];
   const steps = [
-    [...wsl, "sh", "-c", ENSURE_SESSION],
+    // wsl.exe re-parses its command line, which mangles quotes in a multi-line script: ship it as one base64 token.
+    [...wsl, "sh", "-c", `echo ${Buffer.from(ENSURE_SESSION).toString("base64")} | base64 -d | sh`],
     ["wsl.exe", "-d", DISTRO, "--", "waydroid", "app", "install", toWslPath(info.file)],
   ];
-  if (info.packageName) steps.push(["wsl.exe", "-d", DISTRO, "--", "waydroid", "app", "launch", info.packageName]);
+  if (info.packageName) {
+    // `waydroid app install` returns before PackageManager has finished (dexopt); launch once the package resolves.
+    const wait = `for i in $(seq 120); do waydroid shell -- pm path ${info.packageName} >/dev/null 2>&1 && exit 0; sleep 0.5; done; exit 1`;
+    steps.push([...wsl, "sh", "-c", `echo ${Buffer.from(wait).toString("base64")} | base64 -d | sh`]);
+    steps.push(["wsl.exe", "-d", DISTRO, "--", "waydroid", "app", "launch", info.packageName]);
+  }
   return steps;
 }
 

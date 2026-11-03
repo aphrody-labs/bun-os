@@ -31,3 +31,6 @@ instanceIdleTimeout=-1
 autoMemoryReclaim=gradual
 sparseVhd=true
 hostAddressLoopback=true
+# Mirrored mode refuses Linux binds on ports Windows already uses; Waydroid's dnsmasq serves DNS + DHCP (53, 67)
+# on its own bridge (waydroid0), which Windows ICS/Hyper-V DHCP also hold on the host.
+ignoredPorts=53,67

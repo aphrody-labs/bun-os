@@ -9,7 +9,8 @@
 // p9-stat    median ms of one stat + 4 KiB read of /etc/os-release through \\wsl.localhost (Plan 9 / virtiofs), 50 runs
 // p9-list    ms to list /usr/bin through \\wsl.localhost
 // tcp-rtt    1-byte ping-pong between a Windows client and a Bun echo server in the distro on 127.0.0.1, 2000 runs, µs
-// docker-run `docker run --rm hello-world` inside the distro (image already pulled), median of 5, ms
+// docker-run `docker run --rm hello-world` through wsl.exe (image already pulled), median of 5, ms; docker-exe-run the
+// same from Windows docker.exe over 127.0.0.1:2375, docker-exe-version a bare API round trip
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { connect } from "node:net";
 
@@ -105,6 +106,14 @@ if (argv.includes("--docker")) {
       ms(() => sh(["-d", distro, "-u", "root", "--", "docker", "run", "--rm", "hello-world"])),
     ),
   );
+  // The Windows CLI straight to dockerd over the mirrored loopback (no wsl.exe in the path).
+  const exe = Bun.which("docker");
+  if (exe) {
+    const docker = (...a: string[]) => Bun.spawnSync([exe, ...a], { stdout: "ignore", stderr: "ignore" });
+    docker("run", "--rm", "hello-world");
+    out["docker-exe-run"] = stats(Array.from({ length: 5 }, () => ms(() => docker("run", "--rm", "hello-world"))));
+    out["docker-exe-version"] = stats(Array.from({ length: 10 }, () => ms(() => docker("version"))));
+  }
 }
 
 console.log(JSON.stringify(out, null, 2));

@@ -12,7 +12,15 @@ mode=${1:?usage: bunos-wsl-native.sh <docker|waydroid|waydroid-init|all> [waydro
 src=${2:-/opt/bunos/src/waydroid}
 user=$(id -nu 1000)
 
+latency_setup() {
+  # The kernel defaults to bbr + fq (wsl-latency.config), but systemd's 50-default.conf resets default_qdisc to
+  # fq_codel at boot; a later drop-in wins.
+  printf 'net.core.default_qdisc = fq\nnet.ipv4.tcp_congestion_control = bbr\n' >/etc/sysctl.d/90-bunos-latency.conf
+  sysctl -q --system >/dev/null
+}
+
 docker_setup() {
+  latency_setup
   pacman -S --needed --noconfirm docker docker-buildx docker-compose
   install -d /etc/systemd/system/docker.service.d /etc/docker
   # Loopback TCP without TLS: reachable only from this machine (127.0.0.1, shared with Windows by mirrored mode).
@@ -48,13 +56,14 @@ waydroid_setup() {
 waydroid_init() {
   [[ -f /var/lib/waydroid/waydroid.cfg ]] || waydroid init -s VANILLA
   cfg=/var/lib/waydroid/waydroid.cfg
-  # The Android Mesa has no d3d12 driver and WSL's only DRM node is vgem: render with SwiftShader + default gralloc.
+  # The Android Mesa has no d3d12 driver and the only DRM node is vgem: default (CPU) gralloc; Waydroid 1.6 then
+  # renders through ANGLE on a software Vulkan device by itself (ro.hardware.egl=angle).
   # multi_windows: every Android activity is its own Wayland toplevel, i.e. its own WSLg (Win32) window.
   python - "$cfg" <<'PY'
 import configparser, sys
 p = sys.argv[1]; c = configparser.ConfigParser(); c.optionxform = str; c.read(p)
 c.setdefault("properties", {})
-c["properties"].update({"ro.hardware.gralloc": "default", "ro.hardware.egl": "swiftshader",
+c["properties"].update({"ro.hardware.gralloc": "default",
                         "persist.waydroid.multi_windows": "true", "persist.waydroid.cursor_on_subsurface": "true"})
 with open(p, "w") as f: c.write(f)
 PY

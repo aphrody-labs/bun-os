@@ -4,6 +4,8 @@
 # Never run on the Windows workstation, never under WSL (owner rule). Output: bzImage,
 # modules.vhdx, config, report.json (times, sizes, tool versions). Anything not produced is not claimed.
 set -euo pipefail
+# mke2fs (gen_artifacts_vhdx.sh) lives in /usr/sbin, which a minimal service PATH may lack.
+export PATH="$PATH:/usr/sbin:/sbin"
 repo=$(realpath "$1"); work=$2; out=$3
 kver=${KVER:-7.3}
 jobs=${JOBS:-$(nproc)}
