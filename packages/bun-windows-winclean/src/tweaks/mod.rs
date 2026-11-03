@@ -497,7 +497,7 @@ impl Catalog {
 /// modules = ["privacy", "ai"]   # empty = every module
 /// include = ["shell.dark-mode"] # extra tweaks regardless of level
 /// exclude = ["appx.consumer"]
-/// desktop = "windows-mac"    # desktop profile, handled by bunos-win11
+/// desktop = "windows-native" # desktop profile, handled by bunos-win11
 /// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

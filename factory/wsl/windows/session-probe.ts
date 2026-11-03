@@ -10,7 +10,7 @@
 // (e.g. a bunos-wayland-win run). The window is any top-level window of msrdc.exe (WSLg) or bunos-wayland-win.exe whose
 // title contains --title (default: any new window). Prints JSON: ms from spawn to the window, its title and size.
 // The session runs detached in the guest (setsid), so it outlives this probe; without --keep it is stopped afterwards.
-import { CString, JSCallback, dlopen, FFIType, ptr } from "bun:ffi";
+import { JSCallback, dlopen, FFIType, ptr, type Pointer } from "bun:ffi";
 
 const argv = process.argv.slice(2);
 const opt = (n: string, d?: string) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : d);
@@ -65,7 +65,7 @@ function windows(): Win[] {
   const pid = new Uint32Array(1);
   const rect = new Int32Array(4);
   const cb = new JSCallback(
-    (hwnd: number) => {
+    (hwnd: Pointer) => {
       if (!user32.symbols.IsWindowVisible(hwnd)) return 1;
       user32.symbols.GetWindowThreadProcessId(hwnd, ptr(pid));
       const exe = processName(pid[0]!);
@@ -135,12 +135,7 @@ function detachedWin(cmd: string[]): string[] {
   if (!argv.includes("--keep")) return cmd;
   const q = (a: string) => `'${a.replaceAll("'", "''")}'`;
   const rest = cmd.slice(1).map(a => (a.includes(" ") ? `'"${a.replaceAll("'", "''")}"'` : q(a)));
-  return [
-    "pwsh",
-    "-NoProfile",
-    "-Command",
-    `Start-Process -FilePath ${q(cmd[0]!)} -ArgumentList ${rest.join(",")}`,
-  ];
+  return ["pwsh", "-NoProfile", "-Command", `Start-Process -FilePath ${q(cmd[0]!)} -ArgumentList ${rest.join(",")}`];
 }
 
 /** End what a session started (compositor, its helpers, viewer, wayvnc, dbus-run-session): TERM, then KILL. */

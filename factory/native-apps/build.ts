@@ -511,7 +511,7 @@ async function lu() {
     !contents.includes("lu-llama-server") ||
     !contents.includes(".desktop") ||
     !/ggml-cpu[^/]*\.so/.test(contents) ||
-    !contents.includes("/usr/share/doc/locally-uncensored/copyright")
+    !contents.includes("usr/share/doc/locally-uncensored/copyright")
   )
     throw new Error("LU deb is missing its sidecar, CPU backends, desktop launcher or license");
   const candidates = join(WORK, "lu-candidates");

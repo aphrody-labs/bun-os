@@ -35,7 +35,7 @@ const WAIVED: Record<string, string> = {
 // Requirements whose symbol does not exist in the mainline tree, with what replaces it.
 const ABSENT: Record<string, string> = {
   CONFIG_ANDROID_BINDER_IPC:
-    "C binder removed from mainline drivers/android in v7.4; ANDROID_BINDER_IPC_RUST (Rust binder) is the only binder and is enabled",
+    "C binder removed in v7.4-rc1 (fd2bc059ed46 'binder: rm -f binder.c', char-misc-7.4-rc1); ANDROID_BINDER_IPC_RUST (Rust binder) is the only binder and is enabled",
   CONFIG_ANDROID_BINDERFS: "C binderfs removed with the C binder; the Rust binder links rust_binderfs.c (binderfs) unconditionally",
   CONFIG_ASHMEM: "removed from staging in v5.18; Android 10+ libcutils uses memfd (sys.use_memfd=true in Waydroid)",
   CONFIG_CPU_FREQ_TIMES: "Android common kernel only; replaced by the BPF time_in_state program (Android 12+)",

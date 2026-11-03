@@ -51,7 +51,8 @@ function gl() {
   }).symbols;
 
   const dpy = egl.eglGetPlatformDisplay(0x31dd /* EGL_PLATFORM_SURFACELESS_MESA */, null, null);
-  if (!dpy || !egl.eglInitialize(dpy, null, null)) throw new Error(`eglInitialize failed: 0x${egl.eglGetError().toString(16)}`);
+  if (!dpy || !egl.eglInitialize(dpy, null, null))
+    throw new Error(`eglInitialize failed: 0x${egl.eglGetError().toString(16)}`);
   egl.eglBindAPI(0x30a0 /* EGL_OPENGL_ES_API */);
   const attrs = new Int32Array([0x3098 /* EGL_CONTEXT_MAJOR_VERSION */, 3, 0x3038 /* EGL_NONE */]);
   const ctx = egl.eglCreateContext(dpy, null /* EGL_NO_CONFIG_KHR */, null, attrs);
@@ -81,7 +82,10 @@ function gl() {
   const prog = g.glCreateProgram();
   g.glAttachShader(
     prog,
-    shader(0x8b31, "#version 300 es\nvoid main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.0-1.0,0.0,1.0);}"),
+    shader(
+      0x8b31,
+      "#version 300 es\nvoid main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.0-1.0,0.0,1.0);}",
+    ),
   );
   g.glAttachShader(
     prog,
@@ -123,16 +127,19 @@ function gl() {
 }
 
 async function run(cmd: string[], env: Record<string, string | undefined> = {}, timeout = 120_000) {
-  const headless = { ...Bun.env, DISPLAY: undefined, WAYLAND_DISPLAY: undefined, ...env };
+  const headless: Record<string, string> = {};
+  for (const [key, value] of Object.entries({ ...Bun.env, DISPLAY: undefined, WAYLAND_DISPLAY: undefined, ...env })) {
+    if (typeof value === "string") headless[key] = value;
+  }
   try {
-    const p = Bun.spawn(cmd, { env: headless as Record<string, string>, stdout: "pipe", stderr: "pipe", timeout });
+    const p = Bun.spawn(cmd, { env: headless, stdout: "pipe", stderr: "pipe", timeout });
     const [out, err] = await Promise.all([new Response(p.stdout).text(), new Response(p.stderr).text()]);
     return { code: await p.exited, out: out + err };
   } catch (e) {
     return { code: -1, out: String(e) };
   }
 }
-const pick = (text: string, re: RegExp) => [...text.matchAll(re)].map((m) => m[1].trim());
+const pick = (text: string, re: RegExp) => [...text.matchAll(re)].map(m => m[1].trim());
 
 if (Bun.argv.includes("--gl-only")) {
   try {
@@ -147,13 +154,23 @@ const self = [process.execPath, import.meta.path, "--gl-only"];
 const glRun = async (env: Record<string, string>) => {
   const r = await run(self, env);
   try {
-    return JSON.parse(r.out.split("\n").find((l) => l.startsWith("{"))!);
+    return JSON.parse(r.out.split("\n").find(l => l.startsWith("{"))!);
   } catch {
     return { error: r.out.slice(-400) };
   }
 };
 const vk = await run(["vulkaninfo", "--summary"]);
-const vkmark = await run(["vkmark", "--winsys", "headless", "-b", "vertex:duration=3", "-b", "texture:duration=3", "-b", "shading:duration=3"]);
+const vkmark = await run([
+  "vkmark",
+  "--winsys",
+  "headless",
+  "-b",
+  "vertex:duration=3",
+  "-b",
+  "texture:duration=3",
+  "-b",
+  "shading:duration=3",
+]);
 // The same default bunos-opencl-mesa ships in profile.d and environment.d.
 const cl = await run(["clinfo", "-l"], { RUSTICL_ENABLE: Bun.env.RUSTICL_ENABLE ?? "d3d12,llvmpipe" });
 const va = await run(["vainfo", "--display", "drm", "--device", "/dev/dri/renderD128"]);

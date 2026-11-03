@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# windows-native: the Bun OS desktop on a running Windows 11, drawn by Windows itself (docs/WINDOWS-ARCHITECTURE.md).
+#   bunos-win11 plan  --config crates/bunos-win11/profiles/windows-native.toml
+#   bunos-win11 apply --config crates/bunos-win11/profiles/windows-native.toml --yes
+#   bunos-win11 undo
+# Standard debloat plus the look module. Guardrails in the engine still refuse Defender, Windows Update, WSL/Hyper-V,
+# the Store, WebView2, runtimes, networking and the Bun OS/agent services whatever this file says.
+target = "live"
+level = "standard"
+exclude = [
+  # A OneDrive folder may still back known folders; turning sync off by policy is the owner's choice, not a default.
+  "edge-onedrive.onedrive-policy",
+]
+desktop = "windows-native"

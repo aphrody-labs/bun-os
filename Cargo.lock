@@ -29991,6 +29991,7 @@ version = "0.8.2"
 dependencies = [
  "blake3",
  "crc32fast",
+ "filmcraft-docpath",
  "flate2",
  "photocraft-affinity",
  "photocraft-algo",
