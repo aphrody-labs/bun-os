@@ -1,8 +1,8 @@
 # Bun OS on WSL: forks, distro image, kernel port
 
 Recorded 2026-10-29. Rule for this page: a line says "verified" only when a command was run in this session and its
-output read; everything else is listed under "Not verified". WSL was never started on the workstation, no remote host was
-used, no Linux build ran locally. Build checks are GitHub Actions workflows (`.github/workflows/wsl-*.yml`), not yet run.
+output read; everything else is listed under "Not verified". Sections 1-6 date from before WSL ran on the workstation;
+since 2026-11-03 the workstation runs the Bun OS bundle and section 8 records what was installed and measured there.
 
 ## 1. Forks and divergence from upstream
 
@@ -132,6 +132,10 @@ and a prebuilt-module `PKGBUILD` pinned to commit `1a82fbfda8f3` of our fork. `l
 
 ## 5. Not verified (needs CI or a Linux host)
 
+Since verified on 2026-11-03 (section 8): dxgkrnl and the Hyper-V series compile on 7.3.1 and work (`/dev/dxg`, D3D12
+on the GPU), the kernel boots under WSL, `--from-file` install, `systemd=true` boot with the masked units, the
+generated `modules.vhdx` as `kernelModules=`, WSLg sockets in this distro. The rest of this list still stands.
+
 - Any workflow run: `wsl-kernel.yml` (kernel build, `make rustavailable`, size/time report in the job summary and `report.json`, nvidia-open compile on 7.2.11 and 7.3) and `wsl-rootfs.yml` (rootfs build). Both are unbuilt.
 - That `dxgkrnl` and the Hyper-V patches compile and work on 7.3; that the kernel boots under WSL; that Rust objects build with rustc 1.99.1 + bindgen 0.71.1 on the runner.
 - Whether CachyOS v3/v4 repos install cleanly in the chroot (mirror still serving the pinned `cachyos-keyring-20240331-1`, `cachyos-mirrorlist-27-1`, `pacman-7.1.0.r9.g54d9411-5` files; they may have been superseded).
@@ -153,7 +157,7 @@ Tag choice: GitHub release dates are not ordered by version: `595.112.07` 2026-1
 
 Goal: Linux, systemd, Wayland and GLib apps running on Windows 11 like Win32 apps, with no sandbox between Bun OS and
 Windows: our WSL2 kernel, the `bunos-wsl` distro, WSLg tuned for native-looking windows, and the `bunos.sys` kernel
-driver (docs/NTCORE.md section 8). Built on the build host; WSL was not started on the workstation.
+driver (docs/NTCORE.md section 8). Built on the build host; installed on the workstation in section 8.
 
 | Piece | Path | Role |
 |---|---|---|
@@ -183,3 +187,166 @@ Verified on 2026-11-03:
 - Installer: `bun test factory/wsl/windows/install.test.ts` (INI merge keeps user keys/sections and comments, overrides
   ours, escapes paths) 3 pass; `install.ts --dry-run` prints the merged files and the `wsl.exe` command lines and
   writes nothing.
+
+## 8. Workstation setup: native WSL, Docker, Waydroid (2026-11-03)
+
+Owner request: the workstation runs our WSL (patched kernel, tuned WSLg) with Docker and Waydroid native inside it,
+installed into the Windows directory like `cmd.exe`, tuned for the lowest latency. Machine: i7-13700F (16 cores, 24
+threads), 31.8 GiB, RTX 4070, Windows 11 Pro 10.0.28120, WSL 3.0.4, WSLg 1.0.79. Everything below was run and read.
+
+### Windows side
+
+| Item | State |
+|---|---|
+| Optional features (`Win32_OptionalFeature`) | `Microsoft-Windows-Subsystem-Linux`, `VirtualMachinePlatform`, `Microsoft-Hyper-V-All` (+ Hypervisor, Services, Management-PowerShell), `HypervisorPlatform`, `Containers`: all enabled already; nothing to enable, no reboot |
+| Hypervisor / VBS | hypervisor present, VBS running, HVCI off, Secure Boot on, test signing off (boot configuration untouched) |
+| Power plan | Ultimate Performance already active |
+| Docker Desktop | not installed; only a leftover `desktop-linux` context in `%USERPROFILE%\.docker` (left alone) |
+
+### Install layout
+
+`factory/wsl/windows/setup-elevated.ps1`, run through Windows Sudo (`C:\Windows\System32\sudo.exe`, inline mode):
+
+| Path | Content |
+|---|---|
+| `%SystemRoot%\BunOS\wsl\` | `bzImage`, `modules.vhdx`, `bunos-wsl.wsl`, `waydroid-src.tar.gz` (git archive of `vendor/waydroid`), `bunos-wsl-native.sh`, `install.ts`, `latency.ts`, both templates |
+| `%SystemRoot%\BunOS\bin\` | `docker.exe` (aphrody-labs/docker-cli `v29.9.2` = `a82e528`, cross-built by `factory/wsl/windows/docker-cli.sh`), `bunos.exe` (`bun build --compile --target=bun-windows-x64 packages/bunos-run/src/bunos.ts`) |
+| `%SystemRoot%\System32\docker.exe`, `bunos.exe` | hard links to `bin\` (no launcher process; names checked against System32, SysWOW64, `%SystemRoot%`, Wbem, WindowsPowerShell, OpenSSH with every PATHEXT extension) |
+| `%SystemRoot%\BunOS\manifests\wsl.json` | every file and link: path, bundle sha256, installed sha256, size, signer thumbprint |
+| `%LOCALAPPDATA%\BunOS\wsl\bunos\ext4.vhdx` | the distro disk (per-user data, sparse) |
+
+Both executables are signed with the Bun OS test certificate (`factory/windows/signing`, thumbprint
+`1E67DBDB0D46A61CF57D286A5562DD76675D4E87`; `Get-AuthenticodeSignature`: `Valid`). The script verifies every bundle file
+against `SHA256SUMS`, plans before writing, never replaces a file it cannot prove it installed (manifest hash, or after
+an interrupted run: same bytes as the bundle or signed by our certificate), and is idempotent; a second run reports
+every file as `same`. It then runs `install.ts --dest %SystemRoot%\BunOS\wsl --no-copy --native` as the same user.
+
+```sh
+# on the build host: kernel, docker.exe, bundle
+KVER=7.3.1 bash factory/wsl/kernel/build-wsl-kernel.sh <repo> <work> <out>
+bash factory/wsl/windows/docker-cli.sh <work> <out>
+DOCKER_CLI_DIR=<out> bash factory/wsl/windows/bundle.sh <repo> <kernel-out> <distro-out> - <bundle-out>
+# on Windows (bundle copied to %LOCALAPPDATA%\BunOS\bundle\bunos-windows)
+pwsh -NoProfile -File factory/wsl/windows/setup-elevated.ps1 -Bundle <bundle> -Plan           # dry run
+C:\Windows\System32\sudo.exe pwsh -NoProfile -File factory/wsl/windows/setup-elevated.ps1 -Bundle <bundle> -Native
+```
+
+Bundle of this install: built from `b2f4ba4dc5`, `bunos-windows.zip` sha256 `b60a5d36...c88fc`; `bzImage` `880be2ae...e89e1`
+(16,876,544 bytes), `modules.vhdx` `2e6e0091...e6ea9a` (167,772,160), `bunos-wsl.wsl` `7e64f85d...824ff6`, `docker.exe`
+`68d0fe10...b3d54d9` before signing. The dry runs (`setup-elevated.ps1 -Plan`, `install.ts --dry-run`) were saved before the
+real run.
+
+### Kernel 7.3.1 for this setup
+
+`build-wsl-kernel.sh` merges four fragments over Microsoft's `config-wsl` and fails if any line is dropped:
+`wsl-rust.config` (Rust, dxgkrnl, identity), `wsl-android.config` (binder + binderfs; it had never been merged before),
+`wsl-docker.config`, `wsl-latency.config`. Compared with `config-wsl` (6.18.58) and Azure Linux 3.0 `SPECS/kernel/config`
+(6.6.159.1) and `SPECS/kernel-hwe/config` (6.18.57.1):
+
+| Option | config-wsl | Azure Linux 6.6 / HWE 6.18 | Bun OS |
+|---|---|---|---|
+| Preemption | `PREEMPT_NONE` + dynamic | `PREEMPT_NONE` + dynamic | `PREEMPT` + dynamic (`PREEMPT_NONE` needs `ARCH_NO_PREEMPT` in 7.3); boot shows `(full)` |
+| Tick | 250 Hz | 250 / **1000 Hz** | 1000 Hz |
+| MGLRU | off | on / on | on (`/sys/kernel/mm/lru_gen/enabled` = `0x0007`) |
+| zswap | off | off / on | on by default, shrinker on |
+| sched_ext | off | - / on | on (BTF already on) |
+| TCP / qdisc | cubic, pfifo_fast/fq_codel | cubic | BBR + fq built in; `/etc/sysctl.d/90-bunos-latency.conf` pins fq over systemd's fq_codel |
+| Docker | bridge, br_netfilter, nft compat, tun as modules | modules | built in (no modprobe at dockerd/container start); legacy `ip_tables` stay modules (Arch uses iptables-nft) |
+| Waydroid | no binder | no binder | `ANDROID_BINDER_IPC`, `ANDROID_BINDERFS`, `UDMABUF`, `DMABUF_HEAPS_SYSTEM` |
+| Already in config-wsl, kept | `DXGKRNL`, `HYPERV_VSOCKETS`, `VIRTIO_FS`, `OVERLAY_FS`, cgroup v2 controllers, `SECCOMP_FILTER`, `NO_HZ_IDLE`, `HYPERV_TIMER`, `PARAVIRT_SPINLOCKS` | | |
+
+Not taken: `NO_HZ_FULL` (syscall entry cost), cpufreq governors (a Hyper-V guest has no cpufreq driver), `PREEMPT_RT`.
+**dxgkrnl compiles against 7.3.1**: the build (12 jobs in `build.slice`, about 6 min prepare + 19 min compile) finished
+with no error; `report.json`: Rust on, 22 Rust objects, `DXGKRNL=y`, `ANDROID_BINDERFS=y`, `HZ=1000`, perf built. The
+first attempt of the day died in the 03:00 build-host OOM, the second stopped at `gen_artifacts_vhdx.sh` because the
+service PATH lacked `/usr/sbin` (`mke2fs`); the script now appends it.
+
+### `.wslconfig` (merged; the user's file is kept as `.wslconfig.bunos-backup`, no `.wslgconfig` existed: `.wslgconfig.bunos-absent`)
+
+`kernel=` and `kernelModules=` under `%SystemRoot%\BunOS\wsl`, `processors=24`, `memory=16GB`, `swap=8GB` (all CPUs,
+half the RAM, a quarter as swap: `install.ts` computes them), `networkingMode=mirrored`, `dnsTunneling`, `autoProxy`,
+`firewall=true` (kept from the user's file), `nestedVirtualization`, `guiApplications`; `[general] instanceIdleTimeout=-1`
+(the distro, Docker and Waydroid stay up: no cold boot on the next `wsl.exe`); `[experimental] autoMemoryReclaim=gradual`,
+`sparseVhd`, `hostAddressLoopback`, `ignoredPorts=53,67`. The last one is needed: in mirrored mode Linux cannot bind a
+port Windows already holds, and Windows' DHCP on 67 made Waydroid's dnsmasq fail (`failed to bind DHCP server socket`).
+GPU-PV and hvsocket need no key (on by default; WSL's own channels are hvsocket).
+
+### Verified in the distro
+
+`uname -r` = `7.3.1-microsoft-standard-WSL2`; `/dev/dxg` present; WSLg `wayland-0` socket and `/run/user/1000/wayland-0`
+link, `wayland-info` lists `wl_compositor` 4, `xdg_wm_base` 1, `wl_seat` 7; `glxinfo -B`: `D3D12 (NVIDIA GeForce RTX 4070)`;
+24 CPUs, 15 GiB; binderfs mounted on `/dev/binderfs`; `systemctl is-active docker containerd waydroid-container` all active.
+
+### Docker
+
+Docker Engine 29.9.2 + buildx + compose from pacman (`bunos-wsl-native.sh docker`): `docker.service` enabled, overlayfs,
+cgroup v2 / systemd driver, API on the unix socket and on `tcp://127.0.0.1:2375` (`--tls=false`; mirrored mode shares
+that loopback with Windows only; whoever reaches it is root in the distro, which the Windows user already is through
+`wsl -u root`). Windows: `docker.exe` with context `bunos` (current). From a Windows shell: `docker version` shows
+client and server 29.9.2 on kernel 7.3.1, `docker run --rm hello-world` prints its greeting, and GPU-PV inside a
+container works without the NVIDIA toolkit:
+
+```sh
+docker run --rm --device /dev/dxg -v /usr/lib/wsl:/usr/lib/wsl:ro -e LD_LIBRARY_PATH=/usr/lib/wsl/lib \
+  debian:stable-slim /usr/lib/wsl/lib/nvidia-smi -L     # GPU 0: NVIDIA GeForce RTX 4070
+```
+
+### Waydroid and `bunos apk`
+
+Waydroid 1.6.3 from `vendor/waydroid` (`cdc6437`, installed with `make install USE_NFTABLES=1`), dependencies from pacman,
+LineageOS 20 VANILLA system + MAINLINE vendor images (`waydroid init`), `persist.waydroid.multi_windows=true`,
+`ro.hardware.gralloc=default`; Waydroid picks ANGLE on a software Vulkan device itself (`ro.hardware.egl=angle`).
+`bunos apk install <file.apk>` (`packages/bunos-run/src/apk.ts`, also `C:\Windows\System32\bunos.exe apk ...`) reads the
+package name with the bun-loaders AXML decoder, starts the session as a transient user unit on WSLg's Wayland socket,
+waits for `sys.boot_completed`, installs, waits until PackageManager resolves the package, launches. Test: F-Droid
+`F-Droid.apk` from f-droid.org (12,569,951 bytes, sha256 `19d51fad...c3327b52`, PGP signature good from F-Droid
+`37D2 C987 89D8 3119 4839 4E3E 41E7 044E 1DBA 2E89`, checked on the build host) in its own directory:
+`org.fdroid.fdroid` 2.0.2 installed (`pm list packages`), `topResumedActivity` = `org.fdroid.fdroid/org.fdroid.IconActivity`,
+and a Win32 window "F-Droid (bunos)" owned by `msrdc` (WSLg RAIL). Three fixes came out of the run: `wsl.exe` re-parses its
+command line and broke the quoted guest script (now shipped as one base64 token); `waydroid prop get` as root looks for a
+root session (now `waydroid shell -- getprop`); `waydroid app install` returns before dexopt ends (launch waits for `pm path`).
+
+### Latency
+
+Probe: `factory/wsl/windows/latency.ts` (raw JSON in `%LOCALAPPDATA%\BunOS\measure\`). The workstation is shared with
+other agents (rustc builds held 37-94% of the 24 threads during the after-runs), so absolute numbers drift by 2-5x between
+runs; the fair comparison is the interleaved A/B, which alternates the original setup and ours under the same load.
+
+| Metric (median) | Before: stock 6.18.54.1, NAT, 12 vCPU, quiet host (05:16) | Interleaved A/B, original / ours, run 1 | run 2 |
+|---|---|---|---|
+| `wsl -d bunos -- true`, VM warm | 75 ms | 350 / 439 ms | 625 / 456 ms |
+| `\\wsl.localhost` stat + 4 KiB read | 1.62 ms | 7.27 / 5.83 ms | 5.50 / 4.76 ms |
+| `\\wsl.localhost` list `/usr/bin` (1.6k entries) | 4.9 ms | 13.2 / 11.3 ms | 10.6 / 10.3 ms |
+| TCP 1-byte RTT Windows <-> distro on 127.0.0.1 | 98 µs (p99 171) | 308 / 201 µs | 331 / 220 µs |
+
+Ours is faster on file access and loopback TCP (about a third less RTT) under identical load; `wsl.exe` start time is
+noise-dominated. Other numbers:
+
+| Metric | Value |
+|---|---|
+| Cold start (`wsl --shutdown`, then `wsl -d bunos -- true`) | 3.49 s before; 7.85 s after (systemd now starts dockerd, containerd and the Waydroid container); avoided in normal use by `instanceIdleTimeout=-1` |
+| dockerd from Windows: TCP connect / `GET /_ping` on 127.0.0.1:2375 | 0.8 ms / 0.6 ms |
+| `docker.exe --version` / `docker.exe version` (process start + API) | 192-235 ms / 310-490 ms on a quiet moment; 1.3-3 s under full host load |
+| `docker run --rm hello-world` via `wsl.exe` | 399 ms before (stock kernel); 650-810 ms after under load |
+| Waydroid: launch call to Win32 window | 0.56-0.80 s with the app process warm, 1.93 s with a process start (Android `Displayed +815ms`) |
+| `bunos apk install F-Droid.apk` with Android already booted | 15.5 s (install, dexopt, launch) |
+| Android boot (session start to launcher displayed) | about 24 s |
+
+### Undo
+
+```sh
+C:\Windows\System32\sudo.exe pwsh -NoProfile -File factory/wsl/windows/setup-elevated.ps1 -Uninstall
+wsl --unregister bunos          # only the Bun OS distro: deletes its ext4.vhdx
+```
+
+The first command removes exactly what `manifests\wsl.json` lists (links first, files only if unchanged), restores
+`.wslconfig` from `.wslconfig.bunos-backup`, deletes `.wslgconfig` (it did not exist before) and shuts WSL down. The
+`bunos` docker context stays in `%USERPROFILE%\.docker` (`docker context rm bunos`). Nothing else on Windows was changed:
+no optional feature, boot setting, driver or other distro.
+
+### Open
+
+- The distro image does not carry Docker/Waydroid yet; `--native` provisions them on first install (needs network).
+- Android renders in software (ANGLE on a software Vulkan device); a d3d12 path for Android gralloc does not exist.
+- `bunos.sys` is not loaded on this workstation (Secure Boot locks test signing; factory/windows/signing/README.md).
+- Quiet-host after-numbers for `wsl.exe` start and Docker runs: rerun `latency.ts --docker` when no build is running.
