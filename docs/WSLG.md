@@ -164,3 +164,20 @@ wayland-protocols 1.49.
   FreeRDP/winpr and the RAIL Weston, which an Arch rootfs would not carry).
 * Hyprland is not packaged into the stock system-distro image.
 * Weston 16 RDP with GL renderer, an RDP client connection, audio and input: not run.
+
+## Bun OS for Windows: WSLg settings shipped (2026-11-03)
+
+`factory/wsl/windows/wslgconfig.template` becomes `%USERPROFILE%\.wslgconfig` (merged by `factory/wsl/windows/install.ts`,
+backup `*.bunos-backup`). Every key of `[system-distro-env]` is exported into the WSLg system distro by WSLGd
+(`WSLGd/main.cpp` `SetupOptionalEnv`, read 2026-11-03). The keys were checked in the sources that read them:
+
+| Key | Value | Reader | Effect |
+|---|---|---|---|
+| `WESTON_RDPRAIL_SHELL_BLEND_OVERLAY_ICON_TASKBAR` | `false` | weston-mirror `rdprail-shell/shell.c` (`read_rdpshell_config_bool`, default true) | no penguin overlay on taskbar icons |
+| `WESTON_RDPRAIL_SHELL_BLEND_OVERLAY_ICON_APPLIST` | `false` | same | no overlay on Start-menu icons |
+| `WESTON_RDPRAIL_SHELL_APPEND_DISTRONAME_STARTMENU` | `false` | same | Start-menu entries without the `(bunos)` suffix |
+| `WESTON_RDPRAIL_SHELL_ALLOW_ALT_F4_TO_CLOSE_APP` | `true` | same | Alt+F4 closes the Linux app like a Win32 app |
+| `WSLG_USE_USER_DISTRO_XFONTS` | `true` | WSLGd `main.cpp` (default true, pinned) | XWayland uses the distro fonts |
+
+`.wslconfig` `[wsl2] guiApplications=true` keeps WSLg on. The values parse as `true`/`false`/`1`/`0` only. Not yet
+observed on a running WSLg session (WSL is not started on the workstation; the test VM has no WSL yet).

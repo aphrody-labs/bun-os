@@ -163,3 +163,58 @@ cd packages/ntcore && bun test
 Registered in `factory/bunos/components.json`: `npm:@aphrody/ntcore` depends on `submodule:vendor/reactos`,
 `submodule:vendor/wine-cachyos`, `npm:@aphrody/buncc` and `npm:@aphrody/windows`. The `wasmos` edge is not recorded
 because no such component id exists yet.
+
+## 8. bunos.sys: the Bun OS Windows kernel driver (2026-11-03)
+
+The native half of the NT personality: a WDM driver in Rust (`windows-drivers-rs`: `wdk` 0.5, `wdk-sys` 0.5.2,
+`wdk-build` 0.6) that runs inside the Windows 11 kernel, with no sandbox between it and the Bun OS userland.
+
+| Piece | Path | State |
+|---|---|---|
+| Driver | `crates/bunos-nt-driver` (package `bunos`, own workspace, `panic = "abort"`, static CRT) | builds with WDK/SDK 10.0.28000 |
+| INF source | `crates/bunos-nt-driver/bunos.inx` | primitive driver (`[DefaultInstall.NTamd64]`, no hardware ID), service `BunOS`, demand start, Driver Store (DirId 13) |
+| Package | `cargo wdk build --profile release` (cargo-wdk 0.2.0) | `bunos.sys`, `bunos.inf` (stampinf), `bunos.cat` (inf2cat), infverif passes, `.sys` and `.cat` test-signed with `WDRLocalTestCert` |
+| Rust client | `crates/bunos-nt-client` (windows-rs 0.62.2, own workspace) | `Device::open/version/ping/ioctl`, CLI `bunos-nt status/version/ping`; exit 3 when the driver is absent |
+| bun:ffi client | `packages/windows/src/nt-driver.ts` (`@aphrody/windows/nt-driver`, `ntDriver`) | `BunOsDevice.open()` (null when absent), `version()`, `ping()`, `available()` |
+| Test VM | `factory/wsl/windows/vm/` (`vm.sh`, `autounattend.xml`, `setup.cmd`, `test-driver.cmd`) | Windows 11 LTSC eval under QEMU/KVM on the build host |
+
+Contract (`CTL_CODE(FILE_DEVICE_UNKNOWN, fn, METHOD_BUFFERED, FILE_ANY_ACCESS)`): `IOCTL_BUNOS_VERSION` = `0x00222000`
+(returns `"bunos.sys <version>\0"`), `IOCTL_BUNOS_PING` = `0x00222004` (echoes the input). Device `\Device\BunOS`, link
+`\.\BunOS`. Both clients pin these values in tests; a new kernel service is a new control code.
+
+Release package measured on the workstation (`%CARGO_TARGET_DIR%\release\bunos_package`):
+
+| File | Bytes | sha256 |
+|---|---|---|
+| `bunos.sys` | 26,624 | `1aacfbb71c8138cbad9b05e8e3acd9434b56abf5bc2daa07aad19a06b15346f4` |
+| `bunos.cat` | 8,040 | `e984dfde2df441b26a5050593ae0339d74d7fa3a15105ddba51bdc5c0087321a` |
+| `bunos.inf` | 1,379 | `9c82c7b68c00a6c4c69c021b80950d74d476c4ecf66029aefb8b5d525ad90b22` |
+| `bunos-nt.exe` | 256,512 | `3c324e099c4423a4a3c0787a4b6eb9634471b9adecce53b930190059bce6a076` |
+| `WDRLocalTestCert.cer` | 809 | `4c20b14bd29634f5ecbeabf13517dac82dd60fe037f34317ae3dbb7a4f43d2b2` |
+
+`bunos.sys` imports only `ntoskrnl.exe`; `bunos-nt.exe` (static CRT) imports only `kernel32`, `ntdll`, `oleaut32` and an
+API set. `signtool verify /pa` on the workstation reports the chain ends in an untrusted root: expected, the test
+certificate is trusted only inside the test VM. Hashes change with every rebuild (the signature carries a timestamp
+and stampinf a DriverVer).
+
+Safety rule: the driver is **never** installed or loaded on the workstation, and test signing / boot configuration are
+never changed there. The `cargo wdk build` step only creates the self-signed certificate in the current user's
+`WDRTestCertStore` store, which grants nothing.
+
+### Load test procedure (Windows 11 VM on the build host)
+
+```
+# workstation: build the package and the client
+cd crates/bunos-nt-driver && cargo wdk build --profile release
+cd ../bunos-nt-client && cargo build --release
+# copy bunos_package/{bunos.sys,bunos.inf,bunos.cat,WDRLocalTestCert.cer}, bunos-nt.exe and a ts/ dir
+# (packages/windows/src/{nt-driver,errors,ffi}.ts, test/nt-driver.test.ts, bun.exe) to the build host, then there:
+factory/wsl/windows/vm/vm.sh config <pkg> <bunos-nt.exe> <ts>   # config.iso
+factory/wsl/windows/vm/vm.sh install                              # unattended Windows 11 + OpenSSH + test signing
+factory/wsl/windows/vm/vm.sh test                                 # certutil Root/TrustedPublisher, pnputil, sc start, both clients
+```
+
+The VM uses `OVMF_CODE_4M.fd` (no Secure Boot, so `bcdedit /set testsigning on` takes effect), swtpm TPM 2.0, AHCI
+disk and e1000e NIC (inbox drivers, no virtio ISO), SSH forwarded to `127.0.0.1:2222` only. Inside the VM
+`test-driver.cmd` imports the test certificate, runs `pnputil /add-driver bunos.inf /install`, `sc start BunOS`,
+`bunos-nt.exe status`, `bunos-nt.exe ping`, the bun:ffi test, then `sc stop BunOS`.
