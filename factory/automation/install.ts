@@ -38,12 +38,19 @@ ${extra}`,
   ] as const;
 }
 function timer(name: string, description: string, schedule: string, unit?: string) {
+  // OnUnitInactiveSec only counts from the unit's last run: a timer enabled after boot (OnBootSec already elapsed)
+  // would never fire. OnActiveSec starts the chain whenever the timer itself is (re)started.
+  const boot = /^OnBootSec=(\S+)$/m.exec(schedule)?.[1];
+  const active =
+    boot && schedule.includes("OnUnitInactiveSec=") && !schedule.includes("OnActiveSec=")
+      ? `\nOnActiveSec=${boot}`
+      : "";
   return [
     `${name}.timer`,
     `[Unit]
 Description=${description}
 [Timer]
-${schedule}
+${schedule}${active}
 Persistent=true
 ${unit ? `Unit=${unit}\n` : ""}[Install]
 WantedBy=timers.target

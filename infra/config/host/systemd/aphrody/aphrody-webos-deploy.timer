@@ -4,6 +4,7 @@ Description=Check the WebOS runner handoff for completed releases
 
 [Timer]
 OnBootSec=30
+OnActiveSec=30
 OnUnitInactiveSec=30
 Unit=aphrody-webos-deploy.service
 
