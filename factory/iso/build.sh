@@ -62,6 +62,7 @@ docker pull -q "$image" >/dev/null
 docker run --rm --privileged --cgroup-parent=build.slice --cpus "$jobs" \
   -v "$work:/work" -v "$out:/out" -e SOURCE_DATE_EPOCH="$epoch" -e FPR="$store_fpr" "$image" bash -euo pipefail -c '
     pacman -Syu --noconfirm --needed archiso >/dev/null
+    pacman-key --init >/dev/null 2>&1 # the image ships without a local master key, which --lsign-key needs
     pacman-key --add /work/profile/airootfs/usr/share/pacman/keyrings/bunos.gpg >/dev/null
     pacman-key --lsign-key "$FPR" >/dev/null
     mkarchiso -v -r -w /work/w -o /work/iso /work/profile
