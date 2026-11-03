@@ -19,7 +19,7 @@
  * as they are. Every process runs from the staged tree, so `down` finds them by image path.
  */
 import { $ } from "bun";
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 const repo = resolve(import.meta.dir, "../../..");
