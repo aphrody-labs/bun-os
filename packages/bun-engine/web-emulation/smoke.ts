@@ -315,7 +315,7 @@ export async function smoke(
       const png = Buffer.from(shot.data, "base64");
       await Bun.write(shotPath, png);
       let presentation;
-      if (renderer === "gpu") {
+      if (renderer === "gpu" || renderer === "software") {
         const pixels = decodeScreenshotPng(png);
         let lit = false;
         for (let i = 0; i < pixels.data.length; i += 4)
@@ -330,7 +330,7 @@ export async function smoke(
           height: pixels.height,
           evidence: "cdp-canvas-screenshot-rgba",
         };
-        if (result)
+        if (result && renderer === "gpu")
           Object.assign(result, {
             lit,
             hash: presentation.hash,
@@ -341,6 +341,7 @@ export async function smoke(
               result.gpu2d_submitted_frames > 0 &&
               (!privateROM || result.gpu3d_submitted_frames > 0),
           });
+        else if (result) result.ok = result.ok && lit;
       }
       if (privateROM && (await qualificationSHA256(privateROM.path)) !== privateROM.sha256)
         throw new Error("Private ROM changed during qualification");
@@ -378,7 +379,7 @@ export async function smoke(
           gpu3d_submitted_frames: entry.gpu3d_submitted_frames ?? 0,
         });
       console.log(
-        `${core}${threads ? " (threads)" : ""}: ${entry.ok ? "ok" : "FAIL"} frames=${entry.frames} hash=${entry.hash} lit=${entry.lit} ${entry.renderer ?? ""} first=${Math.round(entry.ms?.firstFrame ?? -1)}ms ${entry.error ?? ""}`,
+        `${core}${threads ? " (threads)" : ""}: ${entry.ok ? "ok" : "FAIL"} frames=${entry.frames} hash=${entry.hash} lit=${entry.lit} presented=${presentation?.lit ?? "unverified"} ${entry.renderer ?? ""} first=${Math.round(entry.ms?.firstFrame ?? -1)}ms ${entry.error ?? ""}`,
       );
       await Bun.write(join(reportDir, "smoke.json"), `${JSON.stringify(results, null, 2)}\n`);
     }
