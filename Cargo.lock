@@ -3892,7 +3892,6 @@ dependencies = [
  "serde_json",
  "tokio",
  "tokio-tungstenite 0.29.0",
- "tower",
  "tower-http 0.7.1",
 ]
 
@@ -39108,8 +39107,6 @@ dependencies = [
  "tokio-util",
  "tower-layer",
  "tower-service",
- "tracing",
- "uuid",
 ]
 
 [[package]]
