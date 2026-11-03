@@ -219,27 +219,55 @@ async function probeGpu() {
       preferredFormat: navigator.gpu.getPreferredCanvasFormat(),
     };
     const out = document.getElementById("gpu");
-    if (out) out.textContent = `Loading the desktop on WebGPU${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
+    if (out?.classList.contains("loading")) out.textContent = `Loading the desktop on WebGPU${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
   } catch {
     root.dataset.gpu = "webgl2";
   }
 }
 
-// The landing content stays for crawlers and first paint; the client's canvas replaces it once mounted.
+// The landing stays for crawlers and first paint. It gives way only once the client has really started drawing
+// (winit sized the canvas away from the 300x150 default); if the client fails, the landing stays and says so.
 function watchCanvas() {
   const landing = document.getElementById("landing");
   if (!landing) return;
-  const hide = () => {
-    if (document.querySelector("body > canvas")) {
-      landing.hidden = true;
-      return true;
+  let failed = false;
+  const fail = (detail) => {
+    if (failed) return;
+    failed = true;
+    const canvas = document.querySelector("body > canvas");
+    if (canvas) canvas.hidden = true;
+    landing.hidden = false;
+    const out = document.getElementById("gpu");
+    if (out) {
+      out.classList.remove("loading");
+      out.setAttribute("role", "alert");
+      out.textContent = "The desktop could not start in this browser. ";
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "tonal";
+      retry.dataset.action = "reload";
+      retry.textContent = "Try again";
+      out.append(retry);
     }
-    return false;
+    console.error("aphrody.com client failed:", detail);
   };
-  if (!hide()) {
-    const observer = new MutationObserver(() => hide() && observer.disconnect());
-    observer.observe(document.body, { childList: true });
-  }
+  addEventListener("error", (event) => {
+    if (/\.wasm|aphrody_webos_client|unreachable/.test(`${event.filename} ${event.message}`)) fail(globalThis.aphrodyClientError ?? event.message);
+  });
+  addEventListener("unhandledrejection", (event) => {
+    if (/aphrody_webos_client|wasm/i.test(String(event.reason?.stack ?? event.reason))) fail(event.reason);
+  });
+  const tick = () => {
+    if (failed) return;
+    if (globalThis.aphrodyClientError) return fail(globalThis.aphrodyClientError);
+    const canvas = document.querySelector("body > canvas");
+    if (canvas && (canvas.width !== 300 || canvas.height !== 150)) {
+      landing.hidden = true;
+      return;
+    }
+    setTimeout(tick, 200);
+  };
+  tick();
 }
 
 function start() {

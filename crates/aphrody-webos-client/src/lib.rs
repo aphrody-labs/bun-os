@@ -249,6 +249,17 @@ pub fn run() -> cosmic::iced::Result {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen::prelude::wasm_bindgen(start)]
 pub fn start() {
+    // A panic aborts the wasm instance with a bare "unreachable": log its message first and expose it to the page
+    // (`globalThis.aphrodyClientError`, read by /site.js), which keeps the landing visible and explains the failure.
+    std::panic::set_hook(Box::new(|info| {
+        let message = format!("aphrody.com client panicked: {info}");
+        web::log_error(&message);
+        let _ = js_sys::Reflect::set(
+            &js_sys::global(),
+            &wasm_bindgen::JsValue::from_str("aphrodyClientError"),
+            &wasm_bindgen::JsValue::from_str(&message),
+        );
+    }));
     if let Err(error) = run() {
         web::log_error(&format!("aphrody.com client stopped: {error}"));
     }
