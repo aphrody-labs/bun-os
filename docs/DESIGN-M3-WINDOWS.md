@@ -34,8 +34,8 @@ the 12-core host. The DLL is linked with `/Brepro`, so it is byte-reproducible. 
 (`infra/config/host/systemd/aphrody/aphrody-fonts-proxy.service`) serves `~/apps/cdn/design/current` as a third
 `--static` root, and `publish` switches that link atomically after checking the receipt.
 
-Current artifact: `~/build/storage/artifacts/design/386aab0d12a7`, also reachable as `design/current` and
-`icons/386aab0d12a7`. It holds 10,895 files: 148 ICO, 1,562 PNG, 9,059 SVG and 21 fonts, 163 MB in total.
+Current artifact: `~/build/storage/artifacts/design/3b89bb26a8f4`, also reachable as `design/current` and
+`icons/3b89bb26a8f4`. It holds 10,895 files: 148 ICO, 1,562 PNG, 9,059 SVG and 21 fonts, 163 MB in total.
 `receipt.json` sha256 is `0d74782d…218d`. `bunos-icons.dll` is `63b06e1c…d1d2` unsigned and `34ce03f4…0de2` as signed
 and installed on the workstation.
 
