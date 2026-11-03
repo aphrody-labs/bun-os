@@ -5,12 +5,13 @@ one unified image and session; Wii functionality belongs to its games and emulat
 
 ## Existing owners
 
-| Capability                 | Bun OS                                            | Wii OS source at the workstation           | Integration concern                                                                                                                                                            |
-| -------------------------- | ------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Wii and GameCube execution | `crates/aphrody-wii-runtime`                      | `crates/gecko-core`                        | Compare behavior and retain one runtime owner; do not replace the existing DOL path.                                                                                           |
-| Disc formats               | `crates/aphrody-wii-image`                        | `crates/gecko-image`                       | Bun OS retains `rvz.rs` behind `cfg(feature = "rvz")`, but its manifest currently declares neither that feature nor its Zstd dependency. Wii OS also has a chunked RVZ reader. |
-| Browser emulator           | `apps/iecode-web-wii-wasm`, `apps/iecode-web/wii` | `crates/gecko-web`                         | Bun OS exposes checked Wii DOL boot; Wii OS has a separate RVZ loading interface and audio/input behavior to evaluate.                                                         |
-| Wii menu and services      | Not yet established as a Bun OS owner             | `crates/menu-*`, `apps/server`, `frontend` | Preserve the menu, catalog and public service contracts when integrating; do not equate a static reproduction with the original System Menu.                                   |
+| Capability                 | Bun OS                                            | Wii OS source at the workstation           | Integration concern                                                                                                                          |
+| -------------------------- | ------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wii and GameCube execution | `crates/aphrody-wii-runtime`                      | `crates/gecko-core`                        | Compare behavior and retain one runtime owner; do not replace the existing DOL path.                                                         |
+| Disc formats               | `crates/aphrody-wii-image`                        | `crates/gecko-image`                       | The optional `rvz` feature and Zstd dependency are restored. Wii OS also has a chunked RVZ reader.                                           |
+| Browser emulator           | `apps/iecode-web-wii-wasm`, `apps/iecode-web/wii` | `crates/gecko-web`                         | Bun OS exposes checked Wii DOL boot; Wii OS has a separate RVZ loading interface and audio/input behavior to evaluate.                       |
+| Wii menu and services      | Not yet established as a Bun OS owner             | `crates/menu-*`, `apps/server`, `frontend` | Preserve the menu, catalog and public service contracts when integrating; do not equate a static reproduction with the original System Menu. |
+| Dolphin                    | `vendor/dolphin` and native package integration   | `dolphin-ffi`                              | The Wii OS bridge links a native Dolphin library; no Dolphin WASM/WebGPU runtime is established by this bridge.                              |
 
 The local Wii OS tree inspected at `C:/src/wii/wii-os` has no accessible Git metadata. Its
 source state, generated files, local user data, licenses and provenance therefore need to be
@@ -30,11 +31,18 @@ it is recorded here only as the observed source location.
 - The local Wii OS README makes broader claims than these tests establish. Its RVZ parser and
   apploader paths must be qualified with owned test inputs, bounded resource handling and
   explicit errors before exposing disc loading as production-ready.
+- On 2026-11-03, `aphrody-wii-image` compiled with `--locked --features rvz` and its
+  uncompressed/Zstd metadata fixture passed on the VPS. Wii OS's existing Gecko multitool
+  read the supplied Budokai Tenkaichi 3 RVZ header and file table locally; this is not a
+  Bun OS disc-boot test. Wii OS's CLI `boot` currently treats non-WAD inputs as DOL bytes,
+  despite its RVZ help text.
+- Dolphin is marked pending in `packages/bun-engine/web-emulation/emulators.ts` because its
+  JIT and graphics backends target native hosts. The requested Dolphin WASM/WebGPU path needs
+  an actual browser build, adapter and game qualification before it can be selected.
 
 ## Integration gates
 
-1. Restore and compile the existing RVZ feature with the workspace dependency and the
-   lockfile writer; test the existing reader, including malformed inputs, before exposing it.
+1. Test the restored RVZ reader with real and malformed inputs before exposing it.
 2. Compare and port the chunked reader and browser load lifecycle into the canonical owners,
    preserving cancellation, memory bounds, the DOL API and source attribution.
 3. Compare the menu, server, input, audio, NAND and NetPlay contracts against Bun OS owners;
