@@ -135,7 +135,7 @@ impl H264 {
             .map_err(js_error)?
             .ok_or("no 2d context")?
             .dyn_into()
-            .map_err(js_error)?;
+            .map_err(|object: js_sys::Object| js_error(object.into()))?;
         let output = Closure::<dyn FnMut(JsValue)>::new(move |frame: JsValue| {
             let dimension = |key: &str| {
                 js_sys::Reflect::get(&frame, &JsValue::from_str(key))
