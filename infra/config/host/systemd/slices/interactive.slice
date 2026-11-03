@@ -1,10 +1,10 @@
-# SPDX-License-Identifier: Apache-2.0
-# Latency-sensitive Bun OS services: nginx, gateways, the Hyprland/wayvnc session, WebOS, session containers.
-# Weights, not caps: interactive services and Bun OS release builds get equal weight when both are active.
+# Bun OS production tier (aphrody.com, API, WebOS, sessions). Highest CPU and I/O weight and hard memory protection,
+# so builds on the same host can never starve it (docs/ops/BUILD.md, Resources).
 [Unit]
-Description=Bun OS interactive services
+Description=Bun OS production services
 Before=slices.target
-
 [Slice]
 CPUWeight=1000
 IOWeight=1000
+MemoryMin=8G
+MemoryLow=12G

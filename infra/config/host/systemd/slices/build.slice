@@ -1,10 +1,14 @@
-# SPDX-License-Identifier: Apache-2.0
-# Bun OS release builds: high CPU and I/O priority with no quotas. When production is stopped,
-# build workers can use every core and all available storage.
+# Bun OS builds (docs/ops/BUILD.md). Work-conserving: builds take every idle CPU, but under contention production
+# (interactive.slice, weight 1000) wins 10:1. Memory is throttled at MemoryHigh and capped at MemoryMax; under
+# sustained memory pressure systemd-oomd kills the offending build unit, never production.
+# References: docs.kernel.org/admin-guide/cgroup-v2.html, systemd.resource-control(5), systemd-oomd.service(8).
 [Unit]
 Description=Bun OS builds
 Before=slices.target
-
 [Slice]
-CPUWeight=1000
-IOWeight=1000
+CPUWeight=100
+IOWeight=100
+MemoryHigh=34G
+MemoryMax=38G
+ManagedOOMMemoryPressure=kill
+ManagedOOMMemoryPressureLimit=80%

@@ -15,7 +15,10 @@ for u in $(jq -r '.interactiveUnits[]' "$HERE/aphrody-priority.json"); do
   systemctl cat "$u" >/dev/null 2>&1 || continue
   sudo install -D -m 0644 "$HERE/interactive.conf" "/etc/systemd/system/$u.d/90-aphrody-interactive.conf"
 done
+# systemd-oomd acts on build.slice (ManagedOOMMemoryPressure=kill) before the kernel OOM killer.
+command -v /usr/lib/systemd/systemd-oomd >/dev/null 2>&1 || sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq systemd-oomd >/dev/null
 sudo systemctl daemon-reload
+sudo systemctl enable --now systemd-oomd.service >/dev/null
 sudo systemctl start interactive.slice build.slice
 sudo systemctl enable --now aphrody-iocost.service aphrody-priority.timer >/dev/null
 sudo systemctl start aphrody-priority.service
