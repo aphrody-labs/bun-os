@@ -171,35 +171,55 @@ The native half of the NT personality: a WDM driver in Rust (`windows-drivers-rs
 
 | Piece | Path | State |
 |---|---|---|
-| Driver | `crates/bunos-nt-driver` (package `bunos`, own workspace, `panic = "abort"`, static CRT) | builds with WDK/SDK 10.0.28000 |
+| Contract | `crates/bunos-nt-proto` (`no_std`, dependency-free) | control codes + fixed little-endian layouts + strict, fuzz-tested parsers, shared verbatim by the driver and every client so the two sides cannot drift |
+| Driver | `crates/bunos-nt-driver` (package `bunos`, own workspace, `panic = "abort"`, static CRT) | builds with WDK/SDK 10.0.28000; depends on `bunos-nt-proto` |
 | INF source | `crates/bunos-nt-driver/bunos.inx` | primitive driver (`[DefaultInstall.NTamd64]`, no hardware ID), service `BunOS`, demand start, Driver Store (DirId 13) |
-| Package | `cargo wdk build --profile release` (cargo-wdk 0.2.0) | `bunos.sys`, `bunos.inf` (stampinf), `bunos.cat` (inf2cat), infverif passes, `.sys` and `.cat` test-signed with `WDRLocalTestCert` |
-| Rust client | `crates/bunos-nt-client` (windows-rs 0.62.2, own workspace) | `Device::open/version/ping/ioctl`, CLI `bunos-nt status/version/ping`; exit 3 when the driver is absent |
-| bun:ffi client | `packages/windows/src/nt-driver.ts` (`@aphrody/windows/nt-driver`, `ntDriver`) | `BunOsDevice.open()` (null when absent), `version()`, `ping()`, `available()` |
+| Package | `cargo wdk build --profile release` (cargo-wdk 0.2.0) | `bunos.sys`, `bunos.inf` (stampinf), `bunos.cat` (inf2cat), infverif passes, `.sys` and `.cat` test-signed |
+| Rust client | `crates/bunos-nt-client` (windows-rs 0.62.2, own workspace) | `Device::open/version/ping/caps/configure/read_events`, CLI `bunos-nt status/version/caps/ping/events`; exit 3 absent, 4 not elevated |
+| bun:ffi client | `packages/windows/src/nt-driver.ts` (`@aphrody/windows/nt-driver`, `ntDriver`) | `BunOsDevice.open()` (null when absent, throws on access denied), `version/ping/caps/configure/readEvents`, strict `decodeCaps/decodeEvents`, `available()` |
 | Test VM | `factory/wsl/windows/vm/` (`vm.sh`, `autounattend.xml`, `setup.cmd`, `test-driver.cmd`) | Windows 11 LTSC eval under QEMU/KVM on the build host |
 
-Contract (`CTL_CODE(FILE_DEVICE_UNKNOWN, fn, METHOD_BUFFERED, FILE_ANY_ACCESS)`): `IOCTL_BUNOS_VERSION` = `0x00222000`
-(returns `"bunos.sys <version>\0"`), `IOCTL_BUNOS_PING` = `0x00222004` (echoes the input). Device `\Device\BunOS`, link
-`\.\BunOS`. Both clients pin these values in tests; a new kernel service is a new control code.
+**Scope — user mode first, no vulnerable-driver primitives.** WinClean (section 9) is the control plane of the whole
+PC through Win32/WinRT/NT APIs; the kernel driver adds only what user mode cannot do. Deliberately absent, and they
+stay absent: no arbitrary kernel or physical-memory read/write, no I/O-port or MSR access, no code-execution IOCTL.
+Those are exactly what turns a signed driver into an exploitable "vulnerable driver" (BYOVD) used to disable security
+software; every control code returns kernel-produced data, never memory the caller chooses, and kernel image/object
+addresses are never exposed (KASLR stays intact). Each new kernel service is a new, versioned control code whose
+input is parsed by `bunos-nt-proto` (exact length, ABI number, reserved fields and every enumerated value checked)
+before the driver acts, with fuzz-style tests on the parsing side.
+
+Contract — ABI 1, `CTL_CODE(FILE_DEVICE_UNKNOWN, fn, METHOD_BUFFERED, access)`. Device `\Device\BunOS`, link
+`\\.\BunOS`, DACL `D:P(A;;GA;;;SY)(A;;GA;;;BA)` applied by `IoCreateDeviceSecure` so only SYSTEM and Administrators
+can open it:
+
+| IOCTL | Code | Access | In → out |
+|---|---|---|---|
+| `VERSION` | `0x00222000` | any | — → `"bunos.sys <ver>\0"` |
+| `PING` | `0x00222004` | any | bytes → same bytes |
+| `CAPS` | `0x00226008` | read | — → `Caps` (ABI, sources supported/active, ring capacity, counters) |
+| `EVENTS_CONFIG` | `0x0022E040` | read+write | `{abi,sources mask}` → `Caps`; enables exactly the given sources (0 disables all) |
+| `EVENTS_READ` | `0x00226044` | read | — → header + up to N 256-byte `Record`s drained from the kernel ring |
+
+Event sources are kernel notification callbacks, monitor only (they never block or alter the operation): `process`
+(`PsSetCreateProcessNotifyRoutineEx`, create with image path + exit), `thread` (`PsSetCreateThreadNotifyRoutine`),
+`image` (`PsSetLoadImageNotifyRoutine`; user images carry base+size, kernel images none), `registry`
+(`CmRegisterCallbackEx`, set/delete value and delete key). Events go into a 512-slot non-paged ring behind one spin
+lock, drop-newest on overflow with a counter; closing the last handle disables every source. All three clients pin
+the codes and layouts in tests; the registry altitude is `385210.4207`.
 
 Release package measured on the workstation (`%CARGO_TARGET_DIR%\release\bunos_package`):
 
-| File | Bytes | sha256 |
-|---|---|---|
-| `bunos.sys` | 26,624 | `1aacfbb71c8138cbad9b05e8e3acd9434b56abf5bc2daa07aad19a06b15346f4` |
-| `bunos.cat` | 8,040 | `e984dfde2df441b26a5050593ae0339d74d7fa3a15105ddba51bdc5c0087321a` |
-| `bunos.inf` | 1,379 | `9c82c7b68c00a6c4c69c021b80950d74d476c4ecf66029aefb8b5d525ad90b22` |
-| `bunos-nt.exe` | 256,512 | `3c324e099c4423a4a3c0787a4b6eb9634471b9adecce53b930190059bce6a076` |
-| `WDRLocalTestCert.cer` | 809 | `4c20b14bd29634f5ecbeabf13517dac82dd60fe037f34317ae3dbb7a4f43d2b2` |
+`bunos.sys` imports only `ntoskrnl.exe` (the process/thread/image/registry callback routines, the spin lock and the
+precise clock) and `wdmsec.lib` statically (`WdmlibIoCreateDeviceSecure`). The release package is measured in the
+build bundle's `SHA256SUMS`; hashes change with every rebuild (the signature carries a timestamp and stampinf a
+DriverVer), so they are not pinned here.
 
-`bunos.sys` imports only `ntoskrnl.exe`; `bunos-nt.exe` (static CRT) imports only `kernel32`, `ntdll`, `oleaut32` and an
-API set. `signtool verify /pa` on the workstation reports the chain ends in an untrusted root: expected, the test
-certificate is trusted only inside the test VM. Hashes change with every rebuild (the signature carries a timestamp
-and stampinf a DriverVer).
-
-Safety rule: the driver is **never** installed or loaded on the workstation, and test signing / boot configuration are
-never changed there. The `cargo wdk build` step only creates the self-signed certificate in the current user's
-`WDRTestCertStore` store, which grants nothing.
+Signing: the `aphrody-labs/bun` test certificate is machine-wide `CN=Bun OS Test Signing, O=Aphrody`
+(`factory/windows/signing/test-signing.ps1`, LocalMachine `My`/`Root`/`TrustedPublisher`). `cargo wdk build`
+test-signs with its local `WDRLocalTestCert`; the install/bundle step re-signs `bunos.sys`/`bunos.cat` and the
+`.exe`s with the machine certificate so they are trusted here. User-mode binaries so signed load with Secure Boot on;
+the **kernel driver loads only in test-signing mode, which Secure Boot forbids** — loading it is an owner step
+(section 9).
 
 ### Load test procedure (Windows 11 VM on the build host)
 
@@ -218,3 +238,78 @@ The VM uses `OVMF_CODE_4M.fd` (no Secure Boot, so `bcdedit /set testsigning on` 
 disk and e1000e NIC (inbox drivers, no virtio ISO), SSH forwarded to `127.0.0.1:2222` only. Inside the VM
 `test-driver.cmd` imports the test certificate, runs `pnputil /add-driver bunos.inf /install`, `sc start BunOS`,
 `bunos-nt.exe status`, `bunos-nt.exe ping`, the bun:ffi test, then `sc stop BunOS`.
+
+## 9. WinClean NT tools, the WSL bridge and owner-run driver loading (2026-11-03)
+
+User mode is the control plane; the driver only feeds it kernel events. The surfaces:
+
+| Piece | Path | What |
+|---|---|---|
+| WinClean `nt_*` tools | `packages/bun-windows-winclean/src/nt.rs` | `nt_status`, `nt_events_start/read/stop`, `nt_handles`, `nt_kernel_modules`; in the 193-tool catalog, reached from the aphrody MCP and `aphrody` CLI like every other WinClean tool |
+| WSL bridge | `crates/bunos-nt-bridge` (`bunos-winbridge`) | serves the WinClean catalog to the Bun OS WSL guest over hvsocket; `serve`, `service`, `tools` |
+| Guest client | `crates/bunos-nt-bridge/client/bunos-win.ts` | the `bunos win <tool> [jsonArgs]` client the WSL agent wires into the guest |
+| Install | `factory/windows/nt/{setup-elevated.ps1,build-nt-bundle.ts}` | `%SystemRoot%\BunOS` system install + `BunOSWinBridge` service |
+| Driver load / test | `factory/windows/nt/driver/{load-driver,test-driver}.cmd`, `factory/windows/nt/end-to-end.ts` | owner-run load + the end-to-end check |
+
+**`nt_*` tools.** Every one works whether or not `bunos.sys` is loaded. `nt_status` reports the driver state
+(`loaded` / `access-denied` when not elevated / `absent`), ABI and caps. `nt_events_start` opens a kernel session
+(process/thread/image/registry sources) when the driver is loaded and the process is elevated, otherwise it falls
+back to a user-mode process-create/exit poll; `nt_events_read` drains it. `nt_handles` and `nt_kernel_modules` are
+pure user-mode `NtQuerySystemInformation` calls (handle table with object-type names; loaded kernel images) with the
+object pointers and image bases stripped. The buffer parsers are bounds-checked and fuzz-tested.
+
+**Bridge.** Windows is exposed to the Linux side (WSL) over hvsocket: `AF_HYPERV` on the Windows host, `AF_VSOCK` in
+the guest, newline-delimited JSON, one request per line `{token,id,tool,args}`. A shared token
+(`%SystemRoot%\BunOS\bridge.token`, SYSTEM+Administrators ACL, shared read-only into the guest) gates every
+connection; a wrong token drops it. An **allow-list** (`DEFAULT_ALLOW`) serves only read-only / diagnostic tools —
+including the `nt_*` event streams — and an **absolute deny-list** (`DENY`) blocks anything that changes the machine
+(`tweak_apply`, `delete_*`, `set_registry_value`, `kill_process`, `mem_write_*`, `nt_events_start/stop`) even if an
+operator adds an `--allow` prefix; a guest that needs those uses the elevated WinClean path directly. The serve loop
+is transport-agnostic: `--transport loopback` (TCP on 127.0.0.1) is used to test on the workstation before any WSL
+distro exists, `--transport hvsocket` is the real guest transport. The WSL bundle is owned by the other agent
+(`factory/wsl/`, `docs/WSL.md`); coordinate through this interface only, and test against the distro once `wsl -l -v`
+shows it.
+
+```
+# workstation, no driver, no elevation: the whole chain over loopback
+cargo build --release -p bunos-nt-client -p bunos-nt-bridge
+bun factory/windows/nt/end-to-end.ts            # ffi contract + loopback bridge (hello, nt_status, allow-list, token)
+```
+
+**System install (elevated, idempotent).** Everything lands in `%SystemRoot%\BunOS`, like `cmd.exe` or
+`explorer.exe`, with a sha256-checked manifest, no overwrites and an uninstall path — the same layout the WSL and
+userland agents use:
+
+```
+bun  factory/windows/nt/build-nt-bundle.ts                                        # -> %LOCALAPPDATA%\BunOS\bundle\bunos-nt
+C:\Windows\System32\sudo.exe pwsh -NoProfile -File factory\windows\nt\setup-elevated.ps1 -Bundle <bundle>
+#   bin\{bunos-nt.exe,bunos-winbridge.exe} (signed) + System32 hard links where the name collides with nothing,
+#   nt\bunos-win.ts, nt\driver\{bunos.sys,bunos.inf,bunos.cat,load-driver.cmd,test-driver.cmd}, bridge.token,
+#   manifests\nt.json, and the BunOSWinBridge service (demand start).  -Plan previews, -Uninstall reverses it,
+#   -StartBridge starts the service.  sc start BunOSWinBridge  runs it.
+```
+
+The driver package is staged under `nt\driver\` but **never loaded by the install** and never copied by hand into
+`System32\drivers`: that is `pnputil`'s job at owner-run load time, through the INF.
+
+**Owner-run driver loading (documented, not performed by any agent).** The driver changes the kernel's trust
+boundary, so loading it is a manual owner decision with its security trade-offs stated here:
+
+- *Test signing (development).* Our certificate is self-signed. Windows loads a kernel driver signed by it only in
+  test-signing mode, and test-signing mode requires **Secure Boot OFF** (with Secure Boot on, `bcdedit /set
+  testsigning on` is refused — "protected by Secure Boot policy"). Steps the owner performs: disable Secure Boot in
+  firmware; elevated `bcdedit /set testsigning on`; reboot; then
+  `C:\Windows\System32\sudo.exe cmd /c %SystemRoot%\BunOS\nt\driver\load-driver.cmd`
+  (`pnputil /add-driver bunos.inf /install`, `sc start BunOS`) and `test-driver.cmd`
+  (`bunos-nt version/caps/ping/events`). Trade-off: test-signing mode and Secure Boot off weaken the machine's boot
+  trust for every driver, not only ours, and a "Test Mode" watermark appears. Reverse with `sc stop BunOS`,
+  `pnputil /delete-driver bunos.inf /uninstall`, `bcdedit /set testsigning off`, re-enable Secure Boot.
+- *Attestation signing (production).* To load with Secure Boot on and no test mode, submit `bunos.sys` to the
+  Microsoft Partner Center hardware dashboard for **attestation signing** (an EV code-signing certificate and a
+  Partner Center account are required); Microsoft returns a cab signed so the driver loads on normal machines. This
+  is the only way to ship the driver to an owner who keeps Secure Boot on. Trade-off: it ties the driver to our
+  Partner Center identity and Microsoft's attestation policy, and each revision is re-submitted.
+
+Until the owner loads it, `bunos.sys` is **not** loaded on the workstation, and no agent enables test signing or
+changes boot configuration here. Everything above (`nt_*` user-mode paths, the bridge, both clients) runs and is
+tested without it; the kernel paths are verified in the Windows 11 VM (section 8) and by the owner post-reboot.
