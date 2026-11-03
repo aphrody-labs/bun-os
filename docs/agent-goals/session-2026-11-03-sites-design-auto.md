@@ -68,3 +68,28 @@ workstation Cargo.lock wholesale (the VPS lock writer bunos-sync regenerates it)
 7. Repo-wide `bun format` (about 6700 files fail the gate) once the migration lands; auto-deliver stays
    skipped-red until the gate is green.
 8. Pre-existing: m3-fonts upstream sync test fails on Windows by one byte (CRLF in material-symbols/index.d.ts).
+
+## iced exploration report (done, not applied yet)
+
+Priorities from the read-only comparison of upstream iced/libcosmic with our forks and consumers:
+1. No WebGL2 fallback on aphrody.com: the client's wgpu 28 lacks the `webgl` feature, so browsers without WebGPU
+   fall to tiny-skia CPU. Add `webgl` (libcosmic fork feature forwarding iced/webgl, or wgpu features=["webgl"] in
+   the client wasm deps); test navigator.gpu present but requestAdapter failing.
+2. Stream frames: replace VideoFrame -> 2d canvas -> getImageData -> image::Handle (GPU readback + atlas churn every
+   frame) with a shader widget owning one wgpu texture fed by queue.copy_external_image_to_texture; JPEG/PNG via
+   createImageBitmap, drop the `image` dep (keep Handle path for tiny-skia).
+3. Keep only the latest frame (web.rs:245 unbounded mpsc + 64-deep channel queue latency).
+4. Request the stream at physical size (track window::Event::Rescaled; lib.rs:130-133,187-192, input.rs:82).
+5. Wasm size 8.87 MB (2.38 MB br): gate libcosmic EMBEDDED_FONTS (~2.1 MB) and the 677 embedded cosmic-icons
+   (~0.9 MB, libcosmic build.rs) behind features; release.sh builds without LTO: use `--profile web-craft`.
+6. Cherry-pick iced-rs fixes into aphrody-labs/iced: b54f2c599 (event-loop spin, 50-85% CPU per keystroke in
+   chat/search), 8e05eade2, 08eb93ad4, c197a4cea; rebase iced on pop-os 229186b and libcosmic on pop-os master
+   (12 behind). Cargo.lock carries wgpu 28 + 30 (two copies).
+7. Client theme: cosmic::Theme::dark() uses a different seed than the page; build it from aphrody-m3-tokens via
+   libm3::cosmic (drop libm3's forced tokio feature so wasm can use it).
+8. libm3::cosmic::themed() rebuilds the theme on every call: cache one theme per (seed, mode).
+9. Install console_log/tracing-wasm on wasm; add a panic hook to cosmic-calculator.
+10. release.sh: replace wasm-opt --all-features and +relaxed-simd with explicit, verified features.
+11. vendor/cosmic-epoch/libcosmic is stale (de9353ab, iced submodule not checked out); cosmic-calculator cannot
+    build from it: repin to the fork rev used elsewhere.
+12. Dev tools: forward iced tester/hot/time-travel through libcosmic; add iced_test snapshot tests.
