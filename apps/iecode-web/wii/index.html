@@ -29,19 +29,27 @@
     const dsp = document.getElementById('input-dsp');
     const start = document.getElementById('start');
     const status = document.getElementById('status');
-    rom.addEventListener('change', () => { start.disabled = !rom.files.length; });
+    let runtime;
+    try {
+      runtime = await import('./pkg/gecko_web.js');
+      await runtime.default();
+      start.disabled = !rom.files.length;
+    } catch (error) {
+      runtime = undefined;
+      status.textContent = error instanceof Error ? error.message : String(error);
+    }
+    rom.addEventListener('change', () => { start.disabled = !runtime || !rom.files.length; });
     start.addEventListener('click', async () => {
       if (!rom.files.length) return;
       start.disabled = true;
       status.textContent = 'Loading…';
       try {
         if (!navigator.gpu) throw new Error('WebGPU is required to run Wii.');
-        const [runtime, data, dspData] = await Promise.all([
-          import('./pkg/gecko_web.js'),
+        runtime.prepare_audio();
+        const [data, dspData] = await Promise.all([
           rom.files[0].arrayBuffer(),
           dsp.files[0]?.arrayBuffer(),
         ]);
-        await runtime.default();
         runtime.start_wii_emulator(new Uint8Array(data), dspData ? new Uint8Array(dspData) : undefined);
         document.getElementById('setup').hidden = true;
         status.textContent = '';

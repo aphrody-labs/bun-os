@@ -3,6 +3,16 @@
 use std::cell::RefCell;
 thread_local! {
     static EXECUTION_STATUS: RefCell<[u32; 3]> = const { RefCell::new([0; 3]) };
+    static PREPARED_AUDIO: RefCell<Option<web_sys::AudioContext>> = const { RefCell::new(None) };
+}
+
+/// Call from a user gesture before an asynchronous image load.
+#[wasm_bindgen]
+pub fn prepare_audio() -> Result<(), JsValue> {
+    let context = web_sys::AudioContext::new()?;
+    let _ = context.resume();
+    PREPARED_AUDIO.with(|slot| *slot.borrow_mut() = Some(context));
+    Ok(())
 }
 
 /// Completed browser frames, Broadway r3 and PC for runtime diagnostics.
@@ -17,6 +27,7 @@ use std::sync::{Arc, Mutex};
 
 use egui::ViewportId;
 use gecko::HostInput;
+use gecko::audio::{AidBlock, AudioSink};
 use gecko::flipper::si::pad::{
     self, PadStatus, STICK_CENTER, STICK_MAX, STICK_MIN, TRIGGER_MAX, TRIGGER_MIN,
 };
@@ -81,6 +92,43 @@ struct WebSinkShared {
 }
 
 type WebSinkQueue = Arc<Mutex<WebSinkShared>>;
+
+const MAX_AUDIO_FRAMES: usize = 96_000;
+
+#[derive(Default)]
+struct AudioQueue {
+    frames: VecDeque<(f32, f32)>,
+    sample_rate: u32,
+}
+
+struct BrowserAudioSink(Arc<Mutex<AudioQueue>>);
+
+impl AudioSink for BrowserAudioSink {
+    fn set_sample_rate(&mut self, rate: u32) {
+        self.0.lock().unwrap().sample_rate = rate.max(1);
+    }
+
+    fn push_stereo_i16(&mut self, left: i16, right: i16) {
+        let mut queue = self.0.lock().unwrap();
+        if queue.frames.len() < MAX_AUDIO_FRAMES {
+            queue
+                .frames
+                .push_back((left as f32 / 32768.0, right as f32 / 32768.0));
+        }
+    }
+
+    fn push_stereo_block(&mut self, frames: &AidBlock) {
+        let mut queue = self.0.lock().unwrap();
+        for &(left, right) in frames {
+            if queue.frames.len() >= MAX_AUDIO_FRAMES {
+                break;
+            }
+            queue
+                .frames
+                .push_back((left as f32 / 32768.0, right as f32 / 32768.0));
+        }
+    }
+}
 
 /// RenderSink that queues actions for synchronous processing on the main thread.
 struct WebSink {
@@ -535,6 +583,9 @@ struct App<const SYSTEM: SystemId> {
     action_queue: WebSinkQueue,
     window: Option<Arc<Window>>,
     state: SharedState,
+    audio_queue: Arc<Mutex<AudioQueue>>,
+    audio_context: Option<web_sys::AudioContext>,
+    audio_next_time: f64,
     #[cfg(feature = "debug")]
     debug_state: debug_ui::DebugState,
     #[cfg(feature = "debug")]
@@ -609,6 +660,11 @@ impl<const SYSTEM: SystemId> ApplicationHandler for App<SYSTEM> {
                 }
             }
             WindowEvent::KeyboardInput { event, .. } => {
+                if event.state.is_pressed() {
+                    if let Some(context) = &self.audio_context {
+                        let _ = context.resume();
+                    }
+                }
                 let pressed = event.state.is_pressed();
                 if let PhysicalKey::Code(key) = event.physical_key {
                     match &mut self.input {
@@ -654,6 +710,9 @@ impl<const SYSTEM: SystemId> ApplicationHandler for App<SYSTEM> {
             }
             WindowEvent::RedrawRequested => {
                 if let Some(window) = self.window.clone() {
+                    if let Some(context) = &self.audio_context {
+                        play_pending_audio(context, &self.audio_queue, &mut self.audio_next_time);
+                    }
                     if let Some(state) = self.state.borrow_mut().as_mut() {
                         state.render(
                             &mut self.emulator,
@@ -721,6 +780,11 @@ fn launch<const SYSTEM: SystemId>(mut emulator: System<SYSTEM>, dsp_irom: Option
 
     let input = HostInput::neutral_for(SYSTEM);
     emulator.apply_host_input(&input);
+    let audio_queue = Arc::new(Mutex::new(AudioQueue {
+        frames: VecDeque::new(),
+        sample_rate: 32_000,
+    }));
+    emulator.audio_sink = Box::new(BrowserAudioSink(audio_queue.clone()));
 
     // Install the WebSink as the emulator's render sink.
     let action_queue: WebSinkQueue = Arc::new(Mutex::new(WebSinkShared {
@@ -741,6 +805,11 @@ fn launch<const SYSTEM: SystemId>(mut emulator: System<SYSTEM>, dsp_irom: Option
         action_queue,
         window: None,
         state: Rc::new(RefCell::new(None)),
+        audio_queue,
+        audio_context: PREPARED_AUDIO
+            .with(|slot| slot.borrow_mut().take())
+            .or_else(|| web_sys::AudioContext::new().ok()),
+        audio_next_time: 0.0,
         #[cfg(feature = "debug")]
         debug_state: debug_ui::DebugState::default(),
         #[cfg(feature = "debug")]
@@ -748,6 +817,55 @@ fn launch<const SYSTEM: SystemId>(mut emulator: System<SYSTEM>, dsp_irom: Option
     };
 
     event_loop.spawn_app(app);
+}
+
+fn play_pending_audio(
+    context: &web_sys::AudioContext,
+    queue: &Arc<Mutex<AudioQueue>>,
+    next_time: &mut f64,
+) {
+    if context.state() != web_sys::AudioContextState::Running {
+        queue.lock().unwrap().frames.clear();
+        return;
+    }
+    if *next_time > context.current_time() + 0.25 {
+        queue.lock().unwrap().frames.clear();
+        return;
+    }
+    let (frames, rate) = {
+        let mut queue = queue.lock().unwrap();
+        (std::mem::take(&mut queue.frames), queue.sample_rate.max(1))
+    };
+    if frames.is_empty() {
+        return;
+    }
+    let Ok(buffer) = context.create_buffer(2, frames.len() as u32, rate as f32) else {
+        return;
+    };
+    let (left, right): (Vec<f32>, Vec<f32>) = frames.into_iter().unzip();
+    if buffer
+        .copy_to_channel_with_start_in_channel(&left, 0, 0)
+        .is_err()
+        || buffer
+            .copy_to_channel_with_start_in_channel(&right, 1, 0)
+            .is_err()
+    {
+        return;
+    }
+    let Ok(source) = context.create_buffer_source() else {
+        return;
+    };
+    source.set_buffer(Some(&buffer));
+    if source
+        .connect_with_audio_node(&context.destination())
+        .is_err()
+    {
+        return;
+    }
+    let start = (*next_time).max(context.current_time() + 0.01);
+    if source.start_with_when(start).is_ok() {
+        *next_time = start + left.len() as f64 / rate as f64;
+    }
 }
 
 fn update_pad(pad: &mut PadStatus, key: KeyCode, pressed: bool) {
