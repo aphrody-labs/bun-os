@@ -44,7 +44,7 @@ All three are built from kernel.org sources verified by signature, with `CONFIG_
 ## Crates and npm packages
 
 SemVer 2.0 with one workspace version for first-party crates and packages (today `1.4.7`); `cargo semver-checks`
-gates crate releases. Publication through `scripts/publish-plan.ts` and `scripts/publish.ts` on the build host.
+gates crate releases. Publication through `scripts/publish-plan.ts` and `scripts/publish.ts` on the build host: [PUBLISH.md](PUBLISH.md).
 
 ## Version strings
 
