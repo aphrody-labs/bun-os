@@ -251,6 +251,10 @@ pub type ImportFn = Box<dyn Fn(&str, &[u8], usize) -> Result<(Document, Vec<Stri
 /// Encoder settings chosen in Export As (the file format comes from the name's extension).
 #[derive(Clone, Debug, PartialEq)]
 pub struct ExportSettings {
+    /// Permit ambient filesystem reads when embedding external links.
+    pub allow_external_links: bool,
+    /// Source document path for resolving stored links while exporting.
+    pub document_path: Option<std::path::PathBuf>,
     /// JPEG quality 1–100 (None = codec default).
     pub jpeg_quality: Option<u8>,
     /// WebP: lossless (VP8L) rather than lossy (VP8 at [`Self::webp_quality`]).
@@ -277,6 +281,8 @@ pub struct ExportSettings {
 impl Default for ExportSettings {
     fn default() -> Self {
         ExportSettings {
+            allow_external_links: true,
+            document_path: None,
             jpeg_quality: None,
             webp_lossless: true,
             webp_quality: None,
@@ -1583,11 +1589,13 @@ impl PhotocraftApp {
         let maximize =
             file_handling.maximize_psd_compatibility != photocraft_engine::prefs::Ask::Never;
         let mut settings = ExportSettings {
+            allow_external_links: self.session.authorize.is_none(),
             image_previews: previews,
             psd_maximize_compatibility: maximize,
             ..ExportSettings::default()
         };
         if let Some(st) = self.session.active() {
+            settings.document_path = st.path.as_deref().map(std::path::PathBuf::from);
             let e = &st.doc.file_encoding;
             settings.jpeg_quality = e.jpeg_quality.map(|q| q.clamp(1, 100));
             settings.webp_lossless = e.webp_lossless.unwrap_or(settings.webp_lossless);

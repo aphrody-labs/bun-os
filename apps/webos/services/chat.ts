@@ -15,6 +15,10 @@ const MODELS = (process.env.APHRODY_CHAT_MODELS ?? "google/gemini-2.5-flash,goog
 const MAX_TOKENS = Number(process.env.APHRODY_CHAT_MAX_TOKENS ?? 4096);
 const BUDGET = Number(process.env.APHRODY_CHAT_BUDGET ?? 60); // requests per client per 10 minutes
 const UPSTREAM = `https://${REGION}-aiplatform.googleapis.com/v1/projects/${PROJECT}/locations/${REGION}/endpoints/openapi`;
+// Optional local OpenAI-compatible router, running on this host. This does not
+// expose a user's workstation loopback to the VPS or start a model implicitly.
+const LOCAL_ENDPOINT = process.env.APHRODY_CHAT_LOCAL_ENDPOINT?.replace(/\/+$/, "");
+const LOCAL_MODELS = (process.env.APHRODY_CHAT_LOCAL_MODELS ?? "").split(",").map((id) => id.trim()).filter(Boolean);
 const SCOPE = "https://www.googleapis.com/auth/cloud-platform";
 const contract = chatContract(async () => ({
   credentials: { ok: await Bun.file(ADC).exists(), detail: "Vertex AI credentials file present" },
@@ -98,6 +102,29 @@ const json = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: { "cache-control": "no-store", "x-content-type-options": "nosniff" } });
 const error = (message: string, status: number, type = "invalid_request_error") => json({ error: { message, type } }, status);
 
+let localModelsCache: { at: number; ids: string[] } | undefined;
+/** The router is probed at most every 30 s so a down router cannot stall every model listing for its timeout. */
+async function availableLocalModels(): Promise<string[]> {
+  if (!LOCAL_ENDPOINT || !LOCAL_MODELS.length) return [];
+  if (localModelsCache && Date.now() - localModelsCache.at < 30_000) return localModelsCache.ids;
+  const ids = await probeLocalModels();
+  localModelsCache = { at: Date.now(), ids };
+  return ids;
+}
+
+async function probeLocalModels(): Promise<string[]> {
+  try {
+    const response = await fetch(`${LOCAL_ENDPOINT}/models`, { signal: AbortSignal.timeout(3000) });
+    if (!response.ok) return [];
+    const body = await response.json() as { data?: { id?: unknown }[] };
+    if (!Array.isArray(body.data)) return [];
+    const available = new Set(body.data.map((entry) => entry?.id));
+    return LOCAL_MODELS.filter((id) => available.has(id) && !MODELS.includes(id));
+  } catch {
+    return [];
+  }
+}
+
 Bun.serve({
   hostname: "127.0.0.1",
   port: PORT,
@@ -107,7 +134,10 @@ Bun.serve({
     if (standard) return standard;
     const path = new URL(request.url).pathname.replace(/^\/api\/chat/, "");
     if (path === "/v1/models" && request.method === "GET")
-      return json({ object: "list", data: MODELS.map((id) => ({ id, object: "model", owned_by: "google" })) });
+      return json({ object: "list", data: [
+        ...MODELS.map((id) => ({ id, object: "model", owned_by: "google" })),
+        ...(await availableLocalModels()).map((id) => ({ id, object: "model", owned_by: "local" })),
+      ] });
     if (path === "/healthz") return json({ ok: true, project: PROJECT, region: REGION, models: MODELS });
     if (path !== "/v1/chat/completions") return error("Not found", 404);
     if (request.method !== "POST") return error("Method not allowed", 405);
@@ -120,32 +150,47 @@ Bun.serve({
       return error("Body must be JSON", 400);
     }
     if (!Array.isArray(body.messages) || !body.messages.length) return error("messages is required", 400);
-    // The model id of the client ("local", a llama name, ...) maps to the default Gemini model.
-    const model = MODELS.includes(String(body.model)) ? String(body.model) : MODELS[0];
+    const model = typeof body.model === "string" && body.model ? body.model : MODELS[0];
+    const local = Boolean(LOCAL_ENDPOINT && LOCAL_MODELS.includes(model) && !MODELS.includes(model));
+    if (!local && !MODELS.includes(model)) return error(`Unknown model: ${model}`, 404, "model_not_found");
     const forwarded = {
       model,
       messages: body.messages,
       stream: body.stream === true,
       temperature: typeof body.temperature === "number" ? body.temperature : undefined,
       max_tokens: Math.min(Number(body.max_tokens) || MAX_TOKENS, MAX_TOKENS),
+      ...(local ? {
+        tools: body.tools,
+        tool_choice: body.tool_choice,
+        response_format: body.response_format,
+      } : {}),
     };
-    let token: string;
-    try {
-      token = await accessToken();
-    } catch (e) {
-      console.error(e);
-      return error("Inference credentials are unavailable", 503, "server_error");
+    const headers: Record<string, string> = { "content-type": "application/json" };
+    if (!local) {
+      try {
+        headers.authorization = `Bearer ${await accessToken()}`;
+      } catch (e) {
+        console.error(e);
+        return error("Inference credentials are unavailable", 503, "server_error");
+      }
     }
-    const upstream = await fetch(`${UPSTREAM}/chat/completions`, {
-      method: "POST",
-      headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-      body: JSON.stringify(forwarded),
-      signal: request.signal,
-    });
+    let upstream: Response;
+    try {
+      upstream = await fetch(`${local ? LOCAL_ENDPOINT : UPSTREAM}/chat/completions`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(forwarded),
+        signal: request.signal,
+      });
+    } catch (e) {
+      console.error("inference backend unavailable", e);
+      return error("Inference backend is unavailable", 503, "server_error");
+    }
     if (!upstream.ok) {
       const text = await upstream.text();
-      console.error(`vertex ${upstream.status}: ${text.slice(0, 500)}`);
-      return error(`Model backend answered ${upstream.status}`, upstream.status === 429 ? 429 : 502, "server_error");
+      console.error(`inference backend ${upstream.status}: ${text.slice(0, 500)}`);
+      const status = local && [404, 429, 503].includes(upstream.status) ? upstream.status : upstream.status === 429 ? 429 : 502;
+      return error(`Model backend answered ${upstream.status}`, status, "server_error");
     }
     return new Response(upstream.body, {
       headers: {

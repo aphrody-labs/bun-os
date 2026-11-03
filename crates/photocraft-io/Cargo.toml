@@ -20,6 +20,7 @@ corpus = []
 heif = ["photocraft-codecs/heif"]
 
 [dependencies]
+craft-docpath = { package = "filmcraft-docpath", path = "../craft-docpath", version = "0.1.0" }
 photocraft-geom = { path = "../photocraft-geom", version = "0.8.2" }
 photocraft-color = { path = "../photocraft-color", version = "0.8.2" }
 photocraft-cms = { path = "../photocraft-cms", version = "0.8.2" }

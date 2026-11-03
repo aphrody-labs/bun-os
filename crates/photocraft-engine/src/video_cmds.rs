@@ -454,7 +454,9 @@ fn reload_frame(s: &mut Session, _p: &Value) -> Result<Value> {
             msg: "this layer has no file source to reload".into(),
         });
     };
-    let frames = load_frames(&path, fmt)?.frames;
+    let file = crate::doc_path::resolve(&path)
+        .map_err(|why| crate::doc_path::refusal("the footage", &path, why))?;
+    let frames = load_frames(&file.to_string_lossy(), fmt)?.frames;
     edit_video(s, "Reload Frame", move |v, _| {
         v.original_frames = Some(frames.clone());
         v.frames = frames;
@@ -573,7 +575,11 @@ pub fn render_video_with(
     }
 
     // Image sequence.
-    let opts = photocraft_io::ExportOptions::default();
+    let opts = photocraft_io::ExportOptions {
+        allow_external_links: crate::doc_path::allowed(),
+        document_path: crate::doc_path::current(),
+        ..Default::default()
+    };
     let mut files = Vec::new();
     for f in 0..frames {
         let mut doc = base.clone();

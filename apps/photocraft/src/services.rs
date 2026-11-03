@@ -313,6 +313,8 @@ fn write_atomic_progress(path: &Path, bytes: &[u8], progress: &dyn Fn(f32)) -> R
 
 fn export_options(settings: &photocraft_ui_egui::ExportSettings) -> photocraft_io::ExportOptions {
     let mut opts = photocraft_io::ExportOptions::default();
+    opts.allow_external_links = settings.allow_external_links;
+    opts.document_path = settings.document_path.clone();
     if let Some(q) = settings.jpeg_quality {
         opts.encode.jpeg_quality = q;
     }
@@ -595,7 +597,9 @@ pub fn native(automation: Option<photocraft_automation::AuthorizedWorkspace>) ->
                   path: &str,
                   settings: &photocraft_ui_egui::ExportSettings,
                   ctl: &photocraft_ui_egui::jobs_ui::SaveCtl| {
-                save_through(doc, path, settings, ctl, |p, b, _| {
+                let mut scoped = settings.clone();
+                scoped.allow_external_links = false;
+                save_through(doc, path, &scoped, ctl, |p, b, _| {
                     workspace.write(p, b).map_err(|e| e.to_string())
                 })
             },
@@ -828,6 +832,18 @@ mod tests {
     use photocraft_format::list_recovery;
     use photocraft_ui_egui::{PhotocraftApp, prefs_ui};
     use serde_json::{Value, json};
+
+    #[test]
+    fn export_settings_keep_the_source_document_path() {
+        let settings = photocraft_ui_egui::ExportSettings {
+            document_path: Some(std::path::PathBuf::from("source/project.pcraft")),
+            ..Default::default()
+        };
+        assert_eq!(
+            export_options(&settings).document_path,
+            settings.document_path
+        );
+    }
 
     #[cfg(all(unix, not(target_os = "macos")))]
     #[test]

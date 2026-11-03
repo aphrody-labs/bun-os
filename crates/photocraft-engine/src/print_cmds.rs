@@ -718,7 +718,13 @@ fn package(s: &mut Session, p: &Value) -> Result<Value> {
                     fname = format!("{}-{}", copied.len(), fname);
                 }
                 let t = join(&links_dir, &fname);
-                match read_file(path) {
+                let Ok(file) =
+                    crate::doc_path::resolve_in(path, d.path.as_deref().map(std::path::Path::new))
+                else {
+                    missing.push(path.clone());
+                    continue;
+                };
+                match read_file(&file.to_string_lossy()) {
                     Ok(bytes) => {
                         write_file(&t, &bytes)?;
                         copied.push((path.clone(), t.clone()));

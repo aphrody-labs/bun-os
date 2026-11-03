@@ -66,9 +66,15 @@ pub fn linked_files(d: &Document) -> Vec<(String, Vec<u64>)> {
 pub(crate) fn update_changed(s: &mut Session, _: &Value) -> Result<Value> {
     let st = s.active().ok_or(EngineError::NoDocument)?;
     let (doc, files) = (st.doc.id.0, linked_files(&st.doc));
+    let document = st.path.as_deref().map(std::path::Path::new);
     let now = files
         .into_iter()
-        .map(|(p, ids)| (p.clone(), ids, stamp(&p)))
+        .map(|(p, ids)| {
+            let value = crate::doc_path::resolve_in(&p, document)
+                .ok()
+                .and_then(|f| stamp(&f.to_string_lossy()));
+            (p, ids, value)
+        })
         .collect();
     s.apply_link_stamps(doc, now)
 }
@@ -77,11 +83,12 @@ impl Session {
     /// Start stamping the active document's linked files on a worker thread, unless a look is
     /// still running (or the build has no files to look at: the web app).
     pub fn start_link_scan(&mut self) {
-        if self.link_scan.is_some() || cfg!(target_arch = "wasm32") {
+        if self.link_scan.is_some() || cfg!(target_arch = "wasm32") || self.authorize.is_some() {
             return;
         }
         let Some(st) = self.active() else { return };
         let (doc, files) = (st.doc.id.0, linked_files(&st.doc));
+        let document = st.path.as_deref().map(std::path::PathBuf::from);
         if files.is_empty() {
             return;
         }
@@ -92,7 +99,12 @@ impl Session {
             .spawn(move || {
                 let stamps = files
                     .into_iter()
-                    .map(|(p, ids)| (p.clone(), ids, stamp(&p)))
+                    .map(|(p, ids)| {
+                        let value = crate::doc_path::resolve_in(&p, document.as_deref())
+                            .ok()
+                            .and_then(|f| stamp(&f.to_string_lossy()));
+                        (p, ids, value)
+                    })
                     .collect();
                 *out.lock().unwrap_or_else(PoisonError::into_inner) = Some((doc, stamps));
             });

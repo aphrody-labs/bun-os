@@ -468,8 +468,10 @@ fn reveal_in_finder(s: &mut Session, p: &Value) -> Result<Value> {
     let SmartSource::Linked { path } = &sm.source else {
         return Err(other("embedded smart objects have no file to reveal"));
     };
+    let file = crate::doc_path::resolve_in(path, d.path.as_deref().map(std::path::Path::new))
+        .map_err(|why| crate::doc_path::refusal("the linked file", path, why))?;
     reveal(
-        path,
+        &file.to_string_lossy(),
         p.get("dryRun").and_then(Value::as_bool).unwrap_or(false),
     )
 }
@@ -1126,8 +1128,12 @@ fn export_layer(s: &mut Session, p: &Value, cmd: &str, png_only: bool) -> Result
         tmp.execute("image.imageSize", json!({"width": w}))?;
         ldoc = (*tmp.active().ok_or(EngineError::NoDocument)?.doc).clone();
     }
-    let out = photocraft_io::export(&ldoc, path, &Default::default())
-        .map_err(|e| other(e.to_string()))?;
+    let opts = photocraft_io::ExportOptions {
+        allow_external_links: crate::doc_path::allowed(),
+        document_path: d.path.as_deref().map(std::path::PathBuf::from),
+        ..Default::default()
+    };
+    let out = photocraft_io::export(&ldoc, path, &opts).map_err(|e| other(e.to_string()))?;
     write_file(path, &out.bytes)?;
     Ok(
         json!({"path": path, "bytes": out.bytes.len(), "width": ldoc.size.width, "height": ldoc.size.height, "warnings": out.warnings}),

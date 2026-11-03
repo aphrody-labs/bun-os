@@ -92,7 +92,7 @@ fn read_file(path: &str) -> Option<Vec<u8>> {
     if path.is_empty() {
         None
     } else {
-        photocraft_format::read_file(std::path::Path::new(path)).ok()
+        photocraft_format::read_file(&crate::doc_path::resolve(path).ok()?).ok()
     }
 }
 
@@ -592,6 +592,23 @@ pub fn render_below_filter(
     below.smart_filters.truncate(index);
     below.filter_mask = None;
     render(doc, &below)
+}
+
+/// Render a smart filter preview under the active session's document and authority.
+pub fn render_below_filter_for_session(
+    session: &Session,
+    doc: &Document,
+    sm: &SmartObject,
+    index: usize,
+) -> Result<Option<Surface>> {
+    let _document = crate::doc_path::scope_authorized(
+        session
+            .active()
+            .and_then(|d| d.path.as_deref())
+            .map(std::path::Path::new),
+        session.authorize.is_none(),
+    );
+    render_below_filter(doc, sm, index)
 }
 
 /// Re-renders smart layer `l` (which lives in `doc`) in place. Returns false if its source is

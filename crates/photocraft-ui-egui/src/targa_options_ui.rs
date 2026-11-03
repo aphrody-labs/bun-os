@@ -101,12 +101,14 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         let Some(p) = app.targa_options.take() else {
             return;
         };
-        let settings = ExportSettings {
-            tga_bits: Some(p.bits),
-            ..app.save_settings()
-        };
         let step = serde_json::json!({"path": p.path, "tgaBits": p.bits.bits()});
-        let written = app.with_document(p.doc, |app| app.write_document(p.path, &settings, p.copy));
+        let written = app.with_document(p.doc, |app| {
+            let settings = ExportSettings {
+                tga_bits: Some(p.bits),
+                ..app.save_settings()
+            };
+            app.write_document(p.path, &settings, p.copy)
+        });
         if written.is_ok() {
             // An action being recorded keeps the Save As or Save a Copy with this answer (#2032).
             app.session.journal.push((p.record.into(), step));

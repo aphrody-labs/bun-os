@@ -255,6 +255,8 @@ pub(crate) fn export_layered(
     // The PSD exporter renders the composite we need for the TIFF itself: unmatted (the TIFF
     // keeps straight alpha) and uncompressed (its planes are interleaved below).
     let psd_opts = PsdExportOptions {
+        allow_external_links: opts.allow_external_links,
+        document_path: opts.document_path.clone(),
         force_psb: opts.force_psb || big,
         merged_matte: false,
         merged_compression: Compression::Raw,

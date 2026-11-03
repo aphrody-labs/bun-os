@@ -38,6 +38,78 @@ fn fixture() -> Document {
     doc
 }
 
+#[test]
+fn linked_sources_resolve_from_document_folder_for_psd_and_tiff() {
+    let mut doc = fixture();
+    let sm = smart_mut(&mut doc.layers[0]);
+    let SmartSource::Embedded { bytes, .. } = &sm.source else {
+        panic!("embedded fixture")
+    };
+    let dir = std::env::temp_dir().join(format!("photocraft-linked-export-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("source.pcraft"), bytes.as_slice()).unwrap();
+    sm.source = SmartSource::Linked {
+        path: "source.pcraft".into(),
+    };
+    for name in ["out.psd", "out.tif"] {
+        let options = ExportOptions {
+            document_path: Some(dir.join("project.pcraft")),
+            tiff_layers: true,
+            ..Default::default()
+        };
+        let result = export(&doc, name, &options).unwrap();
+        assert!(
+            !result
+                .warnings
+                .iter()
+                .any(|w| w.contains("smart object written as pixels")),
+            "{:?}",
+            result.warnings
+        );
+        let imported = import(name, &result.bytes).unwrap().document;
+        assert!(matches!(
+            &imported.layers[0].content,
+            LayerContent::Smart(_)
+        ));
+        let denied = export(
+            &doc,
+            name,
+            &ExportOptions {
+                document_path: Some(dir.join("project.pcraft")),
+                allow_external_links: false,
+                tiff_layers: true,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(
+            denied
+                .warnings
+                .iter()
+                .any(|w| w.contains("filesystem access is not granted")),
+            "{:?}",
+            denied.warnings
+        );
+        let without_document = export(
+            &doc,
+            name,
+            &ExportOptions {
+                tiff_layers: true,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(
+            without_document
+                .warnings
+                .iter()
+                .any(|w| w.contains("smart object written as pixels")),
+            "{:?}",
+            without_document.warnings
+        );
+    }
+}
+
 fn smart<'a>(doc: &'a Document, name: &str) -> &'a SmartObject {
     let layer = doc.layers.iter().find(|l| l.name == name).unwrap();
     let LayerContent::Smart(sm) = &layer.content else {

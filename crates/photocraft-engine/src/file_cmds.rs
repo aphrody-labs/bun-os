@@ -20,6 +20,22 @@ use serde_json::{Value, json};
 use crate::commands::{CommandSpec, layer_param};
 use crate::{EngineError, Result, Session};
 
+/// Encode the active document for a host-managed download without changing its history.
+pub fn export_active_bytes(
+    s: &Session,
+    name: &str,
+    params: &Value,
+) -> Result<photocraft_io::ExportResult> {
+    let active = s.active().ok_or(EngineError::NoDocument)?;
+    let options = SaveOpts::from_params(s, params, "file.saveAs")?;
+    let _document = crate::doc_path::scope_authorized(
+        active.path.as_deref().map(std::path::Path::new),
+        s.authorize.is_none(),
+    );
+    let (bytes, warnings) = encode(&active.doc, name, options)?;
+    Ok(photocraft_io::ExportResult { bytes, warnings })
+}
+
 // ---------- predicates ----------
 
 fn has_doc(s: &Session) -> std::result::Result<(), String> {
@@ -409,6 +425,8 @@ pub(crate) fn encode(
     crate::allocation::checkpoint("saving document")?;
     let save = save.into();
     let mut opts = photocraft_io::ExportOptions {
+        allow_external_links: crate::doc_path::allowed(),
+        document_path: crate::doc_path::current(),
         tiff_layers: save.tiff_layers,
         tga_bits: save.tga_bits,
         image_previews: save.image_previews,
@@ -1233,6 +1251,7 @@ pub(crate) fn process_files(
             scratch.add_document(doc, Some(path.clone()));
             f(&mut scratch)?;
             let d = scratch.active().ok_or(EngineError::NoDocument)?;
+            let _document = crate::doc_path::scope(d.path.as_deref().map(std::path::Path::new));
             save_doc(&d.doc, &out, save)?;
             Ok(())
         })();
@@ -1615,6 +1634,12 @@ pub fn export_layers_with(
     p: &Value,
     mut write: impl FnMut(&str, &[u8]) -> Result<()>,
 ) -> Result<Vec<String>> {
+    let _document = crate::doc_path::scope_authorized(
+        s.active()
+            .and_then(|d| d.path.as_deref())
+            .map(std::path::Path::new),
+        s.authorize.is_none(),
+    );
     let cmd = "file.export.layersToFiles";
     let format = p
         .get("format")

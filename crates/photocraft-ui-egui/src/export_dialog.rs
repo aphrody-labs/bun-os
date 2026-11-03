@@ -602,7 +602,14 @@ pub fn confirm(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Result<Value,
         .to_string();
     let ext = s_fmt(f);
     let suggested = format!("{stem}.{ext}");
-    let (f, settings) = (f.clone(), settings(f));
+    let mut export_settings = settings(f);
+    export_settings.allow_external_links = app.session.authorize.is_none();
+    export_settings.document_path = app
+        .session
+        .active()
+        .and_then(|s| s.path.as_deref())
+        .map(std::path::PathBuf::from);
+    let (f, settings) = (f.clone(), export_settings);
     app.pick_save(&suggested, move |app, path| {
         let out = export_document(&doc, &f, None)?;
         let export = app
@@ -657,7 +664,10 @@ fn confirm_layers(
         .rsplit_once('.')
         .map_or(st.doc.name.as_str(), |(a, _)| a);
     let suggested = format!("{}.{}", export_name(stem), s_fmt(f));
-    let (f, settings) = (f.clone(), settings(f));
+    let mut export_settings = settings(f);
+    export_settings.allow_external_links = app.session.authorize.is_none();
+    export_settings.document_path = st.path.as_deref().map(std::path::PathBuf::from);
+    let (f, settings) = (f.clone(), export_settings);
     app.pick_save(&suggested, move |app, path| {
         let mut exported = Vec::new();
         for (doc, path) in docs.iter().zip(batch_paths(&path, &docs)) {

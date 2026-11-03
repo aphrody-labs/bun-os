@@ -695,9 +695,14 @@ pub fn open_smart_filter(
         return Err("the smart filter is not a Camera Raw filter".into());
     }
     let params = raw_params(RAW, &filter.params).map_err(|e| e.to_string())?;
-    let surf = photocraft_engine::smart_cmds::render_below_filter(&st.doc, sm, index)
-        .map_err(|e| e.to_string())?
-        .ok_or("the smart object's contents are unavailable (missing linked file?)")?;
+    let surf = photocraft_engine::smart_cmds::render_below_filter_for_session(
+        &app.session,
+        &st.doc,
+        sm,
+        index,
+    )
+    .map_err(|e| e.to_string())?
+    .ok_or("the smart object's contents are unavailable (missing linked file?)")?;
     let coverage = sm
         .filter_mask
         .clone()

@@ -27,7 +27,7 @@ describe('CSP direct-fetch allow-list', () => {
   })
 
   it('routes a user-configured cloud endpoint through the proxy', () => {
-    for (const host of ['api.fireworks.ai', 'api.x.ai', 'api.cerebras.ai', 'llm.example.com']) {
+    for (const host of ['api.fireworks.ai', 'api.x.ai', 'api.cerebras.ai', 'api.aphrody.com', 'llm.example.com']) {
       expect(isDirectFetchAllowed(host), `${host} must not use a direct fetch`).toBe(false)
     }
   })

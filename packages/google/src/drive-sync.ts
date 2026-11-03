@@ -55,6 +55,33 @@ async function privateDirectory(path: string): Promise<void> {
   if (!info.isDirectory() || info.isSymbolicLink()) throw new Error("Unsafe retrieval projection directory");
   await chmod(path, 0o700);
 }
+/** Never reclaim an existing lock: its owner may still be creating the pid file. */
+export async function acquireSyncLock(lock: string): Promise<() => Promise<void>> {
+  try {
+    await mkdir(lock, { mode: 0o700 });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "EEXIST")
+      throw new Error("Google Drive sync lock already exists; preserve it for inspection", { cause: error });
+    throw error;
+  }
+  const identity = await lstat(lock);
+  try {
+    await Bun.write(join(lock, "pid"), `${process.pid}\n`, { mode: 0o600 });
+  } catch (error) {
+    // We created this directory a moment ago: do not leak it when the pid file cannot be written.
+    await rm(lock, { recursive: true, force: true }).catch(() => {});
+    throw error;
+  }
+  return async () => {
+    const current = await lstat(lock).catch((error: NodeJS.ErrnoException) => {
+      if (error.code === "ENOENT") return undefined;
+      throw error;
+    });
+    if (!current || current.dev !== identity.dev || current.ino !== identity.ino)
+      throw new Error("Google Drive sync lock ownership changed; preserving lock");
+    await rm(lock, { recursive: true });
+  };
+}
 /** Index candidates separately from their private local/baseline/native evidence. */
 export async function projectRetrievalCandidate(
   privateRoot: string,
@@ -115,27 +142,7 @@ export async function syncAgentHome(options: { dryRun?: boolean; seedReviewed?: 
   const statePath = join(privateRoot, "dbfr-google-markdown.json"),
     lock = join(privateRoot, "dbfr-google-api.lock");
   await mkdir(privateRoot, { recursive: true, mode: 0o700 });
-  try {
-    await mkdir(lock, { mode: 0o700 });
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-    const pid = Number(
-      await Bun.file(join(lock, "pid"))
-        .text()
-        .catch(() => "0"),
-    );
-    if (pid > 1) {
-      try {
-        process.kill(pid, 0);
-        throw new Error("Google Drive sync is already running", { cause: error });
-      } catch (probe) {
-        if ((probe as NodeJS.ErrnoException).code !== "ESRCH") throw probe;
-      }
-    }
-    await rm(lock, { recursive: true });
-    await mkdir(lock, { mode: 0o700 });
-  }
-  await Bun.write(join(lock, "pid"), `${process.pid}\n`, { mode: 0o600 });
+  const releaseLock = await acquireSyncLock(lock);
   try {
     // A fresh worker may have no staged differences; its retrieval root is still indexable.
     if (!options.dryRun) await privateDirectory(join(privateRoot, "retrieval-markdown"));
@@ -260,6 +267,6 @@ export async function syncAgentHome(options: { dryRun?: boolean; seedReviewed?: 
     if (!options.dryRun) await save(statePath, JSON.stringify(state, null, 2) + "\n");
     console.log(JSON.stringify(summary));
   } finally {
-    await rm(lock, { recursive: true, force: true });
+    await releaseLock();
   }
 }

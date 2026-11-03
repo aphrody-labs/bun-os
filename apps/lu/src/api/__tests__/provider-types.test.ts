@@ -43,6 +43,17 @@ describe('PROVIDER_PRESETS', () => {
     }
   })
 
+  it('offers the first-party Aphrody Chat gateway without a client API key', () => {
+    const preset = PROVIDER_PRESETS.find(p => p.id === 'aphrody-chat')
+    expect(preset).toMatchObject({
+      name: 'Aphrody Chat',
+      providerId: 'openai',
+      baseUrl: 'https://api.aphrody.com/v1/chat/v1',
+      isLocal: false,
+    })
+    expect(preset!.placeholder).toBeUndefined()
+  })
+
   it('local presets have no API key placeholder', () => {
     const locals = PROVIDER_PRESETS.filter(p => p.isLocal)
     for (const p of locals) {
@@ -51,7 +62,7 @@ describe('PROVIDER_PRESETS', () => {
   })
 
   it('cloud presets have API key placeholders', () => {
-    const clouds = PROVIDER_PRESETS.filter(p => !p.isLocal && p.id !== 'custom-openai')
+    const clouds = PROVIDER_PRESETS.filter(p => !p.isLocal && !['custom-openai', 'aphrody-chat'].includes(p.id))
     for (const p of clouds) {
       expect(p.placeholder, `Cloud preset ${p.name} should have placeholder`).toBeDefined()
     }

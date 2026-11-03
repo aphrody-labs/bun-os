@@ -69,6 +69,11 @@ pub mod pipeline3d;
 /// OBJ and glTF 2.0 (`.gltf`/`.glb`) model import into the 3D scene graph.
 pub mod model;
 
+/// 3D authoring backend: editable meshes, modeling operators, sculpting,
+/// rigging, skinning, keyframe animation, PBR materials and an undoable
+/// JSON command document that evaluates to [`scene3d::Scene3d`].
+pub mod author3d;
+
 /// Deterministic benchmark and test scenes.
 pub mod fixtures;
 

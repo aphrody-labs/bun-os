@@ -326,7 +326,13 @@ pub fn run<T: Send + 'static>(
     work: impl FnOnce(&JobCtx) -> Result<T> + Send + 'static,
     apply: impl FnOnce(&mut Session, T) -> Result<Value> + Send + 'static,
 ) -> Result<Value> {
+    let document = s
+        .active()
+        .and_then(|d| d.path.as_deref())
+        .map(std::path::PathBuf::from);
     if !s.jobs.spawn || cfg!(target_arch = "wasm32") {
+        let _document =
+            crate::doc_path::scope_authorized(document.as_deref(), s.authorize.is_none());
         let t = work(&s.jobs.inline.clone().unwrap_or_default())?;
         return apply(s, t);
     }
@@ -342,7 +348,10 @@ pub fn run<T: Send + 'static>(
     };
     let ctx = JobCtx::new();
     let (tx, rx) = std::sync::mpsc::channel::<Result<Payload>>();
+    let work_document = document.clone();
+    let permit = s.authorize.is_none() && crate::doc_path::allowed();
     let erased: Apply = Box::new(move |s, any| {
+        let _document = crate::doc_path::scope_authorized(document.as_deref(), permit);
         let t = any
             .downcast::<T>()
             .map_err(|_| EngineError::Other("internal error: job result type mismatch".into()))?;
@@ -354,9 +363,11 @@ pub fn run<T: Send + 'static>(
     let handle = {
         let wctx = ctx.clone();
         let label_w = label.to_string();
+        let document = work_document;
         // The work closure is moved into the thread. If spawning fails (thread limits), there is
         // no way to get it back, so the error is reported instead.
         let spawned = std::thread::Builder::new().name(format!("photocraft-job-{}", id.0)).spawn(move || {
+            let _document = crate::doc_path::scope_authorized(document.as_deref(), permit);
             let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| work(&wctx).map(|t| Box::new(t) as Payload)))
                 .unwrap_or_else(|_| Err(EngineError::Other(format!("`{label_w}` failed with an internal error (logged); the document is unchanged"))));
             // The receiver is gone when the job was cancelled: nothing to report.
@@ -701,6 +712,12 @@ impl Session {
         params: Value,
         background: bool,
     ) -> Result<Started> {
+        let _document = crate::doc_path::scope_authorized(
+            self.active()
+                .and_then(|d| d.path.as_deref())
+                .map(std::path::Path::new),
+            self.authorize.is_none(),
+        );
         let spec =
             crate::commands::find(id).ok_or_else(|| EngineError::UnknownCommand(id.to_string()))?;
         // Params are named fields: anything but an object (or null, meaning none) is a caller

@@ -33,6 +33,10 @@ const PSD_ESTIMATE_LAYER_OVERHEAD: u64 = 64 * 1024;
 /// Options for [`document_to_psd_with`].
 #[derive(Debug, Clone)]
 pub struct PsdExportOptions {
+    /// Allow embedding linked files from the ambient filesystem.
+    pub allow_external_links: bool,
+    /// Source document path used to resolve stored links.
+    pub document_path: Option<std::path::PathBuf>,
     /// Write PSB even when the document fits PSD limits.
     pub force_psb: bool,
     /// Matte the merged image against white where it is translucent, as Photoshop does
@@ -52,6 +56,8 @@ pub struct PsdExportOptions {
 impl Default for PsdExportOptions {
     fn default() -> Self {
         PsdExportOptions {
+            allow_external_links: true,
+            document_path: None,
             force_psb: false,
             merged_matte: true,
             merged_compression: Compression::Rle,
@@ -61,6 +67,8 @@ impl Default for PsdExportOptions {
 }
 
 struct Ex {
+    allow_external_links: bool,
+    document_path: Option<std::path::PathBuf>,
     fmt: PixelFormat,
     /// Document resolution (for generated type-layer data).
     dpi: f32,
@@ -1160,7 +1168,14 @@ impl Ex {
             SmartSource::Linked { path } => {
                 #[cfg(not(target_arch = "wasm32"))]
                 {
-                    let bytes = std::fs::read(path)
+                    if !self.allow_external_links {
+                        return Err(format!(
+                            "the linked file {path} is not opened: filesystem access is not granted"
+                        ));
+                    }
+                    let file = crate::doc_path::resolve(path, self.document_path.as_deref())
+                        .map_err(|e| format!("the linked file {path} is not opened: {e}"))?;
+                    let bytes = std::fs::read(file)
                         .map_err(|e| format!("the linked file {path} can't be read: {e}"))?;
                     let name = path.rsplit(['/', '\\']).next().unwrap_or(path).to_string();
                     self.warnings.push(format!("the linked smart object {name} was embedded (PSD export keeps no external links)"));
@@ -1263,6 +1278,8 @@ impl Ex {
                 &doc,
                 &PsdExportOptions {
                     force_psb: true,
+                    allow_external_links: self.allow_external_links,
+                    document_path: self.document_path.clone(),
                     ..Default::default()
                 },
                 self.smart.depth + 1,
@@ -1953,6 +1970,8 @@ fn document_to_psd_nested(
     let size_exceeds_limit = !opts.force_psb && !big && psd_size_exceeds_limit(doc);
     let version = psd_version(doc, opts.force_psb, size_exceeds_limit);
     let mut ex = Ex {
+        allow_external_links: opts.allow_external_links,
+        document_path: opts.document_path.clone(),
         fmt,
         dpi: doc.resolution_dpi,
         text_styles: doc.text_styles.clone(),

@@ -4,6 +4,7 @@
 import { hostname, userInfo } from "node:os";
 import type { BunWindowsApi } from "./bun-windows";
 import * as nativeRegistry from "@aphrody/windows/registry";
+import { registry as windowsRegistry } from "@aphrody/windows/fork/windows";
 import * as win32 from "@aphrody/windows/win32";
 import * as shell from "@aphrody/windows/shell";
 
@@ -135,7 +136,7 @@ export function windowsHost(): BunWindowsApi {
       set: (path, name, value, type = "REG_SZ") =>
         nativeRegistry.set(path, name, value, REG_TYPE_ALIASES[type] ?? type),
       deleteValue: nativeRegistry.deleteValue,
-      deleteKey: nativeRegistry.deleteKey,
+      deleteKey: windowsRegistry.deleteKey,
     },
     services: {
       list: () => services().map(({ name, displayName, state }) => ({ name, displayName, state })),

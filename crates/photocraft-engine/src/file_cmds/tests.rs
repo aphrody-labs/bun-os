@@ -1,5 +1,28 @@
 use super::*;
 
+#[test]
+fn headless_byte_export_preserves_session_and_validates_parameters() {
+    assert!(matches!(
+        export_active_bytes(&Session::new(), "x.png", &json!({})),
+        Err(EngineError::NoDocument)
+    ));
+    let s = session(2, 3, 8);
+    let before = s.active().unwrap().clone();
+    assert!(matches!(
+        export_active_bytes(&s, "x.tga", &json!({"tgaBits": 7})),
+        Err(EngineError::BadParams { .. })
+    ));
+    let png = export_active_bytes(&s, "x.png", &json!({})).unwrap();
+    assert!(png.bytes.starts_with(b"\x89PNG\r\n\x1a\n"));
+    let imported = photocraft_io::import("x.png", &png.bytes).unwrap().document;
+    assert_eq!((imported.size.width, imported.size.height), (2, 3));
+    let after = s.active().unwrap();
+    assert_eq!(after.path, before.path);
+    assert_eq!(after.revision, before.revision);
+    assert_eq!(after.saved_revision, before.saved_revision);
+    assert!(Arc::ptr_eq(&after.doc, &before.doc));
+}
+
 fn tmp(name: &str) -> String {
     let d = std::env::temp_dir().join(format!(
         "photocraft-file-cmds-{}-{name}",

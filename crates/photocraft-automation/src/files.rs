@@ -141,7 +141,9 @@ pub fn save_bytes(
             Vec::new(),
         ));
     }
-    let result = photocraft_io::export(doc, &ext, opts)?;
+    let mut scoped = opts.clone();
+    scoped.allow_external_links = false;
+    let result = photocraft_io::export(doc, &ext, &scoped)?;
     Ok((result.bytes, result.warnings))
 }
 

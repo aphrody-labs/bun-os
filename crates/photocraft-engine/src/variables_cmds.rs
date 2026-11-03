@@ -299,8 +299,10 @@ fn replace_pixels(
         return Ok(());
     }
     let fmt = doc.pixel_format();
+    let file = crate::doc_path::resolve(path)
+        .map_err(|why| crate::doc_path::refusal("the image", path, why))?;
     let bytes =
-        std::fs::read(path).map_err(|e| EngineError::Other(format!("read `{path}`: {e}")))?;
+        std::fs::read(file).map_err(|e| EngineError::Other(format!("read `{path}`: {e}")))?;
     let src = crate::file_cmds::import(path, &bytes)?;
     let img = crate::file_cmds::flattened(&src, fmt);
     let (iw, ih) = (src.size.width.max(1) as f64, src.size.height.max(1) as f64);
@@ -552,6 +554,12 @@ pub fn export_data_sets_with(
     p: &Value,
     mut write: impl FnMut(&str, &[u8]) -> Result<()>,
 ) -> Result<Vec<String>> {
+    let _document = crate::doc_path::scope_authorized(
+        s.active()
+            .and_then(|d| d.path.as_deref())
+            .map(std::path::Path::new),
+        s.authorize.is_none(),
+    );
     let format = p.get("format").and_then(Value::as_str).unwrap_or("png");
     let st = s.active().ok_or(EngineError::NoDocument)?;
     let original = st.doc.clone();
@@ -613,7 +621,11 @@ pub fn export_data_sets_with(
     for (set, name) in sets.iter().zip(&names) {
         let mut doc = (*original).clone();
         apply_to_doc(&mut doc, &vars, set)?;
-        let opts = photocraft_io::ExportOptions::default();
+        let opts = photocraft_io::ExportOptions {
+            allow_external_links: crate::doc_path::allowed(),
+            document_path: crate::doc_path::current(),
+            ..Default::default()
+        };
         let bytes = photocraft_io::export(&doc, format, &opts)
             .map(|r| r.bytes)
             .map_err(|e| EngineError::Other(format!("export `{}`: {e}", set.name)))?;

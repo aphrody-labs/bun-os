@@ -61,6 +61,13 @@ struct ChunkDelta {
     content: Option<String>,
 }
 
+/// Extract one complete SSE line without decoding partial UTF-8 sequences.
+fn take_sse_line(buffer: &mut Vec<u8>) -> Option<String> {
+    let end = buffer.iter().position(|byte| *byte == b'\n')?;
+    let line: Vec<u8> = buffer.drain(..=end).collect();
+    Some(String::from_utf8_lossy(&line).into_owned())
+}
+
 /// POST the conversation and turn the SSE body into deltas.
 fn ask(endpoint: String, model: String, turns: Vec<Turn>) -> impl cosmic::iced::futures::Stream<Item = Delta> {
     cosmic::iced::stream::channel(64, move |mut out: cosmic::iced::futures::channel::mpsc::Sender<Delta>| async move {
@@ -86,7 +93,9 @@ fn ask(endpoint: String, model: String, turns: Vec<Turn>) -> impl cosmic::iced::
             return;
         }
         let mut bytes = response.bytes_stream();
-        let mut buffer = String::new();
+        // Keep bytes until a complete SSE line arrives: a network chunk may
+        // split a UTF-8 code point, and SSE permits both LF and CRLF endings.
+        let mut buffer = Vec::<u8>::new();
         while let Some(part) = bytes.next().await {
             let part = match part {
                 Ok(p) => p,
@@ -95,20 +104,17 @@ fn ask(endpoint: String, model: String, turns: Vec<Turn>) -> impl cosmic::iced::
                     return;
                 }
             };
-            buffer.push_str(&String::from_utf8_lossy(&part));
-            while let Some(end) = buffer.find("\n\n") {
-                let event: String = buffer.drain(..end + 2).collect();
-                for line in event.lines() {
-                    let Some(data) = line.strip_prefix("data:").map(str::trim) else { continue };
-                    if data == "[DONE]" {
-                        let _ = out.send(Delta::Done).await;
-                        return;
-                    }
-                    if let Ok(chunk) = serde_json::from_str::<Chunk>(data) {
-                        for choice in chunk.choices {
-                            if let Some(text) = choice.delta.and_then(|d| d.content).filter(|t| !t.is_empty()) {
-                                let _ = out.send(Delta::Text(text)).await;
-                            }
+            buffer.extend_from_slice(&part);
+            while let Some(line) = take_sse_line(&mut buffer) {
+                let Some(data) = line.strip_prefix("data:").map(str::trim) else { continue };
+                if data == "[DONE]" {
+                    let _ = out.send(Delta::Done).await;
+                    return;
+                }
+                if let Ok(chunk) = serde_json::from_str::<Chunk>(data) {
+                    for choice in chunk.choices {
+                        if let Some(text) = choice.delta.and_then(|d| d.content).filter(|t| !t.is_empty()) {
+                            let _ = out.send(Delta::Text(text)).await;
                         }
                     }
                 }
@@ -116,6 +122,21 @@ fn ask(endpoint: String, model: String, turns: Vec<Turn>) -> impl cosmic::iced::
         }
         let _ = out.send(Delta::Done).await;
     })
+}
+
+#[cfg(test)]
+mod stream_tests {
+    use super::take_sse_line;
+
+    #[test]
+    fn preserves_split_utf8_and_crlf() {
+        let mut buffer = b"data: caf\xc3".to_vec();
+        assert!(take_sse_line(&mut buffer).is_none());
+        buffer.extend_from_slice(b"\xa9\r\n\r\n");
+        assert_eq!(take_sse_line(&mut buffer).as_deref(), Some("data: café\r\n"));
+        assert_eq!(take_sse_line(&mut buffer).as_deref(), Some("\r\n"));
+        assert!(buffer.is_empty());
+    }
 }
 
 impl cosmic::Application for App {

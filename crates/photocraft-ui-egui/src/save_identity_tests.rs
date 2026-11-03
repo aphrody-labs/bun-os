@@ -44,6 +44,21 @@ fn identity(app: &PhotocraftApp) -> (String, Option<String>, u64, u64) {
 }
 
 #[test]
+fn save_settings_capture_the_active_document_path() {
+    let mut app = app();
+    assert_eq!(app.save_settings().document_path, None);
+    app.session.active_mut().unwrap().path = Some("folder/source.pcraft".into());
+    let captured = app.save_settings();
+    app.session.active_mut().unwrap().path = Some("different.pcraft".into());
+    assert_eq!(
+        captured.document_path.as_deref(),
+        Some(std::path::Path::new("folder/source.pcraft"))
+    );
+    app.session.authorize = Some(|_, _| Ok(()));
+    assert!(!app.save_settings().allow_external_links);
+}
+
+#[test]
 fn new_document_psd_and_subsequent_save_as_adopt_the_written_file_name() {
     for depth in [8, 16, 32] {
         let mut app = app();

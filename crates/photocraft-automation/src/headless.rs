@@ -358,7 +358,9 @@ impl Headless {
             }
             Filesystem::TrustedLocal => {
                 let writer = self.writers.entry(doc.id.0).or_default();
-                files::save(&doc, &target, format, opts, Some(writer))?
+                let mut local = opts.clone();
+                local.document_path = stored_path.as_deref().map(PathBuf::from);
+                files::save(&doc, &target, format, &local, Some(writer))?
             }
             Filesystem::Workspace(workspace) => {
                 let (bytes, warnings) = files::save_bytes(&doc, target_text, format, opts)?;

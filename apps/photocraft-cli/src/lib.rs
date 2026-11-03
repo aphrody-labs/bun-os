@@ -342,7 +342,8 @@ fn convert(a: &Args, _out: &mut dyn Write, err: &mut dyn Write) -> R {
     let [input, output] = a.positional.as_slice() else {
         return Err("convert needs <in> <out>".into());
     };
-    let opts = export_opts(a)?;
+    let mut opts = export_opts(a)?;
+    opts.document_path = Some(Path::new(input).to_path_buf());
     let o = files::open(Path::new(input)).map_err(|e| e.to_string())?;
     warn_all(err, &o.warnings);
     warn_all(

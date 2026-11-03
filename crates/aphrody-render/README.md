@@ -22,6 +22,7 @@ wasm WebGPU, WebGL, CPU); GPU backends are reported only when `gpu` is compiled.
 | `gpu3d` | Persistent GPU 3D renderer: instanced draws, shadow pass, MSAA, `render_to_texture` / `render_to_view` for hosts that present themselves. |
 | `pipeline3d` | `Pipeline3d` with `CpuOnly` / `Auto` / `GpuRequired`. |
 | `model` | glTF/GLB (`gltf`) and OBJ (`tobj`) import, `inspect`, `write_glb`, `studio_scene`, `orbit_camera`. |
+| `author3d` | Authoring backend: editable n-gon meshes (extrude, inset, Catmull-Clark, merge, ray pick), sculpt brushes, skeletons + auto-weights + linear-blend skinning, keyframe clips + blending, PBR material presets, and the undoable JSON `Op` document that evaluates to `Scene3d`, PNG and GLB. Design and upstream evaluation: [`docs/3D-AUTHORING.md`](../../docs/3D-AUTHORING.md). |
 
 ## Features
 
@@ -34,9 +35,9 @@ wasm WebGPU, WebGL, CPU); GPU backends are reported only when `gpu` is compiled.
 - Native: `m3/packages/canvas` and `@aphrody/bun` (`m3Render`, `m3Render3d`).
 - Browser: `m3/packages/canvas/site` and `m3/packages/material-web` (`md-3d-scene`,
   `md-native-3d`).
-- Tauri hosts and agent tools: the former `aphrody-tauri-3d`, `aphrody-model-view`
-  and `aphrody-render3d` (`render3d_*` kernel tools) crates were removed; this crate
-  is the single render owner and a new host must call it rather than reimplement it.
+- Tauri hosts: `aphrody-tauri-3d` (wgpu scene under a transparent M3 webview) and
+  `apps/aphrody-model-view` consume this crate; the former `aphrody-render3d` kernel tools were removed.
+  This crate is the single render owner and a new host must call it rather than reimplement it.
 
 Hosts never duplicate backend policy; they call this crate.
 
@@ -44,6 +45,7 @@ Hosts never duplicate backend policy; they call this crate.
 
 ```sh
 cargo test -p aphrody-render --locked
+cargo run -p aphrody-render --release --example studio3d -- crates/aphrody-render/examples/studio3d/character.json out/
 cargo test -p aphrody-render --features gpu --locked
 cargo clippy -p aphrody-render --all-targets --features gpu -- -D warnings
 cargo bench -p aphrody-render --bench frame --features gpu

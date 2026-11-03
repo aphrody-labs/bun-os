@@ -47,6 +47,7 @@ pub mod blocks;
 pub mod camera_raw_xmp;
 mod channel_map;
 pub mod comps_map;
+pub mod doc_path;
 pub mod effects_map;
 pub mod exr_parts;
 mod flat;
@@ -170,6 +171,10 @@ pub enum XmpEmbed {
 /// Export options.
 #[derive(Debug, Clone)]
 pub struct ExportOptions {
+    /// Allow embedding linked files from the ambient filesystem.
+    pub allow_external_links: bool,
+    /// Source document path used to resolve stored links during export.
+    pub document_path: Option<std::path::PathBuf>,
     /// Codec options for flat formats.
     pub encode: EncodeOptions,
     /// Write PSB even for `.psd` names when the document is small.
@@ -198,6 +203,8 @@ pub struct ExportOptions {
 impl Default for ExportOptions {
     fn default() -> Self {
         ExportOptions {
+            allow_external_links: true,
+            document_path: None,
             encode: EncodeOptions::default(),
             force_psb: false,
             tiff_layers: false,
@@ -480,7 +487,9 @@ fn export_stages(
     }
     if ext == "psd" || ext == "psb" {
         let o = PsdExportOptions {
+            allow_external_links: opts.allow_external_links,
             force_psb: opts.force_psb || ext == "psb",
+            document_path: opts.document_path.clone(),
             maximize_compatibility: opts.psd_maximize_compatibility,
             ..Default::default()
         };

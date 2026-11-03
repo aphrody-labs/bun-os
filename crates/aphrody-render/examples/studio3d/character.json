@@ -1,0 +1,45 @@
+{
+  "ops": [
+    { "op": "add_object", "name": "body", "primitive": { "shape": "cube", "size": [0.5, 1.0, 0.5] },
+      "transform": { "translation": [0.0, 0.5, 0.0] }, "material": "skin" },
+    { "op": "extrude", "object": "body", "faces": { "select": "facing", "direction": [0, 1, 0] }, "distance": 0.5 },
+    { "op": "extrude", "object": "body", "faces": { "select": "facing", "direction": [0, 1, 0] }, "distance": 0.5 },
+    { "op": "subdivide", "object": "body", "levels": 2 },
+    { "op": "sculpt", "object": "body",
+      "brush": { "kind": "draw", "radius": 0.25, "strength": 0.15, "symmetry_x": true },
+      "rays": [
+        { "origin": [0.1, 0.2, 2.0], "direction": [0, 0, -1] },
+        { "origin": [0.1, 0.5, 2.0], "direction": [0, 0, -1] },
+        { "origin": [0.1, 0.8, 2.0], "direction": [0, 0, -1] }
+      ] },
+    { "op": "sculpt", "object": "body",
+      "brush": { "kind": "smooth", "radius": 0.3, "strength": 0.5 },
+      "stroke": [[0.0, 1.5, 0.0]] },
+    { "op": "define_material", "name": "teal",
+      "material": { "color": "#1f9e9a", "metallic": 0.0, "roughness": 0.3 } },
+    { "op": "add_object", "name": "head", "primitive": { "shape": "quad_sphere", "radius": 0.32, "level": 3 },
+      "transform": { "translation": [0.0, 2.35, 0.0] }, "material": "teal" },
+    { "op": "add_object", "name": "plinth", "primitive": { "shape": "cube", "size": [1.6, 0.2, 1.6] },
+      "transform": { "translation": [0.0, -0.1, 0.0] }, "material": "iron", "shading": "flat" },
+    { "op": "inset", "object": "plinth", "faces": { "select": "facing", "direction": [0, 1, 0] }, "amount": 0.15 },
+    { "op": "extrude", "object": "plinth", "faces": { "select": "facing", "direction": [0, 1, 0] }, "distance": -0.05 },
+    { "op": "add_bone", "name": "root", "length": 0.75 },
+    { "op": "add_bone", "name": "spine", "parent": "root", "transform": { "translation": [0.0, 0.75, 0.0] }, "length": 0.75 },
+    { "op": "add_bone", "name": "tip", "parent": "spine", "transform": { "translation": [0.0, 0.75, 0.0] }, "length": 0.5 },
+    { "op": "bind_skin", "object": "body" },
+    { "op": "add_clip", "clip": { "name": "wave", "looping": true, "tracks": [
+      { "bone": "spine", "property": "rotation", "interpolation": "smooth",
+        "keys": [ { "time": 0.0, "value": [0, 0, 0] }, { "time": 0.5, "value": [0, 0, 35] }, { "time": 1.0, "value": [0, 0, 0] } ] },
+      { "bone": "tip", "property": "rotation", "interpolation": "smooth",
+        "keys": [ { "time": 0.0, "value": [0, 0, 0] }, { "time": 0.5, "value": [0, 0, 30] }, { "time": 1.0, "value": [0, 0, 0] } ] }
+    ] } }
+  ],
+  "outputs": [
+    { "kind": "png", "path": "character-rest.png", "view": { "width": 640, "height": 480 } },
+    { "kind": "frames", "prefix": "character-wave", "count": 8, "fps": 8,
+      "view": { "width": 320, "height": 240, "clip": "wave" } },
+    { "kind": "glb", "path": "character-wave.glb", "view": { "clip": "wave", "time": 0.5 } },
+    { "kind": "document", "path": "character.doc3d.json" },
+    { "kind": "stats", "path": "character.stats.json" }
+  ]
+}

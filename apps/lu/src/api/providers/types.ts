@@ -119,7 +119,11 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
   { id: 'sglang', name: 'SGLang', providerId: 'openai', baseUrl: 'http://localhost:30000/v1', isLocal: true },
   { id: 'tgi', name: 'TGI (HuggingFace)', providerId: 'openai', baseUrl: 'http://localhost:8080/v1', isLocal: true },
 
-  // ── Cloud providers (API key required) ───────────────────
+  // ── Cloud providers ─────────────────────────────────────
+  // First-party OpenAI-compatible gateway (Aphrody Chat). The gateway owns
+  // Vertex credentials server-side; users opt in through the existing cloud
+  // data warning and do not enter or store a client API key.
+  { id: 'aphrody-chat', name: 'Aphrody Chat', providerId: 'openai', baseUrl: 'https://api.aphrody.com/v1/chat/v1', isLocal: false },
   { id: 'openrouter', name: 'OpenRouter', providerId: 'openai', baseUrl: 'https://openrouter.ai/api/v1', isLocal: false, placeholder: 'sk-or-...' },
   { id: 'groq', name: 'Groq', providerId: 'openai', baseUrl: 'https://api.groq.com/openai/v1', isLocal: false, placeholder: 'gsk_...' },
   { id: 'together', name: 'Together', providerId: 'openai', baseUrl: 'https://api.together.xyz/v1', isLocal: false, placeholder: 'tok_...' },

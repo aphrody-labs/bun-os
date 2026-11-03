@@ -561,7 +561,13 @@ pub(crate) fn resolve_map_path(fp: &mut FilterParams, p: &Value) -> Result<()> {
         && map.is_none()
         && let Some(path) = map_path(p)
     {
-        *map = map_from_path(path, p.get("mapLayer").and_then(Value::as_u64))?.map(Arc::new);
+        let file = crate::doc_path::resolve(path)
+            .map_err(|why| crate::doc_path::refusal("the displacement map", path, why))?;
+        *map = map_from_path(
+            &file.to_string_lossy(),
+            p.get("mapLayer").and_then(Value::as_u64),
+        )?
+        .map(Arc::new);
     }
     Ok(())
 }
