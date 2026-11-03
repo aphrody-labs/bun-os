@@ -1,0 +1,13 @@
+# Bun OS for Windows: %USERPROFILE%\.wslgconfig. WSLGd (microsoft/wslg WSLGd/main.cpp, SetupOptionalEnv) exports
+# every key of [system-distro-env] into the WSLg system distro; the WESTON_RDPRAIL_SHELL_* names are read by
+# weston-mirror rdprail-shell (branch working). Goal: Linux windows that look and behave like Win32 windows.
+
+[system-distro-env]
+# No penguin overlay on taskbar and Start-menu icons; no "(bunos)" suffix on Start-menu entries.
+WESTON_RDPRAIL_SHELL_BLEND_OVERLAY_ICON_TASKBAR=false
+WESTON_RDPRAIL_SHELL_BLEND_OVERLAY_ICON_APPLIST=false
+WESTON_RDPRAIL_SHELL_APPEND_DISTRONAME_STARTMENU=false
+# Alt+F4 closes the Linux app like a Win32 app.
+WESTON_RDPRAIL_SHELL_ALLOW_ALT_F4_TO_CLOSE_APP=true
+# Use the distro's X fonts for XWayland (WSLGd default, pinned here).
+WSLG_USE_USER_DISTRO_XFONTS=true
