@@ -19,6 +19,7 @@ import { isMobile } from './device-kind'
  */
 export const MOBILE_REMOVED_TOOLS: ReadonlySet<string> = new Set([
   'shell_execute',
+  'craft_execute',
   'pr_resume',
   'screenshot',
   'image_generate',

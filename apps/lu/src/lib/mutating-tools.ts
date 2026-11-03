@@ -22,6 +22,7 @@ export const MUTATING_TOOLS = new Set([
   'file_write',
   'file_edit',
   'shell_execute',
+  'craft_execute',
   'image_generate',
   'video_generate',
   'run_workflow',

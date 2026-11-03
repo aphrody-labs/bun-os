@@ -1,4 +1,9 @@
-import type { Config } from "./index.ts";
+/** Minimal configuration consumed by the catalog, usable by browser clients. */
+export interface CapabilityConfig {
+  modules: readonly { id: string; role?: string }[];
+  priorities?: readonly string[];
+  deployment?: { appPrefix: string; domain: string };
+}
 
 export type CraftHostId = "cad" | "deck" | "grid" | "pdf" | "photo";
 
@@ -258,7 +263,7 @@ export function appCapabilityForLibrary(libraryId: string): AppCapability | unde
   return capability ? { ...capability } : undefined;
 }
 
-export function appCapabilities(config: Pick<Config, "modules" | "priorities">): AppCapability[] {
+export function appCapabilities(config: CapabilityConfig): AppCapability[] {
   const engines = new Set(config.modules.filter(module => module.role === "engine").map(module => module.id));
   for (const id of engines) {
     if (!capabilities.some(entry => entry.libraryId === id)) throw new Error(`Application capability missing: ${id}`);
@@ -272,7 +277,7 @@ export function appCapabilities(config: Pick<Config, "modules" | "priorities">):
 
 export function appHostname(
   capabilityId: string,
-  config: Pick<Config, "modules" | "priorities" | "deployment">,
+  config: CapabilityConfig,
 ): string {
   if (!appCapabilities(config).some(entry => entry.id === capabilityId))
     throw new Error(`Unknown application: ${capabilityId}`);
@@ -286,7 +291,7 @@ export function appHostname(
 /** Canonical app host plus the library-name DNS alias already used by clients. */
 export function appHostnamesForLibrary(
   libraryId: string,
-  config: Pick<Config, "modules" | "priorities" | "deployment">,
+  config: CapabilityConfig,
 ): string[] {
   const capability = appCapabilityForLibrary(libraryId);
   if (!capability) throw new Error(`Unknown application library: ${libraryId}`);

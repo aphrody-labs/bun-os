@@ -8,6 +8,7 @@ import type {
 import type { ToolRegistry } from './tool-registry'
 import { reserveCreateTools } from './create-tools'
 import { registerSettingsTools } from './settings-tools'
+import { CRAFT_EXECUTE, craftShellArgs } from './craft-tools'
 import { SETTINGS_TOOL_NAMES } from '../../lib/settings-tool-names'
 import { v4 as uuid } from 'uuid'
 import { backendCall, isTauri } from '../backend'
@@ -207,6 +208,7 @@ function mediaSettingsSchema(own: Record<string, JSONSchemaProp>): JSONSchemaPro
 // every one of them is classified as mutating or read-only. It parses the file
 // rather than importing it, because importing pulls in the tool-registry cycle.
 const BUILTIN_TOOLS: MCPToolDefinition[] = [
+  CRAFT_EXECUTE,
   // Planning
   {
     name: 'todo_write',
@@ -2376,6 +2378,10 @@ const EXECUTOR_MAP: Record<
   string,
   (args: ToolArgs, run?: AgentRunContext, signal?: AbortSignal) => Promise<string>
 > = {
+  craft_execute: async (args, run, signal) => {
+    const shell = craftShellArgs(args)
+    return typeof shell === 'string' ? shell : executeShellExecute(shell, run, signal)
+  },
   todo_write: executeTodoWrite,
   web_search: executeWebSearch,
   web_fetch: executeWebFetch,
