@@ -27,6 +27,7 @@ function choose(value) {
     localStorage.setItem(KEY, value);
   } catch {}
   document.getElementById("storage-notice")?.remove();
+  document.documentElement.style.setProperty("--site-notice-height", "0px");
   if (value === "functional") registerWorker();
 }
 
@@ -37,28 +38,23 @@ function registerWorker() {
 
 function notice() {
   if (choice() || location.pathname === "/privacy") return;
-  const bar = document.createElement("aside");
-  bar.id = "storage-notice";
-  bar.setAttribute("role", "region");
-  bar.setAttribute("aria-label", "Storage");
-  bar.style.cssText =
-    "position:fixed;z-index:2147483647;inset:auto 16px 16px 16px;max-width:640px;margin:0 auto;padding:16px;display:flex;" +
-    "flex-wrap:wrap;gap:12px;align-items:center;border-radius:16px;background:#1b1f23ee;color:#e6e8ea;" +
-    "font:14px/1.5 system-ui,sans-serif;box-shadow:0 8px 32px #0008;backdrop-filter:blur(12px)";
-  bar.innerHTML =
-    '<span style="flex:1 1 280px">No ads, no trackers. aphrody.com can keep an offline copy of the client and your ' +
-    'preferences on this device. <a href="/privacy" style="color:#f5c451">Manage storage</a></span>' +
-    '<button type="button" data-storage="refuse">Essential only</button>' +
-    '<button type="button" data-storage="accept" class="primary">Allow</button>';
-  for (const button of bar.querySelectorAll("button"))
-    button.style.cssText =
-      "font:inherit;padding:8px 14px;border-radius:999px;border:1px solid #8886;cursor:pointer;" +
-      (button.classList.contains("primary") ? "background:#f5c451;color:#16181a;border-color:transparent" : "background:transparent;color:inherit");
-  document.body.append(bar);
+  const sheet = document.createElement("aside");
+  sheet.id = "storage-notice";
+  sheet.setAttribute("aria-label", "Storage on this device");
+  sheet.innerHTML =
+    "<p>No ads and no trackers. aphrody.com can keep an offline copy of the client and your preferences on this " +
+    'device. <a href="/privacy">Manage storage</a></p>' +
+    '<div class="row"><button type="button" data-storage="refuse">Essential only</button>' +
+    '<button type="button" class="filled" data-storage="accept">Allow</button></div>';
+  document.body.append(sheet);
+  // The page reserves the sheet's height so it never covers the focused control (WCAG 2.4.11).
+  new ResizeObserver(([entry]) =>
+    document.documentElement.style.setProperty("--site-notice-height", `${Math.ceil(entry.borderBoxSize[0].blockSize) + 16}px`),
+  ).observe(sheet);
 }
 
 const format = (bytes) =>
-  bytes == null ? "?" : bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
+  bytes == null ? "?" : bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${(bytes / 1024).toFixed(1)} KB` : bytes < 1073741824 ? `${(bytes / 1048576).toFixed(1)} MB` : `${(bytes / 1073741824).toFixed(1)} GB`;
 
 async function report() {
   const table = document.getElementById("storage-report");
@@ -158,6 +154,19 @@ document.addEventListener("click", async (event) => {
       status("Local data cleared.");
       break;
     case "clear-all":
+      // Two steps: the first press arms the button, the second clears.
+      if (!el.hasAttribute("data-armed")) {
+        el.setAttribute("data-armed", "");
+        el.textContent = "Press again to clear everything";
+        status("This deletes all aphrody.com data in this browser and signs you out.");
+        setTimeout(() => {
+          el.removeAttribute("data-armed");
+          el.textContent = "Clear everything and sign out";
+        }, 6000);
+        return;
+      }
+      el.removeAttribute("data-armed");
+      el.textContent = "Clear everything and sign out";
       await clearLocal();
       await fetch("/privacy/clear", { method: "POST", credentials: "same-origin" }).catch(() => {});
       status("Everything cleared and signed out.");
@@ -177,6 +186,7 @@ document.addEventListener("click", async (event) => {
         if (error?.name !== "AbortError") {
           await navigator.clipboard?.writeText(location.origin + "/");
           el.textContent = "Link copied";
+          setTimeout(() => (el.textContent = "Copy link"), 3000);
         }
       }
       break;
@@ -209,7 +219,7 @@ async function probeGpu() {
       preferredFormat: navigator.gpu.getPreferredCanvasFormat(),
     };
     const out = document.getElementById("gpu");
-    if (out) out.textContent = `WebGPU ${adapter.info?.vendor ?? ""} ${adapter.info?.architecture ?? ""}`.trim();
+    if (out) out.textContent = `Loading the desktop on WebGPU${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
   } catch {
     root.dataset.gpu = "webgl2";
   }

@@ -24,7 +24,7 @@ streamed from Bun OS and drawn by a Rust WebAssembly client on WebGPU.";
 /// Subtitle of the site card: short enough for three lines.
 const TAGLINE: &str =
     "COSMIC with Android apps, Redox, Wine and Proton, streamed from Bun OS to any tab.";
-const THEME: &str = "#101214";
+const THEME: &str = "#17130b"; // M3 dark surface of SEED
 const ACCENT: &str = "#f5c451";
 /// Inter Bold (SIL Open Font License 1.1, assets/effectcraft/fonts), the only font the share images use.
 const FONT: &[u8] = include_bytes!("../../../assets/effectcraft/fonts/Inter-Bold.ttf");
@@ -456,16 +456,38 @@ self.addEventListener("message", (event) => {{
         .into_response()
 }
 
-const PAGE_STYLE: &str = ":root{color-scheme:dark light;--bg:#101214;--fg:#e6e8ea;--muted:#a9afb5;--card:#1b1f23;--accent:#f5c451}\
-@media (prefers-color-scheme:light){:root{--bg:#f7f7f5;--fg:#16181a;--muted:#555b61;--card:#fff}}\
-*{box-sizing:border-box}body{margin:0;min-height:100dvh;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif}\
-main{max-width:760px;margin:0 auto;padding:48px 24px;display:grid;gap:20px}a{color:var(--accent)}\
-h1{margin:0;font-size:clamp(28px,5vw,40px);line-height:1.15}h2{margin:16px 0 0;font-size:20px}p{margin:0;color:var(--muted)}\
-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden}\
-td,th{padding:10px 12px;text-align:left;border-bottom:1px solid #8882;font-size:14px;vertical-align:top}\
-button{font:inherit;padding:10px 16px;border-radius:999px;border:1px solid #8886;background:var(--card);color:var(--fg);cursor:pointer}\
-button.primary{background:var(--accent);color:#16181a;border-color:transparent}.row{display:flex;flex-wrap:wrap;gap:12px}\
-output{display:block;color:var(--muted);font-size:14px;min-height:1.6em}";
+/// Source colour of the aphrody.com scheme (the bun of the mark); every colour on the pages is an M3 role of it.
+const SEED: u32 = 0xFFF5_C451;
+const SITE_CSS: &str = include_str!("site.css");
+
+/// M3 light and dark schemes generated from `SEED` by aphrody-m3-tokens, its static tokens (shape, type, motion,
+/// state layers, elevation) and the page components. `html.dark` forces the dark scheme (the landing).
+fn stylesheet() -> &'static str {
+    static CSS: OnceLock<String> = OnceLock::new();
+    CSS.get_or_init(|| {
+        use aphrody_m3_tokens::{scheme::Variant, sheets};
+        let light = sheets::scheme_css(SEED, Variant::TonalSpot, false, 0.0);
+        let dark = sheets::scheme_css(SEED, Variant::TonalSpot, true, 0.0);
+        format!(
+            "{light}
+@media (prefers-color-scheme: dark) {{
+{dark}}}
+{forced}
+{statics}
+{SITE_CSS}",
+            forced = dark.replace(":root", "html.dark"),
+            statics = sheets::static_css(),
+        )
+    })
+}
+
+async fn site_css() -> Response {
+    bytes(
+        "text/css; charset=utf-8",
+        HOUR,
+        stylesheet().as_bytes().to_vec(),
+    )
+}
 
 fn page(path: &str, title: &str, description: &str, body: &str) -> Html<String> {
     Html(format!(
@@ -481,6 +503,7 @@ fn page(path: &str, title: &str, description: &str, body: &str) -> Html<String> 
 <link rel="canonical" href="{ORIGIN}{path}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/site.css">
 <link rel="describedby" type="text/markdown" href="/llms.txt">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{NAME}">
@@ -489,13 +512,12 @@ fn page(path: &str, title: &str, description: &str, body: &str) -> Html<String> 
 <meta property="og:url" content="{ORIGIN}{path}">
 <meta property="og:image" content="{ORIGIN}/og.png?title={title_q}">
 <meta name="twitter:card" content="summary_large_image">
-<style>{PAGE_STYLE}</style>
 <script type="module" src="/site.js"></script>
 </head>
 <body>
-<main>
+<main class="page" id="main">
 {body}
-<p><a href="/">← Back to {NAME}</a></p>
+<p><a href="/">Back to {NAME}</a></p>
 </main>
 </body>
 </html>
@@ -515,28 +537,33 @@ async fn privacy() -> Html<String> {
 <p>aphrody.com sets no advertising or tracking cookies and loads nothing from third parties. It only stores what the
 desktop needs to work: the cookie of an owner session, your storage choice and the offline copy of the client.</p>
 <h2>What is stored</h2>
-<table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="What is stored"><table class="wide">
+<caption hidden>Storage used by aphrody.com</caption>
 <thead><tr><th>Name</th><th>Kind</th><th>Purpose</th><th>Lifetime</th></tr></thead>
 <tbody>
 <tr><td><code>aphrody_session</code></td><td>Cookie (HttpOnly, Secure)</td><td>Owner sign-in to start and stop sessions</td><td>Until it expires</td></tr>
 <tr><td><code>aphrody.storage</code></td><td>localStorage</td><td>Your choice in the storage notice</td><td>Until cleared</td></tr>
 <tr><td><code>aphrody-&lt;release&gt;</code></td><td>Cache Storage</td><td>Offline page and the WebAssembly client</td><td>Replaced on every release</td></tr>
 </tbody>
-</table>
-<h2>In this browser now</h2>
-<table id="storage-report"><tbody><tr><td>Reading local storage…</td></tr></tbody></table>
+</table></div>
+<h2>Your choice</h2>
+<p>“Essential only” keeps the session cookie and nothing else: no offline copy and no saved preferences.</p>
 <div class="row">
-<button type="button" class="primary" data-storage="persist">Keep data on this device</button>
-<button type="button" data-storage="clear-local">Clear local data</button>
-<button type="button" data-storage="clear-all">Clear everything and sign out</button>
-</div>
-<output id="storage-status" aria-live="polite"></output>
-<h2>Choice</h2>
-<div class="row">
-<button type="button" data-storage="accept">Allow functional storage</button>
+<button type="button" class="filled" data-storage="accept">Allow functional storage</button>
 <button type="button" data-storage="refuse">Essential only</button>
 </div>
-<p>“Essential only” keeps the session cookie and nothing else: no offline copy and no saved preferences.</p>"#,
+<h2>In this browser now</h2>
+<div class="table-wrap"><table id="storage-report"><tbody><tr><td>Reading local storage…</td></tr></tbody></table></div>
+<div class="row">
+<button type="button" class="tonal" data-storage="persist">Keep data on this device</button>
+<button type="button" data-storage="clear-local">Clear local data</button>
+</div>
+<section class="danger-zone" aria-labelledby="danger-title">
+<h2 id="danger-title">Clear everything</h2>
+<p>Deletes cookies, storage and caches of aphrody.com in this browser and signs you out. This cannot be undone.</p>
+<div class="row"><button type="button" class="danger" data-storage="clear-all">Clear everything and sign out</button></div>
+</section>
+<output id="storage-status" role="status" aria-live="polite"></output>"#,
     )
 }
 
@@ -547,7 +574,7 @@ async fn offline() -> Html<String> {
         "aphrody.com needs the network to stream your Bun OS session.",
         r#"<h1>You are offline</h1>
 <p>The Bun OS session is streamed from the server. Reconnect, then reload this page.</p>
-<div class="row"><button type="button" class="primary" data-action="reload">Reload</button></div>"#,
+<div class="row"><button type="button" class="filled" data-action="reload">Reload</button></div>"#,
     )
 }
 
@@ -602,6 +629,7 @@ pub fn router(state: Arc<AppState>) -> Router {
         .route("/og.png", get(og))
         .route("/sw.js", get(service_worker))
         .route("/site.js", get(site_js))
+        .route("/site.css", get(site_css))
         .route("/privacy", get(privacy))
         .route("/offline", get(offline))
         .route("/privacy/clear", post(clear))
@@ -633,5 +661,15 @@ mod tests {
         let full = llms_txt(true);
         assert!(full.starts_with("# Aphrody Bun OS\n\n> "));
         assert!(API.ops.iter().all(|op| full.contains(op.summary)));
+    }
+
+    #[test]
+    fn stylesheet_has_both_schemes() {
+        let css = stylesheet();
+        assert!(css.contains("--md-sys-color-primary:"));
+        assert!(css.contains("prefers-color-scheme: dark"));
+        assert!(css.contains("html.dark"));
+        assert!(css.contains("--md-sys-shape-corner-full"));
+        assert!(css.contains("#storage-notice"));
     }
 }

@@ -19,6 +19,8 @@ path = "src/main.rs"
 aphrody-http-error = { workspace = true }
 aphrody-inventory = { workspace = true, features = ["server"] }
 aphrody-webos-protocol = { path = "../aphrody-webos-protocol" }
+# M3 colour roles of the pages (site.rs, /site.css).
+aphrody-m3-tokens = { workspace = true }
 # Share images and icons rendered from SVG (site.rs).
 resvg = { workspace = true }
 bun-ui-web = { path = "../bun-ui-web", features = ["server"] }

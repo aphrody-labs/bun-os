@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" class="app dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#101214" />
+    <meta name="theme-color" content="#17130b" />
     <title>Aphrody Bun OS: COSMIC, Android, Redox, Wine and Proton in your browser</title>
     <meta name="description" content="Bun OS in your browser: the COSMIC desktop with Android apps, Redox, Wine and Proton, streamed from Bun OS and drawn by a Rust WebAssembly client on WebGPU." />
     <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -77,47 +77,40 @@
 
     <link rel="preload" href="/aphrody_webos_client_bg.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high" />
     <link rel="modulepreload" href="/aphrody_webos_client.js" />
+    <link rel="stylesheet" href="/site.css" />
     <style>
-      /* The iced/libcosmic client draws everything on the canvas winit appends to the body; the landing below is
-         the first paint and the crawlable text, hidden by /site.js once the canvas is mounted. */
-      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #101214; color: #e6e8ea; font: 16px/1.5 system-ui, sans-serif; }
-      noscript, #landing { display: grid; place-content: center; height: 100%; padding: 24px; box-sizing: border-box; }
-      #landing { gap: 20px; max-width: 760px; margin: 0 auto; }
-      #landing[hidden] { display: none; }
-      #landing h1 { margin: 0; font-size: clamp(30px, 6vw, 52px); line-height: 1.1; }
-      #landing p { margin: 0; color: #a9afb5; max-width: 60ch; }
-      #landing ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
-      #landing li { padding: 4px 12px; border-radius: 999px; background: #1b1f23; font-size: 14px; }
-      #landing nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
-      #landing a { color: #f5c451; }
-      #landing button { font: inherit; padding: 8px 16px; border-radius: 999px; border: 0; background: #f5c451; color: #16181a; cursor: pointer; }
-      #landing .loading { font-size: 14px; color: #6f757b; }
-      @media (prefers-reduced-motion: no-preference) { #landing .loading::after { content: " …"; animation: pulse 1.2s infinite; } }
-      @keyframes pulse { 50% { opacity: 0.2; } }
+      /* First paint before /site.css (M3 roles, components): the dark surface the iced/libcosmic canvas also uses. */
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #17130b; color: #ebe1d4; }
     </style>
   </head>
   <body>
     <main id="landing">
+      <img class="mark" src="/favicon.svg" width="56" height="56" alt="" />
       <h1>Bun OS in your browser</h1>
       <p>One desktop, COSMIC with Android apps inside it, plus Redox, Wine and Proton, streamed from Bun OS to this tab and drawn by a Rust WebAssembly client on WebGPU.</p>
-      <ul aria-label="Inside">
+      <ul aria-label="What runs inside">
         <li>COSMIC desktop</li><li>Android apps</li><li>Redox OS</li><li>Wine and Proton</li><li>Emulators</li><li>Gemini</li>
       </ul>
-      <nav aria-label="Actions">
-        <button type="button" data-action="install" hidden>Install the app</button>
-        <button type="button" data-action="share">Share</button>
-        <a data-share="x" href="https://x.com/intent/post?url=https%3A%2F%2Faphrody.com%2F">X</a>
-        <a data-share="bluesky" href="https://bsky.app/intent/compose?text=https%3A%2F%2Faphrody.com%2F">Bluesky</a>
-        <a data-share="linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Faphrody.com%2F">LinkedIn</a>
-        <a data-share="facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Faphrody.com%2F">Facebook</a>
-        <a data-share="reddit" href="https://www.reddit.com/submit?url=https%3A%2F%2Faphrody.com%2F">Reddit</a>
-        <a data-share="whatsapp" href="https://wa.me/?text=https%3A%2F%2Faphrody.com%2F">WhatsApp</a>
-        <a data-share="telegram" href="https://t.me/share/url?url=https%3A%2F%2Faphrody.com%2F">Telegram</a>
+      <div class="row">
+        <button type="button" class="filled" data-action="install" hidden>Install the app</button>
+        <button type="button" class="tonal" data-action="share">Share</button>
+      </div>
+      <nav aria-labelledby="share-label">
+        <p class="share-label" id="share-label">Share on</p>
+        <div class="row">
+          <a class="button chip" data-share="x" href="https://x.com/intent/post?url=https%3A%2F%2Faphrody.com%2F">X</a>
+          <a class="button chip" data-share="bluesky" href="https://bsky.app/intent/compose?text=https%3A%2F%2Faphrody.com%2F">Bluesky</a>
+          <a class="button chip" data-share="linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Faphrody.com%2F">LinkedIn</a>
+          <a class="button chip" data-share="facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Faphrody.com%2F">Facebook</a>
+          <a class="button chip" data-share="reddit" href="https://www.reddit.com/submit?url=https%3A%2F%2Faphrody.com%2F">Reddit</a>
+          <a class="button chip" data-share="whatsapp" href="https://wa.me/?text=https%3A%2F%2Faphrody.com%2F">WhatsApp</a>
+          <a class="button chip" data-share="telegram" href="https://t.me/share/url?url=https%3A%2F%2Faphrody.com%2F">Telegram</a>
+        </div>
       </nav>
-      <nav aria-label="Site">
-        <a href="/status">Status</a><a href="/privacy">Privacy and storage</a><a href="/llms.txt">llms.txt</a><a href="https://github.com/aphrody-labs/bun-os">Source</a>
+      <nav class="links" aria-label="Site">
+        <a href="/status">Status</a><a href="/privacy">Privacy and storage</a><a href="/llms.txt">llms.txt</a><a href="https://github.com/aphrody-labs/bun-os">Source code</a>
       </nav>
-      <p class="loading" id="gpu">Loading the desktop</p>
+      <p class="loading" id="gpu" role="status">Loading the desktop</p>
     </main>
     <noscript>aphrody.com runs a WebAssembly client; enable JavaScript to load it.</noscript>
     <script type="module" src="/site.js"></script>
