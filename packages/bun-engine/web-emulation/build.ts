@@ -187,8 +187,6 @@ async function buildRust(id: string, core: RustCore, threads: boolean) {
   const cargo = [
     "build",
     "--locked",
-    "--jobs",
-    "4",
     "-p",
     "bun-engine",
     "--lib",
@@ -218,17 +216,16 @@ async function buildRust(id: string, core: RustCore, threads: boolean) {
   const cargoSeconds = await run([process.execPath, "scripts/cargo.ts", "exec", "--", ...cargo], {
     env: {
       CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS: rustflags.join(" "),
+      // Match buncc's lock to Cargo's explicit --target-dir.
+      CARGO_TARGET_DIR: join(root, "target"),
       CARGO_BUILD_BUILD_DIR: join(root, "build", "rust"),
-      CARGO_BUILD_JOBS: "4",
-      // sccache passes web-sys's ~1,500 --cfg flags on a command line Windows rejects
-      // (os error 206); compile these crates without the wrapper.
-      RUSTC_WRAPPER: "",
-      CARGO_BUILD_RUSTC_WRAPPER: "",
+      // Windows rejects sccache's long web-sys command line (os error 206).
+      // On other hosts retain the operator's shared compiler cache.
+      ...(process.platform === "win32" ? { RUSTC_WRAPPER: "", CARGO_BUILD_RUSTC_WRAPPER: "" } : {}),
     },
   });
   const raw = join(root, "target", "wasm32-unknown-unknown", lock.rust.profile, "bun_engine.wasm");
-  const out = join(work, "out", id, variant);
-  rmSync(out, { recursive: true, force: true });
+  const out = join(work, "out", id, variant, crypto.randomUUID());
   mkdirSync(out, { recursive: true });
   const bindgen = await tool("wasm-bindgen", process.platform === "win32" ? "wasm-bindgen.exe" : "wasm-bindgen");
   const bindgenSeconds = await run([
@@ -266,13 +263,11 @@ async function buildRust(id: string, core: RustCore, threads: boolean) {
     optimized,
   ]);
   const before = sizes(bound);
-  // Content-addressed directory: everything under it can be cached as immutable; only
-  // manifest.json revalidates. Older builds of the same variant are removed.
+  // Content-addressed directories may still be referenced by running clients or receipts.
+  // Keep old builds when publishing a new manifest.
   const hash = (await sha256(optimized)).slice(0, 12);
   const parent = threads ? join(dist, id, "threads") : join(dist, id);
   mkdirSync(parent, { recursive: true });
-  for (const old of readdirSync(parent).filter(d => /^([0-9a-f]{12}|bun_engine.*|snippets)$/.test(d)))
-    rmSync(join(parent, old), { recursive: true, force: true });
   const target = join(parent, hash);
   mkdirSync(target, { recursive: true });
   await Bun.write(join(target, "bun_engine_bg.wasm"), Bun.file(optimized));

@@ -65,8 +65,8 @@ source obligations remain applicable to each emulator and fixture.
 
 `<hash>` is the first 12 hex digits of the wasm's SHA-256: every file under it can be served
 with `Cache-Control: public, max-age=31536000, immutable`; `manifest.json` (which names the
-current `<hash>/...` paths) must be `no-cache`. Older hash directories are removed when a core is
-republished. `application/wasm` for `.wasm`; the page sends COOP `same-origin` and COEP
+current `<hash>/...` paths) must be `no-cache`. Older hash directories remain available to
+running clients and receipts. `application/wasm` for `.wasm`; the page sends COOP `same-origin` and COEP
 `credentialless`. melonDS's wrapper is `index.js` because `melonds.js` and Emscripten's
 `melonDS.js` collide on case-insensitive file systems.
 
