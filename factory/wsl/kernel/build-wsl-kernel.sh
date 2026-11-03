@@ -22,6 +22,9 @@ for p in "$repo"/factory/wsl/kernel/patches/*.patch; do patch -p1 --no-backup-if
 # Microsoft's config at the commit the series was ported from, then adapted to the new tree.
 curl -fsSL https://raw.githubusercontent.com/microsoft/WSL2-Linux-Kernel/a989171929bed4ea681be8d77333845ce1c1732a/arch/x86/configs/config-wsl >.config
 export LLVM=1
+# CONFIG_RUST is invisible unless `make rustavailable` passes (rustc, bindgen, libclang and the rust-src
+# component); check it first so a missing component fails here with the real reason, not as a dropped line.
+make rustavailable || { echo "Rust toolchain unusable for the kernel (rustup component add rust-src?)" >&2; exit 1; }
 make olddefconfig
 scripts/kconfig/merge_config.sh -m .config "$repo/factory/wsl/kernel/wsl-rust.config"
 make olddefconfig
