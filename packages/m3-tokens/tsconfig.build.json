@@ -14,6 +14,7 @@
     "src/wasm.ts",
     "src/native-theme.ts",
     "src/breakpoints.ts",
-    "src/platform-contract.ts"
+    "src/platform-contract.ts",
+    "src/expressive.ts"
   ]
 }

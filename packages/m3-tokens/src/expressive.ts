@@ -2,7 +2,7 @@
  * Material 3 Expressive tokens that the generated `m3-tokens.css` does not carry:
  * the 15 emphasized type styles, the Expressive spatial springs and the directional shapes.
  * Mirrors crates/aphrody-m3-tokens (typography.rs, motion.rs). `expressive.css` is generated from
- * this module: `bun run generate:expressive`.
+ * this module: `bun run generate`.
  */
 
 /** Base style metrics (rem) and base weight, from the generated typescale. */
@@ -145,7 +145,7 @@ export function expressiveCss(): string {
   return `/* SPDX-License-Identifier: Apache-2.0 */
 /*
  * Material 3 Expressive tokens: emphasized typescale, Expressive spatial springs, directional shapes.
- * GENERATED from src/expressive.ts - do not hand-edit: bun run generate:expressive.
+ * GENERATED from src/expressive.ts - do not hand-edit: bun run generate.
  * Requires m3-tokens.css (corner scale and typefaces).
  */
 

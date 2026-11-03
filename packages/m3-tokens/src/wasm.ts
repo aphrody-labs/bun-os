@@ -2,7 +2,7 @@
 // Runtime entry for the canonical Material 3 engine compiled to WebAssembly (crates/libm3-wasm on
 // top of crates/aphrody-m3-tokens). Every colour computed in a browser or in Bun comes from here;
 // this module only moves numbers and bytes across the ABI.
-import { LIBM3_WASM_BASE64 } from "./libm3-wasm.ts";
+import { LIBM3_WASM_BASE64 } from "./libm3-wasm";
 
 /** ABI version this loader speaks (`m3_abi_version`). */
 export const MATERIAL_WASM_ABI = 3;
