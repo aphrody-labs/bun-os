@@ -8,6 +8,7 @@ import { mkdirSync, writeFileSync, chmodSync, lstatSync, readFileSync } from "no
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { nativeThemeVariant, parseNativeThemeExport } from "@aphrody/m3-tokens/native-theme";
 import { APP_TARGETS, BUNOS_THEME, generateApps, type AppTarget } from "./apps.ts";
+import { runDesign, verifyDesign } from "./design.ts";
 import { generate } from "./generate.ts";
 import { TARGETS, type ActiveMode, type GeneratedFile, type Target } from "./types.ts";
 
@@ -23,7 +24,26 @@ const USAGE = `m3-os-themes <install|generate|uninstall> --target windows|gnome|
   [--native-theme <Rust-theme.json>] [--icons <freedesktop theme dir>] [--dry-run] [--apply]
 install/uninstall only print the plan unless --apply is given. generate writes into --out (default ./m3-os-themes-out).
 m3-os-themes apps [--target css|compose|flutter|cosmic|all] [--seed <hex>] [--root <checkout>] [--check]
-  writes the web CSS, Jetpack Compose, Flutter and COSMIC themes from one token source into their consumers.`;
+  writes the web CSS, Jetpack Compose, Flutter and COSMIC themes from one token source into their consumers.
+m3-os-themes design --out <dir> [--wallpaper <svg|png>] [--seed <hex>] [--bin <bunos-design>] [--no-dll] [--no-catalogue]
+  the full design artifact (themes, window chrome, icons, fonts, receipt); m3-os-themes verify --dir <dir> checks its receipt.`;
+
+/** `design`: the end-to-end design artifact (design.ts). */
+function designCommand(flags: Record<string, string | boolean>): CliResult {
+  try {
+    const out = runDesign({
+      out: resolve(String(flags["out"] ?? "bunos-design-out")),
+      wallpaper: typeof flags["wallpaper"] === "string" ? flags["wallpaper"] : undefined,
+      seed: typeof flags["seed"] === "string" ? flags["seed"] : undefined,
+      bin: String(flags["bin"] ?? "bunos-design"),
+      dll: flags["no-dll"] !== true,
+      catalogue: flags["no-catalogue"] !== true,
+    });
+    return { code: out.some(l => l.startsWith("CHECK FAILED")) ? 1 : 0, out };
+  } catch (e) {
+    return { code: 1, out: [(e as Error).message] };
+  }
+}
 
 /** `apps`: regenerate (or --check) the app themes in the checkout. */
 function appsCommand(flags: Record<string, string | boolean>): CliResult {
@@ -80,7 +100,7 @@ function parse(argv: string[]): {
     const a = rest[i]!;
     if (!a.startsWith("--")) throw new Error(`unexpected argument ${a}`);
     const key = a.slice(2);
-    if (key === "dry-run" || key === "apply" || key === "help" || key === "check") flags[key] = true;
+    if (key === "dry-run" || key === "apply" || key === "help" || key === "check" || key === "no-dll" || key === "no-catalogue") flags[key] = true;
     else {
       const v = rest[++i];
       if (v === undefined || v.startsWith("--")) throw new Error(`--${key} needs a value`);
@@ -183,6 +203,12 @@ export function run(argv: string[], exec: Exec = defaultExec): CliResult {
   }
   const { cmd, flags } = parsed;
   if (cmd === "apps") return appsCommand(flags);
+  if (cmd === "design") return designCommand(flags);
+  if (cmd === "verify") {
+    const dir = resolve(String(flags["dir"] ?? flags["out"] ?? "."));
+    const bad = verifyDesign(dir);
+    return { code: bad.length ? 1 : 0, out: bad.length ? bad.map(p => `mismatch ${p}`) : [`receipt ok: ${dir}`] };
+  }
   if (!["install", "generate", "uninstall"].includes(cmd) || flags["help"]) return { code: cmd ? 2 : 0, out: [USAGE] };
   const targetFlag = String(flags["target"] ?? "all");
   if (targetFlag !== "all" && !(TARGETS as readonly string[]).includes(targetFlag))

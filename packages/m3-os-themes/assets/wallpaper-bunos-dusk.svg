@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <!-- SPDX-License-Identifier: CC-BY-4.0 -->
+  <!-- Bun OS "Dusk" default wallpaper, (c) aphrody-dev. Original artwork: layered dusk ridges and a warm glow. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b1640"/>
+      <stop offset="0.55" stop-color="#3b2b78"/>
+      <stop offset="1" stop-color="#6a4bb0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.72" cy="0.62" r="0.55">
+      <stop offset="0" stop-color="#ffc58a" stop-opacity="0.95"/>
+      <stop offset="0.25" stop-color="#f28a6b" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#9a5fc0" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#3b2b78" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="r1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b46a8"/><stop offset="1" stop-color="#2e2366"/></linearGradient>
+    <linearGradient id="r2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#43358e"/><stop offset="1" stop-color="#211a4c"/></linearGradient>
+    <linearGradient id="r3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d2468"/><stop offset="1" stop-color="#150f33"/></linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+  <circle cx="1382" cy="640" r="96" fill="#ffd9a8" opacity="0.9"/>
+  <path d="M0 720 C 240 640 420 700 640 660 S 1060 560 1300 640 S 1700 700 1920 620 V1080 H0Z" fill="url(#r1)" opacity="0.95"/>
+  <path d="M0 820 C 300 760 520 830 780 790 S 1240 720 1500 780 S 1800 820 1920 770 V1080 H0Z" fill="url(#r2)"/>
+  <path d="M0 920 C 260 880 560 950 880 905 S 1380 860 1640 910 S 1860 930 1920 900 V1080 H0Z" fill="url(#r3)"/>
+</svg>

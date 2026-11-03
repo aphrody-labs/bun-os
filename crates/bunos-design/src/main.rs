@@ -7,7 +7,7 @@
 //!   bunos-design render <jobs.json>                   render every job in parallel (ICO and/or PNG outputs)
 //!
 //! A render job is `{ "svg": "<svg>", "small"?: "<svg>", "ico"?: "out.ico", "sizes"?: [16, ...],
-//! "png"?: [{ "size": 48, "out": "x.png" }] }`. `small` replaces `svg` at 24 px and below (hinted detail).
+//! "png"?: [{ "size": 48, "height"?: 27, "out": "x.png" }], "text"?: bool }`. `small` replaces `svg` at 24 px and below (hinted detail).
 //! ICOs use the Windows shell layout of `aphrody_svg::raster::render_ico_windows` (DIB < 256 px, PNG 256 px).
 
 use std::{fs, path::PathBuf, process::ExitCode};
@@ -20,6 +20,9 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 struct Png {
     size: u32,
+    /// Output height for non-square renders (wallpapers, previews); `size` is then the width.
+    #[serde(default)]
+    height: Option<u32>,
     out: PathBuf,
 }
 
@@ -31,6 +34,9 @@ struct Job {
     sizes: Option<Vec<u32>>,
     #[serde(default)]
     png: Vec<Png>,
+    /// Load the system fonts so `<text>` renders (previews); icons never need it.
+    #[serde(default)]
+    text: bool,
 }
 
 #[derive(Deserialize)]
@@ -68,7 +74,13 @@ fn run_job(job: &Job) -> Result<usize, String> {
         written += 1;
     }
     for png in &job.png {
-        let bytes = render_png(svg_for(png.size), RenderOptions::square(png.size))
+        let options = RenderOptions {
+            width: Some(png.size),
+            height: Some(png.height.unwrap_or(png.size)),
+            system_fonts: job.text,
+            ..RenderOptions::default()
+        };
+        let bytes = render_png(svg_for(png.size.min(png.height.unwrap_or(png.size))), options)
             .map_err(|e| format!("{}: {e}", png.out.display()))?;
         write(&png.out, &bytes)?;
         written += 1;

@@ -1736,6 +1736,10 @@
 	url = https://github.com/aphrody-labs/wlvncc.git
 	shallow = true
 	update = none
+[submodule "vendor/detours"]
+	shallow = true
+	path = vendor/detours
+	url = https://github.com/aphrody-labs/Detours.git
 [submodule "vendor/zebar"]
 	path = vendor/zebar
 	url = https://github.com/aphrody-labs/zebar.git
