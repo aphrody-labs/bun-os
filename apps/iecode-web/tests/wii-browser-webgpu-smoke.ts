@@ -1,11 +1,10 @@
-import { mkdtempSync } from "node:fs";
 import { stopTestBrowser } from "./browser-process";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 // Explicit execution gate against real generated Wii WASM and Chromium WebGPU.
 const browser = process.env.IECODE_BROWSER;
 if (!browser) throw new Error("Set IECODE_BROWSER to a Chromium executable");
-const pkg = new URL("../wii/pkg/", import.meta.url);
+const pkg = process.env.IECODE_WII_PKG
+  ? Bun.pathToFileURL(`${process.env.IECODE_WII_PKG.replace(/[\\/]+$/, "")}/`)
+  : new URL("../wii/pkg/", import.meta.url);
 const dol = new Uint8Array(0x108);
 const words = new DataView(dol.buffer);
 for (const [offset, value] of [
@@ -69,7 +68,10 @@ const server = Bun.serve({
     );
   },
 });
-const browserProfile = mkdtempSync(join(tmpdir(), "iecode-chromium-smoke-"));
+const separator = process.platform === "win32" ? "\\" : "/";
+const tempRoot = (Bun.env.TMPDIR ?? Bun.env.TEMP ?? Bun.env.TMP ?? ".").replace(/[\\/]+$/, "");
+const browserProfile = `${tempRoot}${separator}iecode-chromium-smoke-${crypto.randomUUID()}`;
+await Bun.$`mkdir -p ${browserProfile}`;
 const child = Bun.spawn(
   [
     browser,

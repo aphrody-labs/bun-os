@@ -1,7 +1,4 @@
 import type { Subprocess } from "bun";
-import { realpathSync, rmSync } from "node:fs";
-import { basename, dirname } from "node:path";
-import { tmpdir } from "node:os";
 
 export async function stopTestBrowser(
   child: Pick<Subprocess, "pid" | "exitCode" | "kill" | "exited">,
@@ -14,12 +11,19 @@ export async function stopTestBrowser(
     });
   } else child.kill();
   await child.exited;
-  const canonical = realpathSync(profile);
-  const parent = realpathSync(tmpdir());
+  const separator = process.platform === "win32" ? "\\" : "/";
+  const canonical = profile.replace(/[\\/]+/g, separator).replace(/[\\/]+$/, "");
+  const parent = (Bun.env.TMPDIR ?? Bun.env.TEMP ?? Bun.env.TMP ?? ".")
+    .replace(/[\\/]+/g, separator)
+    .replace(/[\\/]+$/, "");
+  const normalized = process.platform === "win32" ? canonical.toLowerCase() : canonical;
+  const normalizedParent = process.platform === "win32" ? parent.toLowerCase() : parent;
+  const relative = normalized.slice(normalizedParent.length);
   if (
-    dirname(canonical).toLowerCase() !== parent.toLowerCase() ||
-    !basename(canonical).startsWith("iecode-chromium-smoke-")
+    !normalized.startsWith(normalizedParent + separator) ||
+    !relative.slice(1).startsWith("iecode-chromium-smoke-") ||
+    relative.includes("..")
   )
     throw new Error("Unexpected browser test profile cleanup target");
-  rmSync(canonical, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 });
+  await Bun.$`rm -rf -- ${canonical}`.quiet();
 }
