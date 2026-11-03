@@ -126,9 +126,12 @@ export async function start(): Promise<{ library: string; powershell: string; ps
 export async function evaluate(script: string, options: EvalOptions = {}): Promise<PwshResult> {
   const h = await load();
   const { promise, resolve, reject } = Promise.withResolvers<PwshResult>();
+  // A thread-safe JSCallback does not hold the event loop open: a ref'd timer does until completion.
+  const keepAlive = setInterval(() => {}, 1 << 30);
   const callback = new JSCallback(
     (_user: bigint, _kind: number, json: Pointer) => {
       callback.close();
+      clearInterval(keepAlive);
       try {
         resolve(unwrap(new CString(json).toString()));
       } catch (error) {

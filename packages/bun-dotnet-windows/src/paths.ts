@@ -2,8 +2,8 @@
 /**
  * Where the native artifacts of @aphrody/bun-dotnet-windows live, first match wins:
  *   1. BUNOS_DOTNET_WINDOWS_DIR (one directory holding everything, the install layout)
- *   2. %SystemRoot%\BunOS\dotnet-windows (install/install.ps1, the shipped layout)
- *   3. beside the running executable (a `bun build --compile` bin installed next to the libraries)
+ *   2. %SystemRoot%\BunOS\dotnet-windows (install/install.ts, the shipped layout)
+ *   3. beside the running executable (a `bun build --compile` bin installed next to the libraries, or in <build>/bin)
  *   4. <checkout>/target/bun-dotnet-windows (scripts/build.ts output, the build layout)
  */
 import { existsSync } from "node:fs";
@@ -59,6 +59,8 @@ export function layout(): Layout {
   const systemRoot = process.env.SystemRoot ?? process.env.windir ?? "C:\\Windows";
   candidates.push(installed(join(systemRoot, "BunOS", "dotnet-windows"), "installed"));
   candidates.push(installed(dirname(process.execPath), "exe"));
+  // A compiled bin in <build>/bin/ next to the build layout.
+  candidates.push(build(dirname(dirname(process.execPath))));
   candidates.push(build(join(checkoutRoot(), "target", "bun-dotnet-windows")));
   cached = candidates.find(c => existsSync(c.native)) ?? candidates.at(-1)!;
   return cached;
@@ -66,4 +68,4 @@ export function layout(): Layout {
 
 /** Install/build hint for error messages. */
 export const BUILD_HINT =
-  "build with `bun packages/bun-dotnet-windows/scripts/build.ts` and install with `sudo.exe pwsh -NoProfile -File packages/bun-dotnet-windows/install/install.ps1 install`";
+  "build with `bun packages/bun-dotnet-windows/scripts/build.ts` and install with `sudo.exe bun packages/bun-dotnet-windows/install/install.ts install`";

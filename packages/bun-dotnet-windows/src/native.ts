@@ -112,6 +112,8 @@ export function callAsync<T = unknown>(
 ): Promise<T> {
   const s = nativeSymbols();
   const { promise, resolve, reject } = Promise.withResolvers<T>();
+  // A thread-safe JSCallback does not hold the event loop open: a ref'd timer does until completion.
+  const keepAlive = setInterval(() => {}, 1 << 30);
   const callback = new JSCallback(
     (_user: bigint, kind: number, json: Pointer) => {
       const text = new CString(json).toString();
@@ -124,6 +126,7 @@ export function callAsync<T = unknown>(
         return;
       }
       callback.close();
+      clearInterval(keepAlive);
       try {
         resolve(unwrap<T>(method, text));
       } catch (error) {

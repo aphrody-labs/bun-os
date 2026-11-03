@@ -57,9 +57,11 @@ async function main(): Promise<number> {
   return result.hadErrors ? 1 : 0;
 }
 
-try {
-  process.exit(await main());
-} catch (error) {
-  console.error(`bunos pwsh: ${error instanceof Error ? error.message : String(error)}`);
-  process.exit(1);
-}
+// No top-level await: `bun build --compile --bytecode` emits CommonJS.
+main().then(
+  code => process.exit(code),
+  (error: unknown) => {
+    console.error(`bunos pwsh: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  },
+);
