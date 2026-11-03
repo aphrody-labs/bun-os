@@ -13,6 +13,6 @@ exclude = [
   "edge-onedrive.onedrive-policy",
   # Preference, not part of the look: keep the taskbar where the user put it.
   "shell.taskbar-left",
-  # Animation effects are off on purpose on latency-tuned desktops; opt in with --include look.animations.
+  # Animation effects are off on purpose on latency-tuned desktops; opt in by removing this line.
   "look.animations",
 ]

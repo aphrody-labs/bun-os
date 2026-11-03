@@ -216,6 +216,8 @@ Catalog module `look` (all HKCU, journaled, `bunos-win11 undo` restores each val
 | `look.wallpaper` | `Control Panel\Desktop\Wallpaper` = `%SystemRoot%\BunOS\share\wallpaper\bunos-dusk-3840x2160.png` (REG_EXPAND_SZ), `WallpaperStyle` 10 (fill), `TileWallpaper` 0 | bunos-win11-wallpaper |
 | `look.snap` | `WindowArrangementActive` 1, `SnapAssist`, `EnableSnapAssistFlyout`, `EnableSnapBar`, `EnableTaskGroups` 1 | GlazeWM, AltSnap |
 | `look.virtual-desktops` | `VirtualDesktopTaskbarFilter`, `VirtualDesktopAltTabFilter` 1 | GlazeWM workspaces |
+| `look.animations` (opt-in, excluded: animations are off on this latency-tuned host) | `WindowMetrics\MinAnimate`, `TaskbarAnimations`, `EnableAeroPeek` | GlazeWM animations |
+| `performance.game-mode`, `performance.hags`, `performance.mmcss` | Game Mode on, `HwSchMode` 2, MMCSS 10 % and Games High | latency tuning |
 | existing `shell.*` | dark mode, taskbar declutter (Widgets, Task View, Chat, search icon), Start declutter, Explorer defaults, taskbar left (standard) | waku/Zebar, Flow Launcher (Start search stays) |
 
 Rounded corners and Mica are Windows 11 defaults for every app that opts in; nothing to set. Deeper theming, when
@@ -252,6 +254,133 @@ patched `.msstyles`. Profile: `bunos-win11 desktop windows-native`.
   any-refresh path ([flip model](https://learn.microsoft.com/windows/win32/direct3ddxgi/dxgi-flip-model)), which is what
   `bunos-wayland-win` uses; WSLg presents through RDP RAIL, whose client does not forward Windows-side resizes
   ([WSLG.md](WSLG.md)).
+
+## Native Windows mechanisms (deep research, 2026-11-03)
+
+For every layer the retired stack used to cover: the Windows mechanism, the exact keys or APIs, what it cannot do,
+and the source (Microsoft Learn unless noted). "Applied" names the catalog tweak that sets it; "not applied" says why.
+
+### Accent colour, window borders, title bars
+
+- Two user settings, both documented: `HKCU\Software\Microsoft\Windows\DWM\ColorPrevalence` ("show accent colour on title bars and
+  window borders") and `HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize\ColorPrevalence` ("on Start and taskbar");
+  `Control Panel\Desktop\AutoColorization` chooses wallpaper-derived or manual colour
+  ([Settings reference](https://learn.microsoft.com/windows/apps/develop/settings/settings-common#personalization---colors)).
+  The accent itself lives in `DWM\AccentColor`, `ColorizationColor`, `Explorer\Accent\AccentPalette` (8 tones). Applied: `look.accent`.
+- Since the July 2025 servicing update Windows only offers the Start/taskbar accent in dark mode
+  ([Q&A](https://learn.microsoft.com/answers/a/8262376)); the profile keeps dark mode on and the taskbar accent off.
+- Fleet enforcement without a script: the ADMX policy "Force a specific background and accent color"
+  (`CPL_Personalization_PersonalColors`, Computer Configuration, needs 2:1 contrast with white text)
+  ([ADMX_ControlPanelDisplay](https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-controlpaneldisplay)).
+  Not applied: it locks the user out of changing the colour.
+- Per-window colours (`DWMWA_BORDER_COLOR`, `DWMWA_CAPTION_COLOR`, `DWMWA_TEXT_COLOR`, Windows 11 build 22000+) exist but a process
+  can only set them on windows it owns ([DWMWINDOWATTRIBUTE](https://learn.microsoft.com/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute)).
+  That is why a global per-window theme needed a resident hook, and why it is gone.
+
+### Transparency, Mica and Acrylic
+
+- `Personalize\EnableTransparency` is the single switch (Settings > Personalization > Colors); apps read it as
+  `UISettings.AdvancedEffectsEnabled` ([tailoring effects](https://learn.microsoft.com/windows/apps/develop/composition/composition-tailoring)).
+  Applied: `look.transparency`.
+- Mica and Acrylic are opt-in per app: `DWMWA_SYSTEMBACKDROP_TYPE` (build 22621+: `DWMSBT_MAINWINDOW` = Mica,
+  `TRANSIENTWINDOW` = Acrylic, `TABBEDWINDOW` = Mica Alt) or `Window.SystemBackdrop` in WinUI
+  ([DWM_SYSTEMBACKDROP_TYPE](https://learn.microsoft.com/windows/win32/api/dwmapi/ne-dwmapi-dwm_systembackdrop_type),
+  [system backdrops](https://learn.microsoft.com/windows/apps/develop/ui/system-backdrops)). Mica samples the wallpaper once, so it is
+  the cheap material; Acrylic is for transient surfaces. There is no policy that forces a backdrop onto apps that did not
+  opt in, so Win32 apps with an opaque client area stay opaque (documented behaviour). Our own windows
+  (`bunos-wayland-win`, `bunos-win11-chrome` as a library) opt in.
+
+### Animations
+
+- `SPI_SETCLIENTAREAANIMATION` (client-area animations), `SPI_SETANIMATION` / `ANIMATIONINFO.iMinAnimate`
+  (minimise/restore, persisted as `Control Panel\Desktop\WindowMetrics\MinAnimate`), UWP/WinUI read `UISettings.AnimationsEnabled`
+  (Settings > Accessibility > Visual effects) ([client area animation](https://learn.microsoft.com/windows/win32/winauto/client-area-animation),
+  [SystemParametersInfo](https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-systemparametersinfow)).
+  `UISettingsController.SetAnimationsEnabled` is IoT-only (needs the `systemManagement` capability).
+  This host has them **off** (`MinAnimate=0`, `TaskbarAnimations=0`), a latency choice; `look.animations` exists but is excluded from the profile.
+  Windows has no way to restyle the animations themselves; Hyprland-style curves were only possible with a resident compositor hook.
+
+### Snap layouts, snap groups, virtual desktops
+
+- Settings > System > Multitasking: snap windows, layouts on maximise hover (`Win+Z`), layouts by dragging to the top (22H2+),
+  snap groups in the taskbar and Alt+Tab, "suggest what to snap next"; separate switches for desktops (taskbar and Alt+Tab show
+  all or only the current desktop) ([Windows 11 overview](https://learn.microsoft.com/windows/whats-new/windows-11-overview#customize-the-desktop-experience),
+  [settings catalog](https://learn.microsoft.com/windows/configuration/windows-backup/catalog#system)). Apps with a custom title bar must answer
+  `WM_NCHITTEST` with `HTMAXBUTTON` and support a minimum width of at most 500 epx to snap properly
+  ([snap layout support](https://learn.microsoft.com/windows/apps/desktop/modernize/ui/apply-snap-layout-menu)). Applied: `look.snap`, `look.virtual-desktops`.
+- Programmatic placement is `SPI_SETDOCKMOVING`, `SPI_SETDRAGFROMMAXIMIZE` (need `SPI_GETWINARRANGING`); the only documented
+  virtual-desktop API is the read-only `IVirtualDesktopManager` per-window query, so Bun OS does not move windows between desktops.
+
+### Wallpaper and themes
+
+- Registry plus `SPI_SETDESKWALLPAPER` (what `look.wallpaper` does) or, better for multi-monitor, `IDesktopWallpaper`
+  (Windows 8+: per-monitor `SetWallpaper`, `SetPosition` fill/fit/span, background colour, slideshow)
+  ([IDesktopWallpaper](https://learn.microsoft.com/windows/win32/api/shobjidl_core/nn-shobjidl_core-idesktopwallpaper)). Follow-up: a WinClean
+  `desktop_wallpaper` tool over that interface so each monitor can have its own image.
+- `.theme` files are the supported way to ship a complete look (colours, wallpaper, sounds, cursors, visual style):
+  an INI with `[MasterThemeSelector] MTSM=DABJDKT`, installed under `%LOCALAPPDATA%\Microsoft\Windows\Themes`; `ShellExecute` on it opens
+  Personalization on that theme. It cannot be the OS default, remote resources are blocked unless `EnableThemeFileRemoteResource`, and
+  the policy "Load a specific theme" applies one at first logon only
+  ([theme file format](https://learn.microsoft.com/windows/win32/controls/themesfileformat-overview),
+  [CPL_Personalization_SetTheme](https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-controlpaneldisplay)). For images and ISOs the
+  unattend `Themes` block (`DesktopBackground`, `ThemeName`, `WindowColor`, `UWPAppsUseLightTheme`) sets the default theme
+  ([Themes](https://learn.microsoft.com/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-themes)).
+
+### Power, GPU scheduling, Game Mode, scheduler
+
+- **Power plan:** `powercfg /setactive`, `/duplicatescheme`, `/setacvalueindex`; overlay schemes may only change the processor
+  (`SUB_PROCESSOR`) and graphics (`SUB_GRAPHICS`) subgroups; `PERFBOOSTMODE` (hidden, GUID be337238-0d82-4146-a960-4f3749d470c7)
+  selects disabled/enabled/aggressive boost ([powercfg](https://learn.microsoft.com/windows-hardware/design/device-experiences/powercfg-command-line-options),
+  [PERFBOOSTMODE](https://learn.microsoft.com/windows-hardware/customize/power-settings/options-for-perf-state-engine-perfboostmode)).
+  High performance (8c5e7fda-...) is already the active plan on this host (applied by an earlier run), so `performance.power-plan` is a no-op here.
+  An Ultimate Performance clone needs `powercfg /duplicatescheme` first, which the journal engine has no operation for; not applied.
+- **Hardware-accelerated GPU scheduling:** `HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\HwSchMode` (2 = on); the key is the DxgKrnl
+  override location ([DxgKrnl configuration](https://learn.microsoft.com/windows-hardware/drivers/display/dxgkrnl-configuration)); the value semantics come from the
+  Settings UI (Graphics > Default graphics settings), not from a Learn page. Read live: already 2. Catalog: `performance.hags` (idempotent; reboot to change).
+- **Game Mode:** `HKCU\Software\Microsoft\GameBar\AutoGameModeEnabled` is documented
+  ([Settings reference](https://learn.microsoft.com/windows/apps/develop/settings/settings-windows-11#gaming-game-bar,-game-mode,-gaming-shortcuts));
+  already 1. Catalog: `performance.game-mode`; `performance.game-dvr` (existing) keeps background recording off.
+- **Timer resolution:** since Windows 10 2004 `timeBeginPeriod` is per process, and on Windows 11 a fully occluded, minimised or silent
+  process loses the request; `PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION` opts a process out explicitly. A machine-wide tick therefore
+  buys nothing and costs idle power. Not applied; apps that need 1 ms ask for it ([timeBeginPeriod](https://learn.microsoft.com/windows/win32/api/timeapi/nf-timeapi-timebeginperiod),
+  [SetProcessInformation](https://learn.microsoft.com/windows/win32/api/processthreadsapi/nf-processthreadsapi-setprocessinformation)). Audit with
+  `pwrtest /timer` ([PwrTest](https://learn.microsoft.com/windows-hardware/drivers/devtest/pwrtest-timer-scenario)) and `powercfg /energy`.
+- **QoS / EcoQoS:** Windows classifies processes by focus, visibility and audibility (in focus High, visible Medium, minimised or fully occluded Low) and
+  `PROCESS_POWER_THROTTLING_EXECUTION_SPEED` marks background work as EcoQoS (efficiency cores, lower clocks)
+  ([Quality of Service](https://learn.microsoft.com/windows/win32/procthread/quality-of-service)). Rule for Bun OS binaries: background services call
+  `SetProcessInformation(ProcessPowerThrottling)` at start; the Rust helper is a follow-up in `bunos-winres`-style shared code.
+- **MMCSS:** `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile` `SystemResponsiveness` is the percentage kept for
+  low-priority work (default 20; rounded down to a multiple of 10; below 10 or above 100 is read as 20; 100 disables MMCSS) and `Tasks\Games`
+  holds `Scheduling Category`, `Priority`, `SFIO Priority`, `GPU Priority`; High-category threads run at priority 23-26
+  ([MMCSS](https://learn.microsoft.com/windows/win32/procthread/multimedia-class-scheduler-service)). Catalog: `performance.mmcss` (10 %, Games High / 6 / High).
+- **Processor scheduling (`Win32PrioritySeparation`):** Learn describes the model (client quantum is short, the foreground thread gets a longer one;
+  priority boosts for foreground and input, [scheduling](https://learn.microsoft.com/windows/win32/procthread/scheduling)) but documents no client
+  values for the registry value. Not applied; unverified claims in tuning guides are not a basis for a journaled change.
+
+### Startup apps and Task Scheduler
+
+- Startup apps are the `Run`/`RunOnce` keys (HKLM, HKCU, WOW64) and the Startup folders; Task Manager's Startup tab and
+  `ms-settings:startupapps` let the user disable them and rate impact (high: more than 1 s CPU or 3 MB disk I/O); Windows may delay Run entries
+  ([startup apps](https://learn.microsoft.com/windows/win32/w8cookbook/startup-apps), [Run keys](https://learn.microsoft.com/windows/win32/setupapi/run-and-runonce-registry-keys)).
+  Packaged apps declare `uap5:StartupTask` with `UserConfigurable`. Anything needing elevation can only start from a Task Scheduler logon trigger.
+  Rule: **Bun OS registers no startup entry**; the only owner-visible entries left are the owner's (LGHUB, Steam, Google, Gemini, Realtek, Edge update),
+  which the profile never touches. Policy `LetAppsRunInBackground` (AppPrivacy, 2 = deny) only governs UWP apps and breaks notifications; not applied.
+- Task Scheduler idle detection (CPU and disk below 80-90 % for a window) is what to use for any future maintenance job
+  ([idle conditions](https://learn.microsoft.com/windows/win32/taskschd/task-idle-conditions), [trigger types](https://learn.microsoft.com/windows/win32/taskschd/trigger-types)).
+  The only Bun OS task is `BunOS-Sync` (headless, on a schedule).
+
+### Measuring (ETW and WPR)
+
+- `wpr.exe` ships with Windows 8.1+; profiles are ETW provider sets ([WPR](https://learn.microsoft.com/windows-hardware/test/wpt/introduction-to-wpr)).
+  Protocol for the budgets: `wpr -start CPU -filemode`, 60 s idle, `wpr -stop idle.etl`, open in WPA (CPU Usage Sampled by process, Timers, Context
+  Switches by process); `powercfg /energy` for wake sources; `pwrtest /timer` for timer requests. Quick numbers without WPA:
+  `Win32_PerfFormattedData_PerfProc_Process` over 10 s (used in this report).
+
+### What stays impossible without a resident process (and is therefore dropped)
+
+Per-window border gradients and animated borders, custom easing for window open/close, tiling layouts beyond Snap, a status bar with
+workspaces, a launcher that is not Start search, caption buttons on other apps' windows, an animated wallpaper. Each needed a hook, an overlay or a
+render loop; the measured cost was 10-16 % of a core and 188 MB at idle.
 
 ## Prioritised plan
 
