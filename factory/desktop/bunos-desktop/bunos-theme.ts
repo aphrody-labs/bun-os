@@ -44,7 +44,9 @@ const hex = (c: string) => c.replace(/^#/, "").slice(0, 6);
 function hue(c: string): number {
   const n = parseInt(hex(c), 16);
   const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => v / 255) as [number, number, number];
-  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b),
+    d = max - min;
   if (d < 0.08) return -1; // grey
   const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
   return (h * 60 + 360) % 360;
@@ -55,8 +57,15 @@ export function adwaitaAccent(c: string): string {
   const h = hue(c);
   if (h < 0) return "slate";
   const table: [number, string][] = [
-    [0, "red"], [30, "orange"], [52, "yellow"], [120, "green"], [175, "teal"], [215, "blue"], [275, "purple"],
-    [325, "pink"], [360, "red"],
+    [0, "red"],
+    [30, "orange"],
+    [52, "yellow"],
+    [120, "green"],
+    [175, "teal"],
+    [215, "blue"],
+    [275, "purple"],
+    [325, "pink"],
+    [360, "red"],
   ];
   return table.reduce((best, t) => (Math.abs(t[0] - h) < Math.abs(best[0] - h) ? t : best))[1];
 }
@@ -64,21 +73,37 @@ export function adwaitaAccent(c: string): string {
 /** libadwaita named colours (GTK 4 @define-color), from the theme's canonical Omarchy keys. */
 export function gtkCss(name: string, c: Colors): string {
   const pick = (...keys: string[]) => keys.map(k => c[k]).find(Boolean) ?? "#808080";
-  const bg = pick("background"), fg = pick("foreground"), accent = pick("accent", "blue");
+  const bg = pick("background"),
+    fg = pick("foreground"),
+    accent = pick("accent", "blue");
   const pairs: [string, string][] = [
-    ["accent_bg_color", accent], ["accent_fg_color", bg], ["accent_color", accent],
-    ["window_bg_color", bg], ["window_fg_color", fg],
-    ["view_bg_color", pick("dark_background", "background")], ["view_fg_color", fg],
-    ["headerbar_bg_color", pick("darker_background", "dark_background", "background")], ["headerbar_fg_color", fg],
-    ["sidebar_bg_color", pick("dark_background", "background")], ["sidebar_fg_color", fg],
-    ["card_bg_color", pick("lighter_background", "background")], ["card_fg_color", fg],
-    ["popover_bg_color", pick("lighter_background", "background")], ["popover_fg_color", fg],
-    ["dialog_bg_color", pick("lighter_background", "background")], ["dialog_fg_color", fg],
-    ["destructive_bg_color", pick("red")], ["success_bg_color", pick("green")],
-    ["warning_bg_color", pick("yellow")], ["error_bg_color", pick("red")],
+    ["accent_bg_color", accent],
+    ["accent_fg_color", bg],
+    ["accent_color", accent],
+    ["window_bg_color", bg],
+    ["window_fg_color", fg],
+    ["view_bg_color", pick("dark_background", "background")],
+    ["view_fg_color", fg],
+    ["headerbar_bg_color", pick("darker_background", "dark_background", "background")],
+    ["headerbar_fg_color", fg],
+    ["sidebar_bg_color", pick("dark_background", "background")],
+    ["sidebar_fg_color", fg],
+    ["card_bg_color", pick("lighter_background", "background")],
+    ["card_fg_color", fg],
+    ["popover_bg_color", pick("lighter_background", "background")],
+    ["popover_fg_color", fg],
+    ["dialog_bg_color", pick("lighter_background", "background")],
+    ["dialog_fg_color", fg],
+    ["destructive_bg_color", pick("red")],
+    ["success_bg_color", pick("green")],
+    ["warning_bg_color", pick("yellow")],
+    ["error_bg_color", pick("red")],
   ];
-  return `/* bunos-theme ${name}: generated from colors.toml (Omarchy theme format, MIT) */\n` +
-    pairs.map(([k, v]) => `@define-color ${k} ${v};`).join("\n") + "\n";
+  return (
+    `/* bunos-theme ${name}: generated from colors.toml (Omarchy theme format, MIT) */\n` +
+    pairs.map(([k, v]) => `@define-color ${k} ${v};`).join("\n") +
+    "\n"
+  );
 }
 
 async function sh(cmd: string[]) {
@@ -89,21 +114,38 @@ async function sh(cmd: string[]) {
 async function apply(name: string) {
   const dir = find(name) ?? (console.error(`no such theme: ${name} (bunos-theme lists them)`), process.exit(1));
   const colors = Object.fromEntries(
-    Object.entries(Bun.TOML.parse(await Bun.file(join(dir, "colors.toml")).text())).filter(([, v]) => typeof v === "string"),
+    Object.entries(Bun.TOML.parse(await Bun.file(join(dir, "colors.toml")).text())).filter(
+      ([, v]) => typeof v === "string",
+    ),
   ) as Colors;
   const mode = colors.mode === "light" ? "light" : "dark";
   const done: string[] = [];
 
   if (await sh(["omarchy-theme-set", name])) done.push("hyprland/omarchy");
-  if (existsSync(join("/usr/share/bunos/themes", slug(name), "cosmic.ron")) && (await sh(["bunos-theme-set", slug(name)])))
+  if (
+    existsSync(join("/usr/share/bunos/themes", slug(name), "cosmic.ron")) &&
+    (await sh(["bunos-theme-set", slug(name)]))
+  )
     done.push("cosmic");
 
   const gtk4 = join(process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), "gtk-4.0");
   await mkdir(gtk4, { recursive: true });
   await Bun.write(join(gtk4, "gtk.css"), gtkCss(name, colors));
   if (Bun.which("gsettings")) {
-    await sh(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", mode === "dark" ? "prefer-dark" : "prefer-light"]);
-    await sh(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", adwaitaAccent(colors.accent ?? colors.blue ?? "#3584e4")]);
+    await sh([
+      "gsettings",
+      "set",
+      "org.gnome.desktop.interface",
+      "color-scheme",
+      mode === "dark" ? "prefer-dark" : "prefer-light",
+    ]);
+    await sh([
+      "gsettings",
+      "set",
+      "org.gnome.desktop.interface",
+      "accent-color",
+      adwaitaAccent(colors.accent ?? colors.blue ?? "#3584e4"),
+    ]);
   }
   done.push("gnome/gtk4");
   console.log(`${slug(name)} applied to: ${done.join(", ")}`);
