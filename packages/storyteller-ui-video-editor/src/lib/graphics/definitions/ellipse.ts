@@ -15,13 +15,13 @@ const ELLIPSE_PARAMS: ParamDefinition<keyof EllipseParams & string>[] = [
     key: "fill",
     label: "Fill",
     type: "color",
-    default: "#ffffff",
+    default: "#ffffff", // design:content: default fill and stroke of a new shape (document data)
   },
   {
     key: "stroke",
     label: "Color",
     type: "color",
-    default: "#000000",
+    default: "#000000", // design:content
     group: "stroke",
   },
   {
@@ -44,8 +44,8 @@ export const ellipseGraphicDefinition: GraphicDefinition = {
   keywords: ["ellipse", "circle", "oval"],
   params: ELLIPSE_PARAMS,
   render({ ctx, params, width, height }) {
-    const fill = String(params.fill ?? "#ffffff");
-    const stroke = String(params.stroke ?? "#000000");
+    const fill = String(params.fill ?? "#ffffff"); // design:content
+    const stroke = String(params.stroke ?? "#000000"); // design:content
     const strokeWidth = Math.max(0, Number(params.strokeWidth ?? 0));
     const strokeAlign = (params.strokeAlign ?? "center") as GraphicStrokeAlign;
     const inset = strokeAlign === "center" ? strokeWidth / 2 : 0;

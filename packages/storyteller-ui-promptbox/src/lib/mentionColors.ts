@@ -1,26 +1,28 @@
 import type { MentionItem } from "./MentionTextarea";
 
-// ── @-mention color palette ─────────────────────────────────────────────
-
+// design:content: @-mention highlight hues. Each hue identifies one reference
+// (image, video, audio or character) across the prompt and its thumbnails,
+// like chart series, so they are data colours rather than theme roles.
 const IMAGE_COLORS = [
-  "rgb(96, 165, 250)",
-  "rgb(251, 146, 60)",
-  "rgb(167, 139, 250)",
-  "rgb(52, 211, 153)",
-  "rgb(251, 113, 133)",
+  "rgb(96, 165, 250)", // design:content
+  "rgb(251, 146, 60)", // design:content
+  "rgb(167, 139, 250)", // design:content
+  "rgb(52, 211, 153)", // design:content
+  "rgb(251, 113, 133)", // design:content
 ];
 
-const VIDEO_COLORS = ["rgb(250, 204, 21)", "rgb(245, 158, 11)", "rgb(74, 222, 128)"];
+const VIDEO_COLORS = ["rgb(250, 204, 21)", "rgb(245, 158, 11)", "rgb(74, 222, 128)"]; // design:content
 
-const AUDIO_COLORS = ["rgb(192, 132, 252)", "rgb(232, 121, 249)"];
+const AUDIO_COLORS = ["rgb(192, 132, 252)", "rgb(232, 121, 249)"]; // design:content
 
 const CHARACTER_COLORS = [
-  "rgb(45, 212, 191)", // teal
-  "rgb(34, 197, 94)", // emerald
-  "rgb(14, 165, 233)", // sky
+  "rgb(45, 212, 191)", // design:content: teal
+  "rgb(34, 197, 94)", // design:content: emerald
+  "rgb(14, 165, 233)", // design:content: sky
 ];
 
-export function getMentionColor(label: string, mentionItems?: MentionItem[]): string {
+/** The highlight hue of a mention, or undefined when the label is not a known reference. */
+export function getMentionColor(label: string, mentionItems?: MentionItem[]): string | undefined {
   const imgMatch = label.match(/^@Image(\d+)$/);
   if (imgMatch) return IMAGE_COLORS[(parseInt(imgMatch[1]) - 1) % IMAGE_COLORS.length];
   const vidMatch = label.match(/^@Video(\d+)$/);
@@ -33,14 +35,15 @@ export function getMentionColor(label: string, mentionItems?: MentionItem[]): st
     const idx = charItems.findIndex(m => m.label === label);
     if (idx !== -1) return CHARACTER_COLORS[idx % CHARACTER_COLORS.length];
   }
-  return "rgb(255, 255, 255)";
+  return undefined;
 }
 
 export function buildMentionColorMap(mentionItems?: MentionItem[]): Record<string, string> {
   if (!mentionItems?.length) return {};
   const map: Record<string, string> = {};
   for (const item of mentionItems) {
-    map[item.label] = getMentionColor(item.label, mentionItems);
+    const color = getMentionColor(item.label, mentionItems);
+    if (color) map[item.label] = color;
   }
   return map;
 }

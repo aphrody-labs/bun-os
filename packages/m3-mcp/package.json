@@ -1,7 +1,7 @@
 {
   "name": "@aphrody/m3-mcp",
   "version": "1.4.7",
-  "description": "Design/UI tool host of aphrody-m3 (served through the single aphrody-mcp): packages, M3 tokens (lookup, validate), docs search, research links, templates, Material Symbols SVG, SVG to Tauri icons.",
+  "description": "Design/UI tool host of aphrody-m3 (served through the single aphrody-mcp): packages, M3 tokens (lookup, validate), docs search, research links, templates, Material Symbols SVG, SVG to Tauri icons, 3Dviz Pro Max 3D design tools (@aphrody/viz3d).",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
     "@aphrody/m3-os-themes": "workspace:*",
     "@aphrody/m3-tokens": "workspace:*",
     "@aphrody/material-design-icons": "workspace:*",
+    "@aphrody/viz3d": "workspace:*",
     "zod": "catalog:"
   },
   "engines": {

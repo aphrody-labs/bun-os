@@ -29,7 +29,7 @@ export function SnapGuides({ lines }: { lines: SnapLine[] }) {
           return (
             <div
               key={`vertical-${line.position}`}
-              className="absolute top-0 bottom-0 w-px bg-white/70"
+              className="absolute top-0 bottom-0 w-px bg-on-surface/70"
               style={{ left: toOverlayX(line.position) }}
             />
           );
@@ -37,7 +37,7 @@ export function SnapGuides({ lines }: { lines: SnapLine[] }) {
         return (
           <div
             key={`horizontal-${line.position}`}
-            className="absolute left-0 right-0 h-px bg-white/70"
+            className="absolute left-0 right-0 h-px bg-on-surface/70"
             style={{ top: toOverlayY(line.position) }}
           />
         );

@@ -25,31 +25,12 @@ export default {
   ],
   theme: {
     extend: {
+      // The m3-fonts typefaces (Google Sans Flex, Google Sans Code) through the
+      // typescale references of the M3 tokens sheet.
       fontFamily: {
-        "custom-font": ["Fira Sans", "sans-serif"],
-        // Brutalist type system, matching artcraft-webapp.
-        mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
-        display: [
-          "Archivo",
-          "system-ui",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Arial",
-          "sans-serif",
-        ],
-        sans: [
-          "system-ui",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Arial",
-          "sans-serif",
-        ],
+        mono: ["var(--md-ref-typeface-code)"],
+        display: ["var(--md-ref-typeface-brand)"],
+        sans: ["var(--md-ref-typeface-plain)"],
       },
       keyframes: {
         fadeIn: {
@@ -177,7 +158,7 @@ export default {
       },
       border: m3Color("outline-variant"),
       input: m3Color("outline"),
-      ring: m3Color("primary"),
+      ring: m3Color("secondary"),
     },
   },
   plugins: [],

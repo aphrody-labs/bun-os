@@ -260,14 +260,14 @@ const CharacterListView = ({
       reminderType: "default",
       title: "Delete character?",
       message: (
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-on-surface/70">
           This will permanently delete <strong>{character.name}</strong>. This action cannot be undone.
         </p>
       ),
       primaryActionText: "Delete",
       primaryActionIcon: Trash2Icon,
       secondaryActionText: "Cancel",
-      primaryActionBtnClassName: "bg-red text-white hover:bg-red/90",
+      primaryActionBtnClassName: "bg-error text-on-error hover:bg-error/90",
       onPrimaryAction: async () => {
         if (actionReminderProps.value) {
           actionReminderProps.value = {
@@ -359,9 +359,9 @@ const CharacterListView = ({
                     <UsersIcon className="text-2xl" />
                   </div>
                 )}
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40">
-                  <LoaderCircleIcon className="text-lg text-white/80 animate-spin" />
-                  <span className="text-xs font-medium text-white/80">Creating...</span>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-surface/40">
+                  <LoaderCircleIcon className="text-lg text-on-surface/80 animate-spin" />
+                  <span className="text-xs font-medium text-on-surface/80">Creating...</span>
                 </div>
               </div>
               <div className="px-2 py-1.5 text-center">
@@ -409,7 +409,7 @@ const CharacterListView = ({
                           setPreviewCharacter(character);
                         }}
                         title="View full size"
-                        className="flex h-7 w-7 items-center justify-center bg-black/60 text-white/80 transition-colors hover:bg-black/80"
+                        className="flex h-7 w-7 items-center justify-center bg-surface/60 text-on-surface/80 transition-colors hover:bg-surface/80"
                       >
                         <EyeIcon className="text-[10px]" />
                       </button>
@@ -421,7 +421,7 @@ const CharacterListView = ({
                             e.stopPropagation();
                             onEditCharacter(character);
                           }}
-                          className="flex h-7 w-7 items-center justify-center bg-black/60 text-white/80 transition-colors hover:bg-black/80"
+                          className="flex h-7 w-7 items-center justify-center bg-surface/60 text-on-surface/80 transition-colors hover:bg-surface/80"
                         >
                           <PenIcon className="text-[10px]" />
                         </button>
@@ -430,7 +430,7 @@ const CharacterListView = ({
                             e.stopPropagation();
                             handleDelete(character);
                           }}
-                          className="flex h-7 w-7 items-center justify-center bg-black/60 text-white/80 transition-colors hover:bg-red-500"
+                          className="flex h-7 w-7 items-center justify-center bg-surface/60 text-on-surface/80 transition-colors hover:bg-error"
                         >
                           <Trash2Icon className="text-[10px]" />
                         </button>
@@ -565,7 +565,7 @@ const EditCharacterView = ({
             placeholder="Description..."
             rows={3}
             autoComplete="off"
-            className="w-full resize-none rounded-[3px] border border-ui-panel-border bg-ui-controls px-3 py-2 text-sm text-base-fg placeholder-base-fg/50 outline-none transition-colors focus:border-white focus:!outline-none"
+            className="w-full resize-none rounded-[3px] border border-ui-panel-border bg-ui-controls px-3 py-2 text-sm text-base-fg placeholder-base-fg/50 outline-none transition-colors focus:border-on-surface focus:!outline-none"
           />
         </div>
       </div>
@@ -784,7 +784,7 @@ const NewCharacterView = ({
           ref={dropZoneRef}
           className={twMerge(
             "flex h-56 max-h-56 shrink-0 cursor-pointer flex-col items-center justify-center rounded-[3px] border-2 border-dashed border-base-fg/15 bg-base-fg/[0.05] transition-colors overflow-hidden",
-            isDragging && "border-white/60 bg-white/10",
+            isDragging && "border-outline bg-on-surface/10",
           )}
           onDragEnter={handleDragEnter}
           onDragOver={handleDragOver}
@@ -799,8 +799,8 @@ const NewCharacterView = ({
             >
               <img src={images[0]!.url} alt="Reference" className="max-h-full max-w-full object-contain" />
               {!images[0]!.mediaToken && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                  <LoaderCircleIcon className="text-white animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center bg-surface/50">
+                  <LoaderCircleIcon className="text-on-surface animate-spin" />
                 </div>
               )}
               <button
@@ -808,7 +808,7 @@ const NewCharacterView = ({
                   e.stopPropagation();
                   removeImage(0);
                 }}
-                className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center bg-black/60 text-white/80 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-500"
+                className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center bg-surface/60 text-on-surface/80 opacity-0 transition-all group-hover:opacity-100 hover:bg-error"
               >
                 <XIcon className="text-sm" />
               </button>
@@ -867,7 +867,7 @@ const NewCharacterView = ({
             placeholder="Description..."
             rows={3}
             autoComplete="off"
-            className="w-full resize-none rounded-[3px] border border-ui-panel-border bg-ui-controls px-3 py-2 text-sm text-base-fg placeholder-base-fg/50 outline-none transition-colors focus:border-white focus:!outline-none"
+            className="w-full resize-none rounded-[3px] border border-ui-panel-border bg-ui-controls px-3 py-2 text-sm text-base-fg placeholder-base-fg/50 outline-none transition-colors focus:border-on-surface focus:!outline-none"
           />
         </div>
       </div>

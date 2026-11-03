@@ -39,8 +39,8 @@ export const VFXShowcaseView = ({ onTryThis }: VFXShowcaseViewProps) => {
         <ShowcaseCarousel entries={VFX_SHOWCASE} activeId={activeId} onSelect={setSelectedShowcaseId} />
 
         <div className="flex flex-col items-center gap-1 text-center">
-          <h2 className="text-2xl font-bold text-white">{entry.title}</h2>
-          <p className="text-sm text-white/60">{entry.description}</p>
+          <h2 className="text-2xl font-bold text-on-surface">{entry.title}</h2>
+          <p className="text-sm text-on-surface/60">{entry.description}</p>
         </div>
 
         <VFXResultCard

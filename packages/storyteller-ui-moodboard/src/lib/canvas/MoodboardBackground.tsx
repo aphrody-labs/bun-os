@@ -27,7 +27,7 @@ const MoodboardBackgroundInner = ({
   viewport,
   spacing,
   zoom,
-  dotColor = "rgba(255,255,255,0.18)",
+  dotColor,
   dotRadiusPx = 1.2,
 }: Props) => {
   const baseOnScreen = spacing * zoom;

@@ -108,7 +108,7 @@ export const MotionPopover = ({ easing, onChange, leftPercent, title = "Motion",
       <svg
         ref={svgRef}
         viewBox={`0 0 ${BOX} ${BOX}`}
-        className="w-full touch-none rounded-[3px] bg-white/5"
+        className="w-full touch-none rounded-[3px] bg-on-surface/5"
         onPointerMove={onPointerMove}
         onPointerUp={() => setDragging(null)}
         onPointerLeave={() => setDragging(null)}

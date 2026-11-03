@@ -395,7 +395,7 @@ export const PromptBox2D = ({
                   variant="action"
                   className={twMerge(
                     "h-8 w-8 p-0 bg-transparent hover:bg-transparent group transition-all border-0 shadow-none",
-                    isImageRowVisible && "text-white",
+                    isImageRowVisible && "text-on-surface",
                   )}
                   onClick={() => setShowImagePrompts(prev => !prev)}
                 >
@@ -432,7 +432,7 @@ export const PromptBox2D = ({
               />
               <PromptFullscreenButton onClick={openFullscreen} />
               <span
-                className={`pointer-events-none absolute -bottom-1 right-4 text-[10px] tabular-nums ${isFinite(maxLen) && prompt.length > maxLen ? "text-red-500" : "text-base-fg/40"}`}
+                className={`pointer-events-none absolute -bottom-1 right-4 text-[10px] tabular-nums ${isFinite(maxLen) && prompt.length > maxLen ? "text-error" : "text-base-fg/40"}`}
               >
                 {prompt.length} / {isFinite(maxLen) ? maxLen : "∞"}
               </span>
@@ -492,7 +492,7 @@ export const PromptBox2D = ({
                 confirmClear={referenceImages.length > 0}
               />
               <GenerateButton
-                className="flex items-center border-none bg-white px-3 text-sm font-bold text-black hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center border-none bg-inverse-surface px-3 text-sm font-bold text-inverse-on-surface hover:bg-inverse-surface/90 disabled:cursor-not-allowed disabled:opacity-50"
                 icon={undefined}
                 onClick={handleGenerate}
                 disabled={isEnqueueing || isDisabled || !prompt.trim()}

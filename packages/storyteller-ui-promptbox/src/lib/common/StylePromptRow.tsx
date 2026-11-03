@@ -22,7 +22,7 @@ export function StylePromptRow({
   };
 
   return (
-    <div className={twMerge("flex items-center gap-2 border-t border-white/10 px-1 pt-2", className)}>
+    <div className={twMerge("flex items-center gap-2 border-t border-outline-variant px-1 pt-2", className)}>
       <TagsIcon className="h-3.5 w-3.5 shrink-0 text-base-fg/40" />
       <input
         type="text"
@@ -36,7 +36,7 @@ export function StylePromptRow({
           type="button"
           aria-label="Clear style"
           onClick={() => onChange("")}
-          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[3px] text-base-fg/40 transition-colors hover:bg-white/10 hover:text-base-fg"
+          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[3px] text-base-fg/40 transition-colors hover:bg-on-surface/10 hover:text-base-fg"
         >
           <XIcon className="h-3 w-3" />
         </button>

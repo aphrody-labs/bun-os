@@ -827,8 +827,9 @@ fn resolve_velocity(vel: &PhaseVel, duration: f32, max_scroll: f32) -> f32 {
 /// The theme colors cell chrome is drawn in, read once per frame.
 struct Chrome {
 	accent: Hsla,
-	white: Hsla,
-	shade: Hsla,
+	on_accent: Hsla,
+	media_ink: Hsla,
+	media_shade: Hsla,
 }
 
 /// A selected cell: tinted, ringed, and badged with a check.
@@ -854,7 +855,7 @@ fn paint_selected(window: &mut Window, cell: Bounds<Pixels>, chrome: &Chrome) {
 	check.line_to(at(0.44, 0.68));
 	check.line_to(at(0.74, 0.34));
 	if let Ok(path) = check.build() {
-		window.paint_path(path, chrome.white);
+		window.paint_path(path, chrome.on_accent);
 	}
 }
 
@@ -888,7 +889,7 @@ fn paint_tag_dots(
 		let run = TextRun {
 			len: text.len(),
 			font: window.text_style().font(),
-			color: chrome.white.opacity(0.9),
+			color: chrome.media_ink.opacity(0.9),
 			background_color: None,
 			underline: None,
 			strikethrough: None,
@@ -913,7 +914,7 @@ fn paint_tag_dots(
 	window.paint_quad(quad(
 		pill,
 		Corners::all(px(height / 2.0)),
-		chrome.shade.opacity(0.55),
+		chrome.media_shade.opacity(0.55),
 		Edges::default(),
 		transparent_black(),
 		BorderStyle::Solid,

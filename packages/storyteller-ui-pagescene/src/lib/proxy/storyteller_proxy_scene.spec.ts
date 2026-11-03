@@ -25,7 +25,7 @@ const BOX_JSON = {
   position: new THREE.Vector3(),
   rotation: new THREE.Vector3(),
   scale: new THREE.Vector3(1, 1, 1),
-  color: "#FFFFFF",
+  color: "#FFFFFF", // design:content: test fixture
   metalness: 0,
   shininess: 0.5,
   specular: 0,

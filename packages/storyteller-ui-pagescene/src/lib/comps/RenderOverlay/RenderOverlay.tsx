@@ -31,7 +31,7 @@ export const RenderOverlay = () => {
           <button
             type="button"
             onClick={requestEncodeCancel}
-            className="glass glass-no-hover rounded-full px-5 py-2 text-sm font-medium text-base-fg shadow-xl hover:bg-white/10"
+            className="glass glass-no-hover rounded-full px-5 py-2 text-sm font-medium text-base-fg shadow-xl hover:bg-on-surface/10"
           >
             Cancel (Esc)
           </button>

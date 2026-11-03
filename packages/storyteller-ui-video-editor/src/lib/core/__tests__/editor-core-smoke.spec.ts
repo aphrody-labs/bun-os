@@ -87,7 +87,7 @@ function buildSampleProject(): TProject {
     settings: {
       fps: 30 as never,
       canvasSize: { width: 1920, height: 1080 },
-      background: { type: "color", color: "#000000" },
+      background: { type: "color", color: "#000000" }, // design:content: test fixture
     },
     version: 1,
   };

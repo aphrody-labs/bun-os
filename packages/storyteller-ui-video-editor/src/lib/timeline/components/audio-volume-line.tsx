@@ -211,7 +211,7 @@ export function AudioVolumeLine({ element, trackId }: { element: AudioElement; t
         <div
           className={cn(
             "pointer-events-none absolute inset-x-0 -translate-y-1/2 border-t transition-colors",
-            isDragging ? "border-white" : "border-white/50 group-hover/audio:border-white/80",
+            isDragging ? "border-on-surface" : "border-outline group-hover/audio:border-on-surface/80",
           )}
           style={{ top: lineTop }}
         />
@@ -232,7 +232,7 @@ export function AudioVolumeLine({ element, trackId }: { element: AudioElement; t
           tooltipClientPos &&
           createPortal(
             <div
-              className="pointer-events-none fixed left-0 top-0 z-50 -translate-y-full rounded bg-black/75 px-1.5 py-0.5 text-[10px] font-medium text-white whitespace-nowrap"
+              className="pointer-events-none fixed left-0 top-0 z-50 -translate-y-full rounded bg-surface/75 px-1.5 py-0.5 text-[10px] font-medium text-on-surface whitespace-nowrap"
               style={{
                 transform: `translate(${tooltipClientPos.x}px, ${tooltipClientPos.y}px)`,
               }}

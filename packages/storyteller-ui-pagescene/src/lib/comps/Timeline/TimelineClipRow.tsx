@@ -152,8 +152,8 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
               title="Add one of this object's baked animations"
               className={`flex h-4 w-4 items-center justify-center rounded-[3px] transition-colors ${
                 pickerAnchor
-                  ? "bg-brand-primary text-white"
-                  : "bg-white/10 text-base-fg/70 hover:bg-white/20 hover:text-base-fg"
+                  ? "bg-brand-primary text-on-primary"
+                  : "bg-on-surface/10 text-base-fg/70 hover:bg-on-surface/20 hover:text-base-fg"
               }`}
               onClick={e => setPickerAnchor(open => (open ? null : e.currentTarget.getBoundingClientRect()))}
             >
@@ -168,7 +168,7 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
                       screen bottom, so up always has room). */}
                   <div
                     ref={pickerMenuRef}
-                    className="fixed max-h-40 w-44 overflow-y-auto rounded-lg border border-white/10 bg-ui-controls py-1 shadow-xl"
+                    className="fixed max-h-40 w-44 overflow-y-auto rounded-lg border border-outline-variant bg-ui-controls py-1 shadow-xl"
                     style={{
                       zIndex: 9999,
                       left: pickerAnchor.left,
@@ -179,7 +179,7 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
                       <button
                         key={clipIndex}
                         type="button"
-                        className="block w-full truncate px-2.5 py-1 text-left text-[11px] text-base-fg/90 hover:bg-white/10"
+                        className="block w-full truncate px-2.5 py-1 text-left text-[11px] text-base-fg/90 hover:bg-on-surface/10"
                         onClick={() => addBaked(clipIndex)}
                       >
                         {clipName}
@@ -198,14 +198,14 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
         /* overflow-hidden: strips are engine-clamped into the lane, but any
            transient out-of-range placement must clip here rather than paint
            over the add-button column. */
-        className="relative h-6 flex-1 overflow-hidden rounded-md bg-white/5"
+        className="relative h-6 flex-1 overflow-hidden rounded-md bg-on-surface/5"
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerLeave={endDrag}
         onPointerCancel={endDrag}
       >
         {lanes.length === 0 && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-md border border-dashed border-white/15 text-[10px] text-base-fg/30">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-md border border-dashed border-outline-variant text-[10px] text-base-fg/30">
             {droppable ? "Drag an animation here" : "Add a baked animation with +"}
           </div>
         )}
@@ -227,8 +227,8 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
               data-clip-strip
               /* pe-2.5 keeps the × (and name) clear of the absolute w-1.5
                  trim handle on the right edge */
-              className={`absolute inset-y-0 flex items-center gap-1 rounded-md border pe-2.5 ps-1.5 text-[10px] text-white ${
-                isSelected ? "border-white/80 bg-brand-primary/45" : "border-brand-primary/60 bg-brand-primary/25"
+              className={`absolute inset-y-0 flex items-center gap-1 rounded-md border pe-2.5 ps-1.5 text-[10px] text-on-surface ${
+                isSelected ? "border-on-surface/80 bg-brand-primary/45" : "border-brand-primary/60 bg-brand-primary/25"
               }`}
               style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
               onPointerDown={e => {
@@ -246,7 +246,7 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
                 type="button"
                 title={strip.loop ? "Looping — click to play once" : "Play once — click to loop"}
                 className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] ${
-                  strip.loop ? "bg-white/90 text-brand-primary" : "text-white/70 hover:text-white"
+                  strip.loop ? "bg-inverse-surface/90 text-brand-primary" : "text-on-surface/70 hover:text-on-surface"
                 }`}
                 onPointerDown={e => e.stopPropagation()}
                 onClick={() => editor && setClipLoop(editor, lane.id, !strip.loop)}
@@ -263,7 +263,7 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
                 <button
                   type="button"
                   title="Remove animation (Del)"
-                  className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] text-white/70 hover:bg-white/20 hover:text-white"
+                  className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] text-on-surface/70 hover:bg-on-surface/20 hover:text-on-surface"
                   onPointerDown={e => e.stopPropagation()}
                   onClick={() => {
                     if (!editor) return;
@@ -277,7 +277,7 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
 
               {/* right-edge trim handle */}
               <div
-                className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize rounded-r-md bg-white/40 hover:bg-white/70"
+                className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize rounded-r-md bg-on-surface/40 hover:bg-on-surface/70"
                 title="Trim clip length"
                 onPointerDown={e => {
                   e.stopPropagation();
@@ -314,8 +314,8 @@ export const TimelineClipRow = ({ objectUuid, lanes, duration, bakedClips, dropp
                 title={active ? "Edit transition into the next clip" : "Blend into the next clip"}
                 className={`absolute top-1/2 z-10 flex h-4 w-4 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border transition-colors ${
                   active
-                    ? "border-brand-primary bg-brand-primary text-white"
-                    : "border-dashed border-white/30 bg-white/5 text-white/40 hover:border-white/60 hover:text-white/80"
+                    ? "border-brand-primary bg-brand-primary text-on-primary"
+                    : "border-dashed border-outline bg-on-surface/5 text-on-surface/40 hover:border-outline hover:text-on-surface/80"
                 }`}
                 style={{ left: `${midPct}%` }}
                 onPointerDown={e => e.stopPropagation()}

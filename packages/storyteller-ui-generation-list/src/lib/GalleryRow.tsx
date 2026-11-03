@@ -77,13 +77,13 @@ export const GalleryRow = memo(function GalleryRow({
       tabIndex={0}
       onClick={handleRowClick}
       onKeyDown={handleRowKeyDown}
-      className={`group flex cursor-pointer items-center gap-3 rounded-[3px] px-2.5 py-2 transition-colors hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/60 ${selected ? "bg-primary-400/10" : ""}`}
+      className={`group flex cursor-pointer items-center gap-3 rounded-[3px] px-2.5 py-2 transition-colors hover:bg-on-surface/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/60 ${selected ? "bg-primary-400/10" : ""}`}
     >
       {/* Selection checkbox (select mode only) */}
       {selectMode && (
         <div
           className={`pointer-events-none flex h-5 w-5 shrink-0 items-center justify-center rounded-[3px] border transition-colors ${
-            selected ? "border-primary-400 bg-primary-400 text-white" : "border-white/60 bg-black/40 text-transparent"
+            selected ? "border-primary-400 bg-primary-400 text-on-primary" : "border-outline bg-surface/40 text-transparent"
           } ${item.fullImage ? "" : "invisible"}`}
         >
           <CheckIcon className="text-[10px]" />
@@ -100,20 +100,20 @@ export const GalleryRow = memo(function GalleryRow({
           alt={item.label}
           isVideo={isVideo}
           fallbackIcon={mediaIcon}
-          fallbackIconClassName="text-base text-white/20"
+          fallbackIconClassName="text-base text-on-surface/20"
           showRetryLabel={false}
         />
         {isVideo && item.thumbnail && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-black/55 backdrop-blur-sm">
-              <PlayIcon className="ml-0.5 text-[9px] text-white/90" />
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-surface/55 backdrop-blur-sm">
+              <PlayIcon className="ml-0.5 text-[9px] text-on-surface/90" />
             </span>
           </div>
         )}
         {/* Persistent "Last viewed" badge (stays until another item is
             opened in the lightbox). */}
         {lastViewed && (
-          <div className="pointer-events-none absolute left-1 top-1 z-10 flex items-center gap-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-white/80">
+          <div className="pointer-events-none absolute left-1 top-1 z-10 flex items-center gap-1 rounded-full bg-surface/70 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-on-surface/80">
             <EyeIcon />
             Last viewed
           </div>
@@ -123,26 +123,26 @@ export const GalleryRow = memo(function GalleryRow({
       {/* Title + model / media meta */}
       <div className="min-w-0 flex-1">
         {loading ? (
-          <div className="relative h-4 w-2/3 max-w-[280px] overflow-hidden bg-white/[0.06]">
+          <div className="relative h-4 w-2/3 max-w-[280px] overflow-hidden bg-on-surface/[0.06]">
             <div className="animate-shimmer absolute inset-0" />
           </div>
         ) : (
           <div className="flex items-start gap-2">
-            <p className="line-clamp-3 min-w-0 flex-1 text-sm leading-snug text-white/90">{title || item.label}</p>
+            <p className="line-clamp-3 min-w-0 flex-1 text-sm leading-snug text-on-surface/90">{title || item.label}</p>
             {title && <CopyPromptButton text={title} onCopyResult={onCopyPromptResult} />}
           </div>
         )}
         {isAudio && item.fullImage && (
-          <div className="mt-1.5 max-w-md bg-white/[0.04]">
+          <div className="mt-1.5 max-w-md bg-on-surface/[0.04]">
             <WaveformAudioPlayer src={item.fullImage} durationMillis={item.durationMillis} compact />
           </div>
         )}
-        <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-white/45">
+        <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-on-surface/45">
           {modelIconPath && <img src={modelIconPath} alt="" className="h-3 w-3 shrink-0 icon-auto-contrast" />}
           <span className="max-w-[40vw] truncate sm:max-w-none">{modelDisplayName ?? mediaLabel}</span>
           {modelDisplayName && (
             <>
-              <span className="text-white/25">·</span>
+              <span className="text-on-surface/25">·</span>
               <span className="shrink-0">{mediaLabel}</span>
             </>
           )}
@@ -155,7 +155,7 @@ export const GalleryRow = memo(function GalleryRow({
               {actionsSlot}
             </div>
           )}
-          <span className="ml-auto shrink-0 whitespace-nowrap text-white/40">{timeAgo}</span>
+          <span className="ml-auto shrink-0 whitespace-nowrap text-on-surface/40">{timeAgo}</span>
         </div>
       </div>
     </div>

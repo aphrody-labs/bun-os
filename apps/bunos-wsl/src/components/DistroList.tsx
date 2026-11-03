@@ -143,7 +143,7 @@ export function DistroList() {
   return (
     <div>
       {/* Filter Bar - Two rows on mobile, one row on desktop */}
-      <div className="sticky top-0 z-20 -mx-6 px-6 py-3 mb-1 bg-surface/95 backdrop-blur-sm border-b border-outline-variant/50">
+      <div className="sticky top-0 z-20 -mx-6 px-6 py-3 mb-1 bg-surface border-b border-outline-variant/50">
         <div className="relative">
         {/* IP Address - Always top right */}
         {wslIp && (
@@ -156,7 +156,7 @@ export function DistroList() {
             <span className="text-xs font-mono text-on-surface-variant">{t('common:label.ip')}</span>
             <span className="text-sm font-mono text-primary" data-testid="wsl-ip-value">{wslIp}</span>
             <CopyIcon size="sm" className={`text-on-surface-variant group-hover:text-primary transition-colors ${ipCopied ? 'text-success' : ''}`} />
-            {ipCopied && <span className="text-[10px] text-success" data-testid="ip-copied-indicator">{t('common:label.copied')}</span>}
+            {ipCopied && <span className="text-xs text-success" data-testid="ip-copied-indicator">{t('common:label.copied')}</span>}
           </button>
         )}
 
@@ -186,7 +186,7 @@ export function DistroList() {
               title={t('filter.onlineTooltip', { count: onlineCount })}
             >
               <span className="w-2 h-2 rounded-full bg-success" />
-              <span className="text-[10px]" data-testid="online-count">{onlineCount}</span>
+              <span className="text-xs" data-testid="online-count">{onlineCount}</span>
             </button>
             <button
               onClick={() => setStatusFilter("offline")}
@@ -199,7 +199,7 @@ export function DistroList() {
               title={t('filter.offlineTooltip', { count: offlineCount })}
             >
               <span className="w-2 h-2 rounded-full bg-outline" />
-              <span className="text-[10px]" data-testid="offline-count">{offlineCount}</span>
+              <span className="text-xs" data-testid="offline-count">{offlineCount}</span>
             </button>
           </div>
 
@@ -264,7 +264,7 @@ export function DistroList() {
                 title={wsl1Enabled ? t('filter.hideWsl1', { count: wsl1Count }) : t('filter.showWsl1', { count: wsl1Count })}
               >
                 {t('filter.v1')}
-                <span className="text-[10px] opacity-70" data-testid="wsl1-count">{wsl1Count}</span>
+                <span className="text-xs opacity-70" data-testid="wsl1-count">{wsl1Count}</span>
               </button>
             )}
             {hasWsl2 && (
@@ -279,7 +279,7 @@ export function DistroList() {
                 title={wsl2Enabled ? t('filter.hideWsl2', { count: wsl2Count }) : t('filter.showWsl2', { count: wsl2Count })}
               >
                 {t('filter.v2')}
-                <span className="text-[10px] opacity-70" data-testid="wsl2-count">{wsl2Count}</span>
+                <span className="text-xs opacity-70" data-testid="wsl2-count">{wsl2Count}</span>
               </button>
             )}
           </div>

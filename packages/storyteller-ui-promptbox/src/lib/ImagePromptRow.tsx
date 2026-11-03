@@ -116,17 +116,17 @@ const AudioRefTile = ({
   }, []);
 
   return (
-    <div className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30 hover:border-white/80 transition-all group cursor-pointer flex items-center justify-center">
+    <div className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline hover:border-on-surface/80 transition-all group cursor-pointer flex items-center justify-center">
       <button onClick={handleTogglePlay} className="flex items-center justify-center w-full h-full">
         <DynamicIcon
           icon={isPlaying ? SquareIcon : PlayIcon}
           className={twMerge(
             "h-5 w-5 transition-colors",
-            isPlaying ? "text-red-400" : "text-base-fg/60 group-hover:text-base-fg",
+            isPlaying ? "text-error" : "text-base-fg/60 group-hover:text-base-fg",
           )}
         />
       </button>
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/70 py-0.5 text-[10px] font-bold text-white pointer-events-none">
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-surface/70 py-0.5 text-[10px] font-bold text-on-surface pointer-events-none">
         #{index + 1} · {audio.duration}s
       </div>
       <button
@@ -138,7 +138,7 @@ const AudioRefTile = ({
           }
           onRemove(audio.id);
         }}
-        className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-black/50 hover:bg-red/70 text-white backdrop-blur-md transition-colors hover:bg-black cursor-pointer"
+        className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-surface/50 hover:bg-error/70 text-on-surface backdrop-blur-md transition-colors hover:bg-surface cursor-pointer"
       >
         <XIcon className="h-2.5 w-2.5" />
       </button>
@@ -241,15 +241,15 @@ export const ImagePromptRow = ({
         style={style}
         {...(allowReorder ? { ...attributes, ...listeners } : {})}
         className={twMerge(
-          "glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30 transition-opacity group",
-          allowReorder ? "cursor-move hover:border-white/80" : "cursor-pointer hover:border-white/80",
+          "glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline transition-opacity group",
+          allowReorder ? "cursor-move hover:border-on-surface/80" : "cursor-pointer hover:border-on-surface/80",
           isDragging ? "opacity-50 shadow-lg" : "",
         )}
         onClick={() => onImageClick?.(image)}
       >
         <img src={image.url} alt="Reference" className="h-full w-full object-cover" />
         {isReferenceMode && (
-          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/60 py-0.5 text-[11px] font-bold text-white">
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-surface/60 py-0.5 text-[11px] font-bold text-on-surface">
             {index + 1}
           </div>
         )}
@@ -264,7 +264,7 @@ export const ImagePromptRow = ({
           onPointerDown={e => {
             e.stopPropagation();
           }}
-          className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-black/50 hover:bg-red/70 text-white backdrop-blur-md transition-colors hover:bg-black cursor-pointer"
+          className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-surface/50 hover:bg-error/70 text-on-surface backdrop-blur-md transition-colors hover:bg-surface cursor-pointer"
         >
           <XIcon className="h-2.5 w-2.5" />
         </button>
@@ -794,12 +794,12 @@ export const ImagePromptRow = ({
                   referenceImages.slice(0, Math.max(0, maxImagePromptCount)).map((image, index) => (
                     <div
                       key={image.id}
-                      className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30 hover:border-white/80 transition-all group cursor-pointer hover:cursor-zoom-in"
+                      className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline hover:border-on-surface/80 transition-all group cursor-pointer hover:cursor-zoom-in"
                       onClick={() => onImageClick?.(image)}
                     >
                       <img src={image.url} alt="Reference" className="h-full w-full object-cover" />
                       {isReferenceMode && (
-                        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/60 py-0.5 text-[11px] font-bold text-white">
+                        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-surface/60 py-0.5 text-[11px] font-bold text-on-surface">
                           {index + 1}
                         </div>
                       )}
@@ -808,7 +808,7 @@ export const ImagePromptRow = ({
                           e.stopPropagation();
                           handleRemoveReference(image.id);
                         }}
-                        className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-black/50 hover:bg-red/70 text-white backdrop-blur-md transition-colors hover:bg-black cursor-pointer"
+                        className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-surface/50 hover:bg-error/70 text-on-surface backdrop-blur-md transition-colors hover:bg-surface cursor-pointer"
                       >
                         <XIcon className="h-2.5 w-2.5" />
                       </button>
@@ -820,7 +820,7 @@ export const ImagePromptRow = ({
                   .map(({ id, previewUrl }) => (
                     <div
                       key={id}
-                      className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30"
+                      className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline"
                     >
                       {previewUrl && (
                         <div className="absolute inset-0">
@@ -831,8 +831,8 @@ export const ImagePromptRow = ({
                           />
                         </div>
                       )}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <LoaderCircleIcon className="h-6 w-6 animate-spin text-white" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-surface/20">
+                        <LoaderCircleIcon className="h-6 w-6 animate-spin text-on-surface" />
                       </div>
                     </div>
                   ))}
@@ -866,7 +866,7 @@ export const ImagePromptRow = ({
                   >
                     <Button
                       variant="action"
-                      className="bg-ui-controls/40 hover:bg-ui-controls/60 aspect-square w-full overflow-hidden rounded-[3px] w-14 border-dashed border-2 border-black/5 dark:border-white/25 transition-all"
+                      className="bg-ui-controls/40 hover:bg-ui-controls/60 aspect-square w-full overflow-hidden rounded-[3px] w-14 border-dashed border-2 border-outline-variant dark:border-outline-variant transition-all"
                       onClick={() => {
                         if (allowUpload) handleUploadClickStart();
                         else {
@@ -884,7 +884,7 @@ export const ImagePromptRow = ({
             {isVideo && showEndFrameSection && (
               <div className="flex gap-3 pe-3">
                 <div className="flex grow gap-1">
-                  <div className="w-[1px] h-full bg-white/10" />
+                  <div className="w-[1px] h-full bg-on-surface/10" />
                   <div className="flex flex-col grow gap-1 p-2">
                     <div className="flex items-center gap-2 opacity-90 text-base-fg">
                       <ImageIcon className="h-3.5 w-3.5" />
@@ -898,7 +898,7 @@ export const ImagePromptRow = ({
                 <div className="flex gap-2 items-center">
                   {endFrameImage ? (
                     <div
-                      className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30 hover:border-white/80 transition-all group cursor-pointer hover:cursor-zoom-in"
+                      className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline hover:border-on-surface/80 transition-all group cursor-pointer hover:cursor-zoom-in"
                       onClick={() => onImageClick?.(endFrameImage)}
                     >
                       <img src={endFrameImage.url} alt="Ending Frame" className="h-full w-full object-cover" />
@@ -907,13 +907,13 @@ export const ImagePromptRow = ({
                           e.stopPropagation();
                           setEndFrameImage?.(undefined);
                         }}
-                        className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-black/50 hover:bg-red/70 text-white backdrop-blur-md transition-colors hover:bg-black cursor-pointer"
+                        className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-surface/50 hover:bg-error/70 text-on-surface backdrop-blur-md transition-colors hover:bg-surface cursor-pointer"
                       >
                         <XIcon className="h-2.5 w-2.5" />
                       </button>
                     </div>
                   ) : uploadingEnd ? (
-                    <div className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30">
+                    <div className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline">
                       {uploadingEnd.previewUrl && (
                         <div className="absolute inset-0">
                           <img
@@ -923,8 +923,8 @@ export const ImagePromptRow = ({
                           />
                         </div>
                       )}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <LoaderCircleIcon className="h-6 w-6 animate-spin text-white" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-surface/20">
+                        <LoaderCircleIcon className="h-6 w-6 animate-spin text-on-surface" />
                       </div>
                     </div>
                   ) : (
@@ -957,7 +957,7 @@ export const ImagePromptRow = ({
                     >
                       <Button
                         variant="action"
-                        className="bg-ui-controls/40 hover:bg-ui-controls/60 aspect-square w-full overflow-hidden rounded-[3px] w-14 border-dashed border-2 border-black/5 dark:border-white/25 transition-all"
+                        className="bg-ui-controls/40 hover:bg-ui-controls/60 aspect-square w-full overflow-hidden rounded-[3px] w-14 border-dashed border-2 border-outline-variant dark:border-outline-variant transition-all"
                         onClick={() => {
                           if (allowUploadEnd) handleUploadClickEnd();
                           else {
@@ -975,7 +975,7 @@ export const ImagePromptRow = ({
             )}
           </div>
           {isVideo && showVideoReferenceSection && (
-            <div className="grid grid-cols-2 border-t border-white/10">
+            <div className="grid grid-cols-2 border-t border-outline-variant">
               {/* Video References - Left */}
               <div className="flex gap-2 py-2 px-3">
                 <div className="flex flex-col grow gap-1">
@@ -996,10 +996,10 @@ export const ImagePromptRow = ({
                   {referenceVideos.map(video => (
                     <div
                       key={video.id}
-                      className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30 hover:border-white/80 transition-all group cursor-pointer"
+                      className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline hover:border-on-surface/80 transition-all group cursor-pointer"
                     >
                       <video src={video.url} muted preload="metadata" className="h-full w-full object-cover" />
-                      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/70 py-0.5 text-[10px] font-bold text-white">
+                      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-surface/70 py-0.5 text-[10px] font-bold text-on-surface">
                         {video.duration}s
                       </div>
                       <button
@@ -1007,14 +1007,14 @@ export const ImagePromptRow = ({
                           e.stopPropagation();
                           handleRemoveVideo(video.id);
                         }}
-                        className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-black/50 hover:bg-red/70 text-white backdrop-blur-md transition-colors hover:bg-black cursor-pointer"
+                        className="opacity-0 group-hover:opacity-100 absolute right-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-surface/50 hover:bg-error/70 text-on-surface backdrop-blur-md transition-colors hover:bg-surface cursor-pointer"
                       >
                         <XIcon className="h-2.5 w-2.5" />
                       </button>
                     </div>
                   ))}
                   {uploadingVideo && (
-                    <div className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30">
+                    <div className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline">
                       <div className="absolute inset-0">
                         <video
                           src={URL.createObjectURL(uploadingVideo.file)}
@@ -1023,8 +1023,8 @@ export const ImagePromptRow = ({
                           className="h-full w-full object-cover blur-sm"
                         />
                       </div>
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <LoaderCircleIcon className="h-6 w-6 animate-spin text-white" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-surface/20">
+                        <LoaderCircleIcon className="h-6 w-6 animate-spin text-on-surface" />
                       </div>
                     </div>
                   )}
@@ -1056,7 +1056,7 @@ export const ImagePromptRow = ({
                     >
                       <Button
                         variant="action"
-                        className="bg-ui-controls/40 hover:bg-ui-controls/60 aspect-square w-full overflow-hidden rounded-[3px] w-14 border-dashed border-2 border-black/5 dark:border-white/25 transition-all"
+                        className="bg-ui-controls/40 hover:bg-ui-controls/60 aspect-square w-full overflow-hidden rounded-[3px] w-14 border-dashed border-2 border-outline-variant dark:border-outline-variant transition-all"
                         onClick={handleUploadClickVideo}
                       >
                         <PlusIcon className="text-2xl opacity-80 text-base-fg" />
@@ -1068,7 +1068,7 @@ export const ImagePromptRow = ({
               {/* Audio References - Right */}
               <div className="flex gap-2 pe-3">
                 <div className="flex grow gap-1">
-                  <div className="w-[1px] h-full bg-white/10" />
+                  <div className="w-[1px] h-full bg-on-surface/10" />
                   <div className="flex flex-col grow gap-1 p-2">
                     <div className="flex items-center gap-2 opacity-90 text-base-fg">
                       <MusicIcon className="h-3.5 w-3.5" />
@@ -1089,14 +1089,14 @@ export const ImagePromptRow = ({
                     <AudioRefTile key={audio.id} audio={audio} index={index} onRemove={handleRemoveAudio} />
                   ))}
                   {uploadingAudio && (
-                    <div className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-white/30 flex items-center justify-center">
-                      <LoaderCircleIcon className="h-6 w-6 animate-spin text-white" />
+                    <div className="glass relative aspect-square overflow-hidden rounded-[3px] w-14 border-2 border-outline flex items-center justify-center">
+                      <LoaderCircleIcon className="h-6 w-6 animate-spin text-on-surface" />
                     </div>
                   )}
                   {referenceAudios.length < maxAudioCount && !uploadingAudio && (
                     <Button
                       variant="action"
-                      className="bg-ui-controls/40 hover:bg-ui-controls/60 aspect-square w-full overflow-hidden rounded-[3px] w-14 border-dashed border-2 border-black/5 dark:border-white/25 transition-all"
+                      className="bg-ui-controls/40 hover:bg-ui-controls/60 aspect-square w-full overflow-hidden rounded-[3px] w-14 border-dashed border-2 border-outline-variant dark:border-outline-variant transition-all"
                       onClick={handleUploadClickAudio}
                     >
                       <PlusIcon className="text-2xl opacity-80 text-base-fg" />
@@ -1108,7 +1108,7 @@ export const ImagePromptRow = ({
           )}
         </div>
         <div className="flex items-center">
-          <div className="w-[1px] h-full bg-white/10" />
+          <div className="w-[1px] h-full bg-on-surface/10" />
           <div className="flex items-center gap-2 w-[1px] h-full bg-base-fg/20 dark:bg-base-fg/10" />
           <div className="p-2">
             <Button

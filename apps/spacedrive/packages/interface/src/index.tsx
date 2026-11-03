@@ -8,6 +8,7 @@ import "./styles.css";
 export { Shell } from "./Shell";
 export { DemoWindow } from "./windows/DemoWindow";
 export { ErrorBoundary } from "./components/ErrorBoundary";
+export { MotionPreferences } from "./components/MotionPreferences";
 export { FloatingControls } from "./windows/FloatingControls";
 export { Inspector, PopoutInspector } from "./components/Inspector/Inspector";
 export type { InspectorVariant } from "./components/Inspector/Inspector";

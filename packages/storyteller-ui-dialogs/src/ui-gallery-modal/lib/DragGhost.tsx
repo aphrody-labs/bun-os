@@ -133,7 +133,7 @@ export function DragGhost({ getState, width = 120, height = 120, crossOrigin }: 
       {state.indicator && (
         <div
           className={`absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center shadow-md ring-1 ring-outline-variant/30 ${
-            state.indicator === "ok" ? "bg-success" : "bg-error"
+            state.indicator === "ok" ? "bg-success text-on-success" : "bg-error text-on-error"
           }`}
         >
           {state.indicator === "ok" ? (
@@ -141,7 +141,7 @@ export function DragGhost({ getState, width = 120, height = 120, crossOrigin }: 
               <path
                 d="M3.5 8.5 6.5 11.5 12.5 5"
                 fill="none"
-                stroke="white"
+                stroke="currentColor"
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -149,8 +149,8 @@ export function DragGhost({ getState, width = 120, height = 120, crossOrigin }: 
             </svg>
           ) : (
             <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true">
-              <circle cx="8" cy="8" r="5.4" fill="none" stroke="white" strokeWidth="2" />
-              <path d="M4.2 4.2 11.8 11.8" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              <circle cx="8" cy="8" r="5.4" fill="none" stroke="currentColor" strokeWidth="2" />
+              <path d="M4.2 4.2 11.8 11.8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           )}
         </div>

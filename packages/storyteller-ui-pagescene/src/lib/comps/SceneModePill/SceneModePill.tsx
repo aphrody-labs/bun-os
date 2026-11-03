@@ -24,8 +24,8 @@ export const SceneModePill = () => {
         className="w-auto"
         listClassName="rounded-none border border-ui-panel-border bg-ui-controls px-1"
         tabClassName="rounded-[3px] px-5 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-300"
-        indicatorClassName="rounded-[3px] bg-white/95"
-        selectedTabClassName="text-black"
+        indicatorClassName="rounded-[3px] bg-inverse-surface/95"
+        selectedTabClassName="text-inverse-on-surface"
       />
     </div>
   );

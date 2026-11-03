@@ -64,7 +64,7 @@ export const PreviewEngineCamera = () => {
       >
         <div
           className={twMerge(
-            "origin -z-10 flex h-auto w-full flex-wrap items-center gap-1.5 rounded-t-lg bg-ui-controls p-2 text-white",
+            "origin -z-10 flex h-auto w-full flex-wrap items-center gap-1.5 rounded-t-lg bg-ui-controls p-2 text-on-surface",
             camAspect !== CameraAspectRatio.VERTICAL_9_16 ? "justify-between" : "flex-col justify-center",
             camAspect === CameraAspectRatio.SQUARE_1_1 && "justify-center",
           )}
@@ -97,7 +97,7 @@ export const PreviewEngineCamera = () => {
         </div>
         <div
           className={twMerge(
-            "relative overflow-hidden rounded-b-lg border border-gray-600",
+            "relative overflow-hidden rounded-b-lg border border-outline",
             camAspect === CameraAspectRatio.HORIZONTAL_16_9
               ? "aspect-[16/9]"
               : camAspect === CameraAspectRatio.VERTICAL_9_16

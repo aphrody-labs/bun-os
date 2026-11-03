@@ -117,14 +117,14 @@ export function GenerationListView({
   if (isInitialLoading) {
     return (
       <div className="flex justify-center py-20">
-        <LoadingSpinner className="h-6 w-6 text-white/60" />
+        <LoadingSpinner className="h-6 w-6 text-on-surface/60" />
       </div>
     );
   }
 
   return (
     <div className="mx-auto w-full max-w-5xl sm:px-4">
-      <div className="flex flex-col divide-y divide-white/[0.04]">
+      <div className="flex flex-col divide-y divide-on-surface/[0.04]">
         {mergedEntries.map(entry => {
           if (entry.kind === "pending") {
             return (
@@ -206,7 +206,7 @@ export function GenerationListView({
 
       {hasMore && (
         <div ref={sentinelRef} className="flex justify-center py-8">
-          <LoadingSpinner className="h-6 w-6 text-white/60" />
+          <LoadingSpinner className="h-6 w-6 text-on-surface/60" />
         </div>
       )}
     </div>

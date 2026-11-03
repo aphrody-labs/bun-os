@@ -27,7 +27,7 @@ import { Node } from "../../Node";
 import { Tooltip } from "@storyteller/ui-tooltip";
 import { showActionReminder, isActionReminderOpen } from "@storyteller/ui-action-reminder-modal";
 
-const shapeIconBtn = "flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-white/10";
+const shapeIconBtn = "flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-on-surface/10";
 
 // Toolbar entry → registry action whose resolved key renders as the button's
 // corner badge (updates live when the user remaps in Settings → Keybinds).
@@ -191,7 +191,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
 
     <>
       <div className="relative">
-        <p className="mb-2 text-sm font-medium text-white">Brush Size</p>
+        <p className="mb-2 text-sm font-medium text-on-surface">Brush Size</p>
         <SliderWithIndicator
           value={brushSize}
           onChange={size => {
@@ -212,7 +212,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
   // separate from the brush so switching tools doesn't clobber either.
   const EraserPopout = (
     <div className="glass relative w-56 rounded-2xl p-4 shadow-lg">
-      <p className="mb-2 text-sm font-medium text-white">Eraser Size</p>
+      <p className="mb-2 text-sm font-medium text-on-surface">Eraser Size</p>
       <SliderWithIndicator value={eraserSize} onChange={setEraserSize} min={1} max={64} />
     </div>
   );
@@ -253,7 +253,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
                   setOpen(null);
                 }}
               >
-                <ShapeIcon className="h-5 w-5 text-white" />
+                <ShapeIcon className="h-5 w-5 text-on-surface" />
               </button>
             );
           })}
@@ -303,11 +303,11 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
       icon: (
         <div className="relative inline-flex h-5 w-5 items-center justify-center">
           <span
-            className="absolute h-5 w-5 rounded-full border-2 border-white"
+            className="absolute h-5 w-5 rounded-full border-2 border-on-surface"
             style={{ backgroundColor: hsvaToHex(bgHsva) }}
           />
           <DropletIcon
-            className="relative h-2 w-2 text-white drop-shadow-sm"
+            className="relative h-2 w-2 text-on-surface drop-shadow-sm"
             style={{
               filter: "drop-shadow(0 0 1px rgba(0,0,0,0.8))",
             }}
@@ -343,9 +343,9 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
       reminderType: "default",
       title: "Reset Canvas",
       primaryActionIcon: Trash2Icon,
-      primaryActionBtnClassName: "bg-red hover:bg-red/80",
+      primaryActionBtnClassName: "bg-error hover:bg-error/80",
       message: (
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-on-surface/70">
           Are you sure you want to reset the canvas? This will clear all your work and cannot be undone.
         </p>
       ),
@@ -372,11 +372,11 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
         <div className="glass absolute -top-14 left-1/2 -translate-x-1/2 rounded-xl border-2 border-primary/50 shadow-lg">
           <div className="relative">
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-transparent text-white transition-colors hover:bg-white/10"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-transparent text-on-surface transition-colors hover:bg-on-surface/10"
               onMouseEnter={() => setOpen("shape-color")}
             >
               <span
-                className="inline-block h-5 w-5 rounded-full border-2 border-white"
+                className="inline-block h-5 w-5 rounded-full border-2 border-on-surface"
                 style={{ backgroundColor: firstSelectedColorableNode?.fill }}
               />
             </button>
@@ -384,7 +384,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
             {open === "shape-color" && (
               <div
                 onMouseLeave={() => setOpen(null)}
-                className="absolute left-14 top-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-ui-panel transition-all duration-200 ease-in-out"
+                className="absolute left-14 top-1/2 -translate-y-1/2 rounded-xl border border-outline-variant bg-ui-panel transition-all duration-200 ease-in-out"
               >
                 {ShapePopout}
               </div>
@@ -395,7 +395,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
 
       {tools.map(tool => {
         if (tool.type === "separator") {
-          return <div key={tool.id} className="my-1 h-px w-8 bg-white/15" />;
+          return <div key={tool.id} className="my-1 h-px w-8 bg-on-surface/15" />;
         }
 
         const { id, icon, onClick, popout, label } = tool;
@@ -409,21 +409,21 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
         const toolActionId = TOOL_ACTION_IDS[id];
         const toolBinding = toolActionId ? forAction(toolActionId)[0] : undefined;
         const keyBadge = toolBinding ? (
-          <span className="pointer-events-none absolute bottom-0 right-0 min-w-[13px] rounded-[4px] bg-black/60 px-0.5 text-center text-[9px] font-medium leading-[13px] text-white/80">
+          <span className="pointer-events-none absolute bottom-0 right-0 min-w-[13px] rounded-[4px] bg-surface/60 px-0.5 text-center text-[9px] font-medium leading-[13px] text-on-surface/80">
             {formatBinding(toolBinding)}
           </span>
         ) : null;
         const btnStyle = active
-          ? "bg-primary/30 border-2 !border-primary text-white"
+          ? "bg-primary/30 border-2 !border-primary text-on-surface"
           : id === "inpaint" && !supportsMaskTool
-            ? "opacity-50 cursor-not-allowed hover:bg-transparent hover:border-transparent hover:text-white/50"
-            : "hover:bg-white/10 text-white";
+            ? "opacity-50 cursor-not-allowed hover:bg-transparent hover:border-transparent hover:text-on-surface/50"
+            : "hover:bg-on-surface/10 text-on-surface";
 
         let displayIcon = icon;
         if (id === "draw") {
           displayIcon = active ? (
             <span
-              className="inline-block h-5 w-5 rounded-full border-2 border-white"
+              className="inline-block h-5 w-5 rounded-full border-2 border-on-surface"
               style={{ backgroundColor: hsvaToHex(brushHsva) }}
             />
           ) : (
@@ -557,7 +557,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
                 onMouseLeave={() => {
                   setOpen(null);
                 }}
-                className="absolute left-14 top-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-ui-panel transition-all duration-200 ease-in-out"
+                className="absolute left-14 top-1/2 -translate-y-1/2 rounded-xl border border-outline-variant bg-ui-panel transition-all duration-200 ease-in-out"
               >
                 {popout}
               </div>
@@ -567,17 +567,17 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
       })}
 
       {/* Reset canvas button */}
-      <div className="glass absolute -bottom-14 left-1/2 -translate-x-1/2 rounded-xl border-2 border-red/50 shadow-lg hover:border-red/80">
+      <div className="glass absolute -bottom-14 left-1/2 -translate-x-1/2 rounded-xl border-2 border-error/50 shadow-lg hover:border-error/80">
         <div className="relative">
           <Tooltip
             content="Reset Canvas"
             position="right"
             closeOnClick={true}
-            className="ms-1 rounded-md bg-red px-3 py-1"
+            className="ms-1 rounded-md bg-error px-3 py-1"
             delay={100}
           >
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-transparent text-white transition-colors hover:bg-red/50"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-transparent text-on-surface transition-colors hover:bg-error/50"
               onClick={handleResetCanvas}
             >
               <XIcon className="h-5 w-5 text-xl" />

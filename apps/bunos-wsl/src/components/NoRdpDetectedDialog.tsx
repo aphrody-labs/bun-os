@@ -40,7 +40,7 @@ export function NoRdpDetectedDialog({
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-scrim/40 backdrop-blur-xs"
+          className="absolute inset-0 bg-scrim/32"
           onClick={handleClose}
         />
 
@@ -48,7 +48,7 @@ export function NoRdpDetectedDialog({
         <div
           role="dialog"
           data-testid="no-rdp-detected-dialog"
-          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-md w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-4">
             <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/20 text-primary">

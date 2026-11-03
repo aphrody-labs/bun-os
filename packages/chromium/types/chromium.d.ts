@@ -18,6 +18,8 @@ declare module "bun:chromium" {
     url?: string;
     /** Paths to unpacked extensions supported by the selected browser. */
     extensions?: string[];
+    /** Extra Chromium switches (`--use-angle=d3d11`, ...); they may not replace the profile, debugging endpoint, headless mode or URL. */
+    args?: string[];
   }
 
   /** A Chrome DevTools Protocol connection to a browser or target endpoint. */

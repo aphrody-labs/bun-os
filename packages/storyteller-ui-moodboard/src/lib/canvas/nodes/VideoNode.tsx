@@ -3,6 +3,7 @@ import Konva from "konva";
 import { Image as KonvaImage, Rect } from "react-konva";
 import { VideoNode as VideoNodeData } from "../types";
 import { useNodeDrag } from "../interactions/useNodeDrag";
+import { useRoleColors } from "../../theme/roleColors";
 
 interface Props {
   node: VideoNodeData;
@@ -70,8 +71,8 @@ const VideoNodeInner = ({ node, draggable, selected, onSelect }: Props) => {
           width={node.width}
           height={node.height}
           rotation={node.rotation}
-          fill="#222"
-          stroke={selected ? "#3b82f6" : "transparent"}
+          fill={roles.placeholder}
+          stroke={selected ? roles.selection : "transparent"}
           strokeWidth={1}
         />
       )}

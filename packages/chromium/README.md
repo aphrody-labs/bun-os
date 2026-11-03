@@ -29,7 +29,8 @@ try {
 checkout's Cargo target directory. Build it on the VPS with
 `cargo-serial build -p aphrody-chromium-ffi --release -j4`.
 
-Launch options: executable, userDataDir, headless, webgpu, url, extensions, timeout and signal.
+Launch options: executable, userDataDir, headless, webgpu, url, extensions, args (extra `--switches`, never the
+profile, debugging endpoint, headless mode or URL), timeout and signal.
 Executable discovery honours `BUN_CHROMIUM_PATH`. On Linux the browser runs in its own process
 group, owned through a pidfd (Linux 6.9 `PIDFD_SIGNAL_PROCESS_GROUP`). On Windows, a kill-on-close
 job object is used when the `bun:windows` plugin provides `Job`; otherwise the process is killed

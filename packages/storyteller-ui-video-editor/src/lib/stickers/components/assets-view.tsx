@@ -393,8 +393,8 @@ function StickerItem({ item, shouldCapSize = false, containerClassName }: Sticke
         containerClassName={containerClassName ?? "w-full"}
       />
       {isAdding && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-black/60">
-          <InlineSpinner className="size-6 text-white" />
+        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-surface/60">
+          <InlineSpinner className="size-6 text-on-surface" />
         </div>
       )}
     </div>

@@ -119,7 +119,7 @@ export const ItemInspector = ({
 
       <div className="flex h-full gap-4">
         {/* Media panel — flexible width, dark plate, contained media. */}
-        <div className="group/nav relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-l-xl bg-black/30">
+        <div className="group/nav relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-l-xl bg-surface/30">
           <Media item={item} />
 
           {hasPrev && <NavArrow side="left" onClick={onPrev} />}
@@ -129,7 +129,7 @@ export const ItemInspector = ({
         {/* Info + actions — fixed width, scrollable body, buttons pinned bottom. */}
         <div className="flex h-full w-[280px] shrink-0 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pb-2 text-base-fg">
-            <div className="flex items-center gap-2.5 border-b border-white/5 pb-3 pr-10">
+            <div className="flex items-center gap-2.5 border-b border-outline-variant pb-3 pr-10">
               <span className="rounded-full border border-ui-panel-border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-base-fg/55">
                 {KIND_LABEL[item.kind]}
               </span>
@@ -148,7 +148,7 @@ export const ItemInspector = ({
                     <StarIcon
                       className={
                         n <= item.rating
-                          ? "h-4 w-4 text-yellow-400"
+                          ? "h-4 w-4 text-warning"
                           : "h-4 w-4 text-base-fg/20 transition-colors hover:text-base-fg/40"
                       }
                     />
@@ -164,7 +164,7 @@ export const ItemInspector = ({
                     key={tag}
                     type="button"
                     onClick={() => onRemoveTag(tag)}
-                    className="group/tag flex items-center gap-1 rounded-full bg-base-fg/10 px-2.5 py-1 text-[11px] font-medium text-base-fg/80 transition-colors hover:bg-red/15 hover:text-red focus:outline-none focus-visible:ring-2 focus-visible:ring-red"
+                    className="group/tag flex items-center gap-1 rounded-full bg-base-fg/10 px-2.5 py-1 text-[11px] font-medium text-base-fg/80 transition-colors hover:bg-error/15 hover:text-error focus:outline-none focus-visible:ring-2 focus-visible:ring-error"
                   >
                     {tag}
                     <XIcon className="h-2.5 w-2.5" />
@@ -195,7 +195,7 @@ export const ItemInspector = ({
                         void navigator.clipboard?.writeText(hex);
                         toast.success(`Copied ${hex}`);
                       }}
-                      className="h-7 w-7 rounded-md ring-1 ring-inset ring-black/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      className="h-7 w-7 rounded-md ring-1 ring-inset ring-outline-variant focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       style={{ background: hex }}
                     />
                   ))}
@@ -255,7 +255,7 @@ const Media = ({ item }: { item: BoardItem }) => {
     case "color":
       return (
         <div className="flex h-72 w-72 items-end rounded-2xl p-4 shadow-2xl" style={{ background: item.color }}>
-          <span className="rounded-full bg-black/40 px-3 py-1 text-sm font-medium uppercase tracking-wider text-white backdrop-blur">
+          <span className="rounded-full bg-surface/40 px-3 py-1 text-sm font-medium uppercase tracking-wider text-on-surface backdrop-blur">
             {item.color}
           </span>
         </div>
@@ -302,8 +302,8 @@ const NavArrow = ({ side, onClick }: { side: "left" | "right"; onClick: () => vo
     }}
     className={[
       "absolute top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full",
-      "bg-black/50 text-white/70 opacity-0 transition-opacity duration-200",
-      "hover:bg-black/70 hover:text-white group-hover/nav:opacity-100 focus:outline-none",
+      "bg-surface/50 text-on-surface/70 opacity-0 transition-opacity duration-200",
+      "hover:bg-surface/70 hover:text-on-surface group-hover/nav:opacity-100 focus:outline-none",
       side === "left" ? "left-3" : "right-3",
     ].join(" ")}
   >

@@ -45,7 +45,7 @@ export const SmartSearchBar = ({ query, onQueryChange, tags, activeTags, onToggl
                 className={[
                   "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors duration-150",
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                  active ? "bg-primary text-white" : "bg-base-fg/8 text-base-fg/70 hover:bg-base-fg/15",
+                  active ? "bg-primary text-on-primary" : "bg-base-fg/8 text-base-fg/70 hover:bg-base-fg/15",
                 ].join(" ")}
               >
                 {tag}

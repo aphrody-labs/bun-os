@@ -15,6 +15,7 @@ import { useViewportSize } from "../../hooks/useViewportSize";
 import { DraggablePrecisionMutator } from "./DraggablePrecisionMutator";
 import { beginColorSession, ColorSession } from "../../actions/setObjectColor";
 import { beginTransformSession, TransformSession } from "../../actions/transformObject";
+import { DEFAULT_OBJECT_COLOR } from "../../engine/sceneColors";
 
 // TODO this will be useful later to fix the bug on leading zeros
 // const formatNumber = (input: string): number => {
@@ -52,7 +53,7 @@ export const ControlPanelSceneObject = () => {
 
   const [locked, setLocked] = useState(false);
 
-  const [color, setColor] = useState("#ffffff");
+  const [color, setColor] = useState(DEFAULT_OBJECT_COLOR);
 
   // Pending transform session — opened on first panel edit, committed
   // when the *selection's uuid* actually changes (NOT on every per-frame
@@ -159,7 +160,7 @@ export const ControlPanelSceneObject = () => {
     // Read the swatch from the panel's actual object (same uuid the
     // write path uses), not editorEngine.selected which can be stale.
     const selectedObj = selectedUuid ? editorEngine.activeScene?.get_object_by_uuid(selectedUuid) : undefined;
-    setColor((selectedObj?.userData?.color as string) ?? "#ffffff");
+    setColor((selectedObj?.userData?.color as string) ?? DEFAULT_OBJECT_COLOR);
     // No cleanup function — uuid-change commit lives in the body
     // above. Unmount commit is handled by the separate effect below.
   }, [currentSceneObject, editorEngine]);
@@ -284,7 +285,7 @@ export const ControlPanelSceneObject = () => {
       as="div"
       show={isShowing}
       className={twMerge(
-        "border border-ui-panel-border bg-ui-controls absolute bottom-16 right-0 mb-4 mr-4 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-none p-3.5 text-white",
+        "border border-ui-panel-border bg-ui-controls absolute bottom-16 right-0 mb-4 mr-4 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-none p-3.5 text-on-surface",
       )}
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"
@@ -320,7 +321,7 @@ export const ControlPanelSceneObject = () => {
         className={"flex flex-col gap-2 overflow-y-auto"}
       >
         <div className="flex flex-col gap-1">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/60">Color</p>
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-on-surface/60">Color</p>
           {/* Native <input type="color"> is nested INSIDE the Button's
               <label> so Safari opens the picker reliably. Safari refuses
               to open a color picker triggered via label[htmlFor]→input
@@ -338,7 +339,7 @@ export const ControlPanelSceneObject = () => {
               className="absolute inset-0 cursor-pointer opacity-0"
               id={colorInputId}
               type="color"
-              value={color ?? "#ffffff"}
+              value={color ?? DEFAULT_OBJECT_COLOR}
               disabled={locked || !selectedUuid}
               onFocus={() => {
                 // Normal path: picker opening → start the session that
@@ -363,7 +364,7 @@ export const ControlPanelSceneObject = () => {
           </Button>
         </div>
         <div className="flex flex-col gap-2">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/60">Location</p>
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-on-surface/60">Location</p>
           <InputVector
             x={localPosition.x.toString()}
             y={localPosition.y.toString()}
@@ -376,7 +377,7 @@ export const ControlPanelSceneObject = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/60">Rotation</p>
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-on-surface/60">Rotation</p>
           <InputVector
             x={localRotation.x.toString()}
             y={localRotation.y.toString()}
@@ -391,7 +392,7 @@ export const ControlPanelSceneObject = () => {
 
         <div className="mb-1 flex flex-col gap-2">
           <DraggablePrecisionMutator onChange={handleUniformScaleChange}>
-            <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-white/60">Scale</p>
+            <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-on-surface/60">Scale</p>
           </DraggablePrecisionMutator>
           <InputVector
             x={localScale.x.toString()}

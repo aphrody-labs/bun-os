@@ -533,7 +533,7 @@ export const ImageTo3DExperience = ({ title, subtitle, variant, backgroundImage 
           {!isUploading && (
             <button
               type="button"
-              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-[3px] bg-scrim/60 text-on-surface opacity-0 transition-all hover:bg-scrim group-hover:opacity-100"
+              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-[3px] bg-surface/60 text-on-surface opacity-0 transition-all hover:bg-scrim group-hover:opacity-100"
               onClick={event => {
                 event.stopPropagation();
                 setUploadedPreview(null);
@@ -675,7 +675,7 @@ export const ImageTo3DExperience = ({ title, subtitle, variant, backgroundImage 
         {!img.isUploading && (
           <button
             type="button"
-            className="absolute right-[2px] top-[2px] flex h-4 w-4 cursor-pointer items-center justify-center rounded-[3px] bg-scrim/60 text-on-surface opacity-0 transition-colors hover:bg-error/70 group-hover:opacity-100"
+            className="absolute right-[2px] top-[2px] flex h-4 w-4 cursor-pointer items-center justify-center rounded-[3px] bg-surface/60 text-on-surface opacity-0 transition-colors hover:bg-error/70 group-hover:opacity-100"
             onClick={e => {
               e.stopPropagation();
               removeWorldImage(img.id);
@@ -1043,7 +1043,7 @@ export const ImageTo3DExperience = ({ title, subtitle, variant, backgroundImage 
         >
           <button
             type="button"
-            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-[3px] border border-outline-variant bg-scrim/60 text-on-surface transition-colors hover:border-outline hover:bg-scrim"
+            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-[3px] border border-outline-variant bg-surface/60 text-on-surface transition-colors hover:border-outline hover:bg-scrim"
             onClick={() => setPreviewImage(null)}
           >
             <XIcon className="h-4 w-4" />

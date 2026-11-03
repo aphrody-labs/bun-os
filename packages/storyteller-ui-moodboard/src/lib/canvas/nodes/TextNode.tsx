@@ -4,6 +4,7 @@ import { Text as KonvaText } from "react-konva";
 import { TextNode as TextNodeData } from "../types";
 import { useMoodboardStore } from "../MoodboardStore";
 import { useNodeDrag } from "../interactions/useNodeDrag";
+import { useRoleColors } from "../../theme/roleColors";
 
 interface Props {
   node: TextNodeData;
@@ -41,7 +42,7 @@ const TextNodeInner = ({ node, draggable, selected, onSelect }: Props) => {
       onDragStart={drag.onDragStart}
       onDragMove={drag.onDragMove}
       onDragEnd={drag.onDragEnd}
-      stroke={selected ? "#3b82f6" : undefined}
+      stroke={selected ? roles.selection : undefined}
       strokeWidth={selected ? 0.5 : 0}
     />
   );

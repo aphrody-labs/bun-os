@@ -130,7 +130,7 @@ export const BoardGridToolbar = ({
             "flex h-8 items-center gap-1 rounded-full px-2.5 transition-colors duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
             ratingFilter > 0
-              ? "bg-yellow-400/15 text-yellow-500"
+              ? "bg-warning/15 text-warning"
               : "text-base-fg/55 hover:bg-base-fg/10 hover:text-base-fg",
           ].join(" ")}
         >

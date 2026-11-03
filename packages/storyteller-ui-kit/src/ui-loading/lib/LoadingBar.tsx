@@ -35,7 +35,7 @@ export const LoadingBar = ({
       }
       case "primary":
       default: {
-        return " bg-brand-primary text-on-surface ";
+        return " bg-brand-primary text-on-primary ";
       }
     }
   }

@@ -137,7 +137,7 @@ export const GalleryFolderChip: React.FC<GalleryFolderChipProps> = ({ folder, ch
             e.stopPropagation();
             openMenuAt(e.currentTarget as HTMLElement);
           }}
-          className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-[3px] bg-scrim/40 text-on-surface opacity-0 transition-opacity hover:bg-scrim/60 group-hover/chip:opacity-100 [@media(pointer:coarse)]:opacity-100"
+          className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-[3px] bg-surface/40 text-on-surface opacity-0 transition-opacity hover:bg-scrim/60 group-hover/chip:opacity-100 [@media(pointer:coarse)]:opacity-100"
         >
           <EllipsisIcon className="text-sm" />
         </span>

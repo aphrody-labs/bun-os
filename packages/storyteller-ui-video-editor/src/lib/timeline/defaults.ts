@@ -25,7 +25,7 @@ const defaultTextLineHeight = 1.2;
 
 const defaultTextBackground = {
   enabled: false,
-  color: "#000000",
+  color: "#000000", // design:content: default text and background colours of new elements (document data)
   cornerRadius: 0,
   paddingX: 30,
   paddingY: 42,
@@ -44,7 +44,7 @@ const defaultTextElement: Omit<TextElement, "id"> = {
     content: "Default text",
     fontSize: 15,
     fontFamily: "Arial",
-    color: "#ffffff",
+    color: "#ffffff", // design:content
     textAlign: "center",
     fontWeight: "normal",
     fontStyle: "normal",

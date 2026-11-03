@@ -693,7 +693,7 @@ export {
 export { TIMELINE_LAYERS } from "./lib/timeline/components/layers";
 export {
   TIMELINE_TRACK_THEME,
-  TIMELINE_AUDIO_WAVEFORM_COLOR,
+  TIMELINE_AUDIO_WAVEFORM_CLASS,
   SELECTED_TRACK_ROW_CLASS,
   DEFAULT_TIMELINE_BOOKMARK_COLOR,
   getTimelineElementClassName,

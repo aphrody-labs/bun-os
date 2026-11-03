@@ -20,7 +20,7 @@ export function PrivacySettings() {
       <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
               <ChartBarIcon size="md" className="text-on-primary-container" />
             </div>
             <div>

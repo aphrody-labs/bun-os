@@ -270,7 +270,7 @@ export const TimelineEditor = () => {
   return (
     <div
       id="timeline-editor"
-      className="border border-ui-panel-border bg-ui-controls absolute bottom-4 left-1/2 w-[90vw] max-w-5xl -translate-x-1/2 select-none rounded-none p-3 text-white"
+      className="border border-ui-panel-border bg-ui-controls absolute bottom-4 left-1/2 w-[90vw] max-w-5xl -translate-x-1/2 select-none rounded-none p-3 text-on-surface"
       onMouseDown={e => e.stopPropagation()}
       onClick={e => e.stopPropagation()}
     >
@@ -280,7 +280,7 @@ export const TimelineEditor = () => {
           type="button"
           title="Go to start"
           onClick={() => editor && seekTimeline(editor, 0)}
-          className="flex h-7 w-7 items-center justify-center rounded-[3px] text-base-fg/70 hover:bg-white/10"
+          className="flex h-7 w-7 items-center justify-center rounded-[3px] text-base-fg/70 hover:bg-on-surface/10"
         >
           <SkipBackIcon className="h-3.5 w-3.5" />
         </button>
@@ -288,7 +288,7 @@ export const TimelineEditor = () => {
           type="button"
           onClick={togglePlay}
           aria-label={isPlaying ? "Pause timeline" : "Play timeline"}
-          className="flex h-7 w-7 items-center justify-center rounded-[3px] text-base-fg/90 hover:bg-white/10"
+          className="flex h-7 w-7 items-center justify-center rounded-[3px] text-base-fg/90 hover:bg-on-surface/10"
         >
           <DynamicIcon icon={isPlaying ? PauseIcon : PlayIcon} className="h-3.5 w-3.5" />
         </button>
@@ -296,7 +296,7 @@ export const TimelineEditor = () => {
           type="button"
           title="Go to end"
           onClick={() => editor && seekTimeline(editor, duration)}
-          className="flex h-7 w-7 items-center justify-center rounded-[3px] text-base-fg/70 hover:bg-white/10"
+          className="flex h-7 w-7 items-center justify-center rounded-[3px] text-base-fg/70 hover:bg-on-surface/10"
         >
           <SkipForwardIcon className="h-3.5 w-3.5" />
         </button>
@@ -316,7 +316,7 @@ export const TimelineEditor = () => {
               type="button"
               onClick={() => setFocusSelected(!focusSelected)}
               className={`flex h-7 w-7 items-center justify-center rounded-[3px] transition-colors ${
-                focusSelected ? "bg-primary/20 text-white" : "text-base-fg/60 hover:bg-white/10"
+                focusSelected ? "bg-primary/20 text-on-surface" : "text-base-fg/60 hover:bg-on-surface/10"
               }`}
             >
               <CrosshairIcon className="h-3.5 w-3.5" />
@@ -327,7 +327,7 @@ export const TimelineEditor = () => {
           type="button"
           title="Collapse timeline"
           onClick={() => setExpanded(false)}
-          className="flex h-7 w-7 items-center justify-center rounded-[3px] text-base-fg/60 hover:bg-white/10"
+          className="flex h-7 w-7 items-center justify-center rounded-[3px] text-base-fg/60 hover:bg-on-surface/10"
         >
           <ChevronDownIcon className="h-3 w-3" />
         </button>
@@ -379,7 +379,7 @@ export const TimelineEditor = () => {
                   <span
                     key={i}
                     className={`pointer-events-none absolute bottom-0 w-px ${
-                      isMajor ? "h-2 bg-white/30" : isSecond ? "h-1.5 bg-white/20" : "h-1 bg-white/10"
+                      isMajor ? "h-2 bg-on-surface/30" : isSecond ? "h-1.5 bg-on-surface/20" : "h-1 bg-on-surface/10"
                     }`}
                     style={{ left: `${timeToFraction(t, duration) * 100}%` }}
                   />
@@ -432,9 +432,9 @@ export const TimelineEditor = () => {
 
         {/* playhead (diamond handle in the ruler + line over the lanes) */}
         <div className="pointer-events-none absolute inset-y-0" style={{ left: LANE_LEFT, right: LANE_RIGHT }}>
-          <div className="absolute inset-y-0 w-px bg-white" style={{ left: `${playheadFraction * 100}%` }} />
+          <div className="absolute inset-y-0 w-px bg-inverse-surface" style={{ left: `${playheadFraction * 100}%` }} />
           <div
-            className="absolute top-0 h-2.5 w-2.5 -translate-x-1/2 rotate-45 rounded-[2px] bg-white"
+            className="absolute top-0 h-2.5 w-2.5 -translate-x-1/2 rotate-45 rounded-[2px] bg-inverse-surface"
             style={{ left: `${playheadFraction * 100}%` }}
           />
         </div>
@@ -507,7 +507,7 @@ export const TimelineEditor = () => {
           </Button>
           <Button
             variant="primary"
-            className="flex h-9 items-center border-none bg-brand-primary px-3 text-sm text-white"
+            className="flex h-9 items-center border-none bg-brand-primary px-3 text-sm text-on-primary"
             onClick={() => editor && saveTimeline(editor)}
           >
             Save

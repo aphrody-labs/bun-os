@@ -18,8 +18,9 @@ const BLUR_PREVIEW_UNIFORM_DIMENSIONS = {
   height: 1080,
 } as const;
 
+// design:content: rainbow swatch of the custom colour picker
 const CUSTOM_COLOR_SWATCH_BACKGROUND =
-  "conic-gradient(from 180deg at 50% 50%, #ff5e5e 0deg, #ffb35e 55deg, #fff26b 110deg, #6bff8f 165deg, #5ee7ff 220deg, #6f7cff 275deg, #d76bff 330deg, #ff5e9b 360deg)";
+  "conic-gradient(from 180deg at 50% 50%, #ff5e5e 0deg, #ffb35e 55deg, #fff26b 110deg, #6bff8f 165deg, #5ee7ff 220deg, #6f7cff 275deg, #d76bff 330deg, #ff5e9b 360deg)"; // design:content
 
 const BlurPreview = memo(
   ({
@@ -63,7 +64,7 @@ const BlurPreview = memo(
       >
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute right-1 bottom-1 left-1 text-center">
-          <span className="rounded bg-black/50 px-1 text-xs text-white">{blur.label}</span>
+          <span className="rounded bg-surface/50 px-1 text-xs text-on-surface">{blur.label}</span>
         </div>
       </button>
     );
@@ -143,7 +144,7 @@ function CustomColorPreview({
         >
           <span className="absolute inset-0" style={{ background: CUSTOM_COLOR_SWATCH_BACKGROUND }} />
           <span
-            className="absolute right-1 bottom-1 size-5 rounded-sm border border-white/70 shadow-sm"
+            className="absolute right-1 bottom-1 size-5 rounded-sm border border-on-surface/70 shadow-sm"
             style={{ backgroundColor: currentBackgroundColor }}
           />
         </button>

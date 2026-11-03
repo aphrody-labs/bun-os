@@ -1,3 +1,6 @@
 vendor/
 node_modules/
 build/
+packages/m3-design/intelligence/ui-ux-pro-max/data/
+packages/m3-design/skill/
+packages/m3-design/test/fixtures/

@@ -300,7 +300,7 @@ export const textMaskDefinition: MaskDefinition<"text"> = {
       params: {
         feather: 0,
         inverted: false,
-        strokeColor: "#ffffff",
+        strokeColor: "#ffffff", // design:content: mask pixels and default stroke (document data)
         strokeWidth: 0,
         strokeAlign: "center",
         content: "Mask",
@@ -338,7 +338,7 @@ export const textMaskDefinition: MaskDefinition<"text"> = {
         drawMeasuredTextLayout({
           ctx,
           layout,
-          textColor: "#ffffff",
+          textColor: "#ffffff", // design:content
           background: null,
         });
         ctx.restore();
@@ -369,7 +369,7 @@ export const textMaskDefinition: MaskDefinition<"text"> = {
           drawMeasuredTextLayout({
             ctx,
             layout,
-            textColor: "#ffffff",
+            textColor: "#ffffff", // design:content
             background: null,
           });
         }
@@ -379,7 +379,7 @@ export const textMaskDefinition: MaskDefinition<"text"> = {
           drawMeasuredTextLayout({
             ctx,
             layout,
-            textColor: "#ffffff",
+            textColor: "#ffffff", // design:content
             background: null,
           });
         }

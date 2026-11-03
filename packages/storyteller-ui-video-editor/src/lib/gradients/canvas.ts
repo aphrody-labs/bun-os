@@ -709,7 +709,7 @@ const fixTransparentStops = ({
     }
 
     if (donorColor) {
-      result[i].color = `rgba(${donorColor.r},${donorColor.g},${donorColor.b},0)`;
+      result[i].color = `rgba(${donorColor.r},${donorColor.g},${donorColor.b},0)`; // design:content: serialises document gradient stops
     }
   }
 
@@ -833,19 +833,19 @@ const colorToString = ({ color }: { color: Color }): string => {
   }
 
   if (color.type === "rgb") {
-    return `rgb(${color.value.join(",")})`;
+    return `rgb(${color.value.join(",")})`; // design:content
   }
 
   if (color.type === "rgba") {
-    return `rgba(${color.value.join(",")})`;
+    return `rgba(${color.value.join(",")})`; // design:content
   }
 
   if (color.type === "hsl") {
-    return `hsl(${color.value.join(",")})`;
+    return `hsl(${color.value.join(",")})`; // design:content
   }
 
   if (color.type === "hsla") {
-    return `hsla(${color.value.join(",")})`;
+    return `hsla(${color.value.join(",")})`; // design:content
   }
 
   return `var(${color.value})`;

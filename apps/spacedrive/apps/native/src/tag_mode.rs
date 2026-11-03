@@ -200,7 +200,7 @@ fn render_slot(index: usize, slot: Slot, on_toggle: ToggleHandler, cx: &App) -> 
 				.min_w(px(16.0))
 				.px(px(4.0))
 				.rounded(px(3.0))
-				.bg(theme.black.opacity(0.2))
+				.bg(theme.app_shade.opacity(0.2))
 				.flex()
 				.justify_center()
 				.text_size(px(10.0))

@@ -191,11 +191,9 @@ export const BoardGridView = ({ active, adapter }: Props) => {
 
   return (
     <div
-      className="relative h-full w-full overflow-hidden"
-      // Matches MoodboardWorkspace: desktop themes drive --st-bg, the webapp
-      // falls back to its --background token (#171717). overflow-hidden keeps
-      // the view root from ever scrolling — the grid scrolls internally.
-      style={{ background: "var(--st-bg, hsl(0 0% 9%))" }}
+      className="relative h-full w-full overflow-hidden bg-surface"
+      // overflow-hidden keeps the view root from ever scrolling; the grid
+      // scrolls internally.
       onDragOver={e => {
         if (e.dataTransfer.types.includes("Files")) {
           e.preventDefault();

@@ -1,6 +1,6 @@
 ---
 name: ui-ux-pro-max
-description: "UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 123 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, 2 Aphrody brand themes, and 23 stacks (including Bun OS Material 3)."
+description: "UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 123 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, 4 Aphrody brand themes generated from the M3 token engine, and 25 stacks (including Bun OS Material 3, iced/libcosmic and egui)."
 ---
 
 # UI/UX Pro Max - Design Intelligence
@@ -8,18 +8,35 @@ description: "UI/UX design intelligence for web, mobile, and desktop. This skill
 ## Bun OS and Aphrody Labs Material 3 contract
 
 For Bun OS and Aphrody Labs product work, apply this guidance through the
-existing shared Material 3 system. Treat `@aphrody/m3-tokens`,
-`@aphrody/m3-theme`, `@aphrody/m3-react`, and `@aphrody/m3-design` as the
-canonical owners for roles, themes, components, and generated layouts. Prefer
-their semantic tokens and components over raw color values or a parallel
-palette. Select the bundled `m3` stack guidance for M3 product interfaces, and
-use the stack-specific guidance only when the target platform calls for it.
+existing shared Material 3 system. Bun OS has one theme, Material 3 generated
+from one seed by one engine; `docs/THEMES.md` in the Bun OS checkout maps each
+stack to its owner. The canonical owners are:
+
+- `crates/aphrody-m3-tokens`: the token engine (HCT/CAM16, the 49 colour roles,
+  shape, type, motion, elevation, state layers) behind every adapter;
+- `@aphrody/m3-tokens` (its WebAssembly build) and `@aphrody/m3-theme`: web
+  roles, sheets and the shadcn/Tailwind bridge; `@aphrody/m3-tailwind`: the
+  Tailwind v4 CSS-first preset;
+- `@aphrody/m3-react` and `@aphrody/m3-baseui`: React components bound to the
+  system tokens; `@aphrody/m3-design`: generated layouts and this skill;
+- `crates/libm3`: native iced/libcosmic (and Bevy) apps, panels and shell
+  surfaces; `crates/craft-ui` (`craft_ui::theme::aphrody`): egui editors;
+- `packages/m3-os-themes`: Flutter, Compose, COSMIC, GTK, Windows and terminal
+  themes from the same `ThemeExport`.
+
+Prefer their semantic tokens and components over raw color values or a parallel
+palette. Select the bundled `m3` stack guidance for M3 product interfaces,
+`iced-libcosmic` for native Rust UI and `egui` for the Craft editors, and use
+the other stack guidance only when the target platform calls for it. The
+`brand` domain rows are generated from the token engine: `aphrody-product-light`
+and `aphrody-product-dark` (the Bun OS product seed) and `m3-baseline-light`
+and `m3-baseline-dark` (the M3 baseline seed).
 
 The guidance below remains the broader UI/UX reference catalog; this product
 contract binds its recommendations to the Bun OS and Aphrody Labs M3 design
 system.
 
-UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 123 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, 2 Aphrody brand themes, and 23 stacks (including Bun OS Material 3).
+UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 123 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, 4 Aphrody brand themes generated from the M3 token engine, and 25 stacks (including Bun OS Material 3, iced/libcosmic and egui).
 
 ## When to Apply
 
@@ -388,6 +405,8 @@ Write each query around **one dominant intent**, using **2–5 meaningful terms*
 For accessibility work, search one observable outcome at a time and use explicit accessibility outcome terms. Query the semantic outcome first (`"error summary validation" --domain ux`), then a component-specific domain if needed (`"decorative icon aria hidden" --domain icons` or `"icon button accessible label" --domain icons`), and only then the implementation stack. Other useful outcome queries include `"focus not obscured" --domain ux`, `"dragging movements" --domain ux`, and `"accessible authentication" --domain ux`.
 Do not accept a generic accessibility result for a specific interaction or WCAG criterion.
 
+For right-to-left interfaces (Arabic, Hebrew, Persian, Urdu, or an explicit `dir="rtl"` / `rtl:` request), add `--rtl` to the `style` and `product` searches and respect the returned `rtl_level`: `full` needs no directional rework, `partial` mirrors but requires per-component checks (icons, carousels, motion paths, charts), and `caveats` means the style or product encodes reading direction — say so before recommending it, and propose a mirrorable alternative when the user needs a strict RTL build. `--rtl=full` restricts the search to the safest rows; `--rtl` alone keeps every level.
+
 For text-layout and compact-component bugs, search the **semantic UX outcome first, then the detected stack** for implementation details. Useful outcome queries include `"orphan heading line balance" --domain ux`, `"badge chip label wraps" --domain ux`, `"live badge count screen reader" --domain ux`, and `"rapid chip animation interrupted" --domain ux`. After choosing the applicable UX guidance, use a separate stack query such as `"chip badge overflow nowrap" --stack html-tailwind`; do not replace the outcome search with a framework keyword.
 
 Before using a result, verify the returned domain/category, top result identity, and whether its guidance fits the user's product and platform. **Retry once** with a narrower rewrite or an explicit domain/stack when the result is empty or off-topic. If the retry still fails, state that no verified match was found and use clearly labeled general guidance instead. **Do not persist unverified output.**
@@ -504,21 +523,22 @@ bun scripts/search.ts "<keyword>" --domain <domain> [-n <max_results>]
 
 **When to use detailed searches:**
 
-| Need                          | Domain         | Example                                              |
-| ----------------------------- | -------------- | ---------------------------------------------------- |
-| Product type patterns         | `product`      | `"entertainment social" --domain product`            |
-| More style options            | `style`        | `"glassmorphism dark" --domain style`                |
-| Color palettes                | `color`        | `"entertainment vibrant" --domain color`             |
-| Font pairings                 | `typography`   | `"playful modern" --domain typography`               |
-| Chart recommendations         | `chart`        | `"real-time dashboard" --domain chart`               |
-| UX best practices             | `ux`           | `"error summary validation" --domain ux`             |
-| Landing structure             | `landing`      | `"hero social-proof" --domain landing`               |
-| React/Next.js performance     | `react`        | `"rerender memo list" --domain react`                |
-| Native/app interface guidance | `web`          | `"accessibilityLabel touch safe-areas" --domain web` |
-| Icon suggestions              | `icons`        | `"decorative icon aria hidden" --domain icons`       |
-| Individual Google Fonts       | `google-fonts` | `"variable sans serif" --domain google-fonts`        |
-| GSAP animation snippets       | `gsap`         | `"scroll reveal stagger" --domain gsap`              |
-| Aphrody brand tokens          | `brand`        | `"m3 baseline dark" --domain brand`                  |
+| Need                          | Domain             | Example                                              |
+| ----------------------------- | ------------------ | ---------------------------------------------------- |
+| Product type patterns         | `product`          | `"entertainment social" --domain product`            |
+| More style options            | `style`            | `"glassmorphism dark" --domain style`                |
+| Color palettes                | `color`            | `"entertainment vibrant" --domain color`             |
+| Font pairings                 | `typography`       | `"playful modern" --domain typography`               |
+| Chart recommendations         | `chart`            | `"real-time dashboard" --domain chart`               |
+| UX best practices             | `ux`               | `"error summary validation" --domain ux`             |
+| Landing structure             | `landing`          | `"hero social-proof" --domain landing`               |
+| React/Next.js performance     | `react`            | `"rerender memo list" --domain react`                |
+| Native/app interface guidance | `web`              | `"accessibilityLabel touch safe-areas" --domain web` |
+| Icon suggestions              | `icons`            | `"decorative icon aria hidden" --domain icons`       |
+| Individual Google Fonts       | `google-fonts`     | `"variable sans serif" --domain google-fonts`        |
+| GSAP animation snippets       | `gsap`             | `"scroll reveal stagger" --domain gsap`              |
+| Aphrody brand tokens          | `brand`            | `"m3 baseline dark" --domain brand`                  |
+| RTL compatibility             | `style`, `product` | `"dashboard" --domain style --rtl=full`              |
 
 ### Step 4: Stack Guidelines
 
@@ -554,13 +574,13 @@ bun scripts/search.ts "virtualized list" --stack react-native
 | `web`          | App interface guidelines (iOS/Android/React Native) | accessibilityLabel, touch targets, safe areas, Dynamic Type |
 | `icons`        | Icon recommendations with import code               | arrow, navigation, lucide, phosphor                         |
 | `google-fonts` | Individual Google Fonts lookup                      | sans serif, monospace, japanese, variable font, popular     |
-| `brand`        | Aphrody brand themes extracted from the real M3 CSS | m3 baseline light, m3 baseline dark                         |
+| `brand`        | Aphrody brand themes generated by the M3 engine     | bun os product light/dark, m3 baseline light/dark           |
 
 ### Available Stacks
 
-`react`, `nextjs`, `vue`, `svelte`, `astro`, `swiftui`, `react-native`, `flutter`, `nuxtjs`, `nuxt-ui`, `html-tailwind`, `shadcn`, `jetpack-compose`, `threejs`, `angular`, `laravel`, `javafx`, `wpf`, `winui`, `avalonia`, `uno`, `uwp`, `m3`
+`react`, `nextjs`, `vue`, `svelte`, `astro`, `swiftui`, `react-native`, `flutter`, `nuxtjs`, `nuxt-ui`, `html-tailwind`, `shadcn`, `jetpack-compose`, `threejs`, `angular`, `laravel`, `javafx`, `wpf`, `winui`, `avalonia`, `uno`, `uwp`, `m3`, `iced-libcosmic`, `egui`
 
-**Bun OS / Aphrody stacks:** `m3` covers Material 3 in the Bun OS monorepo (`@aphrody/m3-tokens`, the `m3*` packages, material-web, the `m3` theme of `@aphrody/bun-plugin-tailwind`). For the exact brand tokens use the `brand` domain or `--design-system --brand <brand-id>`.
+**Bun OS / Aphrody stacks:** `m3` covers Material 3 in the Bun OS monorepo (`crates/aphrody-m3-tokens`, `@aphrody/m3-tokens`, the `m3*` packages, material-web, the `m3` theme of `@aphrody/bun-plugin-tailwind`). `iced-libcosmic` covers native Rust apps and shell surfaces through `crates/libm3` (feature `cosmic`), and `egui` the Craft editors through `crates/craft-ui`. For the exact brand tokens use the `brand` domain or `--design-system --brand <brand-id>` (`aphrody-product-light`, `aphrody-product-dark`, `m3-baseline-light`, `m3-baseline-dark`).
 
 **JavaFX enterprise examples:**
 

@@ -38,7 +38,7 @@ const SliderWithIndicator: React.FC<SliderWithIndicatorProps> = ({
 
   return (
     <div className="relative">
-      {label && <p className="mb-2 text-sm font-medium text-white">{label}</p>}
+      {label && <p className="mb-2 text-sm font-medium text-on-surface">{label}</p>}
       <div className="relative">
         <input
           ref={sliderRef}
@@ -61,7 +61,7 @@ const SliderWithIndicator: React.FC<SliderWithIndicatorProps> = ({
               bg-ui-controls
               px-2 py-1
               text-xs font-medium
-              text-white shadow-lg
+              text-on-surface shadow-lg
               transition-all
               duration-150 after:absolute after:-top-1.5 after:left-1/2 after:-translate-x-1/2
             "

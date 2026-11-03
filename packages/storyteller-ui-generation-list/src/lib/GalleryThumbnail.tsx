@@ -39,7 +39,7 @@ export function GalleryThumbnail({
   isVideo,
   fallbackIcon,
   imgClassName = "block h-full w-full object-cover",
-  fallbackIconClassName = "text-xl text-white/20",
+  fallbackIconClassName = "text-xl text-on-surface/20",
   showRetryLabel = true,
   onLoad,
 }: GalleryThumbnailProps) {
@@ -67,8 +67,8 @@ export function GalleryThumbnail({
   if (videoState?.status === "pending") {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center gap-2">
-        <LoaderCircleIcon className="animate-spin text-lg text-white/30" />
-        {showRetryLabel && <span className="text-[10px] text-white/30">Loading thumbnail…</span>}
+        <LoaderCircleIcon className="animate-spin text-lg text-on-surface/30" />
+        {showRetryLabel && <span className="text-[10px] text-on-surface/30">Loading thumbnail…</span>}
       </div>
     );
   }

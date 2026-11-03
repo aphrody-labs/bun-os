@@ -110,7 +110,7 @@ export function WslGlobalSettings() {
       <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
               <CPUIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
@@ -162,7 +162,7 @@ export function WslGlobalSettings() {
       <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
               <SettingsIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
@@ -199,7 +199,7 @@ export function WslGlobalSettings() {
       <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
               <GpuIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
@@ -219,7 +219,7 @@ export function WslGlobalSettings() {
       <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
               <NetworkIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
@@ -235,7 +235,7 @@ export function WslGlobalSettings() {
                 value={config.networkingMode || "NAT"}
                 onChange={(e) => updateConfig("networkingMode", e.target.value)}
                 data-testid="wsl-networking-mode-select"
-                className="w-full px-3 py-2 bg-surface-container-low/50 border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-tertiary"
+                className="w-full px-3 py-2 bg-surface-container-low/50 border border-outline-variant rounded-lg text-on-surface focus:border-tertiary"
               >
                 <option value="NAT">{t('wslGlobal.natDefault')}</option>
                 <option value="mirrored">{t('wslGlobal.mirrored')}</option>
@@ -271,7 +271,7 @@ export function WslGlobalSettings() {
       <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
               <DownloadIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
@@ -313,7 +313,7 @@ export function WslGlobalSettings() {
             onClick={handleSave}
             disabled={isSaving}
             data-testid="wsl-save-button"
-            className="px-6 py-3 bg-primary hover:opacity-90 text-on-primary font-medium rounded-lg shadow-lg shadow-shadow/30 transition-colors disabled:opacity-50"
+            className="px-6 py-3 bg-primary state-layer text-on-primary font-medium rounded-lg shadow-md3-1 transition-colors disabled:opacity-50"
           >
             {isSaving ? t('wslGlobal.saving') : error ? t('wslGlobal.retrySave') : t('wslGlobal.saveChanges')}
           </button>

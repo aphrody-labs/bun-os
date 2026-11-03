@@ -166,13 +166,13 @@ export function SettingSection({
                     onChange={(e) => setCustomCommandInput(e.target.value)}
                     placeholder={customPlaceholder}
                     data-testid={testId ? `${testId}-custom-input` : undefined}
-                    className="flex-1 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary"
+                    className="flex-1 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:border-primary"
                   />
                   <button
                     onClick={handleCustomCommandSave}
                     disabled={!customCommandInput.trim() || customCommandInput.trim() === savedCustomValue}
                     data-testid={testId ? `${testId}-custom-save` : undefined}
-                    className="px-4 py-2 bg-primary hover:opacity-90 text-on-primary font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-primary state-layer text-on-primary font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {t('common:button.save')}
                   </button>

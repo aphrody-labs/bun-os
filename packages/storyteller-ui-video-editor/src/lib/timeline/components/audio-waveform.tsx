@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useCommittedRef } from "../../hooks/use-committed-ref";
 import { useResizeObserver } from "../../hooks/use-resize-observer";
-import { TIMELINE_AUDIO_WAVEFORM_COLOR } from "./theme";
+import { TIMELINE_AUDIO_WAVEFORM_CLASS } from "./theme";
 import {
   buildWaveformSampleBuckets,
   sampleSourceWaveformSummary,
@@ -18,7 +18,6 @@ import { cn } from "../../utils/ui";
 const BAR_WIDTH = 1;
 const BAR_GAP = 1;
 const BAR_STEP = BAR_WIDTH + BAR_GAP;
-const WAVEFORM_BURN_COLOR = "rgba(255, 110, 20, 0.9)";
 export const WAVEFORM_GAIN_SAMPLE_COUNT = 200;
 
 function sampleGainAtClipTime({
@@ -51,6 +50,7 @@ interface AudioWaveformProps {
   clipDurationSec: number;
   retime?: RetimeConfig;
   sourceStartSec: number;
+  /** Overrides the role colours the canvas reads from its own styles. */
   color?: string;
   burnColor?: string;
   className?: string;
@@ -66,8 +66,8 @@ export function AudioWaveform({
   clipDurationSec,
   retime,
   sourceStartSec,
-  color = TIMELINE_AUDIO_WAVEFORM_COLOR,
-  burnColor = WAVEFORM_BURN_COLOR,
+  color,
+  burnColor,
   className = "",
 }: AudioWaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -144,9 +144,14 @@ export function AudioWaveform({
       clipDurationSec: clipDurationSecValue,
       retime: retimeValue,
       sourceStartSec: sourceStartSecValue,
-      color: colorValue,
-      burnColor: burnColorValue,
+      color: colorOverride,
+      burnColor: burnColorOverride,
     } = waveformConfigRef.current;
+    // The canvas carries the role classes: bars use its text colour
+    // (on-surface-variant), the clipping marks its border colour (warning).
+    const canvasStyle = getComputedStyle(canvas);
+    const colorValue = colorOverride ?? canvasStyle.color;
+    const burnColorValue = burnColorOverride ?? canvasStyle.borderTopColor;
     const dpr = window.devicePixelRatio || 1;
     const canvasW = Math.max(1, Math.ceil(visibleWidth * dpr));
     const canvasH = Math.max(1, Math.round(height * dpr));
@@ -317,7 +322,7 @@ export function AudioWaveform({
 
   return (
     <div ref={containerRef} className={cn("relative size-full", className)}>
-      <canvas ref={canvasRef} className="absolute bottom-0" />
+      <canvas ref={canvasRef} className={cn("absolute bottom-0 border-warning", TIMELINE_AUDIO_WAVEFORM_CLASS)} />
     </div>
   );
 }

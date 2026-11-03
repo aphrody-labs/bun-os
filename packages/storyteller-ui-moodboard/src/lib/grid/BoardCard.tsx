@@ -92,7 +92,7 @@ const BoardCardInner = ({
       tabIndex={tabStop ? 0 : -1}
       aria-label={label}
       aria-pressed={selected}
-      className="group absolute rounded-[18px] transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-ui-panel motion-reduce:transition-none"
+      className="group absolute rounded-[18px] transition-[opacity,transform] duration-300 ease-[var(--md-sys-motion-easing-standard)] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-ui-panel motion-reduce:transition-none"
       style={{
         left: pos.x,
         top: pos.y,
@@ -117,19 +117,19 @@ const BoardCardInner = ({
       <div
         className={[
           "h-full w-full rounded-[18px] p-1 transition-all duration-200",
-          "ease-[cubic-bezier(0.4,0,0.2,1)]",
+          "ease-[var(--md-sys-motion-easing-standard)]",
           "ring-1 group-hover:-translate-y-0.5",
-          "bg-[var(--mb-plane-1,rgba(127,127,127,0.04))]",
+          "bg-surface-container-low",
           selected
             ? "ring-2 ring-primary"
-            : "ring-[var(--mb-hairline,rgba(127,127,127,0.12))] group-hover:ring-[var(--mb-hairline,rgba(127,127,127,0.22))]",
+            : "ring-outline-variant group-hover:ring-outline",
           selected
-            ? "shadow-[0_8px_28px_-10px_rgba(0,0,0,0.45)]"
-            : "shadow-[0_1px_2px_rgba(0,0,0,0.10)] group-hover:shadow-[0_10px_30px_-12px_rgba(0,0,0,0.4)]",
+            ? "shadow-[var(--md-sys-elevation-level3)]"
+            : "shadow-[var(--md-sys-elevation-level1)] group-hover:shadow-[var(--md-sys-elevation-level4)]",
         ].join(" ")}
       >
         {/* Inner core — concentric radius, holds the content. */}
-        <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-ui-panel shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]">
+        <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-ui-panel">
           <CardContent item={item} editing={editing} onCommitText={onCommitText} />
 
           {/* Rating — persistent when set (Lightroom-style triage marker).
@@ -137,12 +137,12 @@ const BoardCardInner = ({
               container, where blur filters trigger GPU repaints on every
               scroll frame. A solid scrim keeps the icons legible instead. */}
           {item.rating > 0 && (
-            <div className="absolute bottom-2 left-2 flex items-center gap-0.5 rounded-full bg-black/65 px-2 py-1">
+            <div className="absolute bottom-2 left-2 flex items-center gap-0.5 rounded-full bg-surface/65 px-2 py-1">
               {Array.from({ length: item.rating }).map((_, i) => (
                 <StarIcon
                   key={i}
 
-                  className="h-2.5 w-2.5 text-yellow-400"
+                  className="h-2.5 w-2.5 text-warning"
                 />
               ))}
             </div>
@@ -154,8 +154,8 @@ const BoardCardInner = ({
               "absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full",
               "border transition-all duration-150",
               selected
-                ? "border-primary bg-primary text-white opacity-100"
-                : "border-white/40 bg-black/45 text-white/0 opacity-0 group-hover:opacity-100",
+                ? "border-primary bg-primary text-on-primary opacity-100"
+                : "border-outline bg-surface/45 text-on-surface/0 opacity-0 group-hover:opacity-100",
             ].join(" ")}
           >
             <CheckIcon className="h-3 w-3" />
@@ -163,7 +163,7 @@ const BoardCardInner = ({
 
           {/* Action rail — solid scrim pill (no blur in the scroll container),
               fades up on hover. */}
-          <div className="absolute right-2 top-2 flex translate-y-1 items-center gap-1 rounded-full border border-white/15 bg-black/65 p-0.5 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+          <div className="absolute right-2 top-2 flex translate-y-1 items-center gap-1 rounded-full border border-outline-variant bg-surface/65 p-0.5 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
             <RailButton label="Open" icon={Maximize2Icon} onClick={() => onOpen(item.id)} />
             {item.kind === "image" && (
               <RailButton label="Use as reference" icon={WandSparklesIcon} onClick={() => onUseReference(item.id)} />
@@ -181,7 +181,7 @@ const RailButton = ({ label, icon, onClick }: { label: string; icon: typeof Chec
     type="button"
     aria-label={label}
     title={label}
-    className="flex h-7 w-7 items-center justify-center rounded-full text-white/85 transition-colors duration-150 hover:bg-white/15 hover:text-white focus:outline-none focus-visible:bg-white/15 focus-visible:text-white focus-visible:ring-2 focus-visible:ring-white/70"
+    className="flex h-7 w-7 items-center justify-center rounded-full text-on-surface/85 transition-colors duration-150 hover:bg-on-surface/15 hover:text-on-surface focus:outline-none focus-visible:bg-on-surface/15 focus-visible:text-on-surface focus-visible:ring-2 focus-visible:ring-on-surface/70"
     onPointerDown={e => e.stopPropagation()}
     onClick={e => {
       e.stopPropagation();
@@ -226,7 +226,7 @@ const CardContent = ({
     case "color":
       return (
         <div className="h-full w-full" style={{ background: item.color }}>
-          <span className="absolute bottom-2 left-2 rounded-full bg-black/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur">
+          <span className="absolute bottom-2 left-2 rounded-full bg-surface/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-on-surface backdrop-blur">
             {item.color}
           </span>
         </div>

@@ -75,7 +75,7 @@ export const BoardPicker = () => {
       </button>
 
       {open && (
-        <div className="glass absolute left-0 top-full z-50 mt-1.5 w-64 rounded-2xl border border-ui-divider p-1.5 shadow-[0_12px_32px_-12px_rgba(0,0,0,0.6)]">
+        <div className="glass absolute left-0 top-full z-50 mt-1.5 w-64 rounded-2xl border border-ui-divider p-1.5 shadow-[var(--md-sys-elevation-level3)]">
           <div className="max-h-72 overflow-y-auto">
             {orderedBoards.map(board => (
               <div
@@ -97,7 +97,7 @@ export const BoardPicker = () => {
                   title={`Delete ${board.name}`}
                   aria-label={`Delete ${board.name}`}
                   onClick={() => void handleDelete(board.id)}
-                  className="mr-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-base-fg/40 opacity-0 transition-opacity hover:bg-red-500/20 hover:text-red-400 focus:opacity-100 group-hover:opacity-100"
+                  className="mr-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-base-fg/40 opacity-0 transition-opacity hover:bg-error/20 hover:text-error focus:opacity-100 group-hover:opacity-100"
                 >
                   <Trash2Icon className="h-3 w-3" />
                 </button>

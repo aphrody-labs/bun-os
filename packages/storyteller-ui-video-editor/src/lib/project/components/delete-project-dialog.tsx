@@ -49,7 +49,7 @@ export function DeleteProjectDialog({
             </AlertDescription>
           </Alert>
           <div className="flex flex-col gap-3">
-            <Label className="text-xs font-semibold text-slate-500">Type "DELETE" to confirm</Label>
+            <Label className="text-xs font-semibold text-on-surface-variant">Type "DELETE" to confirm</Label>
             <Input type="text" placeholder="DELETE" size="lg" variant="destructive" />
           </div>
         </DialogBody>

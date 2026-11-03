@@ -15,7 +15,7 @@ export const PrecisionSelector = () => {
 
   return (
     <div
-      className="fixed z-50 bg-red-600 -translate-x-1/2 -translate-y-1/2 flex-col gap-[1px] shadow-md bg-ui-divider border-ui-divider border-2 rounded-md overflow-clip"
+      className="fixed z-50 bg-error -translate-x-1/2 -translate-y-1/2 flex-col gap-[1px] shadow-md bg-ui-divider border-ui-divider border-2 rounded-md overflow-clip"
       style={{
         top: coords.y,
         left: coords.x,
@@ -27,7 +27,7 @@ export const PrecisionSelector = () => {
         <span
           onMouseEnter={() => handleMouseEnterItem(scale)}
           key={index}
-          className="flex bg-ui-controls text-sm justify-center align-middle justify-items-center px-2 hover:bg-white/10"
+          className="flex bg-ui-controls text-sm justify-center align-middle justify-items-center px-2 hover:bg-on-surface/10"
         >
           {scale}
         </span>

@@ -48,6 +48,11 @@ pub fn to_bevy(color: M3Color) -> ::bevy::prelude::Color {
     ::bevy::prelude::Color::srgba_u8(r, g, b, a)
 }
 
+/// One semantic role of a libm3 theme as a Bevy colour.
+pub fn color(theme: &Theme, role: Role) -> ::bevy::prelude::Color {
+    to_bevy(theme.colors.get(role))
+}
+
 /// The live theme: the current M3 theme (possibly mid re-tint), its seed request and the display
 /// scale (1.0 desktop, 1.25 for 10-foot viewing). Hosts re-seed it from art ([`M3Theme::retint`])
 /// or replace the scheme resolved by the platform layer ([`M3Theme::set_hex_roles`]).

@@ -153,11 +153,11 @@ export const GalleryCard = memo(function GalleryCard({
         }}
       >
         {isAudio ? (
-          <div className="flex h-full flex-col bg-gradient-to-br from-white/[0.08] via-white/[0.04] to-white/[0.02] p-3">
-            <p className="line-clamp-2 shrink-0 text-sm leading-snug text-white/85">{title || item.label}</p>
+          <div className="flex h-full flex-col bg-gradient-to-br from-on-surface/[0.08] via-on-surface/[0.04] to-on-surface/[0.02] p-3">
+            <p className="line-clamp-2 shrink-0 text-sm leading-snug text-on-surface/85">{title || item.label}</p>
             <div className="flex min-h-0 flex-1 items-center justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15">
-                <MusicIcon className="text-xl text-white/70" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-on-surface/10 ring-1 ring-on-surface/15">
+                <MusicIcon className="text-xl text-on-surface/70" />
               </div>
             </div>
             {item.fullImage && (
@@ -182,7 +182,7 @@ export const GalleryCard = memo(function GalleryCard({
       {selectMode && item.fullImage && (
         <div
           className={`pointer-events-none absolute left-2 top-2 z-10 flex h-5 w-5 items-center justify-center rounded-[3px] border transition-colors ${
-            selected ? "border-primary-400 bg-primary-400 text-white" : "border-white/60 bg-black/40 text-transparent"
+            selected ? "border-primary-400 bg-primary-400 text-on-primary" : "border-outline bg-surface/40 text-transparent"
           }`}
         >
           <CheckIcon className="text-[10px]" />
@@ -193,21 +193,21 @@ export const GalleryCard = memo(function GalleryCard({
           in the lightbox). Top-right so it never collides with the selection
           checkbox chip at top-left. */}
       {lastViewed && (
-        <div className="pointer-events-none absolute right-2 top-2 z-10 flex items-center gap-1 rounded-[3px] bg-black/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white/80">
+        <div className="pointer-events-none absolute right-2 top-2 z-10 flex items-center gap-1 rounded-[3px] bg-surface/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-on-surface/80">
           <EyeIcon />
           Last viewed
         </div>
       )}
 
       {/* Hover overlay with media type + model badges and quick actions */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t rounded-b-[3px] from-black/70 to-transparent px-2 pb-2 pt-6 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t rounded-b-[3px] from-surface/70 to-transparent px-2 pb-2 pt-6 opacity-0 transition-opacity group-hover:opacity-100">
         <div className="pointer-events-auto flex min-w-0 flex-wrap items-center gap-1.5">
-          <div className="flex items-center gap-1.5 bg-black/60 px-2.5 py-1 text-xs font-medium text-white/90">
+          <div className="flex items-center gap-1.5 bg-surface/60 px-2.5 py-1 text-xs font-medium text-on-surface/90">
             <DynamicIcon icon={mediaIcon} className="text-[10px]" />
             {mediaLabel}
           </div>
           {modelDisplayName && modelIconPath && (
-            <div className="flex items-center gap-1 bg-black/60 px-2 py-1 text-[10px] text-white/80">
+            <div className="flex items-center gap-1 bg-surface/60 px-2 py-1 text-[10px] text-on-surface/80">
               <img src={modelIconPath} alt="" className="h-3 w-3 icon-auto-contrast" />
               <span className="max-w-[100px] truncate">{modelDisplayName}</span>
             </div>
@@ -215,7 +215,7 @@ export const GalleryCard = memo(function GalleryCard({
         </div>
 
         {actionsSlot && !selectMode && (
-          <div className="pointer-events-auto flex shrink-0 items-center gap-0.5 rounded-[3px] bg-black/60 p-1 backdrop-blur-sm">
+          <div className="pointer-events-auto flex shrink-0 items-center gap-0.5 rounded-[3px] bg-surface/60 p-1 backdrop-blur-sm">
             {actionsSlot}
           </div>
         )}

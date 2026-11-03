@@ -45,6 +45,7 @@ import { CharactersModal } from "./CharactersModal";
 import { CharactersApi } from "@storyteller/api";
 import { MentionTextarea } from "./MentionTextarea";
 import type { MentionItem } from "./MentionTextarea";
+import { buildMentionColorMap } from "./mentionColors";
 import { PromptFullscreenModal, useFullscreenPrompt } from "./PromptFullscreenModal";
 import { PromptFullscreenButton } from "./PromptFullscreenButton";
 import { PromptClearAllButton } from "./PromptClearAllButton";
@@ -732,36 +733,11 @@ export const PromptBoxVideo = ({
     />
   );
 
-  // Color palettes for @-mention highlights
-  const IMAGE_COLORS = [
-    "rgb(96, 165, 250)", // blue
-    "rgb(251, 146, 60)", // orange
-    "rgb(167, 139, 250)", // purple
-    "rgb(52, 211, 153)", // green
-    "rgb(251, 113, 133)", // pink
-  ];
-  const VIDEO_COLORS = [
-    "rgb(250, 204, 21)", // yellow
-    "rgb(245, 158, 11)", // amber
-  ];
-  const AUDIO_COLORS = [
-    "rgb(192, 132, 252)", // violet
-    "rgb(232, 121, 249)", // fuchsia
-  ];
-  const CHARACTER_COLORS = [
-    "rgb(45, 212, 191)", // teal
-    "rgb(34, 197, 94)", // emerald
-    "rgb(14, 165, 233)", // sky
-  ];
-
   const hasAnyRefs = referenceImages.length > 0 || referenceVideos.length > 0 || referenceAudios.length > 0;
 
   // Characters are only supported for seedance_2p0
   const isSeedance2p0 = selectedModel?.id === "seedance_2p0";
   const activeCharacters = isSeedance2p0 ? storedCharacters : EMPTY_CHARACTERS;
-
-  // Build a set of character names for highlight matching
-  const characterNames = useMemo(() => activeCharacters.map(c => c.name), [activeCharacters]);
 
   const hasAnyMentionables = hasAnyRefs || activeCharacters.length > 0;
 
@@ -840,37 +816,7 @@ export const PromptBoxVideo = ({
   }, []);
 
   // Build label → color map for inline mention highlighting
-  const mentionColorMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    for (const item of allMentionItems) {
-      const imgMatch = item.label.match(/^@Image(\d+)$/);
-      if (imgMatch) {
-        const idx = parseInt(imgMatch[1]) - 1;
-        map[item.label] = IMAGE_COLORS[idx % IMAGE_COLORS.length];
-        continue;
-      }
-      const vidMatch = item.label.match(/^@Video(\d+)$/);
-      if (vidMatch) {
-        const idx = parseInt(vidMatch[1]) - 1;
-        map[item.label] = VIDEO_COLORS[idx % VIDEO_COLORS.length];
-        continue;
-      }
-      const audMatch = item.label.match(/^@Audio(\d+)$/);
-      if (audMatch) {
-        const idx = parseInt(audMatch[1]) - 1;
-        map[item.label] = AUDIO_COLORS[idx % AUDIO_COLORS.length];
-        continue;
-      }
-      if (item.type === "character") {
-        const charName = item.label.slice(1);
-        const charIdx = characterNames.indexOf(charName);
-        if (charIdx !== -1) {
-          map[item.label] = CHARACTER_COLORS[charIdx % CHARACTER_COLORS.length];
-        }
-      }
-    }
-    return map;
-  }, [allMentionItems, characterNames]);
+  const mentionColorMap = useMemo(() => buildMentionColorMap(allMentionItems), [allMentionItems]);
 
   const insertMention = (label: string) => {
     const textarea = textareaRef.current;
@@ -1278,7 +1224,7 @@ export const PromptBoxVideo = ({
               )}
               <PromptFullscreenButton onClick={openFullscreen} />
               <span
-                className={`pointer-events-none absolute -bottom-1 right-4 text-[10px] tabular-nums ${isFinite(maxLen) && prompt.length > maxLen ? "text-red-500" : "text-base-fg/40"}`}
+                className={`pointer-events-none absolute -bottom-1 right-4 text-[10px] tabular-nums ${isFinite(maxLen) && prompt.length > maxLen ? "text-error" : "text-base-fg/40"}`}
               >
                 {prompt.length} / {isFinite(maxLen) ? maxLen : "∞"}
               </span>
@@ -1395,7 +1341,7 @@ export const PromptBoxVideo = ({
             </div>
             <div className="flex items-center gap-1.5">
               {modelNeedsAnImageButNoneAreSelected && (
-                <span className="flex items-center gap-1.5 text-xs text-red-500 font-medium animate-pulse">
+                <span className="flex items-center gap-1.5 text-xs text-error font-medium animate-pulse">
                   <InfoIcon />
                   Starting frame required
                 </span>
@@ -1443,8 +1389,8 @@ export const PromptBoxVideo = ({
           </div>
         </div>
         {/* {selectedModel?.id === "seedance_2p0" && (
-          <div className="flex items-start gap-2.5 rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3.5 py-2.5 text-xs text-yellow-200">
-            <TriangleAlertIcon className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-yellow-400" />
+          <div className="flex items-start gap-2.5 rounded-lg border border-warning/40 bg-warning/10 px-3.5 py-2.5 text-xs text-warning">
+            <TriangleAlertIcon className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-warning" />
             <span>
               Seedance 2.0 is in Early Alpha. Generations may be slow, and may
               experience outages. Seedance may reject safe inputs unexpectedly.

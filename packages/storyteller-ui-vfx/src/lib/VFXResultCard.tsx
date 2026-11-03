@@ -32,10 +32,10 @@ export const VFXResultCard = ({
   onTryThis,
   onDismiss,
   className,
-  panelGlassClassName = "bg-white/5 ring-1 ring-white/10 backdrop-blur-sm",
-  promptTextClassName = "text-white/85 line-clamp-2",
-  promptLabelClassName = "text-white/50",
-  tryButtonClassName = "border-primary/40 bg-primary/15 text-white hover:bg-primary/25",
+  panelGlassClassName = "bg-on-surface/5 ring-1 ring-on-surface/10 backdrop-blur-sm",
+  promptTextClassName = "text-on-surface/85 line-clamp-2",
+  promptLabelClassName = "text-on-surface/50",
+  tryButtonClassName = "border-primary/40 bg-primary/15 text-on-surface hover:bg-primary/25",
 }: VFXResultCardProps) => {
   return (
     <div
@@ -44,22 +44,22 @@ export const VFXResultCard = ({
         className,
       )}
     >
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-surface ring-1 ring-on-surface/10">
         {data.status === "complete" && data.outputUrl ? (
           <video src={data.outputUrl} controls playsInline className="h-full w-full object-contain" />
         ) : data.status === "pending" ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-white/70">
+          <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-on-surface/70">
             <LoaderCircleIcon className="h-8 w-8 animate-spin" />
             <span className="text-sm">Generating background change...</span>
           </div>
         ) : data.status === "failed" ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-4 text-center text-red-300">
+          <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-4 text-center text-error">
             <CircleAlertIcon className="h-8 w-8" />
             <span className="text-sm">{data.failureReason || "Generation failed"}</span>
             {onDismiss && (
               <button
                 onClick={onDismiss}
-                className="mt-1 flex items-center gap-1.5 rounded-md bg-white/5 px-3 py-1.5 text-xs text-white/60 transition-colors hover:bg-white/10 hover:text-white/80"
+                className="mt-1 flex items-center gap-1.5 rounded-md bg-on-surface/5 px-3 py-1.5 text-xs text-on-surface/60 transition-colors hover:bg-on-surface/10 hover:text-on-surface/80"
               >
                 <XIcon />
                 Dismiss
@@ -68,7 +68,7 @@ export const VFXResultCard = ({
           </div>
         ) : null}
         {data.title && data.status === "complete" && (
-          <div className="absolute left-3 top-3 rounded-md bg-black/60 px-2 py-1 text-xs font-medium uppercase tracking-wider text-white/80 backdrop-blur-sm">
+          <div className="absolute left-3 top-3 rounded-md bg-surface/60 px-2 py-1 text-xs font-medium uppercase tracking-wider text-on-surface/80 backdrop-blur-sm">
             Output
           </div>
         )}
@@ -136,7 +136,7 @@ const CopyPromptButton = ({ text }: CopyPromptButtonProps) => {
     <button
       type="button"
       onClick={handleCopy}
-      className="flex items-center gap-1 text-[10px] font-medium normal-case tracking-normal text-white/60 transition-colors hover:text-white"
+      className="flex items-center gap-1 text-[10px] font-medium normal-case tracking-normal text-on-surface/60 transition-colors hover:text-on-surface"
     >
       <DynamicIcon icon={copied ? CheckIcon : CopyIcon} className="h-2.5 w-2.5" />
       <span>{copied ? "Copied!" : "Copy"}</span>
@@ -151,13 +151,13 @@ interface SidePanelMediaProps {
 }
 
 const SidePanelMedia = ({ label, url, isVideo }: SidePanelMediaProps) => (
-  <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black/40 ring-1 ring-white/10">
+  <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-surface/40 ring-1 ring-on-surface/10">
     {isVideo ? (
       <video src={url} muted loop autoPlay playsInline className="h-full w-full object-cover" />
     ) : (
       <img src={url} alt={label} className="h-full w-full object-cover" />
     )}
-    <span className="absolute left-2 top-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/80 backdrop-blur-sm">
+    <span className="absolute left-2 top-2 rounded bg-surface/60 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-on-surface/80 backdrop-blur-sm">
       {label}
     </span>
   </div>

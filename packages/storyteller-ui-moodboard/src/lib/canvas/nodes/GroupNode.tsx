@@ -5,6 +5,7 @@ import { useShallow } from "zustand/react/shallow";
 import { GroupNode as GroupNodeData, MoodboardNode } from "../types";
 import { useMoodboardStore } from "../MoodboardStore";
 import { useNodeDrag } from "../interactions/useNodeDrag";
+import { useRoleColors } from "../../theme/roleColors";
 import { ImageNode } from "./ImageNode";
 import { TextNode } from "./TextNode";
 
@@ -55,7 +56,7 @@ const GroupNodeInner = ({ node, selected, onSelect }: Props) => {
         width={node.width}
         height={node.height}
         fill="transparent"
-        stroke={selected ? "#3b82f6" : "transparent"}
+        stroke={selected ? roles.selection : "transparent"}
         strokeWidth={1}
         dash={selected ? [4, 4] : undefined}
         listening={false}

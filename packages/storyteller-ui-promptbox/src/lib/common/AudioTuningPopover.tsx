@@ -63,8 +63,8 @@ export function AudioTuningPopover({
                   onClick={() => onSampleRateChange?.(hz)}
                   className={`rounded-[3px] border px-2 py-1 text-xs font-medium transition-colors ${
                     hz === sampleRateHz
-                      ? "border-white/30 bg-white/15 text-base-fg"
-                      : "border-transparent bg-white/5 text-base-fg/60 hover:bg-white/10 hover:text-base-fg"
+                      ? "border-outline bg-on-surface/15 text-base-fg"
+                      : "border-transparent bg-on-surface/5 text-base-fg/60 hover:bg-on-surface/10 hover:text-base-fg"
                   }`}
                 >
                   {formatSampleRateHz(hz)}

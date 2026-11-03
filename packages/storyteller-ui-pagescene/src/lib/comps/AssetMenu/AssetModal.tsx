@@ -435,19 +435,19 @@ export const AssetModal = () => {
           <div className="absolute left-0 top-0 z-[50] h-[46px] w-full cursor-move" />
         </Modal.DragHandle>
         <div className="grid h-full grid-cols-12 gap-3">
-          <div className="relative col-span-3 flex h-full flex-col p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-gray-200 after:bg-white/10">
+          <div className="relative col-span-3 flex h-full flex-col p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-surface-container-highest after:bg-on-surface/10">
             <div className="flex h-10 items-center justify-between gap-2.5">
-              <h2 className="font-display text-lg tracking-tight text-white">ArtCraft Presets</h2>
+              <h2 className="font-display text-lg tracking-tight text-on-surface">ArtCraft Presets</h2>
             </div>
-            <hr className="my-2 w-full border-white/10" />
+            <hr className="my-2 w-full border-outline-variant" />
             <div className="flex h-full flex-col space-y-2">
               {assetTabs.map(tab => (
                 <Button
                   key={tab.id}
                   variant={activeAssetTab === tab.id ? "primary" : "secondary"}
                   className={twMerge(
-                    "w-full justify-start rounded-[3px] border border-transparent bg-transparent px-3.5 py-2.5 text-left hover:bg-white/15",
-                    activeAssetTab === tab.id && "border-white/15 bg-white/10 text-white hover:bg-white/10",
+                    "w-full justify-start rounded-[3px] border border-transparent bg-transparent px-3.5 py-2.5 text-left hover:bg-on-surface/15",
+                    activeAssetTab === tab.id && "border-outline-variant bg-on-surface/10 text-on-surface hover:bg-on-surface/10",
                   )}
                   onClick={() => setActiveAssetTab(tab.id)}
                 >
@@ -474,16 +474,16 @@ export const AssetModal = () => {
                       ref={searchInputRef}
                       placeholder="Search"
                       className="relative z-[51] grow"
-                      inputClassName="bg-white/5 pr-10 placeholder-white/40"
+                      inputClassName="bg-on-surface/5 pr-10 placeholder-on-surface/40"
                       icon={SearchIcon}
                       value={searchTerm}
                       onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                      iconClassName="pointer-events-none left-3 top-1/2 h-4 w-4 -translate-y-1/2 p-0 text-white/50"
+                      iconClassName="pointer-events-none left-3 top-1/2 h-4 w-4 -translate-y-1/2 p-0 text-on-surface/50"
                     />
                     {searchTerm && (
                       <CloseButton
                         onClick={clearSearch}
-                        className="absolute right-2.5 top-1/2 z-[51] h-4 w-4 -translate-y-1/2 bg-white/10 text-[10px] hover:bg-white/20"
+                        className="absolute right-2.5 top-1/2 z-[51] h-4 w-4 -translate-y-1/2 bg-on-surface/10 text-[10px] hover:bg-on-surface/20"
                       />
                     )}
                   </div>
@@ -495,7 +495,7 @@ export const AssetModal = () => {
                       <div className="flex items-center">
                         <Button
                           variant="secondary"
-                          className="flex items-center gap-2 border-none bg-transparent px-3 py-1.5 text-sm text-white/70 hover:bg-transparent hover:text-white/100"
+                          className="flex items-center gap-2 border-none bg-transparent px-3 py-1.5 text-sm text-on-surface/70 hover:bg-transparent hover:text-on-surface/100"
                           onClick={() => setActiveAssetTab("all")}
                         >
                           <ChevronLeftIcon className="text-sm font-semibold opacity-70" />

@@ -1124,6 +1124,7 @@
       },
       "devDependencies": {
         "@aphrody/m3-config": "workspace:*",
+        "@aphrody/m3-os-themes": "workspace:*",
       },
     },
     "packages/m3-explorer": {
@@ -1212,6 +1213,7 @@
         "@aphrody/m3-os-themes": "workspace:*",
         "@aphrody/m3-tokens": "workspace:*",
         "@aphrody/material-design-icons": "workspace:*",
+        "@aphrody/viz3d": "workspace:*",
         "zod": "catalog:",
       },
     },
@@ -1664,6 +1666,22 @@
       "version": "1.4.7",
       "dependencies": {
         "@aphrody/paths": "workspace:*",
+      },
+    },
+    "packages/viz3d": {
+      "name": "@aphrody/viz3d",
+      "version": "1.4.7",
+      "bin": {
+        "viz3d": "./src/cli.ts",
+      },
+      "dependencies": {
+        "@aphrody/bun-blender": "workspace:*",
+        "@aphrody/chromium": "workspace:*",
+        "@aphrody/m3-design": "workspace:*",
+        "@aphrody/m3-os-themes": "workspace:*",
+        "ajv": "^8.0.0",
+        "ajv-formats": "^3.0.0",
+        "three": "catalog:",
       },
     },
     "packages/wasm": {
@@ -2507,6 +2525,8 @@
     "@aphrody/typesafe-sdk": ["@aphrody/typesafe-sdk@0.6.2", "", {}, "sha512-Pnj7gUKWCcTjztzmMBVLX7FNGJVlJKfrwuE3pLDnjGABlZHW7/wb6SakGllIAz65Qjx7+oYd+MYxWbxEpGyVRw=="],
 
     "@aphrody/update": ["@aphrody/update@workspace:packages/update"],
+
+    "@aphrody/viz3d": ["@aphrody/viz3d@workspace:packages/viz3d"],
 
     "@aphrody/wasm": ["@aphrody/wasm@workspace:packages/wasm"],
 

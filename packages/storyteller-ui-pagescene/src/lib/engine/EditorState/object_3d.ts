@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { Object3DJSON } from "./EditorStateJSON/object_3d_json";
+import { DEFAULT_OBJECT_COLOR } from "../sceneColors";
 
 export class Object3D {
   version: number;
@@ -44,7 +45,7 @@ export class Object3D {
     if (object instanceof THREE.Mesh && object.material instanceof THREE.MeshBasicMaterial) {
       return "#" + object.material.color.getHexString();
     }
-    return "#FFFFFF";
+    return DEFAULT_OBJECT_COLOR;
   }
 
   public async initialize(object: THREE.Object3D) {

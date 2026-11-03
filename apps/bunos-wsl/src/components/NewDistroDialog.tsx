@@ -627,7 +627,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
       <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto py-4">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-scrim/40 backdrop-blur-sm transition-opacity"
+          className="absolute inset-0 bg-scrim/32 transition-opacity"
           onClick={handleClose}
         />
 
@@ -636,7 +636,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
           role="dialog"
           aria-modal="true"
           data-testid="new-distro-dialog"
-          className="relative bg-surface-container-low border border-outline-variant rounded-2xl shadow-2xl shadow-shadow/50 max-w-4xl w-full mx-4 max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden animate-fade-slide-in"
+          className="relative bg-surface-container-low border border-outline-variant rounded-2xl shadow-md3-3 max-w-4xl w-full mx-4 max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden animate-fade-slide-in"
         >
 
 
@@ -929,7 +929,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                         >
                           <div className="flex items-center gap-4">
                             <div
-                              className={`relative shrink-0 rounded-xl p-1.5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg bg-surface-container ${
+                              className={`relative shrink-0 rounded-xl p-1.5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-md3-2 bg-surface-container ${
                                 isSelected ? "ring-2 ring-success/50" : ""
                               }`}
                             >
@@ -944,7 +944,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                             {exists ? (
                               <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded-md">{t('common:label.installed')}</span>
                             ) : isSelected ? (
-                              <div className="w-6 h-6 rounded-full bg-success flex items-center justify-center shadow-lg">
+                              <div className="w-6 h-6 rounded-full bg-success flex items-center justify-center shadow-md3-1">
                                 <CheckIcon size="sm" className="text-on-success" />
                               </div>
                             ) : null}
@@ -992,7 +992,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                       onChange={(e) => setCustomUrl(e.target.value)}
                       placeholder={t('placeholder.url')}
                       disabled={isCreating}
-                      className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:outline-none focus:border-secondary/50"
+                      className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:border-secondary/50"
                     />
                   </div>
                 ) : (
@@ -1049,7 +1049,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                           >
                             <div className="flex items-start gap-4">
                               <div
-                                className={`relative shrink-0 rounded-xl p-1.5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg bg-surface-container ${
+                                className={`relative shrink-0 rounded-xl p-1.5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-md3-2 bg-surface-container ${
                                   isSelected ? "ring-2 ring-secondary/50" : ""
                                 }`}
                               >
@@ -1066,7 +1066,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                                 )}
                               </div>
                               {isSelected && (
-                                <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center shrink-0 shadow-lg">
+                                <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center shrink-0 shadow-md3-1">
                                   <CheckIcon size="sm" className="text-on-secondary" />
                                 </div>
                               )}
@@ -1110,7 +1110,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                         onChange={(e) => { setCustomUrl(e.target.value); setSelectedDistro(null); }}
                         placeholder={t('placeholder.url')}
                         disabled={isCreating}
-                        className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:outline-none focus:border-secondary/50"
+                        className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:border-secondary/50"
                       />
                     </div>
                   </div>
@@ -1229,7 +1229,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                         onChange={(e) => { setCustomImage(e.target.value); setSelectedContainer(null); }}
                         placeholder={t('placeholder.image')}
                         disabled={isCreating}
-                        className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:outline-none focus:border-primary/50"
+                        className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:border-primary/50"
                       />
                     </div>
                   </div>
@@ -1239,7 +1239,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
 
             {/* Trademark disclaimer */}
             <div className="mt-6 pt-4 border-t border-outline-variant">
-              <p className="text-[11px] text-on-surface-variant text-center leading-relaxed whitespace-pre-line">
+              <p className="text-xs text-on-surface-variant text-center leading-relaxed whitespace-pre-line">
                 {t('trademarkDisclaimer')}
               </p>
             </div>

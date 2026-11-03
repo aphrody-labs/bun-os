@@ -117,7 +117,7 @@ export function GenerationGridView({
   if (isInitialLoading) {
     return (
       <div className="flex justify-center py-20">
-        <LoadingSpinner className="h-6 w-6 text-white/60" />
+        <LoadingSpinner className="h-6 w-6 text-on-surface/60" />
       </div>
     );
   }
@@ -190,7 +190,7 @@ export function GenerationGridView({
 
       {hasMore && (
         <div ref={sentinelRef} className="flex justify-center py-8">
-          <LoadingSpinner className="h-6 w-6 text-white/60" />
+          <LoadingSpinner className="h-6 w-6 text-on-surface/60" />
         </div>
       )}
     </>

@@ -18,6 +18,7 @@ path = "src/main.rs"
 [dependencies]
 # Our pinned libcosmic fork (aphrody-labs/libcosmic, its iced submodule is our iced fork); same rev as aphrody-webos-client.
 libcosmic = { git = "https://github.com/aphrody-labs/libcosmic", rev = "3abe177e5cb6522e4b905260da56451bc8084c07", default-features = false, features = ["winit", "wgpu", "tokio"] }
+libm3 = { path = "../libm3", features = ["cosmic"] }
 futures = { workspace = true }
 reqwest = { workspace = true, features = ["rustls-no-provider", "json", "stream", "query"] }
 rustls = { workspace = true, features = ["ring", "std"] }

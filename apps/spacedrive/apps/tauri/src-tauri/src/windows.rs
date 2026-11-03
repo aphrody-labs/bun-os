@@ -572,9 +572,12 @@ fn apply_dark_titlebar(window: &WebviewWindow) {
 			"DWMWA_USE_IMMERSIVE_DARK_MODE",
 		);
 
-		// Force caption color to dark gray — overrides user's accent color
-		// COLORREF format is 0x00BBGGRR
-		let caption_color: u32 = 0x00_1E_1E_1E; // #1E1E1E in BGR
+		// The caption takes the surface-container role of the default SpaceUI scheme (dark), which
+		// overrides the user's accent colour. COLORREF is 0x00BBGGRR; the scheme gives 0xAARRGGBB.
+		let argb =
+			aphrody_m3_tokens::sheets::spaceui_scheme(&aphrody_m3_tokens::spaceui::THEMES[0])
+				.argb(aphrody_m3_tokens::role::Role::SurfaceContainer);
+		let caption_color: u32 = ((argb & 0xFF) << 16) | (argb & 0xFF00) | ((argb >> 16) & 0xFF);
 		set_attr(
 			dwm::DWMWA_CAPTION_COLOR,
 			&caption_color as *const _ as *const std::ffi::c_void,

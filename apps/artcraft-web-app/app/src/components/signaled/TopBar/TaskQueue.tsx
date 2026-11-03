@@ -186,7 +186,7 @@ const InProgressCard = ({ task, onDismiss }: { task: InProgressTask; onDismiss?:
         <LoaderCircleIcon className="animate-spin text-on-surface/80" size="lg" />
       </div>
       {task.refImageUrls!.length > 1 && (
-        <div className="absolute bottom-0.5 right-0.5 bg-scrim/60 px-1 text-[9px] text-on-surface/80">
+        <div className="absolute bottom-0.5 right-0.5 bg-surface/60 px-1 text-[9px] text-on-surface/80">
           +{task.refImageUrls!.length - 1}
         </div>
       )}
@@ -354,7 +354,7 @@ const FailedCard = ({ task, onDismiss }: { task: FailedTask; onDismiss?: () => v
         <CircleAlertIcon className="text-error" size="lg" />
       </div>
       {task.refImageUrls!.length > 1 && (
-        <div className="absolute bottom-0.5 right-0.5 bg-scrim/60 px-1 text-[9px] text-on-surface/80">
+        <div className="absolute bottom-0.5 right-0.5 bg-surface/60 px-1 text-[9px] text-on-surface/80">
           +{task.refImageUrls!.length - 1}
         </div>
       )}

@@ -196,8 +196,8 @@ export function MentionChipMenu({
               className="group/avatar relative shrink-0 cursor-pointer overflow-hidden rounded-[3px]"
             >
               <ChipAvatar preview={currentPreview} name={currentName} type={currentType} />
-              <span className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover/avatar:opacity-100">
-                <EyeIcon className="h-3 w-3 text-white" />
+              <span className="absolute inset-0 flex items-center justify-center bg-surface/50 opacity-0 transition-opacity group-hover/avatar:opacity-100">
+                <EyeIcon className="h-3 w-3 text-on-surface" />
               </span>
             </button>
             <div className="min-w-0">
@@ -216,7 +216,7 @@ export function MentionChipMenu({
             <span className="flex-1 text-left">Preview</span>
           </button>
           <div className="my-1 border-t border-ui-panel-border" />
-          <button type="button" className={twMerge(MENU_ROW, "text-red-500 hover:bg-red-500/10")} onClick={onRemove}>
+          <button type="button" className={twMerge(MENU_ROW, "text-error hover:bg-error/10")} onClick={onRemove}>
             <Trash2Icon className="h-3.5 w-3.5 opacity-60" />
             <span className="flex-1 text-left">Remove</span>
           </button>
@@ -273,7 +273,7 @@ function ChipAvatar({
 }) {
   const FallbackIcon = type === "character" ? UserIcon : ImageIcon;
   return (
-    <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden border border-white/10 bg-black/20">
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden border border-outline-variant bg-surface/20">
       {preview ? (
         <img src={preview} alt={name} className="h-full w-full object-cover" />
       ) : (

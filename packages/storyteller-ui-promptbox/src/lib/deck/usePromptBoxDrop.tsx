@@ -425,14 +425,14 @@ export function PromptBoxDropOverlay({
     <div
       className={twMerge(
         "promptbox-drop-overlay pointer-events-none absolute inset-0 z-40 flex flex-col items-center justify-center gap-2 rounded-[3px] border-2 border-dashed bg-ui-controls/85",
-        rejected ? "border-red-400/80" : "border-white/60",
+        rejected ? "border-error/80" : "border-outline",
       )}
     >
       <div className="flex items-center gap-2">
         {kinds.map((kind, i) => (
           <div
             key={kind.label}
-            className="promptbox-drop-chip flex h-9 w-9 items-center justify-center bg-white/10 text-base-fg/90"
+            className="promptbox-drop-chip flex h-9 w-9 items-center justify-center bg-on-surface/10 text-base-fg/90"
             style={{ animationDelay: `${i * 50}ms` }}
           >
             <DynamicIcon icon={kind.icon} className="text-sm" />

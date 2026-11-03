@@ -50,7 +50,7 @@ export const SectionHeader = ({ name, count, collapsed, editable, onToggleCollap
         >
           <ChevronDownIcon
             className={[
-              "h-3 w-3 transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
+              "h-3 w-3 transition-transform duration-200 ease-[var(--md-sys-motion-easing-standard)]",
               collapsed ? "-rotate-90" : "rotate-0",
             ].join(" ")}
           />

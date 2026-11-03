@@ -5,5 +5,7 @@
     "sessionUrl": false
   },
   "includeCoAuthoredBy": false,
-  "enabledPlugins": {}
+  "enabledPlugins": {
+    "neon@anthropic-plugin-directory": true
+  }
 }

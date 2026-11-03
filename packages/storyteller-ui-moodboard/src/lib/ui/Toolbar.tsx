@@ -17,7 +17,7 @@ interface ToolbarShellProps {
 export const ToolbarShell = ({ children, className }: ToolbarShellProps) => (
   <div
     className={twMerge(
-      "glass pointer-events-auto flex items-center gap-2 rounded-2xl border border-ui-divider p-2 text-base-fg shadow-[0_8px_28px_-12px_rgba(0,0,0,0.45)]",
+      "glass pointer-events-auto flex items-center gap-2 rounded-2xl border border-ui-divider p-2 text-base-fg shadow-[var(--md-sys-elevation-level3)]",
       className,
     )}
   >

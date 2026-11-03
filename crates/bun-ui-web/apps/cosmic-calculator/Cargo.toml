@@ -20,10 +20,16 @@ path = "src/main.rs"
 
 [dependencies]
 libcosmic = { path = "../../../../vendor/cosmic-epoch/libcosmic", default-features = false, features = ["winit", "wgpu"] }
+# The Bun OS Material 3 theme (libm3 COSMIC adapter), on the same checked-out libcosmic.
+libm3 = { path = "../../../libm3", default-features = false, features = ["cosmic"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "0.2.129"
 getrandom = { version = "0.3", features = ["wasm_js"] }
+
+# libm3 pins the aphrody-labs/libcosmic fork by git revision; this build uses the checked-out fork instead.
+[patch."https://github.com/aphrody-labs/libcosmic"]
+libcosmic = { path = "../../../../vendor/cosmic-epoch/libcosmic" }
 
 [profile.release]
 opt-level = 3

@@ -63,7 +63,7 @@ export const TimelineTrackRow = ({ item, track, duration }: TimelineTrackRowProp
 
       <div
         ref={laneRef}
-        className="relative h-9 flex-1 rounded-lg bg-white/5"
+        className="relative h-9 flex-1 rounded-lg bg-on-surface/5"
         onPointerMove={e => {
           if (!draggingId.current || !editor) return;
           moveKeyframe(editor, draggingId.current, laneTimeFromEvent(e.clientX));
@@ -74,7 +74,7 @@ export const TimelineTrackRow = ({ item, track, duration }: TimelineTrackRowProp
         {/* connecting line between the first and last keyframe */}
         {sorted.length >= 2 && (
           <div
-            className="pointer-events-none absolute top-1/2 h-px -translate-y-1/2 bg-white/30"
+            className="pointer-events-none absolute top-1/2 h-px -translate-y-1/2 bg-on-surface/30"
             style={{
               left: `${timeToFraction(sorted[0].time, duration) * 100}%`,
               right: `${(1 - timeToFraction(sorted[sorted.length - 1].time, duration)) * 100}%`,
@@ -97,8 +97,8 @@ export const TimelineTrackRow = ({ item, track, duration }: TimelineTrackRowProp
               data-easing-chip
               className={`absolute top-1/2 flex h-5 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md border bg-ui-controls ${
                 active
-                  ? "border-brand-primary text-white"
-                  : "border-white/40 text-white/80 hover:border-white/80 hover:text-white"
+                  ? "border-brand-primary text-on-surface"
+                  : "border-outline text-on-surface/80 hover:border-on-surface/80 hover:text-on-surface"
               }`}
               style={{ left: `${mid * 100}%` }}
               onClick={() => setEasingKeyframe(active ? null : kf.id)}
@@ -120,7 +120,7 @@ export const TimelineTrackRow = ({ item, track, duration }: TimelineTrackRowProp
               data-keyframe
               title={`${kf.time.toFixed(2)}s`}
               className={`absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 cursor-grab rounded-[2px] border transition-colors ${
-                selected ? "border-brand-primary bg-brand-primary" : "border-white/70 bg-white"
+                selected ? "border-brand-primary bg-brand-primary" : "border-on-surface/70 bg-inverse-surface"
               }`}
               style={{ left: `${timeToFraction(kf.time, duration) * 100}%` }}
               onPointerDown={e => {
@@ -140,7 +140,7 @@ export const TimelineTrackRow = ({ item, track, duration }: TimelineTrackRowProp
       <button
         type="button"
         title="Add keyframe at playhead"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-base-fg/70 hover:bg-white/10 hover:text-base-fg"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-base-fg/70 hover:bg-on-surface/10 hover:text-base-fg"
         onClick={() => {
           if (editor) addKeyframe(editor, item.id);
         }}

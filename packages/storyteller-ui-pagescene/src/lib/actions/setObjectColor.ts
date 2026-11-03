@@ -1,5 +1,6 @@
 import type Editor from "../engine/editor";
 import { ColorAction } from "../engine/editor/actions/ColorAction";
+import { DEFAULT_OBJECT_COLOR } from "../engine/sceneColors";
 
 // One-shot apply: use when the change is atomic (e.g. a button click
 // or programmatic setter). Records a single ColorAction.
@@ -12,7 +13,7 @@ import { ColorAction } from "../engine/editor/actions/ColorAction";
 export function setObjectColor(editor: Editor, uuid: string, color: string): void {
   const obj = editor.activeScene.scene.getObjectByProperty("uuid", uuid);
   if (!obj) return;
-  const before = (obj.userData.color as string) ?? "#ffffff";
+  const before = (obj.userData.color as string) ?? DEFAULT_OBJECT_COLOR;
   if (before === color) return;
   editor.activeScene.setColor(uuid, color);
   editor.history.record(new ColorAction(editor, uuid, before, color));
@@ -30,7 +31,7 @@ export type ColorSession = {
 
 export function beginColorSession(editor: Editor, uuid: string): ColorSession {
   const startObj = editor.activeScene.scene.getObjectByProperty("uuid", uuid);
-  const before = (startObj?.userData.color as string) ?? "#ffffff";
+  const before = (startObj?.userData.color as string) ?? DEFAULT_OBJECT_COLOR;
   return {
     apply(color: string) {
       editor.activeScene.setColor(uuid, color);

@@ -52,8 +52,8 @@ export function PasswordPromptDialog({
 
   return (
     <Portal>
-      <div className="fixed inset-0 bg-scrim/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4" data-testid="password-prompt-overlay">
-        <div className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/70 max-w-md w-full overflow-hidden animate-fade-slide-in" data-testid="password-prompt-dialog">
+      <div className="fixed inset-0 bg-scrim/32 flex items-center justify-center z-[100] p-4" data-testid="password-prompt-overlay">
+        <div className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-md w-full overflow-hidden animate-fade-slide-in" data-testid="password-prompt-dialog">
 
           <div className="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
             <div className="flex items-center gap-3">
@@ -86,7 +86,7 @@ export function PasswordPromptDialog({
               placeholder={t('password.placeholder')}
               autoFocus
               data-testid="password-prompt-input"
-              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary transition-colors"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:border-primary transition-colors"
             />
 
             <p className="text-xs text-on-surface-variant mt-3" data-testid="password-prompt-security-note">

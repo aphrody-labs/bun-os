@@ -308,7 +308,7 @@ function resolveTextNode({ node, context }: { node: TextNode; context: ResolveCo
       localTime,
     }),
     textColor: resolveColorAtTime({
-      baseColor: typeof node.params.params.color === "string" ? node.params.params.color : "#ffffff",
+      baseColor: typeof node.params.params.color === "string" ? node.params.params.color : "#ffffff", // design:content: default element colour (document data)
       animations: node.params.animations,
       propertyPath: "color",
       localTime,

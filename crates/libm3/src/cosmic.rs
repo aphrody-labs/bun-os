@@ -23,6 +23,17 @@ pub fn themed<'a, Message: 'a>(
     iced::widget::themer(Some(self::theme(material)), content).into()
 }
 
+/// The Bun OS product theme in the mode and contrast of the COSMIC system preference
+/// (`cosmic-config` theme mode and the high-contrast accessibility setting).
+pub fn system_theme() -> Theme {
+    let system = ::cosmic::theme::system_preference();
+    let native = system.cosmic();
+    Theme::aphrody(
+        native.is_dark,
+        crate::Contrast::from_high_contrast(native.is_high_contrast),
+    )
+}
+
 pub fn color(color: Color) -> iced::Color {
     let [r, g, b, a] = color.rgba();
     iced::Color::from_rgba8(r, g, b, f32::from(a) / 255.0)
@@ -194,6 +205,13 @@ pub fn surface<'a, Message: 'a>(
     content: impl Into<Element<'a, Message>>,
 ) -> Element<'a, Message> {
     let style = component.style(theme, Interaction::Rest);
+    // The ambient elevation layer on the shadow role (`md.sys.elevation` ambient alpha).
+    let shadow = color(
+        theme
+            .colors
+            .get(Role::Shadow)
+            .with_opacity(m3_tokens::elevation::AMBIENT_ALPHA),
+    );
     widget::container(content)
         .padding(f32::from(theme.density.gap()))
         .class(::cosmic::theme::Container::Custom(Box::new(move |_| {
@@ -211,7 +229,7 @@ pub fn surface<'a, Message: 'a>(
                     radius: f32::from(style.corner_radius).into(),
                 },
                 shadow: Shadow {
-                    color: iced::Color::from_rgba(0.0, 0.0, 0.0, 0.15),
+                    color: shadow,
                     offset: Vector::new(0.0, f32::from(style.elevation_dp)),
                     blur_radius: f32::from(style.elevation_dp) * 2.0,
                 },

@@ -41,7 +41,7 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   ghost: 'bg-transparent hover:bg-surface-container text-on-surface-variant hover:text-on-surface border-transparent hover:border-outline-variant',
   success: 'bg-success/10 hover:bg-success/20 text-success border-success/30 hover:border-success/50',
   accent: 'bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 hover:border-primary/50',
-  link: 'bg-transparent hover:bg-transparent text-primary brightness-100 hover:brightness-125 underline underline-offset-2 border-transparent',
+  link: 'bg-transparent text-primary underline hover:decoration-2 underline-offset-2 border-transparent',
 };
 
 /** Filled role colour schemes that override the primary variant */

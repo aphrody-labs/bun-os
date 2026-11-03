@@ -17,16 +17,18 @@ import {
   parseHexAlpha,
 } from "../../utils/color";
 
+// design:content: transparency checkerboard behind alpha swatches
+const CHECKER_INK = "rgba(0,0,0,0.1)"; // design:content
 const CHECKERBOARD_STYLE = {
-  backgroundImage: `
-    linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.1) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.1) 75%)
-  `,
+  backgroundImage: [
+    `linear-gradient(45deg, ${CHECKER_INK} 25%, transparent 25%)`,
+    `linear-gradient(-45deg, ${CHECKER_INK} 25%, transparent 25%)`,
+    `linear-gradient(45deg, transparent 75%, ${CHECKER_INK} 75%)`,
+    `linear-gradient(-45deg, transparent 75%, ${CHECKER_INK} 75%)`,
+  ].join(", "),
   backgroundSize: "8px 8px",
   backgroundPosition: "0 0, 0 4px, 4px -4px, -4px 0px",
-  backgroundColor: "#fff",
+  backgroundColor: "#fff", // design:content
 } as const;
 
 interface ColorPickerContentProps {
@@ -239,11 +241,11 @@ function ColorPickerContent({
   };
 
   const saturationStyle = {
-    background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${displayHue}, 100%, 50%))`,
+    background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${displayHue}, 100%, 50%))`, // design:content
   };
 
   const hueStyle = {
-    background: "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
+    background: "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)", // design:content
   };
 
   return (
@@ -476,7 +478,7 @@ const ColorCircle = ({
 }) => (
   <div
     className={cn(
-      "pointer-events-none absolute rounded-full border-3 border-white shadow-lg",
+      "pointer-events-none absolute rounded-full border-3 border-on-surface shadow-lg",
       size === "sm" ? "size-3" : "size-4",
     )}
     style={{

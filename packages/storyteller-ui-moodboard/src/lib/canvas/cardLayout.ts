@@ -2,7 +2,7 @@ import { CardNode, MoodboardNode } from "./types";
 
 export const DEFAULT_CARD_WIDTH = 280;
 export const DEFAULT_CARD_PADDING = 8;
-export const DEFAULT_CARD_COLOR = "#FFFFFF";
+export const DEFAULT_CARD_COLOR = "#FFFFFF"; // design:content: default fill of a new board card (document data)
 
 // Height of one child when laid out inside a card: child's native aspect
 // ratio applied to (cardWidth - 2*padding), falling back to the child's own

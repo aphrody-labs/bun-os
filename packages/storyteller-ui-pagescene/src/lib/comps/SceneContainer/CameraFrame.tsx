@@ -120,17 +120,17 @@ export const CameraFrame = ({ width, height }: { width: number; height: number }
   return (
     <div id="letterbox" className="pointer-events-none absolute inset-0 select-none">
       {/* Dim everything outside the frame (still visible, won't render). */}
-      <div className="absolute left-0 right-0 top-0 bg-black/60" style={{ height: frame.y }} />
-      <div className="absolute bottom-0 left-0 right-0 bg-black/60" style={{ height: height - bottomEdge }} />
-      <div className="absolute left-0 bg-black/60" style={{ top: frame.y, height: frame.height, width: frame.x }} />
+      <div className="absolute left-0 right-0 top-0 bg-surface/60" style={{ height: frame.y }} />
+      <div className="absolute bottom-0 left-0 right-0 bg-surface/60" style={{ height: height - bottomEdge }} />
+      <div className="absolute left-0 bg-surface/60" style={{ top: frame.y, height: frame.height, width: frame.x }} />
       <div
-        className="absolute right-0 bg-black/60"
+        className="absolute right-0 bg-surface/60"
         style={{ top: frame.y, height: frame.height, width: width - right }}
       />
 
       {/* The frame itself: border, rule-of-thirds guides, focal label. */}
       <div
-        className="absolute border border-white/40"
+        className="absolute border border-outline"
         style={{
           left: frame.x,
           top: frame.y,
@@ -138,12 +138,12 @@ export const CameraFrame = ({ width, height }: { width: number; height: number }
           height: frame.height,
         }}
       >
-        <div className="absolute bottom-0 left-1/3 top-0 w-px bg-white/15" />
-        <div className="absolute bottom-0 left-2/3 top-0 w-px bg-white/15" />
-        <div className="absolute left-0 right-0 top-1/3 h-px bg-white/15" />
-        <div className="absolute left-0 right-0 top-2/3 h-px bg-white/15" />
+        <div className="absolute bottom-0 left-1/3 top-0 w-px bg-on-surface/15" />
+        <div className="absolute bottom-0 left-2/3 top-0 w-px bg-on-surface/15" />
+        <div className="absolute left-0 right-0 top-1/3 h-px bg-on-surface/15" />
+        <div className="absolute left-0 right-0 top-2/3 h-px bg-on-surface/15" />
         {focalLength !== undefined && (
-          <div className="absolute left-3 top-2 text-sm font-medium text-white/80 drop-shadow">{focalLength}mm</div>
+          <div className="absolute left-3 top-2 text-sm font-medium text-on-surface/80 drop-shadow">{focalLength}mm</div>
         )}
       </div>
     </div>

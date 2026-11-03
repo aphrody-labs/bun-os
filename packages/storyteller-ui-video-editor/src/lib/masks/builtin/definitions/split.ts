@@ -205,7 +205,7 @@ export const splitMaskDefinition: MaskDefinition<"split"> = {
       params: {
         feather: 0,
         inverted: false,
-        strokeColor: "#ffffff",
+        strokeColor: "#ffffff", // design:content: mask pixels and default stroke (document data)
         strokeWidth: 0,
         strokeAlign: "center",
         centerX: 0,
@@ -267,7 +267,7 @@ export const splitMaskDefinition: MaskDefinition<"split"> = {
           lineX + normalX * featherHalf,
           lineY + normalY * featherHalf,
         );
-        gradient.addColorStop(0, "rgba(255,255,255,0)");
+        gradient.addColorStop(0, "rgba(255,255,255,0)"); // design:content
         gradient.addColorStop(1, "white");
 
         ctx.fillStyle = gradient;

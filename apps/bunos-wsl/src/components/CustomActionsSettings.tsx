@@ -58,7 +58,7 @@ function ActionEditor({ action, onSave, onCancel, distros }: ActionEditorProps) 
           onChange={(e) => updateField("name", e.target.value)}
           required
           data-testid="action-name-input"
-          className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-primary"
+          className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-primary"
         />
       </div>
 
@@ -94,7 +94,7 @@ function ActionEditor({ action, onSave, onCancel, distros }: ActionEditorProps) 
           rows={3}
           placeholder={t('customActionsSettings.commandPlaceholder')}
           data-testid="action-command-input"
-          className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-outline focus:outline-hidden focus:border-primary font-mono text-sm"
+          className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-outline focus:border-primary font-mono text-sm"
         />
         <div className="mt-2">
           <p className="text-xs text-on-surface-variant mb-1">{t('editor.availableVars')}</p>
@@ -144,7 +144,7 @@ function ActionEditor({ action, onSave, onCancel, distros }: ActionEditorProps) 
               value={formData.scope.pattern}
               onChange={(e) => updateScope({ type: "pattern", pattern: e.target.value })}
               placeholder={t('customActionsSettings.targetPlaceholder')}
-              className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-outline focus:outline-hidden focus:border-primary text-sm ml-6"
+              className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-outline focus:border-primary text-sm ml-6"
             />
           )}
           <label className="flex items-center gap-2">
@@ -426,7 +426,7 @@ export function CustomActionsSettings() {
                 <div className="flex items-center gap-2">
                   <h4 className="font-medium text-on-surface">{action.name}</h4>
                   {action.runOnStartup && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-medium bg-success/20 text-success rounded">
+                    <span className="px-1.5 py-0.5 text-xs font-medium bg-success/20 text-success rounded">
                       {t('badge.startup')}
                     </span>
                   )}

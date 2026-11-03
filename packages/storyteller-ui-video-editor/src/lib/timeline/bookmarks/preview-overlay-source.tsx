@@ -19,10 +19,9 @@ function BookmarkNotesOverlay({ bookmarks }: { bookmarks: Array<{ time: MediaTim
       {bookmarks.map(bookmark => (
         <div
           key={bookmark.time}
-          className="flex max-w-[min(200px,50vw)] px-2.5 py-1.5 text-left text-white text-xs shadow-md backdrop-blur-sm"
+          className="flex max-w-[min(200px,50vw)] px-2.5 py-1.5 text-left text-on-surface text-xs bg-surface/70 shadow-md"
           style={{
-            backgroundColor: "rgb(0 0 0 / 0.5)",
-            borderLeft: bookmark.color ? `3px solid ${bookmark.color}` : "3px solid var(--primary)",
+            borderLeft: bookmark.color ? `3px solid ${bookmark.color}` : "3px solid var(--md-sys-color-primary)",
           }}
         >
           {bookmark.note}

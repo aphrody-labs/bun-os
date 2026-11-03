@@ -1,6 +1,6 @@
 export const MIN_FONT_SIZE = 5;
 export const MAX_FONT_SIZE = 300;
-export const DEFAULT_TEXT_COLOR = "#000000";
+export const DEFAULT_TEXT_COLOR = "#000000"; // design:content: default text colour (document data)
 
 // FONT_SIZE_SCALE_REFERENCE maps `params.fontSize` (user-meaningful
 // pt-ish units) onto a canvas-pixel size proportional to the canvas

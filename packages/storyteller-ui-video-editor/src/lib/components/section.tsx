@@ -63,7 +63,7 @@ export function Section({
     <SectionCtx.Provider value={{ isOpen, toggle, collapsible }}>
       <div
         className={cn(
-          "flex flex-col border-white/5",
+          "flex flex-col border-outline-variant",
           showTopBorder && "border-t first:border-t-0",
           showBottomBorder && "border-b",
           className,

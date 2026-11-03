@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { MediaFileType } from "../enums";
+import { DEFAULT_OBJECT_COLOR } from "../engine/sceneColors";
 
 export interface ObjectJSON {
   version: number;
@@ -88,7 +89,7 @@ export class StoryTellerProxy3DObject {
     if (object instanceof THREE.Mesh && object.material instanceof THREE.MeshBasicMaterial) {
       return "#" + object.material.color.getHexString();
     }
-    return "#FFFFFF";
+    return DEFAULT_OBJECT_COLOR;
   }
 
   public async initialize(object: THREE.Object3D) {

@@ -81,7 +81,7 @@ export const BlankCanvasModal = ({ isOpen, onClose, onConfirm }: BlankCanvasModa
                     )}
                   >
                     <div
-                      className="rounded-sm border border-base-fg/20 bg-white"
+                      className="rounded-sm border border-base-fg/20 bg-inverse-surface"
                       style={{ width: previewW, height: previewH }}
                     />
                     <span className="whitespace-nowrap text-xs">{preset.label}</span>

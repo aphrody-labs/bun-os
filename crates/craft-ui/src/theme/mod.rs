@@ -8,6 +8,8 @@ use egui::{Color32, CornerRadius, Stroke, style::Widgets};
 pub mod aphrody;
 pub mod shape;
 
+pub use aphrody::{Tokens, visuals};
+
 /// Background colors for egui's five widget interaction states.
 ///
 /// These are rendering inputs, not a theme schema: applications construct them from their own
@@ -44,6 +46,7 @@ impl WidgetPalette {
     }
 }
 
+// design:content: the test fixtures below are arbitrary distinguishable fills, not chrome.
 #[cfg(test)]
 mod tests {
     use super::*;

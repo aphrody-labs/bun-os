@@ -203,7 +203,7 @@ export function WslDistroSettings() {
             value={selectedDistro}
             onChange={(e) => setSelectedDistro(e.target.value)}
             data-testid="distro-settings-selector"
-            className="w-full px-3 py-2 bg-surface-container-low/50 border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-primary"
+            className="w-full px-3 py-2 bg-surface-container-low/50 border border-outline-variant rounded-lg text-on-surface focus:border-primary"
           >
             {distributions.map((d) => (
               <option key={d.name} value={d.name}>
@@ -223,7 +223,7 @@ export function WslDistroSettings() {
             onClick={handleStartAndLoad}
             disabled={!canStartSelectedDistro || actionInProgress !== null}
             data-testid="distro-start-and-load-button"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-on-primary bg-primary hover:opacity-90 rounded-lg transition-opacity disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-on-primary bg-primary state-layer rounded-lg transition-opacity disabled:opacity-50"
           >
             {actionInProgress === `Starting ${selectedDistroInfo.name}...`
               ? t('wslDistro.starting')
@@ -239,7 +239,7 @@ export function WslDistroSettings() {
           <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                   <FolderIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
@@ -285,7 +285,7 @@ export function WslDistroSettings() {
           <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                   <NetworkIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
@@ -323,7 +323,7 @@ export function WslDistroSettings() {
           <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                   <TerminalIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
@@ -353,7 +353,7 @@ export function WslDistroSettings() {
           <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                   <SparklesIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
@@ -384,7 +384,7 @@ export function WslDistroSettings() {
           <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                   <UserIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
@@ -408,7 +408,7 @@ export function WslDistroSettings() {
           <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                   <GpuIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
@@ -518,7 +518,7 @@ export function WslDistroSettings() {
                 onClick={handleSave}
                 disabled={isSaving}
                 data-testid="distro-save-button"
-                className="px-6 py-3 bg-primary hover:opacity-90 text-on-primary font-medium rounded-lg shadow-lg shadow-shadow/30 transition-colors disabled:opacity-50"
+                className="px-6 py-3 bg-primary state-layer text-on-primary font-medium rounded-lg shadow-md3-1 transition-colors disabled:opacity-50"
               >
                 {isSaving ? t('wslDistro.saving') : error ? t('wslDistro.retrySave') : t('wslDistro.saveChanges')}
               </button>

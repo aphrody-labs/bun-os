@@ -29,6 +29,8 @@
     "build": "bunx --bun vite build",
     "dev:mobile": "VITE_LU_BUILD_TARGET=mobile bunx --bun vite",
     "build:mobile": "VITE_LU_BUILD_TARGET=mobile bunx --bun vite build",
+    "theme:sheet": "bun src/mobile/styles/sheet/generate.ts",
+    "theme:sheet:check": "bun src/mobile/styles/sheet/generate.ts --check",
     "lint": "bunx --bun eslint .",
     "typecheck": "bunx --bun tsc -b --force",
     "cycles": "bunx --bun madge --circular --extensions ts,tsx src",

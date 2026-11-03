@@ -54,6 +54,10 @@ bun src/tool-host.ts call m3_token_lookup '{"query":"primary"}'  # one MCP-shape
 | `m3_parity`                                  | feature parity score of a clone from a Replica `matrix` CSV (must/should/could weights), missing features in build order; `visual` folds in `m3_imgdiff --json` outputs; `markdown`, `json`             |
 | `m3_imgdiff`                                 | screenshot diff of an `original` and a `clone` PNG: `mode` `layout` ignores colour (rebrand-safe), `pixel` checks regressions; `out` writes a diff PNG; `json`                                          |
 
+The `viz3d_*` tools (`viz3d_search`, `viz3d_resolve`, `viz3d_design_context`, `viz3d_blueprints`, `viz3d_host_probe`,
+`viz3d_validate`, `viz3d_capture`) serve the 3Dviz Pro Max 3D design catalog, kit blueprints, host probe and CDP
+scene capture of `@aphrody/viz3d` in process; they return `structuredContent` with the same JSON as text.
+
 The five design tools run `m3-design search|system|contrast|parity|imgdiff` (30 s limit). `m3_contrast`,
 `m3_parity` and `m3_imgdiff` start their text with `exit <code>`: for `m3_contrast`, `exit 1` means a pair fails
 AA, which is a result, not a tool error; other codes (usage, unreadable input) set `isError`.

@@ -69,7 +69,7 @@ export const HistoryStack = ({
       reminderType: "default",
       title: "Remove pending generation",
       primaryActionIcon: Trash2Icon,
-      primaryActionBtnClassName: "bg-red hover:bg-red/80",
+      primaryActionBtnClassName: "bg-error hover:bg-error/80",
       message: (
         <>
           <p className="text-base-fg text-sm opacity-70">
@@ -229,7 +229,7 @@ export const HistoryStack = ({
                       aria-hidden
                       className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
                     >
-                      <div className="flex items-center justify-center gap-1 rounded-lg bg-red/80 px-3 py-2 shadow-lg">
+                      <div className="flex items-center justify-center gap-1 rounded-lg bg-error/80 px-3 py-2 shadow-lg">
                         <Trash2Icon className="text-base-fg text-base" />
                         {tileCount > 1 && <span className="text-base-fg text-xs font-semibold">×{tileCount}</span>}
                       </div>
@@ -263,7 +263,7 @@ export const HistoryStack = ({
                     onClick={() => handleSelectWithPreload(image)}
                   >
                     {image.isBlankCanvas ? (
-                      <div className="absolute inset-0 h-full w-full bg-white" />
+                      <div className="absolute inset-0 h-full w-full bg-inverse-surface" />
                     ) : (
                       <img
                         src={getImageThumbnailSource(image)}
@@ -272,14 +272,14 @@ export const HistoryStack = ({
                       />
                     )}
                     <div
-                      className="absolute -right-0 -top-0 flex h-5 w-5 items-center justify-center rounded-bl-lg bg-red/50 opacity-0 transition-opacity hover:bg-red/80 group-hover:opacity-100"
+                      className="absolute -right-0 -top-0 flex h-5 w-5 items-center justify-center rounded-bl-lg bg-error/50 opacity-0 transition-opacity hover:bg-error/80 group-hover:opacity-100"
                       onClick={e => {
                         e.stopPropagation();
                         showActionReminder({
                           reminderType: "default",
                           title: "Remove Image",
                           primaryActionIcon: Trash2Icon,
-                          primaryActionBtnClassName: "bg-red hover:bg-red/80",
+                          primaryActionBtnClassName: "bg-error hover:bg-error/80",
                           message: (
                             <>
                               <p className="text-base-fg text-sm opacity-70">
@@ -315,23 +315,23 @@ export const HistoryStack = ({
       </div>
 
       <div className="mt-3 flex justify-center">
-        <div className="glass w-fit rounded-xl border-2 border-red/50 shadow-lg hover:border-red/80">
+        <div className="glass w-fit rounded-xl border-2 border-error/50 shadow-lg hover:border-error/80">
           <div className="relative h-full">
             <Tooltip
               content="Reset All"
               position="left"
               closeOnClick={true}
-              className="ms-1 rounded-md bg-red px-3 py-1"
+              className="ms-1 rounded-md bg-error px-3 py-1"
               delay={100}
             >
               <button
-                className="text-base-fg flex h-10 w-10 items-center justify-center rounded-lg border-2 border-transparent transition-colors hover:bg-red/50"
+                className="text-base-fg flex h-10 w-10 items-center justify-center rounded-lg border-2 border-transparent transition-colors hover:bg-error/50"
                 onClick={() =>
                   showActionReminder({
                     reminderType: "default",
                     title: "Reset All",
                     primaryActionIcon: Trash2Icon,
-                    primaryActionBtnClassName: "bg-red hover:bg-red/80",
+                    primaryActionBtnClassName: "bg-error hover:bg-error/80",
                     message: (
                       <p className="text-base-fg text-sm opacity-70">
                         Are you sure you want to reset all? This will clear all your work and cannot be undone.

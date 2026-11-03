@@ -78,7 +78,7 @@ export function WebsitePricingTable({
             indicatorClassName="rounded-none"
             tabClassName="w-24 font-mono text-[11px] uppercase tracking-[0.1em]"
           />
-          <span className="pricing-hud pricing-sale-badge bg-primary px-2 py-1 text-on-surface">
+          <span className="pricing-hud pricing-sale-badge bg-primary px-2 py-1 text-on-primary">
             {PROMO_PCT}% off · ends soon
           </span>
           <p className="pricing-hud hidden text-primary sm:block">

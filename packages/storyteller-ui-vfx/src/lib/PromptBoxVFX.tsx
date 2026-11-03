@@ -382,7 +382,7 @@ export const PromptBoxVFX = ({
               onClick={onSubmit}
               disabled={!canSubmit}
               loading={isSubmitting}
-              className="border-none bg-primary px-4 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-none bg-primary px-4 text-sm text-on-primary disabled:cursor-not-allowed disabled:opacity-50"
             >
               Generate
             </GenerateButton>
@@ -476,7 +476,7 @@ const UploadTile = ({
           <Button
             variant="action"
             className={twMerge(
-              "bg-ui-controls/40 hover:bg-ui-controls/60 overflow-hidden rounded-lg border-dashed border-2 border-black/10 dark:border-white/25 transition-all",
+              "bg-ui-controls/40 hover:bg-ui-controls/60 overflow-hidden rounded-lg border-dashed border-2 border-outline-variant dark:border-outline-variant transition-all",
               tileSize,
             )}
             onClick={onUpload}
@@ -488,7 +488,7 @@ const UploadTile = ({
         <div
           className={twMerge(
             "glass group relative flex items-center justify-center overflow-hidden rounded-lg border-2 transition-all",
-            "border-white/30 hover:border-white/80",
+            "border-outline hover:border-on-surface/80",
             tileSize,
           )}
         >
@@ -504,7 +504,7 @@ const UploadTile = ({
               <button
                 type="button"
                 onClick={onClear}
-                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity hover:bg-red-500/70 group-hover:opacity-100"
+                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-surface/60 text-on-surface opacity-0 transition-opacity hover:bg-error/70 group-hover:opacity-100"
               >
                 <XIcon className="h-2.5 w-2.5" />
               </button>

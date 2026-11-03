@@ -11,9 +11,9 @@ import { KbdBindings } from "../components/Kbd";
 import { KeybindCaptureInput } from "../components/KeybindCaptureInput";
 import { actionMatchesQuery, groupActions } from "./search";
 
-// House spring — every transition in this panel rides the same curve so the
+// M3 emphasized-decelerate easing: every transition in this panel rides the same curve so the
 // motion reads as one system rather than a pile of defaults.
-const EASE = "ease-[cubic-bezier(0.32,0.72,0,1)]";
+const EASE = "ease-[var(--md-sys-motion-easing-emphasized-decelerate)]";
 
 type SearchMode = "name" | "key";
 
@@ -369,7 +369,7 @@ function PresetDropdown({ value, onChange }: { value: PresetId; onChange: (id: P
             >
               <span
                 className={twMerge(
-                  "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full text-on-surface transition-all",
+                  "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full text-on-primary transition-all",
                   selected ? "bg-primary opacity-100" : "opacity-0",
                 )}
               >
@@ -813,7 +813,7 @@ function ConflictAlert({
           type="button"
           onClick={onConfirm}
           className={twMerge(
-            "rounded-[3px] bg-error px-4 py-1.5 text-[13px] font-medium text-on-surface transition-all hover:bg-error/85 active:scale-[0.97]",
+            "rounded-[3px] bg-error px-4 py-1.5 text-[13px] font-medium text-on-error transition-all hover:bg-error/85 active:scale-[0.97]",
             EASE,
           )}
         >

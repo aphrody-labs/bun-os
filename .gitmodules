@@ -808,7 +808,8 @@
 	shallow = true
 [submodule "vendor/ui-ux-pro-max-skill"]
 	path = vendor/ui-ux-pro-max-skill
-	url = https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+	url = https://github.com/aphrody-labs/ui-ux-pro-max-skill.git
+	branch = main
 	shallow = true
 [submodule "vendor/microsoft/microsoft-ui-xaml"]
 	path = vendor/microsoft/microsoft-ui-xaml
@@ -1754,3 +1755,6 @@
 	url = https://github.com/aphrody-labs/AltSnap.git
 	shallow = true
 	branch = bunos
+[submodule "vendor/3dviz-pro-max"]
+	path = vendor/3dviz-pro-max
+	url = https://github.com/aphrody-labs/3dviz-pro-max.git

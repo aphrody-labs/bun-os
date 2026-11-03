@@ -22,7 +22,7 @@ export const RecenterIndicator = () => {
       type="button"
       onClick={() => fitToContent()}
       title="Zoom to fit (Shift+1)"
-      className="pointer-events-auto absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full border border-white/20 bg-black/70 px-3 py-2 text-sm text-white/90 shadow-lg backdrop-blur-sm transition-colors hover:bg-black/80"
+      className="pointer-events-auto absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full border border-outline-variant bg-surface/70 px-3 py-2 text-sm text-on-surface/90 shadow-lg backdrop-blur-sm transition-colors hover:bg-surface/80"
     >
       <MinimizeIcon />
       <span>Content off-screen — recenter</span>

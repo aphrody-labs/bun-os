@@ -354,7 +354,7 @@ export const Stage3DBody = ({
                   page={PAGE_ID}
                   panelTitle="Select Model"
                   panelClassName="min-w-[300px]"
-                  buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
+                  buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-on-surface/80 hover:text-on-surface"
                   showIconsInList
                   triggerLabel="Model"
                 />

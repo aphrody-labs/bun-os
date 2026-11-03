@@ -53,8 +53,8 @@ function ConfirmDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-scrim/60 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+      <div className="absolute inset-0 bg-scrim/32" onClick={onCancel} />
+      <div className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-md w-full mx-4 p-6">
         <h3 className="text-lg font-semibold text-on-surface mb-2">{title}</h3>
         <p className="text-sm text-on-surface-variant mb-6">{message}</p>
         <div className="flex justify-end gap-3">
@@ -500,13 +500,13 @@ export function DistroSourcesSettings() {
             const isActive = activeTab === key;
             const colorClasses = {
               blue: isActive
-                ? "bg-secondary text-on-secondary shadow-sm"
+                ? "bg-secondary text-on-secondary shadow-md3-1"
                 : "text-on-surface-variant hover:text-on-surface",
               orange: isActive
-                ? "bg-primary text-on-primary shadow-sm"
+                ? "bg-primary text-on-primary shadow-md3-1"
                 : "text-on-surface-variant hover:text-on-surface",
               emerald: isActive
-                ? "bg-success text-on-success shadow-sm"
+                ? "bg-success text-on-success shadow-md3-1"
                 : "text-on-surface-variant hover:text-on-surface",
             }[config.color];
 
@@ -550,7 +550,7 @@ export function DistroSourcesSettings() {
                   value={downloadForm.name}
                   onChange={(e) => setDownloadForm({ ...downloadForm, name: e.target.value })}
                   placeholder={t('distroSources.form.placeholder.downloadName')}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-secondary"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-secondary"
                 />
               </div>
               <div>
@@ -562,7 +562,7 @@ export function DistroSourcesSettings() {
                     setDownloadForm({ ...downloadForm, description: e.target.value })
                   }
                   placeholder={t('distroSources.form.placeholder.downloadDescription')}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-secondary"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-secondary"
                 />
               </div>
               <div>
@@ -572,7 +572,7 @@ export function DistroSourcesSettings() {
                   value={downloadForm.url}
                   onChange={(e) => setDownloadForm({ ...downloadForm, url: e.target.value })}
                   placeholder={t('distroSources.form.placeholder.downloadUrl')}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-secondary"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-secondary"
                 />
               </div>
               <div>
@@ -582,7 +582,7 @@ export function DistroSourcesSettings() {
                   value={downloadForm.size}
                   onChange={(e) => setDownloadForm({ ...downloadForm, size: e.target.value })}
                   placeholder={t('distroSources.form.placeholder.downloadSize')}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-secondary"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-secondary"
                 />
               </div>
               <div className="flex gap-2 pt-2">
@@ -708,7 +708,7 @@ export function DistroSourcesSettings() {
                   value={containerForm.name}
                   onChange={(e) => setContainerForm({ ...containerForm, name: e.target.value })}
                   placeholder={t('distroSources.form.placeholder.containerName')}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-primary"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-primary"
                 />
               </div>
               <div>
@@ -720,7 +720,7 @@ export function DistroSourcesSettings() {
                     setContainerForm({ ...containerForm, description: e.target.value })
                   }
                   placeholder={t('distroSources.form.placeholder.containerDescription')}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-primary"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-primary"
                 />
               </div>
               <div>
@@ -730,7 +730,7 @@ export function DistroSourcesSettings() {
                   value={containerForm.image}
                   onChange={(e) => setContainerForm({ ...containerForm, image: e.target.value })}
                   placeholder={t('distroSources.form.placeholder.containerImage')}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-primary"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-primary"
                 />
               </div>
               <div className="flex gap-2 pt-2">
@@ -864,7 +864,7 @@ export function DistroSourcesSettings() {
                   onChange={(e) => setMsStoreForm({ ...msStoreForm, distroId: e.target.value })}
                   placeholder={t('distroSources.form.placeholder.msStoreDistroId')}
                   disabled={!!editingId}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-success disabled:opacity-50"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-success disabled:opacity-50"
                 />
                 <p className="text-xs text-on-surface-variant mt-1" dangerouslySetInnerHTML={{ __html: t('distroSources.form.distroIdHint') }} />
               </div>
@@ -877,7 +877,7 @@ export function DistroSourcesSettings() {
                     setMsStoreForm({ ...msStoreForm, description: e.target.value })
                   }
                   placeholder={t('distroSources.form.placeholder.msStoreDescription')}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-none focus:border-success"
+                  className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:border-success"
                 />
               </div>
               <div className="flex gap-2 pt-2">

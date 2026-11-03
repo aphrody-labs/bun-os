@@ -29,34 +29,52 @@
     color: var(--md-sys-color-on-primary);
   }
 
+  /* M3 state layers over the container: hover 8%, focus and pressed 10%. */
   .filter-tab:hover:not(:disabled) {
     border-color: var(--md-sys-color-outline);
-    background-color: var(--md-sys-color-surface-container-high);
     color: var(--md-sys-color-on-surface);
+    background-image: linear-gradient(
+      color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent),
+      color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent)
+    );
+  }
+
+  .filter-tab:focus-visible:not(:disabled),
+  .filter-tab:active:not(:disabled) {
+    background-image: linear-gradient(
+      color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent),
+      color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent)
+    );
   }
 
   .filter-tab.active:hover:not(:disabled) {
     border-color: var(--md-sys-color-primary);
-    background-color: var(--md-sys-color-primary);
     color: var(--md-sys-color-on-primary);
+    background-image: linear-gradient(
+      color-mix(in srgb, var(--md-sys-color-on-primary) 8%, transparent),
+      color-mix(in srgb, var(--md-sys-color-on-primary) 8%, transparent)
+    );
   }
 
-  .filter-tab:focus-visible {
-    outline: 2px solid var(--md-sys-color-primary);
-    outline-offset: 2px;
+  .filter-tab.active:focus-visible:not(:disabled),
+  .filter-tab.active:active:not(:disabled) {
+    background-image: linear-gradient(
+      color-mix(in srgb, var(--md-sys-color-on-primary) 10%, transparent),
+      color-mix(in srgb, var(--md-sys-color-on-primary) 10%, transparent)
+    );
   }
 
+  /* M3 disabled: container at 12%, content at 38%. */
   .filter-tab:disabled {
     border-color: transparent;
-    background-color: var(--md-sys-color-surface-container);
-    color: var(--md-sys-color-on-surface);
-    opacity: 0.38;
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
     cursor: not-allowed;
   }
 
-  /* Compatibility surface for existing callers, now backed by M3 roles. */
+  /* Opaque floating-toolbar surface (the transient material: no blur). */
   .glass {
-    @apply relative rounded-md border backdrop-blur-sm transition-colors duration-300;
+    @apply relative rounded-md border transition-colors duration-300;
     border-color: var(--md-sys-color-outline-variant);
     background-color: var(--md-sys-color-surface-container-high);
     color: var(--md-sys-color-on-surface);

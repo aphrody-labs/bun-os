@@ -186,7 +186,7 @@ const ExpandButton = ({ className, size = "md" }: ExpandButtonProps) => {
       aria-label={expanded ? "Restore modal size" : "Expand modal"}
       onClick={toggleExpanded}
       className={twMerge(
-        "flex items-center justify-center rounded-[3px] bg-scrim/40 text-on-surface/60 transition-colors hover:bg-on-surface hover:text-surface",
+        "flex items-center justify-center rounded-[3px] bg-surface/40 text-on-surface/60 transition-colors hover:bg-on-surface hover:text-surface",
         sizeClasses[size],
         "relative z-[70]",
         className,

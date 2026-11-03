@@ -35,7 +35,7 @@ export const CameraStatusPill = () => {
         icon={inCameraView ? VideoIcon : MoveIcon}
         aria-pressed={inCameraView}
         onClick={() => editor && toggleCameraView(editor)}
-        className={twMerge(TOOLBAR_BUTTON_CLASS_NAME, inCameraView && "border-white/30 bg-white/10")}
+        className={twMerge(TOOLBAR_BUTTON_CLASS_NAME, inCameraView && "border-outline bg-on-surface/10")}
       >
         {inCameraView ? renderCameraLabel : "Viewport"}
       </Button>

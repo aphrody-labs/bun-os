@@ -80,13 +80,13 @@ export const CompletionModal = () => {
   const busy = status === "uploading";
 
   return (
-    <div className="absolute inset-0 z-[70] flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
-      <div className="border border-ui-panel-border bg-ui-controls flex w-full max-w-xl flex-col gap-4 rounded-none p-5 text-white">
+    <div className="absolute inset-0 z-[70] flex items-center justify-center bg-surface/60 p-6 backdrop-blur-sm">
+      <div className="border border-ui-panel-border bg-ui-controls flex w-full max-w-xl flex-col gap-4 rounded-none p-5 text-on-surface">
         <div className="text-sm font-semibold text-base-fg/90">
           {isVideo ? "Recording complete" : "Capture complete"}
         </div>
 
-        <div className="flex max-h-[52vh] items-center justify-center overflow-hidden rounded-none bg-white/5">
+        <div className="flex max-h-[52vh] items-center justify-center overflow-hidden rounded-none bg-on-surface/5">
           {isVideo ? (
             <video src={artifact.objectUrl} controls autoPlay loop className="max-h-[52vh] w-full object-contain" />
           ) : (
@@ -102,7 +102,7 @@ export const CompletionModal = () => {
           </div>
         )}
         {status === "error" && (
-          <div role="alert" className="flex items-center gap-2 text-sm text-red">
+          <div role="alert" className="flex items-center gap-2 text-sm text-error">
             <TriangleAlertIcon className="h-4 w-4" />
             {errorMessage}
           </div>
@@ -114,7 +114,7 @@ export const CompletionModal = () => {
             type="button"
             onClick={() => clearProducedArtifact()}
             disabled={busy}
-            className="flex h-9 items-center gap-2 rounded-[3px] px-3 text-sm text-base-fg/60 transition-colors hover:bg-white/10 hover:text-base-fg disabled:opacity-50"
+            className="flex h-9 items-center gap-2 rounded-[3px] px-3 text-sm text-base-fg/60 transition-colors hover:bg-on-surface/10 hover:text-base-fg disabled:opacity-50"
           >
             <TrashIcon className="h-3.5 w-3.5" />
             Discard
@@ -124,7 +124,7 @@ export const CompletionModal = () => {
             <button
               type="button"
               onClick={() => void upload()}
-              className="flex h-9 items-center gap-2 rounded-[3px] bg-brand-primary px-4 text-sm font-medium text-white transition-colors hover:brightness-110"
+              className="flex h-9 items-center gap-2 rounded-[3px] bg-brand-primary px-4 text-sm font-medium text-on-primary transition-colors hover:brightness-110"
             >
               <RotateCwIcon className="h-3.5 w-3.5" />
               Retry
@@ -133,7 +133,7 @@ export const CompletionModal = () => {
             <button
               type="button"
               onClick={() => void upload()}
-              className="flex h-9 items-center gap-2 rounded-[3px] bg-brand-primary px-4 text-sm font-medium text-white transition-colors hover:brightness-110"
+              className="flex h-9 items-center gap-2 rounded-[3px] bg-brand-primary px-4 text-sm font-medium text-on-primary transition-colors hover:brightness-110"
             >
               <CloudUploadIcon className="h-3.5 w-3.5" />
               Upload &amp; continue

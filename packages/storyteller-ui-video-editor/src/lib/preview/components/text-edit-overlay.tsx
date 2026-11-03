@@ -123,7 +123,7 @@ export function TextEditOverlay({
           letterSpacing: `${canvasLetterSpacing}px`,
           lineHeight,
           color: "transparent",
-          caretColor: typeof element.params.color === "string" ? element.params.color : "#ffffff",
+          caretColor: typeof element.params.color === "string" ? element.params.color : "#ffffff", // design:content: caret follows the edited text colour (document data)
           backgroundColor: shouldShowBackground ? bg.color : "transparent",
           minHeight: lineHeightPx,
           textDecoration: textParams.textDecoration ?? "none",

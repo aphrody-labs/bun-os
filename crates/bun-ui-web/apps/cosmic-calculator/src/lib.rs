@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! COSMIC calculator: a libcosmic application (header bar, COSMIC dark theme, suggested/standard buttons) that runs
+//! COSMIC calculator: a libcosmic application (header bar, Bun OS Material 3 theme, suggested/standard buttons) that runs
 //! in the browser through bun-ui and natively on the desktop.
 
 use cosmic::app::{Core, Settings, Task};
@@ -47,6 +47,8 @@ pub enum Message {
 
 pub struct Calculator {
     core: Core,
+    /// The Bun OS Material 3 theme (identity seed, system mode and contrast).
+    material: libm3::Theme,
     entry: String,
     acc: Option<f64>,
     pending: Option<Op>,
@@ -86,13 +88,17 @@ impl Calculator {
         } else {
             widget::button::standard(label)
         };
-        button.on_press(message).width(Length::Fill).height(Length::Fixed(52.0)).into()
+        button
+            .on_press(message)
+            .width(Length::Fill)
+            .height(Length::Fixed(52.0))
+            .into()
     }
 }
 
 impl cosmic::Application for Calculator {
     type Executor = executor::Default;
-    type Flags = ();
+    type Flags = libm3::Theme;
     type Message = Message;
     const APP_ID: &'static str = "com.aphrody.BunUi.CosmicCalculator";
 
@@ -104,9 +110,10 @@ impl cosmic::Application for Calculator {
         &mut self.core
     }
 
-    fn init(core: Core, _flags: ()) -> (Self, Task<Message>) {
+    fn init(core: Core, material: libm3::Theme) -> (Self, Task<Message>) {
         let app = Calculator {
             core,
+            material,
             entry: "0".into(),
             acc: None,
             pending: None,
@@ -136,7 +143,12 @@ impl cosmic::Application for Calculator {
             }
             Message::Equals => {
                 if let Some(op) = self.pending {
-                    self.history = format!("{} {} {} =", Self::show(self.acc.unwrap_or(0.0)), op.symbol(), self.entry);
+                    self.history = format!(
+                        "{} {} {} =",
+                        Self::show(self.acc.unwrap_or(0.0)),
+                        op.symbol(),
+                        self.entry
+                    );
                     self.reduce();
                     self.pending = None;
                     self.acc = None;
@@ -202,22 +214,29 @@ impl cosmic::Application for Calculator {
             }
             keypad = keypad.push(line);
         }
-        widget::container(
+        let content = widget::container(
             widget::column::with_capacity(2)
                 .spacing(16)
                 .max_width(420)
-                .push(widget::container(display).padding(16).class(cosmic::theme::Container::Card))
+                .push(
+                    widget::container(display)
+                        .padding(16)
+                        .class(cosmic::theme::Container::Card),
+                )
                 .push(keypad),
         )
         .padding(16)
-        .center_x(Length::Fill)
-        .into()
+        .center_x(Length::Fill);
+        libm3::cosmic::themed(self.material, content)
     }
 }
 
 pub fn run() -> cosmic::iced::Result {
-    let settings = Settings::default().theme(cosmic::Theme::dark()).size(Size::new(420.0, 560.0));
-    cosmic::app::run::<Calculator>(settings, ())
+    let material = libm3::cosmic::system_theme();
+    let settings = Settings::default()
+        .theme(libm3::cosmic::theme(material))
+        .size(Size::new(420.0, 560.0));
+    cosmic::app::run::<Calculator>(settings, material)
 }
 
 #[cfg(target_arch = "wasm32")]

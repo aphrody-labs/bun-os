@@ -31,8 +31,8 @@ export function EntranceDebugPanel() {
   const splatSec = (ENTRANCE_BASE_DURATIONS.splat * scale).toFixed(2);
 
   return (
-    <div className="pointer-events-auto absolute right-2 top-16 z-50 w-56 rounded-lg border border-white/10 bg-black/70 p-3 text-xs text-white/80 backdrop-blur-md">
-      <div className="mb-2 flex items-center justify-between font-medium text-white/90">
+    <div className="pointer-events-auto absolute right-2 top-16 z-50 w-56 rounded-lg border border-outline-variant bg-surface/70 p-3 text-xs text-on-surface/80 backdrop-blur-md">
+      <div className="mb-2 flex items-center justify-between font-medium text-on-surface/90">
         <span>Entrance speed</span>
         <span className="tabular-nums">{scale.toFixed(2)}×</span>
       </div>
@@ -45,14 +45,14 @@ export function EntranceDebugPanel() {
         onChange={e => apply(parseFloat(e.target.value))}
         className="w-full accent-primary"
       />
-      <div className="mt-2 flex justify-between tabular-nums text-white/50">
+      <div className="mt-2 flex justify-between tabular-nums text-on-surface/50">
         <span>mesh {meshSec}s</span>
         <span>splat {splatSec}s</span>
       </div>
       <button
         type="button"
         onClick={() => apply(1)}
-        className="mt-2 w-full rounded border border-white/10 py-1 text-white/60 transition-colors hover:bg-white/10 hover:text-white/90"
+        className="mt-2 w-full rounded border border-outline-variant py-1 text-on-surface/60 transition-colors hover:bg-on-surface/10 hover:text-on-surface/90"
       >
         Reset to 1× (real timing)
       </button>

@@ -146,10 +146,10 @@ export function DiskMountDialog({ isOpen, onClose }: DiskMountDialogProps) {
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" onClick={handleClose} />
+        <div className="absolute inset-0 bg-scrim/32" onClick={handleClose} />
 
         {/* Dialog */}
-        <div role="dialog" aria-modal="true" data-testid="disk-mount-dialog" className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-lg w-full mx-4 p-6">
+        <div role="dialog" aria-modal="true" data-testid="disk-mount-dialog" className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-lg w-full mx-4 p-6">
         <h2 className="text-xl font-semibold text-on-surface mb-4" data-testid="disk-mount-title">{t('diskMount.title')}</h2>
 
         {/* Tabs */}
@@ -278,7 +278,7 @@ export function DiskMountDialog({ isOpen, onClose }: DiskMountDialogProps) {
               onChange={(e) => setMountName(e.target.value)}
               placeholder="e.g., mydisk"
               data-testid="disk-mount-name-input"
-              className="w-full px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary"
+              className="w-full px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:border-primary"
             />
             <p className="text-xs text-on-surface-variant mt-1" data-testid="disk-mount-point-hint">
               {mountName
@@ -357,7 +357,7 @@ export function DiskMountDialog({ isOpen, onClose }: DiskMountDialogProps) {
             onClick={handleMount}
             disabled={isMounting || (activeTab === "vhd" ? !vhdPath : !selectedDisk)}
             data-testid="disk-mount-submit-button"
-            className="px-4 py-2 text-sm font-medium bg-primary hover:opacity-90 text-on-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium bg-primary state-layer text-on-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isMounting ? t('diskMount.mounting') : t('diskMount.mount')}
           </button>

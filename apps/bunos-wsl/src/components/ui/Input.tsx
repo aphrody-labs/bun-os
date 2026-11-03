@@ -54,7 +54,7 @@ const SIZE_CLASSES: Record<InputSize, string> = {
 const BASE_INPUT_CLASSES = [
   'w-full bg-surface-container text-on-surface',
   'placeholder-on-surface-variant',
-  'focus:outline-hidden',
+  '',
   'disabled:opacity-50 disabled:cursor-not-allowed',
   'transition-colors',
 ].join(' ');
@@ -237,7 +237,7 @@ export function Checkbox({
           'mt-0.5 w-4 h-4 rounded',
           'border-outline-variant bg-surface-container',
           'text-primary',
-          'focus:ring-primary focus:ring-offset-0',
+          'focus:ring-primary',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className,
         ].filter(Boolean).join(' ')}
@@ -296,7 +296,7 @@ export function RadioButton({
           inline ? 'w-4 h-4' : 'mt-0.5 w-4 h-4',
           'bg-surface-container border-outline-variant',
           'text-primary',
-          'focus:ring-primary focus:ring-offset-0',
+          'focus:ring-primary',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className,
         ].filter(Boolean).join(' ')}

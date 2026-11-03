@@ -34,3 +34,16 @@
 	--color-media-ink: #ffffff;
 	--color-media-shade: #000000;
 }
+
+/* Reduced motion (OS setting): CSS transitions and keyframe animations finish at once; framer-motion is
+   handled by MotionPreferences. Busy spinners (animate-spin) are exempt: they only signal activity. */
+@media (prefers-reduced-motion: reduce) {
+	:where(*:not(.animate-spin)),
+	::before,
+	::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}

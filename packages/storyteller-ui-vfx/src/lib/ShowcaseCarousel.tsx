@@ -46,12 +46,12 @@ export const ShowcaseCarousel = ({ entries, activeId, onSelect, className }: Sho
               className={twMerge(
                 "relative h-10 overflow-hidden border-2 transition-all duration-200 ease-out",
                 isActive
-                  ? "w-20 rounded-full border-white/80"
-                  : "w-10 rounded-full border-white/15 opacity-70 hover:opacity-100",
+                  ? "w-20 rounded-full border-on-surface/80"
+                  : "w-10 rounded-full border-outline-variant opacity-70 hover:opacity-100",
               )}
             >
               <img src={entry.thumbnailUrl} alt="" className="h-full w-full object-cover" />
-              {!isActive && <span className="absolute inset-0 bg-black/20 transition-opacity hover:bg-black/0" />}
+              {!isActive && <span className="absolute inset-0 bg-surface/20 transition-opacity hover:bg-surface/0" />}
             </button>
           );
         })}
@@ -75,8 +75,8 @@ const ArrowButton = ({ direction, disabled, onClick }: ArrowButtonProps) => (
     disabled={disabled}
     aria-label={direction === "prev" ? "Previous showcase" : "Next showcase"}
     className={twMerge(
-      "flex h-7 w-7 items-center justify-center rounded-full text-white/60 transition-colors",
-      disabled ? "cursor-not-allowed opacity-30" : "hover:bg-white/10 hover:text-white",
+      "flex h-7 w-7 items-center justify-center rounded-full text-on-surface/60 transition-colors",
+      disabled ? "cursor-not-allowed opacity-30" : "hover:bg-on-surface/10 hover:text-on-surface",
     )}
   >
     <DynamicIcon icon={direction === "prev" ? ChevronLeftIcon : ChevronRightIcon} className="h-3 w-3" />

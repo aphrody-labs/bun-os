@@ -201,7 +201,7 @@ export function StatusBar() {
               {isUpdating ? (
                 <div className="flex items-center gap-1" data-testid="wsl-update-spinner">
                   <div className="w-3 h-3 border border-warning border-t-transparent rounded-full animate-spin" />
-                  <span className="text-[9px] text-warning font-medium animate-pulse">{t('updateWsl.uac')}</span>
+                  <span className="text-xs text-warning font-medium animate-pulse">{t('updateWsl.uac')}</span>
                 </div>
               ) : (
                 <svg className="w-3 h-3 text-on-surface-variant group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -227,7 +227,7 @@ export function StatusBar() {
               </svg>
               <span className="data-label group-hover:text-on-surface">{t('disk')}</span>
               {diskCount > 0 && (
-                <span className="data-value text-[10px] text-primary">
+                <span className="data-value text-xs text-primary">
                   {diskCount}
                 </span>
               )}
@@ -246,7 +246,7 @@ export function StatusBar() {
           {/* Distribution stats */}
           <div className="flex items-center gap-4">
             {mockMode && (
-              <span className="px-2 py-0.5 bg-warning/10 text-warning rounded text-[10px] font-mono font-semibold border border-warning/30 uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-warning/10 text-warning rounded text-xs font-mono font-semibold border border-warning/30 uppercase tracking-wider">
                 {t('dev')}
               </span>
             )}

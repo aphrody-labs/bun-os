@@ -14,6 +14,8 @@ import toast from "react-hot-toast";
 import { SplatMesh } from "@sparkjsdev/spark";
 import { ensureInternalBbox } from "./internalBbox";
 import { collectObjectTextures, disposeObject3D } from "@storyteller/ui-viewer-3d";
+import { resolveRoleColor } from "@storyteller/ui-moodboard";
+import { AMBIENT_LIGHT_COLOR, BLACK_SKYBOX_COLOR, DEFAULT_OBJECT_COLOR, EMPTY_SKYBOX_COLOR } from "./sceneColors";
 
 // Capabilities Scene needs from outside its own state. Editor wires
 // these in inline at construction (Phase 2 idiom — same shape as
@@ -291,7 +293,7 @@ class Scene {
     //obj.type = "Object3D";
     obj.name = name;
     obj.position.copy(pos);
-    obj.userData["color"] = "#FFFFFF";
+    obj.userData["color"] = DEFAULT_OBJECT_COLOR;
     obj.userData["metalness"] = 0.0;
     obj.userData["shininess"] = 0.5;
     obj.userData["specular"] = 0.0;
@@ -651,7 +653,7 @@ class Scene {
     mmd.name = "MMD" + name;
     mmd.frustumCulled = false;
     mmd.userData["media_id"] = media_id;
-    mmd.userData["color"] = "#FFFFFF";
+    mmd.userData["color"] = DEFAULT_OBJECT_COLOR;
     mmd.userData["metalness"] = 0.0;
     mmd.userData["shininess"] = 0.5;
     mmd.userData["specular"] = 0.5;
@@ -867,7 +869,7 @@ class Scene {
 
       child.frustumCulled = false;
       child.userData["media_id"] = media_id;
-      child.userData["color"] = "#FFFFFF";
+      child.userData["color"] = DEFAULT_OBJECT_COLOR;
       child.userData["metalness"] = 0.0;
       child.userData["shininess"] = 0.5;
       child.userData["specular"] = 0.5;
@@ -889,7 +891,7 @@ class Scene {
       glb.scene.name = "Scene";
       glb.scene.userData["name"] = "Scene";
       glb.scene.userData["media_id"] = media_id;
-      glb.scene.userData["color"] = "#FFFFFF";
+      glb.scene.userData["color"] = DEFAULT_OBJECT_COLOR;
       glb.scene.userData["metalness"] = 0.0;
       glb.scene.userData["shininess"] = 0.5;
       glb.scene.userData["specular"] = 0.5;
@@ -898,7 +900,7 @@ class Scene {
       glb.scene.name = name;
       glb.scene.userData["name"] = name;
       glb.scene.userData["media_id"] = media_id;
-      glb.scene.userData["color"] = "#FFFFFF";
+      glb.scene.userData["color"] = DEFAULT_OBJECT_COLOR;
       glb.scene.userData["metalness"] = 0.0;
       glb.scene.userData["shininess"] = 0.5;
       glb.scene.userData["specular"] = 0.5;
@@ -1070,10 +1072,11 @@ class Scene {
     // being replaced (skybox switches and New Scene used to leak it).
     this.disposeBackground();
 
-    // Theme-aware: in light mode, use a near-white background for better contrast with UI
+    // Theme-aware: in light mode the empty viewport takes the lowest surface
+    // role, so the stage reads as part of the light shell.
     try {
       if (typeof document !== "undefined" && document.documentElement.classList.contains("theme-light")) {
-        this.scene.background = new THREE.Color("#f5f6f8");
+        this.scene.background = new THREE.Color(resolveRoleColor("surface-container-lowest"));
         if (this.ambientLight) this.scene.add(this.ambientLight);
         if (this.directional_light) this.scene.remove(this.directional_light);
         if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
@@ -1111,12 +1114,12 @@ class Scene {
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
     } else if (this.skybox == "m_1") {
       // Empty skybox - just a plain color
-      this.scene.background = new THREE.Color("#282828");
+      this.scene.background = new THREE.Color(EMPTY_SKYBOX_COLOR);
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
     } else if (this.skybox == "m_2") {
-      this.scene.background = new THREE.Color("#000000");
+      this.scene.background = new THREE.Color(BLACK_SKYBOX_COLOR);
       if (this.ambientLight) this.scene.add(this.ambientLight);
       if (this.directional_light) this.scene.remove(this.directional_light);
       if (this.hemisphereLight) this.scene.remove(this.hemisphereLight);
@@ -1135,7 +1138,7 @@ class Scene {
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
     } else {
       // Default to empty skybox if no match
-      this.scene.background = new THREE.Color("#282828");
+      this.scene.background = new THREE.Color(EMPTY_SKYBOX_COLOR);
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
@@ -1164,7 +1167,7 @@ class Scene {
     this.hemisphereLight = new THREE.HemisphereLight(color, 0x8d8d8d, 3.0);
     this.scene.add(this.hemisphereLight);
 
-    this.ambientLight = new THREE.AmbientLight(new THREE.Color("#ffffff"), 3);
+    this.ambientLight = new THREE.AmbientLight(new THREE.Color(AMBIENT_LIGHT_COLOR), 3);
 
     this.directional_light = new THREE.DirectionalLight(color, 2.0);
 

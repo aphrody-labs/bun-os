@@ -283,7 +283,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 <div className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                         <WindowIcon size="md" className="text-on-primary-container" />
                       </div>
                       <div>
@@ -300,7 +300,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                           value="ask"
                           checked={settings.closeAction === "ask"}
                           onChange={() => updateSetting("closeAction", "ask")}
-                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary focus:ring-offset-0"
+                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary"
                         />
                         <div>
                           <p className="text-sm font-medium text-on-surface">{t('window.ask')}</p>
@@ -317,7 +317,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                           value="minimize"
                           checked={settings.closeAction === "minimize"}
                           onChange={() => updateSetting("closeAction", "minimize")}
-                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary focus:ring-offset-0"
+                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary"
                         />
                         <div>
                           <p className="text-sm font-medium text-on-surface">{t('window.minimize')}</p>
@@ -334,7 +334,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                           value="quit"
                           checked={settings.closeAction === "quit"}
                           onChange={() => updateSetting("closeAction", "quit")}
-                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary focus:ring-offset-0"
+                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary"
                         />
                         <div>
                           <p className="text-sm font-medium text-on-surface">{t('window.quit')}</p>
@@ -354,7 +354,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 <div className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                         <InfoIcon size="md" className="text-on-primary-container" />
                       </div>
                       <div>
@@ -382,7 +382,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                             }}
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-outline-variant after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-surface-container-lowest after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary" />
+                          <div className="w-11 h-6 bg-surface-container-high peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-secondary rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-outline-variant after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-surface-container-lowest after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary" />
                         </label>
                       </div>
 
@@ -502,7 +502,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                         <InfoIcon size="md" className="text-on-primary-container" />
                       </div>
                       <div>
@@ -538,7 +538,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
                         <TerminalIcon size="md" className="text-on-primary-container" />
                       </div>
                       <div>

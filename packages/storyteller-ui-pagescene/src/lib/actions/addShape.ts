@@ -3,6 +3,7 @@ import type Editor from "../engine/editor";
 import { MediaItem } from "../models";
 import { CreateAction } from "../engine/editor/actions/CreateAction";
 import { ObjectAddedEvent } from "../engine/events/EngineEvent";
+import { DEFAULT_OBJECT_COLOR } from "../engine/sceneColors";
 
 export async function addShape(editor: Editor, item: MediaItem, position?: THREE.Vector3): Promise<string | undefined> {
   const obj = await editor.sceneManager?.create("Parim", item.media_id, position ?? new THREE.Vector3());
@@ -15,7 +16,7 @@ export async function addShape(editor: Editor, item: MediaItem, position?: THREE
   // picker always read a valid #RRGGBB (the input would otherwise be
   // uncontrolled-value=undefined and some browsers refuse to open the
   // color dialog).
-  obj.userData.color = "#ffffff";
+  obj.userData.color = DEFAULT_OBJECT_COLOR;
   obj.name = item.name ?? "shape";
 
   // Animate it in (see addObject).

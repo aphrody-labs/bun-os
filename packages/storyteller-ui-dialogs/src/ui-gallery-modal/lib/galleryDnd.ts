@@ -107,7 +107,12 @@ function spawnDropRipple(x: number, y: number) {
       { transform: "scale(0.4)", opacity: 0.9 },
       { transform: "scale(2.6)", opacity: 0 },
     ],
-    { duration: 460, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+    {
+      duration: 450,
+      easing: getComputedStyle(document.documentElement)
+        .getPropertyValue("--md-sys-motion-easing-emphasized-decelerate")
+        .trim(),
+    },
   );
   anim.onfinish = () => ring.remove();
   anim.oncancel = () => ring.remove();

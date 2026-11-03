@@ -42,7 +42,7 @@ export function ContainerRuntimeSettings() {
       <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
               <DockerLogo size={24} />
             </div>
             <div>
@@ -99,7 +99,7 @@ export function ContainerRuntimeSettings() {
                 value={customCommand}
                 onChange={(e) => handleCustomCommandChange(e.target.value)}
                 placeholder={t('containerRuntime.customPlaceholder')}
-                className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder:text-on-surface-variant/50 focus:outline-hidden focus:border-primary font-mono text-sm"
+                className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary font-mono text-sm"
               />
             </div>
           )}

@@ -336,12 +336,12 @@ export const PromptBoxEdit = ({
             )}
           >
             <ButtonIconSelect options={modes} onOptionChange={onModeSelectionChange} selectedOption={selectedMode} />
-            <div className="h-6 w-px bg-white/20" />
+            <div className="h-6 w-px bg-on-surface/20" />
             <div className="flex items-center gap-1">
               <Tooltip content="Undo" position="top" delay={200}>
                 <button
                   onClick={onUndo}
-                  className="flex h-8 w-8 items-center justify-center rounded-[3px] text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="flex h-8 w-8 items-center justify-center rounded-[3px] text-on-surface/70 transition-colors hover:bg-on-surface/10 hover:text-on-surface disabled:opacity-30 disabled:cursor-not-allowed"
                   disabled={!onUndo}
                 >
                   <RotateCcwIcon className="h-4 w-4" />
@@ -350,7 +350,7 @@ export const PromptBoxEdit = ({
               <Tooltip content="Redo" position="top" delay={200}>
                 <button
                   onClick={onRedo}
-                  className="flex h-8 w-8 items-center justify-center rounded-[3px] text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="flex h-8 w-8 items-center justify-center rounded-[3px] text-on-surface/70 transition-colors hover:bg-on-surface/10 hover:text-on-surface disabled:opacity-30 disabled:cursor-not-allowed"
                   disabled={!onRedo}
                 >
                   <Redo2Icon className="h-4 w-4" />
@@ -392,7 +392,7 @@ export const PromptBoxEdit = ({
                     variant="action"
                     className={twMerge(
                       "h-8 w-8 p-0 bg-transparent hover:bg-transparent group transition-all border-0 shadow-none",
-                      isImageRowVisible && "text-white",
+                      isImageRowVisible && "text-on-surface",
                     )}
                     onClick={() => setShowImagePrompts(prev => !prev)}
                   >
@@ -418,7 +418,7 @@ export const PromptBoxEdit = ({
                   ref={textareaRef}
                   rows={1}
                   placeholder="Write what you want to change in your image and click generate..."
-                  className={`promptbox-scrollbar text-md min-h-[2.5em] w-full resize-y overflow-y-auto bg-transparent pr-8 text-white placeholder-white placeholder:text-white/60 focus:outline-none ${isExpanded ? "max-h-[500px]" : "max-h-[5.5em]"}`}
+                  className={`promptbox-scrollbar text-md min-h-[2.5em] w-full resize-y overflow-y-auto bg-transparent pr-8 text-on-surface placeholder-on-surface placeholder:text-on-surface/60 focus:outline-none ${isExpanded ? "max-h-[500px]" : "max-h-[5.5em]"}`}
                   value={prompt}
                   onChange={handleChange}
                   onPaste={handlePaste}
@@ -428,7 +428,7 @@ export const PromptBoxEdit = ({
                 />
                 <PromptFullscreenButton onClick={openFullscreen} />
                 <span
-                  className={`pointer-events-none absolute -bottom-1 right-4 text-[10px] tabular-nums ${isFinite(maxLen) && prompt.length > maxLen ? "text-red-500" : "text-white/40"}`}
+                  className={`pointer-events-none absolute -bottom-1 right-4 text-[10px] tabular-nums ${isFinite(maxLen) && prompt.length > maxLen ? "text-error" : "text-on-surface/40"}`}
                 >
                   {prompt.length} / {isFinite(maxLen) ? maxLen : "∞"}
                 </span>
@@ -494,7 +494,7 @@ export const PromptBoxEdit = ({
                   confirmClear={referenceImages.length > 0}
                 />
                 <GenerateButton
-                  className="flex items-center border-none bg-white px-3 text-sm font-bold text-black hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center border-none bg-inverse-surface px-3 text-sm font-bold text-inverse-on-surface hover:bg-inverse-surface/90 disabled:cursor-not-allowed disabled:opacity-50"
                   icon={undefined}
                   onClick={handleGenerate}
                   disabled={isDisabled || !prompt.trim()}
@@ -511,7 +511,7 @@ export const PromptBoxEdit = ({
               <button
                 type="button"
                 onClick={toggleExpand}
-                className="text-white/30 hover:text-white/90 transition-colors px-3 py-0.5"
+                className="text-on-surface/30 hover:text-on-surface/90 transition-colors px-3 py-0.5"
               >
                 <DynamicIcon icon={isExpanded ? ChevronUpIcon : ChevronDownIcon} className="text-xs" />
               </button>

@@ -1340,10 +1340,9 @@ div + div > .lu-picker-head { margin-top: 2px; }
 
    Warum Stop NEUTRAL bleibt und nicht `.lu-primary` traegt: Stop ist der
    Normalabschluss eines Streams und die haeufigste Aktion, waehrend eine
-   Antwort laeuft — kein destruktiver Bestaetigungsknopf. Es trug
-   `bg-red-500/15 text-red-400`, und bei 94 `text-red-400`-Fundstellen
-   heisst Rot in dieser App „kaputt oder wird geloescht" (Audit §4, Chat
-   streamend). Auffindbar bleibt es ueber `data-active`, also ueber den
+   Antwort laeuft — kein destruktiver Bestaetigungsknopf. Es trug die
+   Fehlerfarbe, und Rot heisst in dieser App „kaputt oder wird geloescht"
+   (Audit §4, Chat streamend). Auffindbar bleibt es ueber `data-active`, also ueber den
    Behaelter des neutralen Rezepts, nicht ueber Farbe.
 
    Geometrie aus vorhandenen Tokens, keine neuen Zahlen:
@@ -1526,8 +1525,8 @@ div + div > .lu-picker-head { margin-top: 2px; }
      • create/ui/Button.tsx      (Variante `primary`, u.a. Generate)
      • auth/AccountPanel.tsx     (Sign in / Create account)
      • chat/ChatInput.tsx        (Send)
-   Vorher waren das drei getrennte Graustufen-Rezepte (`bg-gray-900`,
-   eine helle Tonung, eine Glasstufe) — die wichtigste Aktion des Bildschirms
+   Vorher waren das drei getrennte Graustufen-Rezepte (ein fast schwarzes
+   Grau, eine helle Tonung, eine Glasstufe) — die wichtigste Aktion des Bildschirms
    sah aus wie eine beliebige Nebenaktion.
 
    Farbe: primary mit on-primary, aus dem generierten M3-Schema; Hover ist

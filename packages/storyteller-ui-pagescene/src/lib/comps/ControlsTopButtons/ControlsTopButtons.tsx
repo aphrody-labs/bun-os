@@ -351,7 +351,7 @@ export const ControlsTopButtons = () => {
         <Button
           icon={outlinerShowing ? SquareCheckIcon : SquareIcon}
           className={TOOLBAR_BUTTON_CLASS_NAME}
-          iconClassName={twMerge("text-[16px]", outlinerShowing ? "text-white" : "text-white/20")}
+          iconClassName={twMerge("text-[16px]", outlinerShowing ? "text-on-surface" : "text-on-surface/20")}
           variant="secondary"
           onClick={handleShowOutliner}
         >
@@ -366,7 +366,7 @@ export const ControlsTopButtons = () => {
           icon={KeyboardIcon}
           variant="secondary"
           className={TOOLBAR_BUTTON_CLASS_NAME}
-          iconClassName={twMerge("text-[16px]", cheatsheetPinned ? "text-white" : "text-white/20")}
+          iconClassName={twMerge("text-[16px]", cheatsheetPinned ? "text-on-surface" : "text-on-surface/20")}
           onClick={toggleCheatsheet}
           data-cheatsheet-toggle
         >

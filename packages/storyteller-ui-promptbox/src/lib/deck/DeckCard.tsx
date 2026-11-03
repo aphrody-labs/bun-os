@@ -84,8 +84,8 @@ export const DeckCard = ({ item, onRemove, onClick, hideHoverChrome, animateIn, 
   return (
     <div
       className={twMerge(
-        "glass group relative aspect-square w-14 shrink-0 overflow-hidden rounded-[3px] border-2 border-white/30 transition-all duration-200",
-        !item.uploading && "cursor-pointer hover:border-white/80 hover:cursor-zoom-in",
+        "glass group relative aspect-square w-14 shrink-0 overflow-hidden rounded-[3px] border-2 border-outline transition-all duration-200",
+        !item.uploading && "cursor-pointer hover:border-on-surface/80 hover:cursor-zoom-in",
         item.kind === "audio" && "hover:cursor-pointer",
         item.kind === "mesh" && "hover:cursor-default",
         animateIn && "animate-[deck-pop_180ms_ease-out]",
@@ -121,32 +121,32 @@ export const DeckCard = ({ item, onRemove, onClick, hideHoverChrome, animateIn, 
             icon={isPlaying ? SquareIcon : PlayIcon}
             className={twMerge(
               "h-5 w-5 transition-colors",
-              isPlaying ? "text-red-400" : "text-base-fg/60 group-hover:text-base-fg",
+              isPlaying ? "text-error" : "text-base-fg/60 group-hover:text-base-fg",
             )}
           />
         </div>
       )}
 
       {item.kind === "video" && (
-        <div className="pointer-events-none absolute left-[3px] top-[3px] flex h-4 w-4 items-center justify-center bg-black/60 text-white">
+        <div className="pointer-events-none absolute left-[3px] top-[3px] flex h-4 w-4 items-center justify-center bg-surface/60 text-on-surface">
           <VideoIcon className="h-2.5 w-2.5" />
         </div>
       )}
       {item.kind === "audio" && (
-        <div className="pointer-events-none absolute left-[3px] top-[3px] flex h-4 w-4 items-center justify-center bg-black/60 text-white">
+        <div className="pointer-events-none absolute left-[3px] top-[3px] flex h-4 w-4 items-center justify-center bg-surface/60 text-on-surface">
           <MusicIcon className="h-2.5 w-2.5" />
         </div>
       )}
 
       {item.duration != null && (
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/70 py-0.5 text-[10px] font-bold text-white">
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex items-center justify-center bg-surface/70 py-0.5 text-[10px] font-bold text-on-surface">
           {item.duration}s
         </div>
       )}
 
       {item.uploading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-          <LoaderCircleIcon className="h-6 w-6 animate-spin text-white" />
+        <div className="absolute inset-0 flex items-center justify-center bg-surface/20">
+          <LoaderCircleIcon className="h-6 w-6 animate-spin text-on-surface" />
         </div>
       )}
 
@@ -159,7 +159,7 @@ export const DeckCard = ({ item, onRemove, onClick, hideHoverChrome, animateIn, 
           }}
           onMouseDown={e => e.stopPropagation()}
           onPointerDown={e => e.stopPropagation()}
-          className="absolute right-[2px] top-[2px] flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-md transition-colors hover:bg-red/70 group-hover:opacity-100"
+          className="absolute right-[2px] top-[2px] flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-surface/50 text-on-surface opacity-0 backdrop-blur-md transition-colors hover:bg-error/70 group-hover:opacity-100"
         >
           <XIcon className="h-2.5 w-2.5" />
         </button>
@@ -196,7 +196,7 @@ export const DeckAddMenu = ({
       {groups.map((group, groupIndex) => (
         <div
           key={group.name ?? groupIndex}
-          className={groupIndex > 0 ? "mt-1 border-t border-white/10 pt-1" : undefined}
+          className={groupIndex > 0 ? "mt-1 border-t border-outline-variant pt-1" : undefined}
         >
           {showHeaders && group.name && (
             <div className="flex items-center justify-between gap-3 px-2.5 pb-0.5 pt-1">
@@ -211,7 +211,7 @@ export const DeckAddMenu = ({
               key={action.key}
               type="button"
               onClick={action.onSelect}
-              className="flex w-full items-center gap-2.5 rounded-[3px] px-2.5 py-1.5 text-left text-[13px] font-medium text-base-fg transition-colors hover:bg-white/10"
+              className="flex w-full items-center gap-2.5 rounded-[3px] px-2.5 py-1.5 text-left text-[13px] font-medium text-base-fg transition-colors hover:bg-on-surface/10"
             >
               <DynamicIcon
                 icon={action.icon ?? (action.key.startsWith("upload") ? UploadIcon : ImagesIcon)}
@@ -236,7 +236,7 @@ export const DeckPreviewModal = ({ item, onClose }: DeckPreviewModalProps) => (
   <Modal
     isOpen={item !== null}
     onClose={onClose}
-    backdropClassName="!bg-black/80"
+    backdropClassName="!bg-surface/80"
     className="h-fit w-fit max-w-none border-0 bg-transparent p-0 shadow-none"
   >
     {item &&

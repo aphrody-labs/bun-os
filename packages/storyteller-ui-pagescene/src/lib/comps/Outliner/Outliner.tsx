@@ -56,20 +56,20 @@ const OutlinerRow = ({ item }: { item: OutlinerItem }) => {
     <div
       role="button"
       className={twMerge(
-        "flex cursor-pointer items-center justify-between gap-2 rounded-[3px] border border-transparent px-3 py-2 transition-colors duration-100 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-300",
-        isSelected && "border-white/20 bg-white/10 hover:bg-white/10",
+        "flex cursor-pointer items-center justify-between gap-2 rounded-[3px] border border-transparent px-3 py-2 transition-colors duration-100 hover:bg-on-surface/5 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-300",
+        isSelected && "border-outline-variant bg-on-surface/10 hover:bg-on-surface/10",
       )}
       onDoubleClick={handleDoubleClick}
       onClick={handleSelect}
       tabIndex={0}
     >
       <span className="flex min-w-0 items-center gap-3">
-        <div className="flex w-5 shrink-0 items-center justify-center text-base text-white/85">
+        <div className="flex w-5 shrink-0 items-center justify-center text-base text-on-surface/85">
           <DynamicIcon icon={item.icon} />
         </div>
         <span className="min-w-0">
-          <span className="block truncate text-[13px] font-semibold text-white">{item.name}</span>
-          <span className="block truncate text-xs text-white/50">{item.type}</span>
+          <span className="block truncate text-[13px] font-semibold text-on-surface">{item.name}</span>
+          <span className="block truncate text-xs text-on-surface/50">{item.type}</span>
         </span>
       </span>
       <div className="flex shrink-0 items-center gap-3">
@@ -77,7 +77,7 @@ const OutlinerRow = ({ item }: { item: OutlinerItem }) => {
           <button
             onClick={handleViewFromCamera}
             title="View from camera"
-            className="text-white/60 transition-colors duration-100 hover:text-white text-xs"
+            className="text-on-surface/60 transition-colors duration-100 hover:text-on-surface text-xs"
           >
             <div className="w-3">
               <LogInIcon />
@@ -91,8 +91,8 @@ const OutlinerRow = ({ item }: { item: OutlinerItem }) => {
             onClick={handleToggleSkeleton}
             title={item.skeletonVisible ? "Hide skeleton" : "Show skeleton"}
             className={twMerge(
-              "text-white/60 transition-colors duration-100 hover:text-white text-xs",
-              item.skeletonVisible && "text-white/90",
+              "text-on-surface/60 transition-colors duration-100 hover:text-on-surface text-xs",
+              item.skeletonVisible && "text-on-surface/90",
             )}
           >
             <div className="w-3">
@@ -104,8 +104,8 @@ const OutlinerRow = ({ item }: { item: OutlinerItem }) => {
           onClick={handleToggleLock}
           title={item.locked ? "Unlock" : "Lock"}
           className={twMerge(
-            "text-white/60 transition-colors duration-100 hover:text-white text-xs",
-            item.locked && "text-white/90",
+            "text-on-surface/60 transition-colors duration-100 hover:text-on-surface text-xs",
+            item.locked && "text-on-surface/90",
           )}
         >
           <div className="w-3">
@@ -116,8 +116,8 @@ const OutlinerRow = ({ item }: { item: OutlinerItem }) => {
           onClick={handleToggleVisibility}
           title={item.visible ? "Hide" : "Show"}
           className={twMerge(
-            "text-white/60 transition-colors duration-100 hover:text-white text-xs",
-            !item.visible && "text-white/90",
+            "text-on-surface/60 transition-colors duration-100 hover:text-on-surface text-xs",
+            !item.visible && "text-on-surface/90",
           )}
         >
           <div className="w-3">
@@ -154,7 +154,7 @@ export const Outliner = () => {
           icon={PlusIcon}
           variant="ghost"
           iconClassName="h-3.5 w-3.5 shrink-0"
-          className="h-7 gap-1 px-1.5 py-0 text-[11px] leading-none text-white/70 hover:text-white"
+          className="h-7 gap-1 px-1.5 py-0 text-[11px] leading-none text-on-surface/70 hover:text-on-surface"
           onClick={openAssetModal}
         >
           Add
@@ -164,7 +164,7 @@ export const Outliner = () => {
           variant="ghost"
           aria-label="Close scene panel"
           iconClassName="h-4 w-4 shrink-0"
-          className="h-7 w-7 p-0 text-white/50 hover:text-white"
+          className="h-7 w-7 p-0 text-on-surface/50 hover:text-on-surface"
           onClick={() => {
             usePageSceneStore.getState().setOutlinerShowing(false);
           }}

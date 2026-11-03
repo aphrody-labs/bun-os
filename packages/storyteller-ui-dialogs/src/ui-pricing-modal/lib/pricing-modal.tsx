@@ -63,7 +63,7 @@ export function PricingContent({ title, subtitle }: PricingContentProps) {
 
   return (
     <div className="min-h-0 flex-1 bg-surface-container-lowest text-on-surface">
-      <div className="bg-primary text-on-surface">
+      <div className="bg-primary text-on-primary">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 py-2.5 pl-6 pr-14 md:pl-10">
           <p className="pricing-hud flex items-center gap-2 font-bold">
             <TagIcon aria-hidden className="h-3.5 w-3.5" />

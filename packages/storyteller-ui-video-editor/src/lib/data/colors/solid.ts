@@ -1,244 +1,244 @@
 export const colors = [
-  "#ffffff",
-  "#000000",
-  "#ffe2e2",
-  "#ffc9c9",
-  "#ffa2a2",
-  "#ff6467",
-  "#fb2c36",
-  "#e7000b",
-  "#c10007",
-  "#9f0712",
-  "#82181a",
-  "#460809",
-  "#fff7ed",
-  "#ffedd4",
-  "#ffd6a7",
-  "#ffb86a",
-  "#ff8904",
-  "#ff6900",
-  "#f54900",
-  "#ca3500",
-  "#9f2d00",
-  "#7e2a0c",
-  "#441306",
-  "#fffbeb",
-  "#fef3c6",
-  "#fee685",
-  "#ffd230",
-  "#ffb900",
-  "#fe9a00",
-  "#e17100",
-  "#bb4d00",
-  "#973c00",
-  "#7b3306",
-  "#461901",
-  "#fefce8",
-  "#fef9c2",
-  "#fff085",
-  "#ffdf20",
-  "#fdc700",
-  "#f0b100",
-  "#d08700",
-  "#a65f00",
-  "#894b00",
-  "#733e0a",
-  "#432004",
-  "#f7fee7",
-  "#ecfcca",
-  "#d8f999",
-  "#bbf451",
-  "#9ae600",
-  "#7ccf00",
-  "#5ea500",
-  "#497d00",
-  "#3c6300",
-  "#35530e",
-  "#192e03",
-  "#f0fdf4",
-  "#dcfce7",
-  "#b9f8cf",
-  "#7bf1a8",
-  "#05df72",
-  "#00c950",
-  "#00a63e",
-  "#008236",
-  "#016630",
-  "#0d542b",
-  "#032e15",
-  "#ecfdf5",
-  "#d0fae5",
-  "#a4f4cf",
-  "#5ee9b5",
-  "#00d492",
-  "#00bc7d",
-  "#009966",
-  "#007a55",
-  "#006045",
-  "#004f3b",
-  "#002c22",
-  "#f0fdfa",
-  "#cbfbf1",
-  "#96f7e4",
-  "#46ecd5",
-  "#00d5be",
-  "#00bba7",
-  "#009689",
-  "#00786f",
-  "#005f5a",
-  "#0b4f4a",
-  "#022f2e",
-  "#ecfeff",
-  "#cefafe",
-  "#a2f4fd",
-  "#53eafd",
-  "#00d3f2",
-  "#00b8db",
-  "#0092b8",
-  "#007595",
-  "#005f78",
-  "#104e64",
-  "#053345",
-  "#f0f9ff",
-  "#dff2fe",
-  "#b8e6fe",
-  "#74d4ff",
-  "#00bcff",
-  "#00a6f4",
-  "#0084d1",
-  "#0069a8",
-  "#00598a",
-  "#024a70",
-  "#052f4a",
-  "#eff6ff",
-  "#dbeafe",
-  "#bedbff",
-  "#8ec5ff",
-  "#51a2ff",
-  "#2b7fff",
-  "#155dfc",
-  "#1447e6",
-  "#193cb8",
-  "#1c398e",
-  "#162456",
-  "#eef2ff",
-  "#e0e7ff",
-  "#c6d2ff",
-  "#a3b3ff",
-  "#7c86ff",
-  "#615fff",
-  "#4f39f6",
-  "#432dd7",
-  "#372aac",
-  "#312c85",
-  "#1e1a4d",
-  "#f5f3ff",
-  "#ede9fe",
-  "#ddd6ff",
-  "#c4b4ff",
-  "#a684ff",
-  "#8e51ff",
-  "#7f22fe",
-  "#7008e7",
-  "#5d0ec0",
-  "#4d179a",
-  "#2f0d68",
-  "#faf5ff",
-  "#f3e8ff",
-  "#e9d4ff",
-  "#dab2ff",
-  "#c27aff",
-  "#ad46ff",
-  "#9810fa",
-  "#8200db",
-  "#6e11b0",
-  "#59168b",
-  "#3c0366",
-  "#fdf4ff",
-  "#fae8ff",
-  "#f6cfff",
-  "#f4a8ff",
-  "#ed6aff",
-  "#e12afb",
-  "#c800de",
-  "#a800b7",
-  "#8a0194",
-  "#721378",
-  "#4b004f",
-  "#fdf2f8",
-  "#fce7f3",
-  "#fccee8",
-  "#fda5d5",
-  "#fb64b6",
-  "#f6339a",
-  "#e60076",
-  "#c6005c",
-  "#a3004c",
-  "#861043",
-  "#510424",
-  "#fff1f2",
-  "#ffe4e6",
-  "#ffccd3",
-  "#ffa1ad",
-  "#ff637e",
-  "#ff2056",
-  "#ec003f",
-  "#c70036",
-  "#a50036",
-  "#8b0836",
-  "#4d0218",
-  "#f8fafc",
-  "#f1f5f9",
-  "#e2e8f0",
-  "#cad5e2",
-  "#90a1b9",
-  "#62748e",
-  "#45556c",
-  "#314158",
-  "#1d293d",
-  "#0f172b",
-  "#020618",
-  "#f9fafb",
-  "#f3f4f6",
-  "#e5e7eb",
-  "#d1d5dc",
-  "#99a1af",
-  "#6a7282",
-  "#4a5565",
-  "#364153",
-  "#1e2939",
-  "#101828",
-  "#030712",
-  "#fafafa",
-  "#f4f4f5",
-  "#e4e4e7",
-  "#d4d4d8",
-  "#9f9fa9",
-  "#71717b",
-  "#52525c",
-  "#3f3f46",
-  "#27272a",
-  "#18181b",
-  "#09090b",
-  "#f5f5f5",
-  "#e5e5e5",
-  "#d4d4d4",
-  "#a1a1a1",
-  "#737373",
-  "#525252",
-  "#404040",
-  "#262626",
-  "#171717",
-  "#0a0a0a",
-  "#fafaf9",
-  "#f5f5f4",
-  "#e7e5e4",
-  "#d6d3d1",
-  "#a6a09b",
-  "#79716b",
-  "#57534d",
-  "#44403b",
-  "#292524",
-  "#1c1917",
-  "#0c0a09",
+  "#ffffff", // design:content: background colour swatches offered to the user
+  "#000000", // design:content
+  "#ffe2e2", // design:content
+  "#ffc9c9", // design:content
+  "#ffa2a2", // design:content
+  "#ff6467", // design:content
+  "#fb2c36", // design:content
+  "#e7000b", // design:content
+  "#c10007", // design:content
+  "#9f0712", // design:content
+  "#82181a", // design:content
+  "#460809", // design:content
+  "#fff7ed", // design:content
+  "#ffedd4", // design:content
+  "#ffd6a7", // design:content
+  "#ffb86a", // design:content
+  "#ff8904", // design:content
+  "#ff6900", // design:content
+  "#f54900", // design:content
+  "#ca3500", // design:content
+  "#9f2d00", // design:content
+  "#7e2a0c", // design:content
+  "#441306", // design:content
+  "#fffbeb", // design:content
+  "#fef3c6", // design:content
+  "#fee685", // design:content
+  "#ffd230", // design:content
+  "#ffb900", // design:content
+  "#fe9a00", // design:content
+  "#e17100", // design:content
+  "#bb4d00", // design:content
+  "#973c00", // design:content
+  "#7b3306", // design:content
+  "#461901", // design:content
+  "#fefce8", // design:content
+  "#fef9c2", // design:content
+  "#fff085", // design:content
+  "#ffdf20", // design:content
+  "#fdc700", // design:content
+  "#f0b100", // design:content
+  "#d08700", // design:content
+  "#a65f00", // design:content
+  "#894b00", // design:content
+  "#733e0a", // design:content
+  "#432004", // design:content
+  "#f7fee7", // design:content
+  "#ecfcca", // design:content
+  "#d8f999", // design:content
+  "#bbf451", // design:content
+  "#9ae600", // design:content
+  "#7ccf00", // design:content
+  "#5ea500", // design:content
+  "#497d00", // design:content
+  "#3c6300", // design:content
+  "#35530e", // design:content
+  "#192e03", // design:content
+  "#f0fdf4", // design:content
+  "#dcfce7", // design:content
+  "#b9f8cf", // design:content
+  "#7bf1a8", // design:content
+  "#05df72", // design:content
+  "#00c950", // design:content
+  "#00a63e", // design:content
+  "#008236", // design:content
+  "#016630", // design:content
+  "#0d542b", // design:content
+  "#032e15", // design:content
+  "#ecfdf5", // design:content
+  "#d0fae5", // design:content
+  "#a4f4cf", // design:content
+  "#5ee9b5", // design:content
+  "#00d492", // design:content
+  "#00bc7d", // design:content
+  "#009966", // design:content
+  "#007a55", // design:content
+  "#006045", // design:content
+  "#004f3b", // design:content
+  "#002c22", // design:content
+  "#f0fdfa", // design:content
+  "#cbfbf1", // design:content
+  "#96f7e4", // design:content
+  "#46ecd5", // design:content
+  "#00d5be", // design:content
+  "#00bba7", // design:content
+  "#009689", // design:content
+  "#00786f", // design:content
+  "#005f5a", // design:content
+  "#0b4f4a", // design:content
+  "#022f2e", // design:content
+  "#ecfeff", // design:content
+  "#cefafe", // design:content
+  "#a2f4fd", // design:content
+  "#53eafd", // design:content
+  "#00d3f2", // design:content
+  "#00b8db", // design:content
+  "#0092b8", // design:content
+  "#007595", // design:content
+  "#005f78", // design:content
+  "#104e64", // design:content
+  "#053345", // design:content
+  "#f0f9ff", // design:content
+  "#dff2fe", // design:content
+  "#b8e6fe", // design:content
+  "#74d4ff", // design:content
+  "#00bcff", // design:content
+  "#00a6f4", // design:content
+  "#0084d1", // design:content
+  "#0069a8", // design:content
+  "#00598a", // design:content
+  "#024a70", // design:content
+  "#052f4a", // design:content
+  "#eff6ff", // design:content
+  "#dbeafe", // design:content
+  "#bedbff", // design:content
+  "#8ec5ff", // design:content
+  "#51a2ff", // design:content
+  "#2b7fff", // design:content
+  "#155dfc", // design:content
+  "#1447e6", // design:content
+  "#193cb8", // design:content
+  "#1c398e", // design:content
+  "#162456", // design:content
+  "#eef2ff", // design:content
+  "#e0e7ff", // design:content
+  "#c6d2ff", // design:content
+  "#a3b3ff", // design:content
+  "#7c86ff", // design:content
+  "#615fff", // design:content
+  "#4f39f6", // design:content
+  "#432dd7", // design:content
+  "#372aac", // design:content
+  "#312c85", // design:content
+  "#1e1a4d", // design:content
+  "#f5f3ff", // design:content
+  "#ede9fe", // design:content
+  "#ddd6ff", // design:content
+  "#c4b4ff", // design:content
+  "#a684ff", // design:content
+  "#8e51ff", // design:content
+  "#7f22fe", // design:content
+  "#7008e7", // design:content
+  "#5d0ec0", // design:content
+  "#4d179a", // design:content
+  "#2f0d68", // design:content
+  "#faf5ff", // design:content
+  "#f3e8ff", // design:content
+  "#e9d4ff", // design:content
+  "#dab2ff", // design:content
+  "#c27aff", // design:content
+  "#ad46ff", // design:content
+  "#9810fa", // design:content
+  "#8200db", // design:content
+  "#6e11b0", // design:content
+  "#59168b", // design:content
+  "#3c0366", // design:content
+  "#fdf4ff", // design:content
+  "#fae8ff", // design:content
+  "#f6cfff", // design:content
+  "#f4a8ff", // design:content
+  "#ed6aff", // design:content
+  "#e12afb", // design:content
+  "#c800de", // design:content
+  "#a800b7", // design:content
+  "#8a0194", // design:content
+  "#721378", // design:content
+  "#4b004f", // design:content
+  "#fdf2f8", // design:content
+  "#fce7f3", // design:content
+  "#fccee8", // design:content
+  "#fda5d5", // design:content
+  "#fb64b6", // design:content
+  "#f6339a", // design:content
+  "#e60076", // design:content
+  "#c6005c", // design:content
+  "#a3004c", // design:content
+  "#861043", // design:content
+  "#510424", // design:content
+  "#fff1f2", // design:content
+  "#ffe4e6", // design:content
+  "#ffccd3", // design:content
+  "#ffa1ad", // design:content
+  "#ff637e", // design:content
+  "#ff2056", // design:content
+  "#ec003f", // design:content
+  "#c70036", // design:content
+  "#a50036", // design:content
+  "#8b0836", // design:content
+  "#4d0218", // design:content
+  "#f8fafc", // design:content
+  "#f1f5f9", // design:content
+  "#e2e8f0", // design:content
+  "#cad5e2", // design:content
+  "#90a1b9", // design:content
+  "#62748e", // design:content
+  "#45556c", // design:content
+  "#314158", // design:content
+  "#1d293d", // design:content
+  "#0f172b", // design:content
+  "#020618", // design:content
+  "#f9fafb", // design:content
+  "#f3f4f6", // design:content
+  "#e5e7eb", // design:content
+  "#d1d5dc", // design:content
+  "#99a1af", // design:content
+  "#6a7282", // design:content
+  "#4a5565", // design:content
+  "#364153", // design:content
+  "#1e2939", // design:content
+  "#101828", // design:content
+  "#030712", // design:content
+  "#fafafa", // design:content
+  "#f4f4f5", // design:content
+  "#e4e4e7", // design:content
+  "#d4d4d8", // design:content
+  "#9f9fa9", // design:content
+  "#71717b", // design:content
+  "#52525c", // design:content
+  "#3f3f46", // design:content
+  "#27272a", // design:content
+  "#18181b", // design:content
+  "#09090b", // design:content
+  "#f5f5f5", // design:content
+  "#e5e5e5", // design:content
+  "#d4d4d4", // design:content
+  "#a1a1a1", // design:content
+  "#737373", // design:content
+  "#525252", // design:content
+  "#404040", // design:content
+  "#262626", // design:content
+  "#171717", // design:content
+  "#0a0a0a", // design:content
+  "#fafaf9", // design:content
+  "#f5f5f4", // design:content
+  "#e7e5e4", // design:content
+  "#d6d3d1", // design:content
+  "#a6a09b", // design:content
+  "#79716b", // design:content
+  "#57534d", // design:content
+  "#44403b", // design:content
+  "#292524", // design:content
+  "#1c1917", // design:content
+  "#0c0a09", // design:content
 ];

@@ -89,15 +89,16 @@ export function deserializeMoodboardDocument(documentJson: string): MoodboardDoc
 // Rendered in place of media whose token couldn't be resolved (deleted from
 // the library, or the resolve call failed). Keeps the item visible instead
 // of an invisible/broken tile. Serialization treats it like an empty src, so
-// the token is re-resolved on every load â€” self-healing if the media comes
-// back.
+// the token is re-resolved on every load, self-healing if the media comes
+// back. The tile is an image asset, so its greys are pixels, not theme roles.
+// design:content: placeholder image pixels
 export const UNRESOLVED_MEDIA_SRC =
   "data:image/svg+xml," +
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">' +
-      '<rect width="96" height="96" fill="#2a2a2e"/>' +
-      '<path d="M30 62l12-16 9 11 6-7 9 12H30z" fill="#55555c"/>' +
-      '<circle cx="38" cy="34" r="6" fill="#55555c"/>' +
+      '<rect width="96" height="96" fill="#2a2a2e"/>' + // design:content
+      '<path d="M30 62l12-16 9 11 6-7 9 12H30z" fill="#55555c"/>' + // design:content
+      '<circle cx="38" cy="34" r="6" fill="#55555c"/>' + // design:content
       "</svg>",
   );
 

@@ -52,11 +52,7 @@ export const MoodboardWorkspace = ({ adapter, topBarEndSlot }: Props) => {
   return (
     <div
       data-moodboard-root
-      className="relative h-full w-full overflow-hidden"
-      // Desktop themes set --st-bg (gray/light/black/aurora) so the board follows
-      // the active theme. The webapp never defines --st-bg, so it falls back to
-      // its own --background token (0 0% 9% / #171717), matching the rest of the app.
-      style={{ background: "var(--st-bg, hsl(0 0% 9%))" }}
+      className="relative h-full w-full overflow-hidden bg-surface"
     >
       {viewMode === "grid" ? <BoardGridView active={!presenting} adapter={adapter} /> : <Moodboard adapter={adapter} />}
       <TopLeftCluster mode={viewMode} onChange={setViewMode} />
@@ -80,7 +76,7 @@ const OPTIONS: Array<{ mode: ViewMode; label: string; icon: LucideIcon }> = [
 // Top-left chrome: the board picker plus the Grid/Canvas view switch, sharing
 // one glass island.
 const TopLeftCluster = ({ mode, onChange }: { mode: ViewMode; onChange: (m: ViewMode) => void }) => (
-  <div className="glass absolute left-3 top-3 z-40 flex items-center gap-0.5 rounded-2xl border border-ui-divider p-1 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.45)]">
+  <div className="glass absolute left-3 top-3 z-40 flex items-center gap-0.5 rounded-2xl border border-ui-divider p-1 shadow-[var(--md-sys-elevation-level3)]">
     <BoardPicker />
     <div className="mx-0.5 h-5 w-px bg-ui-divider" />
     {OPTIONS.map(opt => {
@@ -128,7 +124,7 @@ const SaveButton = ({ status, onSave }: { status: MoodboardSaveStatus; onSave: (
       className={[
         "flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-sm font-medium transition-colors duration-150",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-        status === "error" ? "text-red-400 hover:text-red-300" : "text-base-fg/55 hover:text-base-fg",
+        status === "error" ? "text-error hover:text-error" : "text-base-fg/55 hover:text-base-fg",
       ].join(" ")}
     >
       <DynamicIcon icon={icon} className={["h-3.5 w-3.5", status === "saving" ? "animate-spin" : ""].join(" ")} />
@@ -153,7 +149,7 @@ const TopRightCluster = ({
   endSlot?: ReactNode;
 }) => (
   <div className="pointer-events-none absolute right-3 top-3 z-40 flex items-center gap-2">
-    <div className="glass pointer-events-auto flex items-center rounded-xl border border-ui-divider p-0.5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.45)]">
+    <div className="glass pointer-events-auto flex items-center rounded-xl border border-ui-divider p-0.5 shadow-[var(--md-sys-elevation-level3)]">
       {saveStatus !== null && onSave && <SaveButton status={saveStatus} onSave={onSave} />}
       <button
         type="button"

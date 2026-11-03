@@ -58,12 +58,12 @@ export const KeyframeCards = ({
                 type="button"
                 onClick={onSwap}
                 title="Swap frames"
-                className="flex h-5 w-5 items-center justify-center rounded-full border border-white/20 bg-black/60 text-[10px] text-white shadow backdrop-blur-md transition-all hover:scale-110 hover:bg-black/80"
+                className="flex h-5 w-5 items-center justify-center rounded-full border border-outline-variant bg-surface/60 text-[10px] text-on-surface shadow backdrop-blur-md transition-all hover:scale-110 hover:bg-surface/80"
               >
                 <ArrowLeftRightIcon />
               </button>
             ) : (
-              <div className="pointer-events-none flex h-5 w-5 items-center justify-center rounded-full border border-white/10 bg-black/40 text-[10px] text-white/50 backdrop-blur-md">
+              <div className="pointer-events-none flex h-5 w-5 items-center justify-center rounded-full border border-outline-variant bg-surface/40 text-[10px] text-on-surface/50 backdrop-blur-md">
                 <ArrowLeftRightIcon />
               </div>
             )}
@@ -127,7 +127,7 @@ export const DeckSlotCard = ({
       type="button"
       onClick={() => enabledActions[0]?.onSelect()}
       className={twMerge(
-        "glass flex aspect-square w-14 flex-col items-center justify-center gap-0.5 rounded-[3px] border-2 border-dashed border-black/5 bg-ui-controls/40 text-base-fg transition-all duration-200 hover:z-10 hover:rotate-0 hover:scale-105 hover:bg-ui-controls/60 dark:border-white/25",
+        "glass flex aspect-square w-14 flex-col items-center justify-center gap-0.5 rounded-[3px] border-2 border-dashed border-outline-variant bg-ui-controls/40 text-base-fg transition-all duration-200 hover:z-10 hover:rotate-0 hover:scale-105 hover:bg-ui-controls/60 dark:border-outline-variant",
         tiltClass,
       )}
     >

@@ -526,7 +526,7 @@ export const PromptBoxAudio = ({
             </div>
             <div className="flex items-center gap-1.5">
               {missingRequiredAudioRef && (
-                <span className="flex animate-pulse items-center gap-1.5 text-xs font-medium text-red-500">
+                <span className="flex animate-pulse items-center gap-1.5 text-xs font-medium text-error">
                   Audio track required
                 </span>
               )}

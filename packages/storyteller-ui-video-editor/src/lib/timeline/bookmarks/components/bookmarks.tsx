@@ -193,7 +193,7 @@ function TimelineBookmark({
                 width: BOOKMARK_MARKER_WIDTH_PX,
                 height: BOOKMARK_MARKER_HEIGHT_PX,
                 clipPath: BOOKMARK_MARKER_CLIP_PATH,
-                backgroundColor: "hsl(var(--background))",
+                backgroundColor: "var(--md-sys-color-surface)",
               }}
             />
             <div
@@ -223,7 +223,7 @@ function TimelineBookmark({
                 width: BOOKMARK_MARKER_WIDTH_PX,
                 height: BOOKMARK_MARKER_HEIGHT_PX,
                 clipPath: BOOKMARK_MARKER_CLIP_PATH,
-                backgroundColor: "hsl(var(--background))",
+                backgroundColor: "var(--md-sys-color-surface)",
               }}
             />
             <div

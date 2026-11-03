@@ -33,18 +33,18 @@ export const PresentationView = ({ items, onClose }: Props) => {
   const item = items[Math.min(index, count - 1)];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim">
       <button
         type="button"
         aria-label="Exit presentation"
         onClick={onClose}
-        className="absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/80 backdrop-blur-md transition-colors hover:bg-white/15 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+        className="absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-on-surface/5 text-on-surface/80 backdrop-blur-md transition-colors hover:bg-on-surface/15 hover:text-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-on-surface/70"
       >
         <XIcon className="h-4 w-4" />
       </button>
 
       {count === 0 ? (
-        <p className="text-sm text-white/50">This board is empty.</p>
+        <p className="text-sm text-on-surface/50">This board is empty.</p>
       ) : (
         <>
           <div className="flex h-full w-full items-center justify-center p-12">
@@ -55,7 +55,7 @@ export const PresentationView = ({ items, onClose }: Props) => {
             <>
               <Arrow side="left" onClick={() => setIndex(i => (i - 1 + count) % count)} />
               <Arrow side="right" onClick={() => setIndex(i => (i + 1) % count)} />
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium tabular-nums text-white/70 backdrop-blur">
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-on-surface/10 px-3 py-1 text-xs font-medium tabular-nums text-on-surface/70 backdrop-blur">
                 {index + 1} / {count}
               </div>
             </>
@@ -75,14 +75,14 @@ const Stage = ({ item }: { item: BoardItem }) => {
     case "color":
       return (
         <div className="flex h-[60vh] w-[60vh] items-end rounded-3xl p-6" style={{ background: item.color }}>
-          <span className="rounded-full bg-black/40 px-3 py-1 text-sm font-medium uppercase tracking-wider text-white backdrop-blur">
+          <span className="rounded-full bg-surface/40 px-3 py-1 text-sm font-medium uppercase tracking-wider text-on-surface backdrop-blur">
             {item.color}
           </span>
         </div>
       );
     case "text":
       return (
-        <p className="max-w-3xl whitespace-pre-wrap text-center text-3xl font-medium leading-relaxed text-white">
+        <p className="max-w-3xl whitespace-pre-wrap text-center text-3xl font-medium leading-relaxed text-on-surface">
           {item.text || "Note"}
         </p>
       );
@@ -95,7 +95,7 @@ const Stage = ({ item }: { item: BoardItem }) => {
           className="flex max-w-2xl flex-col items-center gap-4 text-center"
         >
           {item.image && <img src={item.image} alt="" className="max-h-[60vh] rounded-2xl object-contain" />}
-          <span className="text-xl font-medium text-white">{item.title || item.url}</span>
+          <span className="text-xl font-medium text-on-surface">{item.title || item.url}</span>
         </a>
       );
     default:
@@ -110,7 +110,7 @@ const Arrow = ({ side, onClick }: { side: "left" | "right"; onClick: () => void 
     onClick={onClick}
     className={[
       "absolute top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full",
-      "border border-white/15 bg-white/5 text-white/80 backdrop-blur-md transition-colors hover:bg-white/15 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70",
+      "border border-outline-variant bg-on-surface/5 text-on-surface/80 backdrop-blur-md transition-colors hover:bg-on-surface/15 hover:text-on-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-on-surface/70",
       side === "left" ? "left-5" : "right-5",
     ].join(" ")}
   >

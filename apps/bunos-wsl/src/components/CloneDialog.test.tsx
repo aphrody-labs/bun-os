@@ -155,7 +155,7 @@ describe('CloneDialog', () => {
 
     it('calls onClose when backdrop clicked', () => {
       render(<CloneDialog {...defaultProps} />);
-      const backdrop = document.querySelector('.backdrop-blur-xs');
+      const backdrop = document.querySelector('[class~="bg-scrim/32"]');
       fireEvent.click(backdrop!);
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });

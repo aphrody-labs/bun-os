@@ -111,7 +111,7 @@ export function LoadingSpinner({ size = 'md', label, className = '' }: LoadingSp
 export function LoadingOverlay({ message = 'Loading...', inline = false }: LoadingOverlayProps) {
   const containerClasses = inline
     ? 'flex items-center justify-center py-8'
-    : 'absolute inset-0 flex items-center justify-center bg-surface/80 backdrop-blur-xs';
+    : 'absolute inset-0 flex items-center justify-center bg-surface/80';
 
   return (
     <div className={containerClasses}>

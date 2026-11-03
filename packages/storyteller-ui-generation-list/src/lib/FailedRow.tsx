@@ -37,7 +37,7 @@ export const FailedRow = memo(function FailedRow({
   return (
     <div className="flex items-center gap-3 px-2.5 py-2">
       {/* Error thumbnail — ref image (if any) faded behind the warning icon */}
-      <div className="relative flex size-[100px] shrink-0 items-center justify-center overflow-hidden bg-red-500/10 leading-none">
+      <div className="relative flex size-[100px] shrink-0 items-center justify-center overflow-hidden bg-error/10 leading-none">
         {refImageUrl && (
           <img
             src={refImageUrl}
@@ -46,26 +46,26 @@ export const FailedRow = memo(function FailedRow({
             className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10"
           />
         )}
-        <CircleAlertIcon className="relative text-2xl text-red-400" />
+        <CircleAlertIcon className="relative text-2xl text-error" />
       </div>
 
       {/* Reason + prompt + model */}
       <div className="min-w-0 flex-1">
         <div className="flex items-start gap-2">
-          <p className="min-w-0 flex-1 truncate text-sm font-medium text-red-400">
+          <p className="min-w-0 flex-1 truncate text-sm font-medium text-error">
             {failureReason || "Generation failed"}
           </p>
           {prompt && <CopyPromptButton text={prompt} onCopyResult={onCopyPromptResult} />}
           {recreateSlot}
         </div>
-        {prompt && <p className="mt-0.5 truncate text-xs text-white/45">{prompt}</p>}
-        <div className="mt-1 flex items-center gap-1.5 text-xs text-white/40">
+        {prompt && <p className="mt-0.5 truncate text-xs text-on-surface/45">{prompt}</p>}
+        <div className="mt-1 flex items-center gap-1.5 text-xs text-on-surface/40">
           {iconPath && <img src={iconPath} alt="" className="h-3 w-3 shrink-0 icon-auto-contrast" />}
           <span className="truncate">{modelLabel}</span>
           {failureMessage && failureMessage !== failureReason && (
             <>
-              <span className="text-white/20">·</span>
-              <span className="truncate text-red-400/60">{failureMessage}</span>
+              <span className="text-on-surface/20">·</span>
+              <span className="truncate text-error/60">{failureMessage}</span>
             </>
           )}
         </div>
@@ -75,7 +75,7 @@ export const FailedRow = memo(function FailedRow({
       <button
         type="button"
         onClick={() => onDismiss(id)}
-        className="flex shrink-0 items-center gap-1.5 rounded-[3px] bg-white/5 px-3 py-1.5 text-xs text-white/50 transition-colors hover:bg-white/10 hover:text-white/70"
+        className="flex shrink-0 items-center gap-1.5 rounded-[3px] bg-on-surface/5 px-3 py-1.5 text-xs text-on-surface/50 transition-colors hover:bg-on-surface/10 hover:text-on-surface/70"
       >
         <XIcon />
         Dismiss

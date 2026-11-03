@@ -54,7 +54,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, onSceneSelect, sele
         onError={() => setLoadError(true)}
         loading="lazy"
       />
-      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-black/80 to-transparent" />
+      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-surface/80 to-transparent" />
       <div className="absolute bottom-[8px] left-[10px] text-start text-sm drop-shadow-md">
         <div className="flex flex-col">
           <span className="w-60 truncate text-sm font-medium">{scene.name}</span>
@@ -71,11 +71,11 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, onSceneSelect, sele
         <path
           opacity="1"
           d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
-          fill="#FC6B68"
+          className="fill-primary"
         />
         <path
           d="M369 175c-9.4 9.4-9.4 24.6 0 33.9L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0z"
-          fill="#FFFFFF"
+          className="fill-on-primary"
         />
       </svg>
     </button>

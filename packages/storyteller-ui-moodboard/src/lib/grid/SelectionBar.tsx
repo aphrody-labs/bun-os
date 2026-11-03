@@ -34,9 +34,9 @@ export const SelectionBar = ({
       {/* Styled to match the webapp library's multiselect bar: solid pill, filled
           control buttons, red delete, round clear. */}
       <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-ui-panel-border bg-ui-panel/95 px-2.5 py-2 shadow-xl backdrop-blur">
-        <span className="px-1 text-sm font-medium text-white/80">{count} selected</span>
+        <span className="px-1 text-sm font-medium text-on-surface/80">{count} selected</span>
         {/* Triage shortcut discoverability — these keys act on the selection. */}
-        <span className="hidden items-center gap-1 text-[11px] text-white/40 sm:flex">
+        <span className="hidden items-center gap-1 text-[11px] text-on-surface/40 sm:flex">
           <Kbd>1–5</Kbd> rate
           <Kbd>0</Kbd> clear
         </span>
@@ -49,7 +49,7 @@ export const SelectionBar = ({
           <button
             type="button"
             onClick={onUseReference}
-            className="flex items-center gap-2 rounded-full bg-ui-controls/60 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-ui-controls/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="flex items-center gap-2 rounded-full bg-ui-controls/60 px-3 py-1.5 text-sm font-medium text-on-surface transition-colors hover:bg-ui-controls/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <WandSparklesIcon className="text-xs" />
             Use as reference
@@ -58,7 +58,7 @@ export const SelectionBar = ({
         <button
           type="button"
           onClick={onDelete}
-          className="flex items-center gap-2 rounded-full bg-red/90 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-red focus:outline-none focus-visible:ring-2 focus-visible:ring-red"
+          className="flex items-center gap-2 rounded-full bg-error/90 px-3 py-1.5 text-sm font-medium text-on-error transition-colors hover:bg-error focus:outline-none focus-visible:ring-2 focus-visible:ring-error"
         >
           <Trash2Icon className="text-xs" />
           Delete
@@ -67,7 +67,7 @@ export const SelectionBar = ({
           type="button"
           aria-label="Clear selection"
           onClick={onClear}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-ui-controls/60 text-white transition-colors hover:bg-ui-controls/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-ui-controls/60 text-on-surface transition-colors hover:bg-ui-controls/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           <XIcon />
         </button>
@@ -116,7 +116,7 @@ const MoveToMenu = ({
         onClick={() => setOpen(o => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-full bg-ui-controls/60 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-ui-controls/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="flex items-center gap-2 rounded-full bg-ui-controls/60 px-3 py-1.5 text-sm font-medium text-on-surface transition-colors hover:bg-ui-controls/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         <LayersIcon className="text-xs" />
         Move to
@@ -163,8 +163,8 @@ const MenuItem = ({
       accent
         ? "text-primary hover:bg-ui-controls/50"
         : muted
-          ? "text-white/50 hover:bg-ui-controls/50 hover:text-white"
-          : "text-white hover:bg-ui-controls/50",
+          ? "text-on-surface/50 hover:bg-ui-controls/50 hover:text-on-surface"
+          : "text-on-surface hover:bg-ui-controls/50",
     ].join(" ")}
   >
     {icon ? <DynamicIcon icon={icon} className="h-3 w-3 shrink-0 opacity-70" /> : <span className="h-3 w-3 shrink-0" />}
@@ -173,7 +173,7 @@ const MenuItem = ({
 );
 
 const Kbd = ({ children }: { children: ReactNode }) => (
-  <kbd className="rounded border border-ui-panel-border bg-white/5 px-1 py-px font-sans text-[10px] text-white/60">
+  <kbd className="rounded border border-ui-panel-border bg-on-surface/5 px-1 py-px font-sans text-[10px] text-on-surface/60">
     {children}
   </kbd>
 );

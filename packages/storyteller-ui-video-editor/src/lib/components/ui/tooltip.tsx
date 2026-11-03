@@ -14,19 +14,19 @@ const tooltipVariants = cva("z-50 overflow-visible rounded-lg text-sm shadow-md"
   variants: {
     variant: {
       default: "bg-popover text-popover-foreground border px-3 py-1.5",
-      destructive: "bg-destructive/10 text-destructive dark:bg-destructive/20 border-destructive [border-width:0.5px]",
+      destructive: "bg-error-container text-on-error-container border-error [border-width:0.5px]",
       outline: "border-border",
       important:
-        "bg-amber-100/90 text-amber-900 dark:bg-amber-900/20 dark:text-amber-300 border-amber-900 [border-width:0.5px]",
+        "bg-warning-container text-on-warning-container border-warning [border-width:0.5px]",
       promotions:
-        "bg-red-100/90 text-redb-900 dark:bg-red-900/20 dark:text-red-300 border-red-900 [border-width:0.5px]",
+        "bg-error-container text-on-error-container border-error [border-width:0.5px]",
       personal:
-        "bg-green-100/90 text-green-900 dark:bg-green-900/20 dark:text-green-300 border-green-900 [border-width:0.5px]",
+        "bg-success-container text-on-success-container border-success [border-width:0.5px]",
       updates:
-        "bg-purple-100/90 text-purple-900 dark:bg-purple-900/20 dark:text-purple-300 border-purple-900 [border-width:0.5px]",
+        "bg-tertiary-container text-on-tertiary-container border-tertiary [border-width:0.5px]",
       forums:
-        "bg-blue-100/90 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300 border-blue-900 [border-width:0.5px]",
-      sidebar: "bg-white dark:bg-[#413F3E] p-2.5 flex flex-col gap-2",
+        "bg-primary-container text-on-primary-container border-primary [border-width:0.5px]",
+      sidebar: "bg-surface-container-highest text-on-surface p-2.5 flex flex-col gap-2",
     },
   },
   defaultVariants: {
@@ -55,7 +55,7 @@ const TooltipContent = React.forwardRef<React.ElementRef<typeof TooltipPrimitive
           className="absolute top-1/2 left-[-6px] -translate-y-1/2"
           aria-hidden="true"
         >
-          <path d="M6 0L0 5L6 10V0Z" className="fill-white/80 dark:fill-[#413F3E]" />
+          <path d="M6 0L0 5L6 10V0Z" className="fill-surface-container-highest" />
         </svg>
       )}
       {props.children}

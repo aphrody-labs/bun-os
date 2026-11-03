@@ -96,7 +96,7 @@ export const PromptFullscreenModal = ({
           {children}
         </div>
         <div className="flex shrink-0 items-center justify-end">
-          <span className={`text-[11px] tabular-nums ${overLimit ? "text-red-500" : "text-base-fg/40"}`}>
+          <span className={`text-[11px] tabular-nums ${overLimit ? "text-error" : "text-base-fg/40"}`}>
             {promptLength} / {isFinite(maxLength) ? maxLength : "∞"}
           </span>
         </div>

@@ -97,7 +97,7 @@ export function getDefaultBaseMaskParams(): BaseMaskParams {
   return {
     feather: 0,
     inverted: false,
-    strokeColor: "#ffffff",
+    strokeColor: "#ffffff", // design:content: default mask stroke (document data)
     strokeWidth: 0,
     strokeAlign: "center",
   };

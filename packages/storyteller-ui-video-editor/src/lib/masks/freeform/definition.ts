@@ -376,7 +376,7 @@ export const freeformMaskDefinition: MaskDefinition<"freeform"> = {
       params: {
         feather: 0,
         inverted: false,
-        strokeColor: "#ffffff",
+        strokeColor: "#ffffff", // design:content: mask pixels and default stroke (document data)
         strokeWidth: 0,
         strokeAlign: "center",
         path: [],
@@ -453,13 +453,13 @@ export const freeformMaskDefinition: MaskDefinition<"freeform"> = {
 
         if (params.strokeAlign === "inside") {
           ctx.globalCompositeOperation = "destination-in";
-          ctx.fillStyle = "#ffffff";
+          ctx.fillStyle = "#ffffff"; // design:content
           ctx.fill(path);
         }
 
         if (params.strokeAlign === "outside") {
           ctx.globalCompositeOperation = "destination-out";
-          ctx.fillStyle = "#ffffff";
+          ctx.fillStyle = "#ffffff"; // design:content
           ctx.fill(path);
         }
         ctx.restore();

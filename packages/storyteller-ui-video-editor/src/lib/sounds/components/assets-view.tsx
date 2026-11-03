@@ -467,7 +467,7 @@ function AudioItem({ sound, isPlaying, onPlay }: AudioItemProps) {
           variant="text"
           size="icon"
           className={`hover:text-foreground w-auto !opacity-100 ${
-            isSaved ? "text-red-500 hover:text-red-600" : "text-muted-foreground"
+            isSaved ? "text-error hover:text-error" : "text-muted-foreground"
           }`}
           onClick={handleSaveClick}
           title={isSaved ? "Remove from saved" : "Save sound"}

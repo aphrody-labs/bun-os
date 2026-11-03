@@ -5,7 +5,7 @@ import { PopoverMenu } from "@storyteller/ui-popover";
 import { Button } from "@storyteller/ui-button";
 import { Tooltip } from "@storyteller/ui-tooltip";
 
-const DEFAULT_COLOR = "#6384F4"; // character-selected — seeds the picker
+const DEFAULT_COLOR = "#6384F4"; // design:content: initial colour-picker swatch
 
 interface Props {
   onAdd: (color: string) => void;

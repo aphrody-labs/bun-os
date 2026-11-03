@@ -83,7 +83,7 @@ interface ChipMenuState {
 // itself bg-ui-controls, so the default bg-ui-controls/80 chip disappears
 // against it.
 const CHIP_CLASS =
-  "mention-chip mx-0.5 inline-flex max-w-[10rem] cursor-pointer items-center gap-1 rounded-[3px] border border-white/10 bg-ui-controls/80 px-1.5 py-0.5 align-middle leading-tight transition-colors hover:border-white/25 hover:bg-white/15 [@media(hover:none)]:bg-black/30 [@media(hover:none)]:border-white/15";
+  "mention-chip mx-0.5 inline-flex max-w-[10rem] cursor-pointer items-center gap-1 rounded-[3px] border border-outline-variant bg-ui-controls/80 px-1.5 py-0.5 align-middle leading-tight transition-colors hover:border-outline-variant hover:bg-on-surface/15 [@media(hover:none)]:bg-surface/30 [@media(hover:none)]:border-outline-variant";
 const CHIP_IMG_CLASS = "pointer-events-none h-4 w-4 shrink-0 object-cover select-none";
 const CHIP_NAME_CLASS = "pointer-events-none truncate";
 
@@ -542,7 +542,7 @@ function MentionDropdown({
             onClick={() => onSelect(item)}
             onMouseEnter={() => onHover(i)}
           >
-            <div className="h-8 w-8 flex-shrink-0 overflow-hidden border border-white/10 flex items-center justify-center bg-black/20">
+            <div className="h-8 w-8 flex-shrink-0 overflow-hidden border border-outline-variant flex items-center justify-center bg-surface/20">
               {item.type === "character" && item.preview ? (
                 <img src={item.preview} alt={item.label} className="h-full w-full object-cover" />
               ) : item.type === "character" ? (

@@ -185,7 +185,7 @@ const textElementParams: ElementParamDefinition[] = [
     key: "color",
     label: "Color",
     type: "color",
-    default: "#ffffff",
+    default: "#ffffff", // design:content: default colour parameter value (document data)
   },
   {
     key: "textAlign",

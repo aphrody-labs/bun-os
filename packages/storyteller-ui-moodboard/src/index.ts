@@ -50,3 +50,6 @@ export type {
   ViewMode,
   GridDensity,
 } from "./lib/boards/boardTypes";
+
+// Active M3 roles as concrete colours for canvas renderers (Konva, 2D canvas).
+export { resolveRoleColor, useRoleColors } from "./lib/theme/roleColors";

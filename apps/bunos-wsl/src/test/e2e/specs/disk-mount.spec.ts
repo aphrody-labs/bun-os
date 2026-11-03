@@ -371,8 +371,8 @@ describe("Disk Mount Features", () => {
     it("should have backdrop visible when dialog is open", async () => {
       await openDiskMountDialog();
 
-      // Check that backdrop is visible (theme uses bg-surface/80 with backdrop-blur)
-      const backdrop = await $(".backdrop-blur-xs");
+      // Check that backdrop is visible (the scrim role at the M3 scrim opacity)
+      const backdrop = await $('[class~="bg-scrim/32"]');
       await expect(backdrop).toBeDisplayed();
     });
 

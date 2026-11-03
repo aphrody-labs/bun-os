@@ -103,7 +103,7 @@ interface MoodboardState {
 const DEFAULT_TEXT_W = 200;
 const DEFAULT_TEXT_H = 60;
 const DEFAULT_FONT_SIZE = 24;
-const DEFAULT_TEXT_COLOR = "#FFFFFF";
+const DEFAULT_TEXT_COLOR = "#FFFFFF"; // design:content: default ink of a new text node (document data)
 const MAX_IMAGE_DIMENSION = 480;
 
 const fitWithinBox = (w: number, h: number, max: number): { w: number; h: number } => {

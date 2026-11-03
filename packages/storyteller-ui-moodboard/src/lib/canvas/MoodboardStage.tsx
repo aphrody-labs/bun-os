@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from "react";
 import Konva from "konva";
 import { Stage, Layer, Rect, Line, Group, Transformer } from "react-konva";
-import { useThemeFgRgb } from "./useThemeFgRgb";
+import { useRoleColors } from "../theme/roleColors";
 import { useShallow } from "zustand/react/shallow";
 import { useMoodboardStore } from "./MoodboardStore";
 import { MoodboardBackground } from "./MoodboardBackground";
@@ -51,7 +51,12 @@ export const MoodboardStage = ({ containerRef, stageRef }: Props) => {
 
   const zoom = viewport.zoom;
   const pan = viewport.pan;
-  const fgRgb = useThemeFgRgb();
+  const roles = useRoleColors({
+    dot: ["on-surface", 0.1],
+    selection: "primary",
+    marqueeFill: ["primary", 0.08],
+    guide: "tertiary",
+  });
 
   // Track wrapper size with ResizeObserver so the Stage fills its container.
   // The size lives in the store so overlays (recenter indicator, future
@@ -146,7 +151,7 @@ export const MoodboardStage = ({ containerRef, stageRef }: Props) => {
           viewport={visibleViewport}
           spacing={gridSpacing}
           zoom={zoom}
-          dotColor={`rgb(${fgRgb} / 0.10)`}
+          dotColor={roles.dot}
         />
       </Layer>
       <Layer>
@@ -208,7 +213,7 @@ export const MoodboardStage = ({ containerRef, stageRef }: Props) => {
                   y={minY}
                   width={maxX - minX}
                   height={maxY - minY}
-                  stroke="#3b82f6"
+                  stroke={roles.selection}
                   strokeWidth={1 / zoom}
                   dash={[4 / zoom, 4 / zoom]}
                   listening={false}
@@ -224,7 +229,7 @@ export const MoodboardStage = ({ containerRef, stageRef }: Props) => {
               width={n.width}
               height={n.height}
               rotation={n.rotation}
-              stroke="#3b82f6"
+              stroke={roles.selection}
               strokeWidth={1 / zoom}
               dash={[4 / zoom, 4 / zoom]}
               listening={false}
@@ -237,16 +242,16 @@ export const MoodboardStage = ({ containerRef, stageRef }: Props) => {
             y={marquee.y}
             width={marquee.width}
             height={marquee.height}
-            stroke="#3b82f6"
+            stroke={roles.selection}
             strokeWidth={1 / zoom}
             dash={[4 / zoom, 4 / zoom]}
-            fill="rgba(59,130,246,0.08)"
+            fill={roles.marqueeFill}
           />
         )}
         {lassoPath && lassoPath.length >= 2 && (
           <Line
             points={lassoPath.flatMap(p => [p.x, p.y])}
-            stroke="#3b82f6"
+            stroke={roles.selection}
             strokeWidth={1 / zoom}
             dash={[4 / zoom, 4 / zoom]}
             closed={false}
@@ -256,7 +261,7 @@ export const MoodboardStage = ({ containerRef, stageRef }: Props) => {
           <Line
             key={`guide-${i}`}
             points={g.axis === "x" ? [g.pos, g.from, g.pos, g.to] : [g.from, g.pos, g.to, g.pos]}
-            stroke="#f43f5e"
+            stroke={roles.guide}
             strokeWidth={1 / zoom}
             listening={false}
           />

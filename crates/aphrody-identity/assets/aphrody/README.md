@@ -37,3 +37,7 @@ cargo run -p nie-aphrody-gisement --bin export_aphrody -- \
 
 After regeneration, `cargo test -p aphrody-identity` verifies that the dossier parses, its pet block
 describes the embedded package, and the hashes in the table above are exact.
+
+`sprites/idle.webp` is the idle track alone (atlas row 0, six 192×208 cells, 1152×208), cut from `sprites/spritesheet.png`
+with `magick spritesheet.png -crop 1152x208+0+0 +repage -quality 92 -define webp:alpha-quality=100 -define webp:method=6 idle.webp`.
+Pages that only show the idle pet load it (55 KB) instead of the full 1.5 MB atlas.

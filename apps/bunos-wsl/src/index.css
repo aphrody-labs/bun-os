@@ -11,6 +11,9 @@
 
 @theme {
   --font-mono: var(--md-ref-typeface-code);
+  /* Tailwind transitions default to the M3 standard easing and the short4 duration. */
+  --default-transition-duration: var(--md-sys-motion-duration-short4);
+  --default-transition-timing-function: var(--md-sys-motion-easing-standard);
 }
 
 @layer base {
@@ -187,33 +190,6 @@ body.popup-window-transparent-surface #popup-root {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--md-sys-color-outline);
-}
-
-/* Buttons: the M3 state layer. */
-.btn-cyber {
-  position: relative;
-  overflow: hidden;
-  transition:
-    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
-    border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
-}
-
-.btn-cyber::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: currentColor;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
-}
-
-.btn-cyber:hover:not(:disabled)::before {
-  opacity: var(--md-sys-state-hover-state-layer-opacity);
-}
-
-.btn-cyber:active:not(:disabled)::before {
-  opacity: var(--md-sys-state-pressed-state-layer-opacity);
 }
 
 /* Data display styling */

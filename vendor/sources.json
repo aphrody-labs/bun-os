@@ -877,6 +877,12 @@
       "origin": "https://github.com/aphrody-labs/Detours.git",
       "upstream": "https://github.com/microsoft/Detours.git",
       "path": "detours"
+    },
+    "3dviz-pro-max": {
+      "origin": "https://github.com/aphrody-labs/3dviz-pro-max.git",
+      "upstream": "https://github.com/viettranx/3dviz-pro-max.git",
+      "path": "3dviz-pro-max",
+      "consumer": "packages/viz3d (bun run sync)"
     }
   },
   "references": {

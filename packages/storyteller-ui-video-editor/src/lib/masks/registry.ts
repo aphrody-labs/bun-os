@@ -55,7 +55,7 @@ export const BASE_MASK_PARAM_DEFINITIONS: ParamDefinition<keyof BaseMaskParams &
     key: "strokeColor",
     label: "Stroke color",
     type: "color",
-    default: "#ffffff",
+    default: "#ffffff", // design:content: default mask stroke (document data)
   },
 ];
 

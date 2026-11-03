@@ -14,7 +14,12 @@ import { getElementKeyframes } from "../../animation";
 import { canElementHaveAudio, canElementBeHidden, hasElementEffects, hasMediaId } from "../element-utils";
 import { timelineTimeToPixels, timelineTimeToSnappedPixels } from "../pixel-utils";
 import { getTrackHeight } from "./track-layout";
-import { getTimelineElementClassName, TIMELINE_TRACK_THEME } from "./theme";
+import {
+  getTimelineElementClassName,
+  TIMELINE_CLIP_FADE_CLASS,
+  TIMELINE_CLIP_INK_CLASS,
+  TIMELINE_CLIP_SUBTLE_INK_CLASS,
+} from "./theme";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -619,7 +624,7 @@ function KeyframeIndicators({
       >
         <HugeiconsIcon
           icon={KeyframeIcon}
-          className={cn("size-3.5 text-black", isIndicatorSelected ? "fill-primary" : "fill-white")}
+          className={cn("size-3.5 text-inverse-on-surface", isIndicatorSelected ? "fill-primary" : "fill-on-surface")}
           strokeWidth={1.5}
         />
       </button>
@@ -754,7 +759,7 @@ function ExpandedKeyframeLanes({
                 >
                   <HugeiconsIcon
                     icon={KeyframeIcon}
-                    className={cn("size-3.5 text-black mr-1", isSelected ? "fill-primary" : "fill-white")}
+                    className={cn("size-3.5 text-inverse-on-surface mr-1", isSelected ? "fill-primary" : "fill-on-surface")}
                     strokeWidth={1.5}
                   />
                 </button>
@@ -776,7 +781,7 @@ interface ElementContentProps {
 function TextElementContent({ element }: { element: Extract<TimelineElementType, { type: "text" }> }) {
   return (
     <div className="flex size-full items-center justify-start pl-2">
-      <span className="truncate text-xs text-white">
+      <span className={cn("truncate text-xs", TIMELINE_CLIP_INK_CLASS)}>
         {typeof element.params.content === "string" ? element.params.content : ""}
       </span>
     </div>
@@ -786,8 +791,8 @@ function TextElementContent({ element }: { element: Extract<TimelineElementType,
 function EffectElementContent({ element }: { element: Extract<TimelineElementType, { type: "effect" }> }) {
   return (
     <div className="flex size-full items-center justify-start gap-1 pl-2">
-      <HugeiconsIcon icon={MagicWand05Icon} className="size-4 shrink-0 text-white" />
-      <span className="truncate text-xs text-white">{element.name}</span>
+      <HugeiconsIcon icon={MagicWand05Icon} className={cn("size-4 shrink-0", TIMELINE_CLIP_INK_CLASS)} />
+      <span className={cn("truncate text-xs", TIMELINE_CLIP_INK_CLASS)}>{element.name}</span>
     </div>
   );
 }
@@ -805,7 +810,7 @@ function StickerElementContent({ element }: { element: Extract<TimelineElementTy
         width={20}
         height={20}
       />
-      <span className="truncate text-xs text-white">{element.name}</span>
+      <span className={cn("truncate text-xs", TIMELINE_CLIP_INK_CLASS)}>{element.name}</span>
     </div>
   );
 }
@@ -824,7 +829,7 @@ function GraphicElementContent({ element }: { element: Extract<TimelineElementTy
         width={20}
         height={20}
       />
-      <span className="truncate text-xs text-white">{element.name}</span>
+      <span className={cn("truncate text-xs", TIMELINE_CLIP_INK_CLASS)}>{element.name}</span>
     </div>
   );
 }
@@ -869,7 +874,6 @@ function AudioElementContent({ element, trackId }: { element: AudioElement; trac
             clipDurationSec={element.duration / TICKS_PER_SECOND}
             retime={element.retime}
             sourceStartSec={element.trimStart / TICKS_PER_SECOND}
-            color={TIMELINE_TRACK_THEME.audio.waveformColor}
           />
           <AudioVolumeLine element={element} trackId={trackId} />
         </div>
@@ -902,7 +906,7 @@ function EffectsButton({ element, track }: { element: VideoElement | ImageElemen
   return (
     <button
       type="button"
-      className="flex shrink-0 justify-center text-white cursor-pointer"
+      className={cn("flex shrink-0 justify-center cursor-pointer", TIMELINE_CLIP_INK_CLASS)}
       onMouseDown={event => event.stopPropagation()}
       onClick={handleClick}
     >
@@ -963,11 +967,11 @@ function MediaElementHeader({
     <div
       className={cn(
         "absolute top-0 left-0 flex h-5 w-full bg-linear-to-b pt-1",
-        hasFade && "from-black/30 to-transparent",
+        hasFade && [TIMELINE_CLIP_FADE_CLASS, "to-transparent"],
       )}
     >
       {leading && <div className="pl-1">{leading}</div>}
-      {name && <span className="truncate px-1.5 text-[0.6rem] leading-tight text-white/75">{name}</span>}
+      {name && <span className={cn("truncate px-1.5 text-[0.6rem] leading-tight", TIMELINE_CLIP_SUBTLE_INK_CLASS)}>{name}</span>}
     </div>
   );
 }

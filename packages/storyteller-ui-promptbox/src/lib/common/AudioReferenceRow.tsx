@@ -189,7 +189,7 @@ export const AudioReferenceRow = forwardRef<AudioReferenceRowHandle, AudioRefere
               ({referenceAudios.length}/{maxAudioCount})
             </span>
             {audioRequired && referenceAudios.length === 0 && (
-              <span className="ml-1.5 text-xs font-medium text-red-500">required</span>
+              <span className="ml-1.5 text-xs font-medium text-error">required</span>
             )}
           </span>
         </div>
@@ -239,9 +239,9 @@ export const AudioReferenceRow = forwardRef<AudioReferenceRowHandle, AudioRefere
                   type="button"
                   aria-label="Remove image"
                   onClick={() => onReferenceImagesChange?.([])}
-                  className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100"
+                  className="absolute inset-0 flex items-center justify-center bg-surface/60 opacity-0 transition-opacity group-hover:opacity-100"
                 >
-                  <XIcon className="h-3 w-3 text-white" />
+                  <XIcon className="h-3 w-3 text-on-surface" />
                 </button>
               </div>
             ))}
@@ -290,7 +290,7 @@ function AudioRefTile({ audio, index, onRemove }: { audio: RefAudio; index: numb
         type="button"
         aria-label={isPlaying ? "Stop" : "Play"}
         onClick={togglePlay}
-        className="flex h-5 w-5 items-center justify-center rounded-full bg-white/90 text-black transition-transform hover:scale-105"
+        className="flex h-5 w-5 items-center justify-center rounded-full bg-inverse-surface/90 text-inverse-on-surface transition-transform hover:scale-105"
       >
         <DynamicIcon icon={isPlaying ? SquareIcon : PlayIcon} className={`h-2 w-2 ${isPlaying ? "" : "ml-px"}`} />
       </button>

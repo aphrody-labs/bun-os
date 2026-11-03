@@ -192,14 +192,14 @@ export function CloneDialog({ isOpen, sourceName, onClose }: CloneDialogProps) {
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" onClick={handleClose} />
+        <div className="absolute inset-0 bg-scrim/32" onClick={handleClose} />
 
         {/* Dialog */}
         <div
           role="dialog"
           aria-modal="true"
           data-testid="clone-dialog"
-          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-md3-3 max-w-md w-full mx-4 p-6"
         >
         <h2 className="text-xl font-semibold text-on-surface mb-2">{t('clone.title')}</h2>
         <p className="text-sm text-on-surface-variant mb-4">
@@ -299,7 +299,7 @@ export function CloneDialog({ isOpen, sourceName, onClose }: CloneDialogProps) {
             onClick={handleClone}
             disabled={isCloning || !newName.trim() || !!validationError || !!pathError || isValidatingPath}
             data-testid="clone-confirm-button"
-            className="px-4 py-2 text-sm font-medium bg-primary hover:opacity-90 text-on-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 text-sm font-medium bg-primary state-layer text-on-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isCloning ? (
               t('clone.cloning')
