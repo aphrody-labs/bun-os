@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { expect, test, describe } from "bun:test";
 import { DesignCompiler } from "./generator.ts";
-import { loadDesignSystemFromDisk } from "./node.ts";
 
 describe("DesignCompiler React code generation", () => {
   const compiler = new DesignCompiler();
@@ -85,37 +84,15 @@ describe("DesignCompiler React code generation", () => {
 
     const tokens = JSON.parse(tokensFile!.content);
     expect(tokens.color).toBeDefined();
-    expect(tokens.color.primary).toBeDefined();
-    expect(tokens.color.primary["40"]).toBeDefined();
-    expect(tokens.color.primary["40"].$type).toBe("color");
-    expect(tokens.color.primary["40"].$value).toMatch(/^#[0-9a-fA-F]{6}$/);
+    for (const mode of ["light", "dark"] as const) {
+      expect(Object.keys(tokens.color[mode])).toHaveLength(49);
+      expect(tokens.color[mode].primary).toEqual({ $type: "color", $value: result.theme.themeExport[mode].primary });
+    }
   });
 
-  test("should load custom design system overrides and fall back to its accent color", () => {
-    // Custom design system "material" has --accent: #1a73e8; in design-systems/material/tokens.css
-    const withDisk = new DesignCompiler({
-      loadDesignSystem: loadDesignSystemFromDisk,
-    });
-    const result = withDisk.compile("Crée un layout", undefined, "material");
-    const themeFile = result.files.find(f => f.path === "src/theme.css");
-    expect(themeFile).toBeDefined();
-    expect(themeFile!.content).toContain("/* --- Design System Override: material --- */");
-    expect(themeFile!.content).toContain("--accent: #1a73e8;");
-
-    // Seed color should fall back to the design system's accent color (#1a73e8)
-    expect(result.brief.seedColor).toBe("#1a73e8");
-  });
-
-  test("ignores design systems when no loader is configured", () => {
+  test("records the design system id on the brief and keeps the canonical theme", () => {
     const result = compiler.compile("Crée un layout", undefined, "material");
-    const themeFile = result.files.find(f => f.path === "src/theme.css");
-    expect(themeFile!.content).not.toContain("Design System Override");
-  });
-
-  test("disk loader rejects path traversal and unknown ids", () => {
-    expect(loadDesignSystemFromDisk("../package")).toBeUndefined();
-    expect(loadDesignSystemFromDisk("..")).toBeUndefined();
-    expect(loadDesignSystemFromDisk("does-not-exist")).toBeUndefined();
-    expect(loadDesignSystemFromDisk("material")).toContain("--accent");
+    expect(result.brief.designSystemId).toBe("material");
+    expect(result.files.find(f => f.path === "src/theme.css")!.content).toBe(result.theme.cssCustomProperties);
   });
 });

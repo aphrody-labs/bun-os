@@ -235,7 +235,7 @@ export function createFetchHandler(compiler: DesignCompiler): (req: Request) => 
           body: {
             prompt: "string (required)",
             seedColor: "string (optional HEX seed)",
-            designSystemId: "string (optional design system override)",
+            designSystemId: "string (optional design system id recorded on the brief)",
           },
         },
         "POST /api/generate/finalize": {
@@ -295,10 +295,11 @@ export function runCli(options: CliOptions, compiler: DesignCompiler): number {
   console.log("\n--- DESIGN BRIEF EXTRACTED ---");
   console.log(JSON.stringify(result.brief, null, 2));
 
-  console.log("\n--- HCT SEED COLOR GENERATED ---");
-  console.log(`Seed Color: ${result.theme.seed}`);
-  console.log(`Primary (Tone 40): ${result.theme.palettes.primary.tones[40]}`);
-  console.log(`Neutral (Tone 98): ${result.theme.palettes.neutral.tones[98]}`);
+  const { themeExport } = result.theme;
+  console.log("\n--- THEME EXPORT ---");
+  console.log(`Seed Color: ${result.theme.seed} (${themeExport.variant})`);
+  console.log(`Primary: ${themeExport.light.primary} light, ${themeExport.dark.primary} dark`);
+  console.log(`Surface: ${themeExport.light.surface} light, ${themeExport.dark.surface} dark`);
 
   console.log("\n--- GENERATED FILES ---");
   for (const file of result.files) {

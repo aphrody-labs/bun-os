@@ -4,14 +4,12 @@
 
 import { DesignCompiler } from "./generator.ts";
 import { nativeSpecValidator } from "./native.ts";
-import { loadDesignSystemFromDisk } from "./node.ts";
 import { createFetchHandler, parseCliArgs, runCli } from "./handlers.ts";
 
 const PORT = 3005;
 
 const compiler = new DesignCompiler({
   validateSpec: nativeSpecValidator,
-  loadDesignSystem: loadDesignSystemFromDisk,
 });
 const cli = parseCliArgs(Bun.argv);
 

@@ -2,7 +2,7 @@
 
 # @aphrody/m3-design
 
-Design compiler and design-intelligence CLI: turns a natural-language brief into an M3 React scaffold, HCT theme and design tokens.
+Design compiler and design-intelligence CLI: turns a natural-language brief into an M3 React scaffold, a canonical M3 theme and design tokens.
 
 ```sh
 bun add -d @aphrody/m3-design
@@ -57,9 +57,9 @@ AA, a score under `--fail-under`) and 2 on unreadable input. The M3 tool host
 The design engine below generates artifacts against the same M3 component and
 token system; do not introduce a parallel product palette when extending it.
 
-`@aphrody/m3-design` is the natural-language design compiler of the **material-web** Material Design 3 monorepo. It turns raw, natural-language design briefs directly into **Material Design 3 (M3)** React scaffolds, emitting a production-ready `index.tsx` layout tree built on `@aphrody/m3-react` components, plus an HCT tonal-palette theme stylesheet and W3C design-token JSON.
+`@aphrody/m3-design` is the natural-language design compiler of the **material-web** Material Design 3 monorepo. It turns raw, natural-language design briefs directly into **Material Design 3 (M3)** React scaffolds, emitting a production-ready `index.tsx` layout tree built on `@aphrody/m3-react` components, plus the light and dark `--md-sys-color-*` stylesheet of the seed and W3C design-token JSON.
 
-It is meant to be a fast, deterministic scaffold generator for autonomous agents and tooling: it replaces manual visual-configuration forms with a semantic parser and a native HCT tonal theme engine backed by the `aphrody-m3-tokens` Rust implementation.
+It is meant to be a fast, deterministic scaffold generator for autonomous agents and tooling: it replaces manual visual-configuration forms with a semantic parser and the `aphrody-m3-tokens` Rust engine, reached through its WebAssembly build in `@aphrody/m3-tokens`.
 
 ---
 
@@ -72,7 +72,7 @@ graph TD
     A[Raw Design Brief / Prompt] --> B[Semantic Parser]
     B -->|DesignBrief Parameters| C[Design Compiler]
 
-    D[Seed Hex Color / Option] --> E[HCT Palette Engine]
+    D[Seed Hex Color / Option] --> E[aphrody-m3-tokens ThemeExport]
     E -->|18 Tone Steps| F[CSS Custom Properties]
 
     C -->|Compiles template & applies configs| G[index.tsx Layout Code]
@@ -94,14 +94,17 @@ Parses a raw natural-language prompt into structured design directives, extracti
 - **Color Extraction**: detects hex patterns or color references (e.g. "dark blue", "compact red") to pick a seed color. The default seed is the M3 baseline `#6750A4`.
 - **Feature Toggles**: auto-detects real-time streaming, thinking/shimmer indicators, and central action-router delegation.
 
-### 2. HCT Theme Compiler (`src/hct.ts`)
+### 2. Theme (`src/theme.ts`)
 
-Builds M3 tonal palettes with Google's **HCT (Hue, Chroma, Tone)** color space through the native `@aphrody/bun` bindings:
+`generateTheme(seed, { variant, contrastLevel })` returns the ThemeExport of the canonical engine
+(`aphrody_m3_tokens::theme::ThemeExport`): the 49 colour roles for light and dark, computed by
+`crates/aphrody-m3-tokens` through `@aphrody/m3-tokens`. The package computes no colour itself.
 
-- **CorePalette relationships**: primary, secondary, tertiary, neutral, neutral-variant, and error use the canonical Material Color Utilities hue/chroma relationships.
-- **Perceptual tone conversion**: each tone is converted by the shared Rust HCT engine instead of HSL saturation and lightness adjustments.
-- **Tonal Palettes**: computes 18 tone steps `[0, 6, 10, 12, 20, 22, 30, 40, 50, 60, 70, 80, 90, 94, 95, 98, 99, 100]` across 6 core keys: `primary`, `secondary`, `tertiary`, `error`, `neutral`, and `neutral-variant`.
-- **CSS Compilation**: maps palettes to M3 light and dark mode system tokens (e.g. `--md-sys-color-primary-container`, `--md-sys-color-surface-container`), matching the runtime `--md-sys-color-*` roles emitted by `@aphrody/material-web`.
+- **Stylesheet**: `cssCustomProperties` declares every `--md-sys-color-*` role, light by default, dark under
+  `prefers-color-scheme: dark` and `[data-theme="dark"]`.
+- **Design tokens**: `src/tokens.json` is W3C design-token JSON keyed `color.<mode>.<role>`.
+- **Parity**: `src/theme.test.ts` compares every role with the Rust goldens in
+  `crates/aphrody-m3-tokens/tests/fixtures`.
 
 ### 3. Layout Generator (`src/generator.ts`)
 
@@ -151,7 +154,7 @@ bun src/server.ts
 | Field       | Type     | Required | Description                                                   |
 | :---------- | :------- | :------- | :------------------------------------------------------------ |
 | `prompt`    | `string` | **Yes**  | Natural language text defining design layout requirements.    |
-| `seedColor` | `string` | No       | Hex string (e.g., `#6750A4`) to seed the HCT tonal generator. |
+| `seedColor` | `string` | No       | Hex string (e.g., `#6750A4`) seeding the canonical M3 scheme. |
 
 #### Response Schema (`GenerationResult`)
 
@@ -173,14 +176,19 @@ bun src/server.ts
     "hasActionRouter": false
   },
   "theme": {
-    "seed": "#0F52BA",
-    "palettes": {
-      "primary": {
-        "name": "primary",
-        "tones": { "0": "#000000", "40": "#0A3B85" }
-      }
+    "seed": "#0f52ba",
+    "themeExport": {
+      "schema_version": 1,
+      "spec_version": "2021",
+      "seed": "#0f52ba",
+      "variant": "tonal-spot",
+      "contrast_level": 0,
+      "light": { "primary": "...", "onPrimary": "..." },
+      "dark": { "primary": "...", "onPrimary": "..." }
     },
-    "cssCustomProperties": ":root {\n  --md-ref-palette-primary-0: #000000; ..."
+    "cssCustomProperties": ":root {
+  color-scheme: light dark;
+  --md-sys-color-background: ..."
   },
   "files": [
     { "path": "src/theme.css", "content": "..." },
@@ -361,7 +369,7 @@ All modules are clean, type-safe ESM exports:
 
 - `src/types.ts`: core models (`DesignBrief`, `M3Theme`, `GeneratedFile`, `GenerationResult`).
 - `src/parser.ts`: natural-language prompt parsing.
-- `src/hct.ts`: tonal-palette approximation for Material themes.
+- `src/theme.ts`: the ThemeExport of the seed from the canonical engine.
 - `src/prompts.ts`: directive mappings, the seed template, and visual catalogs.
 - `src/generator.ts`: the layout compiler.
 - `src/handlers.ts`: side-effect-free HTTP handler and CLI runner.
@@ -370,6 +378,6 @@ All modules are clean, type-safe ESM exports:
 ### Testing
 
 ```bash
-bun test        # unit suites (parser, hct, generator)
+bun test        # unit suites (parser, theme, generator)
 bun check -p tsconfig.json --noEmit
 ```

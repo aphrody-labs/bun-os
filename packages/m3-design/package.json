@@ -17,7 +17,6 @@
     "LICENSE",
     "LICENSES",
     "README.md",
-    "design-systems",
     "intelligence",
     "src"
   ],
@@ -36,7 +35,7 @@
   },
   "dependencies": {
     "@aphrody/bun": "workspace:*",
-    "@material/material-color-utilities": "catalog:"
+    "@aphrody/m3-tokens": "workspace:*"
   },
   "devDependencies": {
     "@aphrody/m3-config": "workspace:*"

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Core type definitions for design compiler engine.
 
+import type { NativeThemeExport } from "@aphrody/m3-tokens/native-theme";
+
 export type OutputKind = "deck" | "prototype" | "dashboard" | "mobile" | "editorial" | "other";
 
 export interface DesignBrief {
@@ -34,23 +36,12 @@ export interface DesignBrief {
   designSystemId?: string;
 }
 
-export interface TonalPalette {
-  /** Palette name: primary, secondary, tertiary, error, neutral, neutral-variant */
-  name: string;
-  /** HCT palette colors indexed by tone, including all system-role reference tones. */
-  tones: { [tone: number]: string };
-}
-
 export interface M3Theme {
+  /** Normalised `#rrggbb` seed. */
   seed: string;
-  palettes: {
-    primary: TonalPalette;
-    secondary: TonalPalette;
-    tertiary: TonalPalette;
-    neutral: TonalPalette;
-    neutralVariant: TonalPalette;
-    error: TonalPalette;
-  };
+  /** ThemeExport of the canonical engine (aphrody_m3_tokens::theme::ThemeExport): 49 roles per mode. */
+  themeExport: NativeThemeExport;
+  /** Light and dark `--md-sys-color-*` stylesheet of the ThemeExport. */
   cssCustomProperties: string;
 }
 
@@ -90,6 +81,3 @@ export interface SpecValidation {
 
 /** Checks generated source against M3 specification rules. */
 export type SpecValidator = (code: string) => SpecValidation;
-
-/** Returns the `tokens.css` body of a design system, or `undefined` when unknown. */
-export type DesignSystemLoader = (id: string) => string | undefined;

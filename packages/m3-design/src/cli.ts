@@ -40,10 +40,8 @@ async function run(): Promise<number> {
       }
       const { DesignCompiler } = await import("./generator.ts");
       const { nativeSpecValidator } = await import("./native.ts");
-      const { loadDesignSystemFromDisk } = await import("./node.ts");
       const compiler = new DesignCompiler({
         validateSpec: nativeSpecValidator,
-        loadDesignSystem: loadDesignSystemFromDisk,
       });
       return runCli(options, compiler);
     }

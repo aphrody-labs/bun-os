@@ -2,38 +2,27 @@
 //! Core compiler orchestrating the automated M3 design generation workflow.
 
 import { parseBrief } from "./parser.ts";
-import { generateTheme } from "./hct.ts";
+import { generateTheme } from "./theme.ts";
 import { SEED_TEMPLATE } from "./prompts.ts";
-import type {
-  DesignBrief,
-  GenerationResult,
-  GeneratedFile,
-  M3Theme,
-  DesignSystemLoader,
-  SpecValidator,
-} from "./types.ts";
+import type { DesignBrief, GenerationResult, GeneratedFile, M3Theme, SpecValidator } from "./types.ts";
 
 export class DesignCompiler {
   private readonly validateSpec?: SpecValidator;
-  private readonly loadDesignSystem?: DesignSystemLoader;
 
   /**
    * @param options.validateSpec Optional M3 spec validator (e.g. the native one from `native.ts`).
-   * @param options.loadDesignSystem Optional design-system token loader (e.g. `node.ts`, from disk).
    */
   constructor(
     options: {
       validateSpec?: SpecValidator;
-      loadDesignSystem?: DesignSystemLoader;
     } = {},
   ) {
     this.validateSpec = options.validateSpec;
-    this.loadDesignSystem = options.loadDesignSystem;
   }
 
   /**
    * Compiles a raw design brief into a structured project workspace.
-   * Runs the automated HCT theme generator, resolves prompt guidelines,
+   * Resolves the canonical ThemeExport of the seed, resolves prompt guidelines,
    * and outputs React components + CSS sheets.
    */
   public compile(rawBrief: string, seedColor?: string, designSystemId?: string): GenerationResult {
@@ -43,28 +32,8 @@ export class DesignCompiler {
       brief.designSystemId = designSystemId;
     }
 
-    // Load design system tokens overrides if present
-    let systemCss = "";
-    if (designSystemId) {
-      try {
-        systemCss = this.loadDesignSystem?.(designSystemId) ?? "";
-      } catch {
-        // Ignore loader failures, fall back to standard M3 colors
-      }
-      // If no seedColor was specified, fall back to the design system's accent color
-      if (systemCss && !seedColor && !rawBrief.match(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})/)) {
-        const accentMatch = systemCss.match(/--accent:\s*(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})/);
-        if (accentMatch) {
-          brief.seedColor = accentMatch[1];
-        }
-      }
-    }
-
-    // 2. Automated HCT color palette compilation
+    // 2. Canonical ThemeExport for the seed
     const theme = generateTheme(brief.seedColor);
-    if (systemCss) {
-      theme.cssCustomProperties += `\n/* --- Design System Override: ${designSystemId} --- */\n${systemCss}`;
-    }
 
     // 3. Assemble generated files
     const files: GeneratedFile[] = [];
@@ -99,22 +68,15 @@ export class DesignCompiler {
     };
   }
 
+  /** W3C design tokens of the ThemeExport: `color.<mode>.<role>`. */
   private generateW3cTokens(theme: M3Theme): string {
-    const tokens: {
-      color: Record<string, Record<string, { $type: string; $value: string }>>;
-    } = {
-      color: {},
-    };
-    for (const [key, palette] of Object.entries(theme.palettes)) {
-      tokens.color[key] = {};
-      for (const [tone, hex] of Object.entries(palette.tones)) {
-        tokens.color[key][tone] = {
-          $type: "color",
-          $value: hex,
-        };
-      }
+    const tokens: Record<string, Record<string, { $type: "color"; $value: string }>> = {};
+    for (const mode of ["light", "dark"] as const) {
+      tokens[mode] = Object.fromEntries(
+        Object.entries(theme.themeExport[mode]).map(([role, value]) => [role, { $type: "color", $value: value }]),
+      );
     }
-    return JSON.stringify(tokens, null, 2);
+    return JSON.stringify({ color: tokens }, null, 2);
   }
 
   private generateCustomizedReactCode(brief: DesignBrief): string {

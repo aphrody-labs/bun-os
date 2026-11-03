@@ -72,7 +72,8 @@ describe("design generation request contract", () => {
     const result = await response.json();
     expect(result.brief.platforms).toEqual(["android", "desktop-web"]);
     expect(result.brief.designSystemId).toBe("material");
-    expect(result.theme.palettes.primary.tones[40]).toMatch(/^#[\da-f]{6}$/i);
+    expect(result.theme.seed).toBe("#112233");
+    expect(result.theme.themeExport.light.primary).toMatch(/^#[\da-f]{6}$/);
     expect(result.files.map((file: { path: string }) => file.path)).toEqual([
       "src/theme.css",
       "src/tokens.json",
