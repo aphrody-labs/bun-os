@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: Apache-2.0
 import { expect, test } from "bun:test";
-import { runLsp } from "../../src/automation/bun-tools.ts";
+import { resolveArgv } from "@aphrody/bun-os-plugins/commands";
 
-test("LSP forwards the upstream Bun stdio mode and exits with its status", async () => {
-  const previous = process.env.BUN_EXECUTABLE;
-  process.env.BUN_EXECUTABLE = process.execPath;
-  try {
-    expect(await runLsp(["--help"])).toBe(0);
-  } finally {
-    if (previous === undefined) delete process.env.BUN_EXECUTABLE;
-    else process.env.BUN_EXECUTABLE = previous;
+test("LSP resolves to a stdio TypeScript language server, not a fork-only `bun lsp`", () => {
+  const resolved = resolveArgv("lsp", ["--x"]);
+  if ("error" in resolved) {
+    expect(resolved.error).toContain("tsgo");
+    return;
   }
+  expect("argv" in resolved).toBe(true);
+  if (!("argv" in resolved)) return;
+  expect(resolved.argv[0]).not.toBe(process.execPath);
+  expect(resolved.argv).toContain("--stdio");
+  expect(resolved.argv.at(-1)).toBe("--x");
 });

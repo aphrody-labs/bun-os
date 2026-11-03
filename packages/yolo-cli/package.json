@@ -30,6 +30,7 @@
     "typecheck": "bun check -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@aphrody/bun-os-plugins": "workspace:*",
     "@aphrody/bun-workspace": "workspace:*",
     "@aphrody/runtime-sdk": "workspace:*",
     "@aphrody/yolo-core": "workspace:*"
