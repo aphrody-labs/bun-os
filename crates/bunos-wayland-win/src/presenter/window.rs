@@ -634,6 +634,9 @@ fn create(id: u32, w: u32, h: u32, ssd: bool, title: &str, gpu: bool, parent: Op
             let _ = SetFocus(Some(hwnd));
         }
     }
+    if !popup && with_app(|a| a.opts.desktop).unwrap_or(false) {
+        set_fullscreen(hwnd, true);
+    }
 }
 
 fn send_configure(hwnd: HWND) {

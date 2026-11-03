@@ -9,6 +9,7 @@
 //!   --wsl DISTRO    run the host in a WSL distro through wsl.exe (default distro: bunos)
 //!   --host-arg A    pass A to bunos-wlhost (repeatable), e.g. --host-arg --inflight --host-arg 3
 //!   --command CMD   any program whose stdin/stdout reach a bunos-wlhost (socat to vsock/TCP, a VM console...)
+//!   --desktop       full-screen session mode (nested compositor in one borderless monitor-sized window; F11 toggles)
 //!   --glass         translucent Linux windows show a system backdrop under their content (default: chrome only)
 //!   --backdrop B    the --glass backdrop: mica (default) | acrylic | mica-alt | none
 //!   Chrome (caption, border, corners, Mica caption) follows the design spec; BUNOS_CHROME points at it.
@@ -53,6 +54,9 @@ pub(crate) struct Options {
     /// Backdrop under translucent content when `glass` is on (Acrylic is always used for blur-requesting clients).
     pub backdrop: Backdrop,
     pub glass: bool,
+    /// Full-screen desktop mode: every toplevel (a nested cosmic-comp / Hyprland / Weston / GNOME session) opens
+    /// borderless full screen on its monitor, so DWM can hand the flip chain straight to the display (independent flip).
+    pub desktop: bool,
     pub gdi: bool,
     pub vsync: bool,
     pub stats: bool,
@@ -110,7 +114,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
     let mut transport: Option<Vec<String>> = None;
     let mut host_bin = "bunos-wlhost".to_string();
     let mut app: Vec<String> = Vec::new();
-    let mut opts = Options { backdrop: Backdrop::Mica, glass: false, gdi: false, vsync: false, stats: false };
+    let mut opts = Options { backdrop: Backdrop::Mica, glass: false, desktop: false, gdi: false, vsync: false, stats: false };
     let mut host_stats = false;
     let mut host_extra: Vec<String> = Vec::new();
     let mut kind = "wsl";
@@ -143,6 +147,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             "--glass" => opts.glass = true,
+            "--desktop" => opts.desktop = true,
             "--gdi" => opts.gdi = true,
             "--vsync" => opts.vsync = true,
             "--stats" => {
