@@ -33,4 +33,4 @@ pub use m3_engine as components_owner;
 pub use m3_engine::layout as composition;
 #[cfg(feature = "std")]
 pub use m3_engine::{a11y, components, controls, focus, forms, icons, keyboard, visual};
-pub use theme::{Density, Theme, ThemeMode};
+pub use theme::{Contrast, Density, Theme, ThemeMode};

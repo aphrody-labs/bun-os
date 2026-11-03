@@ -1,82 +1,40 @@
-//! Material 3 dark schemes for the shell from the canonical token engine (`aphrody-m3-tokens`).
-//! The baseline (seed #6750A4, tonal spot) matches `packages/m3-theme/tokens.css` and
-//! design-system/bun-os-play/MASTER.md; per DIRECTION.md the live scheme is regenerated from the
-//! focused game's art (seed = the art's dominant color through the M3 quantize + score
-//! algorithm) and every tinted node follows it. Type scale, shape and spacing tokens are in 1080p
-//! design units (`UiScale` maps them to the window).
+//! Material 3 schemes for the shell through the libm3 Bevy adapter (`libm3::bevy`) over the
+//! canonical token engine (`aphrody-m3-tokens`). The user's platform theme file resolves the
+//! scheme; per DIRECTION.md the live scheme is regenerated from the focused game's art (seed = the
+//! art's dominant color through the M3 quantize + score algorithm) and every tinted node follows
+//! it. Type scale, shape and spacing tokens are in 1080p design units (`UiScale` maps them to the
+//! window).
 
-use aphrody_m3_tokens::motion::CubicBezier;
-use aphrody_m3_tokens::scheme::Role;
-use bevy::color::Mix;
 use bevy::prelude::*;
+use libm3::{ColorScheme, Role};
 
-/// The semantic roles the shell paints with.
+/// A semantic role the shell paints with: a shell-side name for one libm3 [`Role`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum R {
-    Primary,
-    OnPrimary,
-    PrimaryContainer,
-    OnPrimaryContainer,
-    SecondaryContainer,
-    OnSecondaryContainer,
-    Tertiary,
-    TertiaryContainer,
-    OnTertiaryContainer,
-    Surface,
-    SurfaceDim,
-    OnSurface,
-    OnSurfaceVariant,
-    ContainerLowest,
-    ContainerLow,
-    Container,
-    ContainerHigh,
-    ContainerHighest,
-    Outline,
-    OutlineVariant,
-    Scrim,
+pub struct R(pub Role);
+
+#[allow(non_upper_case_globals)]
+impl R {
+    pub const Primary: Self = Self(Role::Primary);
+    pub const OnPrimary: Self = Self(Role::OnPrimary);
+    pub const SecondaryContainer: Self = Self(Role::SecondaryContainer);
+    pub const OnSecondaryContainer: Self = Self(Role::OnSecondaryContainer);
+    pub const SurfaceDim: Self = Self(Role::SurfaceDim);
+    pub const OnSurface: Self = Self(Role::OnSurface);
+    pub const OnSurfaceVariant: Self = Self(Role::OnSurfaceVariant);
+    pub const Container: Self = Self(Role::SurfaceContainer);
+    pub const ContainerHigh: Self = Self(Role::SurfaceContainerHigh);
+    pub const ContainerHighest: Self = Self(Role::SurfaceContainerHighest);
+    pub const Scrim: Self = Self(Role::Scrim);
 }
 
-const ROLES: [(R, Role); 21] = [
-    (R::Primary, Role::Primary),
-    (R::OnPrimary, Role::OnPrimary),
-    (R::PrimaryContainer, Role::PrimaryContainer),
-    (R::OnPrimaryContainer, Role::OnPrimaryContainer),
-    (R::SecondaryContainer, Role::SecondaryContainer),
-    (R::OnSecondaryContainer, Role::OnSecondaryContainer),
-    (R::Tertiary, Role::Tertiary),
-    (R::TertiaryContainer, Role::TertiaryContainer),
-    (R::OnTertiaryContainer, Role::OnTertiaryContainer),
-    (R::Surface, Role::Surface),
-    (R::SurfaceDim, Role::SurfaceDim),
-    (R::OnSurface, Role::OnSurface),
-    (R::OnSurfaceVariant, Role::OnSurfaceVariant),
-    (R::ContainerLowest, Role::SurfaceContainerLowest),
-    (R::ContainerLow, Role::SurfaceContainerLow),
-    (R::Container, Role::SurfaceContainer),
-    (R::ContainerHigh, Role::SurfaceContainerHigh),
-    (R::ContainerHighest, Role::SurfaceContainerHighest),
-    (R::Outline, Role::Outline),
-    (R::OutlineVariant, Role::OutlineVariant),
-    (R::Scrim, Role::Scrim),
-];
+/// The M3 reference seed of the token engine, for art without a usable dominant color.
+pub const BASELINE_SEED: u32 = aphrody_m3_tokens::sheets::BASELINE_SEED;
 
-/// The M3 baseline seed (#6750A4).
-pub const BASELINE_SEED: u32 = 0xFF67_50A4;
-
-/// One resolved dark scheme.
+/// One resolved scheme as a libm3 theme.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Scheme {
     pub seed: u32,
-    colors: [Color; 21],
-}
-
-fn color(argb: u32) -> Color {
-    Color::srgba_u8(
-        (argb >> 16) as u8,
-        (argb >> 8) as u8,
-        argb as u8,
-        (argb >> 24) as u8,
-    )
+    theme: libm3::Theme,
 }
 
 /// The user's theme file (`usr/etc/bun-os/settings.json` `theme`, `BUN_OS_THEME`, else the
@@ -93,14 +51,14 @@ fn platform_theme() -> &'static bun_os_platform::theme::ThemeFile {
     })
 }
 
-/// The theme file's seed (the baseline #6750A4 unless the user's theme sets another).
+/// The theme file's seed, else the Bun OS product seed (the identity pet seed).
 pub fn theme_seed() -> u32 {
     platform_theme()
         .color
         .seed
         .as_deref()
         .and_then(aphrody_m3_tokens::color_math::argb_from_hex)
-        .unwrap_or(BASELINE_SEED)
+        .unwrap_or_else(|| libm3::components_owner::theme::Theme::aphrody_request().seed())
 }
 
 impl Scheme {
@@ -121,25 +79,28 @@ impl Scheme {
                 reduced_motion: false,
             },
         );
-        let mut colors = [Color::BLACK; 21];
-        for (i, (_, role)) in ROLES.iter().enumerate() {
-            colors[i] = color(tokens.argb(role.name()));
+        let colors = ColorScheme(Role::ALL.map(|role| libm3::Color(tokens.argb(role.name()))));
+        let mode = if tokens.dark {
+            libm3::ThemeMode::Dark
+        } else {
+            libm3::ThemeMode::Light
+        };
+        Self {
+            seed,
+            theme: libm3::Theme::new(mode, colors),
         }
-        Self { seed, colors }
     }
 
     pub fn get(&self, role: R) -> Color {
-        self.colors[ROLES.iter().position(|(r, _)| *r == role).unwrap_or(0)]
+        libm3::bevy::color(&self.theme, role.0)
     }
 
     fn mix(&self, other: &Self, t: f32) -> Self {
-        let mut colors = self.colors;
-        for (c, o) in colors.iter_mut().zip(other.colors) {
-            *c = c.mix(&o, t);
-        }
+        let mut theme = other.theme;
+        theme.colors = self.theme.colors.mix(other.theme.colors, t);
         Self {
             seed: other.seed,
-            colors,
+            theme,
         }
     }
 }
@@ -150,8 +111,8 @@ impl Default for Scheme {
     }
 }
 
-/// The live scheme: re-tints toward the focused game's scheme in ~300 ms on M3 emphasized easing
-/// (an instant swap under reduced motion).
+/// The live scheme: re-tints toward the focused game's scheme over `md.sys.motion.duration.medium2`
+/// on the emphasized easing (an instant swap under reduced motion).
 #[derive(Resource, Clone, Debug, Default)]
 pub struct Theme {
     pub current: Scheme,
@@ -160,7 +121,7 @@ pub struct Theme {
     t: f32,
 }
 
-pub const RETINT_SECONDS: f32 = 0.3;
+pub const RETINT_SECONDS: f32 = aphrody_m3_tokens::motion::DURATION_MEDIUM2.ms as f32 / 1000.0;
 
 impl Theme {
     pub fn get(&self, role: R) -> Color {
@@ -189,14 +150,9 @@ impl Theme {
             return false;
         }
         self.t = (self.t + dt / RETINT_SECONDS).min(1.0);
-        // `md.sys.motion.easing.emphasized` as its CSS form, cubic-bezier(0.2, 0, 0, 1).
-        let curve = CubicBezier {
-            x1: 0.2,
-            y1: 0.0,
-            x2: 0.0,
-            y2: 1.0,
-        };
-        self.current = self.from.mix(&self.to, curve.eval(self.t));
+        let eased = libm3::tokens::easing_curve(aphrody_m3_tokens::motion::EASING_EMPHASIZED)
+            .map_or(self.t, |curve| curve.eval(self.t));
+        self.current = self.from.mix(&self.to, eased);
         true
     }
 

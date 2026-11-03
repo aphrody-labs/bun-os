@@ -38,6 +38,8 @@ enum Message {
 
 struct App {
     core: Core,
+    /// The Bun OS Material 3 theme (identity seed, system mode and contrast).
+    material: libm3::Theme,
     endpoint: String,
     query: String,
     seq: u64,
@@ -56,12 +58,15 @@ async fn search(endpoint: String, query: String) -> Result<Answer, String> {
     if !response.status().is_success() {
         return Err(format!("Search answered {}", response.status()));
     }
-    response.json::<Answer>().await.map_err(|e| format!("Unreadable search answer: {e}"))
+    response
+        .json::<Answer>()
+        .await
+        .map_err(|e| format!("Unreadable search answer: {e}"))
 }
 
 impl cosmic::Application for App {
     type Executor = executor::Default;
-    type Flags = ();
+    type Flags = libm3::Theme;
     type Message = Message;
     const APP_ID: &'static str = "com.aphrody.Search";
 
@@ -73,11 +78,13 @@ impl cosmic::Application for App {
         &mut self.core
     }
 
-    fn init(mut core: Core, _flags: ()) -> (Self, Task<Message>) {
+    fn init(mut core: Core, material: libm3::Theme) -> (Self, Task<Message>) {
         core.window.header_title = "Aphrody Search".into();
         let app = App {
             core,
-            endpoint: std::env::var("APHRODY_SEARCH_URL").unwrap_or_else(|_| DEFAULT_ENDPOINT.into()),
+            material,
+            endpoint: std::env::var("APHRODY_SEARCH_URL")
+                .unwrap_or_else(|_| DEFAULT_ENDPOINT.into()),
             query: std::env::args().nth(1).unwrap_or_default(),
             seq: 0,
             busy: false,
@@ -85,7 +92,11 @@ impl cosmic::Application for App {
             error: None,
         };
         let focus = widget::text_input::focus(INPUT.clone());
-        let task = if app.query.is_empty() { focus } else { Task::batch([focus, Task::done(cosmic::Action::App(Message::Search))]) };
+        let task = if app.query.is_empty() {
+            focus
+        } else {
+            Task::batch([focus, Task::done(cosmic::Action::App(Message::Search))])
+        };
         (app, task)
     }
 
@@ -125,11 +136,12 @@ impl cosmic::Application for App {
     }
 
     fn view(&self) -> Element<'_, Message> {
-        let field = widget::search_input("Search apps, packages, crates, docs and tools", &self.query)
-            .id(INPUT.clone())
-            .on_input(Message::Query)
-            .on_submit(|_| Message::Search)
-            .width(Length::Fill);
+        let field =
+            widget::search_input("Search apps, packages, crates, docs and tools", &self.query)
+                .id(INPUT.clone())
+                .on_input(Message::Query)
+                .on_submit(|_| Message::Search)
+                .width(Length::Fill);
         let bar = widget::row::with_capacity(2)
             .spacing(8)
             .align_y(Alignment::Center)
@@ -141,7 +153,11 @@ impl cosmic::Application for App {
         } else if let Some(error) = &self.error {
             error.clone()
         } else if let Some(answer) = &self.answer {
-            format!("{} result{}", answer.total, if answer.total == 1 { "" } else { "s" })
+            format!(
+                "{} result{}",
+                answer.total,
+                if answer.total == 1 { "" } else { "s" }
+            )
         } else {
             "Search everything Bun OS serves.".to_owned()
         };
@@ -160,18 +176,21 @@ impl cosmic::Application for App {
                 );
             }
         }
-        widget::column::with_capacity(3)
+        let content = widget::column::with_capacity(3)
             .spacing(12)
             .padding(16)
             .push(bar)
             .push(widget::text::caption(status))
-            .push(scrollable(list).height(Length::Fill))
-            .into()
+            .push(scrollable(list).height(Length::Fill));
+        libm3::cosmic::themed(self.material, content)
     }
 }
 
 fn main() -> cosmic::iced::Result {
     let _ = rustls::crypto::ring::default_provider().install_default();
-    let settings = Settings::default().size(Size::new(760.0, 620.0));
-    cosmic::app::run::<App>(settings, ())
+    let material = libm3::cosmic::system_theme();
+    let settings = Settings::default()
+        .theme(libm3::cosmic::theme(material))
+        .size(Size::new(760.0, 620.0));
+    cosmic::app::run::<App>(settings, material)
 }
