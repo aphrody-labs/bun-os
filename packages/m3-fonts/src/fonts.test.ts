@@ -145,7 +145,9 @@ describe("@aphrody/m3-fonts", () => {
   test("stylesheets are in sync with the manifest", async () => {
     await Promise.all(
       (Object.entries(SHEET_FILES) as [FontSheet, string][]).map(async ([sheet, file]) => {
-        expect(await Bun.file(join(root, "src", file)).text()).toBe(renderStylesheet("../", sheet));
+        // The committed sheets are reflowed by `bun format`; compare them whitespace-insensitively.
+        const flat = (css: string) => css.replace(/s+/g, " ").trim();
+        expect(flat(await Bun.file(join(root, "src", file)).text())).toBe(flat(renderStylesheet("../", sheet)));
       }),
     );
     expect(await Bun.file(join(root, "src", SHEET_FILES.core)).text()).not.toContain(".ttf");

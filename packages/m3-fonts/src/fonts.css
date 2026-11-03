@@ -4,8 +4,7 @@
   font-family: "Google Sans Flex";
   src: url("../fonts/web/GoogleSansFlex-latin.woff2") format("woff2");
   font-weight: 1 1000;
-  font-stretch: 25% 151%;
-  font-style: oblique -10deg 0deg;
+  font-style: normal;
   font-display: swap;
   unicode-range:
     U+000D, U+0020-007E, U+00A0-0107, U+010A-0113, U+0116-011B, U+011E-0123, U+0126-012B, U+012E-0133, U+0136-0137,
@@ -38,7 +37,6 @@
   font-family: "Roboto Flex";
   src: url("../fonts/web/RobotoFlex-latin.woff2") format("woff2");
   font-weight: 100 1000;
-  font-stretch: 25% 151%;
   font-style: normal;
   font-display: swap;
   unicode-range:

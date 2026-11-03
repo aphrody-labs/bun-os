@@ -9,7 +9,8 @@ Run through `bun run subset` (which calls `uv run scripts/subset.py`). Reads the
 stdin, writes the WOFF2 files and prints the resulting faces (file + unicode-range) as JSON.
 
 Plan entries:
-  {"id", "source", "out", "ranges": [[lo, hi], ...]}                     -> one Latin face
+  {"id", "source", "out", "ranges": [[lo, hi], ...], "pin"?: {axis: value}} -> one Latin face,
+      with the `pin` axes instanced at fixed values first
   {"id", "source", "out", "ranges", "japanese": true, "chunk": N}         -> JP chunks: codepoints
       present in the font, restricted to kana/punctuation/full-width forms plus the ideographs of
       Windows-31J (JIS X 0208 levels 1-2 + NEC/IBM extensions), split into chunks of N codepoints.
@@ -25,6 +26,7 @@ from pathlib import Path
 
 from fontTools import subset
 from fontTools.ttLib import TTFont
+from fontTools.varLib.instancer import instantiateVariableFont
 
 
 def options(hinting: bool) -> subset.Options:
@@ -74,12 +76,15 @@ def to_unicode_range(cps: list[int]) -> str:
     return ", ".join(out)
 
 
-def write(source: Path, out: Path, cps: list[int], hinting: bool) -> int:
+def write(source: Path, out: Path, cps: list[int], hinting: bool, pin: dict[str, float] | None = None) -> int:
     opts = options(hinting)
     font = subset.load_font(str(source), opts)
     s = subset.Subsetter(opts)
     s.populate(unicodes=cps)
     s.subset(font)
+    if pin:
+        # Pinned axes are instanced at fixed values after subsetting; the remaining axes stay variable.
+        font = instantiateVariableFont(font, pin, updateFontNames=False)
     out.parent.mkdir(parents=True, exist_ok=True)
     subset.save_font(font, str(out), opts)
     return out.stat().st_size
@@ -144,7 +149,7 @@ def main() -> None:
         if not entry.get("japanese"):
             cps = sorted(cp for cp in cmap if in_ranges(cp, ranges))
             out = root / entry["out"].format(n="")
-            size = write(source, out, cps, hinting=True)
+            size = write(source, out, cps, hinting=True, pin=entry.get("pin"))
             result.append({"id": entry["id"], "file": entry["out"].format(n=""), "unicodeRange": to_unicode_range(cps), "bytes": size})
             continue
         base = sorted(cp for cp in cmap if in_ranges(cp, ranges))

@@ -60,6 +60,8 @@ export interface SubsetJob {
   /** Material Symbols: keep the icons `names` (ligatures, codepoints, every variation axis). */
   symbols?: boolean;
   names?: readonly string[];
+  /** Axes instanced at a fixed value before subsetting (fontTools varLib.instancer). Web text faces keep `wght` and `opsz` (what M3 type and `font-optical-sizing: auto` use); the other axes are pinned to their defaults, which cuts the face by an order of magnitude. */
+  pin?: Readonly<Record<string, number>>;
 }
 
 /** Produced face, as recorded in `src/subsets.json`. */
@@ -111,6 +113,7 @@ export const SUBSET_JOBS: readonly SubsetJob[] = [
     source: `${GS}/google-sans-flex/GoogleSansFlex-Variable.ttf`,
     out: "fonts/web/GoogleSansFlex-latin.woff2",
     ranges: LATIN_CORE_RANGES,
+    pin: { wdth: 100, GRAD: 0, ROND: 0, slnt: 0 },
   },
   {
     id: "google-sans-code",
@@ -123,6 +126,7 @@ export const SUBSET_JOBS: readonly SubsetJob[] = [
     source: "fonts/RobotoFlex-Variable.ttf",
     out: "fonts/web/RobotoFlex-latin.woff2",
     ranges: LATIN_CORE_RANGES,
+    pin: { GRAD: 0, wdth: 100, slnt: 0, XOPQ: 96, YOPQ: 79, XTRA: 468, YTUC: 712, YTLC: 514, YTAS: 750, YTDE: -203, YTFI: 738 },
   },
   {
     id: "roboto-mono",
@@ -199,8 +203,6 @@ export const FONTS: readonly FontFamily[] = [
     sourceFile: `${GS}/google-sans-flex/GoogleSansFlex-Variable.ttf`,
     faces: subsetFaces("google-sans-flex", "Google Sans Flex", "fonts/GoogleSansFlex-OFL.txt", {
       weight: [1, 1000],
-      stretch: [25, 151],
-      oblique: [-10, 0],
     }),
   },
   {
@@ -223,7 +225,6 @@ export const FONTS: readonly FontFamily[] = [
     sourceFile: "fonts/RobotoFlex-Variable.ttf",
     faces: subsetFaces("roboto-flex", "Roboto Flex", "fonts/RobotoFlex-OFL.txt", {
       weight: [100, 1000],
-      stretch: [25, 151],
     }),
   },
   {
