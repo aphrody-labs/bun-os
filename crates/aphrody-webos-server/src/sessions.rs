@@ -22,7 +22,7 @@ use axum::{
     Json, Router,
     extract::{
         Path, State,
-        ws::{Message as WsMessage, WebSocket, WebSocketUpgrade},
+        ws::{CloseFrame, Message as WsMessage, WebSocket, WebSocketUpgrade, close_code},
     },
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
@@ -32,6 +32,7 @@ use futures_util::{SinkExt, StreamExt};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
 use serde::Deserialize;
 use serde_json::json;
+use tokio::sync::watch;
 use tokio_tungstenite::tungstenite::Message as UpMessage;
 
 const SESSION_COOKIE: &str = "aphrody_session";
@@ -93,6 +94,9 @@ struct Session {
 pub struct Sessions {
     upstream: Option<Upstream>,
     live: Arc<Mutex<HashMap<String, Session>>>,
+    /// Becomes true when the server starts draining (SIGTERM, Ctrl-C): bridges close with 1001 Going Away and new
+    /// sessions are refused, so clients reconnect to the next process.
+    draining: watch::Receiver<bool>,
 }
 
 fn random_hex(bytes: usize) -> String {
@@ -102,7 +106,7 @@ fn random_hex(bytes: usize) -> String {
 }
 
 impl Sessions {
-    pub fn from_env() -> Sessions {
+    pub fn from_env(draining: watch::Receiver<bool>) -> Sessions {
         let upstream = std::env::var("WEBOS_SESSION")
             .ok()
             .filter(|u| !u.is_empty())
@@ -118,6 +122,50 @@ impl Sessions {
         Sessions {
             upstream,
             live: Arc::new(Mutex::new(HashMap::new())),
+            draining,
+        }
+    }
+
+    fn draining(&self) -> bool {
+        *self.draining.borrow()
+    }
+
+    /// TCP reachability of the declared desktop stream (host and port of `WEBOS_SESSION`), within `deadline`.
+    pub async fn probe(&self, deadline: std::time::Duration) -> Result<(), String> {
+        let Some(upstream) = &self.upstream else {
+            return Err("no Bun OS desktop stream is declared on this host (WEBOS_SESSION)".into());
+        };
+        let uri: axum::http::Uri = upstream
+            .url
+            .parse()
+            .map_err(|e| format!("bad desktop stream address: {e}"))?;
+        let host = uri
+            .host()
+            .ok_or_else(|| "the desktop stream address has no host".to_owned())?
+            .trim_start_matches('[')
+            .trim_end_matches(']')
+            .to_owned();
+        let port = uri
+            .port_u16()
+            .unwrap_or(if uri.scheme_str() == Some("wss") {
+                443
+            } else {
+                80
+            });
+        match tokio::time::timeout(
+            deadline,
+            tokio::net::TcpStream::connect((host.as_str(), port)),
+        )
+        .await
+        {
+            Ok(Ok(_)) => Ok(()),
+            Ok(Err(e)) => Err(format!(
+                "the desktop stream at {host}:{port} is unreachable: {e}"
+            )),
+            Err(_) => Err(format!(
+                "the desktop stream at {host}:{port} did not answer within {} ms",
+                deadline.as_millis()
+            )),
         }
     }
 
@@ -166,6 +214,12 @@ async fn start(
             "The Bun OS desktop is not running on this host yet.",
         );
     }
+    if sessions.draining() {
+        return error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "The server is restarting; try again in a moment.",
+        );
+    }
     let id = random_hex(8);
     let token = random_hex(24);
     sessions
@@ -191,9 +245,12 @@ async fn stop(
     State(sessions): State<Sessions>,
     headers: HeaderMap,
     Path(id): Path<String>,
-) -> StatusCode {
+) -> Response {
     if !owner_authenticated(&headers) {
-        return StatusCode::UNAUTHORIZED;
+        return error(
+            StatusCode::UNAUTHORIZED,
+            "Sign in with the Bun OS owner Google account first.",
+        );
     }
     match sessions
         .live
@@ -201,8 +258,8 @@ async fn stop(
         .unwrap_or_else(std::sync::PoisonError::into_inner)
         .remove(&id)
     {
-        Some(_) => StatusCode::NO_CONTENT,
-        None => StatusCode::NOT_FOUND,
+        Some(_) => StatusCode::NO_CONTENT.into_response(),
+        None => error(StatusCode::NOT_FOUND, "No such session."),
     }
 }
 
@@ -248,10 +305,17 @@ async fn stream(
             "The session is no longer available.",
         );
     };
+    if sessions.draining() {
+        return error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "The server is restarting; try again in a moment.",
+        );
+    }
     let protocol = format!("bearer.{}", offered.unwrap_or_default());
+    let draining = sessions.draining.clone();
     upgrade
         .protocols([protocol])
-        .on_upgrade(move |socket| bridge(socket, upstream))
+        .on_upgrade(move |socket| bridge(socket, upstream, draining))
 }
 
 /// Remote-desktop wire messages for one protocol input; `buttons` keeps the last DOM button mask.
@@ -278,7 +342,7 @@ fn translate(input: Input, buttons: &mut u8) -> Vec<serde_json::Value> {
     }
 }
 
-async fn bridge(socket: WebSocket, upstream: Upstream) {
+async fn bridge(socket: WebSocket, upstream: Upstream, mut draining: watch::Receiver<bool>) {
     use tokio_tungstenite::tungstenite::client::IntoClientRequest;
     let url = match (&upstream.token, upstream.native) {
         (Some(token), false) => {
@@ -337,7 +401,23 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
     }
     let (mut remote_tx, mut remote_rx) = remote.split();
     let down = async {
-        while let Some(Ok(message)) = remote_rx.next().await {
+        loop {
+            let message = tokio::select! {
+                message = remote_rx.next() => match message {
+                    Some(Ok(message)) => message,
+                    _ => break,
+                },
+                // Shutdown: tell the client to reconnect (1001 Going Away) instead of dropping the TCP stream.
+                () = async { let _ = draining.wait_for(|draining| *draining).await; } => {
+                    let _ = client_tx
+                        .send(WsMessage::Close(Some(CloseFrame {
+                            code: close_code::AWAY,
+                            reason: "server restarting".into(),
+                        })))
+                        .await;
+                    break;
+                }
+            };
             let forwarded = match message {
                 UpMessage::Binary(frame) => WsMessage::Binary(frame),
                 UpMessage::Text(text) if native => WsMessage::Text(text.as_str().into()),
@@ -389,11 +469,18 @@ async fn bridge(socket: WebSocket, upstream: Upstream) {
     }
 }
 
+/// Request/response routes: they run under the request timeout of the server.
 pub fn router(sessions: Sessions) -> Router {
     Router::new()
         .route("/api/session", get(availability))
         .route("/api/sessions", post(start))
         .route("/api/sessions/{id}", axum::routing::delete(stop))
+        .with_state(sessions)
+}
+
+/// The WebSocket stream: long-lived, so it is merged outside the request timeout.
+pub fn stream_router(sessions: Sessions) -> Router {
+    Router::new()
         .route("/api/sessions/{id}/stream", get(stream))
         .with_state(sessions)
 }

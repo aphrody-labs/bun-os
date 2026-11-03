@@ -30,9 +30,19 @@ getrandom = { workspace = true, features = ["std"] }
 jsonwebtoken = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-tokio = { workspace = true, features = ["rt-multi-thread", "macros", "net", "signal", "fs", "time"] }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "net", "signal", "fs", "time", "sync"] }
 tokio-tungstenite = { workspace = true }
-tower-http = { workspace = true, features = ["fs", "compression-br", "compression-gzip", "set-header"] }
+# Global in-flight limit with load shedding and per-request timeouts (main.rs).
+tower = { workspace = true, features = ["limit", "load-shed", "timeout", "util"] }
+tower-http = { workspace = true, features = [
+  "fs",
+  "compression-br",
+  "compression-gzip",
+  "set-header",
+  "catch-panic",
+  "limit",
+  "request-id",
+] }
 
 [lints]
 workspace = true

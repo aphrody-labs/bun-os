@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-//! `GET /api/health`: 200 when every required check passes, 503 otherwise (the release activator gates on it).
+//! `GET /api/health`: readiness, 200 when every required check passes, 503 otherwise (the release activator gates on
+//! it). `GET /healthz`: liveness, answered without touching the disk or the network.
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -45,13 +46,21 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
         Err(error) => check(false, false, format!("no inventory: {error}")),
     };
     checks.insert("inventory".to_owned(), inventory);
-    let session = state.sessions.configured();
+    // The desktop stream behind /api/sessions: declared and accepting TCP connections.
+    let session = state.sessions.probe(SESSION_PROBE).await;
+    let session_ok = session.is_ok();
     checks.insert(
         "session".to_owned(),
+        check(session_ok, true, session.err().unwrap_or_default()),
+    );
+    // A draining process (SIGTERM, Ctrl-C) is not ready: it finishes in-flight work and takes no new sessions.
+    let draining = *state.shutdown.borrow();
+    checks.insert(
+        "accepting".to_owned(),
         check(
-            session,
-            true,
-            "no Bun OS desktop stream is declared on this host (WEBOS_SESSION)".into(),
+            !draining,
+            false,
+            "the server is shutting down and draining its connections".into(),
         ),
     );
     let ok = checks.values().all(|c| c.ok || c.optional);
@@ -87,6 +96,25 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
         Json(value),
     )
 }
+
+/// `GET /healthz`: the process is up and serving. No checks, so a slow disk or an unreachable desktop never makes
+/// the supervisor restart a healthy process.
+pub async fn live(State(state): State<Arc<AppState>>) -> impl IntoResponse {
+    (
+        [(axum::http::header::CACHE_CONTROL, "no-store")],
+        Json(serde_json::json!({
+            "ok": true,
+            "status": "ok",
+            "service": "aphrody-webos",
+            "version": env!("CARGO_PKG_VERSION"),
+            "sourceCommit": state.source_commit,
+            "uptimeSeconds": state.started.elapsed().as_secs(),
+        })),
+    )
+}
+
+/// Upper bound of the desktop stream probe, well under the 2 s budget of the release activator.
+const SESSION_PROBE: std::time::Duration = std::time::Duration::from_millis(750);
 
 fn checks_degraded(checks: &BTreeMap<String, HealthCheck>) -> bool {
     checks.values().any(|c| !c.ok)

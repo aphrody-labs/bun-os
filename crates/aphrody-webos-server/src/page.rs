@@ -37,3 +37,18 @@ pub fn placeholder(commit: Option<&str>) -> Html<String> {
 {build}\n</main>\n</body>\n</html>\n"
     ))
 }
+
+/// The HTML page of an error answered to a browser navigation (unknown path, wrong method, overload, ...); API
+/// clients get the RFC 9457 problem instead.
+pub fn error(status: axum::http::StatusCode, detail: &str) -> Html<String> {
+    let code = status.as_u16();
+    let title = status.canonical_reason().unwrap_or("Error");
+    let detail = escape(detail);
+    Html(format!(
+        "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n\
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
+<meta name=\"color-scheme\" content=\"dark light\">\n<meta name=\"robots\" content=\"noindex\">\n\
+<title>{code} {title} - Aphrody Bun OS</title>\n<style>{STYLE}a{{color:#a8c7fa}}</style>\n</head>\n<body>\n<main>\n\
+<h1>{code} {title}</h1>\n<p>{detail}</p>\n<p><a href=\"/\">Open Bun OS</a></p>\n</main>\n</body>\n</html>\n"
+    ))
+}
