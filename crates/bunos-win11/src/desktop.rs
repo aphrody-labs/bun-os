@@ -212,11 +212,13 @@ impl Desktop {
                 ("XDG_CURRENT_DESKTOP", "COSMIC"),
             ],
             // Aquamarine's Wayland backend refuses WSLg's Weston (no dmabuf, old xdg_wm_base/wl_seat; docs/WSLG.md),
-            // so Hyprland runs on its headless backend (no WAYLAND_DISPLAY, no seat) on the vgem render node with
-            // software GL, as in the WSLg fork's hyprland-headless mode.
+            // so Hyprland runs on Aquamarine's DRM backend with no seat on the kernel's vkms KMS device
+            // (factory/wsl/kernel/wsl-desktop.config; our aquamarine fork renders on it instead of borrowing vgem),
+            // with Mesa's software EGL (llvmpipe): without LIBGL_ALWAYS_SOFTWARE no EGL device matches vkms.
             Self::Hyprland | Self::Omarchy => &[
                 ("WAYLAND_DISPLAY", ""),
                 ("LIBSEAT_BACKEND", "noop"),
+                ("LIBGL_ALWAYS_SOFTWARE", "1"),
                 ("XDG_CURRENT_DESKTOP", "Hyprland"),
                 ("XDG_SESSION_DESKTOP", "Hyprland"),
             ],

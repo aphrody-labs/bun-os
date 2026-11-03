@@ -70,6 +70,10 @@
           "noop"
         ],
         [
+          "LIBGL_ALWAYS_SOFTWARE",
+          "1"
+        ],
+        [
           "XDG_CURRENT_DESKTOP",
           "Hyprland"
         ],
@@ -106,6 +110,10 @@
         [
           "LIBSEAT_BACKEND",
           "noop"
+        ],
+        [
+          "LIBGL_ALWAYS_SOFTWARE",
+          "1"
         ],
         [
           "XDG_CURRENT_DESKTOP",
