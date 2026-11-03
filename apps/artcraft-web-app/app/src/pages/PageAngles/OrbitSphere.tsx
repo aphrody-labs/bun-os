@@ -1,7 +1,36 @@
-// design:content: the orbit gizmo is a rendered 3D illustration (sphere wireframe, camera
-// body, lens and target glow); its shading colours are artwork, not UI chrome.
 import { useRef, useEffect, useCallback, memo } from "react";
 import { ROTATION_VALUES, TILT_VALUES } from "./AnglesStore";
+
+// Shading of the rendered gizmo illustration (sphere wireframe, camera body, lens and
+// target glow). These are artwork colours, not UI chrome.
+const GIZMO = {
+  sphereHaze: "rgba(255, 255, 255, 0.02)", // design:content
+  sphereHazeEdge: "rgba(255, 255, 255, 0)", // design:content
+  edgeGlow: "rgba(180, 200, 255, 0.35)", // design:content
+  edgeGlowBright: "rgba(180, 200, 255, 0.55)", // design:content
+  cameraBody: "rgba(35, 38, 45, 0.92)", // design:content
+  cameraGrip: "rgba(30, 33, 40, 0.9)", // design:content
+  cameraLens: "rgba(28, 30, 38, 0.95)", // design:content
+  cameraViewfinder: "rgba(40, 43, 50, 0.9)", // design:content
+  frontRim: "rgba(180, 210, 255, 0.7)", // design:content
+  frontRimGlow: "rgba(160, 200, 255, 0.9)", // design:content
+  edgeShadow: "rgba(160, 190, 255, 0.4)", // design:content
+  lensBarrel: "rgba(18, 20, 26, 0.98)", // design:content
+  lensBarrelEdge: "rgba(255, 255, 255, 0.06)", // design:content
+  lensRing: "rgba(180, 200, 255, 0.45)", // design:content
+  lensInnerRing: "rgba(160, 190, 255, 0.3)", // design:content
+  lensGlassCenter: "rgba(100, 160, 255, 0.4)", // design:content
+  lensGlassMid: "rgba(60,  100, 200, 0.2)", // design:content
+  lensGlassEdge: "rgba(40,   70, 150, 0.05)", // design:content
+  lensGlow: "rgba(160, 190, 255, 0.6)", // design:content
+  lensRim: "rgba(180, 200, 255, 0.4)", // design:content
+  targetGlow: "rgba(255, 40, 40, 0.8)", // design:content
+  targetGlowMid: "rgba(255, 40, 40, 0.2)", // design:content
+  targetGlowEdge: "rgba(255, 40, 40, 0)", // design:content
+  targetDot: "rgba(255, 60, 60, 1)", // design:content
+  sphereOutline: "rgba(255, 255, 255, 0.12)", // design:content
+  wire: (alpha: number) => `rgba(255, 255, 255, ${alpha})`, // design:content
+} as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -90,8 +119,8 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
 
     // Subtle radial outer glow
     const outerGlow = ctx.createRadialGradient(cx, cy, radius * 0.8, cx, cy, radius * 1.3);
-    outerGlow.addColorStop(0, "rgba(255, 255, 255, 0.02)");
-    outerGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
+    outerGlow.addColorStop(0, GIZMO.sphereHaze);
+    outerGlow.addColorStop(1, GIZMO.sphereHazeEdge);
     ctx.fillStyle = outerGlow;
     ctx.fillRect(0, 0, w, h);
 
@@ -111,7 +140,7 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
 
     // ── Wireframe sphere ────────────────────────────────────────────────
     const wireAlpha = dragging ? 0.12 : 0.06;
-    ctx.strokeStyle = `rgba(255, 255, 255, ${wireAlpha})`;
+    ctx.strokeStyle = GIZMO.wire(wireAlpha);
     ctx.lineWidth = 0.7;
 
     // Meridians
@@ -262,8 +291,6 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
     ];
 
     // Edge colours
-    const edgeGlow = "rgba(180, 200, 255, 0.35)";
-    const edgeGlowBright = "rgba(180, 200, 255, 0.55)";
 
     // ── Face collector ─────────────────────────────────────────────────
     const allFaces: Face[] = [];
@@ -353,10 +380,10 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
     };
 
     // ── Add all camera parts ───────────────────────────────────────────
-    addBoxFaces(bodyCorners, "rgba(35, 38, 45, 0.92)", edgeGlow, 1.0, true, true);
-    addBoxFaces(gripCorners, "rgba(30, 33, 40, 0.9)", edgeGlow, 0.7, false, false);
-    addCylinder(lensCx, lensCy, lensCz, lensR, lensLen, "rgba(28, 30, 38, 0.95)", edgeGlowBright, 0.8, true);
-    addBoxFaces(vfCorners, "rgba(40, 43, 50, 0.9)", edgeGlow, 0.8, false, false);
+    addBoxFaces(bodyCorners, GIZMO.cameraBody, GIZMO.edgeGlow, 1.0, true, true);
+    addBoxFaces(gripCorners, GIZMO.cameraGrip, GIZMO.edgeGlow, 0.7, false, false);
+    addCylinder(lensCx, lensCy, lensCz, lensR, lensLen, GIZMO.cameraLens, GIZMO.edgeGlowBright, 0.8, true);
+    addBoxFaces(vfCorners, GIZMO.cameraViewfinder, GIZMO.edgeGlow, 0.8, false, false);
 
     // Targeting laser from lens tip to sphere centre
     const lensTip = project(lensCx + dirX * lensLen, lensCy + dirY * lensLen, lensCz + dirZ * lensLen);
@@ -380,9 +407,9 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
       // ── Targeting laser ───────────────────────────────────────────
       if (face.isLine) {
         ctx.save();
-        ctx.strokeStyle = "rgba(180, 210, 255, 0.7)";
+        ctx.strokeStyle = GIZMO.frontRim;
         ctx.lineWidth = 1.5;
-        ctx.shadowColor = "rgba(160, 200, 255, 0.9)";
+        ctx.shadowColor = GIZMO.frontRimGlow;
         ctx.shadowBlur = 4;
         ctx.beginPath();
         ctx.moveTo(face.pts[0].x, face.pts[0].y);
@@ -401,7 +428,7 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
       ctx.fill();
 
       ctx.save();
-      ctx.shadowColor = "rgba(160, 190, 255, 0.4)";
+      ctx.shadowColor = GIZMO.edgeShadow;
       ctx.shadowBlur = 3;
       ctx.strokeStyle = face.edgeColor;
       ctx.lineWidth = face.edgeWidth;
@@ -425,9 +452,9 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
         ctx.moveTo(screenPts[0].x, screenPts[0].y);
         for (let i = 1; i < screenPts.length; i++) ctx.lineTo(screenPts[i].x, screenPts[i].y);
         ctx.closePath();
-        ctx.fillStyle = "rgba(18, 20, 26, 0.98)";
+        ctx.fillStyle = GIZMO.lensBarrel;
         ctx.fill();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+        ctx.strokeStyle = GIZMO.lensBarrelEdge;
         ctx.lineWidth = 1;
         ctx.stroke();
 
@@ -437,7 +464,7 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
         ctx.lineTo(screenPts[1].x, screenPts[1].y);
         ctx.lineTo(screenPts[2].x, screenPts[2].y);
         ctx.closePath();
-        ctx.fillStyle = "rgba(255, 255, 255, 0.02)";
+        ctx.fillStyle = GIZMO.sphereHaze;
         ctx.fill();
       }
 
@@ -469,13 +496,13 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
         };
 
         // Mid ring
-        ctx.strokeStyle = "rgba(180, 200, 255, 0.45)";
+        ctx.strokeStyle = GIZMO.lensRing;
         ctx.lineWidth = 1.0;
         drawRing(getCirclePts(0.7));
         ctx.stroke();
 
         // Inner ring
-        ctx.strokeStyle = "rgba(160, 190, 255, 0.3)";
+        ctx.strokeStyle = GIZMO.lensInnerRing;
         ctx.lineWidth = 0.6;
         drawRing(getCirclePts(0.4));
         ctx.stroke();
@@ -483,18 +510,18 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
         // Glass gradient fill
         const lfc = project(lensCx + dirX * lensLen, lensCy + dirY * lensLen, lensCz + dirZ * lensLen);
         const lensGrad = ctx.createRadialGradient(lfc.x, lfc.y, 0, lfc.x, lfc.y, 8);
-        lensGrad.addColorStop(0, "rgba(100, 160, 255, 0.4)");
-        lensGrad.addColorStop(0.6, "rgba(60,  100, 200, 0.2)");
-        lensGrad.addColorStop(1, "rgba(40,   70, 150, 0.05)");
+        lensGrad.addColorStop(0, GIZMO.lensGlassCenter);
+        lensGrad.addColorStop(0.6, GIZMO.lensGlassMid);
+        lensGrad.addColorStop(1, GIZMO.lensGlassEdge);
         ctx.fillStyle = lensGrad;
         drawRing(getCirclePts(0.85));
         ctx.fill();
 
         // Outer glow ring
         ctx.save();
-        ctx.shadowColor = "rgba(160, 190, 255, 0.6)";
+        ctx.shadowColor = GIZMO.lensGlow;
         ctx.shadowBlur = 6;
-        ctx.strokeStyle = "rgba(180, 200, 255, 0.4)";
+        ctx.strokeStyle = GIZMO.lensRim;
         ctx.lineWidth = 1.2;
         drawRing(getCirclePts(0.95));
         ctx.stroke();
@@ -511,15 +538,15 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
         const dot = project(dot3D.x, dot3D.y, dot3D.z);
 
         const glow = ctx.createRadialGradient(dot.x, dot.y, 0, dot.x, dot.y, 5);
-        glow.addColorStop(0, "rgba(255, 40, 40, 0.8)");
-        glow.addColorStop(0.5, "rgba(255, 40, 40, 0.2)");
-        glow.addColorStop(1, "rgba(255, 40, 40, 0)");
+        glow.addColorStop(0, GIZMO.targetGlow);
+        glow.addColorStop(0.5, GIZMO.targetGlowMid);
+        glow.addColorStop(1, GIZMO.targetGlowEdge);
         ctx.fillStyle = glow;
         ctx.beginPath();
         ctx.arc(dot.x, dot.y, 5, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = "rgba(255, 60, 60, 1)";
+        ctx.fillStyle = GIZMO.targetDot;
         ctx.beginPath();
         ctx.arc(dot.x, dot.y, 1.8, 0, Math.PI * 2);
         ctx.fill();
@@ -528,7 +555,7 @@ export const OrbitSphere = memo(({ rotation, tilt, onDragEnd }: OrbitSphereProps
 
     // ── Centre crosshair ─────────────────────────────────────────────
     ctx.lineJoin = "miter";
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+    ctx.strokeStyle = GIZMO.sphereOutline;
     ctx.lineWidth = 0.8;
     const crossSize = 5;
     ctx.beginPath();

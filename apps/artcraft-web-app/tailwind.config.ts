@@ -148,9 +148,9 @@ export default {
       "base-fg": m3Color("on-surface"),
       // design:content: X/Y/Z axis hues of the transform gizmo and vector
       // inputs follow the 3D convention (red X, green Y, blue Z).
-      "axis-x": "#D33242",
-      "axis-y": "#308752",
-      "axis-z": "#2E70FF",
+      "axis-x": "#D33242", // design:content
+      "axis-y": "#308752", // design:content
+      "axis-z": "#2E70FF", // design:content
 
       // shadcn aliases consumed by @storyteller/ui-video-editor.
       foreground: m3Color("on-surface"),
