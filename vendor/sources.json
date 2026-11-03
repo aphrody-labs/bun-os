@@ -624,6 +624,16 @@
       "origin": "https://github.com/aphrody-labs/onnxruntime.git",
       "upstream": "https://github.com/microsoft/onnxruntime.git",
       "path": "wasm/onnxruntime"
+    },
+    "tiny11builder": {
+      "origin": "https://github.com/aphrody-labs/tiny11builder.git",
+      "upstream": "https://github.com/ntdevlabs/tiny11builder.git",
+      "path": "tiny11builder"
+    },
+    "glazewm": {
+      "origin": "https://github.com/aphrody-labs/glazewm.git",
+      "upstream": "https://github.com/glzr-io/glazewm.git",
+      "path": "glazewm"
     }
   },
   "references": {
@@ -775,6 +785,12 @@
       "path": "gamescope",
       "revision": "2b5cf191d1047d6895516a834de8a72ac1c342f3",
       "origin": "https://github.com/aphrody-labs/gamescope.git",
+      "initialized": true
+    },
+    {
+      "path": "glazewm",
+      "revision": "5709ad0a3c7c386bbc3e38166a865ffc12937515",
+      "origin": "https://github.com/aphrody-labs/glazewm.git",
       "initialized": true
     },
     {
@@ -992,6 +1008,12 @@
       "revision": "4bcd8339bc22e74bd81c9f3efdfdfcbcf461db70",
       "origin": "https://github.com/aphrody-labs/tensaku.git",
       "initialized": false
+    },
+    {
+      "path": "tiny11builder",
+      "revision": "38f7ab6b1f177098c026a19b73ec84bca9c4b874",
+      "origin": "https://github.com/aphrody-labs/tiny11builder.git",
+      "initialized": true
     },
     {
       "path": "ttfx",

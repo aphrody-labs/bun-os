@@ -1601,3 +1601,11 @@
 	url = https://github.com/aphrody-labs/searxng.git
 	branch = master
 	shallow = true
+[submodule "vendor/tiny11builder"]
+	path = vendor/tiny11builder
+	url = https://github.com/aphrody-labs/tiny11builder.git
+	shallow = true
+[submodule "vendor/glazewm"]
+	path = vendor/glazewm
+	url = https://github.com/aphrody-labs/glazewm.git
+	shallow = true
