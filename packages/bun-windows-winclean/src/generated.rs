@@ -7,7 +7,7 @@ use serde::Serialize;
 use crate::{Result, ToolResult, Winclean};
 
 /// Every tool name exposed by the Rust WinClean compatibility surface.
-pub const TOOL_NAMES: [&str; 204] = [
+pub const TOOL_NAMES: [&str; 211] = [
     "analyze_pe",
     "aob_scan",
     "asar_list",
@@ -212,6 +212,13 @@ pub const TOOL_NAMES: [&str; 204] = [
     "shell_thumbnail",
     "shell_open_with",
     "shell_reveal",
+    "winget_sources",
+    "winget_search",
+    "winget_list",
+    "winget_show",
+    "winget_install",
+    "winget_upgrade",
+    "winget_uninstall",
 ];
 
 /// Arguments for [`Winclean::analyze_pe`] (`analyze_pe`).
@@ -7289,6 +7296,310 @@ impl ShellRevealArgs {
     }
 }
 
+/// Arguments for [`Winclean::winget_sources`] (`winget_sources`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct WingetSourcesArgs {}
+
+/// Arguments for [`Winclean::winget_search`] (`winget_search`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct WingetSearchArgs {
+    /// Search text.
+    #[serde(rename = "query")]
+    pub query: String,
+    /// winget source name (winget, msstore); every configured source when omitted.
+    #[serde(rename = "source", skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+    /// Maximum results (default 50).
+    ///
+    /// Default: `50`.
+    #[serde(rename = "limit", skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+impl WingetSearchArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `query`.
+    #[must_use]
+    pub fn query(mut self, value: impl Into<String>) -> Self {
+        self.query = value.into();
+        self
+    }
+
+    /// Sets `source`.
+    #[must_use]
+    pub fn source(mut self, value: impl Into<String>) -> Self {
+        self.source = Some(value.into());
+        self
+    }
+
+    /// Sets `limit`.
+    #[must_use]
+    pub fn limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::winget_list`] (`winget_list`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct WingetListArgs {
+    /// Optional filter text.
+    #[serde(rename = "query", skip_serializing_if = "Option::is_none")]
+    pub query: Option<String>,
+    /// winget source name (winget, msstore); every configured source when omitted.
+    #[serde(rename = "source", skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+    /// Only packages with an available update.
+    ///
+    /// Default: `false`.
+    #[serde(rename = "upgradable", skip_serializing_if = "Option::is_none")]
+    pub upgradable: Option<bool>,
+    /// Maximum results (default 0, no limit).
+    ///
+    /// Default: `0`.
+    #[serde(rename = "limit", skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+impl WingetListArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `query`.
+    #[must_use]
+    pub fn query(mut self, value: impl Into<String>) -> Self {
+        self.query = Some(value.into());
+        self
+    }
+
+    /// Sets `source`.
+    #[must_use]
+    pub fn source(mut self, value: impl Into<String>) -> Self {
+        self.source = Some(value.into());
+        self
+    }
+
+    /// Sets `upgradable`.
+    #[must_use]
+    pub fn upgradable(mut self, value: bool) -> Self {
+        self.upgradable = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    #[must_use]
+    pub fn limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::winget_show`] (`winget_show`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct WingetShowArgs {
+    /// Exact package identifier (e.g. Git.Git).
+    #[serde(rename = "id")]
+    pub id: String,
+    /// winget source name (winget, msstore); every configured source when omitted.
+    #[serde(rename = "source", skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+}
+
+impl WingetShowArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `id`.
+    #[must_use]
+    pub fn id(mut self, value: impl Into<String>) -> Self {
+        self.id = value.into();
+        self
+    }
+
+    /// Sets `source`.
+    #[must_use]
+    pub fn source(mut self, value: impl Into<String>) -> Self {
+        self.source = Some(value.into());
+        self
+    }
+}
+
+/// Arguments for [`Winclean::winget_install`] (`winget_install`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct WingetInstallArgs {
+    /// Exact package identifier.
+    #[serde(rename = "id")]
+    pub id: String,
+    /// Specific version; the default install version when omitted.
+    #[serde(rename = "version", skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
+    /// 'user' or 'machine'; any when omitted.
+    #[serde(rename = "scope", skip_serializing_if = "Option::is_none")]
+    pub scope: Option<String>,
+    /// winget source name (winget, msstore); every configured source when omitted.
+    #[serde(rename = "source", skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+    /// Reinstall or override checks.
+    ///
+    /// Default: `false`.
+    #[serde(rename = "force", skip_serializing_if = "Option::is_none")]
+    pub force: Option<bool>,
+}
+
+impl WingetInstallArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `id`.
+    #[must_use]
+    pub fn id(mut self, value: impl Into<String>) -> Self {
+        self.id = value.into();
+        self
+    }
+
+    /// Sets `version`.
+    #[must_use]
+    pub fn version(mut self, value: impl Into<String>) -> Self {
+        self.version = Some(value.into());
+        self
+    }
+
+    /// Sets `scope`.
+    #[must_use]
+    pub fn scope(mut self, value: impl Into<String>) -> Self {
+        self.scope = Some(value.into());
+        self
+    }
+
+    /// Sets `source`.
+    #[must_use]
+    pub fn source(mut self, value: impl Into<String>) -> Self {
+        self.source = Some(value.into());
+        self
+    }
+
+    /// Sets `force`.
+    #[must_use]
+    pub fn force(mut self, value: bool) -> Self {
+        self.force = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::winget_upgrade`] (`winget_upgrade`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct WingetUpgradeArgs {
+    /// Exact package identifier.
+    #[serde(rename = "id")]
+    pub id: String,
+    /// Target version; the newest when omitted.
+    #[serde(rename = "version", skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
+    /// winget source name (winget, msstore); every configured source when omitted.
+    #[serde(rename = "source", skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+    /// Upgrade even when no update is reported.
+    ///
+    /// Default: `false`.
+    #[serde(rename = "force", skip_serializing_if = "Option::is_none")]
+    pub force: Option<bool>,
+}
+
+impl WingetUpgradeArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `id`.
+    #[must_use]
+    pub fn id(mut self, value: impl Into<String>) -> Self {
+        self.id = value.into();
+        self
+    }
+
+    /// Sets `version`.
+    #[must_use]
+    pub fn version(mut self, value: impl Into<String>) -> Self {
+        self.version = Some(value.into());
+        self
+    }
+
+    /// Sets `source`.
+    #[must_use]
+    pub fn source(mut self, value: impl Into<String>) -> Self {
+        self.source = Some(value.into());
+        self
+    }
+
+    /// Sets `force`.
+    #[must_use]
+    pub fn force(mut self, value: bool) -> Self {
+        self.force = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::winget_uninstall`] (`winget_uninstall`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct WingetUninstallArgs {
+    /// Exact package identifier.
+    #[serde(rename = "id")]
+    pub id: String,
+    /// winget source name (winget, msstore); every configured source when omitted.
+    #[serde(rename = "source", skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+    /// Force the uninstall.
+    ///
+    /// Default: `false`.
+    #[serde(rename = "force", skip_serializing_if = "Option::is_none")]
+    pub force: Option<bool>,
+}
+
+impl WingetUninstallArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `id`.
+    #[must_use]
+    pub fn id(mut self, value: impl Into<String>) -> Self {
+        self.id = value.into();
+        self
+    }
+
+    /// Sets `source`.
+    #[must_use]
+    pub fn source(mut self, value: impl Into<String>) -> Self {
+        self.source = Some(value.into());
+        self
+    }
+
+    /// Sets `force`.
+    #[must_use]
+    pub fn force(mut self, value: bool) -> Self {
+        self.force = Some(value);
+        self
+    }
+}
+
 impl Winclean {
     /// Performs static analysis and symbol recovery on a target Windows PE binary (.exe or .dll).
     /// Recovers sections, imports, entry point disassembly, and maps symbols using heuristics (no
@@ -11123,5 +11434,140 @@ impl Winclean {
     /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
     pub async fn shell_reveal_async(&self, args: &ShellRevealArgs) -> Result<ToolResult> {
         self.call_async("shell_reveal", args).await
+    }
+
+    /// Lists the configured winget sources (name, id, type, argument, origin, trust level, last
+    /// update). Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native
+    /// AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no
+    /// winget.exe process, structured JSON.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn winget_sources(&self, args: &WingetSourcesArgs) -> Result<ToolResult> {
+        self.call("winget_sources", args)
+    }
+
+    /// Async variant of [`Winclean::winget_sources`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn winget_sources_async(&self, args: &WingetSourcesArgs) -> Result<ToolResult> {
+        self.call_async("winget_sources", args).await
+    }
+
+    /// Searches winget catalogs (id, name, moniker, tags, like `winget search`) and returns
+    /// packages with id, name, available and installed versions, source and update availability.
+    /// Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over
+    /// the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe
+    /// process, structured JSON.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn winget_search(&self, args: &WingetSearchArgs) -> Result<ToolResult> {
+        self.call("winget_search", args)
+    }
+
+    /// Async variant of [`Winclean::winget_search`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn winget_search_async(&self, args: &WingetSearchArgs) -> Result<ToolResult> {
+        self.call_async("winget_search", args).await
+    }
+
+    /// Lists installed packages correlated with the winget catalogs (installed and available
+    /// version, update availability); upgradable=true keeps those with an update, like `winget
+    /// upgrade`. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native
+    /// AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no
+    /// winget.exe process, structured JSON.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn winget_list(&self, args: &WingetListArgs) -> Result<ToolResult> {
+        self.call("winget_list", args)
+    }
+
+    /// Async variant of [`Winclean::winget_list`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn winget_list_async(&self, args: &WingetListArgs) -> Result<ToolResult> {
+        self.call_async("winget_list", args).await
+    }
+
+    /// Package details: publisher, description, license, URLs, tags, installed version and every
+    /// available version. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows,
+    /// C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses;
+    /// no winget.exe process, structured JSON.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn winget_show(&self, args: &WingetShowArgs) -> Result<ToolResult> {
+        self.call("winget_show", args)
+    }
+
+    /// Async variant of [`Winclean::winget_show`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn winget_show_async(&self, args: &WingetShowArgs) -> Result<ToolResult> {
+        self.call_async("winget_show", args).await
+    }
+
+    /// Installs a package silently by exact id (package agreements accepted) and returns status,
+    /// installer error code and reboot requirement. Runs in process through bunos_windows.dll
+    /// (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM
+    /// API that winget.exe itself uses; no winget.exe process, structured JSON.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn winget_install(&self, args: &WingetInstallArgs) -> Result<ToolResult> {
+        self.call("winget_install", args)
+    }
+
+    /// Async variant of [`Winclean::winget_install`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn winget_install_async(&self, args: &WingetInstallArgs) -> Result<ToolResult> {
+        self.call_async("winget_install", args).await
+    }
+
+    /// Upgrades an installed package by exact id to its newest (or a given) version, silently;
+    /// reports NoApplicableUpgrade when up to date. Runs in process through bunos_windows.dll
+    /// (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM
+    /// API that winget.exe itself uses; no winget.exe process, structured JSON.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn winget_upgrade(&self, args: &WingetUpgradeArgs) -> Result<ToolResult> {
+        self.call("winget_upgrade", args)
+    }
+
+    /// Async variant of [`Winclean::winget_upgrade`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn winget_upgrade_async(&self, args: &WingetUpgradeArgs) -> Result<ToolResult> {
+        self.call_async("winget_upgrade", args).await
+    }
+
+    /// Uninstalls an installed package by exact id, silently, and returns status, uninstaller error
+    /// code and reboot requirement. Runs in process through bunos_windows.dll
+    /// (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM
+    /// API that winget.exe itself uses; no winget.exe process, structured JSON.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn winget_uninstall(&self, args: &WingetUninstallArgs) -> Result<ToolResult> {
+        self.call("winget_uninstall", args)
+    }
+
+    /// Async variant of [`Winclean::winget_uninstall`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn winget_uninstall_async(&self, args: &WingetUninstallArgs) -> Result<ToolResult> {
+        self.call_async("winget_uninstall", args).await
     }
 }

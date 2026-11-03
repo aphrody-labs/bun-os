@@ -9,6 +9,7 @@ mod clipboard;
 mod coordination;
 mod defender;
 pub mod dispatch;
+mod dotnet_windows;
 mod eventlog;
 pub mod filesystem;
 pub mod gamepad;

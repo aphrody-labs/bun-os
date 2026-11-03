@@ -1446,6 +1446,9 @@ pub fn call_rust(tool: &str, arguments: Value) -> Result<Value, SubsystemError> 
                     SubsystemError::InvalidArguments("wait requires integer seconds".into())
                 })?,
         ))),
+        name if crate::dotnet_windows::method(name).is_some() => {
+            crate::dotnet_windows::dispatch(name, &arguments)
+        }
         "power_shell" => system::power_shell(
             path("command")?,
             arguments

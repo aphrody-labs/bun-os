@@ -4320,4 +4320,184 @@ export const TOOL_CATALOG: ReadonlyArray<{
       required: ["path"],
     },
   },
+  {
+    name: "winget_sources",
+    description:
+      "Lists the configured winget sources (name, id, type, argument, origin, trust level, last update). Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
+    name: "winget_search",
+    description:
+      "Searches winget catalogs (id, name, moniker, tags, like `winget search`) and returns packages with id, name, available and installed versions, source and update availability. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: {
+          description: "Search text.",
+          type: "string",
+        },
+        source: {
+          description:
+            "winget source name (winget, msstore); every configured source when omitted.",
+          type: ["string", "null"],
+        },
+        limit: {
+          description: "Maximum results (default 50).",
+          type: "integer",
+          default: 50,
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "winget_list",
+    description:
+      "Lists installed packages correlated with the winget catalogs (installed and available version, update availability); upgradable=true keeps those with an update, like `winget upgrade`. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: {
+          description: "Optional filter text.",
+          type: ["string", "null"],
+        },
+        source: {
+          description:
+            "winget source name (winget, msstore); every configured source when omitted.",
+          type: ["string", "null"],
+        },
+        upgradable: {
+          description: "Only packages with an available update.",
+          type: "boolean",
+          default: false,
+        },
+        limit: {
+          description: "Maximum results (default 0, no limit).",
+          type: "integer",
+          default: 0,
+        },
+      },
+    },
+  },
+  {
+    name: "winget_show",
+    description:
+      "Package details: publisher, description, license, URLs, tags, installed version and every available version. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          description: "Exact package identifier (e.g. Git.Git).",
+          type: "string",
+        },
+        source: {
+          description:
+            "winget source name (winget, msstore); every configured source when omitted.",
+          type: ["string", "null"],
+        },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "winget_install",
+    description:
+      "Installs a package silently by exact id (package agreements accepted) and returns status, installer error code and reboot requirement. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          description: "Exact package identifier.",
+          type: "string",
+        },
+        version: {
+          description:
+            "Specific version; the default install version when omitted.",
+          type: ["string", "null"],
+        },
+        scope: {
+          description: "'user' or 'machine'; any when omitted.",
+          type: ["string", "null"],
+        },
+        source: {
+          description:
+            "winget source name (winget, msstore); every configured source when omitted.",
+          type: ["string", "null"],
+        },
+        force: {
+          description: "Reinstall or override checks.",
+          type: "boolean",
+          default: false,
+        },
+      },
+      required: ["id"],
+    },
+    execution: {
+      taskSupport: "optional",
+    },
+  },
+  {
+    name: "winget_upgrade",
+    description:
+      "Upgrades an installed package by exact id to its newest (or a given) version, silently; reports NoApplicableUpgrade when up to date. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          description: "Exact package identifier.",
+          type: "string",
+        },
+        version: {
+          description: "Target version; the newest when omitted.",
+          type: ["string", "null"],
+        },
+        source: {
+          description:
+            "winget source name (winget, msstore); every configured source when omitted.",
+          type: ["string", "null"],
+        },
+        force: {
+          description: "Upgrade even when no update is reported.",
+          type: "boolean",
+          default: false,
+        },
+      },
+      required: ["id"],
+    },
+    execution: {
+      taskSupport: "optional",
+    },
+  },
+  {
+    name: "winget_uninstall",
+    description:
+      "Uninstalls an installed package by exact id, silently, and returns status, uninstaller error code and reboot requirement. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          description: "Exact package identifier.",
+          type: "string",
+        },
+        source: {
+          description:
+            "winget source name (winget, msstore); every configured source when omitted.",
+          type: ["string", "null"],
+        },
+        force: {
+          description: "Force the uninstall.",
+          type: "boolean",
+          default: false,
+        },
+      },
+      required: ["id"],
+    },
+    execution: {
+      taskSupport: "optional",
+    },
+  },
 ];

@@ -1,8 +1,8 @@
 {
   "$schema": "https://aphrody.dev/schemas/tool-migration-v1.json",
   "catalog": "src/tools.json",
-  "catalog_sha256": "7dbae9811afbf397e889612b240434000a338d3043c7fc53e5b3e5ef07e7d032",
-  "catalog_tool_count": 204,
+  "catalog_sha256": "87a5a1430204555ce0402abf96d8b3f8d94722780b315927385327207514b835",
+  "catalog_tool_count": 211,
   "state": "complete",
   "tools": [
     "analyze_pe",
@@ -208,7 +208,14 @@
     "shell_properties",
     "shell_thumbnail",
     "shell_open_with",
-    "shell_reveal"
+    "shell_reveal",
+    "winget_sources",
+    "winget_search",
+    "winget_list",
+    "winget_show",
+    "winget_install",
+    "winget_upgrade",
+    "winget_uninstall"
   ],
   "owner_rules": [
     {
@@ -474,7 +481,14 @@
     "shell_properties": "rust",
     "shell_thumbnail": "rust",
     "shell_open_with": "rust",
-    "shell_reveal": "rust"
+    "shell_reveal": "rust",
+    "winget_sources": "rust",
+    "winget_search": "rust",
+    "winget_list": "rust",
+    "winget_show": "rust",
+    "winget_install": "rust",
+    "winget_upgrade": "rust",
+    "winget_uninstall": "rust"
   },
   "native_rust_tools": [
     "winml_get_version",
@@ -482,5 +496,5 @@
     "winml_list_providers",
     "winml_run_float32"
   ],
-  "note": "The catalog is frozen for compatibility. Ownership is selected by the first matching rule; all 204 tools are implemented and dispatched by the Rust owner. dispatch_overrides and native_rust_tools remain as explicit migration evidence for compatibility tooling."
+  "note": "The catalog is frozen for compatibility. Ownership is selected by the first matching rule; all 211 tools are implemented and dispatched by the Rust owner. dispatch_overrides and native_rust_tools remain as explicit migration evidence for compatibility tooling."
 }

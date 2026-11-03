@@ -208,6 +208,13 @@ export const TOOL_NAMES = [
   "shell_thumbnail",
   "shell_open_with",
   "shell_reveal",
+  "winget_sources",
+  "winget_search",
+  "winget_list",
+  "winget_show",
+  "winget_install",
+  "winget_upgrade",
+  "winget_uninstall",
 ] as const;
 export type ToolName = (typeof TOOL_NAMES)[number];
 
@@ -2920,6 +2927,123 @@ export interface ShellRevealArgs {
   path: string;
 }
 
+/** Arguments for `winget_sources`. */
+export interface WingetSourcesArgs {}
+
+/** Arguments for `winget_search`. */
+export interface WingetSearchArgs {
+  /**
+   * Search text.
+   */
+  query: string;
+  /**
+   * winget source name (winget, msstore); every configured source when omitted.
+   */
+  source?: string | null;
+  /**
+   * Maximum results (default 50).
+   * @default 50
+   */
+  limit?: number;
+}
+
+/** Arguments for `winget_list`. */
+export interface WingetListArgs {
+  /**
+   * Optional filter text.
+   */
+  query?: string | null;
+  /**
+   * winget source name (winget, msstore); every configured source when omitted.
+   */
+  source?: string | null;
+  /**
+   * Only packages with an available update.
+   * @default false
+   */
+  upgradable?: boolean;
+  /**
+   * Maximum results (default 0, no limit).
+   * @default 0
+   */
+  limit?: number;
+}
+
+/** Arguments for `winget_show`. */
+export interface WingetShowArgs {
+  /**
+   * Exact package identifier (e.g. Git.Git).
+   */
+  id: string;
+  /**
+   * winget source name (winget, msstore); every configured source when omitted.
+   */
+  source?: string | null;
+}
+
+/** Arguments for `winget_install`. */
+export interface WingetInstallArgs {
+  /**
+   * Exact package identifier.
+   */
+  id: string;
+  /**
+   * Specific version; the default install version when omitted.
+   */
+  version?: string | null;
+  /**
+   * 'user' or 'machine'; any when omitted.
+   */
+  scope?: string | null;
+  /**
+   * winget source name (winget, msstore); every configured source when omitted.
+   */
+  source?: string | null;
+  /**
+   * Reinstall or override checks.
+   * @default false
+   */
+  force?: boolean;
+}
+
+/** Arguments for `winget_upgrade`. */
+export interface WingetUpgradeArgs {
+  /**
+   * Exact package identifier.
+   */
+  id: string;
+  /**
+   * Target version; the newest when omitted.
+   */
+  version?: string | null;
+  /**
+   * winget source name (winget, msstore); every configured source when omitted.
+   */
+  source?: string | null;
+  /**
+   * Upgrade even when no update is reported.
+   * @default false
+   */
+  force?: boolean;
+}
+
+/** Arguments for `winget_uninstall`. */
+export interface WingetUninstallArgs {
+  /**
+   * Exact package identifier.
+   */
+  id: string;
+  /**
+   * winget source name (winget, msstore); every configured source when omitted.
+   */
+  source?: string | null;
+  /**
+   * Force the uninstall.
+   * @default false
+   */
+  force?: boolean;
+}
+
 export type ToolArgsMap = {
   analyze_pe: AnalyzePeArgs;
   aob_scan: AobScanArgs;
@@ -3125,6 +3249,13 @@ export type ToolArgsMap = {
   shell_thumbnail: ShellThumbnailArgs;
   shell_open_with: ShellOpenWithArgs;
   shell_reveal: ShellRevealArgs;
+  winget_sources: WingetSourcesArgs;
+  winget_search: WingetSearchArgs;
+  winget_list: WingetListArgs;
+  winget_show: WingetShowArgs;
+  winget_install: WingetInstallArgs;
+  winget_upgrade: WingetUpgradeArgs;
+  winget_uninstall: WingetUninstallArgs;
 };
 
 /** One typed async method per WinClean tool. */
@@ -4572,5 +4703,54 @@ export abstract class GeneratedTools {
    */
   shellReveal(args: ShellRevealArgs): Promise<ToolResult> {
     return this.call("shell_reveal", args);
+  }
+
+  /**
+   * Lists the configured winget sources (name, id, type, argument, origin, trust level, last update). Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.
+   */
+  wingetSources(args?: WingetSourcesArgs): Promise<ToolResult> {
+    return this.call("winget_sources", args);
+  }
+
+  /**
+   * Searches winget catalogs (id, name, moniker, tags, like `winget search`) and returns packages with id, name, available and installed versions, source and update availability. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.
+   */
+  wingetSearch(args: WingetSearchArgs): Promise<ToolResult> {
+    return this.call("winget_search", args);
+  }
+
+  /**
+   * Lists installed packages correlated with the winget catalogs (installed and available version, update availability); upgradable=true keeps those with an update, like `winget upgrade`. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.
+   */
+  wingetList(args?: WingetListArgs): Promise<ToolResult> {
+    return this.call("winget_list", args);
+  }
+
+  /**
+   * Package details: publisher, description, license, URLs, tags, installed version and every available version. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.
+   */
+  wingetShow(args: WingetShowArgs): Promise<ToolResult> {
+    return this.call("winget_show", args);
+  }
+
+  /**
+   * Installs a package silently by exact id (package agreements accepted) and returns status, installer error code and reboot requirement. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.
+   */
+  wingetInstall(args: WingetInstallArgs): Promise<ToolResult> {
+    return this.call("winget_install", args);
+  }
+
+  /**
+   * Upgrades an installed package by exact id to its newest (or a given) version, silently; reports NoApplicableUpgrade when up to date. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.
+   */
+  wingetUpgrade(args: WingetUpgradeArgs): Promise<ToolResult> {
+    return this.call("winget_upgrade", args);
+  }
+
+  /**
+   * Uninstalls an installed package by exact id, silently, and returns status, uninstaller error code and reboot requirement. Runs in process through bunos_windows.dll (packages/bun-dotnet-windows, C# Native AOT) over the Microsoft.Management.Deployment COM API that winget.exe itself uses; no winget.exe process, structured JSON.
+   */
+  wingetUninstall(args: WingetUninstallArgs): Promise<ToolResult> {
+    return this.call("winget_uninstall", args);
   }
 }

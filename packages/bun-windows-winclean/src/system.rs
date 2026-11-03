@@ -529,11 +529,18 @@ pub fn power_shell(command: &str, timeout_seconds: u64) -> io::Result<serde_json
     }
     let timeout = timeout_seconds.clamp(1, 600);
     let executable = if cfg!(windows) {
+        // PowerShell 7 built from vendor/powershell (packages/bun-dotnet-windows install) first.
+        let bunos = std::path::PathBuf::from(
+            std::env::var_os("SystemRoot").unwrap_or_else(|| "C:\\Windows".into()),
+        )
+        .join("BunOS/dotnet-windows/pshome/pwsh.exe");
         let modern = std::path::PathBuf::from(
             std::env::var_os("ProgramFiles").unwrap_or_else(|| "C:\\Program Files".into()),
         )
         .join("PowerShell/7/pwsh.exe");
-        if modern.is_file() {
+        if bunos.is_file() {
+            bunos
+        } else if modern.is_file() {
             modern
         } else {
             std::path::PathBuf::from(
