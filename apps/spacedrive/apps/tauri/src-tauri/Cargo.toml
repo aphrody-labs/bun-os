@@ -58,6 +58,8 @@ file-opening-macos = { path = "../crates/file-opening-macos" }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 file-opening-windows = { path = "../crates/file-opening-windows" }
+# The DWM caption and border colour is the SpaceUI dark scheme surface-container role.
+aphrody-m3-tokens = { path = "../../../../../crates/aphrody-m3-tokens" }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 file-opening-linux = { path = "../crates/file-opening-linux" }

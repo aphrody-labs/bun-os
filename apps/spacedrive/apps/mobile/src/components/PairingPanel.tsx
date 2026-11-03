@@ -324,6 +324,7 @@ function GenerateMode({
             <Text className="text-sm text-ink-dull">
               Scan with mobile device
             </Text>
+            {/* design:content: the QR code keeps its black-on-white quiet zone so every scanner reads it. */}
             <View className="p-4 bg-white rounded-lg">
               <QRCode value={generatePairing.data.qr_json} size={200} />
             </View>

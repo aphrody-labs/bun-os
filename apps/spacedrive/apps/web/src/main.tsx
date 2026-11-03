@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { PlatformProvider, Shell } from "@sd/interface";
+import { MotionPreferences, PlatformProvider, Shell } from "@sd/interface";
 import { SpacedriveClient, HttpTransport } from "@sd/ts-client";
 import { platform } from "./platform";
 import "./index.css";
@@ -20,6 +20,8 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<React.StrictMode>
-		<App />
+		<MotionPreferences>
+			<App />
+		</MotionPreferences>
 	</React.StrictMode>
 );

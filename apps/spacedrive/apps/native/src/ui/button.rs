@@ -23,7 +23,7 @@ pub enum ButtonVariant {
 	Default,
 	/// Solid app-button fill.
 	Gray,
-	/// Accent fill, white label, soft shadow.
+	/// Accent fill, on-accent label, soft shadow.
 	Accent,
 }
 
@@ -99,7 +99,7 @@ impl RenderOnce for Button {
 			ButtonVariant::Accent => {
 				let accent_faint = theme.accent_faint;
 				let accent_deep = theme.accent_deep;
-				base.text_color(theme.white)
+				base.text_color(theme.on_accent)
 					.bg(theme.accent)
 					.border_color(theme.accent)
 					.shadow(vec![BoxShadow::new(
