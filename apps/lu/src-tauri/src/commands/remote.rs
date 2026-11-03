@@ -20,6 +20,15 @@ use tauri::{AppHandle, Emitter};
 use tracing::{error, info, warn};
 use crate::commands::remote_sealed::{self as sealed, SealedCaller, SealedHub};
 
+fn remote_shell_args(body: &serde_json::Value) -> Result<Option<Vec<String>>, String> {
+    match body.get("args") {
+        None | Some(serde_json::Value::Null) => Ok(None),
+        Some(value) => serde_json::from_value::<Vec<String>>(value.clone())
+            .map(Some)
+            .map_err(|_| "shell_execute: `args` must be an array of strings.".to_string()),
+    }
+}
+
 // ─── Constants ───
 
 // 15 minutes. The pairing code the user types on the phone. Was 5 min, but it
@@ -1303,7 +1312,11 @@ async fn handle_agent_tool(
                 // nicht abbrechbar, und das ist ehrlicher als eine Kennung, die
                 // niemand je ruft. Der Weg dahin ist derselbe wie im Fenster:
                 // ein `shell_execute_cancel` in der Fernliste.
-                crate::commands::shell::shell_execute(command, None, cwd, timeout, shell, stdin, chat_id.clone(), None, None).await
+                let positional = remote_shell_args(&body.args);
+                match positional {
+                    Ok(args) => crate::commands::shell::shell_execute(command, args, cwd, timeout, shell, stdin, chat_id.clone(), None, None).await,
+                    Err(error) => Err(error),
+                }
             }
         }
         "system_info" => crate::commands::system::system_info(),
@@ -1322,6 +1335,24 @@ async fn handle_agent_tool(
             eprintln!("[Remote agent] tool `{}` failed: {}", tool_name, e);
             graceful_error(&e)
         }
+    }
+}
+
+#[cfg(all(test, unix))]
+mod craft_remote_shell_args_tests {
+    #[tokio::test]
+    async fn preserves_positional_values_and_rejects_malformed_arguments() {
+        let args = super::remote_shell_args(&serde_json::json!({
+            "args": ["printf", "%s", "a;$(touch nope).xlsx"]
+        })).unwrap();
+        let result = crate::commands::shell::shell_execute(
+            "exec \"$0\" \"$@\"".into(), args, None, None, Some("bash".into()),
+            None, None, None, None,
+        ).await.unwrap();
+        assert_eq!(result["stdout"], "a;$(touch nope).xlsx");
+        assert!(super::remote_shell_args(&serde_json::json!({"args": ["ok", 3]})).is_err());
+        assert!(super::remote_shell_args(&serde_json::json!({"args": "not an array"})).is_err());
+        assert_eq!(super::remote_shell_args(&serde_json::json!({})).unwrap(), None);
     }
 }
 
