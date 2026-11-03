@@ -1,0 +1,107 @@
+# Bun OS fleet: the single source of truth for hosts, their roles, the private mesh, SSH access and the host firewall.
+#
+# Everything else is derived from this file by `bun infra/fleet/fleet.ts` (see docs/ops/FLEET.md):
+#   ssh-config   the workstation SSH client config and pinned known_hosts (infra/fleet/generated/)
+#   firewall     the nftables ruleset of one host (table `inet fleet`, applied by fleet-firewall.service)
+#   audit        a read-only probe comparing each host with this file
+#
+# Rules (owner order 2026-11-03):
+# - Every host is reached over the WireGuard mesh by its short name. `<name>-public` is the recovery path only.
+# - Host keys are pinned here and checked strictly; a host key change is a reviewed commit, never accept-new.
+# - Only the public interface is filtered. The mesh, loopback and container bridges are trusted.
+# - Services listen on loopback or the mesh. Public traffic enters through nginx (80/443) or Cloudflare tunnels only.
+
+schema = 1
+
+[mesh]
+name = "aphrody-private"
+interface = "wg1"
+cidr = "10.200.77.0/24"
+hub = "vps"
+keepalive = 25
+
+[ssh]
+identity = "~/.ssh/id_ed25519_aphrody"
+known_hosts = "infra/fleet/generated/known_hosts"
+server_alive_interval = 15
+server_alive_count_max = 3
+connect_timeout = 15
+# Multiplex interactive and scripted sessions; one TCP+WireGuard handshake per host per 10 minutes.
+control_persist = "10m"
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Servers
+# ---------------------------------------------------------------------------------------------------------------------
+
+[hosts.vps]
+description = "Build, qualification and release factory; WebOS edge for aphrody.com; mesh hub"
+provider = "OVH"
+os = "ubuntu-26.10"
+roles = ["mesh-hub", "build", "qualification", "release", "webos-edge"]
+user = "ubuntu"
+mesh_ip = "10.200.77.1"
+public_ipv4 = "51.77.147.152"
+public_ipv6 = "2001:41d0:404:200::4d8e"
+public_interface = "ens3"
+cpus = 12
+memory_gib = 45
+host_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINPa730pnwLsaHzUJ7T2IErtqGyBgH6gNGdsHNC4h02O"
+checkout = "~/src/bun-os"
+public_tcp = [22, 80, 443]
+public_udp = [443, 51821]
+
+[hosts.dbfr]
+description = "Shenron data host: object storage, extraction workers, Shenron admin"
+aliases = ["shenron"]
+provider = "OVH"
+os = "ubuntu-26.10"
+roles = ["shenron-data"]
+user = "ubuntu"
+mesh_ip = "10.200.77.3"
+public_ipv4 = "51.255.162.6"
+public_ipv6 = "2001:41d0:305:2100::a461"
+public_interface = "ens3"
+cpus = 6
+memory_gib = 11
+host_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHYR3pwug0v845mC0RZLveKK7ZG5QzqQcRtExNwTniOl"
+public_tcp = [22, 80, 443]
+public_udp = [443, 45667]
+
+[hosts.prod]
+description = "Shenron production (dragonballfr.com) behind Cloudflare"
+provider = "Hostinger"
+os = "arch"
+roles = ["shenron-prod"]
+user = "root"
+mesh_ip = "10.200.77.5"
+public_ipv4 = "72.60.186.43"
+public_ipv6 = "2a02:4780:28:8e1e::1"
+public_interface = "eth0"
+cpus = 8
+memory_gib = 31
+host_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIARirhBJIljCJ/n/b7+3hZKOBI+MZ5W6qJtHT4BgDbQs"
+public_tcp = [22, 80, 443]
+# 51821: wg `prod` (10.200.78.0/30); 52244: wg `vps` (mesh link to the hub).
+public_udp = [51821, 52244]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Clients and workstations (mesh members, not managed servers)
+# ---------------------------------------------------------------------------------------------------------------------
+
+[hosts.omar]
+description = "Windows workstation of a collaborator"
+os = "windows"
+roles = ["client"]
+user = "omara"
+mesh_ip = "10.200.77.10"
+host_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID6m0hYvMoqVUcjqaokolMWxnelpP5XoKCUGXSWAHvov"
+managed = false
+
+[hosts.workstation]
+description = "Owner workstation (Windows): edits, syncs and drives the fleet"
+os = "windows"
+roles = ["client", "operator"]
+mesh_ip = "10.200.77.4"
+host_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINp+k0bB75kjrqLbgKY41THnvWM9t+wsTt/c/PuEfDBg"
+managed = false
+ssh = false

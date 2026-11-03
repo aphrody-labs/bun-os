@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Builds and stages an aphrody.com release on the VPS (docs/webos/ARCHITECTURE.md, ADR-003):
 #   crates/aphrody-webos-server/release.sh
-# 1. the server binary (aphrody-webos) and the wasm client, through the serialized Cargo wrapper (four jobs);
+# 1. the server binary (aphrody-webos) and the wasm client, through the serialized Cargo wrapper (all host CPUs);
 # 2. wasm-bindgen --target web and wasm-opt -Oz for the client;
 # 3. an immutable release directory with receipt.json (sha256 of every file);
 # 4. the ready pointer consumed by the root activator (aphrody-webos-deploy.timer), which verifies the receipt,
@@ -20,14 +20,14 @@ git merge-base --is-ancestor "$commit" refs/remotes/origin/main ||
 git diff --quiet HEAD -- crates/aphrody-webos-server crates/aphrody-webos-client crates/aphrody-webos-protocol crates/aphrody-inventory crates/bun-ui-web ||
   { echo "Commit the WebOS crates before releasing" >&2; exit 1; }
 
-# The web lane of the shared factory (AGENTS.md: at most four compiler jobs per concurrent lane): its own serialized
+# The web lane of the shared factory (CARGO_BUILD_JOBS defaults to every host CPU): its own serialized
 # lock, target and build directories (.cargo/config.toml sets a shared build-dir), so a long workspace job in
 # another lane does not block a site release.
 lane="${WEBOS_CARGO_LANE:-$HOME/.cache/aphrody/lanes/webos}"
 target="${WEBOS_CARGO_TARGET:-$HOME/build/storage/targets/webos}"
 mkdir -p "$lane" "$target"
 cargo_serial() {
-  CARGO_BUILD_JOBS=4 APHRODY_BUILD_HOST='' APHRODY_LOCAL_CARGO=1 APHRODY_CARGO_LOCK_DIR="$lane" \
+  CARGO_BUILD_JOBS="" APHRODY_BUILD_HOST='' APHRODY_LOCAL_CARGO=1 APHRODY_CARGO_LOCK_DIR="$lane" \
     APHRODY_CARGO_TARGET_DIR="$target" CARGO_BUILD_BUILD_DIR="$target/build" scripts/aphrody/build/rust/cargo-serial.sh "$@"
 }
 cargo_serial build --release -p aphrody-webos-server -p aphrody-inventory
