@@ -170,6 +170,108 @@ pub fn pack_ico(images: &[(u32, Vec<u8>)]) -> Result<Vec<u8>> {
     Ok(out)
 }
 
+/// Every size the Windows 11 shell asks for across DPI scales (16 at 100 % up to 256 jumbo).
+pub const WINDOWS_SHELL_ICO_SIZES: &[u32] = &[16, 20, 24, 32, 40, 48, 64, 96, 256];
+
+/// One ICO entry: a PNG stream, or a 32-bit BGRA DIB (the classic layout every Win32 API decodes).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum IcoImage {
+    Png(Vec<u8>),
+    Dib(Raster),
+}
+
+/// A 32-bit `BITMAPINFOHEADER` DIB with an all-zero AND mask (alpha carries transparency).
+fn dib(r: &Raster) -> Result<Vec<u8>> {
+    let (w, h) = (r.width as usize, r.height as usize);
+    if r.rgba.len() != w * h * 4 {
+        return Err(Error::Invalid("raster size mismatch".into()));
+    }
+    let mask_row = w.div_ceil(32) * 4;
+    let mut out = Vec::with_capacity(40 + w * h * 4 + mask_row * h);
+    let as_i32 = |v: usize| i32::try_from(v).map_err(|_| Error::Invalid("DIB too large".into()));
+    out.extend_from_slice(&40u32.to_le_bytes());
+    out.extend_from_slice(&as_i32(w)?.to_le_bytes());
+    out.extend_from_slice(&as_i32(h * 2)?.to_le_bytes());
+    out.extend_from_slice(&1u16.to_le_bytes());
+    out.extend_from_slice(&32u16.to_le_bytes());
+    out.extend_from_slice(&[0u8; 24]);
+    for row in (0..h).rev() {
+        for p in r.rgba[row * w * 4..(row + 1) * w * 4].chunks_exact(4) {
+            out.extend_from_slice(&[p[2], p[1], p[0], p[3]]);
+        }
+    }
+    out.resize(out.len() + mask_row * h, 0);
+    Ok(out)
+}
+
+/// Packs mixed PNG/DIB entries into an ICO container, sorted as given. Sides are `1..=256`.
+///
+/// # Errors
+/// [`Error::Invalid`] for an empty list, a side out of range or an oversized image.
+pub fn pack_ico_mixed(images: &[(u32, IcoImage)]) -> Result<Vec<u8>> {
+    let count =
+        u16::try_from(images.len()).map_err(|_| Error::Invalid("too many ICO images".into()))?;
+    if count == 0 {
+        return Err(Error::Invalid("ICO needs at least one image".into()));
+    }
+    let blobs = images
+        .iter()
+        .map(|(_, image)| match image {
+            IcoImage::Png(png) => Ok(png.clone()),
+            IcoImage::Dib(raster) => dib(raster),
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let mut out = Vec::new();
+    out.extend_from_slice(&[0, 0, 1, 0]);
+    out.extend_from_slice(&count.to_le_bytes());
+    let mut offset = 6 + 16 * u32::from(count);
+    for ((side, _), blob) in images.iter().zip(&blobs) {
+        let dim = match *side {
+            256 => 0u8,
+            s @ 1..=255 => u8::try_from(s).map_err(|_| Error::Invalid("ICO side".into()))?,
+            s => return Err(Error::Invalid(format!("ICO side {s} out of 1..=256"))),
+        };
+        let len =
+            u32::try_from(blob.len()).map_err(|_| Error::Invalid("ICO image too large".into()))?;
+        out.extend_from_slice(&[dim, dim, 0, 0]);
+        out.extend_from_slice(&1u16.to_le_bytes());
+        out.extend_from_slice(&32u16.to_le_bytes());
+        out.extend_from_slice(&len.to_le_bytes());
+        out.extend_from_slice(&offset.to_le_bytes());
+        offset = offset
+            .checked_add(len)
+            .ok_or_else(|| Error::Invalid("ICO too large".into()))?;
+    }
+    for blob in &blobs {
+        out.extend_from_slice(blob);
+    }
+    Ok(out)
+}
+
+/// The Windows shell layout: 32-bit DIB entries below 256 px and a PNG-compressed 256 px entry,
+/// each size rendered from its own SVG (`svg_for(size)`, so small sizes can drop detail).
+///
+/// # Errors
+/// As [`render`], [`render_png`] and [`pack_ico_mixed`].
+pub fn render_ico_windows<'a>(
+    svg_for: impl Fn(u32) -> &'a str,
+    sizes: &[u32],
+) -> Result<Vec<u8>> {
+    let images = sizes
+        .iter()
+        .map(|&s| {
+            let svg = svg_for(s);
+            let image = if s >= 256 {
+                IcoImage::Png(render_png(svg, RenderOptions::square(s))?)
+            } else {
+                IcoImage::Dib(render(svg, RenderOptions::square(s))?)
+            };
+            Ok((s, image))
+        })
+        .collect::<Result<Vec<_>>>()?;
+    pack_ico_mixed(&images)
+}
+
 /// Renders `svg` once per size (square) and packs the result as an ICO.
 ///
 /// # Errors
@@ -185,6 +287,19 @@ pub fn render_ico(svg: &str, sizes: &[u32]) -> Result<Vec<u8>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn windows_ico_mixes_dib_and_png() {
+        let ico = render_ico_windows(|_| RED, &[16, 256]).expect("ico");
+        assert_eq!(&ico[..6], &[0, 0, 1, 0, 2, 0]);
+        let off16 = u32::from_le_bytes(ico[18..22].try_into().unwrap()) as usize;
+        assert_eq!(&ico[off16..off16 + 4], &40u32.to_le_bytes());
+        let len16 = u32::from_le_bytes(ico[14..18].try_into().unwrap()) as usize;
+        assert_eq!(len16, 40 + 16 * 16 * 4 + 4 * 16);
+        let off256 = u32::from_le_bytes(ico[34..38].try_into().unwrap()) as usize;
+        assert_eq!(&ico[off256..off256 + 4], b"\x89PNG");
+        assert_eq!(ico[22], 0, "256 px is encoded as 0");
+    }
 
     const RED: &str = r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 20"><rect width="10" height="20" fill="#f00"/></svg>"##;
 

@@ -1729,6 +1729,7 @@
 [submodule "vendor/hyprland/hyprland-plugins"]
 	path = vendor/hyprland/hyprland-plugins
 	url = https://github.com/aphrody-labs/hyprland-plugins.git
+	shallow = true
 [submodule "vendor/wlvncc"]
 	path = vendor/wlvncc
 	url = https://github.com/aphrody-labs/wlvncc.git

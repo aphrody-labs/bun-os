@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "bunos-design"
+version = "1.4.7"
+edition = "2024"
+authors = ["aphrody-dev <contact@aphrody.com>"]
+homepage = "https://aphrody.app"
+repository = "https://github.com/aphrody-labs/bun-os"
+license = "Apache-2.0"
+description = "Bun OS design pipeline renderer: wallpaper source colour and M3 theme export (aphrody-m3-tokens), and parallel SVG to Windows ICO / PNG rendering (aphrody-svg) for the icon, chrome and theme artifacts built by packages/m3-os-themes."
+
+[[bin]]
+name = "bunos-design"
+path = "src/main.rs"
+
+[dependencies]
+aphrody-svg = { path = "../aphrody-svg", default-features = false, features = ["raster"] }
+aphrody-m3-tokens = { path = "../aphrody-m3-tokens", features = ["image", "serde"] }
+rayon = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true
