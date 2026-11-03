@@ -43,7 +43,7 @@ windows-sys = { version = "0.61.2", features = [
 ] }
 
 [build-dependencies]
-embed-resource = "3.0.12"
+bunos-winres = { path = "../bunos-winres" }
 
 [profile.release]
 opt-level = "s"

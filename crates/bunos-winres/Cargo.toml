@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# Windows identity for every Bun OS binary, from build.rs: icon, VERSIONINFO and application manifest in one resource
+# script (docs/WINDOWS-ARCHITECTURE.md, "Identity"). Its own workspace so non-member crates (bunos-wsl-service,
+# nu_plugin_windows, bunos-nt-client) can use it as a path build-dependency without touching the root lock.
+[workspace]
+
+[package]
+name = "bunos-winres"
+version = "1.4.7"
+edition = "2024"
+license = "Apache-2.0"
+authors = ["aphrody-dev <contact@aphrody.com>"]
+repository = "https://github.com/aphrody-labs/bun-os"
+description = "build.rs helper: embeds the Bun OS icon, VERSIONINFO and a per-monitor-v2 / long-path / UTF-8 application manifest into Windows binaries."
+publish = false
+
+[dependencies]
+embed-resource = "3.0.12"

@@ -13,6 +13,8 @@ mod instance;
 #[cfg(windows)]
 mod manage;
 #[cfg(windows)]
+mod pending;
+#[cfg(windows)]
 mod proxy;
 #[cfg(windows)]
 mod user;
@@ -45,6 +47,10 @@ enum Cmd {
         /// Start the service after installing.
         #[arg(long)]
         start: bool,
+        /// Start at boot (AUTO_START). Default is demand start: nothing of Bun OS is resident until asked for
+        /// (`sc start BunOSWsl`, `bunos-wsl-service install --start`, or a unit service), docs/WINDOWS-ARCHITECTURE.md.
+        #[arg(long)]
+        boot: bool,
     },
     /// Stop and remove BunOSWsl and every unit service (elevated). The distro itself is untouched.
     Uninstall,
@@ -83,7 +89,8 @@ fn main() -> anyhow::Result<()> {
             user,
             terminate_on_stop,
             start,
-        } => manage::install(distro, user, terminate_on_stop, start),
+            boot,
+        } => manage::install(distro, user, terminate_on_stop, start, boot),
         Cmd::Uninstall => manage::uninstall(),
         Cmd::Export { units } => manage::export(&units),
         Cmd::Unexport { units } => manage::unexport(&units),

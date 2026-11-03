@@ -67,6 +67,7 @@ pub fn install(
     user: Option<String>,
     terminate_on_stop: Option<bool>,
     start: bool,
+    boot: bool,
 ) -> Result<()> {
     let exe = installed_exe();
     std::fs::create_dir_all(install_dir())?;
@@ -101,7 +102,11 @@ pub fn install(
             name: SERVICE_NAME.into(),
             display_name: "Bun OS (WSL)".into(),
             service_type: ServiceType::OWN_PROCESS,
-            start_type: ServiceStartType::AutoStart,
+            start_type: if boot {
+                ServiceStartType::AutoStart
+            } else {
+                ServiceStartType::OnDemand
+            },
             error_control: ServiceErrorControl::Normal,
             executable_path: exe.clone(),
             launch_arguments: vec![OsString::from("instance")],
@@ -111,7 +116,7 @@ pub fn install(
         },
     )?;
     svc.set_description(format!(
-        "Runs the Bun OS WSL 2 distro '{distro}' as {user} from boot, without a logon, and restarts it if it stops. \
+        "Runs the Bun OS WSL 2 distro '{distro}' as {user} on demand (or from boot with --boot), without a logon, and restarts it if it stops. \
          Mirrored systemd units appear as {UNIT_PREFIX}<unit> services. See docs/WSL-SERVICE.md."
     ))?;
     svc.update_failure_actions(ServiceFailureActions {

@@ -434,13 +434,8 @@ fn run(
         }
     };
 
-    let _ = set(
-        h,
-        ServiceState::StopPending,
-        ServiceExitCode::NO_ERROR,
-        1,
-        Duration::from_secs(30),
-    );
+    // STOP_PENDING with a moving checkpoint until the keeper is gone and the optional terminate returned (bounded 25 s).
+    let _stopping = crate::pending::Pending::start(*h, ServiceState::StopPending);
     if let Some(k) = keeper.take() {
         k.proc.kill();
     }

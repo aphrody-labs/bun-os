@@ -510,22 +510,28 @@ impl Runner {
         let mut p = self.spawn(args)?;
         let mut so = p.stdout.take().unwrap();
         let mut se = p.stderr.take().unwrap();
-        let t = std::thread::spawn(move || {
+        // Readers report through channels so a pipe kept open after wsl.exe exited (a relay or grandchild that
+        // inherited the write end) cannot block the caller: past the grace period the output is taken as empty and the
+        // reader thread is abandoned.
+        let (te, re) = std::sync::mpsc::channel();
+        let (to, ro) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
             let mut b = Vec::new();
             let _ = se.read_to_end(&mut b);
-            b
+            let _ = te.send(b);
         });
-        let t2 = std::thread::spawn(move || {
+        std::thread::spawn(move || {
             let mut b = Vec::new();
             let _ = so.read_to_end(&mut b);
-            b
+            let _ = to.send(b);
         });
         let Some(code) = p.wait(Some(timeout)) else {
             p.kill();
             bail!("wsl.exe {} timed out after {timeout:?}", args.join(" "));
         };
-        let out = t2.join().unwrap_or_default();
-        let err = t.join().unwrap_or_default();
+        const GRACE: Duration = Duration::from_secs(2);
+        let out = ro.recv_timeout(GRACE).unwrap_or_default();
+        let err = re.recv_timeout(GRACE).unwrap_or_default();
         Ok((code, decode_wsl(&out), decode_wsl(&err)))
     }
 

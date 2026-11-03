@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Embeds a message table (RT_MESSAGETABLE) so the executable is its own EventMessageFile: every event ID 1..=4 is the
 //! message "%1", so Event Viewer shows the inserted string instead of "the description cannot be found". The table is
-//! written in the documented MESSAGE_RESOURCE_DATA layout, so no mc.exe is needed.
+//! written in the documented MESSAGE_RESOURCE_DATA layout, so no mc.exe is needed. The Windows identity (icon,
+//! VERSIONINFO, manifest) comes from crates/bunos-winres in the same resource script.
 
 use std::{env, fs, path::PathBuf};
 
@@ -35,10 +36,9 @@ fn main() {
     }
     let bin = out.join("messages.bin");
     fs::write(&bin, table).unwrap();
-    let rc = out.join("messages.rc");
     let bin_path = bin.display().to_string().replace('\\', "\\\\");
-    fs::write(&rc, format!("1 MESSAGETABLE \"{bin_path}\"\n")).unwrap();
-    embed_resource::compile(&rc, embed_resource::NONE)
-        .manifest_optional()
-        .unwrap();
+    // One resource script: icon, VERSIONINFO, application manifest (crates/bunos-winres) plus the message table.
+    bunos_winres::Identity::from_env("Bun OS WSL service")
+        .icon_role("linux")
+        .embed(&format!("1 MESSAGETABLE \"{bin_path}\"\n"));
 }

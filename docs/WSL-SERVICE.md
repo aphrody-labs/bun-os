@@ -10,7 +10,7 @@ bundle work); this page only adds the service layer.
 
 | Windows object | Role |
 | --- | --- |
-| `BunOSWsl` service, "Bun OS (WSL)" | Automatic start (not delayed), LocalSystem, depends on `WSLService`. Starts the distro as its owner at boot, before any logon, keeps it running, restarts it when it stops, reports `RUNNING` once systemd is up. Recovery: restart after 5 s, 15 s, 60 s, reset after 1 day, also on service-specific exit codes. Pre-shutdown timeout 30 s. |
+| `BunOSWsl` service, "Bun OS (WSL)" | Demand start by default (`install --boot` for automatic start at boot; changed 2026-11-03, docs/WINDOWS-ARCHITECTURE.md), LocalSystem, depends on `WSLService`. Starts the distro as its owner (at boot with `--boot`, before any logon), keeps it running, restarts it when it stops, reports `RUNNING` once systemd is up. Recovery: restart after 5 s, 15 s, 60 s, reset after 1 day, also on service-specific exit codes. Pre-shutdown timeout 30 s. |
 | `BunOSWsl.<unit>` services, "Bun OS: <unit>" | One per mirrored systemd unit (manual start, depends on `BunOSWsl`). Start = `systemctl start`, stop = `systemctl stop`; the Windows state follows the unit (a unit started inside Linux starts its Windows service; a unit that stops stops it, exit code 0 for `inactive`, service-specific 1 for `failed`). |
 | Event sources `BunOSWsl`, `BunOSWsl.<unit>` (Application log) | ID 1 lifecycle (start, ready time, restarts, stop), 2 unit state changes, 3 journal entries of the unit (syslog priority 0-3 error, 4 warning, else information; at most 200 per 10 s), 4 service errors. The executable carries its own message table (`build.rs`), so Event Viewer renders every entry. |
 | `HKLM\SYSTEM\CurrentControlSet\Services\BunOSWsl\Parameters` | `Distro`, `User`, `TerminateOnStop` (1: stopping the service terminates the distro), `StatePeriod` (s); status written by the service: `LastReadyMs`, `LastSystemdState`, `LastGuestUptimeS`; `Units\<unit>` holds the last published state of each mirrored unit. |
@@ -19,7 +19,7 @@ bundle work); this page only adds the service layer.
 Commands (`install`, `uninstall`, `export`, `unexport` need elevation, e.g. `sudo bunos-wsl-service ...`):
 
 ```text
-bunos-wsl-service install [--distro bunos] [--user <owner>] [--terminate-on-stop true|false] [--start]
+bunos-wsl-service install [--distro bunos] [--user <owner>] [--terminate-on-stop true|false] [--start] [--boot]
 bunos-wsl-service units [--json] [--all]        # read-only: every service unit, its state, its Windows mirror
 bunos-wsl-service export docker.service waydroid-container.service
 bunos-wsl-service unexport docker.service       # removes the mirror only; the unit keeps running
@@ -195,6 +195,17 @@ of WSL 2. The cost of the VM is addressed by the trims in section 4, not by remo
   next to the other `%SystemRoot%\BunOS` files from `setup-elevated.ps1`, signed), then `export <units>` when units
   are given (suggested default: `docker.service,waydroid-container.service`). `--dry-run` prints both command lines.
 - Uninstall: `bunos-wsl-service uninstall` before unregistering the distro.
+
+## 6b. Start and stop behaviour (2026-11-03)
+
+- Pending states are reported with a 5 s wait hint and a checkpoint that moves every second while the work runs
+  (`src/pending.rs`), for both services, on start and on stop.
+- A unit service stop runs `systemctl stop --no-block` and waits for the unit to leave the running states (published
+  state, else `systemctl is-active` every 3 s), bounded by `Parameters\StopTimeoutS` (default 90 s). Past it the
+  Windows service reports STOPPED with service-specific code 4 and systemd completes the stop. Before this, a blocking
+  `systemctl stop` with one frozen 100 s hint made `Stop-Service` wait forever on a stuck job.
+- `wsl.exe` output is read with a 2 s grace after the process exits, so a relay that keeps a pipe open cannot block.
+- Not re-verified on the workstation yet (at rest); steps in docs/WINDOWS-ARCHITECTURE.md, "Workstation steps".
 
 ## 7. Remaining
 
