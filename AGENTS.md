@@ -18,8 +18,8 @@ Gemini at the centre), shipped as a bootable image and as the WebOS session on a
 ## Fleet
 
 - Hosts, mesh, SSH and firewalls are declared once in `infra/fleet/fleet.toml` ([docs/ops/FLEET.md](docs/ops/FLEET.md)).
-  Reach servers by name over the WireGuard mesh: `ssh vps` to build, `ssh bunos` for Bun OS production, `ssh prod`
-  for Shenron (`<host>-public` only for recovery). Host keys are pinned, never `accept-new`. `bun infra/fleet/fleet.ts audit` must stay clean.
+  Reach servers by name over the WireGuard mesh: `ssh vps` is the single Bun OS host (build farm and production,
+  isolated by `build.slice` and `interactive.slice`), `ssh prod` is Shenron (`<host>-public` only for recovery). Host keys are pinned, never `accept-new`. `bun infra/fleet/fleet.ts audit` must stay clean.
 - Change a host by changing the repository and applying it (`fleet.ts apply-firewall`, sync, automation), never by
   hand edits on the host. Shenron (fully on `prod`) keeps its own release pipeline; the fleet owns access only.
 

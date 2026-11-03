@@ -34,10 +34,10 @@ control_persist = "10m"
 # ---------------------------------------------------------------------------------------------------------------------
 
 [hosts.vps]
-description = "Build, qualification and release factory; mesh hub"
+description = "The Bun OS host: build farm, production (aphrody.com, api.aphrody.com, WebOS) and mesh hub"
 provider = "OVH"
 os = "ubuntu-26.10"
-roles = ["mesh-hub", "build", "qualification", "release"]
+roles = ["mesh-hub", "build", "qualification", "release", "production", "api-gateway"]
 user = "ubuntu"
 mesh_ip = "10.200.77.1"
 public_ipv4 = "51.77.147.152"
@@ -51,10 +51,11 @@ public_tcp = [22, 80, 443]
 public_udp = [443, 51821]
 
 [hosts.bunos]
-description = "Bun OS production: aphrody.com services and the WebOS session (formerly dbfr)"
+description = "Retired 2026-11-03: merged into vps (formerly dbfr); kept reachable until the OVH subscription ends"
 provider = "OVH"
 os = "ubuntu-26.10"
-roles = ["bunos-prod"]
+roles = ["retired"]
+managed = false
 user = "ubuntu"
 mesh_ip = "10.200.77.3"
 public_ipv4 = "51.255.162.6"

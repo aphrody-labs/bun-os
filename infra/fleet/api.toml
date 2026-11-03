@@ -1,4 +1,4 @@
-# Public Bun OS API (docs/ops/API.md): one entry, api.aphrody.com on the production host, routed by /v1/<service>/.
+# Public Bun OS API (docs/ops/API.md): one entry, api.aphrody.com on the single Bun OS host (vps), routed by /v1/<service>/.
 # `bun infra/fleet/fleet.ts api-config` renders the nginx sites; `apply-api` installs them.
 #
 # A service runs on `host` and listens on loopback `port`. When `host` is not the gateway host, the gateway forwards
@@ -7,7 +7,7 @@
 
 schema = 1
 domain = "api.aphrody.com"
-gateway = "bunos"
+gateway = "vps"
 mesh_port = 8080
 # Origins allowed to call the API from a browser (CORS); no wildcard on authenticated routes.
 origins = ["https://aphrody.com", "https://www.aphrody.com", "https://aphrody.app", "https://store.aphrody.com", "https://downloads.aphrody.com"]

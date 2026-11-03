@@ -173,6 +173,13 @@ if (cmd === "render") {
   console.log(`wrote ${Object.keys(files).join(", ")} to ${outDir}`);
 } else if (cmd === "apply") {
   for (const h of meshHosts) await install(h, `fleet-api-mesh.conf`, meshListener(h));
+  // The gateway host serves its services directly; a mesh listener left from an earlier layout would also redefine
+  // the shared upgrade map.
+  if (!meshHosts.includes(api.gateway))
+    await ssh(
+      api.gateway,
+      "sudo -n rm -f /etc/nginx/conf.d/fleet-api-mesh.conf; sudo -n install -d /var/www/letsencrypt",
+    );
   const certCheck = await ssh(
     api.gateway,
     `sudo -n test -f /etc/letsencrypt/live/${api.domain}/fullchain.pem && echo yes || echo no`,

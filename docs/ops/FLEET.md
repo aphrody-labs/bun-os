@@ -3,13 +3,13 @@
 `infra/fleet/fleet.toml` is the only description of the Bun OS hosts. SSH access, pinned host keys, host firewalls
 and the audit are generated from it by `bun infra/fleet/fleet.ts`. Change the TOML, regenerate, commit.
 
-| Host          | Role                                                                                                    | Mesh           | OS           | Provider  |
-| ------------- | ------------------------------------------------------------------------------------------------------- | -------------- | ------------ | --------- |
-| `vps`         | Build, qualification and release factory; mesh hub (still fronts aphrody.com until it moves to `bunos`) | `10.200.77.1`  | Ubuntu 26.10 | OVH       |
-| `bunos`       | Bun OS production (formerly `dbfr`): receives qualified releases from `vps`                             | `10.200.77.3`  | Ubuntu 26.10 | OVH       |
-| `prod`        | Shenron (dragonballfr.com), fully migrated here, behind Cloudflare                                      | `10.200.77.5`  | Arch Linux   | Hostinger |
-| `omar`        | Collaborator workstation (Windows), mesh client                                                         | `10.200.77.10` | Windows      | —         |
-| `workstation` | Owner workstation (Windows): edits, syncs, drives the fleet                                             | `10.200.77.4`  | Windows      | —         |
+| Host          | Role                                                                                                                                   | Mesh           | OS           | Provider  |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------ | --------- |
+| `vps`         | The single Bun OS host: build farm (`build.slice`) and production (`interactive.slice`: aphrody.com, api.aphrody.com, WebOS); mesh hub | `10.200.77.1`  | Ubuntu 26.10 | OVH       |
+| `bunos`       | Retired 2026-11-03 (merged into `vps`); reachable until the subscription ends                                                          | `10.200.77.3`  | Ubuntu 26.10 | OVH       |
+| `prod`        | Shenron (dragonballfr.com), fully migrated here, behind Cloudflare                                                                     | `10.200.77.5`  | Arch Linux   | Hostinger |
+| `omar`        | Collaborator workstation (Windows), mesh client                                                                                        | `10.200.77.10` | Windows      | —         |
+| `workstation` | Owner workstation (Windows): edits, syncs, drives the fleet                                                                            | `10.200.77.4`  | Windows      | —         |
 
 `bun infra/fleet/fleet.ts hosts` prints the live table from the TOML.
 
@@ -17,7 +17,7 @@ and the audit are generated from it by `bun infra/fleet/fleet.ts`. Change the TO
 
 ```sh
 bun infra/fleet/fleet.ts ssh-config     # writes infra/fleet/generated/* and installs ~/.ssh/fleet/{ssh_config,known_hosts}
-ssh vps | ssh bunos | ssh prod          # over the WireGuard mesh, strict host-key checking against the pinned keys
+ssh vps | ssh prod                         # over the WireGuard mesh, strict host-key checking against the pinned keys
 ssh vps-t                               # same host, attached to the persistent tmux session `main`
 ssh prod-public                         # recovery path over the public address when the mesh is down
 ```
@@ -54,6 +54,14 @@ Apply a firewall change (a dead-man switch removes the new table after 180 s unl
 bun infra/fleet/fleet.ts firewall vps          # review
 bun infra/fleet/fleet.ts apply-firewall vps    # stage, prove a fresh SSH session, commit, enable at boot
 ```
+
+## One host for build and production
+
+`vps` runs builds and production side by side. cgroup v2 keeps them apart (kernel `cgroup-v2.rst`,
+`systemd.resource-control(5)`): `interactive.slice` (production) has CPU and I/O weight 1000 and `MemoryMin=8G`;
+`build.slice` has weight 100, `MemoryHigh=34G`, `MemoryMax=38G` and `ManagedOOMMemoryPressure=kill`, so builds take
+every idle CPU, yield 10:1 under contention, and systemd-oomd kills a build, never a production service, under
+memory pressure. Off-site backups go to `prod` (another provider): `/srv/offsite/vps/`.
 
 ## Audit
 
