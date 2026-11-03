@@ -103,29 +103,33 @@ async function publishCrate(
     console.log(`taken   ${key}`);
     return;
   }
-  // Before the first upload, siblings are not on crates.io yet and a plain dry run of a dependent cannot resolve them:
-  // the dry run packages the crate together with its unpublished workspace dependencies (cargo resolves those from the
-  // packages it just built) without the verification build. The real run verifies once its deps are on crates.io.
-  const check = dry
-    ? run(
-        ["cargo", "package", "--no-verify", "--allow-dirty", ...[name, ...siblings].flatMap(n => ["-p", n])],
-        cwd,
-        env,
-      )
-    : run(["cargo", "publish", "-p", name, "--dry-run", "--allow-dirty"], cwd, env);
-  if (check.code !== 0) {
-    await mark(key, "failed", errors(check.out));
-    console.log(`failed  ${key}: ${state[key].detail}`);
-    return;
-  }
+  // Dry run: before the first upload, siblings are not on crates.io and a plain `cargo publish --dry-run` of a dependent
+  // cannot resolve them, so the crate is packaged together with its unpublished workspace dependencies (cargo resolves
+  // those from the packages it just built), without the verification build.
   if (dry) {
+    const check = run(
+      ["cargo", "package", "--no-verify", "--allow-dirty", ...[name, ...siblings].flatMap(n => ["-p", n])],
+      cwd,
+      env,
+    );
+    if (check.code !== 0) {
+      await mark(key, "failed", errors(check.out));
+      console.log(`failed  ${key}: ${state[key].detail}`);
+      return;
+    }
     await mark(key, "verified");
     console.log(`ok      ${key} (dry run)`);
     done++;
     return;
   }
+  // Real run: one `cargo publish`, which packages, runs the verification build against the crates.io dependencies and
+  // uploads (each cargo invocation walks the checkout's status, minutes on this repository). After a 429 the crate is
+  // already verified and the retry uploads with --no-verify.
+  let verified = false;
   for (let attempt = 0; ; attempt++) {
-    const pub = run(["cargo", "publish", "-p", name, "--allow-dirty", "--no-verify"], cwd, env);
+    const pub = run(["cargo", "publish", "-p", name, "--allow-dirty", ...(verified ? ["--no-verify"] : [])], cwd, env);
+    // cargo reaches "Uploading" only after the verification build passed.
+    if (/^\s*Uploading /m.test(pub.out)) verified = true;
     if (pub.code === 0) {
       await mark(key, "published");
       console.log(`publish ${key}`);
