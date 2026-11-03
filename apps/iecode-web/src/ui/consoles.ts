@@ -63,6 +63,7 @@ function installWiiHomebrew(): void {
   const start = document.getElementById("wii-start") as HTMLButtonElement;
   const status = document.getElementById("wii-status") as HTMLElement;
   const host = document.getElementById("wii-runtime-host") as HTMLElement;
+  const home = document.getElementById("wii-home") as HTMLButtonElement;
   if (start.dataset["wired"] === "true") return;
   start.dataset["wired"] = "true";
 
@@ -91,6 +92,7 @@ function installWiiHomebrew(): void {
       const [data, dspData] = await Promise.all([file.arrayBuffer(), dsp.files?.[0]?.arrayBuffer()]);
       host.replaceChildren();
       host.removeAttribute("hidden");
+      home.hidden = false;
       runtime.start_wii_emulator(new Uint8Array(data), dspData ? new Uint8Array(dspData) : undefined);
       document.querySelector(".wii-home")?.setAttribute("hidden", "");
       status.textContent = "Homebrew Wii en cours dans Bun OS.";
@@ -98,5 +100,13 @@ function installWiiHomebrew(): void {
       status.textContent = error instanceof Error ? error.message : String(error);
       start.disabled = false;
     }
+  });
+  home.addEventListener("click", () => {
+    host.replaceChildren();
+    host.hidden = true;
+    home.hidden = true;
+    document.querySelector(".wii-home")?.removeAttribute("hidden");
+    status.textContent = "Choisissez un fichier DOL homebrew pour démarrer.";
+    start.disabled = !runtime || !rom.files?.length || !navigator.gpu;
   });
 }
