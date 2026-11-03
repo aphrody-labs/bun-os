@@ -49,6 +49,13 @@ function halt(cmd: number): never {
   for (;;) Bun.sleepSync(60_000);
 }
 
+// The self-test child is this same compiled executable (process.execPath is /init, not a bun CLI): it only
+// reports and exits, so the self-test never recurses.
+if (process.env.BUNOS_INIT_CHILD === "1") {
+  console.log(`bunos-init child ${process.pid}`);
+  process.exit(0);
+}
+
 const isPid1 = process.pid === 1;
 log(`Bun ${Bun.version} (${Bun.revision.slice(0, 9)}) as pid ${process.pid}`);
 
@@ -86,7 +93,7 @@ const facts = {
 log(`kernel ${facts.kernel}, ${facts.cpus} cpu, ${facts.memTotal} kB, uptime ${facts.uptime}s`);
 
 // Self-test: spawn a child and let it exit, so the reaper is exercised as it would be for a real service.
-const child = Bun.spawnSync([process.execPath, "--version"]);
+const child = Bun.spawnSync([process.execPath], { env: { ...process.env, BUNOS_INIT_CHILD: "1" } });
 log(`child process exit ${child.exitCode}, stdout ${child.stdout.toString().trim()}`);
 const ok = facts.kernel !== "" && child.exitCode === 0;
 console.log(ok ? "BUNOS-INIT-OK" : "BUNOS-INIT-FAILED");

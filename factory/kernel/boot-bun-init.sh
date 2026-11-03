@@ -44,7 +44,8 @@ echo "initramfs: $(du -h "$out/initramfs.cpio.gz" | cut -f1), kernel $release"
 timeout 180 qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 1024 -nographic -no-reboot \
   -kernel "$vmlinuz" -initrd "$out/initramfs.cpio.gz" \
   -append "console=ttyS0 rdinit=/init bunos.init=selftest panic=-1 quiet" | tee "$out/console.log" || true
-if grep -q BUNOS-INIT-OK "$out/console.log"; then
+# Exactly one report: more would mean the self-test child re-ran init instead of exiting.
+if [[ "$(grep -c BUNOS-INIT-OK "$out/console.log")" == 1 ]] && grep -q 'reboot: Power down' "$out/console.log"; then
   printf '{"kernel":"%s","package":"%s","init":"bun","result":"BUNOS-INIT-OK","at":"%s"}\n' \
     "$release" "$(basename "$pkg")" "$(date -u +%FT%TZ)" >"$out/receipt.json"
   echo "qualified: Bun booted as PID 1 on $release ($out/receipt.json)"
