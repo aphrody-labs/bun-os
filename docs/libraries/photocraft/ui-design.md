@@ -1,43 +1,59 @@
 # UI design system
 
-## Themes
+## Appearance
 
-| Theme | Intent |
+PhotoCraft has one appearance: the Bun OS Material 3 scheme ([docs/DESIGN-SYSTEM.md](../../DESIGN-SYSTEM.md)).
+Every chrome colour (panels, docks, tab strips, title bar, menus, controls, text, borders, focus, selection
+and the hover, pressed and disabled states) is an M3 colour role. `theme.rs` builds its `Tokens` from
+`craft_ui::theme::tokens(dark, high_contrast)`, the egui adapter of `crates/aphrody-m3-tokens`, and only maps
+roles to PhotoCraft slots:
+
+| Slot | M3 role |
 |---|---|
-| Pro | Photoshop-style Spectrum dark: flat charcoal panels (#323232), dark tab strips, Spectrum blue accent (#378ef0), pill buttons, checkboxes, compact 12 px type |
-| Pro Medium | Photoshop-style medium-gray panels and a dark canvas |
-| Studio | Dark studio style: near-black, rounded cards, pill tabs, violet accent, toggles |
-| Studio Light | Studio on light surfaces |
-| Classic | Windows-2000 bevels, square corners, navy selection |
-| Adwaita | GNOME's libadwaita light palette on the Studio layout: white header bar and cards on a grey sidebar, GNOME blue accent (#3584e4), 6 / 9 / 12 px radii, grey (not red) close button |
-| Adwaita Dark | The libadwaita dark palette on the same layout |
-| Solarized Dark | Ethan Schoonover's Solarized palette: base03 canvas, base02 panels, base0 text, Solarized blue accent |
-| Breeze Light | An adaptation of KDE Plasma's Breeze Light on the Studio layout: cool light blue-grey surfaces a few levels from Breeze's so the app blends into a Plasma desktop, Breeze-style blue accent, 5 px radii, red close button on hover; text and status colours are darker than Breeze's for contrast |
-| Breeze Dark | The same for Breeze Dark: cool dark blue-grey surfaces (darkest canvas, then dock, cards, chrome and controls) near Breeze's, blue accent, 5 px radii; secondary text and status colours are lighter than Breeze's for contrast |
-| Soft Dark | Low-contrast dark on the Studio layout: muted violet-grey surfaces (never near-black), softened off-white text, periwinkle accent, generous 7/10/14 px radii; text still holds 4.5:1 on every surface (`theme.rs` tests) |
-| Soft Light | The light counterpart: pale violet-grey surfaces, softened dark-violet text instead of black, periwinkle accent, the same radii |
+| Canvas pasteboard, dock background | `SurfaceContainerLowest`, `Surface` |
+| Panels, cards, tab strips | `SurfaceContainer`, `SurfaceContainerLow`, `SurfaceContainerHigh` |
+| Text, secondary text | `OnSurface`, `OnSurfaceVariant` |
+| Borders and hairlines | `OutlineVariant` (`Outline` for control edges) |
+| Accent, primary button, layer edges | `Primary` / `OnPrimary` |
+| Selection | `SecondaryContainer` / `OnSecondaryContainer` |
+| Focus ring | M3 focus indicator, 2 px with a 2 px offset |
+| Errors, title-bar close on hover | `Error` / `OnError` |
+| Scrims behind dialogs and popups | `Scrim` |
 
-Both Breeze themes are our own values close to Plasma's (not a copy of its colour schemes) and put text readability first: every text colour holds 4.5:1 on every surface and on hovered, pressed and selected states (`theme.rs` tests), so their secondary text, accent and status colours are darker (Light) or lighter (Dark) than Breeze's own, and the primary button is a deeper blue with white text.
+There are no vendor palettes: the former Spectrum, Adwaita, Breeze, Solarized, Classic, Studio and Soft
+theme tables are gone, and no widget may hard-code a chrome colour. Colours that belong to the document stay
+literal and are marked `design:content`: image pixels, the black and white outlines drawn over pixels, the
+cursor outline, histogram and channel colours, swatches and the foreground and background colour chips.
 
-Edit → Preferences → Interface shows an Appearance Mode selector (Sync with system, Dark, Light) above separate light and dark theme cards with PhotoCraft editor previews and radio choices. Auto is opt-in and follows the operating system while the app is running. On Linux it reads the desktop portal once and then listens for its `SettingChanged` signal (no polling, and the UI repaints only when the value changes); `gsettings` runs at most once at start-up, by absolute path, when the portal gives no answer. A missing system appearance falls back to Dark. New installs keep Photoshop's default: Dark mode with Pro Medium (Studio Light is the saved light theme). Existing saved single-theme preferences migrate to a fixed Dark or Light mode with their chosen theme. The header appearance button cycles Auto → Light → Dark; its icon shows a monitor, moon or sun for the selected mode. Window → Theme and `ui.set {"theme":"classic"}` select a theme and fix the mode to its light or dark family.
+Edit → Preferences → Interface shows an Appearance Mode selector (Sync with system, Dark, Light) and a
+contrast choice; Sync follows the operating system's appearance and contrast settings while the app runs.
+On Linux it reads the desktop portal once and then listens for its `SettingChanged` signal (no polling, and
+the UI repaints only when the value changes); `gsettings` runs at most once at start-up, by absolute path,
+when the portal gives no answer. A missing system appearance falls back to Dark. High contrast selects the
+engine's high-contrast scheme, so every text pair keeps at least 4.5:1 on every surface and state. The header
+appearance button cycles Auto → Light → Dark; its icon shows a monitor, moon or sun for the selected mode.
+Window → Appearance and `ui.set {"appearance":"dark"}` select a fixed mode. Window → Appearance and macOS
+PhotoCraft → Appearance also offer Sync with system; its checkmark follows the saved Auto mode.
 
-Window → Theme and macOS PhotoCraft → Appearance also offer Sync with system. Its checkmark follows the saved Auto mode rather than the displayed palette; choosing a manual theme selects its fixed appearance mode.
-
-The toolbar's foreground and background colour chips follow the `Tokens::round_chips` flag. Pro and Classic leave it off and draw Photoshop's overlapping squares with Default Colors and Switch Colors above them. Studio, Studio Light, Solarized Dark, Adwaita, Adwaita Dark, Breeze Light, Breeze Dark, Soft Dark and Soft Light (the Studio-layout themes) turn it on and draw large round chips with a curved Switch Colors arrow centred right under them, its heads touching the chips: stacked vertically in one tool column, with Default Colors at their top-right, and side by side in two tool columns, with Default Colors at the toolbar's left edge. Another non-Pro theme can opt in by setting the flag.
+The toolbar's foreground and background colour chips follow the `Tokens::round_chips` layout flag. Off, the
+toolbar draws Photoshop's overlapping squares with Default Colors and Switch Colors above them. On, it draws
+large round chips with a curved Switch Colors arrow centred right under them, its heads touching the chips:
+stacked vertically in one tool column, with Default Colors at their top-right, and side by side in two tool
+columns, with Default Colors at the toolbar's left edge. The flag changes geometry only, never colour.
 
 ## Rules
 
-- **Colours and radii come from tokens.** Read them with `Tokens::get(ctx)`; never hard-code a colour in a widget.
-- **Shared widgets live in `widgets.rs`:** `card` (panel group; Pro renders a Photoshop tab strip), `value_field`, `slider`/`slider_row`, `toggle`/`checkbox`, `primary_button`/`secondary_button`, `dropdown` (with a chevron icon), `hairline`/`vline`, `elided_label`.
+- **Colours and radii come from tokens.** Read them with `Tokens::get(ctx)`; they are M3 roles and shapes from `craft_ui`. Never hard-code a chrome colour in a widget; a document colour carries a `design:content` comment.
+- **Shared widgets live in `widgets.rs`:** `card` (panel group, drawn as a Photoshop tab strip), `value_field`, `slider`/`slider_row`, `toggle`/`checkbox`, `primary_button`/`secondary_button`, `dropdown` (with a chevron icon), `hairline`/`vline`, `elided_label`.
 - **A label never overflows its row.** Wrap by default. Beside a fixed-width control, or anywhere the row cannot reflow, use `widgets::elided_label(ui, text, max_w)`: a longer translation shrinks with `…` and shows the full string on hover instead of running over its neighbours (#3580). A *redundant* caption may be dropped on a narrow dock where its control already carries the meaning (e.g. the Layers lock icons); an *essential* one elides. This mirrors Photoshop: a fixed layout with elision and tooltips, not per-locale reflow.
 - **Icons:** Lucide SVGs in `assets/icons` (ISC licence), embedded via `icon_data.rs`. Regenerate that file when you add icons.
 - **Fonts:** Inter (UI) and JetBrains Mono (numbers), both OFL. Named families `medium` and `semibold` are available via `theme::medium()` and `theme::semibold()`.
-- **Photoshop layout grammar (Pro):**
+- **Photoshop layout grammar:**
   - Essentials dock order: Color | Swatches, then Properties | Adjustments, then Layers | Channels | Paths (Layers fills the remaining height).
   - Options-bar labels end with a colon ("Size:").
   - Document tabs read "name @ 12.5% (RGB/8)".
   - Toolbar tool groups carry a corner triangle.
-- **Verify every visual change** with `ui.screenshot`, at several window sizes and in every theme.
+- **Verify every visual change** with `ui.screenshot`, at several window sizes, in light and dark and at high contrast.
 
 ## Adding icons
 
@@ -97,18 +113,18 @@ The app's top bar (`panels::title_bar`) starts with the brand mark (the app icon
 
 - **Windows and Linux:** the window has no OS decorations, so there is one bar, not two stacked. The top bar is the title bar (`titlebar.rs`): Minimize, Maximize/Restore and Close (red on hover, `caption_close` tokens) sit flush in the window's top-right corner, the free gap between the menus and the controls drags the window and a double-click there maximizes it, and invisible 5 pt edges (12 pt corners) resize it. Close runs File › Exit, so unsaved documents are asked about first.
 - **macOS:** the traffic lights sit over the integrated title strip (`integrated_titlebar`).
-- **Narrow windows** drop controls that are also in a menu before anything overlaps: the theme toggle, then search (Edit › Search), then the workspace switcher narrows (Window › Workspace).
+- **Narrow windows** drop controls that are also in a menu before anything overlaps: the appearance toggle, then search (Edit › Search), then the workspace switcher narrows (Window › Workspace).
 
 ## Compact tool controls
 
 The toolbar scrolls its tool rows when two columns still exceed the available height. Foreground
-and background colours stay visible below those rows, together with Pro's Quick Mask and Screen
+and background colours stay visible below those rows, together with the Quick Mask and Screen
 Mode controls. Long options rows scroll horizontally. Both scrollers bring newly focused
 controls into view and retain the existing tool actions and popups.
 
-The offscreen regression fixture uses production panels, fonts and SVG loaders across every
-theme, 800×480 and 1280×720 point viewports, and 1×, 1.5× and 2× display scales. To retain its
-60 initial/scrolled PNGs while running the compact geometry and interaction checks:
+The offscreen regression fixture uses production panels, fonts and SVG loaders in light,
+dark and high contrast, 800×480 and 1280×720 point viewports, and 1×, 1.5× and 2× display scales. To
+retain its initial and scrolled PNGs while running the compact geometry and interaction checks:
 
 ```sh
 CRAFT_UI_VISUAL_FIXTURES=/tmp/photocraft-compact cargo test -p photocraft-ui-egui --lib compact_visual_regressions -- --nocapture
@@ -130,7 +146,7 @@ session. Restoring a saved workspace or remembered panel layout preserves both f
 when the serialized layout contains their values. Panel visibility, dock layout, tabs and Timeline
 visibility follow the saved layout.
 
-The Pro status bar's Document Dimensions readout follows Preferences › Units & Rulers › Rulers,
+The status bar's Document Dimensions readout follows Preferences › Units & Rulers › Rulers,
 including changes made from a ruler's context menu. It uses the document resolution for physical
 units, each side's own extent for percentages and the selected point-size convention for points
 and picas. The readout retains the document's pixels-per-inch value.
@@ -148,7 +164,7 @@ Use `ui.click {x,y}`, `ui.move`, `ui.key` and `ui.type` (synthetic input in scre
 The Type options bar, Character panel, Character/Paragraph Style editors and Glyphs panel
 share a searchable family picker. Each visible row shows an `AaBbCc` sample rendered by
 PhotoCraft's text engine in that family (script/symbol fonts use characters they support). A family whose face also covers Arabic (alef, lam, meem, ain and the sample letters) shows a short `أبجد هوز` sample left of it, shaped right-to-left by the same engine; its row reserves the extra width once that row has been painted, and Latin-only families are unchanged.
-Samples are cached with a bounded cache and follow display scale and theme text colour.
+Samples are cached with a bounded cache and follow display scale and the `OnSurface` text role.
 Builds without system fonts preview the bundled fonts.
 While the menu is open, Up/Down applies the previous/next matching family and scrolls it into
 view; Enter accepts the selection and closes the menu. Escape closes it, keeping already
@@ -174,9 +190,9 @@ monitors. A 4K display the system runs at 100% stays at 100% (#1278). The fixed 
 continue to control the document independently of UI scaling.
 
 Interface → UI Font Size changes interface text independently of UI Scale and canvas zoom.
-Tiny, Small (the default), Medium and Large use 10/12, 1, 14/12 and 16/12 of the theme's original
+Tiny, Small (the default), Medium and Large use 10/12, 1, 14/12 and 16/12 of the original
 font sizes, preserving the relative sizes of headings, captions and numeric fields. Apply or OK
-updates text immediately; the choice persists across launches and theme changes. CJK fallback
+updates text immediately; the choice persists across launches and appearance changes. CJK fallback
 fonts use the same size, including fonts loaded after the preference changes.
 
 ## Localisation
