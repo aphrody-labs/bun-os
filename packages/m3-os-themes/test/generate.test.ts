@@ -7,8 +7,10 @@ import { generate, nearestGnomeAccent, registryValues, themeManifest } from "../
 import { installCommand, run } from "../src/cli.ts";
 import { encodePng } from "../src/png.ts";
 import { inflateSync } from "node:zlib";
+import { BUNOS_THEME } from "../src/apps.ts";
+import { fixturePath, themed } from "./fixtures.ts";
 
-const input = { name: "Test", seed: "#6750a4", mode: "auto" as const };
+const input = themed("Test", "#6750a4");
 const text = (path: string): string => {
   const f = generate(input).find(x => x.path === path);
   if (!f) throw new Error(`missing ${path}`);
@@ -26,21 +28,21 @@ describe("generate", () => {
     expect(() => generate({ ...input, name: "a b" })).toThrow();
   });
   it("carries contrast into each OS format and rejects invalid levels", () => {
-    const high = generate({ ...input, contrastLevel: 1 });
+    const high = generate(themed("Test", "#6750a4", "tonal-spot", 1));
     for (const target of ["windows", "gnome", "cosmic", "chromium"] as const) {
       const standard = generate(input, [target]);
       expect(high.filter(file => file.target === target)).not.toEqual(standard);
     }
     expect(run(["generate", "--contrast", "NaN", "--dry-run"]).code).toBe(2);
     expect(run(["generate", "--contrast", "2", "--dry-run"]).code).toBe(2);
-    expect(run(["generate", "--contrast", "-0.5", "--dry-run"]).code).toBe(0);
+    expect(run(["generate", "--native-theme", fixturePath("#6750a4", "tonal-spot", -0.5), "--dry-run"]).code).toBe(0);
   });
-  it("uses the canonical pet seed for an unspecified CLI seed", () => {
+  it("uses the product Rust export for an unspecified CLI seed", () => {
     const dir = mkdtempSync(join(tmpdir(), "m3-pet-theme-"));
     try {
       expect(run(["generate", "--target", "chromium", "--out", dir]).code).toBe(0);
       const actual = JSON.parse(readFileSync(join(dir, "chromium/dark/manifest.json"), "utf8"));
-      expect(actual).toEqual(themeManifest({ name: "Aphrody", seed: "#6750a4", mode: "auto" }, "dark"));
+      expect(actual).toEqual(themeManifest({ ...BUNOS_THEME, name: "Aphrody" }, "dark"));
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -145,7 +147,10 @@ describe("chromium", () => {
 describe("cli", () => {
   it("install is dry-run by default and never executes", () => {
     const calls: string[][] = [];
-    const r = run(["install", "--target", "all", "--seed", "#336699", "--mode", "dark"], c => (calls.push(c), 0));
+    const r = run(
+      ["install", "--target", "all", "--native-theme", fixturePath("#336699"), "--mode", "dark"],
+      c => (calls.push(c), 0),
+    );
     expect(r.code).toBe(0);
     expect(calls).toHaveLength(0);
     expect(r.out.join("\n")).toContain("dry-run");
@@ -153,7 +158,7 @@ describe("cli", () => {
   it("generate writes only into --out", async () => {
     const dir = mkdtempSync(join(tmpdir(), "m3os-"));
     try {
-      const r = run(["generate", "--target", "chromium", "--seed", "#336699", "--out", dir]);
+      const r = run(["generate", "--target", "chromium", "--native-theme", fixturePath("#336699"), "--out", dir]);
       expect(r.code).toBe(0);
       expect(await Bun.file(join(dir, "chromium/dark/manifest.json")).exists()).toBe(true);
       expect(readdirSync(dir)).toEqual(["chromium"]);
@@ -165,6 +170,24 @@ describe("cli", () => {
   it("rejects bad input", () => {
     expect(run(["generate", "--target", "mac"]).code).toBe(2);
     expect(run(["generate", "--seed", "zz"]).code).toBe(2);
+  });
+  it("needs bunos-design for a seed without a recorded export", () => {
+    const r = run(["generate", "--seed", "#123456", "--bin", "bunos-design-missing", "--dry-run"]);
+    expect(r.code).toBe(2);
+    expect(r.out.join("\n")).toContain("bunos-design");
+  });
+  it("checks the committed product bundle", () => {
+    expect(run(["generate", "--check"]).code).toBe(0);
+    const dir = mkdtempSync(join(tmpdir(), "m3-product-"));
+    try {
+      const stale = run(["generate", "--check", "--out", dir]);
+      expect(stale.code).toBe(1);
+      expect(stale.out[0]).toStartWith("stale ");
+      expect(run(["generate", "--update", "--out", dir]).code).toBe(0);
+      expect(run(["generate", "--check", "--out", dir]).code).toBe(0);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
 

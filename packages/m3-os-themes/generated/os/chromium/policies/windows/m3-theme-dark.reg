@@ -1,0 +1,13 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+"BrowserThemeColor"="#efb4e9"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Chromium]
+"BrowserThemeColor"="#efb4e9"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\BraveSoftware\Brave]
+"BrowserThemeColor"="#efb4e9"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
+"BrowserThemeColor"="#efb4e9"

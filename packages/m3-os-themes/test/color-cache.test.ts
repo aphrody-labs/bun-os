@@ -1,40 +1,44 @@
 // SPDX-License-Identifier: Apache-2.0
 import { describe, expect, it } from "bun:test";
-import { rolesFor } from "../src/color.ts";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { ROLES, parseNativeThemeExport } from "@aphrody/m3-tokens/native-theme";
+import { BUNOS_THEME } from "../src/apps.ts";
+import { productSeed, rolesFor } from "../src/color.ts";
 import { generate } from "../src/index.ts";
-import { ROLES } from "@aphrody/m3-tokens/dynamic-color";
-import { parseNativeThemeExport } from "@aphrody/m3-tokens/native-theme";
+import { themed } from "./fixtures.ts";
 
-const input = { name: "Cache", seed: "#6750a4", mode: "auto" as const };
+const input = themed("Cache", "#6750a4");
 
-describe("rolesFor memoisation", () => {
-  it("returns the same frozen object for the same seed, variant and mode", () => {
+describe("rolesFor", () => {
+  it("returns the same frozen object for the same export and mode", () => {
     const a = rolesFor(input, "light");
     expect(rolesFor({ ...input, name: "Other" }, "light")).toBe(a);
     expect(Object.isFrozen(a)).toBe(true);
     expect(Object.isFrozen(a.roles)).toBe(true);
   });
 
-  it("keys on seed, variant and mode", () => {
+  it("keys on the export and mode", () => {
     const light = rolesFor(input, "light");
     expect(rolesFor(input, "dark")).not.toBe(light);
-    expect(rolesFor({ ...input, seed: "#00ff88" }, "light").roles["primary"]).not.toBe(light.roles["primary"]);
-    expect(rolesFor({ ...input, variant: "vibrant" }, "light").roles["primary"]).not.toBe(light.roles["primary"]);
+    expect(rolesFor(themed("Cache", "#00ff88"), "light").roles["primary"]).not.toBe(light.roles["primary"]);
+    expect(rolesFor(themed("Cache", "#6750a4", "vibrant"), "light").roles["primary"]).not.toBe(light.roles["primary"]);
     expect(rolesFor({ ...input, seed: "#6750A4" }, "light")).toBe(light);
   });
 
-  it("still validates the seed before consulting the cache", () => {
+  it("validates the seed and contrast before anything else", () => {
     expect(() => rolesFor({ ...input, seed: "nope" }, "light")).toThrow("invalid seed colour");
-  });
-
-  it("keeps contrast variants distinct without splitting equivalent defaults", () => {
-    const standard = rolesFor(input, "light");
-    expect(rolesFor({ ...input, contrastLevel: 0, variant: "tonalSpot" }, "light")).toBe(standard);
-    const high = rolesFor({ ...input, contrastLevel: 1 }, "light");
-    expect(high).not.toBe(standard);
-    expect(high.roles["primary"]).not.toBe(standard.roles["primary"]);
     for (const contrastLevel of [NaN, Infinity, -1.1, 1.1])
       expect(() => rolesFor({ ...input, contrastLevel }, "light")).toThrow("M3 contrast");
+  });
+
+  it("refuses to run without the Rust ThemeExport", () => {
+    expect(() => rolesFor({ name: "Bare", seed: "#6750a4", mode: "auto" }, "light")).toThrow("Rust ThemeExport");
+  });
+
+  it("keeps contrast levels distinct", () => {
+    const high = rolesFor(themed("Cache", "#6750a4", "tonal-spot", 1), "light");
+    expect(high.roles["primary"]).not.toBe(rolesFor(input, "light").roles["primary"]);
   });
 
   it("generates identical files on repeated calls", () => {
@@ -42,11 +46,12 @@ describe("rolesFor memoisation", () => {
     const again = generate(input);
     expect(again.map(f => [f.path, f.content])).toEqual(first.map(f => [f.path, f.content]));
   });
-  it("consumes native roles and refuses metadata drift or stale cached colours", () => {
+
+  it("consumes native roles unchanged and refuses metadata drift", () => {
     const source = {
       schema_version: 1,
       spec_version: "2021",
-      seed: input.seed,
+      seed: "#6750a4",
       variant: "tonal-spot",
       contrast_level: 0,
       light: Object.fromEntries(ROLES.map(role => [role, "#aabbcc"])),
@@ -59,5 +64,17 @@ describe("rolesFor memoisation", () => {
     source.light["primary"] = "#ff0000";
     const changed = parseNativeThemeExport(source);
     expect(rolesFor({ ...input, nativeTheme: changed }, "light").roles["primary"]).toBe("#ff0000");
+  });
+});
+
+describe("product theme", () => {
+  it("is the Rust export of aphrody_identity's pet seed", () => {
+    const committed = JSON.parse(
+      readFileSync(join(import.meta.dir, "..", "generated", "theme", "bunos-m3.json"), "utf8"),
+    );
+    expect(committed.seed).toBe(productSeed());
+    expect(BUNOS_THEME.seed).toBe(productSeed());
+    expect(BUNOS_THEME.nativeTheme?.seed).toBe(productSeed());
+    expect(rolesFor(BUNOS_THEME, "light").roles["primary"]).toBe(committed.light.primary);
   });
 });

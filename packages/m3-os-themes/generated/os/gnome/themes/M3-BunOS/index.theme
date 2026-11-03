@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=M3-BunOS
+Comment=Material 3 theme generated from a seed colour
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=M3-BunOS
+MetacityTheme=Adwaita
+IconTheme=Adwaita
+CursorTheme=Adwaita

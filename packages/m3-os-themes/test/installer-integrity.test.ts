@@ -4,12 +4,13 @@ import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { run, writeFiles } from "../src/cli.ts";
+import { BUNOS_THEME } from "../src/apps.ts";
 import { generate } from "../src/generate.ts";
 
 test("theme inputs and generated output reject invalid modes, variants and escaping paths", async () => {
   expect(run(["generate", "--seed", "--apply"]).code).toBe(2);
   expect(run(["generate", "--variant", "unknown"]).code).toBe(2);
-  expect(() => generate({ name: "Aphrody", seed: "#6750a4", mode: "invalid" as never })).toThrow("mode");
+  expect(() => generate({ ...BUNOS_THEME, mode: "invalid" as never })).toThrow("mode");
   const root = mkdtempSync(join(tmpdir(), "m3-path-boundary-"));
   const outside = mkdtempSync(join(tmpdir(), "m3-path-outside-"));
   try {

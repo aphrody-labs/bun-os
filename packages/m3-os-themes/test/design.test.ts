@@ -5,12 +5,13 @@ import { ICONS, compose } from "../src/icons.ts";
 import { FONTS, fontconfigConf } from "../src/desktops.ts";
 import { BUNOS_THEME } from "../src/apps.ts";
 
-const input = { ...BUNOS_THEME, seed: "#5b45a2" };
+const input = BUNOS_THEME;
 
 describe("window chrome spec", () => {
   const spec = chromeSpec(input);
   test("every accessibility check passes in both modes", () => {
-    for (const m of [spec.light, spec.dark]) for (const c of m.checks) expect({ name: c.name, pass: c.pass }).toEqual({ name: c.name, pass: true });
+    for (const m of [spec.light, spec.dark])
+      for (const c of m.checks) expect({ name: c.name, pass: c.pass }).toEqual({ name: c.name, pass: true });
   });
   test("harmonize rotates at most 15 degrees and keeps the signal hues apart", () => {
     const fills = BUTTONS.map(b => spec.dark.buttons[b].fill);
@@ -39,7 +40,12 @@ describe("icon theme", () => {
   });
   test("compose produces sized SVGs", () => {
     const glyph = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg>`;
-    const c = compose(ICONS.find(i => i.kind === "folder" && i.id === "folder-music")!, glyph, { primary: "#cbbeff", secondary: "#c9c3dc", tertiary: "#edb8cd", neutral: "#938f99" }, false);
+    const c = compose(
+      ICONS.find(i => i.kind === "folder" && i.id === "folder-music")!,
+      glyph,
+      { primary: "#cbbeff", secondary: "#c9c3dc", tertiary: "#edb8cd", neutral: "#938f99" },
+      false,
+    );
     expect(c.svg).toContain('viewBox="0 0 256 256"');
     expect(c.small).not.toEqual(c.svg);
   });

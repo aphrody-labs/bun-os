@@ -21,7 +21,10 @@ export interface IconDef {
   xdg?: string[];
 }
 
-export type Hue = "primary" | "secondary" | "tertiary" | "neutral" | "blue" | "green" | "orange" | "red" | "purple" | "teal" | "pink";
+export type Hue =
+  "primary" | "secondary" | "tertiary" | "neutral" | "blue" | "green" | "orange" | "red" | "purple" | "teal" | "pink";
+/** Fixed hue families of file-type and folder artwork (content badges, not chrome). */
+// design:content
 const FIXED: Record<string, string> = {
   blue: "#3b6fd6",
   green: "#2f8f4e",
@@ -32,7 +35,14 @@ const FIXED: Record<string, string> = {
   pink: "#c94f8a",
 };
 
-const F = (id: string, symbol: string, label: string, knownFolder: string | undefined, xdg: string[], hue: Hue = "primary"): IconDef => ({
+const F = (
+  id: string,
+  symbol: string,
+  label: string,
+  knownFolder: string | undefined,
+  xdg: string[],
+  hue: Hue = "primary",
+): IconDef => ({
   id,
   kind: "folder",
   symbol,
@@ -68,12 +78,25 @@ const A = (id: string, symbol: string, hue: Hue, label: string, xdg: string[]): 
   win: { app: id },
   xdg,
 });
-const G = (id: string, symbol: string, xdg: string[]): IconDef => ({ id, kind: "glyph", symbol, hue: "neutral", label: id, xdg });
+const G = (id: string, symbol: string, xdg: string[]): IconDef => ({
+  id,
+  kind: "glyph",
+  symbol,
+  hue: "neutral",
+  label: id,
+  xdg,
+});
 
 export const ICONS: readonly IconDef[] = [
   // Folders (Windows known folders by KNOWNFOLDERID name; shell index 3/4 = generic closed/open folder).
-  { ...F("folder", "folder", "Folder", undefined, ["places/folder", "places/inode-directory"]), win: { shellIndex: [3] } },
-  { ...F("folder-open", "folder_open", "Open folder", undefined, ["places/folder-open", "status/folder-open"]), win: { shellIndex: [4] } },
+  {
+    ...F("folder", "folder", "Folder", undefined, ["places/folder", "places/inode-directory"]),
+    win: { shellIndex: [3] },
+  },
+  {
+    ...F("folder-open", "folder_open", "Open folder", undefined, ["places/folder-open", "status/folder-open"]),
+    win: { shellIndex: [4] },
+  },
   F("folder-desktop", "desktop_windows", "Desktop", "Desktop", ["places/user-desktop", "places/folder-desktop"]),
   F("folder-documents", "description", "Documents", "Documents", ["places/folder-documents"]),
   F("folder-downloads", "download", "Downloads", "Downloads", ["places/folder-download"]),
@@ -93,32 +116,160 @@ export const ICONS: readonly IconDef[] = [
   F("folder-cloud", "cloud", "Cloud", "SkyDrive", ["places/folder-cloud", "places/folder-remote"]),
   F("folder-network", "lan", "Network folder", undefined, ["places/folder-remote", "places/network-workgroup"]),
   F("folder-archive", "folder_zip", "Archive", undefined, ["places/folder-tar"]),
-  { ...F("trash-empty", "delete", "Recycle Bin (empty)", undefined, ["places/user-trash"], "neutral"), win: { shellIndex: [31] } },
-  { ...F("trash-full", "delete_sweep", "Recycle Bin (full)", undefined, ["places/user-trash-full", "status/user-trash-full"], "neutral"), win: { shellIndex: [32] } },
+  {
+    ...F("trash-empty", "delete", "Recycle Bin (empty)", undefined, ["places/user-trash"], "neutral"),
+    win: { shellIndex: [31] },
+  },
+  {
+    ...F(
+      "trash-full",
+      "delete_sweep",
+      "Recycle Bin (full)",
+      undefined,
+      ["places/user-trash-full", "status/user-trash-full"],
+      "neutral",
+    ),
+    win: { shellIndex: [32] },
+  },
   // File types.
-  { ...T("file-generic", "draft", "neutral", "File", [], ["mimetypes/text-x-generic", "mimetypes/application-octet-stream"]), win: { shellIndex: [0, 1] } },
-  T("file-text", "description", "blue", "Text document", [".txt", ".md", ".rtf", ".log"], ["mimetypes/text-plain", "mimetypes/text-markdown"]),
+  {
+    ...T(
+      "file-generic",
+      "draft",
+      "neutral",
+      "File",
+      [],
+      ["mimetypes/text-x-generic", "mimetypes/application-octet-stream"],
+    ),
+    win: { shellIndex: [0, 1] },
+  },
+  T(
+    "file-text",
+    "description",
+    "blue",
+    "Text document",
+    [".txt", ".md", ".rtf", ".log"],
+    ["mimetypes/text-plain", "mimetypes/text-markdown"],
+  ),
   T("file-pdf", "picture_as_pdf", "red", "PDF document", [".pdf"], ["mimetypes/application-pdf"]),
-  T("file-image", "image", "purple", "Image", [".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".bmp", ".svg", ".heic"], ["mimetypes/image-x-generic"]),
-  T("file-audio", "music_note", "pink", "Audio", [".mp3", ".flac", ".ogg", ".opus", ".wav", ".m4a"], ["mimetypes/audio-x-generic"]),
+  T(
+    "file-image",
+    "image",
+    "purple",
+    "Image",
+    [".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".bmp", ".svg", ".heic"],
+    ["mimetypes/image-x-generic"],
+  ),
+  T(
+    "file-audio",
+    "music_note",
+    "pink",
+    "Audio",
+    [".mp3", ".flac", ".ogg", ".opus", ".wav", ".m4a"],
+    ["mimetypes/audio-x-generic"],
+  ),
   T("file-video", "movie", "orange", "Video", [".mp4", ".mkv", ".webm", ".mov", ".avi"], ["mimetypes/video-x-generic"]),
-  T("file-archive", "folder_zip", "orange", "Archive", [".zip", ".7z", ".tar", ".gz", ".zst", ".xz", ".rar"], ["mimetypes/package-x-generic", "mimetypes/application-zip"]),
-  T("file-code", "code", "teal", "Source code", [".rs", ".ts", ".tsx", ".js", ".mjs", ".py", ".c", ".cpp", ".h", ".go", ".kt", ".java", ".dart", ".zig"], ["mimetypes/text-x-script", "mimetypes/text-x-source"]),
-  T("file-data", "data_object", "teal", "Data", [".json", ".toml", ".yaml", ".yml", ".xml", ".ron", ".ini"], ["mimetypes/application-json", "mimetypes/text-x-generic-template"]),
+  T(
+    "file-archive",
+    "folder_zip",
+    "orange",
+    "Archive",
+    [".zip", ".7z", ".tar", ".gz", ".zst", ".xz", ".rar"],
+    ["mimetypes/package-x-generic", "mimetypes/application-zip"],
+  ),
+  T(
+    "file-code",
+    "code",
+    "teal",
+    "Source code",
+    [".rs", ".ts", ".tsx", ".js", ".mjs", ".py", ".c", ".cpp", ".h", ".go", ".kt", ".java", ".dart", ".zig"],
+    ["mimetypes/text-x-script", "mimetypes/text-x-source"],
+  ),
+  T(
+    "file-data",
+    "data_object",
+    "teal",
+    "Data",
+    [".json", ".toml", ".yaml", ".yml", ".xml", ".ron", ".ini"],
+    ["mimetypes/application-json", "mimetypes/text-x-generic-template"],
+  ),
   T("file-web", "html", "blue", "Web page", [".html", ".htm", ".css"], ["mimetypes/text-html"]),
-  T("file-script", "terminal", "green", "Script", [".sh", ".ps1", ".nu", ".bat", ".cmd"], ["mimetypes/application-x-shellscript"]),
-  T("file-exe", "deployed_code", "primary", "Application", [".exe", ".msi", ".msix", ".appx"], ["mimetypes/application-x-executable", "mimetypes/application-x-msdownload"]),
-  T("file-disc", "album", "neutral", "Disc image", [".iso", ".img", ".vhdx", ".erofs"], ["mimetypes/application-x-cd-image"]),
+  T(
+    "file-script",
+    "terminal",
+    "green",
+    "Script",
+    [".sh", ".ps1", ".nu", ".bat", ".cmd"],
+    ["mimetypes/application-x-shellscript"],
+  ),
+  T(
+    "file-exe",
+    "deployed_code",
+    "primary",
+    "Application",
+    [".exe", ".msi", ".msix", ".appx"],
+    ["mimetypes/application-x-executable", "mimetypes/application-x-msdownload"],
+  ),
+  T(
+    "file-disc",
+    "album",
+    "neutral",
+    "Disc image",
+    [".iso", ".img", ".vhdx", ".erofs"],
+    ["mimetypes/application-x-cd-image"],
+  ),
   T("file-font", "font_download", "purple", "Font", [".ttf", ".otf", ".woff2", ".ttc"], ["mimetypes/font-x-generic"]),
-  T("file-database", "database", "secondary", "Database", [".db", ".sqlite", ".sqlite3"], ["mimetypes/application-vnd.sqlite3"]),
+  T(
+    "file-database",
+    "database",
+    "secondary",
+    "Database",
+    [".db", ".sqlite", ".sqlite3"],
+    ["mimetypes/application-vnd.sqlite3"],
+  ),
   T("file-sheet", "table", "green", "Spreadsheet", [".csv", ".xlsx", ".ods"], ["mimetypes/x-office-spreadsheet"]),
   T("file-doc", "article", "blue", "Document", [".doc", ".docx", ".odt"], ["mimetypes/x-office-document"]),
-  T("file-slides", "slideshow", "orange", "Presentation", [".ppt", ".pptx", ".odp"], ["mimetypes/x-office-presentation"]),
-  T("file-apk", "android", "green", "Android package", [".apk", ".aab", ".xapk"], ["mimetypes/application-vnd.android.package-archive"]),
-  T("file-key", "key", "secondary", "Key or certificate", [".pem", ".crt", ".cer", ".key", ".pfx"], ["mimetypes/application-pkcs8"]),
+  T(
+    "file-slides",
+    "slideshow",
+    "orange",
+    "Presentation",
+    [".ppt", ".pptx", ".odp"],
+    ["mimetypes/x-office-presentation"],
+  ),
+  T(
+    "file-apk",
+    "android",
+    "green",
+    "Android package",
+    [".apk", ".aab", ".xapk"],
+    ["mimetypes/application-vnd.android.package-archive"],
+  ),
+  T(
+    "file-key",
+    "key",
+    "secondary",
+    "Key or certificate",
+    [".pem", ".crt", ".cer", ".key", ".pfx"],
+    ["mimetypes/application-pkcs8"],
+  ),
   // Drives (shell index: 7 removable, 8 fixed, 9 network, 11 CD-ROM, 12 RAM disk, 15 computer).
-  D("drive-fixed", "hard_drive", "Local disk", "fixed", [8], ["devices/drive-harddisk", "devices/drive-harddisk-system"]),
-  D("drive-removable", "usb", "Removable disk", "removable", [7], ["devices/drive-removable-media", "devices/drive-removable-media-usb"]),
+  D(
+    "drive-fixed",
+    "hard_drive",
+    "Local disk",
+    "fixed",
+    [8],
+    ["devices/drive-harddisk", "devices/drive-harddisk-system"],
+  ),
+  D(
+    "drive-removable",
+    "usb",
+    "Removable disk",
+    "removable",
+    [7],
+    ["devices/drive-removable-media", "devices/drive-removable-media-usb"],
+  ),
   D("drive-optical", "album", "Optical drive", "cdrom", [11], ["devices/drive-optical", "devices/media-optical"]),
   D("drive-network", "lan", "Network drive", "network", [9], ["places/network-server", "devices/network-wired"]),
   D("drive-ram", "memory", "RAM disk", "ram", [12], ["devices/drive-harddisk-solidstate"]),
@@ -135,7 +286,10 @@ export const ICONS: readonly IconDef[] = [
   A("app-search", "search", "secondary", "Search", ["apps/system-search"]),
   A("app-editor", "edit_note", "teal", "Editor", ["apps/accessories-text-editor", "apps/com.system76.CosmicEdit"]),
   A("app-code", "code", "teal", "Code", ["apps/bunos-code"]),
-  A("app-media", "play_circle", "orange", "Media Player", ["apps/multimedia-video-player", "apps/com.system76.CosmicPlayer"]),
+  A("app-media", "play_circle", "orange", "Media Player", [
+    "apps/multimedia-video-player",
+    "apps/com.system76.CosmicPlayer",
+  ]),
   A("app-photos", "photo_library", "purple", "Photos", ["apps/image-viewer"]),
   A("app-music", "library_music", "pink", "Music", ["apps/multimedia-audio-player"]),
   A("app-mail", "mail", "blue", "Mail", ["apps/internet-mail"]),
@@ -222,13 +376,18 @@ const place = (g: ReturnType<typeof glyphOf>, cx: number, cy: number, size: numb
   const ty = cy - size / 2 - y0 * s;
   return `<g transform="translate(${tx.toFixed(3)} ${ty.toFixed(3)}) scale(${s.toFixed(5)})" fill="${fill}">${g.paths.map(d => `<path d="${d}"/>`).join("")}</g>`;
 };
-const doc = (body: string) => `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">${body}</svg>`;
+const doc = (body: string) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">${body}</svg>`;
 
 /** Rounded folder silhouette (back tab + front body) in a 256 grid. */
 const FOLDER_BACK = "M28 52a16 16 0 0 1 16-16h56a16 16 0 0 1 11.3 4.7L128 57h84a16 16 0 0 1 16 16v20H28z";
 const FOLDER_FRONT = "M28 84a16 16 0 0 1 16-16h168a16 16 0 0 1 16 16v108a20 20 0 0 1-20 20H48a20 20 0 0 1-20-20z";
 const PAGE = "M64 24h88l52 52v140a16 16 0 0 1-16 16H64a16 16 0 0 1-16-16V40a16 16 0 0 1 16-16z";
 const PAGE_FOLD = "M152 24v40a12 12 0 0 0 12 12h40z";
+
+/** freedesktop -symbolic convention: GTK recolours this exact grey at render time (a file-format value). */
+// design:content
+export const SYMBOLIC_FILL = "#bebebe";
 
 export interface Composed {
   svg: string;
@@ -242,7 +401,10 @@ export interface Composed {
 export function compose(def: IconDef, glyphSvg: string, p: Palette, dark: boolean): Composed {
   const g = glyphOf(glyphSvg);
   const key = keyColor(def.hue, p);
-  const symbolic = doc(place(g, 128, 128, 256, "#bebebe")).replace('width="256" height="256" viewBox="0 0 256 256"', 'width="16" height="16" viewBox="0 0 256 256"');
+  const symbolic = doc(place(g, 128, 128, 256, SYMBOLIC_FILL)).replace(
+    'width="256" height="256" viewBox="0 0 256 256"',
+    'width="16" height="16" viewBox="0 0 256 256"',
+  );
   const shade = `<linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></linearGradient>`;
   switch (def.kind) {
     case "folder": {
@@ -261,7 +423,9 @@ export function compose(def: IconDef, glyphSvg: string, p: Palette, dark: boolea
       const base = `<path d="${PAGE}" fill="${paper}" stroke="${edge}" stroke-width="4"/><path d="${PAGE_FOLD}" fill="${band}" stroke="${edge}" stroke-width="4" stroke-linejoin="round"/>`;
       return {
         svg: doc(base + place(g, 126, 150, 104, ink)),
-        small: doc(`<path d="${PAGE}" fill="${band}" stroke="${ink}" stroke-width="10"/>` + place(g, 126, 150, 120, ink)),
+        small: doc(
+          `<path d="${PAGE}" fill="${band}" stroke="${ink}" stroke-width="10"/>` + place(g, 126, 150, 120, ink),
+        ),
         symbolic,
       };
     }
@@ -275,7 +439,11 @@ export function compose(def: IconDef, glyphSvg: string, p: Palette, dark: boolea
       const container = def.hue === "neutral" ? at(p.neutral, dark ? 30 : 94, 8) : at(key, dark ? 30 : 90);
       const ink = def.hue === "neutral" ? at(p.primary, dark ? 85 : 35) : at(key, dark ? 90 : 25);
       const plate = `<defs>${shade}</defs><rect x="16" y="16" width="224" height="224" rx="64" fill="${container}"/><rect x="16" y="16" width="224" height="224" rx="64" fill="url(#s)"/>`;
-      return { svg: doc(plate + place(g, 128, 128, 136, ink)), small: doc(plate + place(g, 128, 128, 164, ink)), symbolic };
+      return {
+        svg: doc(plate + place(g, 128, 128, 136, ink)),
+        small: doc(plate + place(g, 128, 128, 164, ink)),
+        symbolic,
+      };
     }
     case "glyph": {
       const ink = dark ? "#e6e1e9" : "#1d1b20";
@@ -285,7 +453,13 @@ export function compose(def: IconDef, glyphSvg: string, p: Palette, dark: boolea
 }
 
 /** Freedesktop index.theme for the generated tree. */
-export function indexTheme(name: string, comment: string, sizes: readonly number[], contexts: readonly string[], inherits = "Cosmic,Adwaita,hicolor"): string {
+export function indexTheme(
+  name: string,
+  comment: string,
+  sizes: readonly number[],
+  contexts: readonly string[],
+  inherits = "Cosmic,Adwaita,hicolor",
+): string {
   const ctx: Record<string, string> = {
     actions: "Actions",
     apps: "Applications",
@@ -303,9 +477,13 @@ export function indexTheme(name: string, comment: string, sizes: readonly number
       sections.push(`[${s}x${s}/${c}]\nContext=${ctx[c] ?? "Applications"}\nSize=${s}\nType=Fixed\n`);
     }
     dirs.push(`scalable/${c}`);
-    sections.push(`[scalable/${c}]\nContext=${ctx[c] ?? "Applications"}\nSize=48\nMinSize=8\nMaxSize=512\nType=Scalable\n`);
+    sections.push(
+      `[scalable/${c}]\nContext=${ctx[c] ?? "Applications"}\nSize=48\nMinSize=8\nMaxSize=512\nType=Scalable\n`,
+    );
     dirs.push(`symbolic/${c}`);
-    sections.push(`[symbolic/${c}]\nContext=${ctx[c] ?? "Applications"}\nSize=16\nMinSize=8\nMaxSize=512\nType=Scalable\n`);
+    sections.push(
+      `[symbolic/${c}]\nContext=${ctx[c] ?? "Applications"}\nSize=16\nMinSize=8\nMaxSize=512\nType=Scalable\n`,
+    );
   }
   return `[Icon Theme]\nName=${name}\nComment=${comment}\nInherits=${inherits}\nExample=folder\nDirectories=${dirs.join(",")}\n\n${sections.join("\n")}`;
 }

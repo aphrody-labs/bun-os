@@ -3,7 +3,8 @@
 import { rolesFor, validate } from "./color.ts";
 import type { GeneratedFile, Mode, Roles, ThemeInput } from "./types.ts";
 
-/** GNOME 47+ `accent-color` names with their reference hues (libadwaita accent set). */
+/** GNOME 47+ `accent-color` names with their reference hues (libadwaita accent set): an upstream enum, not chrome. */
+// design:content
 const GNOME_ACCENTS: Record<string, string> = {
   blue: "#3584e4",
   teal: "#2190a4",
@@ -67,7 +68,7 @@ export function adwaitaColors(r: Roles): string {
     secondary_sidebar_fg_color: r["onSurface"]!,
     thumbnail_bg_color: r["surfaceContainerHighest"]!,
     thumbnail_fg_color: r["onSurface"]!,
-    shade_color: "rgba(0, 0, 0, 0.12)",
+    shade_color: `alpha(${r["shadow"]!}, 0.12)`,
     scrollbar_outline_color: r["surface"]!,
   };
   return Object.entries(defs)

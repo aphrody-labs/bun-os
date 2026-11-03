@@ -33,8 +33,19 @@ export function contrast(a: string, b: string): number {
 /** `over` composited at `alpha` on `under` (sRGB, the average a blurred backdrop converges to). */
 export function composite(over: string, alpha: number, under: string): string {
   const [a, b] = [rgb(over), rgb(under)];
-  return `#${a.map((c, i) => Math.round(c * alpha + b[i]! * (1 - alpha)).toString(16).padStart(2, "0")).join("")}`;
+  return `#${a
+    .map((c, i) =>
+      Math.round(c * alpha + b[i]! * (1 - alpha))
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")}`;
 }
+/** A role at `a` alpha as a CSS `rgba()` value (GTK 3 has no color-mix). */
+const rgba = (hex: string, a: number): string => {
+  const [r, g, b] = rgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+};
 const sanitize = (d: number): number => ((d % 360) + 360) % 360;
 /** MCU `Blend.harmonize`: rotate `design`'s hue towards `source` by min(diff / 2, 15 deg), keep chroma and tone. */
 export function harmonize(design: string, source: string): string {
@@ -52,7 +63,8 @@ const tone = (hex: string, t: number): string => {
 
 // ------------------------------------------------------------------------------------------------------------ spec
 
-/** Generic red / amber / green signal hues (not Apple artwork), harmonised per theme. */
+/** Generic red / amber / green signal hues (not Apple artwork), harmonised per theme: recognisable traffic-light content. */
+// design:content
 const SIGNAL = { close: "#ff5f57", minimize: "#febc2e", zoom: "#28c840" } as const;
 export type Button = keyof typeof SIGNAL;
 export const BUTTONS: readonly Button[] = ["close", "minimize", "zoom"];
@@ -75,14 +87,14 @@ export const MOTION = {
   exitRatio: 0.65,
 } as const;
 
-/** One elevation scale (M3 levels 0-5, dp) rendered as two-layer soft shadows (key + ambient). */
+/** One elevation scale (M3 levels 0-5, dp) rendered as two-layer soft shadows (key + ambient) in the `shadow` role. */
 export const ELEVATION = [0, 1, 3, 6, 8, 12] as const;
-export function shadow(level: number, dark: boolean): string {
+export function shadow(level: number, dark: boolean, shadowRole: string): string {
   const dp = ELEVATION[level] ?? 0;
   if (dp === 0) return "none";
   const k = dark ? 0.5 : 0.22;
   const a = dark ? 0.36 : 0.14;
-  return `0 ${dp}px ${dp * 3}px rgba(0, 0, 0, ${k.toFixed(2)}), 0 ${Math.max(1, dp / 4)}px ${Math.max(2, dp / 2)}px rgba(0, 0, 0, ${a.toFixed(2)})`;
+  return `0 ${dp}px ${dp * 3}px ${rgba(shadowRole, Number(k.toFixed(2)))}, 0 ${Math.max(1, dp / 4)}px ${Math.max(2, dp / 2)}px ${rgba(shadowRole, Number(a.toFixed(2)))}`;
 }
 
 /** Geometry shared by every desktop (px at 100 % scale). */
@@ -109,6 +121,8 @@ export interface ModeChrome {
   titlebar: Material;
   sidebar: Material;
   dock: Material;
+  /** The `shadow` role: elevation shadows and the caption-button rim. */
+  shadowColor: string;
   title: string;
   titleInactive: string;
   border: string;
@@ -119,12 +133,15 @@ export interface ModeChrome {
   checks: { name: string; ratio: number; min: number; pass: boolean }[];
 }
 
+/** Reference backdrops for the material contrast check (the extremes a wallpaper can reach), not chrome colours. */
+// design:content
 const WALLPAPERS = { light: "#ffffff", dark: "#000000" } as const;
 
 /** Smallest alpha (>= base) keeping `text` at `min`:1 on the material over both reference wallpapers. */
 function tuneAlpha(material: string, text: string, base: number, min: number): number {
   for (let a = base; a < 1; a += 0.02) {
-    if (Object.values(WALLPAPERS).every(w => contrast(text, composite(material, a, w)) >= min)) return Number(a.toFixed(2));
+    if (Object.values(WALLPAPERS).every(w => contrast(text, composite(material, a, w)) >= min))
+      return Number(a.toFixed(2));
   }
   return 1;
 }
@@ -154,7 +171,7 @@ function modeChrome(r: Roles, mode: Mode): ModeChrome {
     }),
     { name: "title text on opaque title bar", ratio: contrast(r["onSurface"]!, opaqueBar), min: 4.5 },
     { name: "inactive button boundary vs title bar", ratio: contrast(inactive.border, opaqueBar), min: 3 },
-    { name: "focus ring vs title bar", ratio: contrast(primary, opaqueBar), min: 3 },
+    { name: "focus ring vs title bar", ratio: contrast(r["secondary"]!, opaqueBar), min: 3 },
     ...BUTTONS.map(b => ({
       name: `${b} glyph on button`,
       ratio: contrast(buttons[b].glyph, buttons[b].fill),
@@ -169,10 +186,14 @@ function modeChrome(r: Roles, mode: Mode): ModeChrome {
     title: r["onSurface"]!,
     titleInactive: r["onSurfaceVariant"]!,
     border: r["outlineVariant"]!,
-    focusRing: primary,
+    focusRing: r["secondary"]!,
     buttons,
     inactive,
-    shadow: { active: shadow(GEOMETRY.activeElevation, dark), inactive: shadow(GEOMETRY.inactiveElevation, dark) },
+    shadowColor: r["shadow"]!,
+    shadow: {
+      active: shadow(GEOMETRY.activeElevation, dark, r["shadow"]!),
+      inactive: shadow(GEOMETRY.inactiveElevation, dark, r["shadow"]!),
+    },
     checks,
   };
 }
@@ -200,8 +221,10 @@ export function chromeSpec(input: ThemeInput): ChromeSpec {
       names: "Close / Minimise / Zoom exposed through UIA (Windows) and AT-SPI (Linux); tooltips carry the same names",
       glyphs: "shown on hover of the button group and on keyboard focus, never hover-only",
       hitArea: "24x24 px minimum around the 12 px visual circle",
-      transparency: "materials fall back to alpha 1 when reduce-transparency / Windows transparency effects are off or forced colours are on",
-      motion: "spring animations are skipped when reduced motion is requested (Windows animation effects off, gtk-enable-animations=false, Hyprland animations:enabled=false)",
+      transparency:
+        "materials fall back to alpha 1 when reduce-transparency / Windows transparency effects are off or forced colours are on",
+      motion:
+        "spring animations are skipped when reduced motion is requested (Windows animation effects off, gtk-enable-animations=false, Hyprland animations:enabled=false)",
     },
     light: modeChrome(light!.roles, "light"),
     dark: modeChrome(dark!.roles, "dark"),
@@ -223,7 +246,7 @@ export function trafficLightSvg(m: ModeChrome, button: Button, state: ButtonStat
   const ring =
     state === "inactive"
       ? `<circle cx="${c}" cy="${c}" r="${rad - 0.5}" fill="none" stroke="${m.inactive.border}" stroke-width="1"/>`
-      : `<circle cx="${c}" cy="${c}" r="${rad - 0.25}" fill="none" stroke="#000" stroke-opacity="0.12" stroke-width="0.5"/>`;
+      : `<circle cx="${c}" cy="${c}" r="${rad - 0.25}" fill="none" stroke="${m.shadowColor}" stroke-opacity="0.12" stroke-width="0.5"/>`;
   const focus =
     state === "focus"
       ? `<circle cx="${c}" cy="${c}" r="${rad + GEOMETRY.focusRing.offset + GEOMETRY.focusRing.width / 2}" fill="none" stroke="${m.focusRing}" stroke-width="${GEOMETRY.focusRing.width}"/>`
@@ -245,11 +268,6 @@ export function trafficLightSvg(m: ModeChrome, button: Button, state: ButtonStat
 
 // ------------------------------------------------------------------------------------------------------------- GTK
 
-const rgba = (hex: string, a: number): string => {
-  const [r, g, b] = rgb(hex);
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-};
-
 /** GTK chrome: traffic-light window controls (GTK 4 `windowcontrols`, GTK 3 `.titlebutton`), decorations, header bar. */
 export function gtkChromeCss(spec: ChromeSpec, mode: Mode, version: 3 | 4): string {
   const m = spec[mode];
@@ -266,7 +284,7 @@ ${version === 4 ? "windowcontrols:hover > button" : "headerbar:hover button.titl
 ${version === 4 ? "windowcontrols" : "headerbar .titlebutton-box"} { border-spacing: ${gap - (hit - diameter)}px; margin: 0 ${GEOMETRY.button.inset - (hit - diameter) / 2}px; }
 ${sel} { min-width: ${hit}px; min-height: ${hit}px; padding: 0; margin: 0; border: none; background: none; box-shadow: none; outline: none; }
 ${sel}${img} { min-width: ${diameter}px; min-height: ${diameter}px; border-radius: 9999px; color: transparent; -gtk-icon-size: 8px;
-  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.12); transition: background-color ${MOTION.effects.fast.ms}ms cubic-bezier(${MOTION.effects.fast.bezier.join(", ")}); }
+  box-shadow: inset 0 0 0 0.5px ${rgba(m.shadowColor, 0.12)}; transition: background-color ${MOTION.effects.fast.ms}ms cubic-bezier(${MOTION.effects.fast.bezier.join(", ")}); }
 ${per}
 ${sel}:focus-visible { outline: ${GEOMETRY.focusRing.width}px solid ${m.focusRing}; outline-offset: -${(hit - diameter) / 2 - GEOMETRY.focusRing.offset}px; border-radius: 9999px; }
 ${version === 4 ? "window:backdrop windowcontrols > button image" : "headerbar:backdrop button.titlebutton"} { background-color: ${m.inactive.fill}; box-shadow: inset 0 0 0 1px ${m.inactive.border}; color: transparent; }
@@ -293,7 +311,9 @@ gtk-enable-animations=true
 // -------------------------------------------------------------------------------------------------------- Hyprland
 
 const hypr = (hex: string, a = 1): string =>
-  `rgba(${hex.slice(1)}${Math.round(a * 255).toString(16).padStart(2, "0")})`;
+  `rgba(${hex.slice(1)}${Math.round(a * 255)
+    .toString(16)
+    .padStart(2, "0")})`;
 const bez = (b: readonly number[]): string => b.join(", ");
 const ds = (ms: number): string => (ms / 100).toFixed(1);
 
@@ -304,7 +324,11 @@ export function hyprlandChrome(spec: ChromeSpec, mode: Mode, font: string): stri
   const buttons = [...BUTTONS]
     .reverse() // hyprbars lists buttons from the outer edge inwards
     .map(b => {
-      const action = { close: "hyprctl dispatch killactive", minimize: "hyprctl dispatch movetoworkspacesilent special:minimized", zoom: "hyprctl dispatch fullscreen 1" }[b];
+      const action = {
+        close: "hyprctl dispatch killactive",
+        minimize: "hyprctl dispatch movetoworkspacesilent special:minimized",
+        zoom: "hyprctl dispatch fullscreen 1",
+      }[b];
       const icon = { close: "×", minimize: "−", zoom: "+" }[b];
       return `        hyprbars-button = ${hypr(m.buttons[b].fill)}, ${GEOMETRY.button.diameter + 2}, ${icon}, ${action}, ${hypr(m.buttons[b].glyph)}`;
     })
@@ -328,8 +352,8 @@ decoration {
         range = ${ELEVATION[GEOMETRY.activeElevation] * 3}
         render_power = 3
         offset = 0 ${ELEVATION[GEOMETRY.activeElevation]}
-        color = rgba(000000${mode === "dark" ? "80" : "38"})
-        color_inactive = rgba(000000${mode === "dark" ? "5c" : "24"})
+        color = ${hypr(m.shadowColor, mode === "dark" ? 0.5 : 0.22)}
+        color_inactive = ${hypr(m.shadowColor, mode === "dark" ? 0.36 : 0.14)}
     }
     blur {
         enabled = true
@@ -417,7 +441,14 @@ export function win11Chrome(spec: ChromeSpec, mode: Mode): object {
       gap: GEOMETRY.button.gap,
       inset: GEOMETRY.button.inset,
     },
-    dock: { position: "bottom", icon_size: 48, magnification: 1.5, autohide: true, background: u(m.dock.color), items: [] },
+    dock: {
+      position: "bottom",
+      icon_size: 48,
+      magnification: 1.5,
+      autohide: true,
+      background: u(m.dock.color),
+      items: [],
+    },
     "x-bunos": {
       corner: GEOMETRY.dwmCorner,
       hit: GEOMETRY.button.hit,

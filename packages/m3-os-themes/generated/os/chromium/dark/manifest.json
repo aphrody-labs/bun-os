@@ -1,0 +1,119 @@
+{
+  "manifest_version": 3,
+  "name": "M3 BunOS (dark)",
+  "version": "1.0.0",
+  "description": "Material 3 dark theme generated from #8c6c88",
+  "theme": {
+    "colors": {
+      "frame": [
+        36,
+        30,
+        34
+      ],
+      "frame_inactive": [
+        23,
+        18,
+        22
+      ],
+      "frame_incognito": [
+        18,
+        13,
+        17
+      ],
+      "frame_incognito_inactive": [
+        18,
+        13,
+        17
+      ],
+      "toolbar": [
+        46,
+        40,
+        45
+      ],
+      "tab_text": [
+        235,
+        223,
+        230
+      ],
+      "tab_background_text": [
+        209,
+        195,
+        204
+      ],
+      "bookmark_text": [
+        235,
+        223,
+        230
+      ],
+      "ntp_background": [
+        23,
+        18,
+        22
+      ],
+      "ntp_text": [
+        235,
+        223,
+        230
+      ],
+      "ntp_link": [
+        239,
+        180,
+        233
+      ],
+      "button_background": [
+        100,
+        54,
+        99
+      ],
+      "omnibox_background": [
+        58,
+        51,
+        56
+      ],
+      "omnibox_text": [
+        235,
+        223,
+        230
+      ],
+      "toolbar_button_icon": [
+        209,
+        195,
+        204
+      ],
+      "toolbar_text": [
+        235,
+        223,
+        230
+      ]
+    },
+    "tints": {
+      "buttons": [
+        -1,
+        -1,
+        -1
+      ],
+      "frame": [
+        -1,
+        -1,
+        -1
+      ],
+      "frame_inactive": [
+        -1,
+        -1,
+        -1
+      ],
+      "background_tab": [
+        -1,
+        -1,
+        -1
+      ]
+    },
+    "images": {
+      "theme_ntp_background": "images/ntp.png"
+    },
+    "properties": {
+      "ntp_background_alignment": "bottom",
+      "ntp_background_repeat": "no-repeat"
+    }
+  }
+}

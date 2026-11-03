@@ -23,8 +23,23 @@ export function omarchyColors(dark: Roles, ansi: Record<string, string>): string
     .join("\n")}\n`;
 }
 
+/**
+ * ANSI green and yellow (normal and bright) for terminal palettes. They colour program output, not chrome, and no M3 role
+ * carries these hues until the extended success/warning roles reach the ThemeExport.
+ */
+// design:content
+export const ANSI_SIGNAL = {
+  green: "#8fd694",
+  yellow: "#f0c674",
+  brightGreen: "#a8e6ab",
+  brightYellow: "#ffd58f",
+} as const;
+
 /** ANSI 0-15 from the dark roles (same mapping as the Rio palette in apps.ts). */
-export function ansiFromRoles(dark: Roles, harmonized: { red: string; green: string; yellow: string }): Record<string, string> {
+export function ansiFromRoles(
+  dark: Roles,
+  harmonized: { red: string; green: string; yellow: string },
+): Record<string, string> {
   const r = (k: string) => dark[k]!;
   return {
     color0: r("surfaceContainerHigh"),
@@ -105,7 +120,14 @@ export interface FontFile {
   role: "brand" | "plain" | "serif" | "code" | "mono" | "coverage" | "emoji" | "icons";
 }
 
-const gf = (dir: string, src: string, file: string, family: string, role: FontFile["role"], italic = false): FontFile => ({
+const gf = (
+  dir: string,
+  src: string,
+  file: string,
+  family: string,
+  role: FontFile["role"],
+  italic = false,
+): FontFile => ({
   source: "google-fonts",
   path: `ofl/${dir}/${src}`,
   file,
@@ -121,12 +143,38 @@ const gf = (dir: string, src: string, file: string, family: string, role: FontFi
  * Noto for script coverage and emoji, Material Symbols for icon fonts.
  */
 export const FONTS: readonly FontFile[] = [
-  gf("googlesansflex", "GoogleSansFlex[GRAD,ROND,opsz,slnt,wdth,wght].ttf", "GoogleSansFlex-Variable.ttf", "Google Sans Flex", "brand"),
+  gf(
+    "googlesansflex",
+    "GoogleSansFlex[GRAD,ROND,opsz,slnt,wdth,wght].ttf",
+    "GoogleSansFlex-Variable.ttf",
+    "Google Sans Flex",
+    "brand",
+  ),
   gf("googlesanscode", "GoogleSansCode[wght].ttf", "GoogleSansCode-Variable.ttf", "Google Sans Code", "code"),
-  gf("googlesanscode", "GoogleSansCode-Italic[wght].ttf", "GoogleSansCode-Italic-Variable.ttf", "Google Sans Code", "code", true),
-  gf("robotoflex", "RobotoFlex[GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght].ttf", "RobotoFlex-Variable.ttf", "Roboto Flex", "plain"),
+  gf(
+    "googlesanscode",
+    "GoogleSansCode-Italic[wght].ttf",
+    "GoogleSansCode-Italic-Variable.ttf",
+    "Google Sans Code",
+    "code",
+    true,
+  ),
+  gf(
+    "robotoflex",
+    "RobotoFlex[GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght].ttf",
+    "RobotoFlex-Variable.ttf",
+    "Roboto Flex",
+    "plain",
+  ),
   gf("robotoserif", "RobotoSerif[GRAD,opsz,wdth,wght].ttf", "RobotoSerif-Variable.ttf", "Roboto Serif", "serif"),
-  gf("robotoserif", "RobotoSerif-Italic[GRAD,opsz,wdth,wght].ttf", "RobotoSerif-Italic-Variable.ttf", "Roboto Serif", "serif", true),
+  gf(
+    "robotoserif",
+    "RobotoSerif-Italic[GRAD,opsz,wdth,wght].ttf",
+    "RobotoSerif-Italic-Variable.ttf",
+    "Roboto Serif",
+    "serif",
+    true,
+  ),
   gf("robotomono", "RobotoMono[wght].ttf", "RobotoMono-Variable.ttf", "Roboto Mono", "mono"),
   gf("robotomono", "RobotoMono-Italic[wght].ttf", "RobotoMono-Italic-Variable.ttf", "Roboto Mono", "mono", true),
   gf("notosans", "NotoSans[wdth,wght].ttf", "NotoSans-Variable.ttf", "Noto Sans", "coverage"),
@@ -136,20 +184,24 @@ export const FONTS: readonly FontFile[] = [
   gf("notosansmono", "NotoSansMono[wdth,wght].ttf", "NotoSansMono-Variable.ttf", "Noto Sans Mono", "coverage"),
   gf("notosansjp", "NotoSansJP[wght].ttf", "NotoSansJP-Variable.ttf", "Noto Sans JP", "coverage"),
   gf("notosanssymbols", "NotoSansSymbols[wght].ttf", "NotoSansSymbols-Variable.ttf", "Noto Sans Symbols", "coverage"),
-  gf("notosanssymbols2", "NotoSansSymbols2-Regular.ttf", "NotoSansSymbols2-Regular.ttf", "Noto Sans Symbols 2", "coverage"),
+  gf(
+    "notosanssymbols2",
+    "NotoSansSymbols2-Regular.ttf",
+    "NotoSansSymbols2-Regular.ttf",
+    "Noto Sans Symbols 2",
+    "coverage",
+  ),
   gf("notosansmath", "NotoSansMath-Regular.ttf", "NotoSansMath-Regular.ttf", "Noto Sans Math", "coverage"),
   gf("notocoloremoji", "NotoColorEmoji-Regular.ttf", "NotoColorEmoji-Regular.ttf", "Noto Color Emoji", "emoji"),
-  ...(["Outlined", "Rounded", "Sharp"] as const).map(
-    (s): FontFile => ({
-      source: "material-symbols",
-      path: `variablefont/MaterialSymbols${s}[FILL,GRAD,opsz,wght].ttf`,
-      file: `MaterialSymbols${s}-Variable.ttf`,
-      family: `Material Symbols ${s}`,
-      registry: `Material Symbols ${s} (TrueType)`,
-      license: "Apache-2.0",
-      role: "icons",
-    }),
-  ),
+  ...(["Outlined", "Rounded", "Sharp"] as const).map((s): FontFile => ({
+    source: "material-symbols",
+    path: `variablefont/MaterialSymbols${s}[FILL,GRAD,opsz,wght].ttf`,
+    file: `MaterialSymbols${s}-Variable.ttf`,
+    family: `Material Symbols ${s}`,
+    registry: `Material Symbols ${s} (TrueType)`,
+    license: "Apache-2.0",
+    role: "icons",
+  })),
 ];
 
 /** /etc/fonts/conf.d rule: M3 families as the sans/serif/monospace/emoji defaults, Noto for coverage. */

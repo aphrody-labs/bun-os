@@ -4,9 +4,6 @@
 import { rolesFor, unit, validate } from "./color.ts";
 import type { GeneratedFile, Mode, Roles, ThemeInput } from "./types.ts";
 
-const SUCCESS: Record<Mode, string> = { light: "#2e7d32", dark: "#81c784" };
-const WARNING: Record<Mode, string> = { light: "#b26a00", dark: "#ffb74d" };
-
 export const cosmicDir = (mode: Mode): string =>
   `com.system76.CosmicTheme.${mode === "dark" ? "Dark" : "Light"}.Builder/v2`; // ThemeBuilder is #[version = 2] in libcosmic
 export const MODE_DIR = "com.system76.CosmicTheme.Mode/v1";
@@ -21,7 +18,7 @@ const srgba = (c: string, alpha = "1.000000"): string => {
 };
 
 /** Builder keys (cosmic-config file names) mapped to RON values. */
-export function builderEntries(roles: Roles, mode: Mode): Record<string, string> {
+export function builderEntries(roles: Roles): Record<string, string> {
   return {
     accent: `Some(${srgb(roles["primary"]!)})`,
     bg_color: `Some(${srgba(roles["surface"]!)})`,
@@ -29,8 +26,9 @@ export function builderEntries(roles: Roles, mode: Mode): Record<string, string>
     secondary_container_bg: `Some(${srgba(roles["surfaceContainerHigh"]!)})`,
     neutral_tint: `Some(${srgb(roles["surfaceVariant"]!)})`,
     text_tint: `Some(${srgb(roles["onSurface"]!)})`,
-    success: `Some(${srgb(SUCCESS[mode])})`,
-    warning: `Some(${srgb(WARNING[mode])})`,
+    // No M3 role carries these hues yet: COSMIC derives them from the palette's green and yellow.
+    success: "None",
+    warning: "None",
     destructive: `Some(${srgb(roles["error"]!)})`,
     window_hint: `Some(${srgb(roles["primary"]!)})`,
   };
@@ -38,7 +36,9 @@ export function builderEntries(roles: Roles, mode: Mode): Record<string, string>
 
 // libcosmic cosmic-theme/src/model/{dark,light}.ron, spacing.rs and corner.rs ("Round") defaults. The import
 // path (`ron::de::from_str::<ThemeBuilder>`) has no struct-level serde default, so a bundle must carry every
-// field that lacks one: palette, spacing, corner_radii, gaps, active_hint and the optional colours.
+// field that lacks one: palette, spacing, corner_radii, gaps, active_hint and the optional colours. The palette is the
+// upstream file-format default COSMIC derives unset colours from (success and warning come from its green and yellow).
+// design:content
 const PALETTE: Record<Mode, string> = {
   dark: `Dark((name: "cosmic-dark", bright_red: "#FFA09AFF", bright_green: "#5EDB8CFF", bright_orange: "#FFA37DFF", gray_1: "#1B1B1BFF", gray_2: "#262626FF", neutral_0: "#000000FF", neutral_1: "#030303FF", neutral_2: "#161616FF", neutral_3: "#2E2E2EFF", neutral_4: "#484848FF", neutral_5: "#636363FF", neutral_6: "#808080FF", neutral_7: "#9E9E9EFF", neutral_8: "#BEBEBEFF", neutral_9: "#DEDEDEFF", neutral_10: "#FFFFFFFF", accent_blue: "#63D0DFFF", accent_indigo: "#A1C0EBFF", accent_purple: "#E79CFEFF", accent_pink: "#FF9CB1FF", accent_red: "#FDA1A0FF", accent_orange: "#FFAD00FF", accent_yellow: "#F7E062FF", accent_green: "#92CF9CFF", accent_warm_grey: "#CABAB4FF", ext_warm_grey: "#9B8E8AFF", ext_orange: "#FFAD00FF", ext_yellow: "#FEDB40FF", ext_blue: "#48B9C7FF", ext_purple: "#CF7DFFFF", ext_pink: "#F93A83FF", ext_indigo: "#3E88FFFF"))`,
   light: `Light((name: "cosmic-light", bright_red: "#890418FF", bright_green: "#00572CFF", bright_orange: "#792C00FF", gray_1: "#D7D7D7FF", gray_2: "#E4E4E4FF", neutral_0: "#FFFFFFFF", neutral_1: "#DEDEDEFF", neutral_2: "#BEBEBEFF", neutral_3: "#9E9E9EFF", neutral_4: "#808080FF", neutral_5: "#636363FF", neutral_6: "#484848FF", neutral_7: "#2E2E2EFF", neutral_8: "#161616FF", neutral_9: "#030303FF", neutral_10: "#000000FF", accent_blue: "#00525AFF", accent_indigo: "#2E496DFF", accent_purple: "#68217CFF", accent_pink: "#86043AFF", accent_red: "#78292EFF", accent_orange: "#624000FF", accent_yellow: "#534800FF", accent_green: "#185529FF", accent_warm_grey: "#554742FF", ext_warm_grey: "#9B8E8AFF", ext_orange: "#FBB86CFF", ext_yellow: "#F7E062FF", ext_blue: "#6ACAD8FF", ext_purple: "#D58CFFFF", ext_pink: "#FF9CDDFF", ext_indigo: "#95C4FCFF"))`,
@@ -54,7 +54,7 @@ export function themeBundle(roles: Roles, mode: Mode, name: string): string {
     palette: PALETTE[mode],
     spacing: SPACING,
     corner_radii: RADII,
-    ...builderEntries(roles, mode),
+    ...builderEntries(roles),
     gaps: "(0, 8)",
     active_hint: "3",
   };
@@ -172,7 +172,7 @@ export function generateCosmic(input: ThemeInput): GeneratedFile[] {
   };
   for (const mode of ["dark", "light"] as const) {
     const { roles } = rolesFor(input, mode);
-    for (const [key, value] of Object.entries(builderEntries(roles, mode))) {
+    for (const [key, value] of Object.entries(builderEntries(roles))) {
       add(`config/${cosmicDir(mode)}/${key}`, value);
     }
     add(`M3-${input.name}-${mode}.ron`, themeBundle(roles, mode, input.name));

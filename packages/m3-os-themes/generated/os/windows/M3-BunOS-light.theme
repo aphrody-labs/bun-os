@@ -1,0 +1,21 @@
+[Theme]
+DisplayName=M3 BunOS (light)
+
+[Control Panel\Desktop]
+Wallpaper=%LOCALAPPDATA%\m3-os-themes\wallpaper-BunOS-light.png
+TileWallpaper=0
+WallpaperStyle=10
+Pattern=
+
+[Control Panel\Colors]
+Background=255 247 250
+
+[VisualStyles]
+Path=%SystemRoot%\resources\themes\Aero\Aero.msstyles
+ColorStyle=NormalColor
+Size=NormalSize
+AutoColors=0
+ColorizationColor=0XC47E4D7C
+
+[MasterThemeSelector]
+MTSM=RJSPBS

@@ -2,14 +2,24 @@
 
 # @aphrody/m3-os-themes
 
-Generates and installs Material 3 OS themes (Windows 11, GNOME Shell, COSMIC, Chromium browsers) from a seed colour, with the colour roles of `@aphrody/m3-tokens/dynamic-color`.
+Generates and installs Material 3 OS themes (Windows 11, GNOME Shell, COSMIC, Chromium browsers) and the app themes
+(web CSS, Jetpack Compose and Android resources, Flutter, COSMIC) from one colour source: the Rust ThemeExport of
+`aphrody_m3_tokens::theme`, produced by `bunos-design theme` (crates/bunos-design). No colour maths runs in this package.
+
+- The product theme is the export of the pet seed (`aphrody_identity::design::pet_seed_hex`), committed as
+  `generated/theme/bunos-m3.json`; `m3-os-themes native-theme [--bin <bunos-design>]` refreshes it and `--check`
+  compares it with the Rust output.
+- Any other seed, variant or contrast is computed by `bunos-design` (`--bin`, `$BUNOS_DESIGN`, or on PATH; build it with
+  `cargo build -p bunos-design`), or read from `--native-theme <export.json>`.
+- `generate --check` compares the product OS bundle with `generated/os` (`generate --update` rewrites it); `apps --check`
+  compares the app themes with their consumers (`apps` rewrites them). `bun run check` runs both.
 
 ```sh
 bun add -d @aphrody/m3-os-themes
 ```
 
 ```sh
-bunx --bun m3-os-themes generate --target all --seed '#6750a4' --mode auto --out ./m3-os-themes-out
+bunx --bun m3-os-themes generate --target all --mode auto --out ./m3-os-themes-out
 ```
 
 License: Apache-2.0 (`LICENSE`). Install guide: [docs/material/m3/INSTALL.md](https://github.com/aphrody-labs/bun-distribution/blob/os/docs/material/m3/INSTALL.md).
@@ -18,8 +28,9 @@ Full usage (in the Aphrody checkout `yolo m3 os-themes` takes the same arguments
 
 ```sh
 m3-os-themes <install|generate|uninstall> \
-  --target windows|gnome|cosmic|chromium|all --seed '#6750a4' --mode light|dark|auto \
-  [--name Aphrody] [--variant tonalSpot] [--out dir] [--icons dir] [--dry-run] [--apply]
+  --target windows|gnome|cosmic|chromium|all [--seed '#rrggbb'] --mode light|dark|auto \
+  [--name Aphrody] [--variant tonalSpot] [--contrast 0] [--native-theme export.json] [--bin bunos-design] \
+  [--out dir] [--icons dir] [--dry-run] [--apply]
 ```
 
 - `generate` writes only into `--out` (default `./m3-os-themes-out`).
