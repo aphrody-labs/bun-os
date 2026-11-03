@@ -73,41 +73,129 @@ pub const STATE_FULLSCREEN: u32 = 4;
 /// Host (Linux compositor) to presenter (Windows).
 #[derive(Clone, Debug, PartialEq)]
 pub enum HostMsg {
-    Hello { version: u32, host: String },
+    Hello {
+        version: u32,
+        host: String,
+    },
     /// A toplevel was mapped. `ssd` = the client accepted server-side decorations (the Win32 frame). A non-zero
     /// `parent` marks a popup (X11 override-redirect menu or tooltip) placed at `x`,`y` physical pixels from the
     /// parent's client origin.
-    ToplevelNew { id: u32, parent: u32, x: i32, y: i32, width: u32, height: u32, ssd: bool, title: String, app_id: String },
-    ToplevelMeta { id: u32, title: String, app_id: String },
+    ToplevelNew {
+        id: u32,
+        parent: u32,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+        ssd: bool,
+        title: String,
+        app_id: String,
+    },
+    ToplevelMeta {
+        id: u32,
+        title: String,
+        app_id: String,
+    },
     /// The client asked, from its own CSD, for a state (maximize/fullscreen/minimize) or an interactive move/resize,
     /// which the presenter turns into the native Win32 move/resize loop (snap layouts included).
-    ToplevelRequest { id: u32, states: u32, minimize: bool, interactive: Interactive, edges: u32 },
-    ToplevelEffect { id: u32, backdrop: Backdrop, translucent: bool },
-    ToplevelClosed { id: u32 },
+    ToplevelRequest {
+        id: u32,
+        states: u32,
+        minimize: bool,
+        interactive: Interactive,
+        edges: u32,
+    },
+    ToplevelEffect {
+        id: u32,
+        backdrop: Backdrop,
+        translucent: bool,
+    },
+    ToplevelClosed {
+        id: u32,
+    },
     /// A new picture of the toplevel. Only `rects` changed since the previous frame of the same size; a size change
     /// always comes with one full rectangle. `data` holds the rectangles' rows back to back, coded with `codec`.
-    Frame { id: u32, seq: u32, width: u32, height: u32, opaque: bool, rects: Vec<Rect>, codec: Codec, raw_len: u32, data: Vec<u8> },
+    Frame {
+        id: u32,
+        seq: u32,
+        width: u32,
+        height: u32,
+        opaque: bool,
+        rects: Vec<Rect>,
+        codec: Codec,
+        raw_len: u32,
+        data: Vec<u8>,
+    },
     /// Named cursor (CSS / cursor-shape-v1 names), empty = hidden.
-    Cursor { name: String },
-    Bye { reason: String },
+    Cursor {
+        name: String,
+    },
+    Bye {
+        reason: String,
+    },
 }
 
 /// Presenter (Windows) to host.
 #[derive(Clone, Debug, PartialEq)]
 pub enum PresenterMsg {
     /// `xkb_layout`/`xkb_variant` follow the active Windows keyboard layout; `scale_120` = DPI scale x120.
-    Hello { version: u32, xkb_layout: String, xkb_variant: String, scale_120: u32, output_w: u32, output_h: u32 },
-    Configure { id: u32, width: u32, height: u32, states: u32 },
-    PointerMotion { id: u32, x: f64, y: f64, time_ms: u32 },
-    PointerButton { id: u32, button: u32, pressed: bool, time_ms: u32 },
-    PointerAxis { id: u32, dx: f64, dy: f64, v120_x: i32, v120_y: i32, time_ms: u32 },
-    PointerLeave { id: u32 },
+    Hello {
+        version: u32,
+        xkb_layout: String,
+        xkb_variant: String,
+        scale_120: u32,
+        output_w: u32,
+        output_h: u32,
+    },
+    Configure {
+        id: u32,
+        width: u32,
+        height: u32,
+        states: u32,
+    },
+    PointerMotion {
+        id: u32,
+        x: f64,
+        y: f64,
+        time_ms: u32,
+    },
+    PointerButton {
+        id: u32,
+        button: u32,
+        pressed: bool,
+        time_ms: u32,
+    },
+    PointerAxis {
+        id: u32,
+        dx: f64,
+        dy: f64,
+        v120_x: i32,
+        v120_y: i32,
+        time_ms: u32,
+    },
+    PointerLeave {
+        id: u32,
+    },
     /// evdev key code (linux/input-event-codes.h), not xkb (+8).
-    Key { keycode: u32, pressed: bool, time_ms: u32 },
-    Focus { id: u32, focused: bool },
-    Close { id: u32 },
-    FrameAck { id: u32, seq: u32 },
-    Launch { command: String },
+    Key {
+        keycode: u32,
+        pressed: bool,
+        time_ms: u32,
+    },
+    Focus {
+        id: u32,
+        focused: bool,
+    },
+    Close {
+        id: u32,
+    },
+    FrameAck {
+        id: u32,
+        seq: u32,
+    },
+    Launch {
+        command: String,
+    },
 }
 
 #[derive(Default)]
@@ -203,9 +291,27 @@ impl HostMsg {
                 e.u32(*version).str(host);
                 e.finish()
             }
-            Self::ToplevelNew { id, parent, x, y, width, height, ssd, title, app_id } => {
+            Self::ToplevelNew {
+                id,
+                parent,
+                x,
+                y,
+                width,
+                height,
+                ssd,
+                title,
+                app_id,
+            } => {
                 let mut e = Enc::new(2);
-                e.u32(*id).u32(*parent).i32(*x).i32(*y).u32(*width).u32(*height).u8(*ssd as u8).str(title).str(app_id);
+                e.u32(*id)
+                    .u32(*parent)
+                    .i32(*x)
+                    .i32(*y)
+                    .u32(*width)
+                    .u32(*height)
+                    .u8(*ssd as u8)
+                    .str(title)
+                    .str(app_id);
                 e.finish()
             }
             Self::ToplevelMeta { id, title, app_id } => {
@@ -213,12 +319,26 @@ impl HostMsg {
                 e.u32(*id).str(title).str(app_id);
                 e.finish()
             }
-            Self::ToplevelRequest { id, states, minimize, interactive, edges } => {
+            Self::ToplevelRequest {
+                id,
+                states,
+                minimize,
+                interactive,
+                edges,
+            } => {
                 let mut e = Enc::new(4);
-                e.u32(*id).u32(*states).u8(*minimize as u8).u8(*interactive as u8).u32(*edges);
+                e.u32(*id)
+                    .u32(*states)
+                    .u8(*minimize as u8)
+                    .u8(*interactive as u8)
+                    .u32(*edges);
                 e.finish()
             }
-            Self::ToplevelEffect { id, backdrop, translucent } => {
+            Self::ToplevelEffect {
+                id,
+                backdrop,
+                translucent,
+            } => {
                 let mut e = Enc::new(5);
                 e.u32(*id).u8(*backdrop as u8).u8(*translucent as u8);
                 e.finish()
@@ -228,9 +348,24 @@ impl HostMsg {
                 e.u32(*id);
                 e.finish()
             }
-            Self::Frame { id, seq, width, height, opaque, rects, codec, raw_len, data } => {
+            Self::Frame {
+                id,
+                seq,
+                width,
+                height,
+                opaque,
+                rects,
+                codec,
+                raw_len,
+                data,
+            } => {
                 let mut e = Enc::new(7);
-                e.u32(*id).u32(*seq).u32(*width).u32(*height).u8(*opaque as u8).u32(rects.len() as u32);
+                e.u32(*id)
+                    .u32(*seq)
+                    .u32(*width)
+                    .u32(*height)
+                    .u8(*opaque as u8)
+                    .u32(rects.len() as u32);
                 for r in rects {
                     e.u32(r.x).u32(r.y).u32(r.w).u32(r.h);
                 }
@@ -254,7 +389,10 @@ impl HostMsg {
         let mut d = Dec { b, at: 1 };
         let tag = *b.first().ok_or_else(|| bad("empty message"))?;
         Ok(match tag {
-            1 => Self::Hello { version: d.u32()?, host: d.str()? },
+            1 => Self::Hello {
+                version: d.u32()?,
+                host: d.str()?,
+            },
             2 => Self::ToplevelNew {
                 id: d.u32()?,
                 parent: d.u32()?,
@@ -266,7 +404,11 @@ impl HostMsg {
                 title: d.str()?,
                 app_id: d.str()?,
             },
-            3 => Self::ToplevelMeta { id: d.u32()?, title: d.str()?, app_id: d.str()? },
+            3 => Self::ToplevelMeta {
+                id: d.u32()?,
+                title: d.str()?,
+                app_id: d.str()?,
+            },
             4 => Self::ToplevelRequest {
                 id: d.u32()?,
                 states: d.u32()?,
@@ -278,24 +420,44 @@ impl HostMsg {
                 },
                 edges: d.u32()?,
             },
-            5 => Self::ToplevelEffect { id: d.u32()?, backdrop: Backdrop::from_u8(d.u8()?), translucent: d.bool()? },
+            5 => Self::ToplevelEffect {
+                id: d.u32()?,
+                backdrop: Backdrop::from_u8(d.u8()?),
+                translucent: d.bool()?,
+            },
             6 => Self::ToplevelClosed { id: d.u32()? },
             7 => {
-                let (id, seq, width, height, opaque) = (d.u32()?, d.u32()?, d.u32()?, d.u32()?, d.bool()?);
+                let (id, seq, width, height, opaque) =
+                    (d.u32()?, d.u32()?, d.u32()?, d.u32()?, d.bool()?);
                 let n = d.u32()? as usize;
                 if n > 65536 {
                     return Err(bad("too many rectangles"));
                 }
                 let mut rects = Vec::with_capacity(n);
                 for _ in 0..n {
-                    rects.push(Rect { x: d.u32()?, y: d.u32()?, w: d.u32()?, h: d.u32()? });
+                    rects.push(Rect {
+                        x: d.u32()?,
+                        y: d.u32()?,
+                        w: d.u32()?,
+                        h: d.u32()?,
+                    });
                 }
                 let codec = match d.u8()? {
                     0 => Codec::Raw,
                     1 => Codec::Lz4,
                     _ => return Err(bad("unknown codec")),
                 };
-                Self::Frame { id, seq, width, height, opaque, rects, codec, raw_len: d.u32()?, data: d.bytes()? }
+                Self::Frame {
+                    id,
+                    seq,
+                    width,
+                    height,
+                    opaque,
+                    rects,
+                    codec,
+                    raw_len: d.u32()?,
+                    data: d.bytes()?,
+                }
             }
             8 => Self::Cursor { name: d.str()? },
             9 => Self::Bye { reason: d.str()? },
@@ -307,12 +469,29 @@ impl HostMsg {
 impl PresenterMsg {
     pub fn encode(&self) -> Vec<u8> {
         match self {
-            Self::Hello { version, xkb_layout, xkb_variant, scale_120, output_w, output_h } => {
+            Self::Hello {
+                version,
+                xkb_layout,
+                xkb_variant,
+                scale_120,
+                output_w,
+                output_h,
+            } => {
                 let mut e = Enc::new(101);
-                e.u32(*version).str(xkb_layout).str(xkb_variant).u32(*scale_120).u32(*output_w).u32(*output_h);
+                e.u32(*version)
+                    .str(xkb_layout)
+                    .str(xkb_variant)
+                    .u32(*scale_120)
+                    .u32(*output_w)
+                    .u32(*output_h);
                 e.finish()
             }
-            Self::Configure { id, width, height, states } => {
+            Self::Configure {
+                id,
+                width,
+                height,
+                states,
+            } => {
                 let mut e = Enc::new(102);
                 e.u32(*id).u32(*width).u32(*height).u32(*states);
                 e.finish()
@@ -322,14 +501,31 @@ impl PresenterMsg {
                 e.u32(*id).f64(*x).f64(*y).u32(*time_ms);
                 e.finish()
             }
-            Self::PointerButton { id, button, pressed, time_ms } => {
+            Self::PointerButton {
+                id,
+                button,
+                pressed,
+                time_ms,
+            } => {
                 let mut e = Enc::new(104);
                 e.u32(*id).u32(*button).u8(*pressed as u8).u32(*time_ms);
                 e.finish()
             }
-            Self::PointerAxis { id, dx, dy, v120_x, v120_y, time_ms } => {
+            Self::PointerAxis {
+                id,
+                dx,
+                dy,
+                v120_x,
+                v120_y,
+                time_ms,
+            } => {
                 let mut e = Enc::new(105);
-                e.u32(*id).f64(*dx).f64(*dy).i32(*v120_x).i32(*v120_y).u32(*time_ms);
+                e.u32(*id)
+                    .f64(*dx)
+                    .f64(*dy)
+                    .i32(*v120_x)
+                    .i32(*v120_y)
+                    .u32(*time_ms);
                 e.finish()
             }
             Self::PointerLeave { id } => {
@@ -337,7 +533,11 @@ impl PresenterMsg {
                 e.u32(*id);
                 e.finish()
             }
-            Self::Key { keycode, pressed, time_ms } => {
+            Self::Key {
+                keycode,
+                pressed,
+                time_ms,
+            } => {
                 let mut e = Enc::new(107);
                 e.u32(*keycode).u8(*pressed as u8).u32(*time_ms);
                 e.finish()
@@ -377,9 +577,24 @@ impl PresenterMsg {
                 output_w: d.u32()?,
                 output_h: d.u32()?,
             },
-            102 => Self::Configure { id: d.u32()?, width: d.u32()?, height: d.u32()?, states: d.u32()? },
-            103 => Self::PointerMotion { id: d.u32()?, x: d.f64()?, y: d.f64()?, time_ms: d.u32()? },
-            104 => Self::PointerButton { id: d.u32()?, button: d.u32()?, pressed: d.bool()?, time_ms: d.u32()? },
+            102 => Self::Configure {
+                id: d.u32()?,
+                width: d.u32()?,
+                height: d.u32()?,
+                states: d.u32()?,
+            },
+            103 => Self::PointerMotion {
+                id: d.u32()?,
+                x: d.f64()?,
+                y: d.f64()?,
+                time_ms: d.u32()?,
+            },
+            104 => Self::PointerButton {
+                id: d.u32()?,
+                button: d.u32()?,
+                pressed: d.bool()?,
+                time_ms: d.u32()?,
+            },
             105 => Self::PointerAxis {
                 id: d.u32()?,
                 dx: d.f64()?,
@@ -389,10 +604,20 @@ impl PresenterMsg {
                 time_ms: d.u32()?,
             },
             106 => Self::PointerLeave { id: d.u32()? },
-            107 => Self::Key { keycode: d.u32()?, pressed: d.bool()?, time_ms: d.u32()? },
-            108 => Self::Focus { id: d.u32()?, focused: d.bool()? },
+            107 => Self::Key {
+                keycode: d.u32()?,
+                pressed: d.bool()?,
+                time_ms: d.u32()?,
+            },
+            108 => Self::Focus {
+                id: d.u32()?,
+                focused: d.bool()?,
+            },
             109 => Self::Close { id: d.u32()? },
-            110 => Self::FrameAck { id: d.u32()?, seq: d.u32()? },
+            110 => Self::FrameAck {
+                id: d.u32()?,
+                seq: d.u32()?,
+            },
             111 => Self::Launch { command: d.str()? },
             t => return Err(bad(&format!("unknown presenter tag {t}"))),
         })
@@ -409,8 +634,10 @@ pub fn unhex_args(s: &str) -> Option<Vec<String>> {
     if s.is_empty() {
         return Some(Vec::new());
     }
-    let bytes: Option<Vec<u8>> =
-        (0..s.len()).step_by(2).map(|i| s.get(i..i + 2).and_then(|h| u8::from_str_radix(h, 16).ok())).collect();
+    let bytes: Option<Vec<u8>> = (0..s.len())
+        .step_by(2)
+        .map(|i| s.get(i..i + 2).and_then(|h| u8::from_str_radix(h, 16).ok()))
+        .collect();
     let text = String::from_utf8(bytes?).ok()?;
     Some(text.split(' ').map(String::from).collect())
 }
@@ -437,7 +664,12 @@ pub fn write_message(w: &mut impl Write, encoded: &[u8]) -> io::Result<()> {
 }
 
 /// Packs the rectangles of a BGRA picture (`stride` bytes per row) and codes them. Returns (codec, raw_len, data).
-pub fn pack_rects(pixels: &[u8], stride: usize, rects: &[Rect], compress: bool) -> (Codec, u32, Vec<u8>) {
+pub fn pack_rects(
+    pixels: &[u8],
+    stride: usize,
+    rects: &[Rect],
+    compress: bool,
+) -> (Codec, u32, Vec<u8>) {
     let raw_len: usize = rects.iter().map(|r| r.area() * 4).sum();
     let mut raw = Vec::with_capacity(raw_len);
     for r in rects {
@@ -466,7 +698,8 @@ pub fn apply_rects(
     let raw: &[u8] = match codec {
         Codec::Raw => data,
         Codec::Lz4 => {
-            decoded = lz4_flex::block::decompress(data, raw_len as usize).map_err(|_| bad("lz4 frame"))?;
+            decoded = lz4_flex::block::decompress(data, raw_len as usize)
+                .map_err(|_| bad("lz4 frame"))?;
             &decoded
         }
     };
@@ -508,7 +741,10 @@ mod tests {
 
     #[test]
     fn host_messages_roundtrip() {
-        roundtrip_host(HostMsg::Hello { version: VERSION, host: "vps".into() });
+        roundtrip_host(HostMsg::Hello {
+            version: VERSION,
+            host: "vps".into(),
+        });
         roundtrip_host(HostMsg::ToplevelNew {
             id: 3,
             parent: 0,
@@ -520,14 +756,23 @@ mod tests {
             title: "foot — été".into(),
             app_id: "foot".into(),
         });
-        roundtrip_host(HostMsg::ToplevelEffect { id: 3, backdrop: Backdrop::Acrylic, translucent: true });
+        roundtrip_host(HostMsg::ToplevelEffect {
+            id: 3,
+            backdrop: Backdrop::Acrylic,
+            translucent: true,
+        });
         roundtrip_host(HostMsg::Frame {
             id: 3,
             seq: 9,
             width: 2,
             height: 2,
             opaque: false,
-            rects: vec![Rect { x: 0, y: 0, w: 2, h: 2 }],
+            rects: vec![Rect {
+                x: 0,
+                y: 0,
+                w: 2,
+                h: 2,
+            }],
             codec: Codec::Raw,
             raw_len: 16,
             data: vec![7; 16],
@@ -539,7 +784,9 @@ mod tests {
             interactive: Interactive::Resize,
             edges: 10,
         });
-        roundtrip_host(HostMsg::Bye { reason: "done".into() });
+        roundtrip_host(HostMsg::Bye {
+            reason: "done".into(),
+        });
     }
 
     #[test]
@@ -552,16 +799,42 @@ mod tests {
             output_w: 2560,
             output_h: 1440,
         });
-        roundtrip_presenter(PresenterMsg::PointerAxis { id: 1, dx: 0.0, dy: -15.0, v120_x: 0, v120_y: -120, time_ms: 5 });
-        roundtrip_presenter(PresenterMsg::Key { keycode: 30, pressed: true, time_ms: 6 });
-        roundtrip_presenter(PresenterMsg::Launch { command: "foot".into() });
+        roundtrip_presenter(PresenterMsg::PointerAxis {
+            id: 1,
+            dx: 0.0,
+            dy: -15.0,
+            v120_x: 0,
+            v120_y: -120,
+            time_ms: 5,
+        });
+        roundtrip_presenter(PresenterMsg::Key {
+            keycode: 30,
+            pressed: true,
+            time_ms: 6,
+        });
+        roundtrip_presenter(PresenterMsg::Launch {
+            command: "foot".into(),
+        });
     }
 
     #[test]
     fn rects_pack_and_apply_through_lz4() {
         let (w, h) = (64u32, 48u32);
         let src: Vec<u8> = (0..w * h * 4).map(|i| (i % 251) as u8).collect();
-        let rects = [Rect { x: 3, y: 5, w: 40, h: 30 }, Rect { x: 50, y: 0, w: 14, h: 48 }];
+        let rects = [
+            Rect {
+                x: 3,
+                y: 5,
+                w: 40,
+                h: 30,
+            },
+            Rect {
+                x: 50,
+                y: 0,
+                w: 14,
+                h: 48,
+            },
+        ];
         let (codec, raw_len, data) = pack_rects(&src, w as usize * 4, &rects, true);
         assert_eq!(codec, Codec::Lz4);
         let mut dst = vec![0u8; src.len()];
@@ -578,14 +851,36 @@ mod tests {
 
     #[test]
     fn args_roundtrip_through_hex() {
-        let a: Vec<String> = ["--stats", "--", "foot", "sh", "-c", "while :; do ls 'x y'; done", "é"].map(String::from).to_vec();
+        let a: Vec<String> = [
+            "--stats",
+            "--",
+            "foot",
+            "sh",
+            "-c",
+            "while :; do ls 'x y'; done",
+            "é",
+        ]
+        .map(String::from)
+        .to_vec();
         assert_eq!(unhex_args(&hex_args(&a)).unwrap(), a);
     }
 
     #[test]
     fn rejects_rect_outside_picture() {
         let mut dst = vec![0u8; 16];
-        let err = apply_rects(&mut dst, 2, &[Rect { x: 1, y: 1, w: 2, h: 2 }], Codec::Raw, 16, &[0; 16]);
+        let err = apply_rects(
+            &mut dst,
+            2,
+            &[Rect {
+                x: 1,
+                y: 1,
+                w: 2,
+                h: 2,
+            }],
+            Codec::Raw,
+            16,
+            &[0; 16],
+        );
         assert!(err.is_err());
     }
 }

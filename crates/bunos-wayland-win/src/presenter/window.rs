@@ -14,21 +14,21 @@ use windows::{
         Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, POINT, RECT, WPARAM},
         Graphics::{
             Dwm::{
-                DWMSBT_MAINWINDOW, DWMSBT_NONE, DWMSBT_TABBEDWINDOW, DWMSBT_TRANSIENTWINDOW, DWMWA_SYSTEMBACKDROP_TYPE,
-                DwmExtendFrameIntoClientArea,
-                DwmSetWindowAttribute,
+                DWMSBT_MAINWINDOW, DWMSBT_NONE, DWMSBT_TABBEDWINDOW, DWMSBT_TRANSIENTWINDOW,
+                DWMWA_SYSTEMBACKDROP_TYPE, DwmExtendFrameIntoClientArea, DwmSetWindowAttribute,
             },
             Gdi::{
-                BI_RGB, BITMAPINFO, BITMAPINFOHEADER, BeginPaint, DIB_RGB_COLORS, EndPaint, GetMonitorInfoW,
-                InvalidateRect, MONITOR_DEFAULTTONEAREST, MONITORINFO, MonitorFromWindow, PAINTSTRUCT, SetDIBitsToDevice,
+                BI_RGB, BITMAPINFO, BITMAPINFOHEADER, BeginPaint, DIB_RGB_COLORS, EndPaint,
+                GetMonitorInfoW, InvalidateRect, MONITOR_DEFAULTTONEAREST, MONITORINFO,
+                MonitorFromWindow, PAINTSTRUCT, SetDIBitsToDevice,
             },
         },
         UI::{
             Controls::MARGINS,
             HiDpi::{AdjustWindowRectExForDpi, GetDpiForWindow},
             Input::KeyboardAndMouse::{
-                MAPVK_VK_TO_VSC_EX, MapVirtualKeyW, ReleaseCapture, SetCapture, SetFocus, TME_LEAVE, TRACKMOUSEEVENT,
-                TrackMouseEvent, VK_F4, VK_F11, VK_PACKET, VkKeyScanW,
+                MAPVK_VK_TO_VSC_EX, MapVirtualKeyW, ReleaseCapture, SetCapture, SetFocus,
+                TME_LEAVE, TRACKMOUSEEVENT, TrackMouseEvent, VK_F4, VK_F11, VK_PACKET, VkKeyScanW,
             },
             WindowsAndMessaging::*,
         },
@@ -86,7 +86,10 @@ impl App {
         } else {
             match gpu::Device::new() {
                 Ok(d) => {
-                    eprintln!("bunos-wayland-win: D3D11 + DirectComposition flip model on {}", d.adapter);
+                    eprintln!(
+                        "bunos-wayland-win: D3D11 + DirectComposition flip model on {}",
+                        d.adapter
+                    );
                     Some(d)
                 }
                 Err(e) => {
@@ -132,7 +135,13 @@ fn load_chrome() -> bunos_win11_chrome::Chrome {
         candidates.push(p);
     }
     if let Ok(l) = std::env::var("LOCALAPPDATA") {
-        candidates.push(std::path::Path::new(&l).join("BunOS").join("design").join("windows").join(&file));
+        candidates.push(
+            std::path::Path::new(&l)
+                .join("BunOS")
+                .join("design")
+                .join("windows")
+                .join(&file),
+        );
     }
     for c in candidates {
         if let Ok(s) = std::fs::read_to_string(&c) {
@@ -142,7 +151,10 @@ fn load_chrome() -> bunos_win11_chrome::Chrome {
             }
         }
     }
-    bunos_win11_chrome::Chrome { dark, ..Default::default() }
+    bunos_win11_chrome::Chrome {
+        dark,
+        ..Default::default()
+    }
 }
 
 fn apps_use_dark() -> bool {
@@ -201,7 +213,15 @@ pub(crate) fn register_class(hinstance: HINSTANCE) -> windows::core::Result<()> 
 }
 
 enum Action {
-    Create { id: u32, w: u32, h: u32, ssd: bool, title: String, gpu: bool, parent: Option<(HWND, i32, i32)> },
+    Create {
+        id: u32,
+        w: u32,
+        h: u32,
+        ssd: bool,
+        title: String,
+        gpu: bool,
+        parent: Option<(HWND, i32, i32)>,
+    },
     Title(HWND, String),
     Destroy(HWND),
     Show(HWND, SHOW_WINDOW_CMD),
@@ -212,8 +232,12 @@ enum Action {
 
 pub(crate) fn drain_inbox() {
     loop {
-        let Some(inbox) = with_app(|a| a.inbox.clone()) else { return };
-        let Some(msg) = inbox.lock().unwrap().pop_front() else { return };
+        let Some(inbox) = with_app(|a| a.inbox.clone()) else {
+            return;
+        };
+        let Some(msg) = inbox.lock().unwrap().pop_front() else {
+            return;
+        };
         let actions = with_app(|a| handle(a, msg)).unwrap_or_default();
         for act in actions {
             run_action(act);
@@ -227,17 +251,46 @@ fn handle(app: &mut App, msg: HostMsg) -> Vec<Action> {
             eprintln!("bunos-wayland-win: host `{host}` protocol v{version}");
             vec![]
         }
-        HostMsg::ToplevelNew { id, parent, x, y, width, height, ssd, title, app_id } => {
+        HostMsg::ToplevelNew {
+            id,
+            parent,
+            x,
+            y,
+            width,
+            height,
+            ssd,
+            title,
+            app_id,
+        } => {
             let title = if title.is_empty() { app_id } else { title };
             let parent = app.wins.get(&parent).map(|p| (p.hwnd, x, y));
-            vec![Action::Create { id, w: width, h: height, ssd, title, gpu: app.gpu.is_some(), parent }]
+            vec![Action::Create {
+                id,
+                w: width,
+                h: height,
+                ssd,
+                title,
+                gpu: app.gpu.is_some(),
+                parent,
+            }]
         }
         HostMsg::ToplevelMeta { id, title, app_id } => match app.wins.get(&id) {
-            Some(w) => vec![Action::Title(w.hwnd, if title.is_empty() { app_id } else { title })],
+            Some(w) => vec![Action::Title(
+                w.hwnd,
+                if title.is_empty() { app_id } else { title },
+            )],
             None => vec![],
         },
-        HostMsg::ToplevelRequest { id, states, minimize, interactive, edges } => {
-            let Some(w) = app.wins.get(&id) else { return vec![] };
+        HostMsg::ToplevelRequest {
+            id,
+            states,
+            minimize,
+            interactive,
+            edges,
+        } => {
+            let Some(w) = app.wins.get(&id) else {
+                return vec![];
+            };
             let hwnd = w.hwnd;
             let mut out = Vec::new();
             match interactive {
@@ -259,7 +312,11 @@ fn handle(app: &mut App, msg: HostMsg) -> Vec<Action> {
             }
             out
         }
-        HostMsg::ToplevelEffect { id, backdrop, translucent } => {
+        HostMsg::ToplevelEffect {
+            id,
+            backdrop,
+            translucent,
+        } => {
             if let Some(w) = app.wins.get_mut(&id) {
                 w.translucent = translucent;
                 // Acrylic = the client asked for blur behind itself; plain translucency needs --glass.
@@ -277,7 +334,12 @@ fn handle(app: &mut App, msg: HostMsg) -> Vec<Action> {
                         w.surface = None;
                         match g.surface(w.hwnd, w.w, w.h, want_alpha) {
                             Ok(s) => {
-                                let full = [wire::Rect { x: 0, y: 0, w: w.w, h: w.h }];
+                                let full = [wire::Rect {
+                                    x: 0,
+                                    y: 0,
+                                    w: w.w,
+                                    h: w.h,
+                                }];
                                 let _ = g.present(&s, &w.pixels, w.w, &full, false);
                                 w.surface = Some(s);
                             }
@@ -295,7 +357,17 @@ fn handle(app: &mut App, msg: HostMsg) -> Vec<Action> {
             }
             None => vec![],
         },
-        HostMsg::Frame { id, seq, width, height, rects, codec, raw_len, data, .. } => {
+        HostMsg::Frame {
+            id,
+            seq,
+            width,
+            height,
+            rects,
+            codec,
+            raw_len,
+            data,
+            ..
+        } => {
             let started = Instant::now();
             let gpu = app.gpu.as_ref();
             if let Some(w) = app.wins.get_mut(&id) {
@@ -345,7 +417,11 @@ fn handle(app: &mut App, msg: HostMsg) -> Vec<Action> {
                     app.stats.frames as f64 / secs,
                     app.stats.bytes as f64 / secs / 1e6,
                     app.stats.apply.as_secs_f64() * 1e3 / app.stats.frames.max(1) as f64,
-                    if app.gpu.is_some() { "d3d11 flip" } else { "gdi" },
+                    if app.gpu.is_some() {
+                        "d3d11 flip"
+                    } else {
+                        "gdi"
+                    },
                 );
                 app.stats = Stats::default();
             }
@@ -417,12 +493,22 @@ fn apply_chrome(hwnd: HWND, chrome: &bunos_win11_chrome::Chrome, glass: Option<B
             Backdrop::Acrylic => DWMSBT_TRANSIENTWINDOW,
             Backdrop::MicaAlt => DWMSBT_TABBEDWINDOW,
         };
-        let _ = DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &kind as *const _ as *const _, 4);
+        let _ = DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_SYSTEMBACKDROP_TYPE,
+            &kind as *const _ as *const _,
+            4,
+        );
         // The backdrop is drawn under the whole window; translucent client pixels let it through.
         let m = if backdrop == Backdrop::None {
             MARGINS::default()
         } else {
-            MARGINS { cxLeftWidth: -1, cxRightWidth: -1, cyTopHeight: -1, cyBottomHeight: -1 }
+            MARGINS {
+                cxLeftWidth: -1,
+                cxRightWidth: -1,
+                cyTopHeight: -1,
+                cyBottomHeight: -1,
+            }
         };
         let _ = DwmExtendFrameIntoClientArea(hwnd, &m);
     }
@@ -430,7 +516,15 @@ fn apply_chrome(hwnd: HWND, chrome: &bunos_win11_chrome::Chrome, glass: Option<B
 
 fn run_action(act: Action) {
     match act {
-        Action::Create { id, w, h, ssd, title, gpu, parent } => create(id, w, h, ssd, &title, gpu, parent),
+        Action::Create {
+            id,
+            w,
+            h,
+            ssd,
+            title,
+            gpu,
+            parent,
+        } => create(id, w, h, ssd, &title, gpu, parent),
         Action::Title(hwnd, t) => unsafe {
             let _ = SetWindowTextW(hwnd, &HSTRING::from(t));
         },
@@ -464,7 +558,12 @@ fn run_action(act: Action) {
             if wmsz != 0 {
                 unsafe {
                     let _ = ReleaseCapture();
-                    SendMessageW(hwnd, WM_SYSCOMMAND, Some(WPARAM(0xF000 + wmsz)), Some(LPARAM(0)));
+                    SendMessageW(
+                        hwnd,
+                        WM_SYSCOMMAND,
+                        Some(WPARAM(0xF000 + wmsz)),
+                        Some(LPARAM(0)),
+                    );
                 }
                 release_after_modal(hwnd, button);
             }
@@ -481,7 +580,12 @@ fn release_after_modal(hwnd: HWND, button: u32) {
                 w.buttons = 0;
             }
             let t = a.link.now_ms();
-            a.link.send(PresenterMsg::PointerButton { id, button, pressed: false, time_ms: t });
+            a.link.send(PresenterMsg::PointerButton {
+                id,
+                button,
+                pressed: false,
+                time_ms: t,
+            });
         }
     });
 }
@@ -507,14 +611,23 @@ fn set_fullscreen(hwnd: HWND, on: bool) {
         })
     })
     .flatten();
-    let Some((style, rc, entering)) = saved else { return };
+    let Some((style, rc, entering)) = saved else {
+        return;
+    };
     unsafe {
         if entering {
             let mon = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-            let mut mi = MONITORINFO { cbSize: std::mem::size_of::<MONITORINFO>() as u32, ..Default::default() };
+            let mut mi = MONITORINFO {
+                cbSize: std::mem::size_of::<MONITORINFO>() as u32,
+                ..Default::default()
+            };
             let _ = GetMonitorInfoW(mon, &mut mi);
             let r = mi.rcMonitor;
-            SetWindowLongW(hwnd, GWL_STYLE, (style.0 & !(WS_OVERLAPPEDWINDOW.0)) as i32 | WS_POPUP.0 as i32);
+            SetWindowLongW(
+                hwnd,
+                GWL_STYLE,
+                (style.0 & !(WS_OVERLAPPEDWINDOW.0)) as i32 | WS_POPUP.0 as i32,
+            );
             let _ = SetWindowPos(
                 hwnd,
                 Some(HWND_TOP),
@@ -540,10 +653,22 @@ fn set_fullscreen(hwnd: HWND, on: bool) {
     send_configure(hwnd);
 }
 
-fn create(id: u32, w: u32, h: u32, ssd: bool, title: &str, gpu: bool, parent: Option<(HWND, i32, i32)>) {
+fn create(
+    id: u32,
+    w: u32,
+    h: u32,
+    ssd: bool,
+    title: &str,
+    gpu: bool,
+    parent: Option<(HWND, i32, i32)>,
+) {
     let popup = parent.is_some();
     let style = if popup { WS_POPUP } else { WS_OVERLAPPEDWINDOW };
-    let mut ex = if gpu { WS_EX_NOREDIRECTIONBITMAP } else { WINDOW_EX_STYLE(0) };
+    let mut ex = if gpu {
+        WS_EX_NOREDIRECTIONBITMAP
+    } else {
+        WINDOW_EX_STYLE(0)
+    };
     if popup {
         // Menus and tooltips: owned by the parent, never activated, not in Alt+Tab or the taskbar.
         ex |= WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
@@ -560,13 +685,20 @@ fn create(id: u32, w: u32, h: u32, ssd: bool, title: &str, gpu: bool, parent: Op
     };
     let ssd = ssd && !popup;
     let dpi = unsafe { windows::Win32::UI::HiDpi::GetDpiForSystem() };
-    let mut rc = RECT { left: 0, top: 0, right: w as i32, bottom: h as i32 };
+    let mut rc = RECT {
+        left: 0,
+        top: 0,
+        right: w as i32,
+        bottom: h as i32,
+    };
     if ssd {
         unsafe {
             let _ = AdjustWindowRectExForDpi(&mut rc, style, false, ex, dpi);
         }
     }
-    let hinstance = unsafe { windows::Win32::System::LibraryLoader::GetModuleHandleW(None).unwrap_or_default() };
+    let hinstance = unsafe {
+        windows::Win32::System::LibraryLoader::GetModuleHandleW(None).unwrap_or_default()
+    };
     let hwnd = unsafe {
         CreateWindowExW(
             ex,
@@ -591,15 +723,22 @@ fn create(id: u32, w: u32, h: u32, ssd: bool, title: &str, gpu: bool, parent: Op
         }
     };
     with_app(|a| {
-        let surface = a.gpu.as_ref().and_then(|g| match g.surface(hwnd, w, h, false) {
-            Ok(s) => Some(s),
-            Err(e) => {
-                eprintln!("bunos-wayland-win: swap chain: {e}");
-                None
-            }
-        });
+        let surface = a
+            .gpu
+            .as_ref()
+            .and_then(|g| match g.surface(hwnd, w, h, false) {
+                Ok(s) => Some(s),
+                Err(e) => {
+                    eprintln!("bunos-wayland-win: swap chain: {e}");
+                    None
+                }
+            });
         let chrome = if popup {
-            bunos_win11_chrome::Chrome { mica: false, caption: None, ..a.chrome }
+            bunos_win11_chrome::Chrome {
+                mica: false,
+                caption: None,
+                ..a.chrome
+            }
         } else {
             a.chrome
         };
@@ -625,7 +764,15 @@ fn create(id: u32, w: u32, h: u32, ssd: bool, title: &str, gpu: bool, parent: Op
     unsafe {
         if !ssd {
             // Client-side decorations: drop the Win32 caption and borders (WM_NCCALCSIZE), keep DWM shadow/snap.
-            let _ = SetWindowPos(hwnd, None, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
+            let _ = SetWindowPos(
+                hwnd,
+                None,
+                0,
+                0,
+                0,
+                0,
+                SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER,
+            );
         }
         if popup {
             let _ = ShowWindow(hwnd, SW_SHOWNOACTIVATE);
@@ -644,15 +791,24 @@ fn send_configure(hwnd: HWND) {
     unsafe {
         let _ = GetClientRect(hwnd, &mut rc);
     }
-    let (cw, ch) = ((rc.right - rc.left).max(0) as u32, (rc.bottom - rc.top).max(0) as u32);
+    let (cw, ch) = (
+        (rc.right - rc.left).max(0) as u32,
+        (rc.bottom - rc.top).max(0) as u32,
+    );
     if cw == 0 || ch == 0 {
         return;
     }
     let zoomed = unsafe { IsZoomed(hwnd).as_bool() };
     let active = unsafe { GetForegroundWindow() } == hwnd;
     with_app(|a| {
-        let Some(&id) = a.by_hwnd.get(&(hwnd.0 as isize)) else { return };
-        let full = a.wins.get(&id).map(|w| w.fullscreen.is_some()).unwrap_or(false);
+        let Some(&id) = a.by_hwnd.get(&(hwnd.0 as isize)) else {
+            return;
+        };
+        let full = a
+            .wins
+            .get(&id)
+            .map(|w| w.fullscreen.is_some())
+            .unwrap_or(false);
         let mut states = 0;
         if active {
             states |= wire::STATE_ACTIVATED;
@@ -663,7 +819,12 @@ fn send_configure(hwnd: HWND) {
         if full {
             states |= wire::STATE_FULLSCREEN;
         }
-        a.link.send(PresenterMsg::Configure { id, width: cw, height: ch, states });
+        a.link.send(PresenterMsg::Configure {
+            id,
+            width: cw,
+            height: ch,
+            states,
+        });
     });
 }
 
@@ -674,7 +835,9 @@ fn lparam_xy(l: LPARAM) -> (f64, f64) {
 }
 
 fn send_key(scancode: u32, extended: bool, pressed: bool) {
-    let Some(code) = keys::scancode_to_evdev(scancode, extended) else { return };
+    let Some(code) = keys::scancode_to_evdev(scancode, extended) else {
+        return;
+    };
     with_app(|a| {
         if pressed {
             a.keys_down.insert(code);
@@ -682,7 +845,11 @@ fn send_key(scancode: u32, extended: bool, pressed: bool) {
             return;
         }
         let t = a.link.now_ms();
-        a.link.send(PresenterMsg::Key { keycode: code, pressed, time_ms: t });
+        a.link.send(PresenterMsg::Key {
+            keycode: code,
+            pressed,
+            time_ms: t,
+        });
     });
 }
 
@@ -740,11 +907,17 @@ fn is_fake_altgr_ctrl(scancode: u32, extended: bool) -> bool {
 
 unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     let id = with_app(|a| a.by_hwnd.get(&(hwnd.0 as isize)).copied()).flatten();
-    let Some(id) = id else { return unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) } };
+    let Some(id) = id else {
+        return unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) };
+    };
     match msg {
         WM_NCCALCSIZE if wparam.0 != 0 => {
-            let ssd = with_app(|a| a.wins.get(&id).map(|w| w.ssd)).flatten().unwrap_or(true);
-            let full = with_app(|a| a.wins.get(&id).map(|w| w.fullscreen.is_some())).flatten().unwrap_or(false);
+            let ssd = with_app(|a| a.wins.get(&id).map(|w| w.ssd))
+                .flatten()
+                .unwrap_or(true);
+            let full = with_app(|a| a.wins.get(&id).map(|w| w.fullscreen.is_some()))
+                .flatten()
+                .unwrap_or(false);
             if ssd && !full {
                 return unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) };
             }
@@ -844,7 +1017,12 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             let (x, y) = lparam_xy(lparam);
             let start_tracking = with_app(|a| {
                 let t = a.link.now_ms();
-                a.link.send(PresenterMsg::PointerMotion { id, x, y, time_ms: t });
+                a.link.send(PresenterMsg::PointerMotion {
+                    id,
+                    x,
+                    y,
+                    time_ms: t,
+                });
                 let w = a.wins.get_mut(&id)?;
                 let s = !w.tracking;
                 w.tracking = true;
@@ -874,8 +1052,8 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             });
             LRESULT(0)
         }
-        WM_LBUTTONDOWN | WM_LBUTTONUP | WM_RBUTTONDOWN | WM_RBUTTONUP | WM_MBUTTONDOWN | WM_MBUTTONUP
-        | WM_XBUTTONDOWN | WM_XBUTTONUP => {
+        WM_LBUTTONDOWN | WM_LBUTTONUP | WM_RBUTTONDOWN | WM_RBUTTONUP | WM_MBUTTONDOWN
+        | WM_MBUTTONUP | WM_XBUTTONDOWN | WM_XBUTTONUP => {
             let (button, pressed) = match msg {
                 WM_LBUTTONDOWN => (keys::BTN_LEFT, true),
                 WM_LBUTTONUP => (keys::BTN_LEFT, false),
@@ -885,15 +1063,32 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
                 WM_MBUTTONUP => (keys::BTN_MIDDLE, false),
                 _ => {
                     let x = ((wparam.0 >> 16) & 0xffff) as u16;
-                    (if x == 1 { keys::BTN_SIDE } else { keys::BTN_EXTRA }, msg == WM_XBUTTONDOWN)
+                    (
+                        if x == 1 {
+                            keys::BTN_SIDE
+                        } else {
+                            keys::BTN_EXTRA
+                        },
+                        msg == WM_XBUTTONDOWN,
+                    )
                 }
             };
             let (x, y) = lparam_xy(lparam);
             let held = with_app(|a| {
                 let t = a.link.now_ms();
                 // Position first: the client must know where the click happened.
-                a.link.send(PresenterMsg::PointerMotion { id, x, y, time_ms: t });
-                a.link.send(PresenterMsg::PointerButton { id, button, pressed, time_ms: t });
+                a.link.send(PresenterMsg::PointerMotion {
+                    id,
+                    x,
+                    y,
+                    time_ms: t,
+                });
+                a.link.send(PresenterMsg::PointerButton {
+                    id,
+                    button,
+                    pressed,
+                    time_ms: t,
+                });
                 let w = a.wins.get_mut(&id)?;
                 let bit = 1 << (button - keys::BTN_LEFT);
                 if pressed {
@@ -912,7 +1107,11 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
                     let _ = ReleaseCapture();
                 }
             }
-            if msg == WM_XBUTTONDOWN || msg == WM_XBUTTONUP { LRESULT(1) } else { LRESULT(0) }
+            if msg == WM_XBUTTONDOWN || msg == WM_XBUTTONUP {
+                LRESULT(1)
+            } else {
+                LRESULT(0)
+            }
         }
         WM_MOUSEWHEEL | WM_MOUSEHWHEEL => {
             let delta = ((wparam.0 >> 16) & 0xffff) as i16 as i32;
@@ -920,9 +1119,23 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
                 let t = a.link.now_ms();
                 let m = if msg == WM_MOUSEWHEEL {
                     // Windows: positive = away from the user (up); Wayland: positive = down.
-                    PresenterMsg::PointerAxis { id, dx: 0.0, dy: -delta as f64 * 15.0 / 120.0, v120_x: 0, v120_y: -delta, time_ms: t }
+                    PresenterMsg::PointerAxis {
+                        id,
+                        dx: 0.0,
+                        dy: -delta as f64 * 15.0 / 120.0,
+                        v120_x: 0,
+                        v120_y: -delta,
+                        time_ms: t,
+                    }
                 } else {
-                    PresenterMsg::PointerAxis { id, dx: delta as f64 * 15.0 / 120.0, dy: 0.0, v120_x: delta, v120_y: 0, time_ms: t }
+                    PresenterMsg::PointerAxis {
+                        id,
+                        dx: delta as f64 * 15.0 / 120.0,
+                        dy: 0.0,
+                        v120_x: delta,
+                        v120_y: 0,
+                        time_ms: t,
+                    }
                 };
                 a.link.send(m);
             });
@@ -945,7 +1158,9 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
                 return LRESULT(0);
             }
             if vk == VK_F11.0 && pressed && !repeat {
-                let full = with_app(|a| a.wins.get(&id).map(|w| w.fullscreen.is_some())).flatten().unwrap_or(false);
+                let full = with_app(|a| a.wins.get(&id).map(|w| w.fullscreen.is_some()))
+                    .flatten()
+                    .unwrap_or(false);
                 set_fullscreen(hwnd, !full);
                 return LRESULT(0);
             }
@@ -972,7 +1187,11 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
                 if !focused {
                     let t = a.link.now_ms();
                     for code in a.keys_down.drain() {
-                        a.link.send(PresenterMsg::Key { keycode: code, pressed: false, time_ms: t });
+                        a.link.send(PresenterMsg::Key {
+                            keycode: code,
+                            pressed: false,
+                            time_ms: t,
+                        });
                     }
                 }
                 a.link.send(PresenterMsg::Focus { id, focused });

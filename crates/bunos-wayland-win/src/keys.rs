@@ -10,13 +10,13 @@ pub fn scancode_to_evdev(scancode: u32, extended: bool) -> Option<u32> {
         return match scancode {
             0x01..=0x58 => Some(scancode),
             0x64..=0x6e => Some(scancode - 0x64 + 183), // F13..F23
-            0x70 => Some(93),  // KEY_KATAKANAHIRAGANA
-            0x73 => Some(89),  // KEY_RO
-            0x76 => Some(194), // F24
-            0x79 => Some(92),  // KEY_HENKAN
-            0x7b => Some(94),  // KEY_MUHENKAN
-            0x7d => Some(124), // KEY_YEN
-            0x7e => Some(121), // KEY_KPCOMMA
+            0x70 => Some(93),                           // KEY_KATAKANAHIRAGANA
+            0x73 => Some(89),                           // KEY_RO
+            0x76 => Some(194),                          // F24
+            0x79 => Some(92),                           // KEY_HENKAN
+            0x7b => Some(94),                           // KEY_MUHENKAN
+            0x7d => Some(124),                          // KEY_YEN
+            0x7e => Some(121),                          // KEY_KPCOMMA
             _ => None,
         };
     }
@@ -57,33 +57,33 @@ pub fn scancode_to_evdev(scancode: u32, extended: bool) -> Option<u32> {
 /// Windows primary language / sublanguage (the low word of an HKL) to (XKB layout, variant).
 pub fn langid_to_xkb(langid: u16) -> (&'static str, &'static str) {
     match langid {
-        0x040c => ("fr", ""),       // French (France), AZERTY
-        0x080c => ("be", ""),       // French (Belgium)
-        0x0c0c => ("ca", "fr"),     // French (Canada)
-        0x100c => ("ch", "fr"),     // French (Switzerland)
-        0x140c => ("fr", ""),       // French (Luxembourg)
-        0x0407 => ("de", ""),       // German
-        0x0807 => ("ch", ""),       // German (Switzerland)
-        0x0c07 => ("at", ""),       // German (Austria)
-        0x0409 => ("us", ""),       // English (US)
-        0x0809 => ("gb", ""),       // English (UK)
-        0x1009 => ("ca", ""),       // English (Canada)
-        0x0410 => ("it", ""),       // Italian
+        0x040c => ("fr", ""),          // French (France), AZERTY
+        0x080c => ("be", ""),          // French (Belgium)
+        0x0c0c => ("ca", "fr"),        // French (Canada)
+        0x100c => ("ch", "fr"),        // French (Switzerland)
+        0x140c => ("fr", ""),          // French (Luxembourg)
+        0x0407 => ("de", ""),          // German
+        0x0807 => ("ch", ""),          // German (Switzerland)
+        0x0c07 => ("at", ""),          // German (Austria)
+        0x0409 => ("us", ""),          // English (US)
+        0x0809 => ("gb", ""),          // English (UK)
+        0x1009 => ("ca", ""),          // English (Canada)
+        0x0410 => ("it", ""),          // Italian
         0x040a | 0x0c0a => ("es", ""), // Spanish
-        0x080a => ("latam", ""),    // Spanish (Mexico)
-        0x0816 => ("pt", ""),       // Portuguese
-        0x0416 => ("br", ""),       // Portuguese (Brazil)
-        0x0413 => ("nl", ""),       // Dutch
-        0x0419 => ("ru", ""),       // Russian
-        0x0411 => ("jp", ""),       // Japanese
-        0x0412 => ("kr", ""),       // Korean
-        0x0415 => ("pl", ""),       // Polish
-        0x041d => ("se", ""),       // Swedish
-        0x0414 => ("no", ""),       // Norwegian
-        0x0406 => ("dk", ""),       // Danish
-        0x040b => ("fi", ""),       // Finnish
-        0x0405 => ("cz", ""),       // Czech
-        0x041f => ("tr", ""),       // Turkish
+        0x080a => ("latam", ""),       // Spanish (Mexico)
+        0x0816 => ("pt", ""),          // Portuguese
+        0x0416 => ("br", ""),          // Portuguese (Brazil)
+        0x0413 => ("nl", ""),          // Dutch
+        0x0419 => ("ru", ""),          // Russian
+        0x0411 => ("jp", ""),          // Japanese
+        0x0412 => ("kr", ""),          // Korean
+        0x0415 => ("pl", ""),          // Polish
+        0x041d => ("se", ""),          // Swedish
+        0x0414 => ("no", ""),          // Norwegian
+        0x0406 => ("dk", ""),          // Danish
+        0x040b => ("fi", ""),          // Finnish
+        0x0405 => ("cz", ""),          // Czech
+        0x041f => ("tr", ""),          // Turkish
         _ => ("us", ""),
     }
 }

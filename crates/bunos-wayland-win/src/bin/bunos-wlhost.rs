@@ -10,6 +10,8 @@ fn main() {
 
 #[cfg(not(target_os = "linux"))]
 fn main() {
-    eprintln!("bunos-wlhost runs on Linux (the WSL distro, a VM or a remote host); on Windows run bunos-wayland-win");
+    eprintln!(
+        "bunos-wlhost runs on Linux (the WSL distro, a VM or a remote host); on Windows run bunos-wayland-win"
+    );
     std::process::exit(64);
 }

@@ -30,12 +30,15 @@ use windows::{
         Foundation::{HWND, LPARAM, LRESULT, WPARAM},
         System::LibraryLoader::GetModuleHandleW,
         UI::{
-            HiDpi::{DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, GetDpiForSystem, SetProcessDpiAwarenessContext},
+            HiDpi::{
+                DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, GetDpiForSystem,
+                SetProcessDpiAwarenessContext,
+            },
             Input::KeyboardAndMouse::GetKeyboardLayout,
             WindowsAndMessaging::{
-                CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetSystemMetrics, HWND_MESSAGE, MSG,
-                PostMessageW, PostQuitMessage, RegisterClassExW, SM_CXSCREEN, SM_CYSCREEN, TranslateMessage,
-                WINDOW_EX_STYLE, WINDOW_STYLE, WM_APP, WNDCLASSEXW,
+                CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetSystemMetrics,
+                HWND_MESSAGE, MSG, PostMessageW, PostQuitMessage, RegisterClassExW, SM_CXSCREEN,
+                SM_CYSCREEN, TranslateMessage, WINDOW_EX_STYLE, WINDOW_STYLE, WM_APP, WNDCLASSEXW,
             },
         },
     },
@@ -81,8 +84,12 @@ impl Link {
 
 fn find_ssh() -> String {
     for p in [
-        std::env::var("ProgramFiles").map(|p| format!("{p}\\OpenSSH\\ssh.exe")).unwrap_or_default(),
-        std::env::var("SystemRoot").map(|p| format!("{p}\\System32\\OpenSSH\\ssh.exe")).unwrap_or_default(),
+        std::env::var("ProgramFiles")
+            .map(|p| format!("{p}\\OpenSSH\\ssh.exe"))
+            .unwrap_or_default(),
+        std::env::var("SystemRoot")
+            .map(|p| format!("{p}\\System32\\OpenSSH\\ssh.exe"))
+            .unwrap_or_default(),
     ] {
         if !p.is_empty() && std::path::Path::new(&p).exists() {
             return p;
@@ -114,7 +121,14 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
     let mut transport: Option<Vec<String>> = None;
     let mut host_bin = "bunos-wlhost".to_string();
     let mut app: Vec<String> = Vec::new();
-    let mut opts = Options { backdrop: Backdrop::Mica, glass: false, desktop: false, gdi: false, vsync: false, stats: false };
+    let mut opts = Options {
+        backdrop: Backdrop::Mica,
+        glass: false,
+        desktop: false,
+        gdi: false,
+        vsync: false,
+        stats: false,
+    };
     let mut host_stats = false;
     let mut host_extra: Vec<String> = Vec::new();
     let mut kind = "wsl";
@@ -134,7 +148,13 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
             }
             "--command" => {
                 kind = "command";
-                transport = Some(it.next().ok_or("--command needs a program")?.split_whitespace().map(String::from).collect());
+                transport = Some(
+                    it.next()
+                        .ok_or("--command needs a program")?
+                        .split_whitespace()
+                        .map(String::from)
+                        .collect(),
+                );
             }
             "--host-bin" => host_bin = it.next().ok_or("--host-bin needs a path")?,
             "--host-arg" => host_extra.push(it.next().ok_or("--host-arg needs a value")?),
@@ -184,9 +204,23 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
     let mut wsl_env: Option<String> = None;
     let argv: Vec<String> = match kind {
         "ssh" => {
-            let mut v = vec![find_ssh(), "-T".into(), "-o".into(), "Compression=no".into(), "-o".into(), "BatchMode=yes".into(), target];
+            let mut v = vec![
+                find_ssh(),
+                "-T".into(),
+                "-o".into(),
+                "Compression=no".into(),
+                "-o".into(),
+                "BatchMode=yes".into(),
+                target,
+            ];
             // One remote command line; the remote shell splits it.
-            v.push(host_args.iter().map(|a| shell_quote(a)).collect::<Vec<_>>().join(" "));
+            v.push(
+                host_args
+                    .iter()
+                    .map(|a| shell_quote(a))
+                    .collect::<Vec<_>>()
+                    .join(" "),
+            );
             v
         }
         "wsl" => {
@@ -194,7 +228,15 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
             // variable forwarded by WSLENV, so app command lines arrive byte-exact.
             let bin = host_args.remove(0);
             wsl_env = Some(crate::wire::hex_args(&host_args));
-            vec!["wsl.exe".into(), "-d".into(), target, "--exec".into(), bin, "--args-env".into(), "BUNOS_WLHOST_ARGS".into()]
+            vec![
+                "wsl.exe".into(),
+                "-d".into(),
+                target,
+                "--exec".into(),
+                bin,
+                "--args-env".into(),
+                "BUNOS_WLHOST_ARGS".into(),
+            ]
         }
         _ => transport.unwrap_or_default(),
     };
@@ -206,8 +248,14 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
     cmd.args(&argv[1..]);
     if let Some(v) = &wsl_env {
         let wslenv = std::env::var("WSLENV").unwrap_or_default();
-        cmd.env("BUNOS_WLHOST_ARGS", v)
-            .env("WSLENV", if wslenv.is_empty() { "BUNOS_WLHOST_ARGS".to_string() } else { format!("{wslenv}:BUNOS_WLHOST_ARGS") });
+        cmd.env("BUNOS_WLHOST_ARGS", v).env(
+            "WSLENV",
+            if wslenv.is_empty() {
+                "BUNOS_WLHOST_ARGS".to_string()
+            } else {
+                format!("{wslenv}:BUNOS_WLHOST_ARGS")
+            },
+        );
     }
     let mut child: Child = cmd
         .stdin(Stdio::piped())
@@ -301,7 +349,10 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
         });
     }
 
-    let link = Link { tx, started: Instant::now() };
+    let link = Link {
+        tx,
+        started: Instant::now(),
+    };
     let hkl = unsafe { GetKeyboardLayout(0) };
     let (layout, variant) = keys::langid_to_xkb((hkl.0 as usize & 0xffff) as u16);
     let (layout, variant) = (
@@ -334,7 +385,10 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn shell_quote(s: &str) -> String {
-    if !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric() || "-_./=:,+@%~".contains(c)) {
+    if !s.is_empty()
+        && s.chars()
+            .all(|c| c.is_ascii_alphanumeric() || "-_./=:,+@%~".contains(c))
+    {
         // `~` stays unquoted so the remote shell expands it.
         s.to_string()
     } else {
@@ -342,7 +396,12 @@ fn shell_quote(s: &str) -> String {
     }
 }
 
-unsafe extern "system" fn pump_proc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+unsafe extern "system" fn pump_proc(
+    hwnd: HWND,
+    msg: u32,
+    wparam: WPARAM,
+    lparam: LPARAM,
+) -> LRESULT {
     match msg {
         WM_HOST => {
             window::drain_inbox();
