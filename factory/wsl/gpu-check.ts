@@ -154,14 +154,15 @@ const glRun = async (env: Record<string, string>) => {
 };
 const vk = await run(["vulkaninfo", "--summary"]);
 const vkmark = await run(["vkmark", "--winsys", "headless", "-b", "vertex:duration=3", "-b", "texture:duration=3", "-b", "shading:duration=3"]);
-const cl = await run(["clinfo", "-l"]);
+// The same default bunos-opencl-mesa ships in profile.d and environment.d.
+const cl = await run(["clinfo", "-l"], { RUSTICL_ENABLE: Bun.env.RUSTICL_ENABLE ?? "d3d12,llvmpipe" });
 const va = await run(["vainfo", "--display", "drm", "--device", "/dev/dri/renderD128"]);
 const pkgs = await run(["pacman", "-Q", "mesa", "bunos-mesa", "vulkan-dzn", "bunos-vulkan-dzn", "bunos-opencl-mesa"]);
 
 console.log(
   JSON.stringify(
     {
-      packages: pick(pkgs.out, /^(\S+ \S+)$/gm),
+      packages: [...new Set(pick(pkgs.out, /^(\S+ \S+)$/gm))],
       gl: { d3d12: await glRun({}), llvmpipe: await glRun({ LIBGL_ALWAYS_SOFTWARE: "1" }) },
       vulkan: {
         devices: pick(vk.out, /deviceName\s*=\s*(.+)/g),

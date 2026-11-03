@@ -2,15 +2,16 @@
 # Mesa for Bun OS on WSL, built from the Bun OS fork (aphrody-labs/mesa, branch bunos/26.3, a mirror of
 # gitlab.freedesktop.org/mesa/mesa) with DirectX-Headers from aphrody-labs/DirectX-Headers. The GPU path on WSL is
 # D3D12 over /dev/dxg: OpenGL/GLES/EGL/GBM through the d3d12 gallium driver, Vulkan through dzn
-# (microsoft-experimental), VA-API through d3d12 video. llvmpipe/lavapipe stay as the software fallback, zink for
-# GL-on-Vulkan, rusticl for OpenCL (d3d12/zink/llvmpipe selected by RUSTICL_ENABLE). Layout and package split follow Arch's mesa PKGBUILD (packaging/packages/mesa, MIT notices kept).
+# (microsoft-experimental), VA-API through d3d12 video. llvmpipe/lavapipe are the software fallback, zink is
+# GL-on-Vulkan, virgl + Venus (virtio) are the vtest clients that check the Waydroid bridge, rusticl is OpenCL
+# (RUSTICL_ENABLE). Layout and package split follow Arch mesa PKGBUILD (packaging/packages/mesa, MIT notices kept).
 pkgbase=bunos-mesa
 pkgname=(bunos-mesa bunos-vulkan-dzn bunos-vulkan-swrast bunos-opencl-mesa)
 pkgver=26.3.0rc3
 _tag=mesa-26.3.0-rc3
 _commit=90a959ebba9dbb36f2ea5176091c15d6ebdd0af0
 _dxh=6064ae312901a77e8700e84a2341470d050fcbca # v1.721.2
-pkgrel=1
+pkgrel=2
 # The Arch and CachyOS mesa packages carry epochs 1 and 3; provides use the highest so versioned dependents resolve.
 _epoch=3
 pkgdesc='Mesa 3D for Bun OS on WSL: d3d12 (OpenGL/GLES/EGL/GBM/VA-API over DirectX 12), llvmpipe, zink (Bun OS fork)'
@@ -44,9 +45,10 @@ build() {
   local meson_options=(
     --optimization 2
     --force-fallback-for=DirectX-Headers
+    --wrap-mode=default
     -D b_ndebug=true
     -D platforms=x11,wayland
-    -D gallium-drivers=d3d12,llvmpipe,softpipe,zink
+    -D gallium-drivers=d3d12,llvmpipe,softpipe,zink,virgl
     -D gallium-va=enabled
     -D gallium-d3d12-video=enabled
     -D gallium-d3d12-graphics=enabled
@@ -54,7 +56,7 @@ build() {
     -D gallium-rusticl-enable-drivers=
     -D gallium-mediafoundation=disabled
     -D video-codecs=all
-    -D vulkan-drivers=microsoft-experimental,swrast
+    -D vulkan-drivers=microsoft-experimental,swrast,virtio
     -D vulkan-layers=
     -D vulkan-manifest-per-architecture=false
     -D microsoft-clc=disabled
@@ -97,8 +99,8 @@ package_bunos-mesa() {
   depends=(expat glibc libdisplay-info libdrm libelf libgcc libglvnd libstdc++ libva libx11 libxcb libxext libxshmfence libxxf86vm
            llvm-libs lm_sensors spirv-tools wayland zlib zstd)
   provides=("mesa=${_epoch}:${pkgver}" "libva-mesa-driver=${_epoch}:${pkgver}" "mesa-libgl=${_epoch}:${pkgver}"
-            libva-driver opengl-driver)
-  conflicts=(mesa libva-mesa-driver mesa-libgl)
+            "vulkan-virtio=${_epoch}:${pkgver}" libva-driver opengl-driver)
+  conflicts=(mesa libva-mesa-driver mesa-libgl vulkan-virtio)
 
   meson install -C "$srcdir/build" --destdir "$pkgdir" --no-rebuild
   (

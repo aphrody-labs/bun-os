@@ -332,6 +332,68 @@ noise-dominated. Other numbers:
 | `bunos apk install F-Droid.apk` with Android already booted | 15.5 s (install, dexopt, launch) |
 | Android boot (session start to launcher displayed) | about 24 s |
 
+### DirectX 12: Mesa d3d12, Dozen, VA-API, OpenCL
+
+The GPU path is DirectX 12 over `/dev/dxg`: Mesa's `d3d12` gallium driver loads Microsoft's `libd3d12.so`/`libdxcore.so`
+from `/usr/lib/wsl/lib`. The packages are built from our forks, not taken from Arch or CachyOS:
+
+| Package (bunos-testing) | Content |
+|---|---|
+| `bunos-mesa` | `aphrody-labs/mesa` branch `bunos/26.3` (= `mesa-26.3.0-rc3`, `90a959e`) with `aphrody-labs/DirectX-Headers` `v1.721.2` as the meson fallback; gallium `d3d12,llvmpipe,softpipe,zink,virgl`, VA-API through d3d12 video (`-Dvideo-codecs=all`), GBM, EGL, GLX. Provides and conflicts with `mesa` |
+| `bunos-vulkan-dzn` | Dozen (`microsoft-experimental`): Vulkan 1.2 over D3D12, plus `spirv2dxil` |
+| `bunos-vulkan-swrast` | lavapipe, the CPU Vulkan fallback |
+| `bunos-opencl-mesa` | rusticl, with `RUSTICL_ENABLE=d3d12,llvmpipe` in `profile.d` and `environment.d` |
+| `bunos-virglrenderer` | `aphrody-labs/virglrenderer` 1.3.0 with `bunos-vtest@<user>.service` (the Waydroid bridge, below) |
+
+`aphrody-labs/mesa` mirrors `gitlab.freedesktop.org/mesa/mesa` (`main`, `26.2`, `26.3` and 713 release tags); the former
+OpenGamingCollective patch fork under that name is now `aphrody-labs/mesa-ogc-patches`. The `vendor/wayland/mesa` and both
+DirectX-Headers submodules point at the forks. The VPS builds the packages with `factory/wsl/build-gpu.sh`: a clean
+`archlinux:base-devel` container in `build.slice`. `GPU_LOCK`/`GPU_JOBS` run it as a second lane beside the heavy queue,
+and the container is frozen with `docker pause` when the host has under 6 GiB available.
+`bun factory/wsl/gpu-check.ts` checks a distro without any display: GLES 3 on a surfaceless EGL context through `bun:ffi`,
+drawing a 64-iteration fragment shader into a 1920x1080 offscreen framebuffer (d3d12, then `LIBGL_ALWAYS_SOFTWARE=1`),
+plus `vulkaninfo`, `vkmark --winsys headless`, `clinfo` and `vainfo`. The output is one JSON report.
+
+RTX 4070 measurements, taken on 2026-11-03 on the shared workstation while other agents' builds were running:
+
+| | Before: CachyOS `mesa`/`vulkan-dzn` 26.2.5 | After: `bunos-mesa` 26.3.0-rc3 |
+|---|---|---|
+| GL renderer | `D3D12 (NVIDIA GeForce RTX 4070)`, OpenGL ES 3.1 | same, `Mesa 26.3.0-rc3-bunos.1` |
+| GLES fill benchmark, d3d12 | 2510-2630 fps (5.2-5.5 Gpixel/s) | 3492-3856 fps (7.2-8.0 Gpixel/s) |
+| same, llvmpipe (CPU) | 15.9-19.9 fps | 26.0-26.4 fps |
+| vkmark headless (Dozen, `Microsoft Direct3D12 (NVIDIA GeForce RTX 4070)`, Vulkan 1.2) | 1355-1785 | 1785-1912 |
+| VA-API (`vainfo`, d3d12) | 15 profile/entrypoint pairs incl. AV1/VP9/HEVC decode and encode | same 15, `Mesa Gallium driver 26.3.0-rc3-bunos.1 for D3D12` |
+| OpenCL | no Mesa platform | rusticl: `llvmpipe` only |
+
+d3d12 GL is about 1.4x faster with 26.3; the Dozen gain is within noise. OpenCL on the GPU is not available through Mesa:
+rusticl does not expose `d3d12`, and `RUSTICL_ENABLE=zink` over Dozen fails with `ZINK: failed to choose pdev`.
+GPU compute on WSL stays with CUDA (`libcuda.so` from `/usr/lib/wsl/lib`). `glxinfo`/`eglinfo` on WSLg's X11 and Wayland
+sockets hung during the whole run (WSLg's compositor and the system distro stopped answering). That is why the check
+never needs a display. A WSL restart, which would end other agents' sessions, was not done.
+
+### Waydroid on the GPU
+
+Android cannot use Mesa d3d12 directly. The Waydroid vendor image's Mesa 26.0.8 (`libgallium_dri.so`) has no `d3d12`
+driver: it references neither `libd3d12.so` nor `D3D12CreateDevice`. Android (bionic) also cannot load Microsoft's glibc
+`libd3d12`/`libdxcore`, and WSL's only DRM node is `vgem`. The image does carry virgl's `virpipe` and Venus with the
+vtest transport. Mesa on Android reads its options from properties (`GALLIUM_DRIVER` becomes `mesa.gallium.driver`), so
+API forwarding needs no Android rebuild. `bunos-vtest@bun.service` runs `virgl_test_server --use-egl-surfaceless
+--use-gles` on the host Mesa d3d12, with its socket inside the Waydroid `/data` mount
+(`~/.local/share/waydroid/data/vtest/virgl.sock`). The Waydroid properties for the test were
+`ro.hardware.egl=mesa`, `mesa.libgl.always.software=true`, `mesa.gallium.driver=virpipe` and
+`mesa.vtest.socket.name=/data/vtest/virgl.sock`.
+
+Result: Android GLES runs on the RTX 4070. SurfaceFlinger's RenderEngine reports
+`renderer: virgl (D3D12 (NVIDIA GeForce RTX 4070))`, `OpenGL ES 3.1 Mesa 26.0.8`. Android does not boot on it, though.
+SurfaceFlinger aborts at its first composition with `Unable to generate SkSurface. isTextureValid:0`, both in
+`primeShaderCache` and at runtime once `service.sf.prime_shader_cache=0` is set. Android's EGL on a software-winsys
+driver (virpipe) cannot import gralloc buffers as GL textures or render targets (EGLImage from `AHardwareBuffer`),
+and composition needs that. The run used a private headless Weston because WSLg was not answering; with
+`multi_windows=true` the Waydroid hwcomposer also stalled in `window::create` against it.
+The Waydroid configuration was restored to the software path, the unit is shipped disabled, and Android still renders on
+the CPU. Closing the gap means changing the Android side of Mesa in the Waydroid vendor image: virgl with a
+host-visible gralloc (minigbm on vtest resources) or Venus with `AHardwareBuffer` import. Both are listed under Open.
+
 ### Undo
 
 ```sh
@@ -347,6 +409,11 @@ no optional feature, boot setting, driver or other distro.
 ### Open
 
 - The distro image does not carry Docker/Waydroid yet; `--native` provisions them on first install (needs network).
-- Android renders in software (ANGLE on a software Vulkan device); a d3d12 path for Android gralloc does not exist.
+- Android renders in software. The vtest bridge puts Android GLES on the GPU (`virgl (D3D12 ...)`), but SurfaceFlinger
+  cannot texture gralloc buffers through virpipe ("Waydroid on the GPU"). The next step is a Waydroid vendor image whose
+  Mesa imports gralloc buffers on vtest (minigbm on vtest resources, or Venus with `AHardwareBuffer`).
+- GPU OpenCL through Mesa: rusticl has no d3d12 device and zink does not start on Dozen.
+- The distro image still installs CachyOS `mesa`/`vulkan-dzn` (`packages.base`); switch it to `bunos-mesa` once
+  bunos-testing is in the image's pacman.conf.
 - `bunos.sys` is not loaded on this workstation (Secure Boot locks test signing; factory/windows/signing/README.md).
 - Quiet-host after-numbers for `wsl.exe` start and Docker runs: rerun `latency.ts --docker` when no build is running.
