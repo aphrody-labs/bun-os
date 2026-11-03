@@ -10,6 +10,7 @@
 import { mkdirSync, rmSync } from "node:fs";
 import { isAbsolute, join, resolve } from "node:path";
 import { serve } from "./serve.ts";
+import { decodeScreenshotPng } from "./png.ts";
 import {
   createQualificationSnapshot,
   qualificationSHA256,
@@ -315,7 +316,7 @@ export async function smoke(
       await Bun.write(shotPath, png);
       let presentation;
       if (renderer === "gpu") {
-        const pixels = await new Bun.Image(png).rgba();
+        const pixels = decodeScreenshotPng(png);
         let lit = false;
         for (let i = 0; i < pixels.data.length; i += 4)
           if (pixels.data[i]! > 16 || pixels.data[i + 1]! > 16 || pixels.data[i + 2]! > 16) {
