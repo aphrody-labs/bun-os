@@ -21,6 +21,14 @@ import { renderStatus } from "./status.ts";
 
 const bun = process.execPath;
 
+/** Read the immutable image produced by this job, never the mutable session tag. */
+export async function sessionImageReceipt(remote: string): Promise<string> {
+  const value = await Bun.file(join(remote, "out", "bunos-unified-session.iid"))
+    .text()
+    .catch(() => "");
+  return value.trim();
+}
+
 /** `bun factory image build bunos-unified --target session`, then wait for the job's status file to say done. */
 export async function imageBuild() {
   const started = await run([bun, "factory/images/build.ts", "build", "bunos-unified", "--target", "session"], {
@@ -44,6 +52,7 @@ export async function imageBuild() {
         ok,
         detail: `${job.job}: ${ok ? "bunos-unified:session built" : status.split("\n").find(l => /failed|missing|mismatch/.test(l))}`,
         job: job.job,
+        imageId: ok && job.remote ? await sessionImageReceipt(job.remote) : "",
       };
     }
     await Bun.sleep(30_000);

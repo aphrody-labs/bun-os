@@ -394,7 +394,7 @@ function remoteScript(name: string, image: ImageSpec, targets: string[], args: R
         ? ` && { ${base} --output type=tar,dest=out/${name}-${target}-rootfs.tar && zstd -T4 -19 --long --rm -f out/${name}-${target}-rootfs.tar && echo "${name}-${target}-rootfs.tar.zst ok" >>status || echo "${name}-${target}-rootfs failed" >>status; }`
         : "";
     lines.push(
-      `${base} --output type=image,name=docker.io/library/${tag},compression=zstd,compression-level=${compressionLevel},force-compression=true,oci-mediatypes=true && echo "${tag} ok" >>status${rootfs} || echo "${tag} failed" >>status`,
+      `${base}${name === "bunos-unified" && target === "session" ? ` --iidfile out/${name}-${target}.iid` : ""} --output type=image,name=docker.io/library/${tag},compression=zstd,compression-level=${compressionLevel},force-compression=true,oci-mediatypes=true && echo "${tag} ok" >>status${rootfs} || echo "${tag} failed" >>status`,
     );
   }
   lines.push(
@@ -426,7 +426,7 @@ async function build(
       throw new Error(`${name}:${target} is blocked: ${image.blockedTargets[target]}`);
   const extra = await generated(name, desktopSession);
   const args = { ...buildArgs(name), ...extra.args };
-  const job = `${name}-${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}`;
+  const job = `${name}-${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}-${crypto.randomUUID()}`;
   const remote = `${manifest.remoteRoot}/${job}`;
   const stage = await mkdtemp(join(tmpdir(), "bun-os-image-"));
   try {

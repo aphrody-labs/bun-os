@@ -54,6 +54,7 @@ export async function wordcraftImage(): Promise<void> {
   if (!version) throw new Error("WordCraft version is missing");
   const expected = `${version}+bunos${head.slice(0, 10)}`;
   const expectedCraftCli = `1.0.0+bunos${head.slice(0, 10)}`;
+  let imageId = "";
   const buildNative = async (name: string) => {
     const child = Bun.spawn(["sh", join(home, ".local/bin/aphrody-native-apps"), "container", name], {
       cwd: repo,
@@ -73,31 +74,27 @@ export async function wordcraftImage(): Promise<void> {
       if ((await git("rev-parse", "HEAD")).out.trim() !== head) throw new Error("Checkout changed after package build");
       const result = await imageBuild();
       if (!result.ok) throw new Error(`Unified image build failed: ${result.detail}`);
+      imageId = result.imageId?.trim() ?? "";
+      if (!/^sha256:[a-f0-9]{64}$/.test(imageId)) throw new Error("Image build did not provide a valid job receipt");
     },
     async verifyImage() {
+      const image = imageId;
       const prefix = ["docker", "run", "--rm", "--network=none", "--entrypoint"];
-      const installed = await successful([
-        ...prefix,
-        "dpkg-query",
-        "bunos-unified:session",
-        "-W",
-        "-f=${Version}",
-        "wordcraft",
-      ]);
+      const installed = await successful([...prefix, "dpkg-query", image, "-W", "-f=${Version}", "wordcraft"]);
       requirePackageVersion("WordCraft", installed, expected);
       const craftCliVersion = await successful([
         ...prefix,
         "dpkg-query",
-        "bunos-unified:session",
+        image,
         "-W",
         "-f=${Version}",
         "bunos-craft-cli",
       ]);
       requirePackageVersion("Craft CLI", craftCliVersion, expectedCraftCli);
       for (const engine of ["gridcraft", "deckcraft", "filmcraft"]) {
-        await successful([...prefix, `/usr/bin/${engine}-cli`, "bunos-unified:session", "--help"]);
+        await successful([...prefix, `/usr/bin/${engine}-cli`, image, "--help"]);
       }
-      const banner = await successful([...prefix, "/usr/bin/wordcraft", "bunos-unified:session", "--version"]);
+      const banner = await successful([...prefix, "/usr/bin/wordcraft", image, "--version"]);
       if (!banner.startsWith(`wordcraft ${version} `))
         throw new Error("WordCraft in the image did not report its expected version");
       // Exercise the real Markdown and DOCX codecs with a fresh synthetic document.
@@ -114,7 +111,7 @@ export async function wordcraftImage(): Promise<void> {
           `type=bind,src=${directory},dst=/probe`,
           "--entrypoint",
           "/usr/bin/wordcraft-cli",
-          "bunos-unified:session",
+          image,
         ];
         await successful([...cli, "convert", "/probe/probe.md", "/probe/probe.docx"]);
         const text = await successful([...cli, "text", "/probe/probe.docx"]);
@@ -123,7 +120,7 @@ export async function wordcraftImage(): Promise<void> {
         await rm(directory, { recursive: true, force: true });
       }
       if ((await git("rev-parse", "HEAD")).out.trim() !== head) throw new Error("Checkout changed during image build");
-      console.log(`WordCraft ${expected} installed in bunos-unified:session; graphical opening is not yet verified.`);
+      console.log(`WordCraft ${expected} installed in ${image}; graphical opening is not yet verified.`);
     },
   });
 }
