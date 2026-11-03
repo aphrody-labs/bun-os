@@ -315,6 +315,7 @@ const BUILTINS: Record<string, { script: string; args?: string[]; help: string }
   sync: { script: "factory/sync/bunos-sync.ts", help: "synchronise this checkout with main (docs/ops/SYNC.md)" },
   auto: { script: "factory/automation/auto.ts", help: "automation loops (docs/ops/AUTOMATION.md)" },
   image: { script: "factory/images/build.ts", help: "plan, fetch, build or inspect OS images (docs/ops/BUILD.md)" },
+  apk: { script: "packages/bunos-run/src/apk.ts", help: "install/launch Android APKs via Waydroid on the Bun OS WSL bundle (docs/WINDOWS-DESKTOP.md)" },
 };
 
 function checkout(): string | undefined {
