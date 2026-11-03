@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: Apache-2.0
+# bunos.sys: the Bun OS Windows kernel driver (WDM, windows-drivers-rs). Its own workspace: kernel drivers need
+# panic = "abort" and the WDK link setup, which the root workspace must not inherit.
+[workspace]
+
+[workspace.metadata.wdk.driver-model]
+driver-type = "WDM"
+
+[package]
+name = "bunos-nt-driver"
+version = "1.4.7"
+edition = "2024"
+license = "Apache-2.0"
+description = 'Bun OS Windows 11 kernel driver: the BunOS device bridge between the NT kernel and the Bun OS userland.'
+publish = false
+
+[package.metadata.wdk.driver-model]
+driver-type = "WDM"
+
+[lib]
+crate-type = ["cdylib"]
+
+[build-dependencies]
+wdk-build = "0.6.0"
+
+[dependencies]
+wdk = "0.5.0"
+wdk-alloc = "0.4.2"
+wdk-panic = "0.5.0"
+wdk-sys = "0.5.2"
+
+[features]
+default = []
+nightly = ["wdk/nightly", "wdk-sys/nightly"]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = true
