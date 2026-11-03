@@ -6,11 +6,11 @@
 //!   through WSLg, appearing as native Windows windows. This crate owns the profile wiring and the per-desktop
 //!   package lists for the Bun OS Arch-style pacman repos; another member owns the WSL kernel/WSLg bundle, reached
 //!   only through the documented interface in docs/WSL.md.
-//! - `windows-mac` is the native path: the macOS-style window chrome, dock, Rust tiling WM (GlazeWM, vendored) and
-//!   the Rust wallpaper engine, all running on Windows itself.
-//! - `windows-hyprland` is the other native path: the same chrome and wallpaper with GlazeWM (bunos fork, animated),
-//!   tacky-borders, Zebar, Flow Launcher and AltSnap configured as Hyprland/Omarchy; its configs come from
-//!   [`crate::hyprwin`].
+//! - `windows-native` is the Windows path: no process of ours stays resident. It is a one-shot apply of the tweak
+//!   catalog's `look` and `shell` modules (accent on title bars and borders from the M3 seed, dark mode, Mica and
+//!   transparency, a static wallpaper, Snap layouts, virtual desktops, taskbar/Start declutter), journaled and undoable,
+//!   that Windows itself renders. The resident stack it replaces (GlazeWM, tacky-borders, AltSnap, Flow Launcher, Zebar,
+//!   waku, the chrome watcher and caption overlay, the wgpu wallpaper) is retired: docs/WINDOWS-ARCHITECTURE.md.
 //!
 //! This enum is the single desktop profile source: the Linux session chooser (`bunos-session`, package
 //! `bunos-desktop`) reads `factory/desktop/sessions.json`, which `bunos-win11 desktop --json` writes from here and a
@@ -34,10 +34,8 @@ pub enum Desktop {
     Omarchy,
     /// GNOME 51 Shell (Mutter Wayland; 51.1 released 2026-10).
     Gnome,
-    /// Native Windows: macOS-style chrome + dock + GlazeWM + Rust wallpaper engine.
-    WindowsMac,
-    /// Native Windows, Hyprland/Omarchy-style: animated GlazeWM + gradient borders + bar + launcher + Super-drag.
-    WindowsHyprland,
+    /// Windows itself, configured once through its own settings (tweak modules `look` + `shell`); nothing resident.
+    WindowsNative,
 }
 
 impl Desktop {
@@ -49,8 +47,7 @@ impl Desktop {
             Self::Hyprland => "hyprland",
             Self::Omarchy => "omarchy",
             Self::Gnome => "gnome",
-            Self::WindowsMac => "windows-mac",
-            Self::WindowsHyprland => "windows-hyprland",
+            Self::WindowsNative => "windows-native",
         }
     }
 
@@ -61,25 +58,23 @@ impl Desktop {
             "hyprland" => Self::Hyprland,
             "omarchy" => Self::Omarchy,
             "gnome" => Self::Gnome,
-            "windows-mac" => Self::WindowsMac,
-            "windows-hyprland" => Self::WindowsHyprland,
+            "windows-native" => Self::WindowsNative,
             _ => return None,
         })
     }
 
-    pub const ALL: [Self; 7] = [
+    pub const ALL: [Self; 6] = [
         Self::Cosmic,
         Self::CosmicComp,
         Self::Hyprland,
         Self::Omarchy,
         Self::Gnome,
-        Self::WindowsMac,
-        Self::WindowsHyprland,
+        Self::WindowsNative,
     ];
 
     #[must_use]
     pub fn is_wsl(self) -> bool {
-        !matches!(self, Self::WindowsMac | Self::WindowsHyprland)
+        !matches!(self, Self::WindowsNative)
     }
 
     #[must_use]
@@ -90,11 +85,8 @@ impl Desktop {
             Self::Hyprland => "Hyprland (via WSLg)",
             Self::Omarchy => "Omarchy: Hyprland + Omarchy configs, menus and themes (via WSLg)",
             Self::Gnome => "GNOME 51 (via WSLg)",
-            Self::WindowsMac => {
-                "Windows, macOS-style (native: chrome + dock + GlazeWM + wallpaper engine)"
-            }
-            Self::WindowsHyprland => {
-                "Windows, Hyprland-style (native: animated GlazeWM + gradient borders + Zebar + Flow Launcher + AltSnap)"
+            Self::WindowsNative => {
+                "Windows, natively themed (accent, dark mode, Mica, wallpaper, Snap, virtual desktops; nothing resident)"
             }
         }
     }
@@ -156,7 +148,7 @@ impl Desktop {
                 "nautilus",
                 "xdg-desktop-portal-gnome",
             ],
-            Self::WindowsMac | Self::WindowsHyprland => &[],
+            Self::WindowsNative => &[],
         }
     }
 
@@ -172,20 +164,7 @@ impl Desktop {
                 "vendor/hyprland",
             ],
             Self::Gnome => &["vendor/gnome/mutter", "vendor/gnome/gnome-shell"],
-            Self::WindowsMac => &[
-                "vendor/glazewm",
-                "crates/bunos-win11-chrome",
-                "crates/bunos-win11-wallpaper",
-            ],
-            Self::WindowsHyprland => &[
-                "vendor/glazewm",
-                "vendor/tacky-borders",
-                "vendor/zebar",
-                "vendor/flow-launcher",
-                "vendor/altsnap",
-                "crates/bunos-win11-chrome",
-                "crates/bunos-win11-wallpaper",
-            ],
+            Self::WindowsNative => &["packages/bun-windows-winclean"],
         }
     }
 
@@ -196,7 +175,7 @@ impl Desktop {
             Self::Cosmic | Self::CosmicComp => Some(Presentation::NestedWindow),
             Self::Gnome => Some(Presentation::DevkitViewer),
             Self::Hyprland | Self::Omarchy => Some(Presentation::HeadlessViewer),
-            Self::WindowsMac | Self::WindowsHyprland => None,
+            Self::WindowsNative => None,
         }
     }
 
@@ -230,7 +209,7 @@ impl Desktop {
                 ("XDG_SESSION_DESKTOP", "gnome"),
                 ("XDG_DESKTOP_PORTAL_DIR", "/var/empty"),
             ],
-            Self::WindowsMac | Self::WindowsHyprland => &[],
+            Self::WindowsNative => &[],
         }
     }
 
@@ -245,7 +224,7 @@ impl Desktop {
             Self::Omarchy => Some("Hyprland"),
             // --no-x11: WSLg mounts /tmp/.X11-unix read-only and mutter aborts when it cannot start Xwayland there.
             Self::Gnome => Some("gnome-shell --devkit --no-x11"),
-            Self::WindowsMac | Self::WindowsHyprland => None,
+            Self::WindowsNative => None,
         }
     }
 
@@ -295,20 +274,12 @@ impl Desktop {
                 steps.push(p.describe().to_owned());
             }
             steps
-        } else if self == Self::WindowsHyprland {
-            vec![
-                "bun factory/windows/desktop/hyprland.ts build (GlazeWM bunos fork, tacky-borders, Zebar, chrome, wallpaper from source; AltSnap cross-built on vps; Flow Launcher with dotnet; staged and test-signed under %LOCALAPPDATA%/bunos/desktop)".to_owned(),
-                "bunos-win11 desktop windows-hyprland --render <dir> (GlazeWM, tacky-borders, AltSnap, Flow configs from the M3 roles; glass max, reduced when Transparency effects are off)".to_owned(),
-                "bun factory/windows/desktop/hyprland.ts up (per-user processes: wallpaper, chrome watch, GlazeWM, tacky-borders, Zebar, AltSnap, Flow; nothing registered as the shell, no autostart, no registry writes)".to_owned(),
-                "bun factory/windows/desktop/hyprland.ts down | undo (stop them; undo also deletes the staged tree)".to_owned(),
-            ]
         } else {
             vec![
-                "cargo build -p bunos-win11-chrome -p bunos-win11-wallpaper --target x86_64-pc-windows-msvc".to_owned(),
-                "build GlazeWM from vendor/glazewm (GPL-3.0)".to_owned(),
-                "run bunos-win11-wallpaper (wgpu into the WorkerW desktop layer)".to_owned(),
-                "run the macOS chrome module (rounded corners, Mica, unified dark caption, colored borders, dock)".to_owned(),
-                "start GlazeWM for tiling (not registered as the live shell)".to_owned(),
+                "bunos-win11 plan --module look --module shell --level standard (shows every registry value it would set, read-only)".to_owned(),
+                "bunos-win11 apply --module look --module shell --level standard (one shot: restore point, .reg export, journal; then WM_SETTINGCHANGE and SPI_SETDESKWALLPAPER so it shows at once)".to_owned(),
+                "Windows renders it: accent title bars and borders (DWM ColorPrevalence), dark mode, Mica/Acrylic where apps offer them, rounded corners (Windows 11 default), Snap layouts (Win+Z), virtual desktops (Win+Ctrl+arrows, Win+Tab)".to_owned(),
+                "bunos-win11 undo (puts every value back); no process of ours runs afterwards".to_owned(),
             ]
         }
     }

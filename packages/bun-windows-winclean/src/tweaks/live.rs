@@ -205,3 +205,100 @@ impl Backend for LiveBackend {
         }
     }
 }
+
+/// Tells running apps and the shell that settings changed, so a one-shot apply or undo takes effect without a logoff:
+/// `WM_SETTINGCHANGE` for `ImmersiveColorSet` (accent, light/dark, transparency: Explorer, DWM and XAML apps re-read
+/// them) and for `WindowsThemeElement`, and `SPI_SETDESKWALLPAPER` when the plan touched `Control Panel\Desktop`
+/// `Wallpaper` (the documented way to make a registry wallpaper current). Nothing stays resident.
+pub fn notify_settings_changed(ops: &[&Op]) {
+    use windows::{
+        Win32::{
+            Foundation::{LPARAM, WPARAM},
+            UI::WindowsAndMessaging::{
+                HWND_BROADCAST, SMTO_ABORTIFHUNG, SPI_SETDESKWALLPAPER, SPIF_SENDCHANGE,
+                SendMessageTimeoutW, SystemParametersInfoW, WM_SETTINGCHANGE,
+            },
+        },
+        core::PCWSTR,
+    };
+    let user = ops.iter().any(|op| {
+        matches!(op, Op::RegSet { hive: RegHive::User, .. } | Op::RegDeleteValue { hive: RegHive::User, .. })
+    });
+    if !user {
+        return;
+    }
+    // Apply and undo alike: the value now in the registry is the wallpaper to make current.
+    let touches_wallpaper = ops.iter().any(|op| match op {
+        Op::RegSet { hive: RegHive::User, key, name, .. } | Op::RegDeleteValue { hive: RegHive::User, key, name } => {
+            key.eq_ignore_ascii_case(r"Control Panel\Desktop") && name.eq_ignore_ascii_case("Wallpaper")
+        }
+        _ => false,
+    });
+    let wallpaper = if touches_wallpaper {
+        match reg_get(RegHive::User, r"Control Panel\Desktop", "Wallpaper") {
+            Ok(Some(RegData::Sz(p))) => Some(p),
+            Ok(Some(RegData::ExpandSz(p))) => Some(expand_env(&p)),
+            _ => None,
+        }
+    } else {
+        None
+    };
+    if let Some(path) = wallpaper {
+        let mut w: Vec<u16> = path.encode_utf16().chain([0]).collect();
+        // SAFETY: `w` is a NUL-terminated UTF-16 buffer alive for the call.
+        let _ = unsafe {
+            SystemParametersInfoW(
+                SPI_SETDESKWALLPAPER,
+                0,
+                Some(w.as_mut_ptr().cast()),
+                // The registry already holds the value (REG_EXPAND_SZ from the catalog): only make it current.
+                SPIF_SENDCHANGE,
+            )
+        };
+    }
+    for area in ["ImmersiveColorSet", "WindowsThemeElement"] {
+        let a: Vec<u16> = area.encode_utf16().chain([0]).collect();
+        // SAFETY: broadcast with a NUL-terminated string that outlives the bounded (1 s per window) send.
+        unsafe {
+            SendMessageTimeoutW(
+                HWND_BROADCAST,
+                WM_SETTINGCHANGE,
+                WPARAM(0),
+                LPARAM(PCWSTR(a.as_ptr()).0 as isize),
+                SMTO_ABORTIFHUNG,
+                1000,
+                None,
+            );
+        }
+    }
+}
+
+/// `%NAME%` expansion from the process environment (REG_EXPAND_SZ semantics); unknown names stay as written.
+fn expand_env(s: &str) -> String {
+    let mut out = String::new();
+    let mut rest = s;
+    while let Some(i) = rest.find('%') {
+        out.push_str(&rest[..i]);
+        let after = &rest[i + 1..];
+        match after.find('%') {
+            Some(j) => {
+                let name = &after[..j];
+                match std::env::var(name) {
+                    Ok(v) if !name.is_empty() => out.push_str(&v),
+                    _ => {
+                        out.push('%');
+                        out.push_str(name);
+                        out.push('%');
+                    }
+                }
+                rest = &after[j + 1..];
+            }
+            None => {
+                out.push('%');
+                rest = after;
+            }
+        }
+    }
+    out.push_str(rest);
+    out
+}

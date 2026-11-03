@@ -84,6 +84,7 @@ mod live_apply {
             let _ = write_json(&journal_path, j);
         });
         write_json(&journal_path, &journal)?;
+        super::super::live::notify_settings_changed(&plan.steps.iter().map(|s| &s.op).collect::<Vec<_>>());
         Ok((journal, journal_path))
     }
 
@@ -97,6 +98,7 @@ mod live_apply {
         let mut journal: Journal = serde_json::from_slice(&std::fs::read(path)?)?;
         let report = super::super::undo(&mut LiveBackend, &mut journal);
         write_json(path, &journal)?;
+        super::super::live::notify_settings_changed(&journal.entries.iter().map(|e| &e.op).collect::<Vec<_>>());
         Ok(report)
     }
 }

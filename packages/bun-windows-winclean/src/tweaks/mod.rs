@@ -396,6 +396,19 @@ fn reg_data(entry: &RegEntry) -> Result<RegData, String> {
         ("multi_sz", toml::Value::Array(a)) => RegData::MultiSz(
             a.iter().map(|v| v.as_str().map(str::to_owned).ok_or("multi_sz items must be strings")).collect::<Result<_, _>>()?,
         ),
+        // REG_BINARY as a hex string ("ff00a2..."; spaces allowed), e.g. Explorer's 32-byte AccentPalette.
+        ("binary", toml::Value::String(s)) => {
+            let hex: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+            if hex.len() % 2 != 0 {
+                return Err("binary hex string has an odd length".into());
+            }
+            RegData::Binary(
+                (0..hex.len())
+                    .step_by(2)
+                    .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).map_err(|_| "binary: invalid hex"))
+                    .collect::<Result<_, _>>()?,
+            )
+        }
         (k, v) => return Err(format!("unsupported type/value {k} = {v:?}")),
     })
 }

@@ -211,3 +211,27 @@ fn offline_locations() {
     assert_eq!(offline_location(RegHive::User, r"Software\X").unwrap().0, r"Users\Default\NTUSER.DAT");
     assert!(offline_location(RegHive::Machine, r"SAM\X").is_err());
 }
+
+#[test]
+fn look_module_is_user_registry_with_a_binary_palette() {
+    let c = Catalog::embedded().unwrap();
+    let look: Vec<_> = c.tweaks.iter().filter(|t| t.module == "look").collect();
+    assert!(look.len() >= 5);
+    let mut palette = None;
+    for t in look {
+        for op in t.ops().unwrap() {
+            match op {
+                Op::RegSet { hive, name, data, .. } => {
+                    assert_eq!(hive, RegHive::User, "{}", t.id);
+                    if name == "AccentPalette" {
+                        palette = Some(data);
+                    }
+                }
+                other => panic!("{}: unexpected {other:?}", t.id),
+            }
+        }
+    }
+    let Some(RegData::Binary(bytes)) = palette else { panic!("no AccentPalette") };
+    assert_eq!(bytes.len(), 32);
+    assert_eq!(&bytes[12..15], &[0x5b, 0x45, 0xa2], "the seed is the fourth entry");
+}

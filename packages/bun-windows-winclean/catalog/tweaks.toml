@@ -53,6 +53,11 @@ title = "Shell and desktop"
 description = "Start and taskbar declutter, Explorer defaults."
 
 [[module]]
+id = "look"
+title = "Native look (Bun OS Material)"
+description = "Windows' own personalisation settings from the Bun OS M3 seed: accent on title bars and borders, Mica/transparency, static wallpaper, Snap and virtual desktops. One-shot registry values with undo; no resident process."
+
+[[module]]
 id = "devtools"
 title = "Developer tools"
 description = "Long paths, Developer Mode, sudo."
@@ -495,7 +500,7 @@ registry = [
 [[tweak]]
 id = "shell.taskbar-left"
 module = "shell"
-title = "Taskbar aligned left (windows-mac profile moves it under the dock instead)"
+title = "Taskbar aligned left"
 level = "standard"
 registry = [
   { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "TaskbarAl", type = "dword", value = 0 },
@@ -509,6 +514,72 @@ level = "standard"
 registry = [
   { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', name = "AppsUseLightTheme", type = "dword", value = 0 },
   { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', name = "SystemUsesLightTheme", type = "dword", value = 0 },
+]
+
+# ------------------------------------------------------------------------------------------------------------- look
+# Replaces the retired resident desktop stack (GlazeWM, tacky-borders, AltSnap, Flow Launcher, the chrome watcher and
+# overlay, the wgpu wallpaper; docs/WINDOWS-ARCHITECTURE.md): Windows draws all of this itself from these values.
+# Colours are the M3 seed #5b45a2 of the design receipt (vps ~/build/storage/artifacts/design/current/receipt.json);
+# DWORD colours are 0xAABBGGRR. The live apply broadcasts WM_SETTINGCHANGE (ImmersiveColorSet) and calls
+# SPI_SETDESKWALLPAPER, so nothing needs a logoff (src/tweaks/live.rs notify_settings_changed).
+
+[[tweak]]
+id = "look.accent"
+module = "look"
+title = "Accent colour from the Bun OS seed, shown on title bars and window borders"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "AccentColor", type = "dword", value = 4288824667 },
+  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorizationColor", type = "dword", value = 3294315938 },
+  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorizationAfterglow", type = "dword", value = 3294315938 },
+  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorPrevalence", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Accent', name = "AccentColorMenu", type = "dword", value = 4286198852 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Accent', name = "StartColorMenu", type = "dword", value = 4284032562 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Accent', name = "AccentPalette", type = "binary", value = "d6d1e800ada2d1008474b9005b45a20044347a003226590020183900120e2000" },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', name = "ColorPrevalence", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "look.transparency"
+module = "look"
+title = "Transparency effects on (Mica and Acrylic wherever apps and the shell offer them)"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', name = "EnableTransparency", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "look.wallpaper"
+module = "look"
+title = 'Static Bun OS wallpaper (design artifact, installed under %SystemRoot%\BunOS\share\wallpaper)'
+level = "standard"
+registry = [
+  { hive = "user", key = 'Control Panel\Desktop', name = "Wallpaper", type = "expand_sz", value = '%SystemRoot%\BunOS\share\wallpaper\bunos-dusk-3840x2160.png' },
+  { hive = "user", key = 'Control Panel\Desktop', name = "WallpaperStyle", type = "sz", value = "10" },
+  { hive = "user", key = 'Control Panel\Desktop', name = "TileWallpaper", type = "sz", value = "0" },
+]
+
+[[tweak]]
+id = "look.snap"
+module = "look"
+title = "Snap layouts, Snap assist and snap groups on (Windows' own tiling)"
+level = "conservative"
+registry = [
+  { hive = "user", key = 'Control Panel\Desktop', name = "WindowArrangementActive", type = "sz", value = "1" },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "SnapAssist", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "EnableSnapAssistFlyout", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "EnableSnapBar", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "EnableTaskGroups", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "look.virtual-desktops"
+module = "look"
+title = "Virtual desktops as workspaces: taskbar and Alt+Tab show the current desktop only"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "VirtualDesktopTaskbarFilter", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "VirtualDesktopAltTabFilter", type = "dword", value = 1 },
 ]
 
 # --------------------------------------------------------------------------------------------------------- devtools
