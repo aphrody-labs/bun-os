@@ -1,0 +1,53 @@
+# Bun OS: herdr (herdrdev/herdr, Apache-2.0), the terminal workspace manager for coding agents that Omarchy starts
+# in every Hyprland session (`herdr server`, default/hypr/autostart.lua) and binds to SUPER+CTRL+RETURN. Built from
+# the pinned aphrody-labs fork; recipe follows Omarchy's own (omacom/omarchy-pkgs pkgbuilds/herdr, by David Heinemeier
+# Hansson). The vendored libghostty-vt is built by Zig, and its build.zig requires exactly Zig 0.16 (Arch's zig is
+# 0.17, which fails `requireZig`), so the official ziglang.org 0.16.0 toolchain is a checksummed build-only source,
+# as in Omarchy's recipe. Its global cache stays inside $srcdir; uucode is fetched by `zig build` (hash-pinned in
+# build.zig.zon).
+# vendor: vendor/herdr -> _commit
+_commit=143bf5fd4781d164260c63fe28e7dc08054ad32f
+pkgname=herdr
+pkgver=0.9.5
+pkgrel=1
+pkgdesc='Herdr terminal workspace manager for AI coding agents (Bun OS, built from the aphrody-labs fork)'
+arch=(x86_64)
+url='https://github.com/aphrody-labs/herdr'
+license=('Apache-2.0')
+depends=('gcc-libs' 'glibc')
+makedepends=('cargo' 'git')
+replaces=('omarchy-herdr')
+conflicts=('omarchy-herdr')
+options=(!debug !lto)
+_zigver=0.16.0
+source=("herdr::git+https://github.com/aphrody-labs/herdr.git#commit=${_commit}"
+        "zig-x86_64-linux-$_zigver.tar.xz::https://ziglang.org/download/$_zigver/zig-x86_64-linux-$_zigver.tar.xz")
+sha256sums=('SKIP'
+            '70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00')
+
+pkgver() {
+  cd herdr
+  # Cargo version plus the snapshot (the fork's pin is past the v0.9.5 release branch point).
+  local v
+  v=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+  printf '%s.r%s.g%s' "$v" "$(git rev-list --count HEAD)" "$(git rev-parse --short=8 HEAD)"
+}
+
+prepare() {
+  cd herdr
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd herdr
+  export RUSTUP_TOOLCHAIN=stable CARGO_TARGET_DIR=target
+  export ZIG="$srcdir/zig-x86_64-linux-$_zigver/zig" ZIG_GLOBAL_CACHE_DIR="$srcdir/zig-cache"
+  cargo build --frozen --release
+}
+
+package() {
+  cd herdr
+  install -Dm755 target/release/herdr "$pkgdir/usr/bin/herdr"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

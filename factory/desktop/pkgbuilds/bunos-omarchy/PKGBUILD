@@ -12,7 +12,7 @@
 _commit=ae64a4be796239a86f40de4b3cc5bd7f43866296
 pkgname=bunos-omarchy
 pkgver=4.0.0.alpha
-pkgrel=3
+pkgrel=4
 pkgdesc='Omarchy (Hyprland configs, keybindings, menus, themes, Quickshell shell) as a Bun OS desktop layer'
 arch=(any)
 url='https://github.com/aphrody-labs/omarchy'
@@ -24,6 +24,9 @@ depends=(
   # The Quickshell shell decodes the theme backgrounds (webp) through qt6-imageformats, sizes them with magick and
   # watches its plugin directory with inotifywait (install/omarchy-base.packages); without them the bar runs on black.
   'qt6-imageformats' 'imagemagick' 'inotify-tools' 'grim' 'slurp'
+  # Omarchy starts `herdr server` in every Hyprland session (default/hypr/autostart.lua); without it the session
+  # opens on a "command not found: herdr" notification.
+  'herdr'
 )
 optdepends=('walker: Omarchy launcher and menus (omacom/walker; not in Arch, packaged from omarchy-pkgs)')
 provides=('omarchy' 'omarchy-settings')

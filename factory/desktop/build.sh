@@ -23,7 +23,7 @@ min_free="${DESKTOP_MIN_FREE_GIB:-12}"
 default=(
   sd fd ripgrep bat eza dust procs zoxide hyperfine tokei xh ouch just starship git-delta bottom gitui yazi atuin
   helix nushell zellij rio uutils-coreutils bunos-cli
-  bunos-design-m3 bunos-desktop wlvncc cosmic-comp cosmic-session aquamarine hyprland hyprland-plugin-hyprbars bunos-omarchy
+  bunos-design-m3 bunos-desktop wlvncc cosmic-comp cosmic-session aquamarine hyprland hyprland-plugin-hyprbars herdr bunos-omarchy
   mutter gnome-shell
 )
 pkgs=("$@")
