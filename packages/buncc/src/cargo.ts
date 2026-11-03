@@ -12,7 +12,7 @@ import {
   statfsSync,
   writeFileSync,
 } from "node:fs";
-import { availableParallelism } from "node:os";
+import { availableParallelism, totalmem } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { overlayEnv, sanitizeEnv, type Env } from "./env.ts";
 import { acquireSlot, cacheDir, lockPathFor, withLock } from "./lock.ts";
@@ -112,8 +112,8 @@ export interface CargoOptions {
 
 /** Default no-progress window: a build that burns no CPU for this long is hung and is killed. */
 export const DEFAULT_CARGO_STALL = 30 * 60_000;
-/** Default worker share per lane; explicit CARGO_BUILD_JOBS values are not capped here. */
-export const DEFAULT_CPUS_PER_LANE = 4;
+/** Memory one concurrent build lane needs at its peak (rustc + linker); lanes are sized by memory, not CPUs. */
+export const DEFAULT_LANE_MEMORY = 4 * 1024 ** 3;
 /** Fast local disk holding one build directory per lane on the VPS. */
 export const DEFAULT_LANE_ROOT = "/var/cache/aphrody-target";
 
@@ -124,17 +124,22 @@ export interface LanePlan {
 }
 
 /**
- * Lanes sized to the host: one lane per four CPUs by default (12 cores -> 3 lanes of 4 jobs). BUNCC_SLOTS and
- * CARGO_BUILD_JOBS can raise concurrency without a hard-coded lane or per-lane ceiling,
+ * Lanes sized to the host for massively concurrent builds: one lane per DEFAULT_LANE_MEMORY of RAM (45 GiB -> 11
+ * lanes), and every lane may use every CPU (jobs = nproc); the kernel scheduler and build.slice share the CPUs, the
+ * memory bound keeps concurrent links from OOM. BUNCC_SLOTS and CARGO_BUILD_JOBS override both, without a ceiling.
  * BUNCC_LANE_ROOT (default /var/cache/aphrody-target when it exists) holds lane-N build and target directories.
  */
-export function planLanes(env: Env, cpus = availableParallelism(), laneRootExists = existsSync): LanePlan {
+export function planLanes(
+  env: Env,
+  cpus = availableParallelism(),
+  laneRootExists = existsSync,
+  memory = totalmem(),
+): LanePlan {
   const configured = Number.parseInt(env.BUNCC_SLOTS ?? "", 10);
-  const derived = process.platform === "win32" ? 1 : Math.max(1, Math.floor(cpus / DEFAULT_CPUS_PER_LANE));
+  const derived = process.platform === "win32" ? 1 : Math.max(1, Math.floor(memory / DEFAULT_LANE_MEMORY));
   const lanes = Math.max(1, Number.isFinite(configured) && configured > 0 ? configured : derived);
   const requested = Number.parseInt(env.CARGO_BUILD_JOBS ?? "", 10);
-  const share = Math.max(1, Math.floor(cpus / lanes));
-  const jobs = Math.max(1, requested > 0 ? requested : share);
+  const jobs = Math.max(1, requested > 0 ? requested : cpus);
   const root =
     env.BUNCC_LANE_ROOT ||
     (process.platform === "linux" && laneRootExists(DEFAULT_LANE_ROOT) ? DEFAULT_LANE_ROOT : undefined);

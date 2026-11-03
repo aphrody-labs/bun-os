@@ -35,8 +35,9 @@ A stage never reaches back: a stage 4 image consumes stage 3 debs, not a cargo t
 ## Resources
 
 The build host gives builds every CPU, its memory and its disk; there is no repository-imposed cap.
-`CARGO_BUILD_JOBS` defaults to `nproc`; `BUNCC_SLOTS` splits the pool into concurrent lanes when several builds run
-at once. Both are operator controls. Cargo goes through the lane wrapper
+Concurrency is bounded by memory, not CPUs: buncc opens one lane per 4 GiB of RAM (11 concurrent builds on `vps`)
+and every lane runs with `CARGO_BUILD_JOBS = nproc`; the kernel scheduler and `build.slice` share the CPUs.
+`BUNCC_SLOTS` and `CARGO_BUILD_JOBS` override both and are operator controls; the repository sets no ceiling. Cargo goes through the lane wrapper
 (`scripts/aphrody/build/rust/cargo-serial.sh`) so lanes do not fight over one lock, and each lane keeps its own
 target directory under `~/build/storage/targets/<lane>`. Shared caches: `~/.cargo/{git,registry}` (on the build
 volume), sccache. Host tuning (sysctl, zram, I/O cost, build slice): [VPS-TUNING.md](VPS-TUNING.md).
