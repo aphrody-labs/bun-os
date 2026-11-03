@@ -12,6 +12,7 @@
 //     calculator            aphrody-labs/cosmic-calculator
 //     wordcraft             WordCraft desktop and CLI from this workspace (container only)
 //     craft-cli             GridCraft, DeckCraft and FilmCraft CLIs (container only)
+//     lu                    LU desktop Debian candidate (container only; not published)
 //     spacedrive            aphrody-labs/spacedrive at the apps/spacedrive import (sd-daemon, sd-server, desktop)
 //     publish               rebuild and sign the apt feed with the debs built so far
 //     container <command>   run <command> inside the ubuntu:26.04 builder (builder.Dockerfile): the debs link against
@@ -472,6 +473,63 @@ async function craftCli() {
   );
 }
 
+/** Build LU from an isolated export. A candidate is not added to the image or apt feed. */
+async function lu() {
+  const rev = Bun.env.BUNOS_REV;
+  if (!IN_BUILDER || !rev || !/^[0-9a-f]{40}$/.test(rev) || Bun.env.BUNOS_LU_EXPORT !== "1")
+    throw new Error("LU requires an isolated published-source export in the native builder");
+  const app = join(ROOT, "apps/lu");
+  const target = join(ROOT, ".lu-target");
+  const env = { ...Bun.env, CARGO_TARGET_DIR: target };
+  await $`bun install --frozen-lockfile --filter @aphrody/lu`.cwd(ROOT);
+  await $`bash scripts/build-llama.sh x86_64-unknown-linux-gnu`.cwd(app).env(env);
+  await $`bash scripts/build-llama.sh --check`.cwd(app).env(env);
+  await $`bun run tauri build --bundles deb --ci -- --locked`.cwd(app).env(env);
+  const bundle = join(target, "release/bundle/deb");
+  const files = (await readdir(bundle)).filter(name => name.endsWith(".deb"));
+  if (files.length !== 1) throw new Error(`Expected one LU deb, found ${files.length}`);
+  const source = join(bundle, files[0]);
+  const fields = await Promise.all(
+    ["Package", "Version", "Architecture"].map(async field =>
+      (await $`dpkg-deb --field ${source} ${field}`.text()).trim(),
+    ),
+  );
+  if (fields.some(field => !field) || fields[2] !== "amd64")
+    throw new Error("LU deb metadata is incomplete or not amd64");
+  const contents = await $`dpkg-deb --contents ${source}`.text();
+  if (
+    !contents.includes("lu-llama-server") ||
+    !contents.includes(".desktop") ||
+    !/ggml-cpu[^/]*\.so/.test(contents) ||
+    !contents.includes("/usr/share/doc/locally-uncensored/copyright")
+  )
+    throw new Error("LU deb is missing its sidecar, CPU backends, desktop launcher or license");
+  const candidates = join(WORK, "lu-candidates");
+  await mkdir(candidates, { recursive: true });
+  const out = join(candidates, `${rev}-${Date.now()}-${process.pid}`);
+  await mkdir(out);
+  const artifact = join(out, basename(source));
+  await copyFile(source, artifact);
+  const sha256 = new Bun.CryptoHasher("sha256").update(await Bun.file(artifact).arrayBuffer()).digest("hex");
+  await Bun.write(
+    join(out, "receipt.json"),
+    JSON.stringify(
+      {
+        sourceCommit: rev,
+        package: fields[0],
+        version: fields[1],
+        architecture: fields[2],
+        artifact: basename(artifact),
+        sha256,
+        qualification: "pending",
+      },
+      null,
+      2,
+    ) + "\n",
+  );
+  log(`LU candidate built at ${artifact}; qualification and image inclusion are pending`);
+}
+
 /** Rebuild and sign the apt feed (apps/webos/store; suites stable and resolute) from an export of origin/main. */
 async function publish() {
   await $`git -C ${ROOT} fetch -q origin main`;
@@ -491,6 +549,7 @@ async function container(args: string[]) {
   await $`git -C ${ROOT} fetch -q origin main`;
   const rev = (await $`git -C ${ROOT} rev-parse origin/main`.text()).trim();
   const liveWorkspace = args[0] === "wordcraft" || args[0] === "craft-cli";
+  const luExport = args[0] === "lu";
   if (liveWorkspace) {
     const head = (await $`git -C ${ROOT} rev-parse HEAD`.text()).trim();
     const clean = await $`git -C ${ROOT} status --porcelain --untracked-files=normal`
@@ -517,7 +576,8 @@ async function container(args: string[]) {
   ).trim();
   if (patch) paths.push(patch);
   try {
-    await $`git -C ${ROOT} archive ${rev} ${paths} | tar -x -C ${exp}`;
+    if (luExport) await $`git -C ${ROOT} archive ${rev} | tar -x -C ${exp}`;
+    else await $`git -C ${ROOT} archive ${rev} ${paths} | tar -x -C ${exp}`;
     await $`docker build -q -t ${image} -f ${join(exp, "factory/native-apps/builder.Dockerfile")} ${join(exp, "factory/native-apps")}`.quiet();
     const proc = Bun.spawn(
       [
@@ -533,7 +593,7 @@ async function container(args: string[]) {
         "-v",
         `${WORK}:/work`,
         "-v",
-        `${liveWorkspace ? ROOT : exp}:/src/bun-os:ro`,
+        `${liveWorkspace ? ROOT : exp}:/src/bun-os:${luExport ? "rw" : "ro"}`,
         "-v",
         `${join(HOME, ".local/bin/bun")}:/usr/local/bin/bun:ro`,
         "-v",
@@ -550,6 +610,8 @@ async function container(args: string[]) {
         "BUNOS_NATIVE_WORK=/work",
         "-e",
         `BUNOS_REV=${rev}`,
+        "-e",
+        `BUNOS_LU_EXPORT=${luExport ? "1" : "0"}`,
         "-e",
         `COSMIC_EPOCH_PIN=${pin}`,
         "-e",
@@ -584,6 +646,7 @@ const commands: Record<string, () => Promise<void>> = {
   spacedrive,
   wordcraft,
   "craft-cli": craftCli,
+  lu,
   publish,
   container: () => container(args),
 };

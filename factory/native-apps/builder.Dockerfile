@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     RUSTUP_HOME=/opt/rustup \
     PATH=/opt/cargo/bin:/usr/local/bin:/usr/bin:/bin
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates curl git build-essential pkg-config cmake clang mold nasm just dpkg-dev unzip xz-utils python3 \
+      ca-certificates curl git build-essential pkg-config cmake clang mold nasm just dpkg-dev patchelf unzip xz-utils python3 \
       libxkbcommon-dev libwayland-dev libinput-dev libseat-dev libudev-dev libdisplay-info-dev libgbm-dev libegl-dev \
       libpipewire-0.3-dev libpulse-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libflatpak-dev \
       libfontconfig-dev libfreetype-dev libdbus-1-dev libpam0g-dev libsystemd-dev libexpat1-dev libssl-dev \

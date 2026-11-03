@@ -17,6 +17,13 @@
     ]
   },
   "bundle": {
+    "linux": {
+      "deb": {
+        "files": {
+          "/usr/share/doc/locally-uncensored/copyright": "../LICENSE"
+        }
+      }
+    },
     "resources": {
       "resources/whisper_server.py": "resources/whisper_server.py",
       "resources/voice_loop/lu_voice_loop/*.py": "resources/voice_loop/lu_voice_loop/",
