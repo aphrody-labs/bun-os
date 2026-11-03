@@ -1,6 +1,6 @@
 // Nintendo 64 cartridges, GameCube/Wii DOL executables and discs (ISO/GCM, WBFS, WIA, RVZ).
 // Disc, DOL and FST layouts mirror crates/aphrody-wii-image (dvd.rs, dol.rs, rvz.rs), whose
-// decompressing reader stays the canonical owner for RVZ/WIA payloads.
+// decompressing reader is the canonical owner for supported RVZ payloads.
 import { BinaryView, hex, hex32, type BinarySource } from "../stream.js";
 import { parsed, type FileEntry, type ParseContext, type Section } from "../types.js";
 
@@ -343,6 +343,9 @@ export async function parseWia({ source, head }: ParseContext) {
   const view = new BinaryView(head, "be");
   const h2 = 0x48;
   const version = view.u32(4);
+  const container = view.ascii(0, 3);
+  const discType = view.u32(h2);
+  const compression = view.u32(h2 + 4);
   const table = (name: string, offset: number, size: number): Section => ({
     name,
     offset,
@@ -352,10 +355,10 @@ export async function parseWia({ source, head }: ParseContext) {
   return parsed({
     header: {
       ...discHeader(view, h2 + 0x10),
-      container: view.ascii(0, 3),
+      container,
       version: `${version >>> 24}.${(version >>> 16) & 0xff}.${(version >>> 8) & 0xff}`,
-      discType: view.u32(h2) === 2 ? "Wii" : "GameCube",
-      compression: wiaCompression[view.u32(h2 + 4)] ?? `type ${view.u32(h2 + 4)}`,
+      discType: discType === 2 ? "Wii" : discType === 1 ? "GameCube" : `unknown (${discType})`,
+      compression: wiaCompression[compression] ?? `type ${compression}`,
       compressionLevel: view.i32(h2 + 8),
       chunkBytes: view.u32(h2 + 0x0c),
       isoBytes: view.u64(0x24),
@@ -363,7 +366,10 @@ export async function parseWia({ source, head }: ParseContext) {
       partitions: view.u32(h2 + 0x90),
       rawDataEntries: view.u32(h2 + 0xb4),
       groups: view.u32(h2 + 0xc4),
-      decompressor: "crates/aphrody-wii-image (Rvz::parse)",
+      decompressor:
+        container === "RVZ" && (discType === 1 || discType === 2) && (compression === 0 || compression === 5)
+          ? "crates/aphrody-wii-image (Rvz::parse; rvz feature)"
+          : "not supported by the Bun OS RVZ reader",
     },
     sections: [
       table("header1", 0, h2),
