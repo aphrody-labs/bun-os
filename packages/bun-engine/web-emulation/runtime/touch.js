@@ -16,6 +16,7 @@ export function bottomScreenPoint(canvas, event, system) {
   const height = layout.top[1] + layout.bottom[1];
   const rect = canvas.getBoundingClientRect();
   const scale = Math.min(rect.width / width, rect.height / height);
+  if (!Number.isFinite(scale) || scale <= 0) return null;
   const left = rect.left + (rect.width - width * scale) / 2;
   const top = rect.top + (rect.height - height * scale) / 2;
   const x = (event.clientX - left) / scale - (width - layout.bottom[0]) / 2;
