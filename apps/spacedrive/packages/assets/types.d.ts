@@ -20,12 +20,6 @@ declare module "@sd/assets/images/*.jpg" {
 	export default value;
 }
 
-declare module "@sd/assets/svgs/*.svg" {
-	import type { FC } from "react";
-	const content: FC<Record<string, unknown>>;
-	export default content;
-}
-
 declare module "*.svg" {
 	const src: string;
 	export default src;

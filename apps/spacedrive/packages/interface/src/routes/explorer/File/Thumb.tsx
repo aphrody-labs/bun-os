@@ -2,7 +2,7 @@ import { useState, memo } from "react";
 import clsx from "clsx";
 import { getIcon, getBeardedIcon } from "@sd/assets/util";
 // @ts-expect-error - Vite glob import, resolved at build time
-import { beardedIconUrls } from "@sd/assets/svgs/ext/Extras/urls";
+import { beardedIconUrls } from "@aphrody/assets/svgs/ext/Extras/urls.ts";
 import type { File } from "@sd/ts-client";
 import { ThumbstripScrubber } from "./ThumbstripScrubber";
 import { getFileKindForIcon, getVirtualMetadata, getContentKind } from "@sd/ts-client";

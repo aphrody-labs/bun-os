@@ -4,8 +4,8 @@
  * which uses import.meta.glob (Vite-only, not compatible with React Native).
  */
 import * as icons from "../icons";
-import { LayeredIcons } from "../svgs/ext";
-import beardedIconsMapping from "../svgs/ext/icons.json";
+import { LayeredIcons } from "@aphrody/assets/svgs/ext/index.ts";
+import beardedIconsMapping from "@aphrody/assets/svgs/ext/icons.json";
 
 // NOTE: We do NOT export beardedIconUrls here - it uses import.meta.glob
 

@@ -12,7 +12,6 @@
 		"./icons/*": "./icons/*",
 		"./images": "./images/index.ts",
 		"./images/*": "./images/*",
-		"./svgs/*": "./svgs/*",
 		"./sounds": "./sounds/index.ts",
 		"./sounds/*": "./sounds/*",
 		"./videos/*": "./videos/*",
@@ -24,7 +23,6 @@
 		"images",
 		"lottie",
 		"sounds",
-		"svgs",
 		"videos",
 		"util",
 		"types.d.ts"
@@ -33,6 +31,7 @@
 		"gen": "node ./scripts/generate.mjs"
 	},
 	"dependencies": {
+		"@aphrody/assets": "workspace:*",
 		"react": "catalog:"
 	}
 }

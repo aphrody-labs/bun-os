@@ -13,4 +13,8 @@ M3 explorer surfaces, with icon resolution helpers. The icon set is derived from
 | `@aphrody/assets/util/mobile`                    | the same without `beardedIconUrls` (React Native)                                         |
 
 `bun run gen` regenerates the per-folder `index.ts` barrels (`scripts/generate.ts`, formatted with `bun fmt`).
+`bun run gen:traffic-lights` writes `svgs/macos_{close,minimize,fullscreen}.svg` from the `@aphrody/m3-os-themes`
+window chrome (`trafficLightSvg` over the product ThemeExport); `-- --check` fails on a stale file. The other
+monochrome glyphs (`caret`, `arrow-right`, `alert`, `info`, ...) draw in `currentColor`. This package is the single
+owner of the SVG set: Spacedrive `@sd/assets` imports `@aphrody/assets/svgs/*` instead of carrying a copy.
 `bun run test` checks the generated barrels against the folders; `bun run typecheck` runs `tsc`.

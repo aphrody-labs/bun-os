@@ -46,6 +46,7 @@
   },
   "scripts": {
     "gen": "bun scripts/generate.ts",
+    "gen:traffic-lights": "bun scripts/traffic-lights.ts",
     "typecheck": "bun check --noEmit",
     "test": "bun test"
   },
