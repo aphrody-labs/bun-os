@@ -59,6 +59,7 @@ const targetCpu = env.USERLAND_TARGET_CPU ?? config.targetCpu;
 const minFreeGib = Number(env.USERLAND_MIN_FREE_GIB ?? 10);
 const outRoot = resolve(env.USERLAND_OUT ?? join(home, "build/out/windows-userland"));
 const targetRoot = resolve(env.USERLAND_TARGET_ROOT ?? join(home, "build/cargo/windows-userland"));
+const xwinCache = resolve(env.USERLAND_XWIN_CACHE ?? join(home, "build/cache/xwin-userland"));
 
 // Run inside build.slice so production (interactive.slice) keeps its memory and CPU share.
 const cgroup = existsSync("/proc/self/cgroup") ? readFileSync("/proc/self/cgroup", "utf8") : "";
@@ -150,6 +151,10 @@ for (const tool of config.tools) {
     APHRODY_BUILD_HOST: env.APHRODY_BUILD_HOST ?? "vps",
     APHRODY_CARGO_TARGET_DIR: join(targetRoot, tool.name),
     PATH: `${shimDir}:${env.PATH}`,
+    // Own MSVC CRT + SDK splat, x86_64 only: concurrent cargo-xwin runs sharing ~/.cache/cargo-xwin re-splat and
+    // delete each other's sysroot (seen 2026-11-03). Seed `xwin/dl` from the shared cache to skip the download.
+    XWIN_CACHE_DIR: xwinCache,
+    XWIN_ARCH: "x86_64",
     CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS: [`-Ctarget-cpu=${targetCpu}`, ...config.rustflags].join(" "),
   };
   for (const [k, v] of Object.entries(profile)) toolEnv[`CARGO_PROFILE_RELEASE_${k.toUpperCase().replace(/-/g, "_")}`] = v;
