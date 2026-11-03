@@ -8,20 +8,23 @@ arch=(x86_64)
 url='https://github.com/aphrody-labs/rio'
 license=('MIT')
 depends=('gcc-libs' 'glibc' 'fontconfig' 'freetype2' 'libxkbcommon' 'wayland' 'vulkan-icd-loader')
-makedepends=('cargo' 'git' 'cmake')
+makedepends=('cargo' 'git' 'cmake' 'shaderc')
 options=(!lto)
 source=("$pkgname::git+https://github.com/aphrody-labs/rio.git#commit=59203ccd5fa1e6b760a738c1ad653bb29f2f3465")
 b2sums=('SKIP')
 
 pkgver() {
   cd "$pkgname"
-  local tag
-  if tag=$(git describe --tags --exact-match 2>/dev/null); then
-    printf '%s' "${tag#v}" | sed 's/^[^0-9]*//; s/-/./g'
+  # Only release-looking tags count (yazi also tags "nightly" on release commits).
+  local m=(--match 'v[0-9]*' --match '[0-9]*') v
+  if v=$(git describe --tags --exact-match "${m[@]}" 2>/dev/null); then
+    v=$(sed 's/^v//; s/-/./g' <<<"$v")
+  elif v=$(git describe --tags --long "${m[@]}" 2>/dev/null); then
+    v=$(sed 's/^v//; s/-\([0-9]*\)-g/.r\1.g/; s/-/./g' <<<"$v")
   else
-    git describe --tags --long 2>/dev/null | sed 's/^[^0-9]*//; s/-\([0-9]*\)-g/.r\1.g/; s/-/./g' ||
-      printf 'r%s.%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=12 HEAD)"
+    v=r$(git rev-list --count HEAD).$(git rev-parse --short=12 HEAD)
   fi
+  printf '%s' "$v"
 }
 
 prepare() {

@@ -60,13 +60,16 @@ export async function pin(path: string, repo = root, rev = "HEAD"): Promise<stri
 const arr = (xs: string[]) => xs.map(x => `'${x}'`).join(" ");
 const PKGVER = `pkgver() {
   cd "$pkgname"
-  local tag
-  if tag=$(git describe --tags --exact-match 2>/dev/null); then
-    printf '%s' "\${tag#v}" | sed 's/^[^0-9]*//; s/-/./g'
+  # Only release-looking tags count (yazi also tags "nightly" on release commits).
+  local m=(--match 'v[0-9]*' --match '[0-9]*') v
+  if v=$(git describe --tags --exact-match "\${m[@]}" 2>/dev/null); then
+    v=$(sed 's/^v//; s/-/./g' <<<"$v")
+  elif v=$(git describe --tags --long "\${m[@]}" 2>/dev/null); then
+    v=$(sed 's/^v//; s/-\\([0-9]*\\)-g/.r\\1.g/; s/-/./g' <<<"$v")
   else
-    git describe --tags --long 2>/dev/null | sed 's/^[^0-9]*//; s/-\\([0-9]*\\)-g/.r\\1.g/; s/-/./g' ||
-      printf 'r%s.%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=12 HEAD)"
+    v=r$(git rev-list --count HEAD).$(git rev-parse --short=12 HEAD)
   fi
+  printf '%s' "$v"
 }`;
 
 function toolPkgbuild(t: Tool, url: string, commit: string): string {
