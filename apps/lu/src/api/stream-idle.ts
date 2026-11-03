@@ -23,11 +23,11 @@
  * Rust at all, so it must work on its own.
  */
 
-import { isMobile } from '../lib/device-kind'
-import { wasSuspendedSince } from '../lib/app-lifecycle'
+import { isMobile } from "../lib/device-kind";
+import { wasSuspendedSince } from "../lib/app-lifecycle";
 
 /** No chunk for this long, once the stream has started → treat it as dead. */
-export const STREAM_IDLE_TIMEOUT_MS = 60_000
+export const STREAM_IDLE_TIMEOUT_MS = 60_000;
 
 /**
  * Grace for the FIRST chunk. A cold local model is loaded only when the
@@ -38,14 +38,14 @@ export const STREAM_IDLE_TIMEOUT_MS = 60_000
  * already shows as "loading model". Five minutes is past any load this app
  * survives and still far short of the endless hang.
  */
-export const STREAM_FIRST_CHUNK_TIMEOUT_MS = 300_000
+export const STREAM_FIRST_CHUNK_TIMEOUT_MS = 300_000;
 
 /**
  * How far past its deadline a timer may fire before the gap itself counts as
  * proof that the process stood still. A busy main thread delays a timer by
  * milliseconds, a frozen WebView by the whole time it was away.
  */
-export const FROZEN_TIMER_SLACK_MS = 5_000
+export const FROZEN_TIMER_SLACK_MS = 5_000;
 
 /**
  * Did this deadline run out while the app could not listen?
@@ -56,45 +56,44 @@ export const FROZEN_TIMER_SLACK_MS = 5_000
  * the WebView must have been frozen (the system does not always announce it).
  */
 export function deadlineWasFrozen(armedAt: number, budget: number, now: number = Date.now()): boolean {
-  if (!isMobile()) return false
-  if (wasSuspendedSince(armedAt)) return true
-  return now - armedAt > budget + FROZEN_TIMER_SLACK_MS
+  if (!isMobile()) return false;
+  if (wasSuspendedSince(armedAt)) return true;
+  return now - armedAt > budget + FROZEN_TIMER_SLACK_MS;
 }
 
 /** Thrown by the parsers when the watchdog fires. Providers catch it and end
  *  the turn with a terminal 'disconnect' chunk rather than letting it bubble
  *  up as a raw error — the stream did not fail, it went quiet. */
 export class StreamIdleTimeoutError extends Error {
-  readonly code = 'stream_idle_timeout'
+  readonly code = "stream_idle_timeout";
   /** The budget that elapsed, in ms — the readable cause for the log line. */
-  readonly idleMs: number
+  readonly idleMs: number;
 
-  constructor(idleMs: number, phase: 'first chunk' | 'stream') {
-    super(`No data on the ${phase} for ${Math.round(idleMs / 1000)}s — connection went silent`)
-    this.name = 'StreamIdleTimeoutError'
-    this.idleMs = idleMs
+  constructor(idleMs: number, phase: "first chunk" | "stream") {
+    super(`No data on the ${phase} for ${Math.round(idleMs / 1000)}s — connection went silent`);
+    this.name = "StreamIdleTimeoutError";
+    this.idleMs = idleMs;
   }
 }
 
 export function isStreamIdleTimeout(err: unknown): err is StreamIdleTimeoutError {
-  return !!err && typeof err === 'object'
-    && (err as { code?: unknown }).code === 'stream_idle_timeout'
+  return !!err && typeof err === "object" && (err as { code?: unknown }).code === "stream_idle_timeout";
 }
 
 export interface StreamIdleOptions {
   /** Silence budget between chunks, ms. `0` or negative disables the watchdog. */
-  idleMs?: number
+  idleMs?: number;
   /** Silence budget before the first chunk, ms. Independent of `idleMs` and
    *  much larger by default — see STREAM_FIRST_CHUNK_TIMEOUT_MS for why. Only
    *  consulted when `idleMs` enables the watchdog at all. */
-  firstChunkMs?: number
+  firstChunkMs?: number;
   /**
    * Fired once, before the error is thrown, so the caller can abort the request
    * itself. That is what actually stops the upstream generation — and on the
    * Tauri proxy path it is what fires `cancel_proxy_stream`. Cancelling only
    * this reader would leave Rust happily pulling from the backend.
    */
-  onIdle?: () => void
+  onIdle?: () => void;
 }
 
 /**
@@ -103,57 +102,61 @@ export interface StreamIdleOptions {
  * the parser that called us, so the SSE line-terminator handling in sse.ts is
  * untouched by this.
  */
-export async function* readChunks(
-  response: Response,
-  opts?: StreamIdleOptions,
-): AsyncGenerator<Uint8Array> {
-  const reader = response.body?.getReader()
-  if (!reader) throw new Error('No response body')
+export async function* readChunks(response: Response, opts?: StreamIdleOptions): AsyncGenerator<Uint8Array> {
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("No response body");
 
-  const idleMs = opts?.idleMs ?? 0
-  const firstChunkMs = opts?.firstChunkMs ?? STREAM_FIRST_CHUNK_TIMEOUT_MS
-  let first = true
-  let timedOut = false
+  const idleMs = opts?.idleMs ?? 0;
+  const firstChunkMs = opts?.firstChunkMs ?? STREAM_FIRST_CHUNK_TIMEOUT_MS;
+  let first = true;
+  let timedOut = false;
 
   try {
     for (;;) {
-      const budget = first ? firstChunkMs : idleMs
-      let result: ReadableStreamReadResult<Uint8Array>
+      const budget = first ? firstChunkMs : idleMs;
+      let result: Awaited<ReturnType<typeof reader.read>>;
 
       if (idleMs > 0 && budget > 0) {
-        let timer: ReturnType<typeof setTimeout> | undefined
+        let timer: ReturnType<typeof setTimeout> | undefined;
         const silent = new Promise<never>((_, reject) => {
           const arm = () => {
-            const armedAt = Date.now()
+            const armedAt = Date.now();
             timer = setTimeout(() => {
               // Phone only: silence while the app was frozen in the background
               // is not silence on the wire. Give the stream a fresh budget
               // instead of ending it the instant the app is shown again.
-              if (deadlineWasFrozen(armedAt, budget)) { arm(); return }
-              timedOut = true
+              if (deadlineWasFrozen(armedAt, budget)) {
+                arm();
+                return;
+              }
+              timedOut = true;
               // Abort BEFORE rejecting: the reject only unblocks this loop, the
               // caller's abort is what tears the request down.
-              try { opts?.onIdle?.() } catch { /* best effort, never mask the timeout */ }
-              reject(new StreamIdleTimeoutError(budget, first ? 'first chunk' : 'stream'))
-            }, budget)
-          }
-          arm()
-        })
+              try {
+                opts?.onIdle?.();
+              } catch {
+                /* best effort, never mask the timeout */
+              }
+              reject(new StreamIdleTimeoutError(budget, first ? "first chunk" : "stream"));
+            }, budget);
+          };
+          arm();
+        });
         try {
           // Promise.race leaves a reaction on the pending read, so the abort's
           // later rejection is handled and never surfaces as an unhandled one.
-          result = await Promise.race([reader.read(), silent])
+          result = await Promise.race([reader.read(), silent]);
         } finally {
-          if (timer) clearTimeout(timer)
+          if (timer) clearTimeout(timer);
         }
       } else {
-        result = await reader.read()
+        result = await reader.read();
       }
 
-      if (result.done) break
+      if (result.done) break;
       if (result.value) {
-        first = false
-        yield result.value
+        first = false;
+        yield result.value;
       }
     }
   } finally {
@@ -161,21 +164,31 @@ export async function* readChunks(
       // A read is still outstanding. Cancel so the body is not left dangling;
       // both the cancel and the release can reject/throw on a stream the abort
       // already killed, and neither is worth reporting.
-      try { void Promise.resolve(reader.cancel()).catch(() => { /* already dead */ }) } catch { /* no cancel */ }
+      try {
+        void Promise.resolve(reader.cancel()).catch(() => {
+          /* already dead */
+        });
+      } catch {
+        /* no cancel */
+      }
     }
-    try { reader.releaseLock() } catch { /* outstanding read after an idle abort */ }
+    try {
+      reader.releaseLock();
+    } catch {
+      /* outstanding read after an idle abort */
+    }
   }
 }
 
 /** A controller the watchdog may abort, chained to the caller's own signal. */
 export interface IdleAbortGuard {
   /** Hand THIS to fetch / localFetchStream instead of the caller's signal. */
-  readonly signal: AbortSignal
+  readonly signal: AbortSignal;
   /** Abort the request. Wired to `StreamIdleOptions.onIdle`. */
-  readonly abort: () => void
+  readonly abort: () => void;
   /** Drop the listener on the caller's signal — always call it in a `finally`,
    *  a long chat session would otherwise pile up listeners on a shared signal. */
-  readonly release: () => void
+  readonly release: () => void;
 }
 
 /**
@@ -190,26 +203,28 @@ export interface IdleAbortGuard {
  * 17.4, and this ships inside whatever WebView the user's OS provides.
  */
 export function idleAbortGuard(outer?: AbortSignal): IdleAbortGuard {
-  const ctl = new AbortController()
-  let onOuterAbort: (() => void) | null = null
+  const ctl = new AbortController();
+  let onOuterAbort: (() => void) | null = null;
 
   if (outer) {
     if (outer.aborted) {
-      ctl.abort()
+      ctl.abort();
     } else {
-      onOuterAbort = () => ctl.abort()
-      outer.addEventListener('abort', onOuterAbort, { once: true })
+      onOuterAbort = () => ctl.abort();
+      outer.addEventListener("abort", onOuterAbort, { once: true });
     }
   }
 
   return {
     signal: ctl.signal,
-    abort: () => { if (!ctl.signal.aborted) ctl.abort() },
+    abort: () => {
+      if (!ctl.signal.aborted) ctl.abort();
+    },
     release: () => {
       if (outer && onOuterAbort) {
-        outer.removeEventListener('abort', onOuterAbort)
-        onOuterAbort = null
+        outer.removeEventListener("abort", onOuterAbort);
+        onOuterAbort = null;
       }
     },
-  }
+  };
 }
