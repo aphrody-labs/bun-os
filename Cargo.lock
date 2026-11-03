@@ -3886,6 +3886,7 @@ dependencies = [
  "futures-util",
  "getrandom 0.4.3",
  "jsonwebtoken",
+ "resvg 0.45.1",
  "serde",
  "serde_json",
  "tokio",

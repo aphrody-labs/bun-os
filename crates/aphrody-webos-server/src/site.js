@@ -1,0 +1,247 @@
+// SPDX-License-Identifier: Apache-2.0
+// aphrody.com page services (served at /site.js by crates/aphrody-webos-server/src/site.rs): storage notice and
+// manager, service worker, install prompt, Web Share with social links, WebGPU probe. The desktop is the wasm client.
+
+const KEY = "aphrody.storage"; // "functional" | "essential"
+const choice = () => {
+  try {
+    return localStorage.getItem(KEY);
+  } catch {
+    return "essential";
+  }
+};
+
+async function clearLocal() {
+  try {
+    localStorage.clear();
+    sessionStorage.clear();
+  } catch {}
+  for (const name of await caches.keys().catch(() => [])) await caches.delete(name);
+  for (const db of (await indexedDB.databases?.().catch(() => [])) ?? []) if (db.name) indexedDB.deleteDatabase(db.name);
+  for (const reg of await navigator.serviceWorker?.getRegistrations().catch(() => []) ?? []) await reg.unregister();
+}
+
+function choose(value) {
+  if (value === "essential") clearLocal();
+  try {
+    localStorage.setItem(KEY, value);
+  } catch {}
+  document.getElementById("storage-notice")?.remove();
+  if (value === "functional") registerWorker();
+}
+
+function registerWorker() {
+  if (!("serviceWorker" in navigator) || choice() !== "functional") return;
+  navigator.serviceWorker.register("/sw.js", { scope: "/", type: "classic", updateViaCache: "none" }).catch(() => {});
+}
+
+function notice() {
+  if (choice() || location.pathname === "/privacy") return;
+  const bar = document.createElement("aside");
+  bar.id = "storage-notice";
+  bar.setAttribute("role", "region");
+  bar.setAttribute("aria-label", "Storage");
+  bar.style.cssText =
+    "position:fixed;z-index:2147483647;inset:auto 16px 16px 16px;max-width:640px;margin:0 auto;padding:16px;display:flex;" +
+    "flex-wrap:wrap;gap:12px;align-items:center;border-radius:16px;background:#1b1f23ee;color:#e6e8ea;" +
+    "font:14px/1.5 system-ui,sans-serif;box-shadow:0 8px 32px #0008;backdrop-filter:blur(12px)";
+  bar.innerHTML =
+    '<span style="flex:1 1 280px">No ads, no trackers. aphrody.com can keep an offline copy of the client and your ' +
+    'preferences on this device. <a href="/privacy" style="color:#f5c451">Manage storage</a></span>' +
+    '<button type="button" data-storage="refuse">Essential only</button>' +
+    '<button type="button" data-storage="accept" class="primary">Allow</button>';
+  for (const button of bar.querySelectorAll("button"))
+    button.style.cssText =
+      "font:inherit;padding:8px 14px;border-radius:999px;border:1px solid #8886;cursor:pointer;" +
+      (button.classList.contains("primary") ? "background:#f5c451;color:#16181a;border-color:transparent" : "background:transparent;color:inherit");
+  document.body.append(bar);
+}
+
+const format = (bytes) =>
+  bytes == null ? "?" : bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
+
+async function report() {
+  const table = document.getElementById("storage-report");
+  if (!table) return;
+  const rows = [];
+  const cookies = document.cookie ? document.cookie.split(";").map((c) => c.trim().split("=")[0]) : [];
+  rows.push(["Cookies readable by scripts", cookies.length ? cookies.join(", ") : "none (the session cookie is HttpOnly)"]);
+  try {
+    const keys = Object.keys(localStorage);
+    const size = keys.reduce((n, k) => n + k.length + (localStorage.getItem(k)?.length ?? 0), 0) * 2;
+    rows.push(["localStorage", keys.length ? `${keys.join(", ")} (${format(size)})` : "empty"]);
+    rows.push(["sessionStorage", `${sessionStorage.length} item(s)`]);
+  } catch {
+    rows.push(["localStorage", "blocked by the browser"]);
+  }
+  const cacheNames = await caches.keys().catch(() => []);
+  rows.push(["Cache Storage", cacheNames.length ? cacheNames.join(", ") : "empty"]);
+  const dbs = (await indexedDB.databases?.().catch(() => [])) ?? [];
+  rows.push(["IndexedDB", dbs.length ? dbs.map((d) => d.name).join(", ") : "empty"]);
+  const workers = (await navigator.serviceWorker?.getRegistrations().catch(() => [])) ?? [];
+  rows.push(["Service worker", workers.length ? "installed (offline page and client cache)" : "not installed"]);
+  if (navigator.storage?.estimate) {
+    const { usage, quota } = await navigator.storage.estimate();
+    const persisted = await navigator.storage.persisted?.();
+    rows.push(["Usage", `${format(usage)} of ${format(quota)}${persisted ? ", persistent" : ", best effort"}`]);
+  }
+  rows.push(["Your choice", choice() ?? "not made yet"]);
+  const body = document.createElement("tbody");
+  for (const [name, value] of rows) {
+    const tr = body.insertRow();
+    tr.insertCell().textContent = name;
+    tr.insertCell().textContent = value;
+  }
+  table.replaceChildren(body);
+}
+
+const status = (text) => {
+  const out = document.getElementById("storage-status");
+  if (out) out.textContent = text;
+};
+
+let installPrompt = null;
+addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  installPrompt = event;
+  for (const el of document.querySelectorAll("[data-action=install]")) el.hidden = false;
+});
+addEventListener("appinstalled", () => {
+  installPrompt = null;
+  for (const el of document.querySelectorAll("[data-action=install]")) el.hidden = true;
+  navigator.storage?.persist?.();
+});
+
+const shareTargets = (url, text) => ({
+  x: `https://x.com/intent/post?url=${url}&text=${text}`,
+  bluesky: `https://bsky.app/intent/compose?text=${text}%20${url}`,
+  linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+  reddit: `https://www.reddit.com/submit?url=${url}&title=${text}`,
+  whatsapp: `https://wa.me/?text=${text}%20${url}`,
+  telegram: `https://t.me/share/url?url=${url}&text=${text}`,
+  mastodon: `https://mastodonshare.com/?url=${url}&text=${text}`,
+  email: `mailto:?subject=${text}&body=${url}`,
+});
+
+function shareLinks() {
+  const url = encodeURIComponent(document.querySelector("link[rel=canonical]")?.href ?? location.href);
+  const text = encodeURIComponent(document.title);
+  const targets = shareTargets(url, text);
+  for (const a of document.querySelectorAll("a[data-share]")) {
+    const href = targets[a.dataset.share];
+    if (href) {
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+    }
+  }
+}
+
+document.addEventListener("click", async (event) => {
+  const el = event.target.closest("[data-storage],[data-action]");
+  if (!el) return;
+  switch (el.dataset.storage ?? el.dataset.action) {
+    case "accept":
+      choose("functional");
+      status("Functional storage allowed.");
+      break;
+    case "refuse":
+      choose("essential");
+      status("Essential only: local data cleared.");
+      break;
+    case "persist":
+      status((await navigator.storage?.persist?.()) ? "Data is kept on this device." : "The browser kept best-effort storage.");
+      break;
+    case "clear-local":
+      await clearLocal();
+      status("Local data cleared.");
+      break;
+    case "clear-all":
+      await clearLocal();
+      await fetch("/privacy/clear", { method: "POST", credentials: "same-origin" }).catch(() => {});
+      status("Everything cleared and signed out.");
+      break;
+    case "install":
+      if (installPrompt) {
+        installPrompt.prompt();
+        await installPrompt.userChoice;
+        installPrompt = null;
+        el.hidden = true;
+      }
+      break;
+    case "share":
+      try {
+        await navigator.share({ title: document.title, text: document.querySelector("meta[name=description]")?.content, url: location.origin + "/" });
+      } catch (error) {
+        if (error?.name !== "AbortError") {
+          await navigator.clipboard?.writeText(location.origin + "/");
+          el.textContent = "Link copied";
+        }
+      }
+      break;
+    case "reload":
+      location.reload();
+      return;
+  }
+  report();
+});
+
+// WebGPU probe: the client renders through wgpu; the adapter and its features are exposed for diagnostics.
+async function probeGpu() {
+  const root = document.documentElement;
+  if (!navigator.gpu) {
+    root.dataset.gpu = "webgl2";
+    return;
+  }
+  try {
+    const adapter = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
+    if (!adapter) {
+      root.dataset.gpu = "webgl2";
+      return;
+    }
+    root.dataset.gpu = "webgpu";
+    globalThis.aphrodyGpu = {
+      vendor: adapter.info?.vendor,
+      architecture: adapter.info?.architecture,
+      features: [...adapter.features].sort(),
+      wgslLanguageFeatures: [...(navigator.gpu.wgslLanguageFeatures ?? [])].sort(),
+      preferredFormat: navigator.gpu.getPreferredCanvasFormat(),
+    };
+    const out = document.getElementById("gpu");
+    if (out) out.textContent = `WebGPU ${adapter.info?.vendor ?? ""} ${adapter.info?.architecture ?? ""}`.trim();
+  } catch {
+    root.dataset.gpu = "webgl2";
+  }
+}
+
+// The landing content stays for crawlers and first paint; the client's canvas replaces it once mounted.
+function watchCanvas() {
+  const landing = document.getElementById("landing");
+  if (!landing) return;
+  const hide = () => {
+    if (document.querySelector("body > canvas")) {
+      landing.hidden = true;
+      return true;
+    }
+    return false;
+  };
+  if (!hide()) {
+    const observer = new MutationObserver(() => hide() && observer.disconnect());
+    observer.observe(document.body, { childList: true });
+  }
+}
+
+function start() {
+  notice();
+  shareLinks();
+  report();
+  watchCanvas();
+  probeGpu();
+  if (!navigator.share) for (const el of document.querySelectorAll("[data-action=share]")) el.textContent = "Copy link";
+  addEventListener("load", registerWorker, { once: true });
+  if (document.readyState === "complete") registerWorker();
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
+else start();

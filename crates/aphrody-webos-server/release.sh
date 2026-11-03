@@ -76,7 +76,7 @@ done
 )
 # Inventory of every member plus the built wasm modules, with the coverage gate (exits non-zero on failure).
 "$target/release/aphrody-inventory" write "$release/inventory" --versions
-printf 'SOURCE_COMMIT=%s\n' "$commit" > "$release/release.env"
+printf 'SOURCE_COMMIT=%s\nRELEASED_AT=%s\n' "$commit" "$(date -u +%F)" > "$release/release.env"
 
 (
   cd "$release"

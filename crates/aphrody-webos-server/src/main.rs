@@ -7,6 +7,7 @@ mod emulators;
 mod health;
 mod page;
 mod sessions;
+mod site;
 
 use std::net::SocketAddr;
 use std::path::PathBuf;
@@ -79,6 +80,8 @@ pub struct AppState {
     /// Built wasm client (index.html, the wasm-bindgen glue and the .wasm), inside the release.
     pub client: PathBuf,
     pub source_commit: Option<String>,
+    /// Release date (YYYY-MM-DD, `RELEASED_AT` or the start of the process): sitemap lastmod and security.txt.
+    pub released: String,
     /// Inventory of every Bun OS member (crates/aphrody-inventory), when the release carries one.
     pub inventory: Result<aphrody_inventory::InventoryState, String>,
     /// Sessions of the host and the stream bridge (`sessions.rs`).
@@ -158,6 +161,7 @@ fn app(state: Arc<AppState>) -> Router {
         .precompressed_br()
         .precompressed_gzip();
     let state_sessions = state.sessions.clone();
+    let state_site = state.clone();
     let inventory = match &state.inventory {
         Ok(inventory) => aphrody_inventory::router(inventory.clone()),
         Err(_) => Router::new(),
@@ -168,6 +172,8 @@ fn app(state: Arc<AppState>) -> Router {
         .route("/healthz", get(health::health))
         .with_state(state)
         .merge(API.routes_at("/api"))
+        // SEO, llms.txt, share images, web app manifest, service worker and storage management (site.rs).
+        .merge(site::router(state_site))
         .merge(inventory)
         .merge(sessions::router(state_sessions))
         .merge(emulators::router(
@@ -213,6 +219,23 @@ fn app(state: Arc<AppState>) -> Router {
         ))
 }
 
+/// Current UTC date as YYYY-MM-DD (civil-from-days, H. Hinnant).
+fn today() -> String {
+    let days = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs() / 86_400) as i64
+        + 719_468;
+    let era = days.div_euclid(146_097);
+    let doe = days.rem_euclid(146_097);
+    let yoe = (doe - doe / 1_460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let day = doy - (153 * mp + 2) / 5 + 1;
+    let month = if mp < 10 { mp + 3 } else { mp - 9 };
+    let year = yoe + era * 400 + i64::from(month <= 2);
+    format!("{year:04}-{month:02}-{day:02}")
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr: SocketAddr = std::env::var("WEBOS_ADDR")
@@ -224,9 +247,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         source_commit: std::env::var("SOURCE_COMMIT")
             .ok()
             .filter(|s| !s.is_empty()),
+        released: std::env::var("RELEASED_AT")
+            .ok()
+            .filter(|d| d.len() >= 10)
+            .map(|d| d[..10].to_owned())
+            .unwrap_or_else(today),
         inventory: aphrody_inventory::InventoryState::from_env().map_err(|e| e.to_string()),
         sessions: sessions::Sessions::from_env(),
     });
+    site::prerender();
     let listener = tokio::net::TcpListener::bind(addr).await?;
     println!(
         "{}",
