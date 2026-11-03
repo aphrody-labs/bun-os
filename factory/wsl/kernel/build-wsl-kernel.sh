@@ -26,7 +26,10 @@ export LLVM=1
 # component); check it first so a missing component fails here with the real reason, not as a dropped line.
 make rustavailable || { echo "Rust toolchain unusable for the kernel (rustup component add rust-src?)" >&2; exit 1; }
 make olddefconfig
-scripts/kconfig/merge_config.sh -m .config "$repo/factory/wsl/kernel/wsl-rust.config"
+# Fragments in order: Rust + identity, Android binder (Waydroid), Docker/Waydroid networking, Hyper-V latency.
+frags=(wsl-rust wsl-android wsl-docker wsl-latency)
+fragfiles=(); for f in "${frags[@]}"; do fragfiles+=("$repo/factory/wsl/kernel/$f.config"); done
+scripts/kconfig/merge_config.sh -m .config "${fragfiles[@]}"
 make olddefconfig
 # Fail when a fragment line did not survive olddefconfig. A "# CONFIG_X is not set" line may vanish when X's
 # dependencies are unmet (the symbol is then invisible); it only fails if X ended up y or m.
@@ -38,7 +41,7 @@ while read -r line; do
   elif [[ $line =~ ^CONFIG_ ]]; then
     grep -qxF "$line" .config || { echo "fragment line dropped: $line" >&2; missing=1; }
   fi
-done <"$repo/factory/wsl/kernel/wsl-rust.config"
+done < <(cat "${fragfiles[@]}")
 [[ $missing -eq 0 ]] || exit 1
 t1=$(date +%s)
 { rustc --version; bindgen --version; clang --version | head -1; } | tee "$out/tools.txt"
@@ -60,6 +63,7 @@ bash "$work/gen_artifacts_vhdx.sh" "$work/mods" "$work/hdrs" "$work/perf" "$krel
 cat >"$out/report.json" <<JSON
 {"kernel":"$kver","patches":$(find "$repo/factory/wsl/kernel/patches" -name '*.patch' | wc -l),
  "rust":$(grep -c '^CONFIG_RUST=y' .config),"dxgkrnl":"$(grep '^CONFIG_DXGKRNL=' .config)",
+ "binder":"$(grep '^CONFIG_ANDROID_BINDERFS=' .config)","hz":$(grep -oP '^CONFIG_HZ=\K[0-9]+' .config),
  "seconds":{"prepare":$((t1-t0)),"build":$((t2-t1))},
  "kernelrelease":"$krel","perf_built":$perf_built,
  "bytes":{"bzImage":$(stat -c %s "$out/bzImage"),"modules.vhdx":$(stat -c %s "$out/modules.vhdx"),"vmlinux":$(stat -c %s vmlinux)},
