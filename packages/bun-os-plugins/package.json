@@ -16,6 +16,8 @@
     "./preload": "./src/preload.ts",
     "./commands": "./src/commands/index.ts",
     "./devtools": "./src/devtools/devtools.ts",
+    "./graph": "./src/graph/index.ts",
+    "./graph/plugin": "./src/graph/plugin.ts",
     "./dotnet": "./src/dotnet/dotnet.ts",
     "./dotnet/hostfxr": "./src/dotnet/hostfxr.ts",
     "./dotnet/plugin": "./src/dotnet/plugin.ts"

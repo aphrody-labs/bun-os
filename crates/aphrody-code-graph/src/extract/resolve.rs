@@ -283,7 +283,7 @@ impl Files {
             return hit.clone();
         }
         let relative =
-            spec.starts_with(".//") || spec.starts_with("../") || matches!(spec, "." | "..");
+            spec.starts_with("./") || spec.starts_with("../") || matches!(spec, "." | "..");
         let found = if relative {
             join_relative(parent_dir(importer), spec)
                 .and_then(|base| self.probe(&base))

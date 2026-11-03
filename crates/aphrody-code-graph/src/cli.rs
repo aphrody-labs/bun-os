@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Command line of the code graph: build, query, explain, path, report, export, delete. JSON on
+//! Command line of the code graph: build, query, explain, path, report, export, delete, exec. JSON on
 //! stdout for `build`, plain text for the readers. Offline, no model, no network.
 
 use std::{ffi::OsString, fmt::Write as _, path::PathBuf};
@@ -80,6 +80,20 @@ enum Command {
     /// Delete the graph named by `--source` (nodes, edges, communities, cache, scan rows).
     #[command(visible_alias = "drop")]
     Delete,
+    /// Run one JSON worker request (`crate::api`) read from stdin; the JSON response goes to
+    /// stdout. No home database is opened: this is the `bun:graph-native` route on upstream Bun.
+    Exec,
+}
+
+fn exec() -> Result<String> {
+    use std::io::Read as _;
+    let mut input = Vec::new();
+    std::io::stdin()
+        .take(crate::api::MAX_JSON_BYTES as u64 + 1)
+        .read_to_end(&mut input)
+        .map_err(|e| GraphError::Json(serde_json::Error::io(e)))?;
+    let output = crate::api::execute_json(&input, &std::sync::atomic::AtomicBool::new(false))?;
+    String::from_utf8(output).map_err(|e| GraphError::Invalid(e.to_string()))
 }
 
 fn delete_source(db: &HomeDb, label: &str) -> Result<String> {
@@ -134,6 +148,9 @@ fn pick_source(db: &HomeDb, wanted: Option<&str>) -> Result<String> {
 }
 
 fn run(cli: &Cli) -> Result<String> {
+    if matches!(cli.command, Command::Exec) {
+        return exec();
+    }
     let layout = cli.store.layout()?;
     if matches!(cli.command, Command::Delete) {
         let Some(label) = cli.source.as_deref() else {
@@ -176,7 +193,7 @@ fn run(cli: &Cli) -> Result<String> {
     let label = pick_source(&db, cli.source.as_deref())?;
     let graph = Graph::load(&db, &label)?;
     Ok(match &cli.command {
-        Command::Build { .. } | Command::Delete => unreachable!("handled above"),
+        Command::Build { .. } | Command::Delete | Command::Exec => unreachable!("handled above"),
         Command::Query {
             question,
             depth,

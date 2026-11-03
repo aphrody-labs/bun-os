@@ -9,6 +9,7 @@
 #![deny(unsafe_code)]
 
 pub mod analyze;
+pub mod api;
 pub mod cli;
 pub mod error;
 pub mod export;
@@ -19,6 +20,7 @@ pub mod query;
 pub mod report;
 
 pub use crate::{
+    api::{GraphRequest, GraphResponse, execute, execute_json},
     error::{GraphError, Result},
     graph::{Confidence, Edge, Graph, Node, NodeKind},
 };

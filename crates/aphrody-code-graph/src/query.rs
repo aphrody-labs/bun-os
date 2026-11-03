@@ -13,7 +13,8 @@ use crate::{
 };
 
 /// Direction of a connection relative to the explained node.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Direction {
     /// The other node points at this node (`<--`).
     Incoming,
@@ -22,7 +23,7 @@ pub enum Direction {
 }
 
 /// One neighbor of an explained node.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Connection {
     /// Direction.
     pub direction: Direction,
@@ -37,7 +38,7 @@ pub struct Connection {
 }
 
 /// Result of [`Graph::explain`].
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Explanation {
     /// Node label.
     pub label: String,
