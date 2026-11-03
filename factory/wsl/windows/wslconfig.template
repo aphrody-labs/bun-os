@@ -23,8 +23,10 @@ autoProxy=true
 nestedVirtualization=true
 
 [general]
-# Keep the distro (and with it the VM, Docker and Waydroid) running: no 3-4 s cold boot on the next wsl.exe.
-instanceIdleTimeout=-1
+# WSL default idle timeouts (instance 15 s, VM 60 s): the VM runs only while something uses it. Keeping it up is the
+# job of the on-demand BunOSWsl service (docs/WSL-SERVICE.md), never of a global -1 that turns every accidental wake
+# (an Explorer \wsl.localhost lookup, a wsl.exe call) into a 1.6 GB VM resident until shutdown
+# (docs/WINDOWS-ARCHITECTURE.md).
 
 [experimental]
 # gradual: cache is returned slowly, so file-cache hits survive idle periods (dropCache empties it at once).

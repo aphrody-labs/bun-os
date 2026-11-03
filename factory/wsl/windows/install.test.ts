@@ -31,3 +31,11 @@ test("sizing: all CPUs, half the RAM, a quarter as swap", () => {
   expect(sizing(24, 31.8 * 2 ** 30)).toEqual({ processors: "24", memory: "16GB", swap: "8GB" });
   expect(sizing(2, 1 * 2 ** 30)).toEqual({ processors: "2", memory: "2GB", swap: "1GB" });
 });
+
+test("mergeIni drops retired Bun OS values but keeps a user's own", () => {
+  const merged = mergeIni("[general]\ninstanceIdleTimeout=-1\n[wsl2]\nmemory=8GB\n", "[wsl2]\nswap=2GB\n");
+  expect(merged).not.toContain("instanceIdleTimeout");
+  expect(merged).toContain("memory=8GB");
+  const own = mergeIni("[general]\ninstanceIdleTimeout=600000\n", "[wsl2]\nswap=2GB\n");
+  expect(own).toContain("instanceIdleTimeout=600000");
+});

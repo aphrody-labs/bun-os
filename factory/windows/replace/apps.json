@@ -1,0 +1,69 @@
+{
+  "//": "Bun OS apps that can stand in for a Windows counterpart, with the gate each must pass before `bunos windows replace <app> on` switches the default, and the reversible switch it uses (docs/WINDOWS-ARCHITECTURE.md, section 'Replacement path'). Switches only change defaults (associations, shell verbs, Windows Terminal profile); no Windows file is deleted, renamed or patched, and every switch is off by default.",
+  "schema": 1,
+  "defaultGate": {
+    "crashFreeDays": 14,
+    "maxStartupMs": 1500,
+    "idleCpuPct": 0.5,
+    "privateMB": 80
+  },
+  "apps": {
+    "files": {
+      "title": "COSMIC Files instead of Explorer windows",
+      "bunos": "cosmic-files.exe",
+      "windows": "explorer.exe (folder windows; the shell itself is never replaced)",
+      "switch": { "kind": "shell-component", "component": "files-default" },
+      "parity": ["open/copy/move/rename/delete through IFileOperation", "Recycle Bin", "Explorer context menu (Show more options)", "Properties sheet", "thumbnails", "network and WSL locations", "drag and drop with other apps", "keyboard navigation and UIA names"]
+    },
+    "terminal": {
+      "title": "nushell as the Windows Terminal default profile (cmd and PowerShell stay installed)",
+      "bunos": "nu.exe",
+      "windows": "cmd.exe / powershell.exe as the default WT profile",
+      "switch": { "kind": "shell-component", "component": "terminal" },
+      "gate": { "maxStartupMs": 500, "privateMB": 60 },
+      "parity": ["win <tool> covers services, registry, WMI, COM, events", "script associations (.nu)", "UTF-8 console", "Windows Terminal handoff"]
+    },
+    "rio": {
+      "title": "Rio as the console host",
+      "bunos": "rio.exe",
+      "windows": "Windows Terminal / conhost",
+      "switch": { "kind": "none", "reason": "Rio has no ITerminalHandoff server yet: Windows can only delegate the console to a terminal implementing the OpenConsole handoff COM interfaces (docs/WINDOWS-SHELL.md)." },
+      "parity": ["ITerminalHandoff / IConsoleHandoff", "tabs and panes", "IME", "accessibility (UIA text pattern)"]
+    },
+    "userland": {
+      "title": "uutils/brush userland on PATH",
+      "bunos": "coreutils.exe, brush.exe (%SystemRoot%\\BunOS\\userland)",
+      "windows": "System32 tools of the same name (find, sort, more, ...)",
+      "switch": { "kind": "none", "reason": "Ordered PATH only: the userland is reached by its own directory on PATH and the nu/brush shells; System32 tools are never shadowed or replaced, so scripts that call find.exe or sort.exe keep Windows' behaviour." },
+      "parity": ["GNU option compatibility for every shipped tool", "UTF-8 and long paths", "no System32 name collisions on PATH"]
+    },
+    "window-management": {
+      "title": "Window management",
+      "bunos": "(none: retired 2026-11-03)",
+      "windows": "Snap layouts, Snap groups, virtual desktops",
+      "switch": { "kind": "none", "reason": "Windows' own window management is the pick; `bunos-win11 apply --module look` turns on and themes it. GlazeWM, tacky-borders and AltSnap are retired (no resident processes)." },
+      "parity": []
+    },
+    "bar": {
+      "title": "Taskbar",
+      "bunos": "(none: retired 2026-11-03)",
+      "windows": "the Windows taskbar",
+      "switch": { "kind": "none", "reason": "The taskbar stays; the catalog's shell module declutters it (Widgets, Task View, Chat, search box) by policy." },
+      "parity": []
+    },
+    "launcher": {
+      "title": "Launcher",
+      "bunos": "(none: retired 2026-11-03)",
+      "windows": "Start search",
+      "switch": { "kind": "none", "reason": "Start search stays; the catalog turns off web results and suggestions. Flow Launcher is retired." },
+      "parity": []
+    },
+    "tweaks": {
+      "title": "Bun OS Tweaks next to Settings",
+      "bunos": "bunos-win11",
+      "windows": "Settings pages",
+      "switch": { "kind": "none", "reason": "A complement, not a replacement: it writes the same values Settings writes, with a journal and undo." },
+      "parity": []
+    }
+  }
+}

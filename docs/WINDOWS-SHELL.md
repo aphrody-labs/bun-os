@@ -1,6 +1,6 @@
 # Bun OS shell on Windows
 
-How Bun OS puts nushell, bash, Rio, GlazeWM and COSMIC Files in place of cmd, PowerShell, the stock
+How Bun OS puts nushell, bash, Rio and COSMIC Files in place of cmd, PowerShell, the stock
 window behaviour and the Explorer window, with the same Windows APIs, while Windows itself stays intact:
 `cmd.exe`, `powershell.exe` and `explorer.exe` are never removed, renamed or replaced as the shell, and no
 Windows file is overwritten. Everything per-user is reversible from a journal; the one elevated step only
@@ -8,7 +8,7 @@ copies signed binaries into `%SystemRoot%\BunOS\`.
 
 Owners reused here: WinClean (`packages/bun-windows-winclean`, the canonical Windows API owner), the
 userland bundle (`factory/windows/userland`, nu/brush/coreutils, [WINDOWS-USERLAND.md](WINDOWS-USERLAND.md)),
-the Windows desktop picks (GlazeWM + `bunos-win11-chrome` + `bunos-win11-wallpaper`,
+the Windows desktop look (Windows' own settings from the tweak catalog, nothing resident,
 [WINDOWS-DESKTOP.md](WINDOWS-DESKTOP.md)), the WSL desktop sessions ([DESKTOP-SESSIONS.md](DESKTOP-SESSIONS.md)),
 the NT bridge ([NTCORE.md](NTCORE.md)) and test signing (`factory/windows/signing`).
 
@@ -19,7 +19,7 @@ the NT bridge ([NTCORE.md](NTCORE.md)) and test signing (`factory/windows/signin
 | cmd / PowerShell as the interactive shell | **nushell** (fork `vendor/nushell`), default profile of Windows Terminal; **brush** (bash-compatible, userland bundle) for `.sh` | WT fragment + `defaultProfile`; `.nu`/`.sh` associations |
 | PowerShell cmdlets over Windows APIs | **`nu_plugin_windows`** (`win <tool>` in nushell) and the **`win`** CLI (bash/brush, JSON out) | `crates/nu_plugin_windows`, generated from the WinClean catalog (204 tools) |
 | conhost / Windows Terminal window | **Rio** (fork `vendor/rio`) running nushell; Windows Terminal stays the *console host* | see "Terminal" |
-| Stock window management | the `windows-hyprland` session: **GlazeWM** (fork `vendor/glazewm`), tacky-borders, Zebar, Flow Launcher, AltSnap, `bunos-win11-chrome watch`, `bunos-win11-wallpaper` (owner: `factory/windows/desktop/hyprland.ts`, [WINDOWS-DESKTOP.md](WINDOWS-DESKTOP.md)) | `enable wm` adds the HKCU `Run` autostart; `disable wm` removes it |
+| Stock window management | **Windows itself**: Snap layouts, snap groups, virtual desktops, accent borders (catalog `look` module, `bunos-win11 apply`); the resident GlazeWM stack is retired ([WINDOWS-ARCHITECTURE.md](WINDOWS-ARCHITECTURE.md)) | one-shot registry values with undo |
 | Explorer windows | **COSMIC Files** (fork `vendor/cosmic-epoch/cosmic-files`), native `x86_64-pc-windows-msvc` | "Open in COSMIC Files" verbs, Open-with app, optional default folder handler |
 | — | Explorer shows the Bun OS Linux filesystem | pinned "Bun OS (Linux)" navigation-pane entry → `\\wsl.localhost\bunos` |
 
@@ -81,7 +81,7 @@ Windows "default terminal application" delegation (`HKCU\Console\%%Startup` `Del
 open **nushell** by default (fragment profile "Bun OS nushell", `{7b0f5a3e-4b1d-4c2e-9a10-b05e05de1101}`,
 set as `defaultProfile` in each installed WT's `settings.json`, previous value journaled). Explorer's own
 "Open in Terminal" therefore opens nushell too. Rio is the Bun OS terminal everywhere we launch one:
-"Open in Rio (nushell)" on folders/drives/backgrounds, GlazeWM `Alt+Enter`, COSMIC Files "Open in
+"Open in Rio (nushell)" on folders/drives/backgrounds, COSMIC Files "Open in
 terminal"; its config (`%LOCALAPPDATA%\rio\config.toml`, only written when absent) starts nushell.
 Implementing the handoff server in our Rio fork is the path to making Rio the delegated console host.
 
@@ -116,17 +116,12 @@ Linux-side file manager, not an Explorer replacement; COSMIC Files is the native
 
 ## Window manager
 
-The per-user window-manager session is owned by `factory/windows/desktop/hyprland.ts` (`windows-hyprland`:
-the GlazeWM fork with its watcher, tacky-borders, Zebar, Flow Launcher, AltSnap, `bunos-win11-chrome watch`
-and `bunos-win11-wallpaper`; Explorer stays the shell), which deliberately registers nothing. `enable wm`
-only adds the logon autostart (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run\BunOS.Desktop` = `bun hyprland.ts up`) and starts the
-session if it was not running; `disable wm` removes the Run value and stops the session only if `enable`
-started it. GlazeWM itself is never killed by image name: its IPC port (6123) is fixed, and a GlazeWM killed
-while its watcher lives leaves the listening socket in the stuck watcher, so the next GlazeWM fails with
-`os error 10048` until that watcher is terminated (`Win32_Process.Terminate`, elevated).
-`bunos-win11-chrome watch` (added here, used by that session) applies the DWM chrome to captioned top-level
-windows as they appear (an out-of-context `EVENT_OBJECT_SHOW` hook: no injection, nothing persists after the
-windows close).
+Retired on 2026-11-03 with the rest of the resident desktop stack (GlazeWM, tacky-borders, Zebar, Flow Launcher,
+AltSnap, `bunos-win11-chrome watch`, `bunos-win11-wallpaper`): Windows' own Snap layouts and virtual desktops are the
+window manager, themed once by `bunos-win11 apply --module look` ([WINDOWS-ARCHITECTURE.md](WINDOWS-ARCHITECTURE.md)).
+The `wm` component of `bunos-shell.ts` is kept only so `disable wm` / `undo` remove the HKCU `Run\BunOS.Desktop`
+value an earlier `enable wm` journaled; `enable wm` now fails with that pointer. `navpane` (the "Bun OS (Linux)" pane
+entry) is opt-in: Explorer enumerates it at every logon, and resolving `\\wsl.localhost\bunos` starts the WSL VM.
 
 ## Install, enable, undo
 
@@ -136,9 +131,7 @@ Build (workstation; `CARGO_TARGET_DIR` defaults to `%LOCALAPPDATA%\Aphrody\cache
 (cd crates/nu_plugin_windows && CARGO_TARGET_DIR=$T/nu-plugin-windows cargo build --release)
 (cd vendor/nushell && CARGO_TARGET_DIR=$T/nushell-fork cargo build --release --locked -p nu)
 (cd vendor/rio && CARGO_TARGET_DIR=$T/shell-forks cargo build --release --locked -p rioterm)
-(cd vendor/glazewm && CARGO_TARGET_DIR=$T/shell-forks cargo build --release --locked -p wm -p wm-cli -p wm-watcher)
 (cd vendor/cosmic-epoch/cosmic-files && CARGO_TARGET_DIR=$T/shell-forks cargo build --release --no-default-features --features wgpu)
-cargo build --release --locked -p bunos-win11-chrome -p bunos-win11-wallpaper
 ```
 
 Elevated, idempotent (the owner runs it; Windows Sudo inline):
@@ -157,9 +150,9 @@ unchanged files.
 Per user (no elevation):
 
 ```sh
-bun factory/windows/shell/bunos-shell.ts enable            # nu-plugin terminal assoc verbs files navpane icons wm
+bun factory/windows/shell/bunos-shell.ts enable            # nu-plugin terminal assoc verbs files icons
 bun factory/windows/shell/bunos-shell.ts enable files-default
-bun factory/windows/shell/bunos-shell.ts disable wm        # toggle the window manager off
+bun factory/windows/shell/bunos-shell.ts enable navpane    # opt-in: wakes the WSL VM whenever Explorer lists it
 bun factory/windows/shell/bunos-shell.ts undo              # everything per-user back
 bun factory/windows/shell/bunos-shell.ts status
 ```

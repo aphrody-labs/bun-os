@@ -265,8 +265,9 @@ service PATH lacked `/usr/sbin` (`mke2fs`); the script now appends it.
 
 `kernel=` and `kernelModules=` under `%SystemRoot%\BunOS\wsl`, `processors=24`, `memory=16GB`, `swap=8GB` (all CPUs,
 half the RAM, a quarter as swap: `install.ts` computes them), `networkingMode=mirrored`, `dnsTunneling`, `autoProxy`,
-`firewall=true` (kept from the user's file), `nestedVirtualization`, `guiApplications`; `[general] instanceIdleTimeout=-1`
-(the distro, Docker and Waydroid stay up: no cold boot on the next `wsl.exe`); `[experimental] autoMemoryReclaim=gradual`,
+`firewall=true` (kept from the user's file), `nestedVirtualization`, `guiApplications`; WSL's default idle timeouts
+(the 2026-11-03 `instanceIdleTimeout=-1` is dropped by the installer: it kept the VM resident after any accidental
+wake; keep-alive is the on-demand BunOSWsl service, docs/WINDOWS-ARCHITECTURE.md); `[experimental] autoMemoryReclaim=gradual`,
 `sparseVhd`, `hostAddressLoopback`, `ignoredPorts=53,67`. The last one is needed: in mirrored mode Linux cannot bind a
 port Windows already holds, and Windows' DHCP on 67 made Waydroid's dnsmasq fail (`failed to bind DHCP server socket`).
 GPU-PV and hvsocket need no key (on by default; WSL's own channels are hvsocket).
@@ -324,7 +325,7 @@ noise-dominated. Other numbers:
 
 | Metric | Value |
 |---|---|
-| Cold start (`wsl --shutdown`, then `wsl -d bunos -- true`) | 3.49 s before; 7.85 s after (systemd now starts dockerd, containerd and the Waydroid container); avoided in normal use by `instanceIdleTimeout=-1` |
+| Cold start (`wsl --shutdown`, then `wsl -d bunos -- true`) | 3.49 s before; 7.85 s after (systemd now starts dockerd, containerd and the Waydroid container); paid once per use session (the VM idles out 60 s after the last client) |
 | dockerd from Windows: TCP connect / `GET /_ping` on 127.0.0.1:2375 | 0.8 ms / 0.6 ms |
 | `docker.exe --version` / `docker.exe version` (process start + API) | 192-235 ms / 310-490 ms on a quiet moment; 1.3-3 s under full host load |
 | `docker run --rm hello-world` via `wsl.exe` | 399 ms before (stock kernel); 650-810 ms after under load |

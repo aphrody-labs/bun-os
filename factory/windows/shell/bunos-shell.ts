@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // SPDX-License-Identifier: Apache-2.0
 /**
- * Bun OS shell for Windows: nushell + Rio + GlazeWM + COSMIC Files over the stock Windows shell,
+ * Bun OS shell for Windows: nushell + Rio + COSMIC Files over the stock Windows shell,
  * without replacing or renaming any Windows file (cmd.exe, powershell.exe and explorer.exe stay).
  *
  *   sudo.exe bun factory/windows/shell/bunos-shell.ts install     elevated: sign + copy binaries to %SystemRoot%\BunOS
@@ -11,7 +11,9 @@
  *   bun factory/windows/shell/bunos-shell.ts undo                 disable everything (per user)
  *   bun factory/windows/shell/bunos-shell.ts status               JSON state of every component
  *
- * Components: nu-plugin, terminal, assoc, verbs, files, files-default (opt-in), navpane, wm.
+ * Components: nu-plugin, terminal, assoc, verbs, files, icons; opt-in: files-default, navpane (Explorer enumerates it
+ * at every logon and that wakes the WSL VM). `wm` is retired (the resident desktop stack is gone,
+ * docs/WINDOWS-ARCHITECTURE.md): `disable wm` / `undo` still remove an old HKCU Run autostart.
  * Per-user state changes are HKCU values/keys and files under %LOCALAPPDATA%; every previous value
  * is journaled in %LOCALAPPDATA%\bunos\shell\journal.json before it is touched.
  * Registry writes go through our own `win` CLI (WinClean), never reg.exe.
@@ -236,7 +238,6 @@ function uninstall() {
 
 // ---------------------------------------------------------------- per-user components
 
-const desktopTool = join(repo, "factory", "windows", "desktop", "hyprland.ts");
 const HKCU_CLASSES = "HKCU\\Software\\Classes";
 const NU_PROFILE_GUID = "{7b0f5a3e-4b1d-4c2e-9a10-b05e05de1101}";
 const NAVPANE_CLSID = "{b05e05de-5a3e-4b1d-9a10-7b0f5a3e1102}";
@@ -497,23 +498,19 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
   },
 
   wm: {
-    // The window manager session is owned by factory/windows/desktop/hyprland.ts (GlazeWM fork, tacky-borders,
-    // Zebar, Flow Launcher, AltSnap, bunos-win11-chrome watch, bunos-win11-wallpaper; docs/WINDOWS-DESKTOP.md),
-    // which registers nothing. This component only adds logon autostart (HKCU Run) and the toggle.
-    enable(c, files) {
-      // Remember whether the session was already up, so disable restores exactly that state.
-      const wasRunning = desktopRunning();
-      files["wm-session"] ??= { path: desktopTool, previous: wasRunning ? "running" : null };
-      c.set("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "BunOS.Desktop", `${quote(process.execPath)} ${quote(desktopTool)} up`);
-      if (!wasRunning) run([process.execPath, desktopTool, "up"], { allowFail: true });
+    // Retired 2026-11-03: GlazeWM, tacky-borders, AltSnap, Flow Launcher, the chrome watcher and the wallpaper engine
+    // no longer run (no resident Bun OS process on Windows by default). Windows' own Snap layouts and virtual desktops,
+    // themed once by `bunos-win11 apply --module look`, replace them. Kept so `disable wm` / `undo` revert the HKCU
+    // Run value an earlier `enable wm` journaled.
+    enable() {
+      throw new Error("wm is retired: use `bunos-win11 apply --module look --module shell` (docs/WINDOWS-ARCHITECTURE.md)");
     },
     disable(files) {
-      if (files["wm-session"]?.previous !== "running") run([process.execPath, desktopTool, "down"], { allowFail: true });
       delete files["wm-session"];
     },
     status: () => ({
       autostart: regGet("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "BunOS.Desktop") !== null,
-      running: desktopRunning(),
+      retired: true,
     }),
   },
 };
@@ -592,11 +589,6 @@ function restoreFolderIcon(files: Files, id: string) {
   delete files[id];
 }
 
-/** The windows-hyprland session is up when its staged GlazeWM runs (its own `status`). */
-function desktopRunning(): boolean {
-  return existsSync(desktopTool) && /^running \d+ .*[\\/]glazewm\.exe\s*$/im.test(run([process.execPath, desktopTool, "status"], { allowFail: true }).out);
-}
-
 /** A Start menu shortcut through WScript.Shell (one COM chain: create, set, save). */
 function shortcut(lnk: string, target: string, workdir: string) {
   win("com_invoke", {
@@ -612,7 +604,7 @@ function shortcut(lnk: string, target: string, workdir: string) {
 }
 
 
-const ALL = ["nu-plugin", "terminal", "assoc", "verbs", "files", "navpane", "icons", "wm"];
+const ALL = ["nu-plugin", "terminal", "assoc", "verbs", "files", "icons"];
 
 function enable(names: string[]) {
   const journal = loadJournal();
@@ -676,7 +668,7 @@ switch (command) {
     disable(names);
     break;
   case "undo":
-    disable([...ALL, "files-default"].filter(n => n in loadJournal() || n in components));
+    disable([...ALL, "files-default", "navpane", "wm"].filter(n => n in loadJournal() || n in components));
     break;
   case "status":
     status();

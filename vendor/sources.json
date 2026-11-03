@@ -632,6 +632,7 @@
     },
     "glazewm": {
       "origin": "https://github.com/aphrody-labs/glazewm.git",
+      "retired": "2026-11-03: resident Windows desktop stack removed (window manager); Windows Snap, virtual desktops and the catalog look module replace it, docs/WINDOWS-ARCHITECTURE.md. Kept as a reference fork only, not built or shipped.",
       "upstream": "https://github.com/glzr-io/glazewm.git",
       "path": "glazewm",
       "branch": "bunos",
@@ -844,6 +845,7 @@
     },
     "zebar": {
       "origin": "https://github.com/aphrody-labs/zebar.git",
+      "retired": "2026-11-03: resident Windows desktop stack removed (WebView bar); Windows Snap, virtual desktops and the catalog look module replace it, docs/WINDOWS-ARCHITECTURE.md. Kept as a reference fork only, not built or shipped.",
       "upstream": "https://github.com/glzr-io/zebar.git",
       "path": "zebar",
       "branch": "bunos",
@@ -851,11 +853,13 @@
     },
     "tacky-borders": {
       "origin": "https://github.com/aphrody-labs/tacky-borders.git",
+      "retired": "2026-11-03: resident Windows desktop stack removed (border overlay); Windows Snap, virtual desktops and the catalog look module replace it, docs/WINDOWS-ARCHITECTURE.md. Kept as a reference fork only, not built or shipped.",
       "upstream": "https://github.com/luke-you/tacky-borders.git",
       "path": "tacky-borders"
     },
     "flow-launcher": {
       "origin": "https://github.com/aphrody-labs/Flow.Launcher.git",
+      "retired": "2026-11-03: resident Windows desktop stack removed (launcher); Windows Snap, virtual desktops and the catalog look module replace it, docs/WINDOWS-ARCHITECTURE.md. Kept as a reference fork only, not built or shipped.",
       "upstream": "https://github.com/Flow-Launcher/Flow.Launcher.git",
       "path": "flow-launcher",
       "branch": "bunos",
@@ -863,6 +867,7 @@
     },
     "altsnap": {
       "origin": "https://github.com/aphrody-labs/AltSnap.git",
+      "retired": "2026-11-03: resident Windows desktop stack removed (Super-drag hook); Windows Snap, virtual desktops and the catalog look module replace it, docs/WINDOWS-ARCHITECTURE.md. Kept as a reference fork only, not built or shipped.",
       "upstream": "https://github.com/RamonUnch/AltSnap.git",
       "path": "altsnap",
       "branch": "bunos",

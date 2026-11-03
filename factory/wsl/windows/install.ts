@@ -21,8 +21,15 @@ import { dirname, join, resolve } from "node:path";
 
 export type Ini = Map<string, Map<string, string>>;
 
+/**
+ * Values earlier bundles wrote that are now wrong: dropped from `current` while they still hold exactly that value (a
+ * user who set their own keeps it). `[general] instanceIdleTimeout=-1` kept the 1.6 GB VM resident after any accidental
+ * wake; the on-demand BunOSWsl service owns keep-alive now (docs/WINDOWS-ARCHITECTURE.md).
+ */
+export const RETIRED_KEYS: [section: string, key: string, value: string][] = [["general", "instanceIdleTimeout", "-1"]];
+
 /** Keys of `template` win; every other section/key of `current` is kept, comments of `current` are kept in place. */
-export function mergeIni(current: string, template: string): string {
+export function mergeIni(current: string, template: string, retired = RETIRED_KEYS): string {
   const wanted = parseIni(template);
   const lines = current.replace(/\r\n/g, "\n").split("\n");
   if (lines.at(-1) === "") lines.pop();
@@ -44,6 +51,10 @@ export function mergeIni(current: string, template: string): string {
       continue;
     }
     const kv = /^\s*([^#;=\s][^=]*?)\s*=/.exec(line);
+    const value = line.slice(line.indexOf("=") + 1).trim();
+    if (kv && retired.some(([s, k, v]) => s === section && k.toLowerCase() === kv[1]!.toLowerCase() && v === value)) {
+      continue;
+    }
     const keys = wanted.get(section);
     if (kv && keys) {
       const key = [...keys.keys()].find(k => k.toLowerCase() === kv[1]!.toLowerCase());
