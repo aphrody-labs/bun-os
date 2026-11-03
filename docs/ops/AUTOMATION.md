@@ -10,6 +10,12 @@ Scope: Bun OS only (aphrody.com WebOS, store, site, gateways, Bun OS images). Sh
 `/srv/shenron-build`, host `prod`) is a separate project with its own release pipeline: no loop builds, deploys or
 restarts it.
 
+For an explicit WordCraft package and session-image build, run `bun factory/automation/auto.ts wordcraft-image` on
+the VPS. It requires the green gate and checkout to match `origin/main`, refuses to start while Cargo is active,
+builds the Debian package before the image, then checks the installed package version and runs
+`wordcraft --version` and a synthetic Markdown-to-DOCX-to-text round-trip inside the image. This does not
+qualify a graphical session or a real Google document.
+
 ## Loops
 
 | Loop                     | Trigger                                                                | Unit or job                                                      | Recovery                                                                                                                                                |

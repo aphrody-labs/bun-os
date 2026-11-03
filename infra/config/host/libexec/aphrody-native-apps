@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: Apache-2.0
 # Native session apps from our aphrody-labs forks, packaged as Ubuntu 26.04 debs: factory/native-apps/build.ts.
-#   aphrody-native-apps container rio|aphrody|cosmic-src|cosmic [repo...]|calculator|spacedrive
+#   aphrody-native-apps container rio|aphrody|cosmic-src|cosmic [repo...]|calculator|spacedrive|wordcraft
 #   aphrody-native-apps publish
 set -eu
 ROOT=${BUNOS_NATIVE_ROOT:-$HOME/src/bun-os}

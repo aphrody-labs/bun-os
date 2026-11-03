@@ -9,8 +9,10 @@
 //   bun factory/automation/auto.ts coordinator [--once]    loop 4: PRODUCT.md and tasks to agents
 //   bun factory/automation/auto.ts nightly [--skip-build]  loop 5: build, boot, stream, screenshots, Gemini, publish
 //   bun factory/automation/auto.ts image-build             the unified image build job (used by delivery)
+//   bun factory/automation/auto.ts wordcraft-image         build WordCraft then the image and verify the package
 //   bun factory/automation/auto.ts status | digest         render aphrody.com/status | post the daily digest
-if (process.platform !== "linux") throw new Error("The automation loops run on the VPS");
+if (process.platform !== "linux")
+  throw new Error("The automation loops run on the VPS");
 
 const [command = "status", ...args] = Bun.argv.slice(2);
 let ok: unknown = true;
@@ -31,13 +33,22 @@ switch (command) {
     ok = await (await import("./deps.ts")).deps(args[0] ?? "", args.slice(1));
     break;
   case "coordinator":
-    await (await import("./coordinator.ts")).coordinator(args.includes("--once"));
+    await (
+      await import("./coordinator.ts")
+    ).coordinator(args.includes("--once"));
     break;
   case "nightly":
-    ok = (await (await import("./nightly.ts")).nightly(args.includes("--skip-build"))).green;
+    ok = (
+      await (
+        await import("./nightly.ts")
+      ).nightly(args.includes("--skip-build"))
+    ).green;
     break;
   case "image-build":
     ok = (await (await import("./nightly.ts")).imageBuild()).ok;
+    break;
+  case "wordcraft-image":
+    await (await import("./wordcraft-image.ts")).wordcraftImage();
     break;
   case "status":
     await (await import("./status.ts")).renderStatus();
