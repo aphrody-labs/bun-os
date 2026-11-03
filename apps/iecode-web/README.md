@@ -1,15 +1,15 @@
 # IECODE Web
 
-`apps/iecode-web` is the sole active browser frontend. Its TypeScript UI and Rust/WASM adapter
-live together here; reusable JavaScript/TypeScript libraries belong in
-`packages/`. The Rust adapter is a member of the root Cargo workspace.
+`apps/iecode-web` is the sole active browser frontend. Its TypeScript UI lives here; the
+Rust/WASM adapters are root Cargo workspace members in `apps/iecode-web-wasm` and
+`apps/iecode-web-wii-wasm`. Reusable JavaScript/TypeScript libraries belong in `packages/`.
 
-| Console         | Current browser capability                                                                                          | Rust owner                                                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Nintendo DS/DSi | Dust emulation with WebGPU presentation and WebGL fallback                                                          | `crates/emu/core`, `crates/emu/render/*`                                                   |
-| Wii             | Checked Wii DOL boot with Broadway interpreter and WebGPU presentation; keyboard Wiimote buttons, shake and pointer | `apps/iecode-web/wii/crate`, `crates/emu/wii`, `aphrody-labs/bun-engine/plugins/emulation` |
-| Switch          | Tegra block-linear texture primitives; browser execution pending                                                    | `aphrody-labs/bun-engine/plugins/emulation`, `crates/emu/ruzu`                             |
-| Nintendo 3DS    | PICA commands and SHBIN parsing; browser execution pending                                                          | `crates/aphrody-ctr`                                                                       |
+| Console         | Current browser capability                                                                                          | Rust owner                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Nintendo DS/DSi | Dust emulation with WebGPU presentation and WebGL fallback                                                          | `apps/iecode-web-wasm`, `crates/aphrody-dust-*`    |
+| Wii             | Checked Wii DOL boot with Broadway interpreter and WebGPU presentation; keyboard Wiimote buttons, shake and pointer | `apps/iecode-web-wii-wasm`, `crates/aphrody-wii-*` |
+| Switch          | Tegra block-linear texture primitives; browser execution pending                                                    | `crates/ruzu-*`                                    |
+| Nintendo 3DS    | PICA commands and SHBIN parsing; browser execution pending                                                          | `crates/aphrody-ctr`                               |
 
 The console switcher shows the current capability of each owner. It does not
 offer a game launcher for a console whose CPU, devices and renderer are not yet
