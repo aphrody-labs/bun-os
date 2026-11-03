@@ -147,7 +147,7 @@ main() {
   #    The exit code comes out of PIPESTATUS[0]: `$?` after a pipeline is tee's
   #    status, which is 0 whatever the build did. pipefail is set as well; the
   #    explicit read is what the reader should be able to check at a glance.
-  npm run tauri -- build --ci "$@" 2>&1 | tee "$BUILD_LOG"
+  bun run tauri build --ci "$@" 2>&1 | tee "$BUILD_LOG"
   local code=${PIPESTATUS[0]}
   log "TAURI_BUILD_EXIT=$code"
 
