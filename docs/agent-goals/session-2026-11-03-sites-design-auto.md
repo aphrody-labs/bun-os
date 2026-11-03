@@ -107,3 +107,21 @@ Priorities from the read-only comparison of upstream iced/libcosmic with our for
 - Open: next auto release blocked until the crates.io agent's Cargo changes land (pdfcraft-create not found);
   bun-os bug: vendor/bun-ui/packages/bun-plugin-tailwind/package.json requires m3-tailwind/m3-tokens ^3.3.7 →
   fix range and republish 1.4.8; auto CI rust job still fails at setup.
+
+## auto suite crates → crates.io: stopped early, resume here
+
+- Published: aphrody-hayro-jbig2@0.3.0, aphrody-hayro-syntax@0.7.2 (plus earlier: aphrody-rag-core 1.4.7,
+  deckcraft-* + craft-metafile 0.6.1, pdfcraft-cos/fonts/model/crypt/filters/content + aphrody-pdfcraft-forms 0.7.1).
+- bun-os commits 6d4fa46acc (hayro/lopdf forks renamed aphrody-*, patch.crates-io removed, pdfcraft-preflight
+  restored as a crate), 878595c1e3 (designcraft-pdf krilla-hayro-syntax), e5456911dd (Cargo.toml.orig removed).
+- Remaining publish order (VPS script ~/tmp/publish.sh, own CARGO_HOME ~/tmp/cargo-home-publish, skips published,
+  waits on rate limits, hours long): aphrody-hayro-interpret, aphrody-hayro, aphrody-lopdf; gridcraft core, formula,
+  functions, numfmt, model, calc, xlsx; pdfcraft preflight, render, annot, create, organize, sign, edit, redact;
+  wordcraft geom, doc, docx, fonts, proof, layout, pdf.
+- auto switch prepared but NOT on main: aphrody-labs/auto ref `refs/wip/suite-crates-io` (79ef627811, parent
+  a5bfc23). After publishing: rebase onto auto main, regenerate Cargo.lock, cargo fmt/clippy/test --locked, docker
+  build app.Dockerfile, push; also drop the vendor step from auto package.json "vendor" and scripts/prod.ts.
+  auto main still builds from vendor/bun-distribution (working tree restored, clean).
+- Known: krilla now uses upstream hayro-syntax without the PdfCraft hardening; bun-os workspace resolution hit a
+  crc version conflict (uucore vs aphrody-dust-core) unrelated to this work.
+- Then tell bun-os-6c (peer) so it builds the auto delivery lane.
