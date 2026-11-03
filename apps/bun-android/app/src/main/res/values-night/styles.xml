@@ -1,0 +1,6 @@
+<resources>
+    <!-- Night half of the DayNight theme: see values/styles.xml. -->
+    <style name="Base.Theme.Aphrody" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

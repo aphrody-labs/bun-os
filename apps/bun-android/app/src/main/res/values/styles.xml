@@ -1,7 +1,22 @@
 <resources>
-    <style name="Theme.Aphrody" parent="android:style/Theme.Material.Light.NoActionBar">
-        <item name="android:fontFamily">sans</item>
+    <!-- DayNight through resource qualifiers: values-night/styles.xml redefines Base.Theme.Aphrody on the dark
+         framework theme. Colours are the generated values{,-night}/colors.xml (m3-os-themes apps), so the window,
+         system bars and splash follow the same M3 scheme as Compose (BunOsTokens.kt) before the first frame. -->
+    <style name="Base.Theme.Aphrody" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.Aphrody" parent="Base.Theme.Aphrody">
+        <item name="android:fontFamily">sans</item>
         <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:colorPrimary">@color/bunos_primary</item>
+        <item name="android:colorAccent">@color/bunos_primary</item>
+        <item name="android:colorBackground">@color/bunos_surface</item>
+        <item name="android:windowBackground">@color/bunos_surface</item>
+        <item name="android:statusBarColor">@color/bunos_surface</item>
+        <item name="android:navigationBarColor">@color/bunos_surface</item>
+        <item name="android:textColorPrimary">@color/bunos_on_surface</item>
+        <item name="android:textColorSecondary">@color/bunos_on_surface_variant</item>
+        <item name="android:colorControlNormal">@color/bunos_on_surface_variant</item>
     </style>
 </resources>
