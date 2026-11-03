@@ -20,7 +20,7 @@ source=("virglrenderer::git+https://github.com/aphrody-labs/virglrenderer.git#co
 sha256sums=('SKIP' 'SKIP')
 
 build() {
-  arch-meson virglrenderer build -D venus=true -D video=disabled -D tests=false
+  arch-meson virglrenderer build -D venus=true -D video=false -D tests=false
   local _j
   _j=$(sed -n 's/.*-j *\([0-9][0-9]*\).*/\1/p' <<<"${MAKEFLAGS:-}")
   meson compile -C build ${_j:+-j "$_j"}
