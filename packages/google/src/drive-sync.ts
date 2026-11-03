@@ -79,8 +79,9 @@ export async function projectRetrievalCandidate(
   }
   await save(path, markdown);
 }
-async function remoteDocs(drive: drive_v3.Drive, rootId: string): Promise<Map<string, RemoteDoc>> {
+export async function remoteDocs(drive: drive_v3.Drive, rootId: string): Promise<Map<string, RemoteDoc>> {
   const docs = new Map<string, RemoteDoc>();
+  const seenTokens = new Set<string>();
   let pageToken: string | undefined;
   do {
     const page = await drive.files.list({
@@ -98,6 +99,10 @@ async function remoteDocs(drive: drive_v3.Drive, rootId: string): Promise<Map<st
       docs.set(file.name, { id: file.id, name: file.name, modifiedTime: file.modifiedTime ?? "" });
     }
     pageToken = page.data.nextPageToken ?? undefined;
+    if (pageToken) {
+      if (seenTokens.has(pageToken)) throw new Error("Google Drive returned a repeated page token");
+      seenTokens.add(pageToken);
+    }
   } while (pageToken);
   for (const name of DEFAULT_DOCS)
     if (!docs.has(name)) throw new Error(`Required native Agent Home document missing: ${name}`);
