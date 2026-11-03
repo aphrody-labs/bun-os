@@ -15,6 +15,7 @@ path = "src/main.rs"
 
 [dependencies]
 bun-windows-winclean = { path = "../../packages/bun-windows-winclean", version = "1.4.7" }
+aphrody-m3-tokens = { path = "../aphrody-m3-tokens", version = "1.4.7" }
 anyhow = { workspace = true }
 clap = { workspace = true }
 serde = { workspace = true }

@@ -8824,6 +8824,7 @@ name = "bunos-win11"
 version = "1.4.7"
 dependencies = [
  "anyhow",
+ "aphrody-m3-tokens",
  "bun-windows-winclean",
  "clap",
  "crossterm",

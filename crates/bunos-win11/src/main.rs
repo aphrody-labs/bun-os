@@ -8,10 +8,12 @@
 //!   - a Windows 11 ISO (offline): `iso` applies the same declarative profile to a mounted install.wim and writes
 //!     a new, debloated ISO (the Bun OS, Rust-first tiny11; vendor/tiny11builder is credited).
 //!
-//! Desktop profiles (`cosmic`, `cosmic-comp`, `hyprland`, `omarchy`, `gnome`, `windows-mac`) are emitted as launch
-//! plans; the Linux ones run from the Bun OS WSL bundle through WSLg.
+//! Desktop profiles (`cosmic`, `cosmic-comp`, `hyprland`, `omarchy`, `gnome`, `windows-mac`, `windows-hyprland`) are
+//! emitted as launch plans; the Linux ones run from the Bun OS WSL bundle through WSLg. `windows-hyprland --render`
+//! writes the per-user configs of its native tools.
 
 mod desktop;
+mod hyprwin;
 mod iso;
 mod tui;
 
@@ -63,14 +65,39 @@ enum Command {
     },
     /// List or describe desktop profiles.
     Desktop {
-        /// A profile id to describe (cosmic, cosmic-comp, hyprland, omarchy, gnome, windows-mac).
+        /// A profile id to describe (cosmic, cosmic-comp, hyprland, omarchy, gnome, windows-mac, windows-hyprland).
         name: Option<String>,
         /// Print the session manifest (factory/desktop/sessions.json) instead.
         #[arg(long)]
         json: bool,
+        #[command(flatten)]
+        render: RenderArgs,
     },
     /// Build a debloated Windows 11 ISO from an official ISO (offline target).
     Iso(IsoArgs),
+}
+
+/// `desktop windows-hyprland --render <dir>`: write the native tools' configs.
+#[derive(ClapArgs, Clone, Default)]
+struct RenderArgs {
+    /// Directory to write glazewm/, tacky-borders/, altsnap/ and flow-launcher/ configs into.
+    #[arg(long)]
+    render: Option<std::path::PathBuf>,
+    /// M3 seed colour (#rrggbb) for the theme roles; default is the M3 baseline.
+    #[arg(long)]
+    seed: Option<String>,
+    /// A `bunos-design theme` export (the design agent's tokens); wins over --seed.
+    #[arg(long)]
+    theme: Option<std::path::PathBuf>,
+    /// Transparency: auto (follow Settings > Transparency effects), max or reduced.
+    #[arg(long, default_value = "auto")]
+    glass: String,
+    /// Animations: auto (follow Settings > Animation effects), on or off.
+    #[arg(long, default_value = "auto")]
+    motion: String,
+    /// Staged Flow Launcher executable bound to Super+Space.
+    #[arg(long)]
+    launcher: Option<String>,
 }
 
 #[derive(ClapArgs, Clone)]
@@ -138,10 +165,12 @@ fn main() -> Result<()> {
         Command::Apply { profile, plan, yes } => apply(&profile, plan.as_deref(), yes),
         Command::Verify { journal } => verify(journal.as_deref()),
         Command::Undo { journal } => undo(journal.as_deref()),
-        Command::Desktop { name, json } => {
+        Command::Desktop { name, json, render } => {
             if json {
                 print!("{}", desktop::manifest_json());
                 Ok(())
+            } else if let Some(dir) = &render.render {
+                render_desktop(name.as_deref(), dir, &render)
             } else {
                 desktop_cmd(name.as_deref())
             }
@@ -261,12 +290,42 @@ fn undo(_: Option<&str>) -> Result<()> {
     anyhow::bail!("undo runs on Windows")
 }
 
+fn render_desktop(name: Option<&str>, dir: &std::path::Path, args: &RenderArgs) -> Result<()> {
+    anyhow::ensure!(
+        name == Some(Desktop::WindowsHyprland.id()),
+        "--render is for the windows-hyprland profile"
+    );
+    let roles = match &args.theme {
+        Some(path) => hyprwin::Look::from_export(path)?,
+        None => hyprwin::Look::from_seed(args.seed.as_deref())?,
+    };
+    let glass = hyprwin::Glass::parse(&args.glass)
+        .with_context(|| format!("--glass {}: expected auto|max|reduced", args.glass))?
+        .unwrap_or_else(hyprwin::Glass::detect);
+    let motion = match args.motion.as_str() {
+        "auto" => hyprwin::detect_motion(),
+        "on" => true,
+        "off" => false,
+        other => anyhow::bail!("--motion {other}: expected auto|on|off"),
+    };
+    let terminal = if hyprwin::on_path("rio.exe").is_some() { "rio" } else { "wt" }.to_owned();
+    let launcher = args.launcher.clone().unwrap_or_else(|| {
+        dir.join("flow-launcher").join("Flow.Launcher.exe").display().to_string()
+    });
+    let look = hyprwin::Look { roles, glass, motion, terminal, launcher };
+    for path in hyprwin::render(&look, dir)? {
+        println!("wrote {}", path.display());
+    }
+    println!("glass {:?}, motion {}, terminal {}", look.glass, look.motion, look.terminal);
+    Ok(())
+}
+
 fn desktop_cmd(name: Option<&str>) -> Result<()> {
     match name {
         None => {
             println!("desktop profiles:");
             for d in Desktop::ALL {
-                println!("  {:<12} {}", d.id(), d.title());
+                println!("  {:<17} {}", d.id(), d.title());
             }
             Ok(())
         }

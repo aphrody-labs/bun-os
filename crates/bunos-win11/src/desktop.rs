@@ -8,6 +8,9 @@
 //!   only through the documented interface in docs/WSL.md.
 //! - `windows-mac` is the native path: the macOS-style window chrome, dock, Rust tiling WM (GlazeWM, vendored) and
 //!   the Rust wallpaper engine, all running on Windows itself.
+//! - `windows-hyprland` is the other native path: the same chrome and wallpaper with GlazeWM (bunos fork, animated),
+//!   tacky-borders, Zebar, Flow Launcher and AltSnap configured as Hyprland/Omarchy; its configs come from
+//!   [`crate::hyprwin`].
 //!
 //! This enum is the single desktop profile source: the Linux session chooser (`bunos-session`, package
 //! `bunos-desktop`) reads `factory/desktop/sessions.json`, which `bunos-win11 desktop --json` writes from here and a
@@ -33,6 +36,8 @@ pub enum Desktop {
     Gnome,
     /// Native Windows: macOS-style chrome + dock + GlazeWM + Rust wallpaper engine.
     WindowsMac,
+    /// Native Windows, Hyprland/Omarchy-style: animated GlazeWM + gradient borders + bar + launcher + Super-drag.
+    WindowsHyprland,
 }
 
 impl Desktop {
@@ -45,6 +50,7 @@ impl Desktop {
             Self::Omarchy => "omarchy",
             Self::Gnome => "gnome",
             Self::WindowsMac => "windows-mac",
+            Self::WindowsHyprland => "windows-hyprland",
         }
     }
 
@@ -56,16 +62,24 @@ impl Desktop {
             "omarchy" => Self::Omarchy,
             "gnome" => Self::Gnome,
             "windows-mac" => Self::WindowsMac,
+            "windows-hyprland" => Self::WindowsHyprland,
             _ => return None,
         })
     }
 
-    pub const ALL: [Self; 6] =
-        [Self::Cosmic, Self::CosmicComp, Self::Hyprland, Self::Omarchy, Self::Gnome, Self::WindowsMac];
+    pub const ALL: [Self; 7] = [
+        Self::Cosmic,
+        Self::CosmicComp,
+        Self::Hyprland,
+        Self::Omarchy,
+        Self::Gnome,
+        Self::WindowsMac,
+        Self::WindowsHyprland,
+    ];
 
     #[must_use]
     pub fn is_wsl(self) -> bool {
-        !matches!(self, Self::WindowsMac)
+        !matches!(self, Self::WindowsMac | Self::WindowsHyprland)
     }
 
     #[must_use]
@@ -77,6 +91,9 @@ impl Desktop {
             Self::Omarchy => "Omarchy: Hyprland + Omarchy configs, menus and themes (via WSLg)",
             Self::Gnome => "GNOME 51 (via WSLg)",
             Self::WindowsMac => "Windows, macOS-style (native: chrome + dock + GlazeWM + wallpaper engine)",
+            Self::WindowsHyprland => {
+                "Windows, Hyprland-style (native: animated GlazeWM + gradient borders + Zebar + Flow Launcher + AltSnap)"
+            }
         }
     }
 
@@ -100,7 +117,7 @@ impl Desktop {
                 "bunos-desktop", "bunos-cli", "gnome-shell", "mutter", "gnome-session", "gnome-control-center",
                 "nautilus", "xdg-desktop-portal-gnome",
             ],
-            Self::WindowsMac => &[],
+            Self::WindowsMac | Self::WindowsHyprland => &[],
         }
     }
 
@@ -113,6 +130,15 @@ impl Desktop {
             Self::Omarchy => &["vendor/omarchy", "vendor/omarchy-windows", "vendor/hyprland"],
             Self::Gnome => &["vendor/gnome/mutter", "vendor/gnome/gnome-shell"],
             Self::WindowsMac => &["vendor/glazewm", "crates/bunos-win11-chrome", "crates/bunos-win11-wallpaper"],
+            Self::WindowsHyprland => &[
+                "vendor/glazewm",
+                "vendor/tacky-borders",
+                "vendor/zebar",
+                "vendor/flow-launcher",
+                "vendor/altsnap",
+                "crates/bunos-win11-chrome",
+                "crates/bunos-win11-wallpaper",
+            ],
         }
     }
 
@@ -123,7 +149,7 @@ impl Desktop {
             Self::Cosmic | Self::CosmicComp => Some(Presentation::NestedWindow),
             Self::Gnome => Some(Presentation::DevkitViewer),
             Self::Hyprland | Self::Omarchy => Some(Presentation::HeadlessViewer),
-            Self::WindowsMac => None,
+            Self::WindowsMac | Self::WindowsHyprland => None,
         }
     }
 
@@ -145,7 +171,7 @@ impl Desktop {
                 ("XDG_SESSION_DESKTOP", "Hyprland"),
             ],
             Self::Gnome => &[("XDG_CURRENT_DESKTOP", "GNOME"), ("XDG_SESSION_DESKTOP", "gnome")],
-            Self::WindowsMac => &[],
+            Self::WindowsMac | Self::WindowsHyprland => &[],
         }
     }
 
@@ -159,7 +185,7 @@ impl Desktop {
             Self::Hyprland => Some("Hyprland --config /usr/share/hypr/hyprland.lua"),
             Self::Omarchy => Some("Hyprland"),
             Self::Gnome => Some("gnome-shell --devkit"),
-            Self::WindowsMac => None,
+            Self::WindowsMac | Self::WindowsHyprland => None,
         }
     }
 
@@ -199,6 +225,13 @@ impl Desktop {
                 steps.push(p.describe().to_owned());
             }
             steps
+        } else if self == Self::WindowsHyprland {
+            vec![
+                "bun factory/windows/desktop/hyprland.ts build (GlazeWM bunos fork, tacky-borders, Zebar, chrome, wallpaper from source; AltSnap cross-built on vps; Flow Launcher with dotnet; staged and test-signed under %LOCALAPPDATA%/bunos/desktop)".to_owned(),
+                "bunos-win11 desktop windows-hyprland --render <dir> (GlazeWM, tacky-borders, AltSnap, Flow configs from the M3 roles; glass max, reduced when Transparency effects are off)".to_owned(),
+                "bun factory/windows/desktop/hyprland.ts up (per-user processes: wallpaper, chrome watch, GlazeWM, tacky-borders, Zebar, AltSnap, Flow; nothing registered as the shell, no autostart, no registry writes)".to_owned(),
+                "bun factory/windows/desktop/hyprland.ts down | undo (stop them; undo also deletes the staged tree)".to_owned(),
+            ]
         } else {
             vec![
                 "cargo build -p bunos-win11-chrome -p bunos-win11-wallpaper --target x86_64-pc-windows-msvc".to_owned(),
