@@ -230,28 +230,40 @@ const unpublished = (n: string) =>
   !["published", "exists"].includes(state[`${n}@${byName.get(n)?.version}`]?.status ?? "");
 
 if (registry === "crates") {
-  if (values.only !== "members")
-    for (const x of plan.crates.external as { workspace: string; git?: string; path?: string; crates: string[] }[]) {
-      const dir = externalDir(x);
-      const env = { CARGO_TARGET_DIR: join(homedir(), "build", "publish", "target", x.workspace.replaceAll("/", "-")) };
-      for (const c of workspaceOrder(dir)) {
-        if (done >= limit) break;
-        if (!c.publish) {
-          if (x.crates.includes(c.name)) {
-            await mark(`${c.name}@${c.version}`, "private", `publish = false in ${x.workspace}`);
-            console.log(`private ${c.name}@${c.version} (${x.workspace}), required by members`);
+  // Passes until nothing new goes up: an external crate can need a member (bunos-nt-client needs bunos-nt-proto), and a
+  // crate whose upload failed for a transient reason gets another try once the rest is through.
+  for (let pass = 1; pass <= 4; pass++) {
+    const before = Object.values(state).filter(o => o.status === "published").length;
+    if (values.only !== "members")
+      for (const x of plan.crates.external as { workspace: string; git?: string; path?: string; crates: string[] }[]) {
+        const dir = externalDir(x);
+        const env = {
+          CARGO_TARGET_DIR: join(homedir(), "build", "publish", "target", x.workspace.replaceAll("/", "-")),
+        };
+        for (const c of workspaceOrder(dir)) {
+          if (done >= limit) break;
+          if (!c.publish) {
+            if (x.crates.includes(c.name)) {
+              await mark(`${c.name}@${c.version}`, "private", `publish = false in ${x.workspace}`);
+              console.log(`private ${c.name}@${c.version} (${x.workspace}), required by members`);
+            }
+            continue;
           }
-          continue;
+          await publishCrate(c.name, c.version, dir, env, c.deps);
         }
-        await publishCrate(c.name, c.version, dir, env, c.deps);
       }
-    }
-  if (values.only !== "external")
-    for (const name of plan.crates.order as string[]) {
-      if (done >= limit) break;
-      const member = byName.get(name)!;
-      await publishCrate(name, member.version, root, {}, [...memberClosure(name)].filter(unpublished));
-    }
+    if (values.only !== "external")
+      for (const name of plan.crates.order as string[]) {
+        if (done >= limit) break;
+        const member = byName.get(name)!;
+        // In a real run a crate whose first-party dependency is not up yet cannot verify; leave it for the next pass.
+        if (!dry && member.deps.some(unpublished)) continue;
+        await publishCrate(name, member.version, root, {}, [...memberClosure(name)].filter(unpublished));
+      }
+    const after = Object.values(state).filter(o => o.status === "published").length;
+    if (dry || after === before || done >= limit) break;
+    console.log(`pass ${pass}: ${after - before} published, another pass for the rest`);
+  }
 } else {
   const me = run(["bun", "pm", "whoami"]).out.trim();
   for (const m of plan.npm.members as { name: string; version: string; path: string; publishable: boolean }[]) {
