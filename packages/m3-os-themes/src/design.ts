@@ -35,7 +35,7 @@ import { allModes } from "./color.ts";
 import { themeBundle } from "./cosmic.ts";
 import { FONTS, ansiFromRoles, fontconfigConf, nushellTheme, omarchyColors } from "./desktops.ts";
 import { generate } from "./generate.ts";
-import { gtkCss } from "./gnome.ts";
+import { gtkCss, gtkWidgetsCss } from "./gnome.ts";
 import { ICONS, compose, indexTheme, type IconDef, type Palette } from "./icons.ts";
 import type { Mode, Roles, ThemeInput } from "./types.ts";
 
@@ -256,8 +256,8 @@ export function runDesign(o: DesignOptions): string[] {
   const gtkBase = `gtk/BunOS-M3`;
   out.write(`${gtkBase}/index.theme`, `[Desktop Entry]\nType=X-GNOME-Metatheme\nName=BunOS-M3\nComment=Bun OS Material 3 with traffic-light window controls\nEncoding=UTF-8\n\n[X-GNOME-Metatheme]\nGtkTheme=BunOS-M3\nIconTheme=${ICON_THEME}\nCursorTheme=Adwaita\nButtonLayout=close,minimize,maximize:menu\n`);
   for (const v of [3, 4] as const) {
-    out.write(`${gtkBase}/gtk-${v}.0/gtk.css`, `${gtkCss(roles.light, v)}\n${gtkChromeCss(spec, "light", v)}`);
-    out.write(`${gtkBase}/gtk-${v}.0/gtk-dark.css`, `${gtkCss(roles.dark, v)}\n${gtkChromeCss(spec, "dark", v)}`);
+    out.write(`${gtkBase}/gtk-${v}.0/gtk.css`, `${gtkCss(roles.light, v)}\n${gtkWidgetsCss(roles.light)}\n${gtkChromeCss(spec, "light", v)}`);
+    out.write(`${gtkBase}/gtk-${v}.0/gtk-dark.css`, `${gtkCss(roles.dark, v)}\n${gtkWidgetsCss(roles.dark)}\n${gtkChromeCss(spec, "dark", v)}`);
     out.write(`${gtkBase}/gtk-${v}.0/settings.ini`, gtkSettings(fontBrand, ICON_THEME, true));
   }
   out.write(
@@ -279,7 +279,7 @@ export function runDesign(o: DesignOptions): string[] {
   out.write(`${om}/hyprland.conf`, hyprlandChrome(spec, "dark", fontBrand));
   out.write(`${om}/icons.theme`, `${ICON_THEME}\n`);
   out.write(`${om}/rio.toml`, generateRio(input));
-  out.write(`${om}/gtk.css`, `${gtkCss(roles.dark, 4)}\n${gtkChromeCss(spec, "dark", 4)}`);
+  out.write(`${om}/gtk.css`, `${gtkCss(roles.dark, 4)}\n${gtkWidgetsCss(roles.dark)}\n${gtkChromeCss(spec, "dark", 4)}`);
   out.write(`${om}/cosmic.ron`, themeBundle(roles.dark, "dark", "bunos-m3"));
   out.write(`nushell/bunos-m3.nu`, nushellTheme(roles.dark, ansi));
 
