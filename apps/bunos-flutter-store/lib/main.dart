@@ -20,7 +20,7 @@ class ThemeSettings extends ChangeNotifier {
 
   /// Bun OS generated tokens (default), wallpaper colours, or a Rust-computed scheme for [seed].
   ThemeSource source = ThemeSource.bunos;
-  String seed = '#6750a4';
+  String seed = bunOsSeed;
   String variant = 'tonalSpot';
   double contrast = 0;
 

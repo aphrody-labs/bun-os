@@ -2,10 +2,12 @@
 // System (WebOS server health and inventory) and Theme (Bun OS tokens, wallpaper colours or a Rust-computed seed).
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../main.dart';
 import 'api.dart';
 import 'rust_theme.dart';
+import '../theme/bunos_tokens.g.dart';
 
 class StoreHome extends StatefulWidget {
   const StoreHome({super.key, required this.api, required this.settings, required this.wallpaperAvailable});
@@ -28,10 +30,10 @@ class _StoreHomeState extends State<StoreHome> {
       });
 
   static const destinations = [
-    (Icons.explore_outlined, Icons.explore, 'Discover'),
-    (Icons.apps_outlined, Icons.apps, 'Apps'),
-    (Icons.dns_outlined, Icons.dns, 'System'),
-    (Icons.palette_outlined, Icons.palette, 'Theme'),
+    (Symbols.explore, 'Discover'),
+    (Symbols.apps, 'Apps'),
+    (Symbols.dns, 'System'),
+    (Symbols.palette, 'Theme'),
   ];
 
   @override
@@ -45,8 +47,8 @@ class _StoreHomeState extends State<StoreHome> {
     final wide = MediaQuery.sizeOf(context).width >= 840;
     final medium = MediaQuery.sizeOf(context).width >= 600;
     final appBar = AppBar(
-      title: Text(destinations[index].$3 == 'Discover' ? 'Bun OS Store' : destinations[index].$3),
-      actions: [IconButton(onPressed: refresh, tooltip: 'Refresh', icon: const Icon(Icons.refresh))],
+      title: Text(destinations[index].$2 == 'Discover' ? 'Bun OS Store' : destinations[index].$2),
+      actions: [IconButton(onPressed: refresh, tooltip: 'Refresh', icon: const Icon(Symbols.refresh))],
     );
     if (!medium) {
       return Scaffold(
@@ -56,7 +58,7 @@ class _StoreHomeState extends State<StoreHome> {
           selectedIndex: index,
           onDestinationSelected: (i) => setState(() => index = i),
           destinations: [
-            for (final d in destinations) NavigationDestination(icon: Icon(d.$1), selectedIcon: Icon(d.$2), label: d.$3),
+            for (final d in destinations) NavigationDestination(icon: Icon(d.$1), selectedIcon: Icon(d.$1, fill: 1), label: d.$2),
           ],
         ),
       );
@@ -72,7 +74,7 @@ class _StoreHomeState extends State<StoreHome> {
             onDestinationSelected: (i) => setState(() => index = i),
             destinations: [
               for (final d in destinations)
-                NavigationRailDestination(icon: Icon(d.$1), selectedIcon: Icon(d.$2), label: Text(d.$3)),
+                NavigationRailDestination(icon: Icon(d.$1), selectedIcon: Icon(d.$1, fill: 1), label: Text(d.$2)),
             ],
           ),
           const VerticalDivider(width: 1),
@@ -98,7 +100,7 @@ class _Loading<T> extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(Icons.cloud_off, size: 48, color: Theme.of(context).colorScheme.error),
+                  Icon(Symbols.cloud_off, size: 48, color: Theme.of(context).colorScheme.error),
                   const SizedBox(height: 12),
                   Text('${snap.error}', textAlign: TextAlign.center),
                   const SizedBox(height: 12),
@@ -166,7 +168,7 @@ void showAppDetails(BuildContext context, StoreApp app) {
             if (app.permissions.isNotEmpty) ...[
               const SizedBox(height: 16),
               Text('Permissions', style: text.titleMedium),
-              for (final p in app.permissions) ListTile(dense: true, leading: const Icon(Icons.shield_outlined), title: Text(p)),
+              for (final p in app.permissions) ListTile(dense: true, leading: const Icon(Symbols.shield), title: Text(p)),
             ],
             if (app.installHints.isNotEmpty) ...[
               const SizedBox(height: 16),
@@ -177,7 +179,7 @@ void showAppDetails(BuildContext context, StoreApp app) {
                     title: SelectableText(hint, style: text.bodyMedium?.copyWith(fontFamily: 'monospace')),
                     trailing: IconButton(
                       tooltip: 'Copy',
-                      icon: const Icon(Icons.copy),
+                      icon: const Icon(Symbols.content_copy),
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: hint));
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Copied')));
@@ -243,7 +245,7 @@ class DiscoverScreen extends StatelessWidget {
               for (final s in c.sources)
                 Card.outlined(
                   child: ListTile(
-                    leading: const Icon(Icons.inventory_2_outlined),
+                    leading: const Icon(Symbols.inventory_2),
                     title: Text(s.label),
                     subtitle: Text(s.description, maxLines: 2, overflow: TextOverflow.ellipsis),
                     trailing: Badge.count(count: s.count, backgroundColor: Theme.of(context).colorScheme.secondary, textColor: Theme.of(context).colorScheme.onSecondary),
@@ -289,7 +291,7 @@ class _AppsScreenState extends State<AppsScreen> {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: SearchBar(
                 hintText: 'Search ${c.apps.length} apps and packages',
-                leading: const Icon(Icons.search),
+                leading: const Icon(Symbols.search),
                 onChanged: (v) => setState(() => query = v),
               ),
             ),
@@ -345,7 +347,7 @@ class SystemScreen extends StatelessWidget {
             Card.filled(
               color: h.ok ? scheme.primaryContainer : scheme.errorContainer,
               child: ListTile(
-                leading: Icon(h.ok ? Icons.check_circle : Icons.error, color: h.ok ? scheme.onPrimaryContainer : scheme.onErrorContainer),
+                leading: Icon(h.ok ? Symbols.check_circle : Symbols.error, color: h.ok ? scheme.onPrimaryContainer : scheme.onErrorContainer),
                 title: Text(h.ok ? '${h.service} is healthy' : '${h.service} reports a problem'),
                 subtitle: Text('$origin · up ${Duration(seconds: h.uptimeSeconds).inMinutes} min · ${h.sourceCommit.length >= 10 ? h.sourceCommit.substring(0, 10) : h.sourceCommit}'),
               ),
@@ -353,7 +355,7 @@ class SystemScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text('Checks', style: text.titleLarge),
             for (final e in h.checks.entries)
-              ListTile(leading: Icon(e.value ? Icons.check : Icons.close, color: e.value ? scheme.primary : scheme.error), title: Text(e.key)),
+              ListTile(leading: Icon(e.value ? Symbols.check : Symbols.close, color: e.value ? scheme.primary : scheme.error), title: Text(e.key)),
             const SizedBox(height: 16),
             Text('Inventory', style: text.titleLarge),
             const SizedBox(height: 8),
@@ -361,7 +363,7 @@ class SystemScreen extends StatelessWidget {
               for (final e in h.inventory.entries) Chip(avatar: CircleAvatar(child: Text('${e.value}'.characters.take(3).toString())), label: Text('${e.key} · ${e.value}')),
             ]),
             const SizedBox(height: 16),
-            ListTile(leading: const Icon(Icons.memory), title: const Text('Rust core'), subtitle: Text(rustCoreVersion())),
+            ListTile(leading: const Icon(Symbols.memory), title: const Text('Rust core'), subtitle: Text(rustCoreVersion())),
           ]);
         },
       );
@@ -372,7 +374,9 @@ class ThemeScreen extends StatelessWidget {
   final ThemeSettings settings;
   final bool wallpaperAvailable;
 
-  static const seeds = ['#6750a4', '#0b57d0', '#146c2e', '#b3261e', '#8e4a00', '#006a6a', '#7d5260'];
+  // Colour-picker swatches: user-selectable seeds, the product seed first.
+  // design:content
+  static const seeds = [bunOsSeed, '#6750a4', '#0b57d0', '#146c2e', '#b3261e', '#8e4a00', '#006a6a', '#7d5260'];
 
   @override
   Widget build(BuildContext context) {
@@ -383,9 +387,9 @@ class ThemeScreen extends StatelessWidget {
       const SizedBox(height: 8),
       SegmentedButton<ThemeSource>(
         segments: [
-          const ButtonSegment(value: ThemeSource.bunos, label: Text('Bun OS'), icon: Icon(Icons.auto_awesome)),
-          ButtonSegment(value: ThemeSource.wallpaper, label: const Text('Wallpaper'), icon: const Icon(Icons.wallpaper), enabled: wallpaperAvailable),
-          ButtonSegment(value: ThemeSource.seed, label: const Text('Seed'), icon: const Icon(Icons.colorize), enabled: rustReady),
+          const ButtonSegment(value: ThemeSource.bunos, label: Text('Bun OS'), icon: Icon(Symbols.auto_awesome)),
+          ButtonSegment(value: ThemeSource.wallpaper, label: const Text('Wallpaper'), icon: const Icon(Symbols.wallpaper), enabled: wallpaperAvailable),
+          ButtonSegment(value: ThemeSource.seed, label: const Text('Seed'), icon: const Icon(Symbols.colorize), enabled: rustReady),
         ],
         selected: {settings.source},
         onSelectionChanged: (s) => settings.update((t) => t.source = s.first),
@@ -400,7 +404,9 @@ class ThemeScreen extends StatelessWidget {
               child: CircleAvatar(
                 radius: 22,
                 backgroundColor: Color(int.parse('ff${seed.substring(1)}', radix: 16)),
-                child: settings.seed == seed ? const Icon(Icons.check, color: Colors.white) : null,
+                child: settings.seed == seed
+                    ? Icon(Symbols.check, color: rustScheme(seed, settings.variant, Theme.of(context).brightness)!.onPrimary)
+                    : null,
               ),
             ),
         ]),
@@ -455,7 +461,7 @@ class ThemeScreen extends StatelessWidget {
         FilledButton(onPressed: () {}, child: const Text('Filled')),
         FilledButton.tonal(onPressed: () {}, child: const Text('Tonal')),
         OutlinedButton(onPressed: () {}, child: const Text('Outlined')),
-        FloatingActionButton.small(onPressed: () {}, child: const Icon(Icons.add)),
+        FloatingActionButton.small(onPressed: () {}, child: const Icon(Symbols.add)),
       ]),
     ]);
   }

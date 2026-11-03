@@ -1,5 +1,7 @@
 #include "my_application.h"
 
+#include "bunos_colors.g.h"
+
 #include <flutter_linux/flutter_linux.h>
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
@@ -59,10 +61,12 @@ static void my_application_activate(GApplication* application) {
       project, self->dart_entrypoint_arguments);
 
   FlView* view = fl_view_new(project);
+  // Shown until the first Flutter frame: the generated M3 surface of the product seed, following the GTK dark
+  // preference.
+  gboolean prefer_dark = FALSE;
+  g_object_get(gtk_settings_get_default(), "gtk-application-prefer-dark-theme", &prefer_dark, nullptr);
   GdkRGBA background_color;
-  // Background defaults to black, override it here if necessary, e.g. #00000000
-  // for transparent.
-  gdk_rgba_parse(&background_color, "#000000");
+  gdk_rgba_parse(&background_color, prefer_dark ? BUNOS_SURFACE_DARK : BUNOS_SURFACE_LIGHT);
   fl_view_set_background_color(view, &background_color);
   gtk_widget_show(GTK_WIDGET(view));
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));

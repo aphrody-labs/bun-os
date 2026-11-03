@@ -1,5 +1,6 @@
-// M3 schemes computed by the Bun OS Rust core (crates/bunos-flutter-bridge -> crates/aphrody-m3-tokens) through
-// flutter_rust_bridge. Same engine as the generated bunos_tokens.g.dart, but for any seed at run time.
+// M3 schemes computed at run time, for any seed, by the Bun OS Rust core (crates/bunos-flutter-bridge ->
+// crates/aphrody-m3-tokens) through flutter_rust_bridge. bunos_tokens.g.dart holds the product seed's scheme from the
+// same engine, generated at build time from its ThemeExport by packages/m3-os-themes.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
