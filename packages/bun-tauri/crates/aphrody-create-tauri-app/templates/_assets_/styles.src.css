@@ -93,3 +93,11 @@ button:focus-visible {
 #greet-input {
   margin-right: 5px;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .logo,
+  input,
+  button {
+    transition: none;
+  }
+}

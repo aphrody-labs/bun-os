@@ -29,7 +29,8 @@ body {
 #bar button,
 #bar .btn {
   cursor: pointer;
-  padding: 6px 14px;
+  min-height: 40px;
+  padding: 8px 16px;
   border: 0;
   border-radius: 999px;
   background: var(--md-sys-color-primary);
@@ -37,8 +38,18 @@ body {
   font: inherit;
   font-weight: 600;
 }
+/* State layers: on-primary over the primary container (hover 8 %, pressed 10 %); disabled at the M3 12 % / 38 %. */
+#bar button:hover:not(:disabled),
+#bar .btn:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 8%, var(--md-sys-color-primary));
+}
+#bar button:active:not(:disabled),
+#bar .btn:active {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 10%, var(--md-sys-color-primary));
+}
 #bar button:disabled {
-  opacity: 0.45;
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+  color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
   cursor: default;
 }
 #stage {
@@ -62,14 +73,20 @@ body {
   touch-action: none;
 }
 #pad button {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 48px;
+  min-height: 48px;
   margin: 2px;
   border: 0;
   border-radius: 12px;
   background: var(--md-sys-color-surface-container-highest);
   color: var(--md-sys-color-on-surface);
   font: inherit;
+}
+#pad button:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, var(--md-sys-color-surface-container-highest));
+}
+#pad button:active {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, var(--md-sys-color-surface-container-highest));
 }
 #pad button.on {
   background: var(--md-sys-color-primary);

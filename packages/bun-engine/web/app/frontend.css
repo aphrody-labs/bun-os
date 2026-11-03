@@ -17,6 +17,7 @@
   --soft: color-mix(in oklab, var(--text) 78%, var(--bg));
   --focus: var(--md-sys-color-tertiary);
   --on-focus: var(--md-sys-color-on-tertiary);
+  --ring: var(--md-sys-color-secondary);
   --ok: var(--md-sys-color-primary);
   --bad: var(--md-sys-color-error);
   --warn: var(--md-sys-color-tertiary);
@@ -56,8 +57,7 @@ body {
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
   overflow: hidden;
-  background:
-    var(--bg);
+  background: var(--bg);
 }
 button,
 input,
@@ -87,13 +87,13 @@ code,
   white-space: nowrap;
 }
 
-/* One focus treatment everywhere: a solid 3 px ring in the accent role, offset so it stays visible
+/* One focus treatment everywhere: the 2 px secondary-role ring at a 2 px offset, so it stays visible
    on accent-filled buttons. Scroll containers pad their content so the ring is never clipped. */
 [data-nav]:focus,
 input:focus,
 select:focus {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 body.no-pointer,
@@ -501,7 +501,7 @@ button.big {
   background: none;
   text-align: left;
   scroll-snap-align: center;
-  transition: transform var(--dur) ease;
+  transition: transform var(--dur) var(--app-motion-spring-fast-spatial);
   border-radius: 0.9rem;
 }
 .tile:focus {
@@ -559,7 +559,7 @@ button.big {
   overflow: hidden;
   scroll-snap-align: center;
   background: color-mix(in oklab, oklch(from var(--md-sys-color-primary-container) l c var(--tint, h)) 30%, var(--panel));
-  transition: transform var(--dur) ease;
+  transition: transform var(--dur) var(--app-motion-spring-fast-spatial);
 }
 .systems .system {
   width: auto;
@@ -976,7 +976,7 @@ dd {
   height: 1.05rem;
   border-radius: 50%;
   background: var(--muted);
-  transition: transform var(--dur) ease;
+  transition: transform var(--dur) var(--app-motion-spring-fast-spatial);
 }
 [aria-checked="true"] .switch {
   background: var(--focus);
@@ -1123,7 +1123,7 @@ kbd {
   display: grid;
   place-items: center;
   background: color-mix(in oklab, var(--md-sys-color-scrim) 66%, transparent);
-  animation: fade var(--dur) ease-out;
+  animation: fade var(--dur) var(--app-motion-spring-fast-effects);
 }
 .sheet {
   width: min(32rem, 92vw);
@@ -1134,7 +1134,7 @@ kbd {
   background: var(--panel-2);
   border: 1px solid var(--field);
   box-shadow: 0 2rem 4rem var(--shadow);
-  animation: rise var(--dur) ease-out;
+  animation: rise var(--dur) var(--app-motion-spring-fast-spatial);
 }
 .overlay.profile-add .sheet {
   width: min(40rem, 94vw);
@@ -1229,8 +1229,8 @@ kbd {
   opacity: 0;
   transform: translateY(10px);
   transition:
-    opacity var(--dur) ease,
-    transform var(--dur) ease;
+    opacity var(--dur) var(--app-motion-spring-fast-effects),
+    transform var(--dur) var(--app-motion-spring-fast-spatial);
   pointer-events: none;
   white-space: pre-wrap;
 }
@@ -1391,7 +1391,7 @@ kbd {
   z-index: 1000;
   display: grid;
   place-items: center;
-  background: black; /* design:content - letterbox around the emulated frame */
+  background: var(--md-sys-color-scrim);
   color: var(--soft);
   outline: none;
 }
