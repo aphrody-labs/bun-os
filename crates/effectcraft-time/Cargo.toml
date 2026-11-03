@@ -3,6 +3,8 @@ name = "effectcraft-time"
 version = "0.9.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "Exact integer media time for EffectCraft and FilmCraft: ticks, rates, timecode and frame conversion."
+repository = "https://github.com/aphrody-labs/bun-os"
 rust-version = "1.95"
 
 [lints.rust]

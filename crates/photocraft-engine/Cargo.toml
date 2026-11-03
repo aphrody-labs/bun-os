@@ -3,6 +3,8 @@ name = "photocraft-engine"
 version = "0.8.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "The Photocraft engine facade: open documents, history and the command registry."
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"

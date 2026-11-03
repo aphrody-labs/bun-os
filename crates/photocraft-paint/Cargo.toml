@@ -3,6 +3,8 @@ name = "photocraft-paint"
 version = "0.8.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "Photocraft brush engine: computed and sampled tips, shape and colour dynamics, scattering, texture, dual brush and smoothing."
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"

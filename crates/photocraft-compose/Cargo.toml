@@ -3,6 +3,8 @@ name = "photocraft-compose"
 version = "0.8.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "Photocraft CPU reference compositor: flattens a document layer tree into straight-alpha RGBA."
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"

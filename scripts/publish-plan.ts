@@ -10,7 +10,7 @@ import { readdir } from "node:fs/promises";
 const root = join(import.meta.dir, "..");
 const firstParty = /^(crates|cloud|apps|packages)[\\/]/;
 
-type Dep = { name: string; source: string | null; kind: string | null; path?: string };
+type Dep = { name: string; source: string | null; kind: string | null; req: string; path?: string };
 type Pkg = {
   name: string;
   version: string;
@@ -36,6 +36,64 @@ const { packages } = JSON.parse(meta.stdout.toString()) as { packages: Pkg[] };
 const members = packages.filter(p => firstParty.test(relative(root, p.manifest_path)));
 const byName = new Map(members.map(p => [p.name, p]));
 
+// `cargo package` resolves every dependency against crates.io: a [patch.crates-io] entry, a git dependency with a
+// version, or a path dependency outside the members is fine only when crates.io has a matching version. A git or
+// out-of-tree path dependency without a version cannot be published at all.
+const UA = { "User-Agent": "bun-os-release (contact@aphrody.com)" };
+const manifest = Bun.TOML.parse(await Bun.file(join(root, "Cargo.toml")).text()) as {
+  patch?: Record<string, Record<string, { package?: string; git?: string; rev?: string }>>;
+};
+const patchEntries = Object.entries(manifest.patch?.["crates-io"] ?? {}).map(([k, v]) => ({
+  ...v,
+  name: v.package ?? k,
+}));
+const patched = new Set(patchEntries.map(e => e.name));
+// First-party crates that live outside the members (an aphrody-labs fork patched in from git, or a crate in its own
+// workspace under crates/): when crates.io lacks them, scripts/publish.ts publishes their workspace first.
+type External = { workspace: string; git?: string; rev?: string; path?: string; crates: string[] };
+const externals = new Map<string, External>();
+function externalFor(d: Dep): External | undefined {
+  const e = patchEntries.find(p => p.name === d.name);
+  if (e?.git?.includes("github.com/aphrody-labs/")) {
+    const ws = e.git.replace(/.git$/, "").split("/").pop()!;
+    const x = externals.get(ws) ?? { workspace: ws, git: e.git, rev: e.rev, crates: [] };
+    externals.set(ws, x);
+    return x;
+  }
+  if (d.source === null && d.path && firstParty.test(relative(root, d.path))) {
+    const ws = relative(root, d.path).replaceAll("\\", "/");
+    const x = externals.get(ws) ?? { workspace: ws, path: ws, crates: [] };
+    externals.set(ws, x);
+    return x;
+  }
+}
+const registryVersions = new Map<string, string[]>();
+const lookups = new Set([...patched].filter(n => !byName.has(n)));
+for (const p of members)
+  for (const d of p.dependencies)
+    if (
+      d.kind !== "dev" &&
+      d.req !== "*" &&
+      (d.source?.startsWith("git+") || (d.source === null && !byName.has(d.name)))
+    )
+      lookups.add(d.name);
+for (const name of lookups) {
+  const r = await fetch(`https://crates.io/api/v1/crates/${name}`, { headers: UA });
+  const body = r.ok ? ((await r.json()) as { versions: { num: string; yanked: boolean }[] }) : { versions: [] };
+  registryVersions.set(
+    name,
+    body.versions.filter(v => !v.yanked).map(v => v.num),
+  );
+}
+const cargoReq = (req: string) =>
+  req
+    .split(",")
+    .map(p => p.trim())
+    .map(p => (/^\d/.test(p) ? `^${p}` : p))
+    .join(" ");
+const onRegistry = (name: string, req: string) =>
+  (registryVersions.get(name) ?? []).some(v => req === "*" || Bun.semver.satisfies(v, cargoReq(req)));
+
 type Verdict = { name: string; version: string; path: string; publishable: boolean; reasons: string[]; deps: string[] };
 const verdicts = new Map<string, Verdict>();
 function judge(p: Pkg, stack = new Set<string>()): Verdict {
@@ -51,9 +109,17 @@ function judge(p: Pkg, stack = new Set<string>()): Verdict {
   const deps: string[] = [];
   for (const d of p.dependencies) {
     if (d.kind === "dev") continue;
-    if (d.source?.startsWith("git+")) reasons.push(`git dependency ${d.name}`);
-    else if (d.source === null) {
-      const local = byName.get(d.name);
+    const local = d.source === null ? byName.get(d.name) : undefined;
+    if (!local && d.source?.startsWith("registry+") !== true && d.req === "*")
+      reasons.push(`${d.source ? "git" : "path"} dependency ${d.name} without a version`);
+    else if (!local && registryVersions.has(d.name)) {
+      if (!onRegistry(d.name, d.req)) {
+        const x = externalFor(d);
+        if (x) {
+          if (!x.crates.includes(d.name)) x.crates.push(d.name);
+        } else reasons.push(`dependency ${d.name} ${d.req} not on crates.io`);
+      }
+    } else if (d.source === null) {
       if (!local) reasons.push(`path dependency ${d.name} outside first-party members`);
       else {
         deps.push(d.name);
@@ -115,13 +181,19 @@ for (const e of await readdir(join(root, "packages"), { withFileTypes: true })) 
 const blockers = new Map<string, number>();
 for (const v of verdicts.values())
   for (const r of v.reasons) {
-    const key = r.replace(/ [\w-]+$/, m => (r.startsWith("git dependency") ? m : ""));
+    const key = r.startsWith("depends on unpublishable") ? "depends on unpublishable" : r;
     blockers.set(key, (blockers.get(key) ?? 0) + 1);
   }
 const plan = {
   schema: 1,
   generator: "scripts/publish-plan.ts",
-  crates: { total: verdicts.size, publishable: order.length, order, members: [...verdicts.values()] },
+  crates: {
+    total: verdicts.size,
+    publishable: order.length,
+    external: [...externals.values()],
+    order,
+    members: [...verdicts.values()],
+  },
   npm: { total: npm.length, publishable: npm.filter(n => n.publishable).length, members: npm },
   topBlockers: [...blockers.entries()].sort((a, b) => b[1] - a[1]).slice(0, 25),
 };

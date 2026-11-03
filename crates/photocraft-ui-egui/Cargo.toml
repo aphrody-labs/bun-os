@@ -3,6 +3,8 @@ name = "photocraft-ui-egui"
 version = "0.8.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "Photocraft desktop UI shell built on egui and eframe."
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"

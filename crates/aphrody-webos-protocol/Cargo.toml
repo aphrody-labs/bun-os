@@ -9,7 +9,6 @@ homepage.workspace = true
 repository.workspace = true
 license = "Apache-2.0"
 description = "Wire contract of aphrody.com shared by the Rust server and the Rust wasm client: OS catalog, sessions, signalling, input, health."
-publish = false
 
 [dependencies]
 serde = { workspace = true }

@@ -8,7 +8,7 @@ version = "1.4.7"
 edition = "2024"
 license = "Apache-2.0"
 description = "Bun OS bunos.sys IOCTL contract: control codes, event records and strict, fuzz-tested parsers (no_std)."
-publish = false
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lib]
 path = "src/lib.rs"

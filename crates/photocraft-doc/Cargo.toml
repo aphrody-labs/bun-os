@@ -3,6 +3,8 @@ name = "photocraft-doc"
 version = "0.8.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "The Photocraft document model: layers, groups, masks and adjustments as pure data, no rendering, no UI."
+repository = "https://github.com/aphrody-labs/bun-os"
 
 [lints.rust]
 unsafe_code = "forbid"

@@ -3,6 +3,8 @@ name = "photocraft-testkit"
 version = "0.8.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "Test helpers for the Photocraft crates."
+publish = false
 
 [lints.rust]
 unsafe_code = "forbid"
