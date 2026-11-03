@@ -166,11 +166,8 @@ export async function smoke(
         ...(process.platform === "linux"
           ? [
               "--enable-features=Vulkan",
-              // Chrome's documented headless Vulkan path avoids platform swapchain surfaces.
-              // https://developer.chrome.com/blog/supercharge-web-ai-testing
               "--use-angle=vulkan",
               "--use-vulkan=swiftshader",
-              "--disable-vulkan-surface",
               "--use-webgpu-adapter=swiftshader",
               "--enable-unsafe-swiftshader",
               ...(process.getuid?.() === 0 ? ["--no-sandbox"] : []),

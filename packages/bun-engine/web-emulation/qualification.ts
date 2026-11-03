@@ -21,7 +21,7 @@ export interface WasmQualificationReceipt {
   kind: "bun-engine-wasm-qualification";
   core: string;
   variant: "single" | "threads";
-  /** Revision of the qualification harness; artifact provenance is separately retained in the manifest. */
+  /** Revision of the qualification harness; this does not establish the artifact's build revision. */
   sourceRevision: string;
   testedAt: string;
   lockSHA256: string;
