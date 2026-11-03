@@ -1,69 +1,54 @@
-# Releases, versions and LTS
+# Releases and versions
 
-Bun OS ships three kinds of artifacts, each with the versioning its upstream community uses:
+Bun OS follows the Arch Linux model (owner order 2026-11-03): a **rolling release** with the latest upstream
+versions, delivered continuously as packages, never as frozen distribution versions. The machine-readable policy is
+[`infra/releases/policy.toml`](../../infra/releases/policy.toml).
 
-| Artifact                          | Scheme                          | Modelled on                                                                |
-| --------------------------------- | ------------------------------- | -------------------------------------------------------------------------- |
-| The OS image (ISO, disk, session) | `YY.MM` + point releases        | Ubuntu / Pop!_OS calendar releases, COSMIC epochs, LFS dated book releases |
-| Kernel `linux-bun`                | upstream kernel version         | kernel.org mainline, stable and longterm                                   |
-| Crates and npm packages           | SemVer 2.0, one workspace train | Rust's release train and Cargo SemVer; one version per dependency (Google) |
+## Package managers
 
-The machine-readable policy is [`infra/releases/policy.toml`](../../infra/releases/policy.toml); release tooling reads
-it, so this page and the tools cannot disagree.
+| Manager   | Scope                                                                 | Repository                                         |
+| --------- | --------------------------------------------------------------------- | -------------------------------------------------- |
+| `pacman`  | the system: kernel, base, COSMIC, Rust CLIs, Bun, Craft apps, drivers | `[bunos]` and `[bunos-testing]`, signed, on aphrody.com/repo |
+| Flatpak   | sandboxed desktop applications (Flathub plus our remote)              | `aphrody.com/repo/flatpak`                          |
+| `bun`     | Bun/TypeScript packages and tools in the user's space                 | npm registry (`@aphrody/*`)                         |
 
-## Channels
+The userland is Rust and Bun: Rust CLIs (uutils, sudo-rs, ntpd-rs, ripgrep, fd, eza, bat, dust, procs, ...),
+nushell as the default shell, Rio as the terminal, COSMIC as the desktop, Craft apps, Redox crates wherever a
+component exists there (relibc-free crates such as `redox_syscall`, `orbclient`-free UI crates, `redoxfs` tooling).
+C userland is only what the kernel boot path still requires (glibc, systemd until a Rust replacement qualifies).
 
-| Channel  | What it is                                                      | Cadence                         | Support                                                 | Upstream analogue                   |
-| -------- | --------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------- | ----------------------------------- |
-| `edge`   | every green commit of `main` that passed presubmit              | continuous                      | none; replaced by the next build                        | kernel mainline `-rc`, Rust nightly |
-| `beta`   | release candidate of the next `YY.MM`: `YY.MM-rcN`              | weekly during the 4-week freeze | until the release                                       | kernel `-rcN`, Rust beta            |
-| `stable` | `YY.MM.P`, released in April and October                        | point release every 4 weeks     | until the next stable + 1 month                         | kernel stable, Pop!_OS interim      |
-| `lts`    | the April release of even years (`26.04 LTS`, `28.04 LTS`, ...) | point release every 4 weeks     | 5 years (fixes), first 2 years with hardware enablement | Ubuntu/Pop!_OS LTS, kernel longterm |
+## Rolling release (Arch practice)
 
-Rules, taken from the kernel's [stable rules](https://docs.kernel.org/process/stable-kernel-rules.html):
+- **Upstream first and latest.** A new upstream release is packaged as soon as it is out (the dependency loop in
+  [AUTOMATION.md](AUTOMATION.md) bumps pins daily). Patches are minimal and sent upstream.
+- **Staging, testing, release.** Rebuilds that touch many packages go to a staging area first, then
+  `[bunos-testing]`; a package moves to `[bunos]` after the qualification run (stage 5, [BUILD.md](BUILD.md)) passes
+  with it, as Arch moves packages from `[core-testing]`/`[extra-testing]` to `[core]`/`[extra]`.
+- **pkgver/pkgrel.** `pkgver` is the upstream version; `pkgrel` counts Bun OS rebuilds of it. First-party packages use
+  their workspace version (`1.4.7`) as `pkgver`. Git snapshots use `r<count>.<shorthash>`.
+- **No partial upgrades.** Users run `pacman -Syu`; the repository is always a consistent set.
+- **Installation media**: a dated ISO snapshot `YYYY.MM.DD` on the 1st of every month (Arch publishes its ISO
+  monthly), signed, with checksums, on aphrody.com/downloads. An installed system never needs a new ISO.
 
-- **Upstream first.** A fix lands on `main` first and is then backported to `stable/YY.MM` or `lts/YY.MM` with the
-  upstream commit id in the message (`commit <sha> upstream.`). Nothing exists only on a release branch.
-- **Backports are small and fix real bugs** (security, data loss, crash, regression, new hardware ids). No features,
-  no refactors, no dependency bumps beyond security fixes.
-- **No regressions.** A point release is the previous one plus backports; it passes the full stage 5 qualification
-  ([BUILD.md](BUILD.md)) before publication.
+## Kernels (kernel.org, like Arch's `linux` and `linux-lts`)
 
-Branches: `main` (edge), `stable/YY.MM` and `lts/YY.MM`, cut at the end of the freeze. AGENTS.md keeps `main` as the
-only development branch; release branches only receive backports through the release tooling.
+| Package              | Series                       | Repository        |
+| -------------------- | ---------------------------- | ----------------- |
+| `linux-bun`          | latest kernel.org stable     | `[bunos]`         |
+| `linux-bun-lts`      | latest kernel.org longterm   | `[bunos]`         |
+| `linux-bun-mainline` | Linus' mainline `-rc`        | `[bunos-testing]` |
 
-## The release cycle (six months, like the kernel merge window plus rc)
-
-1. **Development** on `main`, about 20 weeks. New upstream pins (COSMIC epoch, Ubuntu base, Android, Bun canary)
-   land here.
-2. **Freeze**, 4 weeks before the release: `YY.MM-rc1` is cut; only fixes land on `main` for that release; one `rcN`
-   per week (Linus Torvalds' rc cadence).
-3. **Release** `YY.MM.0`: signed ISO, disk image and checksums on `aphrody.com/downloads`, release notes generated
-   from the commit log, tag `vYY.MM.0`.
-4. **Maintenance**: point releases `YY.MM.P` every 4 weeks or immediately for a security fix.
-
-## Kernel
-
-`linux-bun` follows kernel.org exactly: an LTS image ships the current [longterm](https://www.kernel.org/category/releases.html)
-series (the last mainline release of the previous year), stable images ship the newest stable series. Patches are
-kept as a quilt-style series on top of the upstream tag, never as a fork that drifts; each one is either upstream,
-sent upstream, or documented as Bun OS specific.
+All three are built from kernel.org sources verified by signature, with `CONFIG_RUST=y` and `make LLVM=1`
+(Documentation/rust/quick-start.rst). Stable rules apply to our patches: upstream first, small, real fixes only.
 
 ## Crates and npm packages
 
-- One workspace version for all first-party crates and packages (`[workspace.package] version` in `Cargo.toml`,
-  `version` in the root `package.json`), today `1.4.7`. SemVer 2.0: breaking API change = major, feature = minor,
-  fix = patch. `cargo semver-checks` gates crate releases.
-- Pre-1.0 forks of upstream projects keep their upstream version plus a `+bunos.N` build suffix; they are not
-  published under the upstream name.
-- MSRV is the toolchain in `rust-toolchain.toml`; editions follow Rust's three-year cadence, migrated with
-  `cargo fix --edition` on `main`.
-- Publication: crates.io (`cargo publish --workspace` in dependency order) and npm (`bun publish`) under the
-  `aphrody` / `@aphrody` names, from the release tooling only, with provenance; never from a workstation.
+SemVer 2.0 with one workspace version for first-party crates and packages (today `1.4.7`); `cargo semver-checks`
+gates crate releases. Publication through `scripts/publish-plan.ts` and `scripts/publish.ts` on the build host.
 
 ## Version strings
 
-- Image: `/etc/os-release` carries `VERSION_ID="26.04"`, `VERSION="26.04 LTS (Bun OS)"`, `BUILD_ID=<commit>`;
-  `edge` builds use `VERSION_ID="26.10~edge"` and `BUILD_ID=<date>.<commit>`.
-- Every binary reports `<version> (<commit> <date>)` with `--version`; every HTTP service reports the same in
-  `GET /api/health` (`version`, `commit`, `channel`).
+- `/etc/os-release`: `ID=bunos`, `ID_LIKE=arch`, `BUILD_ID=rolling`, `VERSION_ID` absent (as on Arch); the image
+  snapshot date in `IMAGE_VERSION=YYYY.MM.DD`.
+- Every binary reports `<version> (<commit> <date>)` with `--version`; every HTTP service reports `version`, `commit`
+  and `channel` in its health endpoint (`channel` is `bunos` or `bunos-testing`).
