@@ -280,14 +280,14 @@ ${
 // ---------------------------------------------------------------------------------------------------------------------
 
 const auditScript = `S=""; [ "$(id -u)" = 0 ] || S="sudo -n"
-. /etc/os-release; echo "os=$ID-$VERSION_ID"
+. /etc/os-release; echo "os=$ID\${VERSION_ID:+-$VERSION_ID}"
 echo "cpus=$(nproc)"
 echo "mem_gib=$(awk '/MemTotal/{printf "%d", $2/1048576+0.5}' /proc/meminfo)"
 echo "mesh=$(ip -4 -o addr | awk '/10\\.200\\.77\\./{print $4}' | cut -d/ -f1 | head -1)"
 echo "fleet_fw=$($S nft list table inet fleet >/dev/null 2>&1 && echo on || echo off)"
 echo "ufw=$($S ufw status 2>/dev/null | head -1 | awk '{print $2}')"
 echo "wg=$(ip -o link show type wireguard | awk -F': ' '{print $2}' | tr '\\n' ' ')"
-echo "public_listen=$($S ss -ltnH | awk '{print $4}' | grep -vE '^(127\\.|\\[::1\\]|10\\.|172\\.|\\[fe80|\\[fc|\\[fd)' | sed -E 's/.*://' | sort -un | tr '\\n' ' ')"
+echo "public_listen=$($S ss -ltnH | awk '{print $4}' | grep -vE '^(127\\.|\\[::1\\]|10\\.|172\\.|192\\.168\\.|\\[fe80|\\[fc|\\[fd)' | sed -E 's/.*://' | sort -un | tr '\\n' ' ')"
 echo "root_login=$($S sshd -T 2>/dev/null | awk '/^permitrootlogin/{print $2}')"
 echo "password_auth=$($S sshd -T 2>/dev/null | awk '/^passwordauthentication/{print $2}')"
 echo "failed_units=$(systemctl --failed --no-legend --plain | awk '{print $1}' | tr '\\n' ' ')"
