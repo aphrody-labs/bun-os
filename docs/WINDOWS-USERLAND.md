@@ -18,7 +18,6 @@ verify.ts). Related: [POSIX-ON-WINDOWS.md](POSIX-ON-WINDOWS.md) (buncc providers
 | diff, cmp | uutils diffutils (`uutils/diffutils`, multicall) | aphrody | `diffutils`, `diff`, `cmp` | MIT OR Apache-2.0 |
 | sed | uutils sed (`uutils/sed`) | 0.3.0 | `sed` | MIT |
 | grep | uutils grep (`uutils/grep`) | main | `grep` | MIT |
-| ps, pgrep, ... | uutils procps (`uutils/procps`) | main | see Gaps | MIT |
 | bash-compatible shell | brush (`brush`) | main 18d616f3 | `brush` | MIT |
 | structured shell | nushell (`nushell`) | 0.116.1+168 | `nu` | MIT |
 | fast grep | ripgrep (`ripgrep`, with PCRE2) | 15.2.0 | `rg` | Unlicense OR MIT |
@@ -138,14 +137,91 @@ C:/Windows/System32/sudo.exe pwsh -NoProfile -File C:/Windows/BunOS/userland/uni
 32-bit processes see `SysWOW64` instead of `System32` (file system redirection) and do not find the tools; use
 `%SystemRoot%\Sysnative\<name>.exe` from them.
 
+Upgrades: `stage.ts` keeps the signed copy of every binary whose build hash did not change, so re-staging the same
+build re-signs nothing and the reinstall is a no-op. A replaced file that is running (Windows cannot delete a running
+executable) is renamed into `BunOS\userland\.trash\`, emptied at the next install or uninstall.
+
+## State on 2026-11-03
+
+Build `userland-20261103T061842Z-0d67c465ff` on the build host (`~/build/out/windows-userland/`, tarball 71.8 MiB):
+22 tools, 23 binaries (183 MiB), 1037 payload files, signed by `CN=Bun OS Test Signing, O=Aphrody`, thumbprint
+`1E67DBDB0D46A61CF57D286A5562DD76675D4E87`. Toolchain: rustc 1.99.1 (nushell, helix and brush use their pinned
+toolchains), cargo-xwin 0.23.1, MSVC CRT 14.44 + Windows SDK 10.0.26100 (xwin splat). Imports of the binaries are
+only Windows system DLLs (`kernel32`, `ntdll`, `bcryptprimitives`, `api-ms-win-core-*`); no `vcruntime140.dll` or
+`ucrtbase.dll`. Build times on the build host (fat LTO, one tool at a time): nushell 28 min, helix 9.5 min, brush 8 min,
+starship 7 min, the rest 0.5 to 5 min each; the first run also splats the SDK (about 30 min, CPU bound).
+
+Installed with `C:\Windows\System32\sudo.exe pwsh -NoProfile -File factory\windows\userland\install-system.ps1`
+(Windows Sudo, inline): 117 commands in System32 (hard links, 92 of them to `coreutils.exe`), 8 renamed or
+multicall-only:
+
+| Command | Installed as | Reason |
+| --- | --- | --- |
+| `find` | `ufind` | `System32\find.exe` |
+| `sort` | `usort` | `System32\sort.exe` |
+| `more` | `umore` | `System32\more.com` |
+| `expand` | `uexpand` | `System32\expand.exe` |
+| `hostname` | `uhostname` | `System32\hostname.exe` |
+| `timeout` | `utimeout` | `System32\timeout.exe` |
+| `whoami` | `uwhoami` | `System32\whoami.exe` |
+| `link` | `coreutils link` | MSVC `link.exe` |
+
 ## Verification
 
-<!-- verification -->
+`bun factory/windows/userland/verify.ts`, run from a fresh environment (machine + user PATH read from the registry,
+no Git Bash PATH): all checks passed. 109 linked commands answer `--version` (or `--help`; `[`, `test`, `true`,
+`false`, `yes`, `xhs` and the diffutils trio, which has no `--version` upstream, are exercised otherwise). Real work:
+`mkdir -p`, `cp -r`, `ls -la`, `ufind -name -type f`, `sed -i`, `diff -u`, `cmp`, `usort`, `rg`, `fd`, `grep -c`,
+`wc -l` from stdin, `ouch` tar.zst round trip, `nu -c "ls | length"`, and a brush script with `set -euo pipefail`,
+a function with `local`, an indexed array, `$(...)` pipelines, `[[ ]]`, brace expansion and `case`. `hx --health`
+finds the runtime through `HELIX_RUNTIME`; Authenticode status of every installed binary is `Valid`.
 
 ## Benchmarks
 
-<!-- benchmarks -->
+`bun factory/windows/userland/bench.ts`: hyperfine 2.0 (the installed one), `-N`, warmup 2, at least 5 runs, output
+piped (with output to NUL GNU grep exits after the first match). Baseline: the GNU tools of Git for Windows 2.56
+(`C:\Program Files\Git\usr\bin`, MSYS2 runtime). Input: a generated 2,000,000-line, 56 MB file and the
+`vendor/nushell` tree. i7-13700F, Windows 11 build 28120.
+
+| Case | GNU (Git for Windows) | Bun OS userland | GNU / ours |
+| --- | --- | --- | --- |
+| sort 56 MB | 517.3 ± 11.6 ms | 1486.2 ± 30.0 ms | 0.35x |
+| wc -l 56 MB | 39.9 ± 3.5 ms | 22.2 ± 3.3 ms | 1.80x |
+| sha256sum 56 MB | 154.1 ± 6.2 ms | 50.3 ± 4.1 ms | 3.06x |
+| grep -c gamma (uutils grep) | 124.0 ± 3.9 ms | 46.7 ± 3.4 ms | 2.66x |
+| grep -c gamma (ripgrep) | 126.1 ± 5.0 ms | 81.4 ± 5.5 ms | 1.55x |
+| sed s/alpha/omega/g 56 MB | 1519.0 ± 21.9 ms | 834.8 ± 62.0 ms | 1.82x |
+| cut -d' ' -f2 | 1319.3 ± 18.5 ms | 72.1 ± 3.1 ms | 18.29x |
+| find tree -name *.rs (uutils find) | 75.5 ± 6.4 ms | 35.0 ± 3.2 ms | 2.16x |
+| find tree -name *.rs (fd) | 73.6 ± 5.8 ms | 20.9 ± 3.5 ms | 3.52x |
+| ls -laR tree | 265.6 ± 14.3 ms | 78.4 ± 4.4 ms | 3.39x |
+| grep -r fn tree (ripgrep) | 313.2 ± 12.8 ms | 53.6 ± 4.0 ms | 5.84x |
+| shell startup: -c true (bash vs brush) | 17.3 ± 3.6 ms | 12.7 ± 3.1 ms | 1.37x |
+| shell loop 20k iterations (bash vs brush) | 105.3 ± 5.7 ms | 89.5 ± 5.3 ms | 1.18x |
+
+The one regression is uutils `sort` on a large file (2.9x slower than GNU sort); for big sorts use `nu`
+(`open --raw f | lines | sort`) or GNU sort until uutils closes the gap.
 
 ## Gaps
 
-<!-- gaps -->
+- **procps**: uutils procps builds for Windows only with a feature subset, and those utilities read `/proc`: `ps`
+  and `pidof` panic, `pgrep` finds nothing, `free` prints wrong numbers; `top` needs libsystemd. It is not installed.
+  Use `procs` (ps/top), `nu` (`ps`, `sys mem`) or `Get-Process`. `uutils/util-linux` is Linux-only and not built.
+- **coreutils applets**: the `windows` feature set has 92 applets; the Unix-only ones are absent (`chmod`, `chown`,
+  `chgrp`, `chroot`, `id`, `groups`, `install`, `logname`, `mkfifo`, `mknod`, `pinky`, `stat`,
+  `stty`, `users`, `who`). `install` is not built for Windows, so the installer-detection rule never triggers today.
+- **awk**: no Rust awk builds for windows-msvc with gawk compatibility (frawk needs LLVM or Cranelift JIT and is
+  not maintained for Windows); use `nu`, or busybox-w32 awk from the buncc `posix` provider.
+- **less**: no Rust `less`; `bat` pages only through an external pager (falls back to plain output), so use
+  `bat --paging=never`, `hx` for reading, nu `explore`, or Windows `more.com`.
+- **tar, curl, wget, ssh, make**: no drop-in Rust CLI. `ouch` (tar, zip, gz, xz, bz2, bz3, zstd, 7z; no RAR, the UnRAR
+  licence is not open source) and `xh` (HTTPie syntax) have their own CLIs; Windows' `tar.exe` (bsdtar) and
+  `curl.exe` stay. SSH stays Windows OpenSSH. `just` is not Makefile-compatible; GNU make (`vendor/make`) is C on
+  the MSYS2/MinGW stack.
+- **bash**: brush covers the tested bash constructs but is not complete bash (job control and some `shopt`s behave
+  differently on Windows); there is no `sh.exe`/`bash.exe` (see the collision rules).
+- **helix grammars**: the runtime ships themes and queries, not compiled tree-sitter grammars (each is a C/C++
+  library fetched by `hx --grammar fetch` and built by `hx --grammar build` with a local C compiler).
+- **CPU**: binaries target Raptor Lake (`-Ctarget-cpu=raptorlake`); for other machines build with
+  `USERLAND_TARGET_CPU=x86-64-v3`.
+- **32-bit processes**: see SysWOW64 above.

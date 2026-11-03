@@ -11,7 +11,7 @@
  */
 import { $ } from "bun";
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 
 const args = Bun.argv.slice(2);
@@ -32,7 +32,22 @@ await $`scp -q ${`${host}:${remote}.sha256`} ${local + ".sha256"}`;
 const want = readFileSync(local + ".sha256", "utf8").split(/\s+/)[0];
 if (sha256(local) !== want) throw new Error(`tarball sha256 mismatch: ${local}`);
 const dir = join(staging, basename(remote, ".tar.gz"));
-rmSync(dir, { recursive: true, force: true }); // a rebuilt (--into) tarball keeps its name
+// A rebuilt (--into) tarball keeps its name: re-extract, but keep the signed copy of every binary whose build hash
+// did not change, so an unchanged tool keeps its installed hash (a new signature carries a new timestamp).
+const signedByBuild = new Map<string, Buffer>();
+if (existsSync(join(dir, "manifest.json"))) {
+  const old = JSON.parse(readFileSync(join(dir, "manifest.json"), "utf8"));
+  for (const tool of old.tools)
+    for (const f of tool.files)
+      if (
+        f.buildSha256 &&
+        f.buildSha256 !== f.sha256 &&
+        existsSync(join(dir, f.path)) &&
+        sha256(join(dir, f.path)) === f.sha256
+      )
+        signedByBuild.set(f.buildSha256, readFileSync(join(dir, f.path)));
+}
+rmSync(dir, { recursive: true, force: true });
 await $`C:/Windows/System32/tar.exe -xzf ${local} -C ${staging}`;
 
 const manifestPath = join(dir, "manifest.json");
@@ -45,6 +60,8 @@ for (const tool of manifest.tools)
     const actual = sha256(p);
     if (actual !== expected && actual !== f.sha256) throw new Error(`sha256 mismatch: ${f.path}`);
     f.buildSha256 = expected;
+    const signed = signedByBuild.get(expected);
+    if (signed) writeFileSync(p, signed);
     if (f.path.endsWith(".exe")) exes.push(p);
   }
 console.log(`verified ${manifest.tools.length} tools in ${dir}`);

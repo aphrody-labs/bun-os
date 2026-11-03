@@ -143,13 +143,23 @@ Write-Host "$($links.Count) commands linked into $LinkDir; $(@($renamed).Count) 
 $renamed | ForEach-Object { Write-Host ("  {0,-12} -> {1,-22} {2}" -f $_.command, $_.invoke, $_.reason) }
 if ($Plan) { return }
 
-# 5. Remove our previous files that this version no longer ships or changes (links first, then payload).
+# 5. Remove our previous files that this version no longer ships or changes (links first, then payload). A running
+# executable cannot be deleted but can be renamed on the same volume: it goes to .trash, emptied on the next run.
+$trash = Join-Path $Root '.trash'
+if (Test-Path -LiteralPath $trash) { Get-ChildItem -LiteralPath $trash -Force | ForEach-Object { try { Remove-Item -LiteralPath $_.FullName -Force } catch {} } }
+function Remove-Ours([string]$p) {
+  try { Remove-Item -LiteralPath $p -Force }
+  catch {
+    New-Item -ItemType Directory -Force -Path $trash | Out-Null
+    Move-Item -LiteralPath $p -Destination (Join-Path $trash "$([guid]::NewGuid().ToString('N'))-$(Split-Path $p -Leaf)") -Force
+  }
+}
 $newLinkSet = @{}; foreach ($l in $links) { $newLinkSet[$l.path.ToLowerInvariant()] = $l.sha256 }
 $newPayloadSet = @{}; foreach ($p in $payload) { $newPayloadSet[$p.dst.ToLowerInvariant()] = $p.sha256 }
 foreach ($k in @($previous.Keys)) {
   $want = if ($newLinkSet.ContainsKey($k)) { $newLinkSet[$k] } elseif ($newPayloadSet.ContainsKey($k)) { $newPayloadSet[$k] } else { $null }
   if ((Test-Path -LiteralPath $k) -and $want -ne $previous[$k]) {
-    if (& $ours $k) { Remove-Item -LiteralPath $k -Force } else { Write-Warning "kept $k (changed since install)" }
+    if (& $ours $k) { Remove-Ours $k } else { Write-Warning "kept $k (changed since install)" }
   }
 }
 

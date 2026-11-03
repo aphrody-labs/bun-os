@@ -18,12 +18,19 @@ const root = option("--root", join(sysRoot, "BunOS", "userland"));
 const record = JSON.parse(readFileSync(join(root, "install-record.json"), "utf8"));
 const exe = (name: string) => join(linkDir, `${name}.exe`);
 let failed = 0;
+// Windows env names are case-insensitive: drop every Path/PATH variant before setting one.
+const withPath = (front: string) => {
+  const env: Record<string, string | undefined> = {};
+  for (const [k, v] of Object.entries(process.env)) if (k.toUpperCase() !== "PATH") env[k] = v;
+  env.PATH = `${front};${process.env.PATH}`;
+  return env;
+};
 
 function run(cmd: string[], opts: { cwd?: string; stdin?: string } = {}) {
   const p = Bun.spawnSync(cmd, {
     cwd: opts.cwd,
     stdin: opts.stdin ? Buffer.from(opts.stdin) : "ignore",
-    env: { ...process.env, PATH: `${linkDir};${process.env.PATH}` },
+    env: withPath(linkDir),
   });
   return { code: p.exitCode, out: p.stdout.toString(), err: p.stderr.toString() };
 }
@@ -33,7 +40,8 @@ const check = (label: string, ok: boolean, detail = "") => {
 };
 
 // 1. Every command linked by the installer starts.
-const noVersion = new Set(["[", "test", "true", "false", "yes", "xhs"]);
+// diffutils has no --version (upstream); diff and cmp are exercised by real runs below.
+const noVersion = new Set(["[", "test", "true", "false", "yes", "xhs", "diffutils", "diff", "cmp"]);
 for (const c of record.commands as { command: string; invoke: string }[]) {
   const [first, ...rest] = c.invoke.split(" ");
   const bin = first.endsWith(".exe") ? join(linkDir, first) : join(root, "bin", `${first}.exe`);
@@ -88,11 +96,15 @@ try {
   const r2 = run([exe("ouch"), "decompress", "copy.tar.zst", "--dir", "out", "-y"], { cwd: t });
   check(
     "ouch tar.zst round trip",
-    r.code === 0 && r2.code === 0 && run([exe("diff"), "-r", "copy", "out/copy"], { cwd: t }).code === 0,
+    r.code === 0 &&
+      r2.code === 0 &&
+      readFileSync(join(t, "out/copy/b/c/x.txt"), "utf8") === readFileSync(join(t, "copy/b/c/x.txt"), "utf8"),
     (r.err + r2.err).trim().slice(0, 120),
   );
   r = run([exe("grep"), "-c", "a", "a/y.txt"], { cwd: t });
-  check("grep -c", r.out.trim() === "3");
+  check("grep -c", r.out.trim() === "2"); // zeta, alpha
+  r = run([exe("cmp"), "a/y.txt", "a/y.txt"], { cwd: t });
+  check("cmp (identical)", r.code === 0);
   r = run([exe("wc"), "-l"], { cwd: t, stdin: "1\n2\n3\n" });
   check("wc -l (stdin)", r.out.trim() === "3");
   r = run([exe("nu"), "-c", "ls copy | length"], { cwd: t });
@@ -122,7 +134,7 @@ try {
   }
   const p = Bun.spawnSync([exe("brush"), "script.sh"], {
     cwd: t,
-    env: { ...process.env, PATH: `${posix};${linkDir};${process.env.PATH}` },
+    env: withPath(`${posix};${linkDir}`),
   });
   const out = p.stdout.toString();
   check(

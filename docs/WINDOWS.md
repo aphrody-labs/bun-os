@@ -26,6 +26,9 @@ registry.get("HKCU\\Software\\X", "Name");
 winrt.parseUri("https://example.com:8443/a?b=1").host; // Windows.Foundation.Uri
 ```
 
+Unix command line on Windows (Rust tools cross-built with cargo-xwin, installed next to `cmd.exe`):
+[WINDOWS-USERLAND.md](WINDOWS-USERLAND.md).
+
 Subpath imports (`@aphrody/windows/registry`, `/win32`, `/shell`, `/services`, `/winrt`, `/winui`, `/provider`) avoid
 loading the other modules. Every `dlopen` is lazy, so importing on another platform is safe; calls throw
 `WindowsError` with `ERR_WINDOWS_UNSUPPORTED`.

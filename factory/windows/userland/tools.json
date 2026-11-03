@@ -115,34 +115,6 @@
       ]
     },
     {
-      "name": "procps",
-      "path": "vendor/uutils/procps",
-      "license": "MIT",
-      "optional": true,
-      "cargo": [
-        "--bin",
-        "procps",
-        "--no-default-features",
-        "--features",
-        "free,pgrep,pidof,pidwait,pkill,ps,watch"
-      ],
-      "bins": [
-        {
-          "file": "procps",
-          "commands": [
-            "procps",
-            "free",
-            "pgrep",
-            "pidof",
-            "pidwait",
-            "pkill",
-            "ps",
-            "watch"
-          ]
-        }
-      ]
-    },
-    {
       "name": "brush",
       "path": "vendor/brush",
       "license": "MIT",

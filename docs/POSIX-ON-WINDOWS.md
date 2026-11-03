@@ -1,5 +1,8 @@
 # POSIX on Windows: decision table
 
+Native Rust userland installed into the Windows directory (coreutils, findutils, diffutils, sed, grep, brush, nushell,
+ripgrep, fd, ...): [WINDOWS-USERLAND.md](WINDOWS-USERLAND.md).
+
 Owner order: `buncc` and `@aphrody/windows` replace or unify MSYS2, MinGW, GnuWin32, Cygwin, Wine and Proton. Rule: adopt
 existing projects, drive them through `buncc` providers, do not reinvent them. Versions and dates were read on 2026-10-29
 (`gh api repos/<owner>/<repo>/releases/latest`, project documentation, Microsoft Learn, Bun docs and direct runs of Bun 1.4.4).

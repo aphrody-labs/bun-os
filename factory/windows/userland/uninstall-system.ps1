@@ -13,11 +13,19 @@ $recordPath = Join-Path $Root 'install-record.json'
 if (-not (Test-Path -LiteralPath $recordPath)) { throw "no install record at $recordPath" }
 $rec = Get-Content $recordPath -Raw | ConvertFrom-Json
 $removed = 0; $kept = @()
+$trashDir = Join-Path $Root '.trash'
+if (Test-Path -LiteralPath $trashDir) { Get-ChildItem -LiteralPath $trashDir -Force | ForEach-Object { try { Remove-Item -LiteralPath $_.FullName -Force } catch {} } }
 # Links first, then payload.
 foreach ($f in @($rec.files | Where-Object kind -eq 'link') + @($rec.files | Where-Object kind -ne 'link')) {
   if (-not (Test-Path -LiteralPath $f.path)) { continue }
   if ((Get-FileHash -LiteralPath $f.path -Algorithm SHA256).Hash.ToLowerInvariant() -eq $f.sha256) {
-    Remove-Item -LiteralPath $f.path -Force; $removed++
+    # A running executable cannot be deleted but can be renamed on the same volume.
+    try { Remove-Item -LiteralPath $f.path -Force }
+    catch {
+      $trash = Join-Path $Root '.trash'; New-Item -ItemType Directory -Force -Path $trash | Out-Null
+      Move-Item -LiteralPath $f.path -Destination (Join-Path $trash "$([guid]::NewGuid().ToString('N'))-$(Split-Path $f.path -Leaf)") -Force
+    }
+    $removed++
   } else { $kept += $f.path }
 }
 foreach ($e in @($rec.env)) {

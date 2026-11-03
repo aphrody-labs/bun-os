@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Benchmarks the installed Bun OS userland against the Git for Windows GNU tools (MSYS2 runtime) with hyperfine
- * (no shell, output discarded, warmup 2). Prints one Markdown table (mean ± σ, ratio GNU/ours).
+ * (no shell, output piped so GNU grep cannot take its stdout-is-/dev/null early exit, warmup 2). Prints one Markdown table (mean ± σ, ratio GNU/ours).
  *
  *   bun factory/windows/userland/bench.ts [--link-dir C:\Windows\System32] [--gnu "C:\Program Files\Git\usr\bin"]
  *
@@ -57,14 +57,16 @@ const rows = ["| Case | GNU (Git for Windows) | Bun OS userland | GNU / ours |",
 for (const [label, a, b] of cases) {
   const out = join(work, "h.json");
   const p = Bun.spawnSync(
-    [hyperfine, "-N", "--warmup", "2", "--min-runs", "5", "--output", "null", "--export-json", out, a, b],
+    [hyperfine, "-N", "--warmup", "2", "--min-runs", "5", "--output", "pipe", "--export-json", out, a, b],
     { stdout: "ignore", stderr: "pipe" },
   );
   if (p.exitCode !== 0) {
     rows.push(`| ${label} | failed | failed | ${p.stderr.toString().trim().split("\n").pop()} |`);
     continue;
   }
-  const [ra, rb] = JSON.parse(readFileSync(out, "utf8")).results;
+  // hyperfine 2 (schema 2) moved the statistics to summary.time_wall_clock; schema 1 had them on the result.
+  const stat = (r: any) => r.summary?.time_wall_clock ?? r;
+  const [ra, rb] = JSON.parse(readFileSync(out, "utf8")).results.map(stat);
   const ms = (r: { mean: number; stddev: number }) =>
     `${(r.mean * 1000).toFixed(1)} ± ${(r.stddev * 1000).toFixed(1)} ms`;
   rows.push(`| ${label} | ${ms(ra)} | ${ms(rb)} | ${(ra.mean / rb.mean).toFixed(2)}x |`);
