@@ -1,0 +1,60 @@
+# Public Bun OS API (docs/ops/API.md): one entry, api.aphrody.com on the production host, routed by /v1/<service>/.
+# `bun infra/fleet/fleet.ts api-config` renders the nginx sites; `apply-api` installs them.
+#
+# A service runs on `host` and listens on loopback `port`. When `host` is not the gateway host, the gateway forwards
+# over the WireGuard mesh to that host's mesh listener (port `mesh_port`), which proxies to loopback. Moving a service
+# to the gateway host only changes `host`; the public URL stays the same.
+
+schema = 1
+domain = "api.aphrody.com"
+gateway = "bunos"
+mesh_port = 8080
+# Origins allowed to call the API from a browser (CORS); no wildcard on authenticated routes.
+origins = ["https://aphrody.com", "https://www.aphrody.com", "https://aphrody.app", "https://store.aphrody.com", "https://downloads.aphrody.com"]
+
+[services.site]
+description = "aphrody.com site backend"
+host = "vps"
+port = 8083
+health = "/health"
+
+[services.store]
+description = "Bun OS Store API (apt, pacman, flatpak, F-Droid, bun, cargo feeds)"
+host = "vps"
+port = 8791
+
+[services.downloads]
+description = "Downloads and release artifacts"
+host = "vps"
+port = 8797
+health = "/health"
+
+[services.chat]
+description = "Aphrody Chat gateway"
+host = "vps"
+port = 8794
+realtime = true
+
+[services.a2a]
+description = "Agent-to-agent hub"
+host = "vps"
+port = 8788
+realtime = true
+
+[services.bunos]
+description = "Bun OS server (product API)"
+host = "vps"
+port = 29030
+
+[services.fonts]
+description = "Fonts proxy"
+host = "vps"
+port = 8796
+health = "/health"
+
+[services.webos]
+description = "WebOS server (session API and stream)"
+host = "vps"
+port = 8790
+health = "/api/health"
+realtime = true
