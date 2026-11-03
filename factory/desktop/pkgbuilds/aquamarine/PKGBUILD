@@ -1,0 +1,52 @@
+# Bun OS: Arch's recipe (gitlab.archlinux.org/archlinux/packaging/packages/aquamarine, 0.16.0-1) built from the pinned
+# aphrody-labs/aquamarine fork, branch bunos/v0.16.0 (v0.16.0 + one patch): a KMS device without its own render node
+# (WSL's vkms) no longer borrows the sole render node of the system when that node is vgem, which has no renderer and
+# made every GBM allocation fail ("GBM: Failed to allocate a GBM buffer: bo null"); it renders on the KMS node.
+# Needed by the Hyprland and Omarchy sessions under WSLg (docs/DESKTOP-SESSIONS.md, docs/WSL.md section 8).
+# vendor: vendor/hyprland/aquamarine -> _commit
+_commit=efb317791df747ddfaff10b55e63cf101aeb5934
+# Maintainer: Caleb Maclennan <caleb@alerque.com>
+# Contributor: Aaron Blasko <blaskoazzolaaaron [at] gmail.com>
+
+pkgname=aquamarine
+pkgver=0.16.0
+pkgrel=2
+pkgdesc='a very light linux rendering backend library'
+arch=(x86_64 aarch64)
+url="https://github.com/aphrody-labs/$pkgname"
+license=(BSD-3-Clause)
+depends=(libgcc
+         libstdc++
+         glibc # libc.so libm.so
+         hyprutils libhyprutils.so
+         libdisplay-info libdisplay-info.so
+         libdrm # libdrm.so
+         libglvnd libEGL.so
+         libinput # libinput.so
+         mesa # libgbm.so
+         opengl-driver
+         pixman
+         seatd libseat.so
+         systemd-libs libudev.so
+         wayland libwayland-client.so
+         wayland-protocols)
+makedepends=(cmake
+             git
+             hyprwayland-scanner)
+provides=("lib$pkgname.so")
+source=("$pkgname::git+https://github.com/aphrody-labs/aquamarine.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+	cd "$pkgname"
+	cmake -B build \
+		-D CMAKE_INSTALL_PREFIX=/usr \
+		-D CMAKE_BUILD_TYPE=Release
+	cmake --build build
+}
+
+package() {
+	cd "$pkgname"
+	DESTDIR="$pkgdir" cmake --install build
+	install -Dm0644 -t "$pkgdir/usr/share/licenses/$pkgname" LICENSE
+}

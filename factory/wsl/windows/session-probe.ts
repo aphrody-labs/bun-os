@@ -4,6 +4,7 @@
 //
 //   bun session-probe.ts <session-id> [--title <substring>] [--timeout 60] [--keep] [--cmd "<shell line>"]
 //   bun session-probe.ts stop          end every running session (after --keep)
+//   bun session-probe.ts <id> --win '["bunos-wayland-win.exe","--wsl","bunos","--","start-cosmic"]'   native presenter
 //
 // Default command: `bunos-session <id>` as the distro user under WSLg (docs/DESKTOP-SESSIONS.md). --cmd replaces it
 // (e.g. a bunos-wayland-win run). The window is any top-level window of msrdc.exe (WSLg) or bunos-wayland-win.exe whose
@@ -20,6 +21,7 @@ const title = opt("--title");
 const distro = process.env.BUNOS_WSL_DISTRO ?? "bunos";
 if (id === "stop") {
   stop();
+  Bun.spawnSync(["taskkill", "/IM", "bunos-wayland-win.exe", "/F"], { stdout: "ignore", stderr: "ignore" });
   process.exit(0);
 }
 
@@ -91,17 +93,21 @@ const line = opt("--cmd") ?? `exec bunos-session ${id}`;
 const log = `/tmp/session-probe-${id}.log`;
 const t0 = Bun.nanoseconds();
 // The line goes through base64: wsl.exe re-parses its command line and would split or unquote it.
+// --win: a Windows-side argv (JSON array), e.g. bunos-wayland-win.exe --wsl bunos -- <session>; it is killed on stop.
+const win = opt("--win");
 const proc = Bun.spawn(
-  [
-    "wsl.exe",
-    "-d",
-    distro,
-    "--",
-    "sh",
-    "-c",
-    `echo ${Buffer.from(line).toString("base64")} | base64 -d >/tmp/session-probe-${id}.sh; setsid -f sh /tmp/session-probe-${id}.sh >${log} 2>&1 </dev/null`,
-  ],
-  { stdout: "ignore", stderr: "ignore" },
+  win
+    ? detachedWin(JSON.parse(win) as string[])
+    : [
+        "wsl.exe",
+        "-d",
+        distro,
+        "--",
+        "sh",
+        "-c",
+        `echo ${Buffer.from(line).toString("base64")} | base64 -d >/tmp/session-probe-${id}.sh; setsid -f sh /tmp/session-probe-${id}.sh >${log} 2>&1 </dev/null`,
+      ],
+  win ? { stdout: "pipe", stderr: "pipe" } : { stdout: "ignore", stderr: "ignore" },
 );
 let found: Win | undefined;
 while (!found && (Bun.nanoseconds() - t0) / 1e6 < timeout) {
@@ -118,8 +124,24 @@ console.log(
     2,
   ),
 );
-if (!argv.includes("--keep")) stop();
+if (!argv.includes("--keep")) {
+  if (win) proc.kill();
+  stop();
+}
 process.exit(found ? 0 : 1);
+
+/** With --keep the Windows command must outlive this probe: Start-Process makes it no child of ours. */
+function detachedWin(cmd: string[]): string[] {
+  if (!argv.includes("--keep")) return cmd;
+  const q = (a: string) => `'${a.replaceAll("'", "''")}'`;
+  const rest = cmd.slice(1).map(a => (a.includes(" ") ? `'"${a.replaceAll("'", "''")}"'` : q(a)));
+  return [
+    "pwsh",
+    "-NoProfile",
+    "-Command",
+    `Start-Process -FilePath ${q(cmd[0]!)} -ArgumentList ${rest.join(",")}`,
+  ];
+}
 
 /** End what a session started (compositor, its helpers, viewer, wayvnc, dbus-run-session): TERM, then KILL. */
 function stop() {
