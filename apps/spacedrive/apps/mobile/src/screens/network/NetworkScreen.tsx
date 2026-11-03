@@ -35,7 +35,7 @@ export function NetworkScreen() {
 			{/* Network Status */}
 			<Card className="mb-6">
 				<View className="flex-row items-center">
-					<View className="w-3 h-3 rounded-full bg-green-500 mr-3" />
+					<View className="w-3 h-3 rounded-full bg-success mr-3" />
 					<View className="flex-1">
 						<Text className="text-ink font-medium">
 							Network Status
@@ -98,8 +98,8 @@ export function NetworkScreen() {
 							Up to date
 						</Text>
 					</View>
-					<View className="px-3 py-1 rounded-full bg-green-500/20">
-						<Text className="text-green-500 text-sm">Synced</Text>
+					<View className="px-3 py-1 rounded-full bg-success/20">
+						<Text className="text-success text-sm">Synced</Text>
 					</View>
 				</Card>
 			</View>

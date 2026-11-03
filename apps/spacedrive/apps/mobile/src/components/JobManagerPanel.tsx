@@ -146,7 +146,7 @@ export function JobManagerPanel() {
 					<Text className="text-base font-semibold text-ink">Jobs</Text>
 					{activeJobCount > 0 && (
 						<View className="bg-accent rounded-full px-2 py-0.5 min-w-[20px] items-center">
-							<Text className="text-white text-[10px] font-bold">
+							<Text className="text-on-primary text-[10px] font-bold">
 								{activeJobCount}
 							</Text>
 						</View>

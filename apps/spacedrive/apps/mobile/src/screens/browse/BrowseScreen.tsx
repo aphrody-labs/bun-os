@@ -22,6 +22,7 @@ import { useRouter } from "expo-router";
 import type { SpaceItem, SpaceGroup } from "@sd/ts-client";
 import { SpaceItem as SpaceItemComponent, SpaceGroupComponent } from "./components";
 import { SettingsGroup } from "../../components/primitive";
+import { role } from "~/theme/roles";
 
 interface Space {
 	id: string;
@@ -177,7 +178,7 @@ export function BrowseScreen() {
 	// Build page colors array - space colors for space pages, accent for create page
 	const pageColors = [
 		...spacesList.map((space) => space.color),
-		"hsl(208, 100%, 57%)", // Create page uses accent color
+		role.primary, // Create page uses accent color
 	];
 
 	return (

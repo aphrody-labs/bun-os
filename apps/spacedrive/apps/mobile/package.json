@@ -7,6 +7,7 @@
 		"start": "bunx expo start",
 		"android": "bunx expo run:android",
 		"ios": "bunx expo run:ios",
+		"m3-roles": "bun scripts/m3-roles.ts",
 		"patch": "./scripts/patch-svg.sh",
 		"prebuild": "bun run patch && bunx expo prebuild",
 		"prebuild:clean": "bun run patch && bunx expo prebuild --clean",

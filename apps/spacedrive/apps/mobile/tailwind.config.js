@@ -1,29 +1,11 @@
-const sharedColors = require('@spacedrive/tokens/raw-colors');
+// Colours are the M3 roles of the SpaceUI dark scheme (@aphrody/m3-theme/spaceui.css), copied into
+// src/theme/m3-roles.json by scripts/m3-roles.ts. The SpaceUI aliases (accent, ink, app, sidebar, menu, status)
+// map onto those roles exactly as the @theme block of spaceui.css does on the web; React Native has no
+// color-mix(), so the hover/active state layers use the next surface-container tone.
+const { dark: r } = require('./src/theme/m3-roles.json');
 
-/**
- * Convert shared color format (HSL string) to NativeWind format (hsl() function)
- * Shared: '235, 15%, 13%'
- * NativeWind: 'hsl(235, 15%, 13%)'
- *
- * Also converts camelCase keys to kebab-case for NativeWind compatibility
- */
-function toHSL(colorValue) {
-	if (typeof colorValue === 'string') {
-		return `hsl(${colorValue})`;
-	}
-
-	// Handle nested objects (like accent.DEFAULT)
-	const result = {};
-	for (const [key, value] of Object.entries(colorValue)) {
-		// Preserve DEFAULT (must be uppercase for Tailwind)
-		// Convert camelCase to kebab-case for everything else
-		const kebabKey = key === 'DEFAULT'
-			? key
-			: key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-		result[kebabKey] = toHSL(value);
-	}
-	return result;
-}
+const kebab = (name) => name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+const roles = Object.fromEntries(Object.entries(r).map(([name, value]) => [kebab(name), value]));
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -32,12 +14,52 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
-				// Use shared colors from @sd/ui
-				accent: toHSL(sharedColors.accent),
-				ink: toHSL(sharedColors.ink),
-				sidebar: toHSL(sharedColors.sidebar),
-				app: toHSL(sharedColors.app),
-				menu: toHSL(sharedColors.menu),
+				...roles,
+				accent: { DEFAULT: r.primary, faint: r.primary, deep: r.primaryContainer },
+				ink: { DEFAULT: r.onSurface, dull: r.onSurfaceVariant, faint: r.outline },
+				app: {
+					DEFAULT: r.surface,
+					box: r.surfaceContainer,
+					'dark-box': r.surfaceContainerLow,
+					'darker-box': r.surfaceContainerLowest,
+					'light-box': r.surfaceContainerHighest,
+					overlay: r.surfaceContainerHigh,
+					input: r.surfaceContainerHighest,
+					focus: r.surfaceContainerLowest,
+					line: r.outlineVariant,
+					divider: r.outlineVariant,
+					button: r.surfaceContainerHigh,
+					hover: r.surfaceContainerHigh,
+					selected: r.secondaryContainer,
+					'selected-item': r.surfaceContainerHigh,
+					active: r.surfaceContainerHighest,
+					shade: r.shadow,
+					frame: r.outlineVariant,
+					slider: r.surfaceContainerHighest,
+					'explorer-scrollbar': r.outlineVariant,
+				},
+				sidebar: {
+					DEFAULT: r.surfaceContainerLow,
+					box: r.surfaceContainer,
+					line: r.outlineVariant,
+					ink: r.onSurface,
+					'ink-dull': r.onSurfaceVariant,
+					'ink-faint': r.outline,
+					divider: r.outlineVariant,
+					button: r.surfaceContainerHigh,
+					selected: r.secondaryContainer,
+					shade: r.shadow,
+				},
+				menu: {
+					DEFAULT: r.surfaceContainer,
+					line: r.outlineVariant,
+					ink: r.onSurface,
+					faint: r.onSurfaceVariant,
+					hover: r.surfaceContainerHigh,
+					selected: r.secondaryContainer,
+					shade: r.shadow,
+				},
+				status: { success: r.success, warning: r.warning, error: r.error, info: r.primary },
 			},
 			fontSize: {
 				md: "16px",

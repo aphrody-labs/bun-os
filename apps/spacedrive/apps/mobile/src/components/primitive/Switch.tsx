@@ -1,15 +1,16 @@
 import React, { FC } from "react";
 import { Switch as RNSwitch, SwitchProps, Text, View } from "react-native";
+import { role } from "~/theme/roles";
 
 export const Switch: FC<SwitchProps> = (props) => {
 	return (
 		<RNSwitch
 			trackColor={{
-				false: "hsl(235, 10%, 16%)",
-				true: "hsl(208, 100%, 57%)",
+				false: role.surfaceContainerHighest,
+				true: role.primary,
 			}}
-			thumbColor="#fff"
-			ios_backgroundColor="hsl(235, 10%, 16%)"
+			thumbColor={props.value ? role.onPrimary : role.outline}
+			ios_backgroundColor={role.surfaceContainerHighest}
 			{...props}
 		/>
 	);

@@ -10,7 +10,7 @@ export const Card: FC<CardProps> = ({ children, className, ...props }) => {
 	return (
 		<View
 			className={cn(
-				"rounded-lg bg-app-card border border-app-divider p-4",
+				"rounded-lg bg-app-box border border-app-divider p-4",
 				className,
 			)}
 			{...props}

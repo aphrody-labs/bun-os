@@ -11,6 +11,7 @@ import { useSearchFiles } from "@sd/ts-client";
 import type { File } from "@sd/ts-client";
 import type { TextInput } from "react-native";
 import { X } from "phosphor-react-native";
+import { role } from "~/theme/roles";
 
 type SearchViewMode = "list" | "grid";
 
@@ -105,7 +106,7 @@ export default function SearchScreen() {
 					</View>
 					<GlassButton
 						onPress={() => router.back()}
-						icon={<X size={20} color="hsl(235, 10%, 55%)" weight="bold" />}
+						icon={<X size={20} color={role.onSurfaceVariant} weight="bold" />}
 					/>
 				</View>
 
@@ -124,7 +125,7 @@ export default function SearchScreen() {
 				</View>
 			) : isLoading ? (
 				<View className="flex-1 items-center justify-center">
-					<ActivityIndicator size="large" color="hsl(208, 100%, 57%)" />
+					<ActivityIndicator size="large" color={role.primary} />
 				</View>
 			) : files.length === 0 && query.length >= 2 ? (
 				<View className="flex-1 items-center justify-center p-8">

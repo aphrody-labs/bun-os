@@ -13,6 +13,7 @@ import { SDMobileCore } from "sd-mobile-core";
 import { usePreferencesStore } from "../../stores/preferences";
 import { useSidebarStore } from "../../stores/sidebar";
 import { useReactQueryDevTools } from "@dev-plugins/react-query";
+import { role } from "~/theme/roles";
 
 // Re-export the shared hook
 export { useSpacedriveClient };
@@ -193,7 +194,7 @@ export function SpacedriveProvider({
   if (!initialized) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#2599FF" />
+        <ActivityIndicator size="large" color={role.primary} />
         <Text style={styles.loadingText}>Initializing Spacedrive...</Text>
       </View>
     );
@@ -211,24 +212,24 @@ export function SpacedriveProvider({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "hsl(235, 15%, 13%)",
+    backgroundColor: role.surface,
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
   },
   loadingText: {
-    color: "hsl(235, 10%, 70%)",
+    color: role.onSurfaceVariant,
     marginTop: 16,
     fontSize: 16,
   },
   errorTitle: {
-    color: "#ff5555",
+    color: role.error,
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 8,
   },
   errorText: {
-    color: "hsl(235, 10%, 70%)",
+    color: role.onSurfaceVariant,
     fontSize: 14,
     textAlign: "center",
   },

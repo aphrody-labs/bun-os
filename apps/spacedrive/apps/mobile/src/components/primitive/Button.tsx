@@ -64,8 +64,8 @@ const buttonText = cva("font-medium text-center", {
 			outline: "text-ink",
 			dotted: "text-ink-faint",
 			gray: "text-ink",
-			accent: "text-white",
-			colored: "text-white",
+			accent: "text-on-primary",
+			colored: "text-on-primary",
 			bare: "text-ink",
 		},
 		size: {

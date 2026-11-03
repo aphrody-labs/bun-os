@@ -14,6 +14,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import QRCode from "react-native-qrcode-svg";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { useCoreAction, useCoreQuery } from "../client";
+import { role } from "~/theme/roles";
 
 interface PairingPanelProps {
   isOpen: boolean;
@@ -158,7 +159,7 @@ export function PairingPanel({
       transparent
       onRequestClose={handleClose}
     >
-      <View className="flex-1 bg-black/50">
+      <View className="flex-1 bg-scrim/50">
         <View
           className="flex-1 bg-app-box rounded-t-3xl overflow-hidden"
           style={{ marginTop: insets.top + 40 }}
@@ -310,8 +311,8 @@ function GenerateMode({
               isLoading ? "bg-accent/50" : "bg-accent active:bg-accent/90"
             }`}
           >
-            {isLoading && <ActivityIndicator size="small" color="white" />}
-            <Text className="text-white font-medium">
+            {isLoading && <ActivityIndicator size="small" color={role.onPrimary} />}
+            <Text className="text-on-primary font-medium">
               {isLoading ? "Generating..." : "Generate Pairing Code"}
             </Text>
           </Pressable>
@@ -378,10 +379,10 @@ function GenerateMode({
 
       {/* Error */}
       {generatePairing.isError && (
-        <View className="flex-row gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-          <Text className="text-red-500 text-xl">⚠</Text>
+        <View className="flex-row gap-2 p-3 bg-error/10 border border-error/30 rounded-lg">
+          <Text className="text-error text-xl">⚠</Text>
           <View className="flex-1">
-            <Text className="text-sm font-medium text-red-500">
+            <Text className="text-sm font-medium text-error">
               Failed to generate code
             </Text>
             <Text className="text-xs text-ink-dull mt-0.5">
@@ -460,7 +461,7 @@ function JoinMode({
           value={joinCode}
           onChangeText={setJoinCode}
           placeholder="brave-lion-sunset-river-eagle-mountain..."
-          placeholderTextColor="hsl(235, 10%, 55%)"
+          placeholderTextColor={role.onSurfaceVariant}
           editable={!isLoading && !state}
           multiline
           numberOfLines={3}
@@ -481,7 +482,7 @@ function JoinMode({
           value={joinNodeId}
           onChangeText={setJoinNodeId}
           placeholder="For cross-network pairing"
-          placeholderTextColor="hsl(235, 10%, 55%)"
+          placeholderTextColor={role.onSurfaceVariant}
           editable={!isLoading && !state}
           className="px-4 py-2.5 bg-sidebar-box border border-sidebar-line rounded-lg text-xs text-ink font-mono"
         />
@@ -535,8 +536,8 @@ function JoinMode({
                   : "bg-accent active:bg-accent/90"
               }`}
             >
-              {isLoading && <ActivityIndicator size="small" color="white" />}
-              <Text className="text-white font-medium">
+              {isLoading && <ActivityIndicator size="small" color={role.onPrimary} />}
+              <Text className="text-on-primary font-medium">
                 {isLoading ? "Joining..." : "Join"}
               </Text>
             </Pressable>
@@ -546,10 +547,10 @@ function JoinMode({
 
       {/* Error */}
       {joinPairing.isError && (
-        <View className="flex-row gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-          <Text className="text-red-500 text-xl">⚠</Text>
+        <View className="flex-row gap-2 p-3 bg-error/10 border border-error/30 rounded-lg">
+          <Text className="text-error text-xl">⚠</Text>
           <View className="flex-1">
-            <Text className="text-sm font-medium text-red-500">
+            <Text className="text-sm font-medium text-error">
               Failed to join
             </Text>
             <Text className="text-xs text-ink-dull mt-0.5">
@@ -590,7 +591,7 @@ function ScannerMode({
       >
         <View className="flex-1 items-center justify-center">
           <View className="w-64 h-64 border-2 border-accent rounded-lg" />
-          <Text className="text-white text-center mt-4 px-6">
+          <Text className="text-on-surface text-center mt-4 px-6">
             {scanned ? "Scanned! Processing..." : "Point camera at QR code"}
           </Text>
         </View>
@@ -598,9 +599,9 @@ function ScannerMode({
 
       <Pressable
         onPress={onClose}
-        className="absolute top-4 right-4 p-3 bg-black/50 rounded-full"
+        className="absolute top-4 right-4 p-3 bg-scrim/50 rounded-full"
       >
-        <Text className="text-white text-xl">✕</Text>
+        <Text className="text-on-surface text-xl">✕</Text>
       </Pressable>
     </View>
   );

@@ -7,6 +7,7 @@ import {
 } from "@callstack/liquid-glass";
 import { useRouter } from "expo-router";
 import { MagnifyingGlass, X } from "phosphor-react-native";
+import { role } from "~/theme/roles";
 
 interface GlassSearchBarProps extends Omit<TextInputProps, 'style' | 'onChange' | 'onChangeText'> {
 	onPress?: () => void;
@@ -102,7 +103,7 @@ export const GlassSearchBar = forwardRef<TextInput, GlassSearchBarProps>(
 
 		const content = (
 			<View className="flex-1 px-4 flex-row items-center gap-3">
-				<MagnifyingGlass size={20} color="hsl(235, 10%, 55%)" weight="bold" />
+				<MagnifyingGlass size={20} color={role.onSurfaceVariant} weight="bold" />
 			<TextInput
 				ref={ref}
 				editable={editable}
@@ -110,9 +111,9 @@ export const GlassSearchBar = forwardRef<TextInput, GlassSearchBarProps>(
 				value={currentValue}
 				onChangeText={handleChange}
 				placeholder="Search library"
-				placeholderTextColor="hsl(235, 10%, 55%)"
+				placeholderTextColor={role.onSurfaceVariant}
 				className="flex-1 text-ink text-base text-md"
-				cursorColor="hsl(220, 90%, 56%)"
+				cursorColor={role.primary}
 				{...textInputProps}
 			/>
 				{currentValue.length > 0 && editable && (
@@ -121,7 +122,7 @@ export const GlassSearchBar = forwardRef<TextInput, GlassSearchBarProps>(
 						className="p-1 -mr-1"
 						hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
 					>
-						<X size={18} color="hsl(235, 10%, 55%)" weight="bold" />
+						<X size={18} color={role.onSurfaceVariant} weight="bold" />
 					</Pressable>
 				)}
 			</View>
@@ -166,7 +167,7 @@ export const GlassSearchBar = forwardRef<TextInput, GlassSearchBarProps>(
 					style={{
 						flex: 1,
 						borderWidth: 1,
-						borderColor: "rgba(128, 128, 128, 0.3)",
+						borderColor: role.outlineVariant,
 						borderRadius: 24,
 					}}
 				>

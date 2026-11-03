@@ -606,7 +606,7 @@ export function SettingsScreen() {
 					</Pressable>
 
 					<Pressable className="p-4 bg-accent rounded-lg active:bg-accent-deep">
-						<Text className="text-white font-medium">
+						<Text className="text-on-primary font-medium">
 							Accent Pressable
 						</Text>
 					</Pressable>
@@ -627,12 +627,12 @@ export function SettingsScreen() {
 						onPress={() => console.log("Profile")}
 					/>
 					<SettingsLink
-						icon={<View className="w-6 h-6 bg-green-500 rounded-full" />}
+						icon={<View className="w-6 h-6 bg-success rounded-full" />}
 						label="Security"
 						onPress={() => console.log("Security")}
 					/>
 					<SettingsToggle
-						icon={<View className="w-6 h-6 bg-orange-500 rounded-full" />}
+						icon={<View className="w-6 h-6 bg-warning rounded-full" />}
 						label="Notifications"
 						description="Push notifications for this library"
 						value={notificationsEnabled}
@@ -645,13 +645,13 @@ export function SettingsScreen() {
 					footer="Dark mode will be applied across all libraries"
 				>
 					<SettingsToggle
-						icon={<View className="w-6 h-6 bg-purple-500 rounded-full" />}
+						icon={<View className="w-6 h-6 bg-tertiary rounded-full" />}
 						label="Dark Mode"
 						value={darkModeEnabled}
 						onValueChange={setDarkModeEnabled}
 					/>
 					<SettingsOption
-						icon={<View className="w-6 h-6 bg-blue-500 rounded-full" />}
+						icon={<View className="w-6 h-6 bg-primary rounded-full" />}
 						label="Theme"
 						value="System"
 						onPress={() => console.log("Theme picker")}
@@ -660,7 +660,7 @@ export function SettingsScreen() {
 
 				<SettingsGroup header="Storage">
 					<SettingsSlider
-						icon={<View className="w-6 h-6 bg-red-500 rounded-full" />}
+						icon={<View className="w-6 h-6 bg-error rounded-full" />}
 						label="Cache Size"
 						description="Maximum cache size in GB"
 						value={sliderValue}
@@ -669,12 +669,12 @@ export function SettingsScreen() {
 						onValueChange={setSliderValue}
 					/>
 					<SettingsLink
-						icon={<View className="w-6 h-6 bg-yellow-500 rounded-full" />}
+						icon={<View className="w-6 h-6 bg-warning-container rounded-full" />}
 						label="Clear Cache"
 						onPress={() => console.log("Clear cache")}
 					/>
 					<SettingsLink
-						icon={<View className="w-6 h-6 bg-red-600 rounded-full" />}
+						icon={<View className="w-6 h-6 bg-error-container rounded-full" />}
 						label="Reset All Data"
 						description="Permanently delete all libraries and settings"
 						onPress={handleResetData}

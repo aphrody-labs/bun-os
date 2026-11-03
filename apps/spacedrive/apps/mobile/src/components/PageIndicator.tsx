@@ -1,5 +1,6 @@
 import React from "react";
 import { View } from "react-native";
+import { role } from "~/theme/roles";
 
 interface PageIndicatorProps {
 	currentIndex: number;
@@ -13,8 +14,8 @@ interface PageIndicatorProps {
 export function PageIndicator({
 	currentIndex,
 	totalPages,
-	activeColor = "hsl(208, 100%, 57%)",
-	inactiveColor = "hsl(235, 15%, 23%)",
+	activeColor = role.primary,
+	inactiveColor = role.outlineVariant,
 	pageColors,
 }: PageIndicatorProps) {
 	return (

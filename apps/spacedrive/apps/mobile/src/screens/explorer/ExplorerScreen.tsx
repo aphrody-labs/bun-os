@@ -12,6 +12,7 @@ import { GlassContextMenu } from "../../components/GlassContextMenu";
 import { SearchToolbar } from "../../components/SearchToolbar";
 import { useSearchStore } from "./context/SearchContext";
 import { List, ArrowLeft } from "phosphor-react-native";
+import { role } from "~/theme/roles";
 
 type ViewMode = "list" | "grid";
 
@@ -114,7 +115,7 @@ export function ExplorerScreen() {
 					<GlassButton
 						onPress={() => router.back()}
 						icon={
-							<ArrowLeft size={20} color="hsl(235, 10%, 55%)" weight="bold" />
+							<ArrowLeft size={20} color={role.onSurfaceVariant} weight="bold" />
 						}
 					/>
 
@@ -137,8 +138,8 @@ export function ExplorerScreen() {
 										size={20}
 										color={
 											viewMode === "list"
-												? "hsl(208, 100%, 57%)"
-												: "hsl(235, 10%, 55%)"
+												? role.primary
+												: role.onSurfaceVariant
 										}
 										weight="bold"
 									/>
@@ -154,8 +155,8 @@ export function ExplorerScreen() {
 											fontSize: 20,
 											color:
 												viewMode === "grid"
-													? "hsl(208, 100%, 57%)"
-													: "hsl(235, 10%, 55%)",
+													? role.primary
+													: role.onSurfaceVariant,
 										}}
 									>
 										⊞
@@ -183,7 +184,7 @@ export function ExplorerScreen() {
 			{/* Content */}
 			{isLoading ? (
 				<View className="flex-1 items-center justify-center">
-					<ActivityIndicator size="large" color="hsl(208, 100%, 57%)" />
+					<ActivityIndicator size="large" color={role.primary} />
 				</View>
 			) : (
 				<>

@@ -5,6 +5,7 @@ import {
 	LiquidGlassView,
 	isLiquidGlassSupported,
 } from "@callstack/liquid-glass";
+import { role } from "~/theme/roles";
 
 interface GlassButtonProps {
 	onPress?: () => void;
@@ -68,7 +69,7 @@ export function GlassButton({
 					interactive
 					effect="regular"
 					colorScheme="dark"
-					tintColor={active ? "rgba(40, 130, 250, 0.15)" : undefined}
+					tintColor={active ? role.primaryContainer : undefined}
 					style={{
 						width: size,
 						height: size,
@@ -104,7 +105,7 @@ export function GlassButton({
 					alignItems: "center",
 					justifyContent: "center",
 					borderWidth: 1,
-					borderColor: "rgba(128, 128, 128, 0.3)",
+					borderColor: role.outlineVariant,
 					borderRadius: size / 2,
 				}}
 			>

@@ -25,6 +25,7 @@ import { useRouter } from "expo-router";
 import { useSearchStore } from "../explorer/context/SearchContext";
 import { CircleNotch, ListBullets } from "phosphor-react-native";
 import { useJobs } from "../../hooks/useJobs";
+import { role } from "~/theme/roles";
 
 const HEADER_INITIAL_HEIGHT = 40;
 const HERO_HEIGHT = 430 + HEADER_INITIAL_HEIGHT;
@@ -285,7 +286,7 @@ export function OverviewScreen() {
 				}}
 			>
 				<View className="items-center justify-center py-12">
-					<Text className="text-red-500 font-semibold">Error</Text>
+					<Text className="text-error font-semibold">Error</Text>
 					<Text className="text-ink-dull mt-2">{String(error)}</Text>
 				</View>
 			</ScrollView>
@@ -295,7 +296,7 @@ export function OverviewScreen() {
 	const stats = libraryInfo.statistics;
 
 	return (
-		<View className="flex-1 bg-black">
+		<View className="flex-1 bg-surface-container-lowest">
 			{/* Hero Clipping Container - clips hero at page container's top edge */}
 			<Animated.View
 				pointerEvents="box-none"
@@ -336,14 +337,14 @@ export function OverviewScreen() {
 										<Animated.View style={spinStyle}>
 											<CircleNotch
 												size={22}
-												color="hsl(208, 100%, 57%)"
+												color={role.primary}
 												weight="bold"
 											/>
 										</Animated.View>
 									) : (
 										<ListBullets
 											size={22}
-											color="hsl(235, 10%, 55%)"
+											color={role.onSurfaceVariant}
 											weight="bold"
 										/>
 									)}
@@ -351,7 +352,7 @@ export function OverviewScreen() {
 										<View
 											className="absolute -top-1 -right-1 bg-accent rounded-full min-w-[16px] h-[16px] items-center justify-center"
 										>
-											<Text className="text-white text-[10px] font-bold">
+											<Text className="text-on-primary text-[10px] font-bold">
 												{activeJobCount > 9 ? "9+" : activeJobCount}
 											</Text>
 										</View>
@@ -404,7 +405,7 @@ export function OverviewScreen() {
 				]}
 				pointerEvents="none"
 			>
-				<View className="flex-1 bg-black/40" />
+				<View className="flex-1 bg-scrim/40" />
 			</Animated.View>
 
 			{/* Page Container - Visual frame only (pins below header) */}
@@ -452,7 +453,7 @@ export function OverviewScreen() {
 						tint="dark"
 						style={StyleSheet.absoluteFill}
 					/>
-					<View style={StyleSheet.absoluteFill} className="bg-black/60" />
+					<View style={StyleSheet.absoluteFill} className="bg-scrim/60" />
 					<View
 						className="flex-1 px-8 flex-row items-center gap-3"
 						style={{ paddingTop: insets.top }}

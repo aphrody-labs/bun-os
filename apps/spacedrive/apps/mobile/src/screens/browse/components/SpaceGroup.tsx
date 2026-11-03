@@ -6,6 +6,7 @@ import { SpaceItem as SpaceItemComponent } from "./SpaceItem";
 import { DevicesGroup } from "./DevicesGroup";
 import { VolumesGroup } from "./VolumesGroup";
 import { CaretDown, CaretRight } from "phosphor-react-native";
+import { role } from "~/theme/roles";
 
 interface SpaceGroupProps {
 	group: SpaceGroup;
@@ -45,9 +46,9 @@ export function SpaceGroupComponent({ group, items }: SpaceGroupProps) {
 					{group.name}
 				</Text>
 				{isCollapsed ? (
-					<CaretRight size={16} color="hsl(235, 10%, 55%)" weight="bold" />
+					<CaretRight size={16} color={role.onSurfaceVariant} weight="bold" />
 				) : (
-					<CaretDown size={16} color="hsl(235, 10%, 55%)" weight="bold" />
+					<CaretDown size={16} color={role.onSurfaceVariant} weight="bold" />
 				)}
 			</Pressable>
 

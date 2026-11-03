@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import Slider from "@react-native-community/slider";
 import { SettingsRow, SettingsRowProps } from "./SettingsRow";
+import { role } from "~/theme/roles";
 
 interface SettingsSliderProps extends Omit<SettingsRowProps, "trailing"> {
 	value: number;
@@ -29,9 +30,9 @@ export function SettingsSlider({
 						minimumValue={minimumValue}
 						maximumValue={maximumValue}
 						onValueChange={onValueChange}
-						minimumTrackTintColor="hsl(220, 90%, 56%)"
-						maximumTrackTintColor="hsl(235, 15%, 23%)"
-						thumbTintColor="hsl(220, 90%, 56%)"
+						minimumTrackTintColor={role.primary}
+						maximumTrackTintColor={role.outlineVariant}
+						thumbTintColor={role.primary}
 						style={{ flex: 1, height: 40 }}
 					/>
 					{showValue && (

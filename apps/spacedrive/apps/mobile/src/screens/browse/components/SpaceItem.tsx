@@ -5,6 +5,7 @@ import type { SpaceItem as SpaceItemType, ItemType, SdPath } from "@sd/ts-client
 import { SettingsLink } from "../../../components/primitive";
 import FolderIcon from "@sd/assets/icons/Folder.webp";
 import { MagnifyingGlass, Clock, Heart, Folders, HardDrive, Tag } from "phosphor-react-native";
+import { role } from "~/theme/roles";
 
 // Type guards
 function isOverviewItem(t: ItemType): t is "Overview" {
@@ -38,16 +39,16 @@ function isPathItem(t: ItemType): t is { Path: { sd_path: SdPath } } {
 // Get icon for item type
 function getItemIcon(itemType: ItemType): React.ReactNode {
 	if (isOverviewItem(itemType)) {
-		return <MagnifyingGlass size={20} color="hsl(235, 10%, 55%)" weight="bold" />;
+		return <MagnifyingGlass size={20} color={role.onSurfaceVariant} weight="bold" />;
 	}
 	if (isRecentsItem(itemType)) {
-		return <Clock size={20} color="hsl(235, 10%, 55%)" weight="bold" />;
+		return <Clock size={20} color={role.onSurfaceVariant} weight="bold" />;
 	}
 	if (isFavoritesItem(itemType)) {
-		return <Heart size={20} color="hsl(235, 10%, 55%)" weight="bold" />;
+		return <Heart size={20} color={role.onSurfaceVariant} weight="bold" />;
 	}
 	if (isFileKindsItem(itemType)) {
-		return <Folders size={20} color="hsl(235, 10%, 55%)" weight="bold" />;
+		return <Folders size={20} color={role.onSurfaceVariant} weight="bold" />;
 	}
 	if (isPathItem(itemType)) {
 		return (
@@ -59,10 +60,10 @@ function getItemIcon(itemType: ItemType): React.ReactNode {
 		);
 	}
 	if (isVolumeItem(itemType)) {
-		return <HardDrive size={20} color="hsl(235, 10%, 55%)" weight="bold" />;
+		return <HardDrive size={20} color={role.onSurfaceVariant} weight="bold" />;
 	}
 	if (isTagItem(itemType)) {
-		return <Tag size={20} color="hsl(235, 10%, 55%)" weight="bold" />;
+		return <Tag size={20} color={role.onSurfaceVariant} weight="bold" />;
 	}
 	return (
 		<Image

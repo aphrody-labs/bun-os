@@ -2,6 +2,7 @@ import { cva, VariantProps } from "class-variance-authority";
 import React, { forwardRef, useState } from "react";
 import { TextInputProps, TextInput, View, Pressable } from "react-native";
 import { cn } from "~/utils/cn";
+import { role } from "~/theme/roles";
 
 const input = cva("rounded-lg border text-ink bg-app-box", {
 	variants: {
@@ -37,8 +38,8 @@ export const Input = forwardRef<TextInput, InputProps>(
 			<TextInput
 				ref={ref}
 				editable={editable ?? !disabled}
-				cursorColor="hsl(220, 90%, 56%)" // accent color
-				placeholderTextColor="hsl(235, 10%, 55%)" // ink-faint
+				cursorColor={role.primary} // accent color
+				placeholderTextColor={role.onSurfaceVariant} // ink-faint
 				style={[style, { fontSize, lineHeight }]}
 				className={cn(input({ variant, size, disabled }), className)}
 				{...props}
@@ -72,8 +73,8 @@ export const PasswordInput = forwardRef<TextInput, PasswordInputProps>(
 					secureTextEntry={!showPassword}
 					autoCorrect={false}
 					autoCapitalize="none"
-					cursorColor="hsl(220, 90%, 56%)" // accent color
-					placeholderTextColor="hsl(235, 10%, 55%)" // ink-faint
+					cursorColor={role.primary} // accent color
+					placeholderTextColor={role.onSurfaceVariant} // ink-faint
 					style={[style, { fontSize, lineHeight }]}
 					className={cn(input({ variant, size, disabled }), "pr-12", className)}
 					{...props}

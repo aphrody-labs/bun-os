@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { GlassButton } from "../components/GlassButton";
 import { useJobs, type ExtendedJobListItem } from "../hooks/useJobs";
 import { X } from "phosphor-react-native";
+import { role } from "~/theme/roles";
 
 function formatBytes(bytes: number): string {
 	if (bytes === 0) return "0 B";
@@ -80,11 +81,11 @@ function JobCard({ job, onPause, onResume, onCancel }: JobCardProps) {
 	const statusColor = isRunning
 		? "text-accent"
 		: isPaused
-		? "text-yellow-500"
+		? "text-tertiary"
 		: isCompleted
-		? "text-green-500"
+		? "text-success"
 		: isFailed
-		? "text-red-500"
+		? "text-error"
 		: "text-ink-dull";
 
 	return (
@@ -119,7 +120,7 @@ function JobCard({ job, onPause, onResume, onCancel }: JobCardProps) {
 			{job.progress !== null && job.progress !== undefined && (isRunning || isPaused) && (
 				<View className="bg-app-darkBox h-2 rounded-full overflow-hidden mb-3">
 					<View
-						className={`h-full rounded-full ${isPaused ? "bg-yellow-500" : "bg-accent"}`}
+						className={`h-full rounded-full ${isPaused ? "bg-tertiary" : "bg-accent"}`}
 						style={{ width: `${Math.min(100, Math.max(0, job.progress))}%` }}
 					/>
 				</View>
@@ -152,7 +153,7 @@ function JobCard({ job, onPause, onResume, onCancel }: JobCardProps) {
 						onPress={() => onCancel(job.id)}
 						className="bg-app-darkBox rounded-lg px-4 py-2"
 					>
-						<Text className="text-red-400 text-sm font-medium">Cancel</Text>
+						<Text className="text-error text-sm font-medium">Cancel</Text>
 					</Pressable>
 				</View>
 			)}
@@ -186,7 +187,7 @@ export default function JobsScreen() {
 		>
 			<Text
 				className={`text-sm font-medium ${
-					filter === type ? "text-white" : "text-ink-dull"
+					filter === type ? "text-on-primary" : "text-ink-dull"
 				}`}
 			>
 				{label}
@@ -212,7 +213,7 @@ export default function JobsScreen() {
 					</View>
 					<GlassButton
 						onPress={() => router.back()}
-						icon={<X size={20} color="hsl(235, 10%, 55%)" weight="bold" />}
+						icon={<X size={20} color={role.onSurfaceVariant} weight="bold" />}
 					/>
 				</View>
 
@@ -227,7 +228,7 @@ export default function JobsScreen() {
 			{/* Content */}
 			{isLoading ? (
 				<View className="flex-1 items-center justify-center">
-					<ActivityIndicator size="large" color="hsl(208, 100%, 57%)" />
+					<ActivityIndicator size="large" color={role.primary} />
 				</View>
 			) : filteredJobs.length === 0 ? (
 				<View className="flex-1 items-center justify-center p-8">

@@ -6,6 +6,7 @@ import {
 	isLiquidGlassSupported,
 } from "@callstack/liquid-glass";
 import type { ReactNode } from "react";
+import { role } from "~/theme/roles";
 
 export interface MenuItem {
 	label: string;
@@ -83,7 +84,7 @@ export function GlassContextMenu({
 				<Pressable
 					style={StyleSheet.absoluteFill}
 					onPress={() => setVisible(false)}
-					className="bg-black/50"
+					className="bg-scrim/50"
 				>
 					<View className="flex-1" />
 				</Pressable>
@@ -125,7 +126,7 @@ export function GlassContextMenu({
 							tint="dark"
 							style={{
 								borderWidth: 1,
-								borderColor: "rgba(128, 128, 128, 0.3)",
+								borderColor: role.outlineVariant,
 								borderRadius: 16,
 							}}
 						>

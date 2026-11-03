@@ -5,10 +5,6 @@ const path = require("path");
 
 const projectRoot = __dirname;
 const workspaceRoot = path.resolve(projectRoot, "../..");
-const spaceUiTokensRoot = path.dirname(
-	require.resolve("@spacedrive/tokens/raw-colors", { paths: [projectRoot, workspaceRoot] })
-);
-const spaceUiTokensNodeModules = path.resolve(spaceUiTokensRoot, "node_modules");
 
 const existingPaths = (paths) => [...new Set(paths.filter((filePath) => fs.existsSync(filePath)))];
 
@@ -20,8 +16,6 @@ config.watchFolders = existingPaths([
 	path.resolve(projectRoot, "src"),
 	path.resolve(workspaceRoot, "packages"),
 	path.resolve(workspaceRoot, "node_modules"),
-	spaceUiTokensRoot,
-	spaceUiTokensNodeModules,
 ]);
 
 // Configure resolver for monorepo and SVG support
@@ -37,7 +31,6 @@ config.resolver = {
 	nodeModulesPaths: existingPaths([
 		path.resolve(projectRoot, "node_modules"),
 		path.resolve(workspaceRoot, "node_modules"),
-		spaceUiTokensNodeModules,
 	]),
 
 	unstable_enableSymlinks: true,
@@ -50,7 +43,6 @@ config.resolver = {
 
 	// Dynamically resolve React/React Native from wherever the package manager installed them
 	extraNodeModules: {
-		"@spacedrive/tokens": spaceUiTokensRoot,
 		react: path.dirname(require.resolve("react/package.json", { paths: [projectRoot, workspaceRoot] })),
 		"react-native": path.dirname(
 			require.resolve("react-native/package.json", { paths: [projectRoot, workspaceRoot] })

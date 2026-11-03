@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCoreQuery, useCoreAction, useSpacedriveClient } from "../client";
 import { useSidebarStore } from "../stores";
+import { role } from "~/theme/roles";
 
 interface LibrarySwitcherPanelProps {
 	isOpen: boolean;
@@ -109,7 +110,7 @@ export function LibrarySwitcherPanel({
 			transparent
 			onRequestClose={onClose}
 		>
-			<View className="flex-1 bg-black/50">
+			<View className="flex-1 bg-scrim/50">
 				<View
 					className="flex-1 bg-app-box rounded-t-3xl overflow-hidden"
 					style={{ marginTop: insets.top + 40 }}
@@ -195,7 +196,7 @@ export function LibrarySwitcherPanel({
 														}
 														className="p-2 active:bg-app-hover rounded-lg ml-2"
 													>
-														<Text className="text-red-500 text-lg">
+														<Text className="text-error text-lg">
 															🗑
 														</Text>
 													</Pressable>
@@ -227,7 +228,7 @@ export function LibrarySwitcherPanel({
 										value={newLibraryName}
 										onChangeText={setNewLibraryName}
 										placeholder="My Photos"
-										placeholderTextColor="hsl(235, 10%, 55%)"
+										placeholderTextColor={role.onSurfaceVariant}
 										className="px-4 py-3 bg-sidebar-box border border-sidebar-line rounded-lg text-ink"
 										autoFocus
 									/>
@@ -261,10 +262,10 @@ export function LibrarySwitcherPanel({
 										{createLibrary.isPending && (
 											<ActivityIndicator
 												size="small"
-												color="white"
+												color={role.onPrimary}
 											/>
 										)}
-										<Text className="text-white font-medium">
+										<Text className="text-on-primary font-medium">
 											{createLibrary.isPending
 												? "Creating..."
 												: "Create"}

@@ -377,7 +377,7 @@ function VolumeMenu({ volume, visible, onClose }: VolumeMenuProps) {
 			onRequestClose={onClose}
 		>
 			<Pressable
-				className="flex-1 bg-black/50 justify-end"
+				className="flex-1 bg-scrim/50 justify-end"
 				onPress={onClose}
 			>
 				<Pressable
@@ -412,7 +412,7 @@ function VolumeMenu({ volume, visible, onClose }: VolumeMenuProps) {
 								className="flex-row items-center gap-3 px-4 py-3 rounded-lg active:bg-app-box"
 							>
 								<Text className="text-2xl">🚫</Text>
-								<Text className="text-red-500 text-base flex-1">
+								<Text className="text-error text-base flex-1">
 									Untrack Volume
 								</Text>
 								{untrackVolume.isPending && (

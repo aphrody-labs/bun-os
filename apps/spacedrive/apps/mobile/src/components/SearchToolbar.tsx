@@ -5,6 +5,7 @@ import { useSearchStore } from "../screens/explorer/context/SearchContext";
 import type { SearchScope } from "../screens/explorer/context/SearchContext";
 import { GlassButton } from "./GlassButton";
 import { GlassContextMenu } from "./GlassContextMenu";
+import { role } from "~/theme/roles";
 
 interface ScopeButtonProps {
 	active: boolean;
@@ -22,7 +23,7 @@ function ScopeButton({ active, onPress, children }: ScopeButtonProps) {
 		>
 			<Text
 				className={`text-xs font-medium ${
-					active ? "text-white" : "text-ink-dull"
+					active ? "text-on-primary" : "text-ink-dull"
 				}`}
 			>
 				{children}
@@ -77,8 +78,8 @@ export function SearchToolbar({ viewMode, setViewMode }: SearchToolbarProps = {}
 									size={20}
 									color={
 										viewMode === "list"
-											? "hsl(208, 100%, 57%)"
-											: "hsl(235, 10%, 55%)"
+											? role.primary
+											: role.onSurfaceVariant
 									}
 									weight="bold"
 								/>
@@ -94,8 +95,8 @@ export function SearchToolbar({ viewMode, setViewMode }: SearchToolbarProps = {}
 										fontSize: 20,
 										color:
 											viewMode === "grid"
-												? "hsl(208, 100%, 57%)"
-												: "hsl(235, 10%, 55%)",
+												? role.primary
+												: role.onSurfaceVariant,
 									}}
 								>
 									⊞
@@ -119,7 +120,7 @@ export function SearchToolbar({ viewMode, setViewMode }: SearchToolbarProps = {}
 
 			<GlassButton
 				icon={
-					<FunnelSimple size={18} color="hsl(235, 10%, 55%)" weight="bold" />
+					<FunnelSimple size={18} color={role.onSurfaceVariant} weight="bold" />
 				}
 				size={32}
 			/>
