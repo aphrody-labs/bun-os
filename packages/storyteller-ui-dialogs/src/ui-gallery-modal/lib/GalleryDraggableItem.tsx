@@ -128,7 +128,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
       ),
       primaryActionText: "Delete",
       secondaryActionText: "Cancel",
-      primaryActionBtnClassName: "bg-error text-on-surface hover:bg-error/90",
+      primaryActionBtnClassName: "bg-error text-on-error hover:bg-error/90",
       onPrimaryAction: async () => {
         try {
           const result = await onDelete(item.id);
@@ -254,7 +254,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
             </p>
           </div>
         ) : !item.thumbnail ? (
-          <div className="flex h-full w-full items-center justify-center bg-scrim/30">
+          <div className="flex h-full w-full items-center justify-center bg-surface/30">
             <span className="text-on-surface/60">Image not available</span>
           </div>
         ) : (
@@ -292,7 +292,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
           </div>
         )}
         {disabled && (
-          <div className="absolute left-2 top-2 bg-scrim/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-on-surface/80">
+          <div className="absolute left-2 top-2 bg-surface/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-on-surface/80">
             Added
           </div>
         )}
@@ -404,7 +404,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
       )}
       {/* Media class badge on hover — bottom-left */}
       {!disableTooltipAndBadge && item.mediaClass && (
-        <div className="pointer-events-none absolute left-2 bottom-2 z-[1] bg-scrim/50 backdrop-blur-lg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <div className="pointer-events-none absolute left-2 bottom-2 z-[1] bg-surface/80 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           {item.mediaClass === "dimensional" || item.mediaClass === "mesh" || item.mediaClass === "splat"
             ? "3D"
             : item.mediaClass}
@@ -412,7 +412,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
       )}
       {/* Upload badge — bottom-right (always visible, even in select mode) */}
       {item.isUpload && (
-        <div className="pointer-events-none absolute right-2 bottom-2 z-[1] flex h-5 w-5 items-center justify-center bg-scrim/50 backdrop-blur-lg text-on-surface">
+        <div className="pointer-events-none absolute right-2 bottom-2 z-[1] flex h-5 w-5 items-center justify-center bg-surface/80 text-on-surface">
           <UploadIcon className="text-[10px]" />
         </div>
       )}

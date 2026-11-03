@@ -17,7 +17,7 @@ export const PricingPromoBanner = ({ className }: PricingPromoBannerProps) => (
     <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 bg-primary/25 blur-3xl" />
 
     <div className="relative flex flex-col gap-3">
-      <span className="inline-flex w-fit items-center gap-1.5 bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-on-surface">
+      <span className="inline-flex w-fit items-center gap-1.5 bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-on-primary">
         <TagIcon className="text-[10px]" />
         Limited-time offer
       </span>

@@ -18,22 +18,16 @@
   --destructive-foreground: var(--md-sys-color-on-error);
   --border: var(--md-sys-color-outline-variant);
   --input: var(--md-sys-color-outline);
-  --ring: var(--md-sys-color-primary);
-  color-scheme: dark;
+  --ring: var(--md-sys-color-secondary);
+  color-scheme: light dark;
 }
 
 :root.theme-light {
   color-scheme: light;
 }
 
-body {
-  background: var(--md-sys-color-surface);
-  color: var(--md-sys-color-on-surface);
-}
-
-:focus-visible {
-  outline: 2px solid var(--md-sys-color-primary);
-  outline-offset: 2px;
+:root.theme-dark {
+  color-scheme: dark;
 }
 
 @media (prefers-reduced-motion: reduce) {

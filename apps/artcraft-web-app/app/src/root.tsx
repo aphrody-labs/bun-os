@@ -1,13 +1,7 @@
 import type { LinksFunction } from "@remix-run/node";
 import { posthog } from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "@remix-run/react";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 
 import normalizeCss from "./styles/normalize.css?url";
 import tailwindCss from "./styles/tailwind.css?url";
@@ -26,19 +20,6 @@ export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
     href: baseCss,
-  },
-  {
-    rel: "preconnect",
-    href: "https://fonts.googleapis.com",
-  },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300..800&display=swap",
   },
 ];
 

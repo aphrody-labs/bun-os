@@ -109,9 +109,9 @@ const CreditsCoinWithStatus = ({ iconStatus }: { iconStatus: CreditsIconStatus }
 
   const badgeColorClass =
     iconStatus === "failed"
-      ? "bg-error text-on-surface"
+      ? "bg-error text-on-error"
       : iconStatus === "recovered"
-        ? "bg-success text-on-surface"
+        ? "bg-success text-on-success"
         : "bg-warning text-surface"; // 'slow'
 
   const badgeIconDef = iconStatus === "recovered" ? CheckIcon : CircleAlertIcon;
@@ -578,7 +578,7 @@ export const TopBar = ({ pageName }: Props) => {
                 </Button>
                 <Button
                   variant="secondary"
-                  className="h-[32px] w-[44px] rounded-none border-0 bg-transparent p-0 text-base-fg opacity-70 shadow-none hover:bg-error hover:text-on-surface hover:opacity-100"
+                  className="h-[32px] w-[44px] rounded-none border-0 bg-transparent p-0 text-base-fg opacity-70 shadow-none hover:bg-error hover:text-on-error hover:opacity-100"
                   onClick={close}
                 >
                   <XIcon className="text-lg" />

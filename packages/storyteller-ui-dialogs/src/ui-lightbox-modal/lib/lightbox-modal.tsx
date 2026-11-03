@@ -387,7 +387,7 @@ export function LightboxModal({
         ),
         primaryActionText: "Delete",
         secondaryActionText: "Cancel",
-        primaryActionBtnClassName: "bg-error text-on-surface hover:bg-error/90",
+        primaryActionBtnClassName: "bg-error text-on-error hover:bg-error/90",
         onPrimaryAction: async () => {
           try {
             await MediaFileDelete(mediaToken);
@@ -661,7 +661,7 @@ export function LightboxModal({
                   e.stopPropagation();
                   onNavigatePrev();
                 }}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-30 flex h-10 w-10 items-center justify-center bg-scrim/50 text-on-surface/70 opacity-0 transition-opacity duration-200 hover:bg-scrim/70 hover:text-on-surface group-hover/nav:opacity-100 focus:outline-none"
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-30 flex h-10 w-10 items-center justify-center bg-surface/50 text-on-surface/70 opacity-0 transition-opacity duration-200 hover:bg-scrim/70 hover:text-on-surface group-hover/nav:opacity-100 focus:outline-none"
                 aria-label="Previous item"
               >
                 <ChevronLeftIcon className="text-lg" />
@@ -673,7 +673,7 @@ export function LightboxModal({
                   e.stopPropagation();
                   onNavigateNext();
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex h-10 w-10 items-center justify-center bg-scrim/50 text-on-surface/70 opacity-0 transition-opacity duration-200 hover:bg-scrim/70 hover:text-on-surface group-hover/nav:opacity-100 focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex h-10 w-10 items-center justify-center bg-surface/50 text-on-surface/70 opacity-0 transition-opacity duration-200 hover:bg-scrim/70 hover:text-on-surface group-hover/nav:opacity-100 focus:outline-none"
                 aria-label="Next item"
               >
                 <ChevronRightIcon className="text-lg" />
@@ -750,7 +750,7 @@ export function LightboxModal({
                         </button>
                       )}
                     </div>
-                    <div className="text-sm text-base-fg/90 break-words px-4 py-3 bg-scrim/20 leading-relaxed border border-outline-variant">
+                    <div className="text-sm text-base-fg/90 break-words px-4 py-3 bg-surface/20 leading-relaxed border border-outline-variant">
                       {promptLoading ? (
                         <div className="animate-pulse space-y-2">
                           <div className="h-3 w-full bg-on-surface/10" />

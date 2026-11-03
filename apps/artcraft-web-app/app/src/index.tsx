@@ -8,6 +8,7 @@ import "./styles/normalize.css";
 import "./styles/tailwind.css";
 import "./styles/base.css";
 import "m3:theme.css";
+import "m3:fonts.css";
 import "./styles/aphrody.css";
 import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 import { pageHeight, pageWidth, persistLogin } from "~/signals";
@@ -16,6 +17,7 @@ import { posthog } from "posthog-js";
 import { SoundManager } from "@storyteller/soundboard";
 import { useModelsStore } from "@storyteller/tauri-api";
 import { isTauri } from "@tauri-apps/api/core";
+import { startAppTheme } from "@storyteller/ui-settings-modal";
 
 // TODO(bt,2025-04-19): Make these configurable
 const ENV = {
@@ -26,28 +28,7 @@ const ENV = {
   DEPLOY_PRIME_URL: "https://studio.storyteller.ai",
 };
 
-const themeRoot = document.documentElement;
-let storedTheme = "dark";
-try {
-  storedTheme = (localStorage.getItem("st-theme") || "dark").trim();
-} catch {
-  // A blocked localStorage should not prevent the editor from rendering.
-}
-// The M3 scheme is generated for light and dark from one seed; any other
-// stored value (retired fixed-palette themes) resolves to dark.
-const initialTheme = storedTheme === "light" ? "light" : "dark";
-for (let index = themeRoot.classList.length - 1; index >= 0; index--) {
-  const themeClass = themeRoot.classList.item(index);
-  if (themeClass?.startsWith("theme-")) themeRoot.classList.remove(themeClass);
-}
-themeRoot.classList.add(`theme-${initialTheme}`);
-
-const syncM3Mode = () => {
-  const dark = !themeRoot.classList.contains("theme-light");
-  themeRoot.classList.toggle("dark", dark);
-  themeRoot.classList.toggle("light", !dark);
-};
-syncM3Mode();
+startAppTheme();
 
 const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
   console.log("GlobalSettingsManager()");
@@ -59,15 +40,6 @@ const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
   useSignalEffect(() => {
     if (isTauri()) persistLogin();
   });
-
-  useEffect(() => {
-    const observer = new MutationObserver(syncM3Mode);
-    observer.observe(themeRoot, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => observer.disconnect();
-  }, []);
 
   /// Initizations that depends on ENV vars ///
   function PostHogInit() {

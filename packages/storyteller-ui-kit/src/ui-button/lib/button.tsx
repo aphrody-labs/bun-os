@@ -46,7 +46,7 @@ export const Button = ({
         return "bg-ui-controls text-base-fg border border-ui-controls-border";
       }
       case "destructive": {
-        return "bg-error hover:bg-error text-on-surface";
+        return "bg-error hover:bg-error text-on-error";
       }
       case "ghost": {
         return "bg-transparent text-base-fg/70 hover:text-base-fg";

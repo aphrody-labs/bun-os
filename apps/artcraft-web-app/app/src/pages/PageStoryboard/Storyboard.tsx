@@ -188,7 +188,7 @@ const MainPreview = ({ board, onUploadClick }: { board: Board | null; onUploadCl
           style={{ pointerEvents: "none" }}
         />
         {board.title && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 border border-outline-variant bg-scrim/70 px-4 py-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 border border-outline-variant bg-surface/70 px-4 py-2">
             <p className="text-sm font-medium text-on-surface">{board.title}</p>
           </div>
         )}
@@ -495,7 +495,7 @@ const ThumbnailItem = ({
         <ImagesIcon className="text-lg text-base-fg/20" />
       </div>
     )}
-    <div className="absolute bottom-0 left-0 right-0 bg-scrim/60 px-1.5 py-0.5">
+    <div className="absolute bottom-0 left-0 right-0 bg-surface/60 px-1.5 py-0.5">
       <span className="font-mono text-[10px] tabular-nums text-on-surface/85">{board.shotNumber}</span>
     </div>
   </div>

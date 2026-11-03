@@ -412,7 +412,7 @@ const BulkThumb = ({ thumbnail, placeholderIcon }: { thumbnail: string | null; p
       {showImage ? (
         <img src={thumbnail} alt="" className="h-full w-full object-cover" onError={() => setFailed(true)} />
       ) : (
-        <div className="h-full w-full flex items-center justify-center bg-scrim/50">
+        <div className="h-full w-full flex items-center justify-center bg-surface/50">
           <DynamicIcon icon={placeholderIcon} className="text-xs text-on-surface/50" />
         </div>
       )}
@@ -1463,7 +1463,7 @@ export const GalleryModal = React.memo(
         ),
         primaryActionText: "Delete",
         secondaryActionText: "Cancel",
-        primaryActionBtnClassName: "bg-error text-on-surface hover:bg-error/90",
+        primaryActionBtnClassName: "bg-error text-on-error hover:bg-error/90",
         onPrimaryAction: async () => {
           try {
             const ids = Array.from(bulkSelectedIds);
@@ -1847,7 +1847,7 @@ export const GalleryModal = React.memo(
           ),
           primaryActionText: "Delete",
           secondaryActionText: "Cancel",
-          primaryActionBtnClassName: "bg-error text-on-surface hover:bg-error/90",
+          primaryActionBtnClassName: "bg-error text-on-error hover:bg-error/90",
           onPrimaryAction: async () => {
             // Optimistic: drop this folder and reparent its direct children to
             // root (mirrors the server orphaning them), and forget its media cache.
@@ -2920,7 +2920,7 @@ export const GalleryModal = React.memo(
                           <div className="text-base-fg/60">Log in to browse and use your library.</div>
                           {onLoginClick ? (
                             <button
-                              className="rounded-[3px] bg-primary px-5 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                              className="rounded-[3px] bg-primary px-5 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                               onClick={() => onLoginClick()}
                             >
                               Log in
