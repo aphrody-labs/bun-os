@@ -7,7 +7,7 @@ authors = ["aphrody-dev <contact@aphrody.com>"]
 homepage = "https://aphrody.app"
 repository = "https://github.com/aphrody-labs/bun-os"
 license = "Apache-2.0"
-description = "macOS-style window chrome for the Bun OS Windows desktop: DWM rounded corners, Mica backdrop, unified dark caption, coloured borders, and a dock descriptor. Applies documented DwmSetWindowAttribute attributes to any HWND; patches no shell."
+description = "macOS-style window chrome for the Bun OS Windows desktop: DWM rounded corners, Mica backdrop, unified dark caption, coloured borders, traffic-light caption buttons drawn in owned overlays, and a dock descriptor. Applies documented DwmSetWindowAttribute attributes to any HWND; injects nothing, patches no shell."
 
 [lib]
 name = "bunos_win11_chrome"
@@ -21,11 +21,20 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
+windows-core = { workspace = true }
 windows = { workspace = true, features = [
   "Win32_Foundation",
   "Win32_Graphics_Dwm",
   "Win32_Graphics_Gdi",
+  "Win32_Security",
+  "Win32_System_Com",
+  "Win32_System_LibraryLoader",
+  "Win32_System_Ole",
+  "Win32_System_Threading",
+  "Win32_System_Variant",
   "Win32_UI_Accessibility",
+  "Win32_UI_HiDpi",
+  "Win32_UI_Input_KeyboardAndMouse",
   "Win32_UI_WindowsAndMessaging",
 ] }
 

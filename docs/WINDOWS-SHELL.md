@@ -19,7 +19,7 @@ the NT bridge ([NTCORE.md](NTCORE.md)) and test signing (`factory/windows/signin
 | cmd / PowerShell as the interactive shell | **nushell** (fork `vendor/nushell`), default profile of Windows Terminal; **brush** (bash-compatible, userland bundle) for `.sh` | WT fragment + `defaultProfile`; `.nu`/`.sh` associations |
 | PowerShell cmdlets over Windows APIs | **`nu_plugin_windows`** (`win <tool>` in nushell) and the **`win`** CLI (bash/brush, JSON out) | `crates/nu_plugin_windows`, generated from the WinClean catalog (204 tools) |
 | conhost / Windows Terminal window | **Rio** (fork `vendor/rio`) running nushell; Windows Terminal stays the *console host* | see "Terminal" |
-| Stock window management | the `windows-hyprland` session: **GlazeWM** (fork `vendor/glazewm`), tacky-borders, Zebar, Flow Launcher, AltSnap, `bunos-win11-chrome watch`, `bunos-win11-wallpaper` (owner: `factory/windows/desktop/hyprland.ts`, [WINDOWS-DESKTOP.md](WINDOWS-DESKTOP.md)) | `enable wm` adds the HKCU `Run` autostart; `disable wm` removes it |
+| Stock window management | the `windows-hyprland` session: **GlazeWM** (fork `vendor/glazewm`), tacky-borders, the waku bar, Flow Launcher, AltSnap, `bunos-win11-chrome watch`, `bunos-win11-wallpaper` (owner: `factory/windows/desktop/hyprland.ts`, [WINDOWS-DESKTOP.md](WINDOWS-DESKTOP.md)) | `enable wm` adds the HKCU `Run` autostart; `disable wm` removes it |
 | Explorer windows | **COSMIC Files** (fork `vendor/cosmic-epoch/cosmic-files`), native `x86_64-pc-windows-msvc` | "Open in COSMIC Files" verbs, Open-with app, optional default folder handler |
 | — | Explorer shows the Bun OS Linux filesystem | pinned "Bun OS (Linux)" navigation-pane entry → `\\wsl.localhost\bunos` |
 
@@ -117,7 +117,7 @@ Linux-side file manager, not an Explorer replacement; COSMIC Files is the native
 ## Window manager
 
 The per-user window-manager session is owned by `factory/windows/desktop/hyprland.ts` (`windows-hyprland`:
-the GlazeWM fork with its watcher, tacky-borders, Zebar, Flow Launcher, AltSnap, `bunos-win11-chrome watch`
+the GlazeWM fork with its watcher, tacky-borders, the waku bar, Flow Launcher, AltSnap, `bunos-win11-chrome watch`
 and `bunos-win11-wallpaper`; Explorer stays the shell), which deliberately registers nothing. `enable wm`
 only adds the logon autostart (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run\BunOS.Desktop` = `bun hyprland.ts up`) and starts the
 session if it was not running; `disable wm` removes the Run value and stops the session only if `enable`

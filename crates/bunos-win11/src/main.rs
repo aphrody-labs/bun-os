@@ -8,12 +8,11 @@
 //!   - a Windows 11 ISO (offline): `iso` applies the same declarative profile to a mounted install.wim and writes
 //!     a new, debloated ISO (the Bun OS, Rust-first tiny11; vendor/tiny11builder is credited).
 //!
-//! Desktop profiles (`cosmic`, `cosmic-comp`, `hyprland`, `omarchy`, `gnome`, `windows-mac`, `windows-hyprland`) are
-//! emitted as launch plans; the Linux ones run from the Bun OS WSL bundle through WSLg. `windows-hyprland --render`
-//! writes the per-user configs of its native tools.
+//! Desktop profiles (`cosmic`, `cosmic-comp`, `hyprland`, `omarchy`, `gnome`, `windows-native`) are emitted as
+//! launch plans; the Linux ones run from the Bun OS WSL bundle through WSLg, `windows-native` is a one-shot apply of the
+//! catalog's `look` and `shell` modules (nothing resident; docs/WINDOWS-ARCHITECTURE.md).
 
 mod desktop;
-mod hyprwin;
 mod iso;
 mod tui;
 
@@ -24,7 +23,11 @@ use clap::{Args as ClapArgs, Parser, Subcommand};
 use desktop::Desktop;
 
 #[derive(Parser)]
-#[command(name = "bunos-win11", version, about = "Optimise and debloat Windows 11: live (archinstall-style) and ISO")]
+#[command(
+    name = "bunos-win11",
+    version,
+    about = "Optimise and debloat Windows 11: live (archinstall-style) and ISO"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -65,39 +68,14 @@ enum Command {
     },
     /// List or describe desktop profiles.
     Desktop {
-        /// A profile id to describe (cosmic, cosmic-comp, hyprland, omarchy, gnome, windows-mac, windows-hyprland).
+        /// A profile id to describe (cosmic, cosmic-comp, hyprland, omarchy, gnome, windows-native).
         name: Option<String>,
         /// Print the session manifest (factory/desktop/sessions.json) instead.
         #[arg(long)]
         json: bool,
-        #[command(flatten)]
-        render: RenderArgs,
     },
     /// Build a debloated Windows 11 ISO from an official ISO (offline target).
     Iso(IsoArgs),
-}
-
-/// `desktop windows-hyprland --render <dir>`: write the native tools' configs.
-#[derive(ClapArgs, Clone, Default)]
-struct RenderArgs {
-    /// Directory to write glazewm/, tacky-borders/, altsnap/ and flow-launcher/ configs into.
-    #[arg(long)]
-    render: Option<std::path::PathBuf>,
-    /// M3 seed colour (#rrggbb) for the theme roles; default is the M3 baseline.
-    #[arg(long)]
-    seed: Option<String>,
-    /// A `bunos-design theme` export (the design agent's tokens); wins over --seed.
-    #[arg(long)]
-    theme: Option<std::path::PathBuf>,
-    /// Transparency: auto (follow Settings > Transparency effects), max or reduced.
-    #[arg(long, default_value = "auto")]
-    glass: String,
-    /// Animations: auto (follow Settings > Animation effects), on or off.
-    #[arg(long, default_value = "auto")]
-    motion: String,
-    /// Staged Flow Launcher executable bound to Super+Space.
-    #[arg(long)]
-    launcher: Option<String>,
 }
 
 #[derive(ClapArgs, Clone)]
@@ -136,7 +114,10 @@ impl ProfileArgs {
                 let text = std::fs::read_to_string(path).with_context(|| format!("read {path}"))?;
                 Profile::parse(&text).map_err(|e| anyhow::anyhow!("profile: {e}"))?
             }
-            None => Profile { target: default_target, ..Default::default() },
+            None => Profile {
+                target: default_target,
+                ..Default::default()
+            },
         };
         if let Some(level) = &self.level {
             profile.level = parse_level(level)?;
@@ -165,12 +146,10 @@ fn main() -> Result<()> {
         Command::Apply { profile, plan, yes } => apply(&profile, plan.as_deref(), yes),
         Command::Verify { journal } => verify(journal.as_deref()),
         Command::Undo { journal } => undo(journal.as_deref()),
-        Command::Desktop { name, json, render } => {
+        Command::Desktop { name, json } => {
             if json {
                 print!("{}", desktop::manifest_json());
                 Ok(())
-            } else if let Some(dir) = &render.render {
-                render_desktop(name.as_deref(), dir, &render)
             } else {
                 desktop_cmd(name.as_deref())
             }
@@ -187,9 +166,24 @@ fn catalog(module: Option<&str>) -> Result<()> {
         }
         println!("\n{} — {}", m.id, m.title);
         for t in catalog.tweaks.iter().filter(|t| t.module == m.id) {
-            let targets: Vec<&str> =
-                t.targets.iter().map(|x| if *x == TargetKind::Live { "live" } else { "offline" }).collect();
-            println!("  {:<28} [{:?}] {:<8} {}", t.id, t.level, targets.join("+"), t.title);
+            let targets: Vec<&str> = t
+                .targets
+                .iter()
+                .map(|x| {
+                    if *x == TargetKind::Live {
+                        "live"
+                    } else {
+                        "offline"
+                    }
+                })
+                .collect();
+            println!(
+                "  {:<28} [{:?}] {:<8} {}",
+                t.id,
+                t.level,
+                targets.join("+"),
+                t.title
+            );
         }
     }
     Ok(())
@@ -200,20 +194,29 @@ fn plan(args: &ProfileArgs) -> Result<()> {
     use bun_windows_winclean::tweaks::{live::LiveBackend, runner};
     let profile = args.load(TargetKind::Live)?;
     let mut backend = LiveBackend;
-    let (plan, path) = runner::make_plan(&profile, &mut backend).map_err(|e| anyhow::anyhow!("{e}"))?;
-    println!("{} changes planned (plan saved to {})", plan.changes(), path.display());
+    let (plan, path) =
+        runner::make_plan(&profile, &mut backend).map_err(|e| anyhow::anyhow!("{e}"))?;
+    println!(
+        "{} changes planned (plan saved to {})",
+        plan.changes(),
+        path.display()
+    );
     for (module, (change, ok, other)) in plan.summary() {
         println!("  {module:<14} change {change:<3} ok {ok:<3} skip/refused {other}");
     }
     for s in plan.steps.iter().filter(|s| s.action == "refused") {
-        println!("  refused {}: {}", s.tweak, s.reason.as_deref().unwrap_or("?"));
+        println!(
+            "  refused {}: {}",
+            s.tweak,
+            s.reason.as_deref().unwrap_or("?")
+        );
     }
     Ok(())
 }
 
 #[cfg(windows)]
 fn apply(args: &ProfileArgs, plan_path: Option<&str>, yes: bool) -> Result<()> {
-    use bun_windows_winclean::tweaks::{live::LiveBackend, runner, Plan};
+    use bun_windows_winclean::tweaks::{Plan, live::LiveBackend, runner};
     if !yes {
         anyhow::bail!("refusing to apply without --yes (run `plan` first to preview)");
     }
@@ -222,14 +225,30 @@ fn apply(args: &ProfileArgs, plan_path: Option<&str>, yes: bool) -> Result<()> {
         None => {
             let profile = args.load(TargetKind::Live)?;
             let mut backend = LiveBackend;
-            runner::make_plan(&profile, &mut backend).map_err(|e| anyhow::anyhow!("{e}"))?.0
+            runner::make_plan(&profile, &mut backend)
+                .map_err(|e| anyhow::anyhow!("{e}"))?
+                .0
         }
     };
-    let (journal, path) = runner::apply_live(&plan, "Bun OS Tweaks").map_err(|e| anyhow::anyhow!("{e}"))?;
-    let applied = journal.entries.iter().filter(|e| e.result == "applied").count();
-    println!("applied {applied} changes; restore point {:?}; journal {}", journal.restore_point, path.display());
+    let (journal, path) =
+        runner::apply_live(&plan, "Bun OS Tweaks").map_err(|e| anyhow::anyhow!("{e}"))?;
+    let applied = journal
+        .entries
+        .iter()
+        .filter(|e| e.result == "applied")
+        .count();
+    println!(
+        "applied {applied} changes; restore point {:?}; journal {}",
+        journal.restore_point,
+        path.display()
+    );
     for e in journal.entries.iter().filter(|e| e.result != "applied") {
-        println!("  not applied {}: {} ({})", e.tweak, e.result, e.error.as_deref().unwrap_or(""));
+        println!(
+            "  not applied {}: {} ({})",
+            e.tweak,
+            e.result,
+            e.error.as_deref().unwrap_or("")
+        );
     }
     println!("undo with: bunos-win11 undo");
     Ok(())
@@ -269,7 +288,8 @@ fn resolve_journal(journal: Option<&str>) -> Result<std::path::PathBuf> {
     use bun_windows_winclean::tweaks::runner;
     match journal {
         Some(p) => Ok(p.into()),
-        None => runner::latest_journal().context("no journal under %LOCALAPPDATA%\\bunos\\win11\\journal"),
+        None => runner::latest_journal()
+            .context("no journal under %LOCALAPPDATA%\\bunos\\win11\\journal"),
     }
 }
 
@@ -290,36 +310,6 @@ fn undo(_: Option<&str>) -> Result<()> {
     anyhow::bail!("undo runs on Windows")
 }
 
-fn render_desktop(name: Option<&str>, dir: &std::path::Path, args: &RenderArgs) -> Result<()> {
-    anyhow::ensure!(
-        name == Some(Desktop::WindowsHyprland.id()),
-        "--render is for the windows-hyprland profile"
-    );
-    let roles = match &args.theme {
-        Some(path) => hyprwin::Look::from_export(path)?,
-        None => hyprwin::Look::from_seed(args.seed.as_deref())?,
-    };
-    let glass = hyprwin::Glass::parse(&args.glass)
-        .with_context(|| format!("--glass {}: expected auto|max|reduced", args.glass))?
-        .unwrap_or_else(hyprwin::Glass::detect);
-    let motion = match args.motion.as_str() {
-        "auto" => hyprwin::detect_motion(),
-        "on" => true,
-        "off" => false,
-        other => anyhow::bail!("--motion {other}: expected auto|on|off"),
-    };
-    let terminal = if hyprwin::on_path("rio.exe").is_some() { "rio" } else { "wt" }.to_owned();
-    let launcher = args.launcher.clone().unwrap_or_else(|| {
-        dir.join("flow-launcher").join("Flow.Launcher.exe").display().to_string()
-    });
-    let look = hyprwin::Look { roles, glass, motion, terminal, launcher };
-    for path in hyprwin::render(&look, dir)? {
-        println!("wrote {}", path.display());
-    }
-    println!("glass {:?}, motion {}, terminal {}", look.glass, look.motion, look.terminal);
-    Ok(())
-}
-
 fn desktop_cmd(name: Option<&str>) -> Result<()> {
     match name {
         None => {
@@ -332,7 +322,14 @@ fn desktop_cmd(name: Option<&str>) -> Result<()> {
         Some(id) => {
             let d = Desktop::parse(id).with_context(|| format!("unknown desktop '{id}'"))?;
             println!("{} — {}", d.id(), d.title());
-            println!("runtime: {}", if d.is_wsl() { "Bun OS WSL bundle via WSLg" } else { "native Windows" });
+            println!(
+                "runtime: {}",
+                if d.is_wsl() {
+                    "Bun OS WSL bundle via WSLg"
+                } else {
+                    "native Windows"
+                }
+            );
             if !d.packages().is_empty() {
                 println!("packages: {}", d.packages().join(" "));
             }

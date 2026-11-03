@@ -21,7 +21,7 @@ never a dependency we redistribute.
 | Launcher | **Flow Launcher** (`vendor/flow-launcher`) | MIT | The most complete OSI launcher on Windows (plugins, Everything, Acrylic/Mica backdrop); `Super+Space`. |
 | Super-drag move/resize | **AltSnap** (`vendor/altsnap`) | GPL-3.0 | Hyprland's mouse move/resize (`bindm`) on the Windows key; small C program, own low-level hooks only. |
 | Tiling WM (reference) | komorebi | Komorebi Licence 2.0.0 (PolyForm-style, **non-OSI**, commercial restriction) | Technically excellent and Rust, but source-available with a commercial-use restriction, so it is a design reference only — never shipped. |
-| Bar / widgets | **Zebar** (GlazeWM's companion) | GPL-3.0 | Same org as GlazeWM, GPL-3.0, integrates with its IPC. |
+| Bar / widgets | **waku** (`vendor/waku`, branch `bunos`) | MIT | Native C++20/Qt Quick bar (no WebView, no HTML): GlazeWM workspaces over its IPC, a real Windows AppBar, DWM blur/Mica, Material Symbols glyphs, themed from our tokens. Replaces Zebar (below). |
 | Full DE alternative | Seelen UI (reference) | AGPL-3.0 | A complete Rust/Tauri DE with dock/bar/wallpaper. AGPL is shippable but heavy for our needs; we take its WorkerW wallpaper technique as a reference and build our own lighter engine. |
 | macOS-style chrome | **bunos-win11-chrome** (ours, `DwmSetWindowAttribute`) | Apache-2.0 | Rounded corners, Mica backdrop, immersive dark caption, coloured borders, traffic-light caption buttons and a dock — the documented DWM attributes, no shell patching. Windhawk (GPL-3.0) mods are a behaviour reference. |
 | Wallpaper engine | **bunos-win11-wallpaper** (ours, WorkerW + wgpu) | Apache-2.0 | The Progman `0x052C` WorkerW technique with a wgpu-rendered animated layer behind the icons. Pure Rust, shares the Bun OS wgpu stack; nothing comparable OSI exists in Rust. |
@@ -94,7 +94,7 @@ The same engine, exposed two ways over one catalog:
 | `omarchy` | WSLg | Hyprland + Omarchy (`vendor/omarchy-windows` = our try-omarchy-windows fork, `vendor/omarchy`). |
 | `gnome` | WSLg | GNOME 51 (Mutter Wayland). |
 | `windows-mac` | native Windows | `bunos-win11-chrome` + `bunos-win11-wallpaper` + GlazeWM. |
-| `windows-hyprland` | native Windows | Animated GlazeWM + tacky-borders + Zebar + Flow Launcher + AltSnap + chrome + wallpaper, configured as Hyprland/Omarchy (below). |
+| `windows-hyprland` | native Windows | Animated GlazeWM + tacky-borders + waku bar + Flow Launcher + AltSnap + chrome + wallpaper, configured as Hyprland/Omarchy (below). |
 
 The Linux desktops run from the **Bun OS WSL bundle** (owned by another member — this crate wires the profile and the
 per-desktop pacman package lists only) and WSLg projects each Wayland surface as a native Windows window. The package
@@ -120,8 +120,14 @@ DirectComposition overlays, low-level keyboard/mouse hooks); nothing replaces `e
 | AdEx-Partners-DE/OpenNiri-Windows | Rust | GPL-3.0 | 51 | 2026-10 | Watch: niri-style scrolling tiling, too young. |
 | ponslookspain/tile-rs | Rust | MIT | 19 | 2026-11 | Watch: Hyprland dwindle layout, too young. |
 | luke-you/tacky-borders | Rust | MIT | 0.6k | 2026-08 (v1.6.0) | **Pick: borders** (gradient, animation, glow). |
-| glzr-io/zebar | Rust/Tauri | GPL-3.0 | 3.1k | 2026-09 (v3.3.1) | **Pick: bar** (GlazeWM IPC; HTML widgets themed from our tokens). |
-| amnweb/yasb | Python | MIT | 5.7k | 2026-11 | Runner-up bar; needs a Python runtime. |
+| JanDeDobbeleer/waku | C++20 / Qt Quick | MIT | new (519 commits, v0.1.0) | 2026-11 | **Pick: bar.** Native Qt Quick scene graph, no WebView: GlazeWM and komorebi workspaces over their IPC, `--register-app-bar` work-area reservation, DWM blur/Mica, CPU/RAM/network/volume/battery/clock/tray/taskbar services, QML config with a theme object, Quickshell-compatible (Omarchy shell port). Young, but by the Oh My Posh author and already complete; our fork adds UIA names and keyboard focus. |
+| glzr-io/zebar | Rust/Tauri | GPL-3.0 | 3.1k | 2026-09 (v3.3.1) | **Dropped.** A Tauri WebView2 window rendering HTML/CSS/JS widgets: the owner rejected an HTML bar, and a WebView costs a Chromium renderer per bar. |
+| amnweb/yasb | Python + PyQt6 | MIT | 5.7k | 2026-11 | Runner-up: mature, native Qt widgets and a GlazeWM widget, but a CPython runtime (about 100 MB idle) and Rust/C++ first rules it out; waku is its C++ successor in spirit and uses YASB as its behaviour reference. |
+| glzr-io/glazewm v2 bar | C# / WPF | GPL-3.0 | (in glazewm) | 2024-01 (v2.1.1) | No: tied to GlazeWM v2's in-process bus, removed in the v3 Rust rewrite (which moved to Zebar). |
+| dalyIsaac/Whim bar plugin | C# / WinUI 3 | MIT | 0.5k | 2026-03 | No: an in-process Whim plugin, no GlazeWM. |
+| dremin/RetroBar, cairoshell/cairoshell (+ ManagedShell) | C# / WPF | Apache-2.0 | 4.4k / 3.4k | 2026-11 / 2026-10 | No: mature taskbar and menu-bar replacements with AppBar support (ManagedShell), but no workspace model; a GlazeWM widget would be new code on .NET. |
+| LGUG2Z/komorebi-bar | Rust / egui | Komorebi Licence 2.0.0 (non-OSI) | (in komorebi) | 2026-11 | Reference only (not shippable). |
+| oplehtinen/kumori-bar | Rust | MIT | 17 | 2025-09 | No: komorebi only, small. |
 | codyduong/hitokage | Rust | MIT | 42 | 2026-08 | Watch: Rust bar, early. |
 | Flow-Launcher/Flow.Launcher | C# | MIT | 15.9k | 2026-11 (v2.1.4) | **Pick: launcher.** |
 | microsoft/PowerToys (Run, Command Palette, FancyZones, Workspaces) | C#/C++ | MIT | 140k | 2026-11 (v0.102) | Optional: one very large solution; Command Palette is the alternative launcher, FancyZones overlaps GlazeWM. |
@@ -131,8 +137,8 @@ DirectComposition overlays, low-level keyboard/mouse hooks); nothing replaces `e
 | valinet/ExplorerPatcher | C | GPL-2.0 | 34.2k | 2026-10 | No: patches Explorer and breaks on Insider builds (this host runs 28120). |
 | MicaForEveryone/MicaForEveryone | C# | MIT | 5.3k | 2026-05 | Reference: `bunos-win11-chrome watch` sets the same `DWMWA_SYSTEMBACKDROP_TYPE` per window, in Rust. |
 | Maplespe/DWMBlurGlass, ExplorerBlurMica | C++ | LGPL-3.0 | 4.7k / 4.3k | 2026 | Optional: real blur behind title bars, but injects into `dwm.exe` (symbols per build); not run. |
-| TranslucentTB/TranslucentTB | C++ | GPL-3.0 | 20.7k | 2026-11 (2026.2) | Optional: acrylic/clear taskbar; the profile leaves the taskbar alone and draws Zebar. |
-| rainmeter/rainmeter | C++ | GPL-2.0 | 6.1k | 2026-10 | No: skin engine, superseded by Zebar widgets. |
+| TranslucentTB/TranslucentTB | C++ | GPL-3.0 | 20.7k | 2026-11 (2026.2) | Optional: acrylic/clear taskbar; the profile leaves the taskbar alone and draws the waku bar. |
+| rainmeter/rainmeter | C++ | GPL-2.0 | 6.1k | 2026-10 | No: skin engine (INI/Lua, native GDI+/D2D), but no AppBar reservation, no backdrop and polling only; GlazeWM workspaces would need a plugin. |
 | Rectify11/Installer | JS/C++ | GPL-3.0 | 3.5k | 2026-01 | No: replaces system resource files (forbidden here). |
 | namazso/SecureUxTheme | C++ | LGPL-2.1 | 3.1k | 2025-06 | No: msstyles signature bypass in winlogon; theming goes through DWM attributes and app backdrops instead. |
 | Open-Shell/Open-Shell-Menu, moudey/Shell (Nilesoft) | C++ | MIT | 9.5k / 6.9k | 2026 | Optional Start and context-menu replacements; not Hyprland-like. |
@@ -144,7 +150,7 @@ DirectComposition overlays, low-level keyboard/mouse hooks); nothing replaces `e
 | --- | --- | --- |
 | Tiling, gaps, workspaces, animations | GlazeWM `bunos` (upstream + #1392) | GPL-3.0 |
 | Active/inactive borders (gradient, animated, glow) | tacky-borders | MIT |
-| Bar | Zebar (starter `with-glazewm` + Bun OS theme CSS) | GPL-3.0 |
+| Bar | waku `bunos` (rendered `shell.qml` + `theme.qml`, one AppBar per monitor) | MIT |
 | Launcher | Flow Launcher | MIT |
 | Mouse move/resize | AltSnap | GPL-3.0 |
 | Backdrops, dark caption, corners | `bunos-win11-chrome watch` (ours, `DWMWA_SYSTEMBACKDROP_TYPE`) | Apache-2.0 |
@@ -162,7 +168,7 @@ one look (M3 dark roles, glass, motion):
   `Super+arrows` focus, `Super+Shift+arrows` move, `Super+1..9` and `Super+Shift+1..9` workspaces, `Super+Tab` next
   workspace, `Super+-`/`Super+=` resize, `Super+R` resize mode, `Super+Shift+R` reload, `Super+Shift+E` exit.
   `Super` with left/right drag moves/resizes (AltSnap). `Win+L` stays the system lock.
-- **Gaps**: 10 px inner, 20 px outer, 52 px at the top for the bar.
+- **Gaps**: 10 px inner, 20 px outer. The bar reserves its own strip as a Windows AppBar (8 px inset + 40 px), GlazeWM tiles in the remaining work area, so the top gap is 10 px below the bar.
 - **Animations**: Hyprland's `myBezier` (0.05, 0.9, 0.1, 1.05) for move/resize (280 ms), zoom-fade open (260 ms) and
   close (180 ms), horizontal workspace slide (380 ms), a 4 s border-angle loop and fades. All off when the user turned
   Animation effects off (`MinAnimate` = 0) or with `--motion off`.
@@ -171,7 +177,7 @@ one look (M3 dark roles, glass, motion):
   Transparency effects are off (`EnableTransparency` = 0 under `HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize`,
   the value behind `UISettings.AdvancedEffectsEnabled`), or with `--glass reduced`.
 - **Colours**: active border `primary` to `tertiary` at 45 degrees, inactive `outlineVariant` to
-  `surfaceContainerHighest`, bar `surfaceContainer`/`onSurface`/`primary`.
+  `surfaceContainerHighest`, bar `surfaceContainer` (65 % over the DWM blur at max glass, opaque when reduced) with `onSurface` text, the focused workspace in `primary`, shown ones in `secondaryContainer`, hover as the M3 8 % `onSurface` state layer, Google Sans Flex text and Material Symbols Rounded glyphs.
 
 A Win32 window shows a system backdrop only where it does not paint its client area, so Mica/Acrylic shows on
 captions, Windows Terminal, Rio, WinUI 3 apps and Explorer; classic GDI apps keep an opaque client area (the
@@ -189,8 +195,28 @@ bun factory/windows/desktop/hyprland.ts undo    # down + delete the staged tree;
 ```
 
 Fork patches: `aphrody-labs/glazewm` `bunos` (PR #1392), `aphrody-labs/AltSnap` `bunos` (`-lshell32` for current
-mingw-w64), `aphrody-labs/Flow.Launcher` `bunos` (`global.json` roll-forward so the .NET 10 SDK builds net9.0). Zebar
-builds its frontend with `bun install --linker hoisted` (its Tailwind preset requires an unhoisted peer).
+mingw-w64), `aphrody-labs/Flow.Launcher` `bunos` (`global.json` roll-forward so the .NET 10 SDK builds net9.0),
+`aphrody-labs/waku` `bunos` (UI Automation names, roles and press actions on every interactive pill and workspace
+button; Tab focus with an `accent` ring, Enter/Space activate). waku builds with CMake + MSVC (vswhere) against Qt 6
+built from source by vcpkg (`qtbase qtdeclarative qtsvg`, x64-windows); its `deploy` target copies the Qt runtime.
+
+### Bar (waku)
+
+The owner rejected Zebar ("de simples fichiers HTML"): its widgets are HTML/CSS/JS in a Tauri WebView2 window. The
+bar is now waku, a native Qt Quick bar. Before writing one from scratch, the existing native bars were evaluated
+(table above, criteria: OSI licence, maintained in 2025-2026, Windows 11 24H2+/28xxx, GlazeWM IPC, M3 theming,
+Mica/Acrylic, AppBar reservation, idle cost). waku is the only one that meets every criterion; YASB meets them too but
+is Python. Our own iced bar was not needed.
+
+- One `PanelWindow` per monitor, `ExclusionMode.Normal` with `--register-app-bar` (`SHAppBarMessage` `ABM_NEW` /
+  `ABM_SETPOS`), so maximised windows and GlazeWM's tiling stay below it; per-monitor DPI v2 (Qt 6).
+- Start: launcher (`apps` glyph, starts Flow Launcher as `Super+Space` does) and the GlazeWM workspaces (live over
+  `ws://localhost:6123` subscriptions; click or Enter focuses one, the wheel steps). Centre: the focused window title
+  on that monitor. End: CPU, RAM, network, volume, battery (hidden without one), clock/date with a calendar popup.
+- Accessibility: every control is a UIA `Button` (`Workspace 3`, `Open launcher`, ...) with a press action; the bar
+  window is focusable and Tab walks the controls.
+- Rendered as `waku/shell.qml`, `waku/theme.qml` and `waku/widgets/{Launcher,ActiveTitle}.qml` under the staged tree;
+  `undo` deletes them with the rest.
 
 ## Android APKs
 
@@ -206,7 +232,7 @@ control plane is `crates/bun-waydroid` (ported from `vendor/waydroid`).
 - DISM API: [DismRemoveProvisionedAppxPackage / DISM API reference, Microsoft Learn](https://learn.microsoft.com/windows-hardware/manufacture/desktop/dism/dismremovepackage-function)
 - Offline Registry library (`offreg.dll`): Microsoft Learn, Offline Registry Library Functions
 - DWM window attributes (Mica, rounded corners, dark caption): Microsoft Learn, `DwmSetWindowAttribute` / `DWMWINDOWATTRIBUTE`
-- GlazeWM GPL-3.0, Zebar GPL-3.0, komorebi "Komorebi License 2.0.0" (non-OSI), Seelen UI AGPL-3.0 — repository licence files, GitHub
+- GlazeWM GPL-3.0, Zebar GPL-3.0 (dropped), waku MIT, RetroBar/Cairo/ManagedShell Apache-2.0, komorebi "Komorebi License 2.0.0" (non-OSI), Seelen UI AGPL-3.0 — repository licence files, GitHub
 - GlazeWM animations: [glzr-io/glazewm#1392](https://github.com/glzr-io/glazewm/pull/1392) (builds on #1199)
 - tacky-borders MIT, Flow Launcher MIT, AltSnap GPL-3.0, Whim MIT, FancyWM PolyForm Perimeter 1.0.1, YASB MIT,
   Windhawk GPL-3.0, TranslucentTB GPL-3.0, MicaForEveryone MIT, DWMBlurGlass LGPL-3.0 — repository licence files, GitHub

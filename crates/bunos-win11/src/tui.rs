@@ -16,11 +16,13 @@ mod imp {
     use std::io;
 
     use anyhow::{Context, Result};
-    use bun_windows_winclean::tweaks::{live::LiveBackend, runner, Catalog, Level, Profile, TargetKind};
+    use bun_windows_winclean::tweaks::{
+        Catalog, Level, Profile, TargetKind, live::LiveBackend, runner,
+    };
     use crossterm::{
         event::{self, Event, KeyCode, KeyEventKind},
         execute,
-        terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+        terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
     };
     use ratatui::{
         prelude::*,
@@ -42,7 +44,11 @@ mod imp {
     impl App {
         fn new() -> Result<Self> {
             let catalog = Catalog::embedded().context("catalog")?;
-            let module_on = catalog.modules.iter().map(|m| (m.id.clone(), true)).collect();
+            let module_on = catalog
+                .modules
+                .iter()
+                .map(|m| (m.id.clone(), true))
+                .collect();
             Ok(Self {
                 catalog,
                 level: Level::Conservative,
@@ -50,7 +56,8 @@ mod imp {
                 module_on,
                 desktop: None,
                 cursor: 0,
-                status: "space: toggle module  l: cycle level  d: cycle desktop  p: plan  q: quit".into(),
+                status: "space: toggle module  l: cycle level  d: cycle desktop  p: plan  q: quit"
+                    .into(),
             })
         }
 
@@ -58,7 +65,12 @@ mod imp {
             Profile {
                 target: self.target,
                 level: self.level,
-                modules: self.module_on.iter().filter(|(_, on)| *on).map(|(id, _)| id.clone()).collect(),
+                modules: self
+                    .module_on
+                    .iter()
+                    .filter(|(_, on)| *on)
+                    .map(|(id, _)| id.clone())
+                    .collect(),
                 include: Vec::new(),
                 exclude: Vec::new(),
                 desktop: self.desktop.map(|d| d.id().to_owned()),
@@ -88,8 +100,15 @@ mod imp {
                 runner::apply_live(&plan, "Bun OS Tweaks (guided)").map_err(Into::into)
             }) {
                 Ok((journal, path)) => {
-                    let applied = journal.entries.iter().filter(|e| e.result == "applied").count();
-                    self.status = format!("applied {applied} changes. Undo: bunos-win11 undo. Journal {}", path.display());
+                    let applied = journal
+                        .entries
+                        .iter()
+                        .filter(|e| e.result == "applied")
+                        .count();
+                    self.status = format!(
+                        "applied {applied} changes. Undo: bunos-win11 undo. Journal {}",
+                        path.display()
+                    );
                 }
                 Err(e) => self.status = format!("apply failed: {e}"),
             }
@@ -110,7 +129,10 @@ mod imp {
         result
     }
 
-    fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, app: &mut App) -> Result<()> {
+    fn event_loop(
+        terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+        app: &mut App,
+    ) -> Result<()> {
         loop {
             terminal.draw(|f| draw(f, app))?;
             if let Event::Key(key) = event::read()? {
@@ -120,7 +142,9 @@ mod imp {
                 match key.code {
                     KeyCode::Char('q') | KeyCode::Esc => return Ok(()),
                     KeyCode::Up => app.cursor = app.cursor.saturating_sub(1),
-                    KeyCode::Down => app.cursor = (app.cursor + 1).min(app.module_on.len().saturating_sub(1)),
+                    KeyCode::Down => {
+                        app.cursor = (app.cursor + 1).min(app.module_on.len().saturating_sub(1))
+                    }
                     KeyCode::Char(' ') => {
                         if let Some(m) = app.module_on.get_mut(app.cursor) {
                             m.1 = !m.1;
@@ -140,7 +164,9 @@ mod imp {
                         };
                     }
                     KeyCode::Char('d') => {
-                        let idx = app.desktop.map_or(0, |d| Desktop::ALL.iter().position(|x| *x == d).unwrap_or(0) + 1);
+                        let idx = app.desktop.map_or(0, |d| {
+                            Desktop::ALL.iter().position(|x| *x == d).unwrap_or(0) + 1
+                        });
                         app.desktop = Desktop::ALL.get(idx).copied();
                     }
                     KeyCode::Char('p') => app.plan_now(),
@@ -152,14 +178,23 @@ mod imp {
     }
 
     fn draw(f: &mut Frame, app: &App) {
-        let areas = Layout::vertical([Constraint::Length(3), Constraint::Min(5), Constraint::Length(5)]).split(f.area());
+        let areas = Layout::vertical([
+            Constraint::Length(3),
+            Constraint::Min(5),
+            Constraint::Length(5),
+        ])
+        .split(f.area());
         let header = format!(
             " Bun OS Windows 11 optimiser   target: {:?}   level: {:?}   desktop: {} ",
             app.target,
             app.level,
             app.desktop.map_or("(none)", Desktop::id),
         );
-        f.render_widget(Paragraph::new(header).block(Block::default().borders(Borders::ALL).title("bunos-win11")), areas[0]);
+        f.render_widget(
+            Paragraph::new(header)
+                .block(Block::default().borders(Borders::ALL).title("bunos-win11")),
+            areas[0],
+        );
 
         let items: Vec<ListItem> = app
             .module_on
@@ -167,14 +202,23 @@ mod imp {
             .map(|(id, on)| {
                 let m = app.catalog.modules.iter().find(|m| &m.id == id);
                 let title = m.map_or(id.as_str(), |m| m.title.as_str());
-                ListItem::new(format!("[{}] {:<14} {}", if *on { "x" } else { " " }, id, title))
+                ListItem::new(format!(
+                    "[{}] {:<14} {}",
+                    if *on { "x" } else { " " },
+                    id,
+                    title
+                ))
             })
             .collect();
         let mut state = ListState::default();
         state.select(Some(app.cursor));
         f.render_stateful_widget(
             List::new(items)
-                .block(Block::default().borders(Borders::ALL).title("modules (space toggles)"))
+                .block(
+                    Block::default()
+                        .borders(Borders::ALL)
+                        .title("modules (space toggles)"),
+                )
                 .highlight_symbol("> "),
             areas[1],
             &mut state,

@@ -20,23 +20,29 @@ pub use imp::build;
 
 #[cfg(not(windows))]
 pub fn build(_: &crate::IsoArgs) -> anyhow::Result<()> {
-    anyhow::bail!("the ISO builder runs on Windows (DISM API); build and unit-test the profile logic elsewhere")
+    anyhow::bail!(
+        "the ISO builder runs on Windows (DISM API); build and unit-test the profile logic elsewhere"
+    )
 }
 
 #[cfg(windows)]
 mod imp {
     use std::path::{Path, PathBuf};
 
-    use anyhow::{bail, Context, Result};
+    use anyhow::{Context, Result, bail};
     use bun_windows_winclean::tweaks::{
-        apply, dism::Dism, offline::OfflineBackend, plan, Catalog, Journal, Profile, TargetKind,
+        Catalog, Journal, Profile, TargetKind, apply, dism::Dism, offline::OfflineBackend, plan,
     };
 
     use crate::IsoArgs;
 
     /// Where the working files live: `%LOCALAPPDATA%\bunos\win11\iso-build`.
     fn work_root() -> PathBuf {
-        dirs::data_local_dir().unwrap_or_else(std::env::temp_dir).join("bunos").join("win11").join("iso-build")
+        dirs::data_local_dir()
+            .unwrap_or_else(std::env::temp_dir)
+            .join("bunos")
+            .join("win11")
+            .join("iso-build")
     }
 
     pub fn build(args: &IsoArgs) -> Result<()> {
@@ -63,7 +69,9 @@ mod imp {
 
         let wim = media.join("sources").join("install.wim");
         if !wim.exists() {
-            bail!("no sources\\install.wim in the ISO (install.esd ISOs must be exported to .wim first)");
+            bail!(
+                "no sources\\install.wim in the ISO (install.esd ISOs must be exported to .wim first)"
+            );
         }
         let index = args.index.unwrap_or(1);
         eprintln!("[2/6] edition index {index} in {}", wim.display());
@@ -73,27 +81,40 @@ mod imp {
 
         let dism = Dism::initialize().context("DismInitialize")?;
         eprintln!("[3/6] mounting image read-write at {}", mount.display());
-        dism.mount(&wim.to_string_lossy(), index, &mount.to_string_lossy()).context("DismMountImage")?;
+        dism.mount(&wim.to_string_lossy(), index, &mount.to_string_lossy())
+            .context("DismMountImage")?;
 
         let result = (|| -> Result<Journal> {
             let mut backend = OfflineBackend::new(&mount, &dism);
-            eprintln!("[4/6] applying '{}' ({} tweaks)", args.config.as_deref().unwrap_or("default offline"), tweaks.len());
+            eprintln!(
+                "[4/6] applying '{}' ({} tweaks)",
+                args.config.as_deref().unwrap_or("default offline"),
+                tweaks.len()
+            );
             let the_plan = plan(&mut backend, &profile, &tweaks, "iso");
             eprintln!("      {} changes", the_plan.changes());
-            let mut journal = Journal { started: "iso".into(), ..Journal::default() };
+            let mut journal = Journal {
+                started: "iso".into(),
+                ..Journal::default()
+            };
             apply(&mut backend, &the_plan, &mut journal, |_| {});
             backend.commit().context("save offline hives")?;
             Ok(journal)
         })();
 
         eprintln!("[5/6] unmounting (commit={})", result.is_ok());
-        dism.unmount(&mount.to_string_lossy(), result.is_ok()).context("DismUnmountImage")?;
+        dism.unmount(&mount.to_string_lossy(), result.is_ok())
+            .context("DismUnmountImage")?;
         let journal = result?;
 
         eprintln!("[6/6] writing bootable ISO {}", out.display());
         make_iso(&media, &out)?;
 
-        let applied = journal.entries.iter().filter(|e| e.result == "applied").count();
+        let applied = journal
+            .entries
+            .iter()
+            .filter(|e| e.result == "applied")
+            .count();
         eprintln!("done: {applied} changes baked into {}", out.display());
         Ok(())
     }
@@ -104,10 +125,13 @@ mod imp {
                 let text = std::fs::read_to_string(path).with_context(|| format!("read {path}"))?;
                 Profile::parse(&text).map_err(|e| anyhow::anyhow!("profile: {e}"))
             }
-            None => Ok(Profile { target: TargetKind::Offline, level: bun_windows_winclean::tweaks::Level::Standard, ..Default::default() }),
+            None => Ok(Profile {
+                target: TargetKind::Offline,
+                level: bun_windows_winclean::tweaks::Level::Standard,
+                ..Default::default()
+            }),
         }
     }
-
 
     /// Copy the ISO's files to `dst` by mounting it as a drive (PowerShell `Mount-DiskImage`), robocopy, dismount.
     fn extract_iso(iso: &Path, dst: &Path) -> Result<()> {
@@ -139,7 +163,11 @@ try {{
         )?;
         let bios = media.join(r"boot\etfsboot.com");
         let efi = media.join(r"efi\microsoft\boot\efisys.bin");
-        let boot = format!("-bootdata:2#p0,e,b{}#pEF,e,b{}", bios.display(), efi.display());
+        let boot = format!(
+            "-bootdata:2#p0,e,b{}#pEF,e,b{}",
+            bios.display(),
+            efi.display()
+        );
         let status = std::process::Command::new(oscdimg)
             .args(["-m", "-o", "-u2", "-udfver102", &boot])
             .arg(media)
@@ -159,7 +187,9 @@ try {{
                 return Some(p);
             }
         }
-        let base = PathBuf::from(r"C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools");
+        let base = PathBuf::from(
+            r"C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools",
+        );
         for arch in ["amd64", "arm64", "x86"] {
             let p = base.join(arch).join(r"Oscdimg\oscdimg.exe");
             if p.exists() {

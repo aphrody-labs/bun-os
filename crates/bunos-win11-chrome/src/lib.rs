@@ -6,9 +6,12 @@
 //! The look: rounded corners (`DWMWA_WINDOW_CORNER_PREFERENCE`), a Mica material
 //! (`DWMWA_SYSTEMBACKDROP_TYPE`), immersive dark mode (`DWMWA_USE_IMMERSIVE_DARK_MODE`), a unified dark caption and
 //! a thin accent border (`DWMWA_CAPTION_COLOR`, `DWMWA_BORDER_COLOR`). The traffic-light caption buttons and the
-//! dock are drawn by the compositor layer that owns the frame; this crate describes them ([`Dock`], [`Traffic`]).
+//! dock are described here ([`Dock`], [`Traffic`]); on Windows, `watch` draws the traffic lights itself in an owned
+//! overlay over the native caption buttons ([`Buttons`], `src/buttons.rs`).
 
 use serde::{Deserialize, Serialize};
+
+pub mod paint;
 
 /// A colour as 0xRRGGBB; converted to the `COLORREF` (0x00BBGGRR) the DWM expects.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -24,6 +27,7 @@ impl Rgb {
 
 /// The chrome applied to a window.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Chrome {
     pub rounded: bool,
     pub mica: bool,
@@ -39,8 +43,9 @@ impl Default for Chrome {
     }
 }
 
-/// macOS traffic-light buttons, left-aligned, as the frame owner should draw them.
+/// macOS traffic-light buttons: colours (0xRRGGBB, harmonised to the theme by the profile) and DIP geometry.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Traffic {
     pub close: Rgb,
     pub minimize: Rgb,
@@ -53,6 +58,73 @@ pub struct Traffic {
 impl Default for Traffic {
     fn default() -> Self {
         Self { close: Rgb(0xff5f57), minimize: Rgb(0xfebc2e), zoom: Rgb(0x28c840), diameter: 12, gap: 8, inset: 12 }
+    }
+}
+
+/// The caption-button overlay that `watch` draws over the native caption buttons (`DWMWA_CAPTION_BUTTON_BOUNDS`).
+/// Colours are 0xRRGGBB; the profile renders them from the theme (`crates/bunos-win11/src/hyprwin.rs`).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Buttons {
+    pub enabled: bool,
+    /// Process names (without `.exe`, case-insensitive) whose windows keep their native buttons.
+    pub exclude: Vec<String>,
+    pub glyph: Triple,
+    pub pressed: Triple,
+    pub inactive_fill: Rgb,
+    pub inactive_border: Rgb,
+    pub focus_ring: Rgb,
+    /// Minimum hit area per button, in device-independent pixels.
+    pub hit: u32,
+}
+
+/// One colour per button, in macOS order.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Triple {
+    pub close: Rgb,
+    pub minimize: Rgb,
+    pub zoom: Rgb,
+}
+
+impl Default for Buttons {
+    /// The Dusk dark theme values (docs/DESIGN-M3-WINDOWS.md), used when no profile is given.
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            exclude: Vec::new(),
+            glyph: Triple { close: Rgb(0x4c0017), minimize: Rgb(0x4a2800), zoom: Rgb(0x00391f) },
+            pressed: Triple { close: Rgb(0xd03466), minimize: Rgb(0xc98736), zoom: Rgb(0x00804f) },
+            inactive_fill: Rgb(0x36343a),
+            inactive_border: Rgb(0x938f99),
+            focus_ring: Rgb(0xcdbdff),
+            hit: 24,
+        }
+    }
+}
+
+/// Everything `watch` reads from `--config`: the `describe` shape plus the button overlay. Missing keys keep their
+/// defaults, so the design export (`windows/bunos-win11-chrome.<mode>.json`) is accepted as is.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct WatchConfig {
+    pub chrome: Chrome,
+    pub traffic: Traffic,
+    pub buttons: Buttons,
+}
+
+impl WatchConfig {
+    /// Read a config file; `None` gives the defaults.
+    pub fn load(path: Option<&std::path::Path>) -> Result<Self, String> {
+        let Some(path) = path else { return Ok(Self::default()) };
+        let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+        serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))
+    }
+
+    /// Whether windows of `process` (image name with or without `.exe`) keep their native buttons.
+    #[must_use]
+    pub fn excluded(&self, process: &str) -> bool {
+        let name = process.strip_suffix(".exe").or_else(|| process.strip_suffix(".EXE")).unwrap_or(process);
+        self.buttons.exclude.iter().any(|e| e.trim_end_matches(".exe").eq_ignore_ascii_case(name))
     }
 }
 

@@ -3,8 +3,9 @@
 /**
  * The `windows-hyprland` desktop profile on this Windows host, per-user and reversible (docs/WINDOWS-DESKTOP.md).
  *
- *   bun factory/windows/desktop/hyprland.ts build    build every piece from its pinned fork (cargo, dotnet; AltSnap is
- *                                                    cross-built on vps with mingw-w64)
+ *   bun factory/windows/desktop/hyprland.ts build    build every piece from its pinned fork (cargo, dotnet, CMake + MSVC
+ *                                                    for the waku bar on vcpkg's from-source Qt; AltSnap is cross-built
+ *                                                    on vps with mingw-w64)
  *   bun factory/windows/desktop/hyprland.ts stage    copy the artifacts to %LOCALAPPDATA%\bunos\desktop\hyprland and
  *                                                    test-sign them (factory/windows/signing/test-signing.ps1)
  *   bun factory/windows/desktop/hyprland.ts up [--glass auto|max|reduced] [--motion auto|on|off] [--seed #rrggbb]
@@ -39,7 +40,7 @@ const flag = (name: string) => {
 const bin = {
   glazewm: join(root, "bin", "glazewm"),
   tacky: join(root, "bin", "tacky-borders"),
-  zebar: join(root, "bin", "zebar"),
+  waku: join(root, "bin", "waku"),
   bunos: join(root, "bin", "bunos"),
   flow: join(root, "flow-launcher"),
   altsnap: join(root, "altsnap"),
@@ -50,11 +51,7 @@ async function build() {
     $`cargo build --release --locked ${pkgs.flatMap((p) => ["-p", p])}`.cwd(join(repo, dir));
   await cargo("vendor/glazewm", "wm", "wm-cli", "wm-watcher");
   await cargo("vendor/tacky-borders", "tacky-borders");
-  const zebar = join(repo, "vendor/zebar");
-  await $`bun install --linker hoisted`.cwd(zebar);
-  await $`bun run build`.cwd(join(zebar, "packages/client-api"));
-  await $`bun run build`.cwd(join(zebar, "packages/settings-ui"));
-  await cargo("vendor/zebar", "zebar");
+  await buildWaku();
   await $`cargo build --release -p bunos-win11 -p bunos-win11-chrome -p bunos-win11-wallpaper`.cwd(repo);
   await $`dotnet build Flow.Launcher.sln -c Release -p:RollForward=LatestMajor -v q -nologo`.cwd(join(repo, "vendor/flow-launcher"));
   // AltSnap is plain C for mingw-w64 (vendor/altsnap MakefileX64); the workstation has no mingw, vps does.
@@ -63,6 +60,37 @@ async function build() {
   await $`ssh vps ${`rm -rf ${dir} && mkdir -p ${dir} && cd ${dir} && curl -fsSL https://codeload.github.com/aphrody-labs/AltSnap/tar.gz/${sha} | tar -xz --strip-components=1 && make -f MakefileX64 CC=x86_64-w64-mingw32-gcc WR=x86_64-w64-mingw32-windres -j4 >/dev/null`}`;
   mkdirSync(join(release, "altsnap"), { recursive: true });
   await $`scp -q vps:${dir}/AltSnap.exe vps:${dir}/hooks.dll ${join(release, "altsnap")}/`;
+}
+
+/**
+ * waku (vendor/waku, C++20 + Qt Quick): MSVC from the newest Visual Studio (vswhere), Qt 6 built from source by vcpkg
+ * (classic mode, `qtbase qtdeclarative qtsvg` for x64-windows; VCPKG_ROOT, else the vcpkg checkout next to this
+ * one), nlohmann-json and gtest from waku's own manifest. The `deploy` target assembles the portable folder
+ * (waku.exe, wakuc.exe, the tray hook, the Qt runtime from windeployqt) in target/release/waku.
+ */
+async function buildWaku() {
+  const vcpkg = process.env.VCPKG_ROOT ?? join(dirname(repo), "vcpkg");
+  if (!existsSync(join(vcpkg, "vcpkg.exe"))) throw new Error(`no vcpkg at ${vcpkg} (set VCPKG_ROOT)`);
+  await $`${join(vcpkg, "vcpkg.exe")} install qtbase qtdeclarative qtsvg --triplet x64-windows`.cwd(vcpkg);
+  const vswhere = join(process.env["ProgramFiles(x86)"] ?? "C:/Program Files (x86)", "Microsoft Visual Studio/Installer/vswhere.exe");
+  const vs = (await $`${vswhere} -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`.text()).trim();
+  const vcvars = join(vs, "VC/Auxiliary/Build/vcvars64.bat");
+  const src = join(repo, "vendor/waku");
+  const out = join(target, "waku-build");
+  const dist = join(release, "waku");
+  // One cmd.exe: vcvars only lasts for the process that ran it. It resets VCPKG_ROOT to the bundled vcpkg, so it is
+  // set again afterwards.
+  const steps = [
+    `call "${vcvars}"`,
+    `set "VCPKG_ROOT=${vcpkg}"`,
+    `set "QT_ROOT=${join(vcpkg, "installed")}"`,
+    `cmake -S "${src}" -B "${out}" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${join(vcpkg, "scripts/buildsystems/vcpkg.cmake")}" -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -DWAKU_QT_DIR=x64-windows -DWAKU_DIST_DIR="${dist}"`,
+    `cmake --build "${out}" --target deploy`,
+  ];
+  const bat = join(out, "build-waku.cmd");
+  mkdirSync(out, { recursive: true });
+  await Bun.write(bat, ["@echo off", ...steps.map((l) => `${l} || exit /b 1`), ""].join("\r\n"));
+  await $`cmd /d /c ${bat}`;
 }
 
 function copy(from: string, to: string) {
@@ -74,10 +102,7 @@ function copy(from: string, to: string) {
 async function stage() {
   for (const f of ["glazewm.exe", "glazewm-cli.exe", "glazewm-watcher.exe"]) copy(join(release, f), join(bin.glazewm, f));
   copy(join(release, "tacky-borders.exe"), join(bin.tacky, "tacky-borders.exe"));
-  copy(join(release, "zebar.exe"), join(bin.zebar, "zebar.exe"));
-  // Tauri resolves `../../resources` (the starter pack, templates) from the exe directory as `_up_/_up_/resources`.
-  copy(join(repo, "vendor/zebar/resources"), join(bin.zebar, "_up_", "_up_", "resources"));
-  copy(join(repo, "vendor/zebar/packages/desktop/resources"), join(bin.zebar, "resources"));
+  copy(join(release, "waku"), bin.waku);
   for (const f of ["bunos-win11.exe", "bunos-win11-chrome.exe", "bunos-win11-wallpaper.exe"]) copy(join(release, f), join(bin.bunos, f));
   copy(join(repo, "vendor/flow-launcher/Output/Release"), bin.flow);
   for (const f of ["AltSnap.exe", "hooks.dll"]) copy(join(release, "altsnap", f), join(bin.altsnap, f));
@@ -85,7 +110,7 @@ async function stage() {
   for (const [tool, lic] of [
     ["glazewm", "vendor/glazewm/LICENSE.md"],
     ["tacky-borders", "vendor/tacky-borders/LICENSE"],
-    ["zebar", "vendor/zebar/LICENSE.md"],
+    ["waku", "vendor/waku/LICENSE"],
   ]) copy(join(repo, lic), join(root, "bin", tool, "LICENSE"));
   copy(join(repo, "vendor/flow-launcher/LICENSE"), join(bin.flow, "LICENSE"));
   if (args.includes("--no-sign")) return;
@@ -93,7 +118,8 @@ async function stage() {
   const files = [
     ...["glazewm.exe", "glazewm-cli.exe", "glazewm-watcher.exe"].map((f) => join(bin.glazewm, f)),
     join(bin.tacky, "tacky-borders.exe"),
-    join(bin.zebar, "zebar.exe"),
+    ...["waku.exe", "wakuc.exe"].map((f) => join(bin.waku, f)),
+    ...readdirSync(bin.waku).filter((f) => /^WakuTrayHook.*\.dll$/i.test(f)).map((f) => join(bin.waku, f)),
     ...["bunos-win11.exe", "bunos-win11-chrome.exe", "bunos-win11-wallpaper.exe"].map((f) => join(bin.bunos, f)),
     ...readdirSync(bin.flow).filter((f) => /^Flow\.Launcher.*\.(exe|dll)$/.test(f)).map((f) => join(bin.flow, f)),
     join(bin.altsnap, "AltSnap.exe"),
@@ -161,37 +187,11 @@ async function up() {
   if (!args.includes("--no-chrome")) await once(join(bin.bunos, "bunos-win11-chrome.exe"), ["watch"], {}, true);
   await once(join(bin.glazewm, "glazewm.exe"), ["start", `--config=${join(root, "glazewm", "config.yaml")}`]);
   await once(join(bin.tacky, "tacky-borders.exe"), [], { TACKY_BORDERS_CONFIG_HOME: join(root, "tacky-borders") });
-  const zebar = join(bin.zebar, "zebar.exe");
-  const zebarConfig = join(root, "zebar", "config");
-  mkdirSync(zebarConfig, { recursive: true });
-  await themeZebar();
-  const settings = join(zebarConfig, "settings.json");
-  if (!existsSync(settings) && !running.has(zebar.toLowerCase())) {
-    // First run: Zebar writes settings.json and registers its starter pack; it picks the `vanilla` bar because our
-    // GlazeWM is not an installed app, so let it initialise once and restart it on the GlazeWM widget.
-    await start(zebar, ["startup", `--config-dir=${zebarConfig}`]);
-    for (let i = 0; i < 40 && !existsSync(settings); i++) await Bun.sleep(250);
-    await $`taskkill /IM zebar.exe /F`.nothrow().quiet();
-    running.delete(zebar.toLowerCase());
-  }
-  if (existsSync(settings)) {
-    const s = await Bun.file(settings).json();
-    for (const c of s.startupConfigs ?? []) if (c.pack === "glzr-io.starter") c.widget = "with-glazewm";
-    await Bun.write(settings, `${JSON.stringify(s, null, 2)}\n`);
-  }
-  await once(zebar, ["startup", `--config-dir=${zebarConfig}`]);
+  // The bar is a Windows AppBar (--register-app-bar): maximised and tiled windows stay below it; GlazeWM reads the
+  // reduced work area. --no-tray: the profile leaves Explorer's notification area alone.
+  await once(join(bin.waku, "waku.exe"), ["--config-home", join(root, "waku"), "--register-app-bar", "--no-tray"]);
   await once(join(bin.altsnap, "AltSnap.exe"), []);
   await once(join(bin.flow, "Flow.Launcher.exe"), []);
-}
-
-/** Append the rendered M3 bar theme to the staged starter stylesheet (Zebar serves the starter pack from there). */
-async function themeZebar() {
-  const styles = join(bin.zebar, "_up_", "_up_", "resources", "starter", "styles.css");
-  if (!existsSync(styles)) return;
-  const marker = "/* bunos-theme */";
-  const body = (await Bun.file(styles).text()).split(marker)[0];
-  await Bun.write(styles, `${body}${marker}\n${await Bun.file(join(root, "zebar", "bunos-theme.css")).text()}`);
-  console.log(`themed ${styles}`);
 }
 
 async function down() {

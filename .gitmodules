@@ -1740,9 +1740,9 @@
 	shallow = true
 	path = vendor/detours
 	url = https://github.com/aphrody-labs/Detours.git
-[submodule "vendor/zebar"]
-	path = vendor/zebar
-	url = https://github.com/aphrody-labs/zebar.git
+[submodule "vendor/waku"]
+	path = vendor/waku
+	url = https://github.com/aphrody-labs/waku.git
 	shallow = true
 	branch = bunos
 [submodule "vendor/tacky-borders"]
