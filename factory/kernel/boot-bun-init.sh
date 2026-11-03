@@ -36,8 +36,9 @@ echo "kernel: $vmlinuz ($release)"
 # 2. Bun /init and its libraries.
 bun build --compile --minify "$root/packages/bunos-init/src/init.ts" --outfile "$out/init" >/dev/null
 gen="$out/gen_init_cpio"
-# Any kernel tree has usr/gen_init_cpio.c; the package build leaves one in src/ (linux-7.4-rc1, linux-7.4.1, ...).
-cc -O2 -o "$gen" "${KERNEL_SRC:-$(ls -d "$HOME"/build/storage/kernel/linux-bun/src/linux-*/ | head -1)}/usr/gen_init_cpio.c"
+# Any kernel tree has gen_init_cpio.c (usr/ up to 7.3, scripts/ from 7.4); the package build leaves one in src/.
+ksrc="${KERNEL_SRC:-$(ls -d "$HOME"/build/storage/kernel/linux-bun/src/linux-*/ | head -1)}"
+cc -O2 -o "$gen" "$(ls "$ksrc"/scripts/gen_init_cpio.c "$ksrc"/usr/gen_init_cpio.c 2>/dev/null | head -1)"
 {
   echo "dir /dev 0755 0 0"
   echo "nod /dev/console 0600 0 0 c 5 1"
