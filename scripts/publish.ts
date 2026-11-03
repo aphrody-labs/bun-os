@@ -32,7 +32,7 @@ const limit = Number(values.limit ?? Infinity);
 const stateDir = join(homedir(), ".local", "state", "bunos-publish");
 await mkdir(stateDir, { recursive: true });
 const stateFile = join(stateDir, `${registry}.json`);
-type Status = "published" | "exists" | "taken" | "failed" | "verified" | "private";
+type Status = "published" | "exists" | "taken" | "failed" | "verified" | "private" | "staged";
 type Outcome = { at: string; status: Status; detail?: string };
 const state: Record<string, Outcome> = (await Bun.file(stateFile).exists()) ? await Bun.file(stateFile).json() : {};
 const save = () => Bun.write(stateFile, `${JSON.stringify(state, null, 2)}\n`);
@@ -42,7 +42,7 @@ const mark = async (key: string, status: Status, detail?: string) => {
 };
 const plan = await Bun.file(join(root, "docs", "generated", "publish-plan.json")).json();
 const UA = { "User-Agent": "bun-os-release (contact@aphrody.com)" };
-const final = new Set<Status>(["published", "exists", "taken", "private"]);
+const final = new Set<Status>(["published", "exists", "taken", "private", "staged"]);
 
 function run(cmd: string[], cwd = root, env: Record<string, string> = {}): { code: number; out: string } {
   const r = Bun.spawnSync(cmd, {
@@ -158,9 +158,12 @@ type Meta = {
     name: string;
     version: string;
     publish: string[] | null;
-    dependencies: { name: string; kind: string | null; source: string | null }[];
+    dependencies: { name: string; kind: string | null; source: string | null; req: string }[];
   }[];
 };
+/// Path dependencies that must be on crates.io first: normal and build ones, and dev-dependencies with a version.
+const needed = (d: { kind: string | null; source: string | null; req: string }) =>
+  d.source === null && (d.kind !== "dev" || d.req !== "*");
 // Topological order of the publishable members of a foreign workspace.
 function workspaceOrder(dir: string): { name: string; version: string; publish: boolean; deps: string[] }[] {
   const r = run(["cargo", "metadata", "--format-version", "1", "--no-deps"], dir);
@@ -170,7 +173,7 @@ function workspaceOrder(dir: string): { name: string; version: string; publish: 
   const out: { name: string; version: string; publish: boolean; deps: string[] }[] = [];
   const closure = (n: string, acc = new Set<string>()) => {
     for (const d of by.get(n)?.dependencies ?? [])
-      if (d.kind !== "dev" && d.source === null && by.has(d.name) && !acc.has(d.name)) {
+      if (needed(d) && by.has(d.name) && !acc.has(d.name)) {
         acc.add(d.name);
         closure(d.name, acc);
       }
@@ -181,7 +184,7 @@ function workspaceOrder(dir: string): { name: string; version: string; publish: 
     const p = by.get(n);
     if (!p || seen.has(n)) return;
     seen.add(n);
-    for (const d of p.dependencies) if (d.kind !== "dev" && d.source === null) visit(d.name);
+    for (const d of p.dependencies) if (needed(d)) visit(d.name);
     out.push({
       name: p.name,
       version: p.version,
@@ -268,16 +271,27 @@ if (registry === "crates") {
     }
     const args = ["bun", "publish", "--access", "public", ...(dry ? ["--dry-run"] : [])];
     const pub = run(args, join(root, m.path));
+    // The account enforces npm staged publishing: an upload lands in the staging queue and only becomes installable
+    // once a maintainer approves it with 2FA (npmjs.com, or `npm stage approve <id>`). Record that, not "published".
+    const live = async () => {
+      const doc = await fetch(`https://registry.npmjs.org/${m.name.replace("/", "%2f")}`, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+      return doc.ok && Boolean(((await doc.json()) as { versions?: Record<string, unknown> }).versions?.[m.version]);
+    };
+    const staged = /previously staged version/i.test(pub.out) || (pub.code === 0 && !dry && !(await live()));
     await mark(
       key,
-      pub.code === 0 ? (dry ? "verified" : "published") : "failed",
-      pub.code === 0
-        ? undefined
-        : pub.out
-            .split("\n")
-            .filter(l => /error/i.test(l))
-            .slice(0, 3)
-            .join(" | "),
+      staged ? "staged" : pub.code === 0 ? (dry ? "verified" : "published") : "failed",
+      staged
+        ? "awaiting 2FA approval on npmjs.com"
+        : pub.code === 0
+          ? undefined
+          : pub.out
+              .split("\n")
+              .filter(l => /error/i.test(l))
+              .slice(0, 3)
+              .join(" | "),
     );
     console.log(`${state[key].status.padEnd(9)} ${key}${state[key].detail ? `: ${state[key].detail}` : ""}`);
     done++;

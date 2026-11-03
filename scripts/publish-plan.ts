@@ -94,6 +94,8 @@ const cargoReq = (req: string) =>
 const onRegistry = (name: string, req: string) =>
   (registryVersions.get(name) ?? []).some(v => req === "*" || Bun.semver.satisfies(v, cargoReq(req)));
 
+// `deps`: first-party crates that must be on crates.io first: normal and build dependencies, and dev-dependencies that
+// carry a version (cargo keeps those in the published manifest and resolves them; versionless ones are stripped).
 type Verdict = { name: string; version: string; path: string; publishable: boolean; reasons: string[]; deps: string[] };
 const verdicts = new Map<string, Verdict>();
 function judge(p: Pkg, stack = new Set<string>()): Verdict {
@@ -108,7 +110,14 @@ function judge(p: Pkg, stack = new Set<string>()): Verdict {
   if (!p.description) reasons.push("no description");
   const deps: string[] = [];
   for (const d of p.dependencies) {
-    if (d.kind === "dev") continue;
+    if (d.kind === "dev") {
+      const local = d.source === null ? byName.get(d.name) : undefined;
+      if (local && d.req !== "*") {
+        deps.push(d.name);
+        if (!judge(local, stack).publishable) reasons.push(`versioned dev-dependency on unpublishable ${d.name}`);
+      }
+      continue;
+    }
     const local = d.source === null ? byName.get(d.name) : undefined;
     if (!local && d.source?.startsWith("registry+") !== true && d.req === "*")
       reasons.push(`${d.source ? "git" : "path"} dependency ${d.name} without a version`);
@@ -181,7 +190,11 @@ for (const e of await readdir(join(root, "packages"), { withFileTypes: true })) 
 const blockers = new Map<string, number>();
 for (const v of verdicts.values())
   for (const r of v.reasons) {
-    const key = r.startsWith("depends on unpublishable") ? "depends on unpublishable" : r;
+    const key = r.startsWith("depends on unpublishable")
+      ? "depends on unpublishable"
+      : r.startsWith("versioned dev")
+        ? "versioned dev-dependency on unpublishable"
+        : r;
     blockers.set(key, (blockers.get(key) ?? 0) + 1);
   }
 const plan = {
