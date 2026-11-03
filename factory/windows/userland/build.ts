@@ -16,7 +16,7 @@
 import { $ } from "bun";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
+import { homedir, hostname } from "node:os";
 import { basename, join, relative, resolve } from "node:path";
 
 type Bin = { file: string; commands: string[] | "uutils-map" };
@@ -94,7 +94,7 @@ const cargoField = (dir: string, field: string) => {
 // implied by the target CPU and keep libwebp-style SIMD sources building.
 const shimDir = join(outRoot, ".shim");
 mkdirSync(shimDir, { recursive: true });
-const realClangCl = (await $`command -v clang-cl`.quiet().nothrow().text()).trim();
+const realClangCl = Bun.which("clang-cl", { PATH: (env.PATH ?? "").split(":").filter((d) => d !== shimDir).join(":") }) ?? "";
 if (!realClangCl) throw new Error("clang-cl not found on PATH");
 const cflags = targetCpu === "native" ? [] : [`/clang:-march=${targetCpu}`];
 writeFileSync(join(shimDir, "clang-cl"), `#!/bin/sh\nexec ${realClangCl} ${cflags.join(" ")} "$@"\n`, { mode: 0o755 });
@@ -233,7 +233,7 @@ const manifest = {
   schema: 1,
   kind: "bunos-windows-userland",
   built: new Date().toISOString(),
-  host: (await $`hostname`.text()).trim(),
+  host: hostname(),
   repository: { revision: repoRev, dirty: (await git(root, "status", "--porcelain", "--", "factory/windows/userland")) !== "" },
   target: config.target,
   targetCpu,
