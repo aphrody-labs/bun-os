@@ -50,13 +50,18 @@ fn current_user() -> String {
     if domain.is_empty() { user } else { format!("{domain}\\{user}") }
 }
 
-pub fn install(distro: String, user: Option<String>, start: bool) -> Result<()> {
+pub fn install(distro: String, user: Option<String>, terminate_on_stop: Option<bool>, start: bool) -> Result<()> {
     let exe = installed_exe();
     std::fs::create_dir_all(install_dir())?;
     let me = std::env::current_exe()?;
+    let was_running = ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT)
+        .ok()
+        .and_then(|m| m.open_service(SERVICE_NAME, ServiceAccess::QUERY_STATUS).ok())
+        .and_then(|s| s.query_status().ok())
+        .is_some_and(|s| s.current_state != ServiceState::Stopped);
     if !me.eq(&exe) {
-        // A running service holds the file; stop it first so the copy can replace it.
-        stop_quiet(SERVICE_NAME);
+        // A running service holds the file; stop everything first (units keep running) so the copy can replace it.
+        stop_detached();
         std::fs::copy(&me, &exe).with_context(|| format!("copying to {}", exe.display()))?;
     }
     let user = user.unwrap_or_else(current_user);
@@ -64,7 +69,7 @@ pub fn install(distro: String, user: Option<String>, start: bool) -> Result<()> 
     Config {
         distro: distro.clone(),
         user: user.clone(),
-        terminate_on_stop: prev.as_ref().is_none_or(|c| c.terminate_on_stop),
+        terminate_on_stop: terminate_on_stop.unwrap_or(prev.as_ref().is_none_or(|c| c.terminate_on_stop)),
         state_period: prev.as_ref().map(|c| c.state_period).unwrap_or(2),
     }
     .save()?;
@@ -107,7 +112,7 @@ pub fn install(distro: String, user: Option<String>, start: bool) -> Result<()> 
         export_one(&scm, &exe, &unit, None)?;
     }
     println!("installed {SERVICE_NAME}: {} instance (distro {distro}, user {user})", exe.display());
-    if start {
+    if start || was_running {
         start_service(&scm, SERVICE_NAME)?;
     }
     Ok(())
@@ -120,6 +125,17 @@ fn start_service(scm: &ServiceManager, name: &str) -> Result<()> {
     }
     println!("started {name}");
     Ok(())
+}
+
+/// Stops the unit services and the instance service without stopping the systemd units (the unit services see
+/// `Parameters\Detach=1` and exit without `systemctl stop`). The instance service starts them again for running units.
+fn stop_detached() {
+    config::set_status("Detach", "1");
+    for unit in config::units() {
+        stop_quiet(&windows_name(&unit));
+    }
+    stop_quiet(SERVICE_NAME);
+    config::set_status("Detach", "0");
 }
 
 fn stop_quiet(name: &str) {
@@ -138,15 +154,14 @@ fn stop_quiet(name: &str) {
 
 pub fn uninstall() -> Result<()> {
     let scm = scm_admin()?;
+    stop_detached();
     for unit in config::units() {
         let name = windows_name(&unit);
-        stop_quiet(&name);
         if let Ok(s) = scm.open_service(&name, ServiceAccess::DELETE) {
             s.delete()?;
         }
         eventlog::unregister_source(&name);
     }
-    stop_quiet(SERVICE_NAME);
     if let Ok(s) = scm.open_service(SERVICE_NAME, ServiceAccess::DELETE) {
         s.delete()?;
     }

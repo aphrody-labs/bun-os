@@ -35,6 +35,9 @@ enum Cmd {
         /// Owner of the distro (`user` or `COMPUTER\user`); default: the calling user.
         #[arg(long)]
         user: Option<String>,
+        /// Whether stopping the service also terminates the distro (default true; kept on reinstall).
+        #[arg(long)]
+        terminate_on_stop: Option<bool>,
         /// Start the service after installing.
         #[arg(long)]
         start: bool,
@@ -71,7 +74,7 @@ enum Cmd {
 #[cfg(windows)]
 fn main() -> anyhow::Result<()> {
     match Cli::parse().cmd {
-        Cmd::Install { distro, user, start } => manage::install(distro, user, start),
+        Cmd::Install { distro, user, terminate_on_stop, start } => manage::install(distro, user, terminate_on_stop, start),
         Cmd::Uninstall => manage::uninstall(),
         Cmd::Export { units } => manage::export(&units),
         Cmd::Unexport { units } => manage::unexport(&units),

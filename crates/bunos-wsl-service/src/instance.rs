@@ -80,6 +80,9 @@ fn set(h: &ServiceStatusHandle, state: ServiceState, exit: ServiceExitCode, chec
 
 struct Keeper {
     proc: Proc,
+    started: Instant,
+    /// Replaces a running keeper after a unit-list change: its READY is not a restart.
+    reload: bool,
     generation: u64,
     units: Vec<String>,
 }
@@ -104,7 +107,7 @@ fn spawn_keeper(runner: &Runner, cfg: &Config, units: Vec<String>, generation: u
         let err = err.join().unwrap_or_default();
         let _ = tx.send(Msg::Eof(generation, crate::units::decode_wsl(&err).trim().to_string()));
     });
-    Ok(Keeper { proc, generation, units })
+    Ok(Keeper { proc, generation, units, started: Instant::now(), reload: false })
 }
 
 /// Caps journal forwarding so a chatty unit cannot flood the Application log.
@@ -148,7 +151,6 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, tx: mpsc::Sender<Msg>, rx: mpsc:
         }
     };
     let mut ready = false;
-    let mut instance_started = Instant::now();
     let mut failures: Vec<Instant> = Vec::new();
     let mut retry_at: Option<Instant> = None;
     let mut show = String::new();
@@ -164,20 +166,26 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, tx: mpsc::Sender<Msg>, rx: mpsc:
             Ok(Msg::Stop) => break ServiceExitCode::NO_ERROR,
             Ok(Msg::Line(g, line)) if keeper.as_ref().is_some_and(|k| k.generation == g) => match line {
                 Line::Ready { state, uptime_s } => {
-                    let ms = instance_started.elapsed().as_millis();
-                    config::set_status("LastReadyMs", &ms.to_string());
-                    config::set_status("LastSystemdState", &state);
-                    config::set_status("LastGuestUptimeS", &format!("{uptime_s:.2}"));
+                    let k = keeper.as_ref().expect("generation matched");
+                    // From service start for the first instance, from the respawn for later ones.
+                    let ms = if ready { k.started.elapsed() } else { start.elapsed() }.as_millis();
+                    if !k.reload {
+                        config::set_status("LastReadyMs", &ms.to_string());
+                        config::set_status("LastSystemdState", &state);
+                        config::set_status("LastGuestUptimeS", &format!("{uptime_s:.2}"));
+                    }
                     if !ready {
                         ready = true;
                         let _ = set(h, ServiceState::Running, ServiceExitCode::NO_ERROR, 0, Duration::ZERO);
                         log.info(&format!(
-                            "Bun OS distro '{}' is up as {} (systemd {state}): {ms} ms from service start to systemd ready \
-                             (S4U logon and profile {logon_ms} ms, guest uptime {uptime_s:.2} s, keeper wsl.exe PID {}).",
-                            cfg.distro, session.account, keeper.as_ref().map_or(0, |k| k.proc.pid)
+                            "Bun OS distro '{}' is up as {} (systemd {state}): {ms} ms from service start to systemd ready                              (S4U logon and profile {logon_ms} ms, guest uptime {uptime_s:.2} s, keeper wsl.exe PID {}).",
+                            cfg.distro, session.account, k.proc.pid
                         ));
-                    } else {
-                        log.info(&format!("Bun OS distro '{}' restarted (systemd {state}) in {ms} ms.", cfg.distro));
+                    } else if !k.reload {
+                        log.info(&format!(
+                            "Bun OS distro '{}' is back (systemd {state}): {ms} ms from respawn to systemd ready, guest uptime {uptime_s:.2} s.",
+                            cfg.distro
+                        ));
                     }
                     failures.retain(|t| t.elapsed() < Duration::from_secs(600));
                 }
@@ -202,8 +210,15 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, tx: mpsc::Sender<Msg>, rx: mpsc:
                     if rate.count > JOURNAL_PER_10S {
                         rate.dropped += 1;
                     } else {
-                        let src = sources.entry(e.unit.clone()).or_insert_with(|| EventLog::open(&windows_name(&e.unit)));
-                        src.report(Level::from_priority(e.priority), ID_JOURNAL, &e.message);
+                        // Only registered sources (the mirrored units), so Event Viewer can render every entry.
+                        let mirrored = keeper.as_ref().map(|k| k.units.as_slice()).unwrap_or_default();
+                        match e.units.iter().find(|u| mirrored.contains(u)) {
+                            Some(u) => sources
+                                .entry(u.clone())
+                                .or_insert_with(|| EventLog::open(&windows_name(u)))
+                                .report(Level::from_priority(e.priority), ID_JOURNAL, &e.message),
+                            None => log.report(Level::from_priority(e.priority), ID_JOURNAL, &e.message),
+                        }
                     }
                 }
             },
@@ -234,7 +249,6 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, tx: mpsc::Sender<Msg>, rx: mpsc:
         if retry_at.is_some_and(|t| Instant::now() >= t) {
             retry_at = None;
             generation += 1;
-            instance_started = Instant::now();
             match spawn_keeper(&runner, &cfg, config::units(), generation, &tx) {
                 Ok(k) => keeper = Some(k),
                 Err(e) => {
@@ -253,7 +267,8 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, tx: mpsc::Sender<Msg>, rx: mpsc:
             {
                 generation += 1;
                 match spawn_keeper(&runner, &cfg, now, generation, &tx) {
-                    Ok(n) => {
+                    Ok(mut n) => {
+                        n.reload = true;
                         let old = keeper.replace(n);
                         if let Some(o) = old {
                             o.proc.kill();

@@ -121,6 +121,8 @@ fn run(h: &ServiceStatusHandle, log: &EventLog, unit: &str, rx: mpsc::Receiver<M
     let mut down = 0;
     loop {
         match rx.recv_timeout(Duration::from_secs(1)) {
+            // Install/uninstall stop the services to replace or remove the binary: leave the unit running.
+            Ok(Msg::Stop) if config::get_status("Detach").as_deref() == Some("1") => return ServiceExitCode::NO_ERROR,
             Ok(Msg::Stop) => {
                 set(h, ServiceState::StopPending, ServiceExitCode::NO_ERROR, 1, Duration::from_secs(100));
                 match runner(&cfg, &mut cache).and_then(|r| r.exec_root(&cfg.distro, &["systemctl", "stop", "--", unit], Duration::from_secs(95))) {

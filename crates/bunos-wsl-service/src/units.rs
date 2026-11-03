@@ -103,7 +103,9 @@ pub enum Line {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct JournalEntry {
-    pub unit: String,
+    /// The unit the entry is about: `_SYSTEMD_UNIT` (the process that logged it), and for systemd's own messages
+    /// (logged by init.scope) the `UNIT` it reports on.
+    pub units: Vec<String>,
     pub priority: u8,
     pub message: String,
 }
@@ -139,13 +141,13 @@ fn parse_journal(line: &str) -> Option<JournalEntry> {
             other => Some(other.to_string()),
         }
     };
-    let unit = field("_SYSTEMD_UNIT").or_else(|| field("UNIT")).unwrap_or_default();
+    let units = [field("_SYSTEMD_UNIT"), field("UNIT")].into_iter().flatten().filter(|u| u != "init.scope").collect();
     let priority = field("PRIORITY").and_then(|p| p.parse().ok()).unwrap_or(6);
     let mut message = field("MESSAGE").unwrap_or_default();
     if let Some(id) = field("SYSLOG_IDENTIFIER") {
         message = format!("{id}: {message}");
     }
-    Some(JournalEntry { unit, priority, message })
+    Some(JournalEntry { units, priority, message })
 }
 
 /// A row of `systemctl list-units --all` joined with `list-unit-files`.
@@ -293,14 +295,18 @@ mod tests {
         assert_eq!(classify("END\r"), Line::End);
         match classify(r#"{"MESSAGE":"hello","PRIORITY":"3","_SYSTEMD_UNIT":"docker.service","SYSLOG_IDENTIFIER":"dockerd"}"#) {
             Line::Journal(e) => {
-                assert_eq!(e.unit, "docker.service");
+                assert_eq!(e.units, ["docker.service"]);
                 assert_eq!(e.priority, 3);
                 assert_eq!(e.message, "dockerd: hello");
             }
             other => panic!("{other:?}"),
         }
         match classify(r#"{"MESSAGE":[104,105],"UNIT":"a.service"}"#) {
-            Line::Journal(e) => assert_eq!((e.message.as_str(), e.priority), ("hi", 6)),
+            Line::Journal(e) => assert_eq!((e.message.as_str(), e.priority, e.units.as_slice()), ("hi", 6, ["a.service".to_string()].as_slice())),
+            other => panic!("{other:?}"),
+        }
+        match classify(r#"{"MESSAGE":"Stopped Docker.","_SYSTEMD_UNIT":"init.scope","UNIT":"docker.service","SYSLOG_IDENTIFIER":"systemd"}"#) {
+            Line::Journal(e) => assert_eq!(e.units, ["docker.service"]),
             other => panic!("{other:?}"),
         }
     }
