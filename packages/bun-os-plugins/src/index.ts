@@ -14,6 +14,7 @@ import windows from "@aphrody/windows/bun-plugin";
 import commands from "./commands/plugin.ts";
 import compat from "./compat/plugin.ts";
 import dotnet from "./dotnet/plugin.ts";
+import graph from "./graph/plugin.ts";
 import thirdparty from "./thirdparty/plugin.ts";
 import type { BunOsPlugin } from "./define.ts";
 
@@ -26,6 +27,7 @@ export const plugins: readonly BunOsPlugin[] = [
   wasm,
   python,
   dotnet,
+  graph,
   compat,
   thirdparty,
   commands,
