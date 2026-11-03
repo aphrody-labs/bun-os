@@ -42,7 +42,11 @@ impl Glass {
     /// The user's Transparency effects setting (absent value = on, the Windows default).
     #[must_use]
     pub fn detect() -> Self {
-        if dword(r"HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "EnableTransparency") == Some(0) {
+        if dword(
+            r"HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+            "EnableTransparency",
+        ) == Some(0)
+        {
             Self::Reduced
         } else {
             Self::Max
@@ -54,11 +58,15 @@ impl Glass {
 /// effects, `HKCU\Control Panel\Desktop\WindowMetrics\MinAnimate` = "0").
 #[must_use]
 pub fn detect_motion() -> bool {
-    string(r"HKCU:\Control Panel\Desktop\WindowMetrics", "MinAnimate").is_none_or(|v| v.trim() != "0")
+    string(r"HKCU:\Control Panel\Desktop\WindowMetrics", "MinAnimate")
+        .is_none_or(|v| v.trim() != "0")
 }
 
 fn reg(path: &str, name: &str) -> Option<serde_json::Value> {
-    bun_windows_winclean::registry::get_value(path, name).ok()?.get("Data").cloned()
+    bun_windows_winclean::registry::get_value(path, name)
+        .ok()?
+        .get("Data")
+        .cloned()
 }
 
 fn dword(path: &str, name: &str) -> Option<u64> {
@@ -85,7 +93,8 @@ pub struct Look {
 impl Look {
     /// Roles from a seed through the canonical token engine (`None` = the M3 baseline seed).
     pub fn from_seed(seed: Option<&str>) -> Result<BTreeMap<String, String>> {
-        let request = aphrody_m3_tokens::theme::ThemeRequest::parse(seed, None, None).map_err(anyhow::Error::msg)?;
+        let request = aphrody_m3_tokens::theme::ThemeRequest::parse(seed, None, None)
+            .map_err(anyhow::Error::msg)?;
         Ok(request.export().dark)
     }
 
@@ -93,9 +102,16 @@ impl Look {
     /// token file.
     pub fn from_export(path: &Path) -> Result<BTreeMap<String, String>> {
         let text = std::fs::read_to_string(path).with_context(|| path.display().to_string())?;
-        let doc: serde_json::Value = serde_json::from_str(&text).with_context(|| path.display().to_string())?;
-        let dark = doc.get("dark").and_then(|d| d.as_object()).context("theme export has no `dark` roles")?;
-        Ok(dark.iter().filter_map(|(k, v)| Some((k.clone(), v.as_str()?.to_owned()))).collect())
+        let doc: serde_json::Value =
+            serde_json::from_str(&text).with_context(|| path.display().to_string())?;
+        let dark = doc
+            .get("dark")
+            .and_then(|d| d.as_object())
+            .context("theme export has no `dark` roles")?;
+        Ok(dark
+            .iter()
+            .filter_map(|(k, v)| Some((k.clone(), v.as_str()?.to_owned())))
+            .collect())
     }
 
     fn role(&self, name: &str) -> &str {
@@ -186,6 +202,8 @@ workspaces:
         window_class: { regex: \"Chrome_WidgetWin_1|MozillaDialogClass\" }
       - window_title: { equals: \"Command Palette\" }
         window_class: { equals: \"WinUIDesktopWin32WindowClass\" }
+      - window_title: { regex: \"OpenPets|AgentCursorOverlay\" }
+      - window_process: { equals: \"cua-driver\" }
   - commands: [\"set-floating --centered\"]
     match:
       - window_class: { equals: \"#32770\" }
@@ -205,8 +223,16 @@ keybindings:
     let launcher = yaml_escape(&look.launcher);
     let mut bind = |commands: &[&str], keys: &[&str]| {
         let c: Vec<String> = commands.iter().map(|c| format!("\"{c}\"")).collect();
-        let k: Vec<String> = keys.iter().map(|k| format!("\"{}\"", k.replace("$m", MOD))).collect();
-        let _ = writeln!(y, "  - {{ commands: [{}], bindings: [{}] }}", c.join(", "), k.join(", "));
+        let k: Vec<String> = keys
+            .iter()
+            .map(|k| format!("\"{}\"", k.replace("$m", MOD)))
+            .collect();
+        let _ = writeln!(
+            y,
+            "  - {{ commands: [{}], bindings: [{}] }}",
+            c.join(", "),
+            k.join(", ")
+        );
     };
     bind(&[&format!("shell-exec {terminal}")], &["$m+enter"]);
     bind(&[&format!("shell-exec {launcher}")], &["$m+space"]);
@@ -216,9 +242,20 @@ keybindings:
     bind(&["toggle-floating --centered"], &["$m+t"]);
     bind(&["toggle-tiling-direction"], &["$m+j"]);
     bind(&["toggle-minimized"], &["$m+m"]);
-    for (dir, key) in [("left", "left"), ("right", "right"), ("up", "up"), ("down", "down")] {
-        bind(&[&format!("focus --direction {dir}")], &[&format!("$m+{key}")]);
-        bind(&[&format!("move --direction {dir}")], &[&format!("$m+shift+{key}")]);
+    for (dir, key) in [
+        ("left", "left"),
+        ("right", "right"),
+        ("up", "up"),
+        ("down", "down"),
+    ] {
+        bind(
+            &[&format!("focus --direction {dir}")],
+            &[&format!("$m+{key}")],
+        );
+        bind(
+            &[&format!("move --direction {dir}")],
+            &[&format!("$m+shift+{key}")],
+        );
     }
     bind(&["resize --width -5%"], &["$m+oem_minus"]);
     bind(&["resize --width +5%"], &["$m+oem_plus"]);
@@ -230,7 +267,13 @@ keybindings:
     bind(&["focus --recent-workspace"], &["$m+oem_tilde"]);
     for n in 1..=9 {
         bind(&[&format!("focus --workspace {n}")], &[&format!("$m+{n}")]);
-        bind(&[&format!("move --workspace {n}"), &format!("focus --workspace {n}")], &[&format!("$m+shift+{n}")]);
+        bind(
+            &[
+                &format!("move --workspace {n}"),
+                &format!("focus --workspace {n}"),
+            ],
+            &[&format!("$m+shift+{n}")],
+        );
     }
     bind(&["move-workspace --direction left"], &["$m+ctrl+left"]);
     bind(&["move-workspace --direction right"], &["$m+ctrl+right"]);
@@ -242,7 +285,11 @@ keybindings:
 }
 
 fn yaml_escape(s: &str) -> String {
-    let quoted = if s.contains(' ') { format!("'{s}'") } else { s.to_owned() };
+    let quoted = if s.contains(' ') {
+        format!("'{s}'")
+    } else {
+        s.to_owned()
+    };
     quoted.replace('\\', "\\\\").replace('"', "\\\"")
 }
 
@@ -251,7 +298,10 @@ fn yaml_escape(s: &str) -> String {
 #[must_use]
 pub fn tacky_borders(look: &Look) -> String {
     let (primary, tertiary) = (look.role("primary"), look.role("tertiary"));
-    let (inactive_a, inactive_b) = (look.role("outlineVariant"), look.role("surfaceContainerHighest"));
+    let (inactive_a, inactive_b) = (
+        look.role("outlineVariant"),
+        look.role("surfaceContainerHighest"),
+    );
     let anim = look.motion;
     let fx = look.glass == Glass::Max;
     format!(
@@ -300,6 +350,11 @@ window_rules:
   - {{ match: Process, name: \"Flow.Launcher\", enabled: false }}
   - {{ match: Process, name: \"AltSnap\", enabled: false }}
   - {{ match: Title, name: \"Picture-in-Picture\", enabled: false }}
+  # Transparent overlays (desktop pets, agent cursor overlays): a border around them draws a grey box over the desktop.
+  - {{ match: Title, name: \"OpenPets\", strategy: Contains, enabled: false }}
+  - {{ match: Title, name: \"AgentCursorOverlay\", strategy: Contains, enabled: false }}
+  - {{ match: Process, name: \"cua-driver\", enabled: false }}
+  - {{ match: Process, name: \"bunos-win11-wallpaper\", enabled: false }}
 "
     )
 }
@@ -397,7 +452,10 @@ pub fn render(look: &Look, dir: &Path) -> Result<Vec<std::path::PathBuf>> {
         ("glazewm/config.yaml", glazewm(look)),
         ("tacky-borders/config.yaml", tacky_borders(look)),
         ("altsnap/AltSnap.ini", altsnap(look)),
-        ("flow-launcher/UserData/Settings/Settings.json", flow_settings(look)),
+        (
+            "flow-launcher/UserData/Settings/Settings.json",
+            flow_settings(look),
+        ),
         ("zebar/bunos-theme.css", zebar_css(look)),
     ];
     let mut written = Vec::new();
@@ -418,7 +476,9 @@ pub fn render(look: &Look, dir: &Path) -> Result<Vec<std::path::PathBuf>> {
 /// The first `name` found on `PATH`.
 #[must_use]
 pub fn on_path(name: &str) -> Option<std::path::PathBuf> {
-    std::env::split_paths(&std::env::var_os("PATH")?).map(|d| d.join(name)).find(|p| p.is_file())
+    std::env::split_paths(&std::env::var_os("PATH")?)
+        .map(|d| d.join(name))
+        .find(|p| p.is_file())
 }
 
 #[cfg(test)]
@@ -431,19 +491,27 @@ mod tests {
             glass,
             motion,
             terminal: "wt".into(),
-            launcher: r"C:\Users\me\AppData\Local\bunos\desktop\flow-launcher\Flow.Launcher.exe".into(),
+            launcher: r"C:\Users\me\AppData\Local\bunos\desktop\flow-launcher\Flow.Launcher.exe"
+                .into(),
         }
     }
 
     #[test]
     fn glazewm_has_hyprland_bindings_gaps_and_animations() {
         let y = glazewm(&look(Glass::Max, true));
-        assert!(y.contains("bindings: [\"lwin+enter\"]") && y.contains("bindings: [\"lwin+space\"]"));
+        assert!(
+            y.contains("bindings: [\"lwin+enter\"]") && y.contains("bindings: [\"lwin+space\"]")
+        );
         assert!(y.contains("\"move --workspace 9\", \"focus --workspace 9\""));
-        assert!(y.contains("inner_gap: \"10px\"") && y.contains("cubic_bezier(0.05, 0.9, 0.1, 1.05)"));
+        assert!(
+            y.contains("inner_gap: \"10px\"") && y.contains("cubic_bezier(0.05, 0.9, 0.1, 1.05)")
+        );
         assert!(y.contains("window_open: { enabled: true"));
         assert!(y.contains("transparency: { enabled: true, opacity: \"86%\" }"));
-        assert!(y.contains(r"C:\\Users\\me"), "windows paths are YAML-escaped");
+        assert!(
+            y.contains(r"C:\\Users\\me"),
+            "windows paths are YAML-escaped"
+        );
     }
 
     #[test]
@@ -452,7 +520,10 @@ mod tests {
         assert!(y.contains("transparency: { enabled: false, opacity: \"100%\" }"));
         assert!(y.contains("window_move: { enabled: false"));
         let t = tacky_borders(&look(Glass::Reduced, false));
-        assert!(t.contains("effects:\n    enabled: false") && t.contains("animations:\n    enabled: false"));
+        assert!(
+            t.contains("effects:\n    enabled: false")
+                && t.contains("animations:\n    enabled: false")
+        );
         assert!(flow_settings(&look(Glass::Reduced, true)).contains("\"BackdropType\": 0"));
     }
 
@@ -460,7 +531,11 @@ mod tests {
     fn borders_use_the_m3_roles() {
         let l = look(Glass::Max, true);
         let t = tacky_borders(&l);
-        assert!(t.contains(&format!("colors: [\"{}\", \"{}\"]", l.role("primary"), l.role("tertiary"))));
+        assert!(t.contains(&format!(
+            "colors: [\"{}\", \"{}\"]",
+            l.role("primary"),
+            l.role("tertiary")
+        )));
         assert!(l.role("primary").starts_with('#') && l.role("primary").len() == 7);
     }
 
