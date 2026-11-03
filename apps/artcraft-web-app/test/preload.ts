@@ -9,3 +9,5 @@ await import("@aphrody/m3-config/test/dom");
 globalThis.Blob = nativeBlob;
 globalThis.File = nativeFile;
 globalThis.FormData = nativeFormData;
+
+export {};
