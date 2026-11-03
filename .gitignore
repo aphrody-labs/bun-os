@@ -9,6 +9,9 @@
 /install/
 /dist/
 /assets/presskit/__MACOSX/
+# Retired checkout of the migrated aphrody-labs/bun fork (packages/bun-os-plugins owns its additions); kept out of
+# status walks, which `cargo package` runs for every crate.
+/toolchains/
 
 # Nested source workspaces
 **/dist/
