@@ -1,0 +1,95 @@
+/* Source of _assets_/styles.css (build-styles.ts prepends @aphrody/m3-theme/tokens.css). Every colour is an M3
+   role: background/on-background for the page, surface-container/on-surface for fields and buttons, primary for
+   links and the hover border, secondary for the focus ring. */
+:root {
+  font-family: "Google Sans Flex", "Roboto Flex", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color: var(--md-sys-color-on-background);
+  background-color: var(--md-sys-color-background);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+.container {
+  margin: 0;
+  padding-top: 10vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: 0.75s;
+}
+
+.logo.tauri:hover {
+  filter: drop-shadow(0 0 2em #24c8db); /* design:content - Tauri brand colour around its logo */
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+}
+
+a {
+  font-weight: 500;
+  color: var(--md-sys-color-primary);
+  text-decoration: inherit;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  text-align: center;
+}
+
+input,
+button {
+  border-radius: 8px;
+  border: 1px solid var(--md-sys-color-outline);
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-surface-container);
+  transition: border-color 0.25s;
+  box-shadow: 0 2px 2px color-mix(in oklab, var(--md-sys-color-shadow) 20%, transparent);
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--md-sys-color-primary);
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, var(--md-sys-color-surface-container));
+}
+
+button:active {
+  border-color: var(--md-sys-color-primary);
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, var(--md-sys-color-surface-container));
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: 2px;
+}
+
+#greet-input {
+  margin-right: 5px;
+}

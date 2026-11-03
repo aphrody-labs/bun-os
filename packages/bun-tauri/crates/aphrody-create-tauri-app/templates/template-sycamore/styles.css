@@ -1,3 +1,3 @@
 .logo.sycamore:hover {
-  filter: drop-shadow(0 0 2em #f8b94c);
+  filter: drop-shadow(0 0 2em #f8b94c); /* design:content - framework brand colour around its logo */
 }
