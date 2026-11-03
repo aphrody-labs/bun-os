@@ -73,12 +73,25 @@ in the session (GNOME viewer), systemd user instance and D-Bus (`dbus-run-sessio
 
 ## Theme
 
-One token source: Omarchy's `colors.toml` (canonical keys of Omarchy's theming docs). `bunos-theme <name>` applies a
-theme to every installed desktop: Hyprland/Omarchy through `omarchy-theme-set`, COSMIC through `bunos-theme-set`
-(cosmic.ron from `factory/distro/cosmic-themes.ts`), GNOME through `gsettings` (color-scheme, nearest libadwaita
-accent) and libadwaita named colours in `~/.config/gtk-4.0/gtk.css`. The default look (Material 3 with macOS-style
-window controls) is produced by the design track from the M3 token source and installed by its packages; this
-layer adds hyprbars so Hyprland windows have title bars for those controls.
+Default look: Material 3 with macOS-style window controls on every desktop, produced by the design track from the
+single M3 token source (docs/DESIGN-M3-WINDOWS.md, `@aphrody/m3-os-themes design`). `bunos-design-m3` installs that
+artifact unchanged (keyed by the commit in its `receipt.json`): GTK 3/4 + libadwaita theme `BunOS-M3`, GNOME Shell
+theme, GNOME defaults as a gschema override (button layout close,minimize,maximize on the left, M3 fonts, icons),
+COSMIC system defaults in `/usr/share/cosmic` (theme builders, CosmicTk with the controls at the start), Hyprland
+chrome for hyprbars, the Omarchy-format palette `bunos-m3`, icon themes Aphrody-M3 / Aphrody-M3-Dark, the M3 fonts
+with `60-bunos-m3.conf`, and the wallpaper. Every Linux profile pulls it, and the first `bunos-session` applies
+`bunos-m3`.
+
+The switch is `bunos-theme <name>` over one token format, Omarchy's `colors.toml`: Hyprland/Omarchy through
+`omarchy-theme-set`, COSMIC through `bunos-theme-set` (cosmic.ron from `factory/distro/cosmic-themes.ts`), GNOME through
+`gsettings` (color-scheme, nearest libadwaita accent) and `~/.config/gtk-4.0/gtk.css` (the theme's own `gtk.css` when it
+ships one, otherwise libadwaita named colours generated from `colors.toml`).
+
+Window controls on the left in libcosmic apps: the design track's patch
+(`packages/m3-os-themes/patches/libcosmic-window-controls-start.patch`) is committed on the aphrody-labs/libcosmic fork
+(branch `bunos/window-controls-start`, on the pinned base `de9353ab`). COSMIC applications take libcosmic as a Cargo git
+dependency, so the controls move once those applications are rebuilt against the fork (`[patch]` to it); until then the
+Arch builds of the COSMIC apps keep the right-side controls.
 
 ## Packages
 

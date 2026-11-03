@@ -23,7 +23,7 @@ min_free="${DESKTOP_MIN_FREE_GIB:-12}"
 default=(
   sd fd ripgrep bat eza dust procs zoxide hyperfine tokei xh ouch just starship git-delta bottom gitui yazi atuin
   helix nushell zellij rio uutils-coreutils bunos-cli
-  bunos-desktop wlvncc cosmic-comp cosmic-session hyprland hyprland-plugin-hyprbars bunos-omarchy
+  bunos-design-m3 bunos-desktop wlvncc cosmic-comp cosmic-session hyprland hyprland-plugin-hyprbars bunos-omarchy
   mutter gnome-shell
 )
 pkgs=("$@")
@@ -39,6 +39,12 @@ for p in "${pkgs[@]}"; do
 done
 # bunos-desktop's sources are repository files.
 [[ ! -d "$work/bunos-desktop" ]] || cp "$here/bunos-desktop/"*.ts "$here/sessions.json" "$work/bunos-desktop/"
+# bunos-design-m3 installs the design track's artifact (docs/DESIGN-M3-WINDOWS.md), keyed by its receipt.
+design="${DESIGN_ARTIFACT:-$HOME/build/storage/artifacts/design/current}"
+if [[ -d "$work/bunos-design-m3" ]]; then
+  [[ -f "$design/receipt.json" ]] || { echo "no design artifact at $design" >&2; exit 2; }
+  mkdir -p "$work/bunos-design-m3/design" && cp -aL "$design/." "$work/bunos-design-m3/design/"
+fi
 [[ -f "$repo/bunos-testing.db.tar.zst" ]] || tar -cf - -T /dev/null | zstd -q >"$repo/bunos-testing.db.tar.zst"
 rm -f "$work/failed"
 

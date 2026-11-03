@@ -48,7 +48,9 @@ async function sessions(): Promise<Session[]> {
 /** WSLg's environment plus the session's; an empty value unsets the variable. */
 function environment(s: Session): Record<string, string | undefined> {
   const env: Record<string, string | undefined> = { ...process.env, XDG_SESSION_TYPE: "wayland" };
-  env.XDG_RUNTIME_DIR ??= existsSync("/mnt/wslg/runtime-dir") ? "/mnt/wslg/runtime-dir" : `/run/user/${process.getuid?.()}`;
+  env.XDG_RUNTIME_DIR ??= existsSync("/mnt/wslg/runtime-dir")
+    ? "/mnt/wslg/runtime-dir"
+    : `/run/user/${process.getuid?.()}`;
   for (const [k, v] of s.env) env[k] = v === "" ? undefined : v;
   return env;
 }
@@ -70,7 +72,8 @@ function plan(s: Session): string[][] {
 function preflight(s: Session) {
   if (!process.env.WAYLAND_DISPLAY && !existsSync("/mnt/wslg"))
     console.warn("bunos-session: no WSLg (WAYLAND_DISPLAY unset, /mnt/wslg absent); the window has nowhere to go");
-  for (const step of plan(s)) if (missing(step[0]!)) die(`${step[0]} is not installed (pacman -S ${s.packages.join(" ")})`);
+  for (const step of plan(s))
+    if (missing(step[0]!)) die(`${step[0]} is not installed (pacman -S ${s.packages.join(" ")})`);
   if (s.presentation === "headless-viewer" && !readdirSync("/dev/dri", { withFileTypes: true }).length)
     die("Hyprland's headless backend needs a DRM render node (vgem); /dev/dri is empty");
 }
@@ -97,6 +100,9 @@ async function run(s: Session) {
   mkdirSync(STATE, { recursive: true });
   await Bun.write(join(STATE, "session"), `${s.id}\n`);
   if (s.id === "omarchy") await seedOmarchy();
+  // First session: the design track's default look (bunos-design-m3) on every desktop; later the user's choice.
+  if (!existsSync(join(STATE, "theme")) && existsSync("/usr/share/bunos/themes/bunos-m3") && Bun.which("bunos-theme"))
+    await Bun.spawn(["bunos-theme", "bunos-m3"], { stdio: ["ignore", "inherit", "inherit"] }).exited;
   const env = environment(s);
   const [main, ...rest] = plan(s);
 
@@ -114,7 +120,10 @@ async function run(s: Session) {
   const vnc = Bun.spawn(rest[1]!, { env: inner, stdio: ["ignore", "inherit", "inherit"] });
   await Bun.sleep(300);
   // The viewer is the WSLg window: it talks to WSLg's compositor, not to Hyprland.
-  const viewer = Bun.spawn(rest[2]!, { env: { ...process.env, XDG_RUNTIME_DIR: env.XDG_RUNTIME_DIR }, stdio: ["inherit", "inherit", "inherit"] });
+  const viewer = Bun.spawn(rest[2]!, {
+    env: { ...process.env, XDG_RUNTIME_DIR: env.XDG_RUNTIME_DIR },
+    stdio: ["inherit", "inherit", "inherit"],
+  });
   const code = await Promise.race([viewer.exited, compositor.exited]);
   for (const p of [viewer, vnc, compositor]) p.kill();
   process.exit(code);
@@ -130,8 +139,15 @@ async function seedOmarchy() {
 }
 
 async function choose(all: Session[]): Promise<Session> {
-  const last = (await Bun.file(join(STATE, "session")).text().catch(() => "")).trim();
-  const def = Math.max(0, all.findIndex(s => s.id === last));
+  const last = (
+    await Bun.file(join(STATE, "session"))
+      .text()
+      .catch(() => "")
+  ).trim();
+  const def = Math.max(
+    0,
+    all.findIndex(s => s.id === last),
+  );
   all.forEach((s, i) => console.log(`${i === def ? "*" : " "} ${i + 1}. ${s.id.padEnd(12)} ${s.title}`));
   const answer = (prompt(`session [${def + 1}]:`) ?? "").trim();
   const pick = answer === "" ? def : Number(answer) - 1;

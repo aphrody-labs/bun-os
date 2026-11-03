@@ -18,6 +18,7 @@
       "packages": [
         "bunos-desktop",
         "bunos-cli",
+        "bunos-design-m3",
         "cosmic-session",
         "cosmic-comp",
         "cosmic-panel",
@@ -49,6 +50,7 @@
       "packages": [
         "bunos-desktop",
         "bunos-cli",
+        "bunos-design-m3",
         "cosmic-comp"
       ],
       "presentation": "nested-window",
@@ -81,6 +83,7 @@
       "packages": [
         "bunos-desktop",
         "bunos-cli",
+        "bunos-design-m3",
         "hyprland",
         "xdg-desktop-portal-hyprland",
         "waybar",
@@ -118,6 +121,7 @@
       "packages": [
         "bunos-desktop",
         "bunos-cli",
+        "bunos-design-m3",
         "bunos-omarchy",
         "hyprland",
         "wayvnc",
@@ -147,6 +151,7 @@
       "packages": [
         "bunos-desktop",
         "bunos-cli",
+        "bunos-design-m3",
         "gnome-shell",
         "mutter",
         "gnome-session",

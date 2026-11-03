@@ -9,7 +9,7 @@ arch=(any)
 url='https://github.com/aphrody-labs/bun-os'
 license=('Apache-2.0' 'MIT')
 # bun itself is part of the distro base (factory/wsl/bunos-wsl.sh installs the pinned canary as /usr/bin/bun).
-depends=('dbus' 'xorg-xwayland')
+depends=('dbus' 'xorg-xwayland' 'bunos-design-m3')
 optdepends=(
   'bunos-omarchy: Omarchy session (Hyprland + Omarchy configs, menus and themes)'
   'cosmic-session: COSMIC session'

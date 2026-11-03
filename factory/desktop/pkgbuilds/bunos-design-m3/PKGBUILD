@@ -1,0 +1,63 @@
+# Bun OS default look on every Linux desktop: Material 3 with macOS-style window controls, produced by the design
+# track (@aphrody/m3-os-themes design, docs/DESIGN-M3-WINDOWS.md) from the single M3 token source. This recipe only
+# installs that artifact; it defines no theme of its own. factory/desktop/build.sh copies the artifact
+# (~/build/storage/artifacts/design/current on vps, keyed by the commit in receipt.json) into ./design.
+pkgname=bunos-design-m3
+pkgver=0
+pkgrel=1
+pkgdesc='Bun OS M3 design defaults: GTK/libadwaita, GNOME Shell, COSMIC, Hyprland + hyprbars, Omarchy palette, Aphrody-M3 icons, M3 fonts'
+arch=(any)
+url='https://github.com/aphrody-labs/bun-os'
+license=('Apache-2.0' 'OFL-1.1')
+depends=('fontconfig' 'hicolor-icon-theme')
+optdepends=('hyprland-plugin-hyprbars: title bars with the window controls on Hyprland')
+source=()
+
+pkgver() {
+  local c d
+  c=$(sed -n 's/^  "commit": "\([0-9a-f]\{12\}\).*/\1/p' design/receipt.json | head -1)
+  d=$(sed -n 's/^  "created": "\([0-9-]*\)T.*/\1/p' design/receipt.json | head -1)
+  printf '%s.g%s' "${d//-/}" "$c"
+}
+
+package() {
+  local d="$startdir/design" s="$pkgdir/usr/share"
+  install -d "$s/themes" "$s/icons" "$s/fonts/bunos-m3" "$s/bunos/design" "$s/bunos/themes" "$s/backgrounds/bunos" \
+    "$s/cosmic" "$s/fontconfig/conf.avail" "$pkgdir/etc/fonts/conf.d" "$s/glib-2.0/schemas"
+  # GTK 3/4 + libadwaita, GNOME Shell
+  cp -a "$d/gtk/BunOS-M3" "$s/themes/"
+  cp -a "$d/os/gnome/themes/M3-BunOS" "$s/themes/"
+  # icon themes
+  cp -a "$d/icons/freedesktop/." "$s/icons/"
+  # fonts (OFL / Apache-2.0, licences beside them)
+  install -m644 "$d"/fonts/*.ttf "$s/fonts/bunos-m3/"
+  install -Dm644 -t "$s/licenses/$pkgname/fonts" "$d"/fonts/licenses/*
+  install -m644 "$d/fonts/fontconfig/60-bunos-m3.conf" "$s/fontconfig/conf.avail/"
+  ln -s /usr/share/fontconfig/conf.avail/60-bunos-m3.conf "$pkgdir/etc/fonts/conf.d/60-bunos-m3.conf"
+  # COSMIC system defaults (cosmic-config reads /usr/share/cosmic): theme builders, mode, CosmicTk (controls at start)
+  cp -a "$d/os/cosmic/config/." "$s/cosmic/"
+  cp -a "$d/cosmic/com.system76.CosmicTk" "$s/cosmic/"
+  # Hyprland chrome (hyprbars buttons, rounding, shadows, M3 motion) and the Omarchy-format palette bunos-theme applies
+  cp -a "$d/hyprland" "$s/bunos/design/"
+  cp -a "$d/omarchy/bunos-m3" "$s/bunos/themes/"
+  install -d "$s/omarchy/themes" && ln -s /usr/share/bunos/themes/bunos-m3 "$s/omarchy/themes/bunos-m3"
+  cp -a "$d/wallpaper/." "$s/backgrounds/bunos/"
+  install -m644 "$d/receipt.json" "$s/bunos/design/receipt.json"
+  # GNOME defaults (glib2's pacman hook compiles the schemas)
+  cat >"$s/glib-2.0/schemas/90-bunos-m3.gschema.override" <<'EOF'
+[org.gnome.desktop.interface]
+gtk-theme='BunOS-M3'
+icon-theme='Aphrody-M3'
+font-name='Google Sans Flex 11'
+document-font-name='Google Sans Flex 11'
+monospace-font-name='Google Sans Code 11'
+color-scheme='prefer-dark'
+
+[org.gnome.desktop.wm.preferences]
+button-layout='close,minimize,maximize:appmenu'
+titlebar-font='Google Sans Flex Semi-Bold 11'
+EOF
+  # GTK defaults for new users outside GNOME (Hyprland, COSMIC apps using GTK)
+  install -Dm644 "$d/gtk/BunOS-M3/gtk-3.0/settings.ini" "$pkgdir/etc/skel/.config/gtk-3.0/settings.ini"
+  install -Dm644 "$d/gtk/BunOS-M3/gtk-4.0/settings.ini" "$pkgdir/etc/skel/.config/gtk-4.0/settings.ini"
+}

@@ -99,22 +99,23 @@ impl Desktop {
 
     /// Bun OS pacman packages the profile needs in the WSL guest (empty for the native profile). Names match the
     /// Bun OS Arch-style repos; upstreams live under `vendor/` as pinned forks built from source
-    /// (factory/desktop/pkgbuilds). Every Linux profile also pulls `bunos-desktop` (chooser, theme) and `bunos-cli`.
+    /// (factory/desktop/pkgbuilds). Every Linux profile also pulls `bunos-desktop` (chooser, theme switch), `bunos-cli`
+    /// and `bunos-design-m3` (the design track's M3 + macOS-controls defaults, docs/DESIGN-M3-WINDOWS.md).
     #[must_use]
     pub fn packages(self) -> &'static [&'static str] {
         match self {
             Self::Cosmic => &[
-                "bunos-desktop", "bunos-cli", "cosmic-session", "cosmic-comp", "cosmic-panel", "cosmic-launcher",
+                "bunos-desktop", "bunos-cli", "bunos-design-m3", "cosmic-session", "cosmic-comp", "cosmic-panel", "cosmic-launcher",
                 "cosmic-settings", "cosmic-files", "cosmic-term", "xdg-desktop-portal-cosmic",
             ],
-            Self::CosmicComp => &["bunos-desktop", "bunos-cli", "cosmic-comp"],
+            Self::CosmicComp => &["bunos-desktop", "bunos-cli", "bunos-design-m3", "cosmic-comp"],
             Self::Hyprland => &[
-                "bunos-desktop", "bunos-cli", "hyprland", "xdg-desktop-portal-hyprland", "waybar", "mako", "wayvnc",
+                "bunos-desktop", "bunos-cli", "bunos-design-m3", "hyprland", "xdg-desktop-portal-hyprland", "waybar", "mako", "wayvnc",
                 "wlvncc",
             ],
-            Self::Omarchy => &["bunos-desktop", "bunos-cli", "bunos-omarchy", "hyprland", "wayvnc", "wlvncc"],
+            Self::Omarchy => &["bunos-desktop", "bunos-cli", "bunos-design-m3", "bunos-omarchy", "hyprland", "wayvnc", "wlvncc"],
             Self::Gnome => &[
-                "bunos-desktop", "bunos-cli", "gnome-shell", "mutter", "gnome-session", "gnome-control-center",
+                "bunos-desktop", "bunos-cli", "bunos-design-m3", "gnome-shell", "mutter", "gnome-session", "gnome-control-center",
                 "nautilus", "xdg-desktop-portal-gnome",
             ],
             Self::WindowsMac | Self::WindowsHyprland => &[],
@@ -312,7 +313,9 @@ mod tests {
             assert_eq!(d.is_wsl(), d.presentation().is_some(), "{}", d.id());
             assert_eq!(d.is_wsl(), d.wslg_launch().is_some(), "{}", d.id());
             if d.is_wsl() {
-                assert!(d.packages().contains(&"bunos-desktop") && d.packages().contains(&"bunos-cli"));
+                for p in ["bunos-desktop", "bunos-cli", "bunos-design-m3"] {
+                    assert!(d.packages().contains(&p), "{} lacks {p}", d.id());
+                }
             }
         }
     }
