@@ -32,14 +32,14 @@ the owner (listed under "Owner-only").
       Needs the owner's decision on the 248 GB WiredTiger data (see Owner-only).
 
 ### Product (docs/PRODUCT.md rows still not done)
-- [ ] #12 aphrody.com serves the desktop session. Step done 2026-11-04: the repo unit of aphrody-webos is installed
-      (WEBOS_SESSION = the Android 17 gateway on 127.0.0.1:8799, native mode, token /etc/aphrody/android.token), so
-      `/api/health` reports `session ok true` and the client now says "Sign in with the Bun OS owner Google account
-      first" (sessions are owner-only). Still open: (a) verify the stream after an owner sign-in (owner action:
-      Google sign-in), (b) run the unified COSMIC session container (`bunos-unified:session`, contract in
-      docs/UNIFIED-IMAGE.md, gateway :8794, token /run/secrets/session.token) as a service and point WEBOS_SESSION at
-      it; the container `sleepy_cori` running for 15 h is an old test without a token (stream gateway not started).
-      Then the client items of docs/agent-goals/session-2026-11-03-sites-design-auto.md (iced report).
+- [ ] #12 aphrody.com serves the desktop session. Done 2026-11-04 (8427e3456c): the unified COSMIC session runs as
+      `aphrody-webos-session.service` (container `bunos-webos-session`, ready marker present, cage + cosmic-comp +
+      aphrody-remote-desktop; loopback :18794, token file ~/apps/webos/secrets/session/session.token) and the
+      aphrody-webos bridge streams it (WEBOS_SESSION=ws://127.0.0.1:18794/ws, non-native wire, `?token=`); the gateway
+      answers 101 with the token and 401 without. `/api/health` session ok true. Not verified from outside: the
+      owner-gated stream itself (needs the owner's Google sign-in on aphrody.com; owner action). Then the client
+      items of docs/agent-goals/session-2026-11-03-sites-design-auto.md (iced report). The old test container
+      `sleepy_cori` (15 h, no token) is not ours: left alone.
 - [ ] #9 Android 17 in the session reaches a booted state (nightly qualification passes); unblocks #10.
 - [ ] #23 apt feed `aphrody.com/repo/apt` answers (404 today); #26 row updated to point at the published ISO.
 - [ ] #33 OpenAPI for every HTTP service (3 of 79 today); #36 crates and npm publication finished.
