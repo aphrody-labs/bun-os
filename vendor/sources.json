@@ -633,7 +633,9 @@
     "glazewm": {
       "origin": "https://github.com/aphrody-labs/glazewm.git",
       "upstream": "https://github.com/glzr-io/glazewm.git",
-      "path": "glazewm"
+      "path": "glazewm",
+      "branch": "bunos",
+      "patches": "bunos branch = upstream main + glzr-io/glazewm#1392 (window/workspace animations)"
     },
     "brush": {
       "origin": "https://github.com/aphrody-labs/brush.git",
@@ -839,6 +841,26 @@
       "origin": "https://github.com/aphrody-labs/wlvncc.git",
       "upstream": "https://github.com/any1/wlvncc.git",
       "path": "wlvncc"
+    },
+    "zebar": {
+      "origin": "https://github.com/aphrody-labs/zebar.git",
+      "upstream": "https://github.com/glzr-io/zebar.git",
+      "path": "zebar"
+    },
+    "tacky-borders": {
+      "origin": "https://github.com/aphrody-labs/tacky-borders.git",
+      "upstream": "https://github.com/luke-you/tacky-borders.git",
+      "path": "tacky-borders"
+    },
+    "flow-launcher": {
+      "origin": "https://github.com/aphrody-labs/Flow.Launcher.git",
+      "upstream": "https://github.com/Flow-Launcher/Flow.Launcher.git",
+      "path": "flow-launcher"
+    },
+    "altsnap": {
+      "origin": "https://github.com/aphrody-labs/AltSnap.git",
+      "upstream": "https://github.com/RamonUnch/AltSnap.git",
+      "path": "altsnap"
     }
   },
   "references": {
@@ -860,6 +882,12 @@
     "packageManager": "native pacman"
   },
   "rootGitOwners": [
+    {
+      "path": "altsnap",
+      "revision": "e35ef154354260beea85cace25fede4f2758f0b7",
+      "origin": "https://github.com/aphrody-labs/AltSnap.git",
+      "initialized": true
+    },
     {
       "path": "bash",
       "revision": "9c465866b7d849378369ef700cbe2965aa9691e3",
@@ -1005,6 +1033,12 @@
       "initialized": false
     },
     {
+      "path": "flow-launcher",
+      "revision": "947ba49f4f05d06843f9dc7114bc6c207a9c4fde",
+      "origin": "https://github.com/aphrody-labs/Flow.Launcher.git",
+      "initialized": true
+    },
+    {
       "path": "frzr",
       "revision": "4d15ebe4fdff0925691f6a1c2766af0c5ca26314",
       "origin": "https://github.com/aphrody-labs/frzr.git",
@@ -1018,7 +1052,7 @@
     },
     {
       "path": "glazewm",
-      "revision": "5709ad0a3c7c386bbc3e38166a865ffc12937515",
+      "revision": "d76641418f9642837b63817a8eeed7fbed4aadb5",
       "origin": "https://github.com/aphrody-labs/glazewm.git",
       "initialized": true
     },
@@ -1275,6 +1309,12 @@
       "initialized": false
     },
     {
+      "path": "tacky-borders",
+      "revision": "31643ca00d51e48957c38b2c463936616cc945dd",
+      "origin": "https://github.com/aphrody-labs/tacky-borders.git",
+      "initialized": true
+    },
+    {
       "path": "tensaku",
       "revision": "4bcd8339bc22e74bd81c9f3efdfdfcbcf461db70",
       "origin": "https://github.com/aphrody-labs/tensaku.git",
@@ -1356,6 +1396,12 @@
       "path": "xh",
       "revision": "319d39c2561d2a8697acb3eb9800abcc33bbad98",
       "origin": "https://github.com/aphrody-labs/xh.git",
+      "initialized": true
+    },
+    {
+      "path": "zebar",
+      "revision": "5f90d341867122175cb4a57af594a44752885056",
+      "origin": "https://github.com/aphrody-labs/zebar.git",
       "initialized": true
     },
     {

@@ -1609,6 +1609,7 @@
 	path = vendor/glazewm
 	url = https://github.com/aphrody-labs/glazewm.git
 	shallow = true
+	branch = bunos
 [submodule "vendor/zoxide"]
 	path = vendor/zoxide
 	url = https://github.com/aphrody-labs/zoxide.git
@@ -1735,3 +1736,19 @@
 	url = https://github.com/aphrody-labs/wlvncc.git
 	shallow = true
 	update = none
+[submodule "vendor/zebar"]
+	path = vendor/zebar
+	url = https://github.com/aphrody-labs/zebar.git
+	shallow = true
+[submodule "vendor/tacky-borders"]
+	path = vendor/tacky-borders
+	url = https://github.com/aphrody-labs/tacky-borders.git
+	shallow = true
+[submodule "vendor/flow-launcher"]
+	path = vendor/flow-launcher
+	url = https://github.com/aphrody-labs/Flow.Launcher.git
+	shallow = true
+[submodule "vendor/altsnap"]
+	path = vendor/altsnap
+	url = https://github.com/aphrody-labs/AltSnap.git
+	shallow = true
