@@ -15,7 +15,8 @@
  */
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { createRequire } from 'node:module'
+import { dirname, resolve } from 'node:path'
 import { quelldateien, quelltext } from './quelldateien'
 import {
   ICON_SM,
@@ -55,17 +56,24 @@ describe('die Leiter ist drei Zahlen, und sie stehen an einer Stelle', () => {
 describe('die optische Korrektur ist Arithmetik, gegen die echte lucide-Formel', () => {
   /**
    * Die Formel steht im installierten Paket, nicht in diesem Test:
-   *   absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth
+   *   absoluteStrokeWidth ? strokeWidth * (Rastergroesse 24) / size : strokeWidth
    * Wir lesen sie, damit ein lucide-Update, das sie aendert, hier auffaellt.
+   * Seit lucide-react 1.x steht der Context in Icon.mjs und die Rechnung in
+   * shared/src/build/buildLucideIconNode.mjs. Aufgeloest wird das Paket wie
+   * der Bundler es tut: im Arbeitsbereich liegt es gehoben in der Wurzel.
    */
-  const lucideIcon = readFileSync(
-    resolve(ROOT, 'node_modules', 'lucide-react', 'dist', 'esm', 'Icon.js'),
-    'utf8',
+  const lucideEsm = resolve(
+    dirname(createRequire(resolve(ROOT, 'package.json')).resolve('lucide-react/package.json')),
+    'dist',
+    'esm',
   )
+  const lucideIcon = readFileSync(resolve(lucideEsm, 'Icon.mjs'), 'utf8')
+  const lucideNode = readFileSync(resolve(lucideEsm, 'shared', 'src', 'build', 'buildLucideIconNode.mjs'), 'utf8')
 
   it('lucide rechnet bei absoluteStrokeWidth wirklich `strokeWidth * 24 / size`', () => {
-    expect(lucideIcon).toContain('* 24 / Number(size ?? contextSize)')
-    expect(lucideIcon).toContain('absoluteStrokeWidth ?? contextAbsoluteStrokeWidth')
+    expect(lucideNode).toMatch(/params\.absoluteStrokeWidth \? Number\(params\.strokeWidth[^)]*\) \* Number\(icon\.size[^)]*\) \/ Number\(params\.size/)
+    expect(lucideIcon).toContain('absoluteStrokeWidth: absoluteStrokeWidth ?? contextAbsoluteStrokeWidth')
+    expect(lucideIcon).toContain('size: contextSize = 24')
   })
 
   it('lucide liest Default-Groesse und -Staerke wirklich aus dem Context', () => {

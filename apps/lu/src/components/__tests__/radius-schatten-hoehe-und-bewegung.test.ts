@@ -43,7 +43,8 @@
  */
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { createRequire } from 'node:module'
+import { dirname, resolve } from 'node:path'
 import { contrast, over } from './wcag-contrast'
 import { quelldateien, quelltext } from './quelldateien'
 
@@ -81,7 +82,10 @@ const WURZEL_PX = Number(CSS_CODE.match(/html\s*\{[^}]*font-size:\s*(\d+)px/)?.[
  * der Blick ins Fenster.
  */
 function tailwindRadien(): Map<string, string> {
-  const theme = readFileSync(resolve(ROOT, 'node_modules', 'tailwindcss', 'theme.css'), 'utf8')
+  // Aufgeloest wie der Bundler es tut: im Arbeitsbereich liegt das Paket
+  // gehoben in der Wurzel, nicht unter apps/lu/node_modules.
+  const paket = dirname(createRequire(resolve(ROOT, 'package.json')).resolve('tailwindcss/package.json'))
+  const theme = readFileSync(resolve(paket, 'theme.css'), 'utf8')
   const m = new Map<string, string>()
   for (const t of theme.matchAll(/--radius-([a-z0-9]+):\s*([^;]+);/g)) m.set(t[1], t[2].trim())
   return m
@@ -220,19 +224,12 @@ describe('ein Schatten kann im Dunkeln nichts heben — die Rechnung', () => {
     expect(contrast(over('#ffffff', '#1e1e1e', 0.15), '#1e1e1e')).toBeGreaterThan(1.5)
   })
 
-  it('die Regel schaltet GENAU den Schatten ab, nicht die Ringe daneben', () => {
-    // Tailwind 4 baut `box-shadow` aus fuenf Variablen zusammen.
-    // `box-shadow: none` haette jeden `ring-*` auf demselben Element
-    // mitgeloescht; im Fenster nachgemessen ueberlebt der Ring so.
-    const regel = CSS_CODE.match(/\.dark\s+\.shadow-sm\s*\{([^}]*)\}/)?.[1] ?? ''
-    expect(regel, 'es gibt keine .dark .shadow-sm-Regel').not.toBe('')
-    const deklarationen = regel.split(';').map((s) => s.trim()).filter(Boolean)
-    expect(deklarationen).toEqual(['--tw-shadow: 0 0 #0000'])
-    expect(regel).not.toContain('box-shadow')
-  })
-
-  it('im Hellmodus wird nichts abgeschaltet', () => {
-    expect(CSS_CODE).not.toMatch(/\.light\s+\.shadow-sm/)
+  it('kein Modus schaltet einen Schatten von Hand um: die Hoehe kommt aus den M3-Stufen', () => {
+    // Die Schatten des Hauses sind die Elevation-Stufen des generierten
+    // Blatts (Schattenrolle mit 0,30 / 0,15), in beiden Modi dieselben.
+    expect(CSS_CODE).not.toMatch(/\.(dark|light)\s+\.shadow-/)
+    expect(CSS_CODE).toMatch(/--shadow-lg:\s*var\(--md-sys-elevation-level3\);/)
+    expect(CSS_CODE).toMatch(/--shadow-xl:\s*var\(--md-sys-elevation-level4\);/)
   })
 })
 
@@ -474,8 +471,7 @@ describe('das Schwebeblatt kommt aus einem Rezept, nicht aus einer Kette', () =>
       expect(STUFEN.has(werk), `shadow-${werk} ist Werkseinstellung und hat eine Call-Site`).toBe(false)
     }
     // Umgekehrt: jede Stufe, die geschrieben wird, ist im @theme-Block
-    // ueberschrieben — bis auf `sm`, das die Hausregel `.dark .shadow-sm`
-    // im Dunkeln abschaltet statt es zu ueberschreiben.
+    // ueberschrieben, bis auf `sm`, die Werkseinstellung fuer den Schalter.
     for (const stufe of STUFEN.keys()) {
       if (stufe === 'sm') continue
       expect(CSS_CODE, `--shadow-${stufe} wird geschrieben, aber nicht ueberschrieben`)
@@ -486,10 +482,12 @@ describe('das Schwebeblatt kommt aus einem Rezept, nicht aus einer Kette', () =>
   it('`.lu-elevated` ist wirklich in Gebrauch und bringt Flaeche, Kante UND Schatten mit', () => {
     const regel = CSS_CODE.match(/\.lu-elevated\s*\{([^}]*)\}/)?.[1] ?? ''
     expect(regel, 'es gibt keine .lu-elevated-Regel').not.toBe('')
-    expect(regel).toContain('var(--color-lu-sheet)')
-    expect(regel).toContain('border:')
-    expect(regel).toContain('var(--shadow-xl)')
-    expect(CSS_CODE).toMatch(/\.light\s+\.lu-elevated/)
+    // Die Menueflaeche des M3-Schemas, eine outline-variant-Kante und die
+    // Hoehe aus der Leiter, fuer beide Modi in EINER Regel.
+    expect(regel).toContain('background: var(--md-sys-color-surface-container)')
+    expect(regel).toContain('border: 1px solid var(--md-sys-color-outline-variant)')
+    expect(regel).toContain('var(--shadow-lg)')
+    expect(CSS_CODE).not.toMatch(/\.(light|dark)\s+\.lu-elevated/)
     const n = (CODE.match(/(?<![\w-])lu-elevated(?![\w-])/g) ?? []).length
     expect(n).toBeGreaterThanOrEqual(15)
   })

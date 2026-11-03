@@ -1,311 +1,152 @@
 /**
- * D-T05 (zwei Akzente nebeneinander) und D-T06 (die Shell malt Literale).
+ * Zwei Akzente und eine Leinwand, seit dem Bun-OS-Designsystem als Rollen
+ * EINES generierten Material-3-Schemas.
  *
- * ── D-T05: der Audit hatte recht in der Beobachtung und unrecht im Schluss ──
+ * Bis November 2026 standen hier ein eigener Haus-Akzent (`--color-lu-accent`
+ * mit Hover-, Kanten- und Tintenstufe), ein Cloud-Akzent (`--color-lu-cloud`)
+ * und eine handgeschriebene Flaechenleiter (`--color-lu-canvas/base/panel/
+ * overlay/sheet`), dunkel und ohne Hell-Gegenstueck. Jetzt gilt:
  *
- * Beobachtung, am 01.09.2026 nachgezaehlt: `--color-lu-accent` ist #a094f8,
- * #7c3aed stand an 20 Stellen in drei Dateien als Literal, und das
- * Brand-Kit-Violett #8b5cf6 kommt in `src/` 0x vor. Der naheliegende
- * Schluss — auf EINEN Hex zusammenfallen — ist nachgerechnet falsch.
+ *   Haus-Akzent  → primary / on-primary / primary-container
+ *   Cloud        → tertiary / on-tertiary / tertiary-container
+ *                  (Cloud ist ein GELDZUSTAND und traegt deshalb eine eigene
+ *                  Rolle, nicht die Hausmarke)
+ *   Leinwand     → surface; Pane, Panel, Overlay, Blatt → surface-container-*
  *
- * Es sind keine zwei Marken, es sind zwei ROLLEN. #7c3aed steht
- * ausschliesslich an der Cloud, und Cloud ist in dieser App ein
- * Geldzustand. Und es ist die einzige Farbe der vier Kandidaten, die an
- * ihren eigenen Call-Sites AA haelt. Dieser Test rechnet alle vier nach,
- * damit die Ablehnung eine Zahl hat und keine Meinung ist.
- *
- * Geaendert wurde deshalb nicht die Farbe, sondern ihre Herkunft: aus
- * zwanzig Literalen wird eine Definition.
- *
- * ── D-T06: EIN Token dazu, und begruendet KEINE gespiegelte Leiter ──
- *
- * Die Flaechenleiter hiess an ihrer untersten Stufe „app canvas", aber die
- * Leinwand der App ist #141414 und nicht #202020. Gezaehlt:
- *
- *     #141414  9 Fundstellen  kein Token   ← die meistbenutzte Flaeche
- *     #1e1e1e  5 Fundstellen  kein Token
- *     --color-lu-base   #202020  2 Fundstellen (zwei Modale)
- *     --color-lu-raised #2d2d2d  0 Fundstellen — im Fenster als LEERE
- *                                Variable gemessen
- *
- * Ein Token dazu (`--color-lu-canvas`), und die Migration betrifft
- * ausschliesslich die DUNKLE Seite: das helle Gegenstueck jeder Call-Site
- * bleibt Zeichen fuer Zeichen stehen, der Tausch ist damit in beiden Modi
- * folgenlos.
- *
- * ── Was hier NICHT geprueft werden kann ──
- *
- *   • ob Violett die richtige Cloud-Farbe ist. Geprueft wird nur, dass sie
- *     lesbar ist und aus einer Quelle kommt.
- *   • ob #1e1e1e ein Token bekommen sollte. Es teilt seinen Wert mit der
- *     Sidebar, und die gehoert in diesem Durchgang einem anderen Agenten.
- *   • ob die drei verbliebenen #141414-Literale falsch sind. Sie stehen in
- *     Dateien, die dieser Durchgang nur lesen darf; sie sind hier gezaehlt.
+ * Beide Modi kommen aus demselben Seed, die Werte stehen im generierten
+ * Blatt `@aphrody/m3-theme/tokens.css`; dieser Test rechnet gegen genau diese
+ * Werte und haelt fest, dass index.css keine eigene Palette mehr fuehrt.
  *
  * Run: npx vitest run src/components/__tests__/zwei-akzente-und-eine-leinwand.test.ts
  */
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { contrast, over } from './wcag-contrast'
+import { contrast } from './wcag-contrast'
 import { quelldateien, quelltext } from './quelldateien'
+import { FLAECHEN, INDEX_CODE as CSS_CODE, SCHEMES, rolle } from './m3-rollen'
+import { SHEET } from '../../mobile/styles/sheet/colours.g'
 
 const SRC = resolve(__dirname, '..', '..')
-const CSS = readFileSync(resolve(SRC, 'index.css'), 'utf8')
 const nurCode = (s: string) =>
   s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1')
-const CSS_CODE = nurCode(CSS)
 
 const DATEIEN = quelldateien(SRC)
-const ALL = DATEIEN.map(([, s]) => s).join('\n')
 
-/** Ein Farbtoken aus index.css lesen — nicht aus dem Gedaechtnis. */
-function token(name: string): string {
-  const v = CSS_CODE.match(new RegExp(`--color-${name}:\\s*(#[0-9a-fA-F]{6})`))?.[1]
-  if (!v) throw new Error(`kein Token --color-${name}`)
-  return v.toLowerCase()
-}
-
-// ── D-T05 ──────────────────────────────────────────────────────────────
-
-describe('der Cloud-Akzent ist eine Rolle, keine zweite Marke', () => {
-  const CLOUD = token('lu-cloud')
-  const LIFT = token('lu-cloud-lift')
-  const HAUS = token('lu-accent')
-  const KANTE = token('lu-accent-edge')
-  const BRANDKIT = '#8b5cf6'
-
-  /** Die sechs Textstellen der Cloud, mit ihren echten Deckungen. */
-  const stellen = (hell: string, dunkel: string) => [
-    contrast(hell, over(hell, '#ffffff', 0.15)), // Abzeichen ueber dem Eingabefeld
-    contrast(dunkel, over(dunkel, '#1e1e1e', 0.15)),
-    contrast(hell, over(hell, '#ffffff', 0.10)), // Cloud-Schalter
-    contrast(dunkel, over(dunkel, '#1e1e1e', 0.10)),
-    contrast(hell, over(hell, '#ffffff', 0.05)), // Kachel im Gate-Dialog
-    contrast(dunkel, over(dunkel, '#1e1e1e', 0.05)),
-  ]
-  const minimum = (hell: string, dunkel: string) => Math.min(...stellen(hell, dunkel))
-
-  it('das heutige Paar haelt AA an jeder seiner Stellen', () => {
-    expect(minimum(CLOUD, LIFT)).toBeGreaterThanOrEqual(4.5)
+describe('index.css fuehrt keine eigene Palette mehr', () => {
+  it('keine --color-lu-*-Stufe und kein --pk-*-Satz', () => {
+    expect(CSS_CODE).not.toMatch(/--color-lu-[a-z-]+\s*:/)
+    expect(CSS_CODE).not.toMatch(/--pk-[a-z0-9-]+/)
+    expect(CSS_CODE).not.toMatch(/var\(--color-lu-/)
   })
 
-  it('und jeder Kollaps auf EINE Farbe faellt durch — mit Zahlen', () => {
-    // A: nur der Haus-Akzent. B: das Brand-Kit-Violett. C: das Haus-PAAR.
-    // Alle drei liegen unter 4,5:1, alle drei kosten gegenueber heute.
-    const heute = minimum(CLOUD, LIFT)
-    const a = minimum(HAUS, HAUS)
-    const b = minimum(BRANDKIT, BRANDKIT)
-    const c = minimum(KANTE, HAUS)
-    for (const [name, wert] of [['A #a094f8', a], ['B #8b5cf6', b], ['C Hauspaar', c]] as const) {
-      expect(wert, `${name} haelt AA — dann waere die Ablehnung falsch`).toBeLessThan(4.5)
-      expect(wert, `${name} ist nicht schlechter als heute`).toBeLessThan(heute)
+  it('die generierten Blaetter werden geladen, Tailwind zuerst', () => {
+    const order = [
+      '@import "tailwindcss"',
+      '@import "@aphrody/m3-tokens/m3-tokens.css"',
+      '@import "@aphrody/m3-theme/tokens.css"',
+      '@import "@aphrody/m3-theme/tailwind.css"',
+    ].map((s) => CSS_CODE.indexOf(s))
+    expect(order.every((i) => i >= 0), JSON.stringify(order)).toBe(true)
+    expect([...order].sort((a, b) => a - b)).toEqual(order)
+  })
+})
+
+describe('der Cloud-Akzent ist eine eigene Rolle, keine zweite Marke', () => {
+  it.each(SCHEMES)('%s: tertiary ist nicht primary', (_name, scheme) => {
+    expect(rolle(scheme, 'tertiary')).not.toBe(rolle(scheme, 'primary'))
+  })
+
+  it.each(SCHEMES)('%s: die gefuellte Cloud-Flaeche traegt ihren Text mit AA', (_name, scheme) => {
+    expect(contrast(rolle(scheme, 'on-tertiary'), rolle(scheme, 'tertiary'))).toBeGreaterThanOrEqual(4.5)
+    expect(contrast(rolle(scheme, 'on-tertiary-container'), rolle(scheme, 'tertiary-container'))).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it.each(SCHEMES)('%s: Cloud- und Haus-Schrift halten AA auf jeder Flaeche', (_name, scheme) => {
+    for (const r of ['tertiary', 'primary']) {
+      for (const f of FLAECHEN) expect(contrast(rolle(scheme, r), rolle(scheme, f)), `${r} auf ${f}`).toBeGreaterThanOrEqual(4.5)
     }
   })
 
-  it('die gefuellte Cloud-Flaeche traegt weissen Text in BEIDEN Modi', () => {
-    // Sie hat bewusst kein dark:-Gegenstueck; deshalb muss die eine Farbe
-    // fuer beide reichen.
-    expect(contrast('#ffffff', CLOUD)).toBeGreaterThanOrEqual(4.5)
-    // Mit dem Haus-Akzent waere genau das nicht mehr wahr.
-    expect(contrast('#ffffff', HAUS)).toBeLessThan(3)
-  })
-
-  it('kein einziges Cloud-Literal ist uebrig', () => {
+  it('kein Akzent-Literal ist im Code uebrig', () => {
+    // Haus (#a094f8 Ruhe, #b1a6ff Hover, #8b7cf0 Kante, #5746d9 Tinte),
+    // Cloud (#7c3aed, #a78bfa) und das Brand-Kit-Violett #8b5cf6.
     const orte: string[] = []
     for (const [name, src] of DATEIEN) {
-      for (const m of src.matchAll(/#(?:7c3aed|a78bfa)/gi)) orte.push(`${name}: ${m[0]}`)
-    }
-    expect(orte).toEqual([])
-  })
-
-  it('und die Tokens werden wirklich aufgerufen', () => {
-    expect((ALL.match(/(?<![\w-])(?:[a-z-]+:)*(?:bg|text|border|ring)-lu-cloud(?![\w-])/g) ?? []).length)
-      .toBeGreaterThanOrEqual(10)
-    expect(ALL).toContain('dark:text-lu-cloud-lift')
-  })
-
-  it('auch der HAUS-Akzent steht nirgends mehr als Zahl', () => {
-    // Die Cloud-Haelfte war Welle 1. Diese hier ist die andere: #a094f8
-    // (Ruhe), #b1a6ff (Hover), #8b7cf0 (Hellmodus-Kante). Der Audit
-    // zaehlte 23 Fundstellen von #a094f8. Im CODE — Kommentare
-    // abgeschnitten, sonst zaehlt man die Kontrastrechnungen mit, die
-    // ueber diese Farben GESCHRIEBEN wurden — ist es null.
-    const orte: string[] = []
-    for (const [name, src] of DATEIEN) {
-      for (const m of nurCode(src).matchAll(/#(?:a094f8|b1a6ff|8b7cf0)/gi)) {
+      for (const m of nurCode(src).matchAll(/#(?:a094f8|b1a6ff|8b7cf0|5746d9|7c3aed|a78bfa|8b5cf6)\b/gi)) {
         orte.push(`${name}: ${m[0]}`)
       }
     }
     expect(orte).toEqual([])
-    // Und die Tokens gibt es wirklich, sie sind nicht mitgeloescht worden.
-    for (const t of ['lu-accent', 'lu-accent-hover', 'lu-accent-edge']) {
-      expect(CSS_CODE, `--color-${t} fehlt`).toMatch(new RegExp(`--color-${t}:`))
-    }
-  })
-
-  it('das Brand-Kit-Violett kommt weiterhin nirgends vor', () => {
-    // Der Audit fuehrte es als „die eigentliche Wahrheit". Es hat in
-    // dieser App nie eine Call-Site gehabt, und es bekommt hier keine.
-    expect(ALL.toLowerCase()).not.toContain(BRANDKIT)
-    expect(CSS_CODE.toLowerCase()).not.toContain(BRANDKIT)
+    expect(CSS_CODE.toLowerCase()).not.toMatch(/#(?:a094f8|b1a6ff|8b7cf0|5746d9|7c3aed|a78bfa|8b5cf6)\b/)
   })
 })
 
-// ── D-T06 ──────────────────────────────────────────────────────────────
-
-describe('die Leinwand hat einen Namen bekommen', () => {
-  it('--color-lu-canvas ist genau der Wert, der vorher als Literal dastand', () => {
-    expect(token('lu-canvas')).toBe('#141414')
+describe('die Leinwand ist die surface-Rolle', () => {
+  it('der Startschirm, die Fehlerschirme und das Telefon nehmen surface aus dem Blatt', () => {
+    for (const [, scheme] of SCHEMES) expect(rolle(scheme, 'surface')).toMatch(/^#[0-9a-f]{6}$/)
+    expect(SHEET.light.surface).toBe(SCHEMES[0][1].surface)
+    expect(SHEET.dark.surface).toBe(SCHEMES[1][1].surface)
   })
 
-  it('die sechs erreichbaren Call-Sites nehmen das Token', () => {
-    const erwartet = [
-      'components/layout/AppShell.tsx',
-      'components/layout/Header.tsx',
-      'components/layout/Titlebar.tsx',
-      'components/layout/ViewSkeletons.tsx',
-    ]
-    for (const f of erwartet) {
-      const src = quelltext(DATEIEN, f)
-      expect(src, `${f} nimmt das Token nicht`).toContain('dark:bg-lu-canvas')
-      expect(src, `${f} hat noch ein Literal`).not.toContain('dark:bg-[#141414]')
+  it('die Notschirme malen ohne Stylesheet, aber mit den Werten des Blatts', () => {
+    // Sie muessen auch dann lesbar sein, wenn das Stylesheet der Grund des
+    // Absturzes war; deshalb lesen sie die generierten Konstanten statt
+    // `var(--…)`, und schreiben keine eigene Zahl.
+    for (const f of ['components/ui/ErrorBoundary.tsx', 'lib/fatal-error.ts']) {
+      const src = nurCode(quelltext(DATEIEN, f))
+      expect(src, f).not.toMatch(/#[0-9a-fA-F]{3,8}\b|rgba?\(/)
     }
-    // Titlebar zeichnet zwei Varianten desselben Balkens.
-    const tb = quelltext(DATEIEN, 'components/layout/Titlebar.tsx')
-    expect((tb.match(/dark:bg-lu-canvas/g) ?? []).length).toBe(2)
+    expect(quelltext(DATEIEN, 'lib/fatal-error.ts')).toContain("from '../mobile/styles/sheet/colours.g'")
+    expect(quelltext(DATEIEN, 'components/ui/ErrorBoundary.tsx')).toContain('bootScheme()')
   })
 
-  it('das Kontextmenue ist aus dieser Liste RAUS — und zwar nach oben', () => {
-    // Es stand hier als sechste Call-Site von `--color-lu-canvas`. Das war
-    // die richtige Antwort auf „welches Literal?" und die falsche auf
-    // „welche Rolle?": ein Menue, das ueber der Leinwand schwebt, in der
-    // FARBE der Leinwand liest sich nicht als schwebend. Seit D-T09 traegt
-    // es dasselbe Rezept wie die uebrigen neun Schwebeblaetter der App.
+  it('der Schwebeblatt-Rezept ist die Menueflaeche, nicht die Leinwand', () => {
+    // Ein Menue, das ueber der Leinwand schwebt, in der FARBE der Leinwand
+    // liest sich nicht als schwebend.
     const cm = quelltext(DATEIEN, 'components/ui/ContextMenu.tsx')
     expect(cm).toContain('lu-elevated')
-    expect(cm).not.toContain('dark:bg-lu-canvas')
-    expect(cm).not.toContain('dark:bg-[#141414]')
+    expect(CSS_CODE).toMatch(/\.lu-elevated \{\s*background: var\(--md-sys-color-surface-container\);/)
+  })
+})
+
+describe('die alten Palettenklassen sterben aus, und nur in diese Richtung', () => {
+  /**
+   * Utilities auf geloeschten `lu-*`-Farben (`bg-lu-canvas`, `text-lu-accent`,
+   * `border-lu-cloud/40` …) erzeugt Tailwind nicht mehr: sie malen nichts.
+   * Ihre Call-Sites liegen in den Bauteilen und werden dort auf die Rollen
+   * umgestellt (bg-surface, text-primary, border-tertiary/40 …). Die Zahl
+   * darf deshalb nur sinken. Stand bei der Umstellung von index.css: 209
+   * Fundstellen in 54 Dateien.
+   */
+  const ALT = /(?<![\w-])(?:[a-z-]+:)*(?:bg|text|border|ring|outline|fill|stroke|from|to|via|divide|shadow|decoration|accent|caret|placeholder)(?:-[lrtbxy])?-lu-(?:canvas|base|panel|overlay|sheet|accent|on-accent|cloud|focus)[a-z-]*(?:\/[\w.[\]]+)?(?![\w-])/g
+
+  it('hoechstens 209 Fundstellen', () => {
+    let n = 0
+    for (const [, src] of DATEIEN) n += (src.match(ALT) ?? []).length
+    expect(n).toBeLessThanOrEqual(209)
   })
 
-  it('jede Call-Site behaelt ihr eigenes Hell-Gegenstueck — der Tausch ist folgenlos', () => {
-    // DAS ist der Grund, warum der Tausch keine Farbe bewegt: die dunkle
-    // Seite wechselt die Schreibweise, die helle bleibt unangetastet.
-    for (const [, src] of DATEIEN) {
-      for (const m of src.matchAll(/[\w-/[\].]*\bdark:bg-lu-canvas\b/g)) {
-        const zeile = src.split('\n').find((z) => z.includes(m[0])) ?? ''
-        expect(zeile, `ohne Hell-Gegenstueck: ${zeile.trim().slice(0, 90)}`)
-          .toMatch(/(?<![\w-:])bg-(white|gray-200)(?![\w-])/)
-      }
+  it('keine Datei, die schon auf Rollen steht, faellt zurueck', () => {
+    for (const f of ['components/ui/ErrorBoundary.tsx']) {
+      expect(quelltext(DATEIEN, f).match(ALT) ?? [], f).toEqual([])
+    }
+  })
+})
+
+describe('die Rollen, die index.css liest, gibt es im Blatt', () => {
+  it('jede var(--md-sys-color-*) hat in beiden Schemata einen Wert', () => {
+    const rollen = new Set([...CSS_CODE.matchAll(/var\(--md-sys-color-([a-z-]+)\)/g)].map((m) => m[1]))
+    expect(rollen.size).toBeGreaterThan(10)
+    for (const r of rollen) for (const [name, scheme] of SCHEMES) expect(scheme[r], `${r} (${name})`).toMatch(/^#/)
+    // Auch die erweiterten Rollen (success) kommen aus dem Blatt.
+    for (const m of CSS_CODE.matchAll(/var\(--md-ext-color-([a-z-]+)\)/g)) {
+      for (const [name, scheme] of SCHEMES) expect(scheme[m[1]], `${m[1]} (${name})`).toMatch(/^#/)
     }
   })
 
-  it('die drei unerreichbaren Literale sind gezaehlt, nicht uebersehen', () => {
-    // Sidebar und die beiden Create-Dateien gehoeren in diesem Durchgang
-    // anderen Agenten. Die Zahl darf sinken, nicht steigen.
-    const rest = DATEIEN
-      .filter(([, s]) => s.includes('dark:bg-[#141414]'))
-      .map(([n]) => n)
-      .sort()
-    expect(rest).toEqual([
-      'components/create/experimental/CreateExperimental.tsx',
-      'components/create/experimental/MaskEditor.tsx',
-    ])
-  })
-
-  it('die dunklen Graustufen im CODE sind gedeckelt — und meine Ecke ist leer', () => {
-    // Der Audit: „16 Graustufen". Gezaehlt werden hier alle Hex-Literale,
-    // deren drei Kanaele unter 0x40 liegen — also echte Flaechenfarben,
-    // keine Textfarben und keine Marken-Blaus. Kommentare sind
-    // abgeschnitten: eine Farbe, ueber die jemand SCHREIBT, ist keine
-    // Call-Site (genau dieser Fehler hat die erste Messung dieses Pakets
-    // um vier Werte danebenliegen lassen).
-    //
-    //   vorher   15   #000000 #0e0e0e #141414 #161616 #161719 #171717
-    //                 #17171c #1a1a1a #1b1b1b #1e1e1e #1f1f1f #202020
-    //                 #232323 #262626 #363636
-    //   nachher  11   die vier Schwebeblatt-Flaechen #161719 #17171c
-    //                 #1f1f1f #262626 sind weg (siehe .lu-elevated)
-    const grau = new Map<string, string[]>()
-    for (const [name, src] of DATEIEN) {
-      for (const m of nurCode(src).matchAll(/#[0-9a-fA-F]{6}\b/g)) {
-        const h = m[0].toLowerCase()
-        const k = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
-        if (k.every((c) => c < 0x40)) grau.set(h, [...(grau.get(h) ?? []), name])
-      }
-    }
-    expect(grau.size, `Graustufen: ${[...grau.keys()].sort().join(' ')}`).toBeLessThanOrEqual(11)
-
-    // In den Verzeichnissen dieses Pakets bleibt genau EINE, und sie ist
-    // begruendet: der Absturzschirm in ui/ErrorBoundary.tsx malt mit
-    // `style={{...}}`, nicht mit Klassen. Er muss auch dann lesbar sein,
-    // wenn das Stylesheet der Grund des Absturzes war — ein `var(--…)`
-    // waere dort genau die Abhaengigkeit, die er nicht haben darf.
-    const meine: string[] = []
-    for (const [name, treffer] of grau) {
-      for (const datei of treffer) {
-        if (/^components\/(chat\/|models\/|ui\/|agents\/|import\/)/.test(datei)
-          && datei !== 'components/chat/ChatView.tsx') meine.push(`${datei}: ${name}`)
-      }
-    }
-    expect([...new Set(meine)].sort()).toEqual(['components/ui/ErrorBoundary.tsx: #171717'])
-  })
-
-  it('es gibt bewusst KEINE gespiegelte Hell-Leiter', () => {
-    // Der Vorschlag lautete, `--color-lu-*` im `.light`-Block zu spiegeln.
-    // Nachgezaehlt zerfaellt #141414 im Hellmodus in zwei Rollen — die
-    // Fundstellen tragen `bg-gray-200` ODER `bg-white` als Gegenstueck —,
-    // eine Spiegelung muesste also eine der beiden falsch faerben.
-    const gegenstuecke = new Set<string>()
-    for (const [, src] of DATEIEN) {
-      for (const zeile of src.split('\n')) {
-        if (!zeile.includes('dark:bg-lu-canvas')) continue
-        const m = zeile.match(/(?<![\w-:])bg-(white|gray-200)(?![\w-])/)
-        if (m) gegenstuecke.add(m[1])
-      }
-    }
-    expect([...gegenstuecke].sort()).toEqual(['gray-200', 'white'])
-    expect(CSS_CODE).not.toMatch(/\.light\s*\{[^}]*--color-lu-(canvas|base|panel|raised|overlay)/)
-  })
-
-  it('das tote Token ist WEG, nicht als tot beschriftet', () => {
-    // Vorfassung: „es steht jetzt dran, dass es tot ist" — geprueft wurde,
-    // dass die Zeile `--color-lu-raised: #2d2d2d;` den Vermerk `0 Call-Sites`
-    // traegt. Das war die halbe Antwort. Ein Farbtoken ohne Aufrufer gibt
-    // Tailwind gar nicht erst aus (im Fenster als LEERE Variable gemessen):
-    // wer `bg-lu-raised` schreibt, bekommt keine Farbe UND keinen Fehler.
-    // Eine Stufe, die beim ersten Gebrauch still danebengreift, gehoert
-    // nicht beschriftet, sondern geloescht.
-    expect(CSS_CODE).not.toContain('--color-lu-raised')
-    expect(CSS_CODE).not.toContain('#2d2d2d')
-    expect(ALL).not.toMatch(/(?<![\w-])(?:[a-z-]+:)*(?:bg|text|border|ring)-lu-raised(?![\w-])/)
-  })
-
-  it('die Leiter geht in BEIDE Richtungen auf: jede Stufe hat einen Aufrufer', () => {
-    // Das ist die Sperrklinke hinter der Loeschung. Sie faellt, wenn jemand
-    // eine sechste Stufe erfindet, ohne sie zu benutzen — und ebenso, wenn
-    // jemand `bg-lu-irgendwas` schreibt, das es nicht gibt.
-    const stufen = [...CSS_CODE.matchAll(/--color-lu-(canvas|base|panel|raised|overlay|pane|sheet):/g)]
-      .map((m) => m[1])
-      .sort()
-    expect(stufen, 'die Flaechenleiter hat sich veraendert').toEqual(['base', 'canvas', 'overlay', 'panel', 'sheet'])
-
-    for (const stufe of stufen) {
-      const direkt = new RegExp(`(?<![\\w-])(?:[a-z-]+:)*(?:bg|text|border|ring)-lu-${stufe}(?![\\w-])`)
-      const ueberRezept = new RegExp(`var\\(--color-lu-${stufe}\\)`)
-      const genutzt = direkt.test(ALL) || ueberRezept.test(CSS_CODE)
-      expect(genutzt, `--color-lu-${stufe} hat keinen einzigen Aufrufer`).toBe(true)
-    }
-
-    // Und umgekehrt: keine Call-Site auf einer Stufe, die es nicht gibt.
-    const erfunden = new Set<string>()
-    for (const [, src] of DATEIEN) {
-      for (const m of src.matchAll(/(?<![\w-])(?:[a-z-]+:)*(?:bg|text|border|ring)-lu-([a-z]+)(?![\w-])/g)) {
-        // `lu-cloud`/`lu-accent`/`lu-on` sind Akzente, keine Flaechenstufen.
-        if (['cloud', 'accent', 'on', 'control', 'primary', 'elevated'].includes(m[1])) continue
-        if (!stufen.includes(m[1])) erfunden.add(m[1])
-      }
-    }
-    expect([...erfunden], 'Call-Site auf einer Flaechenstufe, die index.css nicht kennt').toEqual([])
+  it('und die Kommentare in index.css zitieren keine Zahl mehr als Farbe', () => {
+    const css = readFileSync(resolve(SRC, 'index.css'), 'utf8')
+    expect(css).not.toMatch(/#[0-9a-fA-F]{6}\b|rgba?\(\s*\d/)
   })
 })

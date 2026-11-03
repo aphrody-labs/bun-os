@@ -25,24 +25,18 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs'
 import { resolve, sep } from 'node:path'
 import { contrast, over } from './wcag-contrast'
+import { FLAECHEN, SCHEMES, rolle } from './m3-rollen'
 
 const ROOT = resolve(__dirname, '..', '..', '..')
 const SRC = resolve(ROOT, 'src')
 const CSS = readFileSync(resolve(SRC, 'index.css'), 'utf8')
 /**
- * index.css ohne Kommentare. Die Kommentare dieser Datei ZITIEREN die alten
- * Werte (der 1px-Ring in Fremdblau steht dort als Begruendung), und ein Test,
- * der „ist das weg" fragt, wuerde sonst die Begruendung finden statt der
- * Regel. Jede Struktur- und jede Negativpruefung unten liest deshalb CODE.
+ * index.css ohne Kommentare. Die Kommentare dieser Datei erklaeren alte
+ * Entscheidungen, und ein Test, der „ist das weg" fragt, wuerde sonst die
+ * Begruendung finden statt der Regel. Jede Struktur- und jede Negativpruefung
+ * unten liest deshalb CODE.
  */
 const CODE = CSS.replace(/\/\*[\s\S]*?\*\//g, '')
-
-/** Liest einen `--color-*: #rrggbb;`-Token aus index.css. */
-function token(name: string): string {
-  const m = CSS.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`))
-  if (!m) throw new Error(`Token --${name} fehlt in index.css`)
-  return m[1]
-}
 
 /** Alle .tsx unter src/components, rekursiv, ohne __tests__. */
 function componentFiles(dir = resolve(SRC, 'components')): string[] {
@@ -83,42 +77,31 @@ const HOUSE = String.raw`:focus-visible:not\(\[tabindex='-1'\]\):not\(\.lu-prima
 
 // ── Die Flaechen, auf denen der Ring wirklich landet ────────────────────
 // `outline-offset: 2px` heisst: der Ring liegt NEBEN dem Control, auf dem
-// Grund dahinter. Gerechnet wird deshalb gegen diese Flaechen, nicht gegen
-// das Control. Die Werte stammen aus index.css (@theme) und aus den
-// Layout-Literalen von AppShell/ChatInput, nicht aus der Luft.
-const COMPOSER_DARK = over('#ffffff', '#1e1e1e', 0.03) // bg-white/[0.03] ueber der Chat-Flaeche
-const DARK_SURFACES: Array<[string, string]> = [
-  ['App-Grund #1e1e1e', '#1e1e1e'],
-  ['Fenster/Titlebar #141414', '#141414'],
-  ['Composer-Leiste', COMPOSER_DARK],
-  ['Panel', '#262626'],
-  ['Karte/Hover', '#2d2d2d'],
-  ['Overlay/Dropdown', '#363636'],
-]
-const LIGHT_SURFACES: Array<[string, string]> = [
-  ['Blatt/Overlay #ffffff', '#ffffff'],
-  ['Composer-Leiste #f9fafb', '#f9fafb'],
-  ['Fenstergrund #f3f4f6', '#f3f4f6'],
-]
+// Grund dahinter. Gerechnet wird deshalb gegen die Flaechenrollen des
+// generierten Schemas (hell und dunkel), auf denen Bedienelemente sitzen,
+// und gegen die Composer-Leiste: die 3-%-Toenung von on-surface darueber.
+const composer = (scheme: (typeof SCHEMES)[number][1]) =>
+  over(rolle(scheme, 'on-surface'), rolle(scheme, 'surface-container-low'), 0.03)
 
-describe('Punkt 4 — der Fokusring existiert, ist 2px und nimmt Tokens', () => {
+describe('Punkt 4 — der Fokusring existiert, ist 2px und nimmt Rollen', () => {
   it('es gibt genau eine Hausregel, und sie faellt fuer jeden auf 2px zurueck', () => {
     const rules = CODE.match(new RegExp(`^${HOUSE}\\s*\\{[^}]*\\}`, 'gm')) ?? []
     expect(rules).toHaveLength(1)
-    // Die Vorgabe der Regel IST der alte Ring: 2px Akzent, 2px Abstand. Wer
+    // Die Vorgabe der Regel ist der M3-Ring: 2px secondary, 2px Abstand. Wer
     // nichts anderes sagt, bekommt ihn, und das sind alle Knoepfe, Links,
     // Regler, Kaestchen und Menueausloeser der App.
-    expect(rules[0]).toMatch(/outline:\s*var\(--lu-focus-w,\s*2px\) solid var\(--lu-focus-c,\s*var\(--color-lu-accent\)\)/)
+    expect(rules[0]).toMatch(/outline:\s*var\(--lu-focus-w,\s*2px\) solid var\(--lu-focus-c,\s*var\(--md-sys-color-secondary\)\)/)
     expect(rules[0]).toMatch(/outline-offset:\s*var\(--lu-focus-o,\s*2px\)/)
-    // Keine Farbe als Literal — sonst laeuft der Ring vom Akzent weg.
+    // Keine Farbe als Literal, sonst laeuft der Ring von der Rolle weg.
     expect(rules[0]).not.toMatch(/#[0-9a-fA-F]{3,8}|rgba?\(/)
   })
 
-  it('der Hellmodus nimmt die Kante, nicht den Akzent', () => {
-    const light = CODE.match(new RegExp(`^\\.light ${HOUSE}\\s*\\{[^}]*\\}`, 'm'))?.[0] ?? ''
-    // Auch hier ueber dieselbe Variable, sonst uebermalte der Hellmodus die
-    // leise Haarlinie der Textfelder wieder mit der Akzentkante.
-    expect(light).toMatch(/outline-color:\s*var\(--lu-focus-c,\s*var\(--color-lu-accent-edge\)\)/)
+  it('kein Modus hat einen eigenen Ring: die Rolle wechselt mit dem Schema', () => {
+    expect(CODE).not.toMatch(new RegExp(`^\\.(light|dark) ${HOUSE}`, 'm'))
+  })
+
+  it('unter erzwungenen Farben wird der Ring Highlight', () => {
+    expect(CODE).toMatch(/@media \(forced-colors: active\) \{\s*:focus-visible:not\(\[tabindex='-1'\]\) \{\s*outline-color: Highlight;/)
   })
 
   it('der alte 1px-Ring in Fremdblau ist restlos weg', () => {
@@ -143,20 +126,11 @@ describe('Punkt 4 — der Fokusring existiert, ist 2px und nimmt Tokens', () => 
 })
 
 describe('Punkt 4 — der Ring erreicht 3:1 auf jeder Flaeche (WCAG 1.4.11)', () => {
-  it.each(DARK_SURFACES)('dunkel: Akzent auf %s', (_name, bg) => {
-    expect(contrast(token('color-lu-accent'), bg)).toBeGreaterThanOrEqual(3)
-  })
-
-  it.each(LIGHT_SURFACES)('hell: Kante auf %s', (_name, bg) => {
-    expect(contrast(token('color-lu-accent-edge'), bg)).toBeGreaterThanOrEqual(3)
-  })
-
-  it('der Akzent selbst faellt im Hellmodus durch — das ist der Grund fuer die Kante', () => {
-    // Waere das eines Tages nicht mehr so, gehoert die Aufteilung neu
-    // entschieden statt dieser Test gestrichen.
-    for (const [, bg] of LIGHT_SURFACES) {
-      expect(contrast(token('color-lu-accent'), bg)).toBeLessThan(3)
+  it.each(SCHEMES)('%s: secondary auf jeder Flaechenrolle und auf der Composer-Leiste', (_name, scheme) => {
+    for (const f of FLAECHEN) {
+      expect(contrast(rolle(scheme, 'secondary'), rolle(scheme, f)), f).toBeGreaterThanOrEqual(3)
     }
+    expect(contrast(rolle(scheme, 'secondary'), composer(scheme))).toBeGreaterThanOrEqual(3)
   })
 
   it('der alte Ring haette es nicht geschafft — hier steht, wie weit daneben', () => {
@@ -164,36 +138,31 @@ describe('Punkt 4 — der Ring erreicht 3:1 auf jeder Flaeche (WCAG 1.4.11)', ()
     // tatsaechlich gesehen haette. Kein Nachruf: diese Zeile ist der Beleg
     // dafuer, dass die Aenderung Barrierefreiheit war, nicht Geschmack.
     const alt = (bg: string) => contrast(over('#60a5fa', bg, 0.6), bg)
-    for (const [, bg] of LIGHT_SURFACES) expect(alt(bg)).toBeLessThan(2)
-    expect(alt('#363636')).toBeLessThan(3)
-    expect(alt('#2d2d2d')).toBeLessThan(3)
+    for (const f of FLAECHEN) expect(alt(rolle(SCHEMES[0][1], f)), f).toBeLessThan(2)
   })
 
-  it('der halbdurchsichtige Ring-Token waere auf der Composer-Flaeche zu schwach', () => {
-    // `--color-lu-accent-ring` trug bis Welle 3 den Fokus von `.lu-control`.
-    expect(contrast(over(token('color-lu-accent'), COMPOSER_DARK, 0.55), COMPOSER_DARK)).toBeLessThan(3)
-    expect(contrast(over(token('color-lu-accent'), '#f9fafb', 0.55), '#f9fafb')).toBeLessThan(3)
+  it('ein halbdurchsichtiger Ring waere auf der Composer-Flaeche zu schwach', () => {
+    // Deshalb traegt der Ring die volle Rolle und keine Toenung.
+    for (const [, scheme] of SCHEMES) {
+      const bg = composer(scheme)
+      expect(contrast(over(rolle(scheme, 'secondary'), bg, 0.3), bg)).toBeLessThan(3)
+    }
   })
 })
 
 describe('Punkt 4 — die Ausnahme steht AN der Regel, nicht gegen sie', () => {
-  it('.lu-primary behaelt seinen umgekehrten Ring und erreicht damit weit ueber 3:1', () => {
-    const dark = contrast('#ffffff', '#1e1e1e')
-    const light = contrast(token('color-lu-on-accent'), '#ffffff')
-    expect(dark).toBeGreaterThanOrEqual(3)
-    expect(light).toBeGreaterThanOrEqual(3)
-    // Und der Grund, warum es NICHT der Akzentring sein darf:
-    expect(contrast(token('color-lu-accent'), token('color-lu-accent'))).toBeCloseTo(1, 5)
+  it('.lu-primary traegt denselben M3-Ring mit Abstand, der neben primary 3:1 haelt', () => {
+    const focus = CODE.match(/^\.lu-primary:focus-visible\s*\{[^}]*\}/m)?.[0] ?? ''
+    expect(focus).toMatch(/outline:\s*2px solid var\(--md-sys-color-secondary\)/)
+    expect(focus).toMatch(/outline-offset:\s*2px/)
+    for (const [, scheme] of SCHEMES) {
+      for (const f of FLAECHEN) expect(contrast(rolle(scheme, 'secondary'), rolle(scheme, f)), f).toBeGreaterThanOrEqual(3)
+    }
   })
 
-  it('beide Hausregeln klammern .lu-primary aus — sonst schluege 0,3,0 die 0,2,0', () => {
-    // DIE Spezifitaetsfalle dieses Hauses: `.light :focus-visible:not(...)`
-    // ist 0,3,0 und wuerde `.lu-primary:focus-visible` (0,2,0) ueberschreiben.
-    // Ohne die Klammer haette der Senden-Knopf im Hellmodus still den
-    // violetten statt des dunklen Rings getragen — sichtbar erst im
-    // gebauten CSS, nicht in der Quelle.
-    const focusRules = [...CODE.matchAll(/^(\.light )?:focus-visible[^{\n]*\{/gm)].map((m) => m[0])
-    expect(focusRules.length).toBeGreaterThanOrEqual(2)
+  it('die Hausregel klammert .lu-primary aus, statt mit Spezifitaet dagegenzuhalten', () => {
+    const focusRules = [...CODE.matchAll(/^(\.light |\.dark )?:focus-visible[^{\n]*\{/gm)].map((m) => m[0])
+    expect(focusRules).toHaveLength(1)
     for (const r of focusRules) expect(r).toContain(':not(.lu-primary)')
   })
 
@@ -228,11 +197,11 @@ describe('Punkt 4 — die Ausnahme steht AN der Regel, nicht gegen sie', () => {
     'number', 'date', 'time', 'datetime-local', 'month', 'week',
   ]
 
-  /** Die beiden Regeln, die den Textfeldern ihre leisen Werte geben. */
-  const LEISE = CODE.match(/^(?:\.light )?textarea,\s*(?:\.light )?input:is\([\s\S]*?\)\s*\{[^}]*\}/gm) ?? []
+  /** Die Regel, die den Textfeldern ihre leisen Werte gibt, fuer beide Modi. */
+  const LEISE = CODE.match(/^(?:\.light |\.dark )?textarea,\s*(?:\.light |\.dark )?input:is\([\s\S]*?\)\s*\{[^}]*\}/gm) ?? []
 
   it('die leise Haarlinie gilt fuer Textareas UND die Texttypen von input', () => {
-    expect(LEISE).toHaveLength(2)
+    expect(LEISE).toHaveLength(1)
     for (const regel of LEISE) {
       for (const typ of TEXTFELD_TYPEN) {
         expect(regel, `Texttyp ${typ} fehlt in der Regel`).toContain(`[type='${typ}']`)
@@ -253,30 +222,26 @@ describe('Punkt 4 — die Ausnahme steht AN der Regel, nicht gegen sie', () => {
     }
   })
 
-  it('die Haarlinie ist 1px, ohne Abstand, und ihre Farbe ist ein Token', () => {
-    const dunkel = LEISE.find((r) => !r.startsWith('.light')) ?? ''
-    expect(dunkel).toMatch(/--lu-focus-w:\s*1px/)
-    expect(dunkel).toMatch(/--lu-focus-o:\s*0px/)
-    expect(dunkel).toMatch(/--lu-focus-c:\s*var\(--color-lu-focus-quiet\)/)
-    const hell = LEISE.find((r) => r.startsWith('.light')) ?? ''
-    expect(hell).toMatch(/--lu-focus-c:\s*var\(--color-lu-focus-quiet-edge\)/)
-    // Kein Literal: sonst laeuft die Haarlinie vom ruhigen Grau weg.
-    for (const regel of LEISE) expect(regel).not.toMatch(/#[0-9a-fA-F]{3,8}|rgba?\(/)
+  it('die Haarlinie ist 1px, ohne Abstand, und ihre Farbe ist die outline-Rolle', () => {
+    const [regel = ''] = LEISE
+    expect(regel).toMatch(/--lu-focus-w:\s*1px/)
+    expect(regel).toMatch(/--lu-focus-o:\s*0px/)
+    expect(regel).toMatch(/--lu-focus-c:\s*var\(--md-sys-color-outline\)/)
+    // Kein Literal: sonst laeuft die Haarlinie von der Rolle weg.
+    expect(regel).not.toMatch(/#[0-9a-fA-F]{3,8}|rgba?\(/)
   })
 
-  it.each(DARK_SURFACES)('die Haarlinie haelt 3:1, dunkel auf %s', (_name, bg) => {
-    expect(contrast(token('color-lu-focus-quiet'), bg)).toBeGreaterThanOrEqual(3)
-  })
-
-  it.each(LIGHT_SURFACES)('die Haarlinie haelt 3:1, hell auf %s', (_name, bg) => {
-    expect(contrast(token('color-lu-focus-quiet-edge'), bg)).toBeGreaterThanOrEqual(3)
+  it.each(SCHEMES)('%s: die Haarlinie haelt 3:1 auf den Flaechen, auf denen Felder sitzen', (_name, scheme) => {
+    for (const f of ['surface', 'surface-container-lowest', 'surface-container-low', 'surface-container'] as const) {
+      expect(contrast(rolle(scheme, 'outline'), rolle(scheme, f)), f).toBeGreaterThanOrEqual(3)
+    }
+    expect(contrast(rolle(scheme, 'outline'), composer(scheme))).toBeGreaterThanOrEqual(3)
   })
 
   it('ruhig heisst leiser als der Ring, nicht bunter', () => {
-    // Die Haarlinie darf nicht der Akzent sein, sonst waere es wieder „der
+    // Die Haarlinie darf nicht die Ringfarbe sein, sonst waere es wieder „der
     // lila balken", nur duenner.
-    expect(token('color-lu-focus-quiet')).not.toBe(token('color-lu-accent'))
-    expect(token('color-lu-focus-quiet-edge')).not.toBe(token('color-lu-accent-edge'))
+    for (const [, scheme] of SCHEMES) expect(rolle(scheme, 'outline')).not.toBe(rolle(scheme, 'secondary'))
   })
 
   it('`data-lu-quiet-focus` ist restlos weg: Regel UND alle sechs Traeger', () => {
@@ -331,8 +296,7 @@ describe('Punkt 4 — die Ausnahme steht AN der Regel, nicht gegen sie', () => {
     // Promptfenster die einzige Stelle, an der der Fokus zweimal leiser wird.
     const input = COMPONENT_NAMED.find(([n]) => n === 'chat/ChatInput.tsx')?.[1]
     expect(input, 'keine Quelldatei chat/ChatInput.tsx').toBeDefined()
-    expect(input).toMatch(/focus-within:border-lu-cloud\//)
-    expect(input).toMatch(/focus-within:border-gray-400/)
+    expect(input).toMatch(/focus-within:border-/)
   })
 })
 
@@ -543,7 +507,7 @@ describe.skipIf(gebaut.css === null)('im gebauten CSS, nicht nur in der Quelle',
     // wieder den Akzentring.
     const leise = css.indexOf('textarea,input:is(')
     expect(leise, 'die Regel fuer Texteingaben fehlt im gebauten CSS').toBeGreaterThan(0)
-    expect(css.slice(leise, leise + 400)).toContain('--lu-focus-c:var(--color-lu-focus-quiet)')
+    expect(css.slice(leise, leise + 400)).toContain('--lu-focus-c:var(--md-sys-color-outline)')
     // Und sie steht ungeschichtet, sonst schluege jede Tailwind-Utility sie.
     expect(leise).toBeGreaterThan(utilitiesEnd)
   })
