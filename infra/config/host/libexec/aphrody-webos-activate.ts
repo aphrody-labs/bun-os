@@ -128,7 +128,7 @@ try {
     ((await publicHealth.json()) as { sourceCommit?: string }).sourceCommit !== receipt.sourceCommit
   )
     throw new Error("Public ingress did not confirm the activated source");
-  for (const path of ["/", "/api/os", "/api/inventory"]) {
+  for (const path of ["/", "/api/session", "/api/inventory"]) {
     const response = await fetch(`https://aphrody.com${path}`, {
       signal: AbortSignal.timeout(8000),
     });
