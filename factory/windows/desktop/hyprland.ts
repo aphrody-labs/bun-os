@@ -110,16 +110,30 @@ async function stage() {
   console.log(`staged ${root}; ${files.length} binaries signed (${unsigned.length} newly)`);
 }
 
-/** Detached start; the child keeps running after this script exits. */
-function start(exe: string, argv: string[], env: Record<string, string> = {}) {
+const q = (s: string) => `'${s.replaceAll("'", "''")}'`;
+
+/** Run a PowerShell script verbatim (-EncodedCommand: no argv re-quoting touches its quotes or `$`). */
+const ps = (script: string) =>
+  $`pwsh -NoProfile -NonInteractive -EncodedCommand ${Buffer.from(script, "utf16le").toString("base64")}`;
+
+/**
+ * Start a process that outlives this script. Bun's own children are torn down with it on Windows (even `detached`),
+ * so the launch goes through `Start-Process`. Console tools (chrome watch, wallpaper) start hidden.
+ */
+async function start(exe: string, argv: string[], env: Record<string, string> = {}, hidden = false) {
   if (!existsSync(exe)) throw new Error(`not staged: ${exe}; run stage first`);
-  Bun.spawn([exe, ...argv], { cwd: dirname(exe), env: { ...process.env, ...env }, stdio: ["ignore", "ignore", "ignore"] }).unref();
+  const envs = Object.entries(env).map(([k, v]) => `$env:${k} = ${q(v)}; `).join("");
+  const list = argv.length ? ` -ArgumentList ${argv.map(q).join(",")}` : "";
+  const style = hidden ? " -WindowStyle Hidden" : "";
+  await ps(`${envs}Start-Process -FilePath ${q(exe)} -WorkingDirectory ${q(dirname(exe))}${list}${style}`);
   console.log(`started ${exe} ${argv.join(" ")}`);
 }
 
 /** Processes whose image lives under the staged tree (`Get-Process` gives the image path; tasklist does not). */
 async function ours(): Promise<{ id: number; path: string }[]> {
-  const out = await $`pwsh -NoProfile -Command ${`Get-Process | Where-Object { $_.Path -like '${root}\\*' } | ForEach-Object { "$($_.Id)|$($_.Path)" }`}`.text();
+  const out = await ps(
+    `Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -like ${q(`${root}\\*`)} } | ForEach-Object { "$($_.ProcessId)|$($_.ExecutablePath)" }`,
+  ).text();
   return out
     .split(/\r?\n/)
     .filter(Boolean)
@@ -130,40 +144,54 @@ async function ours(): Promise<{ id: number; path: string }[]> {
 }
 
 async function up() {
-  const renderArgs = ["desktop", "windows-hyprland", "--render", root, "--glass", flag("--glass") ?? "auto", "--motion", flag("--motion") ?? "auto"];
+  const renderArgs = ["desktop", "windows-hyprland", "--render", root, "--glass", flag("--glass") ?? "auto", "--motion", flag("--motion") ?? "on"];
   if (flag("--seed")) renderArgs.push("--seed", flag("--seed")!);
   if (flag("--theme")) renderArgs.push("--theme", resolve(flag("--theme")!));
   console.log(await $`${join(bin.bunos, "bunos-win11.exe")} ${renderArgs}`.text());
   const running = new Set((await ours()).map((p) => p.path.toLowerCase()));
-  const once = (exe: string, argv: string[], env?: Record<string, string>) => {
+  const once = async (exe: string, argv: string[], env?: Record<string, string>, hidden = false) => {
     if (running.has(exe.toLowerCase())) console.log(`already running ${exe}`);
-    else start(exe, argv, env);
+    else await start(exe, argv, env, hidden);
   };
-  if (!args.includes("--no-wallpaper")) once(join(bin.bunos, "bunos-win11-wallpaper.exe"), ["run", "31536000"]);
-  if (!args.includes("--no-chrome")) once(join(bin.bunos, "bunos-win11-chrome.exe"), ["watch"]);
-  once(join(bin.glazewm, "glazewm.exe"), ["start", `--config=${join(root, "glazewm", "config.yaml")}`]);
-  once(join(bin.tacky, "tacky-borders.exe"), [], { TACKY_BORDERS_CONFIG_HOME: join(root, "tacky-borders") });
+  const foreign = (await $`tasklist /FI "IMAGENAME eq glazewm.exe" /FO CSV /NH`.nothrow().text()).includes("glazewm.exe");
+  if (foreign && !running.has(join(bin.glazewm, "glazewm.exe").toLowerCase())) {
+    throw new Error("another GlazeWM is running (e.g. the bunos-shell `wm` module); stop it first");
+  }
+  if (!args.includes("--no-wallpaper")) await once(join(bin.bunos, "bunos-win11-wallpaper.exe"), ["run", "31536000"], {}, true);
+  if (!args.includes("--no-chrome")) await once(join(bin.bunos, "bunos-win11-chrome.exe"), ["watch"], {}, true);
+  await once(join(bin.glazewm, "glazewm.exe"), ["start", `--config=${join(root, "glazewm", "config.yaml")}`]);
+  await once(join(bin.tacky, "tacky-borders.exe"), [], { TACKY_BORDERS_CONFIG_HOME: join(root, "tacky-borders") });
+  const zebar = join(bin.zebar, "zebar.exe");
   const zebarConfig = join(root, "zebar", "config");
   mkdirSync(zebarConfig, { recursive: true });
-  once(join(bin.zebar, "zebar.exe"), ["startup", `--config-dir=${zebarConfig}`]);
-  once(join(bin.altsnap, "AltSnap.exe"), []);
-  once(join(bin.flow, "Flow.Launcher.exe"), []);
-  await Bun.sleep(4000);
-  await themeZebar(zebarConfig);
+  await themeZebar();
+  const settings = join(zebarConfig, "settings.json");
+  if (!existsSync(settings) && !running.has(zebar.toLowerCase())) {
+    // First run: Zebar writes settings.json and registers its starter pack; it picks the `vanilla` bar because our
+    // GlazeWM is not an installed app, so let it initialise once and restart it on the GlazeWM widget.
+    await start(zebar, ["startup", `--config-dir=${zebarConfig}`]);
+    for (let i = 0; i < 40 && !existsSync(settings); i++) await Bun.sleep(250);
+    await $`taskkill /IM zebar.exe /F`.nothrow().quiet();
+    running.delete(zebar.toLowerCase());
+  }
+  if (existsSync(settings)) {
+    const s = await Bun.file(settings).json();
+    for (const c of s.startupConfigs ?? []) if (c.pack === "glzr-io.starter") c.widget = "with-glazewm";
+    await Bun.write(settings, `${JSON.stringify(s, null, 2)}\n`);
+  }
+  await once(zebar, ["startup", `--config-dir=${zebarConfig}`]);
+  await once(join(bin.altsnap, "AltSnap.exe"), []);
+  await once(join(bin.flow, "Flow.Launcher.exe"), []);
 }
 
-/** Append the rendered M3 bar theme to every installed starter stylesheet (Zebar copies the pack on first run). */
-async function themeZebar(config: string) {
-  const css = join(root, "zebar", "bunos-theme.css");
-  const walk = (d: string): string[] =>
-    existsSync(d) ? readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : [join(d, f)])) : [];
-  for (const styles of walk(config).filter((f) => f.endsWith("styles.css"))) {
-    const text = await Bun.file(styles).text();
-    const marker = "/* bunos-theme */";
-    const body = text.split(marker)[0];
-    await Bun.write(styles, `${body}${marker}\n${await Bun.file(css).text()}`);
-    console.log(`themed ${styles}`);
-  }
+/** Append the rendered M3 bar theme to the staged starter stylesheet (Zebar serves the starter pack from there). */
+async function themeZebar() {
+  const styles = join(bin.zebar, "_up_", "_up_", "resources", "starter", "styles.css");
+  if (!existsSync(styles)) return;
+  const marker = "/* bunos-theme */";
+  const body = (await Bun.file(styles).text()).split(marker)[0];
+  await Bun.write(styles, `${body}${marker}\n${await Bun.file(join(root, "zebar", "bunos-theme.css")).text()}`);
+  console.log(`themed ${styles}`);
 }
 
 async function down() {

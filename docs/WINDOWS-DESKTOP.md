@@ -158,7 +158,7 @@ DirectComposition overlays, low-level keyboard/mouse hooks); nothing replaces `e
 one look (M3 dark roles, glass, motion):
 
 - **Keys** (Omarchy where Windows allows, `Super` = `lwin`): `Super+Enter` terminal (Rio, else Windows Terminal),
-  `Super+Space` Flow Launcher, `Super+W` close, `Super+F` fullscreen, `Super+T` float, `Super+J` split direction,
+  `Super+Space` Flow Launcher (its own hotkey moves to `Ctrl+Alt+Space`), `Super+W` close, `Super+F` fullscreen, `Super+T` float, `Super+J` split direction,
   `Super+arrows` focus, `Super+Shift+arrows` move, `Super+1..9` and `Super+Shift+1..9` workspaces, `Super+Tab` next
   workspace, `Super+-`/`Super+=` resize, `Super+R` resize mode, `Super+Shift+R` reload, `Super+Shift+E` exit.
   `Super` with left/right drag moves/resizes (AltSnap). `Win+L` stays the system lock.

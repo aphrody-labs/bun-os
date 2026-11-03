@@ -339,12 +339,15 @@ UseZones=0
 }
 
 /// Flow Launcher portable `UserData/Settings/Settings.json` seed: Acrylic at max glass, no backdrop when reduced.
+/// Flow's own hotkey moves to Ctrl+Alt+Space (Alt+Space is the system window menu and often taken); Super+Space is
+/// GlazeWM's binding, which starts or re-shows the single Flow instance.
 /// Flow merges missing keys with its defaults; the user's later changes are kept (the file is only seeded once).
 #[must_use]
 pub fn flow_settings(look: &Look) -> String {
     let backdrop = if look.glass == Glass::Max { 1 } else { 0 }; // BackdropTypes: None=0, Acrylic=1
     let doc = serde_json::json!({
-        "Hotkey": "Alt + Space",
+        "Hotkey": "Ctrl + Alt + Space",
+        "FirstLaunch": false,
         "Theme": "Darker Glass",
         "BackdropType": backdrop,
         "UseDropShadowEffect": true,
