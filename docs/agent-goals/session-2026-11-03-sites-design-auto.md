@@ -125,3 +125,37 @@ Priorities from the read-only comparison of upstream iced/libcosmic with our for
 - Known: krilla now uses upstream hayro-syntax without the PdfCraft hardening; bun-os workspace resolution hit a
   crc version conflict (uucore vs aphrody-dust-core) unrelated to this work.
 - Then tell bun-os-6c (peer) so it builds the auto delivery lane.
+
+## Final state (2026-11-04 ~00:25)
+
+### Design-system migration workflow: stopped on the owner's request
+- 23 batch results recorded: several passed adversarial verification (e.g. commits 2ce0c7a474, c14686ae50), most
+  are partial, some failed verification. Commits of each batch are on main; the run journal is at
+  ~/.claude/projects/C--src-bun-os/b5fe0aa5-8e2a-4599-8793-5d6c70ec6b80/subagents/workflows/wf_bbd2babe-6a5/journal.jsonl.
+- Interrupted, uncommitted batch edits (316 files) saved WITHOUT touching the working tree at
+  `refs/wip/design-migration-20261104` (6d4e2d3eef) on origin. To resume: review that diff per batch, commit the
+  coherent parts with scripts/git-commit-paths.ts, discard the rest; then rerun the workflow with resumeFromRunId
+  wf_bbd2babe-6a5 (completed agents replay from cache) or relaunch only the failed/partial batches.
+- docs/DESIGN-SYSTEM.md (the spec) is still to be written from the synthesized spec (ds-spec.md in %TEMP%; the
+  understand workflow wf_7d939d48-215 journal holds it if %TEMP% is cleaned).
+
+### ui-ux-pro-max: done (17299e48d7)
+- Fork aphrody-labs/ui-ux-pro-max-skill synced (17ce720, upstream 713eef5), vendored at vendor/ui-ux-pro-max-skill.
+- packages/m3-design: `bun run sync:upstream`, 43-query golden parity with upstream Python, stacks iced-libcosmic and
+  egui, brands generated from @aphrody/m3-tokens (product seed #8c6c88), generated skill at
+  packages/m3-design/skill/ui-ux-pro-max (`bun run build:skill`).
+- Left: m3_design_* MCP tools lack rtl/dials/persist/structured results; user-level ~/.claude/skills copy is still
+  upstream Python: install from the generated skill or ship it in the plugin.
+
+### 3dviz-pro-max: done (fbbf252bad, fba7f0ae87, 570629ee60)
+- Fork aphrody-labs/3dviz-pro-max, vendored vendor/3dviz-pro-max at d077e0e6; new owner packages/viz3d
+  (@aphrody/viz3d): 12 Python scripts ported to Bun, golden parity with upstream, Three.js 0.186 WebGPU + WebGL2
+  fallback kits, Bun scaffold, MCP tools viz3d_* in packages/m3-mcp, generated skill at
+  packages/viz3d/plugin/skills/3dviz-pro-max.
+- Left: Blender hero-tier bake not exercised; 37 studies still WebGL + own CSS; factory/bunos/components.json entry
+  (peer scope); pre-existing packages/chromium type errors.
+
+### Next: plugin distribution
+- Build one Claude Code + Codex plugin from packages/m3-design/skill/ui-ux-pro-max + packages/viz3d/plugin +
+  packages/m3-mcp, publish the bun-os repo as a marketplace, enable it in every aphrody-labs repo and on
+  workstation + VPS.
