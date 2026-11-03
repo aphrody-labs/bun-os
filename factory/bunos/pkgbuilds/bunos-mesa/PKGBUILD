@@ -3,9 +3,9 @@
 # gitlab.freedesktop.org/mesa/mesa) with DirectX-Headers from aphrody-labs/DirectX-Headers. The GPU path on WSL is
 # D3D12 over /dev/dxg: OpenGL/GLES/EGL/GBM through the d3d12 gallium driver, Vulkan through dzn
 # (microsoft-experimental), VA-API through d3d12 video. llvmpipe/lavapipe stay as the software fallback, zink for
-# GL-on-Vulkan. Layout and package split follow Arch's mesa PKGBUILD (packaging/packages/mesa, MIT notices kept).
+# GL-on-Vulkan, rusticl for OpenCL (d3d12/zink/llvmpipe selected by RUSTICL_ENABLE). Layout and package split follow Arch's mesa PKGBUILD (packaging/packages/mesa, MIT notices kept).
 pkgbase=bunos-mesa
-pkgname=(bunos-mesa bunos-vulkan-dzn bunos-vulkan-swrast)
+pkgname=(bunos-mesa bunos-vulkan-dzn bunos-vulkan-swrast bunos-opencl-mesa)
 pkgver=26.3.0rc3
 _tag=mesa-26.3.0-rc3
 _commit=90a959ebba9dbb36f2ea5176091c15d6ebdd0af0
@@ -18,9 +18,9 @@ url='https://github.com/aphrody-labs/mesa'
 arch=(x86_64)
 license=('MIT AND BSD-3-Clause AND SGI-B-2.0')
 makedepends=(
-  git meson ninja cmake clang llvm llvm-libs glslang spirv-tools spirv-llvm-translator libclc
+  git meson ninja cmake clang llvm llvm-libs glslang spirv-tools spirv-llvm-translator libclc rust rust-bindgen cbindgen
   python-mako python-packaging python-ply python-pycparser python-yaml
-  expat libdrm libelf libglvnd libva libx11 libxcb libxext libxrandr libxshmfence libxxf86vm libxml2
+  expat libdisplay-info libdrm libelf libglvnd libva libx11 libxcb libxext libxrandr libxshmfence libxxf86vm libxml2
   lm_sensors systemd-libs vulkan-icd-loader wayland wayland-protocols xorgproto xcb-util-keysyms zlib zstd
 )
 options=(!lto)
@@ -43,7 +43,6 @@ prepare() {
 build() {
   local meson_options=(
     --optimization 2
-    --wrap-mode=nodownload
     --force-fallback-for=DirectX-Headers
     -D b_ndebug=true
     -D platforms=x11,wayland
@@ -51,7 +50,8 @@ build() {
     -D gallium-va=enabled
     -D gallium-d3d12-video=enabled
     -D gallium-d3d12-graphics=enabled
-    -D gallium-rusticl=false
+    -D gallium-rusticl=true
+    -D gallium-rusticl-enable-drivers=
     -D gallium-mediafoundation=disabled
     -D video-codecs=all
     -D vulkan-drivers=microsoft-experimental,swrast
@@ -94,7 +94,7 @@ _licenses() {
 }
 
 package_bunos-mesa() {
-  depends=(expat glibc libdrm libelf libgcc libglvnd libstdc++ libva libx11 libxcb libxext libxshmfence libxxf86vm
+  depends=(expat glibc libdisplay-info libdrm libelf libgcc libglvnd libstdc++ libva libx11 libxcb libxext libxshmfence libxxf86vm
            llvm-libs lm_sensors spirv-tools wayland zlib zstd)
   provides=("mesa=${_epoch}:${pkgver}" "libva-mesa-driver=${_epoch}:${pkgver}" "mesa-libgl=${_epoch}:${pkgver}"
             libva-driver opengl-driver)
@@ -107,6 +107,8 @@ package_bunos-mesa() {
     _pick vkd3d12 usr/lib/libspirv_to_dxil.*
     _pick vkd3d12 usr/bin/spirv2dxil
     _pick vkd3d12 usr/share/vulkan/icd.d/dzn_icd.json
+    _pick opencl usr/lib/libRusticlOpenCL*
+    _pick opencl etc/OpenCL/vendors/rusticl.icd
     _pick vkswrast usr/lib/libvulkan_lvp.so
     _pick vkswrast usr/share/vulkan/icd.d/lvp_icd.json
     ln -sr usr/lib/libGLX_{mesa,indirect}.so.0
@@ -131,5 +133,18 @@ package_bunos-vulkan-swrast() {
   provides=("vulkan-swrast=${_epoch}:${pkgver}" vulkan-driver)
   conflicts=(vulkan-swrast vulkan-mesa)
   mv -v "$srcdir"/vkswrast/* "$pkgdir"
+  _licenses
+}
+
+package_bunos-opencl-mesa() {
+  pkgdesc='Mesa rusticl: OpenCL for Bun OS, on d3d12 (DirectX 12), zink or llvmpipe (Bun OS fork)'
+  depends=(clang expat glibc libdrm libelf libgcc libstdc++ llvm-libs spirv-llvm-translator spirv-tools zlib zstd libclc
+           bunos-mesa)
+  provides=("opencl-mesa=${_epoch}:${pkgver}" opencl-driver)
+  conflicts=(opencl-mesa opencl-rusticl-mesa)
+  mv -v "$srcdir"/opencl/* "$pkgdir"
+  # rusticl enables no driver by default; on WSL the GPU is d3d12, with llvmpipe as the CPU device.
+  install -Dm644 /dev/stdin "$pkgdir/usr/lib/environment.d/50-bunos-rusticl.conf" <<<"RUSTICL_ENABLE=d3d12,llvmpipe"
+  install -Dm644 /dev/stdin "$pkgdir/etc/profile.d/bunos-rusticl.sh" <<<'export RUSTICL_ENABLE="${RUSTICL_ENABLE:-d3d12,llvmpipe}"'
   _licenses
 }

@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT
+# vtest GPU bridge for the Waydroid session of user %i: Android's Mesa (virpipe, mesa.gallium.driver) connects to
+# /data/vtest/virgl.sock, which is this socket inside the container, and the frames are rendered here on Mesa d3d12.
+[Unit]
+Description=virgl vtest server for Waydroid (%i) on Mesa d3d12
+After=waydroid-container.service
+
+[Service]
+Type=simple
+User=%i
+UMask=0000
+UnsetEnvironment=DISPLAY WAYLAND_DISPLAY
+Environment=MESA_LOADER_DRIVER_OVERRIDE=d3d12
+ExecStartPre=/usr/bin/install -d -m 0777 /home/%i/.local/share/waydroid/data/vtest
+ExecStart=/usr/bin/virgl_test_server --use-egl-surfaceless --use-gles --socket-path /home/%i/.local/share/waydroid/data/vtest/virgl.sock
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
