@@ -397,7 +397,10 @@
       "license": "MIT",
       "cargo": [
         "--bin",
-        "ouch"
+        "ouch",
+        "--no-default-features",
+        "--features",
+        "use_zlib,use_zstd_thin,bzip3"
       ],
       "bins": [
         {
