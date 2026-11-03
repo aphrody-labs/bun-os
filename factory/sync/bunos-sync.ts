@@ -370,8 +370,27 @@ async function fetchMain(): Promise<string | Result> {
   return last!;
 }
 
+/**
+ * Push HEAD to main. The pre-push gate takes minutes on the build host and other agents push meanwhile, so a
+ * rejection because origin moved is the normal case: fetch, replay the local commits on the new origin/main
+ * (patch-identical ones drop out) and push again. Gives up after three rejections or when the replay does not apply.
+ */
 async function pushMain(): Promise<Result> {
-  return git(["push", "origin", "HEAD:main"], { timeoutMs: 300_000 });
+  let pushed = await git(["push", "origin", "HEAD:main"], { timeoutMs: 300_000 });
+  for (let attempt = 1; attempt <= 3 && pushed.code !== 0; attempt++) {
+    const fetched = await fetchMain();
+    if (typeof fetched !== "string") return pushed;
+    if ((await git(["merge-base", "--is-ancestor", "origin/main", "HEAD"])).code !== 0) {
+      const rebased = await git(["-c", "rebase.autoStash=true", "rebase", "origin/main"], { timeoutMs: 1_800_000 });
+      if (rebased.code !== 0) {
+        await git(["rebase", "--abort"], { timeoutMs: 600_000 });
+        return pushed;
+      }
+    }
+    if ((await gitOk(["rev-parse", "HEAD"])) === fetched) return { ...pushed, code: 0 };
+    pushed = await git(["push", "origin", "HEAD:main"], { timeoutMs: 300_000 });
+  }
+  return pushed;
 }
 
 /** The single Cargo.lock writer: keep the lock in step with the manifests on main. */
