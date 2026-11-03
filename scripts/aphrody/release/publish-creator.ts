@@ -6,6 +6,8 @@
  *   plan                 show what would be built and uploaded
  *   stage                build and stage the release locally, upload nothing (prints the folder)
  *   release              build the Windows exe, stage the packs, upload, checksum on the host, flip `current`
+ *   page                 republish only the page around the current packs: new release dir (packs hard-linked,
+ *                        checksums re-verified), fresh page files, atomic flip of `current`
  *   verify               download latest.json, both packs and check SHA-256
  *   host-plan | host-apply [--apply]
  *                        create the release root, install the nginx vhost in the vps host nginx conf.d
@@ -322,6 +324,43 @@ async function release(): Promise<void> {
   }
 }
 
+/** New release holding the current packs (hard links, never rewritten) and a freshly built page. */
+async function page(): Promise<void> {
+  const commit = (await run(["git", "rev-parse", "--short=12", "HEAD"])).trim();
+  const built = await buildPage();
+  const releaseId = `${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}-page-${commit}`;
+  const dest = `${SITE.root}/releases/${releaseId}`;
+  const cur = `${SITE.root}/current`;
+  await remote(
+    [
+      "set -e",
+      `src=$(readlink -f ${cur})`,
+      `install -d ${dest}`,
+      // Packs are immutable: hard links. Small mutable files are copied so the old release never changes.
+      `cp -al "$src/files" "$src/download" ${dest}/`,
+      `cp -p "$src/latest.json" "$src/SHA256SUMS" ${dest}/`,
+      `cd ${dest} && sha256sum -c --quiet SHA256SUMS`,
+    ].join("\n"),
+  );
+  const site: string[] = [];
+  for await (const file of walk(built)) site.push(relative(built, file).replaceAll("\\", "/"));
+  await remote(
+    `install -d ${[...new Set(site.map(rel => `${dest}/${rel.split("/").slice(0, -1).join("/")}`))].join(" ")}`,
+  );
+  for (const rel of site) await put(join(built, rel), `${dest}/${rel}`);
+  await remote(
+    [
+      "set -e",
+      ...PAGE_FILES.map(name => `test -s ${dest}/${name}`),
+      `chmod -R a+rX ${dest}`,
+      `ln -sfn ${dest} ${SITE.root}/current.tmp`,
+      `mv -Tf ${SITE.root}/current.tmp ${cur}`,
+      `ls -1dt ${SITE.root}/releases/* | tail -n +${SITE.keepReleases + 1} | xargs -r rm -rf`,
+    ].join("\n"),
+  );
+  console.log(`published page ${releaseId}`);
+}
+
 async function verify(): Promise<void> {
   const res = await fetch(`${SITE.baseUrl}/latest.json`, {
     headers: { "cache-control": "no-cache" },
@@ -393,6 +432,9 @@ if (import.meta.main) {
     case "release":
       await release();
       break;
+    case "page":
+      await page();
+      break;
     case "verify":
       await verify();
       break;
@@ -404,7 +446,7 @@ if (import.meta.main) {
       break;
     default:
       console.error(
-        "usage: publish-creator.ts plan|stage|release|verify|host-plan|host-apply [--apply] [--host <ssh-host|local>] [--compile-executable-path <exe>]",
+        "usage: publish-creator.ts plan|stage|release|page|verify|host-plan|host-apply [--apply] [--host <ssh-host|local>] [--compile-executable-path <exe>]",
       );
       process.exit(2);
   }
