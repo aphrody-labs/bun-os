@@ -23,7 +23,7 @@ pkgver() {
 package() {
   local d="$startdir/design" s="$pkgdir/usr/share"
   install -d "$s/themes" "$s/icons" "$s/fonts/bunos-m3" "$s/bunos/design" "$s/bunos/themes" "$s/backgrounds/bunos" \
-    "$s/cosmic" "$s/fontconfig/conf.avail" "$pkgdir/etc/fonts/conf.d" "$s/glib-2.0/schemas"
+    "$s/bunos/xdg/cosmic" "$s/fontconfig/conf.avail" "$pkgdir/etc/fonts/conf.d" "$s/glib-2.0/schemas"
   # GTK 3/4 + libadwaita, GNOME Shell
   cp -a "$d/gtk/BunOS-M3" "$s/themes/"
   cp -a "$d/os/gnome/themes/M3-BunOS" "$s/themes/"
@@ -34,9 +34,18 @@ package() {
   install -Dm644 -t "$s/licenses/$pkgname/fonts" "$d"/fonts/licenses/*
   install -m644 "$d/fonts/fontconfig/60-bunos-m3.conf" "$s/fontconfig/conf.avail/"
   ln -s /usr/share/fontconfig/conf.avail/60-bunos-m3.conf "$pkgdir/etc/fonts/conf.d/60-bunos-m3.conf"
-  # COSMIC system defaults (cosmic-config reads /usr/share/cosmic): theme builders, mode, CosmicTk (controls at start)
-  cp -a "$d/os/cosmic/config/." "$s/cosmic/"
-  cp -a "$d/cosmic/com.system76.CosmicTk" "$s/cosmic/"
+  # COSMIC defaults: theme builders, mode, CosmicTk (controls at the start). cosmic-config looks them up through
+  # XDG_DATA_DIRS (<dir>/cosmic/...), and cosmic-settings already owns /usr/share/cosmic, so they live in their own
+  # data dir placed first in XDG_DATA_DIRS for login shells and the systemd user manager.
+  cp -a "$d/os/cosmic/config/." "$s/bunos/xdg/cosmic/"
+  cp -a "$d/cosmic/com.system76.CosmicTk" "$s/bunos/xdg/cosmic/"
+  install -Dm644 /dev/stdin "$pkgdir/etc/profile.d/bunos-design-m3.sh" <<'EOF'
+# Bun OS: design defaults (bunos-design-m3) ahead of the distribution defaults.
+case ":${XDG_DATA_DIRS:-}:" in *:/usr/share/bunos/xdg:*) ;; *) export XDG_DATA_DIRS="/usr/share/bunos/xdg:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}" ;; esac
+EOF
+  install -Dm644 /dev/stdin "$pkgdir/usr/lib/environment.d/60-bunos-design-m3.conf" <<'EOF'
+XDG_DATA_DIRS=/usr/share/bunos/xdg:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}
+EOF
   # Hyprland chrome (hyprbars buttons, rounding, shadows, M3 motion) and the Omarchy-format palette bunos-theme applies
   cp -a "$d/hyprland" "$s/bunos/design/"
   cp -a "$d/omarchy/bunos-m3" "$s/bunos/themes/"

@@ -77,7 +77,7 @@ Default look: Material 3 with macOS-style window controls on every desktop, prod
 single M3 token source (docs/DESIGN-M3-WINDOWS.md, `@aphrody/m3-os-themes design`). `bunos-design-m3` installs that
 artifact unchanged (keyed by the commit in its `receipt.json`): GTK 3/4 + libadwaita theme `BunOS-M3`, GNOME Shell
 theme, GNOME defaults as a gschema override (button layout close,minimize,maximize on the left, M3 fonts, icons),
-COSMIC system defaults in `/usr/share/cosmic` (theme builders, CosmicTk with the controls at the start), Hyprland
+COSMIC defaults (theme builders, CosmicTk with the controls at the start) in `/usr/share/bunos/xdg/cosmic`, first in `XDG_DATA_DIRS` (cosmic-settings owns `/usr/share/cosmic`), Hyprland
 chrome for hyprbars, the Omarchy-format palette `bunos-m3`, icon themes Aphrody-M3 / Aphrody-M3-Dark, the M3 fonts
 with `60-bunos-m3.conf`, and the wallpaper. Every Linux profile pulls it, and the first `bunos-session` applies
 `bunos-m3`.
