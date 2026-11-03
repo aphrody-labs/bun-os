@@ -1,35 +1,39 @@
 // SPDX-License-Identifier: Apache-2.0
 import { describe, expect, it } from "bun:test";
-import { GEMINI_BRAND_COLORS, GEMINI_BRAND_GRADIENTS, GEMINI_BRAND_SHAPES, getGeminiBrandCss } from "../src/index.js";
+import { brandDeclarations, brandModule } from "../scripts/brand-module";
+import {
+  APHRODY_BRAND_COLORS,
+  APHRODY_BRAND_CSS,
+  APHRODY_BRAND_GRADIENTS,
+  APHRODY_BRAND_SHAPES,
+} from "../src/index.js";
 
-describe("@aphrody/m3-theme brand tokens", () => {
-  it("exposes canonical Gemini brand colors matching Rust definitions", () => {
-    expect(GEMINI_BRAND_COLORS.blue).toBe("#3186FF");
-    expect(GEMINI_BRAND_COLORS.green).toBe("#0EBC5F");
-    expect(GEMINI_BRAND_COLORS.yellow).toBe("#FFCC00");
-    expect(GEMINI_BRAND_COLORS.red).toBe("#FF4641");
-    expect(GEMINI_BRAND_COLORS.purple).toBe("#9B72CB");
-    expect(GEMINI_BRAND_COLORS.pink).toBe("#D96570");
+describe("@aphrody/m3-theme brand tokens (generated from Sheet::Brand)", () => {
+  it("carries every --aphrody-* declaration of the brand sheet and nothing else", () => {
+    const declared = brandDeclarations(APHRODY_BRAND_CSS).map(([name]) => name);
+    expect(declared.every(name => name.startsWith("--aphrody-"))).toBe(true);
+    const counted =
+      Object.keys(APHRODY_BRAND_COLORS).length +
+      Object.keys(APHRODY_BRAND_GRADIENTS).length +
+      Object.keys(APHRODY_BRAND_SHAPES).length;
+    expect(counted).toBe(declared.length);
   });
 
-  it("exposes canonical brand gradients", () => {
-    expect(GEMINI_BRAND_GRADIENTS.spectrumShift).toContain("linear-gradient");
-    expect(GEMINI_BRAND_GRADIENTS.warmTone).toContain("linear-gradient");
-    expect(GEMINI_BRAND_GRADIENTS.sparkle).toContain("radial-gradient");
+  it("groups colours, gradients and corners", () => {
+    for (const value of Object.values(APHRODY_BRAND_COLORS)) expect(value).toMatch(/^#[0-9A-F]{6}$/);
+    for (const value of Object.values(APHRODY_BRAND_GRADIENTS)) expect(value).toStartWith("linear-gradient(");
+    for (const value of Object.values(APHRODY_BRAND_SHAPES)) expect(value).toMatch(/^\d+px$/);
   });
 
-  it("exposes standard brand corner radii", () => {
-    expect(GEMINI_BRAND_SHAPES.promptBar).toBe("32px");
-    expect(GEMINI_BRAND_SHAPES.promptBarInitial).toBe("40px");
-    expect(GEMINI_BRAND_SHAPES.promptBarDocked).toBe("24px 24px 0 0");
-    expect(GEMINI_BRAND_SHAPES.chip).toBe("16px");
-    expect(GEMINI_BRAND_SHAPES.message).toBe("24px");
+  it("drops the sheet's --m3-* baseline companions", () => {
+    const sheet = `:root {\n  --m3-color-primary: #000000;\n  --aphrody-brand-blue: #112233;\n  --aphrody-corner-card: 16px;\n}\n`;
+    const module = brandModule(sheet);
+    expect(module).toContain('blue: "#112233"');
+    expect(module).toContain('card: "16px"');
+    expect(module).not.toContain("--m3-color-primary");
   });
 
-  it("generates runtime CSS variables declaring all brand tokens", () => {
-    const css = getGeminiBrandCss();
-    expect(css).toContain("--gemini-brand-blue: #3186FF;");
-    expect(css).toContain("--gemini-spectrum-shift:");
-    expect(css).toContain("--gemini-corner-prompt-bar: 32px;");
+  it("refuses a sheet without brand declarations", () => {
+    expect(() => brandModule(":root {}\n")).toThrow("no --aphrody-* declarations");
   });
 });

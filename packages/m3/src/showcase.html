@@ -1,221 +1,121 @@
 <!doctype html>
 <!-- SPDX-License-Identifier: Apache-2.0 -->
+<!--
+  Material 3 token gallery. Every colour, shape, type style, elevation and motion value comes from the
+  generated sheets (crates/aphrody-m3-tokens through @aphrody/m3-theme and @aphrody/m3-tokens); this page
+  declares none of its own.
+-->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>
-      Material Design 3 (M3) — Google Design System & Real-Time Engine
-    </title>
-    <link rel="icon" type="image/svg+xml" href="/fonts/icon.svg" />
-    <link rel="stylesheet" href="/fonts/GoogleSansFlex-latin.woff2" />
-    <link rel="stylesheet" href="/fonts/material-symbols-outlined.woff2" />
+    <title>Material 3 token gallery</title>
+    <link rel="stylesheet" href="../../m3-fonts/src/fonts.css" />
+    <link rel="stylesheet" href="../../m3-tokens/src/m3-tokens.css" />
+    <link rel="stylesheet" href="../../m3-theme/tokens.css" />
     <style>
-      :root {
-        --md-sys-color-primary: #6750a4;
-        --md-sys-color-on-primary: #ffffff;
-        --md-sys-color-primary-container: #eaddff;
-        --md-sys-color-on-primary-container: #21005d;
-        --md-sys-color-secondary: #625b71;
-        --md-sys-color-on-secondary: #ffffff;
-        --md-sys-color-secondary-container: #e8def8;
-        --md-sys-color-on-secondary-container: #1d192b;
-        --md-sys-color-tertiary: #7d5260;
-        --md-sys-color-on-tertiary: #ffffff;
-        --md-sys-color-tertiary-container: #ffd8e4;
-        --md-sys-color-on-tertiary-container: #31111d;
-        --md-sys-color-error: #b3261e;
-        --md-sys-color-on-error: #ffffff;
-        --md-sys-color-error-container: #f9dedc;
-        --md-sys-color-on-error-container: #410e0b;
-        --md-sys-color-surface: #fef7ff;
-        --md-sys-color-on-surface: #1d1b20;
-        --md-sys-color-surface-variant: #e7e0ec;
-        --md-sys-color-on-surface-variant: #49454f;
-        --md-sys-color-outline: #79747e;
-        --md-sys-color-outline-variant: #cac4d0;
-        --md-sys-color-surface-container-lowest: #ffffff;
-        --md-sys-color-surface-container-low: #f7f2fa;
-        --md-sys-color-surface-container: #f3edf7;
-        --md-sys-color-surface-container-high: #ece6f0;
-        --md-sys-color-surface-container-highest: #e6e0e9;
-        --md-sys-color-background: #fef7ff;
-        --md-sys-color-on-background: #1d1b20;
-
-        --md-sys-shape-corner-none: 0px;
-        --md-sys-shape-corner-extra-small: 4px;
-        --md-sys-shape-corner-small: 8px;
-        --md-sys-shape-corner-medium: 12px;
-        --md-sys-shape-corner-large: 16px;
-        --md-sys-shape-corner-extra-large: 28px;
-        --md-sys-shape-corner-full: 9999px;
-
-        --md-sys-elevation-level0: none;
-        --md-sys-elevation-level1:
-          0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
-        --md-sys-elevation-level2:
-          0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
-        --md-sys-elevation-level3:
-          0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
-        --md-sys-elevation-level4:
-          0 2px 3px rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
-        --md-sys-elevation-level5:
-          0 4px 4px rgba(0, 0, 0, 0.3), 0 8px 12px 6px rgba(0, 0, 0, 0.15);
-
-        --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
-        --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(
-          0.05,
-          0.7,
-          0.1,
-          1
-        );
-        --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
-        --md-sys-motion-duration-short4: 200ms;
-        --md-sys-motion-duration-medium2: 300ms;
-        --md-sys-motion-duration-long2: 500ms;
-      }
-
-      [data-theme="dark"] {
-        --md-sys-color-primary: #d0bcff;
-        --md-sys-color-on-primary: #381e72;
-        --md-sys-color-primary-container: #4f378b;
-        --md-sys-color-on-primary-container: #eaddff;
-        --md-sys-color-secondary: #ccc2dc;
-        --md-sys-color-on-secondary: #332d41;
-        --md-sys-color-secondary-container: #4a4458;
-        --md-sys-color-on-secondary-container: #e8def8;
-        --md-sys-color-tertiary: #efb8c8;
-        --md-sys-color-on-tertiary: #492532;
-        --md-sys-color-tertiary-container: #633b48;
-        --md-sys-color-on-tertiary-container: #ffd8e4;
-        --md-sys-color-error: #f2b8b5;
-        --md-sys-color-on-error: #601410;
-        --md-sys-color-error-container: #8c1d18;
-        --md-sys-color-on-error-container: #f9dedc;
-        --md-sys-color-surface: #141218;
-        --md-sys-color-on-surface: #e6e0e9;
-        --md-sys-color-surface-variant: #49454f;
-        --md-sys-color-on-surface-variant: #cac4d0;
-        --md-sys-color-outline: #938f99;
-        --md-sys-color-outline-variant: #49454f;
-        --md-sys-color-surface-container-lowest: #0f0d13;
-        --md-sys-color-surface-container-low: #1d1b20;
-        --md-sys-color-surface-container: #211f26;
-        --md-sys-color-surface-container-high: #2b2930;
-        --md-sys-color-surface-container-highest: #36343b;
-        --md-sys-color-background: #141218;
-        --md-sys-color-on-background: #e6e0e9;
-      }
-
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
       body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Google Sans Flex", "Segoe UI",
-          Roboto, sans-serif;
+        font-family: var(--md-sys-typescale-body-medium-font);
+        font-size: var(--md-sys-typescale-body-medium-size);
+        line-height: var(--md-sys-typescale-body-medium-line-height);
+        letter-spacing: var(--md-sys-typescale-body-medium-tracking);
         background-color: var(--md-sys-color-background);
         color: var(--md-sys-color-on-background);
         transition:
-          background-color var(--md-sys-motion-duration-short4)
-            var(--md-sys-motion-easing-standard),
-          color var(--md-sys-motion-duration-short4)
-            var(--md-sys-motion-easing-standard);
-        line-height: 1.5;
-        -webkit-font-smoothing: antialiased;
+          background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+          color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+      }
+      :focus-visible {
+        outline: 2px solid var(--md-sys-color-secondary);
+        outline-offset: 2px;
       }
 
       header {
         position: sticky;
         top: 0;
-        z-index: 100;
+        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 16px;
         padding: 16px 24px;
         background: var(--md-sys-color-surface-container);
         box-shadow: var(--md-sys-elevation-level2);
         border-bottom: 1px solid var(--md-sys-color-outline-variant);
       }
-      .logo-container {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .logo-badge {
-        width: 40px;
-        height: 40px;
-        border-radius: var(--md-sys-shape-corner-medium);
-        background: var(--md-sys-color-primary);
-        color: var(--md-sys-color-on-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 20px;
-        box-shadow: var(--md-sys-elevation-level1);
-      }
-      .header-titles h1 {
-        font-size: 18px;
-        font-weight: 600;
+      header h1 {
+        font-family: var(--md-sys-typescale-title-large-font);
+        font-size: var(--md-sys-typescale-title-large-size);
+        line-height: var(--md-sys-typescale-title-large-line-height);
+        font-weight: var(--md-sys-typescale-title-large-weight);
         color: var(--md-sys-color-on-surface);
-        letter-spacing: -0.2px;
       }
-      .header-titles p {
-        font-size: 12px;
+      header p {
+        font-size: var(--md-sys-typescale-body-small-size);
+        line-height: var(--md-sys-typescale-body-small-line-height);
         color: var(--md-sys-color-on-surface-variant);
       }
 
-      .top-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
       .btn {
+        position: relative;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 10px 24px;
-        font-size: 14px;
-        font-weight: 500;
+        min-height: 40px;
+        padding: 0 24px;
+        font-family: var(--md-sys-typescale-label-large-font);
+        font-size: var(--md-sys-typescale-label-large-size);
+        line-height: var(--md-sys-typescale-label-large-line-height);
+        letter-spacing: var(--md-sys-typescale-label-large-tracking);
+        font-weight: var(--md-sys-typescale-label-large-weight);
         border-radius: var(--md-sys-shape-corner-full);
         cursor: pointer;
         border: none;
-        transition: all var(--md-sys-motion-duration-short4)
-          var(--md-sys-motion-easing-standard);
-        text-decoration: none;
+        overflow: hidden;
+        transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+      }
+      .btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: currentColor;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+      }
+      .btn:hover::after {
+        opacity: var(--md-sys-state-hover-state-layer-opacity);
+      }
+      .btn:focus-visible::after {
+        opacity: var(--md-sys-state-focus-state-layer-opacity);
+      }
+      .btn:active::after {
+        opacity: var(--md-sys-state-pressed-state-layer-opacity);
       }
       .btn-filled {
         background: var(--md-sys-color-primary);
         color: var(--md-sys-color-on-primary);
-        box-shadow: var(--md-sys-elevation-level1);
       }
       .btn-filled:hover {
-        box-shadow: var(--md-sys-elevation-level2);
-        filter: brightness(1.08);
+        box-shadow: var(--md-sys-elevation-level1);
       }
       .btn-tonal {
         background: var(--md-sys-color-secondary-container);
         color: var(--md-sys-color-on-secondary-container);
-      }
-      .btn-tonal:hover {
-        box-shadow: var(--md-sys-elevation-level1);
-        filter: brightness(0.96);
       }
       .btn-outlined {
         background: transparent;
         color: var(--md-sys-color-primary);
         border: 1px solid var(--md-sys-color-outline);
       }
-      .btn-outlined:hover {
-        background: var(--md-sys-color-primary-container);
-      }
 
-      .nav-tabs {
+      nav {
         display: flex;
         gap: 8px;
         padding: 12px 24px;
@@ -223,21 +123,20 @@
         border-bottom: 1px solid var(--md-sys-color-outline-variant);
         overflow-x: auto;
       }
-      .nav-tab {
-        padding: 8px 18px;
+      nav button {
+        padding: 8px 16px;
         border-radius: var(--md-sys-shape-corner-small);
-        font-size: 14px;
-        font-weight: 500;
+        font-family: var(--md-sys-typescale-label-large-font);
+        font-size: var(--md-sys-typescale-label-large-size);
+        font-weight: var(--md-sys-typescale-label-large-weight);
         color: var(--md-sys-color-on-surface-variant);
         cursor: pointer;
         background: transparent;
         border: none;
-        transition: all 0.2s;
       }
-      .nav-tab.active {
-        background: var(--md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container);
-        font-weight: 600;
+      nav button[aria-selected="true"] {
+        background: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container);
       }
 
       main {
@@ -245,29 +144,24 @@
         margin: 0 auto;
         padding: 32px 24px;
       }
-
-      .tab-content {
+      section[hidden] {
         display: none;
       }
-      .tab-content.active {
-        display: block;
-        animation: fadeIn 0.3s ease;
+      h2 {
+        font-family: var(--md-sys-typescale-headline-small-font);
+        font-size: var(--md-sys-typescale-headline-small-size);
+        line-height: var(--md-sys-typescale-headline-small-line-height);
+        font-weight: var(--md-sys-typescale-headline-small-weight);
       }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(6px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      .lead {
+        margin-top: 4px;
+        color: var(--md-sys-color-on-surface-variant);
       }
 
-      .grid-cards {
+      .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
+        gap: 16px;
         margin-top: 20px;
       }
       .card {
@@ -275,734 +169,313 @@
         border-radius: var(--md-sys-shape-corner-large);
         padding: 24px;
         border: 1px solid var(--md-sys-color-outline-variant);
-        box-shadow: var(--md-sys-elevation-level1);
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
       }
-      .card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--md-sys-elevation-level2);
-      }
-      .card-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 8px;
+      .card h3 {
+        font-family: var(--md-sys-typescale-title-medium-font);
+        font-size: var(--md-sys-typescale-title-medium-size);
+        line-height: var(--md-sys-typescale-title-medium-line-height);
+        font-weight: var(--md-sys-typescale-title-medium-weight);
+        margin-bottom: 4px;
         color: var(--md-sys-color-on-surface);
       }
-      .card-subtitle {
-        font-size: 13px;
-        color: var(--md-sys-color-on-surface-variant);
-        margin-bottom: 16px;
-      }
-
-      /* Color Swatches */
-      .color-swatch-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      .card .stack {
+        display: flex;
+        flex-direction: column;
         gap: 12px;
         margin-top: 16px;
       }
-      .color-swatch {
-        border-radius: var(--md-sys-shape-corner-medium);
-        padding: 16px 12px;
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .swatch {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        min-height: 80px;
-        font-size: 11px;
-        font-weight: 600;
-        box-shadow: var(--md-sys-elevation-level1);
-      }
-
-      .seed-picker-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 12px;
-        margin: 16px 0;
-        padding: 16px;
-        background: var(--md-sys-color-surface-container-high);
+        min-height: 88px;
+        padding: 12px;
         border-radius: var(--md-sys-shape-corner-medium);
+        font-size: var(--md-sys-typescale-label-medium-size);
+        line-height: var(--md-sys-typescale-label-medium-line-height);
+        font-weight: var(--md-sys-typescale-label-medium-weight);
       }
-      .seed-chip {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        cursor: pointer;
-        border: 3px solid transparent;
-        transition: transform 0.2s;
-      }
-      .seed-chip:hover {
-        transform: scale(1.15);
-      }
-      .seed-chip.active {
-        border-color: var(--md-sys-color-on-surface);
+      .swatch code {
+        font-family: var(--md-ref-typeface-code);
+        font-weight: 400;
+        opacity: 0.8;
       }
 
-      /* Code block */
-      pre.code-box {
-        background: var(--md-sys-color-surface-container-lowest);
-        border: 1px solid var(--md-sys-color-outline-variant);
-        border-radius: var(--md-sys-shape-corner-medium);
-        padding: 16px;
-        font-family:
-          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 12px;
-        overflow-x: auto;
-        color: var(--md-sys-color-on-surface);
-        margin-top: 12px;
-      }
-
-      /* Chips */
-      .chip-group {
+      .chips {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin: 12px 0;
+        margin-top: 16px;
       }
       .chip {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 16px;
+        min-height: 32px;
+        padding: 0 16px;
         border-radius: var(--md-sys-shape-corner-small);
-        font-size: 13px;
-        font-weight: 500;
-        background: var(--md-sys-color-surface-container-high);
-        color: var(--md-sys-color-on-surface);
-        border: 1px solid var(--md-sys-color-outline-variant);
+        font-family: var(--md-sys-typescale-label-large-font);
+        font-size: var(--md-sys-typescale-label-large-size);
+        font-weight: var(--md-sys-typescale-label-large-weight);
+        background: transparent;
+        color: var(--md-sys-color-on-surface-variant);
+        border: 1px solid var(--md-sys-color-outline);
         cursor: pointer;
-        transition: all 0.2s;
       }
-      .chip.selected {
+      .chip[aria-pressed="true"] {
         background: var(--md-sys-color-secondary-container);
         color: var(--md-sys-color-on-secondary-container);
         border-color: transparent;
       }
 
-      /* Form inputs */
-      .field-input {
-        width: 100%;
-        padding: 12px 16px;
-        background: var(--md-sys-color-surface-container-lowest);
-        border: 1px solid var(--md-sys-color-outline);
-        border-radius: var(--md-sys-shape-corner-small);
-        color: var(--md-sys-color-on-surface);
-        font-size: 14px;
-        outline: none;
-        transition: border 0.2s;
-        margin-top: 6px;
+      label {
+        display: block;
+        margin-top: 16px;
+        font-size: var(--md-sys-typescale-body-small-size);
+        line-height: var(--md-sys-typescale-body-small-line-height);
+        color: var(--md-sys-color-on-surface-variant);
       }
-      .field-input:focus {
-        border: 2px solid var(--md-sys-color-primary);
+      input[type="text"] {
+        width: 100%;
+        min-height: 56px;
+        margin-top: 4px;
+        padding: 0 16px;
+        background: transparent;
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: var(--md-sys-shape-corner-extra-small);
+        color: var(--md-sys-color-on-surface);
+        font: inherit;
+        font-size: var(--md-sys-typescale-body-large-size);
+      }
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--md-sys-color-primary);
+        box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
+      }
+
+      .type-sample {
+        margin-top: 16px;
+      }
+      .type-sample span {
+        display: block;
+        font-size: var(--md-sys-typescale-label-small-size);
+        line-height: var(--md-sys-typescale-label-small-line-height);
+        font-weight: var(--md-sys-typescale-label-small-weight);
+        color: var(--md-sys-color-primary);
+      }
+
+      .elevation {
+        display: grid;
+        place-items: center;
+        min-height: 88px;
+        border-radius: var(--md-sys-shape-corner-medium);
+        background: var(--md-sys-color-surface-container-low);
+        color: var(--md-sys-color-on-surface);
+      }
+
+      .track {
+        position: relative;
+        height: 48px;
+        margin-top: 16px;
+        border-radius: var(--md-sys-shape-corner-full);
+        background: var(--md-sys-color-surface-container-highest);
+      }
+      .dot {
+        position: absolute;
+        inset-block: 4px;
+        inset-inline-start: 4px;
+        width: 40px;
+        border-radius: var(--md-sys-shape-corner-full);
+        background: var(--md-sys-color-primary);
+        transition: inset-inline-start var(--md-sys-motion-duration-long2)
+          var(--md-sys-motion-easing-emphasized-decelerate);
+      }
+      .track[data-on] .dot {
+        inset-inline-start: calc(100% - 44px);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .dot,
+        body,
+        .btn,
+        .btn::after {
+          transition: none;
+        }
       }
     </style>
   </head>
   <body>
     <header>
-      <div class="logo-container">
-        <div class="logo-badge">M3</div>
-        <div class="header-titles">
-          <h1>Google Material Design 3 — Real-Time Design System</h1>
-          <p>Aphrody M3 Framework & Dynamic HCT Compiler</p>
-        </div>
+      <div>
+        <h1>Material 3 token gallery</h1>
+        <p>Generated by crates/aphrody-m3-tokens: roles, shape, type, elevation and motion.</p>
       </div>
-      <div class="top-actions">
-        <button
-          class="btn btn-tonal"
-          id="theme-toggle"
-          onclick="toggleDarkTheme()"
-        >
-          Mode Sombre
-        </button>
-        <a href="/" class="btn btn-filled">Retour App Desktop</a>
-      </div>
+      <button class="btn btn-tonal" id="scheme-toggle" type="button" aria-pressed="false">Dark scheme</button>
     </header>
 
-    <nav class="nav-tabs">
-      <button class="nav-tab active" onclick="showTab('color-tab')">
-        Couleur Dynamique & HCT
-      </button>
-      <button class="nav-tab" onclick="showTab('components-tab')">
-        Composants M3
-      </button>
-      <button class="nav-tab" onclick="showTab('typescale-tab')">
-        Typographie (Google Sans Flex)
-      </button>
-      <button class="nav-tab" onclick="showTab('motion-tab')">
-        Physique & Motion
-      </button>
-      <button class="nav-tab" onclick="showTab('compiler-tab')">
-        Compilateur IA M3 (Gemini)
-      </button>
+    <nav role="tablist" aria-label="Token families">
+      <button role="tab" aria-selected="true" aria-controls="color" type="button">Colour roles</button>
+      <button role="tab" aria-selected="false" aria-controls="components" type="button">Components</button>
+      <button role="tab" aria-selected="false" aria-controls="type" type="button">Type scale</button>
+      <button role="tab" aria-selected="false" aria-controls="elevation" type="button">Elevation</button>
+      <button role="tab" aria-selected="false" aria-controls="motion" type="button">Motion</button>
     </nav>
 
     <main>
-      <!-- TAB 1: DYNAMIC COLOR & HCT -->
-      <div id="color-tab" class="tab-content active">
-        <h2>Studio de Couleur Dynamique Material 3</h2>
-        <p
-          style="
-            color: var(--md-sys-color-on-surface-variant);
-            font-size: 14px;
-            margin-top: 4px;
-          "
-        >
-          Algorithme officiel Google HCT (Hue, Chroma, Tone) générant les 36
-          rôles systèmes et les 13 palettes tonales.
-        </p>
+      <section id="color" role="tabpanel">
+        <h2>Colour roles</h2>
+        <p class="lead">Each tile pairs a container role with its on-role, read from tokens.css.</p>
+        <div class="swatches" id="swatches"></div>
+      </section>
 
-        <div class="seed-picker-row">
-          <span style="font-size: 13px; font-weight: 600"
-            >Sélectionner une graine de couleur :</span
-          >
-          <div
-            class="seed-chip active"
-            style="background: #6750a4"
-            title="Baseline Purple"
-            onclick="setSeed('#6750A4', this)"
-          ></div>
-          <div
-            class="seed-chip"
-            style="background: #1a73e8"
-            title="Google Blue"
-            onclick="setSeed('#1A73E8', this)"
-          ></div>
-          <div
-            class="seed-chip"
-            style="background: #0f9d58"
-            title="Emerald Green"
-            onclick="setSeed('#0F9D58', this)"
-          ></div>
-          <div
-            class="seed-chip"
-            style="background: #d93025"
-            title="Crimson Red"
-            onclick="setSeed('#D93025', this)"
-          ></div>
-          <div
-            class="seed-chip"
-            style="background: #f4b400"
-            title="Golden Amber"
-            onclick="setSeed('#F4B400', this)"
-          ></div>
-          <input
-            type="color"
-            id="custom-seed-picker"
-            value="#6750A4"
-            style="
-              cursor: pointer;
-              width: 36px;
-              height: 36px;
-              border: none;
-              background: none;
-            "
-            onchange="setSeed(this.value, null)"
-          />
-          <span
-            id="active-hex-label"
-            style="
-              font-family: monospace;
-              font-size: 14px;
-              font-weight: 600;
-              margin-left: 8px;
-            "
-            >#6750A4</span
-          >
-        </div>
-
-        <h3 style="margin-top: 24px">36 Rôles de Couleur Système</h3>
-        <div class="color-swatch-grid" id="roles-grid">
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-primary);
-              color: var(--md-sys-color-on-primary);
-            "
-          >
-            <span>Primary</span><span>Action principale</span>
+      <section id="components" role="tabpanel" hidden>
+        <h2>Components</h2>
+        <p class="lead">Buttons, chips and a text field bound to system roles and state layers.</p>
+        <div class="grid">
+          <div class="card">
+            <h3>Buttons</h3>
+            <div class="stack">
+              <button class="btn btn-filled" type="button">Filled</button>
+              <button class="btn btn-tonal" type="button">Filled tonal</button>
+              <button class="btn btn-outlined" type="button">Outlined</button>
+            </div>
           </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-primary-container);
-              color: var(--md-sys-color-on-primary-container);
-            "
-          >
-            <span>Primary Container</span><span>Surfaces d'accent</span>
+          <div class="card">
+            <h3>Filter chips</h3>
+            <div class="chips" id="chips">
+              <button class="chip" type="button" aria-pressed="true">Selected</button>
+              <button class="chip" type="button" aria-pressed="false">Option</button>
+              <button class="chip" type="button" aria-pressed="false">Option</button>
+            </div>
           </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-secondary);
-              color: var(--md-sys-color-on-secondary);
-            "
-          >
-            <span>Secondary</span><span>Éléments d'appui</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-secondary-container);
-              color: var(--md-sys-color-on-secondary-container);
-            "
-          >
-            <span>Secondary Container</span><span>Filtres & badges</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-tertiary);
-              color: var(--md-sys-color-on-tertiary);
-            "
-          >
-            <span>Tertiary</span><span>Équilibre visuel</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-tertiary-container);
-              color: var(--md-sys-color-on-tertiary-container);
-            "
-          >
-            <span>Tertiary Container</span><span>Alertes & contraste</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-surface-container);
-              color: var(--md-sys-color-on-surface);
-            "
-          >
-            <span>Surface Container</span><span>Cartes & volets</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-surface-container-high);
-              color: var(--md-sys-color-on-surface);
-            "
-          >
-            <span>Surface High</span><span>Surélévation N2</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-surface-container-highest);
-              color: var(--md-sys-color-on-surface);
-            "
-          >
-            <span>Surface Highest</span><span>Surélévation N3</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-error);
-              color: var(--md-sys-color-on-error);
-            "
-          >
-            <span>Error</span><span>Validation</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-outline);
-              color: var(--md-sys-color-surface);
-            "
-          >
-            <span>Outline</span><span>Bordures 1dp</span>
-          </div>
-          <div
-            class="color-swatch"
-            style="
-              background: var(--md-sys-color-outline-variant);
-              color: var(--md-sys-color-on-surface);
-            "
-          >
-            <span>Outline Variant</span><span>Séparateurs</span>
+          <div class="card">
+            <h3>Text field</h3>
+            <label for="field">Label</label>
+            <input id="field" type="text" placeholder="Type here" />
           </div>
         </div>
+      </section>
 
-        <h3 style="margin-top: 32px">Export Tokens CSS & Tailwind v4</h3>
-        <pre class="code-box" id="css-export-box">
-/* Tokens générés en temps réel par aphrody-m3-tokens (Rust MCU) */
-:root {
-  --md-sys-color-primary: #6750A4;
-  --md-sys-color-on-primary: #FFFFFF;
-  --md-sys-color-primary-container: #EADDFF;
-  --md-sys-color-on-primary-container: #21005D;
-  --md-sys-color-surface: #FEF7FF;
-  --md-sys-color-on-surface: #1D1B20;
-}</pre>
-      </div>
+      <section id="type" role="tabpanel" hidden>
+        <h2>Type scale</h2>
+        <p class="lead">The fifteen M3 styles, each set entirely from its typescale tokens.</p>
+        <div class="card" id="type-samples" style="margin-top: 20px"></div>
+      </section>
 
-      <!-- TAB 2: COMPONENTS -->
-      <div id="components-tab" class="tab-content">
-        <h2>Galerie de Composants Material 3</h2>
-        <p
-          style="
-            color: var(--md-sys-color-on-surface-variant);
-            font-size: 14px;
-            margin-top: 4px;
-          "
-        >
-          Composants conformes aux spécifications Google Design Material You.
-        </p>
+      <section id="elevation" role="tabpanel" hidden>
+        <h2>Elevation</h2>
+        <p class="lead">Levels 0 to 5 from the shadow role.</p>
+        <div class="grid" id="elevations"></div>
+      </section>
 
-        <div class="grid-cards">
-          <div class="card">
-            <div class="card-title">Boutons & Actions</div>
-            <div class="card-subtitle">5 niveaux d'emphase M3</div>
-            <div style="display: flex; flex-direction: column; gap: 12px">
-              <button class="btn btn-filled">Filled Button</button>
-              <button class="btn btn-tonal">Filled Tonal</button>
-              <button class="btn btn-outlined">Outlined Button</button>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">Chips & Filtres</div>
-            <div class="card-subtitle">Assist, Filter & Input</div>
-            <div class="chip-group">
-              <span class="chip selected">Filtre Actif ✓</span>
-              <span class="chip">Option 1</span>
-              <span class="chip">Option 2</span>
-              <span class="chip">Tag Rapide ✕</span>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">Champs de Texte</div>
-            <div class="card-subtitle">Outlined & Active States</div>
-            <label
-              style="
-                font-size: 12px;
-                font-weight: 600;
-                color: var(--md-sys-color-primary);
-              "
-              >Recherche ou Valeur</label
-            >
-            <input
-              type="text"
-              class="field-input"
-              placeholder="Saisir du texte..."
-              value="Exemple de valeur M3"
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: TYPOGRAPHY -->
-      <div id="typescale-tab" class="tab-content">
-        <h2>Échelle Typographique (Google Sans Flex)</h2>
-        <p
-          style="
-            color: var(--md-sys-color-on-surface-variant);
-            font-size: 14px;
-            margin-top: 4px;
-          "
-        >
-          15 rôles standardisés avec variation de graisse et d'interlettrage.
-        </p>
-
-        <div
-          style="
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-          "
-        >
-          <div class="card">
-            <span
-              style="
-                font-size: 11px;
-                text-transform: uppercase;
-                color: var(--md-sys-color-primary);
-                font-weight: 700;
-              "
-              >Display Large (57px / 64px)</span
-            >
-            <div
-              style="
-                font-size: 57px;
-                font-weight: 400;
-                line-height: 64px;
-                letter-spacing: -0.25px;
-              "
-            >
-              Grand Titre Expressif
-            </div>
-          </div>
-          <div class="card">
-            <span
-              style="
-                font-size: 11px;
-                text-transform: uppercase;
-                color: var(--md-sys-color-primary);
-                font-weight: 700;
-              "
-              >Headline Medium (28px / 36px)</span
-            >
-            <div style="font-size: 28px; font-weight: 400; line-height: 36px">
-              Titre de Section M3
-            </div>
-          </div>
-          <div class="card">
-            <span
-              style="
-                font-size: 11px;
-                text-transform: uppercase;
-                color: var(--md-sys-color-primary);
-                font-weight: 700;
-              "
-              >Title Medium (16px / 24px)</span
-            >
-            <div
-              style="
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 24px;
-                letter-spacing: 0.15px;
-              "
-            >
-              Titre de Carte ou Volet
-            </div>
-          </div>
-          <div class="card">
-            <span
-              style="
-                font-size: 11px;
-                text-transform: uppercase;
-                color: var(--md-sys-color-primary);
-                font-weight: 700;
-              "
-              >Body Large (16px / 24px)</span
-            >
-            <div
-              style="
-                font-size: 16px;
-                font-weight: 400;
-                line-height: 24px;
-                letter-spacing: 0.5px;
-              "
-            >
-              Corps de texte principal optimisé pour la lisibilité sur écrans
-              denses.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 4: MOTION & PHYSICS -->
-      <div id="motion-tab" class="tab-content">
-        <h2>Physique & Dynamique de Mouvement M3</h2>
-        <p
-          style="
-            color: var(--md-sys-color-on-surface-variant);
-            font-size: 14px;
-            margin-top: 4px;
-          "
-        >
-          Transitions à base de ressorts amortis (spring interpolation) et
-          courbes d'accélération/décélération.
-        </p>
-
-        <div class="grid-cards">
-          <div class="card">
-            <div class="card-title">Courbes d'Accélération M3</div>
-            <div class="card-subtitle">Emphasized Decelerate</div>
-            <pre class="code-box">cubic-bezier(0.05, 0.7, 0.1, 1)</pre>
-            <div style="margin-top: 16px">
-              <button class="btn btn-filled" onclick="animateBox()">
-                Tester le Mouvement
-              </button>
-            </div>
-            <div
-              id="animated-box"
-              style="
-                margin-top: 16px;
-                width: 48px;
-                height: 48px;
-                background: var(--md-sys-color-primary);
-                border-radius: 12px;
-                transition: transform 500ms cubic-bezier(0.05, 0.7, 0.1, 1);
-              "
-            ></div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">Paramètres de Ressort (Springs)</div>
-            <div class="card-subtitle">Zero-Overshoot Damping</div>
-            <div
-              style="
-                font-size: 13px;
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-              "
-            >
-              <div>
-                <strong>Spatial :</strong> Raideur 220, Amortissement 0.9
-              </div>
-              <div>
-                <strong>Effets :</strong> Raideur 180, Amortissement 1.0
-                (Critique)
-              </div>
-              <div>
-                <strong>Rapide :</strong> Raideur 350, Amortissement 1.0
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 5: COMPILER IA -->
-      <div id="compiler-tab" class="tab-content">
-        <h2>Compilateur de Design IA M3 (Gemini Web)</h2>
-        <p
-          style="
-            color: var(--md-sys-color-on-surface-variant);
-            font-size: 14px;
-            margin-top: 4px;
-          "
-        >
-          Transforme une consigne textuelle en arbre de composants React M3 et
-          tokens CSS en temps réel.
-        </p>
-
+      <section id="motion" role="tabpanel" hidden>
+        <h2>Motion</h2>
+        <p class="lead">A long2 duration on the emphasized-decelerate easing.</p>
         <div class="card" style="margin-top: 20px">
-          <label style="font-size: 13px; font-weight: 600"
-            >Consigne de Design (Brief M3) :</label
-          >
-          <textarea
-            id="compiler-prompt"
-            class="field-input"
-            rows="3"
-            style="resize: vertical"
-          >
-Tableau de bord d'analyse moderne avec thème bleu profond, cartes denses et volet latéral</textarea>
-          <div
-            style="
-              margin-top: 14px;
-              display: flex;
-              gap: 12px;
-              align-items: center;
-            "
-          >
-            <button class="btn btn-filled" onclick="compileDesign()">
-              Compiler avec le Moteur M3
-            </button>
-            <span
-              id="compiler-status"
-              style="
-                font-size: 13px;
-                color: var(--md-sys-color-on-surface-variant);
-              "
-            ></span>
-          </div>
+          <button class="btn btn-filled" id="move" type="button">Move</button>
+          <div class="track" id="track"><div class="dot"></div></div>
         </div>
-
-        <div id="compiler-results" style="display: none; margin-top: 24px">
-          <h3>Résultats de Génération & Critique M3</h3>
-          <div
-            id="critique-scores"
-            style="display: flex; gap: 12px; margin: 14px 0; flex-wrap: wrap"
-          ></div>
-          <pre
-            class="code-box"
-            id="compiled-code-box"
-            style="max-height: 400px"
-          ></pre>
-        </div>
-      </div>
+      </section>
     </main>
 
     <script>
-      function toggleDarkTheme() {
-        const html = document.documentElement;
-        const isDark = html.getAttribute("data-theme") === "dark";
-        html.setAttribute("data-theme", isDark ? "light" : "dark");
-        document.getElementById("theme-toggle").textContent = isDark
-          ? "Mode Sombre"
-          : "Mode Clair";
+      const ROLES = [
+        ["primary", "on-primary"],
+        ["primary-container", "on-primary-container"],
+        ["secondary", "on-secondary"],
+        ["secondary-container", "on-secondary-container"],
+        ["tertiary", "on-tertiary"],
+        ["tertiary-container", "on-tertiary-container"],
+        ["error", "on-error"],
+        ["error-container", "on-error-container"],
+        ["surface", "on-surface"],
+        ["surface-container-lowest", "on-surface"],
+        ["surface-container-low", "on-surface"],
+        ["surface-container", "on-surface"],
+        ["surface-container-high", "on-surface"],
+        ["surface-container-highest", "on-surface"],
+        ["surface-variant", "on-surface-variant"],
+        ["inverse-surface", "inverse-on-surface"],
+        ["outline", "surface"],
+        ["outline-variant", "on-surface"],
+      ];
+      const STYLES = ["display", "headline", "title", "body", "label"].flatMap(group =>
+        ["large", "medium", "small"].map(size => `${group}-${size}`),
+      );
+
+      const swatches = document.getElementById("swatches");
+      for (const [role, on] of ROLES) {
+        const tile = document.createElement("div");
+        tile.className = "swatch";
+        tile.style.background = `var(--md-sys-color-${role})`;
+        tile.style.color = `var(--md-sys-color-${on})`;
+        tile.innerHTML = `<span>${role}</span><code>${on}</code>`;
+        swatches.append(tile);
       }
 
-      function showTab(tabId) {
-        document
-          .querySelectorAll(".tab-content")
-          .forEach((el) => el.classList.remove("active"));
-        document
-          .querySelectorAll(".nav-tab")
-          .forEach((el) => el.classList.remove("active"));
-        document.getElementById(tabId).classList.add("active");
-        event.target.classList.add("active");
+      const samples = document.getElementById("type-samples");
+      for (const style of STYLES) {
+        const sample = document.createElement("div");
+        sample.className = "type-sample";
+        const label = document.createElement("span");
+        label.textContent = style;
+        const text = document.createElement("div");
+        text.textContent = "Material 3 type scale";
+        for (const [prop, token] of [
+          ["fontFamily", "font"],
+          ["fontSize", "size"],
+          ["lineHeight", "line-height"],
+          ["letterSpacing", "tracking"],
+          ["fontWeight", "weight"],
+        ])
+          text.style[prop] = `var(--md-sys-typescale-${style}-${token})`;
+        sample.append(label, text);
+        samples.append(sample);
       }
 
-      function setSeed(hex, el) {
-        document.getElementById("active-hex-label").textContent = hex;
-        document.documentElement.style.setProperty(
-          "--md-sys-color-primary",
-          hex,
+      const elevations = document.getElementById("elevations");
+      for (let level = 0; level <= 5; level++) {
+        const tile = document.createElement("div");
+        tile.className = "elevation";
+        tile.style.boxShadow = `var(--md-sys-elevation-level${level})`;
+        tile.textContent = `level${level}`;
+        elevations.append(tile);
+      }
+
+      const toggle = document.getElementById("scheme-toggle");
+      const root = document.documentElement;
+      const systemDark = matchMedia("(prefers-color-scheme: dark)").matches;
+      const setDark = dark => {
+        root.classList.toggle("dark", dark);
+        root.classList.toggle("light", !dark);
+        toggle.setAttribute("aria-pressed", String(dark));
+        toggle.textContent = dark ? "Light scheme" : "Dark scheme";
+      };
+      setDark(systemDark);
+      toggle.addEventListener("click", () => setDark(!root.classList.contains("dark")));
+
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      for (const tab of tabs)
+        tab.addEventListener("click", () => {
+          for (const other of tabs) {
+            const selected = other === tab;
+            other.setAttribute("aria-selected", String(selected));
+            document.getElementById(other.getAttribute("aria-controls")).hidden = !selected;
+          }
+        });
+
+      for (const chip of document.querySelectorAll("#chips .chip"))
+        chip.addEventListener("click", () =>
+          chip.setAttribute("aria-pressed", String(chip.getAttribute("aria-pressed") !== "true")),
         );
-        if (el) {
-          document
-            .querySelectorAll(".seed-chip")
-            .forEach((c) => c.classList.remove("active"));
-          el.classList.add("active");
-        }
-        document.getElementById("css-export-box").textContent =
-          `/* Thème dynamique M3 calculé en temps réel depuis ${hex} */\n:root {\n  --md-sys-color-primary: ${hex};\n  --md-sys-color-on-primary: #FFFFFF;\n  --md-sys-color-primary-container: ${hex}33;\n}`;
-      }
 
-      function animateBox() {
-        const box = document.getElementById("animated-box");
-        const current = box.style.transform;
-        box.style.transform = current.includes("300px")
-          ? "translateX(0px)"
-          : "translateX(300px)";
-      }
-
-      async function compileDesign() {
-        const prompt = document.getElementById("compiler-prompt").value;
-        const statusEl = document.getElementById("compiler-status");
-        statusEl.textContent = "Compilation en cours...";
-
-        try {
-          const res = await fetch("/api/m3/design", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              prompt: prompt,
-              seedColor:
-                document.getElementById("active-hex-label").textContent,
-            }),
-          });
-          const data = await res.json();
-          statusEl.textContent = "Compilation réussie !";
-
-          document.getElementById("compiler-results").style.display = "block";
-          const scores = data.critique?.scores || {};
-          const scoresHtml = Object.entries(scores)
-            .map(
-              ([k, v]) => `
-          <div style="background:var(--md-sys-color-primary-container); color:var(--md-sys-color-on-primary-container); padding:8px 16px; border-radius:12px; font-size:12px; font-weight:600;">
-            ${k.toUpperCase()}: ${v}/100
-          </div>
-        `,
-            )
-            .join("");
-          document.getElementById("critique-scores").innerHTML = scoresHtml;
-
-          const tsx =
-            data.files?.find((f) => f.path.endsWith(".tsx"))?.content ||
-            "// Code généré";
-          document.getElementById("compiled-code-box").textContent = tsx;
-        } catch (err) {
-          statusEl.textContent = "Erreur: " + err.message;
-        }
-      }
+      const track = document.getElementById("track");
+      document.getElementById("move").addEventListener("click", () => track.toggleAttribute("data-on"));
     </script>
   </body>
 </html>

@@ -43,15 +43,15 @@ shadcn aliases (`var(--background)` / `var(--primary)`).
 ## Regenerate
 
 ```sh
-bun run generate                                   # tokens.css, tailwind.css, spaceui.css
+bun run generate                                   # tokens.css, tailwind.css, spaceui.css, src/brand.ts
 M3_SEED=#1a73e8 M3_VARIANT=vibrant bun run generate  # another seed / variant for tokens.css
-bun run fixture:mcu                                # refresh the Rust parity fixture
 ```
 
 The sheets are rendered in Rust (`crates/aphrody-m3-tokens/src/sheets.rs`) and reached through
-`m3Css()` of `@aphrody/bun`; this package holds no colour tables. The Rust colour science is an
-exact port of `@material/material-color-utilities` (2021 spec): `test/sheets.test.ts` and
-`cargo test -p aphrody-m3-tokens` check every role against it. `tokens.css` is the tonal-spot
+`m3Css()` of `@aphrody/bun`; this package holds no colour tables and runs no colour engine. Rust is the
+only engine (`cargo test -p aphrody-m3-tokens` holds its colour science); `test/sheets.test.ts` checks the
+committed files are its current output. `src/brand.ts` (`APHRODY_BRAND_*`) is generated from the Rust brand
+sheet (`gemini_brand.rs`). `tokens.css` is the tonal-spot
 scheme of the M3 baseline seed `#6750A4`, all 49 roles, light and dark.
 
 ## `tailwind.css` and `spaceui.css`
@@ -142,7 +142,7 @@ function App() {
 For React applications compiled into Tauri 2.0 desktop shells, this package provides seamless, zero-dependency integration helpers to manage native window styling:
 
 - **`useM3TauriThemeSync`**: A custom React hook that automatically synchronizes the M3 theme mode (light/dark) back to the Tauri native window context, allowing native context menus and dialog boxes to match your application's appearance.
-- **`M3TauriTitlebar`**: A highly polished, Material Design 3 custom titlebar component. It handles window dragging (`data-tauri-drag-region`), maximize/restore state, and window actions (minimize, maximize, close) without external library requirements, automatically hiding when the application runs in a normal web browser.
+- **`M3TauriTitlebar`**: A highly polished, Material Design 3 custom titlebar component. It handles window dragging (`data-tauri-drag-region`), maximize/restore state, and window actions (minimize, maximize, close) painted only with the generated roles and the static scale (it imports `tokens.css` and `@aphrody/m3-tokens/m3-tokens.css` itself), automatically hiding when the application runs in a normal web browser.
 
 ```tsx
 import { M3ThemeProvider } from "@aphrody/m3-theme/react";

@@ -59,7 +59,7 @@
     "access": "public"
   },
   "scripts": {
-    "generate": "bun run generate.ts && bun fmt tokens.css tailwind.css spaceui.css",
+    "generate": "bun run generate.ts && bun fmt --config ../../bun-format.json tokens.css tailwind.css spaceui.css src/brand.ts",
     "build": "bun ../../scripts/m3/build.ts build --only @aphrody/m3-theme",
     "lint": "bun lint",
     "fmt": "bun fmt .",

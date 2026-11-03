@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
+// The titlebar paints with the generated roles and the static scale (typescale, motion, state layers).
+import "@aphrody/m3-tokens/m3-tokens.css";
+import "../tokens.css";
 import React, { useEffect, useState } from "react";
 import { useM3Theme } from "./react";
 
@@ -82,18 +85,19 @@ function WindowControl({ label, onClick, danger = false, children }: WindowContr
       style={{
         background: active
           ? danger
-            ? "var(--md-sys-color-error, #ba1a1a)"
-            : "color-mix(in srgb, var(--md-sys-color-on-surface, #1b1b22) 8%, transparent)"
+            ? "var(--md-sys-color-error)"
+            : "color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), transparent)"
           : "transparent",
         border: "none",
-        color: active && danger ? "var(--md-sys-color-on-error, #ffffff)" : "inherit",
+        color: active && danger ? "var(--md-sys-color-on-error)" : "inherit",
         cursor: "pointer",
         width: "46px",
         height: "100%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        transition: "background-color 150ms ease, color 150ms ease",
+        transition:
+          "background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard), color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard)",
       }}
     >
       {children}
@@ -135,13 +139,15 @@ export function M3TauriTitlebar({ title, logo, forceShow = false, style, extraAc
         alignItems: "center",
         justifyContent: "space-between",
         height: "36px",
-        background: "var(--md-sys-color-surface-container, #f3f3fa)",
-        color: "var(--md-sys-color-on-surface, #1b1b22)",
+        background: "var(--md-sys-color-surface-container)",
+        color: "var(--md-sys-color-on-surface)",
         userSelect: "none",
-        fontFamily: "system-ui, -apple-system, sans-serif",
-        fontSize: "12px",
-        fontWeight: 500,
-        borderBottom: "1px solid var(--md-sys-color-outline-variant, #c7c6cf)",
+        fontFamily: "var(--md-sys-typescale-label-medium-font)",
+        fontSize: "var(--md-sys-typescale-label-medium-size)",
+        lineHeight: "var(--md-sys-typescale-label-medium-line-height)",
+        letterSpacing: "var(--md-sys-typescale-label-medium-tracking)",
+        fontWeight: "var(--md-sys-typescale-label-medium-weight)",
+        borderBottom: "1px solid var(--md-sys-color-outline-variant)",
         boxSizing: "border-box",
         ...style,
       }}

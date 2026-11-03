@@ -106,7 +106,7 @@
    only the M3 palette is re-declared. Automatic via prefers-color-scheme;
    force it with class="dark" on a root element. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --md-sys-color-primary: #cfbdfe;
     --md-sys-color-on-primary: #36275d;
     --md-sys-color-primary-container: #4d3d75;

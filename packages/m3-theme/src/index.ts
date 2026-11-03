@@ -9,7 +9,7 @@ export { M3_PLATFORM_CONTRACT, platformState } from "@aphrody/m3-tokens/platform
 export type { M3PlatformState } from "@aphrody/m3-tokens/platform-contract";
 export { M3_UI_CATALOG, resolveM3Layer } from "./catalog";
 export type { M3UiLayer } from "./catalog";
-export { GEMINI_BRAND_COLORS, GEMINI_BRAND_GRADIENTS, GEMINI_BRAND_SHAPES, getGeminiBrandCss } from "./brand";
+export { APHRODY_BRAND_COLORS, APHRODY_BRAND_CSS, APHRODY_BRAND_GRADIENTS, APHRODY_BRAND_SHAPES } from "./brand";
 
 /** Scheme variant names, all provided by the Rust owner (`aphrody_m3_tokens::scheme::Variant`). */
 export type SchemeVariant = "tonalSpot" | "content" | "fidelity" | "expressive" | "vibrant" | "neutral" | "monochrome";
