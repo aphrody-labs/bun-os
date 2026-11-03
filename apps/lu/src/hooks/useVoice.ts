@@ -860,7 +860,7 @@ export function useVoice() {
         // External HTTP TTS engine takes precedence when selected + configured.
         if (externalReady) {
           try {
-            const url = await synthesizeExternal(text, store.externalTtsUrl.trim(), store.externalTtsVoice || undefined);
+            const url = await synthesizeExternal(text, store.externalTtsUrl.trim(), store.externalTtsVoice || undefined, store.externalTtsUseServerDefault);
             if (stopped()) return;
             await playNeuralAudio(url);
             return;

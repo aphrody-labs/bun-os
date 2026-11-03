@@ -59,6 +59,8 @@ interface VoiceState {
   externalTtsUrl: string;
   /** Voice name passed to the external engine (e.g. "af_bella" / "alloy"). */
   externalTtsVoice: string;
+  /** Let a compatible server such as Voicebox select its default profile. */
+  externalTtsUseServerDefault: boolean;
   /** MiniMax voice for the cloud TTS endpoint (appMode 'cloud'). */
   cloudTtsVoice: string;
   /** The microphone for dictation and Voice, empty for the system default. */
@@ -104,6 +106,7 @@ interface VoiceState {
       ttsMode: "piper" | "external";
       externalTtsUrl: string;
       externalTtsVoice: string;
+      externalTtsUseServerDefault: boolean;
       cloudTtsVoice: string;
       micId: string;
       micLabel: string;
@@ -153,6 +156,7 @@ export const useVoiceStore = create<VoiceState>()(
       ttsMode: "piper",
       externalTtsUrl: "",
       externalTtsVoice: "",
+      externalTtsUseServerDefault: false,
       cloudTtsVoice: "Wise_Woman",
       micId: "",
       micLabel: "",
@@ -195,6 +199,7 @@ export const useVoiceStore = create<VoiceState>()(
           ttsMode: "piper",
           externalTtsUrl: "",
           externalTtsVoice: "",
+          externalTtsUseServerDefault: false,
           cloudTtsVoice: "Wise_Woman",
           micId: "",
       micLabel: "",
@@ -222,6 +227,7 @@ export const useVoiceStore = create<VoiceState>()(
         externalTtsUrl: state.externalTtsUrl,
         cloudTtsVoice: state.cloudTtsVoice,
         externalTtsVoice: state.externalTtsVoice,
+        externalTtsUseServerDefault: state.externalTtsUseServerDefault,
         micId: state.micId,
         micLabel: state.micLabel,
         loopStartMuted: state.loopStartMuted,

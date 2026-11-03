@@ -500,8 +500,8 @@ export async function synthesizeNeural(text: string, voice?: string): Promise<st
  * http://localhost:8880/v1/audio/speech); `voice` is that engine's voice name.
  * Returns a playable blob URL (the Rust side honors the returned audio type).
  */
-export async function synthesizeExternal(text: string, url: string, voice?: string): Promise<string> {
-  const data = await backendCall<{ audio_base64?: string; mime?: string }>("synthesize_external", { text, url, voice });
+export async function synthesizeExternal(text: string, url: string, voice?: string, serverDefaultVoice = false): Promise<string> {
+  const data = await backendCall<{ audio_base64?: string; mime?: string }>("synthesize_external", { text, url, voice, serverDefaultVoice });
   if (!data?.audio_base64) throw new Error("external TTS returned no audio");
   return base64ToBlobUrl(data.audio_base64, data.mime || "audio/wav");
 }

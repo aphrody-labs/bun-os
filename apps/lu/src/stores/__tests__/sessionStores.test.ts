@@ -148,6 +148,15 @@ describe('voiceStore', () => {
   })
 
   describe('updateVoiceSettings', () => {
+    it('keeps Voicebox server-default selection explicit and resettable', () => {
+      useVoiceStore.getState().resetVoiceDefaults()
+      expect(useVoiceStore.getState().externalTtsUseServerDefault).toBe(false)
+      useVoiceStore.getState().updateVoiceSettings({ externalTtsUseServerDefault: true })
+      expect(useVoiceStore.getState().externalTtsUseServerDefault).toBe(true)
+      useVoiceStore.getState().resetVoiceDefaults()
+      expect(useVoiceStore.getState().externalTtsUseServerDefault).toBe(false)
+    })
+
     it('partially merges settings', () => {
       useVoiceStore.getState().updateVoiceSettings({ ttsEnabled: true, ttsVoice: 'en-US' })
       expect(useVoiceStore.getState().ttsEnabled).toBe(true)

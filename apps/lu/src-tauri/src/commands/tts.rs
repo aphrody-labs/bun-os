@@ -328,6 +328,7 @@ pub async fn synthesize_external(
     text: String,
     url: String,
     voice: Option<String>,
+    server_default_voice: Option<bool>,
 ) -> Result<serde_json::Value, String> {
     let text = text.trim().to_string();
     if text.is_empty() {
@@ -344,10 +345,7 @@ pub async fn synthesize_external(
 
     // OpenAI-compatible engines require a voice. Default to OpenAI's "alloy";
     // Kokoro users set their own (e.g. "af_bella") in Settings.
-    let voice = voice
-        .map(|v| v.trim().to_string())
-        .filter(|v| !v.is_empty())
-        .unwrap_or_else(|| "alloy".to_string());
+    let voice = voice.map(|v| v.trim().to_string()).filter(|v| !v.is_empty());
 
     let client = reqwest::Client::builder()
         .user_agent(crate::app_identity::outgoing_agent!("2.0"))
@@ -356,12 +354,7 @@ pub async fn synthesize_external(
         .map_err(|e| e.to_string())?;
 
     // OpenAI-compatible TTS request body. Kokoro-FastAPI + OpenAI both accept it.
-    let body = serde_json::json!({
-        "model": "tts-1",
-        "input": text,
-        "voice": voice,
-        "response_format": "wav",
-    });
+    let body = external_speech_body(&text, voice.as_deref(), server_default_voice.unwrap_or(false));
 
     let resp = client
         .post(parsed.as_str())
@@ -397,10 +390,70 @@ pub async fn synthesize_external(
     Ok(serde_json::json!({ "audio_base64": b64, "mime": mime }))
 }
 
+/// Preserve the legacy alloy default unless the user explicitly asks the
+/// server to select its own profile (as Voicebox supports).
+fn external_speech_body(text: &str, voice: Option<&str>, server_default: bool) -> serde_json::Value {
+    let mut body = serde_json::json!({ "model": "tts-1", "input": text, "response_format": "wav" });
+    if !server_default {
+        body["voice"] = serde_json::json!(voice.unwrap_or("alloy"));
+    }
+    body
+}
+
 #[cfg(test)]
 mod voice_completeness_tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn external_voice_can_use_voicebox_profile_without_changing_legacy_default() {
+        assert_eq!(external_speech_body("hello", None, false)["voice"], "alloy");
+        assert_eq!(external_speech_body("hello", Some("named"), false)["voice"], "named");
+        let voicebox = external_speech_body("hello", None, true);
+        assert!(voicebox.get("voice").is_none());
+        assert_eq!(voicebox["model"], "tts-1");
+        assert_eq!(voicebox["response_format"], "wav");
+    }
+
+    #[tokio::test]
+    async fn voicebox_default_profile_request_reaches_the_local_speech_endpoint() {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let address = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move {
+            let (mut stream, _) = listener.accept().await.unwrap();
+            let mut request = Vec::new();
+            let mut buffer = [0u8; 4096];
+            let body_start = loop {
+                let count = stream.read(&mut buffer).await.unwrap();
+                assert_ne!(count, 0);
+                request.extend_from_slice(&buffer[..count]);
+                if let Some(offset) = request.windows(4).position(|v| v == b"\r\n\r\n") {
+                    break offset + 4;
+                }
+            };
+            let headers = String::from_utf8_lossy(&request[..body_start]);
+            let length: usize = headers.lines().find_map(|line| {
+                let (name, value) = line.split_once(':')?;
+                name.eq_ignore_ascii_case("content-length").then(|| value.trim().parse().ok()).flatten()
+            }).unwrap();
+            while request.len() < body_start + length {
+                let count = stream.read(&mut buffer).await.unwrap();
+                assert_ne!(count, 0);
+                request.extend_from_slice(&buffer[..count]);
+            }
+            let body: serde_json::Value = serde_json::from_slice(&request[body_start..body_start + length]).unwrap();
+            stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Type: audio/wav\r\nContent-Length: 4\r\nConnection: close\r\n\r\nRIFF").await.unwrap();
+            body
+        });
+        let result = synthesize_external("hello".into(), format!("http://{address}/v1/audio/speech"), None, Some(true)).await.unwrap();
+        assert_eq!(result["mime"], "audio/wav");
+        assert_eq!(result["audio_base64"], "UklGRg==");
+        let body = server.await.unwrap();
+        assert_eq!(body["model"], "tts-1");
+        assert_eq!(body["input"], "hello");
+        assert!(body.get("voice").is_none());
+    }
 
     fn voices_dir(tag: &str) -> PathBuf {
         let dir = std::env::temp_dir().join(format!("lu-tts-test-{}-{}", tag, std::process::id()));

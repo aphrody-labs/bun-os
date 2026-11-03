@@ -407,22 +407,29 @@ export function SpeechSettings() {
     </div>
     {voiceSettings.ttsMode === 'external' && (
       <div className="space-y-1.5">
+        <label htmlFor="external-tts-url" className="block text-[0.6rem] text-gray-500">Speech endpoint</label>
         <input
+          id="external-tts-url"
+          type="url"
           value={voiceSettings.externalTtsUrl}
           onChange={(e) => voiceSettings.updateVoiceSettings({ externalTtsUrl: e.target.value })}
           placeholder="http://localhost:8880/v1/audio/speech"
           spellCheck={false}
           className="w-full px-2 py-1 rounded bg-transparent border border-white/8 text-[0.65rem] text-gray-300 placeholder-gray-600 focus:outline-none focus:border-white/20"
         />
+        <InlineToggle label="Use server default voice (Voicebox)" enabled={voiceSettings.externalTtsUseServerDefault} onChange={() => voiceSettings.updateVoiceSettings({ externalTtsUseServerDefault: !voiceSettings.externalTtsUseServerDefault })} icon={<Volume2 size={11} className="text-gray-500" />} />
+        <label htmlFor="external-tts-voice" className="block text-[0.6rem] text-gray-500">Voice or profile name</label>
         <input
+          id="external-tts-voice"
           value={voiceSettings.externalTtsVoice}
           onChange={(e) => voiceSettings.updateVoiceSettings({ externalTtsVoice: e.target.value })}
+          disabled={voiceSettings.externalTtsUseServerDefault}
           placeholder="voice name (e.g. af_bella, alloy)"
           spellCheck={false}
           className="w-full px-2 py-1 rounded bg-transparent border border-white/8 text-[0.65rem] text-gray-300 placeholder-gray-600 focus:outline-none focus:border-white/20"
         />
         <p className="text-[0.55rem] text-gray-500 leading-snug">
-          Any OpenAI-compatible TTS endpoint (e.g. Kokoro-FastAPI). Used for read-aloud instead of Piper. Stays on your machine when the endpoint is local.
+          Use an OpenAI-compatible speech endpoint, such as Voicebox at http://127.0.0.1:8000/v1/audio/speech. It stays local only when the endpoint is local.
         </p>
       </div>
     )}
